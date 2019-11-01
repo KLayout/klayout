@@ -42,6 +42,7 @@ public:
   typedef polygon_layer_type::iterator polygon_iterator_type;
 
   DeepRegion ();
+  DeepRegion (const db::Region &other, DeepShapeStore &dss);
   DeepRegion (const RecursiveShapeIterator &si, DeepShapeStore &dss, double area_ratio = 0.0, size_t max_vertex_count = 0);
   DeepRegion (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool merged_semantics = true, double area_ratio = 0.0, size_t max_vertex_count = 0);
 
@@ -154,56 +155,6 @@ public:
   virtual RegionDelegate *sized (coord_type d, unsigned int mode) const;
   virtual RegionDelegate *sized (coord_type dx, coord_type dy, unsigned int mode) const;
 
-  virtual RegionDelegate *selected_outside (const Region &other) const
-  {
-    return selected_interacting_generic (other, 1, false, false);
-  }
-
-  virtual RegionDelegate *selected_not_outside (const Region &other) const
-  {
-    return selected_interacting_generic (other, 1, false, true);
-  }
-
-  virtual RegionDelegate *selected_inside (const Region &other) const
-  {
-    return selected_interacting_generic (other, -1, true, false);
-  }
-
-  virtual RegionDelegate *selected_not_inside (const Region &other) const
-  {
-    return selected_interacting_generic (other, -1, true, true);
-  }
-
-  virtual RegionDelegate *selected_interacting (const Region &other) const
-  {
-    return selected_interacting_generic (other, 0, true, false);
-  }
-
-  virtual RegionDelegate *selected_not_interacting (const Region &other) const
-  {
-    return selected_interacting_generic (other, 0, true, true);
-  }
-
-  virtual RegionDelegate *selected_interacting (const Edges &other) const
-  {
-    return selected_interacting_generic (other, false);
-  }
-
-  virtual RegionDelegate *selected_not_interacting (const Edges &other) const
-  {
-    return selected_interacting_generic (other, true);
-  }
-
-  virtual RegionDelegate *selected_overlapping (const Region &other) const
-  {
-    return selected_interacting_generic (other, 0, false, false);
-  }
-
-  virtual RegionDelegate *selected_not_overlapping (const Region &other) const
-  {
-    return selected_interacting_generic (other, 0, false, true);
-  }
-
   virtual RegionDelegate *in (const Region &other, bool invert) const;
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
@@ -235,16 +186,14 @@ private:
 
   void init ();
   void ensure_merged_polygons_valid () const;
+  const DeepLayer &merged_deep_layer () const;
   DeepLayer and_or_not_with(const DeepRegion *other, bool and_op) const;
   EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
   EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
-  RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const;
-  RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse) const;
-
-  const DeepLayer &merged_deep_layer () const
-  {
-    return m_merged_polygons;
-  }
+  virtual RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const;
+  virtual RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse) const;
+  virtual RegionDelegate *pull_generic (const Region &other, int mode, bool touching) const;
+  virtual EdgesDelegate *pull_generic (const Edges &other) const;
 
   template <class Result, class OutputContainer> OutputContainer *processed_impl (const polygon_processor<Result> &filter) const;
 };

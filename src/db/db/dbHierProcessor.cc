@@ -441,6 +441,7 @@ local_processor_cell_contexts<TS, TI, TR>::compute_results (const local_processo
 
   for (typename std::vector<std::pair<const context_key_type *, db::local_processor_cell_context<TS, TI, TR> *> >::const_iterator c = sorted_contexts.begin (); c != sorted_contexts.end (); ++c) {
 
+    proc->next ();
     ++index;
 
     if (tl::verbosity () >= proc->base_verbosity () + 20) {
@@ -1046,14 +1047,14 @@ template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::E
 
 template <class TS, class TI, class TR>
 local_processor<TS, TI, TR>::local_processor (db::Layout *layout, db::Cell *top)
-  : mp_subject_layout (layout), mp_intruder_layout (layout), mp_subject_top (top), mp_intruder_top (top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30)
+  : mp_subject_layout (layout), mp_intruder_layout (layout), mp_subject_top (top), mp_intruder_top (top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30), m_progress (0), mp_progress (0)
 {
   //  .. nothing yet ..
 }
 
 template <class TS, class TI, class TR>
 local_processor<TS, TI, TR>::local_processor (db::Layout *subject_layout, db::Cell *subject_top, const db::Layout *intruder_layout, const db::Cell *intruder_top)
-  : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), mp_subject_top (subject_top), mp_intruder_top (intruder_top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30)
+  : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), mp_subject_top (subject_top), mp_intruder_top (intruder_top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30), m_progress (0), mp_progress (0)
 {
   //  .. nothing yet ..
 }
@@ -1066,6 +1067,31 @@ std::string local_processor<TS, TI, TR>::description (const local_operation<TS, 
   } else {
     return m_description;
   }
+}
+
+template <class TS, class TI, class TR>
+void local_processor<TS, TI, TR>::next () const
+{
+  static tl::Mutex s_lock;
+  tl::MutexLocker locker (&s_lock);
+  ++m_progress;
+
+  tl::RelativeProgress *rp = dynamic_cast<tl::RelativeProgress *> (mp_progress);
+  if (rp) {
+    rp->set (m_progress);
+  }
+}
+
+template <class TS, class TI, class TR>
+size_t local_processor<TS, TI, TR>::get_progress () const
+{
+  size_t p = 0;
+  {
+    static tl::Mutex s_lock;
+    tl::MutexLocker locker (&s_lock);
+    p = m_progress;
+  }
+  return p;
 }
 
 template <class TS, class TI, class TR>
@@ -1235,7 +1261,7 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
       if (subject_cell == intruder_cell) {
 
         //  Use the same id's for same instances - this way we can easily detect same instances
-        //  and don't make the self-interacting
+        //  and don't make them self-interacting
 
         for (db::Cell::const_iterator i = subject_cell->begin (); !i.at_end (); ++i) {
           unsigned int iid = ++id;
@@ -1327,7 +1353,11 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
               db::ICplxTrans tk = (*j)->complex_trans (*k);
               //  NOTE: no self-interactions
               if (i->first != *j || tn != tk) {
-                intruders_below.first.insert (db::CellInstArray (db::CellInst ((*j)->object ().cell_index ()), tni * tk));
+                //  optimize the intruder instance so it will be as low as possible
+                std::pair<bool, db::CellInstArray> ei = effective_instance (contexts, i->first->object ().cell_index (), (*j)->object ().cell_index (), tni * tk, dist);
+                if (ei.first) {
+                  intruders_below.first.insert (ei.second);
+                }
               }
             }
           }
@@ -1342,6 +1372,64 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
     }
 
   }
+
+}
+
+/**
+ *  @brief Returns a cell instance array suitable for adding as intruder
+ *
+ *  The given intruder cell with the transformation ti2s - which transforms the intruder instance into
+ *  the coordinate system of the subject cell - is analysed and either this instance or a sub-instance
+ *  is chosen.
+ *  Sub-instances are chosen if the intruder cell does not have shapes which interact with the subject
+ *  cell and there is exactly one sub-instance interacting with the subject cell.
+ */
+template <class TS, class TI, class TR>
+std::pair<bool, db::CellInstArray>
+local_processor<TS, TI, TR>::effective_instance (local_processor_contexts<TS, TI, TR> &contexts, db::cell_index_type subject_cell_index, db::cell_index_type intruder_cell_index, const db::ICplxTrans &ti2s, db::Coord dist) const
+{
+  db::Box bbox = safe_box_enlarged (mp_subject_layout->cell (subject_cell_index).bbox (contexts.subject_layer ()), dist - 1, dist - 1);
+  if (bbox.empty ()) {
+    //  should not happen, but skip if it does
+    return std::make_pair (false, db::CellInstArray ());
+  }
+
+  db::Box ibbox = bbox.transformed (ti2s.inverted ());
+
+  const db::Cell &intruder_cell = mp_intruder_layout->cell (intruder_cell_index);
+  const db::Shapes &intruder_shapes = intruder_cell.shapes (contexts.intruder_layer ());
+  if (! intruder_shapes.empty () && ! intruder_shapes.begin_touching (ibbox, db::ShapeIterator::All).at_end ()) {
+    return std::make_pair (true, db::CellInstArray (db::CellInst (intruder_cell_index), ti2s));
+  }
+
+  db::box_convert <db::CellInst, true> inst_bcii (*mp_intruder_layout, contexts.intruder_layer ());
+
+  size_t ni = 0;
+  db::cell_index_type eff_cell_index = 0;
+  db::ICplxTrans eff_trans;
+
+  for (db::Cell::touching_iterator i = intruder_cell.begin_touching (ibbox); ! i.at_end() && ni < 2; ++i) {
+    const db::CellInstArray &ci = i->cell_inst ();
+    db::Box cbox = mp_intruder_layout->cell (ci.object ().cell_index ()).bbox (contexts.intruder_layer ());
+    for (db::CellInstArray::iterator k = ci.begin_touching (ibbox, inst_bcii); ! k.at_end () && ni < 2; ++k) {
+      db::ICplxTrans tk = ci.complex_trans (*k);
+      if (ibbox.overlaps (cbox.transformed (tk))) {
+        eff_trans = tk;
+        eff_cell_index = ci.object ().cell_index ();
+        ++ni;
+      }
+    }
+  }
+
+  if (ni == 0) {
+    //  should not happen, but skip if it does
+    return std::make_pair (false, db::CellInstArray ());
+  } else if (ni == 1) {
+    //  one instance - dive down
+    return effective_instance (contexts, subject_cell_index, eff_cell_index, ti2s * eff_trans, dist);
+  } else {
+    return std::make_pair (true, db::CellInstArray (db::CellInst (intruder_cell_index), ti2s));
+  }
 }
 
 template <class TS, class TI, class TR>
@@ -1353,6 +1441,16 @@ local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, T
   //  avoids updates while we work on the layout
   mp_subject_layout->update ();
   db::LayoutLocker layout_update_locker (mp_subject_layout);
+
+  //  prepare a progress for the computation tasks
+  size_t comp_effort = 0;
+  for (typename local_processor_contexts<TS, TI, TR>::iterator c = contexts.begin (); c != contexts.end (); ++c) {
+    comp_effort += c->second.size ();
+  }
+
+  tl::RelativeProgress progress (description (op), comp_effort, 1);
+  m_progress = 0;
+  mp_progress = 0;
 
   if (m_nthreads > 0) {
 
@@ -1409,22 +1507,44 @@ local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, T
       }
 
       if (rc_job.get ()) {
-        rc_job->start ();
-        rc_job->wait ();
+
+        try {
+
+          rc_job->start ();
+          while (! rc_job->wait (10)) {
+            progress.set (get_progress ());
+          }
+
+        } catch (...) {
+          rc_job->terminate ();
+          throw;
+        }
+
       }
 
     }
 
   } else {
 
-    for (db::Layout::bottom_up_const_iterator bu = mp_subject_layout->begin_bottom_up (); bu != mp_subject_layout->end_bottom_up (); ++bu) {
+    try {
 
-      typename local_processor_contexts<TS, TI, TR>::iterator cpc = contexts.context_map ().find (&mp_subject_layout->cell (*bu));
-      if (cpc != contexts.context_map ().end ()) {
-        cpc->second.compute_results (contexts, cpc->first, op, output_layer, this);
-        contexts.context_map ().erase (cpc);
+      mp_progress = &progress;
+
+      for (db::Layout::bottom_up_const_iterator bu = mp_subject_layout->begin_bottom_up (); bu != mp_subject_layout->end_bottom_up (); ++bu) {
+
+        typename local_processor_contexts<TS, TI, TR>::iterator cpc = contexts.context_map ().find (&mp_subject_layout->cell (*bu));
+        if (cpc != contexts.context_map ().end ()) {
+          cpc->second.compute_results (contexts, cpc->first, op, output_layer, this);
+          contexts.context_map ().erase (cpc);
+        }
+
       }
 
+      mp_progress = 0;
+
+    } catch (...) {
+      mp_progress = 0;
+      throw;
     }
 
   }
@@ -1616,9 +1736,11 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
 template class DB_PUBLIC local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor<db::PolygonRef, db::Edge, db::PolygonRef>;
+template class DB_PUBLIC local_processor<db::PolygonRef, db::Edge, db::Edge>;
 template class DB_PUBLIC local_processor<db::PolygonRef, db::PolygonRef, db::EdgePair>;
 template class DB_PUBLIC local_processor<db::Edge, db::Edge, db::Edge>;
 template class DB_PUBLIC local_processor<db::Edge, db::PolygonRef, db::Edge>;
+template class DB_PUBLIC local_processor<db::Edge, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor<db::Edge, db::Edge, db::EdgePair>;
 
 }

@@ -784,6 +784,15 @@ TEST(14_Interacting)
   db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
   db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
   db::Region r6 (db::RecursiveShapeIterator (ly, top_cell, l6), dss);
+  db::Region r1f (db::RecursiveShapeIterator (ly, top_cell, l1));
+  db::Region r2f (db::RecursiveShapeIterator (ly, top_cell, l2));
+  db::Region r6f (db::RecursiveShapeIterator (ly, top_cell, l6));
+  db::Region r1r = r1;
+  r1r.set_merged_semantics (false);
+  db::Region r2r = r2;
+  r2r.set_merged_semantics (false);
+  db::Region r6r = r6;
+  r6r.set_merged_semantics (false);
 
   {
     db::Layout target;
@@ -807,13 +816,57 @@ TEST(14_Interacting)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (26, 0)), r6.selected_overlapping (r1));
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (27, 0)), r6.selected_not_overlapping (r1));
 
-    EXPECT_EQ (r2.selected_interacting (r1).is_merged (), true);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), r2.selected_interacting (r1f));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), r2.selected_not_interacting (r1f));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 0)), r2.selected_inside (r1f));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (33, 0)), r2.selected_not_inside (r1f));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (34, 0)), r2.selected_outside (r1f));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (35, 0)), r2.selected_not_outside (r1f));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (36, 0)), r2.selected_overlapping (r1f));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (37, 0)), r2.selected_not_overlapping (r1f));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), r6.selected_interacting (r1f));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), r6.selected_not_interacting (r1f));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 0)), r6.selected_inside (r1f));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (43, 0)), r6.selected_not_inside (r1f));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (44, 0)), r6.selected_outside (r1f));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (45, 0)), r6.selected_not_outside (r1f));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (46, 0)), r6.selected_overlapping (r1f));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (47, 0)), r6.selected_not_overlapping (r1f));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (50, 0)), r2r.selected_interacting (r1r));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (51, 0)), r2r.selected_not_interacting (r1r));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (52, 0)), r2r.selected_inside (r1r));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (53, 0)), r2r.selected_not_inside (r1r));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (54, 0)), r2r.selected_outside (r1r));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (55, 0)), r2r.selected_not_outside (r1r));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (56, 0)), r2r.selected_overlapping (r1r));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (57, 0)), r2r.selected_not_overlapping (r1r));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (60, 0)), r6r.selected_interacting (r1r));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (61, 0)), r6r.selected_not_interacting (r1r));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (62, 0)), r6r.selected_inside (r1r));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (63, 0)), r6r.selected_not_inside (r1r));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (64, 0)), r6r.selected_outside (r1r));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (65, 0)), r6r.selected_not_outside (r1r));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (66, 0)), r6r.selected_overlapping (r1r));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (67, 0)), r6r.selected_not_overlapping (r1r));
+
+    EXPECT_EQ (r2.selected_interacting (r1).is_merged (), false);
+    EXPECT_EQ (r2.selected_interacting (r1.merged ()).is_merged (), true);
+    EXPECT_EQ (r2.selected_inside (r1).is_merged (), true);
+    EXPECT_EQ (r2r.selected_interacting (r1).is_merged (), false);
+    EXPECT_EQ (r2.selected_interacting (r1r).is_merged (), false);
+    EXPECT_EQ (r2r.selected_interacting (r1r).is_merged (), false);
 
     CHECKPOINT();
     db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au14a.gds");
   }
 
   db::Edges r1e = r1.edges ();
+  db::Edges r1ef = r1f.edges ();
+  db::Edges r1er = r1r.edges ();
+  r1er.set_merged_semantics (false);
 
   {
     db::Layout target;
@@ -823,8 +876,15 @@ TEST(14_Interacting)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1e);
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r6.selected_interacting (r1e));
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), r6.selected_not_interacting (r1e));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), r6.selected_interacting (r1ef));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 0)), r6.selected_not_interacting (r1ef));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 0)), r6r.selected_interacting (r1er));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (33, 0)), r6r.selected_not_interacting (r1er));
 
     EXPECT_EQ (r6.selected_interacting (r1e).is_merged (), true);
+    EXPECT_EQ (r6.selected_interacting (r1er).is_merged (), false);
+    EXPECT_EQ (r6r.selected_interacting (r1e).is_merged (), false);
+    EXPECT_EQ (r6r.selected_interacting (r1er).is_merged (), false);
 
     CHECKPOINT();
     db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au14b.gds");
@@ -856,7 +916,6 @@ TEST(15_Filtered)
   db::Region af1_else = r1.filtered (af1inv);
   EXPECT_EQ (af1_filtered.is_merged (), true);
   EXPECT_EQ (af1_else.is_merged (), true);
-
 
   {
     db::Layout target;
@@ -1283,6 +1342,116 @@ TEST(24_TextsFromDeep)
   }
 }
 
+TEST(25_Pull)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l6 = ly.get_layer (db::LayerProperties (6, 0));
+
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+  db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+  db::Region r6 (db::RecursiveShapeIterator (ly, top_cell, l6), dss);
+  db::Region r1f (db::RecursiveShapeIterator (ly, top_cell, l1));
+  db::Region r2f (db::RecursiveShapeIterator (ly, top_cell, l2));
+  db::Region r6f (db::RecursiveShapeIterator (ly, top_cell, l6));
+  db::Region r1r = r1;
+  r1r.set_merged_semantics (false);
+  db::Region r2r = r2;
+  r2r.set_merged_semantics (false);
+  db::Region r6r = r6;
+  r6r.set_merged_semantics (false);
+
+  {
+    db::Layout target;
+    unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1.pull_interacting (r2));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1.pull_inside (r2));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r1.pull_overlapping (r2));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r2.pull_interacting (r6));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r2.pull_inside (r6));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), r2.pull_overlapping (r6));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), r1.pull_interacting (r2f));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), r1.pull_inside (r2f));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 0)), r1.pull_overlapping (r2f));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), r2.pull_interacting (r6f));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), r2.pull_inside (r6f));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 0)), r2.pull_overlapping (r6f));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (50, 0)), r1r.pull_interacting (r2r));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (51, 0)), r1r.pull_inside (r2r));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (52, 0)), r1r.pull_overlapping (r2r));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (60, 0)), r2r.pull_interacting (r6r));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (61, 0)), r2r.pull_inside (r6r));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (62, 0)), r2r.pull_overlapping (r6r));
+
+    EXPECT_EQ (r2.pull_inside (r6).is_merged (), true);
+    EXPECT_EQ (r2.pull_interacting (r6).is_merged (), false);
+    EXPECT_EQ (r2r.pull_interacting (r6).is_merged (), false);
+    EXPECT_EQ (r2.pull_interacting (r6r).is_merged (), false);
+    EXPECT_EQ (r2r.pull_interacting (r6r).is_merged (), false);
+
+    CHECKPOINT();
+    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au25a.gds");
+  }
+
+  db::Edges r1e = r1.edges ();
+  db::Edges r1ef = r1f.edges ();
+  db::Edges r1er = r1r.edges ();
+  r1er.set_merged_semantics (false);
+
+  db::Edges r6e = r6.edges ();
+  db::Edges r6ef = r6f.edges ();
+  db::Edges r6er = r6r.edges ();
+  r6er.set_merged_semantics (false);
+
+  {
+    db::Layout target;
+    unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r6);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1e);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r6.pull_interacting (r1e));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), r6.pull_interacting (r1ef));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), r6r.pull_interacting (r1e));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (15, 0)), r6.pull_interacting (r1er));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (16, 0)), r6r.pull_interacting (r1er));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), r1.pull_interacting (r6e));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 0)), r1.pull_interacting (r6ef));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (24, 0)), r1r.pull_interacting (r6e));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (25, 0)), r1.pull_interacting (r6er));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (26, 0)), r1r.pull_interacting (r6er));
+
+    EXPECT_EQ (r6.pull_interacting (r1e).is_merged (), false);
+    EXPECT_EQ (r6.merged ().pull_interacting (r1e).is_merged (), true);
+    EXPECT_EQ (r6r.pull_interacting (r1er).is_merged (), false);
+    EXPECT_EQ (r6r.pull_interacting (r1e).is_merged (), false);
+    EXPECT_EQ (r6.pull_interacting (r1er).is_merged (), false);
+
+    CHECKPOINT();
+    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au25b.gds");
+  }
+}
+
 TEST(100_Integration)
 {
   db::Layout ly;
@@ -1433,3 +1602,4 @@ TEST(issue_277)
   r.set_min_coherence (false);  //  needs to merge again
   EXPECT_EQ (r.sized (1).merged (false, 1).to_string (), "");
 }
+

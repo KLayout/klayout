@@ -854,8 +854,40 @@ TEST(22)
   EXPECT_EQ ((e & ee).to_string (), "(400,0;-2000,0);(500,-174;400,0);(1000,0;900,-173);(4000,0;1000,0)");
 }
 
-//  GitHub issue #72 (Edges/Region NOT issue)
 TEST(23)
+{
+  db::Edges e;
+  e.insert (db::Edge (db::Point (0, 0), db::Point (0, 200)));
+  e.insert (db::Edge (db::Point (250, 200), db::Point (300, 0)));
+
+  db::Edges e2;
+  e2.insert (db::Edge (db::Point (0, 100), db::Point (100, 100)));
+
+  EXPECT_EQ (e2.pull_interacting (e).to_string (), "(0,0;0,200)");
+
+  e2.clear ();
+  e2.insert (db::Edge (db::Point (0, 100), db::Point (0, 100)));
+
+  EXPECT_EQ (e2.pull_interacting (e).to_string (), "(0,0;0,200)");
+
+  e2.clear ();
+  e2.insert (db::Edge (db::Point (100, 0), db::Point (0, 0)));
+
+  EXPECT_EQ (e2.pull_interacting (e).to_string (), "(0,0;0,200)");
+
+  e2.clear ();
+  e2.insert (db::Edge (db::Point (-100, -1), db::Point (100, -1)));
+
+  EXPECT_EQ (e2.pull_interacting (e).to_string (), "");
+
+  e2.clear ();
+  e2.insert (db::Edge (db::Point (-100, 0), db::Point (100, 0)));
+
+  EXPECT_EQ (e2.pull_interacting (e).to_string (), "(0,0;0,200)");
+}
+
+//  GitHub issue #72 (Edges/Region NOT issue)
+TEST(100)
 {
   db::Edges e;
   e.insert (db::Edge (0, 0, 0, 1000));

@@ -1287,7 +1287,7 @@ CODE
     # @brief Selects shapes or regions of self which overlap shapes from the other region
     # @synopsis layer.overlapping(other)
     # This method selects all shapes or regions from self which overlap shapes from the other
-    # region. If self is in raw mode (see \raw), coherent regions are selected from self, 
+    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
     # It returns a new layer containing the selected shapes. A version which modifies self
     # is \select_overlapping.
@@ -1308,7 +1308,7 @@ CODE
     # @brief Selects shapes or regions of self which do not overlap shapes from the other region
     # @synopsis layer.not_overlapping(other)
     # This method selects all shapes or regions from self which do not overlap shapes from the other
-    # region. If self is in raw mode (see \raw), coherent regions are selected from self, 
+    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
     #
     # The "not_overlapping" method is equivalent to the \outside method. It is provided
@@ -1324,7 +1324,7 @@ CODE
     # @brief Selects shapes or regions of self which overlap shapes from the other region
     # @synopsis layer.select_overlapping(other)
     # This method selects all shapes or regions from self which overlap shapes from the other
-    # region. If self is in raw mode (see \raw), coherent regions are selected from self, 
+    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \overlapping.
@@ -1337,7 +1337,7 @@ CODE
     # @brief Selects shapes or regions of self which do not overlap shapes from the other region
     # @synopsis layer.select_not_overlapping(other)
     # This method selects all shapes or regions from self which do not overlap shapes from the other
-    # region. If self is in raw mode (see \raw), coherent regions are selected from self, 
+    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected. 
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \not_overlapping.
@@ -1538,7 +1538,7 @@ CODE
     # @brief Selects shapes or regions of self which touch or overlap shapes from the other region
     # @synopsis layer.interacting(other)
     # This method selects all shapes or regions from self which touch or overlap shapes from the other
-    # region. If self is in raw mode (see \raw), coherent regions are selected from self, 
+    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
     # It returns a new layer containing the selected shapes. A version which modifies self
     # is \select_interacting.
@@ -1559,7 +1559,7 @@ CODE
     # @brief Selects shapes or regions of self which do not touch or overlap shapes from the other region
     # @synopsis layer.not_interacting(other)
     # This method selects all shapes or regions from self which do not touch or overlap shapes from the other
-    # region. If self is in raw mode (see \raw), coherent regions are selected from self, 
+    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
     # It returns a new layer containing the selected shapes. A version which modifies self
     # is \select_not_interacting.
@@ -1580,7 +1580,7 @@ CODE
     # @brief Selects shapes or regions of self which touch or overlap shapes from the other region
     # @synopsis layer.select_interacting(other)
     # This method selects all shapes or regions from self which touch or overlap shapes from the other
-    # region. If self is in raw mode (see \raw), coherent regions are selected from self, 
+    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \interacting.
@@ -1593,7 +1593,7 @@ CODE
     # @brief Selects shapes or regions of self which do not touch or overlap shapes from the other region
     # @synopsis layer.select_interacting(other)
     # This method selects all shapes or regions from self which do not touch or overlap shapes from the other
-    # region. If self is in raw mode (see \raw), coherent regions are selected from self, 
+    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \not_interacting.
@@ -1633,6 +1633,66 @@ CODE
     #   @/tr
     # @/table
     
+    # %DRC%
+    # @name pull_interacting
+    # @brief Selects shapes or edges of other which touch or overlap shapes from the this region
+    # @synopsis layer.pull_interacting(other)
+    # This method selects all shapes or regions from other which touch or overlap shapes from this
+    # region. Unless other is in raw mode (see \raw), coherent regions are selected from other, 
+    # otherwise individual shapes are selected.
+    #
+    # The functionality is similar to select_interacting, but chosing shapes from other rather
+    # than from self. Because in deep mode the hierarchy reference comes from self, this method
+    # provides a way to pull shapes from other to the hierarchy to self.
+    #
+    # This method will neither modify self nor other.
+    #
+    # This method is available for polygon layers. Other can be an edge or polygon layer. 
+    # Edges or polygons can be selected with respect to polygons of self.
+    
+    # %DRC%
+    # @name pull_overlapping
+    # @brief Selects shapes or regions of other which overlap shapes from the this region
+    # @synopsis layer.pull_overlapping(other)
+    # This method selects all shapes or regions from other which overlap shapes from this
+    # region. Unless other is in raw mode (see \raw), coherent regions are selected from other, 
+    # otherwise individual shapes are selected.
+    #
+    # The functionality is similar to select_overlapping, but chosing shapes from other rather
+    # than from self. Because in deep mode the hierarchy reference comes from self, this method
+    # provides a way to pull shapes from other to the hierarchy to self.
+    #
+    # This method is available for polygon layers. Other needs to be a polygon layer too.
+    
+    # %DRC%
+    # @name pull_inside
+    # @brief Selects shapes or regions of other which are inside polygons from the this region
+    # @synopsis layer.pull_inside(other)
+    # This method selects all shapes or regions from other which are inside polygons from this
+    # region. Unless other is in raw mode (see \raw), coherent regions are selected from other, 
+    # otherwise individual shapes are selected.
+    #
+    # The functionality is similar to select_inside, but chosing shapes from other rather
+    # than from self. Because in deep mode the hierarchy reference comes from self, this method
+    # provides a way to pull shapes from other to the hierarchy to self.
+    #
+    # This method is available for polygon layers. Other needs to be a polygon layer too.
+    
+    %w(pull_interacting pull_overlapping pull_inside).each do |f| 
+      eval <<"CODE"
+      def #{f}(other)
+        if :#{f} != :pull_interacting 
+          requires_region("#{f}")
+          other.requires_region("#{f}")
+        else
+          requires_edges_or_region("#{f}")
+          other.requires_edges_or_region("#{f}")
+        end
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+      end
+CODE
+    end
+
     %w(& | ^ - + interacting not_interacting overlapping not_overlapping inside not_inside outside not_outside in not_in).each do |f| 
       eval <<"CODE"
       def #{f}(other)

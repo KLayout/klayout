@@ -272,6 +272,8 @@ public:
 
   virtual EdgesDelegate *inside_part (const Region &other) const = 0;
   virtual EdgesDelegate *outside_part (const Region &other) const = 0;
+  virtual RegionDelegate *pull_interacting (const Region &) const = 0;
+  virtual EdgesDelegate *pull_interacting (const Edges &) const = 0;
   virtual EdgesDelegate *selected_interacting (const Region &other) const = 0;
   virtual EdgesDelegate *selected_not_interacting (const Region &other) const = 0;
   virtual EdgesDelegate *selected_interacting (const Edges &other) const = 0;

@@ -22,6 +22,7 @@
 
 
 #include "dbRegionUtils.h"
+#include "tlSelect.h"
 
 namespace db
 {
@@ -288,22 +289,28 @@ Poly2PolyCheckBase::enter (const db::Polygon &o1, size_t p1, const db::Polygon &
 // -------------------------------------------------------------------------------------
 //  RegionToEdgeInteractionFilterBase implementation
 
-RegionToEdgeInteractionFilterBase::RegionToEdgeInteractionFilterBase (bool inverse)
+template <class OutputType>
+region_to_edge_interaction_filter_base<OutputType>::region_to_edge_interaction_filter_base (bool inverse)
   : m_inverse (inverse)
 {
   //  .. nothing yet ..
 }
 
+template <class OutputType>
 void
-RegionToEdgeInteractionFilterBase::preset (const db::Polygon *poly)
+region_to_edge_interaction_filter_base<OutputType>::preset (const OutputType *s)
 {
-  m_seen.insert (poly);
+  m_seen.insert (s);
 }
 
+template <class OutputType>
 void
-RegionToEdgeInteractionFilterBase::add (const db::Polygon *p, size_t, const db::Edge *e, size_t)
+region_to_edge_interaction_filter_base<OutputType>::add (const db::Polygon *p, size_t, const db::Edge *e, size_t)
 {
-  if ((m_seen.find (p) == m_seen.end ()) != m_inverse) {
+  const OutputType *o = 0;
+  tl::select (o, p, e);
+
+  if ((m_seen.find (o) == m_seen.end ()) != m_inverse) {
 
     //  A polygon and an edge interact if the edge is either inside completely
     //  of at least one edge of the polygon intersects with the edge
@@ -320,23 +327,28 @@ RegionToEdgeInteractionFilterBase::add (const db::Polygon *p, size_t, const db::
 
     if (interacts) {
       if (m_inverse) {
-        m_seen.erase (p);
+        m_seen.erase (o);
       } else {
-        m_seen.insert (p);
-        put (*p);
+        m_seen.insert (o);
+        put (*o);
       }
     }
 
   }
 }
 
+template <class OutputType>
 void
-RegionToEdgeInteractionFilterBase::fill_output ()
+region_to_edge_interaction_filter_base<OutputType>::fill_output ()
 {
-  for (std::set<const db::Polygon *>::const_iterator p = m_seen.begin (); p != m_seen.end (); ++p) {
-    put (**p);
+  for (typename std::set<const OutputType *>::const_iterator s = m_seen.begin (); s != m_seen.end (); ++s) {
+    put (**s);
   }
 }
+
+//  explicit instantiations
+template class region_to_edge_interaction_filter_base<db::Polygon>;
+template class region_to_edge_interaction_filter_base<db::Edge>;
 
 }
 

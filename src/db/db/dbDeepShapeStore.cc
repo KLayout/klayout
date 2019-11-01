@@ -326,6 +326,36 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Region &region, bool for_n
   return dl;
 }
 
+DeepLayer DeepShapeStore::create_from_flat (const db::Edges &edges, const db::ICplxTrans &trans)
+{
+  //  reuse existing layer
+  std::pair<bool, DeepLayer> lff = layer_for_flat (tl::id_of (edges.delegate ()));
+  if (lff.first) {
+    return lff.second;
+  }
+
+  require_singular ();
+
+  unsigned int layer = layout ().insert_layer ();
+
+  db::Shapes *shapes = &initial_cell ().shapes (layer);
+  db::Box world = db::Box::world ();
+
+  db::EdgeBuildingHierarchyBuilderShapeReceiver eb (false);
+
+  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> ii = edges.begin_iter ();
+  db::ICplxTrans ttop = trans * ii.second;
+  while (! ii.first.at_end ()) {
+    eb.push (*ii.first, ttop * ii.first.trans (), world, 0, shapes);
+    ++ii.first;
+  }
+
+  DeepLayer dl (this, 0 /*singular layout index*/, layer);
+  m_layers_for_flat [tl::id_of (edges.delegate ())] = std::make_pair (dl.layout_index (), dl.layer ());
+  m_flat_region_id [std::make_pair (dl.layout_index (), dl.layer ())] = tl::id_of (edges.delegate ());
+  return dl;
+}
+
 std::pair<bool, DeepLayer> DeepShapeStore::layer_for_flat (const db::Region &region) const
 {
   return layer_for_flat (tl::id_of (region.delegate ()));

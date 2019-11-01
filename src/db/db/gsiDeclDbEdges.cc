@@ -316,6 +316,13 @@ static db::Region extended (const db::Edges *r, db::Coord b, db::Coord e, db::Co
   return out;
 }
 
+static db::Region pull_interacting (const db::Edges *r, const db::Region &other)
+{
+  db::Region out;
+  r->pull_interacting (out, other);
+  return out;
+}
+
 static db::Region extents2 (const db::Edges *r, db::Coord dx, db::Coord dy)
 {
   db::Region e;
@@ -913,6 +920,29 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "This method does not merge the edges before they are selected. If you want to select coherent "
     "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
+  method_ext ("pull_interacting", &pull_interacting, gsi::arg ("other"),
+    "@brief Returns all polygons of \"other\" which are interacting with (overlapping, touching) edges of this edge set\n"
+    "The \"pull_...\" methods are similar to \"select_...\" but work the opposite way: they "
+    "select shapes from the argument region rather than self. In a deep (hierarchical) context "
+    "the output region will be hierarchically aligned with self, so the \"pull_...\" methods "
+    "provide a way for rehierarchisation.\n"
+    "\n"
+    "@return The region after the polygons have been selected (from other)\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.26.1\n"
+  ) +
+  method ("pull_interacting", static_cast<db::Edges (db::Edges::*) (const db::Edges &) const> (&db::Edges::pull_interacting), gsi::arg ("other"),
+    "@brief Returns all edges of \"other\" which are interacting with polygons of this edge set\n"
+    "See the other \\pull_interacting version for more details.\n"
+    "\n"
+    "@return The edge collection after the edges have been selected (from other)\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.26.1\n"
+  ) +
   method ("inside_part", &db::Edges::inside_part, gsi::arg ("other"),
     "@brief Returns the parts of the edges of this edge collection which are inside the polygons of the region\n"
     "\n"

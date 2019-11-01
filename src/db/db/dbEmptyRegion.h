@@ -26,6 +26,7 @@
 
 #include "dbCommon.h"
 #include "dbRegionDelegate.h"
+#include "dbEmptyEdges.h"
 
 namespace db {
 
@@ -106,6 +107,10 @@ public:
   virtual RegionDelegate *selected_not_interacting (const Edges &) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_overlapping (const Region &) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_not_overlapping (const Region &) const { return new EmptyRegion (); }
+  virtual RegionDelegate *pull_inside (const Region &) const  { return new EmptyRegion (); }
+  virtual RegionDelegate *pull_interacting (const Region &) const  { return new EmptyRegion (); }
+  virtual EdgesDelegate *pull_interacting (const Edges &) const  { return new EmptyEdges (); }
+  virtual RegionDelegate *pull_overlapping (const Region &) const  { return new EmptyRegion (); }
   virtual RegionDelegate *in (const Region &, bool) const { return new EmptyRegion (); }
 
   virtual bool has_valid_polygons () const { return true; }

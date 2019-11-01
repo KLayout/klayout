@@ -191,6 +191,11 @@ void Edges::processed (Region &output, const EdgeToPolygonProcessorBase &filter)
   output.set_delegate (mp_delegate->processed_to_polygons (filter));
 }
 
+void Edges::pull_interacting (Region &output, const Region &other) const
+{
+  output = Region (mp_delegate->pull_interacting (other));
+}
+
 void Edges::extended (Region &output, coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i, bool join) const
 {
   output.set_delegate (mp_delegate->extended (ext_b, ext_e, ext_o, ext_i, join));

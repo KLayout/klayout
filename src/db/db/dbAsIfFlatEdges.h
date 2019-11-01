@@ -157,6 +157,8 @@ public:
 
   virtual RegionDelegate *extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i, bool join) const;
 
+  virtual EdgesDelegate *pull_interacting (const Edges &) const;
+  virtual RegionDelegate *pull_interacting (const Region &) const;
   virtual EdgesDelegate *selected_interacting (const Edges &) const;
   virtual EdgesDelegate *selected_not_interacting (const Edges &) const;
   virtual EdgesDelegate *selected_interacting (const Region &) const;
@@ -173,6 +175,8 @@ protected:
   void update_bbox (const db::Box &box);
   void invalidate_bbox ();
   EdgePairsDelegate *run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
+  virtual EdgesDelegate *pull_generic (const Edges &edges) const;
+  virtual RegionDelegate *pull_generic (const Region &region) const;
   virtual EdgesDelegate *selected_interacting_generic (const Edges &edges, bool inverse) const;
   virtual EdgesDelegate *selected_interacting_generic (const Region &region, bool inverse) const;
 

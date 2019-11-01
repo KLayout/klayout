@@ -391,7 +391,7 @@ TEST(10c)
   EXPECT_EQ (r.to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
 }
 
-TEST(11) 
+TEST(11)
 {
   db::Box bb[3] = { db::Box (db::Point (0, 0), db::Point (10, 10)), db::Box (), db::Box (db::Point (20, 20), db::Point (40, 50)) };
   EXPECT_EQ (db::Region (bb + 0, bb + 3).to_string (), "(0,0;0,10;10,10;10,0);(20,20;20,50;40,50;40,20)");
@@ -861,7 +861,33 @@ TEST(18c)
   EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
 }
 
-TEST(19) 
+TEST(18d)
+{
+  db::Region r;
+  r.set_merged_semantics (false);
+  r.insert (db::Box (db::Point (0, 0), db::Point (10, 10)));
+  r.insert (db::Box (db::Point (20, 30), db::Point (40, 50)));
+  r.insert (db::Box (db::Point (50, 10), db::Point (70, 30)));
+  r.insert (db::Box (db::Point (70, 60), db::Point (90, 80)));
+  r.insert (db::Box (db::Point (0, 60), db::Point (60, 80)));
+  r.insert (db::Box (db::Point (0, 100), db::Point (30, 130)));
+
+  db::Region rr;
+  rr.insert (db::Box (db::Point (10, 0), db::Point (20, 10)));
+  rr.insert (db::Box (db::Point (10, 10), db::Point (50, 90)));
+  rr.insert (db::Box (db::Point (10, 110), db::Point (20, 120)));
+
+  EXPECT_EQ (r.pull_inside (rr).to_string (), "(10,110;10,120;20,120;20,110)");
+
+  EXPECT_EQ (r.pull_interacting (rr).to_string (), "(10,0;10,90;50,90;50,10;20,10;20,0);(10,110;10,120;20,120;20,110)");
+  EXPECT_EQ (r.pull_overlapping (rr).to_string (), "(10,0;10,90;50,90;50,10;20,10;20,0);(10,110;10,120;20,120;20,110)");
+
+  rr.set_merged_semantics (false);
+  EXPECT_EQ (r.pull_interacting (rr).to_string (), "(10,0;10,10;20,10;20,0);(10,10;10,90;50,90;50,10);(10,110;10,120;20,120;20,110)");
+  EXPECT_EQ (r.pull_overlapping (rr).to_string (), "(10,10;10,90;50,90;50,10);(10,110;10,120;20,120;20,110)");
+}
+
+TEST(19)
 {
   db::Region r1;
   r1.insert (db::Box (db::Point (0, 0), db::Point (10, 20)));
@@ -1339,6 +1365,30 @@ TEST(30c)
   EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (-200, -200), db::Point (-190, -190)))).to_string (), "");
   r.select_interacting (db::Edges (db::Edge (db::Point (-20, -20), db::Point (-10, -10))));
   EXPECT_EQ (r.to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+}
+
+TEST(31)
+{
+  db::Region r;
+  EXPECT_EQ (r.pull_interacting (db::Region (db::Box (db::Point (20, 20), db::Point (30, 30)))).to_string (), "");
+  r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
+  r.insert (db::Box (db::Point (-100, -100), db::Point (0, 0)));
+  r.set_merged_semantics (true);
+  r.set_min_coherence (false);
+  EXPECT_EQ (r.pull_interacting (db::Region (db::Box (db::Point (20, 20), db::Point (30, 30)))).to_string (), "(20,20;20,30;30,30;30,20)");
+  EXPECT_EQ (r.pull_interacting (db::Region (db::Box (db::Point (-20, -20), db::Point (30, 30)))).to_string (), "(-20,-20;-20,30;30,30;30,-20)");
+  EXPECT_EQ (r.pull_interacting (db::Region (db::Box (db::Point (-200, -200), db::Point (-190, -190)))).to_string (), "");
+
+  r.clear ();
+  r.insert(db::Box (db::Point (1000, 0), db::Point (6000, 4000)));
+  EXPECT_EQ (r.pull_overlapping (db::Region (db::Box (db::Point (0, 4000), db::Point (2000, 6000)))).to_string (), "");
+  EXPECT_EQ (db::Region (db::Box (db::Point (0, 4000), db::Point (2000, 6000))).pull_overlapping (r).to_string (), "");
+  EXPECT_EQ (r.pull_overlapping (db::Region (db::Box (db::Point (0, 4000), db::Point (1000, 6000)))).to_string (), "");
+  EXPECT_EQ (db::Region (db::Box (db::Point (0, 4000), db::Point (1000, 6000))).pull_overlapping (r).to_string (), "");
+  EXPECT_EQ (r.pull_overlapping (db::Region (db::Box (db::Point (0, 4001), db::Point (2000, 6000)))).to_string (), "");
+  EXPECT_EQ (db::Region (db::Box (db::Point (0, 4001), db::Point (2000, 6000))).pull_overlapping (r).to_string (), "");
+  EXPECT_EQ (r.pull_overlapping (db::Region (db::Box (db::Point (0, 3999), db::Point (1001, 6000)))).to_string (), "(0,3999;0,6000;1001,6000;1001,3999)");
+  EXPECT_EQ (db::Region (db::Box (db::Point (0, 3999), db::Point (1001, 6000))).pull_overlapping (r).to_string (), "(1000,0;1000,4000;6000,4000;6000,0)");
 }
 
 TEST(100_Processors)

@@ -56,6 +56,11 @@ class Buddies_TestClass < TestBase
       "strm2txt" => 0x62656769,
     }
 
+    # Windows CRLF -> LF translation
+    signature_equiv = {
+      0x300d0a53 => 0x300a5345
+    }
+
     %w(strm2cif strm2dxf strm2gds strm2gdstxt strm2oas strm2txt).each do |bin|
    
       puts "Testing #{bin} ..."
@@ -72,8 +77,9 @@ class Buddies_TestClass < TestBase
       assert_equal(File.exists?(out_file), true)
       assert_equal(log, bin + "\n")
 
-      File.open(out_file, "r") do |file|
+      File.open(out_file, "rb") do |file|
         sig = file.read(4).unpack('N').first
+        sig = signature_equiv[sig] || sig
         assert_equal(sig, signatures[bin])
       end
 

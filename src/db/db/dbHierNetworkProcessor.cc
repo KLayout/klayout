@@ -1474,7 +1474,12 @@ private:
     }
 
     for (std::vector<std::pair<size_t, size_t> >::const_iterator ii = interactions->begin (); ii != interactions->end (); ++ii) {
-      interacting_clusters.push_back (std::make_pair (make_path (ii->first, p1), make_path (ii->second, p2)));
+
+      ClusterInstance k1 = make_path (ii->first, p1);
+      ClusterInstance k2 = make_path (ii->second, p2);
+
+      interacting_clusters.push_back (std::make_pair (k1, k2));
+
     }
   }
 

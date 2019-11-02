@@ -602,7 +602,7 @@ overlaps = layer.size(0.2).raw.merged(2)</pre>
   While the runset is executed, a log is written that lists the methods and their execution times.
   The log is enabled using the <a href="/about/drc_ref_global.xml#verbose">verbose</a> function.
   The <a href="/about/drc_ref_global.xml#log">log</a> and <a href="/about/drc_ref_global.xml#info">info</a> functions 
-  allows enterin additional information into the log. "info" will enter the message if verbose mode is enabled.
+  allows entering additional information into the log. "info" will enter the message if verbose mode is enabled.
   "log" will enter the message always. <a href="/about/drc_ref_global.xml#silent">silent</a> is equivalent to 
   "verbose(false)".
   </p>
@@ -618,7 +618,7 @@ overlaps = layer.size(0.2).raw.merged(2)</pre>
   <pre>
   ...
   drc_w = input(1, 0).width(0.2)
-  log("Number of width violations: #{drc_w.size}")
+  log("Number of width violations: #{drc_w.data.size}")
   ...
   </pre>
 

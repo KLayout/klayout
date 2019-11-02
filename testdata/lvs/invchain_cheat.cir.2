@@ -1,0 +1,30 @@
+* Extracted by KLayout
+
+.SUBCKT INVCHAIN
+X$1 \$7 \$1 \$9 \$8 \$6 \$9 \$5 \$5 \$3 \$2 \$I2 \$I1 INV3
+X$2 \$8 \$11 \$9 \$10 \$8 \$11 \$2 \$I3 \$2 \$I3 \$5 \$4 \$I2 \$I1 INV2
+X$3 \$I1 \$I2 \$11 \$I3 \$4 \$4 \$10 \$10 INV
+.ENDS INVCHAIN
+
+.SUBCKT INV3 \$I18 \$I17 \$I15 \$I14 \$I13 \$I11 \$I10 \$I8 \$I7 \$I5 \$I4 \$I2
+X$1 \$I2 \$I4 \$I13 \$I17 \$I7 \$I7 \$I18 \$I18 INV
+X$2 \$I2 \$I4 \$I18 \$I7 \$I17 \$I17 \$I13 \$I13 INV
+X$3 \$I2 \$I4 \$I14 \$I5 \$I8 \$I10 \$I15 \$I11 INV
+.ENDS INV3
+
+.SUBCKT INV2 \$I16 \$I15 \$I14 \$I13 \$I12 \$I11 \$I10 \$I9 \$I8 \$I7 \$I6 \$I5
++ \$I4 \$I2
+X$1 \$I2 \$I4 \$I14 \$I6 \$I8 \$I10 \$I16 \$I12 INV
+X$2 \$I2 \$I4 \$I13 \$I5 \$I7 \$I9 \$I15 \$I11 INV
+.ENDS INV2
+
+.SUBCKT INV \$1 \$2 \$3 \$4 \$5 \$8 \$I8 \$I7
+M$1 \$4 \$3 \$2 \$4 PMOS L=0.25U W=0.95U AS=0.79325P AD=0.26125P PS=3.57U
++ PD=1.5U
+M$2 \$2 \$I8 \$5 \$2 PMOS L=0.25U W=0.95U AS=0.26125P AD=0.03325P PS=1.5U
++ PD=1.97U
+M$3 \$4 \$3 \$1 \$4 NMOS L=0.25U W=0.95U AS=0.79325P AD=0.26125P PS=3.57U
++ PD=1.5U
+M$4 \$1 \$I7 \$8 \$1 NMOS L=0.25U W=0.95U AS=0.26125P AD=0.03325P PS=1.5U
++ PD=1.97U
+.ENDS INV

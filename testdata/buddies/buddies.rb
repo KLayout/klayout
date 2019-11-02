@@ -72,7 +72,7 @@ class Buddies_TestClass < TestBase
       assert_equal(File.exists?(out_file), true)
       assert_equal(log, bin + "\n")
 
-      File.open(out_file, "rb") do |file|
+      File.open(out_file, "r") do |file|
         sig = file.read(4).unpack('N').first
         assert_equal(sig, signatures[bin])
       end

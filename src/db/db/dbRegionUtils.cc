@@ -22,6 +22,7 @@
 
 
 #include "dbRegionUtils.h"
+#include "dbEdgeBoolean.h"
 #include "tlSelect.h"
 
 namespace db
@@ -30,9 +31,9 @@ namespace db
 // -------------------------------------------------------------------------------------
 //  Edge2EdgeCheckBase implementation
 
-Edge2EdgeCheckBase::Edge2EdgeCheckBase (const EdgeRelationFilter &check, bool different_polygons, bool requires_different_layers)
+Edge2EdgeCheckBase::Edge2EdgeCheckBase (const EdgeRelationFilter &check, bool different_polygons, bool requires_different_layers, bool with_shielding)
   : mp_check (&check), m_requires_different_layers (requires_different_layers), m_different_polygons (different_polygons),
-    m_pass (0)
+    m_with_shielding (with_shielding), m_has_edge_pair_output (true), m_has_negative_edge_output (false), m_pass (0)
 {
   m_distance = check.distance ();
 }
@@ -44,22 +45,29 @@ Edge2EdgeCheckBase::prepare_next_pass ()
 
   if (m_pass == 1) {
 
-    if (! m_ep.empty ()) {
+    if (m_with_shielding && ! m_ep.empty ()) {
       m_ep_discarded.resize (m_ep.size (), false);
       return true;
     }
 
   } else if (m_pass == 2) {
 
-    std::vector<bool>::const_iterator d = m_ep_discarded.begin ();
-    std::vector<db::EdgePair>::const_iterator ep = m_ep.begin ();
-    while (ep != m_ep.end ()) {
-      tl_assert (d != m_ep_discarded.end ());
-      if (! *d) {
-        put (*ep);
+    if (m_has_edge_pair_output) {
+
+      std::vector<bool>::const_iterator d = m_ep_discarded.begin ();
+      std::vector<db::EdgePair>::const_iterator ep = m_ep.begin ();
+      while (ep != m_ep.end ()) {
+        bool use_result = true;
+        if (d != m_ep_discarded.end ()) {
+          use_result = ! *d;
+          ++d;
+        }
+        if (use_result) {
+          put (*ep);
+        }
+        ++ep;
       }
-      ++d;
-      ++ep;
+
     }
 
   }
@@ -83,6 +91,18 @@ static inline bool shields (const db::EdgePair &ep, const db::Edge &q)
 }
 
 void
+Edge2EdgeCheckBase::finish (const Edge *o, const size_t &p)
+{
+  if (m_has_negative_edge_output && m_pass == 1) {
+
+    //  no interaction at all: create a single-edged edge pair
+    int l = int (p & size_t (1));
+    put_negative (*o, l);
+
+  }
+}
+
+void
 Edge2EdgeCheckBase::add (const db::Edge *o1, size_t p1, const db::Edge *o2, size_t p2)
 {
   if (m_pass == 0) {
@@ -99,7 +119,8 @@ Edge2EdgeCheckBase::add (const db::Edge *o1, size_t p1, const db::Edge *o2, size
       if (mp_check->check (l1 <= l2 ? *o1 : *o2, l1 <= l2 ? *o2 : *o1, &ep)) {
 
         //  found a violation: store inside the local buffer for now. In the second
-        //  pass we will eliminate those which are shielded completely.
+        //  pass we will eliminate those which are shielded completely (with shielding)
+        //  and/or compute the negative edges.
         size_t n = m_ep.size ();
         m_ep.push_back (ep);
         m_e2ep.insert (std::make_pair (std::make_pair (*o1, p1), n));
@@ -111,48 +132,97 @@ Edge2EdgeCheckBase::add (const db::Edge *o1, size_t p1, const db::Edge *o2, size
 
   } else {
 
-    //  a simple (complete) shielding implementation which is based on the
-    //  assumption that shielding is relevant as soon as a foreign edge cuts through
-    //  both of the edge pair's connecting edges.
+    //  set the discarded flags for shielded output
+    if (m_with_shielding) {
 
-    //  TODO: this implementation does not take into account the nature of the
-    //  EdgePair - because of "whole_edge" it may not reflect the part actually
-    //  violating the distance.
+      //  a simple (complete) shielding implementation which is based on the
+      //  assumption that shielding is relevant as soon as a foreign edge cuts through
+      //  both of the edge pair's connecting edges.
 
-    std::vector<size_t> n1, n2;
+      //  TODO: this implementation does not take into account the nature of the
+      //  EdgePair - because of "whole_edge" it may not reflect the part actually
+      //  violating the distance.
 
-    for (unsigned int p = 0; p < 2; ++p) {
+      std::vector<size_t> n1, n2;
 
-      std::pair<db::Edge, size_t> k (*o1, p1);
-      for (std::multimap<std::pair<db::Edge, size_t>, size_t>::const_iterator i = m_e2ep.find (k); i != m_e2ep.end () && i->first == k; ++i) {
-        n1.push_back (i->second);
+      for (unsigned int p = 0; p < 2; ++p) {
+
+        std::pair<db::Edge, size_t> k (*o1, p1);
+        for (std::multimap<std::pair<db::Edge, size_t>, size_t>::const_iterator i = m_e2ep.find (k); i != m_e2ep.end () && i->first == k; ++i) {
+          n1.push_back (i->second);
+        }
+
+        std::sort (n1.begin (), n1.end ());
+
+        std::swap (o1, o2);
+        std::swap (p1, p2);
+        n1.swap (n2);
+
       }
 
-      std::sort (n1.begin (), n1.end ());
+      for (unsigned int p = 0; p < 2; ++p) {
 
-      std::swap (o1, o2);
-      std::swap (p1, p2);
-      n1.swap (n2);
+        std::vector<size_t> nn;
+        std::set_difference (n1.begin (), n1.end (), n2.begin (), n2.end (), std::back_inserter (nn));
+
+        for (std::vector<size_t>::const_iterator i = nn.begin (); i != nn.end (); ++i) {
+          if (! m_ep_discarded [*i]) {
+            db::EdgePair ep = m_ep [*i].normalized ();
+            if (shields (ep, *o2)) {
+              m_ep_discarded [*i] = true;
+            }
+          }
+        }
+
+        std::swap (o1, o2);
+        std::swap (p1, p2);
+        n1.swap (n2);
+
+      }
 
     }
 
-    for (unsigned int p = 0; p < 2; ++p) {
+    //  prepare the negative edge output
+    if (m_has_negative_edge_output) {
 
-      std::vector<size_t> nn;
-      std::set_difference (n1.begin (), n1.end (), n2.begin (), n2.end (), std::back_inserter (nn));
+      //  Overlap or inside checks require input from different layers
+      if ((! m_different_polygons || p1 != p2) && (! m_requires_different_layers || ((p1 ^ p2) & 1) != 0)) {
 
-      for (std::vector<size_t>::const_iterator i = nn.begin (); i != nn.end (); ++i) {
-        if (! m_ep_discarded [*i]) {
-          db::EdgePair ep = m_ep [*i].normalized ();
-          if (shields (ep, *o2)) {
-            m_ep_discarded [*i] = true;
+        for (int p = 0; p < 2; ++p) {
+
+          std::pair<db::Edge, size_t> k (*o1, p1);
+          std::multimap<std::pair<db::Edge, size_t>, size_t>::const_iterator i0 = m_e2ep.find (k);
+
+          bool fully_removed = false;
+          for (std::multimap<std::pair<db::Edge, size_t>, size_t>::const_iterator i = i0; ! fully_removed && i != m_e2ep.end () && i->first == k; ++i) {
+            fully_removed = (m_ep [i->second].first () == *o1);
           }
-        }
-      }
 
-      std::swap (o1, o2);
-      std::swap (p1, p2);
-      n1.swap (n2);
+          if (! fully_removed) {
+
+            std::set<db::Edge> partial_edges;
+
+            db::EdgeBooleanCluster<std::set<db::Edge> > ec (&partial_edges, db::EdgeNot);
+            ec.add (o1, 0);
+
+            for (std::multimap<std::pair<db::Edge, size_t>, size_t>::const_iterator i = i0; i != m_e2ep.end () && i->first == k; ++i) {
+              ec.add (&m_ep [i->second].first (), 1);
+            }
+
+            ec.finish ();
+
+            for (std::set<db::Edge>::const_iterator e = partial_edges.begin (); e != partial_edges.end (); ++e) {
+              put_negative (*e, p);
+            }
+
+            std::swap (o1, o2);
+            std::swap (p1, p2);
+
+          }
+
+        }
+
+      }
 
     }
 

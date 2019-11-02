@@ -25,6 +25,7 @@
 #define HDR_layGenericSyntaxHighlighter
 
 #include "tlString.h"
+#include "laybasicCommon.h"
 
 #include <QSyntaxHighlighter>
 #include <QString>
@@ -40,7 +41,7 @@ namespace lay
 /**
  *  @brief Specifies one element in the text block's user data
  */
-struct SyntaxHighlighterElement
+struct LAYBASIC_PUBLIC SyntaxHighlighterElement
 {
 public:
   /**
@@ -61,7 +62,7 @@ public:
  *
  *  The user data will contain useful data for bracket detection and other things
  */
-class SyntaxHighlighterUserData
+class LAYBASIC_PUBLIC SyntaxHighlighterUserData
   : public QTextBlockUserData
 {
 public:
@@ -92,7 +93,7 @@ public:
  *  Rule implementations must implement this base class in order to plug into the 
  *  generic syntax highlighter framework.
  */
-class GenericSyntaxHighlighterRuleBase
+class LAYBASIC_PUBLIC GenericSyntaxHighlighterRuleBase
 {
 public:
   /** 
@@ -131,7 +132,7 @@ public:
 /**
  *  @brief A specialization of GenericSyntaxHighlighterRuleBase which looks for a choice of strings
  */
-class GenericSyntaxHighlighterRuleStringList
+class LAYBASIC_PUBLIC GenericSyntaxHighlighterRuleStringList
   : public GenericSyntaxHighlighterRuleBase
 {
 public:
@@ -152,7 +153,7 @@ private:
  * 
  *  This object will forward the match request to the actual implementation.
  */
-class GenericSyntaxHighlighterRule
+class LAYBASIC_PUBLIC GenericSyntaxHighlighterRule
 {
 public:
   /**
@@ -319,7 +320,7 @@ private:
  *  Special context ID's are 0 (#stay), -n (#pop n times).
  *  A context is associated with an attribute, which is given by an integer ID.
  */
-class GenericSyntaxHighlighterContext
+class LAYBASIC_PUBLIC GenericSyntaxHighlighterContext
 {
 public:
   enum {
@@ -478,7 +479,7 @@ private:
 /**
  *  @brief A collection of (named) contexts
  */
-class GenericSyntaxHighlighterContexts
+class LAYBASIC_PUBLIC GenericSyntaxHighlighterContexts
 {
 public:
   GenericSyntaxHighlighterContexts ();
@@ -579,7 +580,7 @@ enum def_style {
 /**
  *  @brief A collection of attributes
  */
-class GenericSyntaxHighlighterAttributes
+class LAYBASIC_PUBLIC GenericSyntaxHighlighterAttributes
 {
 public:
   typedef std::map<QString, int>::const_iterator const_iterator;
@@ -672,7 +673,7 @@ private:
 /**
  *  @brief The parser's state
  */
-class GenericSyntaxHighlighterState
+class LAYBASIC_PUBLIC GenericSyntaxHighlighterState
 {
 public:
   GenericSyntaxHighlighterState (const GenericSyntaxHighlighterContexts *contexts);
@@ -710,7 +711,7 @@ private:
 /**
  *  @brief A generic syntax highlighter using "Kate"'s syntax highlight scripts
  */
-class GenericSyntaxHighlighter
+class LAYBASIC_PUBLIC GenericSyntaxHighlighter
   : public QSyntaxHighlighter
 {
 public: 

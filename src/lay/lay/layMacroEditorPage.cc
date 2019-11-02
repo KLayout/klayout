@@ -113,7 +113,14 @@ MacroEditorHighlighters::highlighter_for_scheme (QObject *parent, const std::str
   if (! scheme.empty ()) {
 
     QResource res (tl::to_qstring (":/syntax/" + scheme + ".xml"));
-    QByteArray data = qUncompress (QByteArray ((const char *) res.data (), int (res.size ())));
+
+    QByteArray data;
+    if (res.isCompressed ()) {
+      data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
+    } else {
+      data = QByteArray ((const char *)res.data (), (int)res.size ());
+    }
+
     QBuffer input (&data);
     input.open (QIODevice::ReadOnly);
     lay::GenericSyntaxHighlighter *hl = new GenericSyntaxHighlighter (parent, input, attributes);

@@ -530,7 +530,6 @@ LCPStylePalette::LCPStylePalette (QWidget *parent, const char *name)
   b->setMinimumSize (25, 16);
   b->setAlignment (Qt::AlignCenter);
   b->setLineWidth (1);
-  b->setSizePolicy (sp);
   b->setText (QObject::tr ("0px"));
   connect (b, SIGNAL (clicked (int)), this, SLOT (button_clicked (int)));
   ll->addWidget (b);
@@ -539,7 +538,6 @@ LCPStylePalette::LCPStylePalette (QWidget *parent, const char *name)
   b->setMinimumSize (25, 16);
   b->setAlignment (Qt::AlignCenter);
   b->setLineWidth (1);
-  b->setSizePolicy (sp);
   b->setText (QObject::tr ("1px"));
   connect (b, SIGNAL (clicked (int)), this, SLOT (button_clicked (int)));
   ll->addWidget (b);
@@ -548,7 +546,6 @@ LCPStylePalette::LCPStylePalette (QWidget *parent, const char *name)
   b->setMinimumSize (25, 16);
   b->setAlignment (Qt::AlignCenter);
   b->setLineWidth (1);
-  b->setSizePolicy (sp);
   b->setText (QObject::tr ("2px"));
   connect (b, SIGNAL (clicked (int)), this, SLOT (button_clicked (int)));
   ll->addWidget (b);
@@ -557,7 +554,6 @@ LCPStylePalette::LCPStylePalette (QWidget *parent, const char *name)
   b->setMinimumSize (25, 16);
   b->setAlignment (Qt::AlignCenter);
   b->setLineWidth (1);
-  b->setSizePolicy (sp);
   b->setText (QObject::tr ("3px"));
   connect (b, SIGNAL (clicked (int)), this, SLOT (button_clicked (int)));
   ll->addWidget (b);
@@ -572,7 +568,6 @@ LCPStylePalette::LCPStylePalette (QWidget *parent, const char *name)
   b->setMinimumSize (50, 16);
   b->setAlignment (Qt::AlignCenter);
   b->setLineWidth (1);
-  b->setSizePolicy (sp);
   b->setText (QObject::tr ("No Cross"));
   connect (b, SIGNAL (clicked (int)), this, SLOT (button_clicked (int)));
   ll->addWidget (b);
@@ -581,7 +576,6 @@ LCPStylePalette::LCPStylePalette (QWidget *parent, const char *name)
   b->setMinimumSize (50, 16);
   b->setAlignment (Qt::AlignCenter);
   b->setLineWidth (1);
-  b->setSizePolicy (sp);
   b->setText (QObject::tr ("Cross"));
   connect (b, SIGNAL (clicked (int)), this, SLOT (button_clicked (int)));
   ll->addWidget (b);
@@ -596,7 +590,6 @@ LCPStylePalette::LCPStylePalette (QWidget *parent, const char *name)
   b->setMinimumSize (50, 16);
   b->setAlignment (Qt::AlignCenter);
   b->setLineWidth (1);
-  b->setSizePolicy (sp);
   b->setText (QObject::tr ("Simple"));
   connect (b, SIGNAL (clicked (int)), this, SLOT (button_clicked (int)));
   ll->addWidget (b);
@@ -605,7 +598,6 @@ LCPStylePalette::LCPStylePalette (QWidget *parent, const char *name)
   b->setMinimumSize (50, 16);
   b->setAlignment (Qt::AlignCenter);
   b->setLineWidth (1);
-  b->setSizePolicy (sp);
   b->setText (QObject::tr ("Marked"));
   connect (b, SIGNAL (clicked (int)), this, SLOT (button_clicked (int)));
   ll->addWidget (b);

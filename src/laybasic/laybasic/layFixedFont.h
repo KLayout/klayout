@@ -28,9 +28,19 @@ public:
   static const FixedFont &get_font (double resolution);
 
   /**
+   *  @brief Gets the number of font sizes available
+   */
+  static int font_sizes ();
+
+  /**
+   *  @brief Gets the size description ("small", "large", ...)
+   */
+  static const char *font_size_name (int sz);
+
+  /**
    *  @brief Set the default font size 
    *
-   *  Allowed values are 0 (small), 1 (medium) or 2 (large)
+   *  Allowed values are 0 (small), 1 (medium) or 2 (large) etc.
    */
   static void set_default_font_size (int fs);
 

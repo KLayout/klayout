@@ -162,7 +162,7 @@ SaltAPIVersionCheck::check (const std::string &api_version)
   while (! ex.at_end ()) {
 
     std::string fname;
-    ex.try_read_word (fname);
+    ex.try_read_name (fname);
 
     std::string v;
     while (! ex.at_end () && ! ex.test (";")) {

@@ -1024,6 +1024,15 @@ Extractor::read_word (std::string &value, const char *non_term)
 }
 
 Extractor &
+Extractor::read_name (std::string &value, const char *non_term)
+{
+  if (! try_read_name (value, non_term)) {
+    error (tl::to_string (tr ("Expected a name string")));
+  }
+  return *this;
+}
+
+Extractor &
 Extractor::read_word_or_quoted (std::string &value, const char *non_term)
 {
   if (! try_read_word (value, non_term) && ! try_read_quoted (value)) {
@@ -1228,7 +1237,7 @@ Extractor::try_read (bool &value)
 }
 
 bool
-Extractor::try_read_word (std::string &string, const char *non_term)
+Extractor::try_read_name (std::string &string, const char *non_term)
 {
   if (! *skip ()) {
     return false;
@@ -1243,6 +1252,23 @@ Extractor::try_read_word (std::string &string, const char *non_term)
   } else {
     return false;
   }
+
+  while (*m_cp && (safe_isalnum (*m_cp) || strchr (non_term, *m_cp) != NULL)) {
+    string += *m_cp;
+    ++m_cp;
+  }
+
+  return ! string.empty ();
+}
+
+bool
+Extractor::try_read_word (std::string &string, const char *non_term)
+{
+  if (! *skip ()) {
+    return false;
+  }
+
+  string.clear ();
 
   while (*m_cp && (safe_isalnum (*m_cp) || strchr (non_term, *m_cp) != NULL)) {
     string += *m_cp;

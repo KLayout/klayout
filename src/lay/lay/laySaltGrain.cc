@@ -313,7 +313,7 @@ SaltGrain::valid_api_version (const std::string &v)
   while (! ex.at_end ()) {
 
     std::string feature;
-    ex.try_read_word (feature);
+    ex.try_read_name (feature);
 
     bool first = true;
     while (! ex.at_end () && ! ex.test (";")) {

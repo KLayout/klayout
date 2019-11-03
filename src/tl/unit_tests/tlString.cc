@@ -314,6 +314,9 @@ TEST(8)
   EXPECT_EQ (s, "a_word");
   EXPECT_EQ (x.test ("!"), true);
 
+  x = Extractor ("0_word!");
+  EXPECT_EQ (x.try_read_word (s), false);
+
   x = Extractor ("a_word!");
   EXPECT_EQ (x.try_read_word (s), true);
   EXPECT_EQ (s, "a_word");

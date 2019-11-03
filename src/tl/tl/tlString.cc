@@ -1235,10 +1235,20 @@ Extractor::try_read_word (std::string &string, const char *non_term)
   }
 
   string.clear ();
+
+  //  first character must not be a digit
+  if (*m_cp && (safe_isalpha (*m_cp) || strchr (non_term, *m_cp) != NULL)) {
+    string += *m_cp;
+    ++m_cp;
+  } else {
+    return false;
+  }
+
   while (*m_cp && (safe_isalnum (*m_cp) || strchr (non_term, *m_cp) != NULL)) {
     string += *m_cp;
     ++m_cp;
   }
+
   return ! string.empty ();
 }
 

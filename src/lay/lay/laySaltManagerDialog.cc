@@ -246,15 +246,34 @@ SaltAPIVersionCheck::populate_features ()
   m_features.push_back (APIFeature (std::string (), lay::Version::version (), "KLayout API"));
 
   if (rba::RubyInterpreter::instance () && rba::RubyInterpreter::instance ()->available ()) {
-    m_features.push_back (APIFeature ("ruby", rba::RubyInterpreter::instance ()->version (), "Ruby"));
+    std::string v = rba::RubyInterpreter::instance ()->version ();
+    m_features.push_back (APIFeature ("ruby", v, "Ruby"));
+    if (SaltGrain::compare_versions (v, "2") < 0) {
+      m_features.push_back (APIFeature ("ruby1", v, "Ruby 1"));
+    } else if (SaltGrain::compare_versions (v, "3") < 0) {
+      m_features.push_back (APIFeature ("ruby2", v, "Ruby 2"));
+    }
   }
 
   if (pya::PythonInterpreter::instance () && pya::PythonInterpreter::instance ()->available ()) {
-    m_features.push_back (APIFeature ("python", pya::PythonInterpreter::instance ()->version (), "Python"));
+    std::string v = pya::PythonInterpreter::instance ()->version ();
+    m_features.push_back (APIFeature ("python", v, "Python"));
+    if (SaltGrain::compare_versions (v, "3") < 0) {
+      m_features.push_back (APIFeature ("python2", v, "Python 2"));
+    } else if (SaltGrain::compare_versions (v, "4") < 0) {
+      m_features.push_back (APIFeature ("python3", v, "Python 3"));
+    }
   }
 
 #if defined(HAVE_QTBINDINGS)
   m_features.push_back (APIFeature ("qt_binding", std::string (), "Qt Binding for RBA or PYA"));
+#endif
+#if defined(HAVE_QT)
+#  if QT_VERSION >= 0x040000 && QT_VERSION < 0x050000
+  m_features.push_back (APIFeature ("qt4", std::string (), "Qt 4"));
+#  elif QT_VERSION >= 0x050000 && QT_VERSION < 0x060000
+  m_features.push_back (APIFeature ("qt5", std::string (), "Qt 5"));
+#  endif
 #endif
 
 #if defined(HAVE_64BIT_COORD)

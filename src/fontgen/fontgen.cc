@@ -29,6 +29,8 @@
 #include <stdio.h>
 
 //  The system font to use
+//  NOTE: "Libration Mono" works only well for Ubuntu 16. The version from
+//  Ubuntu 18++ does not come with good hinting and is bad without AA.
 static const char *font_name = "Liberation Mono";
 
 /**

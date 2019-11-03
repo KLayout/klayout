@@ -160,7 +160,13 @@ rba_check_error ()
 
   //  parse the backtrace to get the line number
   tl::BacktraceElement info;
-  if (! bt.empty ()) {
+  if (CLASS_OF (lasterr) == rb_eSyntaxError) {
+    //  for syntax errors we try to parse the message
+    info = rba_split_bt_information (emsg.c_str (), emsg.size ());
+    if (info.line == 0 && ! bt.empty ()) {
+      info = bt.front ();
+    }
+  } else if (! bt.empty ()) {
     //  use the backtrace
     info = bt.front ();
   } else {

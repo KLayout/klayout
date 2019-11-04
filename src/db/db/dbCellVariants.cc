@@ -355,7 +355,7 @@ VariantsCollectorBase::product (const std::map<db::ICplxTrans, size_t> &v1, cons
 }
 
 void
-VariantsCollectorBase::copy_shapes (db::Layout &layout, db::cell_index_type ci_to, db::cell_index_type ci_from) const
+VariantsCollectorBase::copy_shapes (db::Layout &layout, db::cell_index_type ci_to, db::cell_index_type ci_from)
 {
   db::Cell &to = layout.cell (ci_to);
   const db::Cell &from = layout.cell (ci_from);

@@ -225,6 +225,11 @@ public:
    */
   bool has_variants () const;
 
+  /**
+   *  @brief Utility: copy all shapes from one cell to another
+   */
+  static void copy_shapes (db::Layout &layout, db::cell_index_type ci_to, db::cell_index_type ci_from);
+
 private:
   std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> > m_variants;
   const TransformationReducer *mp_red;
@@ -233,7 +238,6 @@ private:
   void add_variant_non_tl_invariant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst) const;
   void add_variant_tl_invariant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst) const;
   void product (const std::map<db::ICplxTrans, size_t> &v1, const std::map<db::ICplxTrans, size_t> &v2, std::map<db::ICplxTrans, size_t> &prod) const;
-  void copy_shapes (db::Layout &layout, db::cell_index_type ci_to, db::cell_index_type ci_from) const;
   void create_var_instances (db::Cell &in_cell, std::vector<db::CellInstArrayWithProperties> &inst, const db::ICplxTrans &for_var, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_table, bool tl_invariant) const;
   void create_var_instances_non_tl_invariant (db::Cell &in_cell, std::vector<db::CellInstArrayWithProperties> &inst, const db::ICplxTrans &for_var, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_table) const;
   void create_var_instances_tl_invariant (db::Cell &in_cell, std::vector<db::CellInstArrayWithProperties> &inst, const db::ICplxTrans &for_var, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_table) const;

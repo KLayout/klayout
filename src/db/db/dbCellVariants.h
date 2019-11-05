@@ -169,6 +169,61 @@ private:
 };
 
 /**
+ *  @brief A scale+grid reducer
+ *
+ *  This reducer incarnation reduces the transformation to it's displacement modulo a grid
+ *  after a specified scaling has been applied.
+ *  The scaling is given by a divider and multiplier and is mult / div.
+ */
+struct DB_PUBLIC ScaleAndGridReducer
+  : public TransformationReducer
+{
+  ScaleAndGridReducer (db::Coord grid, db::Coord mult, db::Coord div)
+    : m_mult (mult), m_grid (int64_t (grid) * int64_t (div))
+  {
+    //  .. nothing yet ..
+  }
+
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const
+  {
+    //  NOTE: we need to keep magnification, angle and mirror so when combining the
+    //  reduced transformations, the result will be equivalent to reducing the combined
+    //  transformation.
+    db::ICplxTrans res (trans);
+    res.disp (db::Vector (mod (trans.disp ().x ()), mod (trans.disp ().y ())));
+    return res;
+  }
+
+  db::Trans reduce (const db::Trans &trans) const
+  {
+    db::Trans res (trans);
+    res.disp (db::Vector (mod (trans.disp ().x ()), mod (trans.disp ().y ())));
+    return res;
+  }
+
+  bool is_translation_invariant () const { return false; }
+
+private:
+  int64_t m_mult;
+  int64_t m_grid;
+
+  inline db::Coord mod (db::Coord c) const
+  {
+    int64_t cc = int64_t (c) * m_mult;
+    if (cc < 0) {
+      cc = m_grid - (-cc) % m_grid;
+      if (cc == m_grid) {
+        return 0;
+      } else {
+        return db::Coord (cc);
+      }
+    } else {
+      return db::Coord (cc % m_grid);
+    }
+  }
+};
+
+/**
  *  @brief A class computing variants for cells according to a given criterion
  *
  *  The cell variants are build from the cell instances and are accumulated over

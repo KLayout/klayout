@@ -33,6 +33,7 @@
 #include "dbPCellDeclaration.h"
 #include "dbHash.h"
 #include "dbRegion.h"
+#include "dbLayoutUtils.h"
 #include "tlStream.h"
 
 namespace gsi
@@ -812,6 +813,16 @@ static const std::string &layout_meta_get_description (const db::MetaInfo *mi)
   return mi->description;
 }
 
+static void scale_and_snap1 (db::Layout *layout, db::Cell &cell, db::Coord g, db::Coord m, db::Coord d)
+{
+  scale_and_snap (*layout, cell, g, m, d);
+}
+
+static void scale_and_snap2 (db::Layout *layout, db::cell_index_type ci, db::Coord g, db::Coord m, db::Coord d)
+{
+  scale_and_snap (*layout, layout->cell (ci), g, m, d);
+}
+
 Class<db::MetaInfo> decl_LayoutMetaInfo ("db", "LayoutMetaInfo",
   gsi::constructor ("new", &layout_meta_info_ctor, gsi::arg ("name"), gsi::arg ("value"), gsi::arg ("description", std::string ()),
     "@brief Creates a layout meta info object\n"
@@ -1541,6 +1552,25 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "The number of layers reports the maximum (plus 1) layer index used so far. Not all of the layers with "
     "an index in the range of 0 to layers-1 needs to be a valid layer. These layers can be either valid, "
     "special or unused. Use \\is_valid_layer? and \\is_special_layer? to test for the first two states.\n"
+  ) +
+  gsi::method_ext ("scale_and_snap", &scale_and_snap1, gsi::arg ("cell"), gsi::arg ("grid"), gsi::arg ("mult"), gsi::arg ("div"),
+    "@brief Scales and snaps the layout below a given cell by the given rational factor and snaps to the given grid\n"
+    "\n"
+    "This method is useful to scale a layout by a non-integer factor. The "
+    "scale factor is given by the rational number mult / div. After scaling, the "
+    "layout will be snapped to the given grid.\n"
+    "\n"
+    "Snapping happens 'as-if-flat' - that is, touching edges will stay touching, regardless of their "
+    "hierarchy path. To achieve this, this method usually needs to produce cell variants.\n"
+    "\n"
+    "This method has been introduced in version 0.26.1.\n"
+  ) +
+  gsi::method_ext ("scale_and_snap", &scale_and_snap2, gsi::arg ("cell_index"), gsi::arg ("grid"), gsi::arg ("mult"), gsi::arg ("div"),
+    "@brief Scales and snaps the layout below a given cell by the given rational factor and snaps to the given grid\n"
+    "\n"
+    "Like the other version of \\scale_and_snap, but taking a cell index for the argument.\n"
+    "\n"
+    "This method has been introduced in version 0.26.1.\n"
   ) +
   gsi::method ("transform", (void (db::Layout::*) (const db::Trans &t)) &db::Layout::transform,
     "@brief Transforms the layout with the given transformation\n"

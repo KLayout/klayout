@@ -389,6 +389,18 @@ Region::snapped (db::Coord gx, db::Coord gy) const
   return Region (mp_delegate->snapped (gx, gy));
 }
 
+void
+Region::scale_and_snap (db::Coord gx, db::Coord mx, db::Coord dx, db::Coord gy, db::Coord my, db::Coord dy)
+{
+  set_delegate (mp_delegate->scaled_and_snapped_in_place (gx, mx, dx, gy, my, dy));
+}
+
+Region
+Region::scaled_and_snapped (db::Coord gx, db::Coord mx, db::Coord dx, db::Coord gy, db::Coord my, db::Coord dy) const
+{
+  return Region (mp_delegate->scaled_and_snapped (gx, mx, dx, gy, my, dy));
+}
+
 Region
 Region::strange_polygon_check () const
 {

@@ -260,6 +260,8 @@ public:
 
   virtual RegionDelegate *snapped_in_place (db::Coord gx, db::Coord gy) = 0;
   virtual RegionDelegate *snapped (db::Coord gx, db::Coord gy) = 0;
+  virtual RegionDelegate *scaled_and_snapped_in_place (db::Coord gx, db::Coord mx, db::Coord dx, db::Coord gy, db::Coord my, db::Coord dy) = 0;
+  virtual RegionDelegate *scaled_and_snapped (db::Coord gx, db::Coord mx, db::Coord dx, db::Coord gy, db::Coord my, db::Coord dy) = 0;
 
   virtual EdgesDelegate *edges (const EdgeFilterBase *filter) const = 0;
   virtual RegionDelegate *filter_in_place (const PolygonFilterBase &filter) = 0;

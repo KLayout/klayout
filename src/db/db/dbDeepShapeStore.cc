@@ -920,7 +920,7 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
       //  create from them. We need to consider however, that the hierarchy builder is allowed to create
       //  variants which we cannot map.
 
-      for (HierarchyBuilder::cell_map_type::const_iterator m = original_builder.begin_cell_map (); m != original_builder.end_cell_map (); ++m) {
+      for (HierarchyBuilder::cell_map_type::const_iterator m = original_builder.begin_cell_map (); m != original_builder.end_cell_map (); ) {
 
         HierarchyBuilder::cell_map_type::const_iterator mm = m;
         ++mm;
@@ -939,6 +939,8 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
             cm_skipped_variants [n->second] = n->first;
           }
         }
+
+        m = mm;
 
       }
 

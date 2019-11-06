@@ -44,5 +44,6 @@
         <file>images/icon_device_bjt_32.png</file>
         <file>images/icon_device_bjt_24.png</file>
         <file>images/icon_device_bjt_16.png</file>
+        <file>syntax/ur_text.xml</file>
     </qresource>
 </RCC>

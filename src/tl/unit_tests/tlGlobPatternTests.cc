@@ -163,6 +163,7 @@ TEST(6)
 
   EXPECT_EQ (a.match ("abcg"), true);
   EXPECT_EQ (a.match ("adg"), true);
+  EXPECT_EQ (a.match ("ad"), false);
   EXPECT_EQ (a.match ("ag"), false);
   EXPECT_EQ (a.match ("abch"), false);
   EXPECT_EQ (a.match ("adh"), false);
@@ -173,11 +174,33 @@ TEST(6)
 
   EXPECT_EQ (aa.match ("abcg"), true);
   EXPECT_EQ (aa.match ("adg"), true);
+  EXPECT_EQ (aa.match ("ad"), false);
   EXPECT_EQ (aa.match ("ag"), false);
   EXPECT_EQ (aa.match ("abch"), false);
   EXPECT_EQ (aa.match ("adh"), false);
   EXPECT_EQ (aa.match ("ah"), false);
 
+  a = tl::GlobPattern ("a{,d}g");
+
+  EXPECT_EQ (a.match ("abcg"), false);
+  EXPECT_EQ (a.match ("ad"), false);
+  EXPECT_EQ (a.match ("adg"), true);
+  EXPECT_EQ (a.match ("ag"), true);
+  EXPECT_EQ (a.match ("a"), false);
+  EXPECT_EQ (a.match ("abch"), false);
+  EXPECT_EQ (a.match ("adh"), false);
+  EXPECT_EQ (a.match ("ah"), false);
+
+  a = tl::GlobPattern ("a{,d}");
+
+  EXPECT_EQ (a.match ("abcg"), false);
+  EXPECT_EQ (a.match ("ad"), true);
+  EXPECT_EQ (a.match ("adg"), false);
+  EXPECT_EQ (a.match ("ag"), false);
+  EXPECT_EQ (a.match ("a"), true);
+  EXPECT_EQ (a.match ("abch"), false);
+  EXPECT_EQ (a.match ("adh"), false);
+  EXPECT_EQ (a.match ("ah"), false);
 }
 
 TEST(7)

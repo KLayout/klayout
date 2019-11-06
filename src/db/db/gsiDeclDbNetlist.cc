@@ -567,7 +567,14 @@ Class<db::Net> decl_dbNet ("db", "Net",
   ) +
   gsi::method ("is_floating?", &db::Net::is_floating,
     "@brief Returns true, if the net is floating.\n"
-    "Floating nets are those who don't have any or only a single connection (pin_count + terminal_count < 2)."
+    "Floating nets are those which don't have any device or subcircuit on it and are not connected through a pin."
+  ) +
+  gsi::method ("is_passive?", &db::Net::is_passive,
+    "@brief Returns true, if the net is passive.\n"
+    "Passive nets don't have devices or subcircuits on it. They can be exposed through a pin.\n"
+    "\\is_floating? implies \\is_passive?.\n"
+    "\n"
+    "This method has been introduced in version 0.26.1.\n"
   ) +
   gsi::method ("is_internal?", &db::Net::is_internal,
     "@brief Returns true, if the net is an internal net.\n"
@@ -1338,7 +1345,7 @@ static void read_netlist (db::Netlist *nl, const std::string &file, db::NetlistR
 
 static void flatten_circuit_by_name (db::Netlist *nl, const std::string &name_pattern)
 {
-  std::list<tl::weak_ptr<db::Circuit> > circuits_to_flatten;
+  std::vector<db::Circuit *> circuits_to_flatten;
   tl::GlobPattern pat (name_pattern);
   for (db::Netlist::circuit_iterator c = nl->begin_circuits (); c != nl->end_circuits (); ++c) {
     if (pat.match (c->name ())) {
@@ -1346,11 +1353,7 @@ static void flatten_circuit_by_name (db::Netlist *nl, const std::string &name_pa
     }
   }
 
-  for (std::list<tl::weak_ptr<db::Circuit> >::iterator c = circuits_to_flatten.begin (); c != circuits_to_flatten.end (); ++c) {
-    if (c->get ()) {
-      nl->flatten_circuit (c->get ());
-    }
-  }
+  nl->flatten_circuits (circuits_to_flatten);
 }
 
 static void blank_circuit_by_name (db::Netlist *nl, const std::string &name_pattern)
@@ -1391,6 +1394,12 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::method ("flatten", &db::Netlist::flatten,
     "@brief Flattens all circuits of the netlist\n"
     "After calling this method, only the top circuits will remain."
+  ) +
+  gsi::method ("flatten_circuits", &db::Netlist::flatten_circuits,
+    "@brief Flattens all given circuits of the netlist\n"
+    "This method is equivalent to calling \\flatten_circuit for all given circuits, but more efficient.\n"
+    "\n"
+    "This method has been introduced in version 0.26.1"
   ) +
   gsi::method ("flatten_circuit", &db::Netlist::flatten_circuit, gsi::arg ("circuit"),
     "@brief Flattens a subcircuit\n"

@@ -43,11 +43,11 @@ module LVS
     def _before_cleanup
 
       # save the netlist database if requested
-      if @output_lvsdb_file && @netter && @netter.lvs_data && @netter.lvs_data.xref
+      if @output_lvsdb_file && @netter && @netter._lvs_data && @netter._lvs_data.xref
 
         lvsdb_file = _make_path(@output_lvsdb_file)
         info("Writing LVS database: #{lvsdb_file} ..")
-        @netter.lvs_data.write(lvsdb_file, !@output_lvsdb_long)
+        @netter._lvs_data.write(lvsdb_file, !@output_lvsdb_long)
 
       end
 

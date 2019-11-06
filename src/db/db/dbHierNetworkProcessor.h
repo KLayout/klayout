@@ -33,6 +33,8 @@
 #include "tlEquivalenceClusters.h"
 
 #include <map>
+#include <list>
+#include <vector>
 #include <set>
 #include <limits>
 
@@ -609,6 +611,14 @@ public:
   }
 
   /**
+   *  @brief Sets the instance properties id
+   */
+  void set_inst_prop_id (db::properties_id_type pid)
+  {
+    m_inst_prop_id = pid;
+  }
+
+  /**
    *  @brief Transform with the given transformation
    */
   void transform (const db::ICplxTrans &tr)
@@ -721,6 +731,42 @@ public:
 private:
   size_t m_id;
 };
+
+typedef std::list<std::pair<ClusterInstance, ClusterInstance> > cluster_instance_pair_list_type;
+
+/**
+ *  @brief A helper struct to describe a pair of cell instances with a specific relative transformation
+ */
+struct InstanceToInstanceInteraction
+{
+  InstanceToInstanceInteraction (db::cell_index_type _ci1, db::cell_index_type _ci2, const db::ICplxTrans &_t21)
+    : ci1 (_ci1), ci2 (_ci2), t21 (_t21)
+  { }
+
+  bool operator== (const InstanceToInstanceInteraction &other) const
+  {
+    return ci1 == other.ci1 && ci2 == other.ci2 && t21.equal (other.t21);
+  }
+
+  bool operator< (const InstanceToInstanceInteraction &other) const
+  {
+    if (ci1 != other.ci1) {
+      return ci1 < other.ci1;
+    }
+    if (ci2 != other.ci2) {
+      return ci2 < other.ci2;
+    }
+    if (! t21.equal (other.t21)) {
+      return t21.less (other.t21);
+    }
+    return false;
+  }
+
+  db::cell_index_type ci1, ci2;
+  db::ICplxTrans t21;
+};
+
+typedef std::map<InstanceToInstanceInteraction, std::pair<db::ICplxTrans, cluster_instance_pair_list_type> > instance_interaction_cache_type;
 
 template <class T> class hier_clusters;
 template <class T> class connected_clusters;
@@ -895,6 +941,7 @@ class DB_PUBLIC hier_clusters
 {
 public:
   typedef typename local_cluster<T>::box_type box_type;
+  typedef std::map<InstanceToInstanceInteraction, std::pair<db::ICplxTrans, cluster_instance_pair_list_type> > instance_interaction_cache_type;
 
   /**
    *  @brief Creates an empty set of clusters
@@ -912,7 +959,7 @@ public:
   /**
    *  @brief Builds a hierarchy of clusters from a cell hierarchy and given connectivity
    */
-  void build (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence = 0);
+  void build (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence = 0, const std::set<cell_index_type> *breakout_cells = 0);
 
   /**
    *  @brief Gets the connected clusters for a given cell
@@ -951,9 +998,9 @@ public:
 
 private:
   void build_local_cluster (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence);
-  void build_hier_connections (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn);
-  void build_hier_connections_for_cells (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const std::vector<db::cell_index_type> &cells, const db::Connectivity &conn, tl::RelativeProgress &progress);
-  void do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence = 0);
+  void build_hier_connections (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const std::set<cell_index_type> *breakout_cells, instance_interaction_cache_type &instance_interaction_cache);
+  void build_hier_connections_for_cells (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const std::vector<db::cell_index_type> &cells, const db::Connectivity &conn, const std::set<cell_index_type> *breakout_cells, tl::RelativeProgress &progress, instance_interaction_cache_type &instance_interaction_cache);
+  void do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence, const std::set<cell_index_type> *breakout_cells);
 
   std::map<db::cell_index_type, connected_clusters<T> > m_per_cell_clusters;
   int m_base_verbosity;

@@ -36,7 +36,7 @@ Library::Library()
 }
 
 Library::Library(const Library &d)
-  : gsi::ObjectBase (), m_name (d.m_name), m_description (d.m_description), m_id (0), m_layout (d.m_layout)
+  : gsi::ObjectBase (), tl::Object (), m_name (d.m_name), m_description (d.m_description), m_id (0), m_layout (d.m_layout)
 {
   // .. nothing yet ..
 }

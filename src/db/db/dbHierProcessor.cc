@@ -1046,15 +1046,21 @@ template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::E
 //  LocalProcessor implementation
 
 template <class TS, class TI, class TR>
-local_processor<TS, TI, TR>::local_processor (db::Layout *layout, db::Cell *top)
-  : mp_subject_layout (layout), mp_intruder_layout (layout), mp_subject_top (top), mp_intruder_top (top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30), m_progress (0), mp_progress (0)
+local_processor<TS, TI, TR>::local_processor (db::Layout *layout, db::Cell *top, const std::set<db::cell_index_type> *breakout_cells)
+  : mp_subject_layout (layout), mp_intruder_layout (layout),
+    mp_subject_top (top), mp_intruder_top (top),
+    mp_subject_breakout_cells (breakout_cells), mp_intruder_breakout_cells (breakout_cells),
+    m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30), m_progress (0), mp_progress (0)
 {
   //  .. nothing yet ..
 }
 
 template <class TS, class TI, class TR>
-local_processor<TS, TI, TR>::local_processor (db::Layout *subject_layout, db::Cell *subject_top, const db::Layout *intruder_layout, const db::Cell *intruder_top)
-  : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), mp_subject_top (subject_top), mp_intruder_top (intruder_top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30), m_progress (0), mp_progress (0)
+local_processor<TS, TI, TR>::local_processor (db::Layout *subject_layout, db::Cell *subject_top, const db::Layout *intruder_layout, const db::Cell *intruder_top, const std::set<cell_index_type> *subject_breakout_cells, const std::set<cell_index_type> *intruder_breakout_cells)
+  : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout),
+    mp_subject_top (subject_top), mp_intruder_top (intruder_top),
+    mp_subject_breakout_cells (subject_breakout_cells), mp_intruder_breakout_cells (intruder_breakout_cells),
+    m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30), m_progress (0), mp_progress (0)
 {
   //  .. nothing yet ..
 }
@@ -1265,10 +1271,10 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
 
         for (db::Cell::const_iterator i = subject_cell->begin (); !i.at_end (); ++i) {
           unsigned int iid = ++id;
-          if (! inst_bcs (i->cell_inst ()).empty ()) {
+          if (! inst_bcs (i->cell_inst ()).empty () && ! subject_cell_is_breakout (i->cell_index ())) {
             scanner.insert1 (&i->cell_inst (), iid);
           }
-          if (! inst_bci (i->cell_inst ()).empty ()) {
+          if (! inst_bci (i->cell_inst ()).empty () && ! intruder_cell_is_breakout (i->cell_index ())) {
             scanner.insert2 (&i->cell_inst (), iid);
           }
         }
@@ -1276,14 +1282,14 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
       } else {
 
         for (db::Cell::const_iterator i = subject_cell->begin (); !i.at_end (); ++i) {
-          if (! inst_bcs (i->cell_inst ()).empty ()) {
+          if (! inst_bcs (i->cell_inst ()).empty () && ! subject_cell_is_breakout (i->cell_index ())) {
             scanner.insert1 (&i->cell_inst (), ++id);
           }
         }
 
         if (intruder_cell) {
           for (db::Cell::const_iterator i = intruder_cell->begin (); !i.at_end (); ++i) {
-            if (! inst_bci (i->cell_inst ()).empty ()) {
+            if (! inst_bci (i->cell_inst ()).empty () && ! intruder_cell_is_breakout (i->cell_index ())) {
               scanner.insert2 (&i->cell_inst (), ++id);
             }
           }
@@ -1306,7 +1312,7 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
       interaction_registration_inst2shape<TI> rec (mp_subject_layout, contexts.subject_layer (), dist, &interactions);
 
       for (db::Cell::const_iterator i = subject_cell->begin (); !i.at_end (); ++i) {
-        if (! inst_bcs (i->cell_inst ()).empty ()) {
+        if (! inst_bcs (i->cell_inst ()).empty () && ! subject_cell_is_breakout (i->cell_index ())) {
           scanner.insert1 (&i->cell_inst (), 0);
         }
       }
@@ -1701,7 +1707,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
     } else if (intruder_cell) {
 //  TODO: can we confine this search to the subject's (sized) bounding box?
       for (db::Cell::const_iterator i = intruder_cell->begin (); !i.at_end (); ++i) {
-        if (! inst_bci (i->cell_inst ()).empty ()) {
+        if (! inst_bci (i->cell_inst ()).empty () && ! intruder_cell_is_breakout (i->cell_index ())) {
           scanner.insert2 (&i->cell_inst (), ++inst_id);
         }
       }

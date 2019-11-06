@@ -1641,3 +1641,105 @@ TEST(issue_277)
   EXPECT_EQ (r.sized (1).merged (false, 1).to_string (), "");
 }
 
+TEST(issue_400)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/gds/t10.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+  //  keeps a reference to the DSS
+  db::Region rr (db::RecursiveShapeIterator (ly, top_cell, (*ly.begin_layers ()).first), dss);
+
+  for (db::Layout::layer_iterator l = ly.begin_layers (); l != ly.end_layers (); ++l) {
+
+    unsigned int li = (*l).first;
+    db::Region r (db::RecursiveShapeIterator (ly, top_cell, li), dss);
+
+    r.set_merged_semantics (false);
+    r.snap (19, 19);
+
+    ly.clear_layer (li);
+    r.insert_into (&ly, top_cell_index, li);
+
+  }
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au400a.gds");
+}
+
+TEST(issue_400_dont_keep_regions)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/gds/t10.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  for (db::Layout::layer_iterator l = ly.begin_layers (); l != ly.end_layers (); ++l) {
+
+    unsigned int li = (*l).first;
+    db::Region r (db::RecursiveShapeIterator (ly, top_cell, li), dss);
+
+    r.set_merged_semantics (false);
+    r.snap (19, 19);
+
+    ly.clear_layer (li);
+    r.insert_into (&ly, top_cell_index, li);
+
+  }
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au400b.gds");
+}
+
+TEST(issue_400_with_region)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/gds/t10.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::DBox rbox (2.61, -1.6, 12.76, 4.7);
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  for (db::Layout::layer_iterator l = ly.begin_layers (); l != ly.end_layers (); ++l) {
+
+    unsigned int li = (*l).first;
+    db::Region r (db::RecursiveShapeIterator (ly, top_cell, li, rbox.transformed (db::CplxTrans (ly.dbu ()).inverted ())), dss);
+
+    r.set_merged_semantics (false);
+    r.snap (19, 19);
+
+    ly.clear_layer (li);
+    r.insert_into (&ly, top_cell_index, li);
+
+  }
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au400c.gds");
+}

@@ -306,6 +306,33 @@ SaltGrain::valid_name (const std::string &n)
 }
 
 bool
+SaltGrain::valid_api_version (const std::string &v)
+{
+  tl::Extractor ex (v.c_str ());
+
+  while (! ex.at_end ()) {
+
+    std::string feature;
+    ex.try_read_name (feature);
+
+    bool first = true;
+    while (! ex.at_end () && ! ex.test (";")) {
+      int n = 0;
+      if (! first && ! ex.test (".")) {
+        return false;
+      }
+      if (! ex.try_read (n)) {
+        return false;
+      }
+      first = false;
+    }
+
+  }
+
+  return true;
+}
+
+bool
 SaltGrain::valid_version (const std::string &v)
 {
   tl::Extractor ex (v.c_str ());

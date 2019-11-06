@@ -529,8 +529,8 @@ SaltGrainPropertiesDialog::accept ()
 
   //  API version
   api_version_alert->clear ();
-  if (! m_grain.api_version ().empty () && ! SaltGrain::valid_version (m_grain.api_version ())) {
-    api_version_alert->error () << tr ("'%1' is not a valid API version string. An API version string needs to be numeric (like '0.25'').").arg (tl::to_qstring (m_grain.api_version ()));
+  if (! m_grain.api_version ().empty () && ! SaltGrain::valid_api_version (m_grain.api_version ())) {
+    api_version_alert->error () << tr ("'%1' is not a valid API version string. An API version string needs to be a semicolon-separated list of features with optional numeric versions (like '0.26' or 'ruby 2.0; python').").arg (tl::to_qstring (m_grain.api_version ()));
   }
 
   //  doc URL

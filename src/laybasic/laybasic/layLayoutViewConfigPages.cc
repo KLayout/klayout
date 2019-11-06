@@ -45,6 +45,8 @@
 
 #include "layWidgets.h"
 #include "layFileDialog.h"
+#include "layFixedFont.h"
+
 #include "dbHershey.h"
 
 #include <QColorDialog>
@@ -1424,6 +1426,11 @@ LayoutViewConfigPage7::LayoutViewConfigPage7 (QWidget *parent)
 {
   mp_ui = new Ui::LayoutViewConfigPage7 ();
   mp_ui->setupUi (this);
+
+  mp_ui->default_font_size->clear ();
+  for (int i = 0; i < lay::FixedFont::font_sizes (); ++i) {
+    mp_ui->default_font_size->addItem (QString::fromUtf8 (lay::FixedFont::font_size_name (i)));
+  }
 }
 
 LayoutViewConfigPage7::~LayoutViewConfigPage7 ()

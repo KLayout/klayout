@@ -252,7 +252,7 @@ SaltGrainDetailsTextWidget::details_text ()
 
   stream << "<p>";
   if (! g->api_version ().empty ()) {
-    stream << "<b>" << QObject::tr ("API version") << ":</b> " << tl::to_qstring (tl::escaped_to_html (g->api_version ())) << " ";
+    stream << "<b>" << QObject::tr ("API version and features") << ":</b> " << tl::to_qstring (tl::escaped_to_html (g->api_version ())) << " ";
   }
   stream << "</p>";
 

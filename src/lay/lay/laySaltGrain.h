@@ -198,6 +198,11 @@ public:
    *  The API version is the KLayout version required to run the grain's macros.
    *  A version string is of the form "x.y..." where x, y and other version
    *  components are integer numbers.
+   *
+   *  The version string can also list other features such as ruby version etc.
+   *  The components are separated with a semicolon.
+   *  For example, "0.26; ruby; python 3.0" means: requires KLayout API 0.26,
+   *  ruby (any version) any python (>= 3.0).
    */
   const std::string &api_version () const
   {
@@ -432,6 +437,11 @@ public:
    *  @brief Gets a value indicating whether the given version string is a valid version
    */
   static bool valid_version (const std::string &v);
+
+  /**
+   *  @brief Gets a value indicating whether the given version string is a valid API version string
+   */
+  static bool valid_api_version (const std::string &v);
 
   /**
    *  @brief Checks whether the given string is a valid name

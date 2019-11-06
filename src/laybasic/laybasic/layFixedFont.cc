@@ -37,18 +37,30 @@ FixedFont::FixedFont (unsigned int h, unsigned int lh, unsigned int w, unsigned 
   // .. nothing yet ..
 }
 
+int
+FixedFont::font_sizes ()
+{
+  return ff_sizes;
+}
+
+const char *
+FixedFont::font_size_name (int sz)
+{
+  return ff_size_name (sz);
+}
+
 void 
 FixedFont::set_default_font_size (int fs)
 {
-  ms_default_font_size = std::min (2, std::max (0, fs));
+  ms_default_font_size = std::min (ff_sizes - 1, std::max (0, fs));
 }
 
 const FixedFont &
 FixedFont::get_font (double resolution)
 {
   int fs = ms_default_font_size;
-  int od = std::max (1, std::min (int (sizeof (fonts) / sizeof (fonts [0])) / 3, int (1.0 / resolution + 0.5))) - 1;
-  return fonts [od * 3 + fs];
+  int od = std::max (1, std::min (ff_resolutions, int (1.0 / resolution + 0.5))) - 1;
+  return fonts [od * ff_sizes + fs];
 }
 
 }

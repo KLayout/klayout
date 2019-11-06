@@ -451,7 +451,8 @@ static bool is_reserved_word (const std::string &name)
           name == "def" ||
           name == "for" ||
           name == "lambda" ||
-          name == "try");
+          name == "try" ||
+          name == "None");
 }
 
 /**
@@ -2641,7 +2642,7 @@ PythonModule::make_classes (const char *mod_name)
         }
 
         if (name != raw_name) {
-          add_python_doc (**c, mt, int (mid), tl::sprintf (tl::to_string (tr ("This method is available as method '%s' in Python")), name));
+          add_python_doc (**c, mt, int (mid), tl::sprintf (tl::to_string (tr ("This attribute is available as '%s' in Python")), name));
         }
 
         //  create documentation
@@ -2741,7 +2742,7 @@ PythonModule::make_classes (const char *mod_name)
 
           } else if (tl::verbosity () >= 20) {
             tl::warn << "Upper case method name encountered which cannot be used as a Python constant (more than one overload or at least one argument): " << (*c)->name () << "." << name;
-            add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is not available for Python")));
+            add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This attribute is not available for Python")));
           }
 
         } else {

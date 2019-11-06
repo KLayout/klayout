@@ -36,6 +36,7 @@
 #include "layLayoutView.h"
 #include "layCellTreeModel.h"
 #include "layQtTools.h"
+#include "layGenericSyntaxHighlighter.h"
 
 #include "ui_LayerSourceDialog.h"
 #include "ui_NewLayoutPropertiesDialog.h"
@@ -54,6 +55,9 @@
 #include "ui_FlattenInstOptionsDialog.h"
 #include "ui_UserPropertiesForm.h"
 #include "ui_UserPropertiesEditForm.h"
+
+#include <QResource>
+#include <QBuffer>
 
 namespace lay
 {
@@ -1012,17 +1016,38 @@ FlattenInstOptionsDialog::exec_dialog (int &levels, bool &prune)
 //  UserPropertiesForm implementation
 
 UserPropertiesForm::UserPropertiesForm (QWidget *parent)
-  : QDialog (parent), m_editable (false)
+  : QDialog (parent), m_editable (false), mp_prep (0)
 {
   setObjectName (QString::fromUtf8 ("user_properties_form"));
 
   mp_ui = new Ui::UserPropertiesForm ();
   mp_ui->setupUi (this);
 
+  mp_ui->text_edit->setFont (QFont ("Monospace"));
+  mp_ui->text_edit->setAcceptRichText (false);
+
   connect (mp_ui->add_pb, SIGNAL (clicked ()), this, SLOT (add ()));
   connect (mp_ui->remove_pb, SIGNAL (clicked ()), this, SLOT (remove ()));
   connect (mp_ui->edit_pb, SIGNAL (clicked ()), this, SLOT (edit ()));
   connect (mp_ui->prop_list, SIGNAL (itemDoubleClicked (QTreeWidgetItem *, int)), this, SLOT (dbl_clicked (QTreeWidgetItem *, int)));
+  connect (mp_ui->mode_tab, SIGNAL (currentChanged (int)), this, SLOT (tab_changed (int)));
+
+  activate_help_links (mp_ui->help_label);
+
+  QResource res (tl::to_qstring (":/syntax/ur_text.xml"));
+  QByteArray data ((const char *) res.data (), int (res.size ()));
+  if (res.isCompressed ()) {
+    data = qUncompress (data);
+  }
+
+  QBuffer input (&data);
+  input.open (QIODevice::ReadOnly);
+  mp_hl_basic_attributes.reset (new GenericSyntaxHighlighterAttributes ());
+  mp_hl_attributes.reset (new GenericSyntaxHighlighterAttributes (mp_hl_basic_attributes.get ()));
+  lay::GenericSyntaxHighlighter *hl = new GenericSyntaxHighlighter (mp_ui->text_edit, input, mp_hl_attributes.get ());
+  input.close ();
+
+  hl->setDocument (mp_ui->text_edit->document ());
 }
 
 UserPropertiesForm::~UserPropertiesForm ()
@@ -1031,35 +1056,12 @@ UserPropertiesForm::~UserPropertiesForm ()
   mp_ui = 0;
 }
 
-bool
-UserPropertiesForm::show (lay::LayoutView *view, unsigned int cv_index, db::properties_id_type &prop_id)
+db::PropertiesRepository::properties_set
+UserPropertiesForm::get_properties (int tab)
 {
-  bool ret = false;
+  db::PropertiesRepository::properties_set props;
 
-BEGIN_PROTECTED
-
-  const lay::CellView &cv = view->cellview (cv_index);
-  db::PropertiesRepository &prep = cv->layout ().properties_repository ();
-
-  m_editable = cv->layout ().is_editable ();
-  if (m_editable) {
-    mp_ui->edit_frame->show ();
-  } else {
-    mp_ui->edit_frame->hide ();
-  }
-
-  mp_ui->prop_list->clear ();
-
-  const db::PropertiesRepository::properties_set &props = prep.properties (prop_id);
-  for (db::PropertiesRepository::properties_set::const_iterator p = props.begin (); p != props.end (); ++p) {
-    QTreeWidgetItem *entry = new QTreeWidgetItem (mp_ui->prop_list);
-    entry->setText (0, tl::to_qstring (prep.prop_name (p->first).to_parsable_string ()));
-    entry->setText (1, tl::to_qstring (p->second.to_parsable_string ()));
-  }
-
-  if (exec ()) {
-
-    db::PropertiesRepository::properties_set props;
+  if (tab == 0) {
 
     QTreeWidgetItemIterator it (mp_ui->prop_list);
     while (*it) {
@@ -1076,19 +1078,100 @@ BEGIN_PROTECTED
       kex.read (k);
       kex.expect_end ();
 
-      props.insert (std::make_pair (prep.prop_name_id (k), v));
+      props.insert (std::make_pair (mp_prep->prop_name_id (k), v));
 
       ++it;
 
     }
 
-    prop_id = prep.properties_id (props);
+  } else {
+
+    std::string text = tl::to_string (mp_ui->text_edit->toPlainText ());
+    std::vector<std::string> lines = tl::split (text, "\n");
+
+    for (std::vector<std::string>::const_iterator l = lines.begin (); l != lines.end (); ++l) {
+
+      tl::Extractor ex (l->c_str ());
+      if (ex.at_end ()) {
+        //  empty line
+      } else {
+
+        tl::Variant v, k;
+        ex.read (k);
+        ex.test (":");
+        ex.read (v);
+        ex.expect_end ();
+
+        props.insert (std::make_pair (mp_prep->prop_name_id (k), v));
+
+      }
+
+    }
+
+  }
+
+  return props;
+}
+
+void
+UserPropertiesForm::set_properties (const db::PropertiesRepository::properties_set &props)
+{
+  mp_ui->prop_list->clear ();
+
+  for (db::PropertiesRepository::properties_set::const_iterator p = props.begin (); p != props.end (); ++p) {
+    QTreeWidgetItem *entry = new QTreeWidgetItem (mp_ui->prop_list);
+    entry->setText (0, tl::to_qstring (mp_prep->prop_name (p->first).to_parsable_string ()));
+    entry->setText (1, tl::to_qstring (p->second.to_parsable_string ()));
+  }
+
+  std::string text;
+  for (db::PropertiesRepository::properties_set::const_iterator p = props.begin (); p != props.end (); ++p) {
+    text += mp_prep->prop_name (p->first).to_parsable_string ();
+    text += ": ";
+    text += p->second.to_parsable_string ();
+    text += "\n";
+  }
+
+  mp_ui->text_edit->setPlainText (tl::to_qstring (text));
+}
+
+bool
+UserPropertiesForm::show (lay::LayoutView *view, unsigned int cv_index, db::properties_id_type &prop_id)
+{
+  bool ret = false;
+
+BEGIN_PROTECTED
+
+  const lay::CellView &cv = view->cellview (cv_index);
+  mp_prep = &cv->layout ().properties_repository ();
+
+  m_editable = cv->layout ().is_editable ();
+  if (m_editable) {
+    mp_ui->edit_frame->show ();
+  } else {
+    mp_ui->edit_frame->hide ();
+  }
+
+  mp_ui->text_edit->setReadOnly (! m_editable);
+  mp_ui->prop_list->clear ();
+
+  const db::PropertiesRepository::properties_set &props = mp_prep->properties (prop_id);
+  set_properties (props);
+
+  if (exec ()) {
+
+    if (m_editable) {
+      db::PropertiesRepository::properties_set props = get_properties (mp_ui->mode_tab->currentIndex ());
+      prop_id = mp_prep->properties_id (props);
+    }
 
     ret = true;
 
   } else {
     ret = false;
   }
+
+  mp_prep = 0;
 
 END_PROTECTED
 
@@ -1142,6 +1225,50 @@ void
 UserPropertiesForm::dbl_clicked (QTreeWidgetItem *, int)
 {
   edit ();
+}
+
+void
+UserPropertiesForm::tab_changed (int tab_index)
+{
+  if (! m_editable) {
+    return;
+  }
+
+BEGIN_PROTECTED
+
+  int prev_tab = tab_index == 0 ? 1 : 0;
+
+  try {
+
+    //  sync content
+    set_properties (get_properties (prev_tab));
+
+  } catch (...) {
+
+    mp_ui->mode_tab->blockSignals (true);
+    mp_ui->mode_tab->setCurrentIndex (prev_tab);
+    mp_ui->mode_tab->blockSignals (false);
+
+    throw;
+
+  }
+
+END_PROTECTED
+}
+
+void
+UserPropertiesForm::accept ()
+{
+BEGIN_PROTECTED
+
+  //  Test for errors
+  if (m_editable) {
+    get_properties (mp_ui->mode_tab->currentIndex ());
+  }
+
+  QDialog::accept ();
+
+END_PROTECTED
 }
 
 void  

@@ -31,7 +31,21 @@
 * Enhancement: %GITHUB%/issues/393
       DRC syntax errors are now shown in their original code line
       of the DRC script.
-* Enhancement: New Region#pull_* methods and DRC features
+* Bugfix: %GITHUB%/issues/400
+      Snap feature wasn't working for deep regions in certain use
+      cases.
+* Enhancement: new "scale_and_snap" methods
+      These methods allow scaling and snapping of layouts. Scaling
+      is supported by a rational factor. After scaling, snapping can
+      be applied to an integer grid. There are two incarnations.
+      Region#scale_and_snap (or Region#scaled_and_snapped): this is
+      a flat implementation which allows anisotropic scaling/snapping
+      as well. 
+      And there is Layout#scale_and_snap which is a fully
+      hierarchical scale-and-snap feature. The latter does not support
+      anisotropic scaling/snapping, but works hierarchically without
+      opening gaps. It operates on a top cell and on all layers.
+* Enhancement: new Region#pull_* methods and DRC features
       "pull_*" is a class of methods that allows rehierarchisation
       of shapes. These methods act similar to "interacting", but
       the other way around: instead of delivering interacting

@@ -1490,6 +1490,61 @@ TEST(26_BreakoutCells)
   db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au26.gds");
 }
 
+TEST(27_snap)
+{
+  {
+    db::Layout ly;
+    {
+      std::string fn (tl::testsrc ());
+      fn += "/testdata/algo/scale_and_snap.gds";
+      tl::InputStream stream (fn);
+      db::Reader reader (stream);
+      reader.read (ly);
+    }
+
+    db::cell_index_type top_cell_index = *ly.begin_top_down ();
+    db::Cell &top_cell = ly.cell (top_cell_index);
+
+    db::DeepShapeStore dss;
+
+    unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+    db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+    r1.set_merged_semantics (false);
+    db::Region r2 = r1.snapped (19, 19);
+
+    r2.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
+
+    CHECKPOINT();
+    db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au27.gds");
+  }
+
+  {
+    db::Layout ly;
+    {
+      std::string fn (tl::testsrc ());
+      fn += "/testdata/algo/scale_and_snap.gds";
+      tl::InputStream stream (fn);
+      db::Reader reader (stream);
+      reader.read (ly);
+    }
+
+    db::cell_index_type top_cell_index = *ly.begin_top_down ();
+    db::Cell &top_cell = ly.cell (top_cell_index);
+
+    db::DeepShapeStore dss;
+
+    unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+    db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+    r1.set_merged_semantics (false);
+    r1.snap (19, 19);
+
+    r1.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
+
+    CHECKPOINT();
+    db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au27.gds");
+  }
+}
+
 TEST(100_Integration)
 {
   db::Layout ly;

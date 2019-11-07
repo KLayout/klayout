@@ -229,7 +229,7 @@ private:
  *  This method will scale and snap all layers from the given cell and below to the
  *  specified grid. Scaling happens by the rational factor m / d.
  */
-void scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db::Coord d);
+DB_PUBLIC void scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db::Coord d);
 
 }  // namespace db
 

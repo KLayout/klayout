@@ -50,6 +50,8 @@ public:
   TransformationReducer () { }
   virtual ~TransformationReducer () { }
 
+  virtual db::Trans reduce_trans (const db::Trans &trans) const { return reduce (trans); }
+  virtual db::ICplxTrans reduce_trans (const db::ICplxTrans &trans) const { return reduce (trans); }
   virtual db::Trans reduce (const db::Trans &trans) const = 0;
   virtual db::ICplxTrans reduce (const db::ICplxTrans &trans) const = 0;
   virtual bool is_translation_invariant () const { return true; }
@@ -63,18 +65,8 @@ public:
 struct DB_PUBLIC OrientationReducer
   : public TransformationReducer
 {
-  db::ICplxTrans reduce (const db::ICplxTrans &trans) const
-  {
-    db::ICplxTrans res (trans);
-    res.disp (db::Vector ());
-    res.mag (1.0);
-    return res;
-  }
-
-  db::Trans reduce (const db::Trans &trans) const
-  {
-    return db::Trans (trans.fp_trans ());
-  }
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
+  db::Trans reduce (const db::Trans &trans) const;
 };
 
 /**
@@ -85,15 +77,8 @@ struct DB_PUBLIC OrientationReducer
 struct DB_PUBLIC MagnificationReducer
   : public TransformationReducer
 {
-  db::ICplxTrans reduce (const db::ICplxTrans &trans) const
-  {
-    return db::ICplxTrans (trans.mag ());
-  }
-
-  db::Trans reduce (const db::Trans &) const
-  {
-    return db::Trans ();
-  }
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
+  db::Trans reduce (const db::Trans &) const;
 };
 
 /**
@@ -104,17 +89,8 @@ struct DB_PUBLIC MagnificationReducer
 struct DB_PUBLIC MagnificationAndOrientationReducer
   : public TransformationReducer
 {
-  db::ICplxTrans reduce (const db::ICplxTrans &trans) const
-  {
-    db::ICplxTrans res (trans);
-    res.disp (db::Vector ());
-    return res;
-  }
-
-  db::Trans reduce (const db::Trans &trans) const
-  {
-    return db::Trans (trans.fp_trans ());
-  }
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
+  db::Trans reduce (const db::Trans &trans) const;
 };
 
 /**
@@ -125,47 +101,15 @@ struct DB_PUBLIC MagnificationAndOrientationReducer
 struct DB_PUBLIC GridReducer
   : public TransformationReducer
 {
-  GridReducer (db::Coord grid)
-    : m_grid (grid)
-  {
-    //  .. nothing yet ..
-  }
+  GridReducer (db::Coord grid);
 
-  db::ICplxTrans reduce (const db::ICplxTrans &trans) const
-  {
-    //  NOTE: we need to keep magnification, angle and mirror so when combining the
-    //  reduced transformations, the result will be equivalent to reducing the combined
-    //  transformation.
-    db::ICplxTrans res (trans);
-    res.disp (db::Vector (mod (trans.disp ().x ()), mod (trans.disp ().y ())));
-    return res;
-  }
-
-  db::Trans reduce (const db::Trans &trans) const
-  {
-    db::Trans res (trans);
-    res.disp (db::Vector (mod (trans.disp ().x ()), mod (trans.disp ().y ())));
-    return res;
-  }
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
+  db::Trans reduce (const db::Trans &trans) const;
 
   bool is_translation_invariant () const { return false; }
 
 private:
   db::Coord m_grid;
-
-  inline db::Coord mod (db::Coord c) const
-  {
-    if (c < 0) {
-      c = m_grid - (-c) % m_grid;
-      if (c == m_grid) {
-        return 0;
-      } else {
-        return c;
-      }
-    } else {
-      return c % m_grid;
-    }
-  }
 };
 
 /**
@@ -178,49 +122,18 @@ private:
 struct DB_PUBLIC ScaleAndGridReducer
   : public TransformationReducer
 {
-  ScaleAndGridReducer (db::Coord grid, db::Coord mult, db::Coord div)
-    : m_mult (mult), m_grid (int64_t (grid) * int64_t (div))
-  {
-    //  .. nothing yet ..
-  }
+  ScaleAndGridReducer (db::Coord grid, db::Coord mult, db::Coord div);
 
-  db::ICplxTrans reduce (const db::ICplxTrans &trans) const
-  {
-    //  NOTE: we need to keep magnification, angle and mirror so when combining the
-    //  reduced transformations, the result will be equivalent to reducing the combined
-    //  transformation.
-    db::ICplxTrans res (trans);
-    res.disp (db::Vector (mod (trans.disp ().x ()), mod (trans.disp ().y ())));
-    return res;
-  }
-
-  db::Trans reduce (const db::Trans &trans) const
-  {
-    db::Trans res (trans);
-    res.disp (db::Vector (mod (trans.disp ().x ()), mod (trans.disp ().y ())));
-    return res;
-  }
+  virtual db::ICplxTrans reduce_trans (const db::ICplxTrans &trans) const;
+  virtual db::Trans reduce_trans (const db::Trans &trans) const;
+  virtual db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
+  virtual db::Trans reduce (const db::Trans &trans) const;
 
   bool is_translation_invariant () const { return false; }
 
 private:
   int64_t m_mult;
   int64_t m_grid;
-
-  inline db::Coord mod (db::Coord c) const
-  {
-    int64_t cc = int64_t (c) * m_mult;
-    if (cc < 0) {
-      cc = m_grid - (-cc) % m_grid;
-      if (cc == m_grid) {
-        return 0;
-      } else {
-        return db::Coord (cc);
-      }
-    } else {
-      return db::Coord (cc % m_grid);
-    }
-  }
 };
 
 /**

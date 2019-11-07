@@ -427,13 +427,13 @@ scaled_and_snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coord mx,
 }
 
 db::Vector
-scaled_and_snapped_vector (const db::Vector &v, db::Coord gx, db::Coord mx, db::Coord dx, db::Coord gy, db::Coord my, db::Coord dy)
+scaled_and_snapped_vector (const db::Vector &v, db::Coord gx, db::Coord mx, db::Coord dx, db::Coord ox, db::Coord gy, db::Coord my, db::Coord dy, db::Coord oy)
 {
   int64_t dgx = int64_t (gx) * int64_t (dx);
   int64_t dgy = int64_t (gy) * int64_t (dy);
 
-  int64_t x = snap_to_grid (int64_t (v.x ()) * mx, dgx) / int64_t (dx);
-  int64_t y = snap_to_grid (int64_t (v.y ()) * my, dgy) / int64_t (dy);
+  int64_t x = snap_to_grid (int64_t (v.x ()) * mx + int64_t (ox), dgx) / int64_t (dx);
+  int64_t y = snap_to_grid (int64_t (v.y ()) * my + int64_t (oy), dgy) / int64_t (dy);
 
   return db::Vector (db::Coord (x), db::Coord (y));
 }

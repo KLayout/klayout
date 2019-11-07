@@ -493,7 +493,20 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
         db::Polygon poly;
         si->polygon (poly);
         poly.transform (tr);
-        out.insert (scaled_and_snapped_polygon (poly, g, m, d, tr_disp.x (), g, m, d, tr_disp.y (), heap).transformed (trinv));
+        poly = scaled_and_snapped_polygon (poly, g, m, d, tr_disp.x (), g, m, d, tr_disp.y (), heap);
+        poly.transform (trinv);
+        out.insert (poly);
+
+      }
+
+      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Texts); ! si.at_end (); ++si) {
+
+        db::Text text;
+        si->text (text);
+        text.transform (tr);
+        text.trans (db::Trans (text.trans ().rot (), scaled_and_snapped_vector (text.trans ().disp (), g, m, d, tr_disp.x (), g, m, d, tr_disp.y ())));
+        text.transform (trinv);
+        out.insert (text);
 
       }
 
@@ -515,7 +528,11 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
       for (db::CellInstArray::iterator i = ia.begin (); ! i.at_end (); ++i) {
 
         db::Trans ti (*i);
-        ti.disp (scaled_and_snapped_vector (ti.disp (), g, m, d, g, m, d));
+        db::Vector ti_disp = ti.disp ();
+        ti_disp.transform (tr);
+        ti_disp = scaled_and_snapped_vector (ti_disp, g, m, d, tr_disp.x (), g, m, d, tr_disp.y ());
+        ti_disp.transform (trinv);
+        ti.disp (ti_disp);
 
         if (ia.is_complex ()) {
           new_insts.push_back (db::CellInstArray (ia.object (), ia.complex_trans (ti)));

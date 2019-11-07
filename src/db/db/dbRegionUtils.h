@@ -545,15 +545,15 @@ DB_PUBLIC db::Polygon snapped_polygon (const db::Polygon &poly, db::Coord gx, db
 /**
  *  @brief Scales and snaps a polygon to the given grid
  *  Heap is a vector of points reused for the point list
- *  The coordinate transformation is q = ((p * m + o) % (g * d)) / d.
+ *  The coordinate transformation is q = ((p * m + o) snap (g * d)) / d.
  */
 DB_PUBLIC db::Polygon scaled_and_snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coord mx, db::Coord dx, db::Coord ox, db::Coord gy, db::Coord my, db::Coord dy, db::Coord oy, std::vector<db::Point> &heap);
 
 /**
  *  @brief Scales and snaps a vector to the given grid
- *  The coordinate transformation is q = ((p * m) % (g * d)) / d.
+ *  The coordinate transformation is q = ((p * m + o) snap (g * d)) / d.
  */
-DB_PUBLIC db::Vector scaled_and_snapped_vector (const db::Vector &v, db::Coord gx, db::Coord mx, db::Coord dx, db::Coord gy, db::Coord my, db::Coord dy);
+DB_PUBLIC db::Vector scaled_and_snapped_vector (const db::Vector &v, db::Coord gx, db::Coord mx, db::Coord dx, db::Coord ox, db::Coord gy, db::Coord my, db::Coord dy, db::Coord oy);
 
 } // namespace db
 

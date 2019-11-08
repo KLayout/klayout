@@ -58,6 +58,7 @@ from setuptools import setup, Distribution, find_packages
 from setuptools.extension import Extension, Library
 import glob
 import os
+import re
 import platform
 from distutils.errors import CompileError
 import distutils.command.build_ext
@@ -326,7 +327,19 @@ class Config(object):
         """
         Gets the version string
         """
-        return "0.26.0"
+
+        # this will obtain the version string from the "version.sh" file which
+        # is the central point of configuration
+        version_file = os.path.join(os.path.dirname(__file__), "version.sh")
+        with open(version_file, "r") as file:
+            version_txt = file.read()
+            rm = re.search(r"KLAYOUT_VERSION\s*=\s*\"(.*?)\".*", version_txt)
+            if rm:
+                version_string = rm.group(1)
+                print("KLAYOUT_VERSION = " + version_string)
+                return version_string
+
+        raise RuntimeError("Unable to obtain version string from version.sh")
 
 
 config = Config()

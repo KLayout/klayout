@@ -105,6 +105,13 @@ public:
 
   virtual RegionDelegate *snapped (db::Coord gx, db::Coord gy);
 
+  virtual RegionDelegate *scaled_and_snapped_in_place (db::Coord gx, db::Coord mx, db::Coord dx, db::Coord gy, db::Coord my, db::Coord dy)
+  {
+    return scaled_and_snapped (gx, mx, dx, gy, my, dy);
+  }
+
+  virtual RegionDelegate *scaled_and_snapped (db::Coord gx, db::Coord mx, db::Coord dx, db::Coord gy, db::Coord my, db::Coord dy);
+
   virtual EdgesDelegate *edges (const EdgeFilterBase *) const;
 
   virtual RegionDelegate *process_in_place (const PolygonProcessorBase &filter)
@@ -247,7 +254,6 @@ protected:
   static void produce_markers_for_grid_check (const db::Polygon &poly, const Trans &tr, db::Coord gx, db::Coord gy, db::Shapes &shapes);
   template <class Trans>
   static void produce_markers_for_angle_check (const db::Polygon &poly, const Trans &tr, double min, double max, bool inverse, db::Shapes &shapes);
-  static db::Polygon snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coord gy, std::vector<db::Point> &heap);
 
 private:
   AsIfFlatRegion &operator= (const AsIfFlatRegion &other);

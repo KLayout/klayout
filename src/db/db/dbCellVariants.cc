@@ -22,10 +22,123 @@
 
 
 #include "dbCellVariants.h"
+#include "dbRegionUtils.h"
 #include "tlUtils.h"
 
 namespace db
 {
+
+// ------------------------------------------------------------------------------------------
+
+db::ICplxTrans OrientationReducer::reduce (const db::ICplxTrans &trans) const
+{
+  db::ICplxTrans res (trans);
+  res.disp (db::Vector ());
+  res.mag (1.0);
+  return res;
+}
+
+db::Trans OrientationReducer::reduce (const db::Trans &trans) const
+{
+  return db::Trans (trans.fp_trans ());
+}
+
+// ------------------------------------------------------------------------------------------
+
+db::ICplxTrans MagnificationReducer::reduce (const db::ICplxTrans &trans) const
+{
+  return db::ICplxTrans (trans.mag ());
+}
+
+db::Trans MagnificationReducer::reduce (const db::Trans &) const
+{
+  return db::Trans ();
+}
+
+// ------------------------------------------------------------------------------------------
+
+db::ICplxTrans MagnificationAndOrientationReducer::reduce (const db::ICplxTrans &trans) const
+{
+  db::ICplxTrans res (trans);
+  res.disp (db::Vector ());
+  return res;
+}
+
+db::Trans MagnificationAndOrientationReducer::reduce (const db::Trans &trans) const
+{
+  return db::Trans (trans.fp_trans ());
+}
+
+// ------------------------------------------------------------------------------------------
+
+GridReducer::GridReducer (db::Coord grid)
+  : m_grid (grid)
+{
+  //  .. nothing yet ..
+}
+
+db::ICplxTrans GridReducer::reduce (const db::ICplxTrans &trans) const
+{
+  //  NOTE: we need to keep magnification, angle and mirror so when combining the
+  //  reduced transformations, the result will be equivalent to reducing the combined
+  //  transformation.
+  db::ICplxTrans res (trans);
+  res.disp (db::Vector (trans.disp ().x () - snap_to_grid (trans.disp ().x (), m_grid), trans.disp ().y () - snap_to_grid (trans.disp ().y (), m_grid)));
+  return res;
+}
+
+db::Trans GridReducer::reduce (const db::Trans &trans) const
+{
+  db::Trans res (trans);
+  res.disp (db::Vector (trans.disp ().x () - snap_to_grid (trans.disp ().x (), m_grid), trans.disp ().y () - snap_to_grid (trans.disp ().y (), m_grid)));
+  return res;
+}
+
+// ------------------------------------------------------------------------------------------
+
+ScaleAndGridReducer::ScaleAndGridReducer (db::Coord grid, db::Coord mult, db::Coord div)
+  : m_mult (mult), m_grid (int64_t (grid) * int64_t (div))
+{
+  //  .. nothing yet ..
+}
+
+db::ICplxTrans ScaleAndGridReducer::reduce_trans (const db::ICplxTrans &trans) const
+{
+  db::ICplxTrans res (trans);
+  int64_t dx = int64_t (trans.disp ().x ()) * m_mult;
+  int64_t dy = int64_t (trans.disp ().y ()) * m_mult;
+  res.disp (db::Vector (db::Coord (dx - snap_to_grid (dx, m_grid)), db::Coord (dy - snap_to_grid (dy, m_grid))));
+  return res;
+}
+
+db::Trans ScaleAndGridReducer::reduce_trans (const db::Trans &trans) const
+{
+  db::Trans res (trans);
+  int64_t dx = int64_t (trans.disp ().x ()) * m_mult;
+  int64_t dy = int64_t (trans.disp ().y ()) * m_mult;
+  res.disp (db::Vector (db::Coord (dx - snap_to_grid (dx, m_grid)), db::Coord (dy - snap_to_grid (dy, m_grid))));
+  return res;
+}
+
+db::ICplxTrans ScaleAndGridReducer::reduce (const db::ICplxTrans &trans) const
+{
+  db::ICplxTrans res (trans);
+  int64_t dx = int64_t (trans.disp ().x ());
+  int64_t dy = int64_t (trans.disp ().y ());
+  res.disp (db::Vector (db::Coord (dx - snap_to_grid (dx, m_grid)), db::Coord (dy - snap_to_grid (dy, m_grid))));
+  return res;
+}
+
+db::Trans ScaleAndGridReducer::reduce (const db::Trans &trans) const
+{
+  db::Trans res (trans);
+  int64_t dx = int64_t (trans.disp ().x ());
+  int64_t dy = int64_t (trans.disp ().y ());
+  res.disp (db::Vector (db::Coord (dx - snap_to_grid (dx, m_grid)), db::Coord (dy - snap_to_grid (dy, m_grid))));
+  return res;
+}
+
+// ------------------------------------------------------------------------------------------
 
 VariantsCollectorBase::VariantsCollectorBase ()
   : mp_red ()
@@ -219,7 +332,7 @@ VariantsCollectorBase::commit_shapes (db::Layout &layout, db::Cell &top_cell, un
             for (db::CellInstArray::iterator ia = i->begin (); ! ia.at_end (); ++ia) {
 
               db::ICplxTrans t = i->complex_trans (*ia);
-              db::ICplxTrans rt = mp_red->reduce (vc->first * t);
+              db::ICplxTrans rt = mp_red->reduce (vc->first * mp_red->reduce_trans (t));
               std::map<db::ICplxTrans, db::Shapes>::const_iterator v = vt.find (rt);
               if (v != vt.end ()) {
 
@@ -263,7 +376,7 @@ VariantsCollectorBase::commit_shapes (db::Layout &layout, db::Cell &top_cell, un
           for (db::CellInstArray::iterator ia = i->begin (); ! ia.at_end (); ++ia) {
 
             db::ICplxTrans t = i->complex_trans (*ia);
-            db::ICplxTrans rt = mp_red->reduce (vvc.begin ()->first * t);
+            db::ICplxTrans rt = mp_red->reduce (vvc.begin ()->first * mp_red->reduce_trans (t));
             std::map<db::ICplxTrans, db::Shapes>::const_iterator v = vt.find (rt);
 
             if (v != vt.end ()) {
@@ -325,11 +438,11 @@ VariantsCollectorBase::add_variant_non_tl_invariant (std::map<db::ICplxTrans, si
 {
   if (inst.is_complex ()) {
     for (db::CellInstArray::iterator i = inst.begin (); ! i.at_end (); ++i) {
-      variants [mp_red->reduce (inst.complex_trans (*i))] += 1;
+      variants [mp_red->reduce_trans (inst.complex_trans (*i))] += 1;
     }
   } else {
     for (db::CellInstArray::iterator i = inst.begin (); ! i.at_end (); ++i) {
-      variants [db::ICplxTrans (mp_red->reduce (*i))] += 1;
+      variants [db::ICplxTrans (mp_red->reduce_trans (*i))] += 1;
     }
   }
 }
@@ -338,9 +451,9 @@ void
 VariantsCollectorBase::add_variant_tl_invariant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst) const
 {
   if (inst.is_complex ()) {
-    variants [mp_red->reduce (inst.complex_trans ())] += inst.size ();
+    variants [mp_red->reduce_trans (inst.complex_trans ())] += inst.size ();
   } else {
-    variants [db::ICplxTrans (mp_red->reduce (inst.front ()))] += inst.size ();
+    variants [db::ICplxTrans (mp_red->reduce_trans (inst.front ()))] += inst.size ();
   }
 }
 
@@ -355,7 +468,7 @@ VariantsCollectorBase::product (const std::map<db::ICplxTrans, size_t> &v1, cons
 }
 
 void
-VariantsCollectorBase::copy_shapes (db::Layout &layout, db::cell_index_type ci_to, db::cell_index_type ci_from) const
+VariantsCollectorBase::copy_shapes (db::Layout &layout, db::cell_index_type ci_to, db::cell_index_type ci_from)
 {
   db::Cell &to = layout.cell (ci_to);
   const db::Cell &from = layout.cell (ci_from);
@@ -390,7 +503,7 @@ VariantsCollectorBase::create_var_instances_non_tl_invariant (db::Cell &in_cell,
 
       for (db::CellInstArray::iterator ia = i->begin (); ! ia.at_end (); ++ia) {
 
-        db::ICplxTrans rt = mp_red->reduce (for_var * i->complex_trans (*ia));
+        db::ICplxTrans rt = mp_red->reduce (for_var * mp_red->reduce_trans (i->complex_trans (*ia)));
         std::map<db::ICplxTrans, db::cell_index_type>::const_iterator v = vt.find (rt);
         tl_assert (v != vt.end ());
 
@@ -419,7 +532,7 @@ VariantsCollectorBase::create_var_instances_tl_invariant (db::Cell &in_cell, std
 
       std::map<db::ICplxTrans, db::cell_index_type>::const_iterator v;
 
-      db::ICplxTrans rt = mp_red->reduce (for_var * i->complex_trans ());
+      db::ICplxTrans rt = mp_red->reduce (for_var * mp_red->reduce_trans (i->complex_trans ()));
       v = vt.find (rt);
       tl_assert (v != vt.end ());
 

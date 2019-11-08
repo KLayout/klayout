@@ -904,6 +904,19 @@ public:
   Region snapped (db::Coord gx, db::Coord gy) const;
 
   /**
+   *  @brief Scales and grid-snaps the region
+   *
+   *  This method will scale the region by mx/dx in horizontal and by my/dy in vertical
+   *  direction and then snape to gx and gy respectively.
+   */
+  void scale_and_snap (db::Coord gx, db::Coord mx, db::Coord dx, db::Coord gy, db::Coord my, db::Coord dy);
+
+  /**
+   *  @brief Returns the scaled and snapped region
+   */
+  Region scaled_and_snapped (db::Coord gx, db::Coord mx, db::Coord dx, db::Coord gy, db::Coord my, db::Coord dy) const;
+
+  /**
    *  @brief Performs a check for "strange" polygons
    *
    *  This check will return a region with all self-overlapping or

@@ -285,6 +285,24 @@ public:
   }
 
   /**
+   *  @brief Unmaps an original cell/clip box version from the original-to-working copy cell map
+   *
+   *  An unmapped cell is never again considered.
+   */
+  void unmap (const cell_map_type::key_type &k)
+  {
+    m_cell_map.erase (k);
+  }
+
+  /**
+   *  @brief Maps an original cell/clip box version to a original-to-working copy cell
+   */
+  void map (const cell_map_type::key_type &k, db::cell_index_type ci)
+  {
+    m_cell_map [k] = ci;
+  }
+
+  /**
    *  @brief Marks a cell as a variant of another
    *
    *  The first cell is either the original, non-variant target cell or itself a variant.
@@ -293,12 +311,22 @@ public:
   void register_variant (db::cell_index_type non_var, db::cell_index_type var);
 
   /**
+   *  @brief Unregisters a cell as a variant
+   */
+  void unregister_variant (db::cell_index_type var);
+
+  /**
    *  @brief Gets a value indicating whether the given cell is a variant cell
    */
   bool is_variant (db::cell_index_type ci) const
   {
     return m_variants_to_original_target_map.find (ci) != m_variants_to_original_target_map.end ();
   }
+
+  /**
+   *  @brief Gets the original target for a variant cell
+   */
+  db::cell_index_type original_target_for_variant (db::cell_index_type ci) const;
 
 private:
   tl::weak_ptr<db::Layout> mp_target;

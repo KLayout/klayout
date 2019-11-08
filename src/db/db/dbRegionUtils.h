@@ -524,6 +524,37 @@ private:
   OutputContainer *mp_output;
 };
 
+template <class C>
+static inline C snap_to_grid (C c, C g)
+{
+  //  This form of snapping always snaps g/2 to right/top.
+  if (c < 0) {
+    c = -g * ((-c + (g - 1) / 2) / g);
+  } else {
+    c = g * ((c + g / 2) / g);
+  }
+  return c;
+}
+
+/**
+ *  @brief Snaps a polygon to the given grid
+ *  Heap is a vector of points reused for the point list
+ */
+DB_PUBLIC db::Polygon snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coord gy, std::vector<db::Point> &heap);
+
+/**
+ *  @brief Scales and snaps a polygon to the given grid
+ *  Heap is a vector of points reused for the point list
+ *  The coordinate transformation is q = ((p * m + o) snap (g * d)) / d.
+ */
+DB_PUBLIC db::Polygon scaled_and_snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coord mx, db::Coord dx, db::Coord ox, db::Coord gy, db::Coord my, db::Coord dy, db::Coord oy, std::vector<db::Point> &heap);
+
+/**
+ *  @brief Scales and snaps a vector to the given grid
+ *  The coordinate transformation is q = ((p * m + o) snap (g * d)) / d.
+ */
+DB_PUBLIC db::Vector scaled_and_snapped_vector (const db::Vector &v, db::Coord gx, db::Coord mx, db::Coord dx, db::Coord ox, db::Coord gy, db::Coord my, db::Coord dy, db::Coord oy);
+
 } // namespace db
 
 #endif

@@ -186,6 +186,40 @@ HierarchyBuilder::register_variant (db::cell_index_type non_var, db::cell_index_
 }
 
 void
+HierarchyBuilder::unregister_variant (db::cell_index_type var)
+{
+  variant_to_original_target_map_type::const_iterator v = m_variants_to_original_target_map.find (var);
+  if (v == m_variants_to_original_target_map.end ()) {
+    return;
+  }
+
+  original_target_to_variants_map_type::iterator rv = m_original_targets_to_variants_map.find (v->second);
+  tl_assert (rv != m_original_targets_to_variants_map.end ());
+
+  std::vector<db::cell_index_type> &vv = rv->second;
+  std::vector<db::cell_index_type>::iterator ri = std::find (vv.begin (), vv.end (), var);
+  tl_assert (ri != vv.end ());
+  vv.erase (ri);
+
+  if (vv.empty ()) {
+    m_original_targets_to_variants_map.erase (rv);
+  }
+
+  m_variants_to_original_target_map.erase (v);
+}
+
+db::cell_index_type
+HierarchyBuilder::original_target_for_variant (db::cell_index_type ci) const
+{
+  variant_to_original_target_map_type::const_iterator v = m_variants_to_original_target_map.find (ci);
+  if (v != m_variants_to_original_target_map.end ()) {
+    return v->second;
+  } else {
+    return ci;
+  }
+}
+
+void
 HierarchyBuilder::begin (const RecursiveShapeIterator *iter)
 {
   if (m_initial_pass) {
@@ -269,6 +303,7 @@ HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellIn
   if (all) {
 
     std::pair<db::cell_index_type, std::set<db::Box> > key (inst.object ().cell_index (), std::set<db::Box> ());
+
     m_cm_entry = m_cell_map.find (key);
     m_cm_new_entry = false;
 

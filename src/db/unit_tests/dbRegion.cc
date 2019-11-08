@@ -28,6 +28,10 @@
 #include "dbRegionProcessors.h"
 #include "dbEdgesUtils.h"
 #include "dbBoxScanner.h"
+#include "dbReader.h"
+#include "dbTestSupport.h"
+
+#include "tlStream.h"
 
 #include <cstdio>
 
@@ -1389,6 +1393,106 @@ TEST(31)
   EXPECT_EQ (db::Region (db::Box (db::Point (0, 4001), db::Point (2000, 6000))).pull_overlapping (r).to_string (), "");
   EXPECT_EQ (r.pull_overlapping (db::Region (db::Box (db::Point (0, 3999), db::Point (1001, 6000)))).to_string (), "(0,3999;0,6000;1001,6000;1001,3999)");
   EXPECT_EQ (db::Region (db::Box (db::Point (0, 3999), db::Point (1001, 6000))).pull_overlapping (r).to_string (), "(1000,0;1000,4000;6000,4000;6000,0)");
+}
+
+TEST(32a_snap)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/scale_and_snap.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1));
+  r1.set_merged_semantics (false);
+  db::Region r2 = r1.snapped (19, 19);
+
+  r2.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/region_au32.gds");
+}
+
+TEST(32b_snap)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/scale_and_snap.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1));
+  r1.set_merged_semantics (false);
+  r1.snap (19, 19);
+
+  r1.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/region_au32.gds");
+}
+
+TEST(33a_snap)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/scale_and_snap.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1));
+  r1.set_merged_semantics (false);
+  db::Region r2 = r1.scaled_and_snapped (19, 2, 10, 19, 2, 10);
+
+  r2.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/region_au33.gds");
+}
+
+TEST(33b_snap)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/scale_and_snap.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1));
+  r1.set_merged_semantics (false);
+  r1.scale_and_snap (19, 2, 10, 19, 2, 10);
+
+  r1.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/region_au33.gds");
 }
 
 TEST(100_Processors)

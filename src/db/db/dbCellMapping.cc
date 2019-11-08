@@ -295,9 +295,26 @@ CellMapping::create_from_names (const db::Layout &layout_a, db::cell_index_type 
 }
 
 std::vector<db::cell_index_type> 
-CellMapping::create_missing_mapping (db::Layout &layout_a, db::cell_index_type /*cell_index_a*/, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells)
+CellMapping::create_missing_mapping (db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells)
 {
   std::vector<db::cell_index_type> new_cells;
+  do_create_missing_mapping (layout_a, cell_index_a, layout_b, cell_index_b, exclude_cells, include_cells, &new_cells, 0);
+  return new_cells;
+}
+
+std::vector<std::pair<db::cell_index_type, db::cell_index_type> >
+CellMapping::create_missing_mapping2 (db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells)
+{
+  std::vector<std::pair<db::cell_index_type, db::cell_index_type> > cell_pairs;
+  do_create_missing_mapping (layout_a, cell_index_a, layout_b, cell_index_b, exclude_cells, include_cells, 0, &cell_pairs);
+  return cell_pairs;
+}
+
+void
+CellMapping::do_create_missing_mapping (db::Layout &layout_a, db::cell_index_type /*cell_index_a*/, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells, std::vector<db::cell_index_type> *new_cells_ptr, std::vector<std::pair<db::cell_index_type, db::cell_index_type> > *mapped_pairs)
+{
+  std::vector<db::cell_index_type> new_cells_int;
+  std::vector<db::cell_index_type> &new_cells = *(new_cells_ptr ? new_cells_ptr : &new_cells_int);
   std::vector<db::cell_index_type> new_cells_b;
 
   std::set<db::cell_index_type> called_b;
@@ -308,10 +325,17 @@ CellMapping::create_missing_mapping (db::Layout &layout_a, db::cell_index_type /
     if (m_b2a_mapping.find (*b) == m_b2a_mapping.end ()
         && (! exclude_cells || exclude_cells->find (*b) == exclude_cells->end ())
         && (! include_cells || include_cells->find (*b) != include_cells->end ())) {
+
       db::cell_index_type new_cell = layout_a.add_cell (layout_b.cell_name (*b));
       new_cells.push_back (new_cell);
       new_cells_b.push_back (*b);
+
+      if (mapped_pairs) {
+        mapped_pairs->push_back (std::make_pair (*b, new_cell));
+      }
+
       map (*b, new_cell);
+
     }
   }
 
@@ -355,8 +379,6 @@ CellMapping::create_missing_mapping (db::Layout &layout_a, db::cell_index_type /
     layout_a.end_changes ();
 
   }
-
-  return new_cells;
 }
 
 void 

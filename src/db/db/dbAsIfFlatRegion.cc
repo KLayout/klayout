@@ -632,56 +632,11 @@ AsIfFlatRegion::angle_check (double min, double max, bool inverse) const
   return res.release ();
 }
 
-static inline db::Coord snap_to_grid (db::Coord c, db::Coord g)
-{
-  //  This form of snapping always snaps g/2 to right/top.
-  if (c < 0) {
-    c = -g * ((-c + (g - 1) / 2) / g);
-  } else {
-    c = g * ((c + g / 2) / g);
-  }
-  return c;
-}
-
-db::Polygon
-AsIfFlatRegion::snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coord gy, std::vector<db::Point> &heap)
-{
-  db::Polygon pnew;
-
-  for (size_t i = 0; i < poly.holes () + 1; ++i) {
-
-    heap.clear ();
-
-    db::Polygon::polygon_contour_iterator b, e;
-
-    if (i == 0) {
-      b = poly.begin_hull ();
-      e = poly.end_hull ();
-    } else {
-      b = poly.begin_hole ((unsigned int)  (i - 1));
-      e = poly.end_hole ((unsigned int)  (i - 1));
-    }
-
-    for (db::Polygon::polygon_contour_iterator pt = b; pt != e; ++pt) {
-      heap.push_back (db::Point (snap_to_grid ((*pt).x (), gx), snap_to_grid ((*pt).y (), gy)));
-    }
-
-    if (i == 0) {
-      pnew.assign_hull (heap.begin (), heap.end ());
-    } else {
-      pnew.insert_hole (heap.begin (), heap.end ());
-    }
-
-  }
-
-  return pnew;
-}
-
 RegionDelegate *
 AsIfFlatRegion::snapped (db::Coord gx, db::Coord gy)
 {
   if (gx < 0 || gy < 0) {
-    throw tl::Exception (tl::to_string (tr ("Grid check requires a positive grid value")));
+    throw tl::Exception (tl::to_string (tr ("Grid snap requires a positive grid value")));
   }
 
   std::auto_ptr<FlatRegion> new_region (new FlatRegion (merged_semantics ()));
@@ -693,6 +648,31 @@ AsIfFlatRegion::snapped (db::Coord gx, db::Coord gy)
 
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
     new_region->raw_polygons ().insert (snapped_polygon (*p, gx, gy, heap));
+  }
+
+  return new_region.release ();
+}
+
+RegionDelegate *
+AsIfFlatRegion::scaled_and_snapped (db::Coord gx, db::Coord mx, db::Coord dx, db::Coord gy, db::Coord my, db::Coord dy)
+{
+  if (gx < 0 || gy < 0) {
+    throw tl::Exception (tl::to_string (tr ("Grid snap requires a positive grid value")));
+  }
+
+  if (mx <= 0 || dx <= 0 || my <= 0 || dy <= 0) {
+    throw tl::Exception (tl::to_string (tr ("Scale and snap requires positive and non-null magnification or divisor values")));
+  }
+
+  std::auto_ptr<FlatRegion> new_region (new FlatRegion (merged_semantics ()));
+
+  gx = std::max (db::Coord (1), gx);
+  gy = std::max (db::Coord (1), gy);
+
+  std::vector<db::Point> heap;
+
+  for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
+    new_region->raw_polygons ().insert (scaled_and_snapped_polygon (*p, gx, mx, dx, 0, gy, my, dy, 0, heap));
   }
 
   return new_region.release ();

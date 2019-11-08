@@ -615,3 +615,41 @@ TEST(16)
 
 }
 
+TEST(17_scale_and_snap)
+{
+  db::Layout l1;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/scale_and_snap.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (l1);
+  }
+
+  db::scale_and_snap (l1, l1.cell (*l1.begin_top_down ()), 1, 20, 19);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, l1, tl::testsrc () + "/testdata/algo/layout_utils_au_sns1.gds");
+
+  db::scale_and_snap (l1, l1.cell (*l1.begin_top_down ()), 1, 19, 20);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, l1, tl::testsrc () + "/testdata/algo/layout_utils_au_sns2.gds");
+}
+
+TEST(18_scale_and_snap)
+{
+  db::Layout l1;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/scale_and_snap.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (l1);
+  }
+
+  db::scale_and_snap (l1, l1.cell (*l1.begin_top_down ()), 19, 1, 1);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, l1, tl::testsrc () + "/testdata/algo/layout_utils_au_sns3.gds");
+}

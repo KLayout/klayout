@@ -312,10 +312,26 @@ TEST(8)
   x = Extractor ("a_word!");
   x.read_word (s);
   EXPECT_EQ (s, "a_word");
+
+  x = Extractor ("a_word!");
+  s.clear ();
+  x.read_name (s);
+  EXPECT_EQ (s, "a_word");
   EXPECT_EQ (x.test ("!"), true);
+
+  x = Extractor ("0_word!");
+  EXPECT_EQ (x.try_read_word (s), true);
+
+  x = Extractor ("0_word!");
+  EXPECT_EQ (x.try_read_name (s), false);
 
   x = Extractor ("a_word!");
   EXPECT_EQ (x.try_read_word (s), true);
+  EXPECT_EQ (s, "a_word");
+  EXPECT_EQ (x.test ("!"), true);
+
+  x = Extractor ("a_word!");
+  EXPECT_EQ (x.try_read_name (s), true);
   EXPECT_EQ (s, "a_word");
   EXPECT_EQ (x.test ("!"), true);
 
@@ -325,7 +341,17 @@ TEST(8)
   EXPECT_EQ (x.at_end (), true);
 
   x = Extractor ("a_word!");
+  x.read_name (s, "_!");
+  EXPECT_EQ (s, "a_word!");
+  EXPECT_EQ (x.at_end (), true);
+
+  x = Extractor ("a_word!");
   EXPECT_EQ (x.try_read_word (s, "_!"), true);
+  EXPECT_EQ (s, "a_word!");
+  EXPECT_EQ (x.at_end (), true);
+
+  x = Extractor ("a_word!");
+  EXPECT_EQ (x.try_read_name (s, "_!"), true);
   EXPECT_EQ (s, "a_word!");
   EXPECT_EQ (x.at_end (), true);
 

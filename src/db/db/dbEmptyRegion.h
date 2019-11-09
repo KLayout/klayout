@@ -72,7 +72,9 @@ public:
   virtual EdgePairsDelegate *angle_check (double, double, bool) const;
 
   virtual RegionDelegate *snapped_in_place (db::Coord, db::Coord) { return this; }
-  virtual RegionDelegate *snapped (db::Coord, db::Coord)  { return new EmptyRegion (); }
+  virtual RegionDelegate *snapped (db::Coord, db::Coord) { return new EmptyRegion (); }
+  virtual RegionDelegate *scaled_and_snapped_in_place (db::Coord, db::Coord, db::Coord, db::Coord, db::Coord, db::Coord) { return this; }
+  virtual RegionDelegate *scaled_and_snapped (db::Coord, db::Coord, db::Coord, db::Coord, db::Coord, db::Coord) { return new EmptyRegion (); }
 
   virtual EdgesDelegate *edges (const EdgeFilterBase *) const;
   virtual RegionDelegate *filter_in_place (const PolygonFilterBase &) { return this; }

@@ -380,6 +380,30 @@ void Netlist::purge_circuit (Circuit *circuit)
   remove_circuit (circuit);
 }
 
+void Netlist::flatten_circuits (const std::vector<Circuit *> &circuits)
+{
+  if (circuits.empty ()) {
+    return;
+  }
+
+  std::set<Circuit *> circuits_set (circuits.begin (), circuits.end ());
+
+  std::vector<Circuit *> to_flatten;
+  to_flatten.reserve (circuits.size ());
+
+  //  Before flatten, we sort top-down. This optimizes for the case of flattening away
+  //  some hierarchy above a certain circuit.
+  for (top_down_circuit_iterator c = begin_top_down (); c != end_top_down (); ++c) {
+    if (circuits_set.find (c.operator-> ()) != circuits_set.end ()) {
+      to_flatten.push_back (c.operator-> ());
+    }
+  }
+
+  for (std::vector<Circuit *>::const_iterator c = to_flatten.begin (); c != to_flatten.end (); ++c) {
+    flatten_circuit (*c);
+  }
+}
+
 void Netlist::flatten_circuit (Circuit *circuit)
 {
   tl_assert (circuit != 0);
@@ -485,8 +509,16 @@ void Netlist::purge ()
 
     Circuit *circuit = c.operator-> ();
 
+    //  purge floating, disconnected nets
     circuit->purge_nets ();
-    if (circuit->begin_nets () == circuit->end_nets () && ! circuit->dont_purge ()) {
+
+    //  if only passive nets are left, consider this circuit for purging
+    bool purge_candidate = ! circuit->dont_purge ();
+    for (db::Circuit::net_iterator n = circuit->begin_nets (); n != circuit->end_nets () && purge_candidate; ++n) {
+      purge_candidate = n->is_passive ();
+    }
+
+    if (purge_candidate) {
 
       //  No nets left: delete the subcircuits that refer to us and finally delete the circuit
       while (circuit->begin_refs () != circuit->end_refs ()) {

@@ -841,23 +841,34 @@ end;
 END
 
     nl3 = nl2.dup
-    nl2.flatten_circuit(nl2.circuit_by_name("PTRANS"))
-    nl2.flatten_circuit(nl2.circuit_by_name("NTRANS"))
+    nl3.flatten_circuit(nl3.circuit_by_name("NTRANS"))
+    nl3.flatten_circuit(nl3.circuit_by_name("PTRANS"))
 
-    assert_equal(nl2.to_s, <<"END")
+    assert_equal(nl3.to_s, <<"END")
 circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);
   device PMOS $1 (S=$5,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);
-  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);
-  device NMOS $3 (S=$4,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);
-  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);
+  device NMOS $2 (S=$4,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);
+  device NMOS $3 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);
+  device PMOS $4 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);
 end;
 END
 
-    nl3.flatten_circuit("{N,P}TRANS")
-    assert_equal(nl3.to_s, nl2.to_s)
+    nl4 = nl2.dup
+    nl4.flatten_circuit("{P,N}TRANS")
+    assert_equal(nl4.to_s, nl3.to_s)
+
+    nl4 = nl2.dup
+    nl4.flatten_circuits([ nl4.circuit_by_name("PTRANS"), nl4.circuit_by_name("NTRANS") ])
+    assert_equal(nl4.to_s, nl3.to_s)
 
     nl2 = nl.dup
     nl2.flatten_circuit("*")   # smoke test
+    assert_equal(nl2.to_s, "")
+
+    nl2 = nl.dup
+    cc = []
+    nl2.each_circuit { |c| cc << c }
+    nl2.flatten_circuits(cc) 
     assert_equal(nl2.to_s, "")
 
   end

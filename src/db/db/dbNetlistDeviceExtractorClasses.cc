@@ -92,7 +92,6 @@ db::Connectivity NetlistDeviceExtractorMOS3Transistor::get_connectivity (const d
 
   } else {
 
-
     tl_assert (layers.size () >= 4);
 
     unsigned int sdiff = layers [0];

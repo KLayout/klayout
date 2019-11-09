@@ -175,6 +175,12 @@ public:
   void flatten_circuit (Circuit *circuit);
 
   /**
+   *  @brief Flattens the given circuits
+   *  This is basically equivalent to calling flatten on all given circuits, but more efficient.
+   */
+  void flatten_circuits (const std::vector<Circuit *> &circuits);
+
+  /**
    *  @brief Flattens the netlist
    */
   void flatten ();

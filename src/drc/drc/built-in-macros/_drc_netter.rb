@@ -383,6 +383,10 @@ module DRC
       l2ndb
     end
 
+    def _l2n_data
+      @netlisted && self.l2n_data
+    end
+
   private
 
     def cleanup

@@ -1,3 +1,83 @@
+0.26.1          (2019-11-06):
+
+* Bugfix: %GITHUB%/issues/354
+      Buddy scripts did segfault.
+* Bugfix: %GITHUB%/issues/352
+      LVS: equivalent_pins required the cell to be present.
+* Enhancement: %GITHUB%/issues/353
+      Session files: "file-path" and "rdb-file" behavior was inconsistent.
+* Bugfix: %GITHUB%/issues/358
+      "strm2oas" was writing GDS files.
+* Bugfix: %GITHUB%/issues/363
+      It was possible to produce bad polygons while drawing.
+* Bugfix: %GITHUB%/issues/372
+      pymod build failed with HAVE_64BIT_COORD=1.
+* Enhancement: %GITHUB%/issues/376
+      Parameters UI callback invoking.
+* Bugfix: %GITHUB%/issues/368
+      Segfault with layer list manipulation while iterating.
+* Bugfix: %GITHUB%/issues/386
+      "None" is a reserved keyword for Python binding - use "None_".
+* Enhancement: %GITHUB%/issues/382
+      Possibility to copy user property value.
+* Enhancement: %GITHUB%/issues/387
+      Salt: Python version can be specified in "api-version".
+      Other requirements can be specified too.
+* Bugfix: %GITHUB%/issues/392
+      Layers "Style" sub-pane was malformed.
+* Enhancement: %GITHUB%/issues/394
+      Even bigger font sizes for rulers and labels for the 4k age:
+      Now there is "XLarge", "XXLarge" and "XXXLarge" as well.
+* Enhancement: %GITHUB%/issues/393
+      DRC syntax errors are now shown in their original code line
+      of the DRC script.
+* Bugfix: %GITHUB%/issues/400
+      Snap feature wasn't working for deep regions in certain use
+      cases.
+* Enhancement: new "scale_and_snap" methods
+      These methods allow scaling and snapping of layouts. Scaling
+      is supported by a rational factor. After scaling, snapping can
+      be applied to an integer grid. There are two incarnations.
+      Region#scale_and_snap (or Region#scaled_and_snapped): this is
+      a flat implementation which allows anisotropic scaling/snapping
+      as well. 
+      And there is Layout#scale_and_snap which is a fully
+      hierarchical scale-and-snap feature. The latter does not support
+      anisotropic scaling/snapping, but works hierarchically without
+      opening gaps. It operates on a top cell and on all layers.
+* Enhancement: new Region#pull_* methods and DRC features
+      "pull_*" is a class of methods that allows rehierarchisation
+      of shapes. These methods act similar to "interacting", but
+      the other way around: instead of delivering interacting
+      shapes of the first argument, it will deliver shapes of
+      the second argument. For example, "a.pull_interacting(b)"
+      will deliver polygons of b which interact with polygons 
+      of a. As a side effect, the polygons of b will be stored
+      hierarchically close to the polygons of a. This provides
+      a way to "re-hierarchise" layout.
+      The full class of methods and DRC functions involve:
+      Region#pull_interacting, Region#pull_inside, Region#pull_overlapping
+      and the same functions for DRC.
+      "pull_interacting" is also available for the Edges class
+      and edge layers in DRC.
+* Enhancement: Net tracer bug fix for heavily decomposed polygons
+      The net tracing feature now can operate on heavily decompose
+      polygons as well. Such layouts can be created by using a low
+      max. vertex count on GDS write. The problem were small
+      triangles with an area of 0.5 square DBU.
+* Enhancements: General fixes of deep DRC mode
+      Some inconsistencies with merged/raw mode have been 
+      removed. Performance was enhanced in a few places.
+      Multithreaded mode now works more reliably. 
+* Enhancements/bugfixes: various LVS improvements
+      The backtracking algorithm should work more reliable
+      in cases of ambiguities and floating nets or pins. 
+      Performance should be better in some cases. 
+      LVS script structure is less rigid now. "cheats" to
+      forcibly ignore hierarchy interactions for some
+      cells (useful for SRAM layout for example).
+      Still there is some work to do.
+
 0.26            (2019-09-10):
 
 * Bugfix: %GITHUB%/issues/197

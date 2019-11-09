@@ -279,7 +279,7 @@
          </font>
         </property>
         <property name="text">
-         <string>API version</string>
+         <string>API features</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -842,7 +842,7 @@
          </font>
         </property>
         <property name="text">
-         <string>(API version required - i.e. &quot;0.25&quot;)</string>
+         <string>(API version and features - e.g. &quot;0.26; ruby 2.0&quot;)</string>
         </property>
        </widget>
       </item>

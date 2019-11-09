@@ -28,9 +28,9 @@
 #include "tlException.h"
 #include "tlExpression.h"
 #include "tlAssert.h"
+#include "tlInternational.h"
 
 #include <algorithm>
-
 
 namespace lay
 {
@@ -1870,8 +1870,14 @@ LayerPropertiesList::insert (const LayerPropertiesIterator &iter, const LayerPro
   LayerPropertiesIterator parent = iter.parent ();
 
   if (parent.is_null ()) {
+    if (iter.child_index () > m_layer_properties.size ()) {
+      throw tl::Exception (tl::to_string (tr ("Iterator is out of range in LayerPropertiesList::insert")));
+    }
     ret = &*(m_layer_properties.insert (m_layer_properties.begin () + iter.child_index (), node));
   } else {
+    if (iter.child_index () > size_t (parent->end_children () - parent->begin_children ())) {
+      throw tl::Exception (tl::to_string (tr ("Iterator is out of range in LayerPropertiesList::insert")));
+    }
     ret = &(parent->insert_child (parent->begin_children () + iter.child_index (), node));
   }
 
@@ -1889,8 +1895,14 @@ LayerPropertiesList::erase (const LayerPropertiesIterator &iter)
   std::pair <LayerPropertiesNode *, size_t> pp = iter.parent_obj ();
 
   if (pp.first == 0) {
+    if (pp.second >= m_layer_properties.size ()) {
+      throw tl::Exception (tl::to_string (tr ("Iterator is out of range in LayerPropertiesList::erase")));
+    }
     m_layer_properties.erase (m_layer_properties.begin () + pp.second);
   } else {
+    if (pp.second >= size_t (pp.first->end_children () - pp.first->begin_children ())) {
+      throw tl::Exception (tl::to_string (tr ("Iterator is out of range in LayerPropertiesList::erase")));
+    }
     pp.first->erase_child (pp.first->begin_children () + pp.second);
   }
 }

@@ -223,6 +223,14 @@ private:
   const db::Layout *mp_layout;
 };
 
+/**
+ *  @brief Scales and snaps the layout below the given cell
+ *
+ *  This method will scale and snap all layers from the given cell and below to the
+ *  specified grid. Scaling happens by the rational factor m / d.
+ */
+DB_PUBLIC void scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db::Coord d);
+
 }  // namespace db
 
 #endif

@@ -31,6 +31,9 @@
 #include "tlString.h"
 #include "tlExceptions.h"
 
+#include "rba.h"
+#include "pya.h"
+
 #include <QTextDocument>
 #include <QPainter>
 #include <QDir>
@@ -107,6 +110,176 @@ private:
   lay::Salt m_salt_templates;
   lay::Salt *mp_salt;
 };
+
+// --------------------------------------------------------------------------------------
+//  SaltAPIVersionCheck
+
+class SaltAPIVersionCheck
+{
+public:
+  struct APIFeature
+  {
+    APIFeature (const std::string &_name, const std::string &_version, const std::string &_description)
+      : name (_name), version (_version), description (_description)
+    {
+      //  .. nothing yet ..
+    }
+
+    std::string name, version, description;
+  };
+
+  SaltAPIVersionCheck ();
+  bool check (const std::string &api_version);
+
+  const std::string &message () const
+  {
+    return m_message;
+  }
+
+private:
+  std::vector<APIFeature> m_features;
+  std::string m_message;
+
+  void populate_features ();
+  const APIFeature *find_feature (const std::string &name) const;
+  std::string feature_list () const;
+};
+
+SaltAPIVersionCheck::SaltAPIVersionCheck ()
+{
+  populate_features ();
+}
+
+bool
+SaltAPIVersionCheck::check (const std::string &api_version)
+{
+  tl::Extractor ex (api_version.c_str ());
+
+  bool any_not_available = false;
+  bool good = true;
+  m_message.clear ();
+
+  while (! ex.at_end ()) {
+
+    std::string fname;
+    ex.try_read_name (fname);
+
+    std::string v;
+    while (! ex.at_end () && ! ex.test (";")) {
+      int n = 0;
+      if (ex.try_read (n)) {
+        v += tl::to_string (n);
+      } else if (ex.test (".")) {
+        v += ".";
+      } else {
+        m_message = tl::to_string (tr ("API version string malformed - cannot check."));
+        return false;
+      }
+    }
+
+    const APIFeature *f = find_feature (fname);
+    if (!f) {
+
+      if (! m_message.empty ()) {
+        m_message += "\n";
+      }
+      m_message += tl::sprintf (tl::to_string (tr ("Feature %s not available.")), fname);
+
+      good = false;
+      any_not_available = true;
+
+    } else if (! f->version.empty () && ! v.empty () && SaltGrain::compare_versions (f->version, v) < 0) {
+
+      //  shorten the version (Python reports "3.6.7 blabla...")
+      std::vector<std::string> fv = tl::split (f->version, " ");
+      tl_assert (! fv.empty ());
+      std::string fv_short = fv.front ();
+      if (fv.size () > 1) {
+        fv_short += " ...";
+      }
+
+      if (! m_message.empty ()) {
+        m_message += "\n";
+      }
+      m_message += tl::sprintf (tl::to_string (tr ("%s required with version %s or later (is %s).")), f->description, v, fv_short);
+
+      good = false;
+
+    }
+
+  }
+
+  if (any_not_available) {
+    m_message += tl::sprintf (tl::to_string (tr ("\nAvailable features are: %s.")), feature_list ());
+  }
+
+  return good;
+}
+
+std::string
+SaltAPIVersionCheck::feature_list () const
+{
+  std::string fl;
+  for (std::vector<APIFeature>::const_iterator f = m_features.begin (); f != m_features.end (); ++f) {
+    if (! fl.empty ()) {
+      fl += ", ";
+    }
+    fl += f->name;
+  }
+  return fl;
+}
+
+const SaltAPIVersionCheck::APIFeature *
+SaltAPIVersionCheck::find_feature (const std::string &name) const
+{
+  for (std::vector<APIFeature>::const_iterator f = m_features.begin (); f != m_features.end (); ++f) {
+    if (f->name == name) {
+      return f.operator-> ();
+    }
+  }
+  return 0;
+}
+
+void
+SaltAPIVersionCheck::populate_features ()
+{
+  m_features.push_back (APIFeature (std::string (), lay::Version::version (), "KLayout API"));
+
+  if (rba::RubyInterpreter::instance () && rba::RubyInterpreter::instance ()->available ()) {
+    std::string v = rba::RubyInterpreter::instance ()->version ();
+    m_features.push_back (APIFeature ("ruby", v, "Ruby"));
+    if (SaltGrain::compare_versions (v, "2") < 0) {
+      m_features.push_back (APIFeature ("ruby1", v, "Ruby 1"));
+    } else if (SaltGrain::compare_versions (v, "3") < 0) {
+      m_features.push_back (APIFeature ("ruby2", v, "Ruby 2"));
+    }
+  }
+
+  if (pya::PythonInterpreter::instance () && pya::PythonInterpreter::instance ()->available ()) {
+    std::string v = pya::PythonInterpreter::instance ()->version ();
+    m_features.push_back (APIFeature ("python", v, "Python"));
+    if (SaltGrain::compare_versions (v, "3") < 0) {
+      m_features.push_back (APIFeature ("python2", v, "Python 2"));
+    } else if (SaltGrain::compare_versions (v, "4") < 0) {
+      m_features.push_back (APIFeature ("python3", v, "Python 3"));
+    }
+  }
+
+#if defined(HAVE_QTBINDINGS)
+  m_features.push_back (APIFeature ("qt_binding", std::string (), "Qt Binding for RBA or PYA"));
+#endif
+#if defined(HAVE_QT)
+#  if QT_VERSION >= 0x040000 && QT_VERSION < 0x050000
+  m_features.push_back (APIFeature ("qt4", std::string (), "Qt 4"));
+#  elif QT_VERSION >= 0x050000 && QT_VERSION < 0x060000
+  m_features.push_back (APIFeature ("qt5", std::string (), "Qt 5"));
+#  endif
+#endif
+
+#if defined(HAVE_64BIT_COORD)
+  m_features.push_back (APIFeature ("wide-coords", std::string (), "64 bit coordinates"));
+#endif
+}
 
 // --------------------------------------------------------------------------------------
 //  SaltManager implementation
@@ -790,6 +963,7 @@ SaltManagerDialog::update_models ()
 
   }
 
+  SaltAPIVersionCheck svc;
   SaltModel *mine_model;
 
   mine_model = dynamic_cast <SaltModel *> (salt_mine_view_update->model ());
@@ -817,8 +991,8 @@ SaltManagerDialog::update_models ()
 
   //  Establish a message indicating whether the API version does not match
   for (Salt::flat_iterator g = m_salt_mine.begin_flat (); g != m_salt_mine.end_flat (); ++g) {
-    if (SaltGrain::compare_versions (lay::Version::version (), (*g)->api_version ()) < 0) {
-      mine_model->set_message ((*g)->name (), SaltModel::Warning, tl::to_string (tr ("This package requires a newer API (%1)").arg (tl::to_qstring ((*g)->api_version ()))));
+    if (! svc.check ((*g)->api_version ())) {
+      mine_model->set_message ((*g)->name (), SaltModel::Warning, svc.message ());
       mine_model->set_enabled ((*g)->name (), false);
     }
   }
@@ -848,8 +1022,8 @@ SaltManagerDialog::update_models ()
 
   //  Establish a message indicating whether the API version does not match
   for (Salt::flat_iterator g = m_salt_mine.begin_flat (); g != m_salt_mine.end_flat (); ++g) {
-    if (SaltGrain::compare_versions (lay::Version::version (), (*g)->api_version ()) < 0) {
-      mine_model->set_message ((*g)->name (), SaltModel::Warning, tl::to_string (tr ("This package requires a newer API (%1)").arg (tl::to_qstring ((*g)->api_version ()))));
+    if (! svc.check ((*g)->api_version ())) {
+      mine_model->set_message ((*g)->name (), SaltModel::Warning, svc.message ());
       mine_model->set_enabled ((*g)->name (), false);
     }
   }

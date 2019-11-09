@@ -350,5 +350,92 @@ region_to_edge_interaction_filter_base<OutputType>::fill_output ()
 template class region_to_edge_interaction_filter_base<db::Polygon>;
 template class region_to_edge_interaction_filter_base<db::Edge>;
 
+// -------------------------------------------------------------------------------------
+//  Polygon snapping
+
+db::Polygon
+snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coord gy, std::vector<db::Point> &heap)
+{
+  db::Polygon pnew;
+
+  for (size_t i = 0; i < poly.holes () + 1; ++i) {
+
+    heap.clear ();
+
+    db::Polygon::polygon_contour_iterator b, e;
+
+    if (i == 0) {
+      b = poly.begin_hull ();
+      e = poly.end_hull ();
+    } else {
+      b = poly.begin_hole ((unsigned int)  (i - 1));
+      e = poly.end_hole ((unsigned int)  (i - 1));
+    }
+
+    for (db::Polygon::polygon_contour_iterator pt = b; pt != e; ++pt) {
+      heap.push_back (db::Point (snap_to_grid ((*pt).x (), gx), snap_to_grid ((*pt).y (), gy)));
+    }
+
+    if (i == 0) {
+      pnew.assign_hull (heap.begin (), heap.end ());
+    } else {
+      pnew.insert_hole (heap.begin (), heap.end ());
+    }
+
+  }
+
+  return pnew;
 }
 
+db::Polygon
+scaled_and_snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coord mx, db::Coord dx, db::Coord ox, db::Coord gy, db::Coord my, db::Coord dy, db::Coord oy, std::vector<db::Point> &heap)
+{
+  db::Polygon pnew;
+
+  int64_t dgx = int64_t (gx) * int64_t (dx);
+  int64_t dgy = int64_t (gy) * int64_t (dy);
+
+  for (size_t i = 0; i < poly.holes () + 1; ++i) {
+
+    heap.clear ();
+
+    db::Polygon::polygon_contour_iterator b, e;
+
+    if (i == 0) {
+      b = poly.begin_hull ();
+      e = poly.end_hull ();
+    } else {
+      b = poly.begin_hole ((unsigned int)  (i - 1));
+      e = poly.end_hole ((unsigned int)  (i - 1));
+    }
+
+    for (db::Polygon::polygon_contour_iterator pt = b; pt != e; ++pt) {
+      int64_t x = snap_to_grid (int64_t ((*pt).x ()) * mx + int64_t (ox), dgx) / int64_t (dx);
+      int64_t y = snap_to_grid (int64_t ((*pt).y ()) * my + int64_t (oy), dgy) / int64_t (dy);
+      heap.push_back (db::Point (db::Coord (x), db::Coord (y)));
+    }
+
+    if (i == 0) {
+      pnew.assign_hull (heap.begin (), heap.end ());
+    } else {
+      pnew.insert_hole (heap.begin (), heap.end ());
+    }
+
+  }
+
+  return pnew;
+}
+
+db::Vector
+scaled_and_snapped_vector (const db::Vector &v, db::Coord gx, db::Coord mx, db::Coord dx, db::Coord ox, db::Coord gy, db::Coord my, db::Coord dy, db::Coord oy)
+{
+  int64_t dgx = int64_t (gx) * int64_t (dx);
+  int64_t dgy = int64_t (gy) * int64_t (dy);
+
+  int64_t x = snap_to_grid (int64_t (v.x ()) * mx + int64_t (ox), dgx) / int64_t (dx);
+  int64_t y = snap_to_grid (int64_t (v.y ()) * my + int64_t (oy), dgy) / int64_t (dy);
+
+  return db::Vector (db::Coord (x), db::Coord (y));
+}
+
+}

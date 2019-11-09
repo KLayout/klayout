@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+
+<language name="UserPropertiesTextFormat">
+
+	<highlighting>
+
+		<contexts>
+
+			<context name="Normal" attribute="Normal Text">
+
+				<DetectChar attribute="String" char="&quot;" context="Quoted Key String"/>
+				<DetectChar attribute="Raw String" char="'" context="Apostrophed Key String"/>
+
+				<RegExpr attribute="Float" String="##\s*\-?[0-9]([0-9]|_[0-9])*(\.[0-9]([0-9]|_[0-9])*)?([eE]\-?[1-9]([0-9]|_[0-9])*(\.[0-9]*)?)?" context="After Key"/>
+				<RegExpr attribute="Dec" String="#\s*\-?[1-9]([0-9]|_[0-9])*" context="After Key"/>
+				<RegExpr attribute="Symbol" String="[_A-Za-z0-9]+\b" context="After Key"/>
+
+				<RegExpr attribute="Error" String="[^\s]" context="Error"/>
+
+			</context>
+
+			<context name="After Key" attribute="Normal Text" fallthrough="true" fallthroughContext="Value" lineEndContext="Error">
+				<DetectChar attribute="Normal" char=":" context="Value"/>
+				<RegExpr attribute="Normal" String="\s+" context="#stay"/>
+      </context>
+
+			<context name="Value" attribute="Normal Text" fallthrough="true" fallthroughContext="Error" lineEndContext="Error">
+
+				<DetectChar attribute="String" char="&quot;" context="Quoted Value String"/>
+				<DetectChar attribute="Raw String" char="'" context="Apostrophed Value String"/>
+
+				<RegExpr attribute="Float" String="##\s*\-?[0-9]([0-9]|_[0-9])*(\.[0-9]([0-9]|_[0-9])*)?([eE]\-?[1-9]([0-9]|_[0-9])*(\.[0-9]*)?)?" context="After Value"/>
+				<RegExpr attribute="Dec" String="#\s*\-?[1-9]([0-9]|_[0-9])*" context="After Value"/>
+				<RegExpr attribute="Symbol" String="[_A-Za-z0-9]+\b" context="After Value"/>
+
+				<RegExpr attribute="Normal" String="\s+" context="Value"/>
+
+			</context>
+
+			<context name="After Value" attribute="Normal Text" fallthrough="true" fallthroughContext="Error" lineEndContext="Normal">
+				<RegExpr attribute="Normal" String="\s+" context="#stay"/>
+      </context>
+
+			<context name="Error" attribute="Error" lineEndContext="Normal">
+      </context>
+
+			<context name="Quoted Key String" attribute="String" lineEndContext="Error">
+				<StringDetect attribute="String" String="\\" context="#stay"/>
+				<RegExpr attribute="String" String="\\\&quot;" context="#stay"/>
+				<DetectChar char="&quot;" attribute="String" context="After Key"/>
+			</context>
+
+			<context name="Apostrophed Key String" attribute="Raw String" lineEndContext="Error">
+				<StringDetect attribute="String" String="\\" context="#stay"/>
+				<RegExpr attribute="String" String="\\\'" context="#stay"/>
+				<DetectChar char="'" attribute="Raw String" context="After Key"/>
+			</context>
+
+			<context name="Quoted Value String" attribute="String" lineEndContext="Error">
+				<StringDetect attribute="String" String="\\" context="#stay"/>
+				<RegExpr attribute="String" String="\\\&quot;" context="#stay"/>
+				<DetectChar char="&quot;" attribute="String" context="After Value"/>
+			</context>
+
+			<context name="Apostrophed Value String" attribute="Raw String" lineEndContext="Error">
+				<StringDetect attribute="String" String="\\" context="#stay"/>
+				<RegExpr attribute="String" String="\\\'" context="#stay"/>
+				<DetectChar char="'" attribute="Raw String" context="After Value"/>
+			</context>
+
+    </contexts>
+
+		<itemDatas>
+			<itemData name="Normal Text" defStyleNum="dsNormal"/>
+
+			<itemData name="Dec" defStyleNum="dsDecVal"/>
+			<itemData name="Float" defStyleNum="dsFloat"/>
+			<itemData name="Symbol" defStyleNum="dsString" color="#D40000"/>
+			<itemData name="String" defStyleNum="dsString"/>
+			<itemData name="Raw String" defStyleNum="dsString" color="#DD4A4A" selColor="#DD4A4A"/>
+
+			<!-- use these to mark errors and alerts things -->
+			<itemData name="Error" defStyleNum="dsAlert"/>
+
+		</itemDatas>
+
+	</highlighting>
+</language>

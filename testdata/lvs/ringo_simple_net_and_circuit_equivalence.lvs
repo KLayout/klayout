@@ -7,6 +7,9 @@ target_netlist($lvs_test_target_cir, write_spice, "Extracted by KLayout")
 
 schematic("ringo.cir")
 
+# preempt configuration (see below)
+same_nets("top", "ENABLE", "RINGO", "ENABLE")
+
 deep
 
 # Drawing layers
@@ -71,7 +74,6 @@ connect_global(ptie, "SUBSTRATE")
 same_circuits("top", "RINGO")
 same_circuits("INV", "INVX1")
 same_circuits("DOESNOTEXIST", "DOESNOTEXIST2")
-same_nets("top", "ENABLE", "RINGO", "ENABLE")
 same_nets("DOESNOTEXIST", "ENABLE", "DOESNOTEXIST2", "ENABLE")
 
 netlist.simplify

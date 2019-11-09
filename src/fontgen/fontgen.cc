@@ -28,6 +28,11 @@
 
 #include <stdio.h>
 
+//  The system font to use
+//  NOTE: "Libration Mono" works only well for Ubuntu 16. The version from
+//  Ubuntu 18++ does not come with good hinting and is bad without AA.
+static const char *font_name = "Liberation Mono";
+
 /**
  *  @brief A small utility program to produce the fixed font definition file
  *  Run this binary and redirect the output to "laybasic/fixedFont.h".
@@ -43,19 +48,34 @@ main (int argc, char *argv [])
 
   std::string table;
 
-  int sz[] = { 9, 11, 13, 0 };
+  //  33% increments:
+  int sz[]              = { 9,       11,       13,      16,       21,        27         };
+  const char *sz_name[] = { "Small", "Medium", "Large", "XLarge", "XXLarge", "XXXLarge" };
+
+  int resolutions = 6;
+
+  int font_sizes = int (sizeof (sz) / sizeof (sz[0]));
+
+  printf("\nconst int ff_resolutions = %d;\n", resolutions);
+  printf("const int ff_sizes = %d;\n", font_sizes);
+
+  printf("\nconst char *ff_size_name (int sz) {\n");
+  for (int s = 0; s < font_sizes; ++s) {
+    printf("  if (sz == %d) { return \"%s\"; }\n", s, sz_name [s]);
+  }
+  printf("  return \"\";\n}\n");
 
   int os = 1;
 
-  for (int r = 1; r <= 6; ++r) {
+  for (int r = 1; r <= resolutions; ++r) {
 
-    for (int s = 0; sz[s] > 0; ++s) {
+    for (int s = 0; s < font_sizes; ++s) {
 
       char b[1024];
       sprintf (b, "  FixedFont (ff%d_height, ff%d_line_height, ff%d_width, ff%d_first_char, sizeof (ff%d_data) / sizeof (uint32_t) / (ff%d_height * ff%d_stride), ff%d_data, ff%d_stride),\n", os, os, os, os, os, os, os, os, os);
       table += b;
 
-      QFont f (QString::fromLatin1 ("Liberation Mono"), r * sz[s]);
+      QFont f (QString::fromLatin1 (font_name), r * sz[s]);
       f.setStyleStrategy(QFont::StyleStrategy ((f.styleStrategy() & ~QFont::PreferAntialias) | QFont::NoAntialias));
 
       QFontMetrics fm (f);

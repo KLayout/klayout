@@ -81,7 +81,6 @@ DeepLayer &DeepLayer::operator= (const DeepLayer &other)
   return *this;
 }
 
-
 DeepLayer::~DeepLayer ()
 {
   if (mp_store.get ()) {
@@ -137,6 +136,12 @@ DeepLayer::add_from (const DeepLayer &dl)
     db::copy_shapes (*into_layout, *source_layout, db::ICplxTrans (), source_cells, cm.table (), lm);
 
   }
+}
+
+const std::set<db::cell_index_type> *
+DeepLayer::breakout_cells () const
+{
+  return store ()->breakout_cells (layout_index ());
 }
 
 void
@@ -251,16 +256,114 @@ struct DeepShapeStore::LayoutHolder
 
 // ----------------------------------------------------------------------------------
 
+DeepShapeStoreState::DeepShapeStoreState ()
+  : m_threads (1), m_max_area_ratio (3.0), m_max_vertex_count (16), m_text_property_name (), m_text_enlargement (-1)
+{
+  //  .. nothing yet ..
+}
+
+void DeepShapeStoreState::set_text_enlargement (int enl)
+{
+  m_text_enlargement = enl;
+}
+
+int DeepShapeStoreState::text_enlargement () const
+{
+  return m_text_enlargement;
+}
+
+void DeepShapeStoreState::set_text_property_name (const tl::Variant &pn)
+{
+  m_text_property_name = pn;
+}
+
+const tl::Variant &
+DeepShapeStoreState::text_property_name () const
+{
+  return m_text_property_name;
+}
+
+const std::set<db::cell_index_type> *
+DeepShapeStoreState::breakout_cells (unsigned int layout_index) const
+{
+  const std::set<db::cell_index_type> &boc = (const_cast<DeepShapeStoreState *> (this))->ensure_breakout_cells (layout_index);
+  if (boc.empty ()) {
+    return 0;
+  } else {
+    return &boc;
+  }
+}
+
+void
+DeepShapeStoreState::clear_breakout_cells (unsigned int layout_index)
+{
+  ensure_breakout_cells (layout_index).clear ();
+}
+
+void
+DeepShapeStoreState::set_breakout_cells (unsigned int layout_index, const std::set<db::cell_index_type> &boc)
+{
+  ensure_breakout_cells (layout_index) = boc;
+}
+
+void
+DeepShapeStoreState::add_breakout_cell (unsigned int layout_index, db::cell_index_type ci)
+{
+  ensure_breakout_cells (layout_index).insert (ci);
+}
+
+void
+DeepShapeStoreState::add_breakout_cells (unsigned int layout_index, const std::set<db::cell_index_type> &cc)
+{
+  ensure_breakout_cells (layout_index).insert (cc.begin (), cc.end ());
+}
+
+void
+DeepShapeStoreState::set_threads (int n)
+{
+  m_threads = n;
+}
+
+int
+DeepShapeStoreState::threads () const
+{
+  return m_threads;
+}
+
+void
+DeepShapeStoreState::set_max_area_ratio (double ar)
+{
+  m_max_area_ratio = ar;
+}
+
+double
+DeepShapeStoreState::max_area_ratio () const
+{
+  return m_max_area_ratio;
+}
+
+void
+DeepShapeStoreState::set_max_vertex_count (size_t n)
+{
+  m_max_vertex_count = n;
+}
+
+size_t
+DeepShapeStoreState::max_vertex_count () const
+{
+  return m_max_vertex_count;
+}
+
+// ----------------------------------------------------------------------------------
+
 static size_t s_instance_count = 0;
 
 DeepShapeStore::DeepShapeStore ()
-  : m_threads (1), m_max_area_ratio (3.0), m_max_vertex_count (16), m_text_property_name (), m_text_enlargement (-1)
 {
   ++s_instance_count;
 }
 
 DeepShapeStore::DeepShapeStore (const std::string &topcell_name, double dbu)
-  : m_threads (1), m_max_area_ratio (3.0), m_max_vertex_count (16), m_text_property_name (), m_text_enlargement (-1)
 {
   ++s_instance_count;
 
@@ -292,17 +395,17 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Region &region, bool for_n
   unsigned int layer = layout ().insert_layer ();
 
   if (max_area_ratio == 0.0) {
-    max_area_ratio = m_max_area_ratio;
+    max_area_ratio = m_state.max_area_ratio ();
   }
   if (max_vertex_count == 0) {
-    max_vertex_count = m_max_vertex_count;
+    max_vertex_count = m_state.max_vertex_count ();
   }
 
   db::Shapes *shapes = &initial_cell ().shapes (layer);
   db::Box world = db::Box::world ();
 
   //  The chain of operators for producing clipped and reduced polygon references
-  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (&layout (), m_text_enlargement, m_text_property_name);
+  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (&layout (), text_enlargement (), text_property_name ());
   db::ReducingHierarchyBuilderShapeReceiver red (&refs, max_area_ratio, max_vertex_count);
 
   //  try to maintain the texts on top level - go through shape iterator
@@ -399,12 +502,95 @@ const db::Cell &DeepShapeStore::const_initial_cell (unsigned int n) const
 
 void DeepShapeStore::set_text_enlargement (int enl)
 {
-  m_text_enlargement = enl;
+  m_state.set_text_enlargement (enl);
+}
+
+int DeepShapeStore::text_enlargement () const
+{
+  return m_state.text_enlargement ();
 }
 
 void DeepShapeStore::set_text_property_name (const tl::Variant &pn)
 {
-  m_text_property_name = pn;
+  m_state.set_text_property_name (pn);
+}
+
+const tl::Variant &DeepShapeStore::text_property_name () const
+{
+  return m_state.text_property_name ();
+}
+
+const std::set<db::cell_index_type> *
+DeepShapeStore::breakout_cells (unsigned int layout_index) const
+{
+  return m_state.breakout_cells (layout_index);
+}
+
+void
+DeepShapeStore::clear_breakout_cells (unsigned int layout_index)
+{
+  m_state.clear_breakout_cells (layout_index);
+}
+
+void
+DeepShapeStore::set_breakout_cells (unsigned int layout_index, const std::set<db::cell_index_type> &boc)
+{
+  m_state.set_breakout_cells (layout_index, boc);
+}
+
+void
+DeepShapeStore::add_breakout_cell (unsigned int layout_index, db::cell_index_type ci)
+{
+  m_state.add_breakout_cell (layout_index, ci);
+}
+
+void
+DeepShapeStore::add_breakout_cells (unsigned int layout_index, const std::set<db::cell_index_type> &cc)
+{
+  m_state.add_breakout_cells (layout_index, cc);
+}
+
+void DeepShapeStore::set_threads (int n)
+{
+  m_state.set_threads (n);
+}
+
+int DeepShapeStore::threads () const
+{
+  return m_state.threads ();
+}
+
+void DeepShapeStore::set_max_area_ratio (double ar)
+{
+  m_state.set_max_area_ratio (ar);
+}
+
+double DeepShapeStore::max_area_ratio () const
+{
+  return m_state.max_area_ratio ();
+}
+
+void DeepShapeStore::set_max_vertex_count (size_t n)
+{
+  m_state.set_max_vertex_count (n);
+}
+
+size_t DeepShapeStore::max_vertex_count () const
+{
+  return m_state.max_vertex_count ();
+}
+
+void DeepShapeStore::push_state ()
+{
+  m_state_stack.push_back (m_state);
+}
+
+void DeepShapeStore::pop_state ()
+{
+  if (! m_state_stack.empty ()) {
+    m_state = m_state_stack.back ();
+    m_state_stack.pop_back ();
+  }
 }
 
 bool DeepShapeStore::is_valid_layout_index (unsigned int n) const
@@ -427,21 +613,6 @@ db::Layout &DeepShapeStore::layout (unsigned int n)
 size_t DeepShapeStore::instance_count ()
 {
   return s_instance_count;
-}
-
-void DeepShapeStore::set_threads (int n)
-{
-  m_threads = n;
-}
-
-void DeepShapeStore::set_max_area_ratio (double ar)
-{
-  m_max_area_ratio = ar;
-}
-
-void DeepShapeStore::set_max_vertex_count (size_t n)
-{
-  m_max_vertex_count = n;
 }
 
 void DeepShapeStore::add_ref (unsigned int layout, unsigned int layer)
@@ -474,6 +645,7 @@ void DeepShapeStore::remove_ref (unsigned int layout, unsigned int layer)
   if ((m_layouts[layout]->refs -= 1) <= 0) {
     delete m_layouts[layout];
     m_layouts[layout] = 0;
+    clear_breakout_cells (layout);
   }
 }
 
@@ -542,10 +714,10 @@ static unsigned int init_layer (db::Layout &layout, const db::RecursiveShapeIter
 DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio, size_t max_vertex_count, const db::ICplxTrans &trans)
 {
   if (max_area_ratio == 0.0) {
-    max_area_ratio = m_max_area_ratio;
+    max_area_ratio = m_state.max_area_ratio ();
   }
   if (max_vertex_count == 0) {
-    max_vertex_count = m_max_vertex_count;
+    max_vertex_count = m_state.max_vertex_count ();
   }
 
   unsigned int layout_index = layout_for_iter (si, trans);
@@ -557,7 +729,7 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
   builder.set_target_layer (layer_index);
 
   //  The chain of operators for producing clipped and reduced polygon references
-  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (& layout, m_text_enlargement, m_text_property_name);
+  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (& layout, text_enlargement (), text_property_name ());
   db::ReducingHierarchyBuilderShapeReceiver red (&refs, max_area_ratio, max_vertex_count);
   db::ClippingHierarchyBuilderShapeReceiver clip (&red);
 
@@ -717,7 +889,7 @@ DeepShapeStore::issue_variants (unsigned int layout_index, const std::map<db::ce
 const db::CellMapping &
 DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout *into_layout, db::cell_index_type into_cell, const std::set<db::cell_index_type> *excluded_cells, const std::set<db::cell_index_type> *included_cells)
 {
-  const db::Layout *source_layout = &m_layouts [layout_index]->layout;
+  db::Layout *source_layout = &m_layouts [layout_index]->layout;
   if (source_layout->begin_top_down () == source_layout->end_top_cells ()) {
     //  empty source - nothing to do.
     static db::CellMapping cm;
@@ -738,6 +910,9 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
 
     cm = m_delivery_mapping_cache.insert (std::make_pair (key, db::CellMapping ())).first;
 
+    //  collects the cell mappings we skip because they are variants (variant building or box variants)
+    std::map<db::cell_index_type, std::pair<db::cell_index_type, std::set<db::Box> > > cm_skipped_variants;
+
     if (into_layout == original_builder.source ().layout () && &into_layout->cell (into_cell) == original_builder.source ().top_cell ()) {
 
       //  This is the case of mapping back to the original. In this case we can use the information
@@ -745,21 +920,27 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
       //  create from them. We need to consider however, that the hierarchy builder is allowed to create
       //  variants which we cannot map.
 
-      for (HierarchyBuilder::cell_map_type::const_iterator m = original_builder.begin_cell_map (); m != original_builder.end_cell_map (); ++m) {
+      for (HierarchyBuilder::cell_map_type::const_iterator m = original_builder.begin_cell_map (); m != original_builder.end_cell_map (); ) {
 
         HierarchyBuilder::cell_map_type::const_iterator mm = m;
         ++mm;
         bool skip = original_builder.is_variant (m->second);   //  skip variant cells
-        while (mm != original_builder.end_cell_map () && mm->first.first == m->first.first && ! skip) {
-          //  we have cell variants and cannot simply map
+        while (mm != original_builder.end_cell_map () && mm->first.first == m->first.first) {
+          //  we have cell (box) variants and cannot simply map
           ++mm;
-          ++m;
           skip = true;
         }
 
         if (! skip) {
           cm->second.map (m->second, m->first.first);
+        } else {
+          for (HierarchyBuilder::cell_map_type::const_iterator n = m; n != mm; ++n) {
+            tl_assert (cm_skipped_variants.find (n->second) == cm_skipped_variants.end ());
+            cm_skipped_variants [n->second] = n->first;
+          }
         }
+
+        m = mm;
 
       }
 
@@ -776,7 +957,43 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
 
     //  Add new cells for the variants and (possible) devices which are cells added during the device
     //  extraction process
-    cm->second.create_missing_mapping (*into_layout, into_cell, *source_layout, source_top, excluded_cells, included_cells);
+    std::vector<std::pair<db::cell_index_type, db::cell_index_type> > new_pairs = cm->second.create_missing_mapping2 (*into_layout, into_cell, *source_layout, source_top, excluded_cells, included_cells);
+
+    //  the variant's originals we are going to delete
+    std::set<db::cell_index_type> cells_to_delete;
+
+    //  We now need to fix the cell map from the hierarchy builder, so we can import back from the modified layout.
+    //  This is in particular important if we created new cells for known variants.
+    for (std::vector<std::pair<db::cell_index_type, db::cell_index_type> >::const_iterator np = new_pairs.begin (); np != new_pairs.end (); ++np) {
+
+      db::cell_index_type var_org = original_builder.original_target_for_variant (np->first);
+
+      std::map<db::cell_index_type, std::pair<db::cell_index_type, std::set<db::Box> > >::const_iterator icm = cm_skipped_variants.find (var_org);
+      if (icm != cm_skipped_variants.end ()) {
+
+        //  create the variant clone in the original layout too and delete this cell
+        VariantsCollectorBase::copy_shapes (*into_layout, np->second, icm->second.first);
+        cells_to_delete.insert (icm->second.first);
+
+        //  forget the original cell (now separated into variants) and map the variants back into the
+        //  DSS layout
+        original_builder.unmap (icm->second);
+        original_builder.map (std::make_pair (np->second, icm->second.second), np->first);
+
+        //  forget the variant as now it's a real cell in the source layout
+        original_builder.unregister_variant (np->first);
+
+        //  rename the cell because it may be a different one now
+        source_layout->rename_cell (np->first, into_layout->cell_name (np->second));
+
+      }
+
+    }
+
+    //  delete the variant's original cell
+    if (! cells_to_delete.empty ()) {
+      into_layout->delete_cells (cells_to_delete);
+    }
 
   }
 

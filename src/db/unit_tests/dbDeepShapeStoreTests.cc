@@ -208,3 +208,60 @@ TEST(4_FlatAndEmptyInput)
   EXPECT_EQ ((dr1 - dr3).to_string (), "(0,0;0,1000;1000,1000;1000,0)");
 }
 
+TEST(5_State)
+{
+  db::DeepShapeStore store ("TOP", 0.01);
+  EXPECT_EQ (store.layout ().dbu (), 0.01);
+
+  store.set_threads (4);
+  EXPECT_EQ (store.threads (), 4);
+  store.set_max_area_ratio (2.5);
+  EXPECT_EQ (store.max_area_ratio (), 2.5);
+  store.set_max_vertex_count (100);
+  EXPECT_EQ (store.max_vertex_count (), size_t (100));
+  store.set_text_enlargement (5);
+  EXPECT_EQ (store.text_enlargement (), 5);
+  store.set_text_property_name (tl::Variant ("x"));
+  EXPECT_EQ (store.text_property_name ().to_string (), "x");
+  EXPECT_EQ (store.breakout_cells (0) == 0, true);
+
+  {
+    std::set<db::cell_index_type> boc;
+    boc.insert (5);
+    store.set_breakout_cells (0, boc);
+    EXPECT_EQ (store.breakout_cells (0) == 0, false);
+    EXPECT_EQ (store.breakout_cells (0)->find (5) != store.breakout_cells (0)->end (), true);
+    EXPECT_EQ (store.breakout_cells (0)->find (3) != store.breakout_cells (0)->end (), false);
+    store.add_breakout_cell (0, 3);
+    EXPECT_EQ (store.breakout_cells (0)->find (5) != store.breakout_cells (0)->end (), true);
+    EXPECT_EQ (store.breakout_cells (0)->find (3) != store.breakout_cells (0)->end (), true);
+  }
+
+  store.push_state ();
+
+  store.set_threads (2);
+  store.set_max_area_ratio (1);
+  store.set_max_vertex_count (10);
+  store.set_text_enlargement (1);
+  store.set_text_property_name (tl::Variant ("y"));
+  EXPECT_EQ (store.threads (), 2);
+  EXPECT_EQ (store.max_area_ratio (), 1.0);
+  EXPECT_EQ (store.max_vertex_count (), size_t (10));
+  EXPECT_EQ (store.text_enlargement (), 1);
+  EXPECT_EQ (store.text_property_name ().to_string (), "y");
+
+  store.clear_breakout_cells (0);
+  EXPECT_EQ (store.breakout_cells (0) == 0, true);
+
+  store.pop_state ();
+
+  EXPECT_EQ (store.threads (), 4);
+  EXPECT_EQ (store.max_area_ratio (), 2.5);
+  EXPECT_EQ (store.max_vertex_count (), size_t (100));
+  EXPECT_EQ (store.text_enlargement (), 5);
+  EXPECT_EQ (store.text_property_name ().to_string (), "x");
+
+  EXPECT_EQ (store.breakout_cells (0) == 0, false);
+  EXPECT_EQ (store.breakout_cells (0)->find (5) != store.breakout_cells (0)->end (), true);
+  EXPECT_EQ (store.breakout_cells (0)->find (3) != store.breakout_cells (0)->end (), true);
+}

@@ -35,6 +35,8 @@
 #include "tlGlobPattern.h"
 
 #include <memory>
+#include <vector>
+#include <set>
 
 namespace gsi
 {
@@ -801,7 +803,7 @@ Class<db::Region> decl_Region ("db", "Region",
     "See \\strict_handling= for a description of this attribute.\n"
     "\n"
     "This method has been introduced in version 0.23.2."
-  ) + 
+  ) +
   method ("min_coherence=", &db::Region::set_min_coherence, gsi::arg ("f"),
     "@brief Enable or disable minimum coherence\n"
     "If minimum coherence is set, the merge operations (explicit merge with \\merge or\n"
@@ -947,9 +949,27 @@ Class<db::Region> decl_Region ("db", "Region",
     "This method will snap the region to the given grid - each x or y coordinate is brought on the gx or gy grid by rounding "
     "to the nearest value which is a multiple of gx or gy.\n"
     "\n"
-    "If gx or gy is 0 or less, no snapping happens in that direction.\n"
+    "If gx or gy is 0, no snapping happens in that direction.\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+  ) +
+  method ("scaled_and_snapped", &db::Region::scaled_and_snapped, gsi::arg ("gx"), gsi::arg ("mx"), gsi::arg ("dx"), gsi::arg ("gy"),gsi::arg ("my"), gsi::arg ("dy"),
+    "@brief Returns the scaled and snapped region\n"
+    "This method will scale and snap the region to the given grid and return the scaled and snapped region (see \\scale_and_snap). The original region is not modified.\n"
+    "\n"
+    "This method has been introduced in version 0.26.1."
+  ) +
+  method ("scale_and_snap", &db::Region::scale_and_snap, gsi::arg ("gx"), gsi::arg ("mx"), gsi::arg ("dx"), gsi::arg ("gy"),gsi::arg ("my"), gsi::arg ("dy"),
+    "@brief Scales and snaps the region to the given grid\n"
+    "This method will first scale the region by a rational factor of mx/dx horizontally and my/dy vertically and then "
+    "snap the region to the given grid - each x or y coordinate is brought on the gx or gy grid by rounding "
+    "to the nearest value which is a multiple of gx or gy.\n"
+    "\n"
+    "If gx or gy is 0, the result is brought on a grid of 1.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.26.1."
   ) +
   method ("grid_check", &db::Region::grid_check, gsi::arg ("gx"), gsi::arg ("gy"),
     "@brief Returns a marker for all vertices not being on the given grid\n"

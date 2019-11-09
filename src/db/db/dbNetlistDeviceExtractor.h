@@ -263,7 +263,7 @@ public:
    *
    *  NOTE: The extractor expects "PolygonRef" type layers.
    */
-  void extract (Layout &layout, Cell &cell, const std::vector<unsigned int> &layers, Netlist *netlist, hier_clusters_type &clusters, double device_scaling = 1.0);
+  void extract (Layout &layout, Cell &cell, const std::vector<unsigned int> &layers, Netlist *netlist, hier_clusters_type &clusters, double device_scaling = 1.0, const std::set<cell_index_type> *breakout_cells = 0);
 
   /**
    *  @brief Extracts the devices from a list of regions
@@ -533,6 +533,7 @@ private:
   db::properties_id_type m_terminal_id_propname_id, m_device_id_propname_id, m_device_class_propname_id;
   hier_clusters_type *mp_clusters;
   db::cell_index_type m_cell_index;
+  const std::set<db::cell_index_type> *mp_breakout_cells;
   double m_device_scaling;
   db::Circuit *mp_circuit;
   db::DeviceClass *mp_device_class;
@@ -553,7 +554,7 @@ private:
    */
   void initialize (db::Netlist *nl);
 
-  void extract_without_initialize (db::Layout &layout, db::Cell &cell, hier_clusters_type &clusters, const std::vector<unsigned int> &layers, double device_scaling);
+  void extract_without_initialize (db::Layout &layout, db::Cell &cell, hier_clusters_type &clusters, const std::vector<unsigned int> &layers, double device_scaling, const std::set<cell_index_type> *breakout_cells);
   void push_new_devices (const Vector &disp_cache);
   void push_cached_devices (const tl::vector<Device *> &cached_devices, const db::Vector &disp_cache, const db::Vector &new_disp);
 };

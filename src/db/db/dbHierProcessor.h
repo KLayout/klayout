@@ -368,8 +368,8 @@ template <class TS, class TI, class TR>
 class DB_PUBLIC local_processor
 {
 public:
-  local_processor (db::Layout *layout, db::Cell *top);
-  local_processor (db::Layout *subject_layout, db::Cell *subject_top, const db::Layout *intruder_layout, const db::Cell *intruder_cell);
+  local_processor (db::Layout *layout, db::Cell *top, const std::set<db::cell_index_type> *breakout_cells = 0);
+  local_processor (db::Layout *subject_layout, db::Cell *subject_top, const db::Layout *intruder_layout, const db::Cell *intruder_cell, const std::set<db::cell_index_type> *subject_breakout_cells = 0, const std::set<db::cell_index_type> *intruder_breakout_cells = 0);
   void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer);
   void compute_contexts (local_processor_contexts<TS, TI, TR> &contexts, const local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer) const;
   void compute_results (local_processor_contexts<TS, TI, TR> &contexts, const local_operation<TS, TI, TR> *op, unsigned int output_layer) const;
@@ -427,6 +427,8 @@ private:
   const db::Layout *mp_intruder_layout;
   db::Cell *mp_subject_top;
   const db::Cell *mp_intruder_top;
+  const std::set<db::cell_index_type> *mp_subject_breakout_cells;
+  const std::set<db::cell_index_type> *mp_intruder_breakout_cells;
   std::string m_description;
   unsigned int m_nthreads;
   size_t m_max_vertex_count;
@@ -445,6 +447,16 @@ private:
   void push_results (db::Cell *cell, unsigned int output_layer, const std::unordered_set<TR> &result) const;
   void compute_local_cell (const db::local_processor_contexts<TS, TI, TR> &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const local_operation<TS, TI, TR> *op, const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, std::unordered_set<TR> &result) const;
   std::pair<bool, db::CellInstArray> effective_instance (local_processor_contexts<TS, TI, TR> &contexts, db::cell_index_type subject_cell_index, db::cell_index_type intruder_cell_index, const db::ICplxTrans &ti2s, db::Coord dist) const;
+
+  bool subject_cell_is_breakout (db::cell_index_type ci) const
+  {
+    return mp_subject_breakout_cells && mp_subject_breakout_cells->find (ci) != mp_subject_breakout_cells->end ();
+  }
+
+  bool intruder_cell_is_breakout (db::cell_index_type ci) const
+  {
+    return mp_intruder_breakout_cells && mp_intruder_breakout_cells->find (ci) != mp_intruder_breakout_cells->end ();
+  }
 };
 
 }

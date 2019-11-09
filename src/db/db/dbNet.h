@@ -603,9 +603,17 @@ public:
   }
 
   /**
-   *  @brief Returns true, if the net is floating (there is no active element on the net)
+   *  @brief Returns true, if the net is floating (there is no device, no subcircuit and no pin)
    */
   bool is_floating () const
+  {
+    return (m_subcircuit_pins.size () + m_terminals.size () + m_pins.size ()) < 1;
+  }
+
+  /**
+   *  @brief Returns true, if the net is passive (there is no active element on the net)
+   */
+  bool is_passive () const
   {
     return (m_subcircuit_pins.size () + m_terminals.size ()) < 1;
   }

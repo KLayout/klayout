@@ -20,10 +20,6 @@
 
 */
 
-
-
-#include <math.h>
-
 #include "dbBox.h"
 #include "dbLayout.h"
 

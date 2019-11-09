@@ -529,6 +529,13 @@ public:
   Extractor &read (std::string &value, const char *term = "");
 
   /**
+   *  @brief Read a name string
+   *
+   *  Name strings are like words, but for the first character digits are not allowed.
+   */
+  Extractor &read_name (std::string &value, const char *non_term = "_.$");
+
+  /**
    *  @brief Read a string consisting of "word" characters
    *
    *  Beside letters and digits the characters given in the "non_term" array are
@@ -609,6 +616,13 @@ public:
    *  or the input ends, the reader stops reading.
    */
   bool try_read (std::string &string, const char *term = "");
+
+  /**
+   *  @brief Try to read a name string
+   *
+   *  Name strings are like words, but for the first character digits are not allowed.
+   */
+  bool try_read_name (std::string &value, const char *non_term = "_.$");
 
   /**
    *  @brief Try to read a string consisting of "word" characters

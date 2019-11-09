@@ -50,6 +50,8 @@ public:
   TransformationReducer () { }
   virtual ~TransformationReducer () { }
 
+  virtual db::Trans reduce_trans (const db::Trans &trans) const { return reduce (trans); }
+  virtual db::ICplxTrans reduce_trans (const db::ICplxTrans &trans) const { return reduce (trans); }
   virtual db::Trans reduce (const db::Trans &trans) const = 0;
   virtual db::ICplxTrans reduce (const db::ICplxTrans &trans) const = 0;
   virtual bool is_translation_invariant () const { return true; }
@@ -63,18 +65,8 @@ public:
 struct DB_PUBLIC OrientationReducer
   : public TransformationReducer
 {
-  db::ICplxTrans reduce (const db::ICplxTrans &trans) const
-  {
-    db::ICplxTrans res (trans);
-    res.disp (db::Vector ());
-    res.mag (1.0);
-    return res;
-  }
-
-  db::Trans reduce (const db::Trans &trans) const
-  {
-    return db::Trans (trans.fp_trans ());
-  }
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
+  db::Trans reduce (const db::Trans &trans) const;
 };
 
 /**
@@ -85,15 +77,8 @@ struct DB_PUBLIC OrientationReducer
 struct DB_PUBLIC MagnificationReducer
   : public TransformationReducer
 {
-  db::ICplxTrans reduce (const db::ICplxTrans &trans) const
-  {
-    return db::ICplxTrans (trans.mag ());
-  }
-
-  db::Trans reduce (const db::Trans &) const
-  {
-    return db::Trans ();
-  }
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
+  db::Trans reduce (const db::Trans &) const;
 };
 
 /**
@@ -104,17 +89,8 @@ struct DB_PUBLIC MagnificationReducer
 struct DB_PUBLIC MagnificationAndOrientationReducer
   : public TransformationReducer
 {
-  db::ICplxTrans reduce (const db::ICplxTrans &trans) const
-  {
-    db::ICplxTrans res (trans);
-    res.disp (db::Vector ());
-    return res;
-  }
-
-  db::Trans reduce (const db::Trans &trans) const
-  {
-    return db::Trans (trans.fp_trans ());
-  }
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
+  db::Trans reduce (const db::Trans &trans) const;
 };
 
 /**
@@ -125,47 +101,39 @@ struct DB_PUBLIC MagnificationAndOrientationReducer
 struct DB_PUBLIC GridReducer
   : public TransformationReducer
 {
-  GridReducer (db::Coord grid)
-    : m_grid (grid)
-  {
-    //  .. nothing yet ..
-  }
+  GridReducer (db::Coord grid);
 
-  db::ICplxTrans reduce (const db::ICplxTrans &trans) const
-  {
-    //  NOTE: we need to keep magnification, angle and mirror so when combining the
-    //  reduced transformations, the result will be equivalent to reducing the combined
-    //  transformation.
-    db::ICplxTrans res (trans);
-    res.disp (db::Vector (mod (trans.disp ().x ()), mod (trans.disp ().y ())));
-    return res;
-  }
-
-  db::Trans reduce (const db::Trans &trans) const
-  {
-    db::Trans res (trans);
-    res.disp (db::Vector (mod (trans.disp ().x ()), mod (trans.disp ().y ())));
-    return res;
-  }
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
+  db::Trans reduce (const db::Trans &trans) const;
 
   bool is_translation_invariant () const { return false; }
 
 private:
   db::Coord m_grid;
+};
 
-  inline db::Coord mod (db::Coord c) const
-  {
-    if (c < 0) {
-      c = m_grid - (-c) % m_grid;
-      if (c == m_grid) {
-        return 0;
-      } else {
-        return c;
-      }
-    } else {
-      return c % m_grid;
-    }
-  }
+/**
+ *  @brief A scale+grid reducer
+ *
+ *  This reducer incarnation reduces the transformation to it's displacement modulo a grid
+ *  after a specified scaling has been applied.
+ *  The scaling is given by a divider and multiplier and is mult / div.
+ */
+struct DB_PUBLIC ScaleAndGridReducer
+  : public TransformationReducer
+{
+  ScaleAndGridReducer (db::Coord grid, db::Coord mult, db::Coord div);
+
+  virtual db::ICplxTrans reduce_trans (const db::ICplxTrans &trans) const;
+  virtual db::Trans reduce_trans (const db::Trans &trans) const;
+  virtual db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
+  virtual db::Trans reduce (const db::Trans &trans) const;
+
+  bool is_translation_invariant () const { return false; }
+
+private:
+  int64_t m_mult;
+  int64_t m_grid;
 };
 
 /**
@@ -225,6 +193,11 @@ public:
    */
   bool has_variants () const;
 
+  /**
+   *  @brief Utility: copy all shapes from one cell to another
+   */
+  static void copy_shapes (db::Layout &layout, db::cell_index_type ci_to, db::cell_index_type ci_from);
+
 private:
   std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> > m_variants;
   const TransformationReducer *mp_red;
@@ -233,7 +206,6 @@ private:
   void add_variant_non_tl_invariant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst) const;
   void add_variant_tl_invariant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst) const;
   void product (const std::map<db::ICplxTrans, size_t> &v1, const std::map<db::ICplxTrans, size_t> &v2, std::map<db::ICplxTrans, size_t> &prod) const;
-  void copy_shapes (db::Layout &layout, db::cell_index_type ci_to, db::cell_index_type ci_from) const;
   void create_var_instances (db::Cell &in_cell, std::vector<db::CellInstArrayWithProperties> &inst, const db::ICplxTrans &for_var, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_table, bool tl_invariant) const;
   void create_var_instances_non_tl_invariant (db::Cell &in_cell, std::vector<db::CellInstArrayWithProperties> &inst, const db::ICplxTrans &for_var, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_table) const;
   void create_var_instances_tl_invariant (db::Cell &in_cell, std::vector<db::CellInstArrayWithProperties> &inst, const db::ICplxTrans &for_var, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_table) const;

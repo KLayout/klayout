@@ -27,9 +27,11 @@
 #include "dbPoint.h"
 #include "dbVector.h"
 #include "dbTypes.h"
+#include "dbPropertiesRepository.h"
 #include "laybasicCommon.h"
 
 #include <QDialog>
+#include <memory>
 
 class QTreeWidgetItem;
 
@@ -37,6 +39,11 @@ namespace db
 {
   class Layout;
   struct LayerProperties;
+}
+
+namespace lay
+{
+  class GenericSyntaxHighlighterAttributes;
 }
 
 namespace Ui
@@ -412,11 +419,17 @@ public slots:
   void remove ();
   void edit ();
   void dbl_clicked (QTreeWidgetItem *, int);
+  void tab_changed (int);
 
 private:
-  bool m_editable;
+  db::PropertiesRepository::properties_set get_properties (int tab);
+  void set_properties (const db::PropertiesRepository::properties_set &props);
+  void accept ();
 
+  bool m_editable;
+  db::PropertiesRepository *mp_prep;
   Ui::UserPropertiesForm *mp_ui;
+  std::auto_ptr<lay::GenericSyntaxHighlighterAttributes> mp_hl_attributes, mp_hl_basic_attributes;
 };
 
 /**
@@ -432,7 +445,6 @@ public:
   bool show (QString &key, QString &value);
   virtual void accept ();
 
-private:
   Ui::UserPropertiesEditForm *mp_ui;
 };
 

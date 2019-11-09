@@ -40,6 +40,7 @@
 namespace db {
 
 class DeepShapeStore;
+class DeepShapeStoreState;
 class Region;
 class Edges;
 
@@ -133,6 +134,13 @@ public:
   }
 
   /**
+   *  @brief Gets the list of breakout cells if there are some
+   *  "breakout cells" are cells which are not considered to participate in hierarchical operations,
+   *  neither as sibling nor in parent-child relationships.
+   */
+  const std::set<db::cell_index_type> *breakout_cells () const;
+
+  /**
    *  @brief Inserts the layer into the given layout, starting from the given cell and into the given layer
    */
   void insert_into (Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer) const;
@@ -198,6 +206,52 @@ private:
   tl::weak_ptr<DeepShapeStore> mp_store;
   unsigned int m_layout;
   unsigned int m_layer;
+};
+
+/**
+ *  @brief An object holding the state of a DeepShapeStore
+ */
+class DB_PUBLIC DeepShapeStoreState
+{
+public:
+  DeepShapeStoreState ();
+
+  void set_threads (int n);
+  int threads () const;
+
+  void set_max_vertex_count (size_t n);
+  size_t max_vertex_count () const;
+
+  void set_max_area_ratio (double ar);
+  double max_area_ratio () const;
+
+  void set_text_property_name (const tl::Variant &pn);
+  const tl::Variant &text_property_name () const;
+
+  void set_text_enlargement (int enl);
+  int text_enlargement () const;
+
+  const std::set<db::cell_index_type> *breakout_cells (unsigned int layout_index) const;
+  void clear_breakout_cells (unsigned int layout_index);
+  void set_breakout_cells (unsigned int layout_index, const std::set<db::cell_index_type> &boc);
+  void add_breakout_cell (unsigned int layout_index, db::cell_index_type ci);
+  void add_breakout_cells (unsigned int layout_index, const std::set<db::cell_index_type> &cc);
+
+private:
+  int m_threads;
+  double m_max_area_ratio;
+  size_t m_max_vertex_count;
+  tl::Variant m_text_property_name;
+  std::vector<std::set<db::cell_index_type> > m_breakout_cells;
+  int m_text_enlargement;
+
+  std::set<db::cell_index_type> &ensure_breakout_cells (unsigned int layout_index)
+  {
+    if (m_breakout_cells.size () <= size_t (layout_index)) {
+      m_breakout_cells.resize (layout_index + 1, std::set<db::cell_index_type> ());
+    }
+    return m_breakout_cells [layout_index];
+  }
 };
 
 struct DB_PUBLIC RecursiveShapeIteratorCompareForTargetHierarchy
@@ -514,10 +568,7 @@ public:
   /**
    *  @brief Gets the number of threads
    */
-  int threads () const
-  {
-    return m_threads;
-  }
+  int threads () const;
 
   /**
    *  @brief Sets the maximum vertex count default value
@@ -531,10 +582,7 @@ public:
   /**
    *  @brief Gets the maximum vertex count
    */
-  size_t max_vertex_count () const
-  {
-    return m_max_vertex_count;
-  }
+  size_t max_vertex_count () const;
 
   /**
    *  @brief Sets the max. area ratio for bounding box vs. polygon area
@@ -548,10 +596,7 @@ public:
   /**
    *  @brief Gets the max. area ratio
    */
-  double max_area_ratio () const
-  {
-    return m_max_area_ratio;
-  }
+  double max_area_ratio () const;
 
   /**
    *  @brief Sets the text property name
@@ -566,10 +611,7 @@ public:
   /**
    *  @brief Gets the text property name
    */
-  const tl::Variant &text_property_name () const
-  {
-    return m_text_property_name;
-  }
+  const tl::Variant &text_property_name () const;
 
   /**
    *  @brief Sets the text enlargement value
@@ -584,10 +626,45 @@ public:
   /**
    *  @brief Gets the text enlargement value
    */
-  int text_enlargement () const
-  {
-    return m_text_enlargement;
-  }
+  int text_enlargement () const;
+
+  /**
+   *  @brief Gets the breakout cells for a given layout
+   *  Returns 0 if there are no breakout cells for this layout.
+   */
+  const std::set<db::cell_index_type> *breakout_cells (unsigned int layout_index) const;
+
+  /**
+   *  @brief Clears the breakout cell list for a given layout
+   */
+  void clear_breakout_cells (unsigned int layout_index);
+
+  /**
+   *  @brief Sets the breakout cell list for a given layout
+   */
+  void set_breakout_cells (unsigned int layout_index, const std::set<db::cell_index_type> &boc);
+
+  /**
+   *  @brief Adds a breakout cell for a given layout
+   */
+  void add_breakout_cell (unsigned int layout_index, db::cell_index_type ci);
+
+  /**
+   *  @brief Adds breakout cells for a given layout
+   */
+  void add_breakout_cells (unsigned int layout_index, const std::set<db::cell_index_type> &cc);
+
+  /**
+   *  @brief Pushes the state on the state stack
+   *  The state involves threads, max_area_ratio, max_vertex_count, the breakout cells and
+   *  the text representation properties (enlargement, property name).
+   */
+  void push_state ();
+
+  /**
+   *  @brief Pops the state (see @ref push_state)
+   */
+  void pop_state ();
 
 private:
   friend class DeepLayer;
@@ -614,11 +691,8 @@ private:
   std::map<size_t, std::pair<unsigned int, unsigned int> > m_layers_for_flat;
   std::map<std::pair<unsigned int, unsigned int>, size_t> m_flat_region_id;
   layout_map_type m_layout_map;
-  int m_threads;
-  double m_max_area_ratio;
-  size_t m_max_vertex_count;
-  tl::Variant m_text_property_name;
-  int m_text_enlargement;
+  DeepShapeStoreState m_state;
+  std::list<DeepShapeStoreState> m_state_stack;
   tl::Mutex m_lock;
 
   struct DeliveryMappingCacheKey

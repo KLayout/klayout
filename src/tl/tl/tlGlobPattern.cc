@@ -238,6 +238,38 @@ private:
   GlobPatternString &operator= (const GlobPatternString &);
 };
 
+class GlobPatternEmpty
+  : public GlobPatternOp
+{
+public:
+  GlobPatternEmpty ()
+    : GlobPatternOp ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual GlobPatternOp *clone () const
+  {
+    GlobPatternEmpty *op = new GlobPatternEmpty ();
+    init_clone (op);
+    return op;
+  }
+
+  virtual bool is_const () const
+  {
+    return next () == 0;
+  }
+
+  virtual bool match (const char *s, std::vector<std::string> *e) const
+  {
+    return GlobPatternOp::match (s, e);
+  }
+
+private:
+  GlobPatternEmpty (const GlobPatternEmpty &);
+  GlobPatternEmpty &operator= (const GlobPatternString &);
+};
+
 class GlobPatternPass
   : public GlobPatternOp
 {
@@ -602,6 +634,8 @@ compile_emit_alt (GlobPatternOp *&op_head, GlobPatternOp *&op, const char *&p, b
     GlobPatternOp *alt = compile (p, false, cs, false, true);
     if (alt) {
       alt_op->add_choice (alt);
+    } else {
+      alt_op->add_choice (new GlobPatternEmpty ());
     }
     if (*p == ',') {
       ++p;

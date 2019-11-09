@@ -22,6 +22,8 @@
 
 
 #include "dbLayoutUtils.h"
+#include "dbCellVariants.h"
+#include "dbRegionUtils.h"
 #include "tlProgress.h"
 
 namespace db
@@ -429,6 +431,126 @@ ContextCache::find_layout_context (db::cell_index_type from, db::cell_index_type
     c->second = db::find_layout_context (*mp_layout, from, to);
   }
   return c->second;
+}
+
+// ------------------------------------------------------------
+//  Scale and snap a layout
+
+void
+scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db::Coord d)
+{
+  if (g < 0) {
+    throw tl::Exception (tl::to_string (tr ("Snapping requires a positive grid value")));
+  }
+
+  if (m <= 0 || d <= 0) {
+    throw tl::Exception (tl::to_string (tr ("Scale and snap requires positive and non-null magnification or divisor values")));
+  }
+
+  if (! g && m == d) {
+    return;
+  }
+
+  db::cell_variants_collector<db::ScaleAndGridReducer> vars (db::ScaleAndGridReducer (g, m, d));
+
+  vars.collect (layout, cell);
+  vars.separate_variants (layout, cell);
+
+  std::set<db::cell_index_type> called_cells;
+  cell.collect_called_cells (called_cells);
+  called_cells.insert (cell.cell_index ());
+
+  db::LayoutLocker layout_locker (&layout);
+  layout.update ();
+
+  std::vector<db::Point> heap;
+
+  unsigned int work_layer = layout.insert_layer ();
+
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    if (called_cells.find (c->cell_index ()) == called_cells.end ()) {
+      continue;
+    }
+
+    const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
+    tl_assert (v.size () == size_t (1));
+    db::ICplxTrans tr = v.begin ()->first;
+
+    //  NOTE: tr_disp is already multiplied with mag, so it can be an integer
+    db::Vector tr_disp = tr.disp ();
+
+    tr.disp (db::Vector ());
+    db::ICplxTrans trinv = tr.inverted ();
+
+    for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
+
+      db::Shapes &s = c->shapes ((*l).first);
+      db::Shapes &out = c->shapes (work_layer);
+
+      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Paths | db::ShapeIterator::Boxes); ! si.at_end (); ++si) {
+
+        db::Polygon poly;
+        si->polygon (poly);
+        poly.transform (tr);
+        poly = scaled_and_snapped_polygon (poly, g, m, d, tr_disp.x (), g, m, d, tr_disp.y (), heap);
+        poly.transform (trinv);
+        out.insert (poly);
+
+      }
+
+      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Texts); ! si.at_end (); ++si) {
+
+        db::Text text;
+        si->text (text);
+        text.transform (tr);
+        text.trans (db::Trans (text.trans ().rot (), scaled_and_snapped_vector (text.trans ().disp (), g, m, d, tr_disp.x (), g, m, d, tr_disp.y ())));
+        text.transform (trinv);
+        out.insert (text);
+
+      }
+
+      s.swap (out);
+      out.clear ();
+
+    }
+
+    //  Snap instance placements to grid and magnify
+    //  NOTE: we can modify the instances because the ScaleAndGridReducer marked every cell with children
+    //  as a variant cell (an effect of ScaleAndGridReducer::want_variants(cell) == true where cells have children).
+    //  Variant cells are not copied blindly back to the original layout.
+
+    std::list<db::CellInstArray> new_insts;
+
+    for (db::Cell::const_iterator inst = c->begin (); ! inst.at_end (); ++inst) {
+
+      const db::CellInstArray &ia = inst->cell_inst ();
+      for (db::CellInstArray::iterator i = ia.begin (); ! i.at_end (); ++i) {
+
+        db::Trans ti (*i);
+        db::Vector ti_disp = ti.disp ();
+        ti_disp.transform (tr);
+        ti_disp = scaled_and_snapped_vector (ti_disp, g, m, d, tr_disp.x (), g, m, d, tr_disp.y ());
+        ti_disp.transform (trinv);
+        ti.disp (ti_disp);
+
+        if (ia.is_complex ()) {
+          new_insts.push_back (db::CellInstArray (ia.object (), ia.complex_trans (ti)));
+        } else {
+          new_insts.push_back (db::CellInstArray (ia.object (), ti));
+        }
+
+      }
+
+    }
+
+    c->clear_insts ();
+
+    for (std::list<db::CellInstArray>::const_iterator i = new_insts.begin (); i != new_insts.end (); ++i) {
+      c->insert (*i);
+    }
+
+  }
 }
 
 }

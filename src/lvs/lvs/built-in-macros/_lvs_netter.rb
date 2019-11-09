@@ -48,6 +48,7 @@ module LVS
 
     def initialize(engine)
       super
+      @comparer_config = []
     end
 
     def _make_data
@@ -65,7 +66,6 @@ module LVS
       @lvs.generator = @engine._generator
 
       @l2n = @lvs
-      @comparer = RBA::NetlistComparer::new
 
     end
 
@@ -94,6 +94,10 @@ module LVS
       data
     end
 
+    def _lvs_data
+      _l2n_data && @lvs
+    end
+
     # %LVS%
     # @name align
     # @brief Aligns the extracted netlist vs. the schematic
@@ -120,7 +124,9 @@ module LVS
 
       nl = _ensure_two_netlists
 
-      unmatched_a = @comparer.unmatched_circuits_a(*nl)
+      comparer = self._comparer 
+
+      unmatched_a = comparer.unmatched_circuits_a(*nl)
 
       # check whether we're about to flatten away the internal top cell - that's bad
       top_cell = l2n_data.internal_top_cell.name
@@ -131,14 +137,15 @@ module LVS
       # flatten layout cells for which there is no corresponding schematic circuit
       unmatched_a.each do |c|
         @engine.info("Flatten layout cell (no schematic): #{c.name}")
-        nl[0].flatten_circuit(c)
       end
+      nl[0].flatten_circuits(unmatched_a)
 
       # flatten schematic circuits for which there is no corresponding layout cell
-      @comparer.unmatched_circuits_b(*nl).each do |c|
+      unmatched_b = comparer.unmatched_circuits_b(*nl)
+      unmatched_b.each do |c|
         @engine.info("Flatten schematic circuit (no layout): #{c.name}")
-        nl[1].flatten_circuit(c)
       end
+      nl[1].flatten_circuits(unmatched_b)
 
     end
 
@@ -161,7 +168,20 @@ module LVS
       nl = _ensure_two_netlists
       lvs_data.reference = nl[1]
 
-      lvs_data.compare(@comparer)
+      lvs_data.compare(self._comparer)
+
+    end
+
+    def _comparer
+
+      comparer = RBA::NetlistComparer::new
+
+      # execute the configuration commands
+      @comparer_config.each do |cc|
+        cc.call(comparer)
+      end
+
+      return comparer
 
     end
 
@@ -217,6 +237,12 @@ module LVS
         n.is_a?(String) || n.is_a?(RBA::Net) || raise("Net arguments of 'same_nets' must be strings or Net objects")
       end
 
+      @comparer_config << lambda { |comparer| self._same_nets(comparer, ca, a, cb, b) }
+
+    end
+
+    def _same_nets(comparer, ca, a, cb, b)
+
       ( nl_a, nl_b ) = _ensure_two_netlists
 
       if ca.is_a?(String)
@@ -234,19 +260,19 @@ module LVS
       if circuit_a && circuit_b
 
         if a.is_a?(String)
-          net_a = circuit_a.net_by_name(a) || raise("Not a valid net name in extracted netlist: #{a} (for circuit #{circuit_a})")
+          net_a = circuit_a.net_by_name(a) || raise("Not a valid net name in extracted netlist in 'same_nets': #{a} (for circuit #{circuit_a})")
         else
           net_a = a
         end
 
         if b.is_a?(String)
-          net_b = circuit_b.net_by_name(b) || raise("Not a valid net name in extracted netlist: #{b} (for circuit #{circuit_b})")
+          net_b = circuit_b.net_by_name(b) || raise("Not a valid net name in extracted netlist in 'same_nets': #{b} (for circuit #{circuit_b})")
         else
           net_b = b
         end
 
         if net_a && net_b
-          @comparer.same_nets(net_a, net_b)
+          comparer.same_nets(net_a, net_b)
         end
 
       end
@@ -271,13 +297,19 @@ module LVS
 
       a.is_a?(String) || a == nil || b.is_a?(String) || b == nil || raise("Both arguments of 'same_circuits' need to be strings or nil")
 
+      @comparer_config << lambda { |comparer| self._same_circuits(comparer, a, b) }
+
+    end
+
+    def _same_circuits(comparer, a, b)
+
       ( nl_a, nl_b ) = _ensure_two_netlists
 
       circuit_a = a && nl_a.circuit_by_name(a)
       circuit_b = b && nl_b.circuit_by_name(b)
 
       if circuit_a && circuit_b
-        @comparer.same_circuits(circuit_a, circuit_b)
+        comparer.same_circuits(circuit_a, circuit_b)
       end
       
     end
@@ -301,15 +333,21 @@ module LVS
 
       a.is_a?(String) || a == nil || b.is_a?(String) || b == nil || raise("Both arguments of 'same_device_classes' need to be strings or nil")
 
+      @comparer_config << lambda { |comparer| self._same_device_classes(comparer, a, b) }
+
+    end
+
+    def _same_device_classes(comparer, a, b)
+
       ( nl_a, nl_b ) = _ensure_two_netlists
 
-      dc_a = a && (nl_a.device_class_by_name(a) || raise("Not a valid device class in extracted netlist: #{a}"))
+      dc_a = a && (nl_a.device_class_by_name(a) || raise("Not a valid device class in extracted netlist in 'same_device_class': #{a}"))
       dc_b = b && nl_b.device_class_by_name(b)
 
       # NOTE: a device class is allowed to be missing in the reference netlist because the
       # device may simply not be used there.
       if dc_b
-        @comparer.same_device_classes(dc_a, dc_b)
+        comparer.same_device_classes(dc_a, dc_b)
       end
       
     end
@@ -347,6 +385,12 @@ module LVS
           raise("All pin arguments of 'equivalent_pins' need to be strings or numbers")
       end
 
+      @comparer_config << lambda { |comparer| self._equivalent_pins(comparer, circuit, *pins) }
+
+    end
+
+    def _equivalent_pins(comparer, circuit, *pins)
+
       ( nl_a, nl_b ) = _ensure_two_netlists
 
       circuit_b = nl_b.circuit_by_name(circuit)
@@ -357,14 +401,14 @@ module LVS
 
         pin_ids_b = pins.collect do |p|
           if p.is_a?(String)
-            pin = circuit_b.pin_by_name(p) || raise("Not a valid pin name in circuit '#{circuit}': #{p}")
+            pin = circuit_b.pin_by_name(p) || raise("Not a valid pin name in circuit '#{circuit}' in 'equivalent_pins': #{p}")
           else
-            pin = pins_by_index[p.to_i] || raise("Not a valid pin index in circuit '#{circuit}': #{p}")
+            pin = pins_by_index[p.to_i] || raise("Not a valid pin index in circuit '#{circuit}' in 'equivalent_pins': #{p}")
           end
           pin.id
         end
 
-        @comparer.equivalent_pins(circuit_b, pin_ids_b)
+        comparer.equivalent_pins(circuit_b, pin_ids_b)
 
       end
       
@@ -428,8 +472,8 @@ module LVS
     # with a capacitance values below the given threshold (in Farad).
 
     def min_caps(value)
-      lvs_data
-      @comparer.min_capacitance = value.to_f
+      v = value.to_f
+      @comparer_config << lambda { |comparer| comparer.min_capacitance = v }
     end
       
     # %LVS%
@@ -440,8 +484,8 @@ module LVS
     # with a resistance value above the given threshold (in Farad).
 
     def max_res(value)
-      lvs_data
-      @comparer.max_resistance = value.to_f
+      v = value.to_f
+      @comparer_config << lambda { |comparer| comparer.max_resistance = v }
     end
 
     # %LVS%
@@ -459,8 +503,8 @@ module LVS
     # as the seeds for this deduction path. The default value is 8. 
 
     def max_depth(value)
-      lvs_data
-      @comparer.max_depth = value.to_i
+      v = value.to_i
+      @comparer_config << lambda { |comparer| comparer.max_depth = v }
     end
 
     # @name max_branch_complexity
@@ -480,8 +524,8 @@ module LVS
     # complexity.
  
     def max_branch_complexity(value)
-      lvs_data
-      @comparer.max_branch_complexity = value.to_i
+      v = value.to_i
+      @comparer_config << lambda { |comparer| comparer.max_branch_complexity = v }
     end
 
   end

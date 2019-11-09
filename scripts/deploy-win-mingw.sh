@@ -4,7 +4,7 @@
 # This is the command executed for the Python interpreter that is going
 # to be included in KLayout.
 
-python="python3.5m"
+python="python3"
 
 # Specify the Ruby interpreter to use.
 # This is the command executed for the Ruby interpreter that is going

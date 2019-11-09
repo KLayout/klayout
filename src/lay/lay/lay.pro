@@ -11,7 +11,6 @@ HEADERS = \
     layClipDialog.h \
     layCrashMessage.h \
     layFillDialog.h \
-    layGenericSyntaxHighlighter.h \
     layGSIHelpProvider.h \
     layHelpDialog.h \
     layHelpProvider.h \

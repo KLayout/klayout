@@ -23,10 +23,10 @@
 
 #include "layProgressWidget.h"
 
-#include <math.h>
-
 #include <QFrame>
 #include <QGridLayout>
+
+#include <math.h>
 
 namespace lay
 {

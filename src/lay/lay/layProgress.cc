@@ -25,14 +25,14 @@
 #include <QApplication>
 #include <QInputEvent>
 
-#include <stdlib.h>
-#include <math.h>
-
 #include "layProgress.h"
 #include "layMainWindow.h"
 #include "layProgressWidget.h"
 #include "tlProgress.h"
 #include "tlDeferredExecution.h"
+
+#include <stdlib.h>
+#include <math.h>
 
 namespace lay
 {

@@ -21,13 +21,13 @@
 */
 
 
-#include <math.h>
-#include <stdio.h>
-
 #include "tlProgress.h"
 #include "tlString.h"
 #include "tlAssert.h"
 #include "tlThreads.h"
+
+#include <stdio.h>
+#include <math.h>
 
 namespace tl
 {

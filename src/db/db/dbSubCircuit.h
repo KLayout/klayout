@@ -43,7 +43,7 @@ class Circuit;
  *  This class essentially is a reference to another circuit
  */
 class DB_PUBLIC SubCircuit
-  : public tl::Object
+  : public db::NetlistObject
 {
 public:
   typedef tl::vector<const Net *> connected_net_list;

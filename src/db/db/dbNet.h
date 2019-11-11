@@ -24,6 +24,7 @@
 #define _HDR_dbNet
 
 #include "dbCommon.h"
+#include "dbNetlistObject.h"
 
 #include "tlObject.h"
 
@@ -360,7 +361,7 @@ private:
  *  A net connects terminals of devices and pins or circuits
  */
 class DB_PUBLIC Net
-  : public tl::Object
+  : public db::NetlistObject
 {
 public:
   typedef std::list<NetTerminalRef> terminal_list;

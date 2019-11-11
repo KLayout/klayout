@@ -20,33 +20,49 @@
 
 */
 
-#include "dbPin.h"
-#include "tlString.h"
+#include "dbNetlistObject.h"
 
 namespace db
 {
 
-// --------------------------------------------------------------------------------
-//  Pin class implementation
-
-Pin::Pin ()
-  : db::NetlistObject (), m_id (0)
+NetlistObject::NetlistObject ()
+  : tl::Object ()
 {
   //  .. nothing yet ..
 }
 
-Pin::Pin (const std::string &name)
-  : db::NetlistObject (), m_name (name), m_id (0)
+NetlistObject::NetlistObject (const db::NetlistObject &other)
+  : tl::Object (other), m_properties (other.m_properties)
 {
   //  .. nothing yet ..
 }
 
-std::string Pin::expanded_name () const
+NetlistObject &NetlistObject::operator= (const NetlistObject &other)
 {
-  if (name ().empty ()) {
-    return "$" + tl::to_string (id ());
+  if (this != &other) {
+    tl::Object::operator= (other);
+    m_properties = other.m_properties;
+  }
+  return *this;
+}
+
+tl::Variant NetlistObject::property (const tl::Variant &key) const
+{
+  std::map<tl::Variant, tl::Variant>::const_iterator i = m_properties.find (key);
+  if (i == m_properties.end ()) {
+    return tl::Variant ();
   } else {
-    return name ();
+    return i->second;
+  }
+}
+
+void
+NetlistObject::set_property (const tl::Variant &key, const tl::Variant &value)
+{
+  if (value.is_nil ()) {
+    m_properties.erase (key);
+  } else {
+    m_properties [key] = value;
   }
 }
 

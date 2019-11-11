@@ -20,73 +20,55 @@
 
 */
 
-#ifndef _HDR_dbPin
-#define _HDR_dbPin
+#ifndef _HDR_dbNetlistObject
+#define _HDR_dbNetlistObject
 
 #include "dbCommon.h"
-#include "dbNetlistObject.h"
+#include "tlObject.h"
+#include "tlVariant.h"
 
+#include <list>
 #include <string>
 
 namespace db
 {
 
 /**
- *  @brief The definition of a pin of a circuit
- *
- *  A pin is some place other nets can connect to a circuit.
+ *  @brief A base class for a objects in the netlist
  */
-class DB_PUBLIC Pin
-  : public db::NetlistObject
+class DB_PUBLIC NetlistObject
+  : public tl::Object
 {
 public:
   /**
    *  @brief Default constructor
    */
-  Pin ();
+  NetlistObject ();
 
   /**
-   *  @brief Creates a pin with the given name.
+   *  @brief Copy constructor
    */
-  Pin (const std::string &name);
+  NetlistObject (const db::NetlistObject &object);
 
   /**
-   *  @brief Gets the name of the pin
+   *  @brief Assignment
    */
-  const std::string &name () const
-  {
-    return m_name;
-  }
+  NetlistObject &operator= (const NetlistObject &other);
 
   /**
-   *  @brief Gets a name which always non-empty
-   *  This method will pick a name like "$<id>" if the explicit name is empty.
+   *  @brief Gets the property value for a given key
+   *  Returns nil if there is no property for the given key.
    */
-  std::string expanded_name () const;
+  tl::Variant property (const tl::Variant &key) const;
 
   /**
-   *  @brief Gets the ID of the pin (only pins inside circuits have valid ID's)
+   *  @brief Sets the property value for a given key
+   *  Set the value to nil to clear a specific key
    */
-  size_t id () const
-  {
-    return m_id;
-  }
+  void set_property (const tl::Variant &key, const tl::Variant &value);
 
 private:
-  friend class Circuit;
-
-  std::string m_name;
-  size_t m_id;
-
-  void set_id (size_t id)
-  {
-    m_id = id;
-  }
-
-  void set_name (const std::string &name)
-  {
-    m_name = name;
-  }
+  std::map<tl::Variant, tl::Variant> m_properties;
 };
 
 }

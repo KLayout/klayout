@@ -33,7 +33,7 @@ namespace db
 //  Circuit class implementation
 
 Circuit::Circuit ()
-  : gsi::ObjectBase (), db::NetlistObject (), m_dont_purge (false), m_cell_index (0), mp_netlist (0),
+  : db::NetlistObject (), gsi::ObjectBase (), m_dont_purge (false), m_cell_index (0), mp_netlist (0),
     m_device_by_id (this, &Circuit::begin_devices, &Circuit::end_devices),
     m_subcircuit_by_id (this, &Circuit::begin_subcircuits, &Circuit::end_subcircuits),
     m_net_by_cluster_id (this, &Circuit::begin_nets, &Circuit::end_nets),
@@ -48,7 +48,7 @@ Circuit::Circuit ()
 }
 
 Circuit::Circuit (const db::Layout &layout, db::cell_index_type ci)
-  : gsi::ObjectBase (), db::NetlistObject (), m_name (layout.cell_name (ci)), m_dont_purge (false), m_cell_index (ci), mp_netlist (0),
+  : db::NetlistObject (), gsi::ObjectBase (), m_name (layout.cell_name (ci)), m_dont_purge (false), m_cell_index (ci), mp_netlist (0),
     m_device_by_id (this, &Circuit::begin_devices, &Circuit::end_devices),
     m_subcircuit_by_id (this, &Circuit::begin_subcircuits, &Circuit::end_subcircuits),
     m_net_by_cluster_id (this, &Circuit::begin_nets, &Circuit::end_nets),
@@ -65,7 +65,7 @@ Circuit::Circuit (const db::Layout &layout, db::cell_index_type ci)
 }
 
 Circuit::Circuit (const Circuit &other)
-  : gsi::ObjectBase (other), db::NetlistObject (other), m_dont_purge (false), m_cell_index (0), mp_netlist (0),
+  : db::NetlistObject (other), gsi::ObjectBase (other), m_dont_purge (false), m_cell_index (0), mp_netlist (0),
     m_device_by_id (this, &Circuit::begin_devices, &Circuit::end_devices),
     m_subcircuit_by_id (this, &Circuit::begin_subcircuits, &Circuit::end_subcircuits),
     m_net_by_cluster_id (this, &Circuit::begin_nets, &Circuit::end_nets),

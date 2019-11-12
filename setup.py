@@ -274,8 +274,7 @@ class Config(object):
             return [ os.path.join(bits, "zlib", "bin", "zlib1.dll"),
                      os.path.join(bits, "ptw", "bin", "pthreadVCE2.dll"),
                      os.path.join(bits, "expat", "bin", "expat.dll"),
-                     os.path.join(bits, "curl", "bin", "libcurl.dll"),
-                     os.getenv("KLAYOUT_MSVCRT") ]
+                     os.path.join(bits, "curl", "bin", "libcurl.dll") ]
         else:
             return []
 

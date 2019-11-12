@@ -254,7 +254,7 @@ TEST(1b_ReaderBasicShort)
 
   //  verify against the input
 
-  std::string path = tmp_file ("tmp_l2nreader_2.txt");
+  std::string path = tmp_file ("tmp.txt");
   {
     tl::OutputStream stream (path);
     db::LayoutToNetlistStandardWriter writer (stream, true);
@@ -262,6 +262,30 @@ TEST(1b_ReaderBasicShort)
   }
 
   std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au_s.txt");
+
+  compare_text_files (path, au_path);
+}
+
+TEST(1c_ReaderBasicShortWithProps)
+{
+  db::LayoutToNetlist l2n;
+
+  std::string in_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au_p.txt");
+  tl::InputStream is_in (in_path);
+
+  db::LayoutToNetlistStandardReader reader (is_in);
+  reader.read (&l2n);
+
+  //  verify against the input
+
+  std::string path = tmp_file ("tmp.txt");
+  {
+    tl::OutputStream stream (path);
+    db::LayoutToNetlistStandardWriter writer (stream, true);
+    writer.write (&l2n);
+  }
+
+  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au_p.txt");
 
   compare_text_files (path, au_path);
 }
@@ -278,7 +302,7 @@ TEST(2_ReaderWithGlobalNets)
 
   //  verify against the input
 
-  std::string path = tmp_file ("tmp_l2nreader_2.txt");
+  std::string path = tmp_file ("tmp.txt");
   {
     tl::OutputStream stream (path);
     db::LayoutToNetlistStandardWriter writer (stream, false);
@@ -335,7 +359,7 @@ TEST(3_ReaderAbsoluteCoordinates)
 
   //  verify against the input
 
-  std::string path = tmp_file ("tmp_l2nreader_2.txt");
+  std::string path = tmp_file ("tmp.txt");
   {
     tl::OutputStream stream (path);
     db::LayoutToNetlistStandardWriter writer (stream, false);
@@ -394,7 +418,7 @@ TEST(4_ReaderCombinedDevices)
 
   //  verify against the input
 
-  std::string path = tmp_file ("tmp_l2nreader_4.txt");
+  std::string path = tmp_file ("tmp.txt");
   {
     tl::OutputStream stream (path);
     db::LayoutToNetlistStandardWriter writer (stream, false);

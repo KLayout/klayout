@@ -292,6 +292,13 @@ void Circuit::clear_pins ()
   m_pins.clear ();
 }
 
+const Pin &Circuit::add_pin (const Pin &pin)
+{
+  m_pins.push_back (pin);
+  m_pins.back ().set_id (m_pins.size () - 1);
+  return m_pins.back ();
+}
+
 const Pin &Circuit::add_pin (const std::string &name)
 {
   m_pins.push_back (Pin (name));

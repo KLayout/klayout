@@ -278,6 +278,13 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
 
   }
 
+  for (db::NetlistObject::property_iterator p = circuit.begin_properties (); p != circuit.end_properties (); ++p) {
+    if (p == circuit.begin_properties() && ! Keys::is_short ()) {
+      *mp_stream << endl << indent << indent1 << "# Properties" << endl;
+    }
+    *mp_stream << indent << indent1 << Keys::property_key << "(" << p->first.to_parsable_string () << " " << p->second.to_parsable_string () << ")" << endl;
+  }
+
   std::map<const db::Net *, unsigned int> net2id_local;
   std::map<const db::Net *, unsigned int> *net2id = &net2id_local;
   if (net2id_per_circuit) {
@@ -416,12 +423,19 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
         } else {
 
           if (! any) {
+
             *mp_stream << indent << indent1 << Keys::net_key << "(" << id;
             if (! net.name ().empty ()) {
               *mp_stream << " " << Keys::name_key << "(" << tl::to_word_or_quoted_string (net.name ()) << ")";
             }
             *mp_stream << endl;
+
+            for (db::NetlistObject::property_iterator p = net.begin_properties (); p != net.end_properties (); ++p) {
+              *mp_stream << indent << indent2 << Keys::property_key << "(" << p->first.to_parsable_string () << " " << p->second.to_parsable_string () << ")" << endl;
+            }
+
             any = true;
+
           }
 
           *mp_stream << indent << indent2;
@@ -449,7 +463,15 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
     if (! net.name ().empty ()) {
       *mp_stream << " " << Keys::name_key << "(" << tl::to_word_or_quoted_string (net.name ()) << ")";
     }
-    *mp_stream << ")" << endl;
+    if (net.begin_properties () != net.end_properties ()) {
+      *mp_stream << endl;
+      for (db::NetlistObject::property_iterator p = net.begin_properties (); p != net.end_properties (); ++p) {
+        *mp_stream << indent << indent2 << Keys::property_key << "(" << p->first.to_parsable_string () << " " << p->second.to_parsable_string () << ")" << endl;
+      }
+      *mp_stream << indent << ")" << endl;
+    } else {
+      *mp_stream << ")" << endl;
+    }
 
   }
 }
@@ -470,10 +492,14 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Sub
   }
 
   //  each pin in one line for more than a few pins
-  bool separate_lines = (subcircuit.circuit_ref ()->pin_count () > 1);
+  bool separate_lines = (subcircuit.circuit_ref ()->pin_count () > 1) || subcircuit.begin_properties () != subcircuit.end_properties ();
 
   if (separate_lines) {
     *mp_stream << endl;
+  }
+
+  for (db::NetlistObject::property_iterator p = subcircuit.begin_properties (); p != subcircuit.end_properties (); ++p) {
+    *mp_stream << indent << indent2 << Keys::property_key << "(" << p->first.to_parsable_string () << " " << p->second.to_parsable_string () << ")" << endl;
   }
 
   for (db::Circuit::const_pin_iterator p = subcircuit.circuit_ref ()->begin_pins (); p != subcircuit.circuit_ref ()->end_pins (); ++p) {
@@ -612,6 +638,10 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist * /*l2n*/, const db
 
   if (! device.name ().empty ()) {
     *mp_stream << indent << indent2 << Keys::name_key << "(" << tl::to_word_or_quoted_string (device.name ()) << ")" << endl;
+  }
+
+  for (db::NetlistObject::property_iterator p = device.begin_properties (); p != device.end_properties (); ++p) {
+    *mp_stream << indent << indent2 << Keys::property_key << "(" << p->first.to_parsable_string () << " " << p->second.to_parsable_string () << ")" << endl;
   }
 
   for (std::vector<DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {

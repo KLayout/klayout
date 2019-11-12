@@ -43,6 +43,7 @@ namespace l2n_std_format
   DB_PUBLIC std::string LongKeys::circuit_key ("circuit");
   DB_PUBLIC std::string LongKeys::net_key ("net");
   DB_PUBLIC std::string LongKeys::name_key ("name");
+  DB_PUBLIC std::string LongKeys::property_key ("property");
   DB_PUBLIC std::string LongKeys::device_key ("device");
   DB_PUBLIC std::string LongKeys::polygon_key ("polygon");
   DB_PUBLIC std::string LongKeys::rect_key ("rect");
@@ -55,7 +56,7 @@ namespace l2n_std_format
   DB_PUBLIC std::string LongKeys::scale_key ("scale");
   DB_PUBLIC std::string LongKeys::pin_key ("pin");
 
-  //  A, B, C, D, E, G, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y
+  //  A, B, C, D, E, F, G, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y
   DB_PUBLIC std::string ShortKeys::version_key ("V");
   DB_PUBLIC std::string ShortKeys::description_key ("B");
   DB_PUBLIC std::string ShortKeys::top_key ("W");
@@ -67,6 +68,7 @@ namespace l2n_std_format
   DB_PUBLIC std::string ShortKeys::circuit_key ("X");
   DB_PUBLIC std::string ShortKeys::net_key ("N");
   DB_PUBLIC std::string ShortKeys::name_key ("I");
+  DB_PUBLIC std::string ShortKeys::property_key ("F");
   DB_PUBLIC std::string ShortKeys::device_key ("D");
   DB_PUBLIC std::string ShortKeys::polygon_key ("Q");
   DB_PUBLIC std::string ShortKeys::rect_key ("R");

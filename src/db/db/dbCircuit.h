@@ -325,6 +325,12 @@ public:
   const Pin &add_pin (const std::string &name);
 
   /**
+   *  @brief Adds a pin to this circuit
+   *  This version uses the given pin as the template.
+   */
+  const Pin &add_pin (const Pin &pin);
+
+  /**
    *  @brief Begin iterator for the pins of the circuit (non-const version)
    */
   pin_iterator begin_pins ()

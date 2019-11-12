@@ -1125,7 +1125,7 @@ static void circuit_disconnect_pin1 (db::Circuit *c, const db::Pin *pin)
 }
 
 Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
-  gsi::method ("create_pin", &db::Circuit::add_pin, gsi::arg ("name"),
+  gsi::method ("create_pin", (const db::Pin &(db::Circuit::*) (const std::string &)) &db::Circuit::add_pin, gsi::arg ("name"),
     "@brief Creates a new \\Pin object inside the circuit\n"
     "This object will describe a pin of the circuit. A circuit connects "
     "to the outside through such a pin. The pin is added after all existing "

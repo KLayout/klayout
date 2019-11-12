@@ -72,6 +72,15 @@ public:
     return m_id;
   }
 
+  /**
+   *  @brief Sets the name of the pin
+   *  CAUTION: don't use this method on pins stored inside a netlist.
+   */
+  void set_name (const std::string &name)
+  {
+    m_name = name;
+  }
+
 private:
   friend class Circuit;
 
@@ -81,11 +90,6 @@ private:
   void set_id (size_t id)
   {
     m_id = id;
-  }
-
-  void set_name (const std::string &name)
-  {
-    m_name = name;
   }
 };
 

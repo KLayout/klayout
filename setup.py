@@ -271,7 +271,7 @@ class Config(object):
         """
         if platform.system() == "Windows":
             bits = os.getenv("KLAYOUT_BITS")
-            return [ os.path.join(bits, "zlib", "bin", "zlib.dll"),
+            return [ os.path.join(bits, "zlib", "bin", "zlib1.dll"),
                      os.path.join(bits, "ptw", "bin", "pthreadVCE2.dll"),
                      os.path.join(bits, "expat", "bin", "expat.dll"),
                      os.path.join(bits, "curl", "bin", "libcurl.dll"),

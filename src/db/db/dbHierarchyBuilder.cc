@@ -188,7 +188,7 @@ HierarchyBuilder::register_variant (db::cell_index_type non_var, db::cell_index_
 void
 HierarchyBuilder::unregister_variant (db::cell_index_type var)
 {
-  variant_to_original_target_map_type::const_iterator v = m_variants_to_original_target_map.find (var);
+  variant_to_original_target_map_type::iterator v = m_variants_to_original_target_map.find (var);
   if (v == m_variants_to_original_target_map.end ()) {
     return;
   }

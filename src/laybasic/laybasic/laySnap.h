@@ -58,7 +58,7 @@ namespace lay
    */
   inline db::DCoord snap (db::DCoord c)
   {
-    return floor (c + 0.5);
+    return floor (c + 0.5 + db::coord_traits<double>::prec ());
   }
 
   /**

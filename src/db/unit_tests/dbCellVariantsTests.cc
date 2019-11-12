@@ -297,7 +297,7 @@ TEST(8_GridVariants)
   //  expanded placements mod 10:
   //    c in a: r0 *2 x=1,1+102 y=10,10+101  x  r0 *1 x=2,y=3
   //              = (3,3),(5,3),(3,4),(5,4)
-  EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "r0 *1 3,3[1];r0 *1 5,3[1];r0 *1 3,4[1];r0 *1 5,4[1]");
+  EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "r0 *1 -5,3[1];r0 *1 3,3[1];r0 *1 -5,4[1];r0 *1 3,4[1]");
   EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
 
   EXPECT_EQ (inst2str (ly, a), "B:r0 *1 1,10;B:r0 *1 1,111;B:r0 *1 103,10;B:r0 *1 103,111");
@@ -306,13 +306,13 @@ TEST(8_GridVariants)
 
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > vm;
   vb.separate_variants (ly, a, &vm);
-  EXPECT_EQ (vm2str (ly, vm), "B:B[r0 *1 1,0],B$VAR1[r0 *1 3,0],B$VAR2[r0 *1 1,1],B$VAR3[r0 *1 3,1];C:C[r0 *1 3,3],C$VAR1[r0 *1 5,3],C$VAR2[r0 *1 3,4],C$VAR3[r0 *1 5,4]");
+  EXPECT_EQ (vm2str (ly, vm), "B:B[r0 *1 1,0],B$VAR1[r0 *1 3,0],B$VAR2[r0 *1 1,1],B$VAR3[r0 *1 3,1];C:C[r0 *1 -5,3],C$VAR1[r0 *1 3,3],C$VAR2[r0 *1 -5,4],C$VAR3[r0 *1 3,4]");
 
   EXPECT_EQ (inst2str (ly, a), "B:r0 *1 1,10;B$VAR2:r0 *1 1,111;B$VAR1:r0 *1 103,10;B$VAR3:r0 *1 103,111");
-  EXPECT_EQ (inst2str (ly, b), "C:r0 *1 2,3");
-  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("B$VAR1").second)), "C$VAR1:r0 *1 2,3");
-  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("B$VAR2").second)), "C$VAR2:r0 *1 2,3");
-  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("B$VAR3").second)), "C$VAR3:r0 *1 2,3");
+  EXPECT_EQ (inst2str (ly, b), "C$VAR1:r0 *1 2,3");
+  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("B$VAR1").second)), "C:r0 *1 2,3");
+  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("B$VAR2").second)), "C$VAR3:r0 *1 2,3");
+  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("B$VAR3").second)), "C$VAR2:r0 *1 2,3");
   EXPECT_EQ (inst2str (ly, c), "");
 }
 
@@ -352,21 +352,21 @@ TEST(9_ComplexGridVariants)
   //                (-9,102),(-9,207),(-112,102),(-112,207)
   //            r90 *1 x=1,y=100  x  m0 *1 x=2,y=100
   //                (-99,102)
-  //  expanded placements mod 10:
+  //  expanded ((placements + 5) mod 10) - placements
   //    c in a: r0 *2 x=1,1+102 y=10,10+101  x  r0 *2 x=2,2+105 y=10,10+103
-  //              = (5,0),(5,0),(5,6),(5,6)
-  //                (7,0),(7,0),(7,6),(7,6)
-  //                (5,1),(5,1),(5,7),(5,7)
-  //                (7,1),(7,1),(7,7),(7,7)
+  //              = (5,0),(5,0),(-5,-4),(-5,-4)
+  //                (7,0),(7,0),(-3,-4),(-3,-4)
+  //                (-5,1),(-5,1),(-5,-3),(-5,-3)
+  //                (-3,1),(-3,1),(-3,-3),(-3,-3)
   //            r0 *2 x=1,1+102 y=10,10+101  x  m0 *1 x=2,y=100
-  //                (5,0),(5,1),(7,0),(7,1)
+  //                (-5,0),(-5,1),(-3,0),(-3,1)
   //            r90 *1 x=1,y=100  x  r0 *2 x=2,2+105 y=10,10+103
-  //                (1,2),(1,7),(8,2),(8,7)
+  //                (1,2),(1,-3),(-2,2),(-2,-3)
   //            r90 *1 x=1,y=100  x  m0 *1 x=2,y=100
   //                (1,2)
-  EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "m0 *2 5,0[1];r0 *4 5,0[2];m0 *2 7,0[1];r0 *4 7,0[2];m0 *2 5,1[1];r0 *4 5,1[2];"
-                                                      "m0 *2 7,1[1];r0 *4 7,1[2];m45 *1 1,2[1];r90 *2 1,2[1];r90 *2 8,2[1];"
-                                                      "r0 *4 5,6[2];r0 *4 7,6[2];r90 *2 1,7[1];r0 *4 5,7[2];r0 *4 7,7[2];r90 *2 8,7[1]");
+  EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "r0 *4 -5,-4[2];r0 *4 -3,-4[2];r0 *4 -5,-3[2];r0 *4 -3,-3[2];r90 *2 -2,-3[1];"
+                                                      "r90 *2 1,-3[1];m0 *2 -5,0[1];r0 *4 -5,0[2];m0 *2 -3,0[1];r0 *4 -3,0[2];"
+                                                      "m0 *2 -5,1[1];r0 *4 -5,1[2];m0 *2 -3,1[1];r0 *4 -3,1[2];r90 *2 -2,2[1];m45 *1 1,2[1];r90 *2 1,2[1]");
   EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
 }
 

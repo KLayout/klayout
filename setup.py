@@ -265,6 +265,20 @@ class Config(object):
                     "-std=c++11",  # because we use unordered_map/unordered_set
                     ]
 
+    def data_files(self):
+        """
+        Gets the data files to add
+        """
+        if platform.system() == "Windows":
+            bits = os.getenv("KLAYOUT_BITS")
+            return [ os.path.join(bits, "zlib", "bin", "zlib.dll"),
+                     os.path.join(bits, "ptw", "bin", "pthreadVCE2.dll"),
+                     os.path.join(bits, "expat", "bin", "expat.dll"),
+                     os.path.join(bits, "curl", "bin", "libcurl.dll"),
+                     os.getenv("KLAYOUT_MSVCRT") ]
+        else:
+            return []
+
     def libraries(self, mod):
         """
         Gets the libraries to add
@@ -550,7 +564,8 @@ if __name__ == '__main__':
               # Optional classifiers
               "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
           ],
-          url='https://github.com/klayoutmatthias/klayout',
+          url='https://github.com/klayout/klayout',
           packages=find_packages('src/pymod/distutils_src'),
+          data_files=[('lib\\site-packages\\',config.data_files())],   # https://github.com/pypa/setuptools/issues/405
           package_dir={'': 'src/pymod/distutils_src'},  # https://github.com/pypa/setuptools/issues/230
           ext_modules=[_tl, _gsi, _pya, _db, _lib, _rdb] + db_plugins + [tl, db, lib, rdb])

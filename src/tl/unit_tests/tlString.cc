@@ -31,6 +31,11 @@
 
 using namespace tl;
 
+static std::string norm_exp (const std::string &s)
+{
+  return tl::replaced (tl::replaced (s, "e+006", "e+06"), "E+006", "E+06");
+}
+
 TEST(1)
 {
   EXPECT_EQ (to_string (12.5), "12.5");
@@ -44,17 +49,10 @@ TEST(1)
   EXPECT_EQ (to_string ((unsigned char *)" 12"), " 12");
   EXPECT_EQ (to_string (std::string (" 12")), " 12");
 
-#if defined(_WIN32) && !defined(_MSC_VER)
-  EXPECT_EQ (tl::sprintf("%g %e %f",M_PI,M_PI*1e6,M_PI*0.001), "3.14159 3.141593e+006 0.003142");
-  EXPECT_EQ (tl::sprintf("%G %E %F",M_PI*1e6,M_PI*1e6,M_PI*1e6), "3.14159E+006 3.141593E+006 3141592.653590");
-  EXPECT_EQ (tl::sprintf("%-15g %15.8e %15.12f %g",M_PI,M_PI*1e6,M_PI*0.001,M_PI), "3.14159         3.14159265e+006  0.003141592654 3.14159");
-  EXPECT_EQ (tl::sprintf("%-15g %15.8E %15.12f %g",M_PI,M_PI*1e6,M_PI*0.001,M_PI), "3.14159         3.14159265E+006  0.003141592654 3.14159");
-#else
-  EXPECT_EQ (tl::sprintf("%g %e %f",M_PI,M_PI*1e6,M_PI*0.001), "3.14159 3.141593e+06 0.003142");
-  EXPECT_EQ (tl::sprintf("%G %E %F",M_PI*1e6,M_PI*1e6,M_PI*1e6), "3.14159E+06 3.141593E+06 3141592.653590");
-  EXPECT_EQ (tl::sprintf("%-15g %015.8e %15.12f %g",M_PI,M_PI*1e6,M_PI*0.001,M_PI), "3.14159         03.14159265e+06  0.003141592654 3.14159");
-  EXPECT_EQ (tl::sprintf("%-15g %015.8E %15.12f %g",M_PI,M_PI*1e6,M_PI*0.001,M_PI), "3.14159         03.14159265E+06  0.003141592654 3.14159");
-#endif
+  EXPECT_EQ (norm_exp (tl::sprintf("%g %e %f",M_PI,M_PI*1e6,M_PI*0.001)), "3.14159 3.141593e+06 0.003142");
+  EXPECT_EQ (norm_exp (tl::sprintf("%G %E %F",M_PI*1e6,M_PI*1e6,M_PI*1e6)), "3.14159E+06 3.141593E+06 3141592.653590");
+  EXPECT_EQ (norm_exp (tl::sprintf("%-15g %015.8e %15.12f %g",M_PI,M_PI*1e6,M_PI*0.001,M_PI)), "3.14159         03.14159265e+06  0.003141592654 3.14159");
+  EXPECT_EQ (norm_exp (tl::sprintf("%-15g %015.8E %15.12f %g",M_PI,M_PI*1e6,M_PI*0.001,M_PI)), "3.14159         03.14159265E+06  0.003141592654 3.14159");
   EXPECT_EQ (tl::sprintf("%-5s %5s %x %u %d (%s)","a","b",1234,2345,3456), "a         b 4d2 2345 3456 ()");
   EXPECT_EQ (tl::sprintf("%lu %llu %02x", 1, 2, 167), "1 2 a7");
   EXPECT_EQ (tl::sprintf("%lu %llu %02X", 1, 2, 761), "1 2 2F9");

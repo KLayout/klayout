@@ -29,12 +29,15 @@ class DBNetlist_TestClass < TestBase
 
     nlo = RBA::NetlistObject::new
     assert_equal(nlo.property(17), nil)
+    assert_equal(nlo.property_keys.inspect, "[]")
     nlo.set_property(17, 42)
+    assert_equal(nlo.property_keys.inspect, "[17]")
     assert_equal(nlo.property(17), 42)
 
     nlo2 = nlo.dup
     assert_equal(nlo2.property(17), 42)
     nlo.set_property(17, nil)
+    assert_equal(nlo.property_keys.inspect, "[]")
     assert_equal(nlo.property(17), nil)
     assert_equal(nlo2.property(17), 42)
 

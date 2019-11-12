@@ -40,6 +40,9 @@ class DB_PUBLIC NetlistObject
   : public tl::Object
 {
 public:
+  typedef std::map<tl::Variant, tl::Variant> property_table;
+  typedef property_table::const_iterator property_iterator;
+
   /**
    *  @brief Default constructor
    */
@@ -49,6 +52,11 @@ public:
    *  @brief Copy constructor
    */
   NetlistObject (const db::NetlistObject &object);
+
+  /**
+   *  @brief Destructor
+   */
+  ~NetlistObject ();
 
   /**
    *  @brief Assignment
@@ -67,8 +75,18 @@ public:
    */
   void set_property (const tl::Variant &key, const tl::Variant &value);
 
+  /**
+   *  @brief Iterator for the netlist properties (begin)
+   */
+  property_iterator begin_properties () const;
+
+  /**
+   *  @brief Iterator for the netlist properties (end)
+   */
+  property_iterator end_properties () const;
+
 private:
-  std::map<tl::Variant, tl::Variant> m_properties;
+  property_table *mp_properties;
 };
 
 }

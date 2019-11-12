@@ -26,30 +26,50 @@ namespace db
 {
 
 NetlistObject::NetlistObject ()
-  : tl::Object ()
+  : tl::Object (), mp_properties (0)
 {
   //  .. nothing yet ..
 }
 
 NetlistObject::NetlistObject (const db::NetlistObject &other)
-  : tl::Object (other), m_properties (other.m_properties)
+  : tl::Object (other), mp_properties (0)
 {
-  //  .. nothing yet ..
+  if (other.mp_properties) {
+    mp_properties = new std::map<tl::Variant, tl::Variant> (*other.mp_properties);
+  }
+}
+
+NetlistObject::~NetlistObject ()
+{
+  delete mp_properties;
+  mp_properties = 0;
 }
 
 NetlistObject &NetlistObject::operator= (const NetlistObject &other)
 {
   if (this != &other) {
+
     tl::Object::operator= (other);
-    m_properties = other.m_properties;
+
+    delete mp_properties;
+    mp_properties = 0;
+
+    if (other.mp_properties) {
+      mp_properties = new std::map<tl::Variant, tl::Variant> (*other.mp_properties);
+    }
+
   }
   return *this;
 }
 
 tl::Variant NetlistObject::property (const tl::Variant &key) const
 {
-  std::map<tl::Variant, tl::Variant>::const_iterator i = m_properties.find (key);
-  if (i == m_properties.end ()) {
+  if (! mp_properties) {
+    return tl::Variant ();
+  }
+
+  std::map<tl::Variant, tl::Variant>::const_iterator i = mp_properties->find (key);
+  if (i == mp_properties->end ()) {
     return tl::Variant ();
   } else {
     return i->second;
@@ -60,10 +80,35 @@ void
 NetlistObject::set_property (const tl::Variant &key, const tl::Variant &value)
 {
   if (value.is_nil ()) {
-    m_properties.erase (key);
+
+    if (mp_properties) {
+      mp_properties->erase (key);
+      if (mp_properties->empty ()) {
+        delete mp_properties;
+        mp_properties = 0;
+      }
+    }
+
   } else {
-    m_properties [key] = value;
+    if (! mp_properties) {
+      mp_properties = new std::map<tl::Variant, tl::Variant> ();
+    }
+    (*mp_properties) [key] = value;
   }
+}
+
+static NetlistObject::property_table empty_properties;
+
+NetlistObject::property_iterator
+NetlistObject::begin_properties () const
+{
+  return mp_properties ? mp_properties->begin () : empty_properties.begin ();
+}
+
+NetlistObject::property_iterator
+NetlistObject::end_properties () const
+{
+  return mp_properties ? mp_properties->end () : empty_properties.end ();
 }
 
 }

@@ -344,9 +344,12 @@ TEST(3_CircuitBasic)
   EXPECT_EQ (c.pin_by_name ("p1")->name (), "p1");
   EXPECT_EQ (c.pin_by_name ("doesnt_exist") == 0, true);
   EXPECT_EQ (c.pin_by_name ("p2")->name (), "p2");
+  EXPECT_EQ (c.pin_by_id (0)->begin_properties () == c.pin_by_id (0)->end_properties (), true);
 
   EXPECT_EQ (c.pin_by_id (0)->property (17).to_string (), "nil");
   c.pin_by_id (0)->set_property (17, 42);
+  EXPECT_EQ (c.pin_by_id (0)->begin_properties () == c.pin_by_id (0)->end_properties (), false);
+  EXPECT_EQ (c.pin_by_id (0)->begin_properties ()->second.to_string (), "42");
   EXPECT_EQ (c.pin_by_id (0)->property (17).to_string (), "42");
 
   db::Circuit c2 = c;

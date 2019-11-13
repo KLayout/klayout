@@ -212,7 +212,9 @@ echo ']' >>$target/.python-paths.txt
 # ----------------------------------------------------------
 # Binary dependencies
 
-new_libs=$(find $target -name "*.dll" -or -name "*.so")
+pushd $target
+
+new_libs=$(find . -name "*.dll" -or -name "*.so")
 
 while [ "$new_libs" != "" ]; do
 
@@ -223,14 +225,16 @@ while [ "$new_libs" != "" ]; do
   new_libs=""
 
   for l in $libs; do
-    if [ -e $mingw_inst/bin/$l ] && ! [ -e $target/$l ]; then
-      echo "Copying binary installation partial $mingw_inst/bin/$l -> $target/$l .."
-      cp $mingw_inst/bin/$l $target/$l
-      new_libs="$new_libs $target/$l"
+    if [ -e $mingw_inst/bin/$l ] && ! [ -e $l ]; then
+      echo "Copying binary installation partial $mingw_inst/bin/$l -> $$l .."
+      cp $mingw_inst/bin/$l $l
+      new_libs="$new_libs $l"
     fi  
   done
 
 done
+
+popd
 
 # ----------------------------------------------------------
 # Run NSIS

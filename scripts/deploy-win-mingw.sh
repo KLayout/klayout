@@ -226,7 +226,7 @@ while [ "$new_libs" != "" ]; do
 
   for l in $libs; do
     if [ -e $mingw_inst/bin/$l ] && ! [ -e $l ]; then
-      echo "Copying binary installation partial $mingw_inst/bin/$l -> $$l .."
+      echo "Copying binary installation partial $mingw_inst/bin/$l -> $l .."
       cp $mingw_inst/bin/$l $l
       new_libs="$new_libs $l"
     fi  

@@ -814,11 +814,20 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
 db::properties_id_type
 LayoutToNetlist::make_netname_propid (db::Layout &ly, const tl::Variant &netname_prop, const db::Net &net) const
 {
-  if (! netname_prop.is_nil ()) {
+  if (! netname_prop.is_nil () || net.begin_properties () != net.end_properties ()) {
 
-    db::property_names_id_type name_propnameid = ly.properties_repository ().prop_name_id (netname_prop);
     db::PropertiesRepository::properties_set propset;
-    propset.insert (std::make_pair (name_propnameid, tl::Variant (net.expanded_name ())));
+
+    //  add the user properties too (TODO: make this configurable?)
+    for (db::Net::property_iterator p = net.begin_properties (); p != net.end_properties (); ++p) {
+      db::property_names_id_type key_propnameid = ly.properties_repository ().prop_name_id (p->first);
+      propset.insert (std::make_pair (key_propnameid, p->second));
+    }
+
+    if (! netname_prop.is_nil ()) {
+      db::property_names_id_type name_propnameid = ly.properties_repository ().prop_name_id (netname_prop);
+      propset.insert (std::make_pair (name_propnameid, tl::Variant (net.expanded_name ())));
+    }
 
     return ly.properties_repository ().properties_id (propset);
 

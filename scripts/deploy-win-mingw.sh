@@ -190,8 +190,12 @@ first=1
 pythons=$($python -c "import sys; print('\n'.join(sys.path))" | sort)
 for p in $pythons; do 
   p=$(cygpath $p)
+  rp=""
   if [[ $p == "$mingw_inst"* ]] && [ -e "$p" ]; then
     rp=${p/"$mingw_inst/"}
+  fi
+  # NOTE: "bin" is in the path sometimes and will pollute our installation, so we skip it
+  if [ "$rp" != "" ] && [ "$rp" != "bin" ]; then
     if [ $first == "0" ]; then
       echo "," >>$target/.python-paths.txt
     fi

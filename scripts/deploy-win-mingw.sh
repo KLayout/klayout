@@ -28,31 +28,39 @@ pwd=$(pwd)
 
 enable32bit=1
 enable64bit=1
+args=""
+suffix=""
 
-if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-  echo "Runs the Windows build include installer generation."
-  echo ""
-  echo "Run this script from the root directory."
-  echo ""
-  echo "Usage:"
-  echo "  scripts/deploy-win-mingw.sh <options>"
-  echo ""
-  echo "Options:"
-  echo "  -32     Run 32 bit build only"
-  echo "  -64     Run 64 bit build only"
-  echo ""
-  echo "By default, both 32 and 64 bit builds are performed"
-  exit 0
-elif [ "$1" = "-32" ]; then
-  enable64bit=0
-  enable32bit=1
-elif [ "$1" = "-64" ]; then
-  enable64bit=1
-  enable32bit=0
-elif [ "$1" != "" ]; then
-  echo "ERROR: invalid option $1 (use -h for details)"
-  exit 1
-fi
+while [ "$1" != "" ]; do
+  if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    echo "Runs the Windows build include installer generation."
+    echo ""
+    echo "Run this script from the root directory."
+    echo ""
+    echo "Usage:"
+    echo "  scripts/deploy-win-mingw.sh <options>"
+    echo ""
+    echo "Options:"
+    echo "  -32          Run 32 bit build only"
+    echo "  -64          Run 64 bit build only"
+    echo "  -s <suffix>  Binary suffix"
+    echo ""
+    echo "By default, both 32 and 64 bit builds are performed"
+    exit 0
+  elif [ "$1" = "-32" ]; then
+    enable64bit=0
+    enable32bit=1
+  elif [ "$1" = "-64" ]; then
+    enable64bit=1
+    enable32bit=0
+  elif [ "$1" = "-s" ]; then
+    shift
+    suffix="-$1"
+  else
+    args="$args $1"
+  fi
+  shift
+done
 
 # ---------------------------------------------------
 # Bootstrap script
@@ -63,6 +71,8 @@ if [ "$KLAYOUT_BUILD_IN_PROGRESS" == "" ]; then
   self=$(which $0)
 
   export KLAYOUT_BUILD_IN_PROGRESS=1
+  export KLAYOUT_BUILD_ARGS="$args"
+  export KLAYOUT_BUILD_SUFFIX="$suffix"
 
   # Run ourself in MINGW32 system for the win32 build
   if [ "$enable32bit" != "0" ]; then
@@ -104,13 +114,15 @@ plugins="audio generic iconengines imageformats platforms printsupport sqldriver
 echo "------------------------------------------------------------------"
 echo "Running build for architecture $arch .."
 echo ""
-echo "  target = $target"
-echo "  build = $build"
-echo "  version = $KLAYOUT_VERSION"
+echo "  target     = $target"
+echo "  build      = $build"
+echo "  version    = $KLAYOUT_VERSION"
+echo "  build args = $KLAYOUT_BUILD_ARGS"
+echo "  suffix     = $KLAYOUT_BUILD_SUFFIX"
 echo ""
 
 rm -rf $target
-./build.sh -python $python -ruby $ruby -bin $target -build $build -j2
+./build.sh -python $python -ruby $ruby -bin $target -build $build -j2$KLAYOUT_BUILD_ARGS
 
 if ! [ -e $target ]; then
   echo "ERROR: Target directory $target not found"
@@ -178,8 +190,12 @@ first=1
 pythons=$($python -c "import sys; print('\n'.join(sys.path))" | sort)
 for p in $pythons; do 
   p=$(cygpath $p)
+  rp=""
   if [[ $p == "$mingw_inst"* ]] && [ -e "$p" ]; then
     rp=${p/"$mingw_inst/"}
+  fi
+  # NOTE: "bin" is in the path sometimes and will pollute our installation, so we skip it
+  if [ "$rp" != "" ] && [ "$rp" != "bin" ]; then
     if [ $first == "0" ]; then
       echo "," >>$target/.python-paths.txt
     fi
@@ -200,7 +216,9 @@ echo ']' >>$target/.python-paths.txt
 # ----------------------------------------------------------
 # Binary dependencies
 
-new_libs=$(find $target -name "*.dll" -or -name "*.so")
+pushd $target
+
+new_libs=$(find . -name "*.dll" -or -name "*.so")
 
 while [ "$new_libs" != "" ]; do
 
@@ -211,14 +229,16 @@ while [ "$new_libs" != "" ]; do
   new_libs=""
 
   for l in $libs; do
-    if [ -e $mingw_inst/bin/$l ] && ! [ -e $target/$l ]; then
-      echo "Copying binary installation partial $mingw_inst/bin/$l -> $target/$l .."
-      cp $mingw_inst/bin/$l $target/$l
-      new_libs="$new_libs $target/$l"
+    if [ -e $mingw_inst/bin/$l ] && ! [ -e $l ]; then
+      echo "Copying binary installation partial $mingw_inst/bin/$l -> $l .."
+      cp $mingw_inst/bin/$l $l
+      new_libs="$new_libs $l"
     fi  
   done
 
 done
+
+popd
 
 # ----------------------------------------------------------
 # Run NSIS
@@ -227,12 +247,12 @@ done
 # longer require the copy
 cp $scripts/klayout-inst.nsis $target
 cd $target
-NSIS_VERSION=$KLAYOUT_VERSION NSIS_ARCH=$arch "$makensis" klayout-inst.nsis
+NSIS_VERSION=$KLAYOUT_VERSION NSIS_ARCH=$arch$KLAYOUT_BUILD_SUFFIX "$makensis" klayout-inst.nsis
 
 # ----------------------------------------------------------
 # Produce the .zip file
 
-zipname="klayout-$KLAYOUT_VERSION-$arch"
+zipname="klayout-$KLAYOUT_VERSION-$arch$KLAYOUT_BUILD_SUFFIX"
 
 echo "Making .zip file $zipname.zip .."
 

@@ -463,13 +463,17 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
     db::DCplxTrans::inverse_trans trans_inv (trans.inverted ());
 
     db::DBox dbworld (trans_inv * db::DBox (0.0, 0.0, double (vp.width ()), double (vp.height ())));
-    
+
+    //  fw is the basic unit of the ruler geometry
+    const lay::FixedFont &ff = lay::FixedFont::get_font (bmp_canvas->resolution ());
+    int fw = ff.width ();
+
     double dgrid = trans.ctrans (m_grid);
     GridStyle style = m_style1;
 
     //  compute major grid and switch to secondary style if necessary
     int s = 0;
-    while (dgrid < 32.0 / bmp_canvas->resolution ()) {
+    while (dgrid < fw * 4 / bmp_canvas->resolution ()) {
       if (s == 0) {
         dgrid *= 2.0;
       } else if (s == 1) {
@@ -498,9 +502,9 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
 
     if (m_show_ruler && dgrid < vp.width () * 0.2) {
 
-      int rh = int (floor (0.5 + 6 / bmp_canvas->resolution ()));
-      int xoffset = int (floor (0.5 + 20 / bmp_canvas->resolution ()));
-      int yoffset = int (floor (0.5 + 20 / bmp_canvas->resolution ()));
+      int rh = int (floor (0.5 + fw * 0.8 / bmp_canvas->resolution ()));
+      int xoffset = int (floor (0.5 + fw * 2.5 / bmp_canvas->resolution ()));
+      int yoffset = int (floor (0.5 + fw * 2.5 / bmp_canvas->resolution ()));
 
       painter.fill_rect (QPoint (xoffset, vp.height () - yoffset - rh / 2),
                          QPoint (xoffset + int (floor (0.5 + dgrid)), vp.height () - yoffset + rh / 2), 

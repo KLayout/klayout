@@ -207,6 +207,8 @@ PythonInterpreter::PythonInterpreter (bool embedded)
 
   tl_assert (sizeof (wchar_t) == 2);
 
+  Py_SetPythonHome ((wchar_t *) L"");  //  really ignore $PYTHONHOME + without this, we get dummy error message about lacking path for libraries
+
   const wchar_t *python_path = _wgetenv (L"KLAYOUT_PYTHONPATH");
   if (python_path) {
 

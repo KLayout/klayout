@@ -598,6 +598,8 @@ NetlistBrowserPage::rerun_button_pressed ()
 void
 NetlistBrowserPage::rerun_macro ()
 {
+BEGIN_PROTECTED
+
   if (! mp_database->generator ().empty ()) {
 
     std::map<std::string, tl::Variant> add_pars;
@@ -612,6 +614,8 @@ NetlistBrowserPage::rerun_macro ()
     tl::Recipe::make (mp_database->generator (), add_pars);
 
   }
+
+END_PROTECTED
 }
 
 void

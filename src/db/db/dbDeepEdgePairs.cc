@@ -251,7 +251,7 @@ RegionDelegate *DeepEdgePairs::polygons (db::Coord e) const
     for (db::Shapes::shape_iterator s = c->shapes (m_deep_layer.layer ()).begin (db::ShapeIterator::EdgePairs); ! s.at_end (); ++s) {
       db::Polygon poly = s->edge_pair ().normalized ().to_polygon (e);
       if (poly.vertices () >= 3) {
-        output.insert (poly);
+        output.insert (db::PolygonRef (poly, layout.shape_repository ()));
       }
     }
   }

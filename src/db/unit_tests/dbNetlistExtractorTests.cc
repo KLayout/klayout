@@ -2303,3 +2303,110 @@ TEST(10_DeviceExtractionWithBreakoutCells)
 
   db::compare_layouts (_this, ly, au);
 }
+
+TEST(11_DeviceExtractionWithSameClass)
+{
+  db::Layout ly;
+  db::LayerMap lmap;
+
+  unsigned int rmarker    = define_layer (ly, lmap, 1);
+  unsigned int poly       = define_layer (ly, lmap, 2);
+  unsigned int diff       = define_layer (ly, lmap, 3);
+  unsigned int contact    = define_layer (ly, lmap, 4);
+  unsigned int metal      = define_layer (ly, lmap, 5);
+
+  {
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+    std::string fn (tl::testsrc ());
+    fn = tl::combine_path (fn, "testdata");
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "device_extract_l11.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+
+  db::DeepShapeStore dss;
+  dss.set_text_enlargement (1);
+  dss.set_text_property_name (tl::Variant ("LABEL"));
+
+  //  original layers
+  db::Region rrmarker (db::RecursiveShapeIterator (ly, tc, rmarker), dss);
+  db::Region rpoly (db::RecursiveShapeIterator (ly, tc, poly), dss);
+  db::Region rdiff (db::RecursiveShapeIterator (ly, tc, diff), dss);
+  db::Region rcontact (db::RecursiveShapeIterator (ly, tc, contact), dss);
+  db::Region rmetal (db::RecursiveShapeIterator (ly, tc, metal), dss);
+
+  //  derived regions
+
+  db::Region rpoly_cap = rpoly - rrmarker;
+  db::Region rpoly_res = rpoly & rrmarker;
+  db::Region rdiff_cap = rdiff - rrmarker;
+  db::Region rdiff_res = rdiff & rrmarker;
+
+  //  perform the extraction
+
+  db::Netlist nl;
+  db::hier_clusters<db::PolygonRef> cl;
+
+  db::NetlistDeviceExtractorResistor polyres_ex ("RES", 50.0);
+  db::NetlistDeviceExtractorResistor diffres_ex ("RES", 150.0);
+
+  db::NetlistDeviceExtractor::input_layers dl;
+  dl["R"] = &rpoly_res;
+  dl["C"] = &rpoly_cap;
+  polyres_ex.extract (dss, 0, dl, nl, cl);
+
+  dl.clear ();
+  dl["R"] = &rdiff_res;
+  dl["C"] = &rdiff_cap;
+  diffres_ex.extract (dss, 0, dl, nl, cl);
+
+  //  perform the net extraction
+
+  db::NetlistExtractor net_ex;
+
+  db::Connectivity conn;
+  //  Intra-layer
+  conn.connect (rpoly_cap);
+  conn.connect (rdiff_cap);
+  conn.connect (rcontact);
+  //  Inter-layer
+  conn.connect (rpoly_cap,  rcontact);
+  conn.connect (rdiff_cap,  rcontact);
+  conn.connect (rmetal,     rcontact);
+
+  //  extract the nets
+
+  net_ex.extract_nets (dss, 0, conn, nl, cl);
+
+  std::string nl_au_string =
+    "circuit TOP ();\n"
+    "  device RES $1 (A=$1,B=$2) (R=175,L=2.8,W=0.8,A=0.56,P=3.6);\n"
+    "  device RES $2 (A=$2,B=$3) (R=175,L=2.8,W=0.8,A=0.56,P=3.6);\n"
+    "  device RES $3 (A=$3,B=$4) (R=525,L=2.8,W=0.8,A=0.56,P=3.6);\n"
+    "end;\n"
+  ;
+
+  //  compare netlist as string
+  CHECKPOINT ();
+  db::compare_netlist (_this, nl, nl_au_string);
+
+  nl.combine_devices ();
+
+  std::string nl_au_string_post =
+    "circuit TOP ();\n"
+    "  device RES $3 (A=$1,B=$4) (R=875,L=8.4,W=0.8,A=1.68,P=10.8);\n"
+    "end;\n"
+  ;
+
+  //  compare netlist as string
+  CHECKPOINT ();
+  db::compare_netlist (_this, nl, nl_au_string_post);
+}

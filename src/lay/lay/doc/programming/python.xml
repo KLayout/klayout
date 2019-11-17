@@ -17,7 +17,7 @@
   So it is possible to write one script in Ruby and another one in Python. Just pick your favorite language. 
   Scripts written in different languages share the same KLayout data structures.
   Naturally they cannot directly share variables or language-specific data. But you can, for example, 
-  implement PCell's in Python and Ruby and use those different PCells in the same layout at the same time. 
+  implement PCells in Python and Ruby and use those different PCells in the same layout at the same time.
   Depending on the type of PCell, KLayout will either execute Python or Ruby code.
   </p>
 

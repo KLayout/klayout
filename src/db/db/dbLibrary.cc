@@ -143,7 +143,7 @@ Library::remap_to (db::Library *other)
     }
 
     //  We do PCell resolution before the library proxy resolution. The reason is that 
-    //  PCell's may generate library proxies in their instantiation. Hence we must instantiate
+    //  PCells may generate library proxies in their instantiation. Hence we must instantiate
     //  the PCells before we can resolve them.
     for (std::vector<std::pair<db::LibraryProxy *, db::PCellVariant *> >::const_iterator lp = pcells_to_map.begin (); lp != pcells_to_map.end (); ++lp) {
 

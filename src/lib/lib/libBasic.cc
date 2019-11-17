@@ -49,7 +49,7 @@ public:
     set_name ("Basic");
     set_description ("Basic layout objects");
 
-    //  register all the PCell's:
+    //  register all the PCells:
     layout ().register_pcell ("TEXT", new BasicText ());
     layout ().register_pcell ("CIRCLE", new BasicCircle ());
     layout ().register_pcell ("ELLIPSE", new BasicEllipse ());

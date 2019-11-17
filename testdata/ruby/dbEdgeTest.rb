@@ -104,6 +104,7 @@ class DBEdge_TestClass < TestBase
 
     assert_equal( a.intersect?( RBA::DEdge::new( -1, -1, 1, 5 ) ), true )
     assert_equal( a.intersection_point( RBA::DEdge::new( -1, -1, 1, 5 ) ).to_s, "0,2" )
+    assert_equal( a.intersection_point( RBA::DEdge::new( -1, 3, 1, 5 ) ) == nil, true )
     assert_equal( a.intersect?( RBA::DEdge::new( -1, 11, 1, 15 ) ), false )
     assert_equal( a.distance( RBA::DPoint::new( 3, 3 ) ), 1.0 )
     assert_equal( a.distance( RBA::DPoint::new( 3, 1 ) ), -1.0 )
@@ -162,6 +163,7 @@ class DBEdge_TestClass < TestBase
     assert_equal( a.dy, -9 )
     assert_equal( a.dx_abs, 16 )
     assert_equal( a.dy_abs, 9 )
+    assert_equal( a.d.to_s, "16,-9" )
     assert_equal( a.is_degenerate?, false )
 
     c = a.dup;
@@ -217,6 +219,7 @@ class DBEdge_TestClass < TestBase
 
     assert_equal( a.intersect?( RBA::Edge::new( RBA::Point::new( -1, -1 ), RBA::Point::new( 1, 5 ) ) ), true )
     assert_equal( a.intersection_point( RBA::Edge::new( RBA::Point::new( -1, -1 ), RBA::Point::new( 1, 5 ) ) ).to_s, "0,2" )
+    assert_equal( a.intersection_point( RBA::Edge::new( RBA::Point::new( -1, 3 ), RBA::Point::new( 1, 5 ) ) ) == nil, true )
     assert_equal( a.intersect?( RBA::Edge::new( RBA::Point::new( -1, 11 ), RBA::Point::new( 1, 15 ) ) ), false )
     assert_equal( a.distance( RBA::Point::new( 3, 3 ) ), 1.0 )
     assert_equal( a.distance( RBA::Point::new( 3, 1 ) ), -1.0 )
@@ -285,6 +288,39 @@ class DBEdge_TestClass < TestBase
     assert_equal(h[b1], "a")
     assert_equal(h[b2], "a")
     assert_equal(h[b3], "b")
+
+  end
+
+  # Clipped
+  def test_4_clip
+
+    e = RBA::Edge::new(0, 0, 1000, 2000)
+
+    assert_equal(e.clipped(RBA::Box::new(100, 0, 200, 2000)).to_s, "(100,200;200,400)")
+    assert_equal(e.clipped(RBA::Box::new(100, 1000, 200, 2000)) == nil, true)
+    assert_equal(e.clipped(RBA::Box::new(1000, 0, 1100, 3000)).to_s, "(1000,2000;1000,2000)")
+    assert_equal(e.clipped(RBA::Box::new(1001, 0, 1100, 3000)) == nil, true)
+    assert_equal(e.clipped(RBA::Box::new(-100, -100, 200, 2000)).to_s, "(0,0;200,400)")
+
+    assert_equal(e.clipped_line(RBA::Box::new(100, 0, 200, 2000)).to_s, "(100,200;200,400)")
+    assert_equal(e.clipped_line(RBA::Box::new(100, 1000, 200, 2000)) == nil, true)
+    assert_equal(e.clipped_line(RBA::Box::new(1000, 0, 1100, 3000)).to_s, "(1000,2000;1100,2200)")
+    assert_equal(e.clipped_line(RBA::Box::new(1001, 0, 1100, 3000)).to_s, "(1001,2002;1100,2200)")
+    assert_equal(e.clipped_line(RBA::Box::new(-100, -100, 200, 2000)).to_s, "(-50,-100;200,400)")
+
+    e = RBA::DEdge::new(0, 0, 1000, 2000)
+
+    assert_equal(e.clipped(RBA::DBox::new(100, 0, 200, 2000)).to_s, "(100,200;200,400)")
+    assert_equal(e.clipped(RBA::DBox::new(100, 1000, 200, 2000)) == nil, true)
+    assert_equal(e.clipped(RBA::DBox::new(1000, 0, 1100, 3000)).to_s, "(1000,2000;1000,2000)")
+    assert_equal(e.clipped(RBA::DBox::new(1001, 0, 1100, 3000)) == nil, true)
+    assert_equal(e.clipped(RBA::DBox::new(-100, -100, 200, 2000)).to_s, "(0,0;200,400)")
+
+    assert_equal(e.clipped_line(RBA::DBox::new(100, 0, 200, 2000)).to_s, "(100,200;200,400)")
+    assert_equal(e.clipped_line(RBA::DBox::new(100, 1000, 200, 2000)) == nil, true)
+    assert_equal(e.clipped_line(RBA::DBox::new(1000, 0, 1100, 3000)).to_s, "(1000,2000;1100,2200)")
+    assert_equal(e.clipped_line(RBA::DBox::new(1001, 0, 1100, 3000)).to_s, "(1001,2002;1100,2200)")
+    assert_equal(e.clipped_line(RBA::DBox::new(-100, -100, 200, 2000)).to_s, "(-50,-100;200,400)")
 
   end
 

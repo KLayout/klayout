@@ -177,8 +177,8 @@ std::string SelfOverlapMergeLocalOperation::description () const
 // ---------------------------------------------------------------------------------------------
 //  EdgeBoolAndOrNotLocalOperation implementation
 
-EdgeBoolAndOrNotLocalOperation::EdgeBoolAndOrNotLocalOperation (bool is_and)
-  : m_is_and (is_and)
+EdgeBoolAndOrNotLocalOperation::EdgeBoolAndOrNotLocalOperation (EdgeBoolOp op)
+  : m_op (op)
 {
   //  .. nothing yet ..
 }
@@ -186,19 +186,27 @@ EdgeBoolAndOrNotLocalOperation::EdgeBoolAndOrNotLocalOperation (bool is_and)
 local_operation<db::Edge, db::Edge, db::Edge>::on_empty_intruder_mode
 EdgeBoolAndOrNotLocalOperation::on_empty_intruder_hint () const
 {
-  return m_is_and ? Drop : Copy;
+  return (m_op == EdgeAnd || m_op == EdgeIntersections) ? Drop : Copy;
 }
 
 std::string
 EdgeBoolAndOrNotLocalOperation::description () const
 {
-  return m_is_and ? tl::to_string (tr ("Edge AND operation")) : tl::to_string (tr ("Edge NOT operation"));
+  if (m_op == EdgeIntersections) {
+    return tl::to_string (tr ("Edge INTERSECTION operation"));
+  } else if (m_op == EdgeAnd) {
+    return tl::to_string (tr ("Edge AND operation"));
+  } else if (m_op == EdgeNot) {
+    return tl::to_string (tr ("Edge NOT operation"));
+  } else {
+    return std::string ();
+  }
 }
 
 void
 EdgeBoolAndOrNotLocalOperation::compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
-  EdgeBooleanClusterCollector<std::unordered_set<db::Edge> > cluster_collector (&result, m_is_and ? EdgeAnd : EdgeNot);
+  EdgeBooleanClusterCollector<std::unordered_set<db::Edge> > cluster_collector (&result, m_op);
 
   db::box_scanner<db::Edge, size_t> scanner;
 
@@ -210,17 +218,18 @@ EdgeBoolAndOrNotLocalOperation::compute_local (db::Layout * /*layout*/, const sh
   }
 
   bool any_subject = false;
+  bool is_and = (m_op == EdgeAnd || m_op == EdgeIntersections);
 
   for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
 
     const db::Edge &subject = interactions.subject_shape (i->first);
     if (others.find (subject) != others.end ()) {
-      if (m_is_and) {
+      if (is_and) {
         result.insert (subject);
       }
     } else if (i->second.empty ()) {
       //  shortcut (not: keep, and: drop)
-      if (! m_is_and) {
+      if (! is_and) {
         result.insert (subject);
       }
     } else {

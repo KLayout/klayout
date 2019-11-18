@@ -24,13 +24,17 @@
 #define HDR_dbEdgeBoolean
 
 #include "dbEdge.h"
-#include "dbEdgesDelegate.h"
 #include "dbBoxScanner.h"
 
 #include "tlIntervalMap.h"
 
 namespace db
 {
+
+/**
+ *  @brief A common definition for the boolean operations available on edges
+ */
+enum EdgeBoolOp { EdgeOr, EdgeNot, EdgeXor, EdgeAnd, EdgeIntersections };
 
 struct OrJoinOp
 {
@@ -216,7 +220,15 @@ struct EdgeBooleanClusterCollector
   : public db::cluster_collector<db::Edge, size_t, EdgeBooleanCluster<OutputContainer> >
 {
   EdgeBooleanClusterCollector (OutputContainer *output, EdgeBoolOp op)
-    : db::cluster_collector<db::Edge, size_t, EdgeBooleanCluster<OutputContainer> > (EdgeBooleanCluster<OutputContainer> (output, op), op != EdgeAnd /*report single*/)
+    : db::cluster_collector<db::Edge, size_t, EdgeBooleanCluster<OutputContainer> > (EdgeBooleanCluster<OutputContainer> (output, op == EdgeIntersections ? EdgeAnd : op), op != EdgeAnd && op != EdgeIntersections /*report single*/),
+      mp_intersections (op == EdgeIntersections ? output : 0)
+  {
+    //  .. nothing yet ..
+  }
+
+  EdgeBooleanClusterCollector (OutputContainer *output, OutputContainer *intersections, EdgeBoolOp op)
+    : db::cluster_collector<db::Edge, size_t, EdgeBooleanCluster<OutputContainer> > (EdgeBooleanCluster<OutputContainer> (output, op), op != EdgeAnd /*report single*/),
+      mp_intersections (intersections)
   {
     //  .. nothing yet ..
   }
@@ -227,12 +239,27 @@ struct EdgeBooleanClusterCollector
     //  1.) not degenerate
     //  2.) parallel with some tolerance of roughly 1 dbu
     //  3.) connected
+    //  In intersection-detection mode, identify intersection points otherwise
+    //  and insert into the intersections container as degenerated edges.
+
     if (! o1->is_degenerate () && ! o2->is_degenerate () 
         && fabs ((double) db::vprod (*o1, *o2)) < db::coord_traits<db::Coord>::prec_distance () * std::min (o1->double_length (), o2->double_length ())
         && (o1->p1 () == o2->p1 () || o1->p1 () == o2->p2 () || o1->p2 () == o2->p1 () || o1->p2 () == o2->p2 () || o1->coincident (*o2))) {
+
       db::cluster_collector<db::Edge, size_t, EdgeBooleanCluster<OutputContainer> >::add (o1, p1, o2, p2);
+
+    } else if (mp_intersections && p1 != p2) {
+
+      std::pair<bool, db::Point> ip = o1->intersect_point (*o2);
+      if (ip.first) {
+        mp_intersections->insert (db::Edge (ip.second, ip.second));
+      }
+
     }
   }
+
+private:
+  OutputContainer *mp_intersections;
 };
 
 }

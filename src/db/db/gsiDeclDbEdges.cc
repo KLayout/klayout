@@ -943,6 +943,13 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "This method has been introduced in version 0.26.1\n"
   ) +
+  method ("intersections", &db::Edges::intersections, gsi::arg ("other"),
+    "@brief Computes the intersections between this edges and other edges\n"
+    "This computation is like an AND operation, but also including crossing points between non-coincident edges as "
+    "degenerated (point-like) edges.\n"
+    "\n"
+    "This method has been introduced in version 0.26.2\n"
+  ) +
   method ("inside_part", &db::Edges::inside_part, gsi::arg ("other"),
     "@brief Returns the parts of the edges of this edge collection which are inside the polygons of the region\n"
     "\n"

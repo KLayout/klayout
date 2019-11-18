@@ -951,6 +951,16 @@ public:
   }
 
   /**
+   *  @brief Intersections with other edges
+   *  Intersections are similar to "AND", but will also report
+   *  non-parallel intersections between crossing edges.
+   */
+  Edges intersections (const Edges &other) const
+  {
+    return Edges (mp_delegate->intersections (other));
+  }
+
+  /**
    *  @brief returns the extended edges
    *
    *  Edges are extended by creating a rectangle on each edge. The rectangle is constructed on the

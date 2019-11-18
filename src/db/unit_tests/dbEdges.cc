@@ -852,6 +852,9 @@ TEST(22)
   ee.insert (db::Edge (4000,-2000,-2000,-2000));
 
   EXPECT_EQ ((e & ee).to_string (), "(400,0;-2000,0);(500,-174;400,0);(1000,0;900,-173);(4000,0;1000,0)");
+  EXPECT_EQ (e.intersections (ee).to_string (), "(400,0;400,0);(-2000,0;-2000,0);(1000,0;1000,0);(4000,0;4000,0);(400,0;-2000,0);(500,-174;400,0);(1000,0;900,-173);(4000,0;1000,0)");
+  //  no particular new points with intersections - just endpoints of original edges
+  EXPECT_EQ (e.intersections (ee).merged ().to_string (), "(400,0;-2000,0);(500,-174;400,0);(1000,0;900,-173);(4000,0;1000,0)");
 }
 
 TEST(23)

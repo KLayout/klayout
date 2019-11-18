@@ -24,6 +24,7 @@
 #define HDR_dbEdgeBoolean
 
 #include "dbEdge.h"
+#include "dbHash.h"
 #include "dbBoxScanner.h"
 
 #include "tlIntervalMap.h"
@@ -251,7 +252,7 @@ struct EdgeBooleanClusterCollector
     } else if (mp_intersections && p1 != p2) {
 
       std::pair<bool, db::Point> ip = o1->intersect_point (*o2);
-      if (ip.first) {
+      if (ip.first && m_seen_intersections.insert (ip.second).second) {
         mp_intersections->insert (db::Edge (ip.second, ip.second));
       }
 
@@ -260,6 +261,7 @@ struct EdgeBooleanClusterCollector
 
 private:
   OutputContainer *mp_intersections;
+  std::unordered_set<db::Point> m_seen_intersections;
 };
 
 }

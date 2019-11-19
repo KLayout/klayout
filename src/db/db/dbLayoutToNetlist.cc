@@ -1024,16 +1024,36 @@ db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::Poin
       cell_indexes.push_back (i->inst_ptr.cell_index ());
     }
 
-    db::Circuit *circuit = mp_netlist->circuit_by_cell_index (cell_indexes.back ());
-    if (! circuit) {
-      //  the circuit has probably been optimized away
-      return 0;
-    }
+    db::Circuit *circuit = 0;
+    db::Net *net = 0;
 
-    db::Net *net = circuit->net_by_cluster_id (cluster_id);
-    if (! net) {
-      //  the net has probably been optimized away
-      return 0;
+    while (true) {
+
+      circuit = mp_netlist->circuit_by_cell_index (cell_indexes.back ());
+      if (circuit) {
+        net = circuit->net_by_cluster_id (cluster_id);
+        if (net) {
+          break;
+        }
+      }
+
+      //  The net might have been propagated to the parent. So move there.
+      if (inst_path.empty ()) {
+        return 0;
+      }
+
+      db::ClusterInstance ci (cluster_id, inst_path.back ());
+
+      cell_indexes.pop_back ();
+      inst_path.pop_back ();
+
+      cluster_id = m_net_clusters.clusters_per_cell (cell_indexes.back ()).find_cluster_with_connection (ci);
+
+      //  no parent cluster found
+      if (cluster_id == 0) {
+        return 0;
+      }
+
     }
 
     //  follow the path up in the net hierarchy using the transformation and the upper cell index as the

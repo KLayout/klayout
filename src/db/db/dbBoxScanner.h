@@ -137,6 +137,21 @@ struct box_scanner_receiver
    *  terminate the scan process early if the outcome is known.
    */
   bool stop () const { return false; }
+
+  /**
+   *  @brief Pre-scanning operations
+   *
+   *  This method is called before the scanning starts.
+   */
+  void initialize () { }
+
+  /**
+   *  @brief Post-scanning operations
+   *
+   *  This method is called after the scan has finished (without exception). The argument is the
+   *  return value (false if "stop" stopped the process).
+   */
+  void finalize (bool) { }
 };
 
 /**
@@ -265,6 +280,22 @@ public:
    */
   template <class Rec, class BoxConvert>
   bool process (Rec &rec, typename BoxConvert::box_type::coord_type enl, const BoxConvert &bc = BoxConvert ())
+  {
+    rec.initialize ();
+    bool ret = do_process (rec, enl, bc);
+    rec.finalize (ret);
+    return ret;
+  }
+
+private:
+  container_type m_pp;
+  double m_fill_factor;
+  size_t m_scanner_thr;
+  bool m_report_progress;
+  std::string m_progress_desc;
+
+  template <class Rec, class BoxConvert>
+  bool do_process (Rec &rec, typename BoxConvert::box_type::coord_type enl, const BoxConvert &bc = BoxConvert ())
   {
     typedef typename BoxConvert::box_type box_type;
     typedef typename box_type::coord_type coord_type;
@@ -420,13 +451,6 @@ public:
     return true;
 
   }
-
-private:
-  container_type m_pp;
-  double m_fill_factor;
-  size_t m_scanner_thr;
-  bool m_report_progress;
-  std::string m_progress_desc;
 };
 
 /**
@@ -469,6 +493,21 @@ struct box_scanner_receiver2
    *  terminate the scan process early if the outcome is known.
    */
   bool stop () const { return false; }
+
+  /**
+   *  @brief Pre-scanning operations
+   *
+   *  This method is called before the scanning starts.
+   */
+  void initialize () { }
+
+  /**
+   *  @brief Post-scanning operations
+   *
+   *  This method is called after the scan has finished (without exception). The argument is the
+   *  return value (false if "stop" stopped the process).
+   */
+  void finalize (bool) { }
 };
 
 /**
@@ -613,6 +652,23 @@ public:
    */
   template <class Rec, class BoxConvert1, class BoxConvert2>
   bool process (Rec &rec, typename BoxConvert1::box_type::coord_type enl, const BoxConvert1 &bc1 = BoxConvert1 (), const BoxConvert2 &bc2 = BoxConvert2 ())
+  {
+    rec.initialize ();
+    bool ret = do_process (rec, enl, bc1, bc2);
+    rec.finalize (ret);
+    return ret;
+  }
+
+private:
+  container_type1 m_pp1;
+  container_type2 m_pp2;
+  double m_fill_factor;
+  size_t m_scanner_thr;
+  bool m_report_progress;
+  std::string m_progress_desc;
+
+  template <class Rec, class BoxConvert1, class BoxConvert2>
+  bool do_process (Rec &rec, typename BoxConvert1::box_type::coord_type enl, const BoxConvert1 &bc1 = BoxConvert1 (), const BoxConvert2 &bc2 = BoxConvert2 ())
   {
     typedef typename BoxConvert1::box_type box_type; //  must be same as BoxConvert2::box_type
     typedef typename box_type::coord_type coord_type;
@@ -845,14 +901,6 @@ public:
     return true;
 
   }
-
-private:
-  container_type1 m_pp1;
-  container_type2 m_pp2;
-  double m_fill_factor;
-  size_t m_scanner_thr;
-  bool m_report_progress;
-  std::string m_progress_desc;
 };
 
 /**

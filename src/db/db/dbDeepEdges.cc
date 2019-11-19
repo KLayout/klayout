@@ -349,7 +349,7 @@ public:
     //  .. and run the merge operation
 
     s->second.clear ();
-    EdgeBooleanClusterCollector<db::Shapes> cluster_collector (&s->second, EdgeOr);
+    EdgeBooleanClusterCollectorToShapes cluster_collector (&s->second, EdgeOr);
     m_scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
 
     return s->second;

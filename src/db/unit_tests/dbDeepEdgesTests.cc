@@ -131,6 +131,7 @@ TEST(3_Edge2EdgeBooleans)
   db::Region r3 (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
   db::Region r2and3 = r2 & r3;
 
+  db::Edges e2 = r2.edges ();
   db::Edges e3 = r3.edges ();
   db::Edges e2and3 = r2and3.edges ();
 
@@ -144,6 +145,8 @@ TEST(3_Edge2EdgeBooleans)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), e3 & e2and3);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), e3 - e2and3);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), e3 ^ e2and3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 0)), e3.intersections(e2and3));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (24, 0)), e3.intersections(e2));
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au3.gds");

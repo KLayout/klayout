@@ -1016,14 +1016,15 @@ public:
    *
    *  This constructor takes a delegate object. 
    */
-  OutputStream (OutputStreamBase &delegate);
+  OutputStream (OutputStreamBase &delegate, bool as_text = false);
 
   /**
    *  @brief Open an output stream with the given path and stream mode
    *
    *  This will automatically create a delegate object and delete it later.
+   *  If "as_text" is true, the output will be formatted with the system's line separator.
    */
-  OutputStream (const std::string &abstract_path, OutputStreamMode om = OM_Auto);
+  OutputStream (const std::string &abstract_path, OutputStreamMode om = OM_Auto, bool as_text = false);
 
   /**
    *  @brief Destructor
@@ -1141,8 +1142,11 @@ private:
   size_t m_pos;
   OutputStreamBase *mp_delegate;
   bool m_owns_delegate;
+  bool m_as_text;
   char *mp_buffer;
   size_t m_buffer_capacity, m_buffer_pos;
+
+  void put_raw (const char *b, size_t n);
 
   //  No copying currently
   OutputStream (const OutputStream &);

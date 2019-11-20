@@ -42,3 +42,34 @@ TEST(InputPipe2)
   tl::info << "Process exit code: " << ret;
   EXPECT_NE (ret, 0);
 }
+
+TEST(TextOutputStream)
+{
+  std::string fn = tmp_file ("test.txt");
+
+  {
+    tl::OutputStream os (fn, tl::OutputStream::OM_Auto, false);
+    os << "Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.";
+  }
+
+  {
+    tl::InputStream is (fn);
+    std::string s = is.read_all ();
+    EXPECT_EQ (s, "Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.");
+  }
+
+  {
+    tl::OutputStream os (fn, tl::OutputStream::OM_Auto, true);
+    os << "Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.";
+  }
+
+  {
+    tl::InputStream is (fn);
+    std::string s = is.read_all ();
+#if defined(__WIN32)
+    EXPECT_EQ (s, "Hello, world!\r\nWith another line\r\n\r\nseparated by a LFCR and CRLF.");
+#else
+    EXPECT_EQ (s, "Hello, world!\nWith another line\n\nseparated by a LFCR and CRLF.");
+#endif
+  }
+}

@@ -1669,7 +1669,7 @@ NetTracerDialog::trace_all_nets (db::LayoutToNetlist *l2ndb, const lay::CellView
 
   tracer_data.configure_l2n (*l2ndb);
 
-  l2ndb->extract_netlist ();
+  l2ndb->extract_netlist (std::string (), flat /*include floating subcircuits for netlist to flatten*/);
 
   if (flat) {
     l2ndb->netlist ()->flatten ();

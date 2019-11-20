@@ -2624,18 +2624,15 @@ compute_device_key (const db::Device &device, const db::NetGraph &g, bool strict
   return k;
 }
 
-static std::vector<std::pair<size_t, size_t> >
-compute_subcircuit_key (const db::SubCircuit &subcircuit, const db::NetGraph &g, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map)
+static bool
+compute_subcircuit_key (const db::SubCircuit &subcircuit, const db::NetGraph &g, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, std::vector<std::pair<size_t, size_t> > &k)
 {
-  std::vector<std::pair<size_t, size_t> > k;
-
   const db::Circuit *cr = subcircuit.circuit_ref ();
 
   std::map<const db::Circuit *, CircuitMapper>::const_iterator icm = circuit_map->find (cr);
   if (icm == circuit_map->end ()) {
-    //  this can happen if the other circuit does not exist - in this case the key is an invalid one which cannot
-    //  be produced by a regular subcircuit.
-    return k;
+    //  this can happen if the other circuit does not exist - report invalid mapping.
+    return false;
   }
 
   const CircuitMapper *cm = & icm->second;
@@ -2660,7 +2657,7 @@ compute_subcircuit_key (const db::SubCircuit &subcircuit, const db::NetGraph &g,
 
   std::sort (k.begin (), k.end ());
 
-  return k;
+  return true;
 }
 
 namespace {
@@ -3349,7 +3346,8 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
       continue;
     }
 
-    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key (*sc, g1, &c12_circuit_and_pin_mapping, &circuit_pin_mapper);
+    std::vector<std::pair<size_t, size_t> > k;
+    bool valid = compute_subcircuit_key (*sc, g1, &c12_circuit_and_pin_mapping, &circuit_pin_mapper, k);
 
     bool mapped = true;
     for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end () && mapped; ++i) {
@@ -3363,7 +3361,7 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
         mp_logger->subcircuit_mismatch (sc.operator-> (), 0);
       }
       good = false;
-    } else if (! k.empty ()) {
+    } else if (valid) {
       //  TODO: report devices which cannot be distiguished topologically?
       subcircuit_map.insert (std::make_pair (k, std::make_pair (sc.operator-> (), sc_cat)));
     }
@@ -3381,7 +3379,8 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
       continue;
     }
 
-    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key (*sc, g2, &c22_circuit_and_pin_mapping, &circuit_pin_mapper);
+    std::vector<std::pair<size_t, size_t> > k;
+    compute_subcircuit_key (*sc, g2, &c22_circuit_and_pin_mapping, &circuit_pin_mapper, k);
 
     bool mapped = true;
     for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
@@ -3407,18 +3406,50 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
 
       db::SubCircuitCompare scc;
 
-      if (! scc.equals (scm->second, std::make_pair (sc.operator-> (), sc_cat))) {
-        if (mp_logger) {
-          mp_logger->subcircuit_mismatch (scm->second.first, sc.operator-> ());
-        }
-        good = false;
-      } else {
-        if (mp_logger) {
-          mp_logger->match_subcircuits (scm->second.first, sc.operator-> ());
+      std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> >::iterator scm_start = scm;
+
+      bool found = false;
+      size_t nscm = 0;
+      while (! found && scm != subcircuit_map.end () && scm->first == k) {
+        ++nscm;
+        if (scc.equals (scm->second, std::make_pair (sc.operator-> (), sc_cat))) {
+          found = true;
         }
       }
 
-      subcircuit_map.erase (scm);
+      if (! found) {
+
+        if (nscm == 1) {
+
+          //  unique match, but doesn't fit: report this one as paired, but mismatching:
+          if (mp_logger) {
+            mp_logger->subcircuit_mismatch (scm_start->second.first, sc.operator-> ());
+          }
+
+          //  no longer look for this one
+          subcircuit_map.erase (scm_start);
+
+        } else {
+
+          //  no unqiue match
+          if (mp_logger) {
+            mp_logger->subcircuit_mismatch (0, sc.operator-> ());
+          }
+
+        }
+
+        good = false;
+
+      } else {
+
+        if (mp_logger) {
+          mp_logger->match_subcircuits (scm->second.first, sc.operator-> ());
+        }
+
+        //  no longer look for this one
+        subcircuit_map.erase (scm);
+
+      }
 
     }
 

@@ -389,7 +389,7 @@ public:
    *  @brief Runs the netlist extraction
    *  See the class description for more details.
    */
-  void extract_netlist (const std::string &joined_net_names = std::string ());
+  void extract_netlist (const std::string &joined_net_names = std::string (), bool include_floating_subcircuits = false);
 
   /**
    *  @brief Marks the netlist as extracted

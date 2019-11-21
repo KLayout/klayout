@@ -192,7 +192,7 @@ std::string TL_PUBLIC get_module_path (void *addr);
 /**
  *  @brief Gets the line separator (CRLF on windows, LF on linux)
  */
-const char * TL_PUBLIC line_separator ();
+TL_PUBLIC const char *line_separator ();
 
 }
 

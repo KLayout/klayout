@@ -769,11 +769,10 @@ OutputStream::put (const char *b, size_t n)
         ++b;
         --n;
       } else if (*b == '\n') {
-#if defined(__WIN32)
-        put_raw ("\r\n", 2);
-#else
-        put_raw ("\n", 1);
-#endif
+        const char *ls = line_separator ();
+        while (*ls) {
+          put_raw (ls++, 1);
+        }
         ++b;
         --n;
       } else {

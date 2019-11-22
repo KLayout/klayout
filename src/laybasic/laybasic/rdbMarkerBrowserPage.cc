@@ -29,6 +29,7 @@
 #include "tlRecipe.h"
 #include "layLayoutView.h"
 #include "layMarker.h"
+#include "tlExceptions.h"
 
 #include "ui_MarkerBrowserSnapshotView.h"
 
@@ -2667,6 +2668,8 @@ MarkerBrowserPage::rerun_button_pressed ()
 void
 MarkerBrowserPage::rerun_macro ()
 {
+BEGIN_PROTECTED
+
   if (! mp_database->generator ().empty ()) {
 
     std::map<std::string, tl::Variant> add_pars;
@@ -2681,6 +2684,8 @@ MarkerBrowserPage::rerun_macro ()
     tl::Recipe::make (mp_database->generator (), add_pars);
 
   }
+
+END_PROTECTED
 }
 
 void

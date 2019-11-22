@@ -192,13 +192,7 @@ BEGIN_PROTECTED
   unsigned int technology_index = 0;
   for (db::Technologies::const_iterator t = db::Technologies::instance ()->begin (); t != db::Technologies::instance ()->end (); ++t, ++technology_index) {
 
-    std::string d = t->name ();
-    if (! d.empty () && ! t->description ().empty ()) {
-      d += " - ";
-    }
-    d += t->description ();
-
-    tech_cbx->addItem (tl::to_qstring (d));
+    tech_cbx->addItem (tl::to_qstring (t->get_display_string ()));
     if (t->name () == m_handles [index]->tech_name ()) {
       tech_cbx->setCurrentIndex (technology_index);
     }

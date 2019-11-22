@@ -658,8 +658,8 @@ InputZLibFile::filename () const
 // ---------------------------------------------------------------
 //  OutputStream implementation
 
-OutputStream::OutputStream (OutputStreamBase &delegate)
-  : m_pos (0), mp_delegate (&delegate), m_owns_delegate (false)
+OutputStream::OutputStream (OutputStreamBase &delegate, bool as_text)
+  : m_pos (0), mp_delegate (&delegate), m_owns_delegate (false), m_as_text (as_text)
 { 
   m_buffer_capacity = 16384;
   m_buffer_pos = 0;
@@ -690,8 +690,8 @@ OutputStreamBase *create_file_stream (const std::string &path, OutputStream::Out
   }
 }
 
-OutputStream::OutputStream (const std::string &abstract_path, OutputStreamMode om)
-  : m_pos (0), mp_delegate (0), m_owns_delegate (false)
+OutputStream::OutputStream (const std::string &abstract_path, OutputStreamMode om, bool as_text)
+  : m_pos (0), mp_delegate (0), m_owns_delegate (false), m_as_text (as_text)
 {
   //  Determine output mode
   om = output_mode_from_filename (abstract_path, om);
@@ -761,6 +761,36 @@ OutputStream::flush ()
 
 void
 OutputStream::put (const char *b, size_t n)
+{
+  if (m_as_text) {
+    //  skip CR, but replace LF by CRLF -> this will normalize the line terminators to CRLF
+    while (n > 0) {
+      if (*b == '\r') {
+        ++b;
+        --n;
+      } else if (*b == '\n') {
+        const char *ls = line_separator ();
+        while (*ls) {
+          put_raw (ls++, 1);
+        }
+        ++b;
+        --n;
+      } else {
+        const char *b0 = b;
+        while (n > 0 && *b != '\r' && *b != '\n') {
+          ++b;
+          --n;
+        }
+        put_raw (b0, b - b0);
+      }
+    }
+  } else {
+    put_raw (b, n);
+  }
+}
+
+void
+OutputStream::put_raw (const char *b, size_t n)
 {
   m_pos += n;
 

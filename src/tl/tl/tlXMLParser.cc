@@ -639,8 +639,12 @@ public:
       }
 
       qint64 n0 = n;
-      for (const char *rd = 0; n > 0 && (rd = mp_stream->get (1)) != 0; --n) {
-        *data++ = *rd;
+      for (const char *rd = 0; n > 0 && (rd = mp_stream->get (1)) != 0; ) {
+        //  NOTE: we skip CR to compensate for Windows CRLF line terminators (issue #419).
+        if (*rd != '\r') {
+          *data++ = *rd;
+          --n;
+        }
       }
 
       if (n0 == n) {

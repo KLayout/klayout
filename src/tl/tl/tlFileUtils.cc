@@ -84,6 +84,10 @@ TL_PUBLIC void file_utils_force_windows () { s_mode = OS_Windows; }
 TL_PUBLIC void file_utils_force_linux () { s_mode = OS_Linux; }
 TL_PUBLIC void file_utils_force_reset () { s_mode = OS_Auto; }
 
+const char *line_separator ()
+{
+  return is_win () ? "\r\n" : "\n";
+}
 
 static bool is_drive (const std::string &part)
 {

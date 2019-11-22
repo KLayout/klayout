@@ -28,6 +28,7 @@
 
 #include "dbAsIfFlatEdges.h"
 #include "dbDeepShapeStore.h"
+#include "dbEdgeBoolean.h"
 #include "dbEdgePairs.h"
 
 namespace db {
@@ -132,6 +133,8 @@ public:
   virtual EdgesDelegate *add_in_place (const Edges &other);
   virtual EdgesDelegate *add (const Edges &other) const;
 
+  virtual EdgesDelegate *intersections (const Edges &other) const;
+
   virtual EdgesDelegate *inside_part (const Region &other) const;
   virtual EdgesDelegate *outside_part (const Region &other) const;
 
@@ -168,7 +171,7 @@ private:
   void init ();
   void ensure_merged_edges_valid () const;
   const DeepLayer &merged_deep_layer () const;
-  DeepLayer and_or_not_with(const DeepEdges *other, bool and_op) const;
+  DeepLayer and_or_not_with(const DeepEdges *other, EdgeBoolOp op) const;
   DeepLayer edge_region_op (const DeepRegion *other, bool outside, bool include_borders) const;
   EdgePairsDelegate *run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
   virtual EdgesDelegate *pull_generic (const Edges &edges) const;

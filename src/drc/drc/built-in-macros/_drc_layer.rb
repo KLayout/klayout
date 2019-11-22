@@ -1602,6 +1602,16 @@ CODE
     # with respect to other edges or polygons.
     
     # %DRC%
+    # @name intersections
+    # @brief Returns the intersection points of intersecting edge segments for two edge collections
+    # @synopsis layer.intersections(edges)
+    # This operation is similar to the "&" operator, but it does also report intersection points
+    # between non-colinear, but intersection edges. Such points are reported as point-like,
+    # degenerated edge objects.
+    #
+    # This method is available for edge layers. The argument must be an edge layer.
+    
+    # %DRC%
     # @name inside_part
     # @brief Returns the parts of the edges inside the given region
     # @synopsis layer.inside_part(region)
@@ -1731,10 +1741,24 @@ CODE
     end
     
     %w(inside_part outside_part).each do |f|
-      # In tiled mode, there are no modifying versions. Emulate using the non-modifying one.
       eval <<"CODE"
       def #{f}(other)
         other.requires_region("#{f}")
+        requires_edges("#{f}")
+        if @engine.is_tiled?
+          @data = @engine._tcmd(@data, 0, @data.class, :#{f}, other.data)
+          DRCLayer::new(@engine, @data)
+        else
+          DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+        end
+      end
+CODE
+    end
+    
+    %w(intersections).each do |f|
+      eval <<"CODE"
+      def #{f}(other)
+        other.requires_edges("#{f}")
         requires_edges("#{f}")
         if @engine.is_tiled?
           @data = @engine._tcmd(@data, 0, @data.class, :#{f}, other.data)

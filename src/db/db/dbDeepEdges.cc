@@ -349,7 +349,7 @@ public:
     //  .. and run the merge operation
 
     s->second.clear ();
-    EdgeBooleanClusterCollector<db::Shapes> cluster_collector (&s->second, EdgeOr);
+    EdgeBooleanClusterCollectorToShapes cluster_collector (&s->second, EdgeOr);
     m_scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
 
     return s->second;
@@ -751,11 +751,11 @@ EdgesDelegate *DeepEdges::merged () const
 }
 
 DeepLayer
-DeepEdges::and_or_not_with (const DeepEdges *other, bool and_op) const
+DeepEdges::and_or_not_with (const DeepEdges *other, EdgeBoolOp op) const
 {
   DeepLayer dl_out (m_deep_layer.derived ());
 
-  db::EdgeBoolAndOrNotLocalOperation op (and_op);
+  db::EdgeBoolAndOrNotLocalOperation local_op (op);
 
   db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell ());
   proc.set_base_verbosity (base_verbosity ());
@@ -763,7 +763,7 @@ DeepEdges::and_or_not_with (const DeepEdges *other, bool and_op) const
   proc.set_area_ratio (m_deep_layer.store ()->max_area_ratio ());
   proc.set_max_vertex_count (m_deep_layer.store ()->max_vertex_count ());
 
-  proc.run (&op, m_deep_layer.layer (), other->deep_layer ().layer (), dl_out.layer ());
+  proc.run (&local_op, m_deep_layer.layer (), other->deep_layer ().layer (), dl_out.layer ());
 
   return dl_out;
 }
@@ -786,6 +786,26 @@ DeepEdges::edge_region_op (const DeepRegion *other, bool outside, bool include_b
   return dl_out;
 }
 
+EdgesDelegate *DeepEdges::intersections (const Edges &other) const
+{
+  const DeepEdges *other_deep = dynamic_cast <const DeepEdges *> (other.delegate ());
+
+  if (empty () || other.empty ()) {
+
+    //  Nothing to do
+    return new EmptyEdges ();
+
+  } else if (! other_deep) {
+
+    return AsIfFlatEdges::intersections (other);
+
+  } else {
+
+    return new DeepEdges (and_or_not_with (other_deep, EdgeIntersections));
+
+  }
+}
+
 EdgesDelegate *DeepEdges::and_with (const Edges &other) const
 {
   const DeepEdges *other_deep = dynamic_cast <const DeepEdges *> (other.delegate ());
@@ -801,7 +821,7 @@ EdgesDelegate *DeepEdges::and_with (const Edges &other) const
 
   } else {
 
-    return new DeepEdges (and_or_not_with (other_deep, true));
+    return new DeepEdges (and_or_not_with (other_deep, EdgeAnd));
 
   }
 }
@@ -851,7 +871,7 @@ EdgesDelegate *DeepEdges::not_with (const Edges &other) const
 
   } else {
 
-    return new DeepEdges (and_or_not_with (other_deep, false));
+    return new DeepEdges (and_or_not_with (other_deep, EdgeNot));
 
   }
 }
@@ -903,8 +923,8 @@ EdgesDelegate *DeepEdges::xor_with (const Edges &other) const
 
     //  Implement XOR as (A-B)+(B-A) - only this implementation
     //  is compatible with the local processor scheme
-    DeepLayer n1 (and_or_not_with (other_deep, false));
-    DeepLayer n2 (other_deep->and_or_not_with (this, false));
+    DeepLayer n1 (and_or_not_with (other_deep, EdgeNot));
+    DeepLayer n2 (other_deep->and_or_not_with (this, EdgeNot));
 
     n1.add_from (n2);
     return new DeepEdges (n1);

@@ -1228,11 +1228,6 @@ public:
     add_pair (*c1, *i2, p, t);
   }
 
-  bool stop () const
-  {
-    return false;
-  }
-
   /**
    *  @brief Finally join the clusters in the join set
    *
@@ -1274,6 +1269,11 @@ public:
 
     }
   }
+
+  //  needs explicit implementation because we have two base classes:
+  bool stop () const { return false; }
+  void initialize () { }
+  void finalize (bool) { }
 
 private:
   struct InteractionKeyForClustersType

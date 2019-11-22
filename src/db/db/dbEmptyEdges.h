@@ -81,6 +81,7 @@ public:
   virtual EdgesDelegate *or_with (const Edges &other) const;
   virtual EdgesDelegate *add_in_place (const Edges &other);
   virtual EdgesDelegate *add (const Edges &other) const;
+  virtual EdgesDelegate *intersections (const Edges &) const { return new EmptyEdges (); }
 
   virtual RegionDelegate *extended (coord_type, coord_type, coord_type, coord_type, bool) const;
 

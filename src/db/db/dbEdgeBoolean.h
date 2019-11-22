@@ -24,13 +24,19 @@
 #define HDR_dbEdgeBoolean
 
 #include "dbEdge.h"
-#include "dbEdgesDelegate.h"
+#include "dbHash.h"
 #include "dbBoxScanner.h"
+#include "dbShapes.h"
 
 #include "tlIntervalMap.h"
 
 namespace db
 {
+
+/**
+ *  @brief A common definition for the boolean operations available on edges
+ */
+enum EdgeBoolOp { EdgeOr, EdgeNot, EdgeXor, EdgeAnd, EdgeIntersections };
 
 struct OrJoinOp
 {
@@ -216,7 +222,15 @@ struct EdgeBooleanClusterCollector
   : public db::cluster_collector<db::Edge, size_t, EdgeBooleanCluster<OutputContainer> >
 {
   EdgeBooleanClusterCollector (OutputContainer *output, EdgeBoolOp op)
-    : db::cluster_collector<db::Edge, size_t, EdgeBooleanCluster<OutputContainer> > (EdgeBooleanCluster<OutputContainer> (output, op), op != EdgeAnd /*report single*/)
+    : db::cluster_collector<db::Edge, size_t, EdgeBooleanCluster<OutputContainer> > (EdgeBooleanCluster<OutputContainer> (output, op == EdgeIntersections ? EdgeAnd : op), op != EdgeAnd && op != EdgeIntersections /*report single*/),
+      mp_output (output), mp_intersections (op == EdgeIntersections ? output : 0)
+  {
+    //  .. nothing yet ..
+  }
+
+  EdgeBooleanClusterCollector (OutputContainer *output, OutputContainer *intersections, EdgeBoolOp op)
+    : db::cluster_collector<db::Edge, size_t, EdgeBooleanCluster<OutputContainer> > (EdgeBooleanCluster<OutputContainer> (output, op), op != EdgeAnd /*report single*/),
+      mp_output (output), mp_intersections (intersections)
   {
     //  .. nothing yet ..
   }
@@ -227,12 +241,180 @@ struct EdgeBooleanClusterCollector
     //  1.) not degenerate
     //  2.) parallel with some tolerance of roughly 1 dbu
     //  3.) connected
+    //  In intersection-detection mode, identify intersection points otherwise
+    //  and insert into the intersections container as degenerated edges.
+
     if (! o1->is_degenerate () && ! o2->is_degenerate () 
         && fabs ((double) db::vprod (*o1, *o2)) < db::coord_traits<db::Coord>::prec_distance () * std::min (o1->double_length (), o2->double_length ())
         && (o1->p1 () == o2->p1 () || o1->p1 () == o2->p2 () || o1->p2 () == o2->p1 () || o1->p2 () == o2->p2 () || o1->coincident (*o2))) {
+
       db::cluster_collector<db::Edge, size_t, EdgeBooleanCluster<OutputContainer> >::add (o1, p1, o2, p2);
+
+    } else if (mp_intersections && p1 != p2) {
+
+      std::pair<bool, db::Point> ip = o1->intersect_point (*o2);
+      if (ip.first) {
+        m_intersections.insert (ip.second);
+      }
+
     }
   }
+
+  /**
+   *  @brief A receiver for the reducer which removes points that are on the edges
+   */
+  struct RemovePointsOnEdges
+    : public db::box_scanner_receiver2<db::Edge, size_t, db::Point, size_t>
+  {
+  public:
+    RemovePointsOnEdges (std::set<db::Point> &points_to_remove)
+      : mp_points_to_remove (&points_to_remove)
+    { }
+
+    void add (const db::Edge *e, const size_t &, const db::Point *pt, const size_t &)
+    {
+      if (e->contains (*pt)) {
+        mp_points_to_remove->insert (*pt);
+      }
+    }
+
+  private:
+    std::set<db::Point> *mp_points_to_remove;
+  };
+
+  /**
+   *  @brief An inserter to produce degenerated edges from points
+   */
+  struct PointInserter
+    : public std::iterator<std::output_iterator_tag, void, void, void, void>
+  {
+    typedef db::Point value_type;
+
+    PointInserter (OutputContainer *output)
+      : mp_output (output)
+    { }
+
+    PointInserter &operator= (const db::Point &pt)
+    {
+      mp_output->insert (db::Edge (pt, pt));
+      return *this;
+    }
+
+    PointInserter &operator* () { return *this; }
+    PointInserter &operator++ () { return *this; }
+    PointInserter &operator++ (int) { return *this; }
+
+  private:
+    OutputContainer *mp_output;
+  };
+
+  /**
+   *  @brief Finalizes the implementation for "EdgeIntersections"
+   *  This method pushes those points which don't interact with the edges to the output container
+   *  as degenerate edges. It needs to be called after the pass has been made.
+   */
+  void finalize (bool)
+  {
+    if (m_intersections.empty ()) {
+      return;
+    }
+
+    db::box_scanner2<db::Edge, size_t, db::Point, size_t> intersections_to_edge_scanner;
+    for (typename OutputContainer::const_iterator e = mp_output->begin (); e != mp_output->end (); ++e) {
+      intersections_to_edge_scanner.insert1 (e.operator-> (), 0);
+    }
+    for (std::set<db::Point>::const_iterator p = m_intersections.begin (); p != m_intersections.end (); ++p) {
+      intersections_to_edge_scanner.insert2 (p.operator-> (), 0);
+    }
+
+    std::set<db::Point> points_to_remove;
+    RemovePointsOnEdges rpoe (points_to_remove);
+    intersections_to_edge_scanner.process (rpoe, 1, db::box_convert<db::Edge> (), db::box_convert<db::Point> ());
+
+    std::set_difference (m_intersections.begin (), m_intersections.end (), points_to_remove.begin (), points_to_remove.end (), PointInserter (mp_intersections));
+  }
+
+private:
+  OutputContainer *mp_output;
+  OutputContainer *mp_intersections;
+  std::set<db::Point> m_intersections;
+};
+
+/**
+ *  @brief A helper class to use db::Shapes as container for EdgeBooleanClusterCollector
+ */
+struct DB_PUBLIC ShapesToOutputContainerAdaptor
+{
+public:
+  struct Iterator
+    : public db::Shapes::shape_iterator
+  {
+    Iterator (const db::Shapes::shape_iterator &iter)
+      : db::Shapes::shape_iterator (iter)
+    { }
+
+    Iterator ()
+      : db::Shapes::shape_iterator ()
+    { }
+
+    const db::Edge *operator-> () const
+    {
+      return (db::Shapes::shape_iterator::operator* ()).basic_ptr (db::Edge::tag ());
+    }
+
+    bool operator!= (const Iterator &other) const
+    {
+      //  only for testing whether at end:
+      return at_end () != other.at_end ();
+    }
+
+    bool operator== (const Iterator &other) const
+    {
+      //  only for testing whether at end:
+      return at_end () == other.at_end ();
+    }
+  };
+
+  typedef Iterator const_iterator;
+
+  ShapesToOutputContainerAdaptor (db::Shapes &shapes)
+    : mp_shapes (&shapes)
+  {
+    //  .. nothing yet ..
+  }
+
+  const_iterator begin ()
+  {
+    return Iterator (mp_shapes->begin (db::ShapeIterator::Edges));
+  }
+
+  const_iterator end ()
+  {
+    return Iterator ();
+  }
+
+  void insert (const db::Edge &edge)
+  {
+    mp_shapes->insert (edge);
+  }
+
+private:
+  db::Shapes *mp_shapes;
+};
+
+/**
+ *  @brief A specialization of the EdgeBooleanClusterCollector for a Shapes output container
+ */
+struct DB_PUBLIC EdgeBooleanClusterCollectorToShapes
+  : EdgeBooleanClusterCollector<ShapesToOutputContainerAdaptor>
+{
+  EdgeBooleanClusterCollectorToShapes (db::Shapes *output, EdgeBoolOp op)
+    : EdgeBooleanClusterCollector<ShapesToOutputContainerAdaptor> (&m_adaptor, op), m_adaptor (*output)
+  {
+  }
+
+private:
+  ShapesToOutputContainerAdaptor m_adaptor;
 };
 
 }

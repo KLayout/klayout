@@ -155,19 +155,19 @@ const Pin *NetSubcircuitPinRef::pin () const
 //  Net class implementation
 
 Net::Net ()
-  : m_cluster_id (0), mp_circuit (0)
+  : NetlistObject (), m_cluster_id (0), mp_circuit (0)
 {
   //  .. nothing yet ..
 }
 
 Net::Net (const std::string &name)
-  : m_cluster_id (0), mp_circuit (0)
+  : NetlistObject (), m_cluster_id (0), mp_circuit (0)
 {
   m_name = name;
 }
 
 Net::Net (const Net &other)
-  : tl::Object (other), m_cluster_id (0), mp_circuit (0)
+  : NetlistObject (other), m_cluster_id (0), mp_circuit (0)
 {
   operator= (other);
 }
@@ -175,6 +175,8 @@ Net::Net (const Net &other)
 Net &Net::operator= (const Net &other)
 {
   if (this != &other) {
+
+    db::NetlistObject::operator= (other);
 
     clear ();
 

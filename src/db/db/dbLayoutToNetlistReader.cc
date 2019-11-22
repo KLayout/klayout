@@ -305,7 +305,9 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
 
       while (br) {
 
-        if (test (skeys::rect_key) || test (lkeys::rect_key)) {
+        if (test (skeys::property_key) || test (lkeys::property_key)) {
+          read_property (circuit);
+        } else if (test (skeys::rect_key) || test (lkeys::rect_key)) {
           circuit->set_boundary (db::DPolygon (dbu * read_rect ()));
         } else if (test (skeys::polygon_key) || test (lkeys::polygon_key)) {
           circuit->set_boundary (read_polygon ().transformed (dbu));
@@ -423,6 +425,22 @@ LayoutToNetlistStandardReader::read_point ()
   return m_ref;
 }
 
+void
+LayoutToNetlistStandardReader::read_property (db::NetlistObject *obj)
+{
+  Brace br (this);
+
+  tl::Variant k, v;
+  m_ex.read (k);
+  m_ex.read (v);
+
+  if (obj) {
+    obj->set_property (k, v);
+  }
+
+  br.done ();
+}
+
 std::pair<unsigned int, db::PolygonRef>
 LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n)
 {
@@ -502,14 +520,18 @@ LayoutToNetlistStandardReader::read_polygon ()
 }
 
 void
-LayoutToNetlistStandardReader::read_geometries (Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<db::PolygonRef> &lc, db::Cell &cell)
+LayoutToNetlistStandardReader::read_geometries (db::NetlistObject *obj, Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<db::PolygonRef> &lc, db::Cell &cell)
 {
   m_ref = db::Point ();
 
   while (br) {
-    std::pair<unsigned int, db::PolygonRef> pr = read_geometry (l2n);
-    lc.add (pr.second, pr.first);
-    cell.shapes (pr.first).insert (pr.second);
+    if (test (skeys::property_key) || test (lkeys::property_key)) {
+      read_property (obj);
+    } else {
+      std::pair<unsigned int, db::PolygonRef> pr = read_geometry (l2n);
+      lc.add (pr.second, pr.first);
+      cell.shapes (pr.first).insert (pr.second);
+    }
   }
 }
 
@@ -540,7 +562,7 @@ LayoutToNetlistStandardReader::read_net (db::Netlist * /*netlist*/, db::LayoutTo
     net->set_cluster_id (lc.id ());
 
     db::Cell &cell = l2n->internal_layout ()->cell (circuit->cell_index ());
-    read_geometries (br, l2n, lc, cell);
+    read_geometries (net, br, l2n, lc, cell);
 
   }
 
@@ -552,20 +574,27 @@ LayoutToNetlistStandardReader::read_pin (db::Netlist * /*netlist*/, db::LayoutTo
 {
   Brace br (this);
 
-  std::string name;
   db::Net *net = 0;
+
+  db::Pin pin;
 
   while (br) {
 
     if (test (skeys::name_key) || test (lkeys::name_key)) {
 
-      if (!name.empty ()) {
+      if (! pin.name ().empty ()) {
         throw tl::Exception (tl::to_string (tr ("Duplicate pin name")));
       }
 
       Brace br_name (this);
-      read_word_or_quoted (name);
+      std::string n;
+      read_word_or_quoted (n);
+      pin.set_name (n);
       br_name.done ();
+
+    } else if (test (skeys::property_key) || test (lkeys::property_key)) {
+
+      read_property (&pin);
 
     } else {
 
@@ -583,9 +612,9 @@ LayoutToNetlistStandardReader::read_pin (db::Netlist * /*netlist*/, db::LayoutTo
 
   }
 
-  const db::Pin &pin = circuit->add_pin (name);
+  size_t pin_id = circuit->add_pin (pin).id ();
   if (net) {
-    circuit->connect_pin (pin.id (), net);
+    circuit->connect_pin (pin_id, net);
   }
 
   br.done ();
@@ -656,6 +685,10 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
     } else if (read_trans_part (trans)) {
 
       //  .. nothing yet ..
+
+    } else if (test (skeys::property_key) || test (lkeys::property_key)) {
+
+      read_property (device.get ());
 
     } else if (test (skeys::device_key) || test (lkeys::device_key)) {
 
@@ -900,6 +933,10 @@ LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::Layout
 
       //  .. nothing yet ..
 
+    } else if (test (skeys::property_key) || test (lkeys::property_key)) {
+
+      read_property (subcircuit.get ());
+
     } else if (test (skeys::pin_key) || test (lkeys::pin_key)) {
 
       Brace br2 (this);
@@ -989,7 +1026,7 @@ LayoutToNetlistStandardReader::read_abstract_terminal (db::LayoutToNetlist *l2n,
     dm->set_cluster_id_for_terminal (tid, lc.id ());
 
     db::Cell &cell = l2n->internal_layout ()->cell (dm->cell_index ());
-    read_geometries (br, l2n, lc, cell);
+    read_geometries (0, br, l2n, lc, cell);
 
   }
 

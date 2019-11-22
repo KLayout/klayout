@@ -24,6 +24,7 @@
 #define _HDR_dbPin
 
 #include "dbCommon.h"
+#include "dbNetlistObject.h"
 
 #include <string>
 
@@ -36,6 +37,7 @@ namespace db
  *  A pin is some place other nets can connect to a circuit.
  */
 class DB_PUBLIC Pin
+  : public db::NetlistObject
 {
 public:
   /**
@@ -70,6 +72,15 @@ public:
     return m_id;
   }
 
+  /**
+   *  @brief Sets the name of the pin
+   *  CAUTION: don't use this method on pins stored inside a netlist.
+   */
+  void set_name (const std::string &name)
+  {
+    m_name = name;
+  }
+
 private:
   friend class Circuit;
 
@@ -79,11 +90,6 @@ private:
   void set_id (size_t id)
   {
     m_id = id;
-  }
-
-  void set_name (const std::string &name)
-  {
-    m_name = name;
   }
 };
 

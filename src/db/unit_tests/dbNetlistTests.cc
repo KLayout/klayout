@@ -344,8 +344,16 @@ TEST(3_CircuitBasic)
   EXPECT_EQ (c.pin_by_name ("p1")->name (), "p1");
   EXPECT_EQ (c.pin_by_name ("doesnt_exist") == 0, true);
   EXPECT_EQ (c.pin_by_name ("p2")->name (), "p2");
+  EXPECT_EQ (c.pin_by_id (0)->begin_properties () == c.pin_by_id (0)->end_properties (), true);
+
+  EXPECT_EQ (c.pin_by_id (0)->property (17).to_string (), "nil");
+  c.pin_by_id (0)->set_property (17, 42);
+  EXPECT_EQ (c.pin_by_id (0)->begin_properties () == c.pin_by_id (0)->end_properties (), false);
+  EXPECT_EQ (c.pin_by_id (0)->begin_properties ()->second.to_string (), "42");
+  EXPECT_EQ (c.pin_by_id (0)->property (17).to_string (), "42");
 
   db::Circuit c2 = c;
+  EXPECT_EQ (c2.pin_by_id (0)->property (17).to_string (), "42");
   EXPECT_EQ (c2.name (), "name");
   EXPECT_EQ (pins2string (c), "p1#0,p2#1");
 
@@ -1418,4 +1426,91 @@ TEST(22_BlankCircuit)
     "circuit RINGO (IN=(null),OSC=(null),VSS=(null),VDD=(null));\n"
     "end;\n"
   );
+}
+
+TEST(23_NetlistObject)
+{
+  db::NetlistObject nlo;
+  nlo.set_property (1, "hello");
+  EXPECT_EQ (nlo.property ("key").to_string (), "nil");
+  EXPECT_EQ (nlo.property (1).to_string (), "hello");
+  nlo.set_property ("key", 42);
+  EXPECT_EQ (nlo.property ("key").to_string (), "42");
+  nlo.set_property ("key", tl::Variant ());
+  EXPECT_EQ (nlo.property ("key").to_string (), "nil");
+
+  db::Net net ("net_name");
+  net.set_property (1, "hello");
+  EXPECT_EQ (net.property ("key").to_string (), "nil");
+  EXPECT_EQ (net.property (1).to_string (), "hello");
+
+  db::Net net2 (net);
+  EXPECT_EQ (net.property ("key").to_string (), "nil");
+  EXPECT_EQ (net.property (1).to_string (), "hello");
+
+  db::Net net3;
+  EXPECT_EQ (net3.property ("key").to_string (), "nil");
+  EXPECT_EQ (net3.property (1).to_string (), "nil");
+  net3 = net2;
+  EXPECT_EQ (net3.property (1).to_string (), "hello");
+
+  db::SubCircuit sc;
+  sc.set_property (1, "hello");
+  EXPECT_EQ (sc.property ("key").to_string (), "nil");
+  EXPECT_EQ (sc.property (1).to_string (), "hello");
+
+  db::SubCircuit sc2 (sc);
+  EXPECT_EQ (sc.property ("key").to_string (), "nil");
+  EXPECT_EQ (sc.property (1).to_string (), "hello");
+
+  db::SubCircuit sc3;
+  EXPECT_EQ (sc3.property ("key").to_string (), "nil");
+  EXPECT_EQ (sc3.property (1).to_string (), "nil");
+  sc3 = sc2;
+  EXPECT_EQ (sc3.property (1).to_string (), "hello");
+
+  db::Device dev;
+  dev.set_property (1, "hello");
+  EXPECT_EQ (dev.property ("key").to_string (), "nil");
+  EXPECT_EQ (dev.property (1).to_string (), "hello");
+
+  db::Device dev2 (dev);
+  EXPECT_EQ (dev.property ("key").to_string (), "nil");
+  EXPECT_EQ (dev.property (1).to_string (), "hello");
+
+  db::Device dev3;
+  EXPECT_EQ (dev3.property ("key").to_string (), "nil");
+  EXPECT_EQ (dev3.property (1).to_string (), "nil");
+  dev3 = dev2;
+  EXPECT_EQ (dev3.property (1).to_string (), "hello");
+
+  db::Circuit circuit;
+  circuit.set_property (1, "hello");
+  EXPECT_EQ (circuit.property ("key").to_string (), "nil");
+  EXPECT_EQ (circuit.property (1).to_string (), "hello");
+
+  db::Circuit circuit2 (circuit);
+  EXPECT_EQ (circuit.property ("key").to_string (), "nil");
+  EXPECT_EQ (circuit.property (1).to_string (), "hello");
+
+  db::Circuit circuit3;
+  EXPECT_EQ (circuit3.property ("key").to_string (), "nil");
+  EXPECT_EQ (circuit3.property (1).to_string (), "nil");
+  circuit3 = circuit2;
+  EXPECT_EQ (circuit3.property (1).to_string (), "hello");
+
+  db::Pin pin ("pin_name");
+  pin.set_property (1, "hello");
+  EXPECT_EQ (pin.property ("key").to_string (), "nil");
+  EXPECT_EQ (pin.property (1).to_string (), "hello");
+
+  db::Pin pin2 (pin);
+  EXPECT_EQ (pin.property ("key").to_string (), "nil");
+  EXPECT_EQ (pin.property (1).to_string (), "hello");
+
+  db::Pin pin3;
+  EXPECT_EQ (pin3.property ("key").to_string (), "nil");
+  EXPECT_EQ (pin3.property (1).to_string (), "nil");
+  pin3 = pin2;
+  EXPECT_EQ (pin3.property (1).to_string (), "hello");
 }

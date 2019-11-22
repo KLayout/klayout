@@ -254,7 +254,7 @@ TEST(1b_ReaderBasicShort)
 
   //  verify against the input
 
-  std::string path = tmp_file ("tmp_l2nreader_2.txt");
+  std::string path = tmp_file ("tmp.txt");
   {
     tl::OutputStream stream (path);
     db::LayoutToNetlistStandardWriter writer (stream, true);
@@ -264,6 +264,60 @@ TEST(1b_ReaderBasicShort)
   std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au_s.txt");
 
   compare_text_files (path, au_path);
+}
+
+TEST(1c_ReaderBasicShortWithProps)
+{
+  db::LayoutToNetlist l2n;
+
+  std::string in_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au_p.txt");
+  tl::InputStream is_in (in_path);
+
+  db::LayoutToNetlistStandardReader reader (is_in);
+  reader.read (&l2n);
+
+  //  verify against the input
+
+  std::string path = tmp_file ("tmp.txt");
+  {
+    tl::OutputStream stream (path);
+    db::LayoutToNetlistStandardWriter writer (stream, true);
+    writer.write (&l2n);
+  }
+
+  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au_p.txt");
+
+  compare_text_files (path, au_path);
+
+  {
+    db::Layout ly2;
+    ly2.dbu (l2n.internal_layout ()->dbu ());
+    db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
+
+    std::map<unsigned int, const db::Region *> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0))] = l2n.layer_by_name ("poly");
+    lmap [ly2.insert_layer (db::LayerProperties (3, 1))] = l2n.layer_by_name ("poly_lbl");
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0))] = l2n.layer_by_name ("diff_cont");
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0))] = l2n.layer_by_name ("poly_cont");
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0))] = l2n.layer_by_name ("metal1");
+    lmap [ly2.insert_layer (db::LayerProperties (6, 1))] = l2n.layer_by_name ("metal1_lbl");
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0))] = l2n.layer_by_name ("via1");
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0))] = l2n.layer_by_name ("metal2");
+    lmap [ly2.insert_layer (db::LayerProperties (8, 1))] = l2n.layer_by_name ("metal2_lbl");
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_by_name ("psd");
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_by_name ("nsd");
+
+    db::CellMapping cm = l2n.cell_mapping_into (ly2, top2);
+
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, "DEVICE_");
+
+    std::string au = tl::testsrc ();
+    au = tl::combine_path (au, "testdata");
+    au = tl::combine_path (au, "algo");
+    au = tl::combine_path (au, "l2n_writer_au_p.oas");
+
+    db::compare_layouts (_this, ly2, au, db::WriteOAS);
+  }
 }
 
 TEST(2_ReaderWithGlobalNets)
@@ -278,7 +332,7 @@ TEST(2_ReaderWithGlobalNets)
 
   //  verify against the input
 
-  std::string path = tmp_file ("tmp_l2nreader_2.txt");
+  std::string path = tmp_file ("tmp.txt");
   {
     tl::OutputStream stream (path);
     db::LayoutToNetlistStandardWriter writer (stream, false);
@@ -335,7 +389,7 @@ TEST(3_ReaderAbsoluteCoordinates)
 
   //  verify against the input
 
-  std::string path = tmp_file ("tmp_l2nreader_2.txt");
+  std::string path = tmp_file ("tmp.txt");
   {
     tl::OutputStream stream (path);
     db::LayoutToNetlistStandardWriter writer (stream, false);
@@ -394,7 +448,7 @@ TEST(4_ReaderCombinedDevices)
 
   //  verify against the input
 
-  std::string path = tmp_file ("tmp_l2nreader_4.txt");
+  std::string path = tmp_file ("tmp.txt");
   {
     tl::OutputStream stream (path);
     db::LayoutToNetlistStandardWriter writer (stream, false);

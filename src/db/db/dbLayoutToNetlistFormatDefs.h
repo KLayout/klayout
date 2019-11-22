@@ -66,7 +66,9 @@ namespace db
  *
  *    [boundary-def]
  *
- *    net(<id> [name]? [geometry-def]*)
+ *    [property-def]*
+ *
+ *    net(<id> [name]? [property-def]* [geometry-def]*)
  *                                  - net geometry [short key: N]
  *                                    A net declaration shall be there also if no geometry
  *                                    is present. The ID is a numerical shortcut for the net.
@@ -103,6 +105,14 @@ namespace db
  *
  *    name(<name>)                  - specify net name [short key: I]
  *
+ *  [property-def]:
+ *
+ *    property(<prop-name> <prop-value>)
+ *                                  - specifies a property value/key pair [short key: F]
+ *                                    prop-name and prop-value are variant specifications
+ *                                    in klayout notation: #x is an integer, ##y a floating-point
+ *                                    value, a word or quoted literal is a string.
+ *
  *  [geometry-def]:
  *
  *    polygon(<layer> [coord] ...)  - defines a polygon [short key: Q]
@@ -123,24 +133,26 @@ namespace db
  *
  *  [device-def]:
  *
- *    [trans-def]                   - location of the device [short key Y]
+ *    [property-def]*               - user properties
+ *    [trans-def]                   - location of the device
  *                                    must be before terminal
- *    param(<name> <value>)         - defines a parameter [short key E]
+ *    param(<name> <value>)         - defines a parameter [short key: E]
  *    terminal(<terminal-name> <net-id>)
  *                                  - specifies connection of the terminal with
  *                                    a net (short key: T)
  *
  *  [subcircuit-def]:
  *
- *    [trans-def]                   - location of the subcircuit [short key Y]
+ *    [property-def]*               - user properties
+ *    [trans-def]                   - location of the subcircuit
  *    pin(<pin-id> <net-id>)        - specifies connection of the pin with a net [short key: P]
  *
  *  [trans-def]:
  *
- *    location(<x> <y>)             - location of the instance [short key Y]
- *    rotation(<angle>)             - rotation angle (in degree, default is 0) [short key O]
- *    mirror                        - if specified, the instance is mirrored before rotation [short key M]
- *    scale(<mag>)                  - magnification (default is 1) [short key S]
+ *    location(<x> <y>)             - location of the instance [short key: Y]
+ *    rotation(<angle>)             - rotation angle (in degree, default is 0) [short key: O]
+ *    mirror                        - if specified, the instance is mirrored before rotation [short key: M]
+ *    scale(<mag>)                  - magnification (default is 1) [short key: S]
  */
 
 namespace l2n_std_format
@@ -160,6 +172,7 @@ namespace l2n_std_format
     static std::string circuit_key;
     static std::string net_key;
     static std::string name_key;
+    static std::string property_key;
     static std::string device_key;
     static std::string subcircuit_key;
     static std::string polygon_key;
@@ -191,6 +204,7 @@ namespace l2n_std_format
     static std::string circuit_key;
     static std::string net_key;
     static std::string name_key;
+    static std::string property_key;
     static std::string device_key;
     static std::string subcircuit_key;
     static std::string polygon_key;

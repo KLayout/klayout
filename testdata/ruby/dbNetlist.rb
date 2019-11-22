@@ -25,6 +25,24 @@ load("test_prologue.rb")
 
 class DBNetlist_TestClass < TestBase
 
+  def test_0_NetlistObject
+
+    nlo = RBA::NetlistObject::new
+    assert_equal(nlo.property(17), nil)
+    assert_equal(nlo.property_keys.inspect, "[]")
+    nlo.set_property(17, 42)
+    assert_equal(nlo.property_keys.inspect, "[17]")
+    assert_equal(nlo.property(17), 42)
+
+    nlo2 = nlo.dup
+    assert_equal(nlo2.property(17), 42)
+    nlo.set_property(17, nil)
+    assert_equal(nlo.property_keys.inspect, "[]")
+    assert_equal(nlo.property(17), nil)
+    assert_equal(nlo2.property(17), 42)
+
+  end
+
   def test_1_NetlistBasicCircuit
 
     nl = RBA::Netlist::new
@@ -141,6 +159,10 @@ class DBNetlist_TestClass < TestBase
     p1 = c.create_pin("A")
     p2 = c.create_pin("B")
 
+    assert_equal(p1.property(17), nil)
+    p1.set_property(17, 42)
+    assert_equal(p1.property(17), 42)
+
     assert_equal(p1.id, 0)
     assert_equal(p2.id, 1)
 
@@ -188,6 +210,10 @@ class DBNetlist_TestClass < TestBase
     assert_equal(c.device_by_id(2).inspect, "nil")
     assert_equal(c.device_by_name("doesnt_exist").inspect, "nil")
 
+    assert_equal(d1.property(17), nil)
+    d1.set_property(17, 42)
+    assert_equal(d1.property(17), 42)
+
     d2 = c.create_device(dc)
     assert_equal(d2.device_class.id, dc.id)
     assert_equal(d2.device_class.object_id, dc.object_id)   # by virtue of Ruby-to-C++ object mapping
@@ -214,6 +240,10 @@ class DBNetlist_TestClass < TestBase
     assert_equal(dcs, [ "DC", "DC" ])
 
     net = c.create_net("NET")
+
+    assert_equal(net.property(17), nil)
+    net.set_property(17, 42)
+    assert_equal(net.property(17), 42)
 
     assert_equal(net.is_floating?, true)
     assert_equal(net.is_internal?, false)
@@ -369,6 +399,10 @@ class DBNetlist_TestClass < TestBase
     assert_equal(c.subcircuit_by_name(sc1.name).name, "SC1")
     assert_equal(c.subcircuit_by_id(2).inspect, "nil")
     assert_equal(c.subcircuit_by_name("doesnt_exist").inspect, "nil")
+
+    assert_equal(sc1.property(17), nil)
+    sc1.set_property(17, 42)
+    assert_equal(sc1.property(17), 42)
 
     refs = []
     cc.each_ref { |r| refs << r.name }
@@ -564,6 +598,10 @@ class DBNetlist_TestClass < TestBase
     c.cell_index = 42
     assert_equal(c.cell_index, 42)
 
+    assert_equal(c.property(17), nil)
+    c.set_property(17, 42)
+    assert_equal(c.property(17), 42)
+
     pina1 = c.create_pin("A1")
     pina2 = c.create_pin("A2")
     pinb1 = c.create_pin("B1")
@@ -580,6 +618,11 @@ class DBNetlist_TestClass < TestBase
     assert_equal(c.pin_by_name("B2").name, "B2")
     assert_equal(c.pin_by_id(17).inspect, "nil")
     assert_equal(c.pin_by_name("DOESNOTEXIST").inspect, "nil")
+
+    assert_equal(c.pin_by_id(0).property(17), nil)
+    c.pin_by_id(0).set_property(17, 42)
+    assert_equal(c.pin_by_id(0).property(17), 42)
+    assert_equal(c.pin_by_name("A1").property(17), 42)
 
     names = []
     c.each_pin { |p| names << p.name }

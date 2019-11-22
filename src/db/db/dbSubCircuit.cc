@@ -30,7 +30,7 @@ namespace db
 //  SubCircuit class implementation
 
 SubCircuit::SubCircuit ()
-  : m_id (0), mp_circuit (0)
+  : db::NetlistObject (), m_id (0), mp_circuit (0)
 {
   //  .. nothing yet ..
 }
@@ -45,13 +45,13 @@ SubCircuit::~SubCircuit()
 }
 
 SubCircuit::SubCircuit (Circuit *circuit, const std::string &name)
-  : m_circuit_ref (0), m_name (name), m_id (0), mp_circuit (0)
+  : db::NetlistObject (), m_circuit_ref (0), m_name (name), m_id (0), mp_circuit (0)
 {
   set_circuit_ref (circuit);
 }
 
 SubCircuit::SubCircuit (const SubCircuit &other)
-  : tl::Object (other), m_id (0), mp_circuit (0)
+  : db::NetlistObject (other), m_id (0), mp_circuit (0)
 {
   operator= (other);
 }
@@ -59,6 +59,7 @@ SubCircuit::SubCircuit (const SubCircuit &other)
 SubCircuit &SubCircuit::operator= (const SubCircuit &other)
 {
   if (this != &other) {
+    db::NetlistObject::operator= (other);
     m_name = other.m_name;
     m_trans = other.m_trans;
     set_circuit_ref (const_cast<Circuit *> (other.circuit_ref ()));

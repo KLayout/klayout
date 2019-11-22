@@ -30,13 +30,13 @@ namespace db
 //  Pin class implementation
 
 Pin::Pin ()
-  : m_id (0)
+  : db::NetlistObject (), m_id (0)
 {
   //  .. nothing yet ..
 }
 
 Pin::Pin (const std::string &name)
-  : m_name (name), m_id (0)
+  : db::NetlistObject (), m_name (name), m_id (0)
 {
   //  .. nothing yet ..
 }

@@ -183,7 +183,8 @@ SOURCES = \
     dbLayoutVsSchematicFormatDefs.cc \
     dbLayoutVsSchematic.cc \
     gsiDeclDbNetlistCrossReference.cc \
-    gsiDeclDbLayoutVsSchematic.cc
+    gsiDeclDbLayoutVsSchematic.cc \
+    dbNetlistObject.cc
 
 HEADERS = \
   dbArray.h \
@@ -329,7 +330,8 @@ HEADERS = \
     dbLayoutVsSchematicWriter.h \
     dbLayoutVsSchematicReader.h \
     dbLayoutVsSchematicFormatDefs.h \
-    dbLayoutVsSchematic.h
+    dbLayoutVsSchematic.h \
+    dbNetlistObject.h
 
 !equals(HAVE_QT, "0") {
 

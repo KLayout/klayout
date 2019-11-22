@@ -217,6 +217,33 @@ TEST(1_WriterBasic)
 
     db::compare_layouts (_this, ly2, au);
   }
+
+  l2n.netlist ()->begin_circuits ()->set_property (17, 42);
+  l2n.netlist ()->begin_circuits ()->set_property ("a_float", 0.5);
+  l2n.netlist ()->begin_circuits ()->set_property ("a_\"non_quoted\"_string", "s");
+
+  l2n.netlist ()->begin_circuits ()->begin_nets ()->set_property (17, 142);
+  l2n.netlist ()->begin_circuits ()->begin_nets ()->set_property ("a_float", 10.5);
+  l2n.netlist ()->begin_circuits ()->begin_nets ()->set_property ("a_\"non_quoted\"_string", "1s");
+
+  l2n.netlist ()->circuit_by_name ("INV2")->begin_devices ()->set_property (17, 242);
+  l2n.netlist ()->circuit_by_name ("INV2")->begin_devices ()->set_property ("a_float", 20.5);
+  l2n.netlist ()->circuit_by_name ("INV2")->begin_devices ()->set_property ("a_\"non_quoted\"_string", "2s");
+
+  l2n.netlist ()->circuit_by_name ("RINGO")->begin_subcircuits ()->set_property (17, 342);
+  l2n.netlist ()->circuit_by_name ("RINGO")->begin_subcircuits ()->set_property ("a_float", 30.5);
+  l2n.netlist ()->circuit_by_name ("RINGO")->begin_subcircuits ()->set_property ("a_\"non_quoted\"_string", "3s");
+
+  path = tmp_file ("tmp_l2nwriter_1p.txt");
+  {
+    tl::OutputStream stream (path);
+    db::LayoutToNetlistStandardWriter writer (stream, true);
+    writer.write (&l2n);
+  }
+
+  au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au_p.txt");
+
+  compare_text_files (path, au_path);
 }
 
 TEST(2_WriterWithGlobalNets)

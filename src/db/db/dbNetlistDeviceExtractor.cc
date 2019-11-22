@@ -481,6 +481,10 @@ void NetlistDeviceExtractor::extract_devices (const std::vector<db::Region> & /*
 
 void NetlistDeviceExtractor::register_device_class (DeviceClass *device_class)
 {
+  std::auto_ptr<DeviceClass> holder (device_class);
+  tl_assert (device_class != 0);
+  tl_assert (m_netlist.get () != 0);
+
   if (mp_device_class != 0) {
     throw tl::Exception (tl::to_string (tr ("Device class already set")));
   }
@@ -488,12 +492,22 @@ void NetlistDeviceExtractor::register_device_class (DeviceClass *device_class)
     throw tl::Exception (tl::to_string (tr ("No device extractor/device class name set")));
   }
 
-  tl_assert (device_class != 0);
-  mp_device_class = device_class;
-  mp_device_class->set_name (m_name);
+  DeviceClass *existing = m_netlist->device_class_by_name (m_name);
+  if (existing) {
 
-  tl_assert (m_netlist.get () != 0);
-  m_netlist->add_device_class (device_class);
+    if (typeid (*existing) != typeid (*device_class)) {
+      throw tl::Exception (tl::to_string (tr ("Different device class already registered with the same name")));
+    }
+    mp_device_class = existing;
+
+  } else {
+
+    mp_device_class = holder.get ();
+    mp_device_class->set_name (m_name);
+
+    m_netlist->add_device_class (holder.release ());
+
+  }
 }
 
 const db::NetlistDeviceExtractorLayerDefinition &NetlistDeviceExtractor::define_layer (const std::string &name, const std::string &description)

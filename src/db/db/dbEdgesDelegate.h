@@ -155,11 +155,6 @@ class DB_PUBLIC EdgeToEdgePairProcessorBase
   //  .. nothing yet ..
 };
 
-/**
- *  @brief A common definition for the boolean operations available on edges
- */
-enum EdgeBoolOp { EdgeOr, EdgeNot, EdgeXor, EdgeAnd };
-
 class RecursiveShapeIterator;
 class EdgeFilterBase;
 class EdgePairsDelegate;
@@ -267,6 +262,7 @@ public:
   virtual EdgesDelegate *or_with (const Edges &other) const = 0;
   virtual EdgesDelegate *add_in_place (const Edges &other) = 0;
   virtual EdgesDelegate *add (const Edges &other) const = 0;
+  virtual EdgesDelegate *intersections (const Edges &other) const = 0;
 
   virtual RegionDelegate *extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i, bool join) const = 0;
 

@@ -852,6 +852,37 @@ TEST(22)
   ee.insert (db::Edge (4000,-2000,-2000,-2000));
 
   EXPECT_EQ ((e & ee).to_string (), "(400,0;-2000,0);(500,-174;400,0);(1000,0;900,-173);(4000,0;1000,0)");
+  EXPECT_EQ (e.intersections (ee).to_string (), "(400,0;-2000,0);(500,-174;400,0);(1000,0;900,-173);(4000,0;1000,0)");
+
+  //  Edge/edge intersections
+  ee.clear ();
+  e.clear ();
+  e.insert (db::Edge (0, -100, 0, 150));
+  ee.insert (db::Edge (-50, 50, 50, 50));
+  ee.insert (db::Edge (-50, 100, 50, 100));
+  EXPECT_EQ ((e & ee).to_string (), "");  //  AND does not report intersection points
+  EXPECT_EQ (e.intersections (ee).to_string (), "(0,50;0,50);(0,100;0,100)");
+
+  //  Edge is intersected by pair with connection point on this line
+  ee.clear ();
+  e.clear ();
+  e.insert (db::Edge (0, -100, 0, 150));
+  ee.insert (db::Edge (-50, 50, 0, 50));
+  ee.insert (db::Edge (0, 60, 50, 60));
+  ee.insert (db::Edge (-50, 100, 0, 100));
+  ee.insert (db::Edge (0, 100, 50, 100));
+  EXPECT_EQ ((e & ee).to_string (), "");  //  AND does not report intersection points
+  EXPECT_EQ (e.intersections (ee).to_string (), "(0,50;0,50);(0,60;0,60);(0,100;0,100)");
+
+  //  Coincident edges are crossed by another one
+  ee.clear ();
+  e.clear ();
+  e.insert (db::Edge (0, -100, 0, 250));
+  ee.insert (db::Edge (0, 0, 0, 150));
+  ee.insert (db::Edge (-50, 100, 50, 100));
+  ee.insert (db::Edge (-50, 200, 50, 200));
+  EXPECT_EQ ((e & ee).to_string (), "(0,0;0,150)");
+  EXPECT_EQ (e.intersections (ee).to_string (), "(0,0;0,150);(0,200;0,200)");
 }
 
 TEST(23)

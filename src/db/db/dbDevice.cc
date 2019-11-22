@@ -31,7 +31,7 @@ namespace db
 //  Device class implementation
 
 Device::Device ()
-  : mp_device_class (0), mp_device_abstract (0), m_id (0), mp_circuit (0)
+  : db::NetlistObject (), mp_device_class (0), mp_device_abstract (0), m_id (0), mp_circuit (0)
 {
   //  .. nothing yet ..
 }
@@ -46,19 +46,19 @@ Device::~Device ()
 }
 
 Device::Device (DeviceClass *device_class, const std::string &name)
-  : mp_device_class (device_class), mp_device_abstract (0), m_name (name), m_id (0), mp_circuit (0)
+  : db::NetlistObject (), mp_device_class (device_class), mp_device_abstract (0), m_name (name), m_id (0), mp_circuit (0)
 {
   //  .. nothing yet ..
 }
 
 Device::Device (DeviceClass *device_class, DeviceAbstract *device_abstract, const std::string &name)
-  : mp_device_class (device_class), mp_device_abstract (device_abstract), m_name (name), m_id (0), mp_circuit (0)
+  : db::NetlistObject (), mp_device_class (device_class), mp_device_abstract (device_abstract), m_name (name), m_id (0), mp_circuit (0)
 {
   //  .. nothing yet ..
 }
 
 Device::Device (const Device &other)
-  : tl::Object (other), mp_device_class (0), mp_device_abstract (0), m_id (0), mp_circuit (0)
+  : db::NetlistObject (other), mp_device_class (0), mp_device_abstract (0), m_id (0), mp_circuit (0)
 {
   operator= (other);
 }
@@ -66,6 +66,7 @@ Device::Device (const Device &other)
 Device &Device::operator= (const Device &other)
 {
   if (this != &other) {
+    db::NetlistObject::operator= (other);
     m_name = other.m_name;
     m_trans = other.m_trans;
     m_parameters = other.m_parameters;

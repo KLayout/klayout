@@ -327,10 +327,7 @@ public:
    *  a technology file was imported. The explicit one is the one that is specified
    *  explicitly.
    */
-  const std::string &base_path () const
-  {
-    return m_explicit_base_path.empty () ? m_default_base_path : m_explicit_base_path;
-  }
+  std::string base_path () const;
 
   /**
    *  @brief Makes a file path relative to the base path if one is specified.

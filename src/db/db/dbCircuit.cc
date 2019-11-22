@@ -33,7 +33,7 @@ namespace db
 //  Circuit class implementation
 
 Circuit::Circuit ()
-  : m_dont_purge (false), m_cell_index (0), mp_netlist (0),
+  : db::NetlistObject (), gsi::ObjectBase (), m_dont_purge (false), m_cell_index (0), mp_netlist (0),
     m_device_by_id (this, &Circuit::begin_devices, &Circuit::end_devices),
     m_subcircuit_by_id (this, &Circuit::begin_subcircuits, &Circuit::end_subcircuits),
     m_net_by_cluster_id (this, &Circuit::begin_nets, &Circuit::end_nets),
@@ -48,7 +48,7 @@ Circuit::Circuit ()
 }
 
 Circuit::Circuit (const db::Layout &layout, db::cell_index_type ci)
-  : m_name (layout.cell_name (ci)), m_dont_purge (false), m_cell_index (ci), mp_netlist (0),
+  : db::NetlistObject (), gsi::ObjectBase (), m_name (layout.cell_name (ci)), m_dont_purge (false), m_cell_index (ci), mp_netlist (0),
     m_device_by_id (this, &Circuit::begin_devices, &Circuit::end_devices),
     m_subcircuit_by_id (this, &Circuit::begin_subcircuits, &Circuit::end_subcircuits),
     m_net_by_cluster_id (this, &Circuit::begin_nets, &Circuit::end_nets),
@@ -65,7 +65,7 @@ Circuit::Circuit (const db::Layout &layout, db::cell_index_type ci)
 }
 
 Circuit::Circuit (const Circuit &other)
-  : gsi::ObjectBase (other), tl::Object (other), m_dont_purge (false), m_cell_index (0), mp_netlist (0),
+  : db::NetlistObject (other), gsi::ObjectBase (other), m_dont_purge (false), m_cell_index (0), mp_netlist (0),
     m_device_by_id (this, &Circuit::begin_devices, &Circuit::end_devices),
     m_subcircuit_by_id (this, &Circuit::begin_subcircuits, &Circuit::end_subcircuits),
     m_net_by_cluster_id (this, &Circuit::begin_nets, &Circuit::end_nets),
@@ -94,6 +94,8 @@ Circuit::~Circuit ()
 Circuit &Circuit::operator= (const Circuit &other)
 {
   if (this != &other) {
+
+    db::NetlistObject::operator= (other);
 
     clear ();
 
@@ -288,6 +290,13 @@ Circuit::const_child_circuit_iterator Circuit::end_parents () const
 void Circuit::clear_pins ()
 {
   m_pins.clear ();
+}
+
+const Pin &Circuit::add_pin (const Pin &pin)
+{
+  m_pins.push_back (pin);
+  m_pins.back ().set_id (m_pins.size () - 1);
+  return m_pins.back ();
 }
 
 const Pin &Circuit::add_pin (const std::string &name)

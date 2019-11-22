@@ -34,7 +34,33 @@
 namespace gsi
 {
 
-Class<db::Pin> decl_dbPin ("db", "Pin",
+static std::vector<tl::Variant> property_keys (const db::NetlistObject *object)
+{
+  std::vector<tl::Variant> v;
+  for (db::NetlistObject::property_iterator p = object->begin_properties (); p != object->end_properties (); ++p) {
+    v.push_back (p->first);
+  }
+  return v;
+}
+
+Class<db::NetlistObject> decl_dbNetlistObject ("db", "NetlistObject",
+  gsi::method ("property", &db::NetlistObject::property, gsi::arg ("key"),
+    "@brief Gets the property value for the given key or nil if there is no value with this key."
+  ) +
+  gsi::method ("set_property", &db::NetlistObject::set_property, gsi::arg ("key"), gsi::arg ("value"),
+    "@brief Sets the property value for the given key.\n"
+    "Use a nil value to erase the property with this key."
+  ) +
+  gsi::method_ext ("property_keys", &property_keys,
+    "@brief Gets the keys for the properties stored in this object."
+  ),
+  "@brief The base class for some netlist objects.\n"
+  "The main purpose of this class is to supply user properties for netlist objects.\n"
+  "\n"
+  "This class has been introduced in version 0.26.2"
+);
+
+Class<db::Pin> decl_dbPin (decl_dbNetlistObject, "db", "Pin",
   gsi::method ("id", &db::Pin::id,
     "@brief Gets the ID of the pin.\n"
   ) +
@@ -225,7 +251,7 @@ static void add_other_abstracts (db::Device *device, const db::DeviceAbstractRef
   device->other_abstracts ().push_back (ref);
 }
 
-Class<db::Device> decl_dbDevice ("db", "Device",
+Class<db::Device> decl_dbDevice (decl_dbNetlistObject, "db", "Device",
   gsi::method ("device_class", &db::Device::device_class,
     "@brief Gets the device class the device belongs to.\n"
   ) +
@@ -397,7 +423,7 @@ static void subcircuit_disconnect_pin1 (db::SubCircuit *subcircuit, const db::Pi
   }
 }
 
-Class<db::SubCircuit> decl_dbSubCircuit ("db", "SubCircuit",
+Class<db::SubCircuit> decl_dbSubCircuit (decl_dbNetlistObject, "db", "SubCircuit",
   gsi::method ("circuit_ref", (const db::Circuit *(db::SubCircuit::*) () const) &db::SubCircuit::circuit_ref,
     "@brief Gets the circuit referenced by the subcircuit.\n"
   ) +
@@ -516,7 +542,7 @@ Class<db::NetSubcircuitPinRef> decl_dbNetSubcircuitPinRef ("db", "NetSubcircuitP
   "This class has been added in version 0.26."
 );
 
-Class<db::Net> decl_dbNet ("db", "Net",
+Class<db::Net> decl_dbNet (decl_dbNetlistObject, "db", "Net",
   gsi::method ("circuit", (db::Circuit *(db::Net::*) ()) &db::Net::circuit,
     "@brief Gets the circuit the net lives in."
   ) +
@@ -1098,8 +1124,8 @@ static void circuit_disconnect_pin1 (db::Circuit *c, const db::Pin *pin)
   }
 }
 
-Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
-  gsi::method ("create_pin", &db::Circuit::add_pin, gsi::arg ("name"),
+Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
+  gsi::method ("create_pin", (const db::Pin &(db::Circuit::*) (const std::string &)) &db::Circuit::add_pin, gsi::arg ("name"),
     "@brief Creates a new \\Pin object inside the circuit\n"
     "This object will describe a pin of the circuit. A circuit connects "
     "to the outside through such a pin. The pin is added after all existing "
@@ -1147,11 +1173,11 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
     "@brief Gets the net object for a given name.\n"
     "If the ID is not a valid net name, nil is returned."
   ) +
-  gsi::method ("pin_by_id", &db::Circuit::pin_by_id, gsi::arg ("id"),
+  gsi::method ("pin_by_id", (db::Pin *(db::Circuit::*) (size_t)) &db::Circuit::pin_by_id, gsi::arg ("id"),
     "@brief Gets the \\Pin object corresponding to a specific ID\n"
     "If the ID is not a valid pin ID, nil is returned."
   ) +
-  gsi::method ("pin_by_name", &db::Circuit::pin_by_name, gsi::arg ("name"),
+  gsi::method ("pin_by_name", (db::Pin *(db::Circuit::*) (const std::string &)) &db::Circuit::pin_by_name, gsi::arg ("name"),
     "@brief Gets the \\Pin object corresponding to a specific name\n"
     "If the ID is not a valid pin name, nil is returned."
   ) +

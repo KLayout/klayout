@@ -741,16 +741,19 @@ TEST(3_DeviceAndNetExtractionWithImplicitConnections)
   //  extract the nets
 
   db::Netlist nl2 = nl;
-  net_ex.extract_nets (dss, 0, conn, nl2, cl, "{VDDZ,VSSZ,NEXT,FB}");
+  net_ex.set_joined_net_names ("{VDDZ,VSSZ,NEXT,FB}");
+  net_ex.extract_nets (dss, 0, conn, nl2, cl);
 
   EXPECT_EQ (all_net_names_unique (nl2), true);
 
   nl2 = nl;
-  net_ex.extract_nets (dss, 0, conn, nl2, cl, "{VDDZ,VSSZ,NEXT}");
+  net_ex.set_joined_net_names ("{VDDZ,VSSZ,NEXT}");
+  net_ex.extract_nets (dss, 0, conn, nl2, cl);
 
   EXPECT_EQ (all_net_names_unique (nl2), false);
 
-  net_ex.extract_nets (dss, 0, conn, nl, cl, "*");
+  net_ex.set_joined_net_names ("*");
+  net_ex.extract_nets (dss, 0, conn, nl, cl);
 
   EXPECT_EQ (all_net_names_unique (nl), true);
 
@@ -1012,7 +1015,8 @@ TEST(4_ResAndCapExtraction)
 
   //  extract the nets
 
-  net_ex.extract_nets (dss, 0, conn, nl, cl, "*");
+  net_ex.set_joined_net_names ("*");
+  net_ex.extract_nets (dss, 0, conn, nl, cl);
 
   //  Flatten device circuits
 
@@ -1285,7 +1289,8 @@ TEST(5_ResAndCapWithBulkExtraction)
 
   //  extract the nets
 
-  net_ex.extract_nets (dss, 0, conn, nl, cl, "*");
+  net_ex.set_joined_net_names ("*");
+  net_ex.extract_nets (dss, 0, conn, nl, cl);
 
   //  Flatten device circuits
 
@@ -1526,7 +1531,8 @@ TEST(6_BJT3TransistorExtraction)
 
   //  extract the nets
 
-  net_ex.extract_nets (dss, 0, conn, nl, cl, "*");
+  net_ex.set_joined_net_names ("*");
+  net_ex.extract_nets (dss, 0, conn, nl, cl);
 
   //  Flatten device circuits
 
@@ -1691,7 +1697,8 @@ TEST(7_DiodeExtraction)
 
   //  extract the nets
 
-  net_ex.extract_nets (dss, 0, conn, nl, cl, "*");
+  net_ex.set_joined_net_names ("*");
+  net_ex.extract_nets (dss, 0, conn, nl, cl);
 
   //  cleanup + completion
   nl.combine_devices ();
@@ -1823,7 +1830,8 @@ TEST(8_DiodeExtractionScaled)
 
   //  extract the nets
 
-  net_ex.extract_nets (dss, 0, conn, nl, cl, "*");
+  net_ex.set_joined_net_names ("*");
+  net_ex.extract_nets (dss, 0, conn, nl, cl);
 
   //  cleanup + completion
   nl.combine_devices ();
@@ -2303,3 +2311,265 @@ TEST(10_DeviceExtractionWithBreakoutCells)
 
   db::compare_layouts (_this, ly, au);
 }
+
+TEST(11_DeviceExtractionWithSameClass)
+{
+  db::Layout ly;
+  db::LayerMap lmap;
+
+  unsigned int rmarker    = define_layer (ly, lmap, 1);
+  unsigned int poly       = define_layer (ly, lmap, 2);
+  unsigned int diff       = define_layer (ly, lmap, 3);
+  unsigned int contact    = define_layer (ly, lmap, 4);
+  unsigned int metal      = define_layer (ly, lmap, 5);
+
+  {
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+    std::string fn (tl::testsrc ());
+    fn = tl::combine_path (fn, "testdata");
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "device_extract_l11.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+
+  db::DeepShapeStore dss;
+  dss.set_text_enlargement (1);
+  dss.set_text_property_name (tl::Variant ("LABEL"));
+
+  //  original layers
+  db::Region rrmarker (db::RecursiveShapeIterator (ly, tc, rmarker), dss);
+  db::Region rpoly (db::RecursiveShapeIterator (ly, tc, poly), dss);
+  db::Region rdiff (db::RecursiveShapeIterator (ly, tc, diff), dss);
+  db::Region rcontact (db::RecursiveShapeIterator (ly, tc, contact), dss);
+  db::Region rmetal (db::RecursiveShapeIterator (ly, tc, metal), dss);
+
+  //  derived regions
+
+  db::Region rpoly_cap = rpoly - rrmarker;
+  db::Region rpoly_res = rpoly & rrmarker;
+  db::Region rdiff_cap = rdiff - rrmarker;
+  db::Region rdiff_res = rdiff & rrmarker;
+
+  //  perform the extraction
+
+  db::Netlist nl;
+  db::hier_clusters<db::PolygonRef> cl;
+
+  db::NetlistDeviceExtractorResistor polyres_ex ("RES", 50.0);
+  db::NetlistDeviceExtractorResistor diffres_ex ("RES", 150.0);
+
+  db::NetlistDeviceExtractor::input_layers dl;
+  dl["R"] = &rpoly_res;
+  dl["C"] = &rpoly_cap;
+  polyres_ex.extract (dss, 0, dl, nl, cl);
+
+  dl.clear ();
+  dl["R"] = &rdiff_res;
+  dl["C"] = &rdiff_cap;
+  diffres_ex.extract (dss, 0, dl, nl, cl);
+
+  //  perform the net extraction
+
+  db::NetlistExtractor net_ex;
+
+  db::Connectivity conn;
+  //  Intra-layer
+  conn.connect (rpoly_cap);
+  conn.connect (rdiff_cap);
+  conn.connect (rcontact);
+  //  Inter-layer
+  conn.connect (rpoly_cap,  rcontact);
+  conn.connect (rdiff_cap,  rcontact);
+  conn.connect (rmetal,     rcontact);
+
+  //  extract the nets
+
+  net_ex.extract_nets (dss, 0, conn, nl, cl);
+
+  std::string nl_au_string =
+    "circuit TOP ();\n"
+    "  device RES $1 (A=$1,B=$2) (R=175,L=2.8,W=0.8,A=0.56,P=3.6);\n"
+    "  device RES $2 (A=$2,B=$3) (R=175,L=2.8,W=0.8,A=0.56,P=3.6);\n"
+    "  device RES $3 (A=$3,B=$4) (R=525,L=2.8,W=0.8,A=0.56,P=3.6);\n"
+    "end;\n"
+  ;
+
+  //  compare netlist as string
+  CHECKPOINT ();
+  db::compare_netlist (_this, nl, nl_au_string);
+
+  nl.combine_devices ();
+
+  std::string nl_au_string_post =
+    "circuit TOP ();\n"
+    "  device RES $3 (A=$1,B=$4) (R=875,L=8.4,W=0.8,A=1.68,P=10.8);\n"
+    "end;\n"
+  ;
+
+  //  compare netlist as string
+  CHECKPOINT ();
+  db::compare_netlist (_this, nl, nl_au_string_post);
+}
+
+TEST(12_FloatingSubcircuitExtraction)
+{
+  db::Layout ly;
+  db::LayerMap lmap;
+
+  unsigned int nwell      = define_layer (ly, lmap, 1);
+  unsigned int active     = define_layer (ly, lmap, 2);
+  unsigned int poly       = define_layer (ly, lmap, 3);
+  unsigned int poly_lbl   = define_layer (ly, lmap, 3, 1);
+  unsigned int diff_cont  = define_layer (ly, lmap, 4);
+  unsigned int poly_cont  = define_layer (ly, lmap, 5);
+  unsigned int metal1     = define_layer (ly, lmap, 6);
+  unsigned int metal1_lbl = define_layer (ly, lmap, 6, 1);
+  unsigned int via1       = define_layer (ly, lmap, 7);
+  unsigned int metal2     = define_layer (ly, lmap, 8);
+  unsigned int metal2_lbl = define_layer (ly, lmap, 8, 1);
+
+  {
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+    std::string fn (tl::testsrc ());
+    fn = tl::combine_path (fn, "testdata");
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "device_extract_l1_floating_subcircuits.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+
+  db::DeepShapeStore dss;
+  dss.set_text_enlargement (1);
+  dss.set_text_property_name (tl::Variant ("LABEL"));
+
+  //  original layers
+  db::Region rnwell (db::RecursiveShapeIterator (ly, tc, nwell), dss);
+  db::Region ractive (db::RecursiveShapeIterator (ly, tc, active), dss);
+  db::Region rpoly (db::RecursiveShapeIterator (ly, tc, poly), dss);
+  db::Region rpoly_lbl (db::RecursiveShapeIterator (ly, tc, poly_lbl), dss);
+  db::Region rdiff_cont (db::RecursiveShapeIterator (ly, tc, diff_cont), dss);
+  db::Region rpoly_cont (db::RecursiveShapeIterator (ly, tc, poly_cont), dss);
+  db::Region rmetal1 (db::RecursiveShapeIterator (ly, tc, metal1), dss);
+  db::Region rmetal1_lbl (db::RecursiveShapeIterator (ly, tc, metal1_lbl), dss);
+  db::Region rvia1 (db::RecursiveShapeIterator (ly, tc, via1), dss);
+  db::Region rmetal2 (db::RecursiveShapeIterator (ly, tc, metal2), dss);
+  db::Region rmetal2_lbl (db::RecursiveShapeIterator (ly, tc, metal2_lbl), dss);
+
+  //  derived regions
+
+  db::Region rpactive = ractive & rnwell;
+  db::Region rpgate   = rpactive & rpoly;
+  db::Region rpsd     = rpactive - rpgate;
+
+  db::Region rnactive = ractive - rnwell;
+  db::Region rngate   = rnactive & rpoly;
+  db::Region rnsd     = rnactive - rngate;
+
+  //  perform the extraction
+
+  db::Netlist nl;
+  db::hier_clusters<db::PolygonRef> cl;
+
+  db::NetlistDeviceExtractorMOS3Transistor pmos_ex ("PMOS");
+  db::NetlistDeviceExtractorMOS3Transistor nmos_ex ("NMOS");
+
+  db::NetlistDeviceExtractor::input_layers dl;
+
+  dl["SD"] = &rpsd;
+  dl["G"] = &rpgate;
+  dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
+  pmos_ex.extract (dss, 0, dl, nl, cl);
+
+  dl["SD"] = &rnsd;
+  dl["G"] = &rngate;
+  dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
+  nmos_ex.extract (dss, 0, dl, nl, cl);
+
+  //  perform the net extraction
+
+  db::Connectivity conn;
+  //  Intra-layer
+  conn.connect (rpsd);
+  conn.connect (rnsd);
+  conn.connect (rpoly);
+  conn.connect (rdiff_cont);
+  conn.connect (rpoly_cont);
+  conn.connect (rmetal1);
+  conn.connect (rvia1);
+  conn.connect (rmetal2);
+  //  Inter-layer
+  conn.connect (rpsd,       rdiff_cont);
+  conn.connect (rnsd,       rdiff_cont);
+  conn.connect (rpoly,      rpoly_cont);
+  conn.connect (rpoly_cont, rmetal1);
+  conn.connect (rdiff_cont, rmetal1);
+  conn.connect (rmetal1,    rvia1);
+  conn.connect (rvia1,      rmetal2);
+  conn.connect (rpoly,      rpoly_lbl);     //  attaches labels
+  conn.connect (rmetal1,    rmetal1_lbl);   //  attaches labels
+  conn.connect (rmetal2,    rmetal2_lbl);   //  attaches labels
+
+  //  extract the nets
+
+  db::NetlistExtractor net_ex;
+  net_ex.set_include_floating_subcircuits (true);
+  net_ex.extract_nets (dss, 0, conn, nl, cl);
+
+  //  compare netlist as string
+  CHECKPOINT ();
+  db::compare_netlist (_this, nl,
+    "circuit RINGO ();\n"
+    "  subcircuit INV2 $1 (IN=FB,$2=$I29,OUT=$I1,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $2 (IN=$I1,$2=$I30,OUT=$I2,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2X $3 ($1=VDD,$2=VSS,$3=$I25,$4=$I11);\n"
+    "  subcircuit TRANSISO $4 ();\n"   //  effect of "include floating subcircuits"!
+    "  subcircuit INV2 $5 (IN=$I9,$2=$I31,OUT=$I3,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $6 (IN=$I3,$2=$I32,OUT=$I25,$4=VSS,$5=VDD);\n"
+    "  subcircuit TRANSISOB $7 ();\n"   //  effect of "include floating subcircuits"!
+    "  subcircuit INV2 $7 (IN=$I11,$2=$I33,OUT=$I5,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $8 (IN=$I5,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2X $9 ($1=VDD,$2=VSS,$3=$I2,$4=$I9);\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$2,G=IN,D=$5) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$2,G=IN,D=$4) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  subcircuit TRANS $1 ($1=$2,$2=$4,$3=IN);\n"
+    "  subcircuit TRANS $2 ($1=$2,$2=$5,$3=IN);\n"
+    "  subcircuit TRANS $3 ($1=$4,$2=OUT,$3=$2);\n"
+    "  subcircuit TRANS $4 ($1=$5,$2=OUT,$3=$2);\n"
+    "end;\n"
+    "circuit TRANS ($1=$1,$2=$2,$3=$3);\n"
+    "end;\n"
+    "circuit INV2X ($1=$I4,$2=$I3,$3=$I2,$4=$I1);\n"
+    "  subcircuit INV2 $1 (IN=$I2,$2=$I6,OUT=$I5,$4=$I3,$5=$I4);\n"
+    "  subcircuit INV2 $2 (IN=$I5,$2=$I7,OUT=$I1,$4=$I3,$5=$I4);\n"
+    "  subcircuit TRANSISO $3 ();\n"   //  effect of "include floating subcircuits"!
+    "  subcircuit TRANSISO $4 ();\n"   //  effect of "include floating subcircuits"!
+    "  subcircuit TRANSISOB $5 ();\n"   //  effect of "include floating subcircuits"!
+    "end;\n"
+    "circuit TRANSISO ();\n"
+    "  device NMOS $1 (S=$1,G=$2,D=$1) (L=0.25,W=0.95,AS=0.49875,AD=0.49875,PS=2.95,PD=2.95);\n"
+    "end;\n"
+    "circuit TRANSISOB ();\n"
+    "  device NMOS $1 (S=$1,G=$2,D=$1) (L=0.25,W=0.95,AS=0.49875,AD=0.49875,PS=2.95,PD=2.95);\n"
+    "end;\n"
+  );
+}
+

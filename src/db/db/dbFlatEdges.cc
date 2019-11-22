@@ -112,7 +112,7 @@ FlatEdges::ensure_merged_edges_valid () const
     m_merged_edges.clear ();
 
     db::Shapes tmp (false);
-    EdgeBooleanClusterCollector<db::Shapes> cluster_collector (&tmp, EdgeOr);
+    EdgeBooleanClusterCollectorToShapes cluster_collector (&tmp, EdgeOr);
 
     db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
     scanner.reserve (m_edges.size ());

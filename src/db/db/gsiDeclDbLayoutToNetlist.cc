@@ -329,7 +329,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("global_net_name", &db::LayoutToNetlist::global_net_name, gsi::arg ("global_net_id"),
     "@brief Gets the global net name for the given global net ID."
   ) +
-  gsi::method ("extract_netlist", &db::LayoutToNetlist::extract_netlist, gsi::arg ("join_net_names", std::string ()),
+  gsi::method ("extract_netlist", &db::LayoutToNetlist::extract_netlist, gsi::arg ("join_net_names", std::string ()), gsi::arg ("include_floating_subcircuits", false),
     "@brief Runs the netlist extraction\n"
     "'join_net_names' is a glob expression for labels. Nets on top level carrying the same label which matches this glob "
     "expression will be connected implicitly even if there is no physical connection. This feature is useful to simulate a connection "
@@ -346,7 +346,14 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "Label matching is case sensitive.\n"
     "\n"
+    "With 'include_floating_subcircuits' set to true, subcircuits with no connection to their parent "
+    "circuit are still included in the circuit as floating subcircuits. Specifically on flattening this "
+    "means that these subcircuits are property propagated to their parent instead of appearing as "
+    "additional top circuits.\n"
+    "\n"
     "See the class description for more details.\n"
+    "\n"
+    "The 'include_floating_subcircuits' argument has been introduced in version 0.26.2."
   ) +
   gsi::method_ext ("internal_layout", &l2n_internal_layout,
     "@brief Gets the internal layout\n"

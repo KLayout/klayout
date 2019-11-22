@@ -22,6 +22,15 @@
 
 #include "tlStream.h"
 #include "tlUnitTest.h"
+#include "tlFileUtils.h"
+
+//  Secret mode switchers for testing
+namespace tl
+{
+TL_PUBLIC void file_utils_force_windows ();
+TL_PUBLIC void file_utils_force_linux ();
+TL_PUBLIC void file_utils_force_reset ();
+}
 
 TEST(InputPipe1)
 {
@@ -41,4 +50,60 @@ TEST(InputPipe2)
   int ret = pipe.wait ();
   tl::info << "Process exit code: " << ret;
   EXPECT_NE (ret, 0);
+}
+
+TEST(TextOutputStream)
+{
+  std::string fn = tmp_file ("test.txt");
+
+  {
+    tl::OutputStream os (fn, tl::OutputStream::OM_Auto, false);
+    os << "Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.";
+  }
+
+  {
+    tl::InputStream is (fn);
+    std::string s = is.read_all ();
+    EXPECT_EQ (s, "Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.");
+  }
+
+  try {
+
+    tl::file_utils_force_linux ();
+
+    {
+      tl::OutputStream os (fn, tl::OutputStream::OM_Auto, true);
+      os << "Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.";
+    }
+
+    tl::InputStream is (fn);
+    std::string s = is.read_all ();
+
+    EXPECT_EQ (s, "Hello, world!\nWith another line\n\nseparated by a LFCR and CRLF.");
+    tl::file_utils_force_reset ();
+
+  } catch (...) {
+    tl::file_utils_force_reset ();
+    throw;
+  }
+
+  try {
+
+    tl::file_utils_force_windows ();
+
+    {
+      tl::OutputStream os (fn, tl::OutputStream::OM_Auto, true);
+      os << "Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.";
+    }
+
+    tl::InputStream is (fn);
+    std::string s = is.read_all ();
+
+    EXPECT_EQ (s, "Hello, world!\r\nWith another line\r\n\r\nseparated by a LFCR and CRLF.");
+    tl::file_utils_force_reset ();
+
+  } catch (...) {
+    tl::file_utils_force_reset ();
+    throw;
+  }
 }

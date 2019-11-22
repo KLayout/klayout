@@ -36,6 +36,8 @@ struct BoxScannerTestRecorder
   }
 
   bool stop () const { return false; }
+  void initialize () { str += "[i]"; }
+  void finalize (bool) { str += "[f]"; }
 
   void add (const db::Box * /*b1*/, size_t p1, const db::Box * /*b2*/, size_t p2)
   {
@@ -54,6 +56,8 @@ struct BoxScannerTestRecorderStopping
   }
 
   bool stop () const { return do_stop; }
+  void initialize () { str += "[i]"; }
+  void finalize (bool s) { str += s ? "[f+]" : "[f-]"; }
 
   void add (const db::Box * /*b1*/, size_t p1, const db::Box * /*b2*/, size_t p2)
   {
@@ -70,6 +74,8 @@ struct BoxScannerTestRecorder2
   void finish (const db::Box *, size_t) { }
 
   bool stop () const { return false; }
+  void initialize () { }
+  void finalize (bool) { }
 
   void add (const db::Box * /*b1*/, size_t p1, const db::Box * /*b2*/, size_t p2)
   {
@@ -91,6 +97,8 @@ struct BoxScannerTestRecorderTwo
   }
 
   bool stop () const { return false; }
+  void initialize () { str += "[i]"; }
+  void finalize (bool) { str += "[f]"; }
 
   void add (const db::Box * /*b1*/, size_t p1, const db::SimplePolygon * /*b2*/, int p2)
   {
@@ -113,6 +121,8 @@ struct BoxScannerTestRecorderTwoStopping
   }
 
   bool stop () const { return do_stop; }
+  void initialize () { str += "[i]"; }
+  void finalize (bool s) { str += s ? "[f+]" : "[f-]"; }
 
   void add (const db::Box * /*b1*/, size_t p1, const db::SimplePolygon * /*b2*/, int p2)
   {
@@ -130,6 +140,8 @@ struct BoxScannerTestRecorder2Two
   void finish2 (const db::SimplePolygon *, int) { }
 
   bool stop () const { return false; }
+  void initialize () { }
+  void finalize (bool) { }
 
   void add (const db::Box * /*b1*/, size_t p1, const db::SimplePolygon * /*b2*/, int p2)
   {
@@ -159,11 +171,11 @@ TEST(1)
   db::box_convert<db::Box> bc;
   bs.set_scanner_threshold (0);
   EXPECT_EQ (bs.process (tr, 1, bc), true);
-  EXPECT_EQ (tr.str, "(4-2)(5-2)(5-4)(3-2)(3-4)(5-3)<2><5><4><3>(1-0)<0><1>");
+  EXPECT_EQ (tr.str, "[i](4-2)(5-2)(5-4)(3-2)(3-4)(5-3)<2><5><4><3>(1-0)<0><1>[f]");
 
   BoxScannerTestRecorderStopping trstop;
   EXPECT_EQ (bs.process (trstop, 1, bc), false);
-  EXPECT_EQ (trstop.str, "(4-2)");
+  EXPECT_EQ (trstop.str, "[i](4-2)[f-]");
 }
 
 TEST(1a)
@@ -182,7 +194,7 @@ TEST(1a)
   db::box_convert<db::Box> bc;
   bs.set_scanner_threshold (0);
   bs.process (tr, 1, bc);
-  EXPECT_EQ (tr.str, "(1-0)<0><1>");
+  EXPECT_EQ (tr.str, "[i](1-0)<0><1>[f]");
 }
 
 TEST(1b)
@@ -204,7 +216,7 @@ TEST(1b)
   db::box_convert<db::Box> bc;
   bs.set_scanner_threshold (0);
   bs.process (tr, 1, bc);
-  EXPECT_EQ (tr.str, "(3-0)(1-3)(4-1)(2-4)<0><3><1><4><2>");
+  EXPECT_EQ (tr.str, "[i](3-0)(1-3)(4-1)(2-4)<0><3><1><4><2>[f]");
 }
 
 TEST(1c)
@@ -226,7 +238,7 @@ TEST(1c)
   db::box_convert<db::Box> bc;
   bs.set_scanner_threshold (0);
   bs.process (tr, 1, bc);
-  EXPECT_EQ (tr.str, "(3-0)(1-3)<0>(4-1)<3>(2-4)<1><4><2>");
+  EXPECT_EQ (tr.str, "[i](3-0)(1-3)<0>(4-1)<3>(2-4)<1><4><2>[f]");
 }
 
 TEST(1d)
@@ -248,7 +260,7 @@ TEST(1d)
   db::box_convert<db::Box> bc;
   bs.set_scanner_threshold (0);
   bs.process (tr, 0, bc);
-  EXPECT_EQ (tr.str, "(3-0)<0><3><1><4><2>");
+  EXPECT_EQ (tr.str, "[i](3-0)<0><3><1><4><2>[f]");
 }
 
 TEST(1e)
@@ -269,7 +281,7 @@ TEST(1e)
   bs.set_fill_factor (0.0);
   db::box_convert<db::Box> bc;
   bs.process (tr, 0, bc);
-  EXPECT_EQ (tr.str, "(0-3)<0><1><2><3><4>");
+  EXPECT_EQ (tr.str, "[i](0-3)<0><1><2><3><4>[f]");
 }
 
 TEST(1f)
@@ -280,7 +292,7 @@ TEST(1f)
   bs.set_fill_factor (0.0);
   db::box_convert<db::Box> bc;
   bs.process (tr, 0, bc);
-  EXPECT_EQ (tr.str, "");
+  EXPECT_EQ (tr.str, "[i][f]");
 }
 
 TEST(1g)
@@ -302,7 +314,7 @@ TEST(1g)
   bs.set_fill_factor (0.0);
   db::box_convert<db::Box> bc;
   bs.process (tr, 0, bc);
-  EXPECT_EQ (tr.str, "<2><4>(0-3)<0><1><3>");
+  EXPECT_EQ (tr.str, "[i]<2><4>(0-3)<0><1><3>[f]");
 }
 
 void run_test2 (tl::TestBase *_this, size_t n, double ff, db::Coord spread, bool touch = true)
@@ -927,7 +939,7 @@ TEST(two_1)
   db::box_convert<db::SimplePolygon> bc2;
   bs.set_scanner_threshold (0);
   bs.process (tr, 1, bc1, bc2);
-  EXPECT_EQ (tr.str, "(2-12)(2-14)(4-12)(4-14)(2-15)(4-15)(5-12)(5-14)(5-15)(2-13)(4-13)(3-12)(3-14)(3-13)(3-15)(5-13)(0-10)<2><5><4><3><12><15><14><13>(0-11)(1-10)(1-11)<0><1><10><11>");
+  EXPECT_EQ (tr.str, "[i](2-12)(2-14)(4-12)(4-14)(2-15)(4-15)(5-12)(5-14)(5-15)(2-13)(4-13)(3-12)(3-14)(3-13)(3-15)(5-13)(0-10)<2><5><4><3><12><15><14><13>(0-11)(1-10)(1-11)<0><1><10><11>[f]");
 }
 
 TEST(two_1a)
@@ -963,7 +975,7 @@ TEST(two_1a)
   db::box_convert<db::SimplePolygon> bc2;
   bs.set_scanner_threshold (0);
   bs.process (tr, 1, bc1, bc2);
-  EXPECT_EQ (tr.str, "(2-11)(2-12)(1-11)(1-12)<1><2><11><12>(0-10)<0><10>");
+  EXPECT_EQ (tr.str, "[i](2-11)(2-12)(1-11)(1-12)<1><2><11><12>(0-10)<0><10>[f]");
 }
 
 TEST(two_1b)
@@ -999,12 +1011,12 @@ TEST(two_1b)
   db::box_convert<db::SimplePolygon> bc2;
   bs.set_scanner_threshold (0);
   EXPECT_EQ (bs.process (tr, 1, bc1, bc2), true);
-  EXPECT_EQ (tr.str, "(1-12)(2-12)(1-11)(2-11)<1><2><11><12>(0-10)<0><10>");
+  EXPECT_EQ (tr.str, "[i](1-12)(2-12)(1-11)(2-11)<1><2><11><12>(0-10)<0><10>[f]");
 
 
   BoxScannerTestRecorderTwoStopping trstop;
   EXPECT_EQ (bs.process (trstop, 1, bc1, bc2), false);
-  EXPECT_EQ (trstop.str, "(1-12)");
+  EXPECT_EQ (trstop.str, "[i](1-12)[f-]");
 }
 
 TEST(two_1c)
@@ -1035,7 +1047,7 @@ TEST(two_1c)
   db::box_convert<db::SimplePolygon> bc2;
   bs.set_scanner_threshold (0);
   EXPECT_EQ (bs.process (tr, 1, bc1, bc2), true);
-  EXPECT_EQ (tr.str, "<0><10>(1-12)(2-12)(1-11)(2-11)<1><2><12><11>");
+  EXPECT_EQ (tr.str, "[i]<0><10>(1-12)(2-12)(1-11)(2-11)<1><2><12><11>[f]");
 }
 
 void run_test2_two (tl::TestBase *_this, size_t n, double ff, db::Coord spread, bool touch = true)

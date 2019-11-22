@@ -196,7 +196,7 @@ void Macro::save_to (const std::string &path)
     tl::log << "Saving macro to " << path;
   }
 
-  tl::OutputStream os (path, tl::OutputStream::OM_Plain);
+  tl::OutputStream os (path, tl::OutputStream::OM_Plain, true /*as text*/);
 
   if (m_format == MacroFormat) {
     xml_struct.write (os, *this);

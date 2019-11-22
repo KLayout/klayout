@@ -27,6 +27,7 @@
 #include "dbCommon.h"
 #include "dbBoxScanner.h"
 #include "dbEdgesDelegate.h"
+#include "dbEdgeBoolean.h"
 #include "dbBoxScanner.h"
 #include "dbPolygonTools.h"
 
@@ -136,6 +137,11 @@ public:
   virtual EdgesDelegate *or_with (const Edges &other) const
   {
     return boolean (&other, EdgeOr);
+  }
+
+  virtual EdgesDelegate *intersections (const Edges &other) const
+  {
+    return boolean (&other, EdgeIntersections);
   }
 
   virtual EdgesDelegate *add_in_place (const Edges &other)

@@ -86,7 +86,7 @@ public:
  *  devices.
  */
 class DB_PUBLIC Circuit
-  : public gsi::ObjectBase, public tl::Object
+  : public db::NetlistObject, public gsi::ObjectBase
 {
 public:
   typedef tl::vector<Pin> pin_list;
@@ -325,6 +325,12 @@ public:
   const Pin &add_pin (const std::string &name);
 
   /**
+   *  @brief Adds a pin to this circuit
+   *  This version uses the given pin as the template.
+   */
+  const Pin &add_pin (const Pin &pin);
+
+  /**
    *  @brief Begin iterator for the pins of the circuit (non-const version)
    */
   pin_iterator begin_pins ()
@@ -354,12 +360,28 @@ public:
   const Pin *pin_by_id (size_t id) const;
 
   /**
+   *  @brief Gets the pin by ID (the ID is basically the index) - non-const version
+   */
+  Pin *pin_by_id (size_t id)
+  {
+    return const_cast<Pin *> (((const db::Circuit *) this)->pin_by_id (id));
+  }
+
+  /**
    *  @brief Gets the pin by name
    *
    *  If there is no pin with that name, null is returned.
    *  NOTE: this is a linear search, so it's performance may not be good for many pins.
    */
   const Pin *pin_by_name (const std::string &name) const;
+
+  /**
+   *  @brief Gets the pin by name - non-const version
+   */
+  Pin *pin_by_name (const std::string &name)
+  {
+    return const_cast<Pin *> (((const db::Circuit *) this)->pin_by_name (name));
+  }
 
   /**
    *  @brief Begin iterator for the pins of the circuit (const version)

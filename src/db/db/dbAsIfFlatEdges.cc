@@ -533,7 +533,7 @@ EdgesDelegate *
 AsIfFlatEdges::boolean (const Edges *other, EdgeBoolOp op) const
 {
   std::auto_ptr<FlatEdges> output (new FlatEdges (true));
-  EdgeBooleanClusterCollector<db::Shapes> cluster_collector (&output->raw_edges (), op);
+  EdgeBooleanClusterCollectorToShapes cluster_collector (&output->raw_edges (), op);
 
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve (size () + (other ? other->size () : 0));

@@ -294,7 +294,7 @@ size_t LayoutToNetlist::global_net_id (const std::string &name)
   return m_conn.global_net_id (name);
 }
 
-void LayoutToNetlist::extract_netlist (const std::string &joined_net_names)
+void LayoutToNetlist::extract_netlist (const std::string &joined_net_names, bool include_floating_subcircuits)
 {
   if (m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
@@ -302,7 +302,9 @@ void LayoutToNetlist::extract_netlist (const std::string &joined_net_names)
   ensure_netlist ();
 
   db::NetlistExtractor netex;
-  netex.extract_nets (dss (), m_layout_index, m_conn, *mp_netlist, m_net_clusters, joined_net_names);
+  netex.set_joined_net_names (joined_net_names);
+  netex.set_include_floating_subcircuits (include_floating_subcircuits);
+  netex.extract_nets (dss (), m_layout_index, m_conn, *mp_netlist, m_net_clusters);
 
   m_netlist_extracted = true;
 }
@@ -814,11 +816,20 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
 db::properties_id_type
 LayoutToNetlist::make_netname_propid (db::Layout &ly, const tl::Variant &netname_prop, const db::Net &net) const
 {
-  if (! netname_prop.is_nil ()) {
+  if (! netname_prop.is_nil () || net.begin_properties () != net.end_properties ()) {
 
-    db::property_names_id_type name_propnameid = ly.properties_repository ().prop_name_id (netname_prop);
     db::PropertiesRepository::properties_set propset;
-    propset.insert (std::make_pair (name_propnameid, tl::Variant (net.expanded_name ())));
+
+    //  add the user properties too (TODO: make this configurable?)
+    for (db::Net::property_iterator p = net.begin_properties (); p != net.end_properties (); ++p) {
+      db::property_names_id_type key_propnameid = ly.properties_repository ().prop_name_id (p->first);
+      propset.insert (std::make_pair (key_propnameid, p->second));
+    }
+
+    if (! netname_prop.is_nil ()) {
+      db::property_names_id_type name_propnameid = ly.properties_repository ().prop_name_id (netname_prop);
+      propset.insert (std::make_pair (name_propnameid, tl::Variant (net.expanded_name ())));
+    }
 
     return ly.properties_repository ().properties_id (propset);
 
@@ -1024,16 +1035,36 @@ db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::Poin
       cell_indexes.push_back (i->inst_ptr.cell_index ());
     }
 
-    db::Circuit *circuit = mp_netlist->circuit_by_cell_index (cell_indexes.back ());
-    if (! circuit) {
-      //  the circuit has probably been optimized away
-      return 0;
-    }
+    db::Circuit *circuit = 0;
+    db::Net *net = 0;
 
-    db::Net *net = circuit->net_by_cluster_id (cluster_id);
-    if (! net) {
-      //  the net has probably been optimized away
-      return 0;
+    while (true) {
+
+      circuit = mp_netlist->circuit_by_cell_index (cell_indexes.back ());
+      if (circuit) {
+        net = circuit->net_by_cluster_id (cluster_id);
+        if (net) {
+          break;
+        }
+      }
+
+      //  The net might have been propagated to the parent. So move there.
+      if (inst_path.empty ()) {
+        return 0;
+      }
+
+      db::ClusterInstance ci (cluster_id, inst_path.back ());
+
+      cell_indexes.pop_back ();
+      inst_path.pop_back ();
+
+      cluster_id = m_net_clusters.clusters_per_cell (cell_indexes.back ()).find_cluster_with_connection (ci);
+
+      //  no parent cluster found
+      if (cluster_id == 0) {
+        return 0;
+      }
+
     }
 
     //  follow the path up in the net hierarchy using the transformation and the upper cell index as the

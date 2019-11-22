@@ -28,6 +28,7 @@
 #include "dbCommon.h"
 
 #include "dbLayout.h"
+#include "dbEdgeBoolean.h"
 
 #include <unordered_map>
 #include <unordered_set>
@@ -151,7 +152,7 @@ class DB_PUBLIC EdgeBoolAndOrNotLocalOperation
   : public local_operation<db::Edge, db::Edge, db::Edge>
 {
 public:
-  EdgeBoolAndOrNotLocalOperation (bool is_and);
+  EdgeBoolAndOrNotLocalOperation (EdgeBoolOp op);
 
   virtual void compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::Edge> &interactions, std::unordered_set<db::Edge> &result, size_t max_vertex_count, double area_ratio) const;
   virtual on_empty_intruder_mode on_empty_intruder_hint () const;
@@ -161,7 +162,7 @@ public:
   virtual db::Coord dist () const { return 1; }
 
 private:
-  bool m_is_and;
+  EdgeBoolOp m_op;
 };
 
 /**

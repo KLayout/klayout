@@ -95,7 +95,7 @@ struct DeviceAbstractRef
  *  a specific device class.
  */
 class DB_PUBLIC Device
-  : public tl::Object
+  : public db::NetlistObject
 {
 public:
   typedef std::vector<std::pair<size_t, size_t> > global_connections;

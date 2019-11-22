@@ -24,6 +24,7 @@
 #include "dbTechnology.h"
 #include "dbStream.h"
 #include "tlFileUtils.h"
+#include "tlExpression.h"
 
 #include <stdio.h>
 
@@ -408,13 +409,24 @@ Technology::set_component (TechnologyComponent *component)
   }
 }
 
+std::string
+Technology::base_path () const
+{
+  tl::Eval expr;
+  expr.set_var ("tech_dir", m_default_base_path);
+  expr.set_var ("tech_file", m_lyt_file);
+  expr.set_var ("tech_name", name ());
+  return expr.interpolate (m_explicit_base_path.empty () ? m_default_base_path : m_explicit_base_path);
+}
+
 std::string 
 Technology::correct_path (const std::string &fp) const
 {
-  if (base_path ().empty ()) {
+  std::string bp = base_path ();
+  if (bp.empty ()) {
     return fp;
   } else {
-    return tl::relative_path (base_path (), fp);
+    return tl::relative_path (bp, fp);
   }
 }
 
@@ -442,14 +454,15 @@ Technology::save (const std::string &fn) const
 std::string 
 Technology::build_effective_path (const std::string &p) const
 {
-  if (p.empty () || base_path ().empty ()) {
+  std::string bp = base_path ();
+  if (p.empty () || bp.empty ()) {
     return p;
   }
 
   if (tl::is_absolute (p)) {
     return p;
   } else {
-    return tl::combine_path (base_path (), p);
+    return tl::combine_path (bp, p);
   }
 }
 

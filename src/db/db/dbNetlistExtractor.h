@@ -81,10 +81,44 @@ public:
   NetlistExtractor ();
 
   /**
+   *  @brief Sets a flag indicating whether floating circuits shall be included as subcircuits
+   *  If this attribute is set to true, disconnected subcircuits (such that do not have a pin)
+   *  are included per instance of a cell. Such subcircuits do not have a connection to their
+   *  parent circuit but reflect the hierarchy they are present it. This is useful when the
+   *  netlist is supposed to be flattened later, because then each subcircuit will render floating
+   *  nets in the parent circuit. With this flag set to false, floating circuits will always appear
+   *  as additional top cells.
+   */
+  void set_include_floating_subcircuits (bool f);
+
+  /**
+   *  @brief Gets a flag indicating whether floating circuits shall be included as subcircuits
+   */
+  bool include_floating_subcircuits () const
+  {
+    return m_include_floating_subcircuits;
+  }
+
+  /**
+   *  @brief Sets the joined net names attribute
+   *  This is a glob expression rendering net names where partial nets with the
+   *  same name are joined even without explicit connection.
+   */
+  void set_joined_net_names (const std::string &jnn);
+
+  /**
+   *  @brief Gets the joined net names expression
+   */
+  const std::string &joined_net_names () const
+  {
+    return m_joined_net_names;
+  }
+
+  /**
    *  @brief Extract the nets
    *  See the class description for more details.
    */
-  void extract_nets (const db::DeepShapeStore &dss, unsigned int layout_index, const db::Connectivity &conn, db::Netlist &nl, hier_clusters_type &clusters, const std::string &joined_net_names = std::string ());
+  void extract_nets (const db::DeepShapeStore &dss, unsigned int layout_index, const db::Connectivity &conn, db::Netlist &nl, hier_clusters_type &clusters);
 
 private:
   hier_clusters_type *mp_clusters;
@@ -93,6 +127,8 @@ private:
   std::pair<bool, db::property_names_id_type> m_text_annot_name_id;
   std::pair<bool, db::property_names_id_type> m_device_annot_name_id;
   std::pair<bool, db::property_names_id_type> m_terminal_annot_name_id;
+  std::string m_joined_net_names;
+  bool m_include_floating_subcircuits;
 
   bool instance_is_device (db::properties_id_type prop_id) const;
   db::Device *device_from_instance (db::properties_id_type prop_id, db::Circuit *circuit) const;
@@ -105,6 +141,18 @@ private:
    *  returns the new pin's ID.
    */
   size_t make_pin (db::Circuit *circuit, db::Net *net);
+
+  /**
+   *  @brief Makes a subcircuit for the given instance (by cell index and transformation)
+   *  This method maintains a subcircuit cache in "subcircuits" and will pull the subcircuit from there
+   *  if possible.
+   *  It returns the new or old subcircuit.
+   */
+  db::SubCircuit *make_subcircuit (Circuit *circuit,
+                                   db::cell_index_type inst_cell_index,
+                                   const db::ICplxTrans &inst_trans,
+                                   std::map<std::pair<db::cell_index_type, db::ICplxTrans>, db::SubCircuit *> &subcircuits,
+                                   const std::map<db::cell_index_type, db::Circuit *> &circuits);
 
   /**
    *  @brief Turns the connections of a cluster into subcircuit instances

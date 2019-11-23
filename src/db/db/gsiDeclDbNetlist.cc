@@ -1131,6 +1131,11 @@ Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
     "to the outside through such a pin. The pin is added after all existing "
     "pins. For more details see the \\Pin class."
   ) +
+  gsi::method ("remove_pin", &db::Circuit::remove_pin, gsi::arg ("id"),
+    "@brief Removes the pin with the given ID from the circuit\n"
+    "\n"
+    "This method has been introduced in version 0.26.2.\n"
+  ) +
   gsi::iterator ("each_child", (db::Circuit::child_circuit_iterator (db::Circuit::*) ()) &db::Circuit::begin_children, (db::Circuit::child_circuit_iterator (db::Circuit::*) ()) &db::Circuit::end_children,
     "@brief Iterates over the child circuits of this circuit\n"
     "Child circuits are the ones that are referenced from this circuit via subcircuits."

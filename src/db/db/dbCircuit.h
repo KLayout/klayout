@@ -89,7 +89,7 @@ class DB_PUBLIC Circuit
   : public db::NetlistObject, public gsi::ObjectBase
 {
 public:
-  typedef tl::vector<Pin> pin_list;
+  typedef std::list<Pin> pin_list;
   typedef pin_list::const_iterator const_pin_iterator;
   typedef pin_list::iterator pin_iterator;
   typedef tl::shared_collection<Device> device_list;
@@ -329,6 +329,11 @@ public:
    *  This version uses the given pin as the template.
    */
   const Pin &add_pin (const Pin &pin);
+
+  /**
+   *  @brief Removes the pin with the given ID
+   */
+  void remove_pin (size_t id);
 
   /**
    *  @brief Begin iterator for the pins of the circuit (non-const version)
@@ -751,6 +756,7 @@ private:
   db::cell_index_type m_cell_index;
   net_list m_nets;
   pin_list m_pins;
+  std::vector<pin_list::iterator> m_pin_by_id;
   device_list m_devices;
   subcircuit_list m_subcircuits;
   Netlist *mp_netlist;

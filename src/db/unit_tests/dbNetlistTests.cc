@@ -360,6 +360,17 @@ TEST(3_CircuitBasic)
   EXPECT_EQ (c2.pin_by_id (0)->name (), "p1");
   EXPECT_EQ (c2.pin_by_id (1)->name (), "p2");
   EXPECT_EQ (c2.pin_by_id (2), 0);
+
+  c2.remove_pin (1);
+  EXPECT_EQ (c2.pin_by_id (0)->name (), "p1");
+  EXPECT_EQ (c2.pin_by_id (1), 0);
+  EXPECT_EQ (c2.pin_by_id (2), 0);
+
+  db::Pin p3 = c2.add_pin ("p3");
+  EXPECT_EQ (c2.pin_by_id (0)->name (), "p1");
+  EXPECT_EQ (c2.pin_by_id (1), 0);
+  EXPECT_EQ (c2.pin_by_id (2)->name (), "p3");
+  EXPECT_EQ (c2.pin_by_id (3), 0);
 }
 
 TEST(4_CircuitDevices)

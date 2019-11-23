@@ -1404,7 +1404,7 @@ TEST(22_BlankCircuit)
   nl2.purge ();
 
   EXPECT_EQ (nl2.to_string (),
-    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "circuit RINGO (OSC=OSC,VSS=VSS,VDD=VDD);\n"
     "  subcircuit INV2 INV2_SC1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
     "  subcircuit INV2 INV2_SC2 (IN=FB,$2=(null),OUT=$I8,$4=VSS,$5=VDD);\n"
     "end;\n"

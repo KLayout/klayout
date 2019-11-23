@@ -282,37 +282,10 @@ void NetlistSpiceReader::read (tl::InputStream &stream, db::Netlist &netlist)
   }
 }
 
-/**
- *  @brief Removes dummy nets which are just there to define a pin for a subcircuit
- */
-static void
-remove_dummy_nets (db::Circuit &circuit)
-{
-  std::vector<db::Net *> nets_to_be_purged;
-  for (db::Circuit::net_iterator n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
-    if (n->subcircuit_pin_count () == 1 && (n->terminal_count () + n->pin_count ()) == 0) {
-      nets_to_be_purged.push_back (n.operator-> ());
-    }
-  }
-
-  for (std::vector<db::Net *>::const_iterator n = nets_to_be_purged.begin (); n != nets_to_be_purged.end (); ++n) {
-    delete *n;
-  }
-}
-
 void NetlistSpiceReader::finish ()
 {
   while (! m_streams.empty ()) {
     pop_stream ();
-  }
-
-  if (mp_netlist) {
-    //  purge nets with single connections (this way unconnected pins can be realized)
-    //  NOTE: we don't use Netlist::purge_nets as this method has too many side effects
-    db::NetlistLocker locker (mp_netlist);
-    for (db::Netlist::bottom_up_circuit_iterator c = mp_netlist->begin_bottom_up (); c != mp_netlist->end_bottom_up (); ++c) {
-      remove_dummy_nets (*c);
-    }
   }
 
   mp_stream.reset (0);

@@ -575,7 +575,17 @@ void Circuit::connect_pin (size_t pin_id, Net *net)
   }
 }
 
+void Circuit::purge_nets_keep_pins ()
+{
+  do_purge_nets (true);
+}
+
 void Circuit::purge_nets ()
+{
+  do_purge_nets (false);
+}
+
+void Circuit::do_purge_nets (bool keep_pins)
 {
   std::vector<db::Net *> nets_to_be_purged;
   for (net_iterator n = begin_nets (); n != end_nets (); ++n) {
@@ -587,29 +597,35 @@ void Circuit::purge_nets ()
   std::set<size_t> pins_to_delete;
 
   for (std::vector<db::Net *>::const_iterator n = nets_to_be_purged.begin (); n != nets_to_be_purged.end (); ++n) {
-    for (db::Net::pin_iterator p = (*n)->begin_pins (); p != (*n)->end_pins (); ++p) {
-      pins_to_delete.insert (p->pin_id ());
+    if (! keep_pins) {
+      for (db::Net::pin_iterator p = (*n)->begin_pins (); p != (*n)->end_pins (); ++p) {
+        pins_to_delete.insert (p->pin_id ());
+      }
     }
     delete *n;
   }
 
-  //  remove the pin references of the pins we're going to delete
-  for (refs_iterator r = begin_refs (); r != end_refs (); ++r) {
-    db::SubCircuit *subcircuit = r.operator-> ();
-    for (std::set<size_t>::const_iterator p = pins_to_delete.begin (); p != pins_to_delete.end (); ++p) {
-      db::Net *net = subcircuit->net_for_pin (*p);
-      for (db::Net::subcircuit_pin_iterator sp = net->begin_subcircuit_pins (); sp != net->end_subcircuit_pins (); ++sp) {
-        if (sp->pin_id () == *p && sp->subcircuit () == subcircuit) {
-          net->erase_subcircuit_pin (sp);
-          break;
+  if (! pins_to_delete.empty ()) {
+
+    //  remove the pin references of the pins we're going to delete
+    for (refs_iterator r = begin_refs (); r != end_refs (); ++r) {
+      db::SubCircuit *subcircuit = r.operator-> ();
+      for (std::set<size_t>::const_iterator p = pins_to_delete.begin (); p != pins_to_delete.end (); ++p) {
+        db::Net *net = subcircuit->net_for_pin (*p);
+        for (db::Net::subcircuit_pin_iterator sp = net->begin_subcircuit_pins (); sp != net->end_subcircuit_pins (); ++sp) {
+          if (sp->pin_id () == *p && sp->subcircuit () == subcircuit) {
+            net->erase_subcircuit_pin (sp);
+            break;
+          }
         }
       }
     }
-  }
 
-  //  and actually remove those pins
-  for (std::set<size_t>::const_iterator p = pins_to_delete.begin (); p != pins_to_delete.end (); ++p) {
-    remove_pin (*p);
+    //  and actually remove those pins
+    for (std::set<size_t>::const_iterator p = pins_to_delete.begin (); p != pins_to_delete.end (); ++p) {
+      remove_pin (*p);
+    }
+
   }
 }
 

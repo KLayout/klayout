@@ -1316,8 +1316,16 @@ Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
   ) +
   gsi::method ("purge_nets", &db::Circuit::purge_nets,
     "@brief Purges floating nets.\n"
-    "Floating nets can be created as effect of reconnections of devices or pins. "
-    "This method will eliminate all nets that make less than two connections."
+    "Floating nets are nets with no device or subcircuit attached to. Such floating "
+    "nets are removed in this step. If these nets are connected outward to a circuit pin, this "
+    "circuit pin is also removed."
+  ) +
+  gsi::method ("purge_nets_keep_pins", &db::Circuit::purge_nets_keep_pins,
+    "@brief Purges floating nets but keep pins.\n"
+    "This method will remove floating nets like \\purge_nets, but if these nets are attached "
+    "to a pin, the pin will be left disconnected from any net.\n"
+    "\n"
+    "This method has been introduced in version 0.26.2.\n"
   ),
   "@brief Circuits are the basic building blocks of the netlist\n"
   "A circuit has pins by which it can connect to the outside. Pins are "

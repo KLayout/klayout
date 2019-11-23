@@ -713,9 +713,18 @@ public:
   /**
    *  @brief Purge unused nets
    *
-   *  This method will purge all nets which return "floating".
+   *  This method will purge all nets which return "is_passive".
+   *  Pins on these nets will also be removed.
    */
   void purge_nets ();
+
+  /**
+   *  @brief Purge unused nets but
+   *
+   *  This method will purge all nets which return "is_passive".
+   *  Pins on these nets will be kept but their net will be 0.
+   */
+  void purge_nets_keep_pins ();
 
   /**
    *  @brief Combine devices
@@ -786,6 +795,7 @@ private:
   void set_netlist (Netlist *netlist);
   bool combine_parallel_devices (const db::DeviceClass &cls);
   bool combine_serial_devices (const db::DeviceClass &cls);
+  void do_purge_nets (bool keep_pins);
 
   void devices_changed ();
   void subcircuits_changed ();

@@ -1849,7 +1849,7 @@ static void autorun_for (lym::MacroCollection &collection, bool early)
   }
 
   for (lym::MacroCollection::iterator c = collection.begin (); c != collection.end (); ++c) {
-    if ((early && c->second->is_autorun_early ()) || (!early && c->second->is_autorun () && !c->second->is_autorun_early ())) {
+    if (c->second->can_run () && ((early && c->second->is_autorun_early ()) || (!early && c->second->is_autorun () && !c->second->is_autorun_early ()))) {
       BEGIN_PROTECTED_SILENT
         c->second->run ();
         c->second->install_doc ();

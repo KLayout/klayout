@@ -2997,10 +2997,11 @@ NetlistComparer::handle_pin_mismatch (const db::NetGraph &g1, const db::Circuit 
   const db::NetGraph *graph = pin1 ? &g1 : &g2;
   const db::Net *net = c->net_for_pin (pin->id ());
 
-  //  Nets which are paired with "null" trigger this condition:
+  //  Nets which are paired with "null" are "safely to be ignored" and
+  //  pin matching against "null" is valid.
   if (net) {
     const db::NetGraphNode &n = graph->node (graph->node_index_for_net (net));
-    if (n.has_other ()) {
+    if (n.has_other () && n.other_net_index () == 0) {
       if (mp_logger) {
         mp_logger->match_pins (pin1, pin2);
       }

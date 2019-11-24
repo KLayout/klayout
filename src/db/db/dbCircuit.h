@@ -89,7 +89,7 @@ class DB_PUBLIC Circuit
   : public db::NetlistObject, public gsi::ObjectBase
 {
 public:
-  typedef tl::vector<Pin> pin_list;
+  typedef std::list<Pin> pin_list;
   typedef pin_list::const_iterator const_pin_iterator;
   typedef pin_list::iterator pin_iterator;
   typedef tl::shared_collection<Device> device_list;
@@ -329,6 +329,11 @@ public:
    *  This version uses the given pin as the template.
    */
   const Pin &add_pin (const Pin &pin);
+
+  /**
+   *  @brief Removes the pin with the given ID
+   */
+  void remove_pin (size_t id);
 
   /**
    *  @brief Begin iterator for the pins of the circuit (non-const version)
@@ -708,9 +713,18 @@ public:
   /**
    *  @brief Purge unused nets
    *
-   *  This method will purge all nets which return "floating".
+   *  This method will purge all nets which return "is_passive".
+   *  Pins on these nets will also be removed.
    */
   void purge_nets ();
+
+  /**
+   *  @brief Purge unused nets but
+   *
+   *  This method will purge all nets which return "is_passive".
+   *  Pins on these nets will be kept but their net will be 0.
+   */
+  void purge_nets_keep_pins ();
 
   /**
    *  @brief Combine devices
@@ -751,6 +765,7 @@ private:
   db::cell_index_type m_cell_index;
   net_list m_nets;
   pin_list m_pins;
+  std::vector<pin_list::iterator> m_pin_by_id;
   device_list m_devices;
   subcircuit_list m_subcircuits;
   Netlist *mp_netlist;
@@ -780,6 +795,7 @@ private:
   void set_netlist (Netlist *netlist);
   bool combine_parallel_devices (const db::DeviceClass &cls);
   bool combine_serial_devices (const db::DeviceClass &cls);
+  void do_purge_nets (bool keep_pins);
 
   void devices_changed ();
   void subcircuits_changed ();

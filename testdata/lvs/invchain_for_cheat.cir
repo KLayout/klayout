@@ -1,85 +1,27 @@
 
 * cell INVCHAIN
 .SUBCKT INVCHAIN
-* cell instance $1 r0 *1 -1.5,-0.8
-X$1 9 7 8 6 9 5 1 5 3 2 13 14 INV3
-* cell instance $2 r0 *1 2.6,-0.8
-X$2 8 11 9 10 8 11 2 12 2 12 5 4 13 14 INV2
-* cell instance $3 m90 *1 7.4,0
-X$3 14 13 11 12 4 4 10 10 INV
+X$1 1 2 3 4 4 5 5 6 INV3
+X$2 1 2 6 7 7 8 INV2
+X$3 1 2 8 9 INV
 .ENDS INVCHAIN
 
 * cell INV3
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-.SUBCKT INV3 1 2 3 4 5 6 7 8 9 10 11 12
-* cell instance $1 r0 *1 4.8,0.8
-X$1 12 11 3 10 8 6 1 5 INV
-* cell instance $2 r0 *1 1.5,0.8
-X$2 12 11 4 7 9 9 2 2 INV
-* cell instance $3 m90 *1 2.3,0.8
-X$3 12 11 2 9 7 7 4 4 INV
+.SUBCKT INV3 1 2 3 4 5 6 7 8 
+X$1 1 2 3 4 INV
+X$2 1 2 5 6 INV
+X$3 1 2 7 8 INV
 .ENDS INV3
 
 * cell INV2
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-.SUBCKT INV2 1 2 3 4 5 6 7 8 9 10 11 12 13 14
-* cell instance $1 m90 *1 1.5,0.8
-X$1 14 13 3 11 9 7 1 5 INV
-* cell instance $2 r0 *1 4,0.8
-X$2 14 13 4 12 10 8 2 6 INV
+.SUBCKT INV2 1 2 3 4 5 6 
+X$1 1 2 3 4 INV
+X$2 1 2 5 6 INV
 .ENDS INV2
 
 * cell INV
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-* pin 
-.SUBCKT INV 1 2 3 4 5 6 7 8
-* cell instance $1 r0 *1 0,0
-X$1 4 1 3 TRANS
-* cell instance $2 r0 *1 0,2.8
-X$2 4 2 3 TRANS
-* device instance $1 r0 *1 0,2.8 PMOS
-M$1 4 3 2 4 PMOS L=0.25U W=0.95U AS=0.79325P AD=0.26125P PS=3.57U PD=1.5U
-* device instance $2 r0 *1 0.8,2.8 PMOS
-M$2 2 7 5 2 PMOS L=0.25U W=0.95U AS=0.26125P AD=0.03325P PS=1.5U PD=1.97U
-* device instance $3 r0 *1 0,0 NMOS
-M$3 4 3 1 4 NMOS L=0.25U W=0.95U AS=0.79325P AD=0.26125P PS=3.57U PD=1.5U
-* device instance $4 r0 *1 0.8,0 NMOS
-M$4 1 8 6 1 NMOS L=0.25U W=0.95U AS=0.26125P AD=0.03325P PS=1.5U PD=1.97U
+.SUBCKT INV 1 2 3 4 
+M$1 1 3 4 1 PMOS L=0.25U W=0.95U
+M$3 2 3 4 2 NMOS L=0.25U W=0.95U
 .ENDS INV
 
-* cell TRANS
-* pin 
-* pin 
-* pin 
-.SUBCKT TRANS 1 2 3
-.ENDS TRANS

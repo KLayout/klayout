@@ -2055,11 +2055,11 @@ TEST(14_Subcircuit2NandMismatchNoSwap)
     "net_mismatch INT IN1\n"
     "net_mismatch IN1 INT\n"
     "net_mismatch IN2 IN2\n"
-    "match_pins $0 (null)\n"
     "match_pins $1 $1\n"
     "match_pins $2 $2\n"
     "match_pins $3 $3\n"
     "match_pins $4 $4\n"
+    "match_pins $0 (null)\n"
     "match_pins (null) $0\n"
     "match_subcircuits $2 $1\n"
     "subcircuit_mismatch $1 $2\n"
@@ -3366,3 +3366,340 @@ TEST(21_BusLikeAmbiguousConnections)
   EXPECT_EQ (good, true);
 }
 
+TEST(22_NodesRemoved)
+{
+  const char *nls1 =
+    "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV2PAIR $1 ($2=FB,$3=VDD,$4=VSS,$5=$I7,$6=OSC);\n"
+    "  subcircuit INV2PAIR $2 ($2=$I22,$3=VDD,$4=VSS,$5=FB,$6=$I21);\n"
+    "  subcircuit INV2PAIR $3 ($2=$I23,$3=VDD,$4=VSS,$5=$I21,$6=$I5);\n"
+    "  subcircuit INV2PAIR $4 ($2=$I24,$3=VDD,$4=VSS,$5=$I5,$6=$I6);\n"
+    "  subcircuit INV2PAIR $5 ($2=$I25,$3=VDD,$4=VSS,$5=$I6,$6=$I7);\n"
+    "end;\n"
+    "circuit INV2PAIR ($2=$I8,$3=$I5,$4=$I4,$5=$I3,$6=$I2);\n"
+    "  subcircuit INV2 $1 (IN=$I3,$3=$I7,OUT=$I6,VSS=$I4,VDD=$I5);\n"
+    "  subcircuit INV2 $2 (IN=$I6,$3=$I8,OUT=$I2,VSS=$I4,VDD=$I5);\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD);\n"
+    "  device PMOS $1 (S=$3,G=IN,D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=$3,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$3,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=VSS,G=$3,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV2PAIR $1 (BULK=VSS,$2=FB,$3=VDD,$4=VSS,$5=$I7,$6=OSC,$7=VDD);\n"
+    "  subcircuit INV2PAIR $2 (BULK=VSS,$2=$I22,$3=VDD,$4=VSS,$5=FB,$6=$I13,$7=VDD);\n"
+    "  subcircuit INV2PAIR $3 (BULK=VSS,$2=$I23,$3=VDD,$4=VSS,$5=$I13,$6=$I5,$7=VDD);\n"
+    "  subcircuit INV2PAIR $4 (BULK=VSS,$2=$I24,$3=VDD,$4=VSS,$5=$I5,$6=$I6,$7=VDD);\n"
+    "  subcircuit INV2PAIR $5 (BULK=VSS,$2=$I25,$3=VDD,$4=VSS,$5=$I6,$6=$I7,$7=VDD);\n"
+    "end;\n"
+    "circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1);\n"
+    "  subcircuit INV2 $1 ($1=$I1,IN=$I3,$3=$I7,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);\n"
+    "  subcircuit INV2 $2 ($1=$I1,IN=$I4,$3=$I8,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK);\n"
+    "end;\n"
+    "circuit INV2 ($1=$1,IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK);\n"
+    "  device PMOS $1 (S=$3,G=IN,D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=$3,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$3,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=VSS,G=$3,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  std::string txt = logger.text ();
+
+  EXPECT_EQ (txt,
+    "begin_circuit INV2 INV2\n"
+    "match_nets VDD VDD\n"
+    "match_nets OUT OUT\n"
+    "match_nets $3 $3\n"
+    "match_nets IN IN\n"
+    "match_nets VSS VSS\n"
+    "match_nets (null) $1\n"
+    "match_nets (null) BULK\n"
+    "match_pins IN IN\n"
+    "match_pins $1 $2\n"
+    "match_pins OUT OUT\n"
+    "match_pins VSS VSS\n"
+    "match_pins VDD VDD\n"
+    "match_pins (null) $0\n"
+    "match_pins (null) BULK\n"
+    "match_devices $1 $1\n"
+    "match_devices $2 $2\n"
+    "match_devices $3 $3\n"
+    "match_devices $4 $4\n"
+    "end_circuit INV2 INV2 MATCH\n"
+    "begin_circuit INV2PAIR INV2PAIR\n"
+    "match_nets $I2 $I2\n"
+    "match_nets $I5 $I6\n"
+    "match_nets $I4 $I5\n"
+    "match_nets $I6 $I4\n"
+    "match_nets $I3 $I3\n"
+    "match_nets $I7 $I7\n"
+    "match_nets $I8 $I8\n"
+    "match_nets (null) BULK\n"
+    "match_nets (null) $I1\n"
+    "match_pins $0 $1\n"
+    "match_pins $1 $2\n"
+    "match_pins $2 $3\n"
+    "match_pins $3 $4\n"
+    "match_pins $4 $5\n"
+    "match_pins (null) BULK\n"
+    "match_pins (null) $6\n"
+    "match_subcircuits $1 $1\n"
+    "match_subcircuits $2 $2\n"
+    "end_circuit INV2PAIR INV2PAIR MATCH\n"
+    "begin_circuit RINGO RINGO\n"
+    "match_nets OSC OSC\n"
+    "match_nets $I7 $I7\n"
+    "match_nets $I6 $I6\n"
+    "match_nets $I5 $I5\n"
+    "match_nets $I21 $I13\n"
+    "match_nets FB FB\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets $I22 $I22\n"
+    "match_nets $I23 $I23\n"
+    "match_nets $I24 $I24\n"
+    "match_nets $I25 $I25\n"
+    "match_pins FB FB\n"
+    "match_pins OSC OSC\n"
+    "match_pins VDD VDD\n"
+    "match_pins VSS VSS\n"
+    "match_subcircuits $1 $1\n"
+    "match_subcircuits $2 $2\n"
+    "match_subcircuits $3 $3\n"
+    "match_subcircuits $4 $4\n"
+    "match_subcircuits $5 $5\n"
+    "end_circuit RINGO RINGO MATCH"
+  );
+  EXPECT_EQ (good, true);
+}
+
+TEST(23_NodesRemovedWithError)
+{
+  const char *nls1 =
+    "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV2PAIR $1 ($2=FB,$3=VDD,$4=VSS,$5=$I7,$6=OSC);\n"
+    "  subcircuit INV2PAIR $2 ($2=$I22,$3=VDD,$4=VSS,$5=FB,$6=$I21);\n"
+    "  subcircuit INV2PAIR $3 ($2=$I23,$3=VDD,$4=VSS,$5=$I21,$6=$I5);\n"
+    "  subcircuit INV2PAIR $4 ($2=$I24,$3=VDD,$4=VSS,$5=$I5,$6=$I6);\n"
+    "  subcircuit INV2PAIR $5 ($2=$I25,$3=VDD,$4=VSS,$5=$I6,$6=$I7);\n"
+    "end;\n"
+    "circuit INV2PAIR ($2=$I8,$3=$I5,$4=$I4,$5=$I3,$6=$I2);\n"
+    //  NOTE: $1 pin should not be connected to different nets, although it's not functional
+    "  subcircuit INV2 $1 ($1=$3,IN=$I3,$3=$I7,OUT=$I6,VSS=$I4,VDD=$I5);\n"
+    "  subcircuit INV2 $2 ($1=$6,IN=$I6,$3=$I8,OUT=$I2,VSS=$I4,VDD=$I5);\n"
+    "end;\n"
+    "circuit INV2 ($1=$1,IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD);\n"
+    "  device PMOS $1 (S=$3,G=IN,D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=$3,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$3,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=VSS,G=$3,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV2PAIR $1 (BULK=VSS,$2=FB,$3=VDD,$4=VSS,$5=$I7,$6=OSC,$7=VDD);\n"
+    "  subcircuit INV2PAIR $2 (BULK=VSS,$2=$I22,$3=VDD,$4=VSS,$5=FB,$6=$I13,$7=VDD);\n"
+    "  subcircuit INV2PAIR $3 (BULK=VSS,$2=$I23,$3=VDD,$4=VSS,$5=$I13,$6=$I5,$7=VDD);\n"
+    "  subcircuit INV2PAIR $4 (BULK=VSS,$2=$I24,$3=VDD,$4=VSS,$5=$I5,$6=$I6,$7=VDD);\n"
+    "  subcircuit INV2PAIR $5 (BULK=VSS,$2=$I25,$3=VDD,$4=VSS,$5=$I6,$6=$I7,$7=VDD);\n"
+    "end;\n"
+    "circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1);\n"
+    "  subcircuit INV2 $1 ($1=$I1,IN=$I3,$3=$I7,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);\n"
+    "  subcircuit INV2 $2 ($1=$I1,IN=$I4,$3=$I8,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK);\n"
+    "end;\n"
+    "circuit INV2 ($1=$1,IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK);\n"
+    "  device PMOS $1 (S=$3,G=IN,D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=$3,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$3,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=VSS,G=$3,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  std::string txt = logger.text ();
+
+  EXPECT_EQ (txt,
+    "begin_circuit INV2 INV2\n"
+    "match_nets $1 $1\n"
+    "match_nets VDD VDD\n"
+    "match_nets OUT OUT\n"
+    "match_nets $3 $3\n"
+    "match_nets IN IN\n"
+    "match_nets VSS VSS\n"
+    "match_nets (null) BULK\n"
+    "match_pins $0 $0\n"
+    "match_pins IN IN\n"
+    "match_pins $2 $2\n"
+    "match_pins OUT OUT\n"
+    "match_pins VSS VSS\n"
+    "match_pins VDD VDD\n"
+    "match_pins (null) BULK\n"
+    "match_devices $1 $1\n"
+    "match_devices $2 $2\n"
+    "match_devices $3 $3\n"
+    "match_devices $4 $4\n"
+    "end_circuit INV2 INV2 MATCH\n"
+    "begin_circuit INV2PAIR INV2PAIR\n"
+    "match_nets $I2 $I2\n"
+    "match_nets $I5 $I6\n"
+    "match_nets $I4 $I5\n"
+    "match_nets $I6 $I4\n"
+    "match_nets $I3 $I3\n"
+    "match_nets $I7 $I7\n"
+    "net_mismatch $3 $I1\n"
+    "match_nets $I8 $I8\n"
+    "net_mismatch $6 BULK\n"
+    "match_pins $0 $1\n"
+    "match_pins $1 $2\n"
+    "match_pins $2 $3\n"
+    "match_pins $3 $4\n"
+    "match_pins $4 $5\n"
+    "pin_mismatch (null) BULK\n"
+    "pin_mismatch (null) $6\n"
+    "match_subcircuits $1 $1\n"
+    "subcircuit_mismatch $2 $2\n"
+    "end_circuit INV2PAIR INV2PAIR NOMATCH\n"
+    "circuit_skipped RINGO RINGO"
+  );
+  EXPECT_EQ (good, false);
+}
+
+TEST(24_NodesRemovedButConnectedInOther)
+{
+  const char *nls1 =
+    "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV2PAIR $1 ($2=FB,$3=VDD,$4=VSS,$5=$I7,$6=OSC);\n"
+    "  subcircuit INV2PAIR $2 ($2=$I22,$3=VDD,$4=VSS,$5=FB,$6=$I21);\n"
+    "  subcircuit INV2PAIR $3 ($2=$I23,$3=VDD,$4=VSS,$5=$I21,$6=$I5);\n"
+    "  subcircuit INV2PAIR $4 ($2=$I24,$3=VDD,$4=VSS,$5=$I5,$6=$I6);\n"
+    "  subcircuit INV2PAIR $5 ($2=$I25,$3=VDD,$4=VSS,$5=$I6,$6=$I7);\n"
+    "end;\n"
+    "circuit INV2PAIR ($2=$I8,$3=$I5,$4=$I4,$5=$I3,$6=$I2);\n"
+    "  subcircuit INV2 $1 (IN=$I3,$3=$I7,OUT=$I6,VSS=$I4,VDD=$I5);\n"
+    "  subcircuit INV2 $2 (IN=$I6,$3=$I8,OUT=$I2,VSS=$I4,VDD=$I5);\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD);\n"
+    "  device PMOS $1 (S=$3,G=IN,D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=$3,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$3,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=VSS,G=$3,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV2PAIR $1 (BULK=VSS,$2=FB,$3=VDD,$4=VSS,$5=$I7,$6=OSC,$7=VDD);\n"
+    "  subcircuit INV2PAIR $2 (BULK=VSS,$2=$I22,$3=VDD,$4=VSS,$5=FB,$6=$I13,$7=VDD);\n"
+    "  subcircuit INV2PAIR $3 (BULK=VSS,$2=$I23,$3=VDD,$4=VSS,$5=$I13,$6=$I5,$7=VDD);\n"
+    "  subcircuit INV2PAIR $4 (BULK=VSS,$2=$I24,$3=VDD,$4=VSS,$5=$I5,$6=$I6,$7=VDD);\n"
+    "  subcircuit INV2PAIR $5 (BULK=VSS,$2=$I25,$3=VDD,$4=VSS,$5=$I6,$6=$I7,$7=VDD);\n"
+    "end;\n"
+    //  rewired here: BULK->VSS (pin $4), $1->$I3/$I4 (both rewired pins are deleted in the first netlist)
+    //  This proves that we can basically do everything with the dropped pins.
+    "circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1);\n"
+    "  subcircuit INV2 $1 ($1=$I3,IN=$I3,$3=$I7,OUT=$I4,VSS=$I5,VDD=$I6,BULK=$I5);\n"
+    "  subcircuit INV2 $2 ($1=$I4,IN=$I4,$3=$I8,OUT=$I2,VSS=$I5,VDD=$I6,BULK=$I5);\n"
+    "end;\n"
+    "circuit INV2 ($1=$1,IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK);\n"
+    "  device PMOS $1 (S=$3,G=IN,D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=$3,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$3,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=VSS,G=$3,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  std::string txt = logger.text ();
+
+  EXPECT_EQ (txt,
+    "begin_circuit INV2 INV2\n"
+    "match_nets VDD VDD\n"
+    "match_nets OUT OUT\n"
+    "match_nets $3 $3\n"
+    "match_nets IN IN\n"
+    "match_nets VSS VSS\n"
+    "match_nets (null) $1\n"
+    "match_nets (null) BULK\n"
+    "match_pins IN IN\n"
+    "match_pins $1 $2\n"
+    "match_pins OUT OUT\n"
+    "match_pins VSS VSS\n"
+    "match_pins VDD VDD\n"
+    "match_pins (null) $0\n"
+    "match_pins (null) BULK\n"
+    "match_devices $1 $1\n"
+    "match_devices $2 $2\n"
+    "match_devices $3 $3\n"
+    "match_devices $4 $4\n"
+    "end_circuit INV2 INV2 MATCH\n"
+    "begin_circuit INV2PAIR INV2PAIR\n"
+    "match_nets $I2 $I2\n"
+    "match_nets $I5 $I6\n"
+    "match_nets $I4 $I5\n"
+    "match_nets $I6 $I4\n"
+    "match_nets $I3 $I3\n"
+    "match_nets $I7 $I7\n"
+    "match_nets $I8 $I8\n"
+    "match_nets (null) BULK\n"
+    "match_nets (null) $I1\n"
+    "match_pins $0 $1\n"
+    "match_pins $1 $2\n"
+    "match_pins $2 $3\n"
+    "match_pins $3 $4\n"
+    "match_pins $4 $5\n"
+    "match_pins (null) BULK\n"
+    "match_pins (null) $6\n"
+    "match_subcircuits $1 $1\n"
+    "match_subcircuits $2 $2\n"
+    "end_circuit INV2PAIR INV2PAIR MATCH\n"
+    "begin_circuit RINGO RINGO\n"
+    "match_nets OSC OSC\n"
+    "match_nets $I7 $I7\n"
+    "match_nets $I6 $I6\n"
+    "match_nets $I5 $I5\n"
+    "match_nets $I21 $I13\n"
+    "match_nets FB FB\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets $I22 $I22\n"
+    "match_nets $I23 $I23\n"
+    "match_nets $I24 $I24\n"
+    "match_nets $I25 $I25\n"
+    "match_pins FB FB\n"
+    "match_pins OSC OSC\n"
+    "match_pins VDD VDD\n"
+    "match_pins VSS VSS\n"
+    "match_subcircuits $1 $1\n"
+    "match_subcircuits $2 $2\n"
+    "match_subcircuits $3 $3\n"
+    "match_subcircuits $4 $4\n"
+    "match_subcircuits $5 $5\n"
+    "end_circuit RINGO RINGO MATCH"
+  );
+  EXPECT_EQ (good, true);
+}

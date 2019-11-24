@@ -4,6 +4,6 @@
  <description/>
  <dbu>0.001</dbu>
  <base-path/>
- <layer-properties_file/>
+ <layer-properties-file/>
  <add-other-layers>true</add-other-layers>
 </technology>

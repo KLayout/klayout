@@ -2858,9 +2858,9 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "this method returns true, if this cell represents a pcell with a distinct\n"
     "set of parameters (a PCell proxy). This also is true, if the PCell is imported from a library.\n"
     "\n"
-    "Technically, PCell's imported from a library are library proxies which are \n"
+    "Technically, PCells imported from a library are library proxies which are \n"
     "pointing to PCell variant proxies. This scheme can even proceed over multiple\n"
-    "indirections, i.e. a library using PCell's from another library.\n"
+    "indirections, i.e. a library using PCells from another library.\n"
     "\n"
     "This method has been introduced in version 0.22.\n"
   ) +   
@@ -3011,7 +3011,7 @@ Class<db::Cell> decl_Cell ("db", "Cell",
   gsi::method ("basic_name", &db::Cell::get_basic_name,
     "@brief Returns the name of the library or PCell or the real name of the cell\n"
     "For non-proxy cells (see \\is_proxy?), this method simply returns the cell name.\n"
-    "For proxy cells, this method returns the PCell's definition name or the library\n"
+    "For proxy cells, this method returns the PCells definition name or the library\n"
     "cell name. This name may differ from the actual cell's name because to ensure\n"
     "that cell names are unique, KLayout may assign different names to the actual \n"
     "cell compared to the source cell.\n"

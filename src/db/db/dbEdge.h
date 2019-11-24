@@ -851,7 +851,7 @@ public:
    *
    *  Returns the distance between the edge and the point. The 
    *  distance is signed which is negative if the point is to the
-   *  "left" of the edge and positive if the point is to the "right".
+   *  "right" of the edge and positive if the point is to the "left".
    *  The distance is measured by projecting the point onto the
    *  line through the edge. If the edge is degenerated, the distance
    *  is not defined.

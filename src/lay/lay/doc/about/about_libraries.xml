@@ -53,7 +53,7 @@
     <li><b>Coded libraries:</b>
       Such libraries are provided by code, either through shared objects/DLL's or through Ruby code.
       Basically such code has to provide a layout object containing the library cells. 
-      A coded library can also provide PCell's (parametrized cells) as library components.
+      A coded library can also provide PCells (parametrized cells) as library components.
       Sell <link href="/about/about_pcells.xml"/> for details about parametrized cells.
     </li>
   </ul>

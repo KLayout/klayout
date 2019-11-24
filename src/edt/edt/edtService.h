@@ -358,7 +358,7 @@ public:
   /**
    *  @brief Handle changes in the guiding shapes, i.e. create PCell variants
    *
-   *  @return true, if PCell's have been updated, indicating that our selection is no longer valid
+   *  @return true, if PCells have been updated, indicating that our selection is no longer valid
    *
    *  This version assumes there is only one guiding shape selected and will update the selection.
    *  It will also call layout.cleanup() if required.

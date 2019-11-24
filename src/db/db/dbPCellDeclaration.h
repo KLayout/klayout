@@ -293,9 +293,9 @@ private:
 };
 
 /**
- *  @brief A layer declaration for PCell's
+ *  @brief A layer declaration for PCells
  *
- *  PCell's must declare the layers it wants to create.
+ *  PCells must declare the layers it wants to create.
  *  Such a layer declaration consists of a db::LayerProperties description (layer, datatype and/or name)
  *  and a symbolic name which can potentially be used as a variable name.
  */

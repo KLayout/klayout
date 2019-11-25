@@ -51,9 +51,6 @@ public:
 private slots:
   void add_lib_path_clicked ();
   void add_lib_path_clicked_with_choose ();
-  void del_lib_paths_clicked ();
-  void move_lib_paths_up_clicked ();
-  void move_lib_paths_down_clicked ();
 
 private:
   Ui::MAGReaderOptionPage *mp_ui;

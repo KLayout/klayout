@@ -106,7 +106,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0" rowspan="5">
-       <widget class="QListWidget" name="lib_path">
+       <widget class="lay::InteractiveListWidget" name="lib_path">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Ignored">
           <horstretch>0</horstretch>
@@ -281,6 +281,11 @@ You can use expressions inside the path components for variable paths</string>
    <slots>
     <signal>enable_all_layers(bool)</signal>
    </slots>
+  </customwidget>
+  <customwidget>
+   <class>lay::InteractiveListWidget</class>
+   <extends>QListWidget</extends>
+   <header>layWidgets.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

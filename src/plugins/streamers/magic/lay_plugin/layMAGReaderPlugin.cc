@@ -34,117 +34,6 @@ namespace lay
 {
 
 // ---------------------------------------------------------------
-//  List manipulation utilities
-//  @@@ TODO: move this to a central place
-static void
-refresh_item_flags (QListWidget *list)
-{
-  for (int i = 0; i < list->count (); ++i) {
-    list->item (i)->setFlags (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-  }
-}
-
-static void
-add_items_to_list (QListWidget *list, const QStringList &items)
-{
-  for (QStringList::const_iterator f = items.begin (); f != items.end (); ++f) {
-    list->addItem (*f);
-  }
-  refresh_item_flags (list);
-}
-
-static void
-delete_selected_items_from_list (QListWidget *list)
-{
-  QStringList items;
-  for (int i = 0; i < list->count (); ++i) {
-    if (! list->item (i)->isSelected ()) {
-      items.push_back (list->item (i)->text ());
-    }
-  }
-
-  list->clear ();
-  for (QStringList::const_iterator f = items.begin (); f != items.end (); ++f) {
-    list->addItem (*f);
-  }
-  refresh_item_flags (list);
-}
-
-static void
-move_selected_items_up (QListWidget *list)
-{
-  std::set<QString> selected;
-  for (int i = 0; i < list->count (); ++i) {
-    if (list->item (i)->isSelected ()) {
-      selected.insert (list->item (i)->text ());
-    }
-  }
-
-  QStringList items;
-  int j = -1;
-  for (int i = 0; i < list->count (); ++i) {
-    if (list->item (i)->isSelected ()) {
-      items.push_back (list->item (i)->text ());
-    } else {
-      if (j >= 0) {
-        items.push_back (list->item (j)->text ());
-      }
-      j = i;
-    }
-  }
-  if (j >= 0) {
-    items.push_back (list->item (j)->text ());
-  }
-
-  list->clear ();
-  for (QStringList::const_iterator f = items.begin (); f != items.end (); ++f) {
-    list->addItem (*f);
-    if (selected.find (*f) != selected.end ()) {
-      list->item (list->count () - 1)->setSelected (true);
-    }
-  }
-  refresh_item_flags (list);
-}
-
-static void
-move_selected_items_down (QListWidget *list)
-{
-  std::set<QString> selected;
-  for (int i = 0; i < list->count (); ++i) {
-    if (list->item (i)->isSelected ()) {
-      selected.insert (list->item (i)->text ());
-    }
-  }
-
-  QStringList items;
-  int j = -1;
-  for (int i = list->count (); i > 0; ) {
-    --i;
-    if (list->item (i)->isSelected ()) {
-      items.push_back (list->item (i)->text ());
-    } else {
-      if (j >= 0) {
-        items.push_back (list->item (j)->text ());
-      }
-      j = i;
-    }
-  }
-  if (j >= 0) {
-    items.push_back (list->item (j)->text ());
-  }
-
-  list->clear ();
-  for (QStringList::const_iterator f = items.end (); f != items.begin (); ) {
-    --f;
-    list->addItem (*f);
-    if (selected.find (*f) != selected.end ()) {
-      list->item (list->count () - 1)->setSelected (true);
-    }
-  }
-  refresh_item_flags (list);
-}
-
-// ---------------------------------------------------------------
 //  MAGReaderOptionPage definition and implementation
 
 MAGReaderOptionPage::MAGReaderOptionPage (QWidget *parent)
@@ -155,9 +44,9 @@ MAGReaderOptionPage::MAGReaderOptionPage (QWidget *parent)
 
   connect (mp_ui->add_lib_path, SIGNAL (clicked ()), this, SLOT (add_lib_path_clicked ()));
   connect (mp_ui->add_lib_path_with_choose, SIGNAL (clicked ()), this, SLOT (add_lib_path_clicked_with_choose ()));
-  connect (mp_ui->del_lib_path, SIGNAL (clicked ()), this, SLOT (del_lib_paths_clicked ()));
-  connect (mp_ui->move_lib_path_up, SIGNAL (clicked ()), this, SLOT (move_lib_paths_up_clicked ()));
-  connect (mp_ui->move_lib_path_down, SIGNAL (clicked ()), this, SLOT (move_lib_paths_down_clicked ()));
+  connect (mp_ui->del_lib_path, SIGNAL (clicked ()), mp_ui->lib_path, SLOT (delete_selected_items ()));
+  connect (mp_ui->move_lib_path_up, SIGNAL (clicked ()), mp_ui->lib_path, SLOT (move_selected_items_up ()));
+  connect (mp_ui->move_lib_path_down, SIGNAL (clicked ()), mp_ui->lib_path, SLOT (move_selected_items_down ()));
 }
 
 MAGReaderOptionPage::~MAGReaderOptionPage ()
@@ -181,12 +70,7 @@ MAGReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::
   mp_ui->read_all_cbx->setChecked (options->create_other_layers);
   mp_ui->keep_names_cbx->setChecked (options->keep_layer_names);
 
-  mp_ui->lib_path->clear ();
-  QStringList items;
-  for (std::vector <std::string>::const_iterator f = options->lib_paths.begin (); f != options->lib_paths.end (); ++f) {
-    items << tl::to_qstring (*f);
-  }
-  add_items_to_list (mp_ui->lib_path, items);
+  mp_ui->lib_path->set_values (options->lib_paths);
 }
 
 void 
@@ -209,11 +93,7 @@ MAGReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Techn
     options->create_other_layers = mp_ui->read_all_cbx->isChecked ();
     options->keep_layer_names = mp_ui->keep_names_cbx->isChecked ();
 
-    options->lib_paths.clear ();
-    options->lib_paths.reserve (mp_ui->lib_path->count ());
-    for (int i = 0; i < mp_ui->lib_path->count (); ++i) {
-      options->lib_paths.push_back (tl::to_string (mp_ui->lib_path->item (i)->text ()));
-    }
+    options->lib_paths = mp_ui->lib_path->get_values ();
 
   }
 }
@@ -221,11 +101,7 @@ MAGReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Techn
 void
 MAGReaderOptionPage::add_lib_path_clicked ()
 {
-  QStringList dirs;
-  dirs << tr ("Enter your path here ..");
-  add_items_to_list (mp_ui->lib_path, dirs);
-  mp_ui->lib_path->clearSelection ();
-  mp_ui->lib_path->setCurrentItem (mp_ui->lib_path->item (mp_ui->lib_path->count () - 1));
+  mp_ui->lib_path->add_value (tl::to_string (tr ("Enter your path here ...")));
 }
 
 void
@@ -233,30 +109,8 @@ MAGReaderOptionPage::add_lib_path_clicked_with_choose ()
 {
   QString dir = QFileDialog::getExistingDirectory (this, QObject::tr ("Add library path"));
   if (! dir.isNull ()) {
-    QStringList dirs;
-    dirs << dir;
-    add_items_to_list (mp_ui->lib_path, dirs);
-    mp_ui->lib_path->clearSelection ();
-    mp_ui->lib_path->setCurrentItem (mp_ui->lib_path->item (mp_ui->lib_path->count () - 1));
+    mp_ui->lib_path->add_value (tl::to_string (dir));
   }
-}
-
-void
-MAGReaderOptionPage::del_lib_paths_clicked ()
-{
-  delete_selected_items_from_list (mp_ui->lib_path);
-}
-
-void
-MAGReaderOptionPage::move_lib_paths_up_clicked ()
-{
-  move_selected_items_up (mp_ui->lib_path);
-}
-
-void
-MAGReaderOptionPage::move_lib_paths_down_clicked ()
-{
-  move_selected_items_down (mp_ui->lib_path);
 }
 
 // ---------------------------------------------------------------
@@ -286,8 +140,4 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> plugin_decl (new lay::MAGReaderPluginDeclaration (), 10000, "MAGReader");
 
 }
-
-
-
-
 

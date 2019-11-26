@@ -54,7 +54,7 @@ public:
   virtual std::string format_name () const { return "MAG"; }
   virtual std::string format_desc () const { return "Magic"; }
   virtual std::string format_title () const { return "MAG (Magic layout format)"; }
-  virtual std::string file_format () const { return "MAG files (*.MAG *.msg *.mag.gz *.MAG.gz)"; }
+  virtual std::string file_format () const { return "Magic files (*.MAG *.mag *.mag.gz *.MAG.gz)"; }
 
   virtual bool detect (tl::InputStream &s) const 
   {
@@ -89,6 +89,7 @@ public:
       tl::make_member (&db::MAGReaderOptions::layer_map, "layer-map") +
       tl::make_member (&db::MAGReaderOptions::create_other_layers, "create-other-layers") +
       tl::make_member (&db::MAGReaderOptions::keep_layer_names, "keep-layer-names") +
+      tl::make_member (&db::MAGReaderOptions::merge, "merge") +
       tl::make_element<std::vector<std::string>, db::MAGReaderOptions> (&db::MAGReaderOptions::lib_paths, "lib-paths",
         tl::make_member<std::string, std::vector<std::string>::const_iterator, std::vector<std::string> > (&std::vector<std::string>::begin, &std::vector<std::string>::end, &std::vector<std::string>::push_back, "lib-path")
       )

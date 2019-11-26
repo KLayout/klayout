@@ -133,11 +133,26 @@ public:
 
 private:
   tl::TextInputStream m_stream;
+  tl::TextInputStream *mp_current_stream;
   tl::AbsoluteProgress m_progress;
   double m_lambda, m_dbu;
   std::vector<std::string> m_lib_paths;
+  bool m_merge;
+  std::map<std::string, db::cell_index_type> m_cells_read;
+  std::map<std::string, std::pair<std::string, db::cell_index_type> > m_cells_to_read;
+  std::map<std::string, std::string> m_use_lib_paths;
+  db::VCplxTrans m_dbu_trans_inv;
+  std::string m_tech;
 
-  void do_read (db::Layout &layout);
+  void do_read (db::Layout &layout, db::cell_index_type to_cell, tl::TextInputStream &stream);
+  void do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl::TextInputStream &stream);
+  void do_merge_part (db::Layout &layout, db::cell_index_type cell_index);
+  bool resolve_path(const std::string &path, std::string &real_path);
+  std::string cell_name_from_path (const std::string &path);
+  db::cell_index_type cell_from_path (const std::string &path, Layout &layout);
+  void read_rect (tl::Extractor &ex, Layout &layout, cell_index_type cell_index, unsigned int layer);
+  void read_rlabel (tl::Extractor &ex, Layout &layout, cell_index_type cell_index);
+  void read_cell_instance (tl::Extractor &ex, tl::TextInputStream &stream, Layout &layout, cell_index_type cell_index);
 };
 
 }

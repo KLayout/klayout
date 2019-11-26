@@ -46,7 +46,8 @@ public:
     : lambda (1.0),
       dbu (0.001),
       create_other_layers (true),
-      keep_layer_names (false)
+      keep_layer_names (false),
+      merge (true)
   {
     //  .. nothing yet ..
   }
@@ -94,6 +95,14 @@ public:
    *  layer names. If this value is set to true, no name translation happens.
    */
   bool keep_layer_names;
+
+  /**
+   *  @brief A flag indicating whether to merge boxes into polygons
+   *
+   *  If this flag is set to true (the default), the boxes of the Magic
+   *  layout files are merged into polygons.
+   */
+  bool merge;
 
   /**
    *  @brief The library paths

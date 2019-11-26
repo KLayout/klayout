@@ -69,6 +69,7 @@ MAGReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::
   mp_ui->layer_map->set_layer_map (options->layer_map);
   mp_ui->read_all_cbx->setChecked (options->create_other_layers);
   mp_ui->keep_names_cbx->setChecked (options->keep_layer_names);
+  mp_ui->merge_cbx->setChecked (options->merge);
 
   mp_ui->lib_path->set_values (options->lib_paths);
 }
@@ -92,6 +93,7 @@ MAGReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Techn
     options->layer_map = mp_ui->layer_map->get_layer_map ();
     options->create_other_layers = mp_ui->read_all_cbx->isChecked ();
     options->keep_layer_names = mp_ui->keep_names_cbx->isChecked ();
+    options->merge = mp_ui->merge_cbx->isChecked ();
 
     options->lib_paths = mp_ui->lib_path->get_values ();
 

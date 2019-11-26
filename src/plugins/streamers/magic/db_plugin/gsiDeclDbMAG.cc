@@ -105,6 +105,16 @@ static void set_keep_layer_names (db::LoadLayoutOptions *options, bool l)
   options->get_options<db::MAGReaderOptions> ().keep_layer_names = l;
 }
 
+static bool merge (const db::LoadLayoutOptions *options)
+{
+  return options->get_options<db::MAGReaderOptions> ().merge;
+}
+
+static void set_merge (db::LoadLayoutOptions *options, bool l)
+{
+  options->get_options<db::MAGReaderOptions> ().merge = l;
+}
+
 //  extend lay::LoadLayoutOptions with the MAG options
 static
 gsi::ClassExt<db::LoadLayoutOptions> mag_reader_options (
@@ -168,6 +178,22 @@ gsi::ClassExt<db::LoadLayoutOptions> mag_reader_options (
     "@param keep True, if layer names are to be kept.\n"
     "\n"
     "See \\mag_keep_layer_names? for a description of this property.\n"
+    "\n"
+    "This method has been added in version 0.26.2."
+  ) +
+  gsi::method_ext ("mag_merge?", &merge,
+    "@brief Gets a value indicating whether boxes are merged into polygons\n"
+    "@return True, if boxes are merged.\n"
+    "\n"
+    "When set to true, the boxes of the Magic layout files are merged into (manhattan) polygons where possible.\n"
+    "\n"
+    "This method has been added in version 0.26.2."
+  ) +
+  gsi::method_ext ("mag_merge=", &set_merge, gsi::arg ("merge"),
+    "@brief sets a value indicating whether boxes are merged into polygons\n"
+    "@param merge True, if boxes to be merged into polygons.\n"
+    "\n"
+    "See \\mag_merge? for a description of this property.\n"
     "\n"
     "This method has been added in version 0.26.2."
   ) +

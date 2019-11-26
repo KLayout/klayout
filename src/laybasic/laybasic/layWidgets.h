@@ -476,14 +476,6 @@ public:
   InteractiveListWidget (QWidget *parent = 0);
 
   /**
-   *  @brief Configures this list for drag and drop
-   *
-   *  Call this method with a "true" value to enable drag and drop or "false" to disable.
-   *  By default, drag and drop is enabled.
-   */
-  void enable_drag_and_drop (bool f);
-
-  /**
    *  @brief Sets the items in the widget
    */
   void set_values (const std::vector<std::string> &values);

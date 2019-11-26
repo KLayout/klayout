@@ -27,12 +27,16 @@
 #include "dbObjectWithProperties.h"
 #include "dbArray.h"
 #include "dbStatic.h"
+#include "dbShapeProcessor.h"
 
 #include "tlException.h"
 #include "tlString.h"
 #include "tlClassRegistry.h"
+#include "tlFileUtils.h"
+#include "tlUri.h"
 
 #include <cctype>
+#include <string>
 
 namespace db
 {
@@ -44,16 +48,24 @@ namespace db
 MAGReader::MAGReader (tl::InputStream &s)
   : m_stream (s),
     m_progress (tl::to_string (tr ("Reading MAG file")), 1000),
-    m_lambda (1.0), m_dbu (0.001)
+    m_lambda (1.0), m_dbu (0.001), m_merge (true)
 {
   m_progress.set_format (tl::to_string (tr ("%.0fk lines")));
   m_progress.set_format_unit (1000.0);
   m_progress.set_unit (100000.0);
+
+  mp_current_stream = 0;
 }
 
 MAGReader::~MAGReader ()
 {
   //  .. nothing yet ..
+}
+
+const LayerMap &
+MAGReader::read (db::Layout &layout)
+{
+  return read (layout, db::LoadLayoutOptions ());
 }
 
 const LayerMap &
@@ -65,6 +77,8 @@ MAGReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   m_lambda = specific_options.lambda;
   m_dbu = specific_options.dbu;
   m_lib_paths = specific_options.lib_paths;
+  m_merge = specific_options.merge;
+  mp_current_stream = 0;
 
   db::LayerMap lm = specific_options.layer_map;
   lm.prepare (layout);
@@ -72,22 +86,42 @@ MAGReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   set_create_layers (specific_options.create_other_layers);
   set_keep_layer_names (specific_options.keep_layer_names);
 
-  do_read (layout);
+  db::cell_index_type top_cell = layout.add_cell (cell_name_from_path (m_stream.source ()).c_str ());
+
+  layout.dbu (m_dbu);
+
+  m_cells_to_read.clear ();
+  m_cells_read.clear ();
+  m_use_lib_paths.clear ();
+  m_dbu_trans_inv = db::CplxTrans (m_dbu).inverted ();
+  m_tech.clear ();
+
+  {
+    tl::SelfTimer timer (tl::verbosity () >= 21, "Reading MAGIC file tree");
+
+    //  This is the seed
+    do_read (layout, top_cell, m_stream);
+
+    while (! m_cells_to_read.empty ()) {
+
+      std::pair<std::string, std::pair<std::string, db::cell_index_type> > next = *m_cells_to_read.begin ();
+      m_cells_to_read.erase (m_cells_to_read.begin ());
+
+      tl::InputStream stream (next.second.first);
+      tl::TextInputStream text_stream (stream);
+      do_read (layout, next.second.second, text_stream);
+
+    }
+  }
 
   finish_layers (layout);
   return layer_map ();
 }
 
-const LayerMap &
-MAGReader::read (db::Layout &layout)
-{
-  return read (layout, db::LoadLayoutOptions ());
-}
-
 void 
 MAGReader::error (const std::string &msg)
 {
-  throw MAGReaderException (msg, m_stream.line_number (), m_stream.source ());
+  throw MAGReaderException (msg, mp_current_stream->line_number (), mp_current_stream->source ());
 }
 
 void 
@@ -95,767 +129,411 @@ MAGReader::warn (const std::string &msg)
 {
   // TODO: compress
   tl::warn << msg 
-           << tl::to_string (tr (" (line=")) << m_stream.line_number ()
-           << tl::to_string (tr (", file=")) << m_stream.source ()
+           << tl::to_string (tr (" (line=")) << mp_current_stream->line_number ()
+           << tl::to_string (tr (", file=")) << mp_current_stream->source ()
            << ")";
 }
 
-#if 0 // @@@
-/**
- *  @brief Skip blanks in the sense of MAG
- *  A blank in MAG is "any ASCII character except digit, upperChar, '-', '(', ')', or ';'"
- */
-void 
-MAGReader::skip_blanks()
+db::cell_index_type
+MAGReader::cell_from_path (const std::string &path, db::Layout &layout)
 {
-  while (! m_stream.at_end ()) {
-    char c = m_stream.peek_char ();
-    if (isupper (c) || isdigit (c) || c == '-' || c == '(' || c == ')' || c == ';') {
-      return;
-    }
-    m_stream.get_char ();
+  std::map<std::string, db::cell_index_type>::const_iterator c = m_cells_read.find (path);
+  if (c != m_cells_read.end ()) {
+    return c->second;
   }
-}
 
-/**
- *  @brief Skips separators
- */
-void 
-MAGReader::skip_sep ()
-{
-  while (! m_stream.at_end ()) {
-    char c = m_stream.peek_char ();
-    if (isdigit (c) || c == '-' || c == '(' || c == ')' || c == ';') {
-      return;
-    }
-    m_stream.get_char ();
-  }
-}
+// @@@ this can lead to cell variants if a cell is present with different library paths ... (L500_CHAR_p)
+  db::cell_index_type ci = layout.add_cell (cell_name_from_path (path).c_str ());
+  m_cells_read.insert (std::make_pair (path, ci));
 
-/**
- *  @brief Skip comments
- *  This assumes that the reader is after the first '(' and it will stop
- *  after the final ')'.
- */
-void 
-MAGReader::skip_comment ()
-{
-  char c;
-  int bl = 0;
-  while (! m_stream.at_end () && ((c = m_stream.get_char ()) != ')' || bl > 0)) {
-    // check for nested comments (bl is the nesting level)
-    if (c == '(') {
-      ++bl;
-    } else if (c == ')') {
-      --bl;
-    }
-  }
-}
-
-/**
- *  @brief Gets a character and issues an error if the stream is at the end
- */
-char 
-MAGReader::get_char ()
-{
-  if (m_stream.at_end ()) {
-    error ("Unexpected end of file");
-    return 0;
+  std::string cell_file;
+  if (! resolve_path (path, cell_file)) {
+    //  skip with a warning if the file can't be opened (TODO: better to raise an error?)
+    tl::warn << tl::to_string (tr ("Unable to find a layout file for cell - skipping this cell: ")) << path;
+    layout.cell (ci).set_ghost_cell (true);
   } else {
-    return m_stream.get_char ();
+    m_cells_to_read.insert (std::make_pair (path, std::make_pair (cell_file, ci)));
   }
+
+  return ci;
 }
 
-/**
- *  @brief Tests whether the next character is a semicolon (after blanks)
- */
-bool 
-MAGReader::test_semi ()
+std::string
+MAGReader::cell_name_from_path (const std::string &path)
 {
-  skip_blanks ();
-  if (! m_stream.at_end () && m_stream.peek_char () == ';') {
-    return true;
-  } else {
-    return false;
-  }
+  std::string file = tl::split (path, "/").back ();
+  return tl::split (file, ".").front ();
 }
 
-/**
- *  @brief Tests whether a semicolon follows and issue an error if not
- */
-void
-MAGReader::expect_semi ()
+static bool find_and_normalize_file (const tl::URI &uri, std::string &path)
 {
-  if (! test_semi ()) {
-    error ("Expected ';' command terminator");
-  } else {
-    get_char ();
-  }
-}
+  //  TODO: sync with plugin definition
+  static const char *extensions[] = {
+    ".mag", ".mag.gz", ".MAG", ".MAG.gz"
+  };
 
-/**
- *  @brief Skips all until the next semicolon
- */
-void
-MAGReader::skip_to_end ()
-{
-  while (! m_stream.at_end () && m_stream.get_char () != ';') {
-    ;
-  }
-}
+  for (size_t e = 0; e < sizeof (extensions) / sizeof (extensions [0]); ++e) {
 
-/**
- *  @brief Fetches an integer
- */
-int 
-MAGReader::read_integer_digits ()
-{
-  if (m_stream.at_end () || ! isdigit (m_stream.peek_char ())) {
-    error ("Digit expected");
-  }
+    if (uri.scheme ().empty () || uri.scheme () == "file") {
 
-  int i = 0;
-  while (! m_stream.at_end () && isdigit (m_stream.peek_char ())) {
+      std::string fp = uri.path () + extensions[e];
 
-    if (i > std::numeric_limits<int>::max () / 10) {
-
-      error ("Integer overflow");
-      while (! m_stream.at_end () && isdigit (m_stream.peek_char ())) {
-        m_stream.get_char ();
+      if (tl::verbosity () >= 30) {
+        tl::log << tl::to_string (tr ("Trying layout file: ")) << fp;
       }
 
-      return 0;
-
-    }
-
-    char c = m_stream.get_char ();
-    i = i * 10 + int (c - '0');
-
-  }
-
-  return i;
-}
-
-/**
- *  @brief Fetches an integer
- */
-int 
-MAGReader::read_integer ()
-{
-  skip_sep ();
-  return read_integer_digits ();
-}
-
-/**
- *  @brief Fetches a signed integer
- */
-int 
-MAGReader::read_sinteger ()
-{
-  skip_sep ();
-
-  bool neg = false;
-  if (m_stream.peek_char () == '-') {
-    m_stream.get_char ();
-    neg = true;
-  }
-
-  int i = read_integer_digits ();
-  return neg ? -i : i;
-}
-
-/**
- *  @brief Fetches a string (layer name)
- */
-const std::string &
-MAGReader::read_name ()
-{
-  skip_blanks ();
-
-  m_cmd_buffer.clear ();
-  if (m_stream.at_end ()) {
-    return m_cmd_buffer;
-  }
-
-  //  Note: officially only upper and digits are allowed in names. But we allow lower case and "_" too ...
-  while (! m_stream.at_end () && (isupper (m_stream.peek_char ()) || islower (m_stream.peek_char ()) || m_stream.peek_char () == '_' || isdigit (m_stream.peek_char ()))) {
-    m_cmd_buffer += m_stream.get_char ();
-  }
-
-  return m_cmd_buffer;
-}
-
-/**
- *  @brief Fetches a string (in labels, texts)
- */
-const std::string &
-MAGReader::read_string ()
-{
-  m_stream.skip ();
-
-  m_cmd_buffer.clear ();
-  if (m_stream.at_end ()) {
-    return m_cmd_buffer;
-  }
-
-  char q = m_stream.peek_char ();
-  if (q == '"' || q == '\'') {
-
-    get_char ();
-
-    //  read a quoted string (KLayout extension)
-    while (! m_stream.at_end () && m_stream.peek_char () != q) {
-      char c = m_stream.get_char ();
-      if (c == '\\' && ! m_stream.at_end ()) {
-        c = m_stream.get_char ();
+      if (tl::file_exists (fp)) {
+        path = fp;
+        return true;
       }
-      m_cmd_buffer += c;
-    }
 
-    if (! m_stream.at_end ()) {
-      get_char ();
-    }
+    } else {
 
-  } else {
+      //  TODO: this is not quite efficient, but the only thing we can do for now
+      tl::URI uri_with_ext = uri;
+      uri_with_ext.set_path (uri_with_ext.path () + extensions[e]);
+      std::string us = uri_with_ext.to_string ();
 
-    while (! m_stream.at_end () && !isspace (m_stream.peek_char ()) && m_stream.peek_char () != ';') {
-      m_cmd_buffer += m_stream.get_char ();
+      if (tl::verbosity () >= 30) {
+        tl::log << tl::to_string (tr ("Trying layout URI: ")) << us;
+      }
+
+      try {
+        tl::InputStream is (us);
+        if (is.get (1)) {
+          path = us;
+          return true;
+        }
+      } catch (...) {
+        //  .. nothing yet ..
+      }
+
     }
 
   }
 
-  return m_cmd_buffer;
-}
-
-/**
- *  @brief Reads a double value (extension)
- */
-double
-MAGReader::read_double ()
-{
-  m_stream.skip ();
-
-  //  read a quoted string (KLayout extension)
-  m_cmd_buffer.clear ();
-  while (! m_stream.at_end () && (isdigit (m_stream.peek_char ()) || m_stream.peek_char () == '.' || m_stream.peek_char () == '-' || m_stream.peek_char () == 'e' || m_stream.peek_char () == 'E')) {
-    m_cmd_buffer += m_stream.get_char ();
-  }
-
-  double v = 0.0;
-  tl::from_string (m_cmd_buffer, v);
-  return v;
+  return false;
 }
 
 bool
-MAGReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
+MAGReader::resolve_path (const std::string &path, std::string &real_path)
 {
-  if (fabs (sf - floor (sf + 0.5)) > 1e-6) {
-    warn ("Scaling factor is not an integer - snapping errors may occur in cell '" + m_cellname + "'");
+  tl::Eval expr;
+/* @@@
+  expr.set_var ("tech_dir", m_default_base_path);
+  expr.set_var ("tech_file", m_lyt_file);
+  expr.set_var ("tech_name", m_lyt_file);
+*/
+  expr.set_var ("tech_info", m_tech);
+
+  tl::URI path_uri (path);
+
+  //  absolute URIs are kept - we just try to figure out the suffix
+  if (tl::is_absolute (path_uri.path ())) {
+    return find_and_normalize_file (path_uri, real_path);
   }
 
-  int nx = 0, ny = 0, dx = 0, dy = 0;
-  int layer = -2; // no layer defined yet.
-  int path_mode = -1;
-  size_t insts = 0;
-  size_t shapes = 0;
-  size_t layer_specs = 0;
-  std::vector <db::Point> poly_pts;
-
-  while (true) {
-
-    skip_blanks ();
-
-    char c = get_char ();
-    if (c == ';') {
-
-      //  empty command
-
-    } else if (c == '(') {
-
-      skip_comment ();
-
-    } else if (c == 'E') {
-
-      if (level > 0) {
-        error ("'E' command must be outside a cell specification");
-      } 
-
-      skip_blanks ();
-      break;
-
-    } else if (c == 'D') {
-
-      skip_blanks ();
-
-      c = get_char ();
-      if (c == 'S') {
-
-        //  DS command:
-        //  "D" blank* "S" integer (sep integer sep integer)?
-
-        unsigned int n = 0, denom = 1, divider = 1;
-        n = read_integer ();
-        if (! test_semi ()) {
-          denom = read_integer ();
-          divider = read_integer ();
-          if (divider == 0) {
-            error ("'DS' command: divider cannot be zero");
-          }
-        }
-
-        expect_semi ();
-
-        std::string outer_cell = "C" + tl::to_string (n);
-        std::swap (m_cellname, outer_cell);
-
-        std::map <unsigned int, db::cell_index_type>::const_iterator c = m_cells_by_id.find (n);
-        db::cell_index_type ci;
-        if (c == m_cells_by_id.end ()) {
-          ci = layout.add_cell (m_cellname.c_str ());
-          m_cells_by_id.insert (std::make_pair (n, ci));
-        } else {
-          ci = c->second;
-        } 
-
-        db::Cell &cell = layout.cell (ci);
-
-        read_cell (layout, cell, sf * double (denom) / double (divider), level + 1);
-
-        std::swap (m_cellname, outer_cell);
-
-      } else if (c == 'F') {
-
-        // DF command:
-        // "D" blank* "F"
-        if (level == 0) {
-          error ("'DF' command must be inside a cell specification");
-        } 
-
-        //  skip the rest of the command
-        skip_to_end ();
-
-        break;
-
-      } else if (c == 'D') {
-
-        //  DD command:
-        //  "D" blank* "D" integer
-
-        read_integer ();
-        warn ("'DD' command ignored");
-        skip_to_end ();
-
-      } else {
-
-        error ("Invalid 'D' sub-command");
-        skip_to_end ();
-
-      }
-
-    } else if (c == 'C') {
-
-      //  C command:
-      //  "C" integer transformation
-      //  transformation := (blank* ("T" point |"M" blank* "X" |"M" blank* "Y" |"R" point)*)*
-
-      ++insts;
-
-      unsigned int n = read_integer ();
-      std::map <unsigned int, db::cell_index_type>::const_iterator c = m_cells_by_id.find (n);
-      if (c == m_cells_by_id.end ()) {
-        std::string cn = "C" + tl::to_string (n);
-        c = m_cells_by_id.insert (std::make_pair (n, layout.add_cell (cn.c_str ()))).first;
-      } 
-
-      db::DCplxTrans trans;
-
-      while (! test_semi ()) {
-
-        skip_blanks ();
-
-        char ct = get_char ();
-        if (ct == 'M') {
-
-          skip_blanks ();
-
-          char ct2 = get_char ();
-          if (ct2 == 'X') {
-            trans = db::DCplxTrans (db::FTrans::m90) * trans;
-          } else if (ct2 == 'Y') {
-            trans = db::DCplxTrans (db::FTrans::m0) * trans;
-          } else {
-            error ("Invalid 'M' transformation specification");
-            //  skip everything to avoid more errors here
-            while (! test_semi ()) {
-              get_char ();
-            }
-          }
-
-        } else if (ct == 'T') {
-
-          int x = read_sinteger ();
-          int y = read_sinteger ();
-          trans = db::DCplxTrans (db::DVector (x * sf, y * sf)) * trans;
-
-        } else if (ct == 'R') {
-
-          int x = read_sinteger ();
-          int y = read_sinteger ();
-
-          if (y != 0 || x != 0) {
-            double a = atan2 (double (y), double (x)) * 180.0 / M_PI;
-            trans = db::DCplxTrans (1.0, a, false, db::DVector ()) * trans;
-          }
-
-        } else {
-          error ("Invalid transformation specification");
-          //  skip everything to avoid more errors here
-          while (! test_semi ()) {
-            get_char ();
-          }
-        }
-
-      }
-
-      if (nx > 0 || ny > 0) {
-        if (trans.is_ortho () && ! trans.is_mag ()) {
-          cell.insert (db::CellInstArray (db::CellInst (c->second), db::Trans (db::ICplxTrans (trans)), db::Vector (dx * sf, 0.0), db::Vector (0.0, dy * sf), std::max (1, nx), std::max (1, ny)));
-        } else {
-          cell.insert (db::CellInstArray (db::CellInst (c->second), db::ICplxTrans (trans), db::Vector (dx * sf, 0.0), db::Vector (0.0, dy * sf), std::max (1, nx), std::max (1, ny)));
-        }
-      } else {
-        if (trans.is_ortho () && ! trans.is_mag ()) {
-          cell.insert (db::CellInstArray (db::CellInst (c->second), db::Trans (db::ICplxTrans (trans))));
-        } else {
-          cell.insert (db::CellInstArray (db::CellInst (c->second), db::ICplxTrans (trans)));
-        }
-      }
-
-      nx = ny = 0;
-      dx = dy = 0;
-
-      expect_semi ();
-
-    } else if (c == 'L') {
-
-      skip_blanks ();
-
-      ++layer_specs;
-
-      std::string name = read_name ();
-      if (name.empty ()) {
-        error ("Missing layer name in 'L' command");
-      }
-
-      std::pair<bool, unsigned int> ll = open_layer (layout, name);
-      if (! ll.first) {
-        layer = -1; // ignore geometric objects on this layer
-      } else {
-        layer = int (ll.second);
-      }
-
-      expect_semi ();
-
-    } else if (c == 'B') {
-
-      ++shapes;
-
-      if (layer < 0) {
-
-        if (layer < -1) {
-          warn ("'B' command ignored since no layer was selected");
-        }
-        skip_to_end ();
-
-      } else {
-
-        unsigned int w = 0, h = 0;
-        int x = 0, y = 0;
-
-        w = read_integer ();
-        h = read_integer ();
-        x = read_sinteger ();
-        y = read_sinteger ();
-
-        int rx = 0, ry = 0;
-        if (! test_semi ()) {
-          rx = read_sinteger ();
-          ry = read_sinteger ();
-        }
-
-        if (rx >= 0 && ry == 0) {
-
-          cell.shapes ((unsigned int) layer).insert (db::Box (sf * (x - 0.5 * w), sf * (y - 0.5 * h), sf * (x + 0.5 * w), sf * (y + 0.5 * h)));
-
-        } else {
-
-          double n = 1.0 / sqrt (double (rx) * double (rx) + double (ry) * double (ry));
-
-          double xw = sf * w * 0.5 * rx * n, yw = sf * w * 0.5 * ry * n;
-          double xh = -sf * h * 0.5 * ry * n, yh = sf * h * 0.5 * rx * n;
-
-          db::Point c (sf * x, sf * y);
-
-          db::Point points [4];
-          points [0] = c + db::Vector (-xw - xh, -yw - yh);
-          points [1] = c + db::Vector (-xw + xh, -yw + yh);
-          points [2] = c + db::Vector (xw + xh, yw + yh);
-          points [3] = c + db::Vector (xw - xh, yw - yh);
-
-          db::Polygon p;
-          p.assign_hull (points, points + 4);
-          cell.shapes ((unsigned int) layer).insert (p);
-
-        }
-
-        expect_semi ();
-
-      }
-
-    } else if (c == 'P') {
-
-      ++shapes;
-
-      if (layer < 0) {
-
-        if (layer < -1) {
-          warn ("'P' command ignored since no layer was selected");
-        }
-        skip_to_end ();
-
-      } else {
-
-        poly_pts.clear ();
-
-        while (! test_semi ()) {
-
-          int rx = read_sinteger ();
-          int ry = read_sinteger ();
-
-          poly_pts.push_back (db::Point (sf * rx, sf * ry));
-
-        }
-
-        db::Polygon p;
-        p.assign_hull (poly_pts.begin (), poly_pts.end ());
-        cell.shapes ((unsigned int) layer).insert (p);
-
-        expect_semi ();
-
-      }
-
-    } else if (c == 'R') {
-
-      ++shapes;
-
-      if (layer < 0) {
-
-        if (layer < -1) {
-          warn ("'R' command ignored since no layer was selected");
-        }
-        skip_to_end ();
-
-      } else {
-
-        int w = read_integer ();
-
-        poly_pts.clear ();
-
-        int rx = read_sinteger ();
-        int ry = read_sinteger ();
-
-        poly_pts.push_back (db::Point (sf * rx, sf * ry));
-
-        db::Path p (poly_pts.begin (), poly_pts.end (), db::coord_traits <db::Coord>::rounded (sf * w), db::coord_traits <db::Coord>::rounded (sf * w / 2), db::coord_traits <db::Coord>::rounded (sf * w / 2), true);
-        cell.shapes ((unsigned int) layer).insert (p);
-
-        expect_semi ();
-
-      }
-
-    } else if (c == 'W') {
-
-      ++shapes;
-
-      if (layer < 0) {
-
-        if (layer < -1) {
-          warn ("'W' command ignored since no layer was selected");
-        }
-
-        skip_to_end ();
-
-      } else {
-
-        int w = read_integer ();
-
-        poly_pts.clear ();
-
-        while (! test_semi ()) {
-
-          int rx = read_sinteger ();
-          int ry = read_sinteger ();
-
-          poly_pts.push_back (db::Point (sf * rx, sf * ry));
-
-        }
-
-        if (path_mode == 0 || (path_mode < 0 && m_wire_mode == 1)) {
-          //  Flush-ended paths 
-          db::Path p (poly_pts.begin (), poly_pts.end (), db::coord_traits <db::Coord>::rounded (sf * w), 0, 0, false);
-          cell.shapes ((unsigned int) layer).insert (p);
-        } else if (path_mode == 1 || (path_mode < 0 && m_wire_mode == 2)) {
-          //  Round-ended paths
-          db::Path p (poly_pts.begin (), poly_pts.end (), db::coord_traits <db::Coord>::rounded (sf * w), db::coord_traits <db::Coord>::rounded (sf * w / 2), db::coord_traits <db::Coord>::rounded (sf * w / 2), true);
-          cell.shapes ((unsigned int) layer).insert (p);
-        } else {
-          //  Square-ended paths
-          db::Path p (poly_pts.begin (), poly_pts.end (), db::coord_traits <db::Coord>::rounded (sf * w), db::coord_traits <db::Coord>::rounded (sf * w / 2), db::coord_traits <db::Coord>::rounded (sf * w / 2), false);
-          cell.shapes ((unsigned int) layer).insert (p);
-        }
-
-        expect_semi ();
-
-      }
-
-    } else if (isdigit (c)) {
-
-      char cc = m_stream.peek_char ();
-      if (c == '9' && cc == '3') {
-
-        get_char ();
-
-        nx = read_sinteger ();
-        dx = read_sinteger ();
-        ny = read_sinteger ();
-        dy = read_sinteger ();
-
-      } else if (c == '9' && cc == '4') {
-
-        get_char ();
-
-        // label at location 
-        ++shapes;
-
-        if (layer < 0) {
-          if (layer < -1) {
-            warn ("'94' command ignored since no layer was selected");
-          }
-        } else {
-
-          std::string text = read_string ();
-
-          int rx = read_sinteger ();
-          int ry = read_sinteger ();
-
-          double h = 0.0;
-          if (! test_semi ()) {
-            h = read_double ();
-          }
-
-          db::Text t (text.c_str (), db::Trans (db::Vector (sf * rx, sf * ry)), db::coord_traits <db::Coord>::rounded (h / m_dbu));
-          cell.shapes ((unsigned int) layer).insert (t);
-
-        }
-
-      } else if (c == '9' && cc == '5') {
-
-        get_char ();
-
-        // label in box 
-        ++shapes;
-
-        if (layer < 0) {
-          if (layer < -1) {
-            warn ("'95' command ignored since no layer was selected");
-          }
-        } else {
-
-          std::string text = read_string ();
-
-          //  TODO: box dimensions are ignored currently.
-          read_sinteger ();
-          read_sinteger ();
-
-          int rx = read_sinteger ();
-          int ry = read_sinteger ();
-
-          db::Text t (text.c_str (), db::Trans (db::Vector (sf * rx, sf * ry)));
-          cell.shapes ((unsigned int) layer).insert (t);
-
-        }
-
-      } else if (c == '9' && cc == '8') {
-
-        get_char ();
-
-        // Path type (0: flush, 1: round, 2: square)
-        path_mode = read_integer ();
-
-      } else if (c == '9' && ! isdigit (cc)) {
-
-        m_cellname = read_string ();
-        m_cellname = layout.uniquify_cell_name (m_cellname.c_str ());
-        layout.rename_cell (cell.cell_index (), m_cellname.c_str ());
-
-      } else {
-        //  ignore the command 
-      }
-
-      skip_to_end ();
-
-    } else {
-
-      //  ignore the command 
-      warn ("Unknown command ignored");
-      skip_to_end ();
-
+  tl::URI source_uri (mp_current_stream->source ());
+  source_uri.set_path (tl::dirname (source_uri.path ()));
+
+  //  first attempt: try relative to source
+  if (find_and_normalize_file (source_uri.resolved (tl::URI (path)), real_path)) {
+    return true;
+  }
+
+  //  then try relative to library paths
+  for (std::vector<std::string>::const_iterator lp = m_lib_paths.begin (); lp != m_lib_paths.end (); ++lp) {
+    std::string lib_path = expr.interpolate (*lp);
+    if (find_and_normalize_file (source_uri.resolved (tl::URI (lib_path).resolved (tl::URI (path))), real_path)) {
+      return true;
     }
-    
   }
 
-  //  The cell is considered non-empty if it contains more than one instance, at least one shape or
-  //  has at least one "L" command.
-  return insts > 1 || shapes > 0 || layer_specs > 0;
+  return false;
 }
-#endif
 
-void 
-MAGReader::do_read (db::Layout &layout)
+void
+MAGReader::do_read (db::Layout &layout, db::cell_index_type cell_index, tl::TextInputStream &stream)
 {
-#if 0 // @@@
-  tl::SelfTimer timer (tl::verbosity () >= 21, "File read");
-
   try {
-  
-    double sf = 0.01 / m_dbu;
-    layout.dbu (m_dbu);
 
-    m_cellname = "{MAG top level}";
+    mp_current_stream = &stream;
+    do_read_part (layout, cell_index, stream);
 
-    db::Cell &cell = layout.cell (layout.add_cell ());
-
-    if (! read_cell (layout, cell, sf, 0)) {
-      // The top cell is empty or contains a single instance: discard it.
-      layout.delete_cell (cell.cell_index ());
-    } else {
-      layout.rename_cell (cell.cell_index (), layout.uniquify_cell_name ("MAG_TOP").c_str ());
+    if (m_merge) {
+      do_merge_part (layout, cell_index);
     }
 
-    m_cellname = std::string ();
-
-    skip_blanks ();
-
-    if (! m_stream.at_end ()) {
-      warn ("E command is followed by more text");
-    }
-
-  } catch (db::MAGReaderException &ex) {
-    throw ex;
   } catch (tl::Exception &ex) {
     error (ex.msg ());
   }
-#endif
+}
+
+void 
+MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl::TextInputStream &stream)
+{
+  tl::SelfTimer timer (tl::verbosity () >= 31, "File read");
+
+  if (tl::verbosity () >= 30) {
+    tl::log << "Reading layout file: " << stream.source ();
+  }
+
+  std::string l = stream.get_line ();
+  if (l != "magic") {
+    error (tl::to_string (tr ("Could not find 'magic' header line - is this a MAGIC file?")));
+  }
+
+  bool valid_layer = false;
+  unsigned int current_layer = 0;
+  bool in_labels = false;
+
+  while (! stream.at_end ()) {
+
+    std::string l = stream.get_line ();
+    tl::Extractor ex (l.c_str ());
+
+    if (ex.at_end () || ex.test ("#")) {
+
+      //  skip empty lines and comments
+      continue;
+
+    } else if (ex.test ("tech")) {
+
+      ex.read_word_or_quoted (m_tech);
+
+      if (&m_stream == &stream) {
+        //  initial file - store technology
+        layout.add_meta_info (db::MetaInfo ("magic_tech", "MAGIC technology string", m_tech));
+      }
+
+      ex.expect_end ();
+
+    } else if (ex.test ("timestamp")) {
+
+      size_t ts = 0;
+      ex.read (ts);
+
+      if (&m_stream == &stream) {
+        //  initial file - store technology
+        layout.add_meta_info (db::MetaInfo ("magic_timestamp", "MAGIC main file timestamp", tl::to_string (ts)));
+      }
+
+      ex.expect_end ();
+
+    } else if (ex.test ("<<")) {
+
+      std::string lname;
+      ex.read_word_or_quoted (lname);
+
+      if (lname == "end") {
+        in_labels = false;
+        valid_layer = false;
+      } else if (lname == "labels") {
+        in_labels = true;
+      } else {
+        in_labels = false;
+        std::pair<bool, unsigned int> ll = open_layer (layout, lname);
+        valid_layer = ll.first;
+        current_layer = ll.second;
+      }
+
+      ex.expect (">>");
+      ex.expect_end ();
+
+    } else if (ex.test ("rect")) {
+
+      if (in_labels) {
+        error (tl::to_string (tr ("'rect' statement inside labels section")));
+      } else if (valid_layer) {
+        read_rect (ex, layout, cell_index, current_layer);
+      }
+
+    } else if (ex.test ("rlabel")) {
+
+      if (! in_labels) {
+        error (tl::to_string (tr ("'rlabel' statement outside labels section")));
+      } else {
+        read_rlabel (ex, layout, cell_index);
+      }
+
+    } else if (ex.test ("use")) {
+
+      read_cell_instance (ex, stream, layout, cell_index);
+
+    }
+
+  }
+}
+
+void
+MAGReader::do_merge_part (Layout &layout, cell_index_type cell_index)
+{
+  tl::SelfTimer timer (tl::verbosity () >= 31, "Merge step");
+
+  db::Cell &cell = layout.cell (cell_index);
+  db::ShapeProcessor sp;
+  if (tl::verbosity () >= 40) {
+    sp.enable_progress (tl::to_string (tr ("Merging shapes for MAG reader")));
+  }
+
+  for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
+    unsigned int li = (unsigned int) (*l).first;
+    sp.merge (layout, cell, li, cell.shapes (li), false);
+  }
+}
+
+void
+MAGReader::read_rect (tl::Extractor &ex, Layout &layout, cell_index_type cell_index, unsigned int layer)
+{
+  double l, b, r, t;
+  ex.read (l);
+  ex.read (b);
+  ex.read (r);
+  ex.read (t);
+  ex.expect_end ();
+
+  db::DBox box (l, b, r, t);
+  layout.cell (cell_index).shapes (layer).insert ((box * m_lambda).transformed (m_dbu_trans_inv));
+}
+
+void
+MAGReader::read_rlabel (tl::Extractor &ex, Layout &layout, cell_index_type cell_index)
+{
+  std::string lname;
+  ex.read (lname);
+
+  double l, b, r, t;
+  ex.read (l);
+  ex.read (b);
+  ex.read (r);
+  ex.read (t);
+
+  int pos = 0;
+  ex.read (pos);
+
+  ex.skip ();
+  db::DText text (db::DTrans (), *ex);
+
+  double x = 0.5 * (l + r);
+  double y = 0.5 * (b + t);
+  if (pos == 2 || pos == 3 || pos == 4) {
+    x = r;
+  } else if (pos == 6 || pos == 7 || pos == 8) {
+    x = l;
+  }
+  if (pos == 1 || pos == 2 || pos == 8) {
+    y = t;
+  } else if (pos == 4 || pos == 5 || pos == 6) {
+    y = b;
+  }
+
+  text.move (db::DVector (x, y));
+
+  if (lname != "space") {   //  really? "space"?
+    std::pair<bool, unsigned int> ll = open_layer (layout, lname);
+    if (ll.first) {
+      layout.cell (cell_index).shapes (ll.second).insert ((text * m_lambda).transformed (m_dbu_trans_inv));
+    }
+  }
+}
+
+void
+MAGReader::read_cell_instance (tl::Extractor &ex, tl::TextInputStream &stream, Layout &layout, cell_index_type cell_index)
+{
+  const char *include_chars_in_files = "$_,.-$+#:;[]()<>|/\\";
+
+  std::string filename, use_id, lib_path;
+  ex.read_word_or_quoted (filename, include_chars_in_files);
+  if (! ex.at_end ()) {
+    ex.read_word_or_quoted (use_id);
+  }
+  if (! ex.at_end ()) {
+    ex.read_word_or_quoted (lib_path, include_chars_in_files);
+  }
+
+  if (lib_path.empty ()) {
+    std::map<std::string, std::string>::const_iterator lp = m_use_lib_paths.find (filename);
+    if (lp != m_use_lib_paths.end ()) {
+      lib_path = lp->second;
+    }
+  } else {
+    //  give precendence to lib_path
+    filename = tl::filename (filename);
+    //  save for next use
+    m_use_lib_paths.insert (std::make_pair (filename, lib_path));
+  }
+
+  if (! lib_path.empty ()) {
+    //  NOTE: we don't use the system separator because it looks like MAG files use "/".
+    filename = lib_path + "/" + filename;
+  }
+
+  //  read more lines until box
+
+  db::DVector a, b, p;
+  unsigned long na = 1, nb = 1;
+
+  db::DCplxTrans trans;
+
+  while (! stream.at_end ()) {
+
+    std::string l = stream.get_line ();
+    tl::Extractor ex2 (l.c_str ());
+
+    if (ex2.at_end () || ex2.test ("#")) {
+      continue;
+    } else if (ex2.test ("array")) {
+
+      int xlo = 0, xhi = 0, ylo = 0, yhi = 0;
+      double xsep = 0.0, ysep = 0.0;
+
+      ex2.read (xlo);
+      ex2.read (xhi);
+      ex2.read (xsep);
+
+      ex2.read (ylo);
+      ex2.read (yhi);
+      ex2.read (ysep);
+
+      na = (unsigned long) std::max (0, xhi - xlo + 1);
+      a = db::DVector (xsep, 0);
+      nb = (unsigned long) std::max (0, yhi - ylo + 1);
+      b = db::DVector (ysep, 0);
+
+    } else if (ex2.test ("timestamp")) {
+      //  ignored
+    } else if (ex2.test ("transform")) {
+
+      double m11 = 0.0, m12 = 0.0, m21 = 0.0, m22 = 0.0;
+      double dx = 0.0, dy = 0.0;
+
+      ex2.read (m11);
+      ex2.read (m12);
+      ex2.read (dx);
+      ex2.read (m21);
+      ex2.read (m22);
+      ex2.read (dy);
+
+      trans = db::DCplxTrans (db::Matrix2d (m11, m12, m21, m22), db::DVector (dx, dy));
+
+    } else if (ex2.test ("box")) {
+      //  ignored
+      break;
+    }
+
+  }
+
+  //  create the instance
+
+  db::cell_index_type ci = cell_from_path (filename, layout);
+
+  db::ICplxTrans itrans = m_dbu_trans_inv * trans * db::CplxTrans (m_dbu);
+
+  if (na == 1 && nb == 1) {
+    layout.cell (cell_index).insert (db::CellInstArray (db::CellInst (ci), itrans));
+  } else {
+    layout.cell (cell_index).insert (db::CellInstArray (db::CellInst (ci), itrans, m_dbu_trans_inv * a, m_dbu_trans_inv * b, na, nb));
+  }
 }
 
 }

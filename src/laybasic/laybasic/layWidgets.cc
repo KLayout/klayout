@@ -1147,21 +1147,10 @@ void DecoratedLineEdit::resizeEvent (QResizeEvent * /*event*/)
 //  InteractiveListWidget implementation
 
 InteractiveListWidget::InteractiveListWidget (QWidget *parent)
-  : QListWidget (parent), m_drag_and_drop_enabled (false)
+  : QListWidget (parent)
 {
   setSelectionMode (QAbstractItemView::ExtendedSelection);
   setDragDropMode (QAbstractItemView::InternalMove);
-  enable_drag_and_drop (true);
-}
-
-void
-InteractiveListWidget::enable_drag_and_drop (bool f)
-{
-  if (f != m_drag_and_drop_enabled) {
-    m_drag_and_drop_enabled = f;
-    setDragEnabled (f);
-    refresh_flags ();
-  }
 }
 
 void
@@ -1296,7 +1285,7 @@ void
 InteractiveListWidget::refresh_flags ()
 {
   for (int i = 0; i < count (); ++i) {
-    item (i)->setFlags (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled | (m_drag_and_drop_enabled ? Qt::ItemIsDragEnabled : Qt::ItemFlags ()));
+    item (i)->setFlags (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
   }
 }
 

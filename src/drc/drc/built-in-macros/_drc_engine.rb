@@ -894,8 +894,9 @@ module DRC
     # "what" specifies what input to use. "what" be either
     #
     # @ul
-    # @li A string "\@n" specifying output to a layout in the current panel @/li
-    # @li A layout filename @/li 
+    # @li A string "\@n" (n is an integer) specifying output to a layout in the current panel @/li
+    # @li A string "\@+" specifying output to a new layout in the current panel @/li
+    # @li A layout filename @/li
     # @li A RBA::Layout object @/li
     # @li A RBA::Cell object @/li
     # @/ul
@@ -912,15 +913,21 @@ module DRC
           
       if arg.is_a?(String)
       
-        if arg =~ /^@(\d+)/
-          n = $1.to_i - 1
+        if arg =~ /^@(\d+|\+)/
           view = RBA::LayoutView::current
           view || raise("No view open")
+          if $1 == "+"
+            n = view.create_layout(true)
+            cellname ||= (@def_cell ? @def_cell.name : "TOP")
+          else
+            n = $1.to_i - 1
+          end
           (n >= 0 && view.cellviews > n) || raise("Invalid layout index @#{n + 1}")
           cv = view.cellview(n)
           cv.is_valid? || raise("Invalid layout @#{n + 1}")
           @output_layout = cv.layout
           @output_cell = cellname ? (@output_layout.cell(cellname.to_s) || @output_layout.create_cell(cellname.to_s)) : cv.cell
+          cv.cell = @output_cell
           @output_layout_file = nil
         else
           @output_layout = RBA::Layout::new
@@ -1545,7 +1552,7 @@ CODE
             
             @output_layers.each do |li|
               if !present_layers[li]
-                info = @def_layout.get_info(li)
+                info = output.get_info(li)
                 lp = RBA::LayerProperties::new
                 lp.source_layer = info.layer
                 lp.source_datatype = info.datatype

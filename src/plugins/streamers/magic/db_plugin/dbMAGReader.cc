@@ -414,7 +414,7 @@ MAGReader::read_rlabel (tl::Extractor &ex, Layout &layout, cell_index_type cell_
   ex.read (pos);
 
   ex.skip ();
-  db::DText text (db::DTrans (), *ex);
+  db::DText text (ex.get (), db::DTrans ());
 
   double x = 0.5 * (l + r);
   double y = 0.5 * (b + t);

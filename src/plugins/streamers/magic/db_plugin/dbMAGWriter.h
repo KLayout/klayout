@@ -72,6 +72,7 @@ private:
   std::map<unsigned int, std::string> m_layer_names;
   size_t m_timestamp;
   std::map<db::cell_index_type, size_t> m_cell_id;
+  double m_sf;
 
   std::string filename_for_cell (db::cell_index_type ci, db::Layout &layout);
   void write_cell (db::cell_index_type ci, db::Layout &layout, tl::OutputStream &os);

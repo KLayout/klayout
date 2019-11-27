@@ -55,11 +55,11 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
   options.set_options (opt);
 
   db::Manager m;
-  db::Layout layout (&m), layout2 (&m), layout2_cif (&m), layout_au (&m);
+  db::Layout layout (&m), layout2 (&m), layout2_mag (&m), layout_au (&m);
 
   {
     std::string fn (base);
-    fn += "/testdata/cif/";
+    fn += "/testdata/mag/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -75,7 +75,7 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
   //  normalize the layout by writing to GDS and reading from ..
 
   std::string tmp_gds_file = _this->tmp_file (tl::sprintf ("tmp_%x.gds", hash));
-  std::string tmp_cif_file = _this->tmp_file (tl::sprintf ("tmp_%x.cif", hash));
+  std::string tmp_mag_file = _this->tmp_file (tl::sprintf ("tmp_%x.mag", hash));
 
   {
     tl::OutputStream stream (tmp_gds_file);
@@ -94,7 +94,7 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
   //  normalize the layout by writing to MAG and reading from ..
 
   {
-    tl::OutputStream stream (tmp_cif_file);
+    tl::OutputStream stream (tmp_mag_file);
 
     db::MAGWriterOptions *opt = new db::MAGWriterOptions();
     opt->lambda = 0.5;
@@ -106,7 +106,7 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
   }
 
   {
-    tl::InputStream stream (tmp_cif_file);
+    tl::InputStream stream (tmp_mag_file);
 
     db::MAGReaderOptions *opt = new db::MAGReaderOptions();
     opt->dbu = dbu;
@@ -114,12 +114,12 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
     reread_options.set_options (opt);
 
     db::Reader reader (stream);
-    reader.read (layout2_cif, reread_options);
+    reader.read (layout2_mag, reread_options);
   }
 
   {
     std::string fn (base);
-    fn += "/testdata/cif/";
+    fn += "/testdata/mag/";
     fn += file_au;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -131,67 +131,67 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
     _this->raise (tl::sprintf ("Compare failed after reading - see %s vs %s\n", tmp_gds_file, file_au));
   }
 
-  equal = db::compare_layouts (layout, layout2_cif, db::layout_diff::f_boxes_as_polygons | db::layout_diff::f_verbose | db::layout_diff::f_flatten_array_insts, 1);
+  equal = db::compare_layouts (layout, layout2_mag, db::layout_diff::f_boxes_as_polygons | db::layout_diff::f_verbose | db::layout_diff::f_flatten_array_insts, 1);
   if (! equal) {
-    _this->raise (tl::sprintf ("Compare failed after writing - see %s vs %s\n", file, tmp_cif_file));
+    _this->raise (tl::sprintf ("Compare failed after writing - see %s vs %s\n", file, tmp_mag_file));
   }
 }
 
 #if 0 // @@@
 TEST(1a)
 {
-  run_test (_this, tl::testsrc_private (), "t1.cif.gz", "t1a_au.gds.gz");
+  run_test (_this, tl::testsrc_private (), "t1.mag.gz", "t1a_au.gds.gz");
 }
 
 TEST(1b)
 {
-  run_test (_this, tl::testsrc_private (), "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01);
+  run_test (_this, tl::testsrc_private (), "t1.mag.gz", "t1b_au.gds.gz", 0, 0.01);
 }
 
 TEST(1c)
 {
-  run_test (_this, tl::testsrc_private (), "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01, true);
+  run_test (_this, tl::testsrc_private (), "t1.mag.gz", "t1b_au.gds.gz", 0, 0.01, true);
 }
 
 TEST(1d)
 {
-  run_test (_this, tl::testsrc_private (), "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01, false, true);
+  run_test (_this, tl::testsrc_private (), "t1.mag.gz", "t1b_au.gds.gz", 0, 0.01, false, true);
 }
 
 TEST(2)
 {
-  run_test (_this, tl::testsrc_private (), "t2.cif.gz", "t2_au.gds.gz");
+  run_test (_this, tl::testsrc_private (), "t2.mag.gz", "t2_au.gds.gz");
 }
 
 TEST(3a)
 {
-  run_test (_this, tl::testsrc_private (), "t3.cif.gz", "t3a_au.gds.gz", "CAA:43,CCA:48,CCP:47,CMF:49,CMS:51,CPG:46,CSN:45,CSP:44,CVA:50,CWN:42,XP:26");
+  run_test (_this, tl::testsrc_private (), "t3.mag.gz", "t3a_au.gds.gz", "CAA:43,CCA:48,CCP:47,CMF:49,CMS:51,CPG:46,CSN:45,CSP:44,CVA:50,CWN:42,XP:26");
 }
 
 TEST(3b)
 {
-  run_test (_this, tl::testsrc_private (), "t3.cif.gz", "t3b_au.gds.gz", "CAA:43,CCA:48,CCP:47,CMF:49,CMS:51,CPG:46,CSN:45,CSP:44,CVA:50,CWN:42,XP:26", 0.00012);
+  run_test (_this, tl::testsrc_private (), "t3.mag.gz", "t3b_au.gds.gz", "CAA:43,CCA:48,CCP:47,CMF:49,CMS:51,CPG:46,CSN:45,CSP:44,CVA:50,CWN:42,XP:26", 0.00012);
 }
 
 TEST(4)
 {
-  run_test (_this, tl::testsrc_private (), "t4.cif.gz", "t4_au.gds.gz");
+  run_test (_this, tl::testsrc_private (), "t4.mag.gz", "t4_au.gds.gz");
 }
 
 TEST(5)
 {
-  run_test (_this, tl::testsrc_private (), "t5.cif.gz", "t5_au.gds.gz");
+  run_test (_this, tl::testsrc_private (), "t5.mag.gz", "t5_au.gds.gz");
 }
 
 //  Issue #28
 TEST(lasi)
 {
-  run_test (_this, tl::testsrc (), "lasi.cif.gz", "lasi_au.gds.gz");
+  run_test (_this, tl::testsrc (), "lasi.mag.gz", "lasi_au.gds.gz");
 }
 
 //  Issue #305
 TEST(rot_boxes)
 {
-  run_test (_this, tl::testsrc (), "issue_305.cif", "issue_305_au.gds");
+  run_test (_this, tl::testsrc (), "issue_305.mag", "issue_305_au.gds");
 }
 #endif // @@@

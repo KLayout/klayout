@@ -1,12 +1,12 @@
 
-TARGET = cif_ui
+TARGET = mag_ui
 DESTDIR = $$OUT_PWD/../../../../lay_plugins
 
 include($$PWD/../../../lay_plugin.pri)
 
 INCLUDEPATH += $$PWD/../db_plugin
 DEPENDPATH += $$PWD/../db_plugin
-LIBS += -L$$DESTDIR/../db_plugins -lcif
+LIBS += -L$$DESTDIR/../db_plugins -lmag
 
 !isEmpty(RPATH) {
   QMAKE_RPATHDIR += $$RPATH/db_plugins

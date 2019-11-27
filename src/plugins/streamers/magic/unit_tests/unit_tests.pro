@@ -1,7 +1,7 @@
 
 DESTDIR_UT = $$OUT_PWD/../../../..
 
-TARGET = cif_tests
+TARGET = mag_tests
 
 include($$PWD/../../../../lib_ut.pri)
 
@@ -16,4 +16,4 @@ LIBS += -L$$DESTDIR_UT -lklayout_db -lklayout_tl -lklayout_gsi
 PLUGINPATH = $$OUT_PWD/../../../../db_plugins
 QMAKE_RPATHDIR += $$PLUGINPATH
 
-LIBS += -L$$PLUGINPATH -lcif
+LIBS += -L$$PLUGINPATH -lmag

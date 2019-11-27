@@ -62,6 +62,17 @@ MAGWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
   m_layer_names.clear ();
   m_timestamp = 0;  //  @@@ set timestamp?
 
+  double lambda = m_options.lambda;
+  if (lambda <= 0.0) {
+    const std::string &lv = layout.meta_info_value ("lambda");
+    if (lv.empty ()) {
+      throw tl::Exception (tl::to_string (tr ("No lambda value configured for MAG writer and no 'lambda' metadata present in layout.")));
+    }
+    tl::from_string (lv, lambda);
+  }
+
+  m_sf = layout.dbu () / lambda;
+
   if (layout.end_top_cells () - layout.begin_top_down () == 1) {
 
     //  write the one top cell to the given stream. Otherwise
@@ -155,7 +166,9 @@ MAGWriter::write_cell (db::cell_index_type ci, db::Layout &layout, tl::OutputStr
     if (! cell.shapes (li).empty ()) {
       os << "<< " << tl::to_word_or_quoted_string (layer_name (li, layout)) << " >>\n";
       for (db::Shapes::shape_iterator s = cell.shapes (li).begin (db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Paths); ! s.at_end (); ++s) {
-        write_polygon (s->polygon (), layout, os);
+        db::Polygon poly;
+        s->polygon (poly);
+        write_polygon (poly, layout, os);
       }
     }
 
@@ -168,7 +181,9 @@ MAGWriter::write_cell (db::cell_index_type ci, db::Layout &layout, tl::OutputStr
       if (! any) {
         os << "<< labels >>\n";
       }
-      write_label (layer_name ((*i).first, layout), s->text (), layout, os);
+      db::Text text;
+      s->text (text);
+      write_label (layer_name ((*i).first, layout), text, layout, os);
     }
   }
 
@@ -210,16 +225,16 @@ namespace {
 }
 
 void
-MAGWriter::write_polygon (const db::Polygon &poly, const db::Layout &layout, tl::OutputStream &os)
+MAGWriter::write_polygon (const db::Polygon &poly, const db::Layout & /*layout*/, tl::OutputStream &os)
 {
-  TrapezoidWriter writer (os, layout.dbu () / m_options.lambda);
+  TrapezoidWriter writer (os, m_sf);
   db::decompose_trapezoids (poly, TD_simple, writer);
 }
 
 void
-MAGWriter::write_label (const std::string &layer, const db::Text &text, const db::Layout &layout, tl::OutputStream &os)
+MAGWriter::write_label (const std::string &layer, const db::Text &text, const db::Layout & /*layout*/, tl::OutputStream &os)
 {
-  db::DVector v = db::DVector (text.trans ().disp ()) * (layout.dbu () / m_options.lambda);
+  db::DVector v = db::DVector (text.trans ().disp ()) * m_sf;
 
   std::string s = text.string ();
   if (s.find ("\n") != std::string::npos) {
@@ -232,8 +247,6 @@ MAGWriter::write_label (const std::string &layer, const db::Text &text, const db
 void
 MAGWriter::write_instance (const db::CellInstArray &inst, const db::Layout &layout, tl::OutputStream &os)
 {
-  double sf = layout.dbu () / m_options.lambda;
-
   int id = (m_cell_id [inst.object ().cell_index ()] += 1);
   std::string cn = layout.cell_name (inst.object ().cell_index ());
   os << "use " << tl::to_word_or_quoted_string (cn) << " " << tl::to_word_or_quoted_string (cn + "_" + tl::to_string (id));
@@ -243,7 +256,7 @@ MAGWriter::write_instance (const db::CellInstArray &inst, const db::Layout &layo
   db::ICplxTrans tr = inst.complex_trans ();
   db::Matrix2d m = tr.to_matrix2d ();
 
-  db::DVector d = db::DVector (tr.disp ()) * sf;
+  db::DVector d = db::DVector (tr.disp ()) * m_sf;
   os << "transform " << m.m11 () << " " << m.m12 () << " " << d.x () << " " << m.m21 () << " " << m.m22 () << " " << d.y () << "\n";
 
   {
@@ -259,15 +272,15 @@ MAGWriter::write_instance (const db::CellInstArray &inst, const db::Layout &layo
         std::swap (na, nb);
       }
 
-      db::DVector da = db::DVector (a) * sf;
-      db::DVector db = db::DVector (b) * sf;
+      db::DVector da = db::DVector (a) * m_sf;
+      db::DVector db = db::DVector (b) * m_sf;
       os << "array " << 0 << " " << (na - 1) << " " << da.x () << " " << 0 << " " << (nb - 1) << " " << db.y () << "\n";
 
     }
   }
 
   {
-    db::DBox b = db::DBox (inst.bbox (db::box_convert<db::CellInst> ())) * sf;
+    db::DBox b = db::DBox (inst.bbox (db::box_convert<db::CellInst> ())) * m_sf;
     os << "box " << b.left () << " " << b.bottom () << " " << b.right () << " " << b.top () << "\n";
   }
 }

@@ -212,7 +212,7 @@ static bool get_cif_blank_separator (const db::SaveLayoutOptions *options)
   return options->get_options<db::CIFWriterOptions> ().blank_separator;
 }
 
-//  extend lay::SaveLayoutOptions with the GDS2 options
+//  extend lay::SaveLayoutOptions with the CIF options
 static
 gsi::ClassExt<db::SaveLayoutOptions> cif_writer_options (
   gsi::method_ext ("cif_dummy_calls=", &set_cif_dummy_calls,

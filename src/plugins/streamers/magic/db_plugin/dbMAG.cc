@@ -83,7 +83,7 @@ public:
 
   virtual tl::XMLElementBase *xml_reader_options_element () const
   {
-    return new db::ReaderOptionsXMLElement<db::MAGReaderOptions> ("cif",
+    return new db::ReaderOptionsXMLElement<db::MAGReaderOptions> ("mag",
       tl::make_member (&db::MAGReaderOptions::lambda, "lambda") +
       tl::make_member (&db::MAGReaderOptions::dbu, "dbu") +
       tl::make_member (&db::MAGReaderOptions::layer_map, "layer-map") +
@@ -98,12 +98,9 @@ public:
 
   virtual tl::XMLElementBase *xml_writer_options_element () const
   {
-// @@@
-    return new db::WriterOptionsXMLElement<db::MAGWriterOptions> ("cif",
-      tl::make_member (&db::MAGWriterOptions::dummy_calls, "dummy-calls") +
-      tl::make_member (&db::MAGWriterOptions::blank_separator, "blank-separator")
+    return new db::WriterOptionsXMLElement<db::MAGWriterOptions> ("mag",
+      tl::make_member (&db::MAGWriterOptions::lambda, "lambda")
     );
-// @@@
   }
 };
 

@@ -97,8 +97,7 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
     tl::OutputStream stream (tmp_cif_file);
 
     db::MAGWriterOptions *opt = new db::MAGWriterOptions();
-    opt->dummy_calls = dummy_calls;
-    opt->blank_separator = blank_sep;
+    opt->lambda = 0.5;
 
     db::MAGWriter writer;
     db::SaveLayoutOptions options;

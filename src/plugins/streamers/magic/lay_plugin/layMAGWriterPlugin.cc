@@ -55,8 +55,11 @@ MAGWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::
 {
   const db::MAGWriterOptions *options = dynamic_cast<const db::MAGWriterOptions *> (o);
   if (options) {
-    mp_ui->dummy_calls_cbx->setChecked (options->dummy_calls);
-    mp_ui->blank_separator_cbx->setChecked (options->blank_separator);
+    if (options->lambda <= 0.0) {
+      mp_ui->lambda_le->setText (QString ());
+    } else {
+      mp_ui->lambda_le->setText (tl::to_qstring (tl::to_string (options->lambda)));
+    }
   }
 }
 
@@ -65,8 +68,11 @@ MAGWriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Techn
 {
   db::MAGWriterOptions *options = dynamic_cast<db::MAGWriterOptions *> (o);
   if (options) {
-    options->dummy_calls = mp_ui->dummy_calls_cbx->isChecked ();
-    options->blank_separator = mp_ui->blank_separator_cbx->isChecked ();
+    QString l = mp_ui->lambda_le->text ().trimmed ();
+    options->lambda = 0.0;
+    if (! l.isEmpty ()) {
+      tl::from_string (tl::to_string (l), options->lambda);
+    }
   }
 }
 

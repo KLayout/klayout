@@ -236,53 +236,32 @@ gsi::ClassExt<db::LoadLayoutOptions> mag_reader_options (
 // ---------------------------------------------------------------
 //  gsi Implementation of specific methods
 
-static void set_mag_dummy_calls (db::SaveLayoutOptions *options, bool f)
+static void set_mag_lambda_w (db::SaveLayoutOptions *options, double f)
 {
-  options->get_options<db::MAGWriterOptions> ().dummy_calls = f;
+  options->get_options<db::MAGWriterOptions> ().lambda = f;
 }
 
-static bool get_mag_dummy_calls (const db::SaveLayoutOptions *options)
+static double get_mag_lambda_w (const db::SaveLayoutOptions *options)
 {
-  return options->get_options<db::MAGWriterOptions> ().dummy_calls;
+  return options->get_options<db::MAGWriterOptions> ().lambda;
 }
 
-static void set_mag_blank_separator (db::SaveLayoutOptions *options, bool f)
-{
-  options->get_options<db::MAGWriterOptions> ().blank_separator = f;
-}
-
-static bool get_mag_blank_separator (const db::SaveLayoutOptions *options)
-{
-  return options->get_options<db::MAGWriterOptions> ().blank_separator;
-}
-
-//  extend lay::SaveLayoutOptions with the GDS2 options
+//  extend lay::SaveLayoutOptions with the MAG options
 static
 gsi::ClassExt<db::SaveLayoutOptions> mag_writer_options (
-  gsi::method_ext ("mag_dummy_calls=", &set_mag_dummy_calls,
-    "@brief Sets a flag indicating whether dummy calls shall be written\n"
-    "If this property is set to true, dummy calls will be written in the top level entity "
-    "of the MAG file calling every top cell.\n"
-    "This option is useful for enhanced compatibility with other tools.\n"
-    "\nThis property has been added in version 0.23.10.\n"
+  gsi::method_ext ("mag_lambda=", &set_mag_lambda_w, gsi::arg ("lambda"),
+    "@brief Specifies the lambda value to used for writing\n"
+    "\n"
+    "The lamdba value is the basic unit of the layout.\n"
+    "The layout is brought to units of this value. If the layout is not on-grid on this unit, snapping will happen. "
+    "If the value is less or equal to zero, KLayout will use the lambda value stored inside the layout (set by a previous read operation "
+    "of a MAGIC file).\n"
+    "\nThis property has been added in version 0.26.2.\n"
   ) +
-  gsi::method_ext ("mag_dummy_calls?|#mag_dummy_calls", &get_mag_dummy_calls,
-    "@brief Gets a flag indicating whether dummy calls shall be written\n"
-    "See \\mag_dummy_calls= method for a description of that property."
-    "\nThis property has been added in version 0.23.10.\n"
-    "\nThe predicate version (mag_blank_separator?) has been added in version 0.25.1.\n"
-  ) +
-  gsi::method_ext ("mag_blank_separator=", &set_mag_blank_separator,
-    "@brief Sets a flag indicating whether blanks shall be used as x/y separator characters\n"
-    "If this property is set to true, the x and y coordinates are separated with blank characters "
-    "rather than comma characters."
-    "\nThis property has been added in version 0.23.10.\n"
-  ) +
-  gsi::method_ext ("mag_blank_separator?|#mag_blank_separator", &get_mag_blank_separator,
-    "@brief Gets a flag indicating whether blanks shall be used as x/y separator characters\n"
-    "See \\mag_blank_separator= method for a description of that property."
-    "\nThis property has been added in version 0.23.10.\n"
-    "\nThe predicate version (mag_blank_separator?) has been added in version 0.25.1.\n"
+  gsi::method_ext ("mag_lambda", &get_mag_lambda_w,
+    "@brief Get the lambda value\n"
+    "See \\mag_lambda= method for a description of this attribute."
+    "\nThis property has been added in version 0.26.2.\n"
   ),
   ""
 );

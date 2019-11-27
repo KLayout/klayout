@@ -146,24 +146,19 @@ public:
    *  @brief The constructor
    */
   MAGWriterOptions ()
-    : dummy_calls (false), blank_separator (false)
+    : lambda (0.0)
   {
     //  .. nothing yet ..
   }
 
   /**
-   *  @brief A flag indicating whether dummy calls shall be written
-   *  If this flag is true, the writer will produce dummy cell calls on global
-   *  level for all top cells.
+   *  @brief Specifies the lambda value for writing
+   *
+   *  The lambda value is the basic scaling parameter.
+   *  If this value is set to 0 or negative, the lambda value stored in the layout
+   *  is used (meta data "lambda").
    */
-  bool dummy_calls;
-
-  /**
-   *  @brief A flag indicating whether to use blanks as x/y separators
-   *  If this flag is true, blank characters will be used to separate x and y values.
-   *  Otherwise comma characters will be used.
-   */
-  bool blank_separator;
+  double lambda;
 
   /**
    *  @brief Implementation of FormatSpecificWriterOptions

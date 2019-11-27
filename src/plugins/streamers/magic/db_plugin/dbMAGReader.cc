@@ -283,7 +283,7 @@ MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl:
     error (tl::to_string (tr ("Could not find 'magic' header line - is this a MAGIC file?")));
   }
 
-  layout.add_meta_info (db::MetaInfo ("magic_lambda", "MAGIC lambda value", tl::to_string (m_lambda)));
+  layout.add_meta_info (db::MetaInfo ("lambda", "lambda value (tech scaling)", tl::to_string (m_lambda)));
 
   bool valid_layer = false;
   unsigned int current_layer = 0;

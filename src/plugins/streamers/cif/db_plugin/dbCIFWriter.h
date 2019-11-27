@@ -66,7 +66,7 @@ private:
   tl::OutputStream *mp_stream;
   CIFWriterOptions m_options;
   tl::AbsoluteProgress m_progress;
-  endl_tag endl;
+  endl_tag m_endl;
   db::LayerProperties m_layer;
   bool m_needs_emit;
   

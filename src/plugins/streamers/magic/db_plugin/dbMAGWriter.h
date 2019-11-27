@@ -66,28 +66,6 @@ private:
   tl::OutputStream *mp_stream;
   MAGWriterOptions m_options;
   tl::AbsoluteProgress m_progress;
-  endl_tag endl;
-  db::LayerProperties m_layer;
-  bool m_needs_emit;
-  
-  MAGWriter &operator<<(const char *s);
-  MAGWriter &operator<<(const std::string &s);
-  MAGWriter &operator<<(endl_tag);
-
-  template<class X> MAGWriter &operator<<(const X &x)
-  {
-    return (*this << tl::to_string(x));
-  }
-
-  void write_texts (const db::Layout &layout, const db::Cell &cell, unsigned int layer, double tl_scale);
-  void write_polygons (const db::Layout &layout, const db::Cell &cell, unsigned int layer, double tl_scale);
-  void write_polygon (const db::Polygon &polygon, double tl_scale);
-  void write_boxes (const db::Layout &layout, const db::Cell &cell, unsigned int layer, double tl_scale);
-  void write_paths (const db::Layout &layout, const db::Cell &cell, unsigned int layer, double tl_scale);
-  void write_edges (const db::Layout &layout, const db::Cell &cell, unsigned int layer, double tl_scale);
-  const char *xy_sep () const;
-
-  void emit_layer();
 };
 
 } // namespace db

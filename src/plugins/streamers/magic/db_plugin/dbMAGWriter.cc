@@ -37,42 +37,10 @@ namespace db
 
 MAGWriter::MAGWriter ()
   : mp_stream (0),
-    m_progress (tl::to_string (tr ("Writing MAG file")), 10000),
-    m_needs_emit (false)
+    m_progress (tl::to_string (tr ("Writing Magic file")), 10000)
 {
   m_progress.set_format (tl::to_string (tr ("%.0f MB")));
   m_progress.set_unit (1024 * 1024);
-}
-
-MAGWriter &
-MAGWriter::operator<<(const char *s)
-{
-  mp_stream->put(s, strlen(s));
-  return *this;
-}
-
-MAGWriter &
-MAGWriter::operator<<(const std::string &s)
-{
-  mp_stream->put(s.c_str(), s.size());
-  return *this;
-}
-
-MAGWriter &
-MAGWriter::operator<<(endl_tag)
-{
-#ifdef _WIN32
-  *this << "\r\n";
-#else
-  *this << "\n";
-#endif
-  return *this;
-}
-
-const char *
-MAGWriter::xy_sep () const
-{
-  return m_options.blank_separator ? " " : ",";
 }
 
 void 
@@ -81,6 +49,7 @@ MAGWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
   m_options = options.get_options<MAGWriterOptions> ();
   mp_stream = &stream;
 
+#if 0 // @@@
   //  compute the scale factor to get to the 10 nm basic database unit of MAG
   double tl_scale = options.scale_factor () * layout.dbu () / 0.01;
 
@@ -242,11 +211,12 @@ MAGWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
 
   //  end of file
   *this << "E" << endl;
+#endif
 
   m_progress.set (mp_stream->pos ());
-
 }
 
+#if 0 // @@@
 void 
 MAGWriter::emit_layer()
 {
@@ -440,6 +410,7 @@ MAGWriter::write_paths (const db::Layout & /*layout*/, const db::Cell &cell, uns
 
   }
 }
+#endif
 
 }
 

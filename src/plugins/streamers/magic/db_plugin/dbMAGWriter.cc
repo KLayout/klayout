@@ -23,8 +23,11 @@
 
 #include "dbMAGWriter.h"
 #include "dbPolygonGenerators.h"
+#include "dbPolygonTools.h"
 #include "tlStream.h"
 #include "tlUtils.h"
+#include "tlFileUtils.h"
+#include "tlUri.h"
 
 #include <time.h>
 #include <string.h>
@@ -41,6 +44,7 @@ MAGWriter::MAGWriter ()
 {
   m_progress.set_format (tl::to_string (tr ("%.0f MB")));
   m_progress.set_unit (1024 * 1024);
+  m_timestamp = 0;
 }
 
 void 
@@ -49,368 +53,224 @@ MAGWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
   m_options = options.get_options<MAGWriterOptions> ();
   mp_stream = &stream;
 
-#if 0 // @@@
-  //  compute the scale factor to get to the 10 nm basic database unit of MAG
-  double tl_scale = options.scale_factor () * layout.dbu () / 0.01;
+  m_base_uri = tl::URI (stream.path ());
+  m_ext = tl::extension (m_base_uri.path ());
+  m_base_uri.set_path (tl::dirname (m_base_uri.path ()));
 
-  std::vector <std::pair <unsigned int, db::LayerProperties> > layers;
-  options.get_valid_layers (layout, layers, db::SaveLayoutOptions::LP_AssignName);
+  m_cells_written.clear ();
+  m_cells_to_write.clear ();
+  m_layer_names.clear ();
+  m_timestamp = 0;  //  @@@ set timestamp?
 
-  std::set <db::cell_index_type> cell_set;
-  options.get_cells (layout, cell_set, layers);
+  if (layout.end_top_cells () - layout.begin_top_down () == 1) {
 
-  //  create a cell index vector sorted bottom-up
-  std::vector <db::cell_index_type> cells;
-  cells.reserve (cell_set.size ());
+    //  write the one top cell to the given stream. Otherwise
+    write_cell (*layout.begin_top_down (), layout, stream);
 
-  for (db::Layout::bottom_up_const_iterator cell = layout.begin_bottom_up (); cell != layout.end_bottom_up (); ++cell) {
-    if (cell_set.find (*cell) != cell_set.end ()) {
-      cells.push_back (*cell);
+  } else {
+
+    stream << "# KLayout is not writing this file as there are multiple top cells - see those files for the individual cells.";
+
+    for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_cells (); ++c) {
+      m_cells_to_write.insert (std::make_pair (*c, filename_for_cell (*c, layout)));
     }
+
   }
 
-  time_t t = time(NULL);
-  struct tm tt = *localtime(&t);
+  while (! m_cells_to_write.empty ()) {
 
-  char timestr[100];
-  strftime(timestr, sizeof (timestr), "%F %T", &tt);
+    std::map<db::cell_index_type, std::string> cells_to_write;
+    cells_to_write.swap (m_cells_to_write);
 
-  //  Write header
-  *this << "(MAG file written " << (const char *)timestr << " by KLayout);" << endl;
-
-  //  TODO: this can be done more intelligently ..
-  int tl_scale_divider;
-  int tl_scale_denom;
-  for (tl_scale_divider = 1; tl_scale_divider < 1000; ++tl_scale_divider) {
-    tl_scale_denom = int (floor (0.5 + tl_scale * tl_scale_divider));
-    if (fabs (tl_scale_denom - tl_scale * tl_scale_divider) < 1e-6) {
-      break;
+    for (std::map<db::cell_index_type, std::string>::const_iterator cw = cells_to_write.begin (); cw != cells_to_write.end (); ++cw) {
+      tl::OutputStream os (cw->second, tl::OutputStream::OM_Auto, true);
+      write_cell (cw->first, layout, os);
     }
+
+  }
+}
+
+std::string
+MAGWriter::layer_name (unsigned int li, const Layout &layout)
+{
+  //  @@@ TODO: avoid built-in names, like "end", "space", "labels" ...
+
+  std::map<unsigned int, std::string>::const_iterator i = m_layer_names.find (li);
+  if (i != m_layer_names.end ()) {
+    return i->second;
   }
 
-  int cell_index = 0;
-  std::map <db::cell_index_type, int> db_to_cif_index_map;
-  std::set <db::cell_index_type> called_cells;
+  if (m_layer_names.empty ()) {
 
-  //  body
-  for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end (); ++cell) {
+    for (db::Layout::layer_iterator i = layout.begin_layers (); i != layout.end_layers (); ++i) {
+      db::LayerProperties lp = layout.get_properties ((*i).first);
+      if (lp.is_named ()) {
+        m_layer_names.insert (std::make_pair ((*i).first, lp.name));
+      }
+    }
 
-    m_progress.set (mp_stream->pos ());
-
-    //  cell body 
-    const db::Cell &cref (layout.cell (*cell));
-
-    ++cell_index;
-    db_to_cif_index_map.insert (std::make_pair (*cell, cell_index));
-
-    double sf = 1.0;
-
-    *this << "DS " << cell_index << " " << tl_scale_denom << " " << tl_scale_divider << ";" << endl;
-    *this << "9 " << tl::to_word_or_quoted_string (layout.cell_name (*cell)) << ";" << endl;
-
-    //  instances
-    for (db::Cell::const_iterator inst = cref.begin (); ! inst.at_end (); ++inst) {
-
-      //  write only instances to selected cells
-      if (cell_set.find (inst->cell_index ()) != cell_set.end ()) {
-
-        called_cells.insert (inst->cell_index ());
-
-        m_progress.set (mp_stream->pos ());
-
-        std::map<db::cell_index_type, int>::const_iterator cif_index = db_to_cif_index_map.find (inst->cell_index ());
-        tl_assert(cif_index != db_to_cif_index_map.end ());
-
-        // resolve instance arrays
-        for (db::Cell::cell_inst_array_type::iterator pp = inst->begin (); ! pp.at_end (); ++pp) {
-
-          *this << "C" << cif_index->second;
-          
-          // convert the transformation into MAG's notation
-
-          db::CplxTrans t (inst->complex_trans (*pp));
-          db::Vector d (t.disp() * sf);
-
-          if (t.is_mirror()) {
-            *this << " MY";
-          }
-          
-          double a = t.angle();
-          while (a < 0) {
-            a += 360.0;
-          }
-          double ya = 0.0, xa = 0.0;
-          if (a < 45 || a > 315) {
-            xa = 1.0;
-            ya = tan(a / 180.0 * M_PI);
-          } else if (a < 135) {
-            xa = 1.0 / tan(a / 180.0 * M_PI);
-            ya = 1.0;
-          } else if (a < 225) {
-            xa = -1.0;
-            ya = tan(a / 180.0 * M_PI);
-          } else {
-            xa = 1.0 / tan(a / 180.0 * M_PI);
-            ya = -1.0;
-          } 
-
-          //  TODO: that can be done smarter ...
-          while (fabs (xa - floor (0.5 + xa)) > 1e-3 || fabs (ya - floor (0.5 + ya)) > 1e-3) {
-            xa *= 2.0;
-            ya *= 2.0;
-          }
-
-          *this << " R" << floor (0.5 + xa) << xy_sep () << floor (0.5 + ya);
-
-          *this << " T" << d.x() << xy_sep () << d.y();
-
-          *this << ";" << endl;
-
+    for (db::Layout::layer_iterator i = layout.begin_layers (); i != layout.end_layers (); ++i) {
+      db::LayerProperties lp = layout.get_properties ((*i).first);
+      if (! lp.is_named ()) {
+        //  @@@ TODO: avoid duplicates
+        std::string ld_name = std::string ("L") + tl::to_string (lp.layer);
+        if (lp.datatype) {
+          ld_name += "D";
+          ld_name += tl::to_string (lp.datatype);
         }
-
+        m_layer_names.insert (std::make_pair ((*i).first, ld_name));
       }
-
-    }
-
-    //  shapes
-    for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-
-      m_needs_emit = true;
-      m_layer = l->second;
-
-      write_texts (layout, cref, l->first, sf);
-      write_polygons (layout, cref, l->first, sf);
-      write_paths (layout, cref, l->first, sf);
-      write_boxes (layout, cref, l->first, sf);
-
-      m_progress.set (mp_stream->pos ());
-
-    }
-
-    //  end of cell
-    *this << "DF;" << endl;
-
-  }
-
-  if (m_options.dummy_calls) {
-
-    //  If requested, write dummy calls for all top cells
-    for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end (); ++cell) {
-
-      if (called_cells.find (*cell) == called_cells.end ()) {
-
-        std::map<db::cell_index_type, int>::const_iterator cif_index = db_to_cif_index_map.find (*cell);
-        tl_assert(cif_index != db_to_cif_index_map.end ());
-        *this << "C" << cif_index->second << ";" << endl;
-
-      }
-
     }
 
   }
 
-  //  end of file
-  *this << "E" << endl;
-#endif
-
-  m_progress.set (mp_stream->pos ());
+  return m_layer_names [li];
 }
 
-#if 0 // @@@
-void 
-MAGWriter::emit_layer()
+std::string
+MAGWriter::filename_for_cell (db::cell_index_type ci, db::Layout &layout)
 {
-  if (m_needs_emit) {
-    m_needs_emit = false;
-    *this << "L " << tl::to_word_or_quoted_string(m_layer.name, "0123456789_.$") << ";" << endl;
+  tl::URI uri (m_base_uri);
+  if (uri.path ().empty ()) {
+    uri.set_path (std::string (layout.cell_name (ci)) + m_ext);
   }
+  return uri.to_string ();
 }
 
-void 
-MAGWriter::write_texts (const db::Layout &layout, const db::Cell &cell, unsigned int layer, double sf)
+void
+MAGWriter::write_cell (db::cell_index_type ci, db::Layout &layout, tl::OutputStream &os)
 {
-  db::ShapeIterator shape (cell.shapes (layer).begin (db::ShapeIterator::Texts));
-  while (! shape.at_end ()) {
+  os.set_as_text (true);
+  os << "magic\n";
 
-    m_progress.set (mp_stream->pos ());
+  //  @@@ write tech
 
-    emit_layer ();
+  os << "timestamp " << m_timestamp << "\n";
 
-    *this << "94 " << tl::to_word_or_quoted_string(shape->text_string(), "0123456789:<>/&%$!.-_#+*?\\[]{}");
+  db::Cell &cell = layout.cell (ci);
 
-    double h = shape->text_size () * layout.dbu ();
+  for (db::Layout::layer_iterator i = layout.begin_layers (); i != layout.end_layers (); ++i) {
 
-    db::Vector p (shape->text_trans ().disp () * sf);
-    *this << " " << p.x() << xy_sep () << p.y () << " " << h << ";" << endl;
-
-    ++shape;
-
-  }
-}
-
-void 
-MAGWriter::write_polygons (const db::Layout & /*layout*/, const db::Cell &cell, unsigned int layer, double sf)
-{
-  db::ShapeIterator shape (cell.shapes (layer).begin (db::ShapeIterator::Polygons));
-  while (! shape.at_end ()) {
-
-    m_progress.set (mp_stream->pos ());
-
-    db::Polygon poly;
-    shape->polygon (poly);
-
-    if (poly.holes () > 0) {
-
-      //  resolve holes or merge polygon as a preparation step for split_polygon which only works properly
-      //  on merged polygons ...
-      std::vector<db::Polygon> polygons;
-
-      db::EdgeProcessor ep;
-      ep.insert_sequence (poly.begin_edge ());
-      db::PolygonContainer pc (polygons);
-      db::PolygonGenerator out (pc, true /*resolve holes*/, false /*min coherence for splitting*/);
-      db::SimpleMerge op;
-      ep.process (out, op);
-
-      for (std::vector<db::Polygon>::const_iterator p = polygons.begin (); p != polygons.end (); ++p) {
-        write_polygon (*p, sf);
-      }
-
-    } else {
-      write_polygon (poly, sf);
-    }
-
-    ++shape;
-
-  }
-}
-
-void 
-MAGWriter::write_polygon (const db::Polygon &polygon, double sf)
-{
-  emit_layer ();
-  *this << "P";
-  for (db::Polygon::polygon_contour_iterator p = polygon.begin_hull (); p != polygon.end_hull (); ++p) {
-    db::Point pp (*p * sf);
-    *this << " " << pp.x () << xy_sep () << pp.y ();
-  }
-  *this << ";" << endl;
-}
-
-void 
-MAGWriter::write_boxes (const db::Layout & /*layout*/, const db::Cell &cell, unsigned int layer, double sf)
-{
-  db::ShapeIterator shape (cell.shapes (layer).begin (db::ShapeIterator::Boxes));
-  while (! shape.at_end ()) {
-
-    m_progress.set (mp_stream->pos ());
-
-    emit_layer ();
-
-    db::Box b (shape->bbox () * sf);
-    *this << "B " << b.width () << " " << b.height () << " " << b.center ().x () << xy_sep () << b.center ().y () << ";" << endl;
-
-    ++shape;
-
-  }
-}
-
-void 
-MAGWriter::write_paths (const db::Layout & /*layout*/, const db::Cell &cell, unsigned int layer, double sf)
-{
-  db::ShapeIterator shape (cell.shapes (layer).begin (db::ShapeIterator::Paths));
-  while (! shape.at_end ()) {
-
-    m_progress.set (mp_stream->pos ());
-
-#if 0 
-
-    //  "official" code: write only round paths as such - other paths are converted to polygons
-    if (shape->round_path ()) {
-
-      emit_layer ();
-
-      *this << "W " << long (floor (0.5 + sf * shape->path_width ()));
-
-      for (db::Shape::point_iterator p = shape->begin_point (); p != shape->end_point (); ++p) {
-        db::Point pp (*p * sf);
-        *this << " " << pp.x () << xy_sep () << pp.y ();
-      }
-
-      *this << ";" << endl;
-
-    } else {
-      db::Polygon poly;
-      shape->polygon (poly);
-      write_polygon (poly, sf);
-    }
-
-#else
-
-    //  Use 98 extension for path type. Only use polygons for custom extensions.
-    int path_type = -1;
-    if (shape->round_path ()) {
-      if (shape->path_extensions ().first == shape->path_width () / 2 && shape->path_extensions ().second == shape->path_width () / 2) {
-        path_type = 1;
-      }
-    } else {
-      if (shape->path_extensions ().first == 0 && shape->path_extensions ().second == 0) {
-        path_type = 0;
-      } else if (shape->path_extensions ().first == shape->path_width () / 2 && shape->path_extensions ().second == shape->path_width () / 2) {
-        path_type = 2;
+    unsigned int li = (*i).first;
+    if (! cell.shapes (li).empty ()) {
+      os << "<< " << tl::to_word_or_quoted_string (layer_name (li, layout)) << " >>\n";
+      for (db::Shapes::shape_iterator s = cell.shapes (li).begin (db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Paths); ! s.at_end (); ++s) {
+        write_polygon (s->polygon (), layout, os);
       }
     }
 
-    size_t npts = 0;
-    for (db::Shape::point_iterator p = shape->begin_point (); p != shape->end_point () && npts < 2; ++p) {
-      ++npts;
-    }
+  }
 
-    if (npts == 0) {
+  bool any = false;
 
-      //  ignore paths with zero points
-
-    } else if (path_type == 1 && npts == 1) {
-
-      //  produce a round flash for single-point round paths
-
-      emit_layer ();
-
-      *this << "R " << long (floor (0.5 + sf * shape->path_width ()));
-
-      db::Point pp (*shape->begin_point () * sf);
-      *this << " " << pp.x () << xy_sep () << pp.y ();
-
-      *this << ";" << endl;
-
-    } else if (path_type >= 0 && npts > 1) {
-
-      emit_layer ();
-
-      *this << "98 " << path_type << ";" << endl;
-
-      *this << "W " << long (floor (0.5 + sf * shape->path_width ()));
-
-      for (db::Shape::point_iterator p = shape->begin_point (); p != shape->end_point (); ++p) {
-        db::Point pp (*p * sf);
-        *this << " " << pp.x () << xy_sep () << pp.y ();
+  for (db::Layout::layer_iterator i = layout.begin_layers (); i != layout.end_layers (); ++i) {
+    for (db::Shapes::shape_iterator s = cell.shapes ((*i).first).begin (db::ShapeIterator::Texts); ! s.at_end (); ++s) {
+      if (! any) {
+        os << "<< labels >>\n";
       }
-
-      *this << ";" << endl;
-
-    } else {
-      db::Polygon poly;
-      shape->polygon (poly);
-      write_polygon (poly, sf);
+      write_label (layer_name ((*i).first, layout), s->text (), layout, os);
     }
+  }
 
-#endif
-
-    ++shape;
-
+  m_cell_id.clear ();
+  for (db::Cell::const_iterator i = cell.begin (); ! i.at_end (); ++i) {
+    if (m_cells_written.find (i->cell_index ()) == m_cells_written.end ()) {
+      m_cells_written.insert (i->cell_index ());
+      m_cells_to_write.insert (std::make_pair (i->cell_index (), filename_for_cell (i->cell_index (), layout)));
+    }
+    write_instance (i->cell_inst (), layout, os);
   }
 }
-#endif
+
+namespace {
+
+  class TrapezoidWriter
+    : public SimplePolygonSink
+  {
+  public:
+    TrapezoidWriter (tl::OutputStream &os, double scale)
+      : mp_os (&os), m_scale (scale)
+    { }
+
+    virtual void put (const db::SimplePolygon &polygon)
+    {
+      if (! polygon.is_box ()) {
+        //  @@@ TODO: handle non-boxes
+      }
+
+      db::DBox b = db::DBox (polygon.box ()) * m_scale;
+      //  @@@ TODO: floating coords on output?
+      (*mp_os) << "rect " << b.left () << " " << b.bottom () << " " << b.right () << " " << b.top () << "\n";
+    }
+
+  private:
+    tl::OutputStream *mp_os;
+    double m_scale;
+  };
+}
+
+void
+MAGWriter::write_polygon (const db::Polygon &poly, const db::Layout &layout, tl::OutputStream &os)
+{
+  TrapezoidWriter writer (os, layout.dbu () / m_options.lambda);
+  db::decompose_trapezoids (poly, TD_simple, writer);
+}
+
+void
+MAGWriter::write_label (const std::string &layer, const db::Text &text, const db::Layout &layout, tl::OutputStream &os)
+{
+  db::DVector v = db::DVector (text.trans ().disp ()) * (layout.dbu () / m_options.lambda);
+
+  std::string s = text.string ();
+  if (s.find ("\n") != std::string::npos) {
+    s = tl::replaced (s, "\n", "\\n");
+  }
+
+  os << "rlabel " << tl::to_word_or_quoted_string (layer) << " " << v.x () << " " << v.y () << " " << v.x () << " " << v.y () << " 0 " << s << "\n";
+}
+
+void
+MAGWriter::write_instance (const db::CellInstArray &inst, const db::Layout &layout, tl::OutputStream &os)
+{
+  double sf = layout.dbu () / m_options.lambda;
+
+  int id = (m_cell_id [inst.object ().cell_index ()] += 1);
+  std::string cn = layout.cell_name (inst.object ().cell_index ());
+  os << "use " << tl::to_word_or_quoted_string (cn) << " " << tl::to_word_or_quoted_string (cn + "_" + tl::to_string (id));
+
+  os << "timestamp " << m_timestamp << "\n";
+
+  db::ICplxTrans tr = inst.complex_trans ();
+  db::Matrix2d m = tr.to_matrix2d ();
+
+  db::DVector d = db::DVector (tr.disp ()) * sf;
+  os << "transform " << m.m11 () << " " << m.m12 () << " " << d.x () << " " << m.m21 () << " " << m.m22 () << " " << d.y () << "\n";
+
+  {
+    db::Vector a, b;
+    unsigned long na = 0, nb = 0;
+    if (inst.is_regular_array (a, b, na, nb) && ((a.x () == 0 && b.y () == 0) || (a.y () == 0 && b.x () == 0))) {
+
+      na = std::max ((unsigned long) 1, na);
+      nb = std::max ((unsigned long) 1, nb);
+
+      if (a.y () != 0) {
+        std::swap (a, b);
+        std::swap (na, nb);
+      }
+
+      db::DVector da = db::DVector (a) * sf;
+      db::DVector db = db::DVector (b) * sf;
+      os << "array " << 0 << " " << (na - 1) << " " << da.x () << " " << 0 << " " << (nb - 1) << " " << db.y () << "\n";
+
+    }
+  }
+
+  {
+    db::DBox b = db::DBox (inst.bbox (db::box_convert<db::CellInst> ())) * sf;
+    os << "box " << b.left () << " " << b.bottom () << " " << b.right () << " " << b.top () << "\n";
+  }
+}
 
 }
 

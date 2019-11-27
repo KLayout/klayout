@@ -691,7 +691,7 @@ OutputStreamBase *create_file_stream (const std::string &path, OutputStream::Out
 }
 
 OutputStream::OutputStream (const std::string &abstract_path, OutputStreamMode om, bool as_text)
-  : m_pos (0), mp_delegate (0), m_owns_delegate (false), m_as_text (as_text)
+  : m_pos (0), mp_delegate (0), m_owns_delegate (false), m_as_text (as_text), m_path (abstract_path)
 {
   //  Determine output mode
   om = output_mode_from_filename (abstract_path, om);
@@ -726,6 +726,12 @@ OutputStream::~OutputStream ()
     delete[] mp_buffer;
     mp_buffer = 0;
   }
+}
+
+void
+OutputStream::set_as_text (bool f)
+{
+  m_as_text = f;
 }
 
 inline void fast_copy (char *t, const char *s, size_t n)

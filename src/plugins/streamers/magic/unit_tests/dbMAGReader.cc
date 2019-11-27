@@ -29,7 +29,7 @@
 
 #include <stdlib.h>
 
-static void run_test (tl::TestBase *_this, const std::string &base, const char *file, const char *file_au, const char *map = 0, double dbu = 0.001, bool dummy_calls = false, bool blank_sep = false)
+static void run_test (tl::TestBase *_this, const std::string &base, const char *file, const char *file_au, const char *map = 0, double dbu = 0.001)
 {
   db::MAGReaderOptions *opt = new db::MAGReaderOptions();
   opt->dbu = dbu;
@@ -137,6 +137,7 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
   }
 }
 
+#if 0 // @@@
 TEST(1a)
 {
   run_test (_this, tl::testsrc_private (), "t1.cif.gz", "t1a_au.gds.gz");
@@ -193,3 +194,4 @@ TEST(rot_boxes)
 {
   run_test (_this, tl::testsrc (), "issue_305.cif", "issue_305_au.gds");
 }
+#endif // @@@

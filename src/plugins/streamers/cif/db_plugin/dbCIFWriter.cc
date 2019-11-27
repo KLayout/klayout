@@ -61,11 +61,7 @@ CIFWriter::operator<<(const std::string &s)
 CIFWriter &
 CIFWriter::operator<<(endl_tag)
 {
-#ifdef _WIN32
-  *this << "\r\n";
-#else
   *this << "\n";
-#endif
   return *this;
 }
 
@@ -78,6 +74,8 @@ CIFWriter::xy_sep () const
 void 
 CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options)
 {
+  stream.set_as_text (true);
+
   m_options = options.get_options<CIFWriterOptions> ();
   mp_stream = &stream;
 

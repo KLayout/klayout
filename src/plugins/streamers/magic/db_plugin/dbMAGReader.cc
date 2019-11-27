@@ -431,7 +431,7 @@ MAGReader::read_rlabel (tl::Extractor &ex, Layout &layout, cell_index_type cell_
 
   text.move (db::DVector (x, y));
 
-  if (lname != "space") {   //  really? "space"?
+  if (true || lname != "space") {   //  @@@ really? "space"? ignore it?
     std::pair<bool, unsigned int> ll = open_layer (layout, lname);
     if (ll.first) {
       layout.cell (cell_index).shapes (ll.second).insert ((text * m_lambda).transformed (m_dbu_trans_inv));

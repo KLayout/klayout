@@ -350,6 +350,14 @@ MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl:
         read_rect (ex, layout, cell_index, current_layer);
       }
 
+    } else if (ex.test ("tri")) {
+
+      if (in_labels) {
+        error (tl::to_string (tr ("'rect' statement inside labels section")));
+      } else if (valid_layer) {
+        read_tri (ex, layout, cell_index, current_layer);
+      }
+
     } else if (ex.test ("rlabel")) {
 
       if (! in_labels) {
@@ -378,9 +386,27 @@ MAGReader::do_merge_part (Layout &layout, cell_index_type cell_index)
     sp.enable_progress (tl::to_string (tr ("Merging shapes for MAG reader")));
   }
 
+  std::vector<db::Text> saved_texts;
+
   for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
+
     unsigned int li = (unsigned int) (*l).first;
-    sp.merge (layout, cell, li, cell.shapes (li), false);
+    db::Shapes &shapes = cell.shapes (li);
+
+    //  save texts before merge
+    saved_texts.clear ();
+    for (db::Shapes::shape_iterator t = shapes.begin (db::ShapeIterator::Texts); ! t.at_end (); ++t) {
+      saved_texts.push_back (db::Text ());
+      t->text (saved_texts.back ());
+    }
+
+    sp.merge (layout, cell, li, shapes, false);
+
+    //  re-insert the texts
+    for (std::vector<db::Text>::const_iterator t = saved_texts.begin (); t != saved_texts.end (); ++t) {
+      shapes.insert (*t);
+    }
+
   }
 }
 
@@ -396,6 +422,52 @@ MAGReader::read_rect (tl::Extractor &ex, Layout &layout, cell_index_type cell_in
 
   db::DBox box (l, b, r, t);
   layout.cell (cell_index).shapes (layer).insert ((box * m_lambda).transformed (m_dbu_trans_inv));
+}
+
+void
+MAGReader::read_tri (tl::Extractor &ex, Layout &layout, cell_index_type cell_index, unsigned int layer)
+{
+  double l, b, r, t;
+  ex.read (l);
+  ex.read (b);
+  ex.read (r);
+  ex.read (t);
+
+  bool s = false, e = false;
+  while (! ex.at_end ()) {
+    if (ex.test ("s")) {
+      s = true;
+    } else if (ex.test ("e")) {
+      e = true;
+    } else {
+      break;
+    }
+  }
+  ex.expect_end ();
+
+  std::vector<db::Point> pts;
+
+  if (s && e) {
+    pts.push_back (db::Point (l, b));
+    pts.push_back (db::Point (r, t));
+    pts.push_back (db::Point (r, b));
+  } else if (s) {
+    pts.push_back (db::Point (l, b));
+    pts.push_back (db::Point (l, t));
+    pts.push_back (db::Point (r, b));
+  } else if (e) {
+    pts.push_back (db::Point (r, b));
+    pts.push_back (db::Point (l, t));
+    pts.push_back (db::Point (r, t));
+  } else {
+    pts.push_back (db::Point (l, b));
+    pts.push_back (db::Point (l, t));
+    pts.push_back (db::Point (r, t));
+  }
+
+  db::SimplePolygon poly;
+  poly.assign_hull (pts.begin (), pts.end ());
+  layout.cell (cell_index).shapes (layer).insert ((poly * m_lambda).transformed (m_dbu_trans_inv));
 }
 
 void
@@ -419,19 +491,27 @@ MAGReader::read_rlabel (tl::Extractor &ex, Layout &layout, cell_index_type cell_
   double x = 0.5 * (l + r);
   double y = 0.5 * (b + t);
   if (pos == 2 || pos == 3 || pos == 4) {
+    text.halign (db::HAlignRight);
     x = r;
   } else if (pos == 6 || pos == 7 || pos == 8) {
+    text.halign (db::HAlignLeft);
     x = l;
+  } else {
+    text.halign (db::HAlignCenter);
   }
   if (pos == 1 || pos == 2 || pos == 8) {
+    text.valign (db::VAlignTop);
     y = t;
   } else if (pos == 4 || pos == 5 || pos == 6) {
+    text.valign (db::VAlignBottom);
     y = b;
+  } else {
+    text.valign (db::VAlignCenter);
   }
 
   text.move (db::DVector (x, y));
 
-  if (true || lname != "space") {   //  @@@ really? "space"? ignore it?
+  if (true || lname != "space") {   //  really? "space"? ignore it?
     std::pair<bool, unsigned int> ll = open_layer (layout, lname);
     if (ll.first) {
       layout.cell (cell_index).shapes (ll.second).insert ((text * m_lambda).transformed (m_dbu_trans_inv));
@@ -500,7 +580,7 @@ MAGReader::read_cell_instance (tl::Extractor &ex, tl::TextInputStream &stream, L
       na = (unsigned long) std::max (0, xhi - xlo + 1);
       a = db::DVector (xsep, 0) * m_lambda;
       nb = (unsigned long) std::max (0, yhi - ylo + 1);
-      b = db::DVector (ysep, 0) * m_lambda;
+      b = db::DVector (0, ysep) * m_lambda;
 
     } else if (ex2.test ("timestamp")) {
       //  ignored
@@ -526,6 +606,9 @@ MAGReader::read_cell_instance (tl::Extractor &ex, tl::TextInputStream &stream, L
   }
 
   //  create the instance
+
+  a = trans * a;
+  b = trans * b;
 
   db::cell_index_type ci = cell_from_path (filename, layout);
 

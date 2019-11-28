@@ -151,6 +151,7 @@ private:
   std::string cell_name_from_path (const std::string &path);
   db::cell_index_type cell_from_path (const std::string &path, Layout &layout);
   void read_rect (tl::Extractor &ex, Layout &layout, cell_index_type cell_index, unsigned int layer);
+  void read_tri (tl::Extractor &ex, Layout &layout, cell_index_type cell_index, unsigned int layer);
   void read_rlabel (tl::Extractor &ex, Layout &layout, cell_index_type cell_index);
   void read_cell_instance (tl::Extractor &ex, tl::TextInputStream &stream, Layout &layout, cell_index_type cell_index);
 };

@@ -61,6 +61,31 @@ public:
    */
   void write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options);
 
+  /**
+   *  @brief Scales the polygon to Magic lambda space
+   */
+  db::Polygon scaled (const db::Polygon &poly);
+
+  /**
+   *  @brief Scales the box to Magic lambda space
+   */
+  db::Box scaled (const Box &bx) const;
+
+  /**
+   *  @brief Scales the vector to Magic lambda space
+   */
+  db::Vector scaled (const db::Vector &v) const;
+
+  /**
+   *  @brief Scales the point to Magic lambda space
+   */
+  db::Point scaled (const db::Point &p) const;
+
+  /**
+   *  @brief Returns true if the vector can be scaled to Magic rounding space without loss
+   */
+  bool needs_rounding (const db::Vector &v) const;
+
 private:
   tl::OutputStream *mp_stream;
   MAGWriterOptions m_options;
@@ -73,13 +98,16 @@ private:
   size_t m_timestamp;
   std::map<db::cell_index_type, size_t> m_cell_id;
   double m_sf;
+  std::string m_cellname;
 
   std::string filename_for_cell (db::cell_index_type ci, db::Layout &layout);
   void write_cell (db::cell_index_type ci, db::Layout &layout, tl::OutputStream &os);
+  void do_write_cell (db::cell_index_type ci, db::Layout &layout, tl::OutputStream &os);
   std::string layer_name (unsigned int li, const db::Layout &layout);
   void write_polygon (const db::Polygon &poly, const db::Layout &layout, tl::OutputStream &os);
   void write_label (const std::string &layer, const db::Text &text, const Layout &layout, tl::OutputStream &os);
   void write_instance (const db::CellInstArray &inst, const db::Layout &layout, tl::OutputStream &os);
+  void write_single_instance (db::cell_index_type ci, ICplxTrans tr, db::Vector a, db::Vector b, unsigned long na, unsigned long nb, const db::Layout &layout, tl::OutputStream &os);
 };
 
 } // namespace db

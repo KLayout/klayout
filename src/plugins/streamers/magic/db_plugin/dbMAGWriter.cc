@@ -28,6 +28,8 @@
 #include "tlUtils.h"
 #include "tlFileUtils.h"
 #include "tlUri.h"
+#include "tlLog.h"
+#include "tlUniqueName.h"
 
 #include <time.h>
 #include <string.h>
@@ -104,32 +106,50 @@ MAGWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
 std::string
 MAGWriter::layer_name (unsigned int li, const Layout &layout)
 {
-  //  @@@ TODO: avoid built-in names, like "end", "space", "labels" ...
-
   std::map<unsigned int, std::string>::const_iterator i = m_layer_names.find (li);
   if (i != m_layer_names.end ()) {
     return i->second;
   }
 
+  //  Avoid built-in names, like "end", "space", "labels" and "checkpaint"
+  std::set<std::string> used_names;
+  used_names.insert ("end");
+  used_names.insert ("space");
+  used_names.insert ("labels");
+  used_names.insert ("checkpaint");
+
   if (m_layer_names.empty ()) {
 
     for (db::Layout::layer_iterator i = layout.begin_layers (); i != layout.end_layers (); ++i) {
+
       db::LayerProperties lp = layout.get_properties ((*i).first);
-      if (lp.is_named ()) {
-        m_layer_names.insert (std::make_pair ((*i).first, lp.name));
+      if (! lp.name.empty ()) {
+
+        std::string lp_name = lp.name;
+        lp_name = tl::unique_name (lp_name, used_names, "_");
+        used_names.insert (lp_name);
+
+        m_layer_names.insert (std::make_pair ((*i).first, lp_name));
+
       }
+
     }
 
     for (db::Layout::layer_iterator i = layout.begin_layers (); i != layout.end_layers (); ++i) {
+
       db::LayerProperties lp = layout.get_properties ((*i).first);
-      if (! lp.is_named ()) {
-        //  @@@ TODO: avoid duplicates
+      if (lp.name.empty ()) {
+
         std::string ld_name = std::string ("L") + tl::to_string (lp.layer);
         if (lp.datatype) {
           ld_name += "D";
           ld_name += tl::to_string (lp.datatype);
         }
+
+        ld_name = tl::unique_name (ld_name, used_names, "_");
+        used_names.insert (ld_name);
         m_layer_names.insert (std::make_pair ((*i).first, ld_name));
+
       }
     }
 
@@ -153,6 +173,17 @@ MAGWriter::filename_for_cell (db::cell_index_type ci, db::Layout &layout)
 void
 MAGWriter::write_cell (db::cell_index_type ci, db::Layout &layout, tl::OutputStream &os)
 {
+  m_cellname = layout.cell_name (ci);
+  try {
+    do_write_cell (ci, layout, os);
+  } catch (tl::Exception &ex) {
+    throw tl::Exception (ex.msg () + tl::to_string (tr (" when writing cell ")) + m_cellname);
+  }
+}
+
+void
+MAGWriter::do_write_cell (db::cell_index_type ci, db::Layout &layout, tl::OutputStream &os)
+{
   os.set_as_text (true);
   os << "magic\n";
 
@@ -162,6 +193,9 @@ MAGWriter::write_cell (db::cell_index_type ci, db::Layout &layout, tl::OutputStr
   os << "timestamp " << m_timestamp << "\n";
 
   db::Cell &cell = layout.cell (ci);
+
+  os << "<< checkpaint >>\n";
+  write_polygon (db::Polygon (cell.bbox ()), layout, os);
 
   for (db::Layout::layer_iterator i = layout.begin_layers (); i != layout.end_layers (); ++i) {
 
@@ -198,40 +232,79 @@ MAGWriter::write_cell (db::cell_index_type ci, db::Layout &layout, tl::OutputStr
     }
     write_instance (i->cell_inst (), layout, os);
   }
+
+  os << "<< end >>\n";
 }
 
 namespace {
 
+  /**
+   *  @brief A simple polygon receiver that writes triangles and rectangles from trapezoids
+   */
   class TrapezoidWriter
     : public SimplePolygonSink
   {
   public:
-    TrapezoidWriter (tl::OutputStream &os, double scale)
-      : mp_os (&os), m_scale (scale)
+    TrapezoidWriter (tl::OutputStream &os)
+      : mp_os (&os)
     { }
 
     virtual void put (const db::SimplePolygon &polygon)
     {
-      if (! polygon.is_box ()) {
-        //  @@@ TODO: handle non-boxes
+      db::Box b = polygon.box ();
+      if (b.empty () || b.height () == 0 || b.width () == 0) {
+        //  safe fallback for degenerated polygons
+        return;
       }
 
-      db::DBox b = db::DBox (polygon.box ()) * m_scale;
-      //  @@@ TODO: floating coords on output?
-      (*mp_os) << "rect " << b.left () << " " << b.bottom () << " " << b.right () << " " << b.top () << "\n";
+      //  Determine the border triangles left and right
+
+      //  tl, tr describe the two triangles: tl left and tr right one.
+      //  If sl/sr indicate south half of the rectangle.
+      db::Box tl, tr;
+      bool sl = false, sr = false;
+
+      for (db::SimplePolygon::polygon_edge_iterator ie = polygon.begin_edge (); ! ie.at_end (); ++ie) {
+        db::Edge e = *ie;
+        if (e.dy () > 0 /*left side*/) {
+          tl = e.bbox ();
+          sl = e.dx () > 0;
+        } else if (e.dy () < 0 /*right side*/) {
+          tr = e.bbox ();
+          sr = e.dx () > 0;
+        }
+      }
+
+      //  outputs the parts
+
+      if (tl.width () > 0) {
+        (*mp_os) << "tri " << tl.left () << " " << tl.bottom () << " " << tl.right () << " " << tl.top () << " " << (sl ? "s" : "") << "e\n";
+      }
+
+      db::Box ib (tl.right (), tl.bottom (), tr.left (), tr.top ());
+      if (ib.width () > 0) {
+        (*mp_os) << "rect " << ib.left () << " " << ib.bottom () << " " << ib.right () << " " << ib.top () << "\n";
+      }
+
+      if (tr.width () > 0) {
+        (*mp_os) << "tri " << tr.left () << " " << tr.bottom () << " " << tr.right () << " " << tr.top () << " " << (sr ? "s" : "") << "\n";
+      }
     }
 
   private:
     tl::OutputStream *mp_os;
-    double m_scale;
   };
 }
 
 void
 MAGWriter::write_polygon (const db::Polygon &poly, const db::Layout & /*layout*/, tl::OutputStream &os)
 {
-  TrapezoidWriter writer (os, m_sf);
-  db::decompose_trapezoids (poly, TD_simple, writer);
+  db::EdgeProcessor ep;
+  ep.insert (scaled (poly));
+  db::MergeOp op;
+  TrapezoidWriter writer (os);
+  db::TrapezoidGenerator tpgen (writer);
+  ep.process (tpgen, op);
 }
 
 void
@@ -250,42 +323,120 @@ MAGWriter::write_label (const std::string &layer, const db::Text &text, const db
 void
 MAGWriter::write_instance (const db::CellInstArray &inst, const db::Layout &layout, tl::OutputStream &os)
 {
-  int id = (m_cell_id [inst.object ().cell_index ()] += 1);
-  std::string cn = layout.cell_name (inst.object ().cell_index ());
-  os << "use " << tl::to_word_or_quoted_string (cn) << " " << tl::to_word_or_quoted_string (cn + "_" + tl::to_string (id));
+  db::Vector a, b;
+  unsigned long na = 0, nb = 0;
+  if (inst.is_regular_array (a, b, na, nb) && ((a.x () == 0 && b.y () == 0) || (a.y () == 0 && b.x () == 0)) && !needs_rounding (a) && !needs_rounding (b)) {
+
+    db::ICplxTrans tr = inst.complex_trans ();
+    write_single_instance (inst.object ().cell_index (), tr, a, b, na, nb, layout, os);
+
+  } else {
+
+    for (db::CellInstArray::iterator ia = inst.begin (); ! ia.at_end (); ++ia) {
+      db::ICplxTrans tr = inst.complex_trans (*ia);
+      write_single_instance (inst.object ().cell_index (), tr, db::Vector (), db::Vector (), 1, 1, layout, os);
+    }
+
+  }
+}
+
+void
+MAGWriter::write_single_instance (db::cell_index_type ci, db::ICplxTrans trans, db::Vector a, db::Vector b, unsigned long na, unsigned long nb, const db::Layout &layout, tl::OutputStream &os)
+{
+  if (trans.is_mag ()) {
+    throw tl::Exception (tl::to_string (tr ("Cannot write magnified instance to MAG files: ")) + trans.to_string () + tl::to_string (tr (" of cell ")) + layout.cell_name (ci));
+  }
+
+  int id = (m_cell_id [ci] += 1);
+  std::string cn = layout.cell_name (ci);
+  os << "use " << tl::to_word_or_quoted_string (cn) << " " << tl::to_word_or_quoted_string (cn + "_" + tl::to_string (id)) << "\n";
+
+  if (na > 1 || nb > 1) {
+
+    na = std::max ((unsigned long) 1, na);
+    nb = std::max ((unsigned long) 1, nb);
+
+    db::ICplxTrans trinv = trans.inverted ();
+    a = trinv * a;
+    b = trinv * b;
+
+    if (a.y () != 0) {
+      std::swap (a, b);
+      std::swap (na, nb);
+    }
+
+    db::Vector da = scaled (a);
+    db::Vector db = scaled (b);
+
+    os << "array " << 0 << " " << (na - 1) << " " << da.x () << " " << 0 << " " << (nb - 1) << " " << db.y () << "\n";
+
+  }
 
   os << "timestamp " << m_timestamp << "\n";
 
-  db::ICplxTrans tr = inst.complex_trans ();
-  db::Matrix2d m = tr.to_matrix2d ();
+  db::Matrix2d m = trans.to_matrix2d ();
 
-  db::DVector d = db::DVector (tr.disp ()) * m_sf;
+  db::Vector d = scaled (trans.disp ());
   os << "transform " << m.m11 () << " " << m.m12 () << " " << d.x () << " " << m.m21 () << " " << m.m22 () << " " << d.y () << "\n";
 
+  db::Box bx = scaled (trans * layout.cell (ci).bbox ());
+  os << "box " << bx.left () << " " << bx.bottom () << " " << bx.right () << " " << bx.top () << "\n";
+}
+
+namespace {
+
+  struct ScalingOp
   {
-    db::Vector a, b;
-    unsigned long na = 0, nb = 0;
-    if (inst.is_regular_array (a, b, na, nb) && ((a.x () == 0 && b.y () == 0) || (a.y () == 0 && b.x () == 0))) {
+    ScalingOp (MAGWriter *wr) : mp_wr (wr) { }
+    db::Point operator() (const db::Point &pt) const { return mp_wr->scaled (pt); }
+  private:
+    MAGWriter *mp_wr;
+  };
 
-      na = std::max ((unsigned long) 1, na);
-      nb = std::max ((unsigned long) 1, nb);
+}
 
-      if (a.y () != 0) {
-        std::swap (a, b);
-        std::swap (na, nb);
-      }
-
-      db::DVector da = db::DVector (a) * m_sf;
-      db::DVector db = db::DVector (b) * m_sf;
-      os << "array " << 0 << " " << (na - 1) << " " << da.x () << " " << 0 << " " << (nb - 1) << " " << db.y () << "\n";
-
-    }
+db::Polygon
+MAGWriter::scaled (const db::Polygon &poly)
+{
+  db::Polygon spoly;
+  spoly.assign_hull (poly.begin_hull (), poly.end_hull (), ScalingOp (this));
+  for (unsigned int h = 0; h < poly.holes (); ++h) {
+    spoly.assign_hole (h, poly.begin_hole (h), poly.end_hole (h), ScalingOp (this));
   }
+  return spoly;
+}
 
-  {
-    db::DBox b = db::DBox (inst.bbox (db::box_convert<db::CellInst> (layout))) * m_sf;
-    os << "box " << b.left () << " " << b.bottom () << " " << b.right () << " " << b.top () << "\n";
+db::Box
+MAGWriter::scaled (const db::Box &bx) const
+{
+  return db::Box (scaled (bx.p1 ()), scaled (bx.p2 ()));
+}
+
+db::Vector
+MAGWriter::scaled (const db::Vector &v) const
+{
+  db::Vector res (db::DVector (v) * m_sf);
+  if (! db::DVector (res).equal (db::DVector (v) * m_sf)) {
+    tl::warn << tl::sprintf (tl::to_string (tr ("Vector rounding occured at %s in cell %s - not a multiple of lambda (%.12g)")), v.to_string (), m_cellname, m_options.lambda);
   }
+  return res;
+}
+
+db::Point
+MAGWriter::scaled (const db::Point &p) const
+{
+  db::Point res (db::DPoint (p) * m_sf);
+  if (! db::DPoint (res).equal (db::DPoint (p) * m_sf)) {
+    tl::warn << tl::sprintf (tl::to_string (tr ("Coordinate rounding occured at %s in cell %s - not a multiple of lambda (%.12g)")), p.to_string (), m_cellname, m_options.lambda);
+  }
+  return res;
+}
+
+bool
+MAGWriter::needs_rounding (const db::Vector &v) const
+{
+  db::Vector res (db::DVector (v) * m_sf);
+  return ! db::DVector (res).equal (db::DVector (v) * m_sf);
 }
 
 }

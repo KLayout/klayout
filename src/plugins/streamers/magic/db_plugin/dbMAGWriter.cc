@@ -143,7 +143,9 @@ MAGWriter::filename_for_cell (db::cell_index_type ci, db::Layout &layout)
 {
   tl::URI uri (m_base_uri);
   if (uri.path ().empty ()) {
-    uri.set_path (std::string (layout.cell_name (ci)) + m_ext);
+    uri.set_path (std::string (layout.cell_name (ci)) + "." + m_ext);
+  } else {
+    uri.set_path (uri.path () + "/" + std::string (layout.cell_name (ci)) + "." + m_ext);
   }
   return uri.to_string ();
 }
@@ -155,6 +157,7 @@ MAGWriter::write_cell (db::cell_index_type ci, db::Layout &layout, tl::OutputStr
   os << "magic\n";
 
   //  @@@ write tech
+  os << "tech scmos\n";
 
   os << "timestamp " << m_timestamp << "\n";
 
@@ -280,7 +283,7 @@ MAGWriter::write_instance (const db::CellInstArray &inst, const db::Layout &layo
   }
 
   {
-    db::DBox b = db::DBox (inst.bbox (db::box_convert<db::CellInst> ())) * m_sf;
+    db::DBox b = db::DBox (inst.bbox (db::box_convert<db::CellInst> (layout))) * m_sf;
     os << "box " << b.left () << " " << b.bottom () << " " << b.right () << " " << b.top () << "\n";
   }
 }

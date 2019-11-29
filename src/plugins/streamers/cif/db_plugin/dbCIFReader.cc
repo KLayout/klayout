@@ -106,9 +106,16 @@ CIFReader::warn (const std::string &msg)
 void 
 CIFReader::skip_blanks()
 {
+  bool had_space = false;
   while (! m_stream.at_end ()) {
     char c = m_stream.peek_char ();
     if (isupper (c) || isdigit (c) || c == '-' || c == '(' || c == ')' || c == ';') {
+      return;
+    } else if (isspace (c)) {
+      had_space = true;
+    } else if (had_space) {
+      //  an extension to allow lower-case cell and layer names and some more flexibility
+      //  in general: after space (blank, tab ...) any character will end the sequence.
       return;
     }
     m_stream.get_char ();
@@ -535,8 +542,6 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
       expect_semi ();
 
     } else if (c == 'L') {
-
-      skip_blanks ();
 
       ++layer_specs;
 

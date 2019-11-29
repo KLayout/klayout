@@ -246,6 +246,26 @@ static double get_mag_lambda_w (const db::SaveLayoutOptions *options)
   return options->get_options<db::MAGWriterOptions> ().lambda;
 }
 
+static void set_mag_write_timestamp (db::SaveLayoutOptions *options, bool f)
+{
+  options->get_options<db::MAGWriterOptions> ().write_timestamp = f;
+}
+
+static bool get_mag_write_timestamp (const db::SaveLayoutOptions *options)
+{
+  return options->get_options<db::MAGWriterOptions> ().write_timestamp;
+}
+
+static void set_mag_tech_w (db::SaveLayoutOptions *options, const std::string &t)
+{
+  options->get_options<db::MAGWriterOptions> ().tech = t;
+}
+
+static const std::string &get_mag_tech_w (const db::SaveLayoutOptions *options)
+{
+  return options->get_options<db::MAGWriterOptions> ().tech;
+}
+
 //  extend lay::SaveLayoutOptions with the MAG options
 static
 gsi::ClassExt<db::SaveLayoutOptions> mag_writer_options (
@@ -259,8 +279,30 @@ gsi::ClassExt<db::SaveLayoutOptions> mag_writer_options (
     "\nThis property has been added in version 0.26.2.\n"
   ) +
   gsi::method_ext ("mag_lambda", &get_mag_lambda_w,
-    "@brief Get the lambda value\n"
+    "@brief Gets the lambda value\n"
     "See \\mag_lambda= method for a description of this attribute."
+    "\nThis property has been added in version 0.26.2.\n"
+  ) +
+  gsi::method_ext ("write_timestamp=", &set_mag_write_timestamp, gsi::arg ("f"),
+    "@brief Specifies whether to write a timestamp\n"
+    "\n"
+    "If this attribute is set to false, the timestamp written is 0. This isn't correct in the strict sense but simplifies comparison of Magic files.\n"
+    "\nThis property has been added in version 0.26.2.\n"
+  ) +
+  gsi::method_ext ("write_timestamp", &get_mag_write_timestamp,
+    "@brief Gets a value indicating whether to write a timestamp\n"
+    "See \\write_timestamp= method for a description of this attribute.\n"
+    "\nThis property has been added in version 0.26.2.\n"
+  ) +
+  gsi::method_ext ("mag_tech=", &set_mag_tech_w, gsi::arg ("tech"),
+    "@brief Specifies the technology string used for writing\n"
+    "\n"
+    "If this string is empty, the writer will try to obtain the technology from the \"technology\" metadata attribute of the layout.\n"
+    "\nThis property has been added in version 0.26.2.\n"
+  ) +
+  gsi::method_ext ("mag_tech", &get_mag_tech_w,
+    "@brief Gets the technology string used for writing\n"
+    "See \\mag_tech= method for a description of this attribute."
     "\nThis property has been added in version 0.26.2.\n"
   ),
   ""

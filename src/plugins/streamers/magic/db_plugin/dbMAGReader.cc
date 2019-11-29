@@ -142,7 +142,7 @@ MAGReader::cell_from_path (const std::string &path, db::Layout &layout)
     return c->second;
   }
 
-// @@@ this can lead to cell variants if a cell is present with different library paths ... (L500_CHAR_p)
+  //  NOTE: this can lead to cell variants if a cell is present with different library paths ... (L500_CHAR_p)
   db::cell_index_type ci = layout.add_cell (cell_name_from_path (path).c_str ());
   m_cells_read.insert (std::make_pair (path, ci));
 
@@ -219,11 +219,7 @@ bool
 MAGReader::resolve_path (const std::string &path, std::string &real_path)
 {
   tl::Eval expr;
-/* @@@
-  expr.set_var ("tech_dir", m_default_base_path);
-  expr.set_var ("tech_file", m_lyt_file);
-  expr.set_var ("tech_name", m_lyt_file);
-*/
+  //  TODO: more variables?
   expr.set_var ("tech_info", m_tech);
 
   tl::URI path_uri (path);
@@ -305,7 +301,7 @@ MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl:
 
       if (&m_stream == &stream) {
         //  initial file - store technology
-        layout.add_meta_info (db::MetaInfo ("magic_tech", "MAGIC technology string", m_tech));
+        layout.add_meta_info (db::MetaInfo ("technology", "MAGIC technology string", m_tech));
       }
 
       ex.expect_end ();
@@ -316,7 +312,7 @@ MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl:
       ex.read (ts);
 
       if (&m_stream == &stream) {
-        //  initial file - store technology
+        //  initial file - store timestamp
         layout.add_meta_info (db::MetaInfo ("magic_timestamp", "MAGIC main file timestamp", tl::to_string (ts)));
       }
 

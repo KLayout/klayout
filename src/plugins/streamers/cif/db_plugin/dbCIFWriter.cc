@@ -135,7 +135,7 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
     double sf = 1.0;
 
     *this << "DS " << cell_index << " " << tl_scale_denom << " " << tl_scale_divider << ";" << m_endl;
-    *this << "9 " << tl::to_word_or_quoted_string (layout.cell_name (*cell)) << ";" << m_endl;
+    *this << "9 " << tl::to_word_or_quoted_string (tl::to_upper_case (layout.cell_name (*cell))) << ";" << m_endl;
 
     //  instances
     for (db::Cell::const_iterator inst = cref.begin (); ! inst.at_end (); ++inst) {
@@ -250,7 +250,7 @@ CIFWriter::emit_layer()
 {
   if (m_needs_emit) {
     m_needs_emit = false;
-    *this << "L " << tl::to_word_or_quoted_string(m_layer.name, "0123456789_.$") << ";" << m_endl;
+    *this << "L " << tl::to_word_or_quoted_string (tl::to_upper_case (m_layer.name), "0123456789_.$") << ";" << m_endl;
   }
 }
 
@@ -264,7 +264,7 @@ CIFWriter::write_texts (const db::Layout &layout, const db::Cell &cell, unsigned
 
     emit_layer ();
 
-    *this << "94 " << tl::to_word_or_quoted_string(shape->text_string(), "0123456789:<>/&%$!.-_#+*?\\[]{}");
+    *this << "94 " << tl::to_word_or_quoted_string (shape->text_string(), "0123456789:<>/&%$!.-_#+*?\\[]{}");
 
     double h = shape->text_size () * layout.dbu ();
 

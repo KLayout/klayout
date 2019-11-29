@@ -60,6 +60,8 @@ MAGWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::
     } else {
       mp_ui->lambda_le->setText (tl::to_qstring (tl::to_string (options->lambda)));
     }
+    mp_ui->tech_le->setText (tl::to_qstring (options->tech));
+    mp_ui->zero_ts_cbx->setChecked (! options->write_timestamp);
   }
 }
 
@@ -73,6 +75,8 @@ MAGWriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Techn
     if (! l.isEmpty ()) {
       tl::from_string (tl::to_string (l), options->lambda);
     }
+    options->tech = tl::to_string (mp_ui->tech_le->text ().trimmed ());
+    options->write_timestamp = ! mp_ui->zero_ts_cbx->isChecked ();
   }
 }
 

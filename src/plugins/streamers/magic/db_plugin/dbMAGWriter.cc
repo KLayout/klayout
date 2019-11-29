@@ -30,6 +30,7 @@
 #include "tlUri.h"
 #include "tlLog.h"
 #include "tlUniqueName.h"
+#include "tlTimer.h"
 
 #include <time.h>
 #include <string.h>
@@ -52,6 +53,23 @@ MAGWriter::MAGWriter ()
 void 
 MAGWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options)
 {
+  std::vector <std::pair <unsigned int, db::LayerProperties> > layers;
+  options.get_valid_layers (layout, layers, db::SaveLayoutOptions::LP_AssignName);
+
+  std::set <db::cell_index_type> cell_set;
+  options.get_cells (layout, cell_set, layers);
+
+  tl::URI src (stream.path ());
+  std::string basename = tl::basename (src.path ());
+  std::pair<bool, db::cell_index_type> ci = layout.cell_by_name (basename.c_str ());
+  if (! ci.first) {
+    throw tl::Exception (tl::to_string (tr ("Magic file names must be valid cell names. This is not a valid name: ")) + basename);
+  }
+
+  if (cell_set.find (ci.second) == cell_set.end ()) {
+    throw tl::Exception (tl::to_string (tr ("Cell name derived from file name isn't a selected cell: ")) + basename);
+  }
+
   m_options = options.get_options<MAGWriterOptions> ();
   mp_stream = &stream;
 
@@ -59,10 +77,12 @@ MAGWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
   m_ext = tl::extension (m_base_uri.path ());
   m_base_uri.set_path (tl::dirname (m_base_uri.path ()));
 
-  m_cells_written.clear ();
-  m_cells_to_write.clear ();
-  m_layer_names.clear ();
-  m_timestamp = 0;  //  @@@ set timestamp?
+  m_timestamp = 0;
+  if (m_options.write_timestamp) {
+    timespec ts;
+    tl::current_utc_time (&ts);
+    m_timestamp = ts.tv_sec;
+  }
 
   double lambda = m_options.lambda;
   if (lambda <= 0.0) {
@@ -75,87 +95,10 @@ MAGWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
 
   m_sf = layout.dbu () / lambda;
 
-  if (layout.end_top_cells () - layout.begin_top_down () == 1) {
-
-    //  write the one top cell to the given stream. Otherwise
-    write_cell (*layout.begin_top_down (), layout, stream);
-
-  } else {
-
-    stream << "# KLayout is not writing this file as there are multiple top cells - see those files for the individual cells.";
-
-    for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_cells (); ++c) {
-      m_cells_to_write.insert (std::make_pair (*c, filename_for_cell (*c, layout)));
-    }
-
+  for (std::set<db::cell_index_type>::const_iterator c = cell_set.begin (); c != cell_set.end (); ++c) {
+    tl::OutputStream os (filename_for_cell (*c, layout), tl::OutputStream::OM_Auto, true);
+    write_cell (*c, layers, layout, os);
   }
-
-  while (! m_cells_to_write.empty ()) {
-
-    std::map<db::cell_index_type, std::string> cells_to_write;
-    cells_to_write.swap (m_cells_to_write);
-
-    for (std::map<db::cell_index_type, std::string>::const_iterator cw = cells_to_write.begin (); cw != cells_to_write.end (); ++cw) {
-      tl::OutputStream os (cw->second, tl::OutputStream::OM_Auto, true);
-      write_cell (cw->first, layout, os);
-    }
-
-  }
-}
-
-std::string
-MAGWriter::layer_name (unsigned int li, const Layout &layout)
-{
-  std::map<unsigned int, std::string>::const_iterator i = m_layer_names.find (li);
-  if (i != m_layer_names.end ()) {
-    return i->second;
-  }
-
-  //  Avoid built-in names, like "end", "space", "labels" and "checkpaint"
-  std::set<std::string> used_names;
-  used_names.insert ("end");
-  used_names.insert ("space");
-  used_names.insert ("labels");
-  used_names.insert ("checkpaint");
-
-  if (m_layer_names.empty ()) {
-
-    for (db::Layout::layer_iterator i = layout.begin_layers (); i != layout.end_layers (); ++i) {
-
-      db::LayerProperties lp = layout.get_properties ((*i).first);
-      if (! lp.name.empty ()) {
-
-        std::string lp_name = lp.name;
-        lp_name = tl::unique_name (lp_name, used_names, "_");
-        used_names.insert (lp_name);
-
-        m_layer_names.insert (std::make_pair ((*i).first, lp_name));
-
-      }
-
-    }
-
-    for (db::Layout::layer_iterator i = layout.begin_layers (); i != layout.end_layers (); ++i) {
-
-      db::LayerProperties lp = layout.get_properties ((*i).first);
-      if (lp.name.empty ()) {
-
-        std::string ld_name = std::string ("L") + tl::to_string (lp.layer);
-        if (lp.datatype) {
-          ld_name += "D";
-          ld_name += tl::to_string (lp.datatype);
-        }
-
-        ld_name = tl::unique_name (ld_name, used_names, "_");
-        used_names.insert (ld_name);
-        m_layer_names.insert (std::make_pair ((*i).first, ld_name));
-
-      }
-    }
-
-  }
-
-  return m_layer_names [li];
 }
 
 std::string
@@ -171,24 +114,29 @@ MAGWriter::filename_for_cell (db::cell_index_type ci, db::Layout &layout)
 }
 
 void
-MAGWriter::write_cell (db::cell_index_type ci, db::Layout &layout, tl::OutputStream &os)
+MAGWriter::write_cell (db::cell_index_type ci, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers, db::Layout &layout, tl::OutputStream &os)
 {
   m_cellname = layout.cell_name (ci);
   try {
-    do_write_cell (ci, layout, os);
+    do_write_cell (ci, layers, layout, os);
   } catch (tl::Exception &ex) {
     throw tl::Exception (ex.msg () + tl::to_string (tr (" when writing cell ")) + m_cellname);
   }
 }
 
 void
-MAGWriter::do_write_cell (db::cell_index_type ci, db::Layout &layout, tl::OutputStream &os)
+MAGWriter::do_write_cell (db::cell_index_type ci, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers, db::Layout &layout, tl::OutputStream &os)
 {
   os.set_as_text (true);
   os << "magic\n";
 
-  //  @@@ write tech
-  os << "tech scmos\n";
+  std::string tech = m_options.tech;
+  if (tech.empty ()) {
+    tech = layout.meta_info_value ("technology");
+  }
+  if (! tech.empty ()) {
+    os << "tech " << tl::to_word_or_quoted_string (tl::to_lower_case (tech)) << "\n";
+  }
 
   os << "timestamp " << m_timestamp << "\n";
 
@@ -197,39 +145,36 @@ MAGWriter::do_write_cell (db::cell_index_type ci, db::Layout &layout, tl::Output
   os << "<< checkpaint >>\n";
   write_polygon (db::Polygon (cell.bbox ()), layout, os);
 
-  for (db::Layout::layer_iterator i = layout.begin_layers (); i != layout.end_layers (); ++i) {
+  bool any;
 
-    unsigned int li = (*i).first;
-    if (! cell.shapes (li).empty ()) {
-      os << "<< " << tl::to_word_or_quoted_string (layer_name (li, layout)) << " >>\n";
-      for (db::Shapes::shape_iterator s = cell.shapes (li).begin (db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Paths); ! s.at_end (); ++s) {
-        db::Polygon poly;
-        s->polygon (poly);
-        write_polygon (poly, layout, os);
+  for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator ll = layers.begin (); ll != layers.end (); ++ll) {
+    any = false;
+    for (db::Shapes::shape_iterator s = cell.shapes (ll->first).begin (db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Paths); ! s.at_end (); ++s) {
+      if (! any) {
+        os << "<< " << tl::to_word_or_quoted_string (tl::to_lower_case (ll->second.name)) << " >>\n";
+        any = true;
       }
+      db::Polygon poly;
+      s->polygon (poly);
+      write_polygon (poly, layout, os);
     }
-
   }
 
-  bool any = false;
-
-  for (db::Layout::layer_iterator i = layout.begin_layers (); i != layout.end_layers (); ++i) {
-    for (db::Shapes::shape_iterator s = cell.shapes ((*i).first).begin (db::ShapeIterator::Texts); ! s.at_end (); ++s) {
+  any = false;
+  for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator ll = layers.begin (); ll != layers.end (); ++ll) {
+    for (db::Shapes::shape_iterator s = cell.shapes (ll->first).begin (db::ShapeIterator::Texts); ! s.at_end (); ++s) {
       if (! any) {
         os << "<< labels >>\n";
+        any = true;
       }
       db::Text text;
       s->text (text);
-      write_label (layer_name ((*i).first, layout), text, layout, os);
+      write_label (tl::to_lower_case (ll->second.name), text, layout, os);
     }
   }
 
   m_cell_id.clear ();
   for (db::Cell::const_iterator i = cell.begin (); ! i.at_end (); ++i) {
-    if (m_cells_written.find (i->cell_index ()) == m_cells_written.end ()) {
-      m_cells_written.insert (i->cell_index ());
-      m_cells_to_write.insert (std::make_pair (i->cell_index (), filename_for_cell (i->cell_index (), layout)));
-    }
     write_instance (i->cell_inst (), layout, os);
   }
 

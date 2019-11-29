@@ -66,16 +66,12 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
     reader.read (layout, options);
   }
 
-  //  generate a "unique" name ...
-  unsigned int hash = 0;
-  for (const char *cp = file_au; *cp; ++cp) {
-    hash = (hash << 4) ^ (hash >> 4) ^ ((unsigned int) *cp);
-  }
+  std::string tc_name = layout.cell_name (*layout.begin_top_down ());
 
   //  normalize the layout by writing to GDS and reading from ..
 
-  std::string tmp_cif_file = _this->tmp_file (tl::sprintf ("tmp_%x.cif", hash));
-  std::string tmp_mag_file = _this->tmp_file (tl::sprintf ("tmp_%x.mag", hash));
+  std::string tmp_cif_file = _this->tmp_file (tl::sprintf ("%s.cif", tc_name));
+  std::string tmp_mag_file = _this->tmp_file (tl::sprintf ("%s.mag", tc_name));
 
   {
     tl::OutputStream stream (tmp_cif_file);
@@ -142,6 +138,6 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
 
 TEST(1)
 {
-  run_test (_this, tl::testsrc (), "mag_test.mag.gz", "mag_test_au.cif.gz");
+  run_test (_this, tl::testsrc (), "MAG_TEST.mag.gz", "mag_test_au.cif.gz");
 }
 

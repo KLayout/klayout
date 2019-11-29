@@ -90,20 +90,16 @@ private:
   tl::OutputStream *mp_stream;
   MAGWriterOptions m_options;
   tl::AbsoluteProgress m_progress;
-  std::set<db::cell_index_type> m_cells_written;
-  std::map<db::cell_index_type, std::string> m_cells_to_write;
   tl::URI m_base_uri;
   std::string m_ext;
-  std::map<unsigned int, std::string> m_layer_names;
   size_t m_timestamp;
   std::map<db::cell_index_type, size_t> m_cell_id;
   double m_sf;
   std::string m_cellname;
 
   std::string filename_for_cell (db::cell_index_type ci, db::Layout &layout);
-  void write_cell (db::cell_index_type ci, db::Layout &layout, tl::OutputStream &os);
-  void do_write_cell (db::cell_index_type ci, db::Layout &layout, tl::OutputStream &os);
-  std::string layer_name (unsigned int li, const db::Layout &layout);
+  void write_cell (db::cell_index_type ci, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers, db::Layout &layout, tl::OutputStream &os);
+  void do_write_cell (db::cell_index_type ci, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers, db::Layout &layout, tl::OutputStream &os);
   void write_polygon (const db::Polygon &poly, const db::Layout &layout, tl::OutputStream &os);
   void write_label (const std::string &layer, const db::Text &text, const Layout &layout, tl::OutputStream &os);
   void write_instance (const db::CellInstArray &inst, const db::Layout &layout, tl::OutputStream &os);

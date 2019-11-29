@@ -84,7 +84,7 @@ extract_ld (const char *s, int &l, int &d, std::string &n)
 {
   l = d = 0;
 
-  if (*s == 'L') {
+  if (*s == 'L' || *s == 'l') {
     ++s;
   }
 
@@ -97,7 +97,7 @@ extract_ld (const char *s, int &l, int &d, std::string &n)
     ++s;
   }
 
-  if (*s == 'D' || *s == '.') {
+  if (*s == 'D' || *s == 'd' || *s == '.') {
     ++s;
     if (! safe_isdigit (*s)) {
       return false;

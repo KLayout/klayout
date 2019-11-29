@@ -99,7 +99,9 @@ public:
   virtual tl::XMLElementBase *xml_writer_options_element () const
   {
     return new db::WriterOptionsXMLElement<db::MAGWriterOptions> ("mag",
-      tl::make_member (&db::MAGWriterOptions::lambda, "lambda")
+      tl::make_member (&db::MAGWriterOptions::lambda, "lambda") +
+      tl::make_member (&db::MAGWriterOptions::tech, "tech") +
+      tl::make_member (&db::MAGWriterOptions::write_timestamp, "write-timestamp")
     );
   }
 };

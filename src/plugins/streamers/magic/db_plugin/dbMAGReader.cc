@@ -332,6 +332,10 @@ MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl:
         valid_layer = false;
       } else if (lname == "labels") {
         in_labels = true;
+      } else if (lname == "checkpaint") {
+        //  ignore "checkpaint" internal layer
+        in_labels = false;
+        valid_layer = false;
       } else {
         in_labels = false;
         std::pair<bool, unsigned int> ll = open_layer (layout, lname);

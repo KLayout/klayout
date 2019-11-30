@@ -399,7 +399,10 @@ MAGReader::do_merge_part (Layout &layout, cell_index_type cell_index)
   db::ShapeProcessor sp;
   if (tl::verbosity () >= 40) {
     sp.enable_progress (tl::to_string (tr ("Merging shapes for MAG reader")));
+  } else {
+    sp.disable_progress ();
   }
+  sp.set_base_verbosity (40);
 
   std::vector<db::Text> saved_texts;
 

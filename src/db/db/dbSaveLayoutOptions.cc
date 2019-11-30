@@ -294,6 +294,17 @@ SaveLayoutOptions::get_valid_layers (const db::Layout &layout, std::vector <std:
       }
     }
 
+  } else if (lm == LP_AssignNameWithPriority) {
+
+    for (std::vector<std::pair <unsigned int, db::LayerProperties> >::const_iterator l = all_layers.begin (); l != all_layers.end (); ++l) {
+      layers.push_back (*l);
+      if (l->second.name.empty ()) {
+        layers.back ().second = tl::sprintf ("L%dD%d", l->second.layer, l->second.datatype);
+      } else if (l->second.layer >= 0 && l->second.datatype >= 0) {
+        layers.back ().second = l->second.name;
+      }
+    }
+
   } else if (lm == LP_AssignNumber) {
 
     int next_layer = 0;

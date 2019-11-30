@@ -161,6 +161,14 @@ public:
   void reserve (size_t n);
 
   /**
+   *  @brief Sets the base verbosity of the processor (see EdgeProcessor::set_base_verbosity for details)
+   */
+  void set_base_verbosity (int bv)
+  {
+    m_processor.set_base_verbosity (bv);
+  }
+
+  /**
    *  @brief Enable progress
    *
    *  @param progress_text The description text of the progress object

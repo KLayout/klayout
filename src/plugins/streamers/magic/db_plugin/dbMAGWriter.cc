@@ -54,7 +54,7 @@ void
 MAGWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options)
 {
   std::vector <std::pair <unsigned int, db::LayerProperties> > layers;
-  options.get_valid_layers (layout, layers, db::SaveLayoutOptions::LP_AssignName);
+  options.get_valid_layers (layout, layers, db::SaveLayoutOptions::LP_AssignNameWithPriority);
 
   std::set <db::cell_index_type> cell_set;
   options.get_cells (layout, cell_set, layers);
@@ -102,9 +102,9 @@ MAGWriter::filename_for_cell (db::cell_index_type ci, db::Layout &layout)
 {
   tl::URI uri (m_base_uri);
   if (uri.path ().empty ()) {
-    uri.set_path (std::string (layout.cell_name (ci)) + "." + m_ext);
+    uri.set_path (make_string (layout.cell_name (ci)) + "." + m_ext);
   } else {
-    uri.set_path (uri.path () + "/" + std::string (layout.cell_name (ci)) + "." + m_ext);
+    uri.set_path (uri.path () + "/" + make_string (layout.cell_name (ci)) + "." + m_ext);
   }
   return uri.to_string ();
 }
@@ -320,7 +320,7 @@ MAGWriter::write_single_instance (db::cell_index_type ci, db::ICplxTrans trans, 
   db::Vector d = scaled (trans.disp ());
   os << "transform " << m.m11 () << " " << m.m12 () << " " << d.x () << " " << m.m21 () << " " << m.m22 () << " " << d.y () << "\n";
 
-  db::Box bx = scaled (trans * layout.cell (ci).bbox ());
+  db::Box bx = scaled (layout.cell (ci).bbox ());
   os << "box " << bx.left () << " " << bx.bottom () << " " << bx.right () << " " << bx.top () << "\n";
 }
 

@@ -135,7 +135,7 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
     double sf = 1.0;
 
     *this << "DS " << cell_index << " " << tl_scale_denom << " " << tl_scale_divider << ";" << m_endl;
-    *this << "9 " << tl::to_word_or_quoted_string (tl::to_upper_case (layout.cell_name (*cell))) << ";" << m_endl;
+    *this << "9 " << tl::to_word_or_quoted_string (layout.cell_name (*cell)) << ";" << m_endl;
 
     //  instances
     for (db::Cell::const_iterator inst = cref.begin (); ! inst.at_end (); ++inst) {

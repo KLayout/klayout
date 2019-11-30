@@ -1,0 +1,20 @@
+magic
+tech scmos
+timestamp 1538326743
+<< polysilicon >>
+rect 122 21 2004 40
+<< metal1 >>
+rect 100 21 103 40
+rect 2023 21 2026 40
+<< polycontact >>
+rect 103 21 122 40
+rect 2004 21 2023 40
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_1
+timestamp 1537343441
+transform 1 0 0 0 1 0
+box 0 0 100 100
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_0
+timestamp 1537343441
+transform 1 0 2026 0 1 0
+box 0 0 100 100
+<< end >>

@@ -1,0 +1,26 @@
+magic
+tech scmos
+timestamp 1537373212
+<< metal3 >>
+rect 116 86 204 94
+rect 116 54 124 86
+rect 100 46 124 54
+rect 196 14 204 86
+rect 276 86 364 94
+rect 276 14 284 86
+rect 196 6 284 14
+rect 356 14 364 86
+rect 436 86 524 94
+rect 436 14 444 86
+rect 516 54 524 86
+rect 516 46 540 54
+rect 356 6 444 14
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_1 Library/magic
+timestamp 1537343441
+transform 1 0 0 0 1 0
+box 0 0 100 100
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_0
+timestamp 1537343441
+transform 1 0 540 0 1 0
+box 0 0 100 100
+<< end >>

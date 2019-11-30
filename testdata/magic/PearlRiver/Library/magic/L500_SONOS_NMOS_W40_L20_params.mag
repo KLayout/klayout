@@ -1,0 +1,121 @@
+magic
+tech scmos
+timestamp 1540649454
+<< nwell >>
+rect 118 175 198 185
+rect 118 125 128 175
+rect 188 125 198 175
+rect 118 115 198 125
+<< polysilicon >>
+rect 127 140 128 160
+<< pbasepolysilicon >>
+rect 128 140 130 160
+rect 170 140 173 160
+<< metal1 >>
+rect 100 200 127 210
+rect 117 160 127 200
+rect 200 173 210 200
+rect 170 163 210 173
+rect 90 127 130 137
+rect 90 100 100 127
+rect 176 100 186 127
+rect 176 90 200 100
+<< pbsonostransistor >>
+rect 130 140 170 160
+<< nwpbase >>
+rect 128 125 188 175
+<< pbasendiffusion >>
+rect 130 160 170 163
+rect 130 137 170 140
+<< pbasendiffcontact >>
+rect 130 163 170 173
+rect 130 127 170 137
+<< pbasepdiffcontact >>
+rect 176 127 186 160
+<< polycontact >>
+rect 117 140 127 160
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_2
+timestamp 1537343441
+transform 1 0 0 0 1 200
+box 0 0 100 100
+use Library/magic/L500_CHAR_s  L500_CHAR_s_1
+timestamp 1534323853
+transform 1 0 108 0 1 276
+box 0 0 12 18
+use Library/magic/L500_CHAR_o  L500_CHAR_o_0
+timestamp 1534323159
+transform 1 0 124 0 1 276
+box 0 0 12 18
+use Library/magic/L500_CHAR_n  L500_CHAR_n_1
+timestamp 1534323117
+transform 1 0 140 0 1 276
+box 0 0 12 18
+use Library/magic/L500_CHAR_o  L500_CHAR_o_1
+timestamp 1534323159
+transform 1 0 156 0 1 276
+box 0 0 12 18
+use Library/magic/L500_CHAR_s  L500_CHAR_s_2
+timestamp 1534323853
+transform 1 0 172 0 1 276
+box 0 0 12 18
+use Library/magic/L500_CHAR_g  L500_CHAR_g_0
+timestamp 1534322005
+transform 1 0 101 0 1 178
+box 0 0 12 18
+use Library/magic/L500_CHAR_d  L500_CHAR_d_0
+timestamp 1534321738
+transform 1 0 184 0 1 187
+box 0 0 12 18
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_3
+timestamp 1537343441
+transform 1 0 200 0 1 200
+box 0 0 100 100
+use Library/magic/L500_CHAR_n  L500_CHAR_n_0
+timestamp 1534323117
+transform 1 0 215 0 1 140
+box 0 0 12 18
+use Library/magic/L500_CHAR_w  L500_CHAR_w_0
+timestamp 1534324213
+transform 1 0 235 0 1 152
+box 0 0 16 18
+use Library/magic/L500_CHAR_4  L500_CHAR_4_0
+timestamp 1534324830
+transform 1 0 255 0 1 152
+box 0 0 12 18
+use Library/magic/L500_CHAR_0  L500_CHAR_0_0
+timestamp 1534325425
+transform 1 0 271 0 1 152
+box 0 0 12 18
+use Library/magic/L500_CHAR_slash  L500_CHAR_slash_0
+timestamp 1534532558
+transform 1 0 287 0 1 152
+box 0 0 8 18
+use Library/magic/L500_CHAR_l  L500_CHAR_l_0
+timestamp 1534225390
+transform 1 0 239 0 1 130
+box 0 0 12 18
+use Library/magic/L500_CHAR_2  L500_CHAR_2_1
+timestamp 1534324708
+transform 1 0 255 0 1 130
+box 0 0 12 18
+use Library/magic/L500_CHAR_0  L500_CHAR_0_1
+timestamp 1534325425
+transform 1 0 271 0 1 130
+box 0 0 12 18
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_0
+timestamp 1537343441
+transform 1 0 0 0 1 0
+box 0 0 100 100
+use Library/magic/L500_CHAR_s  L500_CHAR_s_0
+timestamp 1534323853
+transform 1 0 104 0 1 95
+box 0 0 12 18
+use Library/magic/L500_CHAR_b  L500_CHAR_b_0
+timestamp 1534321628
+transform 1 0 190 0 1 104
+box 0 0 12 18
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_1
+timestamp 1537343441
+transform 1 0 200 0 1 0
+box 0 0 100 100
+<< end >>

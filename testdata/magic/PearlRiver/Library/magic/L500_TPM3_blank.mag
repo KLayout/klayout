@@ -1,0 +1,11 @@
+magic
+tech scmos
+timestamp 1533879972
+<< metal3 >>
+rect 8 8 112 112
+<< glass >>
+rect 0 100 120 120
+rect 0 20 20 100
+rect 100 20 120 100
+rect 0 0 120 20
+<< end >>

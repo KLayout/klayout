@@ -86,7 +86,13 @@ MAGReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   set_create_layers (specific_options.create_other_layers);
   set_keep_layer_names (specific_options.keep_layer_names);
 
-  db::cell_index_type top_cell = layout.add_cell (cell_name_from_path (m_stream.source ()).c_str ());
+  std::string top_cellname = cell_name_from_path (m_stream.source ());
+  db::cell_index_type top_cell;
+  if (layout.has_cell (top_cellname.c_str ())) {
+    top_cell = layout.cell_by_name (top_cellname.c_str ()).second;
+  } else {
+    top_cell = layout.add_cell (top_cellname.c_str ());
+  }
 
   layout.dbu (m_dbu);
 

@@ -1,0 +1,11 @@
+magic
+tech scmos
+timestamp 1537238671
+<< pad >>
+rect 0 0 100 100
+<< glass >>
+rect 0 88 100 100
+rect 0 12 12 88
+rect 88 12 100 88
+rect 0 0 100 12
+<< end >>

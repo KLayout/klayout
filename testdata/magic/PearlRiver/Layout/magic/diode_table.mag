@@ -1,0 +1,109 @@
+magic
+tech scmos
+timestamp 1542633954
+<< error_s >>
+rect 3500 1958 3504 1971
+rect 3508 1966 3512 1971
+rect 3588 1966 3592 1971
+rect 3596 1958 3600 1971
+rect 3700 1958 3704 1971
+rect 3708 1966 3712 1971
+rect 3788 1966 3792 1971
+rect 3796 1958 3800 1971
+use Library/magic/L500_ZENER_W40_L1  L500_ZENER_W40_L1_0
+timestamp 1542633243
+transform 1 0 2100 0 1 2100
+box 0 0 304 300
+use Library/magic/L500_ZENER_W40_L2  L500_ZENER_W40_L2_0
+timestamp 1542633243
+transform 1 0 2450 0 1 2100
+box 0 0 304 300
+use Library/magic/L500_ZENER_W40_L3  L500_ZENER_W40_L3_0
+timestamp 1542633243
+transform 1 0 2800 0 1 2100
+box 0 0 304 300
+use Library/magic/L500_ZENER_W40_L4  L500_ZENER_W40_L4_0
+timestamp 1542632804
+transform 1 0 3150 0 1 2100
+box 0 0 304 300
+use Library/magic/L500_ZENER_W40_L5  L500_ZENER_W40_L5_0
+timestamp 1542632804
+transform 1 0 3500 0 1 2100
+box 0 0 304 300
+use Library/magic/L500_DIODE_PBASE_A10k_params  L500_DIODE_PBASE_A10k_params_0
+timestamp 1541995960
+transform 1 0 3850 0 1 2078
+box 0 0 301 322
+use Library/magic/L500_ZENER_W20_L1  L500_ZENER_W20_L1_0
+timestamp 1540544127
+transform 1 0 1750 0 1 1750
+box 0 0 304 300
+use Library/magic/L500_ZENER_W20_L2  L500_ZENER_W20_L2_0
+timestamp 1540543980
+transform 1 0 2100 0 1 1750
+box 0 0 304 300
+use Library/magic/L500_ZENER_W20_L3  L500_ZENER_W20_L3_0
+timestamp 1540543901
+transform 1 0 2450 0 1 1750
+box 0 0 304 300
+use Library/magic/L500_ZENER_W20_L4  L500_ZENER_W20_L4_0
+timestamp 1542633243
+transform 1 0 2800 0 1 1750
+box 0 0 304 300
+use Library/magic/L500_ZENER_W20_L5  L500_ZENER_W20_L5_0
+timestamp 1540543671
+transform 1 0 3150 0 1 1750
+box 0 0 304 300
+use Library/magic/L500_DIODE_PBASE_A2k_params  L500_DIODE_PBASE_A2k_params_0
+timestamp 1541945167
+transform 1 0 3500 0 1 1750
+box 0 0 300 322
+use Library/magic/L500_ZENER_W10_L5  L500_ZENER_W10_L5_0
+timestamp 1540543606
+transform 1 0 1400 0 1 1400
+box 0 0 304 300
+use Library/magic/L500_ZENER_W5_L5  L500_ZENER_W5_L5_0
+timestamp 1540544708
+transform 1 0 1750 0 1 1400
+box 0 0 300 300
+use Library/magic/L500_DIODE_SUBSTRATE_A1k_params  L500_DIODE_SUBSTRATE_A1k_params_0
+timestamp 1541215827
+transform 1 0 2450 0 1 1400
+box 0 0 300 322
+use Library/magic/L500_ZENER_W10_L4  L500_ZENER_W10_L4_0
+timestamp 1542632071
+transform 1 0 1050 0 1 1050
+box 0 0 304 300
+use Library/magic/L500_ZENER_W5_L4  L500_ZENER_W5_L4_0
+timestamp 1542632071
+transform 1 0 1400 0 1 1050
+box 0 0 300 300
+use Library/magic/L500_DIODE_SUBSTRATE_A10k_params  L500_DIODE_SUBSTRATE_A10k_params_0
+timestamp 1541224905
+transform 1 0 2450 0 1 1050
+box 0 0 301 322
+use Library/magic/L500_ZENER_W10_L3  L500_ZENER_W10_L3_0
+timestamp 1540543464
+transform 1 0 700 0 1 700
+box 0 0 304 300
+use Library/magic/L500_ZENER_W5_L3  L500_ZENER_W5_L3_0
+timestamp 1540544786
+transform 1 0 1050 0 1 700
+box 0 0 300 300
+use Library/magic/L500_ZENER_W10_L2  L500_ZENER_W10_L2_0
+timestamp 1540542704
+transform 1 0 350 0 1 350
+box 0 0 304 300
+use Library/magic/L500_ZENER_W5_L2  L500_ZENER_W5_L2_0
+timestamp 1540544905
+transform 1 0 700 0 1 350
+box 0 0 300 300
+use Library/magic/L500_ZENER_W10_L1  L500_ZENER_W10_L1_0
+timestamp 1540539143
+transform 1 0 0 0 1 0
+box 0 0 304 300
+use Library/magic/L500_ZENER_W5_L1  L500_ZENER_W5_L1_0
+timestamp 1540544919
+transform 1 0 350 0 1 0
+box 0 0 300 300
+<< end >>

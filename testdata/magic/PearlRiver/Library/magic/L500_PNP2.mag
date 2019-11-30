@@ -1,0 +1,93 @@
+magic
+tech scmos
+timestamp 1542384037
+<< nwell >>
+rect 106 184 194 194
+rect 106 128 116 184
+rect 128 160 172 172
+rect 128 140 140 160
+rect 160 140 172 160
+rect 128 128 172 140
+rect 184 128 194 184
+rect 106 118 194 128
+<< metal1 >>
+rect 100 208 200 218
+rect 145 182 155 208
+rect 118 174 182 182
+rect 118 130 126 174
+rect 130 168 170 170
+rect 130 164 132 168
+rect 168 164 170 168
+rect 130 162 170 164
+rect 130 160 138 162
+rect 130 132 132 160
+rect 136 132 138 160
+rect 162 160 170 162
+rect 130 130 138 132
+rect 142 142 158 158
+rect 142 85 152 142
+rect 100 75 152 85
+rect 162 132 164 160
+rect 168 132 170 160
+rect 162 90 170 132
+rect 174 130 182 174
+rect 162 80 200 90
+<< nwpbase >>
+rect 116 172 184 184
+rect 116 128 128 172
+rect 140 140 160 160
+rect 172 128 184 172
+<< pbasepdiffcontact >>
+rect 120 176 180 180
+rect 120 132 124 172
+rect 144 144 156 156
+rect 176 132 180 172
+<< nsubstratencontact >>
+rect 132 164 168 168
+rect 132 132 136 160
+rect 164 132 168 160
+use L500_TPAD_blank  L500_TPAD_blank_2
+timestamp 1537343441
+transform 1 0 0 0 1 200
+box 0 0 100 100
+use L500_CHAR_c  L500_CHAR_c_0
+timestamp 1534321654
+transform 1 0 146 0 1 230
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_3
+timestamp 1537343441
+transform 1 0 200 0 1 200
+box 0 0 100 100
+use L500_CHAR_p  L500_CHAR_p_0
+timestamp 1534323210
+transform 1 0 208 0 1 136
+box 0 0 12 18
+use L500_CHAR_n  L500_CHAR_n_0
+timestamp 1534323117
+transform 1 0 224 0 1 136
+box 0 0 12 18
+use L500_CHAR_p  L500_CHAR_p_1
+timestamp 1534323210
+transform 1 0 240 0 1 136
+box 0 0 12 18
+use L500_CHAR_2  L500_CHAR_2_0
+timestamp 1534324708
+transform 1 0 256 0 1 136
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_0
+timestamp 1537343441
+transform 1 0 0 0 1 0
+box 0 0 100 100
+use L500_CHAR_e  L500_CHAR_e_0
+timestamp 1534321786
+transform 1 0 114 0 1 50
+box 0 0 12 18
+use L500_CHAR_b  L500_CHAR_b_0
+timestamp 1534321628
+transform 1 0 173 0 1 50
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_1
+timestamp 1537343441
+transform 1 0 200 0 1 0
+box 0 0 100 100
+<< end >>

@@ -1,0 +1,40 @@
+magic
+tech scmos
+timestamp 1542634341
+use Library/magic/L500_NMOSi_W40_L40_params  L500_NMOSi_W40_L40_params_0
+timestamp 1542441308
+transform 1 0 0 0 1 1400
+box 0 0 300 300
+use Library/magic/L500_NMOSi_W3_L3_params  L500_NMOSi_W3_L3_params_0
+timestamp 1542623529
+transform 1 0 350 0 1 1400
+box 0 0 300 300
+use Library/magic/L500_NMOSi_W3_L8_params  L500_NMOSi_W3_L8_params_0
+timestamp 1542624007
+transform 1 0 700 0 1 1400
+box 0 0 300 300
+use Library/magic/L500_NMOSi_W20_L20_params  L500_NMOSi_W20_L20_params_0
+timestamp 1542441116
+transform 1 0 0 0 1 1050
+box 0 0 300 300
+use Library/magic/L500_NMOSi_W8_L3_params  L500_NMOSi_W8_L3_params_0
+timestamp 1542624506
+transform 1 0 350 0 1 1050
+box 0 0 300 300
+use Library/magic/L500_NMOSi_W8_L8_params  L500_NMOSi_W8_L8_params_0
+timestamp 1542624787
+transform 1 0 700 0 1 1050
+box 0 0 300 300
+use Library/magic/L500_NMOSi_W10_L10_params  L500_NMOSi_W10_L10_params_0
+timestamp 1542440942
+transform 1 0 0 0 1 700
+box 0 0 300 300
+use Library/magic/L500_NMOSi_W5_L5_params  L500_NMOSi_W5_L5_params_0
+timestamp 1542090445
+transform 1 0 0 0 1 350
+box 0 0 300 300
+use Library/magic/L500_NMOSi_W3_L2_params  L500_NMOSi_W3_L2_params_0
+timestamp 1542090651
+transform 1 0 0 0 1 0
+box 0 0 300 300
+<< end >>

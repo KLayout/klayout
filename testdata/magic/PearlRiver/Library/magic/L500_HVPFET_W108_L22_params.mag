@@ -1,0 +1,111 @@
+magic
+tech scmos
+timestamp 1541077546
+<< nwell >>
+rect 97 198 212 210
+rect 97 74 158 198
+rect 200 74 212 198
+rect 97 62 212 74
+<< polysilicon >>
+rect 148 186 158 190
+rect 148 82 158 86
+<< pbasepolysilicon >>
+rect 158 186 170 190
+rect 164 86 170 186
+rect 158 82 170 86
+<< highvoltndiffusion >>
+rect 103 184 117 186
+rect 103 88 105 184
+rect 115 88 117 184
+rect 103 86 117 88
+<< highvoltpdiffusion >>
+rect 131 184 148 186
+rect 131 88 133 184
+rect 143 88 148 184
+rect 131 86 148 88
+<< metal1 >>
+rect 100 200 141 210
+rect 131 186 141 200
+rect 148 200 200 210
+rect 103 184 117 186
+rect 103 100 105 184
+rect 100 88 105 100
+rect 115 88 117 184
+rect 100 76 117 88
+rect 131 184 145 186
+rect 131 88 133 184
+rect 143 88 145 184
+rect 131 86 145 88
+rect 174 184 188 186
+rect 174 88 176 184
+rect 186 88 188 184
+rect 174 86 188 88
+rect 174 76 200 86
+<< highvoltptransistor >>
+rect 148 86 164 186
+<< nwpbase >>
+rect 158 74 200 198
+<< polycontact >>
+rect 148 190 158 200
+<< highvoltndcontact >>
+rect 105 88 115 184
+<< highvoltpdcontact >>
+rect 133 88 143 184
+rect 176 88 186 184
+use L500_TPAD_blank  L500_TPAD_blank_2
+timestamp 1537343441
+transform 1 0 0 0 1 200
+box 0 0 100 100
+use L500_CHAR_s  L500_CHAR_s_0
+timestamp 1534323853
+transform 1 0 107 0 1 237
+box 0 0 12 18
+use L500_CHAR_g  L500_CHAR_g_0
+timestamp 1534322005
+transform 1 0 176 0 1 240
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_3
+timestamp 1537343441
+transform 1 0 200 0 1 200
+box 0 0 100 100
+use L500_CHAR_h  L500_CHAR_h_0
+timestamp 1534224731
+transform 1 0 205 0 1 133
+box 0 0 12 18
+use L500_CHAR_v  L500_CHAR_v_0
+timestamp 1534326655
+transform 1 0 221 0 1 133
+box 0 0 12 18
+use L500_CHAR_p  L500_CHAR_p_0
+timestamp 1534323210
+transform 1 0 237 0 1 133
+box 0 0 12 18
+use L500_CHAR_f  L500_CHAR_f_0
+timestamp 1534344057
+transform 1 0 253 0 1 133
+box 0 0 12 18
+use L500_CHAR_e  L500_CHAR_e_0
+timestamp 1534321786
+transform 1 0 269 0 1 133
+box 0 0 12 18
+use L500_CHAR_t  L500_CHAR_t_0
+timestamp 1534318840
+transform 1 0 285 0 1 133
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_0
+timestamp 1537343441
+transform 1 0 0 0 1 0
+box 0 0 100 100
+use L500_CHAR_b  L500_CHAR_b_0
+timestamp 1534321628
+transform 1 0 105 0 1 22
+box 0 0 12 18
+use L500_CHAR_d  L500_CHAR_d_0
+timestamp 1534321738
+transform 1 0 184 0 1 19
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_1
+timestamp 1537343441
+transform 1 0 200 0 1 0
+box 0 0 100 100
+<< end >>

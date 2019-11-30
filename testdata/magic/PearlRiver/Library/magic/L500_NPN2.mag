@@ -1,0 +1,92 @@
+magic
+tech scmos
+timestamp 1542389337
+<< nwell >>
+rect 116 172 184 184
+rect 116 134 128 172
+rect 172 134 184 172
+rect 116 124 184 134
+<< metal1 >>
+rect 100 208 200 218
+rect 145 182 155 208
+rect 118 180 182 182
+rect 118 176 120 180
+rect 180 176 182 180
+rect 118 174 182 176
+rect 118 172 126 174
+rect 118 144 120 172
+rect 124 144 126 172
+rect 174 172 182 174
+rect 118 140 126 144
+rect 130 162 170 170
+rect 130 142 138 162
+rect 142 142 158 158
+rect 142 85 152 142
+rect 100 75 152 85
+rect 162 90 170 162
+rect 174 144 176 172
+rect 180 144 182 172
+rect 174 140 182 144
+rect 162 80 200 90
+<< nwpbase >>
+rect 128 160 172 172
+rect 128 140 140 160
+rect 160 140 172 160
+rect 128 134 172 140
+<< nwpnbase >>
+rect 140 140 160 160
+<< pbasepdiffcontact >>
+rect 132 164 168 168
+rect 132 144 136 162
+rect 164 144 168 162
+<< nbasendiffcontact >>
+rect 144 144 156 156
+<< nsubstratencontact >>
+rect 120 176 180 180
+rect 120 144 124 172
+rect 176 144 180 172
+use L500_TPAD_blank  L500_TPAD_blank_2
+timestamp 1537343441
+transform 1 0 0 0 1 200
+box 0 0 100 100
+use L500_CHAR_c  L500_CHAR_c_0
+timestamp 1534321654
+transform 1 0 146 0 1 230
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_3
+timestamp 1537343441
+transform 1 0 200 0 1 200
+box 0 0 100 100
+use L500_CHAR_n  L500_CHAR_n_0
+timestamp 1534323117
+transform 1 0 208 0 1 136
+box 0 0 12 18
+use L500_CHAR_p  L500_CHAR_p_0
+timestamp 1534323210
+transform 1 0 224 0 1 136
+box 0 0 12 18
+use L500_CHAR_n  L500_CHAR_n_1
+timestamp 1534323117
+transform 1 0 240 0 1 136
+box 0 0 12 18
+use L500_CHAR_2  L500_CHAR_2_0
+timestamp 1534324708
+transform 1 0 256 0 1 136
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_0
+timestamp 1537343441
+transform 1 0 0 0 1 0
+box 0 0 100 100
+use L500_CHAR_e  L500_CHAR_e_0
+timestamp 1534321786
+transform 1 0 114 0 1 50
+box 0 0 12 18
+use L500_CHAR_b  L500_CHAR_b_0
+timestamp 1534321628
+transform 1 0 173 0 1 50
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_1
+timestamp 1537343441
+transform 1 0 200 0 1 0
+box 0 0 100 100
+<< end >>

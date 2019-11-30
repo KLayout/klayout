@@ -1,0 +1,305 @@
+magic
+tech scmos
+timestamp 1538559977
+<< metal1 >>
+rect -310 114 0 118
+rect 600 114 904 118
+rect -310 109 -210 114
+rect 804 109 904 114
+rect -10 66 0 70
+rect 600 66 604 70
+rect -10 48 0 52
+rect 600 48 604 52
+rect -310 4 -210 9
+rect 804 4 904 9
+rect -310 0 19 4
+rect 600 0 904 4
+use Library/magic/L500_CHAR_c  L500_CHAR_c_0
+timestamp 1534321654
+transform 1 0 0 0 1 122
+box 0 0 12 18
+use Library/magic/L500_CHAR_e  L500_CHAR_e_0
+timestamp 1534321786
+transform 1 0 16 0 1 122
+box 0 0 12 18
+use Library/magic/L500_CHAR_l  L500_CHAR_l_0
+timestamp 1534225390
+transform 1 0 32 0 1 122
+box 0 0 12 18
+use Library/magic/L500_CHAR_l  L500_CHAR_l_1
+timestamp 1534225390
+transform 1 0 48 0 1 122
+box 0 0 12 18
+use Library/magic/L500_CHAR_5  L500_CHAR_5_0
+timestamp 1534324893
+transform 1 0 64 0 1 122
+box 0 0 12 18
+use Library/magic/L500_CHAR_0  L500_CHAR_0_0
+timestamp 1534325425
+transform 1 0 80 0 1 122
+box 0 0 12 18
+use Library/magic/L500_CHAR_under  L500_CHAR_under_0
+timestamp 1534325915
+transform 1 0 96 0 1 122
+box 0 0 12 4
+use Library/magic/L500_CHAR_f  L500_CHAR_f_0
+timestamp 1534344057
+transform 1 0 112 0 1 122
+box 0 0 12 18
+use Library/magic/L500_CHAR_i  L500_CHAR_i_0
+timestamp 1534226087
+transform 1 0 128 0 1 122
+box 0 0 8 18
+use Library/magic/L500_CHAR_l  L500_CHAR_l_2
+timestamp 1534225390
+transform 1 0 140 0 1 122
+box 0 0 12 18
+use Library/magic/L500_CHAR_l  L500_CHAR_l_3
+timestamp 1534225390
+transform 1 0 156 0 1 122
+box 0 0 12 18
+use Library/magic/L500_CHAR_c  L500_CHAR_c_1
+timestamp 1534321654
+transform 1 0 172 0 1 122
+box 0 0 12 18
+use Library/magic/L500_CHAR_a  L500_CHAR_a_0
+timestamp 1534325357
+transform 1 0 188 0 1 122
+box 0 0 12 18
+use Library/magic/L500_CHAR_p  L500_CHAR_p_0
+timestamp 1534323210
+transform 1 0 204 0 1 122
+box 0 0 12 18
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_1
+timestamp 1537343441
+transform 1 0 -310 0 1 9
+box 0 0 100 100
+use Library/magic/L500_SIGNATURE_vdd  L500_SIGNATURE_vdd_1
+timestamp 1538544897
+transform 1 0 -172 0 1 86
+box 0 0 52 18
+use Library/magic/L500_SIGNATURE_gnd  L500_SIGNATURE_gnd_1
+timestamp 1538544897
+transform 1 0 -200 0 1 30
+box 0 0 52 18
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_0
+timestamp 1537343441
+transform 1 0 -110 0 1 9
+box 0 0 100 100
+use Library/magic/T7_FILLCAP  T7_FILLCAP_49
+timestamp 1533654616
+transform -1 0 24 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_48
+timestamp 1533654616
+transform -1 0 48 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_47
+timestamp 1533654616
+transform -1 0 72 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_46
+timestamp 1533654616
+transform -1 0 96 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_45
+timestamp 1533654616
+transform -1 0 120 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_44
+timestamp 1533654616
+transform -1 0 144 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_43
+timestamp 1533654616
+transform -1 0 168 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_42
+timestamp 1533654616
+transform -1 0 192 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_41
+timestamp 1533654616
+transform -1 0 216 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_40
+timestamp 1533654616
+transform -1 0 240 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_39
+timestamp 1533654616
+transform -1 0 264 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_38
+timestamp 1533654616
+transform -1 0 288 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_37
+timestamp 1533654616
+transform -1 0 312 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_36
+timestamp 1533654616
+transform -1 0 336 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_35
+timestamp 1533654616
+transform -1 0 360 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_34
+timestamp 1533654616
+transform -1 0 384 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_33
+timestamp 1533654616
+transform -1 0 408 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_32
+timestamp 1533654616
+transform -1 0 432 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_31
+timestamp 1533654616
+transform -1 0 456 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_30
+timestamp 1533654616
+transform -1 0 480 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_29
+timestamp 1533654616
+transform -1 0 504 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_28
+timestamp 1533654616
+transform -1 0 528 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_27
+timestamp 1533654616
+transform -1 0 552 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_26
+timestamp 1533654616
+transform -1 0 576 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_25
+timestamp 1533654616
+transform -1 0 600 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_0
+timestamp 1533654616
+transform 1 0 0 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_1
+timestamp 1533654616
+transform 1 0 24 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_2
+timestamp 1533654616
+transform 1 0 48 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_3
+timestamp 1533654616
+transform 1 0 72 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_4
+timestamp 1533654616
+transform 1 0 96 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_5
+timestamp 1533654616
+transform 1 0 120 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_6
+timestamp 1533654616
+transform 1 0 144 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_7
+timestamp 1533654616
+transform 1 0 168 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_8
+timestamp 1533654616
+transform 1 0 192 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_9
+timestamp 1533654616
+transform 1 0 216 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_10
+timestamp 1533654616
+transform 1 0 240 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_11
+timestamp 1533654616
+transform 1 0 264 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_12
+timestamp 1533654616
+transform 1 0 288 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_13
+timestamp 1533654616
+transform 1 0 312 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_14
+timestamp 1533654616
+transform 1 0 336 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_15
+timestamp 1533654616
+transform 1 0 360 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_16
+timestamp 1533654616
+transform 1 0 384 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_17
+timestamp 1533654616
+transform 1 0 408 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_18
+timestamp 1533654616
+transform 1 0 432 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_19
+timestamp 1533654616
+transform 1 0 456 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_20
+timestamp 1533654616
+transform 1 0 480 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_21
+timestamp 1533654616
+transform 1 0 504 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_22
+timestamp 1533654616
+transform 1 0 528 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_23
+timestamp 1533654616
+transform 1 0 552 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_FILLCAP  T7_FILLCAP_24
+timestamp 1533654616
+transform 1 0 576 0 1 -2
+box 0 0 24 56
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_2
+timestamp 1537343441
+transform 1 0 604 0 1 9
+box 0 0 100 100
+use Library/magic/L500_SIGNATURE_gnd  L500_SIGNATURE_gnd_0
+timestamp 1538544897
+transform 1 0 740 0 1 30
+box 0 0 52 18
+use Library/magic/L500_SIGNATURE_vdd  L500_SIGNATURE_vdd_0
+timestamp 1538544897
+transform 1 0 720 0 1 85
+box 0 0 52 18
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_3
+timestamp 1537343441
+transform 1 0 804 0 1 9
+box 0 0 100 100
+<< end >>

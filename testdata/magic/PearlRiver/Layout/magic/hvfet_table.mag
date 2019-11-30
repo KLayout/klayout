@@ -1,0 +1,12 @@
+magic
+tech scmos
+timestamp 1541045395
+use L500_HVPFET_W108_L22_params  L500_HVPFET_W108_L22_params_0 ../../Library/magic
+timestamp 1541002503
+transform 1 0 0 0 1 0
+box 0 0 300 300
+use L500_HVNFET_W108_L22_params  L500_HVNFET_W108_L22_params_0 ../../Library/magic
+timestamp 1541038230
+transform 1 0 350 0 1 0
+box 0 0 300 300
+<< end >>

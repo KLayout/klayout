@@ -1,0 +1,64 @@
+magic
+tech scmos
+timestamp 1541350492
+use Library/magic/L500_PMOS_W3_L2_params  L500_PMOS_W3_L2_params_0
+timestamp 1541350492
+transform 1 0 0 0 1 1400
+box 0 0 300 300
+use Library/magic/L500_PMOS_W5_L2_params  L500_PMOS_W5_L2_params_0
+timestamp 1541350492
+transform 1 0 0 0 1 1050
+box 0 0 300 300
+use Library/magic/L500_PMOS_W5_L5_params  L500_PMOS_W5_L5_params_0
+timestamp 1541350492
+transform 1 0 350 0 1 1050
+box 0 0 300 300
+use Library/magic/L500_PMOS_W10_L2_params  L500_PMOS_W10_L2_params_0
+timestamp 1541350492
+transform 1 0 0 0 1 700
+box 0 0 300 300
+use Library/magic/L500_PMOS_W10_L5_params  L500_PMOS_W10_L5_params_0
+timestamp 1541350492
+transform 1 0 350 0 1 700
+box 0 0 300 300
+use Library/magic/L500_PMOS_W10_L10_params  L500_PMOS_W10_L10_params_0
+timestamp 1541350492
+transform 1 0 700 0 1 700
+box 0 0 300 300
+use Library/magic/L500_PMOS_W20_L2_params  L500_PMOS_W20_L2_params_0
+timestamp 1541350492
+transform 1 0 0 0 1 350
+box 0 0 300 300
+use Library/magic/L500_PMOS_W20_L5_params  L500_PMOS_W20_L5_params_0
+timestamp 1541350492
+transform 1 0 350 0 1 350
+box 0 0 300 300
+use Library/magic/L500_PMOS_W20_L10_params  L500_PMOS_W20_L10_params_0
+timestamp 1541350492
+transform 1 0 700 0 1 350
+box 0 0 300 300
+use Library/magic/L500_PMOS_W20_L20_params  L500_PMOS_W20_L20_params_0
+timestamp 1541350492
+transform 1 0 1050 0 1 350
+box 0 0 300 300
+use Library/magic/L500_PMOS_W40_L2_params  L500_PMOS_W40_L2_params_0
+timestamp 1541350492
+transform 1 0 0 0 1 0
+box 0 0 300 300
+use Library/magic/L500_PMOS_W40_L5_params  L500_PMOS_W40_L5_params_0
+timestamp 1541350492
+transform 1 0 350 0 1 0
+box 0 0 300 300
+use Library/magic/L500_PMOS_W40_L10_params  L500_PMOS_W40_L10_params_0
+timestamp 1541350492
+transform 1 0 700 0 1 0
+box 0 0 300 300
+use Library/magic/L500_PMOS_W40_L20_params  L500_PMOS_W40_L20_params_0
+timestamp 1541350492
+transform 1 0 1050 0 1 0
+box 0 0 300 300
+use Library/magic/L500_PMOS_W40_L40_params  L500_PMOS_W40_L40_params_0
+timestamp 1541350492
+transform 1 0 1400 0 1 0
+box 0 0 300 300
+<< end >>

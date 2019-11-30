@@ -29,10 +29,13 @@
 
 #include <stdlib.h>
 
-static void run_test (tl::TestBase *_this, const std::string &base, const char *file, const char *file_au, const char *map = 0, double lambda = 0.1, double dbu = 0.001)
+static void run_test (tl::TestBase *_this, const std::string &base, const char *file, const char *file_au, const char *map = 0, double lambda = 0.1, double dbu = 0.001, const std::vector<std::string> *lib_paths = 0)
 {
   db::MAGReaderOptions *opt = new db::MAGReaderOptions();
   opt->dbu = dbu;
+  if (lib_paths) {
+    opt->lib_paths = *lib_paths;
+  }
 
   db::LayerMap lm;
   if (map) {
@@ -139,5 +142,12 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
 TEST(1)
 {
   run_test (_this, tl::testsrc (), "MAG_TEST.mag.gz", "mag_test_au.cif.gz");
+}
+
+TEST(2)
+{
+  std::vector<std::string> lp;
+  lp.push_back (std::string ("../.."));
+  run_test (_this, tl::testsrc (), "PearlRiver/Layout/magic/PearlRiver_die.mag", "PearlRiver_au.cif.gz", 0, 1.0, 0.001, &lp);
 }
 

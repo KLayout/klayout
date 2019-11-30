@@ -54,7 +54,7 @@ class Buddies_TestClass < TestBase
       "strm2gdstxt" => 0x48454144,
       "strm2oas" => 0x2553454d,
       "strm2txt" => 0x62656769,
-      "strm2mag" => 0x0,
+      "strm2mag" => 0x6d616769,
     }
 
     # Windows CRLF -> LF translation
@@ -66,7 +66,11 @@ class Buddies_TestClass < TestBase
    
       puts "Testing #{bin} ..."
 
-      out_file = File.join($ut_testtmp, "out_" + bin)
+      if bin == "strm2mag"
+        out_file = File.join($ut_testtmp, "TOP1.mag")
+      else
+        out_file = File.join($ut_testtmp, "out_" + bin)
+      end
       if File.exists?(out_file)
         File.unlink(out_file)
       end

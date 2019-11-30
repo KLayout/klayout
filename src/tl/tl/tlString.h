@@ -878,8 +878,33 @@ TL_PUBLIC std::string trim (const std::string &s);
 TL_PUBLIC std::vector<std::string> split (const std::string &s, const std::string &sep);
 TL_PUBLIC std::string join (const std::vector<std::string> &strings, const std::string &sep);
 
+/**
+ *  @brief Returns the lower-case character for a wchar_t
+ */
+TL_PUBLIC wchar_t wdowncase (wchar_t c);
+
+/**
+ *  @brief Returns the upper-case character for a wchar_t
+ */
+TL_PUBLIC wchar_t wupcase (wchar_t c);
+
+/**
+ *  @brief Returns the lower-case UTF32 character
+ */
+TL_PUBLIC uint32_t utf32_downcase (uint32_t c32);
+
+/**
+ *  @brief Returns the upper-case UTF32 character
+ */
+TL_PUBLIC uint32_t utf32_upcase (uint32_t c32);
+
+/**
+ *  @brief Parses the next UTF32 character from an UTF-8 string
+ *  @param cp The input character's position, will be set to the next character.
+ *  @paran cpe The end of the string of 0 for "no end"
+ */
+TL_PUBLIC uint32_t utf32_from_utf8 (const char *&cp, const char *cpe = 0);
+
 } // namespace tl
 
 #endif
-
-

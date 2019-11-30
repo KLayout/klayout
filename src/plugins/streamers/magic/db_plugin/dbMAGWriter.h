@@ -104,6 +104,7 @@ private:
   void write_label (const std::string &layer, const db::Text &text, const Layout &layout, tl::OutputStream &os);
   void write_instance (const db::CellInstArray &inst, const db::Layout &layout, tl::OutputStream &os);
   void write_single_instance (db::cell_index_type ci, ICplxTrans tr, db::Vector a, db::Vector b, unsigned long na, unsigned long nb, const db::Layout &layout, tl::OutputStream &os);
+  std::string make_string (const std::string &s);
 };
 
 } // namespace db

@@ -62,12 +62,8 @@ MAGWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
   tl::URI src (stream.path ());
   std::string basename = tl::basename (src.path ());
   std::pair<bool, db::cell_index_type> ci = layout.cell_by_name (basename.c_str ());
-  if (! ci.first) {
-    throw tl::Exception (tl::to_string (tr ("Magic file names must be valid cell names. This is not a valid name: ")) + basename);
-  }
-
-  if (cell_set.find (ci.second) == cell_set.end ()) {
-    throw tl::Exception (tl::to_string (tr ("Cell name derived from file name isn't a selected cell: ")) + basename);
+  if (! ci.first || cell_set.find (ci.second) == cell_set.end ()) {
+    tl::warn << tl::to_string (tr ("Magic file names should be valid cell names - otherwise no such file is written. This is not a valid name: ")) << basename;
   }
 
   m_options = options.get_options<MAGWriterOptions> ();
@@ -135,7 +131,7 @@ MAGWriter::do_write_cell (db::cell_index_type ci, const std::vector <std::pair <
     tech = layout.meta_info_value ("technology");
   }
   if (! tech.empty ()) {
-    os << "tech " << tl::to_word_or_quoted_string (tl::to_lower_case (tech)) << "\n";
+    os << "tech " << make_string (tl::to_lower_case (tech)) << "\n";
   }
 
   os << "timestamp " << m_timestamp << "\n";
@@ -151,7 +147,7 @@ MAGWriter::do_write_cell (db::cell_index_type ci, const std::vector <std::pair <
     any = false;
     for (db::Shapes::shape_iterator s = cell.shapes (ll->first).begin (db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Paths); ! s.at_end (); ++s) {
       if (! any) {
-        os << "<< " << tl::to_word_or_quoted_string (tl::to_lower_case (ll->second.name)) << " >>\n";
+        os << "<< " << make_string (tl::to_lower_case (ll->second.name)) << " >>\n";
         any = true;
       }
       db::Polygon poly;
@@ -262,7 +258,7 @@ MAGWriter::write_label (const std::string &layer, const db::Text &text, const db
     s = tl::replaced (s, "\n", "\\n");
   }
 
-  os << "rlabel " << tl::to_word_or_quoted_string (layer) << " " << v.x () << " " << v.y () << " " << v.x () << " " << v.y () << " 0 " << s << "\n";
+  os << "rlabel " << make_string (layer) << " " << v.x () << " " << v.y () << " " << v.x () << " " << v.y () << " 0 " << s << "\n";
 }
 
 void
@@ -294,7 +290,7 @@ MAGWriter::write_single_instance (db::cell_index_type ci, db::ICplxTrans trans, 
 
   int id = (m_cell_id [ci] += 1);
   std::string cn = layout.cell_name (ci);
-  os << "use " << tl::to_word_or_quoted_string (cn) << " " << tl::to_word_or_quoted_string (cn + "_" + tl::to_string (id)) << "\n";
+  os << "use " << make_string (cn) << " " << make_string (cn + "_" + tl::to_string (id)) << "\n";
 
   if (na > 1 || nb > 1) {
 
@@ -383,6 +379,30 @@ MAGWriter::needs_rounding (const db::Vector &v) const
   db::Vector res (db::DVector (v) * m_sf);
   return ! db::DVector (res).equal (db::DVector (v) * m_sf);
 }
+
+static inline bool is_valid_char (uint32_t c32)
+{
+  return (c32 >= 'A' && c32 <= 'Z') ||
+         (c32 >= 'a' && c32 <= 'z') ||
+         (c32 >= '0' && c32 <= '9') ||
+         c32 == '_' || c32 == '.';
+}
+
+std::string
+MAGWriter::make_string (const std::string &s)
+{
+  std::string res;
+  for (const char *cp = s.c_str (); *cp; ) {
+    uint32_t c32 = tl::utf32_from_utf8 (cp);
+    if (! is_valid_char (c32)) {
+      res += tl::sprintf ("x%x", c32);
+    } else {
+      res += (char) c32;
+    }
+  }
+  return res;
+}
+
 
 }
 

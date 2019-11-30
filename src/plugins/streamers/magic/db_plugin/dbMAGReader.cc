@@ -137,14 +137,23 @@ MAGReader::warn (const std::string &msg)
 db::cell_index_type
 MAGReader::cell_from_path (const std::string &path, db::Layout &layout)
 {
-  std::map<std::string, db::cell_index_type>::const_iterator c = m_cells_read.find (path);
+  std::string cellname = tl::filename (path);
+
+  std::map<std::string, db::cell_index_type>::const_iterator c = m_cells_read.find (cellname);
   if (c != m_cells_read.end ()) {
     return c->second;
   }
 
   //  NOTE: this can lead to cell variants if a cell is present with different library paths ... (L500_CHAR_p)
-  db::cell_index_type ci = layout.add_cell (cell_name_from_path (path).c_str ());
-  m_cells_read.insert (std::make_pair (path, ci));
+  db::cell_index_type ci;
+  if (layout.has_cell (cellname.c_str ())) {
+    //  NOTE: this reuses an existing cell and will add(!) the layout to the latter. This
+    //  enables "incremental read" like for GDS files.
+    ci = layout.cell_by_name (cellname.c_str ()).second;
+  } else {
+    ci = layout.add_cell (cell_name_from_path (path).c_str ());
+  }
+  m_cells_read.insert (std::make_pair (cellname, ci));
 
   std::string cell_file;
   if (! resolve_path (path, cell_file)) {
@@ -152,7 +161,7 @@ MAGReader::cell_from_path (const std::string &path, db::Layout &layout)
     tl::warn << tl::to_string (tr ("Unable to find a layout file for cell - skipping this cell: ")) << path;
     layout.cell (ci).set_ghost_cell (true);
   } else {
-    m_cells_to_read.insert (std::make_pair (path, std::make_pair (cell_file, ci)));
+    m_cells_to_read.insert (std::make_pair (cellname, std::make_pair (cell_file, ci)));
   }
 
   return ci;

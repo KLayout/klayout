@@ -103,6 +103,7 @@ public:
   static const std::string oasis_format_name;
   static const std::string cif_format_name;
   static const std::string dxf_format_name;
+  static const std::string mag_format_name;
 
 private:
   double m_scale_factor;
@@ -132,6 +133,9 @@ private:
 
   bool m_cif_dummy_calls;
   bool m_cif_blank_separator;
+
+  double m_magic_lambda;
+  std::string m_magic_tech;
 
   int m_dxf_polygon_mode;
 

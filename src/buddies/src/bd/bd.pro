@@ -21,6 +21,7 @@ SOURCES = \
   strmcmp.cc \
   strmxor.cc \
   strmrun.cc \
+  strm2mag.cc
 
 HEADERS = \
   bdCommon.h \

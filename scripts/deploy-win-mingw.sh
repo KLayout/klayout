@@ -147,6 +147,8 @@ done
 # ----------------------------------------------------------
 # Ruby dependencies
 
+rubys=$($ruby -e 'puts $:' | sort)
+
 rm -rf $target/.ruby-paths.txt
 echo '# Builds the Ruby paths.' >$target/.ruby-paths.txt
 echo '# KLayout will load the paths listed in this file into $0' >>$target/.ruby-paths.txt
@@ -154,16 +156,17 @@ echo '# Use KLayout EXPRESSIONS syntax to specify a list of file paths.' >>$targ
 echo '[' >>$target/.ruby-paths.txt
 
 first=1
-rubys=$($ruby -e 'puts $:' | sort)
 for p in $rubys; do 
   p=$(cygpath $p)
   if [[ $p == "$mingw_inst"* ]] && [ -e "$p" ]; then
     rp=${p/"$mingw_inst/"}
-    if [ $first == "0" ]; then
-      echo "," >>$target/.ruby-paths.txt
-    fi
-    first=0
-    echo -n "  combine(inst_path, '$rp')" >>$target/.ruby-paths.txt
+    # Apparently adding the paths to the interpreter isn't required - 
+    # Ruby can figure out it's own paths
+    # if [ $first == "0" ]; then
+    #   echo "," >>$target/.ruby-paths.txt
+    # fi
+    # first=0
+    # echo -n "  combine(inst_path, '$rp')" >>$target/.ruby-paths.txt
     echo "Copying Ruby installation partial $p -> $target/$rp .."
     rm -rf $target/$rp
     mkdir -p $target/$rp
@@ -176,8 +179,23 @@ done
 echo '' >>$target/.ruby-paths.txt
 echo ']' >>$target/.ruby-paths.txt
 
+# don't forget the gem directory (specifications and gems)
+p=$(ruby -e 'puts Gem::dir')
+p=$(cygpath $p)
+if [[ $p == "$mingw_inst"* ]] && [ -e "$p" ]; then
+  rp=${p/"$mingw_inst/"}
+  echo "Copying Ruby gems $p -> $target/$rp .."
+  rm -rf $target/$rp
+  mkdir -p $target/$rp
+  rmdir $target/$rp
+  cp -vR $p $target/$rp | sed -u 's/.*/echo -n ./' | sh
+  echo ""
+fi
+
 # ----------------------------------------------------------
 # Python dependencies
+
+pythons=$($python -c "import sys; print('\n'.join(sys.path))" | sort)
 
 rm -rf $target/.python-paths.txt
 echo '# Builds the Python paths.' >$target/.python-paths.txt
@@ -187,7 +205,6 @@ echo '# Use KLayout EXPRESSIONS syntax to specify a list of file paths.' >>$targ
 echo '[' >>$target/.python-paths.txt
 
 first=1
-pythons=$($python -c "import sys; print('\n'.join(sys.path))" | sort)
 for p in $pythons; do 
   p=$(cygpath $p)
   rp=""

@@ -28,6 +28,7 @@
 #include "dbArray.h"
 #include "dbStatic.h"
 #include "dbShapeProcessor.h"
+#include "dbTechnology.h"
 
 #include "tlException.h"
 #include "tlString.h"
@@ -48,7 +49,7 @@ namespace db
 MAGReader::MAGReader (tl::InputStream &s)
   : m_stream (s),
     m_progress (tl::to_string (tr ("Reading MAG file")), 1000),
-    m_lambda (1.0), m_dbu (0.001), m_merge (true)
+    m_lambda (1.0), m_dbu (0.001), m_merge (true), mp_klayout_tech (0)
 {
   m_progress.set_format (tl::to_string (tr ("%.0fk lines")));
   m_progress.set_format_unit (1000.0);
@@ -72,6 +73,12 @@ const LayerMap &
 MAGReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 {
   prepare_layers ();
+
+  mp_klayout_tech = 0;
+  std::string klayout_tech_name = layout.meta_info_value ("technology");
+  if (! klayout_tech_name.empty () && db::Technologies::instance ()->has_technology (klayout_tech_name)) {
+    mp_klayout_tech = db::Technologies::instance ()->technology_by_name (klayout_tech_name);
+  }
 
   const db::MAGReaderOptions &specific_options = options.get_options<db::MAGReaderOptions> ();
   m_lambda = specific_options.lambda;
@@ -162,7 +169,7 @@ MAGReader::cell_from_path (const std::string &path, db::Layout &layout)
   m_cells_read.insert (std::make_pair (cellname, ci));
 
   std::string cell_file;
-  if (! resolve_path (path, cell_file)) {
+  if (! resolve_path (path, layout, cell_file)) {
     //  skip with a warning if the file can't be opened (TODO: better to raise an error?)
     tl::warn << tl::to_string (tr ("Unable to find a layout file for cell - skipping this cell: ")) << path;
     layout.cell (ci).set_ghost_cell (true);
@@ -231,11 +238,23 @@ static bool find_and_normalize_file (const tl::URI &uri, std::string &path)
 }
 
 bool
-MAGReader::resolve_path (const std::string &path, std::string &real_path)
+MAGReader::resolve_path (const std::string &path, const db::Layout & /*layout*/, std::string &real_path)
 {
   tl::Eval expr;
-  //  TODO: more variables?
-  expr.set_var ("tech_info", m_tech);
+
+  //  the variables supported for evaluation are
+  //   "tech_name": the name of the KLayout technology this file is loaded for (this may be the Magic technology name)
+  //   "tech_dir": the path to KLayout's technology folder for "tech_name" or the default technology's folder path
+  //   "magic_tech": the technology name from the Magic file currently read
+
+  if (mp_klayout_tech) {
+    expr.set_var ("tech_dir", mp_klayout_tech->base_path ());
+    expr.set_var ("tech_name", mp_klayout_tech->name ());
+  } else {
+    expr.set_var ("tech_dir", std::string ("."));
+    expr.set_var ("tech_name", std::string ());
+  }
+  expr.set_var ("magic_tech", m_tech);
 
   tl::URI path_uri (path);
 
@@ -315,8 +334,15 @@ MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl:
       ex.read_word_or_quoted (m_tech);
 
       if (&m_stream == &stream) {
+
         //  initial file - store technology
-        layout.add_meta_info (db::MetaInfo ("technology", "MAGIC technology string", m_tech));
+        layout.add_meta_info (db::MetaInfo ("magic_technology", tl::to_string (tr ("MAGIC technology string")), m_tech));
+
+        //  propose this is the KLayout technology unless a good one is given
+        if (! mp_klayout_tech) {
+          layout.add_meta_info (db::MetaInfo ("technology", tl::to_string (tr ("Technology name")), m_tech));
+        }
+
       }
 
       ex.expect_end ();

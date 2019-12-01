@@ -226,6 +226,9 @@ LayoutHandle::set_tech_name (const std::string &tn)
     } else {
       m_tech_name = std::string ();
     }
+    if (mp_layout) {
+      mp_layout->add_meta_info (db::MetaInfo ("technology", tl::to_string (tr ("Technology name")), tn));
+    }
     technology_changed_event ();
   }
 }

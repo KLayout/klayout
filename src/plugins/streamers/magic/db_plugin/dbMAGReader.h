@@ -45,6 +45,8 @@
 namespace db
 {
 
+class Technology;
+
 /**
  *  @brief Generic base class of MAG reader exceptions
  */
@@ -143,11 +145,12 @@ private:
   std::map<std::string, std::string> m_use_lib_paths;
   db::VCplxTrans m_dbu_trans_inv;
   std::string m_tech;
+  db::Technology *mp_klayout_tech;
 
   void do_read (db::Layout &layout, db::cell_index_type to_cell, tl::TextInputStream &stream);
   void do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl::TextInputStream &stream);
   void do_merge_part (db::Layout &layout, db::cell_index_type cell_index);
-  bool resolve_path(const std::string &path, std::string &real_path);
+  bool resolve_path(const std::string &path, const Layout &layout, std::string &real_path);
   std::string cell_name_from_path (const std::string &path);
   db::cell_index_type cell_from_path (const std::string &path, Layout &layout);
   void read_rect (tl::Extractor &ex, Layout &layout, cell_index_type cell_index, unsigned int layer);

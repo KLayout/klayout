@@ -120,17 +120,16 @@ static
 gsi::ClassExt<db::LoadLayoutOptions> mag_reader_options (
   gsi::method_ext ("mag_set_layer_map", &set_layer_map, gsi::arg ("map"), gsi::arg ("create_other_layers"),
     "@brief Sets the layer map\n"
-    "This sets a layer mapping for the reader. The \"create_other_layers\" specifies whether to create layers that are not "
-    "in the mapping and automatically assign layers to them.\n"
-    "@param map The layer map to set."
-    "@param create_other_layers The flag telling whether other layer should be created also. Set to false if just the layers in the mapping table should be read.\n"
+    "This sets a layer mapping for the reader. The layer map allows selection and translation of the original layers, for example to assign layer/datatype numbers to the named layers.\n"
+    "@param map The layer map to set.\n"
+    "@param create_other_layers The flag indicating whether other layers will be created as well. Set to false to read only the layers in the layer map.\n"
     "\n"
     "This method has been added in version 0.26.2."
   ) +
   gsi::method_ext ("mag_layer_map=", &set_layer_map1, gsi::arg ("map"),
     "@brief Sets the layer map\n"
     "This sets a layer mapping for the reader. Unlike \\mag_set_layer_map, the 'create_other_layers' flag is not changed.\n"
-    "@param map The layer map to set."
+    "@param map The layer map to set.\n"
     "\n"
     "This method has been added in version 0.26.2."
   ) +
@@ -146,20 +145,20 @@ gsi::ClassExt<db::LoadLayoutOptions> mag_reader_options (
     "@brief Gets the layer map\n"
     "@return A reference to the layer map\n"
     "\n"
-    "This method has been added in version 0.25 and replaces the respective global option in \\LoadLayoutOptions "
-    "in a format-specific fashion.\n"
-    "\n"
     "This method has been added in version 0.26.2."
   ) +
   gsi::method_ext ("mag_create_other_layers?", &create_other_layers,
     "@brief Gets a value indicating whether other layers shall be created\n"
-    "@return True, if other layers should be created.\n"
+    "@return True, if other layers will be created.\n"
+    "This attribute acts together with a layer map (see \\mag_layer_map=). Layers not listed in this map are created as well when "
+    "\\mag_create_other_layers? is true. Otherwise they are ignored.\n"
     "\n"
     "This method has been added in version 0.26.2."
   ) +
   gsi::method_ext ("mag_create_other_layers=", &set_create_other_layers, gsi::arg ("create"),
     "@brief Specifies whether other layers shall be created\n"
-    "@param create True, if other layers should be created.\n"
+    "@param create True, if other layers will be created.\n"
+    "See \\mag_create_other_layers? for a description of this attribute.\n"
     "\n"
     "This method has been added in version 0.26.2."
   ) +
@@ -185,13 +184,13 @@ gsi::ClassExt<db::LoadLayoutOptions> mag_reader_options (
     "@brief Gets a value indicating whether boxes are merged into polygons\n"
     "@return True, if boxes are merged.\n"
     "\n"
-    "When set to true, the boxes of the Magic layout files are merged into (manhattan) polygons where possible.\n"
+    "When set to true, the boxes and triangles of the Magic layout files are merged into polygons where possible.\n"
     "\n"
     "This method has been added in version 0.26.2."
   ) +
   gsi::method_ext ("mag_merge=", &set_merge, gsi::arg ("merge"),
-    "@brief sets a value indicating whether boxes are merged into polygons\n"
-    "@param merge True, if boxes to be merged into polygons.\n"
+    "@brief Sets a value indicating whether boxes are merged into polygons\n"
+    "@param merge True, if boxes and triangles will be merged into polygons.\n"
     "\n"
     "See \\mag_merge? for a description of this property.\n"
     "\n"
@@ -206,28 +205,33 @@ gsi::ClassExt<db::LoadLayoutOptions> mag_reader_options (
     "\nThis property has been added in version 0.26.2.\n"
   ) +
   gsi::method_ext ("mag_library_paths", &get_mag_library_paths,
-    "@brief Get the locations where to look up libraries (in this order)\n"
-    "See \\mag_library_paths= method for a description of this attribute."
+    "@brief Gets the locations where to look up libraries (in this order)\n"
+    "See \\mag_library_paths= method for a description of this attribute.\n"
     "\nThis property has been added in version 0.26.2.\n"
   ) +
   gsi::method_ext ("mag_lambda=", &set_mag_lambda, gsi::arg ("lambda"),
     "@brief Specifies the lambda value to used for reading\n"
     "\n"
-    "The lamdba value is the basic unit of the layout.\n"
+    "The lamdba value is the basic unit of the layout. Magic draws layout as multiples of this basic unit. "
+    "The layout read by the MAG reader will use the database unit specified by \\mag_dbu, but the physical layout "
+    "coordinates will be multiples of \\mag_lambda.\n"
     "\nThis property has been added in version 0.26.2.\n"
   ) +
   gsi::method_ext ("mag_lambda", &get_mag_lambda,
-    "@brief Get the lambda value\n"
-    "See \\mag_lambda= method for a description of this attribute."
+    "@brief Gets the lambda value\n"
+    "See \\mag_lambda= method for a description of this attribute.\n"
     "\nThis property has been added in version 0.26.2.\n"
   ) +
   gsi::method_ext ("mag_dbu=", &set_mag_dbu, gsi::arg ("dbu"),
     "@brief Specifies the database unit which the reader uses and produces\n"
+    "The database unit is the final resolution of the produced layout. This physical resolution is usually "
+    "defined by the layout system - GDS for example typically uses 1nm (mag_dbu=0.001).\n"
+    "All geometry in the MAG file will first be scaled to \\mag_lambda and is then brought to the database unit.\n"
     "\nThis property has been added in version 0.26.2.\n"
   ) +
   gsi::method_ext ("mag_dbu", &get_mag_dbu,
     "@brief Specifies the database unit which the reader uses and produces\n"
-    "See \\mag_dbu= method for a description of this property."
+    "See \\mag_dbu= method for a description of this property.\n"
     "\nThis property has been added in version 0.26.2.\n"
   ),
   ""
@@ -274,8 +278,8 @@ gsi::ClassExt<db::SaveLayoutOptions> mag_writer_options (
     "\n"
     "The lamdba value is the basic unit of the layout.\n"
     "The layout is brought to units of this value. If the layout is not on-grid on this unit, snapping will happen. "
-    "If the value is less or equal to zero, KLayout will use the lambda value stored inside the layout (set by a previous read operation "
-    "of a MAGIC file).\n"
+    "If the value is less or equal to zero, KLayout will use the lambda value stored inside the layout set by a previous read operation "
+    "of a MAGIC file. The lambda value is stored in the Layout object as the \"lambda\" metadata attribute.\n"
     "\nThis property has been added in version 0.26.2.\n"
   ) +
   gsi::method_ext ("mag_lambda", &get_mag_lambda_w,
@@ -283,13 +287,13 @@ gsi::ClassExt<db::SaveLayoutOptions> mag_writer_options (
     "See \\mag_lambda= method for a description of this attribute."
     "\nThis property has been added in version 0.26.2.\n"
   ) +
-  gsi::method_ext ("write_timestamp=", &set_mag_write_timestamp, gsi::arg ("f"),
+  gsi::method_ext ("mag_write_timestamp=", &set_mag_write_timestamp, gsi::arg ("f"),
     "@brief Specifies whether to write a timestamp\n"
     "\n"
-    "If this attribute is set to false, the timestamp written is 0. This isn't correct in the strict sense but simplifies comparison of Magic files.\n"
+    "If this attribute is set to false, the timestamp written is 0. This is not permitted in the strict sense, but simplifies comparison of Magic files.\n"
     "\nThis property has been added in version 0.26.2.\n"
   ) +
-  gsi::method_ext ("write_timestamp", &get_mag_write_timestamp,
+  gsi::method_ext ("mag_write_timestamp?", &get_mag_write_timestamp,
     "@brief Gets a value indicating whether to write a timestamp\n"
     "See \\write_timestamp= method for a description of this attribute.\n"
     "\nThis property has been added in version 0.26.2.\n"

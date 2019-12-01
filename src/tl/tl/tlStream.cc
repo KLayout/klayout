@@ -716,6 +716,12 @@ OutputStream::OutputStream (const std::string &abstract_path, OutputStreamMode o
 
 OutputStream::~OutputStream ()
 {
+  close ();
+}
+
+void
+OutputStream::close ()
+{
   flush ();
 
   if (mp_delegate && m_owns_delegate) {
@@ -759,7 +765,7 @@ inline void fast_copy (char *t, const char *s, size_t n)
 void
 OutputStream::flush ()
 {
-  if (m_buffer_pos > 0) {
+  if (m_buffer_pos > 0 && mp_delegate) {
     mp_delegate->write (mp_buffer, m_buffer_pos);
     m_buffer_pos = 0;
   }
@@ -768,6 +774,10 @@ OutputStream::flush ()
 void
 OutputStream::put (const char *b, size_t n)
 {
+  if (! mp_delegate) {
+    return;
+  }
+
   if (m_as_text) {
     //  skip CR, but replace LF by CRLF -> this will normalize the line terminators to CRLF
     while (n > 0) {
@@ -825,7 +835,9 @@ OutputStream::seek (size_t pos)
 {
   flush ();
 
-  mp_delegate->seek (pos);
+  if (mp_delegate) {
+    mp_delegate->seek (pos);
+  }
   m_pos = pos;
 }
 

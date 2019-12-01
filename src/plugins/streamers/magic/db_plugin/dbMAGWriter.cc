@@ -63,7 +63,7 @@ MAGWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
   std::string basename = tl::basename (src.path ());
   std::pair<bool, db::cell_index_type> ci = layout.cell_by_name (basename.c_str ());
   if (! ci.first || cell_set.find (ci.second) == cell_set.end ()) {
-    tl::warn << tl::to_string (tr ("Magic file names should be valid cell names - otherwise no such file is written. This is not a valid name: ")) << basename;
+    tl::warn << tl::to_string (tr ("The output file is not corresponding to an existing cell name. The content of this cell will not be a real layout: ")) << basename;
   }
 
   m_options = options.get_options<MAGWriterOptions> ();
@@ -91,6 +91,11 @@ MAGWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
 
   m_sf = layout.dbu () / lambda;
 
+  //  As a favor, write a dummy top level file before closing the stream. If the file name corresponds to a real cell,
+  //  this file is overwritten by the true cell.
+  write_dummmy_top (cell_set, layout, stream);
+  stream.close ();
+
   for (std::set<db::cell_index_type>::const_iterator c = cell_set.begin (); c != cell_set.end (); ++c) {
     tl::OutputStream os (filename_for_cell (*c, layout), tl::OutputStream::OM_Auto, true);
     write_cell (*c, layers, layout, os);
@@ -107,6 +112,50 @@ MAGWriter::filename_for_cell (db::cell_index_type ci, db::Layout &layout)
     uri.set_path (uri.path () + "/" + make_string (layout.cell_name (ci)) + "." + m_ext);
   }
   return uri.to_string ();
+}
+
+void
+MAGWriter::write_dummmy_top (const std::set<db::cell_index_type> &cell_set, const db::Layout &layout, tl::OutputStream &os)
+{
+  os.set_as_text (true);
+  os << "magic\n";
+
+  std::string tech = m_options.tech;
+  if (tech.empty ()) {
+    tech = layout.meta_info_value ("technology");
+  }
+  if (! tech.empty ()) {
+    os << "tech " << make_string (tl::to_lower_case (tech)) << "\n";
+  }
+
+  os << "timestamp " << m_timestamp << "\n";
+
+  std::map<std::string, db::cell_index_type> cells_by_name;
+  for (std::set<db::cell_index_type>::const_iterator c = cell_set.begin (); c != cell_set.end (); ++c) {
+    cells_by_name.insert (std::make_pair (std::string (layout.cell_name (*c)), *c));
+  }
+
+  db::Coord y = 0;
+  db::Coord w = 0;
+  std::vector<db::CellInstArray> cell_instances;
+  cell_instances.reserve (cells_by_name.size ());
+  for (std::map<std::string, db::cell_index_type>::const_iterator c = cells_by_name.begin (); c != cells_by_name.end (); ++c) {
+    //  instances are arrayed as stack
+    db::Box bx = layout.cell (c->second).bbox ();
+    cell_instances.push_back (db::CellInstArray (db::CellInst (c->second), db::Trans (db::Vector (0, y) + (db::Point () - bx.p1 ()))));
+    y += bx.height ();
+    w = std::max (w, db::Coord (bx.width ()));
+  }
+
+  os << "<< checkpaint >>\n";
+  write_polygon (db::Polygon (db::Box (0, 0, w, y)), layout, os);
+
+  m_cell_id.clear ();
+  for (std::vector<db::CellInstArray>::const_iterator i = cell_instances.begin (); i != cell_instances.end (); ++i) {
+    write_instance (*i, layout, os);
+  }
+
+  os << "<< end >>\n";
 }
 
 void
@@ -403,6 +452,4 @@ MAGWriter::make_string (const std::string &s)
   return res;
 }
 
-
 }
-

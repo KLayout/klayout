@@ -1033,6 +1033,11 @@ public:
    */
   virtual ~OutputStream ();
 
+  /**
+   *  @brief Closes the stream - after closing, the stream can't be accessed anymore
+   */
+  void close ();
+
   /** 
    *  @brief This is the outer write method to call
    *  
@@ -1108,7 +1113,7 @@ public:
    */
   bool supports_seek () const
   {
-    return mp_delegate->supports_seek ();
+    return mp_delegate != 0 && mp_delegate->supports_seek ();
   }
 
   /**

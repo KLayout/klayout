@@ -3,7 +3,7 @@
 
 <doc>
 
-  <title>Coding PCell's In Ruby</title>
+  <title>Coding PCells In Ruby</title>
   <keyword name="Ruby"/>
   <keyword name="PCell"/>
   <keyword name="Programming"/>
@@ -12,7 +12,7 @@
   <h2-index/>
 
   <p>
-  A good starting point for Ruby PCell's is the PCell sample. Create a macro in the 
+  A good starting point for Ruby PCells is the PCell sample. Create a macro in the
   macro development IDE (use the "+" button) and choose "PCell sample" from the 
   templates.
   </p>
@@ -171,7 +171,7 @@ end</pre>
   </p>
 
   <p>Using the same concept, a library is an object derived from the <class_doc href="Library"/> class. It is basically
-  a container for PCell's and static layout cells. A library has to be initialized (most conveniently in
+  a container for PCells and static layout cells. A library has to be initialized (most conveniently in
   the constructor), registered and initialized once. That makes the library available to the system and
   it can be used in layouts.
   </p>
@@ -420,13 +420,13 @@ end</pre>
 
   <p>
   Of course, more than one PCell class can be declared. Each PCell type must 
-  have an own implementation class which we will use later to create the PCell's from.
+  have an own implementation class which we will use later to create the PCells from.
   </p>
 
   <h2>The Library</h2>
 
   <p>
-  The library is the container for the PCell's.
+  The library is the container for the PCells.
   All important code is packed into the constructor of the library.
   </p>
 
@@ -476,14 +476,14 @@ end</pre>
 
   <p>
   This line of code will instantiate the library and, through the constructor, instantiate
-  the PCell's and register the library. We are done now and can use the library and our PCell.
+  the PCells and register the library. We are done now and can use the library and our PCell.
   </p>
 
   <h2>Debugging The Code</h2>
 
   <p>
   When you have modified the code, you need to rerun the script. That will create the classes
-  again and re-register the PCell's and the Library with the new implementation. PCell's already
+  again and re-register the PCells and the Library with the new implementation. PCells already
   living in the layout will be migrated to the new implementation by mapping their parameters by
   their symbolic names.
   </p>

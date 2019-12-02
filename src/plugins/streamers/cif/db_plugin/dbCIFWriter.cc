@@ -61,11 +61,7 @@ CIFWriter::operator<<(const std::string &s)
 CIFWriter &
 CIFWriter::operator<<(endl_tag)
 {
-#ifdef _WIN32
-  *this << "\r\n";
-#else
   *this << "\n";
-#endif
   return *this;
 }
 
@@ -78,6 +74,8 @@ CIFWriter::xy_sep () const
 void 
 CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options)
 {
+  stream.set_as_text (true);
+
   m_options = options.get_options<CIFWriterOptions> ();
   mp_stream = &stream;
 
@@ -107,7 +105,7 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
   strftime(timestr, sizeof (timestr), "%F %T", &tt);
 
   //  Write header
-  *this << "(CIF file written " << (const char *)timestr << " by KLayout);" << endl;
+  *this << "(CIF file written " << (const char *)timestr << " by KLayout);" << m_endl;
 
   //  TODO: this can be done more intelligently ..
   int tl_scale_divider;
@@ -136,8 +134,8 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
 
     double sf = 1.0;
 
-    *this << "DS " << cell_index << " " << tl_scale_denom << " " << tl_scale_divider << ";" << endl;
-    *this << "9 " << tl::to_word_or_quoted_string (layout.cell_name (*cell)) << ";" << endl;
+    *this << "DS " << cell_index << " " << tl_scale_denom << " " << tl_scale_divider << ";" << m_endl;
+    *this << "9 " << tl::to_word_or_quoted_string (layout.cell_name (*cell)) << ";" << m_endl;
 
     //  instances
     for (db::Cell::const_iterator inst = cref.begin (); ! inst.at_end (); ++inst) {
@@ -195,7 +193,7 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
 
           *this << " T" << d.x() << xy_sep () << d.y();
 
-          *this << ";" << endl;
+          *this << ";" << m_endl;
 
         }
 
@@ -219,7 +217,7 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
     }
 
     //  end of cell
-    *this << "DF;" << endl;
+    *this << "DF;" << m_endl;
 
   }
 
@@ -232,7 +230,7 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
 
         std::map<db::cell_index_type, int>::const_iterator cif_index = db_to_cif_index_map.find (*cell);
         tl_assert(cif_index != db_to_cif_index_map.end ());
-        *this << "C" << cif_index->second << ";" << endl;
+        *this << "C" << cif_index->second << ";" << m_endl;
 
       }
 
@@ -241,7 +239,7 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
   }
 
   //  end of file
-  *this << "E" << endl;
+  *this << "E" << m_endl;
 
   m_progress.set (mp_stream->pos ());
 
@@ -252,7 +250,7 @@ CIFWriter::emit_layer()
 {
   if (m_needs_emit) {
     m_needs_emit = false;
-    *this << "L " << tl::to_word_or_quoted_string(m_layer.name, "0123456789_.$") << ";" << endl;
+    *this << "L " << tl::to_word_or_quoted_string (tl::to_upper_case (m_layer.name), "0123456789_.$") << ";" << m_endl;
   }
 }
 
@@ -266,12 +264,12 @@ CIFWriter::write_texts (const db::Layout &layout, const db::Cell &cell, unsigned
 
     emit_layer ();
 
-    *this << "94 " << tl::to_word_or_quoted_string(shape->text_string(), "0123456789:<>/&%$!.-_#+*?\\[]{}");
+    *this << "94 " << tl::to_word_or_quoted_string (shape->text_string(), "0123456789:<>/&%$!.-_#+*?\\[]{}");
 
     double h = shape->text_size () * layout.dbu ();
 
     db::Vector p (shape->text_trans ().disp () * sf);
-    *this << " " << p.x() << xy_sep () << p.y () << " " << h << ";" << endl;
+    *this << " " << p.x() << xy_sep () << p.y () << " " << h << ";" << m_endl;
 
     ++shape;
 
@@ -324,7 +322,7 @@ CIFWriter::write_polygon (const db::Polygon &polygon, double sf)
     db::Point pp (*p * sf);
     *this << " " << pp.x () << xy_sep () << pp.y ();
   }
-  *this << ";" << endl;
+  *this << ";" << m_endl;
 }
 
 void 
@@ -338,7 +336,7 @@ CIFWriter::write_boxes (const db::Layout & /*layout*/, const db::Cell &cell, uns
     emit_layer ();
 
     db::Box b (shape->bbox () * sf);
-    *this << "B " << b.width () << " " << b.height () << " " << b.center ().x () << xy_sep () << b.center ().y () << ";" << endl;
+    *this << "B " << b.width () << " " << b.height () << " " << b.center ().x () << xy_sep () << b.center ().y () << ";" << m_endl;
 
     ++shape;
 
@@ -411,13 +409,13 @@ CIFWriter::write_paths (const db::Layout & /*layout*/, const db::Cell &cell, uns
       db::Point pp (*shape->begin_point () * sf);
       *this << " " << pp.x () << xy_sep () << pp.y ();
 
-      *this << ";" << endl;
+      *this << ";" << m_endl;
 
     } else if (path_type >= 0 && npts > 1) {
 
       emit_layer ();
 
-      *this << "98 " << path_type << ";" << endl;
+      *this << "98 " << path_type << ";" << m_endl;
 
       *this << "W " << long (floor (0.5 + sf * shape->path_width ()));
 
@@ -426,7 +424,7 @@ CIFWriter::write_paths (const db::Layout & /*layout*/, const db::Cell &cell, uns
         *this << " " << pp.x () << xy_sep () << pp.y ();
       }
 
-      *this << ";" << endl;
+      *this << ";" << m_endl;
 
     } else {
       db::Polygon poly;

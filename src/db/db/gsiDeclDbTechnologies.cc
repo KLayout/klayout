@@ -191,6 +191,20 @@ gsi::Class<db::Technology> technology_decl ("db", "Technology",
   gsi::method ("description=", &db::Technology::set_description, gsi::arg ("description"),
     "@brief Sets the description\n"
   ) +
+  gsi::method ("group", &db::Technology::group,
+    "@brief Gets the technology group\n"
+    "\n"
+    "The technology group is used to group certain technologies together in the technology selection menu. "
+    "Technologies with the same group are put under a submenu with that group title.\n"
+    "\n"
+    "The 'group' attribute has been introduced in version 0.26.2.\n"
+  ) +
+  gsi::method ("group=", &db::Technology::set_group, gsi::arg ("group"),
+    "@brief Sets the technology group\n"
+    "See \\group for details about this attribute.\n"
+    "\n"
+    "The 'group' attribute has been introduced in version 0.26.2.\n"
+  ) +
   gsi::method ("dbu", &db::Technology::dbu,
     "@brief Gets the default database unit\n"
     "\n"

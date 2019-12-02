@@ -226,6 +226,9 @@ LayoutHandle::set_tech_name (const std::string &tn)
     } else {
       m_tech_name = std::string ();
     }
+    if (mp_layout) {
+      mp_layout->add_meta_info (db::MetaInfo ("technology", tl::to_string (tr ("Technology name")), tn));
+    }
     technology_changed_event ();
   }
 }
@@ -339,6 +342,14 @@ LayoutHandle::load (const db::LoadLayoutOptions &options, const std::string &tec
   db::Reader reader (stream);
   db::LayerMap new_lmap = reader.read (layout (), m_load_options);
 
+  //  If there is no technology given and the reader reports one, use this one
+  if (technology.empty ()) {
+    std::string tech_from_reader = layout ().meta_info_value ("technology");
+    if (! tech_from_reader.empty ()) {
+      set_tech_name (tech_from_reader);
+    }
+  }
+
   //  Update the file's data:
   file_watcher ().remove_file (filename ());
   file_watcher ().add_file (filename ());
@@ -357,6 +368,12 @@ LayoutHandle::load ()
   tl::InputStream stream (m_filename);
   db::Reader reader (stream);
   db::LayerMap new_lmap = reader.read (layout (), m_load_options);
+
+  //  Attach the technology from the reader if it reports one
+  std::string tech_from_reader = layout ().meta_info_value ("technology");
+  if (! tech_from_reader.empty ()) {
+    set_tech_name (tech_from_reader);
+  }
 
   //  Update the file's data:
   file_watcher ().remove_file (filename ());

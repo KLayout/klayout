@@ -475,7 +475,7 @@ LibrariesView::search_editing_finished ()
 }
 
 void
-LibrariesView::middle_clicked (const QModelIndex &index)
+LibrariesView::middle_clicked (const QModelIndex & /*index*/)
 {
   //  ... nothing yet ..
 }
@@ -493,7 +493,7 @@ LibrariesView::clicked (const QModelIndex & /*index*/)
 }
 
 void
-LibrariesView::double_clicked (const QModelIndex &index)
+LibrariesView::double_clicked (const QModelIndex & /*index*/)
 {
   //  ... nothing yet ..
 }

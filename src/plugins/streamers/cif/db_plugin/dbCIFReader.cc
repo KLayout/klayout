@@ -536,8 +536,6 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
 
     } else if (c == 'L') {
 
-      skip_blanks ();
-
       ++layer_specs;
 
       std::string name = read_name ();

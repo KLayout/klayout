@@ -80,6 +80,11 @@ title_for_technology (const db::Technology *t)
       d += t->description ();
     }
   }
+  if (! t->group ().empty ()) {
+    d += " [";
+    d += t->group ();
+    d += "]";
+  }
   return d;
 }
 
@@ -106,6 +111,7 @@ TechBaseEditorPage::setup ()
 {
   mp_ui->name_le->setText (tl::to_qstring (tech ()->name ()));
   mp_ui->desc_le->setText (tl::to_qstring (tech ()->description ()));
+  mp_ui->group_le->setText (tl::to_qstring (tech ()->group ()));
   mp_ui->dbu_le->setText (tl::to_qstring (tl::to_string (tech ()->dbu ())));
   mp_ui->desc_le->setEnabled (! tech ()->name ().empty ());
   mp_ui->base_path_le->setText (tl::to_qstring (tech ()->explicit_base_path ()));
@@ -155,6 +161,7 @@ void
 TechBaseEditorPage::commit ()
 {
   tech ()->set_description (tl::to_string (mp_ui->desc_le->text ()));
+  tech ()->set_group (tl::to_string (mp_ui->group_le->text ()));
   tech ()->set_explicit_base_path (tl::to_string (mp_ui->base_path_le->text ()));
 
   double d = 0.001;
@@ -741,11 +748,7 @@ BEGIN_PROTECTED
     tl_assert (t != 0);
   }
 
-  std::string d = t->name ();
-  if (! d.empty () && ! t->description ().empty ()) {
-    d += " - ";
-  }
-  d += t->description ();
+  std::string d = t->get_display_string ();
 
   bool ok = false;
   QString tn = QInputDialog::getText (this, QObject::tr ("Add Technology"), 

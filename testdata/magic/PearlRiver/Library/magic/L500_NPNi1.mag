@@ -1,0 +1,94 @@
+magic
+tech scmos
+timestamp 1542451001
+<< nwell >>
+rect 110 181 190 191
+rect 110 138 120 181
+rect 180 138 190 181
+rect 110 128 190 138
+<< metal1 >>
+rect 100 200 136 210
+rect 126 175 136 200
+rect 164 200 200 210
+rect 164 175 174 200
+rect 126 166 174 175
+rect 126 144 134 166
+rect 137 159 163 163
+rect 137 100 141 159
+rect 100 90 141 100
+rect 145 100 155 155
+rect 159 146 163 159
+rect 166 144 174 166
+rect 145 90 200 100
+<< nwpbase >>
+rect 120 176 180 181
+rect 120 143 125 176
+rect 135 156 165 165
+rect 135 144 144 156
+rect 156 144 165 156
+rect 135 143 165 144
+rect 175 143 180 176
+rect 120 138 180 143
+<< nwpnbase >>
+rect 125 165 175 176
+rect 125 143 135 165
+rect 144 144 156 156
+rect 165 143 175 165
+<< pbasepdiffcontact >>
+rect 137 159 163 163
+rect 137 146 141 159
+rect 159 146 163 159
+<< nbasendiffcontact >>
+rect 128 169 172 173
+rect 128 146 132 165
+rect 146 146 154 154
+rect 168 146 172 165
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_1
+timestamp 1537343441
+transform 1 0 0 0 1 200
+box 0 0 100 100
+use Library/magic/L500_CHAR_c  L500_CHAR_c_0
+timestamp 1534321654
+transform 1 0 143 0 1 228
+box 0 0 12 18
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_3
+timestamp 1537343441
+transform 1 0 200 0 1 200
+box 0 0 100 100
+use Library/magic/L500_CHAR_n  L500_CHAR_n_0
+timestamp 1534323117
+transform 1 0 198 0 1 164
+box 0 0 12 18
+use Library/magic/L500_CHAR_p  L500_CHAR_p_0
+timestamp 1534323210
+transform 1 0 214 0 1 164
+box 0 0 12 18
+use Library/magic/L500_CHAR_n  L500_CHAR_n_1
+timestamp 1534323117
+transform 1 0 230 0 1 164
+box 0 0 12 18
+use Library/magic/L500_CHAR_1  L500_CHAR_1_0
+timestamp 1534326485
+transform 1 0 246 0 1 164
+box 0 0 12 18
+use Library/magic/L500_CHAR_i  L500_CHAR_i_0
+timestamp 1534226087
+transform 1 0 198 0 1 142
+box 0 0 8 18
+use Library/magic/L500_CHAR_b  L500_CHAR_b_0
+timestamp 1534321628
+transform 1 0 70 0 1 110
+box 0 0 12 18
+use Library/magic/L500_CHAR_e  L500_CHAR_e_0
+timestamp 1534321786
+transform 1 0 226 0 1 105
+box 0 0 12 18
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_0
+timestamp 1537343441
+transform 1 0 0 0 1 0
+box 0 0 100 100
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_2
+timestamp 1537343441
+transform 1 0 200 0 1 0
+box 0 0 100 100
+<< end >>

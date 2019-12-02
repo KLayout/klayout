@@ -105,6 +105,14 @@ Circuit &Circuit::operator= (const Circuit &other)
     m_cell_index = other.m_cell_index;
     m_pins = other.m_pins;
 
+    m_pin_by_id.clear ();
+    for (pin_list::iterator p = m_pins.begin (); p != m_pins.end (); ++p) {
+      if (m_pin_by_id.size () <= p->id ()) {
+        m_pin_by_id.resize (p->id () + 1, pin_list::iterator ());
+      }
+      m_pin_by_id [p->id ()] = p;
+    }
+
     std::map<const Device *, Device *> device_table;
     for (const_device_iterator i = other.begin_devices (); i != other.end_devices (); ++i) {
       Device *d = new Device (*i);
@@ -157,17 +165,22 @@ void Circuit::set_netlist (Netlist *netlist)
 
 const Pin *Circuit::pin_by_id (size_t id) const
 {
-  if (id >= m_pins.size ()) {
+  if (id >= m_pin_by_id.size ()) {
     return 0;
   } else {
-    return &m_pins [id];
+    pin_list::iterator pi = m_pin_by_id [id];
+    if (pi == pin_list::iterator ()) {
+      return 0;
+    } else {
+      return pi.operator-> ();
+    }
   }
 }
 
 void Circuit::rename_pin (size_t id, const std::string &name)
 {
-  if (id < m_pins.size ()) {
-    m_pins [id].set_name (name);
+  if (id < m_pin_by_id.size () && m_pin_by_id [id] != pin_list::iterator ()) {
+    m_pin_by_id [id]->set_name (name);
   }
 }
 
@@ -207,6 +220,7 @@ void Circuit::clear ()
 {
   m_name.clear ();
   m_pins.clear ();
+  m_pin_by_id.clear ();
   m_devices.clear ();
   m_nets.clear ();
   m_subcircuits.clear ();
@@ -290,20 +304,31 @@ Circuit::const_child_circuit_iterator Circuit::end_parents () const
 void Circuit::clear_pins ()
 {
   m_pins.clear ();
+  m_pin_by_id.clear ();
 }
 
 const Pin &Circuit::add_pin (const Pin &pin)
 {
   m_pins.push_back (pin);
-  m_pins.back ().set_id (m_pins.size () - 1);
+  m_pins.back ().set_id (m_pin_by_id.size ());
+  m_pin_by_id.push_back (--m_pins.end ());
   return m_pins.back ();
 }
 
 const Pin &Circuit::add_pin (const std::string &name)
 {
   m_pins.push_back (Pin (name));
-  m_pins.back ().set_id (m_pins.size () - 1);
+  m_pins.back ().set_id (m_pin_by_id.size ());
+  m_pin_by_id.push_back (--m_pins.end ());
   return m_pins.back ();
+}
+
+void Circuit::remove_pin (size_t id)
+{
+  if (id < m_pin_by_id.size () && m_pin_by_id [id] != pin_list::iterator ()) {
+    m_pins.erase (m_pin_by_id [id]);
+    m_pin_by_id [id] = pin_list::iterator ();
+  }
 }
 
 void Circuit::add_net (Net *net)
@@ -550,16 +575,57 @@ void Circuit::connect_pin (size_t pin_id, Net *net)
   }
 }
 
+void Circuit::purge_nets_keep_pins ()
+{
+  do_purge_nets (true);
+}
+
 void Circuit::purge_nets ()
+{
+  do_purge_nets (false);
+}
+
+void Circuit::do_purge_nets (bool keep_pins)
 {
   std::vector<db::Net *> nets_to_be_purged;
   for (net_iterator n = begin_nets (); n != end_nets (); ++n) {
-    if (n->is_floating ()) {
+    if (n->is_passive ()) {
       nets_to_be_purged.push_back (n.operator-> ());
     }
   }
+
+  std::set<size_t> pins_to_delete;
+
   for (std::vector<db::Net *>::const_iterator n = nets_to_be_purged.begin (); n != nets_to_be_purged.end (); ++n) {
+    if (! keep_pins) {
+      for (db::Net::pin_iterator p = (*n)->begin_pins (); p != (*n)->end_pins (); ++p) {
+        pins_to_delete.insert (p->pin_id ());
+      }
+    }
     delete *n;
+  }
+
+  if (! pins_to_delete.empty ()) {
+
+    //  remove the pin references of the pins we're going to delete
+    for (refs_iterator r = begin_refs (); r != end_refs (); ++r) {
+      db::SubCircuit *subcircuit = r.operator-> ();
+      for (std::set<size_t>::const_iterator p = pins_to_delete.begin (); p != pins_to_delete.end (); ++p) {
+        db::Net *net = subcircuit->net_for_pin (*p);
+        for (db::Net::subcircuit_pin_iterator sp = net->begin_subcircuit_pins (); sp != net->end_subcircuit_pins (); ++sp) {
+          if (sp->pin_id () == *p && sp->subcircuit () == subcircuit) {
+            net->erase_subcircuit_pin (sp);
+            break;
+          }
+        }
+      }
+    }
+
+    //  and actually remove those pins
+    for (std::set<size_t>::const_iterator p = pins_to_delete.begin (); p != pins_to_delete.end (); ++p) {
+      remove_pin (*p);
+    }
+
   }
 }
 

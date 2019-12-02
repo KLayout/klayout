@@ -265,7 +265,7 @@ public:
   /**
    *  @brief The constructor 
    */
-  Technology (const std::string &name, const std::string &description);
+  Technology (const std::string &name, const std::string &description, const std::string &group = std::string ());
 
   /**
    *  @brief The copy constructor 
@@ -410,6 +410,33 @@ public:
       technology_changed ();
     }
   }
+
+  /**
+   *  @brief Gets the technology group
+   */
+  const std::string &group () const
+  {
+    return m_group;
+  }
+
+  /**
+   *  @brief Sets the technology group
+   */
+  void set_group (const std::string &d)
+  {
+    if (m_group != d) {
+      m_group = d;
+      technology_changed ();
+    }
+  }
+
+  /**
+   *  @brief Gets the display string
+   *
+   *  The display string is used to indicate the technology through a
+   *  descriptive string
+   */
+  std::string get_display_string () const;
 
   /**
    *  @brief Gets the default database unit
@@ -610,7 +637,7 @@ public:
   tl::event<Technology *> technology_changed_with_sender_event;
 
 private:
-  std::string m_name, m_description;
+  std::string m_name, m_description, m_group;
   std::string m_grain_name;
   double m_dbu;
   std::string m_explicit_base_path, m_default_base_path;

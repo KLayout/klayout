@@ -39,7 +39,7 @@ namespace tl
  *  @brief clock_gettime is not implemented in Mac OS X 10.11 and lower
  *  From: https://gist.githubusercontent.com/jbenet/1087739/raw/638b37f76cdd9dc46d617443cab27eac297e2ee3/current_utc_time.c
  */
-void current_utc_time (struct timespec *ts);
+TL_PUBLIC void current_utc_time (struct timespec *ts);
 
 /**
  *  @brief A basic timer class

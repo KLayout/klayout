@@ -1143,5 +1143,150 @@ void DecoratedLineEdit::resizeEvent (QResizeEvent * /*event*/)
   }
 }
 
+// -------------------------------------------------------------
+//  InteractiveListWidget implementation
+
+InteractiveListWidget::InteractiveListWidget (QWidget *parent)
+  : QListWidget (parent)
+{
+  setSelectionMode (QAbstractItemView::ExtendedSelection);
+  setDragDropMode (QAbstractItemView::InternalMove);
 }
 
+void
+InteractiveListWidget::set_values (const std::vector<std::string> &values)
+{
+  clear ();
+  add_values (values);
+}
+
+std::vector<std::string>
+InteractiveListWidget::get_values ()
+{
+  std::vector<std::string> v;
+  v.reserve ((size_t) count ());
+  for (int i = 0; i < count (); ++i) {
+    v.push_back (tl::to_string (item (i)->text ()));
+  }
+  return v;
+}
+
+void
+InteractiveListWidget::add_value (const std::string &value)
+{
+  addItem (tl::to_qstring (value));
+  refresh_flags ();
+  clearSelection ();
+  setCurrentItem (item (count () - 1));
+}
+
+void
+InteractiveListWidget::add_values (const std::vector<std::string> &values)
+{
+  for (std::vector<std::string>::const_iterator i = values.begin (); i != values.end (); ++i) {
+    addItem (tl::to_qstring (*i));
+  }
+  refresh_flags ();
+  clearSelection ();
+}
+
+void
+InteractiveListWidget::delete_selected_items ()
+{
+  QStringList items;
+  for (int i = 0; i < count (); ++i) {
+    if (! item (i)->isSelected ()) {
+      items.push_back (item (i)->text ());
+    }
+  }
+
+  clear ();
+  for (QStringList::const_iterator f = items.begin (); f != items.end (); ++f) {
+    addItem (*f);
+  }
+  refresh_flags ();
+}
+
+void
+InteractiveListWidget::move_selected_items_up ()
+{
+  std::set<QString> selected;
+  for (int i = 0; i < count (); ++i) {
+    if (item (i)->isSelected ()) {
+      selected.insert (item (i)->text ());
+    }
+  }
+
+  QStringList items;
+  int j = -1;
+  for (int i = 0; i < count (); ++i) {
+    if (item (i)->isSelected ()) {
+      items.push_back (item (i)->text ());
+    } else {
+      if (j >= 0) {
+        items.push_back (item (j)->text ());
+      }
+      j = i;
+    }
+  }
+  if (j >= 0) {
+    items.push_back (item (j)->text ());
+  }
+
+  clear ();
+  for (QStringList::const_iterator f = items.begin (); f != items.end (); ++f) {
+    addItem (*f);
+    if (selected.find (*f) != selected.end ()) {
+      item (count () - 1)->setSelected (true);
+    }
+  }
+  refresh_flags ();
+}
+
+void
+InteractiveListWidget::move_selected_items_down ()
+{
+  std::set<QString> selected;
+  for (int i = 0; i < count (); ++i) {
+    if (item (i)->isSelected ()) {
+      selected.insert (item (i)->text ());
+    }
+  }
+
+  QStringList items;
+  int j = -1;
+  for (int i = count (); i > 0; ) {
+    --i;
+    if (item (i)->isSelected ()) {
+      items.push_back (item (i)->text ());
+    } else {
+      if (j >= 0) {
+        items.push_back (item (j)->text ());
+      }
+      j = i;
+    }
+  }
+  if (j >= 0) {
+    items.push_back (item (j)->text ());
+  }
+
+  clear ();
+  for (QStringList::const_iterator f = items.end (); f != items.begin (); ) {
+    --f;
+    addItem (*f);
+    if (selected.find (*f) != selected.end ()) {
+      item (count () - 1)->setSelected (true);
+    }
+  }
+  refresh_flags ();
+}
+
+void
+InteractiveListWidget::refresh_flags ()
+{
+  for (int i = 0; i < count (); ++i) {
+    item (i)->setFlags (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+  }
+}
+
+}

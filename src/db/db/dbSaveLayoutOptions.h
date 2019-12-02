@@ -391,7 +391,8 @@ public:
     LP_OnlyNumbered = 0,
     LP_OnlyNamed = 1,
     LP_AssignName = 2,
-    LP_AssignNumber = 3
+    LP_AssignNameWithPriority = 3,
+    LP_AssignNumber = 4
   };
 
   /**
@@ -401,7 +402,8 @@ public:
    *  The lm mode specifies how to create layer properties for "halfway defined" layers - 
    *    - LP_OnlyNamed will only select named ones
    *    - LP_OnlyNumbered will select only numbered ones
-   *    - LP_AssignName will assign a name when no name is given
+   *    - LP_AssignName will assign a name when no name is given plus encode layer/datatype when given
+   *    - LP_AssignNameWithPriority will assign a name when no name is given and does not encore layer/datatype together with a name
    *    - LP_AssignNumber will assign numbers when no number is given 
    */
   void get_valid_layers (const db::Layout &layout, std::vector <std::pair <unsigned int, db::LayerProperties> > &valid_layers, LayerAssignmentMode lm) const;

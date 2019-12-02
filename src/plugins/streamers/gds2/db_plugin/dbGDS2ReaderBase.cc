@@ -376,7 +376,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
         if (cell == 0) {
 
-          //  ignore everything in proxy cells: these are created from the libraries or PCell's.
+          //  ignore everything in proxy cells: these are created from the libraries or PCells.
 
         } else if (rec_id == sPROPATTR) {
 

@@ -1,0 +1,28 @@
+magic
+tech scmos
+timestamp 1541350492
+use Library/magic/L500_POLYSI_NWELL_capacitance  L500_POLYSI_NWELL_capacitance_0
+timestamp 1541350492
+transform 1 0 0 0 1 1750
+box 0 0 300 322
+use Library/magic/L500_POLYSI_PWELL_capacitance  L500_POLYSI_PWELL_capacitance_0
+timestamp 1541350492
+transform 1 0 350 0 1 1400
+box 0 0 300 322
+use Library/magic/L500_METAL3_METAL2_capacitance  L500_METAL3_METAL2_capacitance_0
+timestamp 1541350492
+transform 1 0 700 0 1 1050
+box 0 0 300 322
+use Library/magic/L500_METAL2_METAL1_capacitance  L500_METAL2_METAL1_capacitance_0
+timestamp 1541350492
+transform 1 0 1050 0 1 700
+box 0 0 300 322
+use Library/magic/L500_METAL1_PWELL_capacitance  L500_METAL1_PWELL_capacitance_0
+timestamp 1541350492
+transform 1 0 1400 0 1 350
+box 0 0 300 322
+use Library/magic/L500_METAL1_NWELL_capacitance  L500_METAL1_NWELL_capacitance_0
+timestamp 1541350492
+transform 1 0 1750 0 1 0
+box 0 0 300 322
+<< end >>

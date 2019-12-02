@@ -158,3 +158,31 @@ TEST(5)
   db::compare_layouts (this, layout, input, db::NoNormalization);
 }
 
+//  Testing the converter main implementation (MAG)
+TEST(6)
+{
+  std::string input = tl::testsrc ();
+  input += "/testdata/gds/t10.gds";
+
+  std::string input_au = tl::testsrc ();
+  input_au += "/testdata/magic/strm2mag_au.gds";
+
+  std::string output = this->tmp_file ("RINGO.mag");
+
+  const char *argv[] = { "x", input.c_str (), output.c_str (), "--magic-lambda-out=0.005" };
+
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::mag_format_name), 0);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::LoadLayoutOptions options;
+    options.set_option_by_name ("mag_lambda", 0.005);
+    db::Reader reader (stream);
+    reader.read (layout, options);
+    EXPECT_EQ (reader.format (), "MAG");
+  }
+
+  db::compare_layouts (this, layout, input_au, db::WriteGDS2);
+}

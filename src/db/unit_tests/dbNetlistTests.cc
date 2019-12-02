@@ -360,6 +360,17 @@ TEST(3_CircuitBasic)
   EXPECT_EQ (c2.pin_by_id (0)->name (), "p1");
   EXPECT_EQ (c2.pin_by_id (1)->name (), "p2");
   EXPECT_EQ (c2.pin_by_id (2), 0);
+
+  c2.remove_pin (1);
+  EXPECT_EQ (c2.pin_by_id (0)->name (), "p1");
+  EXPECT_EQ (c2.pin_by_id (1), 0);
+  EXPECT_EQ (c2.pin_by_id (2), 0);
+
+  db::Pin p3 = c2.add_pin ("p3");
+  EXPECT_EQ (c2.pin_by_id (0)->name (), "p1");
+  EXPECT_EQ (c2.pin_by_id (1), 0);
+  EXPECT_EQ (c2.pin_by_id (2)->name (), "p3");
+  EXPECT_EQ (c2.pin_by_id (3), 0);
 }
 
 TEST(4_CircuitDevices)
@@ -1393,7 +1404,7 @@ TEST(22_BlankCircuit)
   nl2.purge ();
 
   EXPECT_EQ (nl2.to_string (),
-    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "circuit RINGO (OSC=OSC,VSS=VSS,VDD=VDD);\n"
     "  subcircuit INV2 INV2_SC1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
     "  subcircuit INV2 INV2_SC2 (IN=FB,$2=(null),OUT=$I8,$4=VSS,$5=VDD);\n"
     "end;\n"

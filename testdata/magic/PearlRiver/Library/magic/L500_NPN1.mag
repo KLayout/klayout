@@ -1,0 +1,91 @@
+magic
+tech scmos
+timestamp 1542389586
+<< nwell >>
+rect 120 168 180 180
+rect 120 142 132 168
+rect 168 142 180 168
+rect 120 132 180 142
+<< metal1 >>
+rect 100 208 200 218
+rect 145 178 155 208
+rect 122 176 178 178
+rect 122 172 124 176
+rect 176 172 178 176
+rect 122 170 178 172
+rect 122 168 130 170
+rect 122 136 124 168
+rect 128 136 130 168
+rect 170 168 178 170
+rect 134 158 166 166
+rect 134 144 142 158
+rect 122 134 130 136
+rect 146 85 154 154
+rect 100 75 154 85
+rect 158 90 166 158
+rect 170 136 172 168
+rect 176 136 178 168
+rect 170 134 178 136
+rect 158 80 200 90
+<< nwpbase >>
+rect 132 156 168 168
+rect 132 144 144 156
+rect 156 144 168 156
+rect 132 142 168 144
+<< nwpnbase >>
+rect 144 144 156 156
+<< pbasepdiffcontact >>
+rect 136 160 164 164
+rect 136 146 140 158
+rect 160 146 164 158
+<< nbasendiffcontact >>
+rect 146 146 154 154
+<< nsubstratencontact >>
+rect 124 172 176 176
+rect 124 136 128 168
+rect 172 136 176 168
+use L500_TPAD_blank  L500_TPAD_blank_2
+timestamp 1537343441
+transform 1 0 0 0 1 200
+box 0 0 100 100
+use L500_CHAR_c  L500_CHAR_c_0
+timestamp 1534321654
+transform 1 0 146 0 1 230
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_3
+timestamp 1537343441
+transform 1 0 200 0 1 200
+box 0 0 100 100
+use L500_CHAR_n  L500_CHAR_n_0
+timestamp 1534323117
+transform 1 0 208 0 1 136
+box 0 0 12 18
+use L500_CHAR_p  L500_CHAR_p_0
+timestamp 1534323210
+transform 1 0 224 0 1 136
+box 0 0 12 18
+use L500_CHAR_n  L500_CHAR_n_1
+timestamp 1534323117
+transform 1 0 240 0 1 136
+box 0 0 12 18
+use L500_CHAR_1  L500_CHAR_1_0
+timestamp 1534326485
+transform 1 0 256 0 1 136
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_0
+timestamp 1537343441
+transform 1 0 0 0 1 0
+box 0 0 100 100
+use L500_CHAR_e  L500_CHAR_e_0
+timestamp 1534321786
+transform 1 0 114 0 1 50
+box 0 0 12 18
+use L500_CHAR_b  L500_CHAR_b_0
+timestamp 1534321628
+transform 1 0 173 0 1 50
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_1
+timestamp 1537343441
+transform 1 0 200 0 1 0
+box 0 0 100 100
+<< end >>

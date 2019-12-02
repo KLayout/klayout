@@ -1,0 +1,11 @@
+magic
+tech scmos
+timestamp 1534324830
+<< silk >>
+rect 0 12 4 18
+rect 8 12 12 18
+rect 0 10 12 12
+rect 1 9 12 10
+rect 2 8 12 9
+rect 8 0 12 8
+<< end >>

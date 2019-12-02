@@ -1,0 +1,20 @@
+magic
+tech scmos
+timestamp 1538326505
+<< resistor >>
+rect 113 45 1103 55
+<< metal1 >>
+rect 100 45 103 55
+rect 1113 45 1116 55
+<< polycontact >>
+rect 103 45 113 55
+rect 1103 45 1113 55
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_1
+timestamp 1537343441
+transform 1 0 0 0 1 0
+box 0 0 100 100
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_0
+timestamp 1537343441
+transform 1 0 1116 0 1 0
+box 0 0 100 100
+<< end >>

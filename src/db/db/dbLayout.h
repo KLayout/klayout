@@ -434,7 +434,7 @@ private:
 };
 
 /**
- *  @brief An interface that is used to map layer between libraries and PCell's and the layout
+ *  @brief An interface that is used to map layer between libraries and PCells and the layout
  */
 class ImportLayerMapping
 {
@@ -1510,7 +1510,7 @@ public:
   /**
    *  @brief Gets the guiding shape layer
    *
-   *  The guiding shape layer is used to store the guiding shapes of PCell's
+   *  The guiding shape layer is used to store the guiding shapes of PCells
    */
   unsigned int guiding_shape_layer () const;
 

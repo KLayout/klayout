@@ -2154,9 +2154,9 @@ public:
   bool layer_model_updated ();
 
   /**
-   *  @brief Get the "select inside PCell's" selection mode 
+   *  @brief Get the "select inside PCells" selection mode
    *
-   *  @return true, objects inside PCell's can be selected
+   *  @return true, objects inside PCells can be selected
    */
   bool select_inside_pcells_mode () const
   {

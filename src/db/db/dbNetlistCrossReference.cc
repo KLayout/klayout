@@ -508,8 +508,7 @@ NetlistCrossReference::build_pin_refs (const std::pair<const db::Net *, const db
     std::map<const db::Pin *, const db::Pin *>::const_iterator ipb = m_other_pin.find (pa);
     if (ipb != m_other_pin.end () && ipb->second) {
 
-      const db::Pin *pb = ipb->second;
-      std::map<const Pin *, const db::NetPinRef *>::iterator b = p2r_b.find (pb);
+      std::map<const Pin *, const db::NetPinRef *>::iterator b = p2r_b.find (ipb->second);
       if (b != p2r_b.end ()) {
         prb = b->second;
         //  remove the entry so we won't find it again
@@ -558,7 +557,7 @@ NetlistCrossReference::build_subcircuit_pin_refs (const std::pair<const db::Net 
 
       const db::Pin *pa = sa->circuit_ref ()->pin_by_id (a->first.second);
       std::map<const db::Pin *, const db::Pin *>::const_iterator ipb = m_other_pin.find (pa);
-      if (ipb != m_other_pin.end ()) {
+      if (ipb != m_other_pin.end () && ipb->second) {
 
         std::map<std::pair<const db::SubCircuit *, size_t>, const db::NetSubcircuitPinRef *>::iterator b = s2t_b.find (std::make_pair (sb, ipb->second->id ()));
         if (b != s2t_b.end ()) {

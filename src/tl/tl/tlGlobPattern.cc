@@ -29,49 +29,6 @@
 namespace tl
 {
 
-// ---------------------------------------------------------------------------------
-//  TODO: take from tlString.h
-
-static inline uint32_t utf32_from_utf8 (const char *&cp, const char *cpe = 0)
-{
-  uint32_t c32 = (unsigned char) *cp++;
-  if (c32 >= 0xf0 && ((cpe && cp + 2 < cpe) || (! cpe && cp [0] && cp [1] && cp [2]))) {
-    c32 = ((c32 & 0x7) << 18) | ((uint32_t (cp [0]) & 0x3f) << 12) | ((uint32_t (cp [1]) & 0x3f) << 6) | (uint32_t (cp [2]) & 0x3f);
-    cp += 3;
-  } else if (c32 >= 0xe0 && ((cpe && cp + 1 < cpe) || (! cpe && cp [0] && cp [1]))) {
-    c32 = ((c32 & 0xf) << 12) | ((uint32_t (cp [0]) & 0x3f) << 6) | (uint32_t (cp [1]) & 0x3f);
-    cp += 2;
-  } else if (c32 >= 0xc0 && ((cpe && cp < cpe) || (! cpe && cp [0]))) {
-    c32 = ((c32 & 0x1f) << 6) | (uint32_t (*cp) & 0x3f);
-    ++cp;
-  }
-
-  return c32;
-}
-
-#include "utf_casefolding.h"
-
-static inline wchar_t wdowncase (wchar_t c)
-{
-  int ch = c >> 8;
-  if (ch >= 0 && ch < int (sizeof (uc_tab) / sizeof (uc_tab[0])) && uc_tab[ch]) {
-    return uc_tab[ch][c & 0xff];
-  } else {
-    return c;
-  }
-}
-
-static inline uint32_t utf32_downcase (uint32_t c32)
-{
-  if (sizeof (wchar_t) == 2 && c32 >= 0x10000) {
-    return c32;
-  } else {
-    return uint32_t (wdowncase (wchar_t (c32)));
-  }
-}
-
-// ---------------------------------------------------------------------------------
-
 class GlobPatternOpBase
 {
 public:

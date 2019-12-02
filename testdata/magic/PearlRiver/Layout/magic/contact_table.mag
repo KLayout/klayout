@@ -1,0 +1,24 @@
+magic
+tech scmos
+timestamp 1541743916
+use Library/magic/L500_PDCONTACT_Wmin_resistance  L500_PDCONTACT_Wmin_resistance_0
+timestamp 1541743916
+transform 1 0 0 0 1 1400
+box 0 0 312 300
+use Library/magic/L500_NDCONTACT_Wmin_resistance  L500_NDCONTACT_Wmin_resistance_0
+timestamp 1541739059
+transform 1 0 0 0 1 1050
+box 0 0 312 300
+use Library/magic/L500_CONTACT_Wmin_resistance  L500_CONTACT_Wmin_resistance_0
+timestamp 1541642145
+transform 1 0 0 0 1 700
+box 0 0 300 300
+use Library/magic/L500_VIA_Wmin_resistance  L500_VIA_Wmin_resistance_0
+timestamp 1541639931
+transform 1 0 0 0 1 350
+box 0 0 300 300
+use Library/magic/L500_VIA2_Wmin_resistance  L500_VIA2_Wmin_resistance_0
+timestamp 1541639931
+transform 1 0 0 0 1 0
+box 0 0 300 300
+<< end >>

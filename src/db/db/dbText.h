@@ -676,11 +676,11 @@ public:
     typedef typename Tr::target_coord_type target_coord_type;
     size_t p = (size_t) mp_ptr;
     if (p & 1) {
-      return text<target_coord_type> (reinterpret_cast<StringRef *> (p - 1), simple_trans<target_coord_type> ((t.fp_trans () * m_trans.fp_trans ()).rot (), t (point_type () + m_trans.disp ()) - point<target_coord_type> ()), t.ctrans (m_size), m_font);
+      return text<target_coord_type> (reinterpret_cast<StringRef *> (p - 1), simple_trans<target_coord_type> ((t.fp_trans () * m_trans.fp_trans ()).rot (), t (point_type () + m_trans.disp ()) - point<target_coord_type> ()), t.ctrans (m_size), m_font, m_halign, m_valign);
     } else if (mp_ptr) {
-      return text<target_coord_type> (mp_ptr, simple_trans<target_coord_type> ((t.fp_trans () * m_trans.fp_trans ()).rot (), t (point_type () + m_trans.disp ()) - point<target_coord_type> ()), t.ctrans (m_size), m_font);
+      return text<target_coord_type> (mp_ptr, simple_trans<target_coord_type> ((t.fp_trans () * m_trans.fp_trans ()).rot (), t (point_type () + m_trans.disp ()) - point<target_coord_type> ()), t.ctrans (m_size), m_font, m_halign, m_valign);
     } else {
-      return text<target_coord_type> (simple_trans<target_coord_type> ((t.fp_trans () * m_trans.fp_trans ()).rot (), t (point_type () + m_trans.disp ()) - point<target_coord_type> ()), t.ctrans (m_size), m_font);
+      return text<target_coord_type> (simple_trans<target_coord_type> ((t.fp_trans () * m_trans.fp_trans ()).rot (), t (point_type () + m_trans.disp ()) - point<target_coord_type> ()), t.ctrans (m_size), m_font, m_halign, m_valign);
     }
   }
 

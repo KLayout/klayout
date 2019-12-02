@@ -1,0 +1,120 @@
+magic
+tech scmos
+timestamp 1541350492
+use Library/magic/L500_RPOLY_W4m_100rsquare  L500_RPOLY_W4m_100rsquare_0
+timestamp 1538327188
+transform 1 0 200 0 1 300
+box 0 0 430 100
+use Library/magic/L500_METAL1_W100_1rsquare  L500_METAL1_W100_1rsquare_4
+timestamp 1537367970
+transform 0 1 530 -1 0 400
+box 0 0 100 300
+use Library/magic/L500_RPOLY_W4_100rsquare  L500_RPOLY_W4_100rsquare_0
+timestamp 1538326853
+transform 1 0 1868 0 1 300
+box 0 0 610 100
+use Library/magic/L500_RPOLY_W10_100rsquare  L500_RPOLY_W10_100rsquare_0
+timestamp 1538326505
+transform 1 0 0 0 1 200
+box 0 0 1216 100
+use Library/magic/L500_METAL1_W100_1rsquare  L500_METAL1_W100_1rsquare_1
+timestamp 1537367970
+transform 0 1 1116 -1 0 300
+box 0 0 100 300
+use Library/magic/L500_RPOLY_W6_100rsquare  L500_RPOLY_W6_100rsquare_0
+timestamp 1538327339
+transform 1 0 1316 0 1 200
+box 0 0 812 100
+use Library/magic/L500_METAL1_W100_1rsquare  L500_METAL1_W100_1rsquare_2
+timestamp 1537367970
+transform 0 1 2028 -1 0 300
+box 0 0 100 300
+use Library/magic/L500_METAL1_W100_1rsquare  L500_METAL1_W100_1rsquare_0
+timestamp 1537367970
+transform 1 0 200 0 1 100
+box 0 0 100 300
+use Library/magic/L500_RPOLY_W8m_100rsquare  L500_RPOLY_W8m_100rsquare_0
+timestamp 1538327824
+transform 1 0 200 0 1 100
+box 0 0 654 100
+use Library/magic/L500_METAL1_W100_1rsquare  L500_METAL1_W100_1rsquare_5
+timestamp 1537367970
+transform 0 1 754 -1 0 200
+box 0 0 100 300
+use Library/magic/L500_CHAR_r  L500_CHAR_r_0
+timestamp 1534323573
+transform 1 0 1400 0 1 158
+box 0 0 12 18
+use Library/magic/L500_CHAR_p  L500_CHAR_p_0
+timestamp 1534323210
+transform 1 0 1416 0 1 158
+box 0 0 12 18
+use Library/magic/L500_CHAR_o  L500_CHAR_o_0
+timestamp 1534323159
+transform 1 0 1432 0 1 158
+box 0 0 12 18
+use Library/magic/L500_CHAR_l  L500_CHAR_l_0
+timestamp 1534225390
+transform 1 0 1448 0 1 158
+box 0 0 12 18
+use Library/magic/L500_CHAR_y  L500_CHAR_y_0
+timestamp 1534324403
+transform 1 0 1464 0 1 158
+box 0 0 12 18
+use Library/magic/L500_CHAR_under  L500_CHAR_under_0
+timestamp 1534325915
+transform 1 0 1480 0 1 158
+box 0 0 12 4
+use Library/magic/L500_CHAR_r  L500_CHAR_r_0
+timestamp 1534323573
+transform 1 0 1496 0 1 158
+box 0 0 12 18
+use Library/magic/L500_CHAR_s  L500_CHAR_s_1
+timestamp 1534323853
+transform 1 0 1512 0 1 158
+box 0 0 12 18
+use Library/magic/L500_CHAR_q  L500_CHAR_q_0
+timestamp 1534588197
+transform 1 0 1528 0 1 158
+box 0 0 12 18
+use Library/magic/L500_CHAR_u  L500_CHAR_u_0
+timestamp 1534323899
+transform 1 0 1544 0 1 158
+box 0 0 12 18
+use Library/magic/L500_CHAR_a  L500_CHAR_a_0
+timestamp 1534325357
+transform 1 0 1560 0 1 158
+box 0 0 12 18
+use Library/magic/L500_CHAR_r  L500_CHAR_r_1
+timestamp 1534323573
+transform 1 0 1576 0 1 158
+box 0 0 12 18
+use Library/magic/L500_CHAR_e  L500_CHAR_e_0
+timestamp 1534321786
+transform 1 0 1592 0 1 158
+box 0 0 12 18
+use Library/magic/L500_METAL1_W100_1rsquare  L500_METAL1_W100_1rsquare_0
+timestamp 1537367970
+transform -1 0 1968 0 -1 400
+box 0 0 100 300
+use Library/magic/L500_RPOLY_W8_100rsquare  L500_RPOLY_W8_100rsquare_0
+timestamp 1538327581
+transform 1 0 954 0 1 100
+box 0 0 1014 100
+use Library/magic/L500_METAL1_W100_1rsquare  L500_METAL1_W100_1rsquare_6
+timestamp 1537367970
+transform 1 0 2378 0 1 100
+box 0 0 100 300
+use Library/magic/L500_METAL1_W100_1rsquare  L500_METAL1_W100_1rsquare_1
+timestamp 1537367970
+transform 1 0 0 0 1 0
+box 0 0 100 300
+use Library/magic/L500_RPOLY_W19_100rsquare  L500_RPOLY_190_100rsquare_0
+timestamp 1538326743
+transform 1 0 0 0 1 0
+box 0 0 2126 100
+use Library/magic/L500_METAL1_W100_1rsquare  L500_METAL1_W100_1rsquare_3
+timestamp 1537367970
+transform 0 1 2026 -1 0 100
+box 0 0 100 300
+<< end >>

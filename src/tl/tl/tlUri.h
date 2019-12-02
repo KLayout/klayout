@@ -60,6 +60,14 @@ public:
   }
 
   /**
+   *  @brief Sets the scheme
+   */
+  void set_scheme (const std::string &s)
+  {
+    m_scheme = s;
+  }
+
+  /**
    *  @brief Returns the authority part or an empty string if there is no authority
    *  The leading slashes and not part of the authority.
    *  Percent escaping is undone already.
@@ -67,6 +75,14 @@ public:
   const std::string &authority () const
   {
     return m_authority;
+  }
+
+  /**
+   *  @brief Sets the authority
+   */
+  void set_authority (const std::string &s)
+  {
+    m_authority = s;
   }
 
   /**
@@ -80,11 +96,27 @@ public:
   }
 
   /**
+   *  @brief Sets the path
+   */
+  void set_path (const std::string &s)
+  {
+    m_path = s;
+  }
+
+  /**
    *  @brief Returns the query part or an empty map if there is no query
    *  The map is a map of keys vs. values. Percent escaping is undone
    *  in the keys and values.
    */
   const std::map<std::string, std::string> &query () const
+  {
+    return m_query;
+  }
+
+  /**
+   *  @brief Returns the query part or an empty map if there is no query (non-const version)
+   */
+  std::map<std::string, std::string> &query ()
   {
     return m_query;
   }
@@ -96,6 +128,14 @@ public:
   const std::string &fragment () const
   {
     return m_fragment;
+  }
+
+  /**
+   *  @brief Sets the fragment
+   */
+  void set_fragment (const std::string &s)
+  {
+    m_fragment = s;
   }
 
   /**

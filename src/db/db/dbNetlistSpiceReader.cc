@@ -288,11 +288,6 @@ void NetlistSpiceReader::finish ()
     pop_stream ();
   }
 
-  //  purge nets with single connections (this way unconnected pins can be realized)
-  if (mp_netlist) {
-    mp_netlist->purge_nets ();
-  }
-
   mp_stream.reset (0);
   mp_netlist = 0;
   mp_circuit = 0;

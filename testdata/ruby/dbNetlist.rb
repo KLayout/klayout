@@ -170,6 +170,21 @@ class DBNetlist_TestClass < TestBase
     c.each_pin { |p| names << p.name }
     assert_equal(names, [ "A", "B" ])
 
+    assert_equal(c.pin_by_id(0) == nil, false)
+    assert_equal(c.pin_by_id(1) == nil, false)
+    assert_equal(c.pin_by_id(0).name, "A")
+    assert_equal(c.pin_by_id(1).name, "B")
+
+    c.remove_pin(0)
+
+    names = []
+    c.each_pin { |p| names << p.name }
+    assert_equal(names, [ "B" ])
+
+    assert_equal(c.pin_by_id(0) == nil, true)
+    assert_equal(c.pin_by_id(1) == nil, false)
+    assert_equal(c.pin_by_id(1).name, "B")
+
   end
 
   def test_4_Device

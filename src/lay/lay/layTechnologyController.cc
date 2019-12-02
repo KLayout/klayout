@@ -359,22 +359,37 @@ TechnologyController::update_menu ()
 
   m_tech_actions.clear ();
 
-  std::map<std::string, const db::Technology *> tech_by_name;
+  std::map<std::string, std::map<std::string, const db::Technology *> > tech_by_name_and_group;
   for (db::Technologies::const_iterator t = db::Technologies::instance ()->begin (); t != db::Technologies::instance ()->end (); ++t) {
-    tech_by_name.insert (std::make_pair (t->name (), t.operator-> ()));
+    tech_by_name_and_group [tl::trim (t->group ())].insert (std::make_pair (t->name (), t.operator-> ()));
   }
 
-  int it = 0;
-  for (std::map<std::string, const db::Technology *>::const_iterator t = tech_by_name.begin (); t != tech_by_name.end (); ++t, ++it) {
+  for (std::vector<std::string>::const_iterator tg = tech_group.begin (); tg != tech_group.end (); ++tg) {
 
-    std::string title = tech_string_from_name (t->first);
+    int ig = 0;
+    for (std::map<std::string, std::map<std::string, const db::Technology *> >::const_iterator g = tech_by_name_and_group.begin (); g != tech_by_name_and_group.end (); ++g) {
 
-    m_tech_actions.push_back (pr->create_config_action ("", cfg_initial_technology, t->first));
-    m_tech_actions.back ().set_title (title); // setting the title here avoids interpretation of '(...)' etc.
-    m_tech_actions.back ().set_checkable (true);
-    m_tech_actions.back ().set_checked (t->first == m_current_technology);
-    for (std::vector<std::string>::const_iterator tg = tech_group.begin (); tg != tech_group.end (); ++tg) {
-      pr->menu ()->insert_item (*tg + ".end", "technology_" + tl::to_string (it), m_tech_actions.back ());
+      std::string tp = *tg;
+      if (! g->first.empty ()) {
+        std::string gn = "techgroup_" + tl::to_string (++ig);
+        pr->menu ()->insert_menu (*tg + ".end", gn, g->first);
+        tp = *tg + "." + gn;
+      }
+      tp += ".end";
+
+      int it = 0;
+      for (std::map<std::string, const db::Technology *>::const_iterator t = g->second.begin (); t != g->second.end (); ++t, ++it) {
+
+        std::string title = tech_string_from_name (t->first);
+
+        m_tech_actions.push_back (pr->create_config_action ("", cfg_initial_technology, t->first));
+        m_tech_actions.back ().set_title (title); // setting the title here avoids interpretation of '(...)' etc.
+        m_tech_actions.back ().set_checkable (true);
+        m_tech_actions.back ().set_checked (t->first == m_current_technology);
+        pr->menu ()->insert_item (tp, "technology_" + tl::to_string (it), m_tech_actions.back ());
+
+      }
+
     }
 
   }

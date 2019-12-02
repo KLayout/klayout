@@ -254,13 +254,13 @@ Technologies::technology_by_name (const std::string &name)
 //  Technology implementation
 
 Technology::Technology ()
-  : m_name (), m_description (), m_dbu (0.001), m_persisted (true), m_readonly (false)
+  : m_name (), m_description (), m_group (), m_dbu (0.001), m_persisted (true), m_readonly (false)
 {
   init ();
 }
 
-Technology::Technology (const std::string &name, const std::string &description)
-  : m_name (name), m_description (description), m_dbu (0.001), m_persisted (true), m_readonly (false)
+Technology::Technology (const std::string &name, const std::string &description, const std::string &group)
+  : m_name (name), m_description (description), m_group (group), m_dbu (0.001), m_persisted (true), m_readonly (false)
 {
   init ();
 }
@@ -285,7 +285,7 @@ Technology::~Technology ()
 
 Technology::Technology (const Technology &d)
   : tl::Object (),
-    m_name (d.m_name), m_description (d.m_description), m_grain_name (d.m_grain_name), m_dbu (d.m_dbu),
+    m_name (d.m_name), m_description (d.m_description), m_group (d.m_group), m_grain_name (d.m_grain_name), m_dbu (d.m_dbu),
     m_explicit_base_path (d.m_explicit_base_path), m_default_base_path (d.m_default_base_path),
     m_load_layout_options (d.m_load_layout_options),
     m_save_layout_options (d.m_save_layout_options),
@@ -303,6 +303,7 @@ Technology &Technology::operator= (const Technology &d)
 
     m_name = d.m_name;
     m_description = d.m_description;
+    m_group = d.m_group;
     m_grain_name = d.m_grain_name;
     m_dbu = d.m_dbu;
     m_default_base_path = d.m_default_base_path;
@@ -331,12 +332,29 @@ Technology &Technology::operator= (const Technology &d)
   return *this;
 }
 
+std::string
+Technology::get_display_string () const
+{
+  std::string d = name ();
+  if (! d.empty () && ! description ().empty ()) {
+    d += " - ";
+  }
+  d += description ();
+  if (! group ().empty ()) {
+    d += " [";
+    d += group ();
+    d += "]";
+  }
+  return d;
+}
+
 tl::XMLElementList 
 Technology::xml_elements () 
 {
   tl::XMLElementList elements = 
          tl::make_member (&Technology::name, &Technology::set_name, "name") + 
          tl::make_member (&Technology::description, &Technology::set_description, "description") + 
+         tl::make_member (&Technology::group, &Technology::set_group, "group") +
          tl::make_member (&Technology::dbu, &Technology::set_dbu, "dbu") +
          tl::make_member (&Technology::explicit_base_path, &Technology::set_explicit_base_path, "base-path") +
          tl::make_member (&Technology::default_base_path, &Technology::set_default_base_path, "original-base-path") +

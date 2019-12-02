@@ -36,7 +36,7 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0" colspan="2">
+   <item row="3" column="0" colspan="2">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -46,102 +46,17 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
-    <widget class="QFrame" name="edit_frame">
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QGridLayout">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <property name="spacing">
-       <number>6</number>
-      </property>
-     </layout>
-    </widget>
-   </item>
    <item row="1" column="0">
     <widget class="QTabWidget" name="mode_tab">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
        <string>Table</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="1" rowspan="4">
-        <spacer name="spacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>6</width>
-           <height>201</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="0" column="2">
-        <widget class="QPushButton" name="add_pb">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="../../lay/lay/layResources.qrc">
-           <normaloff>:/add.png</normaloff>:/add.png</iconset>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <widget class="QPushButton" name="remove_pb">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="../../lay/lay/layResources.qrc">
-           <normaloff>:/del.png</normaloff>:/del.png</iconset>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="2">
-        <widget class="QPushButton" name="edit_pb">
-         <property name="text">
-          <string>Edit</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="2">
-        <spacer name="spacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>61</width>
-           <height>211</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="0" column="0" rowspan="4">
+       <item row="0" column="0" rowspan="2">
         <widget class="QTreeWidget" name="prop_list">
          <property name="rootIsDecorated">
           <bool>false</bool>
@@ -159,6 +74,94 @@
            <string>Value</string>
           </property>
          </column>
+        </widget>
+       </item>
+       <item row="0" column="2" rowspan="2">
+        <widget class="QFrame" name="edit_frame">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item row="3" column="1">
+           <spacer name="spacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>61</width>
+              <height>211</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="remove_pb">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../../lay/lay/layResources.qrc">
+              <normaloff>:/del.png</normaloff>:/del.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="add_pb">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../../lay/lay/layResources.qrc">
+              <normaloff>:/add.png</normaloff>:/add.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QPushButton" name="edit_pb">
+            <property name="text">
+             <string>Edit</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <spacer name="spacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>6</width>
+              <height>201</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>

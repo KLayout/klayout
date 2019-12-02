@@ -31,6 +31,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QProxyStyle>
+#include <QListWidget>
 #include <string>
 
 namespace db
@@ -458,6 +459,62 @@ private:
   QLabel *mp_clear_label;
   QMenu *mp_options_menu;
   int m_default_left_margin, m_default_right_margin;
+};
+
+/**
+ *  @brief An interactive liste widget which offers slots to delete and move items and interfaces to std::vector<std::string>
+ */
+class LAYBASIC_PUBLIC InteractiveListWidget
+  : public QListWidget
+{
+Q_OBJECT
+
+public:
+  /**
+   *  @brief Constructor
+   */
+  InteractiveListWidget (QWidget *parent = 0);
+
+  /**
+   *  @brief Sets the items in the widget
+   */
+  void set_values (const std::vector<std::string> &values);
+
+  /**
+   *  @brief Gets the items in the widget
+   */
+  std::vector<std::string> get_values ();
+
+  /**
+   *  @brief Adds a value
+   */
+  void add_value (const std::string &value);
+
+  /**
+   *  @brief Adds values
+   */
+  void add_values (const std::vector<std::string> &values);
+
+private slots:
+  /**
+   *  @brief Deletes the selected items
+   */
+  void delete_selected_items ();
+
+  /**
+   *  @brief Moves the selected items up
+   */
+  void move_selected_items_up ();
+
+  /**
+   *  @brief Moves the selected items down
+   */
+  void move_selected_items_down ();
+
+private:
+  void refresh_flags ();
+
+  bool m_drag_and_drop_enabled;
 };
 
 } // namespace lay

@@ -1,0 +1,80 @@
+magic
+tech scmos
+timestamp 1541382103
+use Library/magic/L500_PBASE_W14_2000rsquare  L500_PBASE_W14_2000rsquare_t
+timestamp 1541382052
+transform -1 0 8600 0 -1 8600
+box 0 0 7325 250
+use Layout/magic/PearlRiver_quarter  PearlRiver_quarter_t
+timestamp 1541382103
+transform -1 0 8100 0 -1 8600
+box -28 0 7778 4050
+use Library/magic/L500_SIGNATURE_kallisti_huge  L500_SIGNATURE_kallisti_huge_0
+timestamp 1533657739
+transform 1 0 3722 0 1 3763
+box 21 17 539 547
+use Library/magic/L500_SIGNATURE_pearlriver  L500_SIGNATURE_pearlriver_0
+timestamp 1541382052
+transform 1 0 3897 0 1 3740
+box 0 0 202 18
+use Library/magic/L500_NBASE_W14_2000rsquare  L500_NBASE_W14_2000rsquare_w
+timestamp 1541382052
+transform 0 1 0 -1 0 8600
+box 0 0 0 8600
+use Layout/magic/PearlRiver_quarter  PearlRiver_quarter_w
+timestamp 1541382103
+transform 0 1 0 -1 0 8150
+box -28 0 7778 4050
+use Library/magic/L500_PWELL_W14_2000rsquare  L500_PWELL_W14_2000rsquare_e
+timestamp 1541382052
+transform 0 -1 8600 1 0 50
+box 0 0 7324 250
+use Layout/magic/PearlRiver_quarter  PearlRiver_quarter_e
+timestamp 1541382103
+transform 0 -1 8600 1 0 500
+box -28 0 7778 4050
+use Library/magic/L500_CHAR_0  L500_CHAR_0_0
+timestamp 1534325425
+transform 1 0 -3 0 1 42
+box 0 0 12 18
+use Library/magic/L500_NWELL_W14_2000rsquare  L500_NWELL_W14_2000rsquare_b
+timestamp 1541382052
+transform 1 0 50 0 1 50
+box 0 0 7324 250
+use Layout/magic/PearlRiver_quarter  PearlRiver_quarter_b
+timestamp 1541382103
+transform 1 0 500 0 1 50
+box -28 0 7778 4050
+use Library/magic/L500_CHAR_1  L500_CHAR_1_0
+timestamp 1534326485
+transform 1 0 1997 0 1 44
+box 0 0 12 18
+use Library/magic/L500_CHAR_2  L500_CHAR_2_0
+timestamp 1534324708
+transform 1 0 3997 0 1 44
+box 0 0 12 18
+use Library/magic/L500_CHAR_3  L500_CHAR_3_0
+timestamp 1534324785
+transform 1 0 5997 0 1 44
+box 0 0 12 18
+use Library/magic/L500_CHAR_4  L500_CHAR_4_0
+timestamp 1534324830
+transform 1 0 7997 0 1 44
+box 0 0 12 18
+use Library/magic/L500_SIGNATURE_ruler  L500_SIGNATURE_ruler_0
+timestamp 1541382052
+transform 1 0 3 0 1 0
+box -3 0 2003 40
+use Library/magic/L500_SIGNATURE_ruler  L500_SIGNATURE_ruler_1
+timestamp 1541382052
+transform 1 0 2003 0 1 0
+box -3 0 2003 40
+use Library/magic/L500_SIGNATURE_ruler  L500_SIGNATURE_ruler_3
+timestamp 1541382052
+transform 1 0 4003 0 1 0
+box -3 0 2003 40
+use Library/magic/L500_SIGNATURE_ruler  L500_SIGNATURE_ruler_2
+timestamp 1541382052
+transform 1 0 6003 0 1 0
+box -3 0 2003 40
+<< end >>

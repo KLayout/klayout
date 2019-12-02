@@ -178,6 +178,45 @@ class DBReaders_TestClass < TestBase
   
   end
 
+  # MAG Options
+  def test_mag_options
+
+    opt = RBA::LoadLayoutOptions::new
+    lm = RBA::LayerMap::new
+    lm.map(RBA::LayerInfo::new(1, 0), 2, RBA::LayerInfo::new(42, 17))
+    opt.mag_set_layer_map(lm, true)
+
+    assert_equal(opt.mag_layer_map.to_string, "1/0 : 42/17\n")
+    assert_equal(opt.mag_create_other_layers?, true)
+
+    opt.mag_create_other_layers = false
+    assert_equal(opt.mag_create_other_layers?, false)
+
+    opt.mag_select_all_layers
+    assert_equal(opt.mag_layer_map.to_string, "")
+    assert_equal(opt.mag_create_other_layers?, true)
+
+    opt.mag_keep_layer_names = true
+    assert_equal(opt.mag_keep_layer_names?, true)
+    opt.mag_keep_layer_names = false
+    assert_equal(opt.mag_keep_layer_names?, false)
+
+    opt.mag_dbu = 0.5
+    assert_equal(opt.mag_dbu, 0.5)
+  
+    opt.mag_lambda = 0.125
+    assert_equal(opt.mag_lambda, 0.125)
+  
+    assert_equal(opt.mag_merge, true)
+    opt.mag_merge = false
+    assert_equal(opt.mag_merge?, false)
+  
+    assert_equal(opt.mag_library_paths, [])
+    opt.mag_library_paths = [ "a", "b" ]
+    assert_equal(opt.mag_library_paths, [ "a", "b" ])
+
+  end
+
 end
 
 load("test_epilogue.rb")

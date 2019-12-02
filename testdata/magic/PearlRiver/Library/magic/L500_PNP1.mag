@@ -1,0 +1,92 @@
+magic
+tech scmos
+timestamp 1542383919
+<< nwell >>
+rect 110 180 190 190
+rect 110 140 120 180
+rect 131 156 169 169
+rect 131 144 144 156
+rect 156 144 169 156
+rect 131 140 169 144
+rect 180 140 190 180
+rect 110 130 190 140
+<< metal1 >>
+rect 100 208 200 218
+rect 145 178 155 208
+rect 122 170 178 178
+rect 122 142 130 170
+rect 134 164 166 166
+rect 134 160 136 164
+rect 164 160 166 164
+rect 134 158 166 160
+rect 134 156 142 158
+rect 134 144 136 156
+rect 140 144 142 156
+rect 158 156 166 158
+rect 134 142 142 144
+rect 146 85 154 154
+rect 100 75 154 85
+rect 158 144 160 156
+rect 164 144 166 156
+rect 158 90 166 144
+rect 170 142 178 170
+rect 158 80 200 90
+<< nwpbase >>
+rect 120 169 180 180
+rect 120 140 131 169
+rect 144 144 156 156
+rect 169 140 180 169
+<< pbasepdiffcontact >>
+rect 124 172 176 176
+rect 124 144 128 168
+rect 146 146 154 154
+rect 172 144 176 168
+<< nsubstratencontact >>
+rect 136 160 164 164
+rect 136 144 140 156
+rect 160 144 164 156
+use L500_TPAD_blank  L500_TPAD_blank_2
+timestamp 1537343441
+transform 1 0 0 0 1 200
+box 0 0 100 100
+use L500_CHAR_c  L500_CHAR_c_0
+timestamp 1534321654
+transform 1 0 146 0 1 230
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_3
+timestamp 1537343441
+transform 1 0 200 0 1 200
+box 0 0 100 100
+use L500_CHAR_p  L500_CHAR_p_0
+timestamp 1534323210
+transform 1 0 208 0 1 136
+box 0 0 12 18
+use L500_CHAR_n  L500_CHAR_n_0
+timestamp 1534323117
+transform 1 0 224 0 1 136
+box 0 0 12 18
+use L500_CHAR_p  L500_CHAR_p_1
+timestamp 1534323210
+transform 1 0 240 0 1 136
+box 0 0 12 18
+use L500_CHAR_1  L500_CHAR_1_0
+timestamp 1534326485
+transform 1 0 256 0 1 136
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_0
+timestamp 1537343441
+transform 1 0 0 0 1 0
+box 0 0 100 100
+use L500_CHAR_e  L500_CHAR_e_0
+timestamp 1534321786
+transform 1 0 114 0 1 50
+box 0 0 12 18
+use L500_CHAR_b  L500_CHAR_b_0
+timestamp 1534321628
+transform 1 0 173 0 1 50
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_1
+timestamp 1537343441
+transform 1 0 200 0 1 0
+box 0 0 100 100
+<< end >>

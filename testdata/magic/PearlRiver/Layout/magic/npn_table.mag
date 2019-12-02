@@ -1,0 +1,20 @@
+magic
+tech scmos
+timestamp 1541350492
+use Library/magic/L500_NPNi2  L500_NPNi2
+timestamp 1541350492
+transform 1 0 350 0 1 350
+box 0 0 300 300
+use Library/magic/L500_NPNi1  L500_NPNi1
+timestamp 1541350492
+transform 1 0 350 0 1 0
+box 0 0 300 300
+use Library/magic/L500_NPN2  L500_NPN2
+timestamp 1541350492
+transform 1 0 0 0 1 350
+box 0 0 300 300
+use Library/magic/L500_NPN1  L500_NPN1
+timestamp 1541350492
+transform 1 0 0 0 1 0
+box 0 0 300 300
+<< end >>

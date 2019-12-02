@@ -1,0 +1,260 @@
+magic
+tech scmos
+timestamp 1541112713
+<< error_s >>
+rect 1165 1416 1187 1421
+rect 1170 1409 1171 1416
+rect 1182 1409 1187 1416
+rect 1170 1408 1187 1409
+rect 450 723 460 725
+rect 458 698 460 723
+rect 453 692 454 697
+rect 458 696 520 698
+rect 524 696 526 700
+rect 454 691 459 692
+<< pwell >>
+rect 1162 1400 1190 1492
+<< polysilicon >>
+rect 804 1055 808 1059
+rect 804 1046 808 1051
+rect 808 1042 818 1046
+rect 822 1042 826 1046
+<< ndiffusion >>
+rect 1174 1464 1178 1468
+rect 1174 1456 1178 1460
+rect 1174 1440 1178 1452
+rect 1174 1432 1178 1436
+<< metal1 >>
+rect 1150 1468 1174 1472
+rect 1174 1464 1178 1468
+rect 1154 1452 1174 1456
+rect 1154 1396 1158 1452
+rect 1174 1448 1178 1452
+rect 1129 1392 1158 1396
+rect 1162 1444 1178 1448
+rect 1129 1350 1133 1392
+rect 1162 1387 1166 1444
+rect 1174 1432 1178 1436
+rect 1174 1416 1178 1428
+rect 1182 1410 1200 1414
+rect 1154 1383 1166 1387
+rect 1154 1131 1158 1383
+rect 1150 1127 1158 1131
+rect 800 1059 804 1063
+rect 804 1055 808 1059
+rect 856 1046 860 1050
+rect 783 1042 804 1046
+rect 822 1042 826 1046
+rect 830 1042 860 1046
+rect 783 1000 787 1042
+rect 804 783 808 1042
+rect 800 779 808 783
+rect 78 342 104 346
+rect 78 300 82 342
+rect 104 56 108 342
+rect 100 52 108 56
+<< metal2 >>
+rect 421 692 454 696
+rect 421 650 425 692
+rect 454 442 458 692
+rect 450 438 458 442
+rect 100 361 108 365
+rect 104 346 108 361
+rect 170 346 174 350
+rect 108 342 174 346
+<< metal3 >>
+rect 450 719 458 723
+rect 454 696 458 719
+rect 520 696 524 700
+rect 458 692 524 696
+<< polycontact >>
+rect 804 1059 808 1063
+rect 804 1051 808 1055
+rect 804 1042 808 1046
+rect 818 1042 822 1046
+rect 826 1042 830 1046
+<< ndcontact >>
+rect 1174 1468 1178 1472
+rect 1174 1460 1178 1464
+rect 1174 1452 1178 1456
+rect 1174 1436 1178 1440
+rect 1174 1428 1178 1432
+<< pdcontact >>
+rect 1170 1408 1182 1416
+<< m2contact >>
+rect 104 342 108 346
+<< m3contact >>
+rect 454 692 458 696
+use L500_CHAR_plus  L500_CHAR_plus_0 ../../Library/magic
+timestamp 1534325833
+transform 1 0 1095 0 1 1498
+box 0 4 12 16
+use L500_CHAR_minus  L500_CHAR_minus_0 ../../Library/magic
+timestamp 1534325869
+transform 1 0 1244 0 1 1495
+box 0 8 12 12
+use L500_TPAD_blank  L500_TPAD_blank_8 ../../Library/magic
+timestamp 1537343441
+transform 1 0 1050 0 1 1400
+box 0 0 100 100
+use L500_CHAR_n  L500_CHAR_n_0 ../../Library/magic
+timestamp 1534323117
+transform 1 0 1153 0 1 1480
+box 0 0 12 18
+use L500_CHAR_d  L500_CHAR_d_0 ../../Library/magic
+timestamp 1534321738
+transform 1 0 1168 0 1 1480
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_9
+timestamp 1537343441
+transform 1 0 1200 0 1 1400
+box 0 0 100 100
+use L500_CHAR_m  L500_CHAR_m_9 ../../Library/magic
+timestamp 1534323034
+transform 1 0 1070 0 1 1353
+box 0 0 16 18
+use L500_CHAR_1  L500_CHAR_1_5 ../../Library/magic
+timestamp 1534326485
+transform 1 0 1089 0 1 1353
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_10
+timestamp 1537343441
+transform 1 0 1050 0 1 1250
+box 0 0 100 100
+use L500_CHAR_m  L500_CHAR_m_8
+timestamp 1534323034
+transform 1 0 1078 0 1 1152
+box 0 0 16 18
+use L500_CHAR_1  L500_CHAR_1_4
+timestamp 1534326485
+transform 1 0 1096 0 1 1152
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_11
+timestamp 1537343441
+transform 1 0 700 0 1 1050
+box 0 0 100 100
+use L500_CHAR_p  L500_CHAR_p_0 ../../Library/magic
+timestamp 1534323210
+transform 1 0 803 0 1 1096
+box 0 0 12 18
+use L500_CHAR_o  L500_CHAR_o_0 ../../Library/magic
+timestamp 1534323159
+transform 1 0 817 0 1 1096
+box 0 0 12 18
+use L500_CHAR_l  L500_CHAR_l_0 ../../Library/magic
+timestamp 1534225390
+transform 1 0 831 0 1 1096
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_12
+timestamp 1537343441
+transform 1 0 850 0 1 1050
+box 0 0 100 100
+use L500_TPAD_blank  L500_TPAD_blank_13
+timestamp 1537343441
+transform 1 0 1050 0 1 1050
+box 0 0 100 100
+use L500_CHAR_m  L500_CHAR_m_7
+timestamp 1534323034
+transform 1 0 720 0 1 1003
+box 0 0 16 18
+use L500_CHAR_1  L500_CHAR_1_3
+timestamp 1534326485
+transform 1 0 739 0 1 1003
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_14
+timestamp 1537343441
+transform 1 0 700 0 1 900
+box 0 0 100 100
+use L500_CHAR_m  L500_CHAR_m_6
+timestamp 1534323034
+transform 1 0 716 0 1 803
+box 0 0 16 18
+use L500_CHAR_1  L500_CHAR_1_2
+timestamp 1534326485
+transform 1 0 734 0 1 803
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_4
+timestamp 1537343441
+transform 1 0 350 0 1 700
+box 0 0 100 100
+use L500_CHAR_m  L500_CHAR_m_5
+timestamp 1534323034
+transform 1 0 461 0 1 750
+box 0 0 16 18
+use L500_CHAR_3  L500_CHAR_3_0 ../../Library/magic
+timestamp 1534324785
+transform 1 0 479 0 1 750
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_5
+timestamp 1537343441
+transform 1 0 500 0 1 700
+box 0 0 100 100
+use L500_TPAD_blank  L500_TPAD_blank_15
+timestamp 1537343441
+transform 1 0 700 0 1 700
+box 0 0 100 100
+use L500_CHAR_m  L500_CHAR_m_4
+timestamp 1534323034
+transform 1 0 365 0 1 653
+box 0 0 16 18
+use L500_CHAR_2  L500_CHAR_2_2 ../../Library/magic
+timestamp 1534324708
+transform 1 0 383 0 1 653
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_6
+timestamp 1537343441
+transform 1 0 350 0 1 550
+box 0 0 100 100
+use L500_CHAR_m  L500_CHAR_m_3
+timestamp 1534323034
+transform 1 0 366 0 1 452
+box 0 0 16 18
+use L500_CHAR_2  L500_CHAR_2_1
+timestamp 1534324708
+transform 1 0 386 0 1 452
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_2
+timestamp 1537343441
+transform 1 0 0 0 1 350
+box 0 0 100 100
+use L500_CHAR_m  L500_CHAR_m_2
+timestamp 1534323034
+transform 1 0 103 0 1 394
+box 0 0 16 18
+use L500_CHAR_2  L500_CHAR_2_0
+timestamp 1534324708
+transform 1 0 120 0 1 394
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_3
+timestamp 1537343441
+transform 1 0 150 0 1 350
+box 0 0 100 100
+use L500_TPAD_blank  L500_TPAD_blank_7
+timestamp 1537343441
+transform 1 0 350 0 1 350
+box 0 0 100 100
+use L500_CHAR_m  L500_CHAR_m_1
+timestamp 1534323034
+transform 1 0 26 0 1 303
+box 0 0 16 18
+use L500_CHAR_1  L500_CHAR_1_1
+timestamp 1534326485
+transform 1 0 44 0 1 303
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_1
+timestamp 1537343441
+transform 1 0 0 0 1 200
+box 0 0 100 100
+use L500_CHAR_m  L500_CHAR_m_0
+timestamp 1534323034
+transform 1 0 16 0 1 104
+box 0 0 16 18
+use L500_CHAR_1  L500_CHAR_1_0
+timestamp 1534326485
+transform 1 0 34 0 1 104
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_0
+timestamp 1537343441
+transform 1 0 0 0 1 0
+box 0 0 100 100
+<< end >>

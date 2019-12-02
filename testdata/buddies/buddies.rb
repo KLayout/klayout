@@ -38,7 +38,7 @@ class Buddies_TestClass < TestBase
   def test_basic
 
     # Basic - buddies can be called
-    %w(strm2cif strm2dxf strm2gds strm2gdstxt strm2oas strm2txt strmclip strmcmp strmrun strmxor).each do |bin|
+    %w(strm2cif strm2dxf strm2gds strm2gdstxt strm2oas strm2mag strm2txt strmclip strmcmp strmrun strmxor).each do |bin|
       version = bin + " " + `#{self.buddy_bin(bin)} --version`
       assert_equal(version =~ /^#{bin} \d+\./, 0) 
     end
@@ -54,6 +54,7 @@ class Buddies_TestClass < TestBase
       "strm2gdstxt" => 0x48454144,
       "strm2oas" => 0x2553454d,
       "strm2txt" => 0x62656769,
+      "strm2mag" => 0x6d616769,
     }
 
     # Windows CRLF -> LF translation
@@ -61,11 +62,15 @@ class Buddies_TestClass < TestBase
       0x300d0a53 => 0x300a5345
     }
 
-    %w(strm2cif strm2dxf strm2gds strm2gdstxt strm2oas strm2txt).each do |bin|
+    %w(strm2cif strm2dxf strm2gds strm2gdstxt strm2oas strm2txt strm2mag).each do |bin|
    
       puts "Testing #{bin} ..."
 
-      out_file = File.join($ut_testtmp, "out_" + bin)
+      if bin == "strm2mag"
+        out_file = File.join($ut_testtmp, "TOP1.mag")
+      else
+        out_file = File.join($ut_testtmp, "out_" + bin)
+      end
       if File.exists?(out_file)
         File.unlink(out_file)
       end

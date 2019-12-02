@@ -100,10 +100,9 @@ static
 gsi::ClassExt<db::LoadLayoutOptions> cif_reader_options (
     gsi::method_ext ("cif_set_layer_map", &set_layer_map, gsi::arg ("map"), gsi::arg ("create_other_layers"),
       "@brief Sets the layer map\n"
-      "This sets a layer mapping for the reader. The \"create_other_layers\" specifies whether to create layers that are not "
-      "in the mapping and automatically assign layers to them.\n"
-      "@param map The layer map to set."
-      "@param create_other_layers The flag telling whether other layer should be created also. Set to false if just the layers in the mapping table should be read.\n"
+      "This sets a layer mapping for the reader. The layer map allows selection and translation of the original layers, for example to assign layer/datatype numbers to the named layers.\n"
+      "@param map The layer map to set.\n"
+      "@param create_other_layers The flag indicating whether other layers will be created as well. Set to false to read only the layers in the layer map.\n"
       "\n"
       "This method has been added in version 0.25 and replaces the respective global option in \\LoadLayoutOptions "
       "in a format-specific fashion."
@@ -111,7 +110,7 @@ gsi::ClassExt<db::LoadLayoutOptions> cif_reader_options (
     gsi::method_ext ("cif_layer_map=", &set_layer_map1, gsi::arg ("map"),
       "@brief Sets the layer map\n"
       "This sets a layer mapping for the reader. Unlike \\cif_set_layer_map, the 'create_other_layers' flag is not changed.\n"
-      "@param map The layer map to set."
+      "@param map The layer map to set.\n"
       "\n"
       "This convenience method has been added in version 0.26."
     ) +
@@ -135,14 +134,17 @@ gsi::ClassExt<db::LoadLayoutOptions> cif_reader_options (
     ) +
     gsi::method_ext ("cif_create_other_layers?", &create_other_layers,
       "@brief Gets a value indicating whether other layers shall be created\n"
-      "@return True, if other layers should be created.\n"
+      "@return True, if other layers will be created.\n"
+      "This attribute acts together with a layer map (see \\cif_layer_map=). Layers not listed in this map are created as well when "
+      "\\cif_create_other_layers? is true. Otherwise they are ignored.\n"
       "\n"
       "This method has been added in version 0.25 and replaces the respective global option in \\LoadLayoutOptions "
       "in a format-specific fashion."
     ) +
     gsi::method_ext ("cif_create_other_layers=", &set_create_other_layers, gsi::arg ("create"),
       "@brief Specifies whether other layers shall be created\n"
-      "@param create True, if other layers should be created.\n"
+      "@param create True, if other layers will be created.\n"
+      "See \\cif_create_other_layers? for a description of this attribute.\n"
       "\n"
       "This method has been added in version 0.25 and replaces the respective global option in \\LoadLayoutOptions "
       "in a format-specific fashion."
@@ -212,7 +214,7 @@ static bool get_cif_blank_separator (const db::SaveLayoutOptions *options)
   return options->get_options<db::CIFWriterOptions> ().blank_separator;
 }
 
-//  extend lay::SaveLayoutOptions with the GDS2 options
+//  extend lay::SaveLayoutOptions with the CIF options
 static
 gsi::ClassExt<db::SaveLayoutOptions> cif_writer_options (
   gsi::method_ext ("cif_dummy_calls=", &set_cif_dummy_calls,

@@ -190,7 +190,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
+            <iconset resource="../../../../lay/lay/layResources.qrc">
              <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
            </property>
           </widget>
@@ -204,7 +204,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
+            <iconset resource="../../../../lay/lay/layResources.qrc">
              <normaloff>:/add.png</normaloff>:/add.png</iconset>
            </property>
           </widget>
@@ -218,7 +218,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
+            <iconset resource="../../../../lay/lay/layResources.qrc">
              <normaloff>:/up.png</normaloff>:/up.png</iconset>
            </property>
           </widget>
@@ -232,7 +232,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
+            <iconset resource="../../../../lay/lay/layResources.qrc">
              <normaloff>:/down.png</normaloff>:/down.png</iconset>
            </property>
           </widget>
@@ -298,7 +298,7 @@
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
-  <include location="../../lay/lay/layResources.qrc"/>
+  <include location="../../../../lay/lay/layResources.qrc"/>
  </resources>
  <connections>
   <connection>

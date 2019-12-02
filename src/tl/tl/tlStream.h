@@ -1033,6 +1033,11 @@ public:
    */
   virtual ~OutputStream ();
 
+  /**
+   *  @brief Closes the stream - after closing, the stream can't be accessed anymore
+   */
+  void close ();
+
   /** 
    *  @brief This is the outer write method to call
    *  
@@ -1108,7 +1113,7 @@ public:
    */
   bool supports_seek () const
   {
-    return mp_delegate->supports_seek ();
+    return mp_delegate != 0 && mp_delegate->supports_seek ();
   }
 
   /**
@@ -1132,6 +1137,19 @@ public:
    */
   void flush ();
 
+  /**
+   *  @brief Gets the path that was specified in the constructor
+   */
+  const std::string &path () const
+  {
+    return m_path;
+  }
+
+  /**
+   *  @brief Configures the stream for text output
+   */
+  void set_as_text (bool f);
+
 protected:
   void reset_pos ()
   {
@@ -1145,6 +1163,7 @@ private:
   bool m_as_text;
   char *mp_buffer;
   size_t m_buffer_capacity, m_buffer_pos;
+  std::string m_path;
 
   void put_raw (const char *b, size_t n);
 

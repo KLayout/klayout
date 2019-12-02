@@ -53,6 +53,7 @@ GenericWriterOptions::GenericWriterOptions ()
     m_oasis_subst_char ("*"),
     m_cif_dummy_calls (false),
     m_cif_blank_separator (false),
+    m_magic_lambda (1.0),
     m_dxf_polygon_mode (0)
 {
   //  .. nothing yet ..
@@ -63,6 +64,7 @@ const std::string GenericWriterOptions::gds2text_format_name  = "GDS2Text";  // 
 const std::string GenericWriterOptions::oasis_format_name     = "OASIS";
 const std::string GenericWriterOptions::dxf_format_name       = "DXF";
 const std::string GenericWriterOptions::cif_format_name       = "CIF";
+const std::string GenericWriterOptions::mag_format_name       = "MAG";
 
 void
 GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::string &format)
@@ -267,6 +269,21 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
       ;
 
   }
+
+  if (format.empty () || format == mag_format_name) {
+
+    //  Add MAG format options
+    std::string group = "[Output options - MAG (Magic) specific]";
+
+    cmd << tl::arg (group +
+                    "--magic-lambda-out=lambda", &m_magic_lambda, "Specifies the lambda value when writing Magic files (which are unitless)"
+                   )
+        << tl::arg (group +
+                    "--magic-tech",           &m_magic_tech, "Specifies the technology to include in the Magic files"
+                   )
+      ;
+
+  }
 }
 
 void GenericWriterOptions::set_oasis_substitution_char (const std::string &text)
@@ -352,6 +369,9 @@ GenericWriterOptions::configure (db::SaveLayoutOptions &save_options, const db::
   save_options.set_option_by_name ("cif_blank_separator", m_cif_blank_separator);
 
   save_options.set_option_by_name ("dxf_polygon_mode", m_dxf_polygon_mode);
+
+  save_options.set_option_by_name ("mag_lambda", m_magic_lambda);
+  save_options.set_option_by_name ("mag_tech", m_magic_tech);
 
   if (!m_cell_selection.empty ()) {
 

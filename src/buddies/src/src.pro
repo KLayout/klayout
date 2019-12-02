@@ -8,6 +8,7 @@ SUBDIRS = \
   strm2gds \
   strm2gdstxt \
   strm2oas \
+  strm2mag \
   strm2txt \
   strmclip \
   strmcmp \
@@ -19,6 +20,7 @@ strm2dxf.depends += bd
 strm2gds.depends += bd
 strm2gdstxt.depends += bd
 strm2oas.depends += bd
+strm2mag.depends += bd
 strm2txt.depends += bd
 strmclip.depends += bd
 strmcmp.depends += bd

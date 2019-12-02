@@ -130,6 +130,13 @@ private:
   bool m_dxf_keep_layer_names;
   bool m_dxf_keep_other_cells;
 
+  //  MAGIC
+  double m_magic_lambda;
+  double m_magic_dbu;
+  bool m_magic_keep_layer_names;
+  bool m_magic_merge;
+  std::vector<std::string> m_magic_lib_path;
+
   void set_layer_map (const std::string &lm);
   void set_dbu (double dbu);
   void set_read_named_layers (bool f);

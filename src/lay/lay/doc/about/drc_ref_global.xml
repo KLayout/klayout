@@ -767,7 +767,8 @@ a new target will be set up.
 "what" specifies what input to use. "what" be either
 </p><p>
 <ul>
-<li>A string "@n" specifying output to a layout in the current panel </li>
+<li>A string "@n" (n is an integer) specifying output to a layout in the current panel </li>
+<li>A string "@+" specifying output to a new layout in the current panel</li>
 <li>A layout filename </li>
 <li>A <class_doc href="Layout">Layout</class_doc> object </li>
 <li>A <class_doc href="Cell">Cell</class_doc> object </li>

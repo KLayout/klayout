@@ -89,15 +89,15 @@ static
 gsi::ClassExt<db::LoadLayoutOptions> common_reader_options (
   gsi::method_ext ("set_layer_map", &set_layer_map, gsi::arg ("map"), gsi::arg ("create_other_layers"),
     "@brief Sets the layer map\n"
-    "This sets a layer mapping for the reader. The \"create_other_layers\" specifies whether to create layers that are not "
-    "in the mapping and automatically assign layers to them.\n"
+    "This sets a layer mapping for the reader. The layer map allows selection and translation of the original layers, for example to add a layer name.\n"
     "@param map The layer map to set."
-    "@param create_other_layers The flag telling whether other layer should be created also. Set to false if just the layers in the mapping table should be read.\n"
+    "@param create_other_layers The flag telling whether other layer should be created as well. Set to false if just the layers in the mapping table should be read.\n"
     "\n"
     "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration."
   ) +
   gsi::method_ext ("layer_map=", &set_layer_map1, gsi::arg ("map"),
     "@brief Sets the layer map, but does not affect the \"create_other_layers\" flag.\n"
+    "Use \\create_other_layers? to enable or disable other layers not listed in the layer map.\n"
     "@param map The layer map to set."
     "\n"
     "This convenience method has been introduced with version 0.26."
@@ -121,12 +121,15 @@ gsi::ClassExt<db::LoadLayoutOptions> common_reader_options (
   gsi::method_ext ("create_other_layers?", &create_other_layers,
     "@brief Gets a value indicating whether other layers shall be created\n"
     "@return True, if other layers should be created.\n"
+    "This attribute acts together with a layer map (see \\layer_map=). Layers not listed in this map are created as well when "
+    "\\create_other_layers? is true. Otherwise they are ignored.\n"
     "\n"
     "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration."
   ) +
   gsi::method_ext ("create_other_layers=", &set_create_other_layers, gsi::arg ("create"),
     "@brief Specifies whether other layers shall be created\n"
     "@param create True, if other layers should be created.\n"
+    "See \\create_other_layers? for a description of this attribute.\n"
     "\n"
     "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration."
   ) +

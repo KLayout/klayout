@@ -118,7 +118,6 @@ class SaveLayoutOptions_TestClass < TestBase
     opt.gds2_write_timestamps = false
     assert_equal(opt.gds2_write_timestamps?, false)
 
-    # DXF+CIF attributes are kept with GDS2
     assert_equal(opt.dxf_polygon_mode, 2)
 
     opt.oasis_compression_level = 5
@@ -157,6 +156,15 @@ class SaveLayoutOptions_TestClass < TestBase
     opt.oasis_substitution_char = "+"
     assert_equal(opt.oasis_substitution_char, "+")
 
+    opt.mag_lambda = 0.25
+    assert_equal(opt.mag_lambda, 0.25)
+    
+    assert_equal(opt.mag_write_timestamp?, true)
+    opt.mag_write_timestamp = false
+    assert_equal(opt.mag_write_timestamp?, false)
+    
+    opt.mag_tech = "xyz"
+    assert_equal(opt.mag_tech, "xyz")
     
     opt.set_format_from_filename("a.gds")
     assert_equal(opt.format, "GDS2")

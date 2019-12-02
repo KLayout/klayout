@@ -1,0 +1,148 @@
+magic
+tech scmos
+timestamp 1541934660
+<< error_p >>
+rect 29 35 30 41
+rect 36 35 40 41
+rect 45 31 48 33
+<< nwell >>
+rect 0 53 69 65
+rect 0 12 12 53
+rect 57 12 69 53
+rect 0 0 69 12
+<< polysilicon >>
+rect 45 36 51 37
+rect 45 34 46 36
+rect 36 31 39 34
+rect 42 32 46 34
+rect 50 32 51 36
+rect 42 31 51 32
+<< ndiffusion >>
+rect 36 40 42 41
+rect 36 36 37 40
+rect 41 36 42 40
+rect 36 35 42 36
+rect 39 34 42 35
+rect 39 30 42 31
+rect 39 29 45 30
+rect 39 25 40 29
+rect 44 25 45 29
+rect 39 24 45 25
+<< pdiffusion >>
+rect 24 40 30 41
+rect 24 36 25 40
+rect 29 36 30 40
+rect 24 35 30 36
+<< metal1 >>
+rect -21 107 42 113
+rect -43 40 30 41
+rect -43 36 25 40
+rect 29 36 30 40
+rect -43 35 30 36
+rect 36 40 42 107
+rect 36 36 37 40
+rect 41 36 42 40
+rect 86 37 92 103
+rect 36 35 42 36
+rect 45 36 92 37
+rect -43 2 -37 35
+rect 45 32 46 36
+rect 50 32 92 36
+rect 45 31 92 32
+rect 39 29 45 30
+rect 39 25 40 29
+rect 44 25 45 29
+rect 39 -12 45 25
+rect 39 -18 86 -12
+<< ntransistor >>
+rect 39 31 42 34
+<< nwpbase >>
+rect 12 12 57 53
+<< polycontact >>
+rect 46 32 50 36
+<< ndcontact >>
+rect 37 36 41 40
+rect 40 25 44 29
+<< pdcontact >>
+rect 25 36 29 40
+use L500_TPAD_blank  L500_TPAD_blank_0
+timestamp 1537343441
+transform 1 0 -120 0 1 103
+box 0 0 100 100
+use L500_CHAR_s  L500_CHAR_s_0
+timestamp 1534323853
+transform 1 0 -19 0 1 148
+box 0 0 12 18
+use L500_CHAR_g  L500_CHAR_g_0
+timestamp 1534322005
+transform 1 0 64 0 1 147
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_1
+timestamp 1537343441
+transform 1 0 80 0 1 103
+box 0 0 100 100
+use L500_CHAR_i  L500_CHAR_i_0
+timestamp 1534226087
+transform 1 0 98 0 1 79
+box 0 0 8 18
+use L500_CHAR_s  L500_CHAR_s_1
+timestamp 1534323853
+transform 1 0 108 0 1 79
+box 0 0 12 18
+use L500_CHAR_o  L500_CHAR_o_0
+timestamp 1534323159
+transform 1 0 122 0 1 79
+box 0 0 12 18
+use L500_CHAR_n  L500_CHAR_n_0
+timestamp 1534323117
+transform 1 0 137 0 1 79
+box 0 0 12 18
+use L500_CHAR_w  L500_CHAR_w_0
+timestamp 1534324213
+transform 1 0 97 0 1 58
+box 0 0 16 18
+use L500_CHAR_1  L500_CHAR_1_0
+timestamp 1534326485
+transform 1 0 115 0 1 58
+box 0 0 12 18
+use L500_CHAR_dot  L500_CHAR_dot_0
+timestamp 1534325697
+transform 1 0 129 0 1 58
+box 0 0 4 4
+use L500_CHAR_5  L500_CHAR_5_0
+timestamp 1534324893
+transform 1 0 136 0 1 58
+box 0 0 12 18
+use L500_CHAR_l  L500_CHAR_l_0
+timestamp 1534225390
+transform 1 0 97 0 1 36
+box 0 0 12 18
+use L500_CHAR_1  L500_CHAR_1_1
+timestamp 1534326485
+transform 1 0 112 0 1 36
+box 0 0 12 18
+use L500_CHAR_dot  L500_CHAR_dot_1
+timestamp 1534325697
+transform 1 0 126 0 1 36
+box 0 0 4 4
+use L500_CHAR_5  L500_CHAR_5_1
+timestamp 1534324893
+transform 1 0 132 0 1 36
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_3
+timestamp 1537343441
+transform 1 0 -120 0 1 -97
+box 0 0 100 100
+use L500_CHAR_b  L500_CHAR_b_0
+timestamp 1534321628
+transform 1 0 -16 0 1 -61
+box 0 0 12 18
+use L500_CHAR_d  L500_CHAR_d_0
+timestamp 1534321738
+transform 1 0 64 0 1 -65
+box 0 0 12 18
+use L500_TPAD_blank  L500_TPAD_blank_2
+timestamp 1537343441
+transform 1 0 80 0 1 -97
+box 0 0 100 100
+<< end >>

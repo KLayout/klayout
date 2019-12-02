@@ -1,0 +1,72 @@
+magic
+tech scmos
+timestamp 1541940149
+use Layout/magic/contact_table  contact_table_0 Layout/magic
+timestamp 1541940149
+transform 1 0 2500 0 1 550
+box 0 0 312 1700
+use Layout/magic/diode_table  diode_table_0 Layout/magic
+timestamp 1541940149
+transform 1 0 50 0 1 1250
+box 0 0 3104 2800
+use Layout/magic/nmos_table  nmos_table_0 Layout/magic
+timestamp 1541940149
+transform 1 0 750 0 1 1200
+box 0 0 1700 1700
+use Layout/magic/rpoly_rsquare  rpoly_rsquare_0 Layout/magic
+timestamp 1541940149
+transform 1 0 -28 0 1 740
+box 0 0 2478 400
+use Layout/magic/npn_table  npn_table_0 Layout/magic
+timestamp 1541940149
+transform 1 0 3200 0 1 1500
+box 0 0 300 650
+use ison_table  ison_table_0
+timestamp 1541939920
+transform 1 0 2850 0 1 1150
+box 0 0 300 1700
+use Layout/magic/hvfet_table  hvfet_table_0 Layout/magic
+timestamp 1541940149
+transform 1 0 3200 0 1 1150
+box 0 0 650 300
+use Layout/magic/metal3_rsquare  metal3_rsquare_0 Layout/magic
+timestamp 1541940149
+transform 1 0 0 0 1 370
+box 0 0 2440 400
+use Layout/magic/metal2_rsquare  metal2_rsquare_0 Layout/magic
+timestamp 1541940149
+transform 1 0 0 0 1 0
+box 0 0 2440 400
+use Layout/magic/pad_measure  pad_measure_0 Layout/magic
+timestamp 1541940149
+transform 0 1 2500 -1 0 504
+box 0 0 504 250
+use Layout/magic/pnp_table  pnp_table_0 Layout/magic
+timestamp 1541940149
+transform 1 0 2850 0 1 450
+box 0 0 300 650
+use Layout/magic/sonos_table  sonos_table_0 Layout/magic
+timestamp 1541940149
+transform 1 0 3200 0 1 450
+box 0 0 650 650
+use Layout/magic/pmos_table  pmos_table_0 Layout/magic
+timestamp 1541940149
+transform 1 0 4400 0 1 450
+box 0 0 1700 1700
+use Layout/magic/caps_table  caps_table_0 Layout/magic
+timestamp 1541940149
+transform 1 0 4400 0 1 450
+box 0 0 2050 2072
+use Layout/magic/ringoscillator_stripe  ringoscillator_stripe_0 Layout/magic
+timestamp 1541940149
+transform 0 1 3900 1 0 350
+box 0 0 2704 440
+use Layout/magic/metal1_rsquare  metal1_rsquare_0 Layout/magic
+timestamp 1541940149
+transform 1 0 2800 0 1 0
+box 0 0 2440 400
+use Layout/magic/polysi_rsquare  polysi_rsquare_0 Layout/magic
+timestamp 1541940149
+transform 1 0 5300 0 1 0
+box 0 0 2478 400
+<< end >>

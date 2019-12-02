@@ -1,0 +1,396 @@
+magic
+tech scmos
+timestamp 1543212938
+<< metal1 >>
+rect -310 114 0 118
+rect 424 114 728 118
+rect -310 109 -210 114
+rect 628 109 728 114
+rect -10 66 0 70
+rect 424 66 428 70
+rect -10 48 0 52
+rect 424 48 428 52
+rect -310 4 -210 9
+rect 628 4 728 9
+rect -310 0 0 4
+rect 424 0 728 4
+<< metal2 >>
+rect -6 28 -2 123
+rect 410 98 414 126
+rect 10 86 14 94
+rect 26 86 30 94
+rect 42 86 46 94
+rect 58 86 62 94
+rect 74 86 78 94
+rect 90 86 94 94
+rect 106 86 110 94
+rect 122 86 126 94
+rect 138 86 142 94
+rect 154 86 158 94
+rect 170 86 174 94
+rect 186 86 190 94
+rect 202 86 206 94
+rect 218 86 222 94
+rect 234 86 238 94
+rect 250 86 254 94
+rect 266 86 270 94
+rect 282 86 286 94
+rect 298 86 302 94
+rect 314 86 318 94
+rect 330 86 334 94
+rect 346 86 350 94
+rect 362 86 366 94
+rect 378 86 382 94
+rect 394 90 422 94
+rect 2 61 6 86
+rect 10 82 22 86
+rect 26 82 38 86
+rect 42 82 54 86
+rect 58 82 70 86
+rect 74 82 86 86
+rect 90 82 102 86
+rect 106 82 118 86
+rect 122 82 134 86
+rect 138 82 150 86
+rect 154 82 166 86
+rect 170 82 182 86
+rect 186 82 198 86
+rect 202 82 214 86
+rect 218 82 230 86
+rect 234 82 246 86
+rect 250 82 262 86
+rect 266 82 278 86
+rect 282 82 294 86
+rect 298 82 310 86
+rect 314 82 326 86
+rect 330 82 342 86
+rect 346 82 358 86
+rect 362 82 374 86
+rect 378 82 390 86
+rect 2 57 22 61
+rect -6 24 6 28
+rect 18 24 22 57
+rect 34 32 46 36
+rect 50 32 62 36
+rect 66 32 78 36
+rect 82 32 94 36
+rect 98 32 110 36
+rect 114 32 126 36
+rect 130 32 142 36
+rect 146 32 158 36
+rect 162 32 174 36
+rect 178 32 190 36
+rect 194 32 206 36
+rect 210 32 222 36
+rect 226 32 238 36
+rect 242 32 254 36
+rect 258 32 270 36
+rect 274 32 286 36
+rect 290 32 302 36
+rect 306 32 318 36
+rect 322 32 334 36
+rect 338 32 350 36
+rect 354 32 366 36
+rect 370 32 382 36
+rect 386 32 398 36
+rect 402 32 414 36
+rect 418 32 422 90
+rect 26 20 30 28
+rect 42 24 46 32
+rect 58 24 62 32
+rect 74 24 78 32
+rect 90 24 94 32
+rect 106 24 110 32
+rect 122 24 126 32
+rect 138 24 142 32
+rect 154 24 158 32
+rect 170 24 174 32
+rect 186 24 190 32
+rect 202 24 206 32
+rect 218 24 222 32
+rect 234 24 238 32
+rect 250 24 254 32
+rect 266 24 270 32
+rect 282 24 286 32
+rect 298 24 302 32
+rect 314 24 318 32
+rect 330 24 334 32
+rect 346 24 350 32
+rect 362 24 366 32
+rect 378 24 382 32
+rect 394 24 398 32
+rect 410 24 414 32
+rect 10 16 30 20
+use Library/magic/L500_CHAR_r  L500_CHAR_r_0
+timestamp 1534323573
+transform 1 0 0 0 1 124
+box 0 0 12 18
+use Library/magic/L500_CHAR_o  L500_CHAR_o_0
+timestamp 1534323159
+transform 1 0 16 0 1 124
+box 0 0 12 18
+use Library/magic/L500_CHAR_5  L500_CHAR_5_0
+timestamp 1534324893
+transform 1 0 32 0 1 124
+box 0 0 12 18
+use Library/magic/L500_CHAR_1  L500_CHAR_1_0
+timestamp 1534326485
+transform 1 0 48 0 1 124
+box 0 0 12 18
+use Library/magic/L500_CHAR_under  L500_CHAR_under_0
+timestamp 1534325915
+transform 1 0 64 0 1 124
+box 0 0 12 4
+use Library/magic/L500_CHAR_i  L500_CHAR_i_0
+timestamp 1534226087
+transform 1 0 80 0 1 124
+box 0 0 8 18
+use Library/magic/L500_CHAR_n  L500_CHAR_n_0
+timestamp 1534323117
+transform 1 0 92 0 1 124
+box 0 0 12 18
+use Library/magic/L500_CHAR_v  L500_CHAR_v_0
+timestamp 1534326655
+transform 1 0 108 0 1 124
+box 0 0 12 18
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_1
+timestamp 1537343441
+transform 1 0 -310 0 1 9
+box 0 0 100 100
+use Library/magic/L500_SIGNATURE_vdd  L500_SIGNATURE_vdd_0
+timestamp 1538544897
+transform 1 0 -172 0 1 86
+box 0 0 52 18
+use Library/magic/L500_SIGNATURE_gnd  L500_SIGNATURE_gnd_0
+timestamp 1538544897
+transform 1 0 -200 0 1 30
+box 0 0 52 18
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_0
+timestamp 1537343441
+transform 1 0 -110 0 1 9
+box 0 0 100 100
+use Library/magic/T7_INV  T7_INV_49
+timestamp 1533657739
+transform -1 0 16 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_48
+timestamp 1533657739
+transform -1 0 32 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_47
+timestamp 1533657739
+transform -1 0 48 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_46
+timestamp 1533657739
+transform -1 0 64 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_45
+timestamp 1533657739
+transform -1 0 80 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_44
+timestamp 1533657739
+transform -1 0 96 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_43
+timestamp 1533657739
+transform -1 0 112 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_42
+timestamp 1533657739
+transform -1 0 128 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_41
+timestamp 1533657739
+transform -1 0 144 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_40
+timestamp 1533657739
+transform -1 0 160 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_39
+timestamp 1533657739
+transform -1 0 176 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_38
+timestamp 1533657739
+transform -1 0 192 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_37
+timestamp 1533657739
+transform -1 0 208 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_36
+timestamp 1533657739
+transform -1 0 224 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_35
+timestamp 1533657739
+transform -1 0 240 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_34
+timestamp 1533657739
+transform -1 0 256 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_33
+timestamp 1533657739
+transform -1 0 272 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_32
+timestamp 1533657739
+transform -1 0 288 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_31
+timestamp 1533657739
+transform -1 0 304 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_30
+timestamp 1533657739
+transform -1 0 320 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_29
+timestamp 1533657739
+transform -1 0 336 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_28
+timestamp 1533657739
+transform -1 0 352 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_27
+timestamp 1533657739
+transform -1 0 368 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_26
+timestamp 1533657739
+transform -1 0 384 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_25
+timestamp 1533657739
+transform -1 0 400 0 -1 120
+box 0 0 16 56
+use Library/magic/T7_NAND2  T7_NAND2_1
+timestamp 1533654698
+transform -1 0 424 0 -1 120
+box 0 0 24 56
+use Library/magic/T7_NAND2  T7_NAND2_0
+timestamp 1533654698
+transform 1 0 0 0 1 -2
+box 0 0 24 56
+use Library/magic/T7_INV  T7_INV_0
+timestamp 1533657739
+transform 1 0 24 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_1
+timestamp 1533657739
+transform 1 0 40 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_2
+timestamp 1533657739
+transform 1 0 56 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_3
+timestamp 1533657739
+transform 1 0 72 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_4
+timestamp 1533657739
+transform 1 0 88 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_5
+timestamp 1533657739
+transform 1 0 104 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_6
+timestamp 1533657739
+transform 1 0 120 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_7
+timestamp 1533657739
+transform 1 0 136 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_8
+timestamp 1533657739
+transform 1 0 152 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_9
+timestamp 1533657739
+transform 1 0 168 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_10
+timestamp 1533657739
+transform 1 0 184 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_11
+timestamp 1533657739
+transform 1 0 200 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_12
+timestamp 1533657739
+transform 1 0 216 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_13
+timestamp 1533657739
+transform 1 0 232 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_14
+timestamp 1533657739
+transform 1 0 248 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_15
+timestamp 1533657739
+transform 1 0 264 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_16
+timestamp 1533657739
+transform 1 0 280 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_17
+timestamp 1533657739
+transform 1 0 296 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_18
+timestamp 1533657739
+transform 1 0 312 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_19
+timestamp 1533657739
+transform 1 0 328 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_20
+timestamp 1533657739
+transform 1 0 344 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_21
+timestamp 1533657739
+transform 1 0 360 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_22
+timestamp 1533657739
+transform 1 0 376 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_23
+timestamp 1533657739
+transform 1 0 392 0 1 -2
+box 0 0 16 56
+use Library/magic/T7_INV  T7_INV_24
+timestamp 1533657739
+transform 1 0 408 0 1 -2
+box 0 0 16 56
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_2
+timestamp 1537343441
+transform 1 0 428 0 1 9
+box 0 0 100 100
+use Library/magic/L500_SIGNATURE_vdd  L500_SIGNATURE_vdd_1
+timestamp 1538544897
+transform 1 0 540 0 1 86
+box 0 0 52 18
+use Library/magic/L500_SIGNATURE_gnd  L500_SIGNATURE_gnd_1
+timestamp 1538544897
+transform 1 0 569 0 1 30
+box 0 0 52 18
+use Library/magic/L500_TPAD_blank  L500_TPAD_blank_3
+timestamp 1537343441
+transform 1 0 628 0 1 9
+box 0 0 100 100
+<< end >>

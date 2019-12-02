@@ -1,0 +1,150 @@
+magic
+tech scmos
+timestamp 1538900168
+<< silk >>
+rect -3 0 3 40
+rect 17 0 23 10
+rect 37 0 43 10
+rect 57 0 63 10
+rect 77 0 83 10
+rect 97 0 103 20
+rect 117 0 123 10
+rect 137 0 143 10
+rect 157 0 163 10
+rect 177 0 183 10
+rect 197 0 203 20
+rect 217 0 223 10
+rect 237 0 243 10
+rect 257 0 263 10
+rect 277 0 283 10
+rect 297 0 303 20
+rect 317 0 323 10
+rect 337 0 343 10
+rect 357 0 363 10
+rect 377 0 383 10
+rect 397 0 403 20
+rect 417 0 423 10
+rect 437 0 443 10
+rect 457 0 463 10
+rect 477 0 483 10
+rect 497 0 503 20
+rect 517 0 523 10
+rect 537 0 543 10
+rect 557 0 563 10
+rect 577 0 583 10
+rect 597 0 603 20
+rect 617 0 623 10
+rect 637 0 643 10
+rect 657 0 663 10
+rect 677 0 683 10
+rect 697 0 703 20
+rect 717 0 723 10
+rect 737 0 743 10
+rect 757 0 763 10
+rect 777 0 783 10
+rect 797 0 803 20
+rect 817 0 823 10
+rect 837 0 843 10
+rect 857 0 863 10
+rect 877 0 883 10
+rect 897 0 903 20
+rect 917 0 923 10
+rect 937 0 943 10
+rect 957 0 963 10
+rect 977 0 983 10
+rect 997 0 1003 20
+rect 1017 0 1023 10
+rect 1037 0 1043 10
+rect 1057 0 1063 10
+rect 1077 0 1083 10
+rect 1097 0 1103 20
+rect 1117 0 1123 10
+rect 1137 0 1143 10
+rect 1157 0 1163 10
+rect 1177 0 1183 10
+rect 1197 0 1203 20
+rect 1217 0 1223 10
+rect 1237 0 1243 10
+rect 1257 0 1263 10
+rect 1277 0 1283 10
+rect 1297 0 1303 20
+rect 1317 0 1323 10
+rect 1337 0 1343 10
+rect 1357 0 1363 10
+rect 1377 0 1383 10
+rect 1397 0 1403 20
+rect 1417 0 1423 10
+rect 1437 0 1443 10
+rect 1457 0 1463 10
+rect 1477 0 1483 10
+rect 1497 0 1503 20
+rect 1517 0 1523 10
+rect 1537 0 1543 10
+rect 1557 0 1563 10
+rect 1577 0 1583 10
+rect 1597 0 1603 20
+rect 1617 0 1623 10
+rect 1637 0 1643 10
+rect 1657 0 1663 10
+rect 1677 0 1683 10
+rect 1697 0 1703 20
+rect 1717 0 1723 10
+rect 1737 0 1743 10
+rect 1757 0 1763 10
+rect 1777 0 1783 10
+rect 1797 0 1803 20
+rect 1817 0 1823 10
+rect 1837 0 1843 10
+rect 1857 0 1863 10
+rect 1877 0 1883 10
+rect 1897 0 1903 20
+rect 1917 0 1923 10
+rect 1937 0 1943 10
+rect 1957 0 1963 10
+rect 1977 0 1983 10
+rect 1997 0 2003 40
+use Library/magic/L500_CHAR_m  L500_CHAR_m_0
+timestamp 1534326485
+transform 1 0 7 0 1 20
+box 0 0 18 18
+use Library/magic/L500_CHAR_m  L500_CHAR_m_1
+timestamp 1534326485
+transform 1 0 29 0 1 20
+box 0 0 18 18
+use Library/magic/L500_CHAR_1  L500_CHAR_1_0
+timestamp 1534326485
+transform 1 0 207 0 1 20
+box 0 0 12 18
+use Library/magic/L500_CHAR_2  L500_CHAR_2_0
+timestamp 1534325425
+transform 1 0 407 0 1 20
+box 0 0 12 18
+use Library/magic/L500_CHAR_3  L500_CHAR_3_0
+timestamp 1534325425
+transform 1 0 607 0 1 20
+box 0 0 12 18
+use Library/magic/L500_CHAR_4  L500_CHAR_4_0
+timestamp 1534325425
+transform 1 0 807 0 1 20
+box 0 0 12 18
+use Library/magic/L500_CHAR_5  L500_CHAR_5_0
+timestamp 1534325425
+transform 1 0 1007 0 1 20
+box 0 0 12 18
+use Library/magic/L500_CHAR_6  L500_CHAR_6_0
+timestamp 1534325425
+transform 1 0 1207 0 1 20
+box 0 0 12 18
+use Library/magic/L500_CHAR_7  L500_CHAR_7_0
+timestamp 1534325425
+transform 1 0 1407 0 1 20
+box 0 0 12 18
+use Library/magic/L500_CHAR_8  L500_CHAR_8_0
+timestamp 1534325425
+transform 1 0 1607 0 1 20
+box 0 0 12 18
+use Library/magic/L500_CHAR_9  L500_CHAR_9_0
+timestamp 1534325425
+transform 1 0 1807 0 1 20
+box 0 0 12 18
+<< end >>

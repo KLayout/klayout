@@ -48,7 +48,11 @@ GenericReaderOptions::GenericReaderOptions ()
     m_dxf_contour_accuracy (0.0),
     m_dxf_render_texts_as_polygons (false),
     m_dxf_keep_layer_names (false),
-    m_dxf_keep_other_cells (false)
+    m_dxf_keep_other_cells (false),
+    m_magic_lambda (1.0),
+    m_magic_dbu (0.001),
+    m_magic_keep_layer_names (false),
+    m_magic_merge (true)
 {
   //  .. nothing yet ..
 }
@@ -238,6 +242,27 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                    )
       ;
   }
+
+  {
+    std::string group ("[" + m_group_prefix + " options - MAG (Magic) specific]");
+
+    cmd << tl::arg (group +
+                    "--" + m_long_prefix + "magic-lambda=lambda", &m_magic_lambda, "Specifies the lambda value",
+                    "The lambda value is used as a scaling factor to turn the dimensionless Magic drawings into "
+                    "physical layout."
+                   )
+        << tl::arg (group +
+                    "#!--" + m_long_prefix + "magic-dont-merge", &m_magic_merge, "Disables polygon merging",
+                    "With this option, the rectangles and triangles of the Magic file are not merged into polygons."
+                   )
+        << tl::arg (group +
+                    "--" + m_long_prefix + "magic-lib-path=path", &m_magic_lib_path, "Specifies the library search path for Magic file loading",
+                    "The library search path gives the locations where the reader looks up files for child cells. "
+                    "This option either specifies a comma-separated list of paths to search or it can be present multiple times "
+                    "for multiple search locations."
+                   )
+      ;
+  }
 }
 
 void GenericReaderOptions::set_layer_map (const std::string &lm)
@@ -256,12 +281,14 @@ void GenericReaderOptions::set_read_named_layers (bool f)
 {
   m_dxf_keep_layer_names = f;
   m_cif_keep_layer_names = f;
+  m_magic_keep_layer_names = f;
 }
 
 void GenericReaderOptions::set_dbu (double dbu)
 {
   m_dxf_dbu = dbu;
   m_cif_dbu = dbu;
+  m_magic_dbu = dbu;
 }
 
 void
@@ -297,6 +324,14 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options) const
   load_options.set_option_by_name ("dxf_render_texts_as_polygons", m_dxf_render_texts_as_polygons);
   load_options.set_option_by_name ("dxf_keep_layer_names", m_dxf_keep_layer_names);
   load_options.set_option_by_name ("dxf_keep_other_cells", m_dxf_keep_other_cells);
+
+  load_options.set_option_by_name ("mag_layer_map", tl::Variant::make_variant (m_layer_map));
+  load_options.set_option_by_name ("mag_create_other_layers", m_create_other_layers);
+  load_options.set_option_by_name ("mag_dbu", m_magic_dbu);
+  load_options.set_option_by_name ("mag_lambda", m_magic_lambda);
+  load_options.set_option_by_name ("mag_merge", m_magic_merge);
+  load_options.set_option_by_name ("mag_keep_layer_names", m_magic_keep_layer_names);
+  load_options.set_option_by_name ("mag_library_paths", tl::Variant (m_magic_lib_path.begin (), m_magic_lib_path.end ()));
 }
 
 }

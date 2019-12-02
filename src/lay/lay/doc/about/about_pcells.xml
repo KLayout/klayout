@@ -3,10 +3,10 @@
 
 <doc>
 
-  <title>About PCell's</title>
+  <title>About PCells</title>
 
   <p>
-  Starting with version 0.22, KLayout offers parametrized cells (PCell's).
+  Starting with version 0.22, KLayout offers parametrized cells (PCells).
   PCells are a feature found in other tools to simplify layout by providing generators
   for common layout building blocks. Parametrized cells do not contain
   static layout but are created dynamically by code using a given set of parameters.
@@ -20,14 +20,14 @@
 
   <p>
   Using a PCell is easy: choose the library and the PCell from that library when asked for
-  the cell in the instance options dialog. For PCell's, KLayout offers an additional
+  the cell in the instance options dialog. For PCells, KLayout offers an additional
   parameters page where it asks for the parameter required by the PCell. The placement
-  of the PCell is done as for simple instances. PCell's offer the same instantiation
+  of the PCell is done as for simple instances. PCells offer the same instantiation
   options that normal cells.
   </p>
 
   <p>
-  KLayout provides a simple library called "Basic" with some useful basic PCell's.
+  KLayout provides a simple library called "Basic" with some useful basic PCells.
   See <link href="/about/basic_lib.xml"/> for more details about that library.
   </p>
 
@@ -52,13 +52,13 @@
   <p>
   A PCell implementation consists of at least three parts: 
   a description text, a parameter declaration and a production callback. In addition, a PCell
-  can provide a method that "fixes" parameters according to the PCell's consistency rules
+  can provide a method that "fixes" parameters according to the PCells consistency rules
   (coerce parameters). Technically, a PCell is a class implementing a certain interface with
   these methods.
   </p>
 
   <p>
-  PCell's are usually packed in libraries. PCell libraries can be provided as
+  PCells are usually packed in libraries. PCell libraries can be provided as
   shared objects/DLL's (in C++) or as Ruby scripts. Because PCell code is only executed if
   required, performance usually is not the main objective. A Ruby implementation
   will therefore be sufficient in most cases and

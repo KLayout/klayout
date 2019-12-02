@@ -10,22 +10,22 @@
   <h2>The "Basic" library</h2>
 
   <p>
-  The "Basic" Library provides some useful generic PCell's.
+  The "Basic" Library provides some useful generic PCells.
   One use model is to draw a shape and convert the shape to one
-  of the provided PCell's. This use model is suitable for creating
+  of the provided PCells. This use model is suitable for creating
   Circles, Ellipses, Donuts, Texts and rounded and stroked polygons or
   rounded paths.
   </p>
 
   <p>
-  To use that feature, draw the shape and choose "Convert To PCell's"
+  To use that feature, draw the shape and choose "Convert To PCells"
   from the "Edit"/"Selection" menu. A dialog will be shown where the
-  target PCell can be selected. Only those PCell's supporting that
+  target PCell can be selected. Only those PCells supporting that
   shape type will be shown.
   </p>
 
   <p>
-  The "Basic" library provides the following PCell's:
+  The "Basic" library provides the following PCells:
   </p>
 
   <ul>
@@ -88,7 +88,7 @@
 
   <h2>CIRCLE and ELLIPSE</h2>
 
-  <p>These PCell's define a circle and an ellipse. In both cases, the number of interpolation
+  <p>These PCells define a circle and an ellipse. In both cases, the number of interpolation
   points (per full circle) can be specified. The default is 64 points. A circle features 
   a handle to define the diameter. An ellipse features two handles defining the diameters in
   x and y direction.
@@ -112,7 +112,7 @@
 
   <h2>PIE and ARC</h2>
 
-  <p>Both of these PCell's are segments of circles or donuts. The PIE PCell features two handles to
+  <p>Both of these PCells are segments of circles or donuts. The PIE PCell features two handles to
   define the radius and start and end angle. The ARC PCell also features two handles to define outer 
   and inner radius as well. The following image shows PIE and ARC in action:</p>
 
@@ -120,7 +120,7 @@
   <img src="/about/pie_arc.png"/>
   </p>
 
-  <p>Both PCell's do not support conversion of shapes.</p>
+  <p>Both PCells do not support conversion of shapes.</p>
 
   <h2>ROUND_PATH</h2>
 

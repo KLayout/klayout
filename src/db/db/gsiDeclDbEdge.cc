@@ -72,14 +72,39 @@ struct edge_defs
     return box_type (e->p1 (), e->p2 ());
   }
 
-  static point_type intersect_point (const C *e, const C &ee)
+  static tl::Variant intersect_point (const C *e, const C &ee)
   {
-    return e->intersect_point (ee).second;
+    std::pair<bool, point_type> ip = e->intersect_point (ee);
+    if (ip.first) {
+      return tl::Variant (ip.second);
+    } else {
+      return tl::Variant ();
+    }
   }
 
   static point_type crossing_point (const C *e, const C &ee)
   {
     return e->crossed_by_point (ee).second;
+  }
+
+  static tl::Variant clipped (const C *e, const box_type &bx)
+  {
+    std::pair<bool, C> c = e->clipped (bx);
+    if (c.first) {
+      return tl::Variant (c.second);
+    } else {
+      return tl::Variant ();
+    }
+  }
+
+  static tl::Variant clipped_line (const C *e, const box_type &bx)
+  {
+    std::pair<bool, C> c = e->clipped_line (bx);
+    if (c.first) {
+      return tl::Variant (c.second);
+    } else {
+      return tl::Variant ();
+    }
   }
 
   static C &move_xy (C *e, coord_type dx, coord_type dy)
@@ -143,34 +168,27 @@ struct edge_defs
     constructor ("new", &new_v, 
       "@brief Default constructor: creates a degenerated edge 0,0 to 0,0"
     ) +
-    constructor ("new|#new_xyxy", &new_xyxy, 
+    constructor ("new|#new_xyxy", &new_xyxy, gsi::arg ("x1"), gsi::arg ("y1"), gsi::arg ("x2"), gsi::arg ("y2"),
       "@brief Constructor with two coordinates given as single values\n"
       "\n"
-      "@args x1, y1, x2, y2\n"
-      "\n"
       "Two points are given to create a new edge."
     ) +
-    constructor ("new|#new_pp", &new_pp, 
+    constructor ("new|#new_pp", &new_pp, gsi::arg ("p1"), gsi::arg ("p2"),
       "@brief Constructor with two points\n"
       "\n"
-      "@args p1, p2\n"
-      "\n"
       "Two points are given to create a new edge."
     ) +
-    method ("<", &C::less,
+    method ("<", &C::less, gsi::arg ("e"),
       "@brief Less operator\n"
-      "@args e\n"
       "@param e The object to compare against\n"
       "@return True, if the edge is 'less' as the other edge with respect to first and second point"
     ) +
-    method ("==", &C::equal,
+    method ("==", &C::equal, gsi::arg ("e"),
       "@brief Equality test\n"
-      "@args e\n"
       "@param e The object to compare against"
     ) +
-    method ("!=", &C::not_equal,
+    method ("!=", &C::not_equal, gsi::arg ("e"),
       "@brief Inequality test\n"
-      "@args e\n"
       "@param e The object to compare against"
     ) +
     method_ext ("hash", &hash_value,
@@ -179,9 +197,8 @@ struct edge_defs
       "\n"
       "This method has been introduced in version 0.25.\n"
     ) +
-    method ("moved", &C::moved,
+    method ("moved", &C::moved, gsi::arg ("p"),
       "@brief Returns the moved edge (does not modify self)\n"
-      "@args p\n"
       "\n"
       "Moves the edge by the given offset and returns the \n"
       "moved edge. The edge is not modified.\n"
@@ -190,9 +207,8 @@ struct edge_defs
       "\n"
       "@return The moved edge.\n"
     ) +
-    method_ext ("moved", &moved_xy,
+    method_ext ("moved", &moved_xy, gsi::arg ("dx"), gsi::arg ("dy"),
       "@brief Returns the moved edge (does not modify self)\n"
-      "@args dx, dy\n"
       "\n"
       "Moves the edge by the given offset and returns the \n"
       "moved edge. The edge is not modified.\n"
@@ -204,9 +220,8 @@ struct edge_defs
       "\n"
       "This version has been added in version 0.23.\n"
     ) +
-    method ("enlarged", &C::enlarged,
+    method ("enlarged", &C::enlarged, gsi::arg ("p"),
       "@brief Returns the enlarged edge (does not modify self)\n"
-      "@args p\n"
       "\n"
       "Enlarges the edge by the given offset and returns the \n"
       "enlarged edge. The edge is not modified. Enlargement means\n"
@@ -216,9 +231,8 @@ struct edge_defs
       "\n"
       "@return The enlarged edge.\n"
     ) +
-    method ("extended", &C::extended,
+    method ("extended", &C::extended, gsi::arg ("d"),
       "@brief Returns the extended edge (does not modify self)\n"
-      "@args d\n"
       "\n"
       "Extends the edge by the given distance and returns the \n"
       "extended edge. The edge is not modified. Extending means\n"
@@ -233,9 +247,8 @@ struct edge_defs
       "\n"
       "@return The extended edge.\n"
     ) +
-    method ("extend", &C::extend,
+    method ("extend", &C::extend, gsi::arg ("d"),
       "@brief Extends the edge (modifies self)\n"
-      "@args d\n"
       "\n"
       "Extends the edge by the given distance and returns the \n"
       "extended edge. The edge is not modified. Extending means\n"
@@ -250,9 +263,8 @@ struct edge_defs
       "\n"
       "@return The extended edge (self).\n"
     ) +
-    method ("shifted", &C::shifted,
+    method ("shifted", &C::shifted, gsi::arg ("d"),
       "@brief Returns the shifted edge (does not modify self)\n"
-      "@args d\n"
       "\n"
       "Shifts the edge by the given distance and returns the \n"
       "shifted edge. The edge is not modified. Shifting by a positive value "
@@ -267,9 +279,8 @@ struct edge_defs
       "\n"
       "@return The shifted edge.\n"
     ) +
-    method ("shift", &C::shift,
+    method ("shift", &C::shift, gsi::arg ("d"),
       "@brief Shifts the edge (modifies self)\n"
-      "@args d\n"
       "\n"
       "Shifts the edge by the given distance and returns the \n"
       "shifted edge. The edge is not modified. Shifting by a positive value "
@@ -284,9 +295,8 @@ struct edge_defs
       "\n"
       "@return The shifted edge (self).\n"
     ) +
-    method ("transformed", &C::template transformed<simple_trans_type>,
+    method ("transformed", &C::template transformed<simple_trans_type>, gsi::arg ("t"),
       "@brief Transform the edge.\n"
-      "@args t\n"
       "\n"
       "Transforms the edge with the given transformation.\n"
       "Does not modify the edge but returns the transformed edge.\n"
@@ -295,9 +305,8 @@ struct edge_defs
       "\n"
       "@return The transformed edge.\n"
     ) +
-    method ("transformed|#transformed_cplx", &C::template transformed<complex_trans_type>,
+    method ("transformed|#transformed_cplx", &C::template transformed<complex_trans_type>, gsi::arg ("t"),
       "@brief Transform the edge.\n"
-      "@args t\n"
       "\n"
       "Transforms the edge with the given complex transformation.\n"
       "Does not modify the edge but returns the transformed edge.\n"
@@ -306,9 +315,8 @@ struct edge_defs
       "\n"
       "@return The transformed edge.\n"
     ) +
-    method ("move", &C::move,
+    method ("move", &C::move, gsi::arg ("p"),
       "@brief Moves the edge.\n"
-      "@args p\n"
       "\n"
       "Moves the edge by the given offset and returns the \n"
       "moved edge. The edge is overwritten.\n"
@@ -317,9 +325,8 @@ struct edge_defs
       "\n"
       "@return The moved edge.\n"
     ) +
-    method_ext ("move", &move_xy,
+    method_ext ("move", &move_xy, gsi::arg ("dx"), gsi::arg ("dy"),
       "@brief Moves the edge.\n"
-      "@args dx, dy\n"
       "\n"
       "Moves the edge by the given offset and returns the \n"
       "moved edge. The edge is overwritten.\n"
@@ -331,9 +338,8 @@ struct edge_defs
       "\n"
       "This version has been added in version 0.23.\n"
     ) +
-    method ("enlarge", &C::enlarge,
+    method ("enlarge", &C::enlarge, gsi::arg ("p"),
       "@brief Enlarges the edge.\n"
-      "@args p\n"
       "\n"
       "Enlarges the edge by the given distance and returns the \n"
       "enlarged edge. The edge is overwritten.\n"
@@ -347,17 +353,15 @@ struct edge_defs
     method ("p1", &C::p1,
       "@brief The first point.\n"
     ) +
-    method_ext ("p1=", &set_p1,
+    method_ext ("p1=", &set_p1, gsi::arg ("point"),
       "@brief Sets the first point.\n"
-      "@args point\n"
       "This method has been added in version 0.23."
     ) +
     method ("p2", &C::p2,
       "@brief The second point.\n"
     ) +
-    method_ext ("p2=", &set_p2,
+    method_ext ("p2=", &set_p2, gsi::arg ("point"),
       "@brief Sets the second point.\n"
-      "@args point\n"
       "This method has been added in version 0.23."
     ) +
     method ("dx", &C::dx,
@@ -369,33 +373,29 @@ struct edge_defs
     method ("x1", &C::x1,
       "@brief Shortcut for p1.x\n"
     ) +
-    method_ext ("x1=", &set_x1,
+    method_ext ("x1=", &set_x1, gsi::arg ("coord"),
       "@brief Sets p1.x\n"
-      "@args coord\n"
       "This method has been added in version 0.23."
     ) +
     method ("y1", &C::y1,
       "@brief Shortcut for p1.y\n"
     ) +
-    method_ext ("y1=", &set_y1,
+    method_ext ("y1=", &set_y1, gsi::arg ("coord"),
       "@brief Sets p1.y\n"
-      "@args coord\n"
       "This method has been added in version 0.23."
     ) +
     method ("x2", &C::x2,
       "@brief Shortcut for p2.x\n"
     ) +
-    method_ext ("x2=", &set_x2,
+    method_ext ("x2=", &set_x2, gsi::arg ("coord"),
       "@brief Sets p2.x\n"
-      "@args coord\n"
       "This method has been added in version 0.23."
     ) +
     method ("y2", &C::y2,
       "@brief Shortcut for p2.y\n"
     ) +
-    method_ext ("y2=", &set_y2,
+    method_ext ("y2=", &set_y2, gsi::arg ("coord"),
       "@brief Sets p2.y\n"
-      "@args coord\n"
       "This method has been added in version 0.23."
     ) +
     method ("dx_abs", &C::dx_abs,
@@ -423,9 +423,8 @@ struct edge_defs
       "\n"
       "@return The orthogonal length (abs(dx)+abs(dy))\n"
     ) +
-    constructor ("from_s", &from_string,
+    constructor ("from_s", &from_string, gsi::arg ("s"),
       "@brief Creates an object from a string\n"
-      "@args s\n"
       "Creates the object from a string representation (as returned by \\to_s)\n"
       "\n"
       "This method has been added in version 0.23.\n"
@@ -433,18 +432,15 @@ struct edge_defs
     method ("to_s", (std::string (C::*) () const) &C::to_string,
       "@brief Returns a string representing the edge\n"
     ) +
-    method ("is_parallel?", &C::parallel,
+    method ("is_parallel?", &C::parallel, gsi::arg ("e"),
       "@brief Test for being parallel\n"
-      "@args e\n"
       "\n"
       "@param e The edge to test against\n"
       "\n"
       "@return True if both edges are parallel\n"
     ) +
-    method ("*", &C::scaled,
+    method ("*", &C::scaled, gsi::arg ("scale_factor"),
       "@brief Scale edge\n"
-      "\n"
-      "@args scale_factor\n"
       "\n"
       "The * operator scales self with the given factor.\n"
       "\n"
@@ -454,9 +450,8 @@ struct edge_defs
       "\n"
       "@return The scaled edge\n"
     ) +
-    method ("contains?", &C::contains,
+    method ("contains?", &C::contains, gsi::arg ("p"),
       "@brief Test whether a point is on an edge.\n"
-      "@args p\n"
       "\n"
       "A point is on a edge if it is on (or at least closer \n"
       "than a grid point to) the edge.\n"
@@ -465,9 +460,8 @@ struct edge_defs
       "\n"
       "@return True if the point is on the edge.\n"
     ) +
-    method ("contains_excl?", &C::contains_excl,
+    method ("contains_excl?", &C::contains_excl, gsi::arg ("p"),
       "@brief Test whether a point is on an edge excluding the endpoints.\n"
-      "@args p\n"
       "\n"
       "A point is on a edge if it is on (or at least closer \n"
       "than a grid point to) the edge.\n"
@@ -476,9 +470,8 @@ struct edge_defs
       "\n"
       "@return True if the point is on the edge but not equal p1 or p2.\n"
     ) +
-    method ("coincident?", &C::coincident,
+    method ("coincident?", &C::coincident, gsi::arg ("e"),
       "@brief Coincidence check.\n"
-      "@args e\n"
       "\n"
       "Checks whether a edge is coincident with another edge. \n"
       "Coincidence is defined by being parallel and that \n"
@@ -488,9 +481,8 @@ struct edge_defs
       "\n"
       "@return True if the edges are coincident.\n"
     ) +
-    method ("intersect?", &C::intersect,
+    method ("intersect?", &C::intersect, gsi::arg ("e"),
       "@brief Intersection test. \n"
-      "@args e\n"
       "\n"
       "Returns true if the edges intersect. Two edges intersect if they share at least one point. \n"
       "If the edges coincide, they also intersect.\n"
@@ -499,9 +491,8 @@ struct edge_defs
       "\n"
       "@param e The edge to test.\n"
     ) +
-    method_ext ("intersection_point", &intersect_point,
+    method_ext ("intersection_point", &intersect_point, gsi::arg ("e"),
       "@brief Returns the intersection point of two edges. \n"
-      "@args e\n"
       "\n"
       "This method delivers the intersection point. If the edges do not intersect, the result is undefined.\n"
       "\n"
@@ -509,14 +500,39 @@ struct edge_defs
       "@return The point where the edges intersect.\n"
       "\n"
       "This method has been introduced in version 0.19.\n"
+      "From version 0.26.2, this method will return nil in case of non-intersection.\n"
     ) +
-    method ("distance", &C::distance,
+    method_ext ("clipped", &clipped, gsi::arg ("box"),
+      "@brief Returns the edge clipped at the given box\n"
+      "\n"
+      "@param box The clip box.\n"
+      "@return The clipped edge or nil if the edge does not intersect with the box.\n"
+      "\n"
+      "This method has been introduced in version 0.26.2.\n"
+    ) +
+    method_ext ("clipped_line", &clipped_line, gsi::arg ("box"),
+      "@brief Returns the line through the edge clipped at the given box\n"
+      "\n"
+      "@param box The clip box.\n"
+      "@return The part of the line through the box or nil if the line does not intersect with the box.\n"
+      "\n"
+      "In contrast to \\clipped, this method will consider the edge exended infinitely (a \"line\"). "
+      "The returned edge will be the part of this line going through the box.\n"
+      "\n"
+      "This method has been introduced in version 0.26.2.\n"
+    ) +
+    method ("d", &C::d,
+      "@brief Gets the edge extension as a vector.\n"
+      "This method is equivalent to p2 - p1."
+      "\n"
+      "This method has been introduced in version 0.26.2.\n"
+    ) +
+    method ("distance", &C::distance, gsi::arg ("p"),
       "@brief Distance between the edge and a point.\n"
-      "@args p\n"
       "\n"
       "Returns the distance between the edge and the point. The \n"
       "distance is signed which is negative if the point is to the\n"
-      "\"left\" of the edge and positive if the point is to the \"right\".\n"
+      "\"right\" of the edge and positive if the point is to the \"left\".\n"
       "The distance is measured by projecting the point onto the\n"
       "line through the edge. If the edge is degenerated, the distance\n"
       "is not defined.\n"
@@ -525,9 +541,8 @@ struct edge_defs
       "\n"
       "@return The distance\n"
     ) +
-    method ("side_of", &C::side_of,
+    method ("side_of", &C::side_of, gsi::arg ("p"),
       "@brief Indicates at which side the point is located relative to the edge.\n"
-      "@args p\n"
       "\n"
       "Returns 1 if the point is \"left\" of the edge, 0 if on\n"
       "and -1 if the point is \"right\" of the edge.\n"
@@ -536,9 +551,8 @@ struct edge_defs
       "\n"
       "@return The side value\n"
     ) +
-    method ("distance_abs", &C::distance_abs,
+    method ("distance_abs", &C::distance_abs, gsi::arg ("p"),
       "@brief Absolute distance between the edge and a point.\n"
-      "@args p\n"
       "\n"
       "Returns the distance between the edge and the point. \n"
       "\n"
@@ -561,9 +575,8 @@ struct edge_defs
       "\n"
       "This method has been introduced in version 0.23.\n"
     ) +
-    method ("crossed_by?", &C::crossed_by,
+    method ("crossed_by?", &C::crossed_by, gsi::arg ("e"),
       "@brief Check, if an edge is cut by a line (given by an edge)\n"
-      "@args e\n"
       "\n"
       "This method returns true if p1 is in one semispace \n"
       "while p2 is in the other or one of them is on the line\n"
@@ -571,9 +584,8 @@ struct edge_defs
       "\n"
       "@param e The edge representing the line that the edge must be crossing.\n"
     ) +
-    method_ext ("crossing_point", &crossing_point,
+    method_ext ("crossing_point", &crossing_point, gsi::arg ("e"),
       "@brief Returns the crossing point on two edges. \n"
-      "@args e\n"
       "\n"
       "This method delivers the point where the given edge (self) crosses the line given "
       "by the edge in argument \"e\". If self does not cross this line, the result is undefined. "
@@ -611,9 +623,8 @@ Class<db::Edge> decl_Edge ("db", "Edge",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method ("transformed", &db::Edge::transformed<db::ICplxTrans>,
+  method ("transformed", &db::Edge::transformed<db::ICplxTrans>, gsi::arg ("t"),
     "@brief Transform the edge.\n"
-    "@args t\n"
     "\n"
     "Transforms the edge with the given complex transformation.\n"
     "Does not modify the edge but returns the transformed edge.\n"
@@ -661,10 +672,8 @@ Class<db::DEdge> decl_DEdge ("db", "DEdge",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method ("transformed", &db::DEdge::transformed<db::VCplxTrans>,
+  method ("transformed", &db::DEdge::transformed<db::VCplxTrans>, gsi::arg ("t"),
     "@brief Transforms the edge with the given complex transformation\n"
-    "\n"
-    "@args t\n"
     "\n"
     "@param t The magnifying transformation to apply\n"
     "@return The transformed edge (in this case an integer coordinate edge)\n"

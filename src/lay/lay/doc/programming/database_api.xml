@@ -321,7 +321,7 @@ lv.remove_unused_layers</pre>
   is a special layer.
   </p>
 
-  <p>In addition, a layout contains a special layer which is used to implement the "guiding shape" feature of PCell's.
+  <p>In addition, a layout contains a special layer which is used to implement the "guiding shape" feature of PCells.
   It is a special layer that serves as a container for shapes which parametrize PCells. The index of that layer can be
   obtained with <class_doc href="Layout#guiding_shape_layer"/>.</p>
 
@@ -523,7 +523,7 @@ shape.set_property(1, "NewValue")</pre>
   API. It represents a cell, which itself is a collection of shapes per layer
   and instances of other cells. The methods provided by the Cell class deal with either the shape or
   the instance aspect. A cell is also responsible for handling parts of the PCell scheme, either for
-  the cell itself (if it is an incarnation of a PCell) or instances of PCell's. 
+  the cell itself (if it is an incarnation of a PCell) or instances of PCells.
   </p>
 
   <p>

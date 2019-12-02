@@ -472,7 +472,7 @@ void Netlist::remove_device_abstract (DeviceAbstract *device_abstract)
 
 void Netlist::purge_nets ()
 {
-  for (circuit_iterator c = begin_circuits (); c != end_circuits (); ++c) {
+  for (bottom_up_circuit_iterator c = begin_bottom_up (); c != end_bottom_up (); ++c) {
     c->purge_nets ();
   }
 }

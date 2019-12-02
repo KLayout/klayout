@@ -30,22 +30,14 @@
 #include "lymMacro.h"
 #include "tlFileUtils.h"
 
-void run_test (tl::TestBase *_this, const std::string &lvs_rs, const std::string &suffix, const std::string &layout)
+void run_test (tl::TestBase *_this, const std::string &lvs_rs, const std::string &au_netlist, const std::string &layout, bool priv = false)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/lvs/" + lvs_rs;
+  std::string testsrc = priv ? tl::testsrc_private () : tl::testsrc ();
+  testsrc = tl::combine_path (tl::combine_path (testsrc, "testdata"), "lvs");
 
-  std::string src = tl::testsrc ();
-  src += "/testdata/lvs/" + layout;
-
-  std::string au_lvsdb = tl::testsrc ();
-  au_lvsdb += "/testdata/lvs/" + suffix + ".lvsdb.gz";
-
-  std::string au_cir = tl::testsrc ();
-  au_cir += "/testdata/lvs/" + suffix + ".cir.gz";
-
-  std::string au_l2n = tl::testsrc ();
-  au_l2n += "/testdata/lvs/" + suffix + ".l2n.gz";
+  std::string rs = tl::combine_path (testsrc, lvs_rs);
+  std::string ly = tl::combine_path (testsrc, layout);
+  std::string au_cir = tl::combine_path (testsrc, au_netlist);
 
   std::string output_lvsdb = _this->tmp_file ("tmp.lvsdb");
   std::string output_cir = _this->tmp_file ("tmp.cir");
@@ -59,7 +51,7 @@ void run_test (tl::TestBase *_this, const std::string &lvs_rs, const std::string
         "$lvs_test_target_lvsdb = '%s'\n"
         "$lvs_test_target_cir = '%s'\n"
         "$lvs_test_target_l2n = '%s'\n"
-      , src, output_lvsdb, output_cir, output_l2n)
+      , ly, output_lvsdb, output_cir, output_l2n)
     );
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
@@ -101,11 +93,53 @@ void run_test (tl::TestBase *_this, const std::string &lvs_rs, const std::string
 TEST(1_full)
 {
   test_is_long_runner ();
-  run_test (_this, "vexriscv.lvs", "vexriscv", "vexriscv.oas.gz");
+  run_test (_this, "vexriscv.lvs", "vexriscv.cir.gz", "vexriscv.oas.gz");
 }
 
 TEST(2_fullWithAlign)
 {
   test_is_long_runner ();
-  run_test (_this, "vexriscv_align.lvs", "vexriscv", "vexriscv.oas.gz");
+  run_test (_this, "vexriscv_align.lvs", "vexriscv.cir.gz", "vexriscv.oas.gz");
+}
+
+TEST(10_private)
+{
+  // test_is_long_runner ();
+  run_test (_this, "test_10.lvs", "test_10.cir.gz", "test_10.gds.gz", true);
+}
+
+TEST(11_private)
+{
+  // test_is_long_runner ();
+  run_test (_this, "test_11.lvs", "test_11.cir.gz", "test_11.gds.gz", true);
+}
+
+TEST(12_private)
+{
+  // test_is_long_runner ();
+  run_test (_this, "test_12.lvs", "test_12.cir.gz", "test_12.gds.gz", true);
+}
+
+TEST(13_private)
+{
+  // test_is_long_runner ();
+  run_test (_this, "test_13.lvs", "test_13.cir.gz", "test_13.gds.gz", true);
+}
+
+TEST(14_private)
+{
+  test_is_long_runner ();
+  run_test (_this, "test_14.lvs", "test_14.cir.gz", "test_14.gds.gz", true);
+}
+
+TEST(15_private)
+{
+  // test_is_long_runner ();
+  run_test (_this, "test_15.lvs", "test_15.cir.gz", "test_15.gds.gz", true);
+}
+
+TEST(16_private)
+{
+  // test_is_long_runner ();
+  run_test (_this, "test_16.lvs", "test_16.cir.gz", "test_16.gds.gz", true);
 }

@@ -2951,14 +2951,34 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
   //  Report missing net assignment
 
   for (db::NetGraph::node_iterator i = g1.begin (); i != g1.end (); ++i) {
-    if (! i->has_other () && mp_logger) {
-      mp_logger->net_mismatch (i->net (), 0);
+    if (! i->has_other ()) {
+      if (mp_logger) {
+        if (good) {
+          mp_logger->match_nets (i->net (), 0);
+        } else {
+          mp_logger->net_mismatch (i->net (), 0);
+        }
+      }
+      if (good) {
+        //  in the "good" case, match the nets against 0
+        g1.identify (g1.node_index_for_net (i->net ()), 0);
+      }
     }
   }
 
   for (db::NetGraph::node_iterator i = g2.begin (); i != g2.end (); ++i) {
-    if (! i->has_other () && mp_logger) {
-      mp_logger->net_mismatch (0, i->net ());
+    if (! i->has_other ()) {
+      if (mp_logger) {
+        if (good) {
+          mp_logger->match_nets (0, i->net ());
+        } else {
+          mp_logger->net_mismatch (0, i->net ());
+        }
+      }
+      if (good) {
+        //  in the "good" case, match the nets against 0
+        g2.identify (g2.node_index_for_net (i->net ()), 0);
+      }
     }
   }
 
@@ -2969,22 +2989,34 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
   return good;
 }
 
-void
-NetlistComparer::handle_pin_mismatch (const db::Circuit *c1, const db::Pin *pin1, const db::Circuit *c2, const db::Pin *pin2, bool &good, bool &pin_mismatch) const
+bool
+NetlistComparer::handle_pin_mismatch (const db::NetGraph &g1, const db::Circuit *c1, const db::Pin *pin1, const db::NetGraph &g2, const db::Circuit *c2, const db::Pin *pin2) const
 {
   const db::Circuit *c = pin1 ? c1 : c2;
   const db::Pin *pin = pin1 ? pin1 : pin2;
+  const db::NetGraph *graph = pin1 ? &g1 : &g2;
+  const db::Net *net = c->net_for_pin (pin->id ());
 
-  //  If the pin isn't connected internally inside the circuit we can ignore it
-  if (c->net_for_pin (pin->id ()) && c->net_for_pin (pin->id ())->is_passive ()) {
-    if (mp_logger) {
-      mp_logger->match_pins (pin1, pin2);
+  //  Nets which are paired with "null" are "safely to be ignored" and
+  //  pin matching against "null" is valid.
+  if (net) {
+    const db::NetGraphNode &n = graph->node (graph->node_index_for_net (net));
+    if (n.has_other () && n.other_net_index () == 0) {
+      if (mp_logger) {
+        mp_logger->match_pins (pin1, pin2);
+      }
+      return true;
     }
-    return;
   }
 
   //  Determine whether the pin in question is used - only in this case we will report an error.
   //  Otherwise, the report will be "match" against 0.
+  //  "used" follows a heuristic criterion derived from the subcircuits which make use of this circuit:
+  //  if one of these connects the pin to a net with either connections upwards, other subcircuits or
+  //  devices, the pin is regarded "used".
+  //  TODO: it would be better probably to have a global concept of "used pins" which considers all
+  //  devices and propagates their presence as "used" property upwards, then downwards to the subcircuit
+  //  pins.
 
   bool is_not_connected = true;
   for (db::Circuit::const_refs_iterator r = c->begin_refs (); r != c->end_refs () && is_not_connected; ++r) {
@@ -2999,12 +3031,12 @@ NetlistComparer::handle_pin_mismatch (const db::Circuit *c1, const db::Pin *pin1
     if (mp_logger) {
       mp_logger->match_pins (pin1, pin2);
     }
+    return true;
   } else {
     if (mp_logger) {
       mp_logger->pin_mismatch (pin1, pin2);
     }
-    good = false;
-    pin_mismatch = true;
+    return false;
   }
 }
 
@@ -3042,18 +3074,21 @@ NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g
     }
   }
 
-  std::vector<const db::Pin *> abstract_pins;
-  std::multimap<size_t, const db::Pin *> net2pin;
+  std::vector<const db::Pin *> abstract_pins2;
+  std::multimap<size_t, const db::Pin *> net2pin2;
   for (db::Circuit::const_pin_iterator p = c2->begin_pins (); p != c2->end_pins (); ++p) {
     const db::Net *net = c2->net_for_pin (p->id ());
     if (net) {
-      net2pin.insert (std::make_pair (g2.node_index_for_net (net), p.operator-> ()));
+      net2pin2.insert (std::make_pair (g2.node_index_for_net (net), p.operator-> ()));
     } else if (abstract_pin_name_mapping.find (p.operator-> ()) == abstract_pin_name_mapping.end ()) {
-      abstract_pins.push_back (p.operator-> ());
+      abstract_pins2.push_back (p.operator-> ());
     }
   }
 
-  std::vector<const db::Pin *>::iterator next_abstract = abstract_pins.begin ();
+  //  collect missing assignment for circuit 1
+  std::multimap<size_t, const db::Pin *> net2pin1;
+
+  std::vector<const db::Pin *>::iterator next_abstract = abstract_pins2.begin ();
 
   CircuitMapper &c12_pin_mapping = c12_circuit_and_pin_mapping [c1];
   c12_pin_mapping.set_other (c2);
@@ -3078,7 +3113,7 @@ NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g
         c12_pin_mapping.map_pin (p->id (), fp->second->id ());
         c22_pin_mapping.map_pin (fp->second->id (), p->id ());
 
-      } else if (next_abstract != abstract_pins.end ()) {
+      } else if (next_abstract != abstract_pins2.end ()) {
 
         //  assign an abstract pin - this is a dummy assignment which is mitigated
         //  by declaring the pins equivalent in derive_pin_equivalence
@@ -3093,7 +3128,10 @@ NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g
       } else {
 
         //  otherwise this is an error for subcircuits or worth a report for top-level circuits
-        handle_pin_mismatch (c1, p.operator-> (), c2, 0, good, pin_mismatch);
+        if (! handle_pin_mismatch (g1, c1, p.operator-> (), g2, c2, 0)) {
+          good = false;
+          pin_mismatch = true;
+        }
 
       }
 
@@ -3104,14 +3142,15 @@ NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g
     const db::NetGraphNode &n = *(g1.begin () + g1.node_index_for_net (net));
 
     if (! n.has_other ()) {
-      handle_pin_mismatch (c1, p.operator-> (), c2, 0, good, pin_mismatch);
+      //  remember and handle later when we know which pins are not mapped
+      net2pin1.insert (std::make_pair (g1.node_index_for_net (net), p.operator-> ()));
       continue;
     }
 
-    std::multimap<size_t, const db::Pin *>::iterator np = net2pin.find (n.other_net_index ());
+    std::multimap<size_t, const db::Pin *>::iterator np = net2pin2.find (n.other_net_index ());
     for (db::Net::const_pin_iterator pi = net->begin_pins (); pi != net->end_pins (); ++pi) {
 
-      if (np != net2pin.end () && np->first == n.other_net_index ()) {
+      if (np != net2pin2.end () && np->first == n.other_net_index ()) {
 
         if (mp_logger) {
           mp_logger->match_pins (pi->pin (), np->second);
@@ -3122,11 +3161,12 @@ NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g
 
         std::multimap<size_t, const db::Pin *>::iterator np_delete = np;
         ++np;
-        net2pin.erase (np_delete);
+        net2pin2.erase (np_delete);
 
       } else {
 
-        handle_pin_mismatch (c1, pi->pin (), c2, 0, good, pin_mismatch);
+        //  remember and handle later when we know which pins are not mapped
+        net2pin1.insert (std::make_pair (g1.node_index_for_net (net), p.operator-> ()));
 
       }
 
@@ -3134,16 +3174,28 @@ NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g
 
   }
 
-  for (std::multimap<size_t, const db::Pin *>::iterator np = net2pin.begin (); np != net2pin.end (); ++np) {
-    handle_pin_mismatch (c1, 0, c2, np->second, good, pin_mismatch);
+  for (std::multimap<size_t, const db::Pin *>::iterator np = net2pin1.begin (); np != net2pin1.end (); ++np) {
+    if (! handle_pin_mismatch (g1, c1, np->second, g2, c2, 0)) {
+      good = false;
+      pin_mismatch = true;
+    }
+  }
+
+  for (std::multimap<size_t, const db::Pin *>::iterator np = net2pin2.begin (); np != net2pin2.end (); ++np) {
+    if (! handle_pin_mismatch (g1, c1, 0, g2, c2, np->second)) {
+      good = false;
+      pin_mismatch = true;
+    }
   }
 
   //  abstract pins must match.
-  while (next_abstract != abstract_pins.end ()) {
-    handle_pin_mismatch (c1, 0, c2, *next_abstract, good, pin_mismatch);
+  while (next_abstract != abstract_pins2.end ()) {
+    if (! handle_pin_mismatch (g1, c1, 0, g2, c2, *next_abstract)) {
+      good = false;
+      pin_mismatch = true;
+    }
     ++next_abstract;
   }
-
 }
 
 void
@@ -3384,7 +3436,7 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
 
     bool mapped = true;
     for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
-      if (! g1.begin () [i->second].has_other ()) {
+      if (! g2.begin () [i->second].has_other ()) {
         mapped = false;
       } else {
         i->second = g2.begin () [i->second].other_net_index ();

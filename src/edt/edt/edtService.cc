@@ -357,6 +357,9 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
 {
   if (view ()->is_editable () && mode == lay::Editable::Selected) {
 
+    //  flush any pending updates of the markers
+    dm_selection_to_view.execute ();
+
     m_move_start = p;
     m_move_trans = db::DTrans ();
     m_move_sel = true; // TODO: there is no "false". Remove this.
@@ -1185,6 +1188,15 @@ bool
 Service::selection_applies (const lay::ObjectInstPath & /*sel*/) const
 {
   return false;
+}
+
+void
+Service::transient_to_selection ()
+{
+  if (! m_transient_selection.empty ()) {
+    m_selection.insert (m_transient_selection.begin (), m_transient_selection.end ());
+    selection_to_view ();
+  }
 }
 
 void

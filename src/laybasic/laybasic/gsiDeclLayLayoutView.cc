@@ -821,6 +821,29 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "selection. Calling this method is useful to ensure there are no potential interactions with the script's "
     "functionality.\n"
   ) +
+  gsi::method ("clear_selection", &lay::LayoutView::clear_selection,
+    "@brief Clears the selection of all objects (shapes, annotations, images ...)\n"
+    "\n"
+    "This method has been introduced in version 0.26.2\n"
+  ) +
+  gsi::method ("clear_transient_selection", &lay::LayoutView::clear_transient_selection,
+    "@brief Clears the transient selection (mouse-over hightlights) of all objects (shapes, annotations, images ...)\n"
+    "\n"
+    "This method has been introduced in version 0.26.2\n"
+  ) +
+  gsi::method ("transient_to_selection", &lay::LayoutView::transient_to_selection,
+    "@brief Turns the transient selection into the actual selection\n"
+    "\n"
+    "The current selection is cleared before. All highlighted objects under the mouse will become selected. "
+    "This applies to all types of objects (rulers, shapes, images ...).\n"
+    "\n"
+    "This method has been introduced in version 0.26.2\n"
+  ) +
+  gsi::method ("selection_bbox", &lay::LayoutView::selection_bbox,
+    "@brief Returns the bounding box of the current selection\n"
+    "\n"
+    "This method has been introduced in version 0.26.2\n"
+  ) +
   gsi::method ("stop", &lay::LayoutView::stop,
     "@brief Stops redraw thread and close any browsers\n"
     "This method usually does not need to be called explicitly. The redraw thread is stopped automatically."
@@ -1077,7 +1100,6 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
   ) +
   gsi::method_ext ("delete_layers", &delete_layers1, gsi::arg ("iterators"),
     "@brief Deletes the layer properties nodes specified by the iterator\n"
-    "@args iterators\n"
     "\n"
     "This method deletes the nodes specifies by the iterators. This method is the most convenient way to "
     "delete multiple entries.\n"
@@ -1837,9 +1859,8 @@ static void cv_show_all_cells (lay::CellViewRef *cv)
 }
 
 Class<lay::CellViewRef> decl_CellView ("lay", "CellView",
-  method ("==", static_cast<bool (lay::CellViewRef::*) (const lay::CellViewRef &) const> (&lay::CellViewRef::operator==),
+  method ("==", static_cast<bool (lay::CellViewRef::*) (const lay::CellViewRef &) const> (&lay::CellViewRef::operator==), gsi::arg ("other"),
     "@brief Equality: indicates whether the cellviews refer to the same one\n"
-    "@args other\n"
     "In version 0.25, the definition of the equality operator has been changed to reflect identity of the "
     "cellview. Before that version, identity of the cell shown was implied."
   ) +
@@ -1868,32 +1889,28 @@ Class<lay::CellViewRef> decl_CellView ("lay", "CellView",
     "@brief Returns true, if the cellview is valid\n"
     "A cellview may become invalid if the corresponding tab is closed for example."
   ) +
-  method ("path=|set_path", &lay::CellViewRef::set_unspecific_path,
+  method ("path=|set_path", &lay::CellViewRef::set_unspecific_path, gsi::arg ("path"),
     "@brief Sets the unspecific part of the path explicitly\n"
-    "@args path\n"
     "\n"
     "Setting the unspecific part of the path will clear the context path component and\n"
     "update the context and target cell.\n"
   ) +
-  method ("context_path=|set_context_path", &lay::CellViewRef::set_specific_path,
+  method ("context_path=|set_context_path", &lay::CellViewRef::set_specific_path, gsi::arg ("path"),
     "@brief Sets the context path explicitly\n"
-    "@args path\n"
     "\n"
     "This method assumes that the unspecific part of the path \n"
     "is established already and that the context path starts\n"
     "from the context cell.\n"
   ) +
-  method ("cell_index=|set_cell", (void (lay::CellViewRef::*) (lay::CellViewRef::cell_index_type)) &lay::CellViewRef::set_cell,
+  method ("cell_index=|set_cell", (void (lay::CellViewRef::*) (lay::CellViewRef::cell_index_type)) &lay::CellViewRef::set_cell, gsi::arg ("cell_index"),
     "@brief Sets the path to the given cell\n"
-    "@args cell_index\n"
     "\n"
     "This method will construct any path to this cell, not a \n"
     "particular one. It will clear the context path\n"
     "and update the context and target cell. Note that the cell is specified by it's index.\n"
   ) +
-  method ("cell_name=|set_cell_name", (void (lay::CellViewRef::*) (const std::string &)) &lay::CellViewRef::set_cell,
+  method ("cell_name=|set_cell_name", (void (lay::CellViewRef::*) (const std::string &)) &lay::CellViewRef::set_cell, gsi::arg ("cell_name"),
     "@brief Sets the cell by name\n"
-    "@args cell_name\n"
     "\n"
     "If the name is not a valid one, the cellview will become\n"
     "invalid.\n"
@@ -1901,9 +1918,8 @@ Class<lay::CellViewRef> decl_CellView ("lay", "CellView",
     "particular one. It will clear the context path\n"
     "and update the context and target cell.\n"
   ) +
-  method_ext ("cell=", set_cell,
+  method_ext ("cell=", set_cell, gsi::arg ("cell"),
     "@brief Sets the cell by reference to a Cell object\n"
-    "@args cell\n"
     "Setting the cell reference to nil invalidates the cellview. "
     "This method will construct any path to this cell, not a \n"
     "particular one. It will clear the context path\n"
@@ -1961,9 +1977,8 @@ Class<lay::CellViewRef> decl_CellView ("lay", "CellView",
     "@brief Returns the technology name for the layout behind the given cell view\n"
     "This method has been added in version 0.23.\n"
   ) + 
-  method_ext ("technology=", &apply_technology,
+  method_ext ("technology=", &apply_technology, gsi::arg ("tech_name"),
     "@brief Sets the technology for the layout behind the given cell view\n"
-    "@args tech_name\n"
     "According to the specification of the technology, new layer properties may be loaded "
     "or the net tracer may be reconfigured. If the layout is shown in multiple views, the "
     "technology is updated for all views.\n"
@@ -1972,9 +1987,8 @@ Class<lay::CellViewRef> decl_CellView ("lay", "CellView",
   method_ext ("layout", &get_layout,
     "@brief Gets the reference to the layout object addressed by this view\n"
   ) +
-  method_ext ("descend", &cv_descend,
+  method_ext ("descend", &cv_descend, gsi::arg ("path"),
     "@brief Descends further into the hierarchy.\n"
-    "@args path\n"
     "Adds the given path (given as an array of InstElement objects) to the specific path of the "
     "cellview with the given index. In effect, the cell addressed by the terminal of the new path "
     "components can be shown in the context of the upper cells, if the minimum hierarchy level is "

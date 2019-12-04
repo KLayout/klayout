@@ -183,6 +183,14 @@ public:
   }
 
   /**
+   *  @brief Turns the transient selection to the selection
+   */
+  virtual void transient_to_selection ()
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
    *  @brief Clear the transient selection
    *
    *  This method is supposed to reset any transient selection
@@ -418,7 +426,7 @@ public:
    *  or must be given in micron units.
    */
   db::DBox selection_bbox ();
-  
+
   /**
    *  @brief transform the selection
    *
@@ -456,6 +464,11 @@ public:
    *  @brief Clear the transient selection
    */
   void clear_transient_selection ();
+
+  /**
+   *  @brief Turns the transient selection to the selection
+   */
+  void transient_to_selection ();
 
   /**
    *  @brief Clear the previous selection

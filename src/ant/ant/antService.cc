@@ -901,11 +901,6 @@ Service::drag_cancel ()
     delete mp_active_ruler;
     mp_active_ruler = 0;
   }
-
-  if (mp_transient_ruler) {
-    delete mp_transient_ruler;
-    mp_transient_ruler = 0;
-  }
 }
 
 int
@@ -1029,6 +1024,8 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
 {
   //  cancel any pending move or drag operations, reset mp_active_ruler
   widget ()->drag_cancel (); // KLUDGE: every service does this to the same service manager
+
+  clear_transient_selection ();
 
   //  choose move mode
   if (mode == lay::Editable::Selected) {
@@ -1486,6 +1483,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
       //  stop dragging
       drag_cancel ();
+      clear_transient_selection ();
 
       //  end the transaction
       manager ()->commit ();
@@ -1535,6 +1533,7 @@ void
 Service::deactivated ()
 {
   drag_cancel ();
+  clear_transient_selection ();
 }
 
 std::pair<bool, db::DPoint> 
@@ -1576,6 +1575,8 @@ struct RulerIdComp
 void
 Service::reduce_rulers (int num)
 {
+  clear_transient_selection ();
+
   lay::AnnotationShapes::iterator rfrom = mp_view->annotation_shapes ().begin (); 
   lay::AnnotationShapes::iterator rto = mp_view->annotation_shapes ().end ();
 
@@ -1918,6 +1919,21 @@ Service::clear_transient_selection ()
   if (mp_transient_ruler) {
     delete mp_transient_ruler;
     mp_transient_ruler = 0;
+  }
+}
+
+void
+Service::transient_to_selection ()
+{
+  if (mp_transient_ruler) {
+    for (lay::AnnotationShapes::iterator r = mp_view->annotation_shapes ().begin (); r != mp_view->annotation_shapes ().end (); ++r) {
+      const ant::Object *robj = dynamic_cast <const ant::Object *> (r->ptr ());
+      if (robj == mp_transient_ruler->ruler ()) {
+        m_selected.insert (std::make_pair (r, 0));
+        selection_to_view ();
+        return;
+      }
+    }
   }
 }
 

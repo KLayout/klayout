@@ -579,6 +579,9 @@ private:
   bool m_show_shapes_of_instances;
   unsigned int m_max_shapes_of_instances;
 
+  //  Hierarchical copy mode (-1: ask, 0: shallow, 1: deep)
+  int m_hier_copy_mode;
+
   //  Sequence number of selection
   bool m_indicate_secondary_selection;
   unsigned long m_seq;

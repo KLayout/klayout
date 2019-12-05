@@ -64,7 +64,7 @@ public:
   CopyModeDialog (QWidget *parent);
   virtual ~CopyModeDialog ();
 
-  bool exec_dialog (unsigned int &mode);
+  bool exec_dialog (unsigned int &mode, bool &dont_ask);
 };
 
 /**

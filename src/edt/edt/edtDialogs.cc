@@ -196,7 +196,7 @@ CopyModeDialog::~CopyModeDialog ()
 }
 
 bool 
-CopyModeDialog::exec_dialog (unsigned int &mode)
+CopyModeDialog::exec_dialog (unsigned int &mode, bool &dont_ask)
 {
   if (mode == 0) {
     shallow_rb->setChecked (true);
@@ -207,6 +207,7 @@ CopyModeDialog::exec_dialog (unsigned int &mode)
     } else {
       mode = 1;
     }
+    dont_ask = dont_ask_cbx->isChecked ();
     return true;
   } else {
     return false;

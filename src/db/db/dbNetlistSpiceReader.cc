@@ -254,6 +254,7 @@ void NetlistSpiceReader::read (tl::InputStream &stream, db::Netlist &netlist)
   mp_circuit = 0;
   mp_nets_by_name.reset (0);
   m_global_nets.clear ();
+  m_circuits_read.clear ();
 
   try {
 
@@ -891,10 +892,15 @@ void NetlistSpiceReader::read_circuit (tl::Extractor &ex, const std::string &nc)
   } else {
 
     if (cc->pin_count () != nn.size () + m_global_nets.size ()) {
-      error (tl::sprintf (tl::to_string (tr ("Pin count mismatch between implicit (through call) and explicit circuit definition: %d expected, got %d")), int (cc->pin_count ()), int (nn.size ())));
+      error (tl::sprintf (tl::to_string (tr ("Pin count mismatch between implicit (through call) and explicit circuit definition: %d expected, got %d in circuit %s")), int (cc->pin_count ()), int (nn.size ()), nc));
     }
 
   }
+
+  if (m_circuits_read.find (cc) != m_circuits_read.end ()) {
+    error (tl::sprintf (tl::to_string (tr ("Redefinition of circuit %s")), nc));
+  }
+  m_circuits_read.insert (cc);
 
   std::auto_ptr<std::map<std::string, db::Net *> > n2n (mp_nets_by_name.release ());
   mp_nets_by_name.reset (0);

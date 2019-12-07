@@ -240,7 +240,8 @@ void Macro::load_from (const std::string &fn)
     } else if (m_format == PlainTextFormat || m_format == PlainTextWithHashAnnotationsFormat) {
 
       tl::InputStream stream (path);
-      m_text = stream.read_all ();
+      tl::TextInputStream text_stream (stream);
+      m_text = text_stream.read_all ();
       sync_properties_with_text ();
 
     }

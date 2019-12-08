@@ -49,7 +49,7 @@ public:
   ~MoveService ();
 
   virtual bool configure (const std::string &name, const std::string &value);
-  bool begin_move (db::Transaction *transaction = 0);
+  bool begin_move (db::Transaction *transaction = 0, bool selected_after_move = true);
 
 private:
   virtual bool mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio);
@@ -62,13 +62,15 @@ private:
   virtual void drag_cancel ();
   virtual void deactivated ();
 
-  bool handle_dragging (const db::DPoint &p, unsigned int buttons, db::Transaction *transaction);
+  bool handle_dragging (const db::DPoint &p, unsigned int buttons, bool drag_transient, db::Transaction *transaction);
 
   bool m_dragging;
+  bool m_dragging_transient;
   lay::Editables *mp_editables;
   lay::LayoutView *mp_view;
   double m_global_grid;
   db::DPoint m_shift;
+  db::DPoint m_mouse_pos;
   std::auto_ptr<db::Transaction> mp_transaction;
 };
 

@@ -530,6 +530,40 @@ class Ant_TestClass < TestBase
 
   end
 
+  # each_annotation_selected
+  def test_4
+
+    if !RBA.constants.member?(:Application)
+      return
+    end
+
+    mw = RBA::Application::instance.main_window
+    mw.close_all
+    mw.create_layout( 0 )
+    lv = mw.current_view
+
+    a = annot_obj( RBA::DPoint::new( 1.0, 2.0 ), RBA::DPoint::new( 3.0, 4.0 ), "a", "b", "c", 1, 2, false, 3 )
+    assert_equal( a.is_valid?, false )
+    lv.insert_annotation( a )
+
+    mw.cm_select_all
+
+    arr = []
+    lv.each_annotation_selected { |a| arr.push(a) }
+    assert_equal(arr.size, 1)
+    assert_equal(arr[0].to_s, "p1=1,2, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal")
+
+    arr[0].p1 = RBA::DPoint::new(11, 12)
+
+    arr = []
+    lv.each_annotation_selected { |a| arr.push(a) }
+    assert_equal(arr.size, 1)
+    assert_equal(arr[0].to_s, "p1=11,12, p2=3,4, fmt=a, fmt_x=b, fmt_y=c, style=arrow_end, outline=diag_xy, snap=false, ac=horizontal")
+
+    mw.close_all
+
+  end
+
 end
 
 load("test_epilogue.rb")

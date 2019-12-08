@@ -384,3 +384,21 @@ TEST(10_SubcircuitsNoPins)
   );
 }
 
+TEST(11_ErrorOnCircuitRedefinition)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader11.cir");
+
+  std::string msg;
+  try {
+    db::NetlistSpiceReader reader;
+    tl::InputStream is (path);
+    reader.read (is, nl);
+  } catch (tl::Exception &ex) {
+    msg = ex.msg ();
+  }
+
+  EXPECT_EQ (tl::replaced (msg, path, "?"), "Redefinition of circuit SUBCKT in ?, line 20");
+}
+

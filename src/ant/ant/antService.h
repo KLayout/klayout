@@ -285,6 +285,11 @@ public:
   virtual void clear_previous_selection ();
 
   /**
+   *  @brief Turns the transient selection to the selection
+   */
+  virtual void transient_to_selection ();
+
+  /**
    *  @brief Establish a transient selection
    */
   virtual bool transient_select (const db::DPoint &pos);
@@ -548,7 +553,7 @@ private:
   bool select (obj_iterator obj, lay::Editable::SelectionMode mode);
 
   /**
-   *  @brief Clear the selection
+   *  @brief Clears the selection
    */
   void clear_selection ();
 

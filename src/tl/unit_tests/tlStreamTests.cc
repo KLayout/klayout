@@ -107,3 +107,41 @@ TEST(TextOutputStream)
     throw;
   }
 }
+
+TEST(TextInputStream)
+{
+  std::string fn = tmp_file ("test.txt");
+
+  {
+    tl::OutputStream os (fn, tl::OutputStream::OM_Auto, false);
+    os << "Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.";
+  }
+
+  {
+    tl::InputStream is (fn);
+    tl::TextInputStream tis (is);
+    EXPECT_EQ (tis.get_line (), "Hello, world!");
+    EXPECT_EQ (tis.line_number (), 1);
+    EXPECT_EQ (tis.get_line (), "With another line");
+    EXPECT_EQ (tis.line_number (), 2);
+    EXPECT_EQ (tis.peek_char (), '\n');
+    EXPECT_EQ (tis.get_line (), "");
+    EXPECT_EQ (tis.line_number (), 3);
+    EXPECT_EQ (tis.peek_char (), 's');
+    EXPECT_EQ (tis.get_line (), "separated by a LFCR and CRLF.");
+    EXPECT_EQ (tis.line_number (), 4);
+    EXPECT_EQ (tis.at_end (), true);
+  }
+
+  {
+    tl::InputStream is (fn);
+    tl::TextInputStream tis (is);
+    EXPECT_EQ (tis.read_all (5), "Hello");
+  }
+
+  {
+    tl::InputStream is (fn);
+    tl::TextInputStream tis (is);
+    EXPECT_EQ (tis.read_all (), "Hello, world!\nWith another line\n\nseparated by a LFCR and CRLF.");
+  }
+}

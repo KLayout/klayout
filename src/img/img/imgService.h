@@ -305,6 +305,11 @@ public:
   virtual bool transient_select (const db::DPoint &pos);
 
   /**
+   *  @brief Turns the transient selection to the selection
+   */
+  virtual void transient_to_selection ();
+
+  /**
    *  @brief Clear the transient selection
    */
   virtual void clear_transient_selection ();

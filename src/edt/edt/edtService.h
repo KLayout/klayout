@@ -184,11 +184,6 @@ public:
    */
   virtual bool select (const db::DBox &box, lay::Editable::SelectionMode mode);
 
-  /**
-   *  @brief Clears the previous selection
-   */
-  virtual void clear_previous_selection ();
-
   /** 
    *  @brief Returns true, if the given selected object is handled by this service
    */
@@ -270,9 +265,19 @@ public:
   bool select (const lay::ObjectInstPath &obj, lay::Editable::SelectionMode mode);
 
   /**
+   *  @brief Clears the previous selection
+   */
+  void clear_previous_selection ();
+
+  /**
    *  @brief Establish a transient selection
    */
   bool transient_select (const db::DPoint &pos);
+
+  /**
+   *  @brief Turns the transient selection to the selection
+   */
+  virtual void transient_to_selection ();
 
   /**
    *  @brief Clear the transient selection
@@ -573,6 +578,9 @@ private:
   bool m_top_level_sel;
   bool m_show_shapes_of_instances;
   unsigned int m_max_shapes_of_instances;
+
+  //  Hierarchical copy mode (-1: ask, 0: shallow, 1: deep)
+  int m_hier_copy_mode;
 
   //  Sequence number of selection
   bool m_indicate_secondary_selection;

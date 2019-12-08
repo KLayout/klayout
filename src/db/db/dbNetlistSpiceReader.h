@@ -28,6 +28,8 @@
 #include "tlStream.h"
 
 #include <string>
+#include <set>
+#include <map>
 #include <memory>
 
 namespace db
@@ -129,6 +131,7 @@ private:
   std::string m_stored_line;
   std::map<std::string, bool> m_captured;
   std::vector<std::string> m_global_nets;
+  std::set<const db::Circuit *> m_circuits_read;
 
   void push_stream (const std::string &path);
   void pop_stream ();

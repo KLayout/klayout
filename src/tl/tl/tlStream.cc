@@ -422,6 +422,30 @@ TextInputStream::TextInputStream (InputStream &stream)
   }
 }
 
+std::string
+TextInputStream::read_all ()
+{
+  return read_all (std::numeric_limits<size_t>::max ());
+}
+
+std::string
+TextInputStream::read_all (size_t max_count)
+{
+  std::string text;
+
+  while (! at_end () && max_count > 0) {
+    char c = get_char ();
+    if (c == 0) {
+      break;
+    } else {
+      --max_count;
+      text += c;
+    }
+  }
+
+  return text;
+}
+
 const std::string &
 TextInputStream::get_line ()
 {
@@ -430,9 +454,7 @@ TextInputStream::get_line ()
 
   while (! at_end ()) {
     char c = get_char ();
-    if (c == '\r') {
-      //  simply skip CR 
-    } else if (c == '\n' || c == 0) {
+    if (c == '\n' || c == 0) {
       break;
     } else {
       m_line_buffer += c;
@@ -445,31 +467,35 @@ TextInputStream::get_line ()
 char 
 TextInputStream::get_char ()
 {
-  m_line = m_next_line;
-  const char *c = m_stream.get (1);
-  if (c == 0) {
-    m_at_end = true;
-    return 0;
-  } else {
-    if (*c == '\n') {
-      ++m_next_line;
+  while (true) {
+    m_line = m_next_line;
+    const char *c = m_stream.get (1);
+    if (c == 0) {
+      m_at_end = true;
+      return 0;
+    } else if (*c != '\r' && *c) {
+      if (*c == '\n') {
+        ++m_next_line;
+      }
+      return *c;
     }
-    return *c;
   }
 }
 
 char 
 TextInputStream::peek_char ()
 {
-  m_line = m_next_line;
-  const char *c = m_stream.get (1);
-  if (c == 0) {
-    m_at_end = true;
-    return 0;
-  } else {
-    char cc = *c;
-    m_stream.unget (1);
-    return cc;
+  while (true) {
+    m_line = m_next_line;
+    const char *c = m_stream.get (1);
+    if (c == 0) {
+      m_at_end = true;
+      return 0;
+    } else if (*c != '\r' && *c) {
+      char cc = *c;
+      m_stream.unget (1);
+      return cc;
+    }
   }
 }
 

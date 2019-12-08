@@ -198,6 +198,7 @@ public:
   virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
   {
     options.push_back (std::pair<std::string, std::string> (cfg_edit_top_level_selection, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_edit_hier_copy_mode, "-1"));
     options.push_back (std::pair<std::string, std::string> (cfg_edit_grid, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_edit_snap_to_objects, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_edit_move_angle_mode, "any"));

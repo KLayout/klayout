@@ -113,6 +113,7 @@ Service::Service (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator
     m_connect_ac (lay::AC_Any), m_move_ac (lay::AC_Any), m_alt_ac (lay::AC_Global),
     m_snap_to_objects (false),
     m_top_level_sel (false), m_show_shapes_of_instances (true), m_max_shapes_of_instances (1000),
+    m_hier_copy_mode (-1),
     m_indicate_secondary_selection (false),
     m_seq (0),
     dm_selection_to_view (this, &edt::Service::do_selection_to_view)
@@ -134,6 +135,7 @@ Service::Service (db::Manager *manager, lay::LayoutView *view)
     m_connect_ac (lay::AC_Any), m_move_ac (lay::AC_Any), m_alt_ac (lay::AC_Global),
     m_snap_to_objects (true),
     m_top_level_sel (false), m_show_shapes_of_instances (true), m_max_shapes_of_instances (1000),
+    m_hier_copy_mode (-1),
     m_indicate_secondary_selection (false),
     m_seq (0),
     dm_selection_to_view (this, &edt::Service::do_selection_to_view)
@@ -255,6 +257,8 @@ Service::configure (const std::string &name, const std::string &value)
     return true;  //  taken
   } else if (name == cfg_edit_top_level_selection) {
     tl::from_string (value, m_top_level_sel);
+  } else if (name == cfg_edit_hier_copy_mode) {
+    tl::from_string (value, m_hier_copy_mode);
   }
 
   return false;  //  not taken
@@ -309,18 +313,30 @@ Service::copy_selected ()
   edt::CopyModeDialog mode_dialog (view ());
 
   bool need_to_ask_for_copy_mode = false;
-  for (objects::const_iterator r = m_selection.begin (); r != m_selection.end () && ! need_to_ask_for_copy_mode; ++r) {
-    if (r->is_cell_inst ()) {
-      const db::Cell &cell = view ()->cellview (r->cv_index ())->layout ().cell (r->back ().inst_ptr.cell_index ());
-      if (! cell.is_proxy ()) {
-        need_to_ask_for_copy_mode = true;
+  unsigned int inst_mode = 0;
+
+  if (m_hier_copy_mode < 0) {
+    for (objects::const_iterator r = m_selection.begin (); r != m_selection.end () && ! need_to_ask_for_copy_mode; ++r) {
+      if (r->is_cell_inst ()) {
+        const db::Cell &cell = view ()->cellview (r->cv_index ())->layout ().cell (r->back ().inst_ptr.cell_index ());
+        if (! cell.is_proxy ()) {
+          need_to_ask_for_copy_mode = true;
+        }
       }
     }
+  } else {
+    inst_mode = (unsigned int) m_hier_copy_mode;
   }
 
-  unsigned int inst_mode = 0; 
+  bool dont_ask_again = false;
 
-  if (! need_to_ask_for_copy_mode || mode_dialog.exec_dialog (inst_mode)) {
+  if (! need_to_ask_for_copy_mode || mode_dialog.exec_dialog (inst_mode, dont_ask_again)) {
+
+    //  store the given value "forever"
+    if (dont_ask_again) {
+      plugin_root ()->config_set (cfg_edit_hier_copy_mode, tl::to_string (inst_mode));
+      plugin_root ()->config_end ();
+    }
 
     //  create one ClipboardData object per cv_index because, this one assumes that there is 
     //  only one source layout object.
@@ -356,6 +372,9 @@ bool
 Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::angle_constraint_type /*ac*/)
 {
   if (view ()->is_editable () && mode == lay::Editable::Selected) {
+
+    //  flush any pending updates of the markers
+    dm_selection_to_view.execute ();
 
     m_move_start = p;
     m_move_trans = db::DTrans ();
@@ -1185,6 +1204,15 @@ bool
 Service::selection_applies (const lay::ObjectInstPath & /*sel*/) const
 {
   return false;
+}
+
+void
+Service::transient_to_selection ()
+{
+  if (! m_transient_selection.empty ()) {
+    m_selection.insert (m_transient_selection.begin (), m_transient_selection.end ());
+    selection_to_view ();
+  }
 }
 
 void

@@ -38,6 +38,7 @@ MoveService::MoveService (lay::LayoutView *view)
   : QObject (),
     lay::ViewService (view->view_object_widget ()), 
     m_dragging (false),
+    m_dragging_transient (false),
     mp_editables (view),
     mp_view (view),
     m_global_grid (0.001)
@@ -148,6 +149,9 @@ MoveService::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool p
 
   }
 
+  //  track mouse position for the infix move initiation
+  m_mouse_pos = p;
+
   return ret;  // not taken to allow the mouse tracker to receive events as well
 }
 
@@ -163,7 +167,7 @@ MoveService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool 
     return true;
   } 
   if (prio && (buttons & lay::LeftButton) != 0) {
-    if (handle_dragging (p, buttons, 0)) {
+    if (handle_dragging (p, buttons, false, 0)) {
       return true;
     }
   } 
@@ -216,7 +220,7 @@ bool
 MoveService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (prio && (buttons & lay::LeftButton) != 0) {
-    if (handle_dragging (p, buttons, 0)) {
+    if (handle_dragging (p, buttons, false, 0)) {
       return true;
     }
   } 
@@ -230,26 +234,50 @@ MoveService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool 
 }
 
 bool
-MoveService::begin_move (db::Transaction *transaction)
+MoveService::begin_move (db::Transaction *transaction, bool selected_after_move)
 {
+  if (m_dragging) {
+    return false;
+  }
+
   std::auto_ptr<db::Transaction> trans_holder (transaction);
 
-  drag_cancel ();
+  bool drag_transient = ! selected_after_move;
+  if (mp_editables->selection_size () == 0) {
+    //  try to use the transient selection for the real one
+    mp_editables->transient_to_selection ();
+    drag_transient = true;
+  }
+
+  if (mp_editables->selection_size () == 0) {
+    //  still nothing selected
+    return false;
+  }
 
   db::DBox bbox = mp_editables->selection_bbox ();
   if (bbox.empty ()) {
-    //  nothing selected
+    //  nothing (useful) selected
     return false;
   }
 
   set_cursor (lay::Cursor::size_all);
 
-  //  emulate a "begin move" at the center of the selection bbox - this will become the reference point
-  return handle_dragging (bbox.center (), 0, trans_holder.release ());
+  //  emulate a "begin move" at the current mouse position if inside the box or the closest point
+  //  of the box.
+
+  db::DPoint pstart = m_mouse_pos;
+  if (! bbox.contains (pstart)) {
+    pstart.set_x (std::max (pstart.x (), bbox.p1 ().x ()));
+    pstart.set_x (std::min (pstart.x (), bbox.p2 ().x ()));
+    pstart.set_y (std::max (pstart.y (), bbox.p1 ().y ()));
+    pstart.set_y (std::min (pstart.y (), bbox.p2 ().y ()));
+  }
+
+  return handle_dragging (pstart, 0, drag_transient, trans_holder.release ());
 }
 
 bool 
-MoveService::handle_dragging (const db::DPoint &p, unsigned int buttons, db::Transaction *transaction)
+MoveService::handle_dragging (const db::DPoint &p, unsigned int buttons, bool drag_transient, db::Transaction *transaction)
 {
   std::auto_ptr<db::Transaction> trans_holder (transaction);
 
@@ -267,6 +295,7 @@ MoveService::handle_dragging (const db::DPoint &p, unsigned int buttons, db::Tra
       mp_view->clear_transient_selection ();
 
       m_dragging = true;
+      m_dragging_transient = drag_transient;
       widget ()->grab_mouse (this, false);
 
       m_shift = db::DPoint ();
@@ -278,8 +307,14 @@ MoveService::handle_dragging (const db::DPoint &p, unsigned int buttons, db::Tra
   } else {
 
     m_dragging = false;
+
     widget ()->ungrab_mouse (this);
     mp_editables->end_move (p, ac_from_buttons (buttons), mp_transaction.release ());
+
+    if (m_dragging_transient) {
+      mp_editables->clear_selection ();
+    }
+
     return true;
 
   }

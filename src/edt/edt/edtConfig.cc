@@ -57,6 +57,7 @@ std::string cfg_edit_inst_column_x ("edit-inst-column_x");
 std::string cfg_edit_inst_column_y ("edit-inst-column_y");
 std::string cfg_edit_inst_place_origin ("edit-inst-place-origin");
 std::string cfg_edit_top_level_selection ("edit-top-level-selection");
+std::string cfg_edit_hier_copy_mode ("edit-hier-copy-mode");
 std::string cfg_edit_show_shapes_of_instances ("edit-show-shapes-of-instances");
 std::string cfg_edit_max_shapes_of_instances ("edit-max-shapes-of-instances");
 std::string cfg_edit_global_grid ("grid-micron");

@@ -5154,7 +5154,7 @@ LayoutView::paste_interactive ()
   //  operations.
   trans->close ();
 
-  if (mp_move_service->begin_move (trans.release ())) {
+  if (mp_move_service->begin_move (trans.release (), false)) {
     switch_mode (-1);  //  move mode
   }
 }
@@ -5167,7 +5167,14 @@ LayoutView::copy ()
   } else if (mp_control_panel && mp_control_panel->has_focus ()) {
     mp_control_panel->copy ();
   } else {
+
+    if (lay::Editables::selection_size () == 0) {
+      //  try to use the transient selection for the real one
+      lay::Editables::transient_to_selection ();
+    }
+
     lay::Editables::copy ();
+
   }
 }
 
@@ -5182,8 +5189,15 @@ LayoutView::cut ()
     db::Transaction trans (manager (), tl::to_string (QObject::tr ("Cut Layers")));
     mp_control_panel->cut ();
   } else {
+
+    if (lay::Editables::selection_size () == 0) {
+      //  try to use the transient selection for the real one
+      lay::Editables::transient_to_selection ();
+    }
+
     db::Transaction trans (manager (), tl::to_string (QObject::tr ("Cut")));
     lay::Editables::cut ();
+
   }
 }
 

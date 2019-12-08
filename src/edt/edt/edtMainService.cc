@@ -1641,7 +1641,7 @@ MainService::boolean_op (int mode)
 
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
     for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
-      if (int (s->layer ()) == layer_index && ! s->is_cell_inst () && (s->shape ().is_polygon () || s->shape ().is_path () || s->shape ().is_box ())) {
+      if (! s->is_cell_inst () && int (s->layer ()) == layer_index && (s->shape ().is_polygon () || s->shape ().is_path () || s->shape ().is_box ())) {
         db::Cell &cell = view ()->cellview (s->cv_index ())->layout ().cell (s->cell_index ());
         if (cell.shapes (s->layer ()).is_valid (s->shape ())) {
           cell.shapes (s->layer ()).erase_shape (s->shape ());

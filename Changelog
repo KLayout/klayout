@@ -1,3 +1,57 @@
+0.26.2          (xxxx-xx-xx):
+
+* Enhancement: %GITHUB%/issues/438
+      Redefining a circuit in Spice netlists will give an error now
+* Bugfix: %GITHUB%/issues/445
+      Cryptic message when instances are selected and 'merge shapes' 
+      is used
+* Bugfix: %GITHUB%/issues/440
+      LayoutView#each_annotation_selected wasn't working
+* Enhancement: %GITHUB%/issues/436
+      Option to silence instance copy mode dialog, 
+      Enhancements to interactive move, duplicate and copy (sensitive
+      to transient selection now)
+* Enhancement: %GITHUB%/issues/426
+      Techs can be grouped in menu now
+* Enhancement: %GITHUB%/issues/428
+      Edit buttons are not shown in user properties dialog 
+      in viewer mode
+* Enhancement: %GITHUB%/issues/425
+      Don't generate dummy pins for dummy gates
+* Bugfix: %GITHUB%/issues/415 and %GITHUB%/issues/439
+      Macros need to be stored with CRLF on Windows for management
+      with a versioning system like git
+* Enhancement: %GITHUB%/issues/407
+      Variables can be used in technology base path now
+        - $(tech_name) -> substituted by the technology name
+        - $(tech_dir) -> substituted by the directory the technology file is stored in
+        - $(tech_file) -> substituted by the absolute path to the tech file
+        - $(appdata_path) -> substituted by KLayout's home directory (e.g. ~/.klayout)
+        - $(env('X')) -> substituted by the environment variable $X
+* Enhancement: %GITHUB%/issues/406
+      DRC edge layers: AND between intersecting edges gives point-like
+      markers indicating the intersection points
+* Bugfix: %GITHUB%/issues/419
+      Multiple top circuits after flatten of netlist
+* Bugfix: %GITHUB%/issues/417
+      Probe nets does not work with flat extraction on Tools/Trace All Nets/Flat
+* Enhancement: %GITHUB%/issues/411
+      Multiple device extractors for same class
+* Bugfix: %GITHUB%/issues/408
+      Internal error after EdgePairs#polygon
+* Bugfix: %GITHUB%/issues/410
+      Errors were not reported on "rerun" from the DRC and LVS report dialogs
+* Enhancement: netlist object properties
+      User properties can be attached to the following netlist objects
+      now: Pin, Device, Circuit, Net and SubCircuit. Properties are
+      key/value pairs (keys and values can be strings can be strings
+      or numbers).
+      The property-enabled classes use "NetlistObject" as the base
+      class now. NetlistObject provides "set_property" to set or reset
+      a property and "property" to retrieve one.
+      Properties are persisted in L2N and LVSDB files and written to 
+      layout shapes on "build_nets".
+
 0.26.1          (2019-11-06):
 
 * Bugfix: %GITHUB%/issues/354

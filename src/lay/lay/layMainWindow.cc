@@ -2275,7 +2275,7 @@ MainWindow::do_cm_duplicate (bool interactive)
 {
   BEGIN_PROTECTED
 
-  if (current_view () && current_view ()->has_selection ()) {
+  if (current_view ()) {
 
     //  Do duplicate simply by concatenating copy & paste currently.
     //  Save the clipboard state before in order to preserve the current content
@@ -2327,7 +2327,7 @@ MainWindow::cm_copy ()
 {
   BEGIN_PROTECTED
 
-  if (current_view () && current_view ()->has_selection ()) {
+  if (current_view ()) {
     current_view ()->copy ();
     current_view ()->clear_selection ();
   }
@@ -2370,7 +2370,7 @@ MainWindow::cm_cut ()
 {
   BEGIN_PROTECTED
 
-  if (current_view () && current_view ()->has_selection ()) {
+  if (current_view ()) {
     current_view ()->cut ();
     current_view ()->cancel (); //  see del() for reason why cancel is after cut
     current_view ()->clear_selection ();
@@ -2764,21 +2764,6 @@ MainWindow::update_action_states ()
       redo_action.set_title (redo_txt);
       redo_action.set_enabled (redo_enable && edits_enabled ());
 
-    }
-
-    if (mp_menu->is_valid ("edit_menu.copy")) {
-      Action copy_action = mp_menu->action ("edit_menu.copy");
-      copy_action.set_enabled (current_view () && current_view ()->has_selection () && edits_enabled ());
-    }
-
-    if (mp_menu->is_valid ("edit_menu.duplicate")) {
-      Action copy_action = mp_menu->action ("edit_menu.duplicate");
-      copy_action.set_enabled (current_view () && current_view ()->has_selection () && edits_enabled ());
-    }
-
-    if (mp_menu->is_valid ("edit_menu.cut")) {
-      Action cut_action = mp_menu->action ("edit_menu.cut");
-      cut_action.set_enabled (current_view () && current_view ()->has_selection () && edits_enabled ());
     }
 
     if (mp_menu->is_valid ("edit_menu.paste")) {

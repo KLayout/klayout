@@ -1063,6 +1063,15 @@ Service::clear_previous_selection ()
   m_previous_selection.clear ();
 }
 
+void
+Service::transient_to_selection ()
+{
+  if (mp_transient_view) {
+    m_selected.insert (std::make_pair (mp_transient_view->image_ref (), 0));
+    selection_to_view ();
+  }
+}
+
 bool 
 Service::select (obj_iterator obj, lay::Editable::SelectionMode mode)
 {

@@ -265,6 +265,8 @@ EditorOptionsGeneric::apply (lay::Plugin *root)
   root->config_set (cfg_edit_connect_angle_mode, acc.to_string (lay::angle_constraint_type (mp_ui->conn_angle_cb->currentIndex ())));
 
   root->config_set (cfg_edit_top_level_selection, tl::to_string (mp_ui->hier_sel_cbx->isChecked ()));
+  int cpm = mp_ui->hier_copy_mode_cbx->currentIndex ();
+  root->config_set (cfg_edit_hier_copy_mode, tl::to_string ((cpm < 0 || cpm > 1) ? -1 : cpm));
   root->config_set (cfg_edit_snap_to_objects, tl::to_string (mp_ui->snap_objects_cbx->isChecked ()));
 
   unsigned int max_shapes = 1000;
@@ -320,6 +322,10 @@ EditorOptionsGeneric::setup (lay::Plugin *root)
   bool top_level_sel = false;
   root->config_get (cfg_edit_top_level_selection, top_level_sel);
   mp_ui->hier_sel_cbx->setChecked (top_level_sel);
+
+  int cpm = -1;
+  root->config_get (cfg_edit_hier_copy_mode, cpm);
+  mp_ui->hier_copy_mode_cbx->setCurrentIndex ((cpm < 0 || cpm > 1) ? 2 : cpm);
 
   bool snap_to_objects = false;
   root->config_get (cfg_edit_snap_to_objects, snap_to_objects);

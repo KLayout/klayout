@@ -301,6 +301,22 @@ Editables::clear_transient_selection ()
   signal_transient_selection_changed ();
 }
 
+void
+Editables::transient_to_selection ()
+{
+  cancel_edits ();
+  for (iterator e = begin (); e != end (); ++e) {
+    e->select (db::DBox (), lay::Editable::Reset);  //  clear selection
+    e->clear_previous_selection ();
+    e->transient_to_selection ();
+    e->clear_transient_selection ();
+  }
+
+  //  send a signal to the observers
+  signal_transient_selection_changed ();
+  signal_selection_changed ();
+}
+
 void 
 Editables::clear_selection ()
 {

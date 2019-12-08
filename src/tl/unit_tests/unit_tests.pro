@@ -28,7 +28,6 @@ SOURCES = \
   tlUtils.cc \
   tlVariant.cc \
   tlXMLParser.cc \
-  tlUri.cc \
   tlStreamTests.cc \
   tlWebDAV.cc \
   tlHttpStream.cc \
@@ -39,7 +38,8 @@ SOURCES = \
   tlEquivalenceClustersTests.cc \
     tlUniqueNameTests.cc \
     tlGlobPatternTests.cc \
-    tlRecipeTests.cc
+    tlRecipeTests.cc \
+    tlUriTests.cc
 
 !equals(HAVE_QT, "0") {
 

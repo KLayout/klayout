@@ -22,6 +22,15 @@
 
 #include "tlUri.h"
 #include "tlUnitTest.h"
+#include "tlFileUtils.h"
+
+//  Secret mode switchers for testing
+namespace tl
+{
+TL_PUBLIC void file_utils_force_windows ();
+TL_PUBLIC void file_utils_force_linux ();
+TL_PUBLIC void file_utils_force_reset ();
+}
 
 std::string uri2string (const tl::URI &uri)
 {
@@ -141,4 +150,29 @@ TEST(1)
   uri = tl::URI ("/path/to/file?%61=v%31&%63=v%33&%62=v%32#fragment");
   EXPECT_EQ (uri2string (uri), "</path/to/file>?<a>=<v1>&<b>=<v2>&<c>=<v3>#<fragment>");
   EXPECT_EQ (uri2string (uri.resolved (tl::URI ("../other"))), "</path/to/file/../other>");
+}
+
+//  windows file paths compatibility
+TEST(2)
+{
+  try {
+
+    tl::file_utils_force_windows ();
+
+    //  use case taken from Magic writer:
+
+    tl::URI uri ("c:\\users\\myself\\path.txt");
+
+    std::string ext = tl::extension (uri.path ());
+    EXPECT_EQ (ext, "txt");
+
+    uri.set_path (tl::dirname (uri.path ()));
+    EXPECT_EQ (uri.to_string (), "C:\\users\\myself");
+
+    tl::file_utils_force_reset ();
+
+  } catch (...) {
+    tl::file_utils_force_reset ();
+    throw;
+  }
 }

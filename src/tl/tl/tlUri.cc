@@ -100,7 +100,9 @@ URI::URI (const std::string &uri)
   tl::Extractor ex0 (uri.c_str ());
   tl::Extractor ex = ex0;
 
-  if (ex.try_read_word (m_scheme) && *ex == ':') {
+  //  NOTE: to distinguish a windows drive letter from a scheme, we expect the scheme to
+  //  be longer than one character
+  if (ex.try_read_word (m_scheme) && *ex == ':' && m_scheme.length () > 1) {
     //  got scheme
     ++ex;
   } else {

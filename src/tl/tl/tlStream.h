@@ -564,7 +564,7 @@ private:
 // ---------------------------------------------------------------------------------
 
 /**
- *  @brief An ASCII input stream
+ *  @brief A text input stream (UTF8 encoded)
  *
  *  This class is put in front of a InputStream to format the input as text input stream.
  */
@@ -590,6 +590,18 @@ public:
    *  @brief Get a single line (presumably UTF8 encoded)
    */
   const std::string &get_line ();
+
+  /**
+   *  @brief Reads all remaining bytes into the string
+   */
+  std::string read_all ();
+
+  /**
+   *  @brief Reads all remaining bytes into the string
+   *
+   *  This function reads all remaining of max_count bytes.
+   */
+  std::string read_all (size_t max_count);
 
   /**
    *  @brief Get a single character

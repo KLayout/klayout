@@ -93,7 +93,8 @@ MAGReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   set_create_layers (specific_options.create_other_layers);
   set_keep_layer_names (specific_options.keep_layer_names);
 
-  std::string top_cellname = cell_name_from_path (m_stream.source ());
+  tl::URI source_uri (m_stream.source ());
+  std::string top_cellname = cell_name_from_path (source_uri.path ());
   db::cell_index_type top_cell;
   if (layout.has_cell (top_cellname.c_str ())) {
     top_cell = layout.cell_by_name (top_cellname.c_str ()).second;
@@ -183,7 +184,7 @@ MAGReader::cell_from_path (const std::string &path, db::Layout &layout)
 std::string
 MAGReader::cell_name_from_path (const std::string &path)
 {
-  std::string file = tl::split (path, "/").back ();
+  std::string file = tl::filename (path);
   return tl::split (file, ".").front ();
 }
 

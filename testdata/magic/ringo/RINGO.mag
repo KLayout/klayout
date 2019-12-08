@@ -1,0 +1,70 @@
+magic
+timestamp 1575832387
+<< checkpaint >>
+rect 0 0 258 80
+<< l9d0 >>
+rect 40 30 47 33
+rect 56 30 65 33
+rect 74 30 83 33
+rect 92 30 101 33
+rect 110 30 119 33
+rect 128 30 137 33
+rect 146 30 155 33
+rect 164 30 173 33
+rect 182 30 191 33
+rect 200 30 209 33
+rect 218 30 227 33
+<< l11d0 >>
+rect 35 38 212 42
+<< labels >>
+rlabel l9d0 29.5 72.5 29.5 72.5 0 VDD
+rlabel l9d0 29.5 8.5 29.5 8.5 0 VSS
+rlabel l11d0 236 40 236 40 0 OUT
+rlabel l11d0 26 31 26 31 0 ENABLE
+rlabel l11d0 33 40 33 40 0 FB
+use ND2X1 ND2X1_1
+timestamp 1575832387
+transform 1 0 18 0 1 0
+box -1 0 25 80
+use INVX1 INVX1_1
+array 0 9 18 0 0 0
+timestamp 1575832387
+transform 1 0 42 0 1 0
+box -1 0 19 80
+use M1M2 M1M2_1
+timestamp 1575832387
+transform 1 0 33 0 1 40
+box -5 -5 5 5
+use M1M2 M1M2_2
+timestamp 1575832387
+transform 1 0 214 0 1 40
+box -5 -5 5 5
+use TIE TIE_1
+timestamp 1575832387
+transform 1 0 240 0 1 0
+box -1 0 13 80
+use TIE TIE_2
+timestamp 1575832387
+transform 1 0 6 0 1 0
+box -1 0 13 80
+use EMPTY EMPTY_1
+timestamp 1575832387
+transform 1 0 252 0 1 0
+box 0 0 6 80
+use EMPTY EMPTY_2
+timestamp 1575832387
+transform 1 0 0 0 1 0
+box 0 0 6 80
+use M1M2 M1M2_3
+timestamp 1575832387
+transform 1 0 26 0 1 31
+box -5 -5 5 5
+use INVX1 INVX1_2
+timestamp 1575832387
+transform 1 0 222 0 1 0
+box -1 0 19 80
+use M1M2 M1M2_4
+timestamp 1575832387
+transform 1 0 236 0 1 40
+box -5 -5 5 5
+<< end >>

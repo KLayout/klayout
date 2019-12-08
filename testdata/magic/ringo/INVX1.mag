@@ -1,0 +1,55 @@
+magic
+timestamp 1575832387
+<< checkpaint >>
+rect -1 0 19 80
+<< l5d0 >>
+rect 7 29 10 48
+<< l1001d0 >>
+rect 0 20 18 24
+rect 0 29 18 33
+rect 0 38 18 42
+rect 0 47 18 51
+rect 0 56 18 60
+<< l8d0 >>
+rect 4 63 6 64
+rect 4 57 6 59
+rect 11 52 13 53
+rect 4 52 6 53
+rect 11 63 13 64
+rect 11 57 13 59
+rect 11 18 13 20
+rect 4 18 6 20
+rect 11 23 13 25
+rect 4 23 6 25
+<< l9d0 >>
+rect 0 4 18 12
+rect 0 68 18 76
+rect 4 51 7 65
+rect 11 17 14 65
+rect 4 12 7 26
+rect 4 65 7 68
+<< l13d0 >>
+rect 0 0 18 80
+<< l1d0 >>
+rect -1 45 19 80
+<< l14d0 >>
+rect 2 49 9 67
+rect 2 15 9 28
+<< labels >>
+rlabel l9d0 9.5 72 9.5 72 0 VDD
+rlabel l9d0 9.5 8 9.5 8 0 VSS
+rlabel l9d0 6 31 6 31 0 IN
+rlabel l9d0 12 40 12 40 0 OUT
+use POLYM1 POLYM1_1
+timestamp 1575832387
+transform 1 0 6 0 1 31
+box -5 -5 5 5
+use NMOS2 NMOS2_1
+timestamp 1575832387
+transform 1 0 3 0 1 17
+box -1 -3 12 12
+use PMOS3 PMOS3_1
+timestamp 1575832387
+transform 1 0 3 0 1 51
+box -1 -3 12 18
+<< end >>

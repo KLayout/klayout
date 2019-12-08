@@ -1,0 +1,37 @@
+magic
+timestamp 1575832387
+<< checkpaint >>
+rect -1 0 13 80
+<< l1001d0 >>
+rect 0 20 12 24
+rect 0 29 12 33
+rect 0 38 12 42
+rect 0 47 12 51
+rect 0 56 12 60
+<< l8d0 >>
+rect 5 16 7 18
+rect 5 5 7 7
+rect 5 68 7 69
+rect 5 11 7 12
+rect 5 73 7 75
+rect 5 62 7 64
+<< l9d0 >>
+rect 0 4 12 12
+rect 0 68 12 76
+rect 5 5 8 19
+rect 5 62 8 76
+<< l2d0 >>
+rect 4 61 9 76
+rect 4 4 9 19
+<< l4d0 >>
+rect 3 61 9 77
+<< l3d0 >>
+rect 3 4 9 20
+<< l13d0 >>
+rect 0 0 12 80
+<< l1d0 >>
+rect -1 45 13 80
+<< labels >>
+rlabel l9d0 6.5 72 6.5 72 0 VDD
+rlabel l9d0 6.5 8 6.5 8 0 VSS
+<< end >>

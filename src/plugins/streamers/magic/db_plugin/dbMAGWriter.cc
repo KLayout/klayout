@@ -350,7 +350,7 @@ MAGWriter::write_single_instance (db::cell_index_type ci, db::ICplxTrans trans, 
     a = trinv * a;
     b = trinv * b;
 
-    if (a.y () != 0) {
+    if (a.y () != 0 || b.x () != 0) {
       std::swap (a, b);
       std::swap (na, nb);
     }

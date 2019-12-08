@@ -1063,7 +1063,7 @@ public:
   typedef AnnotationRef value_type;
   typedef std::map<ant::Service::obj_iterator, unsigned int>::const_iterator iterator_type;
   typedef void pointer; 
-  typedef const value_type &reference;
+  typedef value_type reference;
   typedef std::forward_iterator_tag iterator_category;
   typedef void difference_type;
 
@@ -1088,7 +1088,7 @@ public:
     return *this;
   }
 
-  value_type operator* () const
+  reference operator* () const
   {
     return value_type (*(static_cast<const ant::Object *> (m_iter->first->ptr ())), m_services[m_service]->view ());
   }

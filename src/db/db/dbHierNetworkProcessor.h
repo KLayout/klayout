@@ -739,13 +739,15 @@ typedef std::list<std::pair<ClusterInstance, ClusterInstance> > cluster_instance
  */
 struct InstanceToInstanceInteraction
 {
-  InstanceToInstanceInteraction (db::cell_index_type _ci1, db::cell_index_type _ci2, const db::ICplxTrans &_t21)
-    : ci1 (_ci1), ci2 (_ci2), t21 (_t21)
+  InstanceToInstanceInteraction (db::cell_index_type _ci1, const db::ArrayBase *_array1, db::cell_index_type _ci2, const db::ArrayBase *_array2, const db::ICplxTrans &_t21)
+    : ci1 (_ci1), ci2 (_ci2), array1 (_array1), array2 (_array2), t21 (_t21)
   { }
 
   bool operator== (const InstanceToInstanceInteraction &other) const
   {
-    return ci1 == other.ci1 && ci2 == other.ci2 && t21.equal (other.t21);
+    static const db::array_base_ptr_cmp_f arr_less;
+    return ci1 == other.ci1 && ci2 == other.ci2 && t21.equal (other.t21) &&
+            (array1 == 0) == (array2 == 0) && array1 != 0 && ! arr_less (array1, array2) && ! arr_less (array2, array1);
   }
 
   bool operator< (const InstanceToInstanceInteraction &other) const
@@ -759,10 +761,19 @@ struct InstanceToInstanceInteraction
     if (! t21.equal (other.t21)) {
       return t21.less (other.t21);
     }
-    return false;
+    if ((array1 == 0) != (array2 == 0)) {
+      return (array1 == 0) < (array2 == 0);
+    }
+    if (array1 != 0) {
+      static const db::array_base_ptr_cmp_f arr_less;
+      return arr_less (array1, array2);
+    } else {
+      return false;
+    }
   }
 
   db::cell_index_type ci1, ci2;
+  const db::ArrayBase *array1, *array2;
   db::ICplxTrans t21;
 };
 

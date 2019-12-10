@@ -1457,13 +1457,9 @@ private:
    *
    *  @param common The common box of both instances
    *  @param i1 The first instance to investigate
-   *  @param ci1 The parent cell index of i1
-   *  @param p1 The parent instances property ID of i1 space
-   *  @param t1 The parent instances culmulated transformation
+   *  @param t1 The parent instances' culmulated transformation
    *  @param i2 The second instance to investiage
-   *  @param ci2 The parent cell index of i2
-   *  @param p2 The parent instances property ID of i2 space
-   *  @param t2 The parent instances culmulated transformation
+   *  @param t2 The parent instances' culmulated transformation
    *  @param interacting_clusters_out Receives the cluster interaction descriptors
    *
    *  "interacting_clusters_out" will be cluster interactions in the parent instance space of i1 and i2 respectively.
@@ -1473,7 +1469,7 @@ private:
   void consider_instance_pair (const box_type &common,
                                const db::Instance &i1, const db::ICplxTrans &t1,
                                const db::Instance &i2, const db::ICplxTrans &t2,
-                               std::list<std::pair<ClusterInstance, ClusterInstance> > &interacting_clusters_out)
+                               std::list<std::pair<ClusterInstance, ClusterInstance> > &interacting_clusters)
   {
     if (is_breakout_cell (mp_breakout_cells, i1.cell_index ()) || is_breakout_cell (mp_breakout_cells, i2.cell_index ())) {
       return;
@@ -1491,10 +1487,31 @@ private:
       return;
     }
 
-    db::ICplxTrans tt2 = t2 * i2.complex_trans ();
-    db::ICplxTrans tt1 = t1 * i1.complex_trans ();
+    db::ICplxTrans i1t = i1.complex_trans ();
+    db::ICplxTrans tt1 = t1 * i1t;
+
+    db::ICplxTrans i2t = i2.complex_trans ();
+    db::ICplxTrans tt2 = t2 * i2t;
 
     db::ICplxTrans tt21 = tt1.inverted () * tt2;
+    InstanceToInstanceInteraction ii_key (i1.cell_index (), i1.cell_inst ().delegate (), i2.cell_index (), i2.cell_inst ().delegate (), tt21);
+
+    instance_interaction_cache_type::iterator ii = mp_instance_interaction_cache->find (ii_key);
+    if (ii != mp_instance_interaction_cache->end ()) {
+
+      //  use cached interactions
+      interacting_clusters = ii->second.second;
+      for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = interacting_clusters.begin (); i != interacting_clusters.end (); ++i) {
+        //  translate the property IDs
+        i->first.set_inst_prop_id (i1.prop_id ());
+        i->first.transform (i1t);
+        i->second.set_inst_prop_id (i2.prop_id ());
+        i->second.transform (i2t);
+      }
+
+      return;
+
+    }
 
     //  array interactions
 
@@ -1528,7 +1545,7 @@ private:
           for (std::vector<std::pair<size_t, size_t> >::const_iterator ii = i2i_interactions.begin (); ii != i2i_interactions.end (); ++ii) {
             ClusterInstance k1 (ii->first, i1.cell_index (), i1t, i1.prop_id ());
             ClusterInstance k2 (ii->second, i2.cell_index (), i2t, i2.prop_id ());
-            interacting_clusters_out.push_back (std::make_pair (k1, k2));
+            interacting_clusters.push_back (std::make_pair (k1, k2));
           }
 
           //  dive into cell of ii2
@@ -1540,7 +1557,7 @@ private:
             for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ++i) {
               propagate_cluster_inst (i->second, i2.cell_index (), i2t, i2.prop_id ());
             }
-            interacting_clusters_out.splice (interacting_clusters_out.end (), ii_interactions, ii_interactions.begin (), ii_interactions.end ());
+            interacting_clusters.splice (interacting_clusters.end (), ii_interactions, ii_interactions.begin (), ii_interactions.end ());
 
           }
 
@@ -1560,12 +1577,23 @@ private:
           for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ++i) {
             propagate_cluster_inst (i->first, i1.cell_index (), i1t, i1.prop_id ());
           }
-          interacting_clusters_out.splice (interacting_clusters_out.end (), ii_interactions, ii_interactions.begin (), ii_interactions.end ());
+          interacting_clusters.splice (interacting_clusters.end (), ii_interactions, ii_interactions.begin (), ii_interactions.end ());
 
         }
 
       }
 
+    }
+
+    std::pair<db::ICplxTrans, cluster_instance_pair_list_type> &cached = (*mp_instance_interaction_cache) [ii_key];
+    cached.first = i1.complex_trans (); // @@@ remove or twofold transformation
+    cached.second = interacting_clusters;
+
+    //  normalize transformations in cache
+    db::ICplxTrans i1ti = i1t.inverted (), i2ti = i2t.inverted ();
+    for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = cached.second.begin (); i != cached.second.end (); ++i) {
+      i->first.transform (i1ti);
+      i->second.transform (i2ti);
     }
   }
 

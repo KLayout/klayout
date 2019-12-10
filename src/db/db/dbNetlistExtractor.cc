@@ -159,6 +159,7 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
       //  Make sure we create one subcircuit for each instance of cells which do have circuits
       //  associated.
       for (db::Cell::const_iterator inst = cell.begin (); ! inst.at_end (); ++inst) {
+        // @@@ ARRAY EXPANSION!!!
         make_subcircuit (circuit, inst->cell_index (), inst->complex_trans (), subcircuits, circuits);
       }
 

@@ -201,7 +201,7 @@ private:
  *  of a given connectivity. The shapes will still be organised in layers.
  */
 template <class T>
-class DB_PUBLIC local_cluster
+class DB_PUBLIC_TEMPLATE local_cluster
 {
 public:
   typedef size_t id_type;
@@ -395,7 +395,7 @@ private:
  *  @brief A box converter for the local_cluster class
  */
 template <class T>
-struct DB_PUBLIC local_cluster_box_convert
+struct DB_PUBLIC_TEMPLATE local_cluster_box_convert
 {
   typedef typename local_cluster<T>::box_type box_type;
   typedef typename db::simple_bbox_tag complexity;
@@ -414,7 +414,7 @@ struct DB_PUBLIC local_cluster_box_convert
  *  the clusters from a cell's shapes.
  */
 template <class T>
-class DB_PUBLIC local_clusters
+class DB_PUBLIC_TEMPLATE local_clusters
 {
 public:
   typedef typename local_cluster<T>::id_type id_type;
@@ -786,7 +786,7 @@ template <class T> class connected_clusters;
  *  @brief An iterator delivering all clusters of a connected_clusters set
  */
 template <class T>
-class DB_PUBLIC connected_clusters_iterator
+class DB_PUBLIC_TEMPLATE connected_clusters_iterator
 {
 public:
   typedef typename local_cluster<T>::id_type value_type;
@@ -834,7 +834,7 @@ private:
  *  "half connected" clusters.
  */
 template <class T>
-class DB_PUBLIC connected_clusters
+class DB_PUBLIC_TEMPLATE connected_clusters
   : public local_clusters<T>
 {
 public:
@@ -947,7 +947,7 @@ template <typename> class cell_clusters_box_converter;
  *  Hierarchical clusters
  */
 template <class T>
-class DB_PUBLIC hier_clusters
+class DB_PUBLIC_TEMPLATE hier_clusters
   : public tl::Object
 {
 public:
@@ -1029,7 +1029,7 @@ private:
  *  This iterator applies to one layer.
  */
 template <class T>
-class DB_PUBLIC recursive_cluster_shape_iterator
+class DB_PUBLIC_TEMPLATE recursive_cluster_shape_iterator
 {
 public:
   typedef T value_type;
@@ -1132,7 +1132,7 @@ private:
  *  This iterator will deliver the child clusters of a specific cluster.
  */
 template <class T>
-class DB_PUBLIC recursive_cluster_iterator
+class DB_PUBLIC_TEMPLATE recursive_cluster_iterator
 {
 public:
   /**

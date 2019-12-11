@@ -1210,10 +1210,6 @@ public:
     db::ICplxTrans t;
     consider_cluster_instance_pair (*c1, *i2, t, ic);
 
-    for (typename std::list<ClusterInstanceInteraction>::const_iterator i = ic.begin (); i != ic.end (); ++i) {
-      ensure_cluster_inst_propagated (i->other_ci, mp_cell->cell_index ());
-    }
-
     m_ci_interactions.splice (m_ci_interactions.end (), ic, ic.begin (), ic.end ());
   }
 
@@ -1225,6 +1221,10 @@ public:
    */
   void finish_cluster_to_instance_interactions ()
   {
+    for (typename std::list<ClusterInstanceInteraction>::const_iterator ii = m_ci_interactions.begin (); ii != m_ci_interactions.end (); ++ii) {
+      ensure_cluster_inst_propagated (ii->other_ci, mp_cell->cell_index ());
+    }
+
     for (typename std::list<ClusterInstanceInteraction>::const_iterator ii = m_ci_interactions.begin (); ii != m_ci_interactions.end (); ++ii) {
 
       id_type other = mp_cell_clusters->find_cluster_with_connection (ii->other_ci);

@@ -1779,12 +1779,31 @@ private:
           //  dive into cell of ii2 - this is a self-interaction of a cell with parts of itself
           //  as these self-interactions are expected to be the same always (regular array), we can skip this test the next times.
           if (first) {
+
             for (db::Cell::touching_iterator jj2 = cell.begin_touching (common.transformed (tt2.inverted ())); ! jj2.at_end (); ++jj2) {
-              std::vector<ClusterInstElement> p;
+
               db::ICplxTrans t;
-              add_pair (common, i, p, t, *jj2, pp2, tt2, interacting_clusters);
+
+              // @@@ add_pair (common, i, p, t, *jj2, pp2, tt2, interacting_clusters); // @@@ consider_interactions
+              std::list<std::pair<ClusterInstance, ClusterInstance> > ii_interactions;
+              consider_instance_pair (common, i, t, *jj2, tt2, ii_interactions); // @@@
+
+              for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator ii = ii_interactions.begin (); ii != ii_interactions.end (); ++ii) {
+                propagate_cluster_inst (ii->second, i.cell_index (), tt2, i.prop_id ());
+              }
+              interacting_clusters.splice (interacting_clusters.end (), ii_interactions, ii_interactions.begin (), ii_interactions.end ());
+
             }
+
           }
+
+          // @@@
+          //  connect_clusters requires propagated cluster ID's
+          for (std::list<std::pair<ClusterInstance, ClusterInstance> >::const_iterator i = interacting_clusters.begin (); i != interacting_clusters.end (); ++i) {
+            ensure_cluster_inst_propagated (i->first, mp_cell->cell_index ());
+            ensure_cluster_inst_propagated (i->second, mp_cell->cell_index ());
+          }
+          // @@@
 
           connect_clusters (interacting_clusters);
 
@@ -1970,14 +1989,15 @@ private:
   // @@@
   void propagate_cluster_inst (ClusterInstance &ci, db::cell_index_type pci, const db::ICplxTrans &trans, db::properties_id_type prop_id) const
   {
-    size_t id_new = mp_tree->propagate_cluster_inst (*mp_layout, ci, pci);
+    size_t id_new = mp_tree->propagate_cluster_inst (*mp_layout, *mp_cell, ci, pci);
+    tl_assert (id_new != 0);
     ci = db::ClusterInstance (id_new, pci, trans, prop_id);
   }
 
   // @@@
   void ensure_cluster_inst_propagated (const ClusterInstance &ci, db::cell_index_type pci) const
   {
-    mp_tree->propagate_cluster_inst (*mp_layout, ci, pci);
+    mp_tree->propagate_cluster_inst (*mp_layout, *mp_cell, ci, pci);
   }
 
   /**
@@ -2059,7 +2079,7 @@ private:
 
 template <class T>
 size_t
-hier_clusters<T>::propagate_cluster_inst (const db::Layout &layout, const ClusterInstance &ci, db::cell_index_type pci)
+hier_clusters<T>::propagate_cluster_inst (const db::Layout &layout, const db::Cell &cell, const ClusterInstance &ci, db::cell_index_type pci)
 {
   connected_clusters<T> &target_cc = clusters_per_cell (pci);
   size_t parent_cluster = target_cc.find_cluster_with_connection (ci);
@@ -2078,46 +2098,48 @@ hier_clusters<T>::propagate_cluster_inst (const db::Layout &layout, const Cluste
     //  if we're attaching to a child which is root yet, we need to promote the
     //  cluster to the parent in all places
     connected_clusters<T> &child_cc = clusters_per_cell (ci.inst_cell_index ());
-    tl_assert (child_cc.is_root (id));
+    if (child_cc.is_root (id)) {
 
-    std::set<std::pair<db::cell_index_type, ClusterInstance> > seen;  //  to avoid duplicate connections
+      std::set<std::pair<db::cell_index_type, ClusterInstance> > seen;  //  to avoid duplicate connections
 
-    const db::Cell &child_cell = layout.cell (ci.inst_cell_index ());
-    for (db::Cell::parent_inst_iterator pi = child_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
+      const db::Cell &child_cell = layout.cell (ci.inst_cell_index ());
+      for (db::Cell::parent_inst_iterator pi = child_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
 
-      db::Instance child_inst = pi->child_inst ();
+        db::Instance child_inst = pi->child_inst ();
 
-      connected_clusters<T> &parent_cc = clusters_per_cell (pi->parent_cell_index ());
-      for (db::CellInstArray::iterator pii = child_inst.begin (); ! pii.at_end (); ++pii) {
+        connected_clusters<T> &parent_cc = clusters_per_cell (pi->parent_cell_index ());
+        for (db::CellInstArray::iterator pii = child_inst.begin (); ! pii.at_end (); ++pii) {
 
-        ClusterInstance ci2 (id, child_inst.cell_index (), child_inst.complex_trans (*pii), child_inst.prop_id ());
-        if (seen.find (std::make_pair (pi->parent_cell_index (), ci2)) == seen.end ()) {
+          ClusterInstance ci2 (id, child_inst.cell_index (), child_inst.complex_trans (*pii), child_inst.prop_id ());
+          if ((cell.cell_index () != pi->parent_cell_index () || ci != ci2) && seen.find (std::make_pair (pi->parent_cell_index (), ci2)) == seen.end ()) {
 
-          size_t id_dummy;
+            size_t id_dummy;
 
-          const typename db::local_cluster<T>::global_nets &gn = child_cc.cluster_by_id (id).get_global_nets ();
-          if (gn.empty ()) {
-            id_dummy = parent_cc.insert_dummy ();
-          } else {
-            local_cluster<T> *lc = parent_cc.insert ();
-            lc->set_global_nets (gn);
-            id_dummy = lc->id ();
-          }
+            const typename db::local_cluster<T>::global_nets &gn = child_cc.cluster_by_id (id).get_global_nets ();
+            if (gn.empty ()) {
+              id_dummy = parent_cc.insert_dummy ();
+            } else {
+              local_cluster<T> *lc = parent_cc.insert ();
+              lc->set_global_nets (gn);
+              id_dummy = lc->id ();
+            }
 
-          parent_cc.add_connection (id_dummy, ci2);
-          seen.insert (std::make_pair (pi->parent_cell_index (), ci2));
+            parent_cc.add_connection (id_dummy, ci2);
+            seen.insert (std::make_pair (pi->parent_cell_index (), ci2));
 
-          if (pci == pi->parent_cell_index () && ci == ci2) {
-            id_new = id_dummy;
+            if (pci == pi->parent_cell_index () && ci == ci2) {
+              id_new = id_dummy;
+            }
+
           }
 
         }
 
       }
 
-    }
+      child_cc.reset_root (id);
 
-    child_cc.reset_root (id);
+    }
 
   }
 

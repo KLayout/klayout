@@ -1008,7 +1008,7 @@ public:
   ClusterInstance make_path (const db::Layout &layout, const db::Cell &cell, size_t id, const std::vector<ClusterInstElement> &path);
 
   // @@@
-  size_t propagate_cluster_inst (const db::Layout &layout, const ClusterInstance &ci, db::cell_index_type pci);
+  size_t propagate_cluster_inst (const db::Layout &layout, const Cell &cell, const ClusterInstance &ci, db::cell_index_type pci);
 
 private:
   void build_local_cluster (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence);

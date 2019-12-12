@@ -151,3 +151,8 @@ TEST(2)
   run_test (_this, tl::testsrc (), "PearlRiver/Layout/magic/PearlRiver_die.mag", "PearlRiver_au.cif.gz", 0, 1.0, 0.001, &lp);
 }
 
+TEST(3)
+{
+  run_test (_this, tl::testsrc (), "ringo/RINGO.mag", "ringo_au.cif.gz");
+}
+

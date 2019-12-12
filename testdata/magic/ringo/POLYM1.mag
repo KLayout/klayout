@@ -1,0 +1,13 @@
+magic
+timestamp 1575832387
+<< checkpaint >>
+rect -5 -5 5 5
+<< l5d0 >>
+rect -2 -2 2 2
+<< l1001d0 >>
+rect -5 -5 5 5
+<< l8d0 >>
+rect -1 -1 1 1
+<< l9d0 >>
+rect -2 -2 2 2
+<< end >>

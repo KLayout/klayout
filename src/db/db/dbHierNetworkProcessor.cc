@@ -1179,15 +1179,7 @@ public:
     db::ICplxTrans t;
 
     std::list<std::pair<ClusterInstance, ClusterInstance> > ic;
-    consider_instance_pair (box_type::world (), *i1, t, *i2, t, ic);
-
-    //  @@@ move to connect_clusters
-    //  connect_clusters requires propagated cluster ID's
-    for (std::list<std::pair<ClusterInstance, ClusterInstance> >::const_iterator i = ic.begin (); i != ic.end (); ++i) {
-      ensure_cluster_inst_propagated (i->first, mp_cell->cell_index ());
-      ensure_cluster_inst_propagated (i->second, mp_cell->cell_index ());
-    }
-    //  @@@
+    consider_instance_pair (box_type::world (), *i1, t, db::CellInstArray::iterator (), *i2, t, db::CellInstArray::iterator (), ic);
 
     connect_clusters (ic);
   }
@@ -1222,7 +1214,7 @@ public:
   void finish_cluster_to_instance_interactions ()
   {
     for (typename std::list<ClusterInstanceInteraction>::const_iterator ii = m_ci_interactions.begin (); ii != m_ci_interactions.end (); ++ii) {
-      ensure_cluster_inst_propagated (ii->other_ci, mp_cell->cell_index ());
+      mp_tree->propagate_cluster_inst (*mp_layout, *mp_cell, ii->other_ci, mp_cell->cell_index (), false);
     }
 
     for (typename std::list<ClusterInstanceInteraction>::const_iterator ii = m_ci_interactions.begin (); ii != m_ci_interactions.end (); ++ii) {
@@ -1464,8 +1456,10 @@ private:
    *  @param common The common box of both instances
    *  @param i1 The first instance to investigate
    *  @param t1 The parent instances' culmulated transformation
+   *  @param i1element selects a specific instance from i1 (unless == db::CellInstArray::iterator())
    *  @param i2 The second instance to investiage
    *  @param t2 The parent instances' culmulated transformation
+   *  @param i2element selects a specific instance from i2 (unless == db::CellInstArray::iterator())
    *  @param interacting_clusters_out Receives the cluster interaction descriptors
    *
    *  "interacting_clusters_out" will be cluster interactions in the parent instance space of i1 and i2 respectively.
@@ -1473,8 +1467,8 @@ private:
    *  respectively.
    */
   void consider_instance_pair (const box_type &common,
-                               const db::Instance &i1, const db::ICplxTrans &t1,
-                               const db::Instance &i2, const db::ICplxTrans &t2,
+                               const db::Instance &i1, const db::ICplxTrans &t1, const db::CellInstArray::iterator &i1element,
+                               const db::Instance &i2, const db::ICplxTrans &t2, const db::CellInstArray::iterator &i2element,
                                std::list<std::pair<ClusterInstance, ClusterInstance> > &interacting_clusters)
   {
     if (is_breakout_cell (mp_breakout_cells, i1.cell_index ()) || is_breakout_cell (mp_breakout_cells, i2.cell_index ())) {
@@ -1527,13 +1521,13 @@ private:
     std::list<std::pair<ClusterInstance, ClusterInstance> > ii_interactions;
 
     // @@@ optimize for single inst?
-    for (db::CellInstArray::iterator ii1 = i1.begin_touching (common_all.transformed (t1i), mp_layout); ! ii1.at_end (); ++ii1) {
+    for (db::CellInstArray::iterator ii1 = i1element.at_end () ? i1.begin_touching (common_all.transformed (t1i), mp_layout) : i1element; ! ii1.at_end (); ++ii1) {
 
       db::ICplxTrans i1t = i1.complex_trans (*ii1);
       db::ICplxTrans tt1 = t1 * i1t;
       box_type ib1 = bb1.transformed (tt1);
 
-      for (db::CellInstArray::iterator ii2 = i2.begin_touching (ib1.transformed (t2i), mp_layout); ! ii2.at_end (); ++ii2) {
+      for (db::CellInstArray::iterator ii2 = i2element.at_end () ? i2.begin_touching (ib1.transformed (t2i), mp_layout) : i2element; ! ii2.at_end (); ++ii2) {
 
         db::ICplxTrans i2t = i2.complex_trans (*ii2);
         db::ICplxTrans tt2 = t2 * i2t;
@@ -1559,7 +1553,7 @@ private:
           const db::Cell &cell2 = mp_layout->cell (i2.cell_index ());
           for (db::Cell::touching_iterator jj2 = cell2.begin_touching (common12.transformed (tt2.inverted ())); ! jj2.at_end (); ++jj2) {
 
-            consider_instance_pair (common12, i1, t1, *jj2, tt2, ii_interactions);
+            consider_instance_pair (common12, i1, t1, ii1, *jj2, tt2, db::CellInstArray::iterator (), ii_interactions);
 
             for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ++i) {
               propagate_cluster_inst (i->second, i2.cell_index (), i2t, i2.prop_id ());
@@ -1568,6 +1562,10 @@ private:
 
           }
 
+        }
+
+        if (! i2element.at_end ()) {
+          break;
         }
 
       }
@@ -1579,7 +1577,7 @@ private:
         const db::Cell &cell1 = mp_layout->cell (i1.cell_index ());
         for (db::Cell::touching_iterator jj1 = cell1.begin_touching (common1.transformed (tt1.inverted ())); ! jj1.at_end (); ++jj1) {
 
-          consider_instance_pair (common1, *jj1, tt1, i2, t2, ii_interactions);
+          consider_instance_pair (common1, *jj1, tt1, db::CellInstArray::iterator (), i2, t2, i2element, ii_interactions);
 
           for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ++i) {
             propagate_cluster_inst (i->first, i1.cell_index (), i1t, i1.prop_id ());
@@ -1588,6 +1586,10 @@ private:
 
         }
 
+      }
+
+      if (! i1element.at_end ()) {
+        break;
       }
 
     }
@@ -1762,7 +1764,6 @@ private:
       pp.push_back (ClusterInstElement (i.cell_index (), i.complex_trans (*ii), i.prop_id ()));
 
       bool any = false;
-      bool first = true;
 
       for (db::CellInstArray::iterator ii2 = i.begin_touching (ib, mp_layout); ! ii2.at_end (); ++ii2) {
 
@@ -1782,36 +1783,26 @@ private:
           cluster_instance_pair_list_type interacting_clusters;
 
           box_type common = (ib & ib2);
-          //  @@@ replace:
-          add_single_pair (common, i.cell_index (), pp, tt, i.cell_index (), pp2, tt2, interacting_clusters);
+          const std::vector<std::pair<size_t, size_t> > &i2i_interactions = compute_instance_interactions (common, i.cell_index (), tt, i.cell_index (), tt2);
+          for (std::vector<std::pair<size_t, size_t> >::const_iterator ii = i2i_interactions.begin (); ii != i2i_interactions.end (); ++ii) {
+            ClusterInstance k1 (ii->first, i.cell_index (), tt, i.prop_id ());
+            ClusterInstance k2 (ii->second, i.cell_index (), tt2, i.prop_id ());
+            interacting_clusters.push_back (std::make_pair (k1, k2));
+          }
 
-          //  dive into cell of ii2 - this is a self-interaction of a cell with parts of itself
-          //  as these self-interactions are expected to be the same always (regular array), we can skip this test the next times.
-          if (first) {
+          for (db::Cell::touching_iterator jj2 = cell.begin_touching (common.transformed (tt2.inverted ())); ! jj2.at_end (); ++jj2) {
 
-            for (db::Cell::touching_iterator jj2 = cell.begin_touching (common.transformed (tt2.inverted ())); ! jj2.at_end (); ++jj2) {
+            db::ICplxTrans t;
 
-              db::ICplxTrans t;
+            std::list<std::pair<ClusterInstance, ClusterInstance> > ii_interactions;
+            consider_instance_pair (common, i, t, ii, *jj2, tt2, db::CellInstArray::iterator (), ii_interactions);
 
-              std::list<std::pair<ClusterInstance, ClusterInstance> > ii_interactions;
-              consider_instance_pair (common, i, t, *jj2, tt2, ii_interactions);
-
-              for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator ii = ii_interactions.begin (); ii != ii_interactions.end (); ++ii) {
-                propagate_cluster_inst (ii->second, i.cell_index (), tt2, i.prop_id ());
-              }
-              interacting_clusters.splice (interacting_clusters.end (), ii_interactions, ii_interactions.begin (), ii_interactions.end ());
-
+            for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator ii = ii_interactions.begin (); ii != ii_interactions.end (); ++ii) {
+              propagate_cluster_inst (ii->second, i.cell_index (), tt2, i.prop_id ());
             }
+            interacting_clusters.splice (interacting_clusters.end (), ii_interactions, ii_interactions.begin (), ii_interactions.end ());
 
           }
-
-          // @@@ move to connect_clusters:
-          //  connect_clusters requires propagated cluster ID's
-          for (std::list<std::pair<ClusterInstance, ClusterInstance> >::const_iterator i = interacting_clusters.begin (); i != interacting_clusters.end (); ++i) {
-            ensure_cluster_inst_propagated (i->first, mp_cell->cell_index ());
-            ensure_cluster_inst_propagated (i->second, mp_cell->cell_index ());
-          }
-          // @@@
 
           connect_clusters (interacting_clusters);
 
@@ -1820,8 +1811,6 @@ private:
         }
 
       }
-
-      first = false;
 
       //  we don't expect more to happen on the next instance
       if (! any) {
@@ -2006,34 +1995,24 @@ private:
   // @@@
   void propagate_cluster_inst (ClusterInstance &ci, db::cell_index_type pci, const db::ICplxTrans &trans, db::properties_id_type prop_id) const
   {
-    size_t id_new = mp_tree->propagate_cluster_inst (*mp_layout, *mp_cell, ci, pci);
+    size_t id_new = mp_tree->propagate_cluster_inst (*mp_layout, *mp_cell, ci, pci, true);
     tl_assert (id_new != 0);
     ci = db::ClusterInstance (id_new, pci, trans, prop_id);
-  }
-
-  // @@@
-  void ensure_cluster_inst_propagated (const ClusterInstance &ci, db::cell_index_type pci) const
-  {
-    mp_tree->propagate_cluster_inst (*mp_layout, *mp_cell, ci, pci);
   }
 
   /**
    *  @brief Establishes connections between the cluster instances listed in the argument
    */
-  void connect_clusters (const cluster_instance_pair_list_type &interacting_clusters, const db::ICplxTrans *ic_trans = 0, db::properties_id_type prop_id1 = 0, db::properties_id_type prop_id2 = 0)
+  void connect_clusters (const cluster_instance_pair_list_type &interacting_clusters)
   {
     for (cluster_instance_pair_list_type::const_iterator ic = interacting_clusters.begin (); ic != interacting_clusters.end (); ++ic) {
 
-      ClusterInstance k1 = ic->first;
-      ClusterInstance k2 = ic->second;
+      const ClusterInstance &k1 = ic->first;
+      const ClusterInstance &k2 = ic->second;
 
-      // @@@
-      if (ic_trans) {
-        k1.transform (*ic_trans);
-        k1.set_inst_prop_id (prop_id1);
-        k2.transform (*ic_trans);
-        k2.set_inst_prop_id (prop_id2);
-      }
+      //  Note: "with_self" is false as we're going to create a connected cluster anyway
+      mp_tree->propagate_cluster_inst (*mp_layout, *mp_cell, k1, mp_cell->cell_index (), false);
+      mp_tree->propagate_cluster_inst (*mp_layout, *mp_cell, k2, mp_cell->cell_index (), false);
 
       id_type x1 = mp_cell_clusters->find_cluster_with_connection (k1);
       id_type x2 = mp_cell_clusters->find_cluster_with_connection (k2);
@@ -2096,7 +2075,7 @@ private:
 
 template <class T>
 size_t
-hier_clusters<T>::propagate_cluster_inst (const db::Layout &layout, const db::Cell &cell, const ClusterInstance &ci, db::cell_index_type pci)
+hier_clusters<T>::propagate_cluster_inst (const db::Layout &layout, const db::Cell &cell, const ClusterInstance &ci, db::cell_index_type pci, bool with_self)
 {
   connected_clusters<T> &target_cc = clusters_per_cell (pci);
   size_t parent_cluster = target_cc.find_cluster_with_connection (ci);
@@ -2128,7 +2107,7 @@ hier_clusters<T>::propagate_cluster_inst (const db::Layout &layout, const db::Ce
         for (db::CellInstArray::iterator pii = child_inst.begin (); ! pii.at_end (); ++pii) {
 
           ClusterInstance ci2 (id, child_inst.cell_index (), child_inst.complex_trans (*pii), child_inst.prop_id ());
-          if ((cell.cell_index () != pi->parent_cell_index () || ci != ci2) && seen.find (std::make_pair (pi->parent_cell_index (), ci2)) == seen.end ()) {
+          if ((with_self || cell.cell_index () != pi->parent_cell_index () || ci != ci2) && seen.find (std::make_pair (pi->parent_cell_index (), ci2)) == seen.end ()) {
 
             size_t id_dummy;
 

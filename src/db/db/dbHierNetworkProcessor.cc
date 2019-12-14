@@ -1518,8 +1518,6 @@ private:
     db::ICplxTrans t1i = t1.inverted ();
     db::ICplxTrans t2i = t2.inverted ();
 
-    std::list<std::pair<ClusterInstance, ClusterInstance> > ii_interactions;
-
     // @@@ optimize for single inst?
     for (db::CellInstArray::iterator ii1 = i1element.at_end () ? i1.begin_touching (common_all.transformed (t1i), mp_layout) : i1element; ! ii1.at_end (); ++ii1) {
 
@@ -1553,6 +1551,7 @@ private:
           const db::Cell &cell2 = mp_layout->cell (i2.cell_index ());
           for (db::Cell::touching_iterator jj2 = cell2.begin_touching (common12.transformed (tt2.inverted ())); ! jj2.at_end (); ++jj2) {
 
+            std::list<std::pair<ClusterInstance, ClusterInstance> > ii_interactions;
             consider_instance_pair (common12, i1, t1, ii1, *jj2, tt2, db::CellInstArray::iterator (), ii_interactions);
 
             for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ++i) {
@@ -1577,6 +1576,7 @@ private:
         const db::Cell &cell1 = mp_layout->cell (i1.cell_index ());
         for (db::Cell::touching_iterator jj1 = cell1.begin_touching (common1.transformed (tt1.inverted ())); ! jj1.at_end (); ++jj1) {
 
+          std::list<std::pair<ClusterInstance, ClusterInstance> > ii_interactions;
           consider_instance_pair (common1, *jj1, tt1, db::CellInstArray::iterator (), i2, t2, i2element, ii_interactions);
 
           for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ++i) {

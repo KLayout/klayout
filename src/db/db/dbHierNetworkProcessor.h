@@ -734,6 +734,30 @@ private:
 
 typedef std::list<std::pair<ClusterInstance, ClusterInstance> > cluster_instance_pair_list_type;
 
+inline bool equal_array_delegates (const db::ArrayBase *a, const db::ArrayBase *b)
+{
+  if ((a == 0) != (b == 0)) {
+    return false;
+  } else if (a) {
+    static const db::array_base_ptr_cmp_f arr_less;
+    return ! arr_less (a, b) && ! arr_less (b, a);
+  } else {
+    return true;
+  }
+}
+
+inline bool less_array_delegates (const db::ArrayBase *a, const db::ArrayBase *b)
+{
+  if ((a == 0) != (b == 0)) {
+    return (a == 0) < (b == 0);
+  } else if (a) {
+    static const db::array_base_ptr_cmp_f arr_less;
+    return arr_less (a, b);
+  } else {
+    return false;
+  }
+}
+
 /**
  *  @brief A helper struct to describe a pair of cell instances with a specific relative transformation
  */
@@ -747,7 +771,8 @@ struct InstanceToInstanceInteraction
   {
     static const db::array_base_ptr_cmp_f arr_less;
     return ci1 == other.ci1 && ci2 == other.ci2 && t21.equal (other.t21) &&
-            (array1 == 0) == (array2 == 0) && array1 != 0 && ! arr_less (array1, array2) && ! arr_less (array2, array1);
+            equal_array_delegates (array1, other.array1) &&
+            equal_array_delegates (array2, other.array2);
   }
 
   bool operator< (const InstanceToInstanceInteraction &other) const
@@ -761,15 +786,12 @@ struct InstanceToInstanceInteraction
     if (! t21.equal (other.t21)) {
       return t21.less (other.t21);
     }
-    if ((array1 == 0) != (array2 == 0)) {
-      return (array1 == 0) < (array2 == 0);
-    }
-    if (array1 != 0) {
-      static const db::array_base_ptr_cmp_f arr_less;
-      return arr_less (array1, array2);
-    } else {
+    if (less_array_delegates (array1, other.array1)) {
+      return true;
+    } else if (less_array_delegates (other.array1, array1)) {
       return false;
     }
+    return less_array_delegates (array2, other.array2);
   }
 
   db::cell_index_type ci1, ci2;

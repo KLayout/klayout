@@ -769,7 +769,6 @@ struct InstanceToInstanceInteraction
 
   bool operator== (const InstanceToInstanceInteraction &other) const
   {
-    static const db::array_base_ptr_cmp_f arr_less;
     return ci1 == other.ci1 && ci2 == other.ci2 && t21.equal (other.t21) &&
             equal_array_delegates (array1, other.array1) &&
             equal_array_delegates (array2, other.array2);
@@ -799,7 +798,7 @@ struct InstanceToInstanceInteraction
   db::ICplxTrans t21;
 };
 
-typedef std::map<InstanceToInstanceInteraction, std::pair<db::ICplxTrans, cluster_instance_pair_list_type> > instance_interaction_cache_type;
+typedef std::map<InstanceToInstanceInteraction, cluster_instance_pair_list_type> instance_interaction_cache_type;
 
 template <class T> class hier_clusters;
 template <class T> class connected_clusters;
@@ -974,7 +973,7 @@ class DB_PUBLIC_TEMPLATE hier_clusters
 {
 public:
   typedef typename local_cluster<T>::box_type box_type;
-  typedef std::map<InstanceToInstanceInteraction, std::pair<db::ICplxTrans, cluster_instance_pair_list_type> > instance_interaction_cache_type;
+  typedef std::map<InstanceToInstanceInteraction, cluster_instance_pair_list_type> instance_interaction_cache_type;
 
   /**
    *  @brief Creates an empty set of clusters
@@ -1022,15 +1021,12 @@ public:
   void clear ();
 
   /**
-   *  @brief Makes a valid path to a child cluster
+   *  @brief Ensures a cluster instance is connected from all parents of the instantiated cell
    *
-   *  Cluster connections can only cross one level of hierarchy. This method
-   *  creates necessary dummy entries for the given path.
+   *  If "with_self" is true, the specified instance "ci" is included in the connections. Otherwise
+   *  there is not connection made for this instance.
    */
-  ClusterInstance make_path (const db::Layout &layout, const db::Cell &cell, size_t id, const std::vector<ClusterInstElement> &path);
-
-  // @@@
-  size_t propagate_cluster_inst (const db::Layout &layout, const Cell &cell, const ClusterInstance &ci, db::cell_index_type pci, bool with_self);
+  size_t propagate_cluster_inst (const db::Layout &layout, const Cell &cell, const ClusterInstance &ci, db::cell_index_type parent_ci, bool with_self);
 
 private:
   void build_local_cluster (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence);

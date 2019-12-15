@@ -739,8 +739,7 @@ inline bool equal_array_delegates (const db::ArrayBase *a, const db::ArrayBase *
   if ((a == 0) != (b == 0)) {
     return false;
   } else if (a) {
-    static const db::array_base_ptr_cmp_f arr_less;
-    return ! arr_less (a, b) && ! arr_less (b, a);
+    return ! db::array_base_ptr_cmp_f () (a, b) && ! db::array_base_ptr_cmp_f () (b, a);
   } else {
     return true;
   }
@@ -751,8 +750,7 @@ inline bool less_array_delegates (const db::ArrayBase *a, const db::ArrayBase *b
   if ((a == 0) != (b == 0)) {
     return (a == 0) < (b == 0);
   } else if (a) {
-    static const db::array_base_ptr_cmp_f arr_less;
-    return arr_less (a, b);
+    return db::array_base_ptr_cmp_f () (a, b);
   } else {
     return false;
   }

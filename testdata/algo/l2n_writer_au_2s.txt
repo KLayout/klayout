@@ -32,6 +32,8 @@ C(ptie diff_cont ptie)
 C(nsd diff_cont nsd)
 G(rbulk BULK)
 G(ptie BULK)
+K(PMOS MOS4)
+K(NMOS MOS4)
 D(D$PMOS PMOS
  T(S
   R(psd (-650 -475) (525 950))

@@ -23,6 +23,8 @@ C(metal2 via1 metal2 metal2_lbl)
 C(metal2_lbl metal2)
 C(psd diff_cont psd)
 C(nsd diff_cont nsd)
+K(PMOS MOS3)
+K(NMOS MOS3)
 D(D$PMOS PMOS
  T(S
   R(psd (-650 -475) (525 950))

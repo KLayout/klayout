@@ -27,6 +27,8 @@ J(
  C(l2 l6 l2)
  C(l5 l6 l5)
  G(l14 SUBSTRATE)
+ K(PMOS MOS3)
+ K(NMOS MOS3)
  D(D$PMOS PMOS
   T(S
    R(l2 (-900 -475) (775 950))
@@ -265,6 +267,8 @@ J(
  )
 )
 H(
+ K(PMOS MOS3)
+ K(NMOS MOS3)
  X(INV
   N(1 I('1'))
   N(2 I('2'))

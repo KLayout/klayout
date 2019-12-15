@@ -2286,8 +2286,8 @@ template class DB_PUBLIC hier_clusters<db::Edge>;
 //  recursive_cluster_shape_iterator implementation
 
 template <class T>
-recursive_cluster_shape_iterator<T>::recursive_cluster_shape_iterator (const hier_clusters<T> &hc, unsigned int layer, db::cell_index_type ci, typename local_cluster<T>::id_type id)
-  : mp_hc (&hc), m_layer (layer), m_id (id)
+recursive_cluster_shape_iterator<T>::recursive_cluster_shape_iterator (const hier_clusters<T> &hc, unsigned int layer, db::cell_index_type ci, typename local_cluster<T>::id_type id, const CircuitCallback *callback)
+  : mp_hc (&hc), m_layer (layer), m_id (id), mp_callback (callback)
 {
   if (id == 0) {
     return;
@@ -2352,7 +2352,12 @@ void recursive_cluster_shape_iterator<T>::next_conn ()
   if (m_conn_iter_stack.back ().first != m_conn_iter_stack.back ().second) {
 
     const ClusterInstance &cli = *m_conn_iter_stack.back ().first;
-    down (cli.inst_cell_index (), cli.id (), cli.inst_trans ());
+    if (mp_callback && ! mp_callback->new_cell (cli.inst_cell_index ())) {
+      //  skip this cell
+      ++m_conn_iter_stack.back ().first;
+    } else {
+      down (cli.inst_cell_index (), cli.id (), cli.inst_trans ());
+    }
 
   } else {
 

@@ -1039,6 +1039,25 @@ private:
 };
 
 /**
+ *  @brief A callback function for the recursive cluster shape and cluster iterator selecting cells/circuits
+ *
+ *  Reimplement the "new_circuit" method to receive a callback on a new cell or circuit.
+ */
+class DB_PUBLIC CircuitCallback
+{
+public:
+  CircuitCallback () { }
+
+  /**
+   *  @brief This method is called whenever a circuit is entered when descending.
+   *  Return false to skip this circuit and all of it's children. This method is called before the
+   *  new cell is entered.
+   *  @param new_ci The cell index of the cell to enter
+   */
+  virtual bool new_cell (db::cell_index_type /*new_ci*/) const { return true; }
+};
+
+/**
  *  @brief A recursive shape iterator for the shapes of a cluster
  *
  *  This iterator will deliver the shapes of a cluster including the shapes for the
@@ -1057,7 +1076,7 @@ public:
   /**
    *  @brief Constructor
    */
-  recursive_cluster_shape_iterator (const hier_clusters<T> &hc, unsigned int layer, db::cell_index_type ci, typename local_cluster<T>::id_type id);
+  recursive_cluster_shape_iterator (const hier_clusters<T> &hc, unsigned int layer, db::cell_index_type ci, typename local_cluster<T>::id_type id, const CircuitCallback *callback = 0);
 
   /**
    *  @brief Returns a value indicating whether there are any more shapes
@@ -1138,6 +1157,7 @@ private:
   typename db::local_cluster<T>::shape_iterator m_shape_iter;
   unsigned int m_layer;
   typename db::local_cluster<T>::id_type m_id;
+  const CircuitCallback *mp_callback;
 
   void next_conn ();
   void up ();

@@ -1270,3 +1270,8 @@ TEST(117_HierClusters)
   run_hc_test_with_backannotation (_this, "hc_test_l17.gds", "hc_test_au17b.gds");
 }
 
+TEST(118_HierClustersMeanderArrays)
+{
+  run_hc_test (_this, "meander.gds.gz", "meander_au1.gds");
+  run_hc_test_with_backannotation (_this, "meander.gds.gz", "meander_au2.gds");
+}

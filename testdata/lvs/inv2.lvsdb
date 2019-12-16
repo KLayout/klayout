@@ -30,6 +30,8 @@ J(
  C(l10 l8 l10)
  G(l7 SUBSTRATE)
  G(l10 SUBSTRATE)
+ K(PMOS MOS4)
+ K(NMOS MOS4)
  D(D$PMOS PMOS
   T(S
    R(l2 (-575 -750) (450 1500))
@@ -146,6 +148,8 @@ J(
  )
 )
 H(
+ K(PMOS MOS4)
+ K(NMOS MOS4)
  X(INVERTER_WITH_DIODES
   N(1 I(VSS))
   N(2 I(IN))

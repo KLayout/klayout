@@ -31,6 +31,7 @@
 #include "dbLayoutVsSchematic.h"
 #include "dbLayoutToNetlistFormatDefs.h"
 #include "dbLayoutVsSchematicFormatDefs.h"
+#include "tlGlobPattern.h"
 
 namespace db
 {
@@ -296,13 +297,34 @@ size_t LayoutToNetlist::global_net_id (const std::string &name)
 
 void LayoutToNetlist::extract_netlist (const std::string &joined_net_names, bool include_floating_subcircuits)
 {
+  extract_netlist (joined_net_names, std::map<std::string, std::string> (), include_floating_subcircuits);
+}
+
+void LayoutToNetlist::extract_netlist (const std::string &joined_net_names, const std::map<std::string, std::string> &joined_net_names_per_cell, bool include_floating_subcircuits)
+{
   if (m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
   }
   ensure_netlist ();
 
   db::NetlistExtractor netex;
+
   netex.set_joined_net_names (joined_net_names);
+
+  const db::Layout &layout = dss ().layout (m_layout_index);
+  for (std::map<std::string, std::string>::const_iterator j = joined_net_names_per_cell.begin (); j != joined_net_names_per_cell.end (); ++j) {
+    tl::GlobPattern pat (j->first);
+    if (pat.is_const ()) {
+      netex.set_joined_net_names (j->first, j->second);
+    } else {
+      for (db::Layout::const_iterator c = layout.begin (); c != layout.end (); ++c) {
+        if (pat.match (layout.cell_name (c->cell_index ()))) {
+          netex.set_joined_net_names (layout.cell_name (c->cell_index ()), j->second);
+        }
+      }
+    }
+  }
+
   netex.set_include_floating_subcircuits (include_floating_subcircuits);
   netex.extract_nets (dss (), m_layout_index, m_conn, *mp_netlist, m_net_clusters);
 

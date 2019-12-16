@@ -1,5 +1,18 @@
-0.26.2          (xxxx-xx-xx):
+0.26.2          (2019-12-17):
 
+* Bugfix: %GITHUB%/issues/449
+      The Qt windows styling plugin is now installed too on Windows.
+* Bugfix: %GITHUB%/issues/448
+      The LVSDB database wasn't written with the proper device 
+      class statements in short form.
+* Bugfix: %GITHUB%/issues/447
+      Net extraction did not work properly on a specific test case 
+      with folded and interleaving array instances.
+* Bugfix: %GITHUB%/issues/445
+      "Selection/Merge shapes" gave cryptic message when instances are selected
+* Enhancement: %GITHUB%/issues/444
+      Support for net joining though labels also for specific 
+      subcells (here: to support double-height standard cells)
 * Enhancement: %GITHUB%/issues/438
       Redefining a circuit in Spice netlists will give an error now
 * Bugfix: %GITHUB%/issues/445

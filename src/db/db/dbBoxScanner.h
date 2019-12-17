@@ -419,7 +419,6 @@ private:
             for (iterator_type j = c; j < i; ++j) {
               if (bs_boxes_overlap (bc (*i->first), bc (*j->first), enl)) {
                 if (seen.insert (std::make_pair (i->first, j->first)).second) {
-                  seen.insert (std::make_pair (j->first, i->first));
                   rec.add (i->first, i->second, j->first, j->second);
                   if (rec.stop ()) {
                     return false;

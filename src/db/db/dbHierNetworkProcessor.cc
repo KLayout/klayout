@@ -1023,15 +1023,21 @@ connected_clusters<T>::join_cluster_with (typename local_cluster<T>::id_type id,
 
   //  handle the connections by translating
 
-  const connections_type &to_join = connections_for_cluster (with_id);
-  connections_type &target = m_connections [id];
-  target.insert (target.end (), to_join.begin (), to_join.end ());
+  typename std::map<typename local_cluster<T>::id_type, connections_type>::iterator tc = m_connections.find (with_id);
+  if (tc != m_connections.end ()) {
 
-  for (connections_type::const_iterator c = to_join.begin (); c != to_join.end (); ++c) {
-    m_rev_connections [*c] = id;
+    connections_type &to_join = tc->second;
+
+    for (connections_type::const_iterator c = to_join.begin (); c != to_join.end (); ++c) {
+      m_rev_connections [*c] = id;
+    }
+
+    connections_type &target = m_connections [id];
+    target.splice (target.end (), to_join, to_join.begin (), to_join.end ());
+
+    m_connections.erase (tc);
+
   }
-
-  m_connections.erase (with_id);
 }
 
 template <class T>
@@ -1773,11 +1779,8 @@ private:
       const ClusterInstance &k2 = ic->second;
 
       //  Note: "with_self" is false as we're going to create a connected cluster anyway
-      mp_tree->propagate_cluster_inst (*mp_layout, *mp_cell, k1, mp_cell->cell_index (), false);
-      mp_tree->propagate_cluster_inst (*mp_layout, *mp_cell, k2, mp_cell->cell_index (), false);
-
-      id_type x1 = mp_cell_clusters->find_cluster_with_connection (k1);
-      id_type x2 = mp_cell_clusters->find_cluster_with_connection (k2);
+      id_type x1 = mp_tree->propagate_cluster_inst (*mp_layout, *mp_cell, k1, mp_cell->cell_index (), false);
+      id_type x2 = mp_tree->propagate_cluster_inst (*mp_layout, *mp_cell, k2, mp_cell->cell_index (), false);
 
       if (x1 == 0) {
 
@@ -2228,9 +2231,8 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
         } else {
 
           //  ensures the cluster is propagated so we can connect it with another
-          propagate_cluster_inst (layout, cell, *i, cell.cell_index (), false);
+          size_t other_id = propagate_cluster_inst (layout, cell, *i, cell.cell_index (), false);
 
-          size_t other_id = local.find_cluster_with_connection (*i);
           if (other_id == gcid) {
             //  shouldn't happen, but duplicate instances may trigger this
           } else if (other_id) {

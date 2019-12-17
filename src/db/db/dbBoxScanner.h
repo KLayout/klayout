@@ -415,6 +415,11 @@ private:
             } while (f != future && bc (*f->first).left () == xx);
           } while (f != future && f - c < min_box_size);
 
+          if (m_report_progress) {
+            //  Note: there is no better estimation of the progress than "current" ...
+            progress->set (current - m_pp.begin ());
+          }
+
           for (iterator_type i = f0; i != f; ++i) {
             for (iterator_type j = c; j < i; ++j) {
               if (bs_boxes_overlap (bc (*i->first), bc (*j->first), enl)) {
@@ -429,10 +434,6 @@ private:
           }
 
           x = xx;
-
-          if (m_report_progress) {
-            progress->set (f - m_pp.begin ());
-          }
 
         }
 

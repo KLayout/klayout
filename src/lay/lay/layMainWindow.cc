@@ -136,19 +136,9 @@ public:
     }
   }
 
-  void set_can_cancel (bool f)
+  void set_progress (tl::Progress *progress)
   {
-    mp_progress_widget->set_can_cancel (f);
-  }
-
-  void set_text (const std::string &text)
-  {
-    mp_progress_widget->set_text (text);
-  }
-
-  void set_value (double v, const std::string &value)
-  {
-    mp_progress_widget->set_value (v, value);
+    mp_progress_widget->set_progress (progress);
   }
 
   void add_widget (QWidget *widget)
@@ -4732,23 +4722,14 @@ MainWindow::progress_get_widget () const
 bool
 MainWindow::update_progress (tl::Progress *progress)
 {
-  bool can_cancel = progress->can_cancel ();
-  std::string text = progress->desc ();
-  std::string value = progress->formatted_value ();
-  double v = progress->value ();
-
   if (mp_progress_dialog) {
 
-    mp_progress_dialog->set_can_cancel (can_cancel);
-    mp_progress_dialog->set_text (text);
-    mp_progress_dialog->set_value (v, value);
+    mp_progress_dialog->set_progress (progress);
     return true;
 
   } else if (isVisible () && mp_progress_widget) {
 
-    mp_progress_widget->set_can_cancel (can_cancel);
-    mp_progress_widget->set_text (text);
-    mp_progress_widget->set_value (v, value);
+    mp_progress_widget->set_progress (progress);
     return true;
 
   } else {

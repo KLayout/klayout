@@ -25,6 +25,7 @@
 
 #include <QFrame>
 #include <QGridLayout>
+#include <QLabel>
 
 #include <math.h>
 
@@ -34,22 +35,15 @@ namespace lay
 // --------------------------------------------------------------------
 
 class ProgressBarWidget
-  : public QWidget 
+  : public QWidget
 {
 public:
   ProgressBarWidget (QWidget *parent, const char *name = "");
 
   void set_value (double v, const std::string &value);
 
-  QSize sizeHint () const 
-  {
-    return QSize (m_width, 20);
-  }
-
-  QSize minimumSizeHint () const 
-  {
-    return QSize (m_width, 1);
-  }
+  QSize sizeHint () const;
+  QSize minimumSizeHint () const;
 
 private:
   double m_value;
@@ -69,6 +63,7 @@ ProgressBarWidget::ProgressBarWidget (QWidget *parent, const char *name)
 {
   setObjectName (QString::fromUtf8 (name));
   setMinimumSize (64, 10);
+  setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
 void
@@ -88,6 +83,19 @@ ProgressBarWidget::set_value (double v, const std::string &value)
     m_length = l;
     update ();
   }
+}
+
+QSize
+ProgressBarWidget::sizeHint () const
+{
+  QFontMetrics fm (font ());
+  return QSize (m_width, fm.height () + 2);
+}
+
+QSize
+ProgressBarWidget::minimumSizeHint () const
+{
+  return QSize (m_width, 1);
 }
 
 void 
@@ -161,20 +169,21 @@ ProgressWidget::ProgressWidget (ProgressReporter *pr, QWidget *parent, bool full
 
   QFrame *progress_bar_frame = new QFrame (bar_frame);
   progress_bar_frame->setFrameStyle (QFrame::Box | QFrame::Plain);
-  progress_bar_frame->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Preferred);
+  progress_bar_frame->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
   layout->addWidget (progress_bar_frame, 0, col, 1, 1);
   layout->setColumnStretch(col++, 2);
 
-  QVBoxLayout *pbf_layout = new QVBoxLayout (progress_bar_frame);
+  QGridLayout *pbf_layout = new QGridLayout (progress_bar_frame);
   progress_bar_frame->setLayout (pbf_layout);
   pbf_layout->setMargin (0);
+  pbf_layout->setSpacing (0);
 
   mp_progress_bar1 = new ProgressBarWidget (progress_bar_frame);
-  pbf_layout->addWidget (mp_progress_bar1);
+  pbf_layout->addWidget (mp_progress_bar1, 0, 0, 1, 1);
   mp_progress_bar2 = new ProgressBarWidget (progress_bar_frame);
-  pbf_layout->addWidget (mp_progress_bar2);
+  pbf_layout->addWidget (mp_progress_bar2, 1, 0, 1, 1);
   mp_progress_bar3 = new ProgressBarWidget (progress_bar_frame);
-  pbf_layout->addWidget (mp_progress_bar3);
+  pbf_layout->addWidget (mp_progress_bar3, 2, 0, 1, 1);
 
   layout->addItem (new QSpacerItem (8, 8, QSizePolicy::Fixed, QSizePolicy::Fixed), 0, col++, 1, 1);
 
@@ -240,9 +249,10 @@ ProgressWidget::set_progress (tl::Progress *progress)
   for (size_t i = 0; i < sizeof (progress_bars) / sizeof (progress_bars[0]); ++i) {
 
     lay::ProgressBarWidget *pb = progress_bars[i];
-    pb->setVisible (progress != 0);
 
     if (progress) {
+
+      pb->show ();
 
       std::string value = progress->formatted_value ();
       double v = progress->value ();
@@ -250,10 +260,14 @@ ProgressWidget::set_progress (tl::Progress *progress)
 
       progress = progress->next ();
 
+    } else {
+      pb->hide ();
     }
 
   }
 
+  //  according to the doc this should not be required, but without, the progress bar does not resize
+  mp_progress_bar1->parentWidget ()->updateGeometry ();
 }
 
 void 

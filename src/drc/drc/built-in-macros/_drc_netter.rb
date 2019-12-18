@@ -66,6 +66,7 @@ module DRC
       @engine = engine
       @netlisted = false
       @connect_implicit = []
+      @connect_implicit_per_cell = {}
       @l2n = nil
       @lnum = 0
       @device_scaling = 1.0
@@ -203,6 +204,7 @@ module DRC
     def clear_connections
       @netlisted = false
       @connect_implicit = []
+      @connect_implicit_per_cell = {}
       _clear_data
     end
     
@@ -210,8 +212,9 @@ module DRC
     # @name connect_implicit
     # @brief Specifies a search pattern for labels which create implicit net connections
     # @synopsis connect_implicit(label_pattern)
+    # @synopsis connect_implicit(cell_pattern, label_pattern)
     # Use this method to supply label strings which create implicit net connections
-    # on the top level circuit. This feature is useful to connect identically labelled nets
+    # on the top level circuit in the first version. This feature is useful to connect identically labelled nets
     # while a component isn't integrated yet. If the component is integrated, nets may be connected
     # on a higher hierarchy level - e.g. by a power mesh. Inside the component this net consists
     # of individual islands. To properly perform netlist extraction and comparison, these islands
@@ -219,12 +222,26 @@ module DRC
     # achive this if these islands are labelled with the same text on the top level of the
     # component.
     #
+    # In the second version, the pattern can be specified for a cell range (given by a cell name pattern or a 
+    # single cell name). These pattern are applied to non-top cells. The unspecific pattern
+    # has priority over the cell-specific ones. As the cell selector is a pattern itself, a
+    # single cell may fall into more than one category. In this case, the label filters are
+    # combined.
+    #
     # The implicit connections are applied on the next net extraction and cleared
     # on "clear_connections".
 
-    def connect_implicit(arg)
+    def connect_implicit(arg1, arg2 = nil)
       cleanup
-      @connect_implicit << arg
+      if arg2
+        (arg2.is_a?(String) && arg2 != "") || raise("The second argument of 'connect_implicit' has to be a non-empty string")
+        arg1.is_a?(String) || raise("The first argument of 'connect_implicit' has to be a string")
+        @connect_implicit_per_cell[arg1] ||= []
+        @connect_implicit_per_cell[arg1] << arg2
+      else
+        arg1.is_a?(String) || raise("The argument of 'connect_implicit' has to be a string")
+        @connect_implicit << arg1
+      end
     end
 
     # %DRC%
@@ -341,15 +358,19 @@ module DRC
 
       # run extraction in a timed environment
       if ! @netlisted
+
         # build a glob expression from the parts
-        exprs =  @connect_implicit.collect { |c| c.gsub(/\?\*\[\]\{\},\(\)\\/) { |x| "\\" + x } }
-        if exprs.size > 1
-          expr = "{" + exprs.join(",") + "}"
-        else
-          expr = exprs[0] || ""
+        expr = _join_glob_pattern(@connect_implicit)
+
+        # build cell-pattern specific glob expressions from the parts
+        per_cell_expr = {}
+        @connect_implicit_per_cell.each do |cell_pattern,label_pattern|
+          per_cell_expr[cell_pattern] = _join_glob_pattern(label_pattern)
         end
-        @engine._cmd(@l2n, :extract_netlist, expr)
+
+        @engine._cmd(@l2n, :extract_netlist, expr, per_cell_expr)
         @netlisted = true
+
       end
 
       @l2n
@@ -399,6 +420,19 @@ module DRC
         _make_data
         @l2n.device_scaling = @device_scaling
       end
+    end
+
+    def _join_glob_pattern(pattern)
+
+      exprs = pattern.collect { |c| c.gsub(/\?\*\[\]\{\},\(\)\\/) { |x| "\\" + x } }
+      if exprs.size > 1
+        expr = "{" + exprs.join(",") + "}"
+      else
+        expr = exprs[0] || ""
+      end
+
+      expr
+
     end
 
     def _make_data

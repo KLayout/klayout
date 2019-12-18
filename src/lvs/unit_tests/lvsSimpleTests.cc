@@ -165,3 +165,15 @@ TEST(18_cheats)
   run_test (_this, "invchain_cheat", "invchain_for_cheat.gds");
 }
 
+//  testing cell specific net joining for VSS of the double-height inverter standard cell
+TEST(19_double_height_inv)
+{
+  run_test (_this, "double_height", "double_height_inv.gds");
+}
+
+//  testing cell specific net joining for VSS of the double-height inverter standard cell
+TEST(20_double_height2_inv)
+{
+  run_test (_this, "double_height2", "double_height2_inv.gds");
+}
+

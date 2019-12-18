@@ -1104,6 +1104,9 @@ private:
 //  hier_clusters implementation
 
 template <class T>
+const db::cell_index_type hier_clusters<T>::top_cell_index = std::numeric_limits<db::cell_index_type>::max ();
+
+template <class T>
 hier_clusters<T>::hier_clusters ()
   : m_base_verbosity (20)
 {
@@ -1124,7 +1127,7 @@ void hier_clusters<T>::clear ()
 
 template <class T>
 void
-hier_clusters<T>::build (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence, const std::set<db::cell_index_type> *breakout_cells)
+hier_clusters<T>::build (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const std::map<db::cell_index_type, tl::equivalence_clusters<unsigned int> > *attr_equivalence, const std::set<db::cell_index_type> *breakout_cells)
 {
   clear ();
   cell_clusters_box_converter<T> cbc (layout, *this);
@@ -1903,7 +1906,7 @@ hier_clusters<T>::propagate_cluster_inst (const db::Layout &layout, const db::Ce
 
 template <class T>
 void
-hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence, const std::set<db::cell_index_type> *breakout_cells)
+hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const std::map<db::cell_index_type, tl::equivalence_clusters<unsigned int> > *attr_equivalence, const std::set<db::cell_index_type> *breakout_cells)
 {
   tl::SelfTimer timer (tl::verbosity () > m_base_verbosity, tl::to_string (tr ("Computing shape clusters")));
 
@@ -1918,8 +1921,30 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
     tl::RelativeProgress progress (tl::to_string (tr ("Computing local clusters")), called.size (), 1);
 
     for (std::set<db::cell_index_type>::const_iterator c = called.begin (); c != called.end (); ++c) {
-      build_local_cluster (layout, layout.cell (*c), shape_flags, conn, *c == cell.cell_index () ? attr_equivalence : 0);
+
+      //  look for the net label joining spec - for the top cell the "top_cell_index" entry is looked for.
+      //  If there is no such entry or the cell is not the top cell, look for the entry by cell index.
+      std::map<db::cell_index_type, tl::equivalence_clusters<unsigned int> >::const_iterator ae;
+      const tl::equivalence_clusters<unsigned int> *ec = 0;
+      if (attr_equivalence) {
+        if (*c == cell.cell_index ()) {
+          ae = attr_equivalence->find (top_cell_index);
+          if (ae != attr_equivalence->end ()) {
+            ec = &ae->second;
+          }
+        }
+        if (! ec) {
+          ae = attr_equivalence->find (*c);
+          if (ae != attr_equivalence->end ()) {
+            ec = &ae->second;
+          }
+        }
+      }
+
+      build_local_cluster (layout, layout.cell (*c), shape_flags, conn, ec);
+
       ++progress;
+
     }
   }
 

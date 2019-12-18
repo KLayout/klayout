@@ -184,16 +184,23 @@ to shapes belonging to tie-down diodes.
 <a name="connect_implicit"/><p>Usage:</p>
 <ul>
 <li><tt>connect_implicit(label_pattern)</tt></li>
+<li><tt>connect_implicit(cell_pattern, label_pattern)</tt></li>
 </ul>
 <p>
-Use this method to supply label strings which create implicit net connections
+Use the first version of this method to supply label strings which create implicit net connections
 on the top level circuit. This feature is useful to connect identically labelled nets
 while a component isn't integrated yet. If the component is integrated, nets may be connected
 on a higher hierarchy level - e.g. by a power mesh. Inside the component this net consists
 of individual islands. To properly perform netlist extraction and comparison, these islands
 need to be connected even though there isn't a physical connection. "connect_implicit" can
-achive this if these islands are labelled with the same text on the top level of the
+achieve this if these islands are labelled with the same text on the top level of the
 component.
+</p><p>
+In the second version, the pattern can be specified for a cell range (given by a cell glob-style
+name pattern or a single cell name). These pattern are applied to non-top cells. An unspecific pattern
+has priority over the cell-specific ones. As the cell selector is a pattern itself, a
+single cell may fall into more than one category. In this case, the label filters are
+combined.
 </p><p>
 The implicit connections are applied on the next net extraction and cleared
 on "clear_connections".

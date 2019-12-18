@@ -107,6 +107,13 @@ public:
   void set_joined_net_names (const std::string &jnn);
 
   /**
+   *  @brief Sets the joined net names attribute for a given cell name
+   *  While the single-parameter set_joined_net_names only acts on the top cell, this
+   *  version will act on the cell with the given name.
+   */
+  void set_joined_net_names (const std::string &cell_name, const std::string &jnn);
+
+  /**
    *  @brief Gets the joined net names expression
    */
   const std::string &joined_net_names () const
@@ -128,6 +135,7 @@ private:
   std::pair<bool, db::property_names_id_type> m_device_annot_name_id;
   std::pair<bool, db::property_names_id_type> m_terminal_annot_name_id;
   std::string m_joined_net_names;
+  std::list<std::pair<std::string, std::string> > m_joined_net_names_per_cell;
   bool m_include_floating_subcircuits;
 
   bool instance_is_device (db::properties_id_type prop_id) const;

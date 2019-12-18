@@ -39,6 +39,11 @@ void NetlistExtractor::set_joined_net_names (const std::string &jnn)
   m_joined_net_names = jnn;
 }
 
+void NetlistExtractor::set_joined_net_names (const std::string &cellname, const std::string &jnn)
+{
+  m_joined_net_names_per_cell.push_back (std::make_pair (cellname, jnn));
+}
+
 void NetlistExtractor::set_include_floating_subcircuits (bool f)
 {
   m_include_floating_subcircuits = f;
@@ -90,9 +95,17 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
 
   //  the big part: actually extract the nets
 
-  tl::equivalence_clusters<unsigned int> net_name_equivalence;
-  if (m_text_annot_name_id.first && ! m_joined_net_names.empty ()) {
-    build_net_name_equivalence (mp_layout, m_text_annot_name_id.second, m_joined_net_names, net_name_equivalence);
+  std::map<db::cell_index_type, tl::equivalence_clusters<unsigned int> > net_name_equivalence;
+  if (m_text_annot_name_id.first) {
+    if (! m_joined_net_names.empty ()) {
+      build_net_name_equivalence (mp_layout, m_text_annot_name_id.second, m_joined_net_names, net_name_equivalence [hier_clusters_type::top_cell_index]);
+    }
+    for (std::list<std::pair<std::string, std::string> >::const_iterator m = m_joined_net_names_per_cell.begin (); m != m_joined_net_names_per_cell.end (); ++m) {
+      std::pair<bool, db::cell_index_type> cp = mp_layout->cell_by_name (m->first.c_str ());
+      if (cp.first) {
+        build_net_name_equivalence (mp_layout, m_text_annot_name_id.second, m->second, net_name_equivalence [cp.second]);
+      }
+    }
   }
   mp_clusters->build (*mp_layout, *mp_cell, db::ShapeIterator::Polygons, conn, &net_name_equivalence);
 

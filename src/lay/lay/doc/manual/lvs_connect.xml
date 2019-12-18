@@ -131,4 +131,56 @@ connect(metal2, metal2_labels)</pre>
   opens may pass unnoticed.
   </p>
 
+  <p>
+  You can include labels of a certain class in a "connect_implicit" statement
+  using glob-style pattern:
+  </p>
+
+  <pre>connect_implicit("VDD*")</pre>
+
+  <p>
+  This will connect all nets labelled with "VDD1" for example or those labelled
+  with "VDD_5V". However, this statement will only connect "VDD1" with "VDD1",
+  <b>not</b> nets with different labels. I.e. it will not connect "VDD1" with "VDD2"
+  labels.
+  </p>
+
+  <p>
+  "connect_implicit" can be present multiple times. Each statement extends the
+  choice of labels which will be connected.
+  </p>
+
+  <p>
+  The standard method "connect_implicit" will only act on top-level cells.
+  However, sometimes the construction of certain library cells requires 
+  connecting nets inside subcells. For example, memory cells are often made
+  in a way that their common rails are exposed on different sides but 
+  not connected internally. Formally, those cells need to be described by
+  circuits with multiple pins in the schematic. As the cells are only used
+  in certain contexts where these rails are connected, it's sufficient to 
+  specify a single pin and connect the rails inside the subcells if labelled
+  properly. The following statement will connect all nets labelled with "VDD"
+  from the "MEMCELL" subcell:
+  </p>
+
+  <pre>connect_implicit("MEMCELL", "VDD")</pre>
+
+  <p>
+  If MEMCELL is the top cell, the single-argument, unspecific "connect_implicit"
+  rule is applied, unless no such rule is given. In other words: the unspecific
+  rule has priority for the top cell.
+  </p>
+
+  <p>
+  The cell argument can be a glob-style pattern. In this case, the rule is
+  applied to all matching cells. Again, the "connect_implicit" rule may be 
+  given multiple times. In this case, all matching occurances act together.
+  </p>
+
+  <p>
+  The "connect_implicit" statements must be given before the netlist is 
+  extracted. Typically this happens before or shortly after "connect"
+  statements.
+  </p>
+
 </doc>

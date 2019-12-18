@@ -37,6 +37,11 @@ class QLabel;
 class QToolButton;
 class QGridLayout;
 
+namespace tl
+{
+  class Progress;
+}
+
 namespace lay
 {
 
@@ -50,9 +55,7 @@ Q_OBJECT
 public:
   ProgressWidget (ProgressReporter *pr, QWidget *parent, bool full_width = false);
 
-  void set_text (const std::string &text);
-  void set_value (double v, const std::string &value);
-  void set_can_cancel (bool f);
+  void set_progress (tl::Progress *progress);
   void add_widget (QWidget *widget);
   void remove_widget ();
   QWidget *get_widget () const;
@@ -64,7 +67,7 @@ public slots:
 
 private:
   QLabel *mp_label;
-  ProgressBarWidget *mp_progress_bar;
+  ProgressBarWidget *mp_progress_bar1, *mp_progress_bar2, *mp_progress_bar3;
   QWidget *mp_widget;
   int m_widget_col;
   QGridLayout *mp_layout;

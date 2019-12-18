@@ -148,8 +148,7 @@ Progress::set_desc (const std::string &d)
   }
 }
 
-void
-Progress::test (bool force_yield)
+bool Progress::test(bool force_yield)
 {
   if (++m_interval_count >= m_yield_interval || force_yield) {
 
@@ -180,6 +179,10 @@ Progress::test (bool force_yield)
       throw tl::BreakException ();
     }
 
+    return true;
+
+  } else {
+    return false;
   }
 }
 
@@ -222,8 +225,9 @@ RelativeProgress &
 RelativeProgress::set (size_t count, bool force_yield)
 {
   m_count = count;
-  test (force_yield || m_count - m_last_count >= m_unit);
-  m_last_count = m_count;
+  if (test (force_yield || m_count - m_last_count >= m_unit)) {
+    m_last_count = m_count;
+  }
   return *this;
 }
 

@@ -43,7 +43,7 @@ public:
 
   QSize sizeHint () const 
   {
-    return QSize (m_width, 1);
+    return QSize (m_width, 20);
   }
 
   QSize minimumSizeHint () const 
@@ -165,12 +165,16 @@ ProgressWidget::ProgressWidget (ProgressReporter *pr, QWidget *parent, bool full
   layout->addWidget (progress_bar_frame, 0, col, 1, 1);
   layout->setColumnStretch(col++, 2);
 
-  QHBoxLayout *pbf_layout = new QHBoxLayout (progress_bar_frame);
+  QVBoxLayout *pbf_layout = new QVBoxLayout (progress_bar_frame);
   progress_bar_frame->setLayout (pbf_layout);
   pbf_layout->setMargin (0);
 
-  mp_progress_bar = new ProgressBarWidget (progress_bar_frame);
-  pbf_layout->addWidget (mp_progress_bar);
+  mp_progress_bar1 = new ProgressBarWidget (progress_bar_frame);
+  pbf_layout->addWidget (mp_progress_bar1);
+  mp_progress_bar2 = new ProgressBarWidget (progress_bar_frame);
+  pbf_layout->addWidget (mp_progress_bar2);
+  mp_progress_bar3 = new ProgressBarWidget (progress_bar_frame);
+  pbf_layout->addWidget (mp_progress_bar3);
 
   layout->addItem (new QSpacerItem (8, 8, QSizePolicy::Fixed, QSizePolicy::Fixed), 0, col++, 1, 1);
 
@@ -218,21 +222,38 @@ ProgressWidget::remove_widget ()
 }
 
 void
-ProgressWidget::set_can_cancel (bool f)
+ProgressWidget::set_progress (tl::Progress *progress)
 {
-  mp_cancel_button->setEnabled (f);
-}
+  bool can_cancel = false;
+  std::string text;
 
-void 
-ProgressWidget::set_text (const std::string &text)
-{
+  if (progress) {
+    can_cancel = progress->can_cancel ();
+    text = progress->desc ();
+  }
+
+  mp_cancel_button->setEnabled (can_cancel);
   mp_label->setText (tl::to_qstring (text));
-}
 
-void 
-ProgressWidget::set_value (double v, const std::string &value)
-{
-  mp_progress_bar->set_value (v, value);
+  lay::ProgressBarWidget *progress_bars[] = { mp_progress_bar1, mp_progress_bar2, mp_progress_bar3 };
+
+  for (size_t i = 0; i < sizeof (progress_bars) / sizeof (progress_bars[0]); ++i) {
+
+    lay::ProgressBarWidget *pb = progress_bars[i];
+    pb->setVisible (progress != 0);
+
+    if (progress) {
+
+      std::string value = progress->formatted_value ();
+      double v = progress->value ();
+      pb->set_value (v, value);
+
+      progress = progress->next ();
+
+    }
+
+  }
+
 }
 
 void 

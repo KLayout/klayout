@@ -203,7 +203,7 @@ protected:
    *  This method must be called by the derived class.
    *  If "force_yield" is true, the events are always processed.
    */
-  void test (bool force_yield = false);
+  bool test (bool force_yield = false);
 
   /**
    *  @brief This method needs to be called by all derived classes after initialization has happened

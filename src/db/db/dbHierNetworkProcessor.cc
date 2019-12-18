@@ -1167,6 +1167,11 @@ public:
       : cluster_id (_cluster_id), other_ci (_other_ci)
     { }
 
+    bool operator== (const ClusterInstanceInteraction &other) const
+    {
+      return cluster_id == other.cluster_id && other_ci == other.other_ci;
+    }
+
     size_t cluster_id;
     ClusterInstance other_ci;
   };
@@ -1211,6 +1216,7 @@ public:
     db::ICplxTrans t;
     consider_cluster_instance_pair (*c1, *i2, t, ic);
 
+    ic.unique ();
     m_ci_interactions.splice (m_ci_interactions.end (), ic, ic.begin (), ic.end ());
   }
 
@@ -1411,6 +1417,8 @@ private:
             for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ++i) {
               propagate_cluster_inst (i->second, i2.cell_index (), i2t, i2.prop_id ());
             }
+
+            ii_interactions.unique ();
             interacting_clusters.splice (interacting_clusters.end (), ii_interactions, ii_interactions.begin (), ii_interactions.end ());
 
           }
@@ -1436,6 +1444,8 @@ private:
           for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ++i) {
             propagate_cluster_inst (i->first, i1.cell_index (), i1t, i1.prop_id ());
           }
+
+          ii_interactions.unique ();
           interacting_clusters.splice (interacting_clusters.end (), ii_interactions, ii_interactions.begin (), ii_interactions.end ());
 
         }
@@ -1448,15 +1458,28 @@ private:
 
     }
 
-    cluster_instance_pair_list_type &cached = (*mp_instance_interaction_cache) [ii_key];
-    cached = interacting_clusters;
+    //  remove duplicates (after doing a quick unique before)
+    //  NOTE: duplicates may happen due to manifold child/child interactions which boil down to
+    //  identical parent cluster interactions.
+    std::vector<std::pair<ClusterInstance, ClusterInstance> > sorted_interactions;
+    sorted_interactions.reserve (interacting_clusters.size ());
+    sorted_interactions.insert (sorted_interactions.end (), interacting_clusters.begin (), interacting_clusters.end ());
+    interacting_clusters.clear ();
+    std::sort (sorted_interactions.begin (), sorted_interactions.end ());
+    sorted_interactions.erase (std::unique (sorted_interactions.begin (), sorted_interactions.end ()), sorted_interactions.end ());
+
+    //  return the list of unique interactions
+    interacting_clusters.insert (interacting_clusters.end (), sorted_interactions.begin (), sorted_interactions.end ());
 
     //  normalize transformations in cache
     db::ICplxTrans i1ti = i1t.inverted (), i2ti = i2t.inverted ();
-    for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = cached.begin (); i != cached.end (); ++i) {
+    for (std::vector<std::pair<ClusterInstance, ClusterInstance> >::iterator i = sorted_interactions.begin (); i != sorted_interactions.end (); ++i) {
       i->first.transform (i1ti);
       i->second.transform (i2ti);
     }
+
+    cluster_instance_pair_list_type &cached = (*mp_instance_interaction_cache) [ii_key];
+    cached.insert (cached.end (), sorted_interactions.begin (), sorted_interactions.end ());
   }
 
   /**

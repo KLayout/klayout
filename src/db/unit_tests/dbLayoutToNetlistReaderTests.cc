@@ -101,7 +101,7 @@ TEST(1_ReaderBasic)
 
     std::vector<const db::Net *> nets;
     nets.push_back (l2n.netlist ()->circuit_by_name ("RINGO")->net_by_name ("VSS"));
-    nets.push_back (l2n.netlist ()->circuit_by_name ("RINGO")->net_by_name ("VDD"));
+    nets.push_back (l2n.netlist ()->circuit_by_name ("RINGO")->net_by_name ("FB"));
 
     db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, nets);
 

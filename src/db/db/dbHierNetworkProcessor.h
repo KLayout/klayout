@@ -201,7 +201,7 @@ private:
  *  of a given connectivity. The shapes will still be organised in layers.
  */
 template <class T>
-class DB_PUBLIC local_cluster
+class DB_PUBLIC_TEMPLATE local_cluster
 {
 public:
   typedef size_t id_type;
@@ -395,7 +395,7 @@ private:
  *  @brief A box converter for the local_cluster class
  */
 template <class T>
-struct DB_PUBLIC local_cluster_box_convert
+struct DB_PUBLIC_TEMPLATE local_cluster_box_convert
 {
   typedef typename local_cluster<T>::box_type box_type;
   typedef typename db::simple_bbox_tag complexity;
@@ -414,7 +414,7 @@ struct DB_PUBLIC local_cluster_box_convert
  *  the clusters from a cell's shapes.
  */
 template <class T>
-class DB_PUBLIC local_clusters
+class DB_PUBLIC_TEMPLATE local_clusters
 {
 public:
   typedef typename local_cluster<T>::id_type id_type;
@@ -734,18 +734,42 @@ private:
 
 typedef std::list<std::pair<ClusterInstance, ClusterInstance> > cluster_instance_pair_list_type;
 
+inline bool equal_array_delegates (const db::ArrayBase *a, const db::ArrayBase *b)
+{
+  if ((a == 0) != (b == 0)) {
+    return false;
+  } else if (a) {
+    return ! db::array_base_ptr_cmp_f () (a, b) && ! db::array_base_ptr_cmp_f () (b, a);
+  } else {
+    return true;
+  }
+}
+
+inline bool less_array_delegates (const db::ArrayBase *a, const db::ArrayBase *b)
+{
+  if ((a == 0) != (b == 0)) {
+    return (a == 0) < (b == 0);
+  } else if (a) {
+    return db::array_base_ptr_cmp_f () (a, b);
+  } else {
+    return false;
+  }
+}
+
 /**
  *  @brief A helper struct to describe a pair of cell instances with a specific relative transformation
  */
 struct InstanceToInstanceInteraction
 {
-  InstanceToInstanceInteraction (db::cell_index_type _ci1, db::cell_index_type _ci2, const db::ICplxTrans &_t21)
-    : ci1 (_ci1), ci2 (_ci2), t21 (_t21)
+  InstanceToInstanceInteraction (db::cell_index_type _ci1, const db::ArrayBase *_array1, db::cell_index_type _ci2, const db::ArrayBase *_array2, const db::ICplxTrans &_t21)
+    : ci1 (_ci1), ci2 (_ci2), array1 (_array1), array2 (_array2), t21 (_t21)
   { }
 
   bool operator== (const InstanceToInstanceInteraction &other) const
   {
-    return ci1 == other.ci1 && ci2 == other.ci2 && t21.equal (other.t21);
+    return ci1 == other.ci1 && ci2 == other.ci2 && t21.equal (other.t21) &&
+            equal_array_delegates (array1, other.array1) &&
+            equal_array_delegates (array2, other.array2);
   }
 
   bool operator< (const InstanceToInstanceInteraction &other) const
@@ -759,14 +783,20 @@ struct InstanceToInstanceInteraction
     if (! t21.equal (other.t21)) {
       return t21.less (other.t21);
     }
-    return false;
+    if (less_array_delegates (array1, other.array1)) {
+      return true;
+    } else if (less_array_delegates (other.array1, array1)) {
+      return false;
+    }
+    return less_array_delegates (array2, other.array2);
   }
 
   db::cell_index_type ci1, ci2;
+  const db::ArrayBase *array1, *array2;
   db::ICplxTrans t21;
 };
 
-typedef std::map<InstanceToInstanceInteraction, std::pair<db::ICplxTrans, cluster_instance_pair_list_type> > instance_interaction_cache_type;
+typedef std::map<InstanceToInstanceInteraction, cluster_instance_pair_list_type> instance_interaction_cache_type;
 
 template <class T> class hier_clusters;
 template <class T> class connected_clusters;
@@ -775,7 +805,7 @@ template <class T> class connected_clusters;
  *  @brief An iterator delivering all clusters of a connected_clusters set
  */
 template <class T>
-class DB_PUBLIC connected_clusters_iterator
+class DB_PUBLIC_TEMPLATE connected_clusters_iterator
 {
 public:
   typedef typename local_cluster<T>::id_type value_type;
@@ -823,7 +853,7 @@ private:
  *  "half connected" clusters.
  */
 template <class T>
-class DB_PUBLIC connected_clusters
+class DB_PUBLIC_TEMPLATE connected_clusters
   : public local_clusters<T>
 {
 public:
@@ -936,12 +966,12 @@ template <typename> class cell_clusters_box_converter;
  *  Hierarchical clusters
  */
 template <class T>
-class DB_PUBLIC hier_clusters
+class DB_PUBLIC_TEMPLATE hier_clusters
   : public tl::Object
 {
 public:
   typedef typename local_cluster<T>::box_type box_type;
-  typedef std::map<InstanceToInstanceInteraction, std::pair<db::ICplxTrans, cluster_instance_pair_list_type> > instance_interaction_cache_type;
+  typedef std::map<InstanceToInstanceInteraction, cluster_instance_pair_list_type> instance_interaction_cache_type;
 
   /**
    *  @brief Creates an empty set of clusters
@@ -989,12 +1019,12 @@ public:
   void clear ();
 
   /**
-   *  @brief Makes a valid path to a child cluster
+   *  @brief Ensures a cluster instance is connected from all parents of the instantiated cell
    *
-   *  Cluster connections can only cross one level of hierarchy. This method
-   *  creates necessary dummy entries for the given path.
+   *  If "with_self" is true, the specified instance "ci" is included in the connections. Otherwise
+   *  there is not connection made for this instance.
    */
-  ClusterInstance make_path (const db::Layout &layout, const db::Cell &cell, size_t id, const std::vector<ClusterInstElement> &path);
+  size_t propagate_cluster_inst (const db::Layout &layout, const Cell &cell, const ClusterInstance &ci, db::cell_index_type parent_ci, bool with_self);
 
 private:
   void build_local_cluster (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence);
@@ -1007,6 +1037,25 @@ private:
 };
 
 /**
+ *  @brief A callback function for the recursive cluster shape and cluster iterator selecting cells/circuits
+ *
+ *  Reimplement the "new_circuit" method to receive a callback on a new cell or circuit.
+ */
+class DB_PUBLIC CircuitCallback
+{
+public:
+  CircuitCallback () { }
+
+  /**
+   *  @brief This method is called whenever a circuit is entered when descending.
+   *  Return false to skip this circuit and all of it's children. This method is called before the
+   *  new cell is entered.
+   *  @param new_ci The cell index of the cell to enter
+   */
+  virtual bool new_cell (db::cell_index_type /*new_ci*/) const { return true; }
+};
+
+/**
  *  @brief A recursive shape iterator for the shapes of a cluster
  *
  *  This iterator will deliver the shapes of a cluster including the shapes for the
@@ -1015,7 +1064,7 @@ private:
  *  This iterator applies to one layer.
  */
 template <class T>
-class DB_PUBLIC recursive_cluster_shape_iterator
+class DB_PUBLIC_TEMPLATE recursive_cluster_shape_iterator
 {
 public:
   typedef T value_type;
@@ -1025,7 +1074,7 @@ public:
   /**
    *  @brief Constructor
    */
-  recursive_cluster_shape_iterator (const hier_clusters<T> &hc, unsigned int layer, db::cell_index_type ci, typename local_cluster<T>::id_type id);
+  recursive_cluster_shape_iterator (const hier_clusters<T> &hc, unsigned int layer, db::cell_index_type ci, typename local_cluster<T>::id_type id, const CircuitCallback *callback = 0);
 
   /**
    *  @brief Returns a value indicating whether there are any more shapes
@@ -1106,6 +1155,7 @@ private:
   typename db::local_cluster<T>::shape_iterator m_shape_iter;
   unsigned int m_layer;
   typename db::local_cluster<T>::id_type m_id;
+  const CircuitCallback *mp_callback;
 
   void next_conn ();
   void up ();
@@ -1118,7 +1168,7 @@ private:
  *  This iterator will deliver the child clusters of a specific cluster.
  */
 template <class T>
-class DB_PUBLIC recursive_cluster_iterator
+class DB_PUBLIC_TEMPLATE recursive_cluster_iterator
 {
 public:
   /**

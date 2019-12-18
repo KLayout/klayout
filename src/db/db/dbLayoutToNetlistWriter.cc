@@ -57,7 +57,7 @@ static const std::string indent2 ("  ");
 
 template <class Keys>
 std_writer_impl<Keys>::std_writer_impl (tl::OutputStream &stream, double dbu, const std::string &progress_description)
-  : mp_stream (&stream), m_dbu (dbu),
+  : mp_stream (&stream), m_dbu (dbu), mp_netlist (0),
     m_progress (progress_description.empty () ? tl::to_string (tr ("Writing L2N database")) : progress_description, 10000)
 {
   m_progress.set_format (tl::to_string (tr ("%.0f MB")));
@@ -76,17 +76,51 @@ static std::string name_for_layer (const db::LayoutToNetlist *l2n, unsigned int 
 template <class Keys>
 void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n)
 {
-  write (l2n->netlist (), l2n, false, 0);
+  try {
+
+    mp_netlist = l2n->netlist ();
+    mp_l2n = l2n;
+
+    write (false, 0);
+
+    mp_netlist = 0;
+    mp_l2n = 0;
+
+  } catch (...) {
+    mp_netlist = 0;
+    mp_l2n = 0;
+    throw;
+  }
 }
 
 template <class Keys>
-void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetlist *l2n, bool nested, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int> > *net2id_per_circuit)
+void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutToNetlist *l2n, bool nested, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int> > *net2id_per_circuit)
+{
+  try {
+
+    mp_netlist = netlist;
+    mp_l2n = l2n;
+
+    write (nested, net2id_per_circuit);
+
+    mp_netlist = 0;
+    mp_l2n = 0;
+
+  } catch (...) {
+    mp_netlist = 0;
+    mp_l2n = 0;
+    throw;
+  }
+}
+
+template <class Keys>
+void std_writer_impl<Keys>::write (bool nested, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int> > *net2id_per_circuit)
 {
   bool any = false;
 
   const int version = 0;
 
-  const db::Layout *ly = l2n ? l2n->internal_layout () : 0;
+  const db::Layout *ly = mp_l2n ? mp_l2n->internal_layout () : 0;
   const std::string indent (nested ? indent1 : "");
 
   if (! nested) {
@@ -97,11 +131,11 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
     *mp_stream << indent << Keys::version_key << "(" << version << ")" << endl;
   }
   if (ly) {
-    *mp_stream << indent << Keys::top_key << "(" << tl::to_word_or_quoted_string (ly->cell_name (l2n->internal_top_cell ()->cell_index ())) << ")" << endl;
+    *mp_stream << indent << Keys::top_key << "(" << tl::to_word_or_quoted_string (ly->cell_name (mp_l2n->internal_top_cell ()->cell_index ())) << ")" << endl;
     *mp_stream << indent << Keys::unit_key << "(" << m_dbu << ")" << endl;
   }
 
-  if (l2n) {
+  if (mp_l2n) {
 
     if (! Keys::is_short ()) {
       *mp_stream << endl << indent << "# Layer section" << endl;
@@ -111,8 +145,8 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
     if (! Keys::is_short ()) {
       *mp_stream << endl << indent << "# Mask layers" << endl;
     }
-    for (db::Connectivity::layer_iterator l = l2n->connectivity ().begin_layers (); l != l2n->connectivity ().end_layers (); ++l) {
-      *mp_stream << indent << Keys::layer_key << "(" << name_for_layer (l2n, *l);
+    for (db::Connectivity::layer_iterator l = mp_l2n->connectivity ().begin_layers (); l != mp_l2n->connectivity ().end_layers (); ++l) {
+      *mp_stream << indent << Keys::layer_key << "(" << name_for_layer (mp_l2n, *l);
       db::LayerProperties lp = ly->get_properties (*l);
       if (! lp.is_null ()) {
         *mp_stream << " " << tl::to_word_or_quoted_string (lp.to_string ());
@@ -124,14 +158,14 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
     if (! Keys::is_short ()) {
       *mp_stream << endl << indent << "# Mask layer connectivity" << endl;
     }
-    for (db::Connectivity::layer_iterator l = l2n->connectivity ().begin_layers (); l != l2n->connectivity ().end_layers (); ++l) {
+    for (db::Connectivity::layer_iterator l = mp_l2n->connectivity ().begin_layers (); l != mp_l2n->connectivity ().end_layers (); ++l) {
 
-      db::Connectivity::layer_iterator ce = l2n->connectivity ().end_connected (*l);
-      db::Connectivity::layer_iterator cb = l2n->connectivity ().begin_connected (*l);
+      db::Connectivity::layer_iterator ce = mp_l2n->connectivity ().end_connected (*l);
+      db::Connectivity::layer_iterator cb = mp_l2n->connectivity ().begin_connected (*l);
       if (cb != ce) {
-        *mp_stream << indent << Keys::connect_key << "(" << name_for_layer (l2n, *l);
-        for (db::Connectivity::layer_iterator c = l2n->connectivity ().begin_connected (*l); c != ce; ++c) {
-          *mp_stream << " " << name_for_layer (l2n, *c);
+        *mp_stream << indent << Keys::connect_key << "(" << name_for_layer (mp_l2n, *l);
+        for (db::Connectivity::layer_iterator c = mp_l2n->connectivity ().begin_connected (*l); c != ce; ++c) {
+          *mp_stream << " " << name_for_layer (mp_l2n, *c);
         }
         *mp_stream << ")" << endl;
         m_progress.set (mp_stream->pos ());
@@ -140,10 +174,10 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
     }
 
     any = false;
-    for (db::Connectivity::layer_iterator l = l2n->connectivity ().begin_layers (); l != l2n->connectivity ().end_layers (); ++l) {
+    for (db::Connectivity::layer_iterator l = mp_l2n->connectivity ().begin_layers (); l != mp_l2n->connectivity ().end_layers (); ++l) {
 
-      db::Connectivity::global_nets_iterator ge = l2n->connectivity ().end_global_connections (*l);
-      db::Connectivity::global_nets_iterator gb = l2n->connectivity ().begin_global_connections (*l);
+      db::Connectivity::global_nets_iterator ge = mp_l2n->connectivity ().end_global_connections (*l);
+      db::Connectivity::global_nets_iterator gb = mp_l2n->connectivity ().begin_global_connections (*l);
       if (gb != ge) {
         if (! any) {
           if (! Keys::is_short ()) {
@@ -151,9 +185,9 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
           }
           any = true;
         }
-        *mp_stream << indent << Keys::global_key << "(" << name_for_layer (l2n, *l);
+        *mp_stream << indent << Keys::global_key << "(" << name_for_layer (mp_l2n, *l);
         for (db::Connectivity::global_nets_iterator g = gb; g != ge; ++g) {
-          *mp_stream << " " << tl::to_word_or_quoted_string (l2n->connectivity ().global_net_name (*g));
+          *mp_stream << " " << tl::to_word_or_quoted_string (mp_l2n->connectivity ().global_net_name (*g));
         }
         *mp_stream << ")" << endl;
         m_progress.set (mp_stream->pos ());
@@ -163,25 +197,25 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
 
   }
 
-  if (nl->begin_device_classes () != nl->end_device_classes () && ! Keys::is_short ()) {
+  if (mp_netlist->begin_device_classes () != mp_netlist->end_device_classes () && ! Keys::is_short ()) {
     *mp_stream << endl << indent << "# Device class section" << endl;
-    for (db::Netlist::const_device_class_iterator c = nl->begin_device_classes (); c != nl->end_device_classes (); ++c) {
-      db::DeviceClassTemplateBase *temp = db::DeviceClassTemplateBase::is_a (c.operator-> ());
-      if (temp) {
-        *mp_stream << indent << Keys::class_key << "(" << tl::to_word_or_quoted_string (c->name ()) << " " << tl::to_word_or_quoted_string (temp->name ()) << ")" << endl;
-        m_progress.set (mp_stream->pos ());
-      }
+  }
+  for (db::Netlist::const_device_class_iterator c = mp_netlist->begin_device_classes (); c != mp_netlist->end_device_classes (); ++c) {
+    db::DeviceClassTemplateBase *temp = db::DeviceClassTemplateBase::is_a (c.operator-> ());
+    if (temp) {
+      *mp_stream << indent << Keys::class_key << "(" << tl::to_word_or_quoted_string (c->name ()) << " " << tl::to_word_or_quoted_string (temp->name ()) << ")" << endl;
+      m_progress.set (mp_stream->pos ());
     }
   }
 
-  if (nl->begin_device_abstracts () != nl->end_device_abstracts () && ! Keys::is_short ()) {
+  if (mp_netlist->begin_device_abstracts () != mp_netlist->end_device_abstracts () && ! Keys::is_short ()) {
     *mp_stream << endl << indent << "# Device abstracts section" << endl;
     *mp_stream << indent << "# Device abstracts list the pin shapes of the devices." << endl;
   }
-  for (db::Netlist::const_abstract_model_iterator m = nl->begin_device_abstracts (); m != nl->end_device_abstracts (); ++m) {
+  for (db::Netlist::const_abstract_model_iterator m = mp_netlist->begin_device_abstracts (); m != mp_netlist->end_device_abstracts (); ++m) {
     if (m->device_class ()) {
       *mp_stream << indent << Keys::device_key << "(" << tl::to_word_or_quoted_string (m->name ()) << " " << tl::to_word_or_quoted_string (m->device_class ()->name ()) << endl;
-      write (l2n, *m, indent);
+      write (*m, indent);
       *mp_stream << indent << ")" << endl;
       m_progress.set (mp_stream->pos ());
     }
@@ -191,10 +225,10 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
     *mp_stream << endl << indent << "# Circuit section" << endl;
     *mp_stream << indent << "# Circuits are the hierarchical building blocks of the netlist." << endl;
   }
-  for (db::Netlist::const_bottom_up_circuit_iterator i = nl->begin_bottom_up (); i != nl->end_bottom_up (); ++i) {
+  for (db::Netlist::const_bottom_up_circuit_iterator i = mp_netlist->begin_bottom_up (); i != mp_netlist->end_bottom_up (); ++i) {
     const db::Circuit *x = i.operator-> ();
     *mp_stream << indent << Keys::circuit_key << "(" << tl::to_word_or_quoted_string (x->name ()) << endl;
-    write (nl, l2n, *x, indent, net2id_per_circuit);
+    write (*x, indent, net2id_per_circuit);
     *mp_stream << indent << ")" << endl;
     m_progress.set (mp_stream->pos ());
   }
@@ -243,7 +277,7 @@ void write_points (tl::OutputStream &stream, const T &poly, const Tr &tr, db::Po
 }
 
 template <class Keys>
-void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutToNetlist *l2n, const db::Circuit &circuit, const std::string &indent, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int> > *net2id_per_circuit)
+void std_writer_impl<Keys>::write (const db::Circuit &circuit, const std::string &indent, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int> > *net2id_per_circuit)
 {
   if (circuit.boundary ().vertices () > 0) {
 
@@ -298,14 +332,14 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
 
   if (circuit.begin_nets () != circuit.end_nets ()) {
     if (! Keys::is_short ()) {
-      if (l2n) {
+      if (mp_l2n) {
         *mp_stream << endl << indent << indent1 << "# Nets with their geometries" << endl;
       } else {
         *mp_stream << endl << indent << indent1 << "# Nets" << endl;
       }
     }
     for (db::Circuit::const_net_iterator n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
-      write (netlist, l2n, *n, (*net2id) [n.operator-> ()], indent);
+      write (*n, (*net2id) [n.operator-> ()], indent);
       m_progress.set (mp_stream->pos ());
     }
   }
@@ -336,7 +370,7 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
       *mp_stream << endl << indent << indent1 << "# Devices and their connections" << endl;
     }
     for (db::Circuit::const_device_iterator d = circuit.begin_devices (); d != circuit.end_devices (); ++d) {
-      write (l2n, *d, *net2id, indent);
+      write (*d, *net2id, indent);
       m_progress.set (mp_stream->pos ());
     }
   }
@@ -346,7 +380,7 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
       *mp_stream << endl << indent << indent1 << "# Subcircuits and their connections" << endl;
     }
     for (db::Circuit::const_subcircuit_iterator x = circuit.begin_subcircuits (); x != circuit.end_subcircuits (); ++x) {
-      write (l2n, *x, *net2id, indent);
+      write (*x, *net2id, indent);
       m_progress.set (mp_stream->pos ());
     }
   }
@@ -393,15 +427,21 @@ void std_writer_impl<Keys>::write (const db::PolygonRef *s, const db::ICplxTrans
 }
 
 template <class Keys>
-void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutToNetlist *l2n, const db::Net &net, unsigned int id, const std::string &indent)
+bool std_writer_impl<Keys>::new_cell (cell_index_type ci) const
 {
-  const db::hier_clusters<db::PolygonRef> &clusters = l2n->net_clusters ();
+  return ! (mp_netlist->circuit_by_cell_index (ci) || mp_netlist->device_abstract_by_cell_index (ci));
+}
+
+template <class Keys>
+void std_writer_impl<Keys>::write (const db::Net &net, unsigned int id, const std::string &indent)
+{
+  const db::hier_clusters<db::PolygonRef> &clusters = mp_l2n->net_clusters ();
   const db::Circuit *circuit = net.circuit ();
-  const db::Connectivity &conn = l2n->connectivity ();
+  const db::Connectivity &conn = mp_l2n->connectivity ();
 
   bool any = false;
 
-  if (l2n) {
+  if (mp_l2n) {
 
     reset_geometry_ref ();
 
@@ -410,13 +450,13 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
       db::cell_index_type cci = circuit->cell_index ();
       db::cell_index_type prev_ci = cci;
 
-      for (db::recursive_cluster_shape_iterator<db::PolygonRef> si (clusters, *l, cci, net.cluster_id ()); ! si.at_end (); ) {
+      for (db::recursive_cluster_shape_iterator<db::PolygonRef> si (clusters, *l, cci, net.cluster_id (), this); ! si.at_end (); ) {
 
         //  NOTE: we don't recursive into circuits which will later be output. However, as circuits may
         //  vanish in "purge" but the clusters will still be there we need to recursive into clusters from
         //  unknown cells.
         db::cell_index_type ci = si.cell_index ();
-        if (ci != prev_ci && ci != cci && (netlist->circuit_by_cell_index (ci) || netlist->device_abstract_by_cell_index (ci))) {
+        if (ci != prev_ci && ci != cci && (mp_netlist->circuit_by_cell_index (ci) || mp_netlist->device_abstract_by_cell_index (ci))) {
 
           si.skip_cell ();
 
@@ -439,7 +479,7 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
           }
 
           *mp_stream << indent << indent2;
-          write (si.operator-> (), si.trans (), name_for_layer (l2n, *l), true);
+          write (si.operator-> (), si.trans (), name_for_layer (mp_l2n, *l), true);
           *mp_stream << endl;
           m_progress.set (mp_stream->pos ());
 
@@ -477,7 +517,7 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
 }
 
 template <class Keys>
-void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::SubCircuit &subcircuit, std::map<const db::Net *, unsigned int> &net2id, const std::string &indent)
+void std_writer_impl<Keys>::write (const db::SubCircuit &subcircuit, std::map<const db::Net *, unsigned int> &net2id, const std::string &indent)
 {
   *mp_stream << indent << indent1 << Keys::circuit_key << "(" << tl::to_string (subcircuit.id ());
   *mp_stream << " " << tl::to_word_or_quoted_string (subcircuit.circuit_ref ()->name ());
@@ -486,7 +526,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Sub
     *mp_stream << " " << Keys::name_key << "(" << tl::to_word_or_quoted_string (subcircuit.name ()) << ")";
   }
 
-  if (l2n) {
+  if (mp_l2n) {
     *mp_stream << " ";
     write (subcircuit.trans ());
   }
@@ -526,12 +566,12 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Sub
 }
 
 template <class Keys>
-void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::DeviceAbstract &device_abstract, const std::string &indent)
+void std_writer_impl<Keys>::write (const db::DeviceAbstract &device_abstract, const std::string &indent)
 {
   const std::vector<db::DeviceTerminalDefinition> &td = device_abstract.device_class ()->terminal_definitions ();
 
-  const db::hier_clusters<db::PolygonRef> &clusters = l2n->net_clusters ();
-  const db::Connectivity &conn = l2n->connectivity ();
+  const db::hier_clusters<db::PolygonRef> &clusters = mp_l2n->net_clusters ();
+  const db::Connectivity &conn = mp_l2n->connectivity ();
 
   for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
 
@@ -551,7 +591,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Dev
       for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (*l); ! s.at_end (); ++s) {
 
         *mp_stream << indent << indent2;
-        write (s.operator-> (), db::ICplxTrans (), name_for_layer (l2n, *l), true);
+        write (s.operator-> (), db::ICplxTrans (), name_for_layer (mp_l2n, *l), true);
         *mp_stream << endl;
         m_progress.set (mp_stream->pos ());
 
@@ -598,7 +638,7 @@ void std_writer_impl<Keys>::write (const db::DCplxTrans &tr)
 }
 
 template <class Keys>
-void std_writer_impl<Keys>::write (const db::LayoutToNetlist * /*l2n*/, const db::Device &device, std::map<const Net *, unsigned int> &net2id, const std::string &indent)
+void std_writer_impl<Keys>::write (const db::Device &device, std::map<const Net *, unsigned int> &net2id, const std::string &indent)
 {
   tl_assert (device.device_class () != 0);
   const std::vector<DeviceTerminalDefinition> &td = device.device_class ()->terminal_definitions ();

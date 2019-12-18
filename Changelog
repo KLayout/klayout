@@ -1,5 +1,8 @@
 0.26.2          (2019-12-17):
 
+* Bugfix: %GITHUB%/issues/453
+      A crash happened when the "inverse" button is used on the TEXT
+      PCell
 * Bugfix: %GITHUB%/issues/449
       The Qt windows styling plugin is now installed too on Windows.
 * Bugfix: %GITHUB%/issues/448

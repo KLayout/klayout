@@ -48,7 +48,9 @@ static void set_value (const db::PCellParameterDeclaration &p, const db::Layout 
       {
         QLineEdit *le = dynamic_cast<QLineEdit *> (widget);
         if (le) {
+          le->blockSignals (true);
           le->setText (value.cast<int> ().to_qstring ());
+          le->blockSignals (false);
         }
       }
       break;
@@ -57,7 +59,9 @@ static void set_value (const db::PCellParameterDeclaration &p, const db::Layout 
       {
         QLineEdit *le = dynamic_cast<QLineEdit *> (widget);
         if (le) {
+          le->blockSignals (true);
           le->setText (value.cast<double> ().to_qstring ());
+          le->blockSignals (false);
         }
       }
       break;
@@ -66,7 +70,9 @@ static void set_value (const db::PCellParameterDeclaration &p, const db::Layout 
       {
         QLineEdit *le = dynamic_cast<QLineEdit *> (widget);
         if (le) {
+          le->blockSignals (true);
           le->setText (value.to_qstring ());
+          le->blockSignals (false);
         }
       }
       break;
@@ -75,7 +81,9 @@ static void set_value (const db::PCellParameterDeclaration &p, const db::Layout 
       {
         QLineEdit *le = dynamic_cast<QLineEdit *> (widget);
         if (le) {
+          le->blockSignals (true);
           le->setText (value.to_qstring ());
+          le->blockSignals (false);
         }
       }
       break;
@@ -94,7 +102,9 @@ static void set_value (const db::PCellParameterDeclaration &p, const db::Layout 
             lp.read (ex);
           }
 
+          ly->blockSignals (true);
           ly->set_current_layer (lp);
+          ly->blockSignals (false);
 
         }
       }
@@ -104,7 +114,9 @@ static void set_value (const db::PCellParameterDeclaration &p, const db::Layout 
       {
         QCheckBox *cbx = dynamic_cast<QCheckBox *> (widget);
         if (cbx) {
+          cbx->blockSignals (true);
           cbx->setChecked (value.to_bool ());
+          cbx->blockSignals (false);
         }
       }
       break;
@@ -120,7 +132,9 @@ static void set_value (const db::PCellParameterDeclaration &p, const db::Layout 
       int i = 0;
       for (std::vector<tl::Variant>::const_iterator c = p.get_choices ().begin (); c != p.get_choices ().end (); ++c, ++i) {
         if (*c == value) {
+          cb->blockSignals (true);
           cb->setCurrentIndex (i);
+          cb->blockSignals (false);
         }
       }
     }

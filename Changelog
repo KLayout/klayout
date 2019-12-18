@@ -1,26 +1,54 @@
-0.26.2          (xxxx-xx-xx):
+0.26.2          (2019-12-18):
 
-* Enhancement: %GITHUB%/issues/438
-      Redefining a circuit in Spice netlists will give an error now
+* Bugfix: %GITHUB%/issues/453
+      A crash happened when the "inverse" button is used on the TEXT
+      PCell
+* Bugfix: %GITHUB%/issues/449
+      The Qt windows styling plugin is now installed too on Windows.
+* Bugfix: %GITHUB%/issues/448
+      The LVSDB database wasn't written with the proper device 
+      class statements in short form.
+* Bugfix: %GITHUB%/issues/447
+      Net extraction did not work properly on a specific test case 
+      with folded and interleaving array instances.
 * Bugfix: %GITHUB%/issues/445
-      Cryptic message when instances are selected and 'merge shapes' 
-      is used
+      "Selection/Merge shapes" gave cryptic message when instances are selected
+* Enhancement: %GITHUB%/issues/444
+      Support for net joining though labels also for specific 
+      subcells (here: to support double-height standard cells)
 * Bugfix: %GITHUB%/issues/440
       LayoutView#each_annotation_selected wasn't working
+* Enhancement: %GITHUB%/issues/438
+      Redefining a circuit in Spice netlists will give an error now
 * Enhancement: %GITHUB%/issues/436
       Option to silence instance copy mode dialog, 
       Enhancements to interactive move, duplicate and copy (sensitive
       to transient selection now)
-* Enhancement: %GITHUB%/issues/426
-      Techs can be grouped in menu now
+* Enhancement: %GITHUB%/issues/434
+      New preinstalled Ruby gems and Python packages (e.g. numpy, scipy, 
+      test/unit for Ruby) for the Windows packages.
+* Bugfix: %GITHUB%/issues/429
+      Support for MAGIC file format (*.mag)
 * Enhancement: %GITHUB%/issues/428
       Edit buttons are not shown in user properties dialog 
       in viewer mode
+* Enhancement: %GITHUB%/issues/426
+      Techs can be grouped in menu now
 * Enhancement: %GITHUB%/issues/425
       Don't generate dummy pins for dummy gates
+* Bugfix: %GITHUB%/issues/419
+      Multiple top circuits after flatten of netlist
+* Bugfix: %GITHUB%/issues/417
+      Probe nets does not work with flat extraction on Tools/Trace All Nets/Flat
 * Bugfix: %GITHUB%/issues/415 and %GITHUB%/issues/439
       Macros need to be stored with CRLF on Windows for management
       with a versioning system like git
+* Enhancement: %GITHUB%/issues/411
+      Multiple device extractors for same class
+* Bugfix: %GITHUB%/issues/410
+      Errors were not reported on "rerun" from the DRC and LVS report dialogs
+* Bugfix: %GITHUB%/issues/408
+      Internal error after EdgePairs#polygon
 * Enhancement: %GITHUB%/issues/407
       Variables can be used in technology base path now
         - $(tech_name) -> substituted by the technology name
@@ -31,16 +59,6 @@
 * Enhancement: %GITHUB%/issues/406
       DRC edge layers: AND between intersecting edges gives point-like
       markers indicating the intersection points
-* Bugfix: %GITHUB%/issues/419
-      Multiple top circuits after flatten of netlist
-* Bugfix: %GITHUB%/issues/417
-      Probe nets does not work with flat extraction on Tools/Trace All Nets/Flat
-* Enhancement: %GITHUB%/issues/411
-      Multiple device extractors for same class
-* Bugfix: %GITHUB%/issues/408
-      Internal error after EdgePairs#polygon
-* Bugfix: %GITHUB%/issues/410
-      Errors were not reported on "rerun" from the DRC and LVS report dialogs
 * Enhancement: netlist object properties
       User properties can be attached to the following netlist objects
       now: Pin, Device, Circuit, Net and SubCircuit. Properties are
@@ -51,6 +69,9 @@
       a property and "property" to retrieve one.
       Properties are persisted in L2N and LVSDB files and written to 
       layout shapes on "build_nets".
+* Enhancement: more detailed progress
+      On certain nested operations, a double or triple progress bar is
+      shown indicating the progress of nested operations.
 
 0.26.1          (2019-11-06):
 

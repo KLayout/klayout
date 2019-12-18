@@ -392,6 +392,16 @@ public:
   void extract_netlist (const std::string &joined_net_names = std::string (), bool include_floating_subcircuits = false);
 
   /**
+   *  @brief Runs the netlist extraction
+   *  In addition to the previous version, this extraction method allows specification of a per-cell list of
+   *  joined (labelled) net names.
+   *  The key of the "joined_net_names_per_cell" is a cell name or a glob expression for cells. On all matching cells,
+   *  the value is applied as a label selector for labels that are joined together. The "joined_net_names" expressions
+   *  is only applied to the top cell.
+   */
+  void extract_netlist (const std::string &joined_net_names, const std::map<std::string, std::string> &joined_net_names_per_cell, bool include_floating_subcircuits = false);
+
+  /**
    *  @brief Marks the netlist as extracted
    *  NOTE: this method is provided for special cases such as netlist readers. Don't
    *  use it.

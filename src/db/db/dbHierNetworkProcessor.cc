@@ -1023,15 +1023,21 @@ connected_clusters<T>::join_cluster_with (typename local_cluster<T>::id_type id,
 
   //  handle the connections by translating
 
-  const connections_type &to_join = connections_for_cluster (with_id);
-  connections_type &target = m_connections [id];
-  target.insert (target.end (), to_join.begin (), to_join.end ());
+  typename std::map<typename local_cluster<T>::id_type, connections_type>::iterator tc = m_connections.find (with_id);
+  if (tc != m_connections.end ()) {
 
-  for (connections_type::const_iterator c = to_join.begin (); c != to_join.end (); ++c) {
-    m_rev_connections [*c] = id;
+    connections_type &to_join = tc->second;
+
+    for (connections_type::const_iterator c = to_join.begin (); c != to_join.end (); ++c) {
+      m_rev_connections [*c] = id;
+    }
+
+    connections_type &target = m_connections [id];
+    target.splice (target.end (), to_join, to_join.begin (), to_join.end ());
+
+    m_connections.erase (tc);
+
   }
-
-  m_connections.erase (with_id);
 }
 
 template <class T>
@@ -1104,6 +1110,9 @@ private:
 //  hier_clusters implementation
 
 template <class T>
+const db::cell_index_type hier_clusters<T>::top_cell_index = std::numeric_limits<db::cell_index_type>::max ();
+
+template <class T>
 hier_clusters<T>::hier_clusters ()
   : m_base_verbosity (20)
 {
@@ -1124,7 +1133,7 @@ void hier_clusters<T>::clear ()
 
 template <class T>
 void
-hier_clusters<T>::build (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence, const std::set<db::cell_index_type> *breakout_cells)
+hier_clusters<T>::build (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const std::map<db::cell_index_type, tl::equivalence_clusters<unsigned int> > *attr_equivalence, const std::set<db::cell_index_type> *breakout_cells)
 {
   clear ();
   cell_clusters_box_converter<T> cbc (layout, *this);
@@ -1157,6 +1166,11 @@ public:
     ClusterInstanceInteraction (size_t _cluster_id, const ClusterInstance &_other_ci)
       : cluster_id (_cluster_id), other_ci (_other_ci)
     { }
+
+    bool operator== (const ClusterInstanceInteraction &other) const
+    {
+      return cluster_id == other.cluster_id && other_ci == other.other_ci;
+    }
 
     size_t cluster_id;
     ClusterInstance other_ci;
@@ -1202,6 +1216,7 @@ public:
     db::ICplxTrans t;
     consider_cluster_instance_pair (*c1, *i2, t, ic);
 
+    ic.unique ();
     m_ci_interactions.splice (m_ci_interactions.end (), ic, ic.begin (), ic.end ());
   }
 
@@ -1402,6 +1417,8 @@ private:
             for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ++i) {
               propagate_cluster_inst (i->second, i2.cell_index (), i2t, i2.prop_id ());
             }
+
+            ii_interactions.unique ();
             interacting_clusters.splice (interacting_clusters.end (), ii_interactions, ii_interactions.begin (), ii_interactions.end ());
 
           }
@@ -1427,6 +1444,8 @@ private:
           for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ++i) {
             propagate_cluster_inst (i->first, i1.cell_index (), i1t, i1.prop_id ());
           }
+
+          ii_interactions.unique ();
           interacting_clusters.splice (interacting_clusters.end (), ii_interactions, ii_interactions.begin (), ii_interactions.end ());
 
         }
@@ -1439,15 +1458,28 @@ private:
 
     }
 
-    cluster_instance_pair_list_type &cached = (*mp_instance_interaction_cache) [ii_key];
-    cached = interacting_clusters;
+    //  remove duplicates (after doing a quick unique before)
+    //  NOTE: duplicates may happen due to manifold child/child interactions which boil down to
+    //  identical parent cluster interactions.
+    std::vector<std::pair<ClusterInstance, ClusterInstance> > sorted_interactions;
+    sorted_interactions.reserve (interacting_clusters.size ());
+    sorted_interactions.insert (sorted_interactions.end (), interacting_clusters.begin (), interacting_clusters.end ());
+    interacting_clusters.clear ();
+    std::sort (sorted_interactions.begin (), sorted_interactions.end ());
+    sorted_interactions.erase (std::unique (sorted_interactions.begin (), sorted_interactions.end ()), sorted_interactions.end ());
+
+    //  return the list of unique interactions
+    interacting_clusters.insert (interacting_clusters.end (), sorted_interactions.begin (), sorted_interactions.end ());
 
     //  normalize transformations in cache
     db::ICplxTrans i1ti = i1t.inverted (), i2ti = i2t.inverted ();
-    for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = cached.begin (); i != cached.end (); ++i) {
+    for (std::vector<std::pair<ClusterInstance, ClusterInstance> >::iterator i = sorted_interactions.begin (); i != sorted_interactions.end (); ++i) {
       i->first.transform (i1ti);
       i->second.transform (i2ti);
     }
+
+    cluster_instance_pair_list_type &cached = (*mp_instance_interaction_cache) [ii_key];
+    cached.insert (cached.end (), sorted_interactions.begin (), sorted_interactions.end ());
   }
 
   /**
@@ -1770,11 +1802,8 @@ private:
       const ClusterInstance &k2 = ic->second;
 
       //  Note: "with_self" is false as we're going to create a connected cluster anyway
-      mp_tree->propagate_cluster_inst (*mp_layout, *mp_cell, k1, mp_cell->cell_index (), false);
-      mp_tree->propagate_cluster_inst (*mp_layout, *mp_cell, k2, mp_cell->cell_index (), false);
-
-      id_type x1 = mp_cell_clusters->find_cluster_with_connection (k1);
-      id_type x2 = mp_cell_clusters->find_cluster_with_connection (k2);
+      id_type x1 = mp_tree->propagate_cluster_inst (*mp_layout, *mp_cell, k1, mp_cell->cell_index (), false);
+      id_type x2 = mp_tree->propagate_cluster_inst (*mp_layout, *mp_cell, k2, mp_cell->cell_index (), false);
 
       if (x1 == 0) {
 
@@ -1903,7 +1932,7 @@ hier_clusters<T>::propagate_cluster_inst (const db::Layout &layout, const db::Ce
 
 template <class T>
 void
-hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence, const std::set<db::cell_index_type> *breakout_cells)
+hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const std::map<db::cell_index_type, tl::equivalence_clusters<unsigned int> > *attr_equivalence, const std::set<db::cell_index_type> *breakout_cells)
 {
   tl::SelfTimer timer (tl::verbosity () > m_base_verbosity, tl::to_string (tr ("Computing shape clusters")));
 
@@ -1918,8 +1947,30 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
     tl::RelativeProgress progress (tl::to_string (tr ("Computing local clusters")), called.size (), 1);
 
     for (std::set<db::cell_index_type>::const_iterator c = called.begin (); c != called.end (); ++c) {
-      build_local_cluster (layout, layout.cell (*c), shape_flags, conn, *c == cell.cell_index () ? attr_equivalence : 0);
+
+      //  look for the net label joining spec - for the top cell the "top_cell_index" entry is looked for.
+      //  If there is no such entry or the cell is not the top cell, look for the entry by cell index.
+      std::map<db::cell_index_type, tl::equivalence_clusters<unsigned int> >::const_iterator ae;
+      const tl::equivalence_clusters<unsigned int> *ec = 0;
+      if (attr_equivalence) {
+        if (*c == cell.cell_index ()) {
+          ae = attr_equivalence->find (top_cell_index);
+          if (ae != attr_equivalence->end ()) {
+            ec = &ae->second;
+          }
+        }
+        if (! ec) {
+          ae = attr_equivalence->find (*c);
+          if (ae != attr_equivalence->end ()) {
+            ec = &ae->second;
+          }
+        }
+      }
+
+      build_local_cluster (layout, layout.cell (*c), shape_flags, conn, ec);
+
       ++progress;
+
     }
   }
 
@@ -2203,9 +2254,8 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
         } else {
 
           //  ensures the cluster is propagated so we can connect it with another
-          propagate_cluster_inst (layout, cell, *i, cell.cell_index (), false);
+          size_t other_id = propagate_cluster_inst (layout, cell, *i, cell.cell_index (), false);
 
-          size_t other_id = local.find_cluster_with_connection (*i);
           if (other_id == gcid) {
             //  shouldn't happen, but duplicate instances may trigger this
           } else if (other_id) {

@@ -234,6 +234,7 @@ See <a href="/about/drc_ref_netter.xml#connect_global">Netter#connect_global</a>
 <a name="connect_implicit"/><p>Usage:</p>
 <ul>
 <li><tt>connect_implicit(label_pattern)</tt></li>
+<li><tt>connect_implicit(cell_pattern, label_pattern)</tt></li>
 </ul>
 <p>
 See <a href="/about/drc_ref_netter.xml#connect_implicit">Netter#connect_implicit</a> for a description of that function.

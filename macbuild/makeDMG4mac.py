@@ -74,7 +74,7 @@ def SetGlobals():
   Usage += "   option & argument    : descriptions                                               | default value\n"
   Usage += "   ----------------------------------------------------------------------------------+---------------\n"
   Usage += "   <-p|--pkg <dir>>     : package directory created by `build4mac.py` with [-y|-Y]   | `` \n"
-  Usage += "                        : like 'qt5MP.pkg.macos-Catalina-release-RsysPsys'           | \n"
+  Usage += "                        : like 'ST-qt5MP.pkg.macos-Catalina-release-RsysPsys'        | \n"
   Usage += "   <-c|--clean>         : clean the work directory                                   | disabled \n"
   Usage += "   <-m|--make>          : make a compressed DMG file                                 | disabled \n"
   Usage += "                        :   <-c|--clean> and <-m|--make> are mutually exclusive      | \n"
@@ -144,13 +144,13 @@ def SetGlobals():
 ## To check the contents of the package directory
 #
 # The package directory name should look like:
-#     * qt5MP.pkg.macos-Catalina-release-RsysPsys      --- (1)
-#     * qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
-#     * qt5Brew.pkg.macos-Catalina-release-Rhb26Phb37
-#     * qt5MP.pkg.macos-Catalina-release-Rmp26Pmp37
+#     * ST-qt5MP.pkg.macos-Catalina-release-RsysPsys      --- (1)
+#     * LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
+#     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb26Phb37
+#     * LW-qt5MP.pkg.macos-Catalina-release-Rmp26Pmp37
 #
 # Generated DMG will be, for example,
-#     (1) ---> klayout-0.26.1-macOS-Catalina-1-qt5MP-RsysPsys.dmg
+#     (1) ---> ST-klayout-0.26.1-macOS-Catalina-1-qt5MP-RsysPsys.dmg
 #
 # @return on success, positive integer in [MB] that tells approx. occupied disc space;
 #         on failure, -1

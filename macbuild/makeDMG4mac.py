@@ -4,7 +4,7 @@
 #=============================================================================================
 # File: "macbuild/makeDMG4mac.py"
 #
-#  Python script for making a DMG file of KLayout (http://www.klayout.de/index.php) bundles.
+#  Python script for making a DMG file of KLayout (http://www.klayout.de/index.php) bundle.
 #
 #  This is a derivative work of Ref. 2) below. Refer to "macbuild/LICENSE" file.
 #  Ref.
@@ -15,6 +15,7 @@ from __future__ import print_function  # to use print() of Python 3 in Python >=
 from time import sleep
 import sys
 import os
+import re
 import shutil
 import glob
 import platform
@@ -37,11 +38,15 @@ def SetGlobals():
   global Usage              # string on usage
   global GenOSName          # generic OS name
   global Platform           # platform
-  global PkgDir             # the package directory where "klayout.app" and "klayout.scripts" exist
+  global PkgDir             # the package directory where "klayout.app" exists
   global OpClean            # 'clean' operation
   global OpMake             # 'make' operation
+  global DefaultBundleName  # the default bundle name 'klayout.app'
+  global BundleName         # application bundle name in the DMG
   global DMGSerialNum       # the DMG serial number
+  global PackagePrefix      # the package prefix: 'ST-', 'LW-', 'HW-', or 'EX-'
   global QtIdentification   # Qt identification
+  global RubyPythonID       # Ruby- and Python-identification
   global Version            # KLayout's version
   global OccupiedDS         # approx. occupied disc space
   global BackgroundPNG      # the background PNG image file
@@ -63,20 +68,20 @@ def SetGlobals():
   Usage  = "\n"
   Usage += "--------------------------------------------------------------------------------------------------------\n"
   Usage += "<< Usage of 'makeDMG4mac.py' >>\n"
-  Usage += "       for making a DMG file of KLayout 0.25 or later on different Apple Mac OSX platforms.\n"
+  Usage += "       for making a DMG file of KLayout 0.26.1 or later on different Apple Mac OSX platforms.\n"
   Usage += "\n"
   Usage += "$ [python] ./makeDMG4mac.py \n"
   Usage += "   option & argument    : descriptions                                               | default value\n"
   Usage += "   ----------------------------------------------------------------------------------+---------------\n"
   Usage += "   <-p|--pkg <dir>>     : package directory created by `build4mac.py` with [-y|-Y]   | `` \n"
-  Usage += "                        : like 'qt5.pkg.macos-HighSierra-release'                    | \n"
+  Usage += "                        : like 'qt5MP.pkg.macos-Catalina-release-RsysPsys'           | \n"
   Usage += "   <-c|--clean>         : clean the work directory                                   | disabled \n"
   Usage += "   <-m|--make>          : make a compressed DMG file                                 | disabled \n"
   Usage += "                        :   <-c|--clean> and <-m|--make> are mutually exclusive      | \n"
-  Usage += "   [-q|--qt <ID>]       : ID name of deployed Qt                                     | Qt510Xmp \n"
+  Usage += "   [-b|--bundle <name>] : forcibly use this bundle name in the DMG                   | '' \n"
   Usage += "   [-s|--serial <num>]  : DMG serial number                                          | 1 \n"
   Usage += "   [-?|--?]             : print this usage and exit                                  | disabled \n"
-  Usage += "--------------------------------------------------------------------------------------------------------\n"
+  Usage += "-------------------------------------------------------------------------------------+------------------\n"
 
   ProjectDir = os.getcwd()
   (System, Node, Release, Version, Machine, Processor) = platform.uname()
@@ -87,55 +92,79 @@ def SetGlobals():
     print(Usage)
     quit()
 
-  release = int( Release.split(".")[0] ) # take the first of ['14', '5', '0']
-  if release == 14:
-    GenOSName = "MacOSX"
-    Platform  = "Yosemite"
-  elif release == 15:
-    GenOSName = "MacOSX"
-    Platform  = "ElCapitan"
-  elif release == 16:
+  release = int( Release.split(".")[0] ) # take the first of ['19', '0', '0']
+  if   release == 19:
     GenOSName = "macOS"
-    Platform  = "Sierra"
+    Platform  = "Catalina"
+  elif release == 18:
+    GenOSName = "macOS"
+    Platform  = "Mojave"
   elif release == 17:
     GenOSName = "macOS"
     Platform  = "HighSierra"
+  elif release == 16:
+    Platform  = "Sierra"
+    GenOSName = "macOS"
+  elif release == 15:
+    GenOSName = "MacOSX"
+    Platform  = "ElCapitan"
   else:
     Platform = ""
     print("")
     print( "!!! Sorry. Unsupported major OS release <%d>" % release, file=sys.stderr )
     print(Usage)
-    quit()
+    sys.exit(1)
 
   if not Machine == "x86_64":
     print("")
     print( "!!! Sorry. Only x86_64 architecture machine is supported but found <%s>" % Machine, file=sys.stderr )
     print(Usage)
-    quit()
+    sys.exit(1)
 
-  PkgDir           = ""
-  OpClean          = False
-  OpMake           = False
-  DMGSerialNum     = 1
-  QtIdentification = "Qt510Xmp"
-  Version          = GetKLayoutVersionFrom( "./version.sh" )
-  OccupiedDS       = -1
-  BackgroundPNG    = "KLayoutDMG-Back.png"
-  VolumeIcons      = "KLayoutHDD.icns"
-  AppleScriptDMG   = "macbuild/Resources/KLayoutDMG.applescript"
-  WorkDMG          = "work-KLayout.dmg"
-  VolumeDMG        = "KLayout"
-  TargetDMG        = ""
-  RootApplications = "/Applications"
+  PkgDir            = ""
+  OpClean           = False
+  OpMake            = False
+  DefaultBundleName = "klayout.app"
+  BundleName        = ""
+  DMGSerialNum      = 1
+  PackagePrefix     = ""
+  QtIdentification  = ""
+  RubyPythonID      = ""
+  Version           = GetKLayoutVersionFrom( "./version.sh" )
+  OccupiedDS        = -1
+  BackgroundPNG     = "KLayoutDMG-Back.png"
+  VolumeIcons       = "KLayoutHDD.icns"
+  AppleScriptDMG    = "macbuild/Resources/KLayoutDMG.applescript"
+  WorkDMG           = "work-KLayout.dmg"
+  VolumeDMG         = "KLayout"
+  TargetDMG         = ""
+  RootApplications  = "/Applications"
 
 #------------------------------------------------------------------------------
 ## To check the contents of the package directory
+#
+# The package directory name should look like:
+#     * qt5MP.pkg.macos-Catalina-release-RsysPsys      --- (1)
+#     * qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
+#     * qt5Brew.pkg.macos-Catalina-release-Rhb26Phb37
+#     * qt5MP.pkg.macos-Catalina-release-Rmp26Pmp37
+#
+# Generated DMG will be, for example,
+#     (1) ---> klayout-0.26.1-macOS-Catalina-1-qt5MP-RsysPsys.dmg
 #
 # @return on success, positive integer in [MB] that tells approx. occupied disc space;
 #         on failure, -1
 #------------------------------------------------------------------------------
 def CheckPkgDirectory():
+  global DefaultBundleName
+  global BundleName
+  global PackagePrefix
+  global QtIdentification
+  global RubyPythonID
 
+  #-----------------------------------------------------------------------------
+  # [1] Check the contents of the package directory
+  #-----------------------------------------------------------------------------
   if PkgDir == "":
     print( "! Package directory is not specified", file=sys.stderr )
     print(Usage)
@@ -147,44 +176,44 @@ def CheckPkgDirectory():
     return -1
 
   os.chdir(PkgDir)
-  items = glob.glob( "*" ) # must be ['klayout.app', 'klayout.scripts']
-  if not len(items) == 2:
-    print( "! The package directory <%s> must have just <2> directories ['klayout.app', 'klayout.scripts']" % PkgDir, file=sys.stderr )
+  if not os.path.isdir( DefaultBundleName ):
+    print( "! The package directory <%s> does not hold <%s> bundle" % (PkgDir, DefaultBundleName), file=sys.stderr )
     print( "" )
     os.chdir(ProjectDir)
     return -1
 
-  if not os.path.isdir( "klayout.app" ):
-    print( "! The package directory <%s> does not hold <klayout.app> bundle" % PkgDir, file=sys.stderr )
-    print( "" )
-    os.chdir(ProjectDir)
-    return -1
+  command = "\du -sm %s" % DefaultBundleName
+  sizeApp = int( os.popen(command).read().strip("\n").split("\t")[0] )
 
-  if not os.path.isdir( "klayout.scripts" ):
-    print( "! The package directory <%s> does not hold <klayout.scripts> subdirectory" % PkgDir, file=sys.stderr )
-    print( "" )
-    os.chdir(ProjectDir)
-    return -1
-
-  os.chdir( "klayout.scripts" )
-  if not os.path.isdir( "KLayoutEditor.app" ):
-    print( "! The package directory <%s> does not hold <KLayoutEditor.app> bundle under 'klayout.scripts/'" % PkgDir, file=sys.stderr )
-    print( "" )
-    os.chdir(ProjectDir)
-    return -1
-
-  if not os.path.isdir( "KLayoutViewer.app" ):
-    print( "! The package directory <%s> does not hold <KLayoutViewer.app> bundle under 'klayout.scripts/'" % PkgDir, file=sys.stderr )
-    print( "" )
-    os.chdir(ProjectDir)
-    return -1
-
+  #-----------------------------------------------------------------------------
+  # [2] Change the application bundle name on demand
+  #-----------------------------------------------------------------------------
+  if BundleName == "":
+    BundleName = DefaultBundleName
+  else:
+    os.rename( DefaultBundleName, BundleName )
   os.chdir(ProjectDir)
-  os.chdir(PkgDir)
-  size1 = int( os.popen( "\du -sm klayout.app" )    .read().strip("\n").split("\t")[0] )
-  size2 = int( os.popen( "\du -sm klayout.scripts" ).read().strip("\n").split("\t")[0] )
-  os.chdir(ProjectDir)
-  return size1+size2
+
+  #-----------------------------------------------------------------------------
+  # [3] Identify (Qt, Ruby, Python)
+  #
+  #     * ST-qt5MP.pkg.macos-Catalina-release-RsysPsys
+  #     * LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
+  #     * HW-qt5Brew.pkg.macos-Catalina-release-RsysPhb37
+  #     * EX-qt5MP.pkg.macos-Catalina-release-Rmp26Pmp37
+  #-----------------------------------------------------------------------------
+  patQRP = u'(ST|LW|HW|EX)([-])(qt5[0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-]release[-])([0-9A-Za-z]+)'
+  regQRP = re.compile(patQRP)
+  if not regQRP.match(PkgDir):
+    print( "! Cannot identify (Qt, Ruby, Python) from the package directory name" )
+    print( "" )
+    return -1
+  else:
+    pkgdirComponents = regQRP.match(PkgDir).groups()
+    PackagePrefix    = pkgdirComponents[0]
+    QtIdentification = pkgdirComponents[2]
+    RubyPythonID     = pkgdirComponents[5]
+    return sizeApp
 
 #------------------------------------------------------------------------------
 ## To get command line parameters
@@ -197,8 +226,11 @@ def ParseCommandLineArguments():
   global PkgDir
   global OpClean
   global OpMake
+  global BundleName
   global DMGSerialNum
+  global PackagePrefix
   global QtIdentification
+  global RubyPythonID
   global Version
   global OccupiedDS
   global TargetDMG
@@ -220,9 +252,9 @@ def ParseCommandLineArguments():
                 default=False,
                 help="make operation" )
 
-  p.add_option( '-q', '--qt',
-                dest='qt_identification',
-                help="Qt's ID" )
+  p.add_option( '-b', '--bundle',
+                dest='bundle_name',
+                help="forcibly use this bundle name in the DMG" )
 
   p.add_option( '-s', '--serial',
                 dest='dmg_serial',
@@ -237,30 +269,46 @@ def ParseCommandLineArguments():
   p.set_defaults( pkg_dir           = "",
                   operation_clean   = False,
                   operation_make    = False,
-                  qt_identification = "Qt510Xmp",
+                  bundle_name       = "",
                   dmg_serial        = "1",
                   checkusage        = False )
 
+  #-----------------------------------------------------------
+  # [1] Parse the command line options
+  #-----------------------------------------------------------
   opt, args = p.parse_args()
   if (opt.checkusage):
     print(Usage)
     quit()
 
-  PkgDir           = opt.pkg_dir
-  OpClean          = opt.operation_clean
-  OpMake           = opt.operation_make
-  QtIdentification = opt.qt_identification
-  DMGSerialNum     = int(opt.dmg_serial)
-  TargetDMG        = "klayout-%s-%s-%s-%d-%s.dmg" % (Version, GenOSName, Platform, DMGSerialNum, QtIdentification)
+  PkgDir       = opt.pkg_dir
+  OpClean      = opt.operation_clean
+  OpMake       = opt.operation_make
+  DMGSerialNum = int(opt.dmg_serial)
 
-  OccupiedDS = CheckPkgDirectory()
-  if not OccupiedDS > 0:
-    quit()
+  if not opt.bundle_name == "":
+    base, ext  = os.path.splitext( os.path.basename(opt.bundle_name) )
+    BundleName = base + ".app"
+  else:
+    BundleName = ""
 
   if (OpClean and OpMake) or (not OpClean and not OpMake):
     print( "! Specify <-c|--clean> OR <-m|--make>", file=sys.stderr )
     print(Usage)
     quit()
+
+  #------------------------------------------------------------------------------------
+  # [2] Check the PKG directory to set QtIdentification, RubyPythonID, and BundleName
+  #------------------------------------------------------------------------------------
+  OccupiedDS = CheckPkgDirectory()
+  if not 0 < OccupiedDS:
+    print( "! Failed to check the PKG directory" )
+    print( "" )
+    quit()
+  else:
+    TargetDMG = "%s-klayout-%s-%s-%s-%d-%s-%s.dmg" \
+                % (PackagePrefix, Version, GenOSName, Platform, DMGSerialNum, QtIdentification, RubyPythonID)
+  return
 
 #------------------------------------------------------------------------------
 ## Make the target DMG file
@@ -311,12 +359,11 @@ def MakeTargetDMGFile(msg=""):
     # Figures below were determined by experiments for best fit
     applescript = t.safe_substitute(
                       ORGX='50', ORGY='100',
-                      WIN_WIDTH='1000', WIN_HEIGHT='700',
+                      WIN_WIDTH='1000', WIN_HEIGHT='500',
                       FULL_PATH_DS_STORE='/Volumes/%s/.DS_Store' % VolumeDMG,
                       BACKGROUND_PNG_FILE=BackgroundPNG,
-                      ITEM_1='klayout.app',     X1='960', Y1='140',
-                      ITEM_2='klayout.scripts', X2='610', Y2='140',
-                      ITEM_3='Applications',    X3='790', Y3='140',
+                      ITEM_1='%s' % BundleName,  X1='860', Y1='165',
+                      ITEM_2='Applications',     X2='860', Y2='345',
                       CHECK_BASH='[ -f " & dotDSStore & " ]; echo $?'
                     )
   try:
@@ -475,6 +522,14 @@ def MakeTargetDMGFile(msg=""):
   f.close()
   print( "        generated MD5 checksum file <%s>" % md5TargetDMG )
   print( "" )
+
+  #-------------------------------------------------------------
+  # [3] Rename the application bundle if required
+  #-------------------------------------------------------------
+  if not BundleName == DefaultBundleName:
+    dirPresent = "%s/%s" % (PkgDir, BundleName)
+    dirDefault = "%s/%s" % (PkgDir, DefaultBundleName)
+    os.rename( dirPresent, dirDefault )
 
   return True
 

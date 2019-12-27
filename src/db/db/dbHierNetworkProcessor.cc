@@ -1347,30 +1347,37 @@ private:
       return;
     }
 
-    db::ICplxTrans i1t = i1.complex_trans ();
-    db::ICplxTrans tt1 = t1 * i1t;
+    InstanceToInstanceInteraction ii_key;
+    db::ICplxTrans i1t, i2t;
 
-    db::ICplxTrans i2t = i2.complex_trans ();
-    db::ICplxTrans tt2 = t2 * i2t;
+    {
+      i1t = i1element.at_end () ? i1.complex_trans () : i1.complex_trans (*i1element);
+      db::ICplxTrans tt1 = t1 * i1t;
 
-    db::ICplxTrans tt21 = tt1.inverted () * tt2;
-    InstanceToInstanceInteraction ii_key (i1.cell_index (), i1.cell_inst ().delegate (), i2.cell_index (), i2.cell_inst ().delegate (), tt21);
+      i2t = i2element.at_end () ? i2.complex_trans () : i2.complex_trans (*i2element);
+      db::ICplxTrans tt2 = t2 * i2t;
 
-    instance_interaction_cache_type::iterator ii = mp_instance_interaction_cache->find (ii_key);
-    if (ii != mp_instance_interaction_cache->end ()) {
+      db::ICplxTrans tt21 = tt1.inverted () * tt2;
+      ii_key = InstanceToInstanceInteraction (i1.cell_index (), (! i1element.at_end () || i1.size () == 1) ? 0 : i1.cell_inst ().delegate (),
+                                              i2.cell_index (), (! i2element.at_end () || i2.size () == 1) ? 0 : i2.cell_inst ().delegate (),
+                                              tt21);
 
-      //  use cached interactions
-      interacting_clusters = ii->second;
-      for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = interacting_clusters.begin (); i != interacting_clusters.end (); ++i) {
-        //  translate the property IDs
-        i->first.set_inst_prop_id (i1.prop_id ());
-        i->first.transform (i1t);
-        i->second.set_inst_prop_id (i2.prop_id ());
-        i->second.transform (i2t);
+      instance_interaction_cache_type::iterator ii = mp_instance_interaction_cache->find (ii_key);
+      if (ii != mp_instance_interaction_cache->end ()) {
+
+        //  use cached interactions
+        interacting_clusters = ii->second;
+        for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = interacting_clusters.begin (); i != interacting_clusters.end (); ++i) {
+          //  translate the property IDs
+          i->first.set_inst_prop_id (i1.prop_id ());
+          i->first.transform (i1t);
+          i->second.set_inst_prop_id (i2.prop_id ());
+          i->second.transform (i2t);
+        }
+
+        return;
+
       }
-
-      return;
-
     }
 
     //  array interactions

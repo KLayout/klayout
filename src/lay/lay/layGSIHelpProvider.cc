@@ -796,7 +796,6 @@ method_arguments (const gsi::MethodBase *method, const gsi::ClassBase *cls_obj, 
         if (i > 0) {
           r += ",";
           r += sep;
-          r += "&nbsp;";
         }
         r += escape_xml (doc.args [i]);
       }
@@ -816,7 +815,6 @@ method_arguments (const gsi::MethodBase *method, const gsi::ClassBase *cls_obj, 
       if (n > 0) {
         r += ",";
         r += sep;
-        r += "&nbsp;";
       }
       r += type_to_s (*a, linked, false);
       r += " ";
@@ -1312,7 +1310,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
     if (! attr.empty ()) {
       os << "<i>[" << escape_xml (attr) << "] </i>";
     }
-    os << method_return (i->second.first, method_doc, true) << " <b> " << escape_xml (i->first) << " </b> " << method_arguments (i->second.first, cls_obj, method_doc, true, "");
+    os << method_return (i->second.first, method_doc, true) << " <b> " << escape_xml (i->first) << " </b> " << method_arguments (i->second.first, cls_obj, method_doc, true, " ");
     os << "</p>" << std::endl;
 
     os << "<p><b>" << tl::to_string (QObject::tr ("Description")) << "</b>: " << replace_references (escape_xml (method_doc.brief_doc), cls_obj) << "</p>" << std::endl;

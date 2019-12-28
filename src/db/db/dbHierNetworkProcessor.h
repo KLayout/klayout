@@ -765,6 +765,10 @@ struct InstanceToInstanceInteraction
     : ci1 (_ci1), ci2 (_ci2), array1 (_array1), array2 (_array2), t21 (_t21)
   { }
 
+  InstanceToInstanceInteraction ()
+    : ci1 (0), ci2 (0), array1 (0), array2 (0)
+  { }
+
   bool operator== (const InstanceToInstanceInteraction &other) const
   {
     return ci1 == other.ci1 && ci2 == other.ci2 && t21.equal (other.t21) &&

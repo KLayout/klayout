@@ -77,32 +77,25 @@ RubyElCapitan   = { 'exe': '/System/Library/Frameworks/Ruby.framework/Versions/2
                   }
 
 # Bundled with Sierra (10.12)
-#   Sierra has "Headers/" under "/System/Library/Frameworks/Ruby.framework/".
-#   If it disappeared in a future update, the same technique as "Catalina" can be used.
 # [Key Type Name] = 'Sys'
-SierraSDK = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk"
 RubySierra      = { 'exe': '/System/Library/Frameworks/Ruby.framework/Versions/2.3/usr/bin/ruby',
                     'inc': '/System/Library/Frameworks/Ruby.framework/Headers',
                     'lib': '/System/Library/Frameworks/Ruby.framework/Versions/2.3/usr/lib/libruby.dylib'
                   }
 
 # Bundled with High Sierra (10.13)
-#   HighSierra has "Headers/" under "/System/Library/Frameworks/Ruby.framework/".
-#   If it disappeared in a future update, the same technique as "Catalina" can be used.
 # [Key Type Name] = 'Sys'
-HighSierraSDK = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk"
 RubyHighSierra  = { 'exe': '/System/Library/Frameworks/Ruby.framework/Versions/2.3/usr/bin/ruby',
                     'inc': '/System/Library/Frameworks/Ruby.framework/Headers',
                     'lib': '/System/Library/Frameworks/Ruby.framework/Versions/2.3/usr/lib/libruby.dylib'
                   }
 
 # Bundled with Mojave (10.14)
-#   Earlier, the missing Ruby header files under "/System/Library/Frameworks/Ruby.framework/" were manually deployed there.
-#   Knowing that the technique for "Catalina" shown below works fine, changed the settings accordingly.
+#   The missing Ruby header files under "/System/Library/Frameworks/Ruby.framework/" were manually deployed there
+#   from "Xcode-10.1-beta2" with the corresponding Ruby version.
 # [Key Type Name] = 'Sys'
-MojaveSDK = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk"
 RubyMojave      = { 'exe': '/System/Library/Frameworks/Ruby.framework/Versions/2.3/usr/bin/ruby',
-                    'inc': '%s/System/Library/Frameworks/Ruby.framework/Headers' % MojaveSDK,
+                    'inc': '/System/Library/Frameworks/Ruby.framework/Headers',
                     'lib': '/System/Library/Frameworks/Ruby.framework/Versions/2.3/usr/lib/libruby.dylib'
                   }
 

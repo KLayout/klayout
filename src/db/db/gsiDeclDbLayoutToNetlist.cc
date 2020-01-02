@@ -329,7 +329,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("global_net_name", &db::LayoutToNetlist::global_net_name, gsi::arg ("global_net_id"),
     "@brief Gets the global net name for the given global net ID."
   ) +
-  gsi::method ("extract_netlist", &db::LayoutToNetlist::extract_netlist, gsi::arg ("join_net_names", std::string ()), gsi::arg ("include_floating_subcircuits", false),
+  gsi::method ("extract_netlist", &db::LayoutToNetlist::extract_netlist, gsi::arg ("join_net_names", std::string (), "\"\""), gsi::arg ("include_floating_subcircuits", false),
     "@brief Runs the netlist extraction\n"
     "'join_net_names' is a glob expression for labels. Nets on top level carrying the same label which matches this glob "
     "expression will be connected implicitly even if there is no physical connection. This feature is useful to simulate a connection "
@@ -359,12 +359,14 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "@brief Runs the netlist extraction\n"
     "This method runs the netlist extraction like the two-parameter version. In addition to the latter, this method "
     "can be given a per-cell net label joining specification in 'join_net_names_per_cell'. The keys of this array "
-    "are cell names or cell names or cell name match expressions (glob style). The values are lable match expressions.\n"
+    "are cell names or cell names or cell name match expressions (glob style). The values are label match expressions.\n"
     "\n"
     "If not an empty string, the 'join_net_names' label match expression is applied to the top cell. For all non-top cells "
     "the per-cell label match expression is applied and determines what labels are joined into single nets. "
     "As the keys of 'join_net_names_per_cell' are glob expressions, a single cell may fall into more than one category. In this "
-    "case, the label match pattern are combined. In any case, the 'join_net_names' has priority for the top cell."
+    "case, the label match pattern are combined. In any case, the 'join_net_names' has priority for the top cell.\n"
+    "\n"
+    "This variant of 'extract_netlist' has been introduced in version 0.26.2."
   ) +
   gsi::method_ext ("internal_layout", &l2n_internal_layout,
     "@brief Gets the internal layout\n"

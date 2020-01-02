@@ -6,7 +6,7 @@
 #
 # Here are utility functions and classes ...
 #  for building KLayout (http://www.klayout.de/index.php)
-#  version 0.25 or later on different Apple Mac OSX platforms.
+#  version 0.26.1 or later on different Apple Mac OSX platforms.
 #
 # This file is imported by 'build4mac.py' script.
 #===============================================================================
@@ -32,11 +32,11 @@ from build4mac_env  import *
 # @param[in] depstr   strings that tell dependency such as:
 #
 #  libklayout_edt.0.dylib:
-#    libklayout_edt.0.dylib (compatibility version 0.25.0, current version 0.25.0)
-#    libklayout_tl.0.dylib (compatibility version 0.25.0, current version 0.25.0)
-#    libklayout_gsi.0.dylib (compatibility version 0.25.0, current version 0.25.0)
-#    libklayout_laybasic.0.dylib (compatibility version 0.25.0, current version 0.25.0)
-#    libklayout_db.0.dylib (compatibility version 0.25.0, current version 0.25.0)
+#    libklayout_edt.0.dylib (compatibility version 0.26.0, current version 0.26.1)
+#    libklayout_tl.0.dylib (compatibility version 0.26.0, current version 0.26.1)
+#    libklayout_gsi.0.dylib (compatibility version 0.26.0, current version 0.26.1)
+#    libklayout_laybasic.0.dylib (compatibility version 0.26.0, current version 0.26.1)
+#    libklayout_db.0.dylib (compatibility version 0.26.0, current version 0.26.1)
 #      :
 #      :
 #
@@ -57,6 +57,7 @@ def DecomposeLibraryDependency( depstr ):
 ## To print the contents of a library dependency dictionary
 #
 # @param[in] depdic  dictionary
+# @param[in] pathdic path dictionary
 # @param[in] namedic dictionary name
 #------------------------------------------------------------------------------
 def PrintLibraryDependencyDictionary( depdic, pathdic, namedic ):
@@ -113,8 +114,6 @@ def SetChangeIdentificationNameOfDyLib( libdic, pathDic ):
           return 1
   # for-lib
   return 0
-
-
 
 #------------------------------------------------------------------------------
 ## To set the identification names of KLayout's libraries to an executable
@@ -362,9 +361,9 @@ def GetKLayoutVersionFrom( verfile='version.h' ):
   for line in contents:
     m = verReg.match(line)
     if m:
-      # print(m.group(0)) # KLAYOUT_VERSION="0.25.1"
+      # print(m.group(0)) # KLAYOUT_VERSION="0.26.1"
       # print(m.group(1)) # KLAYOUT_VERSION="
-      # print(m.group(2)) # 0.25.1
+      # print(m.group(2)) # 0.26.1
       # print(m.group(3)) # "
       version = m.group(2)
       return version

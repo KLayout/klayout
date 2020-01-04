@@ -1281,3 +1281,9 @@ TEST(119_HierClustersCombArrays)
   run_hc_test (_this, "comb.gds", "comb_au1.gds");
   run_hc_test_with_backannotation (_this, "comb.gds", "comb_au2.gds");
 }
+
+TEST(120_HierClustersCombArrays)
+{
+  run_hc_test (_this, "comb2.gds", "comb2_au1.gds");
+  run_hc_test_with_backannotation (_this, "comb2.gds", "comb2_au2.gds");
+}

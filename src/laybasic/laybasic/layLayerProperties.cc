@@ -78,7 +78,8 @@ LayerProperties::brighter (color_t in, int x)
 }
 
 LayerProperties::LayerProperties ()
-  : m_frame_color (0), 
+  : m_gen_id (0),
+    m_frame_color (0),
     m_frame_color_real (0), 
     m_fill_color (0),
     m_fill_color_real (0),
@@ -117,6 +118,7 @@ LayerProperties::LayerProperties ()
 
 LayerProperties::LayerProperties (const LayerProperties &d)
   : gsi::ObjectBase (d), 
+    m_gen_id (0),
     m_frame_color (0), 
     m_frame_color_real (0), 
     m_fill_color (0),
@@ -159,6 +161,7 @@ LayerProperties::operator= (const LayerProperties &d)
 {
   if (&d != this) {
 
+    refresh ();
     d.ensure_realized ();
 
     int flags = 0;
@@ -333,13 +336,21 @@ LayerProperties::merge_source (const LayerProperties *d) const
 void
 LayerProperties::ensure_realized () const
 {
-  ensure_source_realized ();
-  ensure_visual_realized ();
+  refresh ();
+  if (m_realize_needed_source) {
+    realize_source ();
+    m_realize_needed_source = false;
+  }
+  if (m_realize_needed_visual) {
+    realize_visual ();
+    m_realize_needed_visual = false;
+  }
 }
 
 void
 LayerProperties::ensure_source_realized () const
 {
+  refresh ();
   if (m_realize_needed_source) {
     realize_source ();
     m_realize_needed_source = false;
@@ -349,6 +360,7 @@ LayerProperties::ensure_source_realized () const
 void
 LayerProperties::ensure_visual_realized () const
 {
+  refresh ();
   if (m_realize_needed_visual) {
     realize_visual ();
     m_realize_needed_visual = false;
@@ -470,6 +482,8 @@ private:
 std::string
 LayerProperties::display_string (const lay::LayoutView *view, bool real, bool always_show_source) const
 {
+  refresh ();
+
   try {
 
     std::string ret;
@@ -516,6 +530,7 @@ LayerProperties::display_string (const lay::LayoutView *view, bool real, bool al
 void
 LayerProperties::set_xfill (bool xf)
 {
+  refresh ();
   if (xf != m_xfill) {
     m_xfill = xf;
     need_realize (nr_visual);
@@ -531,6 +546,7 @@ LayerProperties::set_source (const std::string &s)
 void 
 LayerProperties::set_source (const lay::ParsedLayerSource &s)
 {
+  refresh ();
   if (m_source != s) {
     m_source = s;
     need_realize (nr_source);
@@ -555,8 +571,18 @@ LayerProperties::realize_source () const
 }
 
 void
+LayerProperties::touch ()
+{
+  if (++m_gen_id == 0) {
+    ++m_gen_id;
+  }
+}
+
+void
 LayerProperties::need_realize (unsigned int flags, bool /*force*/)
 {
+  touch ();
+
   if ((flags & nr_source) != 0) {
     m_realize_needed_source = true;
   }
@@ -652,7 +678,7 @@ LayerPropertiesNode::LayerPropertiesNode (const LayerPropertiesNode &d)
     m_children (d.m_children),
     m_id (d.m_id)
 {
-  for (iterator c = begin_children (); c != end_children (); ++c) {
+  for (iterator c = m_children.begin (); c != m_children.end (); ++c) {
     c->set_parent (this);
   }
 }
@@ -662,14 +688,14 @@ LayerPropertiesNode::operator= (const LayerPropertiesNode &d)
 {
   if (&d != this) {
 
+    LayerProperties::operator= (d);
+
     m_children = d.m_children;
     m_id = d.m_id;
 
-    for (iterator c = begin_children (); c != end_children (); ++c) {
+    for (iterator c = m_children.begin (); c != m_children.end (); ++c) {
       c->set_parent (this);
     }
-
-    LayerProperties::operator= (d);
 
     need_realize (nr_hierarchy, true);
 
@@ -722,11 +748,21 @@ LayerPropertiesNode::realize_source () const
 void
 LayerPropertiesNode::need_realize (unsigned int flags, bool force)
 {
+  LayerProperties::need_realize (flags);
+
   if ((flags & (nr_visual + nr_source)) != 0 && (force || ! realize_needed_visual () || ! realize_needed_source ())) {
-    LayerProperties::need_realize (flags);
-    for (iterator c = begin_children (); c != end_children (); ++c) {
+    for (iterator c = m_children.begin (); c != m_children.end (); ++c) {
       c->need_realize (flags, force);
     }
+  }
+
+  //  Propagate the status change to the parents on hierarchy change.
+  //  This is important to make any references to parent nodes aware of this
+  //  change.
+  LayerPropertiesNode *p = const_cast<LayerPropertiesNode *> (parent ());
+  while (p) {
+    p->touch ();
+    p = const_cast<LayerPropertiesNode *> (p->parent ());
   }
 }
 
@@ -773,7 +809,7 @@ LayerPropertiesNode::attach_view (LayoutView *view, unsigned int list_index)
   mp_view.reset (view);
   m_list_index = list_index;
 
-  for (iterator c = begin_children (); c != end_children (); ++c) {
+  for (iterator c = m_children.begin (); c != m_children.end (); ++c) {
     c->attach_view (view, list_index);
   }
   //  Attachment of a view is a strong indication that something significant changed - 
@@ -784,6 +820,7 @@ LayerPropertiesNode::attach_view (LayoutView *view, unsigned int list_index)
 LayerPropertiesNode &
 LayerPropertiesNode::insert_child (const iterator &iter, const LayerPropertiesNode &child)
 {
+  refresh ();
   iterator i = m_children.insert (iter, child);
   i->set_parent (this);
   need_realize (nr_hierarchy, true);
@@ -793,6 +830,7 @@ LayerPropertiesNode::insert_child (const iterator &iter, const LayerPropertiesNo
 void 
 LayerPropertiesNode::erase_child (const iterator &iter)
 {
+  refresh ();
   m_children.erase (iter);
   need_realize (nr_hierarchy, true);
 }
@@ -800,6 +838,7 @@ LayerPropertiesNode::erase_child (const iterator &iter)
 void 
 LayerPropertiesNode::add_child (const LayerPropertiesNode &child)
 {
+  refresh ();
   m_children.push_back (child);
   m_children.back ().set_parent (this);
   need_realize (nr_hierarchy, true);
@@ -1049,7 +1088,6 @@ LayerPropertiesConstIterator::parent_obj () const
   size_t uint = m_uint;
   LayerPropertiesList::const_iterator iter = m_list->begin_const ();
   size_t n = ((m_list->end_const () - m_list->begin_const ()) + 2);
-  size_t f = 1;
   const LayerPropertiesNode *ret = 0;
 
   while (uint > n) {
@@ -1058,7 +1096,6 @@ LayerPropertiesConstIterator::parent_obj () const
     tl_assert (rem < n - 1);
     ret = &iter[rem - 1];
     uint /= n;
-    f *= n;
     n = ((ret->end_children () - ret->begin_children ()) + 2);
     iter = ret->begin_children ();
   }
@@ -1095,14 +1132,12 @@ LayerPropertiesConstIterator::set_obj () const
     size_t uint = m_uint;
     LayerPropertiesList::const_iterator iter = m_list->begin_const ();
     size_t n = ((m_list->end_const () - m_list->begin_const ()) + 2);
-    size_t f = 1;
 
     while (uint > n) {
       size_t rem = uint % n;
       tl_assert (rem > 0);
       tl_assert (rem < n - 1);
       uint /= n;
-      f *= n;
       n = ((iter[rem - 1].end_children () - iter[rem - 1].begin_children ()) + 2);
       iter = iter[rem - 1].begin_children ();
     }
@@ -1911,7 +1946,7 @@ LayerPropertiesList::erase (const LayerPropertiesIterator &iter)
 //  LayerPropertiesNodeRef implementation
 
 LayerPropertiesNodeRef::LayerPropertiesNodeRef (LayerPropertiesNode *node)
-  : m_iter (node)
+  : m_iter (node), m_synched_gen_id (0)
 {
   if (node) {
 
@@ -1929,7 +1964,7 @@ LayerPropertiesNodeRef::LayerPropertiesNodeRef (LayerPropertiesNode *node)
 }
 
 LayerPropertiesNodeRef::LayerPropertiesNodeRef (const LayerPropertiesConstIterator &iter)
-  : m_iter (iter)
+  : m_iter (iter), m_synched_gen_id (0)
 {
   if (!iter.at_end () && !iter.is_null ()) {
 
@@ -1949,12 +1984,13 @@ LayerPropertiesNodeRef::LayerPropertiesNodeRef (const LayerPropertiesConstIterat
 }
 
 LayerPropertiesNodeRef::LayerPropertiesNodeRef ()
+  : m_synched_gen_id (0)
 {
   //  .. nothing yet ..
 }
 
 LayerPropertiesNodeRef::LayerPropertiesNodeRef (const LayerPropertiesNodeRef &other)
-  : LayerPropertiesNode (other), m_iter (other.m_iter), mp_node (other.mp_node)
+  : LayerPropertiesNode (other), m_iter (other.m_iter), mp_node (other.mp_node), m_synched_gen_id (0)
 {
   attach_view (other.view (), other.list_index ());
   set_parent (other.parent ());
@@ -1963,6 +1999,8 @@ LayerPropertiesNodeRef::LayerPropertiesNodeRef (const LayerPropertiesNodeRef &ot
 LayerPropertiesNodeRef &LayerPropertiesNodeRef::operator= (const LayerPropertiesNodeRef &other)
 {
   if (this != &other) {
+
+    m_synched_gen_id = other.gen_id ();
 
     mp_node = other.mp_node;
     m_iter = other.m_iter;
@@ -1981,6 +2019,8 @@ LayerPropertiesNodeRef::erase ()
 {
   if (is_valid ()) {
     view ()->delete_layer ((unsigned int) list_index (), m_iter);
+    //  detach from everthing
+    *this = LayerPropertiesNodeRef ();
   }
 }
 
@@ -2009,12 +2049,29 @@ LayerPropertiesNodeRef::need_realize (unsigned int flags, bool force)
       view ()->replace_layer_node ((unsigned int) list_index (), m_iter, *this);
     }
 
+    //  we're in sync now
+    m_synched_gen_id = mp_node->gen_id ();
+
   } else if (mp_node) {
 
     //  fallback mode is to use the target node directly.
     *mp_node = *this;
+    m_synched_gen_id = mp_node->gen_id ();
 
   }
+}
+
+void
+LayerPropertiesNodeRef::refresh () const
+{
+  if (! mp_node.get () || m_synched_gen_id == mp_node->gen_id ()) {
+    return;
+  }
+
+  LayerPropertiesNodeRef *non_const_this = const_cast<LayerPropertiesNodeRef *> (this);
+
+  non_const_this->m_synched_gen_id = mp_node->gen_id ();
+  non_const_this->LayerPropertiesNode::operator= (*mp_node);
 }
 
 } // namespace lay

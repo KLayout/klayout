@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2019 Matthias Koefferlein
+  Copyright (C) 2006-2020 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1280,4 +1280,10 @@ TEST(119_HierClustersCombArrays)
 {
   run_hc_test (_this, "comb.gds", "comb_au1.gds");
   run_hc_test_with_backannotation (_this, "comb.gds", "comb_au2.gds");
+}
+
+TEST(120_HierClustersCombArrays)
+{
+  run_hc_test (_this, "comb2.gds", "comb2_au1.gds");
+  run_hc_test_with_backannotation (_this, "comb2.gds", "comb2_au2.gds");
 }

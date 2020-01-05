@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2019 Matthias Koefferlein
+  Copyright (C) 2006-2020 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -144,22 +144,39 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
           continue;
         }
 
-        db::Edges edges (rgate.edges () & rdiff2gate.edges ());
-        if (edges.size () != 2) {
-          error (tl::sprintf (tl::to_string (tr ("Expected two edges interacting gate/diff (found %d) - width and length may be incorrect")), int (edges.size ())), *p);
+        std::vector<db::Edges::length_type> widths;
+        for (db::Region::const_iterator d2g = rdiff2gate.begin (); ! d2g.at_end (); ++d2g) {
+
+          db::Region rd2g;
+          rd2g.insert (*d2g);
+
+          db::Edges edges (rgate.edges () & rd2g.edges ());
+          db::Edges::length_type l = edges.length ();
+          if (l == 0) {
+            error (tl::to_string (tr ("Vanishing edges for interaction gate/diff (corner interaction) - gate shape ignored")));
+          } else {
+            widths.push_back (l);
+          }
+
+        }
+
+        if (widths.size () != 2) {
           continue;
         }
 
-        if (! p->is_box ()) {
-          error (tl::to_string (tr ("Gate shape is not a box - width and length may be incorrect")), *p);
-        }
+        //  Computation of the gate length and width - this scheme is compatible with
+        //  non-rectangular gates and circular gates. The computation is based on the
+        //  relationship: A(gate) = L(gate) * W(gate). W(gate) is determined from the
+        //  accumulated edge lengths (average of left and right length).
+        double param_w = sdbu () * (widths[0] + widths[1]) * 0.5;
+        double param_l = sdbu () * sdbu () * double (rgate.area ()) / param_w;
 
         db::Device *device = create_device ();
 
         device->set_trans (db::DCplxTrans ((p->box ().center () - db::Point ()) * dbu ()));
 
-        device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, sdbu () * edges.length () * 0.5);
-        device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, sdbu () * (p->perimeter () - edges.length ()) * 0.5);
+        device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, param_w);
+        device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, param_l);
 
         int diff_index = 0;
         for (db::Region::const_iterator d = rdiff2gate.begin (); !d.at_end () && diff_index < 2; ++d, ++diff_index) {
@@ -230,24 +247,39 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
           continue;
         }
 
-        db::Region diff2gate = sdiff2gate + ddiff2gate;
+        db::Edges::length_type sdwidth = 0, ddwidth = 0;
 
-        db::Edges edges (rgate.edges () & diff2gate.edges ());
-        if (edges.size () != 2) {
-          error (tl::sprintf (tl::to_string (tr ("Expected two edges interacting gate/diff (found %d) - width and length may be incorrect")), int (edges.size ())), *p);
-          continue;
+        {
+          db::Edges edges (rgate.edges () & sdiff2gate.edges ());
+          sdwidth = edges.length ();
+          if (sdwidth == 0) {
+            error (tl::to_string (tr ("Vanishing edges for interaction gate/source diff (corner interaction) - gate shape ignored")));
+            continue;
+          }
         }
 
-        if (! p->is_box ()) {
-          error (tl::to_string (tr ("Gate shape is not a box - width and length may be incorrect")), *p);
+        {
+          db::Edges edges (rgate.edges () & ddiff2gate.edges ());
+          ddwidth = edges.length ();
+          if (ddwidth == 0) {
+            error (tl::to_string (tr ("Vanishing edges for interaction gate/drain diff (corner interaction) - gate shape ignored")));
+            continue;
+          }
         }
+
+        //  Computation of the gate length and width - this scheme is compatible with
+        //  non-rectangular gates and circular gates. The computation is based on the
+        //  relationship: A(gate) = L(gate) * W(gate). W(gate) is determined from the
+        //  accumulated edge lengths (average of left and right length).
+        double param_w = sdbu () * (sdwidth + ddwidth) * 0.5;
+        double param_l = sdbu () * sdbu () * double (rgate.area ()) / param_w;
 
         db::Device *device = create_device ();
 
         device->set_trans (db::DCplxTrans ((p->box ().center () - db::Point ()) * dbu ()));
 
-        device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, sdbu () * edges.length () * 0.5);
-        device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, sdbu () * (p->perimeter () - edges.length ()) * 0.5);
+        device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, param_w);
+        device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, param_l);
 
         for (int diff_index = 0; diff_index < 2; ++diff_index) {
 
@@ -272,6 +304,7 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
         modify_device (*p, layer_geometry, device);
 
         //  output the device for debugging
+        db::Region diff2gate = sdiff2gate + ddiff2gate;
         device_out (device, diff2gate, rgate);
 
       }

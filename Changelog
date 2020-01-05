@@ -1,3 +1,20 @@
+0.26.3          (2020-01-05):
+
+* Bugfix: %GITHUB%/issues/466
+      A crash happened when accessing layer properties tabs with
+      an invalid index in Ruby or Python
+* Bugfix: %GITHUB%/issues/464
+      Problem building a layer tree with "add_child" (Ruby/Python)
+* Bugfix: %GITHUB%/issues/463
+      Configuring a layer color with a group node was not effective
+      over multiple levels of hierarchy
+* Enhancement: %GITHUB%/issues/462
+      MOS transistor gate figures can be more generic now,
+      e.g. ring-like or non-rectangular
+* Bugfix: %GITHUB%/issues/458
+      A net extraction bug related to certain array/array 
+      interactions is fixed
+
 0.26.2          (2019-12-18):
 
 * Bugfix: %GITHUB%/issues/453

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2019 Matthias Koefferlein
+  Copyright (C) 2006-2020 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1935,6 +1935,10 @@ LayoutView::expand_properties (unsigned int index, const std::map<int, int> &map
 void
 LayoutView::replace_layer_node (unsigned int index, const LayerPropertiesConstIterator &iter, const LayerPropertiesNode &node)
 {
+  if (index >= layer_lists ()) {
+    return;
+  }
+
   //  if the source specification changed, a redraw is required
   if (*iter != node) {
 
@@ -1968,6 +1972,10 @@ LayoutView::replace_layer_node (unsigned int index, const LayerPropertiesConstIt
 void 
 LayoutView::set_properties (unsigned int index, const LayerPropertiesConstIterator &iter, const LayerProperties &props)
 {
+  if (index >= layer_lists ()) {
+    return;
+  }
+
   //  if the source specification changed, a redraw is required
   const LayerProperties &l = *iter;
   if (l != props) {
@@ -2007,6 +2015,8 @@ LayoutView::set_properties (unsigned int index, const LayerPropertiesConstIterat
 const LayerPropertiesNode &
 LayoutView::insert_layer (unsigned int index, const LayerPropertiesConstIterator &before, const LayerPropertiesNode &node)
 {
+  tl_assert (index < layer_lists ());
+
   if (transacting ()) {
     manager ()->queue (this, new OpInsertLayerProps (index, (unsigned int) before.uint (), node));
   } else if (manager () && ! replaying ()) {
@@ -2032,6 +2042,10 @@ LayoutView::insert_layer (unsigned int index, const LayerPropertiesConstIterator
 void 
 LayoutView::delete_layer (unsigned int index, LayerPropertiesConstIterator &iter)
 {
+  if (index >= layer_lists ()) {
+    return;
+  }
+
   lay::LayerPropertiesNode orig = *iter;
 
   if (mp_control_panel && index == current_layer_list ()) {

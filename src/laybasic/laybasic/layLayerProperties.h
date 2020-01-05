@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2019 Matthias Koefferlein
+  Copyright (C) 2006-2020 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -102,6 +102,18 @@ public:
   LayerProperties &operator= (const LayerProperties &d);
 
   /**
+   *  @brief Gets the generation number
+   *
+   *  The generation number changes whenever something is changed
+   *  with this layer properties object. "0" is reserved for the
+   *  "uninitialized" state.
+   */
+  size_t gen_id () const
+  {
+    return m_gen_id;
+  }
+
+  /**
    *  @brief Assignment alias for GSI binding
    */
   void assign_lp (const LayerProperties &d)
@@ -170,6 +182,7 @@ public:
       ensure_visual_realized ();
       return m_frame_color_real;
     } else {
+      refresh ();
       return m_frame_color;
     }
   }
@@ -182,6 +195,7 @@ public:
    */
   void set_frame_color_code (color_t c)
   {
+    refresh ();
     if (m_frame_color != c) {
       m_frame_color = c;
       need_realize (nr_visual);
@@ -223,6 +237,7 @@ public:
       ensure_visual_realized ();
       return m_fill_color_real;
     } else {
+      refresh ();
       return m_fill_color;
     }
   }
@@ -235,6 +250,7 @@ public:
    */
   void set_fill_color_code (color_t c)
   {
+    refresh ();
     if (m_fill_color != c) {
       m_fill_color = c;
       need_realize (nr_visual);
@@ -272,6 +288,7 @@ public:
    */
   void set_frame_brightness (int b)
   {
+    refresh ();
     if (m_frame_brightness != b) {
       m_frame_brightness = b;
       need_realize (nr_visual);
@@ -287,6 +304,7 @@ public:
       ensure_visual_realized ();
       return m_frame_brightness_real;
     } else {
+      refresh ();
       return m_frame_brightness;
     }
   }
@@ -298,6 +316,7 @@ public:
    */
   void set_fill_brightness (int b)
   {
+    refresh ();
     if (m_fill_brightness != b) {
       m_fill_brightness = b;
       need_realize (nr_visual);
@@ -315,6 +334,7 @@ public:
       ensure_visual_realized ();
       return m_fill_brightness_real;
     } else {
+      refresh ();
       return m_fill_brightness;
     }
   }
@@ -324,6 +344,7 @@ public:
    */
   void set_dither_pattern (int index)
   {
+    refresh ();
     if (m_dither_pattern != index) {
       m_dither_pattern = index;
       need_realize (nr_visual);
@@ -353,6 +374,7 @@ public:
       ensure_visual_realized ();
       return m_dither_pattern_real;
     } else {
+      refresh ();
       return m_dither_pattern;
     }
   }
@@ -378,6 +400,7 @@ public:
    */
   void set_line_style (int index)
   {
+    refresh ();
     if (m_line_style != index) {
       m_line_style = index;
       need_realize (nr_visual);
@@ -407,6 +430,7 @@ public:
       ensure_visual_realized ();
       return m_line_style_real;
     } else {
+      refresh ();
       return m_line_style;
     }
   }
@@ -432,6 +456,7 @@ public:
    */
   void set_valid (bool v)
   {
+    refresh ();
     if (m_valid != v) {
       m_valid = v;
       need_realize (nr_visual);
@@ -447,6 +472,7 @@ public:
       ensure_visual_realized ();
       return m_valid_real;
     } else {
+      refresh ();
       return m_valid;
     }
   }
@@ -456,6 +482,7 @@ public:
    */
   void set_visible (bool v)
   {
+    refresh ();
     if (m_visible != v) {
       m_visible = v;
       need_realize (nr_visual);
@@ -471,12 +498,13 @@ public:
       ensure_visual_realized ();
       return m_visible_real;
     } else {
+      refresh ();
       return m_visible;
     }
   }
 
   /**
-   *  @brief Return true, if the layer is showing "something"
+   *  @brief Returns true, if the layer is showing "something"
    *
    *  A layer "shows something" if it is visible and it displays some information,
    *  either shapes or cell boxes. Invalid layers, i.e. such that have a layer selection
@@ -523,6 +551,7 @@ public:
    */
   void set_transparent (bool t)
   {
+    refresh ();
     if (m_transparent != t) {
       m_transparent = t;
       need_realize (nr_visual);
@@ -538,6 +567,7 @@ public:
       ensure_visual_realized ();
       return m_transparent_real;
     } else {
+      refresh ();
       return m_transparent;
     }
   }
@@ -547,6 +577,7 @@ public:
    */
   void set_width (int w)
   {
+    refresh ();
     if (m_width != w) {
       m_width = w;
       need_realize (nr_visual);
@@ -562,6 +593,7 @@ public:
       ensure_visual_realized ();
       return m_width_real;
     } else {
+      refresh ();
       return m_width;
     }
   }
@@ -571,6 +603,7 @@ public:
    */
   void set_marked (bool t)
   {
+    refresh ();
     if (m_marked != t) {
       m_marked = t;
       need_realize (nr_visual);
@@ -586,6 +619,7 @@ public:
       ensure_visual_realized ();
       return m_marked_real;
     } else {
+      refresh ();
       return m_marked;
     }
   }
@@ -595,6 +629,7 @@ public:
    */
   void set_animation (int a)
   {
+    refresh ();
     if (m_animation != a) {
       m_animation = a;
       need_realize (nr_visual);
@@ -610,6 +645,7 @@ public:
       ensure_visual_realized ();
       return m_animation_real;
     } else {
+      refresh ();
       return m_animation;
     }
   }
@@ -623,6 +659,7 @@ public:
       ensure_visual_realized ();
       return m_xfill_real;
     } else {
+      refresh ();
       return m_xfill;
     }
   }
@@ -637,6 +674,7 @@ public:
    */
   void set_name (const std::string &n)
   {
+    refresh ();
     if (m_name != n) {
       m_name = n;
       need_realize (nr_meta);
@@ -648,6 +686,7 @@ public:
    */
   const std::string &name () const
   {
+    refresh ();
     return m_name;
   }
   
@@ -699,6 +738,7 @@ public:
       ensure_source_realized ();
       return m_source_real;
     } else {
+      refresh ();
       return m_source;
     }
   }
@@ -850,11 +890,6 @@ protected:
   void do_realize (const LayoutView *view) const;
 
   /** 
-   *  @brief Tell the children that a realize of the visual properties is needed
-   */
-  virtual void need_realize (unsigned int flags, bool force = false);
-
-  /** 
    *  @brief Tell, if a realize of the visual properties is needed
    */
   bool realize_needed_visual () const
@@ -870,7 +905,28 @@ protected:
     return m_realize_needed_source;
   }
 
+  /**
+   *  @brief Marks the properties object as modified
+   *
+   *  This will basically increment the generation count.
+   *  This method is implied when calling "needs_realize".
+   */
+  void touch ();
+
+  /**
+   *  @brief Tells the children that a realize of the visual properties is needed
+   *  This is also the "forward sync" for the LayerPropertiesNodeRef.
+   */
+  virtual void need_realize (unsigned int flags, bool force = false);
+
+  /**
+   *  @brief Fetches the current status from the original properties for the LayerPropertiesNodeRef implementation
+   */
+  virtual void refresh () const { }
+
 private:
+  //  the generation number
+  size_t m_gen_id;
   //  display styles
   color_t m_frame_color;
   mutable color_t m_frame_color_real;
@@ -1018,6 +1074,7 @@ public:
    */
   const_iterator begin_children () const
   {
+    refresh ();
     return m_children.begin ();
   }
   
@@ -1026,6 +1083,7 @@ public:
    */
   const_iterator end_children () const
   {
+    refresh ();
     return m_children.end ();
   }
   
@@ -1034,6 +1092,7 @@ public:
    */
   iterator begin_children ()
   {
+    refresh ();
     return m_children.begin ();
   }
   
@@ -1042,6 +1101,7 @@ public:
    */
   iterator end_children () 
   {
+    refresh ();
     return m_children.end ();
   }
 
@@ -1882,6 +1942,10 @@ private:
  *  a node's property will update the properties in the view as well.
  *  Second, changes in the node's hierarchy will be reflected in the
  *  view's layer hierarchy too.
+ *
+ *  The implementation is based on a synchronized mirror copy of the
+ *  original node. This is not quite efficient and cumbersome. In the
+ *  future, this may be replaced by a simple reference.
  */
 class LAYBASIC_PUBLIC LayerPropertiesNodeRef
   : public LayerPropertiesNode
@@ -1944,8 +2008,10 @@ public:
 private:
   LayerPropertiesConstIterator m_iter;
   tl::weak_ptr<LayerPropertiesNode> mp_node;
+  size_t m_synched_gen_id;
 
   void need_realize (unsigned int flags, bool force);
+  void refresh () const;
 };
 
 }

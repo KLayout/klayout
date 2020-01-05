@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 # KLayout Layout Viewer
-# Copyright (C) 2006-2019 Matthias Koefferlein
+# Copyright (C) 2006-2020 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -396,6 +396,13 @@ class LAYLayoutView_TestClass < TestBase
     lp = lv.insert_layer(0, lv.begin_layers)
     lp.fill_color = 0xffff31cc
     assert_equal(lv.begin_layers.current.fill_color, 0xffff31cc)
+
+    # should not segfault
+    begin
+      lv.insert_layer(42, lv.begin_layers(42))
+      assert_equal(true, false)
+    rescue => ex
+    end
 
   end
 

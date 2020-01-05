@@ -5,7 +5,7 @@
 # File: "macbuild/build4mac.py"
 #
 #  The top Python script for building KLayout (http://www.klayout.de/index.php)
-#  version 0.25 or later on different Apple Mac OSX platforms.
+#  version 0.26.1 or later on different Apple Mac OSX platforms.
 #===============================================================================
 from __future__ import print_function  # to use print() of Python 3 in Python >= 2.7
 import sys
@@ -42,8 +42,10 @@ def SetGlobals():
   global CheckComOnly       # True if only for checking the command line parameters to "build.sh"
   global DeploymentF        # True if fully (including Qt's Frameworks) deploy the binaries for bundles
   global DeploymentP        # True if partially deploy the binaries excluding Qt's Frameworks
+  global PackagePrefix      # the package prefix: 'ST-', 'LW-', 'HW-', or 'EX-'
   global DeployVerbose      # -verbose=<0-3> level passed to 'macdeployqt' tool
   global Version            # KLayout's version
+  global ModuleSet          # (Qt, Ruby, Python)-tuple
   # auxiliary variables on platform
   global System             # 6-tuple from platform.uname()
   global Node               # - do -
@@ -54,37 +56,46 @@ def SetGlobals():
   global Bit                # machine bit-size
 
   Usage  = "\n"
-  Usage += "--------------------------------------------------------------------------------------------------------\n"
+  Usage += "---------------------------------------------------------------------------------------------------------\n"
   Usage += "<< Usage of 'build4mac.py' >>\n"
-  Usage += "       for building KLayout 0.25 or later on different Apple Mac OSX platforms.\n"
+  Usage += "       for building KLayout 0.26.1 or later on different Apple Mac OSX platforms.\n"
   Usage += "\n"
   Usage += "$ [python] ./build4mac.py \n"
-  Usage += "   option & argument    : descriptions                                               | default value\n"
-  Usage += "   ----------------------------------------------------------------------------------+---------------\n"
-  Usage += "                        : * key type names below are case insensitive *              | \n"
-  Usage += "                        :   'nil' = not to support the script language               | \n"
-  Usage += "                        :   'Sys' = using the OS standard script language            | \n"
-  Usage += "                        : Refer to 'macbuild/build4mac_env.py' for details           | \n"
-  Usage += "   [-q|--qt <type>]     : type=['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Brew']             | qt5macports \n"
-  Usage += "   [-r|--ruby <type>]   : type=['nil', 'Sys', 'Src24', 'MP24', 'B25']                | sys \n"
-  Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B37']       | sys \n"
-  Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                  | disabled \n"
-  Usage += "   [-m|--make <option>] : option passed to 'make'                                    | -j4 \n"
-  Usage += "   [-d|--debug]         : enable debug mode build                                    | disabled \n"
-  Usage += "   [-c|--checkcom]      : check command line and exit without building               | disabled \n"
-  Usage += "   [-y|--deploy]        : deploy executables and dylibs including Qt's Frameworks    | disabled \n"
-  Usage += "   [-Y|--DEPLOY]        : deploy executables and dylibs for those who built KLayout  | disabled \n"
-  Usage += "                        : from the source code and use the tools in the same machine | \n"
-  Usage += "                        : ! After confirmation of successful build of                | \n"
-  Usage += "                        :   KLayout, rerun this script with BOTH:                    | \n"
-  Usage += "                        :     1) the same options used for building AND              | \n"
-  Usage += "                        :     2) <-y|--deploy> OR <-Y|--DEPLOY>                      | \n"
-  Usage += "                        :   optionally with [-v|--verbose <0-3>]                     | \n"
-  Usage += "   [-v|--verbose <0-3>] : verbose level of `macdeployqt' (effective with -y only)    | 1 \n"
-  Usage += "                        : 0 = no output, 1 = error/warning (default),                | \n"
-  Usage += "                        : 2 = normal,    3 = debug                                   | \n"
-  Usage += "   [-?|--?]             : print this usage and exit                                  | disabled \n"
-  Usage += "--------------------------------------------------------------------------------------------------------\n"
+  Usage += "   option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)| default value\n"
+  Usage += "   --------------------------------------------------------------------------------------+---------------\n"
+  Usage += "   [-q|--qt <type>]     : case-insensitive type=['Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3']    | qt5macports \n"
+  Usage += "                        :   Qt5MacPorts: use Qt5 from MacPorts                           | \n"
+  Usage += "                        :       Qt5Brew: use Qt5 from Homebrew                           | \n"
+  Usage += "                        :       Qt5Ana3: use Qt5 from Anaconda3                          | \n"
+  Usage += "   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP26', 'HB26', 'Ana3']   | sys \n"
+  Usage += "                        :    nil: don't bind Ruby                                        | \n"
+  Usage += "                        :    Sys: use OS-bundled Ruby [2.0 - 2.6] depending on OS        | \n"
+  Usage += "                        :   MP26: use Ruby 2.6 from MacPorts                             | \n"
+  Usage += "                        :   HB26: use Ruby 2.6 from Homebrew                             | \n"
+  Usage += "                        :   Ana3: use Ruby 2.5 from Anaconda3                            | \n"
+  Usage += "   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP37', 'HB37', 'Ana3']   | sys \n"
+  Usage += "                        :    nil: don't bind Python                                      | \n"
+  Usage += "                        :    Sys: use OS-bundled Python 2.7 [ElCapitan -- Catalina]      | \n"
+  Usage += "                        :   MP37: use Python 3.7 from MacPorts                           | \n"
+  Usage += "                        :   HB37: use Python 3.7 from Homebrew                           | \n"
+  Usage += "                        :   Ana3: use Python 3.7 from Anaconda3                          | \n"
+  Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                      | disabled \n"
+  Usage += "   [-m|--make <option>] : option passed to 'make'                                        | '-j4' \n"
+  Usage += "   [-d|--debug]         : enable debug mode build                                        | disabled \n"
+  Usage += "   [-c|--checkcom]      : check command line and exit without building                   | disabled \n"
+  Usage += "   [-y|--deploy]        : deploy executables and dylibs including Qt's Frameworks        | disabled \n"
+  Usage += "   [-Y|--DEPLOY]        : deploy executables and dylibs for those who built KLayout      | disabled \n"
+  Usage += "                        : from the source code and use the tools in the same machine     | \n"
+  Usage += "                        : ! After confirmation of successful build of 'klayout.app',     | \n"
+  Usage += "                        :   rerun this script with BOTH:                                 | \n"
+  Usage += "                        :     1) the same options used for building AND                  | \n"
+  Usage += "                        :     2) <-y|--deploy> OR <-Y|--DEPLOY>                          | \n"
+  Usage += "                        :   optionally with [-v|--verbose <0-3>]                         | \n"
+  Usage += "   [-v|--verbose <0-3>] : verbose level of `macdeployqt' (effective with -y only)        | 1 \n"
+  Usage += "                        : 0 = no output, 1 = error/warning (default),                    | \n"
+  Usage += "                        : 2 = normal,    3 = debug                                       | \n"
+  Usage += "   [-?|--?]             : print this usage and exit                                      | disabled \n"
+  Usage += "-----------------------------------------------------------------------------------------+---------------\n"
 
   ProjectDir = os.getcwd()
   BuildBash  = "./build.sh"
@@ -94,44 +105,49 @@ def SetGlobals():
     print("")
     print( "!!! Sorry. Your system <%s> looks like non-Mac" % System, file=sys.stderr )
     print(Usage)
-    exit()
+    sys.exit(1)
 
-  release = int( Release.split(".")[0] ) # take the first of ['14', '5', '0']
-  if release == 14:
-    Platform = "Yosemite"
-  elif release == 15:
-    Platform = "ElCapitan"
-  elif release == 16:
-    Platform = "Sierra"
+  release = int( Release.split(".")[0] ) # take the first of ['19', '0', '0']
+  if   release == 19:
+    Platform = "Catalina"
+  elif release == 18:
+    Platform = "Mojave"
   elif release == 17:
     Platform = "HighSierra"
+  elif release == 16:
+    Platform = "Sierra"
+  elif release == 15:
+    Platform = "ElCapitan"
   else:
     Platform = ""
     print("")
     print( "!!! Sorry. Unsupported major OS release <%d>" % release, file=sys.stderr )
     print(Usage)
-    exit()
+    sys.exit(1)
 
   if not Machine == "x86_64":
     print("")
     print( "!!! Sorry. Only x86_64 architecture machine is supported but found <%s>" % Machine, file=sys.stderr )
     print(Usage)
-    exit()
+    sys.exit(1)
 
-  # default modules
+  # Set the default modules
   ModuleQt = "Qt5MacPorts"
-  if Platform == "Yosemite":
-    ModuleRuby   = "RubyYosemite"
-    ModulePython = "PythonYosemite"
-  elif Platform == "ElCapitan":
-    ModuleRuby   = "RubyElCapitan"
-    ModulePython = "PythonElCapitan"
-  elif Platform == "Sierra":
-    ModuleRuby   = "RubySierra"
-    ModulePython = "PythonSierra"
+  if   Platform == "Catalina":
+    ModuleRuby   = "RubyCatalina"
+    ModulePython = "PythonCatalina"
+  elif Platform == "Mojave":
+    ModuleRuby   = "RubyMojave"
+    ModulePython = "PythonMojave"
   elif Platform == "HighSierra":
     ModuleRuby   = "RubyHighSierra"
     ModulePython = "PythonHighSierra"
+  elif Platform == "Sierra":
+    ModuleRuby   = "RubySierra"
+    ModulePython = "PythonSierra"
+  elif Platform == "ElCapitan":
+    ModuleRuby   = "RubyElCapitan"
+    ModulePython = "PythonElCapitan"
   else:
     ModuleRuby   = "nil"
     ModulePython = "nil"
@@ -143,8 +159,10 @@ def SetGlobals():
   CheckComOnly  = False
   DeploymentF   = False
   DeploymentP   = False
+  PackagePrefix = ""
   DeployVerbose = 1
   Version       = GetKLayoutVersionFrom( "./version.sh" )
+  ModuleSet     = ( 'qt5MP', 'Sys', 'Sys' )
 
 #------------------------------------------------------------------------------
 ## To get command line parameters
@@ -162,20 +180,22 @@ def ParseCommandLineArguments():
   global CheckComOnly
   global DeploymentF
   global DeploymentP
+  global PackagePrefix
   global DeployVerbose
+  global ModuleSet
 
   p = optparse.OptionParser( usage=Usage )
   p.add_option( '-q', '--qt',
                 dest='type_qt',
-                help="Qt type=['Qt4MacPorts', 'Qt5MacPorts']" )
+                help="Qt type=['Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3']" )
 
   p.add_option( '-r', '--ruby',
                 dest='type_ruby',
-                help="Ruby type=['nil', 'Sys', 'Src24', 'MP24']" )
+                help="Ruby type=['nil', 'Sys', 'MP26', 'HB26', 'Ana3']" )
 
   p.add_option( '-p', '--python',
                 dest='type_python',
-                help="Python type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B37']" )
+                help="Python type=['nil', 'Sys', 'MP37', 'HB37', 'Ana3']" )
 
   p.add_option( '-n', '--noqtbinding',
                 action='store_true',
@@ -236,103 +256,123 @@ def ParseCommandLineArguments():
   opt, args = p.parse_args()
   if (opt.checkusage):
     print(Usage)
-    exit()
+    sys.exit(0)
 
-  # Determine Qt type
-  candidates = ['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Brew']
-  candidates_upper = [ i.upper() for i in candidates ]
-  ModuleQt   = ""
-  index      = 0
-  if opt.type_qt.upper() in candidates_upper:
-    idx = candidates_upper.index(opt.type_qt.upper())
-    ModuleQt = candidates[idx]
-  else:
+  # Determine the Qt type
+  candidates                = dict()
+  candidates['QT5MACPORTS'] = 'Qt5MacPorts'
+  candidates['QT5BREW']     = 'Qt5Brew'
+  candidates['QT5ANA3']     = 'Qt5Ana3'
+  try:
+    ModuleQt = candidates[ opt.type_qt.upper() ]
+  except KeyError:
+    ModuleQt = ''
+    pass
+  if ModuleQt == '':
     print("")
-    print( "!!! Unknown Qt type %s. Candidates: %s" % (opt.type_qt, candidates), file=sys.stderr )
+    print( "!!! Unknown Qt type <%s>. Case-insensitive candidates: %s" % \
+            (opt.type_qt, list(candidates.keys())), file=sys.stderr )
     print(Usage)
-    exit(1)
+    sys.exit(1)
+  elif ModuleQt == "Qt5MacPorts":
+    choiceQt5 = 'qt5MP'
+  elif ModuleQt == "Qt5Brew":
+    choiceQt5 = 'qt5Brew'
+  elif ModuleQt == "Qt5Ana3":
+    choiceQt5 = 'qt5Ana3'
 
-  # By default, OS-standard script languages (Ruby and Python) are used
+  # By default, OS-standard (-bundled) script languages (Ruby and Python) are used
   NonOSStdLang = False
 
-  # Determine Ruby type
-  candidates = [ i.upper() for i in ['nil', 'Sys', 'Src24', 'MP24', 'B25'] ]
-  ModuleRuby = ""
-  index      = 0
-  for item in candidates:
-    if opt.type_ruby.upper() == item:
-      if index == 0:
-        ModuleRuby = 'nil'
-        break
-      elif index == 1:
-        if Platform == "Yosemite":
-          ModuleRuby = 'RubyYosemite'
-        elif Platform == "ElCapitan":
-          ModuleRuby = 'RubyElCapitan'
-        elif Platform == "Sierra":
-          ModuleRuby = 'RubySierra'
-        elif Platform == "HighSierra":
-          ModuleRuby = 'RubyHighSierra'
-        else:
-          ModuleRuby = ''
-        break
-      elif index == 2:
-        ModuleRuby   = 'Ruby24SrcBuild'
-        NonOSStdLang = True
-      elif index == 3:
-        ModuleRuby   = 'Ruby24MacPorts'
-        NonOSStdLang = True
-      elif index == 4:
-        ModuleRuby   = 'Ruby25Brew'
-        NonOSStdLang = True
-    else:
-      index += 1
-  if ModuleRuby == "":
+  # Determine the Ruby type
+  candidates         = dict()
+  candidates['NIL']  = 'nil'
+  candidates['SYS']  = 'Sys'
+  candidates['MP26'] = 'MP26'
+  candidates['HB26'] = 'HB26'
+  candidates['ANA3'] = 'Ana3'
+  try:
+    choiceRuby = candidates[ opt.type_ruby.upper() ]
+  except KeyError:
+    ModuleRuby = ''
+    pass
+  else:
+    ModuleRuby = ''
+    if choiceRuby == "nil":
+      ModuleRuby = 'nil'
+    elif choiceRuby == "Sys":
+      choiceRuby = "Sys"
+      if Platform == "Catalina":
+        ModuleRuby = 'RubyCatalina'
+      elif Platform == "Mojave":
+        ModuleRuby = 'RubyMojave'
+      elif Platform == "HighSierra":
+        ModuleRuby = 'RubyHighSierra'
+      elif Platform == "Sierra":
+        ModuleRuby = 'RubySierra'
+      elif Platform == "ElCapitan":
+        ModuleRuby = 'RubyElCapitan'
+    elif choiceRuby == "MP26":
+      ModuleRuby   = 'Ruby26MacPorts'
+      NonOSStdLang = True
+    elif choiceRuby == "HB26":
+      ModuleRuby   = 'Ruby26Brew'
+      NonOSStdLang = True
+    elif choiceRuby == "Ana3":
+      ModuleRuby   = 'RubyAnaconda3'
+      NonOSStdLang = True
+  if ModuleRuby == '':
     print("")
-    print( "!!! Unknown Ruby type", file=sys.stderr )
+    print( "!!! Unknown Ruby type <%s>. Case-insensitive candidates: %s" % \
+            (opt.type_ruby, list(candidates.keys())), file=sys.stderr )
     print(Usage)
-    exit()
+    sys.exit(1)
 
-  # Determine Python type
-  candidates   = [ i.upper() for i in ['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B37'] ]
-  ModulePython = ""
-  index        = 0
-  for item in candidates:
-    if opt.type_python.upper() == item:
-      if index == 0:
-        ModulePython = 'nil'
-        break
-      elif index == 1:
-        if Platform == "Yosemite":
-          ModulePython = 'PythonYosemite'
-        elif Platform == "ElCapitan":
-          ModulePython = 'PythonElCapitan'
-        elif Platform == "Sierra":
-          ModulePython = 'PythonSierra'
-        elif Platform == "HighSierra":
-          ModulePython = 'PythonHighSierra'
-        else:
-          ModulePython = ''
-        break
-      elif index == 2:
-        ModulePython = 'Anaconda27'
-        NonOSStdLang = True
-      elif index == 3:
-        ModulePython = 'Anaconda36'
-        NonOSStdLang = True
-      elif index == 4:
-        ModulePython = 'Python36MacPorts'
-        NonOSStdLang = True
-      elif index == 5:
-        ModulePython = 'Python37Brew'
-        NonOSStdLang = True
-    else:
-      index += 1
-  if ModulePython == "":
+  # Determine the Python type
+  candidates         = dict()
+  candidates['NIL']  = 'nil'
+  candidates['SYS']  = 'Sys'
+  candidates['MP37'] = 'MP37'
+  candidates['HB37'] = 'HB37'
+  candidates['ANA3'] = 'Ana3'
+  try:
+    choicePython = candidates[ opt.type_python.upper() ]
+  except KeyError:
+    ModulePython = ''
+    pass
+  else:
+    ModulePython = ''
+    if choicePython ==  "nil":
+      ModulePython = 'nil'
+    elif choicePython == "Sys":
+      if Platform == "Catalina":
+        ModulePython = 'PythonCatalina'
+      elif Platform == "Mojave":
+        ModulePython = 'PythonMojave'
+      elif Platform == "HighSierra":
+        ModulePython = 'PythonHighSierra'
+      elif Platform == "Sierra":
+        ModulePython = 'PythonSierra'
+      elif Platform == "ElCapitan":
+        ModulePython = 'PythonElCapitan'
+    elif choicePython == "MP37":
+      ModulePython = 'Python37MacPorts'
+      NonOSStdLang = True
+    elif choicePython == "HB37":
+      ModulePython = 'Python37Brew'
+      NonOSStdLang = True
+    elif choicePython == "Ana3":
+      ModulePython = 'PythonAnaconda3'
+      NonOSStdLang = True
+  if ModulePython == '':
     print("")
-    print( "!!! Unknown Python type", file=sys.stderr )
+    print( "!!! Unknown Python type <%s>. Case-insensitive candidates: %s" % \
+            (opt.type_python, list(candidates.keys())), file=sys.stderr )
     print(Usage)
-    exit()
+    sys.exit(1)
+
+  # Set of modules chosen
+  ModuleSet = ( choiceQt5, choiceRuby, choicePython )
 
   NoQtBindings  = opt.no_qt_binding
   MakeOptions   = opt.make_option
@@ -345,14 +385,14 @@ def ParseCommandLineArguments():
     print("")
     print( "!!! Choose either [-y|--deploy] or [-Y|--DEPLOY]", file=sys.stderr )
     print(Usage)
-    exit()
+    sys.exit(1)
 
   DeployVerbose = int(opt.deploy_verbose)
   if not DeployVerbose in [0, 1, 2, 3]:
     print("")
     print( "!!! Unsupported verbose level passed to `macdeployqt` tool", file=sys.stderr )
     print(Usage)
-    exit()
+    sys.exit(1)
 
   if not DeploymentF and not DeploymentP:
     target  = "%s %s %s" % (Platform, Release, Machine)
@@ -360,6 +400,26 @@ def ParseCommandLineArguments():
     message = "### You are going to build KLayout\n    for  <%s>\n    with <%s>...\n"
     print("")
     print( message % (target, modules) )
+  else:
+    message = "### You are going to make "
+    if DeploymentP:
+      PackagePrefix = "LW-"
+      message      += "a llightweight (LW-) package excluding Qt5, Ruby, and Python..."
+    elif DeploymentF:
+      if (ModuleRuby in RubySys) and (ModulePython in PythonSys):
+        PackagePrefix = "ST-"
+        message      += "a standard (ST-) package including Qt5 and using OS-bundled Ruby and Python..."
+      elif ModulePython == 'Python37Brew':
+        PackagePrefix = "HW-"
+        message      += "a heavyweight (HW-) package including Qt5 and Python3.7 from Homebrew..."
+      else:
+        PackagePrefix = "EX-"
+        message      += "a package with exceptional (EX-) combinations of different modules..."
+    print( "" )
+    print( message )
+    print( "" )
+    if CheckComOnly:
+      sys.exit(0)
 
 #------------------------------------------------------------------------------
 ## To run the main Bash script "build.sh" with appropriate options
@@ -373,11 +433,14 @@ def RunMainBuildBash():
   global ModuleQt
   global ModuleRuby
   global ModulePython
+  global ModuleSet
   global NoQtBindings
   global MakeOptions
   global DebugMode
   global CheckComOnly
   global DeploymentF
+  global DeploymentP
+  global PackagePrefix
   global MacPkgDir       # relative path to package directory
   global MacBinDir       # relative path to binary directory
   global MacBuildDir     # relative path to build directory
@@ -400,59 +463,49 @@ def RunMainBuildBash():
     mode        = "release"
     parameters += "  -release"
 
-  # (B) Qt4 or Qt5
-  if ModuleQt == 'Qt4MacPorts':
-    parameters    += " \\\n  -qt4"
-    parameters    += " \\\n  -qmake  %s" % Qt4MacPorts['qmake']
-    MacPkgDir      = "./qt4.pkg.macos-%s-%s"        % (Platform, mode)
-    MacBinDir      = "./qt4.bin.macos-%s-%s"        % (Platform, mode)
-    MacBuildDir    = "./qt4.build.macos-%s-%s"      % (Platform, mode)
-    MacBuildLog    = "./qt4.build.macos-%s-%s.log"  % (Platform, mode)
-    AbsMacPkgDir   = "%s/qt4.pkg.macos-%s-%s"       % (ProjectDir, Platform, mode)
-    AbsMacBinDir   = "%s/qt4.bin.macos-%s-%s"       % (ProjectDir, Platform, mode)
-    AbsMacBuildDir = "%s/qt4.build.macos-%s-%s"     % (ProjectDir, Platform, mode)
-    AbsMacBuildLog = "%s/qt4.build.macos-%s-%s.log" % (ProjectDir, Platform, mode)
-    parameters    += " \\\n  -bin    %s" % MacBinDir
-    parameters    += " \\\n  -build  %s" % MacBuildDir
-  elif ModuleQt == 'Qt5MacPorts':
+  # (B) Modules
+  (qt, ruby, python) = ModuleSet  # ( 'qt5MP', 'Sys', 'Sys' )
+  ruby_python = "R%sP%s" % ( ruby.lower(), python.lower() )
+
+  # (C) Target directories and files
+  MacPkgDir      = "./%s%s.pkg.macos-%s-%s-%s"      % (PackagePrefix, qt, Platform, mode, ruby_python)
+  MacBinDir      = "./%s.bin.macos-%s-%s-%s"        % (               qt, Platform, mode, ruby_python)
+  MacBuildDir    = "./%s.build.macos-%s-%s-%s"      % (               qt, Platform, mode, ruby_python)
+  MacBuildLog    = "./%s.build.macos-%s-%s-%s.log"  % (               qt, Platform, mode, ruby_python)
+  AbsMacPkgDir   = "%s/%s%s.pkg.macos-%s-%s-%s"     % (ProjectDir, PackagePrefix, qt, Platform, mode, ruby_python)
+  AbsMacBinDir   = "%s/%s.bin.macos-%s-%s-%s"       % (ProjectDir,                qt, Platform, mode, ruby_python)
+  AbsMacBuildDir = "%s/%s.build.macos-%s-%s-%s"     % (ProjectDir,                qt, Platform, mode, ruby_python)
+  AbsMacBuildLog = "%s/%s.build.macos-%s-%s-%s.log" % (ProjectDir,                qt, Platform, mode, ruby_python)
+
+  # (D) Qt5
+  if ModuleQt == 'Qt5MacPorts':
     parameters    += " \\\n  -qt5"
     parameters    += " \\\n  -qmake  %s" % Qt5MacPorts['qmake']
-    MacPkgDir      = "./qt5.pkg.macos-%s-%s"        % (Platform, mode)
-    MacBinDir      = "./qt5.bin.macos-%s-%s"        % (Platform, mode)
-    MacBuildDir    = "./qt5.build.macos-%s-%s"      % (Platform, mode)
-    MacBuildLog    = "./qt5.build.macos-%s-%s.log"  % (Platform, mode)
-    AbsMacPkgDir   = "%s/qt5.pkg.macos-%s-%s"       % (ProjectDir, Platform, mode)
-    AbsMacBinDir   = "%s/qt5.bin.macos-%s-%s"       % (ProjectDir, Platform, mode)
-    AbsMacBuildDir = "%s/qt5.build.macos-%s-%s"     % (ProjectDir, Platform, mode)
-    AbsMacBuildLog = "%s/qt5.build.macos-%s-%s.log" % (ProjectDir, Platform, mode)
     parameters    += " \\\n  -bin    %s" % MacBinDir
     parameters    += " \\\n  -build  %s" % MacBuildDir
   elif ModuleQt == 'Qt5Brew':
     parameters    += " \\\n  -qt5"
     parameters    += " \\\n  -qmake  %s" % Qt5Brew['qmake']
-    MacPkgDir      = "./qt5.pkg.macos-%s-%s"        % (Platform, mode)
-    MacBinDir      = "./qt5.bin.macos-%s-%s"        % (Platform, mode)
-    MacBuildDir    = "./qt5.build.macos-%s-%s"      % (Platform, mode)
-    MacBuildLog    = "./qt5.build.macos-%s-%s.log"  % (Platform, mode)
-    AbsMacPkgDir   = "%s/qt5.pkg.macos-%s-%s"       % (ProjectDir, Platform, mode)
-    AbsMacBinDir   = "%s/qt5.bin.macos-%s-%s"       % (ProjectDir, Platform, mode)
-    AbsMacBuildDir = "%s/qt5.build.macos-%s-%s"     % (ProjectDir, Platform, mode)
-    AbsMacBuildLog = "%s/qt5.build.macos-%s-%s.log" % (ProjectDir, Platform, mode)
     parameters    += " \\\n  -bin    %s" % MacBinDir
     parameters    += " \\\n  -build  %s" % MacBuildDir
-  parameters    += " \\\n  -rpath    %s" % "@executable_path/../Frameworks"
+  elif ModuleQt == 'Qt5Ana3':
+    parameters    += " \\\n  -qt5"
+    parameters    += " \\\n  -qmake  %s" % Qt5Ana3['qmake']
+    parameters    += " \\\n  -bin    %s" % MacBinDir
+    parameters    += " \\\n  -build  %s" % MacBuildDir
+  parameters += " \\\n  -rpath    %s" % "@executable_path/../Frameworks"
 
-  # (C) want Qt bindings with Ruby scripts?
+  # (E) want Qt bindings with Ruby scripts?
   if NoQtBindings:
     parameters += " \\\n  -without-qtbinding"
   else:
     parameters += " \\\n  -with-qtbinding"
 
-  # (D) options to `make` tool
+  # (F) options to `make` tool
   if not MakeOptions == "":
     parameters += " \\\n  -option %s" % MakeOptions
 
-  # (E) about Ruby
+  # (G) about Ruby
   if ModuleRuby == "nil":
     parameters += " \\\n  -noruby"
   else:
@@ -460,7 +513,7 @@ def RunMainBuildBash():
     parameters += " \\\n  -rbinc  %s" % RubyDictionary[ModuleRuby]['inc']
     parameters += " \\\n  -rblib  %s" % RubyDictionary[ModuleRuby]['lib']
 
-  # (F) about Python
+  # (H) about Python
   if ModulePython == "nil":
     parameters += " \\\n  -nopython"
   else:
@@ -477,7 +530,7 @@ def RunMainBuildBash():
   command += "  2>&1 | tee %s" % MacBuildLog
   if CheckComOnly:
     print(command)
-    exit()
+    sys.exit(0)
 
   #-----------------------------------------------------
   # [3] Invoke the main Bash script; takes time:-)
@@ -581,10 +634,6 @@ def DeployBinariesForBundle():
   #                             |              +-- '*.dylib'
   #                             +-- MacOS/+
   #                             |         +-- 'klayout'
-  #                             |         +-- 'db_plugins'/+
-  #                             |                          +-- '*.dylib'
-  #                             |         +-- 'lay_plugins'/+
-  #                             |                           +-- '*.dylib'
   #                             +-- Buddy/+
   #                                       +-- 'strm2cif'
   #                                       +-- 'strm2dxf'
@@ -610,10 +659,10 @@ def DeployBinariesForBundle():
   #
   # Note:
   #     KLayout's dynamic link library is built as below:
-  #       (1) libklayout_lay.0.25.0.dylib
-  #       (2) libklayout_lay.0.25.dylib -> libklayout_lay.0.25.0.dylib
-  #       (3) libklayout_lay.0.dylib -> libklayout_lay.0.25.0.dylib
-  #       (4) libklayout_lay.dylib -> libklayout_lay.0.25.0.dylib
+  #       (1) libklayout_lay.0.26.1.dylib
+  #       (2) libklayout_lay.0.26.dylib -> libklayout_lay.0.26.1.dylib
+  #       (3) libklayout_lay.0.dylib -> libklayout_lay.0.26.1.dylib
+  #       (4) libklayout_lay.dylib -> libklayout_lay.0.26.1.dylib
   #     where,
   #       (1) is an ordinary file with full version number 'major.minor.teeny'
   #           between "library_name."='libklayout_lay.' and '.dylib'
@@ -625,13 +674,13 @@ def DeployBinariesForBundle():
   #     in the example below.
   #
   # Example:
-  #   MacBookPro(1)$ otool -L klayout
+  #   MacBookPro2(1)$ otool -L klayout
   #   klayout:
   #       :
   #       :
-  #     libklayout_tl.0.dylib (compatibility version 0.25.0, current version 0.25.0)
-  #     libklayout_gsi.0.dylib (compatibility version 0.25.0, current version 0.25.0)
-  #     libklayout_db.0.dylib (compatibility version 0.25.0, current version 0.25.0)
+  #     libklayout_tl.0.dylib (compatibility version 0.26.0, current version 0.26.1)
+  #     libklayout_gsi.0.dylib (compatibility version 0.26.0, current version 0.26.1)
+  #     libklayout_db.0.dylib (compatibility version 0.26.0, current version 0.26.1)
   #       :
   #-------------------------------------------------------------------------------
   os.chdir( targetDirF )
@@ -645,7 +694,7 @@ def DeployBinariesForBundle():
       #     to style (3) and set its mode to 0755 (sanity check).
       #-------------------------------------------------------------------
       fullName = os.path.basename(item).split('.')
-      # e.g. [ 'libklayout_lay', '0', '25', '0', 'dylib' ]
+      # e.g. [ 'libklayout_lay', '0', '26', '1', 'dylib' ]
       nameStyle3 = fullName[0] + "." + fullName[1] + ".dylib"
       shutil.copy2( item, nameStyle3 )
       os.chmod( nameStyle3, 0o0755 )
@@ -678,7 +727,7 @@ def DeployBinariesForBundle():
         #     to style (3) and set its mode to 0755 (sanity check).
         #-------------------------------------------------------------------
         fullName = os.path.basename(item).split('.')
-        # e.g. [ 'libklayout_lay', '0', '25', '0', 'dylib' ]
+        # e.g. [ 'libklayout_lay', '0', '26', '1', 'dylib' ]
         nameStyle3 = fullName[0] + "." + fullName[1] + ".dylib"
         destPath = os.path.join( targetDirM, piDir, nameStyle3 )
         shutil.copy2( item, destPath )
@@ -738,6 +787,7 @@ def DeployBinariesForBundle():
   shutil.copy2( sourceDir1 + "/klayout",      targetDirM )
   shutil.copy2( sourceDir2 + "/klayout.icns", targetDirR )
 
+
   os.chmod( targetDir0 + "/PkgInfo",      0o0644 )
   os.chmod( targetDir0 + "/Info.plist",   0o0644 )
   os.chmod( targetDirM + "/klayout",      0o0755 )
@@ -782,16 +832,20 @@ def DeployBinariesForBundle():
     # [8] Deploy Qt Frameworks
     #-------------------------------------------------------------
     verbose = " -verbose=%d" % DeployVerbose
-    if ModuleQt == 'Qt4MacPorts':
-      deploytool = Qt4MacPorts['deploy']
-      app_bundle = "klayout.app"
-      options    = macdepQtOpt + verbose
-    elif ModuleQt == 'Qt5MacPorts':
+    if ModuleQt == 'Qt5MacPorts':
       deploytool = Qt5MacPorts['deploy']
       app_bundle = "klayout.app"
       options    = macdepQtOpt + verbose
+    # To use Qt5 from Homebrew on Catalina...
+    #   in "/usr/local/opt/python/lib/"
+    #         Python.framework -> ../Frameworks/Python.framework/ <=== this symbolic was needed
+    #         pkgconfig/
     elif ModuleQt == 'Qt5Brew':
       deploytool = Qt5Brew['deploy']
+      app_bundle = "klayout.app"
+      options    = macdepQtOpt + verbose
+    elif ModuleQt == 'Qt5Ana3':
+      deploytool = Qt5Ana3['deploy']
       app_bundle = "klayout.app"
       options    = macdepQtOpt + verbose
 
@@ -803,58 +857,70 @@ def DeployBinariesForBundle():
     os.chdir(MacPkgDir)
     command = "%s %s %s" % ( deploytool, app_bundle, options )
     if subprocess.call( command, shell=True ) != 0:
-      msg = "!!! Failed to deploy applications on OSX !!!"
+      msg = "!!! Failed to deploy applications on OSX/macOS !!!"
       print( msg, file=sys.stderr )
       print("")
       os.chdir(ProjectDir)
       return 1
 
-    deploymentPython = True
-    if deploymentPython and NonOSStdLang:
+    #-------------------------------------------------------------
+    # [9] Special deployment of Python3.7 from Homebrew
+    #-------------------------------------------------------------
+    deploymentPython37HB = (ModulePython == 'Python37Brew')
+    if deploymentPython37HB and NonOSStdLang:
       from build4mac_util import WalkFrameworkPaths, PerformChanges
 
       bundlePath = AbsMacPkgDir + '/klayout.app'
-      # bundlePath = os.getcwd() + '/qt5.pkg.macos-HighSierra-release/klayout.app'
       bundleExecPathAbs = '%s/Contents/MacOS/' % bundlePath
-      pythonOriginalFrameworkPath = '/usr/local/opt/python/Frameworks/Python.framework'
       pythonFrameworkPath = '%s/Contents/Frameworks/Python.framework' % bundlePath
 
-      print(" [8.1] Deploying Python from %s ..." % pythonOriginalFrameworkPath)
-      print("  [1] Copying Python Framework")
+      print( "" )
+      print( " [9] Optional deployment of Python from %s ..." % HBPython37FrameworkPath )
+      print( "  [9.1] Copying Python Framework" )
+
+      cmd1 = "rm -rf %s" % pythonFrameworkPath
+      cmd2 = "rsync -a --safe-links %s/ %s" % (HBPython37FrameworkPath, pythonFrameworkPath)
+      cmd3 = "mkdir %s/Versions/3.7/lib/python3.7/site-packages/" % pythonFrameworkPath
+      cmd4 = "cp -RL %s/Versions/3.7/lib/python3.7/site-packages/{pip*,pkg_resources,setuptools*,wheel*} " % \
+              HBPython37FrameworkPath
+      cmd4 += "%s/Versions/3.7/lib/python3.7/site-packages/" % pythonFrameworkPath
+      cmd5 = "rm -rf %s/Versions/3.7/lib/python3.7/test" % pythonFrameworkPath
+      cmd6 = "rm -rf %s/Versions/3.7/Resources" % pythonFrameworkPath
+      cmd7 = "rm -rf %s/Versions/3.7/bin" % pythonFrameworkPath
+
       shell_commands = list()
-      shell_commands.append("rm -rf %s" % pythonFrameworkPath)
-      shell_commands.append("rsync -a --safe-links %s/ %s" % (pythonOriginalFrameworkPath, pythonFrameworkPath))
-      shell_commands.append("mkdir %s/Versions/3.7/lib/python3.7/site-packages/" % pythonFrameworkPath)
-      shell_commands.append("cp -RL %s/Versions/3.7/lib/python3.7/site-packages/{pip*,pkg_resources,setuptools*,wheel*} " % pythonOriginalFrameworkPath +
-                            "%s/Versions/3.7/lib/python3.7/site-packages/" % pythonFrameworkPath)
-      shell_commands.append("rm -rf %s/Versions/3.7/lib/python3.7/test" % pythonFrameworkPath)
-      shell_commands.append("rm -rf %s/Versions/3.7/Resources" % pythonFrameworkPath)
-      shell_commands.append("rm -rf %s/Versions/3.7/bin" % pythonFrameworkPath)
+      shell_commands.append(cmd1)
+      shell_commands.append(cmd2)
+      shell_commands.append(cmd3)
+      shell_commands.append(cmd4)
+      shell_commands.append(cmd5)
+      shell_commands.append(cmd6)
+      shell_commands.append(cmd7)
 
       for command in shell_commands:
         if subprocess.call( command, shell=True ) != 0:
           msg = "command failed: %s"
           print( msg % command, file=sys.stderr )
-          exit(1)
+          sys.exit(1)
 
       shutil.copy2( sourceDir2 + "/start-console.py", targetDirM )
       shutil.copy2( sourceDir2 + "/klayout_console", targetDirM )
       os.chmod( targetDirM + "/klayout_console",      0o0755 )
 
-      print("  [2] Relinking dylib dependencies inside Python.framework")
-      print("   [2.1] Patching Python Framework")
-      depdict = WalkFrameworkPaths(pythonFrameworkPath)
+      print("  [9.2] Relinking dylib dependencies inside Python.framework" )
+      print("   [9.2.1] Patching Python Framework" )
+      depdict = WalkFrameworkPaths( pythonFrameworkPath )
       appPythonFrameworkPath = '@executable_path/../Frameworks/Python.framework/'
-      PerformChanges(depdict, [(pythonOriginalFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
+      PerformChanges(depdict, [(HBPython37FrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
 
-      print("   [2.2] Patching /usr/local/opt/ libs")
+      print("   [9.2.2] Patching /usr/local/opt/ libs")
       usrLocalPath = '/usr/local/opt/'
       appUsrLocalPath = '@executable_path/../Frameworks/'
       replacePairs = [(usrLocalPath, appUsrLocalPath, True)]
       depdict = WalkFrameworkPaths(pythonFrameworkPath, search_path_filter=r'\t+/usr/local/(opt|Cellar)')
       PerformChanges(depdict, replacePairs, bundleExecPathAbs)
 
-      print("   [2.3] Patching openssl, gdbm, readline, sqlite, tcl-tk, xz")
+      print("   [9.2.3] Patching openssl, gdbm, readline, sqlite, tcl-tk, xz")
       usrLocalPath = '/usr/local/opt'
       appUsrLocalPath = '@executable_path/../Frameworks/'
       replacePairs = [(usrLocalPath, appUsrLocalPath, True)]
@@ -869,16 +935,16 @@ def DeployBinariesForBundle():
 
       PerformChanges(depdict, replacePairs, bundleExecPathAbs)
 
-      print("  [3] Relinking dylib dependencies for klayout")
+      print("  [9.3] Relinking dylib dependencies for klayout")
       klayoutPath = bundleExecPathAbs
       depdict = WalkFrameworkPaths(klayoutPath, filter_regex=r'klayout$')
-      PerformChanges(depdict, [(pythonOriginalFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
+      PerformChanges(depdict, [(HBPython37FrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
 
       libKlayoutPath = bundleExecPathAbs + '../Frameworks'
       depdict = WalkFrameworkPaths(libKlayoutPath, filter_regex=r'libklayout')
-      PerformChanges(depdict, [(pythonOriginalFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
+      PerformChanges(depdict, [(HBPython37FrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
 
-      print("  [4] Patching site.py, pip/, and distutils/")
+      print("  [9.4] Patching site.py, pip/, and distutils/")
       site_module = "%s/Versions/3.7/lib/python3.7/site.py" % pythonFrameworkPath
       with open(site_module, 'r') as site:
         buf = site.readlines()
@@ -915,114 +981,27 @@ def DeployBinariesForBundle():
             continue
           file.write(line)
 
+    #-------------------------------------------------------------
+    # [10] Special deployment of Ruby2.6 from Homebrew?
+    #-------------------------------------------------------------
+    deploymentRuby26HB = (ModuleRuby == 'Ruby26Brew')
+    if deploymentRuby26HB and NonOSStdLang:
+
+      print( "" )
+      print( " [10] You have reached optional deployment of Ruby from %s ..." % HBRuby26Path )
+      print( "   [!!!] Sorry, the deployed package will not work properly since deployment of" )
+      print( "         Ruby2.6 from Homebrew is not yet supported." )
+      print( "         Since you have Homebrew development environment, there two options:" )
+      print( "           (1) Retry to make a package with '-Y|--DEPLOY' option." )
+      print( "               This will not deploy any of Qt5, Python, and Ruby from Homebrew." )
+      print( "               Instead, the package will directly use those Frameworks and libraries" )
+      print( "               in your Homebrew environment." )
+      print( "           (2) Rebuild KLayout with '-r|--ruby <nil|Sys>' option depending on your preference." )
+      print( "" )
+
   else:
-    print( " [8] Skipped deploying Qt's Frameworks ..." )
+    print( " [8] Skipped deploying Qt's Frameworks and optional Python/Ruby Frameworks..." )
   print( "##### Finished deploying libraries and executables for <klayout.app> #####" )
-  print("")
-  os.chdir(ProjectDir)
-  return 0
-#------------------------------------------------------------------------------
-## To deploy script bundles that invoke the main bundle (klayout.app) in
-#  editor mode or viewer mode
-#
-# @return 0 on success; non-zero on failure
-#------------------------------------------------------------------------------
-def DeployScriptBundles():
-  global ProjectDir
-  global MacPkgDir
-  global AbsMacPkgDir
-
-  print("")
-  print( "##### Started deploying files for <KLayoutEditor.app> and <KLayoutViewer.app> #####" )
-  print( " [1] Checking the status of working directory ..." )
-  #-------------------------------------------------------------
-  # [1] Check the status of working directory
-  #-------------------------------------------------------------
-  os.chdir(ProjectDir)
-  if not os.path.isdir(MacPkgDir):
-    print( "!!! Package directory <%s> does not present !!!" % MacPkgDir, file=sys.stderr )
-    return 1
-
-
-  print( " [2] Creating a new empty directory <%s> for deployment ..." % (MacPkgDir + "/klayout.scripts") )
-  #-------------------------------------------------------------
-  # [2] Create a new empty directory for deploying binaries
-  #-------------------------------------------------------------
-  os.chdir(MacPkgDir)
-  scriptDir = "klayout.scripts"
-  if os.path.isfile(scriptDir):
-    os.remove(scriptDir)
-  if os.path.isdir(scriptDir):
-    shutil.rmtree(scriptDir)
-  os.mkdir(scriptDir)
-
-
-  print( " [3] Creating the standard directory structure for the script bundles ..." )
-  #--------------------------------------------------------------------------------------------
-  # [3] Create the directory skeleton for the two script bundles.
-  #
-  #  klayout.scripts/+
-  #                  +-- KLayoutEditor.app/+
-  #                  |                     +-- Contents/+
-  #                  |                                  +-- Info.plist
-  #                  |                                  +-- Resources/+
-  #                  |                                  |             +-- 'klayout-red.icns'
-  #                  |                                  +-- MacOS/+
-  #                  |                                            +-- 'KLayoutEditor.sh'
-  #                  +-- KLayoutViewer.app/+
-  #                                        +-- Contents/+
-  #                                                     +-- Info.plist
-  #                                                     +-- Resources/+
-  #                                                     |             +-- 'klayout-blue.icns'
-  #                                                     +-- MacOS/+
-  #                                                               +-- 'KLayoutViewer.sh'
-  #--------------------------------------------------------------------------------------------
-  os.chdir(ProjectDir)
-  targetDir0E = "%s/%s/KLayoutEditor.app/Contents" % ( AbsMacPkgDir, scriptDir )
-  targetDir0V = "%s/%s/KLayoutViewer.app/Contents" % ( AbsMacPkgDir, scriptDir )
-
-  targetDirME = targetDir0E + "/MacOS"
-  targetDirMV = targetDir0V + "/MacOS"
-  targetDirRE = targetDir0E + "/Resources"
-  targetDirRV = targetDir0V + "/Resources"
-
-  os.makedirs(targetDirME)
-  os.makedirs(targetDirMV)
-  os.makedirs(targetDirRE)
-  os.makedirs(targetDirRV)
-
-
-  print( " [4] Copying script files and icon files ..." )
-  #-------------------------------------------------------------------------------
-  # [4] Copy different script files icon files
-  #-------------------------------------------------------------------------------
-  os.chdir(ProjectDir)
-  resourceDir = "macbuild/Resources"
-
-  shutil.copy2( resourceDir + "/KLayoutEditor.sh",  targetDirME )
-  shutil.copy2( resourceDir + "/KLayoutViewer.sh",  targetDirMV )
-  shutil.copy2( resourceDir + "/klayout-red.icns",  targetDirRE )
-  shutil.copy2( resourceDir + "/klayout-blue.icns", targetDirRV )
-
-  os.chmod( targetDirME + "/KLayoutEditor.sh",  0o0755 )
-  os.chmod( targetDirMV + "/KLayoutViewer.sh",  0o0755 )
-  os.chmod( targetDirRE + "/klayout-red.icns",  0o0644 )
-  os.chmod( targetDirRV + "/klayout-blue.icns", 0o0644 )
-
-  tmpfileE = ProjectDir + "/macbuild/Resources/Info.plist.template"
-  keydicE  = { 'exe': 'KLayoutEditor.sh', 'icon': 'klayout-red.icns',  'bname': 'klayout', 'ver': Version }
-  plistE   = GenerateInfoPlist( keydicE, tmpfileE )
-  fileE    = open( targetDir0E + "/Info.plist", "w" )
-  fileE.write(plistE)
-  fileE.close()
-
-  tmpfileV = ProjectDir + "/macbuild/Resources/Info.plist.template"
-  keydicV  = { 'exe': 'KLayoutViewer.sh', 'icon': 'klayout-blue.icns', 'bname': 'klayout', 'ver': Version }
-  plistV   = GenerateInfoPlist( keydicV, tmpfileV )
-  fileV    = open( targetDir0V + "/Info.plist", "w" )
-  fileV.write(plistV)
-  fileV.close()
-  print( "##### Finished deploying files for <KLayoutEditor.app> and <KLayoutViewer.app> #####" )
   print("")
   os.chdir(ProjectDir)
   return 0
@@ -1033,6 +1012,7 @@ def DeployScriptBundles():
 def main():
   SetGlobals()
   ParseCommandLineArguments()
+
   #----------------------------------------------------------
   # [The main build stage]
   #----------------------------------------------------------
@@ -1042,21 +1022,12 @@ def main():
       sys.exit(1)
   else:
     #----------------------------------------------------------
-    # [Deployment stage-1]
+    # [The deployment stage]
     #   Deployment of dynamic link libraries, executables and
     #   resources to make the main "klayout.app" bundle
     #----------------------------------------------------------
-    ret1 = DeployBinariesForBundle()
-    if not ret1 == 0:
-      sys.exit(1)
-    #----------------------------------------------------------
-    # [Deployment stage-2]
-    #   Deployment of wrapper Bash scripts and resources
-    #   to make "KLayoutEditor.app" and "KLayoutViewer.app"
-    #----------------------------------------------------------
-    ret2 = DeployScriptBundles()
-
-    if not ret2 == 0:
+    ret = DeployBinariesForBundle()
+    if not ret == 0:
       sys.exit(1)
 
 #===================================================================================

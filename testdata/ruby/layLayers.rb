@@ -25,20 +25,20 @@ load("test_prologue.rb")
 
 class LAYLayers_TestClass < TestBase
 
-  def lnode_str( space, l )
-    return space + l.current.source( true ) + "\n";
+  def lnode_str(space, l)
+    return space + l.current.source(true) + "\n";
   end
 
-  def lnodes_str( space, l )
+  def lnodes_str(space, l)
     res = ""
     while ! l.at_end?  
-      res += lnode_str( space, l )
+      res += lnode_str(space, l)
       if (l.current.has_children?) 
         l.down_first_child
-        res += lnodes_str( "  #{space}", l )
+        res += lnodes_str("  #{space}", l)
         l.up
       end
-      l.next_sibling( 1 )
+      l.next_sibling(1)
     end
     return res
   end
@@ -937,6 +937,96 @@ class LAYLayers_TestClass < TestBase
     assert_equal(cv.get_line_style(index), "")
 
     mw.close_all
+
+  end
+
+  # dynamic update of tree with LayerPropertiesNodeRef
+  def test_7
+
+    if !RBA.constants.member?(:Application)
+      return
+    end
+
+    app = RBA::Application.instance
+    mw = app.main_window
+    mw.close_all
+
+    mw.load_layout( ENV["TESTSRC"] + "/testdata/gds/t11.gds", 1 ) 
+
+    lv = mw.current_view
+    lv.clear_layers
+
+    lp = RBA::LayerProperties::new
+    lp.source = "A@*"
+     
+    lp = lv.insert_layer(lv.begin_layers, lp)
+     
+    lpp = RBA::LayerProperties::new
+    lpp = lp.add_child(lpp)
+    lpp.source = "A.1"
+     
+    lppp = RBA::LayerProperties::new
+    lppp = lpp.add_child(lppp)
+    lppp.source = "A.1.1@*"
+     
+    lppp = RBA::LayerProperties::new
+    lppp = lpp.add_child(lppp)
+    li = lv.begin_layers # lp
+    li.down_first_child # lpp
+    li.down_first_child # before lppp
+    li.next # lppp
+    li.current.source = "X"
+    assert_equal(lppp.source, "X@1")
+    lppp.source = "A.1.2"
+    assert_equal(li.current.source, "A.1.2@1")
+     
+    lpp = RBA::LayerProperties::new
+    lpp = lp.add_child(lpp)
+    lpp.source = "A.2@*"
+     
+    lppp = RBA::LayerProperties::new
+    lppp = lpp.add_child(lppp)
+    lppp.source = "A.2.1"
+    lppp_saved = lppp
+
+    lppp = RBA::LayerProperties::new
+    lppp = lpp.add_child(lppp)
+    lppp.source = "A.2.2@*"
+
+    assert_equal(lnodes_str("", lv.begin_layers), 
+      "A@*\n" +
+      "  A.1@1\n" +
+      "    A.1.1@1\n" +
+      "    A.1.2@1\n" +
+      "  A.2@*\n" +
+      "    A.2.1@1\n" +
+      "    A.2.2@*\n"
+    )
+
+    lp.source = "B@2"
+
+    assert_equal(lnodes_str("", lv.begin_layers), 
+      "B@2\n" +
+      "  A.1@1\n" +
+      "    A.1.1@1\n" +
+      "    A.1.2@1\n" +
+      "  A.2@2\n" +
+      "    A.2.1@1\n" +
+      "    A.2.2@2\n"
+    )
+
+    lppp_saved.delete
+
+    assert_equal(lnodes_str("", lv.begin_layers), 
+      "B@2\n" +
+      "  A.1@1\n" +
+      "    A.1.1@1\n" +
+      "    A.1.2@1\n" +
+      "  A.2@2\n" +
+      "    A.2.2@2\n"
+    )
+
+    assert_equal(lppp.source, "A.2.2@*")
 
   end
 

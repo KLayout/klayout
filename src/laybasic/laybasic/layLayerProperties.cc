@@ -275,12 +275,12 @@ LayerProperties::merge_visual (const LayerProperties *d) const
   if (!d || !d->has_frame_color (true)) {
     m_frame_color_real = m_frame_color;
   } else {
-    m_frame_color_real = d->m_frame_color;
+    m_frame_color_real = d->m_frame_color_real;
   }
   if (!d || !d->has_fill_color (true)) {
     m_fill_color_real = m_fill_color;
   } else {
-    m_fill_color_real = d->m_fill_color;
+    m_fill_color_real = d->m_fill_color_real;
   }
 
   m_frame_brightness_real = m_frame_brightness;

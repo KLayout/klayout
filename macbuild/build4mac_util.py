@@ -134,8 +134,11 @@ def SetChangeIdentificationNameOfDyLib( libdic, pathDic ):
 #                             +-- Frameworks/+
 #                             |              +-- '*.framework'
 #                             |              +-- '*.dylib'
+#                             |              +-- 'db_plugins' --slink--> ../MacOS/db_plugins/
 #                             +-- MacOS/+
 #                             |         +-- 'klayout'
+#                             |         +-- db_plugins/
+#                             |         +-- lay_plugins/
 #                             +-- Buddy/+
 #                                       +-- 'strm2cif'
 #                                       +-- 'strm2dxf'

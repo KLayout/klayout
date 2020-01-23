@@ -422,9 +422,8 @@ module DRC
       end
     end
 
-    def _join_glob_pattern(pattern)
+    def _join_glob_pattern(exprs)
 
-      exprs = pattern.collect { |c| c.gsub(/\?\*\[\]\{\},\(\)\\/) { |x| "\\" + x } }
       if exprs.size > 1
         expr = "{" + exprs.join(",") + "}"
       else

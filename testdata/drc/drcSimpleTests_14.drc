@@ -1,0 +1,60 @@
+
+source($drc_test_source, "TOP")
+
+ly = RBA::Layout::new
+ly.create_cell("TOP")
+
+ly2 = RBA::Layout::new
+ly2.create_cell("TOP")
+
+lr1 = input(10,0)
+lr2 = input(61,0)
+cut = lr1&lr2
+target(ly)
+new = (lr1-cut)
+new.output(10,0)
+
+lr1 = input(11,0)
+lr2 = input(61,0)
+cut = lr1&lr2
+new = lr1-cut
+target(ly2)
+new.output(11,0)
+
+lr1 = input(12,0)
+lr2 = input(61,0)
+cut = lr1&lr2
+new = lr1-cut
+target(ly)
+new.output(12,0)
+
+# 2. Boolean Operation (Difference CutOutLayer vs GreylinesLayer)
+lr1 = input(120,0)
+lr2 = layout($drc_test_source, "TOP").input(15,0)
+target(ly2)
+diff = lr2-lr1
+diff.output(150,0)
+
+# 3. Boolean Operation (Union Layer15(@1) und Layer15(@2)
+lr1 = input(150,0)
+lr2 = layout($drc_test_source2, "TOP").input(15,0)
+target(ly)
+align = lr1.or(lr2)
+align.output(15,0)
+
+# 4. Size shapes with 1µm as parameter
+lr1 = input(120,0)
+lr2 = input(121,0)
+lr3 = input(122,0)
+lr4 = input(123,0)
+
+target(ly)
+lr1.size(1.um).output(120,0)
+lr2.size(1.um).output(121,0)
+target(ly2)
+lr3.size(1.um).output(122,0)
+target(ly2)
+lr4.size(1.um).output(123,0)
+
+ly.write($drc_test_target)
+ly2.write($drc_test_target2)

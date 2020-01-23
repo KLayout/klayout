@@ -2449,7 +2449,7 @@ HersheyCharInfo rowmant_info [] = {
     HersheyCharInfo (1030, 1070, 23, 0, 21),
     HersheyCharInfo (1070, 1097, 24, 0, 21),
     HersheyCharInfo (1097, 1110, 12, 0, 21),
-    HersheyCharInfo (1110, 1137, 0, 0, 21),
+    HersheyCharInfo (1110, 1137, 16, 0, 21),
     HersheyCharInfo (1137, 1160, 22, 0, 21),
     HersheyCharInfo (1160, 1178, 18, 0, 21),
     HersheyCharInfo (1178, 1199, 26, 0, 21),

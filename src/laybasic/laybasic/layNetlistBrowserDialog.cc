@@ -449,7 +449,7 @@ BEGIN_PROTECTED
 #endif
 
   //  prepare and open the file dialog
-  lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Netlist/LVS Database File")), fmts);
+  lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Load Netlist/LVS Database File")), fmts);
   if (open_dialog.get_open (m_open_filename)) {
 
     tl::log << tl::to_string (QObject::tr ("Loading file: ")) << m_open_filename;

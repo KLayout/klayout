@@ -97,7 +97,7 @@ GerberImportDialogFileColumnEditorWidget::browse_clicked ()
   } 
 
   std::string new_file (tl::to_string (file.absoluteFilePath ()));
-  lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("PCB data file")), tl::to_string (QObject::tr ("All files (*)")));
+  lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Load PCB data file")), tl::to_string (QObject::tr ("All files (*)")));
   if (open_dialog.get_open (new_file)) {
     set_filename (new_file);
   }
@@ -370,7 +370,7 @@ BEGIN_PROTECTED
   commit_page ();
 
   //  Get the name of the file to save
-  lay::FileDialog save_dialog (this, tl::to_string (QObject::tr ("Gerber Import Project File")), tl::to_string (QObject::tr ("PCB project file (*.pcb);;All files (*)")));
+  lay::FileDialog save_dialog (this, tl::to_string (QObject::tr ("Load Gerber Import Project File")), tl::to_string (QObject::tr ("PCB project file (*.pcb);;All files (*)")));
   std::string fn = mp_data->current_file;
   if (save_dialog.get_save (fn)) {
     mp_data->save (fn);
@@ -392,7 +392,7 @@ GerberImportDialog::open_clicked ()
   BEGIN_PROTECTED
 
   //  Get the name of the file to open
-  lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Gerber Import Project File")), tl::to_string (QObject::tr ("PCB project file (*.pcb);;All files (*)")));
+  lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Load Gerber Import Project File")), tl::to_string (QObject::tr ("PCB project file (*.pcb);;All files (*)")));
   std::string fn = mp_data->current_file;
   if (open_dialog.get_open (fn)) {
 
@@ -412,7 +412,7 @@ void
 GerberImportDialog::browse_layer_properties_file ()
 {
   std::string file = tl::to_string (mp_ui->layer_properties_file_le->text ());
-  lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Layer Properties File")), tl::to_string (QObject::tr ("Layer properties files (*.lyp);;All files (*)")));
+  lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Load Layer Properties File")), tl::to_string (QObject::tr ("Layer properties files (*.lyp);;All files (*)")));
   if (open_dialog.get_open (file)) {
     QDir base_dir (tl::to_qstring (mp_data->base_dir));
     mp_ui->layer_properties_file_le->setText (base_dir.relativeFilePath (tl::to_qstring (file)));
@@ -665,7 +665,7 @@ GerberImportDialog::add_free_file ()
 
   std::vector <std::string> new_files;
 
-  lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("PCB data file")), tl::to_string (QObject::tr ("All files (*)")));
+  lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Load PCB data file")), tl::to_string (QObject::tr ("All files (*)")));
   if (open_dialog.get_open (new_files, mp_data->base_dir)) {
 
     std::sort (new_files.begin (), new_files.end ());

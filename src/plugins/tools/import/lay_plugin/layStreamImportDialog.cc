@@ -225,7 +225,7 @@ StreamImportDialog::browse_filename ()
   if (! files.isEmpty ()) {
     file = files.front ();
   }
-  files = QFileDialog::getOpenFileNames (this, QObject::tr ("File To Import"), file, QObject::tr ("All files (*)"));
+  files = QFileDialog::getOpenFileNames (this, QObject::tr ("Select Files To Import"), file, QObject::tr ("All files (*)"));
   if (! files.isEmpty ()) {
     mp_ui->files_te->setPlainText (files.join (QString::fromUtf8 ("\n")));
   }

@@ -112,7 +112,7 @@ public:
       } else if (symbol == "db::import_gerber_open") {
 
         //  Get the name of the file to open
-        lay::FileDialog open_dialog (QApplication::activeWindow (), tl::to_string (QObject::tr ("Gerber Import Project File")), tl::to_string (QObject::tr ("PCB project file (*.pcb);;All files (*)")));
+        lay::FileDialog open_dialog (QApplication::activeWindow (), tl::to_string (QObject::tr ("Open Gerber Import Project File")), tl::to_string (QObject::tr ("PCB project file (*.pcb);;All files (*)")));
         std::string fn = data.current_file;
         if (! open_dialog.get_open (fn)) {
           return true;

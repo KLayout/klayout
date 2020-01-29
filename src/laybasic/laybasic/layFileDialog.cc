@@ -93,7 +93,7 @@ FileDialog::get_open (std::string &fp, const std::string &title)
     file_name = m_dir.absolutePath ();
   }
 
-  QString f = QFileDialog::getOpenFileName (QApplication::activeWindow (), QObject::tr ("Load ") + (title.empty () ? m_title : tl::to_qstring (title)), file_name, m_filters, &m_sel_filter);
+  QString f = QFileDialog::getOpenFileName (QApplication::activeWindow (), (title.empty () ? m_title : tl::to_qstring (title)), file_name, m_filters, &m_sel_filter);
 
   if (! f.isEmpty ()) {
     fp = tl::to_string (f);
@@ -158,7 +158,7 @@ FileDialog::get_open (std::vector<std::string> &fp, const std::string &dir, cons
     m_dir = fi.absolutePath ();
   }
 
-  QStringList files = QFileDialog::getOpenFileNames (QApplication::activeWindow (), QObject::tr ("Open ") + (title.empty () ? m_title : tl::to_qstring (title)), m_dir.absolutePath (), m_filters, &m_sel_filter);
+  QStringList files = QFileDialog::getOpenFileNames (QApplication::activeWindow (), (title.empty () ? m_title : tl::to_qstring (title)), m_dir.absolutePath (), m_filters, &m_sel_filter);
 
   if (! files.isEmpty ()) {
     fp.clear ();
@@ -244,7 +244,7 @@ FileDialog::get_save (std::string &fp, const std::string &title)
     file_name = m_dir.absolutePath ();
   }
 
-  QString f = QFileDialog::getSaveFileName (QApplication::activeWindow (), QObject::tr ("Save ") + (title.empty () ? m_title : tl::to_qstring (title)), file_name, m_filters, &m_sel_filter);
+  QString f = QFileDialog::getSaveFileName (QApplication::activeWindow (), (title.empty () ? m_title : tl::to_qstring (title)), file_name, m_filters, &m_sel_filter);
 
   if (! f.isEmpty ()) {
     fp = tl::to_string (f);

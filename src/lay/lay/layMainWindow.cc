@@ -2826,7 +2826,7 @@ MainWindow::cm_save_layer_props ()
 
   if (current_view ()) {
     std::string fn;
-    if (mp_lprops_fdia->get_save (fn)) {
+    if (mp_lprops_fdia->get_save (fn, tl::to_string (QObject::tr ("Save Layer Properties File")))) {
       current_view ()->save_layer_props (fn);
     }
   } else {
@@ -2899,7 +2899,7 @@ MainWindow::cm_load_layer_props ()
 
   if (current_view ()) {
     std::string fn;
-    if (mp_lprops_fdia->get_open (fn)) {
+    if (mp_lprops_fdia->get_open (fn, tl::to_string (QObject::tr ("Load Layer Properties File")))) {
 
       int target_cv_index = -2;
 
@@ -2973,7 +2973,7 @@ MainWindow::cm_save_session ()
       QMessageBox::Cancel) == QMessageBox::Ok) {
 
     std::string fn = m_current_session;
-    if (mp_session_fdia->get_save (fn)) {
+    if (mp_session_fdia->get_save (fn, tl::to_string (QObject::tr ("Save Session File")))) {
       save_session (fn);
     }
 
@@ -2988,7 +2988,7 @@ MainWindow::cm_restore_session ()
   BEGIN_PROTECTED
 
   std::string fn = m_current_session;
-  if (mp_session_fdia->get_open (fn)) {
+  if (mp_session_fdia->get_open (fn, tl::to_string (QObject::tr ("Load Session File")))) {
 
     std::string df_list;
     int dirty_layouts = dirty_files (df_list);
@@ -3024,7 +3024,7 @@ MainWindow::cm_save_bookmarks ()
 
   if (current_view ()) {
     std::string fn;
-    if (mp_bookmarks_fdia->get_save (fn)) {
+    if (mp_bookmarks_fdia->get_save (fn, tl::to_string (QObject::tr ("Save Bookmarks File")))) {
       current_view ()->bookmarks ().save (fn);
     }
   } else {
@@ -3041,7 +3041,7 @@ MainWindow::cm_load_bookmarks ()
 
   if (current_view ()) {
     std::string fn;
-    if (mp_bookmarks_fdia->get_open (fn)) {
+    if (mp_bookmarks_fdia->get_open (fn, tl::to_string (QObject::tr ("Load Bookmarks File")))) {
       BookmarkList bookmarks;
       bookmarks.load (fn);
       current_view ()->bookmarks (bookmarks);
@@ -3111,7 +3111,7 @@ MainWindow::cm_screenshot ()
 
   if (current_view ()) {
     std::string fn;
-    if (mp_screenshot_fdia->get_save (fn)) {
+    if (mp_screenshot_fdia->get_save (fn, tl::to_string (QObject::tr ("Save Screenshot")))) {
       current_view ()->save_screenshot (fn);
     }
   } else {
@@ -3141,7 +3141,7 @@ MainWindow::cm_save_current_cell_as ()
         std::string suffix = tl::to_string (file_info.suffix ());
 
         std::string fn = std::string (cv->layout ().cell_name (path.back ())) + "." + suffix;
-        if (mp_layout_fdia->get_save (fn)) {
+        if (mp_layout_fdia->get_save (fn, tl::to_string (QObject::tr ("Save Layout File")))) {
 
           db::SaveLayoutOptions options (cv->save_options ());
           options.set_dbu (cv->layout ().dbu ());
@@ -3217,7 +3217,7 @@ MainWindow::do_save (bool as)
 
         fn = cv->filename ();
 
-        if (! (as || fn.empty ()) || mp_layout_fdia->get_save (fn, tl::to_string (tr ("Layout '%1'").arg (tl::to_qstring (cv->name ()))))) {
+        if (! (as || fn.empty ()) || mp_layout_fdia->get_save (fn, tl::to_string (tr ("Save Layout '%1'").arg (tl::to_qstring (cv->name ()))))) {
 
           //  Here are the options we are going to take:
           //  - if the layout's save options are valid we take the options from there, otherwise we take the options from the technology
@@ -3267,7 +3267,7 @@ MainWindow::cm_save_all ()
         const lay::CellView &cv = view (view_index)->cellview (cv_index);
         std::string fn = cv->filename ();
 
-        if (! fn.empty () || mp_layout_fdia->get_save (fn, tl::to_string (tr ("Layout '%1'").arg (tl::to_qstring (cv->name ()))))) {
+        if (! fn.empty () || mp_layout_fdia->get_save (fn, tl::to_string (tr ("Save Layout '%1'").arg (tl::to_qstring (cv->name ()))))) {
 
           db::SaveLayoutOptions options (cv->save_options ());
           options.set_dbu (cv->layout ().dbu ());
@@ -4270,7 +4270,7 @@ MainWindow::open (int mode)
   BEGIN_PROTECTED
 
   static std::vector<std::string> files;
-  if (! mp_layout_fdia->get_open (files)) {
+  if (! mp_layout_fdia->get_open (files, std::string (), tl::to_string (QObject::tr ("Open Layout Files")))) {
     return;
   }
 

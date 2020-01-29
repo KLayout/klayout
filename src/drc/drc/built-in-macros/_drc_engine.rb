@@ -1507,7 +1507,7 @@ CODE
         view = RBA::LayoutView::current
 
         # save the report database if requested
-        if @output_rdb_file
+        if @output_rdb_file && final
           rdb_file = _make_path(@output_rdb_file)
           info("Writing report database: #{rdb_file} ..")
           @output_rdb.save(rdb_file)
@@ -1570,7 +1570,7 @@ CODE
         end
 
         # save the netlist if required
-        if @target_netlist_file && @netter && @netter._l2n_data
+        if final && @target_netlist_file && @netter && @netter._l2n_data
 
           writer = @target_netlist_format || RBA::NetlistSpiceWriter::new
 
@@ -1581,7 +1581,7 @@ CODE
         end
       
         # save the netlist database if requested
-        if @output_l2ndb_file && @netter && @netter._l2n_data
+        if final && @output_l2ndb_file && @netter && @netter._l2n_data
 
           l2ndb_file = _make_path(@output_l2ndb_file)
           info("Writing netlist database: #{l2ndb_file} ..")
@@ -1589,11 +1589,11 @@ CODE
 
         end
 
-        # give derived classes to perform actions
+        # give derived classes a change to perform their actions
         _before_cleanup
       
         # show the data in the browser
-        if view && @show_l2ndb && @netter && @netter._l2n_data
+        if final && view && @show_l2ndb && @netter && @netter._l2n_data
 
           # NOTE: to prevent the netter destroying the database, we need to take it
           l2ndb = _take_data
@@ -1608,6 +1608,7 @@ CODE
 
       ensure
 
+        @output_layers = []
         @output_layout = nil
         @output_layout_file = nil
         @output_cell = nil

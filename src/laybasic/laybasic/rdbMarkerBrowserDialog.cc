@@ -371,7 +371,7 @@ BEGIN_PROTECTED
     if (rdb) {
 
       //  prepare and open the file dialog
-      lay::FileDialog save_dialog (this, tl::to_string (QObject::tr ("Marker Database File")), "KLayout RDB files (*.lyrdb)");
+      lay::FileDialog save_dialog (this, tl::to_string (QObject::tr ("Save Marker Database File")), "KLayout RDB files (*.lyrdb)");
       std::string fn (rdb->filename ());
       if (save_dialog.get_save (fn)) {
 
@@ -418,7 +418,7 @@ BEGIN_PROTECTED
   }
 
   //  prepare and open the file dialog
-  lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Marker Database File")), fmts);
+  lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Load Marker Database File")), fmts);
   if (open_dialog.get_open (m_open_filename)) {
 
     std::auto_ptr <rdb::Database> db (new rdb::Database ());

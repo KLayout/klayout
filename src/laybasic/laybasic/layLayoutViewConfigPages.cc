@@ -919,7 +919,7 @@ LayoutViewConfigPage5::browse_clicked ()
 {
   std::string fn = tl::to_string (mp_ui->lyp_file_le->text ());
   lay::FileDialog file_dialog (this,
-    tl::to_string (QObject::tr ("Layer Properties File")), 
+    tl::to_string (QObject::tr ("Select Layer Properties File")),
     tl::to_string (QObject::tr ("Layer properties files (*.lyp);;All files (*)")), 
     "lyp");
 

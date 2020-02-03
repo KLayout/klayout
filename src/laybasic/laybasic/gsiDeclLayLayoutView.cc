@@ -402,20 +402,137 @@ static LayerPropertiesConstIteratorWrapper each_layer2 (lay::LayoutView *view, u
   return LayerPropertiesConstIteratorWrapper (view->begin_layers (list_index));
 }
 
-static lay::LayoutView *new_view ()
+static lay::LayoutView *new_view (QWidget *parent, bool editable, db::Manager *manager, unsigned int options)
 {
-  return new lay::LayoutView (0, false, 0);
+  lay::LayoutView *lv = new lay::LayoutView (manager, editable, 0 /*plugin parent*/, parent, "view", options);
+  if (parent) {
+    //  transfer ownership to the parent
+    lv->keep ();
+  }
+  return lv;
 }
 
 Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "LayoutView",
-  gsi::constructor ("new", &new_view,
+  gsi::constructor ("new", &new_view, gsi::arg ("parent", (QWidget *) 0), gsi::arg ("editable", false), gsi::arg ("manager", (db::Manager *) 0), gsi::arg ("options", (unsigned int) 0),
     "@brief Creates a standalone view\n"
     "\n"
     "This constructor is for special purposes only. To create a view in the context of a main window, "
     "use \\MainWindow#create_view and related methods.\n"
     "\n"
+    "@param parent The parent widget in which to embed the view\n"
+    "@param editable True to make the view editable\n"
+    "@param manager The \\Manager object to enable undo/redo\n"
+    "@param options A combination of the values in the LV_... constants\n"
+    "\n"
     "This constructor has been introduced in version 0.25.\n"
+    "It has been enhanced with the arguments in version 0.26.4.\n"
   ) +
+  gsi::constant ("LV_NoLayers", (unsigned int) laybasic::LayoutView::LV_NoLayers,
+    "@brief With this option, no layers view will be provided (see \\layer_control_frame)\n"
+    "Use this value with the constructor's 'options' argument.\n"
+    "\n"
+    "This constant has been introduced in version 0.26.4.\n"
+  ) +
+  gsi::constant ("LV_NoHierarchyPanel", (unsigned int) laybasic::LayoutView::LV_NoHierarchyPanel,
+    "@brief With this option, no cell hierarchy view will be provided (see \\hierarchy_control_frame)\n"
+    "Use this value with the constructor's 'options' argument.\n"
+    "\n"
+    "This constant has been introduced in version 0.26.4.\n"
+  ) +
+  gsi::constant ("LV_NoLibrariesView", (unsigned int) laybasic::LayoutView::LV_NoLibrariesView,
+    "@brief With this option, no library view will be provided (see \\libraries_frame)\n"
+    "Use this value with the constructor's 'options' argument.\n"
+    "\n"
+    "This constant has been introduced in version 0.26.4.\n"
+  ) +
+  gsi::constant ("LV_NoBookmarksView", (unsigned int) laybasic::LayoutView::LV_NoBookmarksView,
+    "@brief With this option, no bookmarks view will be provided (see \\bookmarks_frame)\n"
+    "Use this value with the constructor's 'options' argument.\n"
+    "\n"
+    "This constant has been introduced in version 0.26.4.\n"
+  ) +
+  gsi::constant ("LV_Naked", (unsigned int) laybasic::LayoutView::LV_Naked,
+    "@brief With this option, no separate views will be provided\n"
+    "Use this value with the constructor's 'options' argument.\n"
+    "This option is basically equivalent to using \\LV_NoLayers+\\LV_NoHierarchyPanel+\\LV_NoLibrariesView+\\LV_NoBookmarksView\n"
+    "\n"
+    "This constant has been introduced in version 0.26.4.\n"
+  ) +
+  gsi::constant ("LV_NoZoom", (unsigned int) laybasic::LayoutView::LV_NoZoom,
+    "@brief With this option, zooming is disabled\n"
+    "Use this value with the constructor's 'options' argument.\n"
+    "\n"
+    "This constant has been introduced in version 0.26.4.\n"
+  ) +
+  gsi::constant ("LV_NoGrid", (unsigned int) laybasic::LayoutView::LV_NoGrid,
+    "@brief With this option, the grid background is not shown\n"
+    "Use this value with the constructor's 'options' argument.\n"
+    "\n"
+    "This constant has been introduced in version 0.26.4.\n"
+  ) +
+  gsi::constant ("LV_NoMove", (unsigned int) laybasic::LayoutView::LV_NoMove,
+    "@brief With this option, move operations are not supported\n"
+    "Use this value with the constructor's 'options' argument.\n"
+    "\n"
+    "This constant has been introduced in version 0.26.4.\n"
+  ) +
+  gsi::constant ("LV_NoTracker", (unsigned int) laybasic::LayoutView::LV_NoTracker,
+    "@brief With this option, mouse position tracking is not supported\n"
+    "Use this value with the constructor's 'options' argument.\n"
+    "This option is not useful currently as no mouse tracking support is provided.\n"
+    "\n"
+    "This constant has been introduced in version 0.26.4.\n"
+  ) +
+  gsi::constant ("LV_NoSelection", (unsigned int) laybasic::LayoutView::LV_NoSelection,
+    "@brief With this option, objects cannot be selected\n"
+    "Use this value with the constructor's 'options' argument.\n"
+    "\n"
+    "This constant has been introduced in version 0.26.4.\n"
+  ) +
+  gsi::constant ("LV_NoPlugins", (unsigned int) laybasic::LayoutView::LV_NoPlugins,
+    "@brief With this option, all plugins are disabled\n"
+    "Use this value with the constructor's 'options' argument.\n"
+    "\n"
+    "This constant has been introduced in version 0.26.4.\n"
+  ) +
+  gsi::constant ("LV_NoServices", (unsigned int) laybasic::LayoutView::LV_NoServices,
+    "@brief This option disables all services except the ones for pure viewing\n"
+    "Use this value with the constructor's 'options' argument.\n"
+    "With this option, all manipulation features are disabled, except zooming.\n"
+    "It is equivalent to \\LV_NoMove + \\LV_NoTracker + \\LV_NoSelection + \\LV_NoPlugins.\n"
+    "\n"
+    "This constant has been introduced in version 0.26.4.\n"
+  ) +
+#if defined(HAVE_QTBINDINGS)
+  gsi::method ("layer_control_frame", &lay::LayoutView::layer_control_frame,
+    "@brief Gets the layer control side widget\n"
+    "A 'side widget' is a widget attached to the view. It does not have a parent, so you can "
+    "embed it into a different context. Please note that with embedding through 'setParent' it will be "
+    "destroyed when your parent widget gets destroyed. It will be lost then to the view.\n"
+    "\n"
+    "The side widget can be configured through the views configuration interface.\n"
+    "\n"
+    "This method has been introduced in version 0.26.4\n"
+  ) +
+  gsi::method ("hierarchy_control_frame", &lay::LayoutView::hierarchy_control_frame,
+    "@brief Gets the cell view (hierarchy view) side widget\n"
+    "For details about side widgets see \\layer_control_frame.\n"
+    "\n"
+    "This method has been introduced in version 0.26.4\n"
+  ) +
+  gsi::method ("libraries_frame", &lay::LayoutView::libraries_frame,
+    "@brief Gets the library view side widget\n"
+    "For details about side widgets see \\layer_control_frame.\n"
+    "\n"
+    "This method has been introduced in version 0.26.4\n"
+  ) +
+  gsi::method ("bookmarks_frame", &lay::LayoutView::bookmarks_frame,
+    "@brief Gets the bookmarks side widget\n"
+    "For details about side widgets see \\layer_control_frame.\n"
+    "\n"
+    "This method has been introduced in version 0.26.4\n"
+  ) +
+#endif
   gsi::method ("current", &lay::LayoutView::current,
     "@brief Returns the current view\n"
     "The current view is the one that is shown in the current tab. Returns nil if no layout is loaded.\n"

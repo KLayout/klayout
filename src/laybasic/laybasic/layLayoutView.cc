@@ -477,6 +477,7 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
 
     connect (mp_hierarchy_panel, SIGNAL (cell_selected (cell_path_type, int)), this, SLOT (select_cell_dispatch (cell_path_type, int)));
     connect (mp_hierarchy_panel, SIGNAL (active_cellview_changed (int)), this, SLOT (active_cellview_changed (int)));
+    connect (mp_hierarchy_frame, SIGNAL (destroyed ()), this, SLOT (side_panel_destroyed ()));
 
     QFrame *levels_frame = new QFrame (hierarchy_frame);
     levels_frame->setObjectName (QString::fromUtf8 ("lvl_frame"));
@@ -521,6 +522,8 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
     mp_bookmarks_view = new lay::BookmarksView (this, bookmarks_frame, "bookmarks");
     left_frame_ly->addWidget (mp_bookmarks_view, 1 /*stretch*/);
 
+    connect (mp_bookmarks_frame, SIGNAL (destroyed ()), this, SLOT (side_panel_destroyed ()));
+
   }
 
   if ((m_options & LV_NoLibrariesView) == 0 && (m_options & LV_Naked) == 0) {
@@ -536,6 +539,7 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
     left_frame_ly->addWidget (mp_libraries_view, 1 /*stretch*/);
 
     connect (mp_libraries_view, SIGNAL (active_library_changed (int)), this, SLOT (active_library_changed (int)));
+    connect (mp_libraries_frame, SIGNAL (destroyed ()), this, SLOT (side_panel_destroyed ()));
 
   }
 
@@ -559,6 +563,7 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
     mp_control_panel = new lay::LayerControlPanel (this, manager (), 0, "lcp");
     mp_control_frame = mp_control_panel;
 
+    connect (mp_control_frame, SIGNAL (destroyed ()), this, SLOT (side_panel_destroyed ()));
     connect (mp_control_panel, SIGNAL (tab_changed ()), this, SLOT (layer_tab_changed ()));
     connect (mp_control_panel, SIGNAL (order_changed ()), this, SLOT (layer_order_changed ()));
     /*
@@ -677,6 +682,23 @@ LayoutView::~LayoutView ()
   }
   mp_bookmarks_frame = 0;
   mp_bookmarks_view = 0;
+}
+
+void LayoutView::side_panel_destroyed ()
+{
+  if (sender () == mp_control_frame) {
+    mp_control_frame = 0;
+    mp_control_panel = 0;
+  } else if (sender () == mp_hierarchy_frame) {
+    mp_hierarchy_frame = 0;
+    mp_hierarchy_panel = 0;
+  } else if (sender () == mp_libraries_frame) {
+    mp_libraries_frame = 0;
+    mp_libraries_view = 0;
+  } else if (sender () == mp_bookmarks_frame) {
+    mp_bookmarks_frame = 0;
+    mp_bookmarks_view = 0;
+  }
 }
 
 void LayoutView::hideEvent (QHideEvent *)

@@ -26,3 +26,5 @@ Plan:
 9. BTW: make QWidget::setParent and QObject::setParent transfer ownership for
    Qt binding.
 
+10. Provide the layer toolbox for GSI
+

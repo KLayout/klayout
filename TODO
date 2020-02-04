@@ -1,0 +1,25 @@
+
+Plan:
+
+1. Combine AbstractMenuProvider, PluginRoot and the AbstractMenuProvider's 
+   implementation in MainWindow/LayoutView into lay::Dispatcher
+
+2. Base MainWindow and LayoutView on lay::Dispatcher
+
+3. lay::Plugin::plugin_root -> lay::Dispatcher *lay::Plugin::dispatcher()
+   This method will find the MainWindow or LayoutView depending 
+   which is the root.
+
+4. Don't use AbstractMenuProvider::instance anymore, rather use lay::Dispatcher::instance
+   when necessary (should not be)
+
+5. Instead of slots, bind abstract menu items to symbols passed to 
+   Dispatcher::menu_activated
+
+6. MainWindow will automatically dispatch menu_activated to LayoutView
+
+7. GSI-expose menu_activated in LayoutView and MainWindow
+
+8. We can move menu initialization of LV-specifics to the LayoutView and
+   remove the cm_... and the code which just passes signals to the current view! :)
+   

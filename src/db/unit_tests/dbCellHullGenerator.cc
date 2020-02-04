@@ -61,7 +61,7 @@ static bool check_hull (const std::vector<db::Polygon> &hull, const db::Shapes &
 
 TEST(1) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Layout g (&m);
   unsigned int l1 = g.insert_layer (db::LayerProperties (1, 0)); 
   unsigned int l2 = g.insert_layer (db::LayerProperties (2, 0)); 
@@ -238,7 +238,7 @@ TEST(1)
 
 TEST(2) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Layout g (&m);
   unsigned int l1 = g.insert_layer (db::LayerProperties (1, 0)); 
   db::Cell &c1 (g.cell (g.add_cell ()));

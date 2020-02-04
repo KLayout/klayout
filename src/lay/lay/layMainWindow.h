@@ -132,7 +132,7 @@ public:
   /**
    *  @brief Constructor
    */
-  MainWindow (QApplication *app = 0, lay::Plugin *parent_plugin = 0, const char *name = "main_window");
+  MainWindow (QApplication *app = 0, lay::Plugin *parent_plugin = 0, const char *name = "main_window", bool undo_enabled = true);
 
   /** 
    *  @brief Destructor

@@ -632,14 +632,14 @@ HierarchyControlPanel::double_clicked (const QModelIndex &index)
   BEGIN_PROTECTED
   if (index.isValid ()) {
     set_active_celltree_from_sender ();
-    mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Show or hide cell"))); 
+    mp_view->transaction (tl::to_string (QObject::tr ("Show or hide cell")));
     CellTreeItem *item = (CellTreeItem *) index.internalPointer ();
     if (mp_view->is_cell_hidden (item->cell_or_pcell_index (), m_active_index)) {
       mp_view->show_cell (item->cell_or_pcell_index (), m_active_index);
     } else {
       mp_view->hide_cell (item->cell_or_pcell_index (), m_active_index);
     }
-    mp_view->manager ()->commit ();
+    mp_view->commit ();
   }
   END_PROTECTED
 }
@@ -1085,14 +1085,14 @@ HierarchyControlPanel::cut ()
     }
   }
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Cut Cells")));
+  mp_view->transaction (tl::to_string (QObject::tr ("Cut Cells")));
   if (cut_mode == 1) {
     layout.prune_cells (cells_to_delete);
   } else {
     layout.delete_cells (cells_to_delete);
   }
   layout.cleanup ();
-  mp_view->manager ()->commit ();
+  mp_view->commit ();
 
   //  If one of the cells in the path was deleted, establish a valid path
 

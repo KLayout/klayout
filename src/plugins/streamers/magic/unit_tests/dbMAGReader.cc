@@ -57,7 +57,7 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
   db::LoadLayoutOptions options;
   options.set_options (opt);
 
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout (&m), layout2 (&m), layout2_mag (&m), layout_au (&m);
 
   {

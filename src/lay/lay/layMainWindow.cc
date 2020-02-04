@@ -419,7 +419,7 @@ MainWindow::instance ()
 
 // -----------------------------------
 
-MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const char *name)
+MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const char *name, bool undo_enabled)
     : QMainWindow (0),
       lay::Plugin (plugin_parent),
       m_text_progress (this, 10 /*verbosity threshold*/),
@@ -438,7 +438,8 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
       m_synchronized_views (false),
       m_synchronous (false),
       m_busy (false),
-      mp_app (app)
+      mp_app (app),
+      m_manager (true)
 {
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();

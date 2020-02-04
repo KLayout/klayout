@@ -731,7 +731,6 @@ ApplicationBase::init_app ()
   }
 
   db::set_default_editable_mode (m_editable);
-  db::enable_transactions (m_enable_undo);
 
   if (! m_gtf_record.empty ()) {
     //  since the recorder tracks QAction connections etc., it must be instantiated before every other
@@ -1485,7 +1484,7 @@ GuiApplication::setup ()
   tl_assert (mp_mw == 0 && mp_plugin_root == 0);
 
   mp_plugin_root = new lay::PluginRootToMainWindow ();
-  mp_mw = new lay::MainWindow (this, mp_plugin_root, "main_window");
+  mp_mw = new lay::MainWindow (this, mp_plugin_root, "main_window", is_undo_enabled ());
   mp_plugin_root->attach_to (mp_mw);
 
   QObject::connect (mp_mw, SIGNAL (closed ()), this, SLOT (quit ()));

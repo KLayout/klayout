@@ -92,7 +92,7 @@ class PD
 
 TEST(0) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Layout layout(&m);
   layout.dbu (0.001);
   db::Layout layout_au(&m);
@@ -114,7 +114,7 @@ TEST(0)
 
 TEST(1) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Layout layout(&m);
   layout.dbu (0.001);
   

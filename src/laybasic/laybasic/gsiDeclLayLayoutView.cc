@@ -427,75 +427,75 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "This constructor has been introduced in version 0.25.\n"
     "It has been enhanced with the arguments in version 0.26.4.\n"
   ) +
-  gsi::constant ("LV_NoLayers", (unsigned int) laybasic::LayoutView::LV_NoLayers,
+  gsi::constant ("LV_NoLayers", (unsigned int) lay::LayoutView::LV_NoLayers,
     "@brief With this option, no layers view will be provided (see \\layer_control_frame)\n"
     "Use this value with the constructor's 'options' argument.\n"
     "\n"
     "This constant has been introduced in version 0.26.4.\n"
   ) +
-  gsi::constant ("LV_NoHierarchyPanel", (unsigned int) laybasic::LayoutView::LV_NoHierarchyPanel,
+  gsi::constant ("LV_NoHierarchyPanel", (unsigned int) lay::LayoutView::LV_NoHierarchyPanel,
     "@brief With this option, no cell hierarchy view will be provided (see \\hierarchy_control_frame)\n"
     "Use this value with the constructor's 'options' argument.\n"
     "\n"
     "This constant has been introduced in version 0.26.4.\n"
   ) +
-  gsi::constant ("LV_NoLibrariesView", (unsigned int) laybasic::LayoutView::LV_NoLibrariesView,
+  gsi::constant ("LV_NoLibrariesView", (unsigned int) lay::LayoutView::LV_NoLibrariesView,
     "@brief With this option, no library view will be provided (see \\libraries_frame)\n"
     "Use this value with the constructor's 'options' argument.\n"
     "\n"
     "This constant has been introduced in version 0.26.4.\n"
   ) +
-  gsi::constant ("LV_NoBookmarksView", (unsigned int) laybasic::LayoutView::LV_NoBookmarksView,
+  gsi::constant ("LV_NoBookmarksView", (unsigned int) lay::LayoutView::LV_NoBookmarksView,
     "@brief With this option, no bookmarks view will be provided (see \\bookmarks_frame)\n"
     "Use this value with the constructor's 'options' argument.\n"
     "\n"
     "This constant has been introduced in version 0.26.4.\n"
   ) +
-  gsi::constant ("LV_Naked", (unsigned int) laybasic::LayoutView::LV_Naked,
+  gsi::constant ("LV_Naked", (unsigned int) lay::LayoutView::LV_Naked,
     "@brief With this option, no separate views will be provided\n"
     "Use this value with the constructor's 'options' argument.\n"
     "This option is basically equivalent to using \\LV_NoLayers+\\LV_NoHierarchyPanel+\\LV_NoLibrariesView+\\LV_NoBookmarksView\n"
     "\n"
     "This constant has been introduced in version 0.26.4.\n"
   ) +
-  gsi::constant ("LV_NoZoom", (unsigned int) laybasic::LayoutView::LV_NoZoom,
+  gsi::constant ("LV_NoZoom", (unsigned int) lay::LayoutView::LV_NoZoom,
     "@brief With this option, zooming is disabled\n"
     "Use this value with the constructor's 'options' argument.\n"
     "\n"
     "This constant has been introduced in version 0.26.4.\n"
   ) +
-  gsi::constant ("LV_NoGrid", (unsigned int) laybasic::LayoutView::LV_NoGrid,
+  gsi::constant ("LV_NoGrid", (unsigned int) lay::LayoutView::LV_NoGrid,
     "@brief With this option, the grid background is not shown\n"
     "Use this value with the constructor's 'options' argument.\n"
     "\n"
     "This constant has been introduced in version 0.26.4.\n"
   ) +
-  gsi::constant ("LV_NoMove", (unsigned int) laybasic::LayoutView::LV_NoMove,
+  gsi::constant ("LV_NoMove", (unsigned int) lay::LayoutView::LV_NoMove,
     "@brief With this option, move operations are not supported\n"
     "Use this value with the constructor's 'options' argument.\n"
     "\n"
     "This constant has been introduced in version 0.26.4.\n"
   ) +
-  gsi::constant ("LV_NoTracker", (unsigned int) laybasic::LayoutView::LV_NoTracker,
+  gsi::constant ("LV_NoTracker", (unsigned int) lay::LayoutView::LV_NoTracker,
     "@brief With this option, mouse position tracking is not supported\n"
     "Use this value with the constructor's 'options' argument.\n"
     "This option is not useful currently as no mouse tracking support is provided.\n"
     "\n"
     "This constant has been introduced in version 0.26.4.\n"
   ) +
-  gsi::constant ("LV_NoSelection", (unsigned int) laybasic::LayoutView::LV_NoSelection,
+  gsi::constant ("LV_NoSelection", (unsigned int) lay::LayoutView::LV_NoSelection,
     "@brief With this option, objects cannot be selected\n"
     "Use this value with the constructor's 'options' argument.\n"
     "\n"
     "This constant has been introduced in version 0.26.4.\n"
   ) +
-  gsi::constant ("LV_NoPlugins", (unsigned int) laybasic::LayoutView::LV_NoPlugins,
+  gsi::constant ("LV_NoPlugins", (unsigned int) lay::LayoutView::LV_NoPlugins,
     "@brief With this option, all plugins are disabled\n"
     "Use this value with the constructor's 'options' argument.\n"
     "\n"
     "This constant has been introduced in version 0.26.4.\n"
   ) +
-  gsi::constant ("LV_NoServices", (unsigned int) laybasic::LayoutView::LV_NoServices,
+  gsi::constant ("LV_NoServices", (unsigned int) lay::LayoutView::LV_NoServices,
     "@brief This option disables all services except the ones for pure viewing\n"
     "Use this value with the constructor's 'options' argument.\n"
     "With this option, all manipulation features are disabled, except zooming.\n"

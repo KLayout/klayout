@@ -47,7 +47,7 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
   tc.set_blockages_suffix (".BLK");
   db::LEFDEFLayerDelegate ld (&tc);
 
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout (&m), layout2 (&m), layout_au (&m);
 
   tl::Extractor ex (filename);

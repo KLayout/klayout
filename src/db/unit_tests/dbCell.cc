@@ -28,7 +28,7 @@
 
 TEST(1) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Layout g (&m);
   db::Cell &c1 (g.cell (g.add_cell ()));
   db::Cell &c2 (g.cell (g.add_cell ()));
@@ -265,7 +265,7 @@ TEST(2)
 {
   ::pi = 0;
 
-  db::Manager m;
+  db::Manager m (true);
   db::Layout g (&m);
   db::Cell &c0 (g.cell (g.add_cell ()));
   db::Cell &c1 (g.cell (g.add_cell ()));
@@ -615,7 +615,7 @@ TEST(3)
 {
   ::pi = 0;
 
-  db::Manager m;
+  db::Manager m (true);
   db::Layout g (&m);
   db::Cell &c0 (g.cell (g.add_cell ()));
   db::Cell &c1 (g.cell (g.add_cell ()));
@@ -672,7 +672,7 @@ TEST(3a)
 {
   ::pi = 0;
 
-  db::Manager m;
+  db::Manager m (true);
   db::Layout g (&m);
   db::Cell &c0 (g.cell (g.add_cell ()));
   db::Cell &c1 (g.cell (g.add_cell ()));
@@ -728,7 +728,7 @@ TEST(3b)
 {
   ::pi = 0;
 
-  db::Manager m;
+  db::Manager m (true);
   db::Layout g (&m);
   db::Cell &c0 (g.cell (g.add_cell ()));
   db::Cell &c1 (g.cell (g.add_cell ()));
@@ -805,7 +805,7 @@ TEST(4)
 {
   ::pi = 0;
 
-  db::Manager m;
+  db::Manager m (true);
   db::Layout g (&m);
   db::Cell &c0 (g.cell (g.add_cell ()));
   db::Cell &c1 (g.cell (g.add_cell ()));
@@ -842,7 +842,7 @@ TEST(4)
 
 TEST(5) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Layout g (&m);
   db::Cell &c0 (g.cell (g.add_cell ()));
   db::Cell &c1 (g.cell (g.add_cell ()));
@@ -888,7 +888,7 @@ TEST(5)
 
 TEST(6) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Layout g (&m);
   db::Cell &c0 (g.cell (g.add_cell ()));
   db::Cell &c1 (g.cell (g.add_cell ()));

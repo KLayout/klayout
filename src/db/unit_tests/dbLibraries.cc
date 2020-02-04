@@ -308,7 +308,7 @@ TEST(1)
     EXPECT_EQ (lib->layout ().get_properties(1).to_string (), "16/0");
     EXPECT_EQ (lib->layout ().get_properties(2).to_string (), "24/0");
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout(&m);
     layout.dbu (0.001);
 
@@ -460,7 +460,7 @@ TEST(2)
     bool equal;
     db::Writer writer = db::Writer (db::SaveLayoutOptions ());
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout(&m);
     layout.dbu (0.001);
 
@@ -571,7 +571,7 @@ TEST(3)
     //  This test tests the ability to reference libraries out of other libraries ("B" references "A"),
     //  the ability to persist that and whether this survives a write/read cycle.
     
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout(&m);
     layout.dbu (0.001);
 

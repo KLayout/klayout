@@ -1303,7 +1303,7 @@ TEST (16)
 {
   lay::LayerPropertiesList list;
 
-  db::Manager mgr;
+  db::Manager mgr (true);
   lay::LayoutView view (&mgr, is_editable (), 0);
   list.attach_view (&view, 0);
 
@@ -1355,7 +1355,7 @@ TEST (17)
 {
   lay::LayerPropertiesList list;
 
-  db::Manager mgr;
+  db::Manager mgr (true);
   lay::LayoutView view (&mgr, is_editable (), 0);
   list.attach_view (&view, 0);
 
@@ -1422,7 +1422,7 @@ TEST (18)
 {
   lay::LayerPropertiesList list;
 
-  db::Manager mgr;
+  db::Manager mgr (true);
   lay::LayoutView view (&mgr, is_editable (), 0);
   list.attach_view (&view, 0);
 
@@ -1490,7 +1490,7 @@ TEST (19)
 {
   lay::LayerPropertiesList list;
 
-  db::Manager mgr;
+  db::Manager mgr (true);
   lay::LayoutView view (&mgr, is_editable (), 0);
   list.attach_view (&view, 0);
 
@@ -1559,7 +1559,7 @@ TEST (20)
 {
   lay::LayerPropertiesList list;
 
-  db::Manager mgr;
+  db::Manager mgr (true);
   lay::LayoutView view (&mgr, is_editable (), 0);
   list.attach_view (&view, 0);
 
@@ -1631,7 +1631,7 @@ TEST (21)
 {
   lay::LayerPropertiesList list;
 
-  db::Manager mgr;
+  db::Manager mgr (true);
   lay::LayoutView view (&mgr, is_editable (), 0);
   list.attach_view (&view, 0);
 

@@ -222,7 +222,7 @@ TEST(1)
 {
   tl::InputMemoryStream im ((const char *) data, sizeof (data));
 
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout (&m);
   tl::InputStream file (im);
   db::Reader reader (file);
@@ -264,7 +264,7 @@ TEST(2)
 {
   tl::InputMemoryStream im ((const char *) data, sizeof (data));
 
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout (&m);
 
   db::LayerMap map_full;
@@ -351,7 +351,7 @@ TEST(2)
 
 TEST(Bug_121_1)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout (&m);
 
   {
@@ -372,7 +372,7 @@ TEST(Bug_121_1)
 
 TEST(Bug_121_2)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout (&m);
 
   {

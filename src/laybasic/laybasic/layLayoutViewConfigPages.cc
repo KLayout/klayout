@@ -618,7 +618,7 @@ static QToolButton * (Ui::LayoutViewConfigPage4::*cfg4_buttons []) = {
 
 LayoutViewConfigPage4::LayoutViewConfigPage4 (QWidget *parent)
   : lay::ConfigPage (parent),
-    m_edit_order_changed_disabled (false)
+    m_manager (true), m_edit_order_changed_disabled (false)
 {
   //  install the manager at db::Object
   manager (&m_manager);
@@ -952,7 +952,7 @@ static QToolButton * (Ui::LayoutViewConfigPage6::*cfg6_buttons []) = {
 
 LayoutViewConfigPage6::LayoutViewConfigPage6 (QWidget *parent)
   : lay::ConfigPage (parent),
-    m_edit_order_changed_disabled (false)
+    m_manager (true), m_edit_order_changed_disabled (false)
 {
   //  install the manager at db::Object
   manager (&m_manager);
@@ -1239,7 +1239,7 @@ static QToolButton * (Ui::LayoutViewConfigPage6a::*cfg6a_buttons []) = {
 };
 
 LayoutViewConfigPage6a::LayoutViewConfigPage6a (QWidget *parent)
-  : lay::ConfigPage (parent)
+  : lay::ConfigPage (parent), m_manager (true)
 {
   //  install the manager at db::Object
   manager (&m_manager);

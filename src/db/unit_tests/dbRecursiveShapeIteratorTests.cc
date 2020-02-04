@@ -65,7 +65,7 @@ std::string collect_with_copy(db::RecursiveShapeIterator s, const db::Layout &la
 
 TEST(1) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Layout g (&m);
   g.insert_layer (0);
   g.insert_layer (1);
@@ -326,7 +326,7 @@ TEST(1)
 
 TEST(1a) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Layout g (&m);
   g.insert_layer (0);
   g.insert_layer (1);
@@ -472,7 +472,7 @@ TEST(1a)
 
 TEST(1b) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Layout g (&m);
   g.insert_layer (0);
   db::Cell &c0 (g.cell (g.add_cell ()));
@@ -508,7 +508,7 @@ TEST(1b)
 
 TEST(2) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Layout g (&m);
   g.insert_layer(0);
 
@@ -562,7 +562,7 @@ TEST(2)
 
 TEST(3)
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Layout g (&m);
   g.insert_layer(0);
 
@@ -742,7 +742,7 @@ TEST(4)
 {
   //  Big fun
 
-  db::Manager m;
+  db::Manager m (true);
   db::Layout g (&m);
   g.insert_layer(0);
 
@@ -827,7 +827,7 @@ TEST(5)
 {
   //  Big fun with cells
 
-  db::Manager m;
+  db::Manager m (true);
   db::Layout g (&m);
   g.insert_layer(0);
 
@@ -1013,7 +1013,7 @@ private:
 //  Push mode with cells
 TEST(10)
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Layout g (&m);
   g.insert_layer(0);
 

@@ -107,7 +107,7 @@ public:
 
       bool supports_undo = true;
 
-      if (db::transactions_enabled ()) {
+      if (mp_view->manager () && mp_view->manager ()->is_enabled ()) {
 
         lay::TipDialog td (QApplication::activeWindow (),
                            tl::to_string (QObject::tr ("Undo buffering for the following operation can be memory and time consuming.\nChoose \"Yes\" to use undo buffering or \"No\" for no undo buffering. Warning: in the latter case, the undo history will be lost.\n\nChoose undo buffering?")), 
@@ -244,7 +244,7 @@ public:
 
       bool supports_undo = true;
 
-      if (db::transactions_enabled ()) {
+      if (mp_view->manager () && mp_view->manager ()->is_enabled ()) {
 
         lay::TipDialog td (QApplication::activeWindow (),
                            tl::to_string (QObject::tr ("Undo buffering for the following operation can be memory and time consuming.\nChoose \"Yes\" to use undo buffering or \"No\" for no undo buffering. Warning: in the latter case, the undo history will be lost.\n\nChoose undo buffering?")), 
@@ -359,7 +359,7 @@ public:
 
       bool supports_undo = true;
 
-      if (db::transactions_enabled ()) {
+      if (mp_view->manager () && mp_view->manager ()->is_enabled ()) {
 
         lay::TipDialog td (QApplication::activeWindow (),
                            tl::to_string (QObject::tr ("Undo buffering for the following operation can be memory and time consuming.\nChoose \"Yes\" to use undo buffering or \"No\" for no undo buffering. Warning: in the latter case, the undo history will be lost.\n\nChoose undo buffering?")), 

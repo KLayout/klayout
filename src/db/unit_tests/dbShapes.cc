@@ -30,7 +30,7 @@
 
 TEST(1) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
   db::Box b_empty;
 
@@ -60,7 +60,7 @@ TEST(1)
 
 TEST(1a) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Shapes s (&m, 0, true);
   db::Box b_empty;
 
@@ -88,7 +88,7 @@ TEST(1a)
 
 TEST(1b) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Shapes s (&m, 0, false);
   db::Box b_empty;
 
@@ -393,7 +393,7 @@ struct plus1
 
 TEST(2)
 {
-  db::Manager m;
+  db::Manager m (true);
 
   db::Layout other_layout (&m);
   db::Cell &other_topcell = other_layout.cell (other_layout.add_cell ());
@@ -644,7 +644,7 @@ TEST(2)
 
 TEST(2A)
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Layout layout (&m);
   unsigned int lindex = read_testdata (layout, 0x1);
 
@@ -737,7 +737,7 @@ TEST(2A)
 
 TEST(3)
 {
-  db::Manager m;
+  db::Manager m (true);
 
   db::Layout other_layout (&m);
   db::Cell &other_topcell = other_layout.cell (other_layout.add_cell ());
@@ -988,7 +988,7 @@ TEST(3)
 
 TEST(4)
 {
-  db::Manager m;
+  db::Manager m (true);
 
   db::Layout other_layout (&m);
   db::Cell &other_topcell = other_layout.cell (other_layout.add_cell ());
@@ -1238,7 +1238,7 @@ TEST(4)
 
 TEST(5)
 {
-  db::Manager m;
+  db::Manager m (true);
 
   db::Layout other_layout (&m);
   db::Cell &other_topcell = other_layout.cell (other_layout.add_cell ());
@@ -1489,7 +1489,7 @@ TEST(5)
 
 TEST(6)
 {
-  db::Manager m;
+  db::Manager m (true);
 
   db::Layout other_layout (&m);
   db::Cell &other_topcell = other_layout.cell (other_layout.add_cell ());
@@ -1711,7 +1711,7 @@ TEST(6)
 
 TEST(7)
 {
-  db::Manager m;
+  db::Manager m (true);
 
   db::Layout other_layout (&m);
   db::Cell &other_topcell = other_layout.cell (other_layout.add_cell ());
@@ -2017,7 +2017,7 @@ TEST(10A)
 {
   if (db::default_editable_mode ()) { 
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout (&m);
     unsigned int lindex = read_testdata (layout, 0x1);
 
@@ -2076,7 +2076,7 @@ TEST(10C)
 {
   if (db::default_editable_mode ()) { 
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout (&m);
     unsigned int lindex = read_testdata (layout, 0x1);
 
@@ -2101,7 +2101,7 @@ TEST(10D)
 {
   if (db::default_editable_mode ()) { 
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout (&m);
     unsigned int lindex = read_testdata (layout, 0x1);
 
@@ -2126,7 +2126,7 @@ TEST(11A)
 {
   if (db::default_editable_mode ()) { 
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout (&m);
     unsigned int lindex = read_testdata (layout, 0x20);
 
@@ -2182,7 +2182,7 @@ TEST(11C)
 {
   if (db::default_editable_mode ()) {
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout (&m);
     unsigned int lindex = read_testdata (layout, 0x20);
 
@@ -2207,7 +2207,7 @@ TEST(11D)
 {
   if (db::default_editable_mode ()) { 
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout (&m);
     unsigned int lindex = read_testdata (layout, 0x20);
 
@@ -2232,7 +2232,7 @@ TEST(11E)
 {
   if (db::default_editable_mode ()) { 
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout (&m);
     m.transaction ("y");
     unsigned int lindex = read_testdata (layout, 0x20);
@@ -2268,7 +2268,7 @@ TEST(11F)
 {
   if (db::default_editable_mode ()) {
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout (&m);
     m.transaction ("y");
     unsigned int lindex = read_testdata (layout, 0x20);
@@ -2369,7 +2369,7 @@ TEST(12A)
 {
   if (db::default_editable_mode ()) { 
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout (&m);
     unsigned int lindex = read_testdata (layout, 0x20 | 0x80);  // short box, no arrays
 
@@ -2414,7 +2414,7 @@ TEST(12B)
 {
   if (db::default_editable_mode ()) { 
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout (&m);
     unsigned int lindex = read_testdata (layout, 0x20 | 0x80);  // short box, no arrays
 
@@ -2442,7 +2442,7 @@ TEST(12C)
 {
   if (db::default_editable_mode ()) { 
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout (&m);
     unsigned int lindex = read_testdata (layout, 0x10 | 0x80);  // box, no arrays
 
@@ -2487,7 +2487,7 @@ TEST(12D)
 {
   if (db::default_editable_mode ()) { 
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout (&m);
     unsigned int lindex = read_testdata (layout, 0x10 | 0x80);  // box, no arrays
 
@@ -2515,7 +2515,7 @@ TEST(12E)
 {
   if (db::default_editable_mode ()) { 
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout (&m);
     unsigned int lindex = read_testdata (layout, 0x01 | 0x80);  // simple polygon, no arrays
 
@@ -2577,7 +2577,7 @@ TEST(12F)
 {
   if (db::default_editable_mode ()) { 
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout (&m);
     unsigned int lindex = read_testdata (layout, 0x01 | 0x80);  // simple polygon, no arrays
 
@@ -2614,7 +2614,7 @@ TEST(12G)
 {
   if (db::default_editable_mode ()) { 
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout (&m);
     unsigned int lindex = read_testdata (layout, 0x02 | 0x80);  // polygon, no arrays
 
@@ -2676,7 +2676,7 @@ TEST(12H)
 {
   if (db::default_editable_mode ()) { 
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout (&m);
     unsigned int lindex = read_testdata (layout, 0x02 | 0x80);  // polygon, no arrays
 
@@ -2713,7 +2713,7 @@ TEST(12I)
 {
   if (db::default_editable_mode ()) { 
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout (&m);
     unsigned int lindex = read_testdata (layout, 0x04 | 0x80);  // path, no arrays
 
@@ -2773,7 +2773,7 @@ TEST(12J)
 {
   if (db::default_editable_mode ()) { 
 
-    db::Manager m;
+    db::Manager m (true);
     db::Layout layout (&m);
     unsigned int lindex = read_testdata (layout, 0x08 | 0x80);  // text, no arrays
 
@@ -2831,7 +2831,7 @@ TEST(12J)
 
 TEST(13)
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Layout layout (&m);
   unsigned int lindex = read_testdata (layout, 0x3f); // all with arrays
 
@@ -2859,7 +2859,7 @@ TEST(13)
 
 TEST(14)
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Layout layout (&m);
   unsigned int lindex = read_testdata (layout, 0x10); // boxes
 
@@ -2947,7 +2947,7 @@ TEST(14)
 
 TEST(15)
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Layout layout (&m);
   unsigned int lindex = read_testdata (layout, 0x1);
 
@@ -3058,7 +3058,7 @@ TEST(15)
 
 TEST(16)
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Layout layout (&m);
   unsigned int lindex = read_testdata (layout, 0x1);
 
@@ -3276,7 +3276,7 @@ TEST(22)
 //  Edge pairs
 TEST(23)
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
   db::Box b_empty;
 
@@ -3312,7 +3312,7 @@ TEST(23)
 //  Bug #107
 TEST(100)
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Shapes shapes1 (&m, 0, true);
 
   m.transaction ("y");

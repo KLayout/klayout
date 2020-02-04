@@ -496,7 +496,9 @@ void
 LayerControlPanel::recover ()
 {
   cancel_updates ();
-  manager ()->clear ();
+  if (manager ()) {
+    manager ()->clear ();
+  }
 }
 
 void 
@@ -504,13 +506,13 @@ LayerControlPanel::cm_delete ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Delete layer views"))); 
+  transaction (tl::to_string (QObject::tr ("Delete layer views")));
   do_delete ();
-  manager ()->commit ();
+  commit ();
 
   END_PROTECTED_CLEANUP { 
     recover (); 
-    manager ()->commit (); 
+    commit ();
   }
 }
 
@@ -535,7 +537,7 @@ LayerControlPanel::do_delete ()
       mp_view->delete_layer (*s);
     }
 
-    if (manager ()->transacting ()) {
+    if (transacting ()) {
       manager ()->queue (this, new LayerSelectionClearOp ());
     }
 
@@ -553,7 +555,7 @@ LayerControlPanel::cm_remove_unused ()
 
   begin_updates ();
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Clean up views"))); 
+  transaction (tl::to_string (QObject::tr ("Clean up views")));
 
   bool any_deleted;
   do {
@@ -577,7 +579,7 @@ LayerControlPanel::cm_remove_unused ()
 
   } while (any_deleted);
 
-  manager ()->commit ();
+  commit ();
 
   end_updates ();
 
@@ -592,9 +594,9 @@ LayerControlPanel::cm_add_missing ()
   BEGIN_PROTECTED_CLEANUP
 
   begin_updates ();
-  manager ()->transaction (tl::to_string (QObject::tr ("Add other views"))); 
+  transaction (tl::to_string (QObject::tr ("Add other views")));
   mp_view->add_missing_layers ();
-  manager ()->commit ();
+  commit ();
   end_updates ();
 
   END_PROTECTED_CLEANUP { recover (); }
@@ -618,18 +620,18 @@ LayerControlPanel::cm_insert ()
 
     BEGIN_PROTECTED_CLEANUP
 
-    manager ()->transaction (tl::to_string (QObject::tr ("Insert views"))); 
+    transaction (tl::to_string (QObject::tr ("Insert views")));
 
     props.set_source (tl::to_string (n));
     mp_view->init_layer_properties (props);
     const LayerPropertiesNode &lp = mp_view->insert_layer (sel, props);
 
-    if (manager ()->transacting ()) {
+    if (transacting ()) {
       manager ()->queue (this, new LayerSelectionClearOp ());
     }
     mp_layer_list->set_current (sel);
 
-    manager ()->commit ();
+    commit ();
 
     emit order_changed ();
 
@@ -656,7 +658,7 @@ LayerControlPanel::cm_group ()
 
     begin_updates ();
 
-    manager ()->transaction (tl::to_string (QObject::tr ("Group layer views"))); 
+    transaction (tl::to_string (QObject::tr ("Group layer views")));
 
     lay::LayerPropertiesNode node;
     for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator s = sel.begin (); s != sel.end (); ++s) {
@@ -678,11 +680,11 @@ LayerControlPanel::cm_group ()
 
     mp_view->insert_layer (ins_pos, node);
 
-    if (manager ()->transacting ()) {
+    if (transacting ()) {
       manager ()->queue (this, new LayerSelectionClearOp ());
     }
 
-    manager ()->commit ();
+    commit ();
 
     end_updates ();
 
@@ -705,7 +707,7 @@ LayerControlPanel::cm_ungroup ()
 
     begin_updates ();
 
-    manager ()->transaction (tl::to_string (QObject::tr ("Ungroup layer views"))); 
+    transaction (tl::to_string (QObject::tr ("Ungroup layer views")));
 
     lay::LayerPropertiesNode node = *sel;
 
@@ -720,12 +722,12 @@ LayerControlPanel::cm_ungroup ()
       mp_view->insert_layer (ins_pos, c->flat ());
     }
 
-    if (manager ()->transacting ()) {
+    if (transacting ()) {
       manager ()->queue (this, new LayerSelectionClearOp ());
     }
     set_selection (std::vector<lay::LayerPropertiesConstIterator> ()); // clear selection
 
-    manager ()->commit ();
+    commit ();
 
     end_updates ();
 
@@ -870,7 +872,7 @@ LayerControlPanel::paste ()
       }
     }
 
-    if (manager ()->transacting ()) {
+    if (transacting ()) {
       manager ()->queue (this, new LayerSelectionClearOp ());
     }
 
@@ -904,9 +906,9 @@ LayerControlPanel::cm_source ()
 
       props.set_source (tl::to_string (n));
 
-      manager ()->transaction (tl::to_string (QObject::tr ("Select source"))); 
+      transaction (tl::to_string (QObject::tr ("Select source")));
       mp_view->set_properties (sel, props);
-      manager ()->commit ();
+      commit ();
 
       END_PROTECTED_CLEANUP { recover (); }
 
@@ -937,9 +939,9 @@ LayerControlPanel::cm_rename ()
 
       props.set_name (tl::to_string (n));
 
-      manager ()->transaction (tl::to_string (QObject::tr ("Rename layer"))); 
+      transaction (tl::to_string (QObject::tr ("Rename layer")));
       mp_view->set_properties (sel, props);
-      manager ()->commit ();
+      commit ();
 
       END_PROTECTED_CLEANUP { recover (); }
 
@@ -953,7 +955,7 @@ LayerControlPanel::cm_show_only ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Show selected layers"))); 
+  transaction (tl::to_string (QObject::tr ("Show selected layers")));
 
   std::vector<lay::LayerPropertiesConstIterator> sel = mp_view->selected_layers ();
   std::set<lay::LayerPropertiesConstIterator> sel_set (sel.begin (), sel.end ());
@@ -996,7 +998,7 @@ LayerControlPanel::cm_show_only ()
     }
   }
 
-  manager ()->commit ();
+  commit ();
 
   END_PROTECTED_CLEANUP { recover (); }
 }
@@ -1006,7 +1008,7 @@ LayerControlPanel::cm_show ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Show layer"))); 
+  transaction (tl::to_string (QObject::tr ("Show layer")));
 
   std::vector<lay::LayerPropertiesConstIterator> sel = mp_view->selected_layers ();
 
@@ -1016,7 +1018,7 @@ LayerControlPanel::cm_show ()
     mp_view->set_properties (*l, props);
   }
 
-  manager ()->commit ();
+  commit ();
 
   END_PROTECTED_CLEANUP { recover (); }
 }
@@ -1026,7 +1028,7 @@ LayerControlPanel::cm_show_all ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Show all layers"))); 
+  transaction (tl::to_string (QObject::tr ("Show all layers")));
 
   for (lay::LayerPropertiesConstIterator l = mp_view->begin_layers (); ! l.at_end (); ++l) {
     lay::LayerProperties props (*l);
@@ -1034,7 +1036,7 @@ LayerControlPanel::cm_show_all ()
     mp_view->set_properties (l, props);
   }
 
-  manager ()->commit ();
+  commit ();
 
   END_PROTECTED_CLEANUP { recover (); }
 }
@@ -1044,7 +1046,7 @@ LayerControlPanel::cm_rename_tab ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Rename layer tab"))); 
+  transaction (tl::to_string (QObject::tr ("Rename layer tab")));
 
   bool ok = false;
   QString n = QInputDialog::getText (this, 
@@ -1060,7 +1062,7 @@ LayerControlPanel::cm_rename_tab ()
     end_updates ();
   }
 
-  manager ()->commit ();
+  commit ();
 
   END_PROTECTED_CLEANUP { recover (); }
 }
@@ -1070,7 +1072,7 @@ LayerControlPanel::cm_remove_tab ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Remove layer tab"))); 
+  transaction (tl::to_string (QObject::tr ("Remove layer tab")));
 
   if (mp_view->layer_lists () == 1) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cannot remove last layer tab")));
@@ -1080,7 +1082,7 @@ LayerControlPanel::cm_remove_tab ()
   mp_view->delete_layer_list (mp_view->current_layer_list ());
   end_updates ();
 
-  manager ()->commit ();
+  commit ();
 
   emit order_changed ();
 
@@ -1092,13 +1094,13 @@ LayerControlPanel::cm_new_tab ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("New layer tab"))); 
+  transaction (tl::to_string (QObject::tr ("New layer tab")));
 
   begin_updates ();
   mp_view->insert_layer_list (mp_view->current_layer_list () + 1, mp_view->get_properties ());
   end_updates ();
 
-  manager ()->commit ();
+  commit ();
 
   emit order_changed ();
 
@@ -1110,7 +1112,7 @@ LayerControlPanel::cm_make_valid ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Make layer valid"))); 
+  transaction (tl::to_string (QObject::tr ("Make layer valid")));
 
   std::vector<lay::LayerPropertiesConstIterator> sel = mp_view->selected_layers ();
 
@@ -1120,7 +1122,7 @@ LayerControlPanel::cm_make_valid ()
     mp_view->set_properties (*l, props);
   }
 
-  manager ()->commit ();
+  commit ();
 
   END_PROTECTED_CLEANUP { recover (); }
 }
@@ -1130,7 +1132,7 @@ LayerControlPanel::cm_make_invalid ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Make layer invalid"))); 
+  transaction (tl::to_string (QObject::tr ("Make layer invalid")));
 
   std::vector<lay::LayerPropertiesConstIterator> sel = mp_view->selected_layers ();
 
@@ -1140,7 +1142,7 @@ LayerControlPanel::cm_make_invalid ()
     mp_view->set_properties (*l, props);
   }
 
-  manager ()->commit ();
+  commit ();
 
   END_PROTECTED_CLEANUP { recover (); }
 }
@@ -1150,7 +1152,7 @@ LayerControlPanel::cm_hide ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Hide layer"))); 
+  transaction (tl::to_string (QObject::tr ("Hide layer")));
 
   std::vector<lay::LayerPropertiesConstIterator> sel = mp_view->selected_layers ();
 
@@ -1160,7 +1162,7 @@ LayerControlPanel::cm_hide ()
     mp_view->set_properties (*l, props);
   }
 
-  manager ()->commit ();
+  commit ();
 
   END_PROTECTED_CLEANUP { recover (); }
 }
@@ -1170,7 +1172,7 @@ LayerControlPanel::cm_hide_all ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Hide all layers"))); 
+  transaction (tl::to_string (QObject::tr ("Hide all layers")));
 
   for (lay::LayerPropertiesConstIterator l = mp_view->begin_layers (); ! l.at_end (); ++l) {
     if (l.parent ().is_null ()) {
@@ -1182,7 +1184,7 @@ LayerControlPanel::cm_hide_all ()
     }
   }
 
-  manager ()->commit ();
+  commit ();
 
   END_PROTECTED_CLEANUP { recover (); }
 }
@@ -1214,7 +1216,7 @@ LayerControlPanel::set_selection (const std::vector<lay::LayerPropertiesConstIte
     mp_layer_list->set_selection (new_sel);
 
     //  :TODO: save selection for undo? Currently we just clear it.
-    if (manager ()->transacting ()) {
+    if (transacting ()) {
       manager ()->queue (this, new LayerSelectionClearOp ());
     }
 
@@ -1304,9 +1306,9 @@ LayerControlPanel::cm_regroup_flatten ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Flatten layers"))); 
+  transaction (tl::to_string (QObject::tr ("Flatten layers")));
   regroup_layers (RegroupFlatten);
-  manager ()->commit ();
+  commit ();
 
   emit order_changed ();
 
@@ -1318,9 +1320,9 @@ LayerControlPanel::cm_regroup_by_index ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Regroup layers"))); 
+  transaction (tl::to_string (QObject::tr ("Regroup layers")));
   regroup_layers (RegroupByIndex);
-  manager ()->commit ();
+  commit ();
 
   emit order_changed ();
 
@@ -1332,9 +1334,9 @@ LayerControlPanel::cm_regroup_by_datatype ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Regroup layers"))); 
+  transaction (tl::to_string (QObject::tr ("Regroup layers")));
   regroup_layers (RegroupByDatatype);
-  manager ()->commit ();
+  commit ();
 
   emit order_changed ();
 
@@ -1346,9 +1348,9 @@ LayerControlPanel::cm_regroup_by_layer ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Regroup layers"))); 
+  transaction (tl::to_string (QObject::tr ("Regroup layers")));
   regroup_layers (RegroupByLayer);
-  manager ()->commit ();
+  commit ();
 
   emit order_changed ();
 
@@ -1360,9 +1362,9 @@ LayerControlPanel::cm_sort_by_name ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Sort layers"))); 
+  transaction (tl::to_string (QObject::tr ("Sort layers")));
   sort_layers (ByName);
-  manager ()->commit ();
+  commit ();
 
   emit order_changed ();
 
@@ -1374,9 +1376,9 @@ LayerControlPanel::cm_sort_by_ild ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Sort layers"))); 
+  transaction (tl::to_string (QObject::tr ("Sort layers")));
   sort_layers (ByIndexLayerDatatype);
-  manager ()->commit ();
+  commit ();
 
   emit order_changed ();
 
@@ -1388,9 +1390,9 @@ LayerControlPanel::cm_sort_by_idl ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Sort layers"))); 
+  transaction (tl::to_string (QObject::tr ("Sort layers")));
   sort_layers (ByIndexDatatypeLayer);
-  manager ()->commit ();
+  commit ();
 
   emit order_changed ();
 
@@ -1402,9 +1404,9 @@ LayerControlPanel::cm_sort_by_ldi ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Sort layers"))); 
+  transaction (tl::to_string (QObject::tr ("Sort layers")));
   sort_layers (ByLayerDatatypeIndex);
-  manager ()->commit ();
+  commit ();
 
   emit order_changed ();
 
@@ -1416,9 +1418,9 @@ LayerControlPanel::cm_sort_by_dli ()
 {
   BEGIN_PROTECTED_CLEANUP
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Sort layers"))); 
+  transaction (tl::to_string (QObject::tr ("Sort layers")));
   sort_layers (ByDatatypeLayerIndex);
-  manager ()->commit ();
+  commit ();
 
   emit order_changed ();
 
@@ -1725,14 +1727,14 @@ LayerControlPanel::double_clicked (const QModelIndex &index, Qt::KeyboardModifie
     props.set_visible (! props.visible (false));
 
     if (props.visible (false)) {
-      manager ()->transaction (tl::to_string (QObject::tr ("Show layer"))); 
+      transaction (tl::to_string (QObject::tr ("Show layer")));
     } else {
-      manager ()->transaction (tl::to_string (QObject::tr ("Hide layer"))); 
+      transaction (tl::to_string (QObject::tr ("Hide layer")));
     }
 
     mp_view->set_properties (item, props);
 
-    manager ()->commit ();
+    commit ();
 
   }
 
@@ -2213,9 +2215,9 @@ LayerControlPanel::up_clicked ()
   BEGIN_PROTECTED_CLEANUP
 
   if (mp_view) {
-    mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Move up"))); 
+    mp_view->transaction (tl::to_string (QObject::tr ("Move up")));
     do_move (1 /*up*/);
-    mp_view->manager ()->commit ();
+    mp_view->commit ();
   }
 
   END_PROTECTED_CLEANUP { recover (); }
@@ -2227,9 +2229,9 @@ LayerControlPanel::down_clicked ()
   BEGIN_PROTECTED_CLEANUP
   
   if (mp_view) {
-    mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Move down"))); 
+    mp_view->transaction (tl::to_string (QObject::tr ("Move down")));
     do_move (0 /*down*/);
-    mp_view->manager ()->commit ();
+    mp_view->commit ();
   }
 
   END_PROTECTED_CLEANUP { recover (); }
@@ -2241,9 +2243,9 @@ LayerControlPanel::downdown_clicked ()
   BEGIN_PROTECTED_CLEANUP
   
   if (mp_view) {
-    mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Move fully down"))); 
+    mp_view->transaction (tl::to_string (QObject::tr ("Move fully down")));
     do_move (2 /*downdown*/);
-    mp_view->manager ()->commit ();
+    mp_view->commit ();
   }
 
   END_PROTECTED_CLEANUP { recover (); }
@@ -2255,9 +2257,9 @@ LayerControlPanel::upup_clicked ()
   BEGIN_PROTECTED_CLEANUP
   
   if (mp_view) {
-    mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Move fully up"))); 
+    mp_view->transaction (tl::to_string (QObject::tr ("Move fully up")));
     do_move (3 /*upup*/);
-    mp_view->manager ()->commit ();
+    mp_view->commit ();
   }
 
   END_PROTECTED_CLEANUP { recover (); }

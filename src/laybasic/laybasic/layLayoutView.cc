@@ -720,7 +720,7 @@ LayoutView::action_for_slot (const char *slot)
 lay::Action *
 LayoutView::create_config_action (const std::string &title, const std::string &cname, const std::string &cvalue)
 {
-  lay::ConfigureAction *ca = new lay::ConfigureAction(plugin_root (), title, cname, cvalue);
+  lay::ConfigureAction *ca = new lay::ConfigureAction (plugin_root (), title, cname, cvalue);
   m_ca_collection.push_back (ca);
   return ca;
 }
@@ -728,7 +728,7 @@ LayoutView::create_config_action (const std::string &title, const std::string &c
 lay::Action *
 LayoutView::create_config_action (const std::string &cname, const std::string &cvalue)
 {
-  lay::ConfigureAction *ca = new lay::ConfigureAction(plugin_root (), std::string (), cname, cvalue);
+  lay::ConfigureAction *ca = new lay::ConfigureAction (plugin_root (), std::string (), cname, cvalue);
   m_ca_collection.push_back (ca);
   return ca;
 }

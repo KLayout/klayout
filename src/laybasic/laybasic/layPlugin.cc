@@ -368,9 +368,12 @@ Plugin::get_config_names (std::vector<std::string> &names) const
 PluginRoot *
 Plugin::plugin_root ()
 {
-  PluginRoot *pr = plugin_root_maybe_null ();
-  tl_assert (pr != 0);
-  return pr;
+  Plugin *p = this;
+  while (p->mp_parent) {
+    p = p->mp_parent;
+  }
+
+  return dynamic_cast<PluginRoot *> (p);
 }
 
 PluginRoot *
@@ -436,10 +439,12 @@ Plugin::do_config_set (const std::string &name, const std::string &value, bool f
 
 static PluginRoot *ms_root_instance = 0;
 
-PluginRoot::PluginRoot (bool standalone)
+PluginRoot::PluginRoot (bool standalone, bool reg_inst)
   : Plugin (0, standalone)
 {
-  ms_root_instance = this;
+  if (reg_inst) {
+    ms_root_instance = this;
+  }
 }
 
 PluginRoot::~PluginRoot ()

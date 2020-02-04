@@ -805,7 +805,7 @@ public:
   /**
    *  @brief The constructor
    */
-  PluginRoot (bool standalone = false);
+  PluginRoot (bool standalone = false, bool reg_inst = true);
 
   /**
    *  @brief Destructor

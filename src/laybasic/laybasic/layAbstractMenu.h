@@ -887,10 +887,10 @@ private:
    *  The format of the string is: <text>["("shortcut")"]["<"icon-resource">"]
    *
    *  @param s The title, key and icon resource string in the format given above
-   *  @param parent The widget to which to attach the QAction object
+   *  @param provider The abstract menu provider (the global one will be used if this instance is 0)
    *  @return The ActionHandle object created
    */
-  static ActionHandle *create_action (const std::string &s);
+  static ActionHandle *create_action (const std::string &s, lay::AbstractMenuProvider *provider);
 
   AbstractMenuProvider *mp_provider;
   AbstractMenuItem m_root;

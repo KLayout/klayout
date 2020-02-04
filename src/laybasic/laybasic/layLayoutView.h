@@ -31,12 +31,14 @@
 #include <set>
 #include <list>
 #include <string>
+#include <memory>
 
 #include <QFrame>
 #include <QImage>
 
 #include "layLayerProperties.h"
 #include "layAbstractMenu.h"
+#include "layAbstractMenuProvider.h"
 #include "layAnnotationShapes.h"
 #include "layLayoutCanvas.h"
 #include "layColorPalette.h"
@@ -79,6 +81,8 @@ class SelectionService;
 class MoveService;
 class Browser;
 class ColorButton;
+class PluginRoot;
+class ConfigureAction;
 
 /**
  *  @brief Stores a layer reference to create layers which have been added by some action
@@ -155,7 +159,8 @@ struct LAYBASIC_PUBLIC LayerDisplayProperties
 class LAYBASIC_PUBLIC LayoutView
   : public QFrame,
     public lay::Editables,
-    public lay::Plugin
+    public lay::Plugin,
+    public lay::AbstractMenuProvider
 {
 Q_OBJECT
 
@@ -216,6 +221,12 @@ public:
    *  @brief Gets the current view
    */
   static LayoutView *current ();
+
+  /**
+   *  @brief Gets the abstract menu object for this view
+   *  This is either the global menu object or the local one.
+   */
+  AbstractMenu *menu ();
 
   /**
    *  @brief Determine if there is something to copy
@@ -1668,12 +1679,6 @@ public:
   static void update_menu (lay::LayoutView *view, lay::AbstractMenu &menu);
 
   /**
-   *  @brief Get the menu abstraction object
-   *  This is either the global abstract menu or a view-local one if the view is not embedded into a main window.
-   */
-  AbstractMenu *menu ();
-
-  /**
    *  @brief Query the default mode
    */
   static int default_mode ();
@@ -2758,6 +2763,10 @@ protected:
 
 private:
   lay::AbstractMenu m_menu;
+  std::auto_ptr<lay::PluginRoot> mp_plugin_root;
+  std::map<std::string, lay::Action> m_actions_for_slot;
+  std::map<std::string, std::vector<lay::ConfigureAction *> > m_configuration_actions;
+  tl::shared_collection<lay::ConfigureAction> m_ca_collection;
 
   bool m_editable;
   int m_disabled_edits;
@@ -2939,6 +2948,14 @@ private:
 
   std::list<lay::CellView>::iterator cellview_iter (int cv_index);
   std::list<lay::CellView>::const_iterator cellview_iter (int cv_index) const;
+
+  //  implementation of AbstractMenuProvider
+  virtual QWidget *menu_parent_widget ();
+  virtual lay::Action &action_for_slot (const char *slot);
+  virtual lay::Action *create_config_action (const std::string &title, const std::string &cname, const std::string &cvalue);
+  virtual lay::Action *create_config_action (const std::string &cname, const std::string &cvalue);
+  virtual void register_config_action (const std::string &name, lay::ConfigureAction *action);
+  virtual void unregister_config_action (const std::string &name, lay::ConfigureAction *action);
 };
 
 }

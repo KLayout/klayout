@@ -256,23 +256,29 @@ static LayoutView *ms_current = 0;
 LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, QWidget *parent, const char *name, unsigned int options)
   : QFrame (parent), 
     lay::Plugin (plugin_parent),
-    m_menu (0),
+    lay::AbstractMenuProvider (false /* don't register as global instance */),
+    m_menu (this),
     m_editable (editable),
     m_options (options),
     m_annotation_shapes (manager),
     dm_prop_changed (this, &LayoutView::do_prop_changed) 
 {
+  if (! plugin_root_maybe_null ()) {
+    mp_plugin_root.reset (new lay::PluginRoot (true, false));
+  }
+
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
   setObjectName (QString::fromUtf8 (name));
-  init (manager, plugin_root_maybe_null (), parent);
+  init (manager, plugin_root_maybe_null () ? plugin_root_maybe_null () : mp_plugin_root.get (), parent);
 }
 
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::PluginRoot *root, QWidget *parent, const char *name, unsigned int options)
   : QFrame (parent), 
     lay::Plugin (root),
-    m_menu (0),
+    lay::AbstractMenuProvider (false /* don't register as global instance */),
+    m_menu (this),
     m_editable (editable),
     m_options (options),
     m_annotation_shapes (manager),
@@ -353,6 +359,8 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
 
   if (! lay::AbstractMenuProvider::instance () || ! lay::AbstractMenuProvider::instance ()->menu ()) {
     init_menu (m_menu);
+    //  build the context menus, nothing else so far.
+    m_menu.build (0, 0);
   }
 
   m_annotation_shapes.manager (mgr);
@@ -689,6 +697,67 @@ LayoutView::~LayoutView ()
   }
   mp_bookmarks_frame = 0;
   mp_bookmarks_view = 0;
+}
+
+QWidget *LayoutView::menu_parent_widget ()
+{
+  return this;
+}
+
+lay::Action &
+LayoutView::action_for_slot (const char *slot)
+{
+  std::map<std::string, lay::Action>::iterator a = m_actions_for_slot.find (std::string (slot));
+  if (a != m_actions_for_slot.end ()) {
+    return a->second;
+  } else {
+    Action a = Action::create_free_action (this);
+    gtf::action_connect (a.qaction (), SIGNAL (triggered ()), this, slot);
+    return m_actions_for_slot.insert (std::make_pair (std::string (slot), a)).first->second;
+  }
+}
+
+lay::Action *
+LayoutView::create_config_action (const std::string &title, const std::string &cname, const std::string &cvalue)
+{
+  lay::ConfigureAction *ca = new lay::ConfigureAction(plugin_root (), title, cname, cvalue);
+  m_ca_collection.push_back (ca);
+  return ca;
+}
+
+lay::Action *
+LayoutView::create_config_action (const std::string &cname, const std::string &cvalue)
+{
+  lay::ConfigureAction *ca = new lay::ConfigureAction(plugin_root (), std::string (), cname, cvalue);
+  m_ca_collection.push_back (ca);
+  return ca;
+}
+
+void
+LayoutView::register_config_action (const std::string &name, lay::ConfigureAction *action)
+{
+  std::map<std::string, std::vector<lay::ConfigureAction *> >::iterator ca = m_configuration_actions.insert (std::make_pair (name, std::vector<lay::ConfigureAction *> ())).first;
+  for (std::vector<lay::ConfigureAction *>::iterator a = ca->second.begin (); a != ca->second.end (); ++a) {
+    if (*a == action) {
+      return; // already registered
+    }
+  }
+
+  ca->second.push_back (action);
+}
+
+void
+LayoutView::unregister_config_action (const std::string &name, lay::ConfigureAction *action)
+{
+  std::map<std::string, std::vector<lay::ConfigureAction *> >::iterator ca = m_configuration_actions.find (name);
+  if (ca != m_configuration_actions.end ()) {
+    for (std::vector<lay::ConfigureAction *>::iterator a = ca->second.begin (); a != ca->second.end (); ++a) {
+      if (*a == action) {
+        ca->second.erase (a);
+        return;
+      }
+    }
+  }
 }
 
 void LayoutView::side_panel_destroyed ()

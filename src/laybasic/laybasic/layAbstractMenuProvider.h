@@ -45,8 +45,9 @@ class LAYBASIC_PUBLIC AbstractMenuProvider
 public:
   /**
    *  @brief Constructor
+   *  If "reg_inst" is true, this instance will become the global instance
    */
-  AbstractMenuProvider ();
+  AbstractMenuProvider (bool reg_inst = true);
 
   /**
    *  @brief Destructor
@@ -71,14 +72,14 @@ public:
   /**
    *  @brief Create a configuration action with the given title, parameter name and value
    *
-   *  The action will be owned by the main window but can be deleted to remove the action from the main window.
+   *  The action will be owned by the abstract menu provider but can be deleted to remove it from there.
    */
   virtual lay::Action *create_config_action (const std::string &title, const std::string &cname, const std::string &cvalue) = 0;
   
   /**
    *  @brief Create a configuration action with the given parameter name and value
    *
-   *  The action will be owned by the main window but can be deleted to remove the action from the main window.
+   *  The action will be owned by the abstract menu provider but can be deleted to remove it from there.
    *  This version is provided for applications, where the title is set later.
    */
   virtual lay::Action *create_config_action (const std::string &cname, const std::string &cvalue) = 0;

@@ -28,9 +28,9 @@ namespace lay
 
 static AbstractMenuProvider *ms_instance = 0;
 
-AbstractMenuProvider::AbstractMenuProvider ()
+AbstractMenuProvider::AbstractMenuProvider (bool reg_inst)
 {
-  if (! ms_instance) {
+  if (reg_inst && ! ms_instance) {
     ms_instance = this;
   }
 }

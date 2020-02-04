@@ -590,7 +590,7 @@ Action::no_shortcut ()
 
 Action::Action (const std::string &title)
 {
-  mp_handle = AbstractMenu::create_action (title);
+  mp_handle = AbstractMenu::create_action (title, 0);
   gtf::action_connect (mp_handle->ptr (), SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
   mp_handle->add_ref ();
 }
@@ -1008,9 +1008,12 @@ ConfigureAction::configure (const std::string &value)
 //  AbstractMenu implementation
 
 ActionHandle *
-AbstractMenu::create_action (const std::string &s)
+AbstractMenu::create_action (const std::string &s, AbstractMenuProvider *provider)
 {
-  tl_assert (lay::AbstractMenuProvider::instance () != 0);
+  if (! provider) {
+    provider = lay::AbstractMenuProvider::instance ();
+  }
+  tl_assert (provider != 0);
 
   std::string title;
   std::string shortcut;
@@ -1019,7 +1022,7 @@ AbstractMenu::create_action (const std::string &s)
 
   parse_menu_title (s, title, shortcut, res, tool_tip);
 
-  ActionHandle *ah = new ActionHandle (lay::AbstractMenuProvider::instance ()->menu_parent_widget ());
+  ActionHandle *ah = new ActionHandle (provider->menu_parent_widget ());
   ah->ptr ()->setText (tl::to_qstring (title));
 
   if (! tool_tip.empty ()) {
@@ -1129,15 +1132,17 @@ AbstractMenu::build_detached (const std::string &name, QFrame *mbar)
 void
 AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
 {
-  tl_assert (mp_provider != 0);
-
   m_helper_menu_items.clear ();
-  tbar->clear ();
+  if (tbar) {
+    tbar->clear ();
+  }
 
   std::set<std::pair<size_t, QAction *> > present_actions;
-  QList<QAction *> a = mbar->actions ();
-  for (QList<QAction *>::const_iterator i = a.begin (); i != a.end (); ++i) {
-    present_actions.insert (std::make_pair (id_from_action (*i), *i));
+  if (mbar) {
+    QList<QAction *> a = mbar->actions ();
+    for (QList<QAction *>::const_iterator i = a.begin (); i != a.end (); ++i) {
+      present_actions.insert (std::make_pair (id_from_action (*i), *i));
+    }
   }
 
   for (std::list<AbstractMenuItem>::iterator c = m_root.children.begin (); c != m_root.children.end (); ++c) {
@@ -1146,7 +1151,9 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
 
       if (c->name () == "@toolbar") {
 
-        build (tbar, c->children);
+        if (tbar) {
+          build (tbar, c->children);
+        }
 
       } else if (c->name ().find ("@@") == 0) {
 
@@ -1160,14 +1167,16 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
           // Otherwise, the keyboard shortcuts do not work for menu items inside such a
           // popup menu. It seems not to have a negative effect to add the menu to the
           // main widget.
-          mp_provider->menu_parent_widget ()->addAction (menu->menuAction ());
+          if (mp_provider) {
+            mp_provider->menu_parent_widget ()->addAction (menu->menuAction ());
+          }
           c->set_action (Action (new ActionHandle (menu)), true);
         }
 
         //  prepare a detached menu which can be used as context menues
         build (c->menu (), c->children);
 
-      } else {
+      } else if (mbar) {
 
         if (c->menu () == 0) {
           QMenu *menu = new QMenu ();
@@ -1192,7 +1201,7 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
 
       }
 
-    } else {
+    } else if (mbar) {
       //  Move the action to the end if present in the menu already
       std::set<std::pair<size_t, QAction *> >::iterator a = present_actions.find (std::make_pair (id_from_action (c->action ().qaction ()), c->action ().qaction ()));
       if (a != present_actions.end ()) {
@@ -1209,8 +1218,10 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
   }
 
   //  Remove all actions that have vanished
-  for (std::set<std::pair<size_t, QAction *> >::iterator a = present_actions.begin (); a != present_actions.end (); ++a) {
-    mbar->removeAction (a->second);
+  if (mbar) {
+    for (std::set<std::pair<size_t, QAction *> >::iterator a = present_actions.begin (); a != present_actions.end (); ++a) {
+      mbar->removeAction (a->second);
+    }
   }
 }
 
@@ -1399,8 +1410,6 @@ AbstractMenu::insert_item (const std::string &p, const std::string &name, const 
 void
 AbstractMenu::insert_separator (const std::string &p, const std::string &name)
 {
-  tl_assert (mp_provider != 0);   //  required to get the parent for the new QAction (via ActionHandle)
-
   typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > > path_type;
   path_type path = find_item (p);
   if (! path.empty ()) {
@@ -1410,7 +1419,7 @@ AbstractMenu::insert_separator (const std::string &p, const std::string &name)
 
     parent->children.insert (iter, AbstractMenuItem ());
     --iter;
-    Action action (new ActionHandle (mp_provider->menu_parent_widget ()));
+    Action action (new ActionHandle (mp_provider ? mp_provider->menu_parent_widget () : 0));
     action.set_separator (true);
     iter->setup_item (parent->name (), name, action);
 
@@ -1452,7 +1461,7 @@ AbstractMenu::insert_menu (const std::string &p, const std::string &name, const 
 void
 AbstractMenu::insert_menu (const std::string &path, const std::string &name, const std::string &title)
 {
-  insert_menu (path, name, create_action (title));
+  insert_menu (path, name, create_action (title, mp_provider));
 }
 
 void
@@ -1715,8 +1724,6 @@ AbstractMenu::find_item (const std::string &p)
 void
 AbstractMenu::transfer (const MenuLayoutEntry *layout, AbstractMenuItem &item)
 {
-  tl_assert (mp_provider != 0);
-
   while (layout->name) {
 
     item.children.push_back (AbstractMenuItem ());
@@ -1724,7 +1731,9 @@ AbstractMenu::transfer (const MenuLayoutEntry *layout, AbstractMenuItem &item)
 
     lay::Action a;
 
-    if (layout->slot) {
+    if (! mp_provider) {
+      a = lay::Action (new ActionHandle ((QWidget *) 0));
+    } else if (layout->slot) {
       // reuse any actions already registered for this slot
       a = mp_provider->action_for_slot (layout->slot);
     } else if (! layout->kv_pair.first.empty ()) {

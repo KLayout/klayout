@@ -182,11 +182,13 @@ BookmarksView::refresh ()
 void
 BookmarksView::context_menu (const QPoint &p)
 {
-  tl_assert (lay::AbstractMenuProvider::instance () != 0);
+  if (! mp_view->menu ()) {
+    return;
+  }
 
   QListView *bm_list = dynamic_cast<QListView *> (sender ());
   if (bm_list) {
-    QMenu *ctx_menu = lay::AbstractMenuProvider::instance ()->menu ()->detached_menu ("bookmarks_context_menu");
+    QMenu *ctx_menu = mp_view->menu ()->detached_menu ("bookmarks_context_menu");
     ctx_menu->exec (bm_list->mapToGlobal (p));
   }
 }

@@ -370,12 +370,14 @@ HierarchyControlPanel::event (QEvent *e)
 void 
 HierarchyControlPanel::context_menu (const QPoint &p)
 {
-  tl_assert (lay::AbstractMenuProvider::instance () != 0);
+  if (! mp_view->menu ()) {
+    return;
+  }
 
   QTreeView *cell_list = dynamic_cast<QTreeView *> (sender ());
   if (cell_list) {
     set_active_celltree_from_sender ();
-    QMenu *ctx_menu = lay::AbstractMenuProvider::instance ()->menu ()->detached_menu ("hcp_context_menu");
+    QMenu *ctx_menu = mp_view->menu ()->detached_menu ("hcp_context_menu");
     ctx_menu->exec (cell_list->mapToGlobal (p));
   }
 }

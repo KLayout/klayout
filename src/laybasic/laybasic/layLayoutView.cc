@@ -44,6 +44,7 @@
 #include "tlAssert.h"
 #include "tlExceptions.h"
 #include "layLayoutView.h"
+#include "layAbstractMenuProvider.h"
 #include "layViewOp.h"
 #include "layViewObject.h"
 #include "layLayoutViewConfigPages.h"
@@ -255,6 +256,7 @@ static LayoutView *ms_current = 0;
 LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, QWidget *parent, const char *name, unsigned int options)
   : QFrame (parent), 
     lay::Plugin (plugin_parent),
+    m_menu (0),
     m_editable (editable),
     m_options (options),
     m_annotation_shapes (manager),
@@ -270,6 +272,7 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::PluginRoot *root, QWidget *parent, const char *name, unsigned int options)
   : QFrame (parent), 
     lay::Plugin (root),
+    m_menu (0),
     m_editable (editable),
     m_options (options),
     m_annotation_shapes (manager),
@@ -347,6 +350,10 @@ void
 LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
 {
   manager (mgr);
+
+  if (! lay::AbstractMenuProvider::instance () || ! lay::AbstractMenuProvider::instance ()->menu ()) {
+    init_menu (m_menu);
+  }
 
   m_annotation_shapes.manager (mgr);
 
@@ -6459,6 +6466,16 @@ LayoutView::intrinsic_mouse_modes (std::vector<std::string> *descriptions)
     descriptions->push_back ("move\t" + tl::to_string (QObject::tr ("Move")) + "<:move.png>");
   }
   return 2;
+}
+
+AbstractMenu *
+LayoutView::menu ()
+{
+  if (lay::AbstractMenuProvider::instance () && lay::AbstractMenuProvider::instance ()->menu ()) {
+    return lay::AbstractMenuProvider::instance ()->menu ();
+  } else {
+    return &m_menu;
+  }
 }
 
 int 

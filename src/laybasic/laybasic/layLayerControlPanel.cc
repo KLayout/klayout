@@ -1686,9 +1686,11 @@ LayerControlPanel::cm_expand_all ()
 void
 LayerControlPanel::tab_context_menu (const QPoint &p)
 {
-  tl_assert (lay::AbstractMenuProvider::instance () != 0);
+  if (! mp_view->menu ()) {
+    return;
+  }
 
-  QMenu *ctx_menu = lay::AbstractMenuProvider::instance ()->menu ()->detached_menu ("lcp_tabs_context_menu");
+  QMenu *ctx_menu = mp_view->menu ()->detached_menu ("lcp_tabs_context_menu");
   if (ctx_menu) {
     ctx_menu->exec (mp_tab_bar->mapToGlobal (p));
   }
@@ -1697,9 +1699,11 @@ LayerControlPanel::tab_context_menu (const QPoint &p)
 void
 LayerControlPanel::context_menu (const QPoint &p)
 {
-  tl_assert (lay::AbstractMenuProvider::instance () != 0);
+  if (! mp_view->menu ()) {
+    return;
+  }
 
-  QMenu *ctx_menu = lay::AbstractMenuProvider::instance ()->menu ()->detached_menu ("lcp_context_menu");
+  QMenu *ctx_menu = mp_view->menu ()->detached_menu ("lcp_context_menu");
   if (ctx_menu) {
     ctx_menu->exec (mp_layer_list->mapToGlobal (p));
   }

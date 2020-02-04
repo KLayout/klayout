@@ -36,6 +36,7 @@
 #include <QImage>
 
 #include "layLayerProperties.h"
+#include "layAbstractMenu.h"
 #include "layAnnotationShapes.h"
 #include "layLayoutCanvas.h"
 #include "layColorPalette.h"
@@ -1667,6 +1668,12 @@ public:
   static void update_menu (lay::LayoutView *view, lay::AbstractMenu &menu);
 
   /**
+   *  @brief Get the menu abstraction object
+   *  This is either the global abstract menu or a view-local one if the view is not embedded into a main window.
+   */
+  AbstractMenu *menu ();
+
+  /**
    *  @brief Query the default mode
    */
   static int default_mode ();
@@ -2750,6 +2757,8 @@ protected:
   void activate ();
 
 private:
+  lay::AbstractMenu m_menu;
+
   bool m_editable;
   int m_disabled_edits;
   unsigned int m_options;

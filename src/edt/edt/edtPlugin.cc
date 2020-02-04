@@ -273,7 +273,7 @@ public:
   virtual void initialize (lay::PluginRoot *root)
   {
     lay::AbstractMenuProvider *mp = lay::AbstractMenuProvider::instance ();
-    if (! mp) {
+    if (! mp || ! mp->menu ()) {
       return;
     }
 
@@ -312,7 +312,7 @@ public:
   void update_menu (combine_mode_type cm)
   {
     lay::AbstractMenuProvider *mp = lay::AbstractMenuProvider::instance ();
-    if (! mp) {
+    if (! mp || ! mp->menu ()) {
       return;
     }
 
@@ -375,7 +375,7 @@ public:
   void initialized (lay::PluginRoot *root)
   {
     lay::AbstractMenuProvider *mp = lay::AbstractMenuProvider::instance ();
-    if (! mp) {
+    if (! mp || ! mp->menu ()) {
       return;
     }
 

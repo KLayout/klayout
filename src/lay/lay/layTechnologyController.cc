@@ -299,7 +299,7 @@ void
 TechnologyController::update_current_technology ()
 {
   lay::AbstractMenuProvider *pr = lay::AbstractMenuProvider::instance ();
-  if (! pr) {
+  if (! pr || ! pr->menu ()) {
     return;
   }
 
@@ -326,7 +326,7 @@ void
 TechnologyController::update_menu ()
 {
   lay::AbstractMenuProvider *pr = lay::AbstractMenuProvider::instance ();
-  if (! pr) {
+  if (! pr || ! pr->menu ()) {
     return;
   }
 

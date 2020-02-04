@@ -150,10 +150,6 @@ PluginDeclaration::configure (const std::string &name, const std::string &value)
 void 
 PluginDeclaration::config_finalize ()
 {
-  if (!lay::AbstractMenuProvider::instance ()) {
-    return;
-  }
-
   if (m_templates_updated) {
 
     update_menu ();
@@ -217,6 +213,9 @@ void
 PluginDeclaration::update_current_template ()
 {
   lay::AbstractMenuProvider *mp = lay::AbstractMenuProvider::instance ();
+  if (! mp || ! mp->menu ()) {
+    return;
+  }
 
   if (m_current_template >= 0 && m_current_template < int (m_templates.size ())) {
 
@@ -240,6 +239,9 @@ void
 PluginDeclaration::update_menu ()
 {
   lay::AbstractMenuProvider *mp = lay::AbstractMenuProvider::instance ();
+  if (! mp || ! mp->menu ()) {
+    return;
+  }
 
   if (m_current_template < 0 || m_current_template >= int (m_templates.size ())) {
     m_current_template = 0;

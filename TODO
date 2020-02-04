@@ -23,3 +23,6 @@ Plan:
 8. We can move menu initialization of LV-specifics to the LayoutView and
    remove the cm_... and the code which just passes signals to the current view! :)
    
+9. BTW: make QWidget::setParent and QObject::setParent transfer ownership for
+   Qt binding.
+

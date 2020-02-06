@@ -54,9 +54,9 @@ public:
    */
   TechnologyController ();
 
-  void initialize (lay::PluginRoot *root);
-  void initialized (lay::PluginRoot *root);
-  void uninitialize (lay::PluginRoot *root);
+  void initialize (lay::Dispatcher *root);
+  void initialized (lay::Dispatcher *root);
+  void uninitialize (lay::Dispatcher *root);
 
   void get_options (std::vector < std::pair<std::string, std::string> > &options) const;
   void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const;
@@ -132,7 +132,7 @@ private:
   bool m_technologies_configured;
   lay::TechSetupDialog *mp_editor;
   lay::MainWindow *mp_mw;
-  lay::PluginRoot *mp_plugin_root;
+  lay::Dispatcher *mp_plugin_root;
   std::vector<std::string> m_paths;
   std::vector<db::Technology> m_temp_tech;
   db::Technology *mp_active_technology;

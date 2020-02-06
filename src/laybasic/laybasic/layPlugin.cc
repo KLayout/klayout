@@ -21,7 +21,6 @@
 */
 
 
-#include "layAbstractMenuProvider.h"
 #include "laybasicCommon.h"
 
 #include "tlException.h"
@@ -30,6 +29,7 @@
 #include "tlLog.h"
 
 #include "layPlugin.h"
+#include "layDispatcher.h"
 #include "tlExceptions.h"
 #include "tlClassRegistry.h"
 
@@ -56,8 +56,10 @@ PluginDeclaration::PluginDeclaration ()
 
 PluginDeclaration::~PluginDeclaration ()
 {
-  if (PluginRoot::instance ()) {
-    PluginRoot::instance ()->plugin_removed (this);
+  clear_menu_items ();
+
+  if (Dispatcher::instance ()) {
+    Dispatcher::instance ()->plugin_removed (this);
   }
 }
 
@@ -67,6 +69,30 @@ PluginDeclaration::toggle_editable_enabled ()
   BEGIN_PROTECTED
   set_editable_enabled (! editable_enabled ());
   END_PROTECTED
+}
+
+std::vector<std::string>
+PluginDeclaration::menu_symbols ()
+{
+  std::vector<std::string> symbols;
+
+  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+
+    std::vector<lay::MenuEntry> menu_entries;
+    cls->get_menu_entries (menu_entries);
+
+    for (std::vector<lay::MenuEntry>::const_iterator m = menu_entries.begin (); m != menu_entries.end (); ++m) {
+      if (! m->symbol.empty ()) {
+        symbols.push_back (m->symbol);
+      }
+    }
+
+  }
+
+  std::sort (symbols.begin (), symbols.end ());
+  symbols.erase (std::unique (symbols.begin (), symbols.end ()), symbols.end ());
+
+  return symbols;
 }
 
 void 
@@ -85,7 +111,7 @@ PluginDeclaration::generic_menu ()
   }
 
   //  Forward the request to the plugin root which will propagate it down to the plugins
-  lay::PluginRoot::instance ()->menu_activated (symbol);
+  lay::Dispatcher::instance ()->menu_activated (symbol);
 
   END_PROTECTED
 }
@@ -100,8 +126,8 @@ PluginDeclaration::mode_triggered ()
 
     int mode = action->data ().toInt ();
 
-    if (lay::PluginRoot::instance ()) {
-      lay::PluginRoot::instance ()->select_mode (mode);
+    if (lay::Dispatcher::instance ()) {
+      lay::Dispatcher::instance ()->select_mode (mode);
     }
 
     action->setChecked (true);
@@ -111,19 +137,24 @@ PluginDeclaration::mode_triggered ()
   END_PROTECTED
 }
 
-void 
-PluginDeclaration::init_menu ()
+void
+PluginDeclaration::clear_menu_items ()
 {
-  if (! lay::AbstractMenuProvider::instance () || ! lay::AbstractMenuProvider::instance ()->menu ()) {
-    return;
+  while (! m_menu_actions.empty ()) {
+    delete m_menu_actions.back ();
+    m_menu_actions.pop_back ();
   }
+}
 
-  lay::AbstractMenu &menu = *lay::AbstractMenuProvider::instance ()->menu ();
+void 
+PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
+{
+  lay::AbstractMenu &menu = *dispatcher->menu ();
 
   //  pre-initialize to allow multiple init_menu calls
   m_editable_mode_action = lay::Action ();
   m_mouse_mode_action = lay::Action ();
-  m_menu_actions.clear ();
+  clear_menu_items ();
 
   std::string title;
 
@@ -158,19 +189,41 @@ PluginDeclaration::init_menu ()
   for (std::vector<lay::MenuEntry>::const_iterator m = menu_entries.begin (); m != menu_entries.end (); ++m) {
 
     if (m->title.empty ()) {
+
       menu.insert_separator (m->insert_pos, m->menu_name);
+
     } else {
 
       if (m->sub_menu) {
+
         menu.insert_menu (m->insert_pos, m->menu_name, m->title);
+
       } else {
 
-        Action action (m->title);
-        action.qaction ()->setData (QVariant (tl::to_qstring (m->symbol)));
-        gtf::action_connect (action.qaction (), SIGNAL (triggered ()), this, SLOT (generic_menu ()));
-        menu.insert_item (m->insert_pos, m->menu_name, action);
+        Action *action = 0;
+
+        if (! m->cname.empty ()) {
+
+          action = dispatcher->create_config_action (m->title, m->cname, m->cvalue);
+
+        } else {
+
+          action = new Action (m->title);
+          action->qaction ()->setData (QVariant (tl::to_qstring (m->symbol)));
+          gtf::action_connect (action->qaction (), SIGNAL (triggered ()), this, SLOT (generic_menu ()));
+
+        }
 
         m_menu_actions.push_back (action);
+        menu.insert_item (m->insert_pos, m->menu_name, *action);
+
+        if (! m->exclusive_group.empty ()) {
+          action->add_to_exclusive_group (&menu, m->exclusive_group);
+        }
+
+        if (m->checkable) {
+          action->set_checkable (true);
+        }
 
       }
 
@@ -178,13 +231,29 @@ PluginDeclaration::init_menu ()
 
   }
 
-  //  Fill the mode menu file items from the mouse modes 
+  //  Fill the mode menu file items from the mouse modes
+
+  std::vector<std::pair<std::string, std::pair<std::string, int> > > modes;
 
   title = std::string ();
   if (implements_mouse_mode (title)) {
+    modes.push_back (std::make_pair (title, std::make_pair ("edit_menu.mode_menu.end;@toolbar.end", id ())));
+  }
+
+  //  the primary mouse modes (special for LayoutView)
+  implements_primary_mouse_modes (modes);
+
+  for (std::vector<std::pair<std::string, int> >::const_iterator m = modes.begin (); m != modes.end (); ++m) {
 
     //  extract first part, which is the name, separated by a tab from the title.
-    std::string name = tl::sprintf ("mode_%d", id ());
+    std::string name;
+    if (m->second.second <= 0) {
+      name = tl::sprintf ("mode_i%d", 1 - m->second.second);
+    } else {
+      name = tl::sprintf ("mode_%d", m->second.second);
+    }
+    std::string title = m->first;
+
     const char *tab = strchr (title.c_str (), '\t');
     if (tab) {
       name = std::string (title, 0, tab - title.c_str ());
@@ -193,12 +262,10 @@ PluginDeclaration::init_menu ()
 
     m_mouse_mode_action = Action (title);
     m_mouse_mode_action.add_to_exclusive_group (&menu, "mouse_mode_exclusive_group");
-
     m_mouse_mode_action.set_checkable (true);
-    m_mouse_mode_action.qaction ()->setData (QVariant (id ()));
+    m_mouse_mode_action.qaction ()->setData (QVariant (m->second.second));
 
-    menu.insert_item ("edit_menu.mode_menu.end", name, m_mouse_mode_action);
-    menu.insert_item ("@toolbar.end_modes", name, m_mouse_mode_action);
+    menu.insert_item (m->second.first, name + ":mode_group", m_mouse_mode_action);
 
     gtf::action_connect (m_mouse_mode_action.qaction (), SIGNAL (triggered ()), this, SLOT (mode_triggered ()));
 
@@ -208,15 +275,15 @@ PluginDeclaration::init_menu ()
 void
 PluginDeclaration::remove_menu_items ()
 {
-  if (! lay::AbstractMenuProvider::instance () || ! lay::AbstractMenuProvider::instance ()->menu ()) {
+  if (! lay::Dispatcher::instance () || ! lay::Dispatcher::instance ()->menu ()) {
     return;
   }
 
-  lay::AbstractMenu *menu = lay::AbstractMenuProvider::instance ()->menu ();
+  lay::AbstractMenu *menu = lay::Dispatcher::instance ()->menu ();
   menu->delete_items (m_editable_mode_action);
   menu->delete_items (m_mouse_mode_action);
-  for (std::vector <lay::Action>::const_iterator a = m_menu_actions.begin (); a != m_menu_actions.end (); ++a) {
-    menu->delete_items (*a);
+  for (std::vector <lay::Action *>::const_iterator a = m_menu_actions.begin (); a != m_menu_actions.end (); ++a) {
+    menu->delete_items (**a);
   }
 }
 
@@ -233,9 +300,9 @@ PluginDeclaration::set_editable_enabled (bool f)
 void  
 PluginDeclaration::register_plugin ()
 {
-  if (PluginRoot::instance ()) {
-    PluginRoot::instance ()->plugin_registered (this);
-    initialize (PluginRoot::instance ());
+  if (Dispatcher::instance ()) {
+    Dispatcher::instance ()->plugin_registered (this);
+    initialize (Dispatcher::instance ());
   }
 }
 
@@ -365,26 +432,26 @@ Plugin::get_config_names (std::vector<std::string> &names) const
   }
 }
 
-PluginRoot *
-Plugin::plugin_root ()
+Dispatcher *
+Plugin::dispatcher ()
 {
   Plugin *p = this;
   while (p->mp_parent) {
     p = p->mp_parent;
   }
 
-  return dynamic_cast<PluginRoot *> (p);
+  return dynamic_cast<Dispatcher *> (p);
 }
 
-PluginRoot *
-Plugin::plugin_root_maybe_null ()
+Dispatcher *
+Plugin::dispatcher_maybe_null ()
 {
   Plugin *p = this;
   while (p->mp_parent) {
     p = p->mp_parent;
   }
 
-  return dynamic_cast<PluginRoot *> (p);
+  return dynamic_cast<Dispatcher *> (p);
 }
 
 void 
@@ -432,192 +499,6 @@ Plugin::do_config_set (const std::string &name, const std::string &value, bool f
   }
 
   return false;
-}
-
-// ----------------------------------------------------------------
-//  PluginRoot implementation
-
-static PluginRoot *ms_root_instance = 0;
-
-PluginRoot::PluginRoot (bool standalone, bool reg_inst)
-  : Plugin (0, standalone)
-{
-  if (reg_inst) {
-    ms_root_instance = this;
-  }
-}
-
-PluginRoot::~PluginRoot ()
-{
-  if (ms_root_instance == this) {
-    ms_root_instance = 0;
-  }
-}
-
-//  Writing and Reading of configuration 
-
-struct ConfigGetAdaptor
-{
-  ConfigGetAdaptor (const std::string &name)
-    : mp_owner (0), m_done (false), m_name (name)
-  {
-    // .. nothing yet ..
-  }
-  
-  std::string operator () () const
-  {
-    std::string s;
-    mp_owner->config_get (m_name, s);
-    return s;
-  }
-
-  bool at_end () const 
-  {
-    return m_done;
-  }
-
-  void start (const lay::PluginRoot &owner) 
-  {
-    mp_owner = &owner;
-    m_done = false;
-  }
-
-  void next () 
-  {
-    m_done = true;
-  }
-
-private:
-  const lay::PluginRoot *mp_owner;
-  bool m_done;
-  std::string m_name;
-};
- 
-struct ConfigGetNullAdaptor
-{
-  ConfigGetNullAdaptor ()
-  {
-    // .. nothing yet ..
-  }
-  
-  std::string operator () () const
-  {
-    return std::string ();
-  }
-
-  bool at_end () const 
-  {
-    return true;
-  }
-
-  void start (const lay::PluginRoot & /*owner*/) { }
-  void next () { }
-};
- 
-struct ConfigNamedSetAdaptor
-{
-  ConfigNamedSetAdaptor ()
-  {
-    // .. nothing yet ..
-  }
-  
-  void operator () (lay::PluginRoot &w, tl::XMLReaderState &reader, const std::string &name) const
-  {
-    tl::XMLObjTag<std::string> tag;
-    w.config_set (name, *reader.back (tag));
-  }
-};
- 
-struct ConfigSetAdaptor
-{
-  ConfigSetAdaptor (const std::string &name)
-    : m_name (name)
-  {
-    // .. nothing yet ..
-  }
-  
-  void operator () (lay::PluginRoot &w, tl::XMLReaderState &reader) const
-  {
-    tl::XMLObjTag<std::string> tag;
-    w.config_set (m_name, *reader.back (tag));
-  }
-
-private:
-  std::string m_name;
-};
- 
-//  the configuration file's XML structure is built dynamically
-static tl::XMLStruct<lay::PluginRoot> 
-config_structure (const lay::PluginRoot *plugin) 
-{
-  tl::XMLElementList body;
-  std::string n_with_underscores;
-
-  std::vector <std::string> names; 
-  plugin->get_config_names (names);
-
-  for (std::vector <std::string>::const_iterator n = names.begin (); n != names.end (); ++n) {
-
-    body.append (tl::XMLMember<std::string, lay::PluginRoot, ConfigGetAdaptor, ConfigSetAdaptor, tl::XMLStdConverter <std::string> > ( 
-                       ConfigGetAdaptor (*n), ConfigSetAdaptor (*n), *n));
-
-    //  for compatibility, provide an alternative with underscores (i.e. 0.20->0.21 because of default_grids)
-    n_with_underscores.clear ();
-    for (const char *c = n->c_str (); *c; ++c) {
-      n_with_underscores += (*c == '-' ? '_' : *c);
-    }
-
-    body.append (tl::XMLMember<std::string, lay::PluginRoot, ConfigGetNullAdaptor, ConfigSetAdaptor, tl::XMLStdConverter <std::string> > ( 
-                       ConfigGetNullAdaptor (), ConfigSetAdaptor (*n), n_with_underscores));
-
-  }
-
-  //  add a wildcard member to read all others unspecifically into the repository
-  body.append (tl::XMLWildcardMember<std::string, lay::PluginRoot, ConfigNamedSetAdaptor, tl::XMLStdConverter <std::string> > (ConfigNamedSetAdaptor ()));
-
-  return tl::XMLStruct<lay::PluginRoot> ("config", body);
-}
-
-
-bool 
-PluginRoot::write_config (const std::string &config_file)
-{
-  try {
-    tl::OutputStream os (config_file, tl::OutputStream::OM_Plain);
-    config_structure (this).write (os, *this); 
-    return true;
-  } catch (...) {
-    return false;
-  }
-}
-
-bool
-PluginRoot::read_config (const std::string &config_file)
-{
-  std::auto_ptr<tl::XMLFileSource> file;
-
-  try {
-    file.reset (new tl::XMLFileSource (config_file));
-  } catch (...) {
-    return false;
-  }
-
-  try {
-    config_structure (this).parse (*file, *this); 
-  } catch (tl::Exception &ex) {
-    std::string msg = tl::to_string (QObject::tr ("Problem reading config file ")) + config_file + ": " + ex.msg ();
-    throw tl::Exception (msg);
-  } 
-
-  config_end ();
-
-  return true;
-}
-
-PluginRoot *
-PluginRoot::instance ()
-{
-  return ms_root_instance;
 }
 
 }

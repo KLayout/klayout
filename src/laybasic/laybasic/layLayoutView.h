@@ -38,8 +38,8 @@
 
 #include "layLayerProperties.h"
 #include "layAbstractMenu.h"
-#include "layAbstractMenuProvider.h"
 #include "layAnnotationShapes.h"
+#include "layDispatcher.h"
 #include "layLayoutCanvas.h"
 #include "layColorPalette.h"
 #include "layStipplePalette.h"
@@ -81,7 +81,6 @@ class SelectionService;
 class MoveService;
 class Browser;
 class ColorButton;
-class PluginRoot;
 class ConfigureAction;
 
 /**
@@ -159,8 +158,7 @@ struct LAYBASIC_PUBLIC LayerDisplayProperties
 class LAYBASIC_PUBLIC LayoutView
   : public QFrame,
     public lay::Editables,
-    public lay::Plugin,
-    public lay::AbstractMenuProvider
+    public lay::Dispatcher
 {
 Q_OBJECT
 
@@ -198,7 +196,7 @@ public:
   /**
    *  @brief Constructor (clone from another view)
    */
-  LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::PluginRoot *root, QWidget *parent = 0, const char *name = "view", unsigned int options = (unsigned int) LV_Normal);
+  LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent = 0, const char *name = "view", unsigned int options = (unsigned int) LV_Normal);
 
   /** 
    *  @brief Destructor
@@ -1668,11 +1666,6 @@ public:
   static unsigned int intrinsic_mouse_modes (std::vector<std::string> *descriptions);
 
   /**
-   *  @brief Perform the layout view's initialisations on the main menu
-   */
-  static void init_menu (lay::AbstractMenu &menu);
-
-  /**
    *  @brief Updates the menu for the given view
    *  If the view is 0, the menu shall be updated to reflect "no view active"
    */
@@ -2018,7 +2011,7 @@ public:
    *  PD is the type of the declaration.
    */
   template <class PD>
-  void create_plugin (lay::PluginRoot *root)
+  void create_plugin ()
   {
     for (std::vector<lay::Plugin *>::const_iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
       if (dynamic_cast <const PD *> ((*p)->plugin_declaration ()) != 0) {
@@ -2027,7 +2020,7 @@ public:
     }
     for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
       if (dynamic_cast <const PD *> (&*cls) != 0) {
-        create_plugin (root, &*cls);
+        create_plugin (&*cls);
         break;
       }
     }
@@ -2516,7 +2509,7 @@ public:
    *
    *  If plugins already exist, they are deleted and created again
    */
-  void create_plugins (lay::PluginRoot *root, const lay::PluginDeclaration *except_this = 0);
+  void create_plugins (const lay::PluginDeclaration *except_this = 0);
 
 public slots:
   /**
@@ -2678,6 +2671,7 @@ public slots:
   void layer_order_changed ();
   void timer ();
   void menu_activated (const std::string &symbol);
+  static std::vector<std::string> menu_symbols ();
   void deactivate_all_browsers ();
   void min_hier_changed (int i);
   void max_hier_changed (int i);
@@ -2762,12 +2756,6 @@ protected:
   void activate ();
 
 private:
-  lay::AbstractMenu m_menu;
-  std::auto_ptr<lay::PluginRoot> mp_plugin_root;
-  std::map<std::string, lay::Action> m_actions_for_slot;
-  std::map<std::string, std::vector<lay::ConfigureAction *> > m_configuration_actions;
-  tl::shared_collection<lay::ConfigureAction> m_ca_collection;
-
   bool m_editable;
   int m_disabled_edits;
   unsigned int m_options;
@@ -2904,7 +2892,7 @@ private:
   bool m_active_cellview_changed_event_enabled;
   tl::DeferredMethod<lay::LayoutView> dm_prop_changed;
 
-  void init (db::Manager *mgr, lay::PluginRoot *root, QWidget *parent);
+  void init (db::Manager *mgr, lay::Dispatcher *dispatcher, QWidget *parent);
 
   void do_prop_changed ();
   void do_redraw (int layer);
@@ -2937,6 +2925,11 @@ private:
   void init_layer_properties (LayerProperties &props, const LayerPropertiesList &lp_list) const;
   void merge_dither_pattern (lay::LayerPropertiesList &props);
 
+  void do_cm_duplicate (bool interactive);
+  void do_cm_paste (bool interactive);
+  void cm_new_cell ();
+  void cm_reload ();
+
   //  overrides Editables method to display a message
   void signal_selection_changed ();
 
@@ -2944,18 +2937,13 @@ private:
   void showEvent (QShowEvent *);
   void hideEvent (QHideEvent *);
 
-  lay::Plugin *create_plugin (lay::PluginRoot *root, const lay::PluginDeclaration *cls);
+  lay::Plugin *create_plugin (const lay::PluginDeclaration *cls);
 
   std::list<lay::CellView>::iterator cellview_iter (int cv_index);
   std::list<lay::CellView>::const_iterator cellview_iter (int cv_index) const;
 
-  //  implementation of AbstractMenuProvider
+  //  implementation of Dispatcher
   virtual QWidget *menu_parent_widget ();
-  virtual lay::Action &action_for_slot (const char *slot);
-  virtual lay::Action *create_config_action (const std::string &title, const std::string &cname, const std::string &cvalue);
-  virtual lay::Action *create_config_action (const std::string &cname, const std::string &cvalue);
-  virtual void register_config_action (const std::string &name, lay::ConfigureAction *action);
-  virtual void unregister_config_action (const std::string &name, lay::ConfigureAction *action);
 };
 
 }

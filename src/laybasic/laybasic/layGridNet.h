@@ -44,7 +44,7 @@ class GridNetPluginDeclaration
 public:
   virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const;
   virtual lay::ConfigPage *config_page (QWidget *parent, std::string &title) const;
-  virtual lay::Plugin *create_plugin (db::Manager *, lay::PluginRoot *, lay::LayoutView *view) const;
+  virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *, lay::LayoutView *view) const;
 };
 
 class GridNetConfigPage 
@@ -56,8 +56,8 @@ public:
   GridNetConfigPage (QWidget *parent);
   ~GridNetConfigPage ();
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
 private:
   Ui::GridNetConfigPage *mp_ui;

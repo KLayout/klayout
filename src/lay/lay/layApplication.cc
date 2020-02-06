@@ -1483,7 +1483,7 @@ GuiApplication::setup ()
 {
   tl_assert (mp_mw == 0 && mp_plugin_root == 0);
 
-  mp_plugin_root = new lay::PluginRootToMainWindow ();
+  mp_plugin_root = new lay::DispatcherToMainWindow ();
   mp_mw = new lay::MainWindow (this, mp_plugin_root, "main_window", is_undo_enabled ());
   mp_plugin_root->attach_to (mp_mw);
 

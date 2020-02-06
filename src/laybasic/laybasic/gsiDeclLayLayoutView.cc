@@ -533,6 +533,18 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "This method has been introduced in version 0.27\n"
   ) +
 #endif
+  gsi::method ("call_menu", &lay::LayoutView::menu_activated,
+    "@brief Calls the menu item with the provided symbol.\n"
+    "To obtain all symbols, use get_menu_symbols.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
+  gsi::method ("get_menu_symbols", &lay::LayoutView::get_menu_symbols,
+    "@brief Calls the menu item with the provided symbol.\n"
+    "To obtain all available symbols, use get_menu_symbols.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
   gsi::method ("current", &lay::LayoutView::current,
     "@brief Returns the current view\n"
     "The current view is the one that is shown in the current tab. Returns nil if no layout is loaded.\n"

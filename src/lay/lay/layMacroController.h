@@ -89,12 +89,12 @@ public:
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
-  virtual void initialized (lay::PluginRoot *root);
+  virtual void initialized (lay::Dispatcher *root);
 
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
-  virtual void uninitialize (lay::PluginRoot *root);
+  virtual void uninitialize (lay::Dispatcher *root);
 
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
@@ -109,7 +109,7 @@ public:
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
-  virtual bool can_exit (lay::PluginRoot *root) const;
+  virtual bool can_exit (lay::Dispatcher *root) const;
 
   /**
    *  @brief Gets a value indicating whether the plugin will accept a dropped file with the given URL or path

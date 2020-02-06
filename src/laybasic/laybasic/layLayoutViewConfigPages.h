@@ -67,8 +67,8 @@ public:
   LayoutViewConfigPage (QWidget *parent);
   ~LayoutViewConfigPage ();
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
 private:
   Ui::LayoutViewConfigPage *mp_ui;
@@ -83,8 +83,8 @@ public:
   LayoutViewConfigPage1 (QWidget *parent);
   ~LayoutViewConfigPage1 ();
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
 private:
   Ui::LayoutViewConfigPage1 *mp_ui;
@@ -99,8 +99,8 @@ public:
   LayoutViewConfigPage2a (QWidget *parent);
   ~LayoutViewConfigPage2a ();
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
 private:
   Ui::LayoutViewConfigPage2a *mp_ui;
@@ -115,8 +115,8 @@ public:
   LayoutViewConfigPage2b (QWidget *parent);
   ~LayoutViewConfigPage2b ();
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
 private:
   Ui::LayoutViewConfigPage2b *mp_ui;
@@ -131,8 +131,8 @@ public:
   LayoutViewConfigPage2c (QWidget *parent);
   ~LayoutViewConfigPage2c ();
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
 private:
   Ui::LayoutViewConfigPage2c *mp_ui;
@@ -147,8 +147,8 @@ public:
   LayoutViewConfigPage3a (QWidget *parent);
   ~LayoutViewConfigPage3a ();
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
 private:
   Ui::LayoutViewConfigPage3a *mp_ui;
@@ -163,8 +163,8 @@ public:
   LayoutViewConfigPage3b (QWidget *parent);
   ~LayoutViewConfigPage3b ();
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
 private:
   Ui::LayoutViewConfigPage3b *mp_ui;
@@ -179,8 +179,8 @@ public:
   LayoutViewConfigPage3c (QWidget *parent);
   ~LayoutViewConfigPage3c ();
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
 private:
   Ui::LayoutViewConfigPage3c *mp_ui;
@@ -195,8 +195,8 @@ public:
   LayoutViewConfigPage3f (QWidget *parent);
   ~LayoutViewConfigPage3f ();
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
 private:
   Ui::LayoutViewConfigPage3f *mp_ui;
@@ -212,8 +212,8 @@ public:
   LayoutViewConfigPage4 (QWidget *parent);
   ~LayoutViewConfigPage4 ();
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
   virtual void undo (db::Op *op);
   virtual void redo (db::Op *op);
@@ -244,8 +244,8 @@ public:
   LayoutViewConfigPage5 (QWidget *parent);
   ~LayoutViewConfigPage5 ();
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
 public slots:
   void browse_clicked ();
@@ -264,8 +264,8 @@ public:
   LayoutViewConfigPage6 (QWidget *parent);
   ~LayoutViewConfigPage6 ();
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
   virtual void undo (db::Op *op);
   virtual void redo (db::Op *op);
@@ -298,8 +298,8 @@ public:
   LayoutViewConfigPage6a (QWidget *parent);
   ~LayoutViewConfigPage6a ();
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
   virtual void undo (db::Op *op);
   virtual void redo (db::Op *op);
@@ -329,8 +329,8 @@ public:
   LayoutViewConfigPage7 (QWidget *parent);
   ~LayoutViewConfigPage7 ();
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
 private:
   Ui::LayoutViewConfigPage7 *mp_ui;

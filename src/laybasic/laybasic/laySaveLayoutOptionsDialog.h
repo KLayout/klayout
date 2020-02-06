@@ -80,7 +80,7 @@ public:
   SaveLayoutOptionsDialog (QWidget *parent, const std::string &title);
   ~SaveLayoutOptionsDialog ();
 
-  bool edit_global_options (lay::PluginRoot *config_root, db::Technologies *technologies);
+  bool edit_global_options (lay::Dispatcher *dispatcher, db::Technologies *technologies);
   bool get_options (db::SaveLayoutOptions &options);
 
 public slots:

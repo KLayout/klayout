@@ -59,8 +59,6 @@ public:
 
   void refresh ();
 
-  static void init_menu (lay::AbstractMenu &menu);
-
 public slots:
   void bookmark_triggered (const QModelIndex &index);
   void current_bookmark_changed (const QModelIndex &index);

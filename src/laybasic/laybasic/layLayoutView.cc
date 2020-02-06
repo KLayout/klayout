@@ -44,7 +44,6 @@
 #include "tlAssert.h"
 #include "tlExceptions.h"
 #include "layLayoutView.h"
-#include "layAbstractMenuProvider.h"
 #include "layViewOp.h"
 #include "layViewObject.h"
 #include "layLayoutViewConfigPages.h"
@@ -70,6 +69,11 @@
 #include "layBookmarkManagementForm.h"
 #include "layNetlistBrowserDialog.h"
 #include "layBookmarksView.h"
+#include "laySelectCellViewForm.h"
+#include "layCellSelectionForm.h"
+#include "layLayoutPropertiesForm.h"
+#include "layLayoutStatisticsForm.h"
+#include "dbClipboard.h"
 #include "dbLayout.h"
 #include "dbLayoutUtils.h"
 #include "dbRecursiveShapeIterator.h"
@@ -255,35 +259,33 @@ static LayoutView *ms_current = 0;
 
 LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, QWidget *parent, const char *name, unsigned int options)
   : QFrame (parent), 
-    lay::Plugin (plugin_parent),
-    lay::AbstractMenuProvider (false /* don't register as global instance */),
-    m_menu (this),
+    lay::Dispatcher (plugin_parent, false /*not standalone*/),
     m_editable (editable),
     m_options (options),
     m_annotation_shapes (manager),
     dm_prop_changed (this, &LayoutView::do_prop_changed) 
 {
-  if (! plugin_root_maybe_null ()) {
-    mp_plugin_root.reset (new lay::PluginRoot (true, false));
-  }
+  //  either it's us or the parent has a dispatcher
+  tl_assert (dispatcher () != 0);
 
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
   setObjectName (QString::fromUtf8 (name));
-  init (manager, plugin_root_maybe_null () ? plugin_root_maybe_null () : mp_plugin_root.get (), parent);
+  init (manager, dispatcher (), parent);
 }
 
-LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::PluginRoot *root, QWidget *parent, const char *name, unsigned int options)
+LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, QWidget *parent, const char *name, unsigned int options)
   : QFrame (parent), 
-    lay::Plugin (root),
-    lay::AbstractMenuProvider (false /* don't register as global instance */),
-    m_menu (this),
+    lay::Dispatcher (plugin_parent, false /*not standalone*/),
     m_editable (editable),
     m_options (options),
     m_annotation_shapes (manager),
     dm_prop_changed (this, &LayoutView::do_prop_changed)
 {
+  //  either it's us or the parent has a dispatcher
+  tl_assert (dispatcher () != 0);
+
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
@@ -291,7 +293,7 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
 
   m_annotation_shapes = source->m_annotation_shapes;
 
-  init (manager, root, parent);
+  init (manager, dispatcher (), parent);
 
   //  set the handle reference and clear all cell related stuff 
   m_cellviews = source->cellview_list ();
@@ -353,14 +355,13 @@ LayoutView::eventFilter(QObject *obj, QEvent *event)
 }
 
 void
-LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
+LayoutView::init (db::Manager *mgr, lay::Dispatcher *dispatcher, QWidget * /*parent*/)
 {
   manager (mgr);
 
-  if (! lay::AbstractMenuProvider::instance () || ! lay::AbstractMenuProvider::instance ()->menu ()) {
-    init_menu (m_menu);
+  if (! dispatcher) {
     //  build the context menus, nothing else so far.
-    m_menu.build (0, 0);
+    menu ()->build (0, 0);
   }
 
   m_annotation_shapes.manager (mgr);
@@ -597,9 +598,7 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
   connect (mp_timer, SIGNAL (timeout ()), this, SLOT (timer ()));
   mp_timer->start (timer_interval);
 
-  if (root) {
-    create_plugins (root);
-  }
+  create_plugins ();
 
   m_new_layer_props.layer = 1;
   m_new_layer_props.datatype = 0;
@@ -704,62 +703,6 @@ QWidget *LayoutView::menu_parent_widget ()
   return this;
 }
 
-lay::Action &
-LayoutView::action_for_slot (const char *slot)
-{
-  std::map<std::string, lay::Action>::iterator a = m_actions_for_slot.find (std::string (slot));
-  if (a != m_actions_for_slot.end ()) {
-    return a->second;
-  } else {
-    Action a = Action::create_free_action (this);
-    gtf::action_connect (a.qaction (), SIGNAL (triggered ()), this, slot);
-    return m_actions_for_slot.insert (std::make_pair (std::string (slot), a)).first->second;
-  }
-}
-
-lay::Action *
-LayoutView::create_config_action (const std::string &title, const std::string &cname, const std::string &cvalue)
-{
-  lay::ConfigureAction *ca = new lay::ConfigureAction (plugin_root (), title, cname, cvalue);
-  m_ca_collection.push_back (ca);
-  return ca;
-}
-
-lay::Action *
-LayoutView::create_config_action (const std::string &cname, const std::string &cvalue)
-{
-  lay::ConfigureAction *ca = new lay::ConfigureAction (plugin_root (), std::string (), cname, cvalue);
-  m_ca_collection.push_back (ca);
-  return ca;
-}
-
-void
-LayoutView::register_config_action (const std::string &name, lay::ConfigureAction *action)
-{
-  std::map<std::string, std::vector<lay::ConfigureAction *> >::iterator ca = m_configuration_actions.insert (std::make_pair (name, std::vector<lay::ConfigureAction *> ())).first;
-  for (std::vector<lay::ConfigureAction *>::iterator a = ca->second.begin (); a != ca->second.end (); ++a) {
-    if (*a == action) {
-      return; // already registered
-    }
-  }
-
-  ca->second.push_back (action);
-}
-
-void
-LayoutView::unregister_config_action (const std::string &name, lay::ConfigureAction *action)
-{
-  std::map<std::string, std::vector<lay::ConfigureAction *> >::iterator ca = m_configuration_actions.find (name);
-  if (ca != m_configuration_actions.end ()) {
-    for (std::vector<lay::ConfigureAction *>::iterator a = ca->second.begin (); a != ca->second.end (); ++a) {
-      if (*a == action) {
-        ca->second.erase (a);
-        return;
-      }
-    }
-  }
-}
-
 void LayoutView::side_panel_destroyed ()
 {
   if (sender () == mp_control_frame) {
@@ -859,9 +802,9 @@ void LayoutView::drop_url (const std::string &path_or_url)
   }
 }
 
-lay::Plugin *LayoutView::create_plugin (lay::PluginRoot *root, const lay::PluginDeclaration *cls)
+lay::Plugin *LayoutView::create_plugin (const lay::PluginDeclaration *cls)
 {
-  lay::Plugin *p = cls->create_plugin (manager (), root, this);
+  lay::Plugin *p = cls->create_plugin (manager (), dispatcher (), this);
   if (p) {
 
     //  unhook the plugin from the script side if created there (prevent GC from destroying it)
@@ -881,7 +824,7 @@ lay::Plugin *LayoutView::create_plugin (lay::PluginRoot *root, const lay::Plugin
   return p;
 }
 
-void LayoutView::create_plugins (lay::PluginRoot *root, const lay::PluginDeclaration *except_this)
+void LayoutView::create_plugins (const lay::PluginDeclaration *except_this)
 {
   for (std::vector<lay::Plugin *>::iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
     delete *p;
@@ -896,13 +839,13 @@ void LayoutView::create_plugins (lay::PluginRoot *root, const lay::PluginDeclara
       //  TODO: clean solution. The following is a HACK:
       if (cls.current_name () == "ant::Plugin" || cls.current_name () == "img::Plugin") {
         //  ant and img are created always
-        create_plugin (root, &*cls);
+        create_plugin (&*cls);
       } else if ((m_options & LV_NoPlugins) == 0) {
         //  others: only create unless LV_NoPlugins is set
-        create_plugin (root, &*cls);
+        create_plugin (&*cls);
       } else if ((m_options & LV_NoGrid) == 0 && cls.current_name () == "GridNetPlugin") {
         //  except grid net plugin which is created on request
-        create_plugin (root, &*cls);
+        create_plugin (&*cls);
       }
 
     }
@@ -930,15 +873,6 @@ Plugin *LayoutView::get_plugin_by_name (const std::string &name) const
   }
 
   return 0;
-}
-
-void 
-LayoutView::init_menu (lay::AbstractMenu &menu)
-{
-  lay::LayerControlPanel::init_menu (menu);
-  lay::HierarchyControlPanel::init_menu (menu);
-  lay::LibrariesView::init_menu (menu);
-  lay::BookmarksView::init_menu (menu);
 }
 
 void
@@ -1045,6 +979,8 @@ LayoutView::reset_title ()
 bool 
 LayoutView::configure (const std::string &name, const std::string &value)
 {
+  lay::Dispatcher::configure (name, value);
+
   if (mp_move_service && mp_move_service->configure (name, value)) {
     return true;
   }
@@ -4773,7 +4709,7 @@ LayoutView::active_library_changed (int /*index*/)
 
   //  commit the new active library to the other views and persist this state
   //  TODO: could be passed through the LibraryController (like through some LibraryController::active_library)
-  plugin_root ()->config_set (cfg_current_lib_view, lib_name);
+  dispatcher ()->config_set (cfg_current_lib_view, lib_name);
 }
 
 void
@@ -6540,25 +6476,461 @@ LayoutView::intrinsic_mouse_modes (std::vector<std::string> *descriptions)
 AbstractMenu *
 LayoutView::menu ()
 {
-  if (lay::AbstractMenuProvider::instance () && lay::AbstractMenuProvider::instance ()->menu ()) {
-    return lay::AbstractMenuProvider::instance ()->menu ();
-  } else {
-    return &m_menu;
-  }
+  //  NOTE: dispatcher is either this or the real end of the chain
+  return dispatcher ()->menu ();
 }
 
-int 
+int
 LayoutView::default_mode ()
 {
   return 0; // TODO: any generic scheme? is select, should be ruler..
 }
 
-void 
+void
+LayoutView::do_cm_duplicate (bool interactive)
+{
+  //  Do duplicate simply by concatenating copy & paste currently.
+  //  Save the clipboard state before in order to preserve the current content
+  db::Clipboard saved_clipboard;
+  db::Clipboard::instance ().swap (saved_clipboard);
+
+  try {
+    copy ();
+    clear_selection ();
+    cancel ();
+    if (interactive) {
+      paste_interactive ();
+    } else {
+      paste ();
+    }
+    db::Clipboard::instance ().swap (saved_clipboard);
+  } catch (...) {
+    db::Clipboard::instance ().swap (saved_clipboard);
+    throw;
+  }
+}
+
+void
+LayoutView::do_cm_paste (bool interactive)
+{
+  if (! db::Clipboard::instance ().empty ()) {
+    cancel ();
+    clear_selection ();
+    if (interactive) {
+      paste_interactive ();
+    } else {
+      paste ();
+    }
+  }
+}
+
+void
+LayoutView::cm_new_cell ()
+{
+  static double s_new_cell_window_size = 2.0;
+  static std::string s_new_cell_cell_name;
+
+  NewCellPropertiesDialog cell_prop_dia (this);
+  if (cell_prop_dia.exec_dialog (& cellview (active_cellview_index ())->layout (), s_new_cell_cell_name, s_new_cell_window_size)) {
+
+    db::cell_index_type new_ci = new_cell (active_cellview_index (), s_new_cell_cell_name.c_str ());
+    select_cell (new_ci, active_cellview_index ());
+
+    db::DBox zb = db::DBox (-0.5 * s_new_cell_window_size, -0.5 * s_new_cell_window_size, 0.5 * s_new_cell_window_size, 0.5 * s_new_cell_window_size);
+    if (get_max_hier_levels () < 1 || get_min_hier_levels () > 0) {
+      zoom_box_and_set_hier_levels (zb, std::make_pair (0, 1));
+    } else {
+      zoom_box (zb);
+    }
+
+  }
+}
+
+//  TODO: this constant is defined in MainWindow.cc too ...
+const int max_dirty_files = 15;
+
+void
+LayoutView::cm_reload ()
+{
+  std::vector <int> selected;
+
+  if (cellviews () > 1) {
+
+    SelectCellViewForm form (0, this, tl::to_string (QObject::tr ("Select Layouts To Reload")));
+    form.select_all ();
+
+    if (form.exec () == QDialog::Accepted) {
+      selected = form.selected_cellviews ();
+    }
+
+  } else if (cellviews () > 0) {
+    selected.push_back (0);
+  }
+
+  if (selected.size () > 0) {
+
+    int dirty_layouts = 0;
+    std::string dirty_files;
+
+    for (std::vector <int>::const_iterator i = selected.begin (); i != selected.end (); ++i) {
+
+      const lay::CellView &cv = cellview (*i);
+
+      if (cv->layout ().is_editable () && cv->is_dirty ()) {
+        ++dirty_layouts;
+        if (dirty_layouts == max_dirty_files) {
+          dirty_files += "\n...";
+        } else if (dirty_layouts < max_dirty_files) {
+          if (! dirty_files.empty ()) {
+            dirty_files += "\n";
+          }
+          dirty_files += cv->name ();
+        }
+      }
+
+    }
+
+    bool can_reload = true;
+    if (dirty_layouts != 0) {
+
+      QMessageBox mbox (this);
+      mbox.setText (tl::to_qstring (tl::to_string (QObject::tr ("The following layouts need saving:\n\n")) + dirty_files + "\n\nPress 'Reload Without Saving' to reload anyhow and discard changes."));
+      mbox.setWindowTitle (QObject::tr ("Save Needed"));
+      mbox.setIcon (QMessageBox::Warning);
+      QAbstractButton *yes_button = mbox.addButton (QObject::tr ("Reload Without Saving"), QMessageBox::YesRole);
+      mbox.addButton (QMessageBox::Cancel);
+
+      mbox.exec ();
+
+      can_reload = (mbox.clickedButton() == yes_button);
+
+    }
+
+    if (can_reload) {
+
+      //  Actually reload
+      for (std::vector <int>::const_iterator i = selected.begin (); i != selected.end (); ++i) {
+        reload_layout (*i);
+      }
+
+    }
+
+  }
+}
+
+std::vector<std::string>
+LayoutView::menu_symbols ()
+{
+  //  TODO: currently these are all symbols from all plugins
+  return lay::PluginDeclaration::menu_symbols ();
+}
+
+void
 LayoutView::menu_activated (const std::string &symbol)
 {
-  //  distribute the menu on the plugins - one should take it.
-  for (std::vector<lay::Plugin *>::iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
-    (*p)->menu_activated (symbol);
+  if (symbol == "cm_show_properties") {
+    show_properties (this);
+  } else if (symbol == "cm_delete") {
+
+    del ();
+    //  because a "delete" might involve objects currently edited, we cancel the edit after we have deleted the object
+    cancel ();
+    clear_selection ();
+
+  } else if (symbol == "cm_unselect_all") {
+    select (db::DBox (), lay::Editable::Reset);
+  } else if (symbol == "cm_select_all") {
+    select (full_box (), lay::Editable::Replace);
+  } else if (symbol == "cm_lv_paste") {
+    cm_layer_paste ();
+  } else if (symbol == "cm_lv_cut") {
+    cm_layer_cut ();
+  } else if (symbol == "cm_lv_copy") {
+    cm_layer_copy ();
+  } else if (symbol == "cm_cell_paste") {
+    cm_cell_paste ();
+  } else if (symbol == "cm_cell_cut") {
+    cm_cell_cut ();
+  } else if (symbol == "cm_cell_copy") {
+    cm_cell_copy ();
+  } else if (symbol == "cm_duplicate") {
+    do_cm_duplicate (false);
+  } else if (symbol == "cm_duplicate_interactive") {
+    do_cm_duplicate (true);
+  } else if (symbol == "cm_copy") {
+
+    copy ();
+    clear_selection ();
+
+  } else if (symbol == "cm_paste") {
+    do_cm_paste (true);
+  } else if (symbol == "cm_paste_interactive") {
+    do_cm_paste (true);
+  } else if (symbol == "cm_cut") {
+
+    cut ();
+    cancel (); //  see del() for reason why cancel is after cut
+    clear_selection ();
+
+  } else if (symbol == "cm_zoom_fit_sel") {
+    zoom_fit_sel ();
+  } else if (symbol == "cm_zoom_fit") {
+    zoom_fit ();
+  } else if (symbol == "cm_pan_left") {
+    pan_left ();
+  } else if (symbol == "cm_pan_right") {
+    pan_right ();
+  } else if (symbol == "cm_pan_up") {
+    pan_up ();
+  } else if (symbol == "cm_pan_down") {
+    pan_down ();
+  } else if (symbol == "cm_zoom_in") {
+    zoom_in ();
+  } else if (symbol == "cm_zoom_out") {
+    zoom_out ();
+  } else if (symbol == "cm_select_current_cell") {
+
+    if (active_cellview_index () >= 0) {
+      lay::LayoutView::cell_path_type path;
+      int cvi = active_cellview_index ();
+      current_cell_path (path);
+      select_cell_fit (path, cvi);
+    }
+
+  } else if (symbol == "cm_open_current_cell") {
+
+    if (active_cellview_index () >= 0) {
+      cm_open_current_cell ();
+    }
+
+  } else if (symbol == "cm_select_cell") {
+
+    if (active_cellview_index () >= 0) {
+
+      CellSelectionForm form (0, this, "cell_selection_form");
+
+      if (form.exec () == QDialog::Accepted &&
+          form.selected_cellview_index () >= 0) {
+        select_cell (form.selected_cellview ().combined_unspecific_path (), form.selected_cellview_index ());
+        set_current_cell_path (form.selected_cellview_index (), form.selected_cellview ().combined_unspecific_path ());
+        zoom_fit ();
+      }
+
+    }
+
+  } else if (symbol == "cm_new_cell") {
+    cm_new_cell ();
+  } else if (symbol == "cm_adjust_origin") {
+    if (active_cellview_index () >= 0) {
+      cm_align_cell_origin ();
+    }
+  } else if (symbol == "cm_cell_convert_to_static") {
+    if (active_cellview_index () >= 0) {
+      cm_cell_convert_to_static ();
+    }
+  } else if (symbol == "cm_lay_convert_to_static") {
+    if (active_cellview_index () >= 0) {
+      cm_lay_convert_to_static ();
+    }
+  } else if (symbol == "cm_lay_move") {
+    if (active_cellview_index () >= 0) {
+      cm_lay_move ();
+    }
+  } else if (symbol == "cm_lay_scale") {
+    if (active_cellview_index () >= 0) {
+      cm_lay_scale ();
+    }
+  } else if (symbol == "cm_lay_free_rot") {
+    if (active_cellview_index () >= 0) {
+      cm_lay_free_rot ();
+    }
+  } else if (symbol == "cm_lay_rot_ccw") {
+    if (active_cellview_index () >= 0) {
+      cm_lay_rot_ccw ();
+    }
+  } else if (symbol == "cm_lay_rot_cw") {
+    if (active_cellview_index () >= 0) {
+      cm_lay_rot_cw ();
+    }
+  } else if (symbol == "cm_lay_flip_y") {
+    if (active_cellview_index () >= 0) {
+      cm_lay_flip_y ();
+    }
+  } else if (symbol == "cm_lay_flip_x") {
+    if (active_cellview_index () >= 0) {
+      cm_lay_flip_x ();
+    }
+  } else if (symbol == "cm_sel_move") {
+    if (active_cellview_index () >= 0) {
+      cm_sel_move ();
+    }
+  } else if (symbol == "cm_sel_move_to") {
+    if (active_cellview_index () >= 0) {
+      cm_sel_move_to ();
+    }
+  } else if (symbol == "cm_sel_move_interactive") {
+    if (active_cellview_index () >= 0) {
+      cm_sel_move_interactive ();
+    }
+  } else if (symbol == "cm_sel_scale") {
+    if (active_cellview_index () >= 0) {
+      cm_sel_scale ();
+    }
+  } else if (symbol == "cm_sel_free_rot") {
+    if (active_cellview_index () >= 0) {
+      cm_sel_free_rot ();
+    }
+  } else if (symbol == "cm_sel_rot_ccw") {
+    if (active_cellview_index () >= 0) {
+      cm_sel_rot_ccw ();
+    }
+  } else if (symbol == "cm_sel_rot_cw") {
+    if (active_cellview_index () >= 0) {
+      cm_sel_rot_cw ();
+    }
+  } else if (symbol == "cm_sel_flip_y") {
+    if (active_cellview_index () >= 0) {
+      cm_sel_flip_y ();
+    }
+  } else if (symbol == "cm_sel_flip_x") {
+    if (active_cellview_index () >= 0) {
+      cm_sel_flip_x ();
+    }
+  } else if (symbol == "cm_edit_layer") {
+    if (active_cellview_index () >= 0) {
+      cm_edit_layer ();
+    }
+  } else if (symbol == "cm_delete_layer") {
+    if (active_cellview_index () >= 0) {
+      cm_edit_layer ();
+    }
+  } else if (symbol == "cm_clear_layer") {
+    if (active_cellview_index () >= 0) {
+      cm_clear_layer ();
+    }
+  } else if (symbol == "cm_copy_layer") {
+    if (active_cellview_index () >= 0) {
+      cm_copy_layer ();
+    }
+  } else if (symbol == "cm_new_layer") {
+    if (active_cellview_index () >= 0) {
+      cm_new_layer ();
+    }
+  } else if (symbol == "cm_layout_props") {
+    LayoutPropertiesForm lp_form (this, this, "layout_props_form");
+    lp_form.exec ();
+  } else if (symbol == "cm_layout_stats") {
+    LayoutStatisticsForm lp_form (this, this, "layout_props_form");
+    lp_form.exec ();
+  } else if (symbol == "cm_reload") {
+    cm_reload ();
+  } else if (symbol == "cm_inc_max_hier") {
+    int new_to = get_max_hier_levels () + 1;
+    set_hier_levels (std::make_pair (get_min_hier_levels (), new_to));
+  } else if (symbol == "cm_dec_max_hier") {
+    int new_to = get_max_hier_levels () > 0 ? get_max_hier_levels () - 1 : 0;
+    set_hier_levels (std::make_pair (std::min (get_min_hier_levels (), new_to), new_to));
+  } else if (symbol == "cm_max_hier") {
+    max_hier ();
+  } else if (symbol == "cm_max_hier_0") {
+    set_hier_levels (std::make_pair (std::min (get_min_hier_levels (), 0), 0));
+  } else if (symbol == "cm_max_hier_1") {
+    set_hier_levels (std::make_pair (std::min (get_min_hier_levels (), 0), 1));
+  } else if (symbol == "cm_prev_display_state") {
+    if (has_prev_display_state ()) {
+      prev_display_state ();
+    }
+  } else if (symbol == "cm_next_display_state") {
+    if (has_next_display_state ()) {
+      next_display_state ();
+    }
+  } else if (symbol == "cm_redraw") {
+    redraw ();
+  } else if (symbol == "cm_cell_delete") {
+    cm_cell_delete ();
+  } else if (symbol == "cm_cell_replace") {
+    cm_cell_replace ();
+  } else if (symbol == "cm_cell_rename") {
+    cm_cell_rename ();
+  } else if (symbol == "cm_cell_flatten") {
+    cm_cell_flatten ();
+  } else if (symbol == "cm_cell_select") {
+    cm_cell_select ();
+  } else if (symbol == "cm_cell_hide") {
+    cm_cell_hide ();
+  } else if (symbol == "cm_cell_show") {
+    cm_cell_show ();
+  } else if (symbol == "cm_cell_show_all") {
+    cm_cell_show_all ();
+  } else if (symbol == "cm_cell_user_properties") {
+    if (active_cellview_index () >= 0) {
+      cm_cell_user_properties ();
+    }
+  } else if (symbol == "cm_lv_select_all") {
+    cm_select_all ();
+  } else if (symbol == "cm_lv_new_tab") {
+    cm_new_tab ();
+  } else if (symbol == "cm_lv_rename_tab") {
+    cm_rename_tab ();
+  } else if (symbol == "cm_lv_make_invalid") {
+    cm_make_invalid ();
+  } else if (symbol == "cm_lv_remove_tab") {
+    cm_remove_tab ();
+  } else if (symbol == "cm_lv_make_valid") {
+    cm_make_valid ();
+  } else if (symbol == "cm_lv_hide_all") {
+    cm_hide_all ();
+  } else if (symbol == "cm_lv_hide") {
+    cm_hide ();
+  } else if (symbol == "cm_lv_show_only") {
+    cm_show_only ();
+  } else if (symbol == "cm_lv_show_all") {
+    cm_show_all ();
+  } else if (symbol == "cm_lv_show") {
+    cm_show ();
+  } else if (symbol == "cm_lv_rename") {
+    cm_rename ();
+  } else if (symbol == "cm_lv_delete") {
+    cm_delete ();
+  } else if (symbol == "cm_lv_insert") {
+    cm_insert ();
+  } else if (symbol == "cm_lv_group") {
+    cm_group ();
+  } else if (symbol == "cm_lv_ungroup") {
+    cm_ungroup ();
+  } else if (symbol == "cm_lv_source") {
+    cm_source ();
+  } else if (symbol == "cm_lv_sort_by_name") {
+    cm_sort_by_name ();
+  } else if (symbol == "cm_lv_sort_by_ild") {
+    cm_sort_by_ild ();
+  } else if (symbol == "cm_lv_sort_by_idl") {
+    cm_sort_by_idl ();
+  } else if (symbol == "cm_lv_sort_by_ldi") {
+    cm_sort_by_ldi ();
+  } else if (symbol == "cm_lv_sort_by_dli") {
+    cm_sort_by_dli ();
+  } else if (symbol == "cm_lv_regroup_by_index") {
+    cm_regroup_by_index ();
+  } else if (symbol == "cm_lv_regroup_by_datatype") {
+    cm_regroup_by_datatype ();
+  } else if (symbol == "cm_lv_regroup_by_layer") {
+    cm_regroup_by_layer ();
+  } else if (symbol == "cm_lv_regroup_flatten") {
+    cm_regroup_flatten ();
+  } else if (symbol == "cm_lv_expand_all") {
+    cm_expand_all ();
+  } else if (symbol == "cm_lv_add_missing") {
+    cm_add_missing ();
+  } else if (symbol == "cm_lv_remove_unused") {
+    cm_remove_unused ();
+  } else {
+
+    //  distribute the menu on the plugins - one should take it.
+    for (std::vector<lay::Plugin *>::iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
+      (*p)->menu_activated (symbol);
+    }
+
   }
 }
 
@@ -7596,5 +7968,186 @@ LayoutView::sizeHint () const
   }
 }
 
-} // namespace lay
+// ------------------------------------------------------------
+//  Declaration of the "plugin" for the menu entries
 
+class LayoutViewPluginDeclaration
+  : public lay::PluginDeclaration
+{
+public:
+  virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
+  {
+    std::string at;
+
+    //  secret menu entries
+    at = "@secrets.end";
+    menu_entries.push_back (lay::menu_item ("cm_paste_interactive", "paste_interactive:edit", at, tl::to_string (QObject::tr ("Paste Interactive"))));
+    menu_entries.push_back (lay::menu_item ("cm_duplicate_interactive", "duplicate_interactive:edit", at, tl::to_string (QObject::tr ("Duplicate Interactive"))));
+    menu_entries.push_back (lay::menu_item ("cm_sel_move_interactive", "sel_move_interactive:edit", at, tl::to_string (QObject::tr ("Move Interactive"))));
+
+    at = "edit_menu.end";
+    menu_entries.push_back (lay::separator ("edit_select_individual_group", at));
+
+    menu_entries.push_back (lay::separator ("basic_group", at));
+    menu_entries.push_back (lay::submenu ("layout_menu:edit:edit_mode", at, tl::to_string (QObject::tr ("Layout"))));
+    {
+      std::string at = "edit_menu.layout_menu.end";
+      menu_entries.push_back (lay::menu_item ("cm_lay_flip_x", "lay_flip_x:edit_mode", at, tl::to_string (QObject::tr ("Flip Horizontally"))));
+      menu_entries.push_back (lay::menu_item ("cm_lay_flip_y", "lay_flip_y:edit_mode", at, tl::to_string (QObject::tr ("Flip Vertically"))));
+      menu_entries.push_back (lay::menu_item ("cm_lay_rot_cw", "lay_rot_cw:edit_mode", at, tl::to_string (QObject::tr ("Rotate Clockwise"))));
+      menu_entries.push_back (lay::menu_item ("cm_lay_rot_ccw", "lay_rot_ccw:edit_mode", at, tl::to_string (QObject::tr ("Rotate Counterclockwise"))));
+      menu_entries.push_back (lay::menu_item ("cm_lay_free_rot", "lay_free_rot:edit_mode", at, tl::to_string (QObject::tr ("Rotation By Angle"))));
+      menu_entries.push_back (lay::menu_item ("cm_lay_scale", "lay_scale:edit_mode", at, tl::to_string (QObject::tr ("Scale"))));
+      menu_entries.push_back (lay::menu_item ("cm_lay_move", "lay_move:edit_mode", at, tl::to_string (QObject::tr ("Move By"))));
+      menu_entries.push_back (lay::separator ("cellop_group", at));
+      menu_entries.push_back (lay::menu_item ("cm_lay_convert_to_static", "lay_convert_to_static:edit_mode", at, tl::to_string (QObject::tr ("Convert All Cells To Static"))));
+    }
+
+    menu_entries.push_back (lay::submenu ("cell_menu:edit:edit_mode", at, tl::to_string (QObject::tr ("Cell"))));
+    {
+      std::string at = "edit_menu.cell_menu.end";
+      menu_entries.push_back (lay::menu_item ("cm_new_cell", "new_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("New Cell"))));
+      menu_entries.push_back (lay::menu_item ("cm_cell_delete", "delete_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Delete Cell"))));
+      menu_entries.push_back (lay::menu_item ("cm_cell_rename", "rename_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Rename Cell"))));
+      menu_entries.push_back (lay::menu_item ("cm_cell_replace", "replace_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Replace Cell"))));
+      menu_entries.push_back (lay::menu_item ("cm_cell_flatten", "flatten_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Flatten Cell"))));
+      menu_entries.push_back (lay::separator ("ops_group", at));
+      menu_entries.push_back (lay::menu_item ("cm_adjust_origin", "adjust_cell_origin:edit:edit_mode", at, tl::to_string (QObject::tr ("Adjust Origin"))));
+      menu_entries.push_back (lay::menu_item ("cm_cell_convert_to_static", "convert_cell_to_static:edit_mode", at, tl::to_string (QObject::tr ("Convert Cell To Static"))));
+      menu_entries.push_back (lay::separator ("props_group", at));
+      menu_entries.push_back (lay::menu_item ("cm_cell_user_properties", "user_properties", at, tl::to_string (QObject::tr ("User Properties"))));
+    }
+
+    menu_entries.push_back (lay::submenu ("layer_menu:edit:edit_mode", at, tl::to_string (QObject::tr ("Layer"))));
+    {
+      std::string at = "edit_menu.layer_menu.end";
+      menu_entries.push_back (lay::menu_item ("cm_new_layer", "new_layer:edit:edit_mode", at, tl::to_string (QObject::tr ("New Layer"))));
+      menu_entries.push_back (lay::menu_item ("cm_clear_layer", "clear_layer:edit:edit_mode", at, tl::to_string (QObject::tr ("Clear Layer"))));
+      menu_entries.push_back (lay::menu_item ("cm_delete_layer", "delete_layer:edit:edit_mode", at, tl::to_string (QObject::tr ("Delete Layer"))));
+      menu_entries.push_back (lay::menu_item ("cm_copy_layer", "copy_layer:edit:edit_mode", at, tl::to_string (QObject::tr ("Copy Layer"))));
+      menu_entries.push_back (lay::menu_item ("cm_edit_layer", "edit_layer:edit:edit_mode", at, tl::to_string (QObject::tr ("Edit Layer Specification"))));
+    }
+
+    menu_entries.push_back (lay::submenu ("selection_menu:edit", at, tl::to_string (QObject::tr ("Selection"))));
+    {
+      std::string at = "edit_menu.selection_menu.end";
+      menu_entries.push_back (lay::menu_item ("cm_sel_flip_x", "sel_flip_x", at, tl::to_string (QObject::tr ("Flip Horizontally"))));
+      menu_entries.push_back (lay::menu_item ("cm_sel_flip_y", "sel_flip_y", at, tl::to_string (QObject::tr ("Flip Vertically"))));
+      menu_entries.push_back (lay::menu_item ("cm_sel_rot_cw", "sel_rot_cw", at, tl::to_string (QObject::tr ("Rotate Clockwise"))));
+      menu_entries.push_back (lay::menu_item ("cm_sel_rot_ccw", "sel_rot_ccw", at, tl::to_string (QObject::tr ("Rotate Counterclockwise"))));
+      menu_entries.push_back (lay::menu_item ("cm_sel_free_rot", "sel_free_rot", at, tl::to_string (QObject::tr ("Rotation By Angle"))));
+      menu_entries.push_back (lay::menu_item ("cm_sel_scale", "sel_scale", at, tl::to_string (QObject::tr ("Scale"))));
+      menu_entries.push_back (lay::menu_item ("cm_sel_move", "sel_move", at, tl::to_string (QObject::tr ("Move By"))));
+      menu_entries.push_back (lay::menu_item ("cm_sel_move_to", "sel_move_to", at, tl::to_string (QObject::tr ("Move To"))));
+    }
+
+    menu_entries.push_back (lay::separator ("edit_select_individual_group", at));
+
+    menu_entries.push_back (lay::separator ("utils_group", at));
+    menu_entries.push_back (lay::submenu ("utils_menu:edit:edit_mode", at, tl::to_string (QObject::tr ("Utilities"))));
+
+    menu_entries.push_back (lay::separator ("edit_select_individual_group", at));
+
+    menu_entries.push_back (lay::separator ("misc_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_delete", "delete:edit", at, tl::to_string (QObject::tr ("Delete(Del)"))));
+    menu_entries.push_back (lay::menu_item ("cm_show_properties", "show_properties:edit", at, tl::to_string (QObject::tr ("Properties(Q)"))));
+    menu_entries.push_back (lay::separator ("edit_select_individual_group", at));
+
+    menu_entries.push_back (lay::separator ("cpc_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_copy", "copy:edit", at, tl::to_string (QObject::tr ("Copy(Ctrl+C)"))));
+    menu_entries.push_back (lay::menu_item ("cm_cut", "cut:edit", at, tl::to_string (QObject::tr ("Cut(Ctrl+X)"))));
+    menu_entries.push_back (lay::menu_item ("cm_paste", "paste:edit", at, tl::to_string (QObject::tr ("Paste(Ctrl+V)"))));
+    menu_entries.push_back (lay::menu_item ("cm_duplicate", "duplicate:edit", at, tl::to_string (QObject::tr ("Duplicate(Ctrl+B)"))));
+
+    menu_entries.push_back (lay::separator ("modes_group", at));
+    menu_entries.push_back (lay::submenu ("mode_menu", at, tl::to_string (QObject::tr ("Mode"))));
+
+    menu_entries.push_back (lay::submenu ("select_menu", at, tl::to_string (QObject::tr ("Select"))));
+    {
+      std::string at = "edit_menu.select_menu.end";
+      menu_entries.push_back (lay::menu_item ("cm_select_all", "select_all", at, tl::to_string (QObject::tr ("Select All"))));
+      menu_entries.push_back (lay::menu_item ("cm_unselect_all", "unselect_all", at, tl::to_string (QObject::tr ("Unselect All"))));
+      menu_entries.push_back (lay::separator ("edit_select_basic_group", at));
+      menu_entries.push_back (lay::menu_item ("enable_all", "enable_all", at, tl::to_string (QObject::tr ("Enable All"))));
+      menu_entries.push_back (lay::menu_item ("disable_all", "disable_all", at, tl::to_string (QObject::tr ("Disable All"))));
+      menu_entries.push_back (lay::separator ("edit_select_individual_group", at));
+    };
+
+    menu_entries.push_back (lay::separator ("cancel_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_cancel", "cancel", at, tl::to_string (QObject::tr ("Cancel(Esc)"))));
+
+    at = "bookmark_menu.end";
+    menu_entries.push_back (lay::submenu ("goto_bookmark_menu", at, tl::to_string (QObject::tr ("Goto Bookmark"))));
+    menu_entries.push_back (lay::menu_item ("cm_bookmark_view", "bookmark_view", at, tl::to_string (QObject::tr ("Bookmark This View"))));
+
+    menu_entries.push_back (lay::separator ("bookmark_mgm_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_manage_bookmarks", "manage_bookmarks", at, tl::to_string (QObject::tr ("Manage Bookmarks"))));
+    menu_entries.push_back (lay::menu_item ("cm_load_bookmarks", "load_bookmarks", at, tl::to_string (QObject::tr ("Load Bookmarks"))));
+    menu_entries.push_back (lay::menu_item ("cm_save_bookmarks", "save_bookmarks", at, tl::to_string (QObject::tr ("Save Bookmarks"))));
+
+    at = "zoom_menu.end";
+    menu_entries.push_back (lay::submenu ("global_trans", at, tl::to_string (QObject::tr ("Global Transformation"))));
+    {
+      std::string at = "zoom_menu.global_trans.end";
+      menu_entries.push_back (lay::config_menu_item ("r0", at, tl::to_string (QObject::tr ("\\(r0\\)<:/r0.png>")), cfg_global_trans, "?r0 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("r90", at, tl::to_string (QObject::tr ("\\(r90\\)<:/r90.png>")), cfg_global_trans, "?r90 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("r180", at, tl::to_string (QObject::tr ("\\(r180\\)<:/r180.png>")), cfg_global_trans, "?r180 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("r270", at, tl::to_string (QObject::tr ("\\(r270\\)<:/r270.png>")), cfg_global_trans, "?r270 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("m0", at, tl::to_string (QObject::tr ("\\(m0\\)<:/m0.png>")), cfg_global_trans, "?m0 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("m45", at, tl::to_string (QObject::tr ("\\(m45\\)<:/m45.png>")), cfg_global_trans, "?m45 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("m90", at, tl::to_string (QObject::tr ("\\(m90\\)<:/m90.png>")), cfg_global_trans, "?m90 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("m135", at, tl::to_string (QObject::tr ("\\(m135\\)<:/m135.png>")), cfg_global_trans, "?m135 *1 0,0"));
+    }
+
+    menu_entries.push_back (lay::separator ("hier_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_max_hier", "max_hier", at, tl::to_string (QObject::tr ("Full Hierarchy(*)"))));
+    menu_entries.push_back (lay::menu_item ("cm_max_hier_0", "max_hier_0", at, tl::to_string (QObject::tr ("Box Only(0)"))));
+    menu_entries.push_back (lay::menu_item ("cm_max_hier_1", "max_hier_1", at, tl::to_string (QObject::tr ("Top Level Only(1)"))));
+    menu_entries.push_back (lay::menu_item ("cm_inc_max_hier", "inc_max_hier", at, tl::to_string (QObject::tr ("Increment Hierarchy(+)"))));
+    menu_entries.push_back (lay::menu_item ("cm_dec_max_hier", "dec_max_hier", at, tl::to_string (QObject::tr ("Decrement Hierarchy(-)"))));
+
+    menu_entries.push_back (lay::separator ("zoom_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_zoom_fit", "zoom_fit", at, tl::to_string (QObject::tr ("Zoom Fit(F2)"))));
+    menu_entries.push_back (lay::menu_item ("cm_zoom_fit_sel", "zoom_fit_sel", at, tl::to_string (QObject::tr ("Zoom Fit Selection(Shift+F2)"))));
+    menu_entries.push_back (lay::menu_item ("cm_zoom_in", "zoom_in", at, tl::to_string (QObject::tr ("Zoom In(Return)"))));
+    menu_entries.push_back (lay::menu_item ("cm_zoom_out", "zoom_out", at, tl::to_string (QObject::tr ("Zoom Out(Shift+Return)"))));
+    /* disabled because that interferes with the use of the arrow keys for moving the selection
+    MenuLayoutEntry::separator ("pan_group");
+    menu_entries.push_back (lay::menu_item ("cm_pan_up", "pan_up", at, tl::to_string (QObject::tr ("Pan Up(Up)"))));
+    menu_entries.push_back (lay::menu_item ("cm_pan_down", "pan_down", at, tl::to_string (QObject::tr ("Pan Down(Down)"))));
+    menu_entries.push_back (lay::menu_item ("cm_pan_left", "pan_left", at, tl::to_string (QObject::tr ("Pan Left(Left)"))));
+    menu_entries.push_back (lay::menu_item ("cm_pan_right", "pan_right", at, tl::to_string (QObject::tr ("Pan Right(Right)"))));
+    */
+
+    menu_entries.push_back (lay::separator ("redraw_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_redraw", "redraw", at, tl::to_string (QObject::tr ("Redraw"))));
+    menu_entries.push_back (lay::separator ("state_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_prev_display_state", "prev_display_state", at, tl::to_string (QObject::tr ("Back(Shift+Tab)<:/back.png>"))));
+    menu_entries.push_back (lay::menu_item ("cm_next_display_state", "next_display_state", at, tl::to_string (QObject::tr ("Forward(Tab)<:/forward.png>"))));
+
+    menu_entries.push_back (lay::separator ("select_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_select_cell", "select_cell:edit", at, tl::to_string (QObject::tr ("Select Cell"))));
+    menu_entries.push_back (lay::menu_item ("cm_select_current_cell", "select_current_cell", at, tl::to_string (QObject::tr ("Show As New Top(Ctrl+S)"))));
+    menu_entries.push_back (lay::menu_item ("cm_goto_position", "goto_position", at, tl::to_string (QObject::tr ("Goto Position(Ctrl+G)"))));
+
+    //  Add a hook for inserting new items after the modes
+    menu_entries.push_back (lay::separator ("end_modes", "@toolbar.end"));
+
+  }
+
+  void implements_primary_mouse_modes (std::vector<std::pair<std::string, std::pair<std::string, int> > > &modes)
+  {
+    std::vector <std::string> mode_titles;
+    lay::LayoutView::intrinsic_mouse_modes (&mode_titles);
+
+    int mode_id = 0;
+    for (std::vector <std::string>::const_iterator t = mode_titles.begin (); t != mode_titles.end (); ++t, --mode_id) {
+      //  modes: pair(title, pair(insert_pos, id))
+      modes.push_back (std::make_pair (*t, std::make_pair ("edit_menu.mode_menu.end;@toolbar.end_modes", mode_id)));
+    }
+  }
+};
+
+static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new LayoutViewPluginDeclaration (), -10, "LayoutViewPlugin");
+
+} // namespace lay

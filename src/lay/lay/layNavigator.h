@@ -84,8 +84,6 @@ public:
   void all_hier_levels (bool f);
   void show_images (bool f);
 
-  static void init_menu (AbstractMenu &menu);
-
 protected:
   virtual void closeEvent (QCloseEvent *event);
   virtual void showEvent (QShowEvent *event);

@@ -194,52 +194,6 @@ HCPCellTreeWidget::mouseReleaseEvent (QMouseEvent *event)
 
 const int max_cellviews_in_split_mode = 5;
 
-void 
-HierarchyControlPanel::init_menu (lay::AbstractMenu &menu)
-{
-  MenuLayoutEntry sorting_menu [] = {
-    MenuLayoutEntry ("by_name",                     tl::to_string (QObject::tr ("By Name")),                std::make_pair (cfg_cell_list_sorting, "?by-name")),
-    MenuLayoutEntry ("by_area",                     tl::to_string (QObject::tr ("By Area - Small To Large")),  std::make_pair (cfg_cell_list_sorting, "?by-area")),
-    MenuLayoutEntry ("by_area",                     tl::to_string (QObject::tr ("By Area - Large To Small")),  std::make_pair (cfg_cell_list_sorting, "?by-area-reverse")),
-    MenuLayoutEntry::last ()
-  };
-
-  MenuLayoutEntry context_menu [] = {
-    MenuLayoutEntry ("flat_mode",                   tl::to_string (QObject::tr ("Flat Cell List")),         std::make_pair (cfg_flat_cell_list, "?")),
-    MenuLayoutEntry ("split_mode",                  tl::to_string (QObject::tr ("Split Mode")),             std::make_pair (cfg_split_cell_list, "?")),
-    MenuLayoutEntry ("sorting",                     tl::to_string (QObject::tr ("Sorting")),                sorting_menu),
-    MenuLayoutEntry::separator ("operations_group"),
-    MenuLayoutEntry ("new_cell:edit:edit_mode",     tl::to_string (QObject::tr ("New Cell")),               SLOT (cm_new_cell ())),
-    MenuLayoutEntry ("delete_cell:edit:edit_mode",  tl::to_string (QObject::tr ("Delete Cell")),            SLOT (cm_cell_delete ())),
-    MenuLayoutEntry ("rename_cell:edit:edit_mode",  tl::to_string (QObject::tr ("Rename Cell")),            SLOT (cm_cell_rename ())),
-    MenuLayoutEntry ("replace_cell:edit:edit_mode", tl::to_string (QObject::tr ("Replace Cell")),           SLOT (cm_cell_replace ())),
-    MenuLayoutEntry ("flatten_cell:edit:edit_mode", tl::to_string (QObject::tr ("Flatten Cell")),           SLOT (cm_cell_flatten ())),
-    MenuLayoutEntry ("cell_user_properties",        tl::to_string (QObject::tr ("User Properties")),        SLOT (cm_cell_user_properties ())),
-    MenuLayoutEntry::separator ("clipboard_group:edit_mode"),
-    MenuLayoutEntry ("copy:edit_mode",              tl::to_string (QObject::tr ("Copy")),                   SLOT (cm_cell_copy ())),
-    MenuLayoutEntry ("cut:edit_mode",               tl::to_string (QObject::tr ("Cut")),                    SLOT (cm_cell_cut ())),
-    MenuLayoutEntry ("paste:edit_mode",             tl::to_string (QObject::tr ("Paste")),                  SLOT (cm_cell_paste ())),
-    MenuLayoutEntry::separator ("select_group"),
-    MenuLayoutEntry ("show_as_top",                 tl::to_string (QObject::tr ("Show As New Top")),        SLOT (cm_cell_select ())),
-    MenuLayoutEntry::separator ("visibility_group"),
-    MenuLayoutEntry ("hide_cell",                   tl::to_string (QObject::tr ("Hide")),                   SLOT (cm_cell_hide ())),
-    MenuLayoutEntry ("show_cell",                   tl::to_string (QObject::tr ("Show")),                   SLOT (cm_cell_show ())),
-    MenuLayoutEntry ("show_all",                    tl::to_string (QObject::tr ("Show All")),               SLOT (cm_cell_show_all ())),
-    MenuLayoutEntry::separator ("utils_group"),
-    MenuLayoutEntry ("open_current",                tl::to_string (QObject::tr ("Where Am I?")),            SLOT (cm_open_current_cell ())),
-    MenuLayoutEntry::separator ("file_group"),
-    MenuLayoutEntry ("save_cell_as:hide_vo",        tl::to_string (QObject::tr ("Save Selected Cells As")), SLOT (cm_save_current_cell_as ())),
-    MenuLayoutEntry::last ()
-  };
-
-  MenuLayoutEntry main_menu [] = {
-    MenuLayoutEntry ("@hcp_context_menu", "", context_menu),
-    MenuLayoutEntry::last ()
-  };
-
-  menu.init (main_menu);
-}
-
 HierarchyControlPanel::HierarchyControlPanel (lay::LayoutView *view, QWidget *parent, const char *name)
   : QFrame (parent), 
     m_enable_cb (true), 
@@ -1203,5 +1157,58 @@ HierarchyControlPanel::paste ()
     mp_view->select_cell_fit (new_tops [0], m_active_index);
   }
 }
+
+// ------------------------------------------------------------
+//  Declaration of the "plugin" for the menu entries
+
+class HierarchyControlPanelPluginDeclaration
+  : public lay::PluginDeclaration
+{
+public:
+  virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
+  {
+    std::string at;
+
+    at = ".end";
+    menu_entries.push_back (lay::submenu ("@hcp_context_menu", at, std::string ()));
+
+    at = "@hcp_context_menu.end";
+
+    menu_entries.push_back (lay::config_menu_item ("flat_mode", at, tl::to_string (QObject::tr ("Flat Cell List")), cfg_flat_cell_list, "?")),
+    menu_entries.push_back (lay::config_menu_item ("split_mode", at, tl::to_string (QObject::tr ("Split Mode")), cfg_split_cell_list, "?")),
+    menu_entries.push_back (lay::submenu ("sorting", at, tl::to_string (QObject::tr ("Sorting"))));
+
+    {
+      std::string at = "@hcp_context_menu.sorting.end";
+      menu_entries.push_back (lay::config_menu_item ("by_name", at, tl::to_string (QObject::tr ("By Name")), cfg_cell_list_sorting, "?by-name"));
+      menu_entries.push_back (lay::config_menu_item ("by_area", at, tl::to_string (QObject::tr ("By Area - Small To Large")), cfg_cell_list_sorting, "?by-area"));
+      menu_entries.push_back (lay::config_menu_item ("by_area", at, tl::to_string (QObject::tr ("By Area - Large To Small")), cfg_cell_list_sorting, "?by-area-reverse"));
+    }
+
+    menu_entries.push_back (lay::separator ("operations_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_new_cell", "new_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("New Cell")));
+    menu_entries.push_back (lay::menu_item ("cm_cell_delete", "delete_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Delete Cell")));
+    menu_entries.push_back (lay::menu_item ("cm_cell_rename", "rename_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Rename Cell")));
+    menu_entries.push_back (lay::menu_item ("cm_cell_replace", "replace_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Replace Cell")));
+    menu_entries.push_back (lay::menu_item ("cm_cell_flatten", "flatten_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Flatten Cell")));
+    menu_entries.push_back (lay::menu_item ("cm_cell_user_properties", "cell_user_properties", at, tl::to_string (QObject::tr ("User Properties")));
+    menu_entries.push_back (lay::separator ("clipboard_group:edit_mode", at));
+    menu_entries.push_back (lay::menu_item ("cm_cell_copy", "copy:edit_mode", at, tl::to_string (QObject::tr ("Copy")));
+    menu_entries.push_back (lay::menu_item ("cm_cell_cut", "cut:edit_mode", at, tl::to_string (QObject::tr ("Cut")));
+    menu_entries.push_back (lay::menu_item ("cm_cell_paste", "paste:edit_mode", at, tl::to_string (QObject::tr ("Paste")));
+    menu_entries.push_back (lay::separator ("select_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_cell_select", "show_as_top", at, tl::to_string (QObject::tr ("Show As New Top")));
+    menu_entries.push_back (lay::separator ("visibility_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_cell_hide", "hide_cell", at, tl::to_string (QObject::tr ("Hide")));
+    menu_entries.push_back (lay::menu_item ("cm_cell_show", "show_cell", at, tl::to_string (QObject::tr ("Show")));
+    menu_entries.push_back (lay::menu_item ("cm_cell_show_all", "show_all", at, tl::to_string (QObject::tr ("Show All")));
+    menu_entries.push_back (lay::separator ("utils_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_open_current_cell", "open_current", at, tl::to_string (QObject::tr ("Where Am I?")));
+    menu_entries.push_back (lay::separator ("file_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_save_current_cell_as", "save_cell_as:hide_vo", at, tl::to_string (QObject::tr ("Save Selected Cells As")));
+  }
+};
+
+static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new HierarchyControlPanelPluginDeclaration (), -8, "HierarchyControlPanelPlugin");
 
 } // namespace lay 

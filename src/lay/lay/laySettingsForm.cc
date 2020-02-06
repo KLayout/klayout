@@ -40,9 +40,9 @@ namespace lay
 
 // -------------------------------------------------------------
 
-SettingsForm::SettingsForm (QWidget *parent, lay::PluginRoot *plugin_root, const char *name)
+SettingsForm::SettingsForm (QWidget *parent, lay::Dispatcher *dispatcher, const char *name)
   : QDialog (parent), Ui::SettingsForm (),
-    mp_plugin_root (plugin_root), m_finalize_recursion (false)
+    mp_plugin_root (dispatcher), m_finalize_recursion (false)
 { 
   setObjectName (QString::fromUtf8 (name));
 

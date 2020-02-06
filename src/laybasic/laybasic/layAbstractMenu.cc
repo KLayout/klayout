@@ -22,9 +22,9 @@
 
 
 #include "layAbstractMenu.h"
-#include "layAbstractMenuProvider.h"
-#include "tlExceptions.h"
+#include "layDispatcher.h"
 #include "layPlugin.h"
+#include "tlExceptions.h"
 #include "tlAssert.h"
 #include "gtf.h"
 #include "gsi.h"
@@ -574,8 +574,8 @@ ActionHandle::get_key_sequence_for (const std::string &sc) const
 Action::Action ()
   : mp_handle (0)
 {
-  if (lay::AbstractMenuProvider::instance ()) {
-    mp_handle = new ActionHandle (lay::AbstractMenuProvider::instance ()->menu_parent_widget ());
+  if (lay::Dispatcher::instance ()) {
+    mp_handle = new ActionHandle (lay::Dispatcher::instance ()->menu_parent_widget ());
     gtf::action_connect (mp_handle->ptr (), SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
     mp_handle->add_ref ();
   }
@@ -920,14 +920,14 @@ Action::set_object_name (const std::string &name)
 // ---------------------------------------------------------------
 //  ConfigureAction implementation
 
-ConfigureAction::ConfigureAction (lay::PluginRoot *pr)
-  : Action (), m_pr (pr), m_type (ConfigureAction::setter_type)
+ConfigureAction::ConfigureAction (lay::Dispatcher *dispatcher)
+  : Action (), m_dispatcher (dispatcher), m_type (ConfigureAction::setter_type)
 {
   //  .. nothing yet ..
 }
 
-ConfigureAction::ConfigureAction (lay::PluginRoot *pr, const std::string &cname, const std::string &cvalue)
-  : Action (), m_pr (pr), m_cname (cname), m_cvalue (cvalue), m_type (ConfigureAction::setter_type)
+ConfigureAction::ConfigureAction (lay::Dispatcher *dispatcher, const std::string &cname, const std::string &cvalue)
+  : Action (), m_dispatcher (dispatcher), m_cname (cname), m_cvalue (cvalue), m_type (ConfigureAction::setter_type)
 {
   if (cvalue == "?") {
     m_type = boolean_type;
@@ -937,8 +937,8 @@ ConfigureAction::ConfigureAction (lay::PluginRoot *pr, const std::string &cname,
   reg ();
 }
 
-ConfigureAction::ConfigureAction (lay::PluginRoot *pr, const std::string &title, const std::string &cname, const std::string &cvalue)
-  : Action (title), m_pr (pr), m_cname (cname), m_cvalue (cvalue), m_type (ConfigureAction::setter_type)
+ConfigureAction::ConfigureAction (lay::Dispatcher *dispatcher, const std::string &title, const std::string &cname, const std::string &cvalue)
+  : Action (title), m_dispatcher (dispatcher), m_cname (cname), m_cvalue (cvalue), m_type (ConfigureAction::setter_type)
 {
   if (cvalue == "?") {
     //  A "?" notation indicates a boolean toogle entry
@@ -966,23 +966,19 @@ ConfigureAction::triggered ()
     m_cvalue = tl::to_string (is_checked ());
   }
 
-  m_pr->config_set (m_cname, m_cvalue);
+  m_dispatcher->config_set (m_cname, m_cvalue);
 }
 
 void
 ConfigureAction::reg ()
 {
-  if (lay::AbstractMenuProvider::instance ()) {
-    lay::AbstractMenuProvider::instance ()->register_config_action (m_cname, this);
-  }
+  m_dispatcher->register_config_action (m_cname, this);
 }
 
 void
 ConfigureAction::unreg ()
 {
-  if (lay::AbstractMenuProvider::instance ()) {
-    lay::AbstractMenuProvider::instance ()->unregister_config_action (m_cname, this);
-  }
+  m_dispatcher->unregister_config_action (m_cname, this);
 }
 
 void
@@ -1008,13 +1004,8 @@ ConfigureAction::configure (const std::string &value)
 //  AbstractMenu implementation
 
 ActionHandle *
-AbstractMenu::create_action (const std::string &s, AbstractMenuProvider *provider)
+AbstractMenu::create_action (const std::string &s, lay::Dispatcher *dispatcher)
 {
-  if (! provider) {
-    provider = lay::AbstractMenuProvider::instance ();
-  }
-  tl_assert (provider != 0);
-
   std::string title;
   std::string shortcut;
   std::string res;
@@ -1022,7 +1013,7 @@ AbstractMenu::create_action (const std::string &s, AbstractMenuProvider *provide
 
   parse_menu_title (s, title, shortcut, res, tool_tip);
 
-  ActionHandle *ah = new ActionHandle (provider->menu_parent_widget ());
+  ActionHandle *ah = new ActionHandle (dispatcher->menu_parent_widget ());
   ah->ptr ()->setText (tl::to_qstring (title));
 
   if (! tool_tip.empty ()) {
@@ -1040,8 +1031,8 @@ AbstractMenu::create_action (const std::string &s, AbstractMenuProvider *provide
   return ah;
 }
 
-AbstractMenu::AbstractMenu (AbstractMenuProvider *provider)
-  : mp_provider (provider)
+AbstractMenu::AbstractMenu (Dispatcher *dispatcher)
+  : mp_dispatcher (dispatcher)
 {
   //  .. nothing yet ..
 }
@@ -1049,13 +1040,6 @@ AbstractMenu::AbstractMenu (AbstractMenuProvider *provider)
 AbstractMenu::~AbstractMenu ()
 {
   //  .. nothing yet ..
-}
-
-void
-AbstractMenu::init (const MenuLayoutEntry *layout)
-{
-  m_root.set_has_submenu ();
-  transfer (layout, m_root);
 }
 
 QActionGroup *
@@ -1167,8 +1151,8 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
           // Otherwise, the keyboard shortcuts do not work for menu items inside such a
           // popup menu. It seems not to have a negative effect to add the menu to the
           // main widget.
-          if (mp_provider) {
-            mp_provider->menu_parent_widget ()->addAction (menu->menuAction ());
+          if (mp_dispatcher->menu_parent_widget ()) {
+            mp_dispatcher->menu_parent_widget ()->addAction (menu->menuAction ());
           }
           c->set_action (Action (new ActionHandle (menu)), true);
         }
@@ -1379,27 +1363,32 @@ AbstractMenu::items (const std::string &path) const
 void
 AbstractMenu::insert_item (const std::string &p, const std::string &name, const Action &action)
 {
-  typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > > path_type;
-  path_type path = find_item (p);
-  if (! path.empty ()) {
+  tl::Extractor extr (p.c_str ());
+  while (! extr.at_end ()) {
 
-    AbstractMenuItem *parent = path.back ().first;
-    std::list<AbstractMenuItem>::iterator iter = path.back ().second;
+    typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > > path_type;
+    path_type path = find_item (extr);
+    if (! path.empty ()) {
 
-    //  insert the new item
-    parent->children.insert (iter, AbstractMenuItem ());
-    --iter;
+      AbstractMenuItem *parent = path.back ().first;
+      std::list<AbstractMenuItem>::iterator iter = path.back ().second;
 
-    iter->setup_item (parent->name (), name, action);
+      //  insert the new item
+      parent->children.insert (iter, AbstractMenuItem ());
+      --iter;
 
-    //  find any items with the same name and remove them
-    for (std::list<AbstractMenuItem>::iterator existing = parent->children.begin (); existing != parent->children.end (); ) {
-      std::list<AbstractMenuItem>::iterator existing_next = existing;
-      ++existing_next;
-      if (existing->name () == iter->name () && existing != iter) {
-        parent->children.erase (existing);
+      iter->setup_item (parent->name (), name, action);
+
+      //  find any items with the same name and remove them
+      for (std::list<AbstractMenuItem>::iterator existing = parent->children.begin (); existing != parent->children.end (); ) {
+        std::list<AbstractMenuItem>::iterator existing_next = existing;
+        ++existing_next;
+        if (existing->name () == iter->name () && existing != iter) {
+          parent->children.erase (existing);
+        }
+        existing = existing_next;
       }
-      existing = existing_next;
+
     }
 
   }
@@ -1411,7 +1400,8 @@ void
 AbstractMenu::insert_separator (const std::string &p, const std::string &name)
 {
   typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > > path_type;
-  path_type path = find_item (p);
+  tl::Extractor extr (p.c_str ());
+  path_type path = find_item (extr);
   if (! path.empty ()) {
 
     AbstractMenuItem *parent = path.back ().first;
@@ -1419,7 +1409,7 @@ AbstractMenu::insert_separator (const std::string &p, const std::string &name)
 
     parent->children.insert (iter, AbstractMenuItem ());
     --iter;
-    Action action (new ActionHandle (mp_provider ? mp_provider->menu_parent_widget () : 0));
+    Action action (new ActionHandle (mp_dispatcher->menu_parent_widget ()));
     action.set_separator (true);
     iter->setup_item (parent->name (), name, action);
 
@@ -1432,7 +1422,8 @@ void
 AbstractMenu::insert_menu (const std::string &p, const std::string &name, const Action &action)
 {
   typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > > path_type;
-  path_type path = find_item (p);
+  tl::Extractor extr (p.c_str ());
+  path_type path = find_item (extr);
   if (! path.empty ()) {
 
     AbstractMenuItem *parent = path.back ().first;
@@ -1461,14 +1452,15 @@ AbstractMenu::insert_menu (const std::string &p, const std::string &name, const 
 void
 AbstractMenu::insert_menu (const std::string &path, const std::string &name, const std::string &title)
 {
-  insert_menu (path, name, create_action (title, mp_provider));
+  insert_menu (path, name, create_action (title, mp_dispatcher));
 }
 
 void
 AbstractMenu::clear_menu (const std::string &p)
 {
   typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > > path_type;
-  path_type path = find_item (p);
+  tl::Extractor extr (p.c_str ());
+  path_type path = find_item (extr);
   if (! path.empty () && ! path.back ().second->children.empty ()) {
     path.back ().second->children.clear ();
     emit changed ();
@@ -1479,7 +1471,8 @@ void
 AbstractMenu::delete_item (const std::string &p)
 {
   typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > > path_type;
-  path_type path = find_item (p);
+  tl::Extractor extr (p.c_str ());
+  path_type path = find_item (extr);
   if (! path.empty ()) {
 
     for (path_type::const_reverse_iterator p = path.rbegin (); p != path.rend (); ++p) {
@@ -1588,18 +1581,21 @@ AbstractMenu::find_item_exact (const std::string &path)
 }
 
 std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator> >
-AbstractMenu::find_item (const std::string &p)
+AbstractMenu::find_item (tl::Extractor &extr)
 {
   typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator> > path_type;
   path_type path;
 
-  tl::Extractor extr (p.c_str ());
   AbstractMenuItem *parent = &m_root;
   std::list<AbstractMenuItem>::iterator iter = m_root.children.end ();
 
   while (parent && ! extr.at_end ()) {
 
-    if (extr.test ("#")) {
+    if (extr.test (";")) {
+
+      break;
+
+    } else if (extr.test ("#")) {
 
       unsigned int n = 0;
       extr.try_read (n);
@@ -1719,71 +1715,6 @@ AbstractMenu::find_item (const std::string &p)
   }
 
   return path;
-}
-
-void
-AbstractMenu::transfer (const MenuLayoutEntry *layout, AbstractMenuItem &item)
-{
-  while (layout->name) {
-
-    item.children.push_back (AbstractMenuItem ());
-    AbstractMenuItem &new_item = item.children.back ();
-
-    lay::Action a;
-
-    if (! mp_provider) {
-      a = lay::Action (new ActionHandle ((QWidget *) 0));
-    } else if (layout->slot) {
-      // reuse any actions already registered for this slot
-      a = mp_provider->action_for_slot (layout->slot);
-    } else if (! layout->kv_pair.first.empty ()) {
-      a = *mp_provider->create_config_action (layout->kv_pair.first, layout->kv_pair.second);
-    } else {
-      a = lay::Action (new ActionHandle (mp_provider->menu_parent_widget ()));
-    }
-
-    if (layout->title == "-") {
-
-      //  reuse title from other entry
-
-    } else if (! layout->title.empty ()) {
-
-      std::string title;
-      std::string shortcut;
-      std::string res;
-      std::string tool_tip;
-
-      parse_menu_title (layout->title, title, shortcut, res, tool_tip);
-
-      a.set_separator (false);
-      a.set_title (title);
-
-      if (! shortcut.empty ()) {
-        a.set_default_shortcut (shortcut);
-      }
-
-      if (! tool_tip.empty ()) {
-        a.set_tool_tip (tool_tip);
-      }
-
-      if (! res.empty ()) {
-        a.set_icon (res);
-      }
-
-    } else {
-      a.set_separator (true);
-    }
-
-    new_item.setup_item (item.name (), layout->name, a);
-
-    if (layout->submenu) {
-      new_item.set_has_submenu ();
-      transfer (layout->submenu, item.children.back ());
-    }
-
-    ++layout;
-
-  }
 }
 
 std::vector<std::string>

@@ -229,86 +229,6 @@ LCPTreeWidget::expand_all ()
 // --------------------------------------------------------------------
 //  LayerControlPanel implementation
 
-void 
-LayerControlPanel::init_menu (lay::AbstractMenu &menu)
-{
-  MenuLayoutEntry sort_by_menu [] = {
-    MenuLayoutEntry ("sort_ild",          tl::to_string (QObject::tr ("Layout Index, Layer And Datatype")), SLOT (cm_lv_sort_by_ild ())),
-    MenuLayoutEntry ("sort_idl",          tl::to_string (QObject::tr ("Layout Index, Datatype And Layer")), SLOT (cm_lv_sort_by_idl ())),
-    MenuLayoutEntry ("sort_ldi",          tl::to_string (QObject::tr ("Layer, Datatype And Layout Index")), SLOT (cm_lv_sort_by_ldi ())),
-    MenuLayoutEntry ("sort_dli",          tl::to_string (QObject::tr ("Datatype, Layer And Layout Index")), SLOT (cm_lv_sort_by_dli ())),
-    MenuLayoutEntry ("sort_name",         tl::to_string (QObject::tr ("Name")),                  SLOT (cm_lv_sort_by_name ())),
-    MenuLayoutEntry::last ()
-  };
-
-  MenuLayoutEntry regroup_menu [] = {
-    MenuLayoutEntry ("grp_i",             tl::to_string (QObject::tr ("By Layout Index")),       SLOT (cm_lv_regroup_by_index ())),
-    MenuLayoutEntry ("grp_d",             tl::to_string (QObject::tr ("By Datatype")),           SLOT (cm_lv_regroup_by_datatype ())),
-    MenuLayoutEntry ("grp_l",             tl::to_string (QObject::tr ("By Layer")),              SLOT (cm_lv_regroup_by_layer ())),
-    MenuLayoutEntry ("flatten",           tl::to_string (QObject::tr ("Flatten")),               SLOT (cm_lv_regroup_flatten ())),
-    MenuLayoutEntry::last ()
-  };
-
-  MenuLayoutEntry tab_menu [] = {
-    MenuLayoutEntry ("new_tab",           tl::to_string (QObject::tr ("New Tab")),               SLOT (cm_lv_new_tab ())),
-    MenuLayoutEntry ("remove_tab",        tl::to_string (QObject::tr ("Remove Tab")),            SLOT (cm_lv_remove_tab ())),
-    MenuLayoutEntry ("rename_tab",        tl::to_string (QObject::tr ("Rename Tab")),            SLOT (cm_lv_rename_tab ())),
-    MenuLayoutEntry::last ()
-  };
-
-  MenuLayoutEntry context_menu [] = {
-    MenuLayoutEntry ("select_all",        tl::to_string (QObject::tr ("Select All")),            SLOT (cm_lv_select_all ())),
-    //  It is not sure, whether "expandAll" destabilizes the tree widget:
-    //  MenuLayoutEntry ("expand_all",      tl::to_string (QObject::tr ("Expand All")),            SLOT (cm_lv_expand_all ())),
-    MenuLayoutEntry::separator ("tab_group"),
-    MenuLayoutEntry ("tab_menu",          tl::to_string (QObject::tr ("Tabs")),                  tab_menu),
-    MenuLayoutEntry::separator ("visibility_group"),
-    MenuLayoutEntry ("hide",              tl::to_string (QObject::tr ("Hide")),                  SLOT (cm_lv_hide ())),
-    MenuLayoutEntry ("hide_all",          tl::to_string (QObject::tr ("Hide All")),              SLOT (cm_lv_hide_all ())),
-    MenuLayoutEntry ("show",              tl::to_string (QObject::tr ("Show")),                  SLOT (cm_lv_show ())),
-    MenuLayoutEntry ("show_all",          tl::to_string (QObject::tr ("Show All")),              SLOT (cm_lv_show_all ())),
-    MenuLayoutEntry ("show_only",         tl::to_string (QObject::tr ("Show Only Selected")),    SLOT (cm_lv_show_only ())),
-    MenuLayoutEntry ("valid",             tl::to_string (QObject::tr ("Make Valid")),            SLOT (cm_lv_make_valid ())),
-    MenuLayoutEntry ("invvalid",          tl::to_string (QObject::tr ("Make Invalid")),          SLOT (cm_lv_make_invalid ())),
-    MenuLayoutEntry ("rename",            tl::to_string (QObject::tr ("Rename")),                SLOT (cm_lv_rename ())),
-    MenuLayoutEntry::separator ("options_group"),
-    MenuLayoutEntry ("hide_empty_layers", tl::to_string (QObject::tr ("Hide Empty Layers")),     std::make_pair (cfg_hide_empty_layers, "?")),
-    MenuLayoutEntry ("test_shapes_in_view", tl::to_string (QObject::tr ("Test For Shapes In View")), std::make_pair (cfg_test_shapes_in_view, "?")),
-    MenuLayoutEntry::separator ("source_group"),
-    MenuLayoutEntry ("select_source",     tl::to_string (QObject::tr ("Select Source")),         SLOT (cm_lv_source ())),
-    MenuLayoutEntry::separator ("sort_group"),
-    MenuLayoutEntry ("sort_menu",         tl::to_string (QObject::tr ("Sort By")),               sort_by_menu),
-    MenuLayoutEntry::separator ("view_group"),
-    MenuLayoutEntry ("del",               tl::to_string (QObject::tr ("Delete Layer Entry")),    SLOT (cm_lv_delete ())),
-    MenuLayoutEntry ("insert",            tl::to_string (QObject::tr ("Insert Layer Entry")),    SLOT (cm_lv_insert ())),
-    MenuLayoutEntry ("add_others",        tl::to_string (QObject::tr ("Add Other Layer Entries")), SLOT (cm_lv_add_missing ())),
-    MenuLayoutEntry ("clean_up",          tl::to_string (QObject::tr ("Clean Up Layer Entries")),  SLOT (cm_lv_remove_unused ())),
-    MenuLayoutEntry::separator ("grouping_group"),
-    MenuLayoutEntry ("group",             tl::to_string (QObject::tr ("Group")),                 SLOT (cm_lv_group ())),
-    MenuLayoutEntry ("ungroup",           tl::to_string (QObject::tr ("Ungroup")),               SLOT (cm_lv_ungroup ())),
-    MenuLayoutEntry ("regroup_menu",      tl::to_string (QObject::tr ("Regroup Layer Entries")), regroup_menu),
-    MenuLayoutEntry::separator ("copy_paste_group"),
-    MenuLayoutEntry ("copy",              tl::to_string (QObject::tr ("Copy")),                  SLOT (cm_lv_copy ())),
-    MenuLayoutEntry ("cut",               tl::to_string (QObject::tr ("Cut")),                   SLOT (cm_lv_cut ())),
-    MenuLayoutEntry ("paste",             tl::to_string (QObject::tr ("Paste")),                 SLOT (cm_lv_paste ())),
-    MenuLayoutEntry::last ()
-  };
-
-  MenuLayoutEntry lcp_context_menu [] = {
-    MenuLayoutEntry ("@lcp_context_menu", "",                                      context_menu),
-    MenuLayoutEntry::last ()
-  };
-
-  menu.init (lcp_context_menu);
-
-  MenuLayoutEntry lcp_tab_context_menu [] = {
-    MenuLayoutEntry ("@lcp_tabs_context_menu", "",                                 tab_menu),
-    MenuLayoutEntry::last ()
-  };
-
-  menu.init (lcp_tab_context_menu);
-}
-
 LayerControlPanel::LayerControlPanel (lay::LayoutView *view, db::Manager *manager, QWidget *parent, const char *name)
   : QFrame (parent), 
     db::Object (manager),
@@ -2398,5 +2318,97 @@ LayerControlPanel::do_move (int mode)
   mp_view->set_properties (new_props);
   mp_view->set_selected_layers (new_sel);
 }
+
+// ------------------------------------------------------------
+//  Declaration of the "plugin" for the menu entries
+
+class LayerControlPanelPluginDeclaration
+  : public lay::PluginDeclaration
+{
+public:
+  virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
+  {
+    std::string at;
+
+    at = ".end";
+    menu_entries.push_back (lay::submenu ("@lcp_context_menu", at, std::string ()));
+
+    at = "@lcp_context_menu.end";
+
+    menu_entries.push_back (lay::menu_item ("cm_lv_select_all", "select_all", at, tl::to_string (QObject::tr ("Select All")));
+    //  It is not sure, whether "expandAll" destabilizes the tree widget:
+    //  menu_entries.push_back (lay::menu_item ("cm_lv_expand_all", "expand_all", at, tl::to_string (QObject::tr ("Expand All")));
+    menu_entries.push_back (lay::separator ("tab_group", at));
+    menu_entries.push_back (lay::submenu ("tab_menu", at, tl::to_string (QObject::tr ("Tabs"))));
+
+    {
+      std::string at = "@lcp_context_menu.tab_menu.end";
+      menu_entries.push_back (lay::menu_item ("cm_lv_new_tab", "new_tab", at, tl::to_string (QObject::tr ("New Tab")));
+      menu_entries.push_back (lay::menu_item ("cm_lv_remove_tab", "remove_tab", at, tl::to_string (QObject::tr ("Remove Tab")));
+      menu_entries.push_back (lay::menu_item ("cm_lv_rename_tab", "rename_tab", at, tl::to_string (QObject::tr ("Rename Tab")));
+    }
+
+    menu_entries.push_back (lay::separator ("visibility_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_lv_hide", "hide", at, tl::to_string (QObject::tr ("Hide")));
+    menu_entries.push_back (lay::menu_item ("cm_lv_hide_all", "hide_all", at, tl::to_string (QObject::tr ("Hide All")));
+    menu_entries.push_back (lay::menu_item ("cm_lv_show", "show", at, tl::to_string (QObject::tr ("Show")));
+    menu_entries.push_back (lay::menu_item ("cm_lv_show_all", "show_all", at, tl::to_string (QObject::tr ("Show All")));
+    menu_entries.push_back (lay::menu_item ("cm_lv_show_only", "show_only", at, tl::to_string (QObject::tr ("Show Only Selected")));
+    menu_entries.push_back (lay::menu_item ("cm_lv_make_valid", "valid", at, tl::to_string (QObject::tr ("Make Valid")));
+    menu_entries.push_back (lay::menu_item ("cm_lv_make_invalid", "invvalid", at, tl::to_string (QObject::tr ("Make Invalid")));
+    menu_entries.push_back (lay::menu_item ("cm_lv_rename", "rename", at, tl::to_string (QObject::tr ("Rename")));
+    menu_entries.push_back (lay::separator ("options_group", at));
+    menu_entries.push_back (lay::config_menu_item ("hide_empty_layers", at, tl::to_string (QObject::tr ("Hide Empty Layers")), cfg_hide_empty_layers, "?"));
+    menu_entries.push_back (lay::config_menu_item ("test_shapes_in_view", at, tl::to_string (QObject::tr ("Test For Shapes In View")), cfg_test_shapes_in_view, "?"));
+    menu_entries.push_back (lay::separator ("source_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_lv_source", "select_source", at, tl::to_string (QObject::tr ("Select Source")));
+    menu_entries.push_back (lay::separator ("sort_group", at));
+    menu_entries.push_back (lay::submenu ("sort_menu", at, tl::to_string (QObject::tr ("Sort By"))));
+
+    {
+      std::string at = "@lcp_context_menu.sort_menu.end";
+      menu_entries.push_back (lay::menu_item ("cm_lv_sort_by_ild", "sort_ild", at, tl::to_string (QObject::tr ("Layout Index, Layer And Datatype")));
+      menu_entries.push_back (lay::menu_item ("cm_lv_sort_by_idl", "sort_idl", at, tl::to_string (QObject::tr ("Layout Index, Datatype And Layer")));
+      menu_entries.push_back (lay::menu_item ("cm_lv_sort_by_ldi", "sort_ldi", at, tl::to_string (QObject::tr ("Layer, Datatype And Layout Index")));
+      menu_entries.push_back (lay::menu_item ("cm_lv_sort_by_dli", "sort_dli", at, tl::to_string (QObject::tr ("Datatype, Layer And Layout Index")));
+      menu_entries.push_back (lay::menu_item ("cm_lv_sort_by_name", "sort_name", at, tl::to_string (QObject::tr ("Name")));
+    }
+
+    menu_entries.push_back (lay::separator ("view_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_lv_delete", "del", at, tl::to_string (QObject::tr ("Delete Layer Entry")));
+    menu_entries.push_back (lay::menu_item ("cm_lv_insert", "insert", at, tl::to_string (QObject::tr ("Insert Layer Entry")));
+    menu_entries.push_back (lay::menu_item ("cm_lv_add_missing", "add_others", at, tl::to_string (QObject::tr ("Add Other Layer Entries")));
+    menu_entries.push_back (lay::menu_item ("cm_lv_remove_unused", "clean_up", at, tl::to_string (QObject::tr ("Clean Up Layer Entries")));
+    menu_entries.push_back (lay::separator ("grouping_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_lv_group", "group", at, tl::to_string (QObject::tr ("Group")));
+    menu_entries.push_back (lay::menu_item ("cm_lv_ungroup", "ungroup", at, tl::to_string (QObject::tr ("Ungroup")));
+    menu_entries.push_back (lay::submenu ("regroup_menu", at, tl::to_string (QObject::tr ("Regroup Layer Entries"))));
+
+    {
+      std::string at = "@lcp_context_menu.regroup_menu.end";
+      menu_entries.push_back (lay::menu_item ("cm_lv_regroup_by_index", "grp_i", at, tl::to_string (QObject::tr ("By Layout Index")));
+      menu_entries.push_back (lay::menu_item ("cm_lv_regroup_by_datatype", "grp_d", at, tl::to_string (QObject::tr ("By Datatype")));
+      menu_entries.push_back (lay::menu_item ("cm_lv_regroup_by_layer", "grp_l", at, tl::to_string (QObject::tr ("By Layer")));
+      menu_entries.push_back (lay::menu_item ("cm_lv_regroup_flatten", "flatten", at, tl::to_string (QObject::tr ("Flatten")));
+    }
+
+    menu_entries.push_back (lay::separator ("copy_paste_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_lv_copy", "copy", at, tl::to_string (QObject::tr ("Copy")));
+    menu_entries.push_back (lay::menu_item ("cm_lv_cut", "cut", at, tl::to_string (QObject::tr ("Cut")));
+    menu_entries.push_back (lay::menu_item ("cm_lv_paste", "paste", at, tl::to_string (QObject::tr ("Paste")));
+
+    at = ".end";
+    menu_entries.push_back (lay::submenu ("@lcp_tabs_context_menu", at, std::string ()));
+
+    {
+      std::string at = "@lcp_tabs_context_menu.end";
+      menu_entries.push_back (lay::menu_item ("cm_lv_new_tab", "new_tab", at, tl::to_string (QObject::tr ("New Tab")));
+      menu_entries.push_back (lay::menu_item ("cm_lv_remove_tab", "remove_tab", at, tl::to_string (QObject::tr ("Remove Tab")));
+      menu_entries.push_back (lay::menu_item ("cm_lv_rename_tab", "rename_tab", at, tl::to_string (QObject::tr ("Rename Tab")));
+    }
+  }
+};
+
+static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new LayerControlPanelPluginDeclaration (), -9, "LayerControlPanelPlugin");
 
 } // namespace lay 

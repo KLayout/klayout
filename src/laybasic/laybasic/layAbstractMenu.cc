@@ -1013,7 +1013,7 @@ AbstractMenu::create_action (const std::string &s, lay::Dispatcher *dispatcher)
 
   parse_menu_title (s, title, shortcut, res, tool_tip);
 
-  ActionHandle *ah = new ActionHandle (dispatcher->menu_parent_widget ());
+  ActionHandle *ah = new ActionHandle (dispatcher ? dispatcher->menu_parent_widget () : 0);
   ah->ptr ()->setText (tl::to_qstring (title));
 
   if (! tool_tip.empty ()) {
@@ -1613,7 +1613,11 @@ AbstractMenu::find_item (tl::Extractor &extr)
       std::string n;
       extr.read (n, ".+>(");
 
-      if (n == "begin") {
+      if (n.empty ()) {
+
+        //  skip (avoids infinite loops on wrong paths)
+
+      } else if (n == "begin") {
 
         iter = parent->children.begin ();
 

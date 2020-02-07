@@ -219,7 +219,7 @@ NetlistBrowserPage::is_netlist_mode ()
 }
 
 void
-NetlistBrowserPage::set_plugin_root (lay::PluginRoot *pr)
+NetlistBrowserPage::set_dispatcher (lay::Dispatcher *pr)
 {
   mp_plugin_root = pr;
 }

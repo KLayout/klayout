@@ -42,7 +42,7 @@ namespace lay
 {
 
 class LayoutView;
-class PluginRoot;
+class Dispatcher;
 class Marker;
 class NetInfoDialog;
 class LayerPropertiesConstIterator;
@@ -76,7 +76,7 @@ public:
   /**
    *  @brief Sets the plugin root object for this object
    */
-  void set_plugin_root (lay::PluginRoot *pr);
+  void set_dispatcher (lay::Dispatcher *pr);
 
   /**
    *  @brief Attaches the page to a view
@@ -199,7 +199,7 @@ private:
   bool m_use_original_colors;
   lay::LayoutView *mp_view;
   unsigned int m_cv_index;
-  lay::PluginRoot *mp_plugin_root;
+  lay::Dispatcher *mp_plugin_root;
   tl::weak_ptr<db::LayoutToNetlist> mp_database;
   std::vector<void *> m_history;
   size_t m_history_ptr;

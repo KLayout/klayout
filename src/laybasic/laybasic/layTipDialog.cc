@@ -24,6 +24,7 @@
 #include "layTipDialog.h"
 #include "laybasicConfig.h"
 #include "layPlugin.h"
+#include "layDispatcher.h"
 #include "layDialogs.h"
 #include "layQtTools.h"
 
@@ -134,8 +135,8 @@ TipDialog::do_exec_dialog (button_type *button)
   mp_res = button;
 
   std::string th;
-  if (lay::PluginRoot::instance ()) {
-    lay::PluginRoot::instance ()->config_get (cfg_tip_window_hidden, th);
+  if (lay::Dispatcher::instance ()) {
+    lay::Dispatcher::instance ()->config_get (cfg_tip_window_hidden, th);
   }
 
   //  test if we need to show this window
@@ -172,8 +173,8 @@ TipDialog::accept ()
   if (mp_ui->dont_show_cbx->isChecked ()) {
 
     std::string th;
-    if (lay::PluginRoot::instance ()) {
-      lay::PluginRoot::instance ()->config_get (cfg_tip_window_hidden, th);
+    if (lay::Dispatcher::instance ()) {
+      lay::Dispatcher::instance ()->config_get (cfg_tip_window_hidden, th);
     }
 
     if (! th.empty ()) {
@@ -183,8 +184,8 @@ TipDialog::accept ()
     th += "=";
     th += tl::to_string (int (*mp_res));
 
-    if (lay::PluginRoot::instance ()) {
-      lay::PluginRoot::instance ()->config_set (cfg_tip_window_hidden, th);
+    if (lay::Dispatcher::instance ()) {
+      lay::Dispatcher::instance ()->config_set (cfg_tip_window_hidden, th);
     }
 
   }

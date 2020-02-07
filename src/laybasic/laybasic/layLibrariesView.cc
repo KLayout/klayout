@@ -48,7 +48,6 @@
 #include "layCellTreeModel.h"
 #include "layLayoutView.h"
 #include "layAbstractMenu.h"
-#include "layAbstractMenuProvider.h"
 #include "layDialogs.h"
 #include "tlExceptions.h"
 #include "laybasicConfig.h"

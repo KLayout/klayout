@@ -519,14 +519,14 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
   ) +
   gsi::method ("call_menu", &lay::MainWindow::menu_activated,
     "@brief Calls the menu item with the provided symbol.\n"
-    "To obtain all symbols, use get_menu_symbols.\n"
+    "To obtain all symbols, use menu_symbols.\n"
     "\n"
     "This method has been introduced in version 0.27 and replaces the previous cm_... methods. "
     "Instead of calling a specific cm_... method, use LayoutView#call_menu with 'cm_...' as the symbol."
   ) +
-  gsi::method ("get_menu_symbols", &lay::MainWindow::menu_symbols,
-    "@brief Calls the menu item with the provided symbol.\n"
-    "To obtain all available symbols, use get_menu_symbols.\n"
+  gsi::method ("menu_symbols", &lay::MainWindow::menu_symbols,
+    "@brief Gets all available menu symbols (see \\call_menu).\n"
+    "NOTE: currently this method delivers a superset of all available symbols. Depending on the context, no all symbols may trigger actual functionality.\n"
     "\n"
     "This method has been introduced in version 0.27."
   ) +

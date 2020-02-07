@@ -28,6 +28,7 @@
 #include "ui_ConfigurationDialog.h"
 #include "layConfigurationDialog.h"
 #include "layPlugin.h"
+#include "layDispatcher.h"
 
 #include "tlLog.h"
 
@@ -36,7 +37,7 @@ namespace lay
 
 // -------------------------------------------------------------
 
-ConfigurationDialog::ConfigurationDialog (QWidget *parent, lay::PluginRoot *root, const std::string &plugin_name, const char *name)
+ConfigurationDialog::ConfigurationDialog (QWidget *parent, lay::Dispatcher *root, const std::string &plugin_name, const char *name)
   : QDialog (parent),
     mp_root (root)
 { 
@@ -56,7 +57,7 @@ ConfigurationDialog::ConfigurationDialog (QWidget *parent, lay::PluginRoot *root
   }
 }
 
-ConfigurationDialog::ConfigurationDialog (QWidget *parent, lay::PluginRoot *root, lay::PluginDeclaration *decl, const char *name)
+ConfigurationDialog::ConfigurationDialog (QWidget *parent, lay::Dispatcher *root, lay::PluginDeclaration *decl, const char *name)
   : QDialog (parent),
     mp_root (root)
 { 

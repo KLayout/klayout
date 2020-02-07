@@ -46,7 +46,6 @@
 #include "layCellTreeModel.h"
 #include "layLayoutView.h"
 #include "layAbstractMenu.h"
-#include "layAbstractMenuProvider.h"
 #include "layDialogs.h"
 #include "tlExceptions.h"
 #include "laybasicConfig.h"
@@ -1186,26 +1185,26 @@ public:
     }
 
     menu_entries.push_back (lay::separator ("operations_group", at));
-    menu_entries.push_back (lay::menu_item ("cm_new_cell", "new_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("New Cell")));
-    menu_entries.push_back (lay::menu_item ("cm_cell_delete", "delete_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Delete Cell")));
-    menu_entries.push_back (lay::menu_item ("cm_cell_rename", "rename_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Rename Cell")));
-    menu_entries.push_back (lay::menu_item ("cm_cell_replace", "replace_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Replace Cell")));
-    menu_entries.push_back (lay::menu_item ("cm_cell_flatten", "flatten_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Flatten Cell")));
-    menu_entries.push_back (lay::menu_item ("cm_cell_user_properties", "cell_user_properties", at, tl::to_string (QObject::tr ("User Properties")));
+    menu_entries.push_back (lay::menu_item ("cm_new_cell", "new_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("New Cell"))));
+    menu_entries.push_back (lay::menu_item ("cm_cell_delete", "delete_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Delete Cell"))));
+    menu_entries.push_back (lay::menu_item ("cm_cell_rename", "rename_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Rename Cell"))));
+    menu_entries.push_back (lay::menu_item ("cm_cell_replace", "replace_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Replace Cell"))));
+    menu_entries.push_back (lay::menu_item ("cm_cell_flatten", "flatten_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Flatten Cell"))));
+    menu_entries.push_back (lay::menu_item ("cm_cell_user_properties", "cell_user_properties", at, tl::to_string (QObject::tr ("User Properties"))));
     menu_entries.push_back (lay::separator ("clipboard_group:edit_mode", at));
-    menu_entries.push_back (lay::menu_item ("cm_cell_copy", "copy:edit_mode", at, tl::to_string (QObject::tr ("Copy")));
-    menu_entries.push_back (lay::menu_item ("cm_cell_cut", "cut:edit_mode", at, tl::to_string (QObject::tr ("Cut")));
-    menu_entries.push_back (lay::menu_item ("cm_cell_paste", "paste:edit_mode", at, tl::to_string (QObject::tr ("Paste")));
+    menu_entries.push_back (lay::menu_item ("cm_cell_copy", "copy:edit_mode", at, tl::to_string (QObject::tr ("Copy"))));
+    menu_entries.push_back (lay::menu_item ("cm_cell_cut", "cut:edit_mode", at, tl::to_string (QObject::tr ("Cut"))));
+    menu_entries.push_back (lay::menu_item ("cm_cell_paste", "paste:edit_mode", at, tl::to_string (QObject::tr ("Paste"))));
     menu_entries.push_back (lay::separator ("select_group", at));
-    menu_entries.push_back (lay::menu_item ("cm_cell_select", "show_as_top", at, tl::to_string (QObject::tr ("Show As New Top")));
+    menu_entries.push_back (lay::menu_item ("cm_cell_select", "show_as_top", at, tl::to_string (QObject::tr ("Show As New Top"))));
     menu_entries.push_back (lay::separator ("visibility_group", at));
-    menu_entries.push_back (lay::menu_item ("cm_cell_hide", "hide_cell", at, tl::to_string (QObject::tr ("Hide")));
-    menu_entries.push_back (lay::menu_item ("cm_cell_show", "show_cell", at, tl::to_string (QObject::tr ("Show")));
-    menu_entries.push_back (lay::menu_item ("cm_cell_show_all", "show_all", at, tl::to_string (QObject::tr ("Show All")));
+    menu_entries.push_back (lay::menu_item ("cm_cell_hide", "hide_cell", at, tl::to_string (QObject::tr ("Hide"))));
+    menu_entries.push_back (lay::menu_item ("cm_cell_show", "show_cell", at, tl::to_string (QObject::tr ("Show"))));
+    menu_entries.push_back (lay::menu_item ("cm_cell_show_all", "show_all", at, tl::to_string (QObject::tr ("Show All"))));
     menu_entries.push_back (lay::separator ("utils_group", at));
-    menu_entries.push_back (lay::menu_item ("cm_open_current_cell", "open_current", at, tl::to_string (QObject::tr ("Where Am I?")));
+    menu_entries.push_back (lay::menu_item ("cm_open_current_cell", "open_current", at, tl::to_string (QObject::tr ("Where Am I?"))));
     menu_entries.push_back (lay::separator ("file_group", at));
-    menu_entries.push_back (lay::menu_item ("cm_save_current_cell_as", "save_cell_as:hide_vo", at, tl::to_string (QObject::tr ("Save Selected Cells As")));
+    menu_entries.push_back (lay::menu_item ("cm_save_current_cell_as", "save_cell_as:hide_vo", at, tl::to_string (QObject::tr ("Save Selected Cells As"))));
   }
 };
 

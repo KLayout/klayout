@@ -24,7 +24,6 @@
 #include "layBookmarksView.h"
 #include "layLayoutView.h"
 #include "layAbstractMenu.h"
-#include "layAbstractMenuProvider.h"
 
 #include "laybasicConfig.h"
 
@@ -206,9 +205,9 @@ public:
     at = "@bookmarks_context_menu.end";
     menu_entries.push_back (lay::config_menu_item ("follow_selection", at, tl::to_string (QObject::tr ("Follow Selection")), cfg_bookmarks_follow_selection, "?")),
     menu_entries.push_back (lay::separator ("ops_group", at));
-    menu_entries.push_back (lay::menu_item ("cm_manage_bookmarks", "manage_bookmarks", at, tl::to_string (QObject::tr ("Manage Bookmarks")));
-    menu_entries.push_back (lay::menu_item ("cm_load_bookmarks", "load_bookmarks", at, tl::to_string (QObject::tr ("Load Bookmarks")));
-    menu_entries.push_back (lay::menu_item ("cm_save_bookmarks", "save_bookmarks", at, tl::to_string (QObject::tr ("Save Bookmarks")));
+    menu_entries.push_back (lay::menu_item ("cm_manage_bookmarks", "manage_bookmarks", at, tl::to_string (QObject::tr ("Manage Bookmarks"))));
+    menu_entries.push_back (lay::menu_item ("cm_load_bookmarks", "load_bookmarks", at, tl::to_string (QObject::tr ("Load Bookmarks"))));
+    menu_entries.push_back (lay::menu_item ("cm_save_bookmarks", "save_bookmarks", at, tl::to_string (QObject::tr ("Save Bookmarks"))));
   }
 };
 

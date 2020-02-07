@@ -45,8 +45,8 @@ class BrowseShapesConfigPage
 public:
   BrowseShapesConfigPage (QWidget *parent);
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
 public slots:
   void context_changed (int);
@@ -63,7 +63,7 @@ public:
   enum mode_type { ToCellView = 0, AnyTop, Local };
   enum window_type { DontChange = 0, FitCell, FitMarker, Center, CenterSize };
 
-  BrowseShapesForm (lay::PluginRoot *root, lay::LayoutView *view);
+  BrowseShapesForm (lay::Dispatcher *root, lay::LayoutView *view);
   ~BrowseShapesForm ();
 
   bool eventFilter (QObject *watched, QEvent *event);

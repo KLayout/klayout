@@ -76,11 +76,11 @@ public:
    virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
    {
      lay::PluginDeclaration::get_menu_entries (menu_entries);
-     menu_entries.push_back (lay::MenuEntry ("browser_group", "tools_menu.end"));
-     menu_entries.push_back (lay::MenuEntry ("browse_shapes::show", "browse_shapes", "tools_menu.end", tl::to_string (QObject::tr ("Browse Shapes"))));
+     menu_entries.push_back (lay::separator ("browser_group", "tools_menu.end"));
+     menu_entries.push_back (lay::menu_item ("browse_shapes::show", "browse_shapes", "tools_menu.end", tl::to_string (QObject::tr ("Browse Shapes"))));
    }
  
-   virtual lay::Plugin *create_plugin (db::Manager *, lay::PluginRoot *root, lay::LayoutView *view) const
+   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutView *view) const
    {
      return new BrowseShapesForm (root, view);
    }
@@ -177,7 +177,7 @@ BrowseShapesConfigPage::BrowseShapesConfigPage (QWidget *parent)
 }
 
 void 
-BrowseShapesConfigPage::setup (lay::PluginRoot *root)
+BrowseShapesConfigPage::setup (lay::Dispatcher *root)
 {
   std::string value;
 
@@ -228,7 +228,7 @@ BrowseShapesConfigPage::window_changed (int m)
 }
 
 void 
-BrowseShapesConfigPage::commit (lay::PluginRoot *root)
+BrowseShapesConfigPage::commit (lay::Dispatcher *root)
 {
   double dim = 1.0;
   tl::from_string (tl::to_string (le_window->text ()), dim);
@@ -388,7 +388,7 @@ private:
 
 // ------------------------------------------------------------
 
-BrowseShapesForm::BrowseShapesForm (lay::PluginRoot *root, lay::LayoutView *vw)
+BrowseShapesForm::BrowseShapesForm (lay::Dispatcher *root, lay::LayoutView *vw)
   : lay::Browser (root, vw), 
     Ui::BrowseShapesForm (),
     m_cv_index (-1),

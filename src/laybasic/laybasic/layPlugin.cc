@@ -243,7 +243,7 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
   //  the primary mouse modes (special for LayoutView)
   implements_primary_mouse_modes (modes);
 
-  for (std::vector<std::pair<std::string, int> >::const_iterator m = modes.begin (); m != modes.end (); ++m) {
+  for (std::vector<std::pair<std::string, std::pair<std::string, int> > >::const_iterator m = modes.begin (); m != modes.end (); ++m) {
 
     //  extract first part, which is the name, separated by a tab from the title.
     std::string name;
@@ -499,6 +499,59 @@ Plugin::do_config_set (const std::string &name, const std::string &value, bool f
   }
 
   return false;
+}
+
+// ---------------------------------------------------------------------------------------------------
+//  Menu item generators
+
+MenuEntry separator (const std::string &menu_name, const std::string &insert_pos)
+{
+  MenuEntry e;
+  e.menu_name = menu_name;
+  e.insert_pos = insert_pos;
+  return e;
+}
+
+MenuEntry menu_item (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &title)
+{
+  MenuEntry e;
+  e.symbol = symbol;
+  e.menu_name = menu_name;
+  e.insert_pos = insert_pos;
+  e.title = title;
+  return e;
+}
+
+MenuEntry submenu (const std::string &menu_name, const std::string &insert_pos, const std::string &title)
+{
+  MenuEntry e;
+  e.menu_name = menu_name;
+  e.insert_pos = insert_pos;
+  e.title = title;
+  e.sub_menu = true;
+  return e;
+}
+
+MenuEntry submenu (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &title)
+{
+  MenuEntry e;
+  e.symbol = symbol;
+  e.menu_name = menu_name;
+  e.insert_pos = insert_pos;
+  e.title = title;
+  e.sub_menu = true;
+  return e;
+}
+
+MenuEntry config_menu_item (const std::string &menu_name, const std::string &insert_pos, const std::string &title, const std::string &cname, const std::string &cvalue)
+{
+  MenuEntry e;
+  e.menu_name = menu_name;
+  e.insert_pos = insert_pos;
+  e.title = title;
+  e.cname = cname;
+  e.cvalue = cvalue;
+  return e;
 }
 
 }

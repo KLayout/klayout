@@ -1603,7 +1603,7 @@ MarkerBrowserPage::~MarkerBrowserPage ()
 }
 
 void
-MarkerBrowserPage::set_plugin_root (lay::PluginRoot *pr)
+MarkerBrowserPage::set_dispatcher (lay::Dispatcher *pr)
 {
   mp_plugin_root = pr;
 }

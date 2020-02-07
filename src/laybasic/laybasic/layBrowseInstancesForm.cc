@@ -76,10 +76,10 @@ public:
   virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
   {
     lay::PluginDeclaration::get_menu_entries (menu_entries);
-    menu_entries.push_back (lay::MenuEntry ("browse_instances::show", "browse_instances", "tools_menu.end", tl::to_string (QObject::tr ("Browse Instances"))));
+    menu_entries.push_back (lay::menu_item ("browse_instances::show", "browse_instances", "tools_menu.end", tl::to_string (QObject::tr ("Browse Instances"))));
   }
 
-  virtual lay::Plugin *create_plugin (db::Manager *, lay::PluginRoot *root, lay::LayoutView *view) const
+  virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutView *view) const
   {
     return new BrowseInstancesForm (root, view);
   }
@@ -175,7 +175,7 @@ BrowseInstancesConfigPage::BrowseInstancesConfigPage (QWidget *parent)
 }
 
 void 
-BrowseInstancesConfigPage::setup (lay::PluginRoot *root)
+BrowseInstancesConfigPage::setup (lay::Dispatcher *root)
 {
   std::string value;
 
@@ -221,7 +221,7 @@ BrowseInstancesConfigPage::window_changed (int m)
 }
 
 void 
-BrowseInstancesConfigPage::commit (lay::PluginRoot *root)
+BrowseInstancesConfigPage::commit (lay::Dispatcher *root)
 {
   double dim = 1.0;
   tl::from_string (tl::to_string (le_window->text ()), dim);
@@ -289,7 +289,7 @@ private:
 
 // ------------------------------------------------------------
 
-BrowseInstancesForm::BrowseInstancesForm (lay::PluginRoot *root, lay::LayoutView *vw)
+BrowseInstancesForm::BrowseInstancesForm (lay::Dispatcher *root, lay::LayoutView *vw)
   : lay::Browser (root, vw), 
     Ui::BrowseInstancesForm (),
     m_cv_index (0),

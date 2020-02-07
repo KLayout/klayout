@@ -44,7 +44,7 @@ namespace db
 namespace lay
 {
 
-class PluginRoot;
+class Dispatcher;
 class LayoutHandle;
 
 /**

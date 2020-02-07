@@ -90,8 +90,8 @@ static gsi::Methods application_methods ()
     method<C, bool> ("is_editable?", &C::is_editable,
       "@brief Returns true if the application is in editable mode\n"
     ) +
-    //  TODO: basically this method belongs to PluginRoot (aka MainWindow).
-    //  There is separate declaration for PluginRoot which we have to synchronize
+    //  TODO: basically this method belongs to Dispatcher (aka MainWindow).
+    //  There is separate declaration for Dispatcher which we have to synchronize
     //  with this method.
     method<C, std::string, const std::string &> ("get_config", &C::get_config,
       "@brief Gets the value for a configuration parameter\n"
@@ -109,8 +109,8 @@ static gsi::Methods application_methods ()
       "to the configuration parameter. The values delivered by this method correspond to the values stored "
       "in the configuration file "
     ) +
-    //  TODO: basically this method belongs to PluginRoot (aka MainWindow).
-    //  There is separate declaration for PluginRoot which we have to synchronize
+    //  TODO: basically this method belongs to Dispatcher (aka MainWindow).
+    //  There is separate declaration for Dispatcher which we have to synchronize
     //  with this method.
     method<C, std::vector<std::string> > ("get_config_names", &C::get_config_names,
       "@brief Gets the configuration parameter names\n"
@@ -120,8 +120,8 @@ static gsi::Methods application_methods ()
       "This method returns the names of all known configuration parameters. These names can be used to "
       "get and set configuration parameter values."
     ) +
-    //  TODO: basically this method belongs to PluginRoot (aka MainWindow).
-    //  There is separate declaration for PluginRoot which we have to synchronize
+    //  TODO: basically this method belongs to Dispatcher (aka MainWindow).
+    //  There is separate declaration for Dispatcher which we have to synchronize
     //  with this method.
     method<C, const std::string &, const std::string &> ("set_config", &C::set_config,
       "@brief Sets a configuration parameter with the given name to the given value\n"
@@ -138,8 +138,8 @@ static gsi::Methods application_methods ()
       "It is possible to write an arbitrary name/value pair into the configuration database which then is "
       "written to the configuration file."
     ) +
-    //  TODO: basically this method belongs to PluginRoot (aka MainWindow).
-    //  There is separate declaration for PluginRoot which we have to synchronize
+    //  TODO: basically this method belongs to Dispatcher (aka MainWindow).
+    //  There is separate declaration for Dispatcher which we have to synchronize
     //  with this method.
     method<C> ("commit_config", &C::config_end,
       "@brief Commits the configuration settings\n"
@@ -150,8 +150,8 @@ static gsi::Methods application_methods ()
       "\n"
       "This method has been introduced in version 0.25.\n"
     ) +
-    //  TODO: basically this method belongs to PluginRoot (aka MainWindow).
-    //  There is separate declaration for PluginRoot which we have to synchronize
+    //  TODO: basically this method belongs to Dispatcher (aka MainWindow).
+    //  There is separate declaration for Dispatcher which we have to synchronize
     //  with this method.
     method<C, bool, const std::string &> ("write_config", &C::write_config,
       "@brief Writes configuration to a file\n"
@@ -161,8 +161,8 @@ static gsi::Methods application_methods ()
       "If the configuration file cannot be written, \n"
       "is returned but no exception is thrown.\n"
     ) +
-    //  TODO: basically this method belongs to PluginRoot (aka MainWindow).
-    //  There is separate declaration for PluginRoot which we have to synchronize
+    //  TODO: basically this method belongs to Dispatcher (aka MainWindow).
+    //  There is separate declaration for Dispatcher which we have to synchronize
     //  with this method.
     method<C, bool, const std::string &> ("read_config", &C::read_config,
       "@brief Reads the configuration from a file\n"

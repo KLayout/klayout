@@ -121,7 +121,7 @@ struct LAYBASIC_PUBLIC MenuEntry
  *  @param menu_name The name of the menu item (see layAbstractMenu.h)
  *  @param insert_pos The position where to insert (see layAbstractMenu.h)
  */
-MenuEntry separator (const std::string &menu_name, const std::string &insert_pos);
+LAYBASIC_PUBLIC MenuEntry separator (const std::string &menu_name, const std::string &insert_pos);
 
 /**
  *  @brief Creates a normal menu entry
@@ -131,7 +131,7 @@ MenuEntry separator (const std::string &menu_name, const std::string &insert_pos
  *  @param insert_pos The position where to insert (see layAbstractMenu.h)
  *  @param title The title to display plus optional icon resource and keyboard shortcut. The format of the string is: <text>["("shortcut")"]["<"icon-resource">"][{"tool-tip"}].
  */
-MenuEntry menu_item (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &title);
+LAYBASIC_PUBLIC MenuEntry menu_item (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &title);
 
 /**
  *  @brief Creates a submenu entry
@@ -140,7 +140,7 @@ MenuEntry menu_item (const std::string &symbol, const std::string &menu_name, co
  *  @param insert_pos The position where to insert (see layAbstractMenu.h)
  *  @param title The title to display plus optional icon resource and keyboard shortcut. The format of the string is: <text>["("shortcut")"]["<"icon-resource">"][{"tool-tip"}].
  */
-MenuEntry submenu (const std::string &menu_name, const std::string &insert_pos, const std::string &title);
+LAYBASIC_PUBLIC MenuEntry submenu (const std::string &menu_name, const std::string &insert_pos, const std::string &title);
 
 /**
  *  @brief Creates a submenu entry
@@ -150,7 +150,7 @@ MenuEntry submenu (const std::string &menu_name, const std::string &insert_pos, 
  *  @param insert_pos The position where to insert (see layAbstractMenu.h)
  *  @param title The title to display plus optional icon resource and keyboard shortcut. The format of the string is: <text>["("shortcut")"]["<"icon-resource">"][{"tool-tip"}].
  */
-MenuEntry submenu (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &title);
+LAYBASIC_PUBLIC MenuEntry submenu (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &title);
 
 /**
  *  @brief Creates a configuration entry
@@ -161,7 +161,7 @@ MenuEntry submenu (const std::string &symbol, const std::string &menu_name, cons
  *  @param cname The name of the configuration item
  *  @param cvalue The value to set for the configuration item (optional for boolean configuration items)
  */
-MenuEntry config_menu_item (const std::string &menu_name, const std::string &insert_pos, const std::string &title, const std::string &cname, const std::string &cvalue = std::string ());
+LAYBASIC_PUBLIC MenuEntry config_menu_item (const std::string &menu_name, const std::string &insert_pos, const std::string &title, const std::string &cname, const std::string &cvalue = std::string ());
 
 /**
  *  @brief The configuration declaration

@@ -228,7 +228,7 @@ public:
 
 static lay::MacroEditorDialog *s_macro_editor_instance = 0;
 
-MacroEditorDialog::MacroEditorDialog (lay::PluginRoot *pr, lym::MacroCollection *root)
+MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection *root)
   : QDialog (0 /*show as individual top widget*/, Qt::Window),
     lay::Plugin (pr, true),
     mp_plugin_root (pr),
@@ -2278,7 +2278,7 @@ MacroEditorDialog::ensure_writeable_collection_selected ()
 }
 
 static std::vector<std::pair<std::string, std::string> > 
-get_custom_paths (lay::PluginRoot *root)
+get_custom_paths (lay::Dispatcher *root)
 {
   std::vector <std::pair<std::string, std::string> > paths;
 
@@ -2306,7 +2306,7 @@ get_custom_paths (lay::PluginRoot *root)
 }
 
 static void
-set_custom_paths (lay::PluginRoot *root, const std::vector<std::pair<std::string, std::string> > &paths)
+set_custom_paths (lay::Dispatcher *root, const std::vector<std::pair<std::string, std::string> > &paths)
 {
   std::string mp;
 

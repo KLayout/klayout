@@ -116,7 +116,7 @@ MainConfigPage::~MainConfigPage ()
 }
 
 void 
-MainConfigPage::setup (lay::PluginRoot *root)
+MainConfigPage::setup (lay::Dispatcher *root)
 {
   double grid_micron = 0.0;
   root->config_get (cfg_grid, grid_micron);
@@ -124,7 +124,7 @@ MainConfigPage::setup (lay::PluginRoot *root)
 }
 
 void 
-MainConfigPage::commit (lay::PluginRoot *root)
+MainConfigPage::commit (lay::Dispatcher *root)
 {
   try {
     double g;
@@ -150,7 +150,7 @@ MainConfigPage6::~MainConfigPage6 ()
 }
 
 void 
-MainConfigPage6::setup (lay::PluginRoot *root)
+MainConfigPage6::setup (lay::Dispatcher *root)
 {
   int cp = 32;
   root->config_get (cfg_circle_points, cp);
@@ -158,7 +158,7 @@ MainConfigPage6::setup (lay::PluginRoot *root)
 }
 
 void 
-MainConfigPage6::commit (lay::PluginRoot *root)
+MainConfigPage6::commit (lay::Dispatcher *root)
 {
   try {
     int cp = 32;
@@ -185,7 +185,7 @@ MainConfigPage7::~MainConfigPage7 ()
 }
 
 void
-MainConfigPage7::setup (lay::PluginRoot *root)
+MainConfigPage7::setup (lay::Dispatcher *root)
 {
   bool en = true;
   root->config_get (cfg_layout_file_watcher_enabled, en);
@@ -193,7 +193,7 @@ MainConfigPage7::setup (lay::PluginRoot *root)
 }
 
 void
-MainConfigPage7::commit (lay::PluginRoot *root)
+MainConfigPage7::commit (lay::Dispatcher *root)
 {
   try {
     root->config_set (cfg_layout_file_watcher_enabled, mp_ui->check_for_updates->isChecked ());
@@ -217,7 +217,7 @@ MainConfigPage2::~MainConfigPage2 ()
 }
 
 void 
-MainConfigPage2::setup (lay::PluginRoot *root)
+MainConfigPage2::setup (lay::Dispatcher *root)
 {
   bool flag = false;
   root->config_get (cfg_synchronized_views, flag);
@@ -225,7 +225,7 @@ MainConfigPage2::setup (lay::PluginRoot *root)
 }
 
 void 
-MainConfigPage2::commit (lay::PluginRoot *root)
+MainConfigPage2::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_synchronized_views, mp_ui->sync_views_cbx->isChecked ());
 }
@@ -247,7 +247,7 @@ MainConfigPage3::~MainConfigPage3 ()
 }
 
 void 
-MainConfigPage3::setup (lay::PluginRoot *root)
+MainConfigPage3::setup (lay::Dispatcher *root)
 {
   std::string default_grids;
   root->config_get (cfg_default_grids, default_grids);
@@ -255,7 +255,7 @@ MainConfigPage3::setup (lay::PluginRoot *root)
 }
 
 void 
-MainConfigPage3::commit (lay::PluginRoot *root)
+MainConfigPage3::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_default_grids, tl::to_string (mp_ui->grids_edit->text ()));
 }
@@ -277,7 +277,7 @@ MainConfigPage4::~MainConfigPage4 ()
 }
 
 void 
-MainConfigPage4::setup (lay::PluginRoot *root)
+MainConfigPage4::setup (lay::Dispatcher *root)
 {
   bool flag = true;
   root->config_get (cfg_edit_mode, flag);
@@ -285,7 +285,7 @@ MainConfigPage4::setup (lay::PluginRoot *root)
 }
 
 void 
-MainConfigPage4::commit (lay::PluginRoot *root)
+MainConfigPage4::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_edit_mode, mp_ui->edit_mode_cbx->isChecked ());
 }
@@ -307,7 +307,7 @@ MainConfigPage5::~MainConfigPage5 ()
 }
 
 void 
-MainConfigPage5::setup (lay::PluginRoot *root)
+MainConfigPage5::setup (lay::Dispatcher *root)
 {
   int d;
   d = 5;
@@ -319,7 +319,7 @@ MainConfigPage5::setup (lay::PluginRoot *root)
 }
 
 void 
-MainConfigPage5::commit (lay::PluginRoot *root)
+MainConfigPage5::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_micron_digits, mp_ui->micron_digits->value ());
   root->config_set (cfg_dbu_digits, mp_ui->dbu_digits->value ());
@@ -502,7 +502,7 @@ CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::st
 }
 
 void 
-CustomizeMenuConfigPage::setup (lay::PluginRoot *root)
+CustomizeMenuConfigPage::setup (lay::Dispatcher *root)
 {
   std::string packed_key_bindings;
   root->config_get (cfg_key_bindings, packed_key_bindings);
@@ -516,7 +516,7 @@ CustomizeMenuConfigPage::setup (lay::PluginRoot *root)
 }
 
 void 
-CustomizeMenuConfigPage::commit (lay::PluginRoot *root)
+CustomizeMenuConfigPage::commit (lay::Dispatcher *root)
 {
   current_changed (0, mp_ui->bindings_list->currentItem ());
 

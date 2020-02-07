@@ -46,7 +46,6 @@ namespace lay
 {
 
 class LayoutView;
-class PluginRoot;
 
 class LAYBASIC_PUBLIC SaveLayoutAsOptionsDialog
   : public QDialog, private Ui::SaveLayoutAsOptionsDialog

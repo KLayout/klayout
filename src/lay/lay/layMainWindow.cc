@@ -4073,7 +4073,7 @@ MainWindow::plugin_removed (lay::PluginDeclaration *cls)
 }
 
 // ------------------------------------------------------------
-//  Implementation of the PluginRootToMainWindow bride
+//  Implementation of the DispatcherToMainWindow bride
 
 DispatcherToMainWindow::DispatcherToMainWindow ()
   : lay::Dispatcher (0, false),

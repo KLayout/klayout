@@ -207,7 +207,7 @@ XORToolDialog::exec_dialog (lay::LayoutView *view)
   }
 
   //  take current settings from the configurations
-  lay::PluginRoot *config_root = lay::PluginRoot::instance ();
+  lay::Dispatcher *config_root = lay::Dispatcher::instance ();
 
   input_mode_t im = IMAll;
   if (config_root->config_get (cfg_xor_input_mode, im, InputModeConverter ())) {
@@ -333,7 +333,7 @@ BEGIN_PROTECTED
     }
   }
   
-  lay::PluginRoot *config_root = lay::PluginRoot::instance ();
+  lay::Dispatcher *config_root = lay::Dispatcher::instance ();
 
   config_root->config_set (cfg_xor_input_mode, InputModeConverter ().to_string ((input_mode_t) mp_ui->input_layers_cbx->currentIndex ()));
   config_root->config_set (cfg_xor_output_mode, OutputModeConverter ().to_string ((output_mode_t) mp_ui->output_cbx->currentIndex ()));

@@ -169,7 +169,7 @@ MacroController::finish ()
 }
 
 void
-MacroController::initialized (lay::PluginRoot *root)
+MacroController::initialized (lay::Dispatcher *root)
 {
   connect (&m_temp_macros, SIGNAL (menu_needs_update ()), this, SLOT (macro_collection_changed ()));
   connect (&m_temp_macros, SIGNAL (macro_collection_changed (lym::MacroCollection *)), this, SLOT (macro_collection_changed ()));
@@ -205,7 +205,7 @@ MacroController::initialized (lay::PluginRoot *root)
 }
 
 void
-MacroController::uninitialize (lay::PluginRoot * /*root*/)
+MacroController::uninitialize (lay::Dispatcher * /*root*/)
 {
   disconnect (&lym::MacroCollection::root (), SIGNAL (menu_needs_update ()), this, SLOT (macro_collection_changed ()));
   disconnect (&lym::MacroCollection::root (), SIGNAL (macro_collection_changed (lym::MacroCollection *)), this, SLOT (macro_collection_changed ()));
@@ -247,7 +247,7 @@ MacroController::config_finalize()
 }
 
 bool
-MacroController::can_exit (lay::PluginRoot * /*root*/) const
+MacroController::can_exit (lay::Dispatcher * /*root*/) const
 {
   if (mp_macro_editor) {
     return mp_macro_editor->can_exit ();

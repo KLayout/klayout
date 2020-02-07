@@ -28,7 +28,7 @@
 
 namespace lay
 {
-  class PluginRoot;
+  class Dispatcher;
   class LayoutView;
   class ZoomService;
   class ViewService;
@@ -52,7 +52,7 @@ public:
   ~Navigator ();
 
   void background_color (QColor c);
-  img::Object *setup (lay::PluginRoot *root, img::Object *img);
+  img::Object *setup (lay::Dispatcher *root, img::Object *img);
 
   lay::LayoutView *view () 
   {

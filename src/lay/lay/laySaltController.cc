@@ -43,14 +43,14 @@ SaltController::SaltController ()
 }
 
 void
-SaltController::initialize (lay::PluginRoot *root)
+SaltController::initialize (lay::Dispatcher *root)
 {
   mp_mw = lay::MainWindow::instance ();
   mp_plugin_root = root;
 }
 
 void
-SaltController::initialized (lay::PluginRoot * /*root*/)
+SaltController::initialized (lay::Dispatcher * /*root*/)
 {
   if (! m_file_watcher) {
     m_file_watcher = new tl::FileSystemWatcher (this);
@@ -62,7 +62,7 @@ SaltController::initialized (lay::PluginRoot * /*root*/)
 }
 
 void
-SaltController::uninitialize (lay::PluginRoot * /*root*/)
+SaltController::uninitialize (lay::Dispatcher * /*root*/)
 {
   disconnect (&m_salt, SIGNAL (collections_changed ()), this, SIGNAL (salt_changed ()));
 
@@ -103,7 +103,7 @@ SaltController::config_finalize()
 }
 
 bool
-SaltController::can_exit (lay::PluginRoot * /*root*/) const
+SaltController::can_exit (lay::Dispatcher * /*root*/) const
 {
   //  .. nothing yet ..
   return true;

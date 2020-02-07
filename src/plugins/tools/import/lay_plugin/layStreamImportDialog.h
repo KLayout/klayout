@@ -56,7 +56,7 @@ namespace tl
 
 namespace lay
 {
-  class PluginRoot;
+  class Dispatcher;
 }
 
 namespace lay

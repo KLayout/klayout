@@ -22,6 +22,7 @@
 
 
 #include "laySearchReplaceConfigPage.h"
+#include "layDispatcher.h"
 
 namespace lay
 {
@@ -76,7 +77,7 @@ SearchReplaceConfigPage::SearchReplaceConfigPage (QWidget *parent)
 }
 
 void 
-SearchReplaceConfigPage::setup (lay::PluginRoot *root)
+SearchReplaceConfigPage::setup (lay::Dispatcher *root)
 {
   std::string value;
 
@@ -106,7 +107,7 @@ SearchReplaceConfigPage::window_changed (int m)
 }
 
 void 
-SearchReplaceConfigPage::commit (lay::PluginRoot *root)
+SearchReplaceConfigPage::commit (lay::Dispatcher *root)
 {
   double dim = 1.0;
   tl::from_string (tl::to_string (le_window->text ()), dim);

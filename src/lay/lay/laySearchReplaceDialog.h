@@ -164,7 +164,7 @@ public:
     std::string text;
   };
 
-  SearchReplaceDialog (lay::PluginRoot *root, lay::LayoutView *view);
+  SearchReplaceDialog (lay::Dispatcher *root, lay::LayoutView *view);
   ~SearchReplaceDialog ();
 
 private:

@@ -44,8 +44,8 @@ public:
   MacroEditorSetupPage (QWidget *parent);
   ~MacroEditorSetupPage ();
 
-  virtual void setup (PluginRoot *root);
-  virtual void commit (PluginRoot *root);
+  virtual void setup (Dispatcher *root);
+  virtual void commit (Dispatcher *root);
 
 protected slots:
   void current_attribute_changed (QListWidgetItem *current, QListWidgetItem *previous);

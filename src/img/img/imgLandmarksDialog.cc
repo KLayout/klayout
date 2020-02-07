@@ -406,7 +406,7 @@ LandmarksDialog::LandmarksDialog (QWidget *parent, img::Object &img)
 
   setupUi (this);
 
-  mp_image = navigator->setup (lay::PluginRoot::instance (), &img);
+  mp_image = navigator->setup (lay::Dispatcher::instance (), &img);
 
   connect (new_pb, SIGNAL (clicked ()), this, SLOT (update_mode ()));
   connect (delete_pb, SIGNAL (clicked ()), this, SLOT (update_mode ()));

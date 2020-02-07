@@ -23,6 +23,7 @@
 
 #include "layNetTracerConfig.h"
 #include "layConverters.h"
+#include "layDispatcher.h"
 
 #include <QColorDialog>
 #include <QPainter>
@@ -128,7 +129,7 @@ NetTracerConfigPage::color_button_clicked ()
 }
 
 void 
-NetTracerConfigPage::setup (lay::PluginRoot *root)
+NetTracerConfigPage::setup (lay::Dispatcher *root)
 {
   //  window mode
   lay::nt_window_type wmode = lay::NTFitNet;
@@ -237,7 +238,7 @@ NetTracerConfigPage::window_changed (int m)
 }
 
 void 
-NetTracerConfigPage::commit (lay::PluginRoot *root)
+NetTracerConfigPage::commit (lay::Dispatcher *root)
 {
   double dim = 1.0;
   tl::from_string (tl::to_string (le_window->text ()), dim);

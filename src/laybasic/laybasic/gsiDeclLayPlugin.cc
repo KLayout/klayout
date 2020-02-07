@@ -903,7 +903,7 @@ Class<lay::Dispatcher> decl_Dispatcher ("lay", "Dispatcher",
     "@brief Clears the configuration parameters\n"
   ) +
   method ("instance", &dispatcher_instance,
-    "@brief Gets the singleton instance of the PluginRoot object\n"
+    "@brief Gets the singleton instance of the Dispatcher object\n"
     "\n"
     "@return The instance\n"
   ) +

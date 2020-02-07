@@ -605,7 +605,7 @@ ApplicationBase::init_app ()
   bool editable_from_config = false;
 
   {
-    lay::Dispatcher cfg;
+    lay::Dispatcher cfg (0);
 
     for (std::vector <std::string>::const_iterator c = m_config_files.begin (); c != m_config_files.end (); ++c) {
       try {

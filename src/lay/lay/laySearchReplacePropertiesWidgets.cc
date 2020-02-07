@@ -325,7 +325,7 @@ public:
     setupUi (this);
   }
 
-  void restore_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void restore_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     std::string v;
     if (config_root->config_get (pfx + cfg_suffix_instance_cellname_op, v)) {
@@ -336,7 +336,7 @@ public:
     }
   }
 
-  void save_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void save_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     config_root->config_set (pfx + cfg_suffix_instance_cellname_op, tl::to_string (instance_cellname_op->currentText ()));
     config_root->config_set (pfx + cfg_suffix_instance_cellname_value, tl::to_string (instance_cellname_value->text ()));
@@ -386,7 +386,7 @@ public:
     shape_layer->set_new_layer_enabled (false);
   }
 
-  void restore_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void restore_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     std::string v;
     if (config_root->config_get (pfx + cfg_suffix_shape_layer, v)) {
@@ -406,7 +406,7 @@ public:
     }
   }
 
-  void save_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void save_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     config_root->config_set (pfx + cfg_suffix_shape_layer, tl::to_string (shape_layer->currentText ()));
     config_root->config_set (pfx + cfg_suffix_shape_area_op, tl::to_string (shape_area_op->currentText ()));
@@ -454,7 +454,7 @@ public:
     //  .. nothing yet ..
   }
 
-  void restore_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void restore_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     std::string v;
     if (config_root->config_get (pfx + cfg_suffix_polygon_layer, v)) {
@@ -474,7 +474,7 @@ public:
     }
   }
 
-  void save_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void save_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     config_root->config_set (pfx + cfg_suffix_polygon_layer, tl::to_string (shape_layer->currentText ()));
     config_root->config_set (pfx + cfg_suffix_polygon_area_op, tl::to_string (shape_area_op->currentText ()));
@@ -527,7 +527,7 @@ public:
     box_layer->set_new_layer_enabled (false);
   }
 
-  void restore_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void restore_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     std::string v;
     if (config_root->config_get (pfx + cfg_suffix_box_layer, v)) {
@@ -547,7 +547,7 @@ public:
     }
   }
 
-  void save_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void save_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     config_root->config_set (pfx + cfg_suffix_box_layer, tl::to_string (box_layer->currentText ()));
     config_root->config_set (pfx + cfg_suffix_box_width_op, tl::to_string (box_width_op->currentText ()));
@@ -602,7 +602,7 @@ public:
     path_layer->set_new_layer_enabled (false);
   }
 
-  void restore_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void restore_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     std::string v;
     if (config_root->config_get (pfx + cfg_suffix_path_layer, v)) {
@@ -622,7 +622,7 @@ public:
     }
   }
 
-  void save_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void save_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     config_root->config_set (pfx + cfg_suffix_path_layer, tl::to_string (path_layer->currentText ()));
     config_root->config_set (pfx + cfg_suffix_path_width_op, tl::to_string (path_width_op->currentText ()));
@@ -675,7 +675,7 @@ public:
     text_layer->set_new_layer_enabled (false);
   }
 
-  void restore_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void restore_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     std::string v;
     if (config_root->config_get (pfx + cfg_suffix_text_layer, v)) {
@@ -701,7 +701,7 @@ public:
     }
   }
 
-  void save_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void save_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     config_root->config_set (pfx + cfg_suffix_text_layer, tl::to_string (text_layer->currentText ()));
     config_root->config_set (pfx + cfg_suffix_text_string_op, tl::to_string (text_string_op->currentText ()));
@@ -753,7 +753,7 @@ public:
     setupUi (this);
   }
 
-  void restore_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void restore_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     std::string v;
     if (config_root->config_get (pfx + cfg_suffix_instance_cellname_value, v)) {
@@ -761,7 +761,7 @@ public:
     }
   }
 
-  void save_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void save_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     config_root->config_set (pfx + cfg_suffix_instance_cellname_value, tl::to_string (instance_cellname->text ()));
   }
@@ -795,7 +795,7 @@ public:
     shape_layer->set_no_layer_available (true);
   }
 
-  void restore_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void restore_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     std::string v;
     if (config_root->config_get (pfx + cfg_suffix_shape_layer, v)) {
@@ -803,7 +803,7 @@ public:
     }
   }
 
-  void save_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void save_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     config_root->config_set (pfx + cfg_suffix_shape_layer, tl::to_string (shape_layer->currentText ()));
   }
@@ -833,7 +833,7 @@ public:
     //  .. nothing yet ..
   }
 
-  void restore_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void restore_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     std::string v;
     if (config_root->config_get (pfx + cfg_suffix_polygon_layer, v)) {
@@ -841,7 +841,7 @@ public:
     }
   }
 
-  void save_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void save_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     config_root->config_set (pfx + cfg_suffix_polygon_layer, tl::to_string (shape_layer->currentText ()));
   }
@@ -875,7 +875,7 @@ public:
     box_layer->set_no_layer_available (true);
   }
 
-  void restore_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void restore_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     std::string v;
     if (config_root->config_get (pfx + cfg_suffix_box_layer, v)) {
@@ -889,7 +889,7 @@ public:
     }
   }
 
-  void save_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void save_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     config_root->config_set (pfx + cfg_suffix_box_layer, tl::to_string (box_layer->currentText ()));
     config_root->config_set (pfx + cfg_suffix_box_width_value, tl::to_string (box_width->text ()));
@@ -927,7 +927,7 @@ public:
     path_layer->set_no_layer_available (true);
   }
 
-  void restore_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void restore_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     std::string v;
     if (config_root->config_get (pfx + cfg_suffix_path_layer, v)) {
@@ -938,7 +938,7 @@ public:
     }
   }
 
-  void save_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void save_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     config_root->config_set (pfx + cfg_suffix_path_layer, tl::to_string (path_layer->currentText ()));
     config_root->config_set (pfx + cfg_suffix_path_width_value, tl::to_string (path_width->text ()));
@@ -974,7 +974,7 @@ public:
     text_layer->set_no_layer_available (true);
   }
 
-  void restore_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void restore_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     std::string v;
     if (config_root->config_get (pfx + cfg_suffix_text_layer, v)) {
@@ -991,7 +991,7 @@ public:
     }
   }
 
-  void save_state (const std::string &pfx, lay::PluginRoot *config_root) const
+  void save_state (const std::string &pfx, lay::Dispatcher *config_root) const
   {
     config_root->config_set (pfx + cfg_suffix_text_layer, tl::to_string (text_layer->currentText ()));
     config_root->config_set (pfx + cfg_suffix_text_string_value, tl::to_string (text_string->text ()));

@@ -70,7 +70,7 @@ TechnologyController::instance ()
 }
 
 void
-TechnologyController::initialize (lay::PluginRoot *root)
+TechnologyController::initialize (lay::Dispatcher *root)
 {
   mp_plugin_root = root;
   mp_mw = lay::MainWindow::instance ();
@@ -81,7 +81,7 @@ TechnologyController::initialize (lay::PluginRoot *root)
 }
 
 void
-TechnologyController::initialized (lay::PluginRoot * /*root*/)
+TechnologyController::initialized (lay::Dispatcher * /*root*/)
 {
   update_menu ();
   connect_events ();
@@ -92,7 +92,7 @@ TechnologyController::initialized (lay::PluginRoot * /*root*/)
 }
 
 void
-TechnologyController::uninitialize (lay::PluginRoot * /*root*/)
+TechnologyController::uninitialize (lay::Dispatcher * /*root*/)
 {
   m_tech_actions.clear ();
   tl::Object::detach_from_all_events ();
@@ -113,7 +113,7 @@ void
 TechnologyController::get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
 {
   lay::PluginDeclaration::get_menu_entries (menu_entries);
-  menu_entries.push_back (lay::MenuEntry ("technology_selector:apply_technology", "technology_selector:tech_selector_group", "@toolbar.end", tl::to_string (QObject::tr ("Technology<:techs.png>{Select technology (click to apply)}"))));
+  menu_entries.push_back (lay::menu_item ("technology_selector:apply_technology", "technology_selector:tech_selector_group", "@toolbar.end", tl::to_string (QObject::tr ("Technology<:techs.png>{Select technology (click to apply)}"))));
 }
 
 void
@@ -193,7 +193,7 @@ TechnologyController::update_active_technology ()
 #if 0 
   //  Hint with this implementation, the current technology follows the current layout.
   //  Although that's a nice way to display the current technology, it's pretty confusing
-  lay::PluginRoot *pr = mp_plugin_root;
+  lay::Dispatcher *pr = mp_plugin_root;
   if (pr) {
     pr->config_set (cfg_initial_technology, active_tech);
   }
@@ -204,7 +204,7 @@ void
 TechnologyController::technologies_changed ()
 {
   //  update the configuration to reflect the persisted technologies
-  lay::PluginRoot *pr = mp_plugin_root;
+  lay::Dispatcher *pr = mp_plugin_root;
   if (pr) {
     m_configure_enabled = false;
     try {
@@ -298,7 +298,7 @@ TechnologyController::menu_activated (const std::string &symbol) const
 void
 TechnologyController::update_current_technology ()
 {
-  lay::AbstractMenuProvider *pr = lay::AbstractMenuProvider::instance ();
+  lay::Dispatcher *pr = lay::Dispatcher::instance ();
   if (! pr || ! pr->menu ()) {
     return;
   }
@@ -325,7 +325,7 @@ TechnologyController::update_current_technology ()
 void
 TechnologyController::update_menu ()
 {
-  lay::AbstractMenuProvider *pr = lay::AbstractMenuProvider::instance ();
+  lay::Dispatcher *pr = lay::Dispatcher::instance ();
   if (! pr || ! pr->menu ()) {
     return;
   }

@@ -57,7 +57,7 @@ class NetTracerDialog
 Q_OBJECT
 
 public:
-  NetTracerDialog (lay::PluginRoot *root, lay::LayoutView *view);
+  NetTracerDialog (lay::Dispatcher *root, lay::LayoutView *view);
   virtual ~NetTracerDialog ();
 
   virtual bool mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio);

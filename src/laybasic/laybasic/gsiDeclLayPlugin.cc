@@ -402,6 +402,11 @@ public:
     m_menu_entries.push_back (lay::menu_item (symbol, menu_name, insert_pos, title));
   }
 
+  void add_menu_entry_copy (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &copy_from)
+  {
+    m_menu_entries.push_back (lay::menu_item_copy (symbol, menu_name, insert_pos, copy_from));
+  }
+
   void add_submenu (const std::string &menu_name, const std::string &insert_pos, const std::string &title)
   {
     m_menu_entries.push_back (lay::submenu (menu_name, insert_pos, title));
@@ -547,6 +552,14 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
     "last parameter to \"true\".\n"
     "\n"
     "With version 0.27 it's more convenient to use \\add_submenu."
+  ) +
+  method ("add_menu_item_clone", &gsi::PluginFactoryBase::add_menu_entry_copy, gsi::arg ("symbol"), gsi::arg ("menu_name"), gsi::arg ("insert_pos"), gsi::arg ("copy_from"),
+    "@brief Specifies a menu item as a clone of another one\n"
+    "Using this method, a menu item can be made a clone of another entry (given as path by 'copy_from').\n"
+    "The new item will share the \\Action object with the original one, so manipulating the action will change both the original entry "
+    "and the new entry.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
   ) +
   method ("add_submenu", &gsi::PluginFactoryBase::add_submenu, gsi::arg ("menu_name"), gsi::arg ("insert_pos"), gsi::arg ("title"),
     "@brief Specifies a menu item or sub-menu\n"

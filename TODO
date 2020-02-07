@@ -1,32 +1,34 @@
 
 Plan:
 
-1. Combine AbstractMenuProvider, PluginRoot and the AbstractMenuProvider's 
+DONE 1. Combine AbstractMenuProvider, PluginRoot and the AbstractMenuProvider's 
    implementation in MainWindow/LayoutView into lay::Dispatcher
 
-2. Base MainWindow and LayoutView on lay::Dispatcher
+DONE 2. Base MainWindow and LayoutView on lay::Dispatcher
 
-3. lay::Plugin::plugin_root -> lay::Dispatcher *lay::Plugin::dispatcher()
+DONE 3. lay::Plugin::plugin_root -> lay::Dispatcher *lay::Plugin::dispatcher()
    This method will find the MainWindow or LayoutView depending 
    which is the root.
 
-4. Don't use AbstractMenuProvider::instance anymore, rather use lay::Dispatcher::instance
+DONE 4. Don't use AbstractMenuProvider::instance anymore, rather use lay::Dispatcher::instance
    when necessary (should not be)
 
-5. Instead of slots, bind abstract menu items to symbols passed to 
+DONE 5. Instead of slots, bind abstract menu items to symbols passed to 
    Dispatcher::menu_activated
 
-6. MainWindow will automatically dispatch menu_activated to LayoutView
+DONE 6. MainWindow will automatically dispatch menu_activated to LayoutView
 
-7. GSI-expose menu_activated in LayoutView and MainWindow
+DONE 7. GSI-expose menu_activated in LayoutView and MainWindow as "call_menu"
 
-8. We can move menu initialization of LV-specifics to the LayoutView and
+DONE 8. We can move menu initialization of LV-specifics to the LayoutView and
    remove the cm_... and the code which just passes signals to the current view! :)
    
 9. BTW: make QWidget::setParent and QObject::setParent transfer ownership for
    Qt binding.
 
 10. Provide the layer toolbox for GSI
+
+11. Tests for new features and GSI tests
 
 Tests:
   - compare menu layout
@@ -36,4 +38,5 @@ Tests:
   - ruby plugin (debugging, re-running)
   - changing of macro title, move macro to different place
   - funktionieren die check marks vor den menus? (Mode, selection modes, ruler template)
+  - check whether there is a replacement for the "cm_..." methods and tests them (at least one)
 

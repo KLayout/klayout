@@ -116,8 +116,13 @@ public:
 
   /**
    *  @brief Gets the AbstractMenu object
+   *
+   *  This will deliver the actual menu - the one that is the root dispatcher's menu
    */
-  AbstractMenu *menu () { return &m_menu; }
+  AbstractMenu *menu ()
+  {
+    return (dispatcher () == this) ? &m_menu : dispatcher ()->menu ();
+  }
 
   /**
    *  @brief Creates a configuration action with the given title, parameter name and value

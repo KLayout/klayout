@@ -182,10 +182,20 @@ gsi::Methods cm_method_decl ()
       "Use \"call_menu('" + std::string (cm_symbols[NUM]) + "')\" instead.");
 }
 
+//  NOTE: this avoids an issue with binding: C++ (at least clang
+//  will resolve lay::MainWindow::menu to lay::Dispatcher::menu,
+//  the method declaration will be based on "lay::Dispatcher", and
+//  calling this on a MainWindow object fails, because Dispatcher
+//  is not the first base class.
+static lay::AbstractMenu *menu (lay::MainWindow *mw)
+{
+  return mw->menu ();
+}
+
 Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "MainWindow",
 
   //  QMainWindow interface
-  gsi::method ("menu", &lay::MainWindow::menu,
+  gsi::method_ext ("menu", &menu,
     "@brief Returns a reference to the abstract menu\n"
     "\n"
     "@return A reference to an \\AbstractMenu object representing the menu system"

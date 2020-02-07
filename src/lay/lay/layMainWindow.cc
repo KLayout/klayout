@@ -735,7 +735,7 @@ MainWindow::init_menu ()
   //  make the plugins create their menu items
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
     //  TODO: get rid of the const_cast hack
-    const_cast <lay::PluginDeclaration *> (&*cls)->init_menu (this);
+    const_cast <lay::PluginDeclaration *> (&*cls)->init_menu (dispatcher ());
   }
 
   //  if in "viewer-only mode", hide all entries in the "hide_vo" group

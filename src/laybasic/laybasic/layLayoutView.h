@@ -221,12 +221,6 @@ public:
   static LayoutView *current ();
 
   /**
-   *  @brief Gets the abstract menu object for this view
-   *  This is either the global menu object or the local one.
-   */
-  AbstractMenu *menu ();
-
-  /**
    *  @brief Determine if there is something to copy
    *
    *  This reimplementation of the lay::Editables interface additionally
@@ -2892,7 +2886,7 @@ private:
   bool m_active_cellview_changed_event_enabled;
   tl::DeferredMethod<lay::LayoutView> dm_prop_changed;
 
-  void init (db::Manager *mgr, lay::Dispatcher *dispatcher, QWidget *parent);
+  void init (db::Manager *mgr, QWidget *parent);
 
   void do_prop_changed ();
   void do_redraw (int layer);

@@ -28,3 +28,11 @@ Plan:
 
 10. Provide the layer toolbox for GSI
 
+Tests:
+  - compare menu layout
+  - test every menu function
+  - adding of new tech
+  - adding of rulers/removing
+  - ruby plugin (debugging, re-running)
+  - changing of macro title, move macro to different place
+

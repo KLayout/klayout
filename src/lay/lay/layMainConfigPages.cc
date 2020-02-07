@@ -402,11 +402,11 @@ CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::st
 
   //  get the current bindings
   m_current_bindings.clear ();
-  get_shortcuts (*lay::MainWindow::instance ()->menu (), std::string (), m_current_bindings, false);
+  get_shortcuts (*lay::Dispatcher::instance ()->menu (), std::string (), m_current_bindings, false);
 
   //  get the default bindings
   std::map<std::string, std::string> default_bindings;
-  get_shortcuts (*lay::MainWindow::instance ()->menu (), std::string (), default_bindings, true);
+  get_shortcuts (*lay::Dispatcher::instance ()->menu (), std::string (), default_bindings, true);
 
   m_enable_event = false;
 
@@ -416,7 +416,7 @@ CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::st
   for (std::map<std::string, std::string>::iterator kb = m_current_bindings.begin (); kb != m_current_bindings.end (); ++kb) {
     std::map<std::string, std::string>::iterator bb = b.find (kb->first);
     if (bb != b.end ()) {
-      lay::Action a = lay::MainWindow::instance ()->menu ()->action (kb->first);
+      lay::Action a = lay::Dispatcher::instance ()->menu ()->action (kb->first);
       kb->second = a.get_effective_shortcut_for (bb->second);
     } else {
       kb->second.clear ();
@@ -470,7 +470,7 @@ CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::st
 
       if (t->first == tl_menu) {
         QTreeWidgetItem *item = new QTreeWidgetItem (top_level_item);
-        lay::Action action = lay::MainWindow::instance ()->menu ()->action (cb->first);
+        lay::Action action = lay::Dispatcher::instance ()->menu ()->action (cb->first);
         item->setData (0, Qt::ToolTipRole, tl::to_qstring (rem_path));
         item->setData (0, Qt::DisplayRole, tl::to_qstring (rem_path));
         item->setData (1, Qt::ToolTipRole, tl::to_qstring (action.get_title ()));
@@ -530,7 +530,7 @@ CustomizeMenuConfigPage::commit (lay::Dispatcher *root)
   for (std::vector<std::pair<std::string, std::string> >::iterator kb = key_bindings.begin (); kb != key_bindings.end (); ++kb) {
     std::map<std::string, std::string>::iterator cb = m_current_bindings.find (kb->first);
     if (cb != m_current_bindings.end ()) {
-      lay::Action a = lay::MainWindow::instance ()->menu ()->action (kb->first);
+      lay::Action a = lay::Dispatcher::instance ()->menu ()->action (kb->first);
       if (cb->second != a.get_default_shortcut ()) {
         if (cb->second.empty ()) {
           kb->second = lay::Action::no_shortcut ();
@@ -580,7 +580,7 @@ CustomizeMenuConfigPage::text_cleared ()
   }
 
   std::string path = tl::to_string (item->data (0, Qt::UserRole).toString ());
-  lay::Action a = lay::MainWindow::instance ()->menu ()->action (path);
+  lay::Action a = lay::Dispatcher::instance ()->menu ()->action (path);
 
   //  "clear" reverts to default
   mp_ui->binding_le->setText (tl::to_qstring (a.get_default_shortcut ()));
@@ -634,7 +634,7 @@ CustomizeMenuConfigPage::update_list_item (QTreeWidgetItem *item)
 
   bool is_default = false;
 
-  lay::Action a = lay::MainWindow::instance ()->menu ()->action (path);
+  lay::Action a = lay::Dispatcher::instance ()->menu ()->action (path);
   std::string def_shortcut = a.get_default_shortcut ();
 
   is_default = (def_shortcut == shortcut);
@@ -643,7 +643,7 @@ CustomizeMenuConfigPage::update_list_item (QTreeWidgetItem *item)
   item->setData (2, Qt::ForegroundRole, palette ().color (is_default ? QPalette::Disabled : QPalette::Normal, QPalette::Text));
 
   //  Set the aliases too
-  const lay::AbstractMenu &menu = *lay::MainWindow::instance ()->menu ();
+  const lay::AbstractMenu &menu = *lay::Dispatcher::instance ()->menu ();
   if (menu.is_valid (path)) {
     QAction *qaction = menu.action (path).qaction ();
     std::map<QAction *, std::vector<std::string> >::const_iterator a = m_paths_for_action.find (qaction);
@@ -688,7 +688,7 @@ CustomizeMenuConfigPage::current_changed (QTreeWidgetItem *current, QTreeWidgetI
   if (current && !current->data (0, Qt::UserRole).isNull ()) {
 
     std::string path = tl::to_string (current->data (0, Qt::UserRole).toString ());
-    if (lay::MainWindow::instance ()->menu ()->is_menu (path)) {
+    if (lay::Dispatcher::instance ()->menu ()->is_menu (path)) {
 
       mp_ui->binding_le->setText (QString ());
 #if QT_VERSION >= 0x40700
@@ -700,7 +700,7 @@ CustomizeMenuConfigPage::current_changed (QTreeWidgetItem *current, QTreeWidgetI
 
       std::string shortcut = m_current_bindings[path];
 
-      lay::Action a = lay::MainWindow::instance ()->menu ()->action (path);
+      lay::Action a = lay::Dispatcher::instance ()->menu ()->action (path);
 
       std::string def_shortcut = a.get_default_shortcut ();
 

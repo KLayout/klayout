@@ -272,7 +272,7 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
   tl::DeferredMethodScheduler::instance ();
 
   setObjectName (QString::fromUtf8 (name));
-  init (manager, dispatcher (), parent);
+  init (manager, parent);
 }
 
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, QWidget *parent, const char *name, unsigned int options)
@@ -293,7 +293,7 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
 
   m_annotation_shapes = source->m_annotation_shapes;
 
-  init (manager, dispatcher (), parent);
+  init (manager, parent);
 
   //  set the handle reference and clear all cell related stuff 
   m_cellviews = source->cellview_list ();
@@ -355,12 +355,12 @@ LayoutView::eventFilter(QObject *obj, QEvent *event)
 }
 
 void
-LayoutView::init (db::Manager *mgr, lay::Dispatcher *dispatcher, QWidget * /*parent*/)
+LayoutView::init (db::Manager *mgr, QWidget * /*parent*/)
 {
   manager (mgr);
 
-  if (! dispatcher) {
-    //  build the context menus, nothing else so far.
+  if (dispatcher () == this) {
+    //  if we're the root dispatcher build the context menus, nothing else so far.
     menu ()->build (0, 0);
   }
 
@@ -6471,13 +6471,6 @@ LayoutView::intrinsic_mouse_modes (std::vector<std::string> *descriptions)
     descriptions->push_back ("move\t" + tl::to_string (QObject::tr ("Move")) + "<:move.png>");
   }
   return 2;
-}
-
-AbstractMenu *
-LayoutView::menu ()
-{
-  //  NOTE: dispatcher is either this or the real end of the chain
-  return dispatcher ()->menu ();
 }
 
 int

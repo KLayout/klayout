@@ -232,7 +232,7 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
 
   title = std::string ();
   if (implements_mouse_mode (title)) {
-    modes.push_back (std::make_pair (title, std::make_pair ("edit_menu.mode_menu.end;@toolbar.end", id ())));
+    modes.push_back (std::make_pair (title, std::make_pair ("edit_menu.mode_menu.end;@toolbar.end_modes", id ())));
   }
 
   //  the primary mouse modes (special for LayoutView)

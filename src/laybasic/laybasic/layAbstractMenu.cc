@@ -1611,7 +1611,7 @@ AbstractMenu::find_item (tl::Extractor &extr)
     } else {
 
       std::string n;
-      extr.read (n, ".+>(");
+      extr.read (n, ".;+>(");
 
       if (n.empty ()) {
 
@@ -1629,7 +1629,7 @@ AbstractMenu::find_item (tl::Extractor &extr)
 
         std::string nn;
         if (extr.test (">")) {
-          extr.read (nn, ".+>(");
+          extr.read (nn, ".;+>(");
         }
 
         std::string name (parent->name ());
@@ -1645,7 +1645,7 @@ AbstractMenu::find_item (tl::Extractor &extr)
 
         std::string ndesc;
         if (! nn.empty () && extr.test ("(")) {
-          extr.read_word_or_quoted (ndesc, " _.$");
+          extr.read_word_or_quoted (ndesc, " _.;$");
           extr.test (")");
         }
 

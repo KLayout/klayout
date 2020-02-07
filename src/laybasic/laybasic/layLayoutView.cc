@@ -8115,8 +8115,8 @@ public:
     menu_entries.push_back (lay::separator ("redraw_group", at));
     menu_entries.push_back (lay::menu_item ("cm_redraw", "redraw", at, tl::to_string (QObject::tr ("Redraw"))));
     menu_entries.push_back (lay::separator ("state_group", at));
-    menu_entries.push_back (lay::menu_item ("cm_prev_display_state", "prev_display_state", at, tl::to_string (QObject::tr ("Back(Shift+Tab)<:/back.png>"))));
-    menu_entries.push_back (lay::menu_item ("cm_next_display_state", "next_display_state", at, tl::to_string (QObject::tr ("Forward(Tab)<:/forward.png>"))));
+    menu_entries.push_back (lay::menu_item_copy ("cm_prev_display_state", "prev_display_state", at, "@toolbar.prev_display_state"));
+    menu_entries.push_back (lay::menu_item_copy ("cm_next_display_state", "next_display_state", at, "@toolbar.next_display_state"));
 
     menu_entries.push_back (lay::separator ("select_group", at));
     menu_entries.push_back (lay::menu_item ("cm_select_cell", "select_cell:edit", at, tl::to_string (QObject::tr ("Select Cell"))));

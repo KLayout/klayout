@@ -1729,6 +1729,19 @@ AbstractMenu::group (const std::string &name) const
   return grp;
 }
 
+std::vector<lay::Action>
+AbstractMenu::group_actions (const std::string &name) const
+{
+  std::vector<std::string> grp = group (name);
+
+  std::vector<lay::Action> actions;
+  actions.reserve (grp.size ());
+  for (std::vector<std::string>::const_iterator g = grp.begin (); g != grp.end (); ++g) {
+    actions.push_back (action (*g));
+  }
+  return actions;
+}
+
 void
 AbstractMenu::collect_group (std::vector<std::string> &grp, const std::string &name, const AbstractMenuItem &item) const
 {

@@ -108,6 +108,7 @@ struct LAYBASIC_PUBLIC MenuEntry
   std::string symbol;
   std::string insert_pos;
   std::string title;
+  std::string copy_from;
   std::string cname;
   std::string cvalue;
   std::string exclusive_group;
@@ -133,6 +134,16 @@ LAYBASIC_PUBLIC MenuEntry separator (const std::string &menu_name, const std::st
  *  @param title The title to display plus optional icon resource and keyboard shortcut. The format of the string is: <text>["("shortcut")"]["<"icon-resource">"][{"tool-tip"}].
  */
 LAYBASIC_PUBLIC MenuEntry menu_item (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &title);
+
+/**
+ *  @brief Creates a menu entry as a linked copy from another one
+ *
+ *  @param symbol The symbol to send when this menu item is selected
+ *  @param menu_name The name of the menu item (see layAbstractMenu.h)
+ *  @param insert_pos The position where to insert (see layAbstractMenu.h)
+ *  @param copy_from The path of the item where to copy from (must exist)
+ */
+LAYBASIC_PUBLIC MenuEntry menu_item_copy (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &copy_from);
 
 /**
  *  @brief Creates a submenu entry

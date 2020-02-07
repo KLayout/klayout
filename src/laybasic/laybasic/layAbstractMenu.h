@@ -772,6 +772,14 @@ public:
   std::vector<std::string> group (const std::string &name) const;
 
   /**
+   *  @brief Get the group members as Action objects
+   *
+   *  @param group The group name
+   *  @param A vector of all members (as actions) of the group
+   */
+  std::vector<lay::Action> group_actions (const std::string &name) const;
+
+  /**
    *  @brief Get the detached menu
    *
    *  This will return a QMenu pointer to a detached menu that is created

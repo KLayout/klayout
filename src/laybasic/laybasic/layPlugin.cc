@@ -186,7 +186,11 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
 
   for (std::vector<lay::MenuEntry>::const_iterator m = menu_entries.begin (); m != menu_entries.end (); ++m) {
 
-    if (m->separator) {
+    if (! m->copy_from.empty ()) {
+
+      menu.insert_item (m->insert_pos, m->menu_name, menu.action (m->copy_from));
+
+    } else if (m->separator) {
 
       menu.insert_separator (m->insert_pos, m->menu_name);
 
@@ -517,6 +521,16 @@ MenuEntry menu_item (const std::string &symbol, const std::string &menu_name, co
   e.menu_name = menu_name;
   e.insert_pos = insert_pos;
   e.title = title;
+  return e;
+}
+
+MenuEntry menu_item_copy (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &copy_from)
+{
+  MenuEntry e;
+  e.symbol = symbol;
+  e.menu_name = menu_name;
+  e.insert_pos = insert_pos;
+  e.copy_from = copy_from;
   return e;
 }
 

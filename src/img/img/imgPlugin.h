@@ -39,7 +39,7 @@ public:
   }
 
   virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const;
-  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::PluginRoot *, lay::LayoutView *view) const;
+  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *, lay::LayoutView *view) const;
   virtual bool implements_editable (std::string &title) const;
 };
 

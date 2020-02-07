@@ -1282,14 +1282,14 @@ InstService::sync_to_config ()
 {
   //  push the current setup to configuration so the instance dialog will take these as default
   //  and "apply" of these instance properties doesn't fail because of insistency.
-  plugin_root ()->config_set (cfg_edit_inst_lib_name, m_lib_name);
-  plugin_root ()->config_set (cfg_edit_inst_cell_name, m_cell_or_pcell_name);
+  dispatcher ()->config_set (cfg_edit_inst_lib_name, m_lib_name);
+  dispatcher ()->config_set (cfg_edit_inst_cell_name, m_cell_or_pcell_name);
   if (m_is_pcell) {
-    plugin_root ()->config_set (cfg_edit_inst_pcell_parameters, pcell_parameters_to_string (m_pcell_parameters));
+    dispatcher ()->config_set (cfg_edit_inst_pcell_parameters, pcell_parameters_to_string (m_pcell_parameters));
   } else {
-    plugin_root ()->config_set (cfg_edit_inst_pcell_parameters, std::string ());
+    dispatcher ()->config_set (cfg_edit_inst_pcell_parameters, std::string ());
   }
-  plugin_root ()->config_end ();
+  dispatcher ()->config_end ();
 }
 
 void 

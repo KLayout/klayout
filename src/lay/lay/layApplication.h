@@ -58,7 +58,7 @@ namespace lay
 
 class MainWindow;
 class DispatcherToMainWindow;
-class PluginRoot;
+class Dispatcher;
 class ProgressReporter;
 class ProgressBar;
 
@@ -321,7 +321,7 @@ protected:
   virtual void shutdown ();
   virtual void prepare_recording (const std::string &gtf_record, bool gtf_record_incremental);
   virtual void start_recording ();
-  virtual lay::PluginRoot *plugin_root () const = 0;
+  virtual lay::Dispatcher *dispatcher () const = 0;
   virtual void finish ();
   virtual void process_events_impl (QEventLoop::ProcessEventsFlags flags, bool silent = false);
 
@@ -441,7 +441,7 @@ protected:
   virtual void start_recording ();
   virtual void process_events_impl (QEventLoop::ProcessEventsFlags flags, bool silent);
 
-  virtual lay::PluginRoot *plugin_root () const;
+  virtual lay::Dispatcher *dispatcher () const;
 
 private:
   MainWindow *mp_mw;
@@ -493,15 +493,15 @@ protected:
   virtual void setup ();
   virtual void shutdown ();
 
-  virtual lay::PluginRoot *plugin_root () const
+  virtual lay::Dispatcher *dispatcher () const
   {
-    return mp_plugin_root;
+    return mp_dispatcher;
   }
 
 private:
   lay::ProgressReporter *mp_pr;
   lay::ProgressBar *mp_pb;
-  lay::PluginRoot *mp_plugin_root;
+  lay::Dispatcher *mp_dispatcher;
 };
 
 } // namespace lay

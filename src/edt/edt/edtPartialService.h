@@ -44,7 +44,7 @@ namespace db {
 }
 
 namespace lay {
-  class PluginRoot;
+  class Dispatcher;
   class Marker;
   class InstanceMarker;
 }
@@ -153,7 +153,7 @@ public:
   /**
    *  @brief The constructor
    */
-  PartialService (db::Manager *manager, lay::LayoutView *view, lay::PluginRoot *root);
+  PartialService (db::Manager *manager, lay::LayoutView *view, lay::Dispatcher *root);
 
   /**
    *  @brief The destructor
@@ -288,7 +288,7 @@ protected:
 private:
   //  The layout view that this service is attached to
   lay::LayoutView *mp_view;
-  lay::PluginRoot *mp_root;
+  lay::Dispatcher *mp_root;
   bool m_dragging;
   bool m_keep_selection;
   db::DPoint m_start, m_current;

@@ -42,7 +42,7 @@ PluginDeclaration::get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) 
 }
 
 lay::Plugin *
-PluginDeclaration::create_plugin (db::Manager *manager, lay::PluginRoot *, lay::LayoutView *view) const
+PluginDeclaration::create_plugin (db::Manager *manager, lay::Dispatcher *, lay::LayoutView *view) const
 {
   return new img::Service (manager, view);
 }

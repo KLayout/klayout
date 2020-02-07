@@ -98,7 +98,7 @@ public:
   /**
    *  @brief Constructor
    */
-  MacroEditorDialog (lay::PluginRoot *pr, lym::MacroCollection *root);
+  MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection *root);
 
   /**
    *  @brief Destructor
@@ -289,7 +289,7 @@ private:
   bool configure (const std::string &name, const std::string &value);
   void config_finalize ();
 
-  lay::PluginRoot *mp_plugin_root;
+  lay::Dispatcher *mp_plugin_root;
   lym::MacroCollection *mp_root;
   bool m_first_show;
   bool m_in_processing;

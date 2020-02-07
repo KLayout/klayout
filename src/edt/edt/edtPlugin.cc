@@ -22,7 +22,6 @@
 
 
 #include "layTipDialog.h"
-#include "layAbstractMenuProvider.h"
 #include "edtPlugin.h"
 #include "edtConfig.h"
 #include "edtService.h"
@@ -46,7 +45,7 @@ void get_text_options (std::vector < std::pair<std::string, std::string> > &opti
 }
 
 static 
-void get_text_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::PluginRoot *)
+void get_text_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::Dispatcher *)
 {
   ret.push_back (new edt::EditorOptionsText ());
 }
@@ -61,7 +60,7 @@ void get_path_options (std::vector < std::pair<std::string, std::string> > &opti
 }
 
 static 
-void get_path_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::PluginRoot *)
+void get_path_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::Dispatcher *)
 {
   ret.push_back (new EditorOptionsPath ());
 }
@@ -86,7 +85,7 @@ void get_inst_options (std::vector < std::pair<std::string, std::string> > &opti
 }
 
 static 
-void get_inst_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::PluginRoot *root)
+void get_inst_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::Dispatcher *root)
 {
   ret.push_back (new EditorOptionsInst (root));
 }
@@ -98,7 +97,7 @@ class PluginDeclaration
 public:
   PluginDeclaration (const std::string &title, const std::string &mouse_mode, 
                      void (*option_get_f) (std::vector < std::pair<std::string, std::string> > &) = 0,
-                     void (*pages_f) (std::vector <edt::EditorOptionsPage *> &, lay::PluginRoot *) = 0)
+                     void (*pages_f) (std::vector <edt::EditorOptionsPage *> &, lay::Dispatcher *) = 0)
     : m_title (title), m_mouse_mode (mouse_mode), mp_option_get_f (option_get_f), mp_pages_f (pages_f)
   {
     //  .. nothing yet ..
@@ -121,7 +120,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void get_editor_options_pages (std::vector<edt::EditorOptionsPage *> &pages, lay::PluginRoot *root) const
+  virtual void get_editor_options_pages (std::vector<edt::EditorOptionsPage *> &pages, lay::Dispatcher *root) const
   {
     if (mp_pages_f != 0) {
       size_t nstart = pages.size ();
@@ -132,7 +131,7 @@ public:
     }
   }
 
-  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::PluginRoot *, lay::LayoutView *view) const
+  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *, lay::LayoutView *view) const
   {
     Svc *service = new Svc (manager, view);
     service->set_plugin_declaration (this);
@@ -156,7 +155,7 @@ private:
   std::string m_mouse_mode;
 
   void (*mp_option_get_f) (std::vector < std::pair<std::string, std::string> > &options);
-  void (*mp_pages_f) (std::vector <edt::EditorOptionsPage *> &, lay::PluginRoot *);
+  void (*mp_pages_f) (std::vector <edt::EditorOptionsPage *> &, lay::Dispatcher *);
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl1 (
@@ -215,33 +214,33 @@ public:
   {
     lay::PluginDeclaration::get_menu_entries (menu_entries);
 
-    menu_entries.push_back (lay::MenuEntry ("edt::hier_group", "zoom_menu.end"));
-    menu_entries.push_back (lay::MenuEntry ("edt::descend", "descend", "zoom_menu.end", tl::to_string (QObject::tr ("Descend")) + "(Ctrl+D)"));
-    menu_entries.push_back (lay::MenuEntry ("edt::ascend", "ascend", "zoom_menu.end", tl::to_string (QObject::tr ("Ascend")) + "(Ctrl+A)"));
+    menu_entries.push_back (lay::separator ("edt::hier_group", "zoom_menu.end"));
+    menu_entries.push_back (lay::menu_item ("edt::descend", "descend", "zoom_menu.end", tl::to_string (QObject::tr ("Descend")) + "(Ctrl+D)"));
+    menu_entries.push_back (lay::menu_item ("edt::ascend", "ascend", "zoom_menu.end", tl::to_string (QObject::tr ("Ascend")) + "(Ctrl+A)"));
 
-    menu_entries.push_back (lay::MenuEntry ("edit_options_group:edit_mode", "edit_menu.end"));
-    menu_entries.push_back (lay::MenuEntry ("edt::edit_options", "edit_options:edit_mode", "edit_menu.end", tl::to_string (QObject::tr ("Editor Options")) + "(F3)"));
-    menu_entries.push_back (lay::MenuEntry ("edt::sel_make_array", "make_array:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Make Array"))));
-    menu_entries.push_back (lay::MenuEntry ("selection_group:edit_mode", "edit_menu.selection_menu.end"));
-    menu_entries.push_back (lay::MenuEntry ("edt::sel_change_layer", "change_layer:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Change Layer"))));
-    menu_entries.push_back (lay::MenuEntry ("edt::sel_tap", "tap:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Tap")) + "(T)"));
-    menu_entries.push_back (lay::MenuEntry ("edt::sel_align", "align:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Align"))));
-    menu_entries.push_back (lay::MenuEntry ("edt::sel_round_corners", "round_corners:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Round Corners"))));
-    menu_entries.push_back (lay::MenuEntry ("edt::sel_size", "size:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Size Shapes"))));
-    menu_entries.push_back (lay::MenuEntry ("edt::sel_union", "union:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Merge Shapes"))));
-    menu_entries.push_back (lay::MenuEntry ("edt::sel_intersection", "intersection:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Intersection - Others With First"))));
-    menu_entries.push_back (lay::MenuEntry ("edt::sel_difference", "difference:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Subtraction - Others From First"))));
-    menu_entries.push_back (lay::MenuEntry ("edt::sel_separate", "separate:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Separate - First into Inside/Outside Others"))));
-    menu_entries.push_back (lay::MenuEntry ("hier_group:edit_mode", "edit_menu.selection_menu.end"));
-    menu_entries.push_back (lay::MenuEntry ("edt::sel_flatten_insts", "flatten_insts:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Flatten Instances"))));
-    menu_entries.push_back (lay::MenuEntry ("edt::sel_resolve_arefs", "resolve_arefs:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Resolve Arrays"))));
-    menu_entries.push_back (lay::MenuEntry ("edt::sel_move_hier_up", "move_hier_up:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Move Up In Hierarchy"))));
-    menu_entries.push_back (lay::MenuEntry ("edt::sel_make_cell", "make_cell:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Make Cell"))));
-    menu_entries.push_back (lay::MenuEntry ("edt::sel_make_cell_variants", "make_cell_variants:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Make Cell Variants"))));
-    menu_entries.push_back (lay::MenuEntry ("edt::sel_convert_to_pcell", "convert_to_pcell:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Convert To PCell"))));
-    menu_entries.push_back (lay::MenuEntry ("edt::sel_convert_to_cell", "convert_to_cell:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Convert To Static Cell"))));
+    menu_entries.push_back (lay::separator ("edit_options_group:edit_mode", "edit_menu.end"));
+    menu_entries.push_back (lay::menu_item ("edt::edit_options", "edit_options:edit_mode", "edit_menu.end", tl::to_string (QObject::tr ("Editor Options")) + "(F3)"));
+    menu_entries.push_back (lay::menu_item ("edt::sel_make_array", "make_array:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Make Array"))));
+    menu_entries.push_back (lay::separator ("selection_group:edit_mode", "edit_menu.selection_menu.end"));
+    menu_entries.push_back (lay::menu_item ("edt::sel_change_layer", "change_layer:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Change Layer"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_tap", "tap:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Tap")) + "(T)"));
+    menu_entries.push_back (lay::menu_item ("edt::sel_align", "align:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Align"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_round_corners", "round_corners:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Round Corners"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_size", "size:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Size Shapes"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_union", "union:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Merge Shapes"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_intersection", "intersection:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Intersection - Others With First"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_difference", "difference:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Subtraction - Others From First"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_separate", "separate:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Separate - First into Inside/Outside Others"))));
+    menu_entries.push_back (lay::separator ("hier_group:edit_mode", "edit_menu.selection_menu.end"));
+    menu_entries.push_back (lay::menu_item ("edt::sel_flatten_insts", "flatten_insts:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Flatten Instances"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_resolve_arefs", "resolve_arefs:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Resolve Arrays"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_move_hier_up", "move_hier_up:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Move Up In Hierarchy"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_make_cell", "make_cell:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Make Cell"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_make_cell_variants", "make_cell_variants:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Make Cell Variants"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_convert_to_pcell", "convert_to_pcell:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Convert To PCell"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_convert_to_cell", "convert_to_cell:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Convert To Static Cell"))));
 
-    menu_entries.push_back (lay::MenuEntry ("edt::combine_mode", "combine_mode:edit_mode", "@toolbar.end_modes", tl::to_string (QObject::tr ("Combine{Select background combination mode}"))));
+    menu_entries.push_back (lay::menu_item ("edt::combine_mode", "combine_mode:edit_mode", "@toolbar.end_modes", tl::to_string (QObject::tr ("Combine{Select background combination mode}"))));
   }
 
   bool configure (const std::string &name, const std::string &value)
@@ -255,7 +254,7 @@ public:
     return false;
   }
 
-  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::PluginRoot *root, lay::LayoutView *view) const
+  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *root, lay::LayoutView *view) const
   {
     return new edt::MainService (manager, view, root);
   }
@@ -270,9 +269,9 @@ public:
     return false;
   }
 
-  virtual void initialize (lay::PluginRoot *root)
+  virtual void initialize (lay::Dispatcher *root)
   {
-    lay::AbstractMenuProvider *mp = lay::AbstractMenuProvider::instance ();
+    lay::Dispatcher *mp = lay::Dispatcher::instance ();
     if (! mp || ! mp->menu ()) {
       return;
     }
@@ -311,7 +310,7 @@ public:
 
   void update_menu (combine_mode_type cm)
   {
-    lay::AbstractMenuProvider *mp = lay::AbstractMenuProvider::instance ();
+    lay::Dispatcher *mp = lay::Dispatcher::instance ();
     if (! mp || ! mp->menu ()) {
       return;
     }
@@ -336,7 +335,7 @@ public:
     }
   }
 
-  virtual void uninitialize (lay::PluginRoot *)
+  virtual void uninitialize (lay::Dispatcher *)
   {
     if (mp_obj_prop_dialog) {
       delete mp_obj_prop_dialog;
@@ -372,9 +371,9 @@ public:
     }
   }
 
-  void initialized (lay::PluginRoot *root)
+  void initialized (lay::Dispatcher *root)
   {
-    lay::AbstractMenuProvider *mp = lay::AbstractMenuProvider::instance ();
+    lay::Dispatcher *mp = lay::Dispatcher::instance ();
     if (! mp || ! mp->menu ()) {
       return;
     }
@@ -398,7 +397,7 @@ public:
   }
 
 private:
-  lay::PluginRoot *mp_root;
+  lay::Dispatcher *mp_root;
   std::string m_title;
   edt::EditorOptionsPages *mp_obj_prop_dialog;
   std::vector<edt::EditorOptionsPage *> m_prop_dialog_pages;
@@ -447,7 +446,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::PluginRoot *root, lay::LayoutView *view) const
+  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *root, lay::LayoutView *view) const
   {
     return new edt::PartialService (manager, view, root);
   }

@@ -23,9 +23,9 @@
 
 #include "layPlugin.h"
 #include "layAbstractMenu.h"
-#include "layAbstractMenuProvider.h"
 #include "layConverters.h"
 #include "layConfigurationDialog.h"
+#include "layDispatcher.h"
 #include "antConfigPage.h"
 #include "antConfig.h"
 #include "antPlugin.h"
@@ -85,13 +85,13 @@ void
 PluginDeclaration::get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
 {
   lay::PluginDeclaration::get_menu_entries (menu_entries);
-  menu_entries.push_back (lay::MenuEntry ("rulers_group", "edit_menu.end"));
-  menu_entries.push_back (lay::MenuEntry ("ant::clear_all_rulers", "clear_all_rulers:edit", "edit_menu.end", tl::to_string (QObject::tr ("Clear All Rulers And Annotations(Ctrl+K)"))));
-  menu_entries.push_back (lay::MenuEntry ("ant::configure", "configure_rulers", "edit_menu.end", tl::to_string (QObject::tr ("Ruler And Annotation Setup"))));
+  menu_entries.push_back (lay::separator ("rulers_group", "edit_menu.end"));
+  menu_entries.push_back (lay::menu_item ("ant::clear_all_rulers", "clear_all_rulers:edit", "edit_menu.end", tl::to_string (QObject::tr ("Clear All Rulers And Annotations(Ctrl+K)"))));
+  menu_entries.push_back (lay::menu_item ("ant::configure", "configure_rulers", "edit_menu.end", tl::to_string (QObject::tr ("Ruler And Annotation Setup"))));
 }
 
 lay::Plugin *
-PluginDeclaration::create_plugin (db::Manager *manager, lay::PluginRoot *, lay::LayoutView *view) const
+PluginDeclaration::create_plugin (db::Manager *manager, lay::Dispatcher *, lay::LayoutView *view) const
 {
   return new ant::Service (manager, view);
 }
@@ -101,7 +101,7 @@ PluginDeclaration::menu_activated (const std::string &symbol) const
 {
   if (symbol == "ant::configure") {
 
-    lay::ConfigurationDialog config_dialog (QApplication::activeWindow (), lay::PluginRoot::instance (), "ant::Plugin");
+    lay::ConfigurationDialog config_dialog (QApplication::activeWindow (), lay::Dispatcher::instance (), "ant::Plugin");
     config_dialog.exec ();
     
     return true;
@@ -165,7 +165,7 @@ PluginDeclaration::config_finalize ()
 }
 
 void 
-PluginDeclaration::initialized (lay::PluginRoot *root)
+PluginDeclaration::initialized (lay::Dispatcher *root)
 {
   //  Check if we already have templates (initial setup)
   bool any_templates = false;
@@ -201,7 +201,7 @@ PluginDeclaration::initialized (lay::PluginRoot *root)
 }
 
 void 
-PluginDeclaration::uninitialize (lay::PluginRoot *)
+PluginDeclaration::uninitialize (lay::Dispatcher *)
 {
   for (std::vector<lay::Action *>::iterator a = m_actions.begin (); a != m_actions.end (); ++a) {
     delete *a;
@@ -212,7 +212,7 @@ PluginDeclaration::uninitialize (lay::PluginRoot *)
 void 
 PluginDeclaration::update_current_template ()
 {
-  lay::AbstractMenuProvider *mp = lay::AbstractMenuProvider::instance ();
+  lay::Dispatcher *mp = lay::Dispatcher::instance ();
   if (! mp || ! mp->menu ()) {
     return;
   }
@@ -238,7 +238,7 @@ PluginDeclaration::update_current_template ()
 void 
 PluginDeclaration::update_menu ()
 {
-  lay::AbstractMenuProvider *mp = lay::AbstractMenuProvider::instance ();
+  lay::Dispatcher *mp = lay::Dispatcher::instance ();
   if (! mp || ! mp->menu ()) {
     return;
   }
@@ -296,8 +296,8 @@ PluginDeclaration::register_annotation_template (const ant::Template &t)
   }
 
   m_templates.push_back (t);
-  lay::PluginRoot::instance ()->config_set (cfg_ruler_templates, ant::TemplatesConverter ().to_string (m_templates));
-  lay::PluginRoot::instance ()->config_end ();
+  lay::Dispatcher::instance ()->config_set (cfg_ruler_templates, ant::TemplatesConverter ().to_string (m_templates));
+  lay::Dispatcher::instance ()->config_end ();
 }
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new ant::PluginDeclaration (), 3000, "ant::Plugin");

@@ -55,7 +55,7 @@ public:
     menu_entries.push_back (lay::MenuEntry ("clip_tool::show", "clip_tool:edit_mode", "edit_menu.utils_menu.end", tl::to_string (QObject::tr ("Clip Tool"))));
   }
  
-   virtual lay::Plugin *create_plugin (db::Manager *, lay::PluginRoot *root, lay::LayoutView *view) const
+   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutView *view) const
    {
      return new ClipDialog (root, view);
    }
@@ -66,7 +66,7 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new ClipDialogPl
 
 // ------------------------------------------------------------
 
-ClipDialog::ClipDialog (lay::PluginRoot *root, lay::LayoutView *vw)
+ClipDialog::ClipDialog (lay::Dispatcher *root, lay::LayoutView *vw)
   : lay::Browser (root, vw), 
     Ui::ClipDialog ()
 {

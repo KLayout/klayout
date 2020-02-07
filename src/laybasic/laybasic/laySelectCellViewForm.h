@@ -24,6 +24,8 @@
 #ifndef HDR_SelectCellViewForm
 #define HDR_SelectCellViewForm
 
+#include "laybasicCommon.h"
+
 #include <string>
 #include <vector>
 
@@ -37,7 +39,7 @@ namespace lay
 class CellView;
 class LayoutView;
 
-class SelectCellViewForm
+class LAYBASIC_PUBLIC SelectCellViewForm
   : public QDialog, private Ui::SelectCellViewForm
 {
   Q_OBJECT 

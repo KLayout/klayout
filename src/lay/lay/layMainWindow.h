@@ -533,36 +533,6 @@ public:
   static std::vector<std::string> menu_symbols ();
 
   /**
-   *  @brief Get the action for a slot
-   */
-  lay::Action &action_for_slot (const char *slot);
-
-  /**
-   *  @brief Create a configuration action with the given title, parameter name and value
-   *
-   *  The action will be owned by the main window but can be deleted to remove the action from the main window.
-   */
-  lay::Action *create_config_action (const std::string &title, const std::string &cname, const std::string &cvalue);
-  
-  /**
-   *  @brief Create a configuration action with the given parameter name and value
-   *
-   *  The action will be owned by the main window but can be deleted to remove the action from the main window.
-   *  This version is provided for applications, where the title is set later.
-   */
-  lay::Action *create_config_action (const std::string &cname, const std::string &cvalue);
-  
-  /**
-   *  @brief Register a configuration action with the given name
-   */
-  void register_config_action (const std::string &name, lay::ConfigureAction *action);
-  
-  /**
-   *  @brief Unregister a configuration action with the given name
-   */
-  void unregister_config_action (const std::string &name, lay::ConfigureAction *action);
-  
-  /**
    *  @brief Open a new layout in mode 'mode'
    *
    *  If mode is 2, the layout is opened in the current view in addition to the existing ones.

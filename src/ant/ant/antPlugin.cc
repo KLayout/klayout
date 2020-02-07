@@ -203,9 +203,6 @@ PluginDeclaration::initialized (lay::Dispatcher *root)
 void 
 PluginDeclaration::uninitialize (lay::Dispatcher *)
 {
-  for (std::vector<lay::Action *>::iterator a = m_actions.begin (); a != m_actions.end (); ++a) {
-    delete *a;
-  }
   m_actions.clear ();
 }
 
@@ -226,9 +223,13 @@ PluginDeclaration::update_current_template ()
     }
     
     if (m_templates.size () > 1) {
-      int it = 0;
-      for (std::vector<Template>::const_iterator tt = m_templates.begin (); tt != m_templates.end () && it < int (m_actions.size ()); ++tt, ++it) {
-        m_actions[it]->set_checked (it == m_current_template);
+
+      tl::weak_collection<lay::ConfigureAction>::iterator it = m_actions.begin ();
+      int index = 0;
+      for (std::vector<Template>::const_iterator tt = m_templates.begin (); tt != m_templates.end () && it != m_actions.end (); ++tt, ++it, ++index) {
+        if (it.operator -> ()) {
+          it->set_checked (index == m_current_template);
+        }
       }
     }
 
@@ -263,19 +264,17 @@ PluginDeclaration::update_menu ()
     }
   }
     
-  for (std::vector<lay::Action *>::iterator a = m_actions.begin (); a != m_actions.end (); ++a) {
-    delete *a;
-  }
   m_actions.clear ();
 
   if (m_templates.size () > 1) {
     int it = 0;
     for (std::vector<Template>::const_iterator tt = m_templates.begin (); tt != m_templates.end (); ++tt, ++it) {
-      m_actions.push_back (mp->create_config_action (tt->title (), cfg_current_ruler_template, tl::to_string (it)));
-      m_actions.back ()->set_checkable (true);
-      m_actions.back ()->set_checked (it == m_current_template);
+      lay::ConfigureAction *action = mp->create_config_action (tt->title (), cfg_current_ruler_template, tl::to_string (it));
+      m_actions.push_back (action);
+      action->set_checkable (true);
+      action->set_checked (it == m_current_template);
       for (std::vector<std::string>::const_iterator t = tmpl_group.begin (); t != tmpl_group.end (); ++t) {
-        mp->menu ()->insert_item (*t + ".end", "ruler_template_" + tl::to_string (it), *m_actions.back ());
+        mp->menu ()->insert_item (*t + ".end", "ruler_template_" + tl::to_string (it), *action);
       }
     }
   }

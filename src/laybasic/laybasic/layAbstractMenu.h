@@ -140,7 +140,8 @@ private:
  *  point to. A triggered event will be forwarded from this QAction to all referencing Action objects.
  */
 class LAYBASIC_PUBLIC Action
-  : public QObject
+  : public QObject,
+    public tl::Object
 {
 Q_OBJECT
 
@@ -410,8 +411,7 @@ private:
  *  respective parameters passed to the constructor or set with the write accessors.
  */
 class LAYBASIC_PUBLIC ConfigureAction
-  : public Action,
-    public tl::Object
+  : public Action
 {
 public:
   enum type { setter_type = 0, boolean_type = 1, choice_type = 2 };

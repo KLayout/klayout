@@ -140,10 +140,8 @@ PluginDeclaration::mode_triggered ()
 void
 PluginDeclaration::clear_menu_items ()
 {
-  while (! m_menu_actions.empty ()) {
-    delete m_menu_actions.back ();
-    m_menu_actions.pop_back ();
-  }
+  m_menu_actions.clear ();
+  m_our_menu_actions.clear ();
 }
 
 void 
@@ -188,43 +186,40 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
 
   for (std::vector<lay::MenuEntry>::const_iterator m = menu_entries.begin (); m != menu_entries.end (); ++m) {
 
-    if (m->title.empty ()) {
+    if (m->separator) {
 
       menu.insert_separator (m->insert_pos, m->menu_name);
 
+    } else if (m->sub_menu) {
+
+      menu.insert_menu (m->insert_pos, m->menu_name, m->title);
+
     } else {
 
-      if (m->sub_menu) {
+      Action *action = 0;
 
-        menu.insert_menu (m->insert_pos, m->menu_name, m->title);
+      if (! m->cname.empty ()) {
+
+        action = dispatcher->create_config_action (m->title, m->cname, m->cvalue);
 
       } else {
 
-        Action *action = 0;
+        action = new Action (m->title);
+        action->qaction ()->setData (QVariant (tl::to_qstring (m->symbol)));
+        gtf::action_connect (action->qaction (), SIGNAL (triggered ()), this, SLOT (generic_menu ()));
+        m_our_menu_actions.push_back (action);
 
-        if (! m->cname.empty ()) {
+      }
 
-          action = dispatcher->create_config_action (m->title, m->cname, m->cvalue);
+      m_menu_actions.push_back (action);
+      menu.insert_item (m->insert_pos, m->menu_name, *action);
 
-        } else {
+      if (! m->exclusive_group.empty ()) {
+        action->add_to_exclusive_group (&menu, m->exclusive_group);
+      }
 
-          action = new Action (m->title);
-          action->qaction ()->setData (QVariant (tl::to_qstring (m->symbol)));
-          gtf::action_connect (action->qaction (), SIGNAL (triggered ()), this, SLOT (generic_menu ()));
-
-        }
-
-        m_menu_actions.push_back (action);
-        menu.insert_item (m->insert_pos, m->menu_name, *action);
-
-        if (! m->exclusive_group.empty ()) {
-          action->add_to_exclusive_group (&menu, m->exclusive_group);
-        }
-
-        if (m->checkable) {
-          action->set_checkable (true);
-        }
-
+      if (m->checkable) {
+        action->set_checkable (true);
       }
 
     }
@@ -282,8 +277,10 @@ PluginDeclaration::remove_menu_items ()
   lay::AbstractMenu *menu = lay::Dispatcher::instance ()->menu ();
   menu->delete_items (m_editable_mode_action);
   menu->delete_items (m_mouse_mode_action);
-  for (std::vector <lay::Action *>::const_iterator a = m_menu_actions.begin (); a != m_menu_actions.end (); ++a) {
-    menu->delete_items (**a);
+  for (tl::weak_collection <lay::Action>::iterator a = m_menu_actions.begin (); a != m_menu_actions.end (); ++a) {
+    if (a.operator-> ()) {
+      menu->delete_items (*a);
+    }
   }
 }
 
@@ -509,6 +506,7 @@ MenuEntry separator (const std::string &menu_name, const std::string &insert_pos
   MenuEntry e;
   e.menu_name = menu_name;
   e.insert_pos = insert_pos;
+  e.separator = true;
   return e;
 }
 

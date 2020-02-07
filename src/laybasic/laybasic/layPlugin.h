@@ -102,7 +102,7 @@ public:
  */
 struct LAYBASIC_PUBLIC MenuEntry
 {
-  MenuEntry () : sub_menu (false), checkable (false) { }
+  MenuEntry () : sub_menu (false), checkable (false), separator (false) { }
 
   std::string menu_name;
   std::string symbol;
@@ -113,6 +113,7 @@ struct LAYBASIC_PUBLIC MenuEntry
   std::string exclusive_group;
   bool sub_menu;
   bool checkable;
+  bool separator;
 };
 
 /**
@@ -464,7 +465,8 @@ private slots:
 
 private:
   int m_id;
-  std::vector <lay::Action *> m_menu_actions;
+  tl::weak_collection <lay::Action> m_menu_actions;
+  tl::shared_collection <lay::Action> m_our_menu_actions;
   lay::Action m_editable_mode_action;
   lay::Action m_mouse_mode_action;
   bool m_editable_enabled;

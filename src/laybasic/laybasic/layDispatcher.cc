@@ -50,7 +50,7 @@ Dispatcher::~Dispatcher ()
   }
 }
 
-lay::Action *
+lay::ConfigureAction *
 Dispatcher::create_config_action (const std::string &title, const std::string &cname, const std::string &cvalue)
 {
   lay::ConfigureAction *ca = new lay::ConfigureAction (this, title, cname, cvalue);
@@ -58,7 +58,7 @@ Dispatcher::create_config_action (const std::string &title, const std::string &c
   return ca;
 }
 
-lay::Action *
+lay::ConfigureAction *
 Dispatcher::create_config_action (const std::string &cname, const std::string &cvalue)
 {
   lay::ConfigureAction *ca = new lay::ConfigureAction (this, std::string (), cname, cvalue);

@@ -124,7 +124,7 @@ public:
    *
    *  The action will be owned by the abstract menu provider but can be deleted to remove it from there.
    */
-  lay::Action *create_config_action (const std::string &title, const std::string &cname, const std::string &cvalue);
+  lay::ConfigureAction *create_config_action (const std::string &title, const std::string &cname, const std::string &cvalue);
 
   /**
    *  @brief Creates a configuration action with the given parameter name and value
@@ -132,7 +132,7 @@ public:
    *  The action will be owned by the abstract menu provider but can be deleted to remove it from there.
    *  This version is provided for applications, where the title is set later.
    */
-  lay::Action *create_config_action (const std::string &cname, const std::string &cvalue);
+  lay::ConfigureAction *create_config_action (const std::string &cname, const std::string &cvalue);
 
   /**
    *  @brief Registers a configuration action with the given name

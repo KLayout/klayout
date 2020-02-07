@@ -60,7 +60,7 @@ private:
   
   std::vector<ant::Template> m_templates;
   int m_current_template;
-  std::vector<lay::Action *> m_actions;
+  tl::weak_collection<lay::ConfigureAction> m_actions;
   bool m_current_template_updated;
   bool m_templates_updated;
 };

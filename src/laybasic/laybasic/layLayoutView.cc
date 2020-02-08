@@ -7979,7 +7979,8 @@ public:
     menu_entries.push_back (lay::menu_item ("cm_sel_move_interactive", "sel_move_interactive:edit", at, tl::to_string (QObject::tr ("Move Interactive"))));
 
     at = "edit_menu.end";
-    menu_entries.push_back (lay::separator ("edit_select_individual_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_undo", "undo:edit", at, tl::to_string (QObject::tr ("Undo(Ctrl+Z)"))));
+    menu_entries.push_back (lay::menu_item ("cm_redo", "redo:edit", at, tl::to_string (QObject::tr ("Redo(Ctrl+Y)"))));
 
     menu_entries.push_back (lay::separator ("basic_group", at));
     menu_entries.push_back (lay::submenu ("layout_menu:edit:edit_mode", at, tl::to_string (QObject::tr ("Layout"))));
@@ -8034,17 +8035,12 @@ public:
       menu_entries.push_back (lay::menu_item ("cm_sel_move_to", "sel_move_to", at, tl::to_string (QObject::tr ("Move To"))));
     }
 
-    menu_entries.push_back (lay::separator ("edit_select_individual_group", at));
-
     menu_entries.push_back (lay::separator ("utils_group", at));
     menu_entries.push_back (lay::submenu ("utils_menu:edit:edit_mode", at, tl::to_string (QObject::tr ("Utilities"))));
-
-    menu_entries.push_back (lay::separator ("edit_select_individual_group", at));
 
     menu_entries.push_back (lay::separator ("misc_group", at));
     menu_entries.push_back (lay::menu_item ("cm_delete", "delete:edit", at, tl::to_string (QObject::tr ("Delete(Del)"))));
     menu_entries.push_back (lay::menu_item ("cm_show_properties", "show_properties:edit", at, tl::to_string (QObject::tr ("Properties(Q)"))));
-    menu_entries.push_back (lay::separator ("edit_select_individual_group", at));
 
     menu_entries.push_back (lay::separator ("cpc_group", at));
     menu_entries.push_back (lay::menu_item ("cm_copy", "copy:edit", at, tl::to_string (QObject::tr ("Copy(Ctrl+C)"))));

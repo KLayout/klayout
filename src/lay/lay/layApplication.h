@@ -57,7 +57,6 @@ namespace lay
 {
 
 class MainWindow;
-class DispatcherToMainWindow;
 class Dispatcher;
 class ProgressReporter;
 class ProgressBar;
@@ -445,7 +444,6 @@ protected:
 
 private:
   MainWindow *mp_mw;
-  DispatcherToMainWindow *mp_plugin_root;
   gtf::Recorder *mp_recorder;
 };
 

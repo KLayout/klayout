@@ -4073,61 +4073,6 @@ MainWindow::plugin_removed (lay::PluginDeclaration *cls)
 }
 
 // ------------------------------------------------------------
-//  Implementation of the DispatcherToMainWindow bride
-
-DispatcherToMainWindow::DispatcherToMainWindow ()
-  : lay::Dispatcher (0, false),
-    mp_main_window (0)
-
-{
-  //  .. nothing yet ..
-}
-
-void
-DispatcherToMainWindow::attach_to (lay::MainWindow *main_window)
-{
-  mp_main_window = main_window;
-}
-
-void
-DispatcherToMainWindow::plugin_registered (lay::PluginDeclaration *cls)
-{
-  if (mp_main_window.get ()) {
-    mp_main_window->plugin_registered (cls);
-  }
-
-  //  re-establish the configuration
-  config_setup ();
-}
-
-void
-DispatcherToMainWindow::plugin_removed (lay::PluginDeclaration *cls)
-{
-  if (mp_main_window.get ()) {
-    mp_main_window->plugin_removed (cls);
-  }
-
-  //  re-establish the configuration
-  config_setup ();
-}
-
-void
-DispatcherToMainWindow::select_mode (int mode)
-{
-  if (mp_main_window.get ()) {
-    mp_main_window->select_mode (mode);
-  }
-}
-
-void
-DispatcherToMainWindow::menu_activated (const std::string &symbol)
-{
-  if (mp_main_window.get ()) {
-    mp_main_window->menu_activated (symbol);
-  }
-}
-
-// ------------------------------------------------------------
 //  Implementation of the "help about" dialog
 
 HelpAboutDialog::HelpAboutDialog (QWidget *parent)

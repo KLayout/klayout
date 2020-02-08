@@ -675,8 +675,6 @@ protected:
   void do_update_file_menu ();
 
 private:
-  friend class DispatcherToMainWindow;
-
   TextProgressDelegate m_text_progress;
 
   //  Main menu
@@ -823,26 +821,6 @@ private:
   void libraries_changed ();
   void apply_key_bindings ();
   void apply_hidden (const std::vector<std::pair <std::string, bool> > &hidden);
-};
-
-class LAY_PUBLIC DispatcherToMainWindow
-  : public lay::Dispatcher
-{
-public:
-  DispatcherToMainWindow ();
-
-  void attach_to (lay::MainWindow *main_window);
-
-  virtual void plugin_registered (lay::PluginDeclaration *cls);
-  virtual void plugin_removed (lay::PluginDeclaration *cls);
-  virtual void select_mode (int mode);
-  virtual void menu_activated (const std::string &symbol);
-
-private:
-  DispatcherToMainWindow (const DispatcherToMainWindow &);
-  DispatcherToMainWindow &operator= (const DispatcherToMainWindow &);
-
-  tl::weak_ptr<MainWindow> mp_main_window;
 };
 
 }

@@ -397,7 +397,7 @@ ActionHandle::ActionHandle (QMenu *menu, bool owned)
   sp_actionHandles->insert (this);
 
   //  catch the destroyed signal to tell if the QAction object is deleted.
-  connect (mp_action, SIGNAL (destroyed (QObject *)), this, SLOT (destroyed (QObject *)));
+  connect (mp_menu, SIGNAL (destroyed (QObject *)), this, SLOT (destroyed (QObject *)));
 }
 
 ActionHandle::~ActionHandle ()
@@ -453,9 +453,15 @@ ActionHandle::menu () const
 }
 
 void
-ActionHandle::destroyed (QObject * /*obj*/)
+ActionHandle::destroyed (QObject *obj)
 {
-  mp_action = 0;
+  if (obj == mp_action) {
+    mp_action = 0;
+  }
+  if (obj == mp_menu) {
+    mp_menu = 0;
+    mp_action = 0;
+  }
   m_owned = false;
 }
 
@@ -1088,7 +1094,7 @@ AbstractMenu::build_detached (const std::string &name, QFrame *mbar)
       menu_button->setText (tl::to_qstring (c->action ().get_title ()));
 
       if (c->menu () == 0) {
-        QMenu *menu = new QMenu ();
+        QMenu *menu = new QMenu (mp_dispatcher->menu_parent_widget ());
         menu_button->setMenu (menu);
         c->set_action (Action (new ActionHandle (menu)), true);
       } else {
@@ -1146,7 +1152,7 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
       } else if (c->name ().find ("@") == 0) {
 
         if (c->menu () == 0) {
-          QMenu *menu = new QMenu (tl::to_qstring (c->action ().get_title ()));
+          QMenu *menu = new QMenu (tl::to_qstring (c->action ().get_title ()), mp_dispatcher->menu_parent_widget ());
           // HINT: it is necessary to add the menu action to a widget below the main window.
           // Otherwise, the keyboard shortcuts do not work for menu items inside such a
           // popup menu. It seems not to have a negative effect to add the menu to the
@@ -1163,7 +1169,7 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
       } else if (mbar) {
 
         if (c->menu () == 0) {
-          QMenu *menu = new QMenu ();
+          QMenu *menu = new QMenu (mp_dispatcher->menu_parent_widget ());
           menu->setTitle (tl::to_qstring (c->action ().get_title ()));
           mbar->addMenu (menu);
           c->set_action (Action (new ActionHandle (menu)), true);
@@ -1225,7 +1231,7 @@ AbstractMenu::build (QMenu *m, std::list<AbstractMenuItem> &items)
       if (! c->menu ()) {
         //  HINT: the action acts as a container for the title. Unfortunately, we cannot create a
         //  menu with a given action. The action is provided by addMenu instead.
-        QMenu *menu = new QMenu ();
+        QMenu *menu = new QMenu (mp_dispatcher->menu_parent_widget ());
         menu->setTitle (tl::to_qstring (c->action ().get_title ()));
         m->addMenu (menu);
         c->set_action (Action (new ActionHandle (menu)), true);

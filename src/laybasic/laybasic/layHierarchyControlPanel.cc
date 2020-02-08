@@ -1181,7 +1181,7 @@ public:
       std::string at = "@hcp_context_menu.sorting.end";
       menu_entries.push_back (lay::config_menu_item ("by_name", at, tl::to_string (QObject::tr ("By Name")), cfg_cell_list_sorting, "?by-name"));
       menu_entries.push_back (lay::config_menu_item ("by_area", at, tl::to_string (QObject::tr ("By Area - Small To Large")), cfg_cell_list_sorting, "?by-area"));
-      menu_entries.push_back (lay::config_menu_item ("by_area", at, tl::to_string (QObject::tr ("By Area - Large To Small")), cfg_cell_list_sorting, "?by-area-reverse"));
+      menu_entries.push_back (lay::config_menu_item ("by_area_reverse", at, tl::to_string (QObject::tr ("By Area - Large To Small")), cfg_cell_list_sorting, "?by-area-reverse"));
     }
 
     menu_entries.push_back (lay::separator ("operations_group", at));

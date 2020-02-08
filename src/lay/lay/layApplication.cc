@@ -1296,7 +1296,6 @@ ApplicationBase::special_app_flag (const std::string &name)
 GuiApplication::GuiApplication (int &argc, char **argv)
   : QApplication (argc, argv), ApplicationBase (false),
     mp_mw (0),
-    mp_plugin_root (0),
     mp_recorder (0)
 {
   //  install a special style proxy to overcome the issue of black-on-black tree expanders
@@ -1317,9 +1316,6 @@ GuiApplication::~GuiApplication ()
   }
 
   shutdown ();
-
-  delete mp_plugin_root;
-  mp_plugin_root = 0;
 }
 
 bool
@@ -1475,17 +1471,15 @@ GuiApplication::start_recording ()
 lay::Dispatcher *
 GuiApplication::dispatcher () const
 {
-  return mp_plugin_root;
+  return mp_mw;
 }
 
 void
 GuiApplication::setup ()
 {
-  tl_assert (mp_mw == 0 && mp_plugin_root == 0);
+  tl_assert (mp_mw == 0);
 
-  mp_plugin_root = new lay::DispatcherToMainWindow ();
-  mp_mw = new lay::MainWindow (this, mp_plugin_root, "main_window", is_undo_enabled ());
-  mp_plugin_root->attach_to (mp_mw);
+  mp_mw = new lay::MainWindow (this, 0, "main_window", is_undo_enabled ());
 
   QObject::connect (mp_mw, SIGNAL (closed ()), this, SLOT (quit ()));
 

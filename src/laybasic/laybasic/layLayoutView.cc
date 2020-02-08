@@ -355,12 +355,33 @@ LayoutView::eventFilter(QObject *obj, QEvent *event)
 }
 
 void
+LayoutView::init_menu ()
+{
+  //  make the plugins create their menu items
+  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+    //  TODO: get rid of the const_cast hack
+    const_cast <lay::PluginDeclaration *> (&*cls)->init_menu (dispatcher ());
+  }
+
+  //  if not in editable mode, hide all entries from "edit_mode" group and show all from the "view_mode" group and vice versa
+  std::vector<std::string> edit_mode_grp = menu ()->group ("edit_mode");
+  for (std::vector<std::string>::const_iterator g = edit_mode_grp.begin (); g != edit_mode_grp.end (); ++g) {
+    menu ()->action (*g).set_visible (is_editable ());
+  }
+  std::vector<std::string> view_mode_grp = menu ()->group ("view_mode");
+  for (std::vector<std::string>::const_iterator g = view_mode_grp.begin (); g != view_mode_grp.end (); ++g) {
+    menu ()->action (*g).set_visible (! is_editable ());
+  }
+}
+
+void
 LayoutView::init (db::Manager *mgr, QWidget * /*parent*/)
 {
   manager (mgr);
 
   if (dispatcher () == this) {
-    //  if we're the root dispatcher build the context menus, nothing else so far.
+    //  if we're the root dispatcher initialize the menu and build the context menus. No other menus are built so far.
+    init_menu ();
     menu ()->build (0, 0);
   }
 
@@ -2675,9 +2696,7 @@ LayoutView::do_load_layer_props (const std::string &fn, bool map_cv, int cv_inde
     p->expand (cv_map, add_default);
   }
 
-  if (manager ()) {
-    manager ()->transaction (tl::to_string (QObject::tr ("Load layer properties"))); 
-  }
+  transaction (tl::to_string (QObject::tr ("Load layer properties")));
 
   if (single_list) {
 
@@ -2718,9 +2737,7 @@ LayoutView::do_load_layer_props (const std::string &fn, bool map_cv, int cv_inde
 
   }
 
-  if (manager ()) {
-    manager ()->commit ();
-  }
+  commit ();
 
   update_content ();
 
@@ -5268,9 +5285,7 @@ LayoutView::cm_align_cell_origin ()
 
       clear_selection ();
 
-      if (manager ()) {
-        manager ()->transaction (tl::to_string (QObject::tr ("Align cell origin"))); 
-      }
+      transaction (tl::to_string (QObject::tr ("Align cell origin")));
 
       db::Box bbox; 
 
@@ -5339,9 +5354,7 @@ LayoutView::cm_align_cell_origin ()
 
       }
 
-      if (manager ()) {
-        manager ()->commit ();
-      }
+      commit ();
 
     }
 
@@ -5368,13 +5381,9 @@ LayoutView::cm_cell_user_properties ()
     lay::UserPropertiesForm props_form (this);
     if (props_form.show (this, cv_index, prop_id)) {
 
-      if (manager ()) {
-        manager ()->transaction (tl::to_string (QObject::tr ("Edit cell's user propertes"))); 
-        cell.prop_id (prop_id);
-        manager ()->commit ();
-      } else {
-        cell.prop_id (prop_id);
-      }
+      transaction (tl::to_string (QObject::tr ("Edit cell's user propertes")));
+      cell.prop_id (prop_id);
+      commit ();
 
     }
 
@@ -5426,7 +5435,7 @@ LayoutView::cm_cell_replace ()
 
         clear_selection ();
 
-        manager ()->transaction (tl::to_string (QObject::tr ("Replace cells"))); 
+        transaction (tl::to_string (QObject::tr ("Replace cells")));
 
         //  replace instances of the target cell with the new cell 
 
@@ -5469,7 +5478,7 @@ LayoutView::cm_cell_replace ()
 
         layout.cleanup ();
 
-        manager ()->commit ();
+        commit ();
 
         //  If one of the cells in the path was deleted, establish a valid path
 
@@ -5505,7 +5514,7 @@ LayoutView::cm_lay_convert_to_static ()
 
     db::Layout &layout = cellview (cv_index)->layout ();
 
-    manager ()->transaction (tl::to_string (QObject::tr ("Convert all cells to static"))); 
+    transaction (tl::to_string (QObject::tr ("Convert all cells to static")));
 
     std::vector<db::cell_index_type> cells;
     for (db::Layout::const_iterator c = layout.begin (); c != layout.end (); ++c) {
@@ -5536,7 +5545,7 @@ LayoutView::cm_lay_convert_to_static ()
 
     layout.cleanup ();
 
-    manager ()->commit ();
+    commit ();
 
   }
 }
@@ -5561,7 +5570,7 @@ LayoutView::cm_cell_convert_to_static ()
 
     clear_selection ();
 
-    manager ()->transaction (tl::to_string (QObject::tr ("Convert cells to static"))); 
+    transaction (tl::to_string (QObject::tr ("Convert cells to static")));
 
     std::map<db::cell_index_type, db::cell_index_type> cell_map;
 
@@ -5589,7 +5598,7 @@ LayoutView::cm_cell_convert_to_static ()
 
     layout.cleanup ();
 
-    manager ()->commit ();
+    commit ();
 
     //  If one of the cells in the path was deleted, establish a valid path
 
@@ -5670,7 +5679,7 @@ LayoutView::cm_cell_delete ()
         }
       }
 
-      manager ()->transaction (tl::to_string (QObject::tr ("Delete cells"))); 
+      transaction (tl::to_string (QObject::tr ("Delete cells")));
 
       if (mode == 0 || mode == 2) {
         layout.delete_cells (cells_to_delete);
@@ -5680,7 +5689,7 @@ LayoutView::cm_cell_delete ()
 
       layout.cleanup ();
 
-      manager ()->commit ();
+      commit ();
 
       //  If one of the cells in the path was deleted, establish a valid path
 
@@ -5874,15 +5883,9 @@ LayoutView::cm_cell_rename ()
     std::string name (layout.cell_name (path.back ()));
     if (name_dialog.exec_dialog (layout, name)) {
 
-      if (manager ()) {
-        manager ()->transaction (tl::to_string (QObject::tr ("Rename cell"))); 
-      }
-
+      transaction (tl::to_string (QObject::tr ("Rename cell")));
       layout.rename_cell (path.back (), name.c_str ());
-
-      if (manager ()) {
-        manager ()->commit ();
-      }
+      commit ();
 
     }
 
@@ -5911,7 +5914,7 @@ LayoutView::cm_cell_hide ()
     std::vector<HierarchyControlPanel::cell_path_type> paths;
     mp_hierarchy_panel->selected_cells (active_cellview_index (), paths);
 
-    manager ()->transaction (tl::to_string (QObject::tr ("Hide cell"))); 
+    transaction (tl::to_string (QObject::tr ("Hide cell")));
 
     for (std::vector<HierarchyControlPanel::cell_path_type>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
       if (! p->empty ()) {
@@ -5919,7 +5922,7 @@ LayoutView::cm_cell_hide ()
       }
     }
 
-    manager ()->commit ();
+    commit ();
 
   }
 }
@@ -5932,7 +5935,7 @@ LayoutView::cm_cell_show ()
     std::vector<HierarchyControlPanel::cell_path_type> paths;
     mp_hierarchy_panel->selected_cells (active_cellview_index (), paths);
 
-    manager ()->transaction (tl::to_string (QObject::tr ("Hide cell"))); 
+    transaction (tl::to_string (QObject::tr ("Hide cell")));
 
     for (std::vector<HierarchyControlPanel::cell_path_type>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
       if (! p->empty ()) {
@@ -5940,7 +5943,7 @@ LayoutView::cm_cell_show ()
       }
     }
 
-    manager ()->commit ();
+    commit ();
 
   }
 }
@@ -5949,9 +5952,9 @@ void
 LayoutView::cm_cell_show_all ()
 {
   if (mp_hierarchy_panel) {
-    manager ()->transaction (tl::to_string (QObject::tr ("Show all cells"))); 
+    transaction (tl::to_string (QObject::tr ("Show all cells")));
     show_all_cells ();
-    manager ()->commit ();
+    commit ();
   }
 }
 
@@ -7104,15 +7107,9 @@ LayoutView::new_cell (int cv_index, const std::string &cell_name)
       throw tl::Exception (tl::to_string (QObject::tr ("A cell with that name already exists: %s")), cell_name);
     }
 
-    if (manager ()) {
-      manager ()->transaction (tl::to_string (QObject::tr ("New cell"))); 
-    }
-
+    transaction (tl::to_string (QObject::tr ("New cell")));
     new_ci = layout.add_cell (cell_name.empty () ? 0 : cell_name.c_str ());
-
-    if (manager ()) {
-      manager ()->commit ();
-    }
+    commit ();
 
   }
 
@@ -7159,13 +7156,9 @@ LayoutView::transform_layout (const db::DCplxTrans &tr_mic)
       return;
     }
 
-    if (manager ()) {
-      manager ()->transaction (tl::to_string (QObject::tr ("Transform layout"))); 
-      layout.transform (tr);
-      manager ()->commit ();
-    } else {
-      active_cellview ()->layout ().transform (tr);
-    }
+    transaction (tl::to_string (QObject::tr ("Transform layout")));
+    layout.transform (tr);
+    commit ();
 
   }
 }
@@ -7584,9 +7577,7 @@ LayoutView::cm_new_layer ()
         }
       }
 
-      if (manager ()) {
-        manager ()->transaction (tl::to_string (QObject::tr ("New layer"))); 
-      }
+      transaction (tl::to_string (QObject::tr ("New layer")));
 
       unsigned int l = cv->layout ().insert_layer (m_new_layer_props);
       std::vector <unsigned int> nl;
@@ -7594,9 +7585,7 @@ LayoutView::cm_new_layer ()
       add_new_layers (nl, index);
       update_content ();
 
-      if (manager ()) {
-        manager ()->commit ();
-      }
+      commit ();
 
     }
 
@@ -7629,9 +7618,7 @@ LayoutView::cm_edit_layer ()
       }
     }
 
-    if (manager ()) {
-      manager ()->transaction (tl::to_string (QObject::tr ("Edit layer"))); 
-    }
+    transaction (tl::to_string (QObject::tr ("Edit layer")));
 
     cv->layout ().set_properties (sel->layer_index (), layer_props);
 
@@ -7649,9 +7636,7 @@ LayoutView::cm_edit_layer ()
 
     update_content ();
 
-    if (manager ()) {
-      manager ()->commit ();
-    }
+    commit ();
 
   }
 }
@@ -7681,9 +7666,7 @@ LayoutView::cm_delete_layer ()
   cancel_edits ();
   clear_selection ();
 
-  if (manager ()) {
-    manager ()->transaction (tl::to_string (QObject::tr ("Delete layers"))); 
-  }
+  transaction (tl::to_string (QObject::tr ("Delete layers")));
 
   //  Hint: delete_layer must come before the layers are actually deleted in because
   //  for undo this must be the last thing to do (otherwise the layout is not propertly set up)
@@ -7708,9 +7691,7 @@ LayoutView::cm_delete_layer ()
 
   update_content ();
 
-  if (manager ()) {
-    manager ()->commit ();
-  }
+  commit ();
 }
 
 void
@@ -7727,9 +7708,7 @@ LayoutView::cm_clear_layer ()
     cancel_edits ();
     clear_selection ();
 
-    if (manager ()) {
-      manager ()->transaction (tl::to_string (QObject::tr ("Clear layer")));
-    }
+    transaction (tl::to_string (QObject::tr ("Clear layer")));
 
     for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator si = sel.begin (); si != sel.end (); ++si) {
 
@@ -7758,9 +7737,7 @@ LayoutView::cm_clear_layer ()
 
     }
 
-    if (manager ()) {
-      manager ()->commit ();
-    }
+    commit ();
 
   }
 }

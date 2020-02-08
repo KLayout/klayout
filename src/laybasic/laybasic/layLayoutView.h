@@ -2887,6 +2887,7 @@ private:
   tl::DeferredMethod<lay::LayoutView> dm_prop_changed;
 
   void init (db::Manager *mgr, QWidget *parent);
+  void init_menu ();
 
   void do_prop_changed ();
   void do_redraw (int layer);

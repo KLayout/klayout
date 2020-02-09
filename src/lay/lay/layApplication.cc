@@ -1412,6 +1412,14 @@ GuiApplication::exec ()
 void
 GuiApplication::shutdown ()
 {
+  //  avoid deferred execution later on where there isn't a valid main window anymore
+  //  (problem case: showing a dialog inside main windows's destroyed signal - this will
+  //  process events and trigger execution if not disabled)
+  if (! tl::DeferredMethodScheduler::instance ()->is_disabled ()) {
+    tl::DeferredMethodScheduler::instance ()->execute ();
+  }
+  tl::DeferredMethodScheduler::instance ()->enable (false);
+
   if (mp_mw) {
     delete mp_mw;
     mp_mw = 0;

@@ -38,7 +38,7 @@ Dispatcher::Dispatcher (Plugin *parent, bool standalone)
   : Plugin (parent, standalone),
     m_menu (this)
 {
-  if (! parent) {
+  if (! parent && ! ms_dispatcher_instance) {
     ms_dispatcher_instance = this;
   }
 }

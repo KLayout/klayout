@@ -176,9 +176,9 @@ template <unsigned int NUM>
 gsi::Methods cm_method_decl ()
 {
   tl_assert (NUM < sizeof (cm_symbols) / sizeof (cm_symbols [0]));
-  return gsi::method (std::string ("#") + cm_symbols [NUM], &call_cm_method<NUM>,
+  return gsi::method_ext (std::string ("#") + cm_symbols [NUM], &call_cm_method<NUM>,
     std::string ("@brief '") + cm_symbols[NUM] + "' action.\n"
-      "This method has been added in version 0.25 and is deprecated in version 0.27.\n"
+      "This method is deprecated in version 0.27.\n"
       "Use \"call_menu('" + std::string (cm_symbols[NUM]) + "')\" instead.");
 }
 

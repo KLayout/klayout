@@ -413,7 +413,7 @@ static lay::LayoutView *new_view (QWidget *parent, bool editable, db::Manager *m
 }
 
 Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "LayoutView",
-  gsi::constructor ("new", &new_view, gsi::arg ("parent", (QWidget *) 0), gsi::arg ("editable", false), gsi::arg ("manager", (db::Manager *) 0), gsi::arg ("options", (unsigned int) 0),
+  gsi::constructor ("new", &new_view, gsi::arg ("parent", (QWidget *) 0, "nil"), gsi::arg ("editable", false), gsi::arg ("manager", (db::Manager *) 0, "nil"), gsi::arg ("options", (unsigned int) 0),
     "@brief Creates a standalone view\n"
     "\n"
     "This constructor is for special purposes only. To create a view in the context of a main window, "

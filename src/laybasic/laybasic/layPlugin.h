@@ -421,7 +421,7 @@ public:
   /**
    *  @brief Removes the menu resources associated with this plugin
    */
-  void remove_menu_items ();
+  void remove_menu_items (lay::Dispatcher *dispatcher);
 
   /**
    *  @brief Enables this editable part of the plugin

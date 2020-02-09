@@ -39,4 +39,5 @@ Tests:
   - changing of macro title, move macro to different place
   - funktionieren die check marks vor den menus? (Mode, selection modes, ruler template)
   - check whether there is a replacement for the "cm_..." methods and tests them (at least one)
+  - check if changing the default grid works
 

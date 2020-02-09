@@ -4056,7 +4056,7 @@ MainWindow::plugin_registered (lay::PluginDeclaration *cls)
 void
 MainWindow::plugin_removed (lay::PluginDeclaration *cls)
 {
-  cls->remove_menu_items ();
+  cls->remove_menu_items (this);
 
   //  recreate all plugins except the one that got removed
   for (std::vector <lay::LayoutView *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {

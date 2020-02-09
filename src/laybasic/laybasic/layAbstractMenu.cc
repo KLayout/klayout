@@ -195,14 +195,14 @@ parse_menu_title (const std::string &s, std::string &title, std::string &shortcu
 // ---------------------------------------------------------------
 //  AbstractMenuItem implementation
 
-AbstractMenuItem::AbstractMenuItem ()
-  : m_has_submenu (false), m_remove_on_empty (false)
+AbstractMenuItem::AbstractMenuItem (Dispatcher *dispatcher)
+  : m_action (), mp_dispatcher (dispatcher), m_has_submenu (false), m_remove_on_empty (false)
 {
   //  ... nothing yet ..
 }
 
-AbstractMenuItem::AbstractMenuItem (const AbstractMenuItem &)
-  : m_has_submenu (false), m_remove_on_empty (false)
+AbstractMenuItem::AbstractMenuItem (const AbstractMenuItem &item)
+  : m_action (), mp_dispatcher (item.dispatcher ()), m_has_submenu (false), m_remove_on_empty (false)
 {
   //  ... nothing yet ..
 }
@@ -249,9 +249,11 @@ AbstractMenuItem::set_action (const Action &a, bool copy_properties)
 
   bool enabled = m_action.is_enabled ();
   bool visible = m_action.is_visible ();
+  m_action.handle ()->set_dispatcher (0);
   m_action = acopy;
   m_action.set_enabled (enabled);
   m_action.set_visible (visible);
+  m_action.handle ()->set_dispatcher (mp_dispatcher);
 
   m_action.set_object_name (m_basename);
 
@@ -346,9 +348,10 @@ id_from_action (QAction *action)
   return ao ? ao->id () : 0;
 }
 
-ActionHandle::ActionHandle (QWidget *parent)
+ActionHandle::ActionHandle ()
   : mp_menu (0),
-    mp_action (new ActionObject (parent)),
+    mp_action (new ActionObject (0)),
+    mp_dispatcher (0),
     m_ref_count (0),
     m_owned (true),
     m_visible (true),
@@ -362,11 +365,13 @@ ActionHandle::ActionHandle (QWidget *parent)
 
   //  catch the destroyed signal to tell if the QAction object is deleted.
   connect (mp_action, SIGNAL (destroyed (QObject *)), this, SLOT (destroyed (QObject *)));
+  connect (mp_action, SIGNAL (triggered ()), this, SLOT (qaction_triggered ()));
 }
 
 ActionHandle::ActionHandle (QAction *action, bool owned)
   : mp_menu (0),
     mp_action (action),
+    mp_dispatcher (0),
     m_ref_count (0),
     m_owned (owned),
     m_visible (true),
@@ -380,11 +385,13 @@ ActionHandle::ActionHandle (QAction *action, bool owned)
 
   //  catch the destroyed signal to tell if the QAction object is deleted.
   connect (mp_action, SIGNAL (destroyed (QObject *)), this, SLOT (destroyed (QObject *)));
+  connect (mp_action, SIGNAL (triggered ()), this, SLOT (qaction_triggered ()));
 }
 
 ActionHandle::ActionHandle (QMenu *menu, bool owned)
   : mp_menu (menu),
     mp_action (menu->menuAction ()),
+    mp_dispatcher (0),
     m_ref_count (0),
     m_owned (owned),
     m_visible (true),
@@ -398,6 +405,7 @@ ActionHandle::ActionHandle (QMenu *menu, bool owned)
 
   //  catch the destroyed signal to tell if the QAction object is deleted.
   connect (mp_menu, SIGNAL (destroyed (QObject *)), this, SLOT (destroyed (QObject *)));
+  connect (mp_action, SIGNAL (triggered ()), this, SLOT (qaction_triggered ()));
 }
 
 ActionHandle::~ActionHandle ()
@@ -424,6 +432,23 @@ ActionHandle::~ActionHandle ()
     }
     mp_action = 0;
   }
+}
+
+void
+ActionHandle::set_dispatcher (Dispatcher *dispatcher)
+{
+  if (mp_dispatcher != dispatcher) {
+    if (mp_action && m_owned) {
+      mp_action->setParent (dispatcher ? dispatcher->menu_parent_widget () : 0);
+    }
+    mp_dispatcher = dispatcher;
+  }
+}
+
+void
+ActionHandle::qaction_triggered ()
+{
+  emit triggered ();
 }
 
 void
@@ -580,11 +605,9 @@ ActionHandle::get_key_sequence_for (const std::string &sc) const
 Action::Action ()
   : mp_handle (0)
 {
-  if (lay::Dispatcher::instance ()) {
-    mp_handle = new ActionHandle (lay::Dispatcher::instance ()->menu_parent_widget ());
-    gtf::action_connect (mp_handle->ptr (), SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
-    mp_handle->add_ref ();
-  }
+  mp_handle = new ActionHandle ();
+  connect (mp_handle, SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
+  mp_handle->add_ref ();
 }
 
 const std::string &
@@ -596,22 +619,16 @@ Action::no_shortcut ()
 
 Action::Action (const std::string &title)
 {
-  mp_handle = AbstractMenu::create_action (title, 0);
-  gtf::action_connect (mp_handle->ptr (), SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
+  mp_handle = AbstractMenu::create_action (title);
+  connect (mp_handle, SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
   mp_handle->add_ref ();
 }
 
 Action::Action (ActionHandle *handle)
 {
   mp_handle = handle;
-  gtf::action_connect (mp_handle->ptr (), SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
+  connect (mp_handle, SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
   mp_handle->add_ref ();
-}
-
-Action
-Action::create_free_action (QWidget *parent)
-{
-  return Action (new ActionHandle (parent));
 }
 
 Action::Action (const Action &action)
@@ -619,7 +636,7 @@ Action::Action (const Action &action)
 {
   mp_handle = action.mp_handle;
   if (mp_handle) {
-    gtf::action_connect (mp_handle->ptr (), SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
+    connect (mp_handle, SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
     mp_handle->add_ref ();
   }
 }
@@ -630,14 +647,14 @@ Action::operator= (const Action &action)
   if (this != &action) {
     if (mp_handle) {
       if (mp_handle->ptr ()) {
-        gtf::action_disconnect (mp_handle->ptr (), SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
+        connect (mp_handle, SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
       }
       mp_handle->remove_ref ();
       mp_handle = 0;
     }
     mp_handle = action.mp_handle;
     if (mp_handle) {
-      gtf::action_connect (mp_handle->ptr (), SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
+      connect (mp_handle, SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
       mp_handle->add_ref ();
     }
   }
@@ -648,7 +665,7 @@ Action::~Action ()
 {
   if (mp_handle) {
     if (mp_handle->ptr ()) {
-      gtf::action_disconnect (mp_handle->ptr (), SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
+      connect (mp_handle, SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
     }
     mp_handle->remove_ref ();
     mp_handle = 0;
@@ -927,13 +944,13 @@ Action::set_object_name (const std::string &name)
 //  ConfigureAction implementation
 
 ConfigureAction::ConfigureAction (lay::Dispatcher *dispatcher)
-  : Action (), m_dispatcher (dispatcher), m_type (ConfigureAction::setter_type)
+  : Action (), mp_dispatcher (dispatcher), m_type (ConfigureAction::setter_type)
 {
   //  .. nothing yet ..
 }
 
 ConfigureAction::ConfigureAction (lay::Dispatcher *dispatcher, const std::string &cname, const std::string &cvalue)
-  : Action (), m_dispatcher (dispatcher), m_cname (cname), m_cvalue (cvalue), m_type (ConfigureAction::setter_type)
+  : Action (), mp_dispatcher (dispatcher), m_cname (cname), m_cvalue (cvalue), m_type (ConfigureAction::setter_type)
 {
   if (cvalue == "?") {
     m_type = boolean_type;
@@ -944,7 +961,7 @@ ConfigureAction::ConfigureAction (lay::Dispatcher *dispatcher, const std::string
 }
 
 ConfigureAction::ConfigureAction (lay::Dispatcher *dispatcher, const std::string &title, const std::string &cname, const std::string &cvalue)
-  : Action (title), m_dispatcher (dispatcher), m_cname (cname), m_cvalue (cvalue), m_type (ConfigureAction::setter_type)
+  : Action (title), mp_dispatcher (dispatcher), m_cname (cname), m_cvalue (cvalue), m_type (ConfigureAction::setter_type)
 {
   if (cvalue == "?") {
     //  A "?" notation indicates a boolean toogle entry
@@ -972,19 +989,19 @@ ConfigureAction::triggered ()
     m_cvalue = tl::to_string (is_checked ());
   }
 
-  m_dispatcher->config_set (m_cname, m_cvalue);
+  mp_dispatcher->config_set (m_cname, m_cvalue);
 }
 
 void
 ConfigureAction::reg ()
 {
-  m_dispatcher->register_config_action (m_cname, this);
+  mp_dispatcher->register_config_action (m_cname, this);
 }
 
 void
 ConfigureAction::unreg ()
 {
-  m_dispatcher->unregister_config_action (m_cname, this);
+  mp_dispatcher->unregister_config_action (m_cname, this);
 }
 
 void
@@ -1010,7 +1027,7 @@ ConfigureAction::configure (const std::string &value)
 //  AbstractMenu implementation
 
 ActionHandle *
-AbstractMenu::create_action (const std::string &s, lay::Dispatcher *dispatcher)
+AbstractMenu::create_action (const std::string &s)
 {
   std::string title;
   std::string shortcut;
@@ -1019,7 +1036,7 @@ AbstractMenu::create_action (const std::string &s, lay::Dispatcher *dispatcher)
 
   parse_menu_title (s, title, shortcut, res, tool_tip);
 
-  ActionHandle *ah = new ActionHandle (dispatcher ? dispatcher->menu_parent_widget () : 0);
+  ActionHandle *ah = new ActionHandle ();
   ah->ptr ()->setText (tl::to_qstring (title));
 
   if (! tool_tip.empty ()) {
@@ -1038,7 +1055,7 @@ AbstractMenu::create_action (const std::string &s, lay::Dispatcher *dispatcher)
 }
 
 AbstractMenu::AbstractMenu (Dispatcher *dispatcher)
-  : mp_dispatcher (dispatcher)
+  : mp_dispatcher (dispatcher), m_root (dispatcher)
 {
   //  .. nothing yet ..
 }
@@ -1380,7 +1397,7 @@ AbstractMenu::insert_item (const std::string &p, const std::string &name, const 
       std::list<AbstractMenuItem>::iterator iter = path.back ().second;
 
       //  insert the new item
-      parent->children.insert (iter, AbstractMenuItem ());
+      parent->children.insert (iter, AbstractMenuItem (mp_dispatcher));
       --iter;
 
       iter->setup_item (parent->name (), name, action);
@@ -1413,9 +1430,9 @@ AbstractMenu::insert_separator (const std::string &p, const std::string &name)
     AbstractMenuItem *parent = path.back ().first;
     std::list<AbstractMenuItem>::iterator iter = path.back ().second;
 
-    parent->children.insert (iter, AbstractMenuItem ());
+    parent->children.insert (iter, AbstractMenuItem (mp_dispatcher));
     --iter;
-    Action action (new ActionHandle (mp_dispatcher->menu_parent_widget ()));
+    Action action (new ActionHandle ());
     action.set_separator (true);
     iter->setup_item (parent->name (), name, action);
 
@@ -1435,7 +1452,7 @@ AbstractMenu::insert_menu (const std::string &p, const std::string &name, const 
     AbstractMenuItem *parent = path.back ().first;
     std::list<AbstractMenuItem>::iterator iter = path.back ().second;
 
-    parent->children.insert (iter, AbstractMenuItem ());
+    parent->children.insert (iter, AbstractMenuItem (mp_dispatcher));
     --iter;
     iter->setup_item (parent->name (), name, action);
     iter->set_has_submenu ();
@@ -1458,7 +1475,7 @@ AbstractMenu::insert_menu (const std::string &p, const std::string &name, const 
 void
 AbstractMenu::insert_menu (const std::string &path, const std::string &name, const std::string &title)
 {
-  insert_menu (path, name, create_action (title, mp_dispatcher));
+  insert_menu (path, name, create_action (title));
 }
 
 void
@@ -1694,7 +1711,7 @@ AbstractMenu::find_item (tl::Extractor &extr)
           }
 
           if (parent) {
-            parent->children.insert (iter, AbstractMenuItem ());
+            parent->children.insert (iter, AbstractMenuItem (mp_dispatcher));
             --iter;
             iter->setup_item (parent->name (), n, Action ());
             iter->set_has_submenu ();

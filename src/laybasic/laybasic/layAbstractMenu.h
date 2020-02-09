@@ -83,7 +83,7 @@ class ActionHandle
 Q_OBJECT
 
 public:
-  ActionHandle (QWidget *parent);
+  ActionHandle ();
   ActionHandle (QAction *action, bool owned = true);
   ActionHandle (QMenu *menu, bool owned = true);
   ~ActionHandle ();
@@ -91,6 +91,10 @@ public:
   void remove_ref ();
   QAction *ptr () const;
   QMenu *menu () const;
+  Dispatcher *dispatcher () { return mp_dispatcher; }
+
+  void set_symbol (const std::string &s) { m_symbol = s; }
+  const std::string &symbol () const { return m_symbol; }
 
   void set_visible (bool v);
   void set_hidden (bool h);
@@ -105,12 +109,19 @@ public:
   QKeySequence get_key_sequence () const;
   QKeySequence get_key_sequence_for (const std::string &sc) const;
 
+signals:
+  void triggered ();
+
 protected slots:
   void destroyed (QObject *obj);
+  void qaction_triggered ();
 
 private:
+  friend struct AbstractMenuItem;
+
   QMenu *mp_menu;
   QAction *mp_action;
+  lay::Dispatcher *mp_dispatcher;
   int m_ref_count;
   bool m_owned;
   bool m_visible;
@@ -118,8 +129,11 @@ private:
   std::string m_default_shortcut;
   QKeySequence m_default_key_sequence;
   std::string m_shortcut;
+  std::string m_symbol;
   QKeySequence m_key_sequence;
   bool m_no_key_sequence;
+
+  void set_dispatcher (Dispatcher *dispatcher);
 
   //  no copying
   ActionHandle (const ActionHandle &);
@@ -147,11 +161,11 @@ Q_OBJECT
 
 public:
   /**
-   *  @brief The default constructor
+   *  @brief The main constructor
    *
    *  This constructor creates an QAction object internally which is owned by the Action object.
    */
-  Action (); 
+  Action ();
 
   /**
    *  @brief The copy constructor
@@ -161,20 +175,13 @@ public:
   Action (const Action &action); 
 
   /**
-   *  @brief Create an action with the given title (icon, keyboard shortcut)
+   *  @brief Creates an action with the given title (icon, keyboard shortcut)
    *
    *  The format of the title string is: <text>["("shortcut")"]["<"icon-resource">"]
    *
    *  @param title The title string encoding icon and keyboard shortcut if applicable.
    */
-  Action (const std::string &title); 
-
-  /**
-   *  @brief Creates a new free action
-   *  This constructor wil create a new action with it's own QAction object
-   *  under the given parent.
-   */
-  static Action create_free_action (QWidget *parent);
+  Action (const std::string &title);
 
   /**
    *  @brief Assignement
@@ -376,6 +383,24 @@ public:
   QMenu *menu () const;
 
   /**
+   *  @brief Gets the handle
+   *  The handle is the representative of the menu entry which is shared
+   *  by all Action copies.
+   */
+  ActionHandle *handle ()
+  {
+    return mp_handle;
+  }
+
+  /**
+   *  @brief Gets the dispatcher object this action is connected to
+   */
+  Dispatcher *dispatcher () const
+  {
+    return mp_handle->dispatcher ();
+  }
+
+  /**
    *  @brief Compares two action objects 
    *
    *  Two action objects are equal when they refer to the same ActionHandle.
@@ -418,15 +443,12 @@ public:
 
   /**
    *  @brief The default constructor
-   *
-   *  @param dispatcher The reference to the dispatcher object which receives the configure request
    */
   ConfigureAction (lay::Dispatcher *dispatcher);
 
   /**
    *  @brief Create an configure action with the given name and value
    *
-   *  @param dispatcher The reference to the dispatcher object which receives the configure request
    *  @param cname The name of the configuration parameter to set
    *  @param cvalue The value to set "cname" to
    *
@@ -504,7 +526,7 @@ private:
   ConfigureAction (const ConfigureAction &action); 
   ConfigureAction &operator= (const ConfigureAction &action); 
 
-  lay::Dispatcher *m_dispatcher;
+  lay::Dispatcher *mp_dispatcher;
   std::string m_cname, m_cvalue;
   type m_type;
 };
@@ -514,7 +536,7 @@ private:
  */
 struct LAYBASIC_PUBLIC AbstractMenuItem
 {
-  AbstractMenuItem ();
+  AbstractMenuItem (lay::Dispatcher *dispatcher);
 
   //  No copy constructor semantics because we don't need it (we use list's) and Action does not provide one.
   AbstractMenuItem (const AbstractMenuItem &);
@@ -523,6 +545,11 @@ struct LAYBASIC_PUBLIC AbstractMenuItem
    *  @brief Internal method used to set up the item
    */
   void setup_item (const std::string &pn, const std::string &n, const Action &a); 
+
+  Dispatcher *dispatcher () const
+  {
+    return mp_dispatcher;
+  }
 
   const std::string &name () const 
   {
@@ -565,9 +592,10 @@ struct LAYBASIC_PUBLIC AbstractMenuItem
   std::list <AbstractMenuItem> children;
 
 private:
+  Action m_action;
+  Dispatcher *mp_dispatcher;
   bool m_has_submenu;
   bool m_remove_on_empty;
-  Action m_action;
   std::string m_name;
   std::string m_basename;
   std::set<std::string> m_groups;
@@ -831,10 +859,9 @@ private:
    *  The format of the string is: <text>["("shortcut")"]["<"icon-resource">"]
    *
    *  @param s The title, key and icon resource string in the format given above
-   *  @param provider The abstract menu provider (the global one will be used if this instance is 0)
    *  @return The ActionHandle object created
    */
-  static ActionHandle *create_action (const std::string &s, lay::Dispatcher *dispatcher);
+  static ActionHandle *create_action (const std::string &s);
 
   Dispatcher *mp_dispatcher;
   AbstractMenuItem m_root;
@@ -850,7 +877,6 @@ namespace tl
     typedef tl::false_tag has_copy_constructor;
     typedef tl::false_tag has_default_constructor;
   };
-
 }
 
 #endif

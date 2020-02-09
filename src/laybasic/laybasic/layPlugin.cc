@@ -100,18 +100,17 @@ PluginDeclaration::generic_menu ()
 {
   BEGIN_PROTECTED
 
-  QAction *action = dynamic_cast <QAction *> (sender ());
-  tl_assert (action);
-
-  std::string symbol = tl::to_string (action->data ().toString ());
+  ActionHandle *action_handle = dynamic_cast <ActionHandle *> (sender ());
+  tl_assert (action_handle);
+  tl_assert (action_handle->dispatcher () != 0);
 
   //  Global handler: give the declaration a chance to handle the menu request globally
-  if (menu_activated (symbol)) {
+  if (menu_activated (action_handle->symbol ())) {
     return;
   }
 
   //  Forward the request to the plugin root which will propagate it down to the plugins
-  lay::Dispatcher::instance ()->menu_activated (symbol);
+  action_handle->dispatcher ()->menu_activated (action_handle->symbol ());
 
   END_PROTECTED
 }
@@ -121,18 +120,15 @@ PluginDeclaration::mode_triggered ()
 {
   BEGIN_PROTECTED
 
-  QAction *action = dynamic_cast<QAction *> (sender ());
-  if (action) {
+  ActionHandle *action_handle = dynamic_cast<ActionHandle *> (sender ());
+  tl_assert (action_handle != 0);
+  tl_assert (action_handle->dispatcher () != 0);
 
-    int mode = action->data ().toInt ();
+  int mode = 0;
+  tl::from_string (action_handle->symbol (), mode);
 
-    if (lay::Dispatcher::instance ()) {
-      lay::Dispatcher::instance ()->select_mode (mode);
-    }
-
-    action->setChecked (true);
-
-  }
+  action_handle->dispatcher ()->select_mode (mode);
+  action_handle->ptr ()->setChecked (true);
 
   END_PROTECTED
 }
@@ -172,7 +168,6 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
 
     m_editable_mode_action = Action (title);
     gtf::action_connect (m_editable_mode_action.qaction (), SIGNAL (triggered ()), this, SLOT (toggle_editable_enabled ()));
-    m_editable_mode_action.qaction ()->setData (id ());
     m_editable_mode_action.set_checkable (true);
     m_editable_mode_action.set_checked (m_editable_enabled);
 
@@ -209,8 +204,8 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
       } else {
 
         action = new Action (m->title);
-        action->qaction ()->setData (QVariant (tl::to_qstring (m->symbol)));
-        gtf::action_connect (action->qaction (), SIGNAL (triggered ()), this, SLOT (generic_menu ()));
+        action->handle ()->set_symbol (m->symbol);
+        connect (action->handle (), SIGNAL (triggered ()), this, SLOT (generic_menu ()));
         m_our_menu_actions.push_back (action);
 
       }
@@ -262,23 +257,19 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
     m_mouse_mode_action = Action (title);
     m_mouse_mode_action.add_to_exclusive_group (&menu, "mouse_mode_exclusive_group");
     m_mouse_mode_action.set_checkable (true);
-    m_mouse_mode_action.qaction ()->setData (QVariant (m->second.second));
+    m_mouse_mode_action.handle ()->set_symbol (tl::to_string (m->second.second));
 
     menu.insert_item (m->second.first, name + ":mode_group", m_mouse_mode_action);
 
-    gtf::action_connect (m_mouse_mode_action.qaction (), SIGNAL (triggered ()), this, SLOT (mode_triggered ()));
+    connect (m_mouse_mode_action.handle (), SIGNAL (triggered ()), this, SLOT (mode_triggered ()));
 
   }
 }
 
 void
-PluginDeclaration::remove_menu_items ()
+PluginDeclaration::remove_menu_items (Dispatcher *dispatcher)
 {
-  if (! lay::Dispatcher::instance () || ! lay::Dispatcher::instance ()->menu ()) {
-    return;
-  }
-
-  lay::AbstractMenu *menu = lay::Dispatcher::instance ()->menu ();
+  lay::AbstractMenu *menu = dispatcher->menu ();
   menu->delete_items (m_editable_mode_action);
   menu->delete_items (m_mouse_mode_action);
   for (tl::weak_collection <lay::Action>::iterator a = m_menu_actions.begin (); a != m_menu_actions.end (); ++a) {

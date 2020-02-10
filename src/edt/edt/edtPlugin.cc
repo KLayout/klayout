@@ -272,7 +272,7 @@ public:
   virtual void initialize (lay::Dispatcher *root)
   {
     lay::Dispatcher *mp = lay::Dispatcher::instance ();
-    if (! mp || ! mp->menu ()) {
+    if (! mp || ! mp->has_ui ()) {
       return;
     }
 
@@ -311,7 +311,7 @@ public:
   void update_menu (combine_mode_type cm)
   {
     lay::Dispatcher *mp = lay::Dispatcher::instance ();
-    if (! mp || ! mp->menu ()) {
+    if (! mp || ! mp->has_ui ()) {
       return;
     }
 
@@ -374,7 +374,7 @@ public:
   void initialized (lay::Dispatcher *root)
   {
     lay::Dispatcher *mp = lay::Dispatcher::instance ();
-    if (! mp || ! mp->menu ()) {
+    if (! mp || ! mp->has_ui ()) {
       return;
     }
 

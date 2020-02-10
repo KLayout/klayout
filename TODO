@@ -32,9 +32,14 @@ DONE 8. We can move menu initialization of LV-specifics to the LayoutView and
 
 12. Default ctor for MainWindow so a pymod script can instantiate one (?)
 
+13. Re-think concept of Action as "smart pointers": ConfigureAction
+    violates this. ConfigureAction should be ActionHandle variant?
+    Action as pointer and smart pointers for managing?
+
+
 Tests:
   - DONE: compare menu layout
-  - test every menu function
+  - DONE: test every menu function
   - adding of new tech
   - DONE: adding of rulers/removing
   - ruby plugin (debugging, re-running)
@@ -42,4 +47,5 @@ Tests:
   - DONE: funktionieren die check marks vor den menus? (Mode, selection modes, ruler template)
   - DONE: check whether there is a replacement for the "cm_..." methods and tests them (at least one)
   - DONE: check if changing the default grid works
+  - Run unit tests -> klayout_main_tests:main is failing
 

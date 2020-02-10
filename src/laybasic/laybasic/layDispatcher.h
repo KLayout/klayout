@@ -115,6 +115,11 @@ public:
   virtual QWidget *menu_parent_widget () { return 0; }
 
   /**
+   *  @brief Returns true, if the dispatcher supplies a user interface
+   */
+  virtual bool has_ui () { return menu_parent_widget () != 0; }
+
+  /**
    *  @brief Gets the AbstractMenu object
    *
    *  This will deliver the actual menu - the one that is the root dispatcher's menu

@@ -299,7 +299,7 @@ void
 TechnologyController::update_current_technology ()
 {
   lay::Dispatcher *pr = lay::Dispatcher::instance ();
-  if (! pr || ! pr->menu ()) {
+  if (! pr || ! pr->has_ui ()) {
     return;
   }
 
@@ -326,7 +326,7 @@ void
 TechnologyController::update_menu ()
 {
   lay::Dispatcher *pr = lay::Dispatcher::instance ();
-  if (! pr || ! pr->menu ()) {
+  if (! pr || ! pr->has_ui ()) {
     return;
   }
 

@@ -318,10 +318,6 @@ LibrariesView::event (QEvent *e)
 void
 LibrariesView::context_menu (const QPoint &p)
 {
-  if (! mp_view->menu ()) {
-    return;
-  }
-
   QTreeView *cell_list = dynamic_cast<QTreeView *> (sender ());
   if (cell_list) {
     QMenu *ctx_menu = mp_view->menu ()->detached_menu ("lib_context_menu");

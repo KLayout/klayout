@@ -323,10 +323,6 @@ HierarchyControlPanel::event (QEvent *e)
 void 
 HierarchyControlPanel::context_menu (const QPoint &p)
 {
-  if (! mp_view->menu ()) {
-    return;
-  }
-
   QTreeView *cell_list = dynamic_cast<QTreeView *> (sender ());
   if (cell_list) {
     set_active_celltree_from_sender ();

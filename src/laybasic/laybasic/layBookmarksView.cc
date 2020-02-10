@@ -161,10 +161,6 @@ BookmarksView::refresh ()
 void
 BookmarksView::context_menu (const QPoint &p)
 {
-  if (! mp_view->menu ()) {
-    return;
-  }
-
   QListView *bm_list = dynamic_cast<QListView *> (sender ());
   if (bm_list) {
     QMenu *ctx_menu = mp_view->menu ()->detached_menu ("bookmarks_context_menu");

@@ -210,7 +210,7 @@ void
 PluginDeclaration::update_current_template ()
 {
   lay::Dispatcher *mp = lay::Dispatcher::instance ();
-  if (! mp || ! mp->menu ()) {
+  if (! mp || ! mp->has_ui ()) {
     return;
   }
 
@@ -240,7 +240,7 @@ void
 PluginDeclaration::update_menu ()
 {
   lay::Dispatcher *mp = lay::Dispatcher::instance ();
-  if (! mp || ! mp->menu ()) {
+  if (! mp || ! mp->has_ui ()) {
     return;
   }
 

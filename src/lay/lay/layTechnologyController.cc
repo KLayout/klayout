@@ -265,15 +265,15 @@ TechnologyController::configure (const std::string &name, const std::string &val
 void
 TechnologyController::config_finalize ()
 {
-  if (m_current_technology_updated) {
-    update_current_technology ();
-    m_current_technology_updated = false;
-  }
-
   if (m_technologies_configured) {
     update_menu ();
     emit technologies_edited ();
     m_technologies_configured = false;
+  }
+
+  if (m_current_technology_updated) {
+    update_current_technology ();
+    m_current_technology_updated = false;
   }
 }
 
@@ -316,8 +316,8 @@ TechnologyController::update_current_technology ()
     tech_by_name.insert (std::make_pair (t->name (), t.operator-> ()));
   }
 
-  int it = 0;
-  for (std::map<std::string, const db::Technology *>::const_iterator t = tech_by_name.begin (); t != tech_by_name.end (); ++t, ++it) {
+  size_t it = 0;
+  for (std::map<std::string, const db::Technology *>::const_iterator t = tech_by_name.begin (); t != tech_by_name.end () && it < m_tech_actions.size (); ++t, ++it) {
     m_tech_actions[it].set_checked (t->second->name () == m_current_technology);
   }
 }

@@ -30,14 +30,16 @@ DONE 8. We can move menu initialization of LV-specifics to the LayoutView and
 
 11. Tests for new features and GSI tests
 
+12. Default ctor for MainWindow so a pymod script can instantiate one (?)
+
 Tests:
-  - compare menu layout
+  - DONE: compare menu layout
   - test every menu function
   - adding of new tech
-  - adding of rulers/removing
+  - DONE: adding of rulers/removing
   - ruby plugin (debugging, re-running)
-  - changing of macro title, move macro to different place
-  - funktionieren die check marks vor den menus? (Mode, selection modes, ruler template)
-  - check whether there is a replacement for the "cm_..." methods and tests them (at least one)
-  - check if changing the default grid works
+  - DONE: changing of macro title, move macro to different place
+  - DONE: funktionieren die check marks vor den menus? (Mode, selection modes, ruler template)
+  - DONE: check whether there is a replacement for the "cm_..." methods and tests them (at least one)
+  - DONE: check if changing the default grid works
 

@@ -6632,6 +6632,15 @@ LayoutView::menu_symbols ()
 void
 LayoutView::menu_activated (const std::string &symbol)
 {
+  //  Try the plugin declarations if the view is the top-level dispatcher
+  if (dispatcher () == this) {
+    for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+      if (cls->menu_activated (symbol)) {
+        return;
+      }
+    }
+  }
+
   if (symbol == "cm_show_properties") {
     show_properties (this);
   } else if (symbol == "cm_delete") {
@@ -8042,8 +8051,8 @@ public:
       menu_entries.push_back (lay::menu_item ("cm_select_all", "select_all", at, tl::to_string (QObject::tr ("Select All"))));
       menu_entries.push_back (lay::menu_item ("cm_unselect_all", "unselect_all", at, tl::to_string (QObject::tr ("Unselect All"))));
       menu_entries.push_back (lay::separator ("edit_select_basic_group", at));
-      menu_entries.push_back (lay::menu_item ("enable_all", "enable_all", at, tl::to_string (QObject::tr ("Enable All"))));
-      menu_entries.push_back (lay::menu_item ("disable_all", "disable_all", at, tl::to_string (QObject::tr ("Disable All"))));
+      menu_entries.push_back (lay::menu_item ("lv:enable_all", "enable_all", at, tl::to_string (QObject::tr ("Enable All"))));
+      menu_entries.push_back (lay::menu_item ("lv:disable_all", "disable_all", at, tl::to_string (QObject::tr ("Disable All"))));
       menu_entries.push_back (lay::separator ("edit_select_individual_group", at));
     };
 
@@ -8107,6 +8116,27 @@ public:
     //  Add a hook for inserting new items after the modes
     menu_entries.push_back (lay::separator ("end_modes", "@toolbar.end"));
 
+  }
+
+  bool menu_activated (const std::string &symbol) const
+  {
+    if (symbol == "lv:enable_all") {
+
+      for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+        cls->set_editable_enabled (true);
+      }
+      return true;
+
+    } else if (symbol == "lv:disable_all") {
+
+      for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+        cls->set_editable_enabled (false);
+      }
+      return true;
+
+    } else {
+      return false;
+    }
   }
 
   void implements_primary_mouse_modes (std::vector<std::pair<std::string, std::pair<std::string, int> > > &modes)

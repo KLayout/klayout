@@ -1866,22 +1866,6 @@ MainWindow::select_mode (int m)
 }
 
 void
-MainWindow::enable_all ()
-{
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    cls->set_editable_enabled (true);
-  }
-}
-
-void
-MainWindow::disable_all ()
-{
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    cls->set_editable_enabled (false);
-  }
-}
-
-void
 MainWindow::cm_reset_window_state ()
 {
   restoreState (m_default_window_state);
@@ -3847,6 +3831,13 @@ MainWindow::menu_activated (const std::string &symbol)
   } else if (symbol == "cm_help_about_qt") {
     cm_help_about_qt ();
   } else {
+
+    //  Try the plugin declarations
+    for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+      if (cls->menu_activated (symbol)) {
+        return;
+      }
+    }
 
     //  TODO: this can be part of the Plugin scheme, but the plugin root has no idea which is the active
     //  view.

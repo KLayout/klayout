@@ -329,7 +329,7 @@ MainConfigPage5::commit (lay::Dispatcher *root)
 //  The "key bindings" config page
 
 CustomizeMenuConfigPage::CustomizeMenuConfigPage (QWidget *parent)
-  : lay::ConfigPage (parent), m_enable_event (true)
+  : lay::ConfigPage (parent), m_enable_event (true), mp_dispatcher (0)
 {
   mp_ui = new Ui::CustomizeMenuConfigPage ();
   mp_ui->setupUi (this);
@@ -357,7 +357,7 @@ static void get_shortcuts (const lay::AbstractMenu &menu, const std::string &roo
   std::vector<std::string> items = menu.items (root);
   for (std::vector<std::string>::const_iterator i = items.begin (); i != items.end (); ++i) {
     if (i->size () > 0) {
-      if (menu.is_valid (*i) && menu.action (*i).is_visible ()) {
+      if (menu.is_valid (*i) && menu.action (*i)->is_visible ()) {
         if (menu.is_menu (*i)) {
           //  a menu must be listed (so it can be hidden), but does not have a shortcut
           //  but we don't include special menus
@@ -366,7 +366,7 @@ static void get_shortcuts (const lay::AbstractMenu &menu, const std::string &roo
           }
           get_shortcuts (menu, *i, bindings, with_defaults);
         } else if (! menu.is_separator (*i)) {
-          bindings.insert (std::make_pair (*i, with_defaults ? menu.action (*i).get_default_shortcut () : menu.action (*i).get_effective_shortcut ()));
+          bindings.insert (std::make_pair (*i, with_defaults ? menu.action (*i)->get_default_shortcut () : menu.action (*i)->get_effective_shortcut ()));
         }
       }
     }
@@ -402,11 +402,11 @@ CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::st
 
   //  get the current bindings
   m_current_bindings.clear ();
-  get_shortcuts (*lay::Dispatcher::instance ()->menu (), std::string (), m_current_bindings, false);
+  get_shortcuts (*mp_dispatcher->menu (), std::string (), m_current_bindings, false);
 
   //  get the default bindings
   std::map<std::string, std::string> default_bindings;
-  get_shortcuts (*lay::Dispatcher::instance ()->menu (), std::string (), default_bindings, true);
+  get_shortcuts (*mp_dispatcher->menu (), std::string (), default_bindings, true);
 
   m_enable_event = false;
 
@@ -416,8 +416,8 @@ CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::st
   for (std::map<std::string, std::string>::iterator kb = m_current_bindings.begin (); kb != m_current_bindings.end (); ++kb) {
     std::map<std::string, std::string>::iterator bb = b.find (kb->first);
     if (bb != b.end ()) {
-      lay::Action a = lay::Dispatcher::instance ()->menu ()->action (kb->first);
-      kb->second = a.get_effective_shortcut_for (bb->second);
+      lay::Action *a = mp_dispatcher->menu ()->action (kb->first);
+      kb->second = a->get_effective_shortcut_for (bb->second);
     } else {
       kb->second.clear ();
     }
@@ -470,11 +470,11 @@ CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::st
 
       if (t->first == tl_menu) {
         QTreeWidgetItem *item = new QTreeWidgetItem (top_level_item);
-        lay::Action action = lay::Dispatcher::instance ()->menu ()->action (cb->first);
+        lay::Action *action = mp_dispatcher->menu ()->action (cb->first);
         item->setData (0, Qt::ToolTipRole, tl::to_qstring (rem_path));
         item->setData (0, Qt::DisplayRole, tl::to_qstring (rem_path));
-        item->setData (1, Qt::ToolTipRole, tl::to_qstring (action.get_title ()));
-        item->setData (1, Qt::DisplayRole, tl::to_qstring (action.get_title ()));
+        item->setData (1, Qt::ToolTipRole, tl::to_qstring (action->get_title ()));
+        item->setData (1, Qt::DisplayRole, tl::to_qstring (action->get_title ()));
         item->setData (2, Qt::DisplayRole, tl::to_qstring (sc));
         item->setData (2, Qt::ForegroundRole, palette ().color (is_default ? QPalette::Disabled : QPalette::Normal, QPalette::Text));
         item->setData (0, Qt::UserRole, tl::to_qstring (path));
@@ -482,8 +482,8 @@ CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::st
         item->setCheckState (0, hidden ? Qt::Unchecked : Qt::Checked);
         item->setHidden (false);
         m_item_for_path[path] = item;
-        if (action.qaction ()) {
-          m_paths_for_action[action.qaction ()].push_back (path);
+        if (action->qaction ()) {
+          m_paths_for_action[action->qaction ()].push_back (path);
         }
       }
     }
@@ -502,21 +502,23 @@ CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::st
 }
 
 void 
-CustomizeMenuConfigPage::setup (lay::Dispatcher *root)
+CustomizeMenuConfigPage::setup (lay::Dispatcher *dispatcher)
 {
+  mp_dispatcher = dispatcher;
+
   std::string packed_key_bindings;
-  root->config_get (cfg_key_bindings, packed_key_bindings);
+  dispatcher->config_get (cfg_key_bindings, packed_key_bindings);
   std::vector<std::pair<std::string, std::string> > key_bindings = unpack_key_binding (packed_key_bindings);
 
   std::string packed_menu_items_hidden;
-  root->config_get (cfg_menu_items_hidden, packed_menu_items_hidden);
+  dispatcher->config_get (cfg_menu_items_hidden, packed_menu_items_hidden);
   std::vector<std::pair<std::string, bool> > menu_items_hidden = unpack_menu_items_hidden (packed_menu_items_hidden);
 
   apply (key_bindings, menu_items_hidden);
 }
 
 void 
-CustomizeMenuConfigPage::commit (lay::Dispatcher *root)
+CustomizeMenuConfigPage::commit (lay::Dispatcher *dispatcher)
 {
   current_changed (0, mp_ui->bindings_list->currentItem ());
 
@@ -524,14 +526,14 @@ CustomizeMenuConfigPage::commit (lay::Dispatcher *root)
   //  but never reduce them.
 
   std::string packed_key_bindings;
-  root->config_get (cfg_key_bindings, packed_key_bindings);
+  dispatcher->config_get (cfg_key_bindings, packed_key_bindings);
   std::vector<std::pair<std::string, std::string> > key_bindings = unpack_key_binding (packed_key_bindings);
 
   for (std::vector<std::pair<std::string, std::string> >::iterator kb = key_bindings.begin (); kb != key_bindings.end (); ++kb) {
     std::map<std::string, std::string>::iterator cb = m_current_bindings.find (kb->first);
     if (cb != m_current_bindings.end ()) {
-      lay::Action a = lay::Dispatcher::instance ()->menu ()->action (kb->first);
-      if (cb->second != a.get_default_shortcut ()) {
+      lay::Action *a = dispatcher->menu ()->action (kb->first);
+      if (cb->second != a->get_default_shortcut ()) {
         if (cb->second.empty ()) {
           kb->second = lay::Action::no_shortcut ();
         } else {
@@ -549,10 +551,10 @@ CustomizeMenuConfigPage::commit (lay::Dispatcher *root)
   }
 
   packed_key_bindings = pack_key_binding (key_bindings);
-  root->config_set (cfg_key_bindings, packed_key_bindings);
+  dispatcher->config_set (cfg_key_bindings, packed_key_bindings);
 
   std::string packed_hidden_flags;
-  root->config_get (cfg_menu_items_hidden, packed_hidden_flags);
+  dispatcher->config_get (cfg_menu_items_hidden, packed_hidden_flags);
   std::vector<std::pair<std::string, bool> > hidden = unpack_menu_items_hidden (packed_hidden_flags);
 
   for (std::vector<std::pair<std::string, bool> >::iterator hf = hidden.begin (); hf != hidden.end (); ++hf) {
@@ -568,7 +570,7 @@ CustomizeMenuConfigPage::commit (lay::Dispatcher *root)
   }
 
   packed_hidden_flags = pack_menu_items_hidden (hidden);
-  root->config_set (cfg_menu_items_hidden, packed_hidden_flags);
+  dispatcher->config_set (cfg_menu_items_hidden, packed_hidden_flags);
 }
 
 void
@@ -580,10 +582,10 @@ CustomizeMenuConfigPage::text_cleared ()
   }
 
   std::string path = tl::to_string (item->data (0, Qt::UserRole).toString ());
-  lay::Action a = lay::Dispatcher::instance ()->menu ()->action (path);
+  lay::Action *a = mp_dispatcher->menu ()->action (path);
 
   //  "clear" reverts to default
-  mp_ui->binding_le->setText (tl::to_qstring (a.get_default_shortcut ()));
+  mp_ui->binding_le->setText (tl::to_qstring (a->get_default_shortcut ()));
 }
 
 void
@@ -634,8 +636,8 @@ CustomizeMenuConfigPage::update_list_item (QTreeWidgetItem *item)
 
   bool is_default = false;
 
-  lay::Action a = lay::Dispatcher::instance ()->menu ()->action (path);
-  std::string def_shortcut = a.get_default_shortcut ();
+  lay::Action *a = mp_dispatcher->menu ()->action (path);
+  std::string def_shortcut = a->get_default_shortcut ();
 
   is_default = (def_shortcut == shortcut);
 
@@ -643,9 +645,9 @@ CustomizeMenuConfigPage::update_list_item (QTreeWidgetItem *item)
   item->setData (2, Qt::ForegroundRole, palette ().color (is_default ? QPalette::Disabled : QPalette::Normal, QPalette::Text));
 
   //  Set the aliases too
-  const lay::AbstractMenu &menu = *lay::Dispatcher::instance ()->menu ();
+  const lay::AbstractMenu &menu = *mp_dispatcher->menu ();
   if (menu.is_valid (path)) {
-    QAction *qaction = menu.action (path).qaction ();
+    QAction *qaction = menu.action (path)->qaction ();
     std::map<QAction *, std::vector<std::string> >::const_iterator a = m_paths_for_action.find (qaction);
     if (a != m_paths_for_action.end ()) {
       for (std::vector<std::string>::const_iterator p = a->second.begin (); p != a->second.end (); ++p) {
@@ -688,7 +690,7 @@ CustomizeMenuConfigPage::current_changed (QTreeWidgetItem *current, QTreeWidgetI
   if (current && !current->data (0, Qt::UserRole).isNull ()) {
 
     std::string path = tl::to_string (current->data (0, Qt::UserRole).toString ());
-    if (lay::Dispatcher::instance ()->menu ()->is_menu (path)) {
+    if (mp_dispatcher->menu ()->is_menu (path)) {
 
       mp_ui->binding_le->setText (QString ());
 #if QT_VERSION >= 0x40700
@@ -700,9 +702,9 @@ CustomizeMenuConfigPage::current_changed (QTreeWidgetItem *current, QTreeWidgetI
 
       std::string shortcut = m_current_bindings[path];
 
-      lay::Action a = lay::Dispatcher::instance ()->menu ()->action (path);
+      lay::Action *a = mp_dispatcher->menu ()->action (path);
 
-      std::string def_shortcut = a.get_default_shortcut ();
+      std::string def_shortcut = a->get_default_shortcut ();
 
       mp_ui->binding_le->setText (tl::to_qstring (shortcut));
 #if QT_VERSION >= 0x40700

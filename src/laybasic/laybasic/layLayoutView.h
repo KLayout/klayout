@@ -2684,7 +2684,6 @@ public slots:
 private slots:
   void active_cellview_changed (int index);
   void active_library_changed (int index);
-  void goto_bookmark ();
   void side_panel_destroyed ();
 
 signals:

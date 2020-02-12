@@ -189,6 +189,7 @@ private:
   std::map<std::string, QTreeWidgetItem *> m_item_for_path;
   std::map<QAction *, std::vector<std::string> > m_paths_for_action;
   bool m_enable_event;
+  lay::Dispatcher *mp_dispatcher;
 
   void apply (const std::vector<std::pair<std::string, std::string> > &bindings, const std::vector<std::pair<std::string, bool> > &menu_items_hidden);
   void update_list_item (QTreeWidgetItem *item);

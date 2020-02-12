@@ -541,11 +541,11 @@ Navigator::all_hier_levels (bool f)
 void 
 Navigator::freeze_clicked ()
 {
-  Action freeze_action = mp_main_window->menu ()->action (freeze_action_path);
+  Action *freeze_action = mp_main_window->menu ()->action (freeze_action_path);
 
   m_frozen_list.erase (mp_source_view);
 
-  if (freeze_action.is_checked () && mp_source_view) {
+  if (freeze_action->is_checked () && mp_source_view) {
     NavigatorFrozenViewInfo &info = m_frozen_list.insert (std::make_pair (mp_source_view, NavigatorFrozenViewInfo ())).first->second;
     info.layer_properties = mp_source_view->get_properties ();
     info.hierarchy_levels = mp_source_view->get_hier_levels ();
@@ -690,8 +690,8 @@ Navigator::attach_view (LayoutView *view)
         all_views.erase (*v);
       }
 
-      Action freeze_action = mp_main_window->menu ()->action (freeze_action_path);
-      freeze_action.set_checked (m_frozen_list.find (mp_source_view) != m_frozen_list.end ());
+      Action *freeze_action = mp_main_window->menu ()->action (freeze_action_path);
+      freeze_action->set_checked (m_frozen_list.find (mp_source_view) != m_frozen_list.end ());
 
       //  Hint: this must happen before update ()
       mp_service->attach_view (mp_source_view);

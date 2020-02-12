@@ -1903,22 +1903,5 @@ void MacroCollection::dump (int l)
   }
 }
 
-// ----------------------------------------------------------------------
-
-MacroSignalAdaptor::MacroSignalAdaptor (QObject *parent, Macro *macro)
-  : QObject (parent), mp_macro (macro)
-{
-  //  .. nothing yet ..
-}
-
-void MacroSignalAdaptor::run ()
-{
-BEGIN_PROTECTED
-  if (mp_macro) {
-    mp_macro->run ();
-  }
-END_PROTECTED
-}
-
 }
 

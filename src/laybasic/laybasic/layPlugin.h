@@ -471,18 +471,13 @@ public:
 
 private slots:
   void toggle_editable_enabled ();
-  void generic_menu ();
-  void mode_triggered ();
 
 private:
   int m_id;
-  tl::weak_collection <lay::Action> m_menu_actions;
-  tl::shared_collection <lay::Action> m_our_menu_actions;
-  lay::Action m_editable_mode_action;
-  lay::Action m_mouse_mode_action;
+  tl::weak_ptr<lay::Action> mp_editable_mode_action;
+  tl::weak_ptr<lay::Action> mp_mouse_mode_action;
+  tl::weak_collection<lay::Action> m_menu_actions;
   bool m_editable_enabled;
-
-  void clear_menu_items ();
 };
 
 /**

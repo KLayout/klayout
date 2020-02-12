@@ -218,8 +218,8 @@ PluginDeclaration::update_current_template ()
 
     std::vector<std::string> menu_entries = mp->menu ()->group ("ruler_mode_group");
     for (std::vector<std::string>::const_iterator m = menu_entries.begin (); m != menu_entries.end (); ++m) {
-      lay::Action action = mp->menu ()->action (*m);
-      action.set_title (m_templates [m_current_template].title ());
+      lay::Action *action = mp->menu ()->action (*m);
+      action->set_title (m_templates [m_current_template].title ());
     }
     
     if (m_templates.size () > 1) {
@@ -251,8 +251,8 @@ PluginDeclaration::update_menu ()
   if (m_current_template >= 0 && m_current_template < int (m_templates.size ())) {
     std::vector<std::string> menu_entries = mp->menu ()->group ("ruler_mode_group");
     for (std::vector<std::string>::const_iterator m = menu_entries.begin (); m != menu_entries.end (); ++m) {
-      lay::Action action = mp->menu ()->action (*m);
-      action.set_title (m_templates [m_current_template].title ());
+      lay::Action *action = mp->menu ()->action (*m);
+      action->set_title (m_templates [m_current_template].title ());
     }
   }
   
@@ -269,12 +269,12 @@ PluginDeclaration::update_menu ()
   if (m_templates.size () > 1) {
     int it = 0;
     for (std::vector<Template>::const_iterator tt = m_templates.begin (); tt != m_templates.end (); ++tt, ++it) {
-      lay::ConfigureAction *action = mp->create_config_action (tt->title (), cfg_current_ruler_template, tl::to_string (it));
+      lay::ConfigureAction *action = new lay::ConfigureAction (tt->title (), cfg_current_ruler_template, tl::to_string (it));
       m_actions.push_back (action);
       action->set_checkable (true);
       action->set_checked (it == m_current_template);
       for (std::vector<std::string>::const_iterator t = tmpl_group.begin (); t != tmpl_group.end (); ++t) {
-        mp->menu ()->insert_item (*t + ".end", "ruler_template_" + tl::to_string (it), *action);
+        mp->menu ()->insert_item (*t + ".end", "ruler_template_" + tl::to_string (it), action);
       }
     }
   }

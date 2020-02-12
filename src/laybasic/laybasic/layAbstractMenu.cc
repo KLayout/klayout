@@ -196,19 +196,19 @@ parse_menu_title (const std::string &s, std::string &title, std::string &shortcu
 //  AbstractMenuItem implementation
 
 AbstractMenuItem::AbstractMenuItem (Dispatcher *dispatcher)
-  : m_action (), mp_dispatcher (dispatcher), m_has_submenu (false), m_remove_on_empty (false)
+  : mp_action (new Action ()), mp_dispatcher (dispatcher), m_has_submenu (false), m_remove_on_empty (false)
 {
   //  ... nothing yet ..
 }
 
 AbstractMenuItem::AbstractMenuItem (const AbstractMenuItem &item)
-  : m_action (), mp_dispatcher (item.dispatcher ()), m_has_submenu (false), m_remove_on_empty (false)
+  : mp_action (new Action ()), mp_dispatcher (item.dispatcher ()), m_has_submenu (false), m_remove_on_empty (false)
 {
   //  ... nothing yet ..
 }
 
 void
-AbstractMenuItem::setup_item (const std::string &pn, const std::string &s, const Action &a)
+AbstractMenuItem::setup_item (const std::string &pn, const std::string &s, Action *a)
 {
   m_basename.clear ();
 
@@ -236,36 +236,37 @@ AbstractMenuItem::setup_item (const std::string &pn, const std::string &s, const
 }
 
 void
-AbstractMenuItem::set_action (const Action &a, bool copy_properties)
+AbstractMenuItem::set_action (Action *a, bool copy_properties)
 {
-  Action acopy = a;
+  tl_assert (a != 0);
 
-  if (copy_properties && m_action.qaction () && acopy.qaction ()) {
-    acopy.qaction ()->setIcon (m_action.qaction ()->icon ());
-    acopy.qaction ()->setToolTip (m_action.qaction ()->toolTip ());
-    acopy.qaction ()->setShortcut (m_action.qaction ()->shortcut ());
-    acopy.qaction ()->setIconText (m_action.qaction ()->iconText ());
+  a->keep_object ();
+
+  if (copy_properties && mp_action->qaction () && a->qaction ()) {
+    a->qaction ()->setIcon (mp_action->qaction ()->icon ());
+    a->qaction ()->setToolTip (mp_action->qaction ()->toolTip ());
+    a->qaction ()->setShortcut (mp_action->qaction ()->shortcut ());
+    a->qaction ()->setIconText (mp_action->qaction ()->iconText ());
   }
 
-  bool enabled = m_action.is_enabled ();
-  bool visible = m_action.is_visible ();
-  m_action.handle ()->set_dispatcher (0);
-  m_action = acopy;
-  m_action.set_enabled (enabled);
-  m_action.set_visible (visible);
-  m_action.handle ()->set_dispatcher (mp_dispatcher);
+  bool enabled = mp_action.get () ? mp_action->is_enabled () : true;
+  bool visible = mp_action.get () ? mp_action->is_visible () : true;
+  mp_action->set_dispatcher (0);
+  mp_action.reset (a);
+  mp_action->set_enabled (enabled);
+  mp_action->set_visible (visible);
+  mp_action->set_dispatcher (mp_dispatcher);
+  mp_action->set_object_name (m_basename);
 
-  m_action.set_object_name (m_basename);
-
-  if (m_action.menu ()) {
-    m_action.menu ()->setObjectName (tl::to_qstring (m_basename));
+  if (mp_action->menu ()) {
+    mp_action->menu ()->setObjectName (tl::to_qstring (m_basename));
   }
 }
 
 void
 AbstractMenuItem::set_action_title (const std::string &s)
 {
-  m_action.set_title (s);
+  mp_action->set_title (s);
 }
 
 void
@@ -283,7 +284,32 @@ AbstractMenuItem::set_remove_on_empty ()
 // ---------------------------------------------------------------
 //  Action implementation
 
-static std::set<ActionHandle *> *sp_actionHandles = 0;
+static std::set<Action *> *sp_actionHandles = 0;
+
+static void
+configure_action_from_title (Action *ah, const std::string &s)
+{
+  std::string title;
+  std::string shortcut;
+  std::string res;
+  std::string tool_tip;
+
+  parse_menu_title (s, title, shortcut, res, tool_tip);
+
+  ah->qaction ()->setText (tl::to_qstring (title));
+
+  if (! tool_tip.empty ()) {
+    ah->qaction ()->setToolTip (tl::to_qstring (tool_tip));
+  }
+
+  if (! res.empty ()) {
+    ah->qaction ()->setIcon (QIcon (tl::to_qstring (res)));
+  }
+
+  if (! shortcut.empty ()) {
+    ah->set_default_shortcut (shortcut);
+  }
+}
 
 /**
  *  @brief A specialization that provides a way to catch ambiguous key shortcuts
@@ -317,11 +343,11 @@ public:
         msg += QObject::tr ("Targets of the that shortcut are:");
         msg += tl::to_qstring ("\n");
 
-        for (std::set<ActionHandle *>::const_iterator a = sp_actionHandles->begin (); a != sp_actionHandles->end (); ++a) {
-          if (! (*a)->ptr ()->shortcut ().isEmpty () && (*a)->ptr ()->shortcut ().matches (se->key ()) != QKeySequence::NoMatch) {
+        for (std::set<Action *>::const_iterator a = sp_actionHandles->begin (); a != sp_actionHandles->end (); ++a) {
+          if (! (*a)->qaction ()->shortcut ().isEmpty () && (*a)->qaction ()->shortcut ().matches (se->key ()) != QKeySequence::NoMatch) {
             msg += QChar (0x2022) /*bullet*/;
             msg += tl::to_qstring (" ");
-            msg += (*a)->ptr ()->text ();
+            msg += (*a)->qaction ()->text ();
             msg += tl::to_qstring ("\n");
           }
         }
@@ -348,18 +374,17 @@ id_from_action (QAction *action)
   return ao ? ao->id () : 0;
 }
 
-ActionHandle::ActionHandle ()
+Action::Action ()
   : mp_menu (0),
     mp_action (new ActionObject (0)),
     mp_dispatcher (0),
-    m_ref_count (0),
     m_owned (true),
     m_visible (true),
     m_hidden (false),
     m_no_key_sequence (false)
 {
   if (! sp_actionHandles) {
-    sp_actionHandles = new std::set<ActionHandle *> ();
+    sp_actionHandles = new std::set<Action *> ();
   }
   sp_actionHandles->insert (this);
 
@@ -368,18 +393,17 @@ ActionHandle::ActionHandle ()
   connect (mp_action, SIGNAL (triggered ()), this, SLOT (qaction_triggered ()));
 }
 
-ActionHandle::ActionHandle (QAction *action, bool owned)
+Action::Action (QAction *action, bool owned)
   : mp_menu (0),
     mp_action (action),
     mp_dispatcher (0),
-    m_ref_count (0),
     m_owned (owned),
     m_visible (true),
     m_hidden (false),
     m_no_key_sequence (false)
 {
   if (! sp_actionHandles) {
-    sp_actionHandles = new std::set<ActionHandle *> ();
+    sp_actionHandles = new std::set<Action *> ();
   }
   sp_actionHandles->insert (this);
 
@@ -388,18 +412,17 @@ ActionHandle::ActionHandle (QAction *action, bool owned)
   connect (mp_action, SIGNAL (triggered ()), this, SLOT (qaction_triggered ()));
 }
 
-ActionHandle::ActionHandle (QMenu *menu, bool owned)
+Action::Action (QMenu *menu, bool owned)
   : mp_menu (menu),
     mp_action (menu->menuAction ()),
     mp_dispatcher (0),
-    m_ref_count (0),
     m_owned (owned),
     m_visible (true),
     m_hidden (false),
     m_no_key_sequence (false)
 {
   if (! sp_actionHandles) {
-    sp_actionHandles = new std::set<ActionHandle *> ();
+    sp_actionHandles = new std::set<Action *> ();
   }
   sp_actionHandles->insert (this);
 
@@ -408,7 +431,28 @@ ActionHandle::ActionHandle (QMenu *menu, bool owned)
   connect (mp_action, SIGNAL (triggered ()), this, SLOT (qaction_triggered ()));
 }
 
-ActionHandle::~ActionHandle ()
+Action::Action (const std::string &title)
+  : mp_menu (0),
+    mp_action (new QAction (0)),
+    mp_dispatcher (0),
+    m_owned (true),
+    m_visible (true),
+    m_hidden (false),
+    m_no_key_sequence (false)
+{
+  if (! sp_actionHandles) {
+    sp_actionHandles = new std::set<Action *> ();
+  }
+  sp_actionHandles->insert (this);
+
+  configure_action_from_title (this, title);
+
+  //  catch the destroyed signal to tell if the QAction object is deleted.
+  connect (mp_action, SIGNAL (destroyed (QObject *)), this, SLOT (destroyed (QObject *)));
+  connect (mp_action, SIGNAL (triggered ()), this, SLOT (qaction_triggered ()));
+}
+
+Action::~Action ()
 {
   if (sp_actionHandles) {
     sp_actionHandles->erase (this);
@@ -435,7 +479,7 @@ ActionHandle::~ActionHandle ()
 }
 
 void
-ActionHandle::set_dispatcher (Dispatcher *dispatcher)
+Action::set_dispatcher (Dispatcher *dispatcher)
 {
   if (mp_dispatcher != dispatcher) {
     if (mp_action && m_owned) {
@@ -446,230 +490,11 @@ ActionHandle::set_dispatcher (Dispatcher *dispatcher)
 }
 
 void
-ActionHandle::qaction_triggered ()
+Action::qaction_triggered ()
 {
-  emit triggered ();
-}
-
-void
-ActionHandle::add_ref ()
-{
-  ++m_ref_count;
-}
-
-void
-ActionHandle::remove_ref ()
-{
-  if (--m_ref_count == 0) {
-    delete this;
-  }
-}
-
-QAction *
-ActionHandle::ptr () const
-{
-  return mp_action;
-}
-
-QMenu *
-ActionHandle::menu () const
-{
-  return mp_menu;
-}
-
-void
-ActionHandle::destroyed (QObject *obj)
-{
-  if (obj == mp_action) {
-    mp_action = 0;
-  }
-  if (obj == mp_menu) {
-    mp_menu = 0;
-    mp_action = 0;
-  }
-  m_owned = false;
-}
-
-void
-ActionHandle::set_visible (bool v)
-{
-  if (m_visible != v) {
-    m_visible = v;
-    if (mp_action) {
-      mp_action->setVisible (is_effective_visible ());
-      mp_action->setShortcut (get_key_sequence ());
-    }
-  }
-}
-
-void
-ActionHandle::set_hidden (bool h)
-{
-  if (m_hidden != h) {
-    m_hidden = h;
-    if (mp_action) {
-      mp_action->setVisible (is_effective_visible ());
-      mp_action->setShortcut (get_key_sequence ());
-    }
-  }
-}
-
-bool
-ActionHandle::is_visible () const
-{
-  return m_visible;
-}
-
-bool
-ActionHandle::is_hidden () const
-{
-  return m_hidden;
-}
-
-bool
-ActionHandle::is_effective_visible () const
-{
-  return m_visible && !m_hidden;
-}
-
-void
-ActionHandle::set_default_shortcut (const std::string &sc)
-{
-  if (m_default_shortcut != sc) {
-    m_default_shortcut = sc;
-    m_default_key_sequence = QKeySequence (tl::to_qstring (sc));
-    if (mp_action) {
-      mp_action->setShortcut (get_key_sequence ());
-    }
-  }
-}
-
-void
-ActionHandle::set_shortcut (const std::string &sc)
-{
-  if (m_shortcut != sc) {
-    m_shortcut = sc;
-    m_no_key_sequence = (sc == Action::no_shortcut ());
-    m_key_sequence = m_no_key_sequence ? QKeySequence () : QKeySequence (tl::to_qstring (m_shortcut));
-    if (mp_action) {
-      mp_action->setShortcut (get_key_sequence ());
-    }
-  }
-}
-
-std::string
-ActionHandle::get_default_shortcut () const
-{
-  return tl::to_string (m_default_key_sequence.toString ());
-}
-
-std::string
-ActionHandle::get_shortcut () const
-{
-  return m_no_key_sequence ? Action::no_shortcut () : tl::to_string (m_key_sequence.toString ());
-}
-
-QKeySequence
-ActionHandle::get_key_sequence () const
-{
-  if (m_hidden) {
-    //  A hidden menu item does not have a key sequence too.
-    return QKeySequence ();
-  } else if (m_no_key_sequence) {
-    return QKeySequence ();
-  } else if (m_key_sequence.isEmpty ()) {
-    return m_default_key_sequence;
-  } else {
-    return m_key_sequence;
-  }
-}
-
-QKeySequence
-ActionHandle::get_key_sequence_for (const std::string &sc) const
-{
-  if (m_hidden) {
-    //  A hidden menu item does not have a key sequence too.
-    return QKeySequence ();
-  } else if (sc.empty ()) {
-    return m_default_key_sequence;
-  } else if (sc == Action::no_shortcut ()) {
-    return QKeySequence ();
-  } else {
-    return QKeySequence::fromString (tl::to_qstring (sc));
-  }
-}
-
-// ---------------------------------------------------------------
-//  Action implementation
-
-Action::Action ()
-  : mp_handle (0)
-{
-  mp_handle = new ActionHandle ();
-  connect (mp_handle, SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
-  mp_handle->add_ref ();
-}
-
-const std::string &
-Action::no_shortcut ()
-{
-  static const std::string no_shortcut ("none");
-  return no_shortcut;
-}
-
-Action::Action (const std::string &title)
-{
-  mp_handle = AbstractMenu::create_action (title);
-  connect (mp_handle, SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
-  mp_handle->add_ref ();
-}
-
-Action::Action (ActionHandle *handle)
-{
-  mp_handle = handle;
-  connect (mp_handle, SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
-  mp_handle->add_ref ();
-}
-
-Action::Action (const Action &action)
-  : QObject ()
-{
-  mp_handle = action.mp_handle;
-  if (mp_handle) {
-    connect (mp_handle, SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
-    mp_handle->add_ref ();
-  }
-}
-
-Action &
-Action::operator= (const Action &action)
-{
-  if (this != &action) {
-    if (mp_handle) {
-      if (mp_handle->ptr ()) {
-        connect (mp_handle, SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
-      }
-      mp_handle->remove_ref ();
-      mp_handle = 0;
-    }
-    mp_handle = action.mp_handle;
-    if (mp_handle) {
-      connect (mp_handle, SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
-      mp_handle->add_ref ();
-    }
-  }
-  return *this;
-}
-
-Action::~Action ()
-{
-  if (mp_handle) {
-    if (mp_handle->ptr ()) {
-      connect (mp_handle, SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
-    }
-    mp_handle->remove_ref ();
-    mp_handle = 0;
-  }
+  BEGIN_PROTECTED
+  triggered ();
+  END_PROTECTED
 }
 
 void
@@ -686,12 +511,145 @@ Action::triggered ()
   //  .. no action yet, the reimplementation must provide some ..
 }
 
-void
-Action::triggered_slot ()
+QAction *
+Action::qaction () const
 {
-  BEGIN_PROTECTED
-  triggered ();
-  END_PROTECTED
+  return mp_action;
+}
+
+QMenu *
+Action::menu () const
+{
+  return mp_menu;
+}
+
+void
+Action::destroyed (QObject *obj)
+{
+  if (obj == mp_action) {
+    mp_action = 0;
+  }
+  if (obj == mp_menu) {
+    mp_menu = 0;
+    mp_action = 0;
+  }
+  m_owned = false;
+}
+
+void
+Action::set_visible (bool v)
+{
+  if (m_visible != v) {
+    m_visible = v;
+    if (mp_action) {
+      mp_action->setVisible (is_effective_visible ());
+      mp_action->setShortcut (get_key_sequence ());
+    }
+  }
+}
+
+void
+Action::set_hidden (bool h)
+{
+  if (m_hidden != h) {
+    m_hidden = h;
+    if (mp_action) {
+      mp_action->setVisible (is_effective_visible ());
+      mp_action->setShortcut (get_key_sequence ());
+    }
+  }
+}
+
+bool
+Action::is_visible () const
+{
+  return m_visible;
+}
+
+bool
+Action::is_hidden () const
+{
+  return m_hidden;
+}
+
+bool
+Action::is_effective_visible () const
+{
+  return m_visible && !m_hidden;
+}
+
+void
+Action::set_default_shortcut (const std::string &sc)
+{
+  if (m_default_shortcut != sc) {
+    m_default_shortcut = sc;
+    m_default_key_sequence = QKeySequence (tl::to_qstring (sc));
+    if (mp_action) {
+      mp_action->setShortcut (get_key_sequence ());
+    }
+  }
+}
+
+void
+Action::set_shortcut (const std::string &sc)
+{
+  if (m_shortcut != sc) {
+    m_shortcut = sc;
+    m_no_key_sequence = (sc == Action::no_shortcut ());
+    m_key_sequence = m_no_key_sequence ? QKeySequence () : QKeySequence (tl::to_qstring (m_shortcut));
+    if (mp_action) {
+      mp_action->setShortcut (get_key_sequence ());
+    }
+  }
+}
+
+std::string
+Action::get_default_shortcut () const
+{
+  return tl::to_string (m_default_key_sequence.toString ());
+}
+
+std::string
+Action::get_shortcut () const
+{
+  return m_no_key_sequence ? Action::no_shortcut () : tl::to_string (m_key_sequence.toString ());
+}
+
+QKeySequence
+Action::get_key_sequence () const
+{
+  if (m_hidden) {
+    //  A hidden menu item does not have a key sequence too.
+    return QKeySequence ();
+  } else if (m_no_key_sequence) {
+    return QKeySequence ();
+  } else if (m_key_sequence.isEmpty ()) {
+    return m_default_key_sequence;
+  } else {
+    return m_key_sequence;
+  }
+}
+
+QKeySequence
+Action::get_key_sequence_for (const std::string &sc) const
+{
+  if (m_hidden) {
+    //  A hidden menu item does not have a key sequence too.
+    return QKeySequence ();
+  } else if (sc.empty ()) {
+    return m_default_key_sequence;
+  } else if (sc == Action::no_shortcut ()) {
+    return QKeySequence ();
+  } else {
+    return QKeySequence::fromString (tl::to_qstring (sc));
+  }
+}
+
+const std::string &
+Action::no_shortcut ()
+{
+  static const std::string no_shortcut ("none");
+  return no_shortcut;
 }
 
 void
@@ -712,78 +670,24 @@ Action::get_title () const
   }
 }
 
-void
-Action::set_shortcut (const std::string &s)
-{
-  if (mp_handle) {
-    mp_handle->set_shortcut (s);
-  }
-}
-
-void
-Action::set_default_shortcut (const std::string &s)
-{
-  if (mp_handle) {
-    mp_handle->set_default_shortcut (s);
-  }
-}
-
 std::string
 Action::get_effective_shortcut () const
 {
-  if (mp_handle) {
-    return tl::to_string (mp_handle->get_key_sequence ().toString ());
-  } else {
-    return std::string ();
-  }
+  return tl::to_string (get_key_sequence ().toString ());
 }
 
 std::string
 Action::get_effective_shortcut_for (const std::string &sc) const
 {
-  if (mp_handle) {
-    return tl::to_string (mp_handle->get_key_sequence_for (sc).toString ());
-  } else {
-    return std::string ();
-  }
-}
-
-std::string
-Action::get_shortcut () const
-{
-  if (mp_handle) {
-    return mp_handle->get_shortcut ();
-  } else {
-    return std::string ();
-  }
-}
-
-std::string
-Action::get_default_shortcut () const
-{
-  if (mp_handle) {
-    return mp_handle->get_default_shortcut ();
-  } else {
-    return std::string ();
-  }
-}
-
-QAction *
-Action::qaction () const
-{
-  return mp_handle ? mp_handle->ptr () : 0;
-}
-
-QMenu *
-Action::menu () const
-{
-  return mp_handle ? mp_handle->menu () : 0;
+  return tl::to_string (get_key_sequence_for (sc).toString ());
 }
 
 void
 Action::add_to_exclusive_group (lay::AbstractMenu *menu, const std::string &group_name)
 {
-  menu->make_exclusive_group (group_name)->addAction (qaction ());
+  if (qaction ()) {
+    menu->make_exclusive_group (group_name)->addAction (qaction ());
+  }
 }
 
 bool
@@ -805,24 +709,6 @@ Action::is_enabled () const
 }
 
 bool
-Action::is_visible () const
-{
-  return mp_handle && mp_handle->is_visible ();
-}
-
-bool
-Action::is_hidden () const
-{
-  return mp_handle && mp_handle->is_hidden ();
-}
-
-bool
-Action::is_effective_visible () const
-{
-  return mp_handle && mp_handle->is_effective_visible ();
-}
-
-bool
 Action::is_separator () const
 {
   return qaction () && qaction ()->isSeparator ();
@@ -833,22 +719,6 @@ Action::set_enabled (bool b)
 {
   if (qaction ()) {
     qaction ()->setEnabled (b);
-  }
-}
-
-void
-Action::set_visible (bool v)
-{
-  if (mp_handle) {
-    mp_handle->set_visible (v);
-  }
-}
-
-void
-Action::set_hidden (bool h)
-{
-  if (mp_handle) {
-    mp_handle->set_hidden (h);
   }
 }
 
@@ -943,25 +813,23 @@ Action::set_object_name (const std::string &name)
 // ---------------------------------------------------------------
 //  ConfigureAction implementation
 
-ConfigureAction::ConfigureAction (lay::Dispatcher *dispatcher)
-  : Action (), mp_dispatcher (dispatcher), m_type (ConfigureAction::setter_type)
+ConfigureAction::ConfigureAction ()
+  : Action (), m_type (ConfigureAction::setter_type)
 {
   //  .. nothing yet ..
 }
 
-ConfigureAction::ConfigureAction (lay::Dispatcher *dispatcher, const std::string &cname, const std::string &cvalue)
-  : Action (), mp_dispatcher (dispatcher), m_cname (cname), m_cvalue (cvalue), m_type (ConfigureAction::setter_type)
+ConfigureAction::ConfigureAction (const std::string &cname, const std::string &cvalue)
+  : Action (), m_cname (cname), m_cvalue (cvalue), m_type (ConfigureAction::setter_type)
 {
   if (cvalue == "?") {
     m_type = boolean_type;
     set_checkable (true);
   }
-
-  reg ();
 }
 
-ConfigureAction::ConfigureAction (lay::Dispatcher *dispatcher, const std::string &title, const std::string &cname, const std::string &cvalue)
-  : Action (title), mp_dispatcher (dispatcher), m_cname (cname), m_cvalue (cvalue), m_type (ConfigureAction::setter_type)
+ConfigureAction::ConfigureAction (const std::string &title, const std::string &cname, const std::string &cvalue)
+  : Action (title), m_cname (cname), m_cvalue (cvalue), m_type (ConfigureAction::setter_type)
 {
   if (cvalue == "?") {
     //  A "?" notation indicates a boolean toogle entry
@@ -973,35 +841,22 @@ ConfigureAction::ConfigureAction (lay::Dispatcher *dispatcher, const std::string
     m_cvalue.erase (m_cvalue.begin (), m_cvalue.begin () + 1);
     set_checkable (true);
   }
-
-  reg ();
 }
 
 ConfigureAction::~ConfigureAction ()
 {
-  unreg ();
+  //  .. nothing yet ..
 }
 
 void
 ConfigureAction::triggered ()
 {
-  if (m_type == boolean_type) {
-    m_cvalue = tl::to_string (is_checked ());
+  if (dispatcher ()) {
+    if (m_type == boolean_type) {
+      m_cvalue = tl::to_string (is_checked ());
+    }
+    dispatcher ()->config_set (m_cname, m_cvalue);
   }
-
-  mp_dispatcher->config_set (m_cname, m_cvalue);
-}
-
-void
-ConfigureAction::reg ()
-{
-  mp_dispatcher->register_config_action (m_cname, this);
-}
-
-void
-ConfigureAction::unreg ()
-{
-  mp_dispatcher->unregister_config_action (m_cname, this);
 }
 
 void
@@ -1026,36 +881,8 @@ ConfigureAction::configure (const std::string &value)
 // ---------------------------------------------------------------
 //  AbstractMenu implementation
 
-ActionHandle *
-AbstractMenu::create_action (const std::string &s)
-{
-  std::string title;
-  std::string shortcut;
-  std::string res;
-  std::string tool_tip;
-
-  parse_menu_title (s, title, shortcut, res, tool_tip);
-
-  ActionHandle *ah = new ActionHandle ();
-  ah->ptr ()->setText (tl::to_qstring (title));
-
-  if (! tool_tip.empty ()) {
-    ah->ptr ()->setToolTip (tl::to_qstring (tool_tip));
-  }
-
-  if (! res.empty ()) {
-    ah->ptr ()->setIcon (QIcon (tl::to_qstring (res)));
-  }
-
-  if (! shortcut.empty ()) {
-    ah->set_default_shortcut (shortcut);
-  }
-
-  return ah;
-}
-
 AbstractMenu::AbstractMenu (Dispatcher *dispatcher)
-  : mp_dispatcher (dispatcher), m_root (dispatcher)
+  : mp_dispatcher (dispatcher), m_root (dispatcher), m_config_actions_valid (false)
 {
   //  .. nothing yet ..
 }
@@ -1108,12 +935,12 @@ AbstractMenu::build_detached (const std::string &name, QFrame *mbar)
       menu_layout->addWidget (menu_button);
       menu_button->setAutoRaise (true);
       menu_button->setPopupMode (QToolButton::MenuButtonPopup);
-      menu_button->setText (tl::to_qstring (c->action ().get_title ()));
+      menu_button->setText (tl::to_qstring (c->action ()->get_title ()));
 
       if (c->menu () == 0) {
         QMenu *menu = new QMenu (mp_dispatcher->menu_parent_widget ());
         menu_button->setMenu (menu);
-        c->set_action (Action (new ActionHandle (menu)), true);
+        c->set_action (new Action (menu), true);
       } else {
         menu_button->setMenu (c->menu ());
       }
@@ -1122,7 +949,7 @@ AbstractMenu::build_detached (const std::string &name, QFrame *mbar)
 
     } else {
 
-      QAction *action = c->action ().qaction ();
+      QAction *action = c->action ()->qaction ();
 
       QToolButton *menu_button = new QToolButton (mbar);
       menu_layout->addWidget (menu_button);
@@ -1169,7 +996,7 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
       } else if (c->name ().find ("@") == 0) {
 
         if (c->menu () == 0) {
-          QMenu *menu = new QMenu (tl::to_qstring (c->action ().get_title ()), mp_dispatcher->menu_parent_widget ());
+          QMenu *menu = new QMenu (tl::to_qstring (c->action ()->get_title ()), mp_dispatcher->menu_parent_widget ());
           // HINT: it is necessary to add the menu action to a widget below the main window.
           // Otherwise, the keyboard shortcuts do not work for menu items inside such a
           // popup menu. It seems not to have a negative effect to add the menu to the
@@ -1177,7 +1004,7 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
           if (mp_dispatcher->menu_parent_widget ()) {
             mp_dispatcher->menu_parent_widget ()->addAction (menu->menuAction ());
           }
-          c->set_action (Action (new ActionHandle (menu)), true);
+          c->set_action (new Action (menu), true);
         }
 
         //  prepare a detached menu which can be used as context menues
@@ -1187,9 +1014,9 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
 
         if (c->menu () == 0) {
           QMenu *menu = new QMenu (mp_dispatcher->menu_parent_widget ());
-          menu->setTitle (tl::to_qstring (c->action ().get_title ()));
+          menu->setTitle (tl::to_qstring (c->action ()->get_title ()));
           mbar->addMenu (menu);
-          c->set_action (Action (new ActionHandle (menu)), true);
+          c->set_action (new Action (menu), true);
         } else {
           //  Move the action to the end if present in the menu already
           std::set<std::pair<size_t, QAction *> >::iterator a = present_actions.find (std::make_pair (id_from_action (c->menu ()->menuAction ()), c->menu ()->menuAction ()));
@@ -1210,15 +1037,15 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
 
     } else if (mbar) {
       //  Move the action to the end if present in the menu already
-      std::set<std::pair<size_t, QAction *> >::iterator a = present_actions.find (std::make_pair (id_from_action (c->action ().qaction ()), c->action ().qaction ()));
+      std::set<std::pair<size_t, QAction *> >::iterator a = present_actions.find (std::make_pair (id_from_action (c->action ()->qaction ()), c->action ()->qaction ()));
       if (a != present_actions.end ()) {
         if (s_can_move_menu) {
           mbar->removeAction (a->second);
-          mbar->addAction (c->action ().qaction ());
+          mbar->addAction (c->action ()->qaction ());
         }
         present_actions.erase (*a);
       } else {
-        mbar->addAction (c->action ().qaction ());
+        mbar->addAction (c->action ()->qaction ());
       }
     }
 
@@ -1249,9 +1076,9 @@ AbstractMenu::build (QMenu *m, std::list<AbstractMenuItem> &items)
         //  HINT: the action acts as a container for the title. Unfortunately, we cannot create a
         //  menu with a given action. The action is provided by addMenu instead.
         QMenu *menu = new QMenu (mp_dispatcher->menu_parent_widget ());
-        menu->setTitle (tl::to_qstring (c->action ().get_title ()));
+        menu->setTitle (tl::to_qstring (c->action ()->get_title ()));
         m->addMenu (menu);
-        c->set_action (Action (new ActionHandle (menu)), true);
+        c->set_action (new Action (menu), true);
       } else {
         //  Move the action to the end if present in the menu already
         std::set<std::pair<size_t, QAction *> >::iterator a = present_actions.find (std::make_pair (id_from_action (c->menu ()->menuAction ()), c->menu ()->menuAction ()));
@@ -1271,15 +1098,15 @@ AbstractMenu::build (QMenu *m, std::list<AbstractMenuItem> &items)
     } else {
 
       //  Move the action to the end if present in the menu already
-      std::set<std::pair<size_t, QAction *> >::iterator a = present_actions.find (std::make_pair (id_from_action (c->action ().qaction ()), c->action ().qaction ()));
+      std::set<std::pair<size_t, QAction *> >::iterator a = present_actions.find (std::make_pair (id_from_action (c->action ()->qaction ()), c->action ()->qaction ()));
       if (a != present_actions.end ()) {
         if (s_can_move_menu) {
           m->removeAction (a->second);
-          m->addAction (c->action ().qaction ());
+          m->addAction (c->action ()->qaction ());
         }
         present_actions.erase (*a);
       } else {
-        m->addAction (c->action ().qaction ());
+        m->addAction (c->action ()->qaction ());
       }
 
     }
@@ -1306,12 +1133,12 @@ AbstractMenu::build (QToolBar *t, std::list<AbstractMenuItem> &items)
       //  In order to be able to manage the QMenu ourselves, we must not give it a parent.
       QMenu *menu = new QMenu (0);
       m_helper_menu_items.push_back (menu); // will be owned by the stable vector
-      c->action ().qaction ()->setMenu (menu);
-      t->addAction (c->action ().qaction ());
+      c->action ()->qaction ()->setMenu (menu);
+      t->addAction (c->action ()->qaction ());
       build (menu, c->children);
 
     } else {
-      t->addAction (c->action ().qaction ());
+      t->addAction (c->action ()->qaction ());
     }
 
   }
@@ -1354,13 +1181,17 @@ bool
 AbstractMenu::is_separator (const std::string &path) const
 {
   const AbstractMenuItem *item = find_item_exact (path);
-  return item != 0 && item->action ().is_separator ();
+  return item != 0 && item->action ()->is_separator ();
 }
 
-Action
-AbstractMenu::action (const std::string &path) const
+const Action *AbstractMenu::action(const std::string &path) const
 {
-  const AbstractMenuItem *item = find_item_exact (path);
+  return (const_cast<AbstractMenu *> (this))->action (path);
+}
+
+Action *AbstractMenu::action(const std::string &path)
+{
+  AbstractMenuItem *item = find_item_exact (path);
   if (! item) {
     throw tl::Exception (tl::to_string (QObject::tr ("Not a valid menu item path: ")) + path);
   }
@@ -1384,7 +1215,7 @@ AbstractMenu::items (const std::string &path) const
 }
 
 void
-AbstractMenu::insert_item (const std::string &p, const std::string &name, const Action &action)
+AbstractMenu::insert_item (const std::string &p, const std::string &name, Action *action)
 {
   tl::Extractor extr (p.c_str ());
   while (! extr.at_end ()) {
@@ -1416,7 +1247,7 @@ AbstractMenu::insert_item (const std::string &p, const std::string &name, const 
 
   }
 
-  emit changed ();
+  emit_changed ();
 }
 
 void
@@ -1432,17 +1263,17 @@ AbstractMenu::insert_separator (const std::string &p, const std::string &name)
 
     parent->children.insert (iter, AbstractMenuItem (mp_dispatcher));
     --iter;
-    Action action (new ActionHandle ());
-    action.set_separator (true);
+    Action *action = new Action ();
+    action->set_separator (true);
     iter->setup_item (parent->name (), name, action);
 
   }
 
-  emit changed ();
+  emit_changed ();
 }
 
 void
-AbstractMenu::insert_menu (const std::string &p, const std::string &name, const Action &action)
+AbstractMenu::insert_menu (const std::string &p, const std::string &name, Action *action)
 {
   typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > > path_type;
   tl::Extractor extr (p.c_str ());
@@ -1469,13 +1300,13 @@ AbstractMenu::insert_menu (const std::string &p, const std::string &name, const 
 
   }
 
-  emit changed ();
+  emit_changed ();
 }
 
 void
 AbstractMenu::insert_menu (const std::string &path, const std::string &name, const std::string &title)
 {
-  insert_menu (path, name, create_action (title));
+  insert_menu (path, name, new Action (title));
 }
 
 void
@@ -1486,7 +1317,7 @@ AbstractMenu::clear_menu (const std::string &p)
   path_type path = find_item (extr);
   if (! path.empty () && ! path.back ().second->children.empty ()) {
     path.back ().second->children.clear ();
-    emit changed ();
+    emit_changed ();
   }
 }
 
@@ -1513,10 +1344,10 @@ AbstractMenu::delete_item (const std::string &p)
 
   }
 
-  emit changed ();
+  emit_changed ();
 }
 
-static void do_delete_items (AbstractMenuItem &parent, const Action &action)
+static void do_delete_items (AbstractMenuItem &parent, Action *action)
 {
   for (std::list<AbstractMenuItem>::iterator l = parent.children.begin (); l != parent.children.end (); ) {
     std::list<AbstractMenuItem>::iterator ll = l;
@@ -1534,16 +1365,17 @@ static void do_delete_items (AbstractMenuItem &parent, const Action &action)
 }
 
 void
-AbstractMenu::delete_items (const Action &action)
+AbstractMenu::delete_items (Action *action)
 {
-  do_delete_items (m_root, action);
-  emit changed ();
+  if (action) {
+    do_delete_items (m_root, action);
+    emit_changed ();
+  }
 }
 
 const AbstractMenuItem *
 AbstractMenu::find_item_exact (const std::string &path) const
 {
-  //  Hint: this const_cast saves us having to implement const and non-const versions ..
   return (const_cast<AbstractMenu *> (this))->find_item_exact (path);
 }
 
@@ -1713,7 +1545,7 @@ AbstractMenu::find_item (tl::Extractor &extr)
           if (parent) {
             parent->children.insert (iter, AbstractMenuItem (mp_dispatcher));
             --iter;
-            iter->setup_item (parent->name (), n, Action ());
+            iter->setup_item (parent->name (), n, new Action ());
             iter->set_has_submenu ();
             iter->set_remove_on_empty ();
             iter->set_action_title (ndesc.empty () ? n : ndesc);
@@ -1752,12 +1584,12 @@ AbstractMenu::group (const std::string &name) const
   return grp;
 }
 
-std::vector<lay::Action>
-AbstractMenu::group_actions (const std::string &name) const
+std::vector<lay::Action *>
+AbstractMenu::group_actions (const std::string &name)
 {
   std::vector<std::string> grp = group (name);
 
-  std::vector<lay::Action> actions;
+  std::vector<lay::Action *> actions;
   actions.reserve (grp.size ());
   for (std::vector<std::string>::const_iterator g = grp.begin (); g != grp.end (); ++g) {
     actions.push_back (action (*g));
@@ -1773,6 +1605,45 @@ AbstractMenu::collect_group (std::vector<std::string> &grp, const std::string &n
       grp.push_back (c->name ());
     }
     collect_group (grp, name, *c);
+  }
+}
+
+void
+AbstractMenu::emit_changed ()
+{
+  m_config_actions_valid = false;
+  emit changed ();
+}
+
+std::vector<ConfigureAction *> AbstractMenu::configure_actions (const std::string &name)
+{
+  if (! m_config_actions_valid) {
+
+    std::vector<lay::ConfigureAction *> ca;
+    collect_configure_actions (ca, m_root);
+
+    m_config_action_by_name.clear ();
+    for (std::vector<lay::ConfigureAction *>::const_iterator c = ca.begin (); c != ca.end (); ++c) {
+      m_config_action_by_name [(*c)->get_cname ()].push_back (*c);
+    }
+
+    m_config_actions_valid = true;
+
+  }
+
+  std::map<std::string, std::vector<lay::ConfigureAction *> >::const_iterator c = m_config_action_by_name.find (name);
+  return c == m_config_action_by_name.end () ? std::vector<lay::ConfigureAction *> () : c->second;
+}
+
+void
+AbstractMenu::collect_configure_actions (std::vector<lay::ConfigureAction *> &ca, AbstractMenuItem &item)
+{
+  for (std::list<AbstractMenuItem>::iterator c = item.children.begin (); c != item.children.end (); ++c) {
+    ConfigureAction *cca = dynamic_cast<ConfigureAction *> (c->action ());
+    if (cca) {
+      ca.push_back (cca);
+    }
+    collect_configure_actions (ca, *c);
   }
 }
 

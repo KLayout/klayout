@@ -56,8 +56,6 @@ PluginDeclaration::PluginDeclaration ()
 
 PluginDeclaration::~PluginDeclaration ()
 {
-  clear_menu_items ();
-
   if (Dispatcher::instance ()) {
     Dispatcher::instance ()->plugin_removed (this);
   }
@@ -95,60 +93,58 @@ PluginDeclaration::menu_symbols ()
   return symbols;
 }
 
-void 
-PluginDeclaration::generic_menu ()
+namespace {
+
+class GenericMenuAction
+  : public Action
 {
-  BEGIN_PROTECTED
+public:
+  GenericMenuAction (Dispatcher *dispatcher, const std::string &title, const std::string &symbol)
+    : Action (title), mp_dispatcher (dispatcher), m_symbol (symbol)
+  { }
 
-  ActionHandle *action_handle = dynamic_cast <ActionHandle *> (sender ());
-  tl_assert (action_handle);
-  tl_assert (action_handle->dispatcher () != 0);
-
-  //  Global handler: give the declaration a chance to handle the menu request globally
-  if (menu_activated (action_handle->symbol ())) {
-    return;
+  void triggered ()
+  {
+    if (mp_dispatcher) {
+      mp_dispatcher->menu_activated (m_symbol);
+    }
   }
 
-  //  Forward the request to the plugin root which will propagate it down to the plugins
-  action_handle->dispatcher ()->menu_activated (action_handle->symbol ());
+private:
+  Dispatcher *mp_dispatcher;
+  std::string m_symbol;
+};
 
-  END_PROTECTED
-}
-
-void 
-PluginDeclaration::mode_triggered ()
+class ModeAction
+  : public Action
 {
-  BEGIN_PROTECTED
+public:
+  ModeAction (Dispatcher *dispatcher, const std::string &title, int mode)
+    : Action (title), mp_dispatcher (dispatcher), m_mode (mode)
+  { }
 
-  ActionHandle *action_handle = dynamic_cast<ActionHandle *> (sender ());
-  tl_assert (action_handle != 0);
-  tl_assert (action_handle->dispatcher () != 0);
+  void triggered ()
+  {
+    if (mp_dispatcher) {
+      mp_dispatcher->select_mode (m_mode);
+      set_checked (true);
+    }
+  }
 
-  int mode = 0;
-  tl::from_string (action_handle->symbol (), mode);
+private:
+  Dispatcher *mp_dispatcher;
+  int m_mode;
+};
 
-  action_handle->dispatcher ()->select_mode (mode);
-  action_handle->ptr ()->setChecked (true);
-
-  END_PROTECTED
 }
 
 void
-PluginDeclaration::clear_menu_items ()
-{
-  m_menu_actions.clear ();
-  m_our_menu_actions.clear ();
-}
-
-void 
 PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
 {
   lay::AbstractMenu &menu = *dispatcher->menu ();
 
-  //  pre-initialize to allow multiple init_menu calls
-  m_editable_mode_action = lay::Action ();
-  m_mouse_mode_action = lay::Action ();
-  clear_menu_items ();
+  mp_editable_mode_action.reset ((Action *) 0);
+  mp_mouse_mode_action.reset ((Action *) 0);
 
   std::string title;
 
@@ -166,12 +162,12 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
       title = tab + 1;
     } 
 
-    m_editable_mode_action = Action (title);
-    gtf::action_connect (m_editable_mode_action.qaction (), SIGNAL (triggered ()), this, SLOT (toggle_editable_enabled ()));
-    m_editable_mode_action.set_checkable (true);
-    m_editable_mode_action.set_checked (m_editable_enabled);
+    mp_editable_mode_action.reset (new Action (title));
+    gtf::action_connect (mp_editable_mode_action->qaction (), SIGNAL (triggered ()), this, SLOT (toggle_editable_enabled ()));
+    mp_editable_mode_action->set_checkable (true);
+    mp_editable_mode_action->set_checked (m_editable_enabled);
 
-    menu.insert_item ("edit_menu.select_menu.end", name, m_editable_mode_action);
+    menu.insert_item ("edit_menu.select_menu.end", name, mp_editable_mode_action.get ());
 
   }
 
@@ -198,20 +194,13 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
       Action *action = 0;
 
       if (! m->cname.empty ()) {
-
-        action = dispatcher->create_config_action (m->title, m->cname, m->cvalue);
-
+        action = new ConfigureAction (m->title, m->cname, m->cvalue);
       } else {
-
-        action = new Action (m->title);
-        action->handle ()->set_symbol (m->symbol);
-        connect (action->handle (), SIGNAL (triggered ()), this, SLOT (generic_menu ()));
-        m_our_menu_actions.push_back (action);
-
+        action = new GenericMenuAction (dispatcher, m->title, m->symbol);
       }
 
       m_menu_actions.push_back (action);
-      menu.insert_item (m->insert_pos, m->menu_name, *action);
+      menu.insert_item (m->insert_pos, m->menu_name, action);
 
       if (! m->exclusive_group.empty ()) {
         action->add_to_exclusive_group (&menu, m->exclusive_group);
@@ -254,14 +243,11 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
       title = std::string (tab + 1);
     } 
 
-    m_mouse_mode_action = Action (title);
-    m_mouse_mode_action.add_to_exclusive_group (&menu, "mouse_mode_exclusive_group");
-    m_mouse_mode_action.set_checkable (true);
-    m_mouse_mode_action.handle ()->set_symbol (tl::to_string (m->second.second));
+    mp_mouse_mode_action.reset (new ModeAction (dispatcher, title, m->second.second));
+    mp_mouse_mode_action->add_to_exclusive_group (&menu, "mouse_mode_exclusive_group");
+    mp_mouse_mode_action->set_checkable (true);
 
-    menu.insert_item (m->second.first, name + ":mode_group", m_mouse_mode_action);
-
-    connect (m_mouse_mode_action.handle (), SIGNAL (triggered ()), this, SLOT (mode_triggered ()));
+    menu.insert_item (m->second.first, name + ":mode_group", mp_mouse_mode_action.get ());
 
   }
 }
@@ -270,13 +256,19 @@ void
 PluginDeclaration::remove_menu_items (Dispatcher *dispatcher)
 {
   lay::AbstractMenu *menu = dispatcher->menu ();
-  menu->delete_items (m_editable_mode_action);
-  menu->delete_items (m_mouse_mode_action);
+  menu->delete_items (mp_editable_mode_action.get ());
+  menu->delete_items (mp_mouse_mode_action.get ());
+
+  std::vector<lay::Action *> actions;
   for (tl::weak_collection <lay::Action>::iterator a = m_menu_actions.begin (); a != m_menu_actions.end (); ++a) {
     if (a.operator-> ()) {
-      menu->delete_items (*a);
+      actions.push_back (a.operator-> ());
     }
   }
+  for (std::vector<lay::Action *>::const_iterator a = actions.begin (); a != actions.end (); ++a) {
+    menu->delete_items (*a);
+  }
+  m_menu_actions.clear ();
 }
 
 void 
@@ -284,7 +276,9 @@ PluginDeclaration::set_editable_enabled (bool f)
 {
   if (f != m_editable_enabled) {
     m_editable_enabled = f;
-    m_editable_mode_action.set_checked (f);
+    if (mp_editable_mode_action.get ()) {
+      mp_editable_mode_action->set_checked (f);
+    }
     editable_enabled_changed_event ();
   }
 }

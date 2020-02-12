@@ -366,11 +366,11 @@ LayoutView::init_menu ()
   //  if not in editable mode, hide all entries from "edit_mode" group and show all from the "view_mode" group and vice versa
   std::vector<std::string> edit_mode_grp = menu ()->group ("edit_mode");
   for (std::vector<std::string>::const_iterator g = edit_mode_grp.begin (); g != edit_mode_grp.end (); ++g) {
-    menu ()->action (*g).set_visible (is_editable ());
+    menu ()->action (*g)->set_visible (is_editable ());
   }
   std::vector<std::string> view_mode_grp = menu ()->group ("view_mode");
   for (std::vector<std::string>::const_iterator g = view_mode_grp.begin (); g != view_mode_grp.end (); ++g) {
-    menu ()->action (*g).set_visible (! is_editable ());
+    menu ()->action (*g)->set_visible (! is_editable ());
   }
 }
 
@@ -896,6 +896,32 @@ Plugin *LayoutView::get_plugin_by_name (const std::string &name) const
   return 0;
 }
 
+namespace {
+
+class GotoBookmarkAction
+  : public lay::Action
+{
+public:
+  GotoBookmarkAction (lay::LayoutView *view, size_t id, const std::string &title)
+    : Action (), mp_view (view), m_id (id)
+  {
+    set_title (title);
+  }
+
+  void triggered ()
+  {
+    if (mp_view) {
+      mp_view->goto_view (mp_view->bookmarks ().state (m_id));
+    }
+  }
+
+private:
+  tl::weak_ptr<lay::LayoutView> mp_view;
+  size_t m_id;
+};
+
+}
+
 void
 LayoutView::update_menu (lay::LayoutView *view, lay::AbstractMenu &menu)
 {
@@ -905,23 +931,20 @@ LayoutView::update_menu (lay::LayoutView *view, lay::AbstractMenu &menu)
 
     menu.clear_menu (bm_menu);
 
-    Action goto_bookmark_action = menu.action (bm_menu);
+    Action *goto_bookmark_action = menu.action (bm_menu);
 
     if (view && view->bookmarks ().size () > 0) {
 
-      goto_bookmark_action.set_enabled (true);
+      goto_bookmark_action->set_enabled (true);
 
       const lay::BookmarkList &bookmarks = view->bookmarks ();
       for (size_t i = 0; i < bookmarks.size (); ++i) {
-        Action action;
-        gtf::action_connect (action.qaction (), SIGNAL (triggered ()), view, SLOT (goto_bookmark ()));
-        action.set_title (bookmarks.name (i));
-        action.qaction ()->setData (QVariant (int (i)));
+        Action *action = new GotoBookmarkAction (view, i, bookmarks.name (i));
         menu.insert_item (bm_menu + ".end", tl::sprintf ("bookmark_%d", i + 1), action);
       }
 
     } else {
-      goto_bookmark_action.set_enabled (false);
+      goto_bookmark_action->set_enabled (false);
     }
 
   }
@@ -3915,21 +3938,6 @@ LayoutView::bookmark_view (const std::string &name)
   m_bookmarks.add (name, state);
   mp_bookmarks_view->refresh ();
   emit menu_needs_update ();
-}
-
-void
-LayoutView::goto_bookmark ()
-{
-  BEGIN_PROTECTED
-
-  QAction *action = dynamic_cast <QAction *> (sender ());
-  tl_assert (action);
-  size_t id = size_t (action->data ().toInt ());
-  if (bookmarks ().size () > id) {
-    goto_view (bookmarks ().state (id));
-  }
-
-  END_PROTECTED
 }
 
 void

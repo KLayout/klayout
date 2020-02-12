@@ -638,7 +638,7 @@ public slots:
   void tab_close_requested (int);
   void enable_all ();
   void disable_all ();
-  void open_recent ();
+  void open_recent (size_t n);
   void view_selected (int index);
   void view_title_changed ();
 

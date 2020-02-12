@@ -50,66 +50,13 @@ Dispatcher::~Dispatcher ()
   }
 }
 
-lay::ConfigureAction *
-Dispatcher::create_config_action (const std::string &title, const std::string &cname, const std::string &cvalue)
-{
-  lay::ConfigureAction *ca = new lay::ConfigureAction (this, title, cname, cvalue);
-  m_ca_collection.push_back (ca);
-  return ca;
-}
-
-lay::ConfigureAction *
-Dispatcher::create_config_action (const std::string &cname, const std::string &cvalue)
-{
-  lay::ConfigureAction *ca = new lay::ConfigureAction (this, std::string (), cname, cvalue);
-  m_ca_collection.push_back (ca);
-  return ca;
-}
-
-void
-Dispatcher::register_config_action (const std::string &name, lay::ConfigureAction *action)
-{
-  std::map<std::string, std::vector<lay::ConfigureAction *> >::iterator ca = m_configuration_actions.insert (std::make_pair (name, std::vector<lay::ConfigureAction *> ())).first;
-  for (std::vector<lay::ConfigureAction *>::iterator a = ca->second.begin (); a != ca->second.end (); ++a) {
-    if (*a == action) {
-      return; // already registered
-    }
-  }
-
-  ca->second.push_back (action);
-}
-
-void
-Dispatcher::unregister_config_action (const std::string &name, lay::ConfigureAction *action)
-{
-  std::map<std::string, std::vector<lay::ConfigureAction *> >::iterator ca = m_configuration_actions.find (name);
-  if (ca != m_configuration_actions.end ()) {
-    for (std::vector<lay::ConfigureAction *>::iterator a = ca->second.begin (); a != ca->second.end (); ++a) {
-      if (*a == action) {
-        ca->second.erase (a);
-        return;
-      }
-    }
-  }
-}
-
-void
-Dispatcher::clear_configuration_actions ()
-{
-  m_ca_collection.clear ();
-  m_configuration_actions.clear ();
-}
-
 bool
 Dispatcher::configure (const std::string &name, const std::string &value)
 {
-  std::map<std::string, std::vector<lay::ConfigureAction *> >::iterator ca = m_configuration_actions.find (name);
-  if (ca != m_configuration_actions.end ()) {
-    for (std::vector<lay::ConfigureAction *>::const_iterator a = ca->second.begin (); a != ca->second.end (); ++a) {
-      (*a)->configure (value);
-    }
+  std::vector<lay::ConfigureAction *> ca = m_menu.configure_actions (name);
+  for (std::vector<lay::ConfigureAction *>::const_iterator a = ca.begin (); a != ca.end (); ++a) {
+    (*a)->configure (value);
   }
-
   return false;
 }
 

@@ -25,6 +25,34 @@
 #include "gsiSignals.h"
 #include "layAbstractMenu.h"
 
+namespace {
+
+//  The Action stub to allow reimplementation of the triggered method
+class ActionStub
+  : public lay::Action
+{
+public:
+  virtual void triggered ()
+  {
+    if (triggered_cb.can_issue ()) {
+      triggered_cb.issue<lay::Action> (&lay::Action::triggered);
+    }
+    on_triggered_event ();
+  }
+
+  gsi::Callback triggered_cb;
+  tl::Event on_triggered_event;
+};
+
+}
+
+namespace tl
+{
+  template <> struct type_traits<ActionStub> : public type_traits<void> {
+    typedef tl::false_tag has_copy_constructor;
+  };
+}
+
 namespace gsi
 {
 
@@ -87,7 +115,7 @@ Class<lay::AbstractMenu> decl_AbstractMenu ("lay", "AbstractMenu",
     "\n"
     "This method has been introduced in version 0.26."
   ) +
-  method ("action", &lay::AbstractMenu::action,
+  method ("action", (lay::Action *(lay::AbstractMenu::*) (const std::string &path)) &lay::AbstractMenu::action,
     "@brief Get the reference to a Action object associated with the given path\n"
     "@args path\n"
     "\n"
@@ -359,23 +387,6 @@ Class<lay::Action> decl_ActionBase ("lay", "ActionBase",
   "@alias Action\n"
 );
   
-//  The Action stub to allow reimplementation of the triggered method
-class ActionStub
-  : public lay::Action
-{
-public:
-  virtual void triggered ()
-  {
-    if (triggered_cb.can_issue ()) {
-      triggered_cb.issue<lay::Action> (&lay::Action::triggered);
-    }
-    on_triggered_event ();
-  }
-
-  gsi::Callback triggered_cb;
-  tl::Event on_triggered_event;
-};
-
 Class<ActionStub> decl_Action (decl_ActionBase, "lay", "Action",
   gsi::callback ("triggered", &ActionStub::triggered, &ActionStub::triggered_cb,
     "@brief This method is called if the menu item is selected"

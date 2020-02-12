@@ -694,10 +694,6 @@ MainWindow::~MainWindow ()
 {
   lay::register_help_handler (0, 0, 0);
 
-  //  since the configuration actions unregister themselves, we need to do this before the main
-  //  window is gone:
-  clear_configuration_actions ();
-
   mw_instance = 0;
 
   //  explicitly delete the views here. Otherwise they
@@ -734,7 +730,7 @@ MainWindow::init_menu ()
   if ((lay::ApplicationBase::instance () && lay::ApplicationBase::instance ()->is_vo_mode ())) {
     std::vector<std::string> hide_vo_grp = menu ()->group ("hide_vo");
     for (std::vector<std::string>::const_iterator g = hide_vo_grp.begin (); g != hide_vo_grp.end (); ++g) {
-      menu ()->action (*g).set_visible (false);
+      menu ()->action (*g)->set_visible (false);
     }
   }
 
@@ -744,12 +740,12 @@ MainWindow::init_menu ()
 
   std::vector<std::string> edit_mode_grp = menu ()->group ("edit_mode");
   for (std::vector<std::string>::const_iterator g = edit_mode_grp.begin (); g != edit_mode_grp.end (); ++g) {
-    menu ()->action (*g).set_visible (! view_mode);
+    menu ()->action (*g)->set_visible (! view_mode);
   }
 
   std::vector<std::string> view_mode_grp = menu ()->group ("view_mode");
   for (std::vector<std::string>::const_iterator g = view_mode_grp.begin (); g != view_mode_grp.end (); ++g) {
-    menu ()->action (*g).set_visible (view_mode);
+    menu ()->action (*g)->set_visible (view_mode);
   }
 }
 
@@ -1136,13 +1132,13 @@ MainWindow::config_finalize ()
 
       std::string name = "default_grid_" + tl::to_string (i);
 
-      m_default_grid_actions.push_back (create_config_action (tl::to_string (*g) + tl::to_string (QObject::tr (" um")), cfg_grid, tl::to_string (*g)));
+      m_default_grid_actions.push_back (new lay::ConfigureAction (tl::to_string (*g) + tl::to_string (QObject::tr (" um")), cfg_grid, tl::to_string (*g)));
 
       m_default_grid_actions.back ()->set_checkable (true);
       m_default_grid_actions.back ()->set_checked (fabs (*g - m_grid_micron) < 1e-10);
 
       for (std::vector<std::string>::const_iterator t = group.begin (); t != group.end (); ++t) {
-        menu ()->insert_item (*t + ".end", name, *m_default_grid_actions.back ());
+        menu ()->insert_item (*t + ".end", name, m_default_grid_actions.back ());
       }
 
     }
@@ -1448,8 +1444,8 @@ MainWindow::apply_hidden (const std::vector<std::pair<std::string, bool> > &hidd
 {
   for (std::vector<std::pair<std::string, bool> >::const_iterator hf = hidden.begin (); hf != hidden.end (); ++hf) {
     if (menu ()->is_valid (hf->first)) {
-      lay::Action a = menu ()->action (hf->first);
-      a.set_hidden (hf->second);
+      lay::Action *a = menu ()->action (hf->first);
+      a->set_hidden (hf->second);
     }
   }
 }
@@ -1459,8 +1455,8 @@ MainWindow::apply_key_bindings ()
 {
   for (std::vector<std::pair<std::string, std::string> >::const_iterator kb = m_key_bindings.begin (); kb != m_key_bindings.end (); ++kb) {
     if (menu ()->is_valid (kb->first)) {
-      lay::Action a = menu ()->action (kb->first);
-      a.set_shortcut (kb->second);
+      lay::Action *a = menu ()->action (kb->first);
+      a->set_shortcut (kb->second);
     }
   }
 }
@@ -1481,7 +1477,7 @@ MainWindow::edits_enabled_changed ()
 
   std::vector<std::string> edit_grp = menu ()->group ("edit");
   for (std::vector<std::string>::const_iterator g = edit_grp.begin (); g != edit_grp.end (); ++g) {
-    menu ()->action (*g).set_enabled (enable);
+    menu ()->action (*g)->set_enabled (enable);
   }
 }
 
@@ -1859,9 +1855,9 @@ MainWindow::select_mode (int m)
     //  Plugin's yet (selection, move).
     std::vector<std::string> items = menu ()->items ("@toolbar");
     for (std::vector<std::string>::const_iterator i = items.begin (); i != items.end (); ++i) {
-      Action a = menu ()->action (*i);
-      if (a.qaction ()->isCheckable() && a.qaction ()->data ().toInt () == m_mode) {
-        a.set_checked (true);
+      Action *a = menu ()->action (*i);
+      if (a->qaction ()->isCheckable() && a->qaction ()->data ().toInt () == m_mode) {
+        a->set_checked (true);
         break;
       }
     }
@@ -2029,7 +2025,7 @@ MainWindow::update_action_states ()
 
     if (menu ()->is_valid ("edit_menu.undo")) {
 
-      Action undo_action = menu ()->action ("edit_menu.undo");
+      Action *undo_action = menu ()->action ("edit_menu.undo");
 
       std::string undo_txt (tl::to_string (QObject::tr ("&Undo")));
       bool undo_enable = false;
@@ -2037,14 +2033,14 @@ MainWindow::update_action_states ()
         undo_txt += " - " + m_manager.available_undo ().second;
         undo_enable = true;
       }
-      undo_action.set_title (undo_txt);
-      undo_action.set_enabled (undo_enable && edits_enabled ());
+      undo_action->set_title (undo_txt);
+      undo_action->set_enabled (undo_enable && edits_enabled ());
 
     }
 
     if (menu ()->is_valid ("edit_menu.redo")) {
 
-      Action redo_action = menu ()->action ("edit_menu.redo");
+      Action *redo_action = menu ()->action ("edit_menu.redo");
 
       std::string redo_txt (tl::to_string (QObject::tr ("&Redo")));
       bool redo_enable = false;
@@ -2052,24 +2048,24 @@ MainWindow::update_action_states ()
         redo_txt += " - " + m_manager.available_redo ().second;
         redo_enable = true;
       }
-      redo_action.set_title (redo_txt);
-      redo_action.set_enabled (redo_enable && edits_enabled ());
+      redo_action->set_title (redo_txt);
+      redo_action->set_enabled (redo_enable && edits_enabled ());
 
     }
 
     if (menu ()->is_valid ("edit_menu.paste")) {
-      Action paste_action = menu ()->action ("edit_menu.paste");
-      paste_action.set_enabled (! db::Clipboard::instance ().empty () && edits_enabled ());
+      Action *paste_action = menu ()->action ("edit_menu.paste");
+      paste_action->set_enabled (! db::Clipboard::instance ().empty () && edits_enabled ());
     }
 
     if (menu ()->is_valid ("zoom_menu.next_display_state")) {
-      Action next_display_state_action = menu ()->action ("zoom_menu.next_display_state");
-      next_display_state_action.set_enabled (has_next_display_state ());
+      Action *next_display_state_action = menu ()->action ("zoom_menu.next_display_state");
+      next_display_state_action->set_enabled (has_next_display_state ());
     }
 
     if (menu ()->is_valid ("zoom_menu.prev_display_state")) {
-      Action prev_display_state_action = menu ()->action ("zoom_menu.prev_display_state");
-      prev_display_state_action.set_enabled (has_prev_display_state ());
+      Action *prev_display_state_action = menu ()->action ("zoom_menu.prev_display_state");
+      prev_display_state_action->set_enabled (has_prev_display_state ());
     }
 
   } catch (...) {
@@ -3069,6 +3065,29 @@ MainWindow::add_mru (const std::string &fn_rel, const std::string &tech)
   dispatcher ()->config_set (cfg_mru, config_str);
 }
 
+namespace
+{
+
+class OpenRecentAction
+  : public lay::Action
+{
+public:
+  OpenRecentAction (lay::MainWindow *mw, size_t n)
+    : lay::Action (), mp_mw (mw), m_n (n)
+  { }
+
+  void triggered ()
+  {
+    mp_mw->open_recent (m_n);
+  }
+
+private:
+  lay::MainWindow *mp_mw;
+  size_t m_n;
+};
+
+}
+
 void
 MainWindow::do_update_file_menu ()
 {
@@ -3076,8 +3095,8 @@ MainWindow::do_update_file_menu ()
 
   if (menu ()->is_valid (mru_menu)) {
 
-    Action open_recent_action = menu ()->action (mru_menu);
-    open_recent_action.set_enabled (true);
+    Action *open_recent_action = menu ()->action (mru_menu);
+    open_recent_action->set_enabled (true);
 
     if (m_mru.size () > 0 && edits_enabled ()) {
 
@@ -3086,29 +3105,24 @@ MainWindow::do_update_file_menu ()
 
       for (std::vector<std::pair<std::string, std::string> >::iterator mru = m_mru.end (); mru != m_mru.begin (); ) {
         --mru;
-        unsigned int i = std::distance (m_mru.begin (), mru);
-        Action action;
-        gtf::action_connect (action.qaction (), SIGNAL (triggered ()), this, SLOT (open_recent ()));
-        action.set_title (mru->first);
-        action.qaction ()->setData (QVariant (int (i)));
+        size_t i = std::distance (m_mru.begin (), mru);
+        Action *action = new OpenRecentAction (this, i);
+        action->set_title (mru->first);
         menu ()->insert_item (mru_menu + ".end", tl::sprintf ("open_recent_%d", i + 1), action);
       }
 
     } else {
-      open_recent_action.set_enabled (false);
+      open_recent_action->set_enabled (false);
     }
 
   }
 }
 
 void
-MainWindow::open_recent ()
+MainWindow::open_recent (size_t n)
 {
   BEGIN_PROTECTED
 
-  QAction *action = dynamic_cast <QAction *> (sender ());
-  tl_assert (action);
-  size_t n = size_t (action->data ().toInt ());
   if (n >= m_mru.size ()) {
     return;
   }

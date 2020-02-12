@@ -129,44 +129,15 @@ public:
     return (dispatcher () == this) ? &m_menu : dispatcher ()->menu ();
   }
 
-  /**
-   *  @brief Creates a configuration action with the given title, parameter name and value
-   *
-   *  The action will be owned by the abstract menu provider but can be deleted to remove it from there.
-   */
-  lay::ConfigureAction *create_config_action (const std::string &title, const std::string &cname, const std::string &cvalue);
-
-  /**
-   *  @brief Creates a configuration action with the given parameter name and value
-   *
-   *  The action will be owned by the abstract menu provider but can be deleted to remove it from there.
-   *  This version is provided for applications, where the title is set later.
-   */
-  lay::ConfigureAction *create_config_action (const std::string &cname, const std::string &cvalue);
-
-  /**
-   *  @brief Registers a configuration action with the given name
-   */
-  void register_config_action (const std::string &name, lay::ConfigureAction *action);
-
-  /**
-   *  @brief Unregisters a configuration action with the given name
-   */
-  void unregister_config_action (const std::string &name, lay::ConfigureAction *action);
-
 protected:
   //  capture the configuration events so we can change the value of the configuration actions
   virtual bool configure (const std::string &name, const std::string &value);
-
-  void clear_configuration_actions ();
 
 private:
   Dispatcher (const Dispatcher &);
   Dispatcher &operator= (const Dispatcher &);
 
   lay::AbstractMenu m_menu;
-  std::map<std::string, std::vector<lay::ConfigureAction *> > m_configuration_actions;
-  tl::shared_collection<lay::ConfigureAction> m_ca_collection;
 };
 
 }

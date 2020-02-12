@@ -297,13 +297,11 @@ public:
     }
 
     //  add entries to the combine mode dialog
-    lay::Action combine_menu = mp->menu ()->action ("@toolbar.combine_mode");
-
-    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_add",   *mp->create_config_action (tl::to_string (QObject::tr ("Add<:/cm_add.png>{Add shapes}")),   cfg_edit_combine_mode, CMConverter ().to_string (CM_Add)));
-    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_merge", *mp->create_config_action (tl::to_string (QObject::tr ("Merge<:/cm_merge.png>{Merge shapes with background}")), cfg_edit_combine_mode, CMConverter ().to_string (CM_Merge)));
-    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_erase", *mp->create_config_action (tl::to_string (QObject::tr ("Erase<:/cm_erase.png>{Erase shape from background}")), cfg_edit_combine_mode, CMConverter ().to_string (CM_Erase)));
-    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_mask",  *mp->create_config_action (tl::to_string (QObject::tr ("Mask<:/cm_mask.png>{Mask background with shape}")),  cfg_edit_combine_mode, CMConverter ().to_string (CM_Mask)));
-    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_diff",  *mp->create_config_action (tl::to_string (QObject::tr ("Diff<:/cm_diff.png>{Compute difference of shape with background}")),  cfg_edit_combine_mode, CMConverter ().to_string (CM_Diff)));
+    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_add",   new lay::ConfigureAction (tl::to_string (QObject::tr ("Add<:/cm_add.png>{Add shapes}")),   cfg_edit_combine_mode, CMConverter ().to_string (CM_Add)));
+    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_merge", new lay::ConfigureAction (tl::to_string (QObject::tr ("Merge<:/cm_merge.png>{Merge shapes with background}")), cfg_edit_combine_mode, CMConverter ().to_string (CM_Merge)));
+    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_erase", new lay::ConfigureAction (tl::to_string (QObject::tr ("Erase<:/cm_erase.png>{Erase shape from background}")), cfg_edit_combine_mode, CMConverter ().to_string (CM_Erase)));
+    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_mask",  new lay::ConfigureAction (tl::to_string (QObject::tr ("Mask<:/cm_mask.png>{Mask background with shape}")),  cfg_edit_combine_mode, CMConverter ().to_string (CM_Mask)));
+    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_diff",  new lay::ConfigureAction (tl::to_string (QObject::tr ("Diff<:/cm_diff.png>{Compute difference of shape with background}")),  cfg_edit_combine_mode, CMConverter ().to_string (CM_Diff)));
 
     update_menu (CM_Add);
   }
@@ -315,23 +313,23 @@ public:
       return;
     }
 
-    lay::Action combine_menu = mp->menu ()->action ("@toolbar.combine_mode");
+    lay::Action *combine_menu = mp->menu ()->action ("@toolbar.combine_mode");
 
     if (cm == CM_Add) {
-      combine_menu.set_title (tl::to_string (QObject::tr ("Add")));
-      combine_menu.set_icon (":/cm_add.png");
+      combine_menu->set_title (tl::to_string (QObject::tr ("Add")));
+      combine_menu->set_icon (":/cm_add.png");
     } else if (cm == CM_Merge) {
-      combine_menu.set_title (tl::to_string (QObject::tr ("Merge")));
-      combine_menu.set_icon (":/cm_merge.png");
+      combine_menu->set_title (tl::to_string (QObject::tr ("Merge")));
+      combine_menu->set_icon (":/cm_merge.png");
     } else if (cm == CM_Erase) {
-      combine_menu.set_title (tl::to_string (QObject::tr ("Erase")));
-      combine_menu.set_icon (":/cm_erase.png");
+      combine_menu->set_title (tl::to_string (QObject::tr ("Erase")));
+      combine_menu->set_icon (":/cm_erase.png");
     } else if (cm == CM_Mask) {
-      combine_menu.set_title (tl::to_string (QObject::tr ("Mask")));
-      combine_menu.set_icon (":/cm_mask.png");
+      combine_menu->set_title (tl::to_string (QObject::tr ("Mask")));
+      combine_menu->set_icon (":/cm_mask.png");
     } else if (cm == CM_Diff) {
-      combine_menu.set_title (tl::to_string (QObject::tr ("Diff")));
-      combine_menu.set_icon (":/cm_diff.png");
+      combine_menu->set_title (tl::to_string (QObject::tr ("Diff")));
+      combine_menu->set_icon (":/cm_diff.png");
     }
   }
 
@@ -378,13 +376,13 @@ public:
       return;
     }
 
-    lay::Action combine_menu = mp->menu ()->action ("@toolbar.combine_mode");
+    lay::Action *combine_menu = mp->menu ()->action ("@toolbar.combine_mode");
 
     //  Do some more initialization here.
 
     combine_mode_type cm = CM_Add;
     root->config_get (cfg_edit_combine_mode, cm, CMConverter ());
-    if (cm != CM_Add && combine_menu.is_visible ()) {
+    if (cm != CM_Add && combine_menu->is_visible ()) {
       lay::TipDialog td (QApplication::activeWindow (), 
                     tl::to_string (QObject::tr ("The background combination mode of the shape editor is set to some other mode than 'Add'.\n"
                                                 "This can be confusing, because a shape may not be drawn as expected.\n\nTo switch back to normal mode, choose 'Add' for the background combination mode in the toolbar.")), 

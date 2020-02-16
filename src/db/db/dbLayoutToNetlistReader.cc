@@ -177,6 +177,8 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
     tl_assert (netlist != 0);
   }
 
+  db::LayoutLocker layout_locker (l2n ? l2n->internal_layout () : 0);
+
   while (! at_end ()) {
 
     if (test (skeys::version_key) || test (lkeys::version_key)) {

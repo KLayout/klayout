@@ -2775,6 +2775,7 @@ static void _call_f_setLayout_1341 (const qt_gsi::GenericMethod * /*decl*/, void
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QLayout *arg1 = gsi::arg_reader<QLayout * >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWidget *)cls)->setLayout (arg1);
 }
@@ -2795,6 +2796,7 @@ static void _call_f_setLayoutDirection_2316 (const qt_gsi::GenericMethod * /*dec
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const qt_gsi::Converter<Qt::LayoutDirection>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::LayoutDirection>::target_type & >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWidget *)cls)->setLayoutDirection (qt_gsi::QtToCppAdaptor<Qt::LayoutDirection>(arg1).cref());
 }
@@ -3081,6 +3083,11 @@ static void _call_f_setParent_1315 (const qt_gsi::GenericMethod * /*decl*/, void
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  if (arg1) {
+    qt_gsi::qt_keep ((QWidget *)cls);
+  } else {
+    qt_gsi::qt_release ((QWidget *)cls);
+  }
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWidget *)cls)->setParent (arg1);
 }
@@ -3104,6 +3111,11 @@ static void _call_f_setParent_3702 (const qt_gsi::GenericMethod * /*decl*/, void
   tl::Heap heap;
   QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   QFlags<Qt::WindowType> arg2 = gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap);
+  if (arg1) {
+    qt_gsi::qt_keep ((QWidget *)cls);
+  } else {
+    qt_gsi::qt_release ((QWidget *)cls);
+  }
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWidget *)cls)->setParent (arg1, arg2);
 }

@@ -488,6 +488,20 @@ inline void qt_keep (T *obj)
   }
 }
 
+/**
+ *  @brief An implementation helper for the "keep arg" feature
+ *  This helper will call release on the object, hence returning the
+ *  ownership to the script framework.
+ */
+template <class T>
+inline void qt_release (T *obj)
+{
+  QtObjectBase *qt_obj = dynamic_cast<QtObjectBase *>(obj);
+  if (qt_obj) {
+    qt_obj->release ();
+  }
+}
+
 template <class T>
 inline void qt_keep (const QList<T *> &list)
 {

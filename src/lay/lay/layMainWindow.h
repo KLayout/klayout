@@ -725,7 +725,6 @@ private:
   double m_grid_micron;
   std::vector<double> m_default_grids;
   bool m_default_grids_updated;
-  std::vector<lay::Action *> m_default_grid_actions;
   std::vector<std::pair<std::string, std::string> > m_key_bindings;
   bool m_new_layout_current_panel;
   bool m_synchronized_views;

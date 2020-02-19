@@ -1122,23 +1122,17 @@ MainWindow::config_finalize ()
       }
     }
 
-    for (std::vector<lay::Action *>::iterator a = m_default_grid_actions.begin (); a != m_default_grid_actions.end (); ++a) {
-      delete *a;
-    }
-    m_default_grid_actions.clear ();
-
     int i = 1;
     for (std::vector<double>::const_iterator g = m_default_grids.begin (); g != m_default_grids.end (); ++g, ++i) {
 
       std::string name = "default_grid_" + tl::to_string (i);
 
-      m_default_grid_actions.push_back (new lay::ConfigureAction (tl::to_string (*g) + tl::to_string (QObject::tr (" um")), cfg_grid, tl::to_string (*g)));
-
-      m_default_grid_actions.back ()->set_checkable (true);
-      m_default_grid_actions.back ()->set_checked (fabs (*g - m_grid_micron) < 1e-10);
+      lay::Action *ga = new lay::ConfigureAction (tl::to_string (*g) + tl::to_string (QObject::tr (" um")), cfg_grid, tl::to_string (*g));
+      ga->set_checkable (true);
+      ga->set_checked (fabs (*g - m_grid_micron) < 1e-10);
 
       for (std::vector<std::string>::const_iterator t = group.begin (); t != group.end (); ++t) {
-        menu ()->insert_item (*t + ".end", name, m_default_grid_actions.back ());
+        menu ()->insert_item (*t + ".end", name, ga);
       }
 
     }

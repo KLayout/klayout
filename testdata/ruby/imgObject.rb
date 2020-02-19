@@ -109,9 +109,14 @@ class IMG_TestClass < TestBase
     assert_equal(ii.mask(1, 2), true)
     assert_equal(ii.to_s, "mono:matrix=(0,-2.5,-2.75) (2.5,0,7.5) (0,0,1);min_value=0;max_value=1;is_visible=true;z_position=0;brightness=0;contrast=0;gamma=1;red_gain=1;green_gain=1;blue_gain=1;color_mapping=[0,'#000000';1,'#ffffff';];width=2;height=3;data=[0;0.5;1.5;2.5;10;20;]")
     image.set_mask(1, 2, false)
+    md = image.mask_data
     assert_equal(ii.to_s, "mono:matrix=(0,-2.5,-2.75) (2.5,0,7.5) (0,0,1);min_value=0;max_value=1;is_visible=true;z_position=0;brightness=0;contrast=0;gamma=1;red_gain=1;green_gain=1;blue_gain=1;color_mapping=[0,'#000000';1,'#ffffff';];width=2;height=3;data=[0,1;0.5,1;1.5,1;2.5,1;10,1;20,0;]")
     assert_equal(ii.mask(1, 2), false)
     image.set_mask(1, 2, true)
+    assert_equal(ii.mask(1, 2), true)
+    image.mask_data = md 
+    assert_equal(ii.mask(1, 2), false)
+    image.mask_data = [] 
     assert_equal(ii.mask(1, 2), true)
 
     image.set_data(2, 3, data, data2, [])
@@ -130,6 +135,12 @@ class IMG_TestClass < TestBase
     assert_equal(image.get_pixel(1, 2, 2), 300)
 
     image.set_data(2, 3, data)
+    assert_equal(image.to_s, "mono:matrix=(0,-2.5,-2.75) (2.5,0,7.5) (0,0,1);min_value=0;max_value=1;is_visible=true;z_position=0;brightness=0;contrast=0;gamma=1;red_gain=1;green_gain=1;blue_gain=1;color_mapping=[0,'#000000';1,'#ffffff';];width=2;height=3;data=[0;0.5;1.5;2.5;10;20;]")
+
+    d = image.data
+    image.set_data(2, 3, [])
+    assert_equal(image.to_s, "mono:matrix=(0,-2.5,-2.75) (2.5,0,7.5) (0,0,1);min_value=0;max_value=1;is_visible=true;z_position=0;brightness=0;contrast=0;gamma=1;red_gain=1;green_gain=1;blue_gain=1;color_mapping=[0,'#000000';1,'#ffffff';];width=2;height=3;data=[0;0;0;0;0;0;]")
+    image.set_data(2, 3, d)
     assert_equal(image.to_s, "mono:matrix=(0,-2.5,-2.75) (2.5,0,7.5) (0,0,1);min_value=0;max_value=1;is_visible=true;z_position=0;brightness=0;contrast=0;gamma=1;red_gain=1;green_gain=1;blue_gain=1;color_mapping=[0,'#000000';1,'#ffffff';];width=2;height=3;data=[0;0.5;1.5;2.5;10;20;]")
 
     assert_equal(image.width, 2);
@@ -183,6 +194,14 @@ class IMG_TestClass < TestBase
     assert_equal(image.is_visible?, true)
     image.visible = false
     assert_equal(image.is_visible?, false)
+    assert_equal(image.to_s, "color:matrix=(0,-2.5,-2.75) (2.5,0,7.5) (0,0,1);min_value=0;max_value=1;is_visible=false;z_position=0;brightness=0.5;contrast=0;gamma=1;red_gain=1;green_gain=1;blue_gain=1;color_mapping=[0,'#000000';1,'#ffffff';];width=2;height=3;data=[0,1,0;0.5,1.5,0;1.5,2.5,0;2.5,3.5,0;10,0,0;20,0,0;]")
+
+    d1 = image.data(0)
+    d2 = image.data(1)
+    d3 = image.data(2)
+    image.set_data(2, 3, [], [], [])
+    assert_equal(image.to_s, "color:matrix=(0,-2.5,-2.75) (2.5,0,7.5) (0,0,1);min_value=0;max_value=1;is_visible=false;z_position=0;brightness=0.5;contrast=0;gamma=1;red_gain=1;green_gain=1;blue_gain=1;color_mapping=[0,'#000000';1,'#ffffff';];width=2;height=3;data=[0,0,0;0,0,0;0,0,0;0,0,0;0,0,0;0,0,0;]")
+    image.set_data(2, 3, d1, d2, d3)
     assert_equal(image.to_s, "color:matrix=(0,-2.5,-2.75) (2.5,0,7.5) (0,0,1);min_value=0;max_value=1;is_visible=false;z_position=0;brightness=0.5;contrast=0;gamma=1;red_gain=1;green_gain=1;blue_gain=1;color_mapping=[0,'#000000';1,'#ffffff';];width=2;height=3;data=[0,1,0;0.5,1.5,0;1.5,2.5,0;2.5,3.5,0;10,0,0;20,0,0;]")
 
   end

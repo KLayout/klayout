@@ -71,26 +71,6 @@ static void _call_f_autoSipEnabled_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// void QApplication::commitData(QSessionManager &sm)
-
-
-static void _init_f_commitData_2138 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("sm");
-  decl->add_arg<QSessionManager & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_commitData_2138 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QSessionManager &arg1 = gsi::arg_reader<QSessionManager & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QApplication *)cls)->commitData (arg1);
-}
-
-
 // QInputContext *QApplication::inputContext()
 
 
@@ -140,26 +120,6 @@ static void _call_f_notify_2411 (const qt_gsi::GenericMethod * /*decl*/, void *c
   QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   QEvent *arg2 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QApplication *)cls)->notify (arg1, arg2));
-}
-
-
-// void QApplication::saveState(QSessionManager &sm)
-
-
-static void _init_f_saveState_2138 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("sm");
-  decl->add_arg<QSessionManager & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_saveState_2138 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QSessionManager &arg1 = gsi::arg_reader<QSessionManager & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QApplication *)cls)->saveState (arg1);
 }
 
 
@@ -1572,11 +1532,9 @@ static gsi::Methods methods_QApplication () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":autoSipEnabled", "@brief Method bool QApplication::autoSipEnabled()\n", true, &_init_f_autoSipEnabled_c0, &_call_f_autoSipEnabled_c0);
-  methods += new qt_gsi::GenericMethod ("commitData", "@brief Method void QApplication::commitData(QSessionManager &sm)\n", false, &_init_f_commitData_2138, &_call_f_commitData_2138);
   methods += new qt_gsi::GenericMethod (":inputContext", "@brief Method QInputContext *QApplication::inputContext()\n", true, &_init_f_inputContext_c0, &_call_f_inputContext_c0);
   methods += new qt_gsi::GenericMethod ("isSessionRestored?", "@brief Method bool QApplication::isSessionRestored()\n", true, &_init_f_isSessionRestored_c0, &_call_f_isSessionRestored_c0);
   methods += new qt_gsi::GenericMethod ("notify", "@brief Method bool QApplication::notify(QObject *, QEvent *)\nThis is a reimplementation of QCoreApplication::notify", false, &_init_f_notify_2411, &_call_f_notify_2411);
-  methods += new qt_gsi::GenericMethod ("saveState", "@brief Method void QApplication::saveState(QSessionManager &sm)\n", false, &_init_f_saveState_2138, &_call_f_saveState_2138);
   methods += new qt_gsi::GenericMethod ("sessionId", "@brief Method QString QApplication::sessionId()\n", true, &_init_f_sessionId_c0, &_call_f_sessionId_c0);
   methods += new qt_gsi::GenericMethod ("sessionKey", "@brief Method QString QApplication::sessionKey()\n", true, &_init_f_sessionKey_c0, &_call_f_sessionKey_c0);
   methods += new qt_gsi::GenericMethod ("setAutoSipEnabled|autoSipEnabled=", "@brief Method void QApplication::setAutoSipEnabled(const bool enabled)\n", false, &_init_f_setAutoSipEnabled_1559, &_call_f_setAutoSipEnabled_1559);
@@ -1584,12 +1542,10 @@ static gsi::Methods methods_QApplication () {
   methods += new qt_gsi::GenericMethod ("setStyleSheet|styleSheet=", "@brief Method void QApplication::setStyleSheet(const QString &sheet)\n", false, &_init_f_setStyleSheet_2025, &_call_f_setStyleSheet_2025);
   methods += new qt_gsi::GenericMethod (":styleSheet", "@brief Method QString QApplication::styleSheet()\n", true, &_init_f_styleSheet_c0, &_call_f_styleSheet_c0);
   methods += gsi::qt_signal ("aboutToQuit()", "aboutToQuit", "@brief Signal declaration for QApplication::aboutToQuit()\nYou can bind a procedure to this signal.");
-  methods += gsi::qt_signal<QSessionManager & > ("commitDataRequest(QSessionManager &)", "commitDataRequest", gsi::arg("sessionManager"), "@brief Signal declaration for QApplication::commitDataRequest(QSessionManager &sessionManager)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QApplication::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QWidget *, QWidget * > ("focusChanged(QWidget *, QWidget *)", "focusChanged", gsi::arg("old"), gsi::arg("now"), "@brief Signal declaration for QApplication::focusChanged(QWidget *old, QWidget *now)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("fontDatabaseChanged()", "fontDatabaseChanged", "@brief Signal declaration for QApplication::fontDatabaseChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("lastWindowClosed()", "lastWindowClosed", "@brief Signal declaration for QApplication::lastWindowClosed()\nYou can bind a procedure to this signal.");
-  methods += gsi::qt_signal<QSessionManager & > ("saveStateRequest(QSessionManager &)", "saveStateRequest", gsi::arg("sessionManager"), "@brief Signal declaration for QApplication::saveStateRequest(QSessionManager &sessionManager)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("unixSignal(int)", "unixSignal", gsi::arg("arg1"), "@brief Signal declaration for QApplication::unixSignal(int)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("aboutQt", "@brief Static method void QApplication::aboutQt()\nThis method is static and can be called without an instance.", &_init_f_aboutQt_0, &_call_f_aboutQt_0);
   methods += new qt_gsi::GenericStaticMethod ("activeModalWidget", "@brief Static method QWidget *QApplication::activeModalWidget()\nThis method is static and can be called without an instance.", &_init_f_activeModalWidget_0, &_call_f_activeModalWidget_0);
@@ -1715,21 +1671,6 @@ public:
     return QApplication::sender();
   }
 
-  //  [adaptor impl] void QApplication::commitData(QSessionManager &sm)
-  void cbs_commitData_2138_0(QSessionManager &sm)
-  {
-    QApplication::commitData(sm);
-  }
-
-  virtual void commitData(QSessionManager &sm)
-  {
-    if (cb_commitData_2138_0.can_issue()) {
-      cb_commitData_2138_0.issue<QApplication_Adaptor, QSessionManager &>(&QApplication_Adaptor::cbs_commitData_2138_0, sm);
-    } else {
-      QApplication::commitData(sm);
-    }
-  }
-
   //  [adaptor impl] bool QApplication::eventFilter(QObject *, QEvent *)
   bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
   {
@@ -1760,21 +1701,6 @@ public:
     }
   }
 
-  //  [adaptor impl] void QApplication::saveState(QSessionManager &sm)
-  void cbs_saveState_2138_0(QSessionManager &sm)
-  {
-    QApplication::saveState(sm);
-  }
-
-  virtual void saveState(QSessionManager &sm)
-  {
-    if (cb_saveState_2138_0.can_issue()) {
-      cb_saveState_2138_0.issue<QApplication_Adaptor, QSessionManager &>(&QApplication_Adaptor::cbs_saveState_2138_0, sm);
-    } else {
-      QApplication::saveState(sm);
-    }
-  }
-
   //  [emitter impl] void QApplication::aboutToQuit()
   void emitter_QApplication_aboutToQuit_0()
   {
@@ -1794,12 +1720,6 @@ public:
     } else {
       QApplication::childEvent(arg1);
     }
-  }
-
-  //  [emitter impl] void QApplication::commitDataRequest(QSessionManager &sessionManager)
-  void emitter_QApplication_commitDataRequest_2138(QSessionManager &sessionManager)
-  {
-    emit QApplication::commitDataRequest(sessionManager);
   }
 
   //  [adaptor impl] void QApplication::customEvent(QEvent *)
@@ -1871,12 +1791,6 @@ public:
     emit QApplication::lastWindowClosed();
   }
 
-  //  [emitter impl] void QApplication::saveStateRequest(QSessionManager &sessionManager)
-  void emitter_QApplication_saveStateRequest_2138(QSessionManager &sessionManager)
-  {
-    emit QApplication::saveStateRequest(sessionManager);
-  }
-
   //  [adaptor impl] void QApplication::timerEvent(QTimerEvent *)
   void cbs_timerEvent_1730_0(QTimerEvent *arg1)
   {
@@ -1898,10 +1812,8 @@ public:
     emit QApplication::unixSignal(arg1);
   }
 
-  gsi::Callback cb_commitData_2138_0;
   gsi::Callback cb_eventFilter_2411_0;
   gsi::Callback cb_notify_2411_0;
-  gsi::Callback cb_saveState_2138_0;
   gsi::Callback cb_childEvent_1701_0;
   gsi::Callback cb_customEvent_1217_0;
   gsi::Callback cb_disconnectNotify_1731_0;
@@ -1946,48 +1858,6 @@ static void _call_cbs_childEvent_1701_0 (const qt_gsi::GenericMethod * /*decl*/,
 static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback &cb)
 {
   ((QApplication_Adaptor *)cls)->cb_childEvent_1701_0 = cb;
-}
-
-
-// void QApplication::commitData(QSessionManager &sm)
-
-static void _init_cbs_commitData_2138_0 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("sm");
-  decl->add_arg<QSessionManager & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_cbs_commitData_2138_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QSessionManager &arg1 = args.read<QSessionManager & > (heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QApplication_Adaptor *)cls)->cbs_commitData_2138_0 (arg1);
-}
-
-static void _set_callback_cbs_commitData_2138_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QApplication_Adaptor *)cls)->cb_commitData_2138_0 = cb;
-}
-
-
-// emitter void QApplication::commitDataRequest(QSessionManager &sessionManager)
-
-static void _init_emitter_commitDataRequest_2138 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("sessionManager");
-  decl->add_arg<QSessionManager & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_commitDataRequest_2138 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QSessionManager &arg1 = gsi::arg_reader<QSessionManager & >() (args, heap);
-  ((QApplication_Adaptor *)cls)->emitter_QApplication_commitDataRequest_2138 (arg1);
 }
 
 
@@ -2199,48 +2069,6 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// void QApplication::saveState(QSessionManager &sm)
-
-static void _init_cbs_saveState_2138_0 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("sm");
-  decl->add_arg<QSessionManager & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_cbs_saveState_2138_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QSessionManager &arg1 = args.read<QSessionManager & > (heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QApplication_Adaptor *)cls)->cbs_saveState_2138_0 (arg1);
-}
-
-static void _set_callback_cbs_saveState_2138_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QApplication_Adaptor *)cls)->cb_saveState_2138_0 = cb;
-}
-
-
-// emitter void QApplication::saveStateRequest(QSessionManager &sessionManager)
-
-static void _init_emitter_saveStateRequest_2138 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("sessionManager");
-  decl->add_arg<QSessionManager & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_saveStateRequest_2138 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QSessionManager &arg1 = gsi::arg_reader<QSessionManager & >() (args, heap);
-  ((QApplication_Adaptor *)cls)->emitter_QApplication_saveStateRequest_2138 (arg1);
-}
-
-
 // exposed QObject *QApplication::sender()
 
 static void _init_fp_sender_c0 (qt_gsi::GenericMethod *decl)
@@ -2307,9 +2135,6 @@ static gsi::Methods methods_QApplication_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_aboutToQuit", "@brief Emitter for signal void QApplication::aboutToQuit()\nCall this method to emit this signal.", false, &_init_emitter_aboutToQuit_0, &_call_emitter_aboutToQuit_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QApplication::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("commitData", "@hide", false, &_init_cbs_commitData_2138_0, &_call_cbs_commitData_2138_0);
-  methods += new qt_gsi::GenericMethod ("commitData", "@brief Virtual method void QApplication::commitData(QSessionManager &sm)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_commitData_2138_0, &_call_cbs_commitData_2138_0, &_set_callback_cbs_commitData_2138_0);
-  methods += new qt_gsi::GenericMethod ("emit_commitDataRequest", "@brief Emitter for signal void QApplication::commitDataRequest(QSessionManager &sessionManager)\nCall this method to emit this signal.", false, &_init_emitter_commitDataRequest_2138, &_call_emitter_commitDataRequest_2138);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QApplication::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QApplication::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
@@ -2325,9 +2150,6 @@ static gsi::Methods methods_QApplication_Adaptor () {
   methods += new qt_gsi::GenericMethod ("notify", "@hide", false, &_init_cbs_notify_2411_0, &_call_cbs_notify_2411_0);
   methods += new qt_gsi::GenericMethod ("notify", "@brief Virtual method bool QApplication::notify(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_notify_2411_0, &_call_cbs_notify_2411_0, &_set_callback_cbs_notify_2411_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QApplication::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
-  methods += new qt_gsi::GenericMethod ("saveState", "@hide", false, &_init_cbs_saveState_2138_0, &_call_cbs_saveState_2138_0);
-  methods += new qt_gsi::GenericMethod ("saveState", "@brief Virtual method void QApplication::saveState(QSessionManager &sm)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_saveState_2138_0, &_call_cbs_saveState_2138_0, &_set_callback_cbs_saveState_2138_0);
-  methods += new qt_gsi::GenericMethod ("emit_saveStateRequest", "@brief Emitter for signal void QApplication::saveStateRequest(QSessionManager &sessionManager)\nCall this method to emit this signal.", false, &_init_emitter_saveStateRequest_2138, &_call_emitter_saveStateRequest_2138);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QApplication::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QApplication::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);

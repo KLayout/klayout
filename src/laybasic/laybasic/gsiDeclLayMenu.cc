@@ -86,7 +86,14 @@ static std::map<std::string, bool> unpack_menu_items_hidden (const std::string &
   return kb;
 }
 
+static lay::AbstractMenu *new_menu ()
+{
+  return new lay::AbstractMenu (0);
+}
+
 Class<lay::AbstractMenu> decl_AbstractMenu ("lay", "AbstractMenu",
+  //  for test purposes mainly:
+  constructor ("new", &new_menu, "@hide") +
   method ("pack_key_binding", &pack_key_binding, gsi::arg ("path_to_keys"),
     "@brief Serializes a key binding definition into a single string\n"
     "The serialized format is used by the 'key-bindings' config key. "
@@ -119,8 +126,8 @@ Class<lay::AbstractMenu> decl_AbstractMenu ("lay", "AbstractMenu",
     "@brief Get the reference to a Action object associated with the given path\n"
     "@args path\n"
     "\n"
-    "@param path The path to the item. This must be a valid path.\n"
-    "@return A reference to a Action object associated with this path\n"
+    "@param path The path to the item.\n"
+    "@return A reference to a Action object associated with this path or nil if the path is not valid\n"
   ) + 
   method ("items", &lay::AbstractMenu::items,
     "@brief Get the subitems for a given submenu\n"

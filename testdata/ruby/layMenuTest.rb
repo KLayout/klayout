@@ -38,26 +38,20 @@ class LAYMenuTest_TestClass < TestBase
 
     assert_equal(a.shortcut, "Shift+F1")
     assert_equal(a.effective_shortcut, "Shift+F1")
-    assert_equal(b.shortcut, "Shift+F1")
-    assert_equal(b.effective_shortcut, "Shift+F1")
+    assert_equal(b.shortcut, "")
+    assert_equal(b.effective_shortcut, "")
 
     a.default_shortcut = "X"
 
     assert_equal(a.default_shortcut, "X")
     assert_equal(a.shortcut, "Shift+F1")
     assert_equal(a.effective_shortcut, "Shift+F1")
-    assert_equal(b.default_shortcut, "X")
-    assert_equal(b.shortcut, "Shift+F1")
-    assert_equal(b.effective_shortcut, "Shift+F1")
 
     a.shortcut = ""
 
     assert_equal(a.default_shortcut, "X")
     assert_equal(a.shortcut, "")
     assert_equal(a.effective_shortcut, "X")
-    assert_equal(b.default_shortcut, "X")
-    assert_equal(b.shortcut, "")
-    assert_equal(b.effective_shortcut, "X")
 
     a.shortcut = RBA::Action::NoKeyBound
     assert_equal(a.default_shortcut, "X")
@@ -74,9 +68,6 @@ class LAYMenuTest_TestClass < TestBase
     assert_equal(a.is_hidden?, false)
     assert_equal(a.is_effective_visible?, false)
     assert_equal(a.effective_shortcut, "X")
-    assert_equal(b.is_visible?, false)
-    assert_equal(b.is_hidden?, false)
-    assert_equal(b.is_effective_visible?, false)
 
     a.hidden = false
     a.visible = true
@@ -85,9 +76,6 @@ class LAYMenuTest_TestClass < TestBase
     assert_equal(a.is_hidden?, false)
     assert_equal(a.is_effective_visible?, true)
     assert_equal(a.effective_shortcut, "X")
-    assert_equal(b.is_visible?, true)
-    assert_equal(b.is_hidden?, false)
-    assert_equal(b.is_effective_visible?, true)
 
     a.hidden = true
     a.visible = true
@@ -96,9 +84,6 @@ class LAYMenuTest_TestClass < TestBase
     assert_equal(a.is_hidden?, true)
     assert_equal(a.is_effective_visible?, false)
     assert_equal(a.effective_shortcut, "")
-    assert_equal(b.is_visible?, true)
-    assert_equal(b.is_hidden?, true)
-    assert_equal(b.is_effective_visible?, false)
 
   end
 
@@ -342,6 +327,59 @@ RESULT
 
     map2 = RBA::AbstractMenu::unpack_menu_items_hidden(RBA::AbstractMenu::pack_menu_items_hidden(map))
     assert_equal(map == map2, true)
+
+  end
+
+  def test_4
+
+    action = RBA::Action::new
+    action.title = "title:n1"
+
+    menu = RBA::AbstractMenu::new
+
+    assert_equal(menu.action("s1.n1"), nil)
+    assert_equal(menu.action("s1"), nil)
+
+    menu.insert_menu("end", "s1", "submenu1")
+    menu.insert_menu("end", "s2", "submenu2")
+
+    menu.insert_item("s1.end", "n1", action)
+    menu.insert_item("s2.end", "n1", action)
+
+    assert_equal(menu.action("s1.n1") == action, true)
+    assert_equal(menu.action("s2.n1") == action, true)
+
+    menu._destroy
+
+    # proof of transfer of ownership
+    assert_equal(action._destroyed?, true)
+
+  end
+
+  def test_5
+
+    action = RBA::Action::new
+    action.title = "title:n1"
+
+    menu = RBA::AbstractMenu::new
+
+    assert_equal(menu.action("s1.n1"), nil)
+    assert_equal(menu.action("s1"), nil)
+
+    menu.insert_menu("end", "s1", "submenu1")
+    menu.insert_menu("end", "s2", "submenu2")
+
+    menu.insert_item("s1.end", "n1", action)
+    menu.insert_item("s2.end", "n1", action)
+
+    menu.delete_item ("s2");
+
+    assert_equal(menu.action("s1.n1") == action, true)
+    assert_equal(menu.action("s2.n1") == nil, true)
+
+    menu._destroy
+
+    assert_equal(action._destroyed?, true)
 
   end
 

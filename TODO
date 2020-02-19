@@ -32,7 +32,7 @@ DONE 8. We can move menu initialization of LV-specifics to the LayoutView and
 
 12. Default ctor for MainWindow so a pymod script can instantiate one (?)
 
-13. Re-think concept of Action as "smart pointers": ConfigureAction
+DONE 13. Re-think concept of Action as "smart pointers": ConfigureAction
     violates this. ConfigureAction should be ActionHandle variant?
     Action as pointer and smart pointers for managing?
 

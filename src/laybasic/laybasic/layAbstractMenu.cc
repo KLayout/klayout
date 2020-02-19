@@ -240,7 +240,7 @@ AbstractMenuItem::set_action (Action *a, bool copy_properties)
 {
   tl_assert (a != 0);
 
-  a->keep_object ();
+  a->keep ();
 
   if (copy_properties && mp_action->qaction () && a->qaction ()) {
     a->qaction ()->setIcon (mp_action->qaction ()->icon ());
@@ -1192,10 +1192,7 @@ const Action *AbstractMenu::action(const std::string &path) const
 Action *AbstractMenu::action(const std::string &path)
 {
   AbstractMenuItem *item = find_item_exact (path);
-  if (! item) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Not a valid menu item path: ")) + path);
-  }
-  return item->action ();
+  return item ? item->action () : 0;
 }
 
 std::vector<std::string>

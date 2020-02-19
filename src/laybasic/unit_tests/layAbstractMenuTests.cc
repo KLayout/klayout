@@ -135,3 +135,57 @@ TEST(1)
   menu.clear_menu ("n1");
   EXPECT_EQ (menu_to_string (menu), "(n2,n1)");
 }
+
+TEST(2_ActionReferences)
+{
+  tl::weak_ptr<lay::Action> action (new lay::Action ("title:n1"));
+
+  {
+    lay::AbstractMenu menu (0);
+    EXPECT_EQ (menu_to_string (menu), "");
+    EXPECT_EQ (menu.action ("s1.n1") == 0, true);
+    EXPECT_EQ (menu.action ("s1") == 0, true);
+
+    menu.insert_menu ("end", "s1", "submenu1");
+    menu.insert_menu ("end", "s2", "submenu2");
+
+    menu.insert_item ("s1.end", "n1", action.get ());
+    menu.insert_item ("s2.end", "n1", action.get ());
+    EXPECT_EQ (menu_to_string (menu), "(s1(s1.n1),s2(s2.n1))");
+
+    EXPECT_EQ (menu.action ("s1.n1") == action.get (), true);
+    EXPECT_EQ (menu.action ("s2.n1") == action.get (), true);
+  }
+
+  //  the action is deleted because it's owned by the menu
+  EXPECT_EQ (action.get () == 0, true);
+}
+
+TEST(3_ActionReferences)
+{
+  tl::weak_ptr<lay::Action> action (new lay::Action ("title:n1"));
+
+  {
+    lay::AbstractMenu menu (0);
+    EXPECT_EQ (menu_to_string (menu), "");
+    EXPECT_EQ (menu.action ("s1.n1") == 0, true);
+    EXPECT_EQ (menu.action ("s1") == 0, true);
+
+    menu.insert_menu ("end", "s1", "submenu1");
+    menu.insert_menu ("end", "s2", "submenu2");
+
+    menu.insert_item ("s1.end", "n1", action.get ());
+    menu.insert_item ("s2.end", "n1", action.get ());
+    EXPECT_EQ (menu_to_string (menu), "(s1(s1.n1),s2(s2.n1))");
+
+    menu.delete_item ("s2");
+
+    EXPECT_EQ (menu.action ("s1.n1") != 0, true);
+    EXPECT_EQ (menu.action ("s1.n1") == action.get (), true);
+    EXPECT_EQ (menu.action ("s2.n1") == 0, true);
+  }
+
+  //  the action is deleted because it's owned by the menu
+  EXPECT_EQ (action.get () == 0, true);
+}
+

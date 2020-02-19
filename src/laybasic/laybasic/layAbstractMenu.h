@@ -86,7 +86,8 @@ LAYBASIC_PUBLIC std::string pack_menu_items_hidden (const std::vector<std::pair<
  */
 class LAYBASIC_PUBLIC Action
   : public QObject,
-    public tl::Object
+    public tl::Object,
+    public gsi::ObjectBase
 {
 Q_OBJECT
 

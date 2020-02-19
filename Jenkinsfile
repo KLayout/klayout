@@ -32,7 +32,7 @@ node("master") {
     "Publish": {
 
       //  from shared library - only publish for normal branch, not for PR
-      if (! BRANCHNAME.startsWith('PR')) {
+      if (! BRANCH_NAME.startsWith('PR')) {
         publish(BRANCH_NAME, target, target_dir)
       }
 

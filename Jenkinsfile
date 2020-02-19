@@ -31,8 +31,10 @@ node("master") {
     parallel(
     "Publish": {
 
-      //  from shared library
-      publish(BRANCH_NAME, target, target_dir)
+      //  from shared library - only publish for normal branch, not for PR
+      if (! BRANCHNAME.startsWith('PR')) {
+        publish(BRANCH_NAME, target, target_dir)
+      }
 
     },
     "Unit testing": {

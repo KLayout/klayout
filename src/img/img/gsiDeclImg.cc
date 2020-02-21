@@ -445,6 +445,40 @@ static void img_set_trans (ImageRef *obj, const db::DCplxTrans &t)
   obj->set_matrix (n);
 }
 
+static std::vector<double> get_data (ImageRef *obj, int component)
+{
+  std::vector<double> data;
+  data.reserve (obj->width () * obj->height ());
+  for (size_t y = 0; y < obj->height (); ++y) {
+    for (size_t x = 0; x < obj->width (); ++x) {
+      data.push_back (obj->pixel (x, y, (unsigned int) component));
+    }
+  }
+  return data;
+}
+
+static void set_mask_data (ImageRef *obj, const std::vector<bool> &mask)
+{
+  std::vector<bool>::const_iterator m = mask.begin ();
+  for (size_t y = 0; y < obj->height (); ++y) {
+    for (size_t x = 0; x < obj->width (); ++x) {
+      obj->set_mask (x, y, m == mask.end () ? true : *m++);
+    }
+  }
+}
+
+static std::vector<bool> get_mask_data (ImageRef *obj)
+{
+  std::vector<bool> data;
+  data.reserve (obj->width () * obj->height ());
+  for (size_t y = 0; y < obj->height (); ++y) {
+    for (size_t x = 0; x < obj->width (); ++x) {
+      data.push_back (obj->mask (x, y));
+    }
+  }
+  return data;
+}
+
 //  NOTE: img::Object is available as "BasicImage" to allow binding for other methods.
 gsi::Class<img::Object> decl_BasicImage ("lay", "BasicImage", gsi::Methods (), "@hide");
 
@@ -709,6 +743,27 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "@param b The blue channel data to load into the image\n"
     "\n"
     "See the constructor description for the data organisation in that field.\n"
+  ) +
+  gsi::method_ext ("data", &get_data, gsi::arg ("channel", 0),
+    "@brief Gets the data array for a specific color channel\n"
+    "Returns an array of pixel values for the given channel. For a color image, channel 0 is green, channel 1 is red and channel 2 is blue. "
+    "For a monochrome image, the channel is ignored.\n"
+    "\n"
+    "For the format of the data see the constructor description.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method_ext ("mask_data=", &set_mask_data, gsi::arg ("mask_data"),
+    "@brief Sets the mask from a array of boolean values\n"
+    "The order of the boolean values is line first, from bottom to top and left to right and is the same as the order in the data array.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method_ext ("mask_data", &get_mask_data,
+    "@brief Gets the mask from a array of boolean values\n"
+    "See \\set_mask_data for a description of the data field.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
   ) +
   gsi::method_ext ("pixel_width=", &img_set_pixel_width,
     "@brief Sets the pixel width\n"

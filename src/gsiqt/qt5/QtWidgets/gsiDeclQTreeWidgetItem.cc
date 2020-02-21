@@ -1600,6 +1600,8 @@ static void _call_ctor_QTreeWidgetItem_Adaptor_2374 (const qt_gsi::GenericStatic
   QTreeWidgetItem_Adaptor *obj = new QTreeWidgetItem_Adaptor (arg1, arg2);
   if (arg1) {
     qt_gsi::qt_keep (obj);
+  } else {
+    qt_gsi::qt_release (obj);
   }
   ret.write<QTreeWidgetItem_Adaptor *> (obj);
 }
@@ -1628,6 +1630,8 @@ static void _call_ctor_QTreeWidgetItem_Adaptor_4703 (const qt_gsi::GenericStatic
   QTreeWidgetItem_Adaptor *obj = new QTreeWidgetItem_Adaptor (arg1, arg2, arg3);
   if (arg1) {
     qt_gsi::qt_keep (obj);
+  } else {
+    qt_gsi::qt_release (obj);
   }
   ret.write<QTreeWidgetItem_Adaptor *> (obj);
 }
@@ -1656,6 +1660,8 @@ static void _call_ctor_QTreeWidgetItem_Adaptor_4380 (const qt_gsi::GenericStatic
   QTreeWidgetItem_Adaptor *obj = new QTreeWidgetItem_Adaptor (arg1, arg2, arg3);
   if (arg1) {
     qt_gsi::qt_keep (obj);
+  } else {
+    qt_gsi::qt_release (obj);
   }
   ret.write<QTreeWidgetItem_Adaptor *> (obj);
 }
@@ -1681,6 +1687,8 @@ static void _call_ctor_QTreeWidgetItem_Adaptor_2773 (const qt_gsi::GenericStatic
   QTreeWidgetItem_Adaptor *obj = new QTreeWidgetItem_Adaptor (arg1, arg2);
   if (arg1) {
     qt_gsi::qt_keep (obj);
+  } else {
+    qt_gsi::qt_release (obj);
   }
   ret.write<QTreeWidgetItem_Adaptor *> (obj);
 }
@@ -1709,6 +1717,8 @@ static void _call_ctor_QTreeWidgetItem_Adaptor_5102 (const qt_gsi::GenericStatic
   QTreeWidgetItem_Adaptor *obj = new QTreeWidgetItem_Adaptor (arg1, arg2, arg3);
   if (arg1) {
     qt_gsi::qt_keep (obj);
+  } else {
+    qt_gsi::qt_release (obj);
   }
   ret.write<QTreeWidgetItem_Adaptor *> (obj);
 }
@@ -1737,6 +1747,8 @@ static void _call_ctor_QTreeWidgetItem_Adaptor_4779 (const qt_gsi::GenericStatic
   QTreeWidgetItem_Adaptor *obj = new QTreeWidgetItem_Adaptor (arg1, arg2, arg3);
   if (arg1) {
     qt_gsi::qt_keep (obj);
+  } else {
+    qt_gsi::qt_release (obj);
   }
   ret.write<QTreeWidgetItem_Adaptor *> (obj);
 }

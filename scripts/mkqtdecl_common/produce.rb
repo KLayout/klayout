@@ -1669,6 +1669,18 @@ END
 
   end
 
+  def produce_keep_self(ofile, alist, obj, owner_args = [])
+
+    owner_args.each do |a|
+      ofile.puts("  if (#{alist[a]}) {");
+      ofile.puts("    qt_gsi::qt_keep (#{obj});")
+      ofile.puts("  } else {");
+      ofile.puts("    qt_gsi::qt_release (#{obj});")
+      ofile.puts("  }");
+    end
+  
+  end
+
   def produce_arg_read(ofile, decl_obj, func, alist, kept_args = [])
 
     n_args = func.max_args
@@ -2005,6 +2017,7 @@ END
         ofile.puts("{")
         ofile.puts("  __SUPPRESS_UNUSED_WARNING(args);")
         produce_arg_read(ofile, decl_obj, func, alist, conf.kept_args(bd))
+        produce_keep_self(ofile, alist, "(#{cls} *)cls", conf.owner_args(bd))
         if !rt.is_void?
           ofile.puts("  ret.write<#{rt.gsi_decl_return(decl_obj)} > ((#{rt.gsi_decl_return(decl_obj)})" + rt.access_gsi_return(decl_obj, "((#{cls} *)cls)->#{mid} (#{qt_alist.join(', ')})") + ");")
         else
@@ -2615,11 +2628,7 @@ END
         produce_arg_read(ofile, decl_obj, func, alist, conf.kept_args(bd))
         if conf.owner_args(bd).size > 0
           ofile.puts("  #{clsn}_Adaptor *obj = new #{clsn}_Adaptor (#{qt_alist.join(', ')});")
-          conf.owner_args(bd).each do |a|
-            ofile.puts("  if (#{alist[a]}) {");
-            ofile.puts("    qt_gsi::qt_keep (obj);")
-            ofile.puts("  }");
-          end
+          produce_keep_self(ofile, alist, "obj", conf.owner_args(bd))
           ofile.puts("  ret.write<#{clsn}_Adaptor *> (obj);")
         else
           ofile.puts("  ret.write<#{clsn}_Adaptor *> (new #{clsn}_Adaptor (#{qt_alist.join(', ')}));")

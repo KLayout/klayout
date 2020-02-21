@@ -613,6 +613,66 @@ class QtBinding_TestClass < TestBase
 
   end
 
+  def test_46
+
+    # Layout becomes owned by widget
+
+    w = RBA::QWidget::new
+
+    l = RBA::QHBoxLayout::new
+    w.setLayout(l)
+
+    w._destroy
+    assert_equal(l.destroyed?, true)
+
+  end
+
+  def test_47
+
+    # setParent will attach ownership for QWidget
+
+    w = RBA::QWidget::new
+    wc = RBA::QWidget::new
+
+    wc.setParent(w)
+
+    w._destroy
+    assert_equal(wc.destroyed?, true)
+
+  end
+
+  def test_48
+
+    # setParent will attach ownership for QObject
+
+    w = RBA::QObject::new
+    wc = RBA::QObject::new
+
+    wc.setParent(w)
+
+    w._destroy
+    assert_equal(wc.destroyed?, true)
+
+  end
+
+  def test_49
+
+    # setParent to nil will release ownership for QObject
+
+    w = RBA::QObject::new
+    wc = RBA::QObject::new
+
+    wc.setParent(w)
+    assert_equal(wc.parent == w, true)
+    wc.setParent(nil)
+
+    w._destroy
+    assert_equal(wc.destroyed?, false)
+    wc._destroy
+    assert_equal(wc.destroyed?, true)
+
+  end
+
 end 
 
 load("test_epilogue.rb")

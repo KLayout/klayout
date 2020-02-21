@@ -1028,6 +1028,8 @@ static void _call_ctor_QListWidgetItem_Adaptor_2386 (const qt_gsi::GenericStatic
   QListWidgetItem_Adaptor *obj = new QListWidgetItem_Adaptor (arg1, arg2);
   if (arg1) {
     qt_gsi::qt_keep (obj);
+  } else {
+    qt_gsi::qt_release (obj);
   }
   ret.write<QListWidgetItem_Adaptor *> (obj);
 }

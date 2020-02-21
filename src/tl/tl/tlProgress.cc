@@ -275,10 +275,10 @@ AbsoluteProgress::formatted_value () const
 }
 
 AbsoluteProgress &
-AbsoluteProgress::set (size_t count, bool /*force_yield*/)
+AbsoluteProgress::set (size_t count, bool force_yield)
 {
   m_count = count;
-  test ();
+  test (force_yield);
   return *this;
 }
 

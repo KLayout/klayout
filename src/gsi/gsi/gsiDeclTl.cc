@@ -90,27 +90,23 @@ namespace gsi
 {
 
 Class<Logger> decl_Logger ("tl", "Logger",
-  gsi::method ("info", &Logger::info, 
+  gsi::method ("info", &Logger::info, gsi::arg ("msg"),
     "@brief Writes the given string to the info channel\n"
-    "@args msg\n"
     "\n"
     "The info channel is printed as neutral messages unconditionally.\n"
   ) +
-  gsi::method ("error", &Logger::error, 
+  gsi::method ("error", &Logger::error, gsi::arg ("msg"),
     "@brief Writes the given string to the error channel\n"
-    "@args msg\n"
     "\n"
     "The error channel is formatted as an error (i.e. red in the logger window) and output unconditionally.\n"
   ) +
-  gsi::method ("warn", &Logger::warn, 
+  gsi::method ("warn", &Logger::warn, gsi::arg ("msg"),
     "@brief Writes the given string to the warning channel\n"
-    "@args msg\n"
     "\n"
     "The warning channel is formatted as a warning (i.e. blue in the logger window) and output unconditionally.\n"
   ) +
-  gsi::method ("log", &Logger::log, 
+  gsi::method ("log", &Logger::log, gsi::arg ("msg"),
     "@brief Writes the given string to the log channel\n"
-    "@args msg\n"
     "\n"
     "Log messages are printed as neutral messages and are output only if the verbosity is above 0.\n"
   ) +
@@ -121,9 +117,8 @@ Class<Logger> decl_Logger ("tl", "Logger",
     "Level 0 is silent, levels 10, 20, 30 etc. denote levels with increasing verbosity. "
     "11, 21, 31 .. are sublevels which also enable timing logs in addition to messages."
   ) +
-  gsi::method ("verbosity=", &Logger::set_verbosity, 
+  gsi::method ("verbosity=", &Logger::set_verbosity, gsi::arg ("v"),
     "@brief Sets the verbosity level for the application\n"
-    "@args v\n"
     "\n"
     "See \\verbosity for a definition of the verbosity levels. Please note that this method "
     "changes the verbosity level for the whole application.\n"
@@ -224,16 +219,14 @@ namespace gsi
 {
   
 Class<tl::Progress> decl_Progress ("tl", "Progress",
-  gsi::method ("desc=", &tl::Progress::set_desc, 
+  gsi::method ("desc=", &tl::Progress::set_desc, gsi::arg ("desc"),
     "@brief Sets the description text of the progress object\n"
-    "@args desc\n"
   ) +
   gsi::method ("desc", &tl::Progress::desc, 
     "@brief Gets the description text of the progress object\n"
   ) +
-  gsi::method ("title=", &tl::Progress::set_desc, 
+  gsi::method ("title=", &tl::Progress::set_desc, gsi::arg ("title"),
     "@brief Sets the title text of the progress object\n"
-    "@args title\n"
     "\n"
     "Initially the title is equal to the description.\n"
   ),
@@ -270,16 +263,14 @@ static void rel_progress_set_2 (tl::RelativeProgress *progress, size_t value, bo
 }
 
 Class<tl::RelativeProgress> decl_RelativeProgress (decl_Progress, "tl", "RelativeProgress",
-  gsi::constructor ("new", &rel_progress_2,
+  gsi::constructor ("new", &rel_progress_2, gsi::arg ("desc"), gsi::arg ("max_value"),
     "@brief Creates a relative progress reporter with the given description and maximum value\n"
-    "@args desc, max_value\n"
     "\n"
     "The reported progress will be 0 to 100% for values between 0 and the maximum value.\n"
     "The values are always integers. Double values cannot be used property.\n"
   ) + 
-  gsi::constructor ("new", &rel_progress_3,
+  gsi::constructor ("new", &rel_progress_3, gsi::arg ("desc"), gsi::arg ("max_value"), gsi::arg ("yield_interval"),
     "@brief Creates a relative progress reporter with the given description and maximum value\n"
-    "@args desc, max_value, yield_interval\n"
     "\n"
     "The reported progress will be 0 to 100% for values between 0 and the maximum value.\n"
     "The values are always integers. Double values cannot be used property.\n"
@@ -287,20 +278,17 @@ Class<tl::RelativeProgress> decl_RelativeProgress (decl_Progress, "tl", "Relativ
     "The yield interval specifies, how often the event loop will be triggered. When the yield interval is 10 for example, "
     "the event loop will be executed every tenth call of \\inc or \\set.\n"
   ) + 
-  gsi::method ("format=", &tl::RelativeProgress::set_format, 
+  gsi::method ("format=", &tl::RelativeProgress::set_format, gsi::arg ("format"),
     "@brief sets the output format (sprintf notation) for the progress text\n"
-    "@args format\n"
   ) +
   gsi::method ("inc", &tl::RelativeProgress::operator++, 
     "@brief Increments the progress value\n"
   ) +
-  gsi::method_ext ("value=", &rel_progress_set_1,
+  gsi::method_ext ("value=", &rel_progress_set_1, gsi::arg ("value"),
     "@brief Sets the progress value\n"
-    "@args value\n"
   ) + 
-  gsi::method_ext ("set", &rel_progress_set_2,
+  gsi::method_ext ("set", &rel_progress_set_2, gsi::arg ("value"), gsi::arg ("force_yield"),
     "@brief Sets the progress value\n"
-    "@args value, force_yield\n"
     "\n"
     "This method is equivalent to \\value=, but it allows forcing the event loop to be triggered.\n"
     "If \"force_yield\" is true, the event loop will be triggered always, irregardless of the yield interval specified in the constructor.\n"
@@ -352,24 +340,20 @@ static void abs_progress_set_2 (tl::AbsoluteProgress *progress, size_t value, bo
 }
 
 Class<tl::AbsoluteProgress> decl_AbsoluteProgress (decl_Progress, "tl", "AbsoluteProgress",
-  gsi::constructor ("new", &abs_progress_1,
+  gsi::constructor ("new", &abs_progress_1, gsi::arg ("desc"),
     "@brief Creates an absolute progress reporter with the given description\n"
-    "@args desc, max_value\n"
   ) + 
-  gsi::constructor ("new", &abs_progress_2,
+  gsi::constructor ("new", &abs_progress_2, gsi::arg ("desc"), gsi::arg ("yield_interval"),
     "@brief Creates an absolute progress reporter with the given description\n"
-    "@args desc, max_value, yield_interval\n"
     "\n"
     "The yield interval specifies, how often the event loop will be triggered. When the yield interval is 10 for example, "
     "the event loop will be executed every tenth call of \\inc or \\set.\n"
   ) + 
-  gsi::method ("format=", &tl::AbsoluteProgress::set_format, 
+  gsi::method ("format=", &tl::AbsoluteProgress::set_format, gsi::arg ("format"),
     "@brief sets the output format (sprintf notation) for the progress text\n"
-    "@args format\n"
   ) +
-  gsi::method ("unit=", &tl::AbsoluteProgress::set_unit, 
+  gsi::method ("unit=", &tl::AbsoluteProgress::set_unit, gsi::arg ("unit"),
     "@brief Sets the unit\n"
-    "@args unit\n"
     "\n"
     "Specifies the count value corresponding to 1 percent on the "
     "progress bar. By default, the current value divided by the unit "
@@ -377,9 +361,8 @@ Class<tl::AbsoluteProgress> decl_AbsoluteProgress (decl_Progress, "tl", "Absolut
     "Another attribute is provided (\\format_unit=) to specify "
     "a separate unit for that purpose.\n"
   ) + 
-  gsi::method ("format_unit=", &tl::AbsoluteProgress::set_format_unit, 
+  gsi::method ("format_unit=", &tl::AbsoluteProgress::set_format_unit, gsi::arg ("unit"),
     "@brief Sets the format unit\n"
-    "@args unit\n"
     "\n"
     "This is the unit used for formatted output.\n"
     "The current count is divided by the format unit to render\n"
@@ -388,13 +371,11 @@ Class<tl::AbsoluteProgress> decl_AbsoluteProgress (decl_Progress, "tl", "Absolut
   gsi::method ("inc", &tl::AbsoluteProgress::operator++, 
     "@brief Increments the progress value\n"
   ) +
-  gsi::method_ext ("value=", &abs_progress_set_1,
+  gsi::method_ext ("value=", &abs_progress_set_1, gsi::arg ("value"),
     "@brief Sets the progress value\n"
-    "@args value\n"
   ) + 
-  gsi::method_ext ("set", &abs_progress_set_2,
+  gsi::method_ext ("set", &abs_progress_set_2, gsi::arg ("value"), gsi::arg ("force_yield"),
     "@brief Sets the progress value\n"
-    "@args value, force_yield\n"
     "\n"
     "This method is equivalent to \\value=, but it allows forcing the event loop to be triggered.\n"
     "If \"force_yield\" is true, the event loop will be triggered always, irregardless of the yield interval specified in the constructor.\n"

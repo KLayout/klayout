@@ -43,6 +43,7 @@ Requires: qt5-qttools >= 5.11.1
 
 %define buildopt -j2
 %define pylib %{python_sitearch}
+%define __python /usr/bin/python3
 %endif
 
 # CentOS7 requirements

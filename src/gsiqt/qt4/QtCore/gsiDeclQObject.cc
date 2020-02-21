@@ -465,6 +465,11 @@ static void _call_f_setParent_1302 (const qt_gsi::GenericMethod * /*decl*/, void
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  if (arg1) {
+    qt_gsi::qt_keep ((QObject *)cls);
+  } else {
+    qt_gsi::qt_release ((QObject *)cls);
+  }
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QObject *)cls)->setParent (arg1);
 }

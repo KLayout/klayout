@@ -86,6 +86,21 @@ static void _call_f_inputContext_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
+// bool QApplication::isSessionRestored()
+
+
+static void _init_f_isSessionRestored_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isSessionRestored_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QApplication *)cls)->isSessionRestored ());
+}
+
+
 // bool QApplication::notify(QObject *, QEvent *)
 
 
@@ -105,6 +120,36 @@ static void _call_f_notify_2411 (const qt_gsi::GenericMethod * /*decl*/, void *c
   QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   QEvent *arg2 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QApplication *)cls)->notify (arg1, arg2));
+}
+
+
+// QString QApplication::sessionId()
+
+
+static void _init_f_sessionId_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QString > ();
+}
+
+static void _call_f_sessionId_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QString > ((QString)((QApplication *)cls)->sessionId ());
+}
+
+
+// QString QApplication::sessionKey()
+
+
+static void _init_f_sessionKey_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QString > ();
+}
+
+static void _call_f_sessionKey_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QString > ((QString)((QApplication *)cls)->sessionKey ());
 }
 
 
@@ -1488,7 +1533,10 @@ static gsi::Methods methods_QApplication () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":autoSipEnabled", "@brief Method bool QApplication::autoSipEnabled()\n", true, &_init_f_autoSipEnabled_c0, &_call_f_autoSipEnabled_c0);
   methods += new qt_gsi::GenericMethod (":inputContext", "@brief Method QInputContext *QApplication::inputContext()\n", true, &_init_f_inputContext_c0, &_call_f_inputContext_c0);
+  methods += new qt_gsi::GenericMethod ("isSessionRestored?", "@brief Method bool QApplication::isSessionRestored()\n", true, &_init_f_isSessionRestored_c0, &_call_f_isSessionRestored_c0);
   methods += new qt_gsi::GenericMethod ("notify", "@brief Method bool QApplication::notify(QObject *, QEvent *)\nThis is a reimplementation of QCoreApplication::notify", false, &_init_f_notify_2411, &_call_f_notify_2411);
+  methods += new qt_gsi::GenericMethod ("sessionId", "@brief Method QString QApplication::sessionId()\n", true, &_init_f_sessionId_c0, &_call_f_sessionId_c0);
+  methods += new qt_gsi::GenericMethod ("sessionKey", "@brief Method QString QApplication::sessionKey()\n", true, &_init_f_sessionKey_c0, &_call_f_sessionKey_c0);
   methods += new qt_gsi::GenericMethod ("setAutoSipEnabled|autoSipEnabled=", "@brief Method void QApplication::setAutoSipEnabled(const bool enabled)\n", false, &_init_f_setAutoSipEnabled_1559, &_call_f_setAutoSipEnabled_1559);
   methods += new qt_gsi::GenericMethod ("setInputContext|inputContext=", "@brief Method void QApplication::setInputContext(QInputContext *)\n", false, &_init_f_setInputContext_1972, &_call_f_setInputContext_1972);
   methods += new qt_gsi::GenericMethod ("setStyleSheet|styleSheet=", "@brief Method void QApplication::setStyleSheet(const QString &sheet)\n", false, &_init_f_setStyleSheet_2025, &_call_f_setStyleSheet_2025);

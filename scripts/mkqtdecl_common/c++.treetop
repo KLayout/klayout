@@ -50,7 +50,7 @@ grammar CPP
   end
 
   rule a
-    s ( "__attribute__" s attribute_value s / "__asm" s attribute_value s / "__extension__" s )* 
+    s ( "__attribute__" s attribute_value s / "__asm" s attribute_value s / "__extension__" s / "decltype" s attribute_value s )* 
   end
 
   rule unary_op
@@ -110,11 +110,11 @@ grammar CPP
   end
 
   rule bool_type
-    "bool" <PBoolType>
+    "bool" ![a-zA-Z0-9_] <PBoolType>
   end
 
   rule void_type
-    "void" <PVoidType>
+    "void" ![a-zA-Z0-9_] <PVoidType>
   end
 
   rule float_type
@@ -134,12 +134,20 @@ grammar CPP
   end
 
   rule virtual_spec
-    "virtual" <PVirtual>
+    "virtual" ![a-zA-Z0-9_] <PVirtual>
+  end
+
+  rule explicit_key
+    "explicit" ![a-zA-Z0-9_]
+  end
+
+  rule mutable_key
+    "mutable" ![a-zA-Z0-9_]
   end
 
   rule member_declaration_wo_semicolon
     template:( d:template_decl s )?
-    attr:( ( "explicit" / "mutable" / storage_class / inline_spec / virtual_spec ) s )*
+    attr:( ( explicit_key / mutable_key / storage_class / inline_spec / virtual_spec / constexpr_key ) s )*
     t:type 
     # type declaration ends with a } .. does not need a semicolon
     # (i.e. nested struct or enum)
@@ -155,7 +163,7 @@ grammar CPP
 
   rule member_declaration_w_semicolon
     template:( d:template_decl s )?
-    attr:( ( "explicit" / "mutable" / storage_class / inline_spec / virtual_spec ) s )*
+    attr:( ( explicit_key / mutable_key / storage_class / inline_spec / virtual_spec / constexpr_key ) s )*
     t:type 
     # opposite case (member_see declaration_wo_semicolon)
     # (i.e. nested struct or enum)
@@ -214,11 +222,11 @@ grammar CPP
   end
     
   rule concrete_type
-    ( class_or_struct_type / enum_type / float_type / char_type / int_type / bool_type / void_type / typeof / class_id )?
+    ( constexpr_key / class_or_struct_type / enum_type / float_type / char_type / int_type / bool_type / void_type / typeof / class_id )?
   end
 
   rule cv
-    ( "const" ![a-zA-Z0-9_] / "__const" ![a-zA-Z0-9_] / "volatile" ![a-zA-Z0-9_] / "__volatile" ![a-zA-Z0-9_] ) <PCV>
+    ( constexpr_key / "const" ![a-zA-Z0-9_] / "__const" ![a-zA-Z0-9_] / "volatile" ![a-zA-Z0-9_] / "__volatile" ![a-zA-Z0-9_] ) <PCV>
   end
 
   rule pointer 
@@ -247,8 +255,12 @@ grammar CPP
     ellipsis
   end
 
+  rule noexcept_spec
+    "noexcept" ( s "=" s block / s "(" s block ")" )?
+  end
+
   rule func_spec
-    "(" s fa:( a:func_args )? s ")" cvspec:( s cv:cv )? ( s "throw" s "(" s ( type_wo_comma s )? ")" )* a <PFuncSpec>
+    "(" s fa:( a:func_args )? s ")" cvspec:( s cv:cv )? ( s "throw" s "(" s ( type_wo_comma s )? ")" / s noexcept_spec )* ( s override_key )? a <PFuncSpec>
   end
 
   rule member_pointer
@@ -308,6 +320,14 @@ grammar CPP
     ( "static" ![a-zA-Z0-9_] / "extern" ![a-zA-Z0-9_] ( s '"C"' / s '"C++"' / s '"Pascal"' )? ) <PStorageClass>
   end
 
+  rule override_key
+    "override" ![a-zA-Z0-9_] 
+  end
+
+  rule constexpr_key
+    "constexpr" ![a-zA-Z0-9_]
+  end
+
   rule inline_spec
     "inline" ![a-zA-Z0-9_] <PInline>
   end
@@ -346,6 +366,10 @@ grammar CPP
     "using" ![a-zA-Z0-9_] ( s "namespace" )? ![a-zA-Z0-9_] s id:qualified_id a ";" <PUsing>
   end
 
+  rule static_assert
+    "static_assert" s "(" s block s ")"
+  end
+
   rule typedef
     a "typedef" ![a-zA-Z0-9_] s t:type a ";" <PTypedef>
   end
@@ -362,8 +386,9 @@ grammar CPP
   rule declaration_w_semicolon
     template:( d:template_decl s )?
     template_member:( d_member:template_decl s )?
-    attr:( ( storage_class / inline_spec ) s )*
+    attr:( ( storage_class / inline_spec / constexpr_key ) s )*
     a
+    ( constexpr_key s )?
     t:type 
     # type declaration ends with a } .. does not need a semicolon
     # (i.e. nested struct or enum)
@@ -378,8 +403,9 @@ grammar CPP
 
   rule declaration_wo_semicolon
     template:( d:template_decl s )?
-    attr:( ( storage_class / inline_spec ) s )*
+    attr:( ( storage_class / inline_spec / constexpr_key ) s )*
     a
+    ( constexpr_key s )?
     t:type 
     # opposite case (see declaration_wo_semicolon)
     # (i.e. nested struct or enum)
@@ -398,7 +424,7 @@ grammar CPP
 
   rule namespace
     "namespace" ![a-zA-Z0-9_] s n:id 
-    a "{" decls:( a ( ";" / using / typedef / namespace / declaration ) )* s "}" <PNamespace>
+    a "{" decls:( a ( ";" / static_assert / using / typedef / namespace / declaration ) )* s "}" <PNamespace>
   end
 
   rule extern_decl
@@ -407,7 +433,7 @@ grammar CPP
   end
 
   rule module
-    ( a ( ";" / using / typedef / namespace / extern_decl / declaration ) )* s <PModule>
+    ( a ( ";" / static_assert / using / typedef / namespace / extern_decl / declaration ) )* s <PModule>
   end
 
 end

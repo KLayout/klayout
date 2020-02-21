@@ -170,7 +170,7 @@ if [ $update != 0 ]; then
 
   if [ $reuse == 0 ]; then
 
-    for d in Qt*; do
+    for d in $qt_mods; do
 
       echo "--------------------------------------------------------"
       echo "Parsing $d ..."
@@ -181,7 +181,7 @@ if [ $update != 0 ]; then
       echo "Running gcc preprocessor .."
       # By using -D_GCC_LIMITS_H_ we make the gcc not include constants such as ULONG_MAX which will 
       # remain as such. This way the generated code is more generic.
-      gcc -I$qt -fPIC -D_GCC_LIMITS_H_ -E -o allofqt.x allofqt.cpp 
+      gcc -std=gnu++98 -I$qt -fPIC -D_GCC_LIMITS_H_ -E -o allofqt.x allofqt.cpp 
 
       echo "Stripping hash lines .."
       egrep -v '^#' <allofqt.x >allofqt.e
@@ -225,7 +225,7 @@ else
   cd $work_dir 
 fi  
 
-for d in Qt*; do
+for d in $qt_mods; do
 
   echo "--------------------------------------------------------"
   echo "Processing $d ..."

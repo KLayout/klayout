@@ -31,6 +31,20 @@ Source0:        http://www.klayout.de/downloads/%{name}-%{version}.tar.gz
 # so's of klayout itself)
 AutoReqProv: 	no
 
+# CentOS8 requirements
+%if "%{target_system}" == "centos8"
+Requires:	ruby >= 2.5.5
+Requires:	python >= 3.6.0
+Requires: qt5-qtbase >= 5.11.1
+Requires: qt5-qtmultimedia >= 5.11.1
+Requires: qt5-qtxmlpatterns >= 5.11.1
+Requires: qt5-qtsvg >= 5.11.1
+Requires: qt5-qttools >= 5.11.1
+
+%define buildopt -j2
+%define pylib %{python_sitearch}
+%endif
+
 # CentOS7 requirements
 %if "%{target_system}" == "centos7"
 Requires:	ruby >= 2.0.0

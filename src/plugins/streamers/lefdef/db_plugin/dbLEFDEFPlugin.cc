@@ -239,6 +239,8 @@ class LEFDEFFormatDeclaration
       tl::make_member (&LEFDEFReaderOptions::net_property_name, &LEFDEFReaderOptions::set_net_property_name, "net-property-name") +
       tl::make_member (&LEFDEFReaderOptions::produce_inst_names, &LEFDEFReaderOptions::set_produce_inst_names, "produce-inst-names") +
       tl::make_member (&LEFDEFReaderOptions::inst_property_name, &LEFDEFReaderOptions::set_inst_property_name, "inst-property-name") +
+      tl::make_member (&LEFDEFReaderOptions::produce_pin_names, &LEFDEFReaderOptions::set_produce_pin_names, "produce-pin-names") +
+      tl::make_member (&LEFDEFReaderOptions::pin_property_name, &LEFDEFReaderOptions::set_pin_property_name, "pin-property-name") +
       tl::make_member (&LEFDEFReaderOptions::produce_cell_outlines, &LEFDEFReaderOptions::set_produce_cell_outlines, "produce-cell-outlines") +
       tl::make_member (&LEFDEFReaderOptions::cell_outline_layer, &LEFDEFReaderOptions::set_cell_outline_layer, "cell-outline-layer") +
       tl::make_member (&LEFDEFReaderOptions::produce_placement_blockages, &LEFDEFReaderOptions::set_produce_placement_blockages, "produce-placement-blockages") +

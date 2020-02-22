@@ -41,6 +41,8 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
     m_net_property_name (1),
     m_produce_inst_names (true),
     m_inst_property_name (1),
+    m_produce_pin_names (false),
+    m_pin_property_name (1),
     m_produce_cell_outlines (true),
     m_cell_outline_layer ("OUTLINE"),
     m_produce_placement_blockages (true),
@@ -77,6 +79,8 @@ LEFDEFReaderOptions::LEFDEFReaderOptions (const LEFDEFReaderOptions &d)
     m_net_property_name (d.m_net_property_name),
     m_produce_inst_names (d.m_produce_inst_names),
     m_inst_property_name (d.m_inst_property_name),
+    m_produce_pin_names (d.m_produce_pin_names),
+    m_pin_property_name (d.m_pin_property_name),
     m_produce_cell_outlines (d.m_produce_cell_outlines),
     m_cell_outline_layer (d.m_cell_outline_layer),
     m_produce_placement_blockages (d.m_produce_placement_blockages),
@@ -357,7 +361,8 @@ LEFDEFLayerDelegate::finish (db::Layout &layout)
 LEFDEFImporter::LEFDEFImporter ()
   : mp_progress (0), mp_stream (0), mp_layer_delegate (0),
     m_produce_net_props (false), m_net_prop_name_id (0),
-    m_produce_inst_props (false), m_inst_prop_name_id (0)
+    m_produce_inst_props (false), m_inst_prop_name_id (0),
+    m_produce_pin_props (false), m_pin_prop_name_id (0)
 {
   //  .. nothing yet ..
 }
@@ -391,6 +396,14 @@ LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFLayerDe
   if (ld.tech_comp () && ld.tech_comp ()->produce_inst_names ()) {
     m_produce_inst_props = true;
     m_inst_prop_name_id = layout.properties_repository ().prop_name_id (ld.tech_comp ()->inst_property_name ());
+  }
+
+  m_produce_pin_props = false;
+  m_pin_prop_name_id = 0;
+
+  if (ld.tech_comp () && ld.tech_comp ()->produce_pin_names ()) {
+    m_produce_pin_props = true;
+    m_pin_prop_name_id = layout.properties_repository ().prop_name_id (ld.tech_comp ()->pin_property_name ());
   }
 
   try {

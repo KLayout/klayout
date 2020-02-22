@@ -623,7 +623,7 @@ class QtBinding_TestClass < TestBase
     w.setLayout(l)
 
     w._destroy
-    assert_equal(l.destroyed?, true)
+    assert_equal(l._destroyed?, true)
 
   end
 
@@ -637,7 +637,7 @@ class QtBinding_TestClass < TestBase
     wc.setParent(w)
 
     w._destroy
-    assert_equal(wc.destroyed?, true)
+    assert_equal(wc._destroyed?, true)
 
   end
 
@@ -651,7 +651,7 @@ class QtBinding_TestClass < TestBase
     wc.setParent(w)
 
     w._destroy
-    assert_equal(wc.destroyed?, true)
+    assert_equal(wc._destroyed?, true)
 
   end
 
@@ -667,9 +667,9 @@ class QtBinding_TestClass < TestBase
     wc.setParent(nil)
 
     w._destroy
-    assert_equal(wc.destroyed?, false)
+    assert_equal(wc._destroyed?, false)
     wc._destroy
-    assert_equal(wc.destroyed?, true)
+    assert_equal(wc._destroyed?, true)
 
   end
 

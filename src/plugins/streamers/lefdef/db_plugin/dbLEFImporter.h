@@ -108,7 +108,7 @@ private:
   std::map<std::string, ViaDesc> m_vias;
 
   std::vector <db::Trans> get_iteration (db::Layout &layout);
-  void read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose purpose, std::map<std::string, db::Box> *collect_bboxes = 0);
+  void read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose purpose, std::map<std::string, db::Box> *collect_bboxes = 0, properties_id_type prop_id = 0);
 };
 
 }

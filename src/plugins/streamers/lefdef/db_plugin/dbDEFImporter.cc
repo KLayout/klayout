@@ -1136,10 +1136,23 @@ DEFImporter::do_read (db::Layout &layout)
 
               std::pair <bool, unsigned int> dl = open_layer (layout, g->first, Pins);
               if (dl.first) {
+
+                db::properties_id_type prop_id = 0;
+                if (produce_pin_props ()) {
+                  db::PropertiesRepository::properties_set props;
+                  props.insert (std::make_pair (pin_prop_name_id (), tl::Variant (label)));
+                  prop_id = layout.properties_repository ().properties_id (props);
+                }
+
                 for (std::vector<db::Polygon>::const_iterator p = g->second.begin (); p != g->second.end (); ++p) {
                   db::Polygon pt = p->transformed (trans);
-                  design.shapes (dl.second).insert (pt);
+                  if (prop_id == 0) {
+                    design.shapes (dl.second).insert (pt);
+                  } else {
+                    design.shapes (dl.second).insert (db::PolygonWithProperties (pt, prop_id));
+                  }
                 }
+
               }
 
               dl = open_layer (layout, g->first, Label);

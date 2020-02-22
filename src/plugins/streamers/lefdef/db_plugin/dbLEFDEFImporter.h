@@ -145,6 +145,26 @@ public:
     m_inst_property_name = s;
   }
 
+  bool produce_pin_names () const
+  {
+    return m_produce_pin_names;
+  }
+
+  void set_produce_pin_names (bool f)
+  {
+    m_produce_pin_names = f;
+  }
+
+  const tl::Variant &pin_property_name () const
+  {
+    return m_pin_property_name;
+  }
+
+  void set_pin_property_name (const tl::Variant &s)
+  {
+    m_pin_property_name = s;
+  }
+
   bool produce_cell_outlines () const
   {
     return m_produce_cell_outlines;
@@ -423,6 +443,8 @@ private:
   tl::Variant m_net_property_name;
   bool m_produce_inst_names;
   tl::Variant m_inst_property_name;
+  bool m_produce_pin_names;
+  tl::Variant m_pin_property_name;
   bool m_produce_cell_outlines;
   std::string m_cell_outline_layer;
   bool m_produce_placement_blockages;
@@ -696,6 +718,22 @@ protected:
     return m_inst_prop_name_id;
   }
 
+  /**
+   *  @brief Gets a flag indicating whether pinance names shall be produced as properties
+   */
+  bool produce_pin_props () const
+  {
+    return m_produce_pin_props;
+  }
+
+  /**
+   *  @brief Gets the property name id of the pinance name property
+   */
+  db::property_names_id_type pin_prop_name_id () const
+  {
+    return m_pin_prop_name_id;
+  }
+
 protected:
   void create_generated_via (std::vector<db::Polygon> &bottom,
                              std::vector<db::Polygon> &cut,
@@ -719,6 +757,8 @@ private:
   db::property_names_id_type m_net_prop_name_id;
   bool m_produce_inst_props;
   db::property_names_id_type m_inst_prop_name_id;
+  bool m_produce_pin_props;
+  db::property_names_id_type m_pin_prop_name_id;
 
   const std::string &next ();
 };

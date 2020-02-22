@@ -30,7 +30,7 @@
 
 #include <cstdlib>
 
-static void run_test (tl::TestBase *_this, const char *lef_dir, const char *filename, const char *au, bool priv = true)
+static db::LEFDEFReaderOptions default_options ()
 {
   db::LEFDEFReaderOptions tc;
   tc.set_via_geometry_datatype (0);
@@ -45,6 +45,12 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
   tc.set_labels_suffix (".LABEL");
   tc.set_blockages_datatype (4);
   tc.set_blockages_suffix (".BLK");
+
+  return tc;
+}
+
+static void run_test (tl::TestBase *_this, const char *lef_dir, const char *filename, const char *au, const db::LEFDEFReaderOptions &tc, bool priv = true)
+{
   db::LEFDEFLayerDelegate ld (&tc);
 
   db::Manager m;
@@ -150,91 +156,107 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
 
 TEST(1)
 {
-  run_test (_this, "lef1", "lef:in.lef", 0);
+  run_test (_this, "lef1", "lef:in.lef", 0, default_options ());
 }
 
 TEST(2)
 {
-  run_test (_this, "lef2", "lef:in.lef", "au.oas.gz");
+  run_test (_this, "lef2", "lef:in.lef", "au.oas.gz", default_options ());
 }
 
 TEST(3)
 {
-  run_test (_this, "lef3", "lef:in.lef", "au.oas.gz");
+  run_test (_this, "lef3", "lef:in.lef", "au.oas.gz", default_options ());
 }
 
 TEST(4)
 {
-  run_test (_this, "lef4", "lef:in.lef", 0);
+  run_test (_this, "lef4", "lef:in.lef", 0, default_options ());
 }
 
 TEST(5)
 {
-  run_test (_this, "lef5", "lef:in.lef", 0);
+  run_test (_this, "lef5", "lef:in.lef", 0, default_options ());
 }
 
 TEST(6)
 {
-  run_test (_this, "lef6", "lef:in.lef", 0);
+  run_test (_this, "lef6", "lef:in.lef", 0, default_options ());
 }
 
 TEST(7)
 {
-  run_test (_this, "lef7", "lef:in_tech.lef+lef:in.lef", "au.oas.gz");
+  run_test (_this, "lef7", "lef:in_tech.lef+lef:in.lef", "au.oas.gz", default_options ());
 }
 
 TEST(10)
 {
-  run_test (_this, "def1", "lef:in.lef+def:in.def", "au.oas.gz");
+  run_test (_this, "def1", "lef:in.lef+def:in.def", "au.oas.gz", default_options ());
 }
 
 TEST(11)
 {
-  run_test (_this, "def2", "lef:0.lef+lef:1.lef+def:in.def.gz", "au.oas.gz");
+  run_test (_this, "def2", "lef:0.lef+lef:1.lef+def:in.def.gz", "au.oas.gz", default_options ());
 }
 
 TEST(12)
 {
-  run_test (_this, "def3", "lef:in.lef+def:in.def", "au.oas.gz");
+  run_test (_this, "def3", "lef:in.lef+def:in.def", "au.oas.gz", default_options ());
 }
 
 TEST(13)
 {
-  run_test (_this, "def4", "lef:in.lef+def:in.def", "au.oas.gz");
+  run_test (_this, "def4", "lef:in.lef+def:in.def", "au.oas.gz", default_options ());
 }
 
 TEST(14)
 {
-  run_test (_this, "def5", "lef:in.lef+def:in.def", "au.oas.gz");
+  run_test (_this, "def5", "lef:in.lef+def:in.def", "au.oas.gz", default_options ());
 }
 
 TEST(15)
 {
-  run_test (_this, "def6", "lef:cells.lef+lef:tech.lef+def:in.def.gz", "au.oas.gz");
+  run_test (_this, "def6", "lef:cells.lef+lef:tech.lef+def:in.def.gz", "au.oas.gz", default_options ());
 }
 
 TEST(16)
 {
-  run_test (_this, "def7", "lef:cells.lef+lef:tech.lef+def:in.def.gz", "au.oas.gz");
+  run_test (_this, "def7", "lef:cells.lef+lef:tech.lef+def:in.def.gz", "au.oas.gz", default_options ());
 }
 
 TEST(17)
 {
-  run_test (_this, "def8", "lef:tech.lef+def:in.def", "au.oas.gz");
+  run_test (_this, "def8", "lef:tech.lef+def:in.def", "au.oas.gz", default_options ());
 }
 
 TEST(18)
 {
-  run_test (_this, "def9", "lef:tech.lef+lef:cells_modified.lef+def:in.def", "au.oas.gz");
+  run_test (_this, "def9", "lef:tech.lef+lef:cells_modified.lef+def:in.def", "au.oas.gz", default_options ());
 }
 
 TEST(19)
 {
-  run_test (_this, "def10", "def:in.def", "au.oas.gz");
+  run_test (_this, "def10", "def:in.def", "au.oas.gz", default_options ());
 }
 
 TEST(20)
 {
-  run_test (_this, "issue-172", "lef:in.lef+def:in.def", "au.oas.gz", false);
+  run_test (_this, "issue-172", "lef:in.lef+def:in.def", "au.oas.gz", default_options (), false);
+}
+
+TEST(21)
+{
+  db::LEFDEFReaderOptions opt = default_options ();
+  opt.set_produce_pin_names (true);
+  opt.set_pin_property_name (2);
+  run_test (_this, "issue-489", "lef:in.lef+def:in.def", "au.oas", opt, false);
+}
+
+TEST(22)
+{
+  db::LEFDEFReaderOptions opt = default_options ();
+  opt.set_produce_pin_names (true);
+  opt.set_pin_property_name (3);
+  run_test (_this, "issue-489b", "lef:in_tech.lef+lef:in.lef", "au.oas.gz", opt, false);
 }
 

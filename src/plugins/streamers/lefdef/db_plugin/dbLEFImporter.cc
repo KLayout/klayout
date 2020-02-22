@@ -126,8 +126,28 @@ LEFImporter::get_iteration (db::Layout &layout)
   return t;
 }
 
+template <class Shape, class Trans>
+static db::Shape insert_shape (db::Cell &cell, unsigned int layer_id, const Shape &shape, const Trans &trans, db::properties_id_type prop_id)
+{
+  if (prop_id == 0) {
+    return cell.shapes (layer_id).insert (shape.transformed (trans));
+  } else {
+    return cell.shapes (layer_id).insert (db::object_with_properties<Shape> (shape.transformed (trans), prop_id));
+  }
+}
+
+template <class Shape>
+static db::Shape insert_shape (db::Cell &cell, unsigned int layer_id, const Shape &shape, db::properties_id_type prop_id)
+{
+  if (prop_id == 0) {
+    return cell.shapes (layer_id).insert (shape);
+  } else {
+    return cell.shapes (layer_id).insert (db::object_with_properties<Shape> (shape, prop_id));
+  }
+}
+
 void
-LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose purpose, std::map<std::string, db::Box> *collect_bboxes)
+LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose purpose, std::map<std::string, db::Box> *collect_bboxes, db::properties_id_type prop_id)
 {
   int layer_id = -1;
   std::string layer_name;
@@ -194,14 +214,14 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
         std::vector<db::Trans> ti = get_iteration (layout);
         if (layer_id >= 0) {
           for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
-            db::Shape s = cell.shapes (layer_id).insert (p.transformed (*t));
+            db::Shape s = insert_shape (cell, layer_id, p, *t, prop_id);
             if (collect_bboxes) {
               collect_bboxes->insert (std::make_pair (layer_name, db::Box ())).first->second = s.bbox ();
             }
           }
         }
       } else if (layer_id >= 0) {
-        db::Shape s = cell.shapes (layer_id).insert (p);
+        db::Shape s = insert_shape (cell, layer_id, p, prop_id);
         if (collect_bboxes) {
           collect_bboxes->insert (std::make_pair (layer_name, db::Box ())).first->second = s.bbox ();
         }
@@ -235,14 +255,14 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
         std::vector<db::Trans> ti = get_iteration (layout);
         if (layer_id >= 0) {
           for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
-            db::Shape s = cell.shapes (layer_id).insert (p.transformed (*t));
+            db::Shape s = insert_shape (cell, layer_id, p, *t, prop_id);
             if (collect_bboxes) {
               collect_bboxes->insert (std::make_pair (layer_name, db::Box ())).first->second = s.bbox ();
             }
           }
         }
       } else if (layer_id >= 0) {
-        db::Shape s = cell.shapes (layer_id).insert (p);
+        db::Shape s = insert_shape (cell, layer_id, p, prop_id);
         if (collect_bboxes) {
           collect_bboxes->insert (std::make_pair (layer_name, db::Box ())).first->second = s.bbox ();
         }
@@ -275,14 +295,14 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
         std::vector<db::Trans> ti = get_iteration (layout);
         if (layer_id >= 0) {
           for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
-            db::Shape s = cell.shapes (layer_id).insert (b.transformed (*t));
+            db::Shape s = insert_shape (cell, layer_id, b, *t, prop_id);
             if (collect_bboxes) {
               collect_bboxes->insert (std::make_pair (layer_name, db::Box ())).first->second = s.bbox ();
             }
           }
         }
       } else if (layer_id >= 0) {
-        db::Shape s = cell.shapes (layer_id).insert (b);
+        db::Shape s = insert_shape (cell, layer_id, b, prop_id);
         if (collect_bboxes) {
           collect_bboxes->insert (std::make_pair (layer_name, db::Box ())).first->second = s.bbox ();
         }
@@ -685,9 +705,6 @@ LEFImporter::do_read (db::Layout &layout)
               test (";");
             } else if (test ("PORT")) {
 
-              std::map <std::string, db::Box> bboxes;
-              read_geometries (layout, cell, Pins, &bboxes);
-
               //  produce pin labels
               //  TODO: put a label on every single object?
               std::string label = pn;
@@ -697,6 +714,16 @@ LEFImporter::do_read (db::Layout &layout)
                 label += dir;
               }
               */
+
+              db::properties_id_type prop_id = 0;
+              if (produce_pin_props ()) {
+                db::PropertiesRepository::properties_set props;
+                props.insert (std::make_pair (pin_prop_name_id (), tl::Variant (label)));
+                prop_id = layout.properties_repository ().properties_id (props);
+              }
+
+              std::map <std::string, db::Box> bboxes;
+              read_geometries (layout, cell, Pins, &bboxes, prop_id);
 
               for (std::map <std::string, db::Box>::const_iterator b = bboxes.begin (); b != bboxes.end (); ++b) {
                 std::pair <bool, unsigned int> dl = open_layer (layout, b->first, Label);

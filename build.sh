@@ -591,8 +591,6 @@ qmake_options=(
   -recursive
   CONFIG+="$CONFIG"
   RUBYLIBFILE="$RUBYLIBFILE"
-  RUBYINCLUDE="$RUBYINCLUDE"
-  RUBYINCLUDE2="$RUBYINCLUDE2"
   RUBYVERSIONCODE="$RUBYVERSIONCODE"
   HAVE_RUBY="$HAVE_RUBY"
   PYTHON="$PYTHON"
@@ -612,6 +610,16 @@ qmake_options=(
   KLAYOUT_VERSION_DATE="$KLAYOUT_VERSION_DATE"
   KLAYOUT_VERSION_REV="$KLAYOUT_VERSION_REV"
 )
+
+# NOTE: qmake does not like include paths which clash with paths built into the compiler
+# hence we don't add RUBYINCLUDE or RUBYINCLUDE2 in this case (found on CentOS 8 where Ruby
+# headers are installed in /usr/include)
+if [ "$RUBYINCLUDE" != "/usr/include" ] && [  "$RUBYINCLUDE" != "/usr/local/include" ]; then
+  qmake_options+=( RUBYINCLUDE="$RUBYINCLUDE" )
+fi
+if [ "$RUBYINCLUDE2" != "/usr/include" ] && [  "$RUBYINCLUDE2" != "/usr/local/include" ]; then
+  qmake_options+=( RUBYINCLUDE2="$RUBYINCLUDE2" )
+fi
 
 # This should speed up build time considerably
 # https://ortogonal.github.io/ccache-and-qmake-qtcreator/

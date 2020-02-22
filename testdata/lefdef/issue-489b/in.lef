@@ -1,0 +1,23 @@
+MACRO dummy
+    CLASS CORE ;
+    FOREIGN dummy 0.000 0.000  ;
+    ORIGIN 0.000 0.000 ;
+    SIZE 0.384 BY 0.480 ;
+    SYMMETRY X Y ;
+    SITE BLABLA ;
+    PROPERTY LEF58_EDGETYPE "
+        EDGETYPE LEFT L ;
+        EDGETYPE RIGHT R ;
+    " ;
+    PIN Z
+        ANTENNADIFFAREA 0.009048 ;
+        DIRECTION OUTPUT ;
+        PORT
+        LAYER M1 ;
+        RECT  0.306 0.357 0.318 0.403 ;
+        RECT  0.318 0.115 0.352 0.403 ;
+        VIA  0.336 0.167 square ;
+        VIA  0.336 0.351 square ;
+        END
+    END Z
+END dummy

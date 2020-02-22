@@ -252,4 +252,11 @@ TEST(21)
   run_test (_this, "issue-489", "lef:in.lef+def:in.def", "au.oas", opt, false);
 }
 
+TEST(22)
+{
+  db::LEFDEFReaderOptions opt = default_options ();
+  opt.set_produce_pin_names (true);
+  opt.set_pin_property_name (3);
+  run_test (_this, "issue-489b", "lef:in_tech.lef+lef:in.lef", "au.oas.gz", opt, false);
+}
 

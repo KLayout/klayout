@@ -406,6 +406,16 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
     data->set_inst_property_name (v);
   }
 
+  //  parse the pin property name (may throw an exception)
+  {
+    std::string np = tl::to_string (pin_prop_name->text ());
+    tl::Extractor ex (np.c_str ());
+    tl::Variant v;
+    ex.read (v);
+    ex.expect_end ();
+    data->set_pin_property_name (v);
+  }
+
   data->set_produce_cell_outlines (produce_outlines->isChecked ());
   data->set_cell_outline_layer (tl::to_string (outline_layer->text ()));
   data->set_produce_regions (produce_regions->isChecked ());

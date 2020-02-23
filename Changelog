@@ -16,6 +16,8 @@
       Performance enhancement of L2N/LVS DB file loader
 * Bugfix: %GITHUB%/issues/496
       Fixed builds on CentOS 8 and Fedora 31
+* Enhancement: %GITHUB%/issues/500
+      Option to limit number of shapes for net tracer
 * Bugfix: %GITHUB%/issues/501
       Issues with ownership transfer fixed in Qt binding
 * Bugfix: %GITHUB%/issues/502

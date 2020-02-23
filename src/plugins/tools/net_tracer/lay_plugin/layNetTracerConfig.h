@@ -44,6 +44,7 @@ extern const std::string cfg_nt_marker_intensity;
 extern const std::string cfg_nt_window_mode;
 extern const std::string cfg_nt_window_dim;
 extern const std::string cfg_nt_max_shapes_highlighted;
+extern const std::string cfg_nt_trace_depth;
 
 enum nt_window_type { NTDontChange = 0, NTFitNet, NTCenter, NTCenterSize };
 

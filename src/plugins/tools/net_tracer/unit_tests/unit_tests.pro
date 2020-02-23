@@ -6,8 +6,8 @@ TARGET = net_tracer_tests
 include($$PWD/../../../../lib_ut.pri)
 
 SOURCES = \
-  dbNetTracer.cc \
-    dbTraceAllNets.cc
+    dbTraceAllNets.cc \
+    dbNetTracerTests.cc
 
 INCLUDEPATH += $$LAY_INC $$TL_INC $$DB_INC $$GSI_INC $$PWD/../db_plugin $$PWD/../../../common
 DEPENDPATH += $$LAY_INC $$TL_INC $$DB_INC $$GSI_INC $$PWD/../db_plugin $$PWD/../../../common

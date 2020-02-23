@@ -41,6 +41,7 @@ extern const std::string cfg_nt_marker_intensity ("nt-marker-intensity");
 extern const std::string cfg_nt_window_mode ("nt-window-mode");
 extern const std::string cfg_nt_window_dim ("nt-window-dim");
 extern const std::string cfg_nt_max_shapes_highlighted ("nt-max-shapes-highlighted");
+extern const std::string cfg_nt_trace_depth ("nt-trace_depth");
 
 // ------------------------------------------------------------
 

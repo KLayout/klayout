@@ -131,23 +131,20 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
     "Use this constructor to quickly turn a recursive shape iterator delivery "
     "into a shape selection."
   ) +
-  gsi::method ("<", &lay::ObjectInstPath::operator<,
+  gsi::method ("<", &lay::ObjectInstPath::operator<, gsi::arg ("b"),
     "@brief Provides an order criterion for two ObjectInstPath objects\n"
-    "@args b\n"
     "Note: this operator is just provided to establish any order, not a particular one.\n"
     "\n"
     "This method has been introduced with version 0.24.\n"
   ) +
-  gsi::method ("!=", &lay::ObjectInstPath::operator!=,
+  gsi::method ("!=", &lay::ObjectInstPath::operator!=, gsi::arg ("b"),
     "@brief Inequality of two ObjectInstPath objects\n"
-    "@args b\n"
     "See the comments on the == operator.\n"
     "\n"
     "This method has been introduced with version 0.24.\n"
   ) +
-  gsi::method ("==", &lay::ObjectInstPath::operator==,
+  gsi::method ("==", &lay::ObjectInstPath::operator==, gsi::arg ("b"),
     "@brief Equality of two ObjectInstPath objects\n"
-    "@args b\n"
     "Note: this operator returns true if both instance paths refer to the same object, not just identical ones.\n"
     "\n"
     "This method has been introduced with version 0.24.\n"
@@ -155,9 +152,8 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
   gsi::method ("cv_index", &lay::ObjectInstPath::cv_index, 
     "@brief Gets the cellview index that describes which cell view the shape or instance is located in\n"
   ) + 
-  gsi::method ("cv_index=", &lay::ObjectInstPath::set_cv_index, 
+  gsi::method ("cv_index=", &lay::ObjectInstPath::set_cv_index, gsi::arg ("index"),
     "@brief Sets the cellview index that describes which cell view the shape or instance is located in\n"
-    "@args index\n"
     "\n"
     "This method has been introduced in version 0.24."
   ) + 
@@ -170,9 +166,8 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
     "\n"
     "This method has been introduced in version 0.24."
   ) + 
-  gsi::method ("top=", &lay::ObjectInstPath::set_topcell, 
+  gsi::method ("top=", &lay::ObjectInstPath::set_topcell, gsi::arg ("cell_index"),
     "@brief Sets the cell index of the top cell the selection applies to\n"
-    "@args cell_index\n"
     "\n"
     "See \\top_cell for a description of this property.\n"
     "\n"
@@ -256,9 +251,8 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
     "This method delivers valid results only for object selections that represent shapes, i.e for "
     "which \\is_cell_inst? is false."
   ) + 
-  gsi::method ("layer=", &lay::ObjectInstPath::set_layer, 
+  gsi::method ("layer=", &lay::ObjectInstPath::set_layer, gsi::arg ("layer_index"),
     "@brief Sets to the layer index that describes which layer the selected shape is on\n"
-    "@args layer_index\n"
     "\n"
     "Setting the layer property to a valid layer index makes the path a shape selection path.\n"
     "Setting the layer property to a negative layer index makes the selection an instance selection.\n"
@@ -266,7 +260,7 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
     "This method has been introduced in version 0.24."
   ) + 
   gsi::method ("shape", (const db::Shape &(lay::ObjectInstPath::*) () const) &lay::ObjectInstPath::shape,
-    "@brief Gets the shape object that describes the selected shape geometrically\n"
+    "@brief Gets the selected shape\n"
     "\n"
     "This method delivers valid results only for object selections that represent shapes, i.e for "
     "which \\is_cell_inst? is false.\n"
@@ -274,9 +268,8 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
     "The shape object may be modified. This does not have an immediate effect on the selection. Instead, "
     "the selection must be set in the view using \\LayoutView#object_selection= or \\LayoutView#select_object.\n"
   ) + 
-  gsi::method ("shape=", &lay::ObjectInstPath::set_shape, 
+  gsi::method ("shape=", &lay::ObjectInstPath::set_shape, gsi::arg ("shape"),
     "@brief Sets the shape object that describes the selected shape geometrically\n"
-    "@args shape\n"
     "\n"
     "When using this setter, the layer index must be set to a valid layout layer (see \\layer=).\n"
     "Setting both properties makes the selection a shape selection.\n"
@@ -304,9 +297,8 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
     "The sequence number describes when the item was selected.\n"
     "A sequence number of 0 indicates that the item was selected in the first selection action (without 'Shift' pressed).\n"
   ) + 
-  gsi::method ("seq=", &lay::ObjectInstPath::set_seq, 
+  gsi::method ("seq=", &lay::ObjectInstPath::set_seq, gsi::arg ("n"),
     "@brief Sets the sequence number\n"
-    "@args n\n"
     "\n"
     "See \\seq for a description of this property.\n"
     "\n"
@@ -328,9 +320,8 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
     "\n"
     "This method was introduced in version 0.26.\n"
   ) +
-  gsi::method ("append_path", (void (lay::ObjectInstPath::*) (const db::InstElement &)) &lay::ObjectInstPath::add_path,
+  gsi::method ("append_path", (void (lay::ObjectInstPath::*) (const db::InstElement &)) &lay::ObjectInstPath::add_path, gsi::arg ("element"),
     "@brief Appends an element to the instantiation path\n"
-    "@args element\n"
     "\n"
     "This method allows building of an instantiation path pointing to the selected object.\n"
     "For an instance selection, the last component added is the instance which is selected.\n"
@@ -343,9 +334,8 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
     "\n"
     "This method has been added in version 0.16."
   ) + 
-  gsi::method_ext ("path_nth", &gsi::path_nth, 
+  gsi::method_ext ("path_nth", &gsi::path_nth, gsi::arg ("n"),
     "@brief Returns the nth element of the path (similar to \\each_inst but with direct access through the index)\n"
-    "@args n\n"
     "\n"
     "@param n The index of the element to retrieve (0..\\path_length-1)\n"
     "This method has been added in version 0.16."
@@ -594,9 +584,8 @@ gsi::ClassExt<lay::LayoutView> layout_view_decl (
     "\n"
     "This method has been introduced in version 0.24.\n"
   ) +
-  gsi::method_ext ("object_selection=", &set_object_selection, 
+  gsi::method_ext ("object_selection=", &set_object_selection, gsi::arg ("sel"),
     "@brief Sets the list of selected objects\n"
-    "@args sel\n"
     "\n"
     "This method will set the selection of geometrical objects such as shapes and instances. "
     "It is the setter which complements the \\object_selection method.\n"
@@ -611,9 +600,8 @@ gsi::ClassExt<lay::LayoutView> layout_view_decl (
     "\n"
     "This method has been introduced in version 0.24\n"
   ) +
-  gsi::method_ext ("select_object", &select_object,
+  gsi::method_ext ("select_object", &select_object, gsi::arg ("obj"),
     "@brief Adds the given selection to the list of selected objects\n"
-    "@args obj\n"
     "\n"
     "The selection provided by the \\ObjectInstPath descriptor is added to the list of selected objects.\n"
     "To clear the previous selection, use \\clear_object_selection.\n"
@@ -624,9 +612,8 @@ gsi::ClassExt<lay::LayoutView> layout_view_decl (
     "\n"
     "This method has been introduced in version 0.24\n"
   ) +
-  gsi::method_ext ("unselect_object", &unselect_object,
+  gsi::method_ext ("unselect_object", &unselect_object, gsi::arg ("obj"),
     "@brief Removes the given selection from the list of selected objects\n"
-    "@args obj\n"
     "\n"
     "The selection provided by the \\ObjectInstPath descriptor is removed from the list of selected objects.\n"
     "If the given object was not part of the selection, nothing will be changed.\n"

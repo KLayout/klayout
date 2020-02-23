@@ -176,9 +176,14 @@ public:
   std::string path () const;
   
   /**
-   *  @brief Saves the macro to the specificed path
+   *  @brief Saves the macro to it's path
    */
   void save ();
+
+  /**
+   *  @brief Saves the macro to the specificed path
+   */
+  void save_to (const std::string &path);
 
   /**
    *  @brief Delete the original file (the file behind the macro)
@@ -601,7 +606,6 @@ private:
 
   void on_menu_needs_update ();
   void on_changed ();
-  void save_to (const std::string &path);
   static bool format_from_suffix_string (const std::string &suffix, Macro::Interpreter &interpreter, std::string &dsl_name, bool &autorun_pref, Macro::Format &format);
   static std::pair<bool, std::string> format_from_filename (const std::string &fn, Macro::Interpreter &interpreter, std::string &dsl_name, bool &autorun_pref, Macro::Format &format);
 

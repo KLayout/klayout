@@ -227,6 +227,22 @@ gsi::Class<db::NetTracer> decl_NetTracer ("db", "NetTracer",
     "The net name is extracted from labels found during the extraction. "
     "This attribute is useful only after the extraction has been performed."
   ) +
+  gsi::method ("trace_depth=", &db::NetTracer::set_trace_depth, gsi::arg ("n"),
+    "@brief Sets the trace depth (shape limit)\n"
+    "Set this value to limit the maximum number of shapes delivered. Upon reaching this count, "
+    "the tracer will stop and report the net as 'incomplete' (see \\incomplete?).\n"
+    "Setting a trace depth if 0 is equivalent to 'unlimited'.\n"
+    "The actual number of shapes delivered may be a little less than the depth because of "
+    "internal marker shapes which are taken into account, but are not delivered.\n"
+    "\n"
+    "This method has been introduced in version 0.26.4.\n"
+  ) +
+  gsi::method ("trace_depth", &db::NetTracer::trace_depth,
+    "@brief gets the trace depth\n"
+    "See \\trace_depth= for a description of this property.\n"
+    "\n"
+    "This method has been introduced in version 0.26.4.\n"
+  ) +
   gsi::method ("incomplete?", &db::NetTracer::incomplete,
     "@brief Returns a value indicating whether the net is incomplete\n"
     "A net may be incomplete if the extraction has been stopped by the user for example. "

@@ -54,6 +54,20 @@
   </p>
 
   <p>
+  Sometimes you encounter large nets (e.g. power nets). When you click on such a net, the tracer will start running and
+  the extraction will take a long time. If you're not interested in the details of such nets, you can limit the depth
+  of the net tracing. This means, after a specified number of shapes is encountered, the tracer will stop and report
+  the shapes collected so far as an incomplete net.
+  </p>
+  
+  <p>
+  To configure the depth, enter the desired number of shapes in the 
+  "Trace depth" box at the bottom of the trace dialog. NOTE: the actual number of shapes in the net may be a litte
+  less than the specified depth due to internal marker shapes which are taken into account, but are not delivered
+  as parts of the net.
+  </p>
+
+  <p>
   The "Trace Path" function works similar but allows specification of two points and let the algorithm find the shortest connection
   (in terms of shape count, not geometrical length) between those points. If the points are not connected, a message is given
   which indicates that no path leads from one point to the other.

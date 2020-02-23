@@ -1,3 +1,26 @@
+0.26.4          (2020-xx-xx):
+
+* Enhancement: %GITHUB%/issues/473
+      Direct access to image data in scripts (array of values instead of
+      per-pixel calls)
+* Bugfix: %GITHUB%/issues/476
+      Issues with "target" switching in DRC solved
+* Bugfix: %GITHUB%/issues/477
+      Missing letter "J" in Times font .. actually this bug is of 1967.
+* Bugfix: %GITHUB%/issues/481
+      "isolated" DRC function reported duplicate marker shapes
+* Enhancement: %GITHUB%/issues/489
+      Pin names can be attached as properties to port and pin shapes
+      when reading LEF or DEF
+* Bugfix: %GITHUB%/issues/491
+      Performance enhancement of L2N/LVS DB file loader
+* Bugfix: %GITHUB%/issues/496
+      Fixed builds on CentOS 8 and Fedora 31
+* Bugfix: %GITHUB%/issues/501
+      Issues with ownership transfer fixed in Qt binding
+* Bugfix: %GITHUB%/issues/502
+      Issues with AbsoluteProgressReporter in scripts fixed
+
 0.26.3          (2020-01-05):
 
 * Bugfix: %GITHUB%/issues/466

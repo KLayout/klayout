@@ -347,6 +347,7 @@ LEFDEFReaderOptionsEditor::LEFDEFReaderOptionsEditor (QWidget *parent)
 
   connect (produce_net_names, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_inst_names, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
+  connect (produce_pin_names, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_outlines, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_placement_blockages, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_regions, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
@@ -376,6 +377,7 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
   data->set_layer_map (layer_map->get_layer_map ());
   data->set_produce_net_names (produce_net_names->isChecked ());
   data->set_produce_inst_names (produce_inst_names->isChecked ());
+  data->set_produce_pin_names (produce_pin_names->isChecked ());
 
   double dbu_value = 0.0;
   tl::from_string (tl::to_string (dbu->text ()), dbu_value);
@@ -402,6 +404,16 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
     ex.read (v);
     ex.expect_end ();
     data->set_inst_property_name (v);
+  }
+
+  //  parse the pin property name (may throw an exception)
+  {
+    std::string np = tl::to_string (pin_prop_name->text ());
+    tl::Extractor ex (np.c_str ());
+    tl::Variant v;
+    ex.read (v);
+    ex.expect_end ();
+    data->set_pin_property_name (v);
   }
 
   data->set_produce_cell_outlines (produce_outlines->isChecked ());
@@ -454,6 +466,8 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   net_prop_name->setText (tl::to_qstring (data->net_property_name ().to_parsable_string ()));
   produce_inst_names->setChecked (data->produce_inst_names ());
   inst_prop_name->setText (tl::to_qstring (data->inst_property_name ().to_parsable_string ()));
+  produce_pin_names->setChecked (data->produce_pin_names ());
+  pin_prop_name->setText (tl::to_qstring (data->pin_property_name ().to_parsable_string ()));
   produce_outlines->setChecked (data->produce_cell_outlines ());
   outline_layer->setText (tl::to_qstring (data->cell_outline_layer ()));
   produce_regions->setChecked (data->produce_regions ());
@@ -499,6 +513,7 @@ LEFDEFReaderOptionsEditor::checkbox_changed ()
 {
   net_prop_name->setEnabled (produce_net_names->isChecked ());
   inst_prop_name->setEnabled (produce_inst_names->isChecked ());
+  pin_prop_name->setEnabled (produce_pin_names->isChecked ());
   outline_layer->setEnabled (produce_outlines->isChecked ());
   region_layer->setEnabled (produce_regions->isChecked ());
   placement_blockage_layer->setEnabled (produce_placement_blockages->isChecked ());

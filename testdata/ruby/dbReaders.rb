@@ -178,6 +178,147 @@ class DBReaders_TestClass < TestBase
   
   end
 
+  # LEF/DEF Options
+  def test_lefdef_options
+
+    conf = RBA::LEFDEFReaderConfiguration::new
+    lm = RBA::LayerMap::new
+    lm.map(RBA::LayerInfo::new(1, 0), 2, RBA::LayerInfo::new(42, 17))
+    conf.layer_map = lm
+
+    opt = RBA::LoadLayoutOptions::new
+    opt.lefdef_config = conf
+    assert_equal(opt.lefdef_config.layer_map.to_string, "1/0 : 42/17\n")
+    assert_equal(opt.dup.lefdef_config.layer_map.to_string, "1/0 : 42/17\n")
+
+    assert_equal(conf.layer_map.to_string, "1/0 : 42/17\n")
+
+    conf.create_other_layers = false
+    assert_equal(conf.create_other_layers, false)
+    conf.create_other_layers = true
+    assert_equal(conf.create_other_layers, true)
+
+    conf.dbu = 2.5
+    assert_equal(conf.dbu, 2.5)
+
+    assert_equal(conf.net_property_name, 1)
+    conf.net_property_name = "x"
+    assert_equal(conf.net_property_name, "x")
+    conf.net_property_name = 2
+    assert_equal(conf.net_property_name, 2)
+    conf.net_property_name = nil
+    assert_equal(conf.net_property_name, nil)
+
+    assert_equal(conf.pin_property_name, nil)
+    conf.pin_property_name = "y"
+    assert_equal(conf.pin_property_name, "y")
+    conf.pin_property_name = 3
+    assert_equal(conf.pin_property_name, 3)
+    conf.pin_property_name = nil
+    assert_equal(conf.pin_property_name, nil)
+
+    assert_equal(conf.instance_property_name, 1)
+    conf.instance_property_name = "z"
+    assert_equal(conf.instance_property_name, "z")
+    conf.instance_property_name = 4
+    assert_equal(conf.instance_property_name, 4)
+    conf.instance_property_name = nil
+    assert_equal(conf.instance_property_name, nil)
+
+    assert_equal(conf.produce_cell_outlines, true)
+    conf.produce_cell_outlines = false
+    assert_equal(conf.produce_cell_outlines, false)
+
+    assert_equal(conf.cell_outline_layer, "OUTLINE")
+    conf.cell_outline_layer = "17/1"
+    assert_equal(conf.cell_outline_layer, "17/1")
+
+    assert_equal(conf.produce_placement_blockages, true)
+    conf.produce_placement_blockages = false
+    assert_equal(conf.produce_placement_blockages, false)
+
+    assert_equal(conf.placement_blockage_layer, "PLACEMENT_BLK")
+    conf.placement_blockage_layer = "17/2"
+    assert_equal(conf.placement_blockage_layer, "17/2")
+
+    assert_equal(conf.produce_via_geometry, true)
+    conf.produce_via_geometry = false
+    assert_equal(conf.produce_via_geometry, false)
+
+    assert_equal(conf.via_geometry_suffix, "")
+    conf.via_geometry_suffix = "XVIA"
+    assert_equal(conf.via_geometry_suffix, "XVIA")
+
+    assert_equal(conf.via_geometry_datatype, 0)
+    conf.via_geometry_datatype = 17
+    assert_equal(conf.via_geometry_datatype, 17)
+
+    assert_equal(conf.produce_pins, true)
+    conf.produce_pins = false
+    assert_equal(conf.produce_pins, false)
+
+    assert_equal(conf.pins_suffix, ".PIN")
+    conf.pins_suffix = "XPIN"
+    assert_equal(conf.pins_suffix, "XPIN")
+
+    assert_equal(conf.pins_datatype, 2)
+    conf.pins_datatype = 18
+    assert_equal(conf.pins_datatype, 18)
+
+    assert_equal(conf.produce_obstructions, true)
+    conf.produce_obstructions = false
+    assert_equal(conf.produce_obstructions, false)
+
+    assert_equal(conf.obstructions_suffix, ".OBS")
+    conf.obstructions_suffix = "XOBS"
+    assert_equal(conf.obstructions_suffix, "XOBS")
+
+    assert_equal(conf.obstructions_datatype, 3)
+    conf.obstructions_datatype = 19
+    assert_equal(conf.obstructions_datatype, 19)
+
+    assert_equal(conf.produce_blockages, true)
+    conf.produce_blockages = false
+    assert_equal(conf.produce_blockages, false)
+
+    assert_equal(conf.blockages_suffix, ".BLK")
+    conf.blockages_suffix = "XBLK"
+    assert_equal(conf.blockages_suffix, "XBLK")
+
+    assert_equal(conf.blockages_datatype, 4)
+    conf.blockages_datatype = 20
+    assert_equal(conf.blockages_datatype, 20)
+
+    assert_equal(conf.produce_labels, true)
+    conf.produce_labels = false
+    assert_equal(conf.produce_labels, false)
+
+    assert_equal(conf.labels_suffix, ".LABEL")
+    conf.labels_suffix = "XLABEL"
+    assert_equal(conf.labels_suffix, "XLABEL")
+
+    assert_equal(conf.labels_datatype, 1)
+    conf.labels_datatype = 21
+    assert_equal(conf.labels_datatype, 21)
+
+    assert_equal(conf.produce_routing, true)
+    conf.produce_routing = false
+    assert_equal(conf.produce_routing, false)
+
+    assert_equal(conf.routing_suffix, "")
+    conf.routing_suffix = "XROUT"
+    assert_equal(conf.routing_suffix, "XROUT")
+
+    assert_equal(conf.routing_datatype, 0)
+    conf.routing_datatype = 22
+    assert_equal(conf.routing_datatype, 22)
+
+    assert_equal(conf.lef_files.join(","), "")
+    conf.lef_files = [ "u.lef", "v.lef" ]
+    assert_equal(conf.lef_files.join(","), "u.lef,v.lef")
+
+  end
+
   # MAG Options
   def test_mag_options
 

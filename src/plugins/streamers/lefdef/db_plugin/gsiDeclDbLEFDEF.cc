@@ -76,6 +76,36 @@ static void set_net_property_name (db::LEFDEFReaderOptions *config, const tl::Va
   config->set_net_property_name (name);
 }
 
+static tl::Variant get_instance_property_name (const db::LEFDEFReaderOptions *config)
+{
+  if (config->produce_inst_names ()) {
+    return config->inst_property_name ();
+  } else {
+    return tl::Variant ();
+  }
+}
+
+static void set_instance_property_name (db::LEFDEFReaderOptions *config, const tl::Variant &name)
+{
+  config->set_produce_inst_names (! name.is_nil ());
+  config->set_inst_property_name (name);
+}
+
+static tl::Variant get_pin_property_name (const db::LEFDEFReaderOptions *config)
+{
+  if (config->produce_pin_names ()) {
+    return config->pin_property_name ();
+  } else {
+    return tl::Variant ();
+  }
+}
+
+static void set_pin_property_name (db::LEFDEFReaderOptions *config, const tl::Variant &name)
+{
+  config->set_produce_pin_names (! name.is_nil ());
+  config->set_pin_property_name (name);
+}
+
 static
 gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfiguration",
   gsi::method ("layer_map", (db::LayerMap &(db::LEFDEFReaderOptions::*) ()) &db::LEFDEFReaderOptions::layer_map,
@@ -112,7 +142,7 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
   ) +
   gsi::method_ext ("net_property_name", &get_net_property_name,
     "@brief Gets a value indicating whether and how to produce net names as properties.\n"
-    "If set to a value not nil, net names will be attached to the shapes and instances generated as user properties.\n"
+    "If set to a value not nil, net names will be attached to the net shapes generated as user properties.\n"
     "This attribute then specifies the user property name to be used for attaching the net names.\n"
     "If set to nil, no net names will be produced.\n"
     "\n"
@@ -121,6 +151,38 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
   gsi::method_ext ("net_property_name=", &set_net_property_name, gsi::arg ("name"),
     "@brief Sets a value indicating whether and how to produce net names as properties.\n"
     "See \\net_property_name for details."
+  ) +
+  gsi::method_ext ("pin_property_name", &get_pin_property_name,
+    "@brief Gets a value indicating whether and how to produce pin names as properties.\n"
+    "If set to a value not nil, pin names will be attached to the pin shapes generated as user properties.\n"
+    "This attribute then specifies the user property name to be used for attaching the pin names.\n"
+    "If set to nil, no pin names will be produced.\n"
+    "\n"
+    "The corresponding setter is \\pin_property_name=.\n"
+    "\n"
+    "This method has been introduced in version 0.26.4."
+  ) +
+  gsi::method_ext ("pin_property_name=", &set_pin_property_name, gsi::arg ("name"),
+    "@brief Sets a value indicating whether and how to produce pin names as properties.\n"
+    "See \\pin_property_name for details.\n"
+    "\n"
+    "This method has been introduced in version 0.26.4."
+  ) +
+  gsi::method_ext ("instance_property_name", &get_instance_property_name,
+    "@brief Gets a value indicating whether and how to produce instance names as properties.\n"
+    "If set to a value not nil, instance names will be attached to the instances generated as user properties.\n"
+    "This attribute then specifies the user property name to be used for attaching the instance names.\n"
+    "If set to nil, no instance names will be produced.\n"
+    "\n"
+    "The corresponding setter is \\instance_property_name=.\n"
+    "\n"
+    "This method has been introduced in version 0.26.4."
+  ) +
+  gsi::method_ext ("instance_property_name=", &set_instance_property_name, gsi::arg ("name"),
+    "@brief Sets a value indicating whether and how to produce instance names as properties.\n"
+    "See \\instance_property_name for details.\n"
+    "\n"
+    "This method has been introduced in version 0.26.4."
   ) +
   gsi::method ("produce_cell_outlines", &db::LEFDEFReaderOptions::produce_cell_outlines,
     "@brief Gets a value indicating whether to produce cell outlines.\n"

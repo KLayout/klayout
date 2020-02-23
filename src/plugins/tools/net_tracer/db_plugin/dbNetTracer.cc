@@ -840,7 +840,7 @@ NetTracerLayerExpression::make_l2n_region (db::LayoutToNetlist &l2n, std::map <u
 //  NetTracer implementation
 
 NetTracer::NetTracer ()
-  : mp_layout (0), mp_cell (0), mp_progress (0), m_name_hier_depth (-1), m_incomplete (false)
+  : mp_layout (0), mp_cell (0), mp_progress (0), m_name_hier_depth (-1), m_incomplete (false), m_trace_depth (0)
 {
   //  .. nothing yet ..
 }
@@ -1187,6 +1187,17 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTrace
     m_incomplete = false;
     mp_progress = 0;
 
+  } catch (tl::BreakException &) {
+
+    m_shapes_graph.clear ();
+
+    m_hit_test_queue.clear ();
+    m_incomplete = true;
+    mp_progress = 0;
+
+    //  on user break or depth exhausted just keep the shapes
+    return;
+
   } catch (...) {
 
     m_shapes_graph.clear ();
@@ -1311,6 +1322,10 @@ NetTracer::deliver_shape (const NetTracerShape &net_shape, const NetTracerShape 
 
   if (! m_stop_shape.is_valid ()) {
 
+    if (m_trace_depth > 0 && m_shapes_found.size () >= m_trace_depth) {
+      throw tl::BreakException ();
+    }
+
     std::pair<std::set <NetTracerShape>::iterator, bool> f = m_shapes_found.insert (net_shape);
     if (f.second) {
       if (mp_progress) {
@@ -1325,6 +1340,10 @@ NetTracer::deliver_shape (const NetTracerShape &net_shape, const NetTracerShape 
     
     std::map <NetTracerShape, std::vector<const NetTracerShape *> >::iterator n = m_shapes_graph.find (net_shape);
     if (n == m_shapes_graph.end ()) {
+
+      if (m_trace_depth > 0 && m_shapes_graph.size () >= m_trace_depth) {
+        throw tl::BreakException ();
+      }
 
       n = m_shapes_graph.insert (std::make_pair (net_shape, std::vector<const NetTracerShape *> ())).first;
 

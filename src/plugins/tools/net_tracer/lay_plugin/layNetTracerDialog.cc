@@ -394,16 +394,13 @@ NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &sto
   }
 
   db::NetTracer net_tracer;
+  net_tracer.set_trace_depth (get_trace_depth ());
 
   //  and trace
-  try {
-    if (trace_path) {
-      net_tracer.trace (cv->layout (), *cv.cell (), start_point, start_layer, stop_point, stop_layer, tracer_data);
-    } else {
-      net_tracer.trace (cv->layout (), *cv.cell (), start_point, start_layer, tracer_data);
-    }
-  } catch (tl::BreakException &) {
-    //  just keep the found shapes on break (user abort)
+  if (trace_path) {
+    net_tracer.trace (cv->layout (), *cv.cell (), start_point, start_layer, stop_point, stop_layer, tracer_data);
+  } else {
+    net_tracer.trace (cv->layout (), *cv.cell (), start_point, start_layer, tracer_data);
   }
 
   if (net_tracer.begin () == net_tracer.end ()) {
@@ -433,8 +430,18 @@ NetTracerDialog::configure (const std::string &name, const std::string &value)
 
     need_update = true;
 
-  } else if (name == cfg_nt_marker_cycle_colors) {
+  } else if (name == cfg_nt_trace_depth) {
       
+    unsigned int n = 0;
+    tl::from_string (value, n);
+    if (n > 0) {
+      depth_le->setText (tl::to_qstring (tl::to_string (n)));
+    } else {
+      depth_le->setText (QString ());
+    }
+
+  } else if (name == cfg_nt_marker_cycle_colors) {
+
     m_auto_colors.from_string (value, true);
 
   } else if (name == cfg_nt_marker_cycle_colors_enabled) {
@@ -1113,6 +1120,7 @@ void
 NetTracerDialog::trace_path_button_clicked ()
 {
 BEGIN_PROTECTED
+  commit ();
   net_list->setCurrentItem (0);
   m_mouse_state = 2;
   view ()->message (tl::to_string (QObject::tr ("Click on the first point in the net")));
@@ -1124,6 +1132,7 @@ void
 NetTracerDialog::trace_net_button_clicked ()
 {
 BEGIN_PROTECTED
+  commit ();
   net_list->setCurrentItem (0);
   m_mouse_state = 1;
   view ()->message (tl::to_string (QObject::tr ("Click on a point in the net")));
@@ -1411,9 +1420,35 @@ BEGIN_PROTECTED
 END_PROTECTED
 }
 
+size_t
+NetTracerDialog::get_trace_depth()
+{
+  double n = 0.0;
+  try {
+    QString depth = depth_le->text ().trimmed ();
+    if (! depth.isEmpty ()) {
+      tl::from_string (tl::to_string (depth), n);
+      if (n < 0 || n > std::numeric_limits<size_t>::max ()) {
+        n = 0.0;
+      }
+    }
+  } catch (...) {
+    //  .. nothing yet ..
+  }
+
+  return (size_t) n;
+}
+
+void
+NetTracerDialog::commit ()
+{
+  root ()->config_set (cfg_nt_trace_depth, tl::to_string (get_trace_depth ()));
+}
+
 void  
 NetTracerDialog::deactivated ()
 {
+  commit ();
   clear_markers ();
   release_mouse ();
 }

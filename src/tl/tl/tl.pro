@@ -46,7 +46,8 @@ SOURCES = \
     tlList.cc \
     tlEquivalenceClusters.cc \
     tlUniqueName.cc \
-    tlRecipe.cc
+    tlRecipe.cc \
+    tlEnv.cc
 
 HEADERS = \
     tlAlgorithm.h \
@@ -103,7 +104,8 @@ HEADERS = \
     tlEquivalenceClusters.h \
     tlUniqueName.h \
     tlRecipe.h \
-    tlSelect.h
+    tlSelect.h \
+    tlEnv.h
 
 equals(HAVE_CURL, "1") {
 

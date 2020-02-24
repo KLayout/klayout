@@ -199,16 +199,6 @@ public:
   std::vector<std::string> get_config_names () const;
 
   /**
-   *  @brief Gets a value indicating whether the give special application flag is set
-   *
-   *  Special application flags are ways to introduce debug or flags for special
-   *  use cases. Such flags have a name and currently are controlled externally by
-   *  an environment variable called "KLAYOUT_x" where x is the name. If that
-   *  variable is set and the value is non-empty, the flag is regarded set.
-   */
-  bool special_app_flag (const std::string &name);
-
-  /**
    *  @brief Return a reference to the Ruby interpreter
    */
   gsi::Interpreter &ruby_interpreter ()

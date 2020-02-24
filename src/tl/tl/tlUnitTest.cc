@@ -24,6 +24,7 @@
 #include "tlFileUtils.h"
 #include "tlTimer.h"
 #include "tlStream.h"
+#include "tlEnv.h"
 
 #include <cmath>
 
@@ -85,8 +86,8 @@ void set_debug_mode (bool f)
 
 std::string testsrc ()
 {
-  const char *ts = getenv ("TESTSRC");
-  if (! ts) {
+  std::string ts = tl::get_env ("TESTSRC");
+  if (ts.empty ()) {
     throw tl::Exception ("TESTSRC undefined");
   }
   return ts;
@@ -104,8 +105,8 @@ std::string testsrc_private ()
 std::string testtmp ()
 {
   //  Ensures the test temp directory is present
-  const char *tt = getenv ("TESTTMP");
-  if (! tt) {
+  std::string tt = tl::get_env ("TESTTMP");
+  if (tt.empty ()) {
     throw tl::Exception ("TESTTMP undefined");
   }
   return tt;

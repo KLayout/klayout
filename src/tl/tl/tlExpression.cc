@@ -26,6 +26,7 @@
 #include "tlString.h"
 #include "tlGlobPattern.h"
 #include "tlFileUtils.h"
+#include "tlEnv.h"
 
 #include <map>
 #include <vector>
@@ -35,7 +36,6 @@
 #define _USE_MATH_DEFINES // for MSVC
 #include <math.h>
 #include <string.h>
-#include <stdlib.h>
 #include <ctype.h>
 
 //  Suggestions for further functions:
@@ -2800,9 +2800,9 @@ env_f (const ExpressionParserContext &context, tl::Variant &out, const std::vect
     throw EvalError (tl::to_string (tr ("'env' function expects exactly two arguments")), context);
   }
 
-  const char *env = getenv (vv [0].to_string ());
-  if (env) {
-    out = env;
+  const char *vn = vv [0].to_string ();
+  if (tl::has_env (vn)) {
+    out = tl::get_env (vn);
   } else {
     out = tl::Variant ();
   }

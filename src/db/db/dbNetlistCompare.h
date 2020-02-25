@@ -328,6 +328,9 @@ protected:
   bool m_dont_consider_net_names;
 };
 
+// @@@
+void DB_PUBLIC join_symmetric_nodes (db::Circuit *circuit);
+
 }
 
 namespace tl

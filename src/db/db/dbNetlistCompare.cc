@@ -28,6 +28,7 @@
 #include "tlEquivalenceClusters.h"
 #include "tlLog.h"
 #include "tlEnv.h"
+#include "tlInternational.h"
 
 #include <cstring>
 
@@ -3626,17 +3627,19 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
   }
 }
 
-// @@@
-
-bool derive_symmetry_groups (const db::NetGraph &graph, const tl::equivalence_clusters<const NetGraphNode *> &identical_nodes, std::set<size_t> &considered_nodes, const std::set<size_t> &symmetry_group, std::list<std::set<size_t> > &symmetry_groups)
+static bool derive_symmetry_groups (const db::NetGraph &graph, const tl::equivalence_clusters<const NetGraphNode *> &identical_nodes, std::set<size_t> &considered_nodes, const std::set<size_t> &symmetry_group, std::list<std::set<size_t> > &symmetry_groups)
 {
   std::set<size_t> cids;
   std::set<size_t> new_symmetry_group;
   NetGraphNode::edge_type::first_type edge;
 
+  std::vector<NetGraphNode::edge_type> common_nodes_first;
+
   bool has_candidate = true;
 
-  for (std::set<size_t>::const_iterator g = symmetry_group.begin (); g != symmetry_group.end (); ++g) {
+  for (std::set<size_t>::const_iterator g = symmetry_group.begin (); g != symmetry_group.end () && has_candidate; ++g) {
+
+    std::vector<NetGraphNode::edge_type> common_nodes;
 
     const NetGraphNode &n = graph.node (*g);
     for (NetGraphNode::edge_iterator e = n.begin (); e != n.end () && has_candidate; ++e) {
@@ -3646,7 +3649,8 @@ bool derive_symmetry_groups (const db::NetGraph &graph, const tl::equivalence_cl
       }
 
       const NetGraphNode *other = &graph.node (e->second.first);
-      if (identical_nodes.has_attribute (other)) {
+      //  NOTE: nodes with pins don't go into a symmetry group as we don't know what the pins connect to
+      if (other->net ()->pin_count () == 0 && identical_nodes.has_attribute (other)) {
 
         if (cids.empty ()) {
           edge = e->first;
@@ -3663,6 +3667,21 @@ bool derive_symmetry_groups (const db::NetGraph &graph, const tl::equivalence_cl
           }
         }
 
+      } else {
+        common_nodes.push_back (*e);
+      }
+
+    }
+
+    if (has_candidate) {
+
+      //  all other edges need to have identical destinations for the symmetry group to be
+      //  actually symmetric
+      std::sort (common_nodes.begin (), common_nodes.end ());
+      if (g == symmetry_group.begin ()) {
+        common_nodes_first.swap (common_nodes);
+      } else if (common_nodes_first != common_nodes) {
+        has_candidate = false;
       }
 
     }
@@ -3692,16 +3711,17 @@ bool derive_symmetry_groups (const db::NetGraph &graph, const tl::equivalence_cl
   return has_candidate;
 }
 
-void join_symmetric_nodes (db::Circuit *circuit)
+void
+NetlistComparer::join_symmetric_nodes (db::Circuit *circuit)
 {
-  db::CircuitCategorizer circuit_categorizer;
-  db::DeviceCategorizer device_categorizer;
+  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Join symmetric nodes for circuit: ")) + circuit->name ());
+
+  db::DeviceFilter device_filter (m_cap_threshold, m_res_threshold);
   db::CircuitPinMapper circuit_pin_mapper;
-  db::DeviceFilter device_filter (0.0, 0.0);
   std::map<const db::Circuit *, CircuitMapper> circuit_and_pin_mapping;
 
   db::NetGraph graph;
-  graph.build (circuit, device_categorizer, circuit_categorizer, device_filter, &circuit_and_pin_mapping, &circuit_pin_mapper);
+  graph.build (circuit, *mp_device_categorizer, *mp_circuit_categorizer, device_filter, &circuit_and_pin_mapping, &circuit_pin_mapper);
 
   //  sort the nodes so we can easily identify the identical ones (in terms of topology)
   //  nodes are identical if the attached devices and circuits are of the same kind and with the same parameters
@@ -3746,16 +3766,29 @@ void join_symmetric_nodes (db::Circuit *circuit)
 
   }
 
-  printf("@@@ symmetry groups:\n");
+  //  join the nets
+
   for (std::list<std::set<size_t> >::const_iterator g = symmetry_groups.begin (); g != symmetry_groups.end (); ++g) {
-    printf("@@@ group:\n");
     for (std::set<size_t>::const_iterator i = g->begin (); i != g->end (); ++i) {
-      printf("@@@      %s\n", graph.node (*i).net () ? graph.node (*i).net ()->expanded_name ().c_str () : "(null)");
+      if (i != g->begin ()) {
+        circuit->join_nets (const_cast<db::Net *> (graph.net_by_node_index (*g->begin ())), const_cast<db::Net *> (graph.net_by_node_index (*i)));
+      }
     }
   }
-  fflush(stdout);
+
+  if (! symmetry_groups.empty () && tl::verbosity () >= 30) {
+    tl::info << tl::to_string (tr ("Symmetry groups:"));
+    int index = 0;
+    for (std::list<std::set<size_t> >::const_iterator g = symmetry_groups.begin (); g != symmetry_groups.end (); ++g) {
+      tl::info << "  [" << index << "] " << tl::noendl;
+      for (std::set<size_t>::const_iterator i = g->begin (); i != g->end (); ++i) {
+        tl::info << (i == g->begin () ? "" : ",") << (graph.node (*i).net () ? graph.node (*i).net ()->expanded_name ().c_str () : "(null)") << tl::noendl;
+      }
+      ++index;
+      tl::info << "";
+    }
+  }
 
 }
-// @@@
 
 }

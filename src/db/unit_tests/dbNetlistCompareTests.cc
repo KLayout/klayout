@@ -3745,11 +3745,9 @@ TEST(25_SplitGates)
   prep_nl (nl1, nls1);
   prep_nl (nl2, nls2);
 
-  db::join_symmetric_nodes (nl1.circuit_by_name ("NAND2")); // @@@
+  db::NetlistComparer comp;
+  comp.join_symmetric_nodes (nl1.circuit_by_name ("NAND2")); // @@@
 #if 0
-  NetlistCompareTestLogger logger;
-  db::NetlistComparer comp (&logger);
-
   bool good = comp.compare (&nl1, &nl2);
 
   std::string txt = logger.text ();

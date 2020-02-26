@@ -1525,3 +1525,89 @@ TEST(23_NetlistObject)
   pin3 = pin2;
   EXPECT_EQ (pin3.property (1).to_string (), "hello");
 }
+
+TEST(24_JoinNets)
+{
+  db::Netlist nl;
+  db::Circuit *c;
+
+  db::DeviceClass *dc;
+
+  dc = new db::DeviceClassMOS3Transistor ();
+  dc->set_name ("NMOS");
+  nl.add_device_class (dc);
+
+  dc = new db::DeviceClassMOS3Transistor ();
+  dc->set_name ("PMOS");
+  nl.add_device_class (dc);
+
+  nl.from_string (
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  subcircuit PTRANS SC1 ($1=$5,$2=$2,$3=IN);\n"
+    "  subcircuit NTRANS SC2 ($1=$4,$2=$2,$3=IN);\n"
+    "  subcircuit PTRANS SC3 ($1=$5,$2=OUT,$3=$2);\n"
+    "  subcircuit NTRANS SC4 ($1=$4,$2=OUT,$3=$2);\n"
+    "end;\n"
+    "circuit PTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device PMOS $1 (S=$1,D=$2,G=$3) (L=0.25,W=0.95);\n"
+    "end;\n"
+    "circuit NTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device NMOS $1 (S=$1,D=$2,G=$3) (L=0.25,W=0.95);\n"
+    "end;\n"
+  );
+
+  c = nl.circuit_by_name ("INV2");
+  c->join_nets (c->net_by_name ("IN"), c->net_by_name ("OUT"));
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit INV2 (IN=IN,$2=$2,OUT=IN,$4=$4,$5=$5);\n"
+    "  subcircuit PTRANS SC1 ($1=$5,$2=$2,$3=IN);\n"
+    "  subcircuit NTRANS SC2 ($1=$4,$2=$2,$3=IN);\n"
+    "  subcircuit PTRANS SC3 ($1=$5,$2=IN,$3=$2);\n"
+    "  subcircuit NTRANS SC4 ($1=$4,$2=IN,$3=$2);\n"
+    "end;\n"
+    "circuit PTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device PMOS $1 (S=$1,G=$3,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+    "circuit NTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device NMOS $1 (S=$1,G=$3,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+}
+
+TEST(25_JoinNets)
+{
+  db::Netlist nl;
+  db::Circuit *c;
+
+  db::DeviceClass *dc;
+
+  dc = new db::DeviceClassMOS3Transistor ();
+  dc->set_name ("NMOS");
+  nl.add_device_class (dc);
+
+  dc = new db::DeviceClassMOS3Transistor ();
+  dc->set_name ("PMOS");
+  nl.add_device_class (dc);
+
+  nl.from_string (
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$5,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $3 (S=$4,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  c = nl.circuit_by_name ("INV2");
+  c->join_nets (c->net_by_name ("IN"), c->net_by_name ("OUT"));
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit INV2 (IN=IN,$2=$2,OUT=IN,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$5,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $2 (S=$5,G=$2,D=IN) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $3 (S=$4,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $4 (S=$4,G=$2,D=IN) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+}

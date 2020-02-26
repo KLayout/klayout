@@ -1201,6 +1201,12 @@ Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
   gsi::method ("remove_net", &db::Circuit::remove_net, gsi::arg ("net"),
     "@brief Removes the given net from the circuit\n"
   ) +
+  gsi::method ("join_nets", &db::Circuit::join_nets, gsi::arg ("net"), gsi::arg ("with"),
+    "@brief Joins (connects) two nets into one\n"
+    "This method will connect the 'with' net with 'net' and remove 'with'.\n"
+    "\n"
+    "This method has been introduced in version 0.26.4."
+  ) +
   gsi::iterator ("each_net", (db::Circuit::net_iterator (db::Circuit::*) ()) &db::Circuit::begin_nets, (db::Circuit::net_iterator (db::Circuit::*) ()) &db::Circuit::end_nets,
     "@brief Iterates over the nets of the circuit"
   ) +

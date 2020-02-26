@@ -584,6 +584,75 @@ TEST(1_BasicExtraction)
 
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (2.6, 1.0))), "RINGO:$I39");
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (6.4, 1.0))), "RINGO:$I2");
+
+  //  use this opportunity to check joining of nets with cluster joining
+  db::Circuit *top = l2n.netlist ()->circuit_by_name ("RINGO");
+  top->join_nets (top->net_by_name ("VSS"), top->net_by_name ("VDD"));
+  top->join_nets (top->net_by_name ("FB"), top->net_by_name ("OSC"));
+
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
+    "circuit RINGO (FB=FB,OSC=FB,VSS=VSS,VDD=VDD);\n"
+    "  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=FB,$4=VSS,$5=VSS);\n"
+    "  subcircuit INV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4=VSS,$5=VSS);\n"
+    "  subcircuit INV2 $3 (IN=$I19,$2=$I39,OUT=$I1,$4=VSS,$5=VSS);\n"
+    "  subcircuit INV2 $4 (IN=$I1,$2=$I40,OUT=$I2,$4=VSS,$5=VSS);\n"
+    "  subcircuit INV2 $5 (IN=$I2,$2=$I41,OUT=$I3,$4=VSS,$5=VSS);\n"
+    "  subcircuit INV2 $6 (IN=$I3,$2=$I42,OUT=$I4,$4=VSS,$5=VSS);\n"
+    "  subcircuit INV2 $7 (IN=$I4,$2=$I43,OUT=$I5,$4=VSS,$5=VSS);\n"
+    "  subcircuit INV2 $8 (IN=$I5,$2=$I44,OUT=$I6,$4=VSS,$5=VSS);\n"
+    "  subcircuit INV2 $9 (IN=$I6,$2=$I45,OUT=$I7,$4=VSS,$5=VSS);\n"
+    "  subcircuit INV2 $10 (IN=$I7,$2=$I46,OUT=$I8,$4=VSS,$5=VSS);\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$2,G=IN,D=$5) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$2,G=IN,D=$4) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "end;\n"
+  );
+
+  //  do some probing after purging
+
+  //  top level
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal2, db::DPoint (0.0, 1.8))), "RINGO:FB");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal2, db::Point (0, 1800))), "RINGO:FB");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal2, db::DPoint (-2.0, 1.8))), "(null)");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (-1.5, 1.8))), "RINGO:FB");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (24.5, 1.8))), "RINGO:FB");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (5.3, 0.0))), "RINGO:VSS");
+
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (2.6, 1.0))), "RINGO:$I39");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (6.4, 1.0))), "RINGO:$I2");
+
+  //  compare the collected test data
+
+  {
+    db::Layout ly2;
+    ly2.dbu (ly.dbu ());
+    db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
+
+    db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, true /*with device cells*/);
+
+    std::map<unsigned int, const db::Region *> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = &rpsd;
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = &rnsd;
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = rpoly.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = rdiff_cont.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = rpoly_cont.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = rmetal1.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
+
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
+
+    std::string au = tl::testsrc ();
+    au = tl::combine_path (au, "testdata");
+    au = tl::combine_path (au, "algo");
+    au = tl::combine_path (au, "device_extract_au1_joined_nets.gds");
+
+    db::compare_layouts (_this, ly2, au);
+  }
 }
 
 TEST(2_Probing)

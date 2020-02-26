@@ -3749,14 +3749,16 @@ NetlistComparer::join_symmetric_nodes (db::Circuit *circuit)
   }
 
   std::list<std::set<size_t> > symmetry_groups;
-  std::set<size_t> considered_nodes;
+  std::set<size_t> visited;
 
   for (std::vector<const NetGraphNode *>::const_iterator np = nodes.begin (); np != nodes.end (); ++np) {
 
     size_t node_id = graph.node_index_for_net (np[0]->net ());
-    if (considered_nodes.find (node_id) != considered_nodes.end ()) {
+    if (visited.find (node_id) != visited.end ()) {
       continue;
     }
+
+    std::set<size_t> considered_nodes;
     considered_nodes.insert (node_id);
 
     std::set<size_t> symmetry_group;
@@ -3764,16 +3766,8 @@ NetlistComparer::join_symmetric_nodes (db::Circuit *circuit)
 
     derive_symmetry_groups (graph, identical_nodes, considered_nodes, symmetry_group, symmetry_groups);
 
-  }
+    visited.insert (considered_nodes.begin (), considered_nodes.end ());
 
-  //  join the nets
-
-  for (std::list<std::set<size_t> >::const_iterator g = symmetry_groups.begin (); g != symmetry_groups.end (); ++g) {
-    for (std::set<size_t>::const_iterator i = g->begin (); i != g->end (); ++i) {
-      if (i != g->begin ()) {
-        circuit->join_nets (const_cast<db::Net *> (graph.net_by_node_index (*g->begin ())), const_cast<db::Net *> (graph.net_by_node_index (*i)));
-      }
-    }
   }
 
   if (! symmetry_groups.empty () && tl::verbosity () >= 30) {
@@ -3789,6 +3783,15 @@ NetlistComparer::join_symmetric_nodes (db::Circuit *circuit)
     }
   }
 
+  //  join the nets
+
+  for (std::list<std::set<size_t> >::const_iterator g = symmetry_groups.begin (); g != symmetry_groups.end (); ++g) {
+    for (std::set<size_t>::const_iterator i = g->begin (); i != g->end (); ++i) {
+      if (i != g->begin ()) {
+        circuit->join_nets (const_cast<db::Net *> (graph.net_by_node_index (*g->begin ())), const_cast<db::Net *> (graph.net_by_node_index (*i)));
+      }
+    }
+  }
 }
 
 }

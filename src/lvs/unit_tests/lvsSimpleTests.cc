@@ -80,6 +80,11 @@ TEST(1_simple)
   run_test (_this, "ringo_simple", "ringo.gds");
 }
 
+TEST(1b_simple_with_tolerance)
+{
+  run_test (_this, "ringo_simple_with_tol", "ringo.gds");
+}
+
 TEST(2_simple_io)
 {
   run_test (_this, "ringo_simple_io", "ringo.gds");

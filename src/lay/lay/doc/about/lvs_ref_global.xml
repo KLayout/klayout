@@ -160,4 +160,14 @@ See <a href="/about/lvs_ref_netter.xml#same_nets">Netter#same_nets</a> for a des
 <p>
 See <a href="/about/lvs_ref_netter.xml#schematic">Netter#schematic</a> for a description of that function.
 </p>
+<h2>"tolerance" - Specifies compare tolerances for certain device parameters</h2>
+<keyword name="tolerance"/>
+<a name="tolerance"/><p>Usage:</p>
+<ul>
+<li><tt>tolerance(device_class_name, parameter_name, absolute_tolerance [, relative_tolerance])</tt></li>
+<li><tt>tolerance(device_class_name, parameter_name [, :absolute =&gt; absolute_tolerance] [, :relative =&gt; relative_tolerance])</tt></li>
+</ul>
+<p>
+See <a href="/about/lvs_ref_netter.xml#tolerance">Netter#tolerance</a> for a description of that function.
+</p>
 </doc>

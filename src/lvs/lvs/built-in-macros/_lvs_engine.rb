@@ -155,7 +155,14 @@ module LVS
     # @synopsis max_depth(n)
     # See \Netter#max_depth for a description of that function.
 
-    %w(schematic compare join_symmetric_nets align same_nets same_circuits same_device_classes equivalent_pins min_caps max_res max_depth max_branch_complexity).each do |f|
+    # %LVS%
+    # @name tolerance
+    # @brief Specifies compare tolerances for certain device parameters
+    # @synopsis tolerance(device_class_name, parameter_name, absolute_tolerance [, relative_tolerance])
+    # @synopsis tolerance(device_class_name, parameter_name [, :absolute => absolute_tolerance] [, :relative => relative_tolerance])
+    # See \Netter#tolerance for a description of that function.
+
+    %w(schematic compare join_symmetric_nets tolerance align same_nets same_circuits same_device_classes equivalent_pins min_caps max_res max_depth max_branch_complexity).each do |f|
       eval <<"CODE"
         def #{f}(*args)
           _netter.#{f}(*args)

@@ -563,10 +563,20 @@ public:
    *
    *  The device class takes ownership of the delegate.
    */
-  virtual void set_parameter_compare_delegate (db::DeviceParameterCompareDelegate *delegate)
+  void set_parameter_compare_delegate (db::DeviceParameterCompareDelegate *delegate)
   {
-    delegate->keep ();  //  assume transfer of ownership for scripts
+    if (delegate) {
+      delegate->keep ();  //  assume transfer of ownership for scripts
+    }
     mp_pc_delegate.reset (delegate);
+  }
+
+  /**
+   *  @brief Gets the parameter compare delegate or null if no such delegate is registered
+   */
+  db::DeviceParameterCompareDelegate *parameter_compare_delegate ()
+  {
+    return mp_pc_delegate.get ();
   }
 
 private:

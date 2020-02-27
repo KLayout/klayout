@@ -1730,6 +1730,13 @@ static layout_locking_iterator1<db::Cell::const_iterator> begin_inst (db::Cell *
   return layout_locking_iterator1<db::Cell::const_iterator> (cell->layout (), cell->begin ());
 }
 
+static const db::Shapes *shapes_of_cell_const (const db::Cell *cell, unsigned int layer)
+{
+  //  NOTE: we need a const Shapes *pointer* for the return value, otherwise a copy is
+  //  created.
+  return &cell->shapes (layer);
+}
+
 Class<db::Cell> decl_Cell ("db", "Cell",
   gsi::method ("name", &db::Cell::get_basic_name,
     "@brief Gets the cell's name\n"
@@ -1820,6 +1827,19 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "@param index The layer index of the shapes list to retrieve\n"
     "\n"
     "@return A reference to the shapes list\n"
+  ) +
+  gsi::method_ext ("shapes", &shapes_of_cell_const,
+    "@brief Returns the shapes list of the given layer (const version)\n"
+    "@args layer_index\n"
+    "\n"
+    "This method gives access to the shapes list on a certain layer. This is the const version - only const (reading) methods "
+    "can be called on the returned object.\n"
+    "\n"
+    "@param index The layer index of the shapes list to retrieve\n"
+    "\n"
+    "@return A reference to the shapes list\n"
+    "\n"
+    "This variant has been introduced in version 0.26.4.\n"
   ) +
   gsi::method ("clear_shapes", &db::Cell::clear_shapes,
     "@brief Clears all shapes in the cell\n"

@@ -835,6 +835,11 @@ static void equal_parameters (db::DeviceClass *cls, db::EqualDeviceParameters *c
   cls->set_parameter_compare_delegate (comparer);
 }
 
+static db::EqualDeviceParameters *get_equal_parameters (db::DeviceClass *cls)
+{
+  return dynamic_cast<db::EqualDeviceParameters *> (cls->parameter_compare_delegate ());
+}
+
 Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
   gsi::method ("name", &db::DeviceClass::name,
     "@brief Gets the name of the device class."
@@ -905,12 +910,20 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
     "An exception is thrown if there is no terminal with the given name. Use \\has_terminal to check "
     "whether the name is a valid terminal name."
   ) +
+  gsi::method_ext ("equal_parameters", &get_equal_parameters,
+    "@brief Gets the device parameter comparer for netlist verification or nil if no comparer is registered.\n"
+    "See \\equal_parameters= for the setter.\n"
+    "\n"
+    "This getter has been introduced in version 0.26.4.\n"
+  ) +
   gsi::method_ext ("equal_parameters=", &equal_parameters, gsi::arg ("comparer"),
     "@brief Specifies a device parameter comparer for netlist verification.\n"
     "By default, all devices are compared with all parameters. If you want to select only certain parameters "
     "for comparison or use a fuzzy compare criterion, use an \\EqualDeviceParameters object and assign it "
     "to the device class of one netlist. You can also chain multiple \\EqualDeviceParameters objects with the '+' operator "
     "for specifying multiple parameters in the equality check.\n"
+    "\n"
+    "You can assign nil for the parameter comparer to remove it.\n"
     "\n"
     "In special cases, you can even implement a custom compare scheme by deriving your own comparer from the \\GenericDeviceParameterCompare class."
   ),

@@ -99,6 +99,60 @@ module LVS
     end
 
     # %LVS%
+    # @name tolerance
+    # @brief Specifies compare tolerances for certain device parameters
+    # @synopsis tolerance(device_class_name, parameter_name, absolute_tolerance [, relative_tolerance])
+    # @synopsis tolerance(device_class_name, parameter_name [:absolute => absolute_tolerance,] [:relative => relative_tolerance,])
+    # Specifies a compare tolerance for a specific parameter on a given device class.
+    # The device class is the name of a device class in the extracted netlist.
+    # Tolerances can be given in absolute units or relative or both. 
+    # The relative tolerance is given as a factor, so 0.1 is a 10% tolerance.
+    # Absolute and relative tolerances add, so specifying both allows for a larger
+    # deviation.
+
+    def tolerance(device_class_name, parameter_name, *args)
+
+      device_class_name.is_a?(String) || raise("Device class argument of 'tolerance' must be a string")
+      parameter_name.is_a?(String) || raise("Parameter name argument of 'tolerance' must be a string")
+
+      abs_tol = nil
+      rel_tol = nil
+      args.each do |a|
+        if a.is_a?(Hash)
+          a.keys.each do |k|
+            if k == :absolute
+              abs_tol = a[k].to_f
+            elsif k == :relative
+              rel_tol = a[k].to_f
+            else
+              raise("Unknown option #{k.to_s} in 'tolerance' (allowed options are: absolute, relative)")
+            end
+          end
+        elsif abs_tol == nil
+          abs_tol = a.to_f
+        elsif rel_tol == nil
+          rel_tol = a.to_f
+        else
+          raise("Too many arguments in 'tolerance' (max. 4)")
+        end
+      end
+
+      abs_tol ||= 0.0
+      rel_tol ||= 0.0
+
+      dc = netlist.device_class_by_name(device_class_name)
+      if dc && dc.has_parameter?(parameter_name)
+        ep = RBA::EqualDeviceParameters::new(dc.parameter_id(parameter_name), abs_tol, rel_tol)
+        if dc.equal_parameters == nil
+          dc.equal_parameters = ep
+        else
+          dc.equal_parameters += ep
+        end
+      end
+
+    end
+
+    # %LVS%
     # @name align
     # @brief Aligns the extracted netlist vs. the schematic
     # @synopsis align

@@ -371,15 +371,6 @@ TEST(1_DeviceAndNetExtraction)
     "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
     "end;\n"
   );
-
-  //  compare the collected test data
-
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
-  au = tl::combine_path (au, "algo");
-  au = tl::combine_path (au, "device_extract_au1.gds");
-
-  db::compare_layouts (_this, ly, au);
 }
 
 TEST(2_DeviceAndNetExtractionFlat)

@@ -198,9 +198,23 @@ db::Region *LayoutToNetlist::make_polygon_layer (unsigned int layer_index, const
   return region.release ();
 }
 
+void LayoutToNetlist::link_nets (const db::Net *net, const db::Net *with)
+{
+  if (! net->circuit () || net->circuit () != with->circuit () || ! internal_layout ()
+      || ! internal_layout ()->is_valid_cell_index (net->circuit ()->cell_index ())
+      || net->cluster_id () == 0 || with->cluster_id () == 0) {
+    return;
+  }
+
+  connected_clusters<db::PolygonRef> &clusters = m_net_clusters.clusters_per_cell (net->circuit ()->cell_index ());
+  clusters.join_cluster_with (net->cluster_id (), with->cluster_id ());
+}
+
 size_t LayoutToNetlist::link_net_to_parent_circuit (const Net *subcircuit_net, Circuit *parent_circuit, const DCplxTrans &dtrans)
 {
-  if (! subcircuit_net->circuit () || ! has_internal_layout () || ! internal_layout ()->is_valid_cell_index (parent_circuit->cell_index ())) {
+  if (! subcircuit_net->circuit () || ! has_internal_layout ()
+      || ! internal_layout ()->is_valid_cell_index (parent_circuit->cell_index ())
+      || subcircuit_net->cluster_id () == 0) {
     return 0;
   }
 

@@ -24,6 +24,7 @@
 #include "tlFileUtils.h"
 #include "tlTimer.h"
 #include "tlStream.h"
+#include "tlEnv.h"
 
 #include <cmath>
 
@@ -85,8 +86,8 @@ void set_debug_mode (bool f)
 
 std::string testsrc ()
 {
-  const char *ts = getenv ("TESTSRC");
-  if (! ts) {
+  std::string ts = tl::get_env ("TESTSRC");
+  if (ts.empty ()) {
     throw tl::Exception ("TESTSRC undefined");
   }
   return ts;
@@ -104,8 +105,8 @@ std::string testsrc_private ()
 std::string testtmp ()
 {
   //  Ensures the test temp directory is present
-  const char *tt = getenv ("TESTTMP");
-  if (! tt) {
+  std::string tt = tl::get_env ("TESTTMP");
+  if (tt.empty ()) {
     throw tl::Exception ("TESTTMP undefined");
   }
   return tt;
@@ -145,6 +146,15 @@ CaptureChannel::CaptureChannel ()
   tl::info.add (this, false);
   tl::error.add (this, false);
   tl::warn.add (this, false);
+
+  //  Because we don't want to capture logger messages, we switch verbosity to "silent" during capturing
+  m_saved_verbosity = tl::verbosity ();
+  tl::verbosity (0);
+}
+
+CaptureChannel::~CaptureChannel ()
+{
+  tl::verbosity (m_saved_verbosity);
 }
 
 void CaptureChannel::puts (const char *s)

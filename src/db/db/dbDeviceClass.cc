@@ -39,11 +39,13 @@ static int compare_parameters (double pa, double pb, double absolute, double rel
   pa_min -= mean * relative;
   pa_max += mean * relative;
 
-  //  NOTE: parameter values may be small (e.g. pF for caps) -> no epsilon
+  //  NOTE: parameter values may be small (e.g. pF for caps) -> no fixed epsilon
 
-  if (pa_max < pb) {
+  double eps = (fabs (pa_max) + fabs(pa_min)) * 0.5e-10;
+
+  if (pa_max < pb - eps) {
     return -1;
-  } else if (pa_min > pb) {
+  } else if (pa_min > pb + eps) {
     return 1;
   } else {
     return 0;

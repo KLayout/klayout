@@ -509,9 +509,38 @@ END
     assert_equal(good, true)
 
     logger.clear
+    nl2.device_class_by_name("NMOS").equal_parameters = nil
+    assert_equal(nl2.device_class_by_name("NMOS").equal_parameters == nil, true)
+    good = comp.compare(nl1, nl2)
+
+    assert_equal(logger.text, <<"END")
+begin_circuit BUF BUF
+match_nets OUT OUT
+match_nets INT $10
+net_mismatch IN IN
+net_mismatch INT2 $11
+match_pins $0 $1
+match_pins $1 $3
+match_pins $2 $0
+match_pins $3 $2
+match_devices $1 $1
+match_devices $3 $2
+match_devices $5 $3
+match_devices $7 $4
+match_devices $2 $5
+match_devices $4 $6
+match_devices_with_different_parameters $6 $7
+match_devices $8 $8
+end_circuit BUF BUF NOMATCH
+END
+
+    assert_equal(good, false)
+
+    logger.clear
     eqp = RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_W, 0.01, 0.0)
     eqp = eqp + RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_L, 0.2, 0.0)
     nl2.device_class_by_name("NMOS").equal_parameters = eqp
+    assert_equal(nl2.device_class_by_name("NMOS").equal_parameters == nil, false)
     good = comp.compare(nl1, nl2)
 
     assert_equal(logger.text, <<"END")
@@ -538,9 +567,9 @@ END
     assert_equal(good, true)
 
     logger.clear
-    eqp = RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_W, 0.01, 0.0)
-    eqp += RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_L, 0.2, 0.0)
-    nl2.device_class_by_name("NMOS").equal_parameters = eqp
+    dc = nl2.device_class_by_name("NMOS")
+    dc.equal_parameters = RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_W, 0.01, 0.0)
+    dc.equal_parameters += RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_L, 0.2, 0.0)
     good = comp.compare(nl1, nl2)
 
     assert_equal(logger.text, <<"END")
@@ -984,6 +1013,57 @@ END
 
     assert_equal(good, true)
 
+  end
+
+  def test_11
+
+    nls = <<END
+      circuit RESCUBE (A=A,B=B);
+        device RES $1 (A=A,B=$1) (R=1000);
+        device RES $2 (A=A,B=$2) (R=1000);
+        device RES $3 (A=A,B=$3) (R=1000);
+        device RES $4 (A=$1,B=$4) (R=1000);
+        device RES $5 (A=$2,B=$4) (R=1000);
+        device RES $6 (A=$2,B=$5) (R=1000);
+        device RES $7 (A=$3,B=$5) (R=1000);
+        device RES $8 (A=$3,B=$6) (R=1000);
+        device RES $9 (A=$1,B=$6) (R=1000);
+        device RES $9 (A=$4,B=B) (R=1000);
+        device RES $10 (A=$5,B=B) (R=1000);
+        device RES $11 (A=$6,B=B) (R=1000);
+      end;
+END
+
+    nl = RBA::Netlist::new
+    prep_nl(nl, nls)
+
+    comp = RBA::NetlistComparer::new
+    comp.join_symmetric_nets(nl.circuit_by_name("RESCUBE"))
+
+    assert_equal(nl.to_s, <<END)
+circuit RESCUBE (A=A,B=B);
+  device RES $1 (A=A,B=$1) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $2 (A=A,B=$1) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $3 (A=A,B=$1) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $4 (A=$1,B=$4) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $5 (A=$1,B=$4) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $6 (A=$1,B=$4) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $7 (A=$1,B=$4) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $8 (A=$1,B=$4) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $9 (A=$1,B=$4) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $10 (A=$4,B=B) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $11 (A=$4,B=B) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $12 (A=$4,B=B) (R=1000,L=0,W=0,A=0,P=0);
+end;
+END
+
+    nl.combine_devices
+    assert_equal(nl.to_s, <<END)
+circuit RESCUBE (A=A,B=B);
+  device RES $10 (A=A,B=B) (R=833.333333333,L=0,W=0,A=0,P=0);
+end;
+END
+    
   end
 
 end

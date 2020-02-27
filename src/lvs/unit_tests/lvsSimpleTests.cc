@@ -80,6 +80,11 @@ TEST(1_simple)
   run_test (_this, "ringo_simple", "ringo.gds");
 }
 
+TEST(1b_simple_with_tolerance)
+{
+  run_test (_this, "ringo_simple_with_tol", "ringo.gds");
+}
+
 TEST(2_simple_io)
 {
   run_test (_this, "ringo_simple_io", "ringo.gds");
@@ -175,5 +180,10 @@ TEST(19_double_height_inv)
 TEST(20_double_height2_inv)
 {
   run_test (_this, "double_height2", "double_height2_inv.gds");
+}
+
+TEST(21_split_gate)
+{
+  run_test (_this, "nand2_split_gate", "nand2_split_gate.oas");
 }
 

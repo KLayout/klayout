@@ -146,6 +146,15 @@ CaptureChannel::CaptureChannel ()
   tl::info.add (this, false);
   tl::error.add (this, false);
   tl::warn.add (this, false);
+
+  //  Because we don't want to capture logger messages, we switch verbosity to "silent" during capturing
+  m_saved_verbosity = tl::verbosity ();
+  tl::verbosity (0);
+}
+
+CaptureChannel::~CaptureChannel ()
+{
+  tl::verbosity (m_saved_verbosity);
 }
 
 void CaptureChannel::puts (const char *s)

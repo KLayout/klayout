@@ -3721,7 +3721,7 @@ TEST(25_JoinSymmetricNets)
   prep_nl (nl, nls);
 
   db::NetlistComparer comp;
-  comp.join_symmetric_nodes (nl.circuit_by_name ("NAND2"));
+  comp.join_symmetric_nets (nl.circuit_by_name ("NAND2"));
 
   //  NOTE $1 and $2 are joined because they are symmetric
   EXPECT_EQ (nl.to_string (),
@@ -3758,7 +3758,7 @@ TEST(26_JoinSymmetricNets)
   prep_nl (nl, nls);
 
   db::NetlistComparer comp;
-  comp.join_symmetric_nodes (nl.circuit_by_name ("RESCUBE"));
+  comp.join_symmetric_nets (nl.circuit_by_name ("RESCUBE"));
 
   EXPECT_EQ (nl.to_string (),
     "circuit RESCUBE (A=A,B=B);\n"
@@ -3802,7 +3802,7 @@ TEST(27_DontJoinSymmetricNetsWithPins)
   prep_nl (nl, nls);
 
   db::NetlistComparer comp;
-  comp.join_symmetric_nodes (nl.circuit_by_name ("NAND2"));
+  comp.join_symmetric_nets (nl.circuit_by_name ("NAND2"));
 
   //  NOTE $1 and $2 are NOT joined because they have pins
   EXPECT_EQ (nl.to_string (),
@@ -3836,7 +3836,7 @@ TEST(28_NoSymmetryDetectionCases)
 
     db::NetlistComparer comp;
     std::string sref = nl.to_string ();
-    comp.join_symmetric_nodes (nl.circuit_by_name ("NAND2"));
+    comp.join_symmetric_nets (nl.circuit_by_name ("NAND2"));
 
     EXPECT_EQ (nl.to_string (), sref);
   }
@@ -3858,7 +3858,7 @@ TEST(28_NoSymmetryDetectionCases)
 
     db::NetlistComparer comp;
     std::string sref = nl.to_string ();
-    comp.join_symmetric_nodes (nl.circuit_by_name ("NAND2"));
+    comp.join_symmetric_nets (nl.circuit_by_name ("NAND2"));
 
     EXPECT_EQ (nl.to_string (), sref);
   }

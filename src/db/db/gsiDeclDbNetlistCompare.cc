@@ -557,6 +557,20 @@ Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
     "This method will perform the actual netlist compare using the given logger. It will return true if both netlists are identical. "
     "If the comparer has been configured with \\same_nets or similar methods, the objects given there must "
     "be located inside 'circuit_a' and 'circuit_b' respectively."
+  ) +
+  gsi::method ("join_symmetric_nets", &db::NetlistComparer::join_symmetric_nets, gsi::arg ("circuit"),
+    "@brief Joins symmetric nodes in the given circuit.\n"
+    "\n"
+    "Nodes are symmetrical if swapping them would not modify the circuit.\n"
+    "Hence they will carry the same potential and can be connected (joined).\n"
+    "This will simplify the circuit and can be applied before device combination\n"
+    "to render a schematic-equivalent netlist in some cases (split gate option).\n"
+    "\n"
+    "This algorithm will apply the comparer's settings to the symmetry\n"
+    "condition (device filtering, device compare tolerances, device class\n"
+    "equivalence etc.).\n"
+    "\n"
+    "This method has been introduced in version 0.26.4.\n"
   ),
   "@brief Compares two netlists\n"
   "This class performs a comparison of two netlists.\n"

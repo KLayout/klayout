@@ -90,6 +90,13 @@ class DBNetlist_TestClass < TestBase
     nl.each_circuit { |i| names << i.name }
     assert_equal(names, [ c.name, cc.name ])
 
+    assert_equal(nl.circuits_by_name("X*").collect { |c| c.name }, [ "XYZ" ])
+    assert_equal(nl.circuits_by_name("???").collect { |c| c.name }, [ "XYZ", "UVW" ])
+    assert_equal(nl.circuits_by_name("*").collect { |c| c.name }, [ "XYZ", "UVW" ])
+    assert_equal(nl.circuits_by_name("P*").collect { |c| c.name }, [])
+    assert_equal(nl.circuits_by_name("x*").collect { |c| c.name }, [])
+    assert_equal(nl.circuits_by_name("").collect { |c| c.name }, [])
+
     # same as _destroy
     nl.remove(c)
 

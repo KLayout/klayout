@@ -314,7 +314,7 @@ public:
    *  condition (device filtering, device compare tolerances, device class
    *  equivalence etc.).
    */
-  void join_symmetric_nodes (db::Circuit *circuit);
+  void join_symmetric_nets (db::Circuit *circuit);
 
 private:
   //  No copying

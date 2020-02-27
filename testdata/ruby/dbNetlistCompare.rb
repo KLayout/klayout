@@ -986,6 +986,57 @@ END
 
   end
 
+  def test_11
+
+    nls = <<END
+      circuit RESCUBE (A=A,B=B);
+        device RES $1 (A=A,B=$1) (R=1000);
+        device RES $2 (A=A,B=$2) (R=1000);
+        device RES $3 (A=A,B=$3) (R=1000);
+        device RES $4 (A=$1,B=$4) (R=1000);
+        device RES $5 (A=$2,B=$4) (R=1000);
+        device RES $6 (A=$2,B=$5) (R=1000);
+        device RES $7 (A=$3,B=$5) (R=1000);
+        device RES $8 (A=$3,B=$6) (R=1000);
+        device RES $9 (A=$1,B=$6) (R=1000);
+        device RES $9 (A=$4,B=B) (R=1000);
+        device RES $10 (A=$5,B=B) (R=1000);
+        device RES $11 (A=$6,B=B) (R=1000);
+      end;
+END
+
+    nl = RBA::Netlist::new
+    prep_nl(nl, nls)
+
+    comp = RBA::NetlistComparer::new
+    comp.join_symmetric_nets(nl.circuit_by_name("RESCUBE"))
+
+    assert_equal(nl.to_s, <<END)
+circuit RESCUBE (A=A,B=B);
+  device RES $1 (A=A,B=$1) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $2 (A=A,B=$1) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $3 (A=A,B=$1) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $4 (A=$1,B=$4) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $5 (A=$1,B=$4) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $6 (A=$1,B=$4) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $7 (A=$1,B=$4) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $8 (A=$1,B=$4) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $9 (A=$1,B=$4) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $10 (A=$4,B=B) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $11 (A=$4,B=B) (R=1000,L=0,W=0,A=0,P=0);
+  device RES $12 (A=$4,B=B) (R=1000,L=0,W=0,A=0,P=0);
+end;
+END
+
+    nl.combine_devices
+    assert_equal(nl.to_s, <<END)
+circuit RESCUBE (A=A,B=B);
+  device RES $10 (A=A,B=B) (R=833.333333333,L=0,W=0,A=0,P=0);
+end;
+END
+    
+  end
+
 end
 
 load("test_epilogue.rb")

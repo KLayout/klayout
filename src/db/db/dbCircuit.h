@@ -417,6 +417,11 @@ public:
   void remove_net (Net *net);
 
   /**
+   *  @brief Joins the second net with the first one and removes the second net
+   */
+  void join_nets (Net *net, Net *with);
+
+  /**
    *  @brief Gets the number of nets
    */
   size_t net_count () const

@@ -24,6 +24,7 @@
 #include "laySystemPaths.h"
 #include "tlFileUtils.h"
 #include "tlString.h"
+#include "tlEnv.h"
 
 #include <QDir>
 #include <QFileInfo>
@@ -31,14 +32,7 @@
 
 #ifdef _WIN32
 #  include <windows.h>
-#elif __APPLE__
-#  include <libproc.h>
-#  include <unistd.h>
-#else
-#  include <unistd.h>
 #endif
-
-#include <cstdlib>
 
 namespace lay
 {
@@ -46,17 +40,9 @@ namespace lay
 std::string 
 get_appdata_path ()
 {
-#ifdef _WIN32
-  wchar_t *env = _wgetenv (L"KLAYOUT_HOME");
-  if (env) {
-    return tl::to_string (QString ((const QChar *) env));
+  if (tl::has_env ("KLAYOUT_HOME")) {
+    return tl::get_env ("KLAYOUT_HOME");
   }
-#else
-  char *env = getenv ("KLAYOUT_HOME");
-  if (env) {
-    return (tl::system_to_string (env));
-  }
-#endif
 
   QDir appdata_dir = QDir::homePath ();
   QString appdata_folder;
@@ -138,23 +124,14 @@ get_klayout_path ()
 
     //  generate the klayout path: the first component is always the appdata path
     klayout_path.push_back (get_appdata_path ());
-#ifdef _WIN32
-    wchar_t *env = _wgetenv (L"KLAYOUT_PATH");
-    if (env) {
-      split_path (tl::to_string (QString ((const QChar *) env)), klayout_path);
+
+    std::string env = tl::get_env ("KLAYOUT_PATH");
+    if (! env.empty ()) {
+      split_path (env, klayout_path);
     } else {
       get_other_system_paths (klayout_path);
       klayout_path.push_back (tl::get_inst_path ());
     }
-#else
-    char *env = getenv ("KLAYOUT_PATH");
-    if (env) {
-      split_path (tl::system_to_string (env), klayout_path);
-    } else {
-      get_other_system_paths (klayout_path);
-      klayout_path.push_back (tl::get_inst_path ());
-    }
-#endif
 
     return klayout_path;
 
@@ -164,23 +141,7 @@ get_klayout_path ()
 std::string
 salt_mine_url ()
 {
-  const std::string default_url ("http://sami.klayout.org/repository.xml");
-
-#ifdef _WIN32
-  wchar_t *env = _wgetenv (L"KLAYOUT_SALT_MINE");
-  if (env) {
-    return tl::to_string (QString ((const QChar *) env));
-  } else {
-    return default_url;
-  }
-#else
-  char *env = getenv ("KLAYOUT_SALT_MINE");
-  if (env) {
-    return (tl::system_to_string (env));
-  } else {
-    return default_url;
-  }
-#endif
+  return tl::get_env ("KLAYOUT_SALT_MINE", "http://sami.klayout.org/repository.xml");
 }
 
 }

@@ -23,15 +23,11 @@
 
 #include "tlLog.h"
 #include "tlString.h"
+#include "tlEnv.h"
 
 #include <stdio.h>
 #if !defined(_MSC_VER)
 #  include <unistd.h>
-#endif
-#include <stdlib.h>
-
-#if defined(_WIN32)
-#  include <windows.h>
 #endif
 
 namespace tl
@@ -42,21 +38,9 @@ namespace tl
 
 static int default_verbosity ()
 {
-  const char *verbosity_str = 0;
-
-#if defined(_WIN32)
-  const wchar_t *verbosity_wstr = _wgetenv (L"KLAYOUT_VERBOSITY");
-  std::string vs;
-  if (verbosity_wstr) {
-    vs = tl::to_string (std::wstring (verbosity_wstr));
-    verbosity_str = vs.c_str ();
-  }
-#else
-  verbosity_str = getenv ("KLAYOUT_VERBOSITY");
-#endif
-
   int verbosity = 0;
-  if (verbosity_str) {
+  std::string verbosity_str = tl::get_env ("KLAYOUT_VERBOSITY");
+  if (! verbosity_str.empty ()) {
     try {
       tl::from_string (verbosity_str, verbosity);
     } catch (...) {

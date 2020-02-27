@@ -3703,3 +3703,204 @@ TEST(24_NodesRemovedButConnectedInOther)
   );
   EXPECT_EQ (good, true);
 }
+
+TEST(25_JoinSymmetricNets)
+{
+  const char *nls =
+    "circuit NAND2 (A=A,B=B,OUT=OUT,VSS=VSS,VDD=VDD);\n"
+    "  device PMOS $1 (S=OUT,G=A,D=VDD) (L=0.25,W=1);\n"
+    "  device PMOS $2 (S=VDD,G=B,D=OUT) (L=0.25,W=1);\n"
+    //  NOTE: $1 and $2 are separate nets, but can be joined due to symmetry
+    "  device NMOS $3 (S=$1,G=A,D=OUT) (L=0.25,W=1);\n"
+    "  device NMOS $4 (S=$2,G=A,D=OUT) (L=0.25,W=1);\n"
+    "  device NMOS $5 (S=$1,G=B,D=VSS) (L=0.25,W=1);\n"
+    "  device NMOS $6 (S=$2,G=B,D=VSS) (L=0.25,W=1);\n"
+    "end;\n";
+
+  db::Netlist nl;
+  prep_nl (nl, nls);
+
+  db::NetlistComparer comp;
+  comp.join_symmetric_nets (nl.circuit_by_name ("NAND2"));
+
+  //  NOTE $1 and $2 are joined because they are symmetric
+  EXPECT_EQ (nl.to_string (),
+    "circuit NAND2 (A=A,B=B,OUT=OUT,VSS=VSS,VDD=VDD);\n"
+    "  device PMOS $1 (S=OUT,G=A,D=VDD) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $2 (S=VDD,G=B,D=OUT) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $3 (S=$1,G=A,D=OUT) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $4 (S=$1,G=A,D=OUT) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $5 (S=$1,G=B,D=VSS) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $6 (S=$1,G=B,D=VSS) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  )
+}
+
+TEST(25b_JoinSymmetricNetsMultiple)
+{
+  const char *nls =
+    "circuit NAND2 (A=A,B=B,OUT=OUT,VSS=VSS,VDD=VDD);\n"
+    "  device PMOS $1 (S=OUT,G=A,D=VDD) (L=0.25,W=1);\n"
+    "  device PMOS $2 (S=VDD,G=B,D=OUT) (L=0.25,W=1);\n"
+    "  device PMOS $3 (S=VDD,G=C,D=OUT) (L=0.25,W=1);\n"
+    //  NOTE: $1 and $2 are separate nets, but can be joined due to symmetry
+    "  device NMOS $4 (S=$1,G=A,D=OUT) (L=0.25,W=1);\n"
+    "  device NMOS $5 (S=$2,G=A,D=OUT) (L=0.25,W=1);\n"
+    "  device NMOS $6 (S=$3,G=A,D=OUT) (L=0.25,W=1);\n"
+    "  device NMOS $7 (S=$1,G=B,D=$4) (L=0.25,W=1);\n"
+    "  device NMOS $8 (S=$2,G=B,D=$5) (L=0.25,W=1);\n"
+    "  device NMOS $9 (S=$3,G=B,D=$6) (L=0.25,W=1);\n"
+    "  device NMOS $10 (S=$4,G=C,D=VSS) (L=0.25,W=1);\n"
+    "  device NMOS $11 (S=$5,G=C,D=VSS) (L=0.25,W=1);\n"
+    "  device NMOS $12 (S=$6,G=C,D=VSS) (L=0.25,W=1);\n"
+    "end;\n";
+
+  db::Netlist nl;
+  prep_nl (nl, nls);
+
+  db::NetlistComparer comp;
+  comp.join_symmetric_nets (nl.circuit_by_name ("NAND2"));
+
+  nl.combine_devices ();
+
+  //  NOTE $1 and $2 are joined because they are symmetric
+  EXPECT_EQ (nl.to_string (),
+    "circuit NAND2 (A=A,B=B,OUT=OUT,VSS=VSS,VDD=VDD);\n"
+    "  device PMOS $1 (S=OUT,G=A,D=VDD) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $2 (S=VDD,G=B,D=OUT) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $3 (S=VDD,G=C,D=OUT) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $4 (S=$1,G=A,D=OUT) (L=0.25,W=3,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $7 (S=$1,G=B,D=$4) (L=0.25,W=3,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $10 (S=$4,G=C,D=VSS) (L=0.25,W=3,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  )
+}
+
+TEST(26_JoinSymmetricNets)
+{
+  const char *nls =
+    "circuit RESCUBE (A=A,B=B);\n"
+    "  device RES $1 (A=A,B=$1) (R=1000);\n"
+    "  device RES $2 (A=A,B=$2) (R=1000);\n"
+    "  device RES $3 (A=A,B=$3) (R=1000);\n"
+    "  device RES $4 (A=$1,B=$4) (R=1000);\n"
+    "  device RES $5 (A=$2,B=$4) (R=1000);\n"
+    "  device RES $6 (A=$2,B=$5) (R=1000);\n"
+    "  device RES $7 (A=$3,B=$5) (R=1000);\n"
+    "  device RES $8 (A=$3,B=$6) (R=1000);\n"
+    "  device RES $9 (A=$1,B=$6) (R=1000);\n"
+    "  device RES $9 (A=$4,B=B) (R=1000);\n"
+    "  device RES $10 (A=$5,B=B) (R=1000);\n"
+    "  device RES $11 (A=$6,B=B) (R=1000);\n"
+    "end;\n";
+
+  db::Netlist nl;
+  prep_nl (nl, nls);
+
+  db::NetlistComparer comp;
+  comp.join_symmetric_nets (nl.circuit_by_name ("RESCUBE"));
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit RESCUBE (A=A,B=B);\n"
+    "  device RES $1 (A=A,B=$1) (R=1000,L=0,W=0,A=0,P=0);\n"
+    "  device RES $2 (A=A,B=$1) (R=1000,L=0,W=0,A=0,P=0);\n"
+    "  device RES $3 (A=A,B=$1) (R=1000,L=0,W=0,A=0,P=0);\n"
+    "  device RES $4 (A=$1,B=$4) (R=1000,L=0,W=0,A=0,P=0);\n"
+    "  device RES $5 (A=$1,B=$4) (R=1000,L=0,W=0,A=0,P=0);\n"
+    "  device RES $6 (A=$1,B=$4) (R=1000,L=0,W=0,A=0,P=0);\n"
+    "  device RES $7 (A=$1,B=$4) (R=1000,L=0,W=0,A=0,P=0);\n"
+    "  device RES $8 (A=$1,B=$4) (R=1000,L=0,W=0,A=0,P=0);\n"
+    "  device RES $9 (A=$1,B=$4) (R=1000,L=0,W=0,A=0,P=0);\n"
+    "  device RES $10 (A=$4,B=B) (R=1000,L=0,W=0,A=0,P=0);\n"
+    "  device RES $11 (A=$4,B=B) (R=1000,L=0,W=0,A=0,P=0);\n"
+    "  device RES $12 (A=$4,B=B) (R=1000,L=0,W=0,A=0,P=0);\n"
+    "end;\n"
+  )
+
+  nl.combine_devices ();
+  EXPECT_EQ (nl.to_string (),
+    "circuit RESCUBE (A=A,B=B);\n"
+    "  device RES $10 (A=A,B=B) (R=833.333333333,L=0,W=0,A=0,P=0);\n"
+    "end;\n"
+  )
+}
+
+TEST(27_DontJoinSymmetricNetsWithPins)
+{
+  const char *nls =
+    "circuit NAND2 (A=A,B=B,OUT=OUT,VSS=VSS,VDD=VDD,X=$1,Y=$2);\n"
+    "  device PMOS $1 (S=OUT,G=A,D=VDD) (L=0.25,W=1);\n"
+    "  device PMOS $2 (S=VDD,G=B,D=OUT) (L=0.25,W=1);\n"
+    //  NOTE: $1 and $2 are separate nets, but can be joined due to symmetry
+    "  device NMOS $3 (S=$1,G=A,D=OUT) (L=0.25,W=1);\n"
+    "  device NMOS $4 (S=$2,G=A,D=OUT) (L=0.25,W=1);\n"
+    "  device NMOS $5 (S=$1,G=B,D=VSS) (L=0.25,W=1);\n"
+    "  device NMOS $6 (S=$2,G=B,D=VSS) (L=0.25,W=1);\n"
+    "end;\n";
+
+  db::Netlist nl;
+  prep_nl (nl, nls);
+
+  db::NetlistComparer comp;
+  comp.join_symmetric_nets (nl.circuit_by_name ("NAND2"));
+
+  //  NOTE $1 and $2 are NOT joined because they have pins
+  EXPECT_EQ (nl.to_string (),
+    "circuit NAND2 (A=A,B=B,OUT=OUT,VSS=VSS,VDD=VDD,X=$1,Y=$2);\n"
+    "  device PMOS $1 (S=OUT,G=A,D=VDD) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $2 (S=VDD,G=B,D=OUT) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $3 (S=$1,G=A,D=OUT) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $4 (S=$2,G=A,D=OUT) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $5 (S=$1,G=B,D=VSS) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $6 (S=$2,G=B,D=VSS) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  )
+}
+
+TEST(28_NoSymmetryDetectionCases)
+{
+  {
+    const char *nls =
+      "circuit NAND2 (A=A,B=B,OUT=OUT,VSS=VSS,VDD=VDD);\n"
+      "  device PMOS $1 (S=OUT,G=A,D=VDD) (L=0.25,W=1);\n"
+      "  device PMOS $2 (S=VDD,G=B,D=OUT) (L=0.25,W=1);\n"
+      //  NOTE: $1 and $2 are separate nets, but cannot be joined because of different W
+      "  device NMOS $3 (S=$1,G=A,D=OUT) (L=0.25,W=1);\n"
+      "  device NMOS $4 (S=$2,G=A,D=OUT) (L=0.25,W=1.1);\n"
+      "  device NMOS $5 (S=$1,G=B,D=VSS) (L=0.25,W=1);\n"
+      "  device NMOS $6 (S=$2,G=B,D=VSS) (L=0.25,W=1);\n"
+      "end;\n";
+
+    db::Netlist nl;
+    prep_nl (nl, nls);
+
+    db::NetlistComparer comp;
+    std::string sref = nl.to_string ();
+    comp.join_symmetric_nets (nl.circuit_by_name ("NAND2"));
+
+    EXPECT_EQ (nl.to_string (), sref);
+  }
+
+  {
+    const char *nls =
+      "circuit NAND2 (A=A,B=B,OUT=OUT,VSS=VSS,VSS2=VSS2,VDD=VDD);\n"
+      "  device PMOS $1 (S=OUT,G=A,D=VDD) (L=0.25,W=1);\n"
+      "  device PMOS $2 (S=VDD,G=B,D=OUT) (L=0.25,W=1);\n"
+      "  device NMOS $3 (S=$1,G=A,D=OUT) (L=0.25,W=1);\n"
+      "  device NMOS $4 (S=$2,G=A,D=OUT) (L=0.25,W=1);\n"
+      //  NOTE: $1 and $2 are separate nets, but cannot be joined because of different D connections
+      "  device NMOS $5 (S=$1,G=B,D=VSS) (L=0.25,W=1);\n"
+      "  device NMOS $6 (S=$2,G=B,D=VSS2) (L=0.25,W=1);\n"
+      "end;\n";
+
+    db::Netlist nl;
+    prep_nl (nl, nls);
+
+    db::NetlistComparer comp;
+    std::string sref = nl.to_string ();
+    comp.join_symmetric_nets (nl.circuit_by_name ("NAND2"));
+
+    EXPECT_EQ (nl.to_string (), sref);
+  }
+}
+

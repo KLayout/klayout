@@ -342,6 +342,30 @@ void Circuit::remove_net (Net *net)
   m_nets.erase (net);
 }
 
+void Circuit::join_nets (Net *net, Net *with)
+{
+  while (with->begin_terminals () != with->end_terminals ()) {
+    db::Device *device = const_cast<db::Device *> (with->begin_terminals ()->device ());
+    device->connect_terminal (with->begin_terminals ()->terminal_id (), net);
+  }
+
+  while (with->begin_subcircuit_pins () != with->end_subcircuit_pins ()) {
+    db::SubCircuit *subcircuit = const_cast<db::SubCircuit *> (with->begin_subcircuit_pins ()->subcircuit ());
+    subcircuit->connect_pin (with->begin_subcircuit_pins ()->pin_id (), net);
+  }
+
+  while (with->begin_pins () != with->end_pins ()) {
+    connect_pin (with->begin_pins ()->pin_id (), net);
+  }
+
+  //  TODO: join clusters too, join net properties(?)
+  if (netlist ()->callbacks ()) {
+    netlist ()->callbacks ()->link_nets (net, with);
+  }
+
+  remove_net (with);
+}
+
 void Circuit::add_device (Device *device)
 {
   device->set_circuit (this);

@@ -1214,6 +1214,12 @@ Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
   gsi::method ("remove_net", &db::Circuit::remove_net, gsi::arg ("net"),
     "@brief Removes the given net from the circuit\n"
   ) +
+  gsi::method ("join_nets", &db::Circuit::join_nets, gsi::arg ("net"), gsi::arg ("with"),
+    "@brief Joins (connects) two nets into one\n"
+    "This method will connect the 'with' net with 'net' and remove 'with'.\n"
+    "\n"
+    "This method has been introduced in version 0.26.4."
+  ) +
   gsi::iterator ("each_net", (db::Circuit::net_iterator (db::Circuit::*) ()) &db::Circuit::begin_nets, (db::Circuit::net_iterator (db::Circuit::*) ()) &db::Circuit::end_nets,
     "@brief Iterates over the nets of the circuit"
   ) +
@@ -1425,6 +1431,22 @@ static void blank_circuit_by_name (db::Netlist *nl, const std::string &name_patt
   }
 }
 
+static std::vector<db::Circuit *>
+circuits_by_name (db::Netlist *netlist, const std::string &name_pattern)
+{
+  std::vector<db::Circuit *> res;
+
+  tl::GlobPattern glob (name_pattern);
+  for (db::Netlist::circuit_iterator c = netlist->begin_circuits (); c != netlist->end_circuits (); ++c) {
+    db::Circuit *circuit = c.operator-> ();
+    if (glob.match (circuit->name ())) {
+      res.push_back (circuit);
+    }
+  }
+
+  return res;
+}
+
 Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::method_ext ("add", &gsi::add_circuit, gsi::arg ("circuit"),
     "@brief Adds the circuit to the netlist\n"
@@ -1481,6 +1503,12 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::method ("circuit_by_name", (db::Circuit *(db::Netlist::*) (const std::string &)) &db::Netlist::circuit_by_name, gsi::arg ("name"),
     "@brief Gets the circuit object for a given name.\n"
     "If the name is not a valid circuit name, nil is returned."
+  ) +
+  gsi::method_ext ("circuits_by_name", &circuits_by_name, gsi::arg ("name_pattern"),
+    "@brief Gets the circuit objects for a given name filter.\n"
+    "The name filter is a glob pattern. This method will return all \\Circuit objects matching the glob pattern.\n"
+    "\n"
+    "This method has been introduced in version 0.26.4.\n"
   ) +
   gsi::iterator ("each_circuit_top_down", (db::Netlist::top_down_circuit_iterator (db::Netlist::*) ()) &db::Netlist::begin_top_down, (db::Netlist::top_down_circuit_iterator (db::Netlist::*) ()) &db::Netlist::end_top_down,
     "@brief Iterates over the circuits top-down\n"

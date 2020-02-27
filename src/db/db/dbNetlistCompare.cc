@@ -27,20 +27,50 @@
 #include "tlTimer.h"
 #include "tlEquivalenceClusters.h"
 #include "tlLog.h"
+#include "tlEnv.h"
+#include "tlInternational.h"
 
 #include <cstring>
 
-//  verbose debug output
-//  TODO: make this a feature?
-// #define PRINT_DEBUG_NETCOMPARE
+namespace {
 
-//  verbose net graph output
-//  TODO: make this a feature?
-// #define PRINT_DEBUG_NETGRAPH
+struct GlobalCompareOptions
+{
+  GlobalCompareOptions ()
+  {
+    m_is_initialized = false;
+  }
 
-//  Add this define for case insensitive compare
-//  (applies to circuits, device classes)
-#define COMPARE_CASE_INSENSITIVE
+  void ensure_initialized ()
+  {
+    if (! m_is_initialized) {
+      //  $KLAYOUT_NETLIST_COMPARE_DEBUG_NETCOMPARE
+      debug_netcompare = tl::app_flag ("netlist-compare-debug-netcompare");
+      //  $KLAYOUT_NETLIST_COMPARE_DEBUG_NETGRAPH
+      debug_netgraph = tl::app_flag ("netlist-compare-debug-netgraph");
+      //  $KLAYOUT_NETLIST_COMPARE_CASE_SENSITIVE
+      compare_case_sensitive = tl::app_flag ("netlist-compare-case-sensitive");
+      m_is_initialized = true;
+    }
+  }
+
+  bool debug_netcompare;
+  bool debug_netgraph;
+  bool compare_case_sensitive;
+
+private:
+  bool m_is_initialized;
+};
+
+}
+
+static GlobalCompareOptions *options ()
+{
+  //  TODO: thread safe?
+  static GlobalCompareOptions s_options;
+  s_options.ensure_initialized ();
+  return &s_options;
+}
 
 //  A constant indicating a failed match
 const size_t failed_match = std::numeric_limits<size_t>::max ();
@@ -63,28 +93,25 @@ namespace db
 static int name_compare (const std::string &n1, const std::string &n2)
 {
   //  TODO: unicode support?
-#if defined(COMPARE_CASE_INSENSITIVE)
+  if (options ()->compare_case_sensitive) {
+    return strcmp (n1.c_str (), n2.c_str ());
+  } else {
 #if defined(_WIN32)
-  return _stricmp (n1.c_str (), n2.c_str ());
+    return _stricmp (n1.c_str (), n2.c_str ());
 #else
-  return strcasecmp (n1.c_str (), n2.c_str ());
+    return strcasecmp (n1.c_str (), n2.c_str ());
 #endif
-#else
-  return strcmp (n1.c_str (), n2.c_str ());
-#endif
+  }
 }
 
-#if defined(COMPARE_CASE_INSENSITIVE)
-static std::string normalize_name (const std::string &n)
+static inline std::string normalize_name (const std::string &n)
 {
-  return tl::to_upper_case (n);
+  if (options ()->compare_case_sensitive) {
+    return n;
+  } else {
+    return tl::to_upper_case (n);
+  }
 }
-#else
-static inline const std::string &normalize_name (const std::string &n)
-{
-  return n;
-}
-#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 //  DeviceCompare definition and implementation
@@ -1515,11 +1542,12 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
   for (std::vector<NetGraphNode>::iterator i = m_nodes.begin (); i != m_nodes.end (); ++i) {
     i->apply_net_index (m_net_index);
   }
-#if defined(PRINT_DEBUG_NETGRAPH)
-  for (std::vector<NetGraphNode>::iterator i = m_nodes.begin (); i != m_nodes.end (); ++i) {
-    tl::info << i->to_string () << tl::noendl;
+
+  if (options ()->debug_netgraph) {
+    for (std::vector<NetGraphNode>::iterator i = m_nodes.begin (); i != m_nodes.end (); ++i) {
+      tl::info << i->to_string () << tl::noendl;
+    }
   }
-#endif
 
   //  create subcircuit virtual nodes
 
@@ -1543,11 +1571,12 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
   for (std::map<const db::SubCircuit *, NetGraphNode>::iterator i = m_virtual_nodes.begin (); i != m_virtual_nodes.end (); ++i) {
     i->second.apply_net_index (m_net_index);
   }
-#if defined(PRINT_DEBUG_NETGRAPH)
-  for (std::map<const db::SubCircuit *, NetGraphNode>::iterator i = m_virtual_nodes.begin (); i != m_virtual_nodes.end (); ++i) {
-    tl::info << i->second.to_string () << tl::noendl;
+
+  if (options ()->debug_netgraph) {
+    for (std::map<const db::SubCircuit *, NetGraphNode>::iterator i = m_virtual_nodes.begin (); i != m_virtual_nodes.end (); ++i) {
+      tl::info << i->second.to_string () << tl::noendl;
+    }
   }
-#endif
 }
 
 size_t
@@ -1560,34 +1589,48 @@ NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGr
 
   std::vector<const NetGraphNode *> other_nodes;
   other_nodes.reserve (ee - e);
-#if defined(PRINT_DEBUG_NETCOMPARE)
-  tl::info << indent(depth) << "consider transitions:";
-#endif
+  if (options ()->debug_netcompare) {
+    tl::info << indent(depth) << "considering transitions:";
+  }
+
+  bool first = true;
 
   for (NetGraphNode::edge_iterator i = e; i != ee; ++i) {
     if (i->second.first != net_index) {
       const NetGraphNode *nn = &node (i->second.first);
-#if defined(PRINT_DEBUG_NETCOMPARE)
-      tl::info << indent(depth) << "here: " << (nn->net() ? nn->net()->expanded_name().c_str() : "(null)") << " via";
-      for (std::vector<NetGraphNode::Transition>::const_iterator t = i->first.begin (); t != i->first.end(); ++t) {
-        tl::info << indent(depth) << "  " << t->to_string();
+      if (options ()->debug_netcompare) {
+        if (first) {
+          tl::info << indent (depth) << "  here: " << (node (net_index).net () ? node (net_index).net ()->expanded_name ().c_str () : "(null)") << " ->";
+          first = false;
+        }
+        tl::info << indent (depth) << "    " << (nn->net () ? nn->net ()->expanded_name ().c_str() : "(null)") << " via: " << tl::noendl;
+        for (std::vector<NetGraphNode::Transition>::const_iterator t = i->first.begin (); t != i->first.end(); ++t) {
+          tl::info << (t != i->first.begin () ? "; " : "") << t->to_string() << tl::noendl;
+        }
+        tl::info << "";
       }
-#endif
       nodes.push_back (nn);
     }
   }
 
   if (! nodes.empty ()) {   //  if non-ambiguous, non-assigned
 
+    first = true;
+
     for (NetGraphNode::edge_iterator i = e_other; i != ee_other; ++i) {
       if (i->second.first != other_net_index) {
         const NetGraphNode *nn = &data->other->node (i->second.first);
-#if defined(PRINT_DEBUG_NETCOMPARE)
-        tl::info << indent(depth) << "there: " << (nn->net() ? nn->net()->expanded_name().c_str() : "(null)") << " via";
-        for (std::vector<NetGraphNode::Transition>::const_iterator t = i->first.begin (); t != i->first.end(); ++t) {
-          tl::info << indent(depth) << "  " << t->to_string();
+        if (options ()->debug_netcompare) {
+          if (first) {
+            tl::info << indent (depth) << "  there: " << (data->other->node (other_net_index).net () ? data->other->node (other_net_index).net ()->expanded_name ().c_str () : "(null)") << " ->";
+            first = false;
+          }
+          tl::info << indent(depth) << "    " << (nn->net() ? nn->net()->expanded_name().c_str() : "(null)") << " via: " << tl::noendl;
+          for (std::vector<NetGraphNode::Transition>::const_iterator t = i->first.begin (); t != i->first.end(); ++t) {
+            tl::info << (t != i->first.begin () ? "; " : "") << t->to_string() << tl::noendl;
+          }
+          tl::info << "";
         }
-#endif
         other_nodes.push_back (nn);
       }
     }
@@ -1604,9 +1647,9 @@ NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGr
     if (tentative) {
 
       if (nodes.size () != other_nodes.size ()) {
-#if defined(PRINT_DEBUG_NETCOMPARE)
-        tl::info << indent(depth) << "! rejected branch.";
-#endif
+        if (options ()->debug_netcompare) {
+          tl::info << indent(depth) << "=> rejected branch.";
+        }
         return failed_match;
       }
 
@@ -1614,9 +1657,9 @@ NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGr
       if (nodes.size () > 1 || other_nodes.size () > 1) {
         for (size_t i = 0; i < nodes.size (); ++i) {
           if (! (*nodes[i] == *other_nodes[i])) {
-#if defined(PRINT_DEBUG_NETCOMPARE)
-            tl::info << indent(depth) << "! rejected branch.";
-#endif
+            if (options ()->debug_netcompare) {
+              tl::info << indent(depth) << "=> rejected branch.";
+            }
             return failed_match;
           }
         }
@@ -1631,9 +1674,9 @@ NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGr
 
     if (bt_count == failed_match) {
       if (tentative) {
-#if defined(PRINT_DEBUG_NETCOMPARE)
-        tl::info << indent(depth) << "! rejected branch.";
-#endif
+        if (options ()->debug_netcompare) {
+          tl::info << indent(depth) << "=> rejected branch.";
+        }
         return bt_count;
       }
     } else {
@@ -1642,11 +1685,11 @@ NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGr
 
   }
 
-#if defined(PRINT_DEBUG_NETCOMPARE)
-  if (! new_nodes) {
-    tl::info << indent(depth) << "! no updates.";
+  if (options ()->debug_netcompare) {
+    if (! new_nodes) {
+      tl::info << indent(depth) << "=> no updates.";
+    }
   }
-#endif
   return new_nodes;
 }
 
@@ -1671,13 +1714,13 @@ NetGraph::derive_node_identities (size_t net_index, size_t depth, size_t n_branc
   size_t other_net_index = n->other_net_index ();
   NetGraphNode *n_other = & data->other->node (other_net_index);
 
-#if defined(PRINT_DEBUG_NETCOMPARE)
-  if (! tentative) {
-    tl::info << indent(depth) << "deducing from pair: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
-  } else {
-    tl::info << indent(depth) << "tentatively deducing from pair: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
+  if (options ()->debug_netcompare) {
+    if (! tentative) {
+      tl::info << indent(depth) << "deducing from pair: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
+    } else {
+      tl::info << indent(depth) << "tentatively deducing from pair: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
+    }
   }
-#endif
 
   size_t new_nodes = 0;
 
@@ -1722,9 +1765,9 @@ NetGraph::derive_node_identities (size_t net_index, size_t depth, size_t n_branc
 
       size_t bt_count = derive_node_identities_for_edges (e, ee, e_other, ee_other, net_index, other_net_index, depth, n_branch, tentative, with_ambiguous, data);
       if (bt_count == failed_match) {
-#if defined(PRINT_DEBUG_NETCOMPARE)
-        tl::info << indent(depth) << "! rejected pair.";
-#endif
+        if (options ()->debug_netcompare) {
+          tl::info << indent(depth) << "=> rejected pair.";
+        }
         return bt_count;
       } else {
         new_nodes += bt_count;
@@ -1733,9 +1776,9 @@ NetGraph::derive_node_identities (size_t net_index, size_t depth, size_t n_branc
     } else if (tentative) {
       //  in tentative mode an exact match is required: no having the same edges for a node disqualifies the node
       //  as matching.
-#if defined(PRINT_DEBUG_NETCOMPARE)
-      tl::info << indent(depth) << "! rejected pair for missing edge.";
-#endif
+      if (options ()->debug_netcompare) {
+        tl::info << indent(depth) << "=> rejected pair for missing edge.";
+      }
       return failed_match;
     }
 
@@ -1758,9 +1801,9 @@ NetGraph::derive_node_identities (size_t net_index, size_t depth, size_t n_branc
 
       NetGraphNode::edge_iterator e = n->find_edge (e_other->first);
       if (e == n->end ()) {
-#if defined(PRINT_DEBUG_NETCOMPARE)
-        tl::info << indent(depth) << "! rejected pair for missing edge.";
-#endif
+        if (options ()->debug_netcompare) {
+          tl::info << indent(depth) << "=> rejected pair for missing edge.";
+        }
         return failed_match;
       }
 
@@ -1770,11 +1813,11 @@ NetGraph::derive_node_identities (size_t net_index, size_t depth, size_t n_branc
 
   }
 
-#if defined(PRINT_DEBUG_NETCOMPARE)
-  if (! tentative && new_nodes > 0) {
-    tl::info << indent(depth) << "finished pair deduction: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name () << " with " << new_nodes << " new pairs";
+  if (options ()->debug_netcompare) {
+    if (! tentative && new_nodes > 0) {
+      tl::info << indent(depth) << "=> finished pair deduction: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name () << " with " << new_nodes << " new pairs";
+    }
   }
-#endif
 
   return new_nodes;
 }
@@ -1855,17 +1898,18 @@ static bool net_names_are_different (const db::Net *a, const db::Net *b)
 size_t
 NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *> &nodes, std::vector<const NetGraphNode *> &other_nodes, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data)
 {
-#if defined(PRINT_DEBUG_NETCOMPARE)
-  std::string indent_s = indent (depth);
-  indent_s += "*" + tl::to_string (n_branch) + " ";
-#endif
+  std::string indent_s;
+  if (options ()->debug_netcompare) {
+    indent_s = indent (depth);
+    indent_s += "*" + tl::to_string (n_branch) + " ";
+  }
 
   size_t new_nodes = 0;
 
   if (depth > data->max_depth) {
-#if defined(PRINT_DEBUG_NETCOMPARE)
-    tl::info << indent_s << "max. depth exhausted (" << depth + 1 << ">" << data->max_depth << ")";
-#endif
+    if (options ()->debug_netcompare) {
+      tl::info << indent_s << "max. depth exhausted (" << depth + 1 << ">" << data->max_depth << ")";
+    }
     return failed_match;
   }
 
@@ -1881,9 +1925,9 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
 
       TentativeNodeMapping::map_pair (tentative, this, ni, data->other, other_ni);
 
-#if defined(PRINT_DEBUG_NETCOMPARE)
-      tl::info << indent_s << "deduced match (singular): " << nodes.front ()->net ()->expanded_name () << " vs. " << other_nodes.front ()->net ()->expanded_name ();
-#endif
+      if (options ()->debug_netcompare) {
+        tl::info << indent_s << "deduced match (singular): " << nodes.front ()->net ()->expanded_name () << " vs. " << other_nodes.front ()->net ()->expanded_name ();
+      }
       if (data->logger && ! tentative) {
         if (! (node (ni) == data->other->node (other_ni))) {
           //  this is a mismatch but we continue, because that is the only candidate
@@ -2030,9 +2074,9 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
         //  their names differ -> this favors net matching by name
 
         if (tentative && ! data->dont_consider_net_names && net_names_are_different ((*nr->n1)->net (), (*nr->n2)->net ())) {
-#if defined(PRINT_DEBUG_NETCOMPARE)
-          tl::info << indent_s << "rejecting pair as names are not identical: " << (*nr->n1)->net ()->expanded_name () << " vs. " << (*nr->n2)->net ()->expanded_name ();
-#endif
+          if (options ()->debug_netcompare) {
+            tl::info << indent_s << "rejecting pair as names are not identical: " << (*nr->n1)->net ()->expanded_name () << " vs. " << (*nr->n2)->net ()->expanded_name ();
+          }
           return failed_match;
         }
 
@@ -2044,9 +2088,9 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
 
         TentativeNodeMapping::map_pair (tentative, this, ni, data->other, other_ni);
 
-#if defined(PRINT_DEBUG_NETCOMPARE)
-        tl::info << indent_s << "deduced match (singular): " << (*nr->n1)->net ()->expanded_name () << " vs. " << (*nr->n2)->net ()->expanded_name ();
-#endif
+        if (options ()->debug_netcompare) {
+          tl::info << indent_s << "deduced match (singular): " << (*nr->n1)->net ()->expanded_name () << " vs. " << (*nr->n2)->net ()->expanded_name ();
+        }
         if (data->logger && ! tentative) {
           if (! (node (ni) == data->other->node (other_ni))) {
             //  this is a mismatch, but we continue with this
@@ -2086,16 +2130,16 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
 
     } else if (nr->num * n_branch > data->max_n_branch) {
 
-#if defined(PRINT_DEBUG_NETCOMPARE)
-      tl::info << indent_s << "max. complexity exhausted (" << nr->num << "*" << n_branch << ">" << data->max_n_branch << ") - mismatch.";
-#endif
+      if (options ()->debug_netcompare) {
+        tl::info << indent_s << "max. complexity exhausted (" << nr->num << "*" << n_branch << ">" << data->max_n_branch << ") - mismatch.";
+      }
       return failed_match;
 
     } else {
 
-#if defined(PRINT_DEBUG_NETCOMPARE)
-      tl::info << indent_s << "analyzing ambiguity group with " << nr->num << " members";
-#endif
+      if (options ()->debug_netcompare) {
+        tl::info << indent_s << "analyzing ambiguity group with " << nr->num << " members";
+      }
 
       //  sort the ambiguity group such that net names match best
 
@@ -2152,16 +2196,16 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
             TentativeNodeMapping::map_pair_from_unknown (&tn, this, ni, data->other, other_ni);
 
             //  try this candidate in tentative mode
-#if defined(PRINT_DEBUG_NETCOMPARE)
-            tl::info << indent_s << "trying in tentative mode: " << (*i1)->net ()->expanded_name () << " vs. " << (*i2)->net ()->expanded_name ();
-#endif
+            if (options ()->debug_netcompare) {
+              tl::info << indent_s << "trying in tentative mode: " << (*i1)->net ()->expanded_name () << " vs. " << (*i2)->net ()->expanded_name ();
+            }
             size_t bt_count = derive_node_identities (ni, depth + 1, nr->num * n_branch, &tn, with_ambiguous, data);
 
             if (bt_count != failed_match) {
 
-#if defined(PRINT_DEBUG_NETCOMPARE)
-              tl::info << indent_s << "match found";
-#endif
+              if (options ()->debug_netcompare) {
+                tl::info << indent_s << "match found";
+              }
               //  we have a match ...
 
               if (any) {
@@ -2185,9 +2229,9 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
           }
 
           if (! any && tentative) {
-#if defined(PRINT_DEBUG_NETCOMPARE)
-            tl::info << indent_s << "mismatch.";
-#endif
+            if (options ()->debug_netcompare) {
+              tl::info << indent_s << "mismatch.";
+            }
             //  a mismatch - stop here.
             return failed_match;
           }
@@ -2207,13 +2251,13 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
 
           TentativeNodeMapping::map_pair (tentative, this, ni, data->other, other_ni);
 
-#if defined(PRINT_DEBUG_NETCOMPARE)
-          if (equivalent_other_nodes.has_attribute (p->second)) {
-            tl::info << indent_s << "deduced ambiguous match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
-          } else {
-            tl::info << indent_s << "deduced match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
+          if (options ()->debug_netcompare) {
+            if (equivalent_other_nodes.has_attribute (p->second)) {
+              tl::info << indent_s << "deduced ambiguous match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
+            } else {
+              tl::info << indent_s << "deduced match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
+            }
           }
-#endif
           if (data->logger) {
             bool ambiguous = equivalent_other_nodes.has_attribute (p->second);
             if (ambiguous) {
@@ -2249,9 +2293,9 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
 
       }
 
-#if defined(PRINT_DEBUG_NETCOMPARE)
-      tl::info << indent_s << "finished analysis of ambiguity group with " << nr->num << " members";
-#endif
+      if (options ()->debug_netcompare) {
+        tl::info << indent_s << "finished analysis of ambiguity group with " << nr->num << " members";
+      }
 
     }
 
@@ -2516,9 +2560,9 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 
     if (all_subcircuits_verified (ca, verified_circuits_a) && all_subcircuits_verified (cb, verified_circuits_b)) {
 
-#if defined(PRINT_DEBUG_NETCOMPARE)
-      tl::info << "treating circuit: " << ca->name () << " vs. " << cb->name ();
-#endif
+      if (options ()->debug_netcompare) {
+        tl::info << "treating circuit: " << ca->name () << " vs. " << cb->name ();
+      }
       if (mp_logger) {
         mp_logger->begin_circuit (ca, cb);
       }
@@ -2835,9 +2879,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     g2.identify (ni2, ni1);
   }
 
-#if defined(PRINT_DEBUG_NETCOMPARE)
   int iter = 0;
-#endif
 
   //  two passes: one without ambiguities, the second one with
 
@@ -2845,20 +2887,20 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   for (int pass = 0; pass < 2; ++pass) {
 
-#if defined(PRINT_DEBUG_NETCOMPARE)
-    if (pass > 0) {
-      tl::info << "including ambiguous nodes now.";
+    if (options ()->debug_netcompare) {
+      if (pass > 0) {
+        tl::info << "including ambiguous nodes now.";
+      }
     }
-#endif
 
     good = true;
     while (true) {
 
-#if defined(PRINT_DEBUG_NETCOMPARE)
       ++iter;
-      tl::info << "new compare iteration #" << iter;
-      tl::info << "deducing from present nodes ...";
-#endif
+      if (options ()->debug_netcompare) {
+        tl::info << "new compare iteration #" << iter;
+        tl::info << "deducing from present nodes ...";
+      }
 
       size_t new_identities = 0;
 
@@ -2877,18 +2919,18 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
           size_t ni = g1.derive_node_identities (i1 - g1.begin (), 0, 1, 0 /*not tentative*/, pass > 0 /*with ambiguities*/, &data);
           if (ni > 0 && ni != failed_match) {
             new_identities += ni;
-#if defined(PRINT_DEBUG_NETCOMPARE)
-            tl::info << ni << " new identities.";
-#endif
+            if (options ()->debug_netcompare) {
+              tl::info << ni << " new identities.";
+            }
           }
 
         }
 
       }
 
-#if defined(PRINT_DEBUG_NETCOMPARE)
-      tl::info << "checking topological identity ...";
-#endif
+      if (options ()->debug_netcompare) {
+        tl::info << "checking topological identity ...";
+      }
 
       //  derive new identities through topology: first collect all nets with the same topological signature
 
@@ -2934,9 +2976,9 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       size_t ni = g1.derive_node_identities_from_node_set (nodes, other_nodes, 0, 1, 0 /*not tentative*/, pass > 0 /*with ambiguities*/, &data);
       if (ni > 0 && ni != failed_match) {
         new_identities += ni;
-#if defined(PRINT_DEBUG_NETCOMPARE)
-        tl::info << ni << " new identities.";
-#endif
+        if (options ()->debug_netcompare) {
+          tl::info << ni << " new identities.";
+        }
       }
 
       if (new_identities == 0) {
@@ -3582,6 +3624,173 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
 
     }
 
+  }
+}
+
+static bool derive_symmetry_groups (const db::NetGraph &graph, const tl::equivalence_clusters<const NetGraphNode *> &identical_nodes, std::set<size_t> &considered_nodes, const std::set<size_t> &symmetry_group, std::list<std::set<size_t> > &symmetry_groups)
+{
+  std::set<size_t> cids;
+  std::set<size_t> new_symmetry_group;
+  NetGraphNode::edge_type::first_type edge;
+
+  std::vector<NetGraphNode::edge_type> common_nodes_first;
+
+  bool has_candidate = true;
+
+  for (std::set<size_t>::const_iterator g = symmetry_group.begin (); g != symmetry_group.end () && has_candidate; ++g) {
+
+    std::vector<NetGraphNode::edge_type> common_nodes;
+
+    const NetGraphNode &n = graph.node (*g);
+    for (NetGraphNode::edge_iterator e = n.begin (); e != n.end () && has_candidate; ++e) {
+
+      if (considered_nodes.find (e->second.first) != considered_nodes.end ()) {
+        continue;
+      }
+
+      const NetGraphNode *other = &graph.node (e->second.first);
+      //  NOTE: nodes with pins don't go into a symmetry group as we don't know what the pins connect to
+      if (other->net ()->pin_count () == 0 && identical_nodes.has_attribute (other)) {
+
+        if (cids.empty ()) {
+          edge = e->first;
+        } else if (edge != e->first) {
+          has_candidate = false;
+        }
+
+        if (has_candidate) {
+          cids.insert (identical_nodes.cluster_id (other));
+          if (cids.size () > 1) {
+            has_candidate = false;
+          } else {
+            new_symmetry_group.insert (e->second.first);
+          }
+        }
+
+      } else {
+        common_nodes.push_back (*e);
+      }
+
+    }
+
+    if (has_candidate) {
+
+      //  all other edges need to have identical destinations for the symmetry group to be
+      //  actually symmetric
+      std::sort (common_nodes.begin (), common_nodes.end ());
+      if (g == symmetry_group.begin ()) {
+        common_nodes_first.swap (common_nodes);
+      } else if (common_nodes_first != common_nodes) {
+        has_candidate = false;
+      }
+
+    }
+
+  }
+
+  if (has_candidate && ! cids.empty () && new_symmetry_group.size () > 1) {
+
+    considered_nodes.insert (new_symmetry_group.begin (), new_symmetry_group.end ());
+
+    if (derive_symmetry_groups (graph, identical_nodes, considered_nodes, new_symmetry_group, symmetry_groups)) {
+
+      symmetry_groups.push_back (new_symmetry_group);
+
+    } else {
+
+      std::set<size_t> cn;
+      std::set_difference (considered_nodes.begin (), considered_nodes.end (), new_symmetry_group.begin (), new_symmetry_group.end (), std::inserter (cn, cn.begin ()));
+      considered_nodes.swap (cn);
+
+      has_candidate = false;
+
+    }
+
+  }
+
+  return has_candidate;
+}
+
+void
+NetlistComparer::join_symmetric_nets (db::Circuit *circuit)
+{
+  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Join symmetric nodes for circuit: ")) + circuit->name ());
+
+  db::DeviceFilter device_filter (m_cap_threshold, m_res_threshold);
+  db::CircuitPinMapper circuit_pin_mapper;
+  std::map<const db::Circuit *, CircuitMapper> circuit_and_pin_mapping;
+
+  db::NetGraph graph;
+  graph.build (circuit, *mp_device_categorizer, *mp_circuit_categorizer, device_filter, &circuit_and_pin_mapping, &circuit_pin_mapper);
+
+  //  sort the nodes so we can easily identify the identical ones (in terms of topology)
+  //  nodes are identical if the attached devices and circuits are of the same kind and with the same parameters
+  //  and connect to other nodes in identical configurations.
+
+  std::vector<const NetGraphNode *> nodes;
+
+  nodes.reserve (graph.end () - graph.begin ());
+  for (db::NetGraph::node_iterator i = graph.begin (); i != graph.end (); ++i) {
+    if (! i->has_other () && i->net ()) {
+      nodes.push_back (i.operator-> ());
+    }
+  }
+
+  std::sort (nodes.begin (), nodes.end (), CompareNodePtr ());
+
+  //  Identical nodes leading to the same nodes on the other side are candidates for symmetry.
+
+  tl::equivalence_clusters<const NetGraphNode *> identical_nodes;
+
+  for (std::vector<const NetGraphNode *>::const_iterator np = nodes.begin (); np + 1 != nodes.end (); ++np) {
+    if (*np[0] == *np[1]) {
+      identical_nodes.same (np[0], np[1]);
+    }
+  }
+
+  std::list<std::set<size_t> > symmetry_groups;
+  std::set<size_t> visited;
+
+  for (std::vector<const NetGraphNode *>::const_iterator np = nodes.begin (); np != nodes.end (); ++np) {
+
+    size_t node_id = graph.node_index_for_net (np[0]->net ());
+    if (visited.find (node_id) != visited.end ()) {
+      continue;
+    }
+
+    std::set<size_t> considered_nodes;
+    considered_nodes.insert (node_id);
+
+    std::set<size_t> symmetry_group;
+    symmetry_group.insert (node_id);
+
+    derive_symmetry_groups (graph, identical_nodes, considered_nodes, symmetry_group, symmetry_groups);
+
+    visited.insert (considered_nodes.begin (), considered_nodes.end ());
+
+  }
+
+  if (! symmetry_groups.empty () && tl::verbosity () >= 30) {
+    tl::info << tl::to_string (tr ("Symmetry groups:"));
+    int index = 0;
+    for (std::list<std::set<size_t> >::const_iterator g = symmetry_groups.begin (); g != symmetry_groups.end (); ++g) {
+      tl::info << "  [" << index << "] " << tl::noendl;
+      for (std::set<size_t>::const_iterator i = g->begin (); i != g->end (); ++i) {
+        tl::info << (i == g->begin () ? "" : ",") << (graph.node (*i).net () ? graph.node (*i).net ()->expanded_name ().c_str () : "(null)") << tl::noendl;
+      }
+      ++index;
+      tl::info << "";
+    }
+  }
+
+  //  join the nets
+
+  for (std::list<std::set<size_t> >::const_iterator g = symmetry_groups.begin (); g != symmetry_groups.end (); ++g) {
+    for (std::set<size_t>::const_iterator i = g->begin (); i != g->end (); ++i) {
+      if (i != g->begin ()) {
+        circuit->join_nets (const_cast<db::Net *> (graph.net_by_node_index (*g->begin ())), const_cast<db::Net *> (graph.net_by_node_index (*i)));
+      }
+    }
   }
 }
 

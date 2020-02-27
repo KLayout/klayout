@@ -302,6 +302,20 @@ public:
    */
   bool compare (const db::Netlist *a, const db::Netlist *b, db::NetlistCompareLogger *logger) const;
 
+  /**
+   *  @brief Joins symmetric nodes in the given circuit
+   *
+   *  Nodes are symmetric if their exchanging would not modify the circuit.
+   *  Hence they will carry the same potential and can be connected (joined).
+   *  This will simplify the circuit and can be applied before device combination
+   *  to render a schematic-equivalent netlist in some cases (split gate option).
+   *
+   *  This algorithm will apply the comparer's settings to the symmetry
+   *  condition (device filtering, device compare tolerances, device class
+   *  equivalence etc.).
+   */
+  void join_symmetric_nets (db::Circuit *circuit);
+
 private:
   //  No copying
   NetlistComparer (const NetlistComparer &);

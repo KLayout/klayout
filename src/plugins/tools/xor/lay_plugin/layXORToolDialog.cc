@@ -35,6 +35,7 @@
 #include "tlTimer.h"
 #include "tlProgress.h"
 #include "tlThreadedWorkers.h"
+#include "tlEnv.h"
 #include "tlExceptions.h"
 #include "tlMath.h"
 #include "layCellView.h"
@@ -1085,7 +1086,7 @@ XORToolDialog::run_xor ()
 
   bool summarize = mp_ui->summarize_cb->isChecked ();
   //  TODO: make this a user interface feature later
-  bool process_el = lay::ApplicationBase::instance ()->special_app_flag ("ALWAYS_DO_XOR");
+  bool process_el = tl::app_flag ("always-do-xor");
 
   int cv_index_a = mp_ui->layouta->current_cv_index ();
   int cv_index_b = mp_ui->layoutb->current_cv_index ();

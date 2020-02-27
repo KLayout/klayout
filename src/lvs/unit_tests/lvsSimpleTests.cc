@@ -177,3 +177,8 @@ TEST(20_double_height2_inv)
   run_test (_this, "double_height2", "double_height2_inv.gds");
 }
 
+TEST(21_split_gate)
+{
+  run_test (_this, "nand2_split_gate", "nand2_split_gate.oas");
+}
+

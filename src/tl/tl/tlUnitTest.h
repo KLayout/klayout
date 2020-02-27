@@ -191,6 +191,7 @@ class TL_PUBLIC CaptureChannel : public tl::Channel
 {
 public:
   CaptureChannel ();
+  ~CaptureChannel ();
 
   std::string captured_text () const
   {
@@ -210,6 +211,7 @@ protected:
 
 private:
   std::ostringstream m_text;
+  int m_saved_verbosity;
 };
 
 /**

@@ -24,8 +24,8 @@
 #include "tlExpression.h"
 #include "tlVariantUserClasses.h"
 #include "tlUnitTest.h"
+#include "tlEnv.h"
 
-#include <stdlib.h>
 #define _USE_MATH_DEFINES // for MSVC
 #include <math.h>
 
@@ -834,7 +834,7 @@ TEST(6)
   v = e.parse ("env('HJASK')").execute ();
   EXPECT_EQ (v.to_string (), std::string ("nil"));
   v = e.parse ("env('PATH')").execute ();
-  EXPECT_EQ (v.to_string (), std::string (getenv ("PATH")));
+  EXPECT_EQ (v.to_string (), tl::get_env ("PATH"));
   v = e.parse ("absolute_path('./x.gds')").execute ();
   // EXPECT_EQ (v.to_string (), std::string ()); // not universal
   v = e.parse ("absolute_file_path('./x.gds')").execute ();

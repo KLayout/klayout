@@ -172,6 +172,39 @@ module LVS
 
     end
 
+    # %LVS%
+    # @name join_symmetric_nets
+    # @brief Joins symmetric nets of selected circuits on the extracted netlist
+    # @synopsis join_symmetric_nets(circuit_filter)
+    # Nets are symmetrical if swapping them would not modify the circuit.
+    # Hence they will carry the same potential and can be connected (joined).
+    # This will simplify the circuit and can be applied before device combination
+    # (e.g. through "netlist.simplify") to render a schematic-equivalent netlist in some 
+    # cases where symmetric nodes are split (i.e. "split gate" configuration).
+    #
+    # This method operates on the extracted netlist (layout). The circuit filter
+    # specifies the circuits to which to apply this operation. The filter is a
+    # glob-style pattern. Using "*" for all circuits is possible, but it's 
+    # discouraged currenty until the reliability of the symmetry detection 
+    # algorithm is established. Currently it is recommended to apply it only to 
+    # those circuits for which this feature is required.
+    #
+    # For the symmetry detection, the specified constraints (e.g. tolerances,
+    # device filters etc.) apply.
+
+    def join_symmetric_nets(circuit_pattern)
+
+      circuit_pattern.is_a?(String) || raise("Circuit pattern argument of 'join_symmetric_nets' must be a string")
+
+      comparer = self._comparer 
+
+      netlist || raise("No netlist present (not extracted?)")
+      netlist.circuits_by_name(circuit_pattern).each do |c|
+        comparer.join_symmetric_nets(c)
+      end
+
+    end
+
     def _comparer
 
       comparer = RBA::NetlistComparer::new

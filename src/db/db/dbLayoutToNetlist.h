@@ -798,6 +798,7 @@ private:
 
   //  implementation of NetlistManipulationCallbacks
   virtual size_t link_net_to_parent_circuit (const Net *subcircuit_net, Circuit *parent_circuit, const DCplxTrans &trans);
+  virtual void link_nets (const db::Net *net, const db::Net *with);
 };
 
 }

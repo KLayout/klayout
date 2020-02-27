@@ -1283,14 +1283,6 @@ ApplicationBase::get_config_names () const
   return names;
 }
 
-bool
-ApplicationBase::special_app_flag (const std::string &name)
-{
-  // TODO: some more elaborate scheme?
-  const char *env = getenv (("KLAYOUT_" + name).c_str ());
-  return (env && *env);
-}
-
 // --------------------------------------------------------------------------------
 //  GuiApplication implementation
 

@@ -186,6 +186,7 @@ private slots:
   void new_folder_button_clicked ();
   void save_all_button_clicked ();
   void save_button_clicked ();
+  void save_as_button_clicked ();
   void run_button_clicked ();
   void run_this_button_clicked ();
   void single_step_button_clicked ();
@@ -255,6 +256,7 @@ private:
   lym::Macro *create_macro_here(const char *name = 0);
   void move_subfolder (lym::MacroCollection *source, lym::MacroCollection *target);
   lay::MacroEditorPage *create_page (lym::Macro *macro);
+  void open_macro (lym::Macro *macro);
   void ensure_writeable_collection_selected ();
   void update_console_text ();
   void start_exec (gsi::Interpreter *interpreter);

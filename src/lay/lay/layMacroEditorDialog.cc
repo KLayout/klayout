@@ -314,6 +314,7 @@ MacroEditorDialog::MacroEditorDialog (lay::PluginRoot *pr, lym::MacroCollection 
     macro_tree->addAction (s3);
     macro_tree->addAction (actionSaveAll);
     macro_tree->addAction (actionSave);
+    macro_tree->addAction (actionSaveAs);
 
     macro_tree->header ()->hide ();
 
@@ -422,6 +423,7 @@ MacroEditorDialog::MacroEditorDialog (lay::PluginRoot *pr, lym::MacroCollection 
   connect (actionSaveAll, SIGNAL (triggered ()), this, SLOT (save_all_button_clicked ()));
   connect (saveButton, SIGNAL (clicked ()), this, SLOT (save_button_clicked ()));
   connect (actionSave, SIGNAL (triggered ()), this, SLOT (save_button_clicked ()));
+  connect (actionSaveAs, SIGNAL (triggered ()), this, SLOT (save_as_button_clicked ()));
   connect (dbgOn, SIGNAL (clicked (bool)), this, SLOT (set_debugging_on (bool)));
   connect (runButton, SIGNAL (clicked ()), this, SLOT (run_button_clicked ()));
   connect (runThisButton, SIGNAL (clicked ()), this, SLOT (run_this_button_clicked ()));
@@ -1996,7 +1998,40 @@ BEGIN_PROTECTED
 END_PROTECTED
 }
 
-void  
+void
+MacroEditorDialog::save_as_button_clicked ()
+{
+  if (m_in_exec) {
+    return;
+  }
+
+BEGIN_PROTECTED
+
+  lym::Macro *m = current_macro_tree ()->current_macro ();
+  if (! m) {
+    return;
+  }
+
+  lay::FileDialog file_dialog (lay::MainWindow::instance (), tl::to_string (QObject::tr ("Save Macro As")), tl::to_string (QObject::tr ("All files (*)")), "");
+
+  std::string fn = m->path ();
+  if (file_dialog.get_save (fn)) {
+
+    m->save_to (fn);
+
+    reload_macros ();
+
+    lym::Macro *lym = mp_root->find_macro (fn);
+    if (lym) {
+      open_macro (lym);
+    }
+
+  }
+
+END_PROTECTED
+}
+
+void
 MacroEditorDialog::setup_button_clicked ()
 {
   if (m_in_exec) {
@@ -2089,11 +2124,7 @@ MacroEditorDialog::new_macro()
   //  we don't want to keep the template's description
   m->set_description (std::string ());
 
-  MacroEditorPage *page = create_page (m);
-  int index = tabWidget->addTab (page, tl::to_qstring (m->name ()));
-  tabWidget->setTabToolTip (index, tl::to_qstring (m->summary ()));
-  tabWidget->setCurrentWidget (page);
-  m_tab_widgets.insert (std::make_pair (m, page));
+  open_macro (m);
 
   //  NOTE: we save to make the file watcher go silent and to keep the file system in sync
   m->save ();
@@ -2710,6 +2741,16 @@ BEGIN_PROTECTED
 END_PROTECTED
 }
 
+void
+MacroEditorDialog::open_macro (lym::Macro *m)
+{
+  MacroEditorPage *page = create_page (m);
+  m_tab_widgets.insert (std::make_pair (m, page));
+  int index = tabWidget->addTab (page, tl::to_qstring (m->name ()));
+  tabWidget->setTabToolTip (index, tl::to_qstring (m->summary ()));
+  tabWidget->setCurrentWidget (page);
+}
+
 void 
 MacroEditorDialog::item_double_clicked(lym::Macro *m)
 {
@@ -2717,13 +2758,7 @@ BEGIN_PROTECTED
 
   std::map <lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (m);
   if (page == m_tab_widgets.end ()) {
-
-    MacroEditorPage *page = create_page (m);
-    m_tab_widgets.insert (std::make_pair (m, page));
-    int index = tabWidget->addTab (page, tl::to_qstring (m->name ()));
-    tabWidget->setTabToolTip (index, tl::to_qstring (m->summary ()));
-    tabWidget->setCurrentWidget (page);
-
+    open_macro (m);
   } else {
     tabWidget->setCurrentIndex (tabWidget->indexOf (page->second));
   }

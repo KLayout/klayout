@@ -44,7 +44,7 @@ std::string get_env (const std::string &name, const std::string &def_value)
   std::wstring wname = tl::to_wstring (name);
   wchar_t *env = _wgetenv (wname.c_str ());
   if (env) {
-    return tl::to_string (QString ((const QChar *) env));
+    return tl::to_string (std::wstring (env));
   } else {
     return def_value;
   }

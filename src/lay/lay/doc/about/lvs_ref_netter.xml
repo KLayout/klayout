@@ -257,4 +257,19 @@ If no reader is provided, Spice format will be assumed. The reader object is a
 Alternatively, a <class_doc href="Netlist">Netlist</class_doc> object can be given which is obtained from any other
 source.
 </p>
+<h2>"tolerance" - Specifies compare tolerances for certain device parameters</h2>
+<keyword name="tolerance"/>
+<a name="tolerance"/><p>Usage:</p>
+<ul>
+<li><tt>tolerance(device_class_name, parameter_name, absolute_tolerance [, relative_tolerance])</tt></li>
+<li><tt>tolerance(device_class_name, parameter_name [, :absolute =&gt; absolute_tolerance] [, :relative =&gt; relative_tolerance])</tt></li>
+</ul>
+<p>
+Specifies a compare tolerance for a specific parameter on a given device class.
+The device class is the name of a device class in the extracted netlist.
+Tolerances can be given in absolute units or relative or both. 
+The relative tolerance is given as a factor, so 0.1 is a 10% tolerance.
+Absolute and relative tolerances add, so specifying both allows for a larger
+deviation.
+</p>
 </doc>

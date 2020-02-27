@@ -102,7 +102,7 @@ module LVS
     # @name tolerance
     # @brief Specifies compare tolerances for certain device parameters
     # @synopsis tolerance(device_class_name, parameter_name, absolute_tolerance [, relative_tolerance])
-    # @synopsis tolerance(device_class_name, parameter_name [:absolute => absolute_tolerance,] [:relative => relative_tolerance,])
+    # @synopsis tolerance(device_class_name, parameter_name [, :absolute => absolute_tolerance] [, :relative => relative_tolerance])
     # Specifies a compare tolerance for a specific parameter on a given device class.
     # The device class is the name of a device class in the extracted netlist.
     # Tolerances can be given in absolute units or relative or both. 

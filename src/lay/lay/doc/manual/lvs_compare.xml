@@ -81,6 +81,77 @@
   <pre>same_device_classes("PMOS_IN_LAYOUT", "PMOS_IN_SCHEMATIC")
 same_device_classes("NMOS_IN_LAYOUT", "NMOS_IN_SCHEMATIC")</pre>
 
+  <h2>Tolerances</h2>
+
+  <p>
+  When comparing device parameters, by default strict equivalence is required. 
+  However, when drawing a device like a resistor, it's usually difficult to match
+  the exact value unless the resistor calibration is consistent with drawing grids and
+  the resistor geometry is not confined by design rule constraints.
+  So sometimes the target value or a device parameter can only be approximated in 
+  the layout. This will by default lead to a mismatch.
+  </p>
+
+  <p>
+  The solution is to specify parameter tolerances. Tolerances can be specified
+  in an absolute or relative fashion. If an absolute tolerance is given, the layout
+  parameter may deviate from the target value by this tolerance either to
+  lower or higher values. So the unit of the tolerance is the same than the 
+  unit of the parameter.
+  </p>
+  
+  <p>
+  If a relative tolerance is given, the deviation is
+  computed from the target value times the tolerance. So the relative tolerance
+  is a factor and a value of 0.05 for example specifies an allowed deviation of
+  plus or minus 5%. Relative tolerances are unit-less.
+  </p>
+
+  <p>
+  It's also possible to specify both an absolute and a relative tolerance. In this
+  case, both tolerances add and the allowed deviation becomes larger.
+  </p>
+
+  <p>
+  To specify an absolute tolerance, use the <a href="/about/lvs_ref_global.xml#tolerance">tolerance</a> function:
+  </p>
+
+  <pre>tolerance("NMOS", "L", 0.05)</pre>
+
+  <p>
+  The two arguments are the name of the device class and the name of the parameter
+  for which the tolerance will be applied. In the case above, a tolerance of 50nm (the
+  unit of L is micrometer) is applied to the length parameter of "NMOS" devices.
+  </p>
+
+  <p>
+  A relative tolerance is specified as an additonal forth parameter. You can set
+  the absolute tolerance to zero to specify only relative tolerances. This will
+  specify 1% tolerance for the "L" parameter of "NMOS" devices:
+  </p>
+
+  <pre>tolerance("NMOS", "L", 0.0, 0.01)</pre>
+
+  <p>
+  There is also a more explicit notation for the tolerance:
+  </p>
+
+  <pre>tolerance("NMOS", "L", :absolute => 0.05)
+tolerance("NMOS", "L", :relative => 0.01)</pre>
+
+  <p>
+  This notation is equivalent to the two forms above.
+  </p>
+
+  <p>
+  An absolute plus relative tolerance can be specified by giving both.
+  The following calls will give you 50nm absolute and 1% relative tolerance for the "L"
+  parameter of "NMOS" devices:
+  </p>
+
+  <pre>tolerance("NMOS", "L", 0.05, 0.01)
+tolerance("NMOS", "L", :absolute => 0.05, :relative => 0.01)</pre>
+
   <h2>Pin swapping</h2>
 
   <p>

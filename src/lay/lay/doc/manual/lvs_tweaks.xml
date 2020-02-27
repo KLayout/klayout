@@ -175,6 +175,52 @@ schematic.blank_circuit("CIRCUIT_NAME")</pre>
   sets a flag (<class_doc href="Circuit#dont_purge"/>) which prevents purging of abstract
   circuits.</p>
 
+  <h2>Joining of symmetric nodes</h2>
+
+  <p>
+  Sometimes it is possible to omit connections in the layout because these 
+  will not carry any current. This might simplify the layout and allow denser
+  packing, but finally there is a mismatch between schematic and layout.
+  In general, connections can be omitted if they would connect symmetric
+  nodes. When symmetric nodes are swapped, the circuit will not change.
+  Hence they will always carry the same potential (at least in theory) 
+  and a connection between them will not carry any current. So it can 
+  be omitted.
+  </p>
+
+  <p>
+  The following picture describes such a situation known as "split gate configuration".
+  In this case, the N1 and N2 are identical: swapping them will not change the circuit's
+  topology. Hence, they will carry the same potential and the red connection is not required physically. 
+  But without such a connection, the parallel transistors (top pair and bottom pair) will not be recognized
+  as parallel and the pairs will not be joined into one each:
+  </p>
+
+  <p>
+  <img src="lvs_symm_nodes.png"/>
+  </p>
+
+  <p>
+  KLayout provides a feature which will add such connections after extraction
+  of the netlist:
+  </p>
+
+  <pre>join_symmetric_nets("NAND2")</pre>
+
+  <p>
+  This function will analyze the circuit "NAND2" in the extracted netlist and connect all symmetric 
+  nodes within it. If this function is called before "combine_devices" (e.g. through
+  "netlist.simplify"), this connection is already present then and parallel devices
+  will be recognized and combined.
+  </p>
+
+  <p>
+  The argument to "join_symmetric_nets" is a glob-style pattern. "*" will analyze and
+  modify all circuits, but at the price of potentially introducing unwanted connections.
+  Hence the recommendation is to use this feature on circuits which are known to 
+  need it.
+  </p>
+
   <h2>Purging (elimination of redundancy)</h2>
 
   <p>

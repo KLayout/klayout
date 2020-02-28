@@ -3714,6 +3714,10 @@ static bool derive_symmetry_groups (const db::NetGraph &graph, const tl::equival
 void
 NetlistComparer::join_symmetric_nets (db::Circuit *circuit)
 {
+  if (! circuit) {
+    return;
+  }
+
   tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Join symmetric nodes for circuit: ")) + circuit->name ());
 
   db::DeviceFilter device_filter (m_cap_threshold, m_res_threshold);

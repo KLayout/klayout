@@ -1,0 +1,407 @@
+#%lvsdb-klayout
+
+# Layout
+layout(
+ top(NAND2_WITH_DIODES)
+ unit(0.001)
+
+ # Layer section
+ # This section lists the mask layers (drawing or derived) and their connections.
+
+ # Mask layers
+ layer(l3 'NWELL (1/0)')
+ layer(l4 'POLY (5/0)')
+ layer(l8 'CONTACT (6/0)')
+ layer(l11 'METAL1 (7/0)')
+ layer(l12 'METAL1_LABEL (7/1)')
+ layer(l13 'VIA1 (8/0)')
+ layer(l14 'METAL2 (9/0)')
+ layer(l15 'METAL2_LABEL (9/1)')
+ layer(l7)
+ layer(l2)
+ layer(l9)
+ layer(l6)
+ layer(l10)
+
+ # Mask layer connectivity
+ connect(l3 l3 l9)
+ connect(l4 l4 l8)
+ connect(l8 l4 l8 l11 l2 l9 l6 l10)
+ connect(l11 l8 l11 l12 l13)
+ connect(l12 l11 l12)
+ connect(l13 l11 l13 l14)
+ connect(l14 l13 l14 l15)
+ connect(l15 l14 l15)
+ connect(l7 l7)
+ connect(l2 l8 l2)
+ connect(l9 l3 l8 l9)
+ connect(l6 l8 l6)
+ connect(l10 l8 l10)
+
+ # Global nets and connectivity
+ global(l7 SUBSTRATE)
+ global(l10 SUBSTRATE)
+
+ # Device class section
+ class(PMOS MOS4)
+ class(NMOS MOS4)
+
+ # Device abstracts section
+ # Device abstracts list the pin shapes of the devices.
+ device(D$PMOS PMOS
+  terminal(S
+   rect(l2 (-575 -750) (450 1500))
+  )
+  terminal(G
+   rect(l4 (-125 -750) (250 1500))
+  )
+  terminal(D
+   rect(l2 (125 -750) (500 1500))
+  )
+  terminal(B
+   rect(l3 (-125 -750) (250 1500))
+  )
+ )
+ device(D$PMOS$1 PMOS
+  terminal(S
+   rect(l2 (-625 -750) (500 1500))
+  )
+  terminal(G
+   rect(l4 (-125 -750) (250 1500))
+  )
+  terminal(D
+   rect(l2 (125 -750) (450 1500))
+  )
+  terminal(B
+   rect(l3 (-125 -750) (250 1500))
+  )
+ )
+ device(D$NMOS NMOS
+  terminal(S
+   rect(l6 (-575 -450) (450 900))
+  )
+  terminal(G
+   rect(l4 (-125 -450) (250 900))
+  )
+  terminal(D
+   rect(l6 (125 -450) (500 900))
+  )
+  terminal(B
+   rect(l7 (-125 -450) (250 900))
+  )
+ )
+ device(D$NMOS$1 NMOS
+  terminal(S
+   rect(l6 (-625 -450) (500 900))
+  )
+  terminal(G
+   rect(l4 (-125 -450) (250 900))
+  )
+  terminal(D
+   rect(l6 (125 -450) (450 900))
+  )
+  terminal(B
+   rect(l7 (-125 -450) (250 900))
+  )
+ )
+
+ # Circuit section
+ # Circuits are the hierarchical building blocks of the netlist.
+ circuit(NAND2_WITH_DIODES
+
+  # Circuit boundary
+  rect((0 0) (3750 6150))
+
+  # Nets with their geometries
+  net(1 name(B)
+   rect(l4 (350 2750) (550 400))
+   rect(l4 (0 -2050) (250 3100))
+   rect(l4 (-250 0) (250 1650))
+   rect(l4 (-250 -5800) (250 1050))
+   rect(l4 (-250 300) (250 1050))
+   rect(l8 (-700 400) (200 200))
+   rect(l11 (-300 -300) (400 400))
+   rect(l12 (-201 -201) (2 2))
+  )
+  net(2 name(A)
+   rect(l4 (1900 3400) (550 400))
+   rect(l4 (-800 -2700) (250 3100))
+   rect(l4 (-250 0) (250 1650))
+   rect(l4 (-250 -5800) (250 1050))
+   rect(l4 (-250 300) (250 1050))
+   rect(l8 (250 1050) (200 200))
+   rect(l11 (-300 -300) (400 400))
+   rect(l12 (-201 -201) (2 2))
+  )
+  net(3
+   rect(l8 (1300 300) (200 200))
+   rect(l8 (-200 -200) (200 200))
+   rect(l8 (-200 300) (200 200))
+   rect(l8 (-200 -200) (200 200))
+   rect(l8 (-200 650) (200 200))
+   rect(l8 (-200 -200) (200 200))
+   rect(l8 (-200 300) (200 200))
+   rect(l8 (-200 -200) (200 200))
+   rect(l11 (-250 -2150) (300 900))
+   rect(l11 (-300 -900) (300 850))
+   rect(l11 (-300 500) (300 900))
+   rect(l11 (-300 -900) (300 850))
+   rect(l6 (-400 -2200) (500 900))
+   rect(l6 (-500 450) (500 900))
+  )
+  net(4 name(OUT)
+   rect(l8 (2050 300) (200 200))
+   rect(l8 (-200 300) (200 200))
+   rect(l8 (-200 650) (200 200))
+   rect(l8 (-200 300) (200 200))
+   rect(l8 (-950 2000) (200 200))
+   rect(l8 (-200 -200) (200 200))
+   rect(l8 (-200 300) (200 200))
+   rect(l8 (-200 -200) (200 200))
+   rect(l8 (-200 300) (200 200))
+   rect(l8 (-200 -200) (200 200))
+   rect(l11 (500 -5350) (300 850))
+   rect(l11 (-300 -50) (300 1950))
+   rect(l11 (-300 -1400) (300 850))
+   rect(l11 (-300 300) (450 400))
+   rect(l11 (-1200 -300) (1050 300))
+   rect(l11 (-1050 1150) (300 1400))
+   rect(l11 (-300 -2700) (300 1950))
+   rect(l12 (699 -2001) (2 2))
+   rect(l2 (-1101 1299) (500 1500))
+   rect(l6 (250 -5500) (450 900))
+   rect(l6 (-450 450) (450 900))
+  )
+  net(5 name(VDD)
+   rect(l3 (0 2950) (3750 3200))
+   rect(l8 (-3200 -1800) (200 200))
+   rect(l8 (-200 300) (200 200))
+   rect(l8 (-200 300) (200 200))
+   rect(l8 (1300 -1200) (200 200))
+   rect(l8 (-200 300) (200 200))
+   rect(l8 (-200 300) (200 200))
+   rect(l8 (700 -800) (200 200))
+   rect(l8 (-200 300) (200 200))
+   rect(l11 (-2650 -1200) (300 1600))
+   rect(l11 (1200 -1600) (300 1600))
+   rect(l11 (600 -1200) (300 1200))
+   rect(l13 (-2650 -800) (200 200))
+   rect(l13 (-200 300) (200 200))
+   rect(l13 (1300 -700) (200 200))
+   rect(l13 (-200 300) (200 200))
+   rect(l13 (700 -700) (200 200))
+   rect(l13 (-200 300) (200 200))
+   rect(l14 (-3150 -850) (3750 1000))
+   rect(l15 (-101 -851) (2 2))
+   rect(l2 (-3201 -851) (450 1500))
+   rect(l2 (1000 -1500) (450 1500))
+   rect(l9 (400 -1200) (600 1200))
+  )
+  net(6 name(VSS)
+   rect(l8 (550 1650) (200 200))
+   rect(l8 (-200 300) (200 200))
+   rect(l8 (-200 -2050) (200 200))
+   rect(l8 (-200 300) (200 200))
+   rect(l8 (2200 -550) (200 200))
+   rect(l8 (-200 300) (200 200))
+   rect(l11 (-2650 -50) (300 1350))
+   rect(l11 (-300 -2400) (300 1050))
+   rect(l11 (2100 -1050) (300 1200))
+   rect(l13 (-2650 -1100) (200 200))
+   rect(l13 (-200 300) (200 200))
+   rect(l13 (2200 -700) (200 200))
+   rect(l13 (-200 300) (200 200))
+   rect(l14 (-3150 -850) (3750 1000))
+   rect(l15 (-101 -851) (2 2))
+   rect(l6 (-3201 1399) (450 900))
+   rect(l6 (-450 -2250) (450 900))
+   rect(l10 (1850 -900) (600 1200))
+  )
+
+  # Outgoing pins and their connections to nets
+  pin(1 name(B))
+  pin(2 name(A))
+  pin(4 name(OUT))
+  pin(5 name(VDD))
+  pin(6 name(VSS))
+
+  # Devices and their connections
+  device(1 D$PMOS
+   location(1025 4950)
+   param(L 0.25)
+   param(W 1.5)
+   param(AS 0.675)
+   param(AD 0.375)
+   param(PS 3.9)
+   param(PD 2)
+   terminal(S 5)
+   terminal(G 1)
+   terminal(D 4)
+   terminal(B 5)
+  )
+  device(2 D$PMOS$1
+   location(1775 4950)
+   param(L 0.25)
+   param(W 1.5)
+   param(AS 0.375)
+   param(AD 0.675)
+   param(PS 2)
+   param(PD 3.9)
+   terminal(S 4)
+   terminal(G 2)
+   terminal(D 5)
+   terminal(B 5)
+  )
+  device(3 D$NMOS
+   device(D$NMOS location(0 1350))
+   connect(0 S S)
+   connect(1 S S)
+   connect(0 G G)
+   connect(1 G G)
+   connect(0 D D)
+   connect(1 D D)
+   connect(0 B B)
+   connect(1 B B)
+   location(1025 650)
+   param(L 0.25)
+   param(W 1.8)
+   param(AS 0.81)
+   param(AD 0.45)
+   param(PS 5.4)
+   param(PD 2.8)
+   terminal(S 6)
+   terminal(G 1)
+   terminal(D 3)
+   terminal(B 6)
+  )
+  device(4 D$NMOS$1
+   device(D$NMOS$1 location(0 1350))
+   connect(0 S S)
+   connect(1 S S)
+   connect(0 G G)
+   connect(1 G G)
+   connect(0 D D)
+   connect(1 D D)
+   connect(0 B B)
+   connect(1 B B)
+   location(1775 650)
+   param(L 0.25)
+   param(W 1.8)
+   param(AS 0.45)
+   param(AD 0.81)
+   param(PS 2.8)
+   param(PD 5.4)
+   terminal(S 3)
+   terminal(G 2)
+   terminal(D 4)
+   terminal(B 6)
+  )
+
+ )
+)
+
+# Reference netlist
+reference(
+
+ # Device class section
+ class(PMOS MOS4)
+ class(NMOS MOS4)
+
+ # Circuit section
+ # Circuits are the hierarchical building blocks of the netlist.
+ circuit(NAND2_WITH_DIODES
+
+  # Nets
+  net(1 name(A))
+  net(2 name(B))
+  net(3 name(OUT))
+  net(4 name(VSS))
+  net(5 name(VDD))
+  net(6 name($1))
+
+  # Outgoing pins and their connections to nets
+  pin(1 name(A))
+  pin(2 name(B))
+  pin(3 name(OUT))
+  pin(4 name(VSS))
+  pin(5 name(VDD))
+
+  # Devices and their connections
+  device(1 PMOS
+   name('1')
+   param(L 0.25)
+   param(W 1.5)
+   param(AS 0)
+   param(AD 0)
+   param(PS 0)
+   param(PD 0)
+   terminal(S 5)
+   terminal(G 2)
+   terminal(D 3)
+   terminal(B 5)
+  )
+  device(2 PMOS
+   name('2')
+   param(L 0.25)
+   param(W 1.5)
+   param(AS 0)
+   param(AD 0)
+   param(PS 0)
+   param(PD 0)
+   terminal(S 5)
+   terminal(G 1)
+   terminal(D 3)
+   terminal(B 5)
+  )
+  device(3 NMOS
+   name('3')
+   param(L 0.25)
+   param(W 1.8)
+   param(AS 0)
+   param(AD 0)
+   param(PS 0)
+   param(PD 0)
+   terminal(S 4)
+   terminal(G 2)
+   terminal(D 6)
+   terminal(B 4)
+  )
+  device(4 NMOS
+   name('4')
+   param(L 0.25)
+   param(W 1.8)
+   param(AS 0)
+   param(AD 0)
+   param(PS 0)
+   param(PD 0)
+   terminal(S 6)
+   terminal(G 1)
+   terminal(D 3)
+   terminal(B 4)
+  )
+
+ )
+)
+
+# Cross reference
+xref(
+ circuit(NAND2_WITH_DIODES NAND2_WITH_DIODES match
+  xref(
+   net(3 6 match)
+   net(2 1 match)
+   net(1 2 match)
+   net(4 3 match)
+   net(5 5 match)
+   net(6 4 match)
+   pin(1 0 match)
+   pin(0 1 match)
+   pin(2 2 match)
+   pin(3 4 match)
+   pin(4 3 match)
+   device(3 3 match)
+   device(4 4 match)
+   device(1 1 match)
+   device(2 2 match)
+  )
+ )
+)

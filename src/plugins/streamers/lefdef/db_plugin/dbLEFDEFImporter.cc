@@ -656,7 +656,7 @@ LEFDEFImporter::create_generated_via (std::vector<db::Polygon> &bottom,
   top.push_back (db::Polygon (via_box.enlarged (te).moved (to)));
 
   const char *p = pattern.c_str ();
-  int rp = 0;
+  int rp = pattern.empty () ? -1 : 0;
   const char *p0 = p, *p1 = p;
 
   for (int r = 0; r < rows; ++r) {
@@ -685,8 +685,6 @@ LEFDEFImporter::create_generated_via (std::vector<db::Polygon> &bottom,
           ++p;
         }
 
-      } else {
-        rp = -1;
       }
 
     }

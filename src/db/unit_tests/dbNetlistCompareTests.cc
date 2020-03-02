@@ -3739,7 +3739,7 @@ TEST(25_JoinSymmetricNets)
 TEST(25b_JoinSymmetricNetsMultiple)
 {
   const char *nls =
-    "circuit NAND2 (A=A,B=B,OUT=OUT,VSS=VSS,VDD=VDD);\n"
+    "circuit NAND3 (A=A,B=B,C=C,OUT=OUT,VSS=VSS,VDD=VDD);\n"
     "  device PMOS $1 (S=OUT,G=A,D=VDD) (L=0.25,W=1);\n"
     "  device PMOS $2 (S=VDD,G=B,D=OUT) (L=0.25,W=1);\n"
     "  device PMOS $3 (S=VDD,G=C,D=OUT) (L=0.25,W=1);\n"
@@ -3759,19 +3759,58 @@ TEST(25b_JoinSymmetricNetsMultiple)
   prep_nl (nl, nls);
 
   db::NetlistComparer comp;
-  comp.join_symmetric_nets (nl.circuit_by_name ("NAND2"));
+  comp.join_symmetric_nets (nl.circuit_by_name ("NAND3"));
 
   nl.combine_devices ();
 
   //  NOTE $1 and $2 are joined because they are symmetric
   EXPECT_EQ (nl.to_string (),
-    "circuit NAND2 (A=A,B=B,OUT=OUT,VSS=VSS,VDD=VDD);\n"
+    "circuit NAND3 (A=A,B=B,C=C,OUT=OUT,VSS=VSS,VDD=VDD);\n"
     "  device PMOS $1 (S=OUT,G=A,D=VDD) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
     "  device PMOS $2 (S=VDD,G=B,D=OUT) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
     "  device PMOS $3 (S=VDD,G=C,D=OUT) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
     "  device NMOS $4 (S=$1,G=A,D=OUT) (L=0.25,W=3,AS=0,AD=0,PS=0,PD=0);\n"
     "  device NMOS $7 (S=$1,G=B,D=$4) (L=0.25,W=3,AS=0,AD=0,PS=0,PD=0);\n"
     "  device NMOS $10 (S=$4,G=C,D=VSS) (L=0.25,W=3,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  )
+}
+
+TEST(25c_JoinSymmetricNetsMultipleMessedUp)
+{
+  const char *nls =
+    "circuit NOR3 (A=A,C=C,B=B,OUT=OUT,VSS=VSS,VDD=VDD);\n"
+    "  device PMOS $9 (S=$6,G=B,D=$3) (L=0.27,W=1.1);\n"
+    "  device NMOS $1 (S=OUT,G=A,D=VSS) (L=0.23,W=2.05);\n"
+    "  device PMOS $5 (S=$2,G=A,D=OUT) (L=0.27,W=1.1);\n"
+    "  device NMOS $2 (S=OUT,G=B,D=VSS) (L=0.23,W=2.05);\n"
+    "  device PMOS $8 (S=$2,G=B,D=$5) (L=0.27,W=1.1);\n"
+    "  device PMOS $4 (S=$21,G=A,D=OUT) (L=0.27,W=1.1);\n"
+    "  device PMOS $7 (S=$21,G=B,D=$4) (L=0.27,W=1.1);\n"
+    "  device PMOS $12 (S=VDD,G=C,D=$6) (L=0.27,W=1.1);\n"
+    "  device PMOS $10 (S=$4,G=C,D=VDD) (L=0.27,W=1.1);\n"
+    "  device PMOS $6 (S=$3,G=A,D=OUT) (L=0.27,W=1.1);\n"
+    "  device PMOS $11 (S=VDD,G=C,D=$5) (L=0.27,W=1.1);\n"
+    "  device NMOS $3 (S=VSS,G=C,D=OUT) (L=0.23,W=2.05);\n"
+    "end;\n";
+
+  db::Netlist nl;
+  prep_nl (nl, nls);
+
+  db::NetlistComparer comp;
+  comp.join_symmetric_nets (nl.circuit_by_name ("NOR3"));
+
+  nl.combine_devices ();
+
+  //  NOTE $1 and $2 are joined because they are symmetric
+  EXPECT_EQ (nl.to_string (),
+    "circuit NOR3 (A=A,C=C,B=B,OUT=OUT,VSS=VSS,VDD=VDD);\n"
+    "  device PMOS $1 (S=$5,G=B,D=$3) (L=0.27,W=3.3,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $2 (S=OUT,G=A,D=VSS) (L=0.23,W=2.05,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $3 (S=$3,G=A,D=OUT) (L=0.27,W=3.3,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $4 (S=OUT,G=B,D=VSS) (L=0.23,W=2.05,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $8 (S=VDD,G=C,D=$5) (L=0.27,W=3.3,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $12 (S=VSS,G=C,D=OUT) (L=0.23,W=2.05,AS=0,AD=0,PS=0,PD=0);\n"
     "end;\n"
   )
 }

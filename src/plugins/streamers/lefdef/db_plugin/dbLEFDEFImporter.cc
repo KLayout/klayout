@@ -656,38 +656,44 @@ LEFDEFImporter::create_generated_via (std::vector<db::Polygon> &bottom,
   top.push_back (db::Polygon (via_box.enlarged (te).moved (to)));
 
   const char *p = pattern.c_str ();
-  int rp = 0;
+  int rp = pattern.empty () ? -1 : 0;
   const char *p0 = p, *p1 = p;
 
   for (int r = 0; r < rows; ++r) {
 
-    if (rp == 0 && *p) {
+    if (rp == 0) {
 
-      //  read a new row specification
-      rp = 0;
-      while (*p && is_hex_digit (*p)) {
-        rp = (rp * 16) + hex_value (*p++);
-      }
-      if (*p == '_') {
-        ++p;
-      }
-
-      p0 = p;
       if (*p) {
-        while (*p && (is_hex_digit (*p) || toupper (*p) == 'R')) {
+
+        //  read a new row specification
+        rp = 0;
+        while (*p && is_hex_digit (*p)) {
+          rp = (rp * 16) + hex_value (*p++);
+        }
+        if (*p == '_') {
           ++p;
         }
-      }
-      p1 = p;
-      if (*p == '_') {
-        ++p;
+
+        p0 = p;
+        if (*p) {
+          while (*p && (is_hex_digit (*p) || toupper (*p) == 'R')) {
+            ++p;
+          }
+        }
+        p1 = p;
+        if (*p == '_') {
+          ++p;
+        }
+
       }
 
     }
 
-    if (rp > 0) {
+    if (rp != 0) {
 
-      --rp;
+      if (rp > 0) {
+        --rp;
+      }
 
       const char *pp = p0;
       unsigned int d = 0;

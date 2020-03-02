@@ -260,3 +260,8 @@ TEST(22)
   run_test (_this, "issue-489b", "lef:in_tech.lef+lef:in.lef", "au.oas.gz", opt, false);
 }
 
+TEST(23)
+{
+  run_test (_this, "issue-517", "def:in.def", "au.oas.gz", default_options (), false);
+}
+

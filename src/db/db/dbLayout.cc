@@ -456,7 +456,7 @@ Layout::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat
   db::mem_stat (stat, purpose, cat, m_array_repository, true, (void *) this);
 
   for (std::vector<const char *>::const_iterator i = m_cell_names.begin (); i != m_cell_names.end (); ++i) {
-    stat->add (typeid (char []), (void *) *i, strlen (*i) + 1, strlen (*i) + 1, (void *) this, purpose, cat);
+    stat->add (typeid (char []), (void *) *i, *i ? (strlen (*i) + 1) : 0, *i ? (strlen (*i) + 1) : 0, (void *) this, purpose, cat);
   }
   for (cell_list::const_iterator i = m_cells.begin (); i != m_cells.end (); ++i) {
     db::mem_stat (stat, MemStatistics::CellInfo, int (i->id ()), *i, false, (void *) this);

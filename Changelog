@@ -1,5 +1,7 @@
-0.26.4          (2020-02-28):
+0.26.4          (2020-03-02):
 
+* Bugfix: %GITHUB%/issues/517
+      DEF reader could not read VIAS+VIARULE without pattern
 * Enhancement: %GITHUB%/issues/471
       Leaner way to specify LVS compare tolerances for device parameters
 * Enhancement: %GITHUB%/issues/473

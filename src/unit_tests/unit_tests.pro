@@ -22,6 +22,8 @@ HEADERS += \
 
 !win32 {
   LIBS += -ldl
+} else {
+  LIBS += -lshell32
 }
 
 LIBS += -lklayout_gsi_test
@@ -38,5 +40,7 @@ LIBS += -lklayout_gsi_test
     }
   }
 
+} else {
+  CONFIG -= qt
 }
 

@@ -73,17 +73,77 @@
 
 static int main_cont (int &argc, char **argv);
 
-int
-main (int argc, char **argv)
+#ifdef _WIN32 // for VC++
+
+//  for VC++/MinGW provide a wrapper for main.
+#include <Windows.h>
+
+extern "C"
+int WINAPI 
+WinMain(HINSTANCE /*hInstance*/, HINSTANCE /*prevInstance*/, LPSTR /*lpCmdLine*/, int /*nShowCmd*/)
 {
-  int ret = rba::RubyInterpreter::initialize (argc, argv, &main_cont);
+  int argCount = 0;
+  LPWSTR *szArgList = CommandLineToArgvW(GetCommandLineW(), &argCount);
+
+  //  fail safe behaviour
+  if (!szArgList) {
+    MessageBox(NULL, L"Unable to parse command line", L"Error", MB_OK);
+    return 10;
+  }
+
+  char **argv = new char *[argCount];
+  for (int i = 0; i < argCount; i++) {
+    std::wstring a;
+    for (WCHAR *wc = szArgList [i]; *wc; ++wc) {
+      a += wchar_t ((unsigned int) *wc);
+    }
+    std::string aa = tl::to_string (a);
+    argv [i] = new char [aa.size () + 1];
+    strcpy (argv [i], aa.c_str ());
+  }
+
+  int ret = rba::RubyInterpreter::initialize (argCount, argv, &main_cont);
 
   //  NOTE: this needs to happen after the Ruby interpreter went down since otherwise the GC will
   //  access objects that are already cleaned up.
   tl::StaticObjects::cleanup ();
 
+  for (int i = 0; i < argCount; i++) {
+    delete[] argv [i];
+  }
+  delete[] argv;
+
+  LocalFree(szArgList);
   return ret;
 }
+
+#else
+
+int
+main(int a_argc, const char **a_argv)
+{
+  char **argv = new char *[a_argc];
+  for (int i = 0; i < a_argc; i++) {
+    tl::string aa = tl::system_to_string (a_argv[i]);
+    argv [i] = new char [aa.size () + 1];
+    strcpy (argv [i], aa.c_str ());
+  }
+
+  int ret = rba::RubyInterpreter::initialize (a_argc, argv, &main_cont);
+
+  //  NOTE: this needs to happen after the Ruby interpreter went down since otherwise the GC will
+  //  access objects that are already cleaned up.
+  tl::StaticObjects::cleanup ();
+
+  for (int i = 0; i < a_argc; i++) {
+    delete[] argv [i];
+  }
+  delete[] argv;
+
+  return ret;
+}
+
+#endif
 
 static bool
 run_test (tl::TestBase *t, bool editable, bool slow, int repeat)

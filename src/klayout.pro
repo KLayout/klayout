@@ -99,7 +99,7 @@ plugins.depends += lib rdb db
 
 }
 
-unit_tests.depends += plugins $$MAIN_DEPENDS
+unit_tests.depends += plugins $$MAIN_DEPENDS $$LANG_DEPENDS
 
 RESOURCES += \
     plugins/tools/import/lay_plugin/layResources.qrc \

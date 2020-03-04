@@ -17,6 +17,9 @@ set HAVE_64BIT_COORD=0
 set HAVE_PYTHON=1
 set HAVE_RUBY=1
 set MAKE_OPT=
+set HAVE_CURL=0
+set HAVE_EXPAT=0
+set HAVE_PTHREADS=0
 
 set arch=x64
 set compiler=msvc2017
@@ -64,6 +67,10 @@ for %%a in (%*) do (
           set "HAVE_QTBINDINGS=0"
         ) else if "!arg!" equ "-without-qt" (
           set "HAVE_QT=0"
+	  set "HAVE_CURL=1"
+	  set "HAVE_EXPAT=1"
+	  set "HAVE_PTHREADS=1"
+          set "HAVE_QTBINDINGS=0"
         ) else if "!arg!" equ "-with-64bit-coord" (
           set "HAVE_64BIT_COORD=1"
         ) else if "!arg!" equ "-without-64bit-coord" (
@@ -211,6 +218,9 @@ echo HAVE_QT:                  %HAVE_QT%
 echo HAVE_64BIT_COORD:         %HAVE_64BIT_COORD%
 echo HAVE_PYTHON:              %HAVE_PYTHON%
 echo HAVE_RUBY:                %HAVE_RUBY%
+echo HAVE_CURL:                %HAVE_CURL%
+echo HAVE_PTHREADS:            %HAVE_PTHREADS%
+echo HAVE_EXPAT:               %HAVE_EXPAT%
 echo MAKE_OPT:                 %MAKE_OPT%
 echo.
 echo qmake binary:             %option-qmake%
@@ -245,6 +255,9 @@ echo on
   "KLAYOUT_VERSION_REV=%KLAYOUT_VERSION_REV%" ^
   "HAVE_QTBINDINGS=%HAVE_QTBINDINGS%" ^
   "HAVE_QT=%HAVE_QT%" ^
+  "HAVE_EXPAT=%HAVE_EXPAT%" ^
+  "HAVE_CURL=%HAVE_CURL%" ^
+  "HAVE_PTHREADS=%HAVE_PTHREADS%" ^
   "HAVE_RUBY=%HAVE_RUBY%" ^
   "HAVE_PYTHON=%HAVE_PYTHON%" ^
   "HAVE_64BIT_COORD=%HAVE_64BIT_COORD%" ^

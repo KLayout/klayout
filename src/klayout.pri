@@ -120,6 +120,10 @@ msvc {
 
   QMAKE_CXXFLAGS_WARN_ON += \
 
+  # as we're using default-constructed iterators as "null" we can't have
+  # checked iterators with MSVC
+  DEFINES += _ITERATOR_DEBUG_LEVEL=0
+
 } else {
 
   CONFIG(gcov) {

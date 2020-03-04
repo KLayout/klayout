@@ -594,6 +594,7 @@ module LVS
       @comparer_config << lambda { |comparer| comparer.max_depth = v }
     end
 
+    # %LVS%
     # @name max_branch_complexity
     # @brief Configures the maximum branch complexity for ambiguous net matching
     # @synopsis max_branch_complexity(n)
@@ -603,8 +604,8 @@ module LVS
     # path for this nets may lead to further branches if more ambiguous
     # nets are encountered. To avoid combinational explosion, the maximum
     # branch complexity is limited to the value configured with this 
-    # function. The default value is 100 which means not more than
-    # 100 combinations are tried for a single seed pair. For networks
+    # function. The default value is 500 which means not more than
+    # 500 combinations are tried for a single seed pair. For networks
     # with inherent ambiguity such as decoders, the complexity
     # can be increased at the expense of potentially larger runtimes.
     # The runtime penality is roughly proportional to the branch

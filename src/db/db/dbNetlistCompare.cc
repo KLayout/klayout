@@ -3627,7 +3627,7 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
   }
 }
 
-static bool derive_symmetry_groups (const db::NetGraph &graph, const tl::equivalence_clusters<const NetGraphNode *> &identical_nodes, std::set<size_t> &considered_nodes, const std::set<size_t> &symmetry_group, std::list<std::set<size_t> > &symmetry_groups)
+static bool derive_symmetry_groups (const db::NetGraph &graph, const tl::equivalence_clusters<const NetGraphNode *> &identical_nodes, std::set<size_t> &considered_nodes, const std::set<size_t> &symmetry_group, std::vector<std::set<size_t> > &symmetry_groups)
 {
   std::set<size_t> cids;
   std::set<size_t> new_symmetry_group;
@@ -3752,7 +3752,7 @@ NetlistComparer::join_symmetric_nets (db::Circuit *circuit)
     }
   }
 
-  std::list<std::set<size_t> > symmetry_groups;
+  std::vector<std::set<size_t> > symmetry_groups;
   std::set<size_t> visited;
 
   for (std::vector<const NetGraphNode *>::const_iterator np = nodes.begin (); np != nodes.end (); ++np) {
@@ -3774,10 +3774,13 @@ NetlistComparer::join_symmetric_nets (db::Circuit *circuit)
 
   }
 
+  std::sort (symmetry_groups.begin (), symmetry_groups.end ());
+  symmetry_groups.erase (std::unique (symmetry_groups.begin (), symmetry_groups.end ()), symmetry_groups.end ());
+
   if (! symmetry_groups.empty () && tl::verbosity () >= 30) {
     tl::info << tl::to_string (tr ("Symmetry groups:"));
     int index = 0;
-    for (std::list<std::set<size_t> >::const_iterator g = symmetry_groups.begin (); g != symmetry_groups.end (); ++g) {
+    for (std::vector<std::set<size_t> >::const_iterator g = symmetry_groups.begin (); g != symmetry_groups.end (); ++g) {
       tl::info << "  [" << index << "] " << tl::noendl;
       for (std::set<size_t>::const_iterator i = g->begin (); i != g->end (); ++i) {
         tl::info << (i == g->begin () ? "" : ",") << (graph.node (*i).net () ? graph.node (*i).net ()->expanded_name ().c_str () : "(null)") << tl::noendl;
@@ -3789,7 +3792,7 @@ NetlistComparer::join_symmetric_nets (db::Circuit *circuit)
 
   //  join the nets
 
-  for (std::list<std::set<size_t> >::const_iterator g = symmetry_groups.begin (); g != symmetry_groups.end (); ++g) {
+  for (std::vector<std::set<size_t> >::const_iterator g = symmetry_groups.begin (); g != symmetry_groups.end (); ++g) {
     for (std::set<size_t>::const_iterator i = g->begin (); i != g->end (); ++i) {
       if (i != g->begin ()) {
         circuit->join_nets (const_cast<db::Net *> (graph.net_by_node_index (*g->begin ())), const_cast<db::Net *> (graph.net_by_node_index (*i)));

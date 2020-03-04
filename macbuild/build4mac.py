@@ -632,8 +632,11 @@ def DeployBinariesForBundle():
   #                             +-- Frameworks/+
   #                             |              +-- '*.framework'
   #                             |              +-- '*.dylib'
+  #                             |              +-- 'db_plugins' --slink--> ../MacOS/db_plugins/
   #                             +-- MacOS/+
   #                             |         +-- 'klayout'
+  #                             |         +-- db_plugins/
+  #                             |         +-- lay_plugins/
   #                             +-- Buddy/+
   #                                       +-- 'strm2cif'
   #                                       +-- 'strm2dxf'
@@ -714,8 +717,8 @@ def DeployBinariesForBundle():
 
   os.chdir(ProjectDir)
   #-------------------------------------------------------------------
-  # copy the contents of the plugin directories to a place next to the application
-  # binary
+  # Copy the contents of the plugin directories to a place next to
+  # the application binary
   #-------------------------------------------------------------------
   for piDir in [ "db_plugins", "lay_plugins" ]:
     os.makedirs( os.path.join( targetDirM, piDir ))
@@ -751,13 +754,34 @@ def DeployBinariesForBundle():
   exit()
   '''
 
+  #----------------------------------------------------------------------------------
+  # (D) Make a symbolic link
+  #        'db_plugins' --slink--> ../MacOS/db_plugins/
+  #     under Frameworks/, which is required for the command line Buddy tools.
+  #
+  #     Ref. https://github.com/KLayout/klayout/issues/460#issuecomment-571803458
+  #
+  #             :
+  #             +-- Frameworks/+
+  #             |              +-- '*.framework'
+  #             |              +-- '*.dylib'
+  #             |              +-- 'db_plugins' --slink--> ../MacOS/db_plugins/
+  #             +-- MacOS/+
+  #             |         +-- 'klayout'
+  #             |         +-- db_plugins/
+  #             |         +-- lay_plugins/
+  #             :
+  #----------------------------------------------------------------------------------
+  os.chdir( targetDirF )
+  os.symlink( "../MacOS/db_plugins/", "./db_plugins" )
+
+
   print( " [5] Setting and changing the identification names among KLayout's libraries ..." )
   #-------------------------------------------------------------
   # [5] Set the identification names for KLayout's libraries
   #     and make the library aware of the locations of libraries
   #     on which it depends; that is, inter-library dependency
   #-------------------------------------------------------------
-  os.chdir( targetDirF )
   ret = SetChangeIdentificationNameOfDyLib( depDicOrdinary, pathDic )
   if not ret == 0:
     msg = "!!! Failed to set and change to new identification names !!!"

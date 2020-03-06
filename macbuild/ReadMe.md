@@ -1,4 +1,4 @@
-Relevant KLayout version: 0.26.1
+Relevant KLayout version: 0.26.4
 
 # 1. Introduction
 This directory **`macbuild`** contains different files required for building KLayout (http://www.klayout.de/) version 0.26.1 or later for different 64-bit Mac OSXs including:
@@ -61,11 +61,11 @@ $ [python] ./build4mac.py
                         :   Qt5MacPorts: use Qt5 from MacPorts                           |
                         :       Qt5Brew: use Qt5 from Homebrew                           |
                         :       Qt5Ana3: use Qt5 from Anaconda3                          |
-   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP26', 'HB26', 'Ana3']   | sys
+   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP26', 'HB27', 'Ana3']   | sys
                         :    nil: don't bind Ruby                                        |
                         :    Sys: use OS-bundled Ruby [2.0 - 2.6] depending on OS        |
                         :   MP26: use Ruby 2.6 from MacPorts                             |
-                        :   HB26: use Ruby 2.6 from Homebrew                             |
+                        :   HB27: use Ruby 2.7 from Homebrew                             |
                         :   Ana3: use Ruby 2.5 from Anaconda3                            |
    [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP37', 'HB37', 'Ana3']   | sys
                         :    nil: don't bind Python                                      |
@@ -139,22 +139,22 @@ $ ./build4mac.py -q qt5macports -r mp26 -p mp37 -Y
 * "Rmp26Pmp37" means that Ruby is 2.6 from MacPorts; Python is 3.7 from MacPorts.
 4. Copy/move the generated application bundle **`klayout.app`** to your **`/Applications`** directory for installation.
 
-### 6C. Fully Homebrew-flavored build with Homebrew Ruby 2.6 and Homebrew Python 3.7
+### 6C. Fully Homebrew-flavored build with Homebrew Ruby 2.7 and Homebrew Python 3.7
 ```
 $ cd /where/'build.sh'/exists
-$ ./build4mac.py -q qt5brew -r hb26 -p hb37
+$ ./build4mac.py -q qt5brew -r hb27 -p hb37
 ```
 2. Confirm successful build (it will take about one hour depending on your machine spec).
 3. Run **`build4mac.py`** again with the same options used in 1. PLUS "-Y" to deploy executables and libraries under **`klayout.app`** bundle.<br>
    The buddy command-line tools (strm*) will also be deployed in this step.
 ```
-$ ./build4mac.py -q qt5brew -r hb26 -p hb37 -Y
+$ ./build4mac.py -q qt5brew -r hb27 -p hb37 -Y
 ```
   The application bundle **`klayout.app`** is located under:<br>
-  **`LW-qt5Brew.pkg.macos-Catalina-release-Rhb26Phb37`** directory, where
+  **`LW-qt5Brew.pkg.macos-Catalina-release-Rhb27Phb37`** directory, where
 * "LW-"        means that this is a lightweight package.
 * "qt5Brew"    means that Qt5 from Homebrew is used.
-* "Rhb26Phb37" means that Ruby is 2.6 from Homebrew; Python is 3.7 from Homebrew.
+* "Rhb27Phb37" means that Ruby is 2.7 from Homebrew; Python is 3.7 from Homebrew.
 4. Copy/move the generated application bundle **`klayout.app`** to your **`/Applications`** directory for installation.
 
 ### 6D. Partially Homebrew-flavored build with System Ruby and Homebrew Python 3.7
@@ -220,8 +220,8 @@ $ cd /where/'build.sh'/exists
 $ ./makeDMG4mac.py -p ST-qt5MP.pkg.macos-Catalina-release-RsysPsys -m
 ```
 This command will generate the two files below:<br>
-* **`ST-klayout-0.26.1-macOS-Catalina-1-qt5MP-RsysPsys.dmg`**      ---(1) the main DMG file
-* **`ST-klayout-0.26.1-macOS-Catalina-1-qt5MP-RsysPsys.dmg.md5`**  ---(2) MD5-value text file
+* **`ST-klayout-0.26.4-macOS-Catalina-1-qt5MP-RsysPsys.dmg`**      ---(1) the main DMG file
+* **`ST-klayout-0.26.4-macOS-Catalina-1-qt5MP-RsysPsys.dmg.md5`**  ---(2) MD5-value text file
 
 # Known issues
 Because we assume some specific versions of non-OS-standard Ruby and Python, updating MacPorts, Homebrew, or Anaconda3 may cause build- and link errors.<br>

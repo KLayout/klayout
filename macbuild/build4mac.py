@@ -67,11 +67,11 @@ def SetGlobals():
   Usage += "                        :   Qt5MacPorts: use Qt5 from MacPorts                           | \n"
   Usage += "                        :       Qt5Brew: use Qt5 from Homebrew                           | \n"
   Usage += "                        :       Qt5Ana3: use Qt5 from Anaconda3                          | \n"
-  Usage += "   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP26', 'HB26', 'Ana3']   | sys \n"
+  Usage += "   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP26', 'HB27', 'Ana3']   | sys \n"
   Usage += "                        :    nil: don't bind Ruby                                        | \n"
   Usage += "                        :    Sys: use OS-bundled Ruby [2.0 - 2.6] depending on OS        | \n"
   Usage += "                        :   MP26: use Ruby 2.6 from MacPorts                             | \n"
-  Usage += "                        :   HB26: use Ruby 2.6 from Homebrew                             | \n"
+  Usage += "                        :   HB27: use Ruby 2.7 from Homebrew                             | \n"
   Usage += "                        :   Ana3: use Ruby 2.5 from Anaconda3                            | \n"
   Usage += "   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP37', 'HB37', 'Ana3']   | sys \n"
   Usage += "                        :    nil: don't bind Python                                      | \n"
@@ -191,7 +191,7 @@ def ParseCommandLineArguments():
 
   p.add_option( '-r', '--ruby',
                 dest='type_ruby',
-                help="Ruby type=['nil', 'Sys', 'MP26', 'HB26', 'Ana3']" )
+                help="Ruby type=['nil', 'Sys', 'MP26', 'HB27', 'Ana3']" )
 
   p.add_option( '-p', '--python',
                 dest='type_python',
@@ -289,7 +289,7 @@ def ParseCommandLineArguments():
   candidates['NIL']  = 'nil'
   candidates['SYS']  = 'Sys'
   candidates['MP26'] = 'MP26'
-  candidates['HB26'] = 'HB26'
+  candidates['HB27'] = 'HB27'
   candidates['ANA3'] = 'Ana3'
   try:
     choiceRuby = candidates[ opt.type_ruby.upper() ]
@@ -315,8 +315,8 @@ def ParseCommandLineArguments():
     elif choiceRuby == "MP26":
       ModuleRuby   = 'Ruby26MacPorts'
       NonOSStdLang = True
-    elif choiceRuby == "HB26":
-      ModuleRuby   = 'Ruby26Brew'
+    elif choiceRuby == "HB27":
+      ModuleRuby   = 'Ruby27Brew'
       NonOSStdLang = True
     elif choiceRuby == "Ana3":
       ModuleRuby   = 'RubyAnaconda3'
@@ -632,8 +632,11 @@ def DeployBinariesForBundle():
   #                             +-- Frameworks/+
   #                             |              +-- '*.framework'
   #                             |              +-- '*.dylib'
+  #                             |              +-- 'db_plugins' --slink--> ../MacOS/db_plugins/
   #                             +-- MacOS/+
   #                             |         +-- 'klayout'
+  #                             |         +-- db_plugins/
+  #                             |         +-- lay_plugins/
   #                             +-- Buddy/+
   #                                       +-- 'strm2cif'
   #                                       +-- 'strm2dxf'
@@ -714,8 +717,8 @@ def DeployBinariesForBundle():
 
   os.chdir(ProjectDir)
   #-------------------------------------------------------------------
-  # copy the contents of the plugin directories to a place next to the application
-  # binary
+  # Copy the contents of the plugin directories to a place next to
+  # the application binary
   #-------------------------------------------------------------------
   for piDir in [ "db_plugins", "lay_plugins" ]:
     os.makedirs( os.path.join( targetDirM, piDir ))
@@ -751,13 +754,34 @@ def DeployBinariesForBundle():
   exit()
   '''
 
+  #----------------------------------------------------------------------------------
+  # (D) Make a symbolic link
+  #        'db_plugins' --slink--> ../MacOS/db_plugins/
+  #     under Frameworks/, which is required for the command line Buddy tools.
+  #
+  #     Ref. https://github.com/KLayout/klayout/issues/460#issuecomment-571803458
+  #
+  #             :
+  #             +-- Frameworks/+
+  #             |              +-- '*.framework'
+  #             |              +-- '*.dylib'
+  #             |              +-- 'db_plugins' --slink--> ../MacOS/db_plugins/
+  #             +-- MacOS/+
+  #             |         +-- 'klayout'
+  #             |         +-- db_plugins/
+  #             |         +-- lay_plugins/
+  #             :
+  #----------------------------------------------------------------------------------
+  os.chdir( targetDirF )
+  os.symlink( "../MacOS/db_plugins/", "./db_plugins" )
+
+
   print( " [5] Setting and changing the identification names among KLayout's libraries ..." )
   #-------------------------------------------------------------
   # [5] Set the identification names for KLayout's libraries
   #     and make the library aware of the locations of libraries
   #     on which it depends; that is, inter-library dependency
   #-------------------------------------------------------------
-  os.chdir( targetDirF )
   ret = SetChangeIdentificationNameOfDyLib( depDicOrdinary, pathDic )
   if not ret == 0:
     msg = "!!! Failed to set and change to new identification names !!!"
@@ -984,11 +1008,11 @@ def DeployBinariesForBundle():
     #-------------------------------------------------------------
     # [10] Special deployment of Ruby2.6 from Homebrew?
     #-------------------------------------------------------------
-    deploymentRuby26HB = (ModuleRuby == 'Ruby26Brew')
+    deploymentRuby26HB = (ModuleRuby == 'Ruby27Brew')
     if deploymentRuby26HB and NonOSStdLang:
 
       print( "" )
-      print( " [10] You have reached optional deployment of Ruby from %s ..." % HBRuby26Path )
+      print( " [10] You have reached optional deployment of Ruby from %s ..." % HBRuby27Path )
       print( "   [!!!] Sorry, the deployed package will not work properly since deployment of" )
       print( "         Ruby2.6 from Homebrew is not yet supported." )
       print( "         Since you have Homebrew development environment, there two options:" )

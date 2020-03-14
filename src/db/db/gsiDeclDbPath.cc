@@ -119,28 +119,25 @@ struct path_defs
     constructor ("new", &new_v, 
       "@brief Default constructor: creates an empty (invalid) path with width 0"
     ) +
-    constructor ("new|#new_pw", &new_pw, 
+    constructor ("new|#new_pw", &new_pw, gsi::arg ("pts"), gsi::arg ("width"),
       "@brief Constructor given the points of the path's spine and the width\n"
       "\n"
-      "@args pts, width\n"
       "\n"
       "@param pts The points forming the spine of the path\n"
       "@param width The width of the path\n"
     ) +
-    constructor ("new|#new_pwx", &new_pwx, 
+    constructor ("new|#new_pwx", &new_pwx, gsi::arg ("pts"), gsi::arg ("width"), gsi::arg ("bgn_ext"), gsi::arg ("end_ext"),
       "@brief Constructor given the points of the path's spine, the width and the extensions\n"
       "\n"
-      "@args pts, width, bgn_ext, end_ext\n"
       "\n"
       "@param pts The points forming the spine of the path\n"
       "@param width The width of the path\n"
       "@param bgn_ext The begin extension of the path\n"
       "@param end_ext The end extension of the path\n"
     ) +
-    constructor ("new|#new_pwxr", &new_pwxr, 
+    constructor ("new|#new_pwxr", &new_pwxr, gsi::arg ("pts"), gsi::arg ("width"), gsi::arg ("bgn_ext"), gsi::arg ("end_ext"), gsi::arg ("round"),
       "@brief Constructor given the points of the path's spine, the width, the extensions and the round end flag\n"
       "\n"
-      "@args pts, width, bgn_ext, end_ext, round\n"
       "\n"
       "@param pts The points forming the spine of the path\n"
       "@param width The width of the path\n"
@@ -148,20 +145,17 @@ struct path_defs
       "@param end_ext The end extension of the path\n"
       "@param round If this flag is true, the path will get rounded ends\n"
     ) +
-    method ("<", &C::less,
+    method ("<", &C::less, gsi::arg ("p"),
       "@brief Less operator\n"
-      "@args p\n"
       "@param p The object to compare against\n"
       "This operator is provided to establish some, not necessarily a certain sorting order"
     ) +
-    method ("==", &C::equal,
+    method ("==", &C::equal, gsi::arg ("p"),
       "@brief Equality test\n"
-      "@args p\n"
       "@param p The object to compare against"
     ) +
-    method ("!=", &C::not_equal,
+    method ("!=", &C::not_equal, gsi::arg ("p"),
       "@brief Inequality test\n"
-      "@args p\n"
       "@param p The object to compare against\n"
     ) +
     method_ext ("hash", &hash_value,
@@ -170,9 +164,8 @@ struct path_defs
       "\n"
       "This method has been introduced in version 0.25.\n"
     ) +
-    method_ext ("points=", &set_points,
+    method_ext ("points=", &set_points, gsi::arg ("p"),
       "@brief Set the points of the path\n"
-      "@args p\n"
       "@param p An array of points to assign to the path's spine"
     ) +
     iterator ("each_point", &C::begin, &C::end, 
@@ -181,30 +174,26 @@ struct path_defs
     method ("num_points|#points", &C::points,
       "@brief Get the number of points"
     ) +
-    method ("width=", (void (C::*)(coord_type)) &C::width,
+    method ("width=", (void (C::*)(coord_type)) &C::width, gsi::arg ("w"),
       "@brief Set the width\n"
-      "@args w\n"
     ) +
     method ("width", (coord_type (C::*)() const) &C::width,
       "@brief Get the width\n"
     ) +
-    method ("bgn_ext=", (void (C::*)(coord_type)) &C::bgn_ext,
+    method ("bgn_ext=", (void (C::*)(coord_type)) &C::bgn_ext, gsi::arg ("ext"),
       "@brief Set the begin extension\n"
-      "@args ext\n"
     ) +
     method ("bgn_ext", (coord_type (C::*)() const) &C::bgn_ext,
       "@brief Get the begin extension\n"
     ) +
-    method ("end_ext=", (void (C::*)(coord_type)) &C::end_ext,
+    method ("end_ext=", (void (C::*)(coord_type)) &C::end_ext, gsi::arg ("ext"),
       "@brief Set the end extension\n"
-      "@args ext\n"
     ) +
     method ("end_ext", (coord_type (C::*)() const) &C::end_ext,
       "@brief Get the end extension\n"
     ) +
-    method ("round=", (void (C::*)(bool)) &C::round,
+    method ("round=", (void (C::*)(bool)) &C::round, gsi::arg ("round_ends_flag"),
       "@brief Set the 'round ends' flag\n"
-      "@args round_ends_flag\n"
       "A path with round ends show half circles at the ends, instead of square or rectangular ends. "
       "Paths with this flag set should use a begin and end extension of half the width (see \\bgn_ext and \\end_ext). "
       "The interpretation of such paths in other tools may differ otherwise."
@@ -212,17 +201,15 @@ struct path_defs
     method ("is_round?", (bool (C::*)() const) &C::round,
       "@brief Returns true, if the path has round ends\n"
     ) +
-    method_ext ("*", &scale,
+    method_ext ("*", &scale, gsi::arg ("f"),
       "@brief Scaling by some factor\n"
       "\n"
-      "@args f\n"
       "\n"
       "Returns the scaled object. All coordinates are multiplied with the given factor and if "
       "necessary rounded."
     ) +
-    method ("move", &C::move,
+    method ("move", &C::move, gsi::arg ("p"),
       "@brief Moves the path.\n"
-      "@args p\n"
       "\n"
       "Moves the path by the given offset and returns the \n"
       "moved path. The path is overwritten.\n"
@@ -231,9 +218,8 @@ struct path_defs
       "\n"
       "@return The moved path.\n"
     ) +
-    method_ext ("move", &move_xy,
+    method_ext ("move", &move_xy, gsi::arg ("dx"), gsi::arg ("dy"),
       "@brief Moves the path.\n"
-      "@args dx, dy\n"
       "\n"
       "Moves the path by the given offset and returns the \n"
       "moved path. The path is overwritten.\n"
@@ -245,9 +231,8 @@ struct path_defs
       "\n"
       "This version has been added in version 0.23.\n"
     ) +
-    method ("moved", &C::moved,
+    method ("moved", &C::moved, gsi::arg ("p"),
       "@brief Returns the moved path (does not change self)\n"
-      "@args p\n"
       "\n"
       "Moves the path by the given offset and returns the \n"
       "moved path. The path is not modified.\n"
@@ -256,9 +241,8 @@ struct path_defs
       "\n"
       "@return The moved path.\n"
     ) +
-    method_ext ("moved", &moved_xy,
+    method_ext ("moved", &moved_xy, gsi::arg ("dx"), gsi::arg ("dy"),
       "@brief Returns the moved path (does not change self)\n"
-      "@args dx, dy\n"
       "\n"
       "Moves the path by the given offset and returns the \n"
       "moved path. The path is not modified.\n"
@@ -270,9 +254,8 @@ struct path_defs
       "\n"
       "This version has been added in version 0.23.\n"
     ) +
-    method ("transformed", &C::template transformed<simple_trans_type>,
+    method ("transformed", &C::template transformed<simple_trans_type>, gsi::arg ("t"),
       "@brief Transform the path.\n"
-      "@args t\n"
       "\n"
       "Transforms the path with the given transformation.\n"
       "Does not modify the path but returns the transformed path.\n"
@@ -281,9 +264,8 @@ struct path_defs
       "\n"
       "@return The transformed path.\n"
     ) +
-    method ("transformed|#transformed_cplx", &C::template transformed<complex_trans_type>,
+    method ("transformed|#transformed_cplx", &C::template transformed<complex_trans_type>, gsi::arg ("t"),
       "@brief Transform the path.\n"
-      "@args t\n"
       "\n"
       "Transforms the path with the given complex transformation.\n"
       "Does not modify the path but returns the transformed path.\n"
@@ -292,9 +274,8 @@ struct path_defs
       "\n"
       "@return The transformed path.\n"
     ) +
-    constructor ("from_s", &from_string,
+    constructor ("from_s", &from_string, gsi::arg ("s"),
       "@brief Creates an object from a string\n"
-      "@args s\n"
       "Creates the object from a string representation (as returned by \\to_s)\n"
       "\n"
       "This method has been added in version 0.23.\n"
@@ -367,9 +348,8 @@ Class<db::Path> decl_Path ("db", "Path",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method ("transformed", &db::Path::transformed<db::ICplxTrans>,
+  method ("transformed", &db::Path::transformed<db::ICplxTrans>, gsi::arg ("t"),
     "@brief Transform the path.\n"
-    "@args t\n"
     "\n"
     "Transforms the path with the given complex transformation.\n"
     "Does not modify the path but returns the transformed path.\n"
@@ -447,10 +427,9 @@ Class<db::DPath> decl_DPath ("db", "DPath",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method ("transformed", &db::DPath::transformed<db::VCplxTrans>,
+  method ("transformed", &db::DPath::transformed<db::VCplxTrans>, gsi::arg ("t"),
     "@brief Transforms the polygon with the given complex transformation\n"
     "\n"
-    "@args t\n"
     "\n"
     "@param t The magnifying transformation to apply\n"
     "@return The transformed path (in this case an integer coordinate path)\n"
@@ -474,4 +453,3 @@ Class<db::DPath> decl_DPath ("db", "DPath",
 );
 
 }
-

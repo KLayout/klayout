@@ -156,43 +156,38 @@ struct text_defs
       "\n"
       "Creates a text with unit transformation and empty text."
     ) +
-    constructor ("new", &new_st,
+    constructor ("new", &new_st, gsi::arg ("string"), gsi::arg ("trans"),
       "@brief Constructor with string and transformation\n"
       "\n"
-      "@args string, trans\n"
       "\n"
       "A string and a transformation is provided to this constructor. The transformation "
       "specifies the location and orientation of the text object."
     ) +
-    constructor ("new", &new_sxy,
+    constructor ("new", &new_sxy, gsi::arg ("string"), gsi::arg ("x"), gsi::arg ("y"),
       "@brief Constructor with string and location\n"
       "\n"
-      "@args string, x, y\n"
       "\n"
       "A string and a location is provided to this constructor. The location "
       "is specifies as a pair of x and y coordinates.\n"
       "\n"
       "This method has been introduced in version 0.23."
     ) +
-    constructor ("new", &new_sthf,
+    constructor ("new", &new_sthf, gsi::arg ("string"), gsi::arg ("trans"), gsi::arg ("height"), gsi::arg ("font"),
       "@brief Constructor with string, transformation, text height and font\n"
       "\n"
-      "@args string, trans, height, font\n"
       "\n"
       "A string and a transformation is provided to this constructor. The transformation "
       "specifies the location and orientation of the text object. In addition, the text height "
       "and font can be specified."
     ) +
-    method ("string=", (void (C::*) (const std::string &)) &C::string,
+    method ("string=", (void (C::*) (const std::string &)) &C::string, gsi::arg ("text"),
       "@brief Assign a text string to this object\n"
-      "@args text\n"
     ) +
     method ("string", (const char *(C::*) () const) &C::string,
       "@brief Get the text string\n"
     ) +
-    method_ext ("x=", set_x,
+    method_ext ("x=", set_x, gsi::arg ("x"),
       "@brief Sets the x location of the text\n"
-      "@args x\n"
       "\n"
       "This method has been introduced in version 0.23.\n"
     ) +
@@ -201,9 +196,8 @@ struct text_defs
       "\n"
       "This method has been introduced in version 0.23.\n"
     ) +
-    method_ext ("y=", set_y,
+    method_ext ("y=", set_y, gsi::arg ("y"),
       "@brief Sets the y location of the text\n"
-      "@args y\n"
       "\n"
       "This method has been introduced in version 0.23.\n"
     ) +
@@ -212,30 +206,26 @@ struct text_defs
       "\n"
       "This method has been introduced in version 0.23.\n"
     ) +
-    method ("trans=", (void (C::*) (const simple_trans_type &)) &C::trans,
+    method ("trans=", (void (C::*) (const simple_trans_type &)) &C::trans, gsi::arg ("t"),
       "@brief Assign a transformation (text position and orientation) to this object\n"
-      "@args t\n"
     ) +
     method ("trans", (const simple_trans_type & (C::*) () const) &C::trans,
       "@brief Get the transformation\n"
     ) +
-    method ("size=", (void (C::*) (coord_type)) &C::size,
+    method ("size=", (void (C::*) (coord_type)) &C::size, gsi::arg ("s"),
       "@brief Set the text height of this object\n"
-      "@args s\n"
     ) +
     method ("size", (coord_type (C::*) () const) &C::size,
       "@brief Get the text height\n"
     ) +
-    method_ext ("font=", &set_font,
+    method_ext ("font=", &set_font, gsi::arg ("f"),
       "@brief Set the font number\n"
-      "@args f\n"
     ) +
     method_ext ("font", &get_font,
       "@brief Get the font number\n"
     ) +
-    method_ext ("halign=", &set_halign,
+    method_ext ("halign=", &set_halign, gsi::arg ("a"),
       "@brief Set the horizontal alignment\n"
-      "@args a\n"
       "\n"
       "This property specifies how the text is aligned relative to the anchor point. "
       "Allowed values for this property are 0 (left), 1 (center) and 2 (right)."
@@ -247,9 +237,8 @@ struct text_defs
       "\n"
       "See \\halign= for a description of this property.\n"
     ) +
-    method_ext ("valign=", &set_valign,
+    method_ext ("valign=", &set_valign, gsi::arg ("a"),
       "@brief Set the vertical alignment\n"
-      "@args a\n"
       "\n"
       "This property specifies how the text is aligned relative to the anchor point. "
       "Allowed values for this property are 0 (top), 1 (center) and 2 (bottom)."
@@ -261,10 +250,9 @@ struct text_defs
       "\n"
       "See \\valign= for a description of this property.\n"
     ) +
-    method_ext ("move", &move,
+    method_ext ("move", &move, gsi::arg ("distance"),
       "@brief Moves the text by a certain distance (modifies self)\n"
       "\n"
-      "@args distance\n"
       "\n"
       "Moves the text by a given offset and returns the moved\n"
       "text. Does not check for coordinate overflows.\n"
@@ -273,10 +261,9 @@ struct text_defs
       "\n"
       "@return A reference to this text object\n"
     ) +
-    method_ext ("move", &move_xy,
+    method_ext ("move", &move_xy, gsi::arg ("dx"), gsi::arg ("dy"),
       "@brief Moves the text by a certain distance (modifies self)\n"
       "\n"
-      "@args dx, dy\n"
       "\n"
       "Moves the text by a given distance in x and y direction and returns the moved\n"
       "text. Does not check for coordinate overflows.\n"
@@ -288,10 +275,9 @@ struct text_defs
       "\n"
       "This method was introduced in version 0.23."
     ) +
-    method_ext ("moved", &moved,
+    method_ext ("moved", &moved, gsi::arg ("distance"),
       "@brief Returns the text moved by a certain distance (does not modify self)\n"
       "\n"
-      "@args distance\n"
       "\n"
       "Moves the text by a given offset and returns the moved\n"
       "text. Does not modify *this. Does not check for coordinate\n"
@@ -301,10 +287,9 @@ struct text_defs
       "\n"
       "@return The moved text.\n"
     ) +
-    method_ext ("moved", &moved_xy,
+    method_ext ("moved", &moved_xy, gsi::arg ("dx"), gsi::arg ("dy"),
       "@brief Returns the text moved by a certain distance (does not modify self)\n"
       "\n"
-      "@args dx, dy\n"
       "\n"
       "Moves the text by a given offset and returns the moved\n"
       "text. Does not modify *this. Does not check for coordinate\n"
@@ -317,39 +302,34 @@ struct text_defs
       "\n"
       "This method was introduced in version 0.23."
     ) +
-    method ("transformed", &C::template transformed<simple_trans_type>,
+    method ("transformed", &C::template transformed<simple_trans_type>, gsi::arg ("t"),
       "@brief Transform the text with the given simple transformation\n"
       "\n"
-      "@args t\n"
       "\n"
       "@param t The transformation to apply\n"
       "@return The transformed text\n"
     ) +
-    method ("transformed", &C::template transformed<complex_trans_type>,
+    method ("transformed", &C::template transformed<complex_trans_type>, gsi::arg ("t"),
       "@brief Transform the text with the given complex transformation\n"
       "\n"
-      "@args t\n"
       "\n"
       "@param t The magnifying transformation to apply\n"
       "@return The transformed text (a DText now)\n"
     ) +
-    method ("<", &C::less,
+    method ("<", &C::less, gsi::arg ("t"),
       "@brief Less operator\n"
-      "@args t\n"
       "@param t The object to compare against\n"
       "This operator is provided to establish some, not necessarily a certain sorting order"
     ) +
-    method ("==", &C::equal,
+    method ("==", &C::equal, gsi::arg ("text"),
       "@brief Equality\n"
       "\n"
-      "@args text\n"
       "\n"
       "Return true, if this text object and the given text are equal "
     ) +
-    method ("!=", &C::not_equal,
+    method ("!=", &C::not_equal, gsi::arg ("text"),
       "@brief Inequality\n"
       "\n"
-      "@args text\n"
       "\n"
       "Return true, if this text object and the given text are not equal "
     ) +
@@ -359,9 +339,8 @@ struct text_defs
       "\n"
       "This method has been introduced in version 0.25.\n"
     ) +
-    constructor ("from_s", &from_string,
+    constructor ("from_s", &from_string, gsi::arg ("s"),
       "@brief Creates an object from a string\n"
-      "@args s\n"
       "Creates the object from a string representation (as returned by \\to_s)\n"
       "\n"
       "This method has been added in version 0.23.\n"
@@ -396,10 +375,9 @@ Class<db::Text> decl_Text ("db", "Text",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method ("transformed", &db::Text::transformed<db::ICplxTrans>,
+  method ("transformed", &db::Text::transformed<db::ICplxTrans>, gsi::arg ("t"),
     "@brief Transform the text with the given complex transformation\n"
     "\n"
-    "@args t\n"
     "\n"
     "@param t The magnifying transformation to apply\n"
     "@return The transformed text (in this case an integer coordinate object now)\n"
@@ -446,10 +424,9 @@ Class<db::DText> decl_DText ("db", "DText",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method ("transformed", &db::DText::transformed<db::VCplxTrans>,
+  method ("transformed", &db::DText::transformed<db::VCplxTrans>, gsi::arg ("t"),
     "@brief Transforms the text with the given complex transformation\n"
     "\n"
-    "@args t\n"
     "\n"
     "@param t The magnifying transformation to apply\n"
     "@return The transformed text (in this case an integer coordinate text)\n"
@@ -472,4 +449,3 @@ Class<db::DText> decl_DText ("db", "DText",
 );
 
 }
-

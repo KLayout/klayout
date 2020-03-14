@@ -153,7 +153,6 @@ gsi::ClassExt<db::LoadLayoutOptions> common_reader_options (
   ) +
   gsi::method_ext ("properties_enabled=", &set_properties_enabled, gsi::arg ("enabled"),
     "@brief Specifies whether properties should be read\n"
-    "@args enabled\n"
     "@param enabled True, if properties should be read."
     "\n"
     "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration."
@@ -162,7 +161,6 @@ gsi::ClassExt<db::LoadLayoutOptions> common_reader_options (
 );
 
 }
-
 
 
 

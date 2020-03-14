@@ -185,33 +185,29 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "\n"
     "This constructor creates an empty edge pair collection.\n"
   ) + 
-  constructor ("new", &new_a,
+  constructor ("new", &new_a, gsi::arg ("array"),
     "@brief Constructor from an edge pair array\n"
-    "@args array\n"
     "\n"
     "This constructor creates an edge pair collection from an array of \\EdgePair objects.\n"
     "\n"
     "This constructor has been introduced in version 0.26."
   ) +
-  constructor ("new", &new_ep,
+  constructor ("new", &new_ep, gsi::arg ("edge_pair"),
     "@brief Constructor from a single edge pair object\n"
-    "@args edge_pair\n"
     "\n"
     "This constructor creates an edge pair collection with a single edge pair.\n"
     "\n"
     "This constructor has been introduced in version 0.26."
   ) +
-  constructor ("new", &new_shapes,
+  constructor ("new", &new_shapes, gsi::arg ("shapes"),
     "@brief Shapes constructor\n"
-    "@args shapes\n"
     "\n"
     "This constructor creates an edge pair collection from a \\Shapes collection.\n"
     "\n"
     "This constructor has been introduced in version 0.26."
   ) +
-  constructor ("new", &new_si,
+  constructor ("new", &new_si, gsi::arg ("shape_iterator"),
     "@brief Constructor from a hierarchical shape set\n"
-    "@args shape_iterator\n"
     "\n"
     "This constructor creates an edge pair collection from the shapes delivered by the given recursive shape iterator.\n"
     "Only edge pairs are taken from the shape set and other shapes are ignored.\n"
@@ -228,9 +224,8 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "\n"
     "This constructor has been introduced in version 0.26."
   ) +
-  constructor ("new", &new_si2,
+  constructor ("new", &new_si2, gsi::arg ("shape_iterator"), gsi::arg ("trans"),
     "@brief Constructor from a hierarchical shape set with a transformation\n"
-    "@args shape_iterator, trans\n"
     "\n"
     "This constructor creates an edge pair collection from the shapes delivered by the given recursive shape iterator.\n"
     "Only edge pairs are taken from the shape set and other shapes are ignored.\n"
@@ -304,13 +299,11 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "\n"
     "This method has been introduced in version 0.26."
   ) +
-  method ("insert", (void (db::EdgePairs::*) (const db::Edge &, const db::Edge &)) &db::EdgePairs::insert,
+  method ("insert", (void (db::EdgePairs::*) (const db::Edge &, const db::Edge &)) &db::EdgePairs::insert, gsi::arg ("first"), gsi::arg ("second"),
     "@brief Inserts an edge pair into the collection\n"
-    "@args first, second\n"
   ) +
-  method ("insert", (void (db::EdgePairs::*) (const db::EdgePair &)) &db::EdgePairs::insert,
+  method ("insert", (void (db::EdgePairs::*) (const db::EdgePair &)) &db::EdgePairs::insert, gsi::arg ("edge_pair"),
     "@brief Inserts an edge pair into the collection\n"
-    "@args edge_pair\n"
   ) +
   method_ext ("is_deep?", &is_deep,
     "@brief Returns true if the edge pair collection is a deep (hierarchical) one\n"
@@ -322,29 +315,26 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "\n"
     "This method has been added in version 0.26."
   ) +
-  method ("+", &db::EdgePairs::operator+,
+  method ("+", &db::EdgePairs::operator+, gsi::arg ("other"),
     "@brief Returns the combined edge pair collection of self and the other one\n"
     "\n"
-    "@args other\n"
     "@return The resulting edge pair collection\n"
     "\n"
     "This operator adds the edge pairs of the other collection to self and returns a new combined set.\n"
     "\n"
     "This method has been introduced in version 0.24.\n"
   ) + 
-  method ("+=", &db::EdgePairs::operator+=,
+  method ("+=", &db::EdgePairs::operator+=, gsi::arg ("other"),
     "@brief Adds the edge pairs of the other edge pair collection to self\n"
     "\n"
-    "@args other\n"
     "@return The edge pair collection after modification (self)\n"
     "\n"
     "This operator adds the edge pairs of the other collection to self.\n"
     "\n"
     "This method has been introduced in version 0.24.\n"
   ) + 
-  method_ext ("move", &move_p,
+  method_ext ("move", &move_p, gsi::arg ("p"),
     "@brief Moves the edge pair collection\n"
-    "@args p\n"
     "\n"
     "Moves the edge pairs by the given offset and returns the \n"
     "moved edge pair collection. The edge pair collection is overwritten.\n"
@@ -355,9 +345,8 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "\n"
     "Starting with version 0.25 the displacement is of vector type."
   ) +
-  method_ext ("move", &move_xy,
+  method_ext ("move", &move_xy, gsi::arg ("x"), gsi::arg ("y"),
     "@brief Moves the edge pair collection\n"
-    "@args x,y\n"
     "\n"
     "Moves the edge pairs by the given offset and returns the \n"
     "moved edge pairs. The edge pair collection is overwritten.\n"
@@ -367,9 +356,8 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "\n"
     "@return The moved edge pairs (self).\n"
   ) +
-  method_ext ("moved", &moved_p,
+  method_ext ("moved", &moved_p, gsi::arg ("p"),
     "@brief Returns the moved edge pair collection (does not modify self)\n"
-    "@args p\n"
     "\n"
     "Moves the edge pairs by the given offset and returns the \n"
     "moved edge pairs. The edge pair collection is not modified.\n"
@@ -380,9 +368,8 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "\n"
     "Starting with version 0.25 the displacement is of vector type."
   ) +
-  method_ext ("moved", &moved_xy,
+  method_ext ("moved", &moved_xy, gsi::arg ("x"), gsi::arg ("y"),
     "@brief Returns the moved edge pair collection (does not modify self)\n"
-    "@args x,y\n"
     "\n"
     "Moves the edge pairs by the given offset and returns the \n"
     "moved edge pairs. The edge pair collection is not modified.\n"
@@ -392,9 +379,8 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "\n"
     "@return The moved edge pairs.\n"
   ) +
-  method ("transformed", (db::EdgePairs (db::EdgePairs::*)(const db::Trans &) const) &db::EdgePairs::transformed,
+  method ("transformed", (db::EdgePairs (db::EdgePairs::*)(const db::Trans &) const) &db::EdgePairs::transformed, gsi::arg ("t"),
     "@brief Transform the edge pair collection\n"
-    "@args t\n"
     "\n"
     "Transforms the edge pairs with the given transformation.\n"
     "Does not modify the edge pair collection but returns the transformed edge pairs.\n"
@@ -403,9 +389,8 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "\n"
     "@return The transformed edge pairs.\n"
   ) +
-  method ("transformed|#transformed_icplx", (db::EdgePairs (db::EdgePairs::*)(const db::ICplxTrans &) const) &db::EdgePairs::transformed,
+  method ("transformed|#transformed_icplx", (db::EdgePairs (db::EdgePairs::*)(const db::ICplxTrans &) const) &db::EdgePairs::transformed, gsi::arg ("t"),
     "@brief Transform the edge pair collection with a complex transformation\n"
-    "@args t\n"
     "\n"
     "Transforms the edge pairs with the given complex transformation.\n"
     "Does not modify the edge pair collection but returns the transformed edge pairs.\n"
@@ -414,9 +399,8 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "\n"
     "@return The transformed edge pairs.\n"
   ) +
-  method ("transform", (db::EdgePairs &(db::EdgePairs::*)(const db::Trans &)) &db::EdgePairs::transform,
+  method ("transform", (db::EdgePairs &(db::EdgePairs::*)(const db::Trans &)) &db::EdgePairs::transform, gsi::arg ("t"),
     "@brief Transform the edge pair collection (modifies self)\n"
-    "@args t\n"
     "\n"
     "Transforms the edge pair collection with the given transformation.\n"
     "This version modifies the edge pair collection and returns a reference to self.\n"
@@ -425,9 +409,8 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "\n"
     "@return The transformed edge pair collection.\n"
   ) +
-  method ("transform|#transform_icplx", (db::EdgePairs &(db::EdgePairs::*)(const db::ICplxTrans &)) &db::EdgePairs::transform,
+  method ("transform|#transform_icplx", (db::EdgePairs &(db::EdgePairs::*)(const db::ICplxTrans &)) &db::EdgePairs::transform, gsi::arg ("t"),
     "@brief Transform the edge pair collection with a complex transformation (modifies self)\n"
-    "@args t\n"
     "\n"
     "Transforms the edge pair collection with the given transformation.\n"
     "This version modifies the edge pair collection and returns a reference to self.\n"
@@ -436,9 +419,8 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "\n"
     "@return The transformed edge pair collection.\n"
   ) +
-  method_ext ("insert", &insert_e,
+  method_ext ("insert", &insert_e, gsi::arg ("edge_pairs"),
     "@brief Inserts all edge pairs from the other edge pair collection into this edge pair collection\n"
-    "@args edge_pairs\n"
     "This method has been introduced in version 0.25."
   ) +
   method_ext ("edges", &edges,
@@ -459,17 +441,15 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "The boxes will not be merged, so it is possible to determine overlaps "
     "of these boxes for example.\n"
   ) + 
-  method_ext ("extents", &extents1,
+  method_ext ("extents", &extents1, gsi::arg ("d"),
     "@brief Returns a region with the enlarged bounding boxes of the edge pairs\n"
-    "@args d\n"
     "This method will return a region consisting of the bounding boxes of the edge pairs enlarged by the given distance d.\n"
     "The enlargement is specified per edge, i.e the width and height will be increased by 2*d.\n"
     "The boxes will not be merged, so it is possible to determine overlaps "
     "of these boxes for example.\n"
   ) + 
-  method_ext ("extents", &extents2,
+  method_ext ("extents", &extents2, gsi::arg ("dx"), gsi::arg ("dy"),
     "@brief Returns a region with the enlarged bounding boxes of the edge pairs\n"
-    "@args dx, dy\n"
     "This method will return a region consisting of the bounding boxes of the edge pairs enlarged by the given distance dx in x direction and dy in y direction.\n"
     "The enlargement is specified per edge, i.e the width will be increased by 2*dx.\n"
     "The boxes will not be merged, so it is possible to determine overlaps "
@@ -480,9 +460,8 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "This method creates polygons from the edge pairs. Each polygon will be a triangle or quadrangle "
     "which connects the start and end points of the edges forming the edge pair."
   ) +
-  method_ext ("polygons", &polygons2,
+  method_ext ("polygons", &polygons2, gsi::arg ("e"),
     "@brief Converts the edge pairs to polygons\n"
-    "@args e\n"
     "This method creates polygons from the edge pairs. Each polygon will be a triangle or quadrangle "
     "which connects the start and end points of the edges forming the edge pair. "
     "This version allows one to specify an enlargement which is applied to the edges. The length of the edges is "
@@ -493,9 +472,8 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
   method ("clear", &db::EdgePairs::clear,
     "@brief Clears the edge pair collection\n"
   ) +
-  method ("swap", &db::EdgePairs::swap,
+  method ("swap", &db::EdgePairs::swap, gsi::arg ("other"),
     "@brief Swap the contents of this collection with the contents of another collection\n"
-    "@args other\n"
     "This method is useful to avoid excessive memory allocation in some cases. "
     "For managed memory languages such as Ruby, those cases will be rare. " 
   ) +
@@ -512,9 +490,8 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
   gsi::iterator ("each", &db::EdgePairs::begin,
     "@brief Returns each edge pair of the edge pair collection\n"
   ) +
-  method ("[]", &db::EdgePairs::nth,
+  method ("[]", &db::EdgePairs::nth, gsi::arg ("n"),
     "@brief Returns the nth edge pair\n"
-    "@args n\n"
     "\n"
     "This method returns nil if the index is out of range. It is available for flat edge pairs only - i.e. "
     "those for which \\has_valid_edge_pairs? is true. Use \\flatten to explicitly flatten an edge pair collection.\n"
@@ -534,9 +511,8 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "\n"
     "This method has been introduced in version 0.26."
   ) +
-  method ("enable_progress", &db::EdgePairs::enable_progress,
+  method ("enable_progress", &db::EdgePairs::enable_progress, gsi::arg ("label"),
     "@brief Enable progress reporting\n"
-    "@args label\n"
     "After calling this method, the edge pair collection will report the progress through a progress bar while "
     "expensive operations are running.\n"
     "The label is a text which is put in front of the progress bar.\n"
@@ -551,9 +527,8 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "The length of the output is limited to 20 edge pairs to avoid giant strings on large regions. "
     "For full output use \"to_s\" with a maximum count parameter.\n"
   ) +
-  method_ext ("to_s", &to_string1,
+  method_ext ("to_s", &to_string1, gsi::arg ("max_count"),
     "@brief Converts the edge pair collection to a string\n"
-    "@args max_count\n"
     "This version allows specification of the maximum number of edge pairs contained in the string."
   ),
   "@brief EdgePairs (a collection of edge pairs)\n"
@@ -567,4 +542,3 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
 );
 
 }
-

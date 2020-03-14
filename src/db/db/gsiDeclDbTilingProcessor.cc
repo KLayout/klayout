@@ -172,9 +172,8 @@ gsi::Class<db::TileOutputReceiver> &dbdecl_TileOutputReceiverBase ()
 }
 
 gsi::Class<TileOutputReceiver_Impl> decl_TileOutputReceiver (decl_TileOutputReceiverBase, "db", "TileOutputReceiver",
-  gsi::callback ("begin", &TileOutputReceiver_Impl::begin, &TileOutputReceiver_Impl::begin_cb,
+  gsi::callback ("begin", &TileOutputReceiver_Impl::begin, &TileOutputReceiver_Impl::begin_cb, gsi::arg ("nx"), gsi::arg ("ny"), gsi::arg ("p0"), gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("frame"),
     "@brief Initiates the delivery\n"
-    "@args nx, ny, p0, dx, dy, frame\n"
     "This method is called before the first tile delivers it's data.\n"
     "\n"
     "@param nx The number of tiles in x direction\n"
@@ -191,9 +190,8 @@ gsi::Class<TileOutputReceiver_Impl> decl_TileOutputReceiver (decl_TileOutputRece
     "\n"
     "The frame parameter has been added in version 0.25."
   ) +
-  gsi::callback ("put", &TileOutputReceiver_Impl::put_red, &TileOutputReceiver_Impl::put_cb,
+  gsi::callback ("put", &TileOutputReceiver_Impl::put_red, &TileOutputReceiver_Impl::put_cb, gsi::arg ("ix"), gsi::arg ("iy"), gsi::arg ("tile"), gsi::arg ("obj"), gsi::arg ("dbu"), gsi::arg ("clip"),
     "@brief Delivers data for one tile\n"
-    "@args ix, iy, tile, obj, dbu, clip\n"
     "\n"
     "When the script's \"_output\" function is called, the data will be delivered through this\n"
     "method. \"obj\" is the data passed as the second argument to _output.\n"
@@ -335,44 +333,39 @@ static void tp_input11 (db::TilingProcessor *proc, const std::string &name, cons
 }
 
 Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
-  method_ext ("input", &tp_input2,
+  method_ext ("input", &tp_input2, gsi::arg ("name"), gsi::arg ("iter"),
     "@brief Specifies input for the tiling processor\n"
-    "@args name, iter\n"
     "This method will establish an input channel for the processor. This version receives input from a "
     "recursive shape iterator, hence from a hierarchy of shapes from a layout.\n"
     "\n"
     "The name specifies the variable under which the input can be used in the scripts."
   ) + 
-  method_ext ("input", &tp_input3,
+  method_ext ("input", &tp_input3, gsi::arg ("name"), gsi::arg ("iter"), gsi::arg ("trans"),
     "@brief Specifies input for the tiling processor\n"
-    "@args name, iter, trans\n"
     "This method will establish an input channel for the processor. This version receives input from a "
     "recursive shape iterator, hence from a hierarchy of shapes from a layout.\n"
     "In addition, a transformation can be specified which will be applied to the shapes before they are used.\n"
     "\n"
     "The name specifies the variable under which the input can be used in the scripts."
   ) + 
-  method_ext ("input", &tp_input4,
+  method_ext ("input", &tp_input4, gsi::arg ("name"), gsi::arg ("layout"), gsi::arg ("cell_index"), gsi::arg ("lp"),
     "@brief Specifies input for the tiling processor\n"
-    "@args name, layout, cell_index, lp\n"
     "This method will establish an input channel for the processor. This version receives input from a "
     "layout and the hierarchy below the cell with the given cell index.\n"
     "\"lp\" is a \\LayerInfo object specifying the input layer.\n"
     "\n"
     "The name specifies the variable under which the input can be used in the scripts."
   ) + 
-  method_ext ("input", &tp_input5,
+  method_ext ("input", &tp_input5, gsi::arg ("name"), gsi::arg ("layout"), gsi::arg ("cell_index"), gsi::arg ("layer"),
     "@brief Specifies input for the tiling processor\n"
-    "@args name, layout, cell_index, layer\n"
     "This method will establish an input channel for the processor. This version receives input from a "
     "layout and the hierarchy below the cell with the given cell index.\n"
     "\"layer\" is the layer index of the input layer.\n"
     "\n"
     "The name specifies the variable under which the input can be used in the scripts."
   ) + 
-  method_ext ("input", &tp_input6,
+  method_ext ("input", &tp_input6, gsi::arg ("name"), gsi::arg ("layout"), gsi::arg ("cell_index"), gsi::arg ("lp"), gsi::arg ("trans"),
     "@brief Specifies input for the tiling processor\n"
-    "@args name, layout, cell_index, lp, trans\n"
     "This method will establish an input channel for the processor. This version receives input from a "
     "layout and the hierarchy below the cell with the given cell index.\n"
     "\"lp\" is a \\LayerInfo object specifying the input layer.\n"
@@ -380,9 +373,8 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
     "\n"
     "The name specifies the variable under which the input can be used in the scripts."
   ) + 
-  method_ext ("input", &tp_input7,
+  method_ext ("input", &tp_input7, gsi::arg ("name"), gsi::arg ("layout"), gsi::arg ("cell_index"), gsi::arg ("layer"), gsi::arg ("trans"),
     "@brief Specifies input for the tiling processor\n"
-    "@args name, layout, cell_index, layer, trans\n"
     "This method will establish an input channel for the processor. This version receives input from a "
     "layout and the hierarchy below the cell with the given cell index.\n"
     "\"layer\" is the layer index of the input layer.\n"
@@ -390,18 +382,16 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
     "\n"
     "The name specifies the variable under which the input can be used in the scripts."
   ) + 
-  method_ext ("input", &tp_input8,
+  method_ext ("input", &tp_input8, gsi::arg ("name"), gsi::arg ("region"),
     "@brief Specifies input for the tiling processor\n"
-    "@args name, region\n"
     "This method will establish an input channel for the processor. This version receives input from a \\Region object. "
     "Regions don't always come with a database unit, hence a database unit should be specified with the \\dbu= method if only "
     "regions and edges are used as input.\n"
     "\n"
     "The name specifies the variable under which the input can be used in the scripts."
   ) + 
-  method_ext ("input", &tp_input9,
+  method_ext ("input", &tp_input9, gsi::arg ("name"), gsi::arg ("region"), gsi::arg ("trans"),
     "@brief Specifies input for the tiling processor\n"
-    "@args name, region, trans\n"
     "This method will establish an input channel for the processor. This version receives input from a \\Region object. "
     "Regions don't always come with a database unit, hence a database unit should be specified with the \\dbu= method if only "
     "regions and edges are used as input.\n"
@@ -410,18 +400,16 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
     "\n"
     "This variant allows one to specify an additional transformation too. It has been introduced in version 0.23.2.\n"
   ) + 
-  method_ext ("input", &tp_input10,
+  method_ext ("input", &tp_input10, gsi::arg ("name"), gsi::arg ("edges"),
     "@brief Specifies input for the tiling processor\n"
-    "@args name, edges\n"
     "This method will establish an input channel for the processor. This version receives input from an \\Edges object. "
     "Edge collections don't always come with a database unit, hence a database unit should be specified with the \\dbu= method if only "
     "regions and edges are used as input.\n"
     "\n"
     "The name specifies the variable under which the input can be used in the scripts."
   ) + 
-  method_ext ("input", &tp_input11,
+  method_ext ("input", &tp_input11, gsi::arg ("name"), gsi::arg ("edges"), gsi::arg ("trans"),
     "@brief Specifies input for the tiling processor\n"
-    "@args name, edges, trans\n"
     "This method will establish an input channel for the processor. This version receives input from an \\Edges object. "
     "Edge collections don't always come with a database unit, hence a database unit should be specified with the \\dbu= method if only "
     "regions and edges are used as input.\n"
@@ -431,15 +419,13 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
     "This variant allows one to specify an additional transformation too. It has been introduced in version 0.23.2.\n"
     "\n"
   ) + 
-  method ("var", &db::TilingProcessor::var,
+  method ("var", &db::TilingProcessor::var, gsi::arg ("name"), gsi::arg ("value"),
     "@brief Defines a variable for the tiling processor script\n"
-    "@args name, value\n"
     "\n"
     "The name specifies the variable under which the value can be used in the scripts."
   ) + 
-  method_ext ("output", &tp_output,
+  method_ext ("output", &tp_output, gsi::arg ("name"), gsi::arg ("rec"),
     "@brief Specifies output for the tiling processor\n"
-    "@args name, rec\n"
     "This method will establish an output channel for the processor. For that it registers an output receiver "
     "which will receive data from the scripts. The scripts call the _output function to deliver data.\n"
     "\"name\" will be name of the variable which must be passed to the first argument of the _output function "
@@ -474,9 +460,8 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
     "tp.execute(\"Job description\")\n"
     "@/code\n"
   ) + 
-  method_ext ("output", &tp_output_layout1,
+  method_ext ("output", &tp_output_layout1, gsi::arg ("name"), gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("lp"),
     "@brief Specifies output to a layout layer\n"
-    "@args name, layout, cell, lp\n"
     "This method will establish an output channel to a layer in a layout. The output sent to that channel "
     "will be put into the specified layer and cell. In this version, the layer is specified through a \\LayerInfo "
     "object, i.e. layer and datatype number. If no such layer exists, it will be created.\n"
@@ -489,9 +474,8 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
     "@param cell The index of the cell to which the data is sent\n"
     "@param lp The layer specification where the output will be sent to\n"
   ) +
-  method_ext ("output", &tp_output_layout2,
+  method_ext ("output", &tp_output_layout2, gsi::arg ("name"), gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("layer_index"),
     "@brief Specifies output to a layout layer\n"
-    "@args name, layout, cell, layer_index\n"
     "This method will establish an output channel to a layer in a layout. The output sent to that channel "
     "will be put into the specified layer and cell. In this version, the layer is specified through a layer index, "
     "hence it must be created before.\n"
@@ -504,9 +488,8 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
     "@param cell The index of the cell to which the data is sent\n"
     "@param layer_index The layer index where the output will be sent to\n"
   ) +
-  method_ext ("output", &tp_output_region,
+  method_ext ("output", &tp_output_region, gsi::arg ("name"), gsi::arg ("region"),
     "@brief Specifies output to a \\Region object\n"
-    "@args name, region\n"
     "This method will establish an output channel to a \\Region object. The output sent to that channel "
     "will be put into the specified region.\n"
     "\n"
@@ -517,9 +500,8 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
     "@param name The name of the channel\n"
     "@param region The \\Region object to which the data is sent\n"
   ) +
-  method_ext ("output", &tp_output_edges,
+  method_ext ("output", &tp_output_edges, gsi::arg ("name"), gsi::arg ("edges"),
     "@brief Specifies output to an \\Edges object\n"
-    "@args name, edges\n"
     "This method will establish an output channel to an \\Edges object. The output sent to that channel "
     "will be put into the specified edge collection.\n"
     "'Solid' objects such as polygons will be converted to edges by resolving their hulls into edges. "
@@ -531,9 +513,8 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
     "@param name The name of the channel\n"
     "@param edges The \\Edges object to which the data is sent\n"
   ) +
-  method_ext ("output", &tp_output_edge_pairs,
+  method_ext ("output", &tp_output_edge_pairs, gsi::arg ("name"), gsi::arg ("edge_pairs"),
     "@brief Specifies output to an \\EdgePairs object\n"
-    "@args name, edge_pairs\n"
     "This method will establish an output channel to an \\EdgePairs object. The output sent to that channel "
     "will be put into the specified edge pair collection.\n"
     "Only \\EdgePair objects are accepted. Other objects are discarded.\n"
@@ -544,9 +525,8 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
     "@param name The name of the channel\n"
     "@param edge_pairs The \\EdgePairs object to which the data is sent\n"
   ) +
-  method_ext ("output", &tp_output_double,
+  method_ext ("output", &tp_output_double, gsi::arg ("name"), gsi::arg ("sum"),
     "@brief Specifies output to single value\n"
-    "@args name, sum\n"
     "This method will establish an output channel which sums up float data delivered by calling the _output function.\n"
     "In order to specify the target for the data, a \\Value object must be provided for the \"sum\" parameter.\n"
     "\n"
@@ -558,9 +538,8 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
     "\n"
     "This method has been introduced in version 0.23.2."
   ) + 
-  method ("scale_to_dbu=", &db::TilingProcessor::set_scale_to_dbu,
+  method ("scale_to_dbu=", &db::TilingProcessor::set_scale_to_dbu, gsi::arg ("en"),
     "@brief Enables or disabled automatic scaling to database unit\n"
-    "@args en\n"
     "\n"
     "If automatic scaling to database unit is enabled, the input is automatically scaled to the "
     "database unit set inside the tile processor. This is the default.\n"
@@ -570,16 +549,14 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
   method ("dbu", &db::TilingProcessor::dbu,
     "@brief Gets the database unit under which the computations will be done\n"
   ) + 
-  method ("dbu=", &db::TilingProcessor::set_dbu,
+  method ("dbu=", &db::TilingProcessor::set_dbu, gsi::arg ("u"),
     "@brief Sets the database unit under which the computations will be done\n"
-    "@args u\n"
     "\n"
     "All data used within the scripts will be brought to that database unit. If none is given "
     "it will be the database unit of the first layout given or 1nm if no layout is specified.\n"
   ) + 
-  method ("frame=", &db::TilingProcessor::set_frame,
+  method ("frame=", &db::TilingProcessor::set_frame, gsi::arg ("frame"),
     "@brief Sets the layout frame\n"
-    "@args frame\n"
     "\n"
     "The layout frame is the box (in micron units) taken into account for computing\n"
     "the tiles if the tile counts are not given. If the layout frame is not set or\n"
@@ -588,26 +565,23 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
     "\n"
     "This method has been introduced in version 0.25."
  ) +
-  method ("tile_size", &db::TilingProcessor::tile_size,
+  method ("tile_size", &db::TilingProcessor::tile_size, gsi::arg ("w"), gsi::arg ("h"),
     "@brief Sets the tile size\n"
-    "@args w, h\n"
     "\n"
     "Specifies the size of the tiles to be used. If no tile size is specified, tiling won't be used "
     "and all computations will be done on the whole layout.\n"
     "\n"
     "The tile size is given in micron.\n"
   ) + 
-  method ("tiles", &db::TilingProcessor::tiles,
+  method ("tiles", &db::TilingProcessor::tiles, gsi::arg ("nw"), gsi::arg ("nh"),
     "@brief Sets the tile count\n"
-    "@args nw, nh\n"
     "\n"
     "Specifies the number of tiles to be used. If no tile number is specified, the number of tiles "
     "required is computed from the layout's dimensions and the tile size. If a number is given, but "
     "no tile size, the tile size will be computed from the layout's dimensions.\n"
   ) + 
-  method ("tile_origin", &db::TilingProcessor::tile_origin,
+  method ("tile_origin", &db::TilingProcessor::tile_origin, gsi::arg ("xo"), gsi::arg ("yo"),
     "@brief Sets the tile origin\n"
-    "@args xo, yo\n"
     "\n"
     "Specifies the origin (lower left corner) of the tile field. If no origin is specified, the "
     "tiles are centered to the layout's bounding box. Giving the origin together with the "
@@ -615,9 +589,8 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
     "\n"
     "The tile origin is given in micron.\n"
   ) + 
-  method ("tile_border", &db::TilingProcessor::tile_border,
+  method ("tile_border", &db::TilingProcessor::tile_border, gsi::arg ("bx"), gsi::arg ("by"),
     "@brief Sets the tile border\n"
-    "@args bx, by\n"
     "\n"
     "Specifies the tile border. The border is a margin that is considered when fetching shapes. "
     "By specifying a border you can fetch shapes into the tile's data which are outside the "
@@ -625,24 +598,21 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
     "\n"
     "The tile border is given in micron.\n"
   ) + 
-  method ("threads=", &db::TilingProcessor::set_threads,
+  method ("threads=", &db::TilingProcessor::set_threads, gsi::arg ("n"),
     "@brief Specifies the number of threads to use\n"
-    "@args n\n"
   ) + 
   method ("threads", &db::TilingProcessor::threads,
     "@brief Gets the number of threads to use\n"
   ) + 
-  method ("queue", &db::TilingProcessor::queue,
+  method ("queue", &db::TilingProcessor::queue, gsi::arg ("script"),
     "@brief Queues a script for parallel execution\n"
-    "@args script\n"
     "\n"
     "With this method, scripts are registered that are executed in parallel on each tile.\n"
     "The scripts have \"Expressions\" syntax and can make use of several predefined variables and functions.\n"
     "See the \\TilingProcessor class description for details.\n"
   ) + 
-  method ("execute", &db::TilingProcessor::execute,
+  method ("execute", &db::TilingProcessor::execute, gsi::arg ("desc"),
     "@brief Runs the job\n"
-    "@args desc\n"
     "\n"
     "This method will initiate execution of the queued scripts, once for every tile. The desc is a text "
     "shown in the progress bar for example.\n"
@@ -729,4 +699,3 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
 );
 
 }
-

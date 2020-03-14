@@ -181,25 +181,22 @@ static std::string get_oasis_subst_char (const db::SaveLayoutOptions *options)
 //  extend lay::SaveLayoutOptions with the OASIS options
 static
 gsi::ClassExt<db::SaveLayoutOptions> oasis_writer_options (
-  gsi::method_ext ("oasis_write_cblocks=", &set_oasis_write_cblocks,
+  gsi::method_ext ("oasis_write_cblocks=", &set_oasis_write_cblocks, gsi::arg ("flag"),
     "@brief Sets a value indicating whether to write compressed CBLOCKS per cell\n"
-    "@args flag\n"
     "Setting this property clears all format specific options for other formats such as GDS.\n"
   ) +
   gsi::method_ext ("oasis_write_cblocks?", &get_oasis_write_cblocks,
     "@brief Gets a value indicating whether to write compressed CBLOCKS per cell\n"
   ) +
-  gsi::method_ext ("oasis_strict_mode=", &set_oasis_strict_mode,
+  gsi::method_ext ("oasis_strict_mode=", &set_oasis_strict_mode, gsi::arg ("flag"),
     "@brief Sets a value indicating whether to write strict-mode OASIS files\n"
-    "@args flag\n"
     "Setting this property clears all format specific options for other formats such as GDS.\n"
   ) +
   gsi::method_ext ("oasis_strict_mode?", &get_oasis_strict_mode,
     "@brief Gets a value indicating whether to write strict-mode OASIS files\n"
   ) +
-  gsi::method_ext ("oasis_substitution_char=", &set_oasis_subst_char,
+  gsi::method_ext ("oasis_substitution_char=", &set_oasis_subst_char, gsi::arg ("char"),
     "@brief Sets the substitution character for a-strings and n-strings\n"
-    "@args char\n"
     "The substitution character is used in place of invalid characters. The value of this "
     "attribute is a string which is either empty or a single character. If the string is "
     "empty, no substitution is made at the risk of producing invalid OASIS files.\n"
@@ -211,9 +208,8 @@ gsi::ClassExt<db::SaveLayoutOptions> oasis_writer_options (
     "\n"
     "See \\oasis_substitution_char for details. This attribute has been introduced in version 0.23.\n"
   ) +
-  gsi::method_ext ("oasis_recompress=", &set_oasis_recompress,
+  gsi::method_ext ("oasis_recompress=", &set_oasis_recompress, gsi::arg ("flag"),
     "@brief Sets OASIS recompression mode\n"
-    "@args flag\n"
     "If this flag is true, shape arrays already existing will be resolved and compression is applied "
     "to the individual shapes again. If this flag is false (the default), shape arrays already existing "
     "will be written as such.\n"
@@ -226,9 +222,8 @@ gsi::ClassExt<db::SaveLayoutOptions> oasis_writer_options (
     "\n"
     "This method has been introduced in version 0.23."
   ) +
-  gsi::method_ext ("oasis_permissive=", &set_oasis_permissive,
+  gsi::method_ext ("oasis_permissive=", &set_oasis_permissive, gsi::arg ("flag"),
     "@brief Sets OASIS permissive mode\n"
-    "@args flag\n"
     "If this flag is true, certain shapes which cannot be written to OASIS are reported as warnings, "
     "not as errors. For example, paths with odd width (are rounded) or polygons with less than three points (are skipped).\n"
     "\n"
@@ -240,9 +235,8 @@ gsi::ClassExt<db::SaveLayoutOptions> oasis_writer_options (
     "\n"
     "This method has been introduced in version 0.25.1."
   ) +
-  gsi::method_ext ("oasis_write_cell_bounding_boxes=", &set_oasis_write_cell_bounding_boxes,
+  gsi::method_ext ("oasis_write_cell_bounding_boxes=", &set_oasis_write_cell_bounding_boxes, gsi::arg ("flag"),
     "@brief Sets a value indicating whether cell bounding boxes are written\n"
-    "@args flag\n"
     "If this value is set to true, cell bounding boxes are written (S_BOUNDING_BOX). "
     "The S_BOUNDING_BOX properties will be attached to the CELLNAME records.\n"
     "\n"
@@ -258,9 +252,8 @@ gsi::ClassExt<db::SaveLayoutOptions> oasis_writer_options (
     "\n"
     "This method has been introduced in version 0.24.3."
   ) +
-  gsi::method_ext ("oasis_write_std_properties=", &set_oasis_write_std_properties,
+  gsi::method_ext ("oasis_write_std_properties=", &set_oasis_write_std_properties, gsi::arg ("flag"),
     "@brief Sets a value indicating whether standard properties will be written\n"
-    "@args flag\n"
     "If this value is false, no standard properties are written. If true, S_TOP_CELL and some other global "
     "standard properties are written. In addition, \\oasis_write_cell_bounding_boxes= can be used to "
     "write cell bounding boxes using S_BOUNDING_BOX.\n"
@@ -285,9 +278,8 @@ gsi::ClassExt<db::SaveLayoutOptions> oasis_writer_options (
     //  this method is mainly provided as access point for the generic interface
     "@hide"
   ) +
-  gsi::method_ext ("oasis_compression_level=", &set_oasis_compression,
+  gsi::method_ext ("oasis_compression_level=", &set_oasis_compression, gsi::arg ("level"),
     "@brief Set the OASIS compression level\n"
-    "@args level\n"
     "The OASIS compression level is an integer number between 0 and 10. 0 basically is no compression, "
     "1 produces shape arrays in a simple fashion. 2 and higher compression levels will use a more elaborate "
     "algorithm to find shape arrays which uses 2nd and further neighbor distances. The higher the level, the "

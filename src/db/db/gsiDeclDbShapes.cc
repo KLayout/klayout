@@ -431,9 +431,8 @@ static unsigned int s_texts ()               { return db::ShapeIterator::Texts; 
 static unsigned int s_user_objects ()        { return db::ShapeIterator::UserObjects; }
 
 Class<db::Shapes> decl_Shapes ("db", "Shapes",
-  gsi::method ("insert", (db::Shape (db::Shapes::*)(const db::Shape &)) &db::Shapes::insert,
+  gsi::method ("insert", (db::Shape (db::Shapes::*)(const db::Shape &)) &db::Shapes::insert, gsi::arg ("shape"),
     "@brief Inserts a shape from a shape reference into the shapes list\n"
-    "@args shape\n"
     "@return A reference (a \\Shape object) to the newly created shape\n"
     "This method has been introduced in version 0.16.\n"
   ) +
@@ -707,9 +706,8 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "It has been introduced in version 0.25.\n"
   ) +
-  gsi::method ("transform", (db::Shape (db::Shapes::*)(const db::Shape &, const db::Trans &)) &db::Shapes::transform,
+  gsi::method ("transform", (db::Shape (db::Shapes::*)(const db::Shape &, const db::Trans &)) &db::Shapes::transform, gsi::arg ("shape"), gsi::arg ("trans"),
     "@brief Transforms the shape given by the reference with the given transformation\n"
-    "@args shape, trans\n"
     "@return A reference (a \\Shape object) to the new shape\n"
     "The original shape may be deleted and re-inserted by this method. Therefore, a new reference is returned.\n"
     "It is permitted in editable mode only.\n"
@@ -741,10 +739,9 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This method has been introduced in version 0.25.\n"
   ) +
-  gsi::method_ext ("replace", &replace<db::Box>,
+  gsi::method_ext ("replace", &replace<db::Box>, gsi::arg ("shape"), gsi::arg ("box"),
     "@brief Replaces the given shape with a box\n"
     "@return A reference to the new shape (a \\Shape object)\n"
-    "@args shape,box\n"
     "\n"
     "This method has been introduced with version 0.16. It replaces the given shape with the "
     "object specified. It does not change the property Id. To change the property Id, "
@@ -762,10 +759,9 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("replace", &replace<db::Path>,
+  gsi::method_ext ("replace", &replace<db::Path>, gsi::arg ("shape"), gsi::arg ("path"),
     "@brief Replaces the given shape with a path\n"
     "@return A reference to the new shape (a \\Shape object)\n"
-    "@args shape,path\n"
     "\n"
     "This method has been introduced with version 0.16. It replaces the given shape with the "
     "object specified. It does not change the property Id. To change the property Id, "
@@ -823,10 +819,9 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.26.\n"
   ) +
-  gsi::method_ext ("replace", &replace<db::Text>,
+  gsi::method_ext ("replace", &replace<db::Text>, gsi::arg ("shape"), gsi::arg ("text"),
     "@brief Replaces the given shape with a text object\n"
     "@return A reference to the new shape (a \\Shape object)\n"
-    "@args shape,text\n"
     "\n"
     "This method has been introduced with version 0.16. It replaces the given shape with the "
     "object specified. It does not change the property Id. To change the property Id, "
@@ -844,10 +839,9 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("replace", &replace<db::SimplePolygon>,
+  gsi::method_ext ("replace", &replace<db::SimplePolygon>, gsi::arg ("shape"), gsi::arg ("simple_polygon"),
     "@brief Replaces the given shape with a simple polygon\n"
     "@return A reference to the new shape (a \\Shape object)\n"
-    "@args shape,simple_polygon\n"
     "\n"
     "This method has been introduced with version 0.16. It replaces the given shape with the "
     "object specified. It does not change the property Id. To change the property Id, "
@@ -865,10 +859,9 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("replace", &replace<db::Polygon>,
+  gsi::method_ext ("replace", &replace<db::Polygon>, gsi::arg ("shape"), gsi::arg ("polygon"),
     "@brief Replaces the given shape with a polygon\n"
     "@return A reference to the new shape (a \\Shape object)\n"
-    "@args shape,polygon\n"
     "\n"
     "This method has been introduced with version 0.16. It replaces the given shape with the "
     "object specified. It does not change the property Id. To change the property Id, "
@@ -886,10 +879,9 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("insert|#insert_box", &insert<db::Box>,
+  gsi::method_ext ("insert|#insert_box", &insert<db::Box>, gsi::arg ("box"),
     "@brief Inserts a box into the shapes list\n"
     "@return A reference to the new shape (a \\Shape object)\n"
-    "@args box\n"
     "\n"
     "Starting with version 0.16, this method returns a reference to the newly created shape\n"
   ) +
@@ -901,10 +893,9 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("insert|#insert_path", &insert<db::Path>,
+  gsi::method_ext ("insert|#insert_path", &insert<db::Path>, gsi::arg ("path"),
     "@brief Inserts a path into the shapes list\n"
     "@return A reference to the new shape (a \\Shape object)\n"
-    "@args path\n"
     "\n"
     "Starting with version 0.16, this method returns a reference to the newly created shape\n"
   ) +
@@ -942,10 +933,9 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.26."
   ) +
-  gsi::method_ext ("insert|#insert_text", &insert<db::Text>,
+  gsi::method_ext ("insert|#insert_text", &insert<db::Text>, gsi::arg ("text"),
     "@brief Inserts a text into the shapes list\n"
     "@return A reference to the new shape (a \\Shape object)\n"
-    "@args text\n"
     "\n"
     "Starting with version 0.16, this method returns a reference to the newly created shape\n"
   ) +
@@ -957,10 +947,9 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("insert|#insert_simple_polygon", &insert<db::SimplePolygon>,
+  gsi::method_ext ("insert|#insert_simple_polygon", &insert<db::SimplePolygon>, gsi::arg ("simple_polygon"),
     "@brief Inserts a simple polygon into the shapes list\n"
     "@return A reference to the new shape (a \\Shape object)\n"
-    "@args simple_polygon\n"
     "\n"
     "Starting with version 0.16, this method returns a reference to the newly created shape\n"
   ) +
@@ -972,10 +961,9 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("insert|#insert_polygon", &insert<db::Polygon>,
+  gsi::method_ext ("insert|#insert_polygon", &insert<db::Polygon>, gsi::arg ("polygon"),
     "@brief Inserts a polygon into the shapes list\n"
     "@return A reference to the new shape (a \\Shape object)\n"
-    "@args polygon\n"
     "\n"
     "Starting with version 0.16, this method returns a reference to the newly created shape\n"
   ) +
@@ -987,9 +975,8 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("insert|#insert_box_with_properties", &insert_with_properties<db::Box>,
+  gsi::method_ext ("insert|#insert_box_with_properties", &insert_with_properties<db::Box>, gsi::arg ("box"), gsi::arg ("property_id"),
     "@brief Inserts a box with properties into the shapes list\n"
-    "@args box, property_id\n"
     "@return A reference to the new shape (a \\Shape object)\n"
     "The property Id must be obtained from the \\Layout object's property_id method which "
     "associates a property set with a property Id."
@@ -1004,9 +991,8 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("insert|#insert_path_with_properties", &insert_with_properties<db::Path>,
+  gsi::method_ext ("insert|#insert_path_with_properties", &insert_with_properties<db::Path>, gsi::arg ("path"), gsi::arg ("property_id"),
     "@brief Inserts a path with properties into the shapes list\n"
-    "@args path, property_id\n"
     "@return A reference to the new shape (a \\Shape object)\n"
     "The property Id must be obtained from the \\Layout object's property_id method which "
     "associates a property set with a property Id."
@@ -1053,9 +1039,8 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.26."
   ) +
-  gsi::method_ext ("insert|#insert_text_with_properties", &insert_with_properties<db::Text>,
+  gsi::method_ext ("insert|#insert_text_with_properties", &insert_with_properties<db::Text>, gsi::arg ("text"), gsi::arg ("property_id"),
     "@brief Inserts a text with properties into the shapes list\n"
-    "@args text, property_id\n"
     "@return A reference to the new shape (a \\Shape object)\n"
     "The property Id must be obtained from the \\Layout object's property_id method which "
     "associates a property set with a property Id."
@@ -1070,9 +1055,8 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("insert|#insert_simple_polygon_with_properties", &insert_with_properties<db::SimplePolygon>,
+  gsi::method_ext ("insert|#insert_simple_polygon_with_properties", &insert_with_properties<db::SimplePolygon>, gsi::arg ("simple_polygon"), gsi::arg ("property_id"),
     "@brief Inserts a simple polygon with properties into the shapes list\n"
-    "@args simple_polygon, property_id\n"
     "@return A reference to the new shape (a \\Shape object)\n"
     "The property Id must be obtained from the \\Layout object's property_id method which "
     "associates a property set with a property Id."
@@ -1087,9 +1071,8 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("insert|#insert_polygon_with_properties", &insert_with_properties<db::Polygon>,
+  gsi::method_ext ("insert|#insert_polygon_with_properties", &insert_with_properties<db::Polygon>, gsi::arg ("polygon"), gsi::arg ("property_id"),
     "@brief Inserts a polygon with properties into the shapes list\n"
-    "@args polygon, property_id\n"
     "@return A reference to the new shape (a \\Shape object)\n"
     "The property Id must be obtained from the \\Layout object's property_id method which "
     "associates a property set with a property Id."
@@ -1104,9 +1087,8 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
-  gsi::iterator_ext ("each", &begin,
+  gsi::iterator_ext ("each", &begin, gsi::arg ("flags"),
     "@brief Gets all shapes\n"
-    "@args flags\n"
     "\n"
     "@param flags An \"or\"-ed combination of the S... constants\n"
   ) +
@@ -1115,9 +1097,8 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This call is equivalent to each(SAll). This convenience method has been introduced in version 0.16\n"
   ) +
-  gsi::iterator_ext ("each_touching", &begin_touching,
+  gsi::iterator_ext ("each_touching", &begin_touching, gsi::arg ("flags"), gsi::arg ("region"),
     "@brief Gets all shapes that touch the search box (region)\n"
-    "@args flags,region\n"
     "This method was introduced in version 0.16\n"
     "\n"
     "@param flags An \"or\"-ed combination of the S... constants\n"
@@ -1130,9 +1111,8 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This method was introduced in version 0.25\n"
   ) +
-  gsi::iterator_ext ("each_touching", &begin_touching_all,
+  gsi::iterator_ext ("each_touching", &begin_touching_all, gsi::arg ("region"),
     "@brief Gets all shapes that touch the search box (region)\n"
-    "@args region\n"
     "@param region The rectangular search region\n"
     "\n"
     "This call is equivalent to each_touching(SAll,region). This convenience method has been introduced in version 0.16\n"
@@ -1144,9 +1124,8 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This method was introduced in version 0.25\n"
   ) +
-  gsi::iterator_ext ("each_overlapping", &begin_overlapping,
+  gsi::iterator_ext ("each_overlapping", &begin_overlapping, gsi::arg ("flags"), gsi::arg ("region"),
     "@brief Gets all shapes that overlap the search box (region)\n"
-    "@args flags,region\n"
     "This method was introduced in version 0.16\n"
     "\n"
     "@param flags An \"or\"-ed combination of the S... constants\n"
@@ -1159,9 +1138,8 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This method was introduced in version 0.25\n"
   ) +
-  gsi::iterator_ext ("each_overlapping", &begin_overlapping_all,
+  gsi::iterator_ext ("each_overlapping", &begin_overlapping_all, gsi::arg ("region"),
     "@brief Gets all shapes that overlap the search box (region)\n"
-    "@args region\n"
     "@param region The rectangular search region\n"
     "\n"
     "This call is equivalent to each_overlapping(SAll,region). This convenience method has been introduced in version 0.16\n"
@@ -1173,24 +1151,21 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This method was introduced in version 0.25\n"
   ) +
-  gsi::method ("erase", &db::Shapes::erase_shape,
+  gsi::method ("erase", &db::Shapes::erase_shape, gsi::arg ("shape"),
     "@brief Erases the shape pointed to by the given \\Shape object\n"
-    "@args shape\n"
     "This method has been introduced in version 0.16. It can only be used in editable mode.\n"
     "Erasing a shape will invalidate the shape reference. Access to this reference may then render invalid results.\n"
     "\n"
     "@param shape The shape which to destroy"
   ) +
-  gsi::method ("find", (db::Shape (db::Shapes::*)(const db::Shape &) const) &db::Shapes::find, 
+  gsi::method ("find", (db::Shape (db::Shapes::*)(const db::Shape &) const) &db::Shapes::find, gsi::arg ("shape"),
     "@brief Finds a shape inside this collected\n"
-    "@args shape\n"
     "This method has been introduced in version 0.21.\n"
     "This method tries to find the given shape in this collection. The original shape may be located in another collection. "
     "If the shape is found, this method returns a reference to the shape in this collection, otherwise a null reference is returned."
   ) +
-  gsi::method ("is_valid?", &db::Shapes::is_valid, 
+  gsi::method ("is_valid?", &db::Shapes::is_valid, gsi::arg ("shape"),
     "@brief Tests if the given \\Shape object is still pointing to a valid object\n"
-    "@args shape\n"
     "This method has been introduced in version 0.16.\n"
     "If the shape represented by the given reference has been deleted, this method returns false. "
     "If however, another shape has been inserted already that occupies the original shape's position, "
@@ -1209,9 +1184,8 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "This method was introduced in version 0.16\n"
     "@return The number of shapes in this container\n"
   ) +
-  gsi::method ("replace_prop_id", (db::Shape (db::Shapes::*) (const db::Shape &, db::properties_id_type)) &db::Shapes::replace_prop_id,
+  gsi::method ("replace_prop_id", (db::Shape (db::Shapes::*) (const db::Shape &, db::properties_id_type)) &db::Shapes::replace_prop_id, gsi::arg ("shape"), gsi::arg ("property_id"),
     "@brief Replaces (or install) the properties of a shape\n"
-    "@args shape,property_id\n"
     "@return A \\Shape object representing the new shape\n"
     "This method has been introduced in version 0.16. It can only be used in editable mode.\n"
     "Changes the properties Id of the given shape or install a properties Id on that shape if it does not have one yet.\n"
@@ -1263,4 +1237,3 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
 );
 
 }
-

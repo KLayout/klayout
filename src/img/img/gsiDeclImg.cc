@@ -137,9 +137,8 @@ gsi::Class<img::DataMapping> decl_ImageDataMapping ("lay", "ImageDataMapping",
   gsi::method_ext ("clear_colormap", &gsi::clear_colormap, 
     "@brief The the color map of this data mapping object."
   ) +
-  gsi::method_ext ("add_colormap_entry", &gsi::add_colormap, 
+  gsi::method_ext ("add_colormap_entry", &gsi::add_colormap, gsi::arg ("value"), gsi::arg ("color"),
     "@brief Add a colormap entry for this data mapping object.\n"
-    "@args value, color\n"
     "@param value The value at which the given color should be applied.\n"
     "@param color The color to apply (a 32 bit RGB value).\n"
     "\n"
@@ -152,21 +151,18 @@ gsi::Class<img::DataMapping> decl_ImageDataMapping ("lay", "ImageDataMapping",
     "@brief Returns the current number of color map entries.\n"
     "@return The number of entries.\n"
   ) +
-  gsi::method_ext ("colormap_color", &gsi::colormap_color, 
+  gsi::method_ext ("colormap_color", &gsi::colormap_color, gsi::arg ("n"),
     "@brief Returns the color for a given color map entry.\n"
-    "@args n\n"
     "@param n The index of the entry (0..\\num_colormap_entries-1)\n"
     "@return The color (see \\add_colormap_entry for a description).\n"
   ) +
-  gsi::method_ext ("colormap_value", &gsi::colormap_value, 
+  gsi::method_ext ("colormap_value", &gsi::colormap_value, gsi::arg ("n"),
     "@brief Returns the vlue for a given color map entry.\n"
-    "@args n\n"
     "@param n The index of the entry (0..\\num_colormap_entries-1)\n"
     "@return The value (see \\add_colormap_entry for a description).\n"
   ) +
-  gsi::method_ext ("brightness=", &gsi::set_brightness, 
+  gsi::method_ext ("brightness=", &gsi::set_brightness, gsi::arg ("brightness"),
     "@brief Set the brightness\n"
-    "@args brightness\n"
     "See \\brightness for a description of this property.\n"
   ) +
   gsi::method_ext ("brightness", &gsi::brightness, 
@@ -175,9 +171,8 @@ gsi::Class<img::DataMapping> decl_ImageDataMapping ("lay", "ImageDataMapping",
     "The brightness is a double value between roughly -1.0 and 1.0. \n"
     "Neutral (original) brightness is 0.0.\n"
   ) +
-  gsi::method_ext ("contrast=", &gsi::set_contrast, 
+  gsi::method_ext ("contrast=", &gsi::set_contrast, gsi::arg ("contrast"),
     "@brief Set the contrast\n"
-    "@args contrast\n"
     "See \\contrast for a description of this property.\n"
   ) +
   gsi::method_ext ("contrast", &gsi::contrast, 
@@ -186,9 +181,8 @@ gsi::Class<img::DataMapping> decl_ImageDataMapping ("lay", "ImageDataMapping",
     "The contrast is a double value between roughly -1.0 and 1.0. \n"
     "Neutral (original) contrast is 0.0.\n"
   ) +
-  gsi::method_ext ("gamma=", &gsi::set_gamma, 
+  gsi::method_ext ("gamma=", &gsi::set_gamma, gsi::arg ("gamma"),
     "@brief Set the gamma\n"
-    "@args gamma\n"
     "See \\gamma for a description of this property.\n"
   ) +
   gsi::method_ext ("gamma", &gsi::gamma, 
@@ -198,9 +192,8 @@ gsi::Class<img::DataMapping> decl_ImageDataMapping ("lay", "ImageDataMapping",
     "A value for linear intensity reproduction on the screen is roughly 0.5. The exact value depends on the \n"
     "monitor calibration. Values below 1.0 give a \"softer\" appearance while values above 1.0 give a \"harder\" appearance.\n"
   ) +
-  gsi::method_ext ("red_gain=", &gsi::set_red_gain, 
+  gsi::method_ext ("red_gain=", &gsi::set_red_gain, gsi::arg ("red_gain"),
     "@brief Set the red_gain\n"
-    "@args red_gain\n"
     "See \\red_gain for a description of this property.\n"
   ) +
   gsi::method_ext ("red_gain", &gsi::red_gain, 
@@ -211,9 +204,8 @@ gsi::Class<img::DataMapping> decl_ImageDataMapping ("lay", "ImageDataMapping",
     "\n"
     "1.0 is a neutral value. The gain should be >=0.0.\n"
   ) +
-  gsi::method_ext ("green_gain=", &gsi::set_green_gain, 
+  gsi::method_ext ("green_gain=", &gsi::set_green_gain, gsi::arg ("green_gain"),
     "@brief Set the green_gain\n"
-    "@args green_gain\n"
     "See \\green_gain for a description of this property.\n"
   ) +
   gsi::method_ext ("green_gain", &gsi::green_gain, 
@@ -224,9 +216,8 @@ gsi::Class<img::DataMapping> decl_ImageDataMapping ("lay", "ImageDataMapping",
     "\n"
     "1.0 is a neutral value. The gain should be >=0.0.\n"
   ) +
-  gsi::method_ext ("blue_gain=", &gsi::set_blue_gain, 
+  gsi::method_ext ("blue_gain=", &gsi::set_blue_gain, gsi::arg ("blue_gain"),
     "@brief Set the blue_gain\n"
-    "@args blue_gain\n"
     "See \\blue_gain for a description of this property.\n"
   ) +
   gsi::method_ext ("blue_gain", &gsi::blue_gain, 
@@ -489,9 +480,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "This will create an empty image without data and no particular pixel width or related.\n"
     "Use the \\read_file or \\set_data methods to set image properties and pixel values.\n"
   ) +
-  gsi::constructor ("new", &gsi::new_image_f,
+  gsi::constructor ("new", &gsi::new_image_f, gsi::arg ("filename"),
     "@brief Constructor from a image file \n"
-    "@args filename\n"
     "\n"
     "This constructor creates an image object from a file (which can have any format supported by Qt) and \n"
     "a unit transformation. The image will originally be put to position 0,0 (lower left corner) and each pixel\n"
@@ -499,9 +489,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "\n"
     "@param filename The path to the image file to load.\n"
   ) +
-  gsi::constructor ("new", &gsi::new_image_ft,
+  gsi::constructor ("new", &gsi::new_image_ft, gsi::arg ("filename"), gsi::arg ("trans"),
     "@brief Constructor from a image file \n"
-    "@args filename, trans\n"
     "\n"
     "This constructor creates an image object from a file (which can have any format supported by Qt) and \n"
     "a transformation. The image will originally be put to position 0,0 (lower left corner) and each pixel\n"
@@ -510,9 +499,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "@param filename The path to the image file to load.\n"
     "@param trans The transformation to apply to the image when displaying it.\n"
   ) +
-  gsi::constructor ("new", &gsi::new_image_whd,
+  gsi::constructor ("new", &gsi::new_image_whd, gsi::arg ("w"), gsi::arg ("h"), gsi::arg ("data"),
     "@brief Constructor for a monochrome image with the given pixel values\n"
-    "@args w, h, data\n"
     "\n"
     "This constructor creates an image from the given pixel values. The values have to be organized\n"
     "line by line. Each line must consist of \"w\" values where the first value is the leftmost pixel.\n"
@@ -525,9 +513,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "@param h The height of the image\n"
     "@param d The data (see method description)\n"
   ) +
-  gsi::constructor ("new", &gsi::new_image_whtd,
+  gsi::constructor ("new", &gsi::new_image_whtd, gsi::arg ("w"), gsi::arg ("h"), gsi::arg ("trans"), gsi::arg ("data"),
     "@brief Constructor for a monochrome image with the given pixel values\n"
-    "@args w, h, trans, data\n"
     "\n"
     "This constructor creates an image from the given pixel values. The values have to be organized\n"
     "line by line. Each line must consist of \"w\" values where the first value is the leftmost pixel.\n"
@@ -542,9 +529,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "@param d The data (see method description)\n"
   ) +
   /*  HINT: these declarations cannot be used currently since any array is case to the boolean color parameter
-  gsi::constructor ("new", &img::new_image_whc,
+  gsi::constructor ("new", &img::new_image_whc, gsi::arg ("w"), gsi::arg ("h"), gsi::arg ("color"),
     "@brief Constructor for monochrome or color images with zero pixel values\n"
-    "@args w, h, color\n"
     "\n"
     "This constructor creates an image object from a data set describing one monochrome channel\n"
     "or three color channels.\n"
@@ -558,9 +544,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "@param h The height of the image\n"
     "@param color True to create a color image.\n"
   ) +
-  gsi::constructor ("new", &img::new_image_whtc,
+  gsi::constructor ("new", &img::new_image_whtc, gsi::arg ("w"), gsi::arg ("h"), gsi::arg ("trans"), gsi::arg ("color"),
     "@brief Constructor for monochrome or color images with zero pixel values\n"
-    "@args w, h, trans, color\n"
     "\n"
     "This constructor creates an image object from a data set describing one monochrome channel\n"
     "or three color channels.\n"
@@ -576,9 +561,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "@param color True to create a color image.\n"
   ) +
   */
-  gsi::constructor ("new", &gsi::new_image_whrgb,
+  gsi::constructor ("new", &gsi::new_image_whrgb, gsi::arg ("w"), gsi::arg ("h"), gsi::arg ("red"), gsi::arg ("green"), gsi::arg ("blue"),
     "@brief Constructor for a color image with the given pixel values\n"
-    "@args w, h, red, green, blue\n"
     "\n"
     "This constructor creates an image from the given pixel values. The values have to be organized\n"
     "line by line and separated by color channel. Each line must consist of \"w\" values where the first value is the leftmost pixel.\n"
@@ -593,9 +577,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "@param green The green channel data set which will become owned by the image\n"
     "@param blue The blue channel data set which will become owned by the image\n"
   ) +
-  gsi::constructor ("new", &gsi::new_image_whtrgb,
+  gsi::constructor ("new", &gsi::new_image_whtrgb, gsi::arg ("w"), gsi::arg ("h"), gsi::arg ("trans"), gsi::arg ("red"), gsi::arg ("green"), gsi::arg ("blue"),
     "@brief Constructor for a color image with the given pixel values\n"
-    "@args w, h, trans, red, green, blue\n"
     "\n"
     "This constructor creates an image from the given pixel values. The values have to be organized\n"
     "line by line and separated by color channel. Each line must consist of \"w\" values where the first value is the leftmost pixel.\n"
@@ -615,22 +598,19 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "@brief Gets the bounding box of the image\n"
     "@return The bounding box\n"
   ) +
-  gsi::method ("transformed", &ImageRef::transformed<db::DTrans>,
+  gsi::method ("transformed", &ImageRef::transformed<db::DTrans>, gsi::arg ("t"),
     "@brief Transforms the image with the given simple transformation\n"
-    "@args t\n"
     "@param t The transformation to apply\n"
     "@return The transformed object\n"
   ) +
-  gsi::method ("transformed|#transformed_matrix", &ImageRef::transformed<db::Matrix3d>,
+  gsi::method ("transformed|#transformed_matrix", &ImageRef::transformed<db::Matrix3d>, gsi::arg ("t"),
     "@brief Transforms the image with the given matrix transformation\n"
-    "@args t\n"
     "@param t The transformation to apply (a matrix)\n"
     "@return The transformed object\n"
     "This method has been introduced in version 0.22."
   ) +
-  gsi::method ("transformed|#transformed_cplx", &ImageRef::transformed<db::DCplxTrans>,
+  gsi::method ("transformed|#transformed_cplx", &ImageRef::transformed<db::DCplxTrans>, gsi::arg ("t"),
     "@brief Transforms the image with the given complex transformation\n"
-    "@args t\n"
     "@param t The magnifying transformation to apply\n"
     "@return The transformed object\n"
   ) +
@@ -654,9 +634,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "@brief Returns true, if the image is a color image\n"
     "@return True, if the image is a color image\n"
   ) +
-  gsi::method ("set_mask", &ImageRef::set_mask,
+  gsi::method ("set_mask", &ImageRef::set_mask, gsi::arg ("x"), gsi::arg ("y"), gsi::arg ("m"),
     "@brief Sets the mask for a pixel\n"
-    "@args x, y, m\n"
     "\n"
     "@param x The x coordinate of the pixel (0..width()-1)\n"
     "@param y The y coordinate of the pixel (mathematical order: 0 is the lowest, 0..height()-1)\n"
@@ -666,9 +645,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method ("mask", (bool (ImageRef::*) (size_t x, size_t y) const) &ImageRef::mask,
+  gsi::method ("mask", (bool (ImageRef::*) (size_t x, size_t y) const) &ImageRef::mask, gsi::arg ("x"), gsi::arg ("y"),
     "@brief Gets the mask for one pixel\n"
-    "@args x, y\n"
     "\n"
     "@param x The x coordinate of the pixel (0..width()-1)\n"
     "@param y The y coordinate of the pixel (mathematical order: 0 is the lowest, 0..height()-1)\n"
@@ -678,9 +656,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method ("set_pixel", (void (ImageRef::*)(size_t x, size_t y, double v)) &ImageRef::set_pixel,
+  gsi::method ("set_pixel", (void (ImageRef::*)(size_t x, size_t y, double v)) &ImageRef::set_pixel, gsi::arg ("x"), gsi::arg ("y"), gsi::arg ("v"),
     "@brief Sets one pixel (monochrome)\n"
-    "@args x, y, v\n"
     "\n"
     "@param x The x coordinate of the pixel (0..width()-1)\n"
     "@param y The y coordinate of the pixel (mathematical order: 0 is the lowest, 0..height()-1)\n"
@@ -689,9 +666,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "If the component index, x or y value exceeds the image bounds of the image is a color image,\n"
     "this method does nothing.\n"
   ) +
-  gsi::method ("set_pixel", (void (ImageRef::*)(size_t x, size_t y, double r, double g, double b)) &ImageRef::set_pixel,
+  gsi::method ("set_pixel", (void (ImageRef::*)(size_t x, size_t y, double r, double g, double b)) &ImageRef::set_pixel, gsi::arg ("x"), gsi::arg ("y"), gsi::arg ("r"), gsi::arg ("g"), gsi::arg ("b"),
     "@brief Sets one pixel (color)\n"
-    "@args x, y, r, g, b\n"
     "\n"
     "@param x The x coordinate of the pixel (0..width()-1)\n"
     "@param y The y coordinate of the pixel (mathematical order: 0 is the lowest, 0..height()-1)\n"
@@ -702,9 +678,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "If the component index, x or y value exceeds the image bounds of the image is not a color image,\n"
     "this method does nothing.\n"
   ) +
-  gsi::method ("get_pixel", (double (ImageRef::*)(size_t x, size_t y) const) &ImageRef::pixel,
+  gsi::method ("get_pixel", (double (ImageRef::*)(size_t x, size_t y) const) &ImageRef::pixel, gsi::arg ("x"), gsi::arg ("y"),
     "@brief Gets one pixel (monochrome only)\n"
-    "@args x, y\n"
     "\n"
     "@param x The x coordinate of the pixel (0..width()-1)\n"
     "@param y The y coordinate of the pixel (mathematical order: 0 is the lowest, 0..height()-1)\n"
@@ -713,9 +688,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "returns 0.0. This method is valid for monochrome images only. For color images it will return 0.0 always.\n"
     "Use \\is_color? to decide whether the image is a color image or monochrome one.\n"
   ) +
-  gsi::method ("get_pixel", (double (ImageRef::*)(size_t x, size_t y, unsigned int component) const) &ImageRef::pixel,
+  gsi::method ("get_pixel", (double (ImageRef::*)(size_t x, size_t y, unsigned int component) const) &ImageRef::pixel, gsi::arg ("x"), gsi::arg ("y"), gsi::arg ("component"),
     "@brief Gets one pixel (monochrome and color)\n"
-    "@args x, y, component\n"
     "\n"
     "@param x The x coordinate of the pixel (0..width()-1)\n"
     "@param y The y coordinate of the pixel (mathematical order: 0 is the lowest, 0..height()-1)\n"
@@ -724,18 +698,16 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "If the component index, x or y value exceeds the image bounds, this method \n"
     "returns 0.0. For monochrome images, the component index is ignored.\n"
   ) +
-  gsi::method ("set_data", (void (ImageRef::*)(size_t w, size_t h, const std::vector<double> &d)) &ImageRef::set_data,
+  gsi::method ("set_data", (void (ImageRef::*)(size_t w, size_t h, const std::vector<double> &d)) &ImageRef::set_data, gsi::arg ("w"), gsi::arg ("h"), gsi::arg ("d"),
     "@brief Writes the image data field (monochrome)\n"
-    "@args w, h, d\n"
     "@param w The width of the new data\n"
     "@param h The height of the new data\n"
     "@param d The (monochrome) data to load into the image\n"
     "\n"
     "See the constructor description for the data organisation in that field.\n"
   ) +
-  gsi::method ("set_data", (void (ImageRef::*)(size_t w, size_t h, const std::vector<double> &r, const std::vector<double> &g, const std::vector<double> &b)) &img::Object::set_data,
+  gsi::method ("set_data", (void (ImageRef::*)(size_t w, size_t h, const std::vector<double> &r, const std::vector<double> &g, const std::vector<double> &b)) &img::Object::set_data, gsi::arg ("w"), gsi::arg ("h"), gsi::arg ("r"), gsi::arg ("g"), gsi::arg ("b"),
     "@brief Writes the image data field (color)\n"
-    "@args w, h, r, g, b\n"
     "@param w The width of the new data\n"
     "@param h The height of the new data\n"
     "@param r The red channel data to load into the image\n"
@@ -765,9 +737,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
-  gsi::method_ext ("pixel_width=", &img_set_pixel_width,
+  gsi::method_ext ("pixel_width=", &img_set_pixel_width, gsi::arg ("w"),
     "@brief Sets the pixel width\n"
-    "@args w\n"
     "\n"
     "The pixel width determines the width of on pixel in the original space which is transformed to\n"
     "micron space with the transformation.\n"
@@ -783,9 +754,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "Starting with version 0.22, this property is incorporated into the transformation matrix.\n"
     "This property is provided for convenience only."
   ) +
-  gsi::method_ext ("pixel_height=", &img_set_pixel_height,
+  gsi::method_ext ("pixel_height=", &img_set_pixel_height, gsi::arg ("h"),
     "@brief Sets the pixel height\n"
-    "@args h\n"
     "\n"
     "The pixel height determines the height of on pixel in the original space which is transformed to\n"
     "micron space with the transformation.\n"
@@ -815,9 +785,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "\n"
     "This method was introduced in version 0.25."
   ) +
-  gsi::method ("matrix=", &ImageRef::set_matrix,
+  gsi::method ("matrix=", &ImageRef::set_matrix, gsi::arg ("t"),
     "@brief Sets the transformation matrix\n"
-    "@args t\n"
     "\n"
     "This transformation matrix converts pixel coordinates (0,0 being the center and each pixel having the dimension of pixel_width and pixel_height)\n"
     "to micron coordinates. The coordinate of the pixel is the lower left corner of the pixel.\n"
@@ -850,9 +819,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "Please note that for backward compatibility, the rotation center is pixel 0,0 (lowest left one), while it "
     "is the image center for the matrix transformation."
   ) +
-  gsi::method_ext ("trans=", &img_set_trans,
+  gsi::method_ext ("trans=", &img_set_trans, gsi::arg ("t"),
     "@brief Sets the transformation\n"
-    "@args t\n"
     "\n"
     "This transformation converts pixel coordinates (0,0 being the lower left corner and each pixel having the dimension of pixel_width and pixel_height)\n"
     "to micron coordinates. The coordinate of the pixel is the lower left corner of the pixel.\n"
@@ -862,9 +830,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "Please note that for backward compatibility, the rotation center is pixel 0,0 (lowest left one), while it "
     "is the image center for the matrix transformation."
   ) +
-  gsi::method ("min_value=", &ImageRef::set_min_value,
+  gsi::method ("min_value=", &ImageRef::set_min_value, gsi::arg ("v"),
     "@brief Sets the minimum value\n"
-    "@args v\n"
     "\n"
     "See \\min_value for the description of the minimum value property.\n"
   ) +
@@ -875,9 +842,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "It does not necessarily correspond to the minimum value of the data set but it must be\n"
     "larger than that.\n"
   ) +
-  gsi::method ("max_value=", &ImageRef::set_max_value,
+  gsi::method ("max_value=", &ImageRef::set_max_value, gsi::arg ("v"),
     "@brief Gets the upper limit of the values in the data set\n"
-    "@args v\n"
     "\n"
     "This value determines the upper end of the data mapping (i.e. white value etc.).\n"
     "It does not necessarily correspond to the maximum value of the data set but it must be\n"
@@ -888,9 +854,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "\n"
     "See the \\max_value method for the description of the maximum value property.\n"
   ) +
-  gsi::method ("visible=", &ImageRef::set_visible,
+  gsi::method ("visible=", &ImageRef::set_visible, gsi::arg ("v"),
     "@brief Sets the visibility\n"
-    "@args v\n"
     "\n"
     "See the \\is_visible? method for a description of this property.\n"
     "\n"
@@ -911,9 +876,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "On initialization, a unique Id is given to the object. The Id cannot be changed. "
     "This behaviour has been modified in version 0.20."
   ) +
-  gsi::method ("data_mapping=", &ImageRef::set_data_mapping,
+  gsi::method ("data_mapping=", &ImageRef::set_data_mapping, gsi::arg ("data_mapping"),
     "@brief Sets the data mapping object\n"
-    "@args data_mapping\n"
     "\n"
     "The data mapping describes the transformation of a pixel value (any double value) into pixel data "
     "which can be sent to the graphics cards for display. See \\ImageDataMapping for a more detailed description.\n"
@@ -1335,9 +1299,8 @@ static void tp_output_image (db::TilingProcessor *proc, const std::string &name,
 //  extend the db::TilingProcessor with the ability to feed images
 static
 gsi::ClassExt<db::TilingProcessor> tiling_processor_ext (
-  method_ext ("output", &tp_output_image,
+  method_ext ("output", &tp_output_image, gsi::arg ("name"), gsi::arg ("image"),
     "@brief Specifies output to an image\n"
-    "@args name, image\n"
     "This method will establish an output channel which delivers float data to image data. "
     "The image is a monochrome image where each pixel corresponds to a single tile. This "
     "method for example is useful to collect densitity information into an image. The "
@@ -1350,4 +1313,3 @@ gsi::ClassExt<db::TilingProcessor> tiling_processor_ext (
 );
 
 }
-

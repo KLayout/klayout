@@ -128,16 +128,14 @@ struct vector_defs
     constructor ("new", &new_v,
       "@brief Default constructor: creates a null vector with coordinates (0,0)"
     ) +
-    constructor ("new", &new_point,
+    constructor ("new", &new_point, gsi::arg ("p"),
       "@brief Default constructor: creates a vector from a point\n"
-      "@args p\n"
       "This constructor is equivalent to computing p-point(0,0).\n"
       "This method has been introduced in version 0.25."
     ) +
-    constructor ("new", &new_xy,
+    constructor ("new", &new_xy, gsi::arg ("x"), gsi::arg ("y"),
       "@brief Constructor for a vector from two coordinate values\n"
       "\n"
-      "@args x, y\n"
     ) +
     method_ext ("to_p", &to_point,
       "@brief Turns the vector into a point\n"
@@ -148,48 +146,41 @@ struct vector_defs
     method_ext ("-@", &negate,
       "@brief Compute the negative of a vector\n"
       "\n"
-      "@args p\n"
       "\n"
       "Returns a new vector with -x,-y.\n"
     ) +
-    method ("+", (C (C::*) (const C &) const) &C::add,
+    method ("+", (C (C::*) (const C &) const) &C::add, gsi::arg ("v"),
       "@brief Adds two vectors\n"
       "\n"
-      "@args v\n"
       "\n"
       "Adds vector v to self by adding the coordinates.\n"
     ) +
-    method_ext ("+", &add_with_point,
+    method_ext ("+", &add_with_point, gsi::arg ("p"),
       "@brief Adds a vector and a point\n"
       "\n"
-      "@args p\n"
       "\n"
       "Returns the point p shifted by the vector.\n"
     ) +
-    method ("-", (C (C::*) (const C &) const) &C::subtract,
+    method ("-", (C (C::*) (const C &) const) &C::subtract, gsi::arg ("v"),
       "@brief Subtract two vectors\n"
       "\n"
-      "@args v\n"
       "\n"
       "Subtract vector v from self by subtracting the coordinates.\n"
     ) +
-    method ("<", &C::less,
+    method ("<", &C::less, gsi::arg ("v"),
       "@brief \"less\" comparison operator\n"
       "\n"
-      "@args v\n"
       "\n"
       "This operator is provided to establish a sorting\n"
       "order\n"
     ) +
-    method ("==", &C::equal,
+    method ("==", &C::equal, gsi::arg ("v"),
       "@brief Equality test operator\n"
       "\n"
-      "@args v\n"
     ) +
-    method ("!=", &C::not_equal,
+    method ("!=", &C::not_equal, gsi::arg ("v"),
       "@brief Inequality test operator\n"
       "\n"
-      "@args v\n"
     ) +
     method_ext ("hash", &hash_value,
       "@brief Computes a hash value\n"
@@ -203,71 +194,61 @@ struct vector_defs
     method ("y", &C::y,
       "@brief Accessor to the y coordinate\n"
     ) +
-    method ("x=", &C::set_x,
+    method ("x=", &C::set_x, gsi::arg ("coord"),
       "@brief Write accessor to the x coordinate\n"
-      "@args coord\n"
     ) +
-    method ("y=", &C::set_y,
+    method ("y=", &C::set_y, gsi::arg ("coord"),
       "@brief Write accessor to the y coordinate\n"
-      "@args coord\n"
     ) +
-    method_ext ("*", &scale,
+    method_ext ("*", &scale, gsi::arg ("f"),
       "@brief Scaling by some factor\n"
       "\n"
-      "@args f\n"
       "\n"
       "Returns the scaled object. All coordinates are multiplied with the given factor and if "
       "necessary rounded."
     ) +
-    method_ext ("*=", &iscale,
+    method_ext ("*=", &iscale, gsi::arg ("f"),
       "@brief Scaling by some factor\n"
       "\n"
-      "@args f\n"
       "\n"
       "Scales object in place. All coordinates are multiplied with the given factor and if "
       "necessary rounded."
     ) +
-    method_ext ("/", &divide,
+    method_ext ("/", &divide, gsi::arg ("d"),
       "@brief Division by some divisor\n"
       "\n"
-      "@args d\n"
       "\n"
       "Returns the scaled object. All coordinates are divided with the given divisor and if "
       "necessary rounded."
     ) +
-    method_ext ("/=", &idiv,
+    method_ext ("/=", &idiv, gsi::arg ("d"),
       "@brief Division by some divisor\n"
       "\n"
-      "@args d\n"
       "\n"
       "Divides the object in place. All coordinates are divided with the given divisor and if "
       "necessary rounded."
     ) +
-    method_ext ("vprod", &vprod,
+    method_ext ("vprod", &vprod, gsi::arg ("v"),
       "@brief Computes the vector product between self and the given vector\n"
       "\n"
-      "@args v\n"
       "\n"
       "The vector product of a and b is defined as: vp = ax*by-ay*bx.\n"
     ) +
-    method_ext ("vprod_sign", &vprod_sign,
+    method_ext ("vprod_sign", &vprod_sign, gsi::arg ("v"),
       "@brief Computes the vector product between self and the given vector and returns a value indicating the sign of the product\n"
       "\n"
-      "@args v\n"
       "\n"
       "@return 1 if the vector product is positive, 0 if it is zero and -1 if it is negative.\n"
     ) +
-    method_ext ("sprod", &sprod,
+    method_ext ("sprod", &sprod, gsi::arg ("v"),
       "@brief Computes the scalar product between self and the given vector\n"
       "\n"
-      "@args v\n"
       "\n"
       "The scalar product of a and b is defined as: vp = ax*bx+ay*by.\n"
     ) +
-    method_ext ("sprod_sign", &sprod_sign,
+    method_ext ("sprod_sign", &sprod_sign, gsi::arg ("v"),
       "@brief Computes the scalar product between self and the given vector and returns a value indicating the sign of the product\n"
       "\n"
-      "@args v\n"
       "\n"
       "@return 1 if the scalar product is positive, 0 if it is zero and -1 if it is negative.\n"
     ) +
@@ -279,9 +260,8 @@ struct vector_defs
       "@brief The square length of the vector\n"
       "'sq_abs' is an alias provided for compatibility with the former point type."
     ) +
-    constructor ("from_s", &from_string,
+    constructor ("from_s", &from_string, gsi::arg ("s"),
       "@brief Creates an object from a string\n"
-      "@args s\n"
       "Creates the object from a string representation (as returned by \\to_s)\n"
     ) +
     method ("to_s", (std::string (C::*) () const) &C::to_string,
@@ -362,4 +342,3 @@ Class<db::Vector> decl_Vector ("db", "Vector",
 );
 
 }
-

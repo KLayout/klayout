@@ -66,10 +66,9 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "\n"
     "This method has been added in version 0.24."
   ) +
-  gsi::method ("message", &lay::MainWindow::message,
+  gsi::method ("message", &lay::MainWindow::message, gsi::arg ("message"), gsi::arg ("time"),
     "@brief Displays a message in the status bar\n"
     "\n"
-    "@args message,time\n"
     "@param message The message to display\n"
     "@param time The time how long to display the message in ms\n"
     "\n"
@@ -77,10 +76,9 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "\n"
     "This method has been added in version 0.18."
   ) +
-  gsi::method ("resize", (void (lay::MainWindow::*)(int, int)) &lay::MainWindow::resize,
+  gsi::method ("resize", (void (lay::MainWindow::*)(int, int)) &lay::MainWindow::resize, gsi::arg ("width"), gsi::arg ("height"),
     "@brief Resizes the window\n"
     "\n"
-    "@args width, height\n"
     "@param width The new width of the window\n"
     "@param height The new width of the window\n"
     "\n"
@@ -114,10 +112,9 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "\n"
     "This method has been added in version 0.22.\n"
   ) +
-  gsi::method ("create_layout", (lay::CellViewRef (lay::MainWindow::*) (int)) &lay::MainWindow::create_layout,
+  gsi::method ("create_layout", (lay::CellViewRef (lay::MainWindow::*) (int)) &lay::MainWindow::create_layout, gsi::arg ("mode"),
     "@brief Creates a new, empty layout\n"
     "\n"
-    "@args mode\n"
     "@param mode An integer value of 0, 1 or 2 that determines how the layout is created\n"
     "@return The cellview of the layout that was created\n"
     "\n"
@@ -129,10 +126,9 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "\n"
     "Starting with version 0.25, this method returns a cellview object that can be modified to configure the cellview.\n"
   ) +
-  gsi::method ("create_layout", (lay::CellViewRef (lay::MainWindow::*) (const std::string &, int)) &lay::MainWindow::create_layout,
+  gsi::method ("create_layout", (lay::CellViewRef (lay::MainWindow::*) (const std::string &, int)) &lay::MainWindow::create_layout, gsi::arg ("tech"), gsi::arg ("mode"),
     "@brief Creates a new, empty layout with the given technology\n"
     "\n"
-    "@args tech, mode\n"
     "@param mode An integer value of 0, 1 or 2 that determines how the layout is created\n"
     "@param tech The name of the technology to use for that layout.\n"
     "@return The cellview of the layout that was created\n"
@@ -146,10 +142,9 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "This version was introduced in version 0.22.\n"
     "Starting with version 0.25, this method returns a cellview object that can be modified to configure the cellview.\n"
   ) +
-  gsi::method ("load_layout", (lay::CellViewRef (lay::MainWindow::*) (const std::string &, int)) &lay::MainWindow::load_layout,
+  gsi::method ("load_layout", (lay::CellViewRef (lay::MainWindow::*) (const std::string &, int)) &lay::MainWindow::load_layout, gsi::arg ("filename"), gsi::arg ("mode"),
     "@brief Loads a new layout\n"
     "\n"
-    "@args filename, mode\n"
     "@param filename The name of the file to load\n"
     "@param mode An integer value of 0, 1 or 2 that determines how the file is loaded\n"
     "@return The cellview into which the layout was loaded\n"
@@ -163,10 +158,9 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "\n"
     "Starting with version 0.25, this method returns a cellview object that can be modified to configure the cellview.\n"
   ) +
-  gsi::method ("load_layout", (lay::CellViewRef (lay::MainWindow::*) (const std::string &, const std::string &, int)) &lay::MainWindow::load_layout,
+  gsi::method ("load_layout", (lay::CellViewRef (lay::MainWindow::*) (const std::string &, const std::string &, int)) &lay::MainWindow::load_layout, gsi::arg ("filename"), gsi::arg ("tech"), gsi::arg ("mode"),
     "@brief Loads a new layout and associate it with the given technology\n"
     "\n"
-    "@args filename, tech, mode\n"
     "@param filename The name of the file to load\n"
     "@param tech The name of the technology to use for that layout.\n"
     "@param mode An integer value of 0, 1 or 2 that determines how the file is loaded\n"
@@ -181,10 +175,9 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "This version was introduced in version 0.22.\n"
     "Starting with version 0.25, this method returns a cellview object that can be modified to configure the cellview.\n"
   ) +
-  gsi::method ("load_layout", (lay::CellViewRef (lay::MainWindow::*) (const std::string &, const db::LoadLayoutOptions &, int)) &lay::MainWindow::load_layout,
+  gsi::method ("load_layout", (lay::CellViewRef (lay::MainWindow::*) (const std::string &, const db::LoadLayoutOptions &, int)) &lay::MainWindow::load_layout, gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("mode"),
     "@brief Loads a new layout with the given options\n"
     "\n"
-    "@args filename, options, mode\n"
     "@param filename The name of the file to load\n"
     "@param options The reader options to use.\n"
     "@param mode An integer value of 0, 1 or 2 that determines how the file is loaded\n"
@@ -197,10 +190,9 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "This version was introduced in version 0.22.\n"
     "Starting with version 0.25, this method returns a cellview object that can be modified to configure the cellview.\n"
   ) +
-  gsi::method ("load_layout", (lay::CellViewRef (lay::MainWindow::*) (const std::string &, const db::LoadLayoutOptions &, const std::string &, int)) &lay::MainWindow::load_layout,
+  gsi::method ("load_layout", (lay::CellViewRef (lay::MainWindow::*) (const std::string &, const db::LoadLayoutOptions &, const std::string &, int)) &lay::MainWindow::load_layout, gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("tech"), gsi::arg ("mode"),
     "@brief Loads a new layout with the given options and associate it with the given technology\n"
     "\n"
-    "@args filename, options, tech, mode\n"
     "@param filename The name of the file to load\n"
     "@param options The reader options to use.\n"
     "@param tech The name of the technology to use for that layout.\n"
@@ -219,10 +211,9 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
   gsi::method ("clone_current_view", &lay::MainWindow::clone_current_view,
     "@brief Clones the current view and make it current\n"
   ) +
-  gsi::method ("save_session", &lay::MainWindow::save_session,
+  gsi::method ("save_session", &lay::MainWindow::save_session, gsi::arg ("fn"),
     "@brief Saves the session to the given file\n"
     "\n"
-    "@args fn\n"
     "@param fn The path to the session file\n"
     "\n"
     "The session is saved to the given session file. Any existing layout edits are not automatically saved together with "
@@ -231,10 +222,9 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "\n"
     "This method was added in version 0.18."
   ) +
-  gsi::method ("restore_session", &lay::MainWindow::restore_session,
+  gsi::method ("restore_session", &lay::MainWindow::restore_session, gsi::arg ("fn"),
     "@brief Restores a session from the given file\n"
     "\n"
-    "@args fn\n"
     "@param fn The path to the session file\n"
     "\n"
     "The session stored in the given session file is restored. All existing views are closed and all "
@@ -242,19 +232,17 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "\n"
     "This method was added in version 0.18."
   ) +
-  gsi::method_ext ("#enable_edits", &enable_edits,
+  gsi::method_ext ("#enable_edits", &enable_edits, gsi::arg ("enable"),
     "@brief Enables or disables editing\n"
     "\n"
-    "@args enable\n"
     "@param enable Enable edits if set to true\n"
     "\n"
     "Starting from version 0.25, this method enables/disables edits on the current view only. \n"
     "Use LayoutView#enable_edits instead.\n"
   ) +
-  gsi::method ("synchronous=|#synchroneous", &lay::MainWindow::set_synchronous,
+  gsi::method ("synchronous=|#synchroneous", &lay::MainWindow::set_synchronous, gsi::arg ("sync_mode"),
     "@brief Puts the main window into synchronous mode\n"
     "\n"
-    "@args sync_mode\n"
     "@param sync_mode 'true' if the application should behave synchronously\n"
     "\n"
     "In synchronous mode, an application is allowed to block on redraw. While redrawing, "
@@ -292,10 +280,9 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "This method does not immediately exit the application but sends an exit request "
     "to the application which will cause a clean shutdown of the GUI. "
   ) +
-  gsi::method ("current_view_index=|#select_view", &lay::MainWindow::select_view,
+  gsi::method ("current_view_index=|#select_view", &lay::MainWindow::select_view, gsi::arg ("index"),
     "@brief Selects the view with the given index\n"
     "\n"
-    "@args index\n"
     "@param index The index of the view to select (0 is the first)\n"
     "\n"
     "This method will make the view with the given index the current (front) view.\n"
@@ -319,9 +306,8 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "\n"
     "@return The number of views available so far.\n"
   ) +
-  gsi::method ("view", (lay::LayoutView *(lay::MainWindow::*)(int)) &lay::MainWindow::view,
+  gsi::method ("view", (lay::LayoutView *(lay::MainWindow::*)(int)) &lay::MainWindow::view, gsi::arg ("n"),
     "@brief Returns a reference to a view object by index\n"
-    "@args n\n"
     "\n"
     "@return The view object's reference for the view with the given index.\n"
   ) +
@@ -332,14 +318,13 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "\n"
     "This method was added in version 0.22."
   ) +
-  gsi::method ("initial_technology=", &lay::MainWindow::set_initial_technology,
+  gsi::method ("initial_technology=", &lay::MainWindow::set_initial_technology, gsi::arg ("tech"),
     "@brief Sets the technology used for creating or loading layouts (unless explicitly specified)\n"
     "\n"
     "Setting the technology will have an effect on the next load_layout or create_layout operation which does not explicitly specify the technology but "
     "might not be reflected correctly in the reader options dialog and changes will be reset when the "
     "application is restarted."
     "\n"
-    "@args tech\n"
     "@param tech The new initial technology\n"
     "\n"
     "This method was added in version 0.22."
@@ -352,9 +337,8 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
     "(add_current_view_observer/remove_current_view_observer) have been removed in 0.25.\n"
   ) +
-  gsi::event ("on_view_created", &lay::MainWindow::view_created_event,
+  gsi::event ("on_view_created", &lay::MainWindow::view_created_event, gsi::arg ("index"),
     "@brief An event indicating that a new view was created\n"
-    "@args index\n"
     "@param index The index of the view that was created\n"
     "\n"
     "This event is triggered after a new view was created. For example, if a layout is loaded into a new panel.\n"
@@ -362,9 +346,8 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
     "(add_new_view_observer/remove_new_view_observer) have been removed in 0.25.\n"
   ) +
-  gsi::event ("on_view_closed", &lay::MainWindow::view_closed_event,
+  gsi::event ("on_view_closed", &lay::MainWindow::view_closed_event, gsi::arg ("index"),
     "@brief An event indicating that a view was closed\n"
-    "@args index\n"
     "@param index The index of the view that was closed\n"
     "\n"
     "This event is triggered after a view was closed. For example, because the tab was closed.\n"
@@ -785,4 +768,3 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
 );
 
 }
-

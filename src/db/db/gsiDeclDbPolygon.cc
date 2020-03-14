@@ -1938,9 +1938,8 @@ Class<db::DPolygon> decl_DPolygon ("db", "DPolygon",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method_ext ("transform", &transform_cplx_dp,
+  method_ext ("transform", &transform_cplx_dp, gsi::arg ("t"),
     "@brief Transforms the polygon with a complex transformation (in-place)\n"
-    "@args t\n"
     "\n"
     "Transforms the polygon with the given complex transformation.\n"
     "Modifies self and returns self. An out-of-place version which does not modify self is \\transformed.\n"
@@ -1949,10 +1948,9 @@ Class<db::DPolygon> decl_DPolygon ("db", "DPolygon",
     "\n"
     "This method has been introduced in version 0.24.\n"
   ) +
-  method_ext ("transformed", &transformed_vcplx_dp,
+  method_ext ("transformed", &transformed_vcplx_dp, gsi::arg ("t"),
     "@brief Transforms the polygon with the given complex transformation\n"
     "\n"
-    "@args t\n"
     "\n"
     "@param t The magnifying transformation to apply\n"
     "@return The transformed polygon (in this case an integer coordinate polygon)\n"
@@ -2006,4 +2004,3 @@ Class<db::DPolygon> decl_DPolygon ("db", "DPolygon",
 );
 
 }
-

@@ -58,10 +58,9 @@ static db::Manager::transaction_id_t transaction2(db::Manager *manager, const st
 }
 
 Class<db::Manager> decl_Manager ("db", "Manager",
-  gsi::method_ext ("transaction", &transaction1,
+  gsi::method_ext ("transaction", &transaction1, gsi::arg ("description"),
     "@brief Begin a transaction\n"
     "\n"
-    "@args description\n"
     "\n"
     "This call will open a new transaction. A transaction consists\n"
     "of a set of operations issued with the 'queue' method.\n"
@@ -71,10 +70,9 @@ Class<db::Manager> decl_Manager ("db", "Manager",
     "\n"
     "@return The ID of the transaction (can be used to join other transactions with this one)\n"
   ) +
-  gsi::method_ext ("transaction", &transaction2,
+  gsi::method_ext ("transaction", &transaction2, gsi::arg ("description"), gsi::arg ("join_with"),
     "@brief Begin a joined transaction\n"
     "\n"
-    "@args description, join_with\n"
     "\n"
     "This call will open a new transaction and join if with the previous transaction.\n"
     "The ID of the previous transaction must be equal to the ID given with 'join_with'.\n"

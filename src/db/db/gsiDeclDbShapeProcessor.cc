@@ -176,9 +176,8 @@ size_to_polygon2n (db::ShapeProcessor *processor, const std::vector<db::Shape> &
 
 
 Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
-  method ("merge", (void (db::ShapeProcessor::*) (const db::Layout &, const db::Cell &, unsigned int, db::Shapes &, bool, unsigned int, bool, bool)) &db::ShapeProcessor::merge, 
+  method ("merge", (void (db::ShapeProcessor::*) (const db::Layout &, const db::Cell &, unsigned int, db::Shapes &, bool, unsigned int, bool, bool)) &db::ShapeProcessor::merge, gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("layer"), gsi::arg ("out"), gsi::arg ("hierarchical"), gsi::arg ("min_wc"), gsi::arg ("resolve_holes"), gsi::arg ("min_coherence"),
     "@brief Merge the given shapes from a layout into a shapes container\n"
-    "@args layout, cell, layer, out, hierarchical, min_wc, resolve_holes, min_coherence\n"
     "\n"
     "See the \\EdgeProcessor for a description of the merge method. This implementation takes shapes\n"
     "from a layout cell (optionally all in hierarchy) and produces new shapes in a shapes container. "
@@ -192,9 +191,8 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
     "@param resolve_holes true, if holes should be resolved into the hull\n"
     "@param min_coherence true, if minimum polygons should be created for touching corners\n"
   ) +
-  method ("boolean", (void (db::ShapeProcessor::*) (const db::Layout &, const db::Cell &, unsigned int, const db::Layout &, const db::Cell &, unsigned int, db::Shapes &, int, bool, bool, bool)) &db::ShapeProcessor::boolean,
+  method ("boolean", (void (db::ShapeProcessor::*) (const db::Layout &, const db::Cell &, unsigned int, const db::Layout &, const db::Cell &, unsigned int, db::Shapes &, int, bool, bool, bool)) &db::ShapeProcessor::boolean, gsi::arg ("layout_a"), gsi::arg ("cell_a"), gsi::arg ("layer_a"), gsi::arg ("layout_b"), gsi::arg ("cell_b"), gsi::arg ("layer_b"), gsi::arg ("out"), gsi::arg ("mode"), gsi::arg ("hierarchical"), gsi::arg ("resolve_holes"), gsi::arg ("min_coherence"),
     "@brief Boolean operation on shapes from layouts\n"
-    "@args layout_a, cell_a, layer_a, layout_b, cell_b, layer_b, out, mode, hierarchical, resolve_holes, min_coherence\n"
     "\n"
     "See the \\EdgeProcessor for a description of the boolean operations. This implementation takes shapes\n"
     "from layout cells (optionally all in hierarchy) and produces new shapes in a shapes container. "
@@ -211,9 +209,8 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
     "@param resolve_holes true, if holes should be resolved into the hull\n"
     "@param min_coherence true, if minimum polygons should be created for touching corners\n"
   ) +
-  method ("size", (void (db::ShapeProcessor::*) (const db::Layout &, const db::Cell &, unsigned int, db::Shapes &, db::Coord, db::Coord, unsigned int, bool, bool, bool)) &db::ShapeProcessor::size,
+  method ("size", (void (db::ShapeProcessor::*) (const db::Layout &, const db::Cell &, unsigned int, db::Shapes &, db::Coord, db::Coord, unsigned int, bool, bool, bool)) &db::ShapeProcessor::size, gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("layer"), gsi::arg ("out"), gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("mode"), gsi::arg ("hierarchical"), gsi::arg ("resolve_holes"), gsi::arg ("min_coherence"),
     "@brief Sizing operation on shapes from layouts\n"
-    "@args layout, cell, layer, out, dx, dy, mode, hierarchical, resolve_holes, min_coherence\n"
     "\n"
     "See the \\EdgeProcessor for a description of the sizing operation. This implementation takes shapes\n"
     "from a layout cell (optionally all in hierarchy) and produces new shapes in a shapes container. "
@@ -229,9 +226,8 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
     "@param resolve_holes true, if holes should be resolved into the hull\n"
     "@param min_coherence true, if minimum polygons should be created for touching corners\n"
   ) +
-  method ("size", (void (db::ShapeProcessor::*) (const db::Layout &, const db::Cell &, unsigned int, db::Shapes &, db::Coord, unsigned int, bool, bool, bool)) &db::ShapeProcessor::size,
+  method ("size", (void (db::ShapeProcessor::*) (const db::Layout &, const db::Cell &, unsigned int, db::Shapes &, db::Coord, unsigned int, bool, bool, bool)) &db::ShapeProcessor::size, gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("layer"), gsi::arg ("out"), gsi::arg ("d"), gsi::arg ("mode"), gsi::arg ("hierarchical"), gsi::arg ("resolve_holes"), gsi::arg ("min_coherence"),
     "@brief Sizing operation on shapes from layouts\n"
-    "@args layout, cell, layer, out, d, mode, hierarchical, resolve_holes, min_coherence\n"
     "\n"
     "See the \\EdgeProcessor for a description of the sizing operation. This implementation takes shapes\n"
     "from a layout cell (optionally all in hierarchy) and produces new shapes in a shapes container. "
@@ -247,9 +243,8 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
     "@param resolve_holes true, if holes should be resolved into the hull\n"
     "@param min_coherence true, if minimum polygons should be created for touching corners\n"
   ) +
-  method_ext ("merge", &gsi::merge1,
+  method_ext ("merge", &gsi::merge1, gsi::arg ("in"), gsi::arg ("trans"), gsi::arg ("min_wc"),
     "@brief Merge the given shapes\n"
-    "@args in, trans, min_wc\n"
     "\n"
     "See the \\EdgeProcessor for a description of the merge method. This implementation takes shapes\n"
     "rather than polygons for input and produces an edge set.\n"
@@ -258,9 +253,8 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
     "@param trans A corresponding set of transformations to apply on the shapes\n"
     "@param min_wc The minimum wrap count for output (0: all polygons, 1: at least two overlapping)\n"
   ) +
-  method_ext ("merge_to_polygon", &gsi::merge_to_polygon1,
+  method_ext ("merge_to_polygon", &gsi::merge_to_polygon1, gsi::arg ("in"), gsi::arg ("trans"), gsi::arg ("min_wc"), gsi::arg ("resolve_holes"), gsi::arg ("min_coherence"),
     "@brief Merge the given shapes\n"
-    "@args in, trans, min_wc, resolve_holes, min_coherence\n"
     "\n"
     "See the \\EdgeProcessor for a description of the merge method. This implementation takes shapes\n"
     "rather than polygons for input and produces a polygon set.\n"
@@ -271,9 +265,8 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
     "@param resolve_holes true, if holes should be resolved into the hull\n"
     "@param min_coherence true, if minimum polygons should be created for touching corners\n"
   ) +
-  method_ext ("merge", &gsi::merge2,
+  method_ext ("merge", &gsi::merge2, gsi::arg ("in"), gsi::arg ("min_wc"),
     "@brief Merge the given shapes\n"
-    "@args in, min_wc\n"
     "\n"
     "See the \\EdgeProcessor for a description of the merge method. This implementation takes shapes\n"
     "rather than polygons for input and produces an edge set.\n"
@@ -283,9 +276,8 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
     "@param in The set of shapes to merge\n"
     "@param min_wc The minimum wrap count for output (0: all polygons, 1: at least two overlapping)\n"
   ) +
-  method_ext ("merge_to_polygon", &gsi::merge_to_polygon2,
+  method_ext ("merge_to_polygon", &gsi::merge_to_polygon2, gsi::arg ("in"), gsi::arg ("min_wc"), gsi::arg ("resolve_holes"), gsi::arg ("min_coherence"),
     "@brief Merge the given shapes\n"
-    "@args in, min_wc, resolve_holes, min_coherence\n"
     "\n"
     "See the \\EdgeProcessor for a description of the merge method. This implementation takes shapes\n"
     "rather than polygons for input and produces a polygon set.\n"
@@ -297,9 +289,8 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
     "@param resolve_holes true, if holes should be resolved into the hull\n"
     "@param min_coherence true, if minimum polygons should be created for touching corners\n"
   ) +
-  method_ext ("boolean", &gsi::boolean1,
+  method_ext ("boolean", &gsi::boolean1, gsi::arg ("in_a"), gsi::arg ("trans_a"), gsi::arg ("in_b"), gsi::arg ("trans_b"), gsi::arg ("mode"),
     "@brief Boolean operation on two given shape sets into an edge set\n"
-    "@args in_a, trans_a, in_b, trans_b, mode\n"
     "\n"
     "See the \\EdgeProcessor for a description of the boolean operations. This implementation takes shapes\n"
     "rather than polygons for input and produces an edge set.\n"
@@ -310,9 +301,8 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
     "@param trans_b A set of transformations to apply before the shapes are used\n"
     "@param mode The boolean operation (see \\EdgeProcessor)\n"
   ) +
-  method_ext ("boolean_to_polygon", &gsi::boolean_to_polygon1,
+  method_ext ("boolean_to_polygon", &gsi::boolean_to_polygon1, gsi::arg ("in_a"), gsi::arg ("trans_a"), gsi::arg ("in_b"), gsi::arg ("trans_b"), gsi::arg ("mode"), gsi::arg ("resolve_holes"), gsi::arg ("min_coherence"),
     "@brief Boolean operation on two given shape sets into a polygon set\n"
-    "@args in_a, trans_a, in_b, trans_b, mode, resolve_holes, min_coherence\n"
     "\n"
     "See the \\EdgeProcessor for a description of the boolean operations. This implementation takes shapes\n"
     "rather than polygons for input and produces a polygon set.\n"
@@ -325,9 +315,8 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
     "@param resolve_holes true, if holes should be resolved into the hull\n"
     "@param min_coherence true, if minimum polygons should be created for touching corners\n"
   ) +
-  method_ext ("boolean", &gsi::boolean2,
+  method_ext ("boolean", &gsi::boolean2, gsi::arg ("in_a"), gsi::arg ("in_b"), gsi::arg ("mode"),
     "@brief Boolean operation on two given shape sets into an edge set\n"
-    "@args in_a, in_b, mode\n"
     "\n"
     "See the \\EdgeProcessor for a description of the boolean operations. This implementation takes shapes\n"
     "rather than polygons for input and produces an edge set.\n"
@@ -338,9 +327,8 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
     "@param in_b The set of shapes to use for input A\n"
     "@param mode The boolean operation (see \\EdgeProcessor)\n"
   ) +
-  method_ext ("boolean_to_polygon", &gsi::boolean_to_polygon2,
+  method_ext ("boolean_to_polygon", &gsi::boolean_to_polygon2, gsi::arg ("in_a"), gsi::arg ("in_b"), gsi::arg ("mode"), gsi::arg ("resolve_holes"), gsi::arg ("min_coherence"),
     "@brief Boolean operation on two given shape sets into a polygon set\n"
-    "@args in_a, in_b, mode, resolve_holes, min_coherence\n"
     "\n"
     "See the \\EdgeProcessor for a description of the boolean operations. This implementation takes shapes\n"
     "rather than polygons for input and produces a polygon set.\n"
@@ -353,9 +341,8 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
     "@param resolve_holes true, if holes should be resolved into the hull\n"
     "@param min_coherence true, if minimum polygons should be created for touching corners\n"
   ) +
-  method_ext ("size", &gsi::size1,
+  method_ext ("size", &gsi::size1, gsi::arg ("in"), gsi::arg ("trans"), gsi::arg ("d"), gsi::arg ("mode"),
     "@brief Size the given shapes\n"
-    "@args in, trans, d, mode\n"
     "\n"
     "See the \\EdgeProcessor for a description of the sizing method. This implementation takes shapes\n"
     "rather than polygons for input and produces an edge set. This is isotropic version that does not allow\n"
@@ -366,9 +353,8 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
     "@param d The sizing value\n"
     "@param mode The sizing mode (see \\EdgeProcessor)\n"
   ) +
-  method_ext ("size", &gsi::size2,
+  method_ext ("size", &gsi::size2, gsi::arg ("in"), gsi::arg ("trans"), gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("mode"),
     "@brief Size the given shapes\n"
-    "@args in, trans, dx, dy, mode\n"
     "\n"
     "See the \\EdgeProcessor for a description of the sizing method. This implementation takes shapes\n"
     "rather than polygons for input and produces an edge set.\n"
@@ -379,9 +365,8 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
     "@param dy The sizing value in y-direction\n"
     "@param mode The sizing mode (see \\EdgeProcessor)\n"
   ) +
-  method_ext ("size_to_polygon", &gsi::size_to_polygon1,
+  method_ext ("size_to_polygon", &gsi::size_to_polygon1, gsi::arg ("in"), gsi::arg ("trans"), gsi::arg ("d"), gsi::arg ("mode"), gsi::arg ("resolve_holes"), gsi::arg ("min_coherence"),
     "@brief Size the given shapes\n"
-    "@args in, trans, d, mode, resolve_holes, min_coherence\n"
     "\n"
     "See the \\EdgeProcessor for a description of the sizing method. This implementation takes shapes\n"
     "rather than polygons for input and produces a polygon set. This is isotropic version that does not allow\n"
@@ -394,9 +379,8 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
     "@param resolve_holes true, if holes should be resolved into the hull\n"
     "@param min_coherence true, if minimum polygons should be created for touching corners\n"
   ) +
-  method_ext ("size_to_polygon", &gsi::size_to_polygon2,
+  method_ext ("size_to_polygon", &gsi::size_to_polygon2, gsi::arg ("in"), gsi::arg ("trans"), gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("mode"), gsi::arg ("resolve_holes"), gsi::arg ("min_coherence"),
     "@brief Size the given shapes\n"
-    "@args in, trans, dx, dy, mode, resolve_holes, min_coherence\n"
     "\n"
     "See the \\EdgeProcessor for a description of the sizing method. This implementation takes shapes\n"
     "rather than polygons for input and produces a polygon set.\n"
@@ -409,9 +393,8 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
     "@param resolve_holes true, if holes should be resolved into the hull\n"
     "@param min_coherence true, if minimum polygons should be created for touching corners\n"
   ) +
-  method_ext ("size", &gsi::size1n,
+  method_ext ("size", &gsi::size1n, gsi::arg ("in"), gsi::arg ("d"), gsi::arg ("mode"),
     "@brief Size the given shapes\n"
-    "@args in, d, mode\n"
     "\n"
     "See the \\EdgeProcessor for a description of the sizing method. This implementation takes shapes\n"
     "rather than polygons for input and produces an edge set. This is isotropic version that does not allow\n"
@@ -423,9 +406,8 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
     "@param d The sizing value\n"
     "@param mode The sizing mode (see \\EdgeProcessor)\n"
   ) +
-  method_ext ("size", &gsi::size2n,
+  method_ext ("size", &gsi::size2n, gsi::arg ("in"), gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("mode"),
     "@brief Size the given shapes\n"
-    "@args in, dx, dy, mode\n"
     "\n"
     "See the \\EdgeProcessor for a description of the sizing method. This implementation takes shapes\n"
     "rather than polygons for input and produces an edge set.\n"
@@ -437,9 +419,8 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
     "@param dy The sizing value in y-direction\n"
     "@param mode The sizing mode (see \\EdgeProcessor)\n"
   ) +
-  method_ext ("size_to_polygon", &gsi::size_to_polygon1n,
+  method_ext ("size_to_polygon", &gsi::size_to_polygon1n, gsi::arg ("in"), gsi::arg ("d"), gsi::arg ("mode"), gsi::arg ("resolve_holes"), gsi::arg ("min_coherence"),
     "@brief Size the given shapes\n"
-    "@args in, d, mode, resolve_holes, min_coherence\n"
     "\n"
     "See the \\EdgeProcessor for a description of the sizing method. This implementation takes shapes\n"
     "rather than polygons for input and produces a polygon set. This is isotropic version that does not allow\n"
@@ -453,9 +434,8 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
     "@param resolve_holes true, if holes should be resolved into the hull\n"
     "@param min_coherence true, if minimum polygons should be created for touching corners\n"
   ) +
-  method_ext ("size_to_polygon", &gsi::size_to_polygon2n,
+  method_ext ("size_to_polygon", &gsi::size_to_polygon2n, gsi::arg ("in"), gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("mode"), gsi::arg ("resolve_holes"), gsi::arg ("min_coherence"),
     "@brief Size the given shapes\n"
-    "@args in, dx, dy, mode, resolve_holes, min_coherence\n"
     "\n"
     "See the \\EdgeProcessor for a description of the sizing method. This implementation takes shapes\n"
     "rather than polygons for input and produces a polygon set.\n"
@@ -477,4 +457,3 @@ Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
 );
 
 }
-

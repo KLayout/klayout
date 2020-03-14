@@ -128,9 +128,8 @@ static double get_gds2_user_units (const db::SaveLayoutOptions *options)
 //  extend lay::SaveLayoutOptions with the GDS2 options 
 static
 gsi::ClassExt<db::SaveLayoutOptions> gds2_writer_options (
-  gsi::method_ext ("gds2_max_vertex_count=", &set_gds2_max_vertex_count,
+  gsi::method_ext ("gds2_max_vertex_count=", &set_gds2_max_vertex_count, gsi::arg ("count"),
     "@brief Set the maximum number of vertices for polygons to write\n"
-    "@args count\n"
     "This property describes the maximum number of point for polygons in GDS2 files.\n"
     "Polygons with more points will be split.\n"
     "The minimum value for this property is 4. The maximum allowed value is about 4000 or 8000, depending on the\n"
@@ -143,9 +142,8 @@ gsi::ClassExt<db::SaveLayoutOptions> gds2_writer_options (
     "See \\gds2_max_vertex_count= method for a description of the maximum vertex count."
     "\nThis property has been added in version 0.18.\n"
   ) +
-  gsi::method_ext ("gds2_multi_xy_records=", &set_gds2_multi_xy_records,
+  gsi::method_ext ("gds2_multi_xy_records=", &set_gds2_multi_xy_records, gsi::arg ("flag"),
     "@brief Use multiple XY records in BOUNDARY elements for unlimited large polygons\n"
-    "@args flag\n"
     "\n"
     "Setting this property to true allows producing polygons with an unlimited number of points \n"
     "at the cost of incompatible formats. Setting it to true disables the \\gds2_max_vertex_count setting.\n"
@@ -156,9 +154,8 @@ gsi::ClassExt<db::SaveLayoutOptions> gds2_writer_options (
     "See \\gds2_multi_xy_records= method for a description of this property."
     "\nThis property has been added in version 0.18.\n"
   ) +
-  gsi::method_ext ("gds2_write_timestamps=", &set_gds2_write_timestamps,
+  gsi::method_ext ("gds2_write_timestamps=", &set_gds2_write_timestamps, gsi::arg ("flag"),
     "@brief Write the current time into the GDS2 timestamps if set to true\n"
-    "@args flag\n"
     "\n"
     "If this property is set to false, the time fields will all be zero. This somewhat simplifies compare and diff "
     "applications.\n"
@@ -169,9 +166,8 @@ gsi::ClassExt<db::SaveLayoutOptions> gds2_writer_options (
     "@brief Gets a value indicating whether the current time is written into the GDS2 timestamp fields\n"
     "\nThis property has been added in version 0.21.16.\n"
   ) +
-  gsi::method_ext ("gds2_no_zero_length_paths=", &set_gds2_no_zero_length_paths,
+  gsi::method_ext ("gds2_no_zero_length_paths=", &set_gds2_no_zero_length_paths, gsi::arg ("flag"),
     "@brief Eliminates zero-length paths if true\n"
-    "@args flag\n"
     "\n"
     "If this property is set to true, paths with zero length will be converted to BOUNDARY objects.\n"
     "\n"
@@ -181,9 +177,8 @@ gsi::ClassExt<db::SaveLayoutOptions> gds2_writer_options (
     "@brief Gets a value indicating whether zero-length paths are eliminated\n"
     "\nThis property has been added in version 0.23.\n"
   ) +
-  gsi::method_ext ("gds2_write_cell_properties=", &set_gds2_write_cell_properties,
+  gsi::method_ext ("gds2_write_cell_properties=", &set_gds2_write_cell_properties, gsi::arg ("flag"),
     "@brief Enables writing of cell properties if set to true\n"
-    "@args flag\n"
     "\n"
     "If this property is set to true, cell properties will be written as PROPATTR/PROPVALUE records immediately "
     "following the BGNSTR records. This is a non-standard extension and is therefore disabled by default.\n"
@@ -194,9 +189,8 @@ gsi::ClassExt<db::SaveLayoutOptions> gds2_writer_options (
     "@brief Gets a value indicating whether cell properties are written\n"
     "\nThis property has been added in version 0.23.\n"
   ) +
-  gsi::method_ext ("gds2_write_file_properties=", &set_gds2_write_file_properties,
+  gsi::method_ext ("gds2_write_file_properties=", &set_gds2_write_file_properties, gsi::arg ("flag"),
     "@brief Enables writing of file properties if set to true\n"
-    "@args flag\n"
     "\n"
     "If this property is set to true, layout properties will be written as PROPATTR/PROPVALUE records immediately "
     "following the BGNLIB records. This is a non-standard extension and is therefore disabled by default.\n"
@@ -207,9 +201,8 @@ gsi::ClassExt<db::SaveLayoutOptions> gds2_writer_options (
     "@brief Gets a value indicating whether layout properties are written\n"
     "\nThis property has been added in version 0.24.\n"
   ) +
-  gsi::method_ext ("gds2_max_cellname_length=", &set_gds2_max_cellname_length,
+  gsi::method_ext ("gds2_max_cellname_length=", &set_gds2_max_cellname_length, gsi::arg ("length"),
     "@brief Maximum length of cell names\n"
-    "@args length\n"
     "\n"
     "This property describes the maximum number of characters for cell names. \n"
     "Longer cell names will be shortened.\n"
@@ -220,9 +213,8 @@ gsi::ClassExt<db::SaveLayoutOptions> gds2_writer_options (
     "See \\gds2_max_cellname_length= method for a description of the maximum cell name length."
     "\nThis property has been added in version 0.18.\n"
   ) +
-  gsi::method_ext ("gds2_libname=", &set_gds2_libname,
+  gsi::method_ext ("gds2_libname=", &set_gds2_libname, gsi::arg ("libname"),
     "@brief Set the library name\n"
-    "@args libname\n"
     "\n"
     "The library name is the string written into the LIBNAME records of the GDS file.\n"
     "The library name should not be an empty string and is subject to certain limitations in the character choice.\n"
@@ -233,9 +225,8 @@ gsi::ClassExt<db::SaveLayoutOptions> gds2_writer_options (
     "See \\gds2_libname= method for a description of the library name."
     "\nThis property has been added in version 0.18.\n"
   ) +
-  gsi::method_ext ("gds2_user_units=", &set_gds2_user_units,
+  gsi::method_ext ("gds2_user_units=", &set_gds2_user_units, gsi::arg ("uu"),
     "@brief Set the users units to write into the GDS file\n"
-    "@args uu\n"
     "\n"
     "The user units of a GDS file are rarely used and usually are set to 1 (micron).\n"
     "The intention of the user units is to specify the display units. KLayout ignores the user unit and uses microns as the display unit.\n"
@@ -326,4 +317,3 @@ gsi::ClassExt<db::LoadLayoutOptions> gds2_reader_options (
 );
 
 }
-

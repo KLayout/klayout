@@ -83,29 +83,25 @@ namespace gsi
   }
 
   Class<db::LayerMap> decl_LayerMap ("db", "LayerMap",
-    gsi::method_ext ("is_mapped?", &lm_is_mapped, 
+    gsi::method_ext ("is_mapped?", &lm_is_mapped, gsi::arg ("layer"),
       "@brief Check, if a given physical layer is mapped\n"
-      "@args layer\n"
       "@param layer The physical layer specified with an \\LayerInfo object.\n"
       "@return True, if the layer is mapped."
     ) +
-    gsi::method_ext ("logical", &lm_logical, 
+    gsi::method_ext ("logical", &lm_logical, gsi::arg ("layer"),
       "@brief Returns the logical layer (the layer index in the layout object) for a given physical layer.n"
-      "@args layer\n"
       "@param layer The physical layer specified with an \\LayerInfo object.\n"
       "@return The logical layer index or -1 if the layer is not mapped."
     ) +
-    gsi::method ("mapping_str", &db::LayerMap::mapping_str, 
+    gsi::method ("mapping_str", &db::LayerMap::mapping_str, gsi::arg ("log_layer"),
       "@brief Returns the mapping string for a given logical layer\n"
-      "@args log_layer\n"
       "@param log_layer The logical layer for which the mapping is requested.\n"
       "@return A string describing the mapping."
       "\n"
       "The mapping string is compatible with the string that the \"map\" method accepts.\n"
     ) +
-    gsi::method_ext ("mapping", &lm_mapping, 
+    gsi::method_ext ("mapping", &lm_mapping, gsi::arg ("log_layer"),
       "@brief Returns the mapped physical (or target if one is specified) layer for a given logical layer\n"
-      "@args log_layer\n"
       "@param log_layer The logical layer for which the mapping is requested.\n"
       "@return A \\LayerInfo object which is the physical layer mapped to the logical layer."
       "\n"
@@ -113,18 +109,16 @@ namespace gsi
       "to one logical layer. This method will return a single one of\n"
       "them. It will return the one with the lowest layer and datatype.\n"
     ) +
-    gsi::method_ext ("map", &lm_map, 
+    gsi::method_ext ("map", &lm_map, gsi::arg ("phys_layer"), gsi::arg ("log_layer"),
       "@brief Maps a physical layer to a logical one\n"
-      "@args phys_layer,log_layer\n"
       "@param phys_layer The physical layer (a \\LayerInfo object).\n"
       "@param log_layer The logical layer to which the physical layer is mapped.\n"
       "\n"
       "In general, there may be more than one physical layer mapped\n"
       "to one logical layer. This method will add the given physical layer to the mapping for the logical layer.\n"
     ) +
-    gsi::method_ext ("map", &lm_map_with_target, 
+    gsi::method_ext ("map", &lm_map_with_target, gsi::arg ("phys_layer"), gsi::arg ("log_layer"), gsi::arg ("target_layer"),
       "@brief Maps a physical layer to a logical one with a target layer\n"
-      "@args phys_layer,log_layer,target_layer\n"
       "@param phys_layer The physical layer (a \\LayerInfo object).\n"
       "@param log_layer The logical layer to which the physical layer is mapped.\n"
       "@param target_layer The properties of the layer that will be created unless it already exists.\n"
@@ -134,9 +128,8 @@ namespace gsi
       "\n"
       "This method has been added in version 0.20.\n"
     ) +
-    gsi::method_ext ("map", &lm_map_interval, 
+    gsi::method_ext ("map", &lm_map_interval, gsi::arg ("pl_start"), gsi::arg ("pl_stop"), gsi::arg ("log_layer"),
       "@brief Maps a physical layer interval to a logical one\n"
-      "@args pl_start,pl_stop,log_layer\n"
       "@param pl_start The first physical layer (a \\LayerInfo object).\n"
       "@param pl_stop The last physical layer (a \\LayerInfo object).\n"
       "@param log_layer The logical layer to which the physical layers are mapped.\n"
@@ -145,9 +138,8 @@ namespace gsi
       "given logical layer. l1 and d1 are given by the pl_start argument, while l2 and d2 are given by "
       "the pl_stop argument."
     ) +
-    gsi::method_ext ("map", &lm_map_interval_with_target, 
+    gsi::method_ext ("map", &lm_map_interval_with_target, gsi::arg ("pl_start"), gsi::arg ("pl_stop"), gsi::arg ("log_layer"), gsi::arg ("layer_properties"),
       "@brief Maps a physical layer interval to a logical one with a target layer\n"
-      "@args pl_start,pl_stop,log_layer\n"
       "@param pl_start The first physical layer (a \\LayerInfo object).\n"
       "@param pl_stop The last physical layer (a \\LayerInfo object).\n"
       "@param log_layer The logical layer to which the physical layers are mapped.\n"
@@ -159,9 +151,8 @@ namespace gsi
       "\n"
       "This method has been added in version 0.20.\n"
     ) +
-    gsi::method_ext ("map", &lm_map_string, 
+    gsi::method_ext ("map", &lm_map_string, gsi::arg ("map_expr"), gsi::arg ("log_layer"),
       "@brief Maps a physical layer given by a string to a logical one\n"
-      "@args map_expr,log_layer\n"
       "@param map_expr The string describing the physical layer to map.\n"
       "@param log_layer The logical layer to which the physical layers are mapped.\n"
       "\n"
@@ -262,9 +253,8 @@ namespace gsi
   //  extend the layout class by two reader methods
   static
   gsi::ClassExt<db::Layout> layout_reader_decl (
-    gsi::method_ext ("read", &load_without_options,
+    gsi::method_ext ("read", &load_without_options, gsi::arg ("filename"),
       "@brief Load the layout from the given file\n"
-      "@args filename\n"
       "The format of the file is determined automatically and automatic unzipping is provided. "
       "No particular options can be specified.\n"
       "@param filename The name of the file to load.\n"
@@ -272,9 +262,8 @@ namespace gsi
       "\n"
       "This method has been added in version 0.18."
     ) +
-    gsi::method_ext ("read", &load_with_options,
+    gsi::method_ext ("read", &load_with_options, gsi::arg ("filename"), gsi::arg ("options"),
       "@brief Load the layout from the given file with options\n"
-      "@args filename,options\n"
       "The format of the file is determined automatically and automatic unzipping is provided. "
       "In this version, some reader options can be specified. "
       "@param filename The name of the file to load.\n"
@@ -287,4 +276,3 @@ namespace gsi
   );
 
 }
-

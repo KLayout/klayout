@@ -15,7 +15,6 @@ HEADERS = \
     layHelpDialog.h \
     layHelpProvider.h \
     layHelpSource.h \
-    layLayoutStatisticsForm.h \
     layLogViewerDialog.h \
     layMacroEditorDialog.h \
     layMacroEditorPage.h \
@@ -32,7 +31,6 @@ HEADERS = \
     laySearchReplaceConfigPage.h \
     laySearchReplaceDialog.h \
     laySearchReplacePropertiesWidgets.h \
-    laySelectCellViewForm.h \
     laySession.h \
     laySettingsForm.h \
     layTechSetupDialog.h \
@@ -68,7 +66,6 @@ FORMS = \
     DeleteModeDialog.ui \
     FillDialog.ui \
     HelpAboutDialog.ui \
-    LayoutStatistics.ui \
     LogViewerDialog.ui \
     MacroEditorDialog.ui \
     MacroPropertiesDialog.ui \
@@ -122,7 +119,6 @@ SOURCES = \
     layHelpDialog.cc \
     layHelpProvider.cc \
     layHelpSource.cc \
-    layLayoutStatisticsForm.cc \
     layLogViewerDialog.cc \
     layMacroEditorDialog.cc \
     layMacroEditorPage.cc \

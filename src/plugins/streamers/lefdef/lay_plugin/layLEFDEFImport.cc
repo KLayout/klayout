@@ -69,8 +69,8 @@ public:
   virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
   {
     lay::PluginDeclaration::get_menu_entries (menu_entries);
-    menu_entries.push_back (lay::MenuEntry ("db::import_lef", "import_lef:edit", "file_menu.import_menu.end", tl::to_string (QObject::tr ("LEF"))));
-    menu_entries.push_back (lay::MenuEntry ("db::import_def", "import_def:edit", "file_menu.import_menu.end", tl::to_string (QObject::tr ("DEF/LEF"))));
+    menu_entries.push_back (lay::menu_item ("db::import_lef", "import_lef:edit", "file_menu.import_menu.end", tl::to_string (QObject::tr ("LEF"))));
+    menu_entries.push_back (lay::menu_item ("db::import_def", "import_def:edit", "file_menu.import_menu.end", tl::to_string (QObject::tr ("DEF/LEF"))));
   }
 
   virtual bool configure (const std::string &name, const std::string &value)
@@ -115,7 +115,7 @@ public:
         lay::MainWindow::instance ()->cancel ();
 
         //  store configuration
-        lay::PluginRoot *config_root = lay::PluginRoot::instance ();
+        lay::Dispatcher *config_root = lay::Dispatcher::instance ();
         if (import_lef) {
           config_root->config_set (cfg_lef_import_spec, data.to_string ());
         } else {

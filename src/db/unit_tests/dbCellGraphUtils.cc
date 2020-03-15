@@ -29,7 +29,7 @@
 
 TEST(1) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Layout g (&m);
   db::Cell &c0 (g.cell (g.add_cell ()));
   db::Cell &c1 (g.cell (g.add_cell ()));

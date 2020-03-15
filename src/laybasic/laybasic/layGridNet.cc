@@ -105,7 +105,7 @@ GridNetPluginDeclaration::config_page (QWidget *parent, std::string &title) cons
 }
 
 lay::Plugin *
-GridNetPluginDeclaration::create_plugin (db::Manager *, lay::PluginRoot *, lay::LayoutView *view) const
+GridNetPluginDeclaration::create_plugin (db::Manager *, Dispatcher *, lay::LayoutView *view) const
 {
   return new lay::GridNet (view);
 }
@@ -134,7 +134,7 @@ GridNetConfigPage::~GridNetConfigPage ()
 }
 
 void 
-GridNetConfigPage::setup (lay::PluginRoot *root)
+GridNetConfigPage::setup (lay::Dispatcher *root)
 {
   std::string value;
 
@@ -176,7 +176,7 @@ GridNetConfigPage::setup (lay::PluginRoot *root)
 }
 
 void 
-GridNetConfigPage::commit (lay::PluginRoot *root)
+GridNetConfigPage::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_grid_visible, mp_ui->grid_group->isChecked ());
   root->config_set (cfg_grid_show_ruler, mp_ui->show_ruler->isChecked ());

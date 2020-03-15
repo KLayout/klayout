@@ -45,7 +45,7 @@ LibraryController::LibraryController ()
 }
 
 void
-LibraryController::initialize (lay::PluginRoot * /*root*/)
+LibraryController::initialize (lay::Dispatcher * /*root*/)
 {
   //  NOTE: we initialize the libraries in the stage once to have them available for the autorun
   //  macros. We'll do that later again in order to pull in the libraries from the packages.
@@ -53,7 +53,7 @@ LibraryController::initialize (lay::PluginRoot * /*root*/)
 }
 
 void
-LibraryController::initialized (lay::PluginRoot * /*root*/)
+LibraryController::initialized (lay::Dispatcher * /*root*/)
 {
   if (lay::SaltController::instance ()) {
     connect (lay::SaltController::instance (), SIGNAL (salt_changed ()), this, SLOT (sync_with_external_sources ()));
@@ -69,7 +69,7 @@ LibraryController::initialized (lay::PluginRoot * /*root*/)
 }
 
 void
-LibraryController::uninitialize (lay::PluginRoot * /*root*/)
+LibraryController::uninitialize (lay::Dispatcher * /*root*/)
 {
   if (m_file_watcher) {
     disconnect (m_file_watcher, SIGNAL (fileChanged (const QString &)), this, SLOT (file_watcher_triggered ()));
@@ -108,7 +108,7 @@ LibraryController::config_finalize()
 }
 
 bool
-LibraryController::can_exit (lay::PluginRoot * /*root*/) const
+LibraryController::can_exit (lay::Dispatcher * /*root*/) const
 {
   //  .. nothing yet ..
   return true;

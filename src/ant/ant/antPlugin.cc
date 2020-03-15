@@ -23,9 +23,9 @@
 
 #include "layPlugin.h"
 #include "layAbstractMenu.h"
-#include "layAbstractMenuProvider.h"
 #include "layConverters.h"
 #include "layConfigurationDialog.h"
+#include "layDispatcher.h"
 #include "antConfigPage.h"
 #include "antConfig.h"
 #include "antPlugin.h"
@@ -85,13 +85,13 @@ void
 PluginDeclaration::get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
 {
   lay::PluginDeclaration::get_menu_entries (menu_entries);
-  menu_entries.push_back (lay::MenuEntry ("rulers_group", "edit_menu.end"));
-  menu_entries.push_back (lay::MenuEntry ("ant::clear_all_rulers", "clear_all_rulers:edit", "edit_menu.end", tl::to_string (QObject::tr ("Clear All Rulers And Annotations(Ctrl+K)"))));
-  menu_entries.push_back (lay::MenuEntry ("ant::configure", "configure_rulers", "edit_menu.end", tl::to_string (QObject::tr ("Ruler And Annotation Setup"))));
+  menu_entries.push_back (lay::separator ("rulers_group", "edit_menu.end"));
+  menu_entries.push_back (lay::menu_item ("ant::clear_all_rulers", "clear_all_rulers:edit", "edit_menu.end", tl::to_string (QObject::tr ("Clear All Rulers And Annotations(Ctrl+K)"))));
+  menu_entries.push_back (lay::menu_item ("ant::configure", "configure_rulers", "edit_menu.end", tl::to_string (QObject::tr ("Ruler And Annotation Setup"))));
 }
 
 lay::Plugin *
-PluginDeclaration::create_plugin (db::Manager *manager, lay::PluginRoot *, lay::LayoutView *view) const
+PluginDeclaration::create_plugin (db::Manager *manager, lay::Dispatcher *, lay::LayoutView *view) const
 {
   return new ant::Service (manager, view);
 }
@@ -101,7 +101,7 @@ PluginDeclaration::menu_activated (const std::string &symbol) const
 {
   if (symbol == "ant::configure") {
 
-    lay::ConfigurationDialog config_dialog (QApplication::activeWindow (), lay::PluginRoot::instance (), "ant::Plugin");
+    lay::ConfigurationDialog config_dialog (QApplication::activeWindow (), lay::Dispatcher::instance (), "ant::Plugin");
     config_dialog.exec ();
     
     return true;
@@ -150,10 +150,6 @@ PluginDeclaration::configure (const std::string &name, const std::string &value)
 void 
 PluginDeclaration::config_finalize ()
 {
-  if (!lay::AbstractMenuProvider::instance ()) {
-    return;
-  }
-
   if (m_templates_updated) {
 
     update_menu ();
@@ -169,7 +165,7 @@ PluginDeclaration::config_finalize ()
 }
 
 void 
-PluginDeclaration::initialized (lay::PluginRoot *root)
+PluginDeclaration::initialized (lay::Dispatcher *root)
 {
   //  Check if we already have templates (initial setup)
   bool any_templates = false;
@@ -205,31 +201,35 @@ PluginDeclaration::initialized (lay::PluginRoot *root)
 }
 
 void 
-PluginDeclaration::uninitialize (lay::PluginRoot *)
+PluginDeclaration::uninitialize (lay::Dispatcher *)
 {
-  for (std::vector<lay::Action *>::iterator a = m_actions.begin (); a != m_actions.end (); ++a) {
-    delete *a;
-  }
   m_actions.clear ();
 }
 
 void 
 PluginDeclaration::update_current_template ()
 {
-  lay::AbstractMenuProvider *mp = lay::AbstractMenuProvider::instance ();
+  lay::Dispatcher *mp = lay::Dispatcher::instance ();
+  if (! mp || ! mp->has_ui ()) {
+    return;
+  }
 
   if (m_current_template >= 0 && m_current_template < int (m_templates.size ())) {
 
     std::vector<std::string> menu_entries = mp->menu ()->group ("ruler_mode_group");
     for (std::vector<std::string>::const_iterator m = menu_entries.begin (); m != menu_entries.end (); ++m) {
-      lay::Action action = mp->menu ()->action (*m);
-      action.set_title (m_templates [m_current_template].title ());
+      lay::Action *action = mp->menu ()->action (*m);
+      action->set_title (m_templates [m_current_template].title ());
     }
     
     if (m_templates.size () > 1) {
-      int it = 0;
-      for (std::vector<Template>::const_iterator tt = m_templates.begin (); tt != m_templates.end () && it < int (m_actions.size ()); ++tt, ++it) {
-        m_actions[it]->set_checked (it == m_current_template);
+
+      tl::weak_collection<lay::ConfigureAction>::iterator it = m_actions.begin ();
+      int index = 0;
+      for (std::vector<Template>::const_iterator tt = m_templates.begin (); tt != m_templates.end () && it != m_actions.end (); ++tt, ++it, ++index) {
+        if (it.operator -> ()) {
+          it->set_checked (index == m_current_template);
+        }
       }
     }
 
@@ -239,7 +239,10 @@ PluginDeclaration::update_current_template ()
 void 
 PluginDeclaration::update_menu ()
 {
-  lay::AbstractMenuProvider *mp = lay::AbstractMenuProvider::instance ();
+  lay::Dispatcher *mp = lay::Dispatcher::instance ();
+  if (! mp || ! mp->has_ui ()) {
+    return;
+  }
 
   if (m_current_template < 0 || m_current_template >= int (m_templates.size ())) {
     m_current_template = 0;
@@ -248,8 +251,8 @@ PluginDeclaration::update_menu ()
   if (m_current_template >= 0 && m_current_template < int (m_templates.size ())) {
     std::vector<std::string> menu_entries = mp->menu ()->group ("ruler_mode_group");
     for (std::vector<std::string>::const_iterator m = menu_entries.begin (); m != menu_entries.end (); ++m) {
-      lay::Action action = mp->menu ()->action (*m);
-      action.set_title (m_templates [m_current_template].title ());
+      lay::Action *action = mp->menu ()->action (*m);
+      action->set_title (m_templates [m_current_template].title ());
     }
   }
   
@@ -261,19 +264,17 @@ PluginDeclaration::update_menu ()
     }
   }
     
-  for (std::vector<lay::Action *>::iterator a = m_actions.begin (); a != m_actions.end (); ++a) {
-    delete *a;
-  }
   m_actions.clear ();
 
   if (m_templates.size () > 1) {
     int it = 0;
     for (std::vector<Template>::const_iterator tt = m_templates.begin (); tt != m_templates.end (); ++tt, ++it) {
-      m_actions.push_back (mp->create_config_action (tt->title (), cfg_current_ruler_template, tl::to_string (it)));
-      m_actions.back ()->set_checkable (true);
-      m_actions.back ()->set_checked (it == m_current_template);
+      lay::ConfigureAction *action = new lay::ConfigureAction (tt->title (), cfg_current_ruler_template, tl::to_string (it));
+      m_actions.push_back (action);
+      action->set_checkable (true);
+      action->set_checked (it == m_current_template);
       for (std::vector<std::string>::const_iterator t = tmpl_group.begin (); t != tmpl_group.end (); ++t) {
-        mp->menu ()->insert_item (*t + ".end", "ruler_template_" + tl::to_string (it), *m_actions.back ());
+        mp->menu ()->insert_item (*t + ".end", "ruler_template_" + tl::to_string (it), action);
       }
     }
   }
@@ -294,8 +295,8 @@ PluginDeclaration::register_annotation_template (const ant::Template &t)
   }
 
   m_templates.push_back (t);
-  lay::PluginRoot::instance ()->config_set (cfg_ruler_templates, ant::TemplatesConverter ().to_string (m_templates));
-  lay::PluginRoot::instance ()->config_end ();
+  lay::Dispatcher::instance ()->config_set (cfg_ruler_templates, ant::TemplatesConverter ().to_string (m_templates));
+  lay::Dispatcher::instance ()->config_end ();
 }
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new ant::PluginDeclaration (), 3000, "ant::Plugin");

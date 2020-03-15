@@ -56,14 +56,14 @@ namespace gsi
 //  of the factory, this hack is a quick but dirty workaround.
 static bool s_in_create_plugin = false;
 static lay::LayoutView *sp_view = 0;
-static lay::PluginRoot *sp_root = 0;
+static lay::Dispatcher *sp_dispatcher = 0;
 
 class PluginBase
   : public lay::Plugin, public lay::ViewService
 {
 public:
   PluginBase ()
-    : lay::Plugin (sp_root), lay::ViewService (sp_view ? sp_view->view_object_widget () : 0)
+    : lay::Plugin (sp_dispatcher), lay::ViewService (sp_view ? sp_view->view_object_widget () : 0)
   {
     if (! s_in_create_plugin) {
       throw tl::Exception (tl::to_string (QObject::tr ("A PluginBase object can only be created in the PluginFactory's create_plugin method")));
@@ -334,7 +334,7 @@ public:
     }
   }
 
-  virtual void initialize (lay::PluginRoot *root) 
+  virtual void initialize (lay::Dispatcher *root)
   {
     if (f_initialize.can_issue ()) {
       f_initialize.issue<lay::PluginDeclaration> (&lay::PluginDeclaration::initialize, root);
@@ -343,7 +343,7 @@ public:
     }
   }
     
-  virtual void uninitialize (lay::PluginRoot *root) 
+  virtual void uninitialize (lay::Dispatcher *root)
   {
     if (f_uninitialize.can_issue ()) {
       f_uninitialize.issue<lay::PluginDeclaration> (&lay::PluginDeclaration::uninitialize, root);
@@ -352,7 +352,7 @@ public:
     }
   }
 
-  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::PluginRoot *root, lay::LayoutView *view) const
+  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *root, lay::LayoutView *view) const
   { 
     if (f_create_plugin.can_issue ()) {
       return create_plugin_gsi (manager, root, view);
@@ -361,22 +361,22 @@ public:
     }
   }
 
-  virtual gsi::PluginBase *create_plugin_gsi (db::Manager *manager, lay::PluginRoot *root, lay::LayoutView *view) const
+  virtual gsi::PluginBase *create_plugin_gsi (db::Manager *manager, lay::Dispatcher *root, lay::LayoutView *view) const
   { 
     //  TODO: this is a hack. See notes above at s_in_create_plugin
     s_in_create_plugin = true;
     sp_view = view;
-    sp_root = root;
+    sp_dispatcher = root;
     gsi::PluginBase *ret = 0;
     try {
-      ret = f_create_plugin.issue<PluginFactoryBase, gsi::PluginBase *, db::Manager *, lay::PluginRoot *, lay::LayoutView *> (&PluginFactoryBase::create_plugin_gsi, manager, root, view);
+      ret = f_create_plugin.issue<PluginFactoryBase, gsi::PluginBase *, db::Manager *, lay::Dispatcher *, lay::LayoutView *> (&PluginFactoryBase::create_plugin_gsi, manager, root, view);
       s_in_create_plugin = false;
       sp_view = 0;
-      sp_root = 0;
+      sp_dispatcher = 0;
     } catch (...) {
       s_in_create_plugin = false;
       sp_view = 0;
-      sp_root = 0;
+      sp_dispatcher = 0;
     }
 
     return ret;
@@ -394,17 +394,36 @@ public:
 
   void add_menu_entry1 (const std::string &menu_name, const std::string &insert_pos)
   {
-    m_menu_entries.push_back (lay::MenuEntry (menu_name, insert_pos));
+    m_menu_entries.push_back (lay::separator (menu_name, insert_pos));
   }
 
   void add_menu_entry2 (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &title)
   {
-    m_menu_entries.push_back (lay::MenuEntry (symbol, menu_name, insert_pos, title));
+    m_menu_entries.push_back (lay::menu_item (symbol, menu_name, insert_pos, title));
+  }
+
+  void add_menu_entry_copy (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &copy_from)
+  {
+    m_menu_entries.push_back (lay::menu_item_copy (symbol, menu_name, insert_pos, copy_from));
+  }
+
+  void add_submenu (const std::string &menu_name, const std::string &insert_pos, const std::string &title)
+  {
+    m_menu_entries.push_back (lay::submenu (menu_name, insert_pos, title));
+  }
+
+  void add_config_menu_item (const std::string &menu_name, const std::string &insert_pos, const std::string &title, const std::string &cname, const std::string &cvalue)
+  {
+    m_menu_entries.push_back (lay::config_menu_item (menu_name, insert_pos, title, cname, cvalue));
   }
 
   void add_menu_entry3 (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &title, bool sub_menu)
   {
-    m_menu_entries.push_back (lay::MenuEntry (symbol, menu_name, insert_pos, title, sub_menu));
+    if (sub_menu) {
+      m_menu_entries.push_back (lay::submenu (symbol, menu_name, insert_pos, title));
+    } else {
+      m_menu_entries.push_back (lay::menu_item (symbol, menu_name, insert_pos, title));
+    }
   }
 
   void add_option (const std::string &name, const std::string &default_value)
@@ -491,21 +510,21 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
     "If this method was handling the menu event, it should return true. This indicates that the event "
     "will not be propagated to other plugins hence avoiding duplicate calls.\n"
   ) +
-  callback ("initialized", &gsi::PluginFactoryBase::initialize, &gsi::PluginFactoryBase::f_initialize, gsi::arg ("root"),
+  callback ("initialized", &gsi::PluginFactoryBase::initialize, &gsi::PluginFactoryBase::f_initialize, gsi::arg ("dispatcher"),
     "@brief Gets called when the plugin singleton is initialized, i.e. when the application has been started.\n"
-    "@param root The reference to the \\MainWindow object\n"
+    "@param dispatcher The reference to the \\MainWindow object\n"
   ) +
-  callback ("uninitialized", &gsi::PluginFactoryBase::uninitialize, &gsi::PluginFactoryBase::f_uninitialize, gsi::arg ("root"),
+  callback ("uninitialized", &gsi::PluginFactoryBase::uninitialize, &gsi::PluginFactoryBase::f_uninitialize, gsi::arg ("dispatcher"),
     "@brief Gets called when the application shuts down and the plugin is unregistered\n"
     "This event can be used to free resources allocated with this factory singleton.\n"
-    "@param root The reference to the \\MainWindow object\n"
+    "@param dispatcher The reference to the \\MainWindow object\n"
   ) +
-  factory_callback ("create_plugin", &gsi::PluginFactoryBase::create_plugin_gsi, &gsi::PluginFactoryBase::f_create_plugin, gsi::arg ("manager"), gsi::arg ("root"), gsi::arg ("view"),
+  factory_callback ("create_plugin", &gsi::PluginFactoryBase::create_plugin_gsi, &gsi::PluginFactoryBase::f_create_plugin, gsi::arg ("manager"), gsi::arg ("dispatcher"), gsi::arg ("view"),
     "@brief Creates the plugin\n"
     "This is the basic functionality that the factory must provide. This method must create a plugin of the "
     "specific type.\n"
     "@param manager The database manager object responsible for handling database transactions\n"
-    "@param root The reference to the \\MainWindow object\n"
+    "@param dispatcher The reference to the \\MainWindow object\n"
     "@param view The \\LayoutView that is plugin is created for\n"
     "@return The new \\Plugin implementation object\n"
   ) +
@@ -527,10 +546,33 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
     "@param insert_pos The position where to create the entry\n"
     "@param title The title string for the item. The title can contain a keyboard shortcut in round braces after the title text, i.e. \"My Menu Item(F12)\"\n"
   ) +
-  method ("add_menu_entry", &gsi::PluginFactoryBase::add_menu_entry3, gsi::arg ("symbol"), gsi::arg ("menu_name"), gsi::arg ("insert_pos"), gsi::arg ("title"), gsi::arg ("sub_menu"),
+  method ("#add_menu_entry", &gsi::PluginFactoryBase::add_menu_entry3, gsi::arg ("symbol"), gsi::arg ("menu_name"), gsi::arg ("insert_pos"), gsi::arg ("title"), gsi::arg ("sub_menu"),
     "@brief Specifies a menu item or sub-menu\n"
     "Similar to the previous form of \"add_menu_entry\", but this version allows also to create sub-menus by setting the "
-    "last parameter to \"true\""
+    "last parameter to \"true\".\n"
+    "\n"
+    "With version 0.27 it's more convenient to use \\add_submenu."
+  ) +
+  method ("add_menu_item_clone", &gsi::PluginFactoryBase::add_menu_entry_copy, gsi::arg ("symbol"), gsi::arg ("menu_name"), gsi::arg ("insert_pos"), gsi::arg ("copy_from"),
+    "@brief Specifies a menu item as a clone of another one\n"
+    "Using this method, a menu item can be made a clone of another entry (given as path by 'copy_from').\n"
+    "The new item will share the \\Action object with the original one, so manipulating the action will change both the original entry "
+    "and the new entry.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
+  method ("add_submenu", &gsi::PluginFactoryBase::add_submenu, gsi::arg ("menu_name"), gsi::arg ("insert_pos"), gsi::arg ("title"),
+    "@brief Specifies a menu item or sub-menu\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
+  method ("add_config_menu_item", &gsi::PluginFactoryBase::add_config_menu_item, gsi::arg ("menu_name"), gsi::arg ("insert_pos"), gsi::arg ("title"), gsi::arg ("cname"), gsi::arg ("cvalue"),
+    "@brief Adds a configuration menu item\n"
+    "\n"
+    "Menu items created this way will send a configuration request with 'cname' as the configuration parameter name "
+    "and 'cvalue' as the configuration parameter value.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
   ) +
   method ("add_option", &gsi::PluginFactoryBase::add_option, gsi::arg ("name"), gsi::arg ("default_value"),
     "@brief Specifies configuration variables.\n"
@@ -588,7 +630,7 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
   "  end\n"
   "  \n"
   "  # Create a new plugin instance of the custom type\n"
-  "  def create_plugin(manager, root, view)\n"
+  "  def create_plugin(manager, dispatcher, view)\n"
   "    return PluginTest.new\n"
   "  end\n"
   "\n"
@@ -816,22 +858,22 @@ Class<gsi::ButtonStateNamespace> decl_ButtonState ("lay", "ButtonState",
 );
 
 static std::vector<std::string> 
-get_config_names (lay::PluginRoot *root)
+get_config_names (lay::Dispatcher *dispatcher)
 {
   std::vector<std::string> names;
-  root->get_config_names (names);
+  dispatcher->get_config_names (names);
   return names;
 }
 
-static lay::PluginRoot *config_root_instance ()
+static lay::Dispatcher *dispatcher_instance ()
 {
-  return lay::PluginRoot::instance ();
+  return lay::Dispatcher::instance ();
 }
 
-static tl::Variant get_config (lay::PluginRoot *root, const std::string &name)
+static tl::Variant get_config (lay::Dispatcher *dispatcher, const std::string &name)
 {
   std::string value;
-  if (root->config_get (name, value)) {
+  if (dispatcher->config_get (name, value)) {
     return tl::Variant (value);
   } else {
     return tl::Variant ();
@@ -839,33 +881,33 @@ static tl::Variant get_config (lay::PluginRoot *root, const std::string &name)
 }
 
 /**
- *  @brief Exposes the PluginRoot interface
+ *  @brief Exposes the Dispatcher interface
  *
  *  This interface is intentionally not derived from Plugin. It is used currently to 
- *  identify the plugin root node for configuration. The Plugin nature of this interface
+ *  identify the dispatcher node for configuration. The Plugin nature of this interface
  *  is somewhat artificial and may be removed later. 
  *
  *  TODO: this is a duplicate of the respective methods in LayoutView and Application.
  *  This is intentional since we don't want to spend the only derivation path on this.
  *  Once there is a mixin concept, provide a path through that concept.
  */
-Class<lay::PluginRoot> decl_PluginRoot ("lay", "PluginRoot",
-  method ("clear_config", &lay::PluginRoot::clear_config,
+Class<lay::Dispatcher> decl_Dispatcher ("lay", "Dispatcher",
+  method ("clear_config", &lay::Dispatcher::clear_config,
     "@brief Clears the configuration parameters\n"
   ) +
-  method ("instance", &config_root_instance,
-    "@brief Gets the singleton instance of the PluginRoot object\n"
+  method ("instance", &dispatcher_instance,
+    "@brief Gets the singleton instance of the Dispatcher object\n"
     "\n"
     "@return The instance\n"
   ) +
-  method ("write_config", &lay::PluginRoot::write_config, gsi::arg ("file_name"),
+  method ("write_config", &lay::Dispatcher::write_config, gsi::arg ("file_name"),
     "@brief Writes configuration to a file\n"
     "@return A value indicating whether the operation was successful\n"
     "\n"
     "If the configuration file cannot be written, false \n"
     "is returned but no exception is thrown.\n"
   ) +
-  method ("read_config", &lay::PluginRoot::read_config, gsi::arg ("file_name"),
+  method ("read_config", &lay::Dispatcher::read_config, gsi::arg ("file_name"),
     "@brief Reads the configuration from a file\n"
     "@return A value indicating whether the operation was successful\n"
     "\n"
@@ -880,7 +922,7 @@ Class<lay::PluginRoot> decl_PluginRoot ("lay", "PluginRoot",
     "\n"
     "@return The value of the parameter or nil if there is no such parameter\n"
   ) +
-  method ("set_config", (void (lay::PluginRoot::*) (const std::string &, const std::string &)) &lay::PluginRoot::config_set, gsi::arg ("name"), gsi::arg ("value"),
+  method ("set_config", (void (lay::Dispatcher::*) (const std::string &, const std::string &)) &lay::Dispatcher::config_set, gsi::arg ("name"), gsi::arg ("value"),
     "@brief Set a local configuration parameter with the given name to the given value\n"
     "\n"
     "@param name The name of the configuration parameter to set\n"
@@ -900,14 +942,14 @@ Class<lay::PluginRoot> decl_PluginRoot ("lay", "PluginRoot",
     "This method returns the names of all known configuration parameters. These names can be used to "
     "get and set configuration parameter values.\n"
   ) +
-  method ("commit_config", &lay::PluginRoot::config_end,
+  method ("commit_config", &lay::Dispatcher::config_end,
     "@brief Commits the configuration settings\n"
     "\n"
     "Some configuration options are queued for performance reasons and become active only after 'commit_config' has been called. "
     "After a sequence of \\set_config calls, this method should be called to activate the "
     "settings made by these calls.\n"
   ),
-  "@brief Root of the configuration space in the plugin context\n"
+  "@brief Root of the configuration space in the plugin context and menu dispatcher\n"
   "\n"
   "This class provides access to the root configuration space in the context "
   "of plugin programming. You can use this class to obtain configuration parameters "
@@ -915,12 +957,12 @@ Class<lay::PluginRoot> decl_PluginRoot ("lay", "PluginRoot",
   "preferred way of plugin configuration is through \\Plugin#configure.\n"
   "\n"
   "Currently, the application object provides an identical entry point for configuration modification. "
-  "For example, \"Application::instance.set_config\" is identical to \"PluginRoot::instance.set_config\". "
-  "Hence there is little motivation for the PluginRoot class currently and "
+  "For example, \"Application::instance.set_config\" is identical to \"Dispatcher::instance.set_config\". "
+  "Hence there is little motivation for the Dispatcher class currently and "
   "this interface may be modified or removed in the future."
   "\n"
-  "\n"
-  "This class has been introduced in version 0.25.\n"
+  "This class has been introduced in version 0.25 as 'PluginRoot'.\n"
+  "It is renamed and enhanced as 'Dispatcher' in 0.27."
 );
 
 }

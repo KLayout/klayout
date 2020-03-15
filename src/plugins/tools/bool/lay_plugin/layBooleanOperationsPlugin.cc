@@ -107,7 +107,7 @@ public:
 
       bool supports_undo = true;
 
-      if (db::transactions_enabled ()) {
+      if (mp_view->manager () && mp_view->manager ()->is_enabled ()) {
 
         lay::TipDialog td (QApplication::activeWindow (),
                            tl::to_string (QObject::tr ("Undo buffering for the following operation can be memory and time consuming.\nChoose \"Yes\" to use undo buffering or \"No\" for no undo buffering. Warning: in the latter case, the undo history will be lost.\n\nChoose undo buffering?")), 
@@ -244,7 +244,7 @@ public:
 
       bool supports_undo = true;
 
-      if (db::transactions_enabled ()) {
+      if (mp_view->manager () && mp_view->manager ()->is_enabled ()) {
 
         lay::TipDialog td (QApplication::activeWindow (),
                            tl::to_string (QObject::tr ("Undo buffering for the following operation can be memory and time consuming.\nChoose \"Yes\" to use undo buffering or \"No\" for no undo buffering. Warning: in the latter case, the undo history will be lost.\n\nChoose undo buffering?")), 
@@ -359,7 +359,7 @@ public:
 
       bool supports_undo = true;
 
-      if (db::transactions_enabled ()) {
+      if (mp_view->manager () && mp_view->manager ()->is_enabled ()) {
 
         lay::TipDialog td (QApplication::activeWindow (),
                            tl::to_string (QObject::tr ("Undo buffering for the following operation can be memory and time consuming.\nChoose \"Yes\" to use undo buffering or \"No\" for no undo buffering. Warning: in the latter case, the undo history will be lost.\n\nChoose undo buffering?")), 
@@ -478,10 +478,10 @@ public:
   virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
   {
     lay::PluginDeclaration::get_menu_entries (menu_entries);
-    menu_entries.push_back (lay::MenuEntry ("ops_group", "edit_menu.layer_menu.end"));
-    menu_entries.push_back (lay::MenuEntry ("lay::boolean", "boolean:edit:edit_mode", "edit_menu.layer_menu.end", tl::to_string (QObject::tr ("Boolean Operations"))));
-    menu_entries.push_back (lay::MenuEntry ("lay::merge", "merge:edit:edit_mode", "edit_menu.layer_menu.end", tl::to_string (QObject::tr ("Merge"))));
-    menu_entries.push_back (lay::MenuEntry ("lay::size", "size:edit:edit_mode", "edit_menu.layer_menu.end", tl::to_string (QObject::tr ("Size"))));
+    menu_entries.push_back (lay::separator ("ops_group", "edit_menu.layer_menu.end"));
+    menu_entries.push_back (lay::menu_item ("lay::boolean", "boolean:edit:edit_mode", "edit_menu.layer_menu.end", tl::to_string (QObject::tr ("Boolean Operations"))));
+    menu_entries.push_back (lay::menu_item ("lay::merge", "merge:edit:edit_mode", "edit_menu.layer_menu.end", tl::to_string (QObject::tr ("Merge"))));
+    menu_entries.push_back (lay::menu_item ("lay::size", "size:edit:edit_mode", "edit_menu.layer_menu.end", tl::to_string (QObject::tr ("Size"))));
   }
 
   virtual bool configure (const std::string & /*name*/, const std::string & /*value*/)
@@ -494,7 +494,7 @@ public:
     // .. nothing yet ..
   }
 
-  lay::Plugin *create_plugin (db::Manager *, lay::PluginRoot *root, lay::LayoutView *view) const
+  lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutView *view) const
   {
     return new BooleanOperationsPlugin (root, view);
   }

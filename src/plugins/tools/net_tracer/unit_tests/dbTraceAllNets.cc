@@ -52,7 +52,7 @@ static db::NetTracerSymbolInfo symbol (const std::string &s, const std::string &
 
 void run_test (tl::TestBase *_this, const std::string &file, const db::NetTracerTechnologyComponent &tc, const std::string &file_au)
 {
-  db::Manager m;
+  db::Manager m (false);
 
   db::Layout layout_org (&m);
   {

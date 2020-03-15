@@ -50,8 +50,8 @@ public:
   ConfigPage (QWidget *parent);
   ~ConfigPage ();
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
 private:
   Ui::RulerConfigPage *mp_ui;
@@ -69,8 +69,8 @@ public:
   ConfigPage2 (QWidget *parent);
   ~ConfigPage2 ();
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
 private:
   Ui::RulerConfigPage2 *mp_ui;
@@ -88,8 +88,8 @@ public:
   ConfigPage3 (QWidget *parent);
   ~ConfigPage3 ();
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
 private:
   Ui::RulerConfigPage3 *mp_ui;
@@ -107,8 +107,8 @@ public:
   ConfigPage4 (QWidget *parent);
   ~ConfigPage4 ();
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
 public slots:
   void add_clicked ();

@@ -48,7 +48,7 @@ Navigator::Navigator (QWidget *parent)
 }
 
 img::Object *
-Navigator::setup (lay::PluginRoot *root, img::Object *img)
+Navigator::setup (lay::Dispatcher *root, img::Object *img)
 {
   mp_view = new lay::LayoutView (0, false, root, this, "img_navigator_view", lay::LayoutView::LV_Naked + lay::LayoutView::LV_NoZoom + lay::LayoutView::LV_NoServices + lay::LayoutView::LV_NoGrid);
   mp_view->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);

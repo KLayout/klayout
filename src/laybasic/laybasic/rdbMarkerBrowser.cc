@@ -26,6 +26,7 @@
 
 #include "dbLayout.h"
 #include "layConverters.h"
+#include "layDispatcher.h"
 
 #include <set>
 
@@ -133,7 +134,7 @@ MarkerBrowserConfigPage::MarkerBrowserConfigPage (QWidget *parent)
 }
 
 void 
-MarkerBrowserConfigPage::setup (lay::PluginRoot *root)
+MarkerBrowserConfigPage::setup (lay::Dispatcher *root)
 {
   //  context mode
   rdb::context_mode_type cmode = rdb::DatabaseTop;
@@ -166,7 +167,7 @@ MarkerBrowserConfigPage::window_changed (int m)
 }
 
 void 
-MarkerBrowserConfigPage::commit (lay::PluginRoot *root)
+MarkerBrowserConfigPage::commit (lay::Dispatcher *root)
 {
   double dim = 1.0;
   tl::from_string (tl::to_string (le_window->text ()), dim);
@@ -190,7 +191,7 @@ MarkerBrowserConfigPage2::MarkerBrowserConfigPage2 (QWidget *parent)
 }
 
 void 
-MarkerBrowserConfigPage2::setup (lay::PluginRoot *root)
+MarkerBrowserConfigPage2::setup (lay::Dispatcher *root)
 {
   //  marker color
   QColor color;
@@ -227,7 +228,7 @@ MarkerBrowserConfigPage2::setup (lay::PluginRoot *root)
 }
 
 void 
-MarkerBrowserConfigPage2::commit (lay::PluginRoot *root)
+MarkerBrowserConfigPage2::commit (lay::Dispatcher *root)
 {
   QColor color (color_pb->get_color ());
   root->config_set (cfg_rdb_marker_color, color, lay::ColorConverter ());
@@ -295,13 +296,13 @@ public:
   virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
   {
     lay::PluginDeclaration::get_menu_entries (menu_entries);
-    menu_entries.push_back (lay::MenuEntry ("marker_browser::show", "browse_markers", "tools_menu.end", tl::to_string (QObject::tr ("Marker Browser"))));
-    menu_entries.push_back (lay::MenuEntry ("marker_browser::show", "shapes_to_markers", "tools_menu.end", tl::to_string (QObject::tr ("Shapes To Markers")), true));
-    menu_entries.push_back (lay::MenuEntry ("marker_browser::scan_layers", "scan_layers", "tools_menu.shapes_to_markers.end", tl::to_string (QObject::tr ("Hierarchical"))));
-    menu_entries.push_back (lay::MenuEntry ("marker_browser::scan_layers_flat", "scan_layers_flat", "tools_menu.shapes_to_markers.end", tl::to_string (QObject::tr ("Flat"))));
+    menu_entries.push_back (lay::menu_item ("marker_browser::show", "browse_markers", "tools_menu.end", tl::to_string (QObject::tr ("Marker Browser"))));
+    menu_entries.push_back (lay::submenu ("marker_browser::show", "shapes_to_markers", "tools_menu.end", tl::to_string (QObject::tr ("Shapes To Markers"))));
+    menu_entries.push_back (lay::menu_item ("marker_browser::scan_layers", "scan_layers", "tools_menu.shapes_to_markers.end", tl::to_string (QObject::tr ("Hierarchical"))));
+    menu_entries.push_back (lay::menu_item ("marker_browser::scan_layers_flat", "scan_layers_flat", "tools_menu.shapes_to_markers.end", tl::to_string (QObject::tr ("Flat"))));
   }
 
-  virtual lay::Plugin *create_plugin (db::Manager *, lay::PluginRoot *root, lay::LayoutView *view) const
+  virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutView *view) const
   {
     return new rdb::MarkerBrowserDialog (root, view);
   }

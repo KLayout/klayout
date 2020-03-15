@@ -85,12 +85,20 @@ public:
   /**
    *  @brief Default constructor
    */
-  Manager ();
+  Manager (bool enabled = true);
   
   /**
    *  @brief Destructor
    */
   ~Manager ();
+
+  /**
+   *  @brief Gets a value indicating whether the manager is enabled
+   */
+  bool is_enabled () const
+  {
+    return m_enabled;
+  }
 
   /**
    *  @brief Release an object with the given id.
@@ -255,6 +263,7 @@ private:
   transactions_t::iterator m_current;
   bool m_opened;
   bool m_replay;
+  bool m_enabled;
 
   void erase_transactions (transactions_t::iterator from, transactions_t::iterator to);
 };

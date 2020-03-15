@@ -169,7 +169,7 @@ MacroController::finish ()
 }
 
 void
-MacroController::initialized (lay::PluginRoot *root)
+MacroController::initialized (lay::Dispatcher *root)
 {
   connect (&m_temp_macros, SIGNAL (menu_needs_update ()), this, SLOT (macro_collection_changed ()));
   connect (&m_temp_macros, SIGNAL (macro_collection_changed (lym::MacroCollection *)), this, SLOT (macro_collection_changed ()));
@@ -205,7 +205,7 @@ MacroController::initialized (lay::PluginRoot *root)
 }
 
 void
-MacroController::uninitialize (lay::PluginRoot * /*root*/)
+MacroController::uninitialize (lay::Dispatcher * /*root*/)
 {
   disconnect (&lym::MacroCollection::root (), SIGNAL (menu_needs_update ()), this, SLOT (macro_collection_changed ()));
   disconnect (&lym::MacroCollection::root (), SIGNAL (macro_collection_changed (lym::MacroCollection *)), this, SLOT (macro_collection_changed ()));
@@ -247,7 +247,7 @@ MacroController::config_finalize()
 }
 
 bool
-MacroController::can_exit (lay::PluginRoot * /*root*/) const
+MacroController::can_exit (lay::Dispatcher * /*root*/) const
 {
   if (mp_macro_editor) {
     return mp_macro_editor->can_exit ();
@@ -666,6 +666,40 @@ static std::string menu_name (std::set<std::string> &used_names, const std::stri
   return name;
 }
 
+namespace {
+
+class RunMacroAction
+  : public lay::Action
+{
+public:
+  RunMacroAction (lym::Macro *lym)
+    : lay::Action (), mp_lym (lym)
+  {
+    if (lym->description ().empty ()) {
+      set_title (lym->path ());
+    } else {
+      set_title (lym->description ());
+    }
+  }
+
+  void triggered ()
+  {
+    if (mp_lym.get ()) {
+      mp_lym->run ();
+    }
+  }
+
+  lym::Macro *macro () const
+  {
+    return const_cast<lym::Macro *> (mp_lym.get ());
+  }
+
+private:
+  tl::weak_ptr<lym::Macro> mp_lym;
+};
+
+}
+
 void
 MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, std::set<std::string> &used_names, std::set<std::string> &groups, const db::Technology *tech)
 {
@@ -702,60 +736,30 @@ MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, std:
       std::string gn = tl::trim (c->second->group_name ());
       if (! gn.empty () && groups.find (gn) == groups.end ()) {
         groups.insert (gn);
-        lay::Action as;
-        as.set_separator (true);
+        lay::Action *as = new lay::Action ();
+        as->set_separator (true);
         m_macro_actions.push_back (as);
         mp_mw->menu ()->insert_item (mp, menu_name (used_names, std::string ()), as);
       }
 
-      lay::Action a;
-      if (c->second->description ().empty ()) {
-        a.set_title (c->second->path ());
-      } else {
-        a.set_title (c->second->description ());
-      }
-      a.set_default_shortcut (sc);
+      lay::Action *a = new RunMacroAction (c->second);
+      a->set_default_shortcut (sc);
       m_macro_actions.push_back (a);
       mp_mw->menu ()->insert_item (mp, menu_name (used_names, c->second->name ()), a);
-
-      m_action_to_macro.insert (std::make_pair (a.qaction (), c->second));
-
-      lym::MacroSignalAdaptor *adaptor = new lym::MacroSignalAdaptor (a.qaction (), c->second);
-      QObject::connect (a.qaction (), SIGNAL (triggered ()), adaptor, SLOT (run ()));
 
     } else if (! sc.empty ()) {
 
       //  Create actions for shortcut-only actions too and add them to the main window
       //  to register their shortcut.
 
-      lay::Action a;
-      if (c->second->description ().empty ()) {
-        a.set_title (c->second->path ());
-      } else {
-        a.set_title (c->second->description ());
-      }
-      a.set_shortcut (sc);
+      lay::Action *a = new RunMacroAction (c->second);
+      a->set_shortcut (sc);
       m_macro_actions.push_back (a);
-
-      mp_mw->addAction (a.qaction ());
-      lym::MacroSignalAdaptor *adaptor = new lym::MacroSignalAdaptor (a.qaction (), c->second);
-      QObject::connect (a.qaction (), SIGNAL (triggered ()), adaptor, SLOT (run ()));
+      mp_mw->addAction (a->qaction ());
 
     }
 
   }
-}
-
-lym::Macro *
-MacroController::macro_for_action (const lay::Action *action)
-{
-  if (action) {
-    std::map<QAction *, lym::Macro *>::const_iterator a2m = m_action_to_macro.find (action->qaction ());
-    if (a2m != m_action_to_macro.end ()) {
-      return a2m->second;
-    }
-  }
-  return 0;
 }
 
 void
@@ -778,7 +782,6 @@ void
 MacroController::macro_collection_changed ()
 {
   //  empty action to macro table now we know it's invalid
-  m_action_to_macro.clear ();
   dm_do_update_menu_with_macros ();
   dm_sync_file_watcher ();
 }
@@ -796,11 +799,16 @@ MacroController::do_update_menu_with_macros ()
   }
 
   //  delete all existing items
-  for (std::vector<lay::Action>::iterator a = m_macro_actions.begin (); a != m_macro_actions.end (); ++a) {
+  std::vector<lay::Action *> actions;
+  for (tl::weak_collection<lay::Action>::iterator a = m_macro_actions.begin (); a != m_macro_actions.end (); ++a) {
+    if (a.operator-> ()) {
+      actions.push_back (a.operator-> ());
+    }
+  }
+  for (std::vector<lay::Action *>::const_iterator a = actions.begin (); a != actions.end (); ++a) {
     mp_mw->menu ()->delete_items (*a);
   }
   m_macro_actions.clear ();
-  m_action_to_macro.clear ();
 
   std::set<std::string> groups;
   std::set<std::string> used_names;
@@ -810,16 +818,16 @@ MacroController::do_update_menu_with_macros ()
   //  apply the custom keyboard shortcuts
   for (std::vector<std::pair<std::string, std::string> >::const_iterator kb = m_key_bindings.begin (); kb != m_key_bindings.end (); ++kb) {
     if (mp_mw->menu ()->is_valid (kb->first)) {
-      lay::Action a = mp_mw->menu ()->action (kb->first);
-      a.set_shortcut (kb->second);
+      lay::Action *a = mp_mw->menu ()->action (kb->first);
+      a->set_shortcut (kb->second);
     }
   }
 
   //  apply the custom hidden flags
   for (std::vector<std::pair<std::string, bool> >::const_iterator hf = m_menu_items_hidden.begin (); hf != m_menu_items_hidden.end (); ++hf) {
     if (mp_mw->menu ()->is_valid (hf->first)) {
-      lay::Action a = mp_mw->menu ()->action (hf->first);
-      a.set_hidden (hf->second);
+      lay::Action *a = mp_mw->menu ()->action (hf->first);
+      a->set_hidden (hf->second);
     }
   }
 }
@@ -876,7 +884,8 @@ static tl::RegisteredClass<lay::PluginDeclaration> macro_controller_decl (new la
 
 static lym::Macro *macro_for_action (const lay::Action *action)
 {
-  return MacroController::instance () ? MacroController::instance ()->macro_for_action (action) : 0;
+  const RunMacroAction *rma = dynamic_cast<const RunMacroAction *> (action);
+  return rma ? rma->macro () : 0;
 }
 
 //  extend lay::Action with the ability to associate a macro with it

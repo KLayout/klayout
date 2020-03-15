@@ -1007,7 +1007,7 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box,
 // -----------------------------------------------------------------------------
 //  Main Service implementation
 
-PartialService::PartialService (db::Manager *manager, lay::LayoutView *view, lay::PluginRoot *root)
+PartialService::PartialService (db::Manager *manager, lay::LayoutView *view, lay::Dispatcher *root)
   : QObject (),
     lay::ViewService (view->view_object_widget ()), 
     lay::Editable (view),

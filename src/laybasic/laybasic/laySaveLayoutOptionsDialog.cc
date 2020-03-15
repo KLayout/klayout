@@ -230,7 +230,7 @@ SaveLayoutOptionsDialog::update ()
 }
 
 bool
-SaveLayoutOptionsDialog::edit_global_options (lay::PluginRoot *config_root, db::Technologies *technologies)
+SaveLayoutOptionsDialog::edit_global_options (lay::Dispatcher *config_root, db::Technologies *technologies)
 {
   m_opt_array.clear ();
   m_tech_array.clear ();

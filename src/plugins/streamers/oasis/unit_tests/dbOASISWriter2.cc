@@ -34,7 +34,7 @@ TEST(1)
 {
   db::ShapeProcessor sp;
 
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout_org (&m);
   {
     std::string fn (tl::testsrc ());

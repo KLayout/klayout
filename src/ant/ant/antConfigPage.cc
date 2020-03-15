@@ -28,6 +28,7 @@
 #include "ui_RulerConfigPage4.h"
 #include "antConfig.h"
 #include "layConverters.h"
+#include "layDispatcher.h"
 #include "layQtTools.h"
 #include "tlExceptions.h"
 
@@ -53,7 +54,7 @@ ConfigPage::~ConfigPage ()
 }
 
 void 
-ConfigPage::setup (lay::PluginRoot *root)
+ConfigPage::setup (lay::Dispatcher *root)
 {
   //  Snap range
   int snap_range = 0;
@@ -69,7 +70,7 @@ ConfigPage::setup (lay::PluginRoot *root)
 }
 
 void 
-ConfigPage::commit (lay::PluginRoot *root)
+ConfigPage::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_ruler_obj_snap, mp_ui->ruler_obj_snap_cbx->isChecked ());
   root->config_set (cfg_ruler_grid_snap, mp_ui->ruler_grid_snap_cbx->isChecked ());
@@ -99,7 +100,7 @@ ConfigPage2::~ConfigPage2 ()
 }
 
 void 
-ConfigPage2::setup (lay::PluginRoot *root)
+ConfigPage2::setup (lay::Dispatcher *root)
 {
   //  Max. number of rulers
   int max_number_of_rulers = -1;
@@ -122,7 +123,7 @@ ConfigPage2::setup (lay::PluginRoot *root)
 }
 
 void 
-ConfigPage2::commit (lay::PluginRoot *root)
+ConfigPage2::commit (lay::Dispatcher *root)
 {
   int mr;
   try {
@@ -153,7 +154,7 @@ ConfigPage3::~ConfigPage3 ()
 }
 
 void 
-ConfigPage3::setup (lay::PluginRoot *root)
+ConfigPage3::setup (lay::Dispatcher *root)
 {
   //  snap mode
   lay::angle_constraint_type rm = lay::AC_Any;
@@ -166,7 +167,7 @@ ConfigPage3::setup (lay::PluginRoot *root)
 }
 
 void 
-ConfigPage3::commit (lay::PluginRoot *root)
+ConfigPage3::commit (lay::Dispatcher *root)
 {
   lay::angle_constraint_type rm = lay::AC_Any;
   if (mp_ui->ruler_any_angle_rb->isChecked ()) {
@@ -215,7 +216,7 @@ ConfigPage4::~ConfigPage4 ()
 }
 
 void 
-ConfigPage4::setup (lay::PluginRoot *root)
+ConfigPage4::setup (lay::Dispatcher *root)
 {
   //  templates
   root->config_get (cfg_ruler_templates, m_ruler_templates, TemplatesConverter ());
@@ -236,7 +237,7 @@ ConfigPage4::setup (lay::PluginRoot *root)
 }
 
 void 
-ConfigPage4::commit (lay::PluginRoot *root)
+ConfigPage4::commit (lay::Dispatcher *root)
 {
   commit ();
   

@@ -1,0 +1,51 @@
+
+Plan:
+
+DONE 1. Combine AbstractMenuProvider, PluginRoot and the AbstractMenuProvider's 
+   implementation in MainWindow/LayoutView into lay::Dispatcher
+
+DONE 2. Base MainWindow and LayoutView on lay::Dispatcher
+
+DONE 3. lay::Plugin::plugin_root -> lay::Dispatcher *lay::Plugin::dispatcher()
+   This method will find the MainWindow or LayoutView depending 
+   which is the root.
+
+DONE 4. Don't use AbstractMenuProvider::instance anymore, rather use lay::Dispatcher::instance
+   when necessary (should not be)
+
+DONE 5. Instead of slots, bind abstract menu items to symbols passed to 
+   Dispatcher::menu_activated
+
+DONE 6. MainWindow will automatically dispatch menu_activated to LayoutView
+
+DONE 7. GSI-expose menu_activated in LayoutView and MainWindow as "call_menu"
+
+DONE 8. We can move menu initialization of LV-specifics to the LayoutView and
+   remove the cm_... and the code which just passes signals to the current view! :)
+   
+9. BTW: make QWidget::setParent and QObject::setParent transfer ownership for
+   Qt binding.
+
+10. Provide the layer toolbox for GSI
+
+11. Tests for new features and GSI tests
+
+12. Default ctor for MainWindow so a pymod script can instantiate one (?)
+
+DONE 13. Re-think concept of Action as "smart pointers": ConfigureAction
+    violates this. ConfigureAction should be ActionHandle variant?
+    Action as pointer and smart pointers for managing?
+
+
+Tests:
+  - DONE: compare menu layout
+  - DONE: test every menu function
+  - adding of new tech
+  - DONE: adding of rulers/removing
+  - ruby plugin (debugging, re-running)
+  - DONE: changing of macro title, move macro to different place
+  - DONE: funktionieren die check marks vor den menus? (Mode, selection modes, ruler template)
+  - DONE: check whether there is a replacement for the "cm_..." methods and tests them (at least one)
+  - DONE: check if changing the default grid works
+  - Run unit tests -> klayout_main_tests:main is failing
+

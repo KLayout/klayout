@@ -32,7 +32,7 @@
 
 TEST(1) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Polygon p1;
@@ -129,7 +129,7 @@ TEST(1)
 
 TEST(2) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Polygon p1;
@@ -209,7 +209,7 @@ TEST(2)
 
 TEST(3) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Polygon p1;
@@ -272,7 +272,7 @@ TEST(3)
 
 TEST(1BOX) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Polygon p1;
@@ -342,7 +342,7 @@ TEST(1BOX)
 
 TEST(2BOX) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Polygon p1;
@@ -400,7 +400,7 @@ TEST(2BOX)
 
 TEST(3BOX) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Polygon p1;
@@ -463,7 +463,7 @@ TEST(3BOX)
 
 TEST(1SBOX) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Polygon p1;
@@ -533,7 +533,7 @@ TEST(1SBOX)
 
 TEST(2SBOX) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Polygon p1;
@@ -591,7 +591,7 @@ TEST(2SBOX)
 
 TEST(3SBOX) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Polygon p1;
@@ -654,7 +654,7 @@ TEST(3SBOX)
 
 TEST(4) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Box bx1 (db::Point (0, 0), db::Point (1000, 100));
@@ -684,7 +684,7 @@ TEST(4)
 TEST(5) 
 {
   if (db::default_editable_mode ()) { return; } //  currently Boxes are treated as ones with properties
-  db::Manager m;
+  db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Box bx1 (db::Point (0, 0), db::Point (1000, 100));
@@ -720,7 +720,7 @@ TEST(5)
 
 TEST(6) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Box bx1 (db::Point (0, 0), db::Point (1000, 100));
@@ -745,7 +745,7 @@ TEST(6)
 TEST(7) 
 {
   if (db::default_editable_mode ()) { return; } //  currently Boxes are treated as ones with properties
-  db::Manager m;
+  db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
 
   db::Box bx2 (db::Point (0, 1000), db::Point (100, 2000));
@@ -766,7 +766,7 @@ TEST(7)
 
 TEST(8) 
 {
-  db::Manager m;
+  db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
   db::PropertiesRepository proprep;
 

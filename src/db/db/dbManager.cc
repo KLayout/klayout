@@ -33,10 +33,11 @@
 namespace db
 {
 
-Manager::Manager ()
+Manager::Manager (bool enabled)
   : m_transactions (),
     m_current (m_transactions.begin ()), 
-    m_opened (false), m_replay (false)
+    m_opened (false), m_replay (false),
+    m_enabled (enabled)
 {
   //  .. nothing yet ..
 }
@@ -110,7 +111,7 @@ Manager::erase_transactions (transactions_t::iterator from, transactions_t::iter
 Manager::transaction_id_t 
 Manager::transaction (const std::string &description, transaction_id_t join_with)
 {
-  if (db::transactions_enabled ()) {
+  if (m_enabled) {
 
     //  close transactions that are still open (was an assertion before)
     if (m_opened) {
@@ -146,7 +147,7 @@ Manager::last_transaction_id () const
 void
 Manager::cancel ()
 {
-  if (db::transactions_enabled ()) {
+  if (m_enabled) {
 
     //  commit and undo - revert changes done so far
     commit ();
@@ -162,7 +163,7 @@ Manager::cancel ()
 void 
 Manager::commit ()
 {
-  if (db::transactions_enabled ()) {
+  if (m_enabled) {
 
     tl_assert (m_opened);
     tl_assert (! m_replay);

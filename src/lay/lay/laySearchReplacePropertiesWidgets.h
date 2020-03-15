@@ -37,7 +37,7 @@ namespace db
 namespace lay
 {
 
-class PluginRoot;
+class Dispatcher;
 
 /**
  *  @brief A base class for the search and replace properties widgets
@@ -50,8 +50,8 @@ public:
     : QWidget (parent)
   { }
 
-  virtual void restore_state (const std::string &pfx, lay::PluginRoot *config_root) const = 0;
-  virtual void save_state (const std::string &pfx, lay::PluginRoot *config_root) const = 0;
+  virtual void restore_state (const std::string &pfx, lay::Dispatcher *config_root) const = 0;
+  virtual void save_state (const std::string &pfx, lay::Dispatcher *config_root) const = 0;
 };
 
 /**

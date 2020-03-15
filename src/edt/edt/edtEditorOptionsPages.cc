@@ -87,7 +87,7 @@ struct EOPCompareOp
   }
 };
 
-EditorOptionsPages::EditorOptionsPages (const std::vector<edt::EditorOptionsPage *> &pages, lay::PluginRoot *root)
+EditorOptionsPages::EditorOptionsPages (const std::vector<edt::EditorOptionsPage *> &pages, lay::Dispatcher *root)
   : mp_root (root)
 {
   mp_ui = new Ui::EditorOptionsDialog ();
@@ -515,7 +515,7 @@ EditorOptionsPath::setup (lay::Plugin *root)
 // ------------------------------------------------------------------
 //  EditorOptionsInst implementation
 
-EditorOptionsInst::EditorOptionsInst (lay::PluginRoot *root)
+EditorOptionsInst::EditorOptionsInst (lay::Dispatcher *root)
   : QWidget (), EditorOptionsPage (), mp_root (root), mp_pcell_parameters (0)
 {
   mp_ui = new Ui::EditorOptionsInst ();

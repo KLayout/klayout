@@ -39,7 +39,7 @@ namespace Ui
 namespace lay
 {
 
-class PluginRoot;
+class Dispatcher;
 
 /**
  *  @brief A dialog showing the details of a net
@@ -74,7 +74,7 @@ public:
   void set_start_layer_number (int ln);
   int start_layer_number ();
 
-  int exec_dialog (lay::PluginRoot *mp_plugin_root);
+  int exec_dialog (lay::Dispatcher *mp_plugin_root);
 
 protected:
   void accept ();

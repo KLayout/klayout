@@ -33,7 +33,7 @@
 
 void run_test (tl::TestBase *_this, const char *file, const char *file_ref, bool priv = false, const db::GDS2WriterOptions &opt = db::GDS2WriterOptions ())
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout_org (&m);
   {
     std::string fn (priv ? tl::testsrc_private () : tl::testsrc ());
@@ -85,7 +85,7 @@ TEST(1)
 
 TEST(2)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout_org (&m);
 
   db::cell_index_type cid = layout_org.add_cell ("TOP");
@@ -131,7 +131,7 @@ TEST(2)
 // Test the writer's capabilities to cut a polygon into small pieces correctly
 TEST(3)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout_org (&m);
   {
     std::string fn (tl::testsrc ());
@@ -190,7 +190,7 @@ TEST(4)
 {
   db::ShapeProcessor sp;
 
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout_org (&m);
   {
     std::string fn (tl::testsrc ());
@@ -247,7 +247,7 @@ TEST(4)
 
 TEST(100)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp0;
@@ -329,7 +329,7 @@ TEST(100)
 
 TEST(101)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp0;
@@ -401,7 +401,7 @@ TEST(101)
 
 TEST(102)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp0;
@@ -481,7 +481,7 @@ TEST(102)
 
 TEST(103)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp0;
@@ -554,7 +554,7 @@ TEST(103)
 
 TEST(110)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp0;
@@ -630,7 +630,7 @@ TEST(110)
 
 TEST(111)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp0;
@@ -703,7 +703,7 @@ TEST(111)
 
 TEST(112)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp0;
@@ -780,7 +780,7 @@ TEST(112)
 
 TEST(113)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp0;
@@ -856,7 +856,7 @@ TEST(114)
 {
   // text alignment flags, font and text size
 
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp0;
@@ -946,7 +946,7 @@ TEST(115)
 {
   //  polygons and boxes without area
   
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp1;
@@ -1012,7 +1012,7 @@ TEST(116)
 {
   //  big paths with multi-xy
 
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp1;
@@ -1073,7 +1073,7 @@ TEST(117)
 {
   //  big polygons with multi-xy
 
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp1;

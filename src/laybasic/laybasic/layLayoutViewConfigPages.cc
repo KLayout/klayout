@@ -24,6 +24,7 @@
 #include "layLayoutViewConfigPages.h"
 #include "laybasicConfig.h"
 #include "layConverters.h"
+#include "layDispatcher.h"
 
 #include "ui_LayoutViewConfigPage.h"
 #include "ui_LayoutViewConfigPage1.h"
@@ -74,7 +75,7 @@ LayoutViewConfigPage::~LayoutViewConfigPage ()
 }
 
 void 
-LayoutViewConfigPage::setup (lay::PluginRoot *root)
+LayoutViewConfigPage::setup (lay::Dispatcher *root)
 {
   lay::ColorConverter cc;
   QColor color;
@@ -84,7 +85,7 @@ LayoutViewConfigPage::setup (lay::PluginRoot *root)
 }
 
 void 
-LayoutViewConfigPage::commit (lay::PluginRoot *root)
+LayoutViewConfigPage::commit (lay::Dispatcher *root)
 {
   lay::ColorConverter cc;
   root->config_set (cfg_background_color, mp_ui->bkgnd_color_pb->get_color (), cc);
@@ -107,7 +108,7 @@ LayoutViewConfigPage1::~LayoutViewConfigPage1 ()
 }
 
 void 
-LayoutViewConfigPage1::setup (lay::PluginRoot *root)
+LayoutViewConfigPage1::setup (lay::Dispatcher *root)
 {
   lay::ColorConverter cc;
 
@@ -152,7 +153,7 @@ LayoutViewConfigPage1::setup (lay::PluginRoot *root)
 }
 
 void 
-LayoutViewConfigPage1::commit (lay::PluginRoot *root)
+LayoutViewConfigPage1::commit (lay::Dispatcher *root)
 {
   lay::ColorConverter cc;
 
@@ -192,7 +193,7 @@ LayoutViewConfigPage2a::~LayoutViewConfigPage2a ()
 }
 
 void 
-LayoutViewConfigPage2a::setup (lay::PluginRoot *root)
+LayoutViewConfigPage2a::setup (lay::Dispatcher *root)
 {
   QColor color;
   root->config_get (cfg_cell_box_color, color, ColorConverter ());
@@ -238,7 +239,7 @@ LayoutViewConfigPage2a::setup (lay::PluginRoot *root)
 }
 
 void 
-LayoutViewConfigPage2a::commit (lay::PluginRoot *root)
+LayoutViewConfigPage2a::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_cell_box_text_transform, mp_ui->cell_xform_text_cbx->isChecked ());
   root->config_set (cfg_cell_box_text_font, mp_ui->cell_font_cb->currentIndex ());
@@ -274,7 +275,7 @@ LayoutViewConfigPage2b::~LayoutViewConfigPage2b ()
 }
 
 void 
-LayoutViewConfigPage2b::setup (lay::PluginRoot *root)
+LayoutViewConfigPage2b::setup (lay::Dispatcher *root)
 {
   QColor color;
   root->config_get (cfg_text_color, color, ColorConverter ());
@@ -307,7 +308,7 @@ LayoutViewConfigPage2b::setup (lay::PluginRoot *root)
 }
 
 void 
-LayoutViewConfigPage2b::commit (lay::PluginRoot *root)
+LayoutViewConfigPage2b::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_text_color, mp_ui->text_color_pb->get_color (), ColorConverter ());
   root->config_set (cfg_apply_text_trans, mp_ui->text_apply_trans_cbx->isChecked ());
@@ -339,7 +340,7 @@ LayoutViewConfigPage2c::~LayoutViewConfigPage2c ()
 }
 
 void 
-LayoutViewConfigPage2c::setup (lay::PluginRoot *root)
+LayoutViewConfigPage2c::setup (lay::Dispatcher *root)
 {
   QColor color;
   root->config_get (cfg_sel_color, color, lay::ColorConverter ());
@@ -375,7 +376,7 @@ LayoutViewConfigPage2c::setup (lay::PluginRoot *root)
 }
 
 void 
-LayoutViewConfigPage2c::commit (lay::PluginRoot *root)
+LayoutViewConfigPage2c::commit (lay::Dispatcher *root)
 {
   lay::ColorConverter cc;
   root->config_set (cfg_sel_color, mp_ui->color_pb->get_color (), cc);
@@ -405,7 +406,7 @@ LayoutViewConfigPage3a::~LayoutViewConfigPage3a ()
 }
 
 void 
-LayoutViewConfigPage3a::setup (lay::PluginRoot *root)
+LayoutViewConfigPage3a::setup (lay::Dispatcher *root)
 {
   bool flag = true;
 
@@ -418,7 +419,7 @@ LayoutViewConfigPage3a::setup (lay::PluginRoot *root)
 }
 
 void 
-LayoutViewConfigPage3a::commit (lay::PluginRoot *root)
+LayoutViewConfigPage3a::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_fit_new_cell, mp_ui->fit_new_cell_cbx->isChecked ());
   root->config_set (cfg_full_hier_new_cell, mp_ui->full_hier_new_cell_cbx->isChecked ());
@@ -442,7 +443,7 @@ LayoutViewConfigPage3b::~LayoutViewConfigPage3b ()
 }
 
 void 
-LayoutViewConfigPage3b::setup (lay::PluginRoot *root)
+LayoutViewConfigPage3b::setup (lay::Dispatcher *root)
 {
   bool flag = true;
   double pd = 0.0;
@@ -462,7 +463,7 @@ LayoutViewConfigPage3b::setup (lay::PluginRoot *root)
 }
 
 void 
-LayoutViewConfigPage3b::commit (lay::PluginRoot *root)
+LayoutViewConfigPage3b::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_mouse_wheel_mode, mp_ui->alt_mouse_wheel_mode_cbx->isChecked () ? 1 : 0);
 
@@ -501,7 +502,7 @@ LayoutViewConfigPage3c::~LayoutViewConfigPage3c ()
 }
 
 void 
-LayoutViewConfigPage3c::setup (lay::PluginRoot *root)
+LayoutViewConfigPage3c::setup (lay::Dispatcher *root)
 {
   bool flag = true;
 
@@ -512,7 +513,7 @@ LayoutViewConfigPage3c::setup (lay::PluginRoot *root)
 }
 
 void 
-LayoutViewConfigPage3c::commit (lay::PluginRoot *root)
+LayoutViewConfigPage3c::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_dbu_units, mp_ui->dbu_units_cbx->isChecked ());
   root->config_set (cfg_abs_units, mp_ui->abs_units_cbx->isChecked ());
@@ -535,7 +536,7 @@ LayoutViewConfigPage3f::~LayoutViewConfigPage3f ()
 }
 
 void 
-LayoutViewConfigPage3f::setup (lay::PluginRoot *root)
+LayoutViewConfigPage3f::setup (lay::Dispatcher *root)
 {
   int workers = 1;
   bool flag = true;
@@ -567,7 +568,7 @@ LayoutViewConfigPage3f::setup (lay::PluginRoot *root)
 }
 
 void 
-LayoutViewConfigPage3f::commit (lay::PluginRoot *root)
+LayoutViewConfigPage3f::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_drawing_workers, mp_ui->drawing_workers_spbx->value ());
 
@@ -618,7 +619,7 @@ static QToolButton * (Ui::LayoutViewConfigPage4::*cfg4_buttons []) = {
 
 LayoutViewConfigPage4::LayoutViewConfigPage4 (QWidget *parent)
   : lay::ConfigPage (parent),
-    m_edit_order_changed_disabled (false)
+    m_manager (true), m_edit_order_changed_disabled (false)
 {
   //  install the manager at db::Object
   manager (&m_manager);
@@ -654,7 +655,7 @@ LayoutViewConfigPage4::set_edit_order (bool edit_order)
 }
 
 void 
-LayoutViewConfigPage4::setup (lay::PluginRoot *root)
+LayoutViewConfigPage4::setup (lay::Dispatcher *root)
 {
   m_manager.clear ();
 
@@ -678,7 +679,7 @@ LayoutViewConfigPage4::setup (lay::PluginRoot *root)
 }
 
 void 
-LayoutViewConfigPage4::commit (lay::PluginRoot *root)
+LayoutViewConfigPage4::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_color_palette, m_palette.to_string ());
 }
@@ -876,7 +877,7 @@ LayoutViewConfigPage5::~LayoutViewConfigPage5 ()
 }
 
 void 
-LayoutViewConfigPage5::setup (lay::PluginRoot *root)
+LayoutViewConfigPage5::setup (lay::Dispatcher *root)
 {
   std::string lyp_file;
   root->config_get (cfg_default_lyp_file, lyp_file);
@@ -901,7 +902,7 @@ LayoutViewConfigPage5::setup (lay::PluginRoot *root)
 }
 
 void 
-LayoutViewConfigPage5::commit (lay::PluginRoot *root)
+LayoutViewConfigPage5::commit (lay::Dispatcher *root)
 {
   if (mp_ui->lyp_file_gbx->isChecked ()) {
     root->config_set (cfg_default_lyp_file, tl::to_string (mp_ui->lyp_file_le->text ()));
@@ -952,7 +953,7 @@ static QToolButton * (Ui::LayoutViewConfigPage6::*cfg6_buttons []) = {
 
 LayoutViewConfigPage6::LayoutViewConfigPage6 (QWidget *parent)
   : lay::ConfigPage (parent),
-    m_edit_order_changed_disabled (false)
+    m_manager (true), m_edit_order_changed_disabled (false)
 {
   //  install the manager at db::Object
   manager (&m_manager);
@@ -988,7 +989,7 @@ LayoutViewConfigPage6::set_edit_order (bool edit_order)
 }
 
 void 
-LayoutViewConfigPage6::setup (lay::PluginRoot *root)
+LayoutViewConfigPage6::setup (lay::Dispatcher *root)
 {
   m_manager.clear ();
 
@@ -1016,7 +1017,7 @@ LayoutViewConfigPage6::setup (lay::PluginRoot *root)
 }
 
 void 
-LayoutViewConfigPage6::commit (lay::PluginRoot *root)
+LayoutViewConfigPage6::commit (lay::Dispatcher *root)
 {
   if (m_palette.stipples () == 0) {
     throw tl::Exception (tl::to_string (QObject::tr ("No stipples set")));
@@ -1239,7 +1240,7 @@ static QToolButton * (Ui::LayoutViewConfigPage6a::*cfg6a_buttons []) = {
 };
 
 LayoutViewConfigPage6a::LayoutViewConfigPage6a (QWidget *parent)
-  : lay::ConfigPage (parent)
+  : lay::ConfigPage (parent), m_manager (true)
 {
   //  install the manager at db::Object
   manager (&m_manager);
@@ -1266,7 +1267,7 @@ LayoutViewConfigPage6a::~LayoutViewConfigPage6a ()
 }
 
 void
-LayoutViewConfigPage6a::setup (lay::PluginRoot *root)
+LayoutViewConfigPage6a::setup (lay::Dispatcher *root)
 {
   m_manager.clear ();
 
@@ -1289,7 +1290,7 @@ LayoutViewConfigPage6a::setup (lay::PluginRoot *root)
 }
 
 void
-LayoutViewConfigPage6a::commit (lay::PluginRoot *root)
+LayoutViewConfigPage6a::commit (lay::Dispatcher *root)
 {
   if (m_palette.styles () == 0) {
     throw tl::Exception (tl::to_string (QObject::tr ("No styles set")));
@@ -1440,7 +1441,7 @@ LayoutViewConfigPage7::~LayoutViewConfigPage7 ()
 }
 
 void 
-LayoutViewConfigPage7::setup (lay::PluginRoot *root)
+LayoutViewConfigPage7::setup (lay::Dispatcher *root)
 {
   int oversampling = 1;
   root->config_get (cfg_bitmap_oversampling, oversampling);
@@ -1466,7 +1467,7 @@ LayoutViewConfigPage7::setup (lay::PluginRoot *root)
 }
 
 void 
-LayoutViewConfigPage7::commit (lay::PluginRoot *root)
+LayoutViewConfigPage7::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_bitmap_oversampling, mp_ui->oversampling->currentIndex () + 1);
   root->config_set (cfg_default_font_size, mp_ui->default_font_size->currentIndex ());

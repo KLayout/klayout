@@ -20,10 +20,8 @@
 
 */
 
-
-
-
 #include "layDiffToolDialog.h"
+#include "layDispatcher.h"
 
 #include "layPlugin.h"
 
@@ -91,7 +89,7 @@ public:
   virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
   {
     lay::PluginDeclaration::get_menu_entries (menu_entries);
-    menu_entries.push_back (lay::MenuEntry ("lay::diff_tool", "diff_tool:edit", "tools_menu.post_verification_group", tl::to_string (QObject::tr ("Diff Tool"))));
+    menu_entries.push_back (lay::menu_item ("lay::diff_tool", "diff_tool:edit", "tools_menu.post_verification_group", tl::to_string (QObject::tr ("Diff Tool"))));
   }
 
   virtual bool configure (const std::string & /*name*/, const std::string & /*value*/)
@@ -104,7 +102,7 @@ public:
     // .. nothing yet ..
   }
 
-  lay::Plugin *create_plugin (db::Manager *, lay::PluginRoot *root, lay::LayoutView *view) const
+  lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutView *view) const
   {
     return new DiffPlugin (root, view);
   }

@@ -63,11 +63,11 @@ public:
   virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
   {
     lay::PluginDeclaration::get_menu_entries (menu_entries);
-    menu_entries.push_back (lay::MenuEntry ("db::import_gerber", "import_gerber_menu:edit", "file_menu.import_menu.end", tl::to_string (QObject::tr ("Gerber PCB")), true));
-    menu_entries.push_back (lay::MenuEntry ("db::import_gerber_new", "import_gerber_new:edit", "file_menu.import_menu.import_gerber_menu.end", tl::to_string (QObject::tr ("New Project"))));
-    menu_entries.push_back (lay::MenuEntry ("db::import_gerber_new_free", "import_gerber_new_free:edit", "file_menu.import_menu.import_gerber_menu.end", tl::to_string (QObject::tr ("New Project - Free Layer Mapping"))));
-    menu_entries.push_back (lay::MenuEntry ("db::import_gerber_open", "import_gerber_open:edit", "file_menu.import_menu.import_gerber_menu.end", tl::to_string (QObject::tr ("Open Project"))));
-    menu_entries.push_back (lay::MenuEntry ("db::import_gerber_recent", "import_gerber_recent:edit", "file_menu.import_menu.import_gerber_menu.end", tl::to_string (QObject::tr ("Recent Project"))));
+    menu_entries.push_back (lay::submenu ("db::import_gerber", "import_gerber_menu:edit", "file_menu.import_menu.end", tl::to_string (QObject::tr ("Gerber PCB"))));
+    menu_entries.push_back (lay::menu_item ("db::import_gerber_new", "import_gerber_new:edit", "file_menu.import_menu.import_gerber_menu.end", tl::to_string (QObject::tr ("New Project"))));
+    menu_entries.push_back (lay::menu_item ("db::import_gerber_new_free", "import_gerber_new_free:edit", "file_menu.import_menu.import_gerber_menu.end", tl::to_string (QObject::tr ("New Project - Free Layer Mapping"))));
+    menu_entries.push_back (lay::menu_item ("db::import_gerber_open", "import_gerber_open:edit", "file_menu.import_menu.import_gerber_menu.end", tl::to_string (QObject::tr ("Open Project"))));
+    menu_entries.push_back (lay::menu_item ("db::import_gerber_recent", "import_gerber_recent:edit", "file_menu.import_menu.import_gerber_menu.end", tl::to_string (QObject::tr ("Recent Project"))));
   }
 
   virtual bool configure (const std::string &name, const std::string &value)
@@ -125,7 +125,7 @@ public:
 
       }
 
-      lay::PluginRoot *config_root = lay::PluginRoot::instance ();
+      lay::Dispatcher *config_root = lay::Dispatcher::instance ();
 
       GerberImportDialog dialog (QApplication::activeWindow (), &data);
       db::GerberImporter importer;

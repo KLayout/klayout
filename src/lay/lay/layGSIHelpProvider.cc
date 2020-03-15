@@ -825,7 +825,12 @@ method_arguments (const gsi::MethodBase *method, const gsi::ClassBase *cls_obj, 
           if (! a->spec ()->init_doc ().empty ()) {
             r += replace_references (escape_xml (a->spec ()->init_doc ()), cls_obj);
           } else {
-            r += escape_xml (a->spec ()->default_value ().to_string ());
+            try {
+              r += escape_xml (a->spec ()->default_value ().to_string ());
+            } catch (tl::Exception &ex) {
+              tl::error << cls_obj->name () << "#" << method->begin_synonyms ()->name << ": " << ex.msg ();
+              r += "?";
+            }
           }
         }
       } else if (n < int (doc.args.size ())) {
@@ -1339,11 +1344,11 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
         os << "<p>" << tl::to_string (QObject::tr ("Use of this method is deprecated")) << "</p>" << std::endl;
       }
 
-    } else {
-      std::string dh = method_doc.doc;
-      if (! tl::Extractor (dh.c_str ()).at_end ()) {
-        os << "<p>" << replace_references (method_doc.doc_html (), cls_obj) << "</p>" << std::endl;
-      }
+    }
+
+    std::string dh = method_doc.doc;
+    if (! tl::Extractor (dh.c_str ()).at_end ()) {
+      os << "<p>" << replace_references (method_doc.doc_html (), cls_obj) << "</p>" << std::endl;
     }
 
     if (! pydoc.empty ()) {

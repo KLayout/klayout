@@ -52,7 +52,7 @@ struct CurrentPatternOp
 
 EditStipplesForm::EditStipplesForm (lay::LayoutView *view, const lay::DitherPattern &pattern)
   : QDialog (view), db::Object (0),
-    m_selected (-1), m_pattern (pattern), mp_view (view)
+    m_selected (-1), m_pattern (pattern), m_manager (true), mp_view (view)
 {
   m_selection_changed_enabled = false;
 

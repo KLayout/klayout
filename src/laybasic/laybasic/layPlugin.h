@@ -47,7 +47,7 @@ namespace lay
 {
 
 class Plugin;
-class PluginRoot;
+class Dispatcher;
 class LayoutView;
 class Browser;
 class ViewService;
@@ -77,7 +77,7 @@ public:
    *  The implementation is supposed to fetch the configuration from the
    *  Plugin object provided and load the widgets accordingly.
    */
-  virtual void setup (PluginRoot * /*root*/)
+  virtual void setup (Dispatcher * /*root*/)
   {
     //  the default implementation does nothing.
   }
@@ -89,7 +89,7 @@ public:
    *  throw exceptions if the configuration something is invalid)
    *  and commit the changes through 
    */
-  virtual void commit (PluginRoot * /*root*/)
+  virtual void commit (Dispatcher * /*root*/)
   {
     //  the default implementation does nothing.
   }
@@ -98,41 +98,82 @@ public:
 
 /**
  *  @brief A menu entry declaration
+ *  See separator, menu_item, submenu and config_menu_item below.
  */
 struct LAYBASIC_PUBLIC MenuEntry
 {
-  /**
-   *  @brief A declaration for a separator
-   *
-   *  @param menu_name The name of the menu item (see layAbstractMenu.h)
-   *  @param insert_pos The position where to insert (see layAbstractMenu.h)
-   */
-  MenuEntry (const std::string &menu_name_, const std::string &insert_pos_)
-    : menu_name (menu_name_), insert_pos (insert_pos_), sub_menu (false)
-  {
-    // .. 
-  }
-
-  /**
-   *  @brief A declaration for a menu entry
-   *
-   *  @param symbol The symbol to send when this menu item is selected
-   *  @param menu_name The name of the menu item (see layAbstractMenu.h)
-   *  @param insert_pos The position where to insert (see layAbstractMenu.h)
-   *  @param title The title to display plus optional icon resource and keyboard shortcut. The format of the string is: <text>["("shortcut")"]["<"icon-resource">"][{"tool-tip"}].
-   */
-  MenuEntry (const std::string &symbol_, const std::string &menu_name_, const std::string &insert_pos_, const std::string &title_, bool sub_menu_ = false)
-    : menu_name (menu_name_), symbol (symbol_), insert_pos (insert_pos_), title (title_), sub_menu (sub_menu_)
-  {
-    // .. 
-  }
+  MenuEntry () : sub_menu (false), checkable (false), separator (false) { }
 
   std::string menu_name;
   std::string symbol;
   std::string insert_pos;
   std::string title;
+  std::string copy_from;
+  std::string cname;
+  std::string cvalue;
+  std::string exclusive_group;
   bool sub_menu;
+  bool checkable;
+  bool separator;
 };
+
+/**
+ *  @brief Creates a separator menu entry
+ *
+ *  @param menu_name The name of the menu item (see layAbstractMenu.h)
+ *  @param insert_pos The position where to insert (see layAbstractMenu.h)
+ */
+LAYBASIC_PUBLIC MenuEntry separator (const std::string &menu_name, const std::string &insert_pos);
+
+/**
+ *  @brief Creates a normal menu entry
+ *
+ *  @param symbol The symbol to send when this menu item is selected
+ *  @param menu_name The name of the menu item (see layAbstractMenu.h)
+ *  @param insert_pos The position where to insert (see layAbstractMenu.h)
+ *  @param title The title to display plus optional icon resource and keyboard shortcut. The format of the string is: <text>["("shortcut")"]["<"icon-resource">"][{"tool-tip"}].
+ */
+LAYBASIC_PUBLIC MenuEntry menu_item (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &title);
+
+/**
+ *  @brief Creates a menu entry as a linked copy from another one
+ *
+ *  @param symbol The symbol to send when this menu item is selected
+ *  @param menu_name The name of the menu item (see layAbstractMenu.h)
+ *  @param insert_pos The position where to insert (see layAbstractMenu.h)
+ *  @param copy_from The path of the item where to copy from (must exist)
+ */
+LAYBASIC_PUBLIC MenuEntry menu_item_copy (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &copy_from);
+
+/**
+ *  @brief Creates a submenu entry
+ *
+ *  @param menu_name The name of the menu item (see layAbstractMenu.h)
+ *  @param insert_pos The position where to insert (see layAbstractMenu.h)
+ *  @param title The title to display plus optional icon resource and keyboard shortcut. The format of the string is: <text>["("shortcut")"]["<"icon-resource">"][{"tool-tip"}].
+ */
+LAYBASIC_PUBLIC MenuEntry submenu (const std::string &menu_name, const std::string &insert_pos, const std::string &title);
+
+/**
+ *  @brief Creates a submenu entry
+ *
+ *  @param symbol The symbol to send when this menu item is selected
+ *  @param menu_name The name of the menu item (see layAbstractMenu.h)
+ *  @param insert_pos The position where to insert (see layAbstractMenu.h)
+ *  @param title The title to display plus optional icon resource and keyboard shortcut. The format of the string is: <text>["("shortcut")"]["<"icon-resource">"][{"tool-tip"}].
+ */
+LAYBASIC_PUBLIC MenuEntry submenu (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &title);
+
+/**
+ *  @brief Creates a configuration entry
+ *
+ *  @param menu_name The name of the menu item (see layAbstractMenu.h)
+ *  @param insert_pos The position where to insert (see layAbstractMenu.h)
+ *  @param title The title to display plus optional icon resource and keyboard shortcut. The format of the string is: <text>["("shortcut")"]["<"icon-resource">"][{"tool-tip"}].
+ *  @param cname The name of the configuration item
+ *  @param cvalue The value to set for the configuration item (optional for boolean configuration items)
+ */
+LAYBASIC_PUBLIC MenuEntry config_menu_item (const std::string &menu_name, const std::string &insert_pos, const std::string &title, const std::string &cname, const std::string &cvalue = std::string ());
 
 /**
  *  @brief The configuration declaration
@@ -238,7 +279,7 @@ public:
    *  Reimplementation of this method offers a chance to initialize static resources such as 
    *  dialogs etc.
    */
-  virtual void initialize (lay::PluginRoot * /*root*/)
+  virtual void initialize (lay::Dispatcher * /*dispatcher*/)
   {
     //  .. the default implementation does nothing ..
   }
@@ -251,7 +292,7 @@ public:
    *  While initialize is called before any configuration is loaded, "initialized" will be
    *  called after the pugin system has been initially configured.
    */
-  virtual void initialized (lay::PluginRoot * /*root*/)
+  virtual void initialized (lay::Dispatcher * /*dispatcher*/)
   {
     //  .. the default implementation does nothing ..
   }
@@ -259,7 +300,7 @@ public:
   /**
    *  @brief Uninitialize the plugin
    */
-  virtual void uninitialize (lay::PluginRoot * /*root*/)
+  virtual void uninitialize (lay::Dispatcher * /*dispatcher*/)
   {
     //  .. the default implementation does nothing ..
   }
@@ -270,7 +311,7 @@ public:
    *  If the plugin wants to prevent the application from closing, it may return false
    *  in this method.
    */
-  virtual bool can_exit (lay::PluginRoot * /*root*/) const
+  virtual bool can_exit (lay::Dispatcher * /*dispatcher*/) const
   {
     return true;
   }
@@ -292,7 +333,7 @@ public:
    *  This method may return 0 for "dummy" plugins that just register menu entries
    *  or configuration options.
    */
-  virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::PluginRoot * /*plugin_root*/, lay::LayoutView * /*view*/) const
+  virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::Dispatcher * /*dispatcher*/, lay::LayoutView * /*view*/) const
   {
     return 0;
   }
@@ -321,6 +362,17 @@ public:
   virtual bool implements_mouse_mode (std::string & /*title*/) const
   {
     return false;
+  }
+
+  /**
+   *  @brief Specifies the primary mouse modes
+   *
+   *  These are built-in modes from the LayoutView. This method is intended for
+   *  the LayoutView's standard modes only.
+   */
+  virtual void implements_primary_mouse_modes (std::vector<std::pair<std::string, std::pair<std::string, int> > > & /*modes*/)
+  {
+    //  .. nothing yet ..
   }
   
   /**
@@ -354,14 +406,22 @@ public:
    *  @brief Creates the menu resources for this plugin
    *
    *  This method will create the menu resources for the plugin and perform the 
-   *  required connect operations.
+   *  required connect operations. The dispatcher provides the menu and the
+   *  event endpoints.
    */
-  void init_menu ();
+  void init_menu (lay::Dispatcher *dispatcher);
+
+  /**
+   *  @brief Gets the available menu symbols from all plugins
+   *
+   *  This does not mean all symbols will be available.
+   */
+  static std::vector<std::string> menu_symbols ();
 
   /**
    *  @brief Removes the menu resources associated with this plugin
    */
-  void remove_menu_items ();
+  void remove_menu_items (lay::Dispatcher *dispatcher);
 
   /**
    *  @brief Enables this editable part of the plugin
@@ -397,7 +457,7 @@ public:
   }
 
   /**
-   *  @brief Notifies that plugin root that a new plugin was registered
+   *  @brief Notifies that dispatcher that a new plugin was registered
    *
    *  This method must be called when a plugin is dynamically created. It is important
    *  that when this method is called, the menu items and other properties are set already. 
@@ -411,14 +471,12 @@ public:
 
 private slots:
   void toggle_editable_enabled ();
-  void generic_menu ();
-  void mode_triggered ();
 
 private:
   int m_id;
-  std::vector <lay::Action> m_menu_actions;
-  lay::Action m_editable_mode_action;
-  lay::Action m_mouse_mode_action;
+  tl::weak_ptr<lay::Action> mp_editable_mode_action;
+  tl::weak_ptr<lay::Action> mp_mouse_mode_action;
+  tl::weak_collection<lay::Action> m_menu_actions;
   bool m_editable_enabled;
 };
 
@@ -634,17 +692,17 @@ public:
   void get_config_names (std::vector<std::string> &names) const;
 
   /**
-   *  @brief Gets the plugin root (the parent plugin not having another parent)
+   *  @brief Gets the dispatcher (the top level end of the plugin chain)
    *  The returned pointer is guaranteed to be non-zero.
    */
-  PluginRoot *plugin_root ();
+  Dispatcher *dispatcher ();
 
   /**
-   *  @brief Gets the plugin root (the parent plugin not having another parent)
+   *  @brief Gets the dispatcher (the top level end of the plugin chain)
    *  This version may return null, if the plugin is instantiated without a
    *  root.
    */
-  PluginRoot *plugin_root_maybe_null ();
+  Dispatcher *dispatcher_maybe_null ();
 
   /**
    *  @brief Menu command handler
@@ -791,78 +849,6 @@ private:
 };
 
 /**
- *  @brief The plugin root element
- *
- *  The first (root) object must be derived from this class.
- *  This class offers the full "plugin" functionality like 
- *  configuration interface etc. but cannot have a parent.
- */
-
-class LAYBASIC_PUBLIC PluginRoot
-  : public Plugin
-{
-public:
-  /**
-   *  @brief The constructor
-   */
-  PluginRoot (bool standalone = false);
-
-  /**
-   *  @brief Destructor
-   */
-  ~PluginRoot ();
-
-  /**
-   *  @brief Write configuration to a file
-   *
-   *  If the configuration file cannot be written, false
-   *  is returned but no exception is thrown.
-   *
-   *  @return false, if an error occurred.
-   */
-  bool write_config (const std::string &config_file);
-
-  /**
-   *  @brief Read the configuration from a file
-   *
-   *  This method siletly does nothing, if the config file does not
-   *  exist. If it does and an error occurred, the error message is printed
-   *  on stderr. In both cases, false is returned.
-   *
-   *  @return false, if an error occurred.
-   */
-  bool read_config (const std::string &config_file);
-
-  /**
-   *  @brief The singleton instance of the plugin root
-   */
-  static PluginRoot *instance ();
-
-  /**
-   *  @brief Notifies the plugin root that a new plugin class has been registered
-   *
-   *  This method is called when a plugin is loaded dynamically during runtime.
-   */
-  virtual void plugin_registered (lay::PluginDeclaration * /*cls*/) { }
-
-  /**
-   *  @brief Notifies the plugin root that a plugin class is about to be removed
-   */
-  virtual void plugin_removed (lay::PluginDeclaration * /*cls*/) { }
-
-  /**
-   *  @brief Selects the given mode 
-   *
-   *  The implementation is supposed to select the given mode on all related plugins.
-   */
-  virtual void select_mode (int /*mode*/) { }
-
-private:
-  PluginRoot (const PluginRoot &);
-  PluginRoot &operator= (const PluginRoot &);
-};
-
-/**
  *  @brief A handy function for implementing the configure method
  *
  *  This template compares two values and overwrites the target
@@ -885,11 +871,6 @@ inline bool test_and_set (T &target, const T &source)
 
 namespace tl
 {
-  //  disable copy ctor for PluginRoot
-  template <> struct type_traits<lay::PluginRoot> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-  };
-
   //  disable copy ctor for Plugin
   template <> struct type_traits<lay::Plugin> : public type_traits<void> {
     typedef tl::false_tag has_copy_constructor;

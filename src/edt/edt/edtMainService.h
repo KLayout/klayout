@@ -38,7 +38,7 @@
 #include <vector>
 
 namespace lay {
-  class PluginRoot;
+  class Dispatcher;
   class FlattenInstOptionsDialog;
 }
 
@@ -63,7 +63,7 @@ public:
   /**
    *  @brief The constructor
    */
-  MainService (db::Manager *manager, lay::LayoutView *view, lay::PluginRoot *root);
+  MainService (db::Manager *manager, lay::LayoutView *view, lay::Dispatcher *root);
 
   /**
    *  @brief The destructor
@@ -196,7 +196,7 @@ public:
 private:
   //  The layout view that this service is attached to
   lay::LayoutView *mp_view;
-  lay::PluginRoot *mp_root;
+  lay::Dispatcher *mp_root;
   bool m_needs_update;
 
   //  options 

@@ -24,7 +24,6 @@
 #include "layBookmarksView.h"
 #include "layLayoutView.h"
 #include "layAbstractMenu.h"
-#include "layAbstractMenuProvider.h"
 
 #include "laybasicConfig.h"
 
@@ -135,26 +134,6 @@ BookmarksView::follow_selection (bool f)
 }
 
 void
-BookmarksView::init_menu (lay::AbstractMenu &menu)
-{
-  MenuLayoutEntry context_menu [] = {
-    MenuLayoutEntry ("follow_selection",     tl::to_string (QObject::tr ("Follow Selection")),    std::make_pair (cfg_bookmarks_follow_selection, "?")),
-    MenuLayoutEntry::separator ("ops_group"),
-    MenuLayoutEntry ("manage_bookmarks",     tl::to_string (QObject::tr ("Manage Bookmarks")),    SLOT (cm_manage_bookmarks ())),
-    MenuLayoutEntry ("load_bookmarks",       tl::to_string (QObject::tr ("Load Bookmarks")),      SLOT (cm_load_bookmarks ())),
-    MenuLayoutEntry ("save_bookmarks",       tl::to_string (QObject::tr ("Save Bookmarks")),      SLOT (cm_save_bookmarks ())),
-    MenuLayoutEntry::last ()
-  };
-
-  MenuLayoutEntry main_menu [] = {
-    MenuLayoutEntry ("@bookmarks_context_menu", "", context_menu),
-    MenuLayoutEntry::last ()
-  };
-
-  menu.init (main_menu);
-}
-
-void
 BookmarksView::set_background_color (QColor c)
 {
   QPalette pl (mp_bookmarks->palette ());
@@ -182,11 +161,9 @@ BookmarksView::refresh ()
 void
 BookmarksView::context_menu (const QPoint &p)
 {
-  tl_assert (lay::AbstractMenuProvider::instance () != 0);
-
   QListView *bm_list = dynamic_cast<QListView *> (sender ());
   if (bm_list) {
-    QMenu *ctx_menu = lay::AbstractMenuProvider::instance ()->menu ()->detached_menu ("bookmarks_context_menu");
+    QMenu *ctx_menu = mp_view->menu ()->detached_menu ("bookmarks_context_menu");
     ctx_menu->exec (bm_list->mapToGlobal (p));
   }
 }
@@ -206,6 +183,31 @@ BookmarksView::bookmark_triggered (const QModelIndex &index)
     mp_view->goto_view (mp_view->bookmarks ().state (index.row ()));
   }
 }
+
+// ------------------------------------------------------------
+//  Declaration of the "plugin" for the menu entries
+
+class BookmarksViewPluginDeclaration
+  : public lay::PluginDeclaration
+{
+public:
+  virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
+  {
+    std::string at;
+
+    at = ".end";
+    menu_entries.push_back (lay::submenu ("@bookmarks_context_menu", at, std::string ()));
+
+    at = "@bookmarks_context_menu.end";
+    menu_entries.push_back (lay::config_menu_item ("follow_selection", at, tl::to_string (QObject::tr ("Follow Selection")), cfg_bookmarks_follow_selection, "?")),
+    menu_entries.push_back (lay::separator ("ops_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_manage_bookmarks", "manage_bookmarks", at, tl::to_string (QObject::tr ("Manage Bookmarks"))));
+    menu_entries.push_back (lay::menu_item ("cm_load_bookmarks", "load_bookmarks", at, tl::to_string (QObject::tr ("Load Bookmarks"))));
+    menu_entries.push_back (lay::menu_item ("cm_save_bookmarks", "save_bookmarks", at, tl::to_string (QObject::tr ("Save Bookmarks"))));
+  }
+};
+
+static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new BookmarksViewPluginDeclaration (), -7, "BookmarksViewPlugin");
 
 }
 

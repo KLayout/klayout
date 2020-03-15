@@ -44,7 +44,7 @@ namespace Ui
 namespace lay
 {
   class PluginDeclaration;
-  class PluginRoot;
+  class Dispatcher;
   class Plugin;
 }
 
@@ -92,7 +92,7 @@ class EditorOptionsPages
 Q_OBJECT
 
 public:
-  EditorOptionsPages (const std::vector<edt::EditorOptionsPage *> &pages, lay::PluginRoot *root);
+  EditorOptionsPages (const std::vector<edt::EditorOptionsPage *> &pages, lay::Dispatcher *root);
   ~EditorOptionsPages ();
 
   void unregister_page (edt::EditorOptionsPage *page);
@@ -106,7 +106,7 @@ public slots:
 private:
   std::vector <edt::EditorOptionsPage *> m_pages;
   Ui::EditorOptionsDialog *mp_ui;
-  lay::PluginRoot *mp_root;
+  lay::Dispatcher *mp_root;
 
   void update (edt::EditorOptionsPage *page);
   void do_apply ();
@@ -195,7 +195,7 @@ class EditorOptionsInst
 Q_OBJECT 
 
 public:
-  EditorOptionsInst (lay::PluginRoot *root);
+  EditorOptionsInst (lay::Dispatcher *root);
   ~EditorOptionsInst ();
 
   virtual QWidget *q_frame () { return this; }
@@ -214,7 +214,7 @@ public slots:
 
 private:
   Ui::EditorOptionsInst *mp_ui;
-  lay::PluginRoot *mp_root;
+  lay::Dispatcher *mp_root;
   edt::PCellParametersPage *mp_pcell_parameters;
   int m_cv_index;
 

@@ -130,6 +130,26 @@ public:
     return manager () && manager ()->replaying ();
   }
 
+  /**
+   *  @brief Begins a transaction (same as calling manager ()->transaction (), but safe against null manager ())
+   */
+  void transaction (const std::string &description, db::Manager::transaction_id_t join_with = 0)
+  {
+    if (manager ()) {
+      manager ()->transaction (description, join_with);
+    }
+  }
+
+  /**
+   *  @brief Ends a transaction (same as calling manager ()->commit (), but safe against null manager ())
+   */
+  void commit ()
+  {
+    if (manager ()) {
+      manager ()->commit ();
+    }
+  }
+
 private:
   db::Manager::ident_t m_id;
   db::Manager *mp_manager;

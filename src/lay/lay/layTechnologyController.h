@@ -54,9 +54,9 @@ public:
    */
   TechnologyController ();
 
-  void initialize (lay::PluginRoot *root);
-  void initialized (lay::PluginRoot *root);
-  void uninitialize (lay::PluginRoot *root);
+  void initialize (lay::Dispatcher *root);
+  void initialized (lay::Dispatcher *root);
+  void uninitialize (lay::Dispatcher *root);
 
   void get_options (std::vector < std::pair<std::string, std::string> > &options) const;
   void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const;
@@ -125,14 +125,14 @@ private slots:
   void sync_with_external_sources ();
 
 private:
-  tl::stable_vector <lay::Action> m_tech_actions;
+  std::vector <lay::Action *> m_tech_actions;
   std::string m_current_technology;
   bool m_configure_enabled;
   bool m_current_technology_updated;
   bool m_technologies_configured;
   lay::TechSetupDialog *mp_editor;
   lay::MainWindow *mp_mw;
-  lay::PluginRoot *mp_plugin_root;
+  lay::Dispatcher *mp_dispatcher;
   std::vector<std::string> m_paths;
   std::vector<db::Technology> m_temp_tech;
   db::Technology *mp_active_technology;
@@ -144,8 +144,8 @@ private:
   bool configure (const std::string &name, const std::string &value);
   void config_finalize ();
   bool menu_activated (const std::string &symbol) const;
-  void update_current_technology ();
-  void update_menu ();
+  void update_current_technology (Dispatcher *dispatcher);
+  void update_menu (lay::Dispatcher *dispatcher);
   void replace_technologies (const db::Technologies &technologies);
 };
 

@@ -228,7 +228,7 @@ public:
 
   std::string description () const
   {
-    return ruby2c<std::string> (rba_safe_obj_as_string (m_obj));
+    return ruby2c<std::string> (rba_safe_inspect (m_obj));
   }
 
   VALUE rb_key (size_t index) const
@@ -357,7 +357,7 @@ public:
 
   std::string description () const
   {
-    return ruby2c<std::string> (rba_safe_obj_as_string (m_obj));
+    return ruby2c<std::string> (rba_safe_inspect (m_obj));
   }
 
   virtual std::string key (size_t index) const

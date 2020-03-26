@@ -2665,7 +2665,12 @@ PythonModule::make_classes (const char *mod_name)
 
             //  The str method is also routed via the tp_str implementation
             alt_names.push_back ("__str__");
-            if (! has_inspect) {
+#if GSI_ALIAS_INSPECT
+            bool alias_inspect = ! has_inspect;
+#else
+            bool alias_inspect = false;
+#endif
+            if (alias_inspect) {
               add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is also available as 'str(object)' and 'repr(object)'")));
               alt_names.push_back ("__repr__");
             } else {

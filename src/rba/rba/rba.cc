@@ -1632,7 +1632,7 @@ rba_init (RubyInterpreterPrivateData *d)
       }
 
       if (mt->name (mid) == "to_s") {
-#if HAVE_RUBY_VERSION_CODE>=20000
+#if HAVE_RUBY_VERSION_CODE>=20000 && defined(GSI_ALIAS_INSPECT)
       //  Ruby 2.x does no longer alias "inspect" to "to_s" automatically, so we have to do this:
         rb_define_alias (klass, "inspect", "to_s");
 #endif

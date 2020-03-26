@@ -26,6 +26,8 @@
 
 #include "tlStream.h"
 #include "tlUniqueName.h"
+#include "tlTimer.h"
+#include "tlLog.h"
 
 #include <sstream>
 #include <set>
@@ -244,6 +246,8 @@ void NetlistSpiceWriter::set_with_comments (bool with_comments)
 
 void NetlistSpiceWriter::write (tl::OutputStream &stream, const db::Netlist &netlist, const std::string &description)
 {
+  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Writing netlist ")) + stream.path ());
+
   mp_stream = &stream;
   mp_netlist = &netlist;
   mp_delegate->attach_writer (this);

@@ -1334,7 +1334,7 @@ CODE
     
     def src_line
       cc = caller.find do |c|
-        c !~ /drc.lym:/ && c !~ /\(eval\)/
+        c !~ /drc.lym:/ && c !~ /_drc_\w+\.rb:/ && c !~ /\(eval\)/
       end
       if cc =~ /(.*)\s*:\s*(\d+)\s*:\s*in.*$/
         return File::basename($1) + ":" + $2

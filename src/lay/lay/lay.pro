@@ -89,7 +89,6 @@ FORMS = \
     SearchPropertiesText.ui \
     SearchReplaceConfigPage.ui \
     SearchReplaceDialog.ui \
-    SelectCellViewForm.ui \
     SettingsForm.ui \
     TechBaseEditorPage.ui \
     TechComponentSetupDialog.ui \
@@ -136,7 +135,6 @@ SOURCES = \
     laySearchReplaceDialog.cc \
     laySearchReplacePlugin.cc \
     laySearchReplacePropertiesWidgets.cc \
-    laySelectCellViewForm.cc \
     laySession.cc \
     laySettingsForm.cc \
     layTechSetupDialog.cc \

@@ -11,9 +11,9 @@
 The layer object represents a collection of polygons, edges or edge pairs.
 </p>
 <h2-index/>
-<h2>"&amp;" - Boolean AND operation</h2>
+<a name="&amp;"/><h2>"&amp;" - Boolean AND operation</h2>
 <keyword name="&amp;"/>
-<a name="&amp;"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>self &amp; other</tt></li>
 </ul>
@@ -23,9 +23,9 @@ The method computes a boolean AND between self and other.
 This method is available for polygon and edge layers. An alias
 is "<a href="#and">and</a>". See there for a description of the function.
 </p>
-<h2>"+" - Join layers</h2>
+<a name="+"/><h2>"+" - Join layers</h2>
 <keyword name="+"/>
-<a name="+"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>self + other</tt></li>
 </ul>
@@ -36,9 +36,9 @@ The "+" operator is an alias for the <a href="#join">join</a> method.
 This method is available for polygon, edge and edge pair layers. An alias
 is "<a href="#join">join</a>". See there for a description of the function.
 </p>
-<h2>"-" - Boolean NOT operation</h2>
+<a name="-"/><h2>"-" - Boolean NOT operation</h2>
 <keyword name="-"/>
-<a name="-"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>self - other</tt></li>
 </ul>
@@ -48,9 +48,9 @@ The method computes a boolean NOT between self and other.
 This method is available for polygon and edge layers. An alias
 is "<a href="#not">not</a>". See there for a description of the function.
 </p>
-<h2>"^" - Boolean XOR operation</h2>
+<a name="^"/><h2>"^" - Boolean XOR operation</h2>
 <keyword name="^"/>
-<a name="^"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>self ^ other</tt></li>
 </ul>
@@ -60,9 +60,9 @@ The method computes a boolean XOR between self and other.
 This method is available for polygon and edge layers. An alias
 is "<a href="#xor">xor</a>". See there for a description of the function.
 </p>
-<h2>"and" - Boolean AND operation</h2>
+<a name="and"/><h2>"and" - Boolean AND operation</h2>
 <keyword name="and"/>
-<a name="and"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.and(other)</tt></li>
 </ul>
@@ -86,9 +86,9 @@ on polygons and edges (layer1: red, layer2: blue):
 </tr>
 </table>
 </p>
-<h2>"area" - Returns the total area of the polygons in the region</h2>
+<a name="area"/><h2>"area" - Returns the total area of the polygons in the region</h2>
 <keyword name="area"/>
-<a name="area"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.area</tt></li>
 </ul>
@@ -101,9 +101,9 @@ polygons are not counted twice.
 </p><p>
 The returned value gives the area in square micrometer units.
 </p>
-<h2>"bbox" - Returns the overall bounding box of the layer</h2>
+<a name="bbox"/><h2>"bbox" - Returns the overall bounding box of the layer</h2>
 <keyword name="bbox"/>
-<a name="bbox"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.bbox</tt></li>
 </ul>
@@ -111,9 +111,9 @@ The returned value gives the area in square micrometer units.
 The return value is a <class_doc href="DBox">DBox</class_doc> object giving the bounding box in 
 micrometer units. 
 </p>
-<h2>"centers" - Returns the center parts of the edges</h2>
+<a name="centers"/><h2>"centers" - Returns the center parts of the edges</h2>
 <keyword name="centers"/>
-<a name="centers"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.centers(length)</tt></li>
 <li><tt>layer.centers(length, fraction)</tt></li>
@@ -132,9 +132,9 @@ The following images show the effect of the method:
 </tr>
 </table>
 </p>
-<h2>"clean" - Marks a layer as clean</h2>
+<a name="clean"/><h2>"clean" - Marks a layer as clean</h2>
 <keyword name="clean"/>
-<a name="clean"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.clean</tt></li>
 </ul>
@@ -148,9 +148,9 @@ Clean state is the default.
 See <a href="#raw">raw</a> for some remarks about how this state is 
 propagated.
 </p>
-<h2>"collect" - Transforms a layer</h2>
+<a name="collect"/><h2>"collect" - Transforms a layer</h2>
 <keyword name="collect"/>
-<a name="collect"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.collect { |object| ... }</tt></li>
 </ul>
@@ -182,9 +182,9 @@ t = <class_doc href="DCplxTrans">DCplxTrans</class_doc>(1.0, 45.0, false, <class
 new_layer = layer.collect { |polygon| polygon.transformed(t) }
 </pre>
 </p>
-<h2>"collect_to_edge_pairs" - Transforms a layer into edge pair objects</h2>
+<a name="collect_to_edge_pairs"/><h2>"collect_to_edge_pairs" - Transforms a layer into edge pair objects</h2>
 <keyword name="collect_to_edge_pairs"/>
-<a name="collect_to_edge_pairs"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.collect { |object| ... }</tt></li>
 </ul>
@@ -192,9 +192,9 @@ new_layer = layer.collect { |polygon| polygon.transformed(t) }
 This method is similar to <a href="#collect">collect</a>, but creates an edge pair layer. It expects the block to 
 deliver <class_doc href="EdgePair">EdgePair</class_doc>, <class_doc href="DEdgePair">DEdgePair</class_doc> or <class_doc href="EdgePairs">EdgePairs</class_doc> objects.
 </p>
-<h2>"collect_to_edges" - Transforms a layer into edge objects</h2>
+<a name="collect_to_edges"/><h2>"collect_to_edges" - Transforms a layer into edge objects</h2>
 <keyword name="collect_to_edges"/>
-<a name="collect_to_edges"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.collect { |object| ... }</tt></li>
 </ul>
@@ -203,9 +203,9 @@ This method is similar to <a href="#collect">collect</a>, but creates an edge la
 deliver objects that can be converted into edges. If polygon-like objects are returned, their
 contours will be turned into edge sequences.
 </p>
-<h2>"collect_to_region" - Transforms a layer into polygon objects</h2>
+<a name="collect_to_region"/><h2>"collect_to_region" - Transforms a layer into polygon objects</h2>
 <keyword name="collect_to_region"/>
-<a name="collect_to_region"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.collect { |object| ... }</tt></li>
 </ul>
@@ -214,9 +214,9 @@ This method is similar to <a href="#collect">collect</a>, but creates a polygon 
 deliver objects that can be converted into polygons. Such objects are of class <class_doc href="DPolygon">DPolygon</class_doc>,
 <class_doc href="DBox">DBox</class_doc>, <class_doc href="DPath">DPath</class_doc>, <class_doc href="Polygon">Polygon</class_doc>, <class_doc href="Path">Path</class_doc>, <class_doc href="Box">Box</class_doc> and <class_doc href="Region">Region</class_doc>.
 </p>
-<h2>"corners" - Selects corners of polygons</h2>
+<a name="corners"/><h2>"corners" - Selects corners of polygons</h2>
 <keyword name="corners"/>
-<a name="corners"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.corners([ options ])</tt></li>
 <li><tt>layer.corners(angle, [ options ])</tt></li>
@@ -247,9 +247,9 @@ The following images show the effect of this method:
 </tr>
 </table>
 </p>
-<h2>"data" - Gets the low-level data object</h2>
+<a name="data"/><h2>"data" - Gets the low-level data object</h2>
 <keyword name="data"/>
-<a name="data"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.data</tt></li>
 </ul>
@@ -259,9 +259,9 @@ representing the underlying RBA object for the data.
 Access to these objects is provided to support low-level iteration and manipulation
 of the layer's data. 
 </p>
-<h2>"dup" - Duplicates a layer</h2>
+<a name="dup"/><h2>"dup" - Duplicates a layer</h2>
 <keyword name="dup"/>
-<a name="dup"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.dup</tt></li>
 </ul>
@@ -276,9 +276,9 @@ layer. Using the dup method will avoid that.
 However, dup will double the memory required to hold the data 
 and performing the deep copy may be expensive in terms of CPU time.
 </p>
-<h2>"each" - Iterates over the objects from the layer</h2>
+<a name="each"/><h2>"each" - Iterates over the objects from the layer</h2>
 <keyword name="each"/>
-<a name="each"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.each { |object| ... }</tt></li>
 </ul>
@@ -289,15 +289,15 @@ layer type, these objects are of <class_doc href="DPolygon">DPolygon</class_doc>
 Because this method executes inside the interpreter, it's inherently slow. Tiling does not
 apply to this method.
 </p>
-<h2>"edge_pairs?" - Returns true, if the layer is an edge pair collection</h2>
+<a name="edge_pairs?"/><h2>"edge_pairs?" - Returns true, if the layer is an edge pair collection</h2>
 <keyword name="edge_pairs?"/>
-<a name="edge_pairs?"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.edge_pairs?</tt></li>
 </ul>
-<h2>"edges" - Decomposes the layer into single edges</h2>
+<a name="edges"/><h2>"edges" - Decomposes the layer into single edges</h2>
 <keyword name="edges"/>
-<a name="edges"/><p>
+<p>
 Edge pair collections are decomposed into the individual edges that make up
 the edge pairs. Polygon layers are decomposed into the edges making up the 
 polygons. This method returns an edge layer but will not modify the layer it 
@@ -306,24 +306,24 @@ is called on.
 Merged semantics applies, i.e. the result reflects merged polygons rather than
 individual ones unless raw mode is chosen.
 </p>
-<h2>"edges?" - Returns true, if the layer is an edge layer</h2>
+<a name="edges?"/><h2>"edges?" - Returns true, if the layer is an edge layer</h2>
 <keyword name="edges?"/>
-<a name="edges?"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.edges?</tt></li>
 </ul>
-<h2>"enc" - An alias for "enclosing"</h2>
+<a name="enc"/><h2>"enc" - An alias for "enclosing"</h2>
 <keyword name="enc"/>
-<a name="enc"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.enc(value [, options])</tt></li>
 </ul>
 <p>
 See <a href="#enclosing">enclosing</a> for a description of that method
 </p>
-<h2>"enclosing" - An enclosing check</h2>
+<a name="enclosing"/><h2>"enclosing" - An enclosing check</h2>
 <keyword name="enclosing"/>
-<a name="enclosing"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.enclosing(other_layer, value [, options])</tt></li>
 </ul>
@@ -354,9 +354,9 @@ The following images show the effect of two enclosing checks (red: input1, blue:
 </tr>
 </table>
 </p>
-<h2>"end_segments" - Returns the part at the end of each edge</h2>
+<a name="end_segments"/><h2>"end_segments" - Returns the part at the end of each edge</h2>
 <keyword name="end_segments"/>
-<a name="end_segments"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.end_segments(length)</tt></li>
 <li><tt>layer.end_segments(length, fraction)</tt></li>
@@ -388,9 +388,9 @@ The following images show the effect of the method:
 </tr>
 </table>
 </p>
-<h2>"extended" - Returns polygons describing an area along the edges of the input</h2>
+<a name="extended"/><h2>"extended" - Returns polygons describing an area along the edges of the input</h2>
 <keyword name="extended"/>
-<a name="extended"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.extended([:begin =&gt; b,] [:end =&gt; e,] [:out =&gt; o,] [:in =&gt; i], [:joined =&gt; true])</tt></li>
 <li><tt>layer.extended(b, e, o, i)</tt></li>
@@ -423,9 +423,9 @@ The following images show the effects of some parameters:
 </tr>
 </table>
 </p>
-<h2>"extended_in" - Returns polygons describing an area along the edges of the input</h2>
+<a name="extended_in"/><h2>"extended_in" - Returns polygons describing an area along the edges of the input</h2>
 <keyword name="extended_in"/>
-<a name="extended_in"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.extended_in(d)</tt></li>
 </ul>
@@ -437,9 +437,9 @@ This method is basically equivalent to the <a href="#extended">extended</a> meth
 "extended(0, 0, 0, dist)".
 A version extending to the outside is <a href="#extended_out">extended_out</a>.
 </p>
-<h2>"extended_out" - Returns polygons describing an area along the edges of the input</h2>
+<a name="extended_out"/><h2>"extended_out" - Returns polygons describing an area along the edges of the input</h2>
 <keyword name="extended_out"/>
-<a name="extended_out"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.extended_out(d)</tt></li>
 </ul>
@@ -451,9 +451,9 @@ This method is basically equivalent to the <a href="#extended">extended</a> meth
 "extended(0, 0, dist, 0)".
 A version extending to the inside is <a href="#extended_in">extended_in</a>.
 </p>
-<h2>"extent_refs" - Returns partial references to the boundings boxes of the polygons</h2>
+<a name="extent_refs"/><h2>"extent_refs" - Returns partial references to the boundings boxes of the polygons</h2>
 <keyword name="extent_refs"/>
-<a name="extent_refs"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.extent_refs(fx, fy [, options ])</tt></li>
 <li><tt>layer.extent_refs(fx1, fy1, fx2, fx2 [, options ])</tt></li>
@@ -547,9 +547,9 @@ The following table shows a few applications:
 </tr>
 </table>
 </p>
-<h2>"extents" - Returns the bounding box of each input object</h2>
+<a name="extents"/><h2>"extents" - Returns the bounding box of each input object</h2>
 <keyword name="extents"/>
-<a name="extents"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.extents([ enlargement ])</tt></li>
 </ul>
@@ -574,9 +574,9 @@ The following images show the effect of the extents method:
 </tr>
 </table>
 </p>
-<h2>"first_edges" - Returns the first edges of an edge pair collection</h2>
+<a name="first_edges"/><h2>"first_edges" - Returns the first edges of an edge pair collection</h2>
 <keyword name="first_edges"/>
-<a name="first_edges"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.first_edges</tt></li>
 </ul>
@@ -584,9 +584,9 @@ The following images show the effect of the extents method:
 Applies to edge pair collections only.
 Returns the first edges of the edge pairs in the collection.
 </p>
-<h2>"flatten" - Flattens the layer</h2>
+<a name="flatten"/><h2>"flatten" - Flattens the layer</h2>
 <keyword name="flatten"/>
-<a name="flatten"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.flatten</tt></li>
 </ul>
@@ -596,9 +596,9 @@ If the layer is a hierarchical layer (an original layer or
 a derived layer in deep mode), this method will convert it
 to a flat collection of polygons, edges or edge pairs.
 </p>
-<h2>"holes" - Selects all polygon holes from the input</h2>
+<a name="holes"/><h2>"holes" - Selects all polygon holes from the input</h2>
 <keyword name="holes"/>
-<a name="holes"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.holes</tt></li>
 </ul>
@@ -616,9 +616,9 @@ The following image shows the effects of the holes method:
 </tr>
 </table>
 </p>
-<h2>"hulls" - Selects all polygon hulls from the input</h2>
+<a name="hulls"/><h2>"hulls" - Selects all polygon hulls from the input</h2>
 <keyword name="hulls"/>
-<a name="hulls"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.hulls</tt></li>
 </ul>
@@ -636,9 +636,9 @@ The following image shows the effects of the hulls method:
 </tr>
 </table>
 </p>
-<h2>"in" - Selects shapes or regions of self which are contained in the other layer</h2>
+<a name="in"/><h2>"in" - Selects shapes or regions of self which are contained in the other layer</h2>
 <keyword name="in"/>
-<a name="in"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.in(other)</tt></li>
 </ul>
@@ -661,9 +661,9 @@ The following image shows the effect of the "in" method (input1: red, input2: bl
 </tr>
 </table>
 </p>
-<h2>"insert" - Inserts one or many objects into the layer</h2>
+<a name="insert"/><h2>"insert" - Inserts one or many objects into the layer</h2>
 <keyword name="insert"/>
-<a name="insert"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>insert(object, object ...)</tt></li>
 </ul>
@@ -683,9 +683,9 @@ pl = polygon_layer
 pl.insert(box(0.0, 0.0, 100.0, 200.0)
 </pre>
 </p>
-<h2>"inside" - Selects shapes or regions of self which are inside the other region</h2>
+<a name="inside"/><h2>"inside" - Selects shapes or regions of self which are inside the other region</h2>
 <keyword name="inside"/>
-<a name="inside"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.inside(other)</tt></li>
 </ul>
@@ -708,9 +708,9 @@ The following image shows the effect of the "inside" method (input1: red, input2
 </tr>
 </table>
 </p>
-<h2>"inside_part" - Returns the parts of the edges inside the given region</h2>
+<a name="inside_part"/><h2>"inside_part" - Returns the parts of the edges inside the given region</h2>
 <keyword name="inside_part"/>
-<a name="inside_part"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.inside_part(region)</tt></li>
 </ul>
@@ -727,9 +727,9 @@ This method is available for edge layers. The argument must be a polygon layer.
 </tr>
 </table>
 </p>
-<h2>"interacting" - Selects shapes or regions of self which touch or overlap shapes from the other region</h2>
+<a name="interacting"/><h2>"interacting" - Selects shapes or regions of self which touch or overlap shapes from the other region</h2>
 <keyword name="interacting"/>
-<a name="interacting"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.interacting(other)</tt></li>
 </ul>
@@ -751,9 +751,9 @@ The following image shows the effect of the "interacting" method (input1: red, i
 </tr>
 </table>
 </p>
-<h2>"intersections" - Returns the intersection points of intersecting edge segments for two edge collections</h2>
+<a name="intersections"/><h2>"intersections" - Returns the intersection points of intersecting edge segments for two edge collections</h2>
 <keyword name="intersections"/>
-<a name="intersections"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.intersections(edges)</tt></li>
 </ul>
@@ -764,9 +764,9 @@ degenerated edge objects.
 </p><p>
 This method is available for edge layers. The argument must be an edge layer.
 </p>
-<h2>"is_box?" - Returns true, if the region contains a single box</h2>
+<a name="is_box?"/><h2>"is_box?" - Returns true, if the region contains a single box</h2>
 <keyword name="is_box?"/>
-<a name="is_box?"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.is_box?</tt></li>
 </ul>
@@ -775,30 +775,30 @@ The method returns true, if the region consists of a single box
 only. Merged semantics does not apply - if the region forms a box which
 is composed of multiple pieces, this method will not return true.
 </p>
-<h2>"is_clean?" - Returns true, if the layer is clean state</h2>
+<a name="is_clean?"/><h2>"is_clean?" - Returns true, if the layer is clean state</h2>
 <keyword name="is_clean?"/>
-<a name="is_clean?"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.is_clean?</tt></li>
 </ul>
 <p>
 See <a href="#clean">clean</a> for a discussion of the clean state.
 </p>
-<h2>"is_deep?" - Returns true, if the layer is a deep (hierarchical) layer</h2>
+<a name="is_deep?"/><h2>"is_deep?" - Returns true, if the layer is a deep (hierarchical) layer</h2>
 <keyword name="is_deep?"/>
-<a name="is_deep?"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.is_deep?</tt></li>
 </ul>
-<h2>"is_empty?" - Returns true, if the layer is empty</h2>
+<a name="is_empty?"/><h2>"is_empty?" - Returns true, if the layer is empty</h2>
 <keyword name="is_empty?"/>
-<a name="is_empty?"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.is_empty?</tt></li>
 </ul>
-<h2>"is_merged?" - Returns true, if the polygons of the layer are merged</h2>
+<a name="is_merged?"/><h2>"is_merged?" - Returns true, if the polygons of the layer are merged</h2>
 <keyword name="is_merged?"/>
-<a name="is_merged?"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.is_merged?</tt></li>
 </ul>
@@ -809,27 +809,27 @@ In clean mode, this is ensured implicitly. In raw mode (see <a href="#raw">raw</
 merging can be achieved by using the <a href="#merge">merge</a> method. <a href="#is_merged">is_merged</a>?
 tells, whether calling <a href="#merge">merge</a> is necessary.
 </p>
-<h2>"is_raw?" - Returns true, if the layer is raw state</h2>
+<a name="is_raw?"/><h2>"is_raw?" - Returns true, if the layer is raw state</h2>
 <keyword name="is_raw?"/>
-<a name="is_raw?"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.is_raw?</tt></li>
 </ul>
 <p>
 See <a href="#clean">clean</a> for a discussion of the raw state.
 </p>
-<h2>"iso" - An alias for "isolated"</h2>
+<a name="iso"/><h2>"iso" - An alias for "isolated"</h2>
 <keyword name="iso"/>
-<a name="iso"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.iso(value [, options])</tt></li>
 </ul>
 <p>
 See <a href="#isolated">isolated</a> for a description of that method
 </p>
-<h2>"isolated" - An isolation check</h2>
+<a name="isolated"/><h2>"isolated" - An isolation check</h2>
 <keyword name="isolated"/>
-<a name="isolated"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.isolated(value [, options])</tt></li>
 </ul>
@@ -847,9 +847,9 @@ The following image shows the effect of the isolated check:
 </tr>
 </table>
 </p>
-<h2>"join" - Joins the layer with another layer</h2>
+<a name="join"/><h2>"join" - Joins the layer with another layer</h2>
 <keyword name="join"/>
-<a name="join"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.join(other)</tt></li>
 </ul>
@@ -869,9 +869,9 @@ on polygons and edges (layer1: red, layer2: blue):
 </tr>
 </table>
 </p>
-<h2>"length" - Returns the total length of the edges in the edge layer</h2>
+<a name="length"/><h2>"length" - Returns the total length of the edges in the edge layer</h2>
 <keyword name="length"/>
-<a name="length"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.length</tt></li>
 </ul>
@@ -882,9 +882,9 @@ i.e. before computing the length, the edges are merged unless
 raw mode is chosen (see <a href="#raw">raw</a>). Hence in clean mode (see <a href="#clean">clean</a>), overlapping
 edges are not counted twice.
 </p>
-<h2>"merge" - Merges the layer (modifies the layer)</h2>
+<a name="merge"/><h2>"merge" - Merges the layer (modifies the layer)</h2>
 <keyword name="merge"/>
-<a name="merge"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.merge([overlap_count])</tt></li>
 </ul>
@@ -892,9 +892,9 @@ edges are not counted twice.
 Like <a href="#merged">merged</a>, but modifies the input and returns a reference to the 
 new layer.
 </p>
-<h2>"merged" - Returns the merged layer</h2>
+<a name="merged"/><h2>"merged" - Returns the merged layer</h2>
 <keyword name="merged"/>
-<a name="merged"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.merged([overlap_count])</tt></li>
 </ul>
@@ -923,9 +923,9 @@ The following images show the effect of various forms of the "merged" method:
 </tr>
 </table>
 </p>
-<h2>"middle" - Returns the center points of the bounding boxes of the polygons</h2>
+<a name="middle"/><h2>"middle" - Returns the center points of the bounding boxes of the polygons</h2>
 <keyword name="middle"/>
-<a name="middle"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.middle([ options ])</tt></li>
 </ul>
@@ -949,9 +949,9 @@ The following image shows the effect of this method
 </tr>
 </table>
 </p>
-<h2>"move" - Moves (shifts, translates) a layer (modifies the layer)</h2>
+<a name="move"/><h2>"move" - Moves (shifts, translates) a layer (modifies the layer)</h2>
 <keyword name="move"/>
-<a name="move"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.move(dx, dy)</tt></li>
 </ul>
@@ -962,9 +962,9 @@ upon is modified and the modified version is returned for further processing.
 Shift distances can be given as floating-point values (in micron) or integer values (in
 database units). To explicitly specify the unit, use the unit denominators.
 </p>
-<h2>"moved" - Moves (shifts, translates) a layer</h2>
+<a name="moved"/><h2>"moved" - Moves (shifts, translates) a layer</h2>
 <keyword name="moved"/>
-<a name="moved"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.moved(dx, dy)</tt></li>
 </ul>
@@ -983,9 +983,9 @@ The following images shows the effect of the "moved" method:
 </tr>
 </table>
 </p>
-<h2>"non_rectangles" - Selects all polygons from the input which are not rectangles</h2>
+<a name="non_rectangles"/><h2>"non_rectangles" - Selects all polygons from the input which are not rectangles</h2>
 <keyword name="non_rectangles"/>
-<a name="non_rectangles"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.non_rectangles</tt></li>
 </ul>
@@ -993,9 +993,9 @@ The following images shows the effect of the "moved" method:
 This method is available for polygon layers. By default "merged" semantics applies, 
 i.e. all polygons are merged before non-rectangles are selected (see <a href="#clean">clean</a> and <a href="#raw">raw</a>).
 </p>
-<h2>"non_rectilinear" - Selects all non-rectilinear polygons from the input</h2>
+<a name="non_rectilinear"/><h2>"non_rectilinear" - Selects all non-rectilinear polygons from the input</h2>
 <keyword name="non_rectilinear"/>
-<a name="non_rectilinear"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.non_rectilinear</tt></li>
 </ul>
@@ -1003,9 +1003,9 @@ i.e. all polygons are merged before non-rectangles are selected (see <a href="#c
 This method is available for polygon layers. By default "merged" semantics applies, 
 i.e. all polygons are merged before non-rectilinear polygons are selected (see <a href="#clean">clean</a> and <a href="#raw">raw</a>).
 </p>
-<h2>"non_strict" - Marks a layer for non-strict handling</h2>
+<a name="non_strict"/><h2>"non_strict" - Marks a layer for non-strict handling</h2>
 <keyword name="non_strict"/>
-<a name="non_strict"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.non_strict</tt></li>
 </ul>
@@ -1014,9 +1014,9 @@ See <a href="#strict">strict</a> for details about this option.
 </p><p>
 This feature has been introduced in version 0.23.2.
 </p>
-<h2>"not" - Boolean NOT operation</h2>
+<a name="not"/><h2>"not" - Boolean NOT operation</h2>
 <keyword name="not"/>
-<a name="not"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.not(other)</tt></li>
 </ul>
@@ -1040,9 +1040,9 @@ on polygons and edges (layer1: red, layer2: blue):
 </tr>
 </table>
 </p>
-<h2>"not_in" - Selects shapes or regions of self which are not contained in the other layer</h2>
+<a name="not_in"/><h2>"not_in" - Selects shapes or regions of self which are not contained in the other layer</h2>
 <keyword name="not_in"/>
-<a name="not_in"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.not_in(other)</tt></li>
 </ul>
@@ -1065,9 +1065,9 @@ The following image shows the effect of the "not_in" method (input1: red, input2
 </tr>
 </table>
 </p>
-<h2>"not_inside" - Selects shapes or regions of self which are not inside the other region</h2>
+<a name="not_inside"/><h2>"not_inside" - Selects shapes or regions of self which are not inside the other region</h2>
 <keyword name="not_inside"/>
-<a name="not_inside"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.not_inside(other)</tt></li>
 </ul>
@@ -1090,9 +1090,9 @@ The following image shows the effect of the "not_inside" method (input1: red, in
 </tr>
 </table>
 </p>
-<h2>"not_interacting" - Selects shapes or regions of self which do not touch or overlap shapes from the other region</h2>
+<a name="not_interacting"/><h2>"not_interacting" - Selects shapes or regions of self which do not touch or overlap shapes from the other region</h2>
 <keyword name="not_interacting"/>
-<a name="not_interacting"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.not_interacting(other)</tt></li>
 </ul>
@@ -1114,9 +1114,9 @@ The following image shows the effect of the "not_interacting" method (input1: re
 </tr>
 </table>
 </p>
-<h2>"not_outside" - Selects shapes or regions of self which are not outside the other region</h2>
+<a name="not_outside"/><h2>"not_outside" - Selects shapes or regions of self which are not outside the other region</h2>
 <keyword name="not_outside"/>
-<a name="not_outside"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.not_outside(other)</tt></li>
 </ul>
@@ -1139,9 +1139,9 @@ The following image shows the effect of the "not_outside" method (input1: red, i
 </tr>
 </table>
 </p>
-<h2>"not_overlapping" - Selects shapes or regions of self which do not overlap shapes from the other region</h2>
+<a name="not_overlapping"/><h2>"not_overlapping" - Selects shapes or regions of self which do not overlap shapes from the other region</h2>
 <keyword name="not_overlapping"/>
-<a name="not_overlapping"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.not_overlapping(other)</tt></li>
 </ul>
@@ -1158,9 +1158,9 @@ with respect to other edges or polygons.
 It returns a new layer containing the selected shapes. A version which modifies self
 is <a href="#select_not_overlapping">select_not_overlapping</a>.
 </p>
-<h2>"notch" - An intra-region spacing check</h2>
+<a name="notch"/><h2>"notch" - An intra-region spacing check</h2>
 <keyword name="notch"/>
-<a name="notch"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.notch(value [, options])</tt></li>
 </ul>
@@ -1178,9 +1178,9 @@ The following image shows the effect of the notch check:
 </tr>
 </table>
 </p>
-<h2>"odd_polygons" - Checks for odd polygons (self-overlapping, non-orientable)</h2>
+<a name="odd_polygons"/><h2>"odd_polygons" - Checks for odd polygons (self-overlapping, non-orientable)</h2>
 <keyword name="odd_polygons"/>
-<a name="odd_polygons"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.odd_polygons</tt></li>
 </ul>
@@ -1188,9 +1188,9 @@ The following image shows the effect of the notch check:
 Returns the parts of the polygons which are not orientable (i.e. "8" configuration) or self-overlapping.
 Merged semantics does not apply for this method. Always the raw polygons are taken (see <a href="#raw">raw</a>).
 </p>
-<h2>"ongrid" - Checks for on-grid vertices</h2>
+<a name="ongrid"/><h2>"ongrid" - Checks for on-grid vertices</h2>
 <keyword name="ongrid"/>
-<a name="ongrid"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.ongrid(g)</tt></li>
 <li><tt>layer.ongrid(gx, gy)</tt></li>
@@ -1203,9 +1203,9 @@ When setting the grid to 0, no grid check is performed in that specific directio
 </p><p>
 This method requires a polygon layer. Merged semantics applies (see <a href="#raw">raw</a> and <a href="#clean">clean</a>).
 </p>
-<h2>"or" - Boolean OR operation</h2>
+<a name="or"/><h2>"or" - Boolean OR operation</h2>
 <keyword name="or"/>
-<a name="or"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.or(other)</tt></li>
 </ul>
@@ -1225,9 +1225,9 @@ on polygons and edges (layer1: red, layer2: blue):
 </tr>
 </table>
 </p>
-<h2>"output" - Outputs the content of the layer</h2>
+<a name="output"/><h2>"output" - Outputs the content of the layer</h2>
 <keyword name="output"/>
-<a name="output"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.output(specs)</tt></li>
 </ul>
@@ -1245,9 +1245,9 @@ a single <class_doc href="LayerInfo">LayerInfo</class_doc> object.
 See <a href="/about/drc_ref_global.xml#report">global#report</a> and <a href="/about/drc_ref_global.xml#target">global#target</a> on how to configure output to a target layout
 or report database. 
 </p>
-<h2>"outside" - Selects shapes or regions of self which are outside the other region</h2>
+<a name="outside"/><h2>"outside" - Selects shapes or regions of self which are outside the other region</h2>
 <keyword name="outside"/>
-<a name="outside"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.outside(other)</tt></li>
 </ul>
@@ -1270,9 +1270,9 @@ The following image shows the effect of the "outside" method (input1: red, input
 </tr>
 </table>
 </p>
-<h2>"outside_part" - Returns the parts of the edges outside the given region</h2>
+<a name="outside_part"/><h2>"outside_part" - Returns the parts of the edges outside the given region</h2>
 <keyword name="outside_part"/>
-<a name="outside_part"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.outside_part(region)</tt></li>
 </ul>
@@ -1289,9 +1289,9 @@ This method is available for edge layers. The argument must be a polygon layer.
 </tr>
 </table>
 </p>
-<h2>"overlap" - An overlap check</h2>
+<a name="overlap"/><h2>"overlap" - An overlap check</h2>
 <keyword name="overlap"/>
-<a name="overlap"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.overlap(other_layer, value [, options])</tt></li>
 </ul>
@@ -1327,9 +1327,9 @@ The following images show the effect of the overlap check (layer1: red, layer2: 
 </tr>
 </table>
 </p>
-<h2>"overlapping" - Selects shapes or regions of self which overlap shapes from the other region</h2>
+<a name="overlapping"/><h2>"overlapping" - Selects shapes or regions of self which overlap shapes from the other region</h2>
 <keyword name="overlapping"/>
-<a name="overlapping"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.overlapping(other)</tt></li>
 </ul>
@@ -1351,9 +1351,9 @@ The following image shows the effect of the "overlapping" method:
 </tr>
 </table>
 </p>
-<h2>"perimeter" - Returns the total perimeter of the polygons in the region</h2>
+<a name="perimeter"/><h2>"perimeter" - Returns the total perimeter of the polygons in the region</h2>
 <keyword name="perimeter"/>
-<a name="perimeter"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.perimeter</tt></li>
 </ul>
@@ -1365,9 +1365,9 @@ raw mode is chosen (see <a href="#raw">raw</a>).
 </p><p>
 The returned value gives the perimeter in micrometer units.
 </p>
-<h2>"polygons" - Returns polygons from edge pairs</h2>
+<a name="polygons"/><h2>"polygons" - Returns polygons from edge pairs</h2>
 <keyword name="polygons"/>
-<a name="polygons"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.polygons([ enlargement ])</tt></li>
 </ul>
@@ -1379,15 +1379,15 @@ edges etc.) an enlargement parameter can be specified which will make the
 resulting polygon somewhat larger than the original edge pair. If the enlargement
 parameter is 0, special edge pairs with an area of 0 will be dropped.
 </p>
-<h2>"polygons?" - Returns true, if the layer is a polygon layer</h2>
+<a name="polygons?"/><h2>"polygons?" - Returns true, if the layer is a polygon layer</h2>
 <keyword name="polygons?"/>
-<a name="polygons?"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.polygons?</tt></li>
 </ul>
-<h2>"pull_inside" - Selects shapes or regions of other which are inside polygons from the this region</h2>
+<a name="pull_inside"/><h2>"pull_inside" - Selects shapes or regions of other which are inside polygons from the this region</h2>
 <keyword name="pull_inside"/>
-<a name="pull_inside"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.pull_inside(other)</tt></li>
 </ul>
@@ -1402,9 +1402,9 @@ provides a way to pull shapes from other to the hierarchy to self.
 </p><p>
 This method is available for polygon layers. Other needs to be a polygon layer too.
 </p>
-<h2>"pull_interacting" - Selects shapes or edges of other which touch or overlap shapes from the this region</h2>
+<a name="pull_interacting"/><h2>"pull_interacting" - Selects shapes or edges of other which touch or overlap shapes from the this region</h2>
 <keyword name="pull_interacting"/>
-<a name="pull_interacting"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.pull_interacting(other)</tt></li>
 </ul>
@@ -1422,9 +1422,9 @@ This method will neither modify self nor other.
 This method is available for polygon layers. Other can be an edge or polygon layer. 
 Edges or polygons can be selected with respect to polygons of self.
 </p>
-<h2>"pull_overlapping" - Selects shapes or regions of other which overlap shapes from the this region</h2>
+<a name="pull_overlapping"/><h2>"pull_overlapping" - Selects shapes or regions of other which overlap shapes from the this region</h2>
 <keyword name="pull_overlapping"/>
-<a name="pull_overlapping"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.pull_overlapping(other)</tt></li>
 </ul>
@@ -1439,9 +1439,9 @@ provides a way to pull shapes from other to the hierarchy to self.
 </p><p>
 This method is available for polygon layers. Other needs to be a polygon layer too.
 </p>
-<h2>"raw" - Marks a layer as raw</h2>
+<a name="raw"/><h2>"raw" - Marks a layer as raw</h2>
 <keyword name="raw"/>
-<a name="raw"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.raw</tt></li>
 </ul>
@@ -1466,9 +1466,9 @@ l.raw
 </p><p>
 To avoid that, use the <a href="#dup">dup</a> method to create a real (deep) copy.
 </p>
-<h2>"rectangles" - Selects all rectangle polygons from the input</h2>
+<a name="rectangles"/><h2>"rectangles" - Selects all rectangle polygons from the input</h2>
 <keyword name="rectangles"/>
-<a name="rectangles"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.rectangles</tt></li>
 </ul>
@@ -1477,9 +1477,9 @@ This method is available for polygon layers. By default "merged" semantics appli
 i.e. all polygons are merged before rectangles are selected (see <a href="#clean">clean</a> and <a href="#raw">raw</a>).
 <a href="#non_rectangles">non_rectangles</a> will select all non-rectangles.
 </p>
-<h2>"rectilinear" - Selects all rectilinear polygons from the input</h2>
+<a name="rectilinear"/><h2>"rectilinear" - Selects all rectilinear polygons from the input</h2>
 <keyword name="rectilinear"/>
-<a name="rectilinear"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.rectilinear</tt></li>
 </ul>
@@ -1488,9 +1488,9 @@ This method is available for polygon layers. By default "merged" semantics appli
 i.e. all polygons are merged before rectilinear polygons are selected (see <a href="#clean">clean</a> and <a href="#raw">raw</a>).
 <a href="#non_rectilinear">non_rectilinear</a> will select all non-rectangles.
 </p>
-<h2>"rotate" - Rotates a layer (modifies the layer)</h2>
+<a name="rotate"/><h2>"rotate" - Rotates a layer (modifies the layer)</h2>
 <keyword name="rotate"/>
-<a name="rotate"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.rotate(a)</tt></li>
 </ul>
@@ -1498,9 +1498,9 @@ i.e. all polygons are merged before rectilinear polygons are selected (see <a hr
 Rotates the input by the given angle (in degree). The layer that this method is called 
 upon is modified and the modified version is returned for further processing.
 </p>
-<h2>"rotated" - Rotates a layer</h2>
+<a name="rotated"/><h2>"rotated" - Rotates a layer</h2>
 <keyword name="rotated"/>
-<a name="rotated"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.rotated(a)</tt></li>
 </ul>
@@ -1516,9 +1516,9 @@ The following image shows the effect of the "rotated" method:
 </tr>
 </table>
 </p>
-<h2>"rounded_corners" - Applies corner rounding to each corner of the polygon</h2>
+<a name="rounded_corners"/><h2>"rounded_corners" - Applies corner rounding to each corner of the polygon</h2>
 <keyword name="rounded_corners"/>
-<a name="rounded_corners"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.rounded_corners(inner, outer, n)</tt></li>
 </ul>
@@ -1545,9 +1545,9 @@ a larger radius.
 </tr>
 </table>
 </p>
-<h2>"scale" - Scales a layer (modifies the layer)</h2>
+<a name="scale"/><h2>"scale" - Scales a layer (modifies the layer)</h2>
 <keyword name="scale"/>
-<a name="scale"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.scale(f)</tt></li>
 </ul>
@@ -1556,9 +1556,9 @@ Scales the input. After scaling, features have a f times
 bigger dimension. The layer that this method is called upon is modified and
 the modified version is returned for further processing.
 </p>
-<h2>"scaled" - Scales a layer</h2>
+<a name="scaled"/><h2>"scaled" - Scales a layer</h2>
 <keyword name="scaled"/>
-<a name="scaled"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.scaled(f)</tt></li>
 </ul>
@@ -1574,9 +1574,9 @@ The following images shows the effect of the "scaled" method:
 </tr>
 </table>
 </p>
-<h2>"second_edges" - Returns the second edges of an edge pair collection</h2>
+<a name="second_edges"/><h2>"second_edges" - Returns the second edges of an edge pair collection</h2>
 <keyword name="second_edges"/>
-<a name="second_edges"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.second_edges</tt></li>
 </ul>
@@ -1584,9 +1584,9 @@ The following images shows the effect of the "scaled" method:
 Applies to edge pair collections only.
 Returns the second edges of the edge pairs in the collection.
 </p>
-<h2>"select" - Selects edges, edge pairs or polygons based on evaluation of a block</h2>
+<a name="select"/><h2>"select" - Selects edges, edge pairs or polygons based on evaluation of a block</h2>
 <keyword name="select"/>
-<a name="select"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.select { |object| ... }</tt></li>
 </ul>
@@ -1604,9 +1604,9 @@ Here is a (slow) equivalent of the area selection method:
 new_layer = layer.select { |polygon| polygon.area &gt;= 10.0 }
 </pre>
 </p>
-<h2>"select_inside" - Selects shapes or regions of self which are inside the other region</h2>
+<a name="select_inside"/><h2>"select_inside" - Selects shapes or regions of self which are inside the other region</h2>
 <keyword name="select_inside"/>
-<a name="select_inside"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.select_inside(other)</tt></li>
 </ul>
@@ -1621,9 +1621,9 @@ is <a href="#inside">inside</a>.
 </p><p>
 This method is available for polygon layers.
 </p>
-<h2>"select_interacting" - Selects shapes or regions of self which touch or overlap shapes from the other region</h2>
+<a name="select_interacting"/><h2>"select_interacting" - Selects shapes or regions of self which touch or overlap shapes from the other region</h2>
 <keyword name="select_interacting"/>
-<a name="select_interacting"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.select_interacting(other)</tt></li>
 </ul>
@@ -1637,9 +1637,9 @@ is <a href="#interacting">interacting</a>.
 This method is available for polygon and edge layers. Edges can be selected
 with respect to other edges or polygons.
 </p>
-<h2>"select_not_inside" - Selects shapes or regions of self which are not inside the other region</h2>
+<a name="select_not_inside"/><h2>"select_not_inside" - Selects shapes or regions of self which are not inside the other region</h2>
 <keyword name="select_not_inside"/>
-<a name="select_not_inside"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.select_not_inside(other)</tt></li>
 </ul>
@@ -1654,9 +1654,9 @@ is <a href="#not_inside">not_inside</a>.
 </p><p>
 This method is available for polygon layers.
 </p>
-<h2>"select_not_interacting" - Selects shapes or regions of self which do not touch or overlap shapes from the other region</h2>
+<a name="select_not_interacting"/><h2>"select_not_interacting" - Selects shapes or regions of self which do not touch or overlap shapes from the other region</h2>
 <keyword name="select_not_interacting"/>
-<a name="select_not_interacting"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.select_interacting(other)</tt></li>
 </ul>
@@ -1670,9 +1670,9 @@ is <a href="#not_interacting">not_interacting</a>.
 This method is available for polygon and edge layers. Edges can be selected
 with respect to other edges or polygons.
 </p>
-<h2>"select_not_outside" - Selects shapes or regions of self which are not outside the other region</h2>
+<a name="select_not_outside"/><h2>"select_not_outside" - Selects shapes or regions of self which are not outside the other region</h2>
 <keyword name="select_not_outside"/>
-<a name="select_not_outside"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.select_not_outside(other)</tt></li>
 </ul>
@@ -1687,9 +1687,9 @@ is <a href="#not_outside">not_outside</a>.
 </p><p>
 This method is available for polygon layers.
 </p>
-<h2>"select_not_overlapping" - Selects shapes or regions of self which do not overlap shapes from the other region</h2>
+<a name="select_not_overlapping"/><h2>"select_not_overlapping" - Selects shapes or regions of self which do not overlap shapes from the other region</h2>
 <keyword name="select_not_overlapping"/>
-<a name="select_not_overlapping"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.select_not_overlapping(other)</tt></li>
 </ul>
@@ -1703,9 +1703,9 @@ is <a href="#not_overlapping">not_overlapping</a>.
 This method is available for polygon and edge layers. Edges can be selected
 with respect to other edges or polygons.
 </p>
-<h2>"select_outside" - Selects shapes or regions of self which are outside the other region</h2>
+<a name="select_outside"/><h2>"select_outside" - Selects shapes or regions of self which are outside the other region</h2>
 <keyword name="select_outside"/>
-<a name="select_outside"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.select_outside(other)</tt></li>
 </ul>
@@ -1720,9 +1720,9 @@ is <a href="#outside">outside</a>.
 </p><p>
 This method is available for polygon layers.
 </p>
-<h2>"select_overlapping" - Selects shapes or regions of self which overlap shapes from the other region</h2>
+<a name="select_overlapping"/><h2>"select_overlapping" - Selects shapes or regions of self which overlap shapes from the other region</h2>
 <keyword name="select_overlapping"/>
-<a name="select_overlapping"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.select_overlapping(other)</tt></li>
 </ul>
@@ -1736,18 +1736,18 @@ is <a href="#overlapping">overlapping</a>.
 This method is available for polygon and edge layers. Edges can be selected
 with respect to other edges or polygons.
 </p>
-<h2>"sep" - An alias for "separation"</h2>
+<a name="sep"/><h2>"sep" - An alias for "separation"</h2>
 <keyword name="sep"/>
-<a name="sep"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.sep(value [, options])</tt></li>
 </ul>
 <p>
 See <a href="#separation">separation</a> for a description of that method
 </p>
-<h2>"separation" - A two-layer spacing check</h2>
+<a name="separation"/><h2>"separation" - A two-layer spacing check</h2>
 <keyword name="separation"/>
-<a name="separation"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.separation(other_layer, value [, options])</tt></li>
 </ul>
@@ -1774,9 +1774,9 @@ The following image shows the effect of the separation check (layer1: red, layer
 </tr>
 </table>
 </p>
-<h2>"size" - Polygon sizing (per-edge biasing, modifies the layer)</h2>
+<a name="size"/><h2>"size" - Polygon sizing (per-edge biasing, modifies the layer)</h2>
 <keyword name="size"/>
-<a name="size"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.size(d [, mode])</tt></li>
 <li><tt>layer.size(dx, dy [, mode]))</tt></li>
@@ -1785,9 +1785,9 @@ The following image shows the effect of the separation check (layer1: red, layer
 See <a href="#sized">sized</a>. The size method basically does the same but modifies the layer
 it is called on. The input layer is returned and available for further processing.
 </p>
-<h2>"sized" - Polygon sizing (per-edge biasing)</h2>
+<a name="sized"/><h2>"sized" - Polygon sizing (per-edge biasing)</h2>
 <keyword name="sized"/>
-<a name="sized"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.sized(d [, mode])</tt></li>
 <li><tt>layer.sized(dx, dy [, mode]))</tt></li>
@@ -1842,9 +1842,9 @@ The following images show the effect of various forms of the "sized" method:
 </tr>
 </table>
 </p>
-<h2>"smoothed" - Smoothes the polygons of the region</h2>
+<a name="smoothed"/><h2>"smoothed" - Smoothes the polygons of the region</h2>
 <keyword name="smoothed"/>
-<a name="smoothed"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.smoothed(d)</tt></li>
 </ul>
@@ -1856,9 +1856,9 @@ than the given distance d from the original polygon.
 This method return a layer wit the modified polygons. Merged semantics applies for this
 method (see <a href="#raw">raw</a> and <a href="#clean">clean</a>).
 </p>
-<h2>"snap" - Brings each vertex on the given grid (g or gx/gy for x or y direction)</h2>
+<a name="snap"/><h2>"snap" - Brings each vertex on the given grid (g or gx/gy for x or y direction)</h2>
 <keyword name="snap"/>
-<a name="snap"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.snap(g)</tt></li>
 <li><tt>layer.snap(gx, gy)</tt></li>
@@ -1874,9 +1874,9 @@ without modifying the layer is <a href="#snapped">snapped</a>.
 </p><p>
 This method requires a polygon layer. Merged semantics applies (see <a href="#raw">raw</a> and <a href="#clean">clean</a>).
 </p>
-<h2>"snapped" - Returns a snapped version of the layer</h2>
+<a name="snapped"/><h2>"snapped" - Returns a snapped version of the layer</h2>
 <keyword name="snapped"/>
-<a name="snapped"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.snapped(g)</tt></li>
 <li><tt>layer.snapped(gx, gy)</tt></li>
@@ -1885,9 +1885,9 @@ This method requires a polygon layer. Merged semantics applies (see <a href="#ra
 See <a href="#snap">snap</a> for a description of the functionality. In contrast to <a href="#snap">snap</a>, this method does
 not modify the layer but returns a snapped copy.
 </p>
-<h2>"space" - A space check</h2>
+<a name="space"/><h2>"space" - A space check</h2>
 <keyword name="space"/>
-<a name="space"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.space(value [, options])</tt></li>
 </ul>
@@ -1920,9 +1920,9 @@ The following image shows the effect of the space check:
 </tr>
 </table>
 </p>
-<h2>"start_segments" - Returns the part at the beginning of each edge</h2>
+<a name="start_segments"/><h2>"start_segments" - Returns the part at the beginning of each edge</h2>
 <keyword name="start_segments"/>
-<a name="start_segments"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.start_segments(length)</tt></li>
 <li><tt>layer.start_segments(length, fraction)</tt></li>
@@ -1943,9 +1943,9 @@ The following images show the effect of the method:
 </tr>
 </table>
 </p>
-<h2>"strict" - Marks a layer for strict handling</h2>
+<a name="strict"/><h2>"strict" - Marks a layer for strict handling</h2>
 <keyword name="strict"/>
-<a name="strict"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.strict</tt></li>
 </ul>
@@ -1960,9 +1960,9 @@ See <a href="#non_strict">non_strict</a> about how to reset this mode.
 </p><p>
 This feature has been introduced in version 0.23.2.
 </p>
-<h2>"strict?" - Returns true, if strict handling is enabled for this layer</h2>
+<a name="strict?"/><h2>"strict?" - Returns true, if strict handling is enabled for this layer</h2>
 <keyword name="strict?"/>
-<a name="strict?"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.is_strict?</tt></li>
 </ul>
@@ -1971,9 +1971,9 @@ See <a href="#strict">strict</a> for a discussion of strict handling.
 </p><p>
 This feature has been introduced in version 0.23.2.
 </p>
-<h2>"texts" - Selects texts from an original layer</h2>
+<a name="texts"/><h2>"texts" - Selects texts from an original layer</h2>
 <keyword name="texts"/>
-<a name="texts"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.texts</tt></li>
 <li><tt>layer.texts(p)</tt></li>
@@ -2008,9 +2008,9 @@ t = input(1, 0).texts(pattern("A*"))
 t = input(1, 0).texts(text("A*"))
 </pre>
 </p>
-<h2>"transform" - Transforms a layer (modifies the layer)</h2>
+<a name="transform"/><h2>"transform" - Transforms a layer (modifies the layer)</h2>
 <keyword name="transform"/>
-<a name="transform"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.transform(t)</tt></li>
 </ul>
@@ -2018,9 +2018,9 @@ t = input(1, 0).texts(text("A*"))
 Like <a href="#transform">transform</a>, but modifies the input and returns a reference to it for
 further processing.
 </p>
-<h2>"transformed" - Transforms a layer</h2>
+<a name="transformed"/><h2>"transformed" - Transforms a layer</h2>
 <keyword name="transformed"/>
-<a name="transformed"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.transformed(t)</tt></li>
 </ul>
@@ -2039,9 +2039,9 @@ The following image shows the effect of the "moved" method:
 </tr>
 </table>
 </p>
-<h2>"width" - A width check</h2>
+<a name="width"/><h2>"width" - A width check</h2>
 <keyword name="width"/>
-<a name="width"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.width(value [, options])</tt></li>
 </ul>
@@ -2107,9 +2107,9 @@ The following images show the effect of various forms of the width check:
 </tr>
 </table>
 </p>
-<h2>"with_angle" - Selects edges by their angle</h2>
+<a name="with_angle"/><h2>"with_angle" - Selects edges by their angle</h2>
 <keyword name="with_angle"/>
-<a name="with_angle"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.with_angle(min .. max)</tt></li>
 <li><tt>layer.with_angle(value)</tt></li>
@@ -2142,9 +2142,9 @@ The following images demonstrate some use cases of <a href="#with_angle">with_an
 </tr>
 </table>
 </p>
-<h2>"with_area" - Selects polygons by area</h2>
+<a name="with_area"/><h2>"with_area" - Selects polygons by area</h2>
 <keyword name="with_area"/>
-<a name="with_area"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.with_area(min .. max)</tt></li>
 <li><tt>layer.with_area(value)</tt></li>
@@ -2158,9 +2158,9 @@ The third form basically is equivalent to the first form, but
 allows specification of nil for min or max indicating no lower or 
 upper limit.
 </p>
-<h2>"with_bbox_height" - Selects polygons by the height of the bounding box</h2>
+<a name="with_bbox_height"/><h2>"with_bbox_height" - Selects polygons by the height of the bounding box</h2>
 <keyword name="with_bbox_height"/>
-<a name="with_bbox_height"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.with_bbox_height(min .. max)</tt></li>
 <li><tt>layer.with_bbox_height(value)</tt></li>
@@ -2173,9 +2173,9 @@ bounding box.
 </p><p>
 This method is available for polygon layers only.
 </p>
-<h2>"with_bbox_max" - Selects polygons by the maximum dimension of the bounding box</h2>
+<a name="with_bbox_max"/><h2>"with_bbox_max" - Selects polygons by the maximum dimension of the bounding box</h2>
 <keyword name="with_bbox_max"/>
-<a name="with_bbox_max"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.with_bbox_max(min .. max)</tt></li>
 <li><tt>layer.with_bbox_max(value)</tt></li>
@@ -2189,9 +2189,9 @@ the bounding box, whichever is larger.
 </p><p>
 This method is available for polygon layers only.
 </p>
-<h2>"with_bbox_min" - Selects polygons by the minimum dimension of the bounding box</h2>
+<a name="with_bbox_min"/><h2>"with_bbox_min" - Selects polygons by the minimum dimension of the bounding box</h2>
 <keyword name="with_bbox_min"/>
-<a name="with_bbox_min"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.with_bbox_min(min .. max)</tt></li>
 <li><tt>layer.with_bbox_min(value)</tt></li>
@@ -2205,9 +2205,9 @@ the bounding box, whichever is smaller.
 </p><p>
 This method is available for polygon layers only.
 </p>
-<h2>"with_bbox_width" - Selects polygons by the width of the bounding box</h2>
+<a name="with_bbox_width"/><h2>"with_bbox_width" - Selects polygons by the width of the bounding box</h2>
 <keyword name="with_bbox_width"/>
-<a name="with_bbox_width"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.with_bbox_width(min .. max)</tt></li>
 <li><tt>layer.with_bbox_width(value)</tt></li>
@@ -2220,9 +2220,9 @@ bounding box.
 </p><p>
 This method is available for polygon layers only.
 </p>
-<h2>"with_length" - Selects edges by their length</h2>
+<a name="with_length"/><h2>"with_length" - Selects edges by their length</h2>
 <keyword name="with_length"/>
-<a name="with_length"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.with_length(min .. max)</tt></li>
 <li><tt>layer.with_length(value)</tt></li>
@@ -2237,9 +2237,9 @@ max indicating that there is no lower or upper limit.
 </p><p>
 This method is available for edge layers only.
 </p>
-<h2>"with_perimeter" - Selects polygons by perimeter</h2>
+<a name="with_perimeter"/><h2>"with_perimeter" - Selects polygons by perimeter</h2>
 <keyword name="with_perimeter"/>
-<a name="with_perimeter"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.with_perimeter(min .. max)</tt></li>
 <li><tt>layer.with_perimeter(value)</tt></li>
@@ -2255,9 +2255,9 @@ upper limit.
 </p><p>
 This method is available for polygon layers only.
 </p>
-<h2>"without_angle" - Selects edges by the their angle</h2>
+<a name="without_angle"/><h2>"without_angle" - Selects edges by the their angle</h2>
 <keyword name="without_angle"/>
-<a name="without_angle"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.without_angle(min .. max)</tt></li>
 <li><tt>layer.without_angle(value)</tt></li>
@@ -2268,9 +2268,9 @@ The method basically is the inverse of <a href="#with_angle">with_angle</a>. It 
 of the edge layer or corners of the polygons which do not have the given angle (second form) or whose angle
 is not inside the given interval (first and third form).
 </p>
-<h2>"without_area" - Selects polygons by area</h2>
+<a name="without_area"/><h2>"without_area" - Selects polygons by area</h2>
 <keyword name="without_area"/>
-<a name="without_area"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.without_area(min .. max)</tt></li>
 <li><tt>layer.without_area(value)</tt></li>
@@ -2283,9 +2283,9 @@ the given interval.
 </p><p>
 This method is available for polygon layers only.
 </p>
-<h2>"without_bbox_height" - Selects polygons by the height of the bounding box</h2>
+<a name="without_bbox_height"/><h2>"without_bbox_height" - Selects polygons by the height of the bounding box</h2>
 <keyword name="without_bbox_height"/>
-<a name="without_bbox_height"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.without_bbox_height(min .. max)</tt></li>
 <li><tt>layer.without_bbox_height(value)</tt></li>
@@ -2298,9 +2298,9 @@ bounding box.
 </p><p>
 This method is available for polygon layers only.
 </p>
-<h2>"without_bbox_max" - Selects polygons by the maximum dimension of the bounding box</h2>
+<a name="without_bbox_max"/><h2>"without_bbox_max" - Selects polygons by the maximum dimension of the bounding box</h2>
 <keyword name="without_bbox_max"/>
-<a name="without_bbox_max"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.without_bbox_max(min .. max)</tt></li>
 <li><tt>layer.without_bbox_max(value)</tt></li>
@@ -2314,9 +2314,9 @@ the bounding box, whichever is larger.
 </p><p>
 This method is available for polygon layers only.
 </p>
-<h2>"without_bbox_min" - Selects polygons by the minimum dimension of the bounding box</h2>
+<a name="without_bbox_min"/><h2>"without_bbox_min" - Selects polygons by the minimum dimension of the bounding box</h2>
 <keyword name="without_bbox_min"/>
-<a name="without_bbox_min"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.without_bbox_min(min .. max)</tt></li>
 <li><tt>layer.without_bbox_min(value)</tt></li>
@@ -2330,9 +2330,9 @@ the bounding box, whichever is smaller.
 </p><p>
 This method is available for polygon layers only.
 </p>
-<h2>"without_bbox_width" - Selects polygons by the width of the bounding box</h2>
+<a name="without_bbox_width"/><h2>"without_bbox_width" - Selects polygons by the width of the bounding box</h2>
 <keyword name="without_bbox_width"/>
-<a name="without_bbox_width"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.without_bbox_width(min .. max)</tt></li>
 <li><tt>layer.without_bbox_width(value)</tt></li>
@@ -2345,9 +2345,9 @@ bounding box.
 </p><p>
 This method is available for polygon layers only.
 </p>
-<h2>"without_length" - Selects edges by the their length</h2>
+<a name="without_length"/><h2>"without_length" - Selects edges by the their length</h2>
 <keyword name="without_length"/>
-<a name="without_length"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.without_length(min .. max)</tt></li>
 <li><tt>layer.without_length(value)</tt></li>
@@ -2360,9 +2360,9 @@ not inside the given interval (first and third form).
 </p><p>
 This method is available for edge layers only.
 </p>
-<h2>"without_perimeter" - Selects polygons by perimeter</h2>
+<a name="without_perimeter"/><h2>"without_perimeter" - Selects polygons by perimeter</h2>
 <keyword name="without_perimeter"/>
-<a name="without_perimeter"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.without_perimeter(min .. max)</tt></li>
 <li><tt>layer.without_perimeter(value)</tt></li>
@@ -2375,9 +2375,9 @@ the given interval.
 </p><p>
 This method is available for polygon layers only.
 </p>
-<h2>"xor" - Boolean XOR operation</h2>
+<a name="xor"/><h2>"xor" - Boolean XOR operation</h2>
 <keyword name="xor"/>
-<a name="xor"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layer.xor(other)</tt></li>
 </ul>
@@ -2397,9 +2397,9 @@ on polygons and edges (layer1: red, layer2: blue):
 </tr>
 </table>
 </p>
-<h2>"|" - Boolean OR operation</h2>
+<a name="|"/><h2>"|" - Boolean OR operation</h2>
 <keyword name="|"/>
-<a name="|"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>self | other</tt></li>
 </ul>

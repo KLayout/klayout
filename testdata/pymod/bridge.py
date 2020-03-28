@@ -34,7 +34,7 @@ class BridgeTest(unittest.TestCase):
     p = db.DSimplePolygon(db.DBox(1,2,3,4))
     a = bridge.p2a(p)
     pp = bridge.a2p(a)
-    self.assertEqual(repr(pp), "(1,2;1,4;3,4;3,2)")
+    self.assertEqual(str(pp), "(1,2;1,4;3,4;3,2)")
     self.assertEqual(type(pp).__name__, "DSimplePolygon")
 
 # run unit tests

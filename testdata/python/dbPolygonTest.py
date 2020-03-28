@@ -21,6 +21,12 @@ import pya
 import unittest
 import sys
 
+def astr(a):
+  astr = []
+  for i in a:
+    astr.append(str(i))
+  return "[" + ", ".join(astr) + "]"
+
 class DBPolygonTests(unittest.TestCase):
 
   # DPolygon basics
@@ -490,17 +496,17 @@ class DBPolygonTests(unittest.TestCase):
 
     p = pya.Polygon.from_s("(0,0;0,40;40,40;40,0/10,10;30,10;30,30;10,30)")
 
-    self.assertEqual(str(p.decompose_convex()), "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
-    self.assertEqual(str(p.decompose_convex(pya.Polygon.PO_any)), "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
-    self.assertEqual(str(p.decompose_convex(pya.Polygon.PO_horizontal)), "[(0,10;0,30;10,30;10,10), (0,30;0,40;40,40;40,30), (30,10;30,30;40,30;40,10), (0,0;0,10;40,10;40,0)]")
-    self.assertEqual(str(p.decompose_convex(pya.Polygon.PO_vertical)), "[(10,0;10,10;30,10;30,0), (0,0;0,40;10,40;10,0), (10,30;10,40;30,40;30,30), (30,0;30,40;40,40;40,0)]")
-    self.assertEqual(str(p.decompose_convex(pya.Polygon.PO_htrapezoids)), "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
-    self.assertEqual(str(p.decompose_convex(pya.Polygon.PO_vtrapezoids)), "[(10,0;10,10;30,10;30,0), (0,0;0,30;10,30;10,0), (0,30;0,40;30,40;30,30), (30,0;30,40;40,40;40,0)]")
+    self.assertEqual(astr(p.decompose_convex()), "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
+    self.assertEqual(astr(p.decompose_convex(pya.Polygon.PO_any)), "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
+    self.assertEqual(astr(p.decompose_convex(pya.Polygon.PO_horizontal)), "[(0,10;0,30;10,30;10,10), (0,30;0,40;40,40;40,30), (30,10;30,30;40,30;40,10), (0,0;0,10;40,10;40,0)]")
+    self.assertEqual(astr(p.decompose_convex(pya.Polygon.PO_vertical)), "[(10,0;10,10;30,10;30,0), (0,0;0,40;10,40;10,0), (10,30;10,40;30,40;30,30), (30,0;30,40;40,40;40,0)]")
+    self.assertEqual(astr(p.decompose_convex(pya.Polygon.PO_htrapezoids)), "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
+    self.assertEqual(astr(p.decompose_convex(pya.Polygon.PO_vtrapezoids)), "[(10,0;10,10;30,10;30,0), (0,0;0,30;10,30;10,0), (0,30;0,40;30,40;30,30), (30,0;30,40;40,40;40,0)]")
 
-    self.assertEqual(str(p.decompose_trapezoids()), "[(0,0;0,10;40,10;40,0), (0,10;0,30;10,30;10,10), (30,10;30,30;40,30;40,10), (0,30;0,40;40,40;40,30)]")
-    self.assertEqual(str(p.decompose_trapezoids(pya.Polygon.TD_simple)), "[(0,0;0,10;40,10;40,0), (0,10;0,30;10,30;10,10), (30,10;30,30;40,30;40,10), (0,30;0,40;40,40;40,30)]")
-    self.assertEqual(str(p.decompose_trapezoids(pya.Polygon.TD_htrapezoids)), "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
-    self.assertEqual(str(p.decompose_trapezoids(pya.Polygon.TD_vtrapezoids)), "[(10,0;10,10;30,10;30,0), (0,0;0,30;10,30;10,0), (0,30;0,40;30,40;30,30), (30,0;30,40;40,40;40,0)]")
+    self.assertEqual(astr(p.decompose_trapezoids()), "[(0,0;0,10;40,10;40,0), (0,10;0,30;10,30;10,10), (30,10;30,30;40,30;40,10), (0,30;0,40;40,40;40,30)]")
+    self.assertEqual(astr(p.decompose_trapezoids(pya.Polygon.TD_simple)), "[(0,0;0,10;40,10;40,0), (0,10;0,30;10,30;10,10), (30,10;30,30;40,30;40,10), (0,30;0,40;40,40;40,30)]")
+    self.assertEqual(astr(p.decompose_trapezoids(pya.Polygon.TD_htrapezoids)), "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
+    self.assertEqual(astr(p.decompose_trapezoids(pya.Polygon.TD_vtrapezoids)), "[(10,0;10,10;30,10;30,0), (0,0;0,30;10,30;10,0), (0,30;0,40;30,40;30,30), (30,0;30,40;40,40;40,0)]")
 
   # polygon decomposition
   def test_extractRad(self):

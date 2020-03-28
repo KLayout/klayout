@@ -33,12 +33,12 @@ class DBLayoutQuery_TestClass < TestBase
     q = RBA::LayoutQuery::new("select cell.name, cell.bbox from *")
     res = []
     q.each(ly) do |iter|
-      res << iter.data.inspect
+      res << iter.data.map(&:to_s).join(", ")
     end
 
     assert_equal(res.size, 2)
-    assert_equal(res[0], "[\"TOPTOP\", (0,0;32800,12800)]")
-    assert_equal(res[1], "[\"TOP\", (0,0;900,900)]")
+    assert_equal(res[0], "TOPTOP, (0,0;32800,12800)")
+    assert_equal(res[1], "TOP, (0,0;900,900)")
 
   end
 
@@ -53,11 +53,11 @@ class DBLayoutQuery_TestClass < TestBase
     q = RBA::LayoutQuery::new("select cell.name, cell.bbox from *")
     res = []
     q.each(ly) do |iter|
-      res << iter.data.inspect
+      res << iter.data.map(&:to_s).join(", ")
     end
 
     assert_equal(res.size, 1)
-    assert_equal(res[0], "[\"TOPTOP\", ()]")
+    assert_equal(res[0], "TOPTOP, ()")
 
   end
 

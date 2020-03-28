@@ -152,7 +152,7 @@ class LAYLayers_TestClass < TestBase
     l12_new.source = "@* (0,0 *0.5) (0,5 r45 *2.5)"
     cv.set_layer_properties( p12, l12_new )
     trans = p12.current.trans( true )
-    assert_equal( trans.to_s, p12.current.trans.to_s )
+    assert_equal( trans.map(&:to_s), p12.current.trans.map(&:to_s) )
     assert_equal( trans.size, 2 )
     assert_equal( trans [0].to_s, "r0 *0.5 0,0" )
     assert_equal( trans [1].to_s, "r45 *2.5 0,5" )

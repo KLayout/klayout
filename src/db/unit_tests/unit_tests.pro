@@ -42,7 +42,6 @@ SOURCES = \
   dbShape.cc \
   dbShapeRepository.cc \
   dbShapes.cc \
-  dbStreamLayers.cc \
   dbText.cc \
   dbTilingProcessor.cc \
   dbTrans.cc \
@@ -73,7 +72,8 @@ SOURCES = \
     dbLayoutVsSchematicTests.cc \
     dbLayoutQueryTests.cc \
     dbPolygonToolsTests.cc \
-    dbTechnologyTests.cc
+    dbTechnologyTests.cc \
+    dbStreamLayerTests.cc
 
 INCLUDEPATH += $$TL_INC $$DB_INC $$GSI_INC
 DEPENDPATH += $$TL_INC $$DB_INC $$GSI_INC

@@ -93,5 +93,85 @@
   are empty lines. Comments can be inserted using the "#" character in front of the comment.
   </p>
 
+  <h2>Wildcards</h2>
+
+  <p>
+  Source layers can be specified using wildcards. A wildcard is a "*" character 
+  matching "any layer".
+  Examples for such expressions are:
+  </p>
+
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr>
+      <td><b>10-*/0</b></td>
+      <td>Matching layer 10 and above, datatype 0</td>
+    </tr>
+    <tr>
+      <td><b>*/10</b></td>
+      <td>Matching datatype 10 of every layer</td>
+    </tr>
+    <tr>
+      <td><b>0-5,10-*/*</b></td>
+      <td>Matching layer 0 to 5 (inclusive) and above 10, all datatypes.</td>
+    </tr>
+  </table>
+
+  <p>
+  When ranges or wildcards are used as match expressions, the specified
+  layers will be lumped together into a single layer. This layer will have
+  the least permitted layer and datatype number. For example, with a 
+  match expression of "1-10/*", all these layers will be mapped to "1/0".
+  This behavior can be modified using a target layer specification with
+  wildcards.
+  </p>
+
+  <h2>Wildcard expansion and relative layer mapping</h2>
+
+  <p>
+  If the match expression includes a numerical range or wildcards
+  for the layer or datatype number, by default all these layers
+  will be combined into a single one, where it's layer or datatype number is derived
+  from the least permitted number.
+  </p>
+
+  <p>
+  This behavior can be modified using wildcard expansion. This is a target layer
+  which includes a "*" wildcard. This wildcard is substituted by the actual 
+  layer or datatype number:
+  </p>
+
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr>
+      <td><b>10-*/0 : */10</b></td>
+      <td>Maintain layers for layer 10 and above and map datatype to 10</td>
+    </tr>
+    <tr>
+      <td><b>10-*/0 : */*</b></td>
+      <td>Select layers 10 and above, datatype 0 and maintain these as individual layers</td>
+    </tr>
+    <tr>
+      <td><b>1/* : 2/*</b></td>
+      <td>Map layer number 1 to 2, maintain all datatypes</td>
+    </tr>
+  </table>
+
+  <p>
+  Relative layer mapping allows adding an offset to the layer or datatype numbers.
+  This offset can be negative with undefined behavior when the resulting number goes below
+  zero:
+  </p>
+
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr>
+      <td><b>10-20/*: *+1000/*</b></td>
+      <td>Selects all layers between 10 and 20, all datatypes. These layers will be
+        read into the original layers plus 1000 for the layer number.</td>
+    </tr>
+    <tr>
+      <td><b>10/10-*: */*-10</b></td>
+      <td>Selects layer 10, datatypes 10 plus. The resulting datatypes will be 10 less starting from 0.</td>
+    </tr>
+  </table>
+
 </doc>
 

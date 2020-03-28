@@ -34,6 +34,7 @@
 #include "gsiObject.h"
 
 #include <map>
+#include <limits>
 
 namespace db
 {
@@ -56,6 +57,58 @@ public:
  *  @brief The basic layer/datatype type
  */
 typedef int ld_type;
+
+/**
+ *  @brief Some definitions to declare wildcard and relative datatypes or layers
+ */
+inline ld_type any_ld ()
+{
+  return -1;
+}
+
+inline bool is_any_ld (ld_type ld)
+{
+  return ld == -1;
+}
+
+inline bool is_static_ld (ld_type ld)
+{
+  return ld >= 0;
+}
+
+inline ld_type relative_ld (ld_type ld)
+{
+  if (ld < 0) {
+    return std::numeric_limits<ld_type>::min() - ld;
+  } else {
+    //  NOTE: this way "any_ld" is equivalent to "relative_ld(0)"
+    return -ld - 1;
+  }
+}
+
+inline ld_type is_relative_ld (ld_type ld)
+{
+  return ld < 0;
+}
+
+inline ld_type ld_offset (ld_type ld)
+{
+  if (ld < 0) {
+    ld_type neg = ld - std::numeric_limits<ld_type>::min();
+    ld_type pos = -(ld + 1);
+    return neg < pos ? -neg : pos;
+  } else {
+    return ld;
+  }
+}
+
+/**
+ *  @brief With a relative b, b is added to a. Otherwise b replaces a.
+ */
+inline ld_type ld_combine (ld_type a, ld_type b)
+{
+  return is_relative_ld (b) ? a + ld_offset (b) : b;
+}
 
 /**
  *  @brief A struct for a layer/datatype pair)
@@ -162,7 +215,28 @@ public:
    */
   std::pair<bool, unsigned int> logical (const db::LayerProperties &p) const;
 
-  /** 
+  /**
+   *  @brief Query or install a layer mapping from a name or LDPair
+   *
+   *  @return A pair telling if the layer is mapped (first=true) and
+   *  the logical layer mapped (second) if this is the case.
+   *
+   *  @param p The layer that is looked for
+   *
+   *  This version is used for wildcard and relative mapping. In this case,
+   *  the logical layers are placeholder values which will be replaced by
+   *  true layers during this method if a new layer is requested.
+   */
+  std::pair<bool, unsigned int> logical (const db::LayerProperties &p, db::Layout &layout) const;
+
+  /**
+   *  @brief Query or install a layer mapping from a LDPair
+   *
+   *  See the version for LayerProperties about details.
+   */
+  std::pair<bool, unsigned int> logical (const db::LDPair &p, db::Layout &layout) const;
+
+  /**
    *  @brief String description for the mapping of a logical layer
    *
    *  @return A string describing the mapping (an empty string if
@@ -263,12 +337,23 @@ public:
    *  sequence of numbers, separated by comma values or a range 
    *  separated by a hyphen. Examples are: "1/2", "1-5/0", "1,2,5/0",
    *  "1/5;5/6".
+   *
+   *  layer/datatype wildcards can be specified with "*". When "*" is used
+   *  for the upper limit, it is equivalent to "all layer above". When used
+   *  alone, it is equivalent to "all layers". Examples: "1 / *", "* / 10-*".
+   *
    *  Named layers are specified simply by specifying the name, if 
    *  necessary in single or double quotes (if the name begins with a digit or
    *  contains non-word characters). layer/datatype and name descriptions can
    *  be mixed, i.e. "AA;1/5" (meaning: name "AA" or layer 1/datatype 5).
+   *
    *  A target layer can be specified with the ":<target>" notation, where
    *  target is a valid string for a LayerProperties() object.
+   *
+   *  A target can include relative layer/datatype specifications and wildcards.
+   *  For example, "1-10/0: *+1/0" will add 1 to the original layer number.
+   *  "1-10/0-50: * / *" will use the original layers.
+   *
    *  This method will throw a LayerSpecFormatException if
    *  something is wrong with the format string
    */
@@ -282,8 +367,10 @@ public:
   /**
    *  @brief Prepares a layer mapping object for reading
    *
-   *  This replaces all layer indexes by ones either in the layout or it will create new layers
-   *  in the layout
+   *  This replaces all layer indexes by ones from the layout or it will create new layers
+   *  if required. Note that for relative and wildcard targets (except '* / *'), the layer
+   *  indexes will not be the true indexes but placeholders. They will be replaced later
+   *  when calling logical with a layout argument.
    */
   void prepare (db::Layout &layout);
 
@@ -362,10 +449,18 @@ private:
   ld_map m_ld_map;
   std::map<std::string, unsigned int> m_name_map;
   std::map<unsigned int, LayerProperties> m_target_layers;
+  std::vector<LayerProperties> m_placeholders;
   unsigned int m_next_index;
 
-  void insert (const LDPair &p1, const LDPair &p2, unsigned int l, const LayerProperties &t);
-  void insert (const std::string &name, unsigned int l, const LayerProperties &t);
+  void insert (const LDPair &p1, const LDPair &p2, unsigned int l, const LayerProperties *t);
+  void insert (const std::string &name, unsigned int l, const LayerProperties *t);
+
+  std::pair<bool, unsigned int> logical_internal (const LDPair &p, bool allow_placeholder) const;
+  std::pair<bool, unsigned int> logical_internal (const std::string &name, bool allow_placeholder) const;
+  std::pair<bool, unsigned int> logical_internal (const db::LayerProperties &p, bool allow_placeholder) const;
+
+  std::pair<bool, unsigned int> substitute_placeholder (const db::LayerProperties &p, unsigned int ph, db::Layout &layout);
+  bool is_placeholder (unsigned int l) const;
 };
 
 }

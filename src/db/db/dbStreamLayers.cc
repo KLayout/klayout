@@ -71,13 +71,31 @@ LayerMap::LayerMap ()
   //  .. nothing yet ..
 }
 
-std::pair<bool, unsigned int> 
+std::pair<bool, unsigned int>
 LayerMap::logical (const LDPair &p) const
+{
+  return logical_internal (p, false);
+}
+
+std::pair<bool, unsigned int>
+LayerMap::logical (const std::string &n) const
+{
+  return logical_internal (n, false);
+}
+
+std::pair<bool, unsigned int>
+LayerMap::logical (const db::LayerProperties &p) const
+{
+  return logical_internal (p, false);
+}
+
+std::pair<bool, unsigned int>
+LayerMap::logical_internal (const LDPair &p, bool allow_placeholder) const
 {
   const datatype_map *dm = m_ld_map.mapped (p.layer);
   if (dm) {
     const unsigned int *l = dm->mapped (p.datatype);
-    if (l) {
+    if (l && (allow_placeholder || ! is_placeholder (*l))) {
       return std::make_pair (true, *l);
     }
   }
@@ -85,10 +103,10 @@ LayerMap::logical (const LDPair &p) const
 }
 
 std::pair<bool, unsigned int> 
-LayerMap::logical (const std::string &n) const
+LayerMap::logical_internal (const std::string &n, bool allow_placeholder) const
 {
   std::map<std::string, unsigned int>::const_iterator m = m_name_map.find (n);
-  if (m != m_name_map.end ()) {
+  if (m != m_name_map.end () && (allow_placeholder || ! is_placeholder (m->second))) {
     return std::make_pair (true, m->second);
   } else {
     return std::make_pair (false, 0);
@@ -96,21 +114,75 @@ LayerMap::logical (const std::string &n) const
 }
 
 std::pair<bool, unsigned int> 
-LayerMap::logical (const db::LayerProperties &p) const
+LayerMap::logical_internal (const db::LayerProperties &p, bool allow_placeholder) const
 {
   if (p.layer >= 0 && p.datatype >= 0) {
-    std::pair<bool, unsigned int> m = logical (db::LDPair (p.layer, p.datatype));
+    std::pair<bool, unsigned int> m = logical_internal (db::LDPair (p.layer, p.datatype), allow_placeholder);
     if (m.first) {
       return m;
     }
   }
   if (! p.name.empty ()) {
-    std::pair<bool, unsigned int> m = logical (p.name);
+    std::pair<bool, unsigned int> m = logical_internal (p.name, allow_placeholder);
     if (m.first) {
       return m;
     }
   }
   return std::make_pair (false, 0);
+}
+
+bool
+LayerMap::is_placeholder (unsigned int l) const
+{
+  return (m_placeholders.size () > std::numeric_limits<unsigned int>::max () - l);
+}
+
+std::pair<bool, unsigned int>
+LayerMap::logical (const db::LayerProperties &p, db::Layout &layout) const
+{
+  std::pair<bool, unsigned int> l = logical_internal (p, true);
+  if (l.first && is_placeholder (l.second)) {
+    return const_cast<LayerMap *> (this)->substitute_placeholder (p, l.second, layout);
+  } else {
+    return l;
+  }
+}
+
+std::pair<bool, unsigned int>
+LayerMap::logical (const db::LDPair &p, db::Layout &layout) const
+{
+  std::pair<bool, unsigned int> l = logical_internal (p, true);
+  if (l.first && is_placeholder (l.second)) {
+    return const_cast<LayerMap *> (this)->substitute_placeholder (db::LayerProperties (p.layer, p.datatype), l.second, layout);
+  } else {
+    return l;
+  }
+}
+
+std::pair<bool, unsigned int>
+LayerMap::substitute_placeholder (const db::LayerProperties &p, unsigned int ph, db::Layout &layout)
+{
+  const db::LayerProperties &lp_ph = m_placeholders [std::numeric_limits<unsigned int>::max () - ph];
+  db::LayerProperties lp_new = p;
+  lp_new.layer = db::ld_combine (p.layer, lp_ph.layer);
+  lp_new.datatype = db::ld_combine (p.datatype, lp_ph.datatype);
+
+  unsigned int l_new = layout.insert_layer (lp_new);
+  map (p, l_new, lp_new);
+  return std::make_pair (true, l_new);
+}
+
+static std::string format_interval (ld_type l1, ld_type l2)
+{
+  if (l1 == 0 && l2 == std::numeric_limits<ld_type>::max ()) {
+    return "*";
+  } else if (l2 == std::numeric_limits<ld_type>::max ()) {
+    return tl::to_string (l1) + "-*";
+  } else if (l1 + 1 < l2) {
+    return tl::to_string (l1) + "-" + tl::to_string (l2 - 1);
+  } else {
+    return tl::to_string (l1);
+  }
 }
 
 std::string
@@ -135,21 +207,13 @@ LayerMap::mapping_str (unsigned int ll) const
           }
           f1 = false;
 
-          s += tl::to_string (l->first.first);
-          if (l->first.first < l->first.second - 1) {
-            s += "-";
-            s += tl::to_string (l->first.second - 1);
-          }
+          s += format_interval (l->first.first, l->first.second);
           s += "/";
 
         }
         f2 = false;
 
-        s += tl::to_string (d->first.first);
-        if (d->first.first < d->first.second - 1) {
-          s += "-";
-          s += tl::to_string (d->first.second - 1);
-        }
+        s += format_interval (d->first.first, d->first.second);
 
       }
 
@@ -173,7 +237,7 @@ LayerMap::mapping_str (unsigned int ll) const
   std::map<unsigned int, LayerProperties>::const_iterator t = m_target_layers.find (ll);
   if (t != m_target_layers.end ()) {
     s += " : ";
-    s += t->second.to_string ();
+    s += t->second.to_string (true);
   }
 
   return s;
@@ -182,6 +246,9 @@ LayerMap::mapping_str (unsigned int ll) const
 void
 LayerMap::prepare (db::Layout &layout)
 {
+  m_placeholders.clear ();
+  unsigned int ph = std::numeric_limits<unsigned int>::max ();
+
   std::map<unsigned int, unsigned int> real_layers;
   std::set<unsigned int> mapped_layers;
 
@@ -190,16 +257,33 @@ LayerMap::prepare (db::Layout &layout)
 
   std::vector<unsigned int> old_layers = get_layers ();
   for (std::vector<unsigned int>::const_iterator l = old_layers.begin (); l != old_layers.end (); ++l) {
+
     if (layout.is_valid_layer (*l)) {
+
       real_layers.insert (std::make_pair (*l, *l));
       mapped_layers.insert (*l);
+
     } else {
-      std::pair <bool, unsigned int> lm = layer_mapping.map_layer (mapping (*l));
-      if (lm.first) {
-        real_layers.insert (std::make_pair (*l, lm.second));
-        mapped_layers.insert (lm.second);
+
+      db::LayerProperties lp = mapping (*l);
+      if (lp.is_named () || (db::is_static_ld (lp.layer) && db::is_static_ld (lp.datatype))) {
+
+        std::pair <bool, unsigned int> lm = layer_mapping.map_layer (lp);
+        if (lm.first) {
+          real_layers.insert (std::make_pair (*l, lm.second));
+          mapped_layers.insert (lm.second);
+        }
+
+      } else {
+
+        //  install a placeholder index
+        m_placeholders.push_back (lp);
+        real_layers.insert (std::make_pair (*l, ph--));
+
       }
+
     }
+
   }
 
   //  Now remap the indexes
@@ -253,10 +337,29 @@ LayerMap::mapping (unsigned int ll) const
 
   std::map<unsigned int, LayerProperties>::const_iterator t = m_target_layers.find (ll);
   if (t != m_target_layers.end ()) {
-    p = t->second;
-  }
 
-  if (p.layer < 0 || p.datatype < 0) {
+    //  a mapping is given. Use it.
+    p = t->second;
+
+    //  special case: if it is a name mapping, add the layer mapping (for backward compatibility)
+    if (p.is_named ()) {
+
+      //  no mapping is given. Use the lowest layer and datatype
+      for (ld_map::const_iterator l = m_ld_map.begin (); l != m_ld_map.end (); ++l) {
+        for (datatype_map::const_iterator d = l->second.begin (); d != l->second.end (); ++d) {
+          if (d->second == ll) {
+            p.layer = l->first.first;
+            p.datatype = d->first.first;
+            break;
+          }
+        }
+      }
+
+    }
+
+  } else {
+
+    //  no mapping is given. Use the lowest layer and datatype
     for (ld_map::const_iterator l = m_ld_map.begin (); l != m_ld_map.end (); ++l) {
       for (datatype_map::const_iterator d = l->second.begin (); d != l->second.end (); ++d) {
         if (d->second == ll) {
@@ -266,6 +369,7 @@ LayerMap::mapping (unsigned int ll) const
         }
       }
     }
+
   }
 
   if (p.name.empty ()) {
@@ -284,19 +388,19 @@ LayerMap::mapping (unsigned int ll) const
 void 
 LayerMap::map (const LDPair &p, unsigned int l)
 {
-  insert (p, p, l, LayerProperties ());
+  insert (p, p, l, (const LayerProperties *) 0);
 }
 
 void 
 LayerMap::map (const std::string &name, unsigned int l)
 {
-  insert (name, l, LayerProperties ());
+  insert (name, l, (const LayerProperties *) 0);
 }
 
 void 
 LayerMap::map (const LayerProperties &f, unsigned int l)
 {
-  if (f.layer >= 0 && f.datatype >= 0) {
+  if (f.name.empty () || is_static_ld (f.layer) || is_static_ld (f.datatype)) {
     map (db::LDPair (f.layer, f.datatype), l);
   } 
   if (! f.name.empty ()) {
@@ -307,19 +411,19 @@ LayerMap::map (const LayerProperties &f, unsigned int l)
 void 
 LayerMap::map (const LDPair &p, unsigned int l, const LayerProperties &t)
 {
-  insert (p, p, l, t);
+  insert (p, p, l, &t);
 }
 
 void 
 LayerMap::map (const std::string &name, unsigned int l, const LayerProperties &t)
 {
-  insert (name, l, t);
+  insert (name, l, &t);
 }
 
 void 
 LayerMap::map (const LayerProperties &f, unsigned int l, const LayerProperties &t)
 {
-  if (f.layer >= 0 && f.datatype >= 0) {
+  if (f.name.empty () || is_static_ld (f.layer) || is_static_ld (f.datatype)) {
     map (db::LDPair (f.layer, f.datatype), l, t);
   } 
   if (! f.name.empty ()) {
@@ -330,13 +434,13 @@ LayerMap::map (const LayerProperties &f, unsigned int l, const LayerProperties &
 void 
 LayerMap::map (const LDPair &p1, const LDPair &p2, unsigned int l)
 {
-  insert (p1, p2, l, LayerProperties ());
+  insert (p1, p2, l, (const LayerProperties *) 0);
 }
 
 void 
 LayerMap::map (const LDPair &p1, const LDPair &p2, unsigned int l, const LayerProperties &lp)
 {
-  insert (p1, p2, l, lp);
+  insert (p1, p2, l, &lp);
 }
 
 /// Utility function for the expression parser:  
@@ -346,11 +450,22 @@ parse_interval (tl::Extractor &ex, ld_interval &p)
 {
   ld_type n1 = 0, n2 = 0;
 
-  ex.try_read (n1);
-  if (ex.test ("-")) {
-    ex.try_read (n2);
+  if (ex.test ("*")) {
+    n1 = 0;
+    //  NOTE: as the upper limit is stored as n2 + 1, this will map to max():
+    n2 = std::numeric_limits<ld_type>::max () - 1;
   } else {
-    n2 = n1;
+    ex.try_read (n1);
+    if (ex.test ("-")) {
+      if (ex.test ("*")) {
+        //  NOTE: as the upper limit is stored as n2 + 1, this will map to max():
+        n2 = std::numeric_limits<ld_type>::max () - 1;
+      } else {
+        ex.try_read (n2);
+      }
+    } else {
+      n2 = n1;
+    }
   }
 
   p.first = n1;
@@ -420,7 +535,7 @@ LayerMap::map_expr (tl::Extractor &ex, unsigned int l)
 
     if (ex.test (":")) {
       LayerProperties lp;
-      lp.read (ex); 
+      lp.read (ex, true);
       m_target_layers[l] = lp;
     } 
 
@@ -434,10 +549,10 @@ LayerMap::map_expr (tl::Extractor &ex, unsigned int l)
 }
 
 void
-LayerMap::insert (const std::string &name, unsigned int l, const LayerProperties &target) 
+LayerMap::insert (const std::string &name, unsigned int l, const LayerProperties *target)
 {
-  if (! (target == LayerProperties ())) {
-    m_target_layers[l] = target;
+  if (target) {
+    m_target_layers[l] = *target;
   }
 
   m_name_map.insert (std::make_pair (name, l));
@@ -448,21 +563,29 @@ LayerMap::insert (const std::string &name, unsigned int l, const LayerProperties
 }
 
 void
-LayerMap::insert (const LDPair &p1, const LDPair &p2, unsigned int l, const LayerProperties &target) 
+LayerMap::insert (const LDPair &p1, const LDPair &p2, unsigned int l, const LayerProperties *target)
 {
-  if (! (target == LayerProperties ())) {
-    m_target_layers[l] = target;
+  if (target) {
+    m_target_layers[l] = *target;
   }
 
   //  create a single-interval list for the datatype range
   LayerMap::datatype_map dt;
   LmapJoinOp1 op1;
-  dt.add (p1.datatype, p2.datatype + 1, l, op1);
+  if (db::is_static_ld (p1.datatype) && db::is_static_ld (p2.datatype)) {
+    dt.add (p1.datatype, p2.datatype + 1, l, op1);
+  } else {
+    dt.add (0, std::numeric_limits<ld_type>::max (), l, op1);
+  }
 
   //  add this to the layers using the special join operator that
   //  combines the datatype intervals
   LmapJoinOp2 op2;
-  m_ld_map.add (p1.layer, p2.layer + 1, dt, op2);
+  if (db::is_static_ld (p1.layer) && db::is_static_ld (p2.layer)) {
+    m_ld_map.add (p1.layer, p2.layer + 1, dt, op2);
+  } else {
+    m_ld_map.add (0, std::numeric_limits<ld_type>::max (), dt, op2);
+  }
 
   if (l >= m_next_index) {
     m_next_index = l + 1;

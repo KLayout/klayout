@@ -106,11 +106,11 @@ db::LayerProperties *ctor_layer_info_name (const std::string &name)
 }
 
 static
-db::LayerProperties li_from_string (const char *s)
+db::LayerProperties li_from_string (const char *s, bool as_target)
 {
   tl::Extractor ex (s);
   db::LayerProperties lp;
-  lp.read (ex);
+  lp.read (ex, as_target);
   return lp;
 }
 
@@ -152,21 +152,27 @@ Class<db::LayerProperties> decl_LayerInfo ("db", "LayerInfo",
     "\n"
     "This method was added in version 0.18.\n"
   ) +
-  gsi::method ("from_string", &li_from_string, gsi::arg ("s"),
+  gsi::method ("from_string", &li_from_string, gsi::arg ("s"), gsi::arg ("as_target", false),
     "@brief Create a layer info object from a string\n"
     "@param The string\n"
     "@return The LayerInfo object\n"
+    "\n"
+    "If 'as_target' is true, relative specifications such as '*+1' for layer or datatype are permitted.\n"
     "\n"
     "This method will take strings as produced by \\to_s and create a \\LayerInfo object from them. "
     "The format is either \"layer\", \"layer/datatype\", \"name\" or \"name (layer/datatype)\".\n"
     "\n"
     "This method was added in version 0.23.\n"
+    "The 'as_target' argument has been added in version 0.26.5.\n"
   ) +
-  gsi::method ("to_s", &db::LayerProperties::to_string, 
+  gsi::method ("to_s", &db::LayerProperties::to_string, gsi::arg ("as_target", false),
     "@brief Convert the layer info object to a string\n"
     "@return The string\n"
     "\n"
+    "If 'as_target' is true, wildcard and relative specifications are formatted such such.\n"
+    "\n"
     "This method was added in version 0.18.\n"
+    "The 'as_target' argument has been added in version 0.26.5.\n"
   ) +
   gsi::method ("==", &db::LayerProperties::operator==, gsi::arg ("b"),
     "@brief Compares two layer info objects\n"

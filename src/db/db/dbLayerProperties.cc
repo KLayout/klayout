@@ -22,6 +22,7 @@
 
 
 #include "dbLayerProperties.h"
+#include "dbStreamLayers.h"
 
 namespace db
 {
@@ -30,7 +31,7 @@ namespace db
 //  Implementation of the LayerProperties class
 
 LayerProperties::LayerProperties () 
-  : name (), layer (-1), datatype (-1)
+  : name (), layer (db::any_ld ()), datatype (db::any_ld ())
 { }
 
 LayerProperties::LayerProperties (int l, int d) 
@@ -38,7 +39,7 @@ LayerProperties::LayerProperties (int l, int d)
 { }
 
 LayerProperties::LayerProperties (const std::string &n) 
-  : name (n), layer (-1), datatype (-1)
+  : name (n), layer (db::any_ld ()), datatype (db::any_ld ())
 { }
 
 LayerProperties::LayerProperties (int l, int d, const std::string &n) 
@@ -48,7 +49,13 @@ LayerProperties::LayerProperties (int l, int d, const std::string &n)
 bool 
 LayerProperties::is_named () const
 {
-  return (layer < 0 || datatype < 0) && ! name.empty ();
+  return db::is_any_ld (layer) && db::is_any_ld (datatype) && ! name.empty ();
+}
+
+bool
+LayerProperties::is_null () const
+{
+  return db::is_any_ld (layer) && db::is_any_ld (datatype) && name.empty ();
 }
 
 bool 
@@ -122,34 +129,79 @@ LayerProperties::operator< (const LayerProperties &b) const
   return name < b.name;
 }
 
+static std::string format_ld (db::ld_type ld)
+{
+  if (db::is_static_ld (ld)) {
+    return tl::to_string (ld);
+  } else if (db::is_any_ld (ld)) {
+    return "*";
+  } else if (db::is_relative_ld (ld)) {
+    db::ld_type offset = db::ld_offset (ld);
+    if (offset < 0) {
+      return "*-" + tl::to_string (-offset);
+    } else {
+      return "*+" + tl::to_string (offset);
+    }
+  } else {
+    return tl::to_string (ld);
+  }
+}
+
 std::string 
-LayerProperties::to_string () const
+LayerProperties::to_string (bool as_target) const
 {
   std::string r;
   if (! name.empty ()) {
     if (is_named ()) {
       r = tl::to_word_or_quoted_string (name);
     } else {
-      r = tl::to_word_or_quoted_string (name) + tl::sprintf (" (%d/%d)", layer, datatype);
+      r = tl::to_word_or_quoted_string (name) + " (" + format_ld (layer) + "/" + format_ld (datatype) + ")";
     }
-  } else if (! is_null ()) {
-    r = tl::sprintf ("%d/%d", layer, datatype);
+  } else if (! is_null () || as_target) {
+    r = format_ld (layer) + "/" + format_ld (datatype);
   }
   return r;
 }
 
-void
-LayerProperties::read (tl::Extractor &ex)
+static bool read_ld (tl::Extractor &ex, ld_type &l, bool with_relative)
 {
-  layer = -1;
-  datatype = -1;
+  if (ex.test ("*")) {
+
+    int offset = 0;
+
+    tl::Extractor eex = ex;
+    if (with_relative && eex.test ("+") && eex.try_read (offset)) {
+      l = db::relative_ld (offset);
+      ex = eex;
+    } else {
+      eex = ex;
+      if (with_relative && eex.test ("-") && eex.try_read (offset)) {
+        l = db::relative_ld (-offset);
+        ex = eex;
+      } else {
+        l = db::any_ld ();
+      }
+    }
+
+    return true;
+
+  } else {
+    return ex.try_read (l);
+  }
+}
+
+void
+LayerProperties::read (tl::Extractor &ex, bool as_target)
+{
+  layer = db::any_ld ();
+  datatype = db::any_ld ();
   name.clear ();
 
   int l = 0, d = 0;
-  if (ex.try_read (l)) {
+  if (read_ld (ex, l, as_target)) {
 
     if (ex.test ("/")) {
-      ex.read (d);
+      read_ld (ex, d, as_target);
     }
 
     layer = l;
@@ -159,10 +211,11 @@ LayerProperties::read (tl::Extractor &ex)
 
     if (ex.test ("(")) {
 
-      ex.read (l);
+      read_ld (ex, l, as_target);
       if (ex.test ("/")) {
-        ex.read (d);
+        read_ld (ex, d, as_target);
       }
+
       ex.expect (")");
 
       layer = l;

@@ -383,7 +383,7 @@ DXFReader::do_read (db::Layout &layout, db::cell_index_type top)
 
   //  create the zero layer - this is not mapped to GDS but can be specified in the layer mapping as
   //  a layer named "0".
-  std::pair<bool, unsigned int> ll = layer_map ().logical (zero_layer_name);
+  std::pair<bool, unsigned int> ll = layer_map ().logical (zero_layer_name, layout);
   if (ll.first) {
 
     //  create the layer if it is not part of the layout yet.

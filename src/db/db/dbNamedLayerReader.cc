@@ -128,7 +128,7 @@ NamedLayerReader::open_layer (db::Layout &layout, const std::string &n)
 
   std::pair<bool, unsigned int> ll (false, 0);
 
-  ll = m_layer_map.logical (n);
+  ll = m_layer_map.logical (n, layout);
   if (! ll.first && !m_keep_layer_names) {
 
     if (extract_plain_layer (n.c_str (), l)) {
@@ -136,7 +136,7 @@ NamedLayerReader::open_layer (db::Layout &layout, const std::string &n)
       db::LayerProperties lp;
       lp.layer = l;
       lp.datatype = 0;
-      ll = m_layer_map.logical (lp);
+      ll = m_layer_map.logical (lp, layout);
 
     } else if (extract_ld (n.c_str (), l, d, on)) {
 
@@ -144,7 +144,7 @@ NamedLayerReader::open_layer (db::Layout &layout, const std::string &n)
       lp.layer = l;
       lp.datatype = d;
       lp.name = on;
-      ll = m_layer_map.logical (lp);
+      ll = m_layer_map.logical (lp, layout);
 
     }
 

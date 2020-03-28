@@ -160,9 +160,9 @@ HEAD
       item.name || raise("Missing @name for item #{item_key}")
       item.brief || raise("Missing @brief for item #{item_key}")
 
+      doc += "<a name=\"" + escape(self.mod, item.name) + "\"/>"
       doc += "<h2>\"" + escape(self.mod, item.name) + "\" - " + escape(self.mod, item.brief) + "</h2>\n"
       doc += "<keyword name=\"" + escape(self.mod, item.name) + "\"/>\n"
-      doc += "<a name=\"" + escape(self.mod, item.name) + "\"/>"
       if ! item.synopsis.empty?
         doc += "<p>Usage:</p>\n"
         doc += "<ul>\n"

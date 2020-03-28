@@ -19,90 +19,90 @@ layers or specification of the layout source.
 For more details about the DRC functions see <a href="/about/drc_ref_global.xml">DRC::global</a>.
 </p>
 <h2-index/>
-<h2>"align" - Aligns the extracted netlist vs. the schematic by flattening circuits where required</h2>
+<a name="align"/><h2>"align" - Aligns the extracted netlist vs. the schematic by flattening circuits where required</h2>
 <keyword name="align"/>
-<a name="align"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>align</tt></li>
 </ul>
 <p>
 See <a href="/about/lvs_ref_netter.xml#align">Netter#align</a> for a description of that function.
 </p>
-<h2>"compare" - Compares the extracted netlist vs. the schematic</h2>
+<a name="compare"/><h2>"compare" - Compares the extracted netlist vs. the schematic</h2>
 <keyword name="compare"/>
-<a name="compare"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>compare</tt></li>
 </ul>
 <p>
 See <a href="/about/lvs_ref_netter.xml#compare">Netter#compare</a> for a description of that function.
 </p>
-<h2>"equivalent_pins" - Marks pins as equivalent</h2>
+<a name="equivalent_pins"/><h2>"equivalent_pins" - Marks pins as equivalent</h2>
 <keyword name="equivalent_pins"/>
-<a name="equivalent_pins"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>equivalent_pins(circuit, pins ...)</tt></li>
 </ul>
 <p>
 See <a href="/about/lvs_ref_netter.xml#equivalent_pins">Netter#equivalent_pins</a> for a description of that function.
 </p>
-<h2>"join_symmetric_nets" - Joins symmetric nets of selected circuits on the extracted netlist</h2>
+<a name="join_symmetric_nets"/><h2>"join_symmetric_nets" - Joins symmetric nets of selected circuits on the extracted netlist</h2>
 <keyword name="join_symmetric_nets"/>
-<a name="join_symmetric_nets"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>join_symmetric_nets(circuit_filter)</tt></li>
 </ul>
 <p>
 See <a href="/about/lvs_ref_netter.xml#join_symmetric_nets">Netter#join_symmetric_nets</a> for a description of that function.
 </p>
-<h2>"max_branch_complexity" - Configures the maximum branch complexity for ambiguous net matching</h2>
+<a name="max_branch_complexity"/><h2>"max_branch_complexity" - Configures the maximum branch complexity for ambiguous net matching</h2>
 <keyword name="max_branch_complexity"/>
-<a name="max_branch_complexity"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>max_branch_complexity(n)</tt></li>
 </ul>
 <p>
 See <a href="/about/lvs_ref_netter.xml#max_branch_complexity">Netter#max_branch_complexity</a> for a description of that function.
 </p>
-<h2>"max_depth" - Configures the maximum search depth for net match deduction</h2>
+<a name="max_depth"/><h2>"max_depth" - Configures the maximum search depth for net match deduction</h2>
 <keyword name="max_depth"/>
-<a name="max_depth"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>max_depth(n)</tt></li>
 </ul>
 <p>
 See <a href="/about/lvs_ref_netter.xml#max_depth">Netter#max_depth</a> for a description of that function.
 </p>
-<h2>"max_res" - Ignores resistors with a resistance above a certain value</h2>
+<a name="max_res"/><h2>"max_res" - Ignores resistors with a resistance above a certain value</h2>
 <keyword name="max_res"/>
-<a name="max_res"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>max_res(threshold)</tt></li>
 </ul>
 <p>
 See <a href="/about/lvs_ref_netter.xml#max_res">Netter#max_res</a> for a description of that function.
 </p>
-<h2>"min_caps" - Ignores capacitors with a capacitance below a certain value</h2>
+<a name="min_caps"/><h2>"min_caps" - Ignores capacitors with a capacitance below a certain value</h2>
 <keyword name="min_caps"/>
-<a name="min_caps"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>min_caps(threshold)</tt></li>
 </ul>
 <p>
 See <a href="/about/lvs_ref_netter.xml#min_caps">Netter#min_caps</a> for a description of that function.
 </p>
-<h2>"netter" - Creates a new netter object</h2>
+<a name="netter"/><h2>"netter" - Creates a new netter object</h2>
 <keyword name="netter"/>
-<a name="netter"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>netter</tt></li>
 </ul>
 <p>
 See <a href="/about/lvs_ref_netter.xml">Netter</a> for more details
 </p>
-<h2>"report_lvs" - Specifies an LVS report for output</h2>
+<a name="report_lvs"/><h2>"report_lvs" - Specifies an LVS report for output</h2>
 <keyword name="report_lvs"/>
-<a name="report_lvs"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>report_lvs([ filename [, long ] ])</tt></li>
 </ul>
@@ -121,27 +121,27 @@ extracted netlist.
 </p><p>
 report_lvs is only effective if a comparison step is included.
 </p>
-<h2>"same_circuits" - Establishes an equivalence between the circuits</h2>
+<a name="same_circuits"/><h2>"same_circuits" - Establishes an equivalence between the circuits</h2>
 <keyword name="same_circuits"/>
-<a name="same_circuits"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>same_circuits(circuit_a, circuit_b)</tt></li>
 </ul>
 <p>
 See <a href="/about/lvs_ref_netter.xml#same_circuits">Netter#same_circuits</a> for a description of that function.
 </p>
-<h2>"same_device_classes" - Establishes an equivalence between the device_classes</h2>
+<a name="same_device_classes"/><h2>"same_device_classes" - Establishes an equivalence between the device_classes</h2>
 <keyword name="same_device_classes"/>
-<a name="same_device_classes"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>same_device_classes(class_a, class_b)</tt></li>
 </ul>
 <p>
 See <a href="/about/lvs_ref_netter.xml#same_device_classes">Netter#same_device_classes</a> for a description of that function.
 </p>
-<h2>"same_nets" - Establishes an equivalence between the nets</h2>
+<a name="same_nets"/><h2>"same_nets" - Establishes an equivalence between the nets</h2>
 <keyword name="same_nets"/>
-<a name="same_nets"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>same_nets(circuit, net_a, net_b)</tt></li>
 <li><tt>same_nets(circuit_a, net_a, circuit_b, net_b)</tt></li>
@@ -149,9 +149,9 @@ See <a href="/about/lvs_ref_netter.xml#same_device_classes">Netter#same_device_c
 <p>
 See <a href="/about/lvs_ref_netter.xml#same_nets">Netter#same_nets</a> for a description of that function.
 </p>
-<h2>"schematic" - Reads the reference netlist</h2>
+<a name="schematic"/><h2>"schematic" - Reads the reference netlist</h2>
 <keyword name="schematic"/>
-<a name="schematic"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>schematic(filename)</tt></li>
 <li><tt>schematic(filename, reader)</tt></li>
@@ -160,9 +160,9 @@ See <a href="/about/lvs_ref_netter.xml#same_nets">Netter#same_nets</a> for a des
 <p>
 See <a href="/about/lvs_ref_netter.xml#schematic">Netter#schematic</a> for a description of that function.
 </p>
-<h2>"tolerance" - Specifies compare tolerances for certain device parameters</h2>
+<a name="tolerance"/><h2>"tolerance" - Specifies compare tolerances for certain device parameters</h2>
 <keyword name="tolerance"/>
-<a name="tolerance"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>tolerance(device_class_name, parameter_name, absolute_tolerance [, relative_tolerance])</tt></li>
 <li><tt>tolerance(device_class_name, parameter_name [, :absolute =&gt; absolute_tolerance] [, :relative =&gt; relative_tolerance])</tt></li>

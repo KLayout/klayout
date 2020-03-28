@@ -13,9 +13,9 @@ A source specifies where to take layout from. That includes the actual layout,
 the top cell and options such as clip/query boxes, cell filters etc.
 </p>
 <h2-index/>
-<h2>"cell" - Specifies input from a specific cell</h2>
+<a name="cell"/><h2>"cell" - Specifies input from a specific cell</h2>
 <keyword name="cell"/>
-<a name="cell"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>source.cell(name)</tt></li>
 </ul>
@@ -23,21 +23,21 @@ the top cell and options such as clip/query boxes, cell filters etc.
 This method will create a new source that delivers shapes from the 
 specified cell. 
 </p>
-<h2>"cell_name" - Returns the name of the currently selected cell</h2>
+<a name="cell_name"/><h2>"cell_name" - Returns the name of the currently selected cell</h2>
 <keyword name="cell_name"/>
-<a name="cell_name"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>cell_name</tt></li>
 </ul>
-<h2>"cell_obj" - Returns the <class_doc href="Cell">Cell</class_doc> object of the currently selected cell</h2>
+<a name="cell_obj"/><h2>"cell_obj" - Returns the <class_doc href="Cell">Cell</class_doc> object of the currently selected cell</h2>
 <keyword name="cell_obj"/>
-<a name="cell_obj"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>cell_obj</tt></li>
 </ul>
-<h2>"clip" - Specifies clipped input</h2>
+<a name="clip"/><h2>"clip" - Specifies clipped input</h2>
 <keyword name="clip"/>
-<a name="clip"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>source.clip(box)</tt></li>
 <li><tt>source.clip(p1, p2)</tt></li>
@@ -54,9 +54,9 @@ This method will create a new source which delivers the shapes
 from that region clipped to the rectangle. A method doing the 
 same but without clipping is <a href="#touching">touching</a> or <a href="#overlapping">overlapping</a>.
 </p>
-<h2>"extent" - Returns a layer with the bounding box of the selected layout</h2>
+<a name="extent"/><h2>"extent" - Returns a layer with the bounding box of the selected layout</h2>
 <keyword name="extent"/>
-<a name="extent"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>source.extent</tt></li>
 </ul>
@@ -67,9 +67,9 @@ The extent function is useful to invert a layer:
 inverse_1 = extent.sized(100.0) - input(1, 0)
 </pre>
 </p>
-<h2>"input" - Specifies input from a source</h2>
+<a name="input"/><h2>"input" - Specifies input from a source</h2>
 <keyword name="input"/>
-<a name="input"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>source.input(layer)</tt></li>
 <li><tt>source.input(layer, datatype)</tt></li>
@@ -108,9 +108,9 @@ only. If you only want to see texts, use <a href="#labels">labels</a> to create 
 </p><p>
 Use the global version of "input" without a source object to address the default source.
 </p>
-<h2>"labels" - Gets the labels (texts) from an input layer</h2>
+<a name="labels"/><h2>"labels" - Gets the labels (texts) from an input layer</h2>
 <keyword name="labels"/>
-<a name="labels"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>source.labels(layer)</tt></li>
 <li><tt>source.labels(layer, datatype)</tt></li>
@@ -125,9 +125,9 @@ layer.
 </p><p>
 Use the global version of "labels" without a source object to address the default source.
 </p>
-<h2>"layers" - Gets the layers the source contains</h2>
+<a name="layers"/><h2>"layers" - Gets the layers the source contains</h2>
 <keyword name="layers"/>
-<a name="layers"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>source.layers</tt></li>
 </ul>
@@ -149,24 +149,24 @@ clip_box.insert(box(0.um, -4.um, 4.um, 0.um))
 layers.each { |l| (input(l) &amp; clip_box).output(l) }
 </pre>
 </p>
-<h2>"layout" - Returns the <class_doc href="Layout">Layout</class_doc> object associated with this source</h2>
+<a name="layout"/><h2>"layout" - Returns the <class_doc href="Layout">Layout</class_doc> object associated with this source</h2>
 <keyword name="layout"/>
-<a name="layout"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layout</tt></li>
 </ul>
-<h2>"make_layer" - Creates an empty polygon layer based on the hierarchy of the layout</h2>
+<a name="make_layer"/><h2>"make_layer" - Creates an empty polygon layer based on the hierarchy of the layout</h2>
 <keyword name="make_layer"/>
-<a name="make_layer"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>make_layer</tt></li>
 </ul>
 <p>
 This method delivers a new empty original layer.
 </p>
-<h2>"overlapping" - Specifies input selected from a region in overlapping mode</h2>
+<a name="overlapping"/><h2>"overlapping" - Specifies input selected from a region in overlapping mode</h2>
 <keyword name="overlapping"/>
-<a name="overlapping"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>source.overlapping(...)</tt></li>
 </ul>
@@ -180,15 +180,15 @@ the specified rectangle.
 <a href="#touching">touching</a> is a similar method which delivers shapes touching
 the search region with their bounding box (without the requirement to overlap)
 </p>
-<h2>"path" - Gets the path of the corresponding layout file or nil if there is no path</h2>
+<a name="path"/><h2>"path" - Gets the path of the corresponding layout file or nil if there is no path</h2>
 <keyword name="path"/>
-<a name="path"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>path</tt></li>
 </ul>
-<h2>"polygons" - Gets the polygon shapes (or shapes that can be converted polygons) from an input layer</h2>
+<a name="polygons"/><h2>"polygons" - Gets the polygon shapes (or shapes that can be converted polygons) from an input layer</h2>
 <keyword name="polygons"/>
-<a name="polygons"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>source.polygons(layer)</tt></li>
 <li><tt>source.polygons(layer, datatype)</tt></li>
@@ -204,9 +204,9 @@ This method is identical to <a href="#input">input</a> with respect to the optio
 </p><p>
 Use the global version of "polygons" without a source object to address the default source.
 </p>
-<h2>"select" - Adds cell name expressions to the cell filters</h2>
+<a name="select"/><h2>"select" - Adds cell name expressions to the cell filters</h2>
 <keyword name="select"/>
-<a name="select"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>source.select(filter1, filter2, ...)</tt></li>
 </ul>
@@ -249,9 +249,9 @@ l1 = layout_with_selection.input(1, 0)
 ...
 </pre>
 </p>
-<h2>"touching" - Specifies input selected from a region in touching mode</h2>
+<a name="touching"/><h2>"touching" - Specifies input selected from a region in touching mode</h2>
 <keyword name="touching"/>
-<a name="touching"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>source.touching(box)</tt></li>
 <li><tt>source.touching(p1, p2)</tt></li>

@@ -50,12 +50,7 @@ TEST(1)
   lay::AbstractMenu menu (0);
   EXPECT_EQ (menu_to_string (menu), "");
 
-  try {
-    EXPECT_EQ (menu.action ("n1")->get_title (), "");
-    EXPECT_EQ (true, false);
-  } catch (...) {
-  }
-
+  EXPECT_EQ (menu.action ("n1") == 0, true);
   EXPECT_EQ (menu.is_valid ("n1"), false);
 
   menu.insert_menu ("end", "n1", new lay::Action ("title:n1"));

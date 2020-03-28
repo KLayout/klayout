@@ -495,17 +495,17 @@ class DBPolygon_TestClass < TestBase
 
     p = RBA::Polygon::from_s("(0,0;0,40;40,40;40,0/10,10;30,10;30,30;10,30)")
 
-    assert_equal(p.decompose_convex.inspect, "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
-    assert_equal(p.decompose_convex(RBA::Polygon::PO_any).inspect, "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
-    assert_equal(p.decompose_convex(RBA::Polygon::PO_horizontal).inspect, "[(0,10;0,30;10,30;10,10), (0,30;0,40;40,40;40,30), (30,10;30,30;40,30;40,10), (0,0;0,10;40,10;40,0)]")
-    assert_equal(p.decompose_convex(RBA::Polygon::PO_vertical).inspect, "[(10,0;10,10;30,10;30,0), (0,0;0,40;10,40;10,0), (10,30;10,40;30,40;30,30), (30,0;30,40;40,40;40,0)]")
-    assert_equal(p.decompose_convex(RBA::Polygon::PO_htrapezoids).inspect, "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
-    assert_equal(p.decompose_convex(RBA::Polygon::PO_vtrapezoids).inspect, "[(10,0;10,10;30,10;30,0), (0,0;0,30;10,30;10,0), (0,30;0,40;30,40;30,30), (30,0;30,40;40,40;40,0)]")
+    assert_equal(p.decompose_convex.map(&:to_s), %w((0,10;0,30;10,30;10,10) (0,30;0,40;30,40;30,30) (30,10;30,40;40,40;40,10) (0,0;0,10;40,10;40,0)))
+    assert_equal(p.decompose_convex(RBA::Polygon::PO_any).map(&:to_s), %w((0,10;0,30;10,30;10,10) (0,30;0,40;30,40;30,30) (30,10;30,40;40,40;40,10) (0,0;0,10;40,10;40,0)))
+    assert_equal(p.decompose_convex(RBA::Polygon::PO_horizontal).map(&:to_s), %w((0,10;0,30;10,30;10,10) (0,30;0,40;40,40;40,30) (30,10;30,30;40,30;40,10) (0,0;0,10;40,10;40,0)))
+    assert_equal(p.decompose_convex(RBA::Polygon::PO_vertical).map(&:to_s), %w((10,0;10,10;30,10;30,0) (0,0;0,40;10,40;10,0) (10,30;10,40;30,40;30,30) (30,0;30,40;40,40;40,0)))
+    assert_equal(p.decompose_convex(RBA::Polygon::PO_htrapezoids).map(&:to_s), %w((0,10;0,30;10,30;10,10) (0,30;0,40;30,40;30,30) (30,10;30,40;40,40;40,10) (0,0;0,10;40,10;40,0)))
+    assert_equal(p.decompose_convex(RBA::Polygon::PO_vtrapezoids).map(&:to_s), %w((10,0;10,10;30,10;30,0) (0,0;0,30;10,30;10,0) (0,30;0,40;30,40;30,30) (30,0;30,40;40,40;40,0)))
 
-    assert_equal(p.decompose_trapezoids.inspect, "[(0,0;0,10;40,10;40,0), (0,10;0,30;10,30;10,10), (30,10;30,30;40,30;40,10), (0,30;0,40;40,40;40,30)]")
-    assert_equal(p.decompose_trapezoids(RBA::Polygon::TD_simple).inspect, "[(0,0;0,10;40,10;40,0), (0,10;0,30;10,30;10,10), (30,10;30,30;40,30;40,10), (0,30;0,40;40,40;40,30)]")
-    assert_equal(p.decompose_trapezoids(RBA::Polygon::TD_htrapezoids).inspect, "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
-    assert_equal(p.decompose_trapezoids(RBA::Polygon::TD_vtrapezoids).inspect, "[(10,0;10,10;30,10;30,0), (0,0;0,30;10,30;10,0), (0,30;0,40;30,40;30,30), (30,0;30,40;40,40;40,0)]")
+    assert_equal(p.decompose_trapezoids.map(&:to_s), %w((0,0;0,10;40,10;40,0) (0,10;0,30;10,30;10,10) (30,10;30,30;40,30;40,10) (0,30;0,40;40,40;40,30)))
+    assert_equal(p.decompose_trapezoids(RBA::Polygon::TD_simple).map(&:to_s), %w((0,0;0,10;40,10;40,0) (0,10;0,30;10,30;10,10) (30,10;30,30;40,30;40,10) (0,30;0,40;40,40;40,30)))
+    assert_equal(p.decompose_trapezoids(RBA::Polygon::TD_htrapezoids).map(&:to_s), %w((0,10;0,30;10,30;10,10) (0,30;0,40;30,40;30,30) (30,10;30,40;40,40;40,10) (0,0;0,10;40,10;40,0)))
+    assert_equal(p.decompose_trapezoids(RBA::Polygon::TD_vtrapezoids).map(&:to_s), %w((10,0;10,10;30,10;30,0) (0,0;0,30;10,30;10,0) (0,30;0,40;30,40;30,30) (30,0;30,40;40,40;40,0)))
 
   end
 
@@ -520,7 +520,7 @@ class DBPolygon_TestClass < TestBase
     sp = sp.round_corners(10000, 5000, 200)
     ex = sp.extract_rad
 
-    assert_equal(ex.inspect, "[(0,0;0,200000;300000,200000;300000,100000;100000,100000;100000,0), 10000.0, 5000.0, 200]")
+    assert_equal(ex.map(&:to_s), %w((0,0;0,200000;300000,200000;300000,100000;100000,100000;100000,0) 10000.0 5000.0 200))
 
     ex = RBA::Polygon::new.extract_rad
     assert_equal(ex.inspect, "[]")
@@ -530,7 +530,7 @@ class DBPolygon_TestClass < TestBase
     sp = sp.round_corners(10000, 5000, 200)
     ex = sp.extract_rad
 
-    assert_equal(ex.inspect, "[(0,0;0,300000;300000,300000;300000,0/100000,100000;200000,100000;200000,200000;100000,200000), 10000.0, 5000.0, 200]")
+    assert_equal(ex.map(&:to_s), %w((0,0;0,300000;300000,300000;300000,0/100000,100000;200000,100000;200000,200000;100000,200000) 10000.0 5000.0 200))
 
     # double coords too ...
 
@@ -545,7 +545,7 @@ class DBPolygon_TestClass < TestBase
     # round to integers for better comparison
     
     ex[0] = RBA::SimplePolygon::new(ex[0])
-    assert_equal(ex.inspect, "[(0,0;0,200000;300000,200000;300000,100000;100000,100000;100000,0), 10000.0, 5000.0, 200]")
+    assert_equal(ex.map(&:to_s), %w((0,0;0,200000;300000,200000;300000,100000;100000,100000;100000,0) 10000.0 5000.0 200))
 
     ex = RBA::DPolygon::new.extract_rad
     assert_equal(ex.inspect, "[]")
@@ -558,7 +558,7 @@ class DBPolygon_TestClass < TestBase
     # round to integers for better comparison
     ex[0] = RBA::Polygon::new(ex[0])
 
-    assert_equal(ex.inspect, "[(0,0;0,300000;300000,300000;300000,0/100000,100000;200000,100000;200000,200000;100000,200000), 10000.0, 5000.0, 200]")
+    assert_equal(ex.map(&:to_s), %w((0,0;0,300000;300000,300000;300000,0/100000,100000;200000,100000;200000,200000;100000,200000) 10000.0 5000.0 200))
 
   end
 

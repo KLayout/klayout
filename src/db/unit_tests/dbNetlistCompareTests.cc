@@ -3943,3 +3943,46 @@ TEST(28_NoSymmetryDetectionCases)
   }
 }
 
+TEST(28_JoinSymmetricNets)
+{
+  const char *nls =
+    "circuit INV2LOAD (A=A,VSS=VSS,VDD=VDD);\n"
+    "  device PMOS $1 (S=OUT1,G=A,D=VDD) (L=0.25,W=1);\n"
+    "  device PMOS $2 (S=VDD,G=A,D=OUT1) (L=0.25,W=1);\n"
+    "  device NMOS $3 (S=VSS,G=A,D=OUT1) (L=0.25,W=1);\n"
+    "  device NMOS $4 (S=VSS,G=A,D=OUT1) (L=0.25,W=1.5);\n"
+    "  device PMOS $5 (S=OUT2,G=A,D=VDD) (L=0.25,W=1);\n"
+    "  device PMOS $6 (S=VDD,G=A,D=OUT2) (L=0.25,W=1);\n"
+    "  device NMOS $7 (S=OUT2,G=A,D=VSS) (L=0.25,W=1);\n"
+    "  device NMOS $8 (S=OUT2,G=A,D=VSS) (L=0.25,W=1);\n"
+    "  device PMOS $9 (S=OUT3,G=A,D=VDD) (L=0.25,W=1);\n"
+    "  device PMOS $10 (S=VDD,G=A,D=OUT3) (L=0.25,W=1);\n"
+    "  device NMOS $11 (S=VSS,G=A,D=OUT3) (L=0.25,W=1);\n"
+    "  device NMOS $12 (S=OUT3,G=A,D=VSS) (L=0.25,W=1);\n"
+    "end;\n";
+
+  db::Netlist nl;
+  prep_nl (nl, nls);
+
+  db::NetlistComparer comp;
+  comp.join_symmetric_nets (nl.circuit_by_name ("INV2LOAD"));
+
+  //  NOTE $1 and $2 are joined because they are symmetric
+  EXPECT_EQ (nl.to_string (),
+    "circuit INV2LOAD (A=A,VSS=VSS,VDD=VDD);\n"
+    "  device PMOS $1 (S=OUT1,G=A,D=VDD) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $2 (S=VDD,G=A,D=OUT1) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $3 (S=VSS,G=A,D=OUT1) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $4 (S=VSS,G=A,D=OUT1) (L=0.25,W=1.5,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $5 (S=OUT2,G=A,D=VDD) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $6 (S=VDD,G=A,D=OUT2) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $7 (S=OUT2,G=A,D=VSS) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $8 (S=OUT2,G=A,D=VSS) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $9 (S=OUT2,G=A,D=VDD) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $10 (S=VDD,G=A,D=OUT2) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $11 (S=VSS,G=A,D=OUT2) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $12 (S=OUT2,G=A,D=VSS) (L=0.25,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  )
+}
+

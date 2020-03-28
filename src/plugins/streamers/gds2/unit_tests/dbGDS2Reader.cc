@@ -393,7 +393,7 @@ TEST(Bug_121_2)
 
 TEST(3_AdvancedMapping)
 {
-  db::Manager m (false);
+  db::Manager m;
   db::Layout layout (&m);
 
   db::LoadLayoutOptions options;

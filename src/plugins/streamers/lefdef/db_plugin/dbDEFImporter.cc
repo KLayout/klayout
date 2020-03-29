@@ -136,6 +136,25 @@ struct Group
   std::vector<tl::GlobPattern> comp_match;
 };
 
+db::Coord
+DEFImporter::get_wire_width_for_rule (const std::string &rulename, const std::string &ln, double dbu)
+{
+  double w = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_width (ln, rulename, 0.0) / dbu);
+
+  //  try to find local nondefault rule
+  if (! rulename.empty ()) {
+    std::map<std::string, std::map<std::string, double> >::const_iterator nd = m_nondefault_widths.find (rulename);
+    if (nd != m_nondefault_widths.end ()) {
+      std::map<std::string, double>::const_iterator ld = nd->second.find (ln);
+      if (ld != nd->second.end ()) {
+        w = ld->second;
+      }
+    }
+  }
+
+  return w;
+}
+
 void 
 DEFImporter::do_read (db::Layout &layout)
 {
@@ -521,29 +540,14 @@ DEFImporter::do_read (db::Layout &layout)
 
               }
 
-              if (! specialnets) {
-
-                if (! rulename) {
-                  rulename = &nondefaultrule;
-                }
-
-                w = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_width (ln, *rulename, 0.0) / layout.dbu ());
-
-                //  try to find local nondefault rule
-                if (! rulename->empty ()) {
-                  std::map<std::string, std::map<std::string, double> >::const_iterator nd = m_nondefault_widths.find (*rulename);
-                  if (nd != m_nondefault_widths.end ()) {
-                    std::map<std::string, double>::const_iterator ld = nd->second.find (ln);
-                    if (ld != nd->second.end ()) {
-                      w = ld->second;
-                    }
-                  }
-                }
-
+              if (! rulename) {
+                rulename = &nondefaultrule;
               }
 
               db::Coord def_ext = 0;
+
               if (! specialnets) {
+                w = get_wire_width_for_rule (*rulename, ln, layout.dbu ());
                 def_ext = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_ext (ln, w * 0.5 * layout.dbu ()) / layout.dbu ());
               }
 
@@ -731,6 +735,11 @@ DEFImporter::do_read (db::Layout &layout)
                     } else if (ln == vd->second.m2) {
                       ln = vd->second.m1;
                     }
+                  }
+
+                  if (! specialnets) {
+                    w = get_wire_width_for_rule (*rulename, ln, layout.dbu ());
+                    def_ext = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_ext (ln, w * 0.5 * layout.dbu ()) / layout.dbu ());
                   }
 
                   //  continue a segment with the current point and the new layer

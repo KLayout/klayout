@@ -66,6 +66,7 @@ private:
   db::FTrans get_orient (bool optional);
   void read_polygon (db::Polygon &poly, double scale);
   void read_rect (db::Polygon &poly, double scale);
+  db::Coord get_wire_width_for_rule(const std::string &rule, const std::string &ln, double dbu);
 };
 
 }

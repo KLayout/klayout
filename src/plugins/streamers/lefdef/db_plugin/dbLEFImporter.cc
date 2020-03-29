@@ -602,7 +602,24 @@ LEFImporter::do_read (db::Layout &layout)
           test (";");
         }
 
-        read_geometries (layout, cell, ViaGeometry);
+        std::map<std::string, db::Box> bboxes;
+        read_geometries (layout, cell, ViaGeometry, &bboxes);
+
+        //  determine m1 and m2 layers
+
+        std::vector<std::string> routing_layers;
+        for (std::map<std::string, db::Box>::const_iterator b = bboxes.begin (); b != bboxes.end (); ++b) {
+          if (m_routing_layers.find (b->first) != m_routing_layers.end ()) {
+            routing_layers.push_back (b->first);
+          }
+        }
+
+        if (routing_layers.size () == 2) {
+          via_desc.m1 = routing_layers[0];
+          via_desc.m2 = routing_layers[1];
+        } else {
+          warn ("Can't determine routing layers for via: " + n);
+        }
 
         reset_cellname ();
 
@@ -631,6 +648,15 @@ LEFImporter::do_read (db::Layout &layout)
         if (test ("END")) {
           expect (ln);
           break;
+        } else if (test ("TYPE")) {
+          if (test ("ROUTING")) {
+            m_routing_layers.insert (ln);
+          } else if (test ("CUT")) {
+            m_cut_layers.insert (ln);
+          } else {
+            get ();
+          }
+          expect (";");
         } else if (test ("WIDTH")) {
           double w = get_double ();
           m_default_widths.insert (std::make_pair (ln, w));

@@ -106,6 +106,7 @@ private:
   std::map<std::string, db::Cell *> m_macros_by_name;
   std::map<std::string, db::Box> m_macro_bboxes_by_name;
   std::map<std::string, ViaDesc> m_vias;
+  std::set<std::string> m_routing_layers, m_cut_layers;
 
   std::vector <db::Trans> get_iteration (db::Layout &layout);
   void read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose purpose, std::map<std::string, db::Box> *collect_bboxes = 0, properties_id_type prop_id = 0);

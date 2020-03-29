@@ -914,6 +914,11 @@ DEFImporter::do_read (db::Layout &layout)
 
             std::string ln = get ();
 
+            if (test ("+")) {
+              expect ("MASK");
+              get_long ();
+            }
+
             std::vector<db::Polygon> &polygons = geometry.insert (std::make_pair (ln, std::vector<db::Polygon> ())).first->second;
             polygons.push_back (db::Polygon ());
             read_polygon (polygons.back (), scale);
@@ -921,6 +926,11 @@ DEFImporter::do_read (db::Layout &layout)
           } else if (test ("RECT")) {
 
             std::string ln = get ();
+
+            if (test ("+")) {
+              expect ("MASK");
+              get_long ();
+            }
 
             std::vector<db::Polygon> &polygons = geometry.insert (std::make_pair (ln, std::vector<db::Polygon> ())).first->second;
             polygons.push_back (db::Polygon ());

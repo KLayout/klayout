@@ -386,7 +386,7 @@ TEST(6)
 
   EXPECT_EQ (layers_to_string (ly), "1/0,3/10,2/0");
 
-  //  this will create layer 2/0 in the layout
+  //  this will create layer 2/42 in the layout
   p = lm.logical (db::LayerProperties (2, 42), ly);
   EXPECT_EQ (p.first, true);
   EXPECT_EQ (p.second, (unsigned int) 3);
@@ -404,6 +404,6 @@ TEST(6)
   EXPECT_EQ (layers_to_string (ly), "1/0,3/10,2/0,2/42");
 
   EXPECT_EQ (lm.to_string (),
-    "layer_map('1/0';'3/10-*';'2/0';'2/42';'2/1-41,43-* : */*')"
+    "layer_map('1/0';'3/10-*';'2/0 : 2/0';'2/42 : 2/42';'2/1-41,43-* : */*')"
   );
 }

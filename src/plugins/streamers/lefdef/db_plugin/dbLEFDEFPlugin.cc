@@ -137,7 +137,7 @@ read_map_file (const std::string &path, db::LEFDEFLayerDelegate &layers)
             layers.push_back (tl::split (*p, "/").front ());
           }
 
-          std::string final_name = std::string ("(") + tl::join (layers, "/") + ",LABEL)";
+          std::string final_name = tl::join (layers, "/") + ".LABEL";
           for (std::vector<std::string>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
             std::string canonical_name = std::string ("(") + *l + ",LABEL)";
             lm.map (db::LayerProperties (canonical_name), n, db::LayerProperties (layer, datatype, final_name));

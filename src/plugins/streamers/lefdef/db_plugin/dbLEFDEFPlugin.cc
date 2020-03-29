@@ -120,7 +120,7 @@ read_map_file (const std::string &path, db::LEFDEFLayerDelegate &layers)
 
         if (w1 == "DIEAREA") {
 
-          std::string canonical_name = "(OUTLINE)";
+          std::string canonical_name = "OUTLINE";
           lm.map (db::LayerProperties (canonical_name), n++, db::LayerProperties (layer, datatype));
 
         } else if (w1 == "NAME") {

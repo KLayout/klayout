@@ -76,7 +76,8 @@ FORMS = \
     LayoutStatistics.ui
 
 RESOURCES = \
-    laybasicResources.qrc
+    laybasicResources.qrc \
+    layLayoutStatistics.qrc
 
 SOURCES = \
   gtf.cc \

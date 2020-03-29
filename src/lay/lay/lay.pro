@@ -163,7 +163,6 @@ SOURCES = \
 
 RESOURCES = layBuildInMacros.qrc \
     layHelpResources.qrc \
-    layLayoutStatistics.qrc \
     layMacroTemplates.qrc \
     layResources.qrc \
     laySaltTemplates.qrc

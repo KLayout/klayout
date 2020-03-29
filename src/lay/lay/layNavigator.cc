@@ -503,32 +503,6 @@ Navigator::~Navigator ()
   }
 }
 
-void 
-Navigator::init_menu (AbstractMenu &menu)
-{
-  MenuLayoutEntry navigator_main_menu [] = {
-    MenuLayoutEntry ("navigator_show_images",        tl::to_string (QObject::tr ("Show Images")),                std::make_pair (cfg_navigator_show_images, "?")),
-    MenuLayoutEntry ("navigator_all_hier_levels",    tl::to_string (QObject::tr ("Show All Hierarchy Levels")),  std::make_pair (cfg_navigator_all_hier_levels, "?")),
-    MenuLayoutEntry::separator ("navigator_options_group"),
-    MenuLayoutEntry ("navigator_freeze",             tl::to_string (QObject::tr ("Freeze")),                     SLOT (cm_navigator_freeze ())),
-    MenuLayoutEntry::last ()
-  };
-
-  MenuLayoutEntry navigator_menu [] = {
-    MenuLayoutEntry ("navigator_main_menu",          tl::to_string (QObject::tr ("Options")),                    navigator_main_menu),
-    MenuLayoutEntry::last ()
-  };
-
-  MenuLayoutEntry navigator_detached_menu [] = {
-    MenuLayoutEntry ("@@navigator_menu",             "",                                           navigator_menu),
-    MenuLayoutEntry::last ()
-  };
-
-  menu.init (navigator_detached_menu);
-
-  menu.action (freeze_action_path).set_checkable (true);
-}
-
 void
 Navigator::menu_changed ()
 {
@@ -567,11 +541,11 @@ Navigator::all_hier_levels (bool f)
 void 
 Navigator::freeze_clicked ()
 {
-  Action freeze_action = mp_main_window->menu ()->action (freeze_action_path);
+  Action *freeze_action = mp_main_window->menu ()->action (freeze_action_path);
 
   m_frozen_list.erase (mp_source_view);
 
-  if (freeze_action.is_checked () && mp_source_view) {
+  if (freeze_action->is_checked () && mp_source_view) {
     NavigatorFrozenViewInfo &info = m_frozen_list.insert (std::make_pair (mp_source_view, NavigatorFrozenViewInfo ())).first->second;
     info.layer_properties = mp_source_view->get_properties ();
     info.hierarchy_levels = mp_source_view->get_hier_levels ();
@@ -598,8 +572,8 @@ Navigator::showEvent (QShowEvent *)
 void 
 Navigator::closeEvent (QCloseEvent *)
 {
-  lay::PluginRoot::instance ()->config_set (cfg_show_navigator, "false");
-  lay::PluginRoot::instance ()->config_end ();
+  mp_main_window->config_set (cfg_show_navigator, "false");
+  mp_main_window->config_end ();
 }
 
 void 
@@ -716,8 +690,8 @@ Navigator::attach_view (LayoutView *view)
         all_views.erase (*v);
       }
 
-      Action freeze_action = mp_main_window->menu ()->action (freeze_action_path);
-      freeze_action.set_checked (m_frozen_list.find (mp_source_view) != m_frozen_list.end ());
+      Action *freeze_action = mp_main_window->menu ()->action (freeze_action_path);
+      freeze_action->set_checked (m_frozen_list.find (mp_source_view) != m_frozen_list.end ());
 
       //  Hint: this must happen before update ()
       mp_service->attach_view (mp_source_view);
@@ -792,6 +766,34 @@ Navigator::update ()
   mp_view->update_content ();
   mp_service->update_marker ();
 }
+
+// ------------------------------------------------------------
+//  Declaration of the "plugin" for the menu entries
+
+class NavigatorPluginDeclaration
+  : public lay::PluginDeclaration
+{
+public:
+  virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
+  {
+    std::string at;
+
+    at = ".end";
+    menu_entries.push_back (lay::submenu ("@@navigator_menu", at, std::string ()));
+
+    at = "@@navigator_menu.end";
+    menu_entries.push_back (lay::submenu ("navigator_main_menu", at, tl::to_string (QObject::tr ("Options"))));
+
+    at = "@@navigator_menu.navigator_main_menu.end";
+    menu_entries.push_back (lay::config_menu_item ("navigator_show_images", at, tl::to_string (QObject::tr ("Show Images")), cfg_navigator_show_images, "?"));
+    menu_entries.push_back (lay::config_menu_item ("navigator_all_hier_levels", at, tl::to_string (QObject::tr ("Show All Hierarchy Levels")), cfg_navigator_all_hier_levels, "?"));
+    menu_entries.push_back (lay::separator ("navigator_options_group", at));
+    menu_entries.push_back (lay::menu_item ("cm_navigator_freeze", "navigator_freeze", at, tl::to_string (QObject::tr ("Freeze"))));
+    menu_entries.back ().checkable = true;
+  }
+};
+
+static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new NavigatorPluginDeclaration (), -1, "NavigatorPlugin");
 
 }
 

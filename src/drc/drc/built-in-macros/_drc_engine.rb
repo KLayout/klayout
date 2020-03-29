@@ -147,7 +147,10 @@ module DRC
     # @name mos3
     # @synopsis mos3(name)
     # Use this class with \extract_devices to specify extraction of a 
-    # three-terminal MOS transistor
+    # three-terminal MOS transistor.
+    #
+    # See RBA::DeviceExtractorMOS3Transistor for more details
+    # about this extractor (non-strict mode applies for 'mos3').
 
     def mos3(name)
       RBA::DeviceExtractorMOS3Transistor::new(name)
@@ -158,7 +161,10 @@ module DRC
     # @name mos4
     # @synopsis mos4(name)
     # Use this class with \extract_devices to specify extraction of a 
-    # four-terminal MOS transistor
+    # four-terminal MOS transistor.
+    #
+    # See RBA::DeviceExtractorMOS4Transistor for more details
+    # about this extractor (non-strict mode applies for 'mos4').
 
     def mos4(name)
       RBA::DeviceExtractorMOS4Transistor::new(name)
@@ -172,6 +178,9 @@ module DRC
     # three-terminal DMOS transistor. A DMOS transistor is essentially
     # the same than a MOS transistor, but source and drain are 
     # separated.
+    #
+    # See RBA::DeviceExtractorMOS3Transistor for more details
+    # about this extractor (strict mode applies for 'dmos3').
 
     def dmos3(name)
       RBA::DeviceExtractorMOS3Transistor::new(name, true)
@@ -185,6 +194,9 @@ module DRC
     # four-terminal DMOS transistor. A DMOS transistor is essentially
     # the same than a MOS transistor, but source and drain are 
     # separated.
+    #
+    # See RBA::DeviceExtractorMOS4Transistor for more details
+    # about this extractor (strict mode applies for 'dmos4').
 
     def dmos4(name)
       RBA::DeviceExtractorMOS4Transistor::new(name, true)
@@ -196,6 +208,9 @@ module DRC
     # @synopsis bjt3(name)
     # Use this class with \extract_devices to specify extraction of a 
     # bipolar junction transistor
+    #
+    # See RBA::DeviceExtractorBJT3Transistor for more details
+    # about this extractor.
 
     def bjt3(name)
       RBA::DeviceExtractorBJT3Transistor::new(name)
@@ -207,6 +222,9 @@ module DRC
     # @synopsis bjt4(name)
     # Use this class with \extract_devices to specify extraction of a 
     # bipolar junction transistor with a substrate terminal
+    #
+    # See RBA::DeviceExtractorBJT4Transistor for more details
+    # about this extractor.
 
     def bjt4(name)
       RBA::DeviceExtractorBJT4Transistor::new(name)
@@ -218,6 +236,9 @@ module DRC
     # @synopsis diode(name)
     # Use this class with \extract_devices to specify extraction of a 
     # planar diode 
+    #
+    # See RBA::DeviceExtractorDiode for more details
+    # about this extractor.
 
     def diode(name)
       RBA::DeviceExtractorDiode::new(name)
@@ -228,7 +249,12 @@ module DRC
     # @name resistor
     # @synopsis resistor(name, sheet_rho)
     # Use this class with \extract_devices to specify extraction of a resistor.
-    # The sheet_rho value is the sheet resistance in ohms/square.
+    #
+    # The sheet_rho value is the sheet resistance in ohms/square. It is used
+    # to compute the resistance from the geometry.
+    #
+    # See RBA::DeviceExtractorResistor for more details
+    # about this extractor.
 
     def resistor(name, sheet_rho)
       RBA::DeviceExtractorResistor::new(name, sheet_rho)
@@ -241,6 +267,9 @@ module DRC
     # Use this class with \extract_devices to specify extraction of a resistor 
     # with a bulk terminal.
     # The sheet_rho value is the sheet resistance in ohms/square.
+    #
+    # See RBA::DeviceExtractorResistorWithBulk for more details
+    # about this extractor.
 
     def resistor_with_bulk(name, sheet_rho)
       RBA::DeviceExtractorResistorWithBulk::new(name, sheet_rho)
@@ -252,6 +281,9 @@ module DRC
     # @synopsis capacitor(name, area_cap)
     # Use this class with \extract_devices to specify extraction of a capacitor.
     # The area_cap argument is the capacitance in Farad per square micrometer.
+    #
+    # See RBA::DeviceExtractorCapacitor for more details
+    # about this extractor.
 
     def capacitor(name, area_cap)
       RBA::DeviceExtractorCapacitor::new(name, area_cap)
@@ -264,6 +296,9 @@ module DRC
     # Use this class with \extract_devices to specify extraction of a capacitor 
     # with a bulk terminal.
     # The area_cap argument is the capacitance in Farad per square micrometer.
+    #
+    # See RBA::DeviceExtractorCapacitorWithBulk for more details
+    # about this extractor.
 
     def capacitor_with_bulk(name, area_cap)
       RBA::DeviceExtractorCapacitorWithBulk::new(name, area_cap)
@@ -1334,7 +1369,7 @@ CODE
     
     def src_line
       cc = caller.find do |c|
-        c !~ /drc.lym:/ && c !~ /\(eval\)/
+        c !~ /drc.lym:/ && c !~ /_drc_\w+\.rb:/ && c !~ /\(eval\)/
       end
       if cc =~ /(.*)\s*:\s*(\d+)\s*:\s*in.*$/
         return File::basename($1) + ":" + $2

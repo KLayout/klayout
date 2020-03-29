@@ -625,7 +625,7 @@ DiffToolDialog::exec_dialog (lay::LayoutView *view)
     mp_ui->layoutb->set_layout_view (view);
   }
 
-  lay::PluginRoot *config_root = lay::PluginRoot::instance ();
+  lay::Dispatcher *config_root = lay::Dispatcher::instance ();
 
   bool f = false;
   if (config_root->config_get (cfg_diff_run_xor, f)) {
@@ -674,7 +674,7 @@ BEGIN_PROTECTED
     throw tl::Exception (tl::to_string (QObject::tr ("Trying to perform an Diff between identical layouts")));  
   }
 
-  lay::PluginRoot *config_root = lay::PluginRoot::instance ();
+  lay::Dispatcher *config_root = lay::Dispatcher::instance ();
 
   config_root->config_set (cfg_diff_run_xor, mp_ui->xor_cbx->isChecked ());
   config_root->config_set (cfg_diff_detailed, mp_ui->detailed_cbx->isChecked ());

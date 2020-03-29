@@ -69,7 +69,7 @@ struct A : public db::Object
 
 TEST(1) 
 {
-  db::Manager *man = new db::Manager ();
+  db::Manager *man = new db::Manager (true);
   {
     EXPECT_EQ (man->available_undo ().first, false);
     EXPECT_EQ (man->available_redo ().first, false);
@@ -176,7 +176,7 @@ struct B : public db::Object
 
 TEST(2) 
 {
-  db::Manager *man = new db::Manager ();
+  db::Manager *man = new db::Manager (true);
   {
     EXPECT_EQ (man->available_undo ().first, false);
     EXPECT_EQ (man->available_redo ().first, false);
@@ -234,7 +234,7 @@ TEST(2)
 
 TEST(3) 
 {
-  db::Manager *man = new db::Manager ();
+  db::Manager *man = new db::Manager (true);
   {
     EXPECT_EQ (man->available_undo ().first, false);
     EXPECT_EQ (man->available_redo ().first, false);
@@ -268,7 +268,7 @@ TEST(3)
 
 TEST(4)
 {
-  db::Manager *man = new db::Manager ();
+  db::Manager *man = new db::Manager (true);
   {
     EXPECT_EQ (man->available_undo ().first, false);
     EXPECT_EQ (man->available_redo ().first, false);

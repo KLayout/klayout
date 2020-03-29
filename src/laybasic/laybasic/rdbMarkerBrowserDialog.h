@@ -38,7 +38,7 @@ class MarkerBrowserDialog
   Q_OBJECT
 
 public:
-  MarkerBrowserDialog (lay::PluginRoot *root, lay::LayoutView *view);
+  MarkerBrowserDialog (lay::Dispatcher *root, lay::LayoutView *view);
   ~MarkerBrowserDialog ();
 
   void load (int rdb_index, int cv_index);

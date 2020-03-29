@@ -223,18 +223,16 @@ gsi::ClassExt<db::LoadLayoutOptions> dxf_reader_options (
     "This method has been added in version 0.25 and replaces the respective global option in \\LoadLayoutOptions "
     "in a format-specific fashion."
   ) +
-  gsi::method_ext ("dxf_dbu=", &set_dxf_dbu,
+  gsi::method_ext ("dxf_dbu=", &set_dxf_dbu, gsi::arg ("dbu"),
     "@brief Specifies the database unit which the reader uses and produces\n"
-    "@args dbu\n"
     "\nThis property has been added in version 0.21.\n"
   ) +
   gsi::method_ext ("dxf_dbu", &get_dxf_dbu,
     "@brief Specifies the database unit which the reader uses and produces\n"
     "\nThis property has been added in version 0.21.\n"
   ) +
-  gsi::method_ext ("dxf_text_scaling=", &set_dxf_text_scaling,
+  gsi::method_ext ("dxf_text_scaling=", &set_dxf_text_scaling, gsi::arg ("unit"),
     "@brief Specifies the text scaling in percent of the default scaling\n"
-    "@args unit\n"
     "\n"
     "The default value 100, meaning that the letter pitch is roughly 92 percent of the specified text height. "
     "Decrease this value to get smaller fonts and increase it to get larger fonts.\n"
@@ -244,18 +242,16 @@ gsi::ClassExt<db::LoadLayoutOptions> dxf_reader_options (
     "@brief Gets the text scaling factor (see \\dxf_text_scaling=)\n"
     "\nThis property has been added in version 0.21.20.\n"
   ) +
-  gsi::method_ext ("dxf_unit=", &set_dxf_unit,
+  gsi::method_ext ("dxf_unit=", &set_dxf_unit, gsi::arg ("unit"),
     "@brief Specifies the unit in which the DXF file is drawn.\n"
-    "@args unit\n"
     "\nThis property has been added in version 0.21.3.\n"
   ) +
   gsi::method_ext ("dxf_unit", &get_dxf_unit,
     "@brief Specifies the unit in which the DXF file is drawn\n"
     "\nThis property has been added in version 0.21.3.\n"
   ) +
-  gsi::method_ext ("dxf_circle_points=", &set_dxf_circle_points,
+  gsi::method_ext ("dxf_circle_points=", &set_dxf_circle_points, gsi::arg ("points"),
     "@brief Specifies the number of points used per full circle for arc interpolation\n"
-    "@args points\n"
     "See also \\dxf_circle_accuracy for how to specify the number of points based on "
     "an approximation accuracy.\n"
     "\n"
@@ -268,9 +264,8 @@ gsi::ClassExt<db::LoadLayoutOptions> dxf_reader_options (
     "@brief Gets the number of points used per full circle for arc interpolation\n"
     "\nThis property has been added in version 0.21.6.\n"
   ) +
-  gsi::method_ext ("dxf_circle_accuracy=", &set_dxf_circle_accuracy,
+  gsi::method_ext ("dxf_circle_accuracy=", &set_dxf_circle_accuracy, gsi::arg ("accuracy"),
     "@brief Specifies the accuracy of the circle approximation\n"
-    "@args accuracy\n"
     "\n"
     "In addition to the number of points per circle, the circle accuracy can be specified. "
     "If set to a value larger than the database unit, the number of points per circle will "
@@ -288,9 +283,8 @@ gsi::ClassExt<db::LoadLayoutOptions> dxf_reader_options (
     "@brief Gets the accuracy of the circle approximation\n"
     "\nThis property has been added in version 0.24.9.\n"
   ) +
-  gsi::method_ext ("dxf_contour_accuracy=", &set_dxf_contour_accuracy,
+  gsi::method_ext ("dxf_contour_accuracy=", &set_dxf_contour_accuracy, gsi::arg ("accuracy"),
     "@brief Specifies the accuracy for contour closing\n"
-    "@args accuracy\n"
     "\n"
     "When polylines need to be connected or closed, this\n"
     "value is used to indicate the accuracy. This is the value (in DXF units)\n"
@@ -307,9 +301,8 @@ gsi::ClassExt<db::LoadLayoutOptions> dxf_reader_options (
     "\n"
     "\nThis property has been added in version 0.25.3.\n"
   ) +
-  gsi::method_ext ("dxf_render_texts_as_polygons=", &set_dxf_render_texts_as_polygons,
+  gsi::method_ext ("dxf_render_texts_as_polygons=", &set_dxf_render_texts_as_polygons, gsi::arg ("value"),
     "@brief If this option is set to true, text objects are rendered as polygons\n"
-    "@args value\n"
     "\nThis property has been added in version 0.21.15.\n"
   ) +
   gsi::method_ext ("dxf_render_texts_as_polygons?|#dxf_render_texts_as_polygons", &get_dxf_render_texts_as_polygons,
@@ -334,18 +327,16 @@ gsi::ClassExt<db::LoadLayoutOptions> dxf_reader_options (
     "\n"
     "This method has been added in version 0.25.3."
   ) +
-  gsi::method_ext ("dxf_keep_other_cells=", &set_dxf_keep_other_cells,
+  gsi::method_ext ("dxf_keep_other_cells=", &set_dxf_keep_other_cells, gsi::arg ("value"),
     "@brief If this option is set to true, all cells are kept, not only the top cell and it's children\n"
-    "@args value\n"
     "\nThis property has been added in version 0.21.15.\n"
   ) +
   gsi::method_ext ("dxf_keep_other_cells?|#dxf_keep_other_cells", &get_dxf_keep_other_cells,
     "@brief If this option is true, all cells are kept, not only the top cell and it's children\n"
     "\nThis property has been added in version 0.21.15.\n"
   ) +
-  gsi::method_ext ("dxf_polyline_mode=", &set_dxf_polyline_mode,
+  gsi::method_ext ("dxf_polyline_mode=", &set_dxf_polyline_mode, gsi::arg ("mode"),
     "@brief Specifies how to treat POLYLINE/LWPOLYLINE entities.\n"
-    "@args mode\n"
     "The mode is 0 (automatic), 1 (keep lines), 2 (create polygons from closed polylines with width = 0), "
     "3 (merge all lines with width = 0 into polygons), 4 (as 3 plus auto-close open contours).\n"
     "\nThis property has been added in version 0.21.3.\n"
@@ -378,9 +369,8 @@ static int get_dxf_polygon_mode (const db::SaveLayoutOptions *options)
 //  extend lay::SaveLayoutOptions with the DXF options
 static
 gsi::ClassExt<db::SaveLayoutOptions> dxf_writer_options (
-  gsi::method_ext ("dxf_polygon_mode=", &set_dxf_polygon_mode,
+  gsi::method_ext ("dxf_polygon_mode=", &set_dxf_polygon_mode, gsi::arg ("mode"),
     "@brief Specifies how to write polygons.\n"
-    "@args mode\n"
     "The mode is 0 (write POLYLINE entities), 1 (write LWPOLYLINE entities), 2 (decompose into SOLID entities), "
     "3 (write HATCH entities), or 4 (write LINE entities).\n"
     "\nThis property has been added in version 0.21.3. '4', in version 0.25.6.\n"

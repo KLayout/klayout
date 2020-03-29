@@ -48,10 +48,9 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
     "\n"
     "This constant has been introduced in version 0.25."
   ) +
-  gsi::method ("for_single_cell", &db::CellMapping::create_single_mapping, 
+  gsi::method ("for_single_cell", &db::CellMapping::create_single_mapping, gsi::arg ("layout_a"), gsi::arg ("cell_index_a"), gsi::arg ("layout_b"), gsi::arg ("cell_index_b"),
     "@brief Initializes the cell mapping for top-level identity\n"
     "\n"
-    "@args layout_a, cell_index_a, layout_b, cell_index_b\n"
     "@param layout_a The target layout.\n"
     "@param cell_index_a The index of the target cell.\n"
     "@param layout_b The source layout.\n"
@@ -66,10 +65,9 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
     "\n"
     "This method has been introduced in version 0.23."
   ) +
-  gsi::method ("for_single_cell_full", &db::CellMapping::create_single_mapping_full, 
+  gsi::method ("for_single_cell_full", &db::CellMapping::create_single_mapping_full, gsi::arg ("layout_a"), gsi::arg ("cell_index_a"), gsi::arg ("layout_b"), gsi::arg ("cell_index_b"),
     "@brief Initializes the cell mapping for top-level identity\n"
     "\n"
-    "@args layout_a, cell_index_a, layout_b, cell_index_b\n"
     "@param layout_a The target layout.\n"
     "@param cell_index_a The index of the target cell.\n"
     "@param layout_b The source layout.\n"
@@ -82,10 +80,9 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
     "\n"
     "This method has been introduced in version 0.23."
   ) +
-  gsi::method ("from_geometry_full", &db::CellMapping::create_from_geometry_full, 
+  gsi::method ("from_geometry_full", &db::CellMapping::create_from_geometry_full, gsi::arg ("layout_a"), gsi::arg ("cell_index_a"), gsi::arg ("layout_b"), gsi::arg ("cell_index_b"),
     "@brief Initializes the cell mapping using the geometrical identity in full mapping mode\n"
     "\n"
-    "@args layout_a, cell_index_a, layout_b, cell_index_b\n"
     "@param layout_a The target layout.\n"
     "@param cell_index_a The index of the target starting cell.\n"
     "@param layout_b The source layout.\n"
@@ -103,10 +100,9 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
     "\n"
     "This method has been introduced in version 0.23."
   ) +
-  gsi::method ("from_geometry", &db::CellMapping::create_from_geometry, 
+  gsi::method ("from_geometry", &db::CellMapping::create_from_geometry, gsi::arg ("layout_a"), gsi::arg ("cell_index_a"), gsi::arg ("layout_b"), gsi::arg ("cell_index_b"),
     "@brief Initializes the cell mapping using the geometrical identity\n"
     "\n"
-    "@args layout_a, cell_index_a, layout_b, cell_index_b\n"
     "@param layout_a The target layout.\n"
     "@param cell_index_a The index of the target starting cell.\n"
     "@param layout_b The source layout.\n"
@@ -119,10 +115,9 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
     "\n"
     "This method has been introduced in version 0.23."
   ) +
-  gsi::method ("from_names", &db::CellMapping::create_from_names, 
+  gsi::method ("from_names", &db::CellMapping::create_from_names, gsi::arg ("layout_a"), gsi::arg ("cell_index_a"), gsi::arg ("layout_b"), gsi::arg ("cell_index_b"),
     "@brief Initializes the cell mapping using the name identity\n"
     "\n"
-    "@args layout_a, cell_index_a, layout_b, cell_index_b\n"
     "@param layout_a The target layout.\n"
     "@param cell_index_a The index of the target starting cell.\n"
     "@param layout_b The source layout.\n"
@@ -134,10 +129,9 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
     "\n"
     "This method has been introduced in version 0.23."
   ) +
-  gsi::method ("from_names_full", &db::CellMapping::create_from_names_full, 
+  gsi::method ("from_names_full", &db::CellMapping::create_from_names_full, gsi::arg ("layout_a"), gsi::arg ("cell_index_a"), gsi::arg ("layout_b"), gsi::arg ("cell_index_b"),
     "@brief Initializes the cell mapping using the name identity in full mapping mode\n"
     "\n"
-    "@args layout_a, cell_index_a, layout_b, cell_index_b\n"
     "@param layout_a The target layout.\n"
     "@param cell_index_a The index of the target starting cell.\n"
     "@param layout_b The source layout.\n"
@@ -167,10 +161,9 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  gsi::method ("map", &db::CellMapping::map,
+  gsi::method ("map", &db::CellMapping::map, gsi::arg ("cell_index_b"), gsi::arg ("cell_index_a"),
     "@brief Explicitly specifies a mapping.\n"
     "\n"
-    "@args cell_index_b, cell_index_a\n"
     "\n"
     "@param cell_index_b The index of the cell in layout B (the \"source\")\n"
     "@param cell_index_a The index of the cell in layout A (the \"target\") - this index can be \\DropCell\n"
@@ -180,10 +173,9 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
     "\n"
     "This method has been introduced in version 0.23."
   ) +
-  gsi::method ("has_mapping?", &db::CellMapping::has_mapping, 
+  gsi::method ("has_mapping?", &db::CellMapping::has_mapping, gsi::arg ("cell_index_b"),
     "@brief Returns as value indicating whether a cell of layout_b has a mapping to a layout_a cell.\n"
     "\n"
-    "@args cell_index_b\n"
     "\n"
     "@param cell_index_b The index of the cell in layout_b whose mapping is requested.\n"
     "@return true, if the cell has a mapping\n"
@@ -191,10 +183,9 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
     "Note that if the cell is supposed to be dropped (see \\DropCell), the respective "
     "source cell will also be regarded \"mapped\", so has_mapping? will return true in this case.\n"
   ) +
-  gsi::method ("cell_mapping", &db::CellMapping::cell_mapping, 
+  gsi::method ("cell_mapping", &db::CellMapping::cell_mapping, gsi::arg ("cell_index_b"),
     "@brief Determines cell mapping of a layout_b cell to the corresponding layout_a cell.\n"
     "\n"
-    "@args cell_index_b\n"
     "\n"
     "@param cell_index_b The index of the cell in layout_b whose mapping is requested.\n"
     "@return The cell index in layout_a.\n"
@@ -246,4 +237,3 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
 );
 
 }
-

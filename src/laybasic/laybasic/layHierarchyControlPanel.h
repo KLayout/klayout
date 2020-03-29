@@ -117,11 +117,6 @@ public:
   ~HierarchyControlPanel ();
 
   /**
-   *  @brief Perform the cell control panel's initialisations on the main menu
-   */
-  static void init_menu (lay::AbstractMenu &menu);
-
-  /**
    *  @brief The sizeHint implementation for Qt layout management
    */
   virtual QSize sizeHint () const;

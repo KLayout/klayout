@@ -27,7 +27,7 @@
 
 TEST(1)
 {
-  db::Manager mgr;
+  db::Manager mgr (true);
   lay::LayoutView view (&mgr, is_editable (), 0);
 
   int cv1 = view.create_layout ("", true, false);

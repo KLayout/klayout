@@ -37,7 +37,7 @@
 namespace lay
 {
 
-class PluginRoot;
+class Dispatcher;
 class ConfigPage;
 
 class SettingsForm
@@ -46,7 +46,7 @@ class SettingsForm
   Q_OBJECT
 
 public:
-  SettingsForm (QWidget *parent, lay::PluginRoot *plugin_root, const char *name);
+  SettingsForm (QWidget *parent, lay::Dispatcher *dispatcher, const char *name);
   
   void setup ();
   void commit ();
@@ -58,7 +58,7 @@ public slots:
   void item_changed (QTreeWidgetItem *, QTreeWidgetItem *);
 
 private:
-  lay::PluginRoot *mp_plugin_root;
+  lay::Dispatcher *mp_dispatcher;
   std::vector <lay::ConfigPage *> m_config_pages;
   bool m_finalize_recursion;
 };

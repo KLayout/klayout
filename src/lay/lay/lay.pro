@@ -15,7 +15,6 @@ HEADERS = \
     layHelpDialog.h \
     layHelpProvider.h \
     layHelpSource.h \
-    layLayoutStatisticsForm.h \
     layLogViewerDialog.h \
     layMacroEditorDialog.h \
     layMacroEditorPage.h \
@@ -32,7 +31,6 @@ HEADERS = \
     laySearchReplaceConfigPage.h \
     laySearchReplaceDialog.h \
     laySearchReplacePropertiesWidgets.h \
-    laySelectCellViewForm.h \
     laySession.h \
     laySettingsForm.h \
     layTechSetupDialog.h \
@@ -68,7 +66,6 @@ FORMS = \
     DeleteModeDialog.ui \
     FillDialog.ui \
     HelpAboutDialog.ui \
-    LayoutStatistics.ui \
     LogViewerDialog.ui \
     MacroEditorDialog.ui \
     MacroPropertiesDialog.ui \
@@ -92,7 +89,6 @@ FORMS = \
     SearchPropertiesText.ui \
     SearchReplaceConfigPage.ui \
     SearchReplaceDialog.ui \
-    SelectCellViewForm.ui \
     SettingsForm.ui \
     TechBaseEditorPage.ui \
     TechComponentSetupDialog.ui \
@@ -122,7 +118,6 @@ SOURCES = \
     layHelpDialog.cc \
     layHelpProvider.cc \
     layHelpSource.cc \
-    layLayoutStatisticsForm.cc \
     layLogViewerDialog.cc \
     layMacroEditorDialog.cc \
     layMacroEditorPage.cc \
@@ -140,7 +135,6 @@ SOURCES = \
     laySearchReplaceDialog.cc \
     laySearchReplacePlugin.cc \
     laySearchReplacePropertiesWidgets.cc \
-    laySelectCellViewForm.cc \
     laySession.cc \
     laySettingsForm.cc \
     layTechSetupDialog.cc \
@@ -169,7 +163,6 @@ SOURCES = \
 
 RESOURCES = layBuildInMacros.qrc \
     layHelpResources.qrc \
-    layLayoutStatistics.qrc \
     layMacroTemplates.qrc \
     layResources.qrc \
     laySaltTemplates.qrc

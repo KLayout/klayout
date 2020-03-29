@@ -72,18 +72,16 @@ Class<db::Library> decl_Library ("db", "Library",
   gsi::constructor ("new", &new_lib,
     "@brief Creates a new, empty library"
   ) +
-  gsi::method ("library_by_name", &library_by_name,
+  gsi::method ("library_by_name", &library_by_name, gsi::arg ("name"),
     "@brief Gets a library by name\n"
-    "@args name\n"
     "Returns the library object for the given name. If the name is not a valid\n"
     "library name, nil is returned.\n"
   ) +
   gsi::method ("library_names", &library_names,
     "@brief Returns a list of the names of all libraries registered in the system.\n"
   ) +
-  gsi::method_ext ("register", &register_lib,
+  gsi::method_ext ("register", &register_lib, gsi::arg ("name"),
     "@brief Registers the library with the given name\n"
-    "@args name\n"
     "\n"
     "This method can be called in the constructor to register the library after \n"
     "the layout object has been filled with content. If a library with that name\n"
@@ -110,9 +108,8 @@ Class<db::Library> decl_Library ("db", "Library",
   gsi::method ("description", &db::Library::get_description, 
     "@brief Returns the libraries' description text\n"
   ) +
-  gsi::method ("description=", &db::Library::set_description,
+  gsi::method ("description=", &db::Library::set_description, gsi::arg ("description"),
     "@brief Sets the libraries' description text\n"
-    "@args description\n"
   ) +
   gsi::method ("technology", &db::Library::get_technology,
     "@brief Returns name of the technology the library is associated with\n"
@@ -121,9 +118,8 @@ Class<db::Library> decl_Library ("db", "Library",
     "\n"
     "This attribute has been introduced in version 0.25."
   ) +
-  gsi::method ("technology=", &db::Library::set_technology,
+  gsi::method ("technology=", &db::Library::set_technology, gsi::arg ("technology"),
     "@brief sets the name of the technology the library is associated with\n"
-    "@args technology\n"
     "\n"
     "See \\technology for details. "
     "This attribute has been introduced in version 0.25."
@@ -335,9 +331,8 @@ Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native,
   gsi::method ("parameters_from_shape", &PCellDeclarationImpl::parameters_from_shape_fb, "@hide") +
   gsi::method ("transformation_from_shape", &PCellDeclarationImpl::transformation_from_shape_fb, "@hide") +
   gsi::method ("display_text", &PCellDeclarationImpl::get_display_name_fb, "@hide") +
-  gsi::callback ("get_layers", &PCellDeclarationImpl::get_layer_declarations_impl, &PCellDeclarationImpl::cb_get_layer_declarations, 
+  gsi::callback ("get_layers", &PCellDeclarationImpl::get_layer_declarations_impl, &PCellDeclarationImpl::cb_get_layer_declarations, gsi::arg ("parameters"),
     "@brief Returns a list of layer declarations\n"
-    "@args parameters\n"
     "Reimplement this method to return a list of layers this PCell wants to create.\n"
     "The layer declarations are returned as a list of LayerInfo objects which are\n"
     "used as match expressions to look up the layer in the actual layout.\n"
@@ -352,9 +347,8 @@ Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native,
     "and defines the parameter name, type, description text and possible choices for\n"
     "the parameter value.\n"
   ) +
-  gsi::callback ("coerce_parameters", &PCellDeclarationImpl::coerce_parameters_impl, &PCellDeclarationImpl::cb_coerce_parameters, 
+  gsi::callback ("coerce_parameters", &PCellDeclarationImpl::coerce_parameters_impl, &PCellDeclarationImpl::cb_coerce_parameters, gsi::arg ("layout"), gsi::arg ("input"),
     "@brief Modifies the parameters to match the requirements\n"
-    "@args layout, input\n"
     "@param layout The layout object in which the PCell will be produced\n"
     "@param input The parameters before the modification\n"
     "@return The modified parameters or an empty array, indicating that no modification was done\n"
@@ -367,9 +361,8 @@ Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native,
     "\n"
     "It can raise an exception to indicate that something is not correct.\n"
   ) +
-  gsi::callback ("produce", &PCellDeclarationImpl::produce, &PCellDeclarationImpl::cb_produce, 
+  gsi::callback ("produce", &PCellDeclarationImpl::produce, &PCellDeclarationImpl::cb_produce, gsi::arg ("layout"), gsi::arg ("layer_ids"), gsi::arg ("parameters"), gsi::arg ("cell"),
     "@brief The production callback\n"
-    "@args layout, layer_ids, parameters, cell\n"
     "@param layout The layout object where the cell resides\n"
     "@param layer_ids A list of layer ID's which correspond to the layers declared with get_layers\n"
     "@param parameters A list of parameter values which correspond to the parameters declared with get_parameters\n"
@@ -378,9 +371,8 @@ Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native,
     "The code is supposed to create the layout in the target cell using the provided \n"
     "parameters and the layers passed in the layer_ids list.\n"
   ) +
-  gsi::callback ("can_create_from_shape", &PCellDeclarationImpl::can_create_from_shape, &PCellDeclarationImpl::cb_can_create_from_shape,
+  gsi::callback ("can_create_from_shape", &PCellDeclarationImpl::can_create_from_shape, &PCellDeclarationImpl::cb_can_create_from_shape, gsi::arg ("layout"), gsi::arg ("shape"), gsi::arg ("layer"),
     "@brief Returns true, if the PCell can be created from the given shape\n"
-    "@args layout,shape,layer\n"
     "@param layout The layout the shape lives in\n"
     "@param shape The shape from which a PCell shall be created\n"
     "@param layer The layer index (in layout) of the shape\n"
@@ -389,9 +381,8 @@ Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native,
     "\\parameters_from_shape and \\transformation_from_shape to derive the parameters and instance "
     "transformation for the new PCell instance that will replace the shape.\n"
   ) +
-  gsi::callback ("parameters_from_shape", &PCellDeclarationImpl::parameters_from_shape, &PCellDeclarationImpl::cb_parameters_from_shape,
+  gsi::callback ("parameters_from_shape", &PCellDeclarationImpl::parameters_from_shape, &PCellDeclarationImpl::cb_parameters_from_shape, gsi::arg ("layout"), gsi::arg ("shape"), gsi::arg ("layer"),
     "@brief Gets the parameters for the PCell which can replace the given shape\n"
-    "@args layout,shape,layer\n"
     "@param layout The layout the shape lives in\n"
     "@param shape The shape from which a PCell shall be created\n"
     "@param layer The layer index (in layout) of the shape\n"
@@ -399,9 +390,8 @@ Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native,
     "it will use this method to derive the parameters for the PCell instance that will replace the shape. "
     "See also \\transformation_from_shape and \\can_create_from_shape."
   ) +
-  gsi::callback ("transformation_from_shape", &PCellDeclarationImpl::transformation_from_shape, &PCellDeclarationImpl::cb_transformation_from_shape,
+  gsi::callback ("transformation_from_shape", &PCellDeclarationImpl::transformation_from_shape, &PCellDeclarationImpl::cb_transformation_from_shape, gsi::arg ("layout"), gsi::arg ("shape"), gsi::arg ("layer"),
     "@brief Gets the instance transformation for the PCell which can replace the given shape\n"
-    "@args layout,shape,layer\n"
     "@param layout The layout the shape lives in\n"
     "@param shape The shape from which a PCell shall be created\n"
     "@param layer The layer index (in layout) of the shape\n"
@@ -409,9 +399,8 @@ Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native,
     "it will use this method to derive the transformation for the PCell instance that will replace the shape. "
     "See also \\parameters_from_shape and \\can_create_from_shape."
   ) +
-  gsi::callback ("display_text", &PCellDeclarationImpl::get_display_name, &PCellDeclarationImpl::cb_get_display_name, 
+  gsi::callback ("display_text", &PCellDeclarationImpl::get_display_name, &PCellDeclarationImpl::cb_get_display_name, gsi::arg ("parameters"),
     "@brief Returns the display text for this PCell given a certain parameter set\n"
-    "@args parameters\n"
     "Reimplement this method to create a distinct display text for a PCell variant with \n"
     "the given parameter set. If this method is not implemented, a default text is created. \n"
   ),
@@ -539,24 +528,21 @@ db::PCellParameterDeclaration *ctor_pcell_parameter_3 (const std::string &name, 
 }
 
 Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCellParameterDeclaration",
-  gsi::constructor ("new", &ctor_pcell_parameter, 
+  gsi::constructor ("new", &ctor_pcell_parameter, gsi::arg ("name"), gsi::arg ("type"), gsi::arg ("description"),
     "@brief Create a new parameter declaration with the given name and type\n"
-    "@args name, type, description\n"
     "@param name The parameter name\n"
     "@param type One of the Type... constants describing the type of the parameter\n"
     "@param description The description text\n"
   ) +
-  gsi::constructor ("new", &ctor_pcell_parameter_2, 
+  gsi::constructor ("new", &ctor_pcell_parameter_2, gsi::arg ("name"), gsi::arg ("type"), gsi::arg ("description"), gsi::arg ("default"),
     "@brief Create a new parameter declaration with the given name, type and default value\n"
-    "@args name, type, description, default\n"
     "@param name The parameter name\n"
     "@param type One of the Type... constants describing the type of the parameter\n"
     "@param description The description text\n"
     "@param default The default (initial) value\n"
   ) +
-  gsi::constructor ("new", &ctor_pcell_parameter_3, 
+  gsi::constructor ("new", &ctor_pcell_parameter_3, gsi::arg ("name"), gsi::arg ("type"), gsi::arg ("description"), gsi::arg ("default"), gsi::arg ("unit"),
     "@brief Create a new parameter declaration with the given name, type, default value and unit string\n"
-    "@args name, type, description, default\n"
     "@param name The parameter name\n"
     "@param type One of the Type... constants describing the type of the parameter\n"
     "@param description The description text\n"
@@ -566,57 +552,50 @@ Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCel
   gsi::method ("name", &db::PCellParameterDeclaration::get_name, 
     "@brief Gets the name\n"
   ) +
-  gsi::method ("name=", &db::PCellParameterDeclaration::set_name, 
+  gsi::method ("name=", &db::PCellParameterDeclaration::set_name, gsi::arg ("value"),
     "@brief Sets the name\n"
-    "@args value\n"
   ) +
   gsi::method ("unit", &db::PCellParameterDeclaration::get_unit, 
     "@brief Gets the unit string\n"
   ) +
-  gsi::method ("unit=", &db::PCellParameterDeclaration::set_unit, 
+  gsi::method ("unit=", &db::PCellParameterDeclaration::set_unit, gsi::arg ("unit"),
     "@brief Sets the unit string\n"
     "The unit string is shown right to the edit fields for numeric parameters.\n"
-    "@args unit\n"
   ) +
   gsi::method_ext ("type", &get_type, 
     "@brief Gets the type\n"
     "The type is one of the T... constants."
   ) +
-  gsi::method_ext ("type=", &set_type, 
+  gsi::method_ext ("type=", &set_type, gsi::arg ("type"),
     "@brief Sets the type\n"
-    "@args type\n"
   ) +
   gsi::method ("description", &db::PCellParameterDeclaration::get_description, 
     "@brief Gets the description text\n"
   ) +
-  gsi::method ("description=", &db::PCellParameterDeclaration::set_description, 
+  gsi::method ("description=", &db::PCellParameterDeclaration::set_description, gsi::arg ("description"),
     "@brief Sets the description\n"
-    "@args description\n"
   ) +
   gsi::method ("hidden?", &db::PCellParameterDeclaration::is_hidden, 
     "@brief Returns true, if the parameter is a hidden parameter that should not be shown in the user interface\n"
     "By making a parameter hidden, it is possible to create internal parameters which cannot be\n"
     "edited.\n"
   ) +
-  gsi::method ("hidden=", &db::PCellParameterDeclaration::set_hidden, 
+  gsi::method ("hidden=", &db::PCellParameterDeclaration::set_hidden, gsi::arg ("flag"),
     "@brief Makes the parameter hidden if this attribute is set to true\n"
-    "@args flag\n"
   ) +
   gsi::method ("readonly?", &db::PCellParameterDeclaration::is_readonly, 
     "@brief Returns true, if the parameter is a read-only parameter\n"
     "By making a parameter read-only, it is shown but cannot be\n"
     "edited.\n"
   ) +
-  gsi::method ("readonly=", &db::PCellParameterDeclaration::set_readonly, 
+  gsi::method ("readonly=", &db::PCellParameterDeclaration::set_readonly, gsi::arg ("flag"),
     "@brief Makes the parameter read-only if this attribute is set to true\n"
-    "@args flag\n"
   ) +
   gsi::method_ext ("clear_choices", &clear_choices, 
     "@brief Clears the list of choices\n"
   ) +
-  gsi::method_ext ("add_choice", &add_choice, 
+  gsi::method_ext ("add_choice", &add_choice, gsi::arg ("description"), gsi::arg ("value"),
     "@brief Add a new value to the list of choices\n"
-    "@args description, value\n"
     "This method will add the given value with the given description to the list of\n"
     "choices. If choices are defined, KLayout will show a drop-down box instead of an\n"
     "entry field in the parameter user interface.\n"
@@ -630,9 +609,8 @@ Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCel
   gsi::method ("default", &db::PCellParameterDeclaration::get_default, 
     "@brief Gets the default value\n"
   ) +
-  gsi::method ("default=", &db::PCellParameterDeclaration::set_default, 
+  gsi::method ("default=", &db::PCellParameterDeclaration::set_default, gsi::arg ("value"),
     "@brief Sets the default value\n"
-    "@args value\n"
     "If a default value is defined, it will be used to initialize the parameter value\n"
     "when a PCell is created.\n"
   ) +
@@ -656,5 +634,4 @@ Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCel
 );
 
 }
-
 

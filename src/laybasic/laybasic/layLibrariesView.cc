@@ -48,7 +48,6 @@
 #include "layCellTreeModel.h"
 #include "layLayoutView.h"
 #include "layAbstractMenu.h"
-#include "layAbstractMenuProvider.h"
 #include "layDialogs.h"
 #include "tlExceptions.h"
 #include "laybasicConfig.h"
@@ -196,25 +195,6 @@ LibraryTreeWidget::mouseReleaseEvent (QMouseEvent *event)
 
 const int max_cellviews_in_split_mode = 5;
 
-void
-LibrariesView::init_menu (lay::AbstractMenu &menu)
-{
-  MenuLayoutEntry context_menu [] = {
-#if 0
-    //  doesn't make sense for many libs
-    MenuLayoutEntry ("split_mode",                  tl::to_string (QObject::tr ("Split Mode")),             std::make_pair (cfg_split_lib_views, "?")),
-#endif
-    MenuLayoutEntry::last ()
-  };
-
-  MenuLayoutEntry main_menu [] = {
-    MenuLayoutEntry ("@lib_context_menu", "", context_menu),
-    MenuLayoutEntry::last ()
-  };
-
-  menu.init (main_menu);
-}
-
 LibrariesView::LibrariesView (lay::LayoutView *view, QWidget *parent, const char *name)
   : QFrame (parent),
     m_enable_cb (true),
@@ -338,11 +318,9 @@ LibrariesView::event (QEvent *e)
 void
 LibrariesView::context_menu (const QPoint &p)
 {
-  tl_assert (lay::AbstractMenuProvider::instance () != 0);
-
   QTreeView *cell_list = dynamic_cast<QTreeView *> (sender ());
   if (cell_list) {
-    QMenu *ctx_menu = lay::AbstractMenuProvider::instance ()->menu ()->detached_menu ("lib_context_menu");
+    QMenu *ctx_menu = mp_view->menu ()->detached_menu ("lib_context_menu");
     ctx_menu->exec (cell_list->mapToGlobal (p));
   }
 }
@@ -818,5 +796,29 @@ LibrariesView::has_focus () const
 {
   return m_active_index >= 0 && m_active_index < int (mp_cell_lists.size ()) && mp_cell_lists [m_active_index]->hasFocus ();
 }
+
+// ------------------------------------------------------------
+//  Declaration of the "plugin" for the menu entries
+
+class LibraryViewPluginDeclaration
+  : public lay::PluginDeclaration
+{
+public:
+  virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
+  {
+    std::string at;
+
+    at = ".end";
+    menu_entries.push_back (lay::submenu ("@lib_context_menu", at, std::string ()));
+
+    at = "@lib_context_menu.end";
+#if 0
+    //  doesn't make sense for many libs
+    menu_entries.push_back (lay::config_menu_item ("split_mode", at, tl::to_string (QObject::tr ("Split Mode")), cfg_split_lib_views, "?")),
+#endif
+  }
+};
+
+static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new LibraryViewPluginDeclaration (), -7, "LibraryViewPlugin");
 
 } // namespace lay

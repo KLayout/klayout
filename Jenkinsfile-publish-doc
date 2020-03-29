@@ -1,6 +1,8 @@
 
 @Library("osconfig") _
 
+properties([disableConcurrentBuilds()])
+
 node("master") {
 
   stage("Checkout sources") {

@@ -92,7 +92,7 @@ static db::NetTracerNet trace (db::NetTracer &tracer, const db::Layout &layout, 
 
 void run_test (tl::TestBase *_this, const std::string &file, const db::NetTracerTechnologyComponent &tc, const db::LayerProperties &lp_start, const db::Point &p_start, const std::string &file_au, const char *net_name = 0, size_t depth = 0)
 {
-  db::Manager m;
+  db::Manager m (false);
 
   db::Layout layout_org (&m);
   {
@@ -132,7 +132,7 @@ void run_test (tl::TestBase *_this, const std::string &file, const db::NetTracer
 
 void run_test2 (tl::TestBase *_this, const std::string &file, const db::NetTracerTechnologyComponent &tc, const db::LayerProperties &lp_start, const db::Point &p_start, const db::LayerProperties &lp_stop, const db::Point &p_stop, const std::string &file_au, const char *net_name = 0)
 {
-  db::Manager m;
+  db::Manager m (false);
 
   db::Layout layout_org (&m);
   {

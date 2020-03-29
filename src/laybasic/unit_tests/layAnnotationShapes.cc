@@ -104,7 +104,7 @@ db::DUserObject us (const Sh &sh)
 
 TEST(1) 
 {
-  db::Manager m;
+  db::Manager m (true);
   lay::AnnotationShapes s (&m);
   db::DBox b_empty;
 
@@ -205,7 +205,7 @@ void read_testdata (lay::AnnotationShapes &shapes, unsigned int what = 0xff)
 
 TEST(2)
 {
-  db::Manager m;
+  db::Manager m (true);
   lay::AnnotationShapes shapes (&m);
   read_testdata (shapes, 0x1);
 
@@ -244,7 +244,7 @@ TEST(2)
 
 TEST(3)
 {
-  db::Manager m;
+  db::Manager m (true);
   lay::AnnotationShapes shapes (&m);
   read_testdata (shapes, 0x4);
 
@@ -283,7 +283,7 @@ TEST(3)
 
 TEST(4)
 {
-  db::Manager m;
+  db::Manager m (true);
   lay::AnnotationShapes shapes (&m);
   read_testdata (shapes, 0x4);
 
@@ -333,7 +333,7 @@ TEST(4)
 
 TEST(5)
 {
-  db::Manager m;
+  db::Manager m (true);
   lay::AnnotationShapes shapes (&m);
   read_testdata (shapes, 0x4);
 
@@ -369,7 +369,7 @@ TEST(5)
 
 TEST(6)
 {
-  db::Manager m;
+  db::Manager m (true);
   lay::AnnotationShapes shapes (&m);
   read_testdata (shapes, 0x10);
 
@@ -396,7 +396,7 @@ TEST(6)
 
 TEST(7)
 {
-  db::Manager m;
+  db::Manager m (true);
   lay::AnnotationShapes shapes (&m);
   read_testdata (shapes, 0x10);
 

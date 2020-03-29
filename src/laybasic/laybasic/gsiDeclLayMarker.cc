@@ -83,52 +83,45 @@ bool has_color (const lay::DMarker *marker)
 }
 
 Class<lay::DMarker> decl_Marker ("lay", "Marker",
-  gsi::constructor ("new", &create_marker,
+  gsi::constructor ("new", &create_marker, gsi::arg ("view"),
     "@brief Creates a marker\n"
-    "@args view\n"
     "\n"
     "A marker is always associated with a view, in which it is shown. The "
     "view this marker is associated with must be passed to the constructor."
   ) +
-  gsi::method ("set|set_box", (void (lay::DMarker::*) (const db::DBox &)) &lay::DMarker::set,
+  gsi::method ("set|set_box", (void (lay::DMarker::*) (const db::DBox &)) &lay::DMarker::set, gsi::arg ("box"),
     "@brief Sets the box the marker is to display\n"
-    "@args box\n"
     "\n"
     "Makes the marker show a box. The box must be given in micron units.\n"
     "If the box is empty, no marker is drawn.\n"
     "The set method has been added in version 0.20.\n"
   ) +
-  gsi::method ("set|set_text", (void (lay::DMarker::*) (const db::DText &)) &lay::DMarker::set,
+  gsi::method ("set|set_text", (void (lay::DMarker::*) (const db::DText &)) &lay::DMarker::set, gsi::arg ("text"),
     "@brief Sets the text the marker is to display\n"
-    "@args text\n"
     "\n"
     "Makes the marker show a text. The text must be given in micron units.\n"
     "The set method has been added in version 0.20.\n"
   ) +
-  gsi::method ("set|set_edge", (void (lay::DMarker::*) (const db::DEdge &)) &lay::DMarker::set,
+  gsi::method ("set|set_edge", (void (lay::DMarker::*) (const db::DEdge &)) &lay::DMarker::set, gsi::arg ("edge"),
     "@brief Sets the edge the marker is to display\n"
-    "@args edge\n"
     "\n"
     "Makes the marker show a edge. The edge must be given in micron units.\n"
     "The set method has been added in version 0.20.\n"
   ) +
-  gsi::method ("set|set_path", (void (lay::DMarker::*) (const db::DPath &)) &lay::DMarker::set,
+  gsi::method ("set|set_path", (void (lay::DMarker::*) (const db::DPath &)) &lay::DMarker::set, gsi::arg ("path"),
     "@brief Sets the path the marker is to display\n"
-    "@args path\n"
     "\n"
     "Makes the marker show a path. The path must be given in micron units.\n"
     "The set method has been added in version 0.20.\n"
   ) +
-  gsi::method ("set|set_polygon", (void (lay::DMarker::*) (const db::DPolygon &)) &lay::DMarker::set,
+  gsi::method ("set|set_polygon", (void (lay::DMarker::*) (const db::DPolygon &)) &lay::DMarker::set, gsi::arg ("polygon"),
     "@brief Sets the polygon the marker is to display\n"
-    "@args polygon\n"
     "\n"
     "Makes the marker show a polygon. The polygon must be given in micron units.\n"
     "The set method has been added in version 0.20.\n"
   ) + 
-  gsi::method_ext ("color=", set_color,
+  gsi::method_ext ("color=", set_color, gsi::arg ("color"),
     "@brief Sets the color of the marker\n"
-    "@args color\n"
     "The color is a 32bit unsigned integer encoding the RGB values in the lower 3 bytes (blue in the lowest significant byte). "
     "The color can be reset with \\reset_color, in which case, the default foreground color is used."
   ) +
@@ -143,9 +136,8 @@ Class<lay::DMarker> decl_Marker ("lay", "Marker",
   gsi::method_ext ("has_color?", has_color,
     "@brief Returns a value indicating whether the marker has a specific color\n"
   ) +
-  gsi::method_ext ("frame_color=", set_frame_color,
+  gsi::method_ext ("frame_color=", set_frame_color, gsi::arg ("color"),
     "@brief Sets the frame color of the marker\n"
-    "@args color\n"
     "The color is a 32bit unsigned integer encoding the RGB values in the lower 3 bytes (blue in the lowest significant byte). "
     "The color can be reset with \\reset_frame_color, in which case the fill color is used.\n"
     "The set method has been added in version 0.20.\n"
@@ -164,9 +156,8 @@ Class<lay::DMarker> decl_Marker ("lay", "Marker",
     "@brief Returns a value indicating whether the marker has a specific frame color\n"
     "The set method has been added in version 0.20.\n"
   ) +
-  gsi::method ("dismissable=", &lay::DMarker::set_dismissable,
+  gsi::method ("dismissable=", &lay::DMarker::set_dismissable, gsi::arg ("flag"),
     "@brief Sets a value indicating whether the marker can be hidden\n"
-    "@args flag\n"
     "Dismissable markers can be hidden setting \"View/Show Markers\" to \"off\". "
     "The default setting is \"false\" meaning the marker can't be hidden.\n"
     "\n"
@@ -176,27 +167,24 @@ Class<lay::DMarker> decl_Marker ("lay", "Marker",
     "@brief Gets a value indicating whether the marker can be hidden\n"
     "See \\dismissable= for a description of this predicate."
   ) +
-  gsi::method ("line_width=", &lay::DMarker::set_line_width,
+  gsi::method ("line_width=", &lay::DMarker::set_line_width, gsi::arg ("width"),
     "@brief Sets the line width of the marker\n"
-    "@args width\n"
     "This is the width of the line drawn for the outline of the marker."
   ) +
   gsi::method ("line_width", &lay::DMarker::get_line_width,
     "@brief Gets the line width of the marker\n"
     "See \\line_width= for a description of the line width."
   ) +
-  gsi::method ("vertex_size=", &lay::DMarker::set_vertex_size,
+  gsi::method ("vertex_size=", &lay::DMarker::set_vertex_size, gsi::arg ("size"),
     "@brief Sets the vertex size of the marker\n"
-    "@args size\n"
     "This is the size of the rectangles drawn for the vertices object."
   ) +
   gsi::method ("vertex_size", &lay::DMarker::get_vertex_size,
     "@brief Gets the vertex size of the marker\n"
     "See \\vertex_size= for a description."
   ) +
-  gsi::method ("halo=", &lay::DMarker::set_halo,
+  gsi::method ("halo=", &lay::DMarker::set_halo, gsi::arg ("halo"),
     "@brief Sets the halo flag\n"
-    "@args halo\n"
     "The halo flag is either -1 (for taking the default), 0 to disable the halo or 1 to enable it. "
     "If the halo is enabled, a pixel border with the background color is drawn around the marker, the "
     "vertices and texts."
@@ -205,9 +193,8 @@ Class<lay::DMarker> decl_Marker ("lay", "Marker",
     "@brief Gets the halo flag\n"
     "See \\halo= for a description of the halo flag."
   ) +
-  gsi::method ("dither_pattern=", &lay::DMarker::set_dither_pattern,
+  gsi::method ("dither_pattern=", &lay::DMarker::set_dither_pattern, gsi::arg ("index"),
     "@brief Sets the stipple pattern index\n"
-    "@args index\n"
     "A value of -1 or less than zero indicates that the marker is not filled. Otherwise, the "
     "value indicates which pattern to use for filling the marker."
   ) +
@@ -215,9 +202,8 @@ Class<lay::DMarker> decl_Marker ("lay", "Marker",
     "@brief Gets the stipple pattern index\n"
     "See \\dither_pattern= for a description of the stipple pattern index."
   ) +
-  gsi::method ("line_style=", &lay::DMarker::set_line_style,
+  gsi::method ("line_style=", &lay::DMarker::set_line_style, gsi::arg ("index"),
     "@brief Sets the line style\n"
-    "@args index\n"
     "The line style is given by an index. 0 is solid, 1 is dashed and so forth.\n"
     "\n"
     "This method has been introduced in version 0.25."
@@ -236,4 +222,3 @@ Class<lay::DMarker> decl_Marker ("lay", "Marker",
 );
   
 }
-

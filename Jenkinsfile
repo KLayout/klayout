@@ -1,6 +1,8 @@
 
 @Library("osconfig") _
 
+properties([disableConcurrentBuilds()])
+
 //  from shared library
 target = osconfig()
 

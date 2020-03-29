@@ -70,25 +70,6 @@ inline unsigned int num_circle_points ()
  */
 void DB_PUBLIC set_num_circle_points (unsigned int n);
 
-// -----------------------------------------------------------
-//  transaction enable 
-
-/**
- *  @brief Return true, if undo buffering is enabled
- */
-inline bool transactions_enabled () 
-{
-  extern DB_PUBLIC bool ms_transactions_enabled;
-  return ms_transactions_enabled;
-}
-
-/**
- *  @brief Enable or disable transaction buffering
- *
- *  @param enabled True to enable undo buffering
- */
-void DB_PUBLIC enable_transactions (bool enable);
-
 }
 
 #endif

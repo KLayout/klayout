@@ -52,7 +52,7 @@ struct CurrentStyleOp
 
 EditLineStylesForm::EditLineStylesForm (lay::LayoutView *view, const lay::LineStyles &styles)
   : QDialog (view), db::Object (0),
-    m_selected (-1), m_styles (styles), mp_view (view)
+    m_selected (-1), m_styles (styles), m_manager (true), mp_view (view)
 {
   m_selection_changed_enabled = false;
 

@@ -447,21 +447,18 @@ struct cell_inst_array_defs
     gsi::constructor ("new", &new_v,
       "@brief Creates en empty cell instance with size 0"
     ) +
-    gsi::constructor ("new", &new_cell_inst,
+    gsi::constructor ("new", &new_cell_inst, gsi::arg ("cell_index"), gsi::arg ("trans"),
       "@brief Creates a single cell instance\n"
-      "@args cell_index, trans\n"
       "@param cell_index The cell to instantiate\n"
       "@param trans The transformation by which to instantiate the cell\n"
     ) +
-    gsi::constructor ("new", &new_cell_inst_cplx,
+    gsi::constructor ("new", &new_cell_inst_cplx, gsi::arg ("cell_index"), gsi::arg ("trans"),
       "@brief Creates a single cell instance with a complex transformation\n"
-      "@args cell_index, trans\n"
       "@param cell_index The cell to instantiate\n"
       "@param trans The complex transformation by which to instantiate the cell\n"
     ) +
-    gsi::constructor ("new", &new_cell_inst_array,
+    gsi::constructor ("new", &new_cell_inst_array, gsi::arg ("cell_index"), gsi::arg ("trans"), gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("na"), gsi::arg ("nb"),
       "@brief Creates a single cell instance\n"
-      "@args cell_index, trans, a, b, na, nb\n"
       "@param cell_index The cell to instantiate\n"
       "@param trans The transformation by which to instantiate the cell\n"
       "@param a The displacement vector of the array in the 'a' axis\n"
@@ -473,9 +470,8 @@ struct cell_inst_array_defs
         "Starting with version 0.25 the displacements are of vector type."
       )
     ) +
-    gsi::constructor ("new", &new_cell_inst_array_cplx,
+    gsi::constructor ("new", &new_cell_inst_array_cplx, gsi::arg ("cell_index"), gsi::arg ("trans"), gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("na"), gsi::arg ("nb"),
       "@brief Creates a single cell instance with a complex transformation\n"
-      "@args cell_index, trans, a, b, na, nb\n"
       "@param cell_index The cell to instantiate\n"
       "@param trans The complex transformation by which to instantiate the cell\n"
       "@param a The displacement vector of the array in the 'a' axis\n"
@@ -517,17 +513,15 @@ struct cell_inst_array_defs
     gsi::method_ext ("cell_index", &cell_index,
       "@brief Gets the cell index of the cell instantiated \n"
     ) +
-    method_ext ("cell_index=", &set_cell_index,
+    method_ext ("cell_index=", &set_cell_index, gsi::arg ("index"),
       "@brief Sets the index of the cell this instance refers to\n"
-      "@args index\n"
     ) +
     gsi::method ("cplx_trans", (complex_trans_type (C::*) () const) &C::complex_trans,
       "@brief Gets the complex transformation of the first instance in the array\n"
       "This method is always applicable, compared to \\trans, since simple transformations can be expressed as complex transformations as well."
     ) +
-    gsi::method_ext ("cplx_trans=", &set_cplx_trans,
+    gsi::method_ext ("cplx_trans=", &set_cplx_trans, gsi::arg ("trans"),
       "@brief Sets the complex transformation of the instance or the first instance in the array\n"
-      "@args trans\n"
       + std::string (new_doc ? "" :
         "\n"
         "This method was introduced in version 0.22.\n"
@@ -537,9 +531,8 @@ struct cell_inst_array_defs
       "@brief Gets the transformation of the first instance in the array\n"
       "The transformation returned is only valid if the array does not represent a complex transformation array"
     ) +
-    gsi::method_ext ("trans=", &set_trans,
+    gsi::method_ext ("trans=", &set_trans, gsi::arg ("t"),
       "@brief Sets the transformation of the instance or the first instance in the array\n"
-      "@args t\n"
       + std::string (new_doc ? "" :
         "\n"
         "This method was introduced in version 0.22.\n"
@@ -551,52 +544,45 @@ struct cell_inst_array_defs
       "The inverted array reference describes in which transformations the parent cell is\n"
       "seen from the current cell."
     ) +
-    gsi::method_ext ("transformed", &transformed_simple,
+    gsi::method_ext ("transformed", &transformed_simple, gsi::arg ("trans"),
       "@brief Gets the transformed cell instance\n"
-      "@args trans\n"
       + std::string (new_doc ? "" :
         "\n"
         "This method has been introduced in version 0.20.\n"
       )
     ) +
-    gsi::method_ext ("transformed", &transformed_icplx,
+    gsi::method_ext ("transformed", &transformed_icplx, gsi::arg ("trans"),
       "@brief Gets the transformed cell instance (complex transformation)\n"
-      "@args trans\n"
       + std::string (new_doc ? "" :
         "\n"
         "This method has been introduced in version 0.20.\n"
       )
     ) +
-    gsi::method_ext ("transform", &transform_simple,
+    gsi::method_ext ("transform", &transform_simple, gsi::arg ("trans"),
       "@brief Transforms the cell instance with the given transformation\n"
-      "@args trans\n"
       + std::string (new_doc ? "" :
         "\n"
         "This method has been introduced in version 0.20.\n"
       )
     ) +
-    gsi::method_ext ("transform", &transform_icplx,
+    gsi::method_ext ("transform", &transform_icplx, gsi::arg ("trans"),
       "@brief Transforms the cell instance with the given complex transformation\n"
-      "@args trans\n"
       + std::string (new_doc ? "" :
         "\n"
         "This method has been introduced in version 0.20.\n"
       )
     ) +
-    gsi::method_ext ("<", &less,
+    gsi::method_ext ("<", &less, gsi::arg ("other"),
       "@brief Compares two arrays for 'less'\n"
-      "@args other\n"
       "The comparison provides an arbitrary sorting criterion and not specific sorting order. It "
       "is guaranteed that if an array a is less than b, b is not less than a. In addition, it a "
       "is not less than b and b is not less than a, then a is equal to b."
     ) +
-    gsi::method_ext ("==", &equal,
+    gsi::method_ext ("==", &equal, gsi::arg ("other"),
       "@brief Compares two arrays for equality\n"
-      "@args other"
     ) +
-    gsi::method_ext ("!=", &not_equal,
+    gsi::method_ext ("!=", &not_equal, gsi::arg ("other"),
       "@brief Compares two arrays for inequality\n"
-      "@args other"
     ) +
     method_ext ("hash", &hash_value,
       "@brief Computes a hash value\n"
@@ -620,9 +606,8 @@ struct cell_inst_array_defs
         "Starting with version 0.25 the displacement is of vector type.\n"
       )
     ) +
-    gsi::method_ext ("a=", &set_array_a,
+    gsi::method_ext ("a=", &set_array_a, gsi::arg ("vector"),
       "@brief Sets the displacement vector for the 'a' axis\n"
-      "@args vector\n"
       "\n"
       "If the instance was not regular before this property is set, it will be initialized to a regular instance.\n"
       + std::string (new_doc ? "" :
@@ -637,9 +622,8 @@ struct cell_inst_array_defs
         "Starting with version 0.25 the displacement is of vector type.\n"
       )
     ) +
-    gsi::method_ext ("b=", &set_array_b,
+    gsi::method_ext ("b=", &set_array_b, gsi::arg ("vector"),
       "@brief Sets the displacement vector for the 'b' axis\n"
-      "@args vector\n"
       "\n"
       "If the instance was not regular before this property is set, it will be initialized to a regular instance.\n"
       + std::string (new_doc ? "" :
@@ -650,9 +634,8 @@ struct cell_inst_array_defs
     gsi::method_ext ("na", &array_na,
       "@brief Gets the number of instances in the 'a' axis\n"
     ) +
-    gsi::method_ext ("na=", &set_array_na,
+    gsi::method_ext ("na=", &set_array_na, gsi::arg ("n"),
       "@brief Sets the number of instances in the 'a' axis\n"
-      "@args n\n"
       "\n"
       "If the instance was not regular before this property is set to a value larger than zero, it will be initialized to a regular instance.\n"
       "To make an instance a single instance, set na or nb to 0.\n"
@@ -664,9 +647,8 @@ struct cell_inst_array_defs
     gsi::method_ext ("nb", &array_nb,
       "@brief Gets the number of instances in the 'b' axis\n"
     ) +
-    gsi::method_ext ("nb=", &set_array_nb,
+    gsi::method_ext ("nb=", &set_array_nb, gsi::arg ("n"),
       "@brief Sets the number of instances in the 'b' axis\n"
-      "@args n\n"
       "\n"
       "If the instance was not regular before this property is set to a value larger than zero, it will be initialized to a regular instance.\n"
       "To make an instance a single instance, set na or nb to 0.\n"
@@ -1743,9 +1725,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.22.\n"
   ) +
-  gsi::method ("name=", &db::Cell::set_name,
+  gsi::method ("name=", &db::Cell::set_name, gsi::arg ("name"),
     "@brief Renames the cell\n"
-    "@args name\n"
     "Renaming a cell may cause name clashes, i.e. the name may be identical to the name\n"
     "of another cell. This does not have any immediate effect, but the cell needs to be "
     "renamed, for example when writing the layout to a GDS file.\n"
@@ -1757,9 +1738,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.23."
   ) +
-  method ("prop_id=", (void (db::Cell::*) (db::properties_id_type)) &db::Cell::prop_id,
+  method ("prop_id=", (void (db::Cell::*) (db::properties_id_type)) &db::Cell::prop_id, gsi::arg ("id"),
     "@brief Sets the properties ID associated with the cell\n"
-    "@args id\n"
     "This method is provided, if a properties ID has been derived already. Usually it's more convenient "
     "to use \\delete_property, \\set_property or \\property.\n"
     "\n"
@@ -1770,9 +1750,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.23."
   ) +
-  gsi::method_ext ("delete_property", &delete_cell_property,
+  gsi::method_ext ("delete_property", &delete_cell_property, gsi::arg ("key"),
     "@brief Deletes the user property with the given key\n"
-    "@args key\n"
     "This method is a convenience method that deletes the property with the given key. "
     "It does nothing if no property with that key exists. Using that method is more "
     "convenient than creating a new property set with a new ID and assigning that properties ID.\n"
@@ -1780,9 +1759,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.23."
   ) + 
-  gsi::method_ext ("set_property", &set_cell_property,
+  gsi::method_ext ("set_property", &set_cell_property, gsi::arg ("key"), gsi::arg ("value"),
     "@brief Sets the user property with the given key to the given value\n"
-    "@args key, value\n"
     "This method is a convenience method that sets the property with the given key to the given value. "
     "If no property with that key exists, it will create one. Using that method is more "
     "convenient than creating a new property set with a new ID and assigning that properties ID.\n"
@@ -1790,26 +1768,23 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.23."
   ) + 
-  gsi::method_ext ("property", &get_cell_property,
+  gsi::method_ext ("property", &get_cell_property, gsi::arg ("key"),
     "@brief Gets the user property with the given key\n"
-    "@args key\n"
     "This method is a convenience method that gets the property with the given key. "
     "If no property with that key exists, it will return nil. Using that method is more "
     "convenient than using the layout object and the properties ID to retrieve the property value. "
     "\n"
     "This method has been introduced in version 0.23."
   ) + 
-  gsi::method_ext ("write", &write_simple,
+  gsi::method_ext ("write", &write_simple, gsi::arg ("file_name"),
     "@brief Writes the cell to a layout file\n"
-    "@args file_name\n"
     "The format of the file will be determined from the file name. Only the cell and "
     "it's subtree below will be saved.\n"
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method_ext ("write", &write_options,
+  gsi::method_ext ("write", &write_options, gsi::arg ("file_name"), gsi::arg ("options"),
     "@brief Writes the cell to a layout file\n"
-    "@args file_name, options\n"
     "The format of the file will be determined from the file name. Only the cell and "
     "it's subtree below will be saved.\n"
     "In contrast to the other 'write' method, this version allows one to specify save options, i.e. "
@@ -1817,9 +1792,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method ("shapes", (db::Cell::shapes_type &(db::Cell::*) (unsigned int)) &db::Cell::shapes,
+  gsi::method ("shapes", (db::Cell::shapes_type &(db::Cell::*) (unsigned int)) &db::Cell::shapes, gsi::arg ("layer_index"),
     "@brief Returns the shapes list of the given layer\n"
-    "@args layer_index\n"
     "\n"
     "This method gives access to the shapes list on a certain layer.\n"
     "If the layer does not exist yet, it is created.\n"
@@ -1828,9 +1802,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "@return A reference to the shapes list\n"
   ) +
-  gsi::method_ext ("shapes", &shapes_of_cell_const,
+  gsi::method_ext ("shapes", &shapes_of_cell_const, gsi::arg ("layer_index"),
     "@brief Returns the shapes list of the given layer (const version)\n"
-    "@args layer_index\n"
     "\n"
     "This method gives access to the shapes list on a certain layer. This is the const version - only const (reading) methods "
     "can be called on the returned object.\n"
@@ -1847,21 +1820,18 @@ Class<db::Cell> decl_Cell ("db", "Cell",
   gsi::method ("clear_insts", &db::Cell::clear_insts,
     "@brief Clears the instance list\n"
   ) +
-  gsi::method ("erase", (void (db::Cell::*) (const db::Instance &)) &db::Cell::erase,
+  gsi::method ("erase", (void (db::Cell::*) (const db::Instance &)) &db::Cell::erase, gsi::arg ("inst"),
     "@brief Erases the instance given by the Instance object\n"
-    "@args inst\n"
     "\n"
     "This method has been introduced in version 0.16. It can only be used in editable mode."
   ) +
-  gsi::method ("swap", &db::Cell::swap,
+  gsi::method ("swap", &db::Cell::swap, gsi::arg ("layer_index1"), gsi::arg ("layer_index2"),
     "@brief Swaps the layers given\n"
-    "@args layer_index1, layer_index2\n"
     "\n"
     "This method swaps two layers inside this cell.\n"
   ) +
-  gsi::method ("move", &db::Cell::move,
+  gsi::method ("move", &db::Cell::move, gsi::arg ("src"), gsi::arg ("dest"),
     "@brief Moves the shapes from the source to the target layer\n"
-    "@args src, dest\n"
     "\n"
     "The destination layer is not overwritten. Instead, the shapes are added to the shapes of the destination layer.\n"
     "This method will move shapes within the cell. To move shapes from another cell this cell, "
@@ -1872,9 +1842,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "@param src The layer index of the source layer\n"
     "@param dest The layer index of the destination layer\n"
   ) +
-  gsi::method_ext ("move", &move_from_other_cell,
+  gsi::method_ext ("move", &move_from_other_cell, gsi::arg ("src_cell"), gsi::arg ("src_layer"), gsi::arg ("dest"),
     "@brief Moves shapes from another cell to the target layern this cell\n"
-    "@args src_cell, src_layer, dest\n"
     "\n"
     "This method will move all shapes on layer 'src_layer' of cell 'src_cell' to the layer 'dest' of this cell.\n"
     "The destination layer is not overwritten. Instead, the shapes are added to the shapes of the destination layer.\n"
@@ -1888,9 +1857,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "@param src_layer The layer index of the layer from which to take the shapes\n"
     "@param dest The layer index of the destination layer\n"
   ) +
-  gsi::method ("copy", &db::Cell::copy,
+  gsi::method ("copy", &db::Cell::copy, gsi::arg ("src"), gsi::arg ("dest"),
     "@brief Copies the shapes from the source to the target layer\n"
-    "@args src, dest\n"
     "\n"
     "The destination layer is not overwritten. Instead, the shapes are added to the shapes of the destination layer.\n"
     "If source are target layer are identical, this method does nothing.\n"
@@ -1902,9 +1870,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "@param src The layer index of the source layer\n"
     "@param dest The layer index of the destination layer\n"
   ) +
-  gsi::method_ext ("copy", &copy_from_other_cell,
+  gsi::method_ext ("copy", &copy_from_other_cell, gsi::arg ("src_cell"), gsi::arg ("src_layer"), gsi::arg ("dest"),
     "@brief Copies shapes from another cell to the target layern this cell\n"
-    "@args src_cell, src_layer, dest\n"
     "\n"
     "This method will copy all shapes on layer 'src_layer' of cell 'src_cell' to the layer 'dest' of this cell.\n"
     "The destination layer is not overwritten. Instead, the shapes are added to the shapes of the destination layer.\n"
@@ -1918,9 +1885,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "@param src_layer The layer index of the layer from which to take the shapes\n"
     "@param dest The layer index of the destination layer\n"
   ) + 
-  gsi::method ("clear", &db::Cell::clear,
+  gsi::method ("clear", &db::Cell::clear, gsi::arg ("layer_index"),
     "@brief Clears the shapes on the given layer\n"
-    "@args layer_index\n"
   ) +
   gsi::method_ext ("clear", &clear_all,
     "@brief Clears the cell (deletes shapes and instances)\n"
@@ -1951,9 +1917,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method_ext ("prune_subcells", &prune_subcells,
+  gsi::method_ext ("prune_subcells", &prune_subcells, gsi::arg ("levels"),
     "@brief Deletes all sub cells of the cell which are not used otherwise down to the specified level of hierarchy\n"
-    "@args levels\n"
     "\n"
     "This deletes all sub cells of the cell which are not used otherwise.\n"
     "All instances of the deleted cells are deleted as well.\n"
@@ -1976,9 +1941,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method_ext ("prune_cell", &prune_cell,
+  gsi::method_ext ("prune_cell", &prune_cell, gsi::arg ("levels"),
     "@brief Deletes the cell plus subcells not used otherwise\n"
-    "@args levels\n"
     "\n"
     "This deletes the cell and also all sub cells of the cell which are not used otherwise.\n"
     "The number of hierarchy levels to consider can be specified as well. One level of hierarchy means that "
@@ -1992,9 +1956,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method_ext ("flatten", &flatten1,
+  gsi::method_ext ("flatten", &flatten1, gsi::arg ("prune"),
     "@brief Flattens the given cell\n"
-    "@args prune\n"
     "\n"
     "This method propagates all shapes from the hierarchy below into the given cell.\n"
     "It also removes the instances of the cells from which the shapes came from, but does not remove the cells themselves if prune is set to false.\n"
@@ -2007,9 +1970,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method_ext ("flatten", &flatten,
+  gsi::method_ext ("flatten", &flatten, gsi::arg ("levels"), gsi::arg ("prune"),
     "@brief Flattens the given cell\n"
-    "@args levels, prune\n"
     "\n"
     "This method propagates all shapes from the specified number of hierarchy levels below into the given cell.\n"
     "It also removes the instances of the cells from which the shapes came from, but does not remove the cells themselves if prune is set to false.\n"
@@ -2020,9 +1982,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method_ext ("fill_region", &fill_region1,
+  gsi::method_ext ("fill_region", &fill_region1, gsi::arg ("region"), gsi::arg ("fill_cell_index"), gsi::arg ("fc_box"), gsi::arg ("origin"),
     "@brief Fills the given region with cells of the given type\n"
-    "@args region, fill_cell_index, fc_box, origin\n"
     "@param region The region to fill\n"
     "@param fill_cell_index The fill cell to place\n"
     "@param fc_box The fill cell's footprint\n"
@@ -2040,9 +2001,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method_ext ("fill_region", &fill_region2,
+  gsi::method_ext ("fill_region", &fill_region2, gsi::arg ("region"), gsi::arg ("fill_cell_index"), gsi::arg ("fc_box"), gsi::arg ("origin"), gsi::arg ("remaining_parts"), gsi::arg ("fill_margin"), gsi::arg ("remaining_polygons"),
     "@brief Fills the given region with cells of the given type (extended version)\n"
-    "@args region, fill_cell_index, fc_box, origin, remaining_parts, fill_margin, remaining_polygons\n"
     "@param region The region to fill\n"
     "@param fill_cell_index The fill cell to place\n"
     "@param fc_box The fill cell's footprint\n"
@@ -2084,9 +2044,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method_ext ("begin_shapes_rec", &begin_shapes_rec, 
+  gsi::method_ext ("begin_shapes_rec", &begin_shapes_rec, gsi::arg ("layer"),
     "@brief Delivers a recursive shape iterator for the shapes below the cell on the given layer\n"
-    "@args layer\n"
     "@param layer The layer from which to get the shapes\n"
     "@return A suitable iterator\n"
     "\n"
@@ -2138,9 +2097,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This variant has been added in version 0.25.\n"
   ) +
-  gsi::method_ext ("copy_shapes", &copy_shapes1,
+  gsi::method_ext ("copy_shapes", &copy_shapes1, gsi::arg ("source_cell"),
     "@brief Copies the shapes from the given cell into this cell\n"
-    "@args source_cell\n"
     "@param source_cell The cell from where to copy shapes\n"
     "All shapes are copied from the source cell to this cell. Instances are not copied.\n"
     "\n"
@@ -2156,9 +2114,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been added in version 0.23.\n"
   ) + 
-  gsi::method_ext ("copy_shapes", &copy_shapes2,
+  gsi::method_ext ("copy_shapes", &copy_shapes2, gsi::arg ("source_cell"), gsi::arg ("layer_mapping"),
     "@brief Copies the shapes from the given cell into this cell\n"
-    "@args source_cell, layer_mapping\n"
     "@param source_cell The cell from where to copy shapes\n"
     "@param layer_mapping A \\LayerMapping object that specifies which layers are copied and where\n"
     "All shapes on layers specified in the layer mapping object are copied from the source cell to this cell. Instances are not copied.\n"
@@ -2168,9 +2125,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been added in version 0.23.\n"
   ) + 
-  gsi::method_ext ("copy_instances", &copy_instances,
+  gsi::method_ext ("copy_instances", &copy_instances, gsi::arg ("source_cell"),
     "@brief Copies the instances of child cells in the source cell to this cell\n"
-    "@args source_cell\n"
     "@param source_cell The cell where the instances are copied from\n"
     "The source cell must reside in the same layout than this cell. The instances of "
     "child cells inside the source cell are copied to this cell. No new cells are created, "
@@ -2183,9 +2139,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been added in version 0.23.\n"
   ) + 
-  gsi::method_ext ("copy_tree", &copy_tree,
+  gsi::method_ext ("copy_tree", &copy_tree, gsi::arg ("source_cell"),
     "@brief Copies the cell tree of the given cell into this cell\n"
-    "@args source_cell\n"
     "@param source_cell The cell from where to copy the cell tree\n"
     "@return A list of indexes of newly created cells\n"
     "The complete cell tree of the source cell is copied to the target cell plus all "
@@ -2199,9 +2154,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been added in version 0.23.\n"
   ) + 
-  gsi::method_ext ("copy_tree_shapes", &copy_tree_shapes2,
+  gsi::method_ext ("copy_tree_shapes", &copy_tree_shapes2, gsi::arg ("source_cell"), gsi::arg ("cell_mapping"),
     "@brief Copies the shapes from the given cell and the cell tree below into this cell or subcells of this cell\n"
-    "@args source_cell, cell_mapping\n"
     "@param source_cell The starting cell from where to copy shapes\n"
     "@param cell_mapping The cell mapping object that determines how cells are identified between source and target layout\n"
     "\n"
@@ -2223,9 +2177,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been added in version 0.23.\n"
   ) + 
-  gsi::method_ext ("copy_tree_shapes", &copy_tree_shapes3,
+  gsi::method_ext ("copy_tree_shapes", &copy_tree_shapes3, gsi::arg ("source_cell"), gsi::arg ("cell_mapping"), gsi::arg ("layer_mapping"),
     "@brief Copies the shapes from the given cell and the cell tree below into this cell or subcells of this cell with layer mapping\n"
-    "@args source_cell, cell_mapping, layer_mapping\n"
     "@param source_cell The cell from where to copy shapes and instances\n"
     "@param cell_mapping The cell mapping object that determines how cells are identified between source and target layout\n"
     "\n"
@@ -2248,9 +2201,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been added in version 0.23.\n"
   ) + 
-  gsi::method_ext ("move_shapes", &move_shapes1,
+  gsi::method_ext ("move_shapes", &move_shapes1, gsi::arg ("source_cell"),
     "@brief Moves the shapes from the given cell into this cell\n"
-    "@args source_cell\n"
     "@param source_cell The cell from where to move shapes\n"
     "All shapes are moved from the source cell to this cell. Instances are not moved.\n"
     "\n"
@@ -2266,9 +2218,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been added in version 0.23.\n"
   ) + 
-  gsi::method_ext ("move_shapes", &move_shapes2,
+  gsi::method_ext ("move_shapes", &move_shapes2, gsi::arg ("source_cell"), gsi::arg ("layer_mapping"),
     "@brief Moves the shapes from the given cell into this cell\n"
-    "@args source_cell, layer_mapping\n"
     "@param source_cell The cell from where to move shapes\n"
     "@param layer_mapping A \\LayerMapping object that specifies which layers are moved and where\n"
     "All shapes on layers specified in the layer mapping object are moved from the source cell to this cell. Instances are not moved.\n"
@@ -2278,9 +2229,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been added in version 0.23.\n"
   ) + 
-  gsi::method_ext ("move_instances", &move_instances,
+  gsi::method_ext ("move_instances", &move_instances, gsi::arg ("source_cell"),
     "@brief Moves the instances of child cells in the source cell to this cell\n"
-    "@args source_cell\n"
     "@param source_cell The cell where the instances are moved from\n"
     "The source cell must reside in the same layout than this cell. The instances of "
     "child cells inside the source cell are moved to this cell. No new cells are created, "
@@ -2293,9 +2243,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been added in version 0.23.\n"
   ) + 
-  gsi::method_ext ("move_tree", &move_tree,
+  gsi::method_ext ("move_tree", &move_tree, gsi::arg ("source_cell"),
     "@brief Moves the cell tree of the given cell into this cell\n"
-    "@args source_cell\n"
     "@param source_cell The cell from where to move the cell tree\n"
     "@return A list of indexes of newly created cells\n"
     "The complete cell tree of the source cell is moved to the target cell plus all "
@@ -2309,9 +2258,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been added in version 0.23.\n"
   ) + 
-  gsi::method_ext ("move_tree_shapes", &move_tree_shapes2,
+  gsi::method_ext ("move_tree_shapes", &move_tree_shapes2, gsi::arg ("source_cell"), gsi::arg ("cell_mapping"),
     "@brief Moves the shapes from the given cell and the cell tree below into this cell or subcells of this cell\n"
-    "@args source_cell, cell_mapping\n"
     "@param source_cell The starting cell from where to move shapes\n"
     "@param cell_mapping The cell mapping object that determines how cells are identified between source and target layout\n"
     "\n"
@@ -2333,9 +2281,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been added in version 0.23.\n"
   ) + 
-  gsi::method_ext ("move_tree_shapes", &move_tree_shapes3,
+  gsi::method_ext ("move_tree_shapes", &move_tree_shapes3, gsi::arg ("source_cell"), gsi::arg ("cell_mapping"), gsi::arg ("layer_mapping"),
     "@brief Moves the shapes from the given cell and the cell tree below into this cell or subcells of this cell with layer mapping\n"
-    "@args source_cell, cell_mapping, layer_mapping\n"
     "@param source_cell The cell from where to move shapes and instances\n"
     "@param cell_mapping The cell mapping object that determines how cells are identified between source and target layout\n"
     "\n"
@@ -2358,34 +2305,30 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been added in version 0.23.\n"
   ) + 
-  gsi::method ("replace_prop_id", &db::Cell::replace_prop_id,
+  gsi::method ("replace_prop_id", &db::Cell::replace_prop_id, gsi::arg ("instance"), gsi::arg ("property_id"),
     "@brief Replaces (or install) the properties of a cell\n"
-    "@args instance,property_id\n"
     "@return An Instance object representing the new instance\n"
     "This method has been introduced in version 0.16. It can only be used in editable mode.\n"
     "Changes the properties Id of the given instance or install a properties Id on that instance if it does not have one yet.\n"
     "The property Id must be obtained from the \\Layout object's property_id method which "
     "associates a property set with a property Id.\n"
   ) +
-  gsi::method ("transform", (db::Instance (db::Cell::*)(const db::Instance &, const db::Trans &)) &db::Cell::transform,
+  gsi::method ("transform", (db::Instance (db::Cell::*)(const db::Instance &, const db::Trans &)) &db::Cell::transform, gsi::arg ("instance"), gsi::arg ("trans"),
     "@brief Transforms the instance with the given transformation\n"
-    "@args instance, trans\n"
     "@return A reference (an \\Instance object) to the new instance\n"
     "This method has been introduced in version 0.16.\n"
     "The original instance may be deleted and re-inserted by this method. Therefore, a new reference is returned.\n"
     "It is permitted in editable mode only."
   ) +
-  gsi::method ("transform", (db::Instance (db::Cell::*)(const db::Instance &, const db::ICplxTrans &)) &db::Cell::transform,
+  gsi::method ("transform", (db::Instance (db::Cell::*)(const db::Instance &, const db::ICplxTrans &)) &db::Cell::transform, gsi::arg ("instance"), gsi::arg ("trans"),
     "@brief Transforms the instance with the given complex integer transformation\n"
-    "@args instance, trans\n"
     "@return A reference (an \\Instance object) to the new instance\n"
     "This method has been introduced in version 0.23.\n"
     "The original instance may be deleted and re-inserted by this method. Therefore, a new reference is returned.\n"
     "It is permitted in editable mode only."
   ) +
-  gsi::method ("transform_into", (db::Instance (db::Cell::*)(const db::Instance &, const db::Trans &)) &db::Cell::transform_into,
+  gsi::method ("transform_into", (db::Instance (db::Cell::*)(const db::Instance &, const db::Trans &)) &db::Cell::transform_into, gsi::arg ("instance"), gsi::arg ("trans"),
     "@brief Transforms the instance into a new coordinate system with the given transformation\n"
-    "@args instance, trans\n"
     "@return A reference (an \\Instance object) to the new instance\n"
     "\n"
     "In contrast to the \\transform method, this method allows propagation of the transformation into child cells. "
@@ -2399,9 +2342,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "The original instance may be deleted and re-inserted by this method. Therefore, a new reference is returned.\n"
     "It is permitted in editable mode only."
   ) +
-  gsi::method ("transform_into", (db::Instance (db::Cell::*)(const db::Instance &, const db::ICplxTrans &)) &db::Cell::transform_into,
+  gsi::method ("transform_into", (db::Instance (db::Cell::*)(const db::Instance &, const db::ICplxTrans &)) &db::Cell::transform_into, gsi::arg ("instance"), gsi::arg ("trans"),
     "@brief Transforms the instance into a new coordinate system with the given complex integer transformation\n"
-    "@args instance, trans\n"
     "@return A reference (an \\Instance object) to the new instance\n"
     "\n"
     "See the comments for the simple-transformation version for a description of this method.\n"
@@ -2409,9 +2351,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "The original instance may be deleted and re-inserted by this method. Therefore, a new reference is returned.\n"
     "It is permitted in editable mode only."
   ) +
-  gsi::method ("transform_into", (void (db::Cell::*)(const db::Trans &)) &db::Cell::transform_into,
+  gsi::method ("transform_into", (void (db::Cell::*)(const db::Trans &)) &db::Cell::transform_into, gsi::arg ("trans"),
     "@brief Transforms the cell into a new coordinate system with the given transformation\n"
-    "@args trans\n"
     "\n"
     "This method transforms all instances and all shapes. The instances are transformed in a way that allows propagation "
     "of the transformation into child cells. "
@@ -2423,9 +2364,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "It has been introduced in version 0.23.\n"
   ) +
-  gsi::method ("transform_into", (void (db::Cell::*)(const db::ICplxTrans &)) &db::Cell::transform_into,
+  gsi::method ("transform_into", (void (db::Cell::*)(const db::ICplxTrans &)) &db::Cell::transform_into, gsi::arg ("trans"),
     "@brief Transforms the cell into a new coordinate system with the given complex integer transformation\n"
-    "@args trans\n"
     "\n"
     "See the comments for the simple-transformation version for a description of this method.\n"
     "This method has been introduced in version 0.23.\n"
@@ -2476,17 +2416,15 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
-  gsi::method ("replace", (db::Instance (db::Cell::*)(const db::Instance &, const db::Cell::cell_inst_array_type &)) &db::Cell::replace,
+  gsi::method ("replace", (db::Instance (db::Cell::*)(const db::Instance &, const db::Cell::cell_inst_array_type &)) &db::Cell::replace, gsi::arg ("instance"), gsi::arg ("cell_inst_array"),
     "@brief Replaces a cell instance (array) with a different one\n"
-    "@args instance,cell_inst_array\n"
     "@return An \\Instance object representing the new instance\n"
     "This method has been introduced in version 0.16. It can only be used in editable mode.\n"
     "The instance given by the instance object (first argument) is replaced by the given instance (second argument). "
     "The new object will not have any properties."
   ) +
-  gsi::method_ext ("replace", &replace_inst_with_props,
+  gsi::method_ext ("replace", &replace_inst_with_props, gsi::arg ("instance"), gsi::arg ("cell_inst_array"), gsi::arg ("property_id"),
     "@brief Replaces a cell instance (array) with a different one with properties\n"
-    "@args instance,cell_inst_array,property_id\n"
     "@return An \\Instance object representing the new instance\n"
     "This method has been introduced in version 0.16. It can only be used in editable mode.\n"
     "The instance given by the instance object (first argument) is replaced by the given instance (second argument) with the given properties Id.\n"
@@ -2591,9 +2529,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "The bounding box is computed over all layers. To compute the bounding box over single layers, "
     "use \\bbox_per_layer.\n"
   ) +
-  gsi::method ("bbox_per_layer", (const db::Cell::box_type &(db::Cell::*) (unsigned int) const) &db::Cell::bbox,
+  gsi::method ("bbox_per_layer", (const db::Cell::box_type &(db::Cell::*) (unsigned int) const) &db::Cell::bbox, gsi::arg ("layer_index"),
     "@brief Gets the per-layer bounding box of the cell\n"
-    "@args layer_index\n"
     "\n"
     "@return The bounding box of the cell considering only the given layer\n"
     "\n"
@@ -2707,26 +2644,23 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "A cell is a leaf cell if there are no child instantiations.\n"
   ) +
-  gsi::method ("is_valid?", &db::Cell::is_valid, 
+  gsi::method ("is_valid?", &db::Cell::is_valid, gsi::arg ("instance"),
     "@brief Tests if the given \\Instance object is still pointing to a valid object\n"
-    "@args instance\n"
     "This method has been introduced in version 0.16.\n"
     "If the instance represented by the given reference has been deleted, this method returns false. "
     "If however, another instance has been inserted already that occupies the original instances position, "
     "this method will return true again.\n"
   ) +
-  gsi::iterator_ext ("each_shape", &begin_shapes, 
+  gsi::iterator_ext ("each_shape", &begin_shapes, gsi::arg ("layer_index"), gsi::arg ("flags"),
     "@brief Iterates over all shapes of a given layer\n"
-    "@args layer_index, flags\n"
     "\n"
     "@param flags An \"or\"-ed combination of the S.. constants of the \\Shapes class\n"
     "@param layer_index The layer on which to run the query\n" 
     "\n"
     "This iterator is equivalent to 'shapes(layer).each'."
   ) +
-  gsi::iterator_ext ("each_shape", &begin_shapes_all, 
+  gsi::iterator_ext ("each_shape", &begin_shapes_all, gsi::arg ("layer_index"),
     "@brief Iterates over all shapes of a given layer\n"
-    "@args layer_index\n"
     "\n"
     "@param layer_index The layer on which to run the query\n" 
     "\n"
@@ -2734,17 +2668,15 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "This convenience method has been introduced in version 0.16.\n"
   ) +
   //  Hint: don't use db::Shapes::begin_touching. It does not update the box trees automatically
-  gsi::iterator_ext ("each_touching_shape", &begin_touching_shapes, 
+  gsi::iterator_ext ("each_touching_shape", &begin_touching_shapes, gsi::arg ("layer_index"), gsi::arg ("box"), gsi::arg ("flags"),
     "@brief Iterates over all shapes of a given layer that touch the given box\n"
-    "@args layer_index, box, flags\n"
     "\n"
     "@param flags An \"or\"-ed combination of the S.. constants of the \\Shapes class\n"
     "@param box The box by which to query the shapes\n"
     "@param layer_index The layer on which to run the query\n" 
   ) +
-  gsi::iterator_ext ("each_touching_shape", &begin_touching_shapes_all, 
+  gsi::iterator_ext ("each_touching_shape", &begin_touching_shapes_all, gsi::arg ("layer_index"), gsi::arg ("box"),
     "@brief Iterates over all shapes of a given layer that touch the given box\n"
-    "@args layer_index, box\n"
     "\n"
     "@param box The box by which to query the shapes\n"
     "@param layer_index The layer on which to run the query\n" 
@@ -2753,17 +2685,15 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "This convenience method has been introduced in version 0.16.\n"
   ) +
   //  Hint: don't use db::Shapes::begin_overlapping. It does not update the box trees automatically
-  gsi::iterator_ext ("each_overlapping_shape", &begin_overlapping_shapes, 
+  gsi::iterator_ext ("each_overlapping_shape", &begin_overlapping_shapes, gsi::arg ("layer_index"), gsi::arg ("box"), gsi::arg ("flags"),
     "@brief Iterates over all shapes of a given layer that overlap the given box\n"
-    "@args layer_index, box, flags\n"
     "\n"
     "@param flags An \"or\"-ed combination of the S.. constants of the \\Shapes class\n"
     "@param box The box by which to query the shapes\n"
     "@param layer_index The layer on which to run the query\n" 
   ) +
-  gsi::iterator_ext ("each_overlapping_shape", &begin_overlapping_shapes_all, 
+  gsi::iterator_ext ("each_overlapping_shape", &begin_overlapping_shapes_all, gsi::arg ("layer_index"), gsi::arg ("box"),
     "@brief Iterates over all shapes of a given layer that overlap the given box\n"
-    "@args layer_index, box\n"
     "\n"
     "@param box The box by which to query the shapes\n"
     "@param layer_index The layer on which to run the query\n" 
@@ -2938,17 +2868,15 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.22.\n"
   ) +   
-  gsi::method_ext ("pcell_declaration", &pcell_declaration_of_inst,
+  gsi::method_ext ("pcell_declaration", &pcell_declaration_of_inst, gsi::arg ("instance"),
     "@brief Returns the PCell declaration of a pcell instance\n"
-    "@args instance\n"
     "If the instance is not a PCell instance, this method returns nil.\n"
     "The \\PCellDeclaration object allows one to retrieve PCell parameter definitions for example.\n"
     "\n"
     "This method has been introduced in version 0.22.\n"
   ) +
-  gsi::method_ext ("is_pcell_variant?", &is_pcell_variant_of_inst,
+  gsi::method_ext ("is_pcell_variant?", &is_pcell_variant_of_inst, gsi::arg ("instance"),
     "@brief Returns true, if this instance is a PCell variant\n"
-    "@args instance\n"
     "This method returns true, if this instance represents a PCell with a distinct\n"
     "set of parameters. This method also returns true, if it is a PCell imported from a library.\n"
     "\n"
@@ -2964,27 +2892,24 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.25.\n"
   ) +
-  gsi::method ("pcell_parameters", &db::Cell::get_pcell_parameters,
+  gsi::method ("pcell_parameters", &db::Cell::get_pcell_parameters, gsi::arg ("instance"),
     "@brief Returns the PCell parameters for a pcell instance\n"
-    "@args instance\n"
     "If the given instance is a PCell instance, this method returns a list of\n"
     "values for the PCell parameters. If the instance is not a PCell instance, this\n"
     "method returns an empty list.\n"
     "\n"
     "This method has been introduced in version 0.22.\n"
   ) +
-  gsi::method ("pcell_parameters_by_name", &db::Cell::get_named_pcell_parameters,
+  gsi::method ("pcell_parameters_by_name", &db::Cell::get_named_pcell_parameters, gsi::arg ("instance"),
     "@brief Returns the PCell parameters for a pcell instance as a name to value dictionary\n"
-    "@args instance\n"
     "If the given instance is a PCell instance, this method returns a dictionary of\n"
     "values for the PCell parameters with the parameter names as the keys. If the instance is not a PCell instance, this\n"
     "method returns an empty dictionary.\n"
     "\n"
     "This method has been introduced in version 0.24.\n"
   ) +
-  gsi::method_ext ("change_pcell_parameter", &change_pcell_parameter,
+  gsi::method_ext ("change_pcell_parameter", &change_pcell_parameter, gsi::arg ("instance"), gsi::arg ("name"), gsi::arg ("value"),
     "@brief Changes a single parameter for an individual PCell instance given by name\n"
-    "@args instance, name, value\n"
     "@return The new instance (the old may be invalid)\n"
     "This will set the PCell parameter named 'name' to the given value for the "
     "instance addressed by 'instance'. If no parameter with that name exists, the "
@@ -2992,9 +2917,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) + 
-  gsi::method_ext ("change_pcell_parameters", &change_pcell_parameters,
+  gsi::method_ext ("change_pcell_parameters", &change_pcell_parameters, gsi::arg ("instance"), gsi::arg ("dict"),
     "@brief Changes the given parameter for an individual PCell instance\n"
-    "@args instance, dict\n"
     "@return The new instance (the old may be invalid)\n"
     "This version receives a dictionary of names and values. It will change the "
     "parameters given by the names to the values given by the values of the dictionary. "
@@ -3003,9 +2927,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.24.\n"
   ) + 
-  gsi::method ("change_pcell_parameters", &db::Cell::change_pcell_parameters,
+  gsi::method ("change_pcell_parameters", &db::Cell::change_pcell_parameters, gsi::arg ("instance"), gsi::arg ("parameters"),
     "@brief Changes the parameters for an individual PCell instance\n"
-    "@args instance, parameters\n"
     "@return The new instance (the old may be invalid)\n"
     "If necessary, this method creates a new variant and replaces the given instance\n"
     "by an instance of this variant.\n"
@@ -3066,9 +2989,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.20.\n"
   ) +
-  gsi::method ("ghost_cell=", &db::Cell::set_ghost_cell,
+  gsi::method ("ghost_cell=", &db::Cell::set_ghost_cell, gsi::arg ("flag"),
     "@brief Sets the \"ghost cell\" flag\n"
-    "@args flag\n"
     "\n"
     "See \\is_ghost_cell? for a description of this property.\n"
     "\n"
@@ -3729,9 +3651,8 @@ Class<db::Instance> decl_Instance ("db", "Instance",
   method ("prop_id", &db::Instance::prop_id,
     "@brief Gets the properties ID associated with the instance\n"
   ) +
-  method_ext ("prop_id=", &set_prop_id,
+  method_ext ("prop_id=", &set_prop_id, gsi::arg ("id"),
     "@brief Sets the properties ID associated with the instance\n"
-    "@args id\n"
     "This method is provided, if a properties ID has been derived already. Usually it's more convenient "
     "to use \\delete_property, \\set_property or \\property.\n"
     "\n"
@@ -3740,9 +3661,8 @@ Class<db::Instance> decl_Instance ("db", "Instance",
   gsi::method ("has_prop_id?", &db::Instance::has_prop_id,
     "@brief Returns true, if the instance has properties\n"
   ) +
-  gsi::method_ext ("delete_property", &delete_property,
+  gsi::method_ext ("delete_property", &delete_property, gsi::arg ("key"),
     "@brief Deletes the user property with the given key\n"
-    "@args key\n"
     "This method is a convenience method that deletes the property with the given key. "
     "It does nothing if no property with that key exists. Using that method is more "
     "convenient than creating a new property set with a new ID and assigning that properties ID.\n"
@@ -3752,9 +3672,8 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "This method has been introduced in version 0.22."
   ) + 
-  gsi::method_ext ("set_property", &set_property,
+  gsi::method_ext ("set_property", &set_property, gsi::arg ("key"), gsi::arg ("value"),
     "@brief Sets the user property with the given key to the given value\n"
-    "@args key, value\n"
     "This method is a convenience method that sets the property with the given key to the given value. "
     "If no property with that key exists, it will create one. Using that method is more "
     "convenient than creating a new property set with a new ID and assigning that properties ID.\n"
@@ -3764,9 +3683,8 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "This method has been introduced in version 0.22."
   ) + 
-  gsi::method_ext ("property", &get_property,
+  gsi::method_ext ("property", &get_property, gsi::arg ("key"),
     "@brief Gets the user property with the given key\n"
-    "@args key\n"
     "This method is a convenience method that gets the property with the given key. "
     "If no property with that key exists, it will return nil. Using that method is more "
     "convenient than using the layout object and the properties ID to retrieve the property value. "
@@ -3880,9 +3798,8 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
-  method_ext ("cell=", &set_inst_cell,
+  method_ext ("cell=", &set_inst_cell, gsi::arg ("cell"),
     "@brief Sets the \\Cell object this instance refers to\n"
-    "@args cell\n"
     "\n"
     "Setting the cell object to nil is equivalent to deleting the instance.\n"
     "\n"
@@ -3891,9 +3808,8 @@ Class<db::Instance> decl_Instance ("db", "Instance",
   method ("cell_index", &db::Instance::cell_index,
     "@brief Get the index of the cell this instance refers to\n"
   ) +
-  method_ext ("cell_index=", &set_inst_cell_index,
+  method_ext ("cell_index=", &set_inst_cell_index, gsi::arg ("cell_index"),
     "@brief Sets the index of the cell this instance refers to\n"
-    "@args cell_index\n"
     "\n"
     "This method has been introduced in version 0.23."
   ) +
@@ -3927,17 +3843,15 @@ Class<db::Instance> decl_Instance ("db", "Instance",
   gsi::method_ext ("nb", &array_nb_i,
     "@brief Returns the number of instances in the 'b' axis\n"
   ) +
-  gsi::method_ext ("a=", &set_array_a_i,
+  gsi::method_ext ("a=", &set_array_a_i, gsi::arg ("a"),
     "@brief Sets the displacement vector for the 'a' axis\n"
-    "@args a\n"
     "\n"
     "If the instance was not an array instance before it is made one.\n"
     "\n"
     "This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type."
   ) +
-  gsi::method_ext ("b=", &set_array_b_i,
+  gsi::method_ext ("b=", &set_array_b_i, gsi::arg ("b"),
     "@brief Sets the displacement vector for the 'b' axis\n"
-    "@args b\n"
     "\n"
     "If the instance was not an array instance before it is made one.\n"
     "\n"
@@ -3959,17 +3873,15 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("na=", &set_array_na_i,
+  gsi::method_ext ("na=", &set_array_na_i, gsi::arg ("na"),
     "@brief Sets the number of instances in the 'a' axis\n"
-    "@args na\n"
     "\n"
     "If the instance was not an array instance before it is made one.\n"
     "\n"
     "This method has been introduced in version 0.23."
   ) +
-  gsi::method_ext ("nb=", &set_array_nb_i,
+  gsi::method_ext ("nb=", &set_array_nb_i, gsi::arg ("nb"),
     "@brief Sets the number of instances in the 'b' axis\n"
-    "@args nb\n"
     "\n"
     "If the instance was not an array instance before it is made one.\n"
     "\n"
@@ -3994,9 +3906,8 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "This method has been introduced in version 0.24."
   ) +
-  gsi::method_ext ("flatten", &inst_flatten,
+  gsi::method_ext ("flatten", &inst_flatten, gsi::arg ("levels"),
     "@brief Flattens the instance\n"
-    "@args levels\n"
     "\n"
     "This method will convert the instance to a number of shapes which are equivalent "
     "to the content of the cell. The instance itself will be removed.\n"
@@ -4098,9 +4009,8 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "This method has been introduced in version 0.24."
   ) +
-  gsi::method_ext ("change_pcell_parameters", &inst_change_pcell_parameters_list,
+  gsi::method_ext ("change_pcell_parameters", &inst_change_pcell_parameters_list, gsi::arg ("params"),
     "@brief Changes the parameters of a PCell instance to the list of parameters\n"
-    "@args params\n"
     "\n"
     "This method changes the parameters of a PCell instance to the given list of "
     "parameters. The list must correspond to the parameters listed in the pcell declaration.\n"
@@ -4109,9 +4019,8 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "This method has been introduced in version 0.24."
   ) +
-  gsi::method_ext ("change_pcell_parameters", &inst_change_pcell_parameters_dict,
+  gsi::method_ext ("change_pcell_parameters", &inst_change_pcell_parameters_dict, gsi::arg ("dict"),
     "@brief Changes the parameters of a PCell instance to the dictionary of parameters\n"
-    "@args dict\n"
     "\n"
     "This method changes the parameters of a PCell instance to the given "
     "values. The values are specifies as a dictionary of names (keys) vs. values.\n"
@@ -4120,9 +4029,8 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "This method has been introduced in version 0.24."
   ) +
-  gsi::method_ext ("change_pcell_parameter", &inst_change_pcell_parameter,
+  gsi::method_ext ("change_pcell_parameter", &inst_change_pcell_parameter, gsi::arg ("name"), gsi::arg ("value"),
     "@brief Changes a single parameter of a PCell instance to the given value\n"
-    "@args name,value\n"
     "\n"
     "This method changes a parameter of a PCell instance to the given value. The "
     "name identifies the PCell parameter and must correspond to one parameter listed in the PCell "
@@ -4205,9 +4113,8 @@ Class<db::Instance> decl_Instance ("db", "Instance",
   gsi::method ("cell_inst", &db::Instance::cell_inst,
     "@brief Gets the basic \\CellInstArray object associated with this instance reference."
   ) +
-  gsi::method_ext ("cell_inst=", &set_cell_inst,
+  gsi::method_ext ("cell_inst=", &set_cell_inst, gsi::arg ("inst"),
     "@brief Changes the \\CellInstArray object to the given one.\n"
-    "@args inst\n"
     "This method replaces the instance by the given CellInstArray object.\n"
     "\n"
     "This method has been introduced in version 0.22"
@@ -4223,19 +4130,16 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "This method has been introduced in version 0.25"
   ) +
-  gsi::method ("<", &db::Instance::operator<,
+  gsi::method ("<", &db::Instance::operator<, gsi::arg ("b"),
     "@brief Provides an order criterion for two Instance objects\n"
-    "@args b\n"
     "Warning: this operator is just provided to establish any order, not a particular one."
   ) +
-  gsi::method ("!=", &db::Instance::operator!=,
+  gsi::method ("!=", &db::Instance::operator!=, gsi::arg ("b"),
     "@brief Tests for inequality of two Instance objects\n"
-    "@args b\n"
     "Warning: this operator returns true if both objects refer to the same instance, not just identical ones."
   ) +
-  gsi::method ("==", &db::Instance::operator==,
+  gsi::method ("==", &db::Instance::operator==, gsi::arg ("b"),
     "@brief Tests for equality of two Instance objects\n"
-    "@args b\n"
     "See the hint on the < operator."
   ) +
   gsi::method_ext ("to_s", &to_string1,
@@ -4243,9 +4147,8 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "This method has been introduced with version 0.16."
   ) +
-  gsi::method_ext ("to_s", &to_string2,
+  gsi::method_ext ("to_s", &to_string2, gsi::arg ("with_cellname"),
     "@brief Creates a string showing the contents of the reference\n"
-    "@args with_cellname\n"
     "\n"
     "Passing true to with_cellname makes the string contain the cellname instead of the cell index\n"
     "\n"
@@ -4392,5 +4295,4 @@ Class<db::DCellInstArray> decl_DCellInstArray ("db", "DCellInstArray",
 );
 
 }
-
 

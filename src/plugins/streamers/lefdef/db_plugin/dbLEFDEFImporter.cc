@@ -174,7 +174,7 @@ LEFDEFLayerDelegate::open_layer (db::Layout &layout, const std::string &n, Layer
       lp.datatype = 0;
     }
 
-    std::pair<bool, unsigned int> ll = m_layer_map.logical (lp);
+    std::pair<bool, unsigned int> ll = m_layer_map.logical (lp, layout);
 
     if (ll.first) {
 
@@ -243,7 +243,7 @@ LEFDEFLayerDelegate::open_layer (db::Layout &layout, const std::string &n, Layer
       return std::make_pair (false, 0);
     }
 
-    std::pair<bool, unsigned int> ll = m_layer_map.logical (name);
+    std::pair<bool, unsigned int> ll = m_layer_map.logical (name, layout);
 
     if (ll.first) {
 
@@ -256,14 +256,14 @@ LEFDEFLayerDelegate::open_layer (db::Layout &layout, const std::string &n, Layer
 
     } else {
 
-      std::pair<bool, unsigned int> ll_raw = m_layer_map.logical (n);
+      std::pair<bool, unsigned int> ll_raw = m_layer_map.logical (n, layout);
       int ln = -1;
 
       if (ll_raw.first && (ln = layout.get_properties (ll_raw.second).layer) >= 0) {
 
         m_layer_map.map (db::LayerProperties (name), layout.layers (), db::LayerProperties (ln, dt, name));
         m_layer_map.prepare (layout);
-        return m_layer_map.logical (name);
+        return m_layer_map.logical (name, layout);
 
       } else if (! m_create_layers) {
 

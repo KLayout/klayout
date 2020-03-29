@@ -50,58 +50,53 @@ TEST(1)
   lay::AbstractMenu menu (0);
   EXPECT_EQ (menu_to_string (menu), "");
 
-  try {
-    EXPECT_EQ (menu.action ("n1").get_title (), "");
-    EXPECT_EQ (true, false);
-  } catch (...) {
-  }
-
+  EXPECT_EQ (menu.action ("n1") == 0, true);
   EXPECT_EQ (menu.is_valid ("n1"), false);
 
-  menu.insert_menu ("end", "n1", lay::Action ("title:n1"));
+  menu.insert_menu ("end", "n1", new lay::Action ("title:n1"));
   EXPECT_EQ (menu_to_string (menu), "(n1)");
   EXPECT_EQ (tl::join (menu.items (""), ","), "n1");
   EXPECT_EQ (menu.is_menu ("n1"), true);
-  EXPECT_EQ (menu.action ("n1").get_title (), "title:n1");
+  EXPECT_EQ (menu.action ("n1")->get_title (), "title:n1");
 
   EXPECT_EQ (menu.is_valid ("n1"), true);
   EXPECT_EQ (menu.is_valid ("n2"), false);
 
-  menu.insert_menu ("end", "n2", lay::Action ("title:n2"));
+  menu.insert_menu ("end", "n2", new lay::Action ("title:n2"));
   EXPECT_EQ (menu_to_string (menu), "(n1,n2)");
   EXPECT_EQ (tl::join (menu.items (""), ","), "n1,n2");
   EXPECT_EQ (menu.is_menu ("n2"), true);
-  EXPECT_EQ (menu.action ("n2").get_title (), "title:n2");
+  EXPECT_EQ (menu.action ("n2")->get_title (), "title:n2");
 
   EXPECT_EQ (menu.is_valid ("n2"), true);
 
-  menu.insert_menu ("end", "n1", lay::Action ("title:n1"));
+  menu.insert_menu ("end", "n1", new lay::Action ("title:n1"));
   EXPECT_EQ (menu_to_string (menu), "(n2,n1)");
   EXPECT_EQ (menu.is_menu ("n1"), true);
-  EXPECT_EQ (menu.action ("n1").get_title (), "title:n1");
+  EXPECT_EQ (menu.action ("n1")->get_title (), "title:n1");
 
-  menu.insert_item ("n1.begin", "c1", lay::Action ("title:c1"));
+  menu.insert_item ("n1.begin", "c1", new lay::Action ("title:c1"));
   EXPECT_EQ (menu_to_string (menu), "(n2,n1(n1.c1))");
   EXPECT_EQ (tl::join (menu.items ("n1"), ","), "n1.c1");
-  EXPECT_EQ (menu.action ("n1.c1").get_title (), "title:c1");
+  EXPECT_EQ (menu.action ("n1.c1")->get_title (), "title:c1");
 
-  menu.insert_item ("n1.end", "c2", lay::Action ("title:c2"));
+  menu.insert_item ("n1.end", "c2", new lay::Action ("title:c2"));
   EXPECT_EQ (menu_to_string (menu), "(n2,n1(n1.c1,n1.c2))");
   EXPECT_EQ (tl::join (menu.items ("n1"), ","), "n1.c1,n1.c2");
   EXPECT_EQ (menu.is_menu ("n1.c2"), false);
-  EXPECT_EQ (menu.action ("n1.c2").get_title (), "title:c2");
+  EXPECT_EQ (menu.action ("n1.c2")->get_title (), "title:c2");
 
-  menu.insert_item ("n1.begin", "c1", lay::Action ("title:c1a"));
+  menu.insert_item ("n1.begin", "c1", new lay::Action ("title:c1a"));
   EXPECT_EQ (menu_to_string (menu), "(n2,n1(n1.c1,n1.c2))");
   EXPECT_EQ (tl::join (menu.items ("n1"), ","), "n1.c1,n1.c2");
-  EXPECT_EQ (menu.action ("n1.c1").get_title (), "title:c1a");
+  EXPECT_EQ (menu.action ("n1.c1")->get_title (), "title:c1a");
 
-  menu.insert_item ("n1.c1", "c3", lay::Action ("title:c3"));
+  menu.insert_item ("n1.c1", "c3", new lay::Action ("title:c3"));
   EXPECT_EQ (menu_to_string (menu), "(n2,n1(n1.c3,n1.c1,n1.c2))");
 
-  menu.insert_item ("n1.c1+", "c4", lay::Action ("title:c4"));
+  menu.insert_item ("n1.c1+", "c4", new lay::Action ("title:c4"));
   EXPECT_EQ (menu_to_string (menu), "(n2,n1(n1.c3,n1.c1,n1.c4,n1.c2))");
-  EXPECT_EQ (menu.action ("n1.c4").get_title (), "title:c4");
+  EXPECT_EQ (menu.action ("n1.c4")->get_title (), "title:c4");
 
   menu.delete_item ("n1.c1");
   EXPECT_EQ (menu_to_string (menu), "(n2,n1(n1.c3,n1.c4,n1.c2))");
@@ -109,11 +104,11 @@ TEST(1)
   menu.delete_item ("n1");
   EXPECT_EQ (menu_to_string (menu), "(n2)");
 
-  menu.insert_item ("n1>end(title).end", "c1", lay::Action ("title:c1"));
+  menu.insert_item ("n1>end(title).end", "c1", new lay::Action ("title:c1"));
   EXPECT_EQ (menu_to_string (menu), "(n2,n1(n1.c1))");
-  EXPECT_EQ (menu.action ("n1.c1").get_title (), "title:c1");
+  EXPECT_EQ (menu.action ("n1.c1")->get_title (), "title:c1");
 
-  menu.insert_item ("n1>end(title).end", "c2", lay::Action ("title:c2"));
+  menu.insert_item ("n1>end(title).end", "c2", new lay::Action ("title:c2"));
   EXPECT_EQ (menu_to_string (menu), "(n2,n1(n1.c1,n1.c2))");
 
   menu.delete_item ("n1.c1");
@@ -128,10 +123,64 @@ TEST(1)
   menu.clear_menu ("n1");
   EXPECT_EQ (menu_to_string (menu), "(n2)");
 
-  menu.insert_menu ("end", "n1", lay::Action ("title:n1"));
-  menu.insert_item ("n1.begin", "c1", lay::Action ("title:c1"));
-  menu.insert_item ("n1.end", "c2", lay::Action ("title:c2"));
+  menu.insert_menu ("end", "n1", new lay::Action ("title:n1"));
+  menu.insert_item ("n1.begin", "c1", new lay::Action ("title:c1"));
+  menu.insert_item ("n1.end", "c2", new lay::Action ("title:c2"));
   EXPECT_EQ (menu_to_string (menu), "(n2,n1(n1.c1,n1.c2))");
   menu.clear_menu ("n1");
   EXPECT_EQ (menu_to_string (menu), "(n2,n1)");
 }
+
+TEST(2_ActionReferences)
+{
+  tl::weak_ptr<lay::Action> action (new lay::Action ("title:n1"));
+
+  {
+    lay::AbstractMenu menu (0);
+    EXPECT_EQ (menu_to_string (menu), "");
+    EXPECT_EQ (menu.action ("s1.n1") == 0, true);
+    EXPECT_EQ (menu.action ("s1") == 0, true);
+
+    menu.insert_menu ("end", "s1", "submenu1");
+    menu.insert_menu ("end", "s2", "submenu2");
+
+    menu.insert_item ("s1.end", "n1", action.get ());
+    menu.insert_item ("s2.end", "n1", action.get ());
+    EXPECT_EQ (menu_to_string (menu), "(s1(s1.n1),s2(s2.n1))");
+
+    EXPECT_EQ (menu.action ("s1.n1") == action.get (), true);
+    EXPECT_EQ (menu.action ("s2.n1") == action.get (), true);
+  }
+
+  //  the action is deleted because it's owned by the menu
+  EXPECT_EQ (action.get () == 0, true);
+}
+
+TEST(3_ActionReferences)
+{
+  tl::weak_ptr<lay::Action> action (new lay::Action ("title:n1"));
+
+  {
+    lay::AbstractMenu menu (0);
+    EXPECT_EQ (menu_to_string (menu), "");
+    EXPECT_EQ (menu.action ("s1.n1") == 0, true);
+    EXPECT_EQ (menu.action ("s1") == 0, true);
+
+    menu.insert_menu ("end", "s1", "submenu1");
+    menu.insert_menu ("end", "s2", "submenu2");
+
+    menu.insert_item ("s1.end", "n1", action.get ());
+    menu.insert_item ("s2.end", "n1", action.get ());
+    EXPECT_EQ (menu_to_string (menu), "(s1(s1.n1),s2(s2.n1))");
+
+    menu.delete_item ("s2");
+
+    EXPECT_EQ (menu.action ("s1.n1") != 0, true);
+    EXPECT_EQ (menu.action ("s1.n1") == action.get (), true);
+    EXPECT_EQ (menu.action ("s2.n1") == 0, true);
+  }
+
+  //  the action is deleted because it's owned by the menu
+  EXPECT_EQ (action.get () == 0, true);
+}
+

@@ -67,15 +67,15 @@ public:
   {
     //  TODO: where should that go?
     lay::PluginDeclaration::get_menu_entries (menu_entries);
-    menu_entries.push_back (lay::MenuEntry ("net_trace_group", "tools_menu.end"));
-    menu_entries.push_back (lay::MenuEntry ("lay::net_trace", "net_trace", "tools_menu.end", tl::to_string (QObject::tr ("Trace Net"))));
-    menu_entries.push_back (lay::MenuEntry ("", "trace_all_nets_menu", "tools_menu.end", tl::to_string (QObject::tr ("Trace All Nets")), true));
-    menu_entries.push_back (lay::MenuEntry ("lay::trace_all_nets", "trace_all_nets", "tools_menu.trace_all_nets_menu.end", tl::to_string (QObject::tr ("Hierarchical"))));
-    menu_entries.push_back (lay::MenuEntry ("lay::trace_all_nets_flat", "trace_all_nets_flat", "tools_menu.trace_all_nets_menu.end", tl::to_string (QObject::tr ("Flat"))));
-    menu_entries.push_back (lay::MenuEntry ("lay::edit_layer_stack", "edit_layer_stack", "tools_menu.end", tl::to_string (QObject::tr ("Edit Layer Stack"))));
+    menu_entries.push_back (lay::separator ("net_trace_group", "tools_menu.end"));
+    menu_entries.push_back (lay::menu_item ("lay::net_trace", "net_trace", "tools_menu.end", tl::to_string (QObject::tr ("Trace Net"))));
+    menu_entries.push_back (lay::submenu ("", "trace_all_nets_menu", "tools_menu.end", tl::to_string (QObject::tr ("Trace All Nets"))));
+    menu_entries.push_back (lay::menu_item ("lay::trace_all_nets", "trace_all_nets", "tools_menu.trace_all_nets_menu.end", tl::to_string (QObject::tr ("Hierarchical"))));
+    menu_entries.push_back (lay::menu_item ("lay::trace_all_nets_flat", "trace_all_nets_flat", "tools_menu.trace_all_nets_menu.end", tl::to_string (QObject::tr ("Flat"))));
+    menu_entries.push_back (lay::menu_item ("lay::edit_layer_stack", "edit_layer_stack", "tools_menu.end", tl::to_string (QObject::tr ("Edit Layer Stack"))));
   }
 
-  virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::PluginRoot *root, lay::LayoutView *view) const
+  virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::Dispatcher *root, lay::LayoutView *view) const
   {
     return new NetTracerDialog (root, view);
   }

@@ -37,7 +37,7 @@ namespace lay
 {
   class LayoutView;
   class DMarker;
-  class PluginRoot;
+  class Dispatcher;
 }
 
 namespace rdb
@@ -68,7 +68,7 @@ public:
   /**
    *  @brief Sets the plugin root object for this object
    */
-  void set_plugin_root (lay::PluginRoot *pr);
+  void set_dispatcher (lay::Dispatcher *pr);
 
   /**
    *  @brief Attach the page to a view
@@ -206,7 +206,7 @@ private:
   Qt::SortOrder m_marker_list_sort_order;
   int m_directory_tree_sorted_section;
   Qt::SortOrder m_directory_tree_sort_order;
-  lay::PluginRoot *mp_plugin_root;
+  lay::Dispatcher *mp_plugin_root;
   tl::DeferredMethod<MarkerBrowserPage> dm_rerun_macro;
 
   void release_markers ();

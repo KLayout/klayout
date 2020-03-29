@@ -50,10 +50,9 @@ class QMenu;
 namespace lay
 {
 
-class AbstractMenuProvider;
 class Action;
 class AbstractMenu;
-class PluginRoot;
+class Dispatcher;
 
 /**
  *  @brief A utility function to convert the packed key binding in the cfg_key_bindings string to a vector
@@ -76,115 +75,54 @@ LAYBASIC_PUBLIC std::vector<std::pair<std::string, bool> > unpack_menu_items_hid
 LAYBASIC_PUBLIC std::string pack_menu_items_hidden (const std::vector<std::pair<std::string, bool> > &unpacked);
 
 /**
- *  @brief A helper class that does reference counting for the QAction object
- */
-class ActionHandle
-  : public QObject
-{
-Q_OBJECT
-
-public:
-  ActionHandle (QWidget *parent);
-  ActionHandle (QAction *action, bool owned = true);
-  ActionHandle (QMenu *menu, bool owned = true);
-  ~ActionHandle ();
-  void add_ref ();
-  void remove_ref ();
-  QAction *ptr () const;
-  QMenu *menu () const;
-
-  void set_visible (bool v);
-  void set_hidden (bool h);
-  bool is_visible () const;
-  bool is_hidden () const;
-  bool is_effective_visible () const;
-
-  void set_default_shortcut (const std::string &sc);
-  void set_shortcut (const std::string &sc);
-  std::string get_default_shortcut () const;
-  std::string get_shortcut() const;
-  QKeySequence get_key_sequence () const;
-  QKeySequence get_key_sequence_for (const std::string &sc) const;
-
-protected slots:
-  void destroyed (QObject *obj);
-
-private:
-  QMenu *mp_menu;
-  QAction *mp_action;
-  int m_ref_count;
-  bool m_owned;
-  bool m_visible;
-  bool m_hidden;
-  std::string m_default_shortcut;
-  QKeySequence m_default_key_sequence;
-  std::string m_shortcut;
-  QKeySequence m_key_sequence;
-  bool m_no_key_sequence;
-
-  //  no copying
-  ActionHandle (const ActionHandle &);
-  ActionHandle &operator= (const ActionHandle &);
-};
-
-/**
- *  @brief A QAction proxy 
+ *  @brief The basic Action object
  *
- *  This class is provided to be better suited to automation because it provides the corresponding interfaces
- *  and allows implementing the "trigger" event by reimplementation of the slot (after being connected).
- *  In addition, by acting as a proxy, it can act as a reference to a QAction object created by Qt itself (i.e.
- *  within a QMenu).
- *  To reimplement the "triggered" method, derive a class from Action and reimplement "triggered". Then
- *  pass a reference to this object to "insert_item" of AbstractMenu and store away the derived object.
- *  This object then will receive the triggered events, although the menu holds a pure Action object. 
- *  This works since the basic object is the QAction to which both the derived object and the Action 
- *  point to. A triggered event will be forwarded from this QAction to all referencing Action objects.
+ *  An "action" is the target of a menu action. It allows reimplementing the "triggered" method
+ *  to implement a specific action. The action encapsulates a QAction object.
+ *
+ *  Use this object in "insert_item" of AbstractMenu.
+ *
+ *  This object is typically owned by the AbstractMenu and cannot be copied or assigned.
  */
 class LAYBASIC_PUBLIC Action
-  : public QObject
+  : public QObject,
+    public tl::Object,
+    public gsi::ObjectBase
 {
 Q_OBJECT
 
 public:
   /**
-   *  @brief The default constructor
-   *
-   *  This constructor creates an QAction object internally which is owned by the Action object.
+   *  @brief The main constructor
    */
-  Action (); 
+  Action ();
 
   /**
-   *  @brief The copy constructor
-   *
-   *  This constructor creates an QAction object internally which is owned by the Action object.
+   *  @brief Creates an action from the given QAction
+   *  If "owned" is true, the QAction will become owned by the Action object.
    */
-  Action (const Action &action); 
+  Action (QAction *action, bool owned = true);
 
   /**
-   *  @brief Create an action with the given title (icon, keyboard shortcut)
+   *  @brief Creates an action from the given QMenu
+   *  If "owned" is true, the QAction will become owned by the Action object.
+   */
+  Action (QMenu *menu, bool owned = true);
+
+  /**
+   *  @brief Creates an action with the given title (icon, keyboard shortcut)
    *
+   *  The title will optionally encode the shortcut and/or icon resource.
    *  The format of the title string is: <text>["("shortcut")"]["<"icon-resource">"]
    *
    *  @param title The title string encoding icon and keyboard shortcut if applicable.
    */
-  Action (const std::string &title); 
+  Action (const std::string &title);
 
   /**
-   *  @brief Creates a new free action
-   *  This constructor wil create a new action with it's own QAction object
-   *  under the given parent.
+   *  @brief Destructor
    */
-  static Action create_free_action (QWidget *parent);
-
-  /**
-   *  @brief Assignement
-   */
-  Action &operator= (const Action &action);
-
-  /**
-   *  @brief The destructor
-   */
-  ~Action (); 
+  ~Action ();
 
   /**
    *  @brief Set the title
@@ -309,7 +247,7 @@ public:
   void set_separator (bool s);
 
   /**
-   *  @brief Set the tool tip text 
+   *  @brief Set the tool tip text
    *
    *  @param text The text to display in the tool tip
    */
@@ -325,7 +263,7 @@ public:
   void set_icon (const std::string &filename);
 
   /**
-   *  @brief Set the icon's text 
+   *  @brief Set the icon's text
    *
    *  If an icon text is set, this will be used for the text below the icon.
    *  If no icon text is set, the normal text will be used for the icon.
@@ -333,7 +271,7 @@ public:
    */
   void set_icon_text (const std::string &icon_text);
 
-  /** 
+  /**
    *  @brief Set the action's QObject name (for testing for example)
    */
   void set_object_name (const std::string &name);
@@ -344,12 +282,12 @@ public:
   void add_to_exclusive_group (lay::AbstractMenu *menu, const std::string &group_name);
 
   /**
-   *  @brief Get the tool tip text 
+   *  @brief Get the tool tip text
    */
   std::string get_tool_tip () const;
 
   /**
-   *  @brief Get the icon's text 
+   *  @brief Get the icon's text
    */
   std::string get_icon_text () const;
 
@@ -376,72 +314,76 @@ public:
   QMenu *menu () const;
 
   /**
-   *  @brief Compares two action objects 
-   *
-   *  Two action objects are equal when they refer to the same ActionHandle.
+   *  @brief Gets the dispatcher object this action is connected to
    */
-  bool operator== (const Action &other) const
+  Dispatcher *dispatcher () const
   {
-    return mp_handle == other.mp_handle;
+    return mp_dispatcher;
   }
 
-public slots:
-  void triggered_slot ();
+protected slots:
+  void destroyed (QObject *obj);
+  void qaction_triggered ();
 
 private:
-  friend class AbstractMenu;
+  friend struct AbstractMenuItem;
 
-  ActionHandle *mp_handle;
+  QMenu *mp_menu;
+  QAction *mp_action;
+  lay::Dispatcher *mp_dispatcher;
+  bool m_owned;
+  bool m_visible;
+  bool m_hidden;
+  std::string m_default_shortcut;
+  QKeySequence m_default_key_sequence;
+  std::string m_shortcut;
+  std::string m_symbol;
+  QKeySequence m_key_sequence;
+  bool m_no_key_sequence;
 
-  /**
-   *  @brief The proxy constructor
-   *
-   *  This constructor takes a QAction object that it will refer to.
-   *  If the Action is copied, the copy will refer to the same QAction.
-   *  The QAction object is deleted if the last Action referring to QAction is deleted.
-   */
-  Action (ActionHandle *action);
+  void set_dispatcher (Dispatcher *dispatcher);
+  QKeySequence get_key_sequence () const;
+  QKeySequence get_key_sequence_for (const std::string &sc) const;
+
+  //  no copying
+  Action (const Action &);
+  Action &operator= (const Action &);
 };
 
 /**
  *  @brief A specialisation for the Action to issue a "configure" request on "triggered"
  *
- *  When this action is triggered, a "configure" request is issued to the PluginRoot instance
+ *  When this action is triggered, a "configure" request is issued to the Dispatcher instance
  *  (which is the root of the configuration hierarchy). The name and value is given by the
  *  respective parameters passed to the constructor or set with the write accessors.
  */
 class LAYBASIC_PUBLIC ConfigureAction
-  : public Action,
-    public tl::Object
+  : public Action
 {
 public:
   enum type { setter_type = 0, boolean_type = 1, choice_type = 2 };
 
   /**
    *  @brief The default constructor
-   *
-   *  @param pr The reference to the plugin root object which receives the configure request 
    */
-  ConfigureAction (lay::PluginRoot *pr); 
+  ConfigureAction ();
 
   /**
    *  @brief Create an configure action with the given name and value
    *
-   *  @param pr The reference to the plugin root object which receives the configure request 
    *  @param cname The name of the configuration parameter to set
    *  @param cvalue The value to set "cname" to
    *
    *  The value can be "?" in which case the configuration action describes 
    *  a boolean parameter which is mapped to a checkable action.
    */
-  ConfigureAction (lay::PluginRoot *pr, const std::string &cname, const std::string &value); 
+  ConfigureAction (const std::string &cname, const std::string &value);
 
   /**
    *  @brief Create an configure action with the given title (icon, keyboard shortcut), name and value
    *
    *  The format of the title string is: <text>["("shortcut")"]["<"icon-resource">"]
    *
-   *  @param pr The reference to the plugin root object which receives the configure request 
    *  @param title The title string encoding icon and keyboard shortcut if applicable.
    *  @param cname The name of the configuration parameter to set
    *  @param cvalue The value to set "cname" to
@@ -449,7 +391,7 @@ public:
    *  The value can be "?" in which case the configuration action describes 
    *  a boolean parameter which is mapped to a checkable action.
    */
-  ConfigureAction (lay::PluginRoot *pr, const std::string &title, const std::string &cname, const std::string &value); 
+  ConfigureAction (const std::string &title, const std::string &cname, const std::string &value);
 
   /**
    *  @brief Destructor
@@ -498,68 +440,12 @@ public:
 protected:
   virtual void triggered ();
 
-  void reg ();
-  void unreg ();
-
 private:
   ConfigureAction (const ConfigureAction &action); 
   ConfigureAction &operator= (const ConfigureAction &action); 
 
-  lay::PluginRoot *m_pr;
   std::string m_cname, m_cvalue;
   type m_type;
-};
-
-/**
- *  @brief A menu layout entry for static initialisation
- *
- *  These objects act as the "source" for creating the initial AbstractLayout setup.
- */
-struct LAYBASIC_PUBLIC MenuLayoutEntry {
-
-  MenuLayoutEntry (const char *_name, 
-                   const std::string &_title, 
-                   const std::pair<std::string, std::string> &_kv_pair)
-    : name (_name), title (_title), slot (0), kv_pair (_kv_pair), submenu (0)
-  { }
-
-  MenuLayoutEntry (const char *_name, 
-                   const std::string &_title, 
-                   const char *_slot, 
-                   const MenuLayoutEntry *_submenu = 0)
-    : name (_name), title (_title), slot (_slot), submenu (_submenu)
-  { }
-
-  MenuLayoutEntry (const char *_name, 
-                   const std::string &_title, 
-                   const MenuLayoutEntry *_submenu = 0)
-    : name (_name), title (_title), slot (0), submenu (_submenu)
-  { }
-
-  MenuLayoutEntry (const char *_name)
-    : name (_name), slot (0), submenu (0)
-  { }
-
-  MenuLayoutEntry ()
-    : name (0), slot (0), submenu (0)
-  { }
-
-  static MenuLayoutEntry separator (const char *name) 
-  {
-    return MenuLayoutEntry (name);
-  }
-
-  static MenuLayoutEntry last () 
-  {
-    return MenuLayoutEntry ();
-  }
-
-  const char *name;
-  std::string title;
-  const char *slot;
-  std::pair<std::string, std::string> kv_pair;
-  const MenuLayoutEntry *submenu;
-
 };
 
 /**
@@ -567,7 +453,7 @@ struct LAYBASIC_PUBLIC MenuLayoutEntry {
  */
 struct LAYBASIC_PUBLIC AbstractMenuItem
 {
-  AbstractMenuItem ();
+  AbstractMenuItem (lay::Dispatcher *dispatcher);
 
   //  No copy constructor semantics because we don't need it (we use list's) and Action does not provide one.
   AbstractMenuItem (const AbstractMenuItem &);
@@ -575,7 +461,12 @@ struct LAYBASIC_PUBLIC AbstractMenuItem
   /**
    *  @brief Internal method used to set up the item
    */
-  void setup_item (const std::string &pn, const std::string &n, const Action &a); 
+  void setup_item (const std::string &pn, const std::string &n, Action *a);
+
+  Dispatcher *dispatcher () const
+  {
+    return mp_dispatcher;
+  }
 
   const std::string &name () const 
   {
@@ -587,18 +478,23 @@ struct LAYBASIC_PUBLIC AbstractMenuItem
     return m_groups;
   }
 
-  void set_action (const Action &a, bool copy_properties);
+  void set_action (Action *a, bool copy_properties);
 
   void set_action_title (const std::string &t);
 
-  const Action &action () const
+  Action *action ()
   {
-    return m_action;
+    return mp_action.get ();
   }
 
-  QMenu *menu () const
+  const Action *action () const
   {
-    return m_action.menu ();
+    return mp_action.get ();
+  }
+
+  QMenu *menu ()
+  {
+    return mp_action->menu ();
   }
 
   void set_has_submenu ();
@@ -618,9 +514,10 @@ struct LAYBASIC_PUBLIC AbstractMenuItem
   std::list <AbstractMenuItem> children;
 
 private:
+  tl::shared_ptr<Action> mp_action;
+  Dispatcher *mp_dispatcher;
   bool m_has_submenu;
   bool m_remove_on_empty;
-  Action m_action;
   std::string m_name;
   std::string m_basename;
   std::set<std::string> m_groups;
@@ -635,11 +532,6 @@ private:
  *
  *  Each item can be associated with a Action, which delivers a title, enabled/disable state etc.
  *  The Action is either provided when new entries are inserted or created upon initialisation.
- *
- *  An abstract menu is initialised from a initialisation sequence given by a list of
- *  MenuLayoutEntry objects terminated with a MenuLayoutEntry::last() item.
- *  Each of these entries may provide a submenu. Beside for initialisation, these entries
- *  are not used further.
  *
  *  The abstract menu class provides methods to manipulate the menu structure (the state of the
  *  menu items, their title and shortcut key is provided and manipulated through the Action object). 
@@ -684,17 +576,12 @@ public:
   /**
    *  @brief Create the abstract menu object attached to the given main window
    */
-  AbstractMenu (AbstractMenuProvider *provider);
+  AbstractMenu (Dispatcher *dispatcher);
   
   /** 
    *  @brief Destroy the abstract menu object
    */
   ~AbstractMenu ();
-
-  /**
-   *  @brief Initialise from a sequence of MenuLayoutEntry objects
-   */
-  void init (const MenuLayoutEntry *layout);
 
   /**
    *  @brief Rebuild the QMenu's and refill the QMenuBar object
@@ -729,7 +616,12 @@ public:
    *  @param path The path to the item. This must be a valid path.
    *  @return The action object
    */
-  Action action (const std::string &path) const;
+  Action *action (const std::string &path);
+
+  /**
+   *  @brief Get the Action object for a given item (const version)
+   */
+  const Action *action(const std::string &path) const;
 
   /**
    *  @brief Get the subitems for a given submenu
@@ -772,8 +664,10 @@ public:
    *  @param path The path to the item before which to insert the new item
    *  @param name The name of the item to insert 
    *  @param action The action associated with the item
+   *
+   *  NOTE: the abstract menu will take ownership of the Action object.
    */
-  void insert_item (const std::string &path, const std::string &name, const Action &action); 
+  void insert_item (const std::string &path, const std::string &name, Action *action);
 
   /**
    *  @brief Insert a new separator before the one item by the path
@@ -793,7 +687,7 @@ public:
    *  @param name The name of the submenu to insert 
    *  @param action The action associated with the submenu
    */
-  void insert_menu (const std::string &path, const std::string &name, const Action &action);
+  void insert_menu (const std::string &path, const std::string &name, Action *action);
 
   /**
    *  @brief Insert a new submenu before the item given by the path
@@ -824,7 +718,7 @@ public:
   /**
    *  @brief Delete the items referring to the given action
    */
-  void delete_items (const Action &action);
+  void delete_items (Action *action);
 
   /**
    *  @brief Get the group members
@@ -833,6 +727,21 @@ public:
    *  @param A vector of all members (by path) of the group
    */
   std::vector<std::string> group (const std::string &name) const;
+
+  /**
+   *  @brief Get the group members as Action objects
+   *
+   *  @param group The group name
+   *  @param A vector of all members (as actions) of the group
+   */
+  std::vector<Action *> group_actions(const std::string &name);
+
+  /**
+   *  @brief Get the configure actions for a given configuration name
+   *
+   *  @param The configuration actions for this given configuration name
+   */
+  std::vector<lay::ConfigureAction *> configure_actions (const std::string &name);
 
   /**
    *  @brief Get the detached menu
@@ -873,29 +782,21 @@ signals:
 private:
   friend class Action;
 
-  std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator> > find_item (const std::string &path);
+  std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator> > find_item (tl::Extractor &extr);
   const AbstractMenuItem *find_item_exact (const std::string &path) const;
   AbstractMenuItem *find_item_exact (const std::string &path);
-  void transfer (const MenuLayoutEntry *layout, AbstractMenuItem &item);
   void build (QMenu *menu, std::list<AbstractMenuItem> &items);
   void build (QToolBar *tbar, std::list<AbstractMenuItem> &items);
   void collect_group (std::vector<std::string> &grp, const std::string &name, const AbstractMenuItem &item) const;
+  void collect_configure_actions (std::vector<ConfigureAction *> &ca, AbstractMenuItem &item);
+  void emit_changed ();
 
-  /**
-   *  @brief Create a action from a string
-   *
-   *  The format of the string is: <text>["("shortcut")"]["<"icon-resource">"]
-   *
-   *  @param s The title, key and icon resource string in the format given above
-   *  @param parent The widget to which to attach the QAction object
-   *  @return The ActionHandle object created
-   */
-  static ActionHandle *create_action (const std::string &s);
-
-  AbstractMenuProvider *mp_provider;
+  Dispatcher *mp_dispatcher;
   AbstractMenuItem m_root;
   tl::stable_vector<QMenu> m_helper_menu_items;
   std::map<std::string, QActionGroup *> m_action_groups;
+  std::map<std::string, std::vector<ConfigureAction *> > m_config_action_by_name;
+  bool m_config_actions_valid;
 };
 
 }
@@ -907,6 +808,14 @@ namespace tl
     typedef tl::false_tag has_default_constructor;
   };
 
+  template <> struct type_traits<lay::AbstractMenuItem> : public type_traits<void> {
+    typedef tl::false_tag has_copy_constructor;
+    typedef tl::false_tag has_default_constructor;
+  };
+
+  template <> struct type_traits<lay::Action> : public type_traits<void> {
+    typedef tl::false_tag has_copy_constructor;
+  };
 }
 
 #endif

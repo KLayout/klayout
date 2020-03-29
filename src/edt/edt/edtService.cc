@@ -334,8 +334,8 @@ Service::copy_selected ()
 
     //  store the given value "forever"
     if (dont_ask_again) {
-      plugin_root ()->config_set (cfg_edit_hier_copy_mode, tl::to_string (inst_mode));
-      plugin_root ()->config_end ();
+      dispatcher ()->config_set (cfg_edit_hier_copy_mode, tl::to_string (inst_mode));
+      dispatcher ()->config_end ();
     }
 
     //  create one ClipboardData object per cv_index because, this one assumes that there is 

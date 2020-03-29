@@ -36,7 +36,7 @@ namespace lay
 {
 
 class LayoutView;
-class PluginRoot;
+class Dispatcher;
 
 class LAYBASIC_PUBLIC Browser
   : public QDialog, 
@@ -47,9 +47,9 @@ public:
    *  @brief Constructor 
    */
 #if QT_VERSION >= 0x050000
-  Browser (lay::PluginRoot *root, lay::LayoutView *view, const char *name = "", Qt::WindowFlags fl = Qt::Window /*adds minimize button for example*/);
+  Browser (lay::Dispatcher *root, lay::LayoutView *view, const char *name = "", Qt::WindowFlags fl = Qt::Window /*adds minimize button for example*/);
 #else
-  Browser (lay::PluginRoot *root, lay::LayoutView *view, const char *name = "", Qt::WFlags fl = Qt::Window /*adds minimize button for example*/);
+  Browser (lay::Dispatcher *root, lay::LayoutView *view, const char *name = "", Qt::WFlags fl = Qt::Window /*adds minimize button for example*/);
 #endif
 
   /**
@@ -101,7 +101,7 @@ public:
   /**
    *  @brief Returns the pointer to the root configuration object
    */
-  lay::PluginRoot *root ()
+  lay::Dispatcher *root ()
   {
     return mp_root;
   }
@@ -133,7 +133,7 @@ public:
 private:
   bool m_active;
   lay::LayoutView *mp_view;
-  lay::PluginRoot *mp_root;
+  lay::Dispatcher *mp_root;
 
   void closeEvent (QCloseEvent *);
   void accept ();

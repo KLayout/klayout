@@ -1156,9 +1156,8 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method has been introduced in version 0.22."
   ) +
-  gsi::method_ext ("cell=", &set_cell_ptr,
+  gsi::method_ext ("cell=", &set_cell_ptr, gsi::arg ("cell"),
     "@brief Moves the shape to a different cell\n"
-    "@args cell\n"
     "\n"
     "Both the current and the target cell must reside in the same layout.\n"
     "\n"
@@ -1171,9 +1170,8 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method has been introduced in version 0.22."
   ) +
-  gsi::method_ext ("box=", &set_shape<db::Box>,
+  gsi::method_ext ("box=", &set_shape<db::Box>, gsi::arg ("box"),
     "@brief Replaces the shape by the given box\n"
-    "@args box\n"
     "This method replaces the shape by the given box. This method can only be called "
     "for editable layouts. It does not change the user properties of the shape.\n"
     "Calling this method will invalidate any iterators. It should not be called inside a "
@@ -1188,9 +1186,8 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("path=", &set_shape<db::Path>,
+  gsi::method_ext ("path=", &set_shape<db::Path>, gsi::arg ("box"),
     "@brief Replaces the shape by the given path object\n"
-    "@args box\n"
     "This method replaces the shape by the given path object. This method can only be called "
     "for editable layouts. It does not change the user properties of the shape.\n"
     "Calling this method will invalidate any iterators. It should not be called inside a "
@@ -1205,9 +1202,8 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("polygon=", &set_shape<db::Polygon>,
+  gsi::method_ext ("polygon=", &set_shape<db::Polygon>, gsi::arg ("box"),
     "@brief Replaces the shape by the given polygon object\n"
-    "@args box\n"
     "This method replaces the shape by the given polygon object. This method can only be called "
     "for editable layouts. It does not change the user properties of the shape.\n"
     "Calling this method will invalidate any iterators. It should not be called inside a "
@@ -1222,9 +1218,8 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("text=", &set_shape<db::Text>,
+  gsi::method_ext ("text=", &set_shape<db::Text>, gsi::arg ("box"),
     "@brief Replaces the shape by the given text object\n"
-    "@args box\n"
     "This method replaces the shape by the given text object. This method can only be called "
     "for editable layouts. It does not change the user properties of the shape.\n"
     "Calling this method will invalidate any iterators. It should not be called inside a "
@@ -1241,7 +1236,6 @@ Class<db::Shape> decl_Shape ("db", "Shape",
   ) +
   gsi::method_ext ("edge=", &set_shape<db::Edge>, gsi::arg("edge"),
     "@brief Replaces the shape by the given edge\n"
-    "@args box\n"
     "This method replaces the shape by the given edge. This method can only be called "
     "for editable layouts. It does not change the user properties of the shape.\n"
     "Calling this method will invalidate any iterators. It should not be called inside a "
@@ -1258,7 +1252,6 @@ Class<db::Shape> decl_Shape ("db", "Shape",
   ) +
   gsi::method_ext ("edge_pair=", &set_shape<db::EdgePair>, gsi::arg("edge_pair"),
     "@brief Replaces the shape by the given edge pair\n"
-    "@args box\n"
     "This method replaces the shape by the given edge pair. This method can only be called "
     "for editable layouts. It does not change the user properties of the shape.\n"
     "Calling this method will invalidate any iterators. It should not be called inside a "
@@ -1273,9 +1266,8 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method has been introduced in version 0.26."
   ) +
-  gsi::method_ext ("delete_property", &delete_property,
+  gsi::method_ext ("delete_property", &delete_property, gsi::arg ("key"),
     "@brief Deletes the user property with the given key\n"
-    "@args key\n"
     "This method is a convenience method that deletes the property with the given key. "
     "It does nothing if no property with that key exists. Using that method is more "
     "convenient than creating a new property set with a new ID and assigning that properties ID.\n"
@@ -1285,9 +1277,8 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method has been introduced in version 0.22."
   ) + 
-  gsi::method_ext ("set_property", &set_property,
+  gsi::method_ext ("set_property", &set_property, gsi::arg ("key"), gsi::arg ("value"),
     "@brief Sets the user property with the given key to the given value\n"
-    "@args key, value\n"
     "This method is a convenience method that sets the property with the given key to the given value. "
     "If no property with that key exists, it will create one. Using that method is more "
     "convenient than creating a new property set with a new ID and assigning that properties ID.\n"
@@ -1297,9 +1288,8 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method has been introduced in version 0.22."
   ) + 
-  gsi::method_ext ("property", &get_property,
+  gsi::method_ext ("property", &get_property, gsi::arg ("key"),
     "@brief Gets the user property with the given key\n"
-    "@args key\n"
     "This method is a convenience method that gets the property with the given key. "
     "If no property with that key does not exist, it will return nil. Using that method is more "
     "convenient than using the layout object and the properties ID to retrieve the property value. "
@@ -1336,9 +1326,8 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  gsi::iterator ("each_point_hole", &db::Shape::begin_hole, &db::Shape::end_hole,
+  gsi::iterator ("each_point_hole", &db::Shape::begin_hole, &db::Shape::end_hole, gsi::arg ("hole_index"),
     "@brief Iterates over the points of a hole contour\n"
-    "@args hole_index\n"
     "\n"
     "This method applies to polygons and delivers all points of the respective hole contour.\n"
     "It will throw an exception for other objects.\n"
@@ -1411,9 +1400,8 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method has been introduced in version 0.25.\n"
   ) +
-  gsi::method_ext ("box_width=", &set_box_width,
+  gsi::method_ext ("box_width=", &set_box_width, gsi::arg ("w"),
     "@brief Sets the width of the box\n"
-    "@args w\n"
     "\n"
     "Applies to boxes only. Changes the width of the box and throws an exception if the shape is not a box.\n"
     "\n"
@@ -1421,7 +1409,6 @@ Class<db::Shape> decl_Shape ("db", "Shape",
   ) +
   gsi::method_ext ("box_dwidth=", &set_box_dwidth, gsi::arg ("w"),
     "@brief Sets the width of the box in micrometer units\n"
-    "@args w\n"
     "\n"
     "Applies to boxes only. Changes the width of the box to the value given in micrometer units and throws an exception if the shape is not a box.\n"
     "Translation to database units happens internally.\n"
@@ -1442,9 +1429,8 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method has been introduced in version 0.25.\n"
   ) +
-  gsi::method_ext ("box_height=", &set_box_height,
+  gsi::method_ext ("box_height=", &set_box_height, gsi::arg ("h"),
     "@brief Sets the height of the box\n"
-    "@args h\n"
     "\n"
     "Applies to boxes only. Changes the height of the box and throws an exception if the shape is not a box.\n"
     "\n"
@@ -1655,9 +1641,8 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "Applies to paths only. Will throw an exception if the object is not a path.\n"
   ) +
-  gsi::method_ext ("round_path=", &set_round_path,
+  gsi::method_ext ("round_path=", &set_round_path, gsi::arg ("r"),
     "@brief The path will be a round-ended path if this property is set to true\n"
-    "@args r\n"
     "\n"
     "Applies to paths only. Will throw an exception if the object is not a path.\n"
     "Please note that the extensions will apply as well. To get a path with circular ends, set the begin and "
@@ -1794,9 +1779,8 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "Applies to texts only. Will throw an exception if the object is not a text.\n"
   ) +
-  gsi::method_ext ("text_string=", &set_text_string,
+  gsi::method_ext ("text_string=", &set_text_string, gsi::arg ("string"),
     "@brief Sets the text string\n"
-    "@args string\n"
     "\n"
     "Applies to texts only. Will throw an exception if the object is not a text.\n"
     "\n"
@@ -1807,9 +1791,8 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "Applies to texts only. Will throw an exception if the object is not a text.\n"
   ) +
-  gsi::method_ext ("text_rot=", &set_text_rot,
+  gsi::method_ext ("text_rot=", &set_text_rot, gsi::arg ("o"),
     "@brief Sets the text's orientation code (see \\Trans)\n"
-    "@args o\n"
     "\n"
     "Applies to texts only. Will throw an exception if the object is not a text.\n"
   ) +
@@ -1873,7 +1856,6 @@ Class<db::Shape> decl_Shape ("db", "Shape",
   ) +
   gsi::method_ext ("text_size=", &set_text_size, gsi::arg ("size"),
     "@brief Sets the text size\n"
-    "@args size\n"
     "\n"
     "Applies to texts only. Will throw an exception if the object is not a text.\n"
     "\n"
@@ -1881,7 +1863,6 @@ Class<db::Shape> decl_Shape ("db", "Shape",
   ) +
   gsi::method_ext ("text_dsize=", &set_text_dsize, gsi::arg ("size"),
     "@brief Sets the text size in micrometer units\n"
-    "@args size\n"
     "\n"
     "Applies to texts only. Will throw an exception if the object is not a text.\n"
     "\n"
@@ -1892,9 +1873,8 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "Applies to texts only. Will throw an exception if the object is not a text.\n"
   ) +
-  gsi::method_ext ("text_font=", &set_text_font,
+  gsi::method_ext ("text_font=", &set_text_font, gsi::arg ("font"),
     "@brief Sets the text's font\n"
-    "@args font\n"
     "\n"
     "Applies to texts only. Will throw an exception if the object is not a text.\n"
     "\n"
@@ -1908,9 +1888,8 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method has been introduced in version 0.22.\n"
   ) +
-  gsi::method_ext ("text_halign=", &set_text_halign,
+  gsi::method_ext ("text_halign=", &set_text_halign, gsi::arg ("a"),
     "@brief Sets the text's horizontal alignment\n"
-    "@args a\n"
     "\n"
     "Applies to texts only. Will throw an exception if the object is not a text.\n"
     "See \\text_halign for a description of that property.\n"
@@ -1925,9 +1904,8 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method has been introduced in version 0.22.\n"
   ) +
-  gsi::method_ext ("text_valign=", &set_text_valign,
+  gsi::method_ext ("text_valign=", &set_text_valign, gsi::arg ("a"),
     "@brief Sets the text's vertical alignment\n"
-    "@args a\n"
     "\n"
     "Applies to texts only. Will throw an exception if the object is not a text.\n"
     "See \\text_valign for a description of that property.\n"
@@ -2036,9 +2014,8 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method has been added in version 0.23.\n"
   ) +
-  gsi::method_ext ("layer_info=", &set_shape_layer,
+  gsi::method_ext ("layer_info=", &set_shape_layer, gsi::arg ("layer_info"),
     "@brief Moves the shape to a layer given by a \\LayerInfo object\n"
-    "@args layer_info\n"
     "If no layer with the given properties exists, an exception is thrown.\n"
     "\n"
     "This method has been added in version 0.23.\n"
@@ -2049,19 +2026,16 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method has been added in version 0.23.\n"
   ) +
-  gsi::method_ext ("layer=", &set_shape_layer_index,
+  gsi::method_ext ("layer=", &set_shape_layer_index, gsi::arg ("layer_index"),
     "@brief Moves the shape to a layer given by the layer index object\n"
-    "@args layer_index\n"
     "\n"
     "This method has been added in version 0.23.\n"
   ) +
-  gsi::method ("!=", &db::Shape::operator!=,
+  gsi::method ("!=", &db::Shape::operator!=, gsi::arg ("other"),
     "@brief Inequality operator\n"
-    "@args other\n"
   ) +
-  gsi::method ("==", &db::Shape::operator==,
+  gsi::method ("==", &db::Shape::operator==, gsi::arg ("other"),
     "@brief Equality operator\n"
-    "@args other\n"
     "\n"
     "Equality of shapes is not specified by the identity of the objects but by the\n"
     "identity of the pointers - both shapes must refer to the same object.\n"
@@ -2112,4 +2086,3 @@ Class<db::Shape> decl_Shape ("db", "Shape",
 );
 
 }
-

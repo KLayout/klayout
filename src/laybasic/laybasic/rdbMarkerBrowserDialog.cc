@@ -54,7 +54,7 @@ extern std::string cfg_rdb_marker_vertex_size;
 extern std::string cfg_rdb_marker_halo;
 extern std::string cfg_rdb_marker_dither_pattern;
 
-MarkerBrowserDialog::MarkerBrowserDialog (lay::PluginRoot *root, lay::LayoutView *vw)
+MarkerBrowserDialog::MarkerBrowserDialog (lay::Dispatcher *root, lay::LayoutView *vw)
   : lay::Browser (root, vw),
     Ui::MarkerBrowserDialog (),
     m_context (rdb::AnyCell),
@@ -70,7 +70,7 @@ MarkerBrowserDialog::MarkerBrowserDialog (lay::PluginRoot *root, lay::LayoutView
 {
   Ui::MarkerBrowserDialog::setupUi (this);
 
-  browser_frame->set_plugin_root (root);
+  browser_frame->set_dispatcher (root);
 
   if (view ()) {
     view ()->cellviews_changed_event.add (this, &MarkerBrowserDialog::cellviews_changed);
@@ -122,7 +122,7 @@ MarkerBrowserDialog::~MarkerBrowserDialog ()
 void
 MarkerBrowserDialog::configure_clicked ()
 {
-  lay::ConfigurationDialog config_dialog (this, lay::PluginRoot::instance (), "MarkerBrowserPlugin");
+  lay::ConfigurationDialog config_dialog (this, lay::Dispatcher::instance (), "MarkerBrowserPlugin");
   config_dialog.exec ();
 }
 
@@ -703,8 +703,8 @@ MarkerBrowserDialog::update_content ()
 void 
 MarkerBrowserDialog::deactivated ()
 {
-  if (lay::PluginRoot::instance ()) {
-    lay::PluginRoot::instance ()->config_set (cfg_rdb_window_state, lay::save_dialog_state (this).c_str ());
+  if (lay::Dispatcher::instance ()) {
+    lay::Dispatcher::instance ()->config_set (cfg_rdb_window_state, lay::save_dialog_state (this).c_str ());
   }
 
   browser_frame->set_rdb (0);

@@ -23,8 +23,8 @@
 
 #include "laybasicCommon.h"
 #include "layNetlistBrowserDialog.h"
-
 #include "layConverters.h"
+#include "layDispatcher.h"
 
 #include <set>
 
@@ -105,7 +105,7 @@ NetlistBrowserConfigPage::NetlistBrowserConfigPage (QWidget *parent)
 }
 
 void
-NetlistBrowserConfigPage::setup (lay::PluginRoot *root)
+NetlistBrowserConfigPage::setup (lay::Dispatcher *root)
 {
   //  window mode
   lay::NetlistBrowserConfig::net_window_type wmode = lay::NetlistBrowserConfig::FitNet;
@@ -133,7 +133,7 @@ NetlistBrowserConfigPage::window_changed (int m)
 }
 
 void
-NetlistBrowserConfigPage::commit (lay::PluginRoot *root)
+NetlistBrowserConfigPage::commit (lay::Dispatcher *root)
 {
   double dim = 1.0;
   tl::from_string (tl::to_string (le_window->text ()), dim);
@@ -195,7 +195,7 @@ NetlistBrowserConfigPage2::color_button_clicked ()
 }
 
 void
-NetlistBrowserConfigPage2::setup (lay::PluginRoot *root)
+NetlistBrowserConfigPage2::setup (lay::Dispatcher *root)
 {
   bool cycle_enabled = false;
   root->config_get (cfg_l2ndb_marker_cycle_colors_enabled, cycle_enabled);
@@ -287,7 +287,7 @@ NetlistBrowserConfigPage2::update_colors ()
 }
 
 void
-NetlistBrowserConfigPage2::commit (lay::PluginRoot *root)
+NetlistBrowserConfigPage2::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_l2ndb_marker_cycle_colors_enabled, cycle_colors_cb->isChecked ());
   root->config_set (cfg_l2ndb_marker_cycle_colors, m_palette.to_string ());
@@ -373,10 +373,10 @@ public:
   virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
   {
     lay::PluginDeclaration::get_menu_entries (menu_entries);
-    menu_entries.push_back (lay::MenuEntry ("netlist_browser::show", "browse_netlists", "tools_menu.end", tl::to_string (QObject::tr ("Netlist Browser"))));
+    menu_entries.push_back (lay::menu_item ("netlist_browser::show", "browse_netlists", "tools_menu.end", tl::to_string (QObject::tr ("Netlist Browser"))));
   }
 
-  virtual lay::Plugin *create_plugin (db::Manager *, lay::PluginRoot *root, lay::LayoutView *view) const
+  virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutView *view) const
   {
     return new lay::NetlistBrowserDialog (root, view);
   }

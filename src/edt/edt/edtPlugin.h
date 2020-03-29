@@ -30,7 +30,7 @@
 
 namespace lay
 {
-  class PluginRoot;
+  class Dispatcher;
 }
 
 namespace edt
@@ -44,7 +44,7 @@ namespace edt
     : public lay::PluginDeclaration
   {
   public:
-    virtual void get_editor_options_pages (std::vector<edt::EditorOptionsPage *> &, lay::PluginRoot *) const = 0;
+    virtual void get_editor_options_pages (std::vector<edt::EditorOptionsPage *> &, lay::Dispatcher *) const = 0;
   };
 
   /**

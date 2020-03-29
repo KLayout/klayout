@@ -56,14 +56,14 @@ namespace gsi
 //  of the factory, this hack is a quick but dirty workaround.
 static bool s_in_create_plugin = false;
 static lay::LayoutView *sp_view = 0;
-static lay::PluginRoot *sp_root = 0;
+static lay::Dispatcher *sp_dispatcher = 0;
 
 class PluginBase
   : public lay::Plugin, public lay::ViewService
 {
 public:
   PluginBase ()
-    : lay::Plugin (sp_root), lay::ViewService (sp_view ? sp_view->view_object_widget () : 0)
+    : lay::Plugin (sp_dispatcher), lay::ViewService (sp_view ? sp_view->view_object_widget () : 0)
   {
     if (! s_in_create_plugin) {
       throw tl::Exception (tl::to_string (QObject::tr ("A PluginBase object can only be created in the PluginFactory's create_plugin method")));
@@ -334,7 +334,7 @@ public:
     }
   }
 
-  virtual void initialize (lay::PluginRoot *root) 
+  virtual void initialize (lay::Dispatcher *root)
   {
     if (f_initialize.can_issue ()) {
       f_initialize.issue<lay::PluginDeclaration> (&lay::PluginDeclaration::initialize, root);
@@ -343,7 +343,7 @@ public:
     }
   }
     
-  virtual void uninitialize (lay::PluginRoot *root) 
+  virtual void uninitialize (lay::Dispatcher *root)
   {
     if (f_uninitialize.can_issue ()) {
       f_uninitialize.issue<lay::PluginDeclaration> (&lay::PluginDeclaration::uninitialize, root);
@@ -352,7 +352,7 @@ public:
     }
   }
 
-  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::PluginRoot *root, lay::LayoutView *view) const
+  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *root, lay::LayoutView *view) const
   { 
     if (f_create_plugin.can_issue ()) {
       return create_plugin_gsi (manager, root, view);
@@ -361,22 +361,22 @@ public:
     }
   }
 
-  virtual gsi::PluginBase *create_plugin_gsi (db::Manager *manager, lay::PluginRoot *root, lay::LayoutView *view) const
+  virtual gsi::PluginBase *create_plugin_gsi (db::Manager *manager, lay::Dispatcher *root, lay::LayoutView *view) const
   { 
     //  TODO: this is a hack. See notes above at s_in_create_plugin
     s_in_create_plugin = true;
     sp_view = view;
-    sp_root = root;
+    sp_dispatcher = root;
     gsi::PluginBase *ret = 0;
     try {
-      ret = f_create_plugin.issue<PluginFactoryBase, gsi::PluginBase *, db::Manager *, lay::PluginRoot *, lay::LayoutView *> (&PluginFactoryBase::create_plugin_gsi, manager, root, view);
+      ret = f_create_plugin.issue<PluginFactoryBase, gsi::PluginBase *, db::Manager *, lay::Dispatcher *, lay::LayoutView *> (&PluginFactoryBase::create_plugin_gsi, manager, root, view);
       s_in_create_plugin = false;
       sp_view = 0;
-      sp_root = 0;
+      sp_dispatcher = 0;
     } catch (...) {
       s_in_create_plugin = false;
       sp_view = 0;
-      sp_root = 0;
+      sp_dispatcher = 0;
     }
 
     return ret;
@@ -394,17 +394,36 @@ public:
 
   void add_menu_entry1 (const std::string &menu_name, const std::string &insert_pos)
   {
-    m_menu_entries.push_back (lay::MenuEntry (menu_name, insert_pos));
+    m_menu_entries.push_back (lay::separator (menu_name, insert_pos));
   }
 
   void add_menu_entry2 (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &title)
   {
-    m_menu_entries.push_back (lay::MenuEntry (symbol, menu_name, insert_pos, title));
+    m_menu_entries.push_back (lay::menu_item (symbol, menu_name, insert_pos, title));
+  }
+
+  void add_menu_entry_copy (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &copy_from)
+  {
+    m_menu_entries.push_back (lay::menu_item_copy (symbol, menu_name, insert_pos, copy_from));
+  }
+
+  void add_submenu (const std::string &menu_name, const std::string &insert_pos, const std::string &title)
+  {
+    m_menu_entries.push_back (lay::submenu (menu_name, insert_pos, title));
+  }
+
+  void add_config_menu_item (const std::string &menu_name, const std::string &insert_pos, const std::string &title, const std::string &cname, const std::string &cvalue)
+  {
+    m_menu_entries.push_back (lay::config_menu_item (menu_name, insert_pos, title, cname, cvalue));
   }
 
   void add_menu_entry3 (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &title, bool sub_menu)
   {
-    m_menu_entries.push_back (lay::MenuEntry (symbol, menu_name, insert_pos, title, sub_menu));
+    if (sub_menu) {
+      m_menu_entries.push_back (lay::submenu (symbol, menu_name, insert_pos, title));
+    } else {
+      m_menu_entries.push_back (lay::menu_item (symbol, menu_name, insert_pos, title));
+    }
   }
 
   void add_option (const std::string &name, const std::string &default_value)
@@ -439,9 +458,8 @@ private:
 };
 
 Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
-  method ("register", &PluginFactoryBase::register_gsi,
+  method ("register", &PluginFactoryBase::register_gsi, gsi::arg ("position"), gsi::arg ("name"), gsi::arg ("title"),
     "@brief Registers the plugin factory\n"
-    "@args position, name, title\n"
     "@param position An integer that determines the order in which the plugins are created. The internal plugins use the values from 1000 to 50000.\n"
     "@param name The plugin name. This is an arbitrary string which should be unique. Hence it is recommended to use a unique prefix, i.e. \"myplugin::ThePluginClass\".\n"
     "@param title The title string which is supposed to appear in the tool bar and menu related to this plugin.\n"
@@ -449,9 +467,8 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
     "Registration of the plugin factory makes the object known to the system. Registration requires that the menu items have been set "
     "already. Hence it is recommended to put the registration at the end of the initialization method of the factory class.\n"
   ) + 
-  method ("register", &PluginFactoryBase::register_gsi2,
+  method ("register", &PluginFactoryBase::register_gsi2, gsi::arg ("position"), gsi::arg ("name"), gsi::arg ("title"), gsi::arg ("icon"),
     "@brief Registers the plugin factory\n"
-    "@args position, name, title, icon\n"
     "@param position An integer that determines the order in which the plugins are created. The internal plugins use the values from 1000 to 50000.\n"
     "@param name The plugin name. This is an arbitrary string which should be unique. Hence it is recommended to use a unique prefix, i.e. \"myplugin::ThePluginClass\".\n"
     "@param title The title string which is supposed to appear in the tool bar and menu related to this plugin.\n"
@@ -462,9 +479,8 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
     "Registration of the plugin factory makes the object known to the system. Registration requires that the menu items have been set "
     "already. Hence it is recommended to put the registration at the end of the initialization method of the factory class.\n"
   ) + 
-  callback ("configure", &gsi::PluginFactoryBase::configure, &gsi::PluginFactoryBase::f_configure,
+  callback ("configure", &gsi::PluginFactoryBase::configure, &gsi::PluginFactoryBase::f_configure, gsi::arg ("name"), gsi::arg ("value"),
     "@brief Gets called for configuration events for the plugin singleton\n"
-    "@args name, value\n"
     "This method can be reimplemented to receive configuration events "
     "for the plugin singleton. Before a configuration can be received it must be "
     "registered by calling \\add_option in the plugin factories' constructor.\n"
@@ -479,14 +495,12 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
   ) +
   callback ("config_finalize", &gsi::PluginFactoryBase::config_finalize, &gsi::PluginFactoryBase::f_config_finalize,
     "@brief Gets called after a set of configuration events has been sent\n"
-    "@args\n"
     "This method can be reimplemented and is called after a set of configuration events "
     "has been sent to the plugin factory singleton with \\configure. It can be used to "
     "set up user interfaces properly for example.\n"
   ) +
-  callback ("menu_activated", &gsi::PluginFactoryBase::menu_activated, &gsi::PluginFactoryBase::f_menu_activated,
+  callback ("menu_activated", &gsi::PluginFactoryBase::menu_activated, &gsi::PluginFactoryBase::f_menu_activated, gsi::arg ("symbol"),
     "@brief Gets called when a menu item is selected\n"
-    "@args symbol\n"
     "\n"
     "Usually, menu-triggered functionality is implemented in the per-view instance of the plugin. "
     "However, using this method it is possible to implement functionality globally for all plugin "
@@ -496,37 +510,32 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
     "If this method was handling the menu event, it should return true. This indicates that the event "
     "will not be propagated to other plugins hence avoiding duplicate calls.\n"
   ) +
-  callback ("initialized", &gsi::PluginFactoryBase::initialize, &gsi::PluginFactoryBase::f_initialize,
+  callback ("initialized", &gsi::PluginFactoryBase::initialize, &gsi::PluginFactoryBase::f_initialize, gsi::arg ("dispatcher"),
     "@brief Gets called when the plugin singleton is initialized, i.e. when the application has been started.\n"
-    "@args root\n"
-    "@param root The reference to the \\MainWindow object\n"
+    "@param dispatcher The reference to the \\MainWindow object\n"
   ) +
-  callback ("uninitialized", &gsi::PluginFactoryBase::uninitialize, &gsi::PluginFactoryBase::f_uninitialize,
+  callback ("uninitialized", &gsi::PluginFactoryBase::uninitialize, &gsi::PluginFactoryBase::f_uninitialize, gsi::arg ("dispatcher"),
     "@brief Gets called when the application shuts down and the plugin is unregistered\n"
     "This event can be used to free resources allocated with this factory singleton.\n"
-    "@args root\n"
-    "@param root The reference to the \\MainWindow object\n"
+    "@param dispatcher The reference to the \\MainWindow object\n"
   ) +
-  factory_callback ("create_plugin", &gsi::PluginFactoryBase::create_plugin_gsi, &gsi::PluginFactoryBase::f_create_plugin,
+  factory_callback ("create_plugin", &gsi::PluginFactoryBase::create_plugin_gsi, &gsi::PluginFactoryBase::f_create_plugin, gsi::arg ("manager"), gsi::arg ("dispatcher"), gsi::arg ("view"),
     "@brief Creates the plugin\n"
     "This is the basic functionality that the factory must provide. This method must create a plugin of the "
     "specific type.\n"
-    "@args manager, root, view\n"
     "@param manager The database manager object responsible for handling database transactions\n"
-    "@param root The reference to the \\MainWindow object\n"
+    "@param dispatcher The reference to the \\MainWindow object\n"
     "@param view The \\LayoutView that is plugin is created for\n"
     "@return The new \\Plugin implementation object\n"
   ) +
-  method ("add_menu_entry", &gsi::PluginFactoryBase::add_menu_entry1,
+  method ("add_menu_entry", &gsi::PluginFactoryBase::add_menu_entry1, gsi::arg ("menu_name"), gsi::arg ("insert_pos"),
     "@brief Specifies a separator\n"
-    "@args menu_name, insert_pos\n"
     "Call this method in the factory constructor to build the menu items that this plugin shall create.\n"
     "This specific call inserts a separator at the given position (insert_pos). The position uses abstract menu item paths "
     "and \"menu_name\" names the component that will be created. See \\AbstractMenu for a description of the path.\n"
   ) +
-  method ("add_menu_entry", &gsi::PluginFactoryBase::add_menu_entry2,
+  method ("add_menu_entry", &gsi::PluginFactoryBase::add_menu_entry2, gsi::arg ("symbol"), gsi::arg ("menu_name"), gsi::arg ("insert_pos"), gsi::arg ("title"),
     "@brief Specifies a menu item\n"
-    "@args symbol, menu_name, insert_pos, title\n"
     "Call this method in the factory constructor to build the menu items that this plugin shall create.\n"
     "This specific call inserts a menu item at the specified position (insert_pos). The position uses abstract menu item paths "
     "and \"menu_name\" names the component that will be created. See \\AbstractMenu for a description of the path.\n"
@@ -537,15 +546,36 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
     "@param insert_pos The position where to create the entry\n"
     "@param title The title string for the item. The title can contain a keyboard shortcut in round braces after the title text, i.e. \"My Menu Item(F12)\"\n"
   ) +
-  method ("add_menu_entry", &gsi::PluginFactoryBase::add_menu_entry3,
+  method ("#add_menu_entry", &gsi::PluginFactoryBase::add_menu_entry3, gsi::arg ("symbol"), gsi::arg ("menu_name"), gsi::arg ("insert_pos"), gsi::arg ("title"), gsi::arg ("sub_menu"),
     "@brief Specifies a menu item or sub-menu\n"
-    "@args symbol, menu_name, insert_pos, title, sub_menu\n"
     "Similar to the previous form of \"add_menu_entry\", but this version allows also to create sub-menus by setting the "
-    "last parameter to \"true\""
+    "last parameter to \"true\".\n"
+    "\n"
+    "With version 0.27 it's more convenient to use \\add_submenu."
   ) +
-  method ("add_option", &gsi::PluginFactoryBase::add_option,
+  method ("add_menu_item_clone", &gsi::PluginFactoryBase::add_menu_entry_copy, gsi::arg ("symbol"), gsi::arg ("menu_name"), gsi::arg ("insert_pos"), gsi::arg ("copy_from"),
+    "@brief Specifies a menu item as a clone of another one\n"
+    "Using this method, a menu item can be made a clone of another entry (given as path by 'copy_from').\n"
+    "The new item will share the \\Action object with the original one, so manipulating the action will change both the original entry "
+    "and the new entry.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
+  method ("add_submenu", &gsi::PluginFactoryBase::add_submenu, gsi::arg ("menu_name"), gsi::arg ("insert_pos"), gsi::arg ("title"),
+    "@brief Specifies a menu item or sub-menu\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
+  method ("add_config_menu_item", &gsi::PluginFactoryBase::add_config_menu_item, gsi::arg ("menu_name"), gsi::arg ("insert_pos"), gsi::arg ("title"), gsi::arg ("cname"), gsi::arg ("cvalue"),
+    "@brief Adds a configuration menu item\n"
+    "\n"
+    "Menu items created this way will send a configuration request with 'cname' as the configuration parameter name "
+    "and 'cvalue' as the configuration parameter value.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
+  method ("add_option", &gsi::PluginFactoryBase::add_option, gsi::arg ("name"), gsi::arg ("default_value"),
     "@brief Specifies configuration variables.\n"
-    "@args name, default_value\n"
     "Call this method in the factory constructor to add configuration key/value pairs to the configuration repository. "
     "Without specifying configuration variables, the status of a plugin cannot be persisted. "
     "\n\n"
@@ -555,9 +585,8 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
     "doing so has the advantage that it is guaranteed that a variable with this keys exists and has the given default value initially."
     "\n\n"
   ) +
-  method ("has_tool_entry=", &gsi::PluginFactoryBase::has_tool_entry,
+  method ("has_tool_entry=", &gsi::PluginFactoryBase::has_tool_entry, gsi::arg ("f"),
     "@brief Enables or disables the tool bar entry\n"
-    "@args f\n"
     "Initially this property is set to true. This means that the plugin will have a visible entry in the toolbar. "
     "This property can be set to false to disable this feature. In that case, the title and icon given on registration will be ignored. "
   ),
@@ -601,7 +630,7 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
   "  end\n"
   "  \n"
   "  # Create a new plugin instance of the custom type\n"
-  "  def create_plugin(manager, root, view)\n"
+  "  def create_plugin(manager, dispatcher, view)\n"
   "    return PluginTest.new\n"
   "  end\n"
   "\n"
@@ -638,28 +667,24 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
 );
 
 Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
-  callback ("menu_activated", &gsi::PluginBase::menu_activated, &gsi::PluginBase::f_menu_activated,
+  callback ("menu_activated", &gsi::PluginBase::menu_activated, &gsi::PluginBase::f_menu_activated, gsi::arg ("symbol"),
     "@brief Gets called when a custom menu item is selected\n"
-    "@args symbol\n"
     "When a menu item is clicked which was registered with the plugin factory, the plugin's 'menu_activated' method is "
     "called for the current view. The symbol registered for the menu item is passed in the 'symbol' argument."
   ) +
-  callback ("configure", &gsi::PluginBase::configure, &gsi::PluginBase::f_configure,
+  callback ("configure", &gsi::PluginBase::configure, &gsi::PluginBase::f_configure, gsi::arg ("name"), gsi::arg ("value"),
     "@brief Sends configuration requests to the plugin\n"
-    "@args name, value\n"
     "@param name The name of the configuration variable as registered in the plugin factory\n"
     "@param value The value of the configuration variable\n"
     "When a configuration variable is changed, the new value is reported to the plugin by calling the 'configure' method."
   ) +
   callback ("config_finalize", &gsi::PluginBase::config_finalize, &gsi::PluginBase::f_config_finalize,
     "@brief Sends the post-configuration request to the plugin\n"
-    "@args\n"
     "After all configuration parameters have been sent, 'config_finalize' is called to given the plugin a chance to "
     "update it's internal state according to the new configuration.\n"
   ) +
-  callback ("key_event", &gsi::PluginBase::key_event, &gsi::PluginBase::f_key_event,
+  callback ("key_event", &gsi::PluginBase::key_event, &gsi::PluginBase::f_key_event, gsi::arg ("key"), gsi::arg ("buttons"),
     "@brief Handles the key pressed event\n"
-    "@args key, buttons\n"
     "This method will called by the view on the active plugin when a button is pressed on the mouse.\n"
     "\n"
     "If the plugin handles the event, it should return true to indicate that the event should not be processed further."
@@ -668,9 +693,8 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "@param buttons A combination of the constants in the \\ButtonState class which codes both the mouse buttons and the key modifiers (.e. ShiftButton etc).\n"
     "@return True to terminate dispatcher\n"
   ) +
-  callback ("mouse_button_pressed_event", &gsi::PluginBase::mouse_press_event, &gsi::PluginBase::f_mouse_press_event,
+  callback ("mouse_button_pressed_event", &gsi::PluginBase::mouse_press_event, &gsi::PluginBase::f_mouse_press_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse button pressed event\n"
-    "@args p, buttons, prio\n"
     "This method will called by the view when a button is pressed on the mouse.\n"
     "\n"
     "First, the plugins that grabbed the mouse with \\grab_mouse will receive this event with 'prio' set to true "
@@ -691,76 +715,61 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "@param buttons A combination of the constants in the \\ButtonState class which codes both the mouse buttons and the key modifiers (.e. LeftButton, ShiftButton etc).\n"
     "@return True to terminate dispatcher\n"
   ) +
-  callback ("mouse_click_event", &gsi::PluginBase::mouse_click_event, &gsi::PluginBase::f_mouse_click_event,
+  callback ("mouse_click_event", &gsi::PluginBase::mouse_click_event, &gsi::PluginBase::f_mouse_click_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse button click event (after the button has been released)\n"
-    "@args p, buttons, prio\n"
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse button has been released without moving it.\n"
   ) +
-  callback ("mouse_double_click_event", &gsi::PluginBase::mouse_double_click_event, &gsi::PluginBase::f_mouse_double_click_event,
+  callback ("mouse_double_click_event", &gsi::PluginBase::mouse_double_click_event, &gsi::PluginBase::f_mouse_double_click_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse button double-click event\n"
-    "@args p, buttons, prio\n"
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse button has been double-clicked.\n"
   ) +
-  callback ("leave_event", &gsi::PluginBase::leave_event, &gsi::PluginBase::f_leave_event,
+  callback ("leave_event", &gsi::PluginBase::leave_event, &gsi::PluginBase::f_leave_event, gsi::arg ("prio"),
     "@brief Handles the leave event (mouse leaves canvas area of view)\n"
-    "@args prio\n"
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse leaves the canvas area.\n"
     "This method does not have a position nor button flags.\n"
   ) +
-  callback ("enter_event", &gsi::PluginBase::enter_event, &gsi::PluginBase::f_enter_event,
+  callback ("enter_event", &gsi::PluginBase::enter_event, &gsi::PluginBase::f_enter_event, gsi::arg ("prio"),
     "@brief Handles the enter event (mouse enters canvas area of view)\n"
-    "@args prio\n"
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse enters the canvas area.\n"
     "This method does not have a position nor button flags.\n"
   ) +
-  callback ("mouse_moved_event", &gsi::PluginBase::mouse_move_event, &gsi::PluginBase::f_mouse_move_event,
+  callback ("mouse_moved_event", &gsi::PluginBase::mouse_move_event, &gsi::PluginBase::f_mouse_move_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse move event\n"
-    "@args p, buttons, prio\n"
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse is moved in the canvas area.\n"
   ) +
-  callback ("mouse_button_released_event", &gsi::PluginBase::mouse_release_event, &gsi::PluginBase::f_mouse_release_event,
+  callback ("mouse_button_released_event", &gsi::PluginBase::mouse_release_event, &gsi::PluginBase::f_mouse_release_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse button release event\n"
-    "@args p, buttons, prio\n"
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse button is released.\n"
   ) +
-  callback ("wheel_event", &gsi::PluginBase::wheel_event, &gsi::PluginBase::f_wheel_event,
-    "@args delta, horizontal, p, buttons, prio\n"
+  callback ("wheel_event", &gsi::PluginBase::wheel_event, &gsi::PluginBase::f_wheel_event, gsi::arg ("delta"), gsi::arg ("horizontal"), gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse wheel is rotated.\n"
     "Additional parameters for this event are 'delta' (the rotation angle in units of 1/8th degree) and 'horizontal' which is true when the horizontal wheel was rotated and "
     "false if the vertical wheel was rotated.\n"
   ) +
   callback ("activated", &gsi::PluginBase::activated, &gsi::PluginBase::f_activated,
     "@brief Gets called when the plugin is activated (selected in the tool bar)\n"
-    "@args\n"
   ) +
   callback ("deactivated", &gsi::PluginBase::deactivated, &gsi::PluginBase::f_deactivated,
     "@brief Gets called when the plugin is deactivated and another plugin is activated\n"
-    "@args\n"
   ) +
   callback ("drag_cancel", &gsi::PluginBase::drag_cancel, &gsi::PluginBase::f_drag_cancel,
     "@brief Gets called on various occasions when a drag operation should be canceled\n"
-    "@args\n"
     "If the plugin implements some press-and-drag or a click-and-drag operation, this callback should "
     "cancel this operation and return in some state waiting for a new mouse event."
   ) +
   callback ("update", &gsi::PluginBase::update, &gsi::PluginBase::f_update, 
     "@brief Gets called when the view has changed\n"
-    "@args\n"
     "This method is called in particular if the view has changed the visible rectangle, i.e. after zooming in or out or panning. "
     "This callback can be used to update any internal states that depend on the view's state."
   ) + 
   method ("grab_mouse", &gsi::PluginBase::grab_mouse,
     "@brief Redirects mouse events to this plugin, even if the plugin is not active.\n"
-    "@args\n"
-
   ) + 
   method ("ungrab_mouse", &gsi::PluginBase::ungrab_mouse,
     "@brief Removes a mouse grab registered with \\grab_mouse.\n"
-    "@args\n"
   ) + 
-  method ("set_cursor", &gsi::PluginBase::set_cursor,
+  method ("set_cursor", &gsi::PluginBase::set_cursor, gsi::arg ("cursor_type"),
     "@brief Sets the cursor in the view area to the given type\n"
-    "@args cursor_type\n"
     "Setting the cursor has an effect only inside event handlers, i.e. mouse_press_event. The cursor is not set permanently. Is is reset "
     "in the mouse move handler unless a button is pressed or the cursor is explicitly set again in the mouse_move_event.\n"
     "\n"
@@ -849,22 +858,22 @@ Class<gsi::ButtonStateNamespace> decl_ButtonState ("lay", "ButtonState",
 );
 
 static std::vector<std::string> 
-get_config_names (lay::PluginRoot *root)
+get_config_names (lay::Dispatcher *dispatcher)
 {
   std::vector<std::string> names;
-  root->get_config_names (names);
+  dispatcher->get_config_names (names);
   return names;
 }
 
-static lay::PluginRoot *config_root_instance ()
+static lay::Dispatcher *dispatcher_instance ()
 {
-  return lay::PluginRoot::instance ();
+  return lay::Dispatcher::instance ();
 }
 
-static tl::Variant get_config (lay::PluginRoot *root, const std::string &name)
+static tl::Variant get_config (lay::Dispatcher *dispatcher, const std::string &name)
 {
   std::string value;
-  if (root->config_get (name, value)) {
+  if (dispatcher->config_get (name, value)) {
     return tl::Variant (value);
   } else {
     return tl::Variant ();
@@ -872,54 +881,50 @@ static tl::Variant get_config (lay::PluginRoot *root, const std::string &name)
 }
 
 /**
- *  @brief Exposes the PluginRoot interface
+ *  @brief Exposes the Dispatcher interface
  *
  *  This interface is intentionally not derived from Plugin. It is used currently to 
- *  identify the plugin root node for configuration. The Plugin nature of this interface
+ *  identify the dispatcher node for configuration. The Plugin nature of this interface
  *  is somewhat artificial and may be removed later. 
  *
  *  TODO: this is a duplicate of the respective methods in LayoutView and Application.
  *  This is intentional since we don't want to spend the only derivation path on this.
  *  Once there is a mixin concept, provide a path through that concept.
  */
-Class<lay::PluginRoot> decl_PluginRoot ("lay", "PluginRoot",
-  method ("clear_config", &lay::PluginRoot::clear_config,
+Class<lay::Dispatcher> decl_Dispatcher ("lay", "Dispatcher",
+  method ("clear_config", &lay::Dispatcher::clear_config,
     "@brief Clears the configuration parameters\n"
   ) +
-  method ("instance", &config_root_instance,
-    "@brief Gets the singleton instance of the PluginRoot object\n"
+  method ("instance", &dispatcher_instance,
+    "@brief Gets the singleton instance of the Dispatcher object\n"
     "\n"
     "@return The instance\n"
   ) +
-  method ("write_config", &lay::PluginRoot::write_config,
+  method ("write_config", &lay::Dispatcher::write_config, gsi::arg ("file_name"),
     "@brief Writes configuration to a file\n"
-    "@args file_name\n"
     "@return A value indicating whether the operation was successful\n"
     "\n"
     "If the configuration file cannot be written, false \n"
     "is returned but no exception is thrown.\n"
   ) +
-  method ("read_config", &lay::PluginRoot::read_config,
+  method ("read_config", &lay::Dispatcher::read_config, gsi::arg ("file_name"),
     "@brief Reads the configuration from a file\n"
-    "@args file_name\n"
     "@return A value indicating whether the operation was successful\n"
     "\n"
     "This method siletly does nothing, if the config file does not\n"
     "exist. If it does and an error occurred, the error message is printed\n"
     "on stderr. In both cases, false is returned.\n"
   ) +
-  method_ext ("get_config", &get_config,
+  method_ext ("get_config", &get_config, gsi::arg ("name"),
     "@brief Gets the value of a local configuration parameter\n"
     "\n"
-    "@args name\n"
     "@param name The name of the configuration parameter whose value shall be obtained (a string)\n"
     "\n"
     "@return The value of the parameter or nil if there is no such parameter\n"
   ) +
-  method ("set_config", (void (lay::PluginRoot::*) (const std::string &, const std::string &)) &lay::PluginRoot::config_set,
+  method ("set_config", (void (lay::Dispatcher::*) (const std::string &, const std::string &)) &lay::Dispatcher::config_set, gsi::arg ("name"), gsi::arg ("value"),
     "@brief Set a local configuration parameter with the given name to the given value\n"
     "\n"
-    "@args name, value\n"
     "@param name The name of the configuration parameter to set\n"
     "@param value The value to which to set the configuration parameter\n"
     "\n"
@@ -937,14 +942,14 @@ Class<lay::PluginRoot> decl_PluginRoot ("lay", "PluginRoot",
     "This method returns the names of all known configuration parameters. These names can be used to "
     "get and set configuration parameter values.\n"
   ) +
-  method ("commit_config", &lay::PluginRoot::config_end,
+  method ("commit_config", &lay::Dispatcher::config_end,
     "@brief Commits the configuration settings\n"
     "\n"
     "Some configuration options are queued for performance reasons and become active only after 'commit_config' has been called. "
     "After a sequence of \\set_config calls, this method should be called to activate the "
     "settings made by these calls.\n"
   ),
-  "@brief Root of the configuration space in the plugin context\n"
+  "@brief Root of the configuration space in the plugin context and menu dispatcher\n"
   "\n"
   "This class provides access to the root configuration space in the context "
   "of plugin programming. You can use this class to obtain configuration parameters "
@@ -952,13 +957,12 @@ Class<lay::PluginRoot> decl_PluginRoot ("lay", "PluginRoot",
   "preferred way of plugin configuration is through \\Plugin#configure.\n"
   "\n"
   "Currently, the application object provides an identical entry point for configuration modification. "
-  "For example, \"Application::instance.set_config\" is identical to \"PluginRoot::instance.set_config\". "
-  "Hence there is little motivation for the PluginRoot class currently and "
+  "For example, \"Application::instance.set_config\" is identical to \"Dispatcher::instance.set_config\". "
+  "Hence there is little motivation for the Dispatcher class currently and "
   "this interface may be modified or removed in the future."
   "\n"
-  "\n"
-  "This class has been introduced in version 0.25.\n"
+  "This class has been introduced in version 0.25 as 'PluginRoot'.\n"
+  "It is renamed and enhanced as 'Dispatcher' in 0.27."
 );
 
 }
-

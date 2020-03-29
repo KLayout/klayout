@@ -22,6 +22,7 @@
 
 #include "layNetExportDialog.h"
 #include "layPlugin.h"
+#include "layDispatcher.h"
 #include "layQtTools.h"
 
 #include "tlExceptions.h"
@@ -165,7 +166,7 @@ END_PROTECTED
 }
 
 int
-NetExportDialog::exec_dialog (lay::PluginRoot *plugin_root)
+NetExportDialog::exec_dialog (lay::Dispatcher *plugin_root)
 {
   std::string v;
   plugin_root->config_get (cfg_l2ndb_export_net_cell_prefix, v);

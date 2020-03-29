@@ -524,24 +524,24 @@ static gsi::Methods methods_QPolygonF () {
 }
 
 gsi::Class<QPolygonF> decl_QPolygonF ("QtGui", "QPolygonF",
-  gsi::constructor("new", &ctor_QPolygonF_from_polygon, "@brief Creates a polygon from the given KLayout DPolygon\n@args p\nRemark: holes are not transferred into the QPolygonF.") +
-  gsi::constructor("new", &ctor_QPolygonF_from_simple_polygon, "@brief Creates a polygon from the given KLayout DSimplePolygon\n@args p") +
+  gsi::constructor("new", &ctor_QPolygonF_from_polygon, gsi::arg ("p"), "@brief Creates a polygon from the given KLayout DPolygon\nRemark: holes are not transferred into the QPolygonF.") +
+  gsi::constructor("new", &ctor_QPolygonF_from_simple_polygon, gsi::arg ("p"), "@brief Creates a polygon from the given KLayout DSimplePolygon") +
   gsi::iterator_ext ("each", &f_QPolygonF_each_begin, &f_QPolygonF_each_end, "@brief Iterates over all points of the polygon.") +
-  gsi::method_ext("[]", &f_QPolygonF_at, "@brief Gets the point at the given position\n@args index") +
+  gsi::method_ext("[]", &f_QPolygonF_at, gsi::arg ("index"), "@brief Gets the point at the given position") +
   gsi::method_ext("front", &f_QPolygonF_front, "@brief Gets the first point") +
   gsi::method_ext("back", &f_QPolygonF_back, "@brief Gets the last point") +
   gsi::method_ext("size", &f_QPolygonF_size, "@brief Gets the number of points in the polygon") +
   gsi::method_ext("clear", &f_QPolygonF_clear, "@brief Empties the polygon") +
-  gsi::method_ext("remove", &f_QPolygonF_remove, "@brief Removes the point at the given position\n@args index") +
-  gsi::method_ext("insert", &f_QPolygonF_insert, "@brief Inserts the point after the given position\n@args index, p") +
-  gsi::method_ext("replace", &f_QPolygonF_replace, "@brief Replaces the point at the given position\n@args index, p") +
+  gsi::method_ext("remove", &f_QPolygonF_remove, gsi::arg ("index"), "@brief Removes the point at the given position") +
+  gsi::method_ext("insert", &f_QPolygonF_insert, gsi::arg ("index"), gsi::arg ("p"), "@brief Inserts the point after the given position") +
+  gsi::method_ext("replace", &f_QPolygonF_replace, gsi::arg ("index"), gsi::arg ("p"), "@brief Replaces the point at the given position") +
   gsi::method_ext("pop_front", &f_QPolygonF_pop_front, "@brief Removes the point at the beginning of the list") +
   gsi::method_ext("pop_back", &f_QPolygonF_pop_back, "@brief Removes the point at the end of the list") +
-  gsi::method_ext("push_front", &f_QPolygonF_push_front, "@brief Inserts the point at the beginning of the list\n@args p") +
-  gsi::method_ext("push_back", &f_QPolygonF_push_back, "@brief Inserts the point at the end of the list\n@args p") +
-  gsi::method_ext("reserve", &f_QPolygonF_reserve, "@brief Reserve memory for the given number of points\n@args n") +
-  gsi::method_ext("resize", &f_QPolygonF_resize, "@brief Sets the number of points to the given length\n@args l") +
-  gsi::method_ext("fill", &f_QPolygonF_fill, "@brief Resizes the polygon to l points and ets all elements to the given point\n@args p,l") 
+  gsi::method_ext("push_front", &f_QPolygonF_push_front, gsi::arg ("p"), "@brief Inserts the point at the beginning of the list") +
+  gsi::method_ext("push_back", &f_QPolygonF_push_back, gsi::arg ("p"), "@brief Inserts the point at the end of the list") +
+  gsi::method_ext("reserve", &f_QPolygonF_reserve, gsi::arg ("n"), "@brief Reserve memory for the given number of points") +
+  gsi::method_ext("resize", &f_QPolygonF_resize, gsi::arg ("l"), "@brief Sets the number of points to the given length") +
+  gsi::method_ext("fill", &f_QPolygonF_fill, gsi::arg ("p"), gsi::arg ("l"), "@brief Resizes the polygon to l points and sets all elements to the given point") 
 +
   methods_QPolygonF (),
   "@qt\n@brief Binding of QPolygonF");

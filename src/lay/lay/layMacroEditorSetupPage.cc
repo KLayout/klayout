@@ -25,6 +25,7 @@
 #include "layMacroEditorPage.h"
 #include "layMacroEditorDialog.h"
 #include "layGenericSyntaxHighlighter.h"
+#include "layDispatcher.h"
 
 #include "lymMacro.h"
 
@@ -56,7 +57,7 @@ struct MacroEditorSetupDialogData
   int font_size;
   std::set <std::string> ignore_exceptions_list;
 
-  void setup (lay::PluginRoot *root)
+  void setup (lay::Dispatcher *root)
   {
     lay::MacroEditorHighlighters highlighters (this);
     std::string styles;
@@ -91,7 +92,7 @@ struct MacroEditorSetupDialogData
     }
   }
 
-  void commit (lay::PluginRoot *root)
+  void commit (lay::Dispatcher *root)
   {
     lay::MacroEditorHighlighters highlighters (this);
 
@@ -201,7 +202,7 @@ MacroEditorSetupPage::update_font ()
 }
 
 void
-MacroEditorSetupPage::setup (PluginRoot *root)
+MacroEditorSetupPage::setup (Dispatcher *root)
 {
   delete mp_data;
   mp_data = new MacroEditorSetupDialogData (this);
@@ -268,7 +269,7 @@ MacroEditorSetupPage::setup (PluginRoot *root)
 }
 
 void
-MacroEditorSetupPage::commit (PluginRoot *root)
+MacroEditorSetupPage::commit (Dispatcher *root)
 {
   if (styles_list->currentItem ()) {
     commit_attributes (styles_list->currentItem ());

@@ -50,7 +50,7 @@ std::string tech_string_from_name (const std::string &tn)
 }
 
 TechnologyController::TechnologyController ()
-  : PluginDeclaration (), mp_editor (0), mp_mw (0), mp_plugin_root (0), mp_active_technology (0)
+  : PluginDeclaration (), mp_editor (0), mp_mw (0), mp_dispatcher (0), mp_active_technology (0)
 {
   m_configure_enabled = true;
   m_current_technology_updated = false;
@@ -70,9 +70,9 @@ TechnologyController::instance ()
 }
 
 void
-TechnologyController::initialize (lay::PluginRoot *root)
+TechnologyController::initialize (lay::Dispatcher *dispatcher)
 {
-  mp_plugin_root = root;
+  mp_dispatcher = dispatcher;
   mp_mw = lay::MainWindow::instance ();
   if (mp_mw) {
     mp_editor = new lay::TechSetupDialog (mp_mw);
@@ -81,9 +81,11 @@ TechnologyController::initialize (lay::PluginRoot *root)
 }
 
 void
-TechnologyController::initialized (lay::PluginRoot * /*root*/)
+TechnologyController::initialized (lay::Dispatcher *dispatcher)
 {
-  update_menu ();
+  tl_assert (dispatcher == mp_dispatcher);
+
+  update_menu (mp_dispatcher);
   connect_events ();
 
   if (lay::SaltController::instance ()) {
@@ -92,8 +94,10 @@ TechnologyController::initialized (lay::PluginRoot * /*root*/)
 }
 
 void
-TechnologyController::uninitialize (lay::PluginRoot * /*root*/)
+TechnologyController::uninitialize (lay::Dispatcher *dispatcher)
 {
+  tl_assert (dispatcher == mp_dispatcher);
+
   m_tech_actions.clear ();
   tl::Object::detach_from_all_events ();
 
@@ -113,7 +117,7 @@ void
 TechnologyController::get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
 {
   lay::PluginDeclaration::get_menu_entries (menu_entries);
-  menu_entries.push_back (lay::MenuEntry ("technology_selector:apply_technology", "technology_selector:tech_selector_group", "@toolbar.end", tl::to_string (QObject::tr ("Technology<:techs.png>{Select technology (click to apply)}"))));
+  menu_entries.push_back (lay::menu_item ("technology_selector:apply_technology", "technology_selector:tech_selector_group", "@toolbar.end", tl::to_string (QObject::tr ("Technology<:techs.png>{Select technology (click to apply)}"))));
 }
 
 void
@@ -193,7 +197,7 @@ TechnologyController::update_active_technology ()
 #if 0 
   //  Hint with this implementation, the current technology follows the current layout.
   //  Although that's a nice way to display the current technology, it's pretty confusing
-  lay::PluginRoot *pr = mp_plugin_root;
+  lay::Dispatcher *pr = mp_plugin_root;
   if (pr) {
     pr->config_set (cfg_initial_technology, active_tech);
   }
@@ -204,11 +208,11 @@ void
 TechnologyController::technologies_changed ()
 {
   //  update the configuration to reflect the persisted technologies
-  lay::PluginRoot *pr = mp_plugin_root;
-  if (pr) {
+  lay::Dispatcher *dispatcher = mp_dispatcher;
+  if (dispatcher) {
     m_configure_enabled = false;
     try {
-      pr->config_set (cfg_technologies, db::Technologies::instance ()->to_xml ());
+      dispatcher->config_set (cfg_technologies, db::Technologies::instance ()->to_xml ());
       m_configure_enabled = true;
     } catch (...) {
       m_configure_enabled = true;
@@ -216,7 +220,7 @@ TechnologyController::technologies_changed ()
     }
   }
 
-  update_menu ();
+  update_menu (dispatcher);
   emit technologies_edited ();
 }
 
@@ -265,15 +269,15 @@ TechnologyController::configure (const std::string &name, const std::string &val
 void
 TechnologyController::config_finalize ()
 {
-  if (m_current_technology_updated) {
-    update_current_technology ();
-    m_current_technology_updated = false;
-  }
-
   if (m_technologies_configured) {
-    update_menu ();
+    update_menu (mp_dispatcher);
     emit technologies_edited ();
     m_technologies_configured = false;
+  }
+
+  if (m_current_technology_updated) {
+    update_current_technology (mp_dispatcher);
+    m_current_technology_updated = false;
   }
 }
 
@@ -296,19 +300,18 @@ TechnologyController::menu_activated (const std::string &symbol) const
 }
 
 void
-TechnologyController::update_current_technology ()
+TechnologyController::update_current_technology (lay::Dispatcher *dispatcher)
 {
-  lay::AbstractMenuProvider *pr = lay::AbstractMenuProvider::instance ();
-  if (! pr) {
+  if (! dispatcher || ! dispatcher->has_ui ()) {
     return;
   }
 
   std::string title = tech_string_from_name (m_current_technology);
 
-  std::vector<std::string> menu_entries = pr->menu ()->group ("tech_selector_group");
+  std::vector<std::string> menu_entries = dispatcher->menu ()->group ("tech_selector_group");
   for (std::vector<std::string>::const_iterator m = menu_entries.begin (); m != menu_entries.end (); ++m) {
-    lay::Action action = pr->menu ()->action (*m);
-    action.set_title (title);
+    lay::Action *action = dispatcher->menu ()->action (*m);
+    action->set_title (title);
   }
 
   std::map<std::string, const db::Technology *> tech_by_name;
@@ -316,17 +319,16 @@ TechnologyController::update_current_technology ()
     tech_by_name.insert (std::make_pair (t->name (), t.operator-> ()));
   }
 
-  int it = 0;
-  for (std::map<std::string, const db::Technology *>::const_iterator t = tech_by_name.begin (); t != tech_by_name.end (); ++t, ++it) {
-    m_tech_actions[it].set_checked (t->second->name () == m_current_technology);
+  size_t it = 0;
+  for (std::map<std::string, const db::Technology *>::const_iterator t = tech_by_name.begin (); t != tech_by_name.end () && it < m_tech_actions.size (); ++t, ++it) {
+    m_tech_actions[it]->set_checked (t->second->name () == m_current_technology);
   }
 }
 
 void
-TechnologyController::update_menu ()
+TechnologyController::update_menu (lay::Dispatcher *dispatcher)
 {
-  lay::AbstractMenuProvider *pr = lay::AbstractMenuProvider::instance ();
-  if (! pr) {
+  if (! dispatcher || ! dispatcher->has_ui ()) {
     return;
   }
 
@@ -345,15 +347,15 @@ TechnologyController::update_menu ()
     ++ntech;
   }
 
-  std::vector<std::string> tech_group = pr->menu ()->group ("tech_selector_group");
+  std::vector<std::string> tech_group = dispatcher->menu ()->group ("tech_selector_group");
 
   for (std::vector<std::string>::const_iterator t = tech_group.begin (); t != tech_group.end (); ++t) {
-    lay::Action action = pr->menu ()->action (*t);
-    action.set_title (title);
-    action.set_enabled (ntech > 1);
-    std::vector<std::string> items = pr->menu ()->items (*t);
+    lay::Action *action = dispatcher->menu ()->action (*t);
+    action->set_title (title);
+    action->set_enabled (ntech > 1);
+    std::vector<std::string> items = dispatcher->menu ()->items (*t);
     for (std::vector<std::string>::const_iterator i = items.begin (); i != items.end (); ++i) {
-      pr->menu ()->delete_item (*i);
+      dispatcher->menu ()->delete_item (*i);
     }
   }
 
@@ -372,7 +374,7 @@ TechnologyController::update_menu ()
       std::string tp = *tg;
       if (! g->first.empty ()) {
         std::string gn = "techgroup_" + tl::to_string (++ig);
-        pr->menu ()->insert_menu (*tg + ".end", gn, g->first);
+        dispatcher->menu ()->insert_menu (*tg + ".end", gn, g->first);
         tp = *tg + "." + gn;
       }
       tp += ".end";
@@ -382,11 +384,11 @@ TechnologyController::update_menu ()
 
         std::string title = tech_string_from_name (t->first);
 
-        m_tech_actions.push_back (pr->create_config_action ("", cfg_initial_technology, t->first));
-        m_tech_actions.back ().set_title (title); // setting the title here avoids interpretation of '(...)' etc.
-        m_tech_actions.back ().set_checkable (true);
-        m_tech_actions.back ().set_checked (t->first == m_current_technology);
-        pr->menu ()->insert_item (tp, "technology_" + tl::to_string (it), m_tech_actions.back ());
+        m_tech_actions.push_back (new lay::ConfigureAction ("", cfg_initial_technology, t->first));
+        m_tech_actions.back ()->set_title (title); // setting the title here avoids interpretation of '(...)' etc.
+        m_tech_actions.back ()->set_checkable (true);
+        m_tech_actions.back ()->set_checked (t->first == m_current_technology);
+        dispatcher->menu ()->insert_item (tp, "technology_" + tl::to_string (it), m_tech_actions.back ());
 
       }
 
@@ -490,7 +492,7 @@ TechnologyController::show_editor ()
 
   }
 
-  mp_plugin_root->config_set (cfg_tech_editor_window_state, lay::save_dialog_state (mp_editor));
+  mp_dispatcher->config_set (cfg_tech_editor_window_state, lay::save_dialog_state (mp_editor));
 }
 
 const std::string &

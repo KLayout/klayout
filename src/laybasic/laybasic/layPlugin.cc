@@ -21,7 +21,6 @@
 */
 
 
-#include "layAbstractMenuProvider.h"
 #include "laybasicCommon.h"
 
 #include "tlException.h"
@@ -30,6 +29,7 @@
 #include "tlLog.h"
 
 #include "layPlugin.h"
+#include "layDispatcher.h"
 #include "tlExceptions.h"
 #include "tlClassRegistry.h"
 
@@ -56,8 +56,8 @@ PluginDeclaration::PluginDeclaration ()
 
 PluginDeclaration::~PluginDeclaration ()
 {
-  if (PluginRoot::instance ()) {
-    PluginRoot::instance ()->plugin_removed (this);
+  if (Dispatcher::instance ()) {
+    Dispatcher::instance ()->plugin_removed (this);
   }
 }
 
@@ -69,61 +69,82 @@ PluginDeclaration::toggle_editable_enabled ()
   END_PROTECTED
 }
 
-void 
-PluginDeclaration::generic_menu ()
+std::vector<std::string>
+PluginDeclaration::menu_symbols ()
 {
-  BEGIN_PROTECTED
+  std::vector<std::string> symbols;
 
-  QAction *action = dynamic_cast <QAction *> (sender ());
-  tl_assert (action);
+  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
 
-  std::string symbol = tl::to_string (action->data ().toString ());
+    std::vector<lay::MenuEntry> menu_entries;
+    cls->get_menu_entries (menu_entries);
 
-  //  Global handler: give the declaration a chance to handle the menu request globally
-  if (menu_activated (symbol)) {
-    return;
-  }
-
-  //  Forward the request to the plugin root which will propagate it down to the plugins
-  lay::PluginRoot::instance ()->menu_activated (symbol);
-
-  END_PROTECTED
-}
-
-void 
-PluginDeclaration::mode_triggered ()
-{
-  BEGIN_PROTECTED
-
-  QAction *action = dynamic_cast<QAction *> (sender ());
-  if (action) {
-
-    int mode = action->data ().toInt ();
-
-    if (lay::PluginRoot::instance ()) {
-      lay::PluginRoot::instance ()->select_mode (mode);
+    for (std::vector<lay::MenuEntry>::const_iterator m = menu_entries.begin (); m != menu_entries.end (); ++m) {
+      if (! m->symbol.empty ()) {
+        symbols.push_back (m->symbol);
+      }
     }
 
-    action->setChecked (true);
-
   }
 
-  END_PROTECTED
+  std::sort (symbols.begin (), symbols.end ());
+  symbols.erase (std::unique (symbols.begin (), symbols.end ()), symbols.end ());
+
+  return symbols;
 }
 
-void 
-PluginDeclaration::init_menu ()
+namespace {
+
+class GenericMenuAction
+  : public Action
 {
-  if (! lay::AbstractMenuProvider::instance () || ! lay::AbstractMenuProvider::instance ()->menu ()) {
-    return;
+public:
+  GenericMenuAction (Dispatcher *dispatcher, const std::string &title, const std::string &symbol)
+    : Action (title), mp_dispatcher (dispatcher), m_symbol (symbol)
+  { }
+
+  void triggered ()
+  {
+    if (mp_dispatcher) {
+      mp_dispatcher->menu_activated (m_symbol);
+    }
   }
 
-  lay::AbstractMenu &menu = *lay::AbstractMenuProvider::instance ()->menu ();
+private:
+  Dispatcher *mp_dispatcher;
+  std::string m_symbol;
+};
 
-  //  pre-initialize to allow multiple init_menu calls
-  m_editable_mode_action = lay::Action ();
-  m_mouse_mode_action = lay::Action ();
-  m_menu_actions.clear ();
+class ModeAction
+  : public Action
+{
+public:
+  ModeAction (Dispatcher *dispatcher, const std::string &title, int mode)
+    : Action (title), mp_dispatcher (dispatcher), m_mode (mode)
+  { }
+
+  void triggered ()
+  {
+    if (mp_dispatcher) {
+      mp_dispatcher->select_mode (m_mode);
+      set_checked (true);
+    }
+  }
+
+private:
+  Dispatcher *mp_dispatcher;
+  int m_mode;
+};
+
+}
+
+void
+PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
+{
+  lay::AbstractMenu &menu = *dispatcher->menu ();
+
+  mp_editable_mode_action.reset ((Action *) 0);
+  mp_mouse_mode_action.reset ((Action *) 0);
 
   std::string title;
 
@@ -141,13 +162,12 @@ PluginDeclaration::init_menu ()
       title = tab + 1;
     } 
 
-    m_editable_mode_action = Action (title);
-    gtf::action_connect (m_editable_mode_action.qaction (), SIGNAL (triggered ()), this, SLOT (toggle_editable_enabled ()));
-    m_editable_mode_action.qaction ()->setData (id ());
-    m_editable_mode_action.set_checkable (true);
-    m_editable_mode_action.set_checked (m_editable_enabled);
+    mp_editable_mode_action.reset (new Action (title));
+    gtf::action_connect (mp_editable_mode_action->qaction (), SIGNAL (triggered ()), this, SLOT (toggle_editable_enabled ()));
+    mp_editable_mode_action->set_checkable (true);
+    mp_editable_mode_action->set_checked (m_editable_enabled);
 
-    menu.insert_item ("edit_menu.select_menu.end", name, m_editable_mode_action);
+    menu.insert_item ("edit_menu.select_menu.end", name, mp_editable_mode_action.get ());
 
   }
 
@@ -157,67 +177,98 @@ PluginDeclaration::init_menu ()
 
   for (std::vector<lay::MenuEntry>::const_iterator m = menu_entries.begin (); m != menu_entries.end (); ++m) {
 
-    if (m->title.empty ()) {
+    if (! m->copy_from.empty ()) {
+
+      menu.insert_item (m->insert_pos, m->menu_name, menu.action (m->copy_from));
+
+    } else if (m->separator) {
+
       menu.insert_separator (m->insert_pos, m->menu_name);
+
+    } else if (m->sub_menu) {
+
+      menu.insert_menu (m->insert_pos, m->menu_name, m->title);
+
     } else {
 
-      if (m->sub_menu) {
-        menu.insert_menu (m->insert_pos, m->menu_name, m->title);
+      Action *action = 0;
+
+      if (! m->cname.empty ()) {
+        action = new ConfigureAction (m->title, m->cname, m->cvalue);
       } else {
+        action = new GenericMenuAction (dispatcher, m->title, m->symbol);
+      }
 
-        Action action (m->title);
-        action.qaction ()->setData (QVariant (tl::to_qstring (m->symbol)));
-        gtf::action_connect (action.qaction (), SIGNAL (triggered ()), this, SLOT (generic_menu ()));
-        menu.insert_item (m->insert_pos, m->menu_name, action);
+      m_menu_actions.push_back (action);
+      menu.insert_item (m->insert_pos, m->menu_name, action);
 
-        m_menu_actions.push_back (action);
+      if (! m->exclusive_group.empty ()) {
+        action->add_to_exclusive_group (&menu, m->exclusive_group);
+      }
 
+      if (m->checkable) {
+        action->set_checkable (true);
       }
 
     }
 
   }
 
-  //  Fill the mode menu file items from the mouse modes 
+  //  Fill the mode menu file items from the mouse modes
+
+  std::vector<std::pair<std::string, std::pair<std::string, int> > > modes;
 
   title = std::string ();
   if (implements_mouse_mode (title)) {
+    modes.push_back (std::make_pair (title, std::make_pair ("edit_menu.mode_menu.end;@toolbar.end_modes", id ())));
+  }
+
+  //  the primary mouse modes (special for LayoutView)
+  implements_primary_mouse_modes (modes);
+
+  for (std::vector<std::pair<std::string, std::pair<std::string, int> > >::const_iterator m = modes.begin (); m != modes.end (); ++m) {
 
     //  extract first part, which is the name, separated by a tab from the title.
-    std::string name = tl::sprintf ("mode_%d", id ());
+    std::string name;
+    if (m->second.second <= 0) {
+      name = tl::sprintf ("mode_i%d", 1 - m->second.second);
+    } else {
+      name = tl::sprintf ("mode_%d", m->second.second);
+    }
+    std::string title = m->first;
+
     const char *tab = strchr (title.c_str (), '\t');
     if (tab) {
       name = std::string (title, 0, tab - title.c_str ());
       title = std::string (tab + 1);
     } 
 
-    m_mouse_mode_action = Action (title);
-    m_mouse_mode_action.add_to_exclusive_group (&menu, "mouse_mode_exclusive_group");
+    mp_mouse_mode_action.reset (new ModeAction (dispatcher, title, m->second.second));
+    mp_mouse_mode_action->add_to_exclusive_group (&menu, "mouse_mode_exclusive_group");
+    mp_mouse_mode_action->set_checkable (true);
 
-    m_mouse_mode_action.set_checkable (true);
-    m_mouse_mode_action.qaction ()->setData (QVariant (id ()));
-
-    menu.insert_item ("edit_menu.mode_menu.end", name, m_mouse_mode_action);
-    menu.insert_item ("@toolbar.end_modes", name, m_mouse_mode_action);
-
-    gtf::action_connect (m_mouse_mode_action.qaction (), SIGNAL (triggered ()), this, SLOT (mode_triggered ()));
+    menu.insert_item (m->second.first, name + ":mode_group", mp_mouse_mode_action.get ());
 
   }
 }
 
 void
-PluginDeclaration::remove_menu_items ()
+PluginDeclaration::remove_menu_items (Dispatcher *dispatcher)
 {
-  if (! lay::AbstractMenuProvider::instance () || ! lay::AbstractMenuProvider::instance ()->menu ()) {
-    return;
-  }
+  lay::AbstractMenu *menu = dispatcher->menu ();
+  menu->delete_items (mp_editable_mode_action.get ());
+  menu->delete_items (mp_mouse_mode_action.get ());
 
-  lay::AbstractMenu *menu = lay::AbstractMenuProvider::instance ()->menu ();
-  menu->delete_items (m_editable_mode_action);
-  menu->delete_items (m_mouse_mode_action);
-  for (std::vector <lay::Action>::const_iterator a = m_menu_actions.begin (); a != m_menu_actions.end (); ++a) {
+  std::vector<lay::Action *> actions;
+  for (tl::weak_collection <lay::Action>::iterator a = m_menu_actions.begin (); a != m_menu_actions.end (); ++a) {
+    if (a.operator-> ()) {
+      actions.push_back (a.operator-> ());
+    }
+  }
+  for (std::vector<lay::Action *>::const_iterator a = actions.begin (); a != actions.end (); ++a) {
     menu->delete_items (*a);
   }
+  m_menu_actions.clear ();
 }
 
 void 
@@ -225,7 +276,9 @@ PluginDeclaration::set_editable_enabled (bool f)
 {
   if (f != m_editable_enabled) {
     m_editable_enabled = f;
-    m_editable_mode_action.set_checked (f);
+    if (mp_editable_mode_action.get ()) {
+      mp_editable_mode_action->set_checked (f);
+    }
     editable_enabled_changed_event ();
   }
 }
@@ -233,9 +286,9 @@ PluginDeclaration::set_editable_enabled (bool f)
 void  
 PluginDeclaration::register_plugin ()
 {
-  if (PluginRoot::instance ()) {
-    PluginRoot::instance ()->plugin_registered (this);
-    initialize (PluginRoot::instance ());
+  if (Dispatcher::instance ()) {
+    Dispatcher::instance ()->plugin_registered (this);
+    initialize (Dispatcher::instance ());
   }
 }
 
@@ -365,23 +418,26 @@ Plugin::get_config_names (std::vector<std::string> &names) const
   }
 }
 
-PluginRoot *
-Plugin::plugin_root ()
-{
-  PluginRoot *pr = plugin_root_maybe_null ();
-  tl_assert (pr != 0);
-  return pr;
-}
-
-PluginRoot *
-Plugin::plugin_root_maybe_null ()
+Dispatcher *
+Plugin::dispatcher ()
 {
   Plugin *p = this;
   while (p->mp_parent) {
     p = p->mp_parent;
   }
 
-  return dynamic_cast<PluginRoot *> (p);
+  return dynamic_cast<Dispatcher *> (p);
+}
+
+Dispatcher *
+Plugin::dispatcher_maybe_null ()
+{
+  Plugin *p = this;
+  while (p->mp_parent) {
+    p = p->mp_parent;
+  }
+
+  return dynamic_cast<Dispatcher *> (p);
 }
 
 void 
@@ -431,188 +487,68 @@ Plugin::do_config_set (const std::string &name, const std::string &value, bool f
   return false;
 }
 
-// ----------------------------------------------------------------
-//  PluginRoot implementation
+// ---------------------------------------------------------------------------------------------------
+//  Menu item generators
 
-static PluginRoot *ms_root_instance = 0;
-
-PluginRoot::PluginRoot (bool standalone)
-  : Plugin (0, standalone)
+MenuEntry separator (const std::string &menu_name, const std::string &insert_pos)
 {
-  ms_root_instance = this;
+  MenuEntry e;
+  e.menu_name = menu_name;
+  e.insert_pos = insert_pos;
+  e.separator = true;
+  return e;
 }
 
-PluginRoot::~PluginRoot ()
+MenuEntry menu_item (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &title)
 {
-  if (ms_root_instance == this) {
-    ms_root_instance = 0;
-  }
+  MenuEntry e;
+  e.symbol = symbol;
+  e.menu_name = menu_name;
+  e.insert_pos = insert_pos;
+  e.title = title;
+  return e;
 }
 
-//  Writing and Reading of configuration 
-
-struct ConfigGetAdaptor
+MenuEntry menu_item_copy (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &copy_from)
 {
-  ConfigGetAdaptor (const std::string &name)
-    : mp_owner (0), m_done (false), m_name (name)
-  {
-    // .. nothing yet ..
-  }
-  
-  std::string operator () () const
-  {
-    std::string s;
-    mp_owner->config_get (m_name, s);
-    return s;
-  }
-
-  bool at_end () const 
-  {
-    return m_done;
-  }
-
-  void start (const lay::PluginRoot &owner) 
-  {
-    mp_owner = &owner;
-    m_done = false;
-  }
-
-  void next () 
-  {
-    m_done = true;
-  }
-
-private:
-  const lay::PluginRoot *mp_owner;
-  bool m_done;
-  std::string m_name;
-};
- 
-struct ConfigGetNullAdaptor
-{
-  ConfigGetNullAdaptor ()
-  {
-    // .. nothing yet ..
-  }
-  
-  std::string operator () () const
-  {
-    return std::string ();
-  }
-
-  bool at_end () const 
-  {
-    return true;
-  }
-
-  void start (const lay::PluginRoot & /*owner*/) { }
-  void next () { }
-};
- 
-struct ConfigNamedSetAdaptor
-{
-  ConfigNamedSetAdaptor ()
-  {
-    // .. nothing yet ..
-  }
-  
-  void operator () (lay::PluginRoot &w, tl::XMLReaderState &reader, const std::string &name) const
-  {
-    tl::XMLObjTag<std::string> tag;
-    w.config_set (name, *reader.back (tag));
-  }
-};
- 
-struct ConfigSetAdaptor
-{
-  ConfigSetAdaptor (const std::string &name)
-    : m_name (name)
-  {
-    // .. nothing yet ..
-  }
-  
-  void operator () (lay::PluginRoot &w, tl::XMLReaderState &reader) const
-  {
-    tl::XMLObjTag<std::string> tag;
-    w.config_set (m_name, *reader.back (tag));
-  }
-
-private:
-  std::string m_name;
-};
- 
-//  the configuration file's XML structure is built dynamically
-static tl::XMLStruct<lay::PluginRoot> 
-config_structure (const lay::PluginRoot *plugin) 
-{
-  tl::XMLElementList body;
-  std::string n_with_underscores;
-
-  std::vector <std::string> names; 
-  plugin->get_config_names (names);
-
-  for (std::vector <std::string>::const_iterator n = names.begin (); n != names.end (); ++n) {
-
-    body.append (tl::XMLMember<std::string, lay::PluginRoot, ConfigGetAdaptor, ConfigSetAdaptor, tl::XMLStdConverter <std::string> > ( 
-                       ConfigGetAdaptor (*n), ConfigSetAdaptor (*n), *n));
-
-    //  for compatibility, provide an alternative with underscores (i.e. 0.20->0.21 because of default_grids)
-    n_with_underscores.clear ();
-    for (const char *c = n->c_str (); *c; ++c) {
-      n_with_underscores += (*c == '-' ? '_' : *c);
-    }
-
-    body.append (tl::XMLMember<std::string, lay::PluginRoot, ConfigGetNullAdaptor, ConfigSetAdaptor, tl::XMLStdConverter <std::string> > ( 
-                       ConfigGetNullAdaptor (), ConfigSetAdaptor (*n), n_with_underscores));
-
-  }
-
-  //  add a wildcard member to read all others unspecifically into the repository
-  body.append (tl::XMLWildcardMember<std::string, lay::PluginRoot, ConfigNamedSetAdaptor, tl::XMLStdConverter <std::string> > (ConfigNamedSetAdaptor ()));
-
-  return tl::XMLStruct<lay::PluginRoot> ("config", body);
+  MenuEntry e;
+  e.symbol = symbol;
+  e.menu_name = menu_name;
+  e.insert_pos = insert_pos;
+  e.copy_from = copy_from;
+  return e;
 }
 
-
-bool 
-PluginRoot::write_config (const std::string &config_file)
+MenuEntry submenu (const std::string &menu_name, const std::string &insert_pos, const std::string &title)
 {
-  try {
-    tl::OutputStream os (config_file, tl::OutputStream::OM_Plain);
-    config_structure (this).write (os, *this); 
-    return true;
-  } catch (...) {
-    return false;
-  }
+  MenuEntry e;
+  e.menu_name = menu_name;
+  e.insert_pos = insert_pos;
+  e.title = title;
+  e.sub_menu = true;
+  return e;
 }
 
-bool
-PluginRoot::read_config (const std::string &config_file)
+MenuEntry submenu (const std::string &symbol, const std::string &menu_name, const std::string &insert_pos, const std::string &title)
 {
-  std::auto_ptr<tl::XMLFileSource> file;
-
-  try {
-    file.reset (new tl::XMLFileSource (config_file));
-  } catch (...) {
-    return false;
-  }
-
-  try {
-    config_structure (this).parse (*file, *this); 
-  } catch (tl::Exception &ex) {
-    std::string msg = tl::to_string (QObject::tr ("Problem reading config file ")) + config_file + ": " + ex.msg ();
-    throw tl::Exception (msg);
-  } 
-
-  config_end ();
-
-  return true;
+  MenuEntry e;
+  e.symbol = symbol;
+  e.menu_name = menu_name;
+  e.insert_pos = insert_pos;
+  e.title = title;
+  e.sub_menu = true;
+  return e;
 }
 
-PluginRoot *
-PluginRoot::instance ()
+MenuEntry config_menu_item (const std::string &menu_name, const std::string &insert_pos, const std::string &title, const std::string &cname, const std::string &cvalue)
 {
-  return ms_root_instance;
+  MenuEntry e;
+  e.menu_name = menu_name;
+  e.insert_pos = insert_pos;
+  e.title = title;
+  e.cname = cname;
+  e.cvalue = cvalue;
+  return e;
 }
 
 }

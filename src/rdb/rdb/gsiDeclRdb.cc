@@ -97,9 +97,8 @@ static rdb::Reference *new_ref_tp (const db::DCplxTrans &trans, rdb::id_type par
 }
 
 Class<rdb::Reference> decl_RdbReference ("rdb", "RdbReference",
-  gsi::constructor ("new", &new_ref_tp, 
+  gsi::constructor ("new", &new_ref_tp, gsi::arg ("trans"), gsi::arg ("parent_cell_id"),
     "@brief Creates a reference with a given transformation and parent cell ID\n"
-    "@args trans, parent_cell_id\n"
   ) +
   gsi::method ("database", (const rdb::Database *(rdb::Reference::*)() const) &rdb::Reference::database,
     "@brief Gets the database object that category is associated with\n"
@@ -112,17 +111,15 @@ Class<rdb::Reference> decl_RdbReference ("rdb", "RdbReference",
     "usual transformation of a cell reference.\n"
     "@return The transformation\n"
   ) +
-  gsi::method ("trans=", &rdb::Reference::set_trans, 
+  gsi::method ("trans=", &rdb::Reference::set_trans, gsi::arg ("trans"),
     "@brief Sets the transformation for this reference\n"
-    "@args trans\n"
   ) +
   gsi::method ("parent_cell_id", &rdb::Reference::parent_cell_id, 
     "@brief Gets parent cell ID for this reference\n"
     "@return The parent cell ID\n"
   ) +
-  gsi::method ("parent_cell_id=", &rdb::Reference::set_parent_cell_id, 
+  gsi::method ("parent_cell_id=", &rdb::Reference::set_parent_cell_id, gsi::arg ("id"),
     "@brief Sets the parent cell ID for this reference\n"
-    "@args id\n"
   ),
   "@brief A cell reference inside the report database\n"
   "This class describes a cell reference. Such reference object can be attached to cells to describe instantiations of them "
@@ -209,9 +206,8 @@ Class<rdb::Cell> decl_RdbCell ("rdb", "RdbCell",
   gsi::method ("num_items_visited", &rdb::Cell::num_items_visited, 
     "@brief Gets the number of visited items for this cell\n"
   ) +
-  gsi::method_ext ("add_reference", &add_reference,
+  gsi::method_ext ("add_reference", &add_reference, gsi::arg ("ref"),
     "@brief Adds a reference to the references of this cell\n"
-    "@args ref\n"
     "@param ref The reference to add.\n"
   ) +
   gsi::method_ext ("clear_references", &clear_references,
@@ -343,27 +339,24 @@ Class<rdb::Category> decl_RdbCategory ("rdb", "RdbCategory",
     "\n"
     "This method has been introduced in version 0.26.\n"
   ) +
-  gsi::method_ext ("scan_layer", &scan_layer1,
+  gsi::method_ext ("scan_layer", &scan_layer1, gsi::arg ("layout"), gsi::arg ("layer"),
     "@brief Scans a layer from a layout into this category\n"
-    "@args layout, layer\n"
     "Creates RDB items for each polygon or edge shape read from the each cell in the layout on the given layer and puts them into this category.\n"
     "New cells will be generated for every cell encountered in the layout.\n"
     "Other settings like database unit, description, top cell etc. are not made in the RDB.\n"
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method_ext ("scan_layer", &scan_layer2,
+  gsi::method_ext ("scan_layer", &scan_layer2, gsi::arg ("layout"), gsi::arg ("layer"), gsi::arg ("cell"),
     "@brief Scans a layer from a layout into this category, starting with a given cell\n"
-    "@args layout, layer, cell\n"
     "Creates RDB items for each polygon or edge shape read from the cell and it's children in the layout on the given layer and puts them into this category.\n"
     "New cells will be generated when required.\n"
     "Other settings like database unit, description, top cell etc. are not made in the RDB.\n"
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method_ext ("scan_layer", &scan_layer3,
+  gsi::method_ext ("scan_layer", &scan_layer3, gsi::arg ("layout"), gsi::arg ("layer"), gsi::arg ("cell"), gsi::arg ("levels"),
     "@brief Scans a layer from a layout into this category, starting with a given cell and a depth specification\n"
-    "@args layout, layer, cell, levels\n"
     "Creates RDB items for each polygon or edge shape read from the cell and it's children in the layout on the given layer and puts them into this category.\n"
     "New cells will be generated when required.\n"
     "\"levels\" is the number of hierarchy levels to take the child cells from. 0 means to use only \"cell\" and don't descend, -1 means \"all levels\".\n"  
@@ -388,9 +381,8 @@ Class<rdb::Category> decl_RdbCategory ("rdb", "RdbCategory",
     "@brief Gets the category description\n"
     "@return The description string\n"
   ) +
-  gsi::method ("description=", &rdb::Category::set_description, 
+  gsi::method ("description=", &rdb::Category::set_description, gsi::arg ("description"),
     "@brief Sets the category description\n"
-    "@args description\n"
     "@param description The description string\n"
   ) +
   gsi::iterator_ext ("each_sub_category", &begin_sub_categories, &end_sub_categories,
@@ -606,48 +598,39 @@ void value_set_tag_id (rdb::ValueWrapper *v, rdb::id_type id)
 }
 
 Class<rdb::ValueWrapper> decl_RdbItemValue ("rdb", "RdbItemValue",
-  gsi::method ("from_s", &value_from_string, 
+  gsi::method ("from_s", &value_from_string, gsi::arg ("s"),
     "@brief Creates a value object from a string\n"
-    "@args s\n"
     "The string format is the same than obtained by the to_s method.\n"
   ) +
-  gsi::constructor ("new", &new_value_f, 
+  gsi::constructor ("new", &new_value_f, gsi::arg ("f"),
     "@brief Creates a value representing a numeric value\n"
-    "@args f\n"
     "\n"
     "This variant has been introduced in version 0.24\n"
   ) +
-  gsi::constructor ("new", &new_value_s, 
+  gsi::constructor ("new", &new_value_s, gsi::arg ("s"),
     "@brief Creates a value representing a string\n"
-    "@args s\n"
   ) +
-  gsi::constructor ("new", &new_value_p, 
+  gsi::constructor ("new", &new_value_p, gsi::arg ("p"),
     "@brief Creates a value representing a DPolygon object\n"
-    "@args p\n"
   ) +
-  gsi::constructor ("new", &new_value_path, 
+  gsi::constructor ("new", &new_value_path, gsi::arg ("p"),
     "@brief Creates a value representing a DPath object\n"
-    "@args p\n"
     "\n"
     "This method has been introduced in version 0.22."
   ) +
-  gsi::constructor ("new", &new_value_text, 
+  gsi::constructor ("new", &new_value_text, gsi::arg ("t"),
     "@brief Creates a value representing a DText object\n"
-    "@args t\n"
     "\n"
     "This method has been introduced in version 0.22."
   ) +
-  gsi::constructor ("new", &new_value_e, 
+  gsi::constructor ("new", &new_value_e, gsi::arg ("e"),
     "@brief Creates a value representing a DEdge object\n"
-    "@args e\n"
   ) +
-  gsi::constructor ("new", &new_value_ep, 
+  gsi::constructor ("new", &new_value_ep, gsi::arg ("ee"),
     "@brief Creates a value representing a DEdgePair object\n"
-    "@args ee\n"
   ) +
-  gsi::constructor ("new", &new_value_b, 
+  gsi::constructor ("new", &new_value_b, gsi::arg ("b"),
     "@brief Creates a value representing a DBox object\n"
-    "@args b\n"
   ) +
   gsi::method_ext ("to_s", &value_to_string, 
     "@brief Converts a value to a string\n"
@@ -722,9 +705,8 @@ Class<rdb::ValueWrapper> decl_RdbItemValue ("rdb", "RdbItemValue",
     "@brief Gets the box if the value represents one.\n"
     "@return The \\DBox object or nil"
   ) + 
-  gsi::method_ext ("tag_id=", &value_set_tag_id, 
+  gsi::method_ext ("tag_id=", &value_set_tag_id, gsi::arg ("id"),
     "@brief Sets the tag ID to make the value a tagged value or 0 to reset it\n"
-    "@args id\n"
     "@param id The tag ID\n"
     "To get a tag ID, use \\RdbDatabase#user_tag_id (preferred) or \\RdbDatabase#tag_id (for internal use).\n"
     "Tagged values have been added in version 0.24. Tags can be given to identify a value, for example "
@@ -805,29 +787,25 @@ Class<rdb::Item> decl_RdbItem ("rdb", "RdbItem",
     "@brief Gets a value indicating whether the item was already visited\n"
     "@return True, if the item has been visited already\n"
   ) +
-  gsi::method ("add_tag", &rdb::Item::add_tag, 
+  gsi::method ("add_tag", &rdb::Item::add_tag, gsi::arg ("tag_id"),
     "@brief Adds a tag with the given id to the item\n"
-    "@args tag_id\n"
     "Each tag can be added once to the item. The tags of an item thus form a set. "
     "If a tag with that ID already exists, this method does nothing."
   ) +
-  gsi::method ("remove_tag", &rdb::Item::remove_tag, 
+  gsi::method ("remove_tag", &rdb::Item::remove_tag, gsi::arg ("tag_id"),
     "@brief Remove the tag with the given id from the item\n"
-    "@args tag_id\n"
     "If a tag with that ID does not exists on this item, this method does nothing."
   ) +
-  gsi::method ("has_tag?", &rdb::Item::has_tag, 
+  gsi::method ("has_tag?", &rdb::Item::has_tag, gsi::arg ("tag_id"),
     "@brief Returns a value indicating whether the item has a tag with the given ID\n"
-    "@args tag_id\n"
     "@return True, if the item has a tag with the given ID\n"
   ) +
   gsi::method ("tags_str", &rdb::Item::tag_str, 
     "@brief Returns a string listing all tags of this item\n"
     "@return A comma-separated list of tags\n"
   ) +
-  gsi::method ("tags_str=", &rdb::Item::set_tag_str, 
+  gsi::method ("tags_str=", &rdb::Item::set_tag_str, gsi::arg ("tags"),
     "@brief Sets the tags from a string\n"
-    "@args tags\n"
     "@param tags A comma-separated list of tags\n"
   ) +
 #if defined(HAVE_QT)
@@ -835,9 +813,8 @@ Class<rdb::Item> decl_RdbItem ("rdb", "RdbItem",
     "@brief Gets the image associated with this item as a string\n"
     "@return A base64-encoded image file (usually in PNG format)\n"
   ) +
-  gsi::method ("image_str=", &rdb::Item::set_image_str, 
+  gsi::method ("image_str=", &rdb::Item::set_image_str, gsi::arg ("image"),
     "@brief Sets the image from a string\n"
-    "@args image\n"
     "@param image A base64-encoded image file (preferably in PNG format)\n"
   ) +
 #endif
@@ -849,49 +826,41 @@ Class<rdb::Item> decl_RdbItem ("rdb", "RdbItem",
     "for this specific item instead of simply counting the items. "
     "@return The multiplicity\n"
   ) +
-  gsi::method ("multiplicity=", &rdb::Item::set_multiplicity, 
+  gsi::method ("multiplicity=", &rdb::Item::set_multiplicity, gsi::arg ("multiplicity"),
     "@brief Sets the item's multiplicity\n"
-    "@args multiplicity\n"
   ) +
   */
-  gsi::method_ext ("add_value", &add_value,
+  gsi::method_ext ("add_value", &add_value, gsi::arg ("value"),
     "@brief Adds a value object to the values of this item\n"
-    "@args value\n"
     "@param value The value to add.\n"
   ) +
-  gsi::method_ext ("add_value", &add_value_t<db::DPolygon>,
+  gsi::method_ext ("add_value", &add_value_t<db::DPolygon>, gsi::arg ("value"),
     "@brief Adds a polygon object to the values of this item\n"
-    "@args value\n"
     "@param value The polygon to add.\n"
     "This method has been introduced in version 0.25 as a convenience method."
   ) +
-  gsi::method_ext ("add_value", &add_value_t<db::DBox>,
+  gsi::method_ext ("add_value", &add_value_t<db::DBox>, gsi::arg ("value"),
     "@brief Adds a box object to the values of this item\n"
-    "@args value\n"
     "@param value The box to add.\n"
     "This method has been introduced in version 0.25 as a convenience method."
   ) +
-  gsi::method_ext ("add_value", &add_value_t<db::DEdge>,
+  gsi::method_ext ("add_value", &add_value_t<db::DEdge>, gsi::arg ("value"),
     "@brief Adds an edge object to the values of this item\n"
-    "@args value\n"
     "@param value The edge to add.\n"
     "This method has been introduced in version 0.25 as a convenience method."
   ) +
-  gsi::method_ext ("add_value", &add_value_t<db::DEdgePair>,
+  gsi::method_ext ("add_value", &add_value_t<db::DEdgePair>, gsi::arg ("value"),
     "@brief Adds an edge pair object to the values of this item\n"
-    "@args value\n"
     "@param value The edge pair to add.\n"
     "This method has been introduced in version 0.25 as a convenience method."
   ) +
-  gsi::method_ext ("add_value", &add_value_t<std::string>,
+  gsi::method_ext ("add_value", &add_value_t<std::string>, gsi::arg ("value"),
     "@brief Adds a string object to the values of this item\n"
-    "@args value\n"
     "@param value The string to add.\n"
     "This method has been introduced in version 0.25 as a convenience method."
   ) +
-  gsi::method_ext ("add_value", &add_value_t<double>,
+  gsi::method_ext ("add_value", &add_value_t<double>, gsi::arg ("value"),
     "@brief Adds a numeric value to the values of this item\n"
-    "@args value\n"
     "@param value The value to add.\n"
     "This method has been introduced in version 0.25 as a convenience method."
   ) +
@@ -1198,32 +1167,28 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "@brief Returns the number of items already visited inside the database\n"
     "@return The total number of items already visited\n"
   ) +
-  gsi::method ("num_items", (size_t (rdb::Database::*) (rdb::id_type, rdb::id_type) const) &rdb::Database::num_items,
+  gsi::method ("num_items", (size_t (rdb::Database::*) (rdb::id_type, rdb::id_type) const) &rdb::Database::num_items, gsi::arg ("cell_id"), gsi::arg ("category_id"),
     "@brief Returns the number of items inside the database for a given cell/category combination\n"
-    "@args cell_id, category_id\n"
     "@param cell_id The ID of the cell for which to retrieve the number\n"
     "@param category_id The ID of the category for which to retrieve the number\n"
     "@return The total number of items for the given cell and the given category\n"
   ) +
-  gsi::method ("num_items_visited", (size_t (rdb::Database::*) (rdb::id_type, rdb::id_type) const) &rdb::Database::num_items_visited,
+  gsi::method ("num_items_visited", (size_t (rdb::Database::*) (rdb::id_type, rdb::id_type) const) &rdb::Database::num_items_visited, gsi::arg ("cell_id"), gsi::arg ("category_id"),
     "@brief Returns the number of items visited already for a given cell/category combination\n"
-    "@args cell_id, category_id\n"
     "@param cell_id The ID of the cell for which to retrieve the number\n"
     "@param category_id The ID of the category for which to retrieve the number\n"
     "@return The total number of items visited for the given cell and the given category\n"
   ) +
-  gsi::method_ext ("create_item", &create_item,
+  gsi::method_ext ("create_item", &create_item, gsi::arg ("cell_id"), gsi::arg ("category_id"),
     "@brief Creates a new item for the given cell/category combination\n"
-    "@args cell_id, category_id\n"
     "@param cell_id The ID of the cell to which the item is associated\n"
     "@param category_id The ID of the category to which the item is associated\n"
     "\n"
     "A more convenient method that takes cell and category objects instead of ID's is the "
     "other version of \\create_item.\n"
   ) +
-  gsi::method_ext ("create_item", &create_item_from_objects,
+  gsi::method_ext ("create_item", &create_item_from_objects, gsi::arg ("cell"), gsi::arg ("category"),
     "@brief Creates a new item for the given cell/category combination\n"
-    "@args cell, category\n"
     "@param cell The cell to which the item is associated\n"
     "@param category The category to which the item is associated\n"
     "\n"
@@ -1376,38 +1341,32 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
   gsi::iterator_ext ("each_item", &database_items_begin, &database_items_end,
     "@brief Iterates over all iterms inside the database\n"
   ) +
-  gsi::iterator_ext ("each_item_per_cell", &database_items_begin_cell, &database_items_end_cell,
+  gsi::iterator_ext ("each_item_per_cell", &database_items_begin_cell, &database_items_end_cell, gsi::arg ("cell_id"),
     "@brief Iterates over all iterms inside the database which are associated with the given cell\n"
-    "@args cell_id\n"
     "@param cell_id The ID of the cell for which all associated items should be retrieved\n"
   ) +
-  gsi::iterator_ext ("each_item_per_category", &database_items_begin_cat, &database_items_end_cat,
+  gsi::iterator_ext ("each_item_per_category", &database_items_begin_cat, &database_items_end_cat, gsi::arg ("category_id"),
     "@brief Iterates over all iterms inside the database which are associated with the given category\n"
-    "@args category_id\n"
     "@param category_id The ID of the category for which all associated items should be retrieved\n"
   ) +
-  gsi::iterator_ext ("each_item_per_cell_and_category", &database_items_begin_cc, &database_items_end_cc,
+  gsi::iterator_ext ("each_item_per_cell_and_category", &database_items_begin_cc, &database_items_end_cc, gsi::arg ("cell_id"), gsi::arg ("category_id"),
     "@brief Iterates over all iterms inside the database which are associated with the given cell and category\n"
-    "@args cell_id,category_id\n"
     "@param cell_id The ID of the cell for which all associated items should be retrieved\n"
     "@param category_id The ID of the category for which all associated items should be retrieved\n"
   ) +
-  gsi::method ("set_item_visited", &rdb::Database::set_item_visited,
+  gsi::method ("set_item_visited", &rdb::Database::set_item_visited, gsi::arg ("item"), gsi::arg ("visited"),
     "@brief Modifies the visited state of an item\n"
-    "@args item,visited\n"
     "@param item The item to modify\n"
     "@param visited True to set the item to visited state, false otherwise\n"
   ) +
-  gsi::method ("load", &rdb::Database::load,
+  gsi::method ("load", &rdb::Database::load, gsi::arg ("filename"),
     "@brief Loads the database from the given file\n"
-    "@args filename\n"
     "@param filename The file from which to load the database\n"
     "The reader recognizes the format automatically and will choose the appropriate decoder. 'gzip' compressed files are uncompressed "
     "automatically.\n"
   ) + 
-  gsi::method ("save", &rdb::Database::save,
+  gsi::method ("save", &rdb::Database::save, gsi::arg ("filename"),
     "@brief Saves the database to the given file\n"
-    "@args filename\n"
     "@param filename The file to which to save the database\n"
     "The database is always saved in KLayout's XML-based format.\n"
   ),
@@ -1432,9 +1391,8 @@ static void tp_output_rdb (db::TilingProcessor *proc, const std::string &name, r
 //  extend the db::TilingProcessor with the ability to feed images
 static
 gsi::ClassExt<db::TilingProcessor> tiling_processor_ext (
-  method_ext ("output", &tp_output_rdb,
+  method_ext ("output", &tp_output_rdb, gsi::arg ("name"), gsi::arg ("rdb"), gsi::arg ("cell_id"), gsi::arg ("category_id"),
     "@brief Specifies output to a report database\n"
-    "@args name, rdb, cell_id, category_id\n"
     "This method will establish an output channel for the processor. The output sent to that channel "
     "will be put into the report database given by the \"rdb\" parameter. \"cell_id\" specifies the "
     "cell and \"category_id\" the category to use.\n"
@@ -1446,4 +1404,3 @@ gsi::ClassExt<db::TilingProcessor> tiling_processor_ext (
 );
 
 }
-

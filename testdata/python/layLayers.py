@@ -21,6 +21,11 @@ import unittest
 import os
 import sys
 
+def astr(a):
+  astr = []
+  for i in a:
+    astr.append(str(i))
+  return "[" + ", ".join(astr) + "]"
 
 class LAYLayersTest(unittest.TestCase):
 
@@ -139,7 +144,7 @@ class LAYLayersTest(unittest.TestCase):
     l12_new.source = "@* (0,0 *0.5) (0,5 r45 *2.5)"
     cv.set_layer_properties(p12, l12_new)
     trans = p12.current().trans_(True)
-    self.assertEqual(str(trans), str(p12.current().trans))
+    self.assertEqual(astr(trans), astr(p12.current().trans))
     self.assertEqual(len(trans), 2)
     self.assertEqual(str(trans [0]), "r0 *0.5 0,0")
     self.assertEqual(str(trans [1]), "r45 *2.5 0,5")

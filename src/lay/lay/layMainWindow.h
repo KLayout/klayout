@@ -40,7 +40,7 @@
 #include "dbManager.h"
 #include "dbLoadLayoutOptions.h"
 #include "layAbstractMenu.h"
-#include "layAbstractMenuProvider.h"
+#include "layDispatcher.h"
 #include "layLayoutView.h"
 #include "layPlugin.h"
 #include "layProgress.h"
@@ -118,8 +118,7 @@ private:
 
 class LAY_PUBLIC MainWindow
   : public QMainWindow,
-    public lay::Plugin,
-    public lay::AbstractMenuProvider
+    public lay::Dispatcher
 {
 Q_OBJECT
 public:
@@ -132,7 +131,7 @@ public:
   /**
    *  @brief Constructor
    */
-  MainWindow (QApplication *app = 0, lay::Plugin *parent_plugin = 0, const char *name = "main_window");
+  MainWindow (QApplication *app = 0, lay::Plugin *parent_plugin = 0, const char *name = "main_window", bool undo_enabled = true);
 
   /** 
    *  @brief Destructor
@@ -140,19 +139,11 @@ public:
   ~MainWindow ();
 
   /**
-   *  @brief Implementation of the AbstractMenuProvider interface
+   *  @brief Implementation of the Dispatcher interface
    */
   QWidget *menu_parent_widget ()
   {
     return this;
-  }
-
-  /**
-   *  @brief Get the main menu abstraction object
-   */
-  AbstractMenu *menu ()
-  {
-    return mp_menu;
   }
 
   /**
@@ -407,12 +398,12 @@ public:
   bool show_progress_bar (bool show);
 
   /** 
-   *  @brief Implementation of the PluginRoot interface
+   *  @brief Implementation of the Plugin interface
    */
   bool configure (const std::string &name, const std::string &value);
 
   /** 
-   *  @brief Implementation of the PluginRoot interface
+   *  @brief Implementation of the Plugin interface
    */
   void config_finalize ();
 
@@ -537,35 +528,10 @@ public:
   void menu_activated (const std::string &symbol);
 
   /**
-   *  @brief Get the action for a slot
+   *  @brief Gets the available menu symbols
    */
-  lay::Action &action_for_slot (const char *slot);
+  static std::vector<std::string> menu_symbols ();
 
-  /**
-   *  @brief Create a configuration action with the given title, parameter name and value
-   *
-   *  The action will be owned by the main window but can be deleted to remove the action from the main window.
-   */
-  lay::Action *create_config_action (const std::string &title, const std::string &cname, const std::string &cvalue);
-  
-  /**
-   *  @brief Create a configuration action with the given parameter name and value
-   *
-   *  The action will be owned by the main window but can be deleted to remove the action from the main window.
-   *  This version is provided for applications, where the title is set later.
-   */
-  lay::Action *create_config_action (const std::string &cname, const std::string &cvalue);
-  
-  /**
-   *  @brief Register a configuration action with the given name
-   */
-  void register_config_action (const std::string &name, lay::ConfigureAction *action);
-  
-  /**
-   *  @brief Unregister a configuration action with the given name
-   */
-  void unregister_config_action (const std::string &name, lay::ConfigureAction *action);
-  
   /**
    *  @brief Open a new layout in mode 'mode'
    *
@@ -664,173 +630,15 @@ public slots:
    */
   void select_mode (int m);
 
-  /**
-   *  @brief Called when one of the built-in modes (i.e. select, move) is selected
-   */
-  void intrinsic_mode_triggered ();
-
   void update_action_states ();
   void cancel ();
   void redraw ();
   void exit ();
   void close_current_view ();
   void tab_close_requested (int);
-  void enable_all ();
-  void disable_all ();
-  void open_recent ();
+  void open_recent (size_t n);
   void view_selected (int index);
   void view_title_changed ();
-
-  //  menu callbacks for main window
-  void cm_reset_window_state ();
-  void cm_select_all ();
-  void cm_unselect_all ();
-  void cm_undo ();
-  void cm_redo ();
-  void cm_delete ();
-  void cm_show_properties ();
-  void cm_copy ();
-  void cm_paste ();
-  void cm_paste_interactive ();
-  void cm_duplicate ();
-  void cm_duplicate_interactive ();
-  void cm_cut ();
-  void cm_zoom_fit_sel ();
-  void cm_zoom_fit ();
-  void cm_zoom_in ();
-  void cm_zoom_out ();
-  void cm_pan_up ();
-  void cm_pan_down ();
-  void cm_pan_left ();
-  void cm_pan_right ();
-  void cm_save_session ();
-  void cm_restore_session ();
-  void cm_setup ();
-  void cm_save_as ();
-  void cm_save_all ();
-  void cm_save ();
-  void cm_reload ();
-  void cm_close ();
-  void cm_close_all ();
-  void cm_clone ();
-  void cm_layout_props ();
-  void cm_layout_stats ();
-  void cm_inc_max_hier ();
-  void cm_dec_max_hier ();
-  void cm_max_hier ();
-  void cm_max_hier_0 ();
-  void cm_max_hier_1 ();
-  void cm_prev_display_state ();
-  void cm_next_display_state ();
-  void cm_cancel ();
-  void cm_redraw ();
-  void cm_screenshot ();
-  void cm_save_layer_props ();
-  void cm_load_layer_props ();
-  void cm_save_bookmarks ();
-  void cm_load_bookmarks ();
-  void cm_select_cell ();
-  void cm_select_current_cell ();
-  void cm_print ();
-  void cm_exit ();
-  void cm_view_log ();
-  void cm_bookmark_view ();
-  void cm_manage_bookmarks ();
-  void cm_goto_position ();
-  void cm_show_all_tips ();
-  void cm_help_about ();
-  void cm_help_about_qt ();
-  void cm_macro_editor ();
-  void cm_packages ();
-  void cm_technologies ();
-  void cm_open_too ();
-  void cm_open_new_view ();
-  void cm_open ();
-  void cm_pull_in ();
-  void cm_reader_options ();
-  void cm_writer_options ();
-  void cm_new_layout ();
-  void cm_new_panel ();
-  void cm_adjust_origin ();
-  void cm_new_cell ();
-  void cm_new_layer ();
-  void cm_clear_layer ();
-  void cm_delete_layer ();
-  void cm_edit_layer ();
-  void cm_copy_layer ();
-  void cm_lay_convert_to_static ();
-  void cm_lay_flip_x ();
-  void cm_lay_flip_y ();
-  void cm_lay_rot_cw ();
-  void cm_lay_rot_ccw ();
-  void cm_lay_free_rot ();
-  void cm_lay_scale ();
-  void cm_lay_move ();
-  void cm_sel_flip_x ();
-  void cm_sel_flip_y ();
-  void cm_sel_rot_cw ();
-  void cm_sel_rot_ccw ();
-  void cm_sel_free_rot ();
-  void cm_sel_scale ();
-  void cm_sel_move ();
-  void cm_sel_move_to ();
-  void cm_sel_move_interactive ();
-  void cm_show_assistant ();
-
-  //  forwarded to the current view: layer list context menu
-  void cm_lv_new_tab ();
-  void cm_lv_remove_tab ();
-  void cm_lv_rename_tab ();
-  void cm_lv_make_valid ();
-  void cm_lv_make_invalid ();
-  void cm_lv_hide ();
-  void cm_lv_hide_all ();
-  void cm_lv_show ();
-  void cm_lv_show_all ();
-  void cm_lv_show_only ();
-  void cm_lv_rename ();
-  void cm_lv_select_all ();
-  void cm_lv_delete ();
-  void cm_lv_insert ();
-  void cm_lv_group ();
-  void cm_lv_ungroup ();
-  void cm_lv_source ();
-  void cm_lv_sort_by_name ();
-  void cm_lv_sort_by_ild ();
-  void cm_lv_sort_by_idl ();
-  void cm_lv_sort_by_ldi ();
-  void cm_lv_sort_by_dli ();
-  void cm_lv_regroup_by_index ();
-  void cm_lv_regroup_by_datatype ();
-  void cm_lv_regroup_by_layer ();
-  void cm_lv_regroup_flatten ();
-  void cm_lv_expand_all ();
-  void cm_lv_add_missing ();
-  void cm_lv_remove_unused ();
-  void cm_lv_copy ();
-  void cm_lv_cut ();
-  void cm_lv_paste ();
-
-  // forwarded to the current view: cell list context menu
-  void cm_cell_user_properties ();
-  void cm_cell_delete ();
-  void cm_cell_replace ();
-  void cm_cell_rename ();
-  void cm_cell_flatten ();
-  void cm_cell_convert_to_static ();
-  void cm_cell_copy ();
-  void cm_cell_cut ();
-  void cm_cell_paste ();
-  void cm_cell_select ();
-  void cm_open_current_cell ();
-  void cm_save_current_cell_as ();
-  void cm_cell_hide ();
-  void cm_cell_show ();
-  void cm_cell_show_all ();
-
-  //  forwarded to the navigator
-  void cm_navigator_freeze ();
-  void cm_navigator_close ();
 
   /**
    *  @brief shows the given URL as a non-modal help window
@@ -865,12 +673,9 @@ protected:
   void do_update_file_menu ();
 
 private:
-  friend class PluginRootToMainWindow;
-
   TextProgressDelegate m_text_progress;
 
   //  Main menu
-  AbstractMenu *mp_menu;
   QTabBar *mp_tab_bar;
   QToolBar *mp_tool_bar;
   QDockWidget *mp_navigator_dock_widget;
@@ -920,11 +725,8 @@ private:
   double m_grid_micron;
   std::vector<double> m_default_grids;
   bool m_default_grids_updated;
-  std::vector<lay::Action *> m_default_grid_actions;
   std::vector<std::pair<std::string, std::string> > m_key_bindings;
-  double m_new_cell_window_size;
   bool m_new_layout_current_panel;
-  std::string m_new_cell_cell_name;
   bool m_synchronized_views;
   bool m_synchronous;
   bool m_busy;
@@ -934,10 +736,6 @@ private:
   std::string m_message;
   std::auto_ptr<QPrinter> mp_printer;
   std::vector<QString> m_changed_files;
-
-  std::map<std::string, lay::Action> m_actions_for_slot;
-  std::map<std::string, std::vector<lay::ConfigureAction *> > m_configuration_actions;
-  tl::shared_collection<lay::ConfigureAction> m_ca_collection;
 
   //  the object manager (undo/redo mechanism and others)
   db::Manager m_manager;
@@ -949,8 +747,48 @@ private:
   void closeEvent (QCloseEvent *event);
   void resizeEvent (QResizeEvent *event);
 
-  void do_cm_paste (bool interactive);
-  void do_cm_duplicate (bool interactive);
+  void cm_navigator_freeze ();
+  void cm_navigator_close ();
+  void cm_view_log ();
+  void cm_print ();
+  void cm_exit ();
+  void cm_reset_window_state ();
+  void cm_undo ();
+  void cm_redo ();
+  void cm_goto_position ();
+  void cm_manage_bookmarks ();
+  void cm_bookmark_view ();
+  void cm_cancel ();
+  void cm_save_layer_props ();
+  void cm_load_layer_props ();
+  void cm_save_session ();
+  void cm_restore_session ();
+  void cm_save_bookmarks ();
+  void cm_load_bookmarks ();
+  void cm_screenshot ();
+  void cm_save_current_cell_as ();
+  void cm_save ();
+  void cm_save_as ();
+  void cm_save_all ();
+  void cm_setup ();
+  void cm_open_too ();
+  void cm_open_new_view ();
+  void cm_open ();
+  void cm_pull_in ();
+  void cm_reader_options ();
+  void cm_writer_options ();
+  void cm_new_panel ();
+  void cm_new_layout ();
+  void cm_clone ();
+  void cm_close_all ();
+  void cm_close ();
+  void cm_packages ();
+  void cm_technologies ();
+  void cm_macro_editor ();
+  void cm_show_assistant ();
+  void cm_show_all_tips ();
+  void cm_help_about ();
+  void cm_help_about_qt ();
 
   void format_message ();
 
@@ -980,26 +818,6 @@ private:
   void libraries_changed ();
   void apply_key_bindings ();
   void apply_hidden (const std::vector<std::pair <std::string, bool> > &hidden);
-};
-
-class LAY_PUBLIC PluginRootToMainWindow
-  : public lay::PluginRoot
-{
-public:
-  PluginRootToMainWindow ();
-
-  void attach_to (lay::MainWindow *main_window);
-
-  virtual void plugin_registered (lay::PluginDeclaration *cls);
-  virtual void plugin_removed (lay::PluginDeclaration *cls);
-  virtual void select_mode (int mode);
-  virtual void menu_activated (const std::string &symbol);
-
-private:
-  PluginRootToMainWindow (const PluginRootToMainWindow &);
-  PluginRootToMainWindow &operator= (const PluginRootToMainWindow &);
-
-  tl::weak_ptr<MainWindow> mp_main_window;
 };
 
 }

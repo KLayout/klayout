@@ -222,7 +222,7 @@ TEST(1)
 {
   tl::InputMemoryStream im ((const char *) data, sizeof (data));
 
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout (&m);
   tl::InputStream file (im);
   db::Reader reader (file);
@@ -264,7 +264,7 @@ TEST(2)
 {
   tl::InputMemoryStream im ((const char *) data, sizeof (data));
 
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout (&m);
 
   db::LayerMap map_full;
@@ -351,7 +351,7 @@ TEST(2)
 
 TEST(Bug_121_1)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout (&m);
 
   {
@@ -372,7 +372,7 @@ TEST(Bug_121_1)
 
 TEST(Bug_121_2)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout (&m);
 
   {
@@ -391,3 +391,46 @@ TEST(Bug_121_2)
   db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
 }
 
+TEST(3_AdvancedMapping)
+{
+  db::Manager m (false);
+  db::Layout layout (&m);
+
+  db::LoadLayoutOptions options;
+  db::LayerMap lm, lm_read;
+
+  unsigned int n = 0;
+  lm.map_expr ("*/*: *+100/*", n++);
+  lm.map_expr ("1/*: */*", n++);
+  lm.map_expr ("1/10: 1/0", n++);
+  lm.map_expr ("1/20-30: 1/*+1000", n++);
+  lm.map_expr ("2/*", n++);
+  lm.map_expr ("2/10-20: */*", n++);
+  options.get_options<db::CommonReaderOptions> ().layer_map = lm;
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/alm.gds");
+    db::Reader reader (file);
+    lm_read = reader.read (layout, options);
+  }
+
+  EXPECT_EQ (lm_read.to_string_file_format (),
+    "1/10 : 1/0\n"
+    "2/0-9,21-*\n"
+    "1/0 : 1/0\n"
+    "1/1 : 1/1\n"
+    "1/20 : 1/1020\n"
+    "1/21 : 1/1021\n"
+    "2/10 : 2/10\n"
+    "2/11 : 2/11\n"
+    "42/42 : 142/42\n"
+    "100/0 : 200/0\n"
+    "2/12-20 : */*\n"
+    "1/22-30 : 1/*+1000\n"
+    "1/2-9,11-19,31-* : */*\n"
+    "0/*;3-41/*;42/0-41,43-*;43-99/*;100/1-*;101-*/* : *+100/*\n"
+  );
+
+  std::string fn_au (tl::testsrc () + "/testdata/gds/alm_au.gds");
+  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+}

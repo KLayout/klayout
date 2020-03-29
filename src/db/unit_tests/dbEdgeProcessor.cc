@@ -417,7 +417,7 @@ TEST(3special)
 
 void run_test_size (tl::TestBase *_this, const char *file, const char *au_file, int mode, db::Coord dx, db::Coord dy, bool min_coherence = true, bool flat = true)
 {
-  db::Manager m;
+  db::Manager m (true);
 
   db::Layout layout_org (&m);
   db::Layout layout_au (&m);

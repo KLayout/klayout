@@ -277,25 +277,21 @@ BrowserDialog_Stub *new_browser_dialog_static_and_parent (QWidget *parent, const
 #endif
 
 Class<BrowserDialog_Stub> decl_BrowserDialog (QT_EXTERNAL_BASE (QDialog) "lay", "BrowserDialog",
-  gsi::constructor ("new", &new_browser_dialog_with_source,
+  gsi::constructor ("new", &new_browser_dialog_with_source, gsi::arg ("source"),
     "@brief Creates a HTML browser window with a \\BrowserSource as the source of HTML code\n"
-    "@args source\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::constructor ("new", &new_browser_dialog_static,
+  gsi::constructor ("new", &new_browser_dialog_static, gsi::arg ("html"),
     "@brief Creates a HTML browser window with a static HTML content\n"
-    "@args html\n"
     "This method has been introduced in version 0.23.\n"
   ) +
 #if defined(HAVE_QTBINDINGS)
-  gsi::constructor ("new", &new_browser_dialog_with_source_and_parent,
+  gsi::constructor ("new", &new_browser_dialog_with_source_and_parent, gsi::arg ("parent"), gsi::arg ("source"),
     "@brief Creates a HTML browser window with a \\BrowserSource as the source of HTML code\n"
-    "@args parent,source\n"
     "This method variant with a parent argument has been introduced in version 0.24.2.\n"
   ) +
-  gsi::constructor ("new", &new_browser_dialog_static_and_parent,
+  gsi::constructor ("new", &new_browser_dialog_static_and_parent, gsi::arg ("parent"), gsi::arg ("html"),
     "@brief Creates a HTML browser window with a static HTML content\n"
-    "@args parent,html\n"
     "This method variant with a parent argument has been introduced in version 0.24.2.\n"
   ) +
 #else
@@ -309,24 +305,21 @@ Class<BrowserDialog_Stub> decl_BrowserDialog (QT_EXTERNAL_BASE (QDialog) "lay", 
   gsi::method ("execute|#exec", &BrowserDialog_Stub::exec, 
     "@brief Executes the HTML browser dialog as a modal window\n"
   ) +
-  gsi::method ("load", &BrowserDialog_Stub::load, 
+  gsi::method ("load", &BrowserDialog_Stub::load, gsi::arg ("url"),
     "@brief Loads the given URL into the browser dialog\n"
-    "@args url\n"
     "Typically the URL has the \"int:\" scheme so the HTML code is taken from the "
     "\\BrowserSource object.\n"
   ) +
-  gsi::method ("label=", &BrowserDialog_Stub::set_label, 
+  gsi::method ("label=", &BrowserDialog_Stub::set_label, gsi::arg ("label"),
     "@brief Sets the label text\n"
-    "@args label\n"
     "\n"
     "The label is shown left of the navigation buttons.\n"
     "By default, no label is specified.\n"
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method ("set_search_url", &BrowserDialog_Stub::set_search_url, 
+  gsi::method ("set_search_url", &BrowserDialog_Stub::set_search_url, gsi::arg ("url"), gsi::arg ("query_item"),
     "@brief Enables the search field and specifies the search URL generated for a search\n"
-    "@args url, query_item\n"
     "\n"
     "If a search URL is set, the search box right to the navigation bar will be enabled. "
     "When a text is entered into the search box, the browser will navigate to an URL composed "
@@ -334,34 +327,29 @@ Class<BrowserDialog_Stub> decl_BrowserDialog (QT_EXTERNAL_BASE (QDialog) "lay", 
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method ("search", &BrowserDialog_Stub::search, 
+  gsi::method ("search", &BrowserDialog_Stub::search, gsi::arg ("search_item"),
     "@brief Issues a search request using the given search item and the search URL specified with \\set_search_url\n"
-    "@args search_item\n"
     "\n"
     "See \\set_search_url for a description of the search mechanism.\n"
   ) +
-  gsi::method_ext ("source=|#set_source", &set_source, 
+  gsi::method_ext ("source=|#set_source", &set_source, gsi::arg ("source"),
     "@brief Connects to a source object\n"
-    "@args source\n"
     "\n"
     "Setting the source should be the first thing done after the BrowserDialog object is created. It will not "
     "have any effect after the browser has loaded the first page. In particular, \\home= should be called after the source "
     "was set."
   ) +
-  gsi::method_ext ("resize|#set_size", &set_size, 
+  gsi::method_ext ("resize|#set_size", &set_size, gsi::arg ("width"), gsi::arg ("height"),
     "@brief Sets the size of the dialog window\n"
-    "@args width, height\n"
   ) +
-  gsi::method_ext ("caption=|#set_caption", &set_caption, 
+  gsi::method_ext ("caption=|#set_caption", &set_caption, gsi::arg ("caption"),
     "@brief Sets the caption of the window\n"
-    "@args caption\n"
   ) +
   gsi::method ("reload", &BrowserDialog_Stub::reload, 
     "@brief Reloads the current page"
   ) +
-  gsi::method ("home=|#set_home", &BrowserDialog_Stub::set_home, 
+  gsi::method ("home=|#set_home", &BrowserDialog_Stub::set_home, gsi::arg ("home_url"),
     "@brief Sets the browser's initial and current URL which is selected if the \"home\" location is chosen\n"
-    "@args home_url\n"
     "The home URL is the one shown initially and the one which is selected when the \"home\" button is pressed. "
     "The default location is \"int:/index.html\".\n"
   ) +
@@ -430,9 +418,8 @@ Class<BrowserSource_Stub> decl_BrowserSourceStub ("lay", "BrowserSource",
     "\n"
     "The default HTML string is sent when no specific implementation is provided.\n"
   ) +
-  gsi::callback ("get", &BrowserSource_Stub::get, &BrowserSource_Stub::get_cb,
+  gsi::callback ("get", &BrowserSource_Stub::get, &BrowserSource_Stub::get_cb, gsi::arg ("url"),
     "@brief Get the HTML code for a given \"int\" URL.\n"
-    "@args url\n"
     "\n"
     "If this method returns an empty string, the browser will not be set to \n"
     "a new location. This allows implementing any functionality behind such links.\n"
@@ -463,48 +450,41 @@ lay::BrowserPanel *new_browser_panel (QWidget *parent)
 }
 
 Class<lay::BrowserPanel> decl_BrowserPanel (QT_EXTERNAL_BASE (QWidget) "lay", "BrowserPanel",
-  gsi::constructor ("new", &new_browser_panel_with_source,
+  gsi::constructor ("new", &new_browser_panel_with_source, gsi::arg ("parent"), gsi::arg ("source"),
     "@brief Creates a HTML browser widget with a \\BrowserSource as the source of HTML code\n"
-    "@args parent, source\n"
   ) +
-  gsi::constructor ("new", &new_browser_panel,
+  gsi::constructor ("new", &new_browser_panel, gsi::arg ("parent"),
     "@brief Creates a HTML browser widget\n"
-    "@args parent\n"
   ) +
-  gsi::method ("load", &lay::BrowserPanel::load, 
+  gsi::method ("load", &lay::BrowserPanel::load, gsi::arg ("url"),
     "@brief Loads the given URL into the browser widget\n"
-    "@args url\n"
     "Typically the URL has the \"int:\" scheme so the HTML code is taken from the "
     "\\BrowserSource object.\n"
   ) +
   gsi::method ("url", &lay::BrowserPanel::url, 
     "@brief Gets the URL currently shown\n"
   ) +
-  gsi::method ("set_search_url", &lay::BrowserPanel::set_search_url, 
+  gsi::method ("set_search_url", &lay::BrowserPanel::set_search_url, gsi::arg ("url"), gsi::arg ("query_item"),
     "@brief Enables the search field and specifies the search URL generated for a search\n"
-    "@args url, query_item\n"
     "\n"
     "If a search URL is set, the search box right to the navigation bar will be enabled. "
     "When a text is entered into the search box, the browser will navigate to an URL composed "
     "of the search URL, the search item and the search text, i.e. \"myurl?item=search_text\".\n"
   ) +
-  gsi::method ("search", &lay::BrowserPanel::search, 
+  gsi::method ("search", &lay::BrowserPanel::search, gsi::arg ("search_item"),
     "@brief Issues a search request using the given search item and the search URL specified with \\set_search_url\n"
-    "@args search_item\n"
     "\n"
     "See \\search_url= for a description of the search mechanism.\n"
   ) +
-  gsi::method ("source=", &lay::BrowserPanel::set_source, 
+  gsi::method ("source=", &lay::BrowserPanel::set_source, gsi::arg ("source"),
     "@brief Connects to a source object\n"
-    "@args source\n"
     "\n"
     "Setting the source should be the first thing done after the BrowserDialog object is created. It will not "
     "have any effect after the browser has loaded the first page. In particular, \\home= should be called after the source "
     "was set."
   ) +
-  gsi::method ("label=", &lay::BrowserPanel::set_label, 
+  gsi::method ("label=", &lay::BrowserPanel::set_label, gsi::arg ("label"),
     "@brief Sets the label text\n"
-    "@args label\n"
     "\n"
     "The label is shown left of the navigation buttons.\n"
     "By default, no label is specified.\n"
@@ -512,9 +492,8 @@ Class<lay::BrowserPanel> decl_BrowserPanel (QT_EXTERNAL_BASE (QWidget) "lay", "B
   gsi::method ("reload", &lay::BrowserPanel::reload, 
     "@brief Reloads the current page"
   ) +
-  gsi::method ("home=", &lay::BrowserPanel::set_home, 
+  gsi::method ("home=", &lay::BrowserPanel::set_home, gsi::arg ("home_url"),
     "@brief Sets the browser widget's initial and current URL which is selected if the \"home\" location is chosen\n"
-    "@args home_url\n"
     "The home URL is the one shown initially and the one which is selected when the \"home\" button is pressed. "
     "The default location is \"int:/index.html\".\n"
   ),
@@ -711,18 +690,16 @@ static tl::Variant ask_item (const std::string &title, const std::string &label,
 struct InputDialog { };
 
 Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
-  gsi::method ("#get_string", &get_string,
+  gsi::method ("#get_string", &get_string, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("value"),
     "@brief Open an input dialog requesting a string\n"
-    "@args title, label, value\n"
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param value The initial value for the input field\n"
     "@return A \\StringValue object with has_value? set to true, if \"Ok\" was pressed and the value given in it's value attribute\n"
     "Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent."
   ) +
-  gsi::method ("#get_item", &get_item,
+  gsi::method ("#get_item", &get_item, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("items"), gsi::arg ("value"),
     "@brief Open an input dialog requesting an item from a list\n"
-    "@args title, label, items, value\n"
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param items The list of items to show in the selection element\n"
@@ -730,18 +707,16 @@ Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
     "@return A \\StringValue object with has_value? set to true, if \"Ok\" was pressed and the value given in it's value attribute\n"
     "Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent."
   ) +
-  gsi::method ("#get_string_password", &get_string_password,
+  gsi::method ("#get_string_password", &get_string_password, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("value"),
     "@brief Open an input dialog requesting a string without showing the actual characters entered\n"
-    "@args title, label, value\n"
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param value The initial value for the input field\n"
     "@return A \\StringValue object with has_value? set to true, if \"Ok\" was pressed and the value given in it's value attribute\n"
     "Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent."
   ) +
-  gsi::method ("#get_double", &get_double,
+  gsi::method ("#get_double", &get_double, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("value"), gsi::arg ("digits"),
     "@brief Open an input dialog requesting a floating-point value\n"
-    "@args title, label, value, digits\n"
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param value The initial value for the input field\n"
@@ -749,9 +724,8 @@ Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
     "@return A \\DoubleValue object with has_value? set to true, if \"Ok\" was pressed and the value given in it's value attribute\n"
     "Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent."
   ) +
-  gsi::method ("#get_double_ex", &get_double_ex,
+  gsi::method ("#get_double_ex", &get_double_ex, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("value"), gsi::arg ("min"), gsi::arg ("max"), gsi::arg ("digits"),
     "@brief Open an input dialog requesting a floating-point value with enhanced capabilities\n"
-    "@args title, label, value, min, max, digits\n"
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param value The initial value for the input field\n"
@@ -761,18 +735,16 @@ Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
     "@return A \\DoubleValue object with has_value? set to true, if \"Ok\" was pressed and the value given in it's value attribute\n"
     "Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent."
   ) +
-  gsi::method ("#get_int", &get_int,
+  gsi::method ("#get_int", &get_int, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("value"),
     "@brief Open an input dialog requesting an integer value\n"
-    "@args title, label, value\n"
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param value The initial value for the input field\n"
     "@return A \\IntValue object with has_value? set to true, if \"Ok\" was pressed and the value given in it's value attribute\n"
     "Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent."
   ) +
-  gsi::method ("#get_int_ex", &get_int_ex,
+  gsi::method ("#get_int_ex", &get_int_ex, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("value"), gsi::arg ("min"), gsi::arg ("max"), gsi::arg ("step"),
     "@brief Open an input dialog requesting an integer value with enhanced capabilities\n"
-    "@args title, label, value, min, max, step\n"
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param value The initial value for the input field\n"
@@ -782,18 +754,16 @@ Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
     "@return A \\IntValue object with has_value? set to true, if \"Ok\" was pressed and the value given in it's value attribute\n"
     "Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent."
   ) +
-  gsi::method ("ask_string", &ask_string,
+  gsi::method ("ask_string", &ask_string, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("value"),
     "@brief Open an input dialog requesting a string\n"
-    "@args title, label, value\n"
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param value The initial value for the input field\n"
     "@return The string entered if \"Ok\" was pressed or nil if \"Cancel\" was pressed\n"
     "This method has been introduced in 0.22 and is somewhat easier to use than the get_.. equivalent."
   ) +
-  gsi::method ("ask_item", &ask_item,
+  gsi::method ("ask_item", &ask_item, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("items"), gsi::arg ("value"),
     "@brief Open an input dialog requesting an item from a list\n"
-    "@args title, label, items, value\n"
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param items The list of items to show in the selection element\n"
@@ -801,18 +771,16 @@ Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
     "@return The string of the item selected if \"Ok\" was pressed or nil if \"Cancel\" was pressed\n"
     "This method has been introduced in 0.22 and is somewhat easier to use than the get_.. equivalent."
   ) +
-  gsi::method ("ask_string_password", &ask_string_password,
+  gsi::method ("ask_string_password", &ask_string_password, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("value"),
     "@brief Open an input dialog requesting a string without showing the actual characters entered\n"
-    "@args title, label, value\n"
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param value The initial value for the input field\n"
     "@return The string entered if \"Ok\" was pressed or nil if \"Cancel\" was pressed\n"
     "This method has been introduced in 0.22 and is somewhat easier to use than the get_.. equivalent."
   ) +
-  gsi::method ("ask_double", &ask_double,
+  gsi::method ("ask_double", &ask_double, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("value"), gsi::arg ("digits"),
     "@brief Open an input dialog requesting a floating-point value\n"
-    "@args title, label, value, digits\n"
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param value The initial value for the input field\n"
@@ -820,9 +788,8 @@ Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
     "@return The value entered if \"Ok\" was pressed or nil if \"Cancel\" was pressed\n"
     "This method has been introduced in 0.22 and is somewhat easier to use than the get_.. equivalent."
   ) +
-  gsi::method ("ask_double_ex", &ask_double_ex,
+  gsi::method ("ask_double_ex", &ask_double_ex, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("value"), gsi::arg ("min"), gsi::arg ("max"), gsi::arg ("digits"),
     "@brief Open an input dialog requesting a floating-point value with enhanced capabilities\n"
-    "@args title, label, value, min, max, digits\n"
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param value The initial value for the input field\n"
@@ -832,9 +799,8 @@ Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
     "@return The value entered if \"Ok\" was pressed or nil if \"Cancel\" was pressed\n"
     "This method has been introduced in 0.22 and is somewhat easier to use than the get_.. equivalent."
   ) +
-  gsi::method ("ask_int", &ask_int,
+  gsi::method ("ask_int", &ask_int, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("value"),
     "@brief Open an input dialog requesting an integer value\n"
-    "@args title, label, value\n"
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param value The initial value for the input field\n"
@@ -842,9 +808,8 @@ Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
     "@return The value entered if \"Ok\" was pressed or nil if \"Cancel\" was pressed\n"
     "This method has been introduced in 0.22 and is somewhat easier to use than the get_.. equivalent."
   ) +
-  gsi::method ("ask_int_ex", &ask_int_ex,
+  gsi::method ("ask_int_ex", &ask_int_ex, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("value"), gsi::arg ("min"), gsi::arg ("max"), gsi::arg ("step"),
     "@brief Open an input dialog requesting an integer value with enhanced capabilities\n"
-    "@args title, label, value, min, max, step\n"
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param value The initial value for the input field\n"
@@ -968,9 +933,8 @@ static tl::Variant ask_save_file_name (const std::string &title, const std::stri
 }
 
 Class<FileDialog> decl_FileDialog ("lay", "FileDialog",
-  gsi::method ("#get_existing_dir", &get_existing_dir,
+  gsi::method ("#get_existing_dir", &get_existing_dir, gsi::arg ("title"), gsi::arg ("dir"),
     "@brief Open a dialog to select a directory\n"
-    "@args title, dir\n"
     "\n"
     "@param title The title of the dialog\n"
     "@param dir The directory selected initially\n"
@@ -978,9 +942,8 @@ Class<FileDialog> decl_FileDialog ("lay", "FileDialog",
     "\n"
     "Starting with version 0.23 this method is deprecated. Use \\ask_existing_dir instead.\n"
   ) +
-  gsi::method ("#get_open_file_names", &get_open_file_names,
+  gsi::method ("#get_open_file_names", &get_open_file_names, gsi::arg ("title"), gsi::arg ("dir"), gsi::arg ("filter"),
     "@brief Select one or multiple files for opening\n"
-    "@args title, dir, filter\n"
     "\n"
     "@param title The title of the dialog\n"
     "@param dir The directory selected initially\n"
@@ -989,9 +952,8 @@ Class<FileDialog> decl_FileDialog ("lay", "FileDialog",
     "\n"
     "Starting with version 0.23 this method is deprecated. Use \\ask_open_file_names instead.\n"
   ) +
-  gsi::method ("#get_open_file_name", &get_open_file_name,
+  gsi::method ("#get_open_file_name", &get_open_file_name, gsi::arg ("title"), gsi::arg ("dir"), gsi::arg ("filter"),
     "@brief Select one file for opening\n"
-    "@args title, dir, filter\n"
     "\n"
     "@param title The title of the dialog\n"
     "@param dir The directory selected initially\n"
@@ -1000,9 +962,8 @@ Class<FileDialog> decl_FileDialog ("lay", "FileDialog",
     "\n"
     "Starting with version 0.23 this method is deprecated. Use \\ask_open_file_name instead.\n"
   ) +
-  gsi::method ("#get_save_file_name", &get_save_file_name,
+  gsi::method ("#get_save_file_name", &get_save_file_name, gsi::arg ("title"), gsi::arg ("dir"), gsi::arg ("filter"),
     "@brief Select one file for writing\n"
-    "@args title, dir, filter\n"
     "\n"
     "@param title The title of the dialog\n"
     "@param dir The directory selected initially\n"
@@ -1011,9 +972,8 @@ Class<FileDialog> decl_FileDialog ("lay", "FileDialog",
     "\n"
     "Starting with version 0.23 this method is deprecated. Use \\ask_save_file_name instead.\n"
   ) +
-  gsi::method ("ask_existing_dir", &ask_existing_dir,
+  gsi::method ("ask_existing_dir", &ask_existing_dir, gsi::arg ("title"), gsi::arg ("dir"),
     "@brief Open a dialog to select a directory\n"
-    "@args title, dir\n"
     "\n"
     "@param title The title of the dialog\n"
     "@param dir The directory selected initially\n"
@@ -1021,9 +981,8 @@ Class<FileDialog> decl_FileDialog ("lay", "FileDialog",
     "\n"
     "This method has been introduced in version 0.23. It is somewhat easier to use than the get_... equivalent.\n"
   ) +
-  gsi::method ("ask_open_file_names", &ask_open_file_names,
+  gsi::method ("ask_open_file_names", &ask_open_file_names, gsi::arg ("title"), gsi::arg ("dir"), gsi::arg ("filter"),
     "@brief Select one or multiple files for opening\n"
-    "@args title, dir, filter\n"
     "\n"
     "@param title The title of the dialog\n"
     "@param dir The directory selected initially\n"
@@ -1032,9 +991,8 @@ Class<FileDialog> decl_FileDialog ("lay", "FileDialog",
     "\n"
     "This method has been introduced in version 0.23. It is somewhat easier to use than the get_... equivalent.\n"
   ) +
-  gsi::method ("ask_open_file_name", &ask_open_file_name,
+  gsi::method ("ask_open_file_name", &ask_open_file_name, gsi::arg ("title"), gsi::arg ("dir"), gsi::arg ("filter"),
     "@brief Select one file for opening\n"
-    "@args title, dir, filter\n"
     "\n"
     "@param title The title of the dialog\n"
     "@param dir The directory selected initially\n"
@@ -1043,9 +1001,8 @@ Class<FileDialog> decl_FileDialog ("lay", "FileDialog",
     "\n"
     "This method has been introduced in version 0.23. It is somewhat easier to use than the get_... equivalent.\n"
   ) +
-  gsi::method ("ask_save_file_name", &ask_save_file_name,
+  gsi::method ("ask_save_file_name", &ask_save_file_name, gsi::arg ("title"), gsi::arg ("dir"), gsi::arg ("filter"),
     "@brief Select one file for writing\n"
-    "@args title, dir, filter\n"
     "\n"
     "@param title The title of the dialog\n"
     "@param dir The directory selected initially\n"
@@ -1182,33 +1139,29 @@ Class<MessageBox> decl_MessageBox (QT_EXTERNAL_BASE (QMainWindow) "lay", "Messag
   gsi::method ("Abort|#b_abort",         &b_abort,           "@brief A constant describing the 'Abort' button") +
   gsi::method ("Retry|#b_retry",         &b_retry,           "@brief A constant describing the 'Retry' button") +
   gsi::method ("Ignore|#b_ignore",       &b_ignore,          "@brief A constant describing the 'Ignore' button") +
-  gsi::method ("warning", &warning,
+  gsi::method ("warning", &warning, gsi::arg ("title"), gsi::arg ("text"), gsi::arg ("buttons"),
     "@brief Open a warning message box\n"
-    "@args title, text, buttons\n"
     "@param title The title of the window\n"
     "@param text The text to show\n"
     "@param buttons A combination (+) of button constants (\\Ok and so on) describing the buttons to show for the message box\n"
     "@return The button constant describing the button that was pressed\n"
   ) +
-  gsi::method ("question", &question,
+  gsi::method ("question", &question, gsi::arg ("title"), gsi::arg ("text"), gsi::arg ("buttons"),
     "@brief Open a question message box\n"
-    "@args title, text, buttons\n"
     "@param title The title of the window\n"
     "@param text The text to show\n"
     "@param buttons A combination (+) of button constants (\\Ok and so on) describing the buttons to show for the message box\n"
     "@return The button constant describing the button that was pressed\n"
   ) +
-  gsi::method ("info", &info,
+  gsi::method ("info", &info, gsi::arg ("title"), gsi::arg ("text"), gsi::arg ("buttons"),
     "@brief Open a information message box\n"
-    "@args title, text, buttons\n"
     "@param title The title of the window\n"
     "@param text The text to show\n"
     "@param buttons A combination (+) of button constants (\\Ok and so on) describing the buttons to show for the message box\n"
     "@return The button constant describing the button that was pressed\n"
   ) +
-  gsi::method ("critical", &critical,
+  gsi::method ("critical", &critical, gsi::arg ("title"), gsi::arg ("text"), gsi::arg ("buttons"),
     "@brief Open a critical (error) message box\n"
-    "@args title, text, buttons\n"
     "@param title The title of the window\n"
     "@param text The text to show\n"
     "@param buttons A combination (+) of button constants (\\Ok and so on) describing the buttons to show for the message box\n"
@@ -1233,4 +1186,3 @@ Class<MessageBox> decl_MessageBox (QT_EXTERNAL_BASE (QMainWindow) "lay", "Messag
 );
 
 }
-

@@ -65,17 +65,17 @@ public:
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
-  virtual void initialize (lay::PluginRoot *root);
+  virtual void initialize (lay::Dispatcher *root);
 
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
-  virtual void initialized (lay::PluginRoot *root);
+  virtual void initialized (lay::Dispatcher *root);
 
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
-  virtual void uninitialize (lay::PluginRoot *root);
+  virtual void uninitialize (lay::Dispatcher *root);
 
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
@@ -100,7 +100,7 @@ public:
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
-  bool can_exit (lay::PluginRoot *root) const;
+  bool can_exit (lay::Dispatcher *root) const;
 
   /**
    *  @brief Gets the singleton instance for this object

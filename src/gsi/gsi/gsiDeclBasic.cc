@@ -45,17 +45,15 @@ Class<Value> decl_Value ("tl", "Value",
   gsi::constructor ("new", &new_vv0, 
     "@brief Constructs a nil object.\n"
   ) +
-  gsi::constructor ("new", &new_vv, 
+  gsi::constructor ("new", &new_vv, gsi::arg ("value"),
     "@brief Constructs a non-nil object with the given value.\n"
-    "@args value\n"
     "This constructor has been introduced in version 0.22.\n"
   ) +
   gsi::method ("to_s", &Value::to_string,
     "@brief Convert this object to a string\n"
   ) +
-  gsi::method ("value=", &Value::set_value,
+  gsi::method ("value=", &Value::set_value, gsi::arg ("value"),
     "@brief Set the actual value.\n"
-    "@args value\n"
   ) +
   gsi::method ("value", (const tl::Variant &(Value::*)() const) &Value::value,
     "@brief Gets the actual value.\n"
@@ -69,4 +67,3 @@ Class<Value> decl_Value ("tl", "Value",
 );
 
 }
-

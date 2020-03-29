@@ -697,7 +697,7 @@ fill_ctx_cbx (QComboBox *cbx)
   cbx->addItem (QObject::tr ("All cells"));
 }
 
-SearchReplaceDialog::SearchReplaceDialog (lay::PluginRoot *root, lay::LayoutView *view)
+SearchReplaceDialog::SearchReplaceDialog (lay::Dispatcher *root, lay::LayoutView *view)
   : lay::Browser (root, view),
     Ui::SearchReplaceDialog (),
     mp_view (view),
@@ -768,7 +768,7 @@ SearchReplaceDialog::~SearchReplaceDialog ()
 }
 
 static void 
-save_states (QStackedWidget *sw, const std::string &pfx, lay::PluginRoot *config_root)
+save_states (QStackedWidget *sw, const std::string &pfx, lay::Dispatcher *config_root)
 {
   for (int i = 0; i < sw->count (); ++i) {
     SearchReplacePropertiesWidget *pw = dynamic_cast<SearchReplacePropertiesWidget *> (sw->widget (i));
@@ -779,7 +779,7 @@ save_states (QStackedWidget *sw, const std::string &pfx, lay::PluginRoot *config
 }
 
 static void 
-restore_states (QStackedWidget *sw, const std::string &pfx, lay::PluginRoot *config_root)
+restore_states (QStackedWidget *sw, const std::string &pfx, lay::Dispatcher *config_root)
 {
   for (int i = 0; i < sw->count (); ++i) {
     SearchReplacePropertiesWidget *pw = dynamic_cast<SearchReplacePropertiesWidget *> (sw->widget (i));
@@ -813,7 +813,7 @@ ctx_from_index (int index)
 void 
 SearchReplaceDialog::restore_state ()
 {
-  lay::PluginRoot *config_root = root ();
+  lay::Dispatcher *config_root = root ();
 
   restore_states (find_properties, "sr-find", config_root);
   restore_states (delete_properties, "sr-find", config_root);
@@ -881,7 +881,7 @@ SearchReplaceDialog::restore_state ()
 void
 SearchReplaceDialog::save_state ()
 {
-  lay::PluginRoot *config_root = root ();
+  lay::Dispatcher *config_root = root ();
 
   config_root->config_set (cfg_sr_window_state, lay::save_dialog_state (this));
 
@@ -1877,7 +1877,7 @@ SearchReplaceDialog::tab_index_changed (int index)
 {
   cancel ();
 
-  lay::PluginRoot *config_root = root ();
+  lay::Dispatcher *config_root = root ();
 
   std::string v;
 

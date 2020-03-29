@@ -71,10 +71,13 @@ FORMS = \
     NetlistBrowserConfigPage2.ui \
     NetlistBrowserDialog.ui \
     NetInfoDialog.ui \
-    NetExportDialog.ui
+    NetExportDialog.ui \
+    SelectCellViewForm.ui \
+    LayoutStatistics.ui
 
 RESOURCES = \
-    laybasicResources.qrc
+    laybasicResources.qrc \
+    layLayoutStatistics.qrc
 
 SOURCES = \
   gtf.cc \
@@ -86,7 +89,6 @@ SOURCES = \
   gsiDeclLayPlugin.cc \
   gsiDeclLayStream.cc \
   layAbstractMenu.cc \
-  layAbstractMenuProvider.cc \
   layAnnotationShapes.cc \
   layBitmap.cc \
   layBitmapRenderer.cc \
@@ -178,12 +180,14 @@ SOURCES = \
     layNetlistBrowserTreeModel.cc \
     layLibrariesView.cc \
     layBookmarksView.cc \
-    layGenericSyntaxHighlighter.cc
+    layGenericSyntaxHighlighter.cc \
+    layDispatcher.cc \
+    laySelectCellViewForm.cc \
+    layLayoutStatisticsForm.cc
 
 HEADERS = \
   gtf.h \
   layAbstractMenu.h \
-  layAbstractMenuProvider.h \
   layAnnotationShapes.h \
   layBitmap.h \
   layBitmapRenderer.h \
@@ -277,7 +281,10 @@ HEADERS = \
     layNetlistBrowserTreeModel.h \
     layLibrariesView.h \
     layBookmarksView.h \
-    layGenericSyntaxHighlighter.h
+    layGenericSyntaxHighlighter.h \
+    layDispatcher.h \
+    laySelectCellViewForm.h \
+    layLayoutStatisticsForm.h
 
 INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC

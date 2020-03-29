@@ -105,25 +105,21 @@ gsi::Class<db::Matrix2d> decl_Matrix2d ("db", "Matrix2d",
   gsi::constructor ("new", &new_matrix2d,
     "@brief Create a new Matrix2d representing a unit transformation"
   ) +
-  gsi::constructor ("new", &new_matrix2d_m,
+  gsi::constructor ("new", &new_matrix2d_m, gsi::arg ("m"),
     "@brief Create a new Matrix2d representing an isotropic magnification\n"
-    "@args m\n"
     "@param m The magnification\n"
   ) +
-  gsi::constructor ("new", &new_matrix2d_m2,
+  gsi::constructor ("new", &new_matrix2d_m2, gsi::arg ("mx"), gsi::arg ("my"),
     "@brief Create a new Matrix2d representing an anisotropic magnification\n"
-    "@args mx, my\n"
     "@param mx The magnification in x direction\n"
     "@param my The magnification in y direction\n"
   ) +
-  gsi::constructor ("new", &new_matrix2d_t,
+  gsi::constructor ("new", &new_matrix2d_t, gsi::arg ("t"),
     "@brief Create a new Matrix2d from the given complex transformation"
-    "@args t\n"
     "@param t The transformation from which to create the matrix (not taking into account the displacement)\n"
   ) +
-  gsi::constructor ("newc", &new_matrix2d_mrm, 
+  gsi::constructor ("newc", &new_matrix2d_mrm, gsi::arg ("mag"), gsi::arg ("rotation"), gsi::arg ("mirror"),
     "@brief Create a new Matrix2d representing an isotropic magnification, rotation and mirroring\n"
-    "@args mag, rotation, mirror\n"
     "@param mag The magnification in x direction\n"
     "@param rotation The rotation angle (in degree)\n"
     "@param mirror The mirror flag (at x axis)\n"
@@ -132,9 +128,8 @@ gsi::Class<db::Matrix2d> decl_Matrix2d ("db", "Matrix2d",
     "This constructor is called 'newc' to distinguish it from the constructors taking matrix coefficients ('c' is for composite).\n"
     "The order of execution of the operations is mirror, magnification, rotation (as for complex transformations).\n"
   ) +
-  gsi::constructor ("newc", &new_matrix2d_smrm, 
+  gsi::constructor ("newc", &new_matrix2d_smrm, gsi::arg ("shear"), gsi::arg ("mx"), gsi::arg ("my"), gsi::arg ("rotation"), gsi::arg ("mirror"),
     "@brief Create a new Matrix2d representing a shear, anisotropic magnification, rotation and mirroring\n"
-    "@args shear, mx, my, rotation, mirror\n"
     "@param shear The shear angle\n"
     "@param mx The magnification in x direction\n"
     "@param my The magnification in y direction\n"
@@ -144,9 +139,8 @@ gsi::Class<db::Matrix2d> decl_Matrix2d ("db", "Matrix2d",
     "The order of execution of the operations is mirror, magnification, shear and rotation.\n"
     "This constructor is called 'newc' to distinguish it from the constructor taking the four matrix coefficients ('c' is for composite).\n"
   ) +
-  gsi::constructor ("new", &new_matrix2d_m4, 
+  gsi::constructor ("new", &new_matrix2d_m4, gsi::arg ("m11"), gsi::arg ("m12"), gsi::arg ("m21"), gsi::arg ("m22"),
     "@brief Create a new Matrix2d from the four coefficients\n"
-    "@args m11, m12, m21, m22\n"
   ) +
   gsi::method ("m11", &db::Matrix2d::m11, 
     "@brief Gets the m11 coefficient.\n"
@@ -164,9 +158,8 @@ gsi::Class<db::Matrix2d> decl_Matrix2d ("db", "Matrix2d",
     "@brief Gets the m22 coefficient.\n"
     "@return The value of the m22 coefficient\n"
   ) +
-  gsi::method_ext ("m", &coeff_m, 
+  gsi::method_ext ("m", &coeff_m, gsi::arg ("i"), gsi::arg ("j"),
     "@brief Gets the m coefficient with the given index.\n"
-    "@args i,j\n"
     "@return The coefficient [i,j]\n"
   ) +
   gsi::method ("to_s", &db::Matrix2d::to_string, 
@@ -177,21 +170,18 @@ gsi::Class<db::Matrix2d> decl_Matrix2d ("db", "Matrix2d",
     "@brief The inverse of this matrix.\n"
     "@return The inverse of this matrix\n"
   ) +
-  gsi::method_ext ("trans", &trans_p,
+  gsi::method_ext ("trans", &trans_p, gsi::arg ("p"),
     "@brief Transforms a point with this matrix.\n"
-    "@args p\n"
     "@param p The point to transform.\n"
     "@return The product if self and the point p\n"
   ) +
-  gsi::method_ext ("*", &prod_m, 
+  gsi::method_ext ("*", &prod_m, gsi::arg ("m"),
     "@brief Product of two matrices.\n"
-    "@args m\n"
     "@param m The other matrix.\n"
     "@return The matrix product self*m\n"
   ) +
-  gsi::method_ext ("+", &sum_m, 
+  gsi::method_ext ("+", &sum_m, gsi::arg ("m"),
     "@brief Sum of two matrices.\n"
-    "@args m\n"
     "@param m The other matrix.\n"
     "@return The (element-wise) sum of self+m\n"
   ) +
@@ -373,19 +363,16 @@ gsi::Class<db::Matrix3d> decl_Matrix3d ("db", "Matrix3d",
   gsi::constructor ("new", &new_matrix3d,
     "@brief Create a new Matrix3d representing a unit transformation"
   ) +
-  gsi::constructor ("new", &new_matrix3d_m,
+  gsi::constructor ("new", &new_matrix3d_m, gsi::arg ("m"),
     "@brief Create a new Matrix3d representing a magnification\n"
-    "@args m\n"
     "@param m The magnification\n"
   ) +
-  gsi::constructor ("new", &new_matrix3d_t,
+  gsi::constructor ("new", &new_matrix3d_t, gsi::arg ("t"),
     "@brief Create a new Matrix3d from the given complex transformation"
-    "@args t\n"
     "@param t The transformation from which to create the matrix\n"
   ) +
-  gsi::constructor ("newc", &new_matrix3d_mrm, 
+  gsi::constructor ("newc", &new_matrix3d_mrm, gsi::arg ("mag"), gsi::arg ("rotation"), gsi::arg ("mirrx"),
     "@brief Create a new Matrix3d representing a isotropic magnification, rotation and mirroring\n"
-    "@args mag, rotation, mirrx\n"
     "@param mag The magnification\n"
     "@param rotation The rotation angle (in degree)\n"
     "@param mirrx The mirror flag (at x axis)\n"
@@ -393,9 +380,8 @@ gsi::Class<db::Matrix3d> decl_Matrix3d ("db", "Matrix3d",
     "The order of execution of the operations is mirror, magnification and rotation.\n"
     "This constructor is called 'newc' to distinguish it from the constructors taking coefficients ('c' is for composite).\n"
   ) +
-  gsi::constructor ("newc", &new_matrix3d_smrm, 
+  gsi::constructor ("newc", &new_matrix3d_smrm, gsi::arg ("shear"), gsi::arg ("mx"), gsi::arg ("my"), gsi::arg ("rotation"), gsi::arg ("mirrx"),
     "@brief Create a new Matrix3d representing a shear, anisotropic magnification, rotation and mirroring\n"
-    "@args shear, mx, my, rotation, mirrx\n"
     "@param shear The shear angle\n"
     "@param mx The magnification in x direction\n"
     "@param mx The magnification in y direction\n"
@@ -405,9 +391,8 @@ gsi::Class<db::Matrix3d> decl_Matrix3d ("db", "Matrix3d",
     "The order of execution of the operations is mirror, magnification, rotation and shear.\n"
     "This constructor is called 'newc' to distinguish it from the constructor taking the four matrix coefficients ('c' is for composite).\n"
   ) +
-  gsi::constructor ("newc", &new_matrix3d_dsmrm, 
+  gsi::constructor ("newc", &new_matrix3d_dsmrm, gsi::arg ("u"), gsi::arg ("shear"), gsi::arg ("mx"), gsi::arg ("my"), gsi::arg ("rotation"), gsi::arg ("mirrx"),
     "@brief Create a new Matrix3d representing a displacement, shear, anisotropic magnification, rotation and mirroring\n"
-    "@args u, shear, mx, my, rotation, mirrx\n"
     "@param u The displacement\n"
     "@param shear The shear angle\n"
     "@param mx The magnification in x direction\n"
@@ -420,9 +405,8 @@ gsi::Class<db::Matrix3d> decl_Matrix3d ("db", "Matrix3d",
     "\n"
     "Starting with version 0.25 the displacement is of vector type."
   ) +
-  gsi::constructor ("newc", &new_matrix3d_pdsmrm, 
+  gsi::constructor ("newc", &new_matrix3d_pdsmrm, gsi::arg ("tx"), gsi::arg ("ty"), gsi::arg ("z"), gsi::arg ("u"), gsi::arg ("shear"), gsi::arg ("mx"), gsi::arg ("my"), gsi::arg ("rotation"), gsi::arg ("mirrx"),
     "@brief Create a new Matrix3d representing a perspective distortion, displacement, shear, anisotropic magnification, rotation and mirroring\n"
-    "@args tx, ty, z, u, shear, mx, my, rotation, mirrx\n"
     "@param tx The perspective tilt angle x (around the y axis)\n"
     "@param ty The perspective tilt angle y (around the x axis)\n"
     "@param z The observer distance at which the tilt angles are given\n"
@@ -442,21 +426,17 @@ gsi::Class<db::Matrix3d> decl_Matrix3d ("db", "Matrix3d",
     "\n"
     "Starting with version 0.25 the displacement is of vector type."
   ) +
-  gsi::constructor ("new", &new_matrix3d_m4, 
+  gsi::constructor ("new", &new_matrix3d_m4, gsi::arg ("m11"), gsi::arg ("m12"), gsi::arg ("m21"), gsi::arg ("m22"),
     "@brief Create a new Matrix3d from the four coefficients of a Matrix2d\n"
-    "@args m11, m12, m21, m22\n"
   ) +
-  gsi::constructor ("new", &new_matrix3d_m6, 
+  gsi::constructor ("new", &new_matrix3d_m6, gsi::arg ("m11"), gsi::arg ("m12"), gsi::arg ("m21"), gsi::arg ("m22"), gsi::arg ("dx"), gsi::arg ("dy"),
     "@brief Create a new Matrix3d from the four coefficients of a Matrix2d plus a displacement\n"
-    "@args m11, m12, m21, m22, dx, dy\n"
   ) +
-  gsi::constructor ("new", &new_matrix3d_m9, 
+  gsi::constructor ("new", &new_matrix3d_m9, gsi::arg ("m11"), gsi::arg ("m12"), gsi::arg ("m13"), gsi::arg ("m21"), gsi::arg ("m22"), gsi::arg ("m23"), gsi::arg ("m31"), gsi::arg ("m32"), gsi::arg ("m33"),
     "@brief Create a new Matrix3d from the nine matrix coefficients\n"
-    "@args m11, m12, m13, m21, m22, m23, m31, m32, m33\n"
   ) +
-  gsi::method_ext ("m", &coeff_m3, 
+  gsi::method_ext ("m", &coeff_m3, gsi::arg ("i"), gsi::arg ("j"),
     "@brief Gets the m coefficient with the given index.\n"
-    "@args i,j\n"
     "@return The coefficient [i,j]\n"
   ) +
   gsi::method ("to_s", &db::Matrix3d::to_string, 
@@ -467,27 +447,23 @@ gsi::Class<db::Matrix3d> decl_Matrix3d ("db", "Matrix3d",
     "@brief The inverse of this matrix.\n"
     "@return The inverse of this matrix\n"
   ) +
-  gsi::method_ext ("trans", &trans_p3,
+  gsi::method_ext ("trans", &trans_p3, gsi::arg ("p"),
     "@brief Transforms a point with this matrix.\n"
-    "@args p\n"
     "@param p The point to transform.\n"
     "@return The product if self and the point p\n"
   ) +
-  gsi::method_ext ("*", &prod_m3, 
+  gsi::method_ext ("*", &prod_m3, gsi::arg ("m"),
     "@brief Product of two matrices.\n"
-    "@args m\n"
     "@param m The other matrix.\n"
     "@return The matrix product self*m\n"
   ) +
-  gsi::method_ext ("*", &trans_p3, 
+  gsi::method_ext ("*", &trans_p3, gsi::arg ("p"),
     "@brief Transform a point.\n"
-    "@args p\n"
     "@param p The point to transform.\n"
     "@return The transformed point\n"
   ) +
-  gsi::method_ext ("+", &sum_m3, 
+  gsi::method_ext ("+", &sum_m3, gsi::arg ("m"),
     "@brief Sum of two matrices.\n"
-    "@args m\n"
     "@param m The other matrix.\n"
     "@return The (element-wise) sum of self+m\n"
   ) +
@@ -522,18 +498,16 @@ gsi::Class<db::Matrix3d> decl_Matrix3d ("db", "Matrix3d",
     "Starting with version 0.25 this method returns a vector type instead of a point.\n"
     "@return The displacement vector.\n"
   ) +
-  gsi::method ("tx", &db::Matrix3d::perspective_tilt_x,
+  gsi::method ("tx", &db::Matrix3d::perspective_tilt_x, gsi::arg ("z"),
     "@brief Returns the perspective tilt angle tx.\n"
-    "@args z\n"
     "@param z The observer distance at which the tilt angle is computed.\n"
     "@return The tilt angle tx.\n"
     "The tx and ty parameters represent the perspective distortion. They denote a tilt of the xy plane around the y axis (tx) or the x axis (ty) in degree. "
     "The same effect is achieved for different tilt angles at different observer distances. Hence, the observer distance must be specified at which the tilt angle is computed. "
     "If the magnitude of the tilt angle is not important, z can be set to 1.\n"
   ) +
-  gsi::method ("ty", &db::Matrix3d::perspective_tilt_y,
+  gsi::method ("ty", &db::Matrix3d::perspective_tilt_y, gsi::arg ("z"),
     "@brief Returns the perspective tilt angle ty.\n"
-    "@args z\n"
     "@param z The observer distance at which the tilt angle is computed.\n"
     "@return The tilt angle ty.\n"
     "The tx and ty parameters represent the perspective distortion. They denote a tilt of the xy plane around the y axis (tx) or the x axis (ty) in degree. "
@@ -545,7 +519,7 @@ gsi::Class<db::Matrix3d> decl_Matrix3d ("db", "Matrix3d",
     "@return True if this matrix has a mirror component.\n"
     "See the description of this class for details about the basic transformations."
   ) +
-  gsi::method_ext ("adjust", &adjust,
+  gsi::method_ext ("adjust", &adjust, gsi::arg ("landmarks_before"), gsi::arg ("landmarks_after"), gsi::arg ("flags"), gsi::arg ("fixed_point"),
     "@brief Adjust a 3d matrix to match the given set of landmarks\n"
     "\n"
     "This function tries to adjust the matrix\n"
@@ -553,7 +527,6 @@ gsi::Class<db::Matrix3d> decl_Matrix3d ("db", "Matrix3d",
     "or that the \"after\" landmarks will match as close as possible to the \"before\" landmarks \n"
     "(if the problem is overdetermined).\n"
     "\n"
-    "@args landmarks_before, landmarks_after, flags, fixed_point\n"
     "@param landmarks_before The points before the transformation.\n"
     "@param landmarks_after The points after the transformation.\n"
     "@param mode Selects the adjustment mode. Must be one of the Adjust... constants.\n"
@@ -594,4 +567,3 @@ gsi::Class<db::Matrix3d> decl_Matrix3d ("db", "Matrix3d",
 );
 
 }
-

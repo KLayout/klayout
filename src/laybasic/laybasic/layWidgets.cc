@@ -197,7 +197,7 @@ DitherPatternSelectionButton::update_menu ()
     lay::DitherPattern patterns;
 
     std::string s;
-    lay::PluginRoot::instance ()->config_get (cfg_stipple_palette, s);
+    lay::Dispatcher::instance ()->config_get (cfg_stipple_palette, s);
     lay::StipplePalette palette;
     palette.from_string (s);
 
@@ -831,7 +831,7 @@ ColorButton::build_color_menu (QMenu *menu, QObject *receiver, const char *brows
   try {
 
     std::string s;
-    lay::PluginRoot::instance ()->config_get (cfg_color_palette, s);
+    lay::Dispatcher::instance ()->config_get (cfg_color_palette, s);
     lay::ColorPalette palette;
     palette.from_string (s);
 

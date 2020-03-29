@@ -48,7 +48,7 @@ namespace edt
 // -----------------------------------------------------------------------------
 //  Main Service implementation
 
-MainService::MainService (db::Manager *manager, lay::LayoutView *view, lay::PluginRoot *root)
+MainService::MainService (db::Manager *manager, lay::LayoutView *view, lay::Dispatcher *root)
   : lay::Plugin (view),
     lay::Editable (view),
     db::Object (manager),

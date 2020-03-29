@@ -52,7 +52,7 @@ namespace lay
 {
 
 class LayoutView;
-class PluginRoot;
+class Dispatcher;
 class FileDialog;
 
 class LAYBASIC_PUBLIC LoadLayoutOptionsDialog
@@ -64,7 +64,7 @@ public:
   LoadLayoutOptionsDialog (QWidget *parent, const std::string &title);
   ~LoadLayoutOptionsDialog ();
 
-  bool edit_global_options (lay::PluginRoot *config_root, db::Technologies *technologies);
+  bool edit_global_options (lay::Dispatcher *dispatcher, db::Technologies *technologies);
   bool get_options (db::LoadLayoutOptions &options);
 
   void show_always (bool sa)

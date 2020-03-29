@@ -139,11 +139,6 @@ public:
   bool has_focus () const;
 
   /**
-   *  @brief Perform the layer control panel's initialisations on the main menu
-   */
-  static void init_menu (lay::AbstractMenu &menu);
-
-  /**
    *  @brief Tell, if there is something to copy
    */
   bool has_selection () const;

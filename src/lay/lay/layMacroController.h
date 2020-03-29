@@ -89,12 +89,12 @@ public:
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
-  virtual void initialized (lay::PluginRoot *root);
+  virtual void initialized (lay::Dispatcher *root);
 
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
-  virtual void uninitialize (lay::PluginRoot *root);
+  virtual void uninitialize (lay::Dispatcher *root);
 
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
@@ -109,7 +109,7 @@ public:
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
-  virtual bool can_exit (lay::PluginRoot *root) const;
+  virtual bool can_exit (lay::Dispatcher *root) const;
 
   /**
    *  @brief Gets a value indicating whether the plugin will accept a dropped file with the given URL or path
@@ -161,11 +161,6 @@ public:
    *  The MainWindow object will become owner of the macro object.
    */
   void add_temp_macro (lym::Macro *m);
-
-  /**
-   *  @brief Gets the macro associated with an Action or nil if there is none
-   */
-  lym::Macro *macro_for_action (const lay::Action *action);
 
   /**
    *  @brief Obtain the list of macro categories
@@ -236,8 +231,7 @@ private:
   lay::MacroEditorDialog *mp_macro_editor;
   lay::MainWindow *mp_mw;
   bool m_no_implicit_macros;
-  std::vector<lay::Action> m_macro_actions;
-  std::map<QAction *, lym::Macro *> m_action_to_macro;
+  tl::weak_collection<lay::Action> m_macro_actions;
   lym::MacroCollection m_temp_macros;
   std::vector<MacroCategory> m_macro_categories;
   std::vector<InternalPathDescriptor> m_internal_paths;

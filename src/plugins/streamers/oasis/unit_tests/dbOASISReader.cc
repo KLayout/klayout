@@ -81,7 +81,7 @@ compare_ref (tl::TestBase *_this, const char *test, const db::Layout &layout)
 void
 run_test (tl::TestBase *_this, const char *test)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout (&m);
   std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t";
@@ -106,7 +106,7 @@ run_test (tl::TestBase *_this, const char *test)
 void
 run_test_error (tl::TestBase *_this, const char *test, const char *msg_au)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout (&m);
   std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t";
@@ -435,7 +435,7 @@ TEST(99)
     "end_lib\n"
   ;
 
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout (&m);
 
   {
@@ -518,7 +518,7 @@ TEST(100)
     "end_lib\n"
   ;
 
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout (&m);
 
   {
@@ -540,7 +540,7 @@ TEST(100)
 
 TEST(Bug_121_1)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout (&m);
 
   {
@@ -561,7 +561,7 @@ TEST(Bug_121_1)
 
 TEST(Bug_121_2)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout layout (&m);
 
   {

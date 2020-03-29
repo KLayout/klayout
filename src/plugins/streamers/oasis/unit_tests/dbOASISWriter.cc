@@ -36,7 +36,7 @@
 void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int compr, bool recompress)
 {
   {
-    db::Manager m;
+    db::Manager m (false);
     db::Layout layout_org (&m);
     std::string fn (tl::testsrc ());
     fn += "/testdata/oasis/";
@@ -81,7 +81,7 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
   }
 
   {
-    db::Manager m;
+    db::Manager m (false);
     db::Layout layout_org (&m);
     std::string fn (tl::testsrc ());
     fn += "/testdata/oasis/";
@@ -137,7 +137,7 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
   }
 
   {
-    db::Manager m;
+    db::Manager m (false);
     db::Layout layout_org (&m);
     std::string fn (tl::testsrc ());
     fn += "/testdata/oasis/";
@@ -186,7 +186,7 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
   }
 
   {
-    db::Manager m;
+    db::Manager m (false);
     db::Layout layout_org (&m);
     std::string fn (tl::testsrc ());
     fn += "/testdata/oasis/";
@@ -237,7 +237,7 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
 
   if (scaling_test) {
 
-    db::Manager m;
+    db::Manager m (false);
     db::Layout layout (&m);
     std::string fn (tl::testsrc ());
     fn += "/testdata/oasis/";
@@ -513,7 +513,7 @@ TEST(40)
 
 TEST(100)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp0;
@@ -596,7 +596,7 @@ TEST(100)
 
 TEST(101)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp0;
@@ -669,7 +669,7 @@ TEST(101)
 
 TEST(102)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp0;
@@ -750,7 +750,7 @@ TEST(102)
 
 TEST(103)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp0;
@@ -824,7 +824,7 @@ TEST(103)
 
 TEST(110)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp0;
@@ -901,7 +901,7 @@ TEST(110)
 
 TEST(111)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp0;
@@ -975,7 +975,7 @@ TEST(111)
 
 TEST(112)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp0;
@@ -1053,7 +1053,7 @@ TEST(112)
 
 TEST(113)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp0;
@@ -1127,7 +1127,7 @@ TEST(113)
 
 TEST(114)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp1;
@@ -1182,7 +1182,7 @@ TEST(114)
 
 TEST(115)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::property_names_id_type n1, n2, n3;
@@ -1262,7 +1262,7 @@ TEST(115)
 
 TEST(116)
 {
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::property_names_id_type n1, n2, n3;
@@ -1612,7 +1612,7 @@ TEST(117)
 {
   //  polygons and boxes without area
   
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp1;
@@ -1679,7 +1679,7 @@ TEST(118)
 {
   //  1x1 arrays (#902)
 
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   db::LayerProperties lp1;
@@ -1734,7 +1734,7 @@ TEST(119_WithAndWithoutContext)
 {
   //  PCells with context and without
 
-  db::Manager m;
+  db::Manager m (false);
   db::Layout g (&m);
 
   //  Note: this sample requires the BASIC lib

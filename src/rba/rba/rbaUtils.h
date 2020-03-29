@@ -201,6 +201,7 @@ void rba_check_error ();
 VALUE rba_string_value_f (VALUE obj);
 VALUE rba_safe_string_value (VALUE obj);
 VALUE rba_safe_obj_as_string (VALUE obj);
+VALUE rba_safe_inspect (VALUE obj);
 int rba_num2int_f (VALUE obj);
 int rba_safe_num2int (VALUE obj);
 unsigned int rba_num2uint_f (VALUE obj);

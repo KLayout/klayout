@@ -213,6 +213,15 @@ rba_safe_obj_as_string (VALUE obj)
 }
 
 /**
+ *  @brief object to string with check
+ */
+VALUE
+rba_safe_inspect (VALUE obj)
+{
+  return rba_safe_func (rb_inspect, obj);
+}
+
+/**
  *  @brief needed because NUM2INT may be a macro:
  */
 int

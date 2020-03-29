@@ -60,15 +60,13 @@ lay::HelpDialog *new_help_dialog_with_parent (QWidget *parent, bool modal)
 }
 
 Class<lay::HelpDialog> decl_HelpDialog (QT_EXTERNAL_BASE (QDialog) "lay", "HelpDialog",
-  method ("new", new_help_dialog, 
+  method ("new", new_help_dialog, gsi::arg ("modal"),
     "@brief Creates a new help dialog\n"
-    "@args modal\n"
     "If the modal flag is true, the dialog will be shown as a modal window.\n"
   ) +
 #if defined(HAVE_QTBINDINGS)
-  method ("new", new_help_dialog_with_parent, 
+  method ("new", new_help_dialog_with_parent, gsi::arg ("parent"), gsi::arg ("modal"),
     "@brief Creates a new help dialog\n"
-    "@args parent, modal\n"
     "If the modal flag is true, the dialog will be shown as a modal window.\n"
   ) +
 #else
@@ -79,14 +77,12 @@ Class<lay::HelpDialog> decl_HelpDialog (QT_EXTERNAL_BASE (QDialog) "lay", "HelpD
     "@brief Executes the dialog (shows it modally)\n"
   ) +
 #endif
-  method ("search", &lay::HelpDialog::search, 
+  method ("search", &lay::HelpDialog::search, gsi::arg ("topic"),
     "@brief Issues a search on the specified topic\n"
-    "@args topic\n"
     "This method will call the search page with the given topic.\n"
   ) +
-  method ("load", &lay::HelpDialog::load, 
+  method ("load", &lay::HelpDialog::load, gsi::arg ("url"),
     "@brief Loads the specified URL\n"
-    "@args url\n"
     "This method will call the page with the given URL.\n"
   ),
 
@@ -119,4 +115,3 @@ Class<lay::HelpSource> decl_HelpSource (laybasicdecl_BrowserSource (), "lay", "H
 );
 
 }
-

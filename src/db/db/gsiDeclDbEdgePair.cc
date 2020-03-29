@@ -80,16 +80,14 @@ struct edge_pair_defs
     method ("first", (const edge_type &(C::*) () const) &C::first, 
       "@brief Gets the first edge\n"
     ) + 
-    method ("first=", &C::set_first, 
+    method ("first=", &C::set_first, gsi::arg ("edge"),
       "@brief Sets the first edge\n"
-      "@args edge\n"
     ) + 
     method ("second", (const edge_type &(C::*) () const) &C::second, 
       "@brief Gets the second edge\n"
     ) + 
-    method ("second=", &C::set_second, 
+    method ("second=", &C::set_second, gsi::arg ("edge"),
       "@brief Sets the second edge\n"
-      "@args edge\n"
     ) + 
     method ("normalized", &C::normalized, 
       "@brief Normalizes the edge pair\n"
@@ -100,9 +98,8 @@ struct edge_pair_defs
       "because that way the polygons won't be self-overlapping and the enlargement parameter "
       "is applied properly."
     ) + 
-    method ("polygon", &C::to_polygon, 
+    method ("polygon", &C::to_polygon, gsi::arg ("e The enlargement (set to zero for exact representation)"),
       "@brief Convert an edge pair to a polygon\n"
-      "@args e The enlargement (set to zero for exact representation)\n"
       "The polygon is formed by connecting the end and start points of the edges. It is recommended to "
       "use \\normalized before converting the edge pair to a polygon.\n"
       "\n"
@@ -113,9 +110,8 @@ struct edge_pair_defs
       "\n"
       "Another version for converting edge pairs to simple polygons is \\simple_polygon which renders a \\SimplePolygon object."
     ) + 
-    method ("simple_polygon", &C::to_simple_polygon, 
+    method ("simple_polygon", &C::to_simple_polygon, gsi::arg ("e The enlargement (set to zero for exact representation)"),
       "@brief Convert an edge pair to a simple polygon\n"
-      "@args e The enlargement (set to zero for exact representation)\n"
       "The polygon is formed by connecting the end and start points of the edges. It is recommended to "
       "use \\normalized before converting the edge pair to a polygon.\n"
       "\n"
@@ -126,9 +122,8 @@ struct edge_pair_defs
       "\n"
       "Another version for converting edge pairs to polygons is \\polygon which renders a \\Polygon object."
     ) + 
-    constructor ("from_s", &from_string,
+    constructor ("from_s", &from_string, gsi::arg ("s"),
       "@brief Creates an object from a string\n"
-      "@args s\n"
       "Creates the object from a string representation (as returned by \\to_s)\n"
       "\n"
       "This method has been added in version 0.23.\n"
@@ -139,23 +134,20 @@ struct edge_pair_defs
     method ("bbox", &C::bbox, 
       "@brief Gets the bounding box of the edge pair\n"
     ) +
-    method ("<", &C::less,
+    method ("<", &C::less, gsi::arg ("box"),
       "@brief Less operator\n"
-      "@args box\n"
       "Returns true, if this edge pair is 'less' with respect to first and second edge\n"
       "\n"
       "This method has been introduced in version 0.25.\n"
     ) +
-    method ("==", &C::equal,
+    method ("==", &C::equal, gsi::arg ("box"),
       "@brief Equality\n"
-      "@args box\n"
       "Returns true, if this edge pair and the given one are equal\n"
       "\n"
       "This method has been introduced in version 0.25.\n"
     ) +
-    method ("!=", &C::not_equal,
+    method ("!=", &C::not_equal, gsi::arg ("box"),
       "@brief Inequality\n"
-      "@args box\n"
       "Returns true, if this edge pair and the given one are not equal\n"
       "\n"
       "This method has been introduced in version 0.25.\n"
@@ -166,9 +158,8 @@ struct edge_pair_defs
       "\n"
       "This method has been introduced in version 0.25.\n"
     ) +
-    method ("transformed", &C::template transformed<simple_trans_type>,
+    method ("transformed", &C::template transformed<simple_trans_type>, gsi::arg ("t"),
       "@brief Returns the transformed pair\n"
-      "@args t\n"
       "\n"
       "Transforms the edge pair with the given transformation.\n"
       "Does not modify the edge pair but returns the transformed edge.\n"
@@ -177,9 +168,8 @@ struct edge_pair_defs
       "\n"
       "@return The transformed edge pair\n"
     ) +
-    method ("transformed", &C::template transformed<complex_trans_type>,
+    method ("transformed", &C::template transformed<complex_trans_type>, gsi::arg ("t"),
       "@brief Returns the transformed edge pair\n"
-      "@args t\n"
       "\n"
       "Transforms the edge pair with the given complex transformation.\n"
       "Does not modify the edge pair but returns the transformed edge.\n"
@@ -215,9 +205,8 @@ Class<db::EdgePair> decl_EdgePair ("db", "EdgePair",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method ("transformed", &db::EdgePair::transformed<db::ICplxTrans>,
+  method ("transformed", &db::EdgePair::transformed<db::ICplxTrans>, gsi::arg ("t"),
     "@brief Returns the transformed edge pair\n"
-    "@args t\n"
     "\n"
     "Transforms the edge pair with the given complex transformation.\n"
     "Does not modify the edge pair but returns the transformed edge.\n"
@@ -265,10 +254,9 @@ Class<db::DEdgePair> decl_DEdgePair ("db", "DEdgePair",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method ("transformed", &db::DEdgePair::transformed<db::VCplxTrans>,
+  method ("transformed", &db::DEdgePair::transformed<db::VCplxTrans>, gsi::arg ("t"),
     "@brief Transforms the edge pair with the given complex transformation\n"
     "\n"
-    "@args t\n"
     "\n"
     "@param t The magnifying transformation to apply\n"
     "@return The transformed edge pair (in this case an integer coordinate edge pair)\n"
@@ -290,4 +278,3 @@ Class<db::DEdgePair> decl_DEdgePair ("db", "DEdgePair",
 );
 
 }
-

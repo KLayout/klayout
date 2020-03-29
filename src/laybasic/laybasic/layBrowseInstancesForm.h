@@ -46,8 +46,8 @@ class BrowseInstancesConfigPage
 public:
   BrowseInstancesConfigPage (QWidget *parent);
 
-  virtual void setup (lay::PluginRoot *root);
-  virtual void commit (lay::PluginRoot *root);
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
 
 public slots:
   void context_changed (int);
@@ -64,7 +64,7 @@ public:
   enum mode_type { ToCellView = 0, AnyTop, Parent };
   enum window_type { DontChange = 0, FitCell, FitMarker, Center, CenterSize };
 
-  BrowseInstancesForm (lay::PluginRoot *root, lay::LayoutView *view);
+  BrowseInstancesForm (lay::Dispatcher *root, lay::LayoutView *view);
   ~BrowseInstancesForm ();
 
   bool eventFilter (QObject *watched, QEvent *event);

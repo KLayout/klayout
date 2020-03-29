@@ -43,7 +43,7 @@ class FillDialog
 Q_OBJECT 
 
 public:
-  FillDialog (lay::PluginRoot *root, lay::LayoutView *view);
+  FillDialog (lay::Dispatcher *root, lay::LayoutView *view);
   ~FillDialog ();
 
 public slots:

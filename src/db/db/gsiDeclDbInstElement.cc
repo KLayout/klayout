@@ -92,14 +92,12 @@ Class<db::InstElement> decl_InstElement ("db", "InstElement",
   gsi::constructor ("new", &new_v,
     "@brief Default constructor"
   ) +
-  gsi::constructor ("new|#new_i", &new_i,
+  gsi::constructor ("new|#new_i", &new_i, gsi::arg ("inst"),
     "@brief Create an instance element from a single instance alone\n"
-    "@args inst\n"
     "Starting with version 0.15, this method takes an \\Instance object (an instance reference) as the argument.\n"
   ) +
-  gsi::constructor ("new|#new_iab", &new_iab,
+  gsi::constructor ("new|#new_iab", &new_iab, gsi::arg ("inst"), gsi::arg ("a_index"), gsi::arg ("b_index"),
     "@brief Create an instance element from an array instance pointing into a certain array member\n"
-    "@args inst, a_index, b_index\n"
     "Starting with version 0.15, this method takes an \\Instance object (an instance reference) as the first argument.\n"
   ) +
   gsi::method_ext ("inst", &inst,
@@ -117,19 +115,16 @@ Class<db::InstElement> decl_InstElement ("db", "InstElement",
     "\n"
     "This method is equivalent to \"self.inst.prop_id\" and provided for convenience.\n"
   ) +
-  gsi::method ("<", &db::InstElement::operator<,
+  gsi::method ("<", &db::InstElement::operator<, gsi::arg ("b"),
     "@brief Provides an order criterion for two InstElement objects\n"
-    "@args b\n"
     "Note: this operator is just provided to establish any order, not a particular one."
   ) +
-  gsi::method ("!=", &db::InstElement::operator!=,
+  gsi::method ("!=", &db::InstElement::operator!=, gsi::arg ("b"),
     "@brief Inequality of two InstElement objects\n"
-    "@args b\n"
     "See the comments on the == operator.\n"
   ) +
-  gsi::method ("==", &db::InstElement::operator==,
+  gsi::method ("==", &db::InstElement::operator==, gsi::arg ("b"),
     "@brief Equality of two InstElement objects\n"
-    "@args b\n"
     "Note: this operator returns true if both instance elements refer to the same instance, not just identical ones."
   ) +
   gsi::method_ext ("ia", &array_index_a,
@@ -182,4 +177,3 @@ Class<db::InstElement> decl_InstElement ("db", "InstElement",
 );
 
 }  // namespace gsi
-

@@ -117,11 +117,11 @@ circuit RINGO ();
 end;
 """)
 
-    self.assertEqual(repr(l2n.probe_net(rmetal2, pya.DPoint(0.0, 1.8))), "RINGO:FB")
+    self.assertEqual(str(l2n.probe_net(rmetal2, pya.DPoint(0.0, 1.8))), "RINGO:FB")
     self.assertEqual(repr(l2n.probe_net(rmetal2, pya.DPoint(-2.0, 1.8))), "None")
 
     n = l2n.probe_net(rmetal1, pya.Point(2600, 1000))
-    self.assertEqual(repr(n), "RINGO:$I20")
+    self.assertEqual(str(n), "RINGO:$I20")
 
     self.assertEqual(str(l2n.shapes_of_net(n, rmetal1, True)), "(1660,-420;1660,2420;2020,2420;2020,-420);(1840,820;1840,1180;3220,1180;3220,820);(1660,2420;1660,3180;2020,3180;2020,2420);(1660,-380;1660,380;2020,380;2020,-380)")
 

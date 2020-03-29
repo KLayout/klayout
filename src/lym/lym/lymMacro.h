@@ -25,6 +25,7 @@
 #define HDR_lymMacro
 
 #include "lymCommon.h"
+#include "tlObject.h"
 
 #include <string>
 #include <map>
@@ -55,7 +56,8 @@ class MacroCollection;
  *  by itself which interpreter to use.
  */
 class LYM_PUBLIC Macro
-  : public QObject
+  : public QObject,
+    public tl::Object
 {
 Q_OBJECT 
 
@@ -1130,26 +1132,6 @@ private:
   //  no copying
   MacroCollection (const MacroCollection &d);
   MacroCollection &operator= (const MacroCollection &d);
-};
-
-/**
- *  @brief A signal to macro adaptor
- *
- *  This class allows calling a macro from a signal
- */
-class LYM_PUBLIC MacroSignalAdaptor
-  : public QObject
-{
-Q_OBJECT 
-
-public:
-  MacroSignalAdaptor (QObject *parent, Macro *macro);
-
-public slots:
-  void run ();
-
-private:
-  Macro *mp_macro;
 };
 
 }

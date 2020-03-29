@@ -40,7 +40,7 @@ class ClipDialog
 Q_OBJECT 
 
 public:
-  ClipDialog (lay::PluginRoot *root, lay::LayoutView *view);
+  ClipDialog (lay::Dispatcher *root, lay::LayoutView *view);
   ~ClipDialog ();
 
 public slots:

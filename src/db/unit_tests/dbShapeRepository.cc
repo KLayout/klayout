@@ -256,7 +256,7 @@ TEST(2SIMPLE)
 TEST(3) 
 {
   db::GenericRepository *rep = new db::GenericRepository ();
-  db::Manager m;
+  db::Manager m (true);
 
   std::vector <db::Point> c1;
   c1.push_back (db::Point (100, 0));

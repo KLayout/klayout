@@ -56,7 +56,7 @@ extern const std::string cfg_l2ndb_max_shapes_highlighted;
 extern const std::string cfg_l2ndb_show_all;
 extern const std::string cfg_l2ndb_window_state;
 
-NetlistBrowserDialog::NetlistBrowserDialog (lay::PluginRoot *root, lay::LayoutView *vw)
+NetlistBrowserDialog::NetlistBrowserDialog (lay::Dispatcher *root, lay::LayoutView *vw)
   : lay::Browser (root, vw),
     lay::ViewService (vw->view_object_widget ()),
     Ui::NetlistBrowserDialog (),
@@ -76,7 +76,7 @@ NetlistBrowserDialog::NetlistBrowserDialog (lay::PluginRoot *root, lay::LayoutVi
 {
   Ui::NetlistBrowserDialog::setupUi (this);
 
-  browser_page->set_plugin_root (root);
+  browser_page->set_dispatcher (root);
 
   if (view ()) {
     view ()->cellviews_changed_event.add (this, &NetlistBrowserDialog::cellviews_changed);
@@ -132,7 +132,7 @@ NetlistBrowserDialog::configure_clicked ()
 {
   release_mouse ();
 
-  lay::ConfigurationDialog config_dialog (this, lay::PluginRoot::instance (), "NetlistBrowserPlugin");
+  lay::ConfigurationDialog config_dialog (this, lay::Dispatcher::instance (), "NetlistBrowserPlugin");
   config_dialog.exec ();
 }
 
@@ -747,8 +747,8 @@ NetlistBrowserDialog::deactivated ()
 {
   release_mouse ();
 
-  if (lay::PluginRoot::instance ()) {
-    lay::PluginRoot::instance ()->config_set (cfg_l2ndb_window_state, lay::save_dialog_state (this, false /*don't store the section sizes*/).c_str ());
+  if (lay::Dispatcher::instance ()) {
+    lay::Dispatcher::instance ()->config_set (cfg_l2ndb_window_state, lay::save_dialog_state (this, false /*don't store the section sizes*/).c_str ());
   }
 
   browser_page->set_l2ndb (0);

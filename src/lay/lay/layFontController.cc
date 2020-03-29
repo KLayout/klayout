@@ -40,7 +40,7 @@ FontController::FontController ()
 }
 
 void
-FontController::initialize (lay::PluginRoot * /*root*/)
+FontController::initialize (lay::Dispatcher * /*root*/)
 {
   //  NOTE: we initialize the dirs in the stage once to have them available for the autorun
   //  macros. We'll do that later again in order to pull in the dirs from the packages.
@@ -48,7 +48,7 @@ FontController::initialize (lay::PluginRoot * /*root*/)
 }
 
 void
-FontController::initialized (lay::PluginRoot * /*root*/)
+FontController::initialized (lay::Dispatcher * /*root*/)
 {
   if (lay::SaltController::instance ()) {
     connect (lay::SaltController::instance (), SIGNAL (salt_changed ()), this, SLOT (sync_with_external_sources ()));
@@ -64,7 +64,7 @@ FontController::initialized (lay::PluginRoot * /*root*/)
 }
 
 void
-FontController::uninitialize (lay::PluginRoot * /*root*/)
+FontController::uninitialize (lay::Dispatcher * /*root*/)
 {
   if (m_file_watcher) {
     disconnect (m_file_watcher, SIGNAL (fileChanged (const QString &)), this, SLOT (file_watcher_triggered ()));
@@ -103,7 +103,7 @@ FontController::config_finalize()
 }
 
 bool
-FontController::can_exit (lay::PluginRoot * /*root*/) const
+FontController::can_exit (lay::Dispatcher * /*root*/) const
 {
   //  .. nothing yet ..
   return true;

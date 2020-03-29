@@ -605,7 +605,7 @@ ApplicationBase::init_app ()
   bool editable_from_config = false;
 
   {
-    lay::PluginRoot cfg;
+    lay::Dispatcher cfg (0);
 
     for (std::vector <std::string>::const_iterator c = m_config_files.begin (); c != m_config_files.end (); ++c) {
       try {
@@ -731,7 +731,6 @@ ApplicationBase::init_app ()
   }
 
   db::set_default_editable_mode (m_editable);
-  db::enable_transactions (m_enable_undo);
 
   if (! m_gtf_record.empty ()) {
     //  since the recorder tracks QAction connections etc., it must be instantiated before every other
@@ -771,11 +770,11 @@ ApplicationBase::init_app ()
     if (tl::verbosity () >= 20) {
       tl::info << "  " << cls.current_name () << " [" << cls.current_position () << "]";
     }
-    pd->initialize (plugin_root ());
+    pd->initialize (dispatcher ());
   }
 
   //  establish the configuration
-  plugin_root ()->config_setup ();
+  dispatcher ()->config_setup ();
 
   //  Some info output 
   if (tl::verbosity () >= 20) {
@@ -863,7 +862,7 @@ ApplicationBase::exit (int result)
   //  uninitialize the plugins
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
     lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
-    pd->uninitialize (plugin_root ());
+    pd->uninitialize (dispatcher ());
   }
 
   shutdown ();
@@ -874,13 +873,13 @@ ApplicationBase::exit (int result)
 void 
 ApplicationBase::finish ()
 {
-  if (plugin_root () && m_write_config_file) {
+  if (dispatcher () && m_write_config_file) {
 
     if (! m_config_file_to_write.empty ()) {
       if (tl::verbosity () >= 20) {
         tl::info << tl::to_string (QObject::tr ("Updating configuration file ")) << m_config_file_to_write;
       }
-      plugin_root ()->write_config (m_config_file_to_write);
+      dispatcher ()->write_config (m_config_file_to_write);
     }
     if (! m_config_file_to_delete.empty () && m_config_file_to_delete != m_config_file_to_write) {
       if (tl::verbosity () >= 20) {
@@ -1009,7 +1008,7 @@ ApplicationBase::run ()
 
   for (std::vector <std::string>::const_iterator c = m_config_files.begin (); c != m_config_files.end (); ++c) {
     BEGIN_PROTECTED_CLEANUP
-      plugin_root ()->read_config (*c);
+      dispatcher ()->read_config (*c);
       //  if the last config was read successfully no reset will happen:
       config_failed = false;
     END_PROTECTED_CLEANUP {
@@ -1131,7 +1130,7 @@ ApplicationBase::run ()
     //  Give the plugins a change to do some last-minute initialisation and checks
     for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
       lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
-      pd->initialized (plugin_root ());
+      pd->initialized (dispatcher ());
     }
 
     if (! m_no_gui && m_gtf_replay.empty () && m_gtf_record.empty ()) {
@@ -1139,12 +1138,12 @@ ApplicationBase::run ()
       mw->about_to_exec ();
     }
 
-  } else if (plugin_root ()) {
+  } else if (dispatcher ()) {
 
     //  Give the plugins a change to do some last-minute initialisation and checks
     for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
       lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
-      pd->initialized (plugin_root ());
+      pd->initialized (dispatcher ());
     }
 
   }
@@ -1219,7 +1218,7 @@ ApplicationBase::process_events_impl (QEventLoop::ProcessEventsFlags /*flags*/, 
 bool 
 ApplicationBase::write_config (const std::string &config_file)
 {
-  return plugin_root () ? plugin_root ()->write_config (config_file) : 0;
+  return dispatcher () ? dispatcher ()->write_config (config_file) : 0;
 }
 
 void 
@@ -1236,38 +1235,38 @@ ApplicationBase::reset_config ()
 void 
 ApplicationBase::clear_config ()
 {
-  if (plugin_root ()) {
-    plugin_root ()->clear_config ();
+  if (dispatcher ()) {
+    dispatcher ()->clear_config ();
   }
 }
 
 bool 
 ApplicationBase::read_config (const std::string &config_file)
 {
-  return plugin_root () ? plugin_root ()->read_config (config_file) : true;
+  return dispatcher () ? dispatcher ()->read_config (config_file) : true;
 }
 
 void 
 ApplicationBase::set_config (const std::string &name, const std::string &value)
 {
-  if (plugin_root ()) {
-    plugin_root ()->config_set (name, value);
+  if (dispatcher ()) {
+    dispatcher ()->config_set (name, value);
   }
 }
 
 void 
 ApplicationBase::config_end ()
 {
-  if (plugin_root ()) {
-    plugin_root ()->config_end ();
+  if (dispatcher ()) {
+    dispatcher ()->config_end ();
   }
 }
 
 std::string 
 ApplicationBase::get_config (const std::string &name) const
 {
-  if (plugin_root ()) {
-    return plugin_root ()->config_get (name);
+  if (dispatcher ()) {
+    return dispatcher ()->config_get (name);
   } else {
     return std::string ();
   }
@@ -1277,8 +1276,8 @@ std::vector<std::string>
 ApplicationBase::get_config_names () const
 {
   std::vector<std::string> names;
-  if (plugin_root ()) {
-    plugin_root ()->get_config_names (names);
+  if (dispatcher ()) {
+    dispatcher ()->get_config_names (names);
   }
   return names;
 }
@@ -1289,7 +1288,6 @@ ApplicationBase::get_config_names () const
 GuiApplication::GuiApplication (int &argc, char **argv)
   : QApplication (argc, argv), ApplicationBase (false),
     mp_mw (0),
-    mp_plugin_root (0),
     mp_recorder (0)
 {
   //  install a special style proxy to overcome the issue of black-on-black tree expanders
@@ -1306,13 +1304,10 @@ GuiApplication::~GuiApplication ()
   //  uninitialize the plugins
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
     lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
-    pd->uninitialize (plugin_root ());
+    pd->uninitialize (dispatcher ());
   }
 
   shutdown ();
-
-  delete mp_plugin_root;
-  mp_plugin_root = 0;
 }
 
 bool
@@ -1409,6 +1404,14 @@ GuiApplication::exec ()
 void
 GuiApplication::shutdown ()
 {
+  //  avoid deferred execution later on where there isn't a valid main window anymore
+  //  (problem case: showing a dialog inside main windows's destroyed signal - this will
+  //  process events and trigger execution if not disabled)
+  if (! tl::DeferredMethodScheduler::instance ()->is_disabled ()) {
+    tl::DeferredMethodScheduler::instance ()->execute ();
+  }
+  tl::DeferredMethodScheduler::instance ()->enable (false);
+
   if (mp_mw) {
     delete mp_mw;
     mp_mw = 0;
@@ -1465,20 +1468,18 @@ GuiApplication::start_recording ()
   }
 }
 
-lay::PluginRoot *
-GuiApplication::plugin_root () const
+lay::Dispatcher *
+GuiApplication::dispatcher () const
 {
-  return mp_plugin_root;
+  return mp_mw;
 }
 
 void
 GuiApplication::setup ()
 {
-  tl_assert (mp_mw == 0 && mp_plugin_root == 0);
+  tl_assert (mp_mw == 0);
 
-  mp_plugin_root = new lay::PluginRootToMainWindow ();
-  mp_mw = new lay::MainWindow (this, mp_plugin_root, "main_window");
-  mp_plugin_root->attach_to (mp_mw);
+  mp_mw = new lay::MainWindow (this, 0, "main_window", is_undo_enabled ());
 
   QObject::connect (mp_mw, SIGNAL (closed ()), this, SLOT (quit ()));
 
@@ -1522,7 +1523,7 @@ NonGuiApplication::NonGuiApplication (int &argc, char **argv)
   : QCoreApplication (argc, argv), ApplicationBase (true),
     mp_pr (0),
     mp_pb (0),
-    mp_plugin_root (0)
+    mp_dispatcher (0)
 {
   //  .. nothing yet ..
 }
@@ -1532,7 +1533,7 @@ NonGuiApplication::~NonGuiApplication ()
   //  uninitialize the plugins
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
     lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
-    pd->uninitialize (plugin_root ());
+    pd->uninitialize (dispatcher ());
   }
 
   shutdown ();
@@ -1548,9 +1549,9 @@ NonGuiApplication::exec ()
 void
 NonGuiApplication::shutdown ()
 {
-  if (mp_plugin_root) {
-    delete mp_plugin_root;
-    mp_plugin_root = 0;
+  if (mp_dispatcher) {
+    delete mp_dispatcher;
+    mp_dispatcher = 0;
   }
 
   if (mp_pr) {
@@ -1572,7 +1573,7 @@ NonGuiApplication::setup ()
   mp_pr = new lay::ProgressReporter ();
   mp_pb = new TextProgress (10 /*verbosity level*/);
   mp_pr->set_progress_bar (mp_pb);
-  mp_plugin_root = new lay::PluginRoot ();
+  mp_dispatcher = new lay::Dispatcher (0);
 }
 
 }

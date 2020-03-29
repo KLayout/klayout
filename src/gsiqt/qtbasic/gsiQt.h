@@ -570,14 +570,14 @@ struct pair_decl
   {
     return
       gsi::constructor("new", &pair_default_ctor, "@brief Creates a new pair") +
-      gsi::constructor("new", &pair_ctor, "@brief Creates a new pair from the given arguments\n@args first, second") +
-      gsi::method_ext("first", &pair_first, "@brief Returns the first element of the pair\n") +
-      gsi::method_ext("first=", &pair_set_first, "@brief Sets the first element of the pair\n@args first") +
-      gsi::method_ext("second", &pair_second, "@brief Returns the second element of the pair\n") +
-      gsi::method_ext("second=", &pair_set_second, "@brief Sets the second element of the pair\n@args second") +
-      gsi::method_ext("==", &pair_equal, "@brief Returns true if self is equal to the other pair\n@args other")
+      gsi::constructor("new", &pair_ctor, gsi::arg ("first"), gsi::arg ("second"), "@brief Creates a new pair from the given arguments") +
+      gsi::method_ext("first", &pair_first, "@brief Returns the first element of the pair") +
+      gsi::method_ext("first=", &pair_set_first, gsi::arg ("first"), "@brief Sets the first element of the pair") +
+      gsi::method_ext("second", &pair_second, "@brief Returns the second element of the pair") +
+      gsi::method_ext("second=", &pair_set_second, gsi::arg ("second"), "@brief Sets the second element of the pair") +
+      gsi::method_ext("==", &pair_equal, gsi::arg ("other"), "@brief Returns true if self is equal to the other pair")
       // not available for all types: (TODO: separate pair declaration for those types which do)
-      // gsi::method_ext("<", &pair_less, "@brief Returns true if self is less than the other pair\n@args other")
+      // gsi::method_ext("<", &pair_less, gsi::arg ("other"), "@brief Returns true if self is less than the other pair")
     ;
   }
 };

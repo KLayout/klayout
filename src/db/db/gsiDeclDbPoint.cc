@@ -103,16 +103,14 @@ struct point_defs
     constructor ("new", &new_v,
       "@brief Default constructor: creates a point at 0,0"
     ) +
-    constructor ("new", &new_vec,
+    constructor ("new", &new_vec, gsi::arg ("v"),
       "@brief Default constructor: creates a point at from an vector\n"
-      "@args v\n"
       "This constructor is equivalent to computing point(0,0)+v.\n"
       "This method has been introduced in version 0.25."
     ) +
-    constructor ("new", &new_xy,
+    constructor ("new", &new_xy, gsi::arg ("x"), gsi::arg ("y"),
       "@brief Constructor for a point from two coordinate values\n"
       "\n"
-      "@args x, y\n"
     ) +
     method_ext ("to_v", &to_vector,
       "@brief Turns the point into a vector\n"
@@ -122,47 +120,41 @@ struct point_defs
     method_ext ("-@", &negate,
       "@brief Compute the negative of a point\n"
       "\n"
-      "@args p\n"
       "\n"
       "Returns a new point with -x, -y.\n"
       "\n"
       "This method has been added in version 0.23."
     ) +
-    method ("+", (C (C::*) (const db::vector<coord_type> &) const) &C::add,
+    method ("+", (C (C::*) (const db::vector<coord_type> &) const) &C::add, gsi::arg ("v"),
       "@brief Adds a vector to a point\n"
       "\n"
-      "@args v\n"
       "\n"
       "Adds vector v to self by adding the coordinates.\n"
       "\n"
       "Starting with version 0.25, this method expects a vector argument."
     ) +
-    method ("-", (db::vector<coord_type> (C::*) (const C &) const) &C::subtract,
+    method ("-", (db::vector<coord_type> (C::*) (const C &) const) &C::subtract, gsi::arg ("p"),
       "@brief Subtract one point from another\n"
       "\n"
-      "@args p\n"
       "\n"
       "Subtract point p from self by subtracting the coordinates. This renders a vector.\n"
       "\n"
       "Starting with version 0.25, this method renders a vector."
     ) +
-    method ("<", &C::less,
+    method ("<", &C::less, gsi::arg ("p"),
       "@brief \"less\" comparison operator\n"
       "\n"
-      "@args p\n"
       "\n"
       "This operator is provided to establish a sorting\n"
       "order\n"
     ) +
-    method ("==", &C::equal,
+    method ("==", &C::equal, gsi::arg ("p"),
       "@brief Equality test operator\n"
       "\n"
-      "@args p\n"
     ) +
-    method ("!=", &C::not_equal,
+    method ("!=", &C::not_equal, gsi::arg ("p"),
       "@brief Inequality test operator\n"
       "\n"
-      "@args p\n"
     ) +
     method_ext ("hash", &hash_value,
       "@brief Computes a hash value\n"
@@ -176,57 +168,49 @@ struct point_defs
     method ("y", &C::y,
       "@brief Accessor to the y coordinate\n"
     ) +
-    method ("x=", &C::set_x,
+    method ("x=", &C::set_x, gsi::arg ("coord"),
       "@brief Write accessor to the x coordinate\n"
-      "@args coord\n"
     ) +
-    method ("y=", &C::set_y,
+    method ("y=", &C::set_y, gsi::arg ("coord"),
       "@brief Write accessor to the y coordinate\n"
-      "@args coord\n"
     ) +
-    method_ext ("*", &scale,
+    method_ext ("*", &scale, gsi::arg ("f"),
       "@brief Scaling by some factor\n"
       "\n"
-      "@args f\n"
       "\n"
       "Returns the scaled object. All coordinates are multiplied with the given factor and if "
       "necessary rounded."
     ) +
-    method_ext ("*=", &iscale,
+    method_ext ("*=", &iscale, gsi::arg ("f"),
       "@brief Scaling by some factor\n"
       "\n"
-      "@args f\n"
       "\n"
       "Scales object in place. All coordinates are multiplied with the given factor and if "
       "necessary rounded."
     ) +
-    method_ext ("/", &divide,
+    method_ext ("/", &divide, gsi::arg ("d"),
       "@brief Division by some divisor\n"
       "\n"
-      "@args d\n"
       "\n"
       "Returns the scaled object. All coordinates are divided with the given divisor and if "
       "necessary rounded."
     ) +
-    method_ext ("/=", &idiv,
+    method_ext ("/=", &idiv, gsi::arg ("d"),
       "@brief Division by some divisor\n"
       "\n"
-      "@args d\n"
       "\n"
       "Divides the object in place. All coordinates are divided with the given divisor and if "
       "necessary rounded."
     ) +
-    method ("distance", (double (C::*) (const C &) const) &C::double_distance,
+    method ("distance", (double (C::*) (const C &) const) &C::double_distance, gsi::arg ("d"),
       "@brief The Euclidian distance to another point\n"
       "\n"
-      "@args d\n"
       "\n"
       "@param d The other point to compute the distance to.\n"
     ) +
-    method ("sq_distance", (double (C::*) (const C &) const) &C::sq_double_distance,
+    method ("sq_distance", (double (C::*) (const C &) const) &C::sq_double_distance, gsi::arg ("d"),
       "@brief The square Euclidian distance to another point\n"
       "\n"
-      "@args d\n"
       "\n"
       "@param d The other point to compute the distance to.\n"
     ) +
@@ -244,9 +228,8 @@ struct point_defs
       "\n"
       "This method has been introduced in version 0.23."
     ) +
-    constructor ("from_s", &from_string,
+    constructor ("from_s", &from_string, gsi::arg ("s"),
       "@brief Creates an object from a string\n"
-      "@args s\n"
       "Creates the object from a string representation (as returned by \\to_s)\n"
       "\n"
       "This method has been added in version 0.23.\n"
@@ -329,4 +312,3 @@ Class<db::Point> decl_Point ("db", "Point",
 );
 
 }
-

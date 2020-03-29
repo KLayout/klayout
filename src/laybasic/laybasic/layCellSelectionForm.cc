@@ -76,12 +76,12 @@ CellSelectionForm::CellSelectionForm (QWidget *parent, lay::LayoutView *view, co
   mp_case_sensitive->setChecked (true);
   mp_case_sensitive->setText (tr ("Case sensitive search"));
 
-  if (lay::PluginRoot::instance ()) {
+  if (lay::Dispatcher::instance ()) {
     bool cs = true;
-    lay::PluginRoot::instance ()->config_get (cfg_cell_selection_search_case_sensitive, cs);
+    lay::Dispatcher::instance ()->config_get (cfg_cell_selection_search_case_sensitive, cs);
     mp_case_sensitive->setChecked (cs);
     bool ue = true;
-    lay::PluginRoot::instance ()->config_get (cfg_cell_selection_search_use_expressions, ue);
+    lay::Dispatcher::instance ()->config_get (cfg_cell_selection_search_use_expressions, ue);
     mp_use_regular_expressions->setChecked (ue);
   }
 
@@ -285,9 +285,9 @@ CellSelectionForm::reject ()
 void
 CellSelectionForm::store_config ()
 {
-  if (lay::PluginRoot::instance ()) {
-    lay::PluginRoot::instance ()->config_set (cfg_cell_selection_search_case_sensitive, mp_case_sensitive->isChecked ());
-    lay::PluginRoot::instance ()->config_set (cfg_cell_selection_search_use_expressions, mp_use_regular_expressions->isChecked ());
+  if (lay::Dispatcher::instance ()) {
+    lay::Dispatcher::instance ()->config_set (cfg_cell_selection_search_case_sensitive, mp_case_sensitive->isChecked ());
+    lay::Dispatcher::instance ()->config_set (cfg_cell_selection_search_use_expressions, mp_use_regular_expressions->isChecked ());
   }
 }
 

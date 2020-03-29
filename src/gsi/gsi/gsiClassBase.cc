@@ -376,12 +376,13 @@ static SpecialMethod *
 sm_assign (const char *name, const gsi::ClassBase *cls)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (tr ("@brief Assigns another object to self\n@args other")),
+    tl::to_string (tr ("@brief Assigns another object to self")),
     false,   //  non-const
     false,   //  non-static
     MethodBase::Assign);
 
   gsi::ArgType a;
+  a.init<void> (new gsi::ArgSpecBase ("other"));
   a.set_is_cref (true);
   a.set_type (gsi::T_object);
   a.set_cls (cls);

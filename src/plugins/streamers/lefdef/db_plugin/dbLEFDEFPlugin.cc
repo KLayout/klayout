@@ -125,22 +125,52 @@ read_map_file (const std::string &path, db::LEFDEFLayerDelegate &layers)
 
         } else if (w1 == "NAME") {
 
+          //  converts a line like
+          //    "NAME M1/PINS,M2/PINS ..."
+          //  into a canonical name mapping like
+          //    "(M1/LABELS): M1.LABEL"
+          //    "(M2/LABELS): M2.LABEL"
+
+          std::vector<std::string> layers;
           std::vector<std::string> purposes = tl::split (w2, ",");
           for (std::vector<std::string>::const_iterator p = purposes.begin (); p != purposes.end (); ++p) {
-            std::string canonical_name = std::string ("(") + tl::split (*p, "/").front () + ",LABEL)";
-            lm.map (db::LayerProperties (canonical_name), n++, db::LayerProperties (layer, datatype));
+            layers.push_back (tl::split (*p, "/").front ());
           }
+
+          std::string final_name = std::string ("(") + tl::join (layers, "/") + ",LABEL)";
+          for (std::vector<std::string>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
+            std::string canonical_name = std::string ("(") + *l + ",LABEL)";
+            lm.map (db::LayerProperties (canonical_name), n, db::LayerProperties (layer, datatype, final_name));
+          }
+          ++n;
 
         } else {
 
+          //  converts a line like
+          //    "M1 SPNET,NET,PINS,LEFPINS ..."
+          //  into a canonical name mapping like
+          //    "(M1,NET):  M1.NET/PINS"
+          //    "(M1,PINS): M1.NET/PINS"
+          //  (separating, translating and recombing the purposes)
+
+          std::vector<std::string> translated_purposes;
           std::vector<std::string> purposes = tl::split (w2, ",");
           for (std::vector<std::string>::const_iterator p = purposes.begin (); p != purposes.end (); ++p) {
             std::map<std::string, std::string>::const_iterator i = purpose_translation.find (*p);
             if (i != purpose_translation.end ()) {
-              std::string canonical_name = std::string ("(") + w1 + "," + i->second + ")";
-              lm.map (db::LayerProperties (canonical_name), n++, db::LayerProperties (layer, datatype));
+              translated_purposes.push_back (i->second);
             }
           }
+
+          std::sort (translated_purposes.begin (), translated_purposes.end ());
+          translated_purposes.erase (std::unique (translated_purposes.begin (), translated_purposes.end ()), translated_purposes.end ());
+          std::string final_name = w1 + "." + tl::join (translated_purposes, "/");
+
+          for (std::vector<std::string>::const_iterator p = translated_purposes.begin (); p != translated_purposes.end (); ++p) {
+            std::string canonical_name = std::string ("(") + w1 + "," + *p + ")";
+            lm.map (db::LayerProperties (canonical_name), n, db::LayerProperties (layer, datatype, final_name));
+          }
+          ++n;
 
         }
 

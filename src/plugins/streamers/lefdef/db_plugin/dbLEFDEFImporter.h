@@ -519,6 +519,14 @@ public:
   }
 
   /**
+   *  @brief Get the layer map (non-const version)
+   */
+  db::LayerMap &layer_map ()
+  {
+    return m_layer_map;
+  }
+
+  /**
    *  @brief Create a new layer or return the index of the given layer
    */
   std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose);

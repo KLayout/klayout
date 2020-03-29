@@ -77,6 +77,124 @@ static bool is_def_format (const std::string &fn)
   return false;
 }
 
+/**
+ *  @brief Reads a map file
+ *
+ *  NOTE: this is rather experimental ... no idea what is the specification of
+ *  the map file.
+ */
+static void
+read_map_file (const std::string &path, db::LEFDEFLayerDelegate &layers)
+{
+  tl::log << tl::to_string (tr ("Reading LEF/DEF map file")) << " " << path;
+
+  db::LayerMap &lm = layers.layer_map ();
+  unsigned int n = lm.next_index ();
+
+  tl::InputFile file (path);
+  tl::InputStream file_stream (file);
+  tl::TextInputStream ts (file_stream);
+
+  std::map<std::string, std::string> purpose_translation;
+  purpose_translation ["LEFPIN"] = "PIN";
+  purpose_translation ["LEFOBS"] = "OBS";
+  purpose_translation ["SPNET"] = "NET";
+  purpose_translation ["NET"] = "NET";
+  purpose_translation ["VIA"] = "VIA";
+
+  while (! ts.at_end ()) {
+
+    const std::string &l = ts.get_line ();
+
+    tl::Extractor ex (l.c_str ());
+    if (ex.at_end () || ex.test ("#")) {
+
+      //  ignore empty of comment lines
+
+    } else {
+
+      std::string w1, w2;
+      int layer = 0, datatype = 0;
+
+      if (ex.try_read_word (w1) && ex.try_read_word (w2, "._$,/:") && ex.try_read (layer) && ex.try_read (datatype)) {
+
+        if (w1 == "DIEAREA") {
+
+          std::string canonical_name = "(OUTLINE)";
+          lm.map (db::LayerProperties (canonical_name), n++, db::LayerProperties (layer, datatype));
+
+        } else if (w1 == "NAME") {
+
+          std::vector<std::string> purposes = tl::split (w2, ",");
+          for (std::vector<std::string>::const_iterator p = purposes.begin (); p != purposes.end (); ++p) {
+            std::string canonical_name = std::string ("(") + tl::split (*p, "/").front () + ",LABEL)";
+            lm.map (db::LayerProperties (canonical_name), n++, db::LayerProperties (layer, datatype));
+          }
+
+        } else {
+
+          std::vector<std::string> purposes = tl::split (w2, ",");
+          for (std::vector<std::string>::const_iterator p = purposes.begin (); p != purposes.end (); ++p) {
+            std::map<std::string, std::string>::const_iterator i = purpose_translation.find (*p);
+            if (i != purpose_translation.end ()) {
+              std::string canonical_name = std::string ("(") + w1 + "," + i->second + ")";
+              lm.map (db::LayerProperties (canonical_name), n++, db::LayerProperties (layer, datatype));
+            }
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+}
+
+/**
+ *  @brief Imports a .map file present next to the input files
+ */
+static void
+import_map_file_heuristics (const std::string &main_path, db::LEFDEFLayerDelegate &layers)
+{
+  std::string input_dir = tl::absolute_path (main_path);
+  if (! tl::file_exists (input_dir)) {
+    return;
+  }
+
+  std::string bn = tl::basename (tl::filename (main_path));
+  std::vector<std::string> map_files;
+  std::string map_file_exact;
+
+  std::vector<std::string> entries = tl::dir_entries (input_dir);
+  for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
+
+    if (tl::to_lower_case (tl::extension (*e)) == "map") {
+
+      if (tl::basename (*e) == bn) {
+        map_file_exact = *e;
+      } else {
+        map_files.push_back (*e);
+      }
+
+    }
+
+  }
+
+  try {
+    if (! map_file_exact.empty ()) {
+      read_map_file (tl::combine_path (input_dir, map_file_exact), layers);
+      tl::log << layers.layer_map ().to_string_file_format (); // @@@
+    } else if (map_files.size () == 1) {
+      read_map_file (tl::combine_path (input_dir, map_files.front ()), layers);
+      tl::log << layers.layer_map ().to_string_file_format (); // @@@
+    }
+  } catch (tl::Exception &ex) {
+    //  ignore read errors on map file (this is a heuristics!)
+    tl::error << ex.msg ();
+  }
+}
+
 class LEFDEFReader
   : public db::ReaderBase
 {
@@ -125,6 +243,9 @@ private:
 
     //  Take the layer map and the "read all layers" flag from the reader options - hence we override the
     db::LEFDEFLayerDelegate layers (lefdef_options);
+
+    import_map_file_heuristics (m_stream.absolute_path (), layers);
+
     layers.prepare (layout);
     layout.dbu (lefdef_options->dbu ());
 
@@ -163,9 +284,11 @@ private:
 
       }
 
-      //  Additionally read all LEF files next to the DEF file
+      //  Additionally read all LEF files next to the DEF file and if there is a single .map file
+      //  or one with the same name than the input file with ".map" suffix, try to read this one too.
 
       std::string input_dir = tl::absolute_path (m_stream.absolute_path ());
+
       if (tl::file_exists (input_dir)) {
 
         std::vector<std::string> entries = tl::dir_entries (input_dir);

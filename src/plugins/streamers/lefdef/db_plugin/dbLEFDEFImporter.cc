@@ -147,18 +147,25 @@ LEFDEFLayerDelegate::open_layer (db::Layout &layout, const std::string &n, Layer
 {
   if (purpose == Outline || purpose == PlacementBlockage || purpose == Region) {
 
+    //  NOTE: the canonical name is independent from the tech component's settings
+    //  as is "(name)". It's used for implementing the automatic map file import
+    //  feature.
     std::string ld;
+    std::string canonical_name;
     bool produce;
 
     if (purpose == Outline) {
       produce = mp_tech_comp->produce_cell_outlines ();
       ld = mp_tech_comp->cell_outline_layer ();
+      canonical_name = "(OUTLINE)";
     } else if (purpose == Region) {
       produce = mp_tech_comp->produce_regions ();
       ld = mp_tech_comp->region_layer ();
+      canonical_name = "(REGION)";
     } else {
       produce = mp_tech_comp->produce_placement_blockages ();
       ld = mp_tech_comp->placement_blockage_layer ();
+      canonical_name = "(BLK)";
     }
 
     if (! produce) {
@@ -178,10 +185,9 @@ LEFDEFLayerDelegate::open_layer (db::Layout &layout, const std::string &n, Layer
 
     if (ll.first) {
 
-      //  create the layer if it is not part of the layout yet.
-      if (! layout.is_valid_layer (ll.second)) {
-        layout.insert_layer (ll.second, m_layer_map.mapping (ll.second));
-      }
+      return ll;
+
+    } else if ((ll = m_layer_map.logical (db::LayerProperties (canonical_name), layout)).first) {
 
       return ll;
 
@@ -199,67 +205,99 @@ LEFDEFLayerDelegate::open_layer (db::Layout &layout, const std::string &n, Layer
 
   } else {
 
+    if (mp_tech_comp) {
+      bool produce = true;
+      switch (purpose) {
+      case Routing:
+      default:
+        produce = mp_tech_comp->produce_routing ();
+        break;
+      case ViaGeometry:
+        produce = mp_tech_comp->produce_via_geometry ();
+        break;
+      case Label:
+        produce = mp_tech_comp->produce_labels ();
+        break;
+      case Pins:
+        produce = mp_tech_comp->produce_pins ();
+        break;
+      case Obstructions:
+        produce = mp_tech_comp->produce_obstructions ();
+        break;
+      case Blockage:
+        produce = mp_tech_comp->produce_blockages ();
+        break;
+      }
+      if (! produce) {
+        return std::make_pair (false, 0);
+      }
+    }
+
+    //  Note: "name" is the decorated name as provided by the tech component's
+    //  x_suffix specifications. As this is a variable entity, we also provide
+    //  a canonical name of the form "(layer,purpose)" where purpose is a
+    //  predefined suffix. The canonical name is the last fallback. Hence this
+    //  allows importing layer mapping files as canonical name mapping.
     std::string name (n);
-    bool produce = true;
     int dt = 0;
+
+    std::string canonical_purpose;
 
     if (mp_tech_comp) {
       switch (purpose) {
       case Routing:
       default:
-        produce = mp_tech_comp->produce_routing ();
         name += mp_tech_comp->routing_suffix ();
+        canonical_purpose = "NET";
         dt += mp_tech_comp->routing_datatype ();
         break;
       case ViaGeometry:
-        produce = mp_tech_comp->produce_via_geometry ();
         name += mp_tech_comp->via_geometry_suffix ();
         dt += mp_tech_comp->via_geometry_datatype ();
+        canonical_purpose = "VIA";
         break;
       case Label:
-        produce = mp_tech_comp->produce_labels ();
         name += mp_tech_comp->labels_suffix ();
         dt += mp_tech_comp->labels_datatype ();
+        canonical_purpose = "LABEL";
         break;
       case Pins:
-        produce = mp_tech_comp->produce_pins ();
         name += mp_tech_comp->pins_suffix ();
         dt += mp_tech_comp->pins_datatype ();
+        canonical_purpose = "PIN";
         break;
       case Obstructions:
-        produce = mp_tech_comp->produce_obstructions ();
         name += mp_tech_comp->obstructions_suffix ();
         dt += mp_tech_comp->obstructions_datatype ();
+        canonical_purpose = "OBS";
         break;
       case Blockage:
-        produce = mp_tech_comp->produce_blockages ();
         name += mp_tech_comp->blockages_suffix ();
         dt += mp_tech_comp->blockages_datatype ();
+        canonical_purpose = "BLK";
         break;
       }
     }
 
-    if (! produce) {
-      return std::make_pair (false, 0);
-    }
+    std::string canonical_name = std::string ("(") + n + "," + canonical_purpose + ")";
 
     std::pair<bool, unsigned int> ll = m_layer_map.logical (name, layout);
 
     if (ll.first) {
 
-      //  create the layer if it is not part of the layout yet.
-      if (! layout.is_valid_layer (ll.second)) {
-        layout.insert_layer (ll.second, m_layer_map.mapping (ll.second));
-      }
+      return ll;
 
+    } else if ((ll = m_layer_map.logical (db::LayerProperties (canonical_name), layout)).first) {
+
+      //  final fallback: try canonical name
       return ll;
 
     } else {
 
-      std::pair<bool, unsigned int> ll_raw = m_layer_map.logical (n, layout);
+      ll = m_layer_map.logical (n, layout);
       int ln = -1;
 
-      if (ll_raw.first && (ln = layout.get_properties (ll_raw.second).layer) >= 0) {
+      if (ll.first && (ln = layout.get_properties (ll.second).layer) >= 0) {
 
         m_layer_map.map (db::LayerProperties (name), layout.layers (), db::LayerProperties (ln, dt, name));
         m_layer_map.prepare (layout);

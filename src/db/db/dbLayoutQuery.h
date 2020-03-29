@@ -598,10 +598,7 @@ public:
   /**
    *  @brief Returns true if the iterator is at the end.
    */
-  bool at_end () const
-  {
-    return m_state.empty ();
-  }
+  bool at_end () const;
 
   /**
    *  @brief Increment the iterator: deliver the next state
@@ -644,14 +641,7 @@ public:
    *  @param v The value of the property
    *  @return True, if the property could be delivered.
    */
-  bool get (const std::string &name, tl::Variant &v)
-  {
-    if (m_state.empty () || !m_state.back () || !mp_q->has_property (name)) {
-      return false;
-    } else {
-      return m_state.back ()->get_property (mp_q->property_by_name (name), v);
-    }
-  }
+  bool get (const std::string &name, tl::Variant &v);
 
   /**
    *  @brief Gets a property for the current state (property is given by ID).
@@ -660,14 +650,7 @@ public:
    *  @param v The value of the property
    *  @return True, if the property could be delivered.
    */
-  bool get (unsigned int id, tl::Variant &v)
-  {
-    if (m_state.empty () || !m_state.back ()) {
-      return false;
-    } else {
-      return m_state.back ()->get_property (id, v);
-    }
-  }
+  bool get (unsigned int id, tl::Variant &v);
 
   /**
    *  @brief Get the eval object which provides access to the properties through expressions
@@ -690,7 +673,9 @@ private:
   tl::Eval m_eval;
   db::LayoutContextHandler m_layout_ctx;
   tl::AbsoluteProgress *mp_progress;
+  bool m_initialized;
 
+  void ensure_initialized ();
   void collect (FilterStateBase *state, std::set<FilterStateBase *> &states);
   void next_up (bool skip);
   bool next_down ();

@@ -475,11 +475,12 @@ DEFImporter::do_read (db::Layout &layout)
               take ();
             }
 
-            taperrule.clear ();
-
             do {
 
               std::string ln = get ();
+
+              taperrule.clear ();
+              const std::string *rulename = 0;
 
               db::Coord w = 0;
               if (specialnets) {
@@ -507,8 +508,10 @@ DEFImporter::do_read (db::Layout &layout)
                 while (true) {
                   if (test ("TAPER")) {
                     taperrule.clear ();
+                    rulename = &taperrule;
                   } else if (test ("TAPERRULE")) {
                     taperrule = get ();
+                    rulename = &taperrule;
                   } else if (test ("STYLE")) {
                     sn = get_long ();
                   } else {
@@ -520,8 +523,7 @@ DEFImporter::do_read (db::Layout &layout)
 
               if (! specialnets) {
 
-                const std::string *rulename = &taperrule;
-                if (rulename->empty ()) {
+                if (! rulename) {
                   rulename = &nondefaultrule;
                 }
 

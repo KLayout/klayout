@@ -241,10 +241,15 @@ TEST(19)
 
 TEST(20)
 {
+  run_test (_this, "def11", "lef:test.lef+def:test.def", "au.oas.gz", default_options ());
+}
+
+TEST(100)
+{
   run_test (_this, "issue-172", "lef:in.lef+def:in.def", "au.oas.gz", default_options (), false);
 }
 
-TEST(21)
+TEST(101)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_produce_pin_names (true);
@@ -252,7 +257,7 @@ TEST(21)
   run_test (_this, "issue-489", "lef:in.lef+def:in.def", "au.oas", opt, false);
 }
 
-TEST(22)
+TEST(102)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_produce_pin_names (true);
@@ -260,8 +265,12 @@ TEST(22)
   run_test (_this, "issue-489b", "lef:in_tech.lef+lef:in.lef", "au.oas.gz", opt, false);
 }
 
-TEST(23)
+TEST(103)
 {
   run_test (_this, "issue-517", "def:in.def", "au.oas.gz", default_options (), false);
 }
 
+TEST(104)
+{
+  run_test (_this, "doxy_vias", "def:test.def", "au.oas.gz", default_options (), false);
+}

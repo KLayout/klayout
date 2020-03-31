@@ -727,9 +727,36 @@ DEFImporter::do_read (db::Layout &layout)
                   std::string vn = get ();
                   db::FTrans ft = get_orient (true /*optional*/);
 
+                  db::Coord dx = 0, dy = 0;
+                  long nx = 1, ny = 1;
+
+                  if (specialnets && test ("DO")) {
+
+                    nx = std::max (0l, get_long ());
+                    test ("BY");
+                    ny = std::max (0l, get_long ());
+                    test ("STEP");
+                    dx = db::coord_traits<db::Coord>::rounded (get_double () * scale);
+                    dy = db::coord_traits<db::Coord>::rounded (get_double () * scale);
+
+                    if (nx < 0) {
+                      dx = -dx;
+                      nx = -nx;
+                    }
+                    if (ny < 0) {
+                      dy = -dy;
+                      ny = -ny;
+                    }
+
+                  }
+
                   std::map<std::string, ViaDesc>::const_iterator vd = via_desc.find (vn);
                   if (vd != via_desc.end () && ! pts.empty ()) {
-                    design.insert (db::CellInstArray (db::CellInst (vd->second.cell->cell_index ()), db::Trans (ft.rot (), db::Vector (pts.back ()))));
+                    if (nx <= 1 && ny <= 1) {
+                      design.insert (db::CellInstArray (db::CellInst (vd->second.cell->cell_index ()), db::Trans (ft.rot (), db::Vector (pts.back ()))));
+                    } else {
+                      design.insert (db::CellInstArray (db::CellInst (vd->second.cell->cell_index ()), db::Trans (ft.rot (), db::Vector (pts.back ())), db::Vector (dx, 0), db::Vector (0, dy), (unsigned long) nx, (unsigned long) ny));
+                    }
                     if (ln == vd->second.m1) {
                       ln = vd->second.m2;
                     } else if (ln == vd->second.m2) {

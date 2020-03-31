@@ -967,6 +967,25 @@ DEFImporter::do_read (db::Layout &layout)
 
         }
 
+        if (vd.m1.empty () && vd.m2.empty ()) {
+
+          //  analyze the layers to find the metals
+          std::vector<std::string> routing_layers;
+          for (std::map<std::string, std::vector<db::Polygon> >::const_iterator b = geometry.begin (); b != geometry.end (); ++b) {
+            if (m_lef_importer.is_routing_layer (b->first)) {
+              routing_layers.push_back (b->first);
+            }
+          }
+
+          if (routing_layers.size () == 2) {
+            vd.m1 = routing_layers[0];
+            vd.m2 = routing_layers[1];
+          } else {
+            warn ("Can't determine routing layers for via: " + n);
+          }
+
+        }
+
         test (";");
 
         if (has_via_rule && top && cut && bottom) {

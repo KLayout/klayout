@@ -274,3 +274,8 @@ TEST(104)
 {
   run_test (_this, "doxy_vias", "def:test.def", "au.oas.gz", default_options (), false);
 }
+
+TEST(105)
+{
+  run_test (_this, "specialnets_geo", "lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
+}

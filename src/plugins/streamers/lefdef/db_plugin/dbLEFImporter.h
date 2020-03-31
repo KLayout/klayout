@@ -87,6 +87,22 @@ public:
   double layer_ext (const std::string &layer, double def_ext = 0.0) const;
 
   /**
+   *  @brief Returns true if the given layer is a routing layer
+   */
+  bool is_routing_layer (const std::string &layer) const
+  {
+    return m_routing_layers.find (layer) != m_routing_layers.end ();
+  }
+
+  /**
+   *  @brief Returns true if the given layer is a cut layer
+   */
+  bool is_cut_layer (const std::string &layer) const
+  {
+    return m_cut_layers.find (layer) != m_cut_layers.end ();
+  }
+
+  /**
    *  @brief Gets a map of the vias defined in this LEF file
    *
    *  The map maps the via name to the via description.

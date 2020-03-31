@@ -16,4 +16,13 @@ SPECIALNETS 1 ;
    + ROUTED M1 150 + SHAPE IOWIRE ( 40000 3600 ) VIA1_dummy DO 16000 BY 1 STEP 700 0
 ;
 END SPECIALNETS
+SCANCHAINS 77 ;
+- chain1_clock1
++ PARTITION clock1
++ START block1/bsr_reg_0 Q
++ FLOATING
+block1/pgm_cgm_en_reg_reg ( IN SD ) ( OUT QZ )
+block1/start_reset_dd_reg ( IN SD ) ( OUT QZ )
++ STOP block1/start_reset_d_reg SD ;
+END SCANCHAINS
 END DESIGN

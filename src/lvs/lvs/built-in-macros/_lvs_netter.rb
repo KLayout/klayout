@@ -410,11 +410,26 @@ module LVS
     # By default, device classes are identified by name. If names are different, this
     # method allows establishing an explicit correspondence.
     #
-    # One of the device classes may be nil. In this case, the corresponding
-    # other device class is mapped to "nothing", i.e. ignored.
-    #
     # Before this method can be used, a schematic netlist needs to be loaded with
     # \schematic.
+    #
+    # One of the device classes may be "nil". In this case, the corresponding
+    # other device class is mapped to "nothing", i.e. ignored.
+    #
+    # A device class on one side can be mapped to multiple other device
+    # classes on the other side by using this function multiple times, e.g.
+    #
+    # @code
+    # same_device_classes("POLYRES", "RES")
+    # same_device_classes("WELLRES", "RES")
+    # @/code
+    #
+    # will match both "POLYRES" and "WELLRES" on the layout side to "RES" on the 
+    # schematic side.
+    #
+    # Once a device class is mentioned with "same_device_classes", matching by
+    # name is disabled for this class. So after using 'same_device_classes("A", "B")'
+    # "A" is no longer equivalent to "A" on the other side.
 
     def same_device_classes(a, b)
 

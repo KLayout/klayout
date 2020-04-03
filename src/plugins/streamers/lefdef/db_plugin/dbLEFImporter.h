@@ -87,6 +87,11 @@ public:
   double layer_ext (const std::string &layer, double def_ext = 0.0) const;
 
   /**
+   *  @brief Gets the minimum wire width in x and y direction for the given layer name
+   */
+  std::pair<double, double> min_layer_width (const std::string &layer) const;
+
+  /**
    *  @brief Returns true if the given layer is a routing layer
    */
   bool is_routing_layer (const std::string &layer) const
@@ -119,6 +124,7 @@ private:
   std::map<std::string, std::map<std::string, double> > m_nondefault_widths;
   std::map<std::string, double> m_default_widths;
   std::map<std::string, double> m_default_ext;
+  std::map<std::string, std::pair<double, double> > m_min_widths;
   std::map<std::string, db::Cell *> m_macros_by_name;
   std::map<std::string, db::Box> m_macro_bboxes_by_name;
   std::map<std::string, ViaDesc> m_vias;
@@ -126,6 +132,12 @@ private:
 
   std::vector <db::Trans> get_iteration (db::Layout &layout);
   void read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose purpose, std::map<std::string, db::Box> *collect_bboxes = 0, properties_id_type prop_id = 0);
+  void read_nondefaultrule (Layout &layout);
+  void read_viadef (Layout &layout);
+  void read_viadef_by_rule (Layout &layout, db::Cell &cell, ViaDesc &desc, const std::string &n);
+  void read_viadef_by_geometry (Layout &layout, db::Cell &cell, ViaDesc &desc, const std::string &n);
+  void read_layer (Layout &layout);
+  void read_macro (Layout &layout);
 };
 
 }

@@ -136,10 +136,10 @@ struct Group
   std::vector<tl::GlobPattern> comp_match;
 };
 
-db::Coord
+std::pair<db::Coord, db::Coord>
 DEFImporter::get_wire_width_for_rule (const std::string &rulename, const std::string &ln, double dbu)
 {
-  double w = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_width (ln, rulename, 0.0) / dbu);
+  db::Coord w = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_width (ln, rulename, 0.0) / dbu);
 
   //  try to find local nondefault rule
   if (! rulename.empty ()) {
@@ -152,7 +152,34 @@ DEFImporter::get_wire_width_for_rule (const std::string &rulename, const std::st
     }
   }
 
-  return w;
+  std::pair<double, double> min_wxy = m_lef_importer.min_layer_width (ln);
+  db::Coord min_wx = db::coord_traits<db::Coord>::rounded (min_wxy.first / dbu);
+  db::Coord min_wy = db::coord_traits<db::Coord>::rounded (min_wxy.second / dbu);
+
+  return std::make_pair (std::max (w, min_wx), std::max (w, min_wy));
+}
+
+std::pair<db::Coord, db::Coord>
+DEFImporter::get_def_ext (const std::string &ln, const std::pair<db::Coord, db::Coord> &wxy, double dbu)
+{
+  if (wxy.first == wxy.second) {
+    db::Coord de = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_ext (ln, wxy.first * 0.5 * dbu) / dbu);
+    return std::make_pair (de, de);
+  } else {
+#if 0
+    //  This implementation picks the default extension according to the real width
+    //  NOTE: the swapping of x and y for the default extension is intended. For horizontal lines, the
+    //  extension is in x direction but corresponds to a wire width of a vertical wire and vice versa.
+    db::Coord dex = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_ext (ln, wxy.second * 0.5 * dbu) / dbu);
+    db::Coord dey = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_ext (ln, wxy.first * 0.5 * dbu) / dbu);
+    return std::make_pair (dex, dey);
+#else
+    //  This implementation picks the default extension according to the specified wire width (which is the minimum
+    //  of wx and wy)
+    db::Coord de = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_ext (ln, std::min (wxy.first, wxy.second) * 0.5 * dbu) / dbu);
+    return std::make_pair (de, de);
+#endif
+  }
 }
 
 void 
@@ -501,9 +528,10 @@ DEFImporter::do_read (db::Layout &layout)
               taperrule.clear ();
               const std::string *rulename = 0;
 
-              db::Coord w = 0;
+              std::pair<db::Coord, db::Coord> w (0, 0);
               if (specialnets) {
-                w = db::coord_traits<db::Coord>::rounded (get_double () * scale);
+                db::Coord n = db::coord_traits<db::Coord>::rounded (get_double () * scale);
+                w = std::make_pair (n, n);
               } 
 
               const db::Polygon *style = 0;
@@ -544,11 +572,11 @@ DEFImporter::do_read (db::Layout &layout)
                 rulename = &nondefaultrule;
               }
 
-              db::Coord def_ext = 0;
+              std::pair<db::Coord, db::Coord> def_ext (0, 0);
 
               if (! specialnets) {
                 w = get_wire_width_for_rule (*rulename, ln, layout.dbu ());
-                def_ext = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_ext (ln, w * 0.5 * layout.dbu ()) / layout.dbu ());
+                def_ext = get_def_ext (ln, w, layout.dbu ());
               }
 
               std::map<int, db::Polygon>::const_iterator s = styles.find (sn);
@@ -556,7 +584,7 @@ DEFImporter::do_read (db::Layout &layout)
                 style = &s->second;
               }
 
-              std::vector<db::Coord> ext;
+              std::vector<std::pair<db::Coord, db::Coord> > ext;
               std::vector<db::Point> pts;
 
               double x = 0.0, y = 0.0;
@@ -629,11 +657,12 @@ DEFImporter::do_read (db::Layout &layout)
                       y = get_double ();
                     }
                     pts.push_back (db::Point (db::DPoint (x * scale, y * scale)));
-                    db::Coord e = def_ext;
+                    std::pair<db::Coord, db::Coord> ee = def_ext;
                     if (! peek (")")) {
-                      e = db::coord_traits<db::Coord>::rounded (get_double () * scale);
+                      db::Coord e = db::coord_traits<db::Coord>::rounded (get_double () * scale);
+                      ee.first = ee.second = e;
                     }
-                    ext.push_back (e);
+                    ext.push_back (ee);
 
                     test (")");
 
@@ -648,8 +677,11 @@ DEFImporter::do_read (db::Layout &layout)
 
                         //  Use the default style (octagon "pen" for non-manhattan segments, paths for 
                         //  horizontal/vertical segments).
+                        //  Manhattan paths are stitched together from two-point paths if they
 
-                        db::Coord e = std::max (ext.front (), ext.back ());
+                        std::pair<db::Coord, db::Coord> e = std::max (ext.front (), ext.back ());
+                        bool is_isotropic = (e.first == e.second && w.first == w.second);
+                        bool was_path = false;
 
                         std::vector<db::Point>::const_iterator pt = pts.begin ();
                         while (pt != pts.end ()) {
@@ -657,11 +689,27 @@ DEFImporter::do_read (db::Layout &layout)
                           std::vector<db::Point>::const_iterator pt0 = pt;
                           do {
                             ++pt;
-                          } while (pt != pts.end () && (pt[-1].x () == pt[0].x () || pt[-1].y () == pt[0].y()));
+                          } while (pt != pts.end () && is_isotropic && (pt[-1].x () == pt[0].x () || pt[-1].y () == pt[0].y()));
 
-                          if (pt - pt0 > 1) {
+                          if (pt - pt0 > 1 || pt0->x () == pt0[1].x () || pt0->y () == pt0[0].y()) {
 
-                            db::Path p (pt0, pt, w, pt0 == pts.begin () ? e : 0, pt == pts.end () ? e : 0, false);
+                            if (pt - pt0 == 1) {
+                              ++pt;
+                            }
+
+                            db::Coord wxy, wxy_perp, exy;
+
+                            if (pt0->x () == pt0 [1].x ()) {
+                              wxy = w.second;
+                              wxy_perp = w.first;
+                              exy = e.second;
+                            } else {
+                              wxy = w.first;
+                              wxy_perp = w.second;
+                              exy = e.first;
+                            }
+
+                            db::Path p (pt0, pt, wxy, pt0 == pts.begin () ? exy : (was_path ? wxy_perp / 2 : 0), pt == pts.end () ? exy : 0, false);
                             if (prop_id != 0) {
                               design.shapes (dl.second).insert (db::object_with_properties<db::Path> (p, prop_id));
                             } else {
@@ -674,10 +722,16 @@ DEFImporter::do_read (db::Layout &layout)
 
                             --pt;
 
-                          } else if (pt != pts.end ()) {
+                            was_path = true;
 
-                            db::Coord s = (w + 1) / 2;
-                            db::Coord t = db::Coord (ceil (w * (M_SQRT2 - 1) / 2));
+                          } else {
+
+                            if (! is_isotropic) {
+                              warn("Anisotropic wire widths not supported for diagonal wires");
+                            }
+
+                            db::Coord s = (w.first + 1) / 2;
+                            db::Coord t = db::Coord (ceil (w.first * (M_SQRT2 - 1) / 2));
 
                             db::Point octagon[8] = {
                               db::Point (-s, t),
@@ -699,6 +753,8 @@ DEFImporter::do_read (db::Layout &layout)
                             } else {
                               design.shapes (dl.second).insert (p);
                             }
+
+                            was_path = false;
 
                           }
 
@@ -766,7 +822,7 @@ DEFImporter::do_read (db::Layout &layout)
 
                   if (! specialnets) {
                     w = get_wire_width_for_rule (*rulename, ln, layout.dbu ());
-                    def_ext = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_ext (ln, w * 0.5 * layout.dbu ()) / layout.dbu ());
+                    def_ext = get_def_ext (ln, w, layout.dbu ());
                   }
 
                   //  continue a segment with the current point and the new layer

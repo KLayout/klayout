@@ -270,12 +270,17 @@ TEST(103)
   run_test (_this, "issue-517", "def:in.def", "au.oas.gz", default_options (), false);
 }
 
-TEST(104)
+TEST(104_doxy_vias)
 {
   run_test (_this, "doxy_vias", "def:test.def", "au.oas.gz", default_options (), false);
 }
 
-TEST(105)
+TEST(105_specialnets_geo)
 {
   run_test (_this, "specialnets_geo", "lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
+}
+
+TEST(106_wrongdirection)
+{
+  run_test (_this, "wrongdirection", "lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
 }

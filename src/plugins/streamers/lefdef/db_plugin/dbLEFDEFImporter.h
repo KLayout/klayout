@@ -643,6 +643,16 @@ protected:
   void expect (const std::string &token);
 
   /**
+   *  @brief Test whether the next token matches one of the given ones and raise an error if it does not
+   */
+  void expect (const std::string &token1, const std::string &token2);
+
+  /**
+   *  @brief Test whether the next token matches one of the given ones and raise an error if it does not
+   */
+  void expect (const std::string &token, const std::string &token2, const std::string &token3);
+
+  /**
    *  @brief Gets the next token
    */
   std::string get ();

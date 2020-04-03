@@ -531,7 +531,23 @@ LEFDEFImporter::expect (const std::string &token)
   }
 }
 
-double  
+void
+LEFDEFImporter::expect (const std::string &token1, const std::string &token2)
+{
+  if (! test (token1) && ! test (token2)) {
+    error ("Expected token: " + token1 + " or " + token2);
+  }
+}
+
+void
+LEFDEFImporter::expect (const std::string &token1, const std::string &token2, const std::string &token3)
+{
+  if (! test (token1) && ! test (token2) && ! test (token3)) {
+    error ("Expected token: " + token1 + ", " + token2 + " or " + token3);
+  }
+}
+
+double
 LEFDEFImporter::get_double ()
 {
   if (m_last_token.empty ()) {

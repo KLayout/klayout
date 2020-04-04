@@ -360,6 +360,329 @@ DEFImporter::read_blockages (db::Layout &layout, db::Cell &design, double scale)
 }
 
 void
+DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::Cell &design, double scale, db::properties_id_type prop_id, bool specialnets)
+{
+  std::string taperrule;
+
+  do {
+
+    std::string ln = get ();
+
+    taperrule.clear ();
+    const std::string *rulename = 0;
+
+    std::pair<db::Coord, db::Coord> w (0, 0);
+    if (specialnets) {
+      db::Coord n = db::coord_traits<db::Coord>::rounded (get_double () * scale);
+      w = std::make_pair (n, n);
+    }
+
+    const db::Polygon *style = 0;
+
+    int sn = std::numeric_limits<int>::max ();
+
+    if (specialnets) {
+
+      while (test ("+")) {
+
+        if (test ("STYLE")) {
+          sn = get_long ();
+        } else if (test ("SHAPE")) {
+          take ();
+        }
+
+      }
+
+    } else {
+
+      while (true) {
+        if (test ("TAPER")) {
+          taperrule.clear ();
+          rulename = &taperrule;
+        } else if (test ("TAPERRULE")) {
+          taperrule = get ();
+          rulename = &taperrule;
+        } else if (test ("STYLE")) {
+          sn = get_long ();
+        } else {
+          break;
+        }
+      }
+
+    }
+
+    if (! rulename) {
+      rulename = &nondefaultrule;
+    }
+
+    std::pair<db::Coord, db::Coord> def_ext (0, 0);
+
+    if (! specialnets) {
+      w = get_wire_width_for_rule (*rulename, ln, layout.dbu ());
+      def_ext = get_def_ext (ln, w, layout.dbu ());
+    }
+
+    std::map<int, db::Polygon>::const_iterator s = m_styles.find (sn);
+    if (s != m_styles.end ()) {
+      style = &s->second;
+    }
+
+    std::vector<std::pair<db::Coord, db::Coord> > ext;
+    std::vector<db::Point> pts;
+
+    double x = 0.0, y = 0.0;
+
+    while (true) {
+
+      if (test ("MASK")) {
+        //  ignore mask spec
+        get_long ();
+      }
+
+      if (test ("RECT")) {
+
+        if (! test ("(")) {
+          error (tl::to_string (tr ("RECT routing specification not followed by coordinate list")));
+        }
+
+        //  breaks wiring
+        pts.clear ();
+
+        //  rect spec
+
+        double x1 = get_double ();
+        double y1 = get_double ();
+        double x2 = get_double ();
+        double y2 = get_double ();
+
+        test (")");
+
+        std::pair <bool, unsigned int> dl = open_layer (layout, ln, Routing);
+        if (dl.first) {
+
+          db::Box rect (db::Point (db::DPoint ((x + x1) * scale, (y + y1) * scale)),
+                        db::Point (db::DPoint ((x + x2) * scale, (y + y2) * scale)));
+
+          if (prop_id != 0) {
+            design.shapes (dl.second).insert (db::object_with_properties<db::Box> (rect, prop_id));
+          } else {
+            design.shapes (dl.second).insert (rect);
+          }
+
+        }
+
+      } else if (test ("VIRTUAL")) {
+
+        //  virtual specs simply create a new segment
+        pts.clear ();
+
+      } else if (peek ("(")) {
+
+        ext.clear ();
+
+        while (peek ("(") || peek ("MASK")) {
+
+          if (test ("MASK")) {
+            //  ignore MASK spec
+            get_long ();
+          }
+
+          if (! test ("(")) {
+            //  We could have a via here: in that case we have swallowed MASK already, but
+            //  since we don't do anything with that, this does not hurt for now.
+            break;
+          }
+
+          if (! test ("*")) {
+            x = get_double ();
+          }
+          if (! test ("*")) {
+            y = get_double ();
+          }
+          pts.push_back (db::Point (db::DPoint (x * scale, y * scale)));
+          std::pair<db::Coord, db::Coord> ee = def_ext;
+          if (! peek (")")) {
+            db::Coord e = db::coord_traits<db::Coord>::rounded (get_double () * scale);
+            ee.first = ee.second = e;
+          }
+          ext.push_back (ee);
+
+          test (")");
+
+        }
+
+        if (pts.size () > 1) {
+
+          std::pair <bool, unsigned int> dl = open_layer (layout, ln, Routing);
+          if (dl.first) {
+
+            if (! style) {
+
+              //  Use the default style (octagon "pen" for non-manhattan segments, paths for
+              //  horizontal/vertical segments).
+              //  Manhattan paths are stitched together from two-point paths if they
+
+              std::pair<db::Coord, db::Coord> e = std::max (ext.front (), ext.back ());
+              bool is_isotropic = (e.first == e.second && w.first == w.second);
+              bool was_path = false;
+
+              std::vector<db::Point>::const_iterator pt = pts.begin ();
+              while (pt != pts.end ()) {
+
+                std::vector<db::Point>::const_iterator pt0 = pt;
+                do {
+                  ++pt;
+                } while (pt != pts.end () && is_isotropic && (pt[-1].x () == pt[0].x () || pt[-1].y () == pt[0].y()));
+
+                if (pt - pt0 > 1 || pt0->x () == pt0[1].x () || pt0->y () == pt0[0].y()) {
+
+                  if (pt - pt0 == 1) {
+                    ++pt;
+                  }
+
+                  db::Coord wxy, wxy_perp, exy;
+
+                  if (pt0->x () == pt0 [1].x ()) {
+                    wxy = w.second;
+                    wxy_perp = w.first;
+                    exy = e.second;
+                  } else {
+                    wxy = w.first;
+                    wxy_perp = w.second;
+                    exy = e.first;
+                  }
+
+                  db::Path p (pt0, pt, wxy, pt0 == pts.begin () ? exy : (was_path ? wxy_perp / 2 : 0), pt == pts.end () ? exy : 0, false);
+                  if (prop_id != 0) {
+                    design.shapes (dl.second).insert (db::object_with_properties<db::Path> (p, prop_id));
+                  } else {
+                    design.shapes (dl.second).insert (p);
+                  }
+
+                  if (pt == pts.end ()) {
+                    break;
+                  }
+
+                  --pt;
+
+                  was_path = true;
+
+                } else {
+
+                  if (! is_isotropic) {
+                    warn("Anisotropic wire widths not supported for diagonal wires");
+                  }
+
+                  db::Coord s = (w.first + 1) / 2;
+                  db::Coord t = db::Coord (ceil (w.first * (M_SQRT2 - 1) / 2));
+
+                  db::Point octagon[8] = {
+                    db::Point (-s, t),
+                    db::Point (-t, s),
+                    db::Point (t, s),
+                    db::Point (s, t),
+                    db::Point (s, -t),
+                    db::Point (t, -s),
+                    db::Point (-t, -s),
+                    db::Point (-s, -t)
+                  };
+
+                  db::Polygon k;
+                  k.assign_hull (octagon, octagon + sizeof (octagon) / sizeof (octagon[0]));
+
+                  db::Polygon p = db::minkowsky_sum (k, db::Edge (*pt0, *pt));
+                  if (prop_id != 0) {
+                    design.shapes (dl.second).insert (db::object_with_properties<db::Polygon> (p, prop_id));
+                  } else {
+                    design.shapes (dl.second).insert (p);
+                  }
+
+                  was_path = false;
+
+                }
+
+              }
+
+            } else {
+
+              for (size_t i = 0; i < pts.size () - 1; ++i) {
+                db::Polygon p = db::minkowsky_sum (*style, db::Edge (pts [i], pts [i + 1]));
+                if (prop_id != 0) {
+                  design.shapes (dl.second).insert (db::object_with_properties<db::Polygon> (p, prop_id));
+                } else {
+                  design.shapes (dl.second).insert (p);
+                }
+              }
+
+            }
+
+          }
+
+        }
+
+      } else if (! peek ("NEW") && ! peek ("+") && ! peek ("-") && ! peek (";")) {
+
+        //  indicates a via
+        std::string vn = get ();
+        db::FTrans ft = get_orient (true /*optional*/);
+
+        db::Coord dx = 0, dy = 0;
+        long nx = 1, ny = 1;
+
+        if (specialnets && test ("DO")) {
+
+          nx = std::max (0l, get_long ());
+          test ("BY");
+          ny = std::max (0l, get_long ());
+          test ("STEP");
+          dx = db::coord_traits<db::Coord>::rounded (get_double () * scale);
+          dy = db::coord_traits<db::Coord>::rounded (get_double () * scale);
+
+          if (nx < 0) {
+            dx = -dx;
+            nx = -nx;
+          }
+          if (ny < 0) {
+            dy = -dy;
+            ny = -ny;
+          }
+
+        }
+
+        std::map<std::string, ViaDesc>::const_iterator vd = m_via_desc.find (vn);
+        if (vd != m_via_desc.end () && ! pts.empty ()) {
+          if (nx <= 1 && ny <= 1) {
+            design.insert (db::CellInstArray (db::CellInst (vd->second.cell->cell_index ()), db::Trans (ft.rot (), db::Vector (pts.back ()))));
+          } else {
+            design.insert (db::CellInstArray (db::CellInst (vd->second.cell->cell_index ()), db::Trans (ft.rot (), db::Vector (pts.back ())), db::Vector (dx, 0), db::Vector (0, dy), (unsigned long) nx, (unsigned long) ny));
+          }
+          if (ln == vd->second.m1) {
+            ln = vd->second.m2;
+          } else if (ln == vd->second.m2) {
+            ln = vd->second.m1;
+          }
+        }
+
+        if (! specialnets) {
+          w = get_wire_width_for_rule (*rulename, ln, layout.dbu ());
+          def_ext = get_def_ext (ln, w, layout.dbu ());
+        }
+
+        //  continue a segment with the current point and the new layer
+        if (pts.size () > 1) {
+          pts.erase (pts.begin (), pts.end () - 1);
+        }
+
+      } else {
+        break;
+      }
+
+    }
+
+  } while (test ("NEW"));
+}
+
+void
 DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool specialnets)
 {
   while (test ("-")) {
@@ -367,7 +690,7 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
     std::string net = get ();
     std::string nondefaultrule;
     std::string stored_netname, stored_nondefaultrule;
-    std::string taperrule;
+    db::properties_id_type stored_prop_id;
     bool in_subnet = false;
 
     db::properties_id_type prop_id = 0;
@@ -389,6 +712,8 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
 
       if (! specialnets && test ("SUBNET")) {
 
+        std::string subnetname = get ();
+
         while (test ("(")) {
           while (! test (")")) {
             take ();
@@ -398,7 +723,18 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
         if (! in_subnet) {
           stored_netname = net;
           stored_nondefaultrule = nondefaultrule;
+          stored_prop_id = prop_id;
           in_subnet = true;
+        } else {
+          warn ("Nested subnets");
+        }
+
+        net = stored_netname + "/" + subnetname;
+
+        if (produce_net_props ()) {
+          db::PropertiesRepository::properties_set props;
+          props.insert (std::make_pair (net_prop_name_id (), tl::Variant (net)));
+          prop_id = layout.properties_repository ().properties_id (props);
         }
 
       } else if (! specialnets && test ("NONDEFAULTRULE")) {
@@ -411,329 +747,20 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
           take ();
         }
 
-        do {
-
-          std::string ln = get ();
-
-          taperrule.clear ();
-          const std::string *rulename = 0;
-
-          std::pair<db::Coord, db::Coord> w (0, 0);
-          if (specialnets) {
-            db::Coord n = db::coord_traits<db::Coord>::rounded (get_double () * scale);
-            w = std::make_pair (n, n);
-          }
-
-          const db::Polygon *style = 0;
-
-          int sn = std::numeric_limits<int>::max ();
-
-          if (specialnets) {
-
-            while (test ("+")) {
-
-              if (test ("STYLE")) {
-                sn = get_long ();
-              } else if (test ("SHAPE")) {
-                take ();
-              }
-
-            }
-
-          } else {
-
-            while (true) {
-              if (test ("TAPER")) {
-                taperrule.clear ();
-                rulename = &taperrule;
-              } else if (test ("TAPERRULE")) {
-                taperrule = get ();
-                rulename = &taperrule;
-              } else if (test ("STYLE")) {
-                sn = get_long ();
-              } else {
-                break;
-              }
-            }
-
-          }
-
-          if (! rulename) {
-            rulename = &nondefaultrule;
-          }
-
-          std::pair<db::Coord, db::Coord> def_ext (0, 0);
-
-          if (! specialnets) {
-            w = get_wire_width_for_rule (*rulename, ln, layout.dbu ());
-            def_ext = get_def_ext (ln, w, layout.dbu ());
-          }
-
-          std::map<int, db::Polygon>::const_iterator s = m_styles.find (sn);
-          if (s != m_styles.end ()) {
-            style = &s->second;
-          }
-
-          std::vector<std::pair<db::Coord, db::Coord> > ext;
-          std::vector<db::Point> pts;
-
-          double x = 0.0, y = 0.0;
-
-          while (true) {
-
-            if (test ("MASK")) {
-              //  ignore mask spec
-              get_long ();
-            }
-
-            if (test ("RECT")) {
-
-              if (! test ("(")) {
-                error (tl::to_string (tr ("RECT routing specification not followed by coordinate list")));
-              }
-
-              //  breaks wiring
-              pts.clear ();
-
-              //  rect spec
-
-              double x1 = get_double ();
-              double y1 = get_double ();
-              double x2 = get_double ();
-              double y2 = get_double ();
-
-              test (")");
-
-              std::pair <bool, unsigned int> dl = open_layer (layout, ln, Routing);
-              if (dl.first) {
-
-                db::Box rect (db::Point (db::DPoint ((x + x1) * scale, (y + y1) * scale)),
-                              db::Point (db::DPoint ((x + x2) * scale, (y + y2) * scale)));
-
-                if (prop_id != 0) {
-                  design.shapes (dl.second).insert (db::object_with_properties<db::Box> (rect, prop_id));
-                } else {
-                  design.shapes (dl.second).insert (rect);
-                }
-
-              }
-
-            } else if (test ("VIRTUAL")) {
-
-              //  virtual specs simply create a new segment
-              pts.clear ();
-
-            } else if (peek ("(")) {
-
-              ext.clear ();
-
-              while (peek ("(") || peek ("MASK")) {
-
-                if (test ("MASK")) {
-                  //  ignore MASK spec
-                  get_long ();
-                }
-
-                if (! test ("(")) {
-                  //  We could have a via here: in that case we have swallowed MASK already, but
-                  //  since we don't do anything with that, this does not hurt for now.
-                  break;
-                }
-
-                if (! test ("*")) {
-                  x = get_double ();
-                }
-                if (! test ("*")) {
-                  y = get_double ();
-                }
-                pts.push_back (db::Point (db::DPoint (x * scale, y * scale)));
-                std::pair<db::Coord, db::Coord> ee = def_ext;
-                if (! peek (")")) {
-                  db::Coord e = db::coord_traits<db::Coord>::rounded (get_double () * scale);
-                  ee.first = ee.second = e;
-                }
-                ext.push_back (ee);
-
-                test (")");
-
-              }
-
-              if (pts.size () > 1) {
-
-                std::pair <bool, unsigned int> dl = open_layer (layout, ln, Routing);
-                if (dl.first) {
-
-                  if (! style) {
-
-                    //  Use the default style (octagon "pen" for non-manhattan segments, paths for
-                    //  horizontal/vertical segments).
-                    //  Manhattan paths are stitched together from two-point paths if they
-
-                    std::pair<db::Coord, db::Coord> e = std::max (ext.front (), ext.back ());
-                    bool is_isotropic = (e.first == e.second && w.first == w.second);
-                    bool was_path = false;
-
-                    std::vector<db::Point>::const_iterator pt = pts.begin ();
-                    while (pt != pts.end ()) {
-
-                      std::vector<db::Point>::const_iterator pt0 = pt;
-                      do {
-                        ++pt;
-                      } while (pt != pts.end () && is_isotropic && (pt[-1].x () == pt[0].x () || pt[-1].y () == pt[0].y()));
-
-                      if (pt - pt0 > 1 || pt0->x () == pt0[1].x () || pt0->y () == pt0[0].y()) {
-
-                        if (pt - pt0 == 1) {
-                          ++pt;
-                        }
-
-                        db::Coord wxy, wxy_perp, exy;
-
-                        if (pt0->x () == pt0 [1].x ()) {
-                          wxy = w.second;
-                          wxy_perp = w.first;
-                          exy = e.second;
-                        } else {
-                          wxy = w.first;
-                          wxy_perp = w.second;
-                          exy = e.first;
-                        }
-
-                        db::Path p (pt0, pt, wxy, pt0 == pts.begin () ? exy : (was_path ? wxy_perp / 2 : 0), pt == pts.end () ? exy : 0, false);
-                        if (prop_id != 0) {
-                          design.shapes (dl.second).insert (db::object_with_properties<db::Path> (p, prop_id));
-                        } else {
-                          design.shapes (dl.second).insert (p);
-                        }
-
-                        if (pt == pts.end ()) {
-                          break;
-                        }
-
-                        --pt;
-
-                        was_path = true;
-
-                      } else {
-
-                        if (! is_isotropic) {
-                          warn("Anisotropic wire widths not supported for diagonal wires");
-                        }
-
-                        db::Coord s = (w.first + 1) / 2;
-                        db::Coord t = db::Coord (ceil (w.first * (M_SQRT2 - 1) / 2));
-
-                        db::Point octagon[8] = {
-                          db::Point (-s, t),
-                          db::Point (-t, s),
-                          db::Point (t, s),
-                          db::Point (s, t),
-                          db::Point (s, -t),
-                          db::Point (t, -s),
-                          db::Point (-t, -s),
-                          db::Point (-s, -t)
-                        };
-
-                        db::Polygon k;
-                        k.assign_hull (octagon, octagon + sizeof (octagon) / sizeof (octagon[0]));
-
-                        db::Polygon p = db::minkowsky_sum (k, db::Edge (*pt0, *pt));
-                        if (prop_id != 0) {
-                          design.shapes (dl.second).insert (db::object_with_properties<db::Polygon> (p, prop_id));
-                        } else {
-                          design.shapes (dl.second).insert (p);
-                        }
-
-                        was_path = false;
-
-                      }
-
-                    }
-
-                  } else {
-
-                    for (size_t i = 0; i < pts.size () - 1; ++i) {
-                      db::Polygon p = db::minkowsky_sum (*style, db::Edge (pts [i], pts [i + 1]));
-                      if (prop_id != 0) {
-                        design.shapes (dl.second).insert (db::object_with_properties<db::Polygon> (p, prop_id));
-                      } else {
-                        design.shapes (dl.second).insert (p);
-                      }
-                    }
-
-                  }
-
-                }
-
-              }
-
-            } else if (! peek ("NEW") && ! peek ("+") && ! peek ("-") && ! peek (";")) {
-
-              //  indicates a via
-              std::string vn = get ();
-              db::FTrans ft = get_orient (true /*optional*/);
-
-              db::Coord dx = 0, dy = 0;
-              long nx = 1, ny = 1;
-
-              if (specialnets && test ("DO")) {
-
-                nx = std::max (0l, get_long ());
-                test ("BY");
-                ny = std::max (0l, get_long ());
-                test ("STEP");
-                dx = db::coord_traits<db::Coord>::rounded (get_double () * scale);
-                dy = db::coord_traits<db::Coord>::rounded (get_double () * scale);
-
-                if (nx < 0) {
-                  dx = -dx;
-                  nx = -nx;
-                }
-                if (ny < 0) {
-                  dy = -dy;
-                  ny = -ny;
-                }
-
-              }
-
-              std::map<std::string, ViaDesc>::const_iterator vd = m_via_desc.find (vn);
-              if (vd != m_via_desc.end () && ! pts.empty ()) {
-                if (nx <= 1 && ny <= 1) {
-                  design.insert (db::CellInstArray (db::CellInst (vd->second.cell->cell_index ()), db::Trans (ft.rot (), db::Vector (pts.back ()))));
-                } else {
-                  design.insert (db::CellInstArray (db::CellInst (vd->second.cell->cell_index ()), db::Trans (ft.rot (), db::Vector (pts.back ())), db::Vector (dx, 0), db::Vector (0, dy), (unsigned long) nx, (unsigned long) ny));
-                }
-                if (ln == vd->second.m1) {
-                  ln = vd->second.m2;
-                } else if (ln == vd->second.m2) {
-                  ln = vd->second.m1;
-                }
-              }
-
-              if (! specialnets) {
-                w = get_wire_width_for_rule (*rulename, ln, layout.dbu ());
-                def_ext = get_def_ext (ln, w, layout.dbu ());
-              }
-
-              //  continue a segment with the current point and the new layer
-              if (pts.size () > 1) {
-                pts.erase (pts.begin (), pts.end () - 1);
-              }
-
-            } else {
-              break;
-            }
-
-          }
-
-        } while (test ("NEW"));
+        read_single_net (nondefaultrule, layout, design, scale, prop_id, specialnets);
 
         if (in_subnet) {
+
           in_subnet = false;
+
           net = stored_netname;
-          stored_netname.clear ();
           nondefaultrule = stored_nondefaultrule;
+          prop_id = stored_prop_id;
+
+          stored_netname.clear ();
           stored_nondefaultrule.clear ();
+          stored_prop_id = 0;
+
         }
 
       } else if (test ("POLYGON")) {

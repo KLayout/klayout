@@ -82,6 +82,7 @@ private:
   void read_pins (db::Layout &layout, db::Cell &design, double scale);
   void read_styles (double scale);
   void read_components (std::list<std::pair<std::string, db::CellInstArray> > &instances, double scale);
+  void read_single_net (std::string &nondefaultrule, db::Layout &layout, db::Cell &design, double scale, properties_id_type prop_id, bool specialnets);
 };
 
 }

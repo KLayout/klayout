@@ -64,6 +64,8 @@ protected:
 private:
   LEFImporter m_lef_importer;
   std::map<std::string, std::map<std::string, db::Coord> > m_nondefault_widths;
+  std::map<std::string, ViaDesc> m_via_desc;
+  std::map<int, db::Polygon> m_styles;
 
   db::FTrans get_orient (bool optional);
   void read_polygon (db::Polygon &poly, double scale);
@@ -75,6 +77,11 @@ private:
   void read_regions (std::map<std::string, std::vector<db::Polygon> > &regions, double scale);
   void read_groups (std::list<DEFImporterGroup> &groups, double scale);
   void read_blockages (db::Layout &layout, db::Cell &design, double scale);
+  void read_nets (db::Layout &layout, db::Cell &design, double scale, bool specialnets);
+  void read_vias (db::Layout &layout, db::Cell &design, double scale);
+  void read_pins (db::Layout &layout, db::Cell &design, double scale);
+  void read_styles (double scale);
+  void read_components (std::list<std::pair<std::string, db::CellInstArray> > &instances, double scale);
 };
 
 }

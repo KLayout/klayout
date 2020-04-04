@@ -77,7 +77,7 @@ public:
    *  The nondefaultrule name gives the name of the nondefaultrule or an empty string if
    *  none is requested.
    */
-  double layer_width (const std::string &layer, const std::string &nondefaultrule, double def_width = 0.0) const;
+  std::pair<double, double> layer_width (const std::string &layer, const std::string &nondefaultrule, const std::pair<double, double> &def_width = std::make_pair (0.0, 0.0)) const;
 
   /**
    *  @brief Get the extension for a layer with the given name
@@ -121,8 +121,8 @@ protected:
   void do_read (db::Layout &layout);
 
 private:
-  std::map<std::string, std::map<std::string, double> > m_nondefault_widths;
-  std::map<std::string, double> m_default_widths;
+  std::map<std::string, std::map<std::string, std::pair<double, double> > > m_nondefault_widths;
+  std::map<std::string, std::pair<double, double> > m_default_widths;
   std::map<std::string, double> m_default_ext;
   std::map<std::string, std::pair<double, double> > m_min_widths;
   std::map<std::string, db::Cell *> m_macros_by_name;

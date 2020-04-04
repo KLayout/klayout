@@ -61,13 +61,15 @@ protected:
 
 private:
   LEFImporter m_lef_importer;
-  std::map<std::string, std::map<std::string, double> > m_nondefault_widths;
+  std::map<std::string, std::map<std::string, db::Coord> > m_nondefault_widths;
 
   db::FTrans get_orient (bool optional);
   void read_polygon (db::Polygon &poly, double scale);
   void read_rect (db::Polygon &poly, double scale);
   std::pair<Coord, Coord> get_wire_width_for_rule(const std::string &rule, const std::string &ln, double dbu);
   std::pair<db::Coord, db::Coord> get_def_ext (const std::string &ln, const std::pair<db::Coord, db::Coord> &wxy, double dbu);
+  void read_diearea (db::Layout &layout, db::Cell &design, double scale);
+  void read_nondefaultrules (double scale);
 };
 
 }

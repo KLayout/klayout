@@ -76,12 +76,12 @@ LEFImporter::min_layer_width (const std::string &layer) const
   }
 }
 
-double 
-LEFImporter::layer_width (const std::string &layer, const std::string &nondefaultrule, double def_width) const
+std::pair<double, double>
+LEFImporter::layer_width (const std::string &layer, const std::string &nondefaultrule, const std::pair<double, double> &def_width) const
 {
-  std::map<std::string, std::map<std::string, double> >::const_iterator nd = m_nondefault_widths.find (nondefaultrule);
+  std::map<std::string, std::map<std::string, std::pair<double, double> > >::const_iterator nd = m_nondefault_widths.find (nondefaultrule);
 
-  std::map<std::string, double>::const_iterator l;
+  std::map<std::string, std::pair<double, double> >::const_iterator l;
   bool has_width = false;
 
   if (! nondefaultrule.empty () && nd != m_nondefault_widths.end ()) {
@@ -185,9 +185,9 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
       }
 
       w = 0.0;
-      std::map<std::string, double>::const_iterator dw = m_default_widths.find (layer_name);
+      std::map<std::string, std::pair<double, double> >::const_iterator dw = m_default_widths.find (layer_name);
       if (dw != m_default_widths.end ()) {
-        w = dw->second;
+        w = dw->second.first;
       }
 
       while (! test (";")) {
@@ -388,7 +388,7 @@ LEFImporter::read_nondefaultrule (db::Layout & /*layout*/)
         if (test ("WIDTH")) {
           double w = get_double ();
           test (";");
-          m_nondefault_widths[n][l] = w;
+          m_nondefault_widths[n][l] = std::make_pair (w, w);
         } else {
           while (! test (";")) {
             take ();
@@ -590,7 +590,8 @@ LEFImporter::read_layer (Layout & /*layout*/)
 {
   std::string ln = get ();
   double wmin = 0.0, wmin_wrongdir = 0.0;
-  bool is_horizontal = true;
+  double w = 0.0, w_wrongdir = 0.0;
+  bool is_horizontal = false;
 
   register_layer (ln);
 
@@ -615,8 +616,12 @@ LEFImporter::read_layer (Layout & /*layout*/)
 
     } else if (test ("WIDTH")) {
 
-      double w = get_double ();
-      m_default_widths.insert (std::make_pair (ln, w));
+      w = get_double ();
+      expect (";");
+
+    } else if (test ("MINWIDTH")) {
+
+      wmin = get_double ();
       expect (";");
 
     } else if (test ("DIRECTION")) {
@@ -629,8 +634,8 @@ LEFImporter::read_layer (Layout & /*layout*/)
 
     } else if (test ("WIREEXTENSION")) {
 
-      double w = get_double ();
-      m_default_ext.insert (std::make_pair (ln, w));
+      double v = get_double ();
+      m_default_ext.insert (std::make_pair (ln, v));
       expect (";");
 
     } else if (test ("ACCURRENTDENSITY")) {
@@ -656,16 +661,31 @@ LEFImporter::read_layer (Layout & /*layout*/)
 
         //  Cadence extension
         tl::Extractor ex (value.to_string ());
-        double mw = 0.0;
-        if (ex.test ("MINWIDTH") && ex.try_read (mw)) {
+        double v = 0.0;
+        if (ex.test ("MINWIDTH") && ex.try_read (v)) {
           if (ex.test ("WRONGDIRECTION")) {
-            wmin_wrongdir = mw;
+            wmin_wrongdir = v;
           } else {
-            wmin = mw;
+            wmin = v;
+          }
+        }
+
+      } else if (name == "LEF58_WIDTH") {
+
+        //  Cadence extension
+        tl::Extractor ex (value.to_string ());
+        double v = 0.0;
+        if (ex.test ("WIDTH") && ex.try_read (v)) {
+          if (ex.test ("WRONGDIRECTION")) {
+            w_wrongdir = v;
+          } else {
+            w = v;
           }
         }
 
       }
+
+      expect (";");
 
     } else {
 
@@ -676,9 +696,23 @@ LEFImporter::read_layer (Layout & /*layout*/)
     }
   }
 
+  if (w > 0.0 || w_wrongdir > 0.0) {
+
+    if (w_wrongdir == 0.0) {
+      w_wrongdir = w;
+    } else if (! is_horizontal) {
+      std::swap (w, w_wrongdir);
+    }
+
+    m_default_widths.insert (std::make_pair (ln, std::make_pair (w, w_wrongdir)));
+
+  }
+
   if (wmin > 0.0 || wmin_wrongdir > 0.0) {
 
-    if (! is_horizontal) {
+    if (wmin_wrongdir == 0.0) {
+      wmin_wrongdir = wmin;
+    } else if (! is_horizontal) {
       std::swap (wmin, wmin_wrongdir);
     }
 

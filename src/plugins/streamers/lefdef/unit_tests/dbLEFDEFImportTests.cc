@@ -284,3 +284,14 @@ TEST(106_wrongdirection)
 {
   run_test (_this, "wrongdirection", "lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
 }
+
+TEST(107_specialwidths)
+{
+  run_test (_this, "specialwidths", "lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
+}
+
+TEST(108_scanchain)
+{
+  run_test (_this, "scanchain", "def:test.def", "au.oas.gz", default_options (), false);
+}
+

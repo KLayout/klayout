@@ -139,15 +139,17 @@ struct Group
 std::pair<db::Coord, db::Coord>
 DEFImporter::get_wire_width_for_rule (const std::string &rulename, const std::string &ln, double dbu)
 {
-  db::Coord w = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_width (ln, rulename, 0.0) / dbu);
+  std::pair<double, double> wxy = m_lef_importer.layer_width (ln, rulename);
+  db::Coord wx = db::coord_traits<db::Coord>::rounded (wxy.first / dbu);
+  db::Coord wy = db::coord_traits<db::Coord>::rounded (wxy.second / dbu);
 
   //  try to find local nondefault rule
   if (! rulename.empty ()) {
-    std::map<std::string, std::map<std::string, double> >::const_iterator nd = m_nondefault_widths.find (rulename);
+    std::map<std::string, std::map<std::string, db::Coord> >::const_iterator nd = m_nondefault_widths.find (rulename);
     if (nd != m_nondefault_widths.end ()) {
-      std::map<std::string, double>::const_iterator ld = nd->second.find (ln);
+      std::map<std::string, db::Coord>::const_iterator ld = nd->second.find (ln);
       if (ld != nd->second.end ()) {
-        w = ld->second;
+        wx = wy = ld->second;
       }
     }
   }
@@ -156,30 +158,87 @@ DEFImporter::get_wire_width_for_rule (const std::string &rulename, const std::st
   db::Coord min_wx = db::coord_traits<db::Coord>::rounded (min_wxy.first / dbu);
   db::Coord min_wy = db::coord_traits<db::Coord>::rounded (min_wxy.second / dbu);
 
-  return std::make_pair (std::max (w, min_wx), std::max (w, min_wy));
+  return std::make_pair (std::max (wx, min_wx), std::max (wy, min_wy));
 }
 
 std::pair<db::Coord, db::Coord>
 DEFImporter::get_def_ext (const std::string &ln, const std::pair<db::Coord, db::Coord> &wxy, double dbu)
 {
-  if (wxy.first == wxy.second) {
-    db::Coord de = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_ext (ln, wxy.first * 0.5 * dbu) / dbu);
-    return std::make_pair (de, de);
-  } else {
-#if 0
-    //  This implementation picks the default extension according to the real width
-    //  NOTE: the swapping of x and y for the default extension is intended. For horizontal lines, the
-    //  extension is in x direction but corresponds to a wire width of a vertical wire and vice versa.
-    db::Coord dex = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_ext (ln, wxy.second * 0.5 * dbu) / dbu);
-    db::Coord dey = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_ext (ln, wxy.first * 0.5 * dbu) / dbu);
-    return std::make_pair (dex, dey);
-#else
-    //  This implementation picks the default extension according to the specified wire width (which is the minimum
-    //  of wx and wy)
-    db::Coord de = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_ext (ln, std::min (wxy.first, wxy.second) * 0.5 * dbu) / dbu);
-    return std::make_pair (de, de);
-#endif
+  //  This implementation assumes the "preferred width" is controlling the default extension and it is
+  //  identical to the minimum effective width. This is true if "LEF58_MINWIDTH" with "WRONGDIRECTION" is
+  //  used in the proposed way. Which is to specify a larger width for the "wrong" direction.
+  db::Coord de = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_ext (ln, std::min (wxy.first, wxy.second) * 0.5 * dbu) / dbu);
+  return std::make_pair (de, de);
+}
+
+void
+DEFImporter::read_diearea (db::Layout &layout, db::Cell &design, double scale)
+{
+  std::vector<db::DPoint> points;
+
+  while (! test (";")) {
+    test ("(");
+    double x = get_double ();
+    double y = get_double ();
+    points.push_back (db::DPoint (x * scale, y * scale));
+    test (")");
   }
+
+  if (points.size () >= 2) {
+
+    //  create outline shape
+    std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Outline);
+    if (dl.first) {
+      if (points.size () == 2) {
+        design.shapes (dl.second).insert (db::Box (db::DBox (points [0], points [1])));
+      } else {
+        db::DPolygon p;
+        p.assign_hull (points.begin (), points.end ());
+        design.shapes (dl.second).insert (db::Polygon (p));
+      }
+    }
+
+  }
+}
+
+void
+DEFImporter::read_nondefaultrules (double scale)
+{
+  //  read NONDEFAULTRULES sections
+  get_long ();
+  expect (";");
+
+  while (test ("-")) {
+
+    std::string n = get ();
+
+    while (test ("+")) {
+
+      if (test ("LAYER")) {
+
+        std::string l = get ();
+
+        //  read the width for the layer
+        if (test ("WIDTH")) {
+          double w = get_double () * scale;
+          m_nondefault_widths[n][l] = db::coord_traits<db::Coord>::rounded (w);
+        }
+
+      }
+
+      //  parse over the rest
+      while (! peek ("+") && ! peek ("-") && ! peek (";")) {
+        take ();
+      }
+
+    }
+
+    test (";");
+
+  }
+
+  test ("END");
+  test ("NONDEFAULTRULES");
 }
 
 void 
@@ -231,31 +290,7 @@ DEFImporter::do_read (db::Layout &layout)
 
     } else if (test ("DIEAREA")) {
 
-      std::vector<db::DPoint> points;
-
-      while (! test (";")) {
-        test ("(");
-        double x = get_double ();
-        double y = get_double ();
-        points.push_back (db::DPoint (x * scale, y * scale));
-        test (")");
-      }
-
-      if (points.size () >= 2) {
-
-        //  create outline shape
-        std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Outline);
-        if (dl.first) {
-          if (points.size () == 2) {
-            design.shapes (dl.second).insert (db::Box (db::DBox (points [0], points [1])));
-          } else {
-            db::DPolygon p;
-            p.assign_hull (points.begin (), points.end ());
-            design.shapes (dl.second).insert (db::Polygon (p));
-          }
-        }
-
-      }
+      read_diearea (layout, design, scale);
 
     } else if (test ("PROPERTYDEFINITIONS")) {
       //  read over PROPERTYDEFINITIONS sections
@@ -265,41 +300,7 @@ DEFImporter::do_read (db::Layout &layout)
 
     } else if (test ("NONDEFAULTRULES")) {
 
-      //  read NONDEFAULTRULES sections
-      get_long ();
-      expect (";");
-
-      while (test ("-")) {
-
-        std::string n = get ();
-
-        while (test ("+")) {
-
-          if (test ("LAYER")) {
-
-            std::string l = get ();
-
-            //  read the width for the layer
-            if (test ("WIDTH")) {
-              double w = get_double () * scale;
-              m_nondefault_widths[n][l] = w;
-            } 
-
-          } 
-
-          //  parse over the rest
-          while (! peek ("+") && ! peek ("-") && ! peek (";")) {
-            take ();
-          }
-
-        }
-
-        test (";");
-
-      }
-
-      test ("END");
-      test ("NONDEFAULTRULES");
+      read_nondefaultrules (scale);
 
     } else if (test ("REGIONS")) {
 

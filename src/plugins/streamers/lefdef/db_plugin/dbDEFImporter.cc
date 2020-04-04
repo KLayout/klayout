@@ -92,6 +92,22 @@ DEFImporter::get_orient (bool optional)
   }
 }
 
+db::Point
+DEFImporter::get_point (double scale)
+{
+  double x = get_double ();
+  double y = get_double ();
+  return db::Point (db::DPoint (x * scale, y * scale));
+}
+
+db::Vector
+DEFImporter::get_vector (double scale)
+{
+  double x = get_double ();
+  double y = get_double ();
+  return db::Vector (db::DVector (x * scale, y * scale));
+}
+
 void
 DEFImporter::read_polygon (db::Polygon &poly, double scale)
 {
@@ -119,18 +135,12 @@ DEFImporter::read_polygon (db::Polygon &poly, double scale)
 void
 DEFImporter::read_rect (db::Polygon &poly, double scale)
 {
-  double x = 0.0, y = 0.0;
-
   test ("(");
-  x = get_double ();
-  y = get_double ();
-  db::Point pt1 = db::Point (db::DPoint (x * scale, y * scale));
+  db::Point pt1 = get_point (scale);
   test (")");
 
   test ("(");
-  x = get_double ();
-  y = get_double ();
-  db::Point pt2 = db::Point (db::DPoint (x * scale, y * scale));
+  db::Point pt2 = get_point (scale);
   test (")");
 
   poly = db::Polygon (db::Box (pt1, pt2));
@@ -174,13 +184,11 @@ DEFImporter::get_def_ext (const std::string &ln, const std::pair<db::Coord, db::
 void
 DEFImporter::read_diearea (db::Layout &layout, db::Cell &design, double scale)
 {
-  std::vector<db::DPoint> points;
+  std::vector<db::Point> points;
 
   while (! test (";")) {
     test ("(");
-    double x = get_double ();
-    double y = get_double ();
-    points.push_back (db::DPoint (x * scale, y * scale));
+    points.push_back (get_point (scale));
     test (")");
   }
 
@@ -190,11 +198,11 @@ DEFImporter::read_diearea (db::Layout &layout, db::Cell &design, double scale)
     std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Outline);
     if (dl.first) {
       if (points.size () == 2) {
-        design.shapes (dl.second).insert (db::Box (db::DBox (points [0], points [1])));
+        design.shapes (dl.second).insert (db::Box (points [0], points [1]));
       } else {
-        db::DPolygon p;
+        db::Polygon p;
         p.assign_hull (points.begin (), points.end ());
-        design.shapes (dl.second).insert (db::Polygon (p));
+        design.shapes (dl.second).insert (p);
       }
     }
 
@@ -564,6 +572,7 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
         std::pair <bool, unsigned int> dl = open_layer (layout, ln, Routing);
         if (dl.first) {
 
+          db::Point p (x, y);
           db::Box rect (db::Point (db::DPoint ((x + x1) * scale, (y + y1) * scale)),
                         db::Point (db::DPoint ((x + x2) * scale, (y + y2) * scale)));
 
@@ -837,8 +846,6 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
 
     while (test ("+")) {
 
-      double x, y;
-
       if (test ("VIARULE")) {
 
         has_via_rule = true;
@@ -846,41 +853,25 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
 
       } else if (test ("CUTSIZE")) {
 
-        x = get_double ();
-        y = get_double ();
-        cutsize = db::Vector (db::DVector (x * scale, y * scale));
+        cutsize = get_vector (scale);
 
       } else if (test ("CUTSPACING")) {
 
-        x = get_double ();
-        y = get_double ();
-        cutspacing = db::Vector (db::DVector (x * scale, y * scale));
+        cutspacing = get_vector (scale);
 
       } else if (test ("ORIGIN")) {
 
-        x = get_double ();
-        y = get_double ();
-        offset = db::Point (db::DPoint (x * scale, y * scale));
+        offset = get_point (scale);
 
       } else if (test ("ENCLOSURE")) {
 
-        x = get_double ();
-        y = get_double ();
-        be = db::Vector (db::DVector (x * scale, y * scale));
-
-        x = get_double ();
-        y = get_double ();
-        te = db::Vector (db::DVector (x * scale, y * scale));
+        be = get_vector (scale);
+        te = get_vector (scale);
 
       } else if (test ("OFFSET")) {
 
-        x = get_double ();
-        y = get_double ();
-        bo = db::Vector (db::DVector (x * scale, y * scale));
-
-        x = get_double ();
-        y = get_double ();
-        to = db::Vector (db::DVector (x * scale, y * scale));
+        bo = get_vector (scale);
+        to = get_vector (scale);
 
       } else if (test ("ROWCOL")) {
 
@@ -1000,18 +991,12 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
           take ();
         }
 
-        double x, y;
-
         test ("(");
-        x = get_double ();
-        y = get_double ();
-        db::Point pt1 = db::Point (db::DPoint (x * scale, y * scale));
+        db::Point pt1 = get_point (scale);
         test (")");
 
         test ("(");
-        x = get_double ();
-        y = get_double ();
-        db::Point pt2 = db::Point (db::DPoint (x * scale, y * scale));
+        db::Point pt2 = get_point (scale);
         test (")");
 
         geometry.insert (std::make_pair (ln, std::vector<db::Polygon> ())).first->second.push_back (db::Polygon (db::Box (pt1, pt2)));
@@ -1049,9 +1034,7 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
       } else if (test ("PLACED") || test ("FIXED") || test ("COVER")) {
 
         test ("(");
-        double x = get_double ();
-        double y = get_double ();
-        db::Vector d = db::Vector (db::DVector (x * scale, y * scale));
+        db::Vector d = get_vector (scale);
         test (")");
 
         db::FTrans ft = get_orient (false /*mandatory*/);
@@ -1172,9 +1155,7 @@ DEFImporter::read_components (std::list<std::pair<std::string, CellInstArray> > 
       if (test ("PLACED") || test ("FIXED") || test ("COVER")) {
 
         test ("(");
-        double x = get_double ();
-        double y = get_double ();
-        db::Point pt = db::Point (db::DPoint (x * scale, y * scale));
+        db::Point pt = get_point (scale);
         test (")");
 
         db::FTrans ft = get_orient (false /*mandatory*/);

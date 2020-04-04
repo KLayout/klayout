@@ -84,6 +84,8 @@ private:
   void read_components (std::list<std::pair<std::string, db::CellInstArray> > &instances, double scale);
   void read_single_net (std::string &nondefaultrule, db::Layout &layout, db::Cell &design, double scale, properties_id_type prop_id, bool specialnets);
   void produce_routing_geometry (db::Cell &design, const db::Polygon *style, unsigned int layer, properties_id_type prop_id, const std::vector<db::Point> &pts, const std::vector<std::pair<db::Coord, db::Coord> > &ext, std::pair<db::Coord, db::Coord> w);
+  db::Point get_point (double scale);
+  db::Vector get_vector (double scale);
 };
 
 }

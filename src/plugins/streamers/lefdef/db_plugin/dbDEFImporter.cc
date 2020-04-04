@@ -360,6 +360,110 @@ DEFImporter::read_blockages (db::Layout &layout, db::Cell &design, double scale)
 }
 
 void
+DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, unsigned int layer, properties_id_type prop_id, const std::vector<db::Point> &pts, const std::vector<std::pair<db::Coord, db::Coord> > &ext, std::pair<db::Coord, db::Coord> w)
+{
+  if (! style) {
+
+    //  Use the default style (octagon "pen" for non-manhattan segments, paths for
+    //  horizontal/vertical segments).
+    //  Manhattan paths are stitched together from two-point paths if they
+
+    std::pair<db::Coord, db::Coord> e = std::max (ext.front (), ext.back ());
+    bool is_isotropic = (e.first == e.second && w.first == w.second);
+    bool was_path = false;
+
+    std::vector<db::Point>::const_iterator pt = pts.begin ();
+    while (pt != pts.end ()) {
+
+      std::vector<db::Point>::const_iterator pt0 = pt;
+      do {
+        ++pt;
+      } while (pt != pts.end () && is_isotropic && (pt[-1].x () == pt[0].x () || pt[-1].y () == pt[0].y()));
+
+      if (pt - pt0 > 1 || pt0->x () == pt0[1].x () || pt0->y () == pt0[0].y()) {
+
+        if (pt - pt0 == 1) {
+          ++pt;
+        }
+
+        db::Coord wxy, wxy_perp, exy;
+
+        if (pt0->x () == pt0 [1].x ()) {
+          wxy = w.second;
+          wxy_perp = w.first;
+          exy = e.second;
+        } else {
+          wxy = w.first;
+          wxy_perp = w.second;
+          exy = e.first;
+        }
+
+        db::Path p (pt0, pt, wxy, pt0 == pts.begin () ? exy : (was_path ? wxy_perp / 2 : 0), pt == pts.end () ? exy : 0, false);
+        if (prop_id != 0) {
+          design.shapes (layer).insert (db::object_with_properties<db::Path> (p, prop_id));
+        } else {
+          design.shapes (layer).insert (p);
+        }
+
+        if (pt == pts.end ()) {
+          break;
+        }
+
+        --pt;
+
+        was_path = true;
+
+      } else {
+
+        if (! is_isotropic) {
+          warn("Anisotropic wire widths not supported for diagonal wires");
+        }
+
+        db::Coord s = (w.first + 1) / 2;
+        db::Coord t = db::Coord (ceil (w.first * (M_SQRT2 - 1) / 2));
+
+        db::Point octagon[8] = {
+          db::Point (-s, t),
+          db::Point (-t, s),
+          db::Point (t, s),
+          db::Point (s, t),
+          db::Point (s, -t),
+          db::Point (t, -s),
+          db::Point (-t, -s),
+          db::Point (-s, -t)
+        };
+
+        db::Polygon k;
+        k.assign_hull (octagon, octagon + sizeof (octagon) / sizeof (octagon[0]));
+
+        db::Polygon p = db::minkowsky_sum (k, db::Edge (*pt0, *pt));
+        if (prop_id != 0) {
+          design.shapes (layer).insert (db::object_with_properties<db::Polygon> (p, prop_id));
+        } else {
+          design.shapes (layer).insert (p);
+        }
+
+        was_path = false;
+
+      }
+
+    }
+
+  } else {
+
+    for (size_t i = 0; i < pts.size () - 1; ++i) {
+      db::Polygon p = db::minkowsky_sum (*style, db::Edge (pts [i], pts [i + 1]));
+      if (prop_id != 0) {
+        design.shapes (layer).insert (db::object_with_properties<db::Polygon> (p, prop_id));
+      } else {
+        design.shapes (layer).insert (p);
+      }
+    }
+
+  }
+}
+
+void
 DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::Cell &design, double scale, db::properties_id_type prop_id, bool specialnets)
 {
   std::string taperrule;
@@ -512,112 +616,10 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
         }
 
         if (pts.size () > 1) {
-
           std::pair <bool, unsigned int> dl = open_layer (layout, ln, Routing);
           if (dl.first) {
-
-            if (! style) {
-
-              //  Use the default style (octagon "pen" for non-manhattan segments, paths for
-              //  horizontal/vertical segments).
-              //  Manhattan paths are stitched together from two-point paths if they
-
-              std::pair<db::Coord, db::Coord> e = std::max (ext.front (), ext.back ());
-              bool is_isotropic = (e.first == e.second && w.first == w.second);
-              bool was_path = false;
-
-              std::vector<db::Point>::const_iterator pt = pts.begin ();
-              while (pt != pts.end ()) {
-
-                std::vector<db::Point>::const_iterator pt0 = pt;
-                do {
-                  ++pt;
-                } while (pt != pts.end () && is_isotropic && (pt[-1].x () == pt[0].x () || pt[-1].y () == pt[0].y()));
-
-                if (pt - pt0 > 1 || pt0->x () == pt0[1].x () || pt0->y () == pt0[0].y()) {
-
-                  if (pt - pt0 == 1) {
-                    ++pt;
-                  }
-
-                  db::Coord wxy, wxy_perp, exy;
-
-                  if (pt0->x () == pt0 [1].x ()) {
-                    wxy = w.second;
-                    wxy_perp = w.first;
-                    exy = e.second;
-                  } else {
-                    wxy = w.first;
-                    wxy_perp = w.second;
-                    exy = e.first;
-                  }
-
-                  db::Path p (pt0, pt, wxy, pt0 == pts.begin () ? exy : (was_path ? wxy_perp / 2 : 0), pt == pts.end () ? exy : 0, false);
-                  if (prop_id != 0) {
-                    design.shapes (dl.second).insert (db::object_with_properties<db::Path> (p, prop_id));
-                  } else {
-                    design.shapes (dl.second).insert (p);
-                  }
-
-                  if (pt == pts.end ()) {
-                    break;
-                  }
-
-                  --pt;
-
-                  was_path = true;
-
-                } else {
-
-                  if (! is_isotropic) {
-                    warn("Anisotropic wire widths not supported for diagonal wires");
-                  }
-
-                  db::Coord s = (w.first + 1) / 2;
-                  db::Coord t = db::Coord (ceil (w.first * (M_SQRT2 - 1) / 2));
-
-                  db::Point octagon[8] = {
-                    db::Point (-s, t),
-                    db::Point (-t, s),
-                    db::Point (t, s),
-                    db::Point (s, t),
-                    db::Point (s, -t),
-                    db::Point (t, -s),
-                    db::Point (-t, -s),
-                    db::Point (-s, -t)
-                  };
-
-                  db::Polygon k;
-                  k.assign_hull (octagon, octagon + sizeof (octagon) / sizeof (octagon[0]));
-
-                  db::Polygon p = db::minkowsky_sum (k, db::Edge (*pt0, *pt));
-                  if (prop_id != 0) {
-                    design.shapes (dl.second).insert (db::object_with_properties<db::Polygon> (p, prop_id));
-                  } else {
-                    design.shapes (dl.second).insert (p);
-                  }
-
-                  was_path = false;
-
-                }
-
-              }
-
-            } else {
-
-              for (size_t i = 0; i < pts.size () - 1; ++i) {
-                db::Polygon p = db::minkowsky_sum (*style, db::Edge (pts [i], pts [i + 1]));
-                if (prop_id != 0) {
-                  design.shapes (dl.second).insert (db::object_with_properties<db::Polygon> (p, prop_id));
-                } else {
-                  design.shapes (dl.second).insert (p);
-                }
-              }
-
-            }
-
+            produce_routing_geometry (design, style, dl.second, prop_id, pts, ext, w);
           }
-
         }
 
       } else if (! peek ("NEW") && ! peek ("+") && ! peek ("-") && ! peek (";")) {
@@ -1467,4 +1469,3 @@ DEFImporter::do_read (db::Layout &layout)
 }
 
 }
-

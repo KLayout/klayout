@@ -30,6 +30,28 @@
 namespace db
 {
 
+struct DEFImporterGroup
+{
+  DEFImporterGroup (const std::string &n, const std::string &rn, const std::vector<tl::GlobPattern> &m)
+    : name (n), region_name (rn), comp_match (m)
+  {
+    //  .. nothing yet ..
+  }
+
+  bool comp_matches (const std::string &name) const
+  {
+    for (std::vector<tl::GlobPattern>::const_iterator m = comp_match.begin (); m != comp_match.end (); ++m) {
+      if (m->match (name)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  std::string name, region_name;
+  std::vector<tl::GlobPattern> comp_match;
+};
+
 DEFImporter::DEFImporter ()
   : LEFDEFImporter ()
 {
@@ -114,28 +136,6 @@ DEFImporter::read_rect (db::Polygon &poly, double scale)
   poly = db::Polygon (db::Box (pt1, pt2));
 }
 
-struct Group
-{
-  Group (const std::string &n, const std::string &rn, const std::vector<tl::GlobPattern> &m)
-    : name (n), region_name (rn), comp_match (m)
-  {
-    //  .. nothing yet ..
-  }
-
-  bool comp_matches (const std::string &name) const
-  {
-    for (std::vector<tl::GlobPattern>::const_iterator m = comp_match.begin (); m != comp_match.end (); ++m) {
-      if (m->match (name)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  std::string name, region_name;
-  std::vector<tl::GlobPattern> comp_match;
-};
-
 std::pair<db::Coord, db::Coord>
 DEFImporter::get_wire_width_for_rule (const std::string &rulename, const std::string &ln, double dbu)
 {
@@ -204,10 +204,6 @@ DEFImporter::read_diearea (db::Layout &layout, db::Cell &design, double scale)
 void
 DEFImporter::read_nondefaultrules (double scale)
 {
-  //  read NONDEFAULTRULES sections
-  get_long ();
-  expect (";");
-
   while (test ("-")) {
 
     std::string n = get ();
@@ -236,9 +232,131 @@ DEFImporter::read_nondefaultrules (double scale)
     test (";");
 
   }
+}
 
-  test ("END");
-  test ("NONDEFAULTRULES");
+void
+DEFImporter::read_regions (std::map<std::string, std::vector<db::Polygon> > &regions, double scale)
+{
+  while (test ("-")) {
+
+    std::string n = get ();
+    std::vector<db::Polygon> &polygons = regions [n];
+
+    while (! peek (";")) {
+
+      if (test ("+")) {
+
+        //  ignore other options for now
+        while (! peek (";")) {
+          take ();
+        }
+        break;
+
+      } else {
+
+        db::Polygon box;
+        read_rect (box, scale);
+        polygons.push_back (box);
+
+      }
+
+    }
+
+    test (";");
+
+  }
+}
+void
+DEFImporter::read_groups (std::list<DEFImporterGroup> &groups, double /*scale*/)
+{
+  while (test ("-")) {
+
+    std::string n = get ();
+    std::string rn;
+    std::vector<tl::GlobPattern> match;
+
+    while (! peek (";")) {
+
+      if (test ("+")) {
+
+        //  gets the region name if there is one
+        if (test ("REGION")) {
+          rn = get ();
+        }
+
+        //  ignore the reset for now
+        while (! peek (";")) {
+          take ();
+        }
+        break;
+
+      } else {
+
+        match.push_back (tl::GlobPattern (get ()));
+
+      }
+
+    }
+
+    groups.push_back (DEFImporterGroup (n, rn, match));
+
+    test (";");
+
+  }
+}
+
+void
+DEFImporter::read_blockages (db::Layout &layout, db::Cell &design, double scale)
+{
+  while (test ("-")) {
+
+    std::string layer;
+
+    while (! test (";")) {
+
+      if (test ("PLACEMENT")) {
+
+        //  indicates a placement blockage
+        layer = std::string ();
+
+      } else if (test ("LAYER")) {
+
+        layer = get ();
+
+      } else if (test ("+")) {
+
+        //  ignore options for now
+        while (! peek ("RECT") && ! peek ("POLYGON") && ! peek ("+") && ! peek ("-") && ! peek (";")) {
+          take ();
+        }
+
+      } else if (test ("POLYGON")) {
+
+        db::Polygon p;
+        read_polygon (p, scale);
+
+        std::pair <bool, unsigned int> dl = open_layer (layout, layer, layer.empty () ? PlacementBlockage : Blockage);
+        if (dl.first) {
+          design.shapes (dl.second).insert (p);
+        }
+
+      } else if (test ("RECT")) {
+
+        db::Polygon p;
+        read_rect (p, scale);
+
+        std::pair <bool, unsigned int> dl = open_layer (layout, layer, layer.empty () ? PlacementBlockage : Blockage);
+        if (dl.first) {
+          design.shapes (dl.second).insert (p);
+        }
+
+      } else {
+        expect (";");
+      }
+
+    }
+
+  }
 }
 
 void 
@@ -249,7 +367,7 @@ DEFImporter::do_read (db::Layout &layout)
   std::map<int, db::Polygon> styles;
   std::map<std::string, ViaDesc> via_desc = m_lef_importer.vias ();
   std::map<std::string, std::vector<db::Polygon> > regions;
-  std::list<Group> groups;
+  std::list<DEFImporterGroup> groups;
   std::list<std::pair<std::string, db::CellInstArray> > instances;
 
   db::Cell &design = layout.cell (layout.add_cell ("TOP"));
@@ -300,7 +418,14 @@ DEFImporter::do_read (db::Layout &layout)
 
     } else if (test ("NONDEFAULTRULES")) {
 
+      //  read NONDEFAULTRULES sections
+      get_long ();
+      expect (";");
+
       read_nondefaultrules (scale);
+
+      expect ("END");
+      expect ("NONDEFAULTRULES");
 
     } else if (test ("REGIONS")) {
 
@@ -308,37 +433,10 @@ DEFImporter::do_read (db::Layout &layout)
       get_long ();
       expect (";");
 
-      while (test ("-")) {
+      read_regions (regions, scale);
 
-        std::string n = get ();
-        std::vector<db::Polygon> &polygons = regions [n];
-
-        while (! peek (";")) {
-
-          if (test ("+")) {
-
-            //  ignore other options for now
-            while (! peek (";")) {
-              take ();
-            }
-            break;
-
-          } else {
-
-            db::Polygon box;
-            read_rect (box, scale);
-            polygons.push_back (box);
-
-          }
-
-        }
-
-        test (";");
-
-      }
-
-      test ("END");
-      test ("REGIONS");
+      expect ("END");
+      expect ("REGIONS");
 
     } else if (test ("PINPROPERTIES")) {
       //  read over PINPROPERTIES statements 
@@ -366,45 +464,13 @@ DEFImporter::do_read (db::Layout &layout)
       get_long ();
       expect (";");
 
-      while (test ("-")) {
+      read_groups (groups, scale);
 
-        std::string n = get ();
-        std::string rn;
-        std::vector<tl::GlobPattern> match;
-
-        while (! peek (";")) {
-
-          if (test ("+")) {
-
-            //  gets the region name if there is one
-            if (test ("REGION")) {
-              rn = get ();
-            }
-
-            //  ignore the reset for now
-            while (! peek (";")) {
-              take ();
-            }
-            break;
-
-          } else {
-
-            match.push_back (tl::GlobPattern (get ()));
-
-          }
-
-        }
-
-        groups.push_back (Group (n, rn, match));
-
-        test (";");
-
-      }
-
-      test ("END");
-      test ("GROUPS");
+      expect ("END");
+      expect ("GROUPS");
 
     } else if (test ("BEGINEXT")) {
+
       //  read over BEGINEXT sections
       while (! test ("ENDEXT")) {
         take ();
@@ -415,58 +481,10 @@ DEFImporter::do_read (db::Layout &layout)
       get_long ();
       expect (";");
 
-      while (test ("-")) {
+      read_blockages (layout, design, scale);
 
-        std::string layer;
-
-        while (! test (";")) {
-
-          if (test ("PLACEMENT")) {
-
-            //  indicates a placement blockage
-            layer = std::string ();
-
-          } else if (test ("LAYER")) {
-
-            layer = get ();
-
-          } else if (test ("+")) {
-
-            //  ignore options for now
-            while (! peek ("RECT") && ! peek ("POLYGON") && ! peek ("+") && ! peek ("-") && ! peek (";")) {
-              take ();
-            }
-
-          } else if (test ("POLYGON")) {
-
-            db::Polygon p;
-            read_polygon (p, scale);
-
-            std::pair <bool, unsigned int> dl = open_layer (layout, layer, layer.empty () ? PlacementBlockage : Blockage);
-            if (dl.first) {
-              design.shapes (dl.second).insert (p);
-            }
-
-          } else if (test ("RECT")) {
-
-            db::Polygon p;
-            read_rect (p, scale);
-
-            std::pair <bool, unsigned int> dl = open_layer (layout, layer, layer.empty () ? PlacementBlockage : Blockage);
-            if (dl.first) {
-              design.shapes (dl.second).insert (p);
-            }
-
-          } else {
-            expect (";");
-          }
-
-        }
-
-      }
-
-      test ("END");
-      test ("BLOCKAGES");
+      expect ("END");
+      expect ("BLOCKAGES");
 
     } else if ((specialnets = test ("SPECIALNETS")) == true || test ("NETS")) {
 
@@ -1325,7 +1343,7 @@ DEFImporter::do_read (db::Layout &layout)
     //  Walk through the groups, create a group container cell and put all instances
     //  that match the group match string there. Then delete these cells (spec says "do not assign any component to more than one group").
 
-    for (std::list<Group>::const_iterator g = groups.begin (); g != groups.end (); ++g) {
+    for (std::list<DEFImporterGroup>::const_iterator g = groups.begin (); g != groups.end (); ++g) {
 
       db::Cell *group_cell = &layout.cell (layout.add_cell (("GROUP_" + g->name).c_str ()));
       design.insert (db::CellInstArray (group_cell->cell_index (), db::Trans ()));

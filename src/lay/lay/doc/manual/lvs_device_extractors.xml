@@ -37,7 +37,7 @@
 
   <pre>sheet_rho = 0.5
 model_name = "RES"
-extract_devices(resistor(model_name, sheet_rho), { "R" => res_layer, "C" => cap_layer })</pre>
+extract_devices(resistor(model_name, sheet_rho), { "R" => res_layer, "C" => contact_layer })</pre>
 
   <p>
   The plain resistor offers two terminals which it outputs on "tA" and "tB" terminal layers.
@@ -60,6 +60,13 @@ extract_devices(resistor(model_name, sheet_rho), { "R" => res_layer, "C" => cap_
 
   <p>
   <img src="/manual/res_ex_tw.png"/>
+  </p>
+
+  <p>
+  <b>Note:</b> The resistance computation is based on a simple approximation. It computes the number 
+  of squares by tracing the perimeter of the "R" polygon. The perimeter length is separated 
+  in parts where the perimeter touches the "C" layer and parts where it does not. The number 
+  of squares is computed from the non-touching length divided by the touching length.
   </p>
 
   <h2>Capacitor extractors (<a href="/about/drc_ref_global.xml#capacitor">capacitor</a> 
@@ -117,11 +124,6 @@ extract_devices(capacitor(model_name, area_cap), { "P1" => metal1, "P2" => metal
 
   <p>
   <img src="/manual/diode_ex_layout.png"/>
-  </p>
-
-  <p>
-  The extractor will compute the capacitance from the area of the 
-  overlap and the capacitance per area (F/µm²) value.
   </p>
 
   <pre>model_name = "DIODE"

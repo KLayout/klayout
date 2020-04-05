@@ -13,38 +13,44 @@ Most of them are convenience functions that basically act on some default object
 or provide function-like alternatives for the methods.
 </p>
 <h2-index/>
-<h2>"antenna_check" - Performs an antenna check</h2>
+<a name="antenna_check"/><h2>"antenna_check" - Performs an antenna check</h2>
 <keyword name="antenna_check"/>
-<a name="antenna_check"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>antenna_check(gate, metal, ratio, [ diode_specs ... ])</tt></li>
 </ul>
 <p>
 See <a href="/about/drc_ref_netter.xml#antenna_check">Netter#antenna_check</a> for a description of that function.
 </p>
-<h2>"bjt3" - Supplies the BJT3 transistor extractor class</h2>
+<a name="bjt3"/><h2>"bjt3" - Supplies the BJT3 transistor extractor class</h2>
 <keyword name="bjt3"/>
-<a name="bjt3"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>bjt3(name)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
 bipolar junction transistor
+</p><p>
+See <class_doc href="DeviceExtractorBJT3Transistor">DeviceExtractorBJT3Transistor</class_doc> for more details
+about this extractor.
 </p>
-<h2>"bjt4" - Supplies the BJT4 transistor extractor class</h2>
+<a name="bjt4"/><h2>"bjt4" - Supplies the BJT4 transistor extractor class</h2>
 <keyword name="bjt4"/>
-<a name="bjt4"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>bjt4(name)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
 bipolar junction transistor with a substrate terminal
+</p><p>
+See <class_doc href="DeviceExtractorBJT4Transistor">DeviceExtractorBJT4Transistor</class_doc> for more details
+about this extractor.
 </p>
-<h2>"box" - Creates a box object</h2>
+<a name="box"/><h2>"box" - Creates a box object</h2>
 <keyword name="box"/>
-<a name="box"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>box(...)</tt></li>
 </ul>
@@ -52,19 +58,22 @@ bipolar junction transistor with a substrate terminal
 This function creates a box object. The arguments are the same than for the 
 <class_doc href="DBox">DBox</class_doc> constructors.
 </p>
-<h2>"capacitor" - Supplies the capacitor extractor class</h2>
+<a name="capacitor"/><h2>"capacitor" - Supplies the capacitor extractor class</h2>
 <keyword name="capacitor"/>
-<a name="capacitor"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>capacitor(name, area_cap)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a capacitor.
 The area_cap argument is the capacitance in Farad per square micrometer.
+</p><p>
+See <class_doc href="DeviceExtractorCapacitor">DeviceExtractorCapacitor</class_doc> for more details
+about this extractor.
 </p>
-<h2>"capacitor_with_bulk" - Supplies the capacitor extractor class that includes a bulk terminal</h2>
+<a name="capacitor_with_bulk"/><h2>"capacitor_with_bulk" - Supplies the capacitor extractor class that includes a bulk terminal</h2>
 <keyword name="capacitor_with_bulk"/>
-<a name="capacitor_with_bulk"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>capacitor_with_bulk(name, area_cap)</tt></li>
 </ul>
@@ -72,10 +81,13 @@ The area_cap argument is the capacitance in Farad per square micrometer.
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a capacitor 
 with a bulk terminal.
 The area_cap argument is the capacitance in Farad per square micrometer.
+</p><p>
+See <class_doc href="DeviceExtractorCapacitorWithBulk">DeviceExtractorCapacitorWithBulk</class_doc> for more details
+about this extractor.
 </p>
-<h2>"cell" - Selects a cell for input on the default source</h2>
+<a name="cell"/><h2>"cell" - Selects a cell for input on the default source</h2>
 <keyword name="cell"/>
-<a name="cell"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>cell(args)</tt></li>
 </ul>
@@ -92,9 +104,9 @@ cell("MACRO")
 l1 = input(1, 0)
 </pre>
 </p>
-<h2>"cheat" - Hierarchy cheats</h2>
+<a name="cheat"/><h2>"cheat" - Hierarchy cheats</h2>
 <keyword name="cheat"/>
-<a name="cheat"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>cheat(args) { block }</tt></li>
 </ul>
@@ -184,18 +196,18 @@ cheat("UNIT_CELL{1,2}") { ... }
 For LVS applications, it's usually sufficient to cheat in the device extraction step. 
 Cheats have been introduced in version 0.26.1.
 </p>
-<h2>"clear_connections" - Clears all connections stored so far</h2>
+<a name="clear_connections"/><h2>"clear_connections" - Clears all connections stored so far</h2>
 <keyword name="clear_connections"/>
-<a name="clear_connections"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>clear_connections</tt></li>
 </ul>
 <p>
 See <a href="/about/drc_ref_netter.xml#clear_connections">Netter#clear_connections</a> for a description of that function.
 </p>
-<h2>"clip" - Specifies clipped input on the default source</h2>
+<a name="clip"/><h2>"clip" - Specifies clipped input on the default source</h2>
 <keyword name="clip"/>
-<a name="clip"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>clip(args)</tt></li>
 </ul>
@@ -211,36 +223,37 @@ clip(0.mm, 0.mm, 0.5.mm, 0.6.mm)
 l1 = input(1, 0)
 </pre>
 </p>
-<h2>"connect" - Specifies a connection between two layers</h2>
+<a name="connect"/><h2>"connect" - Specifies a connection between two layers</h2>
 <keyword name="connect"/>
-<a name="connect"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>connect(a, b)</tt></li>
 </ul>
 <p>
 See <a href="/about/drc_ref_netter.xml#connect">Netter#connect</a> for a description of that function.
 </p>
-<h2>"connect_global" - Specifies a connection to a global net</h2>
+<a name="connect_global"/><h2>"connect_global" - Specifies a connection to a global net</h2>
 <keyword name="connect_global"/>
-<a name="connect_global"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>connect_global(l, name)</tt></li>
 </ul>
 <p>
 See <a href="/about/drc_ref_netter.xml#connect_global">Netter#connect_global</a> for a description of that function.
 </p>
-<h2>"connect_implicit" - Specifies a label pattern for implicit net connections</h2>
+<a name="connect_implicit"/><h2>"connect_implicit" - Specifies a label pattern for implicit net connections</h2>
 <keyword name="connect_implicit"/>
-<a name="connect_implicit"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>connect_implicit(label_pattern)</tt></li>
+<li><tt>connect_implicit(cell_pattern, label_pattern)</tt></li>
 </ul>
 <p>
 See <a href="/about/drc_ref_netter.xml#connect_implicit">Netter#connect_implicit</a> for a description of that function.
 </p>
-<h2>"dbu" - Gets or sets the database unit to use</h2>
+<a name="dbu"/><h2>"dbu" - Gets or sets the database unit to use</h2>
 <keyword name="dbu"/>
-<a name="dbu"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>dbu(dbu)</tt></li>
 <li><tt>dbu</tt></li>
@@ -257,9 +270,9 @@ for two layouts (i.e. take the largest common denominator).
 When the database unit is set, it must be set at the beginning
 of the script and before any operation that uses it.
 </p>
-<h2>"deep" - Enters deep (hierarchical) mode</h2>
+<a name="deep"/><h2>"deep" - Enters deep (hierarchical) mode</h2>
 <keyword name="deep"/>
-<a name="deep"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>deep</tt></li>
 </ul>
@@ -277,28 +290,31 @@ implied always. Sometimes cell variants will be created.
 </p><p>
 Deep mode can be cancelled with <a href="#tiles">tiles</a> or <a href="#flat">flat</a>.
 </p>
-<h2>"device_scaling" - Specifies a dimension scale factor for the geometrical device properties</h2>
+<a name="device_scaling"/><h2>"device_scaling" - Specifies a dimension scale factor for the geometrical device properties</h2>
 <keyword name="device_scaling"/>
-<a name="device_scaling"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>device_scaling(factor)</tt></li>
 </ul>
 <p>
 See <a href="/about/drc_ref_netter.xml#device_scaling">Netter#device_scaling</a> for a description of that function.
 </p>
-<h2>"diode" - Supplies the diode extractor class</h2>
+<a name="diode"/><h2>"diode" - Supplies the diode extractor class</h2>
 <keyword name="diode"/>
-<a name="diode"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>diode(name)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
 planar diode 
+</p><p>
+See <class_doc href="DeviceExtractorDiode">DeviceExtractorDiode</class_doc> for more details
+about this extractor.
 </p>
-<h2>"dmos3" - Supplies the DMOS3 transistor extractor class</h2>
+<a name="dmos3"/><h2>"dmos3" - Supplies the DMOS3 transistor extractor class</h2>
 <keyword name="dmos3"/>
-<a name="dmos3"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>dmos3(name)</tt></li>
 </ul>
@@ -307,10 +323,13 @@ Use this class with <a href="#extract_devices">extract_devices</a> to specify ex
 three-terminal DMOS transistor. A DMOS transistor is essentially
 the same than a MOS transistor, but source and drain are 
 separated.
+</p><p>
+See <class_doc href="DeviceExtractorMOS3Transistor">DeviceExtractorMOS3Transistor</class_doc> for more details
+about this extractor (strict mode applies for 'dmos3').
 </p>
-<h2>"dmos4" - Supplies the MOS4 transistor extractor class</h2>
+<a name="dmos4"/><h2>"dmos4" - Supplies the MOS4 transistor extractor class</h2>
 <keyword name="dmos4"/>
-<a name="dmos4"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>dmos4(name)</tt></li>
 </ul>
@@ -319,10 +338,13 @@ Use this class with <a href="#extract_devices">extract_devices</a> to specify ex
 four-terminal DMOS transistor. A DMOS transistor is essentially
 the same than a MOS transistor, but source and drain are 
 separated.
+</p><p>
+See <class_doc href="DeviceExtractorMOS4Transistor">DeviceExtractorMOS4Transistor</class_doc> for more details
+about this extractor (strict mode applies for 'dmos4').
 </p>
-<h2>"edge" - Creates an edge object</h2>
+<a name="edge"/><h2>"edge" - Creates an edge object</h2>
 <keyword name="edge"/>
-<a name="edge"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>edge(...)</tt></li>
 </ul>
@@ -330,9 +352,9 @@ separated.
 This function creates an edge object. The arguments are the same than for the 
 <class_doc href="DEdge">DEdge</class_doc> constructors.
 </p>
-<h2>"edge_layer" - Creates an empty edge layer</h2>
+<a name="edge_layer"/><h2>"edge_layer" - Creates an empty edge layer</h2>
 <keyword name="edge_layer"/>
-<a name="edge_layer"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>edge_layer</tt></li>
 </ul>
@@ -340,27 +362,27 @@ This function creates an edge object. The arguments are the same than for the
 The intention of that method is to create an empty layer which can be 
 filled with edge objects using <a href="/about/drc_ref_layer.xml#insert">Layer#insert</a>.
 </p>
-<h2>"error" - Prints an error</h2>
+<a name="error"/><h2>"error" - Prints an error</h2>
 <keyword name="error"/>
-<a name="error"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>error(message)</tt></li>
 </ul>
 <p>
 Similar to <a href="#log">log</a>, but the message is printed formatted as an error
 </p>
-<h2>"extent" - Creates a new layer with the bounding box of the default source</h2>
+<a name="extent"/><h2>"extent" - Creates a new layer with the bounding box of the default source</h2>
 <keyword name="extent"/>
-<a name="extent"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>extent</tt></li>
 </ul>
 <p>
 See <a href="/about/drc_ref_source.xml#extent">Source#extent</a> for a description of that function.
 </p>
-<h2>"extract_devices" - Extracts devices for a given device extractor and device layer selection</h2>
+<a name="extract_devices"/><h2>"extract_devices" - Extracts devices for a given device extractor and device layer selection</h2>
 <keyword name="extract_devices"/>
-<a name="extract_devices"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>extract_devices(extractor, layer_hash)</tt></li>
 <li><tt>extract_devices(extractor_class, name, layer_hash)</tt></li>
@@ -368,18 +390,18 @@ See <a href="/about/drc_ref_source.xml#extent">Source#extent</a> for a descripti
 <p>
 See <a href="/about/drc_ref_netter.xml#extract_devices">Netter#extract_devices</a> for a description of that function.
 </p>
-<h2>"flat" - Disables tiling mode</h2>
+<a name="flat"/><h2>"flat" - Disables tiling mode</h2>
 <keyword name="flat"/>
-<a name="flat"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>flat</tt></li>
 </ul>
 <p>
 Disables tiling mode. Tiling mode can be enabled again with <a href="#tiles">tiles</a> later.
 </p>
-<h2>"info" - Outputs as message to the logger window</h2>
+<a name="info"/><h2>"info" - Outputs as message to the logger window</h2>
 <keyword name="info"/>
-<a name="info"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>info(message)</tt></li>
 </ul>
@@ -388,9 +410,9 @@ Prints the message to the log window in verbose mode.
 In non-verbose more, nothing is printed.
 <a href="#log">log</a> is a function that always prints a message.
 </p>
-<h2>"input" - Fetches the shapes from the specified input from the default source</h2>
+<a name="input"/><h2>"input" - Fetches the shapes from the specified input from the default source</h2>
 <keyword name="input"/>
-<a name="input"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>input(args)</tt></li>
 </ul>
@@ -399,48 +421,48 @@ See <a href="/about/drc_ref_source.xml#input">Source#input</a> for a description
 polygons and labels. See <a href="#polygons">polygons</a> and <a href="#labels">labels</a> for more specific versions of
 this method.
 </p>
-<h2>"is_deep?" - Returns true, if in deep mode</h2>
+<a name="is_deep?"/><h2>"is_deep?" - Returns true, if in deep mode</h2>
 <keyword name="is_deep?"/>
-<a name="is_deep?"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>is_deep?</tt></li>
 </ul>
-<h2>"is_tiled?" - Returns true, if in tiled mode</h2>
+<a name="is_tiled?"/><h2>"is_tiled?" - Returns true, if in tiled mode</h2>
 <keyword name="is_tiled?"/>
-<a name="is_tiled?"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>is_tiled?</tt></li>
 </ul>
-<h2>"l2n_data" - Gets the internal <class_doc href="LayoutToNetlist">LayoutToNetlist</class_doc> object for the default <a href="#Netter">Netter</a></h2>
+<a name="l2n_data"/><h2>"l2n_data" - Gets the internal <class_doc href="LayoutToNetlist">LayoutToNetlist</class_doc> object for the default <a href="#Netter">Netter</a></h2>
 <keyword name="l2n_data"/>
-<a name="l2n_data"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>l2n_data</tt></li>
 </ul>
 <p>
 See <a href="/about/drc_ref_netter.xml#l2n_data">Netter#l2n_data</a> for a description of that function.
 </p>
-<h2>"labels" - Gets the labels (text) from an original layer</h2>
+<a name="labels"/><h2>"labels" - Gets the labels (text) from an original layer</h2>
 <keyword name="labels"/>
-<a name="labels"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>labels</tt></li>
 </ul>
 <p>
 See <a href="/about/drc_ref_source.xml#labels">Source#labels</a> for a description of that function.
 </p>
-<h2>"layers" - Gets the layers contained in the default source</h2>
+<a name="layers"/><h2>"layers" - Gets the layers contained in the default source</h2>
 <keyword name="layers"/>
-<a name="layers"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layers</tt></li>
 </ul>
 <p>
 See <a href="/about/drc_ref_source.xml#layers">Source#layers</a> for a description of that function.
 </p>
-<h2>"layout" - Specifies an additional layout for the input source.</h2>
+<a name="layout"/><h2>"layout" - Specifies an additional layout for the input source.</h2>
 <keyword name="layout"/>
-<a name="layout"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>layout</tt></li>
 <li><tt>layout(what)</tt></li>
@@ -475,9 +497,9 @@ l2 = layout("second_layout.gds")
 </p><p>
 For further methods on the source object see <a href="#Source">Source</a>.
 </p>
-<h2>"log" - Outputs as message to the logger window</h2>
+<a name="log"/><h2>"log" - Outputs as message to the logger window</h2>
 <keyword name="log"/>
-<a name="log"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>log(message)</tt></li>
 </ul>
@@ -486,9 +508,9 @@ Prints the message to the log window.
 <a href="#info">info</a> is a function that prints a message only if 
 verbose mode is enabled.
 </p>
-<h2>"log_file" - Specify the log file where to send to log to</h2>
+<a name="log_file"/><h2>"log_file" - Specify the log file where to send to log to</h2>
 <keyword name="log_file"/>
-<a name="log_file"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>log_file(filename)</tt></li>
 </ul>
@@ -496,9 +518,9 @@ verbose mode is enabled.
 After using that method, the log output is sent to the 
 given file instead of the logger window or the terminal.
 </p>
-<h2>"make_layer" - Creates an empty polygon layer based on the hierarchical scheme selected</h2>
+<a name="make_layer"/><h2>"make_layer" - Creates an empty polygon layer based on the hierarchical scheme selected</h2>
 <keyword name="make_layer"/>
-<a name="make_layer"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>make_layer</tt></li>
 </ul>
@@ -514,63 +536,69 @@ delivered by <a href="#polygon_layer">polygon_layer</a> is not.
 On the other hand, a layer created by the <a href="#make_layer">make_layer</a> method is not intended to be
 filled with <a href="/about/drc_ref_layer.xml#insert">Layer#insert</a>.
 </p>
-<h2>"mos3" - Supplies the MOS3 transistor extractor class</h2>
+<a name="mos3"/><h2>"mos3" - Supplies the MOS3 transistor extractor class</h2>
 <keyword name="mos3"/>
-<a name="mos3"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>mos3(name)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
-three-terminal MOS transistor
+three-terminal MOS transistor.
+</p><p>
+See <class_doc href="DeviceExtractorMOS3Transistor">DeviceExtractorMOS3Transistor</class_doc> for more details
+about this extractor (non-strict mode applies for 'mos3').
 </p>
-<h2>"mos4" - Supplies the MOS4 transistor extractor class</h2>
+<a name="mos4"/><h2>"mos4" - Supplies the MOS4 transistor extractor class</h2>
 <keyword name="mos4"/>
-<a name="mos4"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>mos4(name)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
-four-terminal MOS transistor
+four-terminal MOS transistor.
+</p><p>
+See <class_doc href="DeviceExtractorMOS4Transistor">DeviceExtractorMOS4Transistor</class_doc> for more details
+about this extractor (non-strict mode applies for 'mos4').
 </p>
-<h2>"netlist" - Obtains the extracted netlist from the default <a href="#Netter">Netter</a></h2>
+<a name="netlist"/><h2>"netlist" - Obtains the extracted netlist from the default <a href="#Netter">Netter</a></h2>
 <keyword name="netlist"/>
-<a name="netlist"/><p>
+<p>
 The netlist is a <class_doc href="Netlist">Netlist</class_doc> object. If no netlist is extracted 
 yet, this method will trigger the extraction process.
 See <a href="/about/drc_ref_netter.xml#netlist">Netter#netlist</a> for a description of this function.
 </p>
-<h2>"netter" - Creates a new netter object</h2>
+<a name="netter"/><h2>"netter" - Creates a new netter object</h2>
 <keyword name="netter"/>
-<a name="netter"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>netter</tt></li>
 </ul>
 <p>
 See <a href="/about/drc_ref_netter.xml">Netter</a> for more details
 </p>
-<h2>"no_borders" - Reset the tile borders</h2>
+<a name="no_borders"/><h2>"no_borders" - Reset the tile borders</h2>
 <keyword name="no_borders"/>
-<a name="no_borders"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>no_borders</tt></li>
 </ul>
 <p>
 Resets the tile borders - see <a href="#tile_borders">tile_borders</a> for a description of tile borders.
 </p>
-<h2>"output" - Outputs a layer to the report database or output layout</h2>
+<a name="output"/><h2>"output" - Outputs a layer to the report database or output layout</h2>
 <keyword name="output"/>
-<a name="output"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>output(layer, args)</tt></li>
 </ul>
 <p>
 This function is equivalent to "layer.output(args)". See <a href="/about/drc_ref_layer.xml#output">Layer#output</a> for details about this function.
 </p>
-<h2>"output_cell" - Specifies a target cell, but does not change the target layout</h2>
+<a name="output_cell"/><h2>"output_cell" - Specifies a target cell, but does not change the target layout</h2>
 <keyword name="output_cell"/>
-<a name="output_cell"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>output_cell(cellname)</tt></li>
 </ul>
@@ -579,9 +607,9 @@ This method switches output to the specified cell, but does not
 change the target layout nor does it switch the output channel to
 layout if is report database. 
 </p>
-<h2>"p" - Creates a point object</h2>
+<a name="p"/><h2>"p" - Creates a point object</h2>
 <keyword name="p"/>
-<a name="p"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>p(x, y)</tt></li>
 </ul>
@@ -594,9 +622,9 @@ x = polygon_layer
 x.insert(polygon([ p(0, 0), p(16.0, 0), p(8.0, 8.0) ]))
 </pre>
 </p>
-<h2>"path" - Creates a path object</h2>
+<a name="path"/><h2>"path" - Creates a path object</h2>
 <keyword name="path"/>
-<a name="path"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>path(...)</tt></li>
 </ul>
@@ -604,9 +632,9 @@ x.insert(polygon([ p(0, 0), p(16.0, 0), p(8.0, 8.0) ]))
 This function creates a path object. The arguments are the same than for the 
 <class_doc href="DPath">DPath</class_doc> constructors.
 </p>
-<h2>"polygon" - Creates a polygon object</h2>
+<a name="polygon"/><h2>"polygon" - Creates a polygon object</h2>
 <keyword name="polygon"/>
-<a name="polygon"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>polygon(...)</tt></li>
 </ul>
@@ -614,9 +642,9 @@ This function creates a path object. The arguments are the same than for the
 This function creates a polygon object. The arguments are the same than for the 
 <class_doc href="DPolygon">DPolygon</class_doc> constructors.
 </p>
-<h2>"polygon_layer" - Creates an empty polygon layer</h2>
+<a name="polygon_layer"/><h2>"polygon_layer" - Creates an empty polygon layer</h2>
 <keyword name="polygon_layer"/>
-<a name="polygon_layer"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>polygon_layer</tt></li>
 </ul>
@@ -626,18 +654,18 @@ filled with polygon-like objects using <a href="/about/drc_ref_layer.xml#insert"
 A similar method which creates a hierarchical layer in deep mode is 
 <a href="#make_layer">make_layer</a>. This other layer is better suited for use with device extraction.
 </p>
-<h2>"polygons" - Fetches the polygons (or shapes that can be converted to polygons) from the specified input from the default source</h2>
+<a name="polygons"/><h2>"polygons" - Fetches the polygons (or shapes that can be converted to polygons) from the specified input from the default source</h2>
 <keyword name="polygons"/>
-<a name="polygons"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>polygons(args)</tt></li>
 </ul>
 <p>
 See <a href="/about/drc_ref_source.xml#polygons">Source#polygons</a> for a description of that function.
 </p>
-<h2>"report" - Specifies a report database for output</h2>
+<a name="report"/><h2>"report" - Specifies a report database for output</h2>
 <keyword name="report"/>
-<a name="report"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>report(description [, filename [, cellname ] ])</tt></li>
 </ul>
@@ -658,9 +686,9 @@ By default this is the cell name of the default source. If there
 is no source layout you'll need to give the cell name in the 
 third parameter.
 </p>
-<h2>"report_netlist" - Specifies an extracted netlist report for output</h2>
+<a name="report_netlist"/><h2>"report_netlist" - Specifies an extracted netlist report for output</h2>
 <keyword name="report_netlist"/>
-<a name="report_netlist"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>report_netlist([ filename [, long ] ])</tt></li>
 </ul>
@@ -675,19 +703,24 @@ will also be written to the given file.
 If a file name is given and "long" is true, a verbose 
 version of the L2N DB format will be used.
 </p>
-<h2>"resistor" - Supplies the resistor extractor class</h2>
+<a name="resistor"/><h2>"resistor" - Supplies the resistor extractor class</h2>
 <keyword name="resistor"/>
-<a name="resistor"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>resistor(name, sheet_rho)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a resistor.
-The sheet_rho value is the sheet resistance in ohms/square.
+</p><p>
+The sheet_rho value is the sheet resistance in ohms/square. It is used
+to compute the resistance from the geometry.
+</p><p>
+See <class_doc href="DeviceExtractorResistor">DeviceExtractorResistor</class_doc> for more details
+about this extractor.
 </p>
-<h2>"resistor_with_bulk" - Supplies the resistor extractor class that includes a bulk terminal</h2>
+<a name="resistor_with_bulk"/><h2>"resistor_with_bulk" - Supplies the resistor extractor class that includes a bulk terminal</h2>
 <keyword name="resistor_with_bulk"/>
-<a name="resistor_with_bulk"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>resistor_with_bulk(name, sheet_rho)</tt></li>
 </ul>
@@ -695,28 +728,31 @@ The sheet_rho value is the sheet resistance in ohms/square.
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a resistor 
 with a bulk terminal.
 The sheet_rho value is the sheet resistance in ohms/square.
+</p><p>
+See <class_doc href="DeviceExtractorResistorWithBulk">DeviceExtractorResistorWithBulk</class_doc> for more details
+about this extractor.
 </p>
-<h2>"select" - Specifies cell filters on the default source</h2>
+<a name="select"/><h2>"select" - Specifies cell filters on the default source</h2>
 <keyword name="select"/>
-<a name="select"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>select(args)</tt></li>
 </ul>
 <p>
 See <a href="/about/drc_ref_source.xml#select">Source#select</a> for a description of that function.
 </p>
-<h2>"silent" - Resets verbose mode</h2>
+<a name="silent"/><h2>"silent" - Resets verbose mode</h2>
 <keyword name="silent"/>
-<a name="silent"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>silent</tt></li>
 </ul>
 <p>
 This function is equivalent to "verbose(false)" (see <a href="#verbose">verbose</a>)
 </p>
-<h2>"source" - Specifies a source layout</h2>
+<a name="source"/><h2>"source" - Specifies a source layout</h2>
 <keyword name="source"/>
-<a name="source"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>source</tt></li>
 <li><tt>source(what)</tt></li>
@@ -751,9 +787,9 @@ l2 = layout("second_layout.gds")
 </p><p>
 For further methods on the source object see <a href="#Source">Source</a>.
 </p>
-<h2>"target" - Specify the target layout</h2>
+<a name="target"/><h2>"target" - Specify the target layout</h2>
 <keyword name="target"/>
-<a name="target"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>target(what [, cellname])</tt></li>
 </ul>
@@ -778,9 +814,9 @@ Except if the argument is a <class_doc href="Cell">Cell</class_doc> object, a ce
 stating the cell name under which the results are saved. If no cellname is 
 specified, either the current cell or "TOP" is used.
 </p>
-<h2>"target_netlist" - With this statement, an extracted netlist is finally written to a file</h2>
+<a name="target_netlist"/><h2>"target_netlist" - With this statement, an extracted netlist is finally written to a file</h2>
 <keyword name="target_netlist"/>
-<a name="target_netlist"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>target_netlist(filename [, format [, comment ] ])</tt></li>
 </ul>
@@ -794,9 +830,9 @@ The format parameter specifies the writer to use. You can use nil
 to use the standard format or produce a SPICE writer with <a href="#write_spice">write_spice</a>.
 See <a href="#write_spice">write_spice</a> for more details.
 </p>
-<h2>"threads" - Specifies the number of CPU cores to use in tiling mode</h2>
+<a name="threads"/><h2>"threads" - Specifies the number of CPU cores to use in tiling mode</h2>
 <keyword name="threads"/>
-<a name="threads"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>threads(n)</tt></li>
 </ul>
@@ -805,9 +841,9 @@ If using threads, tiles are distributed on multiple CPU cores for
 parallelization. Still, all tiles must be processed before the 
 operation proceeds with the next statement.
 </p>
-<h2>"tile_borders" - Specifies a minimum tile border</h2>
+<a name="tile_borders"/><h2>"tile_borders" - Specifies a minimum tile border</h2>
 <keyword name="tile_borders"/>
-<a name="tile_borders"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>tile_border(b)</tt></li>
 <li><tt>tile_border(bx, by)</tt></li>
@@ -826,9 +862,9 @@ given range, although not necessarily all.
 </p><p>
 To reset the tile borders, use <a href="#no_borders">no_borders</a> or "tile_borders(nil)".
 </p>
-<h2>"tiles" - Specifies tiling</h2>
+<a name="tiles"/><h2>"tiles" - Specifies tiling</h2>
 <keyword name="tiles"/>
-<a name="tiles"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>tiles(t)</tt></li>
 <li><tt>tiles(w, h)</tt></li>
@@ -851,9 +887,9 @@ To disable tiling mode use <a href="#flat">flat</a> or <a href="#deep">deep</a>.
 </p><p>
 Tiling mode will disable deep mode (see <a href="#deep">deep</a>).
 </p>
-<h2>"verbose" - Sets or resets verbose mode</h2>
+<a name="verbose"/><h2>"verbose" - Sets or resets verbose mode</h2>
 <keyword name="verbose"/>
-<a name="verbose"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>verbose</tt></li>
 <li><tt>verbose(m)</tt></li>
@@ -861,18 +897,18 @@ Tiling mode will disable deep mode (see <a href="#deep">deep</a>).
 <p>
 In verbose mode, more output is generated in the log file
 </p>
-<h2>"verbose?" - Returns true, if verbose mode is enabled</h2>
+<a name="verbose?"/><h2>"verbose?" - Returns true, if verbose mode is enabled</h2>
 <keyword name="verbose?"/>
-<a name="verbose?"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>verbose?</tt></li>
 </ul>
 <p>
 In verbose mode, more output is generated in the log file
 </p>
-<h2>"write_spice" - Defines SPICE output format (with options)</h2>
+<a name="write_spice"/><h2>"write_spice" - Defines SPICE output format (with options)</h2>
 <keyword name="write_spice"/>
-<a name="write_spice"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>write_spice([ use_net_names [, with_comments ] ])</tt></li>
 </ul>

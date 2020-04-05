@@ -39,6 +39,10 @@ namespace db
  *
  *  The layer properties are basically to be used for storing of layer name and 
  *  layer/datatype information.
+ *
+ *  A special use case is for the target of a layer mapping specification.
+ *  In this case, the layer properties can make use of the relative
+ *  layer/datatype specifications.
  */
 struct DB_PUBLIC LayerProperties
 {
@@ -68,10 +72,7 @@ struct DB_PUBLIC LayerProperties
    *  A null specification is one created by the default constructor. It does not have
    *  a layer, datatype or name assigned.
    */
-  bool is_null () const
-  {
-    return layer < 0 && datatype < 0 && name.empty ();
-  }
+  bool is_null () const;
   
   /**
    *  @brief Return true, if the layer is specified by name only
@@ -81,12 +82,17 @@ struct DB_PUBLIC LayerProperties
   /**
    *  @brief Convert to a string
    */
-  std::string to_string () const;
+  std::string to_string (bool as_target = false) const;
 
   /**
    *  @brief Extract from a tl::Extractor
+   *
+   *  With "with_relative" true, the extractor allows giving
+   *  relative layer/datatype specifications in the format "*+1" or "*-100".
+   *  "*" for layer or datatype is for "don't care" (on input) or "leave as is"
+   *  (for output).
    */
-  void read (tl::Extractor &ex);
+  void read (tl::Extractor &ex, bool as_target = false);
 
   /**
    *  @brief "Logical" equality

@@ -29,6 +29,8 @@
 #include "tlString.h"
 #include "tlFileUtils.h"
 #include "tlUri.h"
+#include "tlTimer.h"
+#include "tlLog.h"
 
 #include <sstream>
 #include <cctype>
@@ -249,6 +251,8 @@ NetlistSpiceReader::~NetlistSpiceReader ()
 
 void NetlistSpiceReader::read (tl::InputStream &stream, db::Netlist &netlist)
 {
+  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading netlist ")) + stream.source ());
+
   mp_stream.reset (new tl::TextInputStream (stream));
   mp_netlist = &netlist;
   mp_circuit = 0;

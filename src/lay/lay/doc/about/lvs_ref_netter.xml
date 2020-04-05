@@ -43,9 +43,9 @@ end
 </pre>
 </p>
 <h2-index/>
-<h2>"align" - Aligns the extracted netlist vs. the schematic</h2>
+<a name="align"/><h2>"align" - Aligns the extracted netlist vs. the schematic</h2>
 <keyword name="align"/>
-<a name="align"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>align</tt></li>
 </ul>
@@ -68,9 +68,9 @@ are other (explicit) ways to flatten circuits.
 Please note that flattening circuits has some side effects such 
 as loss of details in the cross reference and net layout.
 </p>
-<h2>"compare" - Compares the extracted netlist vs. the schematic</h2>
+<a name="compare"/><h2>"compare" - Compares the extracted netlist vs. the schematic</h2>
 <keyword name="compare"/>
-<a name="compare"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>compare</tt></li>
 </ul>
@@ -85,9 +85,9 @@ corresponding circuits: the unpaired circuit will be flattened then.
 This method will return true, if the netlists are equivalent and false
 otherwise.
 </p>
-<h2>"equivalent_pins" - Marks pins as equivalent</h2>
+<a name="equivalent_pins"/><h2>"equivalent_pins" - Marks pins as equivalent</h2>
 <keyword name="equivalent_pins"/>
-<a name="equivalent_pins"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>equivalent_pins(circuit, pin ...)</tt></li>
 </ul>
@@ -110,9 +110,9 @@ If the netlist provides named pins, names can be used instead of numbers.
 Before this method can be used, a schematic netlist needs to be loaded with
 <a href="#schematic">schematic</a>.
 </p>
-<h2>"join_symmetric_nets" - Joins symmetric nets of selected circuits on the extracted netlist</h2>
+<a name="join_symmetric_nets"/><h2>"join_symmetric_nets" - Joins symmetric nets of selected circuits on the extracted netlist</h2>
 <keyword name="join_symmetric_nets"/>
-<a name="join_symmetric_nets"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>join_symmetric_nets(circuit_filter)</tt></li>
 </ul>
@@ -133,9 +133,9 @@ those circuits for which this feature is required.
 For the symmetry detection, the specified constraints (e.g. tolerances,
 device filters etc.) apply.
 </p>
-<h2>"lvs_data" - Gets the internal <class_doc href="LayoutVsSchematic">LayoutVsSchematic</class_doc> object</h2>
+<a name="lvs_data"/><h2>"lvs_data" - Gets the internal <class_doc href="LayoutVsSchematic">LayoutVsSchematic</class_doc> object</h2>
 <keyword name="lvs_data"/>
-<a name="lvs_data"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>lvs_data</tt></li>
 </ul>
@@ -143,9 +143,29 @@ device filters etc.) apply.
 The <class_doc href="LayoutVsSchematic">LayoutVsSchematic</class_doc> object provides access to the internal details of
 the netter object.
 </p>
-<h2>"max_depth" - Configures the maximum search depth for net match deduction</h2>
+<a name="max_branch_complexity"/><h2>"max_branch_complexity" - Configures the maximum branch complexity for ambiguous net matching</h2>
+<keyword name="max_branch_complexity"/>
+<p>Usage:</p>
+<ul>
+<li><tt>max_branch_complexity(n)</tt></li>
+</ul>
+<p>
+The netlist compare algorithm is basically a backtracing algorithm.
+With ambiguous nets, the algorithm picks possible net pairs and
+tries whether they will make a good match. Following the deduction
+path for this nets may lead to further branches if more ambiguous
+nets are encountered. To avoid combinational explosion, the maximum
+branch complexity is limited to the value configured with this 
+function. The default value is 500 which means not more than
+500 combinations are tried for a single seed pair. For networks
+with inherent ambiguity such as decoders, the complexity
+can be increased at the expense of potentially larger runtimes.
+The runtime penality is roughly proportional to the branch
+complexity.
+</p>
+<a name="max_depth"/><h2>"max_depth" - Configures the maximum search depth for net match deduction</h2>
 <keyword name="max_depth"/>
-<a name="max_depth"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>max_depth(n)</tt></li>
 </ul>
@@ -160,9 +180,9 @@ pursues this "deduction path" in greater depth while with
 smaller values, the algorithm prefers picking nets in a random fashion
 as the seeds for this deduction path. The default value is 8. 
 </p>
-<h2>"max_res" - Ignores resistors with a resistance above a certain value</h2>
+<a name="max_res"/><h2>"max_res" - Ignores resistors with a resistance above a certain value</h2>
 <keyword name="max_res"/>
-<a name="max_res"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>max_res(threshold)</tt></li>
 </ul>
@@ -170,9 +190,9 @@ as the seeds for this deduction path. The default value is 8.
 After using this method, the netlist compare will ignore resistor devices
 with a resistance value above the given threshold (in Farad).
 </p>
-<h2>"min_caps" - Ignores capacitors with a capacitance below a certain value</h2>
+<a name="min_caps"/><h2>"min_caps" - Ignores capacitors with a capacitance below a certain value</h2>
 <keyword name="min_caps"/>
-<a name="min_caps"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>min_caps(threshold)</tt></li>
 </ul>
@@ -180,9 +200,9 @@ with a resistance value above the given threshold (in Farad).
 After using this method, the netlist compare will ignore capacitance devices
 with a capacitance values below the given threshold (in Farad).
 </p>
-<h2>"same_circuits" - Establishes an equivalence between the circuits</h2>
+<a name="same_circuits"/><h2>"same_circuits" - Establishes an equivalence between the circuits</h2>
 <keyword name="same_circuits"/>
-<a name="same_circuits"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>same_circuits(circuit_a, circuit_b)</tt></li>
 </ul>
@@ -197,9 +217,9 @@ other circuit is mapped to "nothing", i.e. ignored.
 Before this method can be used, a schematic netlist needs to be loaded with
 <a href="#schematic">schematic</a>.
 </p>
-<h2>"same_device_classes" - Establishes an equivalence between the device classes</h2>
+<a name="same_device_classes"/><h2>"same_device_classes" - Establishes an equivalence between the device classes</h2>
 <keyword name="same_device_classes"/>
-<a name="same_device_classes"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>same_device_classes(class_a, class_b)</tt></li>
 </ul>
@@ -209,15 +229,30 @@ Device classes are also known as "models".
 By default, device classes are identified by name. If names are different, this
 method allows establishing an explicit correspondence.
 </p><p>
-One of the device classes may be nil. In this case, the corresponding
-other device class is mapped to "nothing", i.e. ignored.
-</p><p>
 Before this method can be used, a schematic netlist needs to be loaded with
 <a href="#schematic">schematic</a>.
+</p><p>
+One of the device classes may be "nil". In this case, the corresponding
+other device class is mapped to "nothing", i.e. ignored.
+</p><p>
+A device class on one side can be mapped to multiple other device
+classes on the other side by using this function multiple times, e.g.
+</p><p>
+<pre>
+same_device_classes("POLYRES", "RES")
+same_device_classes("WELLRES", "RES")
+</pre>
+</p><p>
+will match both "POLYRES" and "WELLRES" on the layout side to "RES" on the 
+schematic side.
+</p><p>
+Once a device class is mentioned with "same_device_classes", matching by
+name is disabled for this class. So after using 'same_device_classes("A", "B")'
+"A" is no longer equivalent to "A" on the other side.
 </p>
-<h2>"same_nets" - Establishes an equivalence between the nets</h2>
+<a name="same_nets"/><h2>"same_nets" - Establishes an equivalence between the nets</h2>
 <keyword name="same_nets"/>
-<a name="same_nets"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>same_nets(circuit, net_a, net_b)</tt></li>
 <li><tt>same_nets(circuit_a, net_a, circuit_b, net_b)</tt></li>
@@ -237,9 +272,9 @@ resolve otherwise.
 Before this method can be used, a schematic netlist needs to be loaded with
 <a href="#schematic">schematic</a>.
 </p>
-<h2>"schematic" - Gets, sets or reads the reference netlist</h2>
+<a name="schematic"/><h2>"schematic" - Gets, sets or reads the reference netlist</h2>
 <keyword name="schematic"/>
-<a name="schematic"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>schematic(filename)</tt></li>
 <li><tt>schematic(filename, reader)</tt></li>
@@ -257,9 +292,9 @@ If no reader is provided, Spice format will be assumed. The reader object is a
 Alternatively, a <class_doc href="Netlist">Netlist</class_doc> object can be given which is obtained from any other
 source.
 </p>
-<h2>"tolerance" - Specifies compare tolerances for certain device parameters</h2>
+<a name="tolerance"/><h2>"tolerance" - Specifies compare tolerances for certain device parameters</h2>
 <keyword name="tolerance"/>
-<a name="tolerance"/><p>Usage:</p>
+<p>Usage:</p>
 <ul>
 <li><tt>tolerance(device_class_name, parameter_name, absolute_tolerance [, relative_tolerance])</tt></li>
 <li><tt>tolerance(device_class_name, parameter_name [, :absolute =&gt; absolute_tolerance] [, :relative =&gt; relative_tolerance])</tt></li>

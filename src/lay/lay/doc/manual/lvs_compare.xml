@@ -81,6 +81,21 @@
   <pre>same_device_classes("PMOS_IN_LAYOUT", "PMOS_IN_SCHEMATIC")
 same_device_classes("NMOS_IN_LAYOUT", "NMOS_IN_SCHEMATIC")</pre>
 
+  <p>
+  This method can be used also multiple times to establish a many-to-many 
+  equivalence:
+  </p>
+
+  <pre>same_device_classes("POLYRES", "RES")
+same_device_classes("WELLRES", "RES")</pre>
+
+  <p>
+  If one target is "nil", the corresponding devices are basically ignored:
+  </p>
+
+  <pre># ignores "POLYRES" devices:
+same_device_classes("POLYRES", nil)</pre>
+
   <h2>Tolerances</h2>
 
   <p>

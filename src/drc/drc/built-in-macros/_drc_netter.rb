@@ -135,10 +135,26 @@ module DRC
     # class object and the new extractor's name is given.
     # 
     # The device extractor is either an instance of one of the predefined extractor
-    # classes (e.g. obtained from the utility methods such as \mos4) or a custom class. 
+    # classes (e.g. obtained from the utility methods such as \global#mos4) or a custom class. 
     # It provides the
     # algorithms for deriving the device parameters from the device geometry. It needs 
     # several device recognition layers which are passed in the layer hash.
+    #
+    # Predefined device extractors are:
+    #
+    # @ul
+    # @li \global#mos3 - A three-terminal MOS transistor @/li
+    # @li \global#mos4 - A four-terminal MOS transistor @/li
+    # @li \global#dmos3 - A three-terminal MOS asymmetric transistor @/li
+    # @li \global#dmos4 - A four-terminal MOS asymmetric transistor @/li
+    # @li \global#bjt3 - A three-terminal bipolar transistor @/li
+    # @li \global#bjt4 - A four-terminal bipolar transistor @/li
+    # @li \global#diode - A planar diode @/li
+    # @li \global#resistor - A resistor @/li
+    # @li \global#resistor_with_bulk - A resistor with a separate bulk terminal @/li
+    # @li \global#capacitor - A capacitor @/li
+    # @li \global#capacitor_with_bulk - A capacitor with a separate bulk terminal @/li
+    # @/ul
     #
     # Each device class (e.g. n-MOS/p-MOS or high Vt/low Vt) needs it's own instance
     # of device extractor. The device extractor beside the algorithm and specific 

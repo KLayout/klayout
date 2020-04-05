@@ -374,7 +374,8 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
 
     //  Use the default style (octagon "pen" for non-manhattan segments, paths for
     //  horizontal/vertical segments).
-    //  Manhattan paths are stitched together from two-point paths if they
+    //  Manhattan paths are stitched together from two-point paths if the
+    //  horizontal and vertical width is different.
 
     std::pair<db::Coord, db::Coord> e = std::max (ext.front (), ext.back ());
     bool is_isotropic = (e.first == e.second && w.first == w.second);
@@ -384,15 +385,25 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
     while (pt != pts.end ()) {
 
       std::vector<db::Point>::const_iterator pt0 = pt;
-      do {
-        ++pt;
-      } while (pt != pts.end () && is_isotropic && (pt[-1].x () == pt[0].x () || pt[-1].y () == pt[0].y()));
+      ++pt;
+      if (pt == pts.end ()) {
+        break;
+      }
 
-      if (pt - pt0 > 1 || pt0->x () == pt0[1].x () || pt0->y () == pt0[0].y()) {
-
-        if (pt - pt0 == 1) {
+      bool multipart = false;
+      if (is_isotropic) {
+        while (pt != pts.end () && (pt[-1].x () == pt[0].x () || pt[-1].y () == pt[0].y())) {
           ++pt;
+          multipart = true;
         }
+        if (multipart) {
+          --pt;
+        }
+      }
+
+      //  The next part is the interval [pt0..pt] (pt inclusive)
+
+      if (multipart || (pt0->x () == pt0[1].x () || pt0->y () == pt0[1].y())) {
 
         db::Coord wxy, wxy_perp, exy;
 
@@ -406,18 +417,12 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
           exy = e.first;
         }
 
-        db::Path p (pt0, pt, wxy, pt0 == pts.begin () ? exy : (was_path ? wxy_perp / 2 : 0), pt == pts.end () ? exy : 0, false);
+        db::Path p (pt0, pt + 1, wxy, pt0 == pts.begin () ? exy : (was_path ? wxy_perp / 2 : 0), pt + 1 == pts.end () ? exy : 0, false);
         if (prop_id != 0) {
           design.shapes (layer).insert (db::object_with_properties<db::Path> (p, prop_id));
         } else {
           design.shapes (layer).insert (p);
         }
-
-        if (pt == pts.end ()) {
-          break;
-        }
-
-        --pt;
 
         was_path = true;
 

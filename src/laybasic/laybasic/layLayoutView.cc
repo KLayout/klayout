@@ -6676,7 +6676,7 @@ LayoutView::menu_activated (const std::string &symbol)
     clear_selection ();
 
   } else if (symbol == "cm_paste") {
-    do_cm_paste (true);
+    do_cm_paste (false);
   } else if (symbol == "cm_paste_interactive") {
     do_cm_paste (true);
   } else if (symbol == "cm_cut") {

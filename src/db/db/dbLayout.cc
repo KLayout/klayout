@@ -290,6 +290,8 @@ Layout::Layout (const db::Layout &layout)
   : db::Object (layout),
     db::LayoutStateModel (),
     gsi::ObjectBase (),
+    tl::Object (),
+    tl::UniqueId (),
     m_cells_size (0),
     m_invalid (0),
     m_top_cells (0),

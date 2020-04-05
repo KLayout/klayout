@@ -37,6 +37,7 @@ EdgesDelegate::EdgesDelegate ()
 }
 
 EdgesDelegate::EdgesDelegate (const EdgesDelegate &other)
+  : tl::UniqueId ()
 {
   operator= (other);
 }

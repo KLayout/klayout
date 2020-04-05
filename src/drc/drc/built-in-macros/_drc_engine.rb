@@ -1325,6 +1325,7 @@ CODE
     # @name connect_implicit
     # @brief Specifies a label pattern for implicit net connections
     # @synopsis connect_implicit(label_pattern)
+    # @synopsis connect_implicit(cell_pattern, label_pattern)
     # See \Netter#connect_implicit for a description of that function.
 
     # %DRC%

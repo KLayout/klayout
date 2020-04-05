@@ -5943,7 +5943,7 @@ LayoutView::cm_cell_show ()
     std::vector<HierarchyControlPanel::cell_path_type> paths;
     mp_hierarchy_panel->selected_cells (active_cellview_index (), paths);
 
-    transaction (tl::to_string (QObject::tr ("Hide cell")));
+    transaction (tl::to_string (QObject::tr ("Show cell")));
 
     for (std::vector<HierarchyControlPanel::cell_path_type>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
       if (! p->empty ()) {

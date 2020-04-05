@@ -101,6 +101,7 @@ read_map_file (const std::string &path, db::LEFDEFLayerDelegate &layers)
   purpose_translation ["SPNET"] = "NET";
   purpose_translation ["NET"] = "NET";
   purpose_translation ["VIA"] = "VIA";
+  purpose_translation ["BLOCKAGE"] = "BLK";
 
   while (! ts.at_end ()) {
 
@@ -156,7 +157,7 @@ read_map_file (const std::string &path, db::LEFDEFLayerDelegate &layers)
           std::vector<std::string> translated_purposes;
           std::vector<std::string> purposes = tl::split (w2, ",");
           for (std::vector<std::string>::const_iterator p = purposes.begin (); p != purposes.end (); ++p) {
-            std::map<std::string, std::string>::const_iterator i = purpose_translation.find (*p);
+            std::map<std::string, std::string>::const_iterator i = purpose_translation.find (tl::to_upper_case (*p));
             if (i != purpose_translation.end ()) {
               translated_purposes.push_back (i->second);
             }

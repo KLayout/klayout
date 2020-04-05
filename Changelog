@@ -1,3 +1,20 @@
+0.27            (2020-xx-xx):
+
+* Enhancement: %GITHUB%/issues/521
+      Enhanced API for ObjectInstPath
+* Bugfix: %GITHUB%/issues/524
+      Failed queries leave layout in undefined state
+
+0.26.5          (2020-xx-xx):
+
+* Bugfix: %GITHUB%/issues/525
+      Report true source line in DRC and LVS verbose mode
+* Bugfix: %GITHUB%/issues/526
+      Makes script debugging more reliable
+* Enhancement: %GITHUB%/issues/527
+      Wildcard layer mapping for stream readers
+* Enhancement: documentation clarifications and typos fixed
+
 0.26.4          (2020-03-02):
 
 * Bugfix: %GITHUB%/issues/517

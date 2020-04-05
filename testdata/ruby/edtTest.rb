@@ -47,8 +47,12 @@ class EDT_TestClass < TestBase
     assert_equal(p.seq, 2)
 
     assert_equal(p.is_cell_inst?, true)
+    assert_equal(p.layer, nil)
+    assert_equal(p.shape, nil)
     p.layer = -1
     assert_equal(p.is_cell_inst?, true)
+    assert_equal(p.layer, nil)
+    assert_equal(p.shape, nil)
 
     p.layer = 42
     assert_equal(p.layer, 42)

@@ -125,6 +125,24 @@ static lay::ObjectInstPath *from_si (const db::RecursiveShapeIterator &si, int c
   return ip;
 }
 
+static tl::Variant ip_layer (const lay::ObjectInstPath *ip)
+{
+  if (ip->is_cell_inst ()) {
+    return tl::Variant ();
+  } else {
+    return tl::Variant (ip->layer ());
+  }
+}
+
+static tl::Variant ip_shape (const lay::ObjectInstPath *ip)
+{
+  if (ip->is_cell_inst ()) {
+    return tl::Variant ();
+  } else {
+    return tl::Variant (ip->shape ());
+  }
+}
+
 gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
   gsi::constructor ("new", &from_si, gsi::arg ("si"), gsi::arg ("cv_index"),
     "@brief Creates a new path object from a \\RecursiveShapeIterator\n"
@@ -245,11 +263,11 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
     "\n"
     "The method has been introduced in version 0.25.\n"
   ) +
-  gsi::method ("layer", &lay::ObjectInstPath::layer,
+  gsi::method_ext ("layer", &ip_layer,
     "@brief Gets the layer index that describes which layer the selected shape is on\n"
     "\n"
-    "This method delivers valid results only for object selections that represent shapes, i.e for "
-    "which \\is_cell_inst? is false."
+    "Startiong with version 0.27, this method returns nil for this property if \\is_cell_inst? is false - "
+    "i.e. the selection does not represent a shape."
   ) + 
   gsi::method ("layer=", &lay::ObjectInstPath::set_layer, gsi::arg ("layer_index"),
     "@brief Sets to the layer index that describes which layer the selected shape is on\n"
@@ -259,15 +277,15 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
     "\n"
     "This method has been introduced in version 0.24."
   ) + 
-  gsi::method ("shape", (const db::Shape &(lay::ObjectInstPath::*) () const) &lay::ObjectInstPath::shape,
+  gsi::method_ext ("shape", &ip_shape,
     "@brief Gets the selected shape\n"
-    "\n"
-    "This method delivers valid results only for object selections that represent shapes, i.e for "
-    "which \\is_cell_inst? is false.\n"
     "\n"
     "The shape object may be modified. This does not have an immediate effect on the selection. Instead, "
     "the selection must be set in the view using \\LayoutView#object_selection= or \\LayoutView#select_object.\n"
-  ) + 
+    "\n"
+    "This method delivers valid results only for object selections that represent shapes. "
+    "Startiong with version 0.27, this method returns nil for this property if \\is_cell_inst? is false."
+  ) +
   gsi::method ("shape=", &lay::ObjectInstPath::set_shape, gsi::arg ("shape"),
     "@brief Sets the shape object that describes the selected shape geometrically\n"
     "\n"

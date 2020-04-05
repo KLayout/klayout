@@ -112,6 +112,7 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
     tl::OutputStream stream (tmp_file);
     db::SaveLayoutOptions options;
     options.set_format ("OASIS");
+    options.set_option_by_name ("oasis_permissive", tl::Variant (true));
     db::Writer writer (options);
     writer.write (layout, stream);
   }
@@ -242,6 +243,11 @@ TEST(19)
 TEST(20)
 {
   run_test (_this, "def11", "lef:test.lef+def:test.def", "au.oas.gz", default_options ());
+}
+
+TEST(21)
+{
+  run_test (_this, "def12", "lef:test.lef+def:test.def", "au.oas.gz", default_options ());
 }
 
 TEST(100)

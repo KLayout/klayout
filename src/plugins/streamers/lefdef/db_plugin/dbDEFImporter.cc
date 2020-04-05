@@ -377,9 +377,8 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
     //  Manhattan paths are stitched together from two-point paths if the
     //  horizontal and vertical width is different.
 
-    std::pair<db::Coord, db::Coord> e = std::max (ext.front (), ext.back ());
-    bool is_isotropic = (e.first == e.second && w.first == w.second);
-    bool was_path = false;
+    bool is_isotropic = (w.first == w.second);
+    bool was_path_before = false;
 
     std::vector<db::Point>::const_iterator pt = pts.begin ();
     while (pt != pts.end ()) {
@@ -405,26 +404,39 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
 
       if (multipart || (pt0->x () == pt0[1].x () || pt0->y () == pt0[1].y())) {
 
-        db::Coord wxy, wxy_perp, exy;
+        db::Coord wxy, wxy_perp;
 
         if (pt0->x () == pt0 [1].x ()) {
           wxy = w.second;
           wxy_perp = w.first;
-          exy = e.second;
         } else {
           wxy = w.first;
           wxy_perp = w.second;
-          exy = e.first;
         }
 
-        db::Path p (pt0, pt + 1, wxy, pt0 == pts.begin () ? exy : (was_path ? wxy_perp / 2 : 0), pt + 1 == pts.end () ? exy : 0, false);
+        //  compute begin extension
+        db::Coord be = 0;
+        if (pt0 == pts.begin ()) {
+          be = ext.front ().first;
+        } else if (was_path_before) {
+          //  provides the overlap to the previous segment
+          be = wxy_perp / 2;
+        }
+
+        //  compute end extension
+        db::Coord ee = 0;
+        if (pt + 1 == pts.end ()) {
+          ee = ext.back ().first;
+        }
+
+        db::Path p (pt0, pt + 1, wxy, be, ee, false);
         if (prop_id != 0) {
           design.shapes (layer).insert (db::object_with_properties<db::Path> (p, prop_id));
         } else {
           design.shapes (layer).insert (p);
         }
 
-        was_path = true;
+        was_path_before = true;
 
       } else {
 
@@ -456,7 +468,7 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
           design.shapes (layer).insert (p);
         }
 
-        was_path = false;
+        was_path_before = false;
 
       }
 
@@ -596,8 +608,6 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
 
       } else if (peek ("(")) {
 
-        ext.clear ();
-
         while (peek ("(") || peek ("MASK")) {
 
           if (test ("MASK")) {
@@ -688,6 +698,9 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
         if (pts.size () > 1) {
           pts.erase (pts.begin (), pts.end () - 1);
         }
+
+        ext.clear ();
+        ext.push_back (def_ext);
 
       } else {
         break;

@@ -73,7 +73,7 @@ public:
     //  .. nothing yet ..
   }
   
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
+  virtual void get_options (std::vector < std::pair<std::string, std::string> > & /*options*/) const
   {
     //  .. nothing yet ..
   }

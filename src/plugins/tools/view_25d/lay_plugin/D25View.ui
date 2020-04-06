@@ -30,7 +30,7 @@
     <number>9</number>
    </property>
    <item>
-    <widget class="lay::D25View" name="openGLWidget"/>
+    <widget class="lay::D25ViewWidget" name="openGLWidget"/>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -38,7 +38,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Close</set>
      </property>
     </widget>
    </item>
@@ -46,14 +46,31 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>lay::D25View</class>
+   <class>lay::D25ViewWidget</class>
    <extends>QOpenGLWidget</extends>
-   <header>layD25View.h</header>
+   <header>layD25ViewWidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>D25View</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>530</x>
+     <y>626</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>443</x>
+     <y>643</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

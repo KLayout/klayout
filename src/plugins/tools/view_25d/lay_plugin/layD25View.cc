@@ -22,6 +22,7 @@
 
 
 #include "layD25View.h"
+#include "layLayoutView.h"
 
 #include "ui_D25View.h"
 
@@ -31,7 +32,7 @@ namespace lay
 {
 
 D25View::D25View (QWidget *parent)
-  : QDialog (parent), mp_view (0)
+  : QDialog (parent)
 {
   mp_ui = new Ui::D25View ();
   mp_ui->setupUi (this);

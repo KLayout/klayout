@@ -27,12 +27,12 @@ namespace lay
 {
 
 D25ViewWidget::D25ViewWidget (QWidget *parent)
-  : QOpenGLWidget (parent), mp_view (0)
+  : QOpenGLWidget (parent)
 {
   // @@@
 }
 
-D25View::~D25View ()
+D25ViewWidget::~D25ViewWidget ()
 {
   // @@@
 }

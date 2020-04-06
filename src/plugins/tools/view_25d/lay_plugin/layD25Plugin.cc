@@ -61,7 +61,7 @@ public:
 
 private:
   lay::LayoutView *mp_view;
-  lay::D25ToolDialog *mp_dialog;
+  lay::D25View *mp_dialog;
 };
 
 class D25PluginDeclaration

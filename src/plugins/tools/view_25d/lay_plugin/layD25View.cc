@@ -59,6 +59,7 @@ D25View::exec_dialog (lay::LayoutView *view)
 void 
 D25View::accept ()
 {
+  QDialog::accept ();
   // @@@
 }
 

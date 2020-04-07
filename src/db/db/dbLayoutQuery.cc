@@ -2011,7 +2011,7 @@ private:
 //  LayoutQueryIterator implementation
 
 LayoutQueryIterator::LayoutQueryIterator (const LayoutQuery &q, db::Layout *layout, tl::Eval *parent_eval, tl::AbsoluteProgress *progress)
-  : mp_q (const_cast<db::LayoutQuery *> (&q)), mp_layout (layout), m_eval (parent_eval), m_layout_ctx (layout, true /*can modify*/), mp_progress (progress)
+  : mp_q (const_cast<db::LayoutQuery *> (&q)), mp_layout (layout), m_eval (parent_eval), m_layout_ctx (layout, true /*can modify*/), mp_progress (progress), m_initialized (false)
 {
   m_eval.set_ctx_handler (&m_layout_ctx);
   m_eval.set_var ("layout", tl::Variant::make_variant_ref (layout));
@@ -2022,14 +2022,10 @@ LayoutQueryIterator::LayoutQueryIterator (const LayoutQuery &q, db::Layout *layo
   //  Avoid update() calls while iterating in modifying mode
   mp_layout->update ();
   mp_layout->start_changes ();
-
-  //  NOTE: Stange - in modifying mode, init() will actually already execute the
-  //  first modification. Hence start_changes() needs to be called before.
-  init ();
 }
 
 LayoutQueryIterator::LayoutQueryIterator (const LayoutQuery &q, const db::Layout *layout, tl::Eval *parent_eval, tl::AbsoluteProgress *progress)
-  : mp_q (const_cast<db::LayoutQuery *> (&q)), mp_layout (const_cast <db::Layout *> (layout)), m_eval (parent_eval), m_layout_ctx (layout), mp_progress (progress)
+  : mp_q (const_cast<db::LayoutQuery *> (&q)), mp_layout (const_cast <db::Layout *> (layout)), m_eval (parent_eval), m_layout_ctx (layout), mp_progress (progress), m_initialized (false)
 {
   //  TODO: check whether the query is a modifying one (with .. do, delete)
 
@@ -2039,8 +2035,6 @@ LayoutQueryIterator::LayoutQueryIterator (const LayoutQuery &q, const db::Layout
     m_eval.define_function (mp_q->property_name (i), new FilterStateFunction (i, &m_state));
   }
 
-  init ();
-
   //  Avoid update() calls while iterating in modifying mode
   mp_layout->start_changes ();
 }
@@ -2048,7 +2042,18 @@ LayoutQueryIterator::LayoutQueryIterator (const LayoutQuery &q, const db::Layout
 LayoutQueryIterator::~LayoutQueryIterator ()
 {
   mp_layout->end_changes ();
-  cleanup ();
+  if (m_initialized) {
+    cleanup ();
+  }
+}
+
+void
+LayoutQueryIterator::ensure_initialized ()
+{
+  if (! m_initialized) {
+    init ();
+    m_initialized = true;
+  }
 }
 
 void 
@@ -2080,17 +2085,51 @@ LayoutQueryIterator::cleanup ()
 void
 LayoutQueryIterator::reset () 
 {
-  //  forces an update if required
-  mp_layout->end_changes ();
-  mp_layout->start_changes ();
+  if (m_initialized) {
 
-  cleanup ();
-  init ();
+    //  forces an update if required
+    mp_layout->end_changes ();
+    mp_layout->start_changes ();
+
+    cleanup ();
+    init ();
+
+  }
+}
+
+bool
+LayoutQueryIterator::at_end () const
+{
+  const_cast<LayoutQueryIterator *> (this)->ensure_initialized ();
+  return m_state.empty ();
+}
+
+bool
+LayoutQueryIterator::get (const std::string &name, tl::Variant &v)
+{
+  ensure_initialized ();
+  if (m_state.empty () || !m_state.back () || !mp_q->has_property (name)) {
+    return false;
+  } else {
+    return m_state.back ()->get_property (mp_q->property_by_name (name), v);
+  }
+}
+
+bool
+LayoutQueryIterator::get (unsigned int id, tl::Variant &v)
+{
+  ensure_initialized ();
+  if (m_state.empty () || !m_state.back ()) {
+    return false;
+  } else {
+    return m_state.back ()->get_property (id, v);
+  }
 }
 
 void 
 LayoutQueryIterator::dump () const
 {
+  const_cast<LayoutQueryIterator *> (this)->ensure_initialized ();
   mp_root_state->dump ();
   std::cout << std::endl;
 }
@@ -2111,6 +2150,7 @@ LayoutQueryIterator::collect (FilterStateBase *state, std::set<FilterStateBase *
 void 
 LayoutQueryIterator::next (bool skip)
 {
+  ensure_initialized ();
   do {
     next_up (skip);
   } while (! next_down ());
@@ -2323,11 +2363,11 @@ parse_cell_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bo
     std::auto_ptr<FilterBracket> b (new FilterBracket (q));
 
     if (ex.test ("instances")) {
-      ex.test ("of") && (ex.test ("cells") || ex.test ("cell"));
+      (ex.test ("of") || ex.test ("from")) && (ex.test ("cells") || ex.test ("cell"));
       //  Because an array member cannot be modified we use ArrayInstances in the modification case always
       parse_cell_name_filter_seq (ex, q, b.get (), reading ? ExplodedInstances : ArrayInstances, reading);
     } else if (ex.test ("arrays")) {
-      ex.test ("of") && (ex.test ("cells") || ex.test ("cell"));
+      (ex.test ("of") || ex.test ("from")) && (ex.test ("cells") || ex.test ("cell"));
       parse_cell_name_filter_seq (ex, q, b.get (), ArrayInstances, reading);
     } else {
       ex.test ("cells") || ex.test ("cell");

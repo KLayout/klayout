@@ -2478,7 +2478,7 @@ PythonModule::make_classes (const char *mod_name)
 
     //  then add normal methods - on name clash with properties make them a getter
     for (gsi::ClassBase::method_iterator m = (*c)->begin_methods (); m != (*c)->end_methods (); ++m) {
-      if (! (*m)->is_callback ()) {
+      if (! (*m)->is_callback () && ! (*m)->is_signal ()) {
         for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
           if (! syn->is_getter && ! syn->is_setter) {
             if ((*m)->end_arguments () - (*m)->begin_arguments () == 0 && mt->find_property ((*m)->is_static (), syn->name).first) {

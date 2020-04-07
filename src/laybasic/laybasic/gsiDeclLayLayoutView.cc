@@ -402,6 +402,7 @@ static LayerPropertiesConstIteratorWrapper each_layer2 (lay::LayoutView *view, u
   return LayerPropertiesConstIteratorWrapper (view->begin_layers (list_index));
 }
 
+#if defined(HAVE_QTBINDINGS)
 static lay::LayoutView *new_view (QWidget *parent, bool editable, db::Manager *manager, unsigned int options)
 {
   lay::LayoutView *lv = new lay::LayoutView (manager, editable, 0 /*plugin parent*/, parent, "view", options);
@@ -411,8 +412,10 @@ static lay::LayoutView *new_view (QWidget *parent, bool editable, db::Manager *m
   }
   return lv;
 }
+#endif
 
 Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "LayoutView",
+#if defined(HAVE_QTBINDINGS)
   gsi::constructor ("new", &new_view, gsi::arg ("parent", (QWidget *) 0, "nil"), gsi::arg ("editable", false), gsi::arg ("manager", (db::Manager *) 0, "nil"), gsi::arg ("options", (unsigned int) 0),
     "@brief Creates a standalone view\n"
     "\n"
@@ -427,6 +430,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "This constructor has been introduced in version 0.25.\n"
     "It has been enhanced with the arguments in version 0.27.\n"
   ) +
+#endif
   gsi::constant ("LV_NoLayers", (unsigned int) lay::LayoutView::LV_NoLayers,
     "@brief With this option, no layers view will be provided (see \\layer_control_frame)\n"
     "Use this value with the constructor's 'options' argument.\n"

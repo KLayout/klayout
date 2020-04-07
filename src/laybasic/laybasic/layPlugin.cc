@@ -131,6 +131,11 @@ public:
     }
   }
 
+  bool is_for_mode (int mode_id) const
+  {
+    return mode_id == m_mode;
+  }
+
 private:
   Dispatcher *mp_dispatcher;
   int m_mode;

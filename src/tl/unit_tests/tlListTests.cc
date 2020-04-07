@@ -32,7 +32,7 @@ static size_t obj_count = 0;
 struct MyClass1 : public tl::list_node<MyClass1>
 {
   MyClass1 (int _n) : n (_n) { ++obj_count; }
-  MyClass1 (const MyClass1 &other) : n (other.n) { ++obj_count; }
+  MyClass1 (const MyClass1 &other) : tl::list_node<MyClass1> (), n (other.n) { ++obj_count; }
   ~MyClass1 () { --obj_count; }
   int n;
   bool operator== (const MyClass1 &other) const { return n == other.n; }

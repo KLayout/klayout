@@ -302,6 +302,14 @@ public:
   virtual void triggered ();
 
   /**
+   *  @brief Returns true, if the action is associated with a specific mode ID
+   */
+  virtual bool is_for_mode (int /*mode_id*/) const
+  {
+    return false;
+  }
+
+  /**
    *  @brief Get the underlying QAction object
    *
    *  Hint: do not use for changing the shortcut!

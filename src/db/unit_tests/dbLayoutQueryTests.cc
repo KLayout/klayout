@@ -1463,4 +1463,28 @@ TEST(62)
     std::string s = q2s_var (iq, "data");
     EXPECT_EQ (s, "T2,T1,T1");
   }
+
+  {
+    //  A non-executed query
+    db::LayoutQuery q ("select inst[\"text\"] from instances of ...* where cell_name ~ \"Basic.*\"");
+    db::LayoutQueryIterator iq (q, &g);
+    EXPECT_EQ (true, true);
+  }
+}
+
+TEST(63)
+{
+  db::Layout g;
+
+  //  A failing query must not leave a layout under construction
+  try {
+    db::LayoutQuery q ("!not a valid query");
+    db::LayoutQueryIterator iq (q, &g);
+    std::string s = q2s_var (iq, "data");
+    EXPECT_EQ (true, false);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg (), "Expected a word or quoted string here: !not a val ..");
+  }
+
+  EXPECT_EQ (g.under_construction (), false);
 }

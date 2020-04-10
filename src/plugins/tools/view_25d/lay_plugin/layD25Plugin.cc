@@ -27,6 +27,8 @@
 
 #include "layPlugin.h"
 
+#include <QSurfaceFormat>
+
 namespace lay
 {
 

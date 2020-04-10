@@ -24,18 +24,50 @@
 #define HDR_layD25ViewWidget
 
 #include <QOpenGLWidget>
+#include <QOpenGLVertexArrayObject>
+#include <QOpenGLBuffer>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLFunctions>
+#include <QMatrix4x4>
+#include <QPoint>
+#include <QVector3D>
 
 namespace lay
 {
 
 class D25ViewWidget
-  : public QOpenGLWidget
+  : public QOpenGLWidget,
+    private QOpenGLFunctions
 {
 Q_OBJECT 
 
 public:
   D25ViewWidget (QWidget *parent);
   ~D25ViewWidget ();
+
+  void wheelEvent (QWheelEvent *event);
+  void mousePressEvent (QMouseEvent *event);
+  void mouseReleaseEvent (QMouseEvent *event);
+  void mouseMoveEvent (QMouseEvent *event);
+
+private:
+  QOpenGLShaderProgram *m_program;
+  GLuint m_posAttr;
+  GLuint m_colAttr;
+  GLuint m_matrixUniform;
+  QMatrix4x4 m_cam_trans;
+  bool m_dragging, m_rotating;
+  QVector3D m_cam_position;
+  double m_cam_azimuth, m_cam_elevation;
+  QPoint m_start_pos;
+  QVector3D m_start_cam_position;
+  double m_start_cam_azimuth, m_start_cam_elevation;
+
+  void initializeGL ();
+  void paintGL ();
+  void resizeGL (int w, int h);
+
+  void update_cam_trans ();
 };
 
 }

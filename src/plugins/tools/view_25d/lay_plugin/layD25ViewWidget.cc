@@ -94,6 +94,7 @@ D25ViewWidget::initializeGL ()
       "#undef mediump\n"
       "\n"
       "uniform vec4 color;\n"
+      "uniform vec4 ambient;\n"
       "uniform vec3 illum;\n"
       "out lowp vec4 vertexColor;\n"
       "uniform mat4 matrix;\n"
@@ -104,8 +105,9 @@ D25ViewWidget::initializeGL ()
       "   vec4 p0 = gl_in[0].gl_Position;\n"
       "   vec4 p1 = gl_in[1].gl_Position;\n"
       "   vec4 p2 = gl_in[2].gl_Position;\n"
-      "   vec3 n = cross(p1.xyz - p0.xyz, p2.xyz - p0.xyz);\n"
-      "   vertexColor.rgb = color.rgb * (max(0.0, dot(normalize(n), illum)) * 0.5 + 0.5);\n"
+      "   vec3 n = cross(p2.xyz - p0.xyz, p1.xyz - p0.xyz);\n"
+      "   float dp = dot(normalize(n), illum);\n"
+      "   vertexColor.rgb = color.rgb * (dp * 0.5 + 0.5) - (min(0.0, dp) * 0.5 * ambient.rgb);\n"
       "   vertexColor.a = 1.0;\n"
       "   gl_Position = matrix * p0;\n"
       "   EmitVertex();\n"
@@ -526,7 +528,8 @@ D25ViewWidget::paintGL ()
   matrix *= m_cam_trans;
 
   m_shapes_program->setUniformValue ("matrix", matrix);
-  m_shapes_program->setUniformValue ("illum", QVector3D (-3.0, -4.0, 2.0).normalized ());
+  m_shapes_program->setUniformValue ("illum", QVector3D (-3.0, -4.0, -2.0).normalized ());
+  m_shapes_program->setUniformValue ("ambient", QVector4D (0.5, 0.5, 0.5, 0.5));
 
   glEnableVertexAttribArray (positions);
 

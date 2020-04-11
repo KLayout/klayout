@@ -11,13 +11,15 @@ LIBS += -L$$DESTDIR/.. -lklayout_rdb -lklayout_ant
 HEADERS = \
   layD25View.h \
   layD25ViewWidget.h \
-    layD25MemChunks.h
+    layD25MemChunks.h \
+    layD25ViewUtils.h
 
 SOURCES = \
   layD25View.cc \
   layD25ViewWidget.cc \
   layD25Plugin.cc \
-    layD25MemChunks.cc
+    layD25MemChunks.cc \
+    layD25ViewUtils.cc
 
 FORMS = \
   D25View.ui \

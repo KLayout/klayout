@@ -22,6 +22,7 @@
 
 
 #include "layD25ViewWidget.h"
+#include "layD25ViewUtils.h"
 #include "layLayoutView.h"
 
 #include "dbRecursiveShapeIterator.h"
@@ -50,7 +51,9 @@ D25ViewWidget::D25ViewWidget (QWidget *parent)
   format.setSamples (4); //  more -> widget extends beyond boundary!
   setFormat (format);
 
-  m_cam_position = QVector3D (0.0, 0.0, 3.0); // @@@
+  m_cam_position = QVector3D (0.0, 0.0, 4.0); // @@@
+  m_scale_factor = 1.0;
+  m_focus_dist = 0.0;
 }
 
 D25ViewWidget::~D25ViewWidget ()
@@ -194,17 +197,34 @@ static QVector3D cam_direction (double azimuth, double elevation)
 void
 D25ViewWidget::wheelEvent (QWheelEvent *event)
 {
-  double cal = 0.6;
+  double px = (event->pos ().x () - width () / 2) * 2.0 / width ();
+  double py = -(event->pos ().y () - height () / 2) * 2.0 / height ();
 
-  int dx = event->pos ().x () - width () / 2;
-  int dy = -(event->pos ().y () - height () / 2);
+  double f = exp (event->angleDelta ().y () * (1.0 / (90 * 8)));
 
-  double da = atan (dx * cal * 2.0 / height ()) * 180 / M_PI;
-  double de = atan (dy * cal * 2.0 / height ()) * 180 / M_PI;
+  //  compute vector of line of sight
+  std::pair<QVector3D, QVector3D> ray = camera_normal (m_cam_trans, px, py);
 
-  m_cam_position += (event->angleDelta ().y () * (1.0 / (45 * 8))) * cam_direction (m_cam_azimuth + da, m_cam_elevation + de);
+  //  by definition the ray goes through the camera position
+  std::pair<bool, QVector3D> hp = hit_point_with_scene (m_cam_position, ray.second);
+
+  QVector3D pm = m_cam_trans.map(hp.second);
+  printf("@@@ mouse=%g,%g   back=%g,%g\n", px, py, pm.x(), pm.y());
+  printf("@@@ before: hp=%g,%g,%g    d=%g,%g,%g    s=%g\n", hp.second.x(), hp.second.y(), hp.second.z(), m_displacement.x(), m_displacement.y(), m_displacement.z(), m_scale_factor); fflush(stdout);
+
+  m_displacement = hp.second * (1.0 - f) + m_displacement * f;
+  m_scale_factor *= f;
 
   update_cam_trans ();
+}
+
+std::pair<bool, QVector3D>
+D25ViewWidget::hit_point_with_scene (const QVector3D &line, const QVector3D &line_dir)
+{
+  QVector3D corner = QVector3D (m_bbox.left (), m_zmin, -(m_bbox.bottom () + m_bbox.height ())) * m_scale_factor + m_displacement;
+  QVector3D dim = QVector3D (m_bbox.width (), m_zmax - m_zmin, m_bbox.height ()) * m_scale_factor;
+
+  return lay::hit_point_with_cuboid (line, line_dir, corner, dim);
 }
 
 void
@@ -221,6 +241,19 @@ D25ViewWidget::mousePressEvent (QMouseEvent *event)
   m_start_cam_position = m_cam_position;
   m_start_cam_azimuth = m_cam_azimuth;
   m_start_cam_elevation = m_cam_elevation;
+  m_start_displacement = m_displacement;
+
+  m_focus_dist = 2.0;
+
+  if (m_dragging || m_rotating) {
+
+    QVector3D cd = cam_direction (m_start_cam_azimuth, m_start_cam_elevation);
+    std::pair<bool, QVector3D> hp = hit_point_with_scene (m_cam_position, cd);
+    if (hp.first) {
+      m_focus_dist = std::max (m_focus_dist, double ((m_cam_position - hp.second).length ()));
+    }
+
+  }
 }
 
 void
@@ -232,12 +265,10 @@ D25ViewWidget::mouseReleaseEvent (QMouseEvent * /*event*/)
 void
 D25ViewWidget::mouseMoveEvent (QMouseEvent *event)
 {
-  double focus_dist = 4.0;  //  4 times focal length
-
   if (m_dragging) {
 
     //  for the chosen perspective transformation:
-    double cal = 0.6 * focus_dist;
+    double cal = 0.6 * m_focus_dist;
 
     QPoint d = event->pos () - m_start_pos;
     double f = cal * 2.0 / double (height ());
@@ -249,12 +280,13 @@ D25ViewWidget::mouseMoveEvent (QMouseEvent *event)
     QVector3D yv (-re * xv.z (), cos (m_start_cam_elevation * M_PI / 180.0), re * xv.x ());
     QVector3D drag = xv * dx + yv * dy;
 
-    //  "-drag" because we're not dragging the camera, we're dragging the scene
-    m_cam_position = m_start_cam_position - drag;
+    m_displacement = m_start_displacement + drag;
 
     update_cam_trans ();
 
   } else if (m_rotating) {
+
+    double focus_dist = 4.0; // @@@
 
     QPoint d = event->pos () - m_start_pos;
 
@@ -274,8 +306,11 @@ D25ViewWidget::mouseMoveEvent (QMouseEvent *event)
 void
 D25ViewWidget::update_cam_trans ()
 {
-printf("@@@ e=%g   a=%g     x,y,z=%g,%g,%g\n", m_cam_elevation, m_cam_azimuth, m_cam_position.x(), m_cam_position.y(), m_cam_position.z()); fflush(stdout);
+printf("@@@ e=%g   a=%g     x,y,z=%g,%g,%g    d=%g,%g,%g    s=%g    f=%g\n", m_cam_elevation, m_cam_azimuth, m_cam_position.x(), m_cam_position.y(), m_cam_position.z(), m_displacement.x(), m_displacement.y(), m_displacement.z(), m_scale_factor, m_focus_dist); fflush(stdout);
   QMatrix4x4 t;
+
+  //  finally add perspective
+  t.perspective (60.0f, float (width ()) / float (height ()), 0.1f, 100.0f);
 
   //  third: elevation
   t.rotate (-m_cam_elevation, 1.0, 0.0, 0.0);
@@ -312,6 +347,10 @@ D25ViewWidget::prepare_view ()
 {
   double z = 0.0, dz = 0.2; // @@@
 
+  m_bbox = db::DBox ();
+  bool zset = false;
+  m_zmin = m_zmax = 0.0;
+
   for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
 
     if (! lp->has_children () && lp->visible (true) && lp->cellview_index () >= 0 && lp->cellview_index () < int (mp_view->cellviews ())) {
@@ -322,9 +361,9 @@ D25ViewWidget::prepare_view ()
 
       LayerInfo info;
       // @@@ use alpha?
-      info.color[0] = (color & 0xff) / 255.0f;
+      info.color[0] = ((color >> 16) & 0xff) / 255.0f;
       info.color[1] = ((color >> 8) & 0xff) / 255.0f;
-      info.color[2] = ((color >> 16) & 0xff) / 255.0f;
+      info.color[2] = (color & 0xff) / 255.0f;
       info.color[3] = 1.0;
       info.vertex_chunk = &m_vertex_chunks.back ();
 
@@ -332,6 +371,17 @@ D25ViewWidget::prepare_view ()
 
       const lay::CellView &cv = mp_view->cellview ((unsigned int) lp->cellview_index ());
       render_layout (m_vertex_chunks.back (), cv->layout (), *cv.cell (), (unsigned int) lp->layer_index (), z, z + dz);
+
+      m_bbox += db::DBox (cv.cell ()->bbox ((unsigned int) lp->layer_index ())) * cv->layout ().dbu ();
+
+      if (! zset) {
+        m_zmin = z;
+        m_zmax = z + dz;
+        zset = true;
+      } else {
+        m_zmin = std::min (z, m_zmin);
+        m_zmax = std::max (z + dz, m_zmax);
+      }
 
       z += dz; // @@@
 
@@ -513,6 +563,7 @@ D25ViewWidget::render_layout (D25ViewWidget::chunks_type &chunks, const db::Layo
 void
 D25ViewWidget::paintGL ()
 {
+  printf("@@@ width=%d,height=%d\n", width(),height()); // @@@
   const qreal retinaScale = devicePixelRatio ();
   glViewport (0, 0, width () * retinaScale, height () * retinaScale);
 
@@ -523,12 +574,19 @@ D25ViewWidget::paintGL ()
 
   m_shapes_program->bind ();
 
-  QMatrix4x4 matrix;
-  matrix.perspective (60.0f, float (width ()) / float (height ()), 0.1f, 100.0f);
-  matrix *= m_cam_trans;
+  QMatrix4x4 scene_trans;
 
-  m_shapes_program->setUniformValue ("matrix", matrix);
-  m_shapes_program->setUniformValue ("illum", QVector3D (-3.0, -4.0, -2.0).normalized ());
+  //  provide the displacement and scaling
+  scene_trans.translate (m_displacement);
+  scene_trans.scale (m_scale_factor);
+  //  this way we can use y as z coordinate when drawing
+  scene_trans.scale (1.0, 1.0, -1.0);
+
+  m_shapes_program->setUniformValue ("matrix", m_cam_trans * scene_trans);
+
+  //  NOTE: z axis of illum points towards the scene because we include the z inversion in the scene transformation matrix
+  m_shapes_program->setUniformValue ("illum", QVector3D (-3.0, -4.0, 2.0).normalized ());
+
   m_shapes_program->setUniformValue ("ambient", QVector4D (0.5, 0.5, 0.5, 0.5));
 
   glEnableVertexAttribArray (positions);
@@ -552,7 +610,8 @@ D25ViewWidget::paintGL ()
 
   glEnableVertexAttribArray (positions);
 
-  m_gridplane_program->setUniformValue ("matrix", matrix);
+  // @@@ m_gridplane_program->setUniformValue ("matrix", m_cam_trans * m_scene_trans);
+  m_gridplane_program->setUniformValue ("matrix", QMatrix4x4 ()); // @@@
 
   // @@@
 
@@ -567,6 +626,7 @@ D25ViewWidget::paintGL ()
 
   glDrawArrays (GL_TRIANGLES, 0, 6);
 
+#if 0
   GLfloat gridline_vertices[] = {
       -1.0, 0.0, -2.0,    -1.0, 0.0, 0.0,
       -0.75, 0.0, -2.0,   -0.75, 0.0, 0.0,
@@ -587,6 +647,28 @@ D25ViewWidget::paintGL ()
       1.0, 0.0, -0.25,    -1.0, 0.0, -0.25,
       1.0, 0.0, 0.0,      -1.0, 0.0, 0.0
   };
+#else
+  GLfloat gridline_vertices[] = {
+      -1.0, -1.0, 0.0,    -1.0, 1.0, 0.0,
+      -0.75, -1.0, 0.0,   -0.75, 1.0, 0.0,
+      -0.5, -1.0, 0.0,    -0.5, 1.0, 0.0,
+      -0.25, -1.0, 0.0,   -0.25, 1.0, 0.0,
+      0.0, -1.0, 0.0,     0.0, 1.0, 0.0,
+      0.25, -1.0, 0.0,    0.25, 1.0, 0.0,
+      0.5, -1.0, 0.0,     0.5, 1.0, 0.0,
+      0.75, -1.0, 0.0,    0.75, 1.0, 0.0,
+      1.0, -1.0, 0.0,     1.0, 1.0, 0.0,
+      1.0, -1.0, 0.0,     -1.0, -1.0, 0.0,
+      1.0, -0.75, 0.0,    -1.0, -0.75, 0.0,
+      1.0, -0.5, 0.0,     -1.0, -0.5, 0.0,
+      1.0, -0.25, 0.0,    -1.0, -0.25, 0.0,
+      1.0, 0.0, 0.0,      -1.0, 0.0, 0.0,
+      1.0, 0.25, 0.0,     -1.0, 0.25, 0.0,
+      1.0, 0.5, 0.0,      -1.0, 0.5, 0.0,
+      1.0, 0.75, 0.0,     -1.0, 0.75, 0.0,
+      1.0, 1.0, 0.0,      -1.0, 1.0, 0.0
+  };
+#endif
 
   m_shapes_program->setUniformValue ("vertexColor", 1.0, 1.0, 1.0, 0.2f);
 

@@ -71,11 +71,17 @@ private:
   QMatrix4x4 m_cam_trans;
   bool m_dragging, m_rotating;
   QVector3D m_cam_position;
+  double m_scale_factor;
   double m_cam_azimuth, m_cam_elevation;
+  QVector3D m_displacement;
+  double m_focus_dist;
   QPoint m_start_pos;
   QVector3D m_start_cam_position;
   double m_start_cam_azimuth, m_start_cam_elevation;
+  QVector3D m_start_displacement;
   lay::LayoutView *mp_view;
+  db::DBox m_bbox;
+  double m_zmin, m_zmax;
 
   std::list<chunks_type> m_vertex_chunks;
 
@@ -95,6 +101,7 @@ private:
   void render_layout (D25ViewWidget::chunks_type &chunks, const db::Layout &layout, const db::Cell &cell, unsigned int layer, double zstart, double zstop);
   void render_polygon (D25ViewWidget::chunks_type &chunks, const db::Polygon &poly, double dbu, double zstart, double zstop);
   void render_wall (D25ViewWidget::chunks_type &chunks, const db::Edge &poly, double dbu, double zstart, double zstop);
+  std::pair<bool, QVector3D> hit_point_with_scene (const QVector3D &line, const QVector3D &line_dir);
 };
 
 }

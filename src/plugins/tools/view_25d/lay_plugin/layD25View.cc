@@ -50,10 +50,13 @@ int
 D25View::exec_dialog (lay::LayoutView *view)
 {
   mp_view.reset (view);
+  mp_ui->d25_view->attach_view (view);
 
-  // @@@
-  
-  return QDialog::exec ();
+  int ret = QDialog::exec ();
+
+  mp_ui->d25_view->attach_view (0);
+
+  return ret;
 }
 
 void 

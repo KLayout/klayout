@@ -30,7 +30,7 @@
     <number>9</number>
    </property>
    <item>
-    <widget class="lay::D25ViewWidget" name="openGLWidget"/>
+    <widget class="lay::D25ViewWidget" name="d25_view"/>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">

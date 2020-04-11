@@ -32,8 +32,20 @@
 #include <QPoint>
 #include <QVector3D>
 
+#include "dbPolygon.h"
+
+#include "layD25MemChunks.h"
+
+namespace db
+{
+  class Layout;
+  class Cell;
+}
+
 namespace lay
 {
+
+class LayoutView;
 
 class D25ViewWidget
   : public QOpenGLWidget,
@@ -50,11 +62,12 @@ public:
   void mouseReleaseEvent (QMouseEvent *event);
   void mouseMoveEvent (QMouseEvent *event);
 
+  void attach_view (lay::LayoutView *view);
+
 private:
-  QOpenGLShaderProgram *m_program;
-  GLuint m_posAttr;
-  GLuint m_colAttr;
-  GLuint m_matrixUniform;
+  typedef lay::mem_chunks<GLfloat, 1024 * 9> chunks_type;
+
+  QOpenGLShaderProgram *m_shapes_program, *m_gridplane_program;
   QMatrix4x4 m_cam_trans;
   bool m_dragging, m_rotating;
   QVector3D m_cam_position;
@@ -62,12 +75,26 @@ private:
   QPoint m_start_pos;
   QVector3D m_start_cam_position;
   double m_start_cam_azimuth, m_start_cam_elevation;
+  lay::LayoutView *mp_view;
+
+  std::list<chunks_type> m_vertex_chunks;
+
+  struct LayerInfo {
+    const chunks_type *vertex_chunk;
+    GLfloat color [4];
+  };
+
+  std::list<LayerInfo> m_layers;
 
   void initializeGL ();
   void paintGL ();
   void resizeGL (int w, int h);
 
   void update_cam_trans ();
+  void prepare_view ();
+  void render_layout (D25ViewWidget::chunks_type &chunks, const db::Layout &layout, const db::Cell &cell, unsigned int layer, double zstart, double zstop);
+  void render_polygon (D25ViewWidget::chunks_type &chunks, const db::Polygon &poly, double dbu, double zstart, double zstop);
+  void render_wall (D25ViewWidget::chunks_type &chunks, const db::Edge &poly, double dbu, double zstart, double zstop);
 };
 
 }

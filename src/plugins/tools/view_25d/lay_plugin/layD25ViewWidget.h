@@ -70,7 +70,6 @@ private:
   typedef lay::mem_chunks<GLfloat, 1024 * 9> chunks_type;
 
   QOpenGLShaderProgram *m_shapes_program, *m_gridplane_program;
-  QMatrix4x4 m_cam_trans;
   bool m_dragging, m_rotating;
   double m_scale_factor;
   double m_cam_azimuth, m_cam_elevation;
@@ -108,6 +107,8 @@ private:
   double cam_azimuth () const;
   QVector3D cam_position () const;
   QVector3D cam_direction () const;
+  QMatrix4x4 cam_perspective () const;
+  QMatrix4x4 cam_trans () const;
 };
 
 }

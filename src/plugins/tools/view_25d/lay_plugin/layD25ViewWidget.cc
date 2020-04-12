@@ -190,7 +190,7 @@ D25ViewWidget::wheelEvent (QWheelEvent *event)
   double py = -(event->pos ().y () - height () / 2) * 2.0 / height ();
 
   //  compute vector of line of sight
-  std::pair<QVector3D, QVector3D> ray = camera_normal (m_cam_trans, px, py);
+  std::pair<QVector3D, QVector3D> ray = camera_normal (cam_perspective () * cam_trans (), px, py);
 
   //  by definition the ray goes through the camera position
   float focal_length = 2.0;
@@ -217,15 +217,11 @@ D25ViewWidget::wheelEvent (QWheelEvent *event)
 
     //  normalize the scene translation so the scene does not "flee"
 
-    QMatrix4x4 ct;
-    ct.rotate (-cam_elevation (), 1.0, 0.0, 0.0);
-    ct.rotate (cam_azimuth (), 0.0, 1.0, 0.0);
-    ct.translate (-cam_position ());
-
+    QMatrix4x4 ct = cam_trans ();
     initial_displacement = ct.map (initial_displacement);
     displacement = ct.map (displacement);
 
-    lay::normalize_scene_trans (m_cam_trans, displacement, m_scale_factor, initial_displacement.z ());
+    lay::normalize_scene_trans (cam_perspective (), displacement, m_scale_factor, initial_displacement.z ());
 
     m_displacement = ct.inverted ().map (displacement);
 
@@ -375,27 +371,30 @@ D25ViewWidget::cam_elevation () const
   return m_top_view ? -90.0 : m_cam_elevation;
 }
 
+QMatrix4x4
+D25ViewWidget::cam_perspective () const
+{
+  QMatrix4x4 t;
+  t.perspective (60.0f, float (width ()) / float (height ()), 0.1f, 100.0f);
+  return t;
+}
+
+QMatrix4x4
+D25ViewWidget::cam_trans () const
+{
+  QMatrix4x4 t;
+  t.rotate (-cam_elevation (), 1.0, 0.0, 0.0);
+  t.rotate (cam_azimuth (), 0.0, 1.0, 0.0);
+  t.translate (-cam_position ());
+  return t;
+}
+
 void
 D25ViewWidget::update_cam_trans ()
 {
   QVector3D cp = cam_position ();
 
 printf("@@@ e=%g   a=%g     x,y,z=%g,%g,%g    d=%g,%g,%g    s=%g    f=%g\n", cam_elevation (), cam_azimuth (), cp.x(), cp.y(), cp.z(), m_displacement.x(), m_displacement.y(), m_displacement.z(), m_scale_factor, m_focus_dist); fflush(stdout);
-  QMatrix4x4 t;
-
-  //  finally add perspective
-  t.perspective (60.0f, float (width ()) / float (height ()), 0.1f, 100.0f);
-
-  //  third: elevation
-  t.rotate (-cam_elevation (), 1.0, 0.0, 0.0);
-
-  //  second: azimuth
-  t.rotate (cam_azimuth (), 0.0, 1.0, 0.0);
-
-  //  first: translate the origin into the cam's position
-  t.translate (-cam_position ());
-
-  m_cam_trans = t;
 
   update ();
 }
@@ -656,7 +655,7 @@ D25ViewWidget::paintGL ()
   //  this way we can use y as z coordinate when drawing
   scene_trans.scale (1.0, 1.0, -1.0);
 
-  m_shapes_program->setUniformValue ("matrix", m_cam_trans * scene_trans);
+  m_shapes_program->setUniformValue ("matrix", cam_perspective () * cam_trans () * scene_trans);
 
   //  NOTE: z axis of illum points towards the scene because we include the z inversion in the scene transformation matrix
   m_shapes_program->setUniformValue ("illum", QVector3D (-3.0, -4.0, 2.0).normalized ());

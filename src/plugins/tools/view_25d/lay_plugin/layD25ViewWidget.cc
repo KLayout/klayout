@@ -34,6 +34,7 @@
 
 #include <QWheelEvent>
 #include <QMouseEvent>
+#include <QKeyEvent>
 
 #include "math.h"
 
@@ -44,14 +45,13 @@ namespace lay
 
 D25ViewWidget::D25ViewWidget (QWidget *parent)
   : QOpenGLWidget (parent),
-    m_shapes_program (0), m_dragging (false), m_rotating (false), m_cam_azimuth (0.0), m_cam_elevation (0.0)
+    m_shapes_program (0), m_dragging (false), m_rotating (false), m_cam_azimuth (0.0), m_cam_elevation (0.0), m_top_view (false)
 {
   QSurfaceFormat format;
   format.setDepthBufferSize (24);
   format.setSamples (4); //  more -> widget extends beyond boundary!
   setFormat (format);
 
-  m_cam_position = QVector3D (0.0, 0.0, 4.0); // @@@
   m_scale_factor = 1.0;
   m_focus_dist = 0.0;
 }
@@ -183,48 +183,87 @@ D25ViewWidget::initializeGL ()
   }
 }
 
-static QVector3D cam_direction (double azimuth, double elevation)
-{
-  //  positive azimuth: camera looks left
-  //  positive elevation: camera looks up
-  double y = sin (elevation * M_PI / 180.0);
-  double r = cos (elevation * M_PI / 180.0);
-  double x = r * sin (azimuth * M_PI / 180.0);
-  double z = r * cos (azimuth * M_PI / 180.0);
-  return QVector3D (x, y, -z);
-}
-
 void
 D25ViewWidget::wheelEvent (QWheelEvent *event)
 {
   double px = (event->pos ().x () - width () / 2) * 2.0 / width ();
   double py = -(event->pos ().y () - height () / 2) * 2.0 / height ();
 
-  double f = exp (event->angleDelta ().y () * (1.0 / (90 * 8)));
-
   //  compute vector of line of sight
   std::pair<QVector3D, QVector3D> ray = camera_normal (m_cam_trans, px, py);
 
   //  by definition the ray goes through the camera position
-  std::pair<bool, QVector3D> hp = hit_point_with_scene (m_cam_position, ray.second);
+  float focal_length = 2.0;
+  QVector3D hp = hit_point_with_scene (cam_position () + focal_length * ray.second, ray.second);
 
-  QVector3D pm = m_cam_trans.map(hp.second);
-  printf("@@@ mouse=%g,%g   back=%g,%g\n", px, py, pm.x(), pm.y());
-  printf("@@@ before: hp=%g,%g,%g    d=%g,%g,%g    s=%g\n", hp.second.x(), hp.second.y(), hp.second.z(), m_displacement.x(), m_displacement.y(), m_displacement.z(), m_scale_factor); fflush(stdout);
+  if (false /*@@@*/ && (event->modifiers () & Qt::ShiftModifier)) {
 
-  m_displacement = hp.second * (1.0 - f) + m_displacement * f;
-  m_scale_factor *= f;
+    //  "Shift" is closeup
+
+    double f = event->angleDelta ().y () * (1.0 / (90 * 8));
+    m_displacement += -f * cam_position ().length () * ray.second;
+
+  } else {
+
+    //  No shift is zoom
+
+    double f = exp (event->angleDelta ().y () * (1.0 / (90 * 8)));
+
+    QVector3D initial_displacement = m_displacement;
+    QVector3D displacement = m_displacement;
+
+    displacement = hp * (1.0 - f) + displacement * f;
+    m_scale_factor *= f;
+
+    //  normalize the scene translation so the scene does not "flee"
+
+    QMatrix4x4 ct;
+    ct.rotate (-cam_elevation (), 1.0, 0.0, 0.0);
+    ct.rotate (cam_azimuth (), 0.0, 1.0, 0.0);
+    ct.translate (-cam_position ());
+
+    initial_displacement = ct.map (initial_displacement);
+    displacement = ct.map (displacement);
+
+    lay::normalize_scene_trans (m_cam_trans, displacement, m_scale_factor, initial_displacement.z ());
+
+    m_displacement = ct.inverted ().map (displacement);
+
+  }
 
   update_cam_trans ();
 }
 
-std::pair<bool, QVector3D>
+void
+D25ViewWidget::keyPressEvent (QKeyEvent *event)
+{
+  if (event->key () == Qt::Key_Shift) {
+    m_top_view = true;
+    update_cam_trans ();
+  }
+}
+
+void
+D25ViewWidget::keyReleaseEvent (QKeyEvent *event)
+{
+  if (event->key () == Qt::Key_Shift) {
+    m_top_view = false;
+    update_cam_trans ();
+  }
+}
+
+QVector3D
 D25ViewWidget::hit_point_with_scene (const QVector3D &line, const QVector3D &line_dir)
 {
   QVector3D corner = QVector3D (m_bbox.left (), m_zmin, -(m_bbox.bottom () + m_bbox.height ())) * m_scale_factor + m_displacement;
   QVector3D dim = QVector3D (m_bbox.width (), m_zmax - m_zmin, m_bbox.height ()) * m_scale_factor;
 
-  return lay::hit_point_with_cuboid (line, line_dir, corner, dim);
+  std::pair<bool, QVector3D> hp = lay::hit_point_with_cuboid (line, line_dir, corner, dim);
+  if (! hp.first) {
+    return line;
+  } else {
+    return hp.second;
+  }
 }
 
 void
@@ -238,20 +277,19 @@ D25ViewWidget::mousePressEvent (QMouseEvent *event)
   }
 
   m_start_pos = event->pos ();
-  m_start_cam_position = m_cam_position;
-  m_start_cam_azimuth = m_cam_azimuth;
-  m_start_cam_elevation = m_cam_elevation;
+  m_start_cam_position = cam_position ();
+  m_start_cam_azimuth = cam_azimuth ();
+  m_start_cam_elevation = cam_elevation ();
   m_start_displacement = m_displacement;
 
   m_focus_dist = 2.0;
 
   if (m_dragging || m_rotating) {
 
-    QVector3D cd = cam_direction (m_start_cam_azimuth, m_start_cam_elevation);
-    std::pair<bool, QVector3D> hp = hit_point_with_scene (m_cam_position, cd);
-    if (hp.first) {
-      m_focus_dist = std::max (m_focus_dist, double ((m_cam_position - hp.second).length ()));
-    }
+    QVector3D cd = cam_direction ();
+    QVector3D cp = cam_position ();
+    QVector3D hp = hit_point_with_scene (cp + m_focus_dist * cd, cd);
+    m_focus_dist = std::max (m_focus_dist, double ((cp - hp).length ()));
 
   }
 }
@@ -275,9 +313,9 @@ D25ViewWidget::mouseMoveEvent (QMouseEvent *event)
     double dx = d.x () * f;
     double dy = -d.y () * f;
 
-    QVector3D xv (cos (m_start_cam_azimuth * M_PI / 180.0), 0.0, -sin (m_start_cam_azimuth * M_PI / 180.0));
-    double re = sin (m_start_cam_elevation * M_PI / 180.0);
-    QVector3D yv (-re * xv.z (), cos (m_start_cam_elevation * M_PI / 180.0), re * xv.x ());
+    QVector3D xv (cos (cam_azimuth () * M_PI / 180.0), 0.0, -sin (cam_azimuth () * M_PI / 180.0));
+    double re = sin (cam_elevation () * M_PI / 180.0);
+    QVector3D yv (-re * xv.z (), cos (cam_elevation () * M_PI / 180.0), re * xv.x ());
     QVector3D drag = xv * dx + yv * dy;
 
     m_displacement = m_start_displacement + drag;
@@ -286,6 +324,8 @@ D25ViewWidget::mouseMoveEvent (QMouseEvent *event)
 
   } else if (m_rotating) {
 
+    //  @@@ needs redo ...
+    //  @@@ consider m_top_view
     double focus_dist = 4.0; // @@@
 
     QPoint d = event->pos () - m_start_pos;
@@ -296,30 +336,64 @@ D25ViewWidget::mouseMoveEvent (QMouseEvent *event)
     m_cam_elevation = m_start_cam_elevation + ay;
     m_cam_azimuth = m_start_cam_azimuth + ax;
 
-    m_cam_position = (cam_direction (m_cam_azimuth, m_cam_elevation) * -focus_dist) + cam_direction (m_start_cam_azimuth, m_start_cam_elevation) * focus_dist + m_start_cam_position;
-
     update_cam_trans ();
 
   }
 }
 
+QVector3D
+D25ViewWidget::cam_direction () const
+{
+  double azimuth = cam_azimuth ();
+  double elevation = cam_elevation ();
+
+  //  positive azimuth: camera looks left
+  //  positive elevation: camera looks up
+  double y = sin (elevation * M_PI / 180.0);
+  double r = cos (elevation * M_PI / 180.0);
+  double x = r * sin (azimuth * M_PI / 180.0);
+  double z = r * cos (azimuth * M_PI / 180.0);
+  return QVector3D (x, y, -z);
+}
+
+QVector3D
+D25ViewWidget::cam_position () const
+{
+  double focus_dist = 4.0;
+  return cam_direction () * -focus_dist;
+}
+
+double
+D25ViewWidget::cam_azimuth () const
+{
+  return m_cam_azimuth;
+}
+
+double
+D25ViewWidget::cam_elevation () const
+{
+  return m_top_view ? -90.0 : m_cam_elevation;
+}
+
 void
 D25ViewWidget::update_cam_trans ()
 {
-printf("@@@ e=%g   a=%g     x,y,z=%g,%g,%g    d=%g,%g,%g    s=%g    f=%g\n", m_cam_elevation, m_cam_azimuth, m_cam_position.x(), m_cam_position.y(), m_cam_position.z(), m_displacement.x(), m_displacement.y(), m_displacement.z(), m_scale_factor, m_focus_dist); fflush(stdout);
+  QVector3D cp = cam_position ();
+
+printf("@@@ e=%g   a=%g     x,y,z=%g,%g,%g    d=%g,%g,%g    s=%g    f=%g\n", cam_elevation (), cam_azimuth (), cp.x(), cp.y(), cp.z(), m_displacement.x(), m_displacement.y(), m_displacement.z(), m_scale_factor, m_focus_dist); fflush(stdout);
   QMatrix4x4 t;
 
   //  finally add perspective
   t.perspective (60.0f, float (width ()) / float (height ()), 0.1f, 100.0f);
 
   //  third: elevation
-  t.rotate (-m_cam_elevation, 1.0, 0.0, 0.0);
+  t.rotate (-cam_elevation (), 1.0, 0.0, 0.0);
 
   //  second: azimuth
-  t.rotate (m_cam_azimuth, 0.0, 1.0, 0.0);
+  t.rotate (cam_azimuth (), 0.0, 1.0, 0.0);
 
   //  first: translate the origin into the cam's position
-  t.translate (-m_cam_position);
+  t.translate (-cam_position ());
 
   m_cam_trans = t;
 

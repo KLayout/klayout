@@ -166,3 +166,65 @@ TEST(5_CameraNormal)
   p = matrix.map (ray.first + ray.second * 1000.0);
   EXPECT_EQ (v2s_2d (p), "0,1");
 }
+
+TEST(6_NormalizeSceneTrans)
+{
+  QMatrix4x4 cam;
+  cam.perspective (60.0f, 1.5, 0.1f, 100.0f);
+  cam.rotate (22.0, 1.0, 0.0, 0.0);
+  cam.rotate (-15.0, 0.0, 1.0, 0.0);
+  cam.translate (QVector3D (0.0, 0.0, 4.0));
+
+  double scale = 0.1;
+  QVector3D displacement (-0.5, 0.2, 2.0);
+
+  QMatrix4x4 scene1;
+  scene1.translate (displacement);
+  scene1.scale (scale);
+
+  QVector3D v1 = (cam * scene1).map (QVector3D (1.0, -1.0, 2.0));
+  v1.setZ (0);
+  QVector3D v2 = (cam * scene1).map (QVector3D (0.0, 0.0, 5.0));
+  v2.setZ (0);
+  QVector3D v3 = (cam * scene1).map (QVector3D (-1.0, 0.0, 1.0));
+  v3.setZ (0);
+
+  lay::normalize_scene_trans (cam, displacement, scale);
+
+  QMatrix4x4 scene2;
+  scene2.translate (displacement);
+  scene2.scale (scale);
+
+  EXPECT_EQ (tl::sprintf ("%.4f", scale), "0.0667");
+
+  QVector3D u1 = (cam * scene2).map (QVector3D (1.0, -1.0, 2.0));
+  u1.setZ (0);
+  QVector3D u2 = (cam * scene2).map (QVector3D (0.0, 0.0, 5.0));
+  u2.setZ (0);
+  QVector3D u3 = (cam * scene2).map (QVector3D (-1.0, 0.0, 1.0));
+  u3.setZ (0);
+
+  EXPECT_EQ ((u1 - v1).length () < 1e-4, true);
+  EXPECT_EQ ((u2 - v2).length () < 1e-4, true);
+  EXPECT_EQ ((u3 - v3).length () < 1e-4, true);
+
+  lay::normalize_scene_trans (cam, displacement, scale, 1.0);
+
+  QMatrix4x4 scene3;
+  scene3.translate (displacement);
+  scene3.scale (scale);
+
+  EXPECT_EQ (tl::sprintf ("%.4f", scale), "0.0833");
+  EXPECT_EQ (tl::to_string (displacement.z ()), "1");
+
+  QVector3D uu1 = (cam * scene2).map (QVector3D (1.0, -1.0, 2.0));
+  uu1.setZ (0);
+  QVector3D uu2 = (cam * scene2).map (QVector3D (0.0, 0.0, 5.0));
+  uu2.setZ (0);
+  QVector3D uu3 = (cam * scene2).map (QVector3D (-1.0, 0.0, 1.0));
+  uu3.setZ (0);
+
+  EXPECT_EQ ((uu1 - v1).length () < 1e-4, true);
+  EXPECT_EQ ((uu2 - v2).length () < 1e-4, true);
+  EXPECT_EQ ((uu3 - v3).length () < 1e-4, true);
+}

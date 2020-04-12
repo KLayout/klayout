@@ -37,6 +37,9 @@ D25View::D25View (QWidget *parent)
   mp_ui = new Ui::D25View ();
   mp_ui->setupUi (this);
 
+  // @@@ should be an event filter?
+  mp_ui->d25_view->setFocusPolicy (Qt::StrongFocus);
+  mp_ui->d25_view->setFocus ();
   // @@@
 }
 

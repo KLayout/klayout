@@ -74,6 +74,18 @@ hit_point_with_cuboid (const QVector3D &line, const QVector3D &line_dir, const Q
 LAY_PLUGIN_PUBLIC std::pair<QVector3D, QVector3D>
 camera_normal (const QMatrix4x4 &camera_trans, double x, double y);
 
+/**
+ *  @brief Normalizes a scene transformation
+ *
+ *  Scene transformations consist of a scaling and displacement. Both are
+ *  interchangeable to some extent under the presence of a perspective
+ *  transformation (further away makes the scene smaller). This normalization
+ *  tries to find a displacement which has "ztarget" target value for z. Without normalization
+ *  the scene tends to "move away" with respect to z.
+ */
+LAY_PLUGIN_PUBLIC void
+normalize_scene_trans (const QMatrix4x4 &cam_trans, QVector3D &displacement, double &scale, double ztarget = 0.0);
+
 }
 
 #endif

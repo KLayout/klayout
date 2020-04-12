@@ -340,16 +340,9 @@ D25ViewWidget::mouseMoveEvent (QMouseEvent *event)
 QVector3D
 D25ViewWidget::cam_direction () const
 {
-  double azimuth = cam_azimuth ();
-  double elevation = cam_elevation ();
-
-  //  positive azimuth: camera looks left
-  //  positive elevation: camera looks up
-  double y = sin (elevation * M_PI / 180.0);
-  double r = cos (elevation * M_PI / 180.0);
-  double x = r * sin (azimuth * M_PI / 180.0);
-  double z = r * cos (azimuth * M_PI / 180.0);
-  return QVector3D (x, y, -z);
+  QVector3D cd = cam_trans ().map (QVector3D (0, 0, 1));
+  cd.setZ (-cd.z ());
+  return cd;
 }
 
 QVector3D

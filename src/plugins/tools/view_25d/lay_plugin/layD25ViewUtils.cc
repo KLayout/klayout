@@ -63,12 +63,20 @@ cutpoint_line_with_face (const QVector3D &line, const QVector3D &dir, const QVec
   }
 }
 
+static bool somewhat_perpendicular (const QVector3D &a, const QVector3D &b)
+{
+  //  returns true if a and b are perpendicular within 30 degree
+  return fabs (QVector3D::dotProduct (a, b) < 0.5 * a.length () * b.length ());
+}
+
 static std::pair<bool, QVector3D> plane_or_face (const QVector3D &line, const QVector3D &line_dir, const QVector3D &corner, const QVector3D &u, const QVector3D &v, bool face)
 {
   if (face) {
     return cutpoint_line_with_face (line, line_dir, corner, u, v);
-  } else {
+  } else if (somewhat_perpendicular (u, line_dir) && somewhat_perpendicular (v, line_dir)) {
     return cutpoint_line_with_plane (line, line_dir, corner, QVector3D::crossProduct (u, v));
+  } else {
+    return std::make_pair (false, QVector3D ());
   }
 }
 
@@ -98,17 +106,14 @@ hit_point_with_cuboid (const QVector3D &line, const QVector3D &line_dir, const Q
     cutpoints.push_back (plane_or_face (line, line_dir, corner, QVector3D (dim.x (), 0, 0), QVector3D (0, dim.y (), 0), face));
     //  back
     cutpoints.push_back (plane_or_face (line, line_dir, corner + QVector3D (0, 0, dim.z ()), QVector3D (dim.x (), 0, 0), QVector3D (0, dim.y (), 0), face));
-
-    if (face) {
-      //  bottom
-      cutpoints.push_back (plane_or_face (line, line_dir, corner, QVector3D (dim.x (), 0, 0), QVector3D (0, 0, dim.z ()), face));
-      //  top
-      cutpoints.push_back (plane_or_face (line, line_dir, corner + QVector3D (0, dim.y (), 0), QVector3D (dim.x (), 0, 0), QVector3D (0, 0, dim.z ()), face));
-      //  left
-      cutpoints.push_back (plane_or_face (line, line_dir, corner, QVector3D (0, 0, dim.z ()), QVector3D (0, dim.y (), 0), face));
-      //  right
-      cutpoints.push_back (plane_or_face (line, line_dir, corner + QVector3D (dim.x (), 0, 0), QVector3D (0, 0, dim.z ()), QVector3D (0, dim.y (), 0), face));
-    }
+    //  bottom
+    cutpoints.push_back (plane_or_face (line, line_dir, corner, QVector3D (dim.x (), 0, 0), QVector3D (0, 0, dim.z ()), face));
+    //  top
+    cutpoints.push_back (plane_or_face (line, line_dir, corner + QVector3D (0, dim.y (), 0), QVector3D (dim.x (), 0, 0), QVector3D (0, 0, dim.z ()), face));
+    //  left
+    cutpoints.push_back (plane_or_face (line, line_dir, corner, QVector3D (0, 0, dim.z ()), QVector3D (0, dim.y (), 0), face));
+    //  right
+    cutpoints.push_back (plane_or_face (line, line_dir, corner + QVector3D (dim.x (), 0, 0), QVector3D (0, 0, dim.z ()), QVector3D (0, dim.y (), 0), face));
 
     double min_dist = 0.0;
     int min_dist_index = -1;

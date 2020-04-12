@@ -164,60 +164,60 @@ camera_normal (const QMatrix4x4 &camera_trans, double x, double y)
 void
 normalize_scene_trans (const QMatrix4x4 &cam_trans, QVector3D &displacement, double &scale, double ztarget)
 {
-  QMatrix4x4 m;
-
   //  Here is the theory:
   //  Let:
   //    cam = (  M  t  )     M = 3x3 matrix, t = 3x1 translation vector, z = scalar, p = 1x3 perspective
   //          (  p  z  )
   //  and:
-  //    scene = (  S  d  )   S = s*U1  (s = scale factor, U1 = 3x3 unit matrix), d = 3x1 displacement vector
-  //            (  0  1  )
+  //    scene = (  S  d*s  )   S = s*U1  (s = scale factor, U1 = 3x3 unit matrix), d = 3x1 displacement vector
+  //            (  0  1    )
   //  then:
-  //    cam * scene = (  M*s   M*d+t  )
-  //                  (  p*s   p*d+z  )    (p*d = dot product)
+  //    cam * scene = (  M*s   M*d*s+t  )
+  //                  (  p*s   p*d*s+z  )    (p*d = dot product)
   //
   //  this is image invariant (only x,y results are considered) against changes of s (s->s') if
   //
-  //    1.) (p*d+z)/s = (p*d'+z)/s'
-  //    2.) (M*d+t)/s = (M*d'+t)/s'  for  [x] and [y]
+  //    1.) (p*d*s+z)/s = (p*d'*s'+z)/s'  (because x and y will be devided by this value)
+  //    2.) (M*d*s+t)/s = (M*d'*s'+t)/s'  for  [x] and [y]
   //
-  //  Ff we seek a solution with d'[z] == b  (b = ztarget), we get these equations (f:=s'/s)
+  //  or
   //
-  //    2.)   M[xx] * d'[x] + M[xy] * d'[y] - ((M*d)[x] + t[x]) * f = -t[x] - M[xz] * b
-  //          M[yx] * d'[x] + M[yy] * d'[y] - ((M*d)[y] + t[y]) * f = -t[y] - M[yz] * b
-  //    1.)   p[x]  * d'[x] + p[y]  * d'[y] - (p*d+z)           * f = -z    - p[z] * b
+  //    1.) p*d+z/s = p*d'+z/s'
+  //    2.) M*d+t/s = M*d'+t/s'
+  //
+  //  If we seek a solution with d'[z] == b  (b = ztarget), we get these equations (f:=1/s')
+  //
+  //    2.)   M[xx] * d'[x] + M[xy] * d'[y] + t[x] * f = (M*d)[x] + t[x]/s - M[xz]*b
+  //          M[yx] * d'[x] + M[yy] * d'[y] + t[y] * f = (M*d)[y] + t[y]/s - M[yz]*b
+  //    1.)   p[x]  * d'[x] + p[y]  * d'[y] + z    * f = p*d      + z/s    - p[z]*b
   //
   //  we can solve these equations for d'[x], d'[y] and f.
   //  With p[x]=M[wx], p[y]=M[wy] and z=t[w], the above equation system can be written as
   //
-  //          M[ix] * d'[x] + M[iy] * d'[y] - ((M*d)[i] + t[i]) * f = -t[i] - M[iz]*b   i = x,y,w
-  //
-  //  and with M,t->M (4x4 matrix) and d->(d,1) (4d vector)
-  //
-  //          M[ix] * d'[x] + M[iy] * d'[y] - (M*d)[i] * f = -t[i] - M[iz]*b   i = x,y,w
+  //          M[ix] * d'[x] + M[iy] * d'[y] + t[i] * f = (M*d)[i] - M[iz]*b + t[i]/s   i = x,y,w
   //
 
-  QVector4D d4 (displacement);
-  d4.setW (1.0);
+  QMatrix4x4 m;
 
   for (int i = 0; i < 4; ++i) {
     if (i != 2) {
       m (i, 0) = cam_trans (i, 0);
       m (i, 1) = cam_trans (i, 1);
-      m (i, 3) = -QVector4D::dotProduct (cam_trans.row (i), d4);
+      m (i, 3) = cam_trans (i, 3);
     }
   }
 
   bool invertable = false;
-  m = m.inverted (&invertable);
+  QMatrix4x4 minv = m.inverted (&invertable);
   if (! invertable) {
     return;
   }
 
-  QVector4D sol = m.map (-cam_trans.column (3) - cam_trans.column (2) * ztarget);
-  if (sol.w () > 0.01 /*skip weird solutions*/) {
-    scale *= sol.w ();
+  QVector4D rhs = cam_trans.map (QVector4D (displacement.x (), displacement.y (), displacement.z () - ztarget, 1.0 / scale));
+  QVector4D sol = minv.map (rhs);
+  double f = sol.w ();
+  if (f > 1e-6 /*skip weird solutions*/) {
+    scale = 1.0 / f;
     displacement = QVector3D (sol.x (), sol.y (), ztarget);
   }
 }

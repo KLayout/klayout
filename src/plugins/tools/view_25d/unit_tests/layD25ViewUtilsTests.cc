@@ -176,11 +176,11 @@ TEST(6_NormalizeSceneTrans)
   cam.translate (QVector3D (0.0, 0.0, 4.0));
 
   double scale = 0.1;
-  QVector3D displacement (-0.5, 0.2, 2.0);
+  QVector3D displacement (-5.0, 2.0, 20.0);
 
   QMatrix4x4 scene1;
-  scene1.translate (displacement);
   scene1.scale (scale);
+  scene1.translate (displacement);
 
   QVector3D v1 = (cam * scene1).map (QVector3D (1.0, -1.0, 2.0));
   v1.setZ (0);
@@ -192,8 +192,8 @@ TEST(6_NormalizeSceneTrans)
   lay::normalize_scene_trans (cam, displacement, scale);
 
   QMatrix4x4 scene2;
-  scene2.translate (displacement);
   scene2.scale (scale);
+  scene2.translate (displacement);
 
   EXPECT_EQ (tl::sprintf ("%.4f", scale), "0.0667");
 
@@ -208,14 +208,14 @@ TEST(6_NormalizeSceneTrans)
   EXPECT_EQ ((u2 - v2).length () < 1e-4, true);
   EXPECT_EQ ((u3 - v3).length () < 1e-4, true);
 
-  lay::normalize_scene_trans (cam, displacement, scale, 1.0);
+  lay::normalize_scene_trans (cam, displacement, scale, 10.0);
 
   QMatrix4x4 scene3;
-  scene3.translate (displacement);
   scene3.scale (scale);
+  scene3.translate (displacement);
 
-  EXPECT_EQ (tl::sprintf ("%.4f", scale), "0.0833");
-  EXPECT_EQ (tl::to_string (displacement.z ()), "1");
+  EXPECT_EQ (tl::sprintf ("%.4f", scale), "0.0800");
+  EXPECT_EQ (tl::to_string (displacement.z ()), "10");
 
   QVector3D uu1 = (cam * scene2).map (QVector3D (1.0, -1.0, 2.0));
   uu1.setZ (0);

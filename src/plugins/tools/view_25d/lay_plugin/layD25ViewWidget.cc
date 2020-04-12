@@ -201,7 +201,7 @@ D25ViewWidget::wheelEvent (QWheelEvent *event)
     //  "Shift" is closeup
 
     double f = event->angleDelta ().y () * (1.0 / (90 * 8));
-    m_displacement += -f * cam_position ().length () * ray.second;
+    m_displacement += -(f / m_scale_factor) * cam_position ().length () * ray.second;
 
   } else {
 
@@ -212,7 +212,7 @@ D25ViewWidget::wheelEvent (QWheelEvent *event)
     QVector3D initial_displacement = m_displacement;
     QVector3D displacement = m_displacement;
 
-    displacement = hp * (1.0 - f) + displacement * f;
+    displacement += hp * (1.0 - f) / (f * m_scale_factor);
     m_scale_factor *= f;
 
     //  normalize the scene translation so the scene does not "flee"
@@ -251,7 +251,7 @@ D25ViewWidget::keyReleaseEvent (QKeyEvent *event)
 QVector3D
 D25ViewWidget::hit_point_with_scene (const QVector3D &line, const QVector3D &line_dir)
 {
-  QVector3D corner = QVector3D (m_bbox.left (), m_zmin, -(m_bbox.bottom () + m_bbox.height ())) * m_scale_factor + m_displacement;
+  QVector3D corner = (QVector3D (m_bbox.left (), m_zmin, -(m_bbox.bottom () + m_bbox.height ())) + m_displacement) * m_scale_factor;
   QVector3D dim = QVector3D (m_bbox.width (), m_zmax - m_zmin, m_bbox.height ()) * m_scale_factor;
 
   std::pair<bool, QVector3D> hp = lay::hit_point_with_cuboid (line, line_dir, corner, dim);
@@ -314,7 +314,7 @@ D25ViewWidget::mouseMoveEvent (QMouseEvent *event)
     QVector3D yv (-re * xv.z (), cos (cam_elevation () * M_PI / 180.0), re * xv.x ());
     QVector3D drag = xv * dx + yv * dy;
 
-    m_displacement = m_start_displacement + drag;
+    m_displacement = m_start_displacement + drag / m_scale_factor;
 
     update_cam_trans ();
 
@@ -355,7 +355,7 @@ D25ViewWidget::cam_direction () const
 QVector3D
 D25ViewWidget::cam_position () const
 {
-  double focus_dist = 4.0;
+  double focus_dist = 4.0; // @@@
   return cam_direction () * -focus_dist;
 }
 
@@ -374,8 +374,10 @@ D25ViewWidget::cam_elevation () const
 QMatrix4x4
 D25ViewWidget::cam_perspective () const
 {
+  double focus_dist = 4.0; // @@@
   QMatrix4x4 t;
   t.perspective (60.0f, float (width ()) / float (height ()), 0.1f, 100.0f);
+  t.translate (QVector3D (0.0, 0.0, -focus_dist));
   return t;
 }
 
@@ -385,7 +387,6 @@ D25ViewWidget::cam_trans () const
   QMatrix4x4 t;
   t.rotate (-cam_elevation (), 1.0, 0.0, 0.0);
   t.rotate (cam_azimuth (), 0.0, 1.0, 0.0);
-  t.translate (-cam_position ());
   return t;
 }
 
@@ -649,9 +650,9 @@ D25ViewWidget::paintGL ()
 
   QMatrix4x4 scene_trans;
 
-  //  provide the displacement and scaling
-  scene_trans.translate (m_displacement);
+  //  provide the displacement and scaling (in this order!)
   scene_trans.scale (m_scale_factor);
+  scene_trans.translate (m_displacement);
   //  this way we can use y as z coordinate when drawing
   scene_trans.scale (1.0, 1.0, -1.0);
 

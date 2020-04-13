@@ -76,6 +76,8 @@ private:
   bool m_top_view;
   QVector3D m_displacement;
   double m_focus_dist;
+  double m_fov;
+  QVector3D m_hit_point;
   QPoint m_start_pos;
   QVector3D m_start_cam_position;
   double m_start_cam_azimuth, m_start_cam_elevation;
@@ -97,18 +99,21 @@ private:
   void paintGL ();
   void resizeGL (int w, int h);
 
-  void update_cam_trans ();
+  void refresh ();
+  void reset ();
   void prepare_view ();
   void render_layout (D25ViewWidget::chunks_type &chunks, const db::Layout &layout, const db::Cell &cell, unsigned int layer, double zstart, double zstop);
   void render_polygon (D25ViewWidget::chunks_type &chunks, const db::Polygon &poly, double dbu, double zstart, double zstop);
   void render_wall (D25ViewWidget::chunks_type &chunks, const db::Edge &poly, double dbu, double zstart, double zstop);
-  QVector3D hit_point_with_scene(const QVector3D &line, const QVector3D &line_dir);
+  QVector3D hit_point_with_scene(const QVector3D &line_dir);
   double cam_elevation () const;
   double cam_azimuth () const;
   QVector3D cam_position () const;
   QVector3D cam_direction () const;
   QMatrix4x4 cam_perspective () const;
   QMatrix4x4 cam_trans () const;
+  double cam_dist () const;
+  double cam_fov () const;
 };
 
 }

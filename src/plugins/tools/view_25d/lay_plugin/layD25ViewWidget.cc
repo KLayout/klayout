@@ -45,147 +45,51 @@ namespace lay
 
 D25ViewWidget::D25ViewWidget (QWidget *parent)
   : QOpenGLWidget (parent),
-    m_shapes_program (0), m_dragging (false), m_rotating (false), m_cam_azimuth (0.0), m_cam_elevation (0.0), m_top_view (false)
+    m_shapes_program (0)
 {
   QSurfaceFormat format;
   format.setDepthBufferSize (24);
   format.setSamples (4); //  more -> widget extends beyond boundary!
+  format.setStencilBufferSize (8);
+  // @@@? format.setVersion (3, 2);
+  format.setProfile (QSurfaceFormat::CoreProfile);
   setFormat (format);
 
-  m_scale_factor = 1.0;
-  m_focus_dist = 0.0;
+  m_zmin = m_zmax = 0.0;
+  mp_view = 0;
 }
 
 D25ViewWidget::~D25ViewWidget ()
 {
   // Make sure the context is current and then explicitly
   // destroy all underlying OpenGL resources.
-  makeCurrent();
+  makeCurrent ();
 
   delete m_shapes_program;
 
-  doneCurrent();
+  doneCurrent ();
 }
 
 void
-D25ViewWidget::initializeGL ()
+D25ViewWidget::reset ()
 {
-  QOpenGLFunctions::initializeOpenGLFunctions();
+  m_scale_factor = 1.0;
+  m_focus_dist = 0.0;
+  m_fov = 60.0;
+  m_cam_azimuth = m_cam_elevation = 0.0;
+  m_top_view = false;
+  m_dragging = m_rotating = false;
 
-  glEnable (GL_DEPTH_TEST);
-  glEnable (GL_BLEND);
-  //  @@@ dark background
-  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  //  @@@ white background
-  // @@@ glBlendFunc (GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
-
-  static const char *shapes_vertex_shader_source =
-      "#version 320 es\n"
-      "#undef lowp\n"
-      "#undef highp\n"
-      "#undef mediump\n"
-      "layout (location = 0) in vec4 posAttr;\n"
-      "\n"
-      "void main() {\n"
-      "   gl_Position = posAttr;\n"
-      "}\n";
-
-  static const char *shapes_geometry_shader_source =
-      "#version 320 es\n"
-      "#undef lowp\n"
-      "#undef highp\n"
-      "#undef mediump\n"
-      "\n"
-      "uniform vec4 color;\n"
-      "uniform vec4 ambient;\n"
-      "uniform vec3 illum;\n"
-      "out lowp vec4 vertexColor;\n"
-      "uniform mat4 matrix;\n"
-      "layout (triangles) in;\n"
-      "layout (triangle_strip, max_vertices = 3) out;\n"
-      "\n"
-      "void main() {\n"
-      "   vec4 p0 = gl_in[0].gl_Position;\n"
-      "   vec4 p1 = gl_in[1].gl_Position;\n"
-      "   vec4 p2 = gl_in[2].gl_Position;\n"
-      "   vec3 n = cross(p2.xyz - p0.xyz, p1.xyz - p0.xyz);\n"
-      "   float dp = dot(normalize(n), illum);\n"
-      "   vertexColor.rgb = color.rgb * (dp * 0.5 + 0.5) - (min(0.0, dp) * 0.5 * ambient.rgb);\n"
-      "   vertexColor.a = 1.0;\n"
-      "   gl_Position = matrix * p0;\n"
-      "   EmitVertex();\n"
-      "   gl_Position = matrix * p1;\n"
-      "   EmitVertex();\n"
-      "   gl_Position = matrix * p2;\n"
-      "   EmitVertex();\n"
-      "   EndPrimitive();\n"
-      "}\n";
-
-  static const char *shapes_fragment_shader_source =
-      "#version 320 es\n"
-      "#undef lowp\n"
-      "#undef highp\n"
-      "#undef mediump\n"
-      "in lowp vec4 vertexColor;\n"
-      "out lowp vec4 fragColor;\n"
-      "void main() {\n"
-      "   fragColor = vertexColor;\n"
-      "}\n";
-
-  m_shapes_program = new QOpenGLShaderProgram (this);
-  if (! m_shapes_program->addShaderFromSourceCode (QOpenGLShader::Vertex, shapes_vertex_shader_source)) {
-    throw tl::Exception (std::string ("Shapes vertex shader compilation failed:\n") + tl::to_string (m_shapes_program->log ()));
-  }
-  if (! m_shapes_program->addShaderFromSourceCode (QOpenGLShader::Geometry, shapes_geometry_shader_source)) {
-    throw tl::Exception (std::string ("Shapes geometry shader compilation failed:\n") + tl::to_string (m_shapes_program->log ()));
-  }
-  if (! m_shapes_program->addShaderFromSourceCode (QOpenGLShader::Fragment, shapes_fragment_shader_source)) {
-    throw tl::Exception (std::string ("Shapes fragment shader compilation failed:\n") + tl::to_string (m_shapes_program->log ()));
-  }
-  if (! m_shapes_program->link ()) {
-    throw tl::Exception (std::string ("Shapes shader program linking failed failed:\n") + tl::to_string (m_shapes_program->log ()));
-  }
-
-  //  grid plane shader source
-
-  static const char *gridplan_vertex_shader_source =
-      "#version 320 es\n"
-      "#undef lowp\n"
-      "#undef highp\n"
-      "#undef mediump\n"
-      "layout (location = 0) in vec4 posAttr;\n"
-      "uniform mat4 matrix;\n"
-      "\n"
-      "void main() {\n"
-      "   gl_Position = matrix * posAttr;\n"
-      "}\n";
-
-  static const char *gridplan_fragment_shader_source =
-      "#version 320 es\n"
-      "#undef lowp\n"
-      "#undef highp\n"
-      "#undef mediump\n"
-      "uniform lowp vec4 color;\n"
-      "out lowp vec4 fragColor;\n"
-      "void main() {\n"
-      "   fragColor = color;\n"
-      "}\n";
-
-  m_gridplane_program = new QOpenGLShaderProgram (this);
-  if (! m_gridplane_program->addShaderFromSourceCode (QOpenGLShader::Vertex, gridplan_vertex_shader_source)) {
-    throw tl::Exception (std::string ("Grid plane vertex shader compilation failed:\n") + tl::to_string (m_gridplane_program->log ()));
-  }
-  if (! m_gridplane_program->addShaderFromSourceCode (QOpenGLShader::Fragment, gridplan_fragment_shader_source)) {
-    throw tl::Exception (std::string ("Grid plane fragment shader compilation failed:\n") + tl::to_string (m_gridplane_program->log ()));
-  }
-  if (! m_gridplane_program->link ()) {
-    throw tl::Exception (std::string ("Grid plane shader program linking failed:\n") + tl::to_string (m_gridplane_program->log ()));
-  }
+  refresh ();
 }
 
 void
 D25ViewWidget::wheelEvent (QWheelEvent *event)
 {
+  if (event->angleDelta ().y () == 0) {
+    return;
+  }
+
   double px = (event->pos ().x () - width () / 2) * 2.0 / width ();
   double py = -(event->pos ().y () - height () / 2) * 2.0 / height ();
 
@@ -193,15 +97,14 @@ D25ViewWidget::wheelEvent (QWheelEvent *event)
   std::pair<QVector3D, QVector3D> ray = camera_normal (cam_perspective () * cam_trans (), px, py);
 
   //  by definition the ray goes through the camera position
-  float focal_length = 2.0;
-  QVector3D hp = hit_point_with_scene (cam_position () + focal_length * ray.second, ray.second);
+  QVector3D hp = hit_point_with_scene (ray.second);
 
-  if (false /*@@@*/ && (event->modifiers () & Qt::ShiftModifier)) {
+  if (event->modifiers () & Qt::ControlModifier) {
 
-    //  "Shift" is closeup
+    //  "Ctrl" is closeup
 
     double f = event->angleDelta ().y () * (1.0 / (90 * 8));
-    m_displacement += -(f / m_scale_factor) * cam_position ().length () * ray.second;
+    m_displacement += -((f / m_scale_factor) * cam_dist ()) * ray.second;
 
   } else {
 
@@ -212,8 +115,8 @@ D25ViewWidget::wheelEvent (QWheelEvent *event)
     QVector3D initial_displacement = m_displacement;
     QVector3D displacement = m_displacement;
 
-    displacement += hp * (1.0 - f) / (f * m_scale_factor);
     m_scale_factor *= f;
+    displacement += hp * (1.0 - f) / m_scale_factor;
 
     //  normalize the scene translation so the scene does not "flee"
 
@@ -227,7 +130,7 @@ D25ViewWidget::wheelEvent (QWheelEvent *event)
 
   }
 
-  update_cam_trans ();
+  refresh ();
 }
 
 void
@@ -235,7 +138,7 @@ D25ViewWidget::keyPressEvent (QKeyEvent *event)
 {
   if (event->key () == Qt::Key_Shift) {
     m_top_view = true;
-    update_cam_trans ();
+    refresh ();
   }
 }
 
@@ -244,19 +147,25 @@ D25ViewWidget::keyReleaseEvent (QKeyEvent *event)
 {
   if (event->key () == Qt::Key_Shift) {
     m_top_view = false;
-    update_cam_trans ();
+    refresh ();
   }
 }
 
 QVector3D
-D25ViewWidget::hit_point_with_scene (const QVector3D &line, const QVector3D &line_dir)
+D25ViewWidget::hit_point_with_scene (const QVector3D &line_dir)
 {
+  double min_focus_dist = 0.5;
+
   QVector3D corner = (QVector3D (m_bbox.left (), m_zmin, -(m_bbox.bottom () + m_bbox.height ())) + m_displacement) * m_scale_factor;
   QVector3D dim = QVector3D (m_bbox.width (), m_zmax - m_zmin, m_bbox.height ()) * m_scale_factor;
+  QVector3D line = cam_position ();
 
   std::pair<bool, QVector3D> hp = lay::hit_point_with_cuboid (line, line_dir, corner, dim);
   if (! hp.first) {
-    return line;
+    return line + line_dir * min_focus_dist;
+  } else if (QVector3D::dotProduct (line_dir, hp.second - line) < min_focus_dist) {
+    //  limit to min focus distance (not behind)
+    return line + line_dir * min_focus_dist;
   } else {
     return hp.second;
   }
@@ -279,13 +188,27 @@ D25ViewWidget::mousePressEvent (QMouseEvent *event)
   m_start_displacement = m_displacement;
 
   m_focus_dist = 2.0;
+  m_hit_point = QVector3D ();
 
-  if (m_dragging || m_rotating) {
+  if (m_dragging) {
 
-    QVector3D cd = cam_direction ();
-    QVector3D cp = cam_position ();
-    QVector3D hp = hit_point_with_scene (cp + m_focus_dist * cd, cd);
-    m_focus_dist = std::max (m_focus_dist, double ((cp - hp).length ()));
+    //  by definition the ray goes through the camera position
+    QVector3D hp = hit_point_with_scene (cam_direction ());
+
+    m_focus_dist = std::max (m_focus_dist, double ((m_start_cam_position - hp).length ()));
+
+  } else if (m_rotating) {
+
+    double px = (event->pos ().x () - width () / 2) * 2.0 / width ();
+    double py = -(event->pos ().y () - height () / 2) * 2.0 / height ();
+
+    //  compute vector of line of sight
+    std::pair<QVector3D, QVector3D> ray = camera_normal (cam_perspective () * cam_trans (), px, py);
+
+    //  by definition the ray goes through the camera position
+    m_hit_point = hit_point_with_scene (ray.second);
+
+    m_focus_dist = std::max (m_focus_dist, double ((m_start_cam_position - m_hit_point).length ()));
 
   }
 }
@@ -299,42 +222,65 @@ D25ViewWidget::mouseReleaseEvent (QMouseEvent * /*event*/)
 void
 D25ViewWidget::mouseMoveEvent (QMouseEvent *event)
 {
+  if (! m_dragging && ! m_rotating) {
+    return;
+  }
+
   if (m_dragging) {
 
-    //  for the chosen perspective transformation:
-    double cal = 0.6 * m_focus_dist;
-
     QPoint d = event->pos () - m_start_pos;
-    double f = cal * 2.0 / double (height ());
+    double f = tan ((cam_fov () / 2) / 180.0 * M_PI) * m_focus_dist * 2.0 / double (height ());
     double dx = d.x () * f;
     double dy = -d.y () * f;
 
-    QVector3D xv (cos (cam_azimuth () * M_PI / 180.0), 0.0, -sin (cam_azimuth () * M_PI / 180.0));
-    double re = sin (cam_elevation () * M_PI / 180.0);
-    QVector3D yv (-re * xv.z (), cos (cam_elevation () * M_PI / 180.0), re * xv.x ());
+    QVector3D xv (cos (m_start_cam_azimuth * M_PI / 180.0), 0.0, sin (m_start_cam_azimuth * M_PI / 180.0));
+    double re = sin (m_start_cam_elevation * M_PI / 180.0);
+    QVector3D yv (-re * xv.z (), cos (m_start_cam_elevation * M_PI / 180.0), re * xv.x ());
     QVector3D drag = xv * dx + yv * dy;
 
     m_displacement = m_start_displacement + drag / m_scale_factor;
 
-    update_cam_trans ();
-
-  } else if (m_rotating) {
-
-    //  @@@ needs redo ...
-    //  @@@ consider m_top_view
-    double focus_dist = 4.0; // @@@
+  } else {
 
     QPoint d = event->pos () - m_start_pos;
+    double f = tan ((cam_fov () / 2) / 180.0 * M_PI) * m_focus_dist * 2.0 / double (height ());
+    double dx = d.x () * f;
+    double dy = -d.y () * f;
 
-    double ax = atan (d.x () / (0.5 * height ())) * 180 / M_PI;
-    double ay = atan (-d.y () / (0.5 * height ())) * 180 / M_PI;
+    if (m_hit_point.x () * dx < 0 && (dx + 2.0 * m_hit_point.x ()) * m_hit_point.x () > 0) {
 
-    m_cam_elevation = m_start_cam_elevation + ay;
-    m_cam_azimuth = m_start_cam_azimuth + ax;
+      double da = asin (dx / m_hit_point.x () - 1.0) * 180.0 / M_PI;
+// @@@ printf("@@@ hp=%g,%g,%g  drag=%g,%g -> da=%g\n", m_hit_point.x(), m_hit_point.y(), m_hit_point.z(), drag.x(), drag.z(), da); fflush(stdout);
+      m_cam_azimuth = m_start_cam_azimuth + da;
 
-    update_cam_trans ();
+    }
+
+#if 0
+    //  elevation change
+    if (! m_top_view) {
+
+      dp = m_hit_point + QVector3D (0.0, float (drag.y ()), 0.0);
+      double de = QVector3D::crossProduct (dp, m_hit_point).length () * (drag.y () > 0 ? 1.0 : -1.0) / (dp.length () * m_hit_point.length ()) * 180.0 / M_PI;
+      m_cam_elevation = m_start_cam_elevation + de;
+
+    }
+#endif
 
   }
+
+  refresh ();
+}
+
+double
+D25ViewWidget::cam_fov () const
+{
+  return m_fov; // @@@
+}
+
+double
+D25ViewWidget::cam_dist () const
+{
+  return 4.0; // @@@
 }
 
 QVector3D
@@ -348,8 +294,7 @@ D25ViewWidget::cam_direction () const
 QVector3D
 D25ViewWidget::cam_position () const
 {
-  double focus_dist = 4.0; // @@@
-  return cam_direction () * -focus_dist;
+  return cam_direction () * -cam_dist ();
 }
 
 double
@@ -367,10 +312,9 @@ D25ViewWidget::cam_elevation () const
 QMatrix4x4
 D25ViewWidget::cam_perspective () const
 {
-  double focus_dist = 4.0; // @@@
   QMatrix4x4 t;
-  t.perspective (60.0f, float (width ()) / float (height ()), 0.1f, 100.0f);
-  t.translate (QVector3D (0.0, 0.0, -focus_dist));
+  t.perspective (cam_fov (), float (width ()) / float (height ()), 0.1f, 10000.0f);
+  t.translate (QVector3D (0.0, 0.0, -cam_dist ()));
   return t;
 }
 
@@ -384,7 +328,7 @@ D25ViewWidget::cam_trans () const
 }
 
 void
-D25ViewWidget::update_cam_trans ()
+D25ViewWidget::refresh ()
 {
   QVector3D cp = cam_position ();
 
@@ -399,12 +343,9 @@ D25ViewWidget::attach_view (LayoutView *view)
   if (mp_view != view) {
 
     mp_view = view;
-    m_layers.clear ();
-    m_vertex_chunks.clear ();
 
-    if (mp_view) {
-      prepare_view ();
-    }
+    prepare_view ();
+    reset ();
 
   }
 }
@@ -412,11 +353,19 @@ D25ViewWidget::attach_view (LayoutView *view)
 void
 D25ViewWidget::prepare_view ()
 {
-  double z = 0.0, dz = 0.2; // @@@
+  m_layers.clear ();
+  m_vertex_chunks.clear ();
 
   m_bbox = db::DBox ();
   bool zset = false;
   m_zmin = m_zmax = 0.0;
+
+  if (! mp_view) {
+    m_bbox = db::DBox (-1.0, -1.0, 1.0, 1.0);
+    return;
+  }
+
+  double z = 0.0, dz = 0.2; // @@@
 
   for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
 
@@ -427,11 +376,9 @@ D25ViewWidget::prepare_view ()
       m_vertex_chunks.push_back (chunks_type ());
 
       LayerInfo info;
-      // @@@ use alpha?
       info.color[0] = ((color >> 16) & 0xff) / 255.0f;
       info.color[1] = ((color >> 8) & 0xff) / 255.0f;
       info.color[2] = (color & 0xff) / 255.0f;
-      info.color[3] = 1.0;
       info.vertex_chunk = &m_vertex_chunks.back ();
 
       m_layers.push_back (info);
@@ -627,19 +574,177 @@ D25ViewWidget::render_layout (D25ViewWidget::chunks_type &chunks, const db::Layo
   }
 }
 
+static std::pair<double, double> find_grid (double v)
+{
+  for (int p = -12; p < 12; ++p) {
+    double g10 = pow (10, double (p));
+    if (v > 100 * g10) {
+      continue;
+    } else if (v < 10 * g10) {
+      return std::make_pair (g10, g10);
+    } else if (v < 20 * g10) {
+      return std::make_pair (g10, g10 * 0.1);
+    } else if (v < 50 * g10) {
+      return std::make_pair (2.0 * g10, g10);
+    } else {
+      return std::make_pair (5.0 * g10, g10);
+    }
+  }
+
+  return std::make_pair (v, v);
+}
+
+void
+D25ViewWidget::initializeGL ()
+{
+  QOpenGLFunctions::initializeOpenGLFunctions();
+
+  glEnable (GL_BLEND);
+  //  @@@ dark background
+  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  //  @@@ white background
+  // @@@ glBlendFunc (GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
+
+  static const char *shapes_vertex_shader_source =
+      "#version 320 es\n"
+      "#undef lowp\n"
+      "#undef highp\n"
+      "#undef mediump\n"
+      "layout (location = 0) in vec4 posAttr;\n"
+      "\n"
+      "void main() {\n"
+      "   gl_Position = posAttr;\n"
+      "}\n";
+
+  static const char *shapes_geometry_shader_source =
+      "#version 320 es\n"
+      "#undef lowp\n"
+      "#undef highp\n"
+      "#undef mediump\n"
+      "\n"
+      "uniform vec4 color;\n"
+      "uniform vec4 ambient;\n"
+      "uniform vec3 illum;\n"
+      "out lowp vec4 vertexColor;\n"
+      "uniform mat4 geo_matrix;\n"
+      "uniform mat4 cam_matrix;\n"
+      "layout (triangles) in;\n"
+      "layout (triangle_strip, max_vertices = 3) out;\n"
+      "\n"
+      "void main() {\n"
+      "   vec4 p0 = gl_in[0].gl_Position;\n"
+      "   vec4 p1 = gl_in[1].gl_Position;\n"
+      "   vec4 p2 = gl_in[2].gl_Position;\n"
+      "   vec3 n = cross(p2.xyz - p0.xyz, p1.xyz - p0.xyz);\n"
+      "   float dp = dot(normalize(n), illum);\n"
+      "   vertexColor = color * (dp * 0.5 + 0.5) - (min(0.0, dp) * 0.5 * ambient);\n"
+      "   vertexColor.a = 1.0;\n"
+      "   gl_Position = cam_matrix * geo_matrix * p0;\n"
+      "   EmitVertex();\n"
+      "   gl_Position = cam_matrix * geo_matrix * p1;\n"
+      "   EmitVertex();\n"
+      "   gl_Position = cam_matrix * geo_matrix * p2;\n"
+      "   EmitVertex();\n"
+      "   EndPrimitive();\n"
+      "}\n";
+
+  static const char *shapes_fragment_shader_source =
+      "#version 320 es\n"
+      "#undef lowp\n"
+      "#undef highp\n"
+      "#undef mediump\n"
+      "in lowp vec4 vertexColor;\n"
+      "out lowp vec4 fragColor;\n"
+      "\n"
+      "vec4 color_by_z(lowp vec4 c, highp float z) {\n"
+      "  lowp vec4 mist_color = vec4(c.g * 0.4, c.g * 0.4, c.g * 0.4, 1.0);\n"
+      "  highp float d = 0.12;\n" //  d + dd/2 = 0.15 = 1/?
+      "  highp float dd = 0.06;\n"
+      "  highp float f = 1.0;\n"
+      "  if (z < d - dd) {\n"
+      "    f = 0.0;\n"
+      "  } else if (z < d + dd) {\n"
+      "    f = (z - (d - dd)) / (2.0 * dd);\n"
+      "  }\n"
+      "  return (1.0 - f) * mist_color + f * c;\n"
+      "};\n"
+      "\n"
+      "void main() {\n"
+      "   fragColor = color_by_z(vertexColor, gl_FragCoord.w);\n"
+      "}\n";
+
+  m_shapes_program = new QOpenGLShaderProgram (this);
+  if (! m_shapes_program->addShaderFromSourceCode (QOpenGLShader::Vertex, shapes_vertex_shader_source)) {
+    throw tl::Exception (std::string ("Shapes vertex shader compilation failed:\n") + tl::to_string (m_shapes_program->log ()));
+  }
+  if (! m_shapes_program->addShaderFromSourceCode (QOpenGLShader::Geometry, shapes_geometry_shader_source)) {
+    throw tl::Exception (std::string ("Shapes geometry shader compilation failed:\n") + tl::to_string (m_shapes_program->log ()));
+  }
+  if (! m_shapes_program->addShaderFromSourceCode (QOpenGLShader::Fragment, shapes_fragment_shader_source)) {
+    throw tl::Exception (std::string ("Shapes fragment shader compilation failed:\n") + tl::to_string (m_shapes_program->log ()));
+  }
+  if (! m_shapes_program->link ()) {
+    throw tl::Exception (std::string ("Shapes shader program linking failed failed:\n") + tl::to_string (m_shapes_program->log ()));
+  }
+
+  //  grid plane shader source
+
+  static const char *gridplan_vertex_shader_source =
+      "#version 320 es\n"
+      "#undef lowp\n"
+      "#undef highp\n"
+      "#undef mediump\n"
+      "layout (location = 0) in vec4 posAttr;\n"
+      "uniform mat4 matrix;\n"
+      "\n"
+      "vec4 color_by_z(vec4 face_color, highp float z) {\n"
+      "  vec4 mist_color = vec4(1.0, 1.0, 1.0, 1.0);\n"
+      "  highp float d = -2.309;\n"    //  tan(camera_fov/2)*camera_dist
+      "  highp float dd = 0.0;\n"
+      "  highp float f = 1.0;\n"
+      "  if (z < d - dd) {\n"
+      "    f = 0.0;\n"
+      "  } else if (z < d + dd) {\n"
+      "    f = (z - (d - dd)) / (2.0 * dd);\n"
+      "  }\n"
+      "  return (1.0 - f) * mist_color + f * face_color;\n"
+      "};\n"
+      "\n"
+      "void main() {\n"
+      "   gl_Position = matrix * posAttr;\n"
+      "}\n";
+
+  static const char *gridplan_fragment_shader_source =
+      "#version 320 es\n"
+      "#undef lowp\n"
+      "#undef highp\n"
+      "#undef mediump\n"
+      "uniform lowp vec4 color;\n"
+      "out lowp vec4 fragColor;\n"
+      "void main() {\n"
+      "   fragColor = color;\n"
+      "}\n";
+
+  m_gridplane_program = new QOpenGLShaderProgram (this);
+  if (! m_gridplane_program->addShaderFromSourceCode (QOpenGLShader::Vertex, gridplan_vertex_shader_source)) {
+    throw tl::Exception (std::string ("Grid plane vertex shader compilation failed:\n") + tl::to_string (m_gridplane_program->log ()));
+  }
+  if (! m_gridplane_program->addShaderFromSourceCode (QOpenGLShader::Fragment, gridplan_fragment_shader_source)) {
+    throw tl::Exception (std::string ("Grid plane fragment shader compilation failed:\n") + tl::to_string (m_gridplane_program->log ()));
+  }
+  if (! m_gridplane_program->link ()) {
+    throw tl::Exception (std::string ("Grid plane shader program linking failed:\n") + tl::to_string (m_gridplane_program->log ()));
+  }
+}
+
 void
 D25ViewWidget::paintGL ()
 {
-  printf("@@@ width=%d,height=%d\n", width(),height()); // @@@
   const qreal retinaScale = devicePixelRatio ();
   glViewport (0, 0, width () * retinaScale, height () * retinaScale);
 
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   // @@@ white background: glClearColor (1.0, 1.0, 1.0, 1.0);
-
-  const int positions = 0;
-
-  m_shapes_program->bind ();
 
   QMatrix4x4 scene_trans;
 
@@ -649,13 +754,19 @@ D25ViewWidget::paintGL ()
   //  this way we can use y as z coordinate when drawing
   scene_trans.scale (1.0, 1.0, -1.0);
 
-  m_shapes_program->setUniformValue ("matrix", cam_perspective () * cam_trans () * scene_trans);
+  const int positions = 0;
+
+  m_shapes_program->bind ();
+
+  m_shapes_program->setUniformValue ("geo_matrix", cam_trans () * scene_trans);
+  m_shapes_program->setUniformValue ("cam_matrix", cam_perspective ());
 
   //  NOTE: z axis of illum points towards the scene because we include the z inversion in the scene transformation matrix
   m_shapes_program->setUniformValue ("illum", QVector3D (-3.0, -4.0, 2.0).normalized ());
 
   m_shapes_program->setUniformValue ("ambient", QVector4D (0.5, 0.5, 0.5, 0.5));
 
+  glEnable (GL_DEPTH_TEST);
   glEnableVertexAttribArray (positions);
 
   for (std::list<LayerInfo>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
@@ -675,24 +786,82 @@ D25ViewWidget::paintGL ()
 
   m_gridplane_program->bind ();
 
+  glEnable (GL_DEPTH_TEST);
   glEnableVertexAttribArray (positions);
 
-  // @@@ m_gridplane_program->setUniformValue ("matrix", m_cam_trans * m_scene_trans);
-  m_gridplane_program->setUniformValue ("matrix", QMatrix4x4 ()); // @@@
+  m_gridplane_program->setUniformValue ("matrix", cam_perspective () * cam_trans () * scene_trans);
+
+  std::pair<double, double> gg = find_grid (std::max (m_bbox.width (), m_bbox.height ()));
+  double gminor = gg.second, gmajor = gg.first;
+
+  double margin = std::max (m_bbox.width (), m_bbox.height ()) * 0.02;
+  double l = m_bbox.left () - margin;
+  double r = m_bbox.right () + margin;
+  double b = m_bbox.bottom () - margin;
+  double t = m_bbox.top () + margin;
 
   // @@@
 
+  //  major and minor grid lines
+
+  GLfloat gridline_vertices[6000];
+  size_t nmax = sizeof (gridline_vertices) / sizeof (GLfloat);
+
+  const double epsilon = 1e-6;
+
+  for (int major = 0; major < 2; ++major) {
+
+    m_gridplane_program->setUniformValue ("color", 1.0, 1.0, 1.0, major ? 0.25f : 0.15f);
+
+    size_t index = 0;
+    double x, y;
+    double step = (major ? gmajor : gminor);
+
+    x = ceil (l / step) * step;
+    for ( ; index < nmax && x < r - step * epsilon; x += step) {
+      if ((fabs (floor (x / gmajor + 0.5) * gmajor - x) < epsilon) == (major != 0)) {
+        gridline_vertices [index++] = x;
+        gridline_vertices [index++] = 0.0;
+        gridline_vertices [index++] = b;
+        gridline_vertices [index++] = x;
+        gridline_vertices [index++] = 0.0;
+        gridline_vertices [index++] = t;
+      }
+    }
+
+    y = ceil (b / step) * step;
+    for ( ; index < nmax && y < t - step * epsilon; y += step) {
+      if ((fabs (floor (y / gmajor + 0.5) * gmajor - y) < epsilon) == (major != 0)) {
+        gridline_vertices [index++] = l;
+        gridline_vertices [index++] = 0.0;
+        gridline_vertices [index++] = y;
+        gridline_vertices [index++] = r;
+        gridline_vertices [index++] = 0.0;
+        gridline_vertices [index++] = y;
+      }
+    }
+
+    glVertexAttribPointer (positions, 3, GL_FLOAT, GL_FALSE, 0, gridline_vertices);
+
+    glLineWidth (2.0);
+    glDrawArrays (GL_LINES, 0, index / 3);
+
+  }
+
+  //  base plane
+
   GLfloat plane_vertices[] = {
-      -1.05, 0.0, -2.05,    -1.05, 0.0, 0.05,     1.05, 0.0, 0.05,
-      -1.05, 0.0, -2.05,    1.05, 0.0, 0.05,      1.05, 0.0, -2.05
+      float (l), 0.0f, float (b),    float (l), 0.0f, float (t),    float (r), 0.0f, float (t),
+      float (l), 0.0f, float (b),    float (r), 0.0f, float (t),    float (r), 0.0f, float (b)
   };
 
-  m_gridplane_program->setUniformValue ("color", 1.0, 1.0, 1.0, 0.2f);
+  m_gridplane_program->setUniformValue ("color", 1.0, 1.0, 1.0, 0.1f);
 
   glVertexAttribPointer (positions, 3, GL_FLOAT, GL_FALSE, 0, plane_vertices);
 
   glDrawArrays (GL_TRIANGLES, 0, 6);
 
+#if 0
 #if 0
   GLfloat gridline_vertices[] = {
       -1.0, 0.0, -2.0,    -1.0, 0.0, 0.0,
@@ -743,6 +912,7 @@ D25ViewWidget::paintGL ()
 
   glLineWidth (2.0);
   glDrawArrays (GL_LINES, 0, 36);
+#endif
 
   glDisableVertexAttribArray (positions);
 
@@ -752,7 +922,7 @@ D25ViewWidget::paintGL ()
 void
 D25ViewWidget::resizeGL (int /*w*/, int /*h*/)
 {
-  update_cam_trans ();
+  refresh ();
 }
 
 }

@@ -75,7 +75,7 @@ D25ViewWidget::reset ()
 {
   m_scale_factor = 1.0;
   m_focus_dist = 0.0;
-  m_fov = 60.0;
+  m_fov = 90.0;
   m_cam_azimuth = m_cam_elevation = 0.0;
   m_top_view = false;
   m_dragging = m_rotating = false;
@@ -138,6 +138,8 @@ D25ViewWidget::keyPressEvent (QKeyEvent *event)
 {
   if (event->key () == Qt::Key_Shift) {
     m_top_view = true;
+    m_dragging = false;
+    m_rotating = false;
     refresh ();
   }
 }
@@ -147,6 +149,8 @@ D25ViewWidget::keyReleaseEvent (QKeyEvent *event)
 {
   if (event->key () == Qt::Key_Shift) {
     m_top_view = false;
+    m_dragging = false;
+    m_rotating = false;
     refresh ();
   }
 }
@@ -195,7 +199,7 @@ D25ViewWidget::mousePressEvent (QMouseEvent *event)
     //  by definition the ray goes through the camera position
     QVector3D hp = hit_point_with_scene (cam_direction ());
 
-    m_focus_dist = std::max (m_focus_dist, double ((cam_position () - hp).length ()));
+    m_focus_dist = (cam_position () - hp).length ();
     m_hit_point = cam_position () + cam_direction () * m_focus_dist;
 
   } else if (m_rotating) {
@@ -219,6 +223,7 @@ void
 D25ViewWidget::mouseReleaseEvent (QMouseEvent * /*event*/)
 {
   m_dragging = false;
+  m_rotating = false;
 }
 
 void
@@ -244,14 +249,15 @@ D25ViewWidget::mouseMoveEvent (QMouseEvent *event)
 
   } else {
 
-    double focus_dist = 2.0;
-
-    QPoint d = event->pos () - m_start_pos;
-    double f = tan ((cam_fov () / 2) / 180.0 * M_PI) * focus_dist * 2.0 / double (height ());
-    double dx = d.x () * f;
-    double dy = -d.y () * f;
-
     if (! m_top_view) {
+
+      //  fixed focus point for rotation
+      double focus_dist = 2.0;
+
+      QPoint d = event->pos () - m_start_pos;
+      double f = tan ((cam_fov () / 2) / 180.0 * M_PI) * focus_dist * 2.0 / double (height ());
+      double dx = d.x () * f;
+      double dy = -d.y () * f;
 
       double da = dx / (cam_dist () - focus_dist) * 180.0 / M_PI;
       m_cam_azimuth = m_start_cam_azimuth + da;
@@ -259,30 +265,22 @@ D25ViewWidget::mouseMoveEvent (QMouseEvent *event)
       double de = dy / (cam_dist () - focus_dist) * 180.0 / M_PI;
       m_cam_elevation = m_start_cam_elevation + de;
 
-printf("@@@  -> dy=%g   de=%g    focus_dist=%g\n", dy, de, focus_dist); fflush(stdout);
+    } else {
+
+      //  simple change of azimuth only - with center in the middle
+
+      QPoint m = event->pos () - m_start_pos;
+      QVector3D p (m_start_pos.x () - width () / 2, -m_start_pos.y () + height () / 2, 0);
+      QVector3D d (m.x (), -m.y (), 0);
+
+      double cp = QVector3D::crossProduct (p, p + d).z () / p.length () / (p + d).length ();
+      cp = std::max (-1.0, std::min (1.0, cp));
+      double da = asin (cp) * 180.0 / M_PI;
+
+      m_cam_azimuth += da;
+      m_start_pos = event->pos ();
 
     }
-
-#if 0
-    if (m_hit_point.x () * dx < 0 && (dx + 2.0 * m_hit_point.x ()) * m_hit_point.x () > 0) {
-
-      double da = asin (dx / m_hit_point.x () - 1.0) * 180.0 / M_PI;
-// @@@ printf("@@@ hp=%g,%g,%g  drag=%g,%g -> da=%g\n", m_hit_point.x(), m_hit_point.y(), m_hit_point.z(), drag.x(), drag.z(), da); fflush(stdout);
-      m_cam_azimuth = m_start_cam_azimuth + da;
-
-    }
-#endif
-
-#if 0
-    //  elevation change
-    if (! m_top_view) {
-
-      dp = m_hit_point + QVector3D (0.0, float (drag.y ()), 0.0);
-      double de = QVector3D::crossProduct (dp, m_hit_point).length () * (drag.y () > 0 ? 1.0 : -1.0) / (dp.length () * m_hit_point.length ()) * 180.0 / M_PI;
-      m_cam_elevation = m_start_cam_elevation + de;
-
-    }
-#endif
 
   }
 
@@ -715,19 +713,6 @@ D25ViewWidget::initializeGL ()
       "layout (location = 0) in vec4 posAttr;\n"
       "uniform mat4 matrix;\n"
       "\n"
-      "vec4 color_by_z(vec4 face_color, highp float z) {\n"
-      "  vec4 mist_color = vec4(1.0, 1.0, 1.0, 1.0);\n"
-      "  highp float d = -2.309;\n"    //  tan(camera_fov/2)*camera_dist
-      "  highp float dd = 0.0;\n"
-      "  highp float f = 1.0;\n"
-      "  if (z < d - dd) {\n"
-      "    f = 0.0;\n"
-      "  } else if (z < d + dd) {\n"
-      "    f = (z - (d - dd)) / (2.0 * dd);\n"
-      "  }\n"
-      "  return (1.0 - f) * mist_color + f * face_color;\n"
-      "};\n"
-      "\n"
       "void main() {\n"
       "   gl_Position = matrix * posAttr;\n"
       "}\n";
@@ -944,6 +929,11 @@ D25ViewWidget::paintGL ()
     glDrawArrays (GL_LINES, 0, index / 3);
 
   }
+
+  l = m_bbox.left ();
+  r = m_bbox.right ();
+  b = m_bbox.bottom ();
+  t = m_bbox.top ();
 
   GLfloat plane_vertices[] = {
       float (l), 0.0f, float (b),    float (l), 0.0f, float (t),    float (r), 0.0f, float (t),

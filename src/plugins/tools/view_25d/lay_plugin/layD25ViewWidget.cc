@@ -104,7 +104,7 @@ D25ViewWidget::wheelEvent (QWheelEvent *event)
     //  "Ctrl" is closeup
 
     double f = event->angleDelta ().y () * (1.0 / (90 * 8));
-    m_displacement += -((f / m_scale_factor) * cam_dist ()) * ray.second;
+    m_displacement += -((f / m_scale_factor) * std::min (cam_dist (), double ((cam_position () - hp).length ()))) * ray.second;
 
   } else {
 
@@ -195,7 +195,8 @@ D25ViewWidget::mousePressEvent (QMouseEvent *event)
     //  by definition the ray goes through the camera position
     QVector3D hp = hit_point_with_scene (cam_direction ());
 
-    m_focus_dist = std::max (m_focus_dist, double ((m_start_cam_position - hp).length ()));
+    m_focus_dist = std::max (m_focus_dist, double ((cam_position () - hp).length ()));
+    m_hit_point = cam_position () + cam_direction () * m_focus_dist;
 
   } else if (m_rotating) {
 
@@ -206,9 +207,10 @@ D25ViewWidget::mousePressEvent (QMouseEvent *event)
     std::pair<QVector3D, QVector3D> ray = camera_normal (cam_perspective () * cam_trans (), px, py);
 
     //  by definition the ray goes through the camera position
-    m_hit_point = hit_point_with_scene (ray.second);
+    QVector3D hp = hit_point_with_scene (ray.second);
 
-    m_focus_dist = std::max (m_focus_dist, double ((m_start_cam_position - m_hit_point).length ()));
+    m_focus_dist = std::max (m_focus_dist, double ((cam_position () - hp).length ()));
+    m_hit_point = cam_position () + ray.second * m_focus_dist;
 
   }
 }
@@ -242,11 +244,26 @@ D25ViewWidget::mouseMoveEvent (QMouseEvent *event)
 
   } else {
 
+    double focus_dist = 2.0;
+
     QPoint d = event->pos () - m_start_pos;
-    double f = tan ((cam_fov () / 2) / 180.0 * M_PI) * m_focus_dist * 2.0 / double (height ());
+    double f = tan ((cam_fov () / 2) / 180.0 * M_PI) * focus_dist * 2.0 / double (height ());
     double dx = d.x () * f;
     double dy = -d.y () * f;
 
+    if (! m_top_view) {
+
+      double da = dx / (cam_dist () - focus_dist) * 180.0 / M_PI;
+      m_cam_azimuth = m_start_cam_azimuth + da;
+
+      double de = dy / (cam_dist () - focus_dist) * 180.0 / M_PI;
+      m_cam_elevation = m_start_cam_elevation + de;
+
+printf("@@@  -> dy=%g   de=%g    focus_dist=%g\n", dy, de, focus_dist); fflush(stdout);
+
+    }
+
+#if 0
     if (m_hit_point.x () * dx < 0 && (dx + 2.0 * m_hit_point.x ()) * m_hit_point.x () > 0) {
 
       double da = asin (dx / m_hit_point.x () - 1.0) * 180.0 / M_PI;
@@ -254,6 +271,7 @@ D25ViewWidget::mouseMoveEvent (QMouseEvent *event)
       m_cam_azimuth = m_start_cam_azimuth + da;
 
     }
+#endif
 
 #if 0
     //  elevation change
@@ -740,19 +758,25 @@ D25ViewWidget::initializeGL ()
 void
 D25ViewWidget::paintGL ()
 {
+  GLfloat vertices[6000];
+  size_t nmax = sizeof (vertices) / sizeof (GLfloat);
+
   const qreal retinaScale = devicePixelRatio ();
   glViewport (0, 0, width () * retinaScale, height () * retinaScale);
 
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   // @@@ white background: glClearColor (1.0, 1.0, 1.0, 1.0);
 
-  QMatrix4x4 scene_trans;
+  QMatrix4x4 scene_trans, scene_trans_wo_y;
 
   //  provide the displacement and scaling (in this order!)
   scene_trans.scale (m_scale_factor);
   scene_trans.translate (m_displacement);
   //  this way we can use y as z coordinate when drawing
   scene_trans.scale (1.0, 1.0, -1.0);
+
+  scene_trans_wo_y = scene_trans;
+  scene_trans_wo_y.translate (QVector3D (0.0, -m_displacement.y (), 0.0));
 
   const int positions = 0;
 
@@ -789,7 +813,83 @@ D25ViewWidget::paintGL ()
   glEnable (GL_DEPTH_TEST);
   glEnableVertexAttribArray (positions);
 
-  m_gridplane_program->setUniformValue ("matrix", cam_perspective () * cam_trans () * scene_trans);
+  //  draw pivot compass
+
+  m_gridplane_program->setUniformValue ("matrix", cam_perspective () * cam_trans ());
+
+  size_t index = 0;
+
+  double compass_rad = 0.3;
+  double compass_bars = 0.4;
+
+  vertices[index++] = -compass_bars;
+  vertices[index++] = 0.0;
+  vertices[index++] = 0.0;
+
+  vertices[index++] = compass_bars;
+  vertices[index++] = 0.0;
+  vertices[index++] = 0.0;
+
+  vertices[index++] = 0.0;
+  vertices[index++] = 0.0;
+  vertices[index++] = -compass_bars;
+
+  vertices[index++] = 0.0;
+  vertices[index++] = 0.0;
+  vertices[index++] = compass_bars;
+
+  int ncircle = 64;
+  double x = compass_rad, z = 0.0;
+  double da = 1.0 / double (ncircle) * M_PI * 2.0;
+
+  for (int i = 0; i < ncircle; ++i) {
+
+    double a = double (i + 1) * da;
+    double xx = compass_rad * cos (a);
+    double zz = compass_rad * sin (a);
+
+    vertices[index++] = x;
+    vertices[index++] = 0.0;
+    vertices[index++] = z;
+
+    vertices[index++] = xx;
+    vertices[index++] = 0.0;
+    vertices[index++] = zz;
+
+    x = xx;
+    z = zz;
+
+  }
+
+  m_gridplane_program->setUniformValue ("color", 1.0, 1.0, 1.0, 0.25f);
+
+  glVertexAttribPointer (positions, 3, GL_FLOAT, GL_FALSE, 0, vertices);
+
+  glLineWidth (2.0);
+  glDrawArrays (GL_LINES, 0, index / 3);
+
+  index = 0;
+
+  //  arrow
+  vertices[index++] = -0.25 * compass_rad;
+  vertices[index++] = 0.0;
+  vertices[index++] = 0.6 * compass_rad;
+
+  vertices[index++] = 0.0;
+  vertices[index++] = 0.0;
+  vertices[index++] = -0.8 * compass_rad;
+
+  vertices[index++] = 0.25 * compass_rad;
+  vertices[index++] = 0.0;
+  vertices[index++] = 0.6 * compass_rad;
+
+  glVertexAttribPointer (positions, 3, GL_FLOAT, GL_FALSE, 0, vertices);
+
+  glDrawArrays (GL_TRIANGLES, 0, index / 3);
+
+  //  draw base plane
+
+  m_gridplane_program->setUniformValue ("matrix", cam_perspective () * cam_trans () * scene_trans_wo_y);
 
   std::pair<double, double> gg = find_grid (std::max (m_bbox.width (), m_bbox.height ()));
   double gminor = gg.second, gmajor = gg.first;
@@ -804,9 +904,6 @@ D25ViewWidget::paintGL ()
 
   //  major and minor grid lines
 
-  GLfloat gridline_vertices[6000];
-  size_t nmax = sizeof (gridline_vertices) / sizeof (GLfloat);
-
   const double epsilon = 1e-6;
 
   for (int major = 0; major < 2; ++major) {
@@ -820,35 +917,33 @@ D25ViewWidget::paintGL ()
     x = ceil (l / step) * step;
     for ( ; index < nmax && x < r - step * epsilon; x += step) {
       if ((fabs (floor (x / gmajor + 0.5) * gmajor - x) < epsilon) == (major != 0)) {
-        gridline_vertices [index++] = x;
-        gridline_vertices [index++] = 0.0;
-        gridline_vertices [index++] = b;
-        gridline_vertices [index++] = x;
-        gridline_vertices [index++] = 0.0;
-        gridline_vertices [index++] = t;
+        vertices [index++] = x;
+        vertices [index++] = 0.0;
+        vertices [index++] = b;
+        vertices [index++] = x;
+        vertices [index++] = 0.0;
+        vertices [index++] = t;
       }
     }
 
     y = ceil (b / step) * step;
     for ( ; index < nmax && y < t - step * epsilon; y += step) {
       if ((fabs (floor (y / gmajor + 0.5) * gmajor - y) < epsilon) == (major != 0)) {
-        gridline_vertices [index++] = l;
-        gridline_vertices [index++] = 0.0;
-        gridline_vertices [index++] = y;
-        gridline_vertices [index++] = r;
-        gridline_vertices [index++] = 0.0;
-        gridline_vertices [index++] = y;
+        vertices [index++] = l;
+        vertices [index++] = 0.0;
+        vertices [index++] = y;
+        vertices [index++] = r;
+        vertices [index++] = 0.0;
+        vertices [index++] = y;
       }
     }
 
-    glVertexAttribPointer (positions, 3, GL_FLOAT, GL_FALSE, 0, gridline_vertices);
+    glVertexAttribPointer (positions, 3, GL_FLOAT, GL_FALSE, 0, vertices);
 
     glLineWidth (2.0);
     glDrawArrays (GL_LINES, 0, index / 3);
 
   }
-
-  //  base plane
 
   GLfloat plane_vertices[] = {
       float (l), 0.0f, float (b),    float (l), 0.0f, float (t),    float (r), 0.0f, float (t),
@@ -860,59 +955,6 @@ D25ViewWidget::paintGL ()
   glVertexAttribPointer (positions, 3, GL_FLOAT, GL_FALSE, 0, plane_vertices);
 
   glDrawArrays (GL_TRIANGLES, 0, 6);
-
-#if 0
-#if 0
-  GLfloat gridline_vertices[] = {
-      -1.0, 0.0, -2.0,    -1.0, 0.0, 0.0,
-      -0.75, 0.0, -2.0,   -0.75, 0.0, 0.0,
-      -0.5, 0.0, -2.0,    -0.5, 0.0, 0.0,
-      -0.25, 0.0, -2.0,   -0.25, 0.0, 0.0,
-      0.0, 0.0, -2.0,     0.0, 0.0, 0.0,
-      0.25, 0.0, -2.0,    0.25, 0.0, 0.0,
-      0.5, 0.0, -2.0,     0.5, 0.0, 0.0,
-      0.75, 0.0, -2.0,    0.75, 0.0, 0.0,
-      1.0, 0.0, -2.0,     1.0, 0.0, 0.0,
-      1.0, 0.0, -2.0,     -1.0, 0.0, -2.0,
-      1.0, 0.0, -1.75,    -1.0, 0.0, -1.75,
-      1.0, 0.0, -1.5 ,    -1.0, 0.0, -1.5,
-      1.0, 0.0, -1.25,    -1.0, 0.0, -1.25,
-      1.0, 0.0, -1.0,     -1.0, 0.0, -1.0,
-      1.0, 0.0, -0.75,    -1.0, 0.0, -0.75,
-      1.0, 0.0, -0.5 ,    -1.0, 0.0, -0.5,
-      1.0, 0.0, -0.25,    -1.0, 0.0, -0.25,
-      1.0, 0.0, 0.0,      -1.0, 0.0, 0.0
-  };
-#else
-  GLfloat gridline_vertices[] = {
-      -1.0, -1.0, 0.0,    -1.0, 1.0, 0.0,
-      -0.75, -1.0, 0.0,   -0.75, 1.0, 0.0,
-      -0.5, -1.0, 0.0,    -0.5, 1.0, 0.0,
-      -0.25, -1.0, 0.0,   -0.25, 1.0, 0.0,
-      0.0, -1.0, 0.0,     0.0, 1.0, 0.0,
-      0.25, -1.0, 0.0,    0.25, 1.0, 0.0,
-      0.5, -1.0, 0.0,     0.5, 1.0, 0.0,
-      0.75, -1.0, 0.0,    0.75, 1.0, 0.0,
-      1.0, -1.0, 0.0,     1.0, 1.0, 0.0,
-      1.0, -1.0, 0.0,     -1.0, -1.0, 0.0,
-      1.0, -0.75, 0.0,    -1.0, -0.75, 0.0,
-      1.0, -0.5, 0.0,     -1.0, -0.5, 0.0,
-      1.0, -0.25, 0.0,    -1.0, -0.25, 0.0,
-      1.0, 0.0, 0.0,      -1.0, 0.0, 0.0,
-      1.0, 0.25, 0.0,     -1.0, 0.25, 0.0,
-      1.0, 0.5, 0.0,      -1.0, 0.5, 0.0,
-      1.0, 0.75, 0.0,     -1.0, 0.75, 0.0,
-      1.0, 1.0, 0.0,      -1.0, 1.0, 0.0
-  };
-#endif
-
-  m_shapes_program->setUniformValue ("vertexColor", 1.0, 1.0, 1.0, 0.2f);
-
-  glVertexAttribPointer (positions, 3, GL_FLOAT, GL_FALSE, 0, gridline_vertices);
-
-  glLineWidth (2.0);
-  glDrawArrays (GL_LINES, 0, 36);
-#endif
 
   glDisableVertexAttribArray (positions);
 

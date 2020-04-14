@@ -1397,6 +1397,8 @@ DEFImporter::do_read (db::Layout &layout)
 
   if (! groups.empty ()) {
 
+    db::LayoutLocker locker (&layout);
+
     others_cell = &layout.cell (layout.add_cell ("NOGROUP"));
     design.insert (db::CellInstArray (others_cell->cell_index (), db::Trans ()));
 

@@ -770,15 +770,70 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
 
         nondefaultrule = get ();
 
-      } else if ((was_shield = test ("SHIELD")) == true || test ("NOSHIELD") || test ("ROUTED") || test ("FIXED") || test ("COVER")) {
+      } else {
 
-        if (was_shield) {
-          take ();
+        bool prefixed = false;
+
+        if ((was_shield = test ("SHIELD")) == true || test ("NOSHIELD") || test ("ROUTED") || test ("FIXED") || test ("COVER")) {
+          if (was_shield) {
+            take ();
+          }
+          prefixed = true;
         }
 
-        read_single_net (nondefaultrule, layout, design, scale, prop_id, specialnets);
+        bool any = false;
 
-        if (in_subnet) {
+        if (test ("POLYGON")) {
+
+          std::string ln = get ();
+
+          db::Polygon p;
+          read_polygon (p, scale);
+
+          std::pair <bool, unsigned int> dl = open_layer (layout, ln, Routing);
+          if (dl.first) {
+            if (prop_id != 0) {
+              design.shapes (dl.second).insert (db::object_with_properties<db::Polygon> (p, prop_id));
+            } else {
+              design.shapes (dl.second).insert (p);
+            }
+          }
+
+          any = true;
+
+        } else if (test ("RECT")) {
+
+          std::string ln = get ();
+
+          db::Polygon p;
+          read_rect (p, scale);
+
+          std::pair <bool, unsigned int> dl = open_layer (layout, ln, Routing);
+          if (dl.first) {
+            if (prop_id != 0) {
+              design.shapes (dl.second).insert (db::object_with_properties<db::Polygon> (p, prop_id));
+            } else {
+              design.shapes (dl.second).insert (p);
+            }
+          }
+
+          any = true;
+
+        } else if (prefixed) {
+
+          read_single_net (nondefaultrule, layout, design, scale, prop_id, specialnets);
+          any = true;
+
+        } else {
+
+          //  lazily skip everything else
+          while (! peek ("+") && ! peek ("-") && ! peek (";")) {
+            take ();
+          }
+
+        }
+
+        if (any && in_subnet) {
 
           in_subnet = false;
 
@@ -792,42 +847,6 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
 
         }
 
-      } else if (test ("POLYGON")) {
-
-        std::string ln = get ();
-
-        db::Polygon p;
-        read_polygon (p, scale);
-
-        std::pair <bool, unsigned int> dl = open_layer (layout, ln, Routing);
-        if (dl.first) {
-          if (prop_id != 0) {
-            design.shapes (dl.second).insert (db::object_with_properties<db::Polygon> (p, prop_id));
-          } else {
-            design.shapes (dl.second).insert (p);
-          }
-        }
-
-      } else if (test ("RECT")) {
-
-        std::string ln = get ();
-
-        db::Polygon p;
-        read_rect (p, scale);
-
-        std::pair <bool, unsigned int> dl = open_layer (layout, ln, Routing);
-        if (dl.first) {
-          if (prop_id != 0) {
-            design.shapes (dl.second).insert (db::object_with_properties<db::Polygon> (p, prop_id));
-          } else {
-            design.shapes (dl.second).insert (p);
-          }
-        }
-
-      } else {
-        while (! peek ("+") && ! peek ("-") && ! peek (";")) {
-          take ();
-        }
       }
 
     }

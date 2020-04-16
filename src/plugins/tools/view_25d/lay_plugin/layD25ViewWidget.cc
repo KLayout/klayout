@@ -43,6 +43,146 @@ namespace lay
 
 // ------------------------------------------------------------------------------
 
+D25InteractionMode::D25InteractionMode (D25ViewWidget *view)
+  : mp_view (view)
+{
+  //  .. nothing yet ..
+}
+
+D25InteractionMode::~D25InteractionMode ()
+{
+  //  .. nothing yet ..
+}
+
+
+// ------------------------------------------------------------------------------
+
+class D25PanInteractionMode
+  : public D25InteractionMode
+{
+public:
+  D25PanInteractionMode (D25ViewWidget *widget, const QPoint &pos)
+    : D25InteractionMode (widget), m_start_pos (pos)
+  {
+    m_start_displacement = widget->displacement ();
+
+    double px = (pos.x () - widget->width () / 2) * 2.0 / widget->width ();
+    double py = -(pos.y () - widget->height () / 2) * 2.0 / widget->height ();
+
+    //  compute vector of line of sight
+    std::pair<QVector3D, QVector3D> ray = camera_normal (view ()->cam_perspective () * view ()->cam_trans (), px, py);
+
+    //  by definition the ray goes through the camera position
+    QVector3D hp = widget->hit_point_with_scene (ray.second);
+
+    m_focus_dist = (widget->cam_position () - hp).length ();
+  }
+
+  virtual ~D25PanInteractionMode ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void mouse_move (QMouseEvent *event)
+  {
+    QPoint d = event->pos () - m_start_pos;
+    double f = tan ((view ()->cam_fov () / 2) / 180.0 * M_PI) * m_focus_dist * 2.0 / double (view ()->height ());
+    double dx = d.x () * f;
+    double dy = -d.y () * f;
+
+    QVector3D xv (cos (view ()->cam_azimuth () * M_PI / 180.0), 0.0, sin (view ()->cam_azimuth () * M_PI / 180.0));
+    double re = sin (view ()->cam_elevation () * M_PI / 180.0);
+    QVector3D yv (-re * xv.z (), cos (view ()->cam_elevation () * M_PI / 180.0), re * xv.x ());
+    QVector3D drag = xv * dx + yv * dy;
+
+    view ()->set_displacement (m_start_displacement + drag / view ()->scale_factor ());
+  }
+
+private:
+  QPoint m_start_pos;
+  double m_focus_dist;
+  QVector3D m_start_displacement;
+};
+
+// ------------------------------------------------------------------------------
+
+class D25Rotate2DInteractionMode
+  : public D25InteractionMode
+{
+public:
+  D25Rotate2DInteractionMode (D25ViewWidget *widget, const QPoint &pos)
+    : D25InteractionMode (widget), m_start_pos (pos)
+  {
+    m_start_cam_azimuth = widget->cam_azimuth ();
+    m_start_cam_elevation = widget->cam_elevation ();
+  }
+
+  virtual ~D25Rotate2DInteractionMode ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void mouse_move (QMouseEvent *event)
+  {
+    //  fixed focus point for rotation
+    double focus_dist = 2.0;
+
+    QPoint d = event->pos () - m_start_pos;
+    double f = tan ((view ()->cam_fov () / 2) / 180.0 * M_PI) * focus_dist * 2.0 / double (view ()->height ());
+    double dx = d.x () * f;
+    double dy = -d.y () * f;
+
+    double da = dx / (view ()->cam_dist () - focus_dist) * 180.0 / M_PI;
+    view ()->set_cam_azimuth (m_start_cam_azimuth + da);
+
+    double de = dy / (view ()->cam_dist () - focus_dist) * 180.0 / M_PI;
+    view ()->set_cam_elevation (m_start_cam_elevation + de);
+  }
+
+private:
+  QPoint m_start_pos;
+  double m_start_cam_azimuth, m_start_cam_elevation;
+};
+
+// ------------------------------------------------------------------------------
+
+class D25RotateAzimuthInteractionMode
+  : public D25InteractionMode
+{
+public:
+  D25RotateAzimuthInteractionMode (D25ViewWidget *widget, const QPoint &pos)
+    : D25InteractionMode (widget), m_start_pos (pos)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual ~D25RotateAzimuthInteractionMode ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void mouse_move (QMouseEvent *event)
+  {
+    //  simple change of azimuth only - with center in the middle
+
+    QPoint m = event->pos () - m_start_pos;
+    QVector3D p (m_start_pos.x () - view ()->width () / 2, -m_start_pos.y () + view ()->height () / 2, 0);
+    QVector3D d (m.x (), -m.y (), 0);
+
+    double cp = QVector3D::crossProduct (p, p + d).z () / p.length () / (p + d).length ();
+    cp = std::max (-1.0, std::min (1.0, cp));
+    double da = asin (cp) * 180.0 / M_PI;
+
+    view ()->set_cam_azimuth (view ()->cam_azimuth () + da);
+    m_start_pos = event->pos ();
+  }
+
+private:
+  QPoint m_start_pos;
+};
+
+// ------------------------------------------------------------------------------
+
 D25ViewWidget::D25ViewWidget (QWidget *parent)
   : QOpenGLWidget (parent),
     m_shapes_program (0)
@@ -74,13 +214,9 @@ void
 D25ViewWidget::reset ()
 {
   m_scale_factor = 1.0;
-  m_focus_dist = 0.0;
-  m_fov = 90.0;
-  m_cam_azimuth = m_cam_elevation = 0.0;
-  m_top_view = false;
-  m_dragging = m_rotating = false;
+  mp_mode.reset (0);
 
-  refresh ();
+  camera_reset ();
 }
 
 void
@@ -93,40 +229,55 @@ D25ViewWidget::wheelEvent (QWheelEvent *event)
   double px = (event->pos ().x () - width () / 2) * 2.0 / width ();
   double py = -(event->pos ().y () - height () / 2) * 2.0 / height ();
 
-  //  compute vector of line of sight
-  std::pair<QVector3D, QVector3D> ray = camera_normal (cam_perspective () * cam_trans (), px, py);
+  if (top_view ()) {
 
-  //  by definition the ray goes through the camera position
-  QVector3D hp = hit_point_with_scene (ray.second);
+    //  Plain zoom
 
-  if (event->modifiers () & Qt::ControlModifier) {
-
-    //  "Ctrl" is closeup
-
-    double f = event->angleDelta ().y () * (1.0 / (90 * 8));
-    m_displacement += -((f / m_scale_factor) * std::min (cam_dist (), double ((cam_position () - hp).length ()))) * ray.second;
-
-  } else {
-
-    //  No shift is zoom
+    QVector3D hp (px, py, 0.0);
 
     double f = exp (event->angleDelta ().y () * (1.0 / (90 * 8)));
 
-    QVector3D initial_displacement = m_displacement;
-    QVector3D displacement = m_displacement;
-
     m_scale_factor *= f;
-    displacement += hp * (1.0 - f) / m_scale_factor;
+    m_displacement += hp * (1.0 - f) / m_scale_factor;
 
-    //  normalize the scene translation so the scene does not "flee"
+  } else {
 
-    QMatrix4x4 ct = cam_trans ();
-    initial_displacement = ct.map (initial_displacement);
-    displacement = ct.map (displacement);
+    //  compute vector of line of sight
+    std::pair<QVector3D, QVector3D> ray = camera_normal (cam_perspective () * cam_trans (), px, py);
 
-    lay::normalize_scene_trans (cam_perspective (), displacement, m_scale_factor, initial_displacement.z ());
+    //  by definition the ray goes through the camera position
+    QVector3D hp = hit_point_with_scene (ray.second);
 
-    m_displacement = ct.inverted ().map (displacement);
+    if (event->modifiers () & Qt::ControlModifier) {
+
+      //  "Ctrl" is closeup
+
+      double f = event->angleDelta ().y () * (1.0 / (90 * 8));
+      m_displacement += -((f / m_scale_factor) * std::min (cam_dist (), double ((cam_position () - hp).length ()))) * ray.second;
+
+    } else {
+
+      //  No shift is zoom
+
+      double f = exp (event->angleDelta ().y () * (1.0 / (90 * 8)));
+
+      QVector3D initial_displacement = m_displacement;
+      QVector3D displacement = m_displacement;
+
+      m_scale_factor *= f;
+      displacement += hp * (1.0 - f) / m_scale_factor;
+
+      //  normalize the scene translation so the scene does not "flee"
+
+      QMatrix4x4 ct = cam_trans ();
+      initial_displacement = ct.map (initial_displacement);
+      displacement = ct.map (displacement);
+
+      lay::normalize_scene_trans (cam_perspective (), displacement, m_scale_factor, initial_displacement.z ());
+
+      m_displacement = ct.inverted ().map (displacement);
+
+    }
 
   }
 
@@ -137,10 +288,8 @@ void
 D25ViewWidget::keyPressEvent (QKeyEvent *event)
 {
   if (event->key () == Qt::Key_Shift) {
-    m_top_view = true;
-    m_dragging = false;
-    m_rotating = false;
-    refresh ();
+    mp_mode.reset (0);
+    set_top_view (true);
   }
 }
 
@@ -148,10 +297,8 @@ void
 D25ViewWidget::keyReleaseEvent (QKeyEvent *event)
 {
   if (event->key () == Qt::Key_Shift) {
-    m_top_view = false;
-    m_dragging = false;
-    m_rotating = false;
-    refresh ();
+    mp_mode.reset (0);
+    set_top_view (false);
   }
 }
 
@@ -178,169 +325,63 @@ D25ViewWidget::hit_point_with_scene (const QVector3D &line_dir)
 void
 D25ViewWidget::mousePressEvent (QMouseEvent *event)
 {
-  m_dragging = m_rotating = false;
+  mp_mode.reset (0);
+
   if (event->button () == Qt::MidButton) {
-    m_dragging = true;
+    mp_mode.reset (new D25PanInteractionMode (this, event->pos ()));
   } else if (event->button () == Qt::LeftButton) {
-    m_rotating = true;
-  }
-
-  m_start_pos = event->pos ();
-  m_start_cam_position = cam_position ();
-  m_start_cam_azimuth = cam_azimuth ();
-  m_start_cam_elevation = cam_elevation ();
-  m_start_displacement = m_displacement;
-
-  m_focus_dist = 2.0;
-  m_hit_point = QVector3D ();
-
-  if (m_dragging) {
-
-    //  by definition the ray goes through the camera position
-    QVector3D hp = hit_point_with_scene (cam_direction ());
-
-    m_focus_dist = (cam_position () - hp).length ();
-    m_hit_point = cam_position () + cam_direction () * m_focus_dist;
-
-  } else if (m_rotating) {
-
-    double px = (event->pos ().x () - width () / 2) * 2.0 / width ();
-    double py = -(event->pos ().y () - height () / 2) * 2.0 / height ();
-
-    //  compute vector of line of sight
-    std::pair<QVector3D, QVector3D> ray = camera_normal (cam_perspective () * cam_trans (), px, py);
-
-    //  by definition the ray goes through the camera position
-    QVector3D hp = hit_point_with_scene (ray.second);
-
-    m_focus_dist = std::max (m_focus_dist, double ((cam_position () - hp).length ()));
-    m_hit_point = cam_position () + ray.second * m_focus_dist;
-
+    if (! top_view ()) {
+      mp_mode.reset (new D25Rotate2DInteractionMode (this, event->pos ()));
+    } else {
+      mp_mode.reset (new D25RotateAzimuthInteractionMode (this, event->pos ()));
+    }
   }
 }
 
 void
 D25ViewWidget::mouseReleaseEvent (QMouseEvent * /*event*/)
 {
-  m_dragging = false;
-  m_rotating = false;
+  mp_mode.reset (0);
 }
 
 void
 D25ViewWidget::mouseMoveEvent (QMouseEvent *event)
 {
-  if (! m_dragging && ! m_rotating) {
-    return;
+  if (mp_mode.get ()) {
+    mp_mode->mouse_move (event);
   }
+}
 
-  if (m_dragging) {
+inline double square (double x) { return x * x; }
 
-    QPoint d = event->pos () - m_start_pos;
-    double f = tan ((cam_fov () / 2) / 180.0 * M_PI) * m_focus_dist * 2.0 / double (height ());
-    double dx = d.x () * f;
-    double dy = -d.y () * f;
+void
+D25ViewWidget::fit ()
+{
+  //  we pick a scale factor to adjust the z dimension roughly to 1/4 of the screen height at a focus distance of 2
+  double norm_height = 0.5;
+  double in_focus = 2.0;
+  m_scale_factor = (tan (cam_fov () * M_PI / 180.0 / 2.0) * 2.0) * in_focus * norm_height / std::max (0.001, (m_zmax - m_zmin));
 
-    QVector3D xv (cos (m_start_cam_azimuth * M_PI / 180.0), 0.0, sin (m_start_cam_azimuth * M_PI / 180.0));
-    double re = sin (m_start_cam_elevation * M_PI / 180.0);
-    QVector3D yv (-re * xv.z (), cos (m_start_cam_elevation * M_PI / 180.0), re * xv.x ());
-    QVector3D drag = xv * dx + yv * dy;
+  QVector3D dim = QVector3D (m_bbox.width (), m_zmax - m_zmin, m_bbox.height ()) * m_scale_factor;
+  QVector3D bll = QVector3D (m_bbox.left (), m_zmin, -(m_bbox.bottom () + m_bbox.height ()));
 
-    m_displacement = m_start_displacement + drag / m_scale_factor;
+  //  now we pick a displacement which moves the center to y = 0 and x, y in a way that the dimension covers the field of
+  //  view and is centered.
+  //  (we use the elliptic approximation which works exactly for azimuth angles which are a multiple of 90 degree)
 
-  } else {
+  double dh = sqrt (square (cos (cam_azimuth () * M_PI / 180.0) * dim.x ()) + square (sin (cam_azimuth () * M_PI / 180.0) * dim.z ()));
+  double dv = sqrt (square (cos (cam_azimuth () * M_PI / 180.0) * dim.z ()) + square (sin (cam_azimuth () * M_PI / 180.0) * dim.x ()));
 
-    if (! m_top_view) {
+  double d = std::max (dh, fabs (sin (cam_elevation ()) * dv));
 
-      //  fixed focus point for rotation
-      double focus_dist = 2.0;
+  QVector3D new_center (0.0, 0.0, -dv / 2.0 + std::max (0.0, -d / (2.0 * tan (cam_fov () * M_PI / 180.0 / 2.0)) + cam_dist ()));
+  QVector3D new_center_in_scene = cam_trans ().inverted ().map (new_center);
 
-      QPoint d = event->pos () - m_start_pos;
-      double f = tan ((cam_fov () / 2) / 180.0 * M_PI) * focus_dist * 2.0 / double (height ());
-      double dx = d.x () * f;
-      double dy = -d.y () * f;
+  new_center_in_scene.setY (0.0);
 
-      double da = dx / (cam_dist () - focus_dist) * 180.0 / M_PI;
-      m_cam_azimuth = m_start_cam_azimuth + da;
-
-      double de = dy / (cam_dist () - focus_dist) * 180.0 / M_PI;
-      m_cam_elevation = m_start_cam_elevation + de;
-
-    } else {
-
-      //  simple change of azimuth only - with center in the middle
-
-      QPoint m = event->pos () - m_start_pos;
-      QVector3D p (m_start_pos.x () - width () / 2, -m_start_pos.y () + height () / 2, 0);
-      QVector3D d (m.x (), -m.y (), 0);
-
-      double cp = QVector3D::crossProduct (p, p + d).z () / p.length () / (p + d).length ();
-      cp = std::max (-1.0, std::min (1.0, cp));
-      double da = asin (cp) * 180.0 / M_PI;
-
-      m_cam_azimuth += da;
-      m_start_pos = event->pos ();
-
-    }
-
-  }
+  m_displacement = (new_center_in_scene - dim * 0.5) / m_scale_factor - bll;
 
   refresh ();
-}
-
-double
-D25ViewWidget::cam_fov () const
-{
-  return m_fov; // @@@
-}
-
-double
-D25ViewWidget::cam_dist () const
-{
-  return 4.0; // @@@
-}
-
-QVector3D
-D25ViewWidget::cam_direction () const
-{
-  QVector3D cd = cam_trans ().map (QVector3D (0, 0, 1));
-  cd.setZ (-cd.z ());
-  return cd;
-}
-
-QVector3D
-D25ViewWidget::cam_position () const
-{
-  return cam_direction () * -cam_dist ();
-}
-
-double
-D25ViewWidget::cam_azimuth () const
-{
-  return m_cam_azimuth;
-}
-
-double
-D25ViewWidget::cam_elevation () const
-{
-  return m_top_view ? -90.0 : m_cam_elevation;
-}
-
-QMatrix4x4
-D25ViewWidget::cam_perspective () const
-{
-  QMatrix4x4 t;
-  t.perspective (cam_fov (), float (width ()) / float (height ()), 0.1f, 10000.0f);
-  t.translate (QVector3D (0.0, 0.0, -cam_dist ()));
-  return t;
-}
-
-QMatrix4x4
-D25ViewWidget::cam_trans () const
-{
-  QMatrix4x4 t;
-  t.rotate (-cam_elevation (), 1.0, 0.0, 0.0);
-  t.rotate (cam_azimuth (), 0.0, 1.0, 0.0);
-  return t;
 }
 
 void
@@ -348,9 +389,21 @@ D25ViewWidget::refresh ()
 {
   QVector3D cp = cam_position ();
 
-printf("@@@ e=%g   a=%g     x,y,z=%g,%g,%g    d=%g,%g,%g    s=%g    f=%g\n", cam_elevation (), cam_azimuth (), cp.x(), cp.y(), cp.z(), m_displacement.x(), m_displacement.y(), m_displacement.z(), m_scale_factor, m_focus_dist); fflush(stdout);
+printf("@@@ e=%g   a=%g     x,y,z=%g,%g,%g    d=%g,%g,%g    s=%g\n", cam_elevation (), cam_azimuth (), cp.x(), cp.y(), cp.z(), m_displacement.x(), m_displacement.y(), m_displacement.z(), m_scale_factor); fflush(stdout);
 
   update ();
+}
+
+void
+D25ViewWidget::camera_changed ()
+{
+  refresh ();
+}
+
+double
+D25ViewWidget::aspect_ratio () const
+{
+  return double (width ()) / double (height ());
 }
 
 void
@@ -439,61 +492,26 @@ D25ViewWidget::render_polygon (D25ViewWidget::chunks_type &chunks, const db::Pol
 
     //  triangle bottom
 
-    chunks.add (pts[0].x () * dbu);
-    chunks.add (zstart);
-    chunks.add (pts[0].y () * dbu);
-
-    chunks.add (pts[2].x () * dbu);
-    chunks.add (zstart);
-    chunks.add (pts[2].y () * dbu);
-
-    chunks.add (pts[1].x () * dbu);
-    chunks.add (zstart);
-    chunks.add (pts[1].y () * dbu);
+    chunks.add (pts[0].x () * dbu, zstart, pts[0].y () * dbu);
+    chunks.add (pts[2].x () * dbu, zstart, pts[2].y () * dbu);
+    chunks.add (pts[1].x () * dbu, zstart, pts[1].y () * dbu);
 
     //  triangle top
-
-    chunks.add (pts[0].x () * dbu);
-    chunks.add (zstop);
-    chunks.add (pts[0].y () * dbu);
-
-    chunks.add (pts[1].x () * dbu);
-    chunks.add (zstop);
-    chunks.add (pts[1].y () * dbu);
-
-    chunks.add (pts[2].x () * dbu);
-    chunks.add (zstop);
-    chunks.add (pts[2].y () * dbu);
+    chunks.add (pts[0].x () * dbu, zstop, pts[0].y () * dbu);
+    chunks.add (pts[1].x () * dbu, zstop, pts[1].y () * dbu);
+    chunks.add (pts[2].x () * dbu, zstop, pts[2].y () * dbu);
 
     if (poly.hull ().size () == 4) {
 
       //  triangle bottom
-
-      chunks.add (pts[0].x () * dbu);
-      chunks.add (zstart);
-      chunks.add (pts[0].y () * dbu);
-
-      chunks.add (pts[3].x () * dbu);
-      chunks.add (zstart);
-      chunks.add (pts[3].y () * dbu);
-
-      chunks.add (pts[2].x () * dbu);
-      chunks.add (zstart);
-      chunks.add (pts[2].y () * dbu);
+      chunks.add (pts[0].x () * dbu, zstart, pts[0].y () * dbu);
+      chunks.add (pts[3].x () * dbu, zstart, pts[3].y () * dbu);
+      chunks.add (pts[2].x () * dbu, zstart, pts[2].y () * dbu);
 
       //  triangle top
-
-      chunks.add (pts[0].x () * dbu);
-      chunks.add (zstop);
-      chunks.add (pts[0].y () * dbu);
-
-      chunks.add (pts[2].x () * dbu);
-      chunks.add (zstop);
-      chunks.add (pts[2].y () * dbu);
-
-      chunks.add (pts[3].x () * dbu);
-      chunks.add (zstop);
-      chunks.add (pts[3].y () * dbu);
+      chunks.add (pts[0].x () * dbu, zstop, pts[0].y () * dbu);
+      chunks.add (pts[2].x () * dbu, zstop, pts[2].y () * dbu);
+      chunks.add (pts[3].x () * dbu, zstop, pts[3].y () * dbu);
 
     }
 
@@ -503,29 +521,12 @@ D25ViewWidget::render_polygon (D25ViewWidget::chunks_type &chunks, const db::Pol
 void
 D25ViewWidget::render_wall (D25ViewWidget::chunks_type &chunks, const db::Edge &edge, double dbu, double zstart, double zstop)
 {
-  chunks.add (edge.p1 ().x () * dbu);
-  chunks.add (zstart);
-  chunks.add (edge.p1 ().y () * dbu);
-
-  chunks.add (edge.p2 ().x () * dbu);
-  chunks.add (zstop);
-  chunks.add (edge.p2 ().y () * dbu);
-
-  chunks.add (edge.p1 ().x () * dbu);
-  chunks.add (zstop);
-  chunks.add (edge.p1 ().y () * dbu);
-
-  chunks.add (edge.p1 ().x () * dbu);
-  chunks.add (zstart);
-  chunks.add (edge.p1 ().y () * dbu);
-
-  chunks.add (edge.p2 ().x () * dbu);
-  chunks.add (zstart);
-  chunks.add (edge.p2 ().y () * dbu);
-
-  chunks.add (edge.p2 ().x () * dbu);
-  chunks.add (zstop);
-  chunks.add (edge.p2 ().y () * dbu);
+  chunks.add (edge.p1 ().x () * dbu, zstart, edge.p1 ().y () * dbu);
+  chunks.add (edge.p2 ().x () * dbu, zstop, edge.p2 ().y () * dbu);
+  chunks.add (edge.p1 ().x () * dbu, zstop, edge.p1 ().y () * dbu);
+  chunks.add (edge.p1 ().x () * dbu, zstart, edge.p1 ().y () * dbu);
+  chunks.add (edge.p2 ().x () * dbu, zstart, edge.p2 ().y () * dbu);
+  chunks.add (edge.p2 ().x () * dbu, zstop, edge.p2 ().y () * dbu);
 }
 
 void
@@ -642,8 +643,7 @@ D25ViewWidget::initializeGL ()
       "uniform vec4 ambient;\n"
       "uniform vec3 illum;\n"
       "out lowp vec4 vertexColor;\n"
-      "uniform mat4 geo_matrix;\n"
-      "uniform mat4 cam_matrix;\n"
+      "uniform mat4 matrix;\n"
       "layout (triangles) in;\n"
       "layout (triangle_strip, max_vertices = 3) out;\n"
       "\n"
@@ -655,11 +655,11 @@ D25ViewWidget::initializeGL ()
       "   float dp = dot(normalize(n), illum);\n"
       "   vertexColor = color * (dp * 0.5 + 0.5) - (min(0.0, dp) * 0.5 * ambient);\n"
       "   vertexColor.a = 1.0;\n"
-      "   gl_Position = cam_matrix * geo_matrix * p0;\n"
+      "   gl_Position = matrix * p0;\n"
       "   EmitVertex();\n"
-      "   gl_Position = cam_matrix * geo_matrix * p1;\n"
+      "   gl_Position = matrix * p1;\n"
       "   EmitVertex();\n"
-      "   gl_Position = cam_matrix * geo_matrix * p2;\n"
+      "   gl_Position = matrix * p2;\n"
       "   EmitVertex();\n"
       "   EndPrimitive();\n"
       "}\n";
@@ -743,9 +743,6 @@ D25ViewWidget::initializeGL ()
 void
 D25ViewWidget::paintGL ()
 {
-  GLfloat vertices[6000];
-  size_t nmax = sizeof (vertices) / sizeof (GLfloat);
-
   const qreal retinaScale = devicePixelRatio ();
   glViewport (0, 0, width () * retinaScale, height () * retinaScale);
 
@@ -767,8 +764,9 @@ D25ViewWidget::paintGL ()
 
   m_shapes_program->bind ();
 
-  m_shapes_program->setUniformValue ("geo_matrix", cam_trans () * scene_trans);
-  m_shapes_program->setUniformValue ("cam_matrix", cam_perspective ());
+  //  draw the actual layout
+
+  m_shapes_program->setUniformValue ("matrix", cam_perspective () * cam_trans () * scene_trans);
 
   //  NOTE: z axis of illum points towards the scene because we include the z inversion in the scene transformation matrix
   m_shapes_program->setUniformValue ("illum", QVector3D (-3.0, -4.0, 2.0).normalized ());
@@ -779,19 +777,18 @@ D25ViewWidget::paintGL ()
   glEnableVertexAttribArray (positions);
 
   for (std::list<LayerInfo>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-
     m_shapes_program->setUniformValue ("color", l->color [0], l->color [1], l->color [2], l->color [3]);
-
-    for (chunks_type::iterator c = l->vertex_chunk->begin (); c != l->vertex_chunk->end (); ++c) {
-      glVertexAttribPointer (positions, 3, GL_FLOAT, GL_FALSE, 0, c->front ());
-      glDrawArrays (GL_TRIANGLES, 0, c->size () / 3);
-    }
-
+    l->vertex_chunk->draw_to (this, positions, GL_TRIANGLES);
   }
 
   glDisableVertexAttribArray (positions);
 
   m_shapes_program->release ();
+
+  //  decoration
+
+  //  a vertex buffer for the decoration
+  lay::mem_chunks<float, 1024 * 18> vertexes;
 
   m_gridplane_program->bind ();
 
@@ -802,26 +799,14 @@ D25ViewWidget::paintGL ()
 
   m_gridplane_program->setUniformValue ("matrix", cam_perspective () * cam_trans ());
 
-  size_t index = 0;
-
   double compass_rad = 0.3;
   double compass_bars = 0.4;
 
-  vertices[index++] = -compass_bars;
-  vertices[index++] = 0.0;
-  vertices[index++] = 0.0;
+  vertexes.add (-compass_bars, 0.0, 0.0);
+  vertexes.add (compass_bars, 0.0, 0.0);
 
-  vertices[index++] = compass_bars;
-  vertices[index++] = 0.0;
-  vertices[index++] = 0.0;
-
-  vertices[index++] = 0.0;
-  vertices[index++] = 0.0;
-  vertices[index++] = -compass_bars;
-
-  vertices[index++] = 0.0;
-  vertices[index++] = 0.0;
-  vertices[index++] = compass_bars;
+  vertexes.add (0.0, 0.0, -compass_bars);
+  vertexes.add (0.0, 0.0, compass_bars);
 
   int ncircle = 64;
   double x = compass_rad, z = 0.0;
@@ -833,13 +818,8 @@ D25ViewWidget::paintGL ()
     double xx = compass_rad * cos (a);
     double zz = compass_rad * sin (a);
 
-    vertices[index++] = x;
-    vertices[index++] = 0.0;
-    vertices[index++] = z;
-
-    vertices[index++] = xx;
-    vertices[index++] = 0.0;
-    vertices[index++] = zz;
+    vertexes.add (x, 0.0, z);
+    vertexes.add (xx, 0.0, zz);
 
     x = xx;
     z = zz;
@@ -848,29 +828,18 @@ D25ViewWidget::paintGL ()
 
   m_gridplane_program->setUniformValue ("color", 1.0, 1.0, 1.0, 0.25f);
 
-  glVertexAttribPointer (positions, 3, GL_FLOAT, GL_FALSE, 0, vertices);
-
   glLineWidth (2.0);
-  glDrawArrays (GL_LINES, 0, index / 3);
-
-  index = 0;
+  vertexes.draw_to (this, positions, GL_LINES);
 
   //  arrow
-  vertices[index++] = -0.25 * compass_rad;
-  vertices[index++] = 0.0;
-  vertices[index++] = 0.6 * compass_rad;
 
-  vertices[index++] = 0.0;
-  vertices[index++] = 0.0;
-  vertices[index++] = -0.8 * compass_rad;
+  vertexes.clear ();
 
-  vertices[index++] = 0.25 * compass_rad;
-  vertices[index++] = 0.0;
-  vertices[index++] = 0.6 * compass_rad;
+  vertexes.add (-0.25 * compass_rad, 0.0, 0.6 * compass_rad);
+  vertexes.add (0.0, 0.0, -0.8 * compass_rad);
+  vertexes.add (0.25 * compass_rad, 0.0, 0.6 * compass_rad);
 
-  glVertexAttribPointer (positions, 3, GL_FLOAT, GL_FALSE, 0, vertices);
-
-  glDrawArrays (GL_TRIANGLES, 0, index / 3);
+  vertexes.draw_to (this, positions, GL_TRIANGLES);
 
   //  draw base plane
 
@@ -880,14 +849,15 @@ D25ViewWidget::paintGL ()
   double gminor = gg.second, gmajor = gg.first;
 
   double margin = std::max (m_bbox.width (), m_bbox.height ()) * 0.02;
-  double l = m_bbox.left () - margin;
-  double r = m_bbox.right () + margin;
-  double b = m_bbox.bottom () - margin;
-  double t = m_bbox.top () + margin;
 
-  // @@@
+  double l = m_bbox.left ();
+  double r = m_bbox.right ();
+  double b = m_bbox.bottom ();
+  double t = m_bbox.top ();
 
   //  major and minor grid lines
+
+  vertexes.clear ();
 
   const double epsilon = 1e-6;
 
@@ -895,56 +865,45 @@ D25ViewWidget::paintGL ()
 
     m_gridplane_program->setUniformValue ("color", 1.0, 1.0, 1.0, major ? 0.25f : 0.15f);
 
-    size_t index = 0;
     double x, y;
     double step = (major ? gmajor : gminor);
 
     x = ceil (l / step) * step;
-    for ( ; index < nmax && x < r - step * epsilon; x += step) {
+    for ( ; x < r - step * epsilon; x += step) {
       if ((fabs (floor (x / gmajor + 0.5) * gmajor - x) < epsilon) == (major != 0)) {
-        vertices [index++] = x;
-        vertices [index++] = 0.0;
-        vertices [index++] = b;
-        vertices [index++] = x;
-        vertices [index++] = 0.0;
-        vertices [index++] = t;
+        vertexes.add (x, 0.0, b - margin);
+        vertexes.add (x, 0.0, t + margin);
       }
     }
 
     y = ceil (b / step) * step;
-    for ( ; index < nmax && y < t - step * epsilon; y += step) {
+    for ( ; y < t - step * epsilon; y += step) {
       if ((fabs (floor (y / gmajor + 0.5) * gmajor - y) < epsilon) == (major != 0)) {
-        vertices [index++] = l;
-        vertices [index++] = 0.0;
-        vertices [index++] = y;
-        vertices [index++] = r;
-        vertices [index++] = 0.0;
-        vertices [index++] = y;
+        vertexes.add (l - margin, 0.0, y);
+        vertexes.add (r + margin, 0.0, y);
       }
     }
 
-    glVertexAttribPointer (positions, 3, GL_FLOAT, GL_FALSE, 0, vertices);
-
     glLineWidth (2.0);
-    glDrawArrays (GL_LINES, 0, index / 3);
+    vertexes.draw_to (this, positions, GL_LINES);
 
   }
 
-  l = m_bbox.left ();
-  r = m_bbox.right ();
-  b = m_bbox.bottom ();
-  t = m_bbox.top ();
+  //  the plane itself
 
-  GLfloat plane_vertices[] = {
-      float (l), 0.0f, float (b),    float (l), 0.0f, float (t),    float (r), 0.0f, float (t),
-      float (l), 0.0f, float (b),    float (r), 0.0f, float (t),    float (r), 0.0f, float (b)
-  };
+  vertexes.clear ();
+
+  vertexes.add (l, 0.0, b);
+  vertexes.add (l, 0.0, t);
+  vertexes.add (r, 0.0, t);
+
+  vertexes.add (l, 0.0, b);
+  vertexes.add (r, 0.0, b);
+  vertexes.add (r, 0.0, t);
 
   m_gridplane_program->setUniformValue ("color", 1.0, 1.0, 1.0, 0.1f);
 
-  glVertexAttribPointer (positions, 3, GL_FLOAT, GL_FALSE, 0, plane_vertices);
-
-  glDrawArrays (GL_TRIANGLES, 0, 6);
+  vertexes.draw_to (this, positions, GL_TRIANGLES);
 
   glDisableVertexAttribArray (positions);
 

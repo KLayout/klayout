@@ -24,12 +24,26 @@
 #define HDR_layD25MemChunks
 
 #include <QDialog>
+#include <QOpenGLFunctions>
 
 #include "tlObject.h"
 #include <string.h>  //  for memcpy
 
 namespace lay
 {
+
+template <class Obj>
+struct gl_type2enum
+{
+  GLenum operator() () const;
+};
+
+template <>
+struct gl_type2enum<float>
+{
+  GLenum operator() () const { return GL_FLOAT; }
+};
+
 
 /**
  *  @brief Provides a semi-contiguous array of objects
@@ -202,6 +216,25 @@ public:
   }
 
   /**
+   *  @brief Adds two elements
+   */
+  void add (const Obj &e1, const Obj &e2)
+  {
+    add (e1);
+    add (e2);
+  }
+
+  /**
+   *  @brief Adds three elements
+   */
+  void add (const Obj &e1, const Obj &e2, const Obj &e3)
+  {
+    add (e1);
+    add (e2);
+    add (e3);
+  }
+
+  /**
    *  @brief begin iterator
    */
   iterator begin () const { return iterator (mp_chunks); }
@@ -210,6 +243,17 @@ public:
    *  @brief end iterator
    */
   iterator end () const { return iterator (); }
+
+  /**
+   *  @brief Draw to the given context
+   */
+  void draw_to (QOpenGLFunctions *ctx, GLuint location, GLenum mode) const
+  {
+    for (iterator c = begin (); c != end (); ++c) {
+      ctx->glVertexAttribPointer (location, 3, gl_type2enum<Obj> () (), GL_FALSE, 0, c->front ());
+      ctx->glDrawArrays (mode, 0, c->size () / 3);
+    }
+  }
 
 private:
   chunk *mp_chunks;

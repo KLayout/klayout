@@ -7,7 +7,8 @@ include($$PWD/../../../../lib_ut.pri)
 
 SOURCES = \
   layD25MemChunksTests.cc \
-    layD25ViewUtilsTests.cc
+    layD25ViewUtilsTests.cc \
+    layD25CameraTests.cc
 
 INCLUDEPATH += $$LAY_INC $$TL_INC $$DB_INC $$GSI_INC $$PWD/../lay_plugin $$PWD/../../../common
 DEPENDPATH += $$LAY_INC $$TL_INC $$DB_INC $$GSI_INC $$PWD/../lay_plugin $$PWD/../../../common

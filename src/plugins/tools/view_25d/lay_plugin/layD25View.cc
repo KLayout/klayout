@@ -31,6 +31,8 @@
 namespace lay
 {
 
+const double initial_elevation = 3.0;
+
 D25View::D25View (QWidget *parent)
   : QDialog (parent)
 {
@@ -41,6 +43,13 @@ D25View::D25View (QWidget *parent)
   mp_ui->d25_view->setFocusPolicy (Qt::StrongFocus);
   mp_ui->d25_view->setFocus ();
   // @@@
+
+  connect (mp_ui->fit_back, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
+  connect (mp_ui->fit_front, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
+  connect (mp_ui->fit_left, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
+  connect (mp_ui->fit_right, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
+  connect (mp_ui->fit_top, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
+  connect (mp_ui->fit_bottom, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
 }
 
 D25View::~D25View ()
@@ -55,11 +64,45 @@ D25View::exec_dialog (lay::LayoutView *view)
   mp_view.reset (view);
   mp_ui->d25_view->attach_view (view);
 
+  mp_ui->d25_view->reset ();
+  mp_ui->d25_view->set_cam_azimuth (0.0);
+  mp_ui->d25_view->set_cam_elevation (initial_elevation);
+
   int ret = QDialog::exec ();
 
   mp_ui->d25_view->attach_view (0);
 
   return ret;
+}
+
+void
+D25View::fit_button_clicked ()
+{
+  double azimuth = mp_ui->d25_view->cam_azimuth ();
+  double elevation = mp_ui->d25_view->cam_elevation ();
+
+  if (sender () == mp_ui->fit_back) {
+    azimuth = -180.0;
+    elevation = -initial_elevation;
+  } else if (sender () == mp_ui->fit_front) {
+    azimuth = 0.0;
+    elevation = -initial_elevation;
+  } else if (sender () == mp_ui->fit_left) {
+    azimuth = 90.0;
+    elevation = -initial_elevation;
+  } else if (sender () == mp_ui->fit_right) {
+    azimuth = -90.0;
+    elevation = -initial_elevation;
+  } else if (sender () == mp_ui->fit_top) {
+    elevation = -90;
+  } else if (sender () == mp_ui->fit_bottom) {
+    elevation = 90;
+  }
+
+  mp_ui->d25_view->set_cam_azimuth (azimuth);
+  mp_ui->d25_view->set_cam_elevation (elevation);
+
+  mp_ui->d25_view->fit ();
 }
 
 void 

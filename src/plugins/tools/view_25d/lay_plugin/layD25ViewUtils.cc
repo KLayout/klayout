@@ -65,7 +65,7 @@ cutpoint_line_with_face (const QVector3D &line, const QVector3D &dir, const QVec
 
 static bool somewhat_perpendicular (const QVector3D &a, const QVector3D &b)
 {
-  //  returns true if a and b are perpendicular within 30 degree
+  //  returns true if a and b are perpendicular within +/-30 degree
   return fabs (QVector3D::dotProduct (a, b)) < 0.5 * a.length () * b.length ();
 }
 

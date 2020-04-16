@@ -23,6 +23,11 @@
 #ifndef HDR_layD25ViewWidget
 #define HDR_layD25ViewWidget
 
+#include "dbPolygon.h"
+
+#include "layD25MemChunks.h"
+#include "layD25Camera.h"
+
 #include <QOpenGLWidget>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
@@ -32,9 +37,7 @@
 #include <QPoint>
 #include <QVector3D>
 
-#include "dbPolygon.h"
-
-#include "layD25MemChunks.h"
+#include <memory>
 
 namespace db
 {
@@ -46,10 +49,25 @@ namespace lay
 {
 
 class LayoutView;
+class D25ViewWidget;
+
+class D25InteractionMode
+{
+public:
+  D25InteractionMode (D25ViewWidget *widget);
+  virtual ~D25InteractionMode ();
+
+  D25ViewWidget *view () { return mp_view; }
+  virtual void mouse_move (QMouseEvent *event) = 0;
+
+private:
+  D25ViewWidget *mp_view;
+};
 
 class D25ViewWidget
   : public QOpenGLWidget,
-    private QOpenGLFunctions
+    private QOpenGLFunctions,
+    public D25Camera
 {
 Q_OBJECT 
 
@@ -66,22 +84,40 @@ public:
 
   void attach_view (lay::LayoutView *view);
 
+  QVector3D hit_point_with_scene(const QVector3D &line_dir);
+  void refresh ();
+  void reset ();
+
+  QVector3D displacement () const { return m_displacement; }
+
+  void set_displacement (const QVector3D &d)
+  {
+    m_displacement = d;
+    refresh ();
+  }
+
+  double scale_factor () const { return m_scale_factor; }
+
+  void set_scale_factor (double f)
+  {
+    m_scale_factor = f;
+    refresh ();
+  }
+
+protected:
+  virtual void camera_changed ();
+  virtual double aspect_ratio () const;
+
+public slots:
+  void fit ();
+
 private:
   typedef lay::mem_chunks<GLfloat, 1024 * 9> chunks_type;
 
+  std::auto_ptr<D25InteractionMode> mp_mode;
   QOpenGLShaderProgram *m_shapes_program, *m_gridplane_program;
-  bool m_dragging, m_rotating;
   double m_scale_factor;
-  double m_cam_azimuth, m_cam_elevation;
-  bool m_top_view;
   QVector3D m_displacement;
-  double m_focus_dist;
-  double m_fov;
-  QVector3D m_hit_point;
-  QPoint m_start_pos;
-  QVector3D m_start_cam_position;
-  double m_start_cam_azimuth, m_start_cam_elevation;
-  QVector3D m_start_displacement;
   lay::LayoutView *mp_view;
   db::DBox m_bbox;
   double m_zmin, m_zmax;
@@ -99,21 +135,10 @@ private:
   void paintGL ();
   void resizeGL (int w, int h);
 
-  void refresh ();
-  void reset ();
   void prepare_view ();
   void render_layout (D25ViewWidget::chunks_type &chunks, const db::Layout &layout, const db::Cell &cell, unsigned int layer, double zstart, double zstop);
   void render_polygon (D25ViewWidget::chunks_type &chunks, const db::Polygon &poly, double dbu, double zstart, double zstop);
   void render_wall (D25ViewWidget::chunks_type &chunks, const db::Edge &poly, double dbu, double zstart, double zstop);
-  QVector3D hit_point_with_scene(const QVector3D &line_dir);
-  double cam_elevation () const;
-  double cam_azimuth () const;
-  QVector3D cam_position () const;
-  QVector3D cam_direction () const;
-  QMatrix4x4 cam_perspective () const;
-  QMatrix4x4 cam_trans () const;
-  double cam_dist () const;
-  double cam_fov () const;
 };
 
 }

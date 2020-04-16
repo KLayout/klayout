@@ -54,6 +54,9 @@ public:
 protected:
   void accept ();
 
+private slots:
+  void fit_button_clicked ();
+
 private:
   Ui::D25View *mp_ui;
   tl::weak_ptr<lay::LayoutView> mp_view;

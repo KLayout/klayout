@@ -50,12 +50,39 @@ D25View::D25View (QWidget *parent)
   connect (mp_ui->fit_right, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
   connect (mp_ui->fit_top, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
   connect (mp_ui->fit_bottom, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
+  connect (mp_ui->zoom_slider, SIGNAL (valueChanged (int)), this, SLOT (scale_slider_changed (int)));
+  connect (mp_ui->d25_view, SIGNAL (scale_factor_changed (double)), this, SLOT (scale_factor_changed (double)));
 }
 
 D25View::~D25View ()
 {
   delete mp_ui;
   mp_ui = 0;
+}
+
+static QString scale_factor_to_string (double f)
+{
+  QString s;
+  s.sprintf ("x %.3g", f);
+  return s;
+}
+
+void
+D25View::scale_slider_changed (int value)
+{
+  double f = exp (log (10.0) * -0.01 * value);
+  mp_ui->zoom_factor->setText (scale_factor_to_string (f));
+  mp_ui->d25_view->set_scale_factor (f);
+}
+
+void
+D25View::scale_factor_changed (double f)
+{
+  mp_ui->zoom_factor->setText (scale_factor_to_string (f));
+  int v = floor (0.5 - log10 (f) * 100.0);
+  mp_ui->zoom_slider->blockSignals (true);
+  mp_ui->zoom_slider->setValue (v);
+  mp_ui->zoom_slider->blockSignals (false);
 }
 
 int 

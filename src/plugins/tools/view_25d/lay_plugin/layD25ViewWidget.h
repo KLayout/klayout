@@ -104,6 +104,9 @@ public:
     refresh ();
   }
 
+signals:
+  void scale_factor_changed (double f);
+
 protected:
   virtual void camera_changed ();
   virtual double aspect_ratio () const;
@@ -112,7 +115,7 @@ public slots:
   void fit ();
 
 private:
-  typedef lay::mem_chunks<GLfloat, 1024 * 9> chunks_type;
+  typedef lay::mem_chunks<GLfloat, 1024 * 18> chunks_type;
 
   std::auto_ptr<D25InteractionMode> mp_mode;
   QOpenGLShaderProgram *m_shapes_program, *m_gridplane_program;

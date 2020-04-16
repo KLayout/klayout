@@ -240,6 +240,8 @@ D25ViewWidget::wheelEvent (QWheelEvent *event)
     m_scale_factor *= f;
     m_displacement += hp * (1.0 - f) / m_scale_factor;
 
+    emit scale_factor_changed (m_scale_factor);
+
   } else {
 
     //  compute vector of line of sight
@@ -248,16 +250,16 @@ D25ViewWidget::wheelEvent (QWheelEvent *event)
     //  by definition the ray goes through the camera position
     QVector3D hp = hit_point_with_scene (ray.second);
 
-    if (event->modifiers () & Qt::ControlModifier) {
+    if (! (event->modifiers () & Qt::ControlModifier)) {
 
-      //  "Ctrl" is closeup
+      //  No Ctrl is closeup
 
       double f = event->angleDelta ().y () * (1.0 / (90 * 8));
       m_displacement += -((f / m_scale_factor) * std::min (cam_dist (), double ((cam_position () - hp).length ()))) * ray.second;
 
     } else {
 
-      //  No shift is zoom
+      //  "Ctrl" is zoom
 
       double f = exp (event->angleDelta ().y () * (1.0 / (90 * 8)));
 
@@ -276,6 +278,8 @@ D25ViewWidget::wheelEvent (QWheelEvent *event)
       lay::normalize_scene_trans (cam_perspective (), displacement, m_scale_factor, initial_displacement.z ());
 
       m_displacement = ct.inverted ().map (displacement);
+
+      emit scale_factor_changed (m_scale_factor);
 
     }
 
@@ -382,6 +386,8 @@ D25ViewWidget::fit ()
   m_displacement = (new_center_in_scene - dim * 0.5) / m_scale_factor - bll;
 
   refresh ();
+
+  emit scale_factor_changed (m_scale_factor);
 }
 
 void
@@ -904,6 +910,117 @@ D25ViewWidget::paintGL ()
   m_gridplane_program->setUniformValue ("color", 1.0, 1.0, 1.0, 0.1f);
 
   vertexes.draw_to (this, positions, GL_TRIANGLES);
+
+  //  the orientation cube
+
+  if (! top_view ()) {
+
+    glDisable (GL_DEPTH_TEST);
+
+    int cube_size = 64;
+    int cube_margin = 20;
+
+    QMatrix4x4 into_top_right_corner;
+    into_top_right_corner.translate (1.0 - 2.0 / width () * (cube_margin + cube_size / 2), 1.0 - 2.0 / height () * (cube_margin + cube_size / 2));
+    // into_top_right_corner.translate (0.5, 0.5, 0.0);
+    into_top_right_corner.scale (2.0 * cube_size / double (height ()), 2.0 * cube_size / double (height ()), 1.0);
+
+    m_gridplane_program->setUniformValue ("matrix", into_top_right_corner * cam_perspective () * cam_trans ());
+
+    vertexes.clear ();
+
+    vertexes.add (-1.0, -1.0, 1.0);
+    vertexes.add (-1.0, -1.0, -1.0);
+
+    vertexes.add (-1.0, 1.0, 1.0);
+    vertexes.add (-1.0, 1.0, -1.0);
+
+    vertexes.add (1.0, -1.0, 1.0);
+    vertexes.add (1.0, -1.0, -1.0);
+
+    vertexes.add (1.0, 1.0, 1.0);
+    vertexes.add (1.0, 1.0, -1.0);
+
+    vertexes.add (-1.0, -1.0, 1.0);
+    vertexes.add (-1.0, 1.0, 1.0);
+
+    vertexes.add (1.0, -1.0, 1.0);
+    vertexes.add (1.0, 1.0, 1.0);
+
+    vertexes.add (-1.0, -1.0, 1.0);
+    vertexes.add (1.0, -1.0, 1.0);
+
+    vertexes.add (-1.0, 1.0, 1.0);
+    vertexes.add (1.0, 1.0, 1.0);
+
+    vertexes.add (-1.0, -1.0, -1.0);
+    vertexes.add (-1.0, 1.0, -1.0);
+
+    vertexes.add (1.0, -1.0, -1.0);
+    vertexes.add (1.0, 1.0, -1.0);
+
+    vertexes.add (-1.0, -1.0, -1.0);
+    vertexes.add (1.0, -1.0, -1.0);
+
+    vertexes.add (-1.0, 1.0, -1.0);
+    vertexes.add (1.0, 1.0, -1.0);
+
+    m_gridplane_program->setUniformValue ("color", 1.0, 1.0, 1.0, 0.2f);
+
+    vertexes.draw_to (this, positions, GL_LINES);
+
+    vertexes.clear ();
+
+    //  A "K" at the front
+    vertexes.add (-0.8, -0.8, 1.0);
+    vertexes.add (-0.8, 0.8, 1.0);
+    vertexes.add (-0.2, 0.8, 1.0);
+
+    vertexes.add (-0.8, -0.8, 1.0);
+    vertexes.add (-0.2, -0.8, 1.0);
+    vertexes.add (-0.2, 0.8, 1.0);
+
+    vertexes.add (0.2, 0.8, 1.0);
+    vertexes.add (0.8, 0.8, 1.0);
+    vertexes.add (0.8, 0.6, 1.0);
+
+    vertexes.add (0.2, 0.8, 1.0);
+    vertexes.add (0.8, 0.6, 1.0);
+    vertexes.add (0.6, 0.4, 1.0);
+
+    vertexes.add (-0.2, 0.4, 1.0);
+    vertexes.add (0.2, 0.8, 1.0);
+    vertexes.add (0.6, 0.4, 1.0);
+
+    vertexes.add (-0.2, 0.4, 1.0);
+    vertexes.add (0.6, 0.4, 1.0);
+    vertexes.add (0.2, 0.0, 1.0);
+
+    vertexes.add (-0.2, 0.4, 1.0);
+    vertexes.add (0.2, 0.0, 1.0);
+    vertexes.add (-0.2, -0.4, 1.0);
+
+    vertexes.add (-0.2, -0.4, 1.0);
+    vertexes.add (0.6, -0.4, 1.0);
+    vertexes.add (0.2, -0.0, 1.0);
+
+    vertexes.add (-0.2, -0.4, 1.0);
+    vertexes.add (0.2, -0.8, 1.0);
+    vertexes.add (0.6, -0.4, 1.0);
+
+    vertexes.add (0.2, -0.8, 1.0);
+    vertexes.add (0.8, -0.6, 1.0);
+    vertexes.add (0.6, -0.4, 1.0);
+
+    vertexes.add (0.2, -0.8, 1.0);
+    vertexes.add (0.8, -0.8, 1.0);
+    vertexes.add (0.8, -0.6, 1.0);
+
+    m_gridplane_program->setUniformValue ("color", 1.0, 1.0, 1.0, 0.3f);
+
+    vertexes.draw_to (this, positions, GL_TRIANGLES);
+
+  }
 
   glDisableVertexAttribArray (positions);
 

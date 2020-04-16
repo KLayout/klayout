@@ -105,7 +105,7 @@ public:
 
   /**
    *  @brief Gets the azimuth angle
-   * ...
+   *  A positive angle means we look from the left. A negative means we look from the right.
    */
   double cam_azimuth () const;
 

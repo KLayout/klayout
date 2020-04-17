@@ -134,10 +134,11 @@ D25TechnologyComponent::D25TechnologyComponent ()
     "# 'zstart' and 'zstop'.\n"
     "#\n"
     "# Examples:\n"
-    "#   1: 0.5 1.5                  # extrude layer 1/0 from 0.5 to 1.5 vertically\n"
-    "#   1: zstop=1.5, zstart=0.5    # same as above\n"
-    "#   1: height=1.0, zstop=1.5    # same as above\n"
-    "#   1: 1.0 zstop=1.5            # same as above\n"
+    "#   1: 0.5 1.5                    # extrude layer 1/0 from 0.5 to 1.5 vertically\n"
+    "#   1/0: 0.5 1.5                  # same with explicit datatype\n"
+    "#   1: zstop=1.5, zstart=0.5      # same with named parameters\n"
+    "#   1: height=1.0, zstop=1.5      # same with z stop minus height\n"
+    "#   1: 1.0 zstop=1.5              # same with height as unnamed parameter\n"
   ;
 }
 
@@ -186,6 +187,10 @@ D25TechnologyComponent::compile_from_source (const std::string &src)
 
         while (! ex.at_end ()) {
 
+          if (ex.test ("#")) {
+            break;
+          }
+
           double pv = 0.0;
 
           std::string pn;
@@ -227,6 +232,9 @@ D25TechnologyComponent::compile_from_source (const std::string &src)
             if (! h.is_nil ()) {
               info.set_zstop (info.zstart () + h.to_double ());
             }
+          } else {
+            info.set_zstart (z0.to_double ());
+            info.set_zstop (z1.to_double ());
           }
         } else if (args.size () == 1) {
           info.set_zstop ((! z0.is_nil () ? z0.to_double () : info.zstart ()) + args[0]);
@@ -248,6 +256,21 @@ D25TechnologyComponent::compile_from_source (const std::string &src)
   }
 
   m_src = src;
+}
+
+std::string
+D25TechnologyComponent::to_string () const
+{
+  std::string res;
+
+  for (const_iterator i = begin (); i != end (); ++i) {
+    if (! res.empty ()) {
+      res += "\n";
+    }
+    res += i->layer ().to_string () + ": zstart=" + tl::to_string (i->zstart ()) + ", zstop=" + tl::to_string (i->zstop ());
+  }
+
+  return res;
 }
 
 // -----------------------------------------------------------------------------------

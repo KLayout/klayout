@@ -137,6 +137,8 @@ public:
     m_src = s;
   }
 
+  std::string to_string () const;
+
   db::TechnologyComponent *clone () const
   {
     return new D25TechnologyComponent (*this);

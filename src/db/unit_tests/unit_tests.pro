@@ -73,7 +73,8 @@ SOURCES = \
     dbLayoutQueryTests.cc \
     dbPolygonToolsTests.cc \
     dbTechnologyTests.cc \
-    dbStreamLayerTests.cc
+    dbStreamLayerTests.cc \
+    dbD25TechnologyComponentTests.cc
 
 INCLUDEPATH += $$TL_INC $$DB_INC $$GSI_INC
 DEPENDPATH += $$TL_INC $$DB_INC $$GSI_INC

@@ -15,7 +15,7 @@
 
 				<RegExpr attribute="Normal" String=":" context="After LD"/>
 
-				<RegExpr attribute="Dec" String="\-?[1-9][0-9]*" context="#stay"/>
+				<RegExpr attribute="Dec" String="\-?[0-9]+" context="#stay"/>
 				<DetectChar attribute="Normal" char="*" context="#stay"/>
 				<DetectChar attribute="Normal" char="(" context="#stay"/>
 				<DetectChar attribute="Normal" char=")" context="#stay"/>
@@ -46,13 +46,13 @@
 			<context name="Quoted String" attribute="String" lineEndContext="Error">
 				<StringDetect attribute="String" String="\\" context="#stay"/>
 				<RegExpr attribute="String" String="\\\&quot;" context="#stay"/>
-				<DetectChar char="&quot;" attribute="String" context="After Key"/>
+				<DetectChar char="&quot;" attribute="String" context="Normal"/>
 			</context>
 
 			<context name="Apostrophed String" attribute="Raw String" lineEndContext="Error">
 				<StringDetect attribute="String" String="\\" context="#stay"/>
 				<RegExpr attribute="String" String="\\\'" context="#stay"/>
-				<DetectChar char="'" attribute="Raw String" context="After Key"/>
+				<DetectChar char="'" attribute="Raw String" context="Normal"/>
 			</context>
 
     </contexts>

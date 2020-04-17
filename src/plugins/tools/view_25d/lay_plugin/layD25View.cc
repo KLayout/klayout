@@ -145,7 +145,6 @@ void
 D25View::accept ()
 {
   QDialog::accept ();
-  // @@@
 }
 
 }

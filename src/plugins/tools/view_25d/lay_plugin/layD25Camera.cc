@@ -58,13 +58,13 @@ D25Camera::camera_reset ()
 double
 D25Camera::cam_fov () const
 {
-  return m_fov; // @@@
+  return m_fov;
 }
 
 double
 D25Camera::cam_dist () const
 {
-  return 4.0; // @@@
+  return 4.0;
 }
 
 QVector3D

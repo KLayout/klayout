@@ -192,7 +192,6 @@ D25ViewWidget::D25ViewWidget (QWidget *parent)
   format.setDepthBufferSize (24);
   format.setSamples (4); //  more -> widget extends beyond boundary!
   format.setStencilBufferSize (8);
-  // @@@? format.setVersion (3, 2);
   format.setProfile (QSurfaceFormat::CoreProfile);
   setFormat (format);
 
@@ -394,10 +393,6 @@ D25ViewWidget::fit ()
 void
 D25ViewWidget::refresh ()
 {
-  QVector3D cp = cam_position ();
-
-printf("@@@ e=%g   a=%g     x,y,z=%g,%g,%g    d=%g,%g,%g    s=%g\n", cam_elevation (), cam_azimuth (), cp.x(), cp.y(), cp.z(), m_displacement.x(), m_displacement.y(), m_displacement.z(), m_scale_factor); fflush(stdout);
-
   update ();
 }
 
@@ -621,7 +616,7 @@ D25ViewWidget::render_layout (D25ViewWidget::chunks_type &chunks, const db::Layo
   db::EdgeProcessor ep;
   std::vector<db::Polygon> poly_heap;
 
-  //  @@@ hidden cells, hierarchy depth ...
+  //  TODO: hidden cells, hierarchy depth ...
   db::RecursiveShapeIterator s (layout, cell, layer);
   s.shape_flags (db::ShapeIterator::Polygons | db::ShapeIterator::Paths | db::ShapeIterator::Boxes);
   for ( ; ! s.at_end (); ++s) {
@@ -703,10 +698,7 @@ D25ViewWidget::initializeGL ()
   QOpenGLFunctions::initializeOpenGLFunctions();
 
   glEnable (GL_BLEND);
-  //  @@@ dark background
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  //  @@@ white background
-  // @@@ glBlendFunc (GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
 
   static const char *shapes_vertex_shader_source =
       "#version 320 es\n"
@@ -757,9 +749,12 @@ D25ViewWidget::initializeGL ()
       "#undef mediump\n"
       "in lowp vec4 vertexColor;\n"
       "out lowp vec4 fragColor;\n"
+      "uniform highp float mist_factor;\n"
+      "uniform highp float mist_add;\n"
       "\n"
       "vec4 color_by_z(lowp vec4 c, highp float z) {\n"
-      "  lowp vec4 mist_color = vec4(c.g * 0.4, c.g * 0.4, c.g * 0.4, 1.0);\n"
+      "  highp float mist_rgb = c.g * mist_factor + mist_add;\n"
+      "  lowp vec4 mist_color = vec4(mist_rgb, mist_rgb, mist_rgb, 1.0);\n"
       "  highp float d = 0.12;\n" //  d + dd/2 = 0.15 = 1/?
       "  highp float dd = 0.06;\n"
       "  highp float f = 1.0;\n"
@@ -833,7 +828,13 @@ D25ViewWidget::paintGL ()
   glViewport (0, 0, width () * retinaScale, height () * retinaScale);
 
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  // @@@ white background: glClearColor (1.0, 1.0, 1.0, 1.0);
+
+  QColor c = mp_view->background_color ();
+  float foreground_rgb = (c.green () > 128 ? 0.0f : 1.0f);
+  float ambient = (c.green () > 128 ? 1.0f : 0.5f);
+  float mist_factor = (c.green () > 128 ? 0.2f : 0.4f);
+  float mist_add = (c.green () > 128 ? 0.8f : 0.2f);
+  glClearColor (float (c.red ()) / 255.0f, float (c.green ()) / 255.0f, float (c.blue ()) / 255.0f, 1.0);
 
   QMatrix4x4 scene_trans, scene_trans_wo_y;
 
@@ -857,7 +858,9 @@ D25ViewWidget::paintGL ()
   //  NOTE: z axis of illum points towards the scene because we include the z inversion in the scene transformation matrix
   m_shapes_program->setUniformValue ("illum", QVector3D (-3.0, -4.0, 2.0).normalized ());
 
-  m_shapes_program->setUniformValue ("ambient", QVector4D (0.5, 0.5, 0.5, 0.5));
+  m_shapes_program->setUniformValue ("ambient", QVector4D (ambient, ambient, ambient, 0.5));
+  m_shapes_program->setUniformValue ("mist_factor", mist_factor);
+  m_shapes_program->setUniformValue ("mist_add", mist_add);
 
   glEnable (GL_DEPTH_TEST);
   glEnableVertexAttribArray (positions);
@@ -912,7 +915,7 @@ D25ViewWidget::paintGL ()
 
   }
 
-  m_gridplane_program->setUniformValue ("color", 1.0, 1.0, 1.0, 0.25f);
+  m_gridplane_program->setUniformValue ("color", foreground_rgb, foreground_rgb, foreground_rgb, 0.25f);
 
   glLineWidth (2.0);
   vertexes.draw_to (this, positions, GL_LINES);
@@ -949,7 +952,7 @@ D25ViewWidget::paintGL ()
 
   for (int major = 0; major < 2; ++major) {
 
-    m_gridplane_program->setUniformValue ("color", 1.0, 1.0, 1.0, major ? 0.25f : 0.15f);
+    m_gridplane_program->setUniformValue ("color", foreground_rgb, foreground_rgb, foreground_rgb, major ? 0.25f : 0.15f);
 
     double x, y;
     double step = (major ? gmajor : gminor);
@@ -987,7 +990,7 @@ D25ViewWidget::paintGL ()
   vertexes.add (r, 0.0, b);
   vertexes.add (r, 0.0, t);
 
-  m_gridplane_program->setUniformValue ("color", 1.0, 1.0, 1.0, 0.1f);
+  m_gridplane_program->setUniformValue ("color", foreground_rgb, foreground_rgb, foreground_rgb, 0.1f);
 
   vertexes.draw_to (this, positions, GL_TRIANGLES);
 
@@ -1045,7 +1048,7 @@ D25ViewWidget::paintGL ()
     vertexes.add (-1.0, 1.0, -1.0);
     vertexes.add (1.0, 1.0, -1.0);
 
-    m_gridplane_program->setUniformValue ("color", 1.0, 1.0, 1.0, 0.2f);
+    m_gridplane_program->setUniformValue ("color", foreground_rgb, foreground_rgb, foreground_rgb, 0.2f);
 
     vertexes.draw_to (this, positions, GL_LINES);
 
@@ -1096,7 +1099,7 @@ D25ViewWidget::paintGL ()
     vertexes.add (0.8, -0.8, 1.0);
     vertexes.add (0.8, -0.6, 1.0);
 
-    m_gridplane_program->setUniformValue ("color", 1.0, 1.0, 1.0, 0.3f);
+    m_gridplane_program->setUniformValue ("color", foreground_rgb, foreground_rgb, foreground_rgb, 0.3f);
 
     vertexes.draw_to (this, positions, GL_TRIANGLES);
 

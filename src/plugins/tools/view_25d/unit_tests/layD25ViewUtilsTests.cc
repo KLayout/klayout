@@ -92,7 +92,8 @@ TEST(3_HitWithCuboid)
   EXPECT_EQ (v2s (r.second), "1,1,4");
 
   r = lay::hit_point_with_cuboid (QVector3D (1, 1, 6), QVector3D (0, 0, 1), QVector3D (-1, -1, 3), QVector3D (2, 2, 2));
-  EXPECT_EQ (r.first, false);
+  EXPECT_EQ (r.first, true);
+  EXPECT_EQ (v2s (r.second), "1,1,3");
 
   r = lay::hit_point_with_cuboid (QVector3D (5, -6, 0), QVector3D (0, 0, 1), QVector3D (-1, -1, 3), QVector3D (2, 2, 2));
   EXPECT_EQ (r.first, true);
@@ -100,10 +101,19 @@ TEST(3_HitWithCuboid)
 
   r = lay::hit_point_with_cuboid (QVector3D (5, -6, 4), QVector3D (0, 0, 1), QVector3D (-1, -1, 3), QVector3D (2, 2, 2));
   EXPECT_EQ (r.first, true);
-  EXPECT_EQ (v2s (r.second), "5,-6,5");
+  EXPECT_EQ (v2s (r.second), "5,-6,3");
 
   r = lay::hit_point_with_cuboid (QVector3D (5, -6, 6), QVector3D (0, 0, 1), QVector3D (-1, -1, 3), QVector3D (2, 2, 2));
-  EXPECT_EQ (r.first, false);
+  EXPECT_EQ (r.first, true);
+  EXPECT_EQ (v2s (r.second), "5,-6,3");
+
+  r = lay::hit_point_with_cuboid (QVector3D (5, 0, 0), QVector3D (-1, 0, 0), QVector3D (-1, -1, 3), QVector3D (2, 2, 2));
+  EXPECT_EQ (r.first, true);
+  EXPECT_EQ (v2s (r.second), "1,0,0");
+
+  r = lay::hit_point_with_cuboid (QVector3D (-5, 0, 0), QVector3D (1, 0, 0), QVector3D (-1, -1, 3), QVector3D (2, 2, 2));
+  EXPECT_EQ (r.first, true);
+  EXPECT_EQ (v2s (r.second), "-1,0,0");
 }
 
 TEST(4_CameraNormal)

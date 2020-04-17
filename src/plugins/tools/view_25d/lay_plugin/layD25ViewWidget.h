@@ -82,7 +82,7 @@ public:
   void mouseReleaseEvent (QMouseEvent *event);
   void mouseMoveEvent (QMouseEvent *event);
 
-  void attach_view (lay::LayoutView *view);
+  bool attach_view(lay::LayoutView *view);
 
   QVector3D hit_point_with_scene(const QVector3D &line_dir);
   void refresh ();
@@ -138,7 +138,7 @@ private:
   void paintGL ();
   void resizeGL (int w, int h);
 
-  void prepare_view ();
+  bool prepare_view();
   void render_layout (D25ViewWidget::chunks_type &chunks, const db::Layout &layout, const db::Cell &cell, unsigned int layer, double zstart, double zstop);
   void render_polygon (D25ViewWidget::chunks_type &chunks, const db::Polygon &poly, double dbu, double zstart, double zstop);
   void render_wall (D25ViewWidget::chunks_type &chunks, const db::Edge &poly, double dbu, double zstart, double zstop);

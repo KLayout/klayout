@@ -26,6 +26,7 @@
 #include "layLayoutView.h"
 
 #include "dbRecursiveShapeIterator.h"
+#include "dbD25TechnologyComponent.h"
 #include "dbEdgeProcessor.h"
 #include "dbPolygonGenerators.h"
 #include "dbPolygonTools.h"
@@ -412,20 +413,88 @@ D25ViewWidget::aspect_ratio () const
   return double (width ()) / double (height ());
 }
 
-void
+bool
 D25ViewWidget::attach_view (LayoutView *view)
 {
+  bool any = false;
+
   if (mp_view != view) {
 
     mp_view = view;
 
-    prepare_view ();
+    any = prepare_view ();
     reset ();
 
   }
+
+  return any;
 }
 
-void
+namespace {
+
+  class ZDataCache
+  {
+  public:
+    ZDataCache () { }
+
+    const db::D25LayerInfo *operator() (lay::LayoutView *view, int cv_index, int layer_index)
+    {
+      std::map<int, std::map<int, const db::D25LayerInfo *> >::const_iterator c = m_cache.find (cv_index);
+      if (c != m_cache.end ()) {
+        std::map<int, const db::D25LayerInfo *>::const_iterator l = c->second.find (layer_index);
+        if (l != c->second.end ()) {
+          return l->second;
+        } else {
+          return 0;
+        }
+      }
+
+      std::map<int, const db::D25LayerInfo *> &lcache = m_cache [cv_index];
+
+      const db::D25TechnologyComponent *comp = 0;
+
+      const lay::CellView &cv = view->cellview (cv_index);
+      if (cv.is_valid () && cv->technology ()) {
+        const db::Technology *tech = cv->technology ();
+        comp = dynamic_cast<const db::D25TechnologyComponent *> (tech->component_by_name ("d25"));
+      }
+
+      if (comp) {
+
+        std::map<db::LayerProperties, const db::D25LayerInfo *, db::LPLogicalLessFunc> zi_by_lp;
+        for (db::D25TechnologyComponent::const_iterator i = comp->begin (); i != comp->end (); ++i) {
+          zi_by_lp.insert (std::make_pair (i->layer (), i.operator-> ()));
+        }
+
+        const db::Layout &ly = cv->layout ();
+        for (int l = 0; l < int (ly.layers ()); ++l) {
+          if (ly.is_valid_layer (l)) {
+            const db::LayerProperties &lp = ly.get_properties (l);
+            std::map<db::LayerProperties, const db::D25LayerInfo *, db::LPLogicalLessFunc>::const_iterator z = zi_by_lp.find (lp);
+            if (z == zi_by_lp.end () && ! lp.name.empty ()) {
+              //  If possible, try by name only
+              z = zi_by_lp.find (db::LayerProperties (lp.name));
+            }
+            if (z != zi_by_lp.end ()) {
+              lcache[l] = z->second;
+            }
+          }
+        }
+
+      }
+
+      return operator() (view, cv_index, layer_index);
+
+    }
+
+
+  private:
+    std::map<int, std::map<int, const db::D25LayerInfo *> > m_cache;
+  };
+
+}
+
+bool
 D25ViewWidget::prepare_view ()
 {
   m_layers.clear ();
@@ -437,14 +506,25 @@ D25ViewWidget::prepare_view ()
 
   if (! mp_view) {
     m_bbox = db::DBox (-1.0, -1.0, 1.0, 1.0);
-    return;
+    return false;
   }
 
-  double z = 0.0, dz = 0.2; // @@@
+  ZDataCache zdata;
+  bool any = false;
 
   for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
 
-    if (! lp->has_children () && lp->visible (true) && lp->cellview_index () >= 0 && lp->cellview_index () < int (mp_view->cellviews ())) {
+    const db::D25LayerInfo *zi = 0;
+    if (! lp->has_children () && lp->visible (true)) {
+      zi = zdata (mp_view, lp->cellview_index (), lp->layer_index ());
+    }
+
+    if (zi) {
+
+      any = true;
+
+      double z0 = zi->zstart ();
+      double z1 = zi->zstop ();
 
       lay::color_t color = lp->fill_color (true);
 
@@ -459,24 +539,24 @@ D25ViewWidget::prepare_view ()
       m_layers.push_back (info);
 
       const lay::CellView &cv = mp_view->cellview ((unsigned int) lp->cellview_index ());
-      render_layout (m_vertex_chunks.back (), cv->layout (), *cv.cell (), (unsigned int) lp->layer_index (), z, z + dz);
+      render_layout (m_vertex_chunks.back (), cv->layout (), *cv.cell (), (unsigned int) lp->layer_index (), z0, z1);
 
       m_bbox += db::DBox (cv.cell ()->bbox ((unsigned int) lp->layer_index ())) * cv->layout ().dbu ();
 
       if (! zset) {
-        m_zmin = z;
-        m_zmax = z + dz;
+        m_zmin = z0;
+        m_zmax = z1;
         zset = true;
       } else {
-        m_zmin = std::min (z, m_zmin);
-        m_zmax = std::max (z + dz, m_zmax);
+        m_zmin = std::min (z0, m_zmin);
+        m_zmax = std::max (z1, m_zmax);
       }
-
-      z += dz; // @@@
 
     }
 
   }
+
+  return any;
 }
 
 void

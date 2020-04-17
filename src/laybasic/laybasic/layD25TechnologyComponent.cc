@@ -52,6 +52,15 @@ D25TechnologyComponentEditor::D25TechnologyComponentEditor (QWidget *parent)
   input.close ();
 
   hl->setDocument (src_te->document ());
+
+  connect (src_te, SIGNAL (cursorPositionChanged ()), this, SLOT (cursor_position_changed ()));
+}
+
+void
+D25TechnologyComponentEditor::cursor_position_changed ()
+{
+  int line = src_te->textCursor ().block ().firstLineNumber () + 1;
+  lnum_label->setText (tl::to_qstring (tl::sprintf (tl::to_string (tr ("Line %d")), line)));
 }
 
 void

@@ -237,8 +237,31 @@ D25TechnologyComponent::compile_from_source (const std::string &src)
             info.set_zstop (z1.to_double ());
           }
         } else if (args.size () == 1) {
-          info.set_zstop ((! z0.is_nil () ? z0.to_double () : info.zstart ()) + args[0]);
+          if (! h.is_nil ()) {
+            if (! z0.is_nil ()) {
+              throw tl::Exception (tl::to_string (tr ("Rundundant parameters: zstart already given")));
+            }
+            if (! z1.is_nil ()) {
+              throw tl::Exception (tl::to_string (tr ("Rundundant parameters: zstop implicitly given")));
+            }
+            info.set_zstart (args[0]);
+            info.set_zstop (args[0] + h.to_double ());
+          } else {
+            if (! z1.is_nil ()) {
+              throw tl::Exception (tl::to_string (tr ("Rundundant parameters: zstop implicitly given")));
+            }
+            info.set_zstop ((! z0.is_nil () ? z0.to_double () : info.zstart ()) + args[0]);
+          }
         } else if (args.size () == 2) {
+          if (! z0.is_nil ()) {
+            throw tl::Exception (tl::to_string (tr ("Rundundant parameters: zstart already given")));
+          }
+          if (! z1.is_nil ()) {
+            throw tl::Exception (tl::to_string (tr ("Rundundant parameters: zstop already given")));
+          }
+          if (! h.is_nil ()) {
+            throw tl::Exception (tl::to_string (tr ("Rundundant parameters: height implicitly given")));
+          }
           info.set_zstart (args[0]);
           info.set_zstop (args[1]);
         } else {

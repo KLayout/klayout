@@ -39,6 +39,9 @@ TEST(1)
   comp.compile_from_source ("1/0: zstart=1.0 height=0.5");
   EXPECT_EQ (comp.to_string (), "1/0: zstart=1, zstop=1.5");
 
+  comp.compile_from_source ("1/0: 1.0 height=0.5");
+  EXPECT_EQ (comp.to_string (), "1/0: zstart=1, zstop=1.5");
+
   comp.compile_from_source ("1/0: zstop=1.5 height=0.5");
   EXPECT_EQ (comp.to_string (), "1/0: zstart=1, zstop=1.5");
 

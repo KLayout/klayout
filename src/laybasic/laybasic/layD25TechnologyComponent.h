@@ -44,6 +44,9 @@ public:
   void commit ();
   void setup ();
 
+private slots:
+  void cursor_position_changed ();
+
 private:
   std::auto_ptr<lay::GenericSyntaxHighlighterAttributes> mp_hl_attributes, mp_hl_basic_attributes;
 };

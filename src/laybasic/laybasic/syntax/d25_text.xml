@@ -63,7 +63,7 @@
 			<itemData name="Comment" defStyleNum="dsComment"/>
 			<itemData name="Float" defStyleNum="dsFloat"/>
 			<itemData name="Dec" defStyleNum="dsDecVal"/>
-			<itemData name="Symbol" defStyleNum="dsString" color="#D40000"/>
+			<itemData name="Symbol" defStyleNum="dsKeyword"/>
 			<itemData name="String" defStyleNum="dsString"/>
 			<itemData name="Raw String" defStyleNum="dsString" color="#DD4A4A" selColor="#DD4A4A"/>
 

@@ -39,10 +39,8 @@ D25View::D25View (QWidget *parent)
   mp_ui = new Ui::D25View ();
   mp_ui->setupUi (this);
 
-  // @@@ should be an event filter?
   mp_ui->d25_view->setFocusPolicy (Qt::StrongFocus);
   mp_ui->d25_view->setFocus ();
-  // @@@
 
   connect (mp_ui->fit_back, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
   connect (mp_ui->fit_front, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
@@ -103,6 +101,7 @@ D25View::exec_dialog (lay::LayoutView *view)
   mp_ui->d25_view->reset ();
   mp_ui->d25_view->set_cam_azimuth (0.0);
   mp_ui->d25_view->set_cam_elevation (initial_elevation);
+  mp_ui->d25_view->fit ();
 
   int ret = QDialog::exec ();
 

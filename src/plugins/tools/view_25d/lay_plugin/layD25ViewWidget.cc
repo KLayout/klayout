@@ -731,7 +731,7 @@ D25ViewWidget::initializeGL ()
       "   vec4 p2 = gl_in[2].gl_Position;\n"
       "   vec3 n = cross(p2.xyz - p0.xyz, p1.xyz - p0.xyz);\n"
       "   float dp = dot(normalize(n), illum);\n"
-      "   vertexColor = color * (dp * 0.5 + 0.5) - (min(0.0, dp) * 0.5 * ambient);\n"
+      "   vertexColor = color * (dp * 0.5 + 0.5) - (min(0.0, dp) * ambient);\n"
       "   vertexColor.a = 1.0;\n"
       "   gl_Position = matrix * p0;\n"
       "   EmitVertex();\n"
@@ -827,14 +827,13 @@ D25ViewWidget::paintGL ()
   const qreal retinaScale = devicePixelRatio ();
   glViewport (0, 0, width () * retinaScale, height () * retinaScale);
 
-  glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
   QColor c = mp_view->background_color ();
   float foreground_rgb = (c.green () > 128 ? 0.0f : 1.0f);
-  float ambient = (c.green () > 128 ? 1.0f : 0.5f);
+  float ambient = (c.green () > 128 ? 0.8f : 0.25f);
   float mist_factor = (c.green () > 128 ? 0.2f : 0.4f);
   float mist_add = (c.green () > 128 ? 0.8f : 0.2f);
   glClearColor (float (c.red ()) / 255.0f, float (c.green ()) / 255.0f, float (c.blue ()) / 255.0f, 1.0);
+  glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   QMatrix4x4 scene_trans, scene_trans_wo_y;
 
@@ -858,7 +857,7 @@ D25ViewWidget::paintGL ()
   //  NOTE: z axis of illum points towards the scene because we include the z inversion in the scene transformation matrix
   m_shapes_program->setUniformValue ("illum", QVector3D (-3.0, -4.0, 2.0).normalized ());
 
-  m_shapes_program->setUniformValue ("ambient", QVector4D (ambient, ambient, ambient, 0.5));
+  m_shapes_program->setUniformValue ("ambient", QVector4D (ambient, ambient, ambient, 1.0));
   m_shapes_program->setUniformValue ("mist_factor", mist_factor);
   m_shapes_program->setUniformValue ("mist_add", mist_add);
 

@@ -184,7 +184,8 @@ SOURCES = \
     dbLayoutVsSchematic.cc \
     gsiDeclDbNetlistCrossReference.cc \
     gsiDeclDbLayoutVsSchematic.cc \
-    dbNetlistObject.cc
+    dbNetlistObject.cc \
+    dbD25TechnologyComponent.cc
 
 HEADERS = \
   dbArray.h \
@@ -331,7 +332,8 @@ HEADERS = \
     dbLayoutVsSchematicReader.h \
     dbLayoutVsSchematicFormatDefs.h \
     dbLayoutVsSchematic.h \
-    dbNetlistObject.h
+    dbNetlistObject.h \
+    dbD25TechnologyComponent.h
 
 !equals(HAVE_QT, "0") {
 

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+
+<language name="UserPropertiesTextFormat">
+
+	<highlighting>
+
+		<contexts>
+
+			<context name="Normal" attribute="Normal Text">
+
+				<DetectChar attribute="String" char="&quot;" context="Quoted String"/>
+				<DetectChar attribute="Comment" char="#" context="Comment"/>
+				<DetectChar attribute="Raw String" char="'" context="Apostrophed String"/>
+
+				<RegExpr attribute="Normal" String=":" context="After LD"/>
+
+				<RegExpr attribute="Dec" String="\-?[1-9][0-9]*" context="#stay"/>
+				<DetectChar attribute="Normal" char="*" context="#stay"/>
+				<DetectChar attribute="Normal" char="(" context="#stay"/>
+				<DetectChar attribute="Normal" char=")" context="#stay"/>
+				<DetectChar attribute="Normal" char="/" context="#stay"/>
+				<RegExpr attribute="Raw String" String="[_a-zA-Z]\w*" context="#stay"/>
+
+				<RegExpr attribute="Error" String="[^\s]" context="Error"/>
+
+			</context>
+
+			<context name="Comment" attribute="Comment" lineEndContext="Normal">
+      </context>
+
+			<context name="After LD" attribute="Normal" lineEndContext="Normal">
+				<DetectChar attribute="Comment" char="#" context="Comment"/>
+				<RegExpr attribute="Float" String="\-?[0-9]([0-9]|_[0-9])*(\.[0-9]([0-9]|_[0-9])*)?([eE]\-?[1-9]([0-9]|_[0-9])*(\.[0-9]*)?)?" context="#stay"/>
+				<DetectChar attribute="Normal" char="," context="#stay"/>
+				<DetectChar attribute="Normal" char="=" context="#stay"/>
+				<StringDetect attribute="Symbol" String="zstart" context="#stay"/>
+				<StringDetect attribute="Symbol" String="zstop" context="#stay"/>
+				<StringDetect attribute="Symbol" String="height" context="#stay"/>
+				<RegExpr attribute="Error" String="[^\s]" context="Error"/>
+      </context>
+
+			<context name="Error" attribute="Error" lineEndContext="Normal">
+      </context>
+
+			<context name="Quoted String" attribute="String" lineEndContext="Error">
+				<StringDetect attribute="String" String="\\" context="#stay"/>
+				<RegExpr attribute="String" String="\\\&quot;" context="#stay"/>
+				<DetectChar char="&quot;" attribute="String" context="After Key"/>
+			</context>
+
+			<context name="Apostrophed String" attribute="Raw String" lineEndContext="Error">
+				<StringDetect attribute="String" String="\\" context="#stay"/>
+				<RegExpr attribute="String" String="\\\'" context="#stay"/>
+				<DetectChar char="'" attribute="Raw String" context="After Key"/>
+			</context>
+
+    </contexts>
+
+		<itemDatas>
+			<itemData name="Normal Text" defStyleNum="dsNormal"/>
+
+			<itemData name="Comment" defStyleNum="dsComment"/>
+			<itemData name="Float" defStyleNum="dsFloat"/>
+			<itemData name="Dec" defStyleNum="dsDecVal"/>
+			<itemData name="Symbol" defStyleNum="dsString" color="#D40000"/>
+			<itemData name="String" defStyleNum="dsString"/>
+			<itemData name="Raw String" defStyleNum="dsString" color="#DD4A4A" selColor="#DD4A4A"/>
+
+			<!-- use these to mark errors and alerts things -->
+			<itemData name="Error" defStyleNum="dsAlert"/>
+
+		</itemDatas>
+
+	</highlighting>
+</language>

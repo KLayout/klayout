@@ -73,7 +73,8 @@ FORMS = \
     NetInfoDialog.ui \
     NetExportDialog.ui \
     SelectCellViewForm.ui \
-    LayoutStatistics.ui
+    LayoutStatistics.ui \
+    D25TechnologyComponentEditor.ui
 
 RESOURCES = \
     laybasicResources.qrc \
@@ -183,7 +184,8 @@ SOURCES = \
     layGenericSyntaxHighlighter.cc \
     layDispatcher.cc \
     laySelectCellViewForm.cc \
-    layLayoutStatisticsForm.cc
+    layLayoutStatisticsForm.cc \
+    layD25TechnologyComponent.cc
 
 HEADERS = \
   gtf.h \
@@ -284,7 +286,8 @@ HEADERS = \
     layGenericSyntaxHighlighter.h \
     layDispatcher.h \
     laySelectCellViewForm.h \
-    layLayoutStatisticsForm.h
+    layLayoutStatisticsForm.h \
+    layD25TechnologyComponent.h
 
 INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC

@@ -108,7 +108,7 @@ public:
   }
 };
 
-static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new lay::D25PluginDeclaration (), 3000, "lay::D25Plugin");
+static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new lay::D25PluginDeclaration (), 3100, "lay::D25Plugin");
 
 }
 

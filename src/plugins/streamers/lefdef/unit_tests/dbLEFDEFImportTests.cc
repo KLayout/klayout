@@ -51,7 +51,7 @@ static db::LEFDEFReaderOptions default_options ()
 
 static void run_test (tl::TestBase *_this, const char *lef_dir, const char *filename, const char *au, const db::LEFDEFReaderOptions &tc, bool priv = true)
 {
-  db::LEFDEFLayerDelegate ld (&tc);
+  db::LEFDEFReaderState ld (&tc);
 
   db::Manager m (false);
   db::Layout layout (&m), layout2 (&m), layout_au (&m);
@@ -232,7 +232,11 @@ TEST(17)
 
 TEST(18)
 {
-  run_test (_this, "def9", "lef:tech.lef+lef:cells_modified.lef+def:in.def", "au.oas.gz", default_options ());
+  db::LEFDEFReaderOptions options = default_options ();
+  options.set_separate_groups (true);
+  run_test (_this, "def9", "lef:tech.lef+lef:cells_modified.lef+def:in.def", "au.oas.gz", options);
+
+  run_test (_this, "def9", "lef:tech.lef+lef:cells_modified.lef+def:in.def", "au_nogroups.oas.gz", default_options ());
 }
 
 TEST(19)

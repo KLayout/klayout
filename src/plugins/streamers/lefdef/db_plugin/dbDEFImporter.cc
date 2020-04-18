@@ -59,9 +59,9 @@ DEFImporter::DEFImporter ()
 }
 
 void 
-DEFImporter::read_lef (tl::InputStream &stream, db::Layout &layout, LEFDEFLayerDelegate &ld)
+DEFImporter::read_lef (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderState &state)
 {
-  m_lef_importer.read (stream, layout, ld);
+  m_lef_importer.read (stream, layout, state);
 }
 
 
@@ -846,8 +846,9 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
     ViaDesc &vd = m_via_desc.insert (std::make_pair (n, ViaDesc ())).first->second;
 
     //  produce a cell for vias
-    std::string cellname = "VIA_" + n;
+    std::string cellname = options ().via_cellname_prefix () + n;
     db::Cell &cell = layout.cell (layout.add_cell (cellname.c_str ()));
+    reader_state ()->register_via_cell (n, &cell);
     vd.cell = &cell;
 
     bool has_via_rule = false;
@@ -1395,7 +1396,7 @@ DEFImporter::do_read (db::Layout &layout)
 
   db::Cell *others_cell = &design;
 
-  if (! groups.empty ()) {
+  if (! groups.empty () && options ().separate_groups ()) {
 
     others_cell = &layout.cell (layout.add_cell ("NOGROUP"));
     design.insert (db::CellInstArray (others_cell->cell_index (), db::Trans ()));
@@ -1410,16 +1411,21 @@ DEFImporter::do_read (db::Layout &layout)
 
       if (! g->region_name.empty ()) {
 
-        std::map<std::string, std::vector<db::Polygon> >::const_iterator r = regions.find (g->region_name);
+        std::map<std::string, std::vector<db::Polygon> >::iterator r = regions.find (g->region_name);
         if (r == regions.end ()) {
-          warn (tl::sprintf (tl::to_string (tr ("Not a valid region name: %s in group %s")), g->region_name, g->name));
+
+          warn (tl::sprintf (tl::to_string (tr ("Not a valid region name or region is already used: %s in group %s")), g->region_name, g->name));
+
         } else {
+
           std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Region);
           if (dl.first) {
             for (std::vector<db::Polygon>::const_iterator p = r->second.begin (); p != r->second.end (); ++p) {
               group_cell->shapes (dl.second).insert (*p);
             }
           }
+          regions.erase (r);
+
         }
 
       }
@@ -1445,6 +1451,23 @@ DEFImporter::do_read (db::Layout &layout)
 
         }
 
+      }
+
+    }
+
+  }
+
+  //  put all remaining regions into the "others_cell" which is the top cell if there are no groups.
+
+  if (! regions.empty ()) {
+
+    std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Region);
+    if (dl.first) {
+
+      for (std::map<std::string, std::vector<db::Polygon> >::const_iterator r = regions.begin (); r != regions.end (); ++r) {
+        for (std::vector<db::Polygon>::const_iterator p = r->second.begin (); p != r->second.end (); ++p) {
+          others_cell->shapes (dl.second).insert (*p);
+        }
       }
 
     }

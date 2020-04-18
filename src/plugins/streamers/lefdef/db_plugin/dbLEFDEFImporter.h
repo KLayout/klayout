@@ -255,6 +255,16 @@ public:
     m_via_geometry_datatype = s;
   }
 
+  const std::string &via_cellname_prefix () const
+  {
+    return m_via_cellname_prefix;
+  }
+
+  void set_via_cellname_prefix (const std::string &s)
+  {
+    m_via_cellname_prefix = s;
+  }
+
   bool produce_pins () const
   {
     return m_produce_pins;
@@ -435,6 +445,16 @@ public:
     m_lef_files = lf;
   }
 
+  bool separate_groups () const
+  {
+    return m_separate_groups;
+  }
+
+  void set_separate_groups (bool f)
+  {
+    m_separate_groups = f;
+  }
+
 private:
   bool m_read_all_layers;
   db::LayerMap m_layer_map;
@@ -454,6 +474,7 @@ private:
   bool m_produce_via_geometry;
   std::string m_via_geometry_suffix;
   int m_via_geometry_datatype;
+  std::string m_via_cellname_prefix;
   bool m_produce_pins;
   std::string m_pins_suffix;
   int m_pins_datatype;
@@ -469,6 +490,7 @@ private:
   bool m_produce_routing;
   std::string m_routing_suffix;
   int m_routing_datatype;
+  bool m_separate_groups;
   std::vector<std::string> m_lef_files;
 };
 
@@ -493,13 +515,13 @@ enum LayerPurpose
  *
  *  This class will handle the creation and management of layers in the LEF/DEF reader context
  */
-class DB_PLUGIN_PUBLIC LEFDEFLayerDelegate
+class DB_PLUGIN_PUBLIC LEFDEFReaderState
 {
 public:
   /**
    *  @brief Constructor
    */
-  LEFDEFLayerDelegate (const LEFDEFReaderOptions *tc);
+  LEFDEFReaderState (const LEFDEFReaderOptions *tc);
 
   /**
    *  @brief Set the layer map
@@ -547,6 +569,16 @@ public:
   void finish (db::Layout &layout);
 
   /**
+   *  @brief Registers a via cell for the via with the given name
+   */
+  void register_via_cell (const std::string &vn, db::Cell *cell);
+
+  /**
+   *  @brief Gets the via cell for the given via name or 0 if no such via is registered
+   */
+  db::Cell *via_cell (const std::string &vn);
+
+  /**
    *  @brief Get the technology component pointer
    */
   const LEFDEFReaderOptions *tech_comp () const
@@ -560,6 +592,7 @@ private:
   bool m_create_layers;
   int m_laynum;
   std::map<std::string, int> m_default_number;
+  std::map<std::string, db::Cell *> m_via_cells;
   const LEFDEFReaderOptions *mp_tech_comp;
 };
 
@@ -602,7 +635,7 @@ public:
    *
    *  This method reads the layout specified into the given layout
    */
-  void read (tl::InputStream &stream, db::Layout &layout, LEFDEFLayerDelegate &layer_delegate);
+  void read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderState &state);
 
 protected:
   /**
@@ -677,7 +710,7 @@ protected:
    */
   std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose)
   {
-    return mp_layer_delegate->open_layer (layout, name, purpose);
+    return mp_reader_state->open_layer (layout, name, purpose);
   }
 
   /**
@@ -685,7 +718,7 @@ protected:
    */
   void register_layer (const std::string &l)
   {
-    mp_layer_delegate->register_layer (l);
+    mp_reader_state->register_layer (l);
   }
 
   /**
@@ -752,7 +785,22 @@ protected:
     return m_pin_prop_name_id;
   }
 
-protected:
+  /**
+   *  @brief Gets the reader options
+   */
+  const db::LEFDEFReaderOptions &options () const
+  {
+    return m_options;
+  }
+
+  /**
+   *  @brief Gets the reader state object
+   */
+  db::LEFDEFReaderState *reader_state ()
+  {
+    return mp_reader_state;
+  }
+
   void create_generated_via (std::vector<db::Polygon> &bottom,
                              std::vector<db::Polygon> &cut,
                              std::vector<db::Polygon> &top,
@@ -767,7 +815,7 @@ protected:
 private:
   tl::AbsoluteProgress *mp_progress;
   tl::TextInputStream *mp_stream;
-  LEFDEFLayerDelegate *mp_layer_delegate;
+  LEFDEFReaderState *mp_reader_state;
   std::string m_cellname;
   std::string m_fn;
   std::string m_last_token;
@@ -777,6 +825,7 @@ private:
   db::property_names_id_type m_inst_prop_name_id;
   bool m_produce_pin_props;
   db::property_names_id_type m_pin_prop_name_id;
+  db::LEFDEFReaderOptions m_options;
 
   const std::string &next ();
 };

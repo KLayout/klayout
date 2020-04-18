@@ -425,6 +425,7 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
   data->set_produce_via_geometry (produce_via_geometry->isChecked ());
   data->set_via_geometry_suffix (tl::to_string (suffix_via_geometry->text ()));
   data->set_via_geometry_datatype (datatype_via_geometry->text ().toInt ());
+  data->set_via_cellname_prefix (tl::to_string (prefix_via_cellname->text ()));
   data->set_produce_pins (produce_pins->isChecked ());
   data->set_pins_suffix (tl::to_string (suffix_pins->text ()));
   data->set_pins_datatype (datatype_pins->text ().toInt ());
@@ -440,6 +441,7 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
   data->set_produce_labels (produce_labels->isChecked ());
   data->set_labels_suffix (tl::to_string (suffix_labels->text ()));
   data->set_labels_datatype (datatype_labels->text ().toInt ());
+  data->set_separate_groups (separate_groups->isChecked ());
 
   data->clear_lef_files ();
   for (int i = 0; i < lef_files->count (); ++i) {
@@ -477,6 +479,7 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   produce_via_geometry->setChecked (data->produce_via_geometry ());
   suffix_via_geometry->setText (tl::to_qstring (data->via_geometry_suffix ()));
   datatype_via_geometry->setText (QString::number (data->via_geometry_datatype ()));
+  prefix_via_cellname->setText (tl::to_qstring (data->via_cellname_prefix ()));
   produce_pins->setChecked (data->produce_pins ());
   suffix_pins->setText (tl::to_qstring (data->pins_suffix ()));
   datatype_pins->setText (QString::number (data->pins_datatype ()));
@@ -492,6 +495,7 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   produce_labels->setChecked (data->produce_labels ());
   suffix_labels->setText (tl::to_qstring (data->labels_suffix ()));
   datatype_labels->setText (QString::number (data->labels_datatype ()));
+  separate_groups->setChecked (data->separate_groups ());
 
   checkbox_changed ();
 

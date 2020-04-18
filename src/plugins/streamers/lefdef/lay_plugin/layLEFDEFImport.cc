@@ -140,7 +140,7 @@ public:
           }
         }
 
-        db::LEFDEFLayerDelegate layers (&options);
+        db::LEFDEFReaderState layers (&options);
         layers.prepare (*layout);
         layout->dbu (options.dbu ());
 

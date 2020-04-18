@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>775</width>
-    <height>766</height>
+    <height>855</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -200,31 +200,28 @@
      <property name="flat">
       <bool>true</bool>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QGridLayout" name="gridLayout">
       <property name="topMargin">
        <number>4</number>
       </property>
       <property name="bottomMargin">
        <number>4</number>
       </property>
-      <item>
+      <item row="0" column="0">
        <widget class="QLabel" name="label_4">
         <property name="text">
          <string>Layout database unit</string>
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QLineEdit" name="dbu">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+      <item row="0" column="3">
+       <widget class="QLabel" name="label_21">
+        <property name="text">
+         <string>Via cell name prefix</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="2">
        <widget class="QLabel" name="label_5">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -234,6 +231,40 @@
         </property>
         <property name="text">
          <string>µm</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="dbu">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QLineEdit" name="prefix_via_cellname">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QCheckBox" name="separate_groups">
+        <property name="text">
+         <string>Produce a parent cell for each group</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QLabel" name="label_22">
+        <property name="text">
+         <string>Separate groups</string>
         </property>
        </widget>
       </item>

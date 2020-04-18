@@ -84,7 +84,7 @@ static bool is_def_format (const std::string &fn)
  *  the map file.
  */
 static void
-read_map_file (const std::string &path, db::LEFDEFLayerDelegate &layers)
+read_map_file (const std::string &path, db::LEFDEFReaderState &layers)
 {
   tl::log << tl::to_string (tr ("Reading LEF/DEF map file")) << " " << path;
 
@@ -186,7 +186,7 @@ read_map_file (const std::string &path, db::LEFDEFLayerDelegate &layers)
  *  @brief Imports a .map file present next to the input files
  */
 static void
-import_map_file_heuristics (const std::string &main_path, db::LEFDEFLayerDelegate &layers)
+import_map_file_heuristics (const std::string &main_path, db::LEFDEFReaderState &layers)
 {
   std::string input_dir = tl::absolute_path (main_path);
   if (! tl::file_exists (input_dir)) {
@@ -273,11 +273,11 @@ private:
     }
 
     //  Take the layer map and the "read all layers" flag from the reader options - hence we override the
-    db::LEFDEFLayerDelegate layers (lefdef_options);
+    db::LEFDEFReaderState state (lefdef_options);
 
-    import_map_file_heuristics (m_stream.absolute_path (), layers);
+    import_map_file_heuristics (m_stream.absolute_path (), state);
 
-    layers.prepare (layout);
+    state.prepare (layout);
     layout.dbu (lefdef_options->dbu ());
 
     if (import_lef) {
@@ -292,12 +292,12 @@ private:
 
         tl::InputStream lef_stream (lp);
         tl::log << tl::to_string (tr ("Reading")) << " " << lp;
-        importer.read (lef_stream, layout, layers);
+        importer.read (lef_stream, layout, state);
 
       }
 
       tl::log << tl::to_string (tr ("Reading")) << " " << m_stream.source ();
-      importer.read (m_stream, layout, layers);
+      importer.read (m_stream, layout, state);
 
     } else {
 
@@ -311,7 +311,7 @@ private:
 
         tl::InputStream lef_stream (lp);
         tl::log << tl::to_string (tr ("Reading")) << " " << lp;
-        importer.read_lef (lef_stream, layout, layers);
+        importer.read_lef (lef_stream, layout, state);
 
       }
 
@@ -330,7 +330,7 @@ private:
             std::string lp = tl::combine_path (input_dir, *e);
             tl::InputStream lef_stream (lp);
             tl::log << tl::to_string (tr ("Reading")) << " " << lp;
-            importer.read_lef (lef_stream, layout, layers);
+            importer.read_lef (lef_stream, layout, state);
 
           }
 
@@ -339,13 +339,13 @@ private:
       }
 
       tl::log << tl::to_string (tr ("Reading")) << " " << m_stream.source ();
-      importer.read (m_stream, layout, layers);
+      importer.read (m_stream, layout, state);
 
     }
 
-    layers.finish (layout);
+    state.finish (layout);
 
-    m_layer_map = layers.layer_map ();
+    m_layer_map = state.layer_map ();
     return m_layer_map;
   }
 };

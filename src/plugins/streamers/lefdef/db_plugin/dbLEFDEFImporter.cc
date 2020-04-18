@@ -52,6 +52,7 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
     m_produce_via_geometry (true),
     m_via_geometry_suffix (""),
     m_via_geometry_datatype (0),
+    m_via_cellname_prefix ("VIA_"),
     m_produce_pins (true),
     m_pins_suffix (".PIN"),
     m_pins_datatype (2),
@@ -66,7 +67,8 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
     m_labels_datatype (1),
     m_produce_routing (true),
     m_routing_suffix (""),
-    m_routing_datatype (0)
+    m_routing_datatype (0),
+    m_separate_groups (false)
 {
   //  .. nothing yet ..
 }
@@ -90,6 +92,7 @@ LEFDEFReaderOptions::LEFDEFReaderOptions (const LEFDEFReaderOptions &d)
     m_produce_via_geometry (d.m_produce_via_geometry),
     m_via_geometry_suffix (d.m_via_geometry_suffix),
     m_via_geometry_datatype (d.m_via_geometry_datatype),
+    m_via_cellname_prefix (d.m_via_cellname_prefix),
     m_produce_pins (d.m_produce_pins),
     m_pins_suffix (d.m_pins_suffix),
     m_pins_datatype (d.m_pins_datatype),
@@ -105,6 +108,7 @@ LEFDEFReaderOptions::LEFDEFReaderOptions (const LEFDEFReaderOptions &d)
     m_produce_routing (d.m_produce_routing),
     m_routing_suffix (d.m_routing_suffix),
     m_routing_datatype (d.m_routing_datatype),
+    m_separate_groups (d.m_separate_groups),
     m_lef_files (d.m_lef_files)
 {
   //  .. nothing yet ..
@@ -126,7 +130,7 @@ LEFDEFReaderOptions::format_name () const
 // -----------------------------------------------------------------------------------
 //  LEFDEFLayerDelegate implementation
 
-LEFDEFLayerDelegate::LEFDEFLayerDelegate (const LEFDEFReaderOptions *tc)
+LEFDEFReaderState::LEFDEFReaderState (const LEFDEFReaderOptions *tc)
   : m_create_layers (true), m_laynum (1), mp_tech_comp (tc)
 {
   if (tc) {
@@ -136,14 +140,14 @@ LEFDEFLayerDelegate::LEFDEFLayerDelegate (const LEFDEFReaderOptions *tc)
 }
 
 void
-LEFDEFLayerDelegate::register_layer (const std::string &ln)
+LEFDEFReaderState::register_layer (const std::string &ln)
 {
   m_default_number.insert (std::make_pair (ln, m_laynum));
   ++m_laynum;
 }
 
 std::pair <bool, unsigned int> 
-LEFDEFLayerDelegate::open_layer (db::Layout &layout, const std::string &n, LayerPurpose purpose) 
+LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPurpose purpose)
 {
   if (purpose == Outline || purpose == PlacementBlockage || purpose == Region) {
 
@@ -327,13 +331,13 @@ LEFDEFLayerDelegate::open_layer (db::Layout &layout, const std::string &n, Layer
 }
 
 void
-LEFDEFLayerDelegate::prepare (db::Layout &layout)
+LEFDEFReaderState::prepare (db::Layout &layout)
 {
   m_layer_map.prepare (layout);
 }
 
 void
-LEFDEFLayerDelegate::finish (db::Layout &layout)
+LEFDEFReaderState::finish (db::Layout &layout)
 {
   int lnum = 0;
 
@@ -393,11 +397,24 @@ LEFDEFLayerDelegate::finish (db::Layout &layout)
   }
 }
 
+void
+LEFDEFReaderState::register_via_cell (const std::string &vn, db::Cell *cell)
+{
+  m_via_cells [vn] = cell;
+}
+
+db::Cell *
+LEFDEFReaderState::via_cell (const std::string &vn)
+{
+  std::map<std::string, db::Cell *>::const_iterator i = m_via_cells.find (vn);
+  return i != m_via_cells.end () ? i->second : 0;
+}
+
 // -----------------------------------------------------------------------------------
 //  LEFDEFImporter implementation
 
 LEFDEFImporter::LEFDEFImporter ()
-  : mp_progress (0), mp_stream (0), mp_layer_delegate (0),
+  : mp_progress (0), mp_stream (0), mp_reader_state (0),
     m_produce_net_props (false), m_net_prop_name_id (0),
     m_produce_inst_props (false), m_inst_prop_name_id (0),
     m_produce_pin_props (false), m_pin_prop_name_id (0)
@@ -411,7 +428,7 @@ LEFDEFImporter::~LEFDEFImporter ()
 }
 
 void 
-LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFLayerDelegate &ld)
+LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderState &state)
 {
   m_fn = stream.filename ();
 
@@ -420,34 +437,39 @@ LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFLayerDe
   progress.set_format_unit (1000.0);
   progress.set_unit (10000.0);
 
+  mp_reader_state = &state;
+
+  if (state.tech_comp ()) {
+    m_options = *state.tech_comp ();
+  }
+
   m_produce_net_props = false;
   m_net_prop_name_id = 0;
 
-  if (ld.tech_comp () && ld.tech_comp ()->produce_net_names ()) {
+  if (m_options.produce_net_names ()) {
     m_produce_net_props = true;
-    m_net_prop_name_id = layout.properties_repository ().prop_name_id (ld.tech_comp ()->net_property_name ());
+    m_net_prop_name_id = layout.properties_repository ().prop_name_id (m_options.net_property_name ());
   }
 
   m_produce_inst_props = false;
   m_inst_prop_name_id = 0;
 
-  if (ld.tech_comp () && ld.tech_comp ()->produce_inst_names ()) {
+  if (m_options.produce_inst_names ()) {
     m_produce_inst_props = true;
-    m_inst_prop_name_id = layout.properties_repository ().prop_name_id (ld.tech_comp ()->inst_property_name ());
+    m_inst_prop_name_id = layout.properties_repository ().prop_name_id (m_options.inst_property_name ());
   }
 
   m_produce_pin_props = false;
   m_pin_prop_name_id = 0;
 
-  if (ld.tech_comp () && ld.tech_comp ()->produce_pin_names ()) {
+  if (m_options.produce_pin_names ()) {
     m_produce_pin_props = true;
-    m_pin_prop_name_id = layout.properties_repository ().prop_name_id (ld.tech_comp ()->pin_property_name ());
+    m_pin_prop_name_id = layout.properties_repository ().prop_name_id (m_options.pin_property_name ());
   }
 
   try {
 
     mp_progress = &progress;
-    mp_layer_delegate = &ld;
     mp_stream = new tl::TextInputStream (stream);
 
     do_read (layout); 

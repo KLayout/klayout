@@ -345,20 +345,18 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
       points.push_back (db::Vector (db::DVector (x / dbu, y / dbu)));
 
       std::string vn = get ();
-      std::pair<bool, db::cell_index_type> cn = layout.cell_by_name (("VIA_" + vn).c_str ());
-      if (! cn.first) {
+      db::Cell *vc = reader_state ()->via_cell (vn);
+      if (! vc) {
         warn ("Unknown via: " + vn);
       }
 
       if (iterate) {
         std::vector<db::Trans> ti = get_iteration (layout);
-        if (cn.first) {
-          for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
-            cell.insert (db::CellInstArray (db::CellInst (cn.second), *t * db::Trans (points [0])));
-          }
+        for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
+          cell.insert (db::CellInstArray (db::CellInst (vc->cell_index ()), *t * db::Trans (points [0])));
         }
-      } else if (cn.first) {
-        cell.insert (db::CellInstArray (db::CellInst (cn.second), db::Trans (points [0])));
+      } else {
+        cell.insert (db::CellInstArray (db::CellInst (vc->cell_index ()), db::Trans (points [0])));
       }
 
       expect (";");
@@ -565,8 +563,9 @@ LEFImporter::read_viadef (Layout &layout)
   std::string n = get ();
 
   //  produce a cell for vias
-  std::string cellname = "VIA_" + n;
+  std::string cellname = options ().via_cellname_prefix () + n;
   db::Cell &cell = layout.cell (layout.add_cell (cellname.c_str ()));
+  reader_state ()->register_via_cell (n, &cell);
 
   ViaDesc &via_desc = m_vias[n];
   via_desc.cell = &cell;

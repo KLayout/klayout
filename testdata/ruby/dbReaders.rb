@@ -249,6 +249,10 @@ class DBReaders_TestClass < TestBase
     conf.via_geometry_suffix = "XVIA"
     assert_equal(conf.via_geometry_suffix, "XVIA")
 
+    assert_equal(conf.via_cellname_prefix, "VIA_")
+    conf.via_cellname_prefix = "ABC"
+    assert_equal(conf.via_cellname_prefix, "ABC")
+
     assert_equal(conf.via_geometry_datatype, 0)
     conf.via_geometry_datatype = 17
     assert_equal(conf.via_geometry_datatype, 17)
@@ -312,6 +316,10 @@ class DBReaders_TestClass < TestBase
     assert_equal(conf.routing_datatype, 0)
     conf.routing_datatype = 22
     assert_equal(conf.routing_datatype, 22)
+
+    assert_equal(conf.separate_groups, false)
+    conf.separate_groups = true
+    assert_equal(conf.separate_groups, true)
 
     assert_equal(conf.lef_files.join(","), "")
     conf.lef_files = [ "u.lef", "v.lef" ]

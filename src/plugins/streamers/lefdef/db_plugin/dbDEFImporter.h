@@ -56,7 +56,7 @@ public:
    *  This method reads the layout specified into the given layout.
    *  Multiple LEF files can be read.
    */
-  void read_lef (tl::InputStream &stream, db::Layout &layout, LEFDEFLayerDelegate &ld);
+  void read_lef (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderState &state);
 
 protected:
   void do_read (db::Layout &layout);

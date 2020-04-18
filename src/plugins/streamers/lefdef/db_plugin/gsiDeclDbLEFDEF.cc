@@ -260,6 +260,18 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "@brief Sets the via geometry layer datatype value.\n"
     "See \\produce_via_geometry for details about this property.\n"
   ) +
+  gsi::method ("via_cellname_prefix", &db::LEFDEFReaderOptions::via_cellname_prefix,
+    "@brief Gets the via cellname prefix.\n"
+    "Vias are represented by cells. The cell name is formed by combining the via cell name prefix and the via name.\n"
+    "\n"
+    "This property has been added in version 0.26.5.\n"
+  ) +
+  gsi::method ("via_cellname_prefix=", &db::LEFDEFReaderOptions::set_via_cellname_prefix, gsi::arg ("prefix"),
+    "@brief Sets the via cellname prefix.\n"
+    "See \\via_cellname_prefix for details about this property.\n"
+    "\n"
+    "This property has been added in version 0.26.5.\n"
+  ) +
   gsi::method ("produce_pins", &db::LEFDEFReaderOptions::produce_pins,
     "@brief Gets a value indicating whether pin geometries shall be produced.\n"
     "See \\produce_via_geometry for details about the layer production rules."
@@ -379,6 +391,20 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
   gsi::method ("routing_datatype=", &db::LEFDEFReaderOptions::set_routing_datatype, gsi::arg ("datatype"),
     "@brief Sets the routing layer datatype value.\n"
     "See \\produce_via_geometry for details about the layer production rules."
+  ) +
+  gsi::method ("separate_groups", &db::LEFDEFReaderOptions::separate_groups,
+    "@brief Gets a value indicating whether to create separate parent cells for individual groups.\n"
+    "If this property is set to true, instances belonging to different groups are separated by putting them into "
+    "individual parent cells. These parent cells are named after the groups and are put into the master top cell.\n"
+    "If this property is set to false (the default), no such group parents will be formed."
+    "\n"
+    "This property has been added in version 0.26.5.\n"
+  ) +
+  gsi::method ("separate_groups=", &db::LEFDEFReaderOptions::set_separate_groups, gsi::arg ("flag"),
+    "@brief Gets a value indicating whether to create separate parent cells for individual groups.\n"
+    "See \\seperate_groups for details about this property.\n"
+    "\n"
+    "This property has been added in version 0.26.5.\n"
   ) +
   gsi::method ("lef_files", &db::LEFDEFReaderOptions::lef_files,
     "@brief Gets the list technology LEF files to additionally import\n"

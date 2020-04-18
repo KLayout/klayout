@@ -773,17 +773,19 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
       } else {
 
         bool prefixed = false;
+        bool can_have_rect_or_polygon = true;
 
         if ((was_shield = test ("SHIELD")) == true || test ("NOSHIELD") || test ("ROUTED") || test ("FIXED") || test ("COVER")) {
           if (was_shield) {
             take ();
           }
           prefixed = true;
+          can_have_rect_or_polygon = test ("+");
         }
 
         bool any = false;
 
-        if (test ("POLYGON")) {
+        if (can_have_rect_or_polygon && test ("POLYGON")) {
 
           std::string ln = get ();
 
@@ -801,7 +803,7 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
 
           any = true;
 
-        } else if (test ("RECT")) {
+        } else if (can_have_rect_or_polygon && test ("RECT")) {
 
           std::string ln = get ();
 

@@ -6815,7 +6815,7 @@ LayoutView::menu_activated (const std::string &symbol)
     }
   } else if (symbol == "cm_delete_layer") {
     if (active_cellview_index () >= 0) {
-      cm_edit_layer ();
+      cm_delete_layer ();
     }
   } else if (symbol == "cm_clear_layer") {
     if (active_cellview_index () >= 0) {

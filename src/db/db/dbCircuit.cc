@@ -344,6 +344,10 @@ void Circuit::remove_net (Net *net)
 
 void Circuit::join_nets (Net *net, Net *with)
 {
+  if (net == with || ! with) {
+    return;
+  }
+
   while (with->begin_terminals () != with->end_terminals ()) {
     db::Device *device = const_cast<db::Device *> (with->begin_terminals ()->device ());
     device->connect_terminal (with->begin_terminals ()->terminal_id (), net);
@@ -426,15 +430,21 @@ void Circuit::flatten_subcircuit (SubCircuit *subcircuit)
 
   for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
 
-    //  TODO: cannot join pins through subcircuits currently
-    tl_assert (n->pin_count () <= 1);
-
     db::Net *outside_net = 0;
 
     if (n->pin_count () > 0) {
 
-      size_t pin_id = n->begin_pins ()->pin_id ();
-      outside_net = subcircuit->net_for_pin (pin_id);
+      for (db::Net::const_pin_iterator p = n->begin_pins (); p != n->end_pins (); ++p) {
+
+        size_t pin_id = p->pin_id ();
+
+        if (outside_net) {
+          join_nets (outside_net, subcircuit->net_for_pin (pin_id));
+        } else {
+          outside_net = subcircuit->net_for_pin (pin_id);
+        }
+
+      }
 
     } else {
 

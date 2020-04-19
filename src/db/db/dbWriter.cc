@@ -26,6 +26,8 @@
 #include "tlClassRegistry.h"
 #include "tlAssert.h"
 #include "tlStream.h"
+#include "tlTimer.h"
+#include "tlLog.h"
 
 namespace db
 {
@@ -54,6 +56,8 @@ Writer::~Writer ()
 void 
 Writer::write (db::Layout &layout, tl::OutputStream &stream)
 {
+  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Writing file: ")) + stream.path ());
+
   tl_assert (mp_writer != 0);
   mp_writer->write (layout, stream, m_options);
 }

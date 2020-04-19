@@ -111,7 +111,7 @@ MAGReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   m_tech.clear ();
 
   {
-    tl::SelfTimer timer (tl::verbosity () >= 21, "Reading MAGIC file tree");
+    tl::SelfTimer timer (tl::verbosity () >= 11, "Reading MAGIC file tree");
 
     //  This is the seed
     do_read (layout, top_cell, m_stream);

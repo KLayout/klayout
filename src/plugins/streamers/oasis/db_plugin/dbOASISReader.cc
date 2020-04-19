@@ -689,8 +689,6 @@ static const char magic_bytes[] = { "%SEMI-OASIS\015\012" };
 void 
 OASISReader::do_read (db::Layout &layout)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 21, "File read");
-
   unsigned char r;
   char *mb;
 

@@ -125,10 +125,7 @@ public:
    *  @param layout The layout object to write to
    *  @param options The LayerMap object
    */
-  const db::LayerMap &read (db::Layout &layout, const db::LoadLayoutOptions &options) 
-  {
-    return mp_actual_reader->read (layout, options);
-  }
+  const db::LayerMap &read (db::Layout &layout, const db::LoadLayoutOptions &options);
 
   /** 
    *  @brief The basic read method (without mapping)
@@ -143,10 +140,7 @@ public:
    *  @param layout The layout object to write to
    *  @return The LayerMap object
    */
-  const db::LayerMap &read (db::Layout &layout)
-  {
-    return mp_actual_reader->read (layout);
-  }
+  const db::LayerMap &read (db::Layout &layout);
 
   /**
    *  @brief Returns a format describing the file format found

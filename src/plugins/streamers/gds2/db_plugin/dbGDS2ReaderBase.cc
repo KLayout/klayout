@@ -233,8 +233,6 @@ eq_y (const GDS2XY &a, const GDS2XY &b)
 void 
 GDS2ReaderBase::do_read (db::Layout &layout) 
 {
-  tl::SelfTimer timer (tl::verbosity () >= 21, "File read");
-
   m_cellname = "";
   m_libname = "";
   m_mapped_cellnames.clear ();

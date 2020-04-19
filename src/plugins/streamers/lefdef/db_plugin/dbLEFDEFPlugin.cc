@@ -272,7 +272,6 @@ private:
       lefdef_options = &default_options;
     }
 
-    //  Take the layer map and the "read all layers" flag from the reader options - hence we override the
     db::LEFDEFReaderState state (lefdef_options);
 
     import_map_file_heuristics (m_stream.absolute_path (), state);
@@ -282,7 +281,7 @@ private:
 
     if (import_lef) {
 
-      tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Reading LEF file")));
+      tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file")));
 
       db::LEFImporter importer;
 
@@ -301,7 +300,7 @@ private:
 
     } else {
 
-      tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Reading DEF file")));
+      tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading DEF file")));
 
       DEFImporter importer;
 

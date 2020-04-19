@@ -30,6 +30,7 @@
 #include "dbLEFImporter.h"
 #include "dbDEFImporter.h"
 #include "dbLEFDEFImporter.h"
+#include "dbLayoutUtils.h"
 
 namespace db
 {
@@ -75,156 +76,6 @@ static bool is_def_format (const std::string &fn)
   }
 
   return false;
-}
-
-/**
- *  @brief Reads a map file
- *
- *  NOTE: this is rather experimental ... no idea what is the specification of
- *  the map file.
- */
-static void
-read_map_file (const std::string &path, db::LEFDEFReaderState &layers)
-{
-  tl::log << tl::to_string (tr ("Reading LEF/DEF map file")) << " " << path;
-
-  db::LayerMap &lm = layers.layer_map ();
-  unsigned int n = lm.next_index ();
-
-  tl::InputFile file (path);
-  tl::InputStream file_stream (file);
-  tl::TextInputStream ts (file_stream);
-
-  std::map<std::string, std::string> purpose_translation;
-  purpose_translation ["LEFPIN"] = "LEFPIN";
-  purpose_translation ["PIN"] = "PIN";
-  purpose_translation ["LEFOBS"] = "OBS";
-  purpose_translation ["SPNET"] = "SPNET";
-  purpose_translation ["NET"] = "NET";
-  purpose_translation ["VIA"] = "VIA";
-  purpose_translation ["BLOCKAGE"] = "BLK";
-
-  while (! ts.at_end ()) {
-
-    const std::string &l = ts.get_line ();
-
-    tl::Extractor ex (l.c_str ());
-    if (ex.at_end () || ex.test ("#")) {
-
-      //  ignore empty of comment lines
-
-    } else {
-
-      std::string w1, w2;
-      int layer = 0, datatype = 0;
-
-      if (ex.try_read_word (w1) && ex.try_read_word (w2, "._$,/:") && ex.try_read (layer) && ex.try_read (datatype)) {
-
-        if (w1 == "DIEAREA") {
-
-          std::string canonical_name = "OUTLINE";
-          lm.map (db::LayerProperties (canonical_name), n++, db::LayerProperties (layer, datatype));
-
-        } else if (w1 == "NAME") {
-
-          //  converts a line like
-          //    "NAME M1/PINS,M2/PINS ..."
-          //  into a canonical name mapping like
-          //    "(M1/LABELS): M1.LABEL"
-          //    "(M2/LABELS): M2.LABEL"
-
-          std::vector<std::string> layers;
-          std::vector<std::string> purposes = tl::split (w2, ",");
-          for (std::vector<std::string>::const_iterator p = purposes.begin (); p != purposes.end (); ++p) {
-            layers.push_back (tl::split (*p, "/").front ());
-          }
-
-          std::string final_name = tl::join (layers, "/") + ".LABEL";
-          for (std::vector<std::string>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-            std::string canonical_name = std::string ("(") + *l + ",LABEL)";
-            lm.map (db::LayerProperties (canonical_name), n, db::LayerProperties (layer, datatype, final_name));
-          }
-          ++n;
-
-        } else {
-
-          //  converts a line like
-          //    "M1 SPNET,NET,PINS,LEFPINS ..."
-          //  into a canonical name mapping like
-          //    "(M1,NET):  M1.NET/PINS"
-          //    "(M1,PINS): M1.NET/PINS"
-          //  (separating, translating and recombing the purposes)
-
-          std::vector<std::string> translated_purposes;
-          std::vector<std::string> purposes = tl::split (w2, ",");
-          for (std::vector<std::string>::const_iterator p = purposes.begin (); p != purposes.end (); ++p) {
-            std::map<std::string, std::string>::const_iterator i = purpose_translation.find (tl::to_upper_case (*p));
-            if (i != purpose_translation.end ()) {
-              translated_purposes.push_back (i->second);
-            }
-          }
-
-          std::sort (translated_purposes.begin (), translated_purposes.end ());
-          translated_purposes.erase (std::unique (translated_purposes.begin (), translated_purposes.end ()), translated_purposes.end ());
-          std::string final_name = w1 + "." + tl::join (translated_purposes, "/");
-
-          for (std::vector<std::string>::const_iterator p = translated_purposes.begin (); p != translated_purposes.end (); ++p) {
-            std::string canonical_name = std::string ("(") + w1 + "," + *p + ")";
-            lm.map (db::LayerProperties (canonical_name), n, db::LayerProperties (layer, datatype, final_name));
-          }
-          ++n;
-
-        }
-
-      }
-
-    }
-
-  }
-}
-
-/**
- *  @brief Imports a .map file present next to the input files
- */
-static void
-import_map_file_heuristics (const std::string &main_path, db::LEFDEFReaderState &layers)
-{
-  std::string input_dir = tl::absolute_path (main_path);
-  if (! tl::file_exists (input_dir)) {
-    return;
-  }
-
-  std::string bn = tl::basename (tl::filename (main_path));
-  std::vector<std::string> map_files;
-  std::string map_file_exact;
-
-  std::vector<std::string> entries = tl::dir_entries (input_dir);
-  for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
-
-    if (tl::to_lower_case (tl::extension (*e)) == "map") {
-
-      if (tl::basename (*e) == bn) {
-        map_file_exact = *e;
-      } else {
-        map_files.push_back (*e);
-      }
-
-    }
-
-  }
-
-  try {
-    if (! map_file_exact.empty ()) {
-      read_map_file (tl::combine_path (input_dir, map_file_exact), layers);
-      tl::log << layers.layer_map ().to_string_file_format (); // @@@
-    } else if (map_files.size () == 1) {
-      read_map_file (tl::combine_path (input_dir, map_files.front ()), layers);
-      tl::log << layers.layer_map ().to_string_file_format (); // @@@
-    }
-  } catch (tl::Exception &ex) {
-    //  ignore read errors on map file (this is a heuristics!)
-    tl::error << ex.msg ();
-  }
 }
 
 class LEFDEFReader
@@ -275,7 +126,9 @@ private:
 
     db::LEFDEFReaderState state (lefdef_options);
 
-    import_map_file_heuristics (m_stream.absolute_path (), state);
+    if (lefdef_options->consider_map_file ()) {
+      state.import_map_file_heuristics (m_stream.absolute_path (), layout);
+    }
 
     state.prepare (layout);
     layout.dbu (lefdef_options->dbu ());

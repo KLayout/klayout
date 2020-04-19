@@ -98,6 +98,7 @@ private slots:
   void del_lef_files_clicked ();
   void move_lef_files_up_clicked ();
   void move_lef_files_down_clicked ();
+  void consider_map_file_state_changed ();
 
 private:
   tl::weak_ptr<db::Technology> mp_tech;

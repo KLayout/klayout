@@ -69,7 +69,15 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
 
   while (! ex.at_end ()) {
 
-    if (ex.test ("def:")) {
+    if (ex.test ("map:")) {
+
+      std::string fn = fn_path, f;
+      ex.read_word_or_quoted (f);
+      fn += f;
+
+      ld.read_map_file (fn, layout);
+
+    } else if (ex.test ("def:")) {
 
       std::string fn = fn_path, f;
       ex.read_word_or_quoted (f);
@@ -230,6 +238,7 @@ TEST(15)
 TEST(16)
 {
   run_test (_this, "def7", "lef:cells.lef+lef:tech.lef+def:in.def.gz", "au.oas.gz", default_options ());
+  run_test (_this, "def7", "map:in.map+lef:cells.lef+lef:tech.lef+def:in.def.gz", "au_with_map_file.oas.gz", default_options ());
 }
 
 TEST(17)

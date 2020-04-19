@@ -461,8 +461,22 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "This property has been added in version 0.26.5.\n"
   ) +
   gsi::method ("separate_groups=", &db::LEFDEFReaderOptions::set_separate_groups, gsi::arg ("flag"),
-    "@brief Gets a value indicating whether to create separate parent cells for individual groups.\n"
+    "@brief Sets a value indicating whether to create separate parent cells for individual groups.\n"
     "See \\seperate_groups for details about this property.\n"
+    "\n"
+    "This property has been added in version 0.26.5.\n"
+  ) +
+  gsi::method ("consider_map_file", &db::LEFDEFReaderOptions::consider_map_file,
+    "@brief Gets a value indicating whether to consider reading .map files next to DEF files.\n"
+    "If this property is set to true (the default), the DEF reader will look for .map files next to the "
+    "DEF file. If such a file is found, it will be used to map DEF layers to layout layers. The layer mapping "
+    "settings specified in the reader options are ignored in this case.\n"
+    "\n"
+    "This property has been added in version 0.26.5.\n"
+  ) +
+  gsi::method ("consider_map_file=", &db::LEFDEFReaderOptions::set_consider_map_file, gsi::arg ("flag"),
+    "@brief Sets a value indicating whether to consider reading .map files next to DEF files.\n"
+    "See \\consider_map_file for details about this property.\n"
     "\n"
     "This property has been added in version 0.26.5.\n"
   ) +

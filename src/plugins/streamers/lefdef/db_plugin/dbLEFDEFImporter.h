@@ -515,6 +515,16 @@ public:
     m_separate_groups = f;
   }
 
+  bool consider_map_file () const
+  {
+    return m_consider_map_file;
+  }
+
+  void set_consider_map_file (bool f)
+  {
+    m_consider_map_file = f;
+  }
+
 private:
   bool m_read_all_layers;
   db::LayerMap m_layer_map;
@@ -557,6 +567,7 @@ private:
   std::string m_special_routing_suffix;
   int m_special_routing_datatype;
   bool m_separate_groups;
+  bool m_consider_map_file;
   std::vector<std::string> m_lef_files;
 };
 
@@ -592,7 +603,32 @@ public:
   LEFDEFReaderState (const LEFDEFReaderOptions *tc);
 
   /**
-   *  @brief Set the layer map
+   *  @brief Provides an explicit layer mapping
+   *  This method is used when reading the layer map file.
+   */
+  void map_layer_explicit (const std::string &n, LayerPurpose purpose, unsigned int layer);
+
+  /**
+   *  @brief Provides an explicit layer mapping
+   *  If this flag is set, the layer mapping specified in the reader options are ignored.
+   */
+  void set_explicit_layer_mapping (bool f);
+
+  /**
+   *  @brief Reads a map file
+   */
+  void read_map_file (const std::string &path, db::Layout &layout);
+
+  /**
+   *  @brief Imports a .map file present next to the input files
+   *  "main_path" path of an input file (DEF). If a suitable .map file is found at this path,
+   *  it is loaded into the reader state object. This will eventually disable any other layer
+   *  mapping except for the global layers (region, outline, placement blockage).
+   */
+  void import_map_file_heuristics (const std::string &main_path, db::Layout &layout);
+
+  /**
+   *  @brief Sets the layer map
    */
   virtual void set_layer_map (const db::LayerMap &lm, bool create_layers)
   {
@@ -601,7 +637,7 @@ public:
   }
 
   /**
-   *  @brief Get the layer map
+   *  @brief Gets the layer map
    */
   const db::LayerMap &layer_map () const
   {
@@ -609,7 +645,7 @@ public:
   }
 
   /**
-   *  @brief Get the layer map (non-const version)
+   *  @brief Gets the layer map (non-const version)
    */
   db::LayerMap &layer_map ()
   {
@@ -655,13 +691,17 @@ public:
   }
 
 private:
-  std::map <std::pair<std::string, LayerPurpose>, unsigned int> m_layers;
+  std::map <std::pair<std::string, LayerPurpose>, std::pair<bool, unsigned int> > m_layers;
+  std::map <std::pair<std::string, LayerPurpose>, unsigned int> m_unassigned_layers;
   db::LayerMap m_layer_map;
   bool m_create_layers;
+  bool m_has_explicit_layer_mapping;
   int m_laynum;
   std::map<std::string, int> m_default_number;
   std::map<std::string, db::Cell *> m_via_cells;
   const LEFDEFReaderOptions *mp_tech_comp;
+
+  std::pair <bool, unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose);
 };
 
 /**

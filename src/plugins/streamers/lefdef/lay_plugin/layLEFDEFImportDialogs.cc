@@ -363,6 +363,7 @@ LEFDEFReaderOptionsEditor::LEFDEFReaderOptionsEditor (QWidget *parent)
   connect (del_lef_files, SIGNAL (clicked ()), this, SLOT (del_lef_files_clicked ()));
   connect (move_lef_files_up, SIGNAL (clicked ()), this, SLOT (move_lef_files_up_clicked ()));
   connect (move_lef_files_down, SIGNAL (clicked ()), this, SLOT (move_lef_files_down_clicked ()));
+  connect (consider_map_file, SIGNAL (stateChanged (int)), this, SLOT (consider_map_file_state_changed ()));
 
   lay::activate_help_links (help_label);
 }
@@ -450,6 +451,7 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
   data->set_labels_suffix (tl::to_string (suffix_labels->text ()));
   data->set_labels_datatype (datatype_labels->text ().toInt ());
   data->set_separate_groups (separate_groups->isChecked ());
+  data->set_consider_map_file (consider_map_file->isChecked ());
 
   data->clear_lef_files ();
   for (int i = 0; i < lef_files->count (); ++i) {
@@ -510,6 +512,7 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   suffix_labels->setText (tl::to_qstring (data->labels_suffix ()));
   datatype_labels->setText (QString::number (data->labels_datatype ()));
   separate_groups->setChecked (data->separate_groups ());
+  consider_map_file->setChecked (data->consider_map_file ());
 
   checkbox_changed ();
 
@@ -524,6 +527,13 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   for (int i = 0; i < lef_files->count (); ++i) {
     lef_files->item (i)->setFlags (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
   }
+}
+
+void
+LEFDEFReaderOptionsEditor::consider_map_file_state_changed ()
+{
+  warn1->setVisible (consider_map_file->isChecked ());
+  warn2->setVisible (consider_map_file->isChecked ());
 }
 
 void  

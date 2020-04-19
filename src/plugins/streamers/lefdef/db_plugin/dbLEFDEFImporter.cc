@@ -22,9 +22,11 @@
 
 
 #include "dbLEFDEFImporter.h"
+#include "dbLayoutUtils.h"
 
 #include "tlStream.h"
 #include "tlProgress.h"
+#include "tlFileUtils.h"
 
 #include <cctype>
 
@@ -74,7 +76,8 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
     m_produce_special_routing (true),
     m_special_routing_suffix (""),
     m_special_routing_datatype (0),
-    m_separate_groups (false)
+    m_separate_groups (false),
+    m_consider_map_file (true)
 {
   //  .. nothing yet ..
 }
@@ -121,6 +124,7 @@ LEFDEFReaderOptions::LEFDEFReaderOptions (const LEFDEFReaderOptions &d)
     m_special_routing_suffix (d.m_special_routing_suffix),
     m_special_routing_datatype (d.m_special_routing_datatype),
     m_separate_groups (d.m_separate_groups),
+    m_consider_map_file (d.m_consider_map_file),
     m_lef_files (d.m_lef_files)
 {
   //  .. nothing yet ..
@@ -142,8 +146,20 @@ LEFDEFReaderOptions::format_name () const
 // -----------------------------------------------------------------------------------
 //  LEFDEFLayerDelegate implementation
 
+static db::LayerProperties lp_from_string (const std::string &ld)
+{
+  db::LayerProperties lp;
+  tl::Extractor ex (ld.c_str ());
+  try {
+    ex.read (lp);
+    return lp;
+  } catch (...) {
+    return db::LayerProperties (0, 0);
+  }
+}
+
 LEFDEFReaderState::LEFDEFReaderState (const LEFDEFReaderOptions *tc)
-  : m_create_layers (true), m_laynum (1), mp_tech_comp (tc)
+  : m_create_layers (true), m_has_explicit_layer_mapping (false), m_laynum (1), mp_tech_comp (tc)
 {
   if (tc) {
     m_layer_map = tc->layer_map ();
@@ -158,8 +174,208 @@ LEFDEFReaderState::register_layer (const std::string &ln)
   ++m_laynum;
 }
 
-std::pair <bool, unsigned int> 
+void
+LEFDEFReaderState::set_explicit_layer_mapping (bool f)
+{
+  m_has_explicit_layer_mapping = f;
+  if (! f) {
+    m_layers.clear ();
+  }
+}
+
+void
+LEFDEFReaderState::map_layer_explicit (const std::string &n, LayerPurpose purpose, unsigned int layer)
+{
+  m_layers [std::make_pair (n, purpose)] = std::make_pair (true, layer);
+}
+
+void
+LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
+{
+  tl::log << tl::to_string (tr ("Reading LEF/DEF map file")) << " " << path;
+
+  tl::InputFile file (path);
+  tl::InputStream file_stream (file);
+  tl::TextInputStream ts (file_stream);
+
+  std::map<std::string, LayerPurpose> purpose_translation;
+  purpose_translation ["LEFPIN"] = LEFPins;
+  purpose_translation ["PIN"] = Pins;
+  purpose_translation ["LEFOBS"] = Obstructions;
+  purpose_translation ["SPNET"] = SpecialRouting;
+  purpose_translation ["NET"] = Routing;
+  purpose_translation ["VIA"] = ViaGeometry;
+  purpose_translation ["BLOCKAGE"] = Blockage;
+
+  std::map<std::pair<std::string, LayerPurpose>, db::LayerProperties> layer_map;
+
+  if (tech_comp ()) {
+
+    const db::LEFDEFReaderOptions &options = *tech_comp ();
+
+    if (options.produce_placement_blockages ()) {
+      layer_map [std::make_pair (std::string (), Blockage)] = lp_from_string (options.placement_blockage_layer ());
+    }
+    if (options.produce_cell_outlines ()) {
+      layer_map [std::make_pair (std::string (), Outline)] = lp_from_string (options.cell_outline_layer ());
+    }
+    if (options.produce_regions ()) {
+      layer_map [std::make_pair (std::string (), Region)] = lp_from_string (options.region_layer ());
+    }
+
+  }
+
+  while (! ts.at_end ()) {
+
+    const std::string &l = ts.get_line ();
+
+    tl::Extractor ex (l.c_str ());
+    if (ex.at_end () || ex.test ("#")) {
+
+      //  ignore empty of comment lines
+
+    } else {
+
+      std::string w1, w2;
+      int layer = 0, datatype = 0;
+
+      if (ex.try_read_word (w1) && ex.try_read_word (w2, "._$,/:") && ex.try_read (layer) && ex.try_read (datatype)) {
+
+        if (w1 == "DIEAREA") {
+
+          layer_map [std::make_pair (std::string (), Outline)] = db::LayerProperties (layer, datatype, "OUTLINE");
+
+        } else if (w1 == "NAME") {
+
+          //  converts a line like
+          //    "NAME M1/PINS,M2/PINS ..."
+          //  into a canonical name mapping like
+          //    "(M1/LABELS): M1.LABEL"
+          //    "(M2/LABELS): M2.LABEL"
+
+          std::vector<std::string> layers;
+          std::vector<std::string> purposes = tl::split (w2, ",");
+          for (std::vector<std::string>::const_iterator p = purposes.begin (); p != purposes.end (); ++p) {
+            layers.push_back (tl::split (*p, "/").front ());
+          }
+
+          std::string final_name = tl::join (layers, "/") + ".LABEL";
+          for (std::vector<std::string>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
+            layer_map [std::make_pair (*l, Label)] = db::LayerProperties (layer, datatype, final_name);
+          }
+
+        } else {
+
+          //  converts a line like
+          //    "M1 SPNET,NET,PINS,LEFPINS ..."
+          //  into a canonical name mapping like
+          //    "(M1,NET):  M1.NET/PINS"
+          //    "(M1,PINS): M1.NET/PINS"
+          //  (separating, translating and recombing the purposes)
+
+          std::set<LayerPurpose> translated_purposes;
+          std::string purpose_str;
+          std::vector<std::string> purposes = tl::split (w2, ",");
+          for (std::vector<std::string>::const_iterator p = purposes.begin (); p != purposes.end (); ++p) {
+
+            std::map<std::string, LayerPurpose>::const_iterator i = purpose_translation.find (tl::to_upper_case (*p));
+            if (i != purpose_translation.end ()) {
+
+              translated_purposes.insert (i->second);
+
+              if (! purpose_str.empty ()) {
+                purpose_str += "/";
+              }
+              purpose_str += i->first;
+
+            }
+          }
+
+          std::string final_name = w1 + "." + purpose_str;
+
+          for (std::set<LayerPurpose>::const_iterator p = translated_purposes.begin (); p != translated_purposes.end (); ++p) {
+            layer_map [std::make_pair (w1, *p)] = db::LayerProperties (layer, datatype, final_name);
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+
+  set_explicit_layer_mapping (true);
+
+  db::DirectLayerMapping lm (&layout);
+  for (std::map<std::pair<std::string, LayerPurpose>, db::LayerProperties>::const_iterator i = layer_map.begin (); i != layer_map.end (); ++i) {
+    map_layer_explicit (i->first.first, i->first.second, lm.map_layer (i->second).second);
+  }
+
+  // @@@ TODO: need to assign layer/datatype for all layers present.
+}
+
+void
+LEFDEFReaderState::import_map_file_heuristics (const std::string &main_path, db::Layout &layout)
+{
+  std::string input_dir = tl::absolute_path (main_path);
+  if (! tl::file_exists (input_dir)) {
+    return;
+  }
+
+  std::string bn = tl::basename (tl::filename (main_path));
+  std::vector<std::string> map_files;
+  std::string map_file_exact;
+
+  std::vector<std::string> entries = tl::dir_entries (input_dir);
+  for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
+
+    if (tl::to_lower_case (tl::extension (*e)) == "map") {
+
+      if (tl::basename (*e) == bn) {
+        map_file_exact = *e;
+      } else {
+        map_files.push_back (*e);
+      }
+
+    }
+
+  }
+
+  try {
+    if (! map_file_exact.empty ()) {
+      read_map_file (tl::combine_path (input_dir, map_file_exact), layout);
+    } else if (map_files.size () == 1) {
+      read_map_file (tl::combine_path (input_dir, map_files.front ()), layout);
+    }
+  } catch (tl::Exception &ex) {
+    //  ignore read errors on map file (this is a heuristics!)
+    tl::error << ex.msg ();
+  }
+}
+
+std::pair <bool, unsigned int>
 LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPurpose purpose)
+{
+  std::map <std::pair<std::string, LayerPurpose>, std::pair<bool, unsigned int> >::const_iterator nl = m_layers.find (std::make_pair (n, purpose));
+  if (nl == m_layers.end ()) {
+
+    std::pair <bool, unsigned int> ll (false, 0);
+
+    if (! m_has_explicit_layer_mapping) {
+      ll = open_layer_uncached (layout, n, purpose);
+    }
+
+    m_layers.insert (std::make_pair (std::make_pair (n, purpose), ll));
+    return ll;
+
+  } else {
+    return nl->second;
+  }
+}
+
+std::pair <bool, unsigned int>
+LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n, LayerPurpose purpose)
 {
   if (purpose == Outline || purpose == PlacementBlockage || purpose == Region) {
 
@@ -167,21 +383,17 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
     //  as is "(name)". It's used for implementing the automatic map file import
     //  feature.
     std::string ld;
-    std::string canonical_name;
     bool produce;
 
     if (purpose == Outline) {
       produce = mp_tech_comp->produce_cell_outlines ();
       ld = mp_tech_comp->cell_outline_layer ();
-      canonical_name = "(OUTLINE)";
     } else if (purpose == Region) {
       produce = mp_tech_comp->produce_regions ();
       ld = mp_tech_comp->region_layer ();
-      canonical_name = "(REGION)";
     } else {
       produce = mp_tech_comp->produce_placement_blockages ();
       ld = mp_tech_comp->placement_blockage_layer ();
-      canonical_name = "(BLK)";
     }
 
     if (! produce) {
@@ -200,10 +412,6 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
     std::pair<bool, unsigned int> ll = m_layer_map.logical (lp, layout);
 
     if (ll.first) {
-
-      return ll;
-
-    } else if ((ll = m_layer_map.logical (db::LayerProperties (canonical_name), layout)).first) {
 
       return ll;
 
@@ -256,72 +464,52 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
     }
 
     //  Note: "name" is the decorated name as provided by the tech component's
-    //  x_suffix specifications. As this is a variable entity, we also provide
-    //  a canonical name of the form "(layer,purpose)" where purpose is a
-    //  predefined suffix. The canonical name is the last fallback. Hence this
-    //  allows importing layer mapping files as canonical name mapping.
+    //  x_suffix specifications.
     std::string name (n);
     int dt = 0;
-
-    std::string canonical_purpose;
 
     if (mp_tech_comp) {
       switch (purpose) {
       case Routing:
       default:
         name += mp_tech_comp->routing_suffix ();
-        canonical_purpose = "NET";
         dt += mp_tech_comp->routing_datatype ();
         break;
       case SpecialRouting:
         name += mp_tech_comp->special_routing_suffix ();
-        canonical_purpose = "SPNET";
         dt += mp_tech_comp->special_routing_datatype ();
         break;
       case ViaGeometry:
         name += mp_tech_comp->via_geometry_suffix ();
         dt += mp_tech_comp->via_geometry_datatype ();
-        canonical_purpose = "VIA";
         break;
       case Label:
         name += mp_tech_comp->labels_suffix ();
         dt += mp_tech_comp->labels_datatype ();
-        canonical_purpose = "LABEL";
         break;
       case Pins:
         name += mp_tech_comp->pins_suffix ();
         dt += mp_tech_comp->pins_datatype ();
-        canonical_purpose = "PIN";
         break;
       case LEFPins:
         name += mp_tech_comp->lef_pins_suffix ();
         dt += mp_tech_comp->lef_pins_datatype ();
-        canonical_purpose = "LEFPIN";
         break;
       case Obstructions:
         name += mp_tech_comp->obstructions_suffix ();
         dt += mp_tech_comp->obstructions_datatype ();
-        canonical_purpose = "OBS";
         break;
       case Blockage:
         name += mp_tech_comp->blockages_suffix ();
         dt += mp_tech_comp->blockages_datatype ();
-        canonical_purpose = "BLK";
         break;
       }
     }
-
-    std::string canonical_name = std::string ("(") + n + "," + canonical_purpose + ")";
 
     std::pair<bool, unsigned int> ll = m_layer_map.logical (name, layout);
 
     if (ll.first) {
 
-      return ll;
-
-    } else if ((ll = m_layer_map.logical (db::LayerProperties (canonical_name), layout)).first) {
-
-      //  final fallback: try canonical name
       return ll;
 
     } else {
@@ -341,14 +529,14 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
 
       } else {
 
-        std::map <std::pair<std::string, LayerPurpose>, unsigned int>::const_iterator nl = m_layers.find (std::make_pair (n, purpose));
-        if (nl == m_layers.end ()) {
-          unsigned int li = layout.insert_layer (db::LayerProperties (name));
-          m_layer_map.map (db::LayerProperties (name), li);
-          m_layers.insert (std::make_pair (std::make_pair (n, purpose), li));
-          return std::pair<bool, unsigned int> (true, li);
+        std::map <std::pair<std::string, LayerPurpose>, unsigned int>::const_iterator l = m_unassigned_layers.find (std::make_pair (n, purpose));
+        if (l != m_unassigned_layers.end ()) {
+          return std::pair<bool, unsigned int> (true, l->second);
         } else {
-          return std::pair<bool, unsigned int> (true, nl->second);
+          unsigned int li = layout.insert_layer (db::LayerProperties (name));
+          m_unassigned_layers.insert (std::make_pair (std::make_pair (n, purpose), li));
+          m_layer_map.map (db::LayerProperties (name), li);
+          return std::pair<bool, unsigned int> (true, li);
         }
 
       }
@@ -380,7 +568,7 @@ LEFDEFReaderState::finish (db::Layout &layout)
     used_numbers.insert (ln->second);
   }
 
-  for (std::map<std::pair<std::string, LayerPurpose>, unsigned int>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
+  for (std::map<std::pair<std::string, LayerPurpose>, unsigned int>::const_iterator l = m_unassigned_layers.begin (); l != m_unassigned_layers.end (); ++l) {
 
     int dt = 0;
     switch (l->first.second) {

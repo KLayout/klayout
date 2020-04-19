@@ -207,17 +207,13 @@
       <property name="bottomMargin">
        <number>4</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Layout database unit</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QLabel" name="label_21">
-        <property name="text">
-         <string>Via cell name prefix</string>
+      <item row="0" column="4">
+       <widget class="QLineEdit" name="prefix_via_cellname">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
        </widget>
       </item>
@@ -234,6 +230,34 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="1" colspan="4">
+       <widget class="QCheckBox" name="separate_groups">
+        <property name="text">
+         <string>Produce a parent cell for each group</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLabel" name="label_21">
+        <property name="text">
+         <string>Via cell name prefix</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Layout database unit</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_22">
+        <property name="text">
+         <string>Separate groups</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="1">
        <widget class="QLineEdit" name="dbu">
         <property name="sizePolicy">
@@ -244,27 +268,20 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="4">
-       <widget class="QLineEdit" name="prefix_via_cellname">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_25">
+        <property name="text">
+         <string>Consider map files</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="4">
-       <widget class="QCheckBox" name="separate_groups">
+      <item row="2" column="1" colspan="4">
+       <widget class="QCheckBox" name="consider_map_file">
         <property name="text">
-         <string>Produce a parent cell for each group</string>
+         <string>Look for .map files next to DEF files and use them to map layers</string>
         </property>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <widget class="QLabel" name="label_22">
-        <property name="text">
-         <string>Separate groups</string>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -517,13 +534,6 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="5" colspan="2">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Produce ...</string>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="5">
        <widget class="QCheckBox" name="produce_pins">
         <property name="text">
@@ -764,6 +774,56 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="5" colspan="2">
+       <widget class="QFrame" name="frame">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="warn1">
+           <property name="toolTip">
+            <string>Layer assignment is not used if a .map file is present for DEF layer mapping</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="../../../../lay/lay/layResources.qrc">:/warn_16.png</pixmap>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_26">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>1</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Produce ...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -781,10 +841,7 @@
      <property name="flat">
       <bool>true</bool>
      </property>
-     <layout class="QVBoxLayout">
-      <property name="spacing">
-       <number>6</number>
-      </property>
+     <layout class="QGridLayout" name="gridLayout_2">
       <property name="leftMargin">
        <number>9</number>
       </property>
@@ -797,21 +854,14 @@
       <property name="bottomMargin">
        <number>4</number>
       </property>
-      <item>
+      <item row="0" column="1">
        <widget class="QCheckBox" name="read_all_cbx">
         <property name="text">
          <string>Read all layers (additionally to the ones in the mapping table)</string>
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="Line" name="line_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
+      <item row="2" column="1">
        <widget class="lay::LayerMappingWidget" name="layer_map">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
@@ -830,6 +880,32 @@
         </property>
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="warn2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>This table is not used if a .map file is present for DEF layer mapping</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../../../../lay/lay/layResources.qrc">:/warn_16.png</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="Line" name="line_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
@@ -881,12 +957,12 @@
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>186</x>
-     <y>598</y>
+     <x>229</x>
+     <y>838</y>
     </hint>
     <hint type="destinationlabel">
-     <x>155</x>
-     <y>553</y>
+     <x>198</x>
+     <y>701</y>
     </hint>
    </hints>
   </connection>

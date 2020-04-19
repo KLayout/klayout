@@ -269,6 +269,18 @@ class DBReaders_TestClass < TestBase
     conf.pins_datatype = 18
     assert_equal(conf.pins_datatype, 18)
 
+    assert_equal(conf.produce_lef_pins, true)
+    conf.produce_lef_pins = false
+    assert_equal(conf.produce_lef_pins, false)
+
+    assert_equal(conf.lef_pins_suffix, ".PIN")
+    conf.lef_pins_suffix = "LEFPIN"
+    assert_equal(conf.lef_pins_suffix, "LEFPIN")
+
+    assert_equal(conf.lef_pins_datatype, 2)
+    conf.lef_pins_datatype = 181
+    assert_equal(conf.lef_pins_datatype, 181)
+
     assert_equal(conf.produce_obstructions, true)
     conf.produce_obstructions = false
     assert_equal(conf.produce_obstructions, false)
@@ -316,6 +328,18 @@ class DBReaders_TestClass < TestBase
     assert_equal(conf.routing_datatype, 0)
     conf.routing_datatype = 22
     assert_equal(conf.routing_datatype, 22)
+
+    assert_equal(conf.produce_special_routing, true)
+    conf.produce_special_routing = false
+    assert_equal(conf.produce_special_routing, false)
+
+    assert_equal(conf.special_routing_suffix, "")
+    conf.special_routing_suffix = "SPROUT"
+    assert_equal(conf.special_routing_suffix, "SPROUT")
+
+    assert_equal(conf.special_routing_datatype, 0)
+    conf.special_routing_datatype = 23
+    assert_equal(conf.special_routing_datatype, 23)
 
     assert_equal(conf.separate_groups, false)
     conf.separate_groups = true

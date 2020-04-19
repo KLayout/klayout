@@ -96,9 +96,10 @@ read_map_file (const std::string &path, db::LEFDEFReaderState &layers)
   tl::TextInputStream ts (file_stream);
 
   std::map<std::string, std::string> purpose_translation;
-  purpose_translation ["LEFPIN"] = "PIN";
+  purpose_translation ["LEFPIN"] = "LEFPIN";
+  purpose_translation ["PIN"] = "PIN";
   purpose_translation ["LEFOBS"] = "OBS";
-  purpose_translation ["SPNET"] = "NET";
+  purpose_translation ["SPNET"] = "SPNET";
   purpose_translation ["NET"] = "NET";
   purpose_translation ["VIA"] = "VIA";
   purpose_translation ["BLOCKAGE"] = "BLK";
@@ -406,6 +407,9 @@ class LEFDEFFormatDeclaration
       tl::make_member (&LEFDEFReaderOptions::produce_pins, &LEFDEFReaderOptions::set_produce_pins, "produce-pins") +
       tl::make_member (&LEFDEFReaderOptions::pins_suffix, &LEFDEFReaderOptions::set_pins_suffix, "pins-suffix") +
       tl::make_member (&LEFDEFReaderOptions::pins_datatype, &LEFDEFReaderOptions::set_pins_datatype, "pins-datatype") +
+      tl::make_member (&LEFDEFReaderOptions::produce_lef_pins, &LEFDEFReaderOptions::set_produce_lef_pins, "produce-lef-pins") +
+      tl::make_member (&LEFDEFReaderOptions::lef_pins_suffix, &LEFDEFReaderOptions::set_lef_pins_suffix, "lef-pins-suffix") +
+      tl::make_member (&LEFDEFReaderOptions::lef_pins_datatype, &LEFDEFReaderOptions::set_lef_pins_datatype, "lef-pins-datatype") +
       tl::make_member (&LEFDEFReaderOptions::produce_obstructions, &LEFDEFReaderOptions::set_produce_obstructions, "produce-obstructions") +
       tl::make_member (&LEFDEFReaderOptions::obstructions_suffix, &LEFDEFReaderOptions::set_obstructions_suffix, "obstructions-suffix") +
       tl::make_member (&LEFDEFReaderOptions::obstructions_datatype, &LEFDEFReaderOptions::set_obstructions_datatype, "obstructions-datatype") +
@@ -418,6 +422,9 @@ class LEFDEFFormatDeclaration
       tl::make_member (&LEFDEFReaderOptions::produce_routing, &LEFDEFReaderOptions::set_produce_routing, "produce-routing") +
       tl::make_member (&LEFDEFReaderOptions::routing_suffix, &LEFDEFReaderOptions::set_routing_suffix, "routing-suffix") +
       tl::make_member (&LEFDEFReaderOptions::routing_datatype, &LEFDEFReaderOptions::set_routing_datatype, "routing-datatype") +
+      tl::make_member (&LEFDEFReaderOptions::produce_special_routing, &LEFDEFReaderOptions::set_produce_special_routing, "produce-special-routing") +
+      tl::make_member (&LEFDEFReaderOptions::special_routing_suffix, &LEFDEFReaderOptions::set_special_routing_suffix, "special-routing-suffix") +
+      tl::make_member (&LEFDEFReaderOptions::special_routing_datatype, &LEFDEFReaderOptions::set_special_routing_datatype, "special-routing-datatype") +
       tl::make_member (&LEFDEFReaderOptions::begin_lef_files, &LEFDEFReaderOptions::end_lef_files, &LEFDEFReaderOptions::push_lef_file, "lef-files")
     );
   }

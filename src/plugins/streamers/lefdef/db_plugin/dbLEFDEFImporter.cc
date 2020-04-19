@@ -56,6 +56,9 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
     m_produce_pins (true),
     m_pins_suffix (".PIN"),
     m_pins_datatype (2),
+    m_produce_lef_pins (true),
+    m_lef_pins_suffix (".PIN"),
+    m_lef_pins_datatype (2),
     m_produce_obstructions (true),
     m_obstructions_suffix (".OBS"),
     m_obstructions_datatype (3),
@@ -68,6 +71,9 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
     m_produce_routing (true),
     m_routing_suffix (""),
     m_routing_datatype (0),
+    m_produce_special_routing (true),
+    m_special_routing_suffix (""),
+    m_special_routing_datatype (0),
     m_separate_groups (false)
 {
   //  .. nothing yet ..
@@ -96,6 +102,9 @@ LEFDEFReaderOptions::LEFDEFReaderOptions (const LEFDEFReaderOptions &d)
     m_produce_pins (d.m_produce_pins),
     m_pins_suffix (d.m_pins_suffix),
     m_pins_datatype (d.m_pins_datatype),
+    m_produce_lef_pins (d.m_produce_lef_pins),
+    m_lef_pins_suffix (d.m_lef_pins_suffix),
+    m_lef_pins_datatype (d.m_lef_pins_datatype),
     m_produce_obstructions (d.m_produce_obstructions),
     m_obstructions_suffix (d.m_obstructions_suffix),
     m_obstructions_datatype (d.m_obstructions_datatype),
@@ -108,6 +117,9 @@ LEFDEFReaderOptions::LEFDEFReaderOptions (const LEFDEFReaderOptions &d)
     m_produce_routing (d.m_produce_routing),
     m_routing_suffix (d.m_routing_suffix),
     m_routing_datatype (d.m_routing_datatype),
+    m_produce_special_routing (d.m_produce_special_routing),
+    m_special_routing_suffix (d.m_special_routing_suffix),
+    m_special_routing_datatype (d.m_special_routing_datatype),
     m_separate_groups (d.m_separate_groups),
     m_lef_files (d.m_lef_files)
 {
@@ -216,6 +228,9 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
       default:
         produce = mp_tech_comp->produce_routing ();
         break;
+      case SpecialRouting:
+        produce = mp_tech_comp->produce_special_routing ();
+        break;
       case ViaGeometry:
         produce = mp_tech_comp->produce_via_geometry ();
         break;
@@ -224,6 +239,9 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
         break;
       case Pins:
         produce = mp_tech_comp->produce_pins ();
+        break;
+      case LEFPins:
+        produce = mp_tech_comp->produce_lef_pins ();
         break;
       case Obstructions:
         produce = mp_tech_comp->produce_obstructions ();
@@ -255,6 +273,11 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
         canonical_purpose = "NET";
         dt += mp_tech_comp->routing_datatype ();
         break;
+      case SpecialRouting:
+        name += mp_tech_comp->special_routing_suffix ();
+        canonical_purpose = "SPNET";
+        dt += mp_tech_comp->special_routing_datatype ();
+        break;
       case ViaGeometry:
         name += mp_tech_comp->via_geometry_suffix ();
         dt += mp_tech_comp->via_geometry_datatype ();
@@ -269,6 +292,11 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
         name += mp_tech_comp->pins_suffix ();
         dt += mp_tech_comp->pins_datatype ();
         canonical_purpose = "PIN";
+        break;
+      case LEFPins:
+        name += mp_tech_comp->lef_pins_suffix ();
+        dt += mp_tech_comp->lef_pins_datatype ();
+        canonical_purpose = "LEFPIN";
         break;
       case Obstructions:
         name += mp_tech_comp->obstructions_suffix ();
@@ -360,6 +388,9 @@ LEFDEFReaderState::finish (db::Layout &layout)
     default:
       dt = mp_tech_comp->routing_datatype ();
       break;
+    case SpecialRouting:
+      dt = mp_tech_comp->special_routing_datatype ();
+      break;
     case ViaGeometry:
       dt = mp_tech_comp->via_geometry_datatype ();
       break;
@@ -368,6 +399,9 @@ LEFDEFReaderState::finish (db::Layout &layout)
       break;
     case Pins:
       dt = mp_tech_comp->pins_datatype ();
+      break;
+    case LEFPins:
+      dt = mp_tech_comp->lef_pins_datatype ();
       break;
     case Obstructions:
       dt = mp_tech_comp->obstructions_datatype ();

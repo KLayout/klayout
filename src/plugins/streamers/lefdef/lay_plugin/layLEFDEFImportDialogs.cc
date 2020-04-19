@@ -353,9 +353,11 @@ LEFDEFReaderOptionsEditor::LEFDEFReaderOptionsEditor (QWidget *parent)
   connect (produce_regions, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_via_geometry, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_pins, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
+  connect (produce_lef_pins, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_obstructions, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_blockages, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_routing, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
+  connect (produce_special_routing, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_labels, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (add_lef_file, SIGNAL (clicked ()), this, SLOT (add_lef_file_clicked ()));
   connect (del_lef_files, SIGNAL (clicked ()), this, SLOT (del_lef_files_clicked ()));
@@ -429,6 +431,9 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
   data->set_produce_pins (produce_pins->isChecked ());
   data->set_pins_suffix (tl::to_string (suffix_pins->text ()));
   data->set_pins_datatype (datatype_pins->text ().toInt ());
+  data->set_produce_lef_pins (produce_lef_pins->isChecked ());
+  data->set_lef_pins_suffix (tl::to_string (suffix_lef_pins->text ()));
+  data->set_lef_pins_datatype (datatype_lef_pins->text ().toInt ());
   data->set_produce_obstructions (produce_obstructions->isChecked ());
   data->set_obstructions_suffix (tl::to_string (suffix_obstructions->text ()));
   data->set_obstructions_datatype (datatype_obstructions->text ().toInt ());
@@ -438,6 +443,9 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
   data->set_produce_routing (produce_routing->isChecked ());
   data->set_routing_suffix (tl::to_string (suffix_routing->text ()));
   data->set_routing_datatype (datatype_routing->text ().toInt ());
+  data->set_produce_special_routing (produce_special_routing->isChecked ());
+  data->set_special_routing_suffix (tl::to_string (suffix_special_routing->text ()));
+  data->set_special_routing_datatype (datatype_special_routing->text ().toInt ());
   data->set_produce_labels (produce_labels->isChecked ());
   data->set_labels_suffix (tl::to_string (suffix_labels->text ()));
   data->set_labels_datatype (datatype_labels->text ().toInt ());
@@ -483,6 +491,9 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   produce_pins->setChecked (data->produce_pins ());
   suffix_pins->setText (tl::to_qstring (data->pins_suffix ()));
   datatype_pins->setText (QString::number (data->pins_datatype ()));
+  produce_lef_pins->setChecked (data->produce_lef_pins ());
+  suffix_lef_pins->setText (tl::to_qstring (data->lef_pins_suffix ()));
+  datatype_lef_pins->setText (QString::number (data->lef_pins_datatype ()));
   produce_obstructions->setChecked (data->produce_obstructions ());
   suffix_obstructions->setText (tl::to_qstring (data->obstructions_suffix ()));
   datatype_obstructions->setText (QString::number (data->obstructions_datatype ()));
@@ -492,6 +503,9 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   produce_routing->setChecked (data->produce_routing ());
   suffix_routing->setText (tl::to_qstring (data->routing_suffix ()));
   datatype_routing->setText (QString::number (data->routing_datatype ()));
+  produce_special_routing->setChecked (data->produce_special_routing ());
+  suffix_special_routing->setText (tl::to_qstring (data->special_routing_suffix ()));
+  datatype_special_routing->setText (QString::number (data->special_routing_datatype ()));
   produce_labels->setChecked (data->produce_labels ());
   suffix_labels->setText (tl::to_qstring (data->labels_suffix ()));
   datatype_labels->setText (QString::number (data->labels_datatype ()));
@@ -523,15 +537,19 @@ LEFDEFReaderOptionsEditor::checkbox_changed ()
   placement_blockage_layer->setEnabled (produce_placement_blockages->isChecked ());
   suffix_via_geometry->setEnabled (produce_via_geometry->isChecked ());
   suffix_pins->setEnabled (produce_pins->isChecked ());
+  suffix_lef_pins->setEnabled (produce_lef_pins->isChecked ());
   suffix_obstructions->setEnabled (produce_obstructions->isChecked ());
   suffix_blockages->setEnabled (produce_blockages->isChecked ());
   suffix_routing->setEnabled (produce_routing->isChecked ());
+  suffix_special_routing->setEnabled (produce_special_routing->isChecked ());
   suffix_labels->setEnabled (produce_labels->isChecked ());
   datatype_via_geometry->setEnabled (produce_via_geometry->isChecked ());
   datatype_pins->setEnabled (produce_pins->isChecked ());
+  datatype_lef_pins->setEnabled (produce_lef_pins->isChecked ());
   datatype_obstructions->setEnabled (produce_obstructions->isChecked ());
   datatype_blockages->setEnabled (produce_blockages->isChecked ());
   datatype_routing->setEnabled (produce_routing->isChecked ());
+  datatype_special_routing->setEnabled (produce_special_routing->isChecked ());
   datatype_labels->setEnabled (produce_labels->isChecked ());
 }
 

@@ -295,6 +295,36 @@ public:
     m_pins_datatype = s;
   }
 
+  bool produce_lef_pins () const
+  {
+    return m_produce_lef_pins;
+  }
+
+  void set_produce_lef_pins (bool f)
+  {
+    m_produce_lef_pins = f;
+  }
+
+  const std::string &lef_pins_suffix () const
+  {
+    return m_lef_pins_suffix;
+  }
+
+  void set_lef_pins_suffix (const std::string &s)
+  {
+    m_lef_pins_suffix = s;
+  }
+
+  int lef_pins_datatype () const
+  {
+    return m_lef_pins_datatype;
+  }
+
+  void set_lef_pins_datatype (int s)
+  {
+    m_lef_pins_datatype = s;
+  }
+
   bool produce_obstructions () const
   {
     return m_produce_obstructions;
@@ -415,6 +445,36 @@ public:
     m_routing_datatype = s;
   }
 
+  bool produce_special_routing () const
+  {
+    return m_produce_special_routing;
+  }
+
+  void set_produce_special_routing (bool f)
+  {
+    m_produce_special_routing = f;
+  }
+
+  const std::string &special_routing_suffix () const
+  {
+    return m_special_routing_suffix;
+  }
+
+  void set_special_routing_suffix (const std::string &s)
+  {
+    m_special_routing_suffix = s;
+  }
+
+  int special_routing_datatype () const
+  {
+    return m_special_routing_datatype;
+  }
+
+  void set_special_routing_datatype (int s)
+  {
+    m_special_routing_datatype = s;
+  }
+
   void clear_lef_files ()
   {
     m_lef_files.clear ();
@@ -478,6 +538,9 @@ private:
   bool m_produce_pins;
   std::string m_pins_suffix;
   int m_pins_datatype;
+  bool m_produce_lef_pins;
+  std::string m_lef_pins_suffix;
+  int m_lef_pins_datatype;
   bool m_produce_obstructions;
   std::string m_obstructions_suffix;
   int m_obstructions_datatype;
@@ -490,6 +553,9 @@ private:
   bool m_produce_routing;
   std::string m_routing_suffix;
   int m_routing_datatype;
+  bool m_produce_special_routing;
+  std::string m_special_routing_suffix;
+  int m_special_routing_datatype;
   bool m_separate_groups;
   std::vector<std::string> m_lef_files;
 };
@@ -499,15 +565,17 @@ private:
  */
 enum LayerPurpose 
 {
-  Routing = 0,
-  ViaGeometry = 1,
-  Label = 2,
-  Pins = 3,
-  Obstructions = 4,
-  Outline = 5,
-  Blockage = 6,
-  PlacementBlockage = 7,
-  Region = 8
+  Routing = 0,        //  from DEF only
+  SpecialRouting,     //  from DEF only
+  ViaGeometry,        //  from LEF+DEF
+  Label,              //  from LEF+DEF
+  Pins,               //  from DEF
+  LEFPins,            //  from LEF
+  Obstructions,       //  from LEF only
+  Outline,            //  from LEF+DEF
+  Blockage,           //  from DEF only
+  PlacementBlockage,  //  from DEF only
+  Region,             //  from DEF only
 };
 
 /**

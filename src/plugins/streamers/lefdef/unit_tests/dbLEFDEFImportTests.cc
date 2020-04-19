@@ -295,6 +295,19 @@ TEST(104_doxy_vias)
 TEST(105_specialnets_geo)
 {
   run_test (_this, "specialnets_geo", "lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
+
+  db::LEFDEFReaderOptions options = default_options ();
+  options.set_produce_special_routing (false);
+  run_test (_this, "specialnets_geo", "lef:test.lef+def:test.def", "au_no_spnet.oas.gz", options, false);
+
+  options.set_produce_special_routing (true);
+  options.set_special_routing_datatype (10);
+  options.set_special_routing_suffix (".SPNET");
+
+  options.set_via_geometry_datatype (11);
+  options.set_via_geometry_suffix (".VIA");
+
+  run_test (_this, "specialnets_geo", "lef:test.lef+def:test.def", "au_spnet_mapped.oas.gz", options, false);
 }
 
 TEST(106_wrongdirection)
@@ -315,4 +328,14 @@ TEST(108_scanchain)
 TEST(109_foreigncell)
 {
   run_test (_this, "foreigncell", "gds:foreign.gds+lef:in_tech.lef+lef:in.lef", "au.oas.gz", default_options (), false);
+
+  db::LEFDEFReaderOptions options = default_options ();
+  options.set_produce_lef_pins (false);
+  run_test (_this, "foreigncell", "gds:foreign.gds+lef:in_tech.lef+lef:in.lef", "au_no_lefpins.oas.gz", options, false);
+
+  options.set_produce_lef_pins (true);
+  options.set_lef_pins_datatype (10);
+  options.set_lef_pins_suffix (".LEFPIN");
+
+  run_test (_this, "foreigncell", "gds:foreign.gds+lef:in_tech.lef+lef:in.lef", "au_lefpins_mapped.oas.gz", options, false);
 }

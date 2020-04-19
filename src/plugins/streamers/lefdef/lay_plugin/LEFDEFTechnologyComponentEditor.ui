@@ -590,13 +590,6 @@
       <item row="3" column="2" colspan="2">
        <widget class="QLineEdit" name="pin_prop_name"/>
       </item>
-      <item row="3" column="5">
-       <widget class="QCheckBox" name="produce_obstructions">
-        <property name="text">
-         <string>Obstructions</string>
-        </property>
-       </widget>
-      </item>
       <item row="3" column="6">
        <widget class="QLabel" name="label_14">
         <property name="sizePolicy">
@@ -610,19 +603,6 @@
         </property>
         <property name="pixmap">
          <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="7">
-       <widget class="QLineEdit" name="suffix_obstructions"/>
-      </item>
-      <item row="3" column="8">
-       <widget class="QLineEdit" name="datatype_obstructions"/>
-      </item>
-      <item row="4" column="5">
-       <widget class="QCheckBox" name="produce_routing">
-        <property name="text">
-         <string>Routing</string>
         </property>
        </widget>
       </item>
@@ -642,43 +622,14 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="7">
-       <widget class="QLineEdit" name="suffix_routing"/>
-      </item>
-      <item row="4" column="8">
-       <widget class="QLineEdit" name="datatype_routing"/>
-      </item>
-      <item row="5" column="5">
-       <widget class="QCheckBox" name="produce_labels">
-        <property name="text">
-         <string>Pin labels</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="5">
+      <item row="8" column="5">
        <widget class="QCheckBox" name="produce_blockages">
         <property name="text">
          <string>Blockages</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="6">
-       <widget class="QLabel" name="label_16">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="6">
+      <item row="8" column="6">
        <widget class="QLabel" name="label_17">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -694,17 +645,124 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="7">
-       <widget class="QLineEdit" name="suffix_labels"/>
-      </item>
-      <item row="5" column="8">
-       <widget class="QLineEdit" name="datatype_labels"/>
-      </item>
-      <item row="6" column="7">
+      <item row="8" column="7">
        <widget class="QLineEdit" name="suffix_blockages"/>
       </item>
-      <item row="6" column="8">
+      <item row="8" column="8">
        <widget class="QLineEdit" name="datatype_blockages"/>
+      </item>
+      <item row="6" column="6">
+       <widget class="QLabel" name="label_16">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="6">
+       <widget class="QLabel" name="label_23">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="6">
+       <widget class="QLabel" name="label_24">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="5">
+       <widget class="QCheckBox" name="produce_labels">
+        <property name="text">
+         <string>Pin labels</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="7">
+       <widget class="QLineEdit" name="suffix_labels"/>
+      </item>
+      <item row="7" column="8">
+       <widget class="QLineEdit" name="datatype_labels"/>
+      </item>
+      <item row="6" column="5">
+       <widget class="QCheckBox" name="produce_special_routing">
+        <property name="text">
+         <string>Special routing</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="7">
+       <widget class="QLineEdit" name="suffix_special_routing"/>
+      </item>
+      <item row="6" column="8">
+       <widget class="QLineEdit" name="datatype_special_routing"/>
+      </item>
+      <item row="5" column="5">
+       <widget class="QCheckBox" name="produce_routing">
+        <property name="text">
+         <string>Routing</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="7">
+       <widget class="QLineEdit" name="suffix_routing"/>
+      </item>
+      <item row="5" column="8">
+       <widget class="QLineEdit" name="datatype_routing"/>
+      </item>
+      <item row="4" column="5">
+       <widget class="QCheckBox" name="produce_obstructions">
+        <property name="text">
+         <string>Obstructions</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="7">
+       <widget class="QLineEdit" name="suffix_obstructions"/>
+      </item>
+      <item row="4" column="8">
+       <widget class="QLineEdit" name="datatype_obstructions"/>
+      </item>
+      <item row="3" column="7">
+       <widget class="QLineEdit" name="suffix_lef_pins"/>
+      </item>
+      <item row="3" column="8">
+       <widget class="QLineEdit" name="datatype_lef_pins"/>
+      </item>
+      <item row="3" column="5">
+       <widget class="QCheckBox" name="produce_lef_pins">
+        <property name="text">
+         <string>LEF Pins</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

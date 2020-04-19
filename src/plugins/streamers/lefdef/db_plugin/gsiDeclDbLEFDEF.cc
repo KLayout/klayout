@@ -296,6 +296,30 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "@brief Sets the pin geometry layer datatype value.\n"
     "See \\produce_via_geometry for details about the layer production rules."
   ) +
+  gsi::method ("produce_lef_pins", &db::LEFDEFReaderOptions::produce_lef_pins,
+    "@brief Gets a value indicating whether LEF pin geometries shall be produced.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+  ) +
+  gsi::method ("produce_lef_pins=", &db::LEFDEFReaderOptions::set_produce_lef_pins, gsi::arg ("produce"),
+    "@brief Sets a value indicating whether LEF pin geometries shall be produced.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+  ) +
+  gsi::method ("lef_pins_suffix", &db::LEFDEFReaderOptions::lef_pins_suffix,
+    "@brief Gets the LEF pin geometry layer name suffix.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+  ) +
+  gsi::method ("lef_pins_suffix=", &db::LEFDEFReaderOptions::set_lef_pins_suffix, gsi::arg ("suffix"),
+    "@brief Sets the LEF pin geometry layer name suffix.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+  ) +
+  gsi::method ("lef_pins_datatype", &db::LEFDEFReaderOptions::lef_pins_datatype,
+    "@brief Gets the LEF pin geometry layer datatype value.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+  ) +
+  gsi::method ("lef_pins_datatype=", &db::LEFDEFReaderOptions::set_lef_pins_datatype, gsi::arg ("datatype"),
+    "@brief Sets the LEF pin geometry layer datatype value.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+  ) +
   gsi::method ("produce_obstructions", &db::LEFDEFReaderOptions::produce_obstructions,
     "@brief Gets a value indicating whether obstruction markers shall be produced.\n"
     "See \\produce_via_geometry for details about the layer production rules."
@@ -391,6 +415,42 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
   gsi::method ("routing_datatype=", &db::LEFDEFReaderOptions::set_routing_datatype, gsi::arg ("datatype"),
     "@brief Sets the routing layer datatype value.\n"
     "See \\produce_via_geometry for details about the layer production rules."
+  ) +
+  gsi::method ("produce_special_routing", &db::LEFDEFReaderOptions::produce_special_routing,
+    "@brief Gets a value indicating whether special routing geometry shall be produced.\n"
+    "See \\produce_via_geometry for details about the layer production rules.\n"
+    "\n"
+    "The differentiation between special and normal routing has been introduced in version 0.26.5."
+  ) +
+  gsi::method ("produce_special_routing=", &db::LEFDEFReaderOptions::set_produce_special_routing, gsi::arg ("produce"),
+    "@brief Sets a value indicating whether special routing geometry shall be produced.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "\n"
+    "The differentiation between special and normal routing has been introduced in version 0.26.5."
+  ) +
+  gsi::method ("special_routing_suffix", &db::LEFDEFReaderOptions::special_routing_suffix,
+    "@brief Gets the special routing layer name suffix.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "\n"
+    "The differentiation between special and normal routing has been introduced in version 0.26.5."
+  ) +
+  gsi::method ("special_routing_suffix=", &db::LEFDEFReaderOptions::set_special_routing_suffix, gsi::arg ("suffix"),
+    "@brief Sets the special routing layer name suffix.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "\n"
+    "The differentiation between special and normal routing has been introduced in version 0.26.5."
+  ) +
+  gsi::method ("special_routing_datatype", &db::LEFDEFReaderOptions::special_routing_datatype,
+    "@brief Gets the special routing layer datatype value.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "\n"
+    "The differentiation between special and normal routing has been introduced in version 0.26.5."
+  ) +
+  gsi::method ("special_routing_datatype=", &db::LEFDEFReaderOptions::set_special_routing_datatype, gsi::arg ("datatype"),
+    "@brief Sets the special routing layer datatype value.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "\n"
+    "The differentiation between special and normal routing has been introduced in version 0.26.5."
   ) +
   gsi::method ("separate_groups", &db::LEFDEFReaderOptions::separate_groups,
     "@brief Gets a value indicating whether to create separate parent cells for individual groups.\n"

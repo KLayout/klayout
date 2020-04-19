@@ -789,7 +789,7 @@ LEFImporter::read_macro (Layout &layout)
           }
 
           std::map <std::string, db::Box> bboxes;
-          read_geometries (layout, cell, Pins, &bboxes, prop_id);
+          read_geometries (layout, cell, LEFPins, &bboxes, prop_id);
 
           for (std::map <std::string, db::Box>::const_iterator b = bboxes.begin (); b != bboxes.end (); ++b) {
             std::pair <bool, unsigned int> dl = open_layer (layout, b->first, Label);

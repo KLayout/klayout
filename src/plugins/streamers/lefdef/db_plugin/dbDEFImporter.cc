@@ -543,7 +543,7 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
 
         test (")");
 
-        std::pair <bool, unsigned int> dl = open_layer (layout, ln, Routing);
+        std::pair <bool, unsigned int> dl = open_layer (layout, ln, specialnets ? SpecialRouting : Routing);
         if (dl.first) {
 
           db::Point p (x, y);
@@ -597,7 +597,7 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
         }
 
         if (pts.size () > 1) {
-          std::pair <bool, unsigned int> dl = open_layer (layout, ln, Routing);
+          std::pair <bool, unsigned int> dl = open_layer (layout, ln, specialnets ? SpecialRouting : Routing);
           if (dl.first) {
             produce_routing_geometry (design, style, dl.second, prop_id, pts, ext, w);
           }
@@ -749,7 +749,7 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
           db::Polygon p;
           read_polygon (p, scale);
 
-          std::pair <bool, unsigned int> dl = open_layer (layout, ln, Routing);
+          std::pair <bool, unsigned int> dl = open_layer (layout, ln, specialnets ? SpecialRouting : Routing);
           if (dl.first) {
             if (prop_id != 0) {
               design.shapes (dl.second).insert (db::object_with_properties<db::Polygon> (p, prop_id));
@@ -767,7 +767,7 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
           db::Polygon p;
           read_rect (p, scale);
 
-          std::pair <bool, unsigned int> dl = open_layer (layout, ln, Routing);
+          std::pair <bool, unsigned int> dl = open_layer (layout, ln, specialnets ? SpecialRouting : Routing);
           if (dl.first) {
             if (prop_id != 0) {
               design.shapes (dl.second).insert (db::object_with_properties<db::Polygon> (p, prop_id));

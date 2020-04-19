@@ -209,22 +209,6 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 
   std::map<std::pair<std::string, LayerPurpose>, db::LayerProperties> layer_map;
 
-  if (tech_comp ()) {
-
-    const db::LEFDEFReaderOptions &options = *tech_comp ();
-
-    if (options.produce_placement_blockages ()) {
-      layer_map [std::make_pair (std::string (), Blockage)] = lp_from_string (options.placement_blockage_layer ());
-    }
-    if (options.produce_cell_outlines ()) {
-      layer_map [std::make_pair (std::string (), Outline)] = lp_from_string (options.cell_outline_layer ());
-    }
-    if (options.produce_regions ()) {
-      layer_map [std::make_pair (std::string (), Region)] = lp_from_string (options.region_layer ());
-    }
-
-  }
-
   while (! ts.at_end ()) {
 
     const std::string &l = ts.get_line ();
@@ -311,8 +295,6 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
   for (std::map<std::pair<std::string, LayerPurpose>, db::LayerProperties>::const_iterator i = layer_map.begin (); i != layer_map.end (); ++i) {
     map_layer_explicit (i->first.first, i->first.second, lm.map_layer (i->second).second);
   }
-
-  // @@@ TODO: need to assign layer/datatype for all layers present.
 }
 
 void
@@ -362,7 +344,7 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
 
     std::pair <bool, unsigned int> ll (false, 0);
 
-    if (! m_has_explicit_layer_mapping) {
+    if (n.empty () || ! m_has_explicit_layer_mapping) {
       ll = open_layer_uncached (layout, n, purpose);
     }
 
@@ -377,13 +359,13 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
 std::pair <bool, unsigned int>
 LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n, LayerPurpose purpose)
 {
-  if (purpose == Outline || purpose == PlacementBlockage || purpose == Region) {
+  if (n.empty ()) {
 
     //  NOTE: the canonical name is independent from the tech component's settings
     //  as is "(name)". It's used for implementing the automatic map file import
     //  feature.
     std::string ld;
-    bool produce;
+    bool produce = false;
 
     if (purpose == Outline) {
       produce = mp_tech_comp->produce_cell_outlines ();

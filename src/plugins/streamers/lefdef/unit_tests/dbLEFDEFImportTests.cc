@@ -51,6 +51,11 @@ static db::LEFDEFReaderOptions default_options ()
 
 static void run_test (tl::TestBase *_this, const char *lef_dir, const char *filename, const char *au, const db::LEFDEFReaderOptions &tc, bool priv = true)
 {
+  std::string fn_path (priv ? tl::testsrc_private () : tl::testsrc ());
+  fn_path += "/testdata/lefdef/";
+  fn_path += lef_dir;
+  fn_path += "/";
+
   db::LEFDEFReaderState ld (&tc);
 
   db::Manager m (false);
@@ -66,11 +71,7 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
 
     if (ex.test ("def:")) {
 
-      std::string fn (priv ? tl::testsrc_private () : tl::testsrc ());
-      fn += "/testdata/lefdef/";
-      fn += lef_dir;
-      fn += "/";
-      std::string f;
+      std::string fn = fn_path, f;
       ex.read_word_or_quoted (f);
       fn += f;
 
@@ -79,16 +80,22 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
 
     } else if (ex.test ("lef:")) {
 
-      std::string fn (priv ? tl::testsrc_private () : tl::testsrc ());
-      fn += "/testdata/lefdef/";
-      fn += lef_dir;
-      fn += "/";
-      std::string f;
+      std::string fn = fn_path, f;
       ex.read_word_or_quoted (f);
       fn += f;
 
       tl::InputStream stream (fn);
       imp.read_lef (stream, layout, ld);
+
+    } else if (ex.test ("gds:")) {
+
+      std::string fn = fn_path, f;
+      ex.read_word_or_quoted (f);
+      fn += f;
+
+      tl::InputStream stream (fn);
+      db::Reader reader (stream);
+      reader.read (layout, db::LoadLayoutOptions ());
 
     } else {
 
@@ -305,3 +312,7 @@ TEST(108_scanchain)
   run_test (_this, "scanchain", "def:test.def", "au.oas.gz", default_options (), false);
 }
 
+TEST(109_foreigncell)
+{
+  run_test (_this, "foreigncell", "gds:foreign.gds+lef:in_tech.lef+lef:in.lef", "au.oas.gz", default_options (), false);
+}

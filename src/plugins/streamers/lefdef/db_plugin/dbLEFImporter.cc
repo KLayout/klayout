@@ -742,10 +742,8 @@ LEFImporter::read_macro (Layout &layout)
 
     } else if (test ("ORIGIN")) {
 
-      double x = get_double ();
-      double y = get_double ();
+      origin = get_point (1.0 / layout.dbu ());
       expect (";");
-      origin = db::Point (db::DPoint (x / layout.dbu (), y / layout.dbu ()));
 
     } else if (test ("SIZE")) {
 
@@ -761,11 +759,16 @@ LEFImporter::read_macro (Layout &layout)
       std::string dir;
 
       while (! at_end ()) {
+
         if (test ("END")) {
+
           break;
+
         } else if (test ("DIRECTION")) {
+
           dir = get ();
           test (";");
+
         } else if (test ("PORT")) {
 
           //  produce pin labels
@@ -805,6 +808,35 @@ LEFImporter::read_macro (Layout &layout)
       }
 
       expect (pn);
+
+    } else if (test ("FOREIGN")) {
+
+      std::string cn = get ();
+
+      if (cn == mn) {
+        //  rename out macro placeholder cell so we don't create a recursive hierarchy
+        layout.rename_cell (cell.cell_index (), ("LEF_" + mn).c_str ());
+      }
+
+      db::cell_index_type ci;
+      std::pair<bool, db::cell_index_type> c = layout.cell_by_name (cn.c_str ());
+      if (c.first) {
+        ci = c.second;
+      } else {
+        ci = layout.add_cell (cn.c_str ());
+        layout.cell (ci).set_ghost_cell (true);
+      }
+
+      db::Point origin;
+      db::FTrans ft;
+      if (! peek (";")) {
+        origin = get_point (1.0 / layout.dbu ());
+        ft = get_orient (true);
+      }
+
+      expect (";");
+
+      cell.insert (db::CellInstArray (db::CellInst (ci), (db::Trans (origin - db::Point ()) * db::Trans (ft)).inverted ()));
 
     } else if (test ("OBS")) {
 

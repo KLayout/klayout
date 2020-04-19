@@ -830,5 +830,48 @@ LEFDEFImporter::create_generated_via (std::vector<db::Polygon> &bottom,
 
 }
 
+db::FTrans
+LEFDEFImporter::get_orient (bool optional)
+{
+  if (test ("N")) {
+    return db::FTrans (db::FTrans::r0);
+  } else if (test ("S")) {
+    return db::FTrans (db::FTrans::r180);
+  } else if (test ("W")) {
+    return db::FTrans (db::FTrans::r90);
+  } else if (test ("E")) {
+    return db::FTrans (db::FTrans::r270);
+  } else if (test ("FN")) {
+    return db::FTrans (db::FTrans::m90);
+  } else if (test ("FS")) {
+    return db::FTrans (db::FTrans::m0);
+  } else if (test ("FW")) {
+    return db::FTrans (db::FTrans::m45);
+  } else if (test ("FE")) {
+    return db::FTrans (db::FTrans::m135);
+  } else if (optional) {
+    return db::FTrans (db::FTrans::r0);
+  } else {
+    error (tl::to_string (tr ("Invalid orientation specification: ")) + get ());
+    return db::FTrans (db::FTrans::r0);
+  }
+}
+
+db::Point
+LEFDEFImporter::get_point (double scale)
+{
+  double x = get_double ();
+  double y = get_double ();
+  return db::Point (db::DPoint (x * scale, y * scale));
+}
+
+db::Vector
+LEFDEFImporter::get_vector (double scale)
+{
+  double x = get_double ();
+  double y = get_double ();
+  return db::Vector (db::DVector (x * scale, y * scale));
+}
+
 }
 

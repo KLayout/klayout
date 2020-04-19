@@ -67,7 +67,6 @@ private:
   std::map<std::string, ViaDesc> m_via_desc;
   std::map<int, db::Polygon> m_styles;
 
-  db::FTrans get_orient (bool optional);
   void read_polygon (db::Polygon &poly, double scale);
   void read_rect (db::Polygon &poly, double scale);
   std::pair<Coord, Coord> get_wire_width_for_rule(const std::string &rule, const std::string &ln, double dbu);
@@ -84,8 +83,6 @@ private:
   void read_components (std::list<std::pair<std::string, db::CellInstArray> > &instances, double scale);
   void read_single_net (std::string &nondefaultrule, db::Layout &layout, db::Cell &design, double scale, properties_id_type prop_id, bool specialnets);
   void produce_routing_geometry (db::Cell &design, const db::Polygon *style, unsigned int layer, properties_id_type prop_id, const std::vector<db::Point> &pts, const std::vector<std::pair<db::Coord, db::Coord> > &ext, std::pair<db::Coord, db::Coord> w);
-  db::Point get_point (double scale);
-  db::Vector get_vector (double scale);
 };
 
 }

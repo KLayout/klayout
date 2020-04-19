@@ -706,6 +706,24 @@ protected:
   long get_long ();
 
   /**
+   *  @brief Gets an orientation code
+   *  The orientation code is read employing the LEF/DEF convention ("N" for r0 etc.)
+   */
+  db::FTrans get_orient (bool optional);
+
+  /**
+   *  @brief Reads a point
+   *  A point is given by two coordinates, x and y
+   */
+  db::Point get_point (double scale);
+
+  /**
+   *  @brief Reads a vector
+   *  A vector is given by two coordinates, x and y
+   */
+  db::Vector get_vector (double scale);
+
+  /**
    *  @brief Create a new layer or return the index of the given layer
    */
   std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose)

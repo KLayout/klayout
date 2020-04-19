@@ -1398,7 +1398,7 @@ DEFImporter::do_read (db::Layout &layout)
 
         } else {
 
-          std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Region);
+          std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Regions);
           if (dl.first) {
             for (std::vector<db::Polygon>::const_iterator p = r->second.begin (); p != r->second.end (); ++p) {
               group_cell->shapes (dl.second).insert (*p);
@@ -1441,7 +1441,7 @@ DEFImporter::do_read (db::Layout &layout)
 
   if (! regions.empty ()) {
 
-    std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Region);
+    std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Regions);
     if (dl.first) {
 
       for (std::map<std::string, std::vector<db::Polygon> >::const_iterator r = regions.begin (); r != regions.end (); ++r) {

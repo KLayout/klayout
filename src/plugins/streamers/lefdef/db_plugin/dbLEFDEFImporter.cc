@@ -146,25 +146,15 @@ LEFDEFReaderOptions::format_name () const
 // -----------------------------------------------------------------------------------
 //  LEFDEFLayerDelegate implementation
 
-static db::LayerProperties lp_from_string (const std::string &ld)
-{
-  db::LayerProperties lp;
-  tl::Extractor ex (ld.c_str ());
-  try {
-    ex.read (lp);
-    return lp;
-  } catch (...) {
-    return db::LayerProperties (0, 0);
-  }
-}
-
-LEFDEFReaderState::LEFDEFReaderState (const LEFDEFReaderOptions *tc)
+LEFDEFReaderState::LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout &layout)
   : m_create_layers (true), m_has_explicit_layer_mapping (false), m_laynum (1), mp_tech_comp (tc)
 {
   if (tc) {
     m_layer_map = tc->layer_map ();
     m_create_layers = tc->read_all_layers ();
   }
+
+  m_layer_map.prepare (layout);
 }
 
 void
@@ -184,9 +174,10 @@ LEFDEFReaderState::set_explicit_layer_mapping (bool f)
 }
 
 void
-LEFDEFReaderState::map_layer_explicit (const std::string &n, LayerPurpose purpose, unsigned int layer)
+LEFDEFReaderState::map_layer_explicit (const std::string &n, LayerPurpose purpose, const db::LayerProperties &lp, unsigned int layer)
 {
   m_layers [std::make_pair (n, purpose)] = std::make_pair (true, layer);
+  m_layer_map.map (lp, layer);
 }
 
 void
@@ -228,6 +219,14 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
         if (w1 == "DIEAREA") {
 
           layer_map [std::make_pair (std::string (), Outline)] = db::LayerProperties (layer, datatype, "OUTLINE");
+
+        } else if (w1 == "REGIONS") {
+
+          layer_map [std::make_pair (std::string (), Regions)] = db::LayerProperties (layer, datatype, "REGIONS");
+
+        } else if (w1 == "BLOCKAGE") {
+
+          layer_map [std::make_pair (std::string (), PlacementBlockage)] = db::LayerProperties (layer, datatype, "PLACEMENT_BLK");
 
         } else if (w1 == "NAME") {
 
@@ -293,7 +292,7 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 
   db::DirectLayerMapping lm (&layout);
   for (std::map<std::pair<std::string, LayerPurpose>, db::LayerProperties>::const_iterator i = layer_map.begin (); i != layer_map.end (); ++i) {
-    map_layer_explicit (i->first.first, i->first.second, lm.map_layer (i->second).second);
+    map_layer_explicit (i->first.first, i->first.second, i->second, lm.map_layer (i->second).second);
   }
 }
 
@@ -370,10 +369,10 @@ LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n
     if (purpose == Outline) {
       produce = mp_tech_comp->produce_cell_outlines ();
       ld = mp_tech_comp->cell_outline_layer ();
-    } else if (purpose == Region) {
+    } else if (purpose == Regions) {
       produce = mp_tech_comp->produce_regions ();
       ld = mp_tech_comp->region_layer ();
-    } else {
+    } else if (purpose == PlacementBlockage) {
       produce = mp_tech_comp->produce_placement_blockages ();
       ld = mp_tech_comp->placement_blockage_layer ();
     }
@@ -526,12 +525,6 @@ LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n
     }
 
   }
-}
-
-void
-LEFDEFReaderState::prepare (db::Layout &layout)
-{
-  m_layer_map.prepare (layout);
 }
 
 void

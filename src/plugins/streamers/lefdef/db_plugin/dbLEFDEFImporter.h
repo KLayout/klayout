@@ -586,7 +586,7 @@ enum LayerPurpose
   Outline,            //  from LEF+DEF
   Blockage,           //  from DEF only
   PlacementBlockage,  //  from DEF only
-  Region,             //  from DEF only
+  Regions,            //  from DEF only
 };
 
 /**
@@ -600,13 +600,13 @@ public:
   /**
    *  @brief Constructor
    */
-  LEFDEFReaderState (const LEFDEFReaderOptions *tc);
+  LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout &layout);
 
   /**
    *  @brief Provides an explicit layer mapping
    *  This method is used when reading the layer map file.
    */
-  void map_layer_explicit (const std::string &n, LayerPurpose purpose, unsigned int layer);
+  void map_layer_explicit (const std::string &n, LayerPurpose purpose, const LayerProperties &lp, unsigned int layer);
 
   /**
    *  @brief Provides an explicit layer mapping
@@ -661,11 +661,6 @@ public:
    *  @brief Registers a layer (assign a new default layer number)
    */
   void register_layer (const std::string &l);
-
-  /**
-   *  @brief Prepare, i.e. create layers required by the layer map
-   */
-  void prepare (db::Layout &layout);
 
   /**
    *  @brief Finish, i.e. assign GDS layer numbers to the layers

@@ -124,13 +124,12 @@ private:
       lefdef_options = &default_options;
     }
 
-    db::LEFDEFReaderState state (lefdef_options);
+    db::LEFDEFReaderState state (lefdef_options, layout);
 
     if (lefdef_options->consider_map_file ()) {
       state.import_map_file_heuristics (m_stream.absolute_path (), layout);
     }
 
-    state.prepare (layout);
     layout.dbu (lefdef_options->dbu ());
 
     if (import_lef) {

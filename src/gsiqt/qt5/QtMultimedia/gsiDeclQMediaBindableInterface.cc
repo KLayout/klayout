@@ -183,10 +183,10 @@ gsi::Class<QMediaBindableInterface> &qtdecl_QMediaBindableInterface ();
 static gsi::Methods methods_QMediaBindableInterface_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMediaBindableInterface::QMediaBindableInterface()\nThis method creates an object of class QMediaBindableInterface.", &_init_ctor_QMediaBindableInterface_Adaptor_0, &_call_ctor_QMediaBindableInterface_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("mediaObject", "@hide", true, &_init_cbs_mediaObject_c0_0, &_call_cbs_mediaObject_c0_0);
-  methods += new qt_gsi::GenericMethod ("mediaObject", "@brief Virtual method QMediaObject *QMediaBindableInterface::mediaObject()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_mediaObject_c0_0, &_call_cbs_mediaObject_c0_0, &_set_callback_cbs_mediaObject_c0_0);
-  methods += new qt_gsi::GenericMethod ("*setMediaObject", "@hide", false, &_init_cbs_setMediaObject_1782_0, &_call_cbs_setMediaObject_1782_0);
-  methods += new qt_gsi::GenericMethod ("*setMediaObject", "@brief Virtual method bool QMediaBindableInterface::setMediaObject(QMediaObject *object)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setMediaObject_1782_0, &_call_cbs_setMediaObject_1782_0, &_set_callback_cbs_setMediaObject_1782_0);
+  methods += new qt_gsi::GenericMethod ("mediaObject", "@brief Virtual method QMediaObject *QMediaBindableInterface::mediaObject()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_mediaObject_c0_0, &_call_cbs_mediaObject_c0_0);
+  methods += new qt_gsi::GenericMethod ("mediaObject", "@hide", true, &_init_cbs_mediaObject_c0_0, &_call_cbs_mediaObject_c0_0, &_set_callback_cbs_mediaObject_c0_0);
+  methods += new qt_gsi::GenericMethod ("*setMediaObject", "@brief Virtual method bool QMediaBindableInterface::setMediaObject(QMediaObject *object)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setMediaObject_1782_0, &_call_cbs_setMediaObject_1782_0);
+  methods += new qt_gsi::GenericMethod ("*setMediaObject", "@hide", false, &_init_cbs_setMediaObject_1782_0, &_call_cbs_setMediaObject_1782_0, &_set_callback_cbs_setMediaObject_1782_0);
   return methods;
 }
 

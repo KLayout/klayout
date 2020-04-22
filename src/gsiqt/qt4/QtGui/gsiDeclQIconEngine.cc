@@ -472,16 +472,16 @@ gsi::Class<QIconEngine> &qtdecl_QIconEngine ();
 static gsi::Methods methods_QIconEngine_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QIconEngine::QIconEngine()\nThis method creates an object of class QIconEngine.", &_init_ctor_QIconEngine_Adaptor_0, &_call_ctor_QIconEngine_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("actualSize", "@hide", false, &_init_cbs_actualSize_4543_0, &_call_cbs_actualSize_4543_0);
-  methods += new qt_gsi::GenericMethod ("actualSize", "@brief Virtual method QSize QIconEngine::actualSize(const QSize &size, QIcon::Mode mode, QIcon::State state)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actualSize_4543_0, &_call_cbs_actualSize_4543_0, &_set_callback_cbs_actualSize_4543_0);
-  methods += new qt_gsi::GenericMethod ("addFile", "@hide", false, &_init_cbs_addFile_6460_0, &_call_cbs_addFile_6460_0);
-  methods += new qt_gsi::GenericMethod ("addFile", "@brief Virtual method void QIconEngine::addFile(const QString &fileName, const QSize &size, QIcon::Mode mode, QIcon::State state)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_addFile_6460_0, &_call_cbs_addFile_6460_0, &_set_callback_cbs_addFile_6460_0);
-  methods += new qt_gsi::GenericMethod ("addPixmap", "@hide", false, &_init_cbs_addPixmap_4755_0, &_call_cbs_addPixmap_4755_0);
-  methods += new qt_gsi::GenericMethod ("addPixmap", "@brief Virtual method void QIconEngine::addPixmap(const QPixmap &pixmap, QIcon::Mode mode, QIcon::State state)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_addPixmap_4755_0, &_call_cbs_addPixmap_4755_0, &_set_callback_cbs_addPixmap_4755_0);
-  methods += new qt_gsi::GenericMethod ("paint", "@hide", false, &_init_cbs_paint_5848_0, &_call_cbs_paint_5848_0);
-  methods += new qt_gsi::GenericMethod ("paint", "@brief Virtual method void QIconEngine::paint(QPainter *painter, const QRect &rect, QIcon::Mode mode, QIcon::State state)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_paint_5848_0, &_call_cbs_paint_5848_0, &_set_callback_cbs_paint_5848_0);
-  methods += new qt_gsi::GenericMethod ("pixmap", "@hide", false, &_init_cbs_pixmap_4543_0, &_call_cbs_pixmap_4543_0);
-  methods += new qt_gsi::GenericMethod ("pixmap", "@brief Virtual method QPixmap QIconEngine::pixmap(const QSize &size, QIcon::Mode mode, QIcon::State state)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_pixmap_4543_0, &_call_cbs_pixmap_4543_0, &_set_callback_cbs_pixmap_4543_0);
+  methods += new qt_gsi::GenericMethod ("actualSize", "@brief Virtual method QSize QIconEngine::actualSize(const QSize &size, QIcon::Mode mode, QIcon::State state)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actualSize_4543_0, &_call_cbs_actualSize_4543_0);
+  methods += new qt_gsi::GenericMethod ("actualSize", "@hide", false, &_init_cbs_actualSize_4543_0, &_call_cbs_actualSize_4543_0, &_set_callback_cbs_actualSize_4543_0);
+  methods += new qt_gsi::GenericMethod ("addFile", "@brief Virtual method void QIconEngine::addFile(const QString &fileName, const QSize &size, QIcon::Mode mode, QIcon::State state)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_addFile_6460_0, &_call_cbs_addFile_6460_0);
+  methods += new qt_gsi::GenericMethod ("addFile", "@hide", false, &_init_cbs_addFile_6460_0, &_call_cbs_addFile_6460_0, &_set_callback_cbs_addFile_6460_0);
+  methods += new qt_gsi::GenericMethod ("addPixmap", "@brief Virtual method void QIconEngine::addPixmap(const QPixmap &pixmap, QIcon::Mode mode, QIcon::State state)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_addPixmap_4755_0, &_call_cbs_addPixmap_4755_0);
+  methods += new qt_gsi::GenericMethod ("addPixmap", "@hide", false, &_init_cbs_addPixmap_4755_0, &_call_cbs_addPixmap_4755_0, &_set_callback_cbs_addPixmap_4755_0);
+  methods += new qt_gsi::GenericMethod ("paint", "@brief Virtual method void QIconEngine::paint(QPainter *painter, const QRect &rect, QIcon::Mode mode, QIcon::State state)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_paint_5848_0, &_call_cbs_paint_5848_0);
+  methods += new qt_gsi::GenericMethod ("paint", "@hide", false, &_init_cbs_paint_5848_0, &_call_cbs_paint_5848_0, &_set_callback_cbs_paint_5848_0);
+  methods += new qt_gsi::GenericMethod ("pixmap", "@brief Virtual method QPixmap QIconEngine::pixmap(const QSize &size, QIcon::Mode mode, QIcon::State state)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_pixmap_4543_0, &_call_cbs_pixmap_4543_0);
+  methods += new qt_gsi::GenericMethod ("pixmap", "@hide", false, &_init_cbs_pixmap_4543_0, &_call_cbs_pixmap_4543_0, &_set_callback_cbs_pixmap_4543_0);
   return methods;
 }
 

@@ -142,8 +142,8 @@ gsi::Class<QFactoryInterface> &qtdecl_QFactoryInterface ();
 static gsi::Methods methods_QFactoryInterface_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QFactoryInterface::QFactoryInterface()\nThis method creates an object of class QFactoryInterface.", &_init_ctor_QFactoryInterface_Adaptor_0, &_call_ctor_QFactoryInterface_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("keys", "@hide", true, &_init_cbs_keys_c0_0, &_call_cbs_keys_c0_0);
-  methods += new qt_gsi::GenericMethod ("keys", "@brief Virtual method QStringList QFactoryInterface::keys()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_keys_c0_0, &_call_cbs_keys_c0_0, &_set_callback_cbs_keys_c0_0);
+  methods += new qt_gsi::GenericMethod ("keys", "@brief Virtual method QStringList QFactoryInterface::keys()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_keys_c0_0, &_call_cbs_keys_c0_0);
+  methods += new qt_gsi::GenericMethod ("keys", "@hide", true, &_init_cbs_keys_c0_0, &_call_cbs_keys_c0_0, &_set_callback_cbs_keys_c0_0);
   return methods;
 }
 

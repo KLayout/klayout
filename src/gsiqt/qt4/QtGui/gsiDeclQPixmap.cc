@@ -1362,10 +1362,10 @@ static gsi::Methods methods_QPixmap_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPixmap::QPixmap(const QSize &)\nThis method creates an object of class QPixmap.", &_init_ctor_QPixmap_Adaptor_1805, &_call_ctor_QPixmap_Adaptor_1805);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPixmap::QPixmap(const QString &fileName, const char *format, QFlags<Qt::ImageConversionFlag> flags)\nThis method creates an object of class QPixmap.", &_init_ctor_QPixmap_Adaptor_6908, &_call_ctor_QPixmap_Adaptor_6908);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPixmap::QPixmap(const QPixmap &)\nThis method creates an object of class QPixmap.", &_init_ctor_QPixmap_Adaptor_2017, &_call_ctor_QPixmap_Adaptor_2017);
-  methods += new qt_gsi::GenericMethod ("*metric", "@hide", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0);
-  methods += new qt_gsi::GenericMethod ("*metric", "@brief Virtual method int QPixmap::metric(QPaintDevice::PaintDeviceMetric)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0, &_set_callback_cbs_metric_c3445_0);
-  methods += new qt_gsi::GenericMethod ("paintEngine", "@hide", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0);
-  methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Virtual method QPaintEngine *QPixmap::paintEngine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0, &_set_callback_cbs_paintEngine_c0_0);
+  methods += new qt_gsi::GenericMethod ("*metric", "@brief Virtual method int QPixmap::metric(QPaintDevice::PaintDeviceMetric)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0);
+  methods += new qt_gsi::GenericMethod ("*metric", "@hide", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0, &_set_callback_cbs_metric_c3445_0);
+  methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Virtual method QPaintEngine *QPixmap::paintEngine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0);
+  methods += new qt_gsi::GenericMethod ("paintEngine", "@hide", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0, &_set_callback_cbs_paintEngine_c0_0);
   return methods;
 }
 

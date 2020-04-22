@@ -270,12 +270,12 @@ gsi::Class<QFileIconProvider> &qtdecl_QFileIconProvider ();
 static gsi::Methods methods_QFileIconProvider_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QFileIconProvider::QFileIconProvider()\nThis method creates an object of class QFileIconProvider.", &_init_ctor_QFileIconProvider_Adaptor_0, &_call_ctor_QFileIconProvider_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("icon", "@hide", true, &_init_cbs_icon_c3064_0, &_call_cbs_icon_c3064_0);
-  methods += new qt_gsi::GenericMethod ("icon", "@brief Virtual method QIcon QFileIconProvider::icon(QFileIconProvider::IconType type)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_icon_c3064_0, &_call_cbs_icon_c3064_0, &_set_callback_cbs_icon_c3064_0);
-  methods += new qt_gsi::GenericMethod ("icon", "@hide", true, &_init_cbs_icon_c2174_0, &_call_cbs_icon_c2174_0);
-  methods += new qt_gsi::GenericMethod ("icon", "@brief Virtual method QIcon QFileIconProvider::icon(const QFileInfo &info)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_icon_c2174_0, &_call_cbs_icon_c2174_0, &_set_callback_cbs_icon_c2174_0);
-  methods += new qt_gsi::GenericMethod ("type", "@hide", true, &_init_cbs_type_c2174_0, &_call_cbs_type_c2174_0);
-  methods += new qt_gsi::GenericMethod ("type", "@brief Virtual method QString QFileIconProvider::type(const QFileInfo &info)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_type_c2174_0, &_call_cbs_type_c2174_0, &_set_callback_cbs_type_c2174_0);
+  methods += new qt_gsi::GenericMethod ("icon", "@brief Virtual method QIcon QFileIconProvider::icon(QFileIconProvider::IconType type)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_icon_c3064_0, &_call_cbs_icon_c3064_0);
+  methods += new qt_gsi::GenericMethod ("icon", "@hide", true, &_init_cbs_icon_c3064_0, &_call_cbs_icon_c3064_0, &_set_callback_cbs_icon_c3064_0);
+  methods += new qt_gsi::GenericMethod ("icon", "@brief Virtual method QIcon QFileIconProvider::icon(const QFileInfo &info)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_icon_c2174_0, &_call_cbs_icon_c2174_0);
+  methods += new qt_gsi::GenericMethod ("icon", "@hide", true, &_init_cbs_icon_c2174_0, &_call_cbs_icon_c2174_0, &_set_callback_cbs_icon_c2174_0);
+  methods += new qt_gsi::GenericMethod ("type", "@brief Virtual method QString QFileIconProvider::type(const QFileInfo &info)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_type_c2174_0, &_call_cbs_type_c2174_0);
+  methods += new qt_gsi::GenericMethod ("type", "@hide", true, &_init_cbs_type_c2174_0, &_call_cbs_type_c2174_0, &_set_callback_cbs_type_c2174_0);
   return methods;
 }
 

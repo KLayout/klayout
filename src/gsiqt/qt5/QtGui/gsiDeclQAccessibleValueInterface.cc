@@ -357,16 +357,16 @@ gsi::Class<QAccessibleValueInterface> &qtdecl_QAccessibleValueInterface ();
 static gsi::Methods methods_QAccessibleValueInterface_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAccessibleValueInterface::QAccessibleValueInterface()\nThis method creates an object of class QAccessibleValueInterface.", &_init_ctor_QAccessibleValueInterface_Adaptor_0, &_call_ctor_QAccessibleValueInterface_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("currentValue", "@hide", true, &_init_cbs_currentValue_c0_0, &_call_cbs_currentValue_c0_0);
-  methods += new qt_gsi::GenericMethod ("currentValue", "@brief Virtual method QVariant QAccessibleValueInterface::currentValue()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_currentValue_c0_0, &_call_cbs_currentValue_c0_0, &_set_callback_cbs_currentValue_c0_0);
-  methods += new qt_gsi::GenericMethod ("maximumValue", "@hide", true, &_init_cbs_maximumValue_c0_0, &_call_cbs_maximumValue_c0_0);
-  methods += new qt_gsi::GenericMethod ("maximumValue", "@brief Virtual method QVariant QAccessibleValueInterface::maximumValue()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_maximumValue_c0_0, &_call_cbs_maximumValue_c0_0, &_set_callback_cbs_maximumValue_c0_0);
-  methods += new qt_gsi::GenericMethod ("minimumStepSize", "@hide", true, &_init_cbs_minimumStepSize_c0_0, &_call_cbs_minimumStepSize_c0_0);
-  methods += new qt_gsi::GenericMethod ("minimumStepSize", "@brief Virtual method QVariant QAccessibleValueInterface::minimumStepSize()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_minimumStepSize_c0_0, &_call_cbs_minimumStepSize_c0_0, &_set_callback_cbs_minimumStepSize_c0_0);
-  methods += new qt_gsi::GenericMethod ("minimumValue", "@hide", true, &_init_cbs_minimumValue_c0_0, &_call_cbs_minimumValue_c0_0);
-  methods += new qt_gsi::GenericMethod ("minimumValue", "@brief Virtual method QVariant QAccessibleValueInterface::minimumValue()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_minimumValue_c0_0, &_call_cbs_minimumValue_c0_0, &_set_callback_cbs_minimumValue_c0_0);
-  methods += new qt_gsi::GenericMethod ("setCurrentValue", "@hide", false, &_init_cbs_setCurrentValue_2119_0, &_call_cbs_setCurrentValue_2119_0);
-  methods += new qt_gsi::GenericMethod ("setCurrentValue", "@brief Virtual method void QAccessibleValueInterface::setCurrentValue(const QVariant &value)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setCurrentValue_2119_0, &_call_cbs_setCurrentValue_2119_0, &_set_callback_cbs_setCurrentValue_2119_0);
+  methods += new qt_gsi::GenericMethod ("currentValue", "@brief Virtual method QVariant QAccessibleValueInterface::currentValue()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_currentValue_c0_0, &_call_cbs_currentValue_c0_0);
+  methods += new qt_gsi::GenericMethod ("currentValue", "@hide", true, &_init_cbs_currentValue_c0_0, &_call_cbs_currentValue_c0_0, &_set_callback_cbs_currentValue_c0_0);
+  methods += new qt_gsi::GenericMethod ("maximumValue", "@brief Virtual method QVariant QAccessibleValueInterface::maximumValue()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_maximumValue_c0_0, &_call_cbs_maximumValue_c0_0);
+  methods += new qt_gsi::GenericMethod ("maximumValue", "@hide", true, &_init_cbs_maximumValue_c0_0, &_call_cbs_maximumValue_c0_0, &_set_callback_cbs_maximumValue_c0_0);
+  methods += new qt_gsi::GenericMethod ("minimumStepSize", "@brief Virtual method QVariant QAccessibleValueInterface::minimumStepSize()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_minimumStepSize_c0_0, &_call_cbs_minimumStepSize_c0_0);
+  methods += new qt_gsi::GenericMethod ("minimumStepSize", "@hide", true, &_init_cbs_minimumStepSize_c0_0, &_call_cbs_minimumStepSize_c0_0, &_set_callback_cbs_minimumStepSize_c0_0);
+  methods += new qt_gsi::GenericMethod ("minimumValue", "@brief Virtual method QVariant QAccessibleValueInterface::minimumValue()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_minimumValue_c0_0, &_call_cbs_minimumValue_c0_0);
+  methods += new qt_gsi::GenericMethod ("minimumValue", "@hide", true, &_init_cbs_minimumValue_c0_0, &_call_cbs_minimumValue_c0_0, &_set_callback_cbs_minimumValue_c0_0);
+  methods += new qt_gsi::GenericMethod ("setCurrentValue", "@brief Virtual method void QAccessibleValueInterface::setCurrentValue(const QVariant &value)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setCurrentValue_2119_0, &_call_cbs_setCurrentValue_2119_0);
+  methods += new qt_gsi::GenericMethod ("setCurrentValue", "@hide", false, &_init_cbs_setCurrentValue_2119_0, &_call_cbs_setCurrentValue_2119_0, &_set_callback_cbs_setCurrentValue_2119_0);
   return methods;
 }
 

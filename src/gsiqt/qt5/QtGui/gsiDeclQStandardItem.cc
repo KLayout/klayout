@@ -2063,22 +2063,22 @@ static gsi::Methods methods_QStandardItem_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStandardItem::QStandardItem(const QString &text)\nThis method creates an object of class QStandardItem.", &_init_ctor_QStandardItem_Adaptor_2025, &_call_ctor_QStandardItem_Adaptor_2025);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStandardItem::QStandardItem(const QIcon &icon, const QString &text)\nThis method creates an object of class QStandardItem.", &_init_ctor_QStandardItem_Adaptor_3704, &_call_ctor_QStandardItem_Adaptor_3704);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStandardItem::QStandardItem(int rows, int columns)\nThis method creates an object of class QStandardItem.", &_init_ctor_QStandardItem_Adaptor_1426, &_call_ctor_QStandardItem_Adaptor_1426);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QStandardItem *QStandardItem::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("data", "@hide", true, &_init_cbs_data_c767_1, &_call_cbs_data_c767_1);
-  methods += new qt_gsi::GenericMethod ("data", "@brief Virtual method QVariant QStandardItem::data(int role)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_data_c767_1, &_call_cbs_data_c767_1, &_set_callback_cbs_data_c767_1);
+  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QStandardItem *QStandardItem::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
+  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
+  methods += new qt_gsi::GenericMethod ("data", "@brief Virtual method QVariant QStandardItem::data(int role)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_data_c767_1, &_call_cbs_data_c767_1);
+  methods += new qt_gsi::GenericMethod ("data", "@hide", true, &_init_cbs_data_c767_1, &_call_cbs_data_c767_1, &_set_callback_cbs_data_c767_1);
   methods += new qt_gsi::GenericMethod ("*emitDataChanged", "@brief Method void QStandardItem::emitDataChanged()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_emitDataChanged_0, &_call_fp_emitDataChanged_0);
-  methods += new qt_gsi::GenericMethod ("<", "@hide", true, &_init_cbs_operator_lt__c2610_0, &_call_cbs_operator_lt__c2610_0);
-  methods += new qt_gsi::GenericMethod ("<", "@brief Virtual method bool QStandardItem::operator<(const QStandardItem &other)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_operator_lt__c2610_0, &_call_cbs_operator_lt__c2610_0, &_set_callback_cbs_operator_lt__c2610_0);
+  methods += new qt_gsi::GenericMethod ("<", "@brief Virtual method bool QStandardItem::operator<(const QStandardItem &other)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_operator_lt__c2610_0, &_call_cbs_operator_lt__c2610_0);
+  methods += new qt_gsi::GenericMethod ("<", "@hide", true, &_init_cbs_operator_lt__c2610_0, &_call_cbs_operator_lt__c2610_0, &_set_callback_cbs_operator_lt__c2610_0);
   methods += new qt_gsi::GenericMethod ("*assign", "@brief Method QStandardItem &QStandardItem::operator=(const QStandardItem &other)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_operator_eq__2610, &_call_fp_operator_eq__2610);
-  methods += new qt_gsi::GenericMethod ("read", "@hide", false, &_init_cbs_read_1697_0, &_call_cbs_read_1697_0);
-  methods += new qt_gsi::GenericMethod ("read", "@brief Virtual method void QStandardItem::read(QDataStream &in)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_read_1697_0, &_call_cbs_read_1697_0, &_set_callback_cbs_read_1697_0);
-  methods += new qt_gsi::GenericMethod ("setData", "@hide", false, &_init_cbs_setData_2778_1, &_call_cbs_setData_2778_1);
-  methods += new qt_gsi::GenericMethod ("setData", "@brief Virtual method void QStandardItem::setData(const QVariant &value, int role)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setData_2778_1, &_call_cbs_setData_2778_1, &_set_callback_cbs_setData_2778_1);
-  methods += new qt_gsi::GenericMethod ("type", "@hide", true, &_init_cbs_type_c0_0, &_call_cbs_type_c0_0);
-  methods += new qt_gsi::GenericMethod ("type", "@brief Virtual method int QStandardItem::type()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_type_c0_0, &_call_cbs_type_c0_0, &_set_callback_cbs_type_c0_0);
-  methods += new qt_gsi::GenericMethod ("write", "@hide", true, &_init_cbs_write_c1697_0, &_call_cbs_write_c1697_0);
-  methods += new qt_gsi::GenericMethod ("write", "@brief Virtual method void QStandardItem::write(QDataStream &out)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_write_c1697_0, &_call_cbs_write_c1697_0, &_set_callback_cbs_write_c1697_0);
+  methods += new qt_gsi::GenericMethod ("read", "@brief Virtual method void QStandardItem::read(QDataStream &in)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_read_1697_0, &_call_cbs_read_1697_0);
+  methods += new qt_gsi::GenericMethod ("read", "@hide", false, &_init_cbs_read_1697_0, &_call_cbs_read_1697_0, &_set_callback_cbs_read_1697_0);
+  methods += new qt_gsi::GenericMethod ("setData", "@brief Virtual method void QStandardItem::setData(const QVariant &value, int role)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setData_2778_1, &_call_cbs_setData_2778_1);
+  methods += new qt_gsi::GenericMethod ("setData", "@hide", false, &_init_cbs_setData_2778_1, &_call_cbs_setData_2778_1, &_set_callback_cbs_setData_2778_1);
+  methods += new qt_gsi::GenericMethod ("type", "@brief Virtual method int QStandardItem::type()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_type_c0_0, &_call_cbs_type_c0_0);
+  methods += new qt_gsi::GenericMethod ("type", "@hide", true, &_init_cbs_type_c0_0, &_call_cbs_type_c0_0, &_set_callback_cbs_type_c0_0);
+  methods += new qt_gsi::GenericMethod ("write", "@brief Virtual method void QStandardItem::write(QDataStream &out)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_write_c1697_0, &_call_cbs_write_c1697_0);
+  methods += new qt_gsi::GenericMethod ("write", "@hide", true, &_init_cbs_write_c1697_0, &_call_cbs_write_c1697_0, &_set_callback_cbs_write_c1697_0);
   return methods;
 }
 

@@ -323,14 +323,14 @@ gsi::Class<QXmlErrorHandler> &qtdecl_QXmlErrorHandler ();
 static gsi::Methods methods_QXmlErrorHandler_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlErrorHandler::QXmlErrorHandler()\nThis method creates an object of class QXmlErrorHandler.", &_init_ctor_QXmlErrorHandler_Adaptor_0, &_call_ctor_QXmlErrorHandler_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("error", "@hide", false, &_init_cbs_error_3149_0, &_call_cbs_error_3149_0);
-  methods += new qt_gsi::GenericMethod ("error", "@brief Virtual method bool QXmlErrorHandler::error(const QXmlParseException &exception)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_error_3149_0, &_call_cbs_error_3149_0, &_set_callback_cbs_error_3149_0);
-  methods += new qt_gsi::GenericMethod ("errorString", "@hide", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0);
-  methods += new qt_gsi::GenericMethod ("errorString", "@brief Virtual method QString QXmlErrorHandler::errorString()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0, &_set_callback_cbs_errorString_c0_0);
-  methods += new qt_gsi::GenericMethod ("fatalError", "@hide", false, &_init_cbs_fatalError_3149_0, &_call_cbs_fatalError_3149_0);
-  methods += new qt_gsi::GenericMethod ("fatalError", "@brief Virtual method bool QXmlErrorHandler::fatalError(const QXmlParseException &exception)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_fatalError_3149_0, &_call_cbs_fatalError_3149_0, &_set_callback_cbs_fatalError_3149_0);
-  methods += new qt_gsi::GenericMethod ("warning", "@hide", false, &_init_cbs_warning_3149_0, &_call_cbs_warning_3149_0);
-  methods += new qt_gsi::GenericMethod ("warning", "@brief Virtual method bool QXmlErrorHandler::warning(const QXmlParseException &exception)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_warning_3149_0, &_call_cbs_warning_3149_0, &_set_callback_cbs_warning_3149_0);
+  methods += new qt_gsi::GenericMethod ("error", "@brief Virtual method bool QXmlErrorHandler::error(const QXmlParseException &exception)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_error_3149_0, &_call_cbs_error_3149_0);
+  methods += new qt_gsi::GenericMethod ("error", "@hide", false, &_init_cbs_error_3149_0, &_call_cbs_error_3149_0, &_set_callback_cbs_error_3149_0);
+  methods += new qt_gsi::GenericMethod ("errorString", "@brief Virtual method QString QXmlErrorHandler::errorString()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0);
+  methods += new qt_gsi::GenericMethod ("errorString", "@hide", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0, &_set_callback_cbs_errorString_c0_0);
+  methods += new qt_gsi::GenericMethod ("fatalError", "@brief Virtual method bool QXmlErrorHandler::fatalError(const QXmlParseException &exception)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_fatalError_3149_0, &_call_cbs_fatalError_3149_0);
+  methods += new qt_gsi::GenericMethod ("fatalError", "@hide", false, &_init_cbs_fatalError_3149_0, &_call_cbs_fatalError_3149_0, &_set_callback_cbs_fatalError_3149_0);
+  methods += new qt_gsi::GenericMethod ("warning", "@brief Virtual method bool QXmlErrorHandler::warning(const QXmlParseException &exception)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_warning_3149_0, &_call_cbs_warning_3149_0);
+  methods += new qt_gsi::GenericMethod ("warning", "@hide", false, &_init_cbs_warning_3149_0, &_call_cbs_warning_3149_0, &_set_callback_cbs_warning_3149_0);
   return methods;
 }
 

@@ -1145,7 +1145,7 @@ DEFImporter::read_components (std::list<std::pair<std::string, CellInstArray> > 
     std::string inst_name = get ();
     std::string model = get ();
 
-    db::Cell *cell = m_lef_importer.macro_by_name (model);
+    std::pair<db::Cell *, db::Trans> ct = m_lef_importer.macro_by_name (model);
 
     while (test ("+")) {
 
@@ -1158,8 +1158,8 @@ DEFImporter::read_components (std::list<std::pair<std::string, CellInstArray> > 
         db::FTrans ft = get_orient (false /*mandatory*/);
         db::Vector d = pt - m_lef_importer.macro_bbox_by_name (model).transformed (ft).lower_left ();
 
-        if (cell) {
-          db::CellInstArray inst (db::CellInst (cell->cell_index ()), db::Trans (ft.rot (), d));
+        if (ct.first) {
+          db::CellInstArray inst (db::CellInst (ct.first->cell_index ()), db::Trans (ft.rot (), d) * ct.second);
           instances.push_back (std::make_pair (inst_name, inst));
         } else {
           warn (tl::to_string (tr ("Macro not found in LEF file: ")) + model);

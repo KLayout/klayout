@@ -334,15 +334,18 @@ TEST(108_scanchain)
 
 TEST(109_foreigncell)
 {
-  run_test (_this, "foreigncell", "gds:foreign.gds+lef:in_tech.lef+lef:in.lef", "au.oas.gz", default_options (), false);
+  run_test (_this, "foreigncell", "gds:foreign.gds+lef:in_tech.lef+lef:in.lef+def:in.def", "au.oas.gz", default_options (), false);
+}
 
+TEST(110_lefpins)
+{
   db::LEFDEFReaderOptions options = default_options ();
   options.set_produce_lef_pins (false);
-  run_test (_this, "foreigncell", "gds:foreign.gds+lef:in_tech.lef+lef:in.lef", "au_no_lefpins.oas.gz", options, false);
+  run_test (_this, "lefpins", "lef:in_tech.lef+lef:in.lef+def:in.def", "au_no_lefpins.oas.gz", options, false);
 
   options.set_produce_lef_pins (true);
   options.set_lef_pins_datatype (10);
   options.set_lef_pins_suffix (".LEFPIN");
 
-  run_test (_this, "foreigncell", "gds:foreign.gds+lef:in_tech.lef+lef:in.lef", "au_lefpins_mapped.oas.gz", options, false);
+  run_test (_this, "lefpins", "lef:in_tech.lef+lef:in.lef+def:in.def", "au_lefpins_mapped.oas.gz", options, false);
 }

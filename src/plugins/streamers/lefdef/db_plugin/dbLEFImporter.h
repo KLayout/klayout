@@ -63,7 +63,7 @@ public:
    *  Returns 0 if the name is not a valid macro name. Otherwise it returns the pointer
    *  to the corresponding db::Cell object.
    */
-  db::Cell *macro_by_name (const std::string &macro_name) const;
+  std::pair<db::Cell *, db::Trans> macro_by_name (const std::string &macro_name) const;
 
   /**
    *  @brief Get the cell bbox for the given macro name
@@ -125,7 +125,7 @@ private:
   std::map<std::string, std::pair<double, double> > m_default_widths;
   std::map<std::string, double> m_default_ext;
   std::map<std::string, std::pair<double, double> > m_min_widths;
-  std::map<std::string, db::Cell *> m_macros_by_name;
+  std::map<std::string, std::pair<db::Cell *, db::Trans> > m_macros_by_name;
   std::map<std::string, db::Box> m_macro_bboxes_by_name;
   std::map<std::string, ViaDesc> m_vias;
   std::set<std::string> m_routing_layers, m_cut_layers;

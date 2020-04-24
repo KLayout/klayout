@@ -105,14 +105,14 @@ LEFImporter::layer_width (const std::string &layer, const std::string &nondefaul
   }
 }
 
-db::Cell *
+std::pair<db::Cell *, db::Trans>
 LEFImporter::macro_by_name (const std::string &name) const
 {
-  std::map<std::string, db::Cell *>::const_iterator m = m_macros_by_name.find (name);
+  std::map<std::string, std::pair<db::Cell *, db::Trans> >::const_iterator m = m_macros_by_name.find (name);
   if (m != m_macros_by_name.end ()) {
     return m->second;
   } else {
-    return 0;
+    return std::make_pair ((db::Cell *) 0, db::Trans ());
   }
 }
 
@@ -726,9 +726,9 @@ LEFImporter::read_macro (Layout &layout)
   std::string mn = get ();
   set_cellname (mn);
 
-  db::Cell &cell = layout.cell (layout.add_cell (mn.c_str ()));
-
-  m_macros_by_name.insert (std::make_pair (mn, &cell));
+  db::Cell &cell = layout.cell (layout.add_cell ());
+  db::Cell *foreign_cell = 0;
+  db::Trans foreign_trans;
 
   db::Point origin;
   db::Vector size;
@@ -811,12 +811,11 @@ LEFImporter::read_macro (Layout &layout)
 
     } else if (test ("FOREIGN")) {
 
-      std::string cn = get ();
-
-      if (cn == mn) {
-        //  rename out macro placeholder cell so we don't create a recursive hierarchy
-        layout.rename_cell (cell.cell_index (), ("LEF_" + mn).c_str ());
+      if (foreign_cell) {
+        error ("Duplicate FOREIGN definition");
       }
+
+      std::string cn = get ();
 
       db::cell_index_type ci;
       std::pair<bool, db::cell_index_type> c = layout.cell_by_name (cn.c_str ());
@@ -836,7 +835,8 @@ LEFImporter::read_macro (Layout &layout)
 
       expect (";");
 
-      cell.insert (db::CellInstArray (db::CellInst (ci), (db::Trans (origin - db::Point ()) * db::Trans (ft)).inverted ()));
+      foreign_cell = &layout.cell (ci);
+      foreign_trans = (db::Trans (origin - db::Point ()) * db::Trans (ft)).inverted ();
 
     } else if (test ("OBS")) {
 
@@ -851,9 +851,26 @@ LEFImporter::read_macro (Layout &layout)
 
   }
 
-  std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Outline);
-  if (dl.first) {
-    cell.shapes (dl.second).insert (db::Box (-origin, -origin + size));
+  if (! foreign_cell) {
+
+    //  actually implement the real cell
+
+    layout.rename_cell (cell.cell_index (), mn.c_str ());
+
+    std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Outline);
+    if (dl.first) {
+      cell.shapes (dl.second).insert (db::Box (-origin, -origin + size));
+    }
+
+    m_macros_by_name.insert (std::make_pair (mn, std::make_pair (&cell, db::Trans ())));
+
+  } else {
+
+    //  use FOREIGN cell instead of new one
+
+    layout.delete_cell (cell.cell_index ());
+    m_macros_by_name.insert (std::make_pair (mn, std::make_pair (foreign_cell, foreign_trans)));
+
   }
 
   m_macro_bboxes_by_name.insert (std::make_pair (mn, db::Box (-origin, -origin + size)));

@@ -412,11 +412,19 @@ static lay::LayoutView *new_view (QWidget *parent, bool editable, db::Manager *m
   }
   return lv;
 }
+#else
+static lay::LayoutView *new_view (tl::Variant /*dummy*/, bool editable, db::Manager *manager, unsigned int options)
+{
+  return new lay::LayoutView (manager, editable, 0 /*plugin parent*/, 0 /*parent*/, "view", options);
+}
 #endif
 
 Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "LayoutView",
 #if defined(HAVE_QTBINDINGS)
   gsi::constructor ("new", &new_view, gsi::arg ("parent", (QWidget *) 0, "nil"), gsi::arg ("editable", false), gsi::arg ("manager", (db::Manager *) 0, "nil"), gsi::arg ("options", (unsigned int) 0),
+#else
+  gsi::constructor ("new", &new_view, gsi::arg ("parent", tl::Variant (), "nil"), gsi::arg ("editable", false), gsi::arg ("manager", (db::Manager *) 0, "nil"), gsi::arg ("options", (unsigned int) 0),
+#endif
     "@brief Creates a standalone view\n"
     "\n"
     "This constructor is for special purposes only. To create a view in the context of a main window, "
@@ -430,7 +438,6 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "This constructor has been introduced in version 0.25.\n"
     "It has been enhanced with the arguments in version 0.27.\n"
   ) +
-#endif
   gsi::constant ("LV_NoLayers", (unsigned int) lay::LayoutView::LV_NoLayers,
     "@brief With this option, no layers view will be provided (see \\layer_control_frame)\n"
     "Use this value with the constructor's 'options' argument.\n"

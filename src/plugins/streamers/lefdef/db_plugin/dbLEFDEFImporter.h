@@ -525,6 +525,23 @@ public:
     m_consider_map_file = f;
   }
 
+  /**
+   *  @brief Specify the LEF macro resolution strategy
+   *  Values are:
+   *    0: propduce LEF geometry unless a FOREIGN cell is specified (default)
+   *    1: produce LEF geometry always and ignore FOREIGN
+   *    2: produce a placeholder cell always (even if FOREIGN isn't given)
+   */
+  unsigned int macro_resolution_mode () const
+  {
+    return m_macro_resolution_mode;
+  }
+
+  void set_macro_resolution_mode (unsigned int m)
+  {
+    m_macro_resolution_mode = m;
+  }
+
 private:
   bool m_read_all_layers;
   db::LayerMap m_layer_map;
@@ -568,6 +585,7 @@ private:
   int m_special_routing_datatype;
   bool m_separate_groups;
   bool m_consider_map_file;
+  unsigned int m_macro_resolution_mode;
   std::vector<std::string> m_lef_files;
 };
 

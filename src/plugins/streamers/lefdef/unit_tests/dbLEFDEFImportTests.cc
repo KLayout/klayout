@@ -335,6 +335,18 @@ TEST(108_scanchain)
 TEST(109_foreigncell)
 {
   run_test (_this, "foreigncell", "gds:foreign.gds+lef:in_tech.lef+lef:in.lef+def:in.def", "au.oas.gz", default_options (), false);
+
+  db::LEFDEFReaderOptions options = default_options ();
+
+  run_test (_this, "foreigncell", "gds:foreign.gds+lef:in_tech.lef+lef:in2.lef+def:in.def", "au_default.oas.gz", options, false);
+
+  options.set_macro_resolution_mode (1);
+
+  run_test (_this, "foreigncell", "gds:foreign.gds+lef:in_tech.lef+lef:in2.lef+def:in.def", "au_ignore_foreign.oas.gz", options, false);
+
+  options.set_macro_resolution_mode (2);
+
+  run_test (_this, "foreigncell", "gds:foreign.gds+lef:in_tech.lef+lef:in.lef+def:in.def", "au_always_foreign.oas.gz", options, false);
 }
 
 TEST(110_lefpins)

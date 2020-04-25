@@ -180,6 +180,9 @@ private:
           if (is_lef_format (*e)) {
 
             std::string lp = tl::combine_path (input_dir, *e);
+
+            tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file: ")) + lp);
+
             tl::InputStream lef_stream (lp);
             tl::log << tl::to_string (tr ("Reading")) << " " << lp;
             importer.read_lef (lef_stream, layout, state);

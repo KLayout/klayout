@@ -853,7 +853,7 @@ LEFImporter::read_macro (Layout &layout)
 
   }
 
-  if (! foreign_cell) {
+  if (options ().macro_resolution_mode () == 1 || (! foreign_cell && options ().macro_resolution_mode () != 2)) {
 
     //  actually implement the real cell
 
@@ -865,6 +865,22 @@ LEFImporter::read_macro (Layout &layout)
     }
 
     m_macros_by_name.insert (std::make_pair (mn, std::make_pair (&cell, db::Trans ())));
+
+  } else if (! foreign_cell) {
+
+    //  macro resolution mode #2 (always create a MACRO reference, no LEF geometry)
+
+    db::cell_index_type ci;
+    std::pair<bool, db::cell_index_type> c = layout.cell_by_name (mn.c_str ());
+    if (c.first) {
+      ci = c.second;
+    } else {
+      ci = layout.add_cell (mn.c_str ());
+      layout.cell (ci).set_ghost_cell (true);
+    }
+
+    layout.delete_cell (cell.cell_index ());
+    m_macros_by_name.insert (std::make_pair (mn, std::make_pair (&layout.cell (ci), db::Trans ())));
 
   } else if (foreign_name != mn) {
 

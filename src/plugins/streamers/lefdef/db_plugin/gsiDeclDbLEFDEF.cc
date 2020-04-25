@@ -480,6 +480,25 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "\n"
     "This property has been added in version 0.26.5.\n"
   ) +
+  gsi::method ("macro_resolution_mode", &db::LEFDEFReaderOptions::macro_resolution_mode,
+    "@brief Gets the macro resolution mode.\n"
+    "This property describes the way LEF macros are turned into GDS cells. There "
+    "are three modes available:\n"
+    "\n"
+    "@ul\n"
+    "  @li 0: propduce LEF geometry unless a FOREIGN cell is specified (default) @/li\n"
+    "  @li 1: produce LEF geometry always and ignore FOREIGN @/li\n"
+    "  @li 2: produce a placeholder cell always (even if FOREIGN isn't given) @/li\n"
+    "@/ul\n"
+    "\n"
+    "This property has been added in version 0.26.5.\n"
+  ) +
+  gsi::method ("macro_resolution_mode=", &db::LEFDEFReaderOptions::set_macro_resolution_mode, gsi::arg ("mode"),
+    "@brief Sets the macro resolution mode.\n"
+    "See \\macro_resolution_mode for details about this property.\n"
+    "\n"
+    "This property has been added in version 0.26.5.\n"
+  ) +
   gsi::method ("lef_files", &db::LEFDEFReaderOptions::lef_files,
     "@brief Gets the list technology LEF files to additionally import\n"
     "Returns a list of path names for technology LEF files to read in addition to the primary file. "

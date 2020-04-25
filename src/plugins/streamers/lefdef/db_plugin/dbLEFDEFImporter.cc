@@ -77,7 +77,8 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
     m_special_routing_suffix (""),
     m_special_routing_datatype (0),
     m_separate_groups (false),
-    m_consider_map_file (true)
+    m_consider_map_file (true),
+    m_macro_resolution_mode (0)
 {
   //  .. nothing yet ..
 }
@@ -125,6 +126,7 @@ LEFDEFReaderOptions::LEFDEFReaderOptions (const LEFDEFReaderOptions &d)
     m_special_routing_datatype (d.m_special_routing_datatype),
     m_separate_groups (d.m_separate_groups),
     m_consider_map_file (d.m_consider_map_file),
+    m_macro_resolution_mode (d.m_macro_resolution_mode),
     m_lef_files (d.m_lef_files)
 {
   //  .. nothing yet ..

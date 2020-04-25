@@ -729,6 +729,7 @@ LEFImporter::read_macro (Layout &layout)
   db::Cell &cell = layout.cell (layout.add_cell ());
   db::Cell *foreign_cell = 0;
   db::Trans foreign_trans;
+  std::string foreign_name;
 
   db::Point origin;
   db::Vector size;
@@ -837,6 +838,7 @@ LEFImporter::read_macro (Layout &layout)
 
       foreign_cell = &layout.cell (ci);
       foreign_trans = (db::Trans (origin - db::Point ()) * db::Trans (ft)).inverted ();
+      foreign_name = cn;
 
     } else if (test ("OBS")) {
 
@@ -862,6 +864,26 @@ LEFImporter::read_macro (Layout &layout)
       cell.shapes (dl.second).insert (db::Box (-origin, -origin + size));
     }
 
+    m_macros_by_name.insert (std::make_pair (mn, std::make_pair (&cell, db::Trans ())));
+
+  } else if (foreign_name != mn) {
+
+    warn ("FOREIGN name differs from MACRO name in macro: " + mn);
+
+    layout.rename_cell (cell.cell_index (), mn.c_str ());
+
+    //  clear imported LEF geometry with a foreign cell, but provide a level of indirection so we have
+    //  both the MACRO and the FOREIGN name
+
+    for (unsigned int l = 0; l < layout.layers (); ++l) {
+      if (layout.is_valid_layer (l)) {
+        cell.clear (l);
+      }
+    }
+
+    cell.clear_insts ();
+
+    cell.insert (db::CellInstArray (db::CellInst (foreign_cell->cell_index ()), foreign_trans));
     m_macros_by_name.insert (std::make_pair (mn, std::make_pair (&cell, db::Trans ())));
 
   } else {

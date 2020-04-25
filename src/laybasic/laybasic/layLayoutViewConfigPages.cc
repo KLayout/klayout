@@ -1134,6 +1134,8 @@ LayoutViewConfigPage6::stipple_button_clicked ()
           SelectStippleForm stipples_form (0, m_pattern);
           if (stipples_form.exec () && stipples_form.selected () >= 0) {
 
+            unsigned int s = stipples_form.selected ();
+
             m_manager.transaction (tl::to_string (QObject::tr ("Set stipple")));
             m_manager.queue (this, new StipplePaletteOp (m_palette, false, true /*before*/));
             m_palette.set_stipple (i, s);
@@ -1349,6 +1351,8 @@ LayoutViewConfigPage6a::line_style_button_clicked ()
 
         SelectLineStyleForm styles_form (0, m_style);
         if (styles_form.exec () && styles_form.selected () >= 0) {
+
+          unsigned int s = styles_form.selected ();
 
           m_manager.transaction (tl::to_string (QObject::tr ("Set style")));
           m_manager.queue (this, new LineStylePaletteOp (m_palette, true /*before*/));

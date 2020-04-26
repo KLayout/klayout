@@ -1,0 +1,14 @@
+
+.global vdd gnd
+
+X0 FILLER_CAP
+R$1 vdd gnd 1k
+
+* should be ignored:
+.global vdd 
+.global gnd 
+
+.subckt FILLER_CAP
+M0 gnd vdd gnd gnd NMOS W=10u L=10u
+.ends FILLER_CAP
+

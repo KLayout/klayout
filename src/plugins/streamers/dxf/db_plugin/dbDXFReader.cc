@@ -1550,7 +1550,6 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
             if (got_width == 3) {
               widths.push_back (std::make_pair (seg_start, width1));
               widths.push_back (std::make_pair (points.size () - 1, width2));
-              got_width = 0;
             }
 
           } else if (e == "SEQEND") {
@@ -2302,7 +2301,6 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
       //  close previous loop if necessary
       finish_loop (loop_start, iedges.size (), iedges);
-      loop_start = iedges.size ();
 
       //  create the polygons
       std::pair <bool, unsigned int> ll = open_layer (layout, layer);

@@ -25,6 +25,13 @@
 #include "imgObject.h"
 #include "tlUnitTest.h"
 
+static img::Object from_s (const std::string &s)
+{
+  img::Object img;
+  img.from_string (s.c_str ());
+  return img;
+}
+
 TEST(1) 
 {
   img::Object image (12, 8, db::DCplxTrans (), false);
@@ -95,23 +102,32 @@ TEST(1)
   dm.green_gain = 0.75;
   dm.blue_gain = 2.5;
   QColor c (128, 255, 64);
-  dm.false_color_nodes.insert (dm.false_color_nodes.begin () + 1, std::make_pair (0.5, c));
+  QColor c2 (64, 32, 192);
+  dm.false_color_nodes.insert (dm.false_color_nodes.begin () + 1, std::make_pair (0.5, std::make_pair (c, c)));
   image.set_data_mapping (dm);
   EXPECT_EQ (copy1.equals (&image), false);
+  EXPECT_EQ (from_s (image.to_string ()).equals (&image), true);
+  copy1 = image;
+  EXPECT_EQ (copy1.equals (&image), true);
 
+  dm.false_color_nodes.insert (dm.false_color_nodes.begin () + 1, std::make_pair (0.75, std::make_pair (c, c2)));
+  image.set_data_mapping (dm);
+  EXPECT_EQ (copy1.equals (&image), false);
+  EXPECT_EQ (from_s (image.to_string ()).equals (&image), true);
   copy1 = image;
   EXPECT_EQ (copy1.equals (&image), true);
 
   EXPECT_EQ (copy1.data_mapping ().brightness, 0.5);
   EXPECT_EQ (copy1.data_mapping ().red_gain, 1.25);
-  EXPECT_EQ (copy1.data_mapping ().false_color_nodes.size (), size_t (3));
+  EXPECT_EQ (copy1.data_mapping ().false_color_nodes.size (), size_t (4));
 
   img::Object copy2;
   copy2.from_string (image.to_string ().c_str ());
+  EXPECT_EQ (copy2.equals (&image), true);
 
   EXPECT_EQ (copy2.data_mapping ().brightness, 0.5);
   EXPECT_EQ (tl::to_string (copy2.data_mapping ().red_gain), "1.25");
-  EXPECT_EQ (copy2.data_mapping ().false_color_nodes.size (), size_t (3));
+  EXPECT_EQ (copy2.data_mapping ().false_color_nodes.size (), size_t (4));
   EXPECT_EQ (copy2.equals (&image), true);
 
   EXPECT_EQ (image.to_string (), copy2.to_string ());
@@ -203,7 +219,7 @@ TEST(2)
     dm.green_gain = 0.75;
     dm.blue_gain = 2.5;
     QColor c (128, 255, 64);
-    dm.false_color_nodes.insert (dm.false_color_nodes.begin () + 1, std::make_pair (0.5, c));
+    dm.false_color_nodes.insert (dm.false_color_nodes.begin () + 1, std::make_pair (0.5, std::make_pair (c, c)));
     image.set_data_mapping (dm);
     EXPECT_EQ (copy1.equals (&image), false);
 

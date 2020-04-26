@@ -50,8 +50,8 @@ namespace img
 DataMapping::DataMapping ()
   : brightness (0.0), contrast (0.0), gamma (1.0), red_gain (1.0), green_gain (1.0), blue_gain (1.0)
 {
-  false_color_nodes.push_back (std::make_pair (0.0, QColor (0, 0, 0)));
-  false_color_nodes.push_back (std::make_pair (1.0, QColor (255, 255, 255)));
+  false_color_nodes.push_back (std::make_pair (0.0, std::make_pair (QColor (0, 0, 0), QColor (0, 0, 0))));
+  false_color_nodes.push_back (std::make_pair (1.0, std::make_pair (QColor (255, 255, 255), QColor (255, 255, 255))));
 }
 
 bool 
@@ -91,7 +91,10 @@ DataMapping::operator== (const DataMapping &d) const
     if (fabs (false_color_nodes[i].first - d.false_color_nodes[i].first) > epsilon) {
       return false;
     }
-    if (false_color_nodes[i].second != d.false_color_nodes[i].second) {
+    if (false_color_nodes[i].second.first != d.false_color_nodes[i].second.first) {
+      return false;
+    }
+    if (false_color_nodes[i].second.second != d.false_color_nodes[i].second.second) {
       return false;
     }
   }
@@ -136,8 +139,11 @@ DataMapping::operator< (const DataMapping &d) const
     if (fabs (false_color_nodes[i].first - d.false_color_nodes[i].first) > epsilon) {
       return false_color_nodes[i].first < d.false_color_nodes[i].first;
     }
-    if (false_color_nodes[i].second != d.false_color_nodes[i].second) {
-      return false_color_nodes[i].second.rgb () < d.false_color_nodes[i].second.rgb ();
+    if (false_color_nodes[i].second.first != d.false_color_nodes[i].second.first) {
+      return false_color_nodes[i].second.first.rgb () < d.false_color_nodes[i].second.first.rgb ();
+    }
+    if (false_color_nodes[i].second.second != d.false_color_nodes[i].second.second) {
+      return false_color_nodes[i].second.second.rgb () < d.false_color_nodes[i].second.second.rgb ();
     }
   }
 
@@ -186,10 +192,10 @@ DataMapping::create_data_mapping (bool monochrome, double xmin, double xmax, uns
     for (unsigned int i = 1; i < false_color_nodes.size (); ++i) {
 
       int h1, s1, v1;
-      false_color_nodes [i - 1].second.getHsv (&h1, &s1, &v1);
+      false_color_nodes [i - 1].second.second.getHsv (&h1, &s1, &v1);
 
       int h2, s2, v2;
-      false_color_nodes [i].second.getHsv (&h2, &s2, &v2);
+      false_color_nodes [i].second.first.getHsv (&h2, &s2, &v2);
 
       //  The number of steps is chosen such that the full HSV band divides into approximately 200 steps
       double nsteps = 0.5 * sqrt (double (h1 - h2) * double (h1 - h2) + double (s1 - s2) * double (s1 - s2) + double (v1 - v2) * double (v1 - v2));
@@ -220,11 +226,11 @@ DataMapping::create_data_mapping (bool monochrome, double xmin, double xmax, uns
 
     double ylast = 0.0;
     if (channel == 0) {
-      ylast = false_color_nodes.back ().second.red ();
+      ylast = false_color_nodes.back ().second.second.red ();
     } else if (channel == 1) {
-      ylast = false_color_nodes.back ().second.green ();
+      ylast = false_color_nodes.back ().second.second.green ();
     } else if (channel == 2) {
-      ylast = false_color_nodes.back ().second.blue ();
+      ylast = false_color_nodes.back ().second.second.blue ();
     }
 
     gray_to_color->push_back (false_color_nodes.back ().first, ylast / 255.0);
@@ -1266,18 +1272,33 @@ Object::from_string (const char *str, const char *base_dir)
 
         double x = 0.0;
         lay::ColorConverter cc;
-        QColor c;
+        QColor cl, cr;
         std::string s;
 
         m_data_mapping.false_color_nodes.clear ();
 
         while (! ex.at_end () && ! ex.test ("]")) {
+
           ex.read (x);
+
           ex.test (",");
+
+          s.clear ();
           ex.read_word_or_quoted (s);
-          cc.from_string (s, c);
-          m_data_mapping.false_color_nodes.push_back (std::make_pair (x, c));
+          cc.from_string (s, cl);
+
+          if (ex.test (",")) {
+            s.clear ();
+            ex.read_word_or_quoted (s);
+            cc.from_string (s, cr);
+          } else {
+            cr = cl;
+          }
+
+          m_data_mapping.false_color_nodes.push_back (std::make_pair (x, std::make_pair (cl, cr)));
+
           ex.test (";");
+
         }
 
       } else if (ex.test ("width=")) {
@@ -1604,7 +1625,12 @@ Object::to_string () const
     for (unsigned int i = 0; i < data_mapping ().false_color_nodes.size (); ++i) {
       os << data_mapping ().false_color_nodes[i].first;
       os << ",";
-      os << tl::to_word_or_quoted_string (cc.to_string (data_mapping ().false_color_nodes[i].second));
+      const std::pair<QColor, QColor> &clr = data_mapping ().false_color_nodes[i].second;
+      os << tl::to_word_or_quoted_string (cc.to_string (clr.first));
+      if (clr.first != clr.second) {
+        os << ",";
+        os << tl::to_word_or_quoted_string (cc.to_string (clr.second));
+      }
       os << ";";
     }
 

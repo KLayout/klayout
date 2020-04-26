@@ -44,7 +44,12 @@ static void clear_colormap (img::DataMapping *dm)
 
 static void add_colormap (img::DataMapping *dm, double value, lay::color_t color)
 {
-  dm->false_color_nodes.push_back (std::make_pair (value, QColor (color)));
+  dm->false_color_nodes.push_back (std::make_pair (value, std::make_pair (QColor (color), QColor (color))));
+}
+
+static void add_colormap2 (img::DataMapping *dm, double value, lay::color_t lcolor, lay::color_t rcolor)
+{
+  dm->false_color_nodes.push_back (std::make_pair (value, std::make_pair (QColor (lcolor), QColor (rcolor))));
 }
 
 static size_t num_colormap_entries (const img::DataMapping *dm)
@@ -55,7 +60,25 @@ static size_t num_colormap_entries (const img::DataMapping *dm)
 static lay::color_t colormap_color (const img::DataMapping *dm, size_t i)
 {
   if (i < dm->false_color_nodes.size ()) {
-    return dm->false_color_nodes [i].second.rgb ();
+    return dm->false_color_nodes [i].second.first.rgb ();
+  } else {
+    return 0;
+  }
+}
+
+static lay::color_t colormap_lcolor (const img::DataMapping *dm, size_t i)
+{
+  if (i < dm->false_color_nodes.size ()) {
+    return dm->false_color_nodes [i].second.first.rgb ();
+  } else {
+    return 0;
+  }
+}
+
+static lay::color_t colormap_rcolor (const img::DataMapping *dm, size_t i)
+{
+  if (i < dm->false_color_nodes.size ()) {
+    return dm->false_color_nodes [i].second.second.rgb ();
   } else {
     return 0;
   }
@@ -147,6 +170,22 @@ gsi::Class<img::DataMapping> decl_ImageDataMapping ("lay", "ImageDataMapping",
     "blue component (0 to 255), the second byte the green component and the third byte the "
     "red component, i.e. 0xff0000 is red and 0x0000ff is blue. "
   ) +
+  gsi::method_ext ("add_colormap_entry", &gsi::add_colormap2, gsi::arg ("value"), gsi::arg ("lcolor"), gsi::arg ("rcolor"),
+    "@brief Add a colormap entry for this data mapping object.\n"
+    "@param value The value at which the given color should be applied.\n"
+    "@param lcolor The color to apply left of the value (a 32 bit RGB value).\n"
+    "@param rcolor The color to apply right of the value (a 32 bit RGB value).\n"
+    "\n"
+    "This settings establishes a color mapping for a given value in the monochrome channel. "
+    "The colors must be given as a 32 bit integer, where the lowest order byte describes the "
+    "blue component (0 to 255), the second byte the green component and the third byte the "
+    "red component, i.e. 0xff0000 is red and 0x0000ff is blue.\n"
+    "\n"
+    "In contrast to the version with one color, this version allows specifying a color left and right "
+    "of the value - i.e. a discontinuous step.\n"
+    "\n"
+    "This variant has been introduced in version 0.27.\n"
+  ) +
   gsi::method_ext ("num_colormap_entries", &gsi::num_colormap_entries,
     "@brief Returns the current number of color map entries.\n"
     "@return The number of entries.\n"
@@ -155,11 +194,23 @@ gsi::Class<img::DataMapping> decl_ImageDataMapping ("lay", "ImageDataMapping",
     "@brief Returns the color for a given color map entry.\n"
     "@param n The index of the entry (0..\\num_colormap_entries-1)\n"
     "@return The color (see \\add_colormap_entry for a description).\n"
+    "\n"
+    "NOTE: this version is deprecated and provided for backward compatibility. For discontinuous nodes "
+    "this method delivers the left-sided color."
   ) +
-  gsi::method_ext ("colormap_value", &gsi::colormap_value, gsi::arg ("n"),
-    "@brief Returns the vlue for a given color map entry.\n"
+  gsi::method_ext ("colormap_lcolor", &gsi::colormap_lcolor, gsi::arg ("n"),
+    "@brief Returns the left-side color for a given color map entry.\n"
     "@param n The index of the entry (0..\\num_colormap_entries-1)\n"
-    "@return The value (see \\add_colormap_entry for a description).\n"
+    "@return The color (see \\add_colormap_entry for a description).\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
+  gsi::method_ext ("colormap_rcolor", &gsi::colormap_rcolor, gsi::arg ("n"),
+    "@brief Returns the right-side color for a given color map entry.\n"
+    "@param n The index of the entry (0..\\num_colormap_entries-1)\n"
+    "@return The color (see \\add_colormap_entry for a description).\n"
+    "\n"
+    "This method has been introduced in version 0.27."
   ) +
   gsi::method_ext ("brightness=", &gsi::set_brightness, gsi::arg ("brightness"),
     "@brief Set the brightness\n"

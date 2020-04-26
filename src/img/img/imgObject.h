@@ -73,7 +73,7 @@ public:
    *  Each node is a pair or x-value (normalized to a range of 0..1) and a corresponding color.
    *  The list should have an element with x value of 0.0 and one with an x value of 1.0.
    */
-  std::vector< std::pair<double, QColor> > false_color_nodes;
+  std::vector< std::pair<double, std::pair<QColor, QColor> > > false_color_nodes;
 
   /**
    *  @brief The brightness value

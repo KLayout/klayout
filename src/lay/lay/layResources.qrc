@@ -127,6 +127,8 @@
         <file alias="folder_12.png">images/folder_12.png</file>
         <file alias="file_12.png">images/file_12.png</file>
         <file alias="empty_12.png">images/empty_12.png</file>
+        <file alias="unlocked_16.png">images/unlocked_16.png</file>
+        <file alias="locked_16.png">images/locked_16.png</file>
     </qresource>
     <qresource prefix="/syntax">
         <file alias="ruby.xml">syntax/ruby.xml</file>

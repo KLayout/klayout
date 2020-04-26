@@ -1930,6 +1930,7 @@ property_getter_impl (int mid, PyObject *self)
 
     //  a signal getter is implemented as returning a proxy object for the signal which allows manipulation
     //  of the signal
+    tl_assert (p != 0);  //  no static signals
     return PYASignal::create (self, p->signal_handler (meth));
 
   } else {

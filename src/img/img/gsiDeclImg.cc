@@ -190,6 +190,11 @@ gsi::Class<img::DataMapping> decl_ImageDataMapping ("lay", "ImageDataMapping",
     "@brief Returns the current number of color map entries.\n"
     "@return The number of entries.\n"
   ) +
+  gsi::method_ext ("colormap_value", &gsi::colormap_value, gsi::arg ("n"),
+    "@brief Returns the vlue for a given color map entry.\n"
+    "@param n The index of the entry (0..\\num_colormap_entries-1)\n"
+    "@return The value (see \\add_colormap_entry for a description).\n"
+  ) +
   gsi::method_ext ("colormap_color", &gsi::colormap_color, gsi::arg ("n"),
     "@brief Returns the color for a given color map entry.\n"
     "@param n The index of the entry (0..\\num_colormap_entries-1)\n"
@@ -401,6 +406,13 @@ private:
   tl::DeferredMethod<ImageRef> dm_update_view;
 };
 
+static ImageRef *img_from_s (const std::string &s)
+{
+  std::auto_ptr<ImageRef> img (new ImageRef ());
+  img->from_string (s.c_str ());
+  return img.release ();
+}
+
 static ImageRef *new_image ()
 {
   return new ImageRef ();
@@ -525,6 +537,10 @@ static std::vector<bool> get_mask_data (ImageRef *obj)
 gsi::Class<img::Object> decl_BasicImage ("lay", "BasicImage", gsi::Methods (), "@hide");
 
 gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
+  gsi::constructor ("from_s", &gsi::img_from_s, gsi::arg ("s"),
+    "@brief Creates an image from the string returned by \\to_s.\n"
+    "This method has been introduced in version 0.27."
+  ) +
   gsi::constructor ("new", &gsi::new_image,
     "@brief Create a new image with the default attributes"
     "\n"
@@ -973,6 +989,7 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
   ) +
   gsi::method ("to_s", &ImageRef::to_string,
     "@brief Converts the image to a string\n"
+    "The string returned can be used to create an image object using \\from_s.\n"
     "@return The string\n"
   ),
   "@brief An image to be stored as a layout annotation\n"

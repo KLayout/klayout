@@ -53,14 +53,31 @@ class IMG_TestClass < TestBase
     assert_equal(dm.num_colormap_entries, 0)
     dm.add_colormap_entry(0, 0x123456);
     dm.add_colormap_entry(0.5, 0xff0000);
+    dm.add_colormap_entry(0.75, 0x123456, 0x654321);
     dm.add_colormap_entry(1.0, 0x00ff00);
-    assert_equal(dm.num_colormap_entries, 3)
+    assert_equal(dm.num_colormap_entries, 4)
     assert_equal(dm.colormap_color(0) & 0xffffff, 0x123456)
     assert_equal(dm.colormap_value(0), 0.0)
     assert_equal(dm.colormap_color(1) & 0xffffff, 0xff0000)
+    assert_equal(dm.colormap_lcolor(1) & 0xffffff, 0xff0000)
+    assert_equal(dm.colormap_rcolor(1) & 0xffffff, 0xff0000)
     assert_equal(dm.colormap_value(1), 0.5)
-    assert_equal(dm.colormap_color(2) & 0xffffff, 0x00ff00)
-    assert_equal(dm.colormap_value(2), 1.0)
+    assert_equal(dm.colormap_color(2) & 0xffffff, 0x123456)
+    assert_equal(dm.colormap_lcolor(2) & 0xffffff, 0x123456)
+    assert_equal(dm.colormap_rcolor(2) & 0xffffff, 0x654321)
+    assert_equal(dm.colormap_value(2), 0.75)
+    assert_equal(dm.colormap_color(3) & 0xffffff, 0x00ff00)
+    assert_equal(dm.colormap_value(3), 1.0)
+
+    image = RBA::Image.new 
+    image.data_mapping = dm
+
+    dm2 = image.data_mapping
+    assert_equal(dm2.num_colormap_entries, 4)
+
+    dm.clear_colormap
+    assert_equal(dm2.num_colormap_entries, 4)
+    assert_equal(dm.num_colormap_entries, 0)
 
   end
 
@@ -74,11 +91,20 @@ class IMG_TestClass < TestBase
     assert_equal(image.to_s, "empty:")
     assert_equal(image.is_empty?, true)
 
+    image2 = RBA::Image::from_s(image.to_s)
+    assert_equal(image2.to_s, image.to_s)
+
     image = RBA::Image.new(2, 3, [])
     assert_equal(image.to_s, "mono:matrix=(1,0,0) (0,1,0) (0,0,1);min_value=0;max_value=1;is_visible=true;z_position=0;brightness=0;contrast=0;gamma=1;red_gain=1;green_gain=1;blue_gain=1;color_mapping=[0,'#000000';1,'#ffffff';];width=2;height=3;data=[0;0;0;0;0;0;]")
 
+    image2 = RBA::Image::from_s(image.to_s)
+    assert_equal(image2.to_s, image.to_s)
+
     image = RBA::Image.new(2, 3, [], [], [])
     assert_equal(image.to_s, "color:matrix=(1,0,0) (0,1,0) (0,0,1);min_value=0;max_value=1;is_visible=true;z_position=0;brightness=0;contrast=0;gamma=1;red_gain=1;green_gain=1;blue_gain=1;color_mapping=[0,'#000000';1,'#ffffff';];width=2;height=3;data=[0,0,0;0,0,0;0,0,0;0,0,0;0,0,0;0,0,0;]")
+
+    image2 = RBA::Image::from_s(image.to_s)
+    assert_equal(image2.to_s, image.to_s)
 
     data = [0.0, 0.5, 1.5, 2.5, 10, 20]
     image = RBA::Image.new(2, 3, data)

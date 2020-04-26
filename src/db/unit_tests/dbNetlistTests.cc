@@ -1337,9 +1337,97 @@ TEST(21_FlattenSubCircuit2)
     "  device NMOS $1 (S=$1,G=$3,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
     "end;\n"
   );
+
+
 }
 
-TEST(22_BlankCircuit)
+TEST(22_FlattenSubCircuitPinsJoinNets)
+{
+  db::Netlist nl;
+
+  db::DeviceClass *dc;
+
+  dc = new db::DeviceClassMOS3Transistor ();
+  dc->set_name ("NMOS");
+  nl.add_device_class (dc);
+
+  dc = new db::DeviceClassMOS3Transistor ();
+  dc->set_name ("PMOS");
+  nl.add_device_class (dc);
+
+  nl.from_string (
+    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "  subcircuit INV2 INV2_SC1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 INV2_SC2 (IN=FB,$2=(null),OUT=$I8,$4=VSS,$5=VDD);\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  subcircuit PTRANS SC1 ($1=$5,$2=$2,$3=IN);\n"
+    "  subcircuit NTRANS SC2 ($1=$4,$2=$2,$3=IN);\n"
+    "  subcircuit PTRANS SC3 ($1=$5,$2=OUT,$3=$2);\n"
+    "  subcircuit NTRANS SC4 ($1=$4,$2=OUT,$3=$2);\n"
+    "end;\n"
+    "circuit PTRANS ($1=$1,$2=$2,$3=$1);\n"
+    "  device PMOS $1 (S=$1,D=$2,G=$1) (L=0.25,W=0.95);\n"
+    "end;\n"
+    "circuit NTRANS ($1=$1,$2=$2,$3=$2);\n"
+    "  device NMOS $1 (S=$1,D=$2,G=$2) (L=0.25,W=0.95);\n"
+    "end;\n"
+  );
+
+  db::Netlist nl2;
+
+  nl2 = nl;
+  nl2.flatten_circuit (nl2.circuit_by_name ("PTRANS"));
+
+  EXPECT_EQ (nl2.to_string (),
+    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "  subcircuit INV2 INV2_SC1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 INV2_SC2 (IN=FB,$2=(null),OUT=$I8,$4=VSS,$5=VDD);\n"
+    "end;\n"
+    "circuit INV2 (IN=$5,$2=$5,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$5,G=$5,D=$5) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $2 (S=$5,G=$5,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  subcircuit NTRANS SC2 ($1=$4,$2=$5,$3=$5);\n"
+    "  subcircuit NTRANS SC4 ($1=$4,$2=OUT,$3=$5);\n"
+    "end;\n"
+    "circuit NTRANS ($1=$1,$2=$2,$3=$2);\n"
+    "  device NMOS $1 (S=$1,G=$2,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  nl2.flatten_circuit (nl2.circuit_by_name ("NTRANS"));
+
+  EXPECT_EQ (nl2.to_string (),
+    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "  subcircuit INV2 INV2_SC1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 INV2_SC2 (IN=FB,$2=(null),OUT=$I8,$4=VSS,$5=VDD);\n"
+    "end;\n"
+    "circuit INV2 (IN=OUT,$2=OUT,OUT=OUT,$4=$4,$5=OUT);\n"
+    "  device PMOS $1 (S=OUT,G=OUT,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $2 (S=OUT,G=OUT,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $3 (S=$4,G=OUT,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $4 (S=$4,G=OUT,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  nl2.flatten_circuit (nl2.circuit_by_name ("INV2"));
+
+  EXPECT_EQ (nl2.to_string (),
+    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=OSC);\n"
+    "  device PMOS $1 (S=OSC,G=OSC,D=OSC) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $2 (S=OSC,G=OSC,D=OSC) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $3 (S=VSS,G=OSC,D=OSC) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $4 (S=VSS,G=OSC,D=OSC) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $5 (S=OSC,G=OSC,D=OSC) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $6 (S=OSC,G=OSC,D=OSC) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $7 (S=VSS,G=OSC,D=OSC) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $8 (S=VSS,G=OSC,D=OSC) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+}
+
+TEST(23_BlankCircuit)
 {
   db::Netlist nl;
 
@@ -1439,7 +1527,7 @@ TEST(22_BlankCircuit)
   );
 }
 
-TEST(23_NetlistObject)
+TEST(24_NetlistObject)
 {
   db::NetlistObject nlo;
   nlo.set_property (1, "hello");
@@ -1526,7 +1614,7 @@ TEST(23_NetlistObject)
   EXPECT_EQ (pin3.property (1).to_string (), "hello");
 }
 
-TEST(24_JoinNets)
+TEST(25_JoinNets)
 {
   db::Netlist nl;
   db::Circuit *c;
@@ -1575,7 +1663,7 @@ TEST(24_JoinNets)
   );
 }
 
-TEST(25_JoinNets)
+TEST(26_JoinNets)
 {
   db::Netlist nl;
   db::Circuit *c;

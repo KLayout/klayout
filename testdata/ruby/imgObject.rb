@@ -190,18 +190,18 @@ class IMG_TestClass < TestBase
 
     assert_equal(image.filename, "")
 
-    if false 
-      image = RBA::Image.new("/home/matthias/a.png")
-      assert_equal(image.trans.to_s, "r0 *1 0,0")
-      assert_equal(image.width, 728)
-      assert_equal(image.height, 762)
-      assert_equal(image.filename, "/home/matthias/a.png")
-      
-      image = RBA::Image.new("/home/matthias/a.png", t)
-      assert_equal(image.trans.to_s, "r90 *2.5 1,5")
-      assert_equal(image.width, 728)
-      assert_equal(image.height, 762)
-    end
+    fn = ENV["TESTSRC"] + "/testdata/img/gs.png"
+
+    image = RBA::Image.new(fn)
+    assert_equal(image.trans.to_s, "r0 *1 -513.5,-349")
+    assert_equal(image.width, 1027)
+    assert_equal(image.height, 698)
+    assert_equal(image.filename, fn)
+    
+    image = RBA::Image.new(fn, t)
+    assert_equal(image.trans.to_s, "r90 *1 873.5,-1278.75")
+    assert_equal(image.width, 1027)
+    assert_equal(image.height, 698)
     
     image.min_value = -12.5
     assert_equal(image.min_value, -12.5)

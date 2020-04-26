@@ -419,7 +419,10 @@ bool NetlistSpiceReader::read_card ()
 
       while (! ex.at_end ()) {
         std::string n = read_name (ex);
-        m_global_nets.push_back (n);
+        if (m_global_net_names.find (n) == m_global_net_names.end ()) {
+          m_global_nets.push_back (n);
+          m_global_net_names.insert (n);
+        }
       }
 
     } else if (ex.test_without_case ("subckt")) {

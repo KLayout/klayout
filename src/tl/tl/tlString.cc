@@ -941,6 +941,15 @@ Extractor::read (unsigned int &value)
 }
 
 Extractor &
+Extractor::read (unsigned char &value)
+{
+  if (! try_read (value)) {
+    error (tl::to_string (tr ("Expected an unsigned byte value")));
+  }
+  return *this;
+}
+
+Extractor &
 Extractor::read (unsigned long &value)
 {
   if (! try_read (value)) {
@@ -960,6 +969,15 @@ Extractor::read (unsigned long long &value)
 
 Extractor &
 Extractor::read (double &value)
+{
+  if (! try_read (value)) {
+    error (tl::to_string (tr ("Expected a real number")));
+  }
+  return *this;
+}
+
+Extractor &
+Extractor::read (float &value)
 {
   if (! try_read (value)) {
     error (tl::to_string (tr ("Expected a real number")));
@@ -1099,6 +1117,14 @@ namespace
       return tl::to_string (tr ("Range overflow on unsigned integer"));
     }
   };
+
+  template <> struct overflow_msg_func<unsigned char>
+  {
+    std::string operator() () const
+    {
+      return tl::to_string (tr ("Range overflow on unsigned byte"));
+    }
+  };
 }
 
 template <class T> bool
@@ -1168,6 +1194,12 @@ Extractor::try_read_unsigned_int (T &value)
 }
 
 bool
+Extractor::try_read (unsigned char &value)
+{
+  return try_read_unsigned_int (value);
+}
+
+bool
 Extractor::try_read (unsigned int &value)
 {
   return try_read_unsigned_int (value);
@@ -1202,6 +1234,19 @@ Extractor::try_read (long long &value)
 {
   return try_read_signed_int (value);
 }
+
+bool
+Extractor::try_read (float &value)
+{
+  double d = value;
+  if (try_read (d)) {
+    value = d;
+    return true;
+  } else {
+    return false;
+  }
+}
+
 bool
 Extractor::try_read (double &value)
 {

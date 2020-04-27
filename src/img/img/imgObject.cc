@@ -710,31 +710,16 @@ Object::Object ()
   mp_pixel_data = 0;
 }
 
-Object::Object (size_t w, size_t h, const db::DCplxTrans &trans, bool color)
+Object::Object (size_t w, size_t h, const db::DCplxTrans &trans, bool color, bool byte_data)
   : m_trans (trans), m_id (make_id ()), m_min_value (0.0), m_max_value (1.0), m_min_value_set (false), m_max_value_set (false), m_visible (true), m_z_position (0)
 {
   m_updates_enabled = false;
   mp_pixel_data = 0;
 
-  mp_data = new DataHeader (w, h, color, false);
+  mp_data = new DataHeader (w, h, color, byte_data);
   mp_data->add_ref ();
-
-  //  The default data type is float
-  tl_assert (! is_byte_data ());
-
-  if (is_color ()) {
-    for (unsigned int c = 0; c < 3; ++c) {
-      float *d = mp_data->float_data (c);
-      for (size_t i = data_length (); i > 0; --i) {
-        *d++ = 0.0;
-      }
-    }
-  } else {
-    float *d = mp_data->float_data ();
-    for (size_t i = data_length (); i > 0; --i) {
-      *d++ = 0.0;
-    }
-  }
+  clear ();
+  m_updates_enabled = true;
 }
 
 Object::Object (size_t w, size_t h, const db::DCplxTrans &trans, unsigned char *d)
@@ -808,32 +793,15 @@ Object::Object (const std::string &filename, const db::DCplxTrans &trans)
   m_updates_enabled = true;
 }
 
-Object::Object (size_t w, size_t h, const db::Matrix3d &trans, bool color)
+Object::Object (size_t w, size_t h, const db::Matrix3d &trans, bool color, bool byte_data)
   : m_trans (trans), m_id (make_id ()), m_min_value (0.0), m_max_value (1.0), m_min_value_set (false), m_max_value_set (false), m_visible (true), m_z_position (0)
 {
   m_updates_enabled = false;
   mp_pixel_data = 0;
 
-  mp_data = new DataHeader (w, h, color, false);
+  mp_data = new DataHeader (w, h, color, byte_data);
   mp_data->add_ref ();
-
-  //  The default data type is float
-  tl_assert (! is_byte_data ());
-
-  if (is_color ()) {
-    for (unsigned int c = 0; c < 3; ++c) {
-      float *d = mp_data->float_data (c);
-      for (size_t i = data_length (); i > 0; --i) {
-        *d++ = 0.0;
-      }
-    }
-  } else {
-    float *d = mp_data->float_data ();
-    for (size_t i = data_length (); i > 0; --i) {
-      *d++ = 0.0;
-    }
-  }
-
+  clear ();
   m_updates_enabled = true;
 }
 
@@ -1082,6 +1050,48 @@ db::DUserObjectBase *
 Object::clone () const
 {
   return new img::Object (*this);
+}
+
+void
+Object::clear ()
+{
+  if (is_byte_data ()) {
+
+    if (is_color ()) {
+
+      for (unsigned int c = 0; c < 3; ++c) {
+        unsigned char *d = mp_data->byte_data (c);
+        for (size_t i = data_length (); i > 0; --i) {
+          *d++ = 0.0;
+        }
+      }
+
+    } else {
+
+      unsigned char *d = mp_data->byte_data ();
+      for (size_t i = data_length (); i > 0; --i) {
+        *d++ = 0.0;
+      }
+
+    }
+
+  } else if (is_color ()) {
+
+    for (unsigned int c = 0; c < 3; ++c) {
+      float *d = mp_data->float_data (c);
+      for (size_t i = data_length (); i > 0; --i) {
+        *d++ = 0.0;
+      }
+    }
+
+  } else {
+
+    float *d = mp_data->float_data ();
+    for (size_t i = data_length (); i > 0; --i) {
+      *d++ = 0.0;
+    }
+
+  }
 }
 
 db::DPolygon

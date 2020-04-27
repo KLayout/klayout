@@ -34,7 +34,7 @@ static img::Object from_s (const std::string &s)
 
 TEST(1) 
 {
-  img::Object image (12, 8, db::DCplxTrans (), false);
+  img::Object image (12, 8, db::DCplxTrans (), false, false);
 
   EXPECT_EQ (image.is_color (), false);
   EXPECT_EQ (image.is_byte_data (), false);
@@ -150,7 +150,7 @@ TEST(1)
 TEST(2) 
 {
   for (unsigned int channel = 0; channel < 3; ++channel) {
-    img::Object image (12, 8, db::DCplxTrans (), true);
+    img::Object image (12, 8, db::DCplxTrans (), true, false);
 
     EXPECT_EQ (image.is_color (), true);
 

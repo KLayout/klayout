@@ -1344,7 +1344,7 @@ public:
   {
     if (mp_image) {
       db::Matrix3d m = db::Matrix3d::disp ((p0 - db::DPoint ()) + db::DVector (nx * dx * 0.5, ny * dy * 0.5)) * db::Matrix3d::mag (dx, dy);
-      *mp_image = img::Object (nx, ny, m, false);
+      *mp_image = img::Object (nx, ny, m, false, false);
     }
   }
 

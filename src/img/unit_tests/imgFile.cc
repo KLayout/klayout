@@ -44,6 +44,7 @@ TEST(1_FloatMono)
   dm.contrast = -0.5;
   dm.gamma = 1.5;
   dm.brightness = 1.25;
+  dm.false_color_nodes.clear ();
   dm.false_color_nodes.push_back (std::make_pair (0.0, std::make_pair (QColor (0, 0, 0), QColor (0, 0, 0))));
   dm.false_color_nodes.push_back (std::make_pair (0.5, std::make_pair (QColor (255, 0, 0), QColor (0, 255, 0))));
   dm.false_color_nodes.push_back (std::make_pair (1.0, std::make_pair (QColor (255, 255, 255), QColor (255, 255, 255))));

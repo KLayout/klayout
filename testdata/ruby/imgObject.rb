@@ -396,6 +396,25 @@ class IMG_TestClass < TestBase
 
   end
 
+  def test_4
+
+    tmp = File::join($ut_testtmp, "tmp.lyimg")
+
+    t = RBA::DCplxTrans.new(2.5, 90, false, RBA::DPoint.new(1, 5))
+
+    image = RBA::Image.new(2, 3, t, [1,2,3,4,5,6])
+    assert_equal(image.to_s, "mono:matrix=(0,-2.5,-2.75) (2.5,0,7.5) (0,0,1);min_value=0;max_value=1;is_visible=true;z_position=0;brightness=0;contrast=0;gamma=1;red_gain=1;green_gain=1;blue_gain=1;color_mapping=[0,'#000000';1,'#ffffff';];width=2;height=3;data=[1;2;3;4;5;6;]")
+
+    image.write(tmp)
+
+    image.clear
+    assert_equal(image.to_s, "mono:matrix=(0,-2.5,-2.75) (2.5,0,7.5) (0,0,1);min_value=0;max_value=1;is_visible=true;z_position=0;brightness=0;contrast=0;gamma=1;red_gain=1;green_gain=1;blue_gain=1;color_mapping=[0,'#000000';1,'#ffffff';];width=2;height=3;data=[0;0;0;0;0;0;]")
+
+    image2 = RBA::Image::read(tmp)
+    assert_equal(image2.to_s, "mono:matrix=(0,-2.5,-2.75) (2.5,0,7.5) (0,0,1);min_value=0;max_value=1;is_visible=true;z_position=0;brightness=0;contrast=0;gamma=1;red_gain=1;green_gain=1;blue_gain=1;color_mapping=[0,'#000000';1,'#ffffff';];width=2;height=3;data=[1;2;3;4;5;6;]")
+
+  end
+
 end
 
 load("test_epilogue.rb")

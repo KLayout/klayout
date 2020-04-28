@@ -26,6 +26,7 @@
 #include "gsiSignals.h"
 #include "imgObject.h"
 #include "imgService.h"
+#include "imgStream.h"
 #include "dbTilingProcessor.h"
 #include "layLayoutView.h"
 
@@ -413,6 +414,24 @@ static ImageRef *img_from_s (const std::string &s)
   return img.release ();
 }
 
+static ImageRef *load_image (const std::string &path)
+{
+  tl::InputFile file (path);
+  tl::InputStream stream (file);
+
+  std::auto_ptr<img::Object> read;
+  read.reset (img::ImageStreamer::read (stream));
+  //  need to create a copy for now ...
+  return new ImageRef (*read);
+}
+
+static void save_image (const ImageRef *image, const std::string &path)
+{
+  tl::OutputFile file (path);
+  tl::OutputStream stream (file);
+  img::ImageStreamer::write (stream, *image);
+}
+
 static ImageRef *new_image ()
 {
   return new ImageRef ();
@@ -539,6 +558,16 @@ gsi::Class<img::Object> decl_BasicImage ("lay", "BasicImage", gsi::Methods (), "
 gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
   gsi::constructor ("from_s", &gsi::img_from_s, gsi::arg ("s"),
     "@brief Creates an image from the string returned by \\to_s.\n"
+    "This method has been introduced in version 0.27."
+  ) +
+  gsi::constructor ("read", &load_image, gsi::arg ("path"),
+    "@brief Loads the image from the given path.\n"
+    "\n"
+    "This method expects the image file as a KLayout image format file (.lyimg). "
+    "This is a XML-based format containing the image data plus placement and transformation "
+    "information for the image placement. In addition, image manipulation parameters for "
+    "false color display and color channel enhancement are embedded.\n"
+    "\n"
     "This method has been introduced in version 0.27."
   ) +
   gsi::constructor ("new", &gsi::new_image,
@@ -680,6 +709,10 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "@brief Transforms the image with the given complex transformation\n"
     "@param t The magnifying transformation to apply\n"
     "@return The transformed object\n"
+  ) +
+  gsi::method ("clear", &ImageRef::clear,
+    "@brief Clears the image data (sets to 0 or black).\n"
+    "This method has been introduced in version 0.27."
   ) +
   gsi::method ("width", &ImageRef::width,
     "@brief Gets the width of the image in pixels\n"
@@ -991,6 +1024,10 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "@brief Converts the image to a string\n"
     "The string returned can be used to create an image object using \\from_s.\n"
     "@return The string\n"
+  ) +
+  gsi::method_ext ("write", &save_image, gsi::arg ("path"),
+    "@brief Saves the image to KLayout's image format (.lyimg)\n"
+    "This method has been introduced in version 0.27."
   ),
   "@brief An image to be stored as a layout annotation\n"
   "\n"

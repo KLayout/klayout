@@ -947,6 +947,11 @@ public:
   virtual std::string to_string () const;
 
   /**
+   *  @brief Swap with another image object
+   */
+  void swap (img::Object &other);
+
+  /**
    *  @brief Return the memory used in bytes
    */
   virtual void mem_stat (db::MemStatistics *stat, db::MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const;

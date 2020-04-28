@@ -23,6 +23,7 @@
 
 #include "imgObject.h"
 #include "imgWidgets.h" // for interpolate_color()
+#include "imgStream.h"
 #include "tlLog.h"
 #include "tlTimer.h"
 #include "layPlugin.h"
@@ -1487,6 +1488,24 @@ Object::read_file ()
     tl::info << "Reading image file " << m_filename;
   }
 
+  try {
+
+    tl::InputFile file (m_filename);
+    tl::InputStream stream (file);
+    std::auto_ptr<img::Object> read;
+    read.reset (img::ImageStreamer::read (stream));
+    read->m_filename = m_filename;
+
+    //  for now we need to copy here ...
+    *this = *read;
+
+    //  exit on success
+    return;
+
+  } catch (...) {
+    //  continue with other formats ...
+  }
+
   QImage qimage (tl::to_qstring (m_filename));
 
   if (! qimage.isNull ()) {
@@ -1715,6 +1734,25 @@ Object::to_string () const
   }
   
   return os.str ();
+}
+
+void
+Object::swap (Object &other)
+{
+  m_filename.swap (other.m_filename);
+  std::swap (m_trans, other.m_trans);
+  std::swap (mp_data, other.mp_data);
+  std::swap (m_id, other.m_id);
+  std::swap (m_min_value, other.m_min_value);
+  std::swap (m_max_value, other.m_max_value);
+  std::swap (m_min_value_set, other.m_min_value_set);
+  std::swap (m_max_value_set, other.m_max_value_set);
+  std::swap (m_data_mapping, other.m_data_mapping);
+  std::swap (m_visible, other.m_visible);
+  std::swap (mp_pixel_data, other.mp_pixel_data);
+  m_landmarks.swap (other.m_landmarks);
+  std::swap (m_z_position, other.m_z_position);
+  std::swap (m_updates_enabled, other.m_updates_enabled);
 }
 
 size_t 

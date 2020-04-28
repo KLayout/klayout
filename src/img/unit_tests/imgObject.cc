@@ -130,6 +130,14 @@ TEST(1)
   EXPECT_EQ (copy2.data_mapping ().false_color_nodes.size (), size_t (4));
   EXPECT_EQ (copy2.equals (&image), true);
 
+  img::Object copy3, empty;
+  copy3.swap (copy2);
+  EXPECT_EQ (copy3.equals (&image), true);
+  EXPECT_EQ (copy2.equals (&empty), true);
+  copy3.swap (copy2);
+  EXPECT_EQ (copy2.equals (&image), true);
+  EXPECT_EQ (copy3.equals (&empty), true);
+
   EXPECT_EQ (image.to_string (), copy2.to_string ());
 
   EXPECT_EQ (image.mask (1, 2), true);

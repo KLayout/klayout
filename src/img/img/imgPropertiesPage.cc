@@ -23,9 +23,11 @@
 
 #include "imgPropertiesPage.h"
 #include "imgLandmarksDialog.h"
+#include "imgStream.h"
 #include "layLayoutView.h"
 #include "layFileDialog.h"
 #include "tlExceptions.h"
+#include "tlFileUtils.h"
 
 namespace img
 {
@@ -127,6 +129,7 @@ PropertiesPage::init ()
   connect (value_le, SIGNAL (returnPressed ()), this, SLOT (value_return_pressed ()));
 
   connect (reset_pb, SIGNAL (clicked ()), this, SLOT (reset_pressed ()));
+  connect (save_pb, SIGNAL (clicked ()), this, SLOT (save_pressed ()));
   connect (preview_cbx, SIGNAL (clicked ()), this, SLOT (preview_checked ()));
   connect (define_landmarks_pb, SIGNAL (clicked ()), this, SLOT (define_landmarks_pressed ()));
 }
@@ -833,6 +836,31 @@ BEGIN_PROTECTED
       s_filename = filename;
       update ();
     }
+  }
+
+END_PROTECTED
+}
+
+void
+PropertiesPage::save_pressed ()
+{
+BEGIN_PROTECTED
+
+  apply ();
+
+  lay::FileDialog file_dialog (this, tl::to_string (QObject::tr ("Save As KLayout Image File")), tl::to_string (QObject::tr ("KLayout image files (*.lyimg);;All files (*)")));
+
+  std::string filename = mp_direct_image->filename ();
+  if (! filename.empty () && tl::extension (filename) != "lyimg") {
+    filename = tl::basename (filename) + ".lyimg";
+  }
+
+  if (file_dialog.get_save (filename)) {
+
+    tl::OutputFile file (filename);
+    tl::OutputStream stream (file);
+    img::ImageStreamer::write (stream, *mp_direct_image);
+
   }
 
 END_PROTECTED

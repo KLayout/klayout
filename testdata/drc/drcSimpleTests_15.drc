@@ -1,0 +1,10 @@
+
+source($drc_test_source, "TOP")
+target($drc_test_target)
+
+# various shielding configurations
+
+l1 = input(1,0)
+l1.output(1, 0)
+l1.space(0.21.um, euclidian).output(10, 0)
+

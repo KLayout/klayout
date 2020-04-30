@@ -131,6 +131,7 @@ private:
   std::string m_stored_line;
   std::map<std::string, bool> m_captured;
   std::vector<std::string> m_global_nets;
+  std::set<std::string> m_global_net_names;
   std::set<const db::Circuit *> m_circuits_read;
 
   void push_stream (const std::string &path);

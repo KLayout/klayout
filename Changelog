@@ -1,3 +1,25 @@
+
+0.26.5          (2020-xx-xx):
+
+* Bugfix: %GITHUB%/issues/539
+      An internal error happened on netlist flatten sometimes
+* Bugfix: %GITHUB%/issues/524
+      Failed queries leave layout in undefined state
+* Bugfix: %GITHUB%/issues/525
+      Report true source line in DRC and LVS verbose mode
+* Bugfix: %GITHUB%/issues/526
+      Makes script debugging more reliable
+* Enhancement: %GITHUB%/issues/527
+      Wildcard layer mapping for stream readers
+* Bugfix: %GITHUB%/issues/544
+      Duplicate .global statements in SPICE netlists created
+      duplicate pins
+* Bugfix: %GITHUB%/issues/548
+      A shielding issue was fixed for DRC space measurements
+* Bugfix: diff tool bug with paths
+      Differences in path points where no reported
+* Enhancement: documentation clarifications and typos fixed
+
 0.26.4          (2020-03-02):
 
 * Bugfix: %GITHUB%/issues/517

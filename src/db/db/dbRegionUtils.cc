@@ -76,7 +76,7 @@ static inline bool shields (const db::EdgePair &ep, const db::Edge &q)
   std::pair<bool, db::Point> ip2 = pe2.intersect_point (q);
 
   if (ip1.first && ip2.first) {
-    return ip1.second != ip2.second || (ip1.second != q.p1 () && ip2.second != q.p2 ());
+    return ip1.second != ip2.second || (pe1.side_of (q.p1 ()) != 0 && pe2.side_of (q.p2 ()) != 0);
   } else {
     return false;
   }

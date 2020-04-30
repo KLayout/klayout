@@ -133,3 +133,4 @@ Class<db::Manager> decl_Manager ("db", "Manager",
 );
 
 }
+

@@ -38,7 +38,9 @@ namespace tl
 TL_PUBLIC NO_RETURN void assertion_failed (const char *filename, unsigned int line, const char *condition);
 
 //  the throw int(0) instruction will tell the compiler that the assertion will not return
-#define tl_assert(COND) if (!(COND)) { tl::assertion_failed (__FILE__, __LINE__, #COND); }
+#define tl_assert(COND) if (!(COND)) { \
+  tl::assertion_failed (__FILE__, __LINE__, #COND); \
+}
 
 } // namespace tl
 

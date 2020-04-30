@@ -114,7 +114,7 @@ PYAChannelObject::make_class (PyObject *module)
       {"write", (PyCFunction) &pya_channel_write, METH_VARARGS, "internal stdout/stderr redirection object: write method" },
       {"flush", (PyCFunction) &pya_channel_flush, METH_VARARGS, "internal stdout/stderr redirection object: flush method" },
       {"isatty", (PyCFunction) &pya_channel_isatty, METH_VARARGS, "internal stdout/stderr redirection object: isatty method" },
-      {NULL,	NULL},
+      {NULL,  NULL},
   };
 
   channel_type.tp_flags = Py_TPFLAGS_DEFAULT;
@@ -630,7 +630,7 @@ PYASignal::make_class (PyObject *module)
       {"remove", (PyCFunction) &pya_signal_remove, METH_VARARGS, "internal signal proxy object: -= operator" },
       {"set", (PyCFunction) &pya_signal_set, METH_VARARGS, "internal signal proxy object: assignment" },
       {"clear", (PyCFunction) &pya_signal_clear, METH_NOARGS, "internal signal proxy object: clears all receivers" },
-      {NULL,	NULL},
+      {NULL,  NULL},
   };
 
   static PyNumberMethods nm = { };

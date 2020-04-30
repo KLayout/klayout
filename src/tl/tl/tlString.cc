@@ -1731,10 +1731,10 @@ std::string format_sci_stlport_fix (double f, int prec, unsigned int flags)
   std::string res;
   res.reserve (os.str ().size ());
   for (const char *cp = os.str ().c_str (); *cp; ++cp) {
-	if (*cp == '0' && (cp[1] == 'e' || cp[1] == 'E')) {
-	  ++cp;
-	}
-	res += *cp;
+  if (*cp == '0' && (cp[1] == 'e' || cp[1] == 'E')) {
+    ++cp;
+  }
+  res += *cp;
   }
   return res;
 };
@@ -1841,7 +1841,7 @@ sprintf (const char *f, const std::vector <tl::Variant> &vv, unsigned int a0)
         }
         if (a < vv.size ()) {
 #if defined(_STLPORT_VERSION) && _STLPORT_VERSION == 0x521 && defined(_MSC_VER)
-	      os << format_sci_stlport_fix (vv [a].to_double (), os.precision (), os.flags ()).c_str ();
+        os << format_sci_stlport_fix (vv [a].to_double (), os.precision (), os.flags ()).c_str ();
 #else
           os << vv [a].to_double ();
 #endif

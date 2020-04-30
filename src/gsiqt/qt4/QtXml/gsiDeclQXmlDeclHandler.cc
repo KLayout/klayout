@@ -371,14 +371,14 @@ gsi::Class<QXmlDeclHandler> &qtdecl_QXmlDeclHandler ();
 static gsi::Methods methods_QXmlDeclHandler_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlDeclHandler::QXmlDeclHandler()\nThis method creates an object of class QXmlDeclHandler.", &_init_ctor_QXmlDeclHandler_Adaptor_0, &_call_ctor_QXmlDeclHandler_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("attributeDecl", "@hide", false, &_init_cbs_attributeDecl_9693_0, &_call_cbs_attributeDecl_9693_0);
-  methods += new qt_gsi::GenericMethod ("attributeDecl", "@brief Virtual method bool QXmlDeclHandler::attributeDecl(const QString &eName, const QString &aName, const QString &type, const QString &valueDefault, const QString &value)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_attributeDecl_9693_0, &_call_cbs_attributeDecl_9693_0, &_set_callback_cbs_attributeDecl_9693_0);
-  methods += new qt_gsi::GenericMethod ("errorString", "@hide", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0);
-  methods += new qt_gsi::GenericMethod ("errorString", "@brief Virtual method QString QXmlDeclHandler::errorString()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0, &_set_callback_cbs_errorString_c0_0);
-  methods += new qt_gsi::GenericMethod ("externalEntityDecl", "@hide", false, &_init_cbs_externalEntityDecl_5859_0, &_call_cbs_externalEntityDecl_5859_0);
-  methods += new qt_gsi::GenericMethod ("externalEntityDecl", "@brief Virtual method bool QXmlDeclHandler::externalEntityDecl(const QString &name, const QString &publicId, const QString &systemId)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_externalEntityDecl_5859_0, &_call_cbs_externalEntityDecl_5859_0, &_set_callback_cbs_externalEntityDecl_5859_0);
-  methods += new qt_gsi::GenericMethod ("internalEntityDecl", "@hide", false, &_init_cbs_internalEntityDecl_3942_0, &_call_cbs_internalEntityDecl_3942_0);
-  methods += new qt_gsi::GenericMethod ("internalEntityDecl", "@brief Virtual method bool QXmlDeclHandler::internalEntityDecl(const QString &name, const QString &value)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_internalEntityDecl_3942_0, &_call_cbs_internalEntityDecl_3942_0, &_set_callback_cbs_internalEntityDecl_3942_0);
+  methods += new qt_gsi::GenericMethod ("attributeDecl", "@brief Virtual method bool QXmlDeclHandler::attributeDecl(const QString &eName, const QString &aName, const QString &type, const QString &valueDefault, const QString &value)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_attributeDecl_9693_0, &_call_cbs_attributeDecl_9693_0);
+  methods += new qt_gsi::GenericMethod ("attributeDecl", "@hide", false, &_init_cbs_attributeDecl_9693_0, &_call_cbs_attributeDecl_9693_0, &_set_callback_cbs_attributeDecl_9693_0);
+  methods += new qt_gsi::GenericMethod ("errorString", "@brief Virtual method QString QXmlDeclHandler::errorString()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0);
+  methods += new qt_gsi::GenericMethod ("errorString", "@hide", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0, &_set_callback_cbs_errorString_c0_0);
+  methods += new qt_gsi::GenericMethod ("externalEntityDecl", "@brief Virtual method bool QXmlDeclHandler::externalEntityDecl(const QString &name, const QString &publicId, const QString &systemId)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_externalEntityDecl_5859_0, &_call_cbs_externalEntityDecl_5859_0);
+  methods += new qt_gsi::GenericMethod ("externalEntityDecl", "@hide", false, &_init_cbs_externalEntityDecl_5859_0, &_call_cbs_externalEntityDecl_5859_0, &_set_callback_cbs_externalEntityDecl_5859_0);
+  methods += new qt_gsi::GenericMethod ("internalEntityDecl", "@brief Virtual method bool QXmlDeclHandler::internalEntityDecl(const QString &name, const QString &value)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_internalEntityDecl_3942_0, &_call_cbs_internalEntityDecl_3942_0);
+  methods += new qt_gsi::GenericMethod ("internalEntityDecl", "@hide", false, &_init_cbs_internalEntityDecl_3942_0, &_call_cbs_internalEntityDecl_3942_0, &_set_callback_cbs_internalEntityDecl_3942_0);
   return methods;
 }
 

@@ -549,22 +549,22 @@ gsi::Class<QXmlLexicalHandler> &qtdecl_QXmlLexicalHandler ();
 static gsi::Methods methods_QXmlLexicalHandler_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlLexicalHandler::QXmlLexicalHandler()\nThis method creates an object of class QXmlLexicalHandler.", &_init_ctor_QXmlLexicalHandler_Adaptor_0, &_call_ctor_QXmlLexicalHandler_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("comment", "@hide", false, &_init_cbs_comment_2025_0, &_call_cbs_comment_2025_0);
-  methods += new qt_gsi::GenericMethod ("comment", "@brief Virtual method bool QXmlLexicalHandler::comment(const QString &ch)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_comment_2025_0, &_call_cbs_comment_2025_0, &_set_callback_cbs_comment_2025_0);
-  methods += new qt_gsi::GenericMethod ("endCDATA", "@hide", false, &_init_cbs_endCDATA_0_0, &_call_cbs_endCDATA_0_0);
-  methods += new qt_gsi::GenericMethod ("endCDATA", "@brief Virtual method bool QXmlLexicalHandler::endCDATA()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_endCDATA_0_0, &_call_cbs_endCDATA_0_0, &_set_callback_cbs_endCDATA_0_0);
-  methods += new qt_gsi::GenericMethod ("endDTD", "@hide", false, &_init_cbs_endDTD_0_0, &_call_cbs_endDTD_0_0);
-  methods += new qt_gsi::GenericMethod ("endDTD", "@brief Virtual method bool QXmlLexicalHandler::endDTD()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_endDTD_0_0, &_call_cbs_endDTD_0_0, &_set_callback_cbs_endDTD_0_0);
-  methods += new qt_gsi::GenericMethod ("endEntity", "@hide", false, &_init_cbs_endEntity_2025_0, &_call_cbs_endEntity_2025_0);
-  methods += new qt_gsi::GenericMethod ("endEntity", "@brief Virtual method bool QXmlLexicalHandler::endEntity(const QString &name)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_endEntity_2025_0, &_call_cbs_endEntity_2025_0, &_set_callback_cbs_endEntity_2025_0);
-  methods += new qt_gsi::GenericMethod ("errorString", "@hide", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0);
-  methods += new qt_gsi::GenericMethod ("errorString", "@brief Virtual method QString QXmlLexicalHandler::errorString()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0, &_set_callback_cbs_errorString_c0_0);
-  methods += new qt_gsi::GenericMethod ("startCDATA", "@hide", false, &_init_cbs_startCDATA_0_0, &_call_cbs_startCDATA_0_0);
-  methods += new qt_gsi::GenericMethod ("startCDATA", "@brief Virtual method bool QXmlLexicalHandler::startCDATA()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_startCDATA_0_0, &_call_cbs_startCDATA_0_0, &_set_callback_cbs_startCDATA_0_0);
-  methods += new qt_gsi::GenericMethod ("startDTD", "@hide", false, &_init_cbs_startDTD_5859_0, &_call_cbs_startDTD_5859_0);
-  methods += new qt_gsi::GenericMethod ("startDTD", "@brief Virtual method bool QXmlLexicalHandler::startDTD(const QString &name, const QString &publicId, const QString &systemId)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_startDTD_5859_0, &_call_cbs_startDTD_5859_0, &_set_callback_cbs_startDTD_5859_0);
-  methods += new qt_gsi::GenericMethod ("startEntity", "@hide", false, &_init_cbs_startEntity_2025_0, &_call_cbs_startEntity_2025_0);
-  methods += new qt_gsi::GenericMethod ("startEntity", "@brief Virtual method bool QXmlLexicalHandler::startEntity(const QString &name)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_startEntity_2025_0, &_call_cbs_startEntity_2025_0, &_set_callback_cbs_startEntity_2025_0);
+  methods += new qt_gsi::GenericMethod ("comment", "@brief Virtual method bool QXmlLexicalHandler::comment(const QString &ch)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_comment_2025_0, &_call_cbs_comment_2025_0);
+  methods += new qt_gsi::GenericMethod ("comment", "@hide", false, &_init_cbs_comment_2025_0, &_call_cbs_comment_2025_0, &_set_callback_cbs_comment_2025_0);
+  methods += new qt_gsi::GenericMethod ("endCDATA", "@brief Virtual method bool QXmlLexicalHandler::endCDATA()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_endCDATA_0_0, &_call_cbs_endCDATA_0_0);
+  methods += new qt_gsi::GenericMethod ("endCDATA", "@hide", false, &_init_cbs_endCDATA_0_0, &_call_cbs_endCDATA_0_0, &_set_callback_cbs_endCDATA_0_0);
+  methods += new qt_gsi::GenericMethod ("endDTD", "@brief Virtual method bool QXmlLexicalHandler::endDTD()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_endDTD_0_0, &_call_cbs_endDTD_0_0);
+  methods += new qt_gsi::GenericMethod ("endDTD", "@hide", false, &_init_cbs_endDTD_0_0, &_call_cbs_endDTD_0_0, &_set_callback_cbs_endDTD_0_0);
+  methods += new qt_gsi::GenericMethod ("endEntity", "@brief Virtual method bool QXmlLexicalHandler::endEntity(const QString &name)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_endEntity_2025_0, &_call_cbs_endEntity_2025_0);
+  methods += new qt_gsi::GenericMethod ("endEntity", "@hide", false, &_init_cbs_endEntity_2025_0, &_call_cbs_endEntity_2025_0, &_set_callback_cbs_endEntity_2025_0);
+  methods += new qt_gsi::GenericMethod ("errorString", "@brief Virtual method QString QXmlLexicalHandler::errorString()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0);
+  methods += new qt_gsi::GenericMethod ("errorString", "@hide", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0, &_set_callback_cbs_errorString_c0_0);
+  methods += new qt_gsi::GenericMethod ("startCDATA", "@brief Virtual method bool QXmlLexicalHandler::startCDATA()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_startCDATA_0_0, &_call_cbs_startCDATA_0_0);
+  methods += new qt_gsi::GenericMethod ("startCDATA", "@hide", false, &_init_cbs_startCDATA_0_0, &_call_cbs_startCDATA_0_0, &_set_callback_cbs_startCDATA_0_0);
+  methods += new qt_gsi::GenericMethod ("startDTD", "@brief Virtual method bool QXmlLexicalHandler::startDTD(const QString &name, const QString &publicId, const QString &systemId)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_startDTD_5859_0, &_call_cbs_startDTD_5859_0);
+  methods += new qt_gsi::GenericMethod ("startDTD", "@hide", false, &_init_cbs_startDTD_5859_0, &_call_cbs_startDTD_5859_0, &_set_callback_cbs_startDTD_5859_0);
+  methods += new qt_gsi::GenericMethod ("startEntity", "@brief Virtual method bool QXmlLexicalHandler::startEntity(const QString &name)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_startEntity_2025_0, &_call_cbs_startEntity_2025_0);
+  methods += new qt_gsi::GenericMethod ("startEntity", "@hide", false, &_init_cbs_startEntity_2025_0, &_call_cbs_startEntity_2025_0, &_set_callback_cbs_startEntity_2025_0);
   return methods;
 }
 

@@ -297,12 +297,12 @@ gsi::Class<QXmlDTDHandler> &qtdecl_QXmlDTDHandler ();
 static gsi::Methods methods_QXmlDTDHandler_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlDTDHandler::QXmlDTDHandler()\nThis method creates an object of class QXmlDTDHandler.", &_init_ctor_QXmlDTDHandler_Adaptor_0, &_call_ctor_QXmlDTDHandler_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("errorString", "@hide", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0);
-  methods += new qt_gsi::GenericMethod ("errorString", "@brief Virtual method QString QXmlDTDHandler::errorString()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0, &_set_callback_cbs_errorString_c0_0);
-  methods += new qt_gsi::GenericMethod ("notationDecl", "@hide", false, &_init_cbs_notationDecl_5859_0, &_call_cbs_notationDecl_5859_0);
-  methods += new qt_gsi::GenericMethod ("notationDecl", "@brief Virtual method bool QXmlDTDHandler::notationDecl(const QString &name, const QString &publicId, const QString &systemId)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_notationDecl_5859_0, &_call_cbs_notationDecl_5859_0, &_set_callback_cbs_notationDecl_5859_0);
-  methods += new qt_gsi::GenericMethod ("unparsedEntityDecl", "@hide", false, &_init_cbs_unparsedEntityDecl_7776_0, &_call_cbs_unparsedEntityDecl_7776_0);
-  methods += new qt_gsi::GenericMethod ("unparsedEntityDecl", "@brief Virtual method bool QXmlDTDHandler::unparsedEntityDecl(const QString &name, const QString &publicId, const QString &systemId, const QString &notationName)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_unparsedEntityDecl_7776_0, &_call_cbs_unparsedEntityDecl_7776_0, &_set_callback_cbs_unparsedEntityDecl_7776_0);
+  methods += new qt_gsi::GenericMethod ("errorString", "@brief Virtual method QString QXmlDTDHandler::errorString()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0);
+  methods += new qt_gsi::GenericMethod ("errorString", "@hide", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0, &_set_callback_cbs_errorString_c0_0);
+  methods += new qt_gsi::GenericMethod ("notationDecl", "@brief Virtual method bool QXmlDTDHandler::notationDecl(const QString &name, const QString &publicId, const QString &systemId)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_notationDecl_5859_0, &_call_cbs_notationDecl_5859_0);
+  methods += new qt_gsi::GenericMethod ("notationDecl", "@hide", false, &_init_cbs_notationDecl_5859_0, &_call_cbs_notationDecl_5859_0, &_set_callback_cbs_notationDecl_5859_0);
+  methods += new qt_gsi::GenericMethod ("unparsedEntityDecl", "@brief Virtual method bool QXmlDTDHandler::unparsedEntityDecl(const QString &name, const QString &publicId, const QString &systemId, const QString &notationName)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_unparsedEntityDecl_7776_0, &_call_cbs_unparsedEntityDecl_7776_0);
+  methods += new qt_gsi::GenericMethod ("unparsedEntityDecl", "@hide", false, &_init_cbs_unparsedEntityDecl_7776_0, &_call_cbs_unparsedEntityDecl_7776_0, &_set_callback_cbs_unparsedEntityDecl_7776_0);
   return methods;
 }
 

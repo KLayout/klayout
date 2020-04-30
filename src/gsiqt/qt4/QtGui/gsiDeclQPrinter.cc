@@ -1350,10 +1350,10 @@ static gsi::Methods methods_QPrinter_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPrinter::QPrinter(QPrinter::PrinterMode mode)\nThis method creates an object of class QPrinter.", &_init_ctor_QPrinter_Adaptor_2502, &_call_ctor_QPrinter_Adaptor_2502);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPrinter::QPrinter(const QPrinterInfo &printer, QPrinter::PrinterMode mode)\nThis method creates an object of class QPrinter.", &_init_ctor_QPrinter_Adaptor_4924, &_call_ctor_QPrinter_Adaptor_4924);
-  methods += new qt_gsi::GenericMethod ("*metric", "@hide", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0);
-  methods += new qt_gsi::GenericMethod ("*metric", "@brief Virtual method int QPrinter::metric(QPaintDevice::PaintDeviceMetric)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0, &_set_callback_cbs_metric_c3445_0);
-  methods += new qt_gsi::GenericMethod ("paintEngine", "@hide", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0);
-  methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Virtual method QPaintEngine *QPrinter::paintEngine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0, &_set_callback_cbs_paintEngine_c0_0);
+  methods += new qt_gsi::GenericMethod ("*metric", "@brief Virtual method int QPrinter::metric(QPaintDevice::PaintDeviceMetric)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0);
+  methods += new qt_gsi::GenericMethod ("*metric", "@hide", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0, &_set_callback_cbs_metric_c3445_0);
+  methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Virtual method QPaintEngine *QPrinter::paintEngine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0);
+  methods += new qt_gsi::GenericMethod ("paintEngine", "@hide", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0, &_set_callback_cbs_paintEngine_c0_0);
   methods += new qt_gsi::GenericMethod ("*setEngines", "@brief Method void QPrinter::setEngines(QPrintEngine *printEngine, QPaintEngine *paintEngine)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_setEngines_3527, &_call_fp_setEngines_3527);
   return methods;
 }

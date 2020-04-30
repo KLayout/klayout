@@ -1201,18 +1201,18 @@ static gsi::Methods methods_QTableWidgetItem_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTableWidgetItem::QTableWidgetItem(const QString &text, int type)\nThis method creates an object of class QTableWidgetItem.", &_init_ctor_QTableWidgetItem_Adaptor_2684, &_call_ctor_QTableWidgetItem_Adaptor_2684);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTableWidgetItem::QTableWidgetItem(const QIcon &icon, const QString &text, int type)\nThis method creates an object of class QTableWidgetItem.", &_init_ctor_QTableWidgetItem_Adaptor_4363, &_call_ctor_QTableWidgetItem_Adaptor_4363);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTableWidgetItem::QTableWidgetItem(const QTableWidgetItem &other)\nThis method creates an object of class QTableWidgetItem.", &_init_ctor_QTableWidgetItem_Adaptor_2893, &_call_ctor_QTableWidgetItem_Adaptor_2893);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QTableWidgetItem *QTableWidgetItem::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("data", "@hide", true, &_init_cbs_data_c767_0, &_call_cbs_data_c767_0);
-  methods += new qt_gsi::GenericMethod ("data", "@brief Virtual method QVariant QTableWidgetItem::data(int role)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_data_c767_0, &_call_cbs_data_c767_0, &_set_callback_cbs_data_c767_0);
-  methods += new qt_gsi::GenericMethod ("<", "@hide", true, &_init_cbs_operator_lt__c2893_0, &_call_cbs_operator_lt__c2893_0);
-  methods += new qt_gsi::GenericMethod ("<", "@brief Virtual method bool QTableWidgetItem::operator<(const QTableWidgetItem &other)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_operator_lt__c2893_0, &_call_cbs_operator_lt__c2893_0, &_set_callback_cbs_operator_lt__c2893_0);
-  methods += new qt_gsi::GenericMethod ("read", "@hide", false, &_init_cbs_read_1697_0, &_call_cbs_read_1697_0);
-  methods += new qt_gsi::GenericMethod ("read", "@brief Virtual method void QTableWidgetItem::read(QDataStream &in)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_read_1697_0, &_call_cbs_read_1697_0, &_set_callback_cbs_read_1697_0);
-  methods += new qt_gsi::GenericMethod ("setData", "@hide", false, &_init_cbs_setData_2778_0, &_call_cbs_setData_2778_0);
-  methods += new qt_gsi::GenericMethod ("setData", "@brief Virtual method void QTableWidgetItem::setData(int role, const QVariant &value)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setData_2778_0, &_call_cbs_setData_2778_0, &_set_callback_cbs_setData_2778_0);
-  methods += new qt_gsi::GenericMethod ("write", "@hide", true, &_init_cbs_write_c1697_0, &_call_cbs_write_c1697_0);
-  methods += new qt_gsi::GenericMethod ("write", "@brief Virtual method void QTableWidgetItem::write(QDataStream &out)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_write_c1697_0, &_call_cbs_write_c1697_0, &_set_callback_cbs_write_c1697_0);
+  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QTableWidgetItem *QTableWidgetItem::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
+  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
+  methods += new qt_gsi::GenericMethod ("data", "@brief Virtual method QVariant QTableWidgetItem::data(int role)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_data_c767_0, &_call_cbs_data_c767_0);
+  methods += new qt_gsi::GenericMethod ("data", "@hide", true, &_init_cbs_data_c767_0, &_call_cbs_data_c767_0, &_set_callback_cbs_data_c767_0);
+  methods += new qt_gsi::GenericMethod ("<", "@brief Virtual method bool QTableWidgetItem::operator<(const QTableWidgetItem &other)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_operator_lt__c2893_0, &_call_cbs_operator_lt__c2893_0);
+  methods += new qt_gsi::GenericMethod ("<", "@hide", true, &_init_cbs_operator_lt__c2893_0, &_call_cbs_operator_lt__c2893_0, &_set_callback_cbs_operator_lt__c2893_0);
+  methods += new qt_gsi::GenericMethod ("read", "@brief Virtual method void QTableWidgetItem::read(QDataStream &in)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_read_1697_0, &_call_cbs_read_1697_0);
+  methods += new qt_gsi::GenericMethod ("read", "@hide", false, &_init_cbs_read_1697_0, &_call_cbs_read_1697_0, &_set_callback_cbs_read_1697_0);
+  methods += new qt_gsi::GenericMethod ("setData", "@brief Virtual method void QTableWidgetItem::setData(int role, const QVariant &value)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setData_2778_0, &_call_cbs_setData_2778_0);
+  methods += new qt_gsi::GenericMethod ("setData", "@hide", false, &_init_cbs_setData_2778_0, &_call_cbs_setData_2778_0, &_set_callback_cbs_setData_2778_0);
+  methods += new qt_gsi::GenericMethod ("write", "@brief Virtual method void QTableWidgetItem::write(QDataStream &out)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_write_c1697_0, &_call_cbs_write_c1697_0);
+  methods += new qt_gsi::GenericMethod ("write", "@hide", true, &_init_cbs_write_c1697_0, &_call_cbs_write_c1697_0, &_set_callback_cbs_write_c1697_0);
   return methods;
 }
 

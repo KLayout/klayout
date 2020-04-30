@@ -14,6 +14,8 @@
 * Bugfix: %GITHUB%/issues/544
       Duplicate .global statements in SPICE netlists created
       duplicate pins
+* Bugfix: %GITHUB%/issues/548
+      A shielding issue was fixed for DRC space measurements
 * Bugfix: diff tool bug with paths
       Differences in path points where no reported
 * Enhancement: documentation clarifications and typos fixed

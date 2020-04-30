@@ -526,7 +526,7 @@ PyObject *c2python_func<const char *>::operator() (const char *p)
 #if PY_MAJOR_VERSION < 3
   return PyString_FromString (s);
 #else
-  PyObject *ret = PyUnicode_DecodeUTF8 (p, strlen (p), NULL);
+  PyObject *ret = PyUnicode_DecodeUTF8 (s, strlen (s), NULL);
   if (ret == NULL) {
     check_error ();
   }

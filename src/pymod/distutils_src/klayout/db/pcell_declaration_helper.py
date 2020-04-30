@@ -104,10 +104,10 @@ class _PCellDeclarationHelper(PCellDeclaration):
             pdecl.unit = unit
         if not (choices is None):
             if not isinstance(choices, list) and not isinstance(choices, tuple):
-                raise "choices value must be an list/tuple of two-element arrays (description, value)"
+                raise Exception("choices value must be an list/tuple of two-element arrays (description, value)")
             for c in choices:
                 if (not isinstance(choices, list) and not isinstance(choices, tuple)) or len(c) != 2:
-                    raise "choices value must be an list/tuple of two-element arrays (description, value)"
+                    raise Exception("choices value must be an list/tuple of two-element arrays (description, value)")
                 pdecl.add_choice(c[0], c[1])
 
         # return the declaration object for further operations

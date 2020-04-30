@@ -424,14 +424,14 @@ static gsi::Methods methods_QUndoCommand_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QUndoCommand::QUndoCommand(QUndoCommand *parent)\nThis method creates an object of class QUndoCommand.", &_init_ctor_QUndoCommand_Adaptor_1812, &_call_ctor_QUndoCommand_Adaptor_1812);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QUndoCommand::QUndoCommand(const QString &text, QUndoCommand *parent)\nThis method creates an object of class QUndoCommand.", &_init_ctor_QUndoCommand_Adaptor_3729, &_call_ctor_QUndoCommand_Adaptor_3729);
-  methods += new qt_gsi::GenericMethod ("id", "@hide", true, &_init_cbs_id_c0_0, &_call_cbs_id_c0_0);
-  methods += new qt_gsi::GenericMethod ("id", "@brief Virtual method int QUndoCommand::id()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_id_c0_0, &_call_cbs_id_c0_0, &_set_callback_cbs_id_c0_0);
-  methods += new qt_gsi::GenericMethod ("mergeWith", "@hide", false, &_init_cbs_mergeWith_2507_0, &_call_cbs_mergeWith_2507_0);
-  methods += new qt_gsi::GenericMethod ("mergeWith", "@brief Virtual method bool QUndoCommand::mergeWith(const QUndoCommand *other)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mergeWith_2507_0, &_call_cbs_mergeWith_2507_0, &_set_callback_cbs_mergeWith_2507_0);
-  methods += new qt_gsi::GenericMethod ("redo", "@hide", false, &_init_cbs_redo_0_0, &_call_cbs_redo_0_0);
-  methods += new qt_gsi::GenericMethod ("redo", "@brief Virtual method void QUndoCommand::redo()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_redo_0_0, &_call_cbs_redo_0_0, &_set_callback_cbs_redo_0_0);
-  methods += new qt_gsi::GenericMethod ("undo", "@hide", false, &_init_cbs_undo_0_0, &_call_cbs_undo_0_0);
-  methods += new qt_gsi::GenericMethod ("undo", "@brief Virtual method void QUndoCommand::undo()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_undo_0_0, &_call_cbs_undo_0_0, &_set_callback_cbs_undo_0_0);
+  methods += new qt_gsi::GenericMethod ("id", "@brief Virtual method int QUndoCommand::id()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_id_c0_0, &_call_cbs_id_c0_0);
+  methods += new qt_gsi::GenericMethod ("id", "@hide", true, &_init_cbs_id_c0_0, &_call_cbs_id_c0_0, &_set_callback_cbs_id_c0_0);
+  methods += new qt_gsi::GenericMethod ("mergeWith", "@brief Virtual method bool QUndoCommand::mergeWith(const QUndoCommand *other)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mergeWith_2507_0, &_call_cbs_mergeWith_2507_0);
+  methods += new qt_gsi::GenericMethod ("mergeWith", "@hide", false, &_init_cbs_mergeWith_2507_0, &_call_cbs_mergeWith_2507_0, &_set_callback_cbs_mergeWith_2507_0);
+  methods += new qt_gsi::GenericMethod ("redo", "@brief Virtual method void QUndoCommand::redo()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_redo_0_0, &_call_cbs_redo_0_0);
+  methods += new qt_gsi::GenericMethod ("redo", "@hide", false, &_init_cbs_redo_0_0, &_call_cbs_redo_0_0, &_set_callback_cbs_redo_0_0);
+  methods += new qt_gsi::GenericMethod ("undo", "@brief Virtual method void QUndoCommand::undo()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_undo_0_0, &_call_cbs_undo_0_0);
+  methods += new qt_gsi::GenericMethod ("undo", "@hide", false, &_init_cbs_undo_0_0, &_call_cbs_undo_0_0, &_set_callback_cbs_undo_0_0);
   return methods;
 }
 

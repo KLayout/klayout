@@ -208,10 +208,10 @@ gsi::Class<QSystemLocale> &qtdecl_QSystemLocale ();
 static gsi::Methods methods_QSystemLocale_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSystemLocale::QSystemLocale()\nThis method creates an object of class QSystemLocale.", &_init_ctor_QSystemLocale_Adaptor_0, &_call_ctor_QSystemLocale_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("fallbackLocale", "@hide", true, &_init_cbs_fallbackLocale_c0_0, &_call_cbs_fallbackLocale_c0_0);
-  methods += new qt_gsi::GenericMethod ("fallbackLocale", "@brief Virtual method QLocale QSystemLocale::fallbackLocale()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_fallbackLocale_c0_0, &_call_cbs_fallbackLocale_c0_0, &_set_callback_cbs_fallbackLocale_c0_0);
-  methods += new qt_gsi::GenericMethod ("query", "@hide", true, &_init_cbs_query_c3956_0, &_call_cbs_query_c3956_0);
-  methods += new qt_gsi::GenericMethod ("query", "@brief Virtual method QVariant QSystemLocale::query(QSystemLocale::QueryType type, QVariant in)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_query_c3956_0, &_call_cbs_query_c3956_0, &_set_callback_cbs_query_c3956_0);
+  methods += new qt_gsi::GenericMethod ("fallbackLocale", "@brief Virtual method QLocale QSystemLocale::fallbackLocale()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_fallbackLocale_c0_0, &_call_cbs_fallbackLocale_c0_0);
+  methods += new qt_gsi::GenericMethod ("fallbackLocale", "@hide", true, &_init_cbs_fallbackLocale_c0_0, &_call_cbs_fallbackLocale_c0_0, &_set_callback_cbs_fallbackLocale_c0_0);
+  methods += new qt_gsi::GenericMethod ("query", "@brief Virtual method QVariant QSystemLocale::query(QSystemLocale::QueryType type, QVariant in)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_query_c3956_0, &_call_cbs_query_c3956_0);
+  methods += new qt_gsi::GenericMethod ("query", "@hide", true, &_init_cbs_query_c3956_0, &_call_cbs_query_c3956_0, &_set_callback_cbs_query_c3956_0);
   return methods;
 }
 

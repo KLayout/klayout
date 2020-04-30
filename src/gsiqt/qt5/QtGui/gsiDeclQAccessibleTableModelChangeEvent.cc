@@ -350,8 +350,8 @@ static gsi::Methods methods_QAccessibleTableModelChangeEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAccessibleTableModelChangeEvent::QAccessibleTableModelChangeEvent(QObject *obj, QAccessibleTableModelChangeEvent::ModelChangeType changeType)\nThis method creates an object of class QAccessibleTableModelChangeEvent.", &_init_ctor_QAccessibleTableModelChangeEvent_Adaptor_6411, &_call_ctor_QAccessibleTableModelChangeEvent_Adaptor_6411);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAccessibleTableModelChangeEvent::QAccessibleTableModelChangeEvent(QAccessibleInterface *iface, QAccessibleTableModelChangeEvent::ModelChangeType changeType)\nThis method creates an object of class QAccessibleTableModelChangeEvent.", &_init_ctor_QAccessibleTableModelChangeEvent_Adaptor_7731, &_call_ctor_QAccessibleTableModelChangeEvent_Adaptor_7731);
-  methods += new qt_gsi::GenericMethod ("accessibleInterface", "@hide", true, &_init_cbs_accessibleInterface_c0_0, &_call_cbs_accessibleInterface_c0_0);
-  methods += new qt_gsi::GenericMethod ("accessibleInterface", "@brief Virtual method QAccessibleInterface *QAccessibleTableModelChangeEvent::accessibleInterface()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_accessibleInterface_c0_0, &_call_cbs_accessibleInterface_c0_0, &_set_callback_cbs_accessibleInterface_c0_0);
+  methods += new qt_gsi::GenericMethod ("accessibleInterface", "@brief Virtual method QAccessibleInterface *QAccessibleTableModelChangeEvent::accessibleInterface()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_accessibleInterface_c0_0, &_call_cbs_accessibleInterface_c0_0);
+  methods += new qt_gsi::GenericMethod ("accessibleInterface", "@hide", true, &_init_cbs_accessibleInterface_c0_0, &_call_cbs_accessibleInterface_c0_0, &_set_callback_cbs_accessibleInterface_c0_0);
   return methods;
 }
 

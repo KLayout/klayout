@@ -433,18 +433,18 @@ gsi::Class<QPrintEngine> &qtdecl_QPrintEngine ();
 static gsi::Methods methods_QPrintEngine_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPrintEngine::QPrintEngine()\nThis method creates an object of class QPrintEngine.", &_init_ctor_QPrintEngine_Adaptor_0, &_call_ctor_QPrintEngine_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("abort", "@hide", false, &_init_cbs_abort_0_0, &_call_cbs_abort_0_0);
-  methods += new qt_gsi::GenericMethod ("abort", "@brief Virtual method bool QPrintEngine::abort()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_abort_0_0, &_call_cbs_abort_0_0, &_set_callback_cbs_abort_0_0);
-  methods += new qt_gsi::GenericMethod ("metric", "@hide", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0);
-  methods += new qt_gsi::GenericMethod ("metric", "@brief Virtual method int QPrintEngine::metric(QPaintDevice::PaintDeviceMetric)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0, &_set_callback_cbs_metric_c3445_0);
-  methods += new qt_gsi::GenericMethod ("newPage", "@hide", false, &_init_cbs_newPage_0_0, &_call_cbs_newPage_0_0);
-  methods += new qt_gsi::GenericMethod ("newPage", "@brief Virtual method bool QPrintEngine::newPage()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_newPage_0_0, &_call_cbs_newPage_0_0, &_set_callback_cbs_newPage_0_0);
-  methods += new qt_gsi::GenericMethod ("printerState", "@hide", true, &_init_cbs_printerState_c0_0, &_call_cbs_printerState_c0_0);
-  methods += new qt_gsi::GenericMethod ("printerState", "@brief Virtual method QPrinter::PrinterState QPrintEngine::printerState()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_printerState_c0_0, &_call_cbs_printerState_c0_0, &_set_callback_cbs_printerState_c0_0);
-  methods += new qt_gsi::GenericMethod ("property", "@hide", true, &_init_cbs_property_c4045_0, &_call_cbs_property_c4045_0);
-  methods += new qt_gsi::GenericMethod ("property", "@brief Virtual method QVariant QPrintEngine::property(QPrintEngine::PrintEnginePropertyKey key)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_property_c4045_0, &_call_cbs_property_c4045_0, &_set_callback_cbs_property_c4045_0);
-  methods += new qt_gsi::GenericMethod ("setProperty", "@hide", false, &_init_cbs_setProperty_6056_0, &_call_cbs_setProperty_6056_0);
-  methods += new qt_gsi::GenericMethod ("setProperty", "@brief Virtual method void QPrintEngine::setProperty(QPrintEngine::PrintEnginePropertyKey key, const QVariant &value)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setProperty_6056_0, &_call_cbs_setProperty_6056_0, &_set_callback_cbs_setProperty_6056_0);
+  methods += new qt_gsi::GenericMethod ("abort", "@brief Virtual method bool QPrintEngine::abort()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_abort_0_0, &_call_cbs_abort_0_0);
+  methods += new qt_gsi::GenericMethod ("abort", "@hide", false, &_init_cbs_abort_0_0, &_call_cbs_abort_0_0, &_set_callback_cbs_abort_0_0);
+  methods += new qt_gsi::GenericMethod ("metric", "@brief Virtual method int QPrintEngine::metric(QPaintDevice::PaintDeviceMetric)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0);
+  methods += new qt_gsi::GenericMethod ("metric", "@hide", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0, &_set_callback_cbs_metric_c3445_0);
+  methods += new qt_gsi::GenericMethod ("newPage", "@brief Virtual method bool QPrintEngine::newPage()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_newPage_0_0, &_call_cbs_newPage_0_0);
+  methods += new qt_gsi::GenericMethod ("newPage", "@hide", false, &_init_cbs_newPage_0_0, &_call_cbs_newPage_0_0, &_set_callback_cbs_newPage_0_0);
+  methods += new qt_gsi::GenericMethod ("printerState", "@brief Virtual method QPrinter::PrinterState QPrintEngine::printerState()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_printerState_c0_0, &_call_cbs_printerState_c0_0);
+  methods += new qt_gsi::GenericMethod ("printerState", "@hide", true, &_init_cbs_printerState_c0_0, &_call_cbs_printerState_c0_0, &_set_callback_cbs_printerState_c0_0);
+  methods += new qt_gsi::GenericMethod ("property", "@brief Virtual method QVariant QPrintEngine::property(QPrintEngine::PrintEnginePropertyKey key)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_property_c4045_0, &_call_cbs_property_c4045_0);
+  methods += new qt_gsi::GenericMethod ("property", "@hide", true, &_init_cbs_property_c4045_0, &_call_cbs_property_c4045_0, &_set_callback_cbs_property_c4045_0);
+  methods += new qt_gsi::GenericMethod ("setProperty", "@brief Virtual method void QPrintEngine::setProperty(QPrintEngine::PrintEnginePropertyKey key, const QVariant &value)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setProperty_6056_0, &_call_cbs_setProperty_6056_0);
+  methods += new qt_gsi::GenericMethod ("setProperty", "@hide", false, &_init_cbs_setProperty_6056_0, &_call_cbs_setProperty_6056_0, &_set_callback_cbs_setProperty_6056_0);
   return methods;
 }
 

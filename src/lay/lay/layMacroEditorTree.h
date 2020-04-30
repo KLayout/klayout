@@ -46,7 +46,7 @@ public:
   MacroTreeModel (QObject *parent, lay::MacroEditorDialog *dialog, lym::MacroCollection *root, const std::string &cat);
   MacroTreeModel (QWidget *parent, lym::MacroCollection *root, const std::string &cat);
 
-  int	columnCount (const QModelIndex &parent) const;
+  int columnCount (const QModelIndex &parent) const;
   QVariant data (const QModelIndex &index, int role) const;
   Qt::ItemFlags flags (const QModelIndex &index) const;
   bool hasChildren (const QModelIndex &parent) const;

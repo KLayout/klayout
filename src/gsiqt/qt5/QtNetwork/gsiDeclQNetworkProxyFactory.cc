@@ -235,8 +235,8 @@ gsi::Class<QNetworkProxyFactory> &qtdecl_QNetworkProxyFactory ();
 static gsi::Methods methods_QNetworkProxyFactory_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QNetworkProxyFactory::QNetworkProxyFactory()\nThis method creates an object of class QNetworkProxyFactory.", &_init_ctor_QNetworkProxyFactory_Adaptor_0, &_call_ctor_QNetworkProxyFactory_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("queryProxy", "@hide", false, &_init_cbs_queryProxy_3220_1, &_call_cbs_queryProxy_3220_1);
-  methods += new qt_gsi::GenericMethod ("queryProxy", "@brief Virtual method QList<QNetworkProxy> QNetworkProxyFactory::queryProxy(const QNetworkProxyQuery &query)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_queryProxy_3220_1, &_call_cbs_queryProxy_3220_1, &_set_callback_cbs_queryProxy_3220_1);
+  methods += new qt_gsi::GenericMethod ("queryProxy", "@brief Virtual method QList<QNetworkProxy> QNetworkProxyFactory::queryProxy(const QNetworkProxyQuery &query)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_queryProxy_3220_1, &_call_cbs_queryProxy_3220_1);
+  methods += new qt_gsi::GenericMethod ("queryProxy", "@hide", false, &_init_cbs_queryProxy_3220_1, &_call_cbs_queryProxy_3220_1, &_set_callback_cbs_queryProxy_3220_1);
   return methods;
 }
 

@@ -193,10 +193,10 @@ gsi::Class<QXmlLocator> &qtdecl_QXmlLocator ();
 static gsi::Methods methods_QXmlLocator_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlLocator::QXmlLocator()\nThis method creates an object of class QXmlLocator.", &_init_ctor_QXmlLocator_Adaptor_0, &_call_ctor_QXmlLocator_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("columnNumber", "@hide", true, &_init_cbs_columnNumber_c0_0, &_call_cbs_columnNumber_c0_0);
-  methods += new qt_gsi::GenericMethod ("columnNumber", "@brief Virtual method int QXmlLocator::columnNumber()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_columnNumber_c0_0, &_call_cbs_columnNumber_c0_0, &_set_callback_cbs_columnNumber_c0_0);
-  methods += new qt_gsi::GenericMethod ("lineNumber", "@hide", true, &_init_cbs_lineNumber_c0_0, &_call_cbs_lineNumber_c0_0);
-  methods += new qt_gsi::GenericMethod ("lineNumber", "@brief Virtual method int QXmlLocator::lineNumber()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_lineNumber_c0_0, &_call_cbs_lineNumber_c0_0, &_set_callback_cbs_lineNumber_c0_0);
+  methods += new qt_gsi::GenericMethod ("columnNumber", "@brief Virtual method int QXmlLocator::columnNumber()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_columnNumber_c0_0, &_call_cbs_columnNumber_c0_0);
+  methods += new qt_gsi::GenericMethod ("columnNumber", "@hide", true, &_init_cbs_columnNumber_c0_0, &_call_cbs_columnNumber_c0_0, &_set_callback_cbs_columnNumber_c0_0);
+  methods += new qt_gsi::GenericMethod ("lineNumber", "@brief Virtual method int QXmlLocator::lineNumber()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_lineNumber_c0_0, &_call_cbs_lineNumber_c0_0);
+  methods += new qt_gsi::GenericMethod ("lineNumber", "@hide", true, &_init_cbs_lineNumber_c0_0, &_call_cbs_lineNumber_c0_0, &_set_callback_cbs_lineNumber_c0_0);
   return methods;
 }
 

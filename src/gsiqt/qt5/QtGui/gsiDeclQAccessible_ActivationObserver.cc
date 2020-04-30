@@ -153,8 +153,8 @@ gsi::Class<QAccessible::ActivationObserver> &qtdecl_QAccessible_ActivationObserv
 static gsi::Methods methods_QAccessible_ActivationObserver_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAccessible::ActivationObserver::ActivationObserver()\nThis method creates an object of class QAccessible::ActivationObserver.", &_init_ctor_QAccessible_ActivationObserver_Adaptor_0, &_call_ctor_QAccessible_ActivationObserver_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("accessibilityActiveChanged", "@hide", false, &_init_cbs_accessibilityActiveChanged_864_0, &_call_cbs_accessibilityActiveChanged_864_0);
-  methods += new qt_gsi::GenericMethod ("accessibilityActiveChanged", "@brief Virtual method void QAccessible::ActivationObserver::accessibilityActiveChanged(bool active)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_accessibilityActiveChanged_864_0, &_call_cbs_accessibilityActiveChanged_864_0, &_set_callback_cbs_accessibilityActiveChanged_864_0);
+  methods += new qt_gsi::GenericMethod ("accessibilityActiveChanged", "@brief Virtual method void QAccessible::ActivationObserver::accessibilityActiveChanged(bool active)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_accessibilityActiveChanged_864_0, &_call_cbs_accessibilityActiveChanged_864_0);
+  methods += new qt_gsi::GenericMethod ("accessibilityActiveChanged", "@hide", false, &_init_cbs_accessibilityActiveChanged_864_0, &_call_cbs_accessibilityActiveChanged_864_0, &_set_callback_cbs_accessibilityActiveChanged_864_0);
   return methods;
 }
 

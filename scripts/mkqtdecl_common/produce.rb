@@ -2798,8 +2798,8 @@ END
             ofile.puts("}")
             ofile.puts("")
 
-            mdecl << "new qt_gsi::GenericMethod (\"#{pp}#{mn_name}\", \"@hide\", #{const.to_s}, &_init_cbs_#{mn}_#{hk}_#{i_var}, &_call_cbs_#{mn}_#{hk}_#{i_var});"
-            mdecl << "new qt_gsi::GenericMethod (\"#{pp}#{mn_name}\", \"@brief Virtual method #{sig}\\nThis method can be reimplemented in a derived class.\", #{const.to_s}, &_init_cbs_#{mn}_#{hk}_#{i_var}, &_call_cbs_#{mn}_#{hk}_#{i_var}, &_set_callback_cbs_#{mn}_#{hk}_#{i_var});"
+            mdecl << "new qt_gsi::GenericMethod (\"#{pp}#{mn_name}\", \"@brief Virtual method #{sig}\\nThis method can be reimplemented in a derived class.\", #{const.to_s}, &_init_cbs_#{mn}_#{hk}_#{i_var}, &_call_cbs_#{mn}_#{hk}_#{i_var});"
+            mdecl << "new qt_gsi::GenericMethod (\"#{pp}#{mn_name}\", \"@hide\", #{const.to_s}, &_init_cbs_#{mn}_#{hk}_#{i_var}, &_call_cbs_#{mn}_#{hk}_#{i_var}, &_set_callback_cbs_#{mn}_#{hk}_#{i_var});"
 
           end
 

@@ -245,7 +245,7 @@ namespace tl
   }
 
   template<typename _RandomAccessIterator, typename _Distance, typename _Tp, 
-	       typename _Compare>
+         typename _Compare>
   void
   __push_heap(_RandomAccessIterator __first, _Distance __holeIndex, 
               _Distance __topIndex, const _Tp &__v, _Compare __comp)
@@ -311,7 +311,7 @@ namespace tl
   }
 
   template<typename _RandomAccessIterator, typename _Distance,
-	   typename _Tp, typename _Compare>
+     typename _Tp, typename _Compare>
   void
   __adjust_heap(_RandomAccessIterator __first, _Distance __holeIndex, 
                 _Distance __len, const _Tp &__v, _Compare __comp)
@@ -476,7 +476,7 @@ namespace tl
       }
       --__depth_limit;
       _RandomAccessIter __cut =
-	    tl::__unguarded_partition(__first, __last,
+      tl::__unguarded_partition(__first, __last,
                                   _ValueType(tl::__median(*__first,
                                           *(__first + (__last - __first)/2),
                                           *(__last - 1), __comp)),

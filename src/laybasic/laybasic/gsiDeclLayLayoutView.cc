@@ -412,25 +412,36 @@ static lay::LayoutView *new_view (QWidget *parent, bool editable, db::Manager *m
   }
   return lv;
 }
-#else
-static lay::LayoutView *new_view (tl::Variant /*dummy*/, bool editable, db::Manager *manager, unsigned int options)
+#endif
+
+static lay::LayoutView *new_view2 (bool editable, db::Manager *manager, unsigned int options)
 {
   return new lay::LayoutView (manager, editable, 0 /*plugin parent*/, 0 /*parent*/, "view", options);
 }
-#endif
 
 Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "LayoutView",
 #if defined(HAVE_QTBINDINGS)
-  gsi::constructor ("new", &new_view, gsi::arg ("parent", (QWidget *) 0, "nil"), gsi::arg ("editable", false), gsi::arg ("manager", (db::Manager *) 0, "nil"), gsi::arg ("options", (unsigned int) 0),
-#else
-  gsi::constructor ("new", &new_view, gsi::arg ("parent", tl::Variant (), "nil"), gsi::arg ("editable", false), gsi::arg ("manager", (db::Manager *) 0, "nil"), gsi::arg ("options", (unsigned int) 0),
-#endif
+  gsi::constructor ("new", &new_view, gsi::arg ("parent"), gsi::arg ("editable", false), gsi::arg ("manager", (db::Manager *) 0, "nil"), gsi::arg ("options", (unsigned int) 0),
     "@brief Creates a standalone view\n"
     "\n"
     "This constructor is for special purposes only. To create a view in the context of a main window, "
     "use \\MainWindow#create_view and related methods.\n"
     "\n"
     "@param parent The parent widget in which to embed the view\n"
+    "@param editable True to make the view editable\n"
+    "@param manager The \\Manager object to enable undo/redo\n"
+    "@param options A combination of the values in the LV_... constants\n"
+    "\n"
+    "This constructor has been introduced in version 0.25.\n"
+    "It has been enhanced with the arguments in version 0.27.\n"
+  ) +
+#endif
+  gsi::constructor ("new", &new_view2, gsi::arg ("editable", false), gsi::arg ("manager", (db::Manager *) 0, "nil"), gsi::arg ("options", (unsigned int) 0),
+    "@brief Creates a standalone view\n"
+    "\n"
+    "This constructor is for special purposes only. To create a view in the context of a main window, "
+    "use \\MainWindow#create_view and related methods.\n"
+    "\n"
     "@param editable True to make the view editable\n"
     "@param manager The \\Manager object to enable undo/redo\n"
     "@param options A combination of the values in the LV_... constants\n"

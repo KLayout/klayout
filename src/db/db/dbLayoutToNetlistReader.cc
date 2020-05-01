@@ -358,8 +358,10 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
       dm->set_name (name);
       netlist->add_device_abstract (dm);
 
-      db::cell_index_type ci = l2n->internal_layout ()->add_cell (name.c_str ());
-      dm->set_cell_index (ci);
+      if (l2n) {
+        db::cell_index_type ci = l2n->internal_layout ()->add_cell (name.c_str ());
+        dm->set_cell_index (ci);
+      }
 
       std::string cls;
       read_word_or_quoted (cls);

@@ -298,12 +298,12 @@ gsi::Class<QAbstractExtensionManager> &qtdecl_QAbstractExtensionManager ();
 static gsi::Methods methods_QAbstractExtensionManager_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAbstractExtensionManager::QAbstractExtensionManager()\nThis method creates an object of class QAbstractExtensionManager.", &_init_ctor_QAbstractExtensionManager_Adaptor_0, &_call_ctor_QAbstractExtensionManager_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("extension", "@hide", true, &_init_cbs_extension_c3219_0, &_call_cbs_extension_c3219_0);
-  methods += new qt_gsi::GenericMethod ("extension", "@brief Virtual method QObject *QAbstractExtensionManager::extension(QObject *object, const QString &iid)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_extension_c3219_0, &_call_cbs_extension_c3219_0, &_set_callback_cbs_extension_c3219_0);
-  methods += new qt_gsi::GenericMethod ("registerExtensions", "@hide", false, &_init_cbs_registerExtensions_5125_0, &_call_cbs_registerExtensions_5125_0);
-  methods += new qt_gsi::GenericMethod ("registerExtensions", "@brief Virtual method void QAbstractExtensionManager::registerExtensions(QAbstractExtensionFactory *factory, const QString &iid)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_registerExtensions_5125_0, &_call_cbs_registerExtensions_5125_0, &_set_callback_cbs_registerExtensions_5125_0);
-  methods += new qt_gsi::GenericMethod ("unregisterExtensions", "@hide", false, &_init_cbs_unregisterExtensions_5125_0, &_call_cbs_unregisterExtensions_5125_0);
-  methods += new qt_gsi::GenericMethod ("unregisterExtensions", "@brief Virtual method void QAbstractExtensionManager::unregisterExtensions(QAbstractExtensionFactory *factory, const QString &iid)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_unregisterExtensions_5125_0, &_call_cbs_unregisterExtensions_5125_0, &_set_callback_cbs_unregisterExtensions_5125_0);
+  methods += new qt_gsi::GenericMethod ("extension", "@brief Virtual method QObject *QAbstractExtensionManager::extension(QObject *object, const QString &iid)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_extension_c3219_0, &_call_cbs_extension_c3219_0);
+  methods += new qt_gsi::GenericMethod ("extension", "@hide", true, &_init_cbs_extension_c3219_0, &_call_cbs_extension_c3219_0, &_set_callback_cbs_extension_c3219_0);
+  methods += new qt_gsi::GenericMethod ("registerExtensions", "@brief Virtual method void QAbstractExtensionManager::registerExtensions(QAbstractExtensionFactory *factory, const QString &iid)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_registerExtensions_5125_0, &_call_cbs_registerExtensions_5125_0);
+  methods += new qt_gsi::GenericMethod ("registerExtensions", "@hide", false, &_init_cbs_registerExtensions_5125_0, &_call_cbs_registerExtensions_5125_0, &_set_callback_cbs_registerExtensions_5125_0);
+  methods += new qt_gsi::GenericMethod ("unregisterExtensions", "@brief Virtual method void QAbstractExtensionManager::unregisterExtensions(QAbstractExtensionFactory *factory, const QString &iid)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_unregisterExtensions_5125_0, &_call_cbs_unregisterExtensions_5125_0);
+  methods += new qt_gsi::GenericMethod ("unregisterExtensions", "@hide", false, &_init_cbs_unregisterExtensions_5125_0, &_call_cbs_unregisterExtensions_5125_0, &_set_callback_cbs_unregisterExtensions_5125_0);
   return methods;
 }
 

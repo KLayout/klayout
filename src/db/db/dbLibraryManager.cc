@@ -90,6 +90,7 @@ LibraryManager::delete_lib (Library *library)
       library->remap_to (0);
       delete library;
       m_libs [id] = 0;
+      break;
     }
   }
 }

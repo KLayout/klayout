@@ -209,10 +209,10 @@ gsi::Class<QMediaServiceSupportedFormatsInterface> &qtdecl_QMediaServiceSupporte
 static gsi::Methods methods_QMediaServiceSupportedFormatsInterface_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMediaServiceSupportedFormatsInterface::QMediaServiceSupportedFormatsInterface()\nThis method creates an object of class QMediaServiceSupportedFormatsInterface.", &_init_ctor_QMediaServiceSupportedFormatsInterface_Adaptor_0, &_call_ctor_QMediaServiceSupportedFormatsInterface_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("hasSupport", "@hide", true, &_init_cbs_hasSupport_c4354_0, &_call_cbs_hasSupport_c4354_0);
-  methods += new qt_gsi::GenericMethod ("hasSupport", "@brief Virtual method QMultimedia::SupportEstimate QMediaServiceSupportedFormatsInterface::hasSupport(const QString &mimeType, const QStringList &codecs)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_hasSupport_c4354_0, &_call_cbs_hasSupport_c4354_0, &_set_callback_cbs_hasSupport_c4354_0);
-  methods += new qt_gsi::GenericMethod ("supportedMimeTypes", "@hide", true, &_init_cbs_supportedMimeTypes_c0_0, &_call_cbs_supportedMimeTypes_c0_0);
-  methods += new qt_gsi::GenericMethod ("supportedMimeTypes", "@brief Virtual method QStringList QMediaServiceSupportedFormatsInterface::supportedMimeTypes()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_supportedMimeTypes_c0_0, &_call_cbs_supportedMimeTypes_c0_0, &_set_callback_cbs_supportedMimeTypes_c0_0);
+  methods += new qt_gsi::GenericMethod ("hasSupport", "@brief Virtual method QMultimedia::SupportEstimate QMediaServiceSupportedFormatsInterface::hasSupport(const QString &mimeType, const QStringList &codecs)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_hasSupport_c4354_0, &_call_cbs_hasSupport_c4354_0);
+  methods += new qt_gsi::GenericMethod ("hasSupport", "@hide", true, &_init_cbs_hasSupport_c4354_0, &_call_cbs_hasSupport_c4354_0, &_set_callback_cbs_hasSupport_c4354_0);
+  methods += new qt_gsi::GenericMethod ("supportedMimeTypes", "@brief Virtual method QStringList QMediaServiceSupportedFormatsInterface::supportedMimeTypes()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_supportedMimeTypes_c0_0, &_call_cbs_supportedMimeTypes_c0_0);
+  methods += new qt_gsi::GenericMethod ("supportedMimeTypes", "@hide", true, &_init_cbs_supportedMimeTypes_c0_0, &_call_cbs_supportedMimeTypes_c0_0, &_set_callback_cbs_supportedMimeTypes_c0_0);
   return methods;
 }
 

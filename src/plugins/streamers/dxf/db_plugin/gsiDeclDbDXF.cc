@@ -384,3 +384,4 @@ gsi::ClassExt<db::SaveLayoutOptions> dxf_writer_options (
 );
 
 }
+

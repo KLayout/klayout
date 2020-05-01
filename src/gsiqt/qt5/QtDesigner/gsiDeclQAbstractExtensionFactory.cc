@@ -159,8 +159,8 @@ gsi::Class<QAbstractExtensionFactory> &qtdecl_QAbstractExtensionFactory ();
 static gsi::Methods methods_QAbstractExtensionFactory_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAbstractExtensionFactory::QAbstractExtensionFactory()\nThis method creates an object of class QAbstractExtensionFactory.", &_init_ctor_QAbstractExtensionFactory_Adaptor_0, &_call_ctor_QAbstractExtensionFactory_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("extension", "@hide", true, &_init_cbs_extension_c3219_0, &_call_cbs_extension_c3219_0);
-  methods += new qt_gsi::GenericMethod ("extension", "@brief Virtual method QObject *QAbstractExtensionFactory::extension(QObject *object, const QString &iid)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_extension_c3219_0, &_call_cbs_extension_c3219_0, &_set_callback_cbs_extension_c3219_0);
+  methods += new qt_gsi::GenericMethod ("extension", "@brief Virtual method QObject *QAbstractExtensionFactory::extension(QObject *object, const QString &iid)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_extension_c3219_0, &_call_cbs_extension_c3219_0);
+  methods += new qt_gsi::GenericMethod ("extension", "@hide", true, &_init_cbs_extension_c3219_0, &_call_cbs_extension_c3219_0, &_set_callback_cbs_extension_c3219_0);
   return methods;
 }
 

@@ -1300,15 +1300,17 @@ TEST(6)
   EXPECT_EQ (r.text (), 
     "layout_diff: paths differ for layer 17/0 in cell c2x\n"
     "Not in b but in a:\n"
+    "  (1,2;11,12) w=17 bx=0 ex=0 r=false\n"
     "Not in a but in b:\n"
     "  (1,2;11,12) w=17 bx=0 ex=0 r=true\n"
     "  (1,2;11,12) w=17 bx=0 ex=-1 r=false\n"
     "  (1,3;11,11) w=17 bx=0 ex=0 r=false\n"
+    "  (1,3;11,12) w=17 bx=0 ex=0 r=false\n"
     "  (1,2;11,12) w=17 bx=1 ex=0 r=false\n"
     "  (1,2;11,12) w=18 bx=0 ex=0 r=false\n"
   );
 
-  //  two more to match more of h:
+  //  some more to match more of h:
   g.cell (c2i).shapes (0).insert (p);
   g.cell (c2i).shapes (0).insert (p);
   g.cell (c2i).shapes (0).insert (p);

@@ -1404,7 +1404,6 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
       std::string layer;
       int flags = 0;
       double width1 = 0.0, width2 = 0.0;
-      unsigned int got_width = 0;
       double common_width1 = 0.0, common_width2 = 0.0;
       unsigned int common_width_set = 0;
       double ex = 0.0, ey = 0.0, ez = 1.0;
@@ -1415,6 +1414,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
         unsigned int xy_flags = 0;
         double x = 0.0, y = 0.0;
+        unsigned int got_width = 0;
 
         while ((g = read_group_code ()) != 0) {
 
@@ -1443,7 +1443,6 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
               if (got_width == 3) {
                 widths.push_back (std::make_pair (seg_start, width1));
                 widths.push_back (std::make_pair (points.size () - 1, width2));
-                got_width = 0;
               }
 
               got_width = 0;
@@ -1514,7 +1513,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
           const std::string &e = read_string (true);
           if (e == "VERTEX") {
 
-            got_width = 0;
+            unsigned int got_width = 0;
             
             double x = 0.0, y = 0.0;
             double bnew = 0.0;
@@ -1549,7 +1548,6 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
             if (got_width == 3) {
               widths.push_back (std::make_pair (seg_start, width1));
               widths.push_back (std::make_pair (points.size () - 1, width2));
-              got_width = 0;
             }
 
           } else if (e == "SEQEND") {
@@ -2301,7 +2299,6 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
       //  close previous loop if necessary
       finish_loop (loop_start, iedges.size (), iedges);
-      loop_start = iedges.size ();
 
       //  create the polygons
       std::pair <bool, unsigned int> ll = open_layer (layout, layer);

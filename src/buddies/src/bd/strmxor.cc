@@ -331,6 +331,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   xor_data.threads = threads;
   xor_data.tile_size = tile_size;
   xor_data.output_layout = output_layout.get ();
+  xor_data.output_cell = output_top;
   xor_data.l2l_map = l2l_map;
   xor_data.results = &results;
 

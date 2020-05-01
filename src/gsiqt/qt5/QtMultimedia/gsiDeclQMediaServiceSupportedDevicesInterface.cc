@@ -218,10 +218,10 @@ gsi::Class<QMediaServiceSupportedDevicesInterface> &qtdecl_QMediaServiceSupporte
 static gsi::Methods methods_QMediaServiceSupportedDevicesInterface_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMediaServiceSupportedDevicesInterface::QMediaServiceSupportedDevicesInterface()\nThis method creates an object of class QMediaServiceSupportedDevicesInterface.", &_init_ctor_QMediaServiceSupportedDevicesInterface_Adaptor_0, &_call_ctor_QMediaServiceSupportedDevicesInterface_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("deviceDescription", "@hide", false, &_init_cbs_deviceDescription_4510_0, &_call_cbs_deviceDescription_4510_0);
-  methods += new qt_gsi::GenericMethod ("deviceDescription", "@brief Virtual method QString QMediaServiceSupportedDevicesInterface::deviceDescription(const QByteArray &service, const QByteArray &device)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_deviceDescription_4510_0, &_call_cbs_deviceDescription_4510_0, &_set_callback_cbs_deviceDescription_4510_0);
-  methods += new qt_gsi::GenericMethod ("devices", "@hide", true, &_init_cbs_devices_c2309_0, &_call_cbs_devices_c2309_0);
-  methods += new qt_gsi::GenericMethod ("devices", "@brief Virtual method QList<QByteArray> QMediaServiceSupportedDevicesInterface::devices(const QByteArray &service)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_devices_c2309_0, &_call_cbs_devices_c2309_0, &_set_callback_cbs_devices_c2309_0);
+  methods += new qt_gsi::GenericMethod ("deviceDescription", "@brief Virtual method QString QMediaServiceSupportedDevicesInterface::deviceDescription(const QByteArray &service, const QByteArray &device)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_deviceDescription_4510_0, &_call_cbs_deviceDescription_4510_0);
+  methods += new qt_gsi::GenericMethod ("deviceDescription", "@hide", false, &_init_cbs_deviceDescription_4510_0, &_call_cbs_deviceDescription_4510_0, &_set_callback_cbs_deviceDescription_4510_0);
+  methods += new qt_gsi::GenericMethod ("devices", "@brief Virtual method QList<QByteArray> QMediaServiceSupportedDevicesInterface::devices(const QByteArray &service)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_devices_c2309_0, &_call_cbs_devices_c2309_0);
+  methods += new qt_gsi::GenericMethod ("devices", "@hide", true, &_init_cbs_devices_c2309_0, &_call_cbs_devices_c2309_0, &_set_callback_cbs_devices_c2309_0);
   return methods;
 }
 

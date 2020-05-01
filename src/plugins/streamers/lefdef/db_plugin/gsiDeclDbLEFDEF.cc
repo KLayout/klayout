@@ -466,17 +466,20 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "\n"
     "This property has been added in version 0.26.5.\n"
   ) +
-  gsi::method ("consider_map_file", &db::LEFDEFReaderOptions::consider_map_file,
-    "@brief Gets a value indicating whether to consider reading .map files next to DEF files.\n"
-    "If this property is set to true (the default), the DEF reader will look for .map files next to the "
-    "DEF file. If such a file is found, it will be used to map DEF layers to layout layers. The layer mapping "
-    "settings specified in the reader options are ignored in this case.\n"
+  gsi::method ("map_file", &db::LEFDEFReaderOptions::map_file,
+    "@brief Gets the layer map file to use.\n"
+    "If a layer map file is given, the reader will pull the layer mapping from this file. The layer mapping rules "
+    "specified in the reader options are ignored in this case. These are the name suffix rules for vias, blockages, routing, "
+    "special routing, pins etc. and the corresponding datatype rules. The \\layer_map attribute will also be ignored. "
+    "\n"
+    "The layer map file path will be resolved relative to the technology base path if the LEF/DEF reader options are "
+    "used in the context of a technology.\n"
     "\n"
     "This property has been added in version 0.26.5.\n"
   ) +
-  gsi::method ("consider_map_file=", &db::LEFDEFReaderOptions::set_consider_map_file, gsi::arg ("flag"),
-    "@brief Sets a value indicating whether to consider reading .map files next to DEF files.\n"
-    "See \\consider_map_file for details about this property.\n"
+  gsi::method ("map_file=", &db::LEFDEFReaderOptions::set_map_file, gsi::arg ("file"),
+    "@brief Sets the layer map file to use.\n"
+    "See \\map_file for details about this property.\n"
     "\n"
     "This property has been added in version 0.26.5.\n"
   ) +
@@ -513,6 +516,21 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
   "@brief Detailed LEF/DEF reader options\n"
   "This class is a aggregate belonging to the \\LoadLayoutOptions class. It provides options for the LEF/DEF reader. "
   "These options have been placed into a separate class to account for their complexity."
+  "\n"
+  "This class specifically handles layer mapping. This is the process of generating layer names or GDS layer/datatypes "
+  "from LEF/DEF layers and purpose combinations. There are basically two ways: to use a map file or to use pattern-based production rules.\n"
+  "\n"
+  "To use a layer map file, set the \\map_file attribute to the name of the layer map file. The layer map "
+  "file lists the GDS layer and datatype numbers to generate for the geometry.\n"
+  "\n"
+  "The pattern-based approach will use the layer name and attach a purpose-dependent suffix to it. "
+  "Use the ..._suffix attributes to specify this suffix. For routing, the corresponding attribute is \\routing_suffix for example. "
+  "A purpose can also be mapped to a specific GDS datatype using the corresponding ..._datatype attributes.\n"
+  "The decorated or undecorated names are looked up in a layer mapping table in the next step. The layer mapping table "
+  "is specified using the \\layer_map attribute. This table can be used to map layer names to specific GDS layers "
+  "by using entries of the form 'NAME: layer-number'.\n"
+  "\n"
+  "If a layer map file is present, the pattern-based attributes are ignored.\n"
 );
 
 }

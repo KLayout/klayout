@@ -347,7 +347,7 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
       std::string vn = get ();
       db::Cell *vc = reader_state ()->via_cell (vn);
       if (! vc) {
-        warn ("Unknown via: " + vn);
+        warn (tl::to_string (tr ("Unknown via: ")) + vn);
       }
 
       if (iterate) {
@@ -549,7 +549,7 @@ LEFImporter::read_viadef_by_geometry (Layout &layout, db::Cell &cell, ViaDesc &v
     via_desc.m1 = routing_layers[0];
     via_desc.m2 = routing_layers[1];
   } else {
-    warn ("Can't determine routing layers for via: " + n);
+    warn (tl::to_string (tr ("Can't determine routing layers for via: ")) + n);
   }
 
   reset_cellname ();
@@ -724,6 +724,11 @@ void
 LEFImporter::read_macro (Layout &layout)
 {
   std::string mn = get ();
+
+  if (m_macros_by_name.find (mn) != m_macros_by_name.end ()) {
+    error (tl::to_string (tr ("Duplicate MACRO name: ")) + mn);
+  }
+
   set_cellname (mn);
 
   db::Cell &cell = layout.cell (layout.add_cell ());
@@ -813,19 +818,10 @@ LEFImporter::read_macro (Layout &layout)
     } else if (test ("FOREIGN")) {
 
       if (foreign_cell) {
-        error ("Duplicate FOREIGN definition");
+        error (tl::to_string (tr ("Duplicate FOREIGN definition")));
       }
 
       std::string cn = get ();
-
-      db::cell_index_type ci;
-      std::pair<bool, db::cell_index_type> c = layout.cell_by_name (cn.c_str ());
-      if (c.first) {
-        ci = c.second;
-      } else {
-        ci = layout.add_cell (cn.c_str ());
-        layout.cell (ci).set_ghost_cell (true);
-      }
 
       db::Point vec;
       db::FTrans ft;
@@ -836,11 +832,24 @@ LEFImporter::read_macro (Layout &layout)
 
       expect (";");
 
-      foreign_cell = &layout.cell (ci);
-      //  What is the definition of the FOREIGN transformation?
-      //  Guessing: this transformation moves the lower-left origin to 0,0
-      foreign_trans = db::Trans (db::Point () - vec) * db::Trans (ft);
-      foreign_name = cn;
+      if (options ().macro_resolution_mode () != 1) {
+
+        db::cell_index_type ci;
+        std::pair<bool, db::cell_index_type> c = layout.cell_by_name (cn.c_str ());
+        if (c.first) {
+          ci = c.second;
+        } else {
+          ci = layout.add_cell (cn.c_str ());
+          layout.cell (ci).set_ghost_cell (true);
+        }
+
+        foreign_cell = &layout.cell (ci);
+        //  What is the definition of the FOREIGN transformation?
+        //  Guessing: this transformation moves the lower-left origin to 0,0
+        foreign_trans = db::Trans (db::Point () - vec) * db::Trans (ft);
+        foreign_name = cn;
+
+      }
 
     } else if (test ("OBS")) {
 
@@ -855,38 +864,42 @@ LEFImporter::read_macro (Layout &layout)
 
   }
 
-  if (options ().macro_resolution_mode () == 1 || (! foreign_cell && options ().macro_resolution_mode () != 2)) {
+  if (! foreign_cell) {
 
-    //  actually implement the real cell
+    if (options ().macro_resolution_mode () != 2) {
 
-    layout.rename_cell (cell.cell_index (), mn.c_str ());
+      //  actually implement the real cell
 
-    std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Outline);
-    if (dl.first) {
-      cell.shapes (dl.second).insert (db::Box (-origin, -origin + size));
-    }
+      layout.rename_cell (cell.cell_index (), mn.c_str ());
 
-    m_macros_by_name.insert (std::make_pair (mn, std::make_pair (&cell, db::Trans ())));
+      std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Outline);
+      if (dl.first) {
+        cell.shapes (dl.second).insert (db::Box (-origin, -origin + size));
+      }
 
-  } else if (! foreign_cell) {
+      m_macros_by_name.insert (std::make_pair (mn, std::make_pair (&cell, db::Trans ())));
 
-    //  macro resolution mode #2 (always create a MACRO reference, no LEF geometry)
-
-    db::cell_index_type ci;
-    std::pair<bool, db::cell_index_type> c = layout.cell_by_name (mn.c_str ());
-    if (c.first) {
-      ci = c.second;
     } else {
-      ci = layout.add_cell (mn.c_str ());
-      layout.cell (ci).set_ghost_cell (true);
-    }
 
-    layout.delete_cell (cell.cell_index ());
-    m_macros_by_name.insert (std::make_pair (mn, std::make_pair (&layout.cell (ci), db::Trans ())));
+      //  macro resolution mode #2 (always create a MACRO reference, no LEF geometry)
+
+      db::cell_index_type ci;
+      std::pair<bool, db::cell_index_type> c = layout.cell_by_name (mn.c_str ());
+      if (c.first) {
+        ci = c.second;
+      } else {
+        ci = layout.add_cell (mn.c_str ());
+        layout.cell (ci).set_ghost_cell (true);
+      }
+
+      layout.delete_cell (cell.cell_index ());
+      m_macros_by_name.insert (std::make_pair (mn, std::make_pair (&layout.cell (ci), db::Trans ())));
+
+    }
 
   } else if (foreign_name != mn) {
 
-    warn ("FOREIGN name differs from MACRO name in macro: " + mn);
+    warn (tl::to_string (tr ("FOREIGN name differs from MACRO name in macro: ")) + mn);
 
     layout.rename_cell (cell.cell_index (), mn.c_str ());
 

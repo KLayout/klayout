@@ -77,7 +77,7 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
     m_special_routing_suffix (""),
     m_special_routing_datatype (0),
     m_separate_groups (false),
-    m_consider_map_file (true),
+    m_map_file (),
     m_macro_resolution_mode (0)
 {
   //  .. nothing yet ..
@@ -125,7 +125,7 @@ LEFDEFReaderOptions::LEFDEFReaderOptions (const LEFDEFReaderOptions &d)
     m_special_routing_suffix (d.m_special_routing_suffix),
     m_special_routing_datatype (d.m_special_routing_datatype),
     m_separate_groups (d.m_separate_groups),
-    m_consider_map_file (d.m_consider_map_file),
+    m_map_file (d.m_map_file),
     m_macro_resolution_mode (d.m_macro_resolution_mode),
     m_lef_files (d.m_lef_files)
 {
@@ -295,45 +295,6 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
   db::DirectLayerMapping lm (&layout);
   for (std::map<std::pair<std::string, LayerPurpose>, db::LayerProperties>::const_iterator i = layer_map.begin (); i != layer_map.end (); ++i) {
     map_layer_explicit (i->first.first, i->first.second, i->second, lm.map_layer (i->second).second);
-  }
-}
-
-void
-LEFDEFReaderState::import_map_file_heuristics (const std::string &main_path, db::Layout &layout)
-{
-  std::string input_dir = tl::absolute_path (main_path);
-  if (! tl::file_exists (input_dir)) {
-    return;
-  }
-
-  std::string bn = tl::basename (tl::filename (main_path));
-  std::vector<std::string> map_files;
-  std::string map_file_exact;
-
-  std::vector<std::string> entries = tl::dir_entries (input_dir);
-  for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
-
-    if (tl::to_lower_case (tl::extension (*e)) == "map") {
-
-      if (tl::basename (*e) == bn) {
-        map_file_exact = *e;
-      } else {
-        map_files.push_back (*e);
-      }
-
-    }
-
-  }
-
-  try {
-    if (! map_file_exact.empty ()) {
-      read_map_file (tl::combine_path (input_dir, map_file_exact), layout);
-    } else if (map_files.size () == 1) {
-      read_map_file (tl::combine_path (input_dir, map_files.front ()), layout);
-    }
-  } catch (tl::Exception &ex) {
-    //  ignore read errors on map file (this is a heuristics!)
-    tl::error << ex.msg ();
   }
 }
 

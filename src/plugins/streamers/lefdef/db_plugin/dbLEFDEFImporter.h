@@ -515,14 +515,14 @@ public:
     m_separate_groups = f;
   }
 
-  bool consider_map_file () const
+  const std::string &map_file () const
   {
-    return m_consider_map_file;
+    return m_map_file;
   }
 
-  void set_consider_map_file (bool f)
+  void set_map_file (const std::string &f)
   {
-    m_consider_map_file = f;
+    m_map_file = f;
   }
 
   /**
@@ -584,7 +584,7 @@ private:
   std::string m_special_routing_suffix;
   int m_special_routing_datatype;
   bool m_separate_groups;
-  bool m_consider_map_file;
+  std::string m_map_file;
   unsigned int m_macro_resolution_mode;
   std::vector<std::string> m_lef_files;
 };
@@ -636,14 +636,6 @@ public:
    *  @brief Reads a map file
    */
   void read_map_file (const std::string &path, db::Layout &layout);
-
-  /**
-   *  @brief Imports a .map file present next to the input files
-   *  "main_path" path of an input file (DEF). If a suitable .map file is found at this path,
-   *  it is loaded into the reader state object. This will eventually disable any other layer
-   *  mapping except for the global layers (region, outline, placement blockage).
-   */
-  void import_map_file_heuristics (const std::string &main_path, db::Layout &layout);
 
   /**
    *  @brief Sets the layer map

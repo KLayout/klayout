@@ -31,6 +31,7 @@
 #include "dbDEFImporter.h"
 #include "dbLEFDEFImporter.h"
 #include "dbLayoutUtils.h"
+#include "dbTechnology.h"
 
 namespace db
 {
@@ -103,14 +104,32 @@ public:
   {
     return "LEFDEF";
   }
+
 private:
   tl::InputStream &m_stream;
   db::LayerMap m_layer_map;
 
-  std::string correct_path (const std::string &fn)
+  std::string correct_path (const std::string &fn, const db::Layout &layout)
   {
     if (! tl::is_absolute (fn)) {
+
+      //  if a technology is given and the file can be found in the technology's base path, take it
+      //  from there.
+      std::string tn = layout.meta_info_value ("technology");
+      const db::Technology *tech = 0;
+      if (! tn.empty ()) {
+        tech = db::Technologies::instance ()->technology_by_name (tn);
+      }
+
+      if (tech && ! tech->base_path ().empty ()) {
+        std::string new_fn = tl::combine_path (tech->base_path (), fn);
+        if (tl::file_exists (new_fn)) {
+          return new_fn;
+        }
+      }
+
       return tl::combine_path (m_stream.absolute_path (), fn);
+
     } else {
       return fn;
     }
@@ -126,8 +145,8 @@ private:
 
     db::LEFDEFReaderState state (lefdef_options, layout);
 
-    if (lefdef_options->consider_map_file ()) {
-      state.import_map_file_heuristics (m_stream.absolute_path (), layout);
+    if (! lefdef_options->map_file ().empty ()) {
+      state.read_map_file (correct_path (lefdef_options->map_file (), layout), layout);
     }
 
     layout.dbu (lefdef_options->dbu ());
@@ -140,7 +159,7 @@ private:
 
       for (std::vector<std::string>::const_iterator l = lefdef_options->begin_lef_files (); l != lefdef_options->end_lef_files (); ++l) {
 
-        std::string lp = correct_path (*l);
+        std::string lp = correct_path (*l, layout);
 
         tl::InputStream lef_stream (lp);
         tl::log << tl::to_string (tr ("Reading")) << " " << lp;
@@ -159,7 +178,7 @@ private:
 
       for (std::vector<std::string>::const_iterator l = lefdef_options->begin_lef_files (); l != lefdef_options->end_lef_files (); ++l) {
 
-        std::string lp = correct_path (*l);
+        std::string lp = correct_path (*l, layout);
 
         tl::InputStream lef_stream (lp);
         tl::log << tl::to_string (tr ("Reading")) << " " << lp;
@@ -167,8 +186,7 @@ private:
 
       }
 
-      //  Additionally read all LEF files next to the DEF file and if there is a single .map file
-      //  or one with the same name than the input file with ".map" suffix, try to read this one too.
+      //  Additionally read all LEF files next to the DEF file
 
       std::string input_dir = tl::absolute_path (m_stream.absolute_path ());
 
@@ -204,6 +222,39 @@ private:
     return m_layer_map;
   }
 };
+
+namespace {
+
+  struct MacroResolutionModeConverter
+  {
+  public:
+    MacroResolutionModeConverter ()
+    {
+      m_values.push_back ("default");
+      m_values.push_back ("always-lef");
+      m_values.push_back ("always-cellref");
+    }
+
+    std::string to_string (unsigned int v) const
+    {
+      return v < m_values.size () ? m_values[v] : std::string ();
+    }
+
+    void from_string (const std::string &s, unsigned int &v) const
+    {
+      v = 0;
+      for (unsigned int i = 0; i < (unsigned int) m_values.size (); ++i) {
+        if (m_values [i] == s) {
+          v = i;
+        }
+      }
+    }
+
+  private:
+    std::vector<std::string> m_values;
+  };
+
+}
 
 class LEFDEFFormatDeclaration
   : public db::StreamFormatDeclaration
@@ -280,7 +331,10 @@ class LEFDEFFormatDeclaration
       tl::make_member (&LEFDEFReaderOptions::produce_special_routing, &LEFDEFReaderOptions::set_produce_special_routing, "produce-special-routing") +
       tl::make_member (&LEFDEFReaderOptions::special_routing_suffix, &LEFDEFReaderOptions::set_special_routing_suffix, "special-routing-suffix") +
       tl::make_member (&LEFDEFReaderOptions::special_routing_datatype, &LEFDEFReaderOptions::set_special_routing_datatype, "special-routing-datatype") +
-      tl::make_member (&LEFDEFReaderOptions::begin_lef_files, &LEFDEFReaderOptions::end_lef_files, &LEFDEFReaderOptions::push_lef_file, "lef-files")
+      tl::make_member (&LEFDEFReaderOptions::begin_lef_files, &LEFDEFReaderOptions::end_lef_files, &LEFDEFReaderOptions::push_lef_file, "lef-files") +
+      tl::make_member (&LEFDEFReaderOptions::macro_resolution_mode, &LEFDEFReaderOptions::set_macro_resolution_mode, "macro-resolution-mode", MacroResolutionModeConverter ()) +
+      tl::make_member (&LEFDEFReaderOptions::separate_groups, &LEFDEFReaderOptions::set_separate_groups, "separate-groups") +
+      tl::make_member (&LEFDEFReaderOptions::map_file, &LEFDEFReaderOptions::set_map_file, "map-file")
     );
   }
 };

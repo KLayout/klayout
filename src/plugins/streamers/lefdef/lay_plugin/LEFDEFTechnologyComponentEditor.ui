@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>775</width>
-    <height>855</height>
+    <width>859</width>
+    <height>868</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -207,7 +207,84 @@
       <property name="bottomMargin">
        <number>4</number>
       </property>
+      <item row="1" column="4">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>FOREIGN macros</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="6">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
       <item row="0" column="4">
+       <widget class="QLabel" name="label_21">
+        <property name="text">
+         <string>Via cell name prefix</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Layout DBU</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="5" colspan="2">
+       <widget class="QComboBox" name="foreign_mode">
+        <item>
+         <property name="text">
+          <string>Link to external cells for FOREIGN, LEF macros otherwise</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Ignore FOREIGN, Produce LEF macros always</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Always link to external cells</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="2">
+       <widget class="QCheckBox" name="separate_groups">
+        <property name="text">
+         <string>Produce a parent cell for each group</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_22">
+        <property name="text">
+         <string>Groups</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="dbu">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5">
        <widget class="QLineEdit" name="prefix_via_cellname">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -230,60 +307,21 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1" colspan="4">
-       <widget class="QCheckBox" name="separate_groups">
-        <property name="text">
-         <string>Produce a parent cell for each group</string>
+      <item row="1" column="3">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QLabel" name="label_21">
-        <property name="text">
-         <string>Via cell name prefix</string>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
         </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Layout database unit</string>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>5</width>
+          <height>20</height>
+         </size>
         </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_22">
-        <property name="text">
-         <string>Separate groups</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="dbu">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_25">
-        <property name="text">
-         <string>Consider map files</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1" colspan="4">
-       <widget class="QCheckBox" name="consider_map_file">
-        <property name="text">
-         <string>Look for .map files next to DEF files and use them to map layers</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
+       </spacer>
       </item>
      </layout>
     </widget>
@@ -291,7 +329,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
-      <string>Production (specify what objects to produce and on what layers)</string>
+      <string>Global Production Rules (specify what objects to produce and on what layers)</string>
      </property>
      <property name="flat">
       <bool>true</bool>
@@ -312,32 +350,6 @@
       <property name="spacing">
        <number>6</number>
       </property>
-      <item row="7" column="1">
-       <widget class="QLabel" name="label_10">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2" colspan="2">
-       <widget class="QLabel" name="label_8">
-        <property name="text">
-         <string>As properties with name ...</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2" colspan="2">
-       <widget class="QLineEdit" name="inst_prop_name"/>
-      </item>
       <item row="1" column="0">
        <widget class="QCheckBox" name="produce_net_names">
         <property name="font">
@@ -368,18 +380,77 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="0" colspan="2">
-       <widget class="QLabel" name="label_6">
+      <item row="0" column="2" colspan="2">
+       <widget class="QLabel" name="label_8">
         <property name="text">
-         <string>Produce ...</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+         <string>As properties with name ...</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="0">
-       <widget class="QCheckBox" name="produce_outlines">
+      <item row="2" column="2" colspan="2">
+       <widget class="QLineEdit" name="inst_prop_name"/>
+      </item>
+      <item row="0" column="4" rowspan="8">
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="7">
+       <widget class="QLineEdit" name="placement_blockage_layer"/>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="label_18">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="7">
+       <widget class="QLineEdit" name="region_layer"/>
+      </item>
+      <item row="4" column="0" colspan="4">
+       <widget class="QLabel" name="help_label">
+        <property name="text">
+         <string>&lt;html&gt;&lt;body&gt;(&lt;a href=&quot;int:/about/variant_notation.xml&quot;&gt;See here for the name notation&lt;/a&gt;)&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" colspan="2">
+       <widget class="QLineEdit" name="net_prop_name"/>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="label_20">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2" colspan="2">
+       <widget class="QLineEdit" name="pin_prop_name"/>
+      </item>
+      <item row="3" column="6">
+       <widget class="QLabel" name="label_19">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="5">
+       <widget class="QCheckBox" name="produce_placement_blockages">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -387,11 +458,11 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Cell outlines</string>
+         <string>Blockages</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="1">
+      <item row="1" column="6">
        <widget class="QLabel" name="label_9">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -422,9 +493,6 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="8">
-       <widget class="QLineEdit" name="datatype_pins"/>
-      </item>
       <item row="2" column="0">
        <widget class="QCheckBox" name="produce_inst_names">
         <property name="text">
@@ -432,345 +500,13 @@
         </property>
        </widget>
       </item>
-      <item row="7" column="0">
-       <widget class="QCheckBox" name="produce_placement_blockages">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Blockages</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0" colspan="4">
-       <widget class="QLabel" name="help_label">
-        <property name="text">
-         <string>&lt;html&gt;&lt;body&gt;(&lt;a href=&quot;int:/about/variant_notation.xml&quot;&gt;See here for the name notation&lt;/a&gt;)&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2" colspan="2">
-       <widget class="QLineEdit" name="net_prop_name"/>
-      </item>
-      <item row="0" column="8">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>GDS datatype ...</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="7">
-       <widget class="QLabel" name="lbl1">
-        <property name="text">
-         <string>Layer name suffix ...</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="6">
-       <widget class="QLabel" name="label_12">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="2" colspan="2">
        <widget class="QLabel" name="label_7">
         <property name="text">
          <string>On layer with spec ...</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="2" colspan="2">
-       <widget class="QLineEdit" name="region_layer"/>
-      </item>
-      <item row="7" column="2" colspan="2">
-       <widget class="QLineEdit" name="placement_blockage_layer"/>
-      </item>
-      <item row="6" column="2" colspan="2">
-       <widget class="QLineEdit" name="outline_layer"/>
-      </item>
-      <item row="1" column="7">
-       <widget class="QLineEdit" name="suffix_via_geometry"/>
-      </item>
-      <item row="1" column="5">
-       <widget class="QCheckBox" name="produce_via_geometry">
-        <property name="text">
-         <string>Via geometry</string>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="1">
-       <widget class="QLabel" name="label_19">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4" rowspan="9">
-       <widget class="Line" name="line">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="5">
-       <widget class="QCheckBox" name="produce_pins">
-        <property name="text">
-         <string>Pins</string>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="0">
-       <widget class="QCheckBox" name="produce_regions">
-        <property name="text">
-         <string>Regions</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="6">
-       <widget class="QLabel" name="label_13">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="label_18">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="7">
-       <widget class="QLineEdit" name="suffix_pins"/>
-      </item>
-      <item row="1" column="8">
-       <widget class="QLineEdit" name="datatype_via_geometry"/>
-      </item>
-      <item row="3" column="0">
-       <widget class="QCheckBox" name="produce_pin_names">
-        <property name="text">
-         <string>Pin names</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QLabel" name="label_20">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2" colspan="2">
-       <widget class="QLineEdit" name="pin_prop_name"/>
-      </item>
-      <item row="3" column="6">
-       <widget class="QLabel" name="label_14">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="6">
-       <widget class="QLabel" name="label_15">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="5">
-       <widget class="QCheckBox" name="produce_blockages">
-        <property name="text">
-         <string>Blockages</string>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="6">
-       <widget class="QLabel" name="label_17">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="7">
-       <widget class="QLineEdit" name="suffix_blockages"/>
-      </item>
-      <item row="8" column="8">
-       <widget class="QLineEdit" name="datatype_blockages"/>
-      </item>
-      <item row="6" column="6">
-       <widget class="QLabel" name="label_16">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="6">
-       <widget class="QLabel" name="label_23">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="6">
-       <widget class="QLabel" name="label_24">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="5">
-       <widget class="QCheckBox" name="produce_labels">
-        <property name="text">
-         <string>Pin labels</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="7">
-       <widget class="QLineEdit" name="suffix_labels"/>
-      </item>
-      <item row="7" column="8">
-       <widget class="QLineEdit" name="datatype_labels"/>
-      </item>
-      <item row="6" column="5">
-       <widget class="QCheckBox" name="produce_special_routing">
-        <property name="text">
-         <string>Special routing</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="7">
-       <widget class="QLineEdit" name="suffix_special_routing"/>
-      </item>
-      <item row="6" column="8">
-       <widget class="QLineEdit" name="datatype_special_routing"/>
-      </item>
-      <item row="5" column="5">
-       <widget class="QCheckBox" name="produce_routing">
-        <property name="text">
-         <string>Routing</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="7">
-       <widget class="QLineEdit" name="suffix_routing"/>
-      </item>
-      <item row="5" column="8">
-       <widget class="QLineEdit" name="datatype_routing"/>
-      </item>
-      <item row="4" column="5">
-       <widget class="QCheckBox" name="produce_obstructions">
-        <property name="text">
-         <string>Obstructions</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="7">
-       <widget class="QLineEdit" name="suffix_obstructions"/>
-      </item>
-      <item row="4" column="8">
-       <widget class="QLineEdit" name="datatype_obstructions"/>
-      </item>
-      <item row="3" column="7">
-       <widget class="QLineEdit" name="suffix_lef_pins"/>
-      </item>
-      <item row="3" column="8">
-       <widget class="QLineEdit" name="datatype_lef_pins"/>
-      </item>
-      <item row="3" column="5">
-       <widget class="QCheckBox" name="produce_lef_pins">
-        <property name="text">
-         <string>LEF Pins</string>
         </property>
        </widget>
       </item>
@@ -796,23 +532,10 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="warn1">
-           <property name="toolTip">
-            <string>Layer assignment is not used if a .map file is present for DEF layer mapping</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="pixmap">
-            <pixmap resource="../../../../lay/lay/layResources.qrc">:/warn_16.png</pixmap>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QLabel" name="label_26">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>1</horstretch>
+             <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
@@ -824,92 +547,478 @@
         </layout>
        </widget>
       </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>1</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="title">
-      <string>Layer Mapping (filter/modify layers, assign GDS layer/datatypes)</string>
-     </property>
-     <property name="flat">
-      <bool>true</bool>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <property name="leftMargin">
-       <number>9</number>
-      </property>
-      <property name="topMargin">
-       <number>4</number>
-      </property>
-      <property name="rightMargin">
-       <number>9</number>
-      </property>
-      <property name="bottomMargin">
-       <number>4</number>
-      </property>
-      <item row="0" column="1">
-       <widget class="QCheckBox" name="read_all_cbx">
-        <property name="text">
-         <string>Read all layers (additionally to the ones in the mapping table)</string>
-        </property>
-       </widget>
+      <item row="1" column="7">
+       <widget class="QLineEdit" name="outline_layer"/>
       </item>
-      <item row="2" column="1">
-       <widget class="lay::LayerMappingWidget" name="layer_map">
+      <item row="3" column="5">
+       <widget class="QCheckBox" name="produce_regions">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
-          <verstretch>1</verstretch>
+          <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="minimumSize">
-         <size>
-          <width>16</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
+        <property name="text">
+         <string>Regions</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="warn2">
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="produce_pin_names">
+        <property name="text">
+         <string>Pin names</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="5">
+       <widget class="QCheckBox" name="produce_outlines">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Cell outlines</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="6">
+       <widget class="QLabel" name="label_10">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip">
-         <string>This table is not used if a .map file is present for DEF layer mapping</string>
-        </property>
         <property name="text">
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../../../../lay/lay/layResources.qrc">:/warn_16.png</pixmap>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="Line" name="line_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
         </property>
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="layer_map_mode">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Layer Map File</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="2" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>278</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Layer map file</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QToolButton" name="browse_mapfile">
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="autoRaise">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="mapfile_path"/>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="label_25">
+         <property name="text">
+          <string>If a layer map file is given, pattern based rules are ignored.
+If used inside a technology, the file will be looked up relative to the technology's base path.</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Pattern Based Layer Production Rules</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QFrame" name="frame_5">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>150</height>
+          </size>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item row="3" column="7">
+           <widget class="QLineEdit" name="suffix_labels"/>
+          </item>
+          <item row="1" column="6">
+           <widget class="QLabel" name="label_23">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLineEdit" name="suffix_pins"/>
+          </item>
+          <item row="3" column="8">
+           <widget class="QLineEdit" name="datatype_labels"/>
+          </item>
+          <item row="2" column="5">
+           <widget class="QCheckBox" name="produce_special_routing">
+            <property name="text">
+             <string>Special routing</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="3">
+           <widget class="QLineEdit" name="datatype_obstructions"/>
+          </item>
+          <item row="2" column="8">
+           <widget class="QLineEdit" name="datatype_special_routing"/>
+          </item>
+          <item row="3" column="3">
+           <widget class="QLineEdit" name="datatype_lef_pins"/>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="label_12">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="8">
+           <widget class="QLineEdit" name="datatype_routing"/>
+          </item>
+          <item row="1" column="7">
+           <widget class="QLineEdit" name="suffix_routing"/>
+          </item>
+          <item row="4" column="8">
+           <widget class="QLineEdit" name="datatype_blockages"/>
+          </item>
+          <item row="2" column="6">
+           <widget class="QLabel" name="label_16">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="6">
+           <widget class="QLabel" name="label_24">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="5">
+           <widget class="QCheckBox" name="produce_routing">
+            <property name="text">
+             <string>Routing</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QLineEdit" name="suffix_lef_pins"/>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="label_13">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="label_15">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="produce_via_geometry">
+            <property name="text">
+             <string>Via geometry</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="5">
+           <widget class="QCheckBox" name="produce_labels">
+            <property name="text">
+             <string>Pin labels</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="produce_lef_pins">
+            <property name="text">
+             <string>LEF Pins</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="7">
+           <widget class="QLabel" name="lbl1_2">
+            <property name="text">
+             <string>Layer name suffix ...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="produce_pins">
+            <property name="text">
+             <string>Pins</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLineEdit" name="suffix_via_geometry"/>
+          </item>
+          <item row="2" column="3">
+           <widget class="QLineEdit" name="datatype_pins"/>
+          </item>
+          <item row="0" column="8">
+           <widget class="QLabel" name="label_27">
+            <property name="text">
+             <string>GDS datatype ...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="label_14">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="7">
+           <widget class="QLineEdit" name="suffix_special_routing"/>
+          </item>
+          <item row="1" column="3">
+           <widget class="QLineEdit" name="datatype_via_geometry"/>
+          </item>
+          <item row="4" column="2">
+           <widget class="QLineEdit" name="suffix_obstructions"/>
+          </item>
+          <item row="4" column="5">
+           <widget class="QCheckBox" name="produce_blockages">
+            <property name="text">
+             <string>Blockages</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QCheckBox" name="produce_obstructions">
+            <property name="text">
+             <string>Obstructions</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="6">
+           <widget class="QLabel" name="label_17">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="7">
+           <widget class="QLineEdit" name="suffix_blockages"/>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="lbl1">
+            <property name="text">
+             <string>Layer name suffix ...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>GDS datatype ...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="4" rowspan="5">
+           <widget class="Line" name="line_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>1</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>Layer Mapping (filter/modify layers, assign GDS layer/datatypes)</string>
+         </property>
+         <property name="flat">
+          <bool>true</bool>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <property name="leftMargin">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>4</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+          <property name="bottomMargin">
+           <number>4</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="read_all_cbx">
+            <property name="text">
+             <string>Read all layers (additionally to the ones in the mapping table)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="lay::LayerMappingWidget" name="layer_map">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>1</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>16</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="Line" name="line_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
@@ -934,16 +1043,6 @@
   <tabstop>dbu</tabstop>
   <tabstop>produce_net_names</tabstop>
   <tabstop>net_prop_name</tabstop>
-  <tabstop>produce_outlines</tabstop>
-  <tabstop>outline_layer</tabstop>
-  <tabstop>produce_placement_blockages</tabstop>
-  <tabstop>placement_blockage_layer</tabstop>
-  <tabstop>produce_via_geometry</tabstop>
-  <tabstop>suffix_via_geometry</tabstop>
-  <tabstop>datatype_via_geometry</tabstop>
-  <tabstop>produce_pins</tabstop>
-  <tabstop>suffix_pins</tabstop>
-  <tabstop>datatype_pins</tabstop>
   <tabstop>read_all_cbx</tabstop>
  </tabstops>
  <resources>

@@ -9,7 +9,7 @@ DIEAREA ( 0 0 ) ( 1000 2000 ) ;
 
 COMPONENTS 3 ;
  - macro1 macro1 + PLACED ( 0 0 ) N ;
- - macro2 macro2 + PLACED ( 0 500 ) N ;
+ - macro2 macro2 + PLACED ( 0 500 ) E ;
  - macro3 macro3 + PLACED ( 0 1000 ) N ;
 END COMPONENTS
 

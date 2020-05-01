@@ -827,17 +827,19 @@ LEFImporter::read_macro (Layout &layout)
         layout.cell (ci).set_ghost_cell (true);
       }
 
-      db::Point origin;
+      db::Point vec;
       db::FTrans ft;
       if (! peek (";")) {
-        origin = get_point (1.0 / layout.dbu ());
+        vec = get_point (1.0 / layout.dbu ());
         ft = get_orient (true);
       }
 
       expect (";");
 
       foreign_cell = &layout.cell (ci);
-      foreign_trans = (db::Trans (origin - db::Point ()) * db::Trans (ft)).inverted ();
+      //  What is the definition of the FOREIGN transformation?
+      //  Guessing: this transformation moves the lower-left origin to 0,0
+      foreign_trans = db::Trans (db::Point () - vec) * db::Trans (ft);
       foreign_name = cn;
 
     } else if (test ("OBS")) {
@@ -899,7 +901,7 @@ LEFImporter::read_macro (Layout &layout)
 
     cell.clear_insts ();
 
-    cell.insert (db::CellInstArray (db::CellInst (foreign_cell->cell_index ()), foreign_trans));
+    cell.insert (db::CellInstArray (db::CellInst (foreign_cell->cell_index ()), db::Trans (db::Point () - origin) * foreign_trans));
     m_macros_by_name.insert (std::make_pair (mn, std::make_pair (&cell, db::Trans ())));
 
   } else {
@@ -907,7 +909,7 @@ LEFImporter::read_macro (Layout &layout)
     //  use FOREIGN cell instead of new one
 
     layout.delete_cell (cell.cell_index ());
-    m_macros_by_name.insert (std::make_pair (mn, std::make_pair (foreign_cell, foreign_trans)));
+    m_macros_by_name.insert (std::make_pair (mn, std::make_pair (foreign_cell, db::Trans (db::Point () - origin) * foreign_trans)));
 
   }
 

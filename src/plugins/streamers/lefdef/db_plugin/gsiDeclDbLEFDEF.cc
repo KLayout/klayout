@@ -264,13 +264,13 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "@brief Gets the via cellname prefix.\n"
     "Vias are represented by cells. The cell name is formed by combining the via cell name prefix and the via name.\n"
     "\n"
-    "This property has been added in version 0.26.5.\n"
+    "This property has been added in version 0.27.\n"
   ) +
   gsi::method ("via_cellname_prefix=", &db::LEFDEFReaderOptions::set_via_cellname_prefix, gsi::arg ("prefix"),
     "@brief Sets the via cellname prefix.\n"
     "See \\via_cellname_prefix for details about this property.\n"
     "\n"
-    "This property has been added in version 0.26.5.\n"
+    "This property has been added in version 0.27.\n"
   ) +
   gsi::method ("produce_pins", &db::LEFDEFReaderOptions::produce_pins,
     "@brief Gets a value indicating whether pin geometries shall be produced.\n"
@@ -420,37 +420,37 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "@brief Gets a value indicating whether special routing geometry shall be produced.\n"
     "See \\produce_via_geometry for details about the layer production rules.\n"
     "\n"
-    "The differentiation between special and normal routing has been introduced in version 0.26.5."
+    "The differentiation between special and normal routing has been introduced in version 0.27."
   ) +
   gsi::method ("produce_special_routing=", &db::LEFDEFReaderOptions::set_produce_special_routing, gsi::arg ("produce"),
     "@brief Sets a value indicating whether special routing geometry shall be produced.\n"
     "See \\produce_via_geometry for details about the layer production rules."
     "\n"
-    "The differentiation between special and normal routing has been introduced in version 0.26.5."
+    "The differentiation between special and normal routing has been introduced in version 0.27."
   ) +
   gsi::method ("special_routing_suffix", &db::LEFDEFReaderOptions::special_routing_suffix,
     "@brief Gets the special routing layer name suffix.\n"
     "See \\produce_via_geometry for details about the layer production rules."
     "\n"
-    "The differentiation between special and normal routing has been introduced in version 0.26.5."
+    "The differentiation between special and normal routing has been introduced in version 0.27."
   ) +
   gsi::method ("special_routing_suffix=", &db::LEFDEFReaderOptions::set_special_routing_suffix, gsi::arg ("suffix"),
     "@brief Sets the special routing layer name suffix.\n"
     "See \\produce_via_geometry for details about the layer production rules."
     "\n"
-    "The differentiation between special and normal routing has been introduced in version 0.26.5."
+    "The differentiation between special and normal routing has been introduced in version 0.27."
   ) +
   gsi::method ("special_routing_datatype", &db::LEFDEFReaderOptions::special_routing_datatype,
     "@brief Gets the special routing layer datatype value.\n"
     "See \\produce_via_geometry for details about the layer production rules."
     "\n"
-    "The differentiation between special and normal routing has been introduced in version 0.26.5."
+    "The differentiation between special and normal routing has been introduced in version 0.27."
   ) +
   gsi::method ("special_routing_datatype=", &db::LEFDEFReaderOptions::set_special_routing_datatype, gsi::arg ("datatype"),
     "@brief Sets the special routing layer datatype value.\n"
     "See \\produce_via_geometry for details about the layer production rules."
     "\n"
-    "The differentiation between special and normal routing has been introduced in version 0.26.5."
+    "The differentiation between special and normal routing has been introduced in version 0.27."
   ) +
   gsi::method ("separate_groups", &db::LEFDEFReaderOptions::separate_groups,
     "@brief Gets a value indicating whether to create separate parent cells for individual groups.\n"
@@ -458,13 +458,13 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "individual parent cells. These parent cells are named after the groups and are put into the master top cell.\n"
     "If this property is set to false (the default), no such group parents will be formed."
     "\n"
-    "This property has been added in version 0.26.5.\n"
+    "This property has been added in version 0.27.\n"
   ) +
   gsi::method ("separate_groups=", &db::LEFDEFReaderOptions::set_separate_groups, gsi::arg ("flag"),
     "@brief Sets a value indicating whether to create separate parent cells for individual groups.\n"
     "See \\seperate_groups for details about this property.\n"
     "\n"
-    "This property has been added in version 0.26.5.\n"
+    "This property has been added in version 0.27.\n"
   ) +
   gsi::method ("map_file", &db::LEFDEFReaderOptions::map_file,
     "@brief Gets the layer map file to use.\n"
@@ -475,13 +475,13 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "The layer map file path will be resolved relative to the technology base path if the LEF/DEF reader options are "
     "used in the context of a technology.\n"
     "\n"
-    "This property has been added in version 0.26.5.\n"
+    "This property has been added in version 0.27.\n"
   ) +
   gsi::method ("map_file=", &db::LEFDEFReaderOptions::set_map_file, gsi::arg ("file"),
     "@brief Sets the layer map file to use.\n"
     "See \\map_file for details about this property.\n"
     "\n"
-    "This property has been added in version 0.26.5.\n"
+    "This property has been added in version 0.27.\n"
   ) +
   gsi::method ("macro_resolution_mode", &db::LEFDEFReaderOptions::macro_resolution_mode,
     "@brief Gets the macro resolution mode.\n"
@@ -494,13 +494,13 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "  @li 2: produce a placeholder cell always (even if FOREIGN isn't given) @/li\n"
     "@/ul\n"
     "\n"
-    "This property has been added in version 0.26.5.\n"
+    "This property has been added in version 0.27.\n"
   ) +
   gsi::method ("macro_resolution_mode=", &db::LEFDEFReaderOptions::set_macro_resolution_mode, gsi::arg ("mode"),
     "@brief Sets the macro resolution mode.\n"
     "See \\macro_resolution_mode for details about this property.\n"
     "\n"
-    "This property has been added in version 0.26.5.\n"
+    "This property has been added in version 0.27.\n"
   ) +
   gsi::method ("lef_files", &db::LEFDEFReaderOptions::lef_files,
     "@brief Gets the list technology LEF files to additionally import\n"

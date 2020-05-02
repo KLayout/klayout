@@ -52,6 +52,8 @@ class DataHeader;
 struct IMG_PUBLIC DataMapping
 {
 public:
+  typedef std::vector< std::pair<double, std::pair<QColor, QColor> > > false_color_nodes_type;
+
   /**
    *  @brief The constructor
    */
@@ -73,7 +75,7 @@ public:
    *  Each node is a pair or x-value (normalized to a range of 0..1) and a corresponding color.
    *  The list should have an element with x value of 0.0 and one with an x value of 1.0.
    */
-  std::vector< std::pair<double, QColor> > false_color_nodes;
+  false_color_nodes_type false_color_nodes;
 
   /**
    *  @brief The brightness value
@@ -177,8 +179,9 @@ public:
    *  @param h The height of the image
    *  @param trans The transformation from pixel space to micron space
    *  @param color True to create a color image.
+   *  @param byte_data True to make the image store the data in bytes
    */
-  Object (size_t w, size_t h, const db::DCplxTrans &trans, bool color);
+  Object (size_t w, size_t h, const db::DCplxTrans &trans, bool color, bool byte_data);
 
   /**
    *  @brief Constructor for a monochrome image with the given pixel values
@@ -301,8 +304,9 @@ public:
    *  @param h The height of the image
    *  @param matrix The 3d transformation matrix from pixel space to micron space
    *  @param color True to create a color image.
+   *  @param byte_data True to create n image using bytes rather than floats
    */
-  Object (size_t w, size_t h, const db::Matrix3d &matrix, bool color);
+  Object (size_t w, size_t h, const db::Matrix3d &matrix, bool color, bool byte_data);
 
   /**
    *  @brief Constructor for a monochrome image with the given pixel values
@@ -735,6 +739,11 @@ public:
   void set_data (size_t width, size_t height, const std::vector<double> &red, const std::vector<double> &green, const std::vector<double> &blue);
 
   /**
+   *  @brief Clears the pixel data (sets the values to 0)
+   */
+  void clear ();
+
+  /**
    *  @brief Set the transformation matrix
    *
    *  This transformation matrix converts pixel coordinates (0,0 being the lower left corner and each pixel having the dimension of pixel_width and pixel_height)
@@ -936,6 +945,11 @@ public:
    *  generic factory.
    */
   virtual std::string to_string () const;
+
+  /**
+   *  @brief Swap with another image object
+   */
+  void swap (img::Object &other);
 
   /**
    *  @brief Return the memory used in bytes

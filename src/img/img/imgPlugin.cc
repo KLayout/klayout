@@ -29,6 +29,8 @@
 namespace img
 {
 
+const std::string cfg_images_visible ("images-visible");
+
 void 
 PluginDeclaration::get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
 {
@@ -39,6 +41,7 @@ PluginDeclaration::get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) 
   menu_entries.push_back (lay::menu_item ("img::bring_to_front", "bring_to_front:edit", "edit_menu.image_menu.end", tl::to_string (QObject::tr ("Image Stack: Selected Images to Front"))));
   menu_entries.push_back (lay::menu_item ("img::bring_to_back", "bring_to_back:edit", "edit_menu.image_menu.end", tl::to_string (QObject::tr ("Image Stack: Selected Images to Back"))));
   menu_entries.push_back (lay::menu_item ("img::clear_all_images", "clear_all_images:edit", "edit_menu.image_menu.end", tl::to_string (QObject::tr ("Clear All Images"))));
+  menu_entries.push_back (lay::config_menu_item ("show_images", "view_menu.layout_group+", tl::to_string (QObject::tr ("Show Images")), cfg_images_visible, "?"));
 }
 
 lay::Plugin *
@@ -52,6 +55,12 @@ PluginDeclaration::implements_editable (std::string &title) const
 {
   title = tl::to_string (QObject::tr ("Images"));
   return true;
+}
+
+void
+PluginDeclaration::get_options (std::vector < std::pair<std::string, std::string> > &options) const
+{
+  options.push_back (std::pair<std::string, std::string> (cfg_images_visible, "true"));
 }
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new img::PluginDeclaration (), 4000, "img::Plugin");

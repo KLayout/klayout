@@ -86,6 +86,7 @@ private slots:
   void min_max_return_pressed ();
   void preview_checked ();
   void reset_pressed ();
+  void save_pressed ();
   void define_landmarks_pressed ();
 
 private:

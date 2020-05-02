@@ -15,7 +15,8 @@ HEADERS = \
   imgService.h \
   imgWidgets.h \
   imgForceLink.h \
-  imgCommon.h
+  imgCommon.h \
+    imgStream.h
 
 FORMS = \
   AddNewImageDialog.ui \
@@ -31,7 +32,8 @@ SOURCES = \
   imgPropertiesPage.cc \
   imgService.cc \
   imgWidgets.cc \
-  imgForceLink.cc
+  imgForceLink.cc \
+    imgStream.cc
 
 INCLUDEPATH += $$TL_INC $$DB_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC
 DEPENDPATH += $$TL_INC $$DB_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC

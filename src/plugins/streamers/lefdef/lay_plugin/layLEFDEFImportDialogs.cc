@@ -581,7 +581,13 @@ LEFDEFReaderOptionsEditor::add_lef_file_clicked ()
   std::string title, filters;
   title = tl::to_string (QObject::tr ("Add LEF Files"));
   filters = tl::to_string (QObject::tr ("LEF files (*.lef *.LEF *.lef.gz *.LEF.gz);;All files (*)"));
-  QStringList files = QFileDialog::getOpenFileNames (this, tl::to_qstring (title), QString (), tl::to_qstring (filters));
+
+  std::string dir;
+  if (mp_tech) {
+    dir = mp_tech->base_path ();
+  }
+
+  QStringList files = QFileDialog::getOpenFileNames (this, tl::to_qstring (title), tl::to_qstring (dir), tl::to_qstring (filters));
   for (QStringList::const_iterator f = files.begin (); f != files.end (); ++f) {
     if (mp_tech) {
       lef_files->addItem (tl::to_qstring (mp_tech->correct_path (tl::to_string (*f))));

@@ -604,12 +604,12 @@ LEFImporter::read_layer (Layout & /*layout*/)
 
     } else if (test ("TYPE")) {
 
-      if (test ("ROUTING")) {
+      std::string type = get ();
+
+      if (type == "ROUTING" || type == "MASTERSLICE") {
         m_routing_layers.insert (ln);
-      } else if (test ("CUT")) {
+      } else if (type == "CUT") {
         m_cut_layers.insert (ln);
-      } else {
-        get ();
       }
       expect (";");
 

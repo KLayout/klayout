@@ -49,7 +49,7 @@ static db::LEFDEFReaderOptions default_options ()
   return tc;
 }
 
-static void run_test (tl::TestBase *_this, const char *lef_dir, const char *filename, const char *au, const db::LEFDEFReaderOptions &tc, bool priv = true)
+static void run_test (tl::TestBase *_this, const char *lef_dir, const char *filename, const char *au, const db::LEFDEFReaderOptions &options, bool priv = true)
 {
   std::string fn_path (priv ? tl::testsrc_private () : tl::testsrc ());
   fn_path += "/testdata/lefdef/";
@@ -61,7 +61,7 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
 
   tl::Extractor ex (filename);
 
-  db::LEFDEFReaderState ld (&tc, layout);
+  db::LEFDEFReaderState ld (&options, layout);
 
   db::DEFImporter imp;
 
@@ -102,6 +102,18 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
       tl::InputStream stream (fn);
       db::Reader reader (stream);
       reader.read (layout, db::LoadLayoutOptions ());
+
+    } else if (ex.test("read:")) {
+
+      std::string fn = fn_path, f;
+      ex.read_word_or_quoted (f);
+      fn += f;
+
+      tl::InputStream stream (fn);
+      db::Reader reader (stream);
+      db::LoadLayoutOptions lo;
+      lo.set_options (options);
+      reader.read (layout, lo);
 
     } else {
 
@@ -360,4 +372,12 @@ TEST(110_lefpins)
   options.set_lef_pins_suffix (".LEFPIN");
 
   run_test (_this, "lefpins", "lef:in_tech.lef+lef:in.lef+def:in.def", "au_lefpins_mapped.oas.gz", options, false);
+}
+
+TEST(111_mapfile)
+{
+  db::LEFDEFReaderOptions options = default_options ();
+  options.set_map_file ("test.map");
+
+  run_test (_this, "mapfile", "read:in.def", "au.oas.gz", options, false);
 }

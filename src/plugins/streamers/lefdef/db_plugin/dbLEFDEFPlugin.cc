@@ -128,7 +128,7 @@ private:
         }
       }
 
-      return tl::combine_path (m_stream.absolute_path (), fn);
+      return tl::combine_path (tl::dirname (m_stream.absolute_path ()), fn);
 
     } else {
       return fn;

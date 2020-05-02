@@ -345,9 +345,9 @@ class DBReaders_TestClass < TestBase
     conf.separate_groups = true
     assert_equal(conf.separate_groups, true)
 
-    assert_equal(conf.consider_map_file, true)
-    conf.consider_map_file = false
-    assert_equal(conf.consider_map_file, false)
+    assert_equal(conf.map_file, "")
+    conf.map_file = "xyz.map"
+    assert_equal(conf.map_file, "xyz.map")
 
     assert_equal(conf.lef_files.join(","), "")
     conf.lef_files = [ "u.lef", "v.lef" ]

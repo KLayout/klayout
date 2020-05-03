@@ -1396,7 +1396,7 @@ public:
 
   virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::EdgePair> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
-    edge2edge_check<std::unordered_set<db::EdgePair> > edge_check (m_check, result, m_different_polygons, m_has_other);
+    edge2edge_check<std::unordered_set<db::EdgePair> > edge_check (m_check, result, m_different_polygons, m_has_other, true /*shielded*/);
     poly2poly_check<std::unordered_set<db::EdgePair> > poly_check (edge_check);
 
     std::list<db::Polygon> heap;
@@ -1535,7 +1535,7 @@ DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, b
 
     for (db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::Polygons); ! s.at_end (); ++s) {
 
-      edge2edge_check<db::Shapes> edge_check (check, result, false, false);
+      edge2edge_check<db::Shapes> edge_check (check, result, false, false, true /*shielded*/);
       poly2poly_check<db::Shapes> poly_check (edge_check);
 
       db::Polygon poly;

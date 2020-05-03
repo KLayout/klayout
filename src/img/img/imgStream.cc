@@ -427,7 +427,7 @@ tl::XMLStruct<ImageProxy> s_img_structure ("image-data",
   tl::make_member (&ImageProxy::max_value, &ImageProxy::set_max_value, "max-value") +
   tl::make_element (&ImageProxy::data_mapping, &ImageProxy::set_data_mapping, "data-mapping",
     tl::make_element (&img::DataMapping::false_color_nodes, "color-map",
-      tl::make_member (&img::DataMapping::false_color_nodes_type::begin, &img::DataMapping::false_color_nodes_type::end, &img::DataMapping::false_color_nodes_type::push_back, "color-map-entry", ColorMapConverter ())
+      tl::make_member<std::pair<double, std::pair<QColor, QColor> >, img::DataMapping::false_color_nodes_type::const_iterator, img::DataMapping::false_color_nodes_type, ColorMapConverter> (&img::DataMapping::false_color_nodes_type::begin, &img::DataMapping::false_color_nodes_type::end, &img::DataMapping::false_color_nodes_type::push_back, "color-map-entry", ColorMapConverter ())
     ) +
     tl::make_member (&img::DataMapping::brightness, "brightness") +
     tl::make_member (&img::DataMapping::contrast, "contrast") +
@@ -437,7 +437,7 @@ tl::XMLStruct<ImageProxy> s_img_structure ("image-data",
     tl::make_member (&img::DataMapping::blue_gain, "blue-gain")
   ) +
   tl::make_element (&ImageProxy::landmarks, &ImageProxy::set_landmarks, "landmarks",
-    tl::make_member (&img::Object::landmarks_type::begin, &img::Object::landmarks_type::end, &img::Object::landmarks_type::push_back, "landmark", PointConverter ())
+    tl::make_member<db::DPoint, img::Object::landmarks_type::const_iterator, img::Object::landmarks_type, PointConverter> (&img::Object::landmarks_type::begin, &img::Object::landmarks_type::end, &img::Object::landmarks_type::push_back, "landmark", PointConverter ())
   ) +
   tl::make_member (&ImageProxy::begin_byte_data, &ImageProxy::end_byte_data, &ImageProxy::push_byte_data, "byte-data") +
   tl::make_member (&ImageProxy::begin_data, &ImageProxy::end_data, &ImageProxy::push_data, "data")

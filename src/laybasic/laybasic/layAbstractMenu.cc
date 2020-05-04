@@ -1468,6 +1468,9 @@ AbstractMenu::find_item (tl::Extractor &extr)
       if (n.empty ()) {
 
         //  skip (avoids infinite loops on wrong paths)
+        while (! extr.at_end () && *extr != ';') {
+          ++extr;
+        }
 
       } else if (n == "begin") {
 

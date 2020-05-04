@@ -20,13 +20,15 @@
 
 */
 
-
-
 #ifndef HDR_imgWidgets
 #define HDR_imgWidgets
 
+#include "layWidgets.h"
+
 #include <QObject>
 #include <QWidget>
+#include <QFrame>
+#include <QToolButton>
 #include <vector>
 
 class QMouseEvent;
@@ -41,7 +43,37 @@ namespace img
  *
  *  TODO: move this somewhere else.
  */
-QColor interpolated_color (const std::vector<std::pair <double, QColor> > &nodes, double x);
+QColor interpolated_color (const std::vector<std::pair <double, std::pair<QColor, QColor> > > &nodes, double x);
+
+/**
+ *  @brief A two-color widget
+ *
+ *  This widget has two color buttons and a "lock" checkbox which makes both colors identical
+ */
+class TwoColorWidget
+  : public QFrame
+{
+Q_OBJECT
+
+public:
+  TwoColorWidget (QWidget *parent);
+
+signals:
+  void color_changed (std::pair<QColor, QColor> c);
+
+public slots:
+  void set_color (std::pair<QColor, QColor> c);
+  void set_single_mode (bool f);
+
+private slots:
+  void lcolor_changed (QColor c);
+  void rcolor_changed (QColor c);
+  void lock_changed (bool checked);
+
+private:
+  lay::SimpleColorButton *mp_left, *mp_right;
+  QToolButton *mp_lock;
+};
 
 /**
  *  @brief A color bar widget
@@ -82,9 +114,9 @@ public:
     return m_selected >= 0;
   }
 
-  void set_nodes (const std::vector <std::pair <double, QColor> > &nodes);
+  void set_nodes (const std::vector <std::pair <double, std::pair<QColor, QColor> > > &nodes);
 
-  const std::vector <std::pair <double, QColor> > &nodes () const
+  const std::vector <std::pair <double, std::pair<QColor, QColor> > > &nodes () const
   {
     return m_nodes;
   }
@@ -92,18 +124,18 @@ public:
   void set_histogram (const std::vector <size_t> &histogram);
 
 public slots:
-  void set_current_color (QColor c);
+  void set_current_color (std::pair<QColor, QColor> c);
   void set_current_position (double x);
 
 signals:
   void color_mapping_changed ();
   void selection_changed ();
-  void selection_changed (QColor c);
+  void selection_changed (std::pair<QColor, QColor> c);
 
 private:
   bool m_dragging;
   int m_selected;
-  std::vector <std::pair <double, QColor> > m_nodes;
+  std::vector <std::pair <double, std::pair<QColor, QColor> > > m_nodes;
   std::vector <size_t> m_histogram;
 };
 

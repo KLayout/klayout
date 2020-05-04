@@ -469,6 +469,11 @@ public:
   Extractor &read (unsigned int &value);
 
   /**
+   *  @brief Read an unsigned char int (see read of an unsigned int)
+   */
+  Extractor &read (unsigned char &value);
+
+  /**
    *  @brief Read an unsigned long (see read of an unsigned int)
    */
   Extractor &read (unsigned long &value);
@@ -482,6 +487,11 @@ public:
    *  @brief Read a double (see read of an unsigned int)
    */
   Extractor &read (double &value);
+
+  /**
+   *  @brief Read a float (see read of an unsigned int)
+   */
+  Extractor &read (float &value);
 
   /**
    *  @brief Read a signed int (see read of an unsigned int)
@@ -577,6 +587,11 @@ public:
   bool try_read (int &value);
 
   /**
+   *  @brief Try to read an unsigned char int (see try to read an unsigned int)
+   */
+  bool try_read (unsigned char &value);
+
+  /**
    *  @brief Try to read an unsigned long (see try to read an unsigned int)
    */
   bool try_read (unsigned long &value);
@@ -600,6 +615,11 @@ public:
    *  @brief Try to read a double (see try to read an unsigned int)
    */
   bool try_read (double &value);
+
+  /**
+   *  @brief Try to read a float (see try to read an unsigned int)
+   */
+  bool try_read (float &value);
 
   /**
    *  @brief Try to read a boolean value (see try to read an unsigned int)

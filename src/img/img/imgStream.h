@@ -20,25 +20,38 @@
 
 */
 
+#ifndef HDR_imgStream
+#define HDR_imgStream
 
-#ifndef HDR_imgPlugin
-#define HDR_imgPlugin
+#include "imgCommon.h"
 
-#include "layPlugin.h"
+#include "imgObject.h"
+#include "tlStream.h"
 
-namespace img
-{
-
-extern const std::string cfg_images_visible;
-
-class PluginDeclaration
-  : public lay::PluginDeclaration
+namespace img {
+  
+/**
+ *  @brief An object streaming image data from or to files
+ */
+struct IMG_PUBLIC ImageStreamer
 {
 public:
-  virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const;
-  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *, lay::LayoutView *view) const;
-  virtual bool implements_editable (std::string &title) const;
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const;
+  /**
+   *  @brief The constructor
+   */
+  ImageStreamer () { }
+
+  /**
+   *  @brief Reads an image Object from a stream
+   *
+   *  This method returns a new'd object. It's the responsibility of the caller to delete the object.
+   */
+  static Object *read(tl::InputStream &stream);
+
+  /**
+   *  @brief Writes an image object to a stream
+   */
+  static void write (tl::OutputStream &stream, const img::Object &img);
 };
 
 }

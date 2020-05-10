@@ -120,7 +120,7 @@ Ruby26MacPorts  = { 'exe': '/opt/local/bin/ruby2.6',
 # Ruby 2.7 from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
 #   install with 'brew install ruby'
 # [Key Type Name] = 'HB27'
-HBRuby27Path    = '/usr/local/Cellar/ruby/2.7.0'
+HBRuby27Path    = '/usr/local/opt/ruby'
 Ruby27Brew      = { 'exe': '%s/bin/ruby' % HBRuby27Path,
                     'inc': '%s/include/ruby-2.7.0' % HBRuby27Path,
                     'lib': '%s/lib/libruby.2.7.dylib' % HBRuby27Path
@@ -213,7 +213,7 @@ Python37MacPorts= { 'exe': '/opt/local/Library/Frameworks/Python.framework/Versi
 # Python 3.7 from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
 #   install with 'brew install python'
 # [Key Type Name] = 'HB37'
-HBPython37FrameworkPath = '/usr/local/Cellar/python/3.7.6_1/Frameworks/Python.framework'
+HBPython37FrameworkPath = '/usr/local/opt/python3/Frameworks/Python.framework'
 Python37Brew    = { 'exe': '%s/Versions/3.7/bin/python3.7m' % HBPython37FrameworkPath,
                     'inc': '%s/Versions/3.7/include/python3.7m' % HBPython37FrameworkPath,
                     'lib': '%s/Versions/3.7/lib/libpython3.7m.dylib' % HBPython37FrameworkPath

@@ -272,6 +272,24 @@ class DBShapes_TestClass < TestBase
     assert_equal( arr[0].path.inspect, "nil" )
     assert_equal( arr[0].text.inspect, "nil" )
     assert_equal( arr[0].is_simple_polygon?, true )
+    begin
+      arr[0].each_point { |x| }
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Shape is not a path in Shape::each_point")
+    end
+    begin
+      arr[0].each_point_hole(0) { |x| }
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "A simple polygon doesn't have holes in Shape::each_point_hole")
+    end
+    begin
+      arr[0].text_string
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Shape is not a text in Shape::text_string")
+    end
     assert_equal( arr[0].simple_polygon == a, true )
     assert_equal( arr[0].polygon == b, true )
     assert_equal( arr[0].holes, 0 )
@@ -290,6 +308,7 @@ class DBShapes_TestClass < TestBase
     # polygons
 
     a = RBA::Polygon::new( [ RBA::Point::new( 0, 1 ), RBA::Point::new( 1, 5 ), RBA::Point::new( 5, 5 ) ] )
+    a.insert_hole( [ RBA::Point::new( 1, 2 ), RBA::Point::new( 2, 4 ), RBA::Point::new( 4, 4 ) ] )
     c1.shapes( lindex ).insert( a )
     arr = []
     shapes.each( RBA::Shapes::SPolygons ) { |s| arr.push( s ) } 
@@ -301,14 +320,23 @@ class DBShapes_TestClass < TestBase
     assert_equal( arr[0].is_polygon?, true )
     assert_equal( arr[0].is_simple_polygon?, false )
     assert_equal( arr[0].polygon == a, true )
-    assert_equal( arr[0].holes, 0 )
+    assert_equal( arr[0].holes, 1 )
     assert_equal( arr[0].bbox == a.bbox, true )
     parr = []
     arr[0].each_point_hull { |p| parr.push( p.to_s ) }
     assert_equal( parr, ["0,1", "1,5", "5,5"] )
+    parr = []
+    arr[0].each_point_hole(0) { |p| parr.push( p.to_s ) }
+    assert_equal( parr, ["1,2", "4,4", "2,4"] )
+    begin
+      arr[0].each_point_hole(1) { |x| }
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Invalid hole index in Shape::each_point_hole")
+    end
     earr = []
     arr[0].each_edge { |e| earr.push( e.to_s ) }
-    assert_equal( earr, ["(0,1;1,5)", "(1,5;5,5)", "(5,5;0,1)"] )
+    assert_equal( earr, ["(0,1;1,5)", "(1,5;5,5)", "(5,5;0,1)", "(1,2;4,4)", "(4,4;2,4)", "(2,4;1,2)"] )
     arr = []
     shapes.each( RBA::Shapes::SBoxes ) { |s| arr.push( s ) } 
     assert_equal( arr.size, 1 )
@@ -520,6 +548,18 @@ class DBShapes_TestClass < TestBase
     assert_equal( arr[0].is_null?, false )
     assert_equal( arr[0].type, RBA::Shape::t_path )
     assert_equal( arr[0].is_path?, true )
+    begin
+      arr[0].each_point_hull { |x| }
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Shape is not a general or simple polygon in Shape::each_point_hull")
+    end
+    begin
+      arr[0].each_point_hole(0) { |x| }
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Shape is not a general or simple polygon in Shape::each_point_hole")
+    end
     assert_equal( arr[0].dpolygon.to_s, "(0.012,0.007;-0.012,0.013;-0.002,0.053;0.022,0.047)" )
     assert_equal( arr[0].dsimple_polygon.to_s, "(0.012,0.007;-0.012,0.013;-0.002,0.053;0.022,0.047)" )
     assert_equal( arr[0].dedge.inspect, "nil" )

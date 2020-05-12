@@ -170,6 +170,6 @@ TEST(6)
 
   texts.insert_into (&ly, top_cell, l1);
 
-  db::Region r (db::RecursiveShapeIterator (ly, ly.cell (top_cell), l1));
-  EXPECT_EQ (r.to_string (), "(-10,-21;9,20;50,51;91,80);(-10,-21;9,20;110,121;91,80)");
+  db::Texts r (db::RecursiveShapeIterator (ly, ly.cell (top_cell), l1));
+  EXPECT_EQ (r.to_string (), "('abc',r0 100,-200);('uvw',r0 110,210)");
 }

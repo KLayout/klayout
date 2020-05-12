@@ -396,6 +396,15 @@ public:
   DeepLayer create_edge_pair_layer (const db::RecursiveShapeIterator &si, const ICplxTrans &trans = db::ICplxTrans ());
 
   /**
+   *  @brief Inserts an text layer into the deep shape store
+   *
+   *  This method will create a new layer inside the deep shape store as a
+   *  working copy of the original layer. This method creates a layer
+   *  for texts.
+   */
+  DeepLayer create_text_layer (const db::RecursiveShapeIterator &si, const ICplxTrans &trans = db::ICplxTrans ());
+
+  /**
    *  @brief Inserts a polygon layer into the deep shape store using a custom preparation pipeline
    *
    *  This method will create a new layer inside the deep shapes store and

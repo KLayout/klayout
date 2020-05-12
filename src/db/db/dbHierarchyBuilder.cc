@@ -704,4 +704,18 @@ void EdgePairBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape
   }
 }
 
+// ---------------------------------------------------------------------------------------------
+
+TextBuildingHierarchyBuilderShapeReceiver::TextBuildingHierarchyBuilderShapeReceiver ()
+{
+  //  .. nothing yet ..
+}
+
+void TextBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, const db::ICplxTrans &trans, const db::Box & /*region*/, const db::RecursiveShapeReceiver::box_tree_type * /*complex_region*/, db::Shapes *target)
+{
+  if (shape.is_text ()) {
+    target->insert (shape.text ().transformed (trans));
+  }
+}
+
 }

@@ -1301,6 +1301,7 @@ public:
 
 private:
   friend class EdgePairs;
+  friend class Texts;
 
   EdgesDelegate *mp_delegate;
 

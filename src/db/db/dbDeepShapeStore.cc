@@ -807,64 +807,20 @@ DeepLayer DeepShapeStore::create_copy (const DeepLayer &source, HierarchyBuilder
 
 DeepLayer DeepShapeStore::create_edge_layer (const db::RecursiveShapeIterator &si, bool as_edges, const db::ICplxTrans &trans)
 {
-  unsigned int layout_index = layout_for_iter (si, trans);
-
-  db::Layout &layout = m_layouts[layout_index]->layout;
-  db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
-
-  unsigned int layer_index = init_layer (layout, si);
-  builder.set_target_layer (layer_index);
-
-  //  The chain of operators for producing edges
   db::EdgeBuildingHierarchyBuilderShapeReceiver refs (as_edges);
-
-  //  Build the working hierarchy from the recursive shape iterator
-  try {
-
-    tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Building working hierarchy")));
-    db::LayoutLocker ll (&layout, true /*no update*/);
-
-    builder.set_shape_receiver (&refs);
-    db::RecursiveShapeIterator (si).push (& builder);
-    builder.set_shape_receiver (0);
-
-  } catch (...) {
-    builder.set_shape_receiver (0);
-    throw;
-  }
-
-  return DeepLayer (this, layout_index, layer_index);
+  return create_custom_layer (si, &refs, trans);
 }
 
 DeepLayer DeepShapeStore::create_edge_pair_layer (const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans)
 {
-  unsigned int layout_index = layout_for_iter (si, trans);
-
-  db::Layout &layout = m_layouts[layout_index]->layout;
-  db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
-
-  unsigned int layer_index = init_layer (layout, si);
-  builder.set_target_layer (layer_index);
-
-  //  The chain of operators for producing the edge pairs
   db::EdgePairBuildingHierarchyBuilderShapeReceiver refs;
+  return create_custom_layer (si, &refs, trans);
+}
 
-  //  Build the working hierarchy from the recursive shape iterator
-  try {
-
-    tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Building working hierarchy")));
-    db::LayoutLocker ll (&layout, true /*no update*/);
-
-    builder.set_shape_receiver (&refs);
-    db::RecursiveShapeIterator (si).push (& builder);
-    builder.set_shape_receiver (0);
-
-  } catch (...) {
-    builder.set_shape_receiver (0);
-    throw;
-  }
-
-  return DeepLayer (this, layout_index, layer_index);
+DeepLayer DeepShapeStore::create_text_layer (const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans)
+{
+  db::TextBuildingHierarchyBuilderShapeReceiver refs;
+  return create_custom_layer (si, &refs, trans);
 }
 
 void

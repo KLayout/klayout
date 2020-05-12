@@ -74,7 +74,8 @@ SOURCES = \
     dbBoxTreeTests.cc \
     dbBoxScannerTests.cc \
     dbBoxTests.cc \
-    dbArrayTests.cc
+    dbArrayTests.cc \
+    dbDeepTextsTests.cc
 
 INCLUDEPATH += $$TL_INC $$DB_INC $$GSI_INC
 DEPENDPATH += $$TL_INC $$DB_INC $$GSI_INC

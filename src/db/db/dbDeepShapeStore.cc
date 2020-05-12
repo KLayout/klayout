@@ -1079,6 +1079,12 @@ DeepShapeStore::insert_as_polygons (const DeepLayer &deep_layer, db::Layout *int
         s->polygon (poly);
         out.insert (poly);
 
+      } else if (s->is_text ()) {
+
+        db::Text t;
+        s->text (t);
+        out.insert (db::SimplePolygon (t.box ().enlarged (db::Vector (enl, enl))));
+
       }
 
     }

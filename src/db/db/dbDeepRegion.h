@@ -194,6 +194,7 @@ private:
   virtual RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse) const;
   virtual RegionDelegate *pull_generic (const Region &other, int mode, bool touching) const;
   virtual EdgesDelegate *pull_generic (const Edges &other) const;
+  DeepRegion *apply_filter (const PolygonFilterBase &filter) const;
 
   template <class Result, class OutputContainer> OutputContainer *processed_impl (const polygon_processor<Result> &filter) const;
 };

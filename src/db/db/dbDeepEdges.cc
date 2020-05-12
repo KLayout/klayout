@@ -650,11 +650,18 @@ EdgesDelegate *
 DeepEdges::filter_in_place (const EdgeFilterBase &filter)
 {
   //  TODO: implement to be really in-place
-  return filtered (filter);
+  *this = *apply_filter (filter);
+  return this;
 }
 
 EdgesDelegate *
 DeepEdges::filtered (const EdgeFilterBase &filter) const
+{
+  return apply_filter (filter);
+}
+
+DeepEdges *
+DeepEdges::apply_filter (const EdgeFilterBase &filter) const
 {
   const db::DeepLayer &edges = filter.requires_raw_input () ? deep_layer () : merged_deep_layer ();
 

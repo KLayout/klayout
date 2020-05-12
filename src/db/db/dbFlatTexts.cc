@@ -207,7 +207,7 @@ FlatTexts::insert (const db::Text &t)
 void
 FlatTexts::insert (const db::Shape &shape)
 {
-  if (shape.is_edge_pair ()) {
+  if (shape.is_text ()) {
 
     db::Text t;
     shape.text (t);

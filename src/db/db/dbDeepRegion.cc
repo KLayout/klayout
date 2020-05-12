@@ -1085,11 +1085,18 @@ RegionDelegate *
 DeepRegion::filter_in_place (const PolygonFilterBase &filter)
 {
   //  TODO: implement to be really in-place
-  return filtered (filter);
+  *this = *apply_filter (filter);
+  return this;
 }
 
 RegionDelegate *
 DeepRegion::filtered (const PolygonFilterBase &filter) const
+{
+  return apply_filter (filter);
+}
+
+DeepRegion *
+DeepRegion::apply_filter (const PolygonFilterBase &filter) const
 {
   const db::DeepLayer &polygons = filter.requires_raw_input () ? deep_layer () : merged_deep_layer ();
 

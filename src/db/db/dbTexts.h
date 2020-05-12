@@ -215,6 +215,7 @@ public:
 
   virtual bool selected (const db::Text &text) const = 0;
   virtual const TransformationReducer *vars () const = 0;
+  virtual bool wants_variants () const = 0;
 };
 
 /**

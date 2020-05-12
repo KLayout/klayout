@@ -231,14 +231,86 @@ TextsDelegate *DeepTexts::add (const Texts &other) const
 
 TextsDelegate *DeepTexts::filter_in_place (const TextFilterBase &filter)
 {
-  //  TODO: implement
-  return AsIfFlatTexts::filter_in_place (filter);
+  //  TODO: implement as really in place
+  *this = *apply_filter (filter);
+  return this;
 }
 
 TextsDelegate *DeepTexts::filtered (const TextFilterBase &filter) const
 {
-  //  TODO: implement
-  return AsIfFlatTexts::filtered (filter);
+  return apply_filter (filter);
+}
+
+DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
+{
+  const db::DeepLayer &texts = deep_layer ();
+
+  std::auto_ptr<VariantsCollectorBase> vars;
+  if (filter.vars ()) {
+
+    vars.reset (new db::VariantsCollectorBase (filter.vars ()));
+
+    vars->collect (texts.layout (), texts.initial_cell ());
+
+    if (filter.wants_variants ()) {
+      const_cast<db::DeepLayer &> (texts).separate_variants (*vars);
+    }
+
+  }
+
+  db::Layout &layout = const_cast<db::Layout &> (texts.layout ());
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
+
+  std::auto_ptr<db::DeepTexts> res (new db::DeepTexts (texts.derived ()));
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    const db::Shapes &s = c->shapes (texts.layer ());
+
+    if (vars.get ()) {
+
+      const std::map<db::ICplxTrans, size_t> &vv = vars->variants (c->cell_index ());
+      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+
+        db::Shapes *st;
+        if (vv.size () == 1) {
+          st = & c->shapes (res->deep_layer ().layer ());
+        } else {
+          st = & to_commit [c->cell_index ()] [v->first];
+        }
+
+        const db::ICplxTrans &tr = v->first;
+
+        for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Texts); ! si.at_end (); ++si) {
+          db::Text text;
+          si->text (text);
+          if (filter.selected (text.transformed (tr))) {
+            st->insert (*si);
+          }
+        }
+
+      }
+
+    } else {
+
+      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+
+      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Texts); ! si.at_end (); ++si) {
+        db::Text text;
+        si->text (text);
+        if (filter.selected (text)) {
+          st.insert (*si);
+        }
+      }
+
+    }
+
+  }
+
+  if (! to_commit.empty () && vars.get ()) {
+    res->deep_layer ().commit_shapes (*vars, to_commit);
+  }
+
+  return res.release ();
 }
 
 RegionDelegate *DeepTexts::polygons (db::Coord e) const

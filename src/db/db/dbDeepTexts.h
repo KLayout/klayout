@@ -94,6 +94,7 @@ private:
   DeepLayer m_deep_layer;
 
   void init ();
+  DeepTexts *apply_filter (const TextFilterBase &filter) const;
 };
 
 }

@@ -159,7 +159,7 @@ static db::Texts with_text (const db::Texts *r, const std::string &text, bool in
   return r->filtered (f);
 }
 
-static db::Texts with_pattern (const db::Texts *r, const std::string &pattern, bool inverse)
+static db::Texts with_match (const db::Texts *r, const std::string &pattern, bool inverse)
 {
   db::TextPatternFilter f (pattern, inverse);
   return r->filtered (f);
@@ -391,7 +391,7 @@ Class<db::Texts> decl_Texts ("db", "Texts",
     "If \"inverse\" is false, this method returns the texts with the given string.\n"
     "If \"inverse\" is true, this method returns the texts not having the given string.\n"
   ) +
-  method_ext ("with_match", with_pattern, gsi::arg ("pattern"), gsi::arg ("inverse"),
+  method_ext ("with_match", with_match, gsi::arg ("pattern"), gsi::arg ("inverse"),
     "@brief Filter the text by glob pattern\n"
     "\"pattern\" is a glob-style pattern (e.g. \"A*\" will select all texts starting with a capital \"A\").\n"
     "If \"inverse\" is false, this method returns the texts matching the pattern.\n"

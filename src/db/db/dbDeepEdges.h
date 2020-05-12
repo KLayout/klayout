@@ -178,6 +178,8 @@ private:
   virtual RegionDelegate *pull_generic (const Region &region) const;
   virtual EdgesDelegate *selected_interacting_generic (const Edges &edges, bool invert) const;
   virtual EdgesDelegate *selected_interacting_generic (const Region &region, bool invert) const;
+  DeepEdges *apply_filter (const EdgeFilterBase &filter) const;
+
   template <class Result, class OutputContainer> OutputContainer *processed_impl (const edge_processor<Result> &filter) const;
 };
 

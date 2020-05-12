@@ -238,7 +238,7 @@ public:
               ex.read_word (cell_name, "_.$-");
 
               int m11 = 1, m12 = 0, m21 = 0, m22 = 1;
-              int x = 0, y = 0;
+              int64_t x = 0, y = 0;
 
               bool cspace = (ex.test ("c") || ex.test ("C"));
 
@@ -348,7 +348,7 @@ public:
 
             }
 
-            int x, y;
+            int64_t x, y;
             ex.read (x);
             ex.read (y);
             ex.expect_end ();
@@ -376,11 +376,11 @@ public:
 
             }
 
-            int x1, y1;
+            int64_t x1, y1;
             ex.read (x1);
             ex.read (y1);
 
-            int x2, y2;
+            int64_t x2, y2;
             ex.read (x2);
             ex.read (y2);
 

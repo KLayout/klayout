@@ -165,6 +165,13 @@ static db::Texts with_match (const db::Texts *r, const std::string &pattern, boo
   return r->filtered (f);
 }
 
+static db::Region pull_interacting (const db::Texts *r, const db::Region &other)
+{
+  db::Region out;
+  r->pull_interacting (out, other);
+  return out;
+}
+
 Class<db::Texts> decl_Texts ("db", "Texts",
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
@@ -396,6 +403,41 @@ Class<db::Texts> decl_Texts ("db", "Texts",
     "\"pattern\" is a glob-style pattern (e.g. \"A*\" will select all texts starting with a capital \"A\").\n"
     "If \"inverse\" is false, this method returns the texts matching the pattern.\n"
     "If \"inverse\" is true, this method returns the texts not matching the pattern.\n"
+  ) +
+  method ("interacting", (db::Edges (db::Edges::*) (const db::Region &) const)  &db::Edges::selected_interacting, gsi::arg ("other"),
+    "@brief Returns the texts from this text collection which are inside or on the edge of polygons from the given region\n"
+    "\n"
+    "@return A new text collection containing the texts inside or on the edge of polygons from the region\n"
+  ) +
+  method ("not_interacting", (db::Edges (db::Edges::*) (const db::Region &) const)  &db::Edges::selected_not_interacting, gsi::arg ("other"),
+    "@brief Returns the texts from this text collection which are not inside or on the edge of polygons from the given region\n"
+    "\n"
+    "@return A new text collection containing the texts not inside or on the edge of polygons from the region\n"
+  ) +
+  method ("select_interacting", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_interacting, gsi::arg ("other"),
+    "@brief Selects the texts from this text collection which are inside or on the edge of polygons from the given region\n"
+    "\n"
+    "@return A text collection after the texts have been selected (self)\n"
+    "\n"
+    "In contrast to \\interacting, this method will modify self.\n"
+  ) +
+  method ("select_not_interacting", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_not_interacting, gsi::arg ("other"),
+    "@brief Selects the texts from this text collection which are not inside or on the edge of polygons from the given region\n"
+    "\n"
+    "@return A text collection after the texts have been selected (self)\n"
+    "\n"
+    "In contrast to \\interacting, this method will modify self.\n"
+  ) +
+  method_ext ("pull_interacting", &pull_interacting, gsi::arg ("other"),
+    "@brief Returns all polygons of \"other\" which are including texts of this text set\n"
+    "The \"pull_...\" method is similar to \"select_...\" but works the opposite way: it "
+    "selects shapes from the argument region rather than self. In a deep (hierarchical) context "
+    "the output region will be hierarchically aligned with self, so the \"pull_...\" method "
+    "provide a way for rehierarchisation.\n"
+    "\n"
+    "@return The region after the polygons have been selected (from other)\n"
+    "\n"
+    "Merged semantics applies for the polygon region.\n"
   ) +
   method ("clear", &db::Texts::clear,
     "@brief Clears the text collection\n"

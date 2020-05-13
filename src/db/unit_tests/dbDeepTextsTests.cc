@@ -83,3 +83,63 @@ TEST(1_Basics)
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_texts_au1.gds");
 }
+
+TEST(2_Interactions)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_texts_l2.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l8 = ly.get_layer (db::LayerProperties (8, 0));
+
+  db::Texts texts2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+  db::Region polygons8 (db::RecursiveShapeIterator (ly, top_cell, l8), dss);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  db::Region polygons;
+  texts2.selected_interacting (polygons8).polygons (polygons);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), polygons);
+
+  polygons.clear ();
+  texts2.selected_not_interacting (polygons8).polygons (polygons);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), polygons);
+
+  {
+    db::Texts texts2_copy = texts2;
+    texts2_copy.select_interacting (polygons8);
+    polygons.clear ();
+    texts2_copy.polygons (polygons);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), polygons);
+  }
+
+  {
+    db::Texts texts2_copy = texts2;
+    texts2_copy.select_not_interacting (polygons8);
+    polygons.clear ();
+    texts2_copy.polygons (polygons);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), polygons);
+  }
+
+  {
+    db::Texts texts2_copy = texts2;
+    db::Region polygons;
+    texts2_copy.pull_interacting (polygons, polygons8);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), polygons);
+  }
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_texts_au2.gds");
+}

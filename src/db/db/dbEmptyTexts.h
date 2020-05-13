@@ -75,6 +75,10 @@ public:
   virtual void insert_into (Layout *, db::cell_index_type, unsigned int) const { }
   virtual void insert_into_as_polygons (Layout *, db::cell_index_type, unsigned int, db::Coord) const { }
 
+  virtual RegionDelegate *pull_interacting (const Region &) const;
+  virtual TextsDelegate *selected_interacting (const Region &) const;
+  virtual TextsDelegate *selected_not_interacting (const Region &) const;
+
 private:
   EmptyTexts &operator= (const EmptyTexts &other);
 };

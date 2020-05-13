@@ -30,6 +30,8 @@
 
 namespace db {
 
+class Region;
+
 /**
  *  @brief Provides default flat implementations
  */
@@ -69,6 +71,10 @@ public:
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
   virtual void insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const;
 
+  virtual RegionDelegate *pull_interacting (const Region &) const;
+  virtual TextsDelegate *selected_interacting (const Region &other) const;
+  virtual TextsDelegate *selected_not_interacting (const Region &other) const;
+
 protected:
   void update_bbox (const db::Box &box);
   void invalidate_bbox ();
@@ -80,6 +86,8 @@ private:
   mutable db::Box m_bbox;
 
   virtual db::Box compute_bbox () const;
+  virtual TextsDelegate *selected_interacting_generic (const Region &other, bool inverse) const;
+  virtual RegionDelegate *pull_generic (const Region &other) const;
 };
 
 }

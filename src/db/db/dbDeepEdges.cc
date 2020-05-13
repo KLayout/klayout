@@ -1285,7 +1285,7 @@ public:
       }
     }
 
-    for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (shape_interactions<db::Edge, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       const db::Edge &subject = interactions.subject_shape (i->first);
       scanner.insert1 (&subject, 0);
     }
@@ -1302,7 +1302,7 @@ public:
       edge_to_region_interaction_filter<std::unordered_set<db::Edge> > filter (interacting);
       scanner.process (filter, 1, db::box_convert<db::Edge> (), db::box_convert<db::Polygon> ());
 
-      for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (shape_interactions<db::Edge, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
         const db::Edge &subject = interactions.subject_shape (i->first);
         if (interacting.find (subject) == interacting.end ()) {
           result.insert (subject);
@@ -1381,7 +1381,7 @@ public:
       }
     }
 
-    for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (shape_interactions<db::Edge, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       const db::Edge &subject = interactions.subject_shape (i->first);
       scanner.insert1 (&subject, 1);
     }

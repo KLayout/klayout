@@ -635,6 +635,8 @@ template class DB_PUBLIC shape_interactions<db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC shape_interactions<db::PolygonRef, db::Edge>;
 template class DB_PUBLIC shape_interactions<db::Edge, db::Edge>;
 template class DB_PUBLIC shape_interactions<db::Edge, db::PolygonRef>;
+template class DB_PUBLIC shape_interactions<db::Text, db::Text>;
+template class DB_PUBLIC shape_interactions<db::Text, db::PolygonRef>;
 
 // ---------------------------------------------------------------------------------------------
 //  Helper classes for the LocalProcessor
@@ -654,6 +656,12 @@ template <>
 inline unsigned int shape_flags<db::Edge> ()
 {
   return db::ShapeIterator::Edges;
+}
+
+template <>
+inline unsigned int shape_flags<db::Text> ()
+{
+  return db::ShapeIterator::Texts;
 }
 
 template <class TS, class TI>
@@ -850,8 +858,11 @@ instances_interact (const db::Layout *layout1, const db::CellInstArray *inst1, u
 
           //  not very strong, but already useful: the cells interact if there is a layer1 in cell1
           //  in the common box and a layer2 in the cell2 in the common box
-          if (! db::RecursiveShapeIterator (*layout1, cell1, layer1, tni1 * cbox, true).at_end () &&
-              ! db::RecursiveShapeIterator (*layout2, cell2, layer2, tni2 * cbox, true).at_end ()) {
+          //  NOTE: don't use overlap mode for the RecursiveShapeIterator as this would not capture dot-like
+          //  objects like texts. Instead safe-shrink the search box and use touching mode ("false" for the last
+          //  argument)
+          if (! db::RecursiveShapeIterator (*layout1, cell1, layer1, safe_box_enlarged (tni1 * cbox, -1, -1), false).at_end () &&
+              ! db::RecursiveShapeIterator (*layout2, cell2, layer2, safe_box_enlarged (tni2 * cbox, -1, -1), false).at_end ()) {
             return true;
           }
 
@@ -929,7 +940,9 @@ instance_shape_interacts (const db::Layout *layout, const db::CellInstArray *ins
 
       //  not very strong, but already useful: the cells interact if there is a layer in cell
       //  in the common box
-      if (! db::RecursiveShapeIterator (*layout, cell, layer, tni * cbox, true).at_end ()) {
+      //  NOTE: don't use overlapping mode here, because this will not select point-like objects as texts or
+      //  dot edges. Instead safe-shrink the search box and use touching mode.
+      if (! db::RecursiveShapeIterator (*layout, cell, layer, safe_box_enlarged (tni * cbox, -1, -1), false).at_end ()) {
         return true;
       }
 
@@ -1748,6 +1761,8 @@ template class DB_PUBLIC local_processor<db::Edge, db::Edge, db::Edge>;
 template class DB_PUBLIC local_processor<db::Edge, db::PolygonRef, db::Edge>;
 template class DB_PUBLIC local_processor<db::Edge, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor<db::Edge, db::Edge, db::EdgePair>;
+template class DB_PUBLIC local_processor<db::Text, db::PolygonRef, db::Text>;
+template class DB_PUBLIC local_processor<db::Text, db::PolygonRef, db::PolygonRef>;
 
 }
 

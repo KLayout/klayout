@@ -448,6 +448,52 @@ public:
   }
 
   /**
+   *  @brief Selects all polygons of the other region set which include the texts of this text collection
+   *
+   *  Merged semantics applies for the other region. Merged polygons will be selected from the other region
+   *  if merged semantics is enabled.
+   */
+  void pull_interacting (Region &output, const Region &other) const;
+
+  /**
+   *  @brief Selects all texts of this text set which are inside the polygons from the region
+   */
+  Texts &select_interacting (const Region &other)
+  {
+    set_delegate (mp_delegate->selected_interacting (other));
+    return *this;
+  }
+
+  /**
+   *  @brief Returns all texts of this text set which are inside the polygons from the region
+   *
+   *  This method is an out-of-place version of select_interacting.
+   */
+  Texts selected_interacting (const Region &other) const
+  {
+    return Texts (mp_delegate->selected_interacting (other));
+  }
+
+  /**
+   *  @brief Selects all texts of this text set which are not inside the polygons from the region
+   */
+  Texts &select_not_interacting (const Region &other)
+  {
+    set_delegate (mp_delegate->selected_not_interacting (other));
+    return *this;
+  }
+
+  /**
+   *  @brief Returns all texts of this text set which are not inside the polygons from the region
+   *
+   *  This method is an out-of-place version of select_not_interacting.
+   */
+  Texts selected_not_interacting (const Region &other) const
+  {
+    return Texts (mp_delegate->selected_not_interacting (other));
+  }
+
+  /**
    *  @brief Transforms the text set
    */
   template <class T>

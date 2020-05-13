@@ -80,6 +80,8 @@ class DB_PUBLIC FlatTexts
   : public AsIfFlatTexts
 {
 public:
+  typedef db::Text value_type;
+
   typedef db::layer<db::Text, db::unstable_layer_tag> text_layer_type;
   typedef text_layer_type::iterator text_iterator_type;
 

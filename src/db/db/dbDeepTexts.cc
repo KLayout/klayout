@@ -27,8 +27,13 @@
 #include "dbDeepRegion.h"
 #include "dbCellMapping.h"
 #include "dbLayoutUtils.h"
+#include "dbLocalOperation.h"
+#include "dbTextsUtils.h"
+#include "dbHierProcessor.h"
+#include "dbRegion.h"
 
 #include <sstream>
+#include <unordered_set>
 
 namespace db
 {
@@ -384,5 +389,210 @@ void DeepTexts::insert_into_as_polygons (Layout *layout, db::cell_index_type int
   m_deep_layer.insert_into_as_polygons (layout, into_cell, into_layer, enl);
 }
 
+namespace {
+
+class Text2PolygonInteractingLocalOperation
+  : public local_operation<db::Text, db::PolygonRef, db::Text>
+{
+public:
+  Text2PolygonInteractingLocalOperation (bool inverse)
+    : m_inverse (inverse)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual db::Coord dist () const
+  {
+    //  touching is sufficient
+    return 1;
+  }
+
+  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::Text, db::PolygonRef> &interactions, std::unordered_set<db::Text> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  {
+    db::box_scanner2<db::Text, size_t, db::Polygon, size_t> scanner;
+
+    std::set<db::PolygonRef> others;
+    for (shape_interactions<db::Text, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (shape_interactions<db::Text, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+        others.insert (interactions.intruder_shape (*j));
+      }
+    }
+
+    for (shape_interactions<db::Text, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      const db::Text &subject = interactions.subject_shape (i->first);
+      scanner.insert1 (&subject, 0);
+    }
+
+    std::list<db::Polygon> heap;
+    for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
+      heap.push_back (o->obj ().transformed (o->trans ()));
+      scanner.insert2 (& heap.back (), 1);
+    }
+
+    if (m_inverse) {
+
+      std::unordered_set<db::Text> interacting;
+      text_to_region_interaction_filter<std::unordered_set<db::Text> > filter (interacting);
+      scanner.process (filter, 1, db::box_convert<db::Text> (), db::box_convert<db::Polygon> ());
+
+      for (shape_interactions<db::Text, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+        const db::Text &subject = interactions.subject_shape (i->first);
+        if (interacting.find (subject) == interacting.end ()) {
+          result.insert (subject);
+        }
+      }
+
+    } else {
+
+      text_to_region_interaction_filter<std::unordered_set<db::Text> > filter (result);
+      scanner.process (filter, 1, db::box_convert<db::Text> (), db::box_convert<db::Polygon> ());
+
+    }
+  }
+
+  virtual on_empty_intruder_mode on_empty_intruder_hint () const
+  {
+    if (m_inverse) {
+      return Copy;
+    } else {
+      return Drop;
+    }
+  }
+
+  virtual std::string description () const
+  {
+    return tl::to_string (tr ("Select interacting texts"));
+  }
+
+private:
+  bool m_inverse;
+};
+
+struct ResultInserter
+{
+  typedef db::Polygon value_type;
+
+  ResultInserter (db::Layout *layout, std::unordered_set<db::PolygonRef> &result)
+    : mp_layout (layout), mp_result (&result)
+  {
+    //  .. nothing yet ..
+  }
+
+  void insert (const db::Polygon &p)
+  {
+    (*mp_result).insert (db::PolygonRef (p, mp_layout->shape_repository ()));
+  }
+
+private:
+  db::Layout *mp_layout;
+  std::unordered_set<db::PolygonRef> *mp_result;
+};
+
+class Text2PolygonPullLocalOperation
+  : public local_operation<db::Text, db::PolygonRef, db::PolygonRef>
+{
+public:
+  Text2PolygonPullLocalOperation ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual db::Coord dist () const
+  {
+    //  touching is sufficient
+    return 1;
+  }
+
+  virtual void compute_local (db::Layout *layout, const shape_interactions<db::Text, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  {
+    db::box_scanner2<db::Text, size_t, db::Polygon, size_t> scanner;
+
+    std::set<db::PolygonRef> others;
+    for (shape_interactions<db::Text, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (shape_interactions<db::Text, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+        others.insert (interactions.intruder_shape (*j));
+      }
+    }
+
+    for (shape_interactions<db::Text, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      const db::Text &subject = interactions.subject_shape (i->first);
+      scanner.insert1 (&subject, 1);
+    }
+
+    std::list<db::Polygon> heap;
+    for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
+      heap.push_back (o->obj ().transformed (o->trans ()));
+      scanner.insert2 (& heap.back (), 0);
+    }
+
+    ResultInserter inserter (layout, result);
+    text_to_region_interaction_filter<ResultInserter> filter (inserter);
+    scanner.process (filter, 1, db::box_convert<db::Text> (), db::box_convert<db::Polygon> ());
+  }
+
+  virtual on_empty_intruder_mode on_empty_intruder_hint () const
+  {
+    return Drop;
+  }
+
+  virtual std::string description () const
+  {
+    return tl::to_string (tr ("Select interacting regions"));
+  }
+};
+
+}
+
+TextsDelegate *
+DeepTexts::selected_interacting_generic (const Region &other, bool inverse) const
+{
+  std::auto_ptr<db::DeepRegion> dr_holder;
+  const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
+  if (! other_deep) {
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
+    dr_holder.reset (new db::DeepRegion (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
+  }
+
+  const db::DeepLayer &texts = deep_layer ();
+
+  DeepLayer dl_out (texts.derived ());
+
+  db::Text2PolygonInteractingLocalOperation op (inverse);
+
+  db::local_processor<db::Text, db::PolygonRef, db::Text> proc (const_cast<db::Layout *> (&texts.layout ()), const_cast<db::Cell *> (&texts.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
+  proc.set_base_verbosity (other.base_verbosity ());
+  proc.set_threads (texts.store ()->threads ());
+
+  proc.run (&op, texts.layer (), other_deep->deep_layer ().layer (), dl_out.layer ());
+
+  return new db::DeepTexts (dl_out);
+}
+
+RegionDelegate *DeepTexts::pull_generic (const Region &other) const
+{
+  std::auto_ptr<db::DeepRegion> dr_holder;
+  const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
+  if (! other_deep) {
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
+    dr_holder.reset (new db::DeepRegion (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
+  }
+
+  const db::DeepLayer &texts = deep_layer ();
+  const db::DeepLayer &other_polygons = other_deep->merged_deep_layer ();
+
+  DeepLayer dl_out (other_polygons.derived ());
+
+  db::Text2PolygonPullLocalOperation op;
+
+  db::local_processor<db::Text, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&texts.layout ()), const_cast<db::Cell *> (&texts.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell ());
+  proc.set_base_verbosity (other.base_verbosity ());
+  proc.set_threads (texts.store ()->threads ());
+
+  proc.run (&op, texts.layer (), other_polygons.layer (), dl_out.layer ());
+
+  return new db::DeepRegion (dl_out);
+}
 
 }

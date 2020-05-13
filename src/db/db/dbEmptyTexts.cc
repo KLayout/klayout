@@ -84,5 +84,23 @@ EmptyTexts::less (const Texts &other) const
   return other.empty () ? false : true;
 }
 
+RegionDelegate *
+EmptyTexts::pull_interacting (const Region &) const
+{
+  return new EmptyRegion ();
+}
+
+TextsDelegate *
+EmptyTexts::selected_interacting (const Region &) const
+{
+  return new EmptyTexts ();
+}
+
+TextsDelegate *
+EmptyTexts::selected_not_interacting (const Region &) const
+{
+  return new EmptyTexts ();
+}
+
 }
 

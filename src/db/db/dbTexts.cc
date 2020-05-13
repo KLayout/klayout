@@ -176,6 +176,11 @@ FlatTexts *Texts::flat_texts ()
   return texts;
 }
 
+void Texts::pull_interacting (Region &output, const Region &other) const
+{
+  output = Region (mp_delegate->pull_interacting (other));
+}
+
 }
 
 namespace tl

@@ -176,6 +176,7 @@ protected:
 
 private:
   friend class DeepEdges;
+  friend class DeepTexts;
 
   DeepRegion &operator= (const DeepRegion &other);
 

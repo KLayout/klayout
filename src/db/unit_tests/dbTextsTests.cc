@@ -173,3 +173,32 @@ TEST(6)
   db::Texts r (db::RecursiveShapeIterator (ly, ly.cell (top_cell), l1));
   EXPECT_EQ (r.to_string (), "('abc',r0 100,-200);('uvw',r0 110,210)");
 }
+
+TEST(7)
+{
+  db::Texts texts;
+  texts.insert (db::Text ("abc", db::Trans (db::Vector (100, -200))));
+  texts.insert (db::Text ("uvw", db::Trans (db::Vector (110, 210))));
+
+  db::Region region;
+  region.insert (db::Polygon (db::Box (50, -300, 150, -100)));
+
+  EXPECT_EQ (texts.selected_interacting (region).to_string (), "('abc',r0 100,-200)");
+  EXPECT_EQ (texts.selected_not_interacting (region).to_string (), "('uvw',r0 110,210)");
+
+  {
+    db::Texts tcopy = texts;
+    tcopy.select_interacting (region);
+    EXPECT_EQ (tcopy.to_string (), "('abc',r0 100,-200)");
+  }
+
+  {
+    db::Texts tcopy = texts;
+    tcopy.select_not_interacting (region);
+    EXPECT_EQ (tcopy.to_string (), "('uvw',r0 110,210)");
+  }
+
+  db::Region region_out;
+  texts.pull_interacting (region_out, region);
+  EXPECT_EQ (region_out.to_string (), "(50,-300;50,-100;150,-100;150,-300)");
+}

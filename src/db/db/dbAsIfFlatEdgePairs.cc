@@ -75,7 +75,7 @@ AsIfFlatEdgePairs::in (const EdgePairs &other, bool invert) const
     op.insert (*o);
   }
 
-  std::auto_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs (false));
+  std::auto_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs ());
 
   for (EdgePairsIterator o (begin ()); ! o.at_end (); ++o) {
     if ((op.find (*o) == op.end ()) == invert) {

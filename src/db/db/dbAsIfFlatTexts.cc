@@ -88,7 +88,7 @@ AsIfFlatTexts::in (const Texts &other, bool invert) const
     op.insert (*o);
   }
 
-  std::auto_ptr<FlatTexts> new_texts (new FlatTexts (false));
+  std::auto_ptr<FlatTexts> new_texts (new FlatTexts ());
 
   for (TextsIterator o (begin ()); ! o.at_end (); ++o) {
     if ((op.find (*o) == op.end ()) == invert) {
@@ -308,7 +308,7 @@ AsIfFlatTexts::selected_interacting_generic (const Region &other, bool inverse) 
     scanner.insert2 (p.operator-> (), 1);
   }
 
-  std::auto_ptr<FlatTexts> output (new FlatTexts (true));
+  std::auto_ptr<FlatTexts> output (new FlatTexts ());
 
   if (! inverse) {
 

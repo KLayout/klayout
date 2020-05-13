@@ -490,7 +490,7 @@ Class<db::Texts> decl_Texts ("db", "Texts",
   ) +
   method_ext ("to_s", &to_string0,
     "@brief Converts the text collection to a string\n"
-    "The length of the output is limited to 20 edge pairs to avoid giant strings on large collections. "
+    "The length of the output is limited to 20 texts to avoid giant strings on large collections. "
     "For full output use \"to_s\" with a maximum count parameter.\n"
   ) +
   method_ext ("to_s", &to_string1, gsi::arg ("max_count"),
@@ -500,11 +500,15 @@ Class<db::Texts> decl_Texts ("db", "Texts",
   "@brief Texts (a collection of texts)\n"
   "\n"
   "Text objects are useful as labels for net names, to identify certain regions and to specify specific locations in general. "
-  "Text collections provide a way to store - also in a hierarchical fashion - and manipulate collection of text objects. "
-  "Text objects can be turned into polygons by creating small boxes around the texts. Texts can also be turned into dot-like "
-  "edges. Texts can be filtered by string, either by matching against a fixed string or a glob-style pattern.\n"
+  "Text collections provide a way to store - also in a hierarchical fashion - and manipulate collection of text objects.\n"
   "\n"
-  "Beside that, text collections can be transformed and combined, similar to \\EdgePairs.\n"
+  "Text objects can be turned into polygons by creating small boxes around the texts (\\polygons). Texts can also be turned into dot-like "
+  "edges (\\edges). Texts can be filtered by string, either by matching against a fixed string (\\with_string) or a glob-style pattern (\\with_pattern).\n"
+  "\n"
+  "Text collections can be filtered geometrically against a polygon \\Region using \\interacting or \\non-interacting. "
+  "Vice versa, texts can be used to select polygons from a \\Region using \\pull_interacting.\n"
+  "\n"
+  "Beside that, text collections can be transformed, flattened and combined, similar to \\EdgePairs.\n"
   "\n"
   "This class has been introduced in version 0.27.\n"
 );

@@ -78,9 +78,9 @@ public:
 protected:
   void update_bbox (const db::Box &box);
   void invalidate_bbox ();
+  AsIfFlatTexts &operator= (const AsIfFlatTexts &other);
 
 private:
-  AsIfFlatTexts &operator= (const AsIfFlatTexts &other);
 
   mutable bool m_bbox_valid;
   mutable db::Box m_bbox;

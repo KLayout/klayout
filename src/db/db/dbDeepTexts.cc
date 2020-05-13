@@ -115,6 +115,16 @@ DeepTexts::DeepTexts (const DeepTexts &other)
   //  .. nothing yet ..
 }
 
+DeepTexts &
+DeepTexts::operator= (const DeepTexts &other)
+{
+  if (this != &other) {
+    AsIfFlatTexts::operator= (other);
+    m_deep_layer = other.m_deep_layer.copy ();
+  }
+  return *this;
+}
+
 DeepTexts::DeepTexts (const DeepLayer &dl)
   : AsIfFlatTexts (), m_deep_layer (dl)
 {

@@ -59,6 +59,16 @@ AsIfFlatEdges::~AsIfFlatEdges ()
   //  .. nothing yet ..
 }
 
+AsIfFlatEdges &
+AsIfFlatEdges::operator= (const AsIfFlatEdges &other)
+{
+  if (this != &other) {
+    m_bbox_valid = other.m_bbox_valid;
+    m_bbox = other.m_bbox;
+  }
+  return *this;
+}
+
 std::string
 AsIfFlatEdges::to_string (size_t nmax) const
 {

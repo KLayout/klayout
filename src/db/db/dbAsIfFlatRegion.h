@@ -255,8 +255,9 @@ protected:
   template <class Trans>
   static void produce_markers_for_angle_check (const db::Polygon &poly, const Trans &tr, double min, double max, bool inverse, db::Shapes &shapes);
 
-private:
   AsIfFlatRegion &operator= (const AsIfFlatRegion &other);
+
+private:
 
   mutable bool m_bbox_valid;
   mutable db::Box m_bbox;

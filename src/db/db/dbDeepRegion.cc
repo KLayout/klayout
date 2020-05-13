@@ -150,6 +150,25 @@ DeepRegion::DeepRegion (const DeepRegion &other)
   }
 }
 
+DeepRegion &
+DeepRegion::operator= (const DeepRegion &other)
+{
+  if (this != &other) {
+
+    AsIfFlatRegion::operator= (other);
+
+    m_deep_layer = other.m_deep_layer.copy ();
+    m_merged_polygons_valid = other.m_merged_polygons_valid;
+    m_is_merged = other.m_is_merged;
+    if (m_merged_polygons_valid) {
+      m_merged_polygons = other.m_merged_polygons;
+    }
+
+  }
+
+  return *this;
+}
+
 void DeepRegion::init ()
 {
   m_merged_polygons_valid = false;

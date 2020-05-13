@@ -145,6 +145,25 @@ DeepEdges::DeepEdges (const DeepEdges &other)
   }
 }
 
+DeepEdges &
+DeepEdges::operator= (const DeepEdges &other)
+{
+  if (this != &other) {
+
+    AsIfFlatEdges::operator= (other);
+
+    m_deep_layer = other.m_deep_layer.copy ();
+    m_merged_edges_valid = other.m_merged_edges_valid;
+    m_is_merged = other.m_is_merged;
+    if (m_merged_edges_valid) {
+      m_merged_edges = other.m_merged_edges;
+    }
+
+  }
+
+  return *this;
+}
+
 void DeepEdges::init ()
 {
   m_merged_edges_valid = false;

@@ -28,6 +28,7 @@
 #include "dbDeepShapeStore.h"
 #include "dbRegion.h"
 #include "dbEdges.h"
+#include "dbTextsUtils.h"
 #include "tlUnitTest.h"
 #include "tlStream.h"
 
@@ -142,4 +143,38 @@ TEST(2_Interactions)
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_texts_au2.gds");
+}
+
+TEST(3_Filtering)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_texts_l3.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+
+  db::Texts texts2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), texts2.filtered (db::TextStringFilter ("L2", false)));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), texts2.filtered (db::TextStringFilter ("L2", true)));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), texts2.filtered (db::TextPatternFilter ("L*A", false)));
+
+  texts2.filter (db::TextPatternFilter ("L*A", true));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), texts2);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_texts_au3.gds");
 }

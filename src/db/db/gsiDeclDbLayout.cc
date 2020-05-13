@@ -33,6 +33,9 @@
 #include "dbPCellDeclaration.h"
 #include "dbHash.h"
 #include "dbRegion.h"
+#include "dbEdges.h"
+#include "dbEdgePairs.h"
+#include "dbTexts.h"
 #include "dbLayoutUtils.h"
 #include "tlStream.h"
 
@@ -1187,6 +1190,30 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "try to reuse this hierarchy.\n"
     "\n"
     "This method has been introduced in version 0.26.\n"
+  ) +
+  gsi::method ("insert", (void (db::Layout::*) (db::cell_index_type, int, const db::EdgePairs &)) &db::Layout::insert,
+    gsi::arg ("cell_index"), gsi::arg ("layer"), gsi::arg ("edge_pairs"),
+    "@brief Inserts an edge pair collection into the given cell and layer\n"
+    "If the edge pair collection is (conceptionally) flat, it will be inserted into the cell's shapes "
+    "list as a flat sequence of edge pairs.\n"
+    "If the edge pair collection is deep (hierarchical), it will create a subhierarchy below the given "
+    "cell and it's edge pairs will be put into the respective cells. Suitable subcells will be picked "
+    "for inserting the edge pairs. If a hierarchy already exists below the given cell, the algorithm will "
+    "try to reuse this hierarchy.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method ("insert", (void (db::Layout::*) (db::cell_index_type, int, const db::Texts &)) &db::Layout::insert,
+    gsi::arg ("cell_index"), gsi::arg ("layer"), gsi::arg ("texts"),
+    "@brief Inserts an text collection into the given cell and layer\n"
+    "If the text collection is (conceptionally) flat, it will be inserted into the cell's shapes "
+    "list as a flat sequence of texts.\n"
+    "If the text collection is deep (hierarchical), it will create a subhierarchy below the given "
+    "cell and it's texts will be put into the respective cells. Suitable subcells will be picked "
+    "for inserting the texts. If a hierarchy already exists below the given cell, the algorithm will "
+    "try to reuse this hierarchy.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
   ) +
   gsi::method_ext ("flatten", &flatten, gsi::arg ("cell_index"), gsi::arg ("levels"), gsi::arg ("prune"),
     "@brief Flattens the given cell\n"

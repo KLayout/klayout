@@ -211,6 +211,8 @@ class DBTexts_TestClass < TestBase
     assert_equal(RBA::Texts::new(target.cell("TOP").shapes(target_li)).to_s, "")
     assert_equal(RBA::Texts::new(target.cell("C2").shapes(target_li)).to_s, "('abc',r0 100,-200)")
 
+    target = RBA::Layout::new
+    target_top = target.add_cell("TOP")
     target_li = target.layer
     r.with_text("abc", false).insert_into(target, target_top, target_li)
     cells = []
@@ -259,6 +261,8 @@ class DBTexts_TestClass < TestBase
     assert_equal(RBA::Texts::new(target.cell("TOP").shapes(target_li)).to_s, "")
     assert_equal(RBA::Texts::new(target.cell("C2").shapes(target_li)).to_s, "")
 
+    target = RBA::Layout::new
+    target_top = target.add_cell("TOP")
     target_li = target.layer
     r.insert_into_as_polygons(target, target_top, target_li, 1)
     cells = []
@@ -266,6 +270,38 @@ class DBTexts_TestClass < TestBase
     assert_equal(cells.join(","), "TOP,C2")
     assert_equal(RBA::Region::new(target.cell("TOP").shapes(target_li)).to_s, "")
     assert_equal(RBA::Region::new(target.cell("C2").shapes(target_li)).to_s, "(99,-201;99,-199;101,-199;101,-201)")
+
+    target_li = target.layer
+    target.insert(target_top, target_li, r)
+    cells = []
+    target.each_cell { |c| cells << c.name }
+    assert_equal(cells.join(","), "TOP,C2")
+    assert_equal(RBA::Texts::new(target.cell("TOP").shapes(target_li)).to_s, "")
+    assert_equal(RBA::Region::new(target.cell("TOP").shapes(target_li)).to_s, "")
+    assert_equal(RBA::Texts::new(target.cell("C2").shapes(target_li)).to_s, "('abc',r0 100,-200)")
+    assert_equal(RBA::Region::new(target.cell("C2").shapes(target_li)).to_s, "")
+
+  end
+
+  # interact
+  def test_5
+
+    r = RBA::Texts::new
+    r.insert(RBA::Text::new("abc", RBA::Trans::new(RBA::Vector::new(100, 200))))
+    r.insert(RBA::Text::new("uvw", RBA::Trans::new(RBA::Vector::new(110, -210))))
+    g2 = RBA::Region::new
+    g2.insert(RBA::Box::new(0, 100, 200, 200))
+
+    assert_equal(r.interacting(g2).to_s, "('abc',r0 100,200)")
+    assert_equal(r.not_interacting(g2).to_s, "('uvw',r0 110,-210)")
+    rr = r.dup
+    rr.select_interacting(g2)
+    assert_equal(rr.to_s, "('abc',r0 100,200)")
+    rr = r.dup
+    rr.select_not_interacting(g2)
+    assert_equal(rr.to_s, "('uvw',r0 110,-210)")
+
+    assert_equal(r.pull_interacting(g2).to_s, "(0,100;0,200;200,200;200,100)")
 
   end
 

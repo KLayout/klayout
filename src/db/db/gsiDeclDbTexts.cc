@@ -404,24 +404,24 @@ Class<db::Texts> decl_Texts ("db", "Texts",
     "If \"inverse\" is false, this method returns the texts matching the pattern.\n"
     "If \"inverse\" is true, this method returns the texts not matching the pattern.\n"
   ) +
-  method ("interacting", (db::Edges (db::Edges::*) (const db::Region &) const)  &db::Edges::selected_interacting, gsi::arg ("other"),
+  method ("interacting", (db::Texts (db::Texts::*) (const db::Region &) const)  &db::Texts::selected_interacting, gsi::arg ("other"),
     "@brief Returns the texts from this text collection which are inside or on the edge of polygons from the given region\n"
     "\n"
     "@return A new text collection containing the texts inside or on the edge of polygons from the region\n"
   ) +
-  method ("not_interacting", (db::Edges (db::Edges::*) (const db::Region &) const)  &db::Edges::selected_not_interacting, gsi::arg ("other"),
+  method ("not_interacting", (db::Texts (db::Texts::*) (const db::Region &) const)  &db::Texts::selected_not_interacting, gsi::arg ("other"),
     "@brief Returns the texts from this text collection which are not inside or on the edge of polygons from the given region\n"
     "\n"
     "@return A new text collection containing the texts not inside or on the edge of polygons from the region\n"
   ) +
-  method ("select_interacting", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_interacting, gsi::arg ("other"),
+  method ("select_interacting", (db::Texts &(db::Texts::*) (const db::Region &)) &db::Texts::select_interacting, gsi::arg ("other"),
     "@brief Selects the texts from this text collection which are inside or on the edge of polygons from the given region\n"
     "\n"
     "@return A text collection after the texts have been selected (self)\n"
     "\n"
     "In contrast to \\interacting, this method will modify self.\n"
   ) +
-  method ("select_not_interacting", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_not_interacting, gsi::arg ("other"),
+  method ("select_not_interacting", (db::Texts &(db::Texts::*) (const db::Region &)) &db::Texts::select_not_interacting, gsi::arg ("other"),
     "@brief Selects the texts from this text collection which are not inside or on the edge of polygons from the given region\n"
     "\n"
     "@return A text collection after the texts have been selected (self)\n"

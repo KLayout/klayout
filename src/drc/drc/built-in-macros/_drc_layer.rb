@@ -1740,6 +1740,8 @@ CODE
           requires_edges_texts_or_region("#{f}")
           if @data.is_a?(RBA::Text)
             other.requires_region("#{f}")
+          elsif @data.is_a?(RBA::Region)
+            other.requires_edges_texts_or_region("#{f}")
           else
             other.requires_edges_or_region("#{f}")
           end
@@ -1786,10 +1788,12 @@ CODE
       eval <<"CODE"
       def #{f}(other)
         other.requires_edges_texts_or_region("#{f}")
-        if @data.is_a?(RBA::Texts)
+        if @data.is_a?(RBA::Text)
           other.requires_region("#{f}")
+        elsif @data.is_a?(RBA::Region)
+          other.requires_edges_texts_or_region("#{f}")
         else
-          requires_edges_or_region("#{f}")
+          other.requires_edges_or_region("#{f}")
         end
         DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
       end
@@ -1822,12 +1826,7 @@ CODE
       def #{f}(other)
         other.requires_region("#{f}")
         requires_edges("#{f}")
-        if @engine.is_tiled?
-          @data = @engine._tcmd(@data, 0, @data.class, :#{f}, other.data)
-          DRCLayer::new(@engine, @data)
-        else
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
-        end
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
       end
 CODE
     end
@@ -1837,12 +1836,7 @@ CODE
       def #{f}(other)
         other.requires_edges("#{f}")
         requires_edges("#{f}")
-        if @engine.is_tiled?
-          @data = @engine._tcmd(@data, 0, @data.class, :#{f}, other.data)
-          DRCLayer::new(@engine, @data)
-        else
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
-        end
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
       end
 CODE
     end

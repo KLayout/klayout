@@ -1083,11 +1083,31 @@ module DRC
     # %DRC%
     # @name labels 
     # @brief Gets the labels (text) from an original layer
-    # @synopsis labels
+    # @synopsis labels(args)
     # See \Source#labels for a description of that function.
  
     def labels(*args)
       layout.labels(*args)
+    end
+    
+    # %DRC%
+    # @name edges 
+    # @brief Gets the edges from an original layer
+    # @synopsis edges(args)
+    # See \Source#edges for a description of that function.
+ 
+    def edges(*args)
+      layout.edges(*args)
+    end
+    
+    # %DRC%
+    # @name edge_pairs 
+    # @brief Gets the edges from an original layer
+    # @synopsis edge_pairs(args)
+    # See \Source#edge_pairs for a description of that function.
+ 
+    def edge_pairs(*args)
+      layout.edge_pairs(*args)
     end
     
     # %DRC%
@@ -1757,11 +1777,11 @@ CODE
       end
     end
 
-    def _input(layout, cell_index, layers, sel, box, clip, overlapping, shape_flags)
+    def _input(layout, cell_index, layers, sel, box, clip, overlapping, shape_flags, cls)
     
       if layers.empty? && ! @deep
 
-        r = RBA::Region::new
+        r = cls.new
        
       else
     
@@ -1795,13 +1815,13 @@ CODE
           # object which keeps the DSS.
           @dss.text_property_name = "LABEL"
           @dss.text_enlargement = 1
-          r = RBA::Region::new(iter, @dss, RBA::ICplxTrans::new(sf.to_f))
+          r = cls.new(iter, @dss, RBA::ICplxTrans::new(sf.to_f))
         else
-          r = RBA::Region::new(iter, RBA::ICplxTrans::new(sf.to_f))
+          r = cls.new(iter, RBA::ICplxTrans::new(sf.to_f))
         end
         
         # clip if a box is specified
-        if box && clip
+        if box && clip && (cls == RBA::Region || cls == RBA::Edge)
           r &= RBA::Region::new(box)
         end
       

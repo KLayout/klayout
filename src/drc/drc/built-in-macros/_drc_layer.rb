@@ -593,6 +593,10 @@ CODE
     # selected text. By using the "as_dots" option, degenerated point-like edges will be
     # produced.
     #
+    # This method can also be applied to true text layers obtained with \labels.
+    # In this case, without specifying "as_dots" or "as_boxes" retains the text
+    # objects as such. Only text filtering is applied.
+    #
     # Texts can be selected either by exact match string or a pattern match with a 
     # glob-style pattern. By default, glob-style pattern are used. 
     # The options available are:
@@ -615,14 +619,39 @@ CODE
     #   # Selects all texts whose string is "A*"
     #   t = input(1, 0).texts(text("A*"))
     # @/code
+    # 
      
     def texts(*args)
+      requires_texts_or_region("texts")
+      self._texts_impl(false, *args)
+    end
 
-      requires_region("texts")
+    # %DRC%
+    # @name texts_not
+    # @brief Selects texts from an original layer not matching a specific selection
+    # @synopsis layer.texts_not
+    # @synopsis layer.texts_not(p)
+    # @synopsis layer.texts_not([ options ])
+    #
+    # This method can be applied to true text layers obtained with \labels.
+    # In this case, without specifying "as_dots" or "as_boxes" retains the text
+    # objects as such. Only text filtering is applied.
+    #
+    # Beside that this method acts like \texts, but will select the text objects
+    # not matching the filter.
+
+    def texts_not(*args)
+      requires_texts("texts_not")
+      self._texts_impl(true, *args)
+    end
+
+    # Implementation of texts or texts_not
+
+    def _texts_impl(invert, *args)
 
       as_pattern = true
       pattern = "*"
-      as_dots = false
+      as_dots = nil
 
       args.each do |a|
         if a.is_a?(String)
@@ -637,15 +666,28 @@ CODE
           raise("Invalid argument for 'texts' method")
         end
       end
-          
-      if as_dots
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts_dots, pattern, as_pattern))
-      else
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts, pattern, as_pattern))
+
+      if @data.is_a?(RBA::Texts)
+        if as_pattern
+          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Texts, :with_match, pattern, invert))
+        else
+          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Texts, :with_text, pattern, invert))
+        end
+        if as_dots
+          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :edges))
+        elsif as_dots == false
+          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :polygons))
+        end
+      else    
+        if as_dots
+          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts_dots, pattern, as_pattern))
+        else
+          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts, pattern, as_pattern))
+        end
       end
 
     end
-
+     
     # %DRC%
     # @name corners
     # @brief Selects corners of polygons
@@ -1695,7 +1737,35 @@ CODE
           requires_region("#{f}")
           other.requires_region("#{f}")
         else
-          requires_edges_or_region("#{f}")
+          requires_edges_texts_or_region("#{f}")
+          if @data.is_a?(RBA::Text)
+            other.requires_region("#{f}")
+          else
+            other.requires_edges_or_region("#{f}")
+          end
+        end
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, other.data.class, :#{f}, other.data))
+      end
+CODE
+    end
+
+    %w(| ^ overlapping not_overlapping inside not_inside outside not_outside in not_in).each do |f| 
+      eval <<"CODE"
+      def #{f}(other)
+        requires_same_type(other, "#{f}")
+        requires_edges_or_region("#{f}")
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+      end
+CODE
+    end
+
+    %w(& -).each do |f| 
+      eval <<"CODE"
+      def #{f}(other)
+        other.requires_edges_texts_or_region("#{f}")
+        if @data.is_a?(RBA::Texts)
+          other.requires_region("#{f}")
+        else
           other.requires_edges_or_region("#{f}")
         end
         DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
@@ -1703,15 +1773,22 @@ CODE
 CODE
     end
 
-    %w(& | ^ - + interacting not_interacting overlapping not_overlapping inside not_inside outside not_outside in not_in).each do |f| 
+    %w(+).each do |f| 
       eval <<"CODE"
       def #{f}(other)
-        if :#{f} != :interacting && :#{f} != :not_interacting && :#{f} != :& && :#{f} != :-
-          requires_same_type(other, "#{f}")
+        requires_same_type(other, "#{f}")
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+      end
+CODE
+    end
+
+    %w(interacting not_interacting).each do |f| 
+      eval <<"CODE"
+      def #{f}(other)
+        other.requires_edges_texts_or_region("#{f}")
+        if @data.is_a?(RBA::Texts)
+          other.requires_region("#{f}")
         else
-          other.requires_edges_or_region("#{f}")
-        end
-        if :#{f} != :+
           requires_edges_or_region("#{f}")
         end
         DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
@@ -2207,7 +2284,7 @@ CODE
     # If the layer already is a flat one, this method does nothing.
     # If the layer is a hierarchical layer (an original layer or
     # a derived layer in deep mode), this method will convert it
-    # to a flat collection of polygons, edges or edge pairs.
+    # to a flat collection of texts, polygons, edges or edge pairs.
     
     def flatten
       DRC::DRCLayer::new(@engine, @engine._cmd(@data, :flatten))
@@ -2235,7 +2312,6 @@ CODE
     # @synopsis layer.is_empty?
     
     def is_empty?
-      requires_edges_or_region("is_empty?")
       @data.is_empty?
     end
     
@@ -3006,6 +3082,10 @@ CODE
       @data.is_a?(RBA::Region) || raise("#{f}: Requires a polygon layer")
     end
     
+    def requires_texts_or_region(f)
+      @data.is_a?(RBA::Region) || @data.is_a?(RBA::Texts) || raise("#{f}: Requires a polygon or text layer")
+    end
+    
     def requires_edge_pairs(f)
       @data.is_a?(RBA::EdgePairs) || raise("#{f}: Requires a edge pair layer")
     end
@@ -3016,6 +3096,10 @@ CODE
     
     def requires_edges_or_region(f)
       @data.is_a?(RBA::Edges) || @data.is_a?(RBA::Region) || raise("#{f}: Requires an edge or polygon layer")
+    end
+    
+    def requires_edges_texts_or_region(f)
+      @data.is_a?(RBA::Edges) || @data.is_a?(RBA::Region) || @data.is_a?(RBA::Texts) || raise("#{f}: Requires an edge, text or polygon layer")
     end
     
     def requires_same_type(other, f)

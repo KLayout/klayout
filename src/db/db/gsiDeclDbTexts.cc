@@ -404,12 +404,12 @@ Class<db::Texts> decl_Texts ("db", "Texts",
     "If \"inverse\" is false, this method returns the texts matching the pattern.\n"
     "If \"inverse\" is true, this method returns the texts not matching the pattern.\n"
   ) +
-  method ("interacting", (db::Texts (db::Texts::*) (const db::Region &) const)  &db::Texts::selected_interacting, gsi::arg ("other"),
+  method ("interacting|&", (db::Texts (db::Texts::*) (const db::Region &) const)  &db::Texts::selected_interacting, gsi::arg ("other"),
     "@brief Returns the texts from this text collection which are inside or on the edge of polygons from the given region\n"
     "\n"
     "@return A new text collection containing the texts inside or on the edge of polygons from the region\n"
   ) +
-  method ("not_interacting", (db::Texts (db::Texts::*) (const db::Region &) const)  &db::Texts::selected_not_interacting, gsi::arg ("other"),
+  method ("not_interacting|-", (db::Texts (db::Texts::*) (const db::Region &) const)  &db::Texts::selected_not_interacting, gsi::arg ("other"),
     "@brief Returns the texts from this text collection which are not inside or on the edge of polygons from the given region\n"
     "\n"
     "@return A new text collection containing the texts not inside or on the edge of polygons from the region\n"
@@ -500,10 +500,10 @@ Class<db::Texts> decl_Texts ("db", "Texts",
   "@brief Texts (a collection of texts)\n"
   "\n"
   "Text objects are useful as labels for net names, to identify certain regions and to specify specific locations in general. "
-  "Text collections provide a way to store - also in a hierarchical fashion - and manipulate collection of text objects.\n"
+  "Text collections provide a way to store - also in a hierarchical fashion - and manipulate a collection of text objects.\n"
   "\n"
   "Text objects can be turned into polygons by creating small boxes around the texts (\\polygons). Texts can also be turned into dot-like "
-  "edges (\\edges). Texts can be filtered by string, either by matching against a fixed string (\\with_string) or a glob-style pattern (\\with_pattern).\n"
+  "edges (\\edges). Texts can be filtered by string, either by matching against a fixed string (\\with_text) or a glob-style pattern (\\with_match).\n"
   "\n"
   "Text collections can be filtered geometrically against a polygon \\Region using \\interacting or \\non-interacting. "
   "Vice versa, texts can be used to select polygons from a \\Region using \\pull_interacting.\n"

@@ -338,7 +338,18 @@ public:
    *  After a flat layer has been created for a region, it can be retrieved
    *  from the region later with layer_for_flat (region).
    */
-  DeepLayer create_from_flat (const db::Edges &region, const db::ICplxTrans &trans = db::ICplxTrans ());
+  DeepLayer create_from_flat (const db::Edges &edges, const db::ICplxTrans &trans = db::ICplxTrans ());
+
+  /**
+   *  @brief Creates a new layer from a flat text collection (or the text collection is made flat)
+   *
+   *  This method is intended for use with singular-created DSS objects (see
+   *  singular constructor).
+   *
+   *  After a flat layer has been created for a region, it can be retrieved
+   *  from the region later with layer_for_flat (region).
+   */
+  DeepLayer create_from_flat (const db::Texts &texts, const db::ICplxTrans &trans = db::ICplxTrans ());
 
   /**
    *  @brief Gets the layer for a given flat region.

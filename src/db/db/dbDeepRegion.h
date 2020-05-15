@@ -193,8 +193,10 @@ private:
   EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
   virtual RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const;
   virtual RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse) const;
+  virtual RegionDelegate *selected_interacting_generic (const Texts &other, bool inverse) const;
   virtual RegionDelegate *pull_generic (const Region &other, int mode, bool touching) const;
   virtual EdgesDelegate *pull_generic (const Edges &other) const;
+  virtual TextsDelegate *pull_generic (const Texts &other) const;
   DeepRegion *apply_filter (const PolygonFilterBase &filter) const;
 
   template <class Result, class OutputContainer> OutputContainer *processed_impl (const polygon_processor<Result> &filter) const;

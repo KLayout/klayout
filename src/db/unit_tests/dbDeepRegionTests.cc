@@ -1598,6 +1598,59 @@ TEST(28b_snap)
   db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au28.gds");
 }
 
+TEST(29_InteractionsWithTexts)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_texts_l2.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l8 = ly.get_layer (db::LayerProperties (8, 0));
+
+  db::Texts texts2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+  db::Region polygons8 (db::RecursiveShapeIterator (ly, top_cell, l8), dss);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  db::Region polygons;
+  polygons = polygons8.selected_interacting (texts2);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), polygons);
+
+  polygons = polygons8.selected_not_interacting (texts2);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), polygons);
+
+  {
+    db::Region polygons8_copy = polygons8;
+    polygons8_copy.select_interacting (texts2);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), polygons8_copy);
+  }
+
+  {
+    db::Region polygons8_copy = polygons8;
+    polygons8_copy.select_not_interacting (texts2);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), polygons8_copy);
+  }
+
+  {
+    db::Texts t = polygons8.pull_interacting (texts2);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), t);
+  }
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au29.gds");
+}
+
 TEST(100_Integration)
 {
   db::Layout ly;

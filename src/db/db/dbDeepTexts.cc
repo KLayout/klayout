@@ -96,6 +96,12 @@ DeepTexts::DeepTexts ()
   //  .. nothing yet ..
 }
 
+DeepTexts::DeepTexts (const db::Texts &other, DeepShapeStore &dss)
+  : AsIfFlatTexts ()
+{
+  m_deep_layer = dss.create_from_flat (other);
+}
+
 DeepTexts::DeepTexts (const RecursiveShapeIterator &si, DeepShapeStore &dss)
   : AsIfFlatTexts (), m_deep_layer (dss.create_text_layer (si))
 {

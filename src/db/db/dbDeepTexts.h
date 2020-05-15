@@ -40,6 +40,7 @@ class DB_PUBLIC DeepTexts
 {
 public:
   DeepTexts ();
+  DeepTexts (const db::Texts &other, DeepShapeStore &dss);
   DeepTexts (const RecursiveShapeIterator &si, DeepShapeStore &dss);
   DeepTexts (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans);
 

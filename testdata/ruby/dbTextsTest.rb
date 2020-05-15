@@ -291,9 +291,12 @@ class DBTexts_TestClass < TestBase
     r.insert(RBA::Text::new("uvw", RBA::Trans::new(RBA::Vector::new(110, -210))))
     g2 = RBA::Region::new
     g2.insert(RBA::Box::new(0, 100, 200, 200))
+    g2.insert(RBA::Box::new(-200, 100, -100, 200))
 
     assert_equal(r.interacting(g2).to_s, "('abc',r0 100,200)")
+    assert_equal(g2.interacting(r).to_s, "(0,100;0,200;200,200;200,100)")
     assert_equal(r.not_interacting(g2).to_s, "('uvw',r0 110,-210)")
+    assert_equal(g2.not_interacting(r).to_s, "(-200,100;-200,200;-100,200;-100,100)")
     rr = r.dup
     rr.select_interacting(g2)
     assert_equal(rr.to_s, "('abc',r0 100,200)")
@@ -302,6 +305,7 @@ class DBTexts_TestClass < TestBase
     assert_equal(rr.to_s, "('uvw',r0 110,-210)")
 
     assert_equal(r.pull_interacting(g2).to_s, "(0,100;0,200;200,200;200,100)")
+    assert_equal(g2.pull_interacting(r).to_s, "('abc',r0 100,200)")
 
   end
 

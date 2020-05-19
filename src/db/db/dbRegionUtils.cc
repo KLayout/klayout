@@ -353,23 +353,23 @@ template class region_to_edge_interaction_filter_base<db::Edge>;
 // -------------------------------------------------------------------------------------
 //  RegionToTextInteractionFilterBase implementation
 
-template <class OutputType>
-region_to_text_interaction_filter_base<OutputType>::region_to_text_interaction_filter_base (bool inverse)
+template <class OutputType, class TextType>
+region_to_text_interaction_filter_base<OutputType, TextType>::region_to_text_interaction_filter_base (bool inverse)
   : m_inverse (inverse)
 {
   //  .. nothing yet ..
 }
 
-template <class OutputType>
+template <class OutputType, class TextType>
 void
-region_to_text_interaction_filter_base<OutputType>::preset (const OutputType *s)
+region_to_text_interaction_filter_base<OutputType, TextType>::preset (const OutputType *s)
 {
   m_seen.insert (s);
 }
 
-template <class OutputType>
+template <class OutputType, class TextType>
 void
-region_to_text_interaction_filter_base<OutputType>::add (const db::Polygon *p, size_t, const db::Text *t, size_t)
+region_to_text_interaction_filter_base<OutputType, TextType>::add (const db::Polygon *p, size_t, const TextType *t, size_t)
 {
   const OutputType *o = 0;
   tl::select (o, p, t);
@@ -378,8 +378,7 @@ region_to_text_interaction_filter_base<OutputType>::add (const db::Polygon *p, s
 
     //  A polygon and an text interact if the text is either inside completely
     //  of at least one text of the polygon intersects with the text
-    db::Point pt;
-    pt += t->trans ().disp ();
+    db::Point pt = db::box_convert<TextType> () (*t).p1 ();
     if (p->box ().contains (pt) && db::inside_poly (p->begin_edge (), pt) >= 0) {
       if (m_inverse) {
         m_seen.erase (o);
@@ -392,9 +391,9 @@ region_to_text_interaction_filter_base<OutputType>::add (const db::Polygon *p, s
   }
 }
 
-template <class OutputType>
+template <class OutputType, class TextType>
 void
-region_to_text_interaction_filter_base<OutputType>::fill_output ()
+region_to_text_interaction_filter_base<OutputType, TextType>::fill_output ()
 {
   for (typename std::set<const OutputType *>::const_iterator s = m_seen.begin (); s != m_seen.end (); ++s) {
     put (**s);
@@ -402,8 +401,9 @@ region_to_text_interaction_filter_base<OutputType>::fill_output ()
 }
 
 //  explicit instantiations
-template class region_to_text_interaction_filter_base<db::Polygon>;
-template class region_to_text_interaction_filter_base<db::Text>;
+template class region_to_text_interaction_filter_base<db::Polygon, db::TextRef>;
+template class region_to_text_interaction_filter_base<db::Text, db::Text>;
+template class region_to_text_interaction_filter_base<db::TextRef, db::TextRef>;
 
 // -------------------------------------------------------------------------------------
 //  Polygon snapping

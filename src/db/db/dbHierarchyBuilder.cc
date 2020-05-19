@@ -706,7 +706,8 @@ void EdgePairBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape
 
 // ---------------------------------------------------------------------------------------------
 
-TextBuildingHierarchyBuilderShapeReceiver::TextBuildingHierarchyBuilderShapeReceiver ()
+TextBuildingHierarchyBuilderShapeReceiver::TextBuildingHierarchyBuilderShapeReceiver (db::Layout *layout)
+  : mp_layout (layout)
 {
   //  .. nothing yet ..
 }
@@ -714,10 +715,10 @@ TextBuildingHierarchyBuilderShapeReceiver::TextBuildingHierarchyBuilderShapeRece
 void TextBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, const db::ICplxTrans &trans, const db::Box & /*region*/, const db::RecursiveShapeReceiver::box_tree_type * /*complex_region*/, db::Shapes *target)
 {
   if (shape.is_text ()) {
-    db::Text t;
-    shape.text (t);
-    t.transform (trans);
-    target->insert (t);
+    //  NOTE: we intentionally skip all the text attributes (font etc.) here because in the context
+    //  of a text collections we're only interested in the locations.
+    db::Text t (shape.text_string (), shape.text_trans ());
+    target->insert (db::TextRef (t.transformed (trans), mp_layout->shape_repository ()));
   }
 }
 

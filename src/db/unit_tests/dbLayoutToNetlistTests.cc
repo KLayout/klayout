@@ -91,7 +91,7 @@ static void dump_recursive_nets_to_layout (const db::LayoutToNetlist &l2n, db::L
 
       bool any = false;
       for (std::map<const db::Region *, unsigned int>::const_iterator m = lmap.begin (); m != lmap.end () && !any; ++m) {
-        any = !db::recursive_cluster_shape_iterator<db::PolygonRef> (l2n.net_clusters (), l2n.layer_of (*m->first), c->cell_index (), n->cluster_id ()).at_end ();
+        any = !db::recursive_cluster_shape_iterator<db::NetShape> (l2n.net_clusters (), l2n.layer_of (*m->first), c->cell_index (), n->cluster_id ()).at_end ();
       }
 
       if (!any) {

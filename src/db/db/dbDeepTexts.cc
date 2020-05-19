@@ -408,7 +408,7 @@ void DeepTexts::insert_into_as_polygons (Layout *layout, db::cell_index_type int
 namespace {
 
 class Text2PolygonInteractingLocalOperation
-  : public local_operation<db::Text, db::PolygonRef, db::Text>
+  : public local_operation<db::TextRef, db::PolygonRef, db::TextRef>
 {
 public:
   Text2PolygonInteractingLocalOperation (bool inverse)
@@ -423,19 +423,19 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::Text, db::PolygonRef> &interactions, std::unordered_set<db::Text> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::TextRef, db::PolygonRef> &interactions, std::unordered_set<db::TextRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
-    db::box_scanner2<db::Text, size_t, db::Polygon, size_t> scanner;
+    db::box_scanner2<db::TextRef, size_t, db::Polygon, size_t> scanner;
 
     std::set<db::PolygonRef> others;
-    for (shape_interactions<db::Text, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      for (shape_interactions<db::Text, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+    for (shape_interactions<db::TextRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (shape_interactions<db::TextRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
         others.insert (interactions.intruder_shape (*j));
       }
     }
 
-    for (shape_interactions<db::Text, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      const db::Text &subject = interactions.subject_shape (i->first);
+    for (shape_interactions<db::TextRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      const db::TextRef &subject = interactions.subject_shape (i->first);
       scanner.insert1 (&subject, 0);
     }
 
@@ -447,12 +447,12 @@ public:
 
     if (m_inverse) {
 
-      std::unordered_set<db::Text> interacting;
-      text_to_region_interaction_filter<std::unordered_set<db::Text> > filter (interacting);
-      scanner.process (filter, 1, db::box_convert<db::Text> (), db::box_convert<db::Polygon> ());
+      std::unordered_set<db::TextRef> interacting;
+      text_to_region_interaction_filter<std::unordered_set<db::TextRef>, db::TextRef> filter (interacting);
+      scanner.process (filter, 1, db::box_convert<db::TextRef> (), db::box_convert<db::Polygon> ());
 
-      for (shape_interactions<db::Text, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-        const db::Text &subject = interactions.subject_shape (i->first);
+      for (shape_interactions<db::TextRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+        const db::TextRef &subject = interactions.subject_shape (i->first);
         if (interacting.find (subject) == interacting.end ()) {
           result.insert (subject);
         }
@@ -460,8 +460,8 @@ public:
 
     } else {
 
-      text_to_region_interaction_filter<std::unordered_set<db::Text> > filter (result);
-      scanner.process (filter, 1, db::box_convert<db::Text> (), db::box_convert<db::Polygon> ());
+      text_to_region_interaction_filter<std::unordered_set<db::TextRef>, db::TextRef> filter (result);
+      scanner.process (filter, 1, db::box_convert<db::TextRef> (), db::box_convert<db::Polygon> ());
 
     }
   }
@@ -505,7 +505,7 @@ private:
 };
 
 class Text2PolygonPullLocalOperation
-  : public local_operation<db::Text, db::PolygonRef, db::PolygonRef>
+  : public local_operation<db::TextRef, db::PolygonRef, db::PolygonRef>
 {
 public:
   Text2PolygonPullLocalOperation ()
@@ -519,19 +519,19 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout *layout, const shape_interactions<db::Text, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void compute_local (db::Layout *layout, const shape_interactions<db::TextRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
-    db::box_scanner2<db::Text, size_t, db::Polygon, size_t> scanner;
+    db::box_scanner2<db::TextRef, size_t, db::Polygon, size_t> scanner;
 
     std::set<db::PolygonRef> others;
-    for (shape_interactions<db::Text, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      for (shape_interactions<db::Text, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+    for (shape_interactions<db::TextRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (shape_interactions<db::TextRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
         others.insert (interactions.intruder_shape (*j));
       }
     }
 
-    for (shape_interactions<db::Text, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      const db::Text &subject = interactions.subject_shape (i->first);
+    for (shape_interactions<db::TextRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      const db::TextRef &subject = interactions.subject_shape (i->first);
       scanner.insert1 (&subject, 1);
     }
 
@@ -542,8 +542,8 @@ public:
     }
 
     ResultInserter inserter (layout, result);
-    text_to_region_interaction_filter<ResultInserter> filter (inserter);
-    scanner.process (filter, 1, db::box_convert<db::Text> (), db::box_convert<db::Polygon> ());
+    text_to_region_interaction_filter<ResultInserter, db::TextRef> filter (inserter);
+    scanner.process (filter, 1, db::box_convert<db::TextRef> (), db::box_convert<db::Polygon> ());
   }
 
   virtual on_empty_intruder_mode on_empty_intruder_hint () const
@@ -576,7 +576,7 @@ DeepTexts::selected_interacting_generic (const Region &other, bool inverse) cons
 
   db::Text2PolygonInteractingLocalOperation op (inverse);
 
-  db::local_processor<db::Text, db::PolygonRef, db::Text> proc (const_cast<db::Layout *> (&texts.layout ()), const_cast<db::Cell *> (&texts.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
+  db::local_processor<db::TextRef, db::PolygonRef, db::TextRef> proc (const_cast<db::Layout *> (&texts.layout ()), const_cast<db::Cell *> (&texts.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
   proc.set_base_verbosity (other.base_verbosity ());
   proc.set_threads (texts.store ()->threads ());
 
@@ -602,7 +602,7 @@ RegionDelegate *DeepTexts::pull_generic (const Region &other) const
 
   db::Text2PolygonPullLocalOperation op;
 
-  db::local_processor<db::Text, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&texts.layout ()), const_cast<db::Cell *> (&texts.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell ());
+  db::local_processor<db::TextRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&texts.layout ()), const_cast<db::Cell *> (&texts.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell ());
   proc.set_base_verbosity (other.base_verbosity ());
   proc.set_threads (texts.store ()->threads ());
 

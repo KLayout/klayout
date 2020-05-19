@@ -397,11 +397,16 @@ void std_writer_impl<Keys>::reset_geometry_ref ()
 }
 
 template <class Keys>
-void std_writer_impl<Keys>::write (const db::PolygonRef *s, const db::ICplxTrans &tr, const std::string &lname, bool relative)
+void std_writer_impl<Keys>::write (const db::NetShape *s, const db::ICplxTrans &tr, const std::string &lname, bool relative)
 {
-  db::ICplxTrans t = tr * db::ICplxTrans (s->trans ());
+  if (s->type () != db::NetShape::Polygon) {
+    return;
+  }
 
-  const db::Polygon &poly = s->obj ();
+  db::PolygonRef pr = s->polygon_ref ();
+  db::ICplxTrans t = tr * db::ICplxTrans (pr.trans ());
+
+  const db::Polygon &poly = pr.obj ();
   if (poly.is_box ()) {
 
     db::Box box = t * poly.box ();
@@ -435,7 +440,7 @@ bool std_writer_impl<Keys>::new_cell (cell_index_type ci) const
 template <class Keys>
 void std_writer_impl<Keys>::write (const db::Net &net, unsigned int id, const std::string &indent)
 {
-  const db::hier_clusters<db::PolygonRef> &clusters = mp_l2n->net_clusters ();
+  const db::hier_clusters<db::NetShape> &clusters = mp_l2n->net_clusters ();
   const db::Circuit *circuit = net.circuit ();
   const db::Connectivity &conn = mp_l2n->connectivity ();
 
@@ -450,7 +455,7 @@ void std_writer_impl<Keys>::write (const db::Net &net, unsigned int id, const st
       db::cell_index_type cci = circuit->cell_index ();
       db::cell_index_type prev_ci = cci;
 
-      for (db::recursive_cluster_shape_iterator<db::PolygonRef> si (clusters, *l, cci, net.cluster_id (), this); ! si.at_end (); ) {
+      for (db::recursive_cluster_shape_iterator<db::NetShape> si (clusters, *l, cci, net.cluster_id (), this); ! si.at_end (); ) {
 
         //  NOTE: we don't recursive into circuits which will later be output. However, as circuits may
         //  vanish in "purge" but the clusters will still be there we need to recursive into clusters from
@@ -570,7 +575,7 @@ void std_writer_impl<Keys>::write (const db::DeviceAbstract &device_abstract, co
 {
   const std::vector<db::DeviceTerminalDefinition> &td = device_abstract.device_class ()->terminal_definitions ();
 
-  const db::hier_clusters<db::PolygonRef> &clusters = mp_l2n->net_clusters ();
+  const db::hier_clusters<db::NetShape> &clusters = mp_l2n->net_clusters ();
   const db::Connectivity &conn = mp_l2n->connectivity ();
 
   for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
@@ -587,8 +592,8 @@ void std_writer_impl<Keys>::write (const db::DeviceAbstract &device_abstract, co
         continue;
       }
 
-      const db::local_cluster<db::PolygonRef> &lc = clusters.clusters_per_cell (device_abstract.cell_index ()).cluster_by_id (cid);
-      for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (*l); ! s.at_end (); ++s) {
+      const db::local_cluster<db::NetShape> &lc = clusters.clusters_per_cell (device_abstract.cell_index ()).cluster_by_id (cid);
+      for (db::local_cluster<db::NetShape>::shape_iterator s = lc.begin (*l); ! s.at_end (); ++s) {
 
         *mp_stream << indent << indent2;
         write (s.operator-> (), db::ICplxTrans (), name_for_layer (mp_l2n, *l), true);

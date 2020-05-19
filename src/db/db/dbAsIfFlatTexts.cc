@@ -312,13 +312,13 @@ AsIfFlatTexts::selected_interacting_generic (const Region &other, bool inverse) 
 
   if (! inverse) {
 
-    text_to_region_interaction_filter<FlatTexts> filter (*output);
+    text_to_region_interaction_filter<FlatTexts, db::Text> filter (*output);
     scanner.process (filter, 1, db::box_convert<db::Text> (), db::box_convert<db::Polygon> ());
 
   } else {
 
     std::set<db::Text> interacting;
-    text_to_region_interaction_filter<std::set<db::Text> > filter (interacting);
+    text_to_region_interaction_filter<std::set<db::Text>, db::Text> filter (interacting);
     scanner.process (filter, 1, db::box_convert<db::Text> (), db::box_convert<db::Polygon> ());
 
     for (TextsIterator o (begin ()); ! o.at_end (); ++o) {
@@ -356,7 +356,7 @@ AsIfFlatTexts::pull_generic (const Region &other) const
 
   std::auto_ptr<FlatRegion> output (new FlatRegion (true));
 
-  text_to_region_interaction_filter<FlatRegion> filter (*output);
+  text_to_region_interaction_filter<FlatRegion, db::Text> filter (*output);
   scanner.process (filter, 1, db::box_convert<db::Text> (), db::box_convert<db::Polygon> ());
 
   return output.release ();

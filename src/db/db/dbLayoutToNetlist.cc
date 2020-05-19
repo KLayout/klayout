@@ -206,7 +206,7 @@ void LayoutToNetlist::link_nets (const db::Net *net, const db::Net *with)
     return;
   }
 
-  connected_clusters<db::PolygonRef> &clusters = m_net_clusters.clusters_per_cell (net->circuit ()->cell_index ());
+  connected_clusters<db::NetShape> &clusters = m_net_clusters.clusters_per_cell (net->circuit ()->cell_index ());
   clusters.join_cluster_with (net->cluster_id (), with->cluster_id ());
 }
 
@@ -221,7 +221,7 @@ size_t LayoutToNetlist::link_net_to_parent_circuit (const Net *subcircuit_net, C
   db::CplxTrans dbu_trans (internal_layout ()->dbu ());
   db::ICplxTrans trans = dbu_trans.inverted () * dtrans * dbu_trans;
 
-  connected_clusters<db::PolygonRef> &parent_net_clusters = m_net_clusters.clusters_per_cell (parent_circuit->cell_index ());
+  connected_clusters<db::NetShape> &parent_net_clusters = m_net_clusters.clusters_per_cell (parent_circuit->cell_index ());
 
   size_t id = parent_net_clusters.insert_dummy ();
 
@@ -613,49 +613,84 @@ namespace
 }
 
 template <class Tr>
-static bool deliver_shape (const db::PolygonRef &, StopOnFirst, const Tr &, db::properties_id_type)
+static bool deliver_shape (const db::NetShape &, StopOnFirst, const Tr &, db::properties_id_type)
 {
   return false;
 }
 
 template <class Tr>
-static bool deliver_shape (const db::PolygonRef &pr, db::Region &region, const Tr &tr, db::properties_id_type /*propid*/)
+static bool deliver_shape (const db::NetShape &s, db::Region &region, const Tr &tr, db::properties_id_type /*propid*/)
 {
-  if (pr.obj ().is_box ()) {
-    region.insert (pr.obj ().box ().transformed (pr.trans ()).transformed (tr));
-  } else {
-    region.insert (pr.obj ().transformed (pr.trans ()).transformed (tr));
+  if (s.type () == db::NetShape::Polygon) {
+
+    db::PolygonRef pr = s.polygon_ref ();
+
+    if (pr.obj ().is_box ()) {
+      region.insert (pr.obj ().box ().transformed (pr.trans ()).transformed (tr));
+    } else {
+      region.insert (pr.obj ().transformed (pr.trans ()).transformed (tr));
+    }
+
   }
+
   return true;
 }
 
 template <class Tr>
-static bool deliver_shape (const db::PolygonRef &pr, db::Shapes &shapes, const Tr &tr, db::properties_id_type propid)
+static bool deliver_shape (const db::NetShape &s, db::Shapes &shapes, const Tr &tr, db::properties_id_type propid)
 {
-  if (pr.obj ().is_box ()) {
-    if (propid) {
-      shapes.insert (db::BoxWithProperties (pr.obj ().box ().transformed (pr.trans ()).transformed (tr), propid));
+  if (s.type () == db::NetShape::Polygon) {
+
+    db::PolygonRef pr = s.polygon_ref ();
+
+    if (pr.obj ().is_box ()) {
+      if (propid) {
+        shapes.insert (db::BoxWithProperties (pr.obj ().box ().transformed (pr.trans ()).transformed (tr), propid));
+      } else {
+        shapes.insert (pr.obj ().box ().transformed (pr.trans ()).transformed (tr));
+      }
     } else {
-      shapes.insert (pr.obj ().box ().transformed (pr.trans ()).transformed (tr));
+      db::Layout *layout = shapes.layout ();
+      if (layout) {
+        db::PolygonRef polygon_ref (pr.obj ().transformed (pr.trans ()).transformed (tr), layout->shape_repository ());
+        if (propid) {
+          shapes.insert (db::PolygonRefWithProperties (polygon_ref, propid));
+        } else {
+          shapes.insert (polygon_ref);
+        }
+      } else {
+        db::Polygon polygon (pr.obj ().transformed (pr.trans ()).transformed (tr));
+        if (propid) {
+          shapes.insert (db::PolygonWithProperties (polygon, propid));
+        } else {
+          shapes.insert (polygon);
+        }
+      }
     }
-  } else {
+
+  } else if (s.type () == db::NetShape::Text) {
+
+    db::TextRef pr = s.text_ref ();
+
     db::Layout *layout = shapes.layout ();
     if (layout) {
-      db::PolygonRef polygon_ref (pr.obj ().transformed (pr.trans ()).transformed (tr), layout->shape_repository ());
+      db::TextRef text_ref (pr.obj ().transformed (pr.trans ()).transformed (tr), layout->shape_repository ());
       if (propid) {
-        shapes.insert (db::PolygonRefWithProperties (polygon_ref, propid));
+        shapes.insert (db::TextRefWithProperties (text_ref, propid));
       } else {
-        shapes.insert (polygon_ref);
+        shapes.insert (text_ref);
       }
     } else {
-      db::Polygon polygon (pr.obj ().transformed (pr.trans ()).transformed (tr));
+      db::Text text (pr.obj ().transformed (pr.trans ()).transformed (tr));
       if (propid) {
-        shapes.insert (db::PolygonWithProperties (polygon, propid));
+        shapes.insert (db::TextWithProperties (text, propid));
       } else {
-        shapes.insert (polygon);
+        shapes.insert (text);
       }
     }
+
   }
+
   return true;
 }
 
@@ -759,7 +794,7 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
 
   if (net_cell_name_prefix) {
 
-    const db::connected_clusters<db::PolygonRef> &ccl = m_net_clusters.clusters_per_cell (ci);
+    const db::connected_clusters<db::NetShape> &ccl = m_net_clusters.clusters_per_cell (ci);
 
     bool any_connections = circuit_cell_name_prefix && ! ccl.connections_for_cluster (cid).empty ();
     if (! any_connections) {
@@ -805,8 +840,8 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
   db::ICplxTrans tr_wo_mag = tr * db::ICplxTrans (1.0 / tr.mag ());
   db::ICplxTrans tr_mag (tr.mag ());
 
-  const db::connected_clusters<db::PolygonRef> &clusters = m_net_clusters.clusters_per_cell (ci);
-  typedef db::connected_clusters<db::PolygonRef>::connections_type connections_type;
+  const db::connected_clusters<db::NetShape> &clusters = m_net_clusters.clusters_per_cell (ci);
+  typedef db::connected_clusters<db::NetShape>::connections_type connections_type;
   const connections_type &connections = clusters.connections_for_cluster (cid);
   for (connections_type::const_iterator c = connections.begin (); c != connections.end (); ++c) {
 
@@ -1007,13 +1042,13 @@ db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::DPoi
   return probe_net (of_region, db::CplxTrans (internal_layout ()->dbu ()).inverted () * point);
 }
 
-size_t LayoutToNetlist::search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::PolygonRef> &test_cluster, std::vector<db::InstElement> &rev_inst_path)
+size_t LayoutToNetlist::search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::NetShape> &test_cluster, std::vector<db::InstElement> &rev_inst_path)
 {
   db::Box local_box = trans * test_cluster.bbox ();
 
-  const db::local_clusters<db::PolygonRef> &lcc = net_clusters ().clusters_per_cell (cell->cell_index ());
-  for (db::local_clusters<db::PolygonRef>::touching_iterator i = lcc.begin_touching (local_box); ! i.at_end (); ++i) {
-    const db::local_cluster<db::PolygonRef> &lc = *i;
+  const db::local_clusters<db::NetShape> &lcc = net_clusters ().clusters_per_cell (cell->cell_index ());
+  for (db::local_clusters<db::NetShape>::touching_iterator i = lcc.begin_touching (local_box); ! i.at_end (); ++i) {
+    const db::local_cluster<db::NetShape> &lc = *i;
     if (lc.interacts (test_cluster, trans, m_conn)) {
       return lc.id ();
     }
@@ -1053,7 +1088,7 @@ db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::Poin
   //  Prepare a test cluster
   db::Box box (point - db::Vector (1, 1), point + db::Vector (1, 1));
   db::GenericRepository sr;
-  db::local_cluster<db::PolygonRef> test_cluster;
+  db::local_cluster<db::NetShape> test_cluster;
   test_cluster.add (db::PolygonRef (db::Polygon (box), sr), layer);
 
   std::vector<db::InstElement> inst_path;
@@ -1155,12 +1190,12 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, const db::Reg
 
   for (db::Layout::bottom_up_const_iterator cid = ly.begin_bottom_up (); cid != ly.end_bottom_up (); ++cid) {
 
-    const connected_clusters<db::PolygonRef> &clusters = m_net_clusters.clusters_per_cell (*cid);
+    const connected_clusters<db::NetShape> &clusters = m_net_clusters.clusters_per_cell (*cid);
     if (clusters.empty ()) {
       continue;
     }
 
-    for (connected_clusters<db::PolygonRef>::all_iterator c = clusters.begin_all (); ! c.at_end (); ++c) {
+    for (connected_clusters<db::NetShape>::all_iterator c = clusters.begin_all (); ! c.at_end (); ++c) {
 
       if (! clusters.is_root (*c)) {
         continue;

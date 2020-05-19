@@ -527,15 +527,15 @@ private:
 /**
  *  @brief A helper class for the region to text interaction functionality
  */
-template <class OutputType>
+template <class OutputType, class TextType>
 class DB_PUBLIC region_to_text_interaction_filter_base
-  : public db::box_scanner_receiver2<db::Polygon, size_t, db::Text, size_t>
+  : public db::box_scanner_receiver2<db::Polygon, size_t, TextType, size_t>
 {
 public:
   region_to_text_interaction_filter_base (bool inverse);
 
   void preset (const OutputType *s);
-  void add (const db::Polygon *p, size_t, const db::Text *e, size_t);
+  void add (const db::Polygon *p, size_t, const TextType *e, size_t);
   void fill_output ();
 
 protected:
@@ -549,13 +549,13 @@ private:
 /**
  *  @brief A helper class for the region to text interaction functionality
  */
-template <class OutputContainer, class OutputType = typename OutputContainer::value_type>
+template <class OutputContainer, class TextType, class OutputType = typename OutputContainer::value_type>
 class DB_PUBLIC_TEMPLATE region_to_text_interaction_filter
-  : public region_to_text_interaction_filter_base<OutputType>
+  : public region_to_text_interaction_filter_base<OutputType, TextType>
 {
 public:
   region_to_text_interaction_filter (OutputContainer &output, bool inverse)
-    : region_to_text_interaction_filter_base<OutputType> (inverse), mp_output (&output)
+    : region_to_text_interaction_filter_base<OutputType, TextType> (inverse), mp_output (&output)
   {
     //  .. nothing yet ..
   }

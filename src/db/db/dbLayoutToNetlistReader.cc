@@ -524,7 +524,7 @@ LayoutToNetlistStandardReader::read_polygon ()
 }
 
 void
-LayoutToNetlistStandardReader::read_geometries (db::NetlistObject *obj, Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<db::PolygonRef> &lc, db::Cell &cell)
+LayoutToNetlistStandardReader::read_geometries (db::NetlistObject *obj, Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<db::NetShape> &lc, db::Cell &cell)
 {
   m_ref = db::Point ();
 
@@ -561,8 +561,8 @@ LayoutToNetlistStandardReader::read_net (db::Netlist * /*netlist*/, db::LayoutTo
 
   if (l2n) {
 
-    db::connected_clusters<db::PolygonRef> &cc = l2n->net_clusters ().clusters_per_cell (circuit->cell_index ());
-    db::local_cluster<db::PolygonRef> &lc = *cc.insert ();
+    db::connected_clusters<db::NetShape> &cc = l2n->net_clusters ().clusters_per_cell (circuit->cell_index ());
+    db::local_cluster<db::NetShape> &lc = *cc.insert ();
     net->set_cluster_id (lc.id ());
 
     db::Cell &cell = l2n->internal_layout ()->cell (circuit->cell_index ());
@@ -1025,8 +1025,8 @@ LayoutToNetlistStandardReader::read_abstract_terminal (db::LayoutToNetlist *l2n,
 
   if (l2n) {
 
-    db::connected_clusters<db::PolygonRef> &cc = l2n->net_clusters ().clusters_per_cell (dm->cell_index ());
-    db::local_cluster<db::PolygonRef> &lc = *cc.insert ();
+    db::connected_clusters<db::NetShape> &cc = l2n->net_clusters ().clusters_per_cell (dm->cell_index ());
+    db::local_cluster<db::NetShape> &lc = *cc.insert ();
     dm->set_cluster_id_for_terminal (tid, lc.id ());
 
     db::Cell &cell = l2n->internal_layout ()->cell (dm->cell_index ());

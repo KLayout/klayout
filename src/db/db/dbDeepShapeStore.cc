@@ -474,7 +474,7 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Texts &texts, const db::IC
   db::Shapes *shapes = &initial_cell ().shapes (layer);
   db::Box world = db::Box::world ();
 
-  db::TextBuildingHierarchyBuilderShapeReceiver tb;
+  db::TextBuildingHierarchyBuilderShapeReceiver tb (&layout ());
 
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> ii = texts.begin_iter ();
   db::ICplxTrans ttop = trans * ii.second;
@@ -849,7 +849,10 @@ DeepLayer DeepShapeStore::create_edge_pair_layer (const db::RecursiveShapeIterat
 
 DeepLayer DeepShapeStore::create_text_layer (const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans)
 {
-  db::TextBuildingHierarchyBuilderShapeReceiver refs;
+  unsigned int layout_index = layout_for_iter (si, trans);
+  db::Layout &layout = m_layouts[layout_index]->layout;
+
+  db::TextBuildingHierarchyBuilderShapeReceiver refs (&layout);
   return create_custom_layer (si, &refs, trans);
 }
 

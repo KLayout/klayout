@@ -559,9 +559,25 @@ public:
   }
 
   /**
+   *  @brief Accessor to the string repository (const version)
+   */
+  const StringRepository &string_repository () const
+  {
+    return m_string_repository;
+  }
+
+  /**
    *  @brief Accessor to the shape repository
    */
   GenericRepository &shape_repository ()
+  {
+    return m_shape_repository;
+  }
+
+  /**
+   *  @brief Accessor to the shape repository (const version)
+   */
+  const GenericRepository &shape_repository () const
   {
     return m_shape_repository;
   }

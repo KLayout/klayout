@@ -153,7 +153,7 @@ private:
 };
 
 /**
- *  @brief A helper class for the text to region interaction functionality which acts as an text receiver
+ *  @brief A helper class for the text ref to region interaction functionality which acts as an text receiver
  *
  *  Note: This special scanner uses pointers to two different objects: texts and polygons.
  *  It uses odd value pointers to indicate pointers to polygons and even value pointers to indicate
@@ -161,15 +161,28 @@ private:
  *
  *  There is a special box converter which is able to sort that out as well.
  */
-template <class OutputContainer, class OutputType = typename OutputContainer::value_type>
+template <class OutputContainer, class TextType, class OutputType = typename OutputContainer::value_type>
 class text_to_region_interaction_filter
-  : public db::box_scanner_receiver2<db::Text, size_t, db::Polygon, size_t>
+  : public db::box_scanner_receiver2<TextType, size_t, db::Polygon, size_t>
 {
 public:
   text_to_region_interaction_filter (OutputContainer &output)
     : mp_output (&output)
   {
     //  .. nothing yet ..
+  }
+
+  void add (const db::TextRef *t, size_t, const db::Polygon *p, size_t)
+  {
+    const OutputType *tt = 0;
+    tl::select (tt, t, p);
+
+    if (m_seen.find (tt) == m_seen.end ()) {
+      if (db::interact (*p, t->obj ().transformed (t->trans ()))) {
+        m_seen.insert (tt);
+        mp_output->insert (*tt);
+      }
+    }
   }
 
   void add (const db::Text *t, size_t, const db::Polygon *p, size_t)

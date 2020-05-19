@@ -417,7 +417,7 @@ DeepEdges::ensure_merged_edges_valid () const
       db::Connectivity conn;
       conn.connect (m_deep_layer);
       hc.set_base_verbosity (base_verbosity() + 10);
-      hc.build (layout, m_deep_layer.initial_cell (), db::ShapeIterator::Edges, conn);
+      hc.build (layout, m_deep_layer.initial_cell (), conn);
 
       //  collect the clusters and merge them into big polygons
       //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is
@@ -1077,7 +1077,7 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
     db::Connectivity conn (db::Connectivity::EdgesConnectByPoints);
     conn.connect (edges);
     hc.set_base_verbosity (base_verbosity () + 10);
-    hc.build (layout, edges.initial_cell (), db::ShapeIterator::Edges, conn);
+    hc.build (layout, edges.initial_cell (), conn);
 
     //  TODO: iterate only over the called cells?
     for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {

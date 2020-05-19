@@ -196,11 +196,14 @@ class DB_PUBLIC TextBuildingHierarchyBuilderShapeReceiver
   : public HierarchyBuilderShapeReceiver
 {
 public:
-  TextBuildingHierarchyBuilderShapeReceiver ();
+  TextBuildingHierarchyBuilderShapeReceiver (db::Layout *layout);
 
   virtual void push (const db::Shape &shape, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target);
   virtual void push (const db::Box &, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) { }
   virtual void push (const db::Polygon &, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) { }
+
+private:
+  db::Layout *mp_layout;
 };
 
 /**

@@ -455,7 +455,7 @@ DeepRegion::ensure_merged_polygons_valid () const
       db::Connectivity conn;
       conn.connect (m_deep_layer);
       hc.set_base_verbosity (base_verbosity () + 10);
-      hc.build (layout, m_deep_layer.initial_cell (), db::ShapeIterator::Polygons, conn);
+      hc.build (layout, m_deep_layer.initial_cell (), conn);
 
       //  collect the clusters and merge them into big polygons
       //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is
@@ -1238,7 +1238,7 @@ DeepRegion::merged (bool min_coherence, unsigned int min_wc) const
   db::Connectivity conn;
   conn.connect (m_deep_layer);
   hc.set_base_verbosity (base_verbosity () + 10);
-  hc.build (layout, m_deep_layer.initial_cell (), db::ShapeIterator::Polygons, conn);
+  hc.build (layout, m_deep_layer.initial_cell (), conn);
 
   //  collect the clusters and merge them into big polygons
   //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is
@@ -1899,25 +1899,25 @@ public:
 
 struct TextResultInserter
 {
-  typedef db::Text value_type;
+  typedef db::TextRef value_type;
 
-  TextResultInserter (std::unordered_set<db::Text> &result)
+  TextResultInserter (std::unordered_set<db::TextRef> &result)
     : mp_result (&result)
   {
     //  .. nothing yet ..
   }
 
-  void insert (const db::Text &e)
+  void insert (const db::TextRef &e)
   {
     (*mp_result).insert (e);
   }
 
 private:
-  std::unordered_set<db::Text> *mp_result;
+  std::unordered_set<db::TextRef> *mp_result;
 };
 
 class PullWithTextLocalOperation
-  : public local_operation<db::PolygonRef, db::Text, db::Text>
+  : public local_operation<db::PolygonRef, db::TextRef, db::TextRef>
 {
 public:
   PullWithTextLocalOperation ()
@@ -1931,15 +1931,15 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::Text> &interactions, std::unordered_set<db::Text> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::TextRef> &interactions, std::unordered_set<db::TextRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
-    db::box_scanner2<db::Polygon, size_t, db::Text, size_t> scanner;
+    db::box_scanner2<db::Polygon, size_t, db::TextRef, size_t> scanner;
 
     TextResultInserter inserter (result);
-    region_to_text_interaction_filter<TextResultInserter> filter (inserter, false);
+    region_to_text_interaction_filter<TextResultInserter, db::TextRef> filter (inserter, false);
 
-    for (shape_interactions<db::PolygonRef, db::Text>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      for (shape_interactions<db::PolygonRef, db::Text>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+    for (shape_interactions<db::PolygonRef, db::TextRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (shape_interactions<db::PolygonRef, db::TextRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
         scanner.insert2 (& interactions.intruder_shape (*j), 0);
       }
     }
@@ -1954,7 +1954,7 @@ public:
 
     }
 
-    scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Text> ());
+    scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::TextRef> ());
   }
 
   virtual on_empty_intruder_mode on_empty_intruder_hint () const
@@ -1969,7 +1969,7 @@ public:
 };
 
 class InteractingWithTextLocalOperation
-  : public local_operation<db::PolygonRef, db::Text, db::PolygonRef>
+  : public local_operation<db::PolygonRef, db::TextRef, db::PolygonRef>
 {
 public:
   InteractingWithTextLocalOperation (bool inverse)
@@ -1984,12 +1984,12 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::Text> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::TextRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
-    db::box_scanner2<db::Polygon, size_t, db::Text, size_t> scanner;
+    db::box_scanner2<db::Polygon, size_t, db::TextRef, size_t> scanner;
 
     ResultInserter inserter (layout, result);
-    region_to_text_interaction_filter<ResultInserter> filter (inserter, m_inverse);
+    region_to_text_interaction_filter<ResultInserter, db::TextRef> filter (inserter, m_inverse);
 
     for (shape_interactions<db::PolygonRef, db::Text>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       for (shape_interactions<db::PolygonRef, db::Text>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
@@ -2010,7 +2010,7 @@ public:
 
     }
 
-    scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Text> ());
+    scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::TextRef> ());
     if (m_inverse) {
       filter.fill_output ();
     }
@@ -2199,7 +2199,7 @@ DeepRegion::pull_generic (const Texts &other) const
 
   db::PullWithTextLocalOperation op;
 
-  db::local_processor<db::PolygonRef, db::Text, db::Text> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_texts.layout (), &other_texts.initial_cell (), polygons.breakout_cells (), other_texts.breakout_cells ());
+  db::local_processor<db::PolygonRef, db::TextRef, db::TextRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_texts.layout (), &other_texts.initial_cell (), polygons.breakout_cells (), other_texts.breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (polygons.store ()->threads ());
   proc.run (&op, polygons.layer (), other_texts.layer (), dl_out.layer ());
@@ -2229,7 +2229,7 @@ DeepRegion::selected_interacting_generic (const Texts &other, bool inverse) cons
 
   db::InteractingWithTextLocalOperation op (inverse);
 
-  db::local_processor<db::PolygonRef, db::Text, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), polygons.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
+  db::local_processor<db::PolygonRef, db::TextRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), polygons.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (polygons.store ()->threads ());
   if (split_after) {

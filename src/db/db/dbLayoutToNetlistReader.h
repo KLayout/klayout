@@ -143,7 +143,7 @@ protected:
   void read_property (db::NetlistObject *obj);
   db::Polygon read_polygon ();
   db::Box read_rect ();
-  void read_geometries (db::NetlistObject *obj, Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<db::PolygonRef> &lc, db::Cell &cell);
+  void read_geometries (db::NetlistObject *obj, Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<NetShape> &lc, db::Cell &cell);
   db::Point read_point ();
 
 private:

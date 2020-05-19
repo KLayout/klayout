@@ -59,7 +59,7 @@ static unsigned int define_layer (db::Layout &ly, db::LayerMap &lmap, int gds_la
   return lid;
 }
 
-static void dump_nets_to_layout (const db::Netlist &nl, const db::hier_clusters<db::PolygonRef> &clusters, db::Layout &ly, const std::map<unsigned int, unsigned int> &lmap, const db::CellMapping &cmap, bool with_device_cells = false)
+static void dump_nets_to_layout (const db::Netlist &nl, const db::hier_clusters<db::NetShape> &clusters, db::Layout &ly, const std::map<unsigned int, unsigned int> &lmap, const db::CellMapping &cmap, bool with_device_cells = false)
 {
   std::set<db::cell_index_type> device_cells_seen;
 
@@ -69,7 +69,7 @@ static void dump_nets_to_layout (const db::Netlist &nl, const db::hier_clusters<
 
     for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
 
-      const db::local_cluster<db::PolygonRef> &lc = clusters.clusters_per_cell (c->cell_index ()).cluster_by_id (n->cluster_id ());
+      const db::local_cluster<db::NetShape> &lc = clusters.clusters_per_cell (c->cell_index ()).cluster_by_id (n->cluster_id ());
 
       bool any_shapes = false;
       for (std::map<unsigned int, unsigned int>::const_iterator m = lmap.begin (); m != lmap.end () && !any_shapes; ++m) {
@@ -84,8 +84,8 @@ static void dump_nets_to_layout (const db::Netlist &nl, const db::hier_clusters<
 
         for (std::map<unsigned int, unsigned int>::const_iterator m = lmap.begin (); m != lmap.end (); ++m) {
           db::Shapes &target = net_cell.shapes (m->second);
-          for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (m->first); !s.at_end (); ++s) {
-            target.insert (*s);
+          for (db::local_cluster<db::NetShape>::shape_iterator s = lc.begin (m->first); !s.at_end (); ++s) {
+            s->insert_into (target);
           }
         }
 
@@ -137,12 +137,12 @@ static void dump_nets_to_layout (const db::Netlist &nl, const db::hier_clusters<
         const std::vector<db::DeviceTerminalDefinition> &td = d->device_class ()->terminal_definitions ();
         for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
 
-          const db::local_cluster<db::PolygonRef> &dc = clusters.clusters_per_cell (dci).cluster_by_id (d->device_abstract ()->cluster_id_for_terminal (t->id ()));
+          const db::local_cluster<db::NetShape> &dc = clusters.clusters_per_cell (dci).cluster_by_id (d->device_abstract ()->cluster_id_for_terminal (t->id ()));
 
           for (std::map<unsigned int, unsigned int>::const_iterator m = lmap.begin (); m != lmap.end (); ++m) {
             db::Shapes &target = device_cell.shapes (m->second);
-            for (db::local_cluster<db::PolygonRef>::shape_iterator s = dc.begin (m->first); !s.at_end (); ++s) {
-              target.insert (*s);
+            for (db::local_cluster<db::NetShape>::shape_iterator s = dc.begin (m->first); !s.at_end (); ++s) {
+              s->insert_into (target);
             }
           }
 
@@ -233,7 +233,7 @@ TEST(1_DeviceAndNetExtraction)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS3Transistor pmos_ex ("PMOS");
   db::NetlistDeviceExtractorMOS3Transistor nmos_ex ("NMOS");
@@ -452,7 +452,7 @@ TEST(2_DeviceAndNetExtractionFlat)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS3Transistor pmos_ex ("PMOS");
   db::NetlistDeviceExtractorMOS3Transistor nmos_ex ("NMOS");
@@ -686,7 +686,7 @@ TEST(3_DeviceAndNetExtractionWithImplicitConnections)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS3Transistor pmos_ex ("PMOS");
   db::NetlistDeviceExtractorMOS3Transistor nmos_ex ("NMOS");
@@ -935,7 +935,7 @@ TEST(4_ResAndCapExtraction)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS3Transistor pmos_ex ("PMOS");
   db::NetlistDeviceExtractorMOS3Transistor nmos_ex ("NMOS");
@@ -1182,7 +1182,7 @@ TEST(5_ResAndCapWithBulkExtraction)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS4Transistor pmos_ex ("PMOS");
   db::NetlistDeviceExtractorMOS4Transistor nmos_ex ("NMOS");
@@ -1449,7 +1449,7 @@ TEST(6_BJT3TransistorExtraction)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS4Transistor pmos_ex ("PMOS");
   db::NetlistDeviceExtractorMOS4Transistor nmos_ex ("NMOS");
@@ -1656,7 +1656,7 @@ TEST(7_DiodeExtraction)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorDiode diode_ex ("DIODE");
 
@@ -1790,7 +1790,7 @@ TEST(8_DiodeExtractionScaled)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorDiode diode_ex ("DIODE");
 
@@ -1951,7 +1951,7 @@ TEST(9_StrictDeviceExtraction)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS3Transistor pmos_ex ("PMOS", true /*strict*/);
   db::NetlistDeviceExtractorMOS3Transistor nmos_ex ("NMOS", true /*strict*/);
@@ -2184,7 +2184,7 @@ TEST(10_DeviceExtractionWithBreakoutCells)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS3Transistor pmos_ex ("PMOS");
   db::NetlistDeviceExtractorMOS3Transistor nmos_ex ("NMOS");
@@ -2352,7 +2352,7 @@ TEST(11_DeviceExtractionWithSameClass)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorResistor polyres_ex ("RES", 50.0);
   db::NetlistDeviceExtractorResistor diffres_ex ("RES", 150.0);
@@ -2474,7 +2474,7 @@ TEST(12_FloatingSubcircuitExtraction)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS3Transistor pmos_ex ("PMOS");
   db::NetlistDeviceExtractorMOS3Transistor nmos_ex ("NMOS");
@@ -2628,7 +2628,7 @@ TEST(13_RemoveDummyPins)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS3Transistor pmos_ex ("PMOS");
   db::NetlistDeviceExtractorMOS3Transistor nmos_ex ("NMOS");

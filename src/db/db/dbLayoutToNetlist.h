@@ -522,7 +522,7 @@ public:
    *  NOTE: the layer and cell indexes used inside this structure refer to the
    *  internal layout.
    */
-  const db::hier_clusters<db::PolygonRef> &net_clusters () const
+  const db::hier_clusters<db::NetShape> &net_clusters () const
   {
     return m_net_clusters;
   }
@@ -530,7 +530,7 @@ public:
   /**
    *  @brief Gets the hierarchical shape clusters derived in the net extraction (non-conver version)
    */
-  db::hier_clusters<db::PolygonRef> &net_clusters ()
+  db::hier_clusters<db::NetShape> &net_clusters ()
   {
     return m_net_clusters;
   }
@@ -744,7 +744,7 @@ private:
   tl::weak_ptr<db::DeepShapeStore> mp_dss;
   unsigned int m_layout_index;
   db::Connectivity m_conn;
-  db::hier_clusters<db::PolygonRef> m_net_clusters;
+  db::hier_clusters<db::NetShape> m_net_clusters;
   std::auto_ptr<db::Netlist> mp_netlist;
   std::set<db::DeepLayer> m_dlrefs;
   std::map<std::string, db::DeepLayer> m_named_regions;
@@ -786,7 +786,7 @@ private:
 
   void init ();
   void ensure_netlist ();
-  size_t search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::PolygonRef> &test_cluster, std::vector<db::InstElement> &rev_inst_path);
+  size_t search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<NetShape> &test_cluster, std::vector<db::InstElement> &rev_inst_path);
   void build_net_rec (const db::Net &net, db::Layout &target, cell_index_type circuit_cell, const db::CellMapping &cmap, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, cell_reuse_table_type &reuse_table, const ICplxTrans &tr) const;
   void build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, cell_reuse_table_type &reuse_table, const ICplxTrans &tr) const;
   void build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const Net *net, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, cell_reuse_table_type &reuse_table, const ICplxTrans &tr) const;

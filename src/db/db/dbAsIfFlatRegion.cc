@@ -394,7 +394,7 @@ AsIfFlatRegion::selected_interacting_generic (const Texts &other, bool inverse) 
   scanner.reserve2 (other.size ());
 
   std::auto_ptr<FlatRegion> output (new FlatRegion (false));
-  region_to_text_interaction_filter<Shapes, db::Polygon> filter (output->raw_polygons (), inverse);
+  region_to_text_interaction_filter<Shapes, db::Text, db::Polygon> filter (output->raw_polygons (), inverse);
 
   AddressablePolygonDelivery p (begin_merged (), has_valid_merged_polygons ());
 
@@ -527,7 +527,7 @@ AsIfFlatRegion::pull_generic (const Texts &other) const
   scanner.reserve2 (other.size ());
 
   std::auto_ptr<FlatTexts> output (new FlatTexts (false));
-  region_to_text_interaction_filter<Shapes, db::Text> filter (output->raw_texts (), false);
+  region_to_text_interaction_filter<Shapes, db::Text, db::Text> filter (output->raw_texts (), false);
 
   AddressablePolygonDelivery p (begin (), has_valid_merged_polygons ());
 

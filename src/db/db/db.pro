@@ -193,7 +193,8 @@ SOURCES = \
     dbEmptyTexts.cc \
     dbFlatTexts.cc \
     dbTextsUtils.cc \
-    dbOriginalLayerTexts.cc
+    dbOriginalLayerTexts.cc \
+    dbNetShape.cc
 
 HEADERS = \
   dbArray.h \
@@ -348,7 +349,8 @@ HEADERS = \
     dbEmptyTexts.h \
     dbFlatTexts.h \
     dbTextsUtils.h \
-    dbOriginalLayerTexts.h
+    dbOriginalLayerTexts.h \
+    dbNetShape.h
 
 !equals(HAVE_QT, "0") {
 

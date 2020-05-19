@@ -25,6 +25,7 @@
 
 #include "dbCommon.h"
 #include "dbHierNetworkProcessor.h"
+#include "dbNetShape.h"
 
 #include <map>
 #include <set>
@@ -71,9 +72,9 @@ class DeviceAbstract;
 class DB_PUBLIC NetlistExtractor
 {
 public:
-  typedef db::hier_clusters<db::PolygonRef> hier_clusters_type;
-  typedef db::connected_clusters<db::PolygonRef> connected_clusters_type;
-  typedef db::local_cluster<db::PolygonRef> local_cluster_type;
+  typedef db::hier_clusters<db::NetShape> hier_clusters_type;
+  typedef db::connected_clusters<db::NetShape> connected_clusters_type;
+  typedef db::local_cluster<db::NetShape> local_cluster_type;
 
   /**
    *  @brief NetExtractor constructor

@@ -1318,6 +1318,9 @@ TEST(5)
     "text ('A',r0 10,35) #0\n"
     "text ('B',r90 20,25) #0\n"
     "text ('C',m90 30,15) #0\n"
+    "text ('A',r0 10,35) #1\n"
+    "text ('B',r90 20,25) #2\n"
+    "text ('C',m90 30,15) #3\n"
     "text ('A',r0 0,50) #0\n"
     "text ('B',r90 -90,140) #0\n"
     "text ('C',m90 -180,230) #0\n"
@@ -1333,9 +1336,6 @@ TEST(5)
     "text ('A',r0 33010,40) #0\n"
     "text ('A',r0 33010,10040) #0\n"
     "text ('A',r0 33010,20040) #0\n"
-    "text ('A',r0 10,35) #1\n"
-    "text ('B',r90 20,25) #2\n"
-    "text ('C',m90 30,15) #3\n"
     "text ('A',r0 0,50) #5\n"
     "text ('B',r90 -90,140) #6\n"
     "text ('C',m90 -180,230) #7\n"
@@ -1357,10 +1357,13 @@ TEST(5)
   for (db::Shapes::shape_iterator shape = topcell.shapes (lindex).begin (db::Shapes::shape_iterator::All); ! shape.at_end (); ++shape) {
     sa_copy.insert (*shape);
   }
-  EXPECT_EQ (shapes_to_string (_this, sa_copy),
+  EXPECT_EQ (shapes_to_string (_this, sa_copy),  
     "text ('A',r0 10,35) #0\n"
     "text ('B',r90 20,25) #0\n"
     "text ('C',m90 30,15) #0\n"
+    "text ('A',r0 10,35) #1\n"
+    "text ('B',r90 20,25) #2\n"
+    "text ('C',m90 30,15) #3\n"
     "text ('A',r0 0,50) #0\n"
     "text ('B',r90 -90,140) #0\n"
     "text ('C',m90 -180,230) #0\n"
@@ -1376,9 +1379,6 @@ TEST(5)
     "text ('A',r0 33010,40) #0\n"
     "text ('A',r0 33010,10040) #0\n"
     "text ('A',r0 33010,20040) #0\n"
-    "text ('A',r0 10,35) #1\n"
-    "text ('B',r90 20,25) #2\n"
-    "text ('C',m90 30,15) #3\n"
     "text ('A',r0 0,50) #5\n"
     "text ('B',r90 -90,140) #6\n"
     "text ('C',m90 -180,230) #7\n"

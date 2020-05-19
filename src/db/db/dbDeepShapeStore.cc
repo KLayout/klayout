@@ -25,7 +25,13 @@
 #include "dbCellMapping.h"
 #include "dbLayoutUtils.h"
 #include "dbRegion.h"
+#include "dbEdges.h"
+#include "dbEdgePairs.h"
+#include "dbTexts.h"
 #include "dbDeepRegion.h"
+#include "dbDeepEdges.h"
+#include "dbDeepEdgePairs.h"
+#include "dbDeepTexts.h"
 
 #include "tlTimer.h"
 
@@ -44,6 +50,30 @@ DeepLayer::DeepLayer (const Region &region)
   : mp_store (), m_layout (0), m_layer (0)
 {
   const db::DeepRegion *dr = dynamic_cast<db::DeepRegion *> (region.delegate ());
+  tl_assert (dr != 0);
+  *this = dr->deep_layer ();
+}
+
+DeepLayer::DeepLayer (const Texts &texts)
+  : mp_store (), m_layout (0), m_layer (0)
+{
+  const db::DeepTexts *dr = dynamic_cast<db::DeepTexts *> (texts.delegate ());
+  tl_assert (dr != 0);
+  *this = dr->deep_layer ();
+}
+
+DeepLayer::DeepLayer (const Edges &edges)
+  : mp_store (), m_layout (0), m_layer (0)
+{
+  const db::DeepEdges *dr = dynamic_cast<db::DeepEdges *> (edges.delegate ());
+  tl_assert (dr != 0);
+  *this = dr->deep_layer ();
+}
+
+DeepLayer::DeepLayer (const EdgePairs &edge_pairs)
+  : mp_store (), m_layout (0), m_layer (0)
+{
+  const db::DeepEdgePairs *dr = dynamic_cast<db::DeepEdgePairs *> (edge_pairs.delegate ());
   tl_assert (dr != 0);
   *this = dr->deep_layer ();
 }

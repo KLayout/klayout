@@ -43,6 +43,8 @@ class DeepShapeStore;
 class DeepShapeStoreState;
 class Region;
 class Edges;
+class EdgePairs;
+class Texts;
 
 /**
  *  @brief Represents a shape collection from the deep shape store
@@ -74,6 +76,24 @@ public:
    *  This requires the Region to be a DeepRegion. Otherwise, this constructor will assert
    */
   DeepLayer (const Region &region);
+
+  /**
+   *  @brief Conversion operator from texts collection to DeepLayer
+   *  This requires the texts to be a DeepTexts. Otherwise, this constructor will assert
+   */
+  DeepLayer (const Texts &region);
+
+  /**
+   *  @brief Conversion operator from edges collection to DeepLayer
+   *  This requires the edges to be a DeepEdges. Otherwise, this constructor will assert
+   */
+  DeepLayer (const Edges &region);
+
+  /**
+   *  @brief Conversion operator from edge pairs collection to DeepLayer
+   *  This requires the edge pairs to be a DeepEdgePairs. Otherwise, this constructor will assert
+   */
+  DeepLayer (const EdgePairs &region);
 
   /**
    *  @brief Copy constructor

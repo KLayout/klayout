@@ -402,6 +402,7 @@ region_to_text_interaction_filter_base<OutputType, TextType>::fill_output ()
 
 //  explicit instantiations
 template class region_to_text_interaction_filter_base<db::Polygon, db::TextRef>;
+template class region_to_text_interaction_filter_base<db::Polygon, db::Text>;
 template class region_to_text_interaction_filter_base<db::Text, db::Text>;
 template class region_to_text_interaction_filter_base<db::TextRef, db::TextRef>;
 

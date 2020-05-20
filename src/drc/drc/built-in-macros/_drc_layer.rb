@@ -669,20 +669,22 @@ CODE
 
       if @data.is_a?(RBA::Texts)
         if as_pattern
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Texts, :with_match, pattern, invert))
+          result = @engine._tcmd(@data, 0, RBA::Texts, :with_match, pattern, invert)
         else
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Texts, :with_text, pattern, invert))
+          result = @engine._tcmd(@data, 0, RBA::Texts, :with_text, pattern, invert)
         end
         if as_dots
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :edges))
+          return DRCLayer::new(@engine, @engine._tcmd(result, 0, RBA::Region, :edges))
         elsif as_dots == false
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :polygons))
+          return DRCLayer::new(@engine, @engine._tcmd(result, 0, RBA::Region, :polygons))
+        else
+          return DRCLayer::new(@engine, result)
         end
       else    
         if as_dots
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts_dots, pattern, as_pattern))
+          return DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts_dots, pattern, as_pattern))
         else
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts, pattern, as_pattern))
+          return DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts, pattern, as_pattern))
         end
       end
 
@@ -3078,6 +3080,10 @@ CODE
     
     def requires_texts_or_region(f)
       @data.is_a?(RBA::Region) || @data.is_a?(RBA::Texts) || raise("#{f}: Requires a polygon or text layer")
+    end
+    
+    def requires_texts(f)
+      @data.is_a?(RBA::Texts) || raise("#{f}: Requires a text layer")
     end
     
     def requires_edge_pairs(f)

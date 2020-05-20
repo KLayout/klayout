@@ -990,7 +990,7 @@ template <class T> struct get_shape_flags { };
 template <>
 struct get_shape_flags<db::Edge>
 {
-  db::ShapeIterator::flags_type operator() (bool /*with_attr*/) const
+  db::ShapeIterator::flags_type operator() () const
   {
     return db::ShapeIterator::Edges;
   }
@@ -999,7 +999,7 @@ struct get_shape_flags<db::Edge>
 template <>
 struct get_shape_flags<db::PolygonRef>
 {
-  db::ShapeIterator::flags_type operator() (bool /*with_attr*/) const
+  db::ShapeIterator::flags_type operator() () const
   {
     return db::ShapeIterator::Polygons;
   }
@@ -1008,13 +1008,9 @@ struct get_shape_flags<db::PolygonRef>
 template <>
 struct get_shape_flags<db::NetShape>
 {
-  db::ShapeIterator::flags_type operator() (bool with_attr) const
+  db::ShapeIterator::flags_type operator() () const
   {
-    if (with_attr) {
-      return db::ShapeIterator::flags_type (db::ShapeIterator::Polygons | db::ShapeIterator::Texts);
-    } else {
-      return db::ShapeIterator::flags_type (db::ShapeIterator::Polygons);
-    }
+    return db::ShapeIterator::flags_type (db::ShapeIterator::Polygons | db::ShapeIterator::Texts);
   }
 };
 
@@ -1030,7 +1026,7 @@ local_clusters<T>::build_clusters (const db::Cell &cell, const db::Connectivity 
   db::box_convert<T> bc;
   addressable_shape_delivery<T> heap;
   attr_accessor<T> attr;
-  db::ShapeIterator::flags_type shape_flags = get_shape_flags<T> () (attr_equivalence != 0 /*with attributes*/);
+  db::ShapeIterator::flags_type shape_flags = get_shape_flags<T> () ();
 
   for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
     const db::Shapes &shapes = cell.shapes (*l);

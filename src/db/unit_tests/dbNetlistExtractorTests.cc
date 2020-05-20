@@ -77,6 +77,7 @@ static void dump_nets_to_layout (const db::Netlist &nl, const db::hier_clusters<
 
     for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
 
+      std::string nn = "NET_" + c->name () + "_" + n->expanded_name ();
       const db::local_cluster<db::NetShape> &lc = clusters.clusters_per_cell (c->cell_index ()).cluster_by_id (n->cluster_id ());
 
       bool any_shapes = false;
@@ -86,7 +87,6 @@ static void dump_nets_to_layout (const db::Netlist &nl, const db::hier_clusters<
 
       if (any_shapes || (with_device_cells && n->terminal_count() > 0)) {
 
-        std::string nn = "NET_" + c->name () + "_" + n->expanded_name ();
         db::Cell &net_cell = ly.cell (ly.add_cell (nn.c_str ()));
         cell.insert (db::CellInstArray (db::CellInst (net_cell.cell_index ()), db::Trans ()));
 
@@ -287,6 +287,14 @@ TEST(1_DeviceAndNetExtraction)
   //  extract the nets
 
   net_ex.extract_nets (dss, 0, conn, nl, cl);
+
+  //  check if net names are properly assigned
+  db::Circuit *top_circuit = nl.circuit_by_name ("RINGO");
+  EXPECT_EQ (top_circuit != 0, true);
+  if (top_circuit) {
+    db::Net *fb_net = top_circuit->net_by_name ("FB");
+    EXPECT_EQ (fb_net != 0, true);
+  }
 
   //  debug layers produced for nets
   //    202/0 -> Active
@@ -517,6 +525,14 @@ TEST(1a_DeviceAndNetExtractionWithTextsAsLabels)
   //  extract the nets
 
   net_ex.extract_nets (dss, 0, conn, nl, cl);
+
+  //  check if net names are properly assigned
+  db::Circuit *top_circuit = nl.circuit_by_name ("RINGO");
+  EXPECT_EQ (top_circuit != 0, true);
+  if (top_circuit) {
+    db::Net *fb_net = top_circuit->net_by_name ("FB");
+    EXPECT_EQ (fb_net != 0, true);
+  }
 
   //  debug layers produced for nets
   //    202/0 -> Active

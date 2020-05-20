@@ -300,18 +300,22 @@ void NetlistExtractor::collect_labels (const connected_clusters_type &clusters,
   const local_cluster_type &lc = clusters.cluster_by_id (cid);
   for (local_cluster_type::attr_iterator a = lc.begin_attr (); a != lc.end_attr (); ++a) {
 
-    if (! db::is_prop_id_attr (*a)) {
-      continue;
-    }
+    if (db::is_prop_id_attr (*a)) {
 
-    db::properties_id_type pi = db::prop_id_from_attr (*a);
+      db::properties_id_type pi = db::prop_id_from_attr (*a);
 
-    const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (pi);
-    for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
+      const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (pi);
+      for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
 
-      if (m_text_annot_name_id.first && j->first == m_text_annot_name_id.second) {
-        net_names.insert (j->second.to_string ());
+        if (m_text_annot_name_id.first && j->first == m_text_annot_name_id.second) {
+          net_names.insert (j->second.to_string ());
+        }
+
       }
+
+    } else {
+
+      net_names.insert (db::text_from_attr (*a));
 
     }
 

@@ -31,6 +31,7 @@
 #include "dbCell.h"
 #include "dbInstElement.h"
 #include "tlEquivalenceClusters.h"
+#include "tlAssert.h"
 
 #include <map>
 #include <list>
@@ -1365,7 +1366,17 @@ inline db::properties_id_type prop_id_from_attr (size_t attr)
  */
 inline size_t text_ref_to_attr (const db::Text *tr)
 {
-  return size_t (tr) * 2 + 1;
+  return size_t (tr) + 1;
+}
+
+/**
+ *  @brief Gets the text value from an attribute ID
+ */
+inline const char *text_from_attr (size_t attr)
+{
+  tl_assert ((attr & 1) != 0);
+  const db::Text *t = reinterpret_cast<const db::Text *> (attr - 1);
+  return t->string ();
 }
 
 }

@@ -96,15 +96,13 @@ TEST(3)
   s.transform (db::Disp (db::Vector (10, 20)));
   EXPECT_EQ (s == s2, false);
   EXPECT_EQ (s != s2, true);
-  EXPECT_EQ (s < s2, false);
-  EXPECT_EQ (s2 < s, true);
+  EXPECT_EQ ((s < s2) != (s2 < s), true);
 
   db::Text t ("abc", db::Trans (db::Vector (100, 200)));
   s = db::NetShape (t, repo);
   EXPECT_EQ (s == s2, false);
   EXPECT_EQ (s != s2, true);
-  EXPECT_EQ (s < s2, true);
-  EXPECT_EQ (s2 < s, false);
+  EXPECT_EQ ((s < s2) != (s2 < s), true);
 
   s2 = s;
   EXPECT_EQ (s == db::NetShape (), false);
@@ -117,8 +115,7 @@ TEST(3)
   s.transform (db::Disp (db::Vector (10, 20)));
   EXPECT_EQ (s == s2, false);
   EXPECT_EQ (s != s2, true);
-  EXPECT_EQ (s < s2, false);
-  EXPECT_EQ (s2 < s, true);
+  EXPECT_EQ ((s < s2) != (s2 < s), true);
 }
 
 TEST(4)

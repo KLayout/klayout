@@ -445,8 +445,7 @@ LayoutToNetlistStandardReader::read_property (db::NetlistObject *obj)
   br.done ();
 }
 
-std::pair<unsigned int, db::PolygonRef>
-LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n)
+std::pair<unsigned int, NetShape> LayoutToNetlistStandardReader::read_geometry(db::LayoutToNetlist *l2n)
 {
   std::string lname;
 
@@ -481,6 +480,22 @@ LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n)
     db::Polygon poly;
     poly.assign_hull (pt.begin (), pt.end ());
     return std::make_pair (lid, db::PolygonRef (poly, l2n->internal_layout ()->shape_repository ()));
+
+  } else if (test (skeys::text_key) || test (lkeys::text_key)) {
+
+    Brace br (this);
+
+    read_word_or_quoted (lname);
+    unsigned int lid = l2n->layer_of (layer_by_name (l2n, lname));
+
+    std::string text;
+    read_word_or_quoted (text);
+
+    db::Point pt = read_point ();
+
+    br.done ();
+
+    return std::make_pair (lid, db::TextRef (db::Text (text, db::Trans (pt - db::Point ())), l2n->internal_layout ()->shape_repository ()));
 
   } else if (at_end ()) {
     throw tl::Exception (tl::to_string (tr ("Unexpected end of file (polygon or rect expected)")));
@@ -532,9 +547,9 @@ LayoutToNetlistStandardReader::read_geometries (db::NetlistObject *obj, Brace &b
     if (test (skeys::property_key) || test (lkeys::property_key)) {
       read_property (obj);
     } else {
-      std::pair<unsigned int, db::PolygonRef> pr = read_geometry (l2n);
+      std::pair<unsigned int, db::NetShape> pr = read_geometry (l2n);
       lc.add (pr.second, pr.first);
-      cell.shapes (pr.first).insert (pr.second);
+      pr.second.insert_into (cell.shapes (pr.first));
     }
   }
 }

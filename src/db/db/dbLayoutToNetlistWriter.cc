@@ -399,33 +399,47 @@ void std_writer_impl<Keys>::reset_geometry_ref ()
 template <class Keys>
 void std_writer_impl<Keys>::write (const db::NetShape *s, const db::ICplxTrans &tr, const std::string &lname, bool relative)
 {
-  if (s->type () != db::NetShape::Polygon) {
-    return;
-  }
+  if (s->type () == db::NetShape::Polygon) {
 
-  db::PolygonRef pr = s->polygon_ref ();
-  db::ICplxTrans t = tr * db::ICplxTrans (pr.trans ());
+    db::PolygonRef pr = s->polygon_ref ();
+    db::ICplxTrans t = tr * db::ICplxTrans (pr.trans ());
 
-  const db::Polygon &poly = pr.obj ();
-  if (poly.is_box ()) {
+    const db::Polygon &poly = pr.obj ();
+    if (poly.is_box ()) {
 
-    db::Box box = t * poly.box ();
-    *mp_stream << Keys::rect_key << "(" << lname;
-    *mp_stream << " ";
-    write_point (*mp_stream, box.p1 (), m_ref, relative);
-    *mp_stream << " ";
-    write_point (*mp_stream, box.p2 (), m_ref, relative);
-    *mp_stream << ")";
+      db::Box box = t * poly.box ();
+      *mp_stream << Keys::rect_key << "(" << lname;
+      *mp_stream << " ";
+      write_point (*mp_stream, box.p1 (), m_ref, relative);
+      *mp_stream << " ";
+      write_point (*mp_stream, box.p2 (), m_ref, relative);
+      *mp_stream << ")";
 
-  } else {
-
-    *mp_stream << Keys::polygon_key << "(" << lname;
-    if (poly.holes () > 0) {
-      db::SimplePolygon sp = db::polygon_to_simple_polygon (poly);
-      write_points (*mp_stream, sp, t, m_ref, relative);
     } else {
-      write_points (*mp_stream, poly, t, m_ref, relative);
+
+      *mp_stream << Keys::polygon_key << "(" << lname;
+      if (poly.holes () > 0) {
+        db::SimplePolygon sp = db::polygon_to_simple_polygon (poly);
+        write_points (*mp_stream, sp, t, m_ref, relative);
+      } else {
+        write_points (*mp_stream, poly, t, m_ref, relative);
+      }
+      *mp_stream << ")";
+
     }
+
+  } else if (s->type () == db::NetShape::Text) {
+
+    *mp_stream << Keys::text_key << "(" << lname;
+
+    db::TextRef txtr = s->text_ref ();
+    db::ICplxTrans t = tr * db::ICplxTrans (txtr.trans ());
+
+    *mp_stream << " " << tl::to_word_or_quoted_string (txtr.obj ().string ()) << " ";
+
+    db::Point pt = t * (db::Point () + txtr.obj ().trans ().disp ());
+    write_point (*mp_stream, pt, m_ref, relative);
+
     *mp_stream << ")";
 
   }

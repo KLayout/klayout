@@ -205,7 +205,7 @@ public:
   typedef error_list::const_iterator error_iterator;
   typedef std::vector<db::NetlistDeviceExtractorLayerDefinition> layer_definitions;
   typedef layer_definitions::const_iterator layer_definitions_iterator;
-  typedef std::map<std::string, db::Region *> input_layers;
+  typedef std::map<std::string, db::ShapeCollection *> input_layers;
   typedef db::hier_clusters<db::NetShape> hier_clusters_type;
 
   /**

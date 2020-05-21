@@ -91,7 +91,7 @@ private:
 
 
 DeepTexts::DeepTexts ()
-  : AsIfFlatTexts (), m_deep_layer ()
+  : AsIfFlatTexts ()
 {
   //  .. nothing yet ..
 }
@@ -99,24 +99,23 @@ DeepTexts::DeepTexts ()
 DeepTexts::DeepTexts (const db::Texts &other, DeepShapeStore &dss)
   : AsIfFlatTexts ()
 {
-  m_deep_layer = dss.create_from_flat (other);
+  set_deep_layer (dss.create_from_flat (other));
 }
 
 DeepTexts::DeepTexts (const RecursiveShapeIterator &si, DeepShapeStore &dss)
-  : AsIfFlatTexts (), m_deep_layer (dss.create_text_layer (si))
+  : AsIfFlatTexts ()
 {
-  //  .. nothing yet ..
+  set_deep_layer (dss.create_text_layer (si));
 }
 
 DeepTexts::DeepTexts (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans)
-  : AsIfFlatTexts (), m_deep_layer (dss.create_text_layer (si, trans))
+  : AsIfFlatTexts ()
 {
-  //  .. nothing yet ..
+  set_deep_layer (dss.create_text_layer (si, trans));
 }
 
 DeepTexts::DeepTexts (const DeepTexts &other)
-  : AsIfFlatTexts (other),
-    m_deep_layer (other.m_deep_layer.copy ())
+  : AsIfFlatTexts (other), DeepShapeCollectionDelegateBase (other)
 {
   //  .. nothing yet ..
 }
@@ -126,15 +125,15 @@ DeepTexts::operator= (const DeepTexts &other)
 {
   if (this != &other) {
     AsIfFlatTexts::operator= (other);
-    m_deep_layer = other.m_deep_layer.copy ();
+    DeepShapeCollectionDelegateBase::operator= (other);
   }
   return *this;
 }
 
 DeepTexts::DeepTexts (const DeepLayer &dl)
-  : AsIfFlatTexts (), m_deep_layer (dl)
+  : AsIfFlatTexts ()
 {
-  //  .. nothing yet ..
+  set_deep_layer (dl);
 }
 
 DeepTexts::~DeepTexts ()
@@ -154,7 +153,7 @@ TextsIteratorDelegate *DeepTexts::begin () const
 
 std::pair<db::RecursiveShapeIterator, db::ICplxTrans> DeepTexts::begin_iter () const
 {
-  const db::Layout &layout = m_deep_layer.layout ();
+  const db::Layout &layout = deep_layer ().layout ();
   if (layout.cells () == 0) {
 
     return std::make_pair (db::RecursiveShapeIterator (), db::ICplxTrans ());
@@ -162,7 +161,7 @@ std::pair<db::RecursiveShapeIterator, db::ICplxTrans> DeepTexts::begin_iter () c
   } else {
 
     const db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
-    db::RecursiveShapeIterator iter (m_deep_layer.layout (), top_cell, m_deep_layer.layer ());
+    db::RecursiveShapeIterator iter (deep_layer ().layout (), top_cell, deep_layer ().layer ());
     return std::make_pair (iter, db::ICplxTrans ());
 
   }
@@ -172,10 +171,10 @@ size_t DeepTexts::size () const
 {
   size_t n = 0;
 
-  const db::Layout &layout = m_deep_layer.layout ();
+  const db::Layout &layout = deep_layer ().layout ();
   db::CellCounter cc (&layout);
   for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
-    n += cc.weight (*c) * layout.cell (*c).shapes (m_deep_layer.layer ()).size ();
+    n += cc.weight (*c) * layout.cell (*c).shapes (deep_layer ().layer ()).size ();
   }
 
   return n;
@@ -188,7 +187,7 @@ std::string DeepTexts::to_string (size_t nmax) const
 
 Box DeepTexts::bbox () const
 {
-  return m_deep_layer.initial_cell ().bbox (m_deep_layer.layer ());
+  return deep_layer ().initial_cell ().bbox (deep_layer ().layer ());
 }
 
 bool DeepTexts::empty () const
@@ -336,12 +335,12 @@ DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
 
 RegionDelegate *DeepTexts::polygons (db::Coord e) const
 {
-  db::DeepLayer new_layer = m_deep_layer.derived ();
-  db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
+  db::DeepLayer new_layer = deep_layer ().derived ();
+  db::Layout &layout = const_cast<db::Layout &> (deep_layer ().layout ());
 
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
     db::Shapes &output = c->shapes (new_layer.layer ());
-    for (db::Shapes::shape_iterator s = c->shapes (m_deep_layer.layer ()).begin (db::ShapeIterator::Texts); ! s.at_end (); ++s) {
+    for (db::Shapes::shape_iterator s = c->shapes (deep_layer ().layer ()).begin (db::ShapeIterator::Texts); ! s.at_end (); ++s) {
       db::Box box = s->bbox ();
       box.enlarge (db::Vector (e, e));
       db::Polygon poly (box);
@@ -354,12 +353,12 @@ RegionDelegate *DeepTexts::polygons (db::Coord e) const
 
 EdgesDelegate *DeepTexts::edges () const
 {
-  db::DeepLayer new_layer = m_deep_layer.derived ();
-  db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
+  db::DeepLayer new_layer = deep_layer ().derived ();
+  db::Layout &layout = const_cast<db::Layout &> (deep_layer ().layout ());
 
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
     db::Shapes &output = c->shapes (new_layer.layer ());
-    for (db::Shapes::shape_iterator s = c->shapes (m_deep_layer.layer ()).begin (db::ShapeIterator::Texts); ! s.at_end (); ++s) {
+    for (db::Shapes::shape_iterator s = c->shapes (deep_layer ().layer ()).begin (db::ShapeIterator::Texts); ! s.at_end (); ++s) {
       db::Box box = s->bbox ();
       output.insert (db::Edge (box.p1 (), box.p2 ()));
     }
@@ -377,8 +376,8 @@ TextsDelegate *DeepTexts::in (const Texts &other, bool invert) const
 bool DeepTexts::equals (const Texts &other) const
 {
   const DeepTexts *other_delegate = dynamic_cast<const DeepTexts *> (other.delegate ());
-  if (other_delegate && &other_delegate->m_deep_layer.layout () == &m_deep_layer.layout ()
-      && other_delegate->m_deep_layer.layer () == m_deep_layer.layer ()) {
+  if (other_delegate && &other_delegate->deep_layer ().layout () == &deep_layer ().layout ()
+      && other_delegate->deep_layer ().layer () == deep_layer ().layer ()) {
     return true;
   } else {
     return AsIfFlatTexts::equals (other);
@@ -388,8 +387,8 @@ bool DeepTexts::equals (const Texts &other) const
 bool DeepTexts::less (const Texts &other) const
 {
   const DeepTexts *other_delegate = dynamic_cast<const DeepTexts *> (other.delegate ());
-  if (other_delegate && &other_delegate->m_deep_layer.layout () == &m_deep_layer.layout ()) {
-    return other_delegate->m_deep_layer.layer () < m_deep_layer.layer ();
+  if (other_delegate && &other_delegate->deep_layer ().layout () == &deep_layer ().layout ()) {
+    return other_delegate->deep_layer ().layer () < deep_layer ().layer ();
   } else {
     return AsIfFlatTexts::less (other);
   }
@@ -397,12 +396,12 @@ bool DeepTexts::less (const Texts &other) const
 
 void DeepTexts::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
-  m_deep_layer.insert_into (layout, into_cell, into_layer);
+  deep_layer ().insert_into (layout, into_cell, into_layer);
 }
 
 void DeepTexts::insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const
 {
-  m_deep_layer.insert_into_as_polygons (layout, into_cell, into_layer, enl);
+  deep_layer ().insert_into_as_polygons (layout, into_cell, into_layer, enl);
 }
 
 namespace {

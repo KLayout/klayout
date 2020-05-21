@@ -607,7 +607,9 @@ static size_t id (const db::Region *r)
 int td_simple ();
 int po_any ();
 
-Class<db::Region> decl_Region ("db", "Region",
+extern Class<db::ShapeCollection> decl_dbShapeCollection;
+
+Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
     "\n"

@@ -25,9 +25,8 @@
 #define HDR_dbTextsDelegate
 
 #include "dbCommon.h"
-
+#include "dbShapeCollection.h"
 #include "dbText.h"
-#include "tlUniqueId.h"
 
 namespace db {
 
@@ -60,7 +59,7 @@ public:
  *  @brief The delegate for the actual edge set implementation
  */
 class DB_PUBLIC TextsDelegate
-  : public tl::UniqueId
+  : public ShapeCollectionDelegateBase
 {
 public:
   typedef db::Coord coord_type;

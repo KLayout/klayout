@@ -31,7 +31,7 @@
 #include "dbTexts.h"
 #include "dbEdgePairs.h"
 #include "dbEdgePairRelations.h"
-#include "tlUniqueId.h"
+#include "dbShapeCollection.h"
 
 #include <list>
 
@@ -183,7 +183,7 @@ public:
  *  @brief The delegate for the actual region implementation
  */
 class DB_PUBLIC RegionDelegate
-  : public tl::UniqueId
+  : public db::ShapeCollectionDelegateBase
 {
 public:
   typedef db::Coord coord_type;

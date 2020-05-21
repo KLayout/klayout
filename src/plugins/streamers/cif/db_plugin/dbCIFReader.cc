@@ -818,7 +818,7 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
 void 
 CIFReader::do_read (db::Layout &layout)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 21, "File read");
+  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("File read: ")) + m_stream.source ());
 
   try {
   

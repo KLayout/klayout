@@ -36,7 +36,7 @@ namespace db {
  *  @brief Provides hierarchical edges implementation
  */
 class DB_PUBLIC DeepTexts
-  : public db::AsIfFlatTexts
+  : public db::AsIfFlatTexts, public db::DeepShapeCollectionDelegateBase
 {
 public:
   DeepTexts ();
@@ -79,20 +79,13 @@ public:
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
   virtual void insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const;
 
-  const DeepLayer &deep_layer () const
+  virtual DeepShapeCollectionDelegateBase *deep ()
   {
-    return m_deep_layer;
-  }
-
-  DeepLayer &deep_layer ()
-  {
-    return m_deep_layer;
+    return this;
   }
 
 private:
   DeepTexts &operator= (const DeepTexts &other);
-
-  DeepLayer m_deep_layer;
 
   void init ();
   DeepTexts *apply_filter (const TextFilterBase &filter) const;

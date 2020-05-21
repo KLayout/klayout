@@ -29,8 +29,7 @@
 #include "dbRecursiveShapeIterator.h"
 #include "dbPolygonGenerators.h"
 #include "dbCellVariants.h"
-
-#include "gsiObject.h"
+#include "dbShapeCollection.h"
 
 #include <list>
 
@@ -216,7 +215,7 @@ private:
  *  Polygons inside the region may contain holes if the region is merged.
  */
 class DB_PUBLIC Region
-  : public gsi::ObjectBase
+  : public db::ShapeCollection
 {
 public:
   typedef db::Coord coord_type;
@@ -350,6 +349,14 @@ public:
    *  This method requires the DSS to be singular.
    */
   explicit Region (DeepShapeStore &dss);
+
+  /**
+   *  @brief Implementation of the ShapeCollection interface
+   */
+  ShapeCollectionDelegateBase *get_delegate () const
+  {
+    return mp_delegate;
+  }
 
   /**
    *  @brief Gets the underlying delegate object

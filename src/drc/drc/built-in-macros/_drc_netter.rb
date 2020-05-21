@@ -94,13 +94,13 @@ module DRC
 
       a.is_a?(DRC::DRCLayer) || raise("First argument of Netter#connect must be a layer")
       b.is_a?(DRC::DRCLayer) || raise("Second argument of Netter#connect must be a layer")
-      a.requires_region("Netter#connect (first argument)")
-      b.requires_region("Netter#connect (second argument)")
+      a.requires_texts_or_region("Netter#connect (first argument)")
+      b.requires_texts_or_region("Netter#connect (second argument)")
 
       register_layer(a.data)
       register_layer(b.data)
-      @l2n.connect(a.data)
-      @l2n.connect(b.data)
+      a.data.is_a?(RBA::Region) && @l2n.connect(a.data)
+      b.data.is_a?(RBA::Region) && @l2n.connect(b.data)
       @l2n.connect(a.data, b.data)
 
     end
@@ -117,10 +117,10 @@ module DRC
     def connect_global(l, name)
 
       l.is_a?(DRC::DRCLayer) || raise("Layer argument of Netter#connect_global must be a layer")
-      l.requires_region("Netter#connect_global (layer argument)")
+      l.requires_texts_or_region("Netter#connect_global (layer argument)")
 
       register_layer(l.data)
-      @l2n.connect(l.data)
+      l.data.is_a?(RBA::Region) && @l2n.connect(l.data)
       @l2n.connect_global(l.data, name)
 
     end
@@ -189,7 +189,7 @@ module DRC
       ls = {}
       layer_selection.keys.sort.each do |n|
         l = layer_selection[n]
-        l.requires_region("Netter#extract_devices (#{n} layer)")
+        l.requires_texts_or_region("Netter#extract_devices (#{n} layer)")
         register_layer(l.data)
         ls[n.to_s] = l.data
       end

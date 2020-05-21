@@ -35,7 +35,7 @@ namespace db {
  *  @brief A deep, polygon-set delegate
  */
 class DB_PUBLIC DeepRegion
-  : public AsIfFlatRegion
+  : public AsIfFlatRegion, public DeepShapeCollectionDelegateBase
 {
 public:
   typedef db::layer<db::Polygon, db::unstable_layer_tag> polygon_layer_type;
@@ -159,14 +159,9 @@ public:
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
 
-  const DeepLayer &deep_layer () const
+  virtual DeepShapeCollectionDelegateBase *deep ()
   {
-    return m_deep_layer;
-  }
-
-  DeepLayer &deep_layer ()
-  {
-    return m_deep_layer;
+    return this;
   }
 
 protected:
@@ -180,7 +175,6 @@ private:
 
   DeepRegion &operator= (const DeepRegion &other);
 
-  DeepLayer m_deep_layer;
   mutable DeepLayer m_merged_polygons;
   mutable bool m_merged_polygons_valid;
   bool m_is_merged;

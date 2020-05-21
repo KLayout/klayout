@@ -32,6 +32,7 @@
 #include "dbDeepEdges.h"
 #include "dbDeepEdgePairs.h"
 #include "dbDeepTexts.h"
+#include "dbShapeCollection.h"
 
 #include "tlTimer.h"
 
@@ -519,9 +520,9 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Texts &texts, const db::IC
   return dl;
 }
 
-std::pair<bool, DeepLayer> DeepShapeStore::layer_for_flat (const db::Region &region) const
+std::pair<bool, DeepLayer> DeepShapeStore::layer_for_flat (const ShapeCollection &coll) const
 {
-  return layer_for_flat (tl::id_of (region.delegate ()));
+  return layer_for_flat (tl::id_of (coll.get_delegate ()));
 }
 
 std::pair<bool, DeepLayer> DeepShapeStore::layer_for_flat (size_t region_id) const

@@ -45,6 +45,7 @@ class Region;
 class Edges;
 class EdgePairs;
 class Texts;
+class ShapeCollection;
 
 /**
  *  @brief Represents a shape collection from the deep shape store
@@ -372,12 +373,12 @@ public:
   DeepLayer create_from_flat (const db::Texts &texts, const db::ICplxTrans &trans = db::ICplxTrans ());
 
   /**
-   *  @brief Gets the layer for a given flat region.
+   *  @brief Gets the layer for a given flat collection (Region, Edges, Texts, EdgePairs)
    *
    *  If a layer has been created for a flat region with create_from_flat, it can be retrieved with this method.
    *  The first return value is true in this case.
    */
-  std::pair<bool, DeepLayer> layer_for_flat (const db::Region &region) const;
+  std::pair<bool, DeepLayer> layer_for_flat (const ShapeCollection &coll) const;
 
   /**
    *  @brief Same as layer_for_flat, but takes a region Id

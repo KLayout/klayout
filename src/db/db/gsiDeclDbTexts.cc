@@ -172,7 +172,9 @@ static db::Region pull_interacting (const db::Texts *r, const db::Region &other)
   return out;
 }
 
-Class<db::Texts> decl_Texts ("db", "Texts",
+extern Class<db::ShapeCollection> decl_dbShapeCollection;
+
+Class<db::Texts> decl_Texts (decl_dbShapeCollection, "db", "Texts",
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
     "\n"

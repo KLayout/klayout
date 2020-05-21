@@ -34,7 +34,7 @@ TextsDelegate::TextsDelegate ()
 }
 
 TextsDelegate::TextsDelegate (const TextsDelegate &other)
-  : tl::UniqueId ()
+  : db::ShapeCollectionDelegateBase ()
 {
   operator= (other);
 }

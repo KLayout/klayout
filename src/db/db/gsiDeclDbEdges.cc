@@ -412,7 +412,9 @@ static size_t id (const db::Edges *e)
   return tl::id_of (e->delegate ());
 }
 
-Class<db::Edges> dec_Edges ("db", "Edges",
+extern Class<db::ShapeCollection> decl_dbShapeCollection;
+
+Class<db::Edges> dec_Edges (decl_dbShapeCollection, "db", "Edges",
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
     "\n"

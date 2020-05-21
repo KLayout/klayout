@@ -27,8 +27,7 @@
 #include "dbTextsDelegate.h"
 #include "dbShape.h"
 #include "dbRecursiveShapeIterator.h"
-
-#include "gsiObject.h"
+#include "dbShapeCollection.h"
 
 #include <list>
 
@@ -228,7 +227,7 @@ public:
  *  edges representing the point of the text.
  */
 class DB_PUBLIC Texts
-  : public gsi::ObjectBase
+  : public db::ShapeCollection
 {
 public:
   typedef db::Coord coord_type;
@@ -336,6 +335,14 @@ public:
    *  @brief Constructor from a RecursiveShapeIterator providing a deep representation with transformation
    */
   explicit Texts (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans);
+
+  /**
+   *  @brief Implementation of the ShapeCollection interface
+   */
+  ShapeCollectionDelegateBase *get_delegate () const
+  {
+    return mp_delegate;
+  }
 
   /**
    *  @brief Gets the underlying delegate object

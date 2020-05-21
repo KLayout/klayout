@@ -102,14 +102,16 @@ private:
 //  DeepRegion implementation
 
 DeepRegion::DeepRegion (const RecursiveShapeIterator &si, DeepShapeStore &dss, double area_ratio, size_t max_vertex_count)
-  : AsIfFlatRegion (), m_deep_layer (dss.create_polygon_layer (si, area_ratio, max_vertex_count)), m_merged_polygons ()
+  : AsIfFlatRegion (), m_merged_polygons ()
 {
+  set_deep_layer (dss.create_polygon_layer (si, area_ratio, max_vertex_count));
   init ();
 }
 
 DeepRegion::DeepRegion (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool merged_semantics, double area_ratio, size_t max_vertex_count)
-  : AsIfFlatRegion (), m_deep_layer (dss.create_polygon_layer (si, area_ratio, max_vertex_count, trans)), m_merged_polygons ()
+  : AsIfFlatRegion (), m_merged_polygons ()
 {
+  set_deep_layer (dss.create_polygon_layer (si, area_ratio, max_vertex_count, trans));
   init ();
   set_merged_semantics (merged_semantics);
 }
@@ -117,7 +119,7 @@ DeepRegion::DeepRegion (const RecursiveShapeIterator &si, DeepShapeStore &dss, c
 DeepRegion::DeepRegion (const db::Region &other, DeepShapeStore &dss)
   : AsIfFlatRegion (), m_merged_polygons ()
 {
-  m_deep_layer = dss.create_from_flat (other, false);
+  set_deep_layer (dss.create_from_flat (other, false));
 
   init ();
   set_merged_semantics (other.merged_semantics ());
@@ -130,8 +132,9 @@ DeepRegion::DeepRegion ()
 }
 
 DeepRegion::DeepRegion (const DeepLayer &dl)
-  : AsIfFlatRegion (), m_deep_layer (dl)
+  : AsIfFlatRegion ()
 {
+  set_deep_layer (dl);
   init ();
 }
 
@@ -141,8 +144,7 @@ DeepRegion::~DeepRegion ()
 }
 
 DeepRegion::DeepRegion (const DeepRegion &other)
-  : AsIfFlatRegion (other),
-    m_deep_layer (other.m_deep_layer.copy ()),
+  : AsIfFlatRegion (other), DeepShapeCollectionDelegateBase (other),
     m_merged_polygons_valid (other.m_merged_polygons_valid),
     m_is_merged (other.m_is_merged)
 {
@@ -157,8 +159,8 @@ DeepRegion::operator= (const DeepRegion &other)
   if (this != &other) {
 
     AsIfFlatRegion::operator= (other);
+    DeepShapeCollectionDelegateBase::operator= (other);
 
-    m_deep_layer = other.m_deep_layer.copy ();
     m_merged_polygons_valid = other.m_merged_polygons_valid;
     m_is_merged = other.m_is_merged;
     if (m_merged_polygons_valid) {
@@ -212,7 +214,7 @@ DeepRegion::begin_merged () const
 std::pair<db::RecursiveShapeIterator, db::ICplxTrans>
 DeepRegion::begin_iter () const
 {
-  const db::Layout &layout = m_deep_layer.layout ();
+  const db::Layout &layout = deep_layer ().layout ();
   if (layout.cells () == 0) {
 
     return std::make_pair (db::RecursiveShapeIterator (), db::ICplxTrans ());
@@ -220,7 +222,7 @@ DeepRegion::begin_iter () const
   } else {
 
     const db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
-    db::RecursiveShapeIterator iter (m_deep_layer.layout (), top_cell, m_deep_layer.layer ());
+    db::RecursiveShapeIterator iter (deep_layer ().layout (), top_cell, deep_layer ().layer ());
     return std::make_pair (iter, db::ICplxTrans ());
 
   }
@@ -293,8 +295,8 @@ bool
 DeepRegion::equals (const Region &other) const
 {
   const DeepRegion *other_delegate = dynamic_cast<const DeepRegion *> (other.delegate ());
-  if (other_delegate && &other_delegate->m_deep_layer.layout () == &m_deep_layer.layout ()
-      && other_delegate->m_deep_layer.layer () == m_deep_layer.layer ()) {
+  if (other_delegate && &other_delegate->deep_layer ().layout () == &deep_layer ().layout ()
+      && other_delegate->deep_layer ().layer () == deep_layer ().layer ()) {
     return true;
   } else {
     return AsIfFlatRegion::equals (other);
@@ -305,8 +307,8 @@ bool
 DeepRegion::less (const Region &other) const
 {
   const DeepRegion *other_delegate = dynamic_cast<const DeepRegion *> (other.delegate ());
-  if (other_delegate && &other_delegate->m_deep_layer.layout () == &m_deep_layer.layout ()) {
-    return other_delegate->m_deep_layer.layer () < m_deep_layer.layer ();
+  if (other_delegate && &other_delegate->deep_layer ().layout () == &deep_layer ().layout ()) {
+    return other_delegate->deep_layer ().layer () < deep_layer ().layer ();
   } else {
     return AsIfFlatRegion::less (other);
   }
@@ -441,27 +443,27 @@ DeepRegion::ensure_merged_polygons_valid () const
     if (m_is_merged) {
 
       //  NOTE: this will reuse the deep layer reference
-      m_merged_polygons = m_deep_layer;
+      m_merged_polygons = deep_layer ();
 
     } else {
 
-      m_merged_polygons = m_deep_layer.derived ();
+      m_merged_polygons = deep_layer ().derived ();
 
       tl::SelfTimer timer (tl::verbosity () > base_verbosity (), "Ensure merged polygons");
 
-      db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
+      db::Layout &layout = const_cast<db::Layout &> (deep_layer ().layout ());
 
       db::hier_clusters<db::PolygonRef> hc;
       db::Connectivity conn;
-      conn.connect (m_deep_layer);
+      conn.connect (deep_layer ());
       hc.set_base_verbosity (base_verbosity () + 10);
-      hc.build (layout, m_deep_layer.initial_cell (), conn);
+      hc.build (layout, deep_layer ().initial_cell (), conn);
 
       //  collect the clusters and merge them into big polygons
       //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is
       //  hopefully more efficient that collecting everything and will lead to reuse of parts.
 
-      ClusterMerger cm (m_deep_layer.layer (), layout, hc, min_coherence (), report_progress (), progress_desc ());
+      ClusterMerger cm (deep_layer ().layer (), layout, hc, min_coherence (), report_progress (), progress_desc ());
       cm.set_base_verbosity (base_verbosity () + 10);
 
       //  TODO: iterate only over the called cells?
@@ -493,7 +495,7 @@ DeepRegion::set_is_merged (bool f)
 void
 DeepRegion::insert_into (db::Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
-  m_deep_layer.insert_into (layout, into_cell, into_layer);
+  deep_layer ().insert_into (layout, into_cell, into_layer);
 }
 
 RegionDelegate *
@@ -543,17 +545,17 @@ DeepRegion::not_with (const Region &other) const
 DeepLayer
 DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op) const
 {
-  DeepLayer dl_out (m_deep_layer.derived ());
+  DeepLayer dl_out (deep_layer ().derived ());
 
   db::BoolAndOrNotLocalOperation op (and_op);
 
-  db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), m_deep_layer.breakout_cells (), other->deep_layer ().breakout_cells ());
+  db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
-  proc.set_threads (m_deep_layer.store ()->threads ());
-  proc.set_area_ratio (m_deep_layer.store ()->max_area_ratio ());
-  proc.set_max_vertex_count (m_deep_layer.store ()->max_vertex_count ());
+  proc.set_threads (deep_layer ().store ()->threads ());
+  proc.set_area_ratio (deep_layer ().store ()->max_area_ratio ());
+  proc.set_max_vertex_count (deep_layer ().store ()->max_vertex_count ());
 
-  proc.run (&op, m_deep_layer.layer (), other->deep_layer ().layer (), dl_out.layer ());
+  proc.run (&op, deep_layer ().layer (), other->deep_layer ().layer (), dl_out.layer ());
 
   return dl_out;
 }
@@ -668,10 +670,10 @@ DeepRegion::size () const
 {
   size_t n = 0;
 
-  const db::Layout &layout = m_deep_layer.layout ();
+  const db::Layout &layout = deep_layer ().layout ();
   db::CellCounter cc (&layout);
   for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
-    n += cc.weight (*c) * layout.cell (*c).shapes (m_deep_layer.layer ()).size ();
+    n += cc.weight (*c) * layout.cell (*c).shapes (deep_layer ().layer ()).size ();
   }
 
   return n;
@@ -746,7 +748,7 @@ DeepRegion::perimeter (const db::Box &box) const
 Box
 DeepRegion::bbox () const
 {
-  return m_deep_layer.initial_cell ().bbox (m_deep_layer.layer ());
+  return deep_layer ().initial_cell ().bbox (deep_layer ().layer ());
 }
 
 std::string
@@ -1197,7 +1199,7 @@ DeepRegion::merged_in_place ()
   ensure_merged_polygons_valid ();
 
   //  NOTE: this makes both layers share the same resource
-  m_deep_layer = m_merged_polygons;
+  set_deep_layer (m_merged_polygons);
 
   set_is_merged (true);
   return this;
@@ -1232,21 +1234,21 @@ DeepRegion::merged (bool min_coherence, unsigned int min_wc) const
 {
   tl::SelfTimer timer (tl::verbosity () > base_verbosity (), "Ensure merged polygons");
 
-  db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
+  db::Layout &layout = const_cast<db::Layout &> (deep_layer ().layout ());
 
   db::hier_clusters<db::PolygonRef> hc;
   db::Connectivity conn;
-  conn.connect (m_deep_layer);
+  conn.connect (deep_layer ());
   hc.set_base_verbosity (base_verbosity () + 10);
-  hc.build (layout, m_deep_layer.initial_cell (), conn);
+  hc.build (layout, deep_layer ().initial_cell (), conn);
 
   //  collect the clusters and merge them into big polygons
   //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is
   //  hopefully more efficient that collecting everything and will lead to reuse of parts.
 
-  DeepLayer dl_out (m_deep_layer.derived ());
+  DeepLayer dl_out (deep_layer ().derived ());
 
-  ClusterMerger cm (m_deep_layer.layer (), layout, hc, min_coherence, report_progress (), progress_desc ());
+  ClusterMerger cm (deep_layer ().layer (), layout, hc, min_coherence, report_progress (), progress_desc ());
   cm.set_base_verbosity (base_verbosity () + 10);
 
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
@@ -1529,7 +1531,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
                                                                           const_cast<db::Cell *> (&polygons.initial_cell ()),
                                                                           other_deep ? &other_deep->deep_layer ().layout () : const_cast<db::Layout *> (&polygons.layout ()),
                                                                           other_deep ? &other_deep->deep_layer ().initial_cell () : const_cast<db::Cell *> (&polygons.initial_cell ()),
-                                                                          m_deep_layer.breakout_cells (),
+                                                                          deep_layer ().breakout_cells (),
                                                                           other_deep ? other_deep->deep_layer ().breakout_cells () : 0);
 
   proc.set_base_verbosity (base_verbosity ());

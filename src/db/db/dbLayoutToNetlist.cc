@@ -24,6 +24,7 @@
 #include "dbCommon.h"
 #include "dbLayoutToNetlist.h"
 #include "dbDeepRegion.h"
+#include "dbDeepTexts.h"
 #include "dbShapeRepository.h"
 #include "dbCellMapping.h"
 #include "dbLayoutToNetlistWriter.h"
@@ -172,17 +173,17 @@ db::Region *LayoutToNetlist::make_layer (unsigned int layer_index, const std::st
   return region.release ();
 }
 
-db::Region *LayoutToNetlist::make_text_layer (unsigned int layer_index, const std::string &n)
+db::Texts *LayoutToNetlist::make_text_layer (unsigned int layer_index, const std::string &n)
 {
   db::RecursiveShapeIterator si (m_iter);
   si.set_layer (layer_index);
   si.shape_flags (db::ShapeIterator::Texts);
 
-  std::auto_ptr <db::Region> region (new db::Region (si, dss ()));
+  std::auto_ptr <db::Texts> texts (new db::Texts (si, dss ()));
   if (! n.empty ()) {
-    register_layer (*region, n);
+    register_layer (*texts, n);
   }
-  return region.release ();
+  return texts.release ();
 }
 
 db::Region *LayoutToNetlist::make_polygon_layer (unsigned int layer_index, const std::string &n)
@@ -236,7 +237,7 @@ void LayoutToNetlist::ensure_netlist ()
   }
 }
 
-void LayoutToNetlist::extract_devices (db::NetlistDeviceExtractor &extractor, const std::map<std::string, db::Region *> &layers)
+void LayoutToNetlist::extract_devices (db::NetlistDeviceExtractor &extractor, const std::map<std::string, db::ShapeCollection *> &layers)
 {
   if (m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
@@ -262,7 +263,7 @@ void LayoutToNetlist::connect (const db::Region &l)
   m_conn.connect (dl.layer ());
 }
 
-void LayoutToNetlist::connect (const db::Region &a, const db::Region &b)
+void LayoutToNetlist::connect_impl (const db::ShapeCollection &a, const db::ShapeCollection &b)
 {
   if (m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
@@ -283,7 +284,7 @@ void LayoutToNetlist::connect (const db::Region &a, const db::Region &b)
   m_conn.connect (dla.layer (), dlb.layer ());
 }
 
-size_t LayoutToNetlist::connect_global (const db::Region &l, const std::string &gn)
+void LayoutToNetlist::connect_global_impl (const db::ShapeCollection &l, const std::string &gn)
 {
   if (m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
@@ -296,7 +297,7 @@ size_t LayoutToNetlist::connect_global (const db::Region &l, const std::string &
   db::DeepLayer dl = deep_layer_of (l);
   m_dlrefs.insert (dl);
 
-  return m_conn.connect_global (dl.layer (), gn);
+  m_conn.connect_global (dl.layer (), gn);
 }
 
 const std::string &LayoutToNetlist::global_net_name (size_t id) const
@@ -393,42 +394,6 @@ void LayoutToNetlist::ensure_layout () const
   }
 }
 
-void LayoutToNetlist::register_layer (const db::Region &region, const std::string &n)
-{
-  if (m_named_regions.find (n) != m_named_regions.end ()) {
-    throw tl::Exception (tl::to_string (tr ("Layer name is already used: ")) + n);
-  }
-
-  db::DeepLayer dl;
-
-  if (m_is_flat) {
-
-    dl = dss ().create_from_flat (region, true);
-
-  } else {
-
-    db::DeepRegion *delegate = dynamic_cast<db::DeepRegion *> (region.delegate());
-    if (! delegate) {
-
-      dl = dss ().create_from_flat (region, true);
-
-    } else {
-
-      if (is_persisted (region)) {
-        std::string prev_name = name (region);
-        m_named_regions.erase (prev_name);
-      }
-
-      dl = delegate->deep_layer ();
-
-    }
-
-  }
-
-  m_named_regions [n] = dl;
-  m_name_of_layer [dl.layer ()] = n;
-}
-
 std::string LayoutToNetlist::make_new_name (const std::string &stem)
 {
   int m = std::numeric_limits<int>::max () / 2 + 1;
@@ -452,16 +417,6 @@ std::string LayoutToNetlist::make_new_name (const std::string &stem)
   return name;
 }
 
-std::string LayoutToNetlist::name (const db::Region &region) const
-{
-  std::map<unsigned int, std::string>::const_iterator n = m_name_of_layer.find (layer_of (region));
-  if (n != m_name_of_layer.end ()) {
-    return n->second;
-  } else {
-    return std::string ();
-  }
-}
-
 std::string LayoutToNetlist::name (unsigned int l) const
 {
   std::map<unsigned int, std::string>::const_iterator n = m_name_of_layer.find (l);
@@ -470,11 +425,6 @@ std::string LayoutToNetlist::name (unsigned int l) const
   } else {
     return std::string ();
   }
-}
-
-bool LayoutToNetlist::is_persisted (const db::Region &region) const
-{
-  return m_name_of_layer.find (layer_of (region)) != m_name_of_layer.end ();
 }
 
 db::Region *LayoutToNetlist::layer_by_name (const std::string &name)
@@ -497,12 +447,71 @@ db::Region *LayoutToNetlist::layer_by_index (unsigned int index)
   }
 }
 
-db::DeepLayer LayoutToNetlist::deep_layer_of (const db::Region &region) const
+static db::DeepLayer dss_create_from_flat (db::DeepShapeStore &dss, const db::ShapeCollection &coll)
 {
-  const db::DeepRegion *dr = dynamic_cast<const db::DeepRegion *> (region.delegate ());
+  const db::Region *region = dynamic_cast<const db::Region *> (&coll);
+  const db::Texts *texts = dynamic_cast<const db::Texts *> (&coll);
+  if (region) {
+    return dss.create_from_flat (*region, true);
+  } else if (texts) {
+    return dss.create_from_flat (*texts);
+  } else {
+    tl_assert (false);
+  }
+}
+
+std::string LayoutToNetlist::name (const ShapeCollection &coll) const
+{
+  std::map<unsigned int, std::string>::const_iterator n = m_name_of_layer.find (layer_of (coll));
+  if (n != m_name_of_layer.end ()) {
+    return n->second;
+  } else {
+    return std::string ();
+  }
+}
+
+void LayoutToNetlist::register_layer (const ShapeCollection &collection, const std::string &n)
+{
+  if (m_named_regions.find (n) != m_named_regions.end ()) {
+    throw tl::Exception (tl::to_string (tr ("Layer name is already used: ")) + n);
+  }
+
+  db::DeepLayer dl;
+
+  if (m_is_flat) {
+
+    dl = dss_create_from_flat (dss (), collection);
+
+  } else {
+
+    db::DeepShapeCollectionDelegateBase *delegate = collection.get_delegate ()->deep ();
+    if (! delegate) {
+
+      dl = dss_create_from_flat (dss (), collection);
+
+    } else {
+
+      if (is_persisted (collection)) {
+        std::string prev_name = name (collection);
+        m_named_regions.erase (prev_name);
+      }
+
+      dl = delegate->deep_layer ();
+
+    }
+
+  }
+
+  m_named_regions [n] = dl;
+  m_name_of_layer [dl.layer ()] = n;
+}
+
+db::DeepLayer LayoutToNetlist::deep_layer_of (const db::ShapeCollection &coll) const
+{
+  const db::DeepShapeCollectionDelegateBase *dr = coll.get_delegate ()->deep ();
   if (! dr) {
 
-    std::pair<bool, db::DeepLayer> lff = dss ().layer_for_flat (region);
+    std::pair<bool, db::DeepLayer> lff = dss ().layer_for_flat (coll);
     if (lff.first) {
       return lff.second;
     } else {
@@ -512,11 +521,6 @@ db::DeepLayer LayoutToNetlist::deep_layer_of (const db::Region &region) const
   } else {
     return dr->deep_layer ();
   }
-}
-
-unsigned int LayoutToNetlist::layer_of (const db::Region &region) const
-{
-  return deep_layer_of (region).layer ();
 }
 
 db::CellMapping LayoutToNetlist::make_cell_mapping_into (db::Layout &layout, db::Cell &cell, const std::vector<const db::Net *> *nets, bool with_device_cells)

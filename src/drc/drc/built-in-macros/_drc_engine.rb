@@ -1448,7 +1448,7 @@ CODE
         tp.input("self", obj)
         tp.threads = (@tt || 1)
         args.each_with_index do |a,i|
-          if a.is_a?(RBA::Edges) || a.is_a?(RBA::Region)
+          if a.is_a?(RBA::Edges) || a.is_a?(RBA::Region) || a.is_a?(RBA::EdgePairs) || a.is_a?(RBA::Texts)
             tp.input("a#{i}", a)
           else
             tp.var("a#{i}", a)

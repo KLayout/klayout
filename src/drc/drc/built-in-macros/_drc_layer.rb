@@ -1807,12 +1807,19 @@ CODE
       # In tiled mode, there are no modifying versions. Emulate using the non-modifying one.
       eval <<"CODE"
       def #{f}(other)
-        if :#{fi} != :interacting && :#{f} != :not_interacting 
+        if :#{fi} != :interacting && :#{fi} != :not_interacting 
+          requires_edges_or_region("#{f}")
           requires_same_type(other, "#{f}")
         else
-          other.requires_edges_or_region("#{f}")
+          requires_edges_texts_or_region("#{f}")
+          if @data.is_a?(RBA::Text)
+            other.requires_region("#{f}")
+          elsif @data.is_a?(RBA::Region)
+            other.requires_edges_texts_or_region("#{f}")
+          else
+            other.requires_edges_or_region("#{f}")
+          end
         end
-        requires_edges_or_region("#{f}")
         if @engine.is_tiled?
           @data = @engine._tcmd(@data, 0, @data.class, :#{fi}, other.data)
           DRCLayer::new(@engine, @data)

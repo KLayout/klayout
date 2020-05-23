@@ -3,19 +3,20 @@
  * Template File:
  *  macbuild/Resources/template-KLayoutDMG.applescript
  *
- * On the runtime, "makeDMG4mac.py" will generate the actual AppleScrip File:
+ * On the runtime, "makeDMG4mac.py" will generate the actual AppleScrip File
  *    "macbuild/Resources/KLayoutDMG.applescript"
  * from this template. Hence, the generated actual scrip file does not need
  * to be version controlled by Git.
  *
  * Description:
- *  A template AppleScript to make a fancy DMG installer of KLayout
- *  (http://www.klayout.de/index.php) bundles.
+ *  This is a template AppleScript to make a fancy DMG installer of KLayout
+ *  (http://www.klayout.de/index.php) application bundles.
  *  "makeDMG4mac.py" will read this template and generate the actual AppleScript to execute.
- *  Values to be found and replaced by "makeDMG4mac.py" are marked by ${KEYWORD}.
+ *  Those values to be found and replaced by "makeDMG4mac.py" are marked by ${KEYWORD} in this
+ *  template file.
  *
- *  The background image was designed using Logoist3 (http://www.syniumsoftware.com/en/logoist)
- *  and exported to a PNG file of 1000 x 500 pix size.
+ *  The background PNG image file (1000 x 500 pix size) was designed by using Logoist3
+ *  (http://www.syniumsoftware.com/en/logoist).
  *-----------------------------------------------------------------------------------------------
  *  This is a derivative work of Ref. 2) below. Refer to "macbuild/LICENSE" file.
  *  Ref.
@@ -65,14 +66,16 @@ on run (volumeName) -- most likely, the volume name is "KLayout"
                 set arrangement to not arranged
             end tell
 
-            -- [6] Set the background PNG image (1000 x 700 pix) file name stored
+            -- [6] Set the background PNG image file name stored
             set background picture of opts to file ".background:${BACKGROUND_PNG_FILE}"
 
             -- [7] Set positions of each icon
             --     ITEM_1 = klayout.app      {860, 165}
             --     ITEM_2 = Applications     {860, 345}
+            --     ITEM_3 = AUX. holder      {700, 450}
             set position of item "${ITEM_1}" to {${X1}, ${Y1}}
             set position of item "${ITEM_2}" to {${X2}, ${Y2}}
+            ${ITEM_3}
 
             -- [8] Update the contents of container
             close

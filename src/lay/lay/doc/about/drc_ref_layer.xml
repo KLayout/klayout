@@ -752,7 +752,7 @@ is <a href="#select_interacting">select_interacting</a>.
 </p><p>
 This method is available for polygon, text and edge layers. Edges can be selected
 with respect to other edges or polygons. Texts can be selected with respect to 
-polygons.
+polygons. Polygons can be selected with respect to edges, texts and other polygons.
 </p><p>
 The following image shows the effect of the "interacting" method (input1: red, input2: blue):
 </p><p>
@@ -1124,8 +1124,9 @@ otherwise individual shapes are selected.
 It returns a new layer containing the selected shapes. A version which modifies self
 is <a href="#select_not_interacting">select_not_interacting</a>.
 </p><p>
-This method is available for polygon and edge layers. Edges can be selected
-with respect to other edges or polygons.
+This method is available for polygon, text and edge layers. Edges can be selected
+with respect to other edges or polygons. Texts can be selected with respect to 
+polygons. Polygons can be selected with respect to edges, texts and other polygons.
 </p><p>
 The following image shows the effect of the "not_interacting" method (input1: red, input2: blue):
 </p><p>
@@ -1440,8 +1441,7 @@ provides a way to pull shapes from other to the hierarchy to self.
 </p><p>
 This method will neither modify self nor other.
 </p><p>
-This method is available for polygon layers. Other can be an edge or polygon layer. 
-Edges or polygons can be selected with respect to polygons of self.
+This method is available for polygon, edge and text layers, similar to interacting.
 </p>
 <a name="pull_overlapping"/><h2>"pull_overlapping" - Selects shapes or regions of other which overlap shapes from the this region</h2>
 <keyword name="pull_overlapping"/>
@@ -1655,8 +1655,9 @@ otherwise individual shapes are selected.
 It modifies self to contain the selected shapes. A version which does not modify self
 is <a href="#interacting">interacting</a>.
 </p><p>
-This method is available for polygon and edge layers. Edges can be selected
-with respect to other edges or polygons.
+This method is available for polygon, text and edge layers. Edges can be selected
+with respect to other edges or polygons. Texts can be selected with respect to 
+polygons. Polygons can be selected with respect to edges, texts and other polygons.
 </p>
 <a name="select_not_inside"/><h2>"select_not_inside" - Selects shapes or regions of self which are not inside the other region</h2>
 <keyword name="select_not_inside"/>
@@ -1688,8 +1689,9 @@ otherwise individual shapes are selected.
 It modifies self to contain the selected shapes. A version which does not modify self
 is <a href="#not_interacting">not_interacting</a>.
 </p><p>
-This method is available for polygon and edge layers. Edges can be selected
-with respect to other edges or polygons.
+This method is available for polygon, text and edge layers. Edges can be selected
+with respect to other edges or polygons. Texts can be selected with respect to 
+polygons. Polygons can be selected with respect to edges, texts and other polygons.
 </p>
 <a name="select_not_outside"/><h2>"select_not_outside" - Selects shapes or regions of self which are not outside the other region</h2>
 <keyword name="select_not_outside"/>

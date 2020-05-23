@@ -1619,7 +1619,7 @@ CODE
     #
     # This method is available for polygon, text and edge layers. Edges can be selected
     # with respect to other edges or polygons. Texts can be selected with respect to 
-    # polygons.
+    # polygons. Polygons can be selected with respect to edges, texts and other polygons.
     #
     # The following image shows the effect of the "interacting" method (input1: red, input2: blue):
     #
@@ -1639,8 +1639,9 @@ CODE
     # It returns a new layer containing the selected shapes. A version which modifies self
     # is \select_not_interacting.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # This method is available for polygon, text and edge layers. Edges can be selected
+    # with respect to other edges or polygons. Texts can be selected with respect to 
+    # polygons. Polygons can be selected with respect to edges, texts and other polygons.
     #
     # The following image shows the effect of the "not_interacting" method (input1: red, input2: blue):
     #
@@ -1660,8 +1661,9 @@ CODE
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \interacting.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # This method is available for polygon, text and edge layers. Edges can be selected
+    # with respect to other edges or polygons. Texts can be selected with respect to 
+    # polygons. Polygons can be selected with respect to edges, texts and other polygons.
     
     # %DRC%
     # @name select_not_interacting
@@ -1673,8 +1675,9 @@ CODE
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \not_interacting.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # This method is available for polygon, text and edge layers. Edges can be selected
+    # with respect to other edges or polygons. Texts can be selected with respect to 
+    # polygons. Polygons can be selected with respect to edges, texts and other polygons.
     
     # %DRC%
     # @name intersections
@@ -1732,8 +1735,7 @@ CODE
     #
     # This method will neither modify self nor other.
     #
-    # This method is available for polygon layers. Other can be an edge or polygon layer. 
-    # Edges or polygons can be selected with respect to polygons of self.
+    # This method is available for polygon, edge and text layers, similar to interacting.
     
     # %DRC%
     # @name pull_overlapping

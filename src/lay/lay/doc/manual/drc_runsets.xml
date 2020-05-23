@@ -549,6 +549,8 @@ output(w, "width violations")</pre>
     <li>Boolean NOT with a polygon layer: will select those texts
         which are outside of any polygon.
         <a href="/about/drc_ref_layer.xml#not_interact">not_interact</a> is a synonym for this operation.</li>
+    <li>As second layer for region interact: this way, polygons
+        can be selected which are tagged with certain texts.</li>
     <li>Text filtering by string: texts can be filtered either
         by matching against a fixed text or a glob pattern.
         The methods provided for this purpose are: 

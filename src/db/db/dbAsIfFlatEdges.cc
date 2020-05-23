@@ -180,7 +180,7 @@ AsIfFlatEdges::pull_generic (const Edges &edges) const
 {
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
 
-  AddressableEdgeDelivery e (begin (), true);
+  AddressableEdgeDelivery e (begin (), has_valid_edges ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert (e.operator-> (), 1);
@@ -507,7 +507,7 @@ AsIfFlatEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Co
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve (size () + (other ? other->size () : 0));
 
-  AddressableEdgeDelivery e (begin_merged (), has_valid_edges ());
+  AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
 
   size_t n = 0;
   for ( ; ! e.at_end (); ++e) {

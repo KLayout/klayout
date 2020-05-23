@@ -342,7 +342,7 @@ AsIfFlatTexts::pull_generic (const Region &other) const
 
   db::box_scanner2<db::Text, size_t, db::Polygon, size_t> scanner (report_progress (), progress_desc ());
 
-  AddressableTextDelivery e (begin (), true);
+  AddressableTextDelivery e (begin (), has_valid_texts ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert1 (e.operator-> (), 0);

@@ -496,7 +496,7 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
   std::auto_ptr<FlatEdges> output (new FlatEdges (false));
   region_to_edge_interaction_filter<Shapes, db::Edge> filter (output->raw_edges (), false);
 
-  AddressablePolygonDelivery p (begin (), has_valid_merged_polygons ());
+  AddressablePolygonDelivery p (begin (), has_valid_polygons ());
 
   for ( ; ! p.at_end (); ++p) {
     scanner.insert1 (p.operator-> (), 0);
@@ -529,7 +529,7 @@ AsIfFlatRegion::pull_generic (const Texts &other) const
   std::auto_ptr<FlatTexts> output (new FlatTexts (false));
   region_to_text_interaction_filter<Shapes, db::Text, db::Text> filter (output->raw_texts (), false);
 
-  AddressablePolygonDelivery p (begin (), has_valid_merged_polygons ());
+  AddressablePolygonDelivery p (begin (), has_valid_polygons ());
 
   for ( ; ! p.at_end (); ++p) {
     scanner.insert1 (p.operator-> (), 0);

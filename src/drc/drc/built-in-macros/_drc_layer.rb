@@ -593,9 +593,11 @@ CODE
     # selected text. By using the "as_dots" option, degenerated point-like edges will be
     # produced.
     #
-    # This method can also be applied to true text layers obtained with \labels.
+    # The preferred method however is to use true text layers created with \labels.
     # In this case, without specifying "as_dots" or "as_boxes" retains the text
-    # objects as such. Only text filtering is applied.
+    # objects as such a text filtering is applied. In contrast to this, layers generated
+    # with \input cannot maintain the text nature of the selected objects and 
+    # produce dots or small polygon boxes in the \texts method.
     #
     # Texts can be selected either by exact match string or a pattern match with a 
     # glob-style pattern. By default, glob-style pattern are used. 
@@ -612,14 +614,22 @@ CODE
     #
     # @code
     #   # Selects all texts
-    #   t = input(1, 0).texts
+    #   t = labels(1, 0).texts
     #   # Selects all texts beginning with an "A"
-    #   t = input(1, 0).texts("A*")
-    #   t = input(1, 0).texts(pattern("A*"))
-    #   # Selects all texts whose string is "A*"
-    #   t = input(1, 0).texts(text("A*"))
+    #   t = labels(1, 0).texts("A*")
+    #   t = labels(1, 0).texts(pattern("A*"))
+    #   # Selects all texts whose string is "ABC"
+    #   t = labels(1, 0).texts(text("ABC"))
     # @/code
-    # 
+    #
+    # The effect of the operation is shown in these examples:
+    #  
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_texts1.png) @/td
+    #     @td @img(/images/drc_texts2.png) @/td
+    #   @/tr
+    # @/table
      
     def texts(*args)
       requires_texts_or_region("texts")
@@ -1168,13 +1178,23 @@ CODE
     # borders of the polygons of the second operand.
     #
     # The following images show the effect of the "and" method
-    # on polygons and edges (layer1: red, layer2: blue):
+    # on polygons and edges (input1: red, input2: blue):
     #
     # @table
     #   @tr 
     #     @td @img(/images/drc_and1.png) @/td
     #     @td @img(/images/drc_and2.png) @/td
     #     @td @img(/images/drc_and3.png) @/td
+    #   @/tr
+    # @/table
+    #
+    # The AND operation can be applied between a text and a polygon
+    # layer. In this case, the texts inside or at the border of the 
+    # polygons will be written to the output (labels: red, input2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_textpoly1.png) @/td
     #   @/tr
     # @/table
     
@@ -1195,13 +1215,23 @@ CODE
     # of the second operand.
     #
     # The following images show the effect of the "not" method
-    # on polygons and edges (layer1: red, layer2: blue):
+    # on polygons and edges (input1: red, input2: blue):
     #
     # @table
     #   @tr 
     #     @td @img(/images/drc_not1.png) @/td
     #     @td @img(/images/drc_not2.png) @/td
     #     @td @img(/images/drc_not3.png) @/td
+    #   @/tr
+    # @/table
+    #
+    # The NOT operation can be applied between a text and a polygon
+    # layer. In this case, the texts outside the polygons will be 
+    # written to the output (labels: red, input2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_textpoly2.png) @/td
     #   @/tr
     # @/table
     
@@ -1219,7 +1249,7 @@ CODE
     # This method is available for polygon and edge layers.
     #
     # The following images show the effect of the "xor" method
-    # on polygons and edges (layer1: red, layer2: blue):
+    # on polygons and edges (input1: red, input2: blue):
     #
     # @table
     #   @tr 
@@ -1242,7 +1272,7 @@ CODE
     # This method is available for polygon and edge layers.
     #
     # The following images show the effect of the "or" method
-    # on polygons and edges (layer1: red, layer2: blue):
+    # on polygons and edges (input1: red, input2: blue):
     #
     # @table
     #   @tr 
@@ -1265,7 +1295,7 @@ CODE
     # This method is available for polygon, edge and edge pair layers.
     #
     # The following images show the effect of the "join" method
-    # on polygons and edges (layer1: red, layer2: blue):
+    # on polygons and edges (input1: red, input2: blue):
     #
     # @table
     #   @tr 
@@ -1587,8 +1617,9 @@ CODE
     # It returns a new layer containing the selected shapes. A version which modifies self
     # is \select_interacting.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # This method is available for polygon, text and edge layers. Edges can be selected
+    # with respect to other edges or polygons. Texts can be selected with respect to 
+    # polygons.
     #
     # The following image shows the effect of the "interacting" method (input1: red, input2: blue):
     #
@@ -2502,7 +2533,7 @@ CODE
     # Distance values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
     #
-    # The following image shows the effect of the separation check (layer1: red, layer2: blue):
+    # The following image shows the effect of the separation check (input1: red, input2: blue):
     # 
     # @table
     #   @tr 
@@ -2537,7 +2568,7 @@ CODE
     # Distance values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
     #
-    # The following images show the effect of the overlap check (layer1: red, layer2: blue):
+    # The following images show the effect of the overlap check (input1: red, input2: blue):
     # 
     # @table
     #   @tr 

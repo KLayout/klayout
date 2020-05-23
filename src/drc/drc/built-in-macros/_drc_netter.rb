@@ -76,12 +76,18 @@ module DRC
     # @name connect
     # @brief Specifies a connection between two layers
     # @synopsis connect(a, b)
-    # a and b must be polygon layers. After calling this function, the
+    # a and b must be polygon or text layers. After calling this function, the
     # Netter regards all overlapping or touching shapes on these layers
     # to form an electrical connection between the materials formed by
     # these layers. This also implies intra-layer connections: shapes
     # on these layers touching or overlapping other shapes on these
     # layers will form bigger, electrically connected areas.
+    #
+    # Texts will be used to assign net names to the nets. The preferred
+    # method is to use \labels to create a text layer from a design 
+    # layer. When using \input, text labels are carried implicitly
+    # with the polygons but at the cost of small dummy shapes (2x2 DBU
+    # marker polygons) and limited functionality.
     #
     # Multiple connect calls must be made to form larger connectivity
     # stacks across multiple layers. Such stacks may include forks and
@@ -112,7 +118,7 @@ module DRC
     # Connects the shapes from the given layer l to a global net with the given name.
     # Global nets are common to all cells. Global nets automatically connect to parent
     # cells throughs implied pins. An example is the substrate (bulk) net which connects
-    # to shapes belonging to tie-down diodes.
+    # to shapes belonging to tie-down diodes. "l" can be a polygon or text layer.
     
     def connect_global(l, name)
 

@@ -545,20 +545,20 @@ output(w, "width violations")</pre>
   <ul>
     <li>Boolean AND with a polygon layer: will select those texts
         which are inside or at the border of a polygon.
-        <a href="/about/drc_ref_global.xml#interact">interact</a> is a synonym for this operation.</li>
+        <a href="/about/drc_ref_layer.xml#interact">interact</a> is a synonym for this operation.</li>
     <li>Boolean NOT with a polygon layer: will select those texts
         which are outside of any polygon.
-        <a href="/about/drc_ref_global.xml#not_interact">not_interact</a> is a synonym for this operation.</li>
+        <a href="/about/drc_ref_layer.xml#not_interact">not_interact</a> is a synonym for this operation.</li>
     <li>Text filtering by string: texts can be filtered either
         by matching against a fixed text or a glob pattern.
         The methods provided for this purpose are: 
-        <a href="/about/drc_ref_global.xml#texts">texts</a> and
-        <a href="/about/drc_ref_global.xml#texts_not">texts_not</a></li>
-    <li><a href="/about/drc_ref_global.xml#flatten">flatten</a>
+        <a href="/about/drc_ref_layer.xml#texts">texts</a> and
+        <a href="/about/drc_ref_layer.xml#texts_not">texts_not</a></li>
+    <li><a href="/about/drc_ref_layer.xml#flatten">flatten</a>
         will flatten the hierarchy of a text layer.</li>
     <li>Polygon or edge generation around the text's location:
-        <a href="/about/drc_ref_global.xml#polygons">polygons</a> and
-        <a href="/about/drc_ref_global.xml#edges">edges</a></li>
+        <a href="/about/drc_ref_layer.xml#polygons">polygons</a> and
+        <a href="/about/drc_ref_layer.xml#edges">edges</a></li>
   </ul>
 
   <h2>Edge pairs and edge pair collections</h2>

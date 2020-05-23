@@ -153,12 +153,18 @@ See <a href="#connect">connect</a> for more details.
 <li><tt>connect(a, b)</tt></li>
 </ul>
 <p>
-a and b must be polygon layers. After calling this function, the
+a and b must be polygon or text layers. After calling this function, the
 Netter regards all overlapping or touching shapes on these layers
 to form an electrical connection between the materials formed by
 these layers. This also implies intra-layer connections: shapes
 on these layers touching or overlapping other shapes on these
 layers will form bigger, electrically connected areas.
+</p><p>
+Texts will be used to assign net names to the nets. The preferred
+method is to use <a href="#labels">labels</a> to create a text layer from a design 
+layer. When using <a href="#input">input</a>, text labels are carried implicitly
+with the polygons but at the cost of small dummy shapes (2x2 DBU
+marker polygons) and limited functionality.
 </p><p>
 Multiple connect calls must be made to form larger connectivity
 stacks across multiple layers. Such stacks may include forks and
@@ -177,7 +183,7 @@ can be cleared with <a href="#clear_connections">clear_connections</a>.
 Connects the shapes from the given layer l to a global net with the given name.
 Global nets are common to all cells. Global nets automatically connect to parent
 cells throughs implied pins. An example is the substrate (bulk) net which connects
-to shapes belonging to tie-down diodes.
+to shapes belonging to tie-down diodes. "l" can be a polygon or text layer.
 </p>
 <a name="connect_implicit"/><h2>"connect_implicit" - Specifies a search pattern for labels which create implicit net connections</h2>
 <keyword name="connect_implicit"/>

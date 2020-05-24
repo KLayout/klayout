@@ -124,6 +124,7 @@ public:
 private:
   db::Netlist *mp_netlist;
   db::Circuit *mp_circuit;
+  db::Circuit *mp_anonymous_top_circuit;
   std::auto_ptr<tl::TextInputStream> mp_stream;
   tl::weak_ptr<NetlistSpiceReaderDelegate> mp_delegate;
   std::vector<std::pair<tl::InputStream *, tl::TextInputStream *> > m_streams;
@@ -157,6 +158,7 @@ private:
   db::Net *make_net (const std::string &name);
   void ensure_circuit ();
   bool subcircuit_captured (const std::string &nc_name);
+  void build_global_nets ();
 };
 
 }

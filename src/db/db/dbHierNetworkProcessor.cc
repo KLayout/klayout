@@ -791,10 +791,10 @@ namespace
 
 template <class T, class BoxTree>
 struct cluster_building_receiver
-  : public db::box_scanner_receiver<T, std::pair<unsigned int, unsigned int> >
+  : public db::box_scanner_receiver<T, std::pair<unsigned int, size_t> >
 {
   typedef typename local_cluster<T>::id_type id_type;
-  typedef std::pair<const T *, std::pair<unsigned int, unsigned int> > shape_value;
+  typedef std::pair<const T *, std::pair<unsigned int, size_t> > shape_value;
   typedef std::vector<shape_value> shape_vector;
   typedef std::set<size_t> global_nets;
   typedef std::pair<shape_vector, global_nets> cluster_value;
@@ -822,7 +822,7 @@ struct cluster_building_receiver
     }
   }
 
-  void add (const T *s1, std::pair<unsigned int, unsigned int> p1, const T *s2, std::pair<unsigned int, unsigned int> p2)
+  void add (const T *s1, std::pair<unsigned int, size_t> p1, const T *s2, std::pair<unsigned int, size_t> p2)
   {
     if (! mp_conn->interacts (*s1, p1.first, *s2, p2.first)) {
       return;
@@ -868,7 +868,7 @@ struct cluster_building_receiver
     }
   }
 
-  void finish (const T *s, std::pair<unsigned int, unsigned> p)
+  void finish (const T *s, std::pair<unsigned int, size_t> p)
   {
     //  if the shape has not been handled yet, insert a single cluster with only this shape
     typename std::map<const T *, typename std::list<cluster_value>::iterator>::iterator ic = m_shape_to_clusters.find (s);

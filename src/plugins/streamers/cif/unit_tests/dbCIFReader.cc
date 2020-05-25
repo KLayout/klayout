@@ -194,3 +194,9 @@ TEST(rot_boxes)
 {
   run_test (_this, tl::testsrc (), "issue_305.cif", "issue_305_au.gds");
 }
+
+//  Issue #568
+TEST(rot_instances)
+{
+  run_test (_this, tl::testsrc (), "issue_568.cif", "issue_568_au.gds");
+}

@@ -184,7 +184,7 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
           } 
 
           //  TODO: that can be done smarter ...
-          while (fabs (xa - floor (0.5 + xa)) > 1e-3 || fabs (ya - floor (0.5 + ya)) > 1e-3) {
+          for (int n = 0; n < 20 && (fabs (xa - floor (0.5 + xa)) > 1e-3 || fabs (ya - floor (0.5 + ya)) > 1e-3); ++n) {
             xa *= 2.0;
             ya *= 2.0;
           }

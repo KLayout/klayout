@@ -182,7 +182,13 @@ TEST(20_double_height2_inv)
   run_test (_this, "double_height2", "double_height2_inv.gds");
 }
 
-TEST(21_split_gate)
+//  testing cell specific net joining for VSS of the double-height inverter standard cell
+TEST(21_double_height2_inv_texts)
+{
+  run_test (_this, "double_height2_texts", "double_height2_inv.gds");
+}
+
+TEST(22_split_gate)
 {
   run_test (_this, "nand2_split_gate", "nand2_split_gate.oas");
 }

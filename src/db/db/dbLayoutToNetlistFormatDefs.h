@@ -119,6 +119,7 @@ namespace db
  *                                    "*" for <x> or <y> means take previous
  *    rect(<layer> [coord] [coord]) - defines a rectangle [short key: R]
  *                                    coordinates are bottom/left and top/right
+ *    text(<layer> [text] [coord])  - defines a rectangle [short key: J]
  *
  *  [coord]
  *
@@ -177,6 +178,7 @@ namespace l2n_std_format
     static std::string subcircuit_key;
     static std::string polygon_key;
     static std::string rect_key;
+    static std::string text_key;
     static std::string terminal_key;
     static std::string abstract_key;
     static std::string param_key;
@@ -209,6 +211,7 @@ namespace l2n_std_format
     static std::string subcircuit_key;
     static std::string polygon_key;
     static std::string rect_key;
+    static std::string text_key;
     static std::string terminal_key;
     static std::string abstract_key;
     static std::string param_key;

@@ -176,6 +176,15 @@ public:
     return m_text_repository;
   }
 
+  /**
+   *  @brief Return the repository by tag
+   */
+  template <class Sh>
+  const db::repository<Sh> &repository (db::object_tag<Sh> tag) const
+  {
+    return const_cast<generic_repository<C> *> (this)->repository (tag);
+  }
+
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
     db::mem_stat (stat, purpose, cat, m_polygon_repository, no_self, parent);

@@ -1675,7 +1675,6 @@ LayoutView::enable_edits (bool enable)
     if (m_disabled_edits > 0) {
       --m_disabled_edits;
     }
-    enable = (m_disabled_edits == 0);
   } else {
     ++m_disabled_edits;
   }

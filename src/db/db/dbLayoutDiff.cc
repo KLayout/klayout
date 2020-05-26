@@ -427,6 +427,9 @@ struct PathCompareOpWithTolerance
     db::Path::iterator ia = a.begin (), ib = b.begin ();
     while (ia != a.end () && ib != b.end ()) {
       c = compare_point (*ia, *ib, m_tolerance);
+      if (c != 0) {
+        return c < 0;
+      }
       ++ia;
       ++ib;
     }

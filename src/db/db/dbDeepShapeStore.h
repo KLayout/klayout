@@ -43,6 +43,9 @@ class DeepShapeStore;
 class DeepShapeStoreState;
 class Region;
 class Edges;
+class EdgePairs;
+class Texts;
+class ShapeCollection;
 
 /**
  *  @brief Represents a shape collection from the deep shape store
@@ -74,6 +77,24 @@ public:
    *  This requires the Region to be a DeepRegion. Otherwise, this constructor will assert
    */
   DeepLayer (const Region &region);
+
+  /**
+   *  @brief Conversion operator from texts collection to DeepLayer
+   *  This requires the texts to be a DeepTexts. Otherwise, this constructor will assert
+   */
+  DeepLayer (const Texts &region);
+
+  /**
+   *  @brief Conversion operator from edges collection to DeepLayer
+   *  This requires the edges to be a DeepEdges. Otherwise, this constructor will assert
+   */
+  DeepLayer (const Edges &region);
+
+  /**
+   *  @brief Conversion operator from edge pairs collection to DeepLayer
+   *  This requires the edge pairs to be a DeepEdgePairs. Otherwise, this constructor will assert
+   */
+  DeepLayer (const EdgePairs &region);
 
   /**
    *  @brief Copy constructor
@@ -338,15 +359,26 @@ public:
    *  After a flat layer has been created for a region, it can be retrieved
    *  from the region later with layer_for_flat (region).
    */
-  DeepLayer create_from_flat (const db::Edges &region, const db::ICplxTrans &trans = db::ICplxTrans ());
+  DeepLayer create_from_flat (const db::Edges &edges, const db::ICplxTrans &trans = db::ICplxTrans ());
 
   /**
-   *  @brief Gets the layer for a given flat region.
+   *  @brief Creates a new layer from a flat text collection (or the text collection is made flat)
+   *
+   *  This method is intended for use with singular-created DSS objects (see
+   *  singular constructor).
+   *
+   *  After a flat layer has been created for a region, it can be retrieved
+   *  from the region later with layer_for_flat (region).
+   */
+  DeepLayer create_from_flat (const db::Texts &texts, const db::ICplxTrans &trans = db::ICplxTrans ());
+
+  /**
+   *  @brief Gets the layer for a given flat collection (Region, Edges, Texts, EdgePairs)
    *
    *  If a layer has been created for a flat region with create_from_flat, it can be retrieved with this method.
    *  The first return value is true in this case.
    */
-  std::pair<bool, DeepLayer> layer_for_flat (const db::Region &region) const;
+  std::pair<bool, DeepLayer> layer_for_flat (const ShapeCollection &coll) const;
 
   /**
    *  @brief Same as layer_for_flat, but takes a region Id
@@ -394,6 +426,15 @@ public:
    *  for edge pairs.
    */
   DeepLayer create_edge_pair_layer (const db::RecursiveShapeIterator &si, const ICplxTrans &trans = db::ICplxTrans ());
+
+  /**
+   *  @brief Inserts an text layer into the deep shape store
+   *
+   *  This method will create a new layer inside the deep shape store as a
+   *  working copy of the original layer. This method creates a layer
+   *  for texts.
+   */
+  DeepLayer create_text_layer (const db::RecursiveShapeIterator &si, const ICplxTrans &trans = db::ICplxTrans ());
 
   /**
    *  @brief Inserts a polygon layer into the deep shape store using a custom preparation pipeline

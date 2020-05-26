@@ -110,6 +110,7 @@ private:
   tl::Extractor reader;
   std::vector<GDS2XY> xyData;
 
+  virtual std::string path () const;
   const char *get_string ();
   void get_string (tl::string &s) const;
   int get_int ();

@@ -42,11 +42,12 @@ Qt5Brew = { 'qmake' : '/usr/local/opt/qt/bin/qmake',
             'deploy': '/usr/local/opt/qt/bin/macdeployqt'
           }
 
-# Qt5 bundled with anaconda3 installed under $HOME/opt/anaconda3/
-#  installed by the standard installation package
+# Qt5 bundled with anaconda3 installed under /Applications/anaconda3/
+# The standard installation deploys the tool under $HOME/opt/anaconda3/.
+# If so, you need to make a symbolic link: /Applications/anaconda3 ---> $HOME/opt/anaconda3/
 # [Key Type Name] = 'Qt5Ana3'
-Qt5Ana3 = { 'qmake' : '%s/opt/anaconda3/bin/qmake' % MyHome,
-            'deploy': '%s/opt/anaconda3/bin/macdeployqt' % MyHome
+Qt5Ana3 = { 'qmake' : '/Applications/anaconda3/bin/qmake',
+            'deploy': '/Applications/anaconda3/bin/macdeployqt'
           }
 
 #-----------------------------------------------------
@@ -120,18 +121,19 @@ Ruby26MacPorts  = { 'exe': '/opt/local/bin/ruby2.6',
 # Ruby 2.7 from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
 #   install with 'brew install ruby'
 # [Key Type Name] = 'HB27'
-HBRuby27Path    = '/usr/local/Cellar/ruby/2.7.0'
+HBRuby27Path    = '/usr/local/opt/ruby'
 Ruby27Brew      = { 'exe': '%s/bin/ruby' % HBRuby27Path,
                     'inc': '%s/include/ruby-2.7.0' % HBRuby27Path,
                     'lib': '%s/lib/libruby.2.7.dylib' % HBRuby27Path
                   }
 
-# Ruby 2.5 bundled with anaconda3 installed under $HOME/opt/anaconda3/ *+*+*+ EXPERIMENTAL *+*+*+
-#  install with 'conda install ruby'
+# Ruby 2.5 bundled with anaconda3 installed under /Applications/anaconda3/ *+*+*+ EXPERIMENTAL *+*+*+
+# The standard installation deploys the tool under $HOME/opt/anaconda3/.
+# If so, you need to make a symbolic link: /Applications/anaconda3 ---> $HOME/opt/anaconda3/
 # [Key Type Name] = 'Ana3'
-RubyAnaconda3   = { 'exe': '%s/opt/anaconda3/bin/ruby' % MyHome,
-                    'inc': '%s/opt/anaconda3/include/ruby-2.5.0' % MyHome,
-                    'lib': '%s/opt/anaconda3/lib/libruby.2.5.1.dylib' % MyHome
+RubyAnaconda3   = { 'exe': '/Applications/anaconda3/bin/ruby',
+                    'inc': '/Applications/anaconda3/include/ruby-2.5.0',
+                    'lib': '/Applications/anaconda3/lib/libruby.2.5.1.dylib'
                   }
 
 # Consolidated dictionary kit for Ruby
@@ -213,18 +215,19 @@ Python37MacPorts= { 'exe': '/opt/local/Library/Frameworks/Python.framework/Versi
 # Python 3.7 from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
 #   install with 'brew install python'
 # [Key Type Name] = 'HB37'
-HBPython37FrameworkPath = '/usr/local/Cellar/python/3.7.6_1/Frameworks/Python.framework'
+HBPython37FrameworkPath = '/usr/local/opt/python3/Frameworks/Python.framework'
 Python37Brew    = { 'exe': '%s/Versions/3.7/bin/python3.7m' % HBPython37FrameworkPath,
                     'inc': '%s/Versions/3.7/include/python3.7m' % HBPython37FrameworkPath,
                     'lib': '%s/Versions/3.7/lib/libpython3.7m.dylib' % HBPython37FrameworkPath
                   }
 
-# Python 3.7 bundled with anaconda3 installed under $HOME/opt/anaconda3/ *+*+*+ EXPERIMENTAL *+*+*+
-#  installed by the standard installation package
+# Python 3.7 bundled with anaconda3 installed under /Applications/anaconda3/ *+*+*+ EXPERIMENTAL *+*+*+
+# The standard installation deploys the tool under $HOME/opt/anaconda3/.
+# If so, you need to make a symbolic link: /Applications/anaconda3 ---> $HOME/opt/anaconda3/
 # [Key Type Name] = 'Ana3'
-PythonAnaconda3 = { 'exe': '%s/opt/anaconda3/bin/python3.7m' % MyHome,
-                    'inc': '%s/opt/anaconda3/include/python3.7m' % MyHome,
-                    'lib': '%s/opt/anaconda3/lib/libpython3.7m.dylib' % MyHome
+PythonAnaconda3 = { 'exe': '/Applications/anaconda3/bin/python3.7m',
+                    'inc': '/Applications/anaconda3/include/python3.7m',
+                    'lib': '/Applications/anaconda3/lib/libpython3.7m.dylib'
                   }
 
 # Consolidated dictionary kit for Python

@@ -185,10 +185,9 @@ protected:
   virtual RegionDelegate *pull_generic (const Region &region) const;
   virtual EdgesDelegate *selected_interacting_generic (const Edges &edges, bool inverse) const;
   virtual EdgesDelegate *selected_interacting_generic (const Region &region, bool inverse) const;
-
-private:
   AsIfFlatEdges &operator= (const AsIfFlatEdges &other);
 
+private:
   mutable bool m_bbox_valid;
   mutable db::Box m_bbox;
 

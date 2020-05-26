@@ -593,6 +593,12 @@ CODE
     # selected text. By using the "as_dots" option, degenerated point-like edges will be
     # produced.
     #
+    # The preferred method however is to use true text layers created with \labels.
+    # In this case, without specifying "as_dots" or "as_boxes" retains the text
+    # objects as such a text filtering is applied. In contrast to this, layers generated
+    # with \input cannot maintain the text nature of the selected objects and 
+    # produce dots or small polygon boxes in the \texts method.
+    #
     # Texts can be selected either by exact match string or a pattern match with a 
     # glob-style pattern. By default, glob-style pattern are used. 
     # The options available are:
@@ -608,21 +614,54 @@ CODE
     #
     # @code
     #   # Selects all texts
-    #   t = input(1, 0).texts
+    #   t = labels(1, 0).texts
     #   # Selects all texts beginning with an "A"
-    #   t = input(1, 0).texts("A*")
-    #   t = input(1, 0).texts(pattern("A*"))
-    #   # Selects all texts whose string is "A*"
-    #   t = input(1, 0).texts(text("A*"))
+    #   t = labels(1, 0).texts("A*")
+    #   t = labels(1, 0).texts(pattern("A*"))
+    #   # Selects all texts whose string is "ABC"
+    #   t = labels(1, 0).texts(text("ABC"))
     # @/code
+    #
+    # The effect of the operation is shown in these examples:
+    #  
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_texts1.png) @/td
+    #     @td @img(/images/drc_texts2.png) @/td
+    #   @/tr
+    # @/table
      
     def texts(*args)
+      requires_texts_or_region("texts")
+      self._texts_impl(false, *args)
+    end
 
-      requires_region("texts")
+    # %DRC%
+    # @name texts_not
+    # @brief Selects texts from an original layer not matching a specific selection
+    # @synopsis layer.texts_not
+    # @synopsis layer.texts_not(p)
+    # @synopsis layer.texts_not([ options ])
+    #
+    # This method can be applied to true text layers obtained with \labels.
+    # In this case, without specifying "as_dots" or "as_boxes" retains the text
+    # objects as such. Only text filtering is applied.
+    #
+    # Beside that this method acts like \texts, but will select the text objects
+    # not matching the filter.
+
+    def texts_not(*args)
+      requires_texts("texts_not")
+      self._texts_impl(true, *args)
+    end
+
+    # Implementation of texts or texts_not
+
+    def _texts_impl(invert, *args)
 
       as_pattern = true
       pattern = "*"
-      as_dots = false
+      as_dots = nil
 
       args.each do |a|
         if a.is_a?(String)
@@ -637,15 +676,30 @@ CODE
           raise("Invalid argument for 'texts' method")
         end
       end
-          
-      if as_dots
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts_dots, pattern, as_pattern))
-      else
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts, pattern, as_pattern))
+
+      if @data.is_a?(RBA::Texts)
+        if as_pattern
+          result = @engine._tcmd(@data, 0, RBA::Texts, :with_match, pattern, invert)
+        else
+          result = @engine._tcmd(@data, 0, RBA::Texts, :with_text, pattern, invert)
+        end
+        if as_dots
+          return DRCLayer::new(@engine, @engine._tcmd(result, 0, RBA::Region, :edges))
+        elsif as_dots == false
+          return DRCLayer::new(@engine, @engine._tcmd(result, 0, RBA::Region, :polygons))
+        else
+          return DRCLayer::new(@engine, result)
+        end
+      else    
+        if as_dots
+          return DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts_dots, pattern, as_pattern))
+        else
+          return DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts, pattern, as_pattern))
+        end
       end
 
     end
-
+     
     # %DRC%
     # @name corners
     # @brief Selects corners of polygons
@@ -1124,13 +1178,23 @@ CODE
     # borders of the polygons of the second operand.
     #
     # The following images show the effect of the "and" method
-    # on polygons and edges (layer1: red, layer2: blue):
+    # on polygons and edges (input1: red, input2: blue):
     #
     # @table
     #   @tr 
     #     @td @img(/images/drc_and1.png) @/td
     #     @td @img(/images/drc_and2.png) @/td
     #     @td @img(/images/drc_and3.png) @/td
+    #   @/tr
+    # @/table
+    #
+    # The AND operation can be applied between a text and a polygon
+    # layer. In this case, the texts inside or at the border of the 
+    # polygons will be written to the output (labels: red, input2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_textpoly1.png) @/td
     #   @/tr
     # @/table
     
@@ -1151,13 +1215,23 @@ CODE
     # of the second operand.
     #
     # The following images show the effect of the "not" method
-    # on polygons and edges (layer1: red, layer2: blue):
+    # on polygons and edges (input1: red, input2: blue):
     #
     # @table
     #   @tr 
     #     @td @img(/images/drc_not1.png) @/td
     #     @td @img(/images/drc_not2.png) @/td
     #     @td @img(/images/drc_not3.png) @/td
+    #   @/tr
+    # @/table
+    #
+    # The NOT operation can be applied between a text and a polygon
+    # layer. In this case, the texts outside the polygons will be 
+    # written to the output (labels: red, input2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_textpoly2.png) @/td
     #   @/tr
     # @/table
     
@@ -1175,7 +1249,7 @@ CODE
     # This method is available for polygon and edge layers.
     #
     # The following images show the effect of the "xor" method
-    # on polygons and edges (layer1: red, layer2: blue):
+    # on polygons and edges (input1: red, input2: blue):
     #
     # @table
     #   @tr 
@@ -1198,7 +1272,7 @@ CODE
     # This method is available for polygon and edge layers.
     #
     # The following images show the effect of the "or" method
-    # on polygons and edges (layer1: red, layer2: blue):
+    # on polygons and edges (input1: red, input2: blue):
     #
     # @table
     #   @tr 
@@ -1221,7 +1295,7 @@ CODE
     # This method is available for polygon, edge and edge pair layers.
     #
     # The following images show the effect of the "join" method
-    # on polygons and edges (layer1: red, layer2: blue):
+    # on polygons and edges (input1: red, input2: blue):
     #
     # @table
     #   @tr 
@@ -1543,8 +1617,9 @@ CODE
     # It returns a new layer containing the selected shapes. A version which modifies self
     # is \select_interacting.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # This method is available for polygon, text and edge layers. Edges can be selected
+    # with respect to other edges or polygons. Texts can be selected with respect to 
+    # polygons. Polygons can be selected with respect to edges, texts and other polygons.
     #
     # The following image shows the effect of the "interacting" method (input1: red, input2: blue):
     #
@@ -1564,8 +1639,9 @@ CODE
     # It returns a new layer containing the selected shapes. A version which modifies self
     # is \select_not_interacting.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # This method is available for polygon, text and edge layers. Edges can be selected
+    # with respect to other edges or polygons. Texts can be selected with respect to 
+    # polygons. Polygons can be selected with respect to edges, texts and other polygons.
     #
     # The following image shows the effect of the "not_interacting" method (input1: red, input2: blue):
     #
@@ -1585,8 +1661,9 @@ CODE
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \interacting.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # This method is available for polygon, text and edge layers. Edges can be selected
+    # with respect to other edges or polygons. Texts can be selected with respect to 
+    # polygons. Polygons can be selected with respect to edges, texts and other polygons.
     
     # %DRC%
     # @name select_not_interacting
@@ -1598,8 +1675,9 @@ CODE
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \not_interacting.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # This method is available for polygon, text and edge layers. Edges can be selected
+    # with respect to other edges or polygons. Texts can be selected with respect to 
+    # polygons. Polygons can be selected with respect to edges, texts and other polygons.
     
     # %DRC%
     # @name intersections
@@ -1657,8 +1735,7 @@ CODE
     #
     # This method will neither modify self nor other.
     #
-    # This method is available for polygon layers. Other can be an edge or polygon layer. 
-    # Edges or polygons can be selected with respect to polygons of self.
+    # This method is available for polygon, edge and text layers, similar to interacting.
     
     # %DRC%
     # @name pull_overlapping
@@ -1695,7 +1772,37 @@ CODE
           requires_region("#{f}")
           other.requires_region("#{f}")
         else
-          requires_edges_or_region("#{f}")
+          requires_edges_texts_or_region("#{f}")
+          if @data.is_a?(RBA::Text)
+            other.requires_region("#{f}")
+          elsif @data.is_a?(RBA::Region)
+            other.requires_edges_texts_or_region("#{f}")
+          else
+            other.requires_edges_or_region("#{f}")
+          end
+        end
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, other.data.class, :#{f}, other.data))
+      end
+CODE
+    end
+
+    %w(| ^ overlapping not_overlapping inside not_inside outside not_outside in not_in).each do |f| 
+      eval <<"CODE"
+      def #{f}(other)
+        requires_same_type(other, "#{f}")
+        requires_edges_or_region("#{f}")
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+      end
+CODE
+    end
+
+    %w(& -).each do |f| 
+      eval <<"CODE"
+      def #{f}(other)
+        other.requires_edges_texts_or_region("#{f}")
+        if @data.is_a?(RBA::Texts)
+          other.requires_region("#{f}")
+        else
           other.requires_edges_or_region("#{f}")
         end
         DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
@@ -1703,16 +1810,25 @@ CODE
 CODE
     end
 
-    %w(& | ^ - + interacting not_interacting overlapping not_overlapping inside not_inside outside not_outside in not_in).each do |f| 
+    %w(+).each do |f| 
       eval <<"CODE"
       def #{f}(other)
-        if :#{f} != :interacting && :#{f} != :not_interacting && :#{f} != :& && :#{f} != :-
-          requires_same_type(other, "#{f}")
+        requires_same_type(other, "#{f}")
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+      end
+CODE
+    end
+
+    %w(interacting not_interacting).each do |f| 
+      eval <<"CODE"
+      def #{f}(other)
+        other.requires_edges_texts_or_region("#{f}")
+        if @data.is_a?(RBA::Text)
+          other.requires_region("#{f}")
+        elsif @data.is_a?(RBA::Region)
+          other.requires_edges_texts_or_region("#{f}")
         else
           other.requires_edges_or_region("#{f}")
-        end
-        if :#{f} != :+
-          requires_edges_or_region("#{f}")
         end
         DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
       end
@@ -1724,12 +1840,19 @@ CODE
       # In tiled mode, there are no modifying versions. Emulate using the non-modifying one.
       eval <<"CODE"
       def #{f}(other)
-        if :#{fi} != :interacting && :#{f} != :not_interacting 
+        if :#{fi} != :interacting && :#{fi} != :not_interacting 
+          requires_edges_or_region("#{f}")
           requires_same_type(other, "#{f}")
         else
-          other.requires_edges_or_region("#{f}")
+          requires_edges_texts_or_region("#{f}")
+          if @data.is_a?(RBA::Text)
+            other.requires_region("#{f}")
+          elsif @data.is_a?(RBA::Region)
+            other.requires_edges_texts_or_region("#{f}")
+          else
+            other.requires_edges_or_region("#{f}")
+          end
         end
-        requires_edges_or_region("#{f}")
         if @engine.is_tiled?
           @data = @engine._tcmd(@data, 0, @data.class, :#{fi}, other.data)
           DRCLayer::new(@engine, @data)
@@ -1745,12 +1868,7 @@ CODE
       def #{f}(other)
         other.requires_region("#{f}")
         requires_edges("#{f}")
-        if @engine.is_tiled?
-          @data = @engine._tcmd(@data, 0, @data.class, :#{f}, other.data)
-          DRCLayer::new(@engine, @data)
-        else
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
-        end
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
       end
 CODE
     end
@@ -1760,12 +1878,7 @@ CODE
       def #{f}(other)
         other.requires_edges("#{f}")
         requires_edges("#{f}")
-        if @engine.is_tiled?
-          @data = @engine._tcmd(@data, 0, @data.class, :#{f}, other.data)
-          DRCLayer::new(@engine, @data)
-        else
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
-        end
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
       end
 CODE
     end
@@ -2207,7 +2320,7 @@ CODE
     # If the layer already is a flat one, this method does nothing.
     # If the layer is a hierarchical layer (an original layer or
     # a derived layer in deep mode), this method will convert it
-    # to a flat collection of polygons, edges or edge pairs.
+    # to a flat collection of texts, polygons, edges or edge pairs.
     
     def flatten
       DRC::DRCLayer::new(@engine, @engine._cmd(@data, :flatten))
@@ -2235,7 +2348,6 @@ CODE
     # @synopsis layer.is_empty?
     
     def is_empty?
-      requires_edges_or_region("is_empty?")
       @data.is_empty?
     end
     
@@ -2423,7 +2535,7 @@ CODE
     # Distance values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
     #
-    # The following image shows the effect of the separation check (layer1: red, layer2: blue):
+    # The following image shows the effect of the separation check (input1: red, input2: blue):
     # 
     # @table
     #   @tr 
@@ -2458,7 +2570,7 @@ CODE
     # Distance values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
     #
-    # The following images show the effect of the overlap check (layer1: red, layer2: blue):
+    # The following images show the effect of the overlap check (input1: red, input2: blue):
     # 
     # @table
     #   @tr 
@@ -3006,6 +3118,14 @@ CODE
       @data.is_a?(RBA::Region) || raise("#{f}: Requires a polygon layer")
     end
     
+    def requires_texts_or_region(f)
+      @data.is_a?(RBA::Region) || @data.is_a?(RBA::Texts) || raise("#{f}: Requires a polygon or text layer")
+    end
+    
+    def requires_texts(f)
+      @data.is_a?(RBA::Texts) || raise("#{f}: Requires a text layer")
+    end
+    
     def requires_edge_pairs(f)
       @data.is_a?(RBA::EdgePairs) || raise("#{f}: Requires a edge pair layer")
     end
@@ -3016,6 +3136,10 @@ CODE
     
     def requires_edges_or_region(f)
       @data.is_a?(RBA::Edges) || @data.is_a?(RBA::Region) || raise("#{f}: Requires an edge or polygon layer")
+    end
+    
+    def requires_edges_texts_or_region(f)
+      @data.is_a?(RBA::Edges) || @data.is_a?(RBA::Region) || @data.is_a?(RBA::Texts) || raise("#{f}: Requires an edge, text or polygon layer")
     end
     
     def requires_same_type(other, f)

@@ -428,18 +428,18 @@ static gsi::Methods methods_QXmlInputSource_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlInputSource::QXmlInputSource()\nThis method creates an object of class QXmlInputSource.", &_init_ctor_QXmlInputSource_Adaptor_0, &_call_ctor_QXmlInputSource_Adaptor_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlInputSource::QXmlInputSource(QIODevice *dev)\nThis method creates an object of class QXmlInputSource.", &_init_ctor_QXmlInputSource_Adaptor_1447, &_call_ctor_QXmlInputSource_Adaptor_1447);
-  methods += new qt_gsi::GenericMethod ("data", "@hide", true, &_init_cbs_data_c0_0, &_call_cbs_data_c0_0);
-  methods += new qt_gsi::GenericMethod ("data", "@brief Virtual method QString QXmlInputSource::data()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_data_c0_0, &_call_cbs_data_c0_0, &_set_callback_cbs_data_c0_0);
-  methods += new qt_gsi::GenericMethod ("fetchData", "@hide", false, &_init_cbs_fetchData_0_0, &_call_cbs_fetchData_0_0);
-  methods += new qt_gsi::GenericMethod ("fetchData", "@brief Virtual method void QXmlInputSource::fetchData()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_fetchData_0_0, &_call_cbs_fetchData_0_0, &_set_callback_cbs_fetchData_0_0);
-  methods += new qt_gsi::GenericMethod ("*fromRawData", "@hide", false, &_init_cbs_fromRawData_3065_1, &_call_cbs_fromRawData_3065_1);
-  methods += new qt_gsi::GenericMethod ("*fromRawData", "@brief Virtual method QString QXmlInputSource::fromRawData(const QByteArray &data, bool beginning)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_fromRawData_3065_1, &_call_cbs_fromRawData_3065_1, &_set_callback_cbs_fromRawData_3065_1);
-  methods += new qt_gsi::GenericMethod ("next", "@hide", false, &_init_cbs_next_0_0, &_call_cbs_next_0_0);
-  methods += new qt_gsi::GenericMethod ("next", "@brief Virtual method QChar QXmlInputSource::next()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_next_0_0, &_call_cbs_next_0_0, &_set_callback_cbs_next_0_0);
-  methods += new qt_gsi::GenericMethod ("reset", "@hide", false, &_init_cbs_reset_0_0, &_call_cbs_reset_0_0);
-  methods += new qt_gsi::GenericMethod ("reset", "@brief Virtual method void QXmlInputSource::reset()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_reset_0_0, &_call_cbs_reset_0_0, &_set_callback_cbs_reset_0_0);
-  methods += new qt_gsi::GenericMethod ("setData", "@hide", false, &_init_cbs_setData_2025_0, &_call_cbs_setData_2025_0);
-  methods += new qt_gsi::GenericMethod ("setData", "@brief Virtual method void QXmlInputSource::setData(const QString &dat)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setData_2025_0, &_call_cbs_setData_2025_0, &_set_callback_cbs_setData_2025_0);
+  methods += new qt_gsi::GenericMethod ("data", "@brief Virtual method QString QXmlInputSource::data()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_data_c0_0, &_call_cbs_data_c0_0);
+  methods += new qt_gsi::GenericMethod ("data", "@hide", true, &_init_cbs_data_c0_0, &_call_cbs_data_c0_0, &_set_callback_cbs_data_c0_0);
+  methods += new qt_gsi::GenericMethod ("fetchData", "@brief Virtual method void QXmlInputSource::fetchData()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_fetchData_0_0, &_call_cbs_fetchData_0_0);
+  methods += new qt_gsi::GenericMethod ("fetchData", "@hide", false, &_init_cbs_fetchData_0_0, &_call_cbs_fetchData_0_0, &_set_callback_cbs_fetchData_0_0);
+  methods += new qt_gsi::GenericMethod ("*fromRawData", "@brief Virtual method QString QXmlInputSource::fromRawData(const QByteArray &data, bool beginning)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_fromRawData_3065_1, &_call_cbs_fromRawData_3065_1);
+  methods += new qt_gsi::GenericMethod ("*fromRawData", "@hide", false, &_init_cbs_fromRawData_3065_1, &_call_cbs_fromRawData_3065_1, &_set_callback_cbs_fromRawData_3065_1);
+  methods += new qt_gsi::GenericMethod ("next", "@brief Virtual method QChar QXmlInputSource::next()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_next_0_0, &_call_cbs_next_0_0);
+  methods += new qt_gsi::GenericMethod ("next", "@hide", false, &_init_cbs_next_0_0, &_call_cbs_next_0_0, &_set_callback_cbs_next_0_0);
+  methods += new qt_gsi::GenericMethod ("reset", "@brief Virtual method void QXmlInputSource::reset()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_reset_0_0, &_call_cbs_reset_0_0);
+  methods += new qt_gsi::GenericMethod ("reset", "@hide", false, &_init_cbs_reset_0_0, &_call_cbs_reset_0_0, &_set_callback_cbs_reset_0_0);
+  methods += new qt_gsi::GenericMethod ("setData", "@brief Virtual method void QXmlInputSource::setData(const QString &dat)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setData_2025_0, &_call_cbs_setData_2025_0);
+  methods += new qt_gsi::GenericMethod ("setData", "@hide", false, &_init_cbs_setData_2025_0, &_call_cbs_setData_2025_0, &_set_callback_cbs_setData_2025_0);
   return methods;
 }
 

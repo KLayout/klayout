@@ -135,7 +135,7 @@ LayoutToNetlistStandardReader::skip ()
 
 void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("File read")));
+  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("File read: ")) + m_path);
 
   try {
     read_netlist (0, l2n);
@@ -358,8 +358,10 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
       dm->set_name (name);
       netlist->add_device_abstract (dm);
 
-      db::cell_index_type ci = l2n->internal_layout ()->add_cell (name.c_str ());
-      dm->set_cell_index (ci);
+      if (l2n) {
+        db::cell_index_type ci = l2n->internal_layout ()->add_cell (name.c_str ());
+        dm->set_cell_index (ci);
+      }
 
       std::string cls;
       read_word_or_quoted (cls);
@@ -443,8 +445,7 @@ LayoutToNetlistStandardReader::read_property (db::NetlistObject *obj)
   br.done ();
 }
 
-std::pair<unsigned int, db::PolygonRef>
-LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n)
+std::pair<unsigned int, NetShape> LayoutToNetlistStandardReader::read_geometry(db::LayoutToNetlist *l2n)
 {
   std::string lname;
 
@@ -479,6 +480,22 @@ LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n)
     db::Polygon poly;
     poly.assign_hull (pt.begin (), pt.end ());
     return std::make_pair (lid, db::PolygonRef (poly, l2n->internal_layout ()->shape_repository ()));
+
+  } else if (test (skeys::text_key) || test (lkeys::text_key)) {
+
+    Brace br (this);
+
+    read_word_or_quoted (lname);
+    unsigned int lid = l2n->layer_of (layer_by_name (l2n, lname));
+
+    std::string text;
+    read_word_or_quoted (text);
+
+    db::Point pt = read_point ();
+
+    br.done ();
+
+    return std::make_pair (lid, db::TextRef (db::Text (text, db::Trans (pt - db::Point ())), l2n->internal_layout ()->shape_repository ()));
 
   } else if (at_end ()) {
     throw tl::Exception (tl::to_string (tr ("Unexpected end of file (polygon or rect expected)")));
@@ -522,7 +539,7 @@ LayoutToNetlistStandardReader::read_polygon ()
 }
 
 void
-LayoutToNetlistStandardReader::read_geometries (db::NetlistObject *obj, Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<db::PolygonRef> &lc, db::Cell &cell)
+LayoutToNetlistStandardReader::read_geometries (db::NetlistObject *obj, Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<db::NetShape> &lc, db::Cell &cell)
 {
   m_ref = db::Point ();
 
@@ -530,9 +547,9 @@ LayoutToNetlistStandardReader::read_geometries (db::NetlistObject *obj, Brace &b
     if (test (skeys::property_key) || test (lkeys::property_key)) {
       read_property (obj);
     } else {
-      std::pair<unsigned int, db::PolygonRef> pr = read_geometry (l2n);
+      std::pair<unsigned int, db::NetShape> pr = read_geometry (l2n);
       lc.add (pr.second, pr.first);
-      cell.shapes (pr.first).insert (pr.second);
+      pr.second.insert_into (cell.shapes (pr.first));
     }
   }
 }
@@ -559,8 +576,8 @@ LayoutToNetlistStandardReader::read_net (db::Netlist * /*netlist*/, db::LayoutTo
 
   if (l2n) {
 
-    db::connected_clusters<db::PolygonRef> &cc = l2n->net_clusters ().clusters_per_cell (circuit->cell_index ());
-    db::local_cluster<db::PolygonRef> &lc = *cc.insert ();
+    db::connected_clusters<db::NetShape> &cc = l2n->net_clusters ().clusters_per_cell (circuit->cell_index ());
+    db::local_cluster<db::NetShape> &lc = *cc.insert ();
     net->set_cluster_id (lc.id ());
 
     db::Cell &cell = l2n->internal_layout ()->cell (circuit->cell_index ());
@@ -1023,8 +1040,8 @@ LayoutToNetlistStandardReader::read_abstract_terminal (db::LayoutToNetlist *l2n,
 
   if (l2n) {
 
-    db::connected_clusters<db::PolygonRef> &cc = l2n->net_clusters ().clusters_per_cell (dm->cell_index ());
-    db::local_cluster<db::PolygonRef> &lc = *cc.insert ();
+    db::connected_clusters<db::NetShape> &cc = l2n->net_clusters ().clusters_per_cell (dm->cell_index ());
+    db::local_cluster<db::NetShape> &lc = *cc.insert ();
     dm->set_cluster_id_for_terminal (tid, lc.id ());
 
     db::Cell &cell = l2n->internal_layout ()->cell (dm->cell_index ());

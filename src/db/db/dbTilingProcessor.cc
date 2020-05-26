@@ -164,6 +164,34 @@ private:
   const db::ICplxTrans m_trans;
 };
 
+/**
+ *  @brief A helper class for the generic implementation of the text collection insert functionality
+ */
+class TextsInserter
+{
+public:
+  TextsInserter (db::Texts *texts, const db::ICplxTrans &trans)
+    : mp_texts (texts), m_trans (trans)
+  {
+    //  .. nothing yet ..
+  }
+
+  template <class T>
+  void operator() (const T &)
+  {
+    //  .. discard anything except Texts ..
+  }
+
+  void operator() (const db::Text &t)
+  {
+    mp_texts->insert (t.transformed (m_trans));
+  }
+
+private:
+  db::Texts *mp_texts;
+  const db::ICplxTrans m_trans;
+};
+
 class TileLayoutOutputReceiver
   : public db::TileOutputReceiver
 {
@@ -269,6 +297,26 @@ public:
 
 private:
   db::EdgePairs *mp_edge_pairs;
+};
+
+class TileTextsOutputReceiver
+  : public db::TileOutputReceiver
+{
+public:
+  TileTextsOutputReceiver (db::Texts *texts)
+    : mp_texts (texts)
+  {
+    //  .. nothing yet ..
+  }
+
+  void put (size_t /*ix*/, size_t /*iy*/, const db::Box &tile, size_t /*id*/, const tl::Variant &obj, double /*dbu*/, const db::ICplxTrans &trans, bool clip)
+  {
+    TextsInserter inserter (mp_texts, trans);
+    insert_var (inserter, obj, tile, clip);
+  }
+
+private:
+  db::Texts *mp_texts;
 };
 
 class TilingProcessorJob
@@ -395,6 +443,7 @@ private:
   TilingProcessorJob *mp_job;
 
   void do_perform (const TilingProcessorTask *task);
+  void make_input_var (const TilingProcessor::InputSpec &is, const db::RecursiveShapeIterator *iter, tl::Eval &eval, double sf);
 };
 
 class TilingProcessorReceiverFunction
@@ -453,6 +502,24 @@ public:
 };
 
 void
+TilingProcessorWorker::make_input_var (const TilingProcessor::InputSpec &is, const db::RecursiveShapeIterator *iter, tl::Eval &eval, double sf)
+{
+  if (! iter) {
+    iter = &is.iter;
+  }
+
+  if (is.type == TilingProcessor::TypeRegion) {
+    eval.set_var (is.name, tl::Variant (db::Region (*iter, db::ICplxTrans (sf) * is.trans, is.merged_semantics)));
+  } else if (is.type == TilingProcessor::TypeEdges) {
+    eval.set_var (is.name, tl::Variant (db::Edges (*iter, db::ICplxTrans (sf) * is.trans, is.merged_semantics)));
+  } else if (is.type == TilingProcessor::TypeEdgePairs) {
+    eval.set_var (is.name, tl::Variant (db::EdgePairs (*iter, db::ICplxTrans (sf) * is.trans)));
+  } else if (is.type == TilingProcessor::TypeTexts) {
+    eval.set_var (is.name, tl::Variant (db::Texts (*iter, db::ICplxTrans (sf) * is.trans)));
+  }
+}
+
+void
 TilingProcessorWorker::do_perform (const TilingProcessorTask *tile_task)
 {
   tl::Eval eval (&mp_job->processor ()->top_eval ());
@@ -492,11 +559,7 @@ TilingProcessorWorker::do_perform (const TilingProcessorTask *tile_task)
 
     if (! mp_job->has_tiles ()) { 
 
-      if (i->region) {
-        eval.set_var (i->name, tl::Variant (db::Region (i->iter, db::ICplxTrans (sf) * i->trans, i->merged_semantics)));
-      } else {
-        eval.set_var (i->name, tl::Variant (db::Edges (i->iter, db::ICplxTrans (sf) * i->trans, i->merged_semantics)));
-      }
+      make_input_var (*i, 0, eval, sf);
 
     } else {
 
@@ -509,11 +572,7 @@ TilingProcessorWorker::do_perform (const TilingProcessorTask *tile_task)
         iter.confine_region (region_dbu);
       }
 
-      if (i->region) {
-        eval.set_var (i->name, tl::Variant (db::Region (iter, db::ICplxTrans (sf) * i->trans, i->merged_semantics)));
-      } else {
-        eval.set_var (i->name, tl::Variant (db::Edges (iter, db::ICplxTrans (sf) * i->trans, i->merged_semantics)));
-      }
+      make_input_var (*i, &iter, eval, sf);
 
     }
 
@@ -559,7 +618,7 @@ TilingProcessor::TilingProcessor ()
 }
 
 void 
-TilingProcessor::input (const std::string &name, const db::RecursiveShapeIterator &iter, const db::ICplxTrans &trans, bool as_region, bool merged_semantics)
+TilingProcessor::input (const std::string &name, const db::RecursiveShapeIterator &iter, const db::ICplxTrans &trans, Type type, bool merged_semantics)
 {
   if (m_inputs.empty () && iter.layout ()) {
     m_dbu = iter.layout ()->dbu ();
@@ -568,7 +627,7 @@ TilingProcessor::input (const std::string &name, const db::RecursiveShapeIterato
   m_inputs.back ().name = name;
   m_inputs.back ().iter = iter;
   m_inputs.back ().trans = trans;
-  m_inputs.back ().region = as_region;
+  m_inputs.back ().type = type;
   m_inputs.back ().merged_semantics = merged_semantics;
 }
 
@@ -699,7 +758,17 @@ TilingProcessor::output (const std::string &name, db::EdgePairs &edge_pairs)
   m_outputs.back ().receiver = new TileEdgePairsOutputReceiver (&edge_pairs);
 }
 
-void 
+void
+TilingProcessor::output (const std::string &name, db::Texts &texts)
+{
+  m_top_eval.set_var (name, m_outputs.size ());
+  m_outputs.push_back (OutputSpec ());
+  m_outputs.back ().name = name;
+  m_outputs.back ().id = 0;
+  m_outputs.back ().receiver = new TileTextsOutputReceiver (&texts);
+}
+
+void
 TilingProcessor::output (const std::string &name, db::Edges &edges)
 {
   m_top_eval.set_var (name, m_outputs.size ());

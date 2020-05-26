@@ -256,6 +256,12 @@ GDS2Reader::progress_checkpoint ()
   m_progress.set (m_stream.pos ());
 }
 
+std::string
+GDS2Reader::path () const
+{
+  return m_stream.source ();
+}
+
 void 
 GDS2Reader::error (const std::string &msg)
 {

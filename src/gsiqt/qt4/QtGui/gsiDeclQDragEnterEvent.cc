@@ -230,12 +230,12 @@ gsi::Class<QDragEnterEvent> &qtdecl_QDragEnterEvent ();
 static gsi::Methods methods_QDragEnterEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDragEnterEvent::QDragEnterEvent(const QPoint &pos, QFlags<Qt::DropAction> actions, const QMimeData *data, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers)\nThis method creates an object of class QDragEnterEvent.", &_init_ctor_QDragEnterEvent_Adaptor_11787, &_call_ctor_QDragEnterEvent_Adaptor_11787);
-  methods += new qt_gsi::GenericMethod ("encodedData", "@hide", true, &_init_cbs_encodedData_c1731_0, &_call_cbs_encodedData_c1731_0);
-  methods += new qt_gsi::GenericMethod ("encodedData", "@brief Virtual method QByteArray QDragEnterEvent::encodedData(const char *)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_encodedData_c1731_0, &_call_cbs_encodedData_c1731_0, &_set_callback_cbs_encodedData_c1731_0);
-  methods += new qt_gsi::GenericMethod ("format", "@hide", true, &_init_cbs_format_c767_1, &_call_cbs_format_c767_1);
-  methods += new qt_gsi::GenericMethod ("format", "@brief Virtual method const char *QDragEnterEvent::format(int n)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_format_c767_1, &_call_cbs_format_c767_1, &_set_callback_cbs_format_c767_1);
-  methods += new qt_gsi::GenericMethod ("provides", "@hide", true, &_init_cbs_provides_c1731_0, &_call_cbs_provides_c1731_0);
-  methods += new qt_gsi::GenericMethod ("provides", "@brief Virtual method bool QDragEnterEvent::provides(const char *)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_provides_c1731_0, &_call_cbs_provides_c1731_0, &_set_callback_cbs_provides_c1731_0);
+  methods += new qt_gsi::GenericMethod ("encodedData", "@brief Virtual method QByteArray QDragEnterEvent::encodedData(const char *)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_encodedData_c1731_0, &_call_cbs_encodedData_c1731_0);
+  methods += new qt_gsi::GenericMethod ("encodedData", "@hide", true, &_init_cbs_encodedData_c1731_0, &_call_cbs_encodedData_c1731_0, &_set_callback_cbs_encodedData_c1731_0);
+  methods += new qt_gsi::GenericMethod ("format", "@brief Virtual method const char *QDragEnterEvent::format(int n)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_format_c767_1, &_call_cbs_format_c767_1);
+  methods += new qt_gsi::GenericMethod ("format", "@hide", true, &_init_cbs_format_c767_1, &_call_cbs_format_c767_1, &_set_callback_cbs_format_c767_1);
+  methods += new qt_gsi::GenericMethod ("provides", "@brief Virtual method bool QDragEnterEvent::provides(const char *)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_provides_c1731_0, &_call_cbs_provides_c1731_0);
+  methods += new qt_gsi::GenericMethod ("provides", "@hide", true, &_init_cbs_provides_c1731_0, &_call_cbs_provides_c1731_0, &_set_callback_cbs_provides_c1731_0);
   return methods;
 }
 

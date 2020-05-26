@@ -203,10 +203,10 @@ gsi::Class<QItemEditorCreatorBase> &qtdecl_QItemEditorCreatorBase ();
 static gsi::Methods methods_QItemEditorCreatorBase_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QItemEditorCreatorBase::QItemEditorCreatorBase()\nThis method creates an object of class QItemEditorCreatorBase.", &_init_ctor_QItemEditorCreatorBase_Adaptor_0, &_call_ctor_QItemEditorCreatorBase_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("createWidget", "@hide", true, &_init_cbs_createWidget_c1315_0, &_call_cbs_createWidget_c1315_0);
-  methods += new qt_gsi::GenericMethod ("createWidget", "@brief Virtual method QWidget *QItemEditorCreatorBase::createWidget(QWidget *parent)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_createWidget_c1315_0, &_call_cbs_createWidget_c1315_0, &_set_callback_cbs_createWidget_c1315_0);
-  methods += new qt_gsi::GenericMethod ("valuePropertyName", "@hide", true, &_init_cbs_valuePropertyName_c0_0, &_call_cbs_valuePropertyName_c0_0);
-  methods += new qt_gsi::GenericMethod ("valuePropertyName", "@brief Virtual method QByteArray QItemEditorCreatorBase::valuePropertyName()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_valuePropertyName_c0_0, &_call_cbs_valuePropertyName_c0_0, &_set_callback_cbs_valuePropertyName_c0_0);
+  methods += new qt_gsi::GenericMethod ("createWidget", "@brief Virtual method QWidget *QItemEditorCreatorBase::createWidget(QWidget *parent)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_createWidget_c1315_0, &_call_cbs_createWidget_c1315_0);
+  methods += new qt_gsi::GenericMethod ("createWidget", "@hide", true, &_init_cbs_createWidget_c1315_0, &_call_cbs_createWidget_c1315_0, &_set_callback_cbs_createWidget_c1315_0);
+  methods += new qt_gsi::GenericMethod ("valuePropertyName", "@brief Virtual method QByteArray QItemEditorCreatorBase::valuePropertyName()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_valuePropertyName_c0_0, &_call_cbs_valuePropertyName_c0_0);
+  methods += new qt_gsi::GenericMethod ("valuePropertyName", "@hide", true, &_init_cbs_valuePropertyName_c0_0, &_call_cbs_valuePropertyName_c0_0, &_set_callback_cbs_valuePropertyName_c0_0);
   return methods;
 }
 

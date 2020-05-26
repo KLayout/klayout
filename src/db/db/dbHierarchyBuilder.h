@@ -190,6 +190,23 @@ public:
 };
 
 /**
+ *  @brief An text-generating shape receiver that feeds a shapes array after turning the shapes into texts
+ */
+class DB_PUBLIC TextBuildingHierarchyBuilderShapeReceiver
+  : public HierarchyBuilderShapeReceiver
+{
+public:
+  TextBuildingHierarchyBuilderShapeReceiver (db::Layout *layout);
+
+  virtual void push (const db::Shape &shape, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target);
+  virtual void push (const db::Box &, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) { }
+  virtual void push (const db::Polygon &, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) { }
+
+private:
+  db::Layout *mp_layout;
+};
+
+/**
  *  @brief A class building a hierarchy from a recursive shape iterator in push mode
  *
  *  This class is a RecursiveShapeReceiver which acts on the hierarchy events and

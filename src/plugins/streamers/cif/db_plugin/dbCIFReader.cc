@@ -581,7 +581,7 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
 
         if (rx >= 0 && ry == 0) {
 
-          cell.shapes ((unsigned int) layer).insert (db::Box (sf * (x - 0.5 * w), sf * (y - 0.5 * h), sf * (x + 0.5 * w), sf * (y + 0.5 * h)));
+          cell.shapes ((unsigned int) layer).insert (db::Box (db::Point (sf * (x - 0.5 * w), sf * (y - 0.5 * h)), db::Point (sf * (x + 0.5 * w), sf * (y + 0.5 * h))));
 
         } else {
 
@@ -818,7 +818,7 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
 void 
 CIFReader::do_read (db::Layout &layout)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 21, "File read");
+  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("File read: ")) + m_stream.source ());
 
   try {
   

@@ -303,7 +303,7 @@ MAGReader::do_read (db::Layout &layout, db::cell_index_type cell_index, tl::Text
 void 
 MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl::TextInputStream &stream)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 31, "File read");
+  tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("File read: ")) + m_stream.source ());
 
   if (tl::verbosity () >= 30) {
     tl::log << "Reading layout file: " << stream.source ();

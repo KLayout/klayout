@@ -419,6 +419,29 @@ static void insert_edge_pairs_with_dtrans (db::Shapes *sh, const db::EdgePairs &
   }
 }
 
+static void insert_texts (db::Shapes *sh, const db::Texts &r)
+{
+  for (db::Texts::const_iterator s = r.begin (); ! s.at_end (); ++s) {
+    sh->insert (*s);
+  }
+}
+
+static void insert_texts_with_trans (db::Shapes *sh, const db::Texts &r, const db::ICplxTrans &trans)
+{
+  for (db::Texts::const_iterator s = r.begin (); ! s.at_end (); ++s) {
+    sh->insert (s->transformed (trans));
+  }
+}
+
+static void insert_texts_with_dtrans (db::Shapes *sh, const db::Texts &r, const db::DCplxTrans &trans)
+{
+  db::CplxTrans dbu_trans (shapes_dbu (sh));
+  db::ICplxTrans itrans = dbu_trans.inverted () * trans * dbu_trans;
+  for (db::Texts::const_iterator s = r.begin (); ! s.at_end (); ++s) {
+    sh->insert (s->transformed (itrans));
+  }
+}
+
 static unsigned int s_all ()                 { return db::ShapeIterator::All; }
 static unsigned int s_all_with_properties () { return db::ShapeIterator::AllWithProperties; }
 static unsigned int s_properties ()          { return db::ShapeIterator::Properties; }
@@ -599,7 +622,7 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "@param edges The edge pairs to insert\n"
     "@param trans The transformation to apply (displacement in micrometer units)\n"
     "\n"
-    "This method inserts all edge pairs from the edge collection into this shape container.\n"
+    "This method inserts all edge pairs from the edge pair collection into this shape container.\n"
     "Before an edge pair is inserted, the given transformation is applied.\n"
     "\n"
     "This method has been introduced in version 0.26.\n"
@@ -681,6 +704,34 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "Before each edge is inserted into the shape collection, the given transformation is applied.\n"
     "\n"
     "This method has been introduced in version 0.25.\n"
+  ) +
+  gsi::method_ext ("insert", &insert_texts, gsi::arg ("texts"),
+    "@brief Inserts the texts from the text collection into this shape container\n"
+    "@param texts The texts to insert\n"
+    "\n"
+    "This method inserts all texts from the text collection into this shape container.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method_ext ("insert", &insert_texts_with_trans, gsi::arg ("texts"), gsi::arg ("trans"),
+    "@brief Inserts the texts from the text collection into this shape container with a transformation\n"
+    "@param edges The texts to insert\n"
+    "@param trans The transformation to apply\n"
+    "\n"
+    "This method inserts all texts from the text collection into this shape container.\n"
+    "Before an text is inserted, the given transformation is applied.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method_ext ("insert", &insert_texts_with_dtrans, gsi::arg ("texts"), gsi::arg ("trans"),
+    "@brief Inserts the texts from the text collection into this shape container with a transformation (given in micrometer units)\n"
+    "@param edges The text to insert\n"
+    "@param trans The transformation to apply (displacement in micrometer units)\n"
+    "\n"
+    "This method inserts all texts from the text collection into this shape container.\n"
+    "Before an text is inserted, the given transformation is applied.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
   ) +
   gsi::method_ext ("transform", &transform_shapes, gsi::arg ("trans"),
     "@brief Transforms all shapes with the given transformation\n"

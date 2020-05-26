@@ -66,6 +66,7 @@ class LayerMapping;
 class Region;
 class Edges;
 class EdgePairs;
+class Texts;
 
 template <class Coord> class generic_repository;
 typedef generic_repository<db::Coord> GenericRepository;
@@ -558,9 +559,25 @@ public:
   }
 
   /**
+   *  @brief Accessor to the string repository (const version)
+   */
+  const StringRepository &string_repository () const
+  {
+    return m_string_repository;
+  }
+
+  /**
    *  @brief Accessor to the shape repository
    */
   GenericRepository &shape_repository ()
+  {
+    return m_shape_repository;
+  }
+
+  /**
+   *  @brief Accessor to the shape repository (const version)
+   */
+  const GenericRepository &shape_repository () const
   {
     return m_shape_repository;
   }
@@ -1122,6 +1139,15 @@ public:
    *  given cell.
    */
   void insert (db::cell_index_type cell, int layer, const db::EdgePairs &edge_pairs);
+
+  /**
+   *  @brief Inserts a text collection (potentially hierarchical) into the given cell and layer
+   *
+   *  If the text collection is flat (conceptionally), it will be put into the cell.
+   *  If the text collection is hierarchical, a cell hierarchy will be built below the
+   *  given cell.
+   */
+  void insert (db::cell_index_type cell, int layer, const db::Texts &texts);
 
   /**
    *  @brief Delete a cell plus all subcells 

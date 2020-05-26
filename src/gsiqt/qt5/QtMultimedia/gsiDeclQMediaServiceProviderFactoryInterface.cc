@@ -214,10 +214,10 @@ gsi::Class<QMediaServiceProviderFactoryInterface> &qtdecl_QMediaServiceProviderF
 static gsi::Methods methods_QMediaServiceProviderFactoryInterface_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMediaServiceProviderFactoryInterface::QMediaServiceProviderFactoryInterface()\nThis method creates an object of class QMediaServiceProviderFactoryInterface.", &_init_ctor_QMediaServiceProviderFactoryInterface_Adaptor_0, &_call_ctor_QMediaServiceProviderFactoryInterface_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("qt_create", "@hide", false, &_init_cbs_create_2025_0, &_call_cbs_create_2025_0);
-  methods += new qt_gsi::GenericMethod ("qt_create", "@brief Virtual method QMediaService *QMediaServiceProviderFactoryInterface::create(QString const &key)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_create_2025_0, &_call_cbs_create_2025_0, &_set_callback_cbs_create_2025_0);
-  methods += new qt_gsi::GenericMethod ("release", "@hide", false, &_init_cbs_release_1904_0, &_call_cbs_release_1904_0);
-  methods += new qt_gsi::GenericMethod ("release", "@brief Virtual method void QMediaServiceProviderFactoryInterface::release(QMediaService *service)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_release_1904_0, &_call_cbs_release_1904_0, &_set_callback_cbs_release_1904_0);
+  methods += new qt_gsi::GenericMethod ("qt_create", "@brief Virtual method QMediaService *QMediaServiceProviderFactoryInterface::create(QString const &key)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_create_2025_0, &_call_cbs_create_2025_0);
+  methods += new qt_gsi::GenericMethod ("qt_create", "@hide", false, &_init_cbs_create_2025_0, &_call_cbs_create_2025_0, &_set_callback_cbs_create_2025_0);
+  methods += new qt_gsi::GenericMethod ("release", "@brief Virtual method void QMediaServiceProviderFactoryInterface::release(QMediaService *service)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_release_1904_0, &_call_cbs_release_1904_0);
+  methods += new qt_gsi::GenericMethod ("release", "@hide", false, &_init_cbs_release_1904_0, &_call_cbs_release_1904_0, &_set_callback_cbs_release_1904_0);
   return methods;
 }
 

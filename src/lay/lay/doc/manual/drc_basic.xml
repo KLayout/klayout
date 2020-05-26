@@ -20,6 +20,7 @@
     <li>Support for edge objects derived from polygons or as output from other functions.
         Edge objects are useful to implement edge-related operations, for example selective sizing.</li>
     <li>The capability the work with multiple input layouts.</li>
+    <li>Support for text object layers. Text objects are convenient for tagging polygons or labelling nets.</li>
     <li>Cell filtering, local (region-constrained) operation.</li>
     <li>A tiling approach for large layouts which can be configured to make use of multiple CPU cores.</li>
     <li>A hierarchical option.</li>

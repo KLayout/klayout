@@ -7,47 +7,7 @@ TARGET = db_tests
 include($$PWD/../../lib_ut.pri)
 
 SOURCES = \
-  dbArray.cc \
-  dbBox.cc \
-  dbBoxScanner.cc \
-  dbBoxTree.cc \
-  dbCell.cc \
-  dbCellGraphUtils.cc \
-  dbCellHullGenerator.cc \
-  dbCellMapping.cc \
-  dbClip.cc \
-  dbExpression.cc \
-  dbEdge.cc \
-  dbEdgePair.cc \
-  dbEdgePairRelations.cc \
-  dbEdgePairs.cc \
-  dbEdgeProcessor.cc \
-  dbEdges.cc \
-  dbEdgesToContours.cc \
-  dbLayer.cc \
-  dbLayerMapping.cc \
-  dbLayout.cc \
-  dbLayoutDiff.cc \
-  dbLayoutUtils.cc \
-  dbLibraries.cc \
-  dbMatrix.cc \
-  dbObject.cc \
-  dbPath.cc \
-  dbPCells.cc \
-  dbPoint.cc \
-  dbPolygon.cc \
-  dbPropertiesRepository.cc \
-  dbRegion.cc \
-  dbShapeArray.cc \
-  dbShape.cc \
-  dbShapeRepository.cc \
-  dbShapes.cc \
-  dbText.cc \
-  dbTilingProcessor.cc \
-  dbTrans.cc \
-  dbVector.cc \
   dbWriterTools.cc \
-    dbVariableWidthPath.cc \
     dbLoadLayoutOptionsTests.cc \
     dbSaveLayoutOptionsTests.cc \
     dbHierarchyBuilderTests.cc \
@@ -73,7 +33,50 @@ SOURCES = \
     dbLayoutQueryTests.cc \
     dbPolygonToolsTests.cc \
     dbTechnologyTests.cc \
-    dbStreamLayerTests.cc
+    dbStreamLayerTests.cc \
+    dbVectorTests.cc \
+    dbVariableWidthPathTests.cc \
+    dbTransTests.cc \
+    dbTilingProcessorTests.cc \
+    dbTextsTests.cc \
+    dbTextTests.cc \
+    dbShapesTests.cc \
+    dbShapeRepositoryTests.cc \
+    dbShapeArrayTests.cc \
+    dbShapeTests.cc \
+    dbRegionTests.cc \
+    dbPropertiesRepositoryTests.cc \
+    dbPolygonTests.cc \
+    dbPointTests.cc \
+    dbPCellsTests.cc \
+    dbPathTests.cc \
+    dbObjectTests.cc \
+    dbMatrixTests.cc \
+    dbLibrariesTests.cc \
+    dbLayoutUtilsTests.cc \
+    dbLayoutDiffTests.cc \
+    dbLayoutTests.cc \
+    dbLayerMappingTests.cc \
+    dbLayerTests.cc \
+    dbExpressionTests.cc \
+    dbEdgesToContoursTests.cc \
+    dbEdgesTests.cc \
+    dbEdgeProcessorTests.cc \
+    dbEdgePairsTests.cc \
+    dbEdgePairRelationsTests.cc \
+    dbEdgePairTests.cc \
+    dbEdgeTests.cc \
+    dbClipTests.cc \
+    dbCellMappingTests.cc \
+    dbCellHullGeneratorTests.cc \
+    dbCellGraphUtilsTests.cc \
+    dbCellTests.cc \
+    dbBoxTreeTests.cc \
+    dbBoxScannerTests.cc \
+    dbBoxTests.cc \
+    dbArrayTests.cc \
+    dbDeepTextsTests.cc \
+    dbNetShapeTests.cc
 
 INCLUDEPATH += $$TL_INC $$DB_INC $$GSI_INC
 DEPENDPATH += $$TL_INC $$DB_INC $$GSI_INC

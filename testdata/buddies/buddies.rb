@@ -17,8 +17,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-if !$:.member?(File::dirname($0))
-  $:.push(File::dirname($0))
+ruby_dir = File.join(File::dirname($0), "..", "ruby")
+if !$:.member?(ruby_dir)
+  $:.push(ruby_dir)
 end
 
 load("test_prologue.rb")

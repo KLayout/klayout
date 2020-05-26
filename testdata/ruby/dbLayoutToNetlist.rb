@@ -68,7 +68,7 @@ class DBLayoutToNetlist_TestClass < TestBase
     # cell mapping with nets
 
     l2n = RBA::LayoutToNetlist::new
-    l2n.read(File.join($ut_testsrc, "testdata", "algo", "l2n_writer_au.txt"))
+    l2n.read(File.join($ut_testsrc, "testdata", "algo", "l2n_reader_in.txt"))
 
     nets = [
       l2n.netlist.circuit_by_name("RINGO").net_by_name("VSS"),
@@ -481,7 +481,7 @@ END
 
     l2n = RBA::LayoutToNetlist::new
 
-    input = File.join($ut_testsrc, "testdata", "algo", "l2n_writer_au.txt")
+    input = File.join($ut_testsrc, "testdata", "algo", "l2n_reader_in.txt")
     l2n.read(input)
 
     tmp = File::join($ut_testtmp, "tmp.txt")
@@ -499,7 +499,7 @@ END
 
     l2n = RBA::LayoutToNetlist::new
 
-    input = File.join($ut_testsrc, "testdata", "algo", "l2n_writer_au.txt")
+    input = File.join($ut_testsrc, "testdata", "algo", "l2n_reader_in.txt")
     l2n.read(input)
 
     # build_all_nets

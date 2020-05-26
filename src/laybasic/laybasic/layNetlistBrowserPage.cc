@@ -987,9 +987,9 @@ NetlistBrowserPage::adjust_view ()
     for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
 
       db::Box layer_bbox;
-      db::recursive_cluster_shape_iterator<db::PolygonRef> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
+      db::recursive_cluster_shape_iterator<db::NetShape> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
       while (! shapes.at_end ()) {
-        layer_bbox += shapes.trans () * shapes->box ();
+        layer_bbox += shapes->bbox ();
         ++shapes;
       }
 
@@ -1187,15 +1187,19 @@ NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_ma
     db::LayerProperties lp = layout->get_properties (*layer);
     std::map<db::LayerProperties, lay::LayerPropertiesConstIterator>::const_iterator display = display_by_lp.find (lp);
 
-    db::recursive_cluster_shape_iterator<db::PolygonRef> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
+    db::recursive_cluster_shape_iterator<db::NetShape> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
     while (! shapes.at_end ()) {
+
+      if (shapes->type () != db::NetShape::Polygon) {
+        continue;
+      }
 
       if (n_markers == m_max_shape_count) {
         return true;
       }
 
       mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
-      mp_markers.back ()->set (*shapes, net_trans * shapes.trans (), tv);
+      mp_markers.back ()->set (shapes->polygon_ref (), net_trans * shapes.trans (), tv);
 
       if (net_color.isValid ()) {
 

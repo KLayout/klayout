@@ -625,21 +625,21 @@ public:
     size_t n = data_length ();
     for (unsigned int i = 0; i < 3; ++i) {
       if (mp_color_data[i]) {
-        stat->add (typeid (float []), (void *) mp_color_data[i], sizeof (n * sizeof (float)), sizeof (n * sizeof (float)), (void *) this, purpose, cat);
+        stat->add (typeid (float []), (void *) mp_color_data[i], n * sizeof (float), n * sizeof (float), (void *) this, purpose, cat);
       }
       if (mp_color_byte_data[i]) {
-        stat->add (typeid (unsigned char []), (void *) mp_color_byte_data[i], sizeof (n * sizeof (unsigned char)), sizeof (n * sizeof (unsigned char)), (void *) this, purpose, cat);
+        stat->add (typeid (unsigned char []), (void *) mp_color_byte_data[i], n * sizeof (unsigned char), n * sizeof (unsigned char), (void *) this, purpose, cat);
       }
     }
 
     if (mp_mask) {
-      stat->add (typeid (unsigned char []), (void *) mp_mask, sizeof (n * sizeof (unsigned char)), sizeof (n * sizeof (unsigned char)), (void *) this, purpose, cat);
+      stat->add (typeid (unsigned char []), (void *) mp_mask, n * sizeof (unsigned char), n * sizeof (unsigned char), (void *) this, purpose, cat);
     }
     if (mp_data) {
-      stat->add (typeid (float []), (void *) mp_data, sizeof (n * sizeof (float)), sizeof (n * sizeof (float)), (void *) this, purpose, cat);
+      stat->add (typeid (float []), (void *) mp_data, n * sizeof (float), n * sizeof (float), (void *) this, purpose, cat);
     }
     if (mp_byte_data) {
-      stat->add (typeid (unsigned char []), (void *) mp_byte_data, sizeof (n * sizeof (unsigned char)), sizeof (n * sizeof (unsigned char)), (void *) this, purpose, cat);
+      stat->add (typeid (unsigned char []), (void *) mp_byte_data, n * sizeof (unsigned char), n * sizeof (unsigned char), (void *) this, purpose, cat);
     }
   }
 

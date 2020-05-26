@@ -663,29 +663,29 @@ gsi::Class<QTextBlockGroup> &qtdecl_QTextBlockGroup ();
 
 static gsi::Methods methods_QTextBlockGroup_Adaptor () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("*blockFormatChanged", "@hide", false, &_init_cbs_blockFormatChanged_2306_0, &_call_cbs_blockFormatChanged_2306_0);
-  methods += new qt_gsi::GenericMethod ("*blockFormatChanged", "@brief Virtual method void QTextBlockGroup::blockFormatChanged(const QTextBlock &block)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_blockFormatChanged_2306_0, &_call_cbs_blockFormatChanged_2306_0, &_set_callback_cbs_blockFormatChanged_2306_0);
-  methods += new qt_gsi::GenericMethod ("*blockInserted", "@hide", false, &_init_cbs_blockInserted_2306_0, &_call_cbs_blockInserted_2306_0);
-  methods += new qt_gsi::GenericMethod ("*blockInserted", "@brief Virtual method void QTextBlockGroup::blockInserted(const QTextBlock &block)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_blockInserted_2306_0, &_call_cbs_blockInserted_2306_0, &_set_callback_cbs_blockInserted_2306_0);
+  methods += new qt_gsi::GenericMethod ("*blockFormatChanged", "@brief Virtual method void QTextBlockGroup::blockFormatChanged(const QTextBlock &block)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_blockFormatChanged_2306_0, &_call_cbs_blockFormatChanged_2306_0);
+  methods += new qt_gsi::GenericMethod ("*blockFormatChanged", "@hide", false, &_init_cbs_blockFormatChanged_2306_0, &_call_cbs_blockFormatChanged_2306_0, &_set_callback_cbs_blockFormatChanged_2306_0);
+  methods += new qt_gsi::GenericMethod ("*blockInserted", "@brief Virtual method void QTextBlockGroup::blockInserted(const QTextBlock &block)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_blockInserted_2306_0, &_call_cbs_blockInserted_2306_0);
+  methods += new qt_gsi::GenericMethod ("*blockInserted", "@hide", false, &_init_cbs_blockInserted_2306_0, &_call_cbs_blockInserted_2306_0, &_set_callback_cbs_blockInserted_2306_0);
   methods += new qt_gsi::GenericMethod ("*blockList", "@brief Method QList<QTextBlock> QTextBlockGroup::blockList()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_blockList_c0, &_call_fp_blockList_c0);
-  methods += new qt_gsi::GenericMethod ("*blockRemoved", "@hide", false, &_init_cbs_blockRemoved_2306_0, &_call_cbs_blockRemoved_2306_0);
-  methods += new qt_gsi::GenericMethod ("*blockRemoved", "@brief Virtual method void QTextBlockGroup::blockRemoved(const QTextBlock &block)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_blockRemoved_2306_0, &_call_cbs_blockRemoved_2306_0, &_set_callback_cbs_blockRemoved_2306_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QTextBlockGroup::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QTextBlockGroup::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*blockRemoved", "@brief Virtual method void QTextBlockGroup::blockRemoved(const QTextBlock &block)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_blockRemoved_2306_0, &_call_cbs_blockRemoved_2306_0);
+  methods += new qt_gsi::GenericMethod ("*blockRemoved", "@hide", false, &_init_cbs_blockRemoved_2306_0, &_call_cbs_blockRemoved_2306_0, &_set_callback_cbs_blockRemoved_2306_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QTextBlockGroup::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QTextBlockGroup::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QTextBlockGroup::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_1731_0, &_call_cbs_disconnectNotify_1731_0);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QTextBlockGroup::disconnectNotify(const char *signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_1731_0, &_call_cbs_disconnectNotify_1731_0, &_set_callback_cbs_disconnectNotify_1731_0);
-  methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QTextBlockGroup::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QTextBlockGroup::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QTextBlockGroup::disconnectNotify(const char *signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_1731_0, &_call_cbs_disconnectNotify_1731_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_1731_0, &_call_cbs_disconnectNotify_1731_0, &_set_callback_cbs_disconnectNotify_1731_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QTextBlockGroup::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QTextBlockGroup::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QTextBlockGroup::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QTextBlockGroup::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*setFormat", "@brief Method void QTextBlockGroup::setFormat(const QTextFormat &format)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_setFormat_2432, &_call_fp_setFormat_2432);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QTextBlockGroup::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QTextBlockGroup::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }
 

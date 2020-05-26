@@ -246,12 +246,12 @@ gsi::Class<QAccessibleImageInterface> &qtdecl_QAccessibleImageInterface ();
 static gsi::Methods methods_QAccessibleImageInterface_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAccessibleImageInterface::QAccessibleImageInterface()\nThis method creates an object of class QAccessibleImageInterface.", &_init_ctor_QAccessibleImageInterface_Adaptor_0, &_call_ctor_QAccessibleImageInterface_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("imageDescription", "@hide", true, &_init_cbs_imageDescription_c0_0, &_call_cbs_imageDescription_c0_0);
-  methods += new qt_gsi::GenericMethod ("imageDescription", "@brief Virtual method QString QAccessibleImageInterface::imageDescription()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_imageDescription_c0_0, &_call_cbs_imageDescription_c0_0, &_set_callback_cbs_imageDescription_c0_0);
-  methods += new qt_gsi::GenericMethod ("imagePosition", "@hide", true, &_init_cbs_imagePosition_c0_0, &_call_cbs_imagePosition_c0_0);
-  methods += new qt_gsi::GenericMethod ("imagePosition", "@brief Virtual method QPoint QAccessibleImageInterface::imagePosition()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_imagePosition_c0_0, &_call_cbs_imagePosition_c0_0, &_set_callback_cbs_imagePosition_c0_0);
-  methods += new qt_gsi::GenericMethod ("imageSize", "@hide", true, &_init_cbs_imageSize_c0_0, &_call_cbs_imageSize_c0_0);
-  methods += new qt_gsi::GenericMethod ("imageSize", "@brief Virtual method QSize QAccessibleImageInterface::imageSize()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_imageSize_c0_0, &_call_cbs_imageSize_c0_0, &_set_callback_cbs_imageSize_c0_0);
+  methods += new qt_gsi::GenericMethod ("imageDescription", "@brief Virtual method QString QAccessibleImageInterface::imageDescription()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_imageDescription_c0_0, &_call_cbs_imageDescription_c0_0);
+  methods += new qt_gsi::GenericMethod ("imageDescription", "@hide", true, &_init_cbs_imageDescription_c0_0, &_call_cbs_imageDescription_c0_0, &_set_callback_cbs_imageDescription_c0_0);
+  methods += new qt_gsi::GenericMethod ("imagePosition", "@brief Virtual method QPoint QAccessibleImageInterface::imagePosition()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_imagePosition_c0_0, &_call_cbs_imagePosition_c0_0);
+  methods += new qt_gsi::GenericMethod ("imagePosition", "@hide", true, &_init_cbs_imagePosition_c0_0, &_call_cbs_imagePosition_c0_0, &_set_callback_cbs_imagePosition_c0_0);
+  methods += new qt_gsi::GenericMethod ("imageSize", "@brief Virtual method QSize QAccessibleImageInterface::imageSize()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_imageSize_c0_0, &_call_cbs_imageSize_c0_0);
+  methods += new qt_gsi::GenericMethod ("imageSize", "@hide", true, &_init_cbs_imageSize_c0_0, &_call_cbs_imageSize_c0_0, &_set_callback_cbs_imageSize_c0_0);
   return methods;
 }
 

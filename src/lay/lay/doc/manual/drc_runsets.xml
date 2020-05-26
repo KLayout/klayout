@@ -329,6 +329,8 @@ output(w, "width violations")</pre>
       <a href="/about/drc_ref_global.xml#select">select</a>,
       <a href="/about/drc_ref_global.xml#clip">clip</a>,
       <a href="/about/drc_ref_global.xml#input">input</a>,
+      <a href="/about/drc_ref_global.xml#labels">labels</a>,
+      <a href="/about/drc_ref_global.xml#polygons">polygons</a>,
       <a href="/about/drc_ref_global.xml#output">output</a>, 
       <a href="/about/drc_ref_global.xml#report">report</a>, 
       <a href="/about/drc_ref_global.xml#target">target</a>
@@ -362,6 +364,7 @@ output(w, "width violations")</pre>
       <a href="/about/drc_ref_layer.xml#in">in</a>,
       <a href="/about/drc_ref_layer.xml#inside">inside</a>,
       <a href="/about/drc_ref_layer.xml#interacting">interacting</a>,
+      <a href="/about/drc_ref_layer.xml#pull_interacting">pull_interacting</a>,
       <a href="/about/drc_ref_layer.xml#outside">outside</a>,
       <a href="/about/drc_ref_layer.xml#touching">touching</a>,
       <a href="/about/drc_ref_layer.xml#overlapping">overlapping</a><br/>
@@ -394,6 +397,10 @@ output(w, "width violations")</pre>
       <a href="/about/drc_ref_layer.xml#without_perimeter">without_perimeter</a>
       <a href="/about/drc_ref_layer.xml#without_angle">without_angle</a>,
       <a href="/about/drc_ref_layer.xml#without_length">without_length</a>
+    </li>
+    <li>Text filters:<br/>
+      <a href="/about/drc_ref_layer.xml#texts">texts</a>,
+      <a href="/about/drc_ref_layer.xml#texts_not">texts_not</a>,
     </li>
     <li>Transformations:<br/>
       <a href="/about/drc_ref_layer.xml#moved">moved</a>,
@@ -444,11 +451,21 @@ output(w, "width violations")</pre>
     </li>
   </ul>
 
-  <h2>Edge and polygon layers</h2>
+  <h2>Polygon and edge layers</h2>
 
   <p>
-  KLayout knows two basic layer types: polygon and edge layers. 
-  Input from layout is always of polygon type initially. 
+  KLayout knows four layer types: polygon, edge, edge pair and text layers.
+  Polygon and edge layers are the basic layer types for geometrical operations.
+  </p>
+
+  <p>
+  Polygon layers are created from original layers using <a href="/about/drc_ref_global.xml#input">input</a> or
+  <a href="/about/drc_ref_global.xml#polygons">polygons</a>.
+  "input" will also turn texts into small polygons with a size of 2x2 DBU
+  while "polygons" will skip texts. For handling texts, the 
+  <a href="/about/drc_ref_global.xml#labels">labels</a> method is 
+  recommended which renders a true text layer. Text layers are described
+  below.
   </p>
 
   <p>
@@ -501,6 +518,50 @@ output(w, "width violations")</pre>
   the DRC check functions.
   </p>
 
+  <h2>Text collections</h2>
+
+  <p>
+  Starting with version 0.27, KLayout offers support for text layers.
+  "Texts" are basically locations with a label, i.e. a dot with 
+  an arbitrary string attached. "Text collections" are collections of
+  such objects.
+  </p>
+
+  <p>
+  Texts can be used to select polygons or as net names in 
+  net extractions.
+  </p>
+
+  <p>
+  Text collections are kept in "text layers". These are created
+  using the <a href="/about/drc_ref_global.xml#labels">labels</a>
+  methods instead of "input".
+  </p>
+
+  <p>
+  These operations are supported for text layers:
+  </p>
+
+  <ul>
+    <li>Boolean AND with a polygon layer: will select those texts
+        which are inside or at the border of a polygon.
+        <a href="/about/drc_ref_layer.xml#interact">interact</a> is a synonym for this operation.</li>
+    <li>Boolean NOT with a polygon layer: will select those texts
+        which are outside of any polygon.
+        <a href="/about/drc_ref_layer.xml#not_interact">not_interact</a> is a synonym for this operation.</li>
+    <li>As second layer for region interact: this way, polygons
+        can be selected which are tagged with certain texts.</li>
+    <li>Text filtering by string: texts can be filtered either
+        by matching against a fixed text or a glob pattern.
+        The methods provided for this purpose are: 
+        <a href="/about/drc_ref_layer.xml#texts">texts</a> and
+        <a href="/about/drc_ref_layer.xml#texts_not">texts_not</a></li>
+    <li><a href="/about/drc_ref_layer.xml#flatten">flatten</a>
+        will flatten the hierarchy of a text layer.</li>
+    <li>Polygon or edge generation around the text's location:
+        <a href="/about/drc_ref_layer.xml#polygons">polygons</a> and
+        <a href="/about/drc_ref_layer.xml#edges">edges</a></li>
+  </ul>
 
   <h2>Edge pairs and edge pair collections</h2>
 

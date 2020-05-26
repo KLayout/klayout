@@ -25,9 +25,8 @@
 #define HDR_dbEdgePairsDelegate
 
 #include "dbCommon.h"
-
 #include "dbEdgePair.h"
-#include "tlUniqueId.h"
+#include "dbShapeCollection.h"
 
 namespace db {
 
@@ -59,7 +58,7 @@ public:
  *  @brief The delegate for the actual edge set implementation
  */
 class DB_PUBLIC EdgePairsDelegate
-  : public tl::UniqueId
+  : public ShapeCollectionDelegateBase
 {
 public:
   typedef db::Coord coord_type;

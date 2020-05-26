@@ -41,6 +41,7 @@ class DeviceAbstract;
 class Net;
 class Netlist;
 class LayoutToNetlist;
+class NetShape;
 
 namespace l2n_std_format
 {
@@ -75,7 +76,7 @@ private:
   void write (const db::SubCircuit &subcircuit, std::map<const Net *, unsigned int> &net2id, const std::string &indent);
   void write (const db::Device &device, std::map<const Net *, unsigned int> &net2id, const std::string &indent);
   void write (const db::DeviceAbstract &device_abstract, const std::string &indent);
-  void write (const db::PolygonRef *s, const db::ICplxTrans &tr, const std::string &lname, bool relative);
+  void write (const db::NetShape *s, const db::ICplxTrans &tr, const std::string &lname, bool relative);
   void write (const db::DCplxTrans &trans);
   void reset_geometry_ref ();
 

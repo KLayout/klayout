@@ -1150,10 +1150,10 @@ end</pre>
   </p>
 
   <p>In every case, the <class_doc href="Shape#each_edge"/> iterator will deliver all edges (connections between points
-  of the polygon). <class_doc href="Shape#each_point"/> will deliver every point of the polygon, including that of the
-  holes. <class_doc href="Shape#each_point_hull"/> will only deliver the points of the outer (hull) contour and 
+  of the polygon). 
+  <class_doc href="Shape#each_point_hull"/> will deliver the points of the outer (hull) contour and 
   <class_doc href="Shape#each_point_hole"/> will deliver the points of a specific hole contour. <class_doc href="Shape#holes"/> will deliver
-  the number of holes. A simple polygon does not have holes.
+  the number of holes. A simple polygon does not have holes and <class_doc href="Shape#holes"/> always gives zero.
   </p>
 
   <p>The <class_doc href="Shape#polygon"/> getter delivers a <class_doc href="Polygon"/> object. The same

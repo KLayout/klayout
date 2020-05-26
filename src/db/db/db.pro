@@ -184,7 +184,19 @@ SOURCES = \
     dbLayoutVsSchematic.cc \
     gsiDeclDbNetlistCrossReference.cc \
     gsiDeclDbLayoutVsSchematic.cc \
-    dbNetlistObject.cc
+    dbNetlistObject.cc \
+    gsiDeclDbTexts.cc \
+    dbTexts.cc \
+    dbDeepTexts.cc \
+    dbAsIfFlatTexts.cc \
+    dbTextsDelegate.cc \
+    dbEmptyTexts.cc \
+    dbFlatTexts.cc \
+    dbTextsUtils.cc \
+    dbOriginalLayerTexts.cc \
+    dbNetShape.cc \
+    dbShapeCollection.cc \
+    gsiDeclDbShapeCollection.cc
 
 HEADERS = \
   dbArray.h \
@@ -331,7 +343,17 @@ HEADERS = \
     dbLayoutVsSchematicReader.h \
     dbLayoutVsSchematicFormatDefs.h \
     dbLayoutVsSchematic.h \
-    dbNetlistObject.h
+    dbNetlistObject.h \
+    dbTexts.h \
+    dbDeepTexts.h \
+    dbAsIfFlatTexts.h \
+    dbTextsDelegate.h \
+    dbEmptyTexts.h \
+    dbFlatTexts.h \
+    dbTextsUtils.h \
+    dbOriginalLayerTexts.h \
+    dbNetShape.h \
+    dbShapeCollection.h
 
 !equals(HAVE_QT, "0") {
 

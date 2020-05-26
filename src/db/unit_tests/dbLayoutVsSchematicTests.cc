@@ -95,14 +95,14 @@ TEST(1_BasicFlow)
   std::auto_ptr<db::Region> rpplus (lvs.make_layer (pplus, "pplus"));
   std::auto_ptr<db::Region> rnplus (lvs.make_layer (nplus, "nplus"));
   std::auto_ptr<db::Region> rpoly (lvs.make_polygon_layer (poly, "poly"));
-  std::auto_ptr<db::Region> rpoly_lbl (lvs.make_text_layer (poly_lbl, "poly_lbl"));
+  std::auto_ptr<db::Region> rpoly_lbl (lvs.make_layer (poly_lbl, "poly_lbl"));
   std::auto_ptr<db::Region> rdiff_cont (lvs.make_polygon_layer (diff_cont, "diff_cont"));
   std::auto_ptr<db::Region> rpoly_cont (lvs.make_polygon_layer (poly_cont, "poly_cont"));
   std::auto_ptr<db::Region> rmetal1 (lvs.make_polygon_layer (metal1, "metal1"));
-  std::auto_ptr<db::Region> rmetal1_lbl (lvs.make_text_layer (metal1_lbl, "metal1_lbl"));
+  std::auto_ptr<db::Region> rmetal1_lbl (lvs.make_layer (metal1_lbl, "metal1_lbl"));
   std::auto_ptr<db::Region> rvia1 (lvs.make_polygon_layer (via1, "via1"));
   std::auto_ptr<db::Region> rmetal2 (lvs.make_polygon_layer (metal2, "metal2"));
-  std::auto_ptr<db::Region> rmetal2_lbl (lvs.make_text_layer (metal2_lbl, "metal2_lbl"));
+  std::auto_ptr<db::Region> rmetal2_lbl (lvs.make_layer (metal2_lbl, "metal2_lbl"));
 
   //  derived regions
 
@@ -293,14 +293,14 @@ TEST(2_FlowWithErrors)
   std::auto_ptr<db::Region> rpplus (lvs.make_layer (pplus, "pplus"));
   std::auto_ptr<db::Region> rnplus (lvs.make_layer (nplus, "nplus"));
   std::auto_ptr<db::Region> rpoly (lvs.make_polygon_layer (poly, "poly"));
-  std::auto_ptr<db::Region> rpoly_lbl (lvs.make_text_layer (poly_lbl, "poly_lbl"));
+  std::auto_ptr<db::Region> rpoly_lbl (lvs.make_layer (poly_lbl, "poly_lbl"));
   std::auto_ptr<db::Region> rdiff_cont (lvs.make_polygon_layer (diff_cont, "diff_cont"));
   std::auto_ptr<db::Region> rpoly_cont (lvs.make_polygon_layer (poly_cont, "poly_cont"));
   std::auto_ptr<db::Region> rmetal1 (lvs.make_polygon_layer (metal1, "metal1"));
-  std::auto_ptr<db::Region> rmetal1_lbl (lvs.make_text_layer (metal1_lbl, "metal1_lbl"));
+  std::auto_ptr<db::Region> rmetal1_lbl (lvs.make_layer (metal1_lbl, "metal1_lbl"));
   std::auto_ptr<db::Region> rvia1 (lvs.make_polygon_layer (via1, "via1"));
   std::auto_ptr<db::Region> rmetal2 (lvs.make_polygon_layer (metal2, "metal2"));
-  std::auto_ptr<db::Region> rmetal2_lbl (lvs.make_text_layer (metal2_lbl, "metal2_lbl"));
+  std::auto_ptr<db::Region> rmetal2_lbl (lvs.make_layer (metal2_lbl, "metal2_lbl"));
 
   //  derived regions
 

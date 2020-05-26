@@ -140,7 +140,7 @@ same_device_classes("POLYRES", nil)</pre>
   </p>
 
   <p>
-  A relative tolerance is specified as an additonal forth parameter. You can set
+  A relative tolerance is specified as an additional forth parameter. You can set
   the absolute tolerance to zero to specify only relative tolerances. This will
   specify 1% tolerance for the "L" parameter of "NMOS" devices:
   </p>
@@ -151,12 +151,13 @@ same_device_classes("POLYRES", nil)</pre>
   There is also a more explicit notation for the tolerance:
   </p>
 
-  <pre>tolerance("NMOS", "L", :absolute => 0.05)
-tolerance("NMOS", "L", :relative => 0.01)</pre>
+  <pre>tolerance("NMOS", "L", :absolute => 0.05)</pre>
 
   <p>
-  This notation is equivalent to the two forms above.
+  or
   </p>
+
+  <pre>tolerance("NMOS", "L", :relative => 0.01)</pre>
 
   <p>
   An absolute plus relative tolerance can be specified by giving both.

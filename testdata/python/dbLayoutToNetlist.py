@@ -443,7 +443,7 @@ end;
 
     l2n = pya.LayoutToNetlist()
 
-    infile = os.path.join(ut_testsrc, "testdata", "algo", "l2n_writer_au.txt")
+    infile = os.path.join(ut_testsrc, "testdata", "algo", "l2n_reader_in.txt")
     l2n.read(infile)
 
     tmp = os.path.join(ut_testtmp, "tmp.txt")

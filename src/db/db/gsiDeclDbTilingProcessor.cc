@@ -255,6 +255,11 @@ static void tp_output_edge_pairs (db::TilingProcessor *proc, const std::string &
   proc->output (name, edge_pairs);
 }
 
+static void tp_output_texts (db::TilingProcessor *proc, const std::string &name, db::Texts &texts)
+{
+  proc->output (name, texts);
+}
+
 static void tp_output_double (db::TilingProcessor *proc, const std::string &name, double *v)
 {
   proc->output (name, 0, new DoubleCollectingTileOutputReceiver (v), db::ICplxTrans ());
@@ -311,25 +316,49 @@ static void tp_input7 (db::TilingProcessor *proc, const std::string &name, const
 static void tp_input8 (db::TilingProcessor *proc, const std::string &name, const db::Region &region)
 {
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> it = region.begin_iter ();
-  proc->input (name, it.first, it.second, true /*as polygons*/, region.merged_semantics ());
+  proc->input (name, it.first, it.second, db::TilingProcessor::TypeRegion, region.merged_semantics ());
 }
 
 static void tp_input9 (db::TilingProcessor *proc, const std::string &name, const db::Region &region, const db::ICplxTrans &trans)
 {
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> it = region.begin_iter ();
-  proc->input (name, it.first, trans * it.second, true /*as polygons*/, region.merged_semantics ());
+  proc->input (name, it.first, trans * it.second, db::TilingProcessor::TypeRegion, region.merged_semantics ());
 }
 
 static void tp_input10 (db::TilingProcessor *proc, const std::string &name, const db::Edges &edges)
 {
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> it = edges.begin_iter ();
-  proc->input (name, it.first, it.second, false /*not as polygons*/, edges.merged_semantics ());
+  proc->input (name, it.first, it.second, db::TilingProcessor::TypeEdges, edges.merged_semantics ());
 }
 
 static void tp_input11 (db::TilingProcessor *proc, const std::string &name, const db::Edges &edges, const db::ICplxTrans &trans)
 {
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> it = edges.begin_iter ();
-  proc->input (name, it.first, trans * it.second, false /*not as polygons*/, edges.merged_semantics ());
+  proc->input (name, it.first, trans * it.second, db::TilingProcessor::TypeEdges, edges.merged_semantics ());
+}
+
+static void tp_input12 (db::TilingProcessor *proc, const std::string &name, const db::EdgePairs &edge_pairs)
+{
+  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> it = edge_pairs.begin_iter ();
+  proc->input (name, it.first, it.second, db::TilingProcessor::TypeEdgePairs);
+}
+
+static void tp_input13 (db::TilingProcessor *proc, const std::string &name, const db::EdgePairs &edge_pairs, const db::ICplxTrans &trans)
+{
+  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> it = edge_pairs.begin_iter ();
+  proc->input (name, it.first, trans * it.second, db::TilingProcessor::TypeEdgePairs);
+}
+
+static void tp_input14 (db::TilingProcessor *proc, const std::string &name, const db::Texts &texts)
+{
+  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> it = texts.begin_iter ();
+  proc->input (name, it.first, it.second, db::TilingProcessor::TypeTexts);
+}
+
+static void tp_input15 (db::TilingProcessor *proc, const std::string &name, const db::Texts &texts, const db::ICplxTrans &trans)
+{
+  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> it = texts.begin_iter ();
+  proc->input (name, it.first, trans * it.second, db::TilingProcessor::TypeTexts);
 }
 
 Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
@@ -385,16 +414,16 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
   method_ext ("input", &tp_input8, gsi::arg ("name"), gsi::arg ("region"),
     "@brief Specifies input for the tiling processor\n"
     "This method will establish an input channel for the processor. This version receives input from a \\Region object. "
-    "Regions don't always come with a database unit, hence a database unit should be specified with the \\dbu= method if only "
-    "regions and edges are used as input.\n"
+    "Regions don't always come with a database unit, hence a database unit should be specified with the \\dbu= method unless "
+    "a layout object is specified as input too.\n"
     "\n"
     "The name specifies the variable under which the input can be used in the scripts."
   ) + 
   method_ext ("input", &tp_input9, gsi::arg ("name"), gsi::arg ("region"), gsi::arg ("trans"),
     "@brief Specifies input for the tiling processor\n"
     "This method will establish an input channel for the processor. This version receives input from a \\Region object. "
-    "Regions don't always come with a database unit, hence a database unit should be specified with the \\dbu= method if only "
-    "regions and edges are used as input.\n"
+    "Regions don't always come with a database unit, hence a database unit should be specified with the \\dbu= method unless "
+    "a layout object is specified as input too.\n"
     "\n"
     "The name specifies the variable under which the input can be used in the scripts."
     "\n"
@@ -403,22 +432,62 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
   method_ext ("input", &tp_input10, gsi::arg ("name"), gsi::arg ("edges"),
     "@brief Specifies input for the tiling processor\n"
     "This method will establish an input channel for the processor. This version receives input from an \\Edges object. "
-    "Edge collections don't always come with a database unit, hence a database unit should be specified with the \\dbu= method if only "
-    "regions and edges are used as input.\n"
+    "Edge collections don't always come with a database unit, hence a database unit should be specified with the \\dbu= method unless "
+    "a layout object is specified as input too.\n"
     "\n"
     "The name specifies the variable under which the input can be used in the scripts."
   ) + 
   method_ext ("input", &tp_input11, gsi::arg ("name"), gsi::arg ("edges"), gsi::arg ("trans"),
     "@brief Specifies input for the tiling processor\n"
     "This method will establish an input channel for the processor. This version receives input from an \\Edges object. "
-    "Edge collections don't always come with a database unit, hence a database unit should be specified with the \\dbu= method if only "
-    "regions and edges are used as input.\n"
+    "Edge collections don't always come with a database unit, hence a database unit should be specified with the \\dbu= method unless "
+    "a layout object is specified as input too.\n"
     "\n"
     "The name specifies the variable under which the input can be used in the scripts."
     "\n"
     "This variant allows one to specify an additional transformation too. It has been introduced in version 0.23.2.\n"
     "\n"
   ) + 
+  method_ext ("input", &tp_input12, gsi::arg ("name"), gsi::arg ("edge_pairs"),
+    "@brief Specifies input for the tiling processor\n"
+    "This method will establish an input channel for the processor. This version receives input from an \\EdgePairs object. "
+    "Edge pair collections don't always come with a database unit, hence a database unit should be specified with the \\dbu= method unless "
+    "a layout object is specified as input too.\n"
+    "\n"
+    "The name specifies the variable under which the input can be used in the scripts."
+    "\n"
+    "This variant has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("input", &tp_input13, gsi::arg ("name"), gsi::arg ("edge_pairs"), gsi::arg ("trans"),
+    "@brief Specifies input for the tiling processor\n"
+    "This method will establish an input channel for the processor. This version receives input from an \\EdgePairs object. "
+    "Edge pair collections don't always come with a database unit, hence a database unit should be specified with the \\dbu= method unless "
+    "a layout object is specified as input too.\n"
+    "\n"
+    "The name specifies the variable under which the input can be used in the scripts."
+    "\n"
+    "This variant has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("input", &tp_input14, gsi::arg ("name"), gsi::arg ("texts"),
+    "@brief Specifies input for the tiling processor\n"
+    "This method will establish an input channel for the processor. This version receives input from an \\Texts object. "
+    "Text collections don't always come with a database unit, hence a database unit should be specified with the \\dbu= method unless "
+    "a layout object is specified as input too.\n"
+    "\n"
+    "The name specifies the variable under which the input can be used in the scripts."
+    "\n"
+    "This variant has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("input", &tp_input15, gsi::arg ("name"), gsi::arg ("texts"), gsi::arg ("trans"),
+    "@brief Specifies input for the tiling processor\n"
+    "This method will establish an input channel for the processor. This version receives input from an \\Texts object. "
+    "Text collections don't always come with a database unit, hence a database unit should be specified with the \\dbu= method unless "
+    "a layout object is specified as input too.\n"
+    "\n"
+    "The name specifies the variable under which the input can be used in the scripts."
+    "\n"
+    "This variant has been introduced in version 0.27.\n"
+  ) +
   method ("var", &db::TilingProcessor::var, gsi::arg ("name"), gsi::arg ("value"),
     "@brief Defines a variable for the tiling processor script\n"
     "\n"
@@ -524,6 +593,20 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
     "\n"
     "@param name The name of the channel\n"
     "@param edge_pairs The \\EdgePairs object to which the data is sent\n"
+  ) +
+  method_ext ("output", &tp_output_texts, gsi::arg ("name"), gsi::arg ("texts"),
+    "@brief Specifies output to an \\Texts object\n"
+    "This method will establish an output channel to an \\Texts object. The output sent to that channel "
+    "will be put into the specified edge pair collection.\n"
+    "Only \\Text objects are accepted. Other objects are discarded.\n"
+    "\n"
+    "The name is the name which must be used in the _output function of the scripts in order to "
+    "address that channel.\n"
+    "\n"
+    "@param name The name of the channel\n"
+    "@param texts The \\Texts object to which the data is sent\n"
+    "\n"
+    "This variant has been introduced in version 0.27."
   ) +
   method_ext ("output", &tp_output_double, gsi::arg ("name"), gsi::arg ("sum"),
     "@brief Specifies output to single value\n"

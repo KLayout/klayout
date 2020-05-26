@@ -25,7 +25,14 @@
 #include "dbCellMapping.h"
 #include "dbLayoutUtils.h"
 #include "dbRegion.h"
+#include "dbEdges.h"
+#include "dbEdgePairs.h"
+#include "dbTexts.h"
 #include "dbDeepRegion.h"
+#include "dbDeepEdges.h"
+#include "dbDeepEdgePairs.h"
+#include "dbDeepTexts.h"
+#include "dbShapeCollection.h"
 
 #include "tlTimer.h"
 
@@ -44,6 +51,30 @@ DeepLayer::DeepLayer (const Region &region)
   : mp_store (), m_layout (0), m_layer (0)
 {
   const db::DeepRegion *dr = dynamic_cast<db::DeepRegion *> (region.delegate ());
+  tl_assert (dr != 0);
+  *this = dr->deep_layer ();
+}
+
+DeepLayer::DeepLayer (const Texts &texts)
+  : mp_store (), m_layout (0), m_layer (0)
+{
+  const db::DeepTexts *dr = dynamic_cast<db::DeepTexts *> (texts.delegate ());
+  tl_assert (dr != 0);
+  *this = dr->deep_layer ();
+}
+
+DeepLayer::DeepLayer (const Edges &edges)
+  : mp_store (), m_layout (0), m_layer (0)
+{
+  const db::DeepEdges *dr = dynamic_cast<db::DeepEdges *> (edges.delegate ());
+  tl_assert (dr != 0);
+  *this = dr->deep_layer ();
+}
+
+DeepLayer::DeepLayer (const EdgePairs &edge_pairs)
+  : mp_store (), m_layout (0), m_layer (0)
+{
+  const db::DeepEdgePairs *dr = dynamic_cast<db::DeepEdgePairs *> (edge_pairs.delegate ());
   tl_assert (dr != 0);
   *this = dr->deep_layer ();
 }
@@ -459,9 +490,39 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Edges &edges, const db::IC
   return dl;
 }
 
-std::pair<bool, DeepLayer> DeepShapeStore::layer_for_flat (const db::Region &region) const
+DeepLayer DeepShapeStore::create_from_flat (const db::Texts &texts, const db::ICplxTrans &trans)
 {
-  return layer_for_flat (tl::id_of (region.delegate ()));
+  //  reuse existing layer
+  std::pair<bool, DeepLayer> lff = layer_for_flat (tl::id_of (texts.delegate ()));
+  if (lff.first) {
+    return lff.second;
+  }
+
+  require_singular ();
+
+  unsigned int layer = layout ().insert_layer ();
+
+  db::Shapes *shapes = &initial_cell ().shapes (layer);
+  db::Box world = db::Box::world ();
+
+  db::TextBuildingHierarchyBuilderShapeReceiver tb (&layout ());
+
+  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> ii = texts.begin_iter ();
+  db::ICplxTrans ttop = trans * ii.second;
+  while (! ii.first.at_end ()) {
+    tb.push (*ii.first, ttop * ii.first.trans (), world, 0, shapes);
+    ++ii.first;
+  }
+
+  DeepLayer dl (this, 0 /*singular layout index*/, layer);
+  m_layers_for_flat [tl::id_of (texts.delegate ())] = std::make_pair (dl.layout_index (), dl.layer ());
+  m_flat_region_id [std::make_pair (dl.layout_index (), dl.layer ())] = tl::id_of (texts.delegate ());
+  return dl;
+}
+
+std::pair<bool, DeepLayer> DeepShapeStore::layer_for_flat (const ShapeCollection &coll) const
+{
+  return layer_for_flat (tl::id_of (coll.get_delegate ()));
 }
 
 std::pair<bool, DeepLayer> DeepShapeStore::layer_for_flat (size_t region_id) const
@@ -807,64 +868,23 @@ DeepLayer DeepShapeStore::create_copy (const DeepLayer &source, HierarchyBuilder
 
 DeepLayer DeepShapeStore::create_edge_layer (const db::RecursiveShapeIterator &si, bool as_edges, const db::ICplxTrans &trans)
 {
-  unsigned int layout_index = layout_for_iter (si, trans);
-
-  db::Layout &layout = m_layouts[layout_index]->layout;
-  db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
-
-  unsigned int layer_index = init_layer (layout, si);
-  builder.set_target_layer (layer_index);
-
-  //  The chain of operators for producing edges
   db::EdgeBuildingHierarchyBuilderShapeReceiver refs (as_edges);
-
-  //  Build the working hierarchy from the recursive shape iterator
-  try {
-
-    tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Building working hierarchy")));
-    db::LayoutLocker ll (&layout, true /*no update*/);
-
-    builder.set_shape_receiver (&refs);
-    db::RecursiveShapeIterator (si).push (& builder);
-    builder.set_shape_receiver (0);
-
-  } catch (...) {
-    builder.set_shape_receiver (0);
-    throw;
-  }
-
-  return DeepLayer (this, layout_index, layer_index);
+  return create_custom_layer (si, &refs, trans);
 }
 
 DeepLayer DeepShapeStore::create_edge_pair_layer (const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans)
 {
-  unsigned int layout_index = layout_for_iter (si, trans);
-
-  db::Layout &layout = m_layouts[layout_index]->layout;
-  db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
-
-  unsigned int layer_index = init_layer (layout, si);
-  builder.set_target_layer (layer_index);
-
-  //  The chain of operators for producing the edge pairs
   db::EdgePairBuildingHierarchyBuilderShapeReceiver refs;
+  return create_custom_layer (si, &refs, trans);
+}
 
-  //  Build the working hierarchy from the recursive shape iterator
-  try {
+DeepLayer DeepShapeStore::create_text_layer (const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans)
+{
+  unsigned int layout_index = layout_for_iter (si, trans);
+  db::Layout &layout = m_layouts[layout_index]->layout;
 
-    tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Building working hierarchy")));
-    db::LayoutLocker ll (&layout, true /*no update*/);
-
-    builder.set_shape_receiver (&refs);
-    db::RecursiveShapeIterator (si).push (& builder);
-    builder.set_shape_receiver (0);
-
-  } catch (...) {
-    builder.set_shape_receiver (0);
-    throw;
-  }
-
-  return DeepLayer (this, layout_index, layer_index);
+  db::TextBuildingHierarchyBuilderShapeReceiver refs (&layout);
+  return create_custom_layer (si, &refs, trans);
 }
 
 void
@@ -1122,6 +1142,12 @@ DeepShapeStore::insert_as_polygons (const DeepLayer &deep_layer, db::Layout *int
         db::Polygon poly;
         s->polygon (poly);
         out.insert (poly);
+
+      } else if (s->is_text ()) {
+
+        db::Text t;
+        s->text (t);
+        out.insert (db::SimplePolygon (t.box ().enlarged (db::Vector (enl, enl))));
 
       }
 

@@ -27,8 +27,7 @@
 #include "dbEdgesDelegate.h"
 #include "dbRecursiveShapeIterator.h"
 #include "dbCellVariants.h"
-
-#include "gsiObject.h"
+#include "dbShapeCollection.h"
 
 #include <list>
 
@@ -215,7 +214,7 @@ class Edges;
  */
 
 class DB_PUBLIC Edges
-  : public gsi::ObjectBase
+  : public db::ShapeCollection
 {
 public:
   typedef db::Coord coord_type;
@@ -358,6 +357,14 @@ public:
    *  @brief Constructor from a RecursiveShapeIterator providing a deep representation with transformation
    */
   explicit Edges (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool as_edges = true, bool merged_semantics = true);
+
+  /**
+   *  @brief Implementation of the ShapeCollection interface
+   */
+  ShapeCollectionDelegateBase *get_delegate () const
+  {
+    return mp_delegate;
+  }
 
   /**
    *  @brief Gets the underlying delegate object
@@ -1301,6 +1308,7 @@ public:
 
 private:
   friend class EdgePairs;
+  friend class Texts;
 
   EdgesDelegate *mp_delegate;
 

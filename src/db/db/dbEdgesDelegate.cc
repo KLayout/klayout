@@ -37,7 +37,7 @@ EdgesDelegate::EdgesDelegate ()
 }
 
 EdgesDelegate::EdgesDelegate (const EdgesDelegate &other)
-  : tl::UniqueId ()
+  : ShapeCollectionDelegateBase ()
 {
   operator= (other);
 }

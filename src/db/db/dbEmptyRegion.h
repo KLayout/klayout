@@ -27,6 +27,7 @@
 #include "dbCommon.h"
 #include "dbRegionDelegate.h"
 #include "dbEmptyEdges.h"
+#include "dbEmptyTexts.h"
 
 namespace db {
 
@@ -107,11 +108,14 @@ public:
   virtual RegionDelegate *selected_not_interacting (const Region &) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_interacting (const Edges &) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_not_interacting (const Edges &) const { return new EmptyRegion (); }
+  virtual RegionDelegate *selected_interacting (const Texts &) const { return new EmptyRegion (); }
+  virtual RegionDelegate *selected_not_interacting (const Texts &) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_overlapping (const Region &) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_not_overlapping (const Region &) const { return new EmptyRegion (); }
   virtual RegionDelegate *pull_inside (const Region &) const  { return new EmptyRegion (); }
   virtual RegionDelegate *pull_interacting (const Region &) const  { return new EmptyRegion (); }
   virtual EdgesDelegate *pull_interacting (const Edges &) const  { return new EmptyEdges (); }
+  virtual TextsDelegate *pull_interacting (const Texts &) const  { return new EmptyTexts (); }
   virtual RegionDelegate *pull_overlapping (const Region &) const  { return new EmptyRegion (); }
   virtual RegionDelegate *in (const Region &, bool) const { return new EmptyRegion (); }
 

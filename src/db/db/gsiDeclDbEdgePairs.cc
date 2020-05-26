@@ -179,7 +179,9 @@ static size_t id (const db::EdgePairs *ep)
   return tl::id_of (ep->delegate ());
 }
 
-Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
+extern Class<db::ShapeCollection> decl_dbShapeCollection;
+
+Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
     "\n"

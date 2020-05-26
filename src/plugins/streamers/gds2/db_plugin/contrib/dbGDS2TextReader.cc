@@ -301,6 +301,12 @@ GDS2ReaderText::get_ushort ()
   return x;
 }
 
+std::string
+GDS2ReaderText::path () const
+{
+  return sStream.source ();
+}
+
 void 
 GDS2ReaderText::error (const std::string &msg)
 {

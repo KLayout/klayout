@@ -87,7 +87,7 @@ size_t count_shapes (db::LayoutToNetlist *l2ndb, db::Net *net, unsigned int laye
   size_t cluster_id = net->cluster_id ();
 
   size_t n = 0;
-  for (db::recursive_cluster_shape_iterator<db::PolygonRef> shapes (l2ndb->net_clusters (), layer, cell_index, cluster_id); ! shapes.at_end (); ++shapes) {
+  for (db::recursive_cluster_shape_iterator<db::NetShape> shapes (l2ndb->net_clusters (), layer, cell_index, cluster_id); ! shapes.at_end (); ++shapes) {
     ++n;
   }
   return n;
@@ -278,7 +278,11 @@ void NetInfoDialog::update_info_text ()
 
         std::string l = layer_string (mp_l2ndb.get (), *layer);
 
-        for (db::recursive_cluster_shape_iterator<db::PolygonRef> si (mp_l2ndb->net_clusters (), *layer, cell_index, cluster_id); ! si.at_end (); ++si) {
+        for (db::recursive_cluster_shape_iterator<db::NetShape> si (mp_l2ndb->net_clusters (), *layer, cell_index, cluster_id); ! si.at_end (); ++si) {
+
+          if (si->type () != db::NetShape::Polygon) {
+            continue;
+          }
 
           if (tot_shapes++ >= max_shapes) {
             incomplete = true;
@@ -295,7 +299,7 @@ void NetInfoDialog::update_info_text ()
             statinfo_area.insert (std::make_pair (*layer, db::coord_traits<db::Coord>::area_type (0)));
           }
 
-          s->second.push_back (si->instantiate ());
+          s->second.push_back (si->polygon_ref ().instantiate ());
 
           std::string c (ly->cell_name (si.cell_index ()));
           c += " (with ";

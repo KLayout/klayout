@@ -28,9 +28,10 @@
 
 #include "dbPolygon.h"
 #include "dbEdges.h"
+#include "dbTexts.h"
 #include "dbEdgePairs.h"
 #include "dbEdgePairRelations.h"
-#include "tlUniqueId.h"
+#include "dbShapeCollection.h"
 
 #include <list>
 
@@ -182,7 +183,7 @@ public:
  *  @brief The delegate for the actual region implementation
  */
 class DB_PUBLIC RegionDelegate
-  : public tl::UniqueId
+  : public db::ShapeCollectionDelegateBase
 {
 public:
   typedef db::Coord coord_type;
@@ -294,12 +295,15 @@ public:
   virtual RegionDelegate *selected_not_interacting (const Region &other) const = 0;
   virtual RegionDelegate *selected_interacting (const Edges &other) const = 0;
   virtual RegionDelegate *selected_not_interacting (const Edges &other) const = 0;
+  virtual RegionDelegate *selected_interacting (const Texts &other) const = 0;
+  virtual RegionDelegate *selected_not_interacting (const Texts &other) const = 0;
   virtual RegionDelegate *selected_overlapping (const Region &other) const = 0;
   virtual RegionDelegate *selected_not_overlapping (const Region &other) const = 0;
   virtual RegionDelegate *pull_inside (const Region &other) const = 0;
   virtual RegionDelegate *pull_interacting (const Region &other) const = 0;
   virtual EdgesDelegate *pull_interacting (const Edges &other) const = 0;
   virtual RegionDelegate *pull_overlapping (const Region &other) const = 0;
+  virtual TextsDelegate *pull_interacting (const Texts &other) const = 0;
   virtual RegionDelegate *in (const Region &other, bool invert) const = 0;
 
   virtual const db::Polygon *nth (size_t n) const = 0;

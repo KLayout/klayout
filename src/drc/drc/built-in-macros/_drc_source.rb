@@ -262,7 +262,7 @@ CODE
     #           not have names)@/li
     # @/ul
     #
-    # Layers created with "input" contain both texts and polygons. There is a subtle
+    # Layers created with "input" may contain both texts (labels) and polygons. There is a subtle
     # difference between flat and deep mode: in flat mode, texts are not visible in polygon
     # operations. In deep mode, texts appear as small 2x2 DBU rectangles. In flat mode, 
     # some operations such as clipping are not fully supported for texts. Also, texts will
@@ -273,11 +273,16 @@ CODE
     # If you don't want to see texts, use \polygons to create an input layer with polygon data
     # only. If you only want to see texts, use \labels to create an input layer with texts only.
     #
+    # \labels also produces a true "text layer" which contains text objects. A variety of 
+    # operations is available for these objects, such as boolean "and" and "not" with a polygon layer.
+    # True text layers should be preferred over mixed polygon/text layers if text object processing
+    # is required.
+    #
     # Use the global version of "input" without a source object to address the default source.
     
     def input(*args)
       layers = parse_input_layers(*args)
-      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SAll))
+      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SAll, RBA::Region))
     end
 
     # %DRC%
@@ -288,16 +293,18 @@ CODE
     # @synopsis source.labels(layer_into)
     # @synopsis source.labels(filter, ...)
     #
-    # Creates a layer with the labels from the given layer of the source.
+    # Creates a true text layer with the labels from the given layer of the source.
     # 
     # This method is identical to \input, but takes only texts from the given input
-    # layer.
+    # layer. Starting with version 0.27, the result is no longer a polygon layer that tries
+    # to provide text support but a layer type which is provided for carrying text objects
+    # explicitly.
     #
     # Use the global version of "labels" without a source object to address the default source.
     
     def labels(*args)
       layers = parse_input_layers(*args)
-      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::STexts))
+      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::STexts, RBA::Texts))
     end
 
     # %DRC%
@@ -318,7 +325,55 @@ CODE
     
     def polygons(*args)
       layers = parse_input_layers(*args)
-      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SBoxes | RBA::Shapes::SPaths | RBA::Shapes::SPolygons | RBA::Shapes::SEdgePairs))
+      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SBoxes | RBA::Shapes::SPaths | RBA::Shapes::SPolygons | RBA::Shapes::SEdgePairs, RBA::Region))
+    end
+
+    # %DRC%
+    # @name edges
+    # @brief Gets the edge shapes (or shapes that can be converted edges) from an input layer
+    # @synopsis source.edges(layer)
+    # @synopsis source.edges(layer, datatype)
+    # @synopsis source.edges(layer_into)
+    # @synopsis source.edges(filter, ...)
+    #
+    # Creates a layer with the edges from the given layer of the source.
+    # Edge layers are formed from shapes by decomposing the shapes into edges: polygons
+    # for example are decomposed into their outline edges. Some file formats support egdes
+    # as native objects. 
+    # 
+    # This method is identical to \input with respect to the options supported.
+    #
+    # Use the global version of "edges" without a source object to address the default source.
+    # 
+    # This method has been introduced in version 0.27.
+    
+    def edges(*args)
+      layers = parse_input_layers(*args)
+      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SBoxes | RBA::Shapes::SPaths | RBA::Shapes::SPolygons | RBA::Shapes::SEdgePairs | RBA::Shapes::SEdges, RBA::Edges))
+    end
+
+    # %DRC%
+    # @name edge_pairs
+    # @brief Gets the edge pairs from an input layer
+    # @synopsis source.edge_pairs(layer)
+    # @synopsis source.edge_pairs(layer, datatype)
+    # @synopsis source.edge_pairs(layer_into)
+    # @synopsis source.edge_pairs(filter, ...)
+    #
+    # Creates a layer with the edge_pairs from the given layer of the source.
+    # Edge pairs are not supported by layout formats so far. So except if the source is
+    # a custom-built layout object, this method has little use. It is provided for future 
+    # extensions which may include edge pairs in file streams.
+    # 
+    # This method is identical to \input with respect to the options supported.
+    #
+    # Use the global version of "edge_pairs" without a source object to address the default source.
+    # 
+    # This method has been introduced in version 0.27.
+    
+    def edge_pairs(*args)
+      layers = parse_input_layers(*args)
+      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SEdgePairs, RBA::EdgePairs))
     end
 
     # %DRC%
@@ -329,7 +384,7 @@ CODE
 
     def make_layer
       layers = []
-      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SAll))
+      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SAll, RBA::Region))
     end
 
     # %DRC%

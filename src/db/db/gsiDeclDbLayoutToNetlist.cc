@@ -237,7 +237,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("original_file=", &db::LayoutToNetlist::set_original_file,
     "@brief Sets the original file name of the database\n"
   ) +
-  gsi::method ("layer_name", (std::string (db::LayoutToNetlist::*) (const db::Region &region) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
+  gsi::method ("layer_name", (std::string (db::LayoutToNetlist::*) (const db::ShapeCollection &region) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
     "@brief Gets the name of the given layer\n"
   ) +
   gsi::method ("layer_name", (std::string (db::LayoutToNetlist::*) (unsigned int) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
@@ -254,6 +254,13 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "If required, the system will assign a name automatically."
   ) +
+  gsi::method ("register", (void (db::LayoutToNetlist::*) (const db::Texts &texts, const std::string &)) &db::LayoutToNetlist::register_layer, gsi::arg ("l"), gsi::arg ("n"),
+    "@brief Names the given layer\n"
+    "This method behaves like the one provided for Regions but accepts Texts. "
+    "Texts (hierarchical text collections) are useful to represent labels for naming nets.\n"
+    "\n"
+    "This variant has been introduced in version 0.27.\n"
+  ) +
   gsi::method_ext ("layer_names", &l2n_layer_names,
     "@brief Returns a list of names of the layer kept inside the LayoutToNetlist object."
   ) +
@@ -266,11 +273,19 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "Only named layers can be retrieved with this method. "
     "The returned object is a copy which represents the named layer."
   ) +
-  gsi::method ("is_persisted?", &db::LayoutToNetlist::is_persisted, gsi::arg ("layer"),
+  gsi::method ("is_persisted?", &db::LayoutToNetlist::is_persisted<db::Region>, gsi::arg ("layer"),
     "@brief Returns true, if the given layer is a persisted region.\n"
     "Persisted layers are kept inside the LayoutToNetlist object and are not released "
     "if their object is destroyed. Named layers are persisted, unnamed layers are not. "
     "Only persisted, named layers can be put into \\connect."
+  ) +
+  gsi::method ("is_persisted?", &db::LayoutToNetlist::is_persisted<db::Texts>, gsi::arg ("layer"),
+    "@brief Returns true, if the given layer is a persisted texts collection.\n"
+    "Persisted layers are kept inside the LayoutToNetlist object and are not released "
+    "if their object is destroyed. Named layers are persisted, unnamed layers are not. "
+    "Only persisted, named layers can be put into \\connect.\n"
+    "\n"
+    "The variant for Texts collections has been added in version 0.27."
   ) +
   gsi::factory ("make_layer", (db::Region *(db::LayoutToNetlist::*) (const std::string &)) &db::LayoutToNetlist::make_layer, gsi::arg ("name", std::string ()),
     "@brief Creates a new, empty hierarchical region\n"
@@ -291,6 +306,8 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "See \\make_layer for details.\n"
     "\n"
     "The name is optional. If given, the layer will already be named accordingly (see \\register).\n"
+    "\n"
+    "Starting with version 0.27, this method returns a \\Texts object."
   ) +
   gsi::factory ("make_polygon_layer", &db::LayoutToNetlist::make_polygon_layer, gsi::arg ("layer_index"), gsi::arg ("name", std::string ()),
     "@brief Creates a new region representing an original layer taking polygons and texts\n"
@@ -321,10 +338,31 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "@brief Defines an inter-layer connection for the given layers.\n"
     "The conditions mentioned with intra-layer \\connect apply for this method too.\n"
   ) +
+  gsi::method ("connect", (void (db::LayoutToNetlist::*) (const db::Region &, const db::Texts &)) &db::LayoutToNetlist::connect, gsi::arg ("a"), gsi::arg ("b"),
+    "@brief Defines an inter-layer connection for the given layers.\n"
+    "The conditions mentioned with intra-layer \\connect apply for this method too.\n"
+    "As one argument is a (hierarchical) text collection, this method is used to attach net labels to polygons.\n"
+    "\n"
+    "This variant has been introduced in version 0.27.\n"
+  ) +
+  gsi::method ("connect", (void (db::LayoutToNetlist::*) (const db::Texts &, const db::Region &)) &db::LayoutToNetlist::connect, gsi::arg ("a"), gsi::arg ("b"),
+    "@brief Defines an inter-layer connection for the given layers.\n"
+    "The conditions mentioned with intra-layer \\connect apply for this method too.\n"
+    "As one argument is a (hierarchical) text collection, this method is used to attach net labels to polygons.\n"
+    "\n"
+    "This variant has been introduced in version 0.27.\n"
+  ) +
   gsi::method ("connect_global", (void (db::LayoutToNetlist::*) (const db::Region &, const std::string &)) &db::LayoutToNetlist::connect_global, gsi::arg ("l"), gsi::arg ("global_net_name"),
     "@brief Defines a connection of the given layer with a global net.\n"
     "This method returns the ID of the global net. Use \\global_net_name to get "
     "the name back from the ID."
+  ) +
+  gsi::method ("connect_global", (void (db::LayoutToNetlist::*) (const db::Texts &, const std::string &)) &db::LayoutToNetlist::connect_global, gsi::arg ("l"), gsi::arg ("global_net_name"),
+    "@brief Defines a connection of the given text layer with a global net.\n"
+    "This method returns the ID of the global net. Use \\global_net_name to get "
+    "the name back from the ID."
+    "\n"
+    "This variant has been introduced in version 0.27.\n"
   ) +
   gsi::method ("global_net_name", &db::LayoutToNetlist::global_net_name, gsi::arg ("global_net_id"),
     "@brief Gets the global net name for the given global net ID."
@@ -378,10 +416,17 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "Usually it should not be required to obtain the internal cell. If you need to do so, make sure not to modify the cell as\n"
     "the functionality of the netlist extractor depends on it."
   ) +
-  gsi::method ("layer_of", &db::LayoutToNetlist::layer_of, gsi::arg ("l"),
+  gsi::method ("layer_of", &db::LayoutToNetlist::layer_of<db::Region>, gsi::arg ("l"),
     "@brief Gets the internal layer for a given extraction layer\n"
     "This method is required to derive the internal layer index - for example for\n"
     "investigating the cluster tree.\n"
+  ) +
+  gsi::method ("layer_of", &db::LayoutToNetlist::layer_of<db::Texts>, gsi::arg ("l"),
+    "@brief Gets the internal layer for a given text collection\n"
+    "This method is required to derive the internal layer index - for example for\n"
+    "investigating the cluster tree.\n"
+    "\n"
+    "The variant for Texts collections has been added in version 0.27.\n"
   ) +
   gsi::method ("cell_mapping_into", (db::CellMapping (db::LayoutToNetlist::*) (db::Layout &, db::Cell &, bool)) &db::LayoutToNetlist::cell_mapping_into, gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("with_device_cells", false),
     "@brief Creates a cell mapping for copying shapes from the internal layout to the given target layout.\n"

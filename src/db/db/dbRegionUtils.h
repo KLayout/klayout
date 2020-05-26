@@ -524,6 +524,52 @@ private:
   OutputContainer *mp_output;
 };
 
+/**
+ *  @brief A helper class for the region to text interaction functionality
+ */
+template <class OutputType, class TextType>
+class DB_PUBLIC region_to_text_interaction_filter_base
+  : public db::box_scanner_receiver2<db::Polygon, size_t, TextType, size_t>
+{
+public:
+  region_to_text_interaction_filter_base (bool inverse);
+
+  void preset (const OutputType *s);
+  void add (const db::Polygon *p, size_t, const TextType *e, size_t);
+  void fill_output ();
+
+protected:
+  virtual void put (const OutputType &s) const = 0;
+
+private:
+  std::set<const OutputType *> m_seen;
+  bool m_inverse;
+};
+
+/**
+ *  @brief A helper class for the region to text interaction functionality
+ */
+template <class OutputContainer, class TextType, class OutputType = typename OutputContainer::value_type>
+class DB_PUBLIC_TEMPLATE region_to_text_interaction_filter
+  : public region_to_text_interaction_filter_base<OutputType, TextType>
+{
+public:
+  region_to_text_interaction_filter (OutputContainer &output, bool inverse)
+    : region_to_text_interaction_filter_base<OutputType, TextType> (inverse), mp_output (&output)
+  {
+    //  .. nothing yet ..
+  }
+
+protected:
+  virtual void put (const OutputType &poly) const
+  {
+    mp_output->insert (poly);
+  }
+
+private:
+  OutputContainer *mp_output;
+};
+
 template <class C>
 static inline C snap_to_grid (C c, C g)
 {

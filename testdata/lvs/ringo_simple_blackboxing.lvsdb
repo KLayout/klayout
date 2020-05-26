@@ -28,7 +28,6 @@ layout(
  connect(l11 l8 l11 l12)
  connect(l12 l11 l12 l13)
  connect(l13 l12 l13)
- connect(l7 l7)
  connect(l2 l8 l2)
  connect(l9 l3 l8 l9)
  connect(l6 l8 l6)
@@ -47,7 +46,7 @@ layout(
  circuit(ND2X1
 
   # Circuit boundary
-  rect((-100 249) (2600 7751))
+  rect((-100 250) (2600 7750))
 
   # Outgoing pins and their connections to nets
   pin(name(VDD))
@@ -62,7 +61,7 @@ layout(
  circuit(INVX1
 
   # Circuit boundary
-  rect((-100 249) (2000 7751))
+  rect((-100 250) (2000 7750))
 
   # Outgoing pins and their connections to nets
   pin(name(VDD))
@@ -76,7 +75,7 @@ layout(
  circuit(INVX2
 
   # Circuit boundary
-  rect((-100 249) (2600 7751))
+  rect((-100 250) (2600 7750))
 
   # Outgoing pins and their connections to nets
   pin(name(IN))
@@ -90,7 +89,7 @@ layout(
  circuit(RINGO
 
   # Circuit boundary
-  rect((600 249) (25800 7751))
+  rect((600 250) (25800 7750))
 
   # Nets with their geometries
   net(1

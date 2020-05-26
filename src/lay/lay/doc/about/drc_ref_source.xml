@@ -54,6 +54,48 @@ This method will create a new source which delivers the shapes
 from that region clipped to the rectangle. A method doing the 
 same but without clipping is <a href="#touching">touching</a> or <a href="#overlapping">overlapping</a>.
 </p>
+<a name="edge_pairs"/><h2>"edge_pairs" - Gets the edge pairs from an input layer</h2>
+<keyword name="edge_pairs"/>
+<p>Usage:</p>
+<ul>
+<li><tt>source.edge_pairs(layer)</tt></li>
+<li><tt>source.edge_pairs(layer, datatype)</tt></li>
+<li><tt>source.edge_pairs(layer_into)</tt></li>
+<li><tt>source.edge_pairs(filter, ...)</tt></li>
+</ul>
+<p>
+Creates a layer with the edge_pairs from the given layer of the source.
+Edge pairs are not supported by layout formats so far. So except if the source is
+a custom-built layout object, this method has little use. It is provided for future 
+extensions which may include edge pairs in file streams.
+</p><p>
+This method is identical to <a href="#input">input</a> with respect to the options supported.
+</p><p>
+Use the global version of "edge_pairs" without a source object to address the default source.
+</p><p>
+This method has been introduced in version 0.27.
+</p>
+<a name="edges"/><h2>"edges" - Gets the edge shapes (or shapes that can be converted edges) from an input layer</h2>
+<keyword name="edges"/>
+<p>Usage:</p>
+<ul>
+<li><tt>source.edges(layer)</tt></li>
+<li><tt>source.edges(layer, datatype)</tt></li>
+<li><tt>source.edges(layer_into)</tt></li>
+<li><tt>source.edges(filter, ...)</tt></li>
+</ul>
+<p>
+Creates a layer with the edges from the given layer of the source.
+Edge layers are formed from shapes by decomposing the shapes into edges: polygons
+for example are decomposed into their outline edges. Some file formats support egdes
+as native objects. 
+</p><p>
+This method is identical to <a href="#input">input</a> with respect to the options supported.
+</p><p>
+Use the global version of "edges" without a source object to address the default source.
+</p><p>
+This method has been introduced in version 0.27.
+</p>
 <a name="extent"/><h2>"extent" - Returns a layer with the bounding box of the selected layout</h2>
 <keyword name="extent"/>
 <p>Usage:</p>
@@ -95,7 +137,7 @@ Some filter expressions are:
 not have names)</li>
 </ul>
 </p><p>
-Layers created with "input" contain both texts and polygons. There is a subtle
+Layers created with "input" may contain both texts (labels) and polygons. There is a subtle
 difference between flat and deep mode: in flat mode, texts are not visible in polygon
 operations. In deep mode, texts appear as small 2x2 DBU rectangles. In flat mode, 
 some operations such as clipping are not fully supported for texts. Also, texts will
@@ -105,6 +147,11 @@ Texts can later be selected on the layer returned by "input" with the <a href="/
 </p><p>
 If you don't want to see texts, use <a href="#polygons">polygons</a> to create an input layer with polygon data
 only. If you only want to see texts, use <a href="#labels">labels</a> to create an input layer with texts only.
+</p><p>
+<a href="#labels">labels</a> also produces a true "text layer" which contains text objects. A variety of 
+operations is available for these objects, such as boolean "and" and "not" with a polygon layer.
+True text layers should be preferred over mixed polygon/text layers if text object processing
+is required.
 </p><p>
 Use the global version of "input" without a source object to address the default source.
 </p>
@@ -118,10 +165,12 @@ Use the global version of "input" without a source object to address the default
 <li><tt>source.labels(filter, ...)</tt></li>
 </ul>
 <p>
-Creates a layer with the labels from the given layer of the source.
+Creates a true text layer with the labels from the given layer of the source.
 </p><p>
 This method is identical to <a href="#input">input</a>, but takes only texts from the given input
-layer.
+layer. Starting with version 0.27, the result is no longer a polygon layer that tries
+to provide text support but a layer type which is provided for carrying text objects
+explicitly.
 </p><p>
 Use the global version of "labels" without a source object to address the default source.
 </p>

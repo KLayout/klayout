@@ -212,7 +212,7 @@ bool NetShape::interacts_with_transformed (const db::NetShape &other, const Tr &
 }
 
 //  explicit instantiations
-template bool NetShape::interacts_with_transformed<db::ICplxTrans> (const db::NetShape &other, const db::ICplxTrans &trans) const;
-template bool NetShape::interacts_with_transformed<db::Trans> (const db::NetShape &other, const db::Trans &trans) const;
+template DB_PUBLIC bool NetShape::interacts_with_transformed<db::ICplxTrans> (const db::NetShape &other, const db::ICplxTrans &trans) const;
+template DB_PUBLIC bool NetShape::interacts_with_transformed<db::Trans> (const db::NetShape &other, const db::Trans &trans) const;
 
 }

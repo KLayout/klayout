@@ -2632,13 +2632,13 @@ TEST(10_Antenna)
 
     l2n.extract_netlist ();
 
-    db::Region a2_5 = l2n.antenna_check (*rpoly, 0.0, *rmetal2, 1.0, 5);
-    db::Region a2_15 = l2n.antenna_check (*rpoly, 0.0, *rmetal2, 1.0, 15);
-    db::Region a2_29 = l2n.antenna_check (*rpoly, 0.0, *rmetal2, 1.0, 29);
+    db::Region a5_5 = l2n.antenna_check (*rpoly, 0.0, *rmetal2, 1.0, 5);
+    db::Region a5_15 = l2n.antenna_check (*rpoly, 0.0, *rmetal2, 1.0, 15);
+    db::Region a5_29 = l2n.antenna_check (*rpoly, 0.0, *rmetal2, 1.0, 29);
 
-    a2_5.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (500, 0)));
-    a2_15.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (501, 0)));
-    a2_29.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (502, 0)));
+    a5_5.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (500, 0)));
+    a5_15.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (501, 0)));
+    a5_29.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (502, 0)));
   }
 
 
@@ -2665,13 +2665,13 @@ TEST(10_Antenna)
 
     l2n.extract_netlist ();
 
-    db::Region a2_3 = l2n.antenna_check (*rpoly, 0.3, *rmetal2, 0.0, 3);
-    db::Region a2_5 = l2n.antenna_check (*rpoly, 0.3, *rmetal2, 0.0, 5);
-    db::Region a2_9 = l2n.antenna_check (*rpoly, 0.3, *rmetal2, 0.0, 9);
+    db::Region a6_3 = l2n.antenna_check (*rpoly, 0.3, *rmetal2, 0.0, 3);
+    db::Region a6_5 = l2n.antenna_check (*rpoly, 0.3, *rmetal2, 0.0, 5);
+    db::Region a6_9 = l2n.antenna_check (*rpoly, 0.3, *rmetal2, 0.0, 9);
 
-    a2_3.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (600, 0)));
-    a2_5.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (601, 0)));
-    a2_9.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (602, 0)));
+    a6_3.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (600, 0)));
+    a6_5.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (601, 0)));
+    a6_9.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (602, 0)));
   }
 
   std::string au = tl::testsrc ();

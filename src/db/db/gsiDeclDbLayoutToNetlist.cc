@@ -127,7 +127,7 @@ static db::Region antenna_check2 (db::LayoutToNetlist *l2n, const db::Region &po
 
   }
 
-  return l2n->antenna_check (poly, metal, ratio, diode_pairs);
+  return l2n->antenna_check (poly, poly_perimeter_factor, metal, metal_perimeter_factor, ratio, diode_pairs);
 }
 
 static db::Region antenna_check (db::LayoutToNetlist *l2n, const db::Region &poly, const db::Region &metal, double ratio, const std::vector<tl::Variant> &diodes)

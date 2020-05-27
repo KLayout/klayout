@@ -336,19 +336,19 @@ module DRC
     # Multiple diode specifications are allowed. Just add them 
     # to the antenna_check call.
     #
-    # The area derived from the gate and metal layers can be 
-    # given a contribution from the perimeter. The physical picture
-    # is that the side walls of the material contribute to the 
-    # surface too. The side wall area can be estimated by taking
-    # the perimeter times some material thickness. Hence the
-    # effective area is: 
+    # You can include the perimeter into the area computation for
+    # the gate or metal layer or both. The physical picture
+    # is this: the side walls of the material contribute to the 
+    # surface too. As the side wall area can be estimated by taking
+    # the perimeter times some material thickness, the effective 
+    # area is: 
     #
     # @code
-    # A(eff) = A + P * d
+    # A(eff) = A + P * t
     # @/code
     #
     # Here A is the area of the polygons and P is their perimeter.
-    # d is the "thickness" in micrometer units. To specify such
+    # t is the "thickness" in micrometer units. To specify such
     # a condition, use the following notation:
     #
     # @code
@@ -356,8 +356,10 @@ module DRC
     # @/code
     #
     # "area_and_perimeter" takes the polygon layer and the 
-    # thickness. This notation can be applied to both gate and
-    # metal layers. The normal, area-only case can also be written as
+    # thickness (0.5 micrometers in this case). 
+    # This notation can be applied to both gate and
+    # metal layers. A detailed notation for the usual,
+    # area-only case is available as well for completeness:
     #
     # @code
     # errors = antenna_check(area_only(gate), ...)

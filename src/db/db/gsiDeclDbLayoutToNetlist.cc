@@ -132,7 +132,7 @@ static db::Region antenna_check2 (db::LayoutToNetlist *l2n, const db::Region &po
 
 static db::Region antenna_check (db::LayoutToNetlist *l2n, const db::Region &poly, const db::Region &metal, double ratio, const std::vector<tl::Variant> &diodes)
 {
-  return antenna_check2 (l2n, poly, 0.0, metal, 0.0, ratio, diodes);
+  return antenna_check2 (l2n, poly, 0, metal, 0, ratio, diodes);
 }
 
 Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",

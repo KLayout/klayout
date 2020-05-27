@@ -121,6 +121,14 @@ module DRC
       DRCAsDots::new(false)
     end
     
+    def area_only(r)
+      DRCAreaAndPerimeter::new(r, 0.0)
+    end
+    
+    def area_and_perimeter(r, f)
+      DRCAreaAndPerimeter::new(r, f)
+    end
+    
     # %DRC%
     # @brief Defines SPICE output format (with options) 
     # @name write_spice
@@ -1767,6 +1775,29 @@ CODE
       @l2ndb_index = i
     end
 
+    def _prep_value(a)
+      if a.is_a?(RBA::DPoint)
+        RBA::Point::from_dpoint(a * (1.0 / self.dbu.to_f))
+      elsif a.is_a?(RBA::DCplxTrans)
+        RBA::ICplxTrans::from_dtrans(RBA::DCplxTrans::new(1.0 / self.dbu.to_f) * a * RBA::DCplxTrans::new(self.dbu.to_f))
+      elsif a.is_a?(RBA::DTrans)
+        RBA::ICplxTrans::from_dtrans(RBA::DCplxTrans::new(1.0 / self.dbu.to_f) * RBA::DCplxTrans::new(a) * RBA::DCplxTrans::new(self.dbu.to_f))
+      elsif a.is_a?(Float)
+        (0.5 + a / self.dbu).floor.to_i
+      else
+        a
+      end
+    end
+    
+    def _prep_value_area(a)
+      dbu2 = self.dbu.to_f * self.dbu.to_f
+      if a.is_a?(Float)
+        (0.5 + a / dbu2).floor.to_i
+      else
+        a
+      end
+    end
+    
   private
 
     def _make_string(v)

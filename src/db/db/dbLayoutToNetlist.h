@@ -735,7 +735,8 @@ public:
    *
    *    A(antenna) = A + P * f
    *
-   *  where f is the perimeter factor.
+   *  where f is the perimeter factor. The unit of the area factor is
+   *  micrometers.
    *
    *  The limit ratio can be modified by the presence of connections to
    *  other layers (specifically designating diodes for charge removal).

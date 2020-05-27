@@ -1,0 +1,42 @@
+
+.global vdd gnd
+
+X1 C10
+R$1 vdd nc 1k
+
+.subckt FILLER_CAP
+M1 gnd vdd gnd gnd NMOS W=10u L=10u
+.ends FILLER_CAP
+
+.subckt DUMMY
+M1 a a a b NMOS W=1u L=1u
+.ends DUMMY
+
+.subckt C10
+X1 C1
+X2 C2
+X3 C3
+X4 C4
+.ends C10
+
+.subckt C4
+X3 C1
+.ends C4
+
+.subckt C1
+* generates gnd and vdd
+X1 FILLER_CAP
+X2 DUMMY
+.ends C1
+
+.subckt C2
+* does not generate gnd or vdd
+X1 DUMMY
+.ends C2
+
+.subckt C3
+* generates gnd and vdd too
+X1 FILLER_CAP
+M1 gnd vdd gnd gnd NMOS W=10u L=10u
+.ends C3
+

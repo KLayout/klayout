@@ -266,14 +266,14 @@ reference(
   # Nets
   net(1 name(A))
   net(2 name(Z))
-  net(3 name(VDD))
-  net(4 name(VSS))
+  net(3 name(VSS))
+  net(4 name(VDD))
 
   # Outgoing pins and their connections to nets
   pin(1 name(A))
   pin(2 name(Z))
-  pin(3 name(VDD))
-  pin(4 name(VSS))
+  pin(4 name(VDD))
+  pin(3 name(VSS))
 
   # Devices and their connections
   device(1 NMOS
@@ -286,8 +286,8 @@ reference(
    param(PD 0)
    terminal(S 2)
    terminal(G 1)
-   terminal(D 4)
-   terminal(B 4)
+   terminal(D 3)
+   terminal(B 3)
   )
   device(2 PMOS
    name('1')
@@ -299,8 +299,8 @@ reference(
    param(PD 0)
    terminal(S 2)
    terminal(G 1)
-   terminal(D 3)
-   terminal(B 3)
+   terminal(D 4)
+   terminal(B 4)
   )
 
  )
@@ -343,32 +343,32 @@ reference(
   net(1 name(A))
   net(2 name(C))
   net(3 name(D))
-  net(4 name(VDD))
-  net(5 name(VSS))
-  net(6 name(B))
-  net(7 name(E))
+  net(4 name(B))
+  net(5 name(E))
+  net(6 name(VDD))
+  net(7 name(VSS))
 
   # Outgoing pins and their connections to nets
   pin(1 name(A))
   pin(2 name(C))
   pin(3 name(D))
-  pin(4 name(VDD))
-  pin(5 name(VSS))
+  pin(6 name(VDD))
+  pin(7 name(VSS))
 
   # Subcircuits and their connections
   circuit(1 DINV name('0')
    pin(0 1)
    pin(1 2)
-   pin(2 6)
-   pin(3 7)
-   pin(4 4)
-   pin(5 5)
-  )
-  circuit(2 INVX1 name('1')
-   pin(0 7)
-   pin(1 3)
    pin(2 4)
    pin(3 5)
+   pin(4 6)
+   pin(5 7)
+  )
+  circuit(2 INVX1 name('1')
+   pin(0 5)
+   pin(1 3)
+   pin(2 6)
+   pin(3 7)
   )
 
  )
@@ -398,8 +398,8 @@ xref(
   xref(
    net(3 1 match)
    net(1 2 match)
-   net(2 3 match)
-   net(4 4 match)
+   net(2 4 match)
+   net(4 3 match)
    pin(2 0 match)
    pin(0 1 match)
    pin(1 2 match)
@@ -411,11 +411,11 @@ xref(
  circuit(TOP TOP match
   xref(
    net(5 3 match)
-   net(1 7 match)
-   net(6 4 match)
+   net(1 5 match)
+   net(6 6 match)
    net(2 1 match)
    net(3 2 match)
-   net(4 5 match)
+   net(4 7 match)
    pin(() 2 match)
    pin(() 3 match)
    pin(0 0 match)

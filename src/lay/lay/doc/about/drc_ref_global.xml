@@ -362,6 +362,24 @@ This function creates an edge object. The arguments are the same than for the
 The intention of that method is to create an empty layer which can be 
 filled with edge objects using <a href="/about/drc_ref_layer.xml#insert">Layer#insert</a>.
 </p>
+<a name="edge_pairs"/><h2>"edge_pairs" - Gets the edges from an original layer</h2>
+<keyword name="edge_pairs"/>
+<p>Usage:</p>
+<ul>
+<li><tt>edge_pairs(args)</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_source.xml#edge_pairs">Source#edge_pairs</a> for a description of that function.
+</p>
+<a name="edges"/><h2>"edges" - Gets the edges from an original layer</h2>
+<keyword name="edges"/>
+<p>Usage:</p>
+<ul>
+<li><tt>edges(args)</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_source.xml#edges">Source#edges</a> for a description of that function.
+</p>
 <a name="error"/><h2>"error" - Prints an error</h2>
 <keyword name="error"/>
 <p>Usage:</p>
@@ -446,7 +464,7 @@ See <a href="/about/drc_ref_netter.xml#l2n_data">Netter#l2n_data</a> for a descr
 <keyword name="labels"/>
 <p>Usage:</p>
 <ul>
-<li><tt>labels</tt></li>
+<li><tt>labels(args)</tt></li>
 </ul>
 <p>
 See <a href="/about/drc_ref_source.xml#labels">Source#labels</a> for a description of that function.

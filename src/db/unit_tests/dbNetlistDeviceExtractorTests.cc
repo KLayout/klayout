@@ -123,7 +123,7 @@ TEST(10_MOS3DeviceExtractorTest)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS3Transistor ex ("MOS3");
 
@@ -179,7 +179,7 @@ TEST(11_MOS3DeviceExtractorTestNotRectangularGate)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS3Transistor ex ("MOS3");
 
@@ -235,7 +235,7 @@ TEST(12_MOS3DeviceExtractorTestCircular)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS3Transistor ex ("MOS3");
 
@@ -293,7 +293,7 @@ TEST(20_MOS4DeviceExtractorTest)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS4Transistor ex ("MOS4");
 
@@ -354,7 +354,7 @@ TEST(21_MOS4DeviceExtractorTestNotRectangularGate)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS4Transistor ex ("MOS4");
 
@@ -415,7 +415,7 @@ TEST(22_MOS4DeviceExtractorTestCircular)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS4Transistor ex ("MOS4");
 
@@ -475,7 +475,7 @@ TEST(30_DMOS3DeviceExtractorTest)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS3Transistor ex ("DMOS3", true);
 
@@ -533,7 +533,7 @@ TEST(31_DMOS3DeviceExtractorTestNotRectangularGate)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS3Transistor ex ("DMOS3", true);
 
@@ -591,7 +591,7 @@ TEST(32_DMOS3DeviceExtractorTestCircular)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS3Transistor ex ("DMOS3", true);
 
@@ -651,7 +651,7 @@ TEST(40_DMOS4DeviceExtractorTest)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS4Transistor ex ("DMOS4", true);
 
@@ -714,7 +714,7 @@ TEST(41_DMOS4DeviceExtractorTestNotRectangularGate)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS4Transistor ex ("DMOS4", true);
 
@@ -777,7 +777,7 @@ TEST(42_DMOS4DeviceExtractorTestCircular)
   //  perform the extraction
 
   db::Netlist nl;
-  db::hier_clusters<db::PolygonRef> cl;
+  db::hier_clusters<db::NetShape> cl;
 
   db::NetlistDeviceExtractorMOS4Transistor ex ("DMOS4", true);
 

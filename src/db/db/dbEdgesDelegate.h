@@ -29,7 +29,7 @@
 #include "dbEdge.h"
 #include "dbEdgePairs.h"
 #include "dbEdgePairRelations.h"
-#include "tlUniqueId.h"
+#include "dbShapeCollection.h"
 
 #include <list>
 
@@ -181,7 +181,7 @@ public:
  *  @brief The delegate for the actual edge set implementation
  */
 class DB_PUBLIC EdgesDelegate
-  : public tl::UniqueId
+  : public ShapeCollectionDelegateBase
 {
 public:
   typedef db::Coord coord_type;

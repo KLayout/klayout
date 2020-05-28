@@ -124,6 +124,7 @@ private:
   virtual void error (const std::string &txt);
   virtual void warn (const std::string &txt);
 
+  virtual std::string path () const;
   virtual const char *get_string ();
   virtual void get_string (tl::string &s) const;
   virtual int get_int ();

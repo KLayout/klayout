@@ -159,6 +159,9 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
 class DB_PUBLIC StringRepository
 {
 public:
+  typedef std::set<StringRef *> string_refs_type;
+  typedef string_refs_type::const_iterator iterator;
+
   /**
    *  @brief Constructor
    */
@@ -214,6 +217,22 @@ public:
   size_t size () const
   {
     return m_string_refs.size ();
+  }
+
+  /**
+   *  @brief Iterates over the string refs (begin)
+   */
+  iterator begin () const
+  {
+    return m_string_refs.begin ();
+  }
+
+  /**
+   *  @brief Iterates over the string refs (end)
+   */
+  iterator end () const
+  {
+    return m_string_refs.end ();
   }
 
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
@@ -556,6 +575,21 @@ public:
       return mp_ptr;
     } else {
       return "";
+    }
+  }
+
+  /**
+   *  @brief Gets the StringRef object is there is one
+   *
+   *  If the string is a plain text kept internally, this method returns 0.
+   */
+  const StringRef *string_ref () const
+  {
+    size_t p = (size_t) mp_ptr;
+    if (p & 1) {
+      return reinterpret_cast<const StringRef *> (p - 1);
+    } else {
+      return 0;
     }
   }
 

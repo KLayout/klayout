@@ -2609,6 +2609,71 @@ TEST(10_Antenna)
     a4_30.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (402, 0)));
   }
 
+  {
+    db::LayoutToNetlist l2n (&dss);
+
+    l2n.register_layer (*rpoly, "poly");
+    l2n.register_layer (*rcont, "cont");
+    l2n.register_layer (*rmetal1, "metal1");
+    l2n.register_layer (*rvia1, "via1");
+    l2n.register_layer (*rmetal2, "metal2");
+
+    //  Intra-layer
+    l2n.connect (*rpoly);
+    l2n.connect (*rcont);
+    l2n.connect (*rmetal1);
+    l2n.connect (*rvia1);
+    l2n.connect (*rmetal2);
+    //  Inter-layer
+    l2n.connect (*rpoly,      *rcont);
+    l2n.connect (*rcont,      *rmetal1);
+    l2n.connect (*rmetal1,    *rvia1);
+    l2n.connect (*rvia1,      *rmetal2);
+
+    l2n.extract_netlist ();
+
+    db::Region a5_5 = l2n.antenna_check (*rpoly, 0.0, *rmetal2, 1.0, 5);
+    db::Region a5_15 = l2n.antenna_check (*rpoly, 0.0, *rmetal2, 1.0, 15);
+    db::Region a5_29 = l2n.antenna_check (*rpoly, 0.0, *rmetal2, 1.0, 29);
+
+    a5_5.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (500, 0)));
+    a5_15.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (501, 0)));
+    a5_29.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (502, 0)));
+  }
+
+
+  {
+    db::LayoutToNetlist l2n (&dss);
+
+    l2n.register_layer (*rpoly, "poly");
+    l2n.register_layer (*rcont, "cont");
+    l2n.register_layer (*rmetal1, "metal1");
+    l2n.register_layer (*rvia1, "via1");
+    l2n.register_layer (*rmetal2, "metal2");
+
+    //  Intra-layer
+    l2n.connect (*rpoly);
+    l2n.connect (*rcont);
+    l2n.connect (*rmetal1);
+    l2n.connect (*rvia1);
+    l2n.connect (*rmetal2);
+    //  Inter-layer
+    l2n.connect (*rpoly,      *rcont);
+    l2n.connect (*rcont,      *rmetal1);
+    l2n.connect (*rmetal1,    *rvia1);
+    l2n.connect (*rvia1,      *rmetal2);
+
+    l2n.extract_netlist ();
+
+    db::Region a6_3 = l2n.antenna_check (*rpoly, 0.3, *rmetal2, 0.0, 3);
+    db::Region a6_5 = l2n.antenna_check (*rpoly, 0.3, *rmetal2, 0.0, 5);
+    db::Region a6_9 = l2n.antenna_check (*rpoly, 0.3, *rmetal2, 0.0, 9);
+
+    a6_3.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (600, 0)));
+    a6_5.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (601, 0)));
+    a6_9.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (602, 0)));
+  }
+
   std::string au = tl::testsrc ();
   au = tl::combine_path (au, "testdata");
   au = tl::combine_path (au, "algo");

@@ -98,7 +98,7 @@ static std::vector<std::string> l2n_layer_names (const db::LayoutToNetlist *l2n)
   return ln;
 }
 
-static db::Region antenna_check (db::LayoutToNetlist *l2n, const db::Region &poly, const db::Region &metal, double ratio, const std::vector<tl::Variant> &diodes)
+static db::Region antenna_check2 (db::LayoutToNetlist *l2n, const db::Region &poly, double poly_perimeter_factor, const db::Region &metal, double metal_perimeter_factor, double ratio, const std::vector<tl::Variant> &diodes)
 {
   std::vector<std::pair<const db::Region *, double> > diode_pairs;
 
@@ -127,7 +127,12 @@ static db::Region antenna_check (db::LayoutToNetlist *l2n, const db::Region &pol
 
   }
 
-  return l2n->antenna_check (poly, metal, ratio, diode_pairs);
+  return l2n->antenna_check (poly, poly_perimeter_factor, metal, metal_perimeter_factor, ratio, diode_pairs);
+}
+
+static db::Region antenna_check (db::LayoutToNetlist *l2n, const db::Region &poly, const db::Region &metal, double ratio, const std::vector<tl::Variant> &diodes)
+{
+  return antenna_check2 (l2n, poly, 0, metal, 0, ratio, diodes);
 }
 
 Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
@@ -609,6 +614,23 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
    "# diode_layer1 increases the ratio by 50 per sqaure micrometer area:\n"
    "errors = l2n.antenna(poly, metal, 10.0 [ [ diode_layer, 50.0 ] ])\n"
    "@/code\n"
+  ) +
+  gsi::method_ext ("antenna_check", &antenna_check2, gsi::arg ("gate"), gsi::arg ("gate_perimeter_factor"), gsi::arg ("metal"), gsi::arg ("metal_perimeter_factor"), gsi::arg ("ratio"), gsi::arg ("diodes", std::vector<tl::Variant> (), "[]"),
+   "@brief Runs an antenna check on the extracted clusters taking the perimeter into account\n"
+   "\n"
+   "This version of the \\antenna_check method allows taking the perimeter of gate or metal into account. "
+   "The effective area is computed using:\n"
+   "\n"
+   "@code\n"
+   "Aeff = A + P * f\n"
+   "@/code\n"
+   "\n"
+   "Here Aeff is the area used in the check, A is the polygon area, P the perimeter and f the perimeter factor. "
+   "This formula applies to gate polygon area/perimeter with 'gate_perimeter_factor' for f and metal polygon area/perimeter "
+   "with 'metal_perimeter_factor'. The perimeter_factor has the dimension of micrometers and can be thought of as the width "
+   "of the material. Essentially the side walls of the material are taking into account for the surface area as well.\n"
+   "\n"
+   "This variant has been introduced in version 0.26.6.\n"
   ),
   "@brief A generic framework for extracting netlists from layouts\n"
   "\n"

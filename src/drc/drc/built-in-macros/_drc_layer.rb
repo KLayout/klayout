@@ -253,12 +253,12 @@ module DRC
           if args.size == 1
             a = args[0]
             if a.is_a?(Range)
-              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, prep_value_area(a.first), prep_value_area(a.last), #{inv.inspect}))
+              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, @engine._prep_value_area(a.first), @engine._prep_value_area(a.last), #{inv.inspect}))
             else
-              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, prep_value_area(a), #{inv.inspect}))
+              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, @engine._prep_value_area(a), #{inv.inspect}))
             end
           elsif args.size == 2
-            DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, prep_value_area(args[0]), prep_value_area(args[1]), #{inv.inspect}))
+            DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, @engine._prep_value_area(args[0]), @engine._prep_value_area(args[1]), #{inv.inspect}))
           else
             raise("Invalid number of arguments for method '#{mn}'")
           end
@@ -403,12 +403,12 @@ CODE
           if args.size == 1
             a = args[0]
             if a.is_a?(Range)
-              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, prep_value(a.first), prep_value(a.last), #{inv.inspect}))
+              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, @engine._prep_value(a.first), @engine._prep_value(a.last), #{inv.inspect}))
             else
-              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, prep_value(a), #{inv.inspect}))
+              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, @engine._prep_value(a), #{inv.inspect}))
             end
           elsif args.size == 2
-            DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, prep_value(args[0]), prep_value(args[1]), #{inv.inspect}))
+            DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, @engine._prep_value(args[0]), @engine._prep_value(args[1]), #{inv.inspect}))
           else
             raise("Invalid number of arguments for method '#{mn}'")
           end
@@ -452,12 +452,12 @@ CODE
           if args.size == 1
             a = args[0]
             if a.is_a?(Range)
-              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :with_#{f}, prep_value(a.first), prep_value(a.last), #{inv.inspect}))
+              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :with_#{f}, @engine._prep_value(a.first), @engine._prep_value(a.last), #{inv.inspect}))
             else
-              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :with_#{f}, prep_value(a), #{inv.inspect}))
+              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :with_#{f}, @engine._prep_value(a), #{inv.inspect}))
             end
           elsif args.size == 2
-            DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :with_#{f}, prep_value(args[0]), prep_value(args[1]), #{inv.inspect}))
+            DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :with_#{f}, @engine._prep_value(args[0]), @engine._prep_value(args[1]), #{inv.inspect}))
           else
             raise("Invalid number of arguments for method '#{mn}'")
           end
@@ -562,7 +562,7 @@ CODE
     
     def rounded_corners(inner, outer, n)
       requires_region("rounded_corners")
-      DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :rounded_corners, prep_value(inner), prep_value(outer), n))
+      DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :rounded_corners, @engine._prep_value(inner), @engine._prep_value(outer), n))
     end
     
     # %DRC%
@@ -579,7 +579,7 @@ CODE
     
     def smoothed(d)
       requires_region("smoothed")
-      DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :smoothed, prep_value(d)))
+      DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :smoothed, @engine._prep_value(d)))
     end
     
     # %DRC%
@@ -1106,9 +1106,9 @@ CODE
     def ongrid(*args)
       requires_region("ongrid")
       if args.size == 1
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::EdgePairs, :grid_check, prep_value(args[0]), prep_value(args[0])))
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::EdgePairs, :grid_check, @engine._prep_value(args[0]), @engine._prep_value(args[0])))
       elsif args.size == 2
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::EdgePairs, :grid_check, prep_value(args[0]), prep_value(args[1])))
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::EdgePairs, :grid_check, @engine._prep_value(args[0]), @engine._prep_value(args[1])))
       else
         raise("Invalid number of arguments for method 'ongrid'")
       end
@@ -1143,14 +1143,14 @@ CODE
         requires_region("#{f}")
         gx = gy = 0
         if args.size == 1
-          gx = gy = prep_value(args[0])
+          gx = gy = @engine._prep_value(args[0])
         elsif args.size == 2
-          gx = prep_value(args[0])
-          gy = prep_value(args[1])
+          gx = @engine._prep_value(args[0])
+          gy = @engine._prep_value(args[1])
         else
           raise("Invalid number of arguments for method 'ongrid'")
         end
-        aa = args.collect { |a| prep_value(a) }
+        aa = args.collect { |a| @engine._prep_value(a) }
         if :#{f} == :snap && @engine.is_tiled?
           # in tiled mode, no modifying versions are available
           @data = @engine._tcmd(@data, 0, @data.class, :snapped, gx, gy)
@@ -2039,7 +2039,7 @@ CODE
       eval <<"CODE"
       def #{f}(length, fraction = 0.0)
         requires_edges("#{f}")
-        length = prep_value(length)
+        length = @engine._prep_value(length)
         DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :#{f}, length, fraction))
       end
 CODE
@@ -2087,16 +2087,16 @@ CODE
         av = [ 0, 0, 0, 0, false ]
         args.each_with_index do |a,i|
           if a.is_a?(Hash)
-            a[:begin]  && av[0] = prep_value(a[:begin])
-            a[:end]    && av[1] = prep_value(a[:end])
-            a[:out]    && av[2] = prep_value(a[:out])
-            a[:in]     && av[3] = prep_value(a[:in])
+            a[:begin]  && av[0] = @engine._prep_value(a[:begin])
+            a[:end]    && av[1] = @engine._prep_value(a[:end])
+            a[:out]    && av[2] = @engine._prep_value(a[:out])
+            a[:in]     && av[3] = @engine._prep_value(a[:in])
             a[:joined] && av[4] = true
           elsif i < 4
             if !a.is_a?(1.class) && !a.is_a?(Float)
               raise("Invalid type for argument " + (i+1).to_s + " (method '#{f}')")
             end
-            av[i] = prep_value(a)
+            av[i] = @engine._prep_value(a)
           elsif i == 4
             if a.is_a?(DRCJoinFlag)
               av[i] = a.value
@@ -2142,7 +2142,7 @@ CODE
       eval <<"CODE"
       def #{f}(dist)
         requires_edges("#{f}")
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :#{f}, prep_value(dist)))
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :#{f}, @engine._prep_value(dist)))
       end
 CODE
     end
@@ -2635,11 +2635,11 @@ CODE
           elsif a.is_a?(DRCLayer)
             other = a
           elsif a.is_a?(DRCProjectionLimits)
-            minp = prep_value(a.min)
-            maxp = prep_value(a.max)
+            minp = @engine._prep_value(a.min)
+            maxp = @engine._prep_value(a.max)
           elsif a.is_a?(Float) || a.is_a?(1.class)
             value && raise("Value already specified")
-            value = prep_value(a)
+            value = @engine._prep_value(a)
           else
             raise("#{f}: Parameter #" + n.to_s + " does not have an expected type")
           end
@@ -2694,11 +2694,11 @@ CODE
           elsif a.is_a?(DRCLayer)
             other = a
           elsif a.is_a?(DRCProjectionLimits)
-            minp = prep_value(a.min)
-            maxp = prep_value(a.max)
+            minp = @engine._prep_value(a.min)
+            maxp = @engine._prep_value(a.max)
           elsif a.is_a?(Float) || a.is_a?(1.class)
             value && raise("Value already specified")
-            value = prep_value(a)
+            value = @engine._prep_value(a)
           else
             raise("#{f}: Parameter #" + n.to_s + " does not have an expected type")
           end
@@ -2868,7 +2868,7 @@ CODE
         values = []
         args.each do |a|
           if a.is_a?(1.class) || a.is_a?(Float)
-            v = prep_value(a)
+            v = @engine._prep_value(a)
             v.abs > dist && dist = v.abs 
             values.push(v)
           elsif a.is_a?(DRCSizingMode)
@@ -2918,7 +2918,7 @@ CODE
     def polygons(*args)
       requires_edge_pairs("polygons")
       args.size <= 1 || raise("polygons: Method requires 0 or 1 arguments")
-      aa = args.collect { |a| prep_value(a) }
+      aa = args.collect { |a| @engine._prep_value(a) }
       DRCLayer::new(@engine, @engine._cmd(@data, :polygons, *aa))
     end
     
@@ -3007,7 +3007,7 @@ CODE
     %w(extents moved transformed).each do |f| 
       eval <<"CODE"
       def #{f}(*args)
-        aa = args.collect { |a| prep_value(a) }
+        aa = args.collect { |a| @engine._prep_value(a) }
         DRCLayer::new(@engine, @engine._cmd(@data, :#{f}, *aa))
       end
 CODE
@@ -3016,7 +3016,7 @@ CODE
     %w(move transform).each do |f| 
       eval <<"CODE"
       def #{f}(*args)
-        aa = args.collect { |a| prep_value(a) }
+        aa = args.collect { |a| @engine._prep_value(a) }
         @engine._cmd(@data, :#{f}, *aa)
         self
       end
@@ -3062,13 +3062,13 @@ CODE
     
     def merged(*args)
       requires_edges_or_region("merged")
-      aa = args.collect { |a| prep_value(a) }
+      aa = args.collect { |a| @engine._prep_value(a) }
       DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :merged, *aa))
     end
     
     def merge(*args)
       requires_edges_or_region("merge")
-      aa = args.collect { |a| prep_value(a) }
+      aa = args.collect { |a| @engine._prep_value(a) }
       if @engine.is_tiled?
         # in tiled mode, no modifying versions are available
         @data = @engine._tcmd(@data, 0, @data.class, :merged, *aa)
@@ -3172,29 +3172,6 @@ CODE
       end
     end
   
-    def prep_value(a)
-      if a.is_a?(RBA::DPoint)
-        RBA::Point::from_dpoint(a * (1.0 / @engine.dbu.to_f))
-      elsif a.is_a?(RBA::DCplxTrans)
-        RBA::ICplxTrans::from_dtrans(RBA::DCplxTrans::new(1.0 / @engine.dbu.to_f) * a * RBA::DCplxTrans::new(@engine.dbu.to_f))
-      elsif a.is_a?(RBA::DTrans)
-        RBA::ICplxTrans::from_dtrans(RBA::DCplxTrans::new(1.0 / @engine.dbu.to_f) * RBA::DCplxTrans::new(a) * RBA::DCplxTrans::new(@engine.dbu.to_f))
-      elsif a.is_a?(Float)
-        (0.5 + a / @engine.dbu).floor.to_i
-      else
-        a
-      end
-    end
-    
-    def prep_value_area(a)
-      dbu2 = @engine.dbu.to_f * @engine.dbu.to_f
-      if a.is_a?(Float)
-        (0.5 + a / dbu2).floor.to_i
-      else
-        a
-      end
-    end
-    
   end
  
 end

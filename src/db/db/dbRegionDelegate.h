@@ -135,32 +135,9 @@ public:
   virtual bool wants_variants () const = 0;
 };
 
-/**
- *  @brief A polygon-to-polygon processor base class
- */
-class DB_PUBLIC PolygonProcessorBase
-  : public polygon_processor<db::Polygon>
-{
-  //  .. nothing yet ..
-};
-
-/**
- *  @brief A polygon-to-edge processor base class
- */
-class DB_PUBLIC PolygonToEdgeProcessorBase
-  : public polygon_processor<db::Edge>
-{
-  //  .. nothing yet ..
-};
-
-/**
- *  @brief A polygon-to-edge pair processor base class
- */
-class DB_PUBLIC PolygonToEdgePairProcessorBase
-  : public polygon_processor<db::EdgePair>
-{
-  //  .. nothing yet ..
-};
+typedef shape_collection_processor<db::Polygon, db::Polygon> PolygonProcessorBase;
+typedef shape_collection_processor<db::Polygon, db::Edge> PolygonToEdgeProcessorBase;
+typedef shape_collection_processor<db::Polygon, db::EdgePair> PolygonToEdgePairProcessorBase;
 
 /**
  *  @brief The region iterator delegate

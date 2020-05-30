@@ -466,6 +466,14 @@ public:
   }
 
   /**
+   *  @brief Processes the edge pairs into polygons
+   *
+   *  This method will run the processor over all edge pairs and return a region
+   *  with the outputs of the processor.
+   */
+  void processed (Region &output, const EdgePairToPolygonProcessorBase &filter) const;
+
+  /**
    *  @brief Transforms the edge pair set
    */
   template <class T>

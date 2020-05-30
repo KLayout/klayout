@@ -53,6 +53,12 @@ EmptyEdgePairs::polygons (db::Coord) const
   return new EmptyRegion ();
 }
 
+RegionDelegate *
+EmptyEdgePairs::processed_to_polygons (const EdgePairToPolygonProcessorBase &) const
+{
+  return new EmptyRegion ();
+}
+
 EdgesDelegate *
 EmptyEdgePairs::edges () const
 {

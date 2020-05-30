@@ -259,7 +259,7 @@ static db::Region moved_xy (const db::Region *r, db::Coord x, db::Coord y)
 
 static db::Region extents2 (const db::Region *r, db::Coord dx, db::Coord dy)
 {
-  return r->processed (db::Extents (dx, dy));
+  return r->processed (db::extents_processor<db::Polygon> (dx, dy));
 }
 
 static db::Region extents1 (const db::Region *r, db::Coord d)

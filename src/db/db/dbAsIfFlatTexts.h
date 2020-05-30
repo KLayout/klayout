@@ -53,6 +53,8 @@ public:
 
   virtual TextsDelegate *filtered (const TextFilterBase &) const;
 
+  virtual RegionDelegate *processed_to_polygons (const TextToPolygonProcessorBase &filter) const;
+
   virtual TextsDelegate *add_in_place (const Texts &other)
   {
     return add (other);

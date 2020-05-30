@@ -57,6 +57,22 @@ db::Trans MagnificationReducer::reduce (const db::Trans &) const
 
 // ------------------------------------------------------------------------------------------
 
+db::ICplxTrans XYAnisotropyAndMagnificationReducer::reduce (const db::ICplxTrans &trans) const
+{
+  double a = trans.angle ();
+  if (a > 180.0 - db::epsilon) {
+    a -= 180.0;
+  }
+  return db::ICplxTrans (trans.mag (), a, false, db::Vector ());
+}
+
+db::Trans XYAnisotropyAndMagnificationReducer::reduce (const db::Trans &trans) const
+{
+  return db::Trans (trans.angle () % 2, false, db::Vector ());
+}
+
+// ------------------------------------------------------------------------------------------
+
 db::ICplxTrans MagnificationAndOrientationReducer::reduce (const db::ICplxTrans &trans) const
 {
   db::ICplxTrans res (trans);

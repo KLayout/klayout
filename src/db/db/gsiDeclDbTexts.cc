@@ -116,12 +116,9 @@ static db::Region polygons0 (const db::Texts *e, db::Coord d)
 
 static db::Region extents1 (const db::Texts *r, db::Coord dx, db::Coord dy)
 {
-  db::Region e;
-  e.reserve (r->size ());
-  for (db::Texts::const_iterator i = r->begin (); ! i.at_end (); ++i) {
-    e.insert (i->box ().enlarged (db::Vector (dx, dy)));
-  }
-  return e;
+  db::Region output;
+  r->processed (output, db::extents_processor<db::Text> (dx, dy));
+  return output;
 }
 
 static db::Region extents0 (const db::Texts *r, db::Coord d)

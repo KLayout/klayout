@@ -325,12 +325,9 @@ static db::Region pull_interacting (const db::Edges *r, const db::Region &other)
 
 static db::Region extents2 (const db::Edges *r, db::Coord dx, db::Coord dy)
 {
-  db::Region e;
-  e.reserve (r->size ());
-  for (db::Edges::const_iterator i = r->begin (); ! i.at_end (); ++i) {
-    e.insert (i->bbox ().enlarged (db::Vector (dx, dy)));
-  }
-  return e;
+  db::Region output;
+  r->processed (output, db::extents_processor<db::Edge> (dx, dy));
+  return output;
 }
 
 static db::Region extents1 (const db::Edges *r, db::Coord d)

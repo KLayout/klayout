@@ -1,8 +1,6 @@
 
 0.26.6          (2020-xx-xx):
 
-* Bugfix: %GITHUB%/issues/568
-      A CIF reader and writer bug was fixed
 * Bugfix: %GITHUB%/issues/547
       Doc fixes, better error messages on some Shape methods
 * Bugfix: %GITHUB%/issues/555
@@ -10,6 +8,11 @@
 * Bugfix: %GITHUB%/issues/565
       Spice reader: .global should not add pin if the signal 
       isn't used in a subcircuit
+* Bugfix: %GITHUB%/issues/568
+      A CIF reader and writer bug was fixed
+* Bugfix: %GITHUB%/issues/570
+      Perimenter can be included in antenna area for the
+      antenna check
 
 0.26.5          (2020-05-02):
 

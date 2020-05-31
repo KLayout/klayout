@@ -54,6 +54,12 @@ EmptyTexts::polygons (db::Coord) const
   return new EmptyRegion ();
 }
 
+RegionDelegate *
+EmptyTexts::processed_to_polygons (const TextToPolygonProcessorBase &) const
+{
+  return new EmptyRegion ();
+}
+
 EdgesDelegate *
 EmptyTexts::edges () const
 {

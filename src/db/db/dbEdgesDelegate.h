@@ -30,6 +30,7 @@
 #include "dbEdgePairs.h"
 #include "dbEdgePairRelations.h"
 #include "dbShapeCollection.h"
+#include "dbShapeCollectionUtils.h"
 
 #include <list>
 
@@ -128,32 +129,9 @@ public:
   virtual bool wants_variants () const = 0;
 };
 
-/**
- *  @brief A edge processor base class
- */
-class DB_PUBLIC EdgeProcessorBase
-  : public edge_processor<db::Edge>
-{
-  //  .. nothing yet ..
-};
-
-/**
- *  @brief An edge-to-polygon processor base class
- */
-class DB_PUBLIC EdgeToPolygonProcessorBase
-  : public edge_processor<db::Polygon>
-{
-  //  .. nothing yet ..
-};
-
-/**
- *  @brief An edge-to-edge pair processor base class
- */
-class DB_PUBLIC EdgeToEdgePairProcessorBase
-  : public edge_processor<db::EdgePair>
-{
-  //  .. nothing yet ..
-};
+typedef shape_collection_processor<db::Edge, db::Edge> EdgeProcessorBase;
+typedef shape_collection_processor<db::Edge, db::Polygon> EdgeToPolygonProcessorBase;
+typedef shape_collection_processor<db::Edge, db::EdgePair> EdgeToEdgePairProcessorBase;
 
 class RecursiveShapeIterator;
 class EdgeFilterBase;

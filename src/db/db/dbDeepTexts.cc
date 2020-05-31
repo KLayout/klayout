@@ -333,6 +333,12 @@ DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
   return res.release ();
 }
 
+RegionDelegate *
+DeepTexts::processed_to_polygons (const TextToPolygonProcessorBase &filter) const
+{
+  return shape_collection_processed_impl<db::Text, db::Polygon, db::DeepRegion> (deep_layer (), filter);
+}
+
 RegionDelegate *DeepTexts::polygons (db::Coord e) const
 {
   db::DeepLayer new_layer = deep_layer ().derived ();

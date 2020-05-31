@@ -143,6 +143,11 @@ EdgePairs::iter () const
   return *(i ? i : &def_iter);
 }
 
+void EdgePairs::processed (Region &output, const EdgePairToPolygonProcessorBase &filter) const
+{
+  output = Region (mp_delegate->processed_to_polygons (filter));
+}
+
 void EdgePairs::polygons (Region &output, db::Coord e) const
 {
   output.set_delegate (mp_delegate->polygons (e));

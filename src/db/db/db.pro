@@ -196,7 +196,8 @@ SOURCES = \
     dbOriginalLayerTexts.cc \
     dbNetShape.cc \
     dbShapeCollection.cc \
-    gsiDeclDbShapeCollection.cc
+    gsiDeclDbShapeCollection.cc \
+    dbShapeCollectionUtils.cc
 
 HEADERS = \
   dbArray.h \
@@ -353,7 +354,8 @@ HEADERS = \
     dbTextsUtils.h \
     dbOriginalLayerTexts.h \
     dbNetShape.h \
-    dbShapeCollection.h
+    dbShapeCollection.h \
+    dbShapeCollectionUtils.h
 
 !equals(HAVE_QT, "0") {
 

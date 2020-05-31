@@ -123,12 +123,9 @@ static db::Region polygons2 (const db::EdgePairs *e, db::Coord d)
 
 static db::Region extents2 (const db::EdgePairs *r, db::Coord dx, db::Coord dy)
 {
-  db::Region e;
-  e.reserve (r->size ());
-  for (db::EdgePairs::const_iterator i = r->begin (); ! i.at_end (); ++i) {
-    e.insert (i->bbox ().enlarged (db::Vector (dx, dy)));
-  }
-  return e;
+  db::Region output;
+  r->processed (output, db::extents_processor<db::EdgePair> (dx, dy));
+  return output;
 }
 
 static db::Region extents1 (const db::EdgePairs *r, db::Coord d)

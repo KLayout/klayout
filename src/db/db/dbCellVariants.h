@@ -82,6 +82,18 @@ struct DB_PUBLIC MagnificationReducer
 };
 
 /**
+ *  @brief A reducer for magnification and XYAnisotropy
+ *
+ *  This reducer is used for cases where an x and y-value is given, e.g. anisotropic size.
+ */
+struct DB_PUBLIC XYAnisotropyAndMagnificationReducer
+  : public TransformationReducer
+{
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
+  db::Trans reduce (const db::Trans &trans) const;
+};
+
+/**
  *  @brief A magnification and orientation reducer
  *
  *  This reducer incarnation reduces the transformation to it's rotation/mirror/magnification part (2d matrix)

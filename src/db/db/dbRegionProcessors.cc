@@ -88,28 +88,6 @@ void CornerDetectorCore::detect_corners (const db::Polygon &poly, const CornerPo
 }
 
 // -----------------------------------------------------------------------------------
-//  Extents implementation
-
-void Extents::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
-{
-  db::Box box = poly.box ().enlarged (db::Vector (m_dx, m_dy));
-  if (! box.empty ()) {
-    result.push_back (db::Polygon (box));
-  }
-}
-
-const TransformationReducer *Extents::vars () const
-{
-  if (m_dx == 0 && m_dy == 0) {
-    return 0;
-  } else if (m_dx == m_dy) {
-    return & m_isotropic_reducer;
-  } else {
-    return & m_anisotropic_reducer;
-  }
-}
-
-// -----------------------------------------------------------------------------------
 //  RelativeExtents implementation
 
 void RelativeExtents::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const

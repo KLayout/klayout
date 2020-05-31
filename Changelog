@@ -4,6 +4,10 @@
       Enhanced API for ObjectInstPath
 * Enhancement: %GITHUB%/issues/563
       True support for text objects in DRC/LVS (text layers)
+* Enhancement: %GITHUB%/issues/570
+      Edges#extents, Texts#extents and EdgePairs#extents now
+      work hierarchically in deep mode. In DRC, this means,
+      "extents" is a deep-enabled method now.
 * Enhancement: ability to utilize a LayoutView as a Widget
       Standalone instantiation of a LayoutView object is 
       supported now. So it becomes possible to create

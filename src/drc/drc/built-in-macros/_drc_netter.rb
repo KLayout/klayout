@@ -336,16 +336,74 @@ module DRC
     # Multiple diode specifications are allowed. Just add them 
     # to the antenna_check call.
     #
+    # You can include the perimeter into the area computation for
+    # the gate or metal layer or both. The physical picture
+    # is this: the side walls of the material contribute to the 
+    # surface too. As the side wall area can be estimated by taking
+    # the perimeter times some material thickness, the effective 
+    # area is: 
+    #
+    # @code
+    # A(eff) = A + P * t
+    # @/code
+    #
+    # Here A is the area of the polygons and P is their perimeter.
+    # t is the "thickness" in micrometer units. To specify such
+    # a condition, use the following notation:
+    #
+    # @code
+    # errors = antenna_check(area_and_perimeter(gate, 0.5), ...)
+    # @/code
+    #
+    # "area_and_perimeter" takes the polygon layer and the 
+    # thickness (0.5 micrometers in this case). 
+    # This notation can be applied to both gate and
+    # metal layers. A detailed notation for the usual,
+    # area-only case is available as well for completeness:
+    #
+    # @code
+    # errors = antenna_check(area_only(gate), ...)
+    # 
+    # # this is equivalent to a zero thickness:
+    # errors = antenna_check(area_and_perimeter(gate, 0.0), ...)
+    # # or the standard case:
+    # errors = antenna_check(gate, ...)
+    # @/code
+    #
     # The error shapes produced by the antenna check are copies
     # of the metal shapes on the metal layers of each network 
     # violating the antenna rule.
 
-    def antenna_check(gate, metal, ratio, *diodes)
+    def antenna_check(agate, ametal, ratio, *diodes)
 
-      gate.is_a?(DRC::DRCLayer) || raise("gate argument of Netter#antenna_check must be a layer")
+      gate_perimeter_factor = 0.0
+      if agate.is_a?(DRC::DRCLayer)
+        gate = agate
+      elsif agate.is_a?(DRC::DRCAreaAndPerimeter)
+        gate = agate.region
+        gate_perimeter_factor = agate.perimeter_factor
+        if ! gate.is_a?(DRC::DRCLayer)
+          raise("gate with area or area_and_perimeter: input argument must be a layer")
+        end
+      else
+        raise("gate argument of Netter#antenna_check must be a layer ")
+      end
+
       gate.requires_region("Netter#antenna_check (gate argument)")
 
-      metal.is_a?(DRC::DRCLayer) || raise("metal argument of Netter#antenna_check must be a layer")
+      metal_perimeter_factor = 0.0
+      if ametal.is_a?(DRC::DRCLayer)
+        metal = ametal
+      elsif ametal.is_a?(DRC::DRCAreaAndPerimeter)
+        metal = ametal.region
+        metal_perimeter_factor = ametal.perimeter_factor
+        if ! metal.is_a?(DRC::DRCLayer)
+          raise("metal with area or area_and_perimeter: input argument must be a layer")
+        end
+      else
+        raise("metal argument of Netter#antenna_check must be a layer")
+      end
+
       metal.requires_region("Netter#antenna_check (metal argument)")
 
       if !ratio.is_a?(1.class) && !ratio.is_a?(Float)
@@ -363,7 +421,7 @@ module DRC
         end
       end
 
-      DRC::DRCLayer::new(@engine, @engine._cmd(l2n_data, :antenna_check, gate.data, metal.data, ratio, dl))
+      DRC::DRCLayer::new(@engine, @engine._cmd(l2n_data, :antenna_check, gate.data, gate_perimeter_factor, metal.data, metal_perimeter_factor, ratio, dl))
 
     end
 

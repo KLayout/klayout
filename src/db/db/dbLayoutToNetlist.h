@@ -730,6 +730,14 @@ public:
    *  the limit ratio all metal shapes are copied to the output region as
    *  error markers.
    *
+   *  The area computation of gate and metal happens by taking the polygon
+   *  area (A) and perimeter (P) into account:
+   *
+   *    A(antenna) = A + P * f
+   *
+   *  where f is the perimeter factor. The unit of the area factor is
+   *  micrometers.
+   *
    *  The limit ratio can be modified by the presence of connections to
    *  other layers (specifically designating diodes for charge removal).
    *  Each of these layers will modify the ratio by adding a value of
@@ -742,7 +750,16 @@ public:
    *  regardless of the diode's area.
    *  In other words: any diode will make the net safe against antenna discharge.
    */
-  db::Region antenna_check (const db::Region &gate, const db::Region &metal, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes = std::vector<std::pair<const db::Region *, double> > ());
+  db::Region antenna_check (const db::Region &gate, double gate_perimeter_factor, const db::Region &metal, double metal_perimeter_factor, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes = std::vector<std::pair<const db::Region *, double> > ());
+
+  /**
+   *  @brief Variant of the antennna check not using the perimeter
+   *  This version uses 0 for the perimeter factor hence not taking into account the perimeter at all.
+   */
+  db::Region antenna_check (const db::Region &gate, const db::Region &metal, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes = std::vector<std::pair<const db::Region *, double> > ())
+  {
+    return antenna_check (gate, 0.0, metal, 0.0, ratio, diodes);
+  }
 
   /**
    *  @brief Saves the database to the given path

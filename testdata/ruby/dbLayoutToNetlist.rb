@@ -757,7 +757,7 @@ END
 
     l2n.extract_netlist
 
-    a4_3 = l2n.antenna_check(rpoly, rmetal1, 3, [ rdiode ] )
+    a4_3 = l2n.antenna_check(rpoly, rmetal1, 3, [ rdiode ])
     a4_10 = l2n.antenna_check(rpoly, rmetal1, 10, [ rdiode ])
     a4_30 = l2n.antenna_check(rpoly, rmetal1, 30, [ rdiode ])
 
@@ -765,6 +765,70 @@ END
     assert_equal((a4_3.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(400, 0)))).to_s, "")
     assert_equal((a4_10.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(401, 0)))).to_s, "")
     assert_equal((a4_30.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(402, 0)))).to_s, "")
+
+    # --- antenna check metal perimeter included
+
+    l2n._destroy
+    l2n = RBA::LayoutToNetlist::new(dss)
+
+    l2n.register(rpoly, "poly")
+    l2n.register(rcont, "cont")
+    l2n.register(rmetal1, "metal1")
+    l2n.register(rvia1, "via1")
+    l2n.register(rmetal2, "metal2")
+
+    l2n.connect(rpoly)
+    l2n.connect(rcont)
+    l2n.connect(rmetal1)
+    l2n.connect(rvia1)
+    l2n.connect(rmetal2)
+    l2n.connect(rpoly, rcont)
+    l2n.connect(rcont, rmetal1)
+    l2n.connect(rmetal1, rvia1)
+    l2n.connect(rvia1, rmetal2)
+
+    l2n.extract_netlist
+
+    a5_5 = l2n.antenna_check(rpoly, 0.0, rmetal2, 1.0, 5)
+    a5_15 = l2n.antenna_check(rpoly, 0.0, rmetal2, 1.0, 15)
+    a5_29 = l2n.antenna_check(rpoly, 0.0, rmetal2, 1.0, 29)
+
+    # Note: flatten.merged performs some normalization
+    assert_equal((a5_5.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(500, 0)))).to_s, "")
+    assert_equal((a5_15.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(501, 0)))).to_s, "")
+    assert_equal((a5_29.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(502, 0)))).to_s, "")
+
+    # --- antenna check gate perimeter included
+
+    l2n._destroy
+    l2n = RBA::LayoutToNetlist::new(dss)
+
+    l2n.register(rpoly, "poly")
+    l2n.register(rcont, "cont")
+    l2n.register(rmetal1, "metal1")
+    l2n.register(rvia1, "via1")
+    l2n.register(rmetal2, "metal2")
+
+    l2n.connect(rpoly)
+    l2n.connect(rcont)
+    l2n.connect(rmetal1)
+    l2n.connect(rvia1)
+    l2n.connect(rmetal2)
+    l2n.connect(rpoly, rcont)
+    l2n.connect(rcont, rmetal1)
+    l2n.connect(rmetal1, rvia1)
+    l2n.connect(rvia1, rmetal2)
+
+    l2n.extract_netlist
+
+    a6_3 = l2n.antenna_check(rpoly, 0.3, rmetal2, 0.0, 3)
+    a6_5 = l2n.antenna_check(rpoly, 0.3, rmetal2, 0.0, 5)
+    a6_9 = l2n.antenna_check(rpoly, 0.3, rmetal2, 0.0, 9)
+
+    # Note: flatten.merged performs some normalization
+    assert_equal((a6_3.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(600, 0)))).to_s, "")
+    assert_equal((a6_5.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(601, 0)))).to_s, "")
+    assert_equal((a6_9.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(602, 0)))).to_s, "")
 
   end
 

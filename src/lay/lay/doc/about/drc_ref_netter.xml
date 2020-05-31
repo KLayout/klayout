@@ -133,6 +133,40 @@ errors = antenna_check(gate, metal1, 50.0, [ diode, 10.0 ])
 Multiple diode specifications are allowed. Just add them 
 to the antenna_check call.
 </p><p>
+You can include the perimeter into the area computation for
+the gate or metal layer or both. The physical picture
+is this: the side walls of the material contribute to the 
+surface too. As the side wall area can be estimated by taking
+the perimeter times some material thickness, the effective 
+area is: 
+</p><p>
+<pre>
+A(eff) = A + P * t
+</pre>
+</p><p>
+Here A is the area of the polygons and P is their perimeter.
+t is the "thickness" in micrometer units. To specify such
+a condition, use the following notation:
+</p><p>
+<pre>
+errors = antenna_check(area_and_perimeter(gate, 0.5), ...)
+</pre>
+</p><p>
+"area_and_perimeter" takes the polygon layer and the 
+thickness (0.5 micrometers in this case). 
+This notation can be applied to both gate and
+metal layers. A detailed notation for the usual,
+area-only case is available as well for completeness:
+</p><p>
+<pre>
+errors = antenna_check(area_only(gate), ...)
+
+# this is equivalent to a zero thickness:
+errors = antenna_check(area_and_perimeter(gate, 0.0), ...)
+# or the standard case:
+errors = antenna_check(gate, ...)
+</pre>
+</p><p>
 The error shapes produced by the antenna check are copies
 of the metal shapes on the metal layers of each network 
 violating the antenna rule.

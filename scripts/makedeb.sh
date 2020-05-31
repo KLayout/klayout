@@ -24,6 +24,9 @@ ubuntu16)
 ubuntu18)
   depends="libqt4-designer (>= 4.8.7), libqt4-xml (>= 4.8.7), libqt4-sql (>= 4.8.7), libqt4-network (>= 4.8.7), libqtcore4 (>= 4.8.7), libqtgui4 (>= 4.8.7), zlib1g (>= 1.2.11), libruby2.5 (>= 2.5.1), python3 (>= 3.6.5), libpython3.6 (>= 3.6.5), libstdc++6 (>= 8), libc6 (>= 2.27)"
   ;;
+ubuntu20)
+  depends="libqt5core5a (>= 5.12.8), libqt5designer5 (>= 5.12.8), libqt5gui5 (>= 5.12.8), libqt5multimedia5 (>= 5.12.8), libqt5multimediawidgets5 (>= 5.12.8), libqt5network5 (>= 5.12.8), libqt5opengl5 (>= 5.12.8), libqt5printsupport5 (>= 5.12.8), libqt5sql5 (>= 5.12.8), libqt5svg5 (>= 5.12.8), libqt5widgets5 (>= 5.12.8), libqt5xml5 (>= 5.12.8), libqt5xmlpatterns5 (>= 5.12.8), zlib1g (>= 1.2.11), libruby2.7 (>= 2.7.0), python3 (>= 3.8.2), libpython3.8 (>= 3.8.2), libstdc++6 (>=10), libc6 (>= 2.31)" 
+  ;;
 *)
   echo "Unknown target '$target' (given as first argument)"
   exit 1

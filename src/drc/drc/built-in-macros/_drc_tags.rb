@@ -112,5 +112,17 @@ module DRC
     end
   end
 
+  # A wrapper for an input for the antenna check
+  # This class is used to identify a region plus an
+  # optional perimeter factor
+  class DRCAreaAndPerimeter
+    attr_accessor :region
+    attr_accessor :perimeter_factor
+    def initialize(r, f)
+      self.region = r
+      self.perimeter_factor = f
+    end
+  end
+
 end
 

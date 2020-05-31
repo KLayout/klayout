@@ -129,7 +129,7 @@ class DBEdges_TestClass < TestBase
     
     r = RBA::Edges::new(RBA::Path::new([ RBA::Point::new(0, 0), RBA::Point::new(100, 0) ], 20))
     assert_equal(r.to_s, "(0,-10;0,10);(0,10;100,10);(100,10;100,-10);(100,-10;0,-10)")
-    assert_equal(r.extents.to_s, "")
+    assert_equal(r.extents.to_s, "(0,-10;0,-10;0,10;0,10);(0,10;100,10;100,10;0,10);(100,-10;100,-10;100,10;100,10);(0,-10;100,-10;100,-10;0,-10)")
     assert_equal(r.extents(10).to_s, "(-10,-20;-10,20;10,20;10,-20);(-10,0;-10,20;110,20;110,0);(90,-20;90,20;110,20;110,-20);(-10,-20;-10,0;110,0;110,-20)")
     assert_equal(r.extents(5, -5).to_s, "(-5,-5;-5,5;5,5;5,-5);(95,-5;95,5;105,5;105,-5)")
     assert_equal(r.is_empty?, false)

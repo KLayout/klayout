@@ -248,9 +248,9 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("layer_name", (std::string (db::LayoutToNetlist::*) (unsigned int) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
     "@brief Gets the name of the given layer (by index)\n"
   ) +
-  gsi::method ("register", (void (db::LayoutToNetlist::*) (const db::Region &region, const std::string &)) &db::LayoutToNetlist::register_layer, gsi::arg ("l"), gsi::arg ("n"),
+  gsi::method ("register", (void (db::LayoutToNetlist::*) (const db::ShapeCollection &collection, const std::string &)) &db::LayoutToNetlist::register_layer, gsi::arg ("l"), gsi::arg ("n"),
     "@brief Names the given layer\n"
-    "'l' must be a hierarchical region derived with \\make_layer, \\make_text_layer or \\make_polygon_layer or "
+    "'l' must be a hierarchical \\Region or \\Texts object derived with \\make_layer, \\make_text_layer or \\make_polygon_layer or "
     "a region derived from those by boolean operations or other hierarchical operations.\n"
     "\n"
     "Naming a layer allows the system to indicate the layer in various contexts, i.e. "
@@ -258,13 +258,8 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "They are not discarded when the Region object is destroyed.\n"
     "\n"
     "If required, the system will assign a name automatically."
-  ) +
-  gsi::method ("register", (void (db::LayoutToNetlist::*) (const db::Texts &texts, const std::string &)) &db::LayoutToNetlist::register_layer, gsi::arg ("l"), gsi::arg ("n"),
-    "@brief Names the given layer\n"
-    "This method behaves like the one provided for Regions but accepts Texts. "
-    "Texts (hierarchical text collections) are useful to represent labels for naming nets.\n"
     "\n"
-    "This variant has been introduced in version 0.27.\n"
+    "This method has been generalized in version 0.27.\n"
   ) +
   gsi::method_ext ("layer_names", &l2n_layer_names,
     "@brief Returns a list of names of the layer kept inside the LayoutToNetlist object."

@@ -338,7 +338,7 @@ Shape::simple_polygon_ref_type Shape::simple_polygon_ref () const
 {
   if (m_type == SimplePolygonRef) {
     return *basic_ptr (simple_polygon_ref_type::tag ());
-  } else if (SimplePolygonPtrArrayMember) {
+  } else if (m_type == SimplePolygonPtrArrayMember) {
     tl_assert (m_trans.rot () == 0);
     return simple_polygon_ref_type (&basic_ptr (simple_polygon_ptr_array_type::tag ())->object ().obj (), m_trans.disp ());
   } else {

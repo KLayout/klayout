@@ -59,6 +59,12 @@ AsIfFlatEdges::~AsIfFlatEdges ()
   //  .. nothing yet ..
 }
 
+AsIfFlatEdges::AsIfFlatEdges (const AsIfFlatEdges &other)
+  : EdgesDelegate (other), m_bbox_valid (false)
+{
+  operator= (other);
+}
+
 AsIfFlatEdges &
 AsIfFlatEdges::operator= (const AsIfFlatEdges &other)
 {

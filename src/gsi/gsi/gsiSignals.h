@@ -883,7 +883,7 @@ protected:
   }
 
 private:
-  event_type (X::*mp_event);
+  event_type X::*mp_event;
 };
 
 template <class X, class E, class H, class T>

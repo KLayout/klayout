@@ -260,10 +260,6 @@ public:
     : m_begin (begin), m_step (step), m_index (index)
   { }
 
-  kd_n_it (const kd_n_it &i)
-    : m_begin (i.m_begin), m_step (i.m_step), m_index (i.m_index)
-  { }
-
   kd_n_it (size_type step, const kd_n_it &i)
     : m_begin (i.m_begin), m_step (step), m_index (i.m_index)
   { }

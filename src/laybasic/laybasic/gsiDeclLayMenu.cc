@@ -154,7 +154,7 @@ Class<lay::AbstractMenu> decl_AbstractMenu ("lay", "AbstractMenu",
     "@param path The path to check\n"
     "@return false if the path is not a valid path to an item\n"
   ) +
-  method ("insert_item", (void (lay::AbstractMenu::*) (const std::string &, const std::string &, const lay::Action &)) &lay::AbstractMenu::insert_item, gsi::arg ("path"), gsi::arg ("name"), gsi::arg ("action"),
+  method ("insert_item", (void (lay::AbstractMenu::*) (const std::string &, const std::string &, const lay::Action *)) &lay::AbstractMenu::insert_item, gsi::arg ("path"), gsi::arg ("name"), gsi::arg ("action"),
     "@brief Inserts a new item before the one given by the path\n"
     "\n"
     "The Action object passed as the third parameter references the handler which both implements the "

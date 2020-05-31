@@ -58,12 +58,23 @@ public:
   /**
    *  @brief Copy constructor
    */
-  explicit vector (const tl::vector<T> &d) : std::vector<T> (d) { }
+  explicit vector (const tl::vector<T> &d) : base (d) { }
+
+  /**
+   *  @brief Assignment
+   */
+  vector &operator= (const tl::vector<T> &d)
+  {
+    if (&d != this) {
+      base::operator= (d);
+    }
+    return *this;
+  }
 
   /**
    *  @brief Initialization with value and length
    */
-  vector (const T &v, int s) : std::vector<T> (v, s) { }
+  vector (const T &v, int s) : base (v, s) { }
 };
 
 /**

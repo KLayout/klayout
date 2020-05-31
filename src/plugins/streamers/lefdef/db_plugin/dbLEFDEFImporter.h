@@ -66,6 +66,7 @@ class DB_PLUGIN_PUBLIC LEFDEFReaderOptions
 public:
   LEFDEFReaderOptions ();
   LEFDEFReaderOptions (const LEFDEFReaderOptions &d);
+  LEFDEFReaderOptions &operator= (const LEFDEFReaderOptions &d);
 
   db::FormatSpecificReaderOptions *clone () const;
   virtual const std::string &format_name () const;

@@ -127,6 +127,18 @@ public:
   }
 
   /**
+   *  @brief Assignment
+   *
+   *  @param d The source from which to take the data
+   */
+  vector &operator= (const vector<C> &d) 
+  {
+    m_x = d.x ();
+    m_y = d.y ();
+    return *this;
+  }
+
+  /**
    *  @brief The copy constructor that converts also
    *
    *  The copy constructor allows converting between different
@@ -139,6 +151,21 @@ public:
     : m_x (coord_traits::rounded (d.x ())), m_y (coord_traits::rounded (d.y ()))
   {
     //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Assignment which also converts
+   *
+   *  This assignment operator will convert the coordinate types if possibel
+   *
+   *  @param d The source from which to take the data
+   */
+  template <class D>
+  vector &operator= (const point<C> &d) 
+  {
+    m_x = coord_traits::rounded (d.x ());
+    m_y = coord_traits::rounded (d.y ());
+    return *this;
   }
 
   /**

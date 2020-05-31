@@ -55,6 +55,7 @@ public:
 
   virtual EdgePairsDelegate *filter_in_place (const EdgePairFilterBase &) { return this; }
   virtual EdgePairsDelegate *filtered (const EdgePairFilterBase &) const { return new EmptyEdgePairs (); }
+  virtual RegionDelegate *processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const;
 
   virtual RegionDelegate *polygons (db::Coord e) const;
   virtual EdgesDelegate *edges () const;

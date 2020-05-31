@@ -38,6 +38,7 @@ class DB_PUBLIC AsIfFlatEdgePairs
 {
 public:
   AsIfFlatEdgePairs ();
+  AsIfFlatEdgePairs (const AsIfFlatEdgePairs &other);
   virtual ~AsIfFlatEdgePairs ();
 
   virtual size_t size () const;
@@ -50,6 +51,8 @@ public:
   }
 
   virtual EdgePairsDelegate *filtered (const EdgePairFilterBase &) const;
+
+  virtual RegionDelegate *processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const;
 
   virtual EdgePairsDelegate *add_in_place (const EdgePairs &other)
   {

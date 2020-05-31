@@ -240,6 +240,12 @@ EdgePairsDelegate *DeepEdgePairs::filtered (const EdgePairFilterBase &filter) co
   return AsIfFlatEdgePairs::filtered (filter);
 }
 
+RegionDelegate *
+DeepEdgePairs::processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const
+{
+  return shape_collection_processed_impl<db::EdgePair, db::Polygon, db::DeepRegion> (deep_layer (), filter);
+}
+
 RegionDelegate *DeepEdgePairs::polygons (db::Coord e) const
 {
   db::DeepLayer new_layer = deep_layer ().derived ();

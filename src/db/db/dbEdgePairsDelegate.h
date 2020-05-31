@@ -27,6 +27,7 @@
 #include "dbCommon.h"
 #include "dbEdgePair.h"
 #include "dbShapeCollection.h"
+#include "dbShapeCollectionUtils.h"
 
 namespace db {
 
@@ -36,6 +37,8 @@ class EdgePairFilterBase;
 class RegionDelegate;
 class EdgesDelegate;
 class Layout;
+
+typedef shape_collection_processor<db::EdgePair, db::Polygon> EdgePairToPolygonProcessorBase;
 
 /**
  *  @brief The edge pair set iterator delegate
@@ -97,6 +100,7 @@ public:
 
   virtual EdgePairsDelegate *filter_in_place (const EdgePairFilterBase &filter) = 0;
   virtual EdgePairsDelegate *filtered (const EdgePairFilterBase &filter) const = 0;
+  virtual RegionDelegate *processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const = 0;
 
   virtual RegionDelegate *polygons (db::Coord e) const = 0;
   virtual EdgesDelegate *edges () const = 0;

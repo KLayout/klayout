@@ -455,6 +455,14 @@ public:
   }
 
   /**
+   *  @brief Processes the edges into polygons
+   *
+   *  This method will run the processor over all edges and return a region
+   *  with the outputs of the processor.
+   */
+  void processed (Region &output, const TextToPolygonProcessorBase &filter) const;
+
+  /**
    *  @brief Selects all polygons of the other region set which include the texts of this text collection
    *
    *  Merged semantics applies for the other region. Merged polygons will be selected from the other region

@@ -209,7 +209,7 @@ public:
   std::vector<std::string> to_strings () const;
 
 private:
-  uint32_t *(m_pattern[64]);
+  uint32_t *m_pattern[64];
   uint32_t m_buffer [64 * 32];
   unsigned int m_width, m_height;
   unsigned int m_pattern_stride;

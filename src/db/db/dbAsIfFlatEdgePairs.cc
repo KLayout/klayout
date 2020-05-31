@@ -43,6 +43,12 @@ AsIfFlatEdgePairs::AsIfFlatEdgePairs ()
   //  .. nothing yet ..
 }
 
+AsIfFlatEdgePairs::AsIfFlatEdgePairs (const AsIfFlatEdgePairs &other)
+  : EdgePairsDelegate (other), m_bbox_valid (other.m_bbox_valid), m_bbox (other.m_bbox)
+{
+  //  .. nothing yet ..
+}
+
 AsIfFlatEdgePairs::~AsIfFlatEdgePairs ()
 {
   //  .. nothing yet ..
@@ -123,6 +129,28 @@ void AsIfFlatEdgePairs::update_bbox (const db::Box &b)
 void AsIfFlatEdgePairs::invalidate_bbox ()
 {
   m_bbox_valid = false;
+}
+
+RegionDelegate *
+AsIfFlatEdgePairs::processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const
+{
+  std::auto_ptr<FlatRegion> region (new FlatRegion ());
+
+  if (filter.result_must_not_be_merged ()) {
+    region->set_merged_semantics (false);
+  }
+
+  std::vector<db::Polygon> res_polygons;
+
+  for (EdgePairsIterator e (begin ()); ! e.at_end (); ++e) {
+    res_polygons.clear ();
+    filter.process (*e, res_polygons);
+    for (std::vector<db::Polygon>::const_iterator pr = res_polygons.begin (); pr != res_polygons.end (); ++pr) {
+      region->insert (*pr);
+    }
+  }
+
+  return region.release ();
 }
 
 EdgePairsDelegate *

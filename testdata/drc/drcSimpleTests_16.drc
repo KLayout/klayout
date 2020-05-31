@@ -1,0 +1,17 @@
+
+source($drc_test_source)
+target($drc_test_target)
+
+deep
+
+input(2,0).output(2, 0)
+input(3,0).output(3, 0)
+input(4,0).output(4, 0)
+input(9,0).output(9, 0)
+
+input(2,0).edges.extents(10.nm, 10.nm).output(102, 0)
+input(3,0).edges.extents(10.nm, 20.nm).output(103, 0)
+input(4,0).edges.extents(20.nm, 10.nm).output(104, 0)
+input(9,0).edges.extents(20.nm).output(109, 0)
+labels(9,0).extents(50.nm, 100.nm).output(109, 1)
+

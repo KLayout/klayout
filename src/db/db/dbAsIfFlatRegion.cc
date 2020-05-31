@@ -56,6 +56,12 @@ AsIfFlatRegion::~AsIfFlatRegion ()
   //  .. nothing yet ..
 }
 
+AsIfFlatRegion::AsIfFlatRegion (const AsIfFlatRegion &other)
+  : RegionDelegate (other), m_bbox_valid (false)
+{
+  operator= (other);
+}
+
 AsIfFlatRegion &
 AsIfFlatRegion::operator= (const AsIfFlatRegion &other)
 {

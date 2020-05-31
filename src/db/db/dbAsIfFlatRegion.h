@@ -273,6 +273,7 @@ protected:
   static void produce_markers_for_angle_check (const db::Polygon &poly, const Trans &tr, double min, double max, bool inverse, db::Shapes &shapes);
 
   AsIfFlatRegion &operator= (const AsIfFlatRegion &other);
+  AsIfFlatRegion (const AsIfFlatRegion &other);
 
 private:
 

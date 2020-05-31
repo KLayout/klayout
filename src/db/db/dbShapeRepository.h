@@ -67,15 +67,6 @@ public:
     //  .. nothing yet ..
   }
 
-  /** 
-   *  @brief The copy constructor
-   */
-  repository (const repository<Sh> &d)
-    : m_set (d.m_set)
-  {
-    //  .. nothing yet ..
-  }
-
   /**
    *  @brief Insert a shape into the repository
    *

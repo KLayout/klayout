@@ -26,6 +26,7 @@
 
 #include "dbCommon.h"
 #include "dbShapeCollection.h"
+#include "dbShapeCollectionUtils.h"
 #include "dbText.h"
 
 namespace db {
@@ -37,6 +38,8 @@ class TextFilterBase;
 class RegionDelegate;
 class EdgesDelegate;
 class Layout;
+
+typedef shape_collection_processor<db::Text, db::Polygon> TextToPolygonProcessorBase;
 
 /**
  *  @brief The edge pair set iterator delegate
@@ -98,6 +101,7 @@ public:
 
   virtual TextsDelegate *filter_in_place (const TextFilterBase &filter) = 0;
   virtual TextsDelegate *filtered (const TextFilterBase &filter) const = 0;
+  virtual RegionDelegate *processed_to_polygons (const TextToPolygonProcessorBase &filter) const = 0;
 
   virtual RegionDelegate *polygons (db::Coord e) const = 0;
   virtual EdgesDelegate *edges () const = 0;

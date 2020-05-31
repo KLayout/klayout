@@ -46,6 +46,12 @@ AsIfFlatTexts::AsIfFlatTexts ()
   //  .. nothing yet ..
 }
 
+AsIfFlatTexts::AsIfFlatTexts (const AsIfFlatTexts &other)
+  : TextsDelegate (other), m_bbox_valid (other.m_bbox_valid), m_bbox (other.m_bbox)
+{
+  //  .. nothing yet ..
+}
+
 AsIfFlatTexts::~AsIfFlatTexts ()
 {
   //  .. nothing yet ..
@@ -150,6 +156,28 @@ AsIfFlatTexts::filtered (const TextFilterBase &filter) const
   }
 
   return new_texts.release ();
+}
+
+RegionDelegate *
+AsIfFlatTexts::processed_to_polygons (const TextToPolygonProcessorBase &filter) const
+{
+  std::auto_ptr<FlatRegion> region (new FlatRegion ());
+
+  if (filter.result_must_not_be_merged ()) {
+    region->set_merged_semantics (false);
+  }
+
+  std::vector<db::Polygon> res_polygons;
+
+  for (TextsIterator e (begin ()); ! e.at_end (); ++e) {
+    res_polygons.clear ();
+    filter.process (*e, res_polygons);
+    for (std::vector<db::Polygon>::const_iterator pr = res_polygons.begin (); pr != res_polygons.end (); ++pr) {
+      region->insert (*pr);
+    }
+  }
+
+  return region.release ();
 }
 
 RegionDelegate *

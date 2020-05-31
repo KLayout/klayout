@@ -115,7 +115,7 @@ public:
   {
     T *t = dynamic_cast<T *> (object);
     if (t) {
-      void *(argv[]) = { _CALLARGPTRS };
+      void *argv[] = { _CALLARGPTRS };
       (t->*m_m) (_COUNT, &(argv[0]));
     }
   }
@@ -145,7 +145,7 @@ public:
   {
     T *t = dynamic_cast<T *> (object);
     if (t) {
-      void *(argv[]) = { _CALLARGPTRS };
+      void *argv[] = { _CALLARGPTRS };
       (t->*m_m) (m_d, _COUNT, &(argv[0]));
     }
   }

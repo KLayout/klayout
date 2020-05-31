@@ -176,6 +176,11 @@ FlatTexts *Texts::flat_texts ()
   return texts;
 }
 
+void Texts::processed (Region &output, const TextToPolygonProcessorBase &filter) const
+{
+  output = Region (mp_delegate->processed_to_polygons (filter));
+}
+
 void Texts::pull_interacting (Region &output, const Region &other) const
 {
   output = Region (mp_delegate->pull_interacting (other));

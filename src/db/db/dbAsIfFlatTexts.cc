@@ -46,6 +46,12 @@ AsIfFlatTexts::AsIfFlatTexts ()
   //  .. nothing yet ..
 }
 
+AsIfFlatTexts::AsIfFlatTexts (const AsIfFlatTexts &other)
+  : TextsDelegate (other), m_bbox_valid (other.m_bbox_valid), m_bbox (other.m_bbox)
+{
+  //  .. nothing yet ..
+}
+
 AsIfFlatTexts::~AsIfFlatTexts ()
 {
   //  .. nothing yet ..

@@ -1022,6 +1022,7 @@ public:
   X ();
   X (const char *x);
   X (const X &x);
+  X &operator= (const X &x);
   virtual ~X ();
 
   int x1 () const { return 17; }

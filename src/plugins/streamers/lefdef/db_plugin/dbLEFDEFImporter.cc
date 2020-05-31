@@ -72,42 +72,51 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
 }
 
 LEFDEFReaderOptions::LEFDEFReaderOptions (const LEFDEFReaderOptions &d)
-  : db::FormatSpecificReaderOptions (d),
-    m_read_all_layers (d.m_read_all_layers), m_layer_map (d.m_layer_map),
-    m_dbu (d.m_dbu),
-    m_produce_net_names (d.m_produce_net_names),
-    m_net_property_name (d.m_net_property_name),
-    m_produce_inst_names (d.m_produce_inst_names),
-    m_inst_property_name (d.m_inst_property_name),
-    m_produce_pin_names (d.m_produce_pin_names),
-    m_pin_property_name (d.m_pin_property_name),
-    m_produce_cell_outlines (d.m_produce_cell_outlines),
-    m_cell_outline_layer (d.m_cell_outline_layer),
-    m_produce_placement_blockages (d.m_produce_placement_blockages),
-    m_placement_blockage_layer (d.m_placement_blockage_layer),
-    m_produce_regions (d.m_produce_regions),
-    m_region_layer (d.m_region_layer),
-    m_produce_via_geometry (d.m_produce_via_geometry),
-    m_via_geometry_suffix (d.m_via_geometry_suffix),
-    m_via_geometry_datatype (d.m_via_geometry_datatype),
-    m_produce_pins (d.m_produce_pins),
-    m_pins_suffix (d.m_pins_suffix),
-    m_pins_datatype (d.m_pins_datatype),
-    m_produce_obstructions (d.m_produce_obstructions),
-    m_obstructions_suffix (d.m_obstructions_suffix),
-    m_obstructions_datatype (d.m_obstructions_datatype),
-    m_produce_blockages (d.m_produce_blockages),
-    m_blockages_suffix (d.m_blockages_suffix),
-    m_blockages_datatype (d.m_blockages_datatype),
-    m_produce_labels (d.m_produce_labels),
-    m_labels_suffix (d.m_labels_suffix),
-    m_labels_datatype (d.m_labels_datatype),
-    m_produce_routing (d.m_produce_routing),
-    m_routing_suffix (d.m_routing_suffix),
-    m_routing_datatype (d.m_routing_datatype),
-    m_lef_files (d.m_lef_files)
+  : db::FormatSpecificReaderOptions ()
 {
-  //  .. nothing yet ..
+  operator= (d);
+}
+
+LEFDEFReaderOptions &LEFDEFReaderOptions::operator= (const LEFDEFReaderOptions &d)
+{
+  if (this != &d) {
+    db::FormatSpecificReaderOptions::operator= (d);
+    m_read_all_layers = d.m_read_all_layers;
+    m_layer_map = d.m_layer_map;
+    m_dbu = d.m_dbu;
+    m_produce_net_names = d.m_produce_net_names;
+    m_net_property_name = d.m_net_property_name;
+    m_produce_inst_names = d.m_produce_inst_names;
+    m_inst_property_name = d.m_inst_property_name;
+    m_produce_pin_names = d.m_produce_pin_names;
+    m_pin_property_name = d.m_pin_property_name;
+    m_produce_cell_outlines = d.m_produce_cell_outlines;
+    m_cell_outline_layer = d.m_cell_outline_layer;
+    m_produce_placement_blockages = d.m_produce_placement_blockages;
+    m_placement_blockage_layer = d.m_placement_blockage_layer;
+    m_produce_regions = d.m_produce_regions;
+    m_region_layer = d.m_region_layer;
+    m_produce_via_geometry = d.m_produce_via_geometry;
+    m_via_geometry_suffix = d.m_via_geometry_suffix;
+    m_via_geometry_datatype = d.m_via_geometry_datatype;
+    m_produce_pins = d.m_produce_pins;
+    m_pins_suffix = d.m_pins_suffix;
+    m_pins_datatype = d.m_pins_datatype;
+    m_produce_obstructions = d.m_produce_obstructions;
+    m_obstructions_suffix = d.m_obstructions_suffix;
+    m_obstructions_datatype = d.m_obstructions_datatype;
+    m_produce_blockages = d.m_produce_blockages;
+    m_blockages_suffix = d.m_blockages_suffix;
+    m_blockages_datatype = d.m_blockages_datatype;
+    m_produce_labels = d.m_produce_labels;
+    m_labels_suffix = d.m_labels_suffix;
+    m_labels_datatype = d.m_labels_datatype;
+    m_produce_routing = d.m_produce_routing;
+    m_routing_suffix = d.m_routing_suffix;
+    m_routing_datatype = d.m_routing_datatype;
+    m_lef_files = d.m_lef_files;
+  }
+  return *this;
 }
 
 db::FormatSpecificReaderOptions *

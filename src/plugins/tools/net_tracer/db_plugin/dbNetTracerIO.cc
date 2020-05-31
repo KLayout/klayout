@@ -501,6 +501,13 @@ NetTracerTechnologyComponent::NetTracerTechnologyComponent (const NetTracerTechn
   m_symbols = d.m_symbols;
 }
 
+NetTracerTechnologyComponent &NetTracerTechnologyComponent::operator= (const NetTracerTechnologyComponent &d)
+{
+  m_connections = d.m_connections;
+  m_symbols = d.m_symbols;
+  return *this;
+}
+
 NetTracerData
 NetTracerTechnologyComponent::get_tracer_data (const db::Layout &layout) const
 {

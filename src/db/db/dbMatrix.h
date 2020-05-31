@@ -98,14 +98,6 @@ public:
   }
 
   /**
-   *  @brief Copy ctor
-   */
-  Matrix2d (const Matrix2d &d)
-  {
-    *this = d;
-  }
-
-  /**
    *  @brief Make a matrix from a transformation
    */
   template <class Tr> 
@@ -520,14 +512,6 @@ public:
   explicit Matrix3d (double d)
   {
     set (d, 0.0, 0.0, 0.0, d, 0.0, 0.0, 0.0, 1.0);
-  }
-
-  /**
-   *  @brief Copy ctor
-   */
-  Matrix3d (const Matrix3d &d)
-  {
-    *this = d;
   }
 
   /**

@@ -40,6 +40,7 @@ class DB_PUBLIC AsIfFlatTexts
 {
 public:
   AsIfFlatTexts ();
+  AsIfFlatTexts (const AsIfFlatTexts &other);
   virtual ~AsIfFlatTexts ();
 
   virtual size_t size () const;

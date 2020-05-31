@@ -43,6 +43,12 @@ AsIfFlatEdgePairs::AsIfFlatEdgePairs ()
   //  .. nothing yet ..
 }
 
+AsIfFlatEdgePairs::AsIfFlatEdgePairs (const AsIfFlatEdgePairs &other)
+  : EdgePairsDelegate (other), m_bbox_valid (other.m_bbox_valid), m_bbox (other.m_bbox)
+{
+  //  .. nothing yet ..
+}
+
 AsIfFlatEdgePairs::~AsIfFlatEdgePairs ()
 {
   //  .. nothing yet ..

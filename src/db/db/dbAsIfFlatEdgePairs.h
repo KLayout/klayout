@@ -38,6 +38,7 @@ class DB_PUBLIC AsIfFlatEdgePairs
 {
 public:
   AsIfFlatEdgePairs ();
+  AsIfFlatEdgePairs (const AsIfFlatEdgePairs &other);
   virtual ~AsIfFlatEdgePairs ();
 
   virtual size_t size () const;

@@ -84,6 +84,18 @@ public:
   point (const point<C> &d) : m_x (d.x ()), m_y (d.y ()) { }
 
   /**
+   *  @brief Assignment
+   *
+   *  @param d The source from which to take the data
+   */
+  point &operator= (const point<C> &d) 
+  {
+    m_x = d.x ();
+    m_y = d.y ();
+    return *this;
+  }
+
+  /**
    *  @brief The copy constructor that also converts
    *
    *  The copy constructor allows one to convert between different
@@ -93,6 +105,21 @@ public:
    */
   template <class D>
   explicit point (const point<D> &d) : m_x (coord_traits::rounded (d.x ())), m_y (coord_traits::rounded (d.y ())) { }
+
+  /**
+   *  @brief Assignment which also converts
+   *
+   *  This assignment operator will convert the coordinate types if possibel
+   *
+   *  @param d The source from which to take the data
+   */
+  template <class D>
+  point &operator= (const point<C> &d) 
+  {
+    m_x = coord_traits::rounded (d.x ());
+    m_y = coord_traits::rounded (d.y ());
+    return *this;
+  }
 
   /**
    *  @brief Add to operation

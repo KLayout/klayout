@@ -256,6 +256,16 @@ public:
     m_via_geometry_datatype = s;
   }
 
+  const std::string &via_cellname_prefix () const
+  {
+    return m_via_cellname_prefix;
+  }
+
+  void set_via_cellname_prefix (const std::string &s)
+  {
+    m_via_cellname_prefix = s;
+  }
+
   bool produce_pins () const
   {
     return m_produce_pins;
@@ -284,6 +294,36 @@ public:
   void set_pins_datatype (int s) 
   {
     m_pins_datatype = s;
+  }
+
+  bool produce_lef_pins () const
+  {
+    return m_produce_lef_pins;
+  }
+
+  void set_produce_lef_pins (bool f)
+  {
+    m_produce_lef_pins = f;
+  }
+
+  const std::string &lef_pins_suffix () const
+  {
+    return m_lef_pins_suffix;
+  }
+
+  void set_lef_pins_suffix (const std::string &s)
+  {
+    m_lef_pins_suffix = s;
+  }
+
+  int lef_pins_datatype () const
+  {
+    return m_lef_pins_datatype;
+  }
+
+  void set_lef_pins_datatype (int s)
+  {
+    m_lef_pins_datatype = s;
   }
 
   bool produce_obstructions () const
@@ -406,6 +446,36 @@ public:
     m_routing_datatype = s;
   }
 
+  bool produce_special_routing () const
+  {
+    return m_produce_special_routing;
+  }
+
+  void set_produce_special_routing (bool f)
+  {
+    m_produce_special_routing = f;
+  }
+
+  const std::string &special_routing_suffix () const
+  {
+    return m_special_routing_suffix;
+  }
+
+  void set_special_routing_suffix (const std::string &s)
+  {
+    m_special_routing_suffix = s;
+  }
+
+  int special_routing_datatype () const
+  {
+    return m_special_routing_datatype;
+  }
+
+  void set_special_routing_datatype (int s)
+  {
+    m_special_routing_datatype = s;
+  }
+
   void clear_lef_files ()
   {
     m_lef_files.clear ();
@@ -436,6 +506,43 @@ public:
     m_lef_files = lf;
   }
 
+  bool separate_groups () const
+  {
+    return m_separate_groups;
+  }
+
+  void set_separate_groups (bool f)
+  {
+    m_separate_groups = f;
+  }
+
+  const std::string &map_file () const
+  {
+    return m_map_file;
+  }
+
+  void set_map_file (const std::string &f)
+  {
+    m_map_file = f;
+  }
+
+  /**
+   *  @brief Specify the LEF macro resolution strategy
+   *  Values are:
+   *    0: propduce LEF geometry unless a FOREIGN cell is specified (default)
+   *    1: produce LEF geometry always and ignore FOREIGN
+   *    2: produce a placeholder cell always (even if FOREIGN isn't given)
+   */
+  unsigned int macro_resolution_mode () const
+  {
+    return m_macro_resolution_mode;
+  }
+
+  void set_macro_resolution_mode (unsigned int m)
+  {
+    m_macro_resolution_mode = m;
+  }
+
 private:
   bool m_read_all_layers;
   db::LayerMap m_layer_map;
@@ -455,9 +562,13 @@ private:
   bool m_produce_via_geometry;
   std::string m_via_geometry_suffix;
   int m_via_geometry_datatype;
+  std::string m_via_cellname_prefix;
   bool m_produce_pins;
   std::string m_pins_suffix;
   int m_pins_datatype;
+  bool m_produce_lef_pins;
+  std::string m_lef_pins_suffix;
+  int m_lef_pins_datatype;
   bool m_produce_obstructions;
   std::string m_obstructions_suffix;
   int m_obstructions_datatype;
@@ -470,6 +581,12 @@ private:
   bool m_produce_routing;
   std::string m_routing_suffix;
   int m_routing_datatype;
+  bool m_produce_special_routing;
+  std::string m_special_routing_suffix;
+  int m_special_routing_datatype;
+  bool m_separate_groups;
+  std::string m_map_file;
+  unsigned int m_macro_resolution_mode;
   std::vector<std::string> m_lef_files;
 };
 
@@ -478,15 +595,17 @@ private:
  */
 enum LayerPurpose 
 {
-  Routing = 0,
-  ViaGeometry = 1,
-  Label = 2,
-  Pins = 3,
-  Obstructions = 4,
-  Outline = 5,
-  Blockage = 6,
-  PlacementBlockage = 7,
-  Region = 8
+  Routing = 0,        //  from DEF only
+  SpecialRouting,     //  from DEF only
+  ViaGeometry,        //  from LEF+DEF
+  Label,              //  from LEF+DEF
+  Pins,               //  from DEF
+  LEFPins,            //  from LEF
+  Obstructions,       //  from LEF only
+  Outline,            //  from LEF+DEF
+  Blockage,           //  from DEF only
+  PlacementBlockage,  //  from DEF only
+  Regions,            //  from DEF only
 };
 
 /**
@@ -494,16 +613,33 @@ enum LayerPurpose
  *
  *  This class will handle the creation and management of layers in the LEF/DEF reader context
  */
-class DB_PLUGIN_PUBLIC LEFDEFLayerDelegate
+class DB_PLUGIN_PUBLIC LEFDEFReaderState
 {
 public:
   /**
    *  @brief Constructor
    */
-  LEFDEFLayerDelegate (const LEFDEFReaderOptions *tc);
+  LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout &layout);
 
   /**
-   *  @brief Set the layer map
+   *  @brief Provides an explicit layer mapping
+   *  This method is used when reading the layer map file.
+   */
+  void map_layer_explicit (const std::string &n, LayerPurpose purpose, const LayerProperties &lp, unsigned int layer);
+
+  /**
+   *  @brief Provides an explicit layer mapping
+   *  If this flag is set, the layer mapping specified in the reader options are ignored.
+   */
+  void set_explicit_layer_mapping (bool f);
+
+  /**
+   *  @brief Reads a map file
+   */
+  void read_map_file (const std::string &path, db::Layout &layout);
+
+  /**
+   *  @brief Sets the layer map
    */
   virtual void set_layer_map (const db::LayerMap &lm, bool create_layers)
   {
@@ -512,9 +648,17 @@ public:
   }
 
   /**
-   *  @brief Get the layer map
+   *  @brief Gets the layer map
    */
   const db::LayerMap &layer_map () const
+  {
+    return m_layer_map;
+  }
+
+  /**
+   *  @brief Gets the layer map (non-const version)
+   */
+  db::LayerMap &layer_map ()
   {
     return m_layer_map;
   }
@@ -530,14 +674,19 @@ public:
   void register_layer (const std::string &l);
 
   /**
-   *  @brief Prepare, i.e. create layers required by the layer map
-   */
-  void prepare (db::Layout &layout);
-
-  /**
    *  @brief Finish, i.e. assign GDS layer numbers to the layers
    */
   void finish (db::Layout &layout);
+
+  /**
+   *  @brief Registers a via cell for the via with the given name
+   */
+  void register_via_cell (const std::string &vn, db::Cell *cell);
+
+  /**
+   *  @brief Gets the via cell for the given via name or 0 if no such via is registered
+   */
+  db::Cell *via_cell (const std::string &vn);
 
   /**
    *  @brief Get the technology component pointer
@@ -548,12 +697,17 @@ public:
   }
 
 private:
-  std::map <std::pair<std::string, LayerPurpose>, unsigned int> m_layers;
+  std::map <std::pair<std::string, LayerPurpose>, std::pair<bool, unsigned int> > m_layers;
+  std::map <std::pair<std::string, LayerPurpose>, unsigned int> m_unassigned_layers;
   db::LayerMap m_layer_map;
   bool m_create_layers;
+  bool m_has_explicit_layer_mapping;
   int m_laynum;
   std::map<std::string, int> m_default_number;
+  std::map<std::string, db::Cell *> m_via_cells;
   const LEFDEFReaderOptions *mp_tech_comp;
+
+  std::pair <bool, unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose);
 };
 
 /**
@@ -595,7 +749,7 @@ public:
    *
    *  This method reads the layout specified into the given layout
    */
-  void read (tl::InputStream &stream, db::Layout &layout, LEFDEFLayerDelegate &layer_delegate);
+  void read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderState &state);
 
 protected:
   /**
@@ -636,6 +790,16 @@ protected:
   void expect (const std::string &token);
 
   /**
+   *  @brief Test whether the next token matches one of the given ones and raise an error if it does not
+   */
+  void expect (const std::string &token1, const std::string &token2);
+
+  /**
+   *  @brief Test whether the next token matches one of the given ones and raise an error if it does not
+   */
+  void expect (const std::string &token, const std::string &token2, const std::string &token3);
+
+  /**
    *  @brief Gets the next token
    */
   std::string get ();
@@ -656,11 +820,29 @@ protected:
   long get_long ();
 
   /**
+   *  @brief Gets an orientation code
+   *  The orientation code is read employing the LEF/DEF convention ("N" for r0 etc.)
+   */
+  db::FTrans get_orient (bool optional);
+
+  /**
+   *  @brief Reads a point
+   *  A point is given by two coordinates, x and y
+   */
+  db::Point get_point (double scale);
+
+  /**
+   *  @brief Reads a vector
+   *  A vector is given by two coordinates, x and y
+   */
+  db::Vector get_vector (double scale);
+
+  /**
    *  @brief Create a new layer or return the index of the given layer
    */
   std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose)
   {
-    return mp_layer_delegate->open_layer (layout, name, purpose);
+    return mp_reader_state->open_layer (layout, name, purpose);
   }
 
   /**
@@ -668,7 +850,7 @@ protected:
    */
   void register_layer (const std::string &l)
   {
-    mp_layer_delegate->register_layer (l);
+    mp_reader_state->register_layer (l);
   }
 
   /**
@@ -735,7 +917,22 @@ protected:
     return m_pin_prop_name_id;
   }
 
-protected:
+  /**
+   *  @brief Gets the reader options
+   */
+  const db::LEFDEFReaderOptions &options () const
+  {
+    return m_options;
+  }
+
+  /**
+   *  @brief Gets the reader state object
+   */
+  db::LEFDEFReaderState *reader_state ()
+  {
+    return mp_reader_state;
+  }
+
   void create_generated_via (std::vector<db::Polygon> &bottom,
                              std::vector<db::Polygon> &cut,
                              std::vector<db::Polygon> &top,
@@ -750,7 +947,7 @@ protected:
 private:
   tl::AbsoluteProgress *mp_progress;
   tl::TextInputStream *mp_stream;
-  LEFDEFLayerDelegate *mp_layer_delegate;
+  LEFDEFReaderState *mp_reader_state;
   std::string m_cellname;
   std::string m_fn;
   std::string m_last_token;
@@ -760,6 +957,7 @@ private:
   db::property_names_id_type m_inst_prop_name_id;
   bool m_produce_pin_props;
   db::property_names_id_type m_pin_prop_name_id;
+  db::LEFDEFReaderOptions m_options;
 
   const std::string &next ();
 };

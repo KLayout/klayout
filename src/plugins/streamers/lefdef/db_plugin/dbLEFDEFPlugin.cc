@@ -30,6 +30,8 @@
 #include "dbLEFImporter.h"
 #include "dbDEFImporter.h"
 #include "dbLEFDEFImporter.h"
+#include "dbLayoutUtils.h"
+#include "dbTechnology.h"
 
 namespace db
 {
@@ -102,14 +104,32 @@ public:
   {
     return "LEFDEF";
   }
+
 private:
   tl::InputStream &m_stream;
   db::LayerMap m_layer_map;
 
-  std::string correct_path (const std::string &fn)
+  std::string correct_path (const std::string &fn, const db::Layout &layout)
   {
     if (! tl::is_absolute (fn)) {
-      return tl::combine_path (m_stream.absolute_path (), fn);
+
+      //  if a technology is given and the file can be found in the technology's base path, take it
+      //  from there.
+      std::string tn = layout.meta_info_value ("technology");
+      const db::Technology *tech = 0;
+      if (! tn.empty ()) {
+        tech = db::Technologies::instance ()->technology_by_name (tn);
+      }
+
+      if (tech && ! tech->base_path ().empty ()) {
+        std::string new_fn = tl::combine_path (tech->base_path (), fn);
+        if (tl::file_exists (new_fn)) {
+          return new_fn;
+        }
+      }
+
+      return tl::combine_path (tl::dirname (m_stream.absolute_path ()), fn);
+
     } else {
       return fn;
     }
@@ -123,49 +143,53 @@ private:
       lefdef_options = &default_options;
     }
 
-    //  Take the layer map and the "read all layers" flag from the reader options - hence we override the
-    db::LEFDEFLayerDelegate layers (lefdef_options);
-    layers.prepare (layout);
+    db::LEFDEFReaderState state (lefdef_options, layout);
+
+    if (! lefdef_options->map_file ().empty ()) {
+      state.read_map_file (correct_path (lefdef_options->map_file (), layout), layout);
+    }
+
     layout.dbu (lefdef_options->dbu ());
 
     if (import_lef) {
 
-      tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Reading LEF file")));
+      tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file")));
 
       db::LEFImporter importer;
 
       for (std::vector<std::string>::const_iterator l = lefdef_options->begin_lef_files (); l != lefdef_options->end_lef_files (); ++l) {
 
-        std::string lp = correct_path (*l);
+        std::string lp = correct_path (*l, layout);
 
         tl::InputStream lef_stream (lp);
         tl::log << tl::to_string (tr ("Reading")) << " " << lp;
-        importer.read (lef_stream, layout, layers);
+        importer.read (lef_stream, layout, state);
 
       }
 
       tl::log << tl::to_string (tr ("Reading")) << " " << m_stream.source ();
-      importer.read (m_stream, layout, layers);
+      importer.read (m_stream, layout, state);
 
     } else {
 
-      tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Reading DEF file")));
+      tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading DEF file")));
 
       DEFImporter importer;
 
       for (std::vector<std::string>::const_iterator l = lefdef_options->begin_lef_files (); l != lefdef_options->end_lef_files (); ++l) {
 
-        std::string lp = correct_path (*l);
+        std::string lp = correct_path (*l, layout);
 
         tl::InputStream lef_stream (lp);
         tl::log << tl::to_string (tr ("Reading")) << " " << lp;
-        importer.read_lef (lef_stream, layout, layers);
+        importer.read_lef (lef_stream, layout, state);
 
       }
 
       //  Additionally read all LEF files next to the DEF file
 
       std::string input_dir = tl::absolute_path (m_stream.absolute_path ());
+
       if (tl::file_exists (input_dir)) {
 
         std::vector<std::string> entries = tl::dir_entries (input_dir);
@@ -174,9 +198,12 @@ private:
           if (is_lef_format (*e)) {
 
             std::string lp = tl::combine_path (input_dir, *e);
+
+            tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file: ")) + lp);
+
             tl::InputStream lef_stream (lp);
             tl::log << tl::to_string (tr ("Reading")) << " " << lp;
-            importer.read_lef (lef_stream, layout, layers);
+            importer.read_lef (lef_stream, layout, state);
 
           }
 
@@ -185,16 +212,49 @@ private:
       }
 
       tl::log << tl::to_string (tr ("Reading")) << " " << m_stream.source ();
-      importer.read (m_stream, layout, layers);
+      importer.read (m_stream, layout, state);
 
     }
 
-    layers.finish (layout);
+    state.finish (layout);
 
-    m_layer_map = layers.layer_map ();
+    m_layer_map = state.layer_map ();
     return m_layer_map;
   }
 };
+
+namespace {
+
+  struct MacroResolutionModeConverter
+  {
+  public:
+    MacroResolutionModeConverter ()
+    {
+      m_values.push_back ("default");
+      m_values.push_back ("always-lef");
+      m_values.push_back ("always-cellref");
+    }
+
+    std::string to_string (unsigned int v) const
+    {
+      return v < m_values.size () ? m_values[v] : std::string ();
+    }
+
+    void from_string (const std::string &s, unsigned int &v) const
+    {
+      v = 0;
+      for (unsigned int i = 0; i < (unsigned int) m_values.size (); ++i) {
+        if (m_values [i] == s) {
+          v = i;
+        }
+      }
+    }
+
+  private:
+    std::vector<std::string> m_values;
+  };
+
+}
 
 class LEFDEFFormatDeclaration
   : public db::StreamFormatDeclaration
@@ -253,6 +313,9 @@ class LEFDEFFormatDeclaration
       tl::make_member (&LEFDEFReaderOptions::produce_pins, &LEFDEFReaderOptions::set_produce_pins, "produce-pins") +
       tl::make_member (&LEFDEFReaderOptions::pins_suffix, &LEFDEFReaderOptions::set_pins_suffix, "pins-suffix") +
       tl::make_member (&LEFDEFReaderOptions::pins_datatype, &LEFDEFReaderOptions::set_pins_datatype, "pins-datatype") +
+      tl::make_member (&LEFDEFReaderOptions::produce_lef_pins, &LEFDEFReaderOptions::set_produce_lef_pins, "produce-lef-pins") +
+      tl::make_member (&LEFDEFReaderOptions::lef_pins_suffix, &LEFDEFReaderOptions::set_lef_pins_suffix, "lef-pins-suffix") +
+      tl::make_member (&LEFDEFReaderOptions::lef_pins_datatype, &LEFDEFReaderOptions::set_lef_pins_datatype, "lef-pins-datatype") +
       tl::make_member (&LEFDEFReaderOptions::produce_obstructions, &LEFDEFReaderOptions::set_produce_obstructions, "produce-obstructions") +
       tl::make_member (&LEFDEFReaderOptions::obstructions_suffix, &LEFDEFReaderOptions::set_obstructions_suffix, "obstructions-suffix") +
       tl::make_member (&LEFDEFReaderOptions::obstructions_datatype, &LEFDEFReaderOptions::set_obstructions_datatype, "obstructions-datatype") +
@@ -265,7 +328,13 @@ class LEFDEFFormatDeclaration
       tl::make_member (&LEFDEFReaderOptions::produce_routing, &LEFDEFReaderOptions::set_produce_routing, "produce-routing") +
       tl::make_member (&LEFDEFReaderOptions::routing_suffix, &LEFDEFReaderOptions::set_routing_suffix, "routing-suffix") +
       tl::make_member (&LEFDEFReaderOptions::routing_datatype, &LEFDEFReaderOptions::set_routing_datatype, "routing-datatype") +
-      tl::make_member (&LEFDEFReaderOptions::begin_lef_files, &LEFDEFReaderOptions::end_lef_files, &LEFDEFReaderOptions::push_lef_file, "lef-files")
+      tl::make_member (&LEFDEFReaderOptions::produce_special_routing, &LEFDEFReaderOptions::set_produce_special_routing, "produce-special-routing") +
+      tl::make_member (&LEFDEFReaderOptions::special_routing_suffix, &LEFDEFReaderOptions::set_special_routing_suffix, "special-routing-suffix") +
+      tl::make_member (&LEFDEFReaderOptions::special_routing_datatype, &LEFDEFReaderOptions::set_special_routing_datatype, "special-routing-datatype") +
+      tl::make_member (&LEFDEFReaderOptions::begin_lef_files, &LEFDEFReaderOptions::end_lef_files, &LEFDEFReaderOptions::push_lef_file, "lef-files") +
+      tl::make_member (&LEFDEFReaderOptions::macro_resolution_mode, &LEFDEFReaderOptions::set_macro_resolution_mode, "macro-resolution-mode", MacroResolutionModeConverter ()) +
+      tl::make_member (&LEFDEFReaderOptions::separate_groups, &LEFDEFReaderOptions::set_separate_groups, "separate-groups") +
+      tl::make_member (&LEFDEFReaderOptions::map_file, &LEFDEFReaderOptions::set_map_file, "map-file")
     );
   }
 };

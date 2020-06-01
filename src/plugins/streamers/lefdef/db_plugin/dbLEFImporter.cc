@@ -65,12 +65,23 @@ LEFImporter::layer_ext (const std::string &layer, double def_ext) const
   }
 }
 
-double 
-LEFImporter::layer_width (const std::string &layer, const std::string &nondefaultrule, double def_width) const
+std::pair<double, double>
+LEFImporter::min_layer_width (const std::string &layer) const
 {
-  std::map<std::string, std::map<std::string, double> >::const_iterator nd = m_nondefault_widths.find (nondefaultrule);
+  std::map<std::string, std::pair<double, double> >::const_iterator l = m_min_widths.find (layer);
+  if (l != m_min_widths.end ()) {
+    return l->second;
+  } else {
+    return std::make_pair (0.0, 0.0);
+  }
+}
 
-  std::map<std::string, double>::const_iterator l;
+std::pair<double, double>
+LEFImporter::layer_width (const std::string &layer, const std::string &nondefaultrule, const std::pair<double, double> &def_width) const
+{
+  std::map<std::string, std::map<std::string, std::pair<double, double> > >::const_iterator nd = m_nondefault_widths.find (nondefaultrule);
+
+  std::map<std::string, std::pair<double, double> >::const_iterator l;
   bool has_width = false;
 
   if (! nondefaultrule.empty () && nd != m_nondefault_widths.end ()) {
@@ -94,14 +105,14 @@ LEFImporter::layer_width (const std::string &layer, const std::string &nondefaul
   }
 }
 
-db::Cell *
+std::pair<db::Cell *, db::Trans>
 LEFImporter::macro_by_name (const std::string &name) const
 {
-  std::map<std::string, db::Cell *>::const_iterator m = m_macros_by_name.find (name);
+  std::map<std::string, std::pair<db::Cell *, db::Trans> >::const_iterator m = m_macros_by_name.find (name);
   if (m != m_macros_by_name.end ()) {
     return m->second;
   } else {
-    return 0;
+    return std::make_pair ((db::Cell *) 0, db::Trans ());
   }
 }
 
@@ -174,9 +185,9 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
       }
 
       w = 0.0;
-      std::map<std::string, double>::const_iterator dw = m_default_widths.find (layer_name);
+      std::map<std::string, std::pair<double, double> >::const_iterator dw = m_default_widths.find (layer_name);
       if (dw != m_default_widths.end ()) {
-        w = dw->second;
+        w = dw->second.first;
       }
 
       while (! test (";")) {
@@ -334,20 +345,18 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
       points.push_back (db::Vector (db::DVector (x / dbu, y / dbu)));
 
       std::string vn = get ();
-      std::pair<bool, db::cell_index_type> cn = layout.cell_by_name (("VIA_" + vn).c_str ());
-      if (! cn.first) {
-        warn ("Unknown via: " + vn);
+      db::Cell *vc = reader_state ()->via_cell (vn);
+      if (! vc) {
+        warn (tl::to_string (tr ("Unknown via: ")) + vn);
       }
 
       if (iterate) {
         std::vector<db::Trans> ti = get_iteration (layout);
-        if (cn.first) {
-          for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
-            cell.insert (db::CellInstArray (db::CellInst (cn.second), *t * db::Trans (points [0])));
-          }
+        for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
+          cell.insert (db::CellInstArray (db::CellInst (vc->cell_index ()), *t * db::Trans (points [0])));
         }
-      } else if (cn.first) {
-        cell.insert (db::CellInstArray (db::CellInst (cn.second), db::Trans (points [0])));
+      } else {
+        cell.insert (db::CellInstArray (db::CellInst (vc->cell_index ()), db::Trans (points [0])));
       }
 
       expect (";");
@@ -358,6 +367,568 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
     }
 
   }
+}
+
+void
+LEFImporter::read_nondefaultrule (db::Layout & /*layout*/)
+{
+  //  read NONDEFAULTRULE sections
+  std::string n = get ();
+
+  while (! test ("END") || ! test (n)) {
+
+    if (test ("LAYER")) {
+
+      std::string l = get ();
+
+      //  read the width for the layer
+      while (! test ("END")) {
+        if (test ("WIDTH")) {
+          double w = get_double ();
+          test (";");
+          m_nondefault_widths[n][l] = std::make_pair (w, w);
+        } else {
+          while (! test (";")) {
+            take ();
+          }
+        }
+      }
+
+      test (l);
+
+    } else if (test ("VIA")) {
+
+      //  ignore VIA statements
+      std::string v = get ();
+      while (! test ("END") || ! test (v)) {
+        take ();
+      }
+
+    } else {
+      while (! test (";")) {
+        take ();
+      }
+    }
+
+  }
+}
+
+void
+LEFImporter::read_viadef_by_rule (Layout &layout, db::Cell &cell, ViaDesc &via_desc, const std::string & /*n*/)
+{
+  db::Vector cutsize, cutspacing;
+  db::Vector be, te;
+  db::Vector bo, to;
+  db::Point offset;
+  int rows = 1, columns = 1;
+  std::string pattern;
+
+  std::vector<std::pair<std::string, std::vector<db::Polygon> > > geometry;
+  geometry.push_back (std::pair<std::string, std::vector<db::Polygon> > ());
+  geometry.push_back (std::pair<std::string, std::vector<db::Polygon> > ());
+  geometry.push_back (std::pair<std::string, std::vector<db::Polygon> > ());
+
+  while (! test ("END")) {
+
+    double x, y;
+
+    if (test ("CUTSIZE")) {
+
+      x = get_double ();
+      y = get_double ();
+      cutsize = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
+
+      test (";");
+
+    } else if (test ("CUTSPACING")) {
+
+      x = get_double ();
+      y = get_double ();
+      cutspacing = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
+
+      test (";");
+
+    } else if (test ("ORIGIN")) {
+
+      x = get_double ();
+      y = get_double ();
+      offset = db::Point (db::DPoint (x / layout.dbu (), y / layout.dbu ()));
+
+      test (";");
+
+    } else if (test ("ENCLOSURE")) {
+
+      x = get_double ();
+      y = get_double ();
+      be = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
+
+      x = get_double ();
+      y = get_double ();
+      te = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
+
+      test (";");
+
+    } else if (test ("OFFSET")) {
+
+      x = get_double ();
+      y = get_double ();
+      bo = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
+
+      x = get_double ();
+      y = get_double ();
+      to = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
+
+      test (";");
+
+    } else if (test ("ROWCOL")) {
+
+      rows = get_long ();
+      columns = get_long ();
+
+      test (";");
+
+    } else if (test ("PATTERN")) {
+
+      pattern = get ();
+
+      test (";");
+
+    } else if (test ("LAYERS")) {
+
+      via_desc.m1 = geometry[0].first = get ();
+      geometry[1].first = get ();
+      via_desc.m2 = geometry[2].first = get ();
+
+      test (";");
+
+    } else {
+
+      while (! test (";")) {
+        take ();
+      }
+
+    }
+
+  }
+
+  create_generated_via (geometry [0].second, geometry [1].second, geometry [2].second,
+                        cutsize, cutspacing, be, te, bo, to, offset, rows, columns, pattern);
+
+  for (std::vector<std::pair<std::string, std::vector<db::Polygon> > >::const_iterator g = geometry.begin (); g != geometry.end (); ++g) {
+    std::pair <bool, unsigned int> dl = open_layer (layout, g->first, ViaGeometry);
+    if (dl.first) {
+      for (std::vector<db::Polygon>::const_iterator p = g->second.begin (); p != g->second.end (); ++p) {
+        cell.shapes (dl.second).insert (*p);
+      }
+    }
+  }
+}
+
+void
+LEFImporter::read_viadef_by_geometry (Layout &layout, db::Cell &cell, ViaDesc &via_desc, const std::string &n)
+{
+  //  ignore resistance spec
+  if (test ("RESISTANCE")) {
+    get_double ();
+    test (";");
+  }
+
+  std::map<std::string, db::Box> bboxes;
+  read_geometries (layout, cell, ViaGeometry, &bboxes);
+
+  //  determine m1 and m2 layers
+
+  std::vector<std::string> routing_layers;
+  for (std::map<std::string, db::Box>::const_iterator b = bboxes.begin (); b != bboxes.end (); ++b) {
+    if (m_routing_layers.find (b->first) != m_routing_layers.end ()) {
+      routing_layers.push_back (b->first);
+    }
+  }
+
+  if (routing_layers.size () == 2) {
+    via_desc.m1 = routing_layers[0];
+    via_desc.m2 = routing_layers[1];
+  } else {
+    warn (tl::to_string (tr ("Can't determine routing layers for via: ")) + n);
+  }
+
+  reset_cellname ();
+
+  expect ("END");
+}
+
+void
+LEFImporter::read_viadef (Layout &layout)
+{
+  std::string n = get ();
+
+  //  produce a cell for vias
+  std::string cellname = options ().via_cellname_prefix () + n;
+  db::Cell &cell = layout.cell (layout.add_cell (cellname.c_str ()));
+  reader_state ()->register_via_cell (n, &cell);
+
+  ViaDesc &via_desc = m_vias[n];
+  via_desc.cell = &cell;
+
+  while (test ("DEFAULT") || test ("TOPOFSTACKONLY"))
+    ;
+  test (";");
+
+  if (test ("VIARULE")) {
+    read_viadef_by_rule (layout, cell, via_desc, n);
+  } else {
+    read_viadef_by_geometry (layout, cell, via_desc, n);
+  }
+
+  test ("VIA");
+  expect (n);
+}
+
+void
+LEFImporter::read_layer (Layout & /*layout*/)
+{
+  std::string ln = get ();
+  double wmin = 0.0, wmin_wrongdir = 0.0;
+  double w = 0.0, w_wrongdir = 0.0;
+  bool is_horizontal = false;
+
+  register_layer (ln);
+
+  //  just extract the width from the layer - we need that as the default width for paths
+  while (! at_end ()) {
+
+    if (test ("END")) {
+
+      expect (ln);
+      break;
+
+    } else if (test ("TYPE")) {
+
+      std::string type = get ();
+
+      if (type == "ROUTING" || type == "MASTERSLICE") {
+        m_routing_layers.insert (ln);
+      } else if (type == "CUT") {
+        m_cut_layers.insert (ln);
+      }
+      expect (";");
+
+    } else if (test ("WIDTH")) {
+
+      w = get_double ();
+      expect (";");
+
+    } else if (test ("MINWIDTH")) {
+
+      wmin = get_double ();
+      expect (";");
+
+    } else if (test ("DIRECTION")) {
+
+      if (test ("HORIZONTAL")) {
+        is_horizontal = true;
+      } else {
+        expect ("VERTICAL", "DIAG45", "DIAG135");
+      }
+
+    } else if (test ("WIREEXTENSION")) {
+
+      double v = get_double ();
+      m_default_ext.insert (std::make_pair (ln, v));
+      expect (";");
+
+    } else if (test ("ACCURRENTDENSITY")) {
+
+      //  ACCURRENTDENSITY needs some special attention because it can contain nested WIDTH
+      //  blocks following a semicolon
+      take ();
+      if (test ("FREQUENCY")) {
+        while (! test ("TABLEENTRIES")) {
+          take ();
+        }
+      }
+      while (! test (";")) {
+        take ();
+      }
+
+    } else if (test ("PROPERTY")) {
+
+      std::string name = get ();
+      tl::Variant value = get ();
+
+      if (name == "LEF58_MINWIDTH") {
+
+        //  Cadence extension
+        tl::Extractor ex (value.to_string ());
+        double v = 0.0;
+        if (ex.test ("MINWIDTH") && ex.try_read (v)) {
+          if (ex.test ("WRONGDIRECTION")) {
+            wmin_wrongdir = v;
+          } else {
+            wmin = v;
+          }
+        }
+
+      } else if (name == "LEF58_WIDTH") {
+
+        //  Cadence extension
+        tl::Extractor ex (value.to_string ());
+        double v = 0.0;
+        if (ex.test ("WIDTH") && ex.try_read (v)) {
+          if (ex.test ("WRONGDIRECTION")) {
+            w_wrongdir = v;
+          } else {
+            w = v;
+          }
+        }
+
+      }
+
+      expect (";");
+
+    } else {
+
+      while (! test (";")) {
+        take ();
+      }
+
+    }
+  }
+
+  if (w > 0.0 || w_wrongdir > 0.0) {
+
+    if (w_wrongdir == 0.0) {
+      w_wrongdir = w;
+    } else if (! is_horizontal) {
+      std::swap (w, w_wrongdir);
+    }
+
+    m_default_widths.insert (std::make_pair (ln, std::make_pair (w, w_wrongdir)));
+
+  }
+
+  if (wmin > 0.0 || wmin_wrongdir > 0.0) {
+
+    if (wmin_wrongdir == 0.0) {
+      wmin_wrongdir = wmin;
+    } else if (! is_horizontal) {
+      std::swap (wmin, wmin_wrongdir);
+    }
+
+    m_min_widths.insert (std::make_pair (ln, std::make_pair (wmin, wmin_wrongdir)));
+
+  }
+}
+
+void
+LEFImporter::read_macro (Layout &layout)
+{
+  std::string mn = get ();
+
+  if (m_macros_by_name.find (mn) != m_macros_by_name.end ()) {
+    error (tl::to_string (tr ("Duplicate MACRO name: ")) + mn);
+  }
+
+  set_cellname (mn);
+
+  db::Cell &cell = layout.cell (layout.add_cell ());
+  db::Cell *foreign_cell = 0;
+  db::Trans foreign_trans;
+  std::string foreign_name;
+
+  db::Point origin;
+  db::Vector size;
+
+  //  read the macro
+  while (! at_end ()) {
+
+    if (test ("END")) {
+      expect (mn);
+      break;
+
+    } else if (test ("ORIGIN")) {
+
+      origin = get_point (1.0 / layout.dbu ());
+      expect (";");
+
+    } else if (test ("SIZE")) {
+
+      double x = get_double ();
+      test ("BY");
+      double y = get_double ();
+      expect (";");
+      size = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
+
+    } else if (test ("PIN")) {
+
+      std::string pn = get ();
+      std::string dir;
+
+      while (! at_end ()) {
+
+        if (test ("END")) {
+
+          break;
+
+        } else if (test ("DIRECTION")) {
+
+          dir = get ();
+          test (";");
+
+        } else if (test ("PORT")) {
+
+          //  produce pin labels
+          //  TODO: put a label on every single object?
+          std::string label = pn;
+          /* don't add the direction currently, a name is sufficient
+          if (! dir.empty ()) {
+            label += ":";
+            label += dir;
+          }
+          */
+
+          db::properties_id_type prop_id = 0;
+          if (produce_pin_props ()) {
+            db::PropertiesRepository::properties_set props;
+            props.insert (std::make_pair (pin_prop_name_id (), tl::Variant (label)));
+            prop_id = layout.properties_repository ().properties_id (props);
+          }
+
+          std::map <std::string, db::Box> bboxes;
+          read_geometries (layout, cell, LEFPins, &bboxes, prop_id);
+
+          for (std::map <std::string, db::Box>::const_iterator b = bboxes.begin (); b != bboxes.end (); ++b) {
+            std::pair <bool, unsigned int> dl = open_layer (layout, b->first, Label);
+            if (dl.first) {
+              cell.shapes (dl.second).insert (db::Text (label.c_str (), db::Trans (b->second.center () - db::Point ())));
+            }
+          }
+
+          expect ("END");
+
+        } else {
+          while (! test (";")) {
+            take ();
+          }
+        }
+      }
+
+      expect (pn);
+
+    } else if (test ("FOREIGN")) {
+
+      if (foreign_cell) {
+        error (tl::to_string (tr ("Duplicate FOREIGN definition")));
+      }
+
+      std::string cn = get ();
+
+      db::Point vec;
+      db::FTrans ft;
+      if (! peek (";")) {
+        vec = get_point (1.0 / layout.dbu ());
+        ft = get_orient (true);
+      }
+
+      expect (";");
+
+      if (options ().macro_resolution_mode () != 1) {
+
+        db::cell_index_type ci;
+        std::pair<bool, db::cell_index_type> c = layout.cell_by_name (cn.c_str ());
+        if (c.first) {
+          ci = c.second;
+        } else {
+          ci = layout.add_cell (cn.c_str ());
+          layout.cell (ci).set_ghost_cell (true);
+        }
+
+        foreign_cell = &layout.cell (ci);
+        //  What is the definition of the FOREIGN transformation?
+        //  Guessing: this transformation moves the lower-left origin to 0,0
+        foreign_trans = db::Trans (db::Point () - vec) * db::Trans (ft);
+        foreign_name = cn;
+
+      }
+
+    } else if (test ("OBS")) {
+
+      read_geometries (layout, cell, Obstructions);
+      expect ("END");
+
+    } else {
+      while (! test (";")) {
+        take ();
+      }
+    }
+
+  }
+
+  if (! foreign_cell) {
+
+    if (options ().macro_resolution_mode () != 2) {
+
+      //  actually implement the real cell
+
+      layout.rename_cell (cell.cell_index (), mn.c_str ());
+
+      std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Outline);
+      if (dl.first) {
+        cell.shapes (dl.second).insert (db::Box (-origin, -origin + size));
+      }
+
+      m_macros_by_name.insert (std::make_pair (mn, std::make_pair (&cell, db::Trans ())));
+
+    } else {
+
+      //  macro resolution mode #2 (always create a MACRO reference, no LEF geometry)
+
+      db::cell_index_type ci;
+      std::pair<bool, db::cell_index_type> c = layout.cell_by_name (mn.c_str ());
+      if (c.first) {
+        ci = c.second;
+      } else {
+        ci = layout.add_cell (mn.c_str ());
+        layout.cell (ci).set_ghost_cell (true);
+      }
+
+      layout.delete_cell (cell.cell_index ());
+      m_macros_by_name.insert (std::make_pair (mn, std::make_pair (&layout.cell (ci), db::Trans ())));
+
+    }
+
+  } else if (foreign_name != mn) {
+
+    warn (tl::to_string (tr ("FOREIGN name differs from MACRO name in macro: ")) + mn);
+
+    layout.rename_cell (cell.cell_index (), mn.c_str ());
+
+    //  clear imported LEF geometry with a foreign cell, but provide a level of indirection so we have
+    //  both the MACRO and the FOREIGN name
+
+    for (unsigned int l = 0; l < layout.layers (); ++l) {
+      if (layout.is_valid_layer (l)) {
+        cell.clear (l);
+      }
+    }
+
+    cell.clear_insts ();
+
+    cell.insert (db::CellInstArray (db::CellInst (foreign_cell->cell_index ()), db::Trans (db::Point () - origin) * foreign_trans));
+    m_macros_by_name.insert (std::make_pair (mn, std::make_pair (&cell, db::Trans ())));
+
+  } else {
+
+    //  use FOREIGN cell instead of new one
+
+    layout.delete_cell (cell.cell_index ());
+    m_macros_by_name.insert (std::make_pair (mn, std::make_pair (foreign_cell, db::Trans (db::Point () - origin) * foreign_trans)));
+
+  }
+
+  m_macro_bboxes_by_name.insert (std::make_pair (mn, db::Box (-origin, -origin + size)));
+
+  reset_cellname ();
 }
 
 void 
@@ -414,45 +985,7 @@ LEFImporter::do_read (db::Layout &layout)
 
     } else if (test ("NONDEFAULTRULE")) {
 
-      //  read NONDEFAULTRULE sections
-      std::string n = get ();
-
-      while (! test ("END") || ! test (n)) {
-
-        if (test ("LAYER")) {
-
-          std::string l = get ();
-
-          //  read the width for the layer
-          while (! test ("END")) {
-            if (test ("WIDTH")) {
-              double w = get_double ();
-              test (";");
-              m_nondefault_widths[n][l] = w;
-            } else {
-              while (! test (";")) {
-                take ();
-              }
-            }
-          }
-
-          test (l);
-
-        } else if (test ("VIA")) {
-
-          //  ignore VIA statements
-          std::string v = get ();
-          while (! test ("END") || ! test (v)) {
-            take ();
-          }
-
-        } else {
-          while (! test (";")) {
-            take ();
-          }
-        }
-
-      }
+      read_nondefaultrule (layout);
 
     } else if (test ("SITE")) {
 
@@ -472,146 +1005,7 @@ LEFImporter::do_read (db::Layout &layout)
 
     } else if (test ("VIA")) {
 
-      std::string n = get ();
-
-      //  produce a cell for vias
-      std::string cellname = "VIA_" + n;
-      db::Cell &cell = layout.cell (layout.add_cell (cellname.c_str ()));
-
-      ViaDesc &via_desc = m_vias[n];
-      via_desc.cell = &cell;
-
-      while (test ("DEFAULT") || test ("TOPOFSTACKONLY")) 
-        ;
-      test (";");
-
-      if (test ("VIARULE")) {
-
-        db::Vector cutsize, cutspacing;
-        db::Vector be, te;
-        db::Vector bo, to;
-        db::Point offset;
-        int rows = 1, columns = 1;
-        std::string pattern;
-
-        std::vector<std::pair<std::string, std::vector<db::Polygon> > > geometry;
-        geometry.push_back (std::pair<std::string, std::vector<db::Polygon> > ());
-        geometry.push_back (std::pair<std::string, std::vector<db::Polygon> > ());
-        geometry.push_back (std::pair<std::string, std::vector<db::Polygon> > ());
-
-        while (! test ("END")) {
-
-          double x, y;
-
-          if (test ("CUTSIZE")) {
-
-            x = get_double ();
-            y = get_double ();
-            cutsize = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
-
-            test (";");
-
-          } else if (test ("CUTSPACING")) {
-
-            x = get_double ();
-            y = get_double ();
-            cutspacing = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
-
-            test (";");
-
-          } else if (test ("ORIGIN")) {
-
-            x = get_double ();
-            y = get_double ();
-            offset = db::Point (db::DPoint (x / layout.dbu (), y / layout.dbu ()));
-
-            test (";");
-
-          } else if (test ("ENCLOSURE")) {
-
-            x = get_double ();
-            y = get_double ();
-            be = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
-
-            x = get_double ();
-            y = get_double ();
-            te = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
-
-            test (";");
-
-          } else if (test ("OFFSET")) {
-
-            x = get_double ();
-            y = get_double ();
-            bo = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
-
-            x = get_double ();
-            y = get_double ();
-            to = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
-
-            test (";");
-
-          } else if (test ("ROWCOL")) {
-
-            rows = get_long ();
-            columns = get_long ();
-
-            test (";");
-
-          } else if (test ("PATTERN")) {
-
-            pattern = get ();
-
-            test (";");
-
-          } else if (test ("LAYERS")) {
-
-            via_desc.m1 = geometry[0].first = get ();
-            geometry[1].first = get ();
-            via_desc.m2 = geometry[2].first = get ();
-
-            test (";");
-
-          } else {
-
-            while (! test (";")) {
-              take ();
-            }
-
-          }
-
-        }
-
-        create_generated_via (geometry [0].second, geometry [1].second, geometry [2].second,
-                              cutsize, cutspacing, be, te, bo, to, offset, rows, columns, pattern);
-
-        for (std::vector<std::pair<std::string, std::vector<db::Polygon> > >::const_iterator g = geometry.begin (); g != geometry.end (); ++g) {
-          std::pair <bool, unsigned int> dl = open_layer (layout, g->first, ViaGeometry);
-          if (dl.first) {
-            for (std::vector<db::Polygon>::const_iterator p = g->second.begin (); p != g->second.end (); ++p) {
-              cell.shapes (dl.second).insert (*p);
-            }
-          }
-        }
-
-      } else {
-
-        //  ignore resistance spec
-        if (test ("RESISTANCE")) {
-          get_double ();
-          test (";");
-        }
-
-        read_geometries (layout, cell, ViaGeometry);
-
-        reset_cellname ();
-
-        expect ("END");
-
-      }
-
-      test ("VIA");
-      expect (n);
+      read_viadef (layout);
 
     } else if (test ("BEGINEXT")) {
 
@@ -622,148 +1016,11 @@ LEFImporter::do_read (db::Layout &layout)
 
     } else if (test ("LAYER")) {
 
-      std::string ln = get ();
-
-      register_layer (ln);
-
-      //  just extract the width from the layer - we need that as the default width for paths
-      while (! at_end ()) {
-        if (test ("END")) {
-          expect (ln);
-          break;
-        } else if (test ("WIDTH")) {
-          double w = get_double ();
-          m_default_widths.insert (std::make_pair (ln, w));
-          expect (";");
-        } else if (test ("WIREEXTENSION")) {
-          double w = get_double ();
-          m_default_ext.insert (std::make_pair (ln, w));
-          expect (";");
-        } else if (test ("ACCURRENTDENSITY")) {
-          //  ACCURRENTDENSITY needs some special attention because it can contain nested WIDTH
-          //  blocks following a semicolon
-          take ();
-          if (test ("FREQUENCY")) {
-            while (! test ("TABLEENTRIES")) {
-              take ();
-            }
-          }
-          while (! test (";")) {
-            take ();
-          }
-        } else {
-          while (! test (";")) {
-            take ();
-          }
-        }
-      }
+      read_layer (layout);
 
     } else if (test ("MACRO")) {
 
-      std::string mn = get ();
-      set_cellname (mn);
-
-      db::Cell &cell = layout.cell (layout.add_cell (mn.c_str ()));
-
-      m_macros_by_name.insert (std::make_pair (mn, &cell));
-
-      db::Point origin;
-      db::Vector size;
-
-      //  read the macro
-      while (! at_end ()) {
-
-        if (test ("END")) {
-          expect (mn);
-          break;
-
-        } else if (test ("ORIGIN")) {
-
-          double x = get_double ();
-          double y = get_double ();
-          expect (";");
-          origin = db::Point (db::DPoint (x / layout.dbu (), y / layout.dbu ()));
-
-        } else if (test ("SIZE")) {
-
-          double x = get_double ();
-          test ("BY");
-          double y = get_double ();
-          expect (";");
-          size = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
-
-        } else if (test ("PIN")) {
-
-          std::string pn = get ();
-          std::string dir;
-
-          while (! at_end ()) {
-            if (test ("END")) {
-              break;
-            } else if (test ("DIRECTION")) {
-              dir = get ();
-              test (";");
-            } else if (test ("PORT")) {
-
-              //  produce pin labels
-              //  TODO: put a label on every single object?
-              std::string label = pn;
-              /* don't add the direction currently, a name is sufficient
-              if (! dir.empty ()) {
-                label += ":";
-                label += dir;
-              }
-              */
-
-              db::properties_id_type prop_id = 0;
-              if (produce_pin_props ()) {
-                db::PropertiesRepository::properties_set props;
-                props.insert (std::make_pair (pin_prop_name_id (), tl::Variant (label)));
-                prop_id = layout.properties_repository ().properties_id (props);
-              }
-
-              std::map <std::string, db::Box> bboxes;
-              read_geometries (layout, cell, Pins, &bboxes, prop_id);
-
-              for (std::map <std::string, db::Box>::const_iterator b = bboxes.begin (); b != bboxes.end (); ++b) {
-                std::pair <bool, unsigned int> dl = open_layer (layout, b->first, Label);
-                if (dl.first) {
-                  cell.shapes (dl.second).insert (db::Text (label.c_str (), db::Trans (b->second.center () - db::Point ())));
-                }
-              }
-
-              expect ("END");
-
-            } else {
-              while (! test (";")) {
-                take ();
-              }
-            }
-          }
-
-          expect (pn);
-
-        } else if (test ("OBS")) {
-
-          read_geometries (layout, cell, Obstructions);
-          expect ("END");
-
-        } else {
-          while (! test (";")) {
-            take ();
-          }
-        }
-
-      }
-
-      std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Outline);
-      if (dl.first) {
-        cell.shapes (dl.second).insert (db::Box (-origin, -origin + size));
-      }
-
-      m_macro_bboxes_by_name.insert (std::make_pair (mn, db::Box (-origin, -origin + size)));
-
-      reset_cellname ();
+      read_macro (layout);
 
     } else {
       while (! test (";")) {

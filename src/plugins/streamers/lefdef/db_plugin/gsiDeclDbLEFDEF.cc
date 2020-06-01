@@ -260,6 +260,18 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "@brief Sets the via geometry layer datatype value.\n"
     "See \\produce_via_geometry for details about this property.\n"
   ) +
+  gsi::method ("via_cellname_prefix", &db::LEFDEFReaderOptions::via_cellname_prefix,
+    "@brief Gets the via cellname prefix.\n"
+    "Vias are represented by cells. The cell name is formed by combining the via cell name prefix and the via name.\n"
+    "\n"
+    "This property has been added in version 0.27.\n"
+  ) +
+  gsi::method ("via_cellname_prefix=", &db::LEFDEFReaderOptions::set_via_cellname_prefix, gsi::arg ("prefix"),
+    "@brief Sets the via cellname prefix.\n"
+    "See \\via_cellname_prefix for details about this property.\n"
+    "\n"
+    "This property has been added in version 0.27.\n"
+  ) +
   gsi::method ("produce_pins", &db::LEFDEFReaderOptions::produce_pins,
     "@brief Gets a value indicating whether pin geometries shall be produced.\n"
     "See \\produce_via_geometry for details about the layer production rules."
@@ -282,6 +294,30 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
   ) +
   gsi::method ("pins_datatype=", &db::LEFDEFReaderOptions::set_pins_datatype, gsi::arg ("datatype"),
     "@brief Sets the pin geometry layer datatype value.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+  ) +
+  gsi::method ("produce_lef_pins", &db::LEFDEFReaderOptions::produce_lef_pins,
+    "@brief Gets a value indicating whether LEF pin geometries shall be produced.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+  ) +
+  gsi::method ("produce_lef_pins=", &db::LEFDEFReaderOptions::set_produce_lef_pins, gsi::arg ("produce"),
+    "@brief Sets a value indicating whether LEF pin geometries shall be produced.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+  ) +
+  gsi::method ("lef_pins_suffix", &db::LEFDEFReaderOptions::lef_pins_suffix,
+    "@brief Gets the LEF pin geometry layer name suffix.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+  ) +
+  gsi::method ("lef_pins_suffix=", &db::LEFDEFReaderOptions::set_lef_pins_suffix, gsi::arg ("suffix"),
+    "@brief Sets the LEF pin geometry layer name suffix.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+  ) +
+  gsi::method ("lef_pins_datatype", &db::LEFDEFReaderOptions::lef_pins_datatype,
+    "@brief Gets the LEF pin geometry layer datatype value.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+  ) +
+  gsi::method ("lef_pins_datatype=", &db::LEFDEFReaderOptions::set_lef_pins_datatype, gsi::arg ("datatype"),
+    "@brief Sets the LEF pin geometry layer datatype value.\n"
     "See \\produce_via_geometry for details about the layer production rules."
   ) +
   gsi::method ("produce_obstructions", &db::LEFDEFReaderOptions::produce_obstructions,
@@ -380,6 +416,92 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "@brief Sets the routing layer datatype value.\n"
     "See \\produce_via_geometry for details about the layer production rules."
   ) +
+  gsi::method ("produce_special_routing", &db::LEFDEFReaderOptions::produce_special_routing,
+    "@brief Gets a value indicating whether special routing geometry shall be produced.\n"
+    "See \\produce_via_geometry for details about the layer production rules.\n"
+    "\n"
+    "The differentiation between special and normal routing has been introduced in version 0.27."
+  ) +
+  gsi::method ("produce_special_routing=", &db::LEFDEFReaderOptions::set_produce_special_routing, gsi::arg ("produce"),
+    "@brief Sets a value indicating whether special routing geometry shall be produced.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "\n"
+    "The differentiation between special and normal routing has been introduced in version 0.27."
+  ) +
+  gsi::method ("special_routing_suffix", &db::LEFDEFReaderOptions::special_routing_suffix,
+    "@brief Gets the special routing layer name suffix.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "\n"
+    "The differentiation between special and normal routing has been introduced in version 0.27."
+  ) +
+  gsi::method ("special_routing_suffix=", &db::LEFDEFReaderOptions::set_special_routing_suffix, gsi::arg ("suffix"),
+    "@brief Sets the special routing layer name suffix.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "\n"
+    "The differentiation between special and normal routing has been introduced in version 0.27."
+  ) +
+  gsi::method ("special_routing_datatype", &db::LEFDEFReaderOptions::special_routing_datatype,
+    "@brief Gets the special routing layer datatype value.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "\n"
+    "The differentiation between special and normal routing has been introduced in version 0.27."
+  ) +
+  gsi::method ("special_routing_datatype=", &db::LEFDEFReaderOptions::set_special_routing_datatype, gsi::arg ("datatype"),
+    "@brief Sets the special routing layer datatype value.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "\n"
+    "The differentiation between special and normal routing has been introduced in version 0.27."
+  ) +
+  gsi::method ("separate_groups", &db::LEFDEFReaderOptions::separate_groups,
+    "@brief Gets a value indicating whether to create separate parent cells for individual groups.\n"
+    "If this property is set to true, instances belonging to different groups are separated by putting them into "
+    "individual parent cells. These parent cells are named after the groups and are put into the master top cell.\n"
+    "If this property is set to false (the default), no such group parents will be formed."
+    "\n"
+    "This property has been added in version 0.27.\n"
+  ) +
+  gsi::method ("separate_groups=", &db::LEFDEFReaderOptions::set_separate_groups, gsi::arg ("flag"),
+    "@brief Sets a value indicating whether to create separate parent cells for individual groups.\n"
+    "See \\seperate_groups for details about this property.\n"
+    "\n"
+    "This property has been added in version 0.27.\n"
+  ) +
+  gsi::method ("map_file", &db::LEFDEFReaderOptions::map_file,
+    "@brief Gets the layer map file to use.\n"
+    "If a layer map file is given, the reader will pull the layer mapping from this file. The layer mapping rules "
+    "specified in the reader options are ignored in this case. These are the name suffix rules for vias, blockages, routing, "
+    "special routing, pins etc. and the corresponding datatype rules. The \\layer_map attribute will also be ignored. "
+    "\n"
+    "The layer map file path will be resolved relative to the technology base path if the LEF/DEF reader options are "
+    "used in the context of a technology.\n"
+    "\n"
+    "This property has been added in version 0.27.\n"
+  ) +
+  gsi::method ("map_file=", &db::LEFDEFReaderOptions::set_map_file, gsi::arg ("file"),
+    "@brief Sets the layer map file to use.\n"
+    "See \\map_file for details about this property.\n"
+    "\n"
+    "This property has been added in version 0.27.\n"
+  ) +
+  gsi::method ("macro_resolution_mode", &db::LEFDEFReaderOptions::macro_resolution_mode,
+    "@brief Gets the macro resolution mode.\n"
+    "This property describes the way LEF macros are turned into GDS cells. There "
+    "are three modes available:\n"
+    "\n"
+    "@ul\n"
+    "  @li 0: propduce LEF geometry unless a FOREIGN cell is specified (default) @/li\n"
+    "  @li 1: produce LEF geometry always and ignore FOREIGN @/li\n"
+    "  @li 2: produce a placeholder cell always (even if FOREIGN isn't given) @/li\n"
+    "@/ul\n"
+    "\n"
+    "This property has been added in version 0.27.\n"
+  ) +
+  gsi::method ("macro_resolution_mode=", &db::LEFDEFReaderOptions::set_macro_resolution_mode, gsi::arg ("mode"),
+    "@brief Sets the macro resolution mode.\n"
+    "See \\macro_resolution_mode for details about this property.\n"
+    "\n"
+    "This property has been added in version 0.27.\n"
+  ) +
   gsi::method ("lef_files", &db::LEFDEFReaderOptions::lef_files,
     "@brief Gets the list technology LEF files to additionally import\n"
     "Returns a list of path names for technology LEF files to read in addition to the primary file. "
@@ -394,6 +516,21 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
   "@brief Detailed LEF/DEF reader options\n"
   "This class is a aggregate belonging to the \\LoadLayoutOptions class. It provides options for the LEF/DEF reader. "
   "These options have been placed into a separate class to account for their complexity."
+  "\n"
+  "This class specifically handles layer mapping. This is the process of generating layer names or GDS layer/datatypes "
+  "from LEF/DEF layers and purpose combinations. There are basically two ways: to use a map file or to use pattern-based production rules.\n"
+  "\n"
+  "To use a layer map file, set the \\map_file attribute to the name of the layer map file. The layer map "
+  "file lists the GDS layer and datatype numbers to generate for the geometry.\n"
+  "\n"
+  "The pattern-based approach will use the layer name and attach a purpose-dependent suffix to it. "
+  "Use the ..._suffix attributes to specify this suffix. For routing, the corresponding attribute is \\routing_suffix for example. "
+  "A purpose can also be mapped to a specific GDS datatype using the corresponding ..._datatype attributes.\n"
+  "The decorated or undecorated names are looked up in a layer mapping table in the next step. The layer mapping table "
+  "is specified using the \\layer_map attribute. This table can be used to map layer names to specific GDS layers "
+  "by using entries of the form 'NAME: layer-number'.\n"
+  "\n"
+  "If a layer map file is present, the pattern-based attributes are ignored.\n"
 );
 
 }

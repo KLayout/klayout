@@ -49,28 +49,35 @@ static db::LEFDEFReaderOptions default_options ()
   return tc;
 }
 
-static void run_test (tl::TestBase *_this, const char *lef_dir, const char *filename, const char *au, const db::LEFDEFReaderOptions &tc, bool priv = true)
+static void run_test (tl::TestBase *_this, const char *lef_dir, const char *filename, const char *au, const db::LEFDEFReaderOptions &options, bool priv = true)
 {
-  db::LEFDEFLayerDelegate ld (&tc);
+  std::string fn_path (priv ? tl::testsrc_private () : tl::testsrc ());
+  fn_path += "/testdata/lefdef/";
+  fn_path += lef_dir;
+  fn_path += "/";
 
   db::Manager m (false);
   db::Layout layout (&m), layout2 (&m), layout_au (&m);
 
   tl::Extractor ex (filename);
 
-  ld.prepare (layout);
+  db::LEFDEFReaderState ld (&options, layout);
 
   db::DEFImporter imp;
 
   while (! ex.at_end ()) {
 
-    if (ex.test ("def:")) {
+    if (ex.test ("map:")) {
 
-      std::string fn (priv ? tl::testsrc_private () : tl::testsrc ());
-      fn += "/testdata/lefdef/";
-      fn += lef_dir;
-      fn += "/";
-      std::string f;
+      std::string fn = fn_path, f;
+      ex.read_word_or_quoted (f);
+      fn += f;
+
+      ld.read_map_file (fn, layout);
+
+    } else if (ex.test ("def:")) {
+
+      std::string fn = fn_path, f;
       ex.read_word_or_quoted (f);
       fn += f;
 
@@ -79,16 +86,34 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
 
     } else if (ex.test ("lef:")) {
 
-      std::string fn (priv ? tl::testsrc_private () : tl::testsrc ());
-      fn += "/testdata/lefdef/";
-      fn += lef_dir;
-      fn += "/";
-      std::string f;
+      std::string fn = fn_path, f;
       ex.read_word_or_quoted (f);
       fn += f;
 
       tl::InputStream stream (fn);
       imp.read_lef (stream, layout, ld);
+
+    } else if (ex.test ("gds:")) {
+
+      std::string fn = fn_path, f;
+      ex.read_word_or_quoted (f);
+      fn += f;
+
+      tl::InputStream stream (fn);
+      db::Reader reader (stream);
+      reader.read (layout, db::LoadLayoutOptions ());
+
+    } else if (ex.test("read:")) {
+
+      std::string fn = fn_path, f;
+      ex.read_word_or_quoted (f);
+      fn += f;
+
+      tl::InputStream stream (fn);
+      db::Reader reader (stream);
+      db::LoadLayoutOptions lo;
+      lo.set_options (options);
+      reader.read (layout, lo);
 
     } else {
 
@@ -112,6 +137,7 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
     tl::OutputStream stream (tmp_file);
     db::SaveLayoutOptions options;
     options.set_format ("OASIS");
+    options.set_option_by_name ("oasis_permissive", tl::Variant (true));
     db::Writer writer (options);
     writer.write (layout, stream);
   }
@@ -222,6 +248,7 @@ TEST(15)
 TEST(16)
 {
   run_test (_this, "def7", "lef:cells.lef+lef:tech.lef+def:in.def.gz", "au.oas.gz", default_options ());
+  run_test (_this, "def7", "map:in.map+lef:cells.lef+lef:tech.lef+def:in.def.gz", "au_with_map_file.oas.gz", default_options ());
 }
 
 TEST(17)
@@ -231,7 +258,11 @@ TEST(17)
 
 TEST(18)
 {
-  run_test (_this, "def9", "lef:tech.lef+lef:cells_modified.lef+def:in.def", "au.oas.gz", default_options ());
+  db::LEFDEFReaderOptions options = default_options ();
+  options.set_separate_groups (true);
+  run_test (_this, "def9", "lef:tech.lef+lef:cells_modified.lef+def:in.def", "au.oas.gz", options);
+
+  run_test (_this, "def9", "lef:tech.lef+lef:cells_modified.lef+def:in.def", "au_nogroups.oas.gz", default_options ());
 }
 
 TEST(19)
@@ -241,10 +272,20 @@ TEST(19)
 
 TEST(20)
 {
-  run_test (_this, "issue-172", "lef:in.lef+def:in.def", "au.oas.gz", default_options (), false);
+  run_test (_this, "def11", "lef:test.lef+def:test.def", "au.oas.gz", default_options ());
 }
 
 TEST(21)
+{
+  run_test (_this, "def12", "lef:test.lef+def:test.def", "au.oas.gz", default_options ());
+}
+
+TEST(100)
+{
+  run_test (_this, "issue-172", "lef:in.lef+def:in.def", "au.oas.gz", default_options (), false);
+}
+
+TEST(101)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_produce_pin_names (true);
@@ -252,7 +293,7 @@ TEST(21)
   run_test (_this, "issue-489", "lef:in.lef+def:in.def", "au.oas", opt, false);
 }
 
-TEST(22)
+TEST(102)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_produce_pin_names (true);
@@ -260,8 +301,83 @@ TEST(22)
   run_test (_this, "issue-489b", "lef:in_tech.lef+lef:in.lef", "au.oas.gz", opt, false);
 }
 
-TEST(23)
+TEST(103)
 {
   run_test (_this, "issue-517", "def:in.def", "au.oas.gz", default_options (), false);
 }
 
+TEST(104_doxy_vias)
+{
+  run_test (_this, "doxy_vias", "def:test.def", "au.oas.gz", default_options (), false);
+}
+
+TEST(105_specialnets_geo)
+{
+  run_test (_this, "specialnets_geo", "lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
+
+  db::LEFDEFReaderOptions options = default_options ();
+  options.set_produce_special_routing (false);
+  run_test (_this, "specialnets_geo", "lef:test.lef+def:test.def", "au_no_spnet.oas.gz", options, false);
+
+  options.set_produce_special_routing (true);
+  options.set_special_routing_datatype (10);
+  options.set_special_routing_suffix (".SPNET");
+
+  options.set_via_geometry_datatype (11);
+  options.set_via_geometry_suffix (".VIA");
+
+  run_test (_this, "specialnets_geo", "lef:test.lef+def:test.def", "au_spnet_mapped.oas.gz", options, false);
+}
+
+TEST(106_wrongdirection)
+{
+  run_test (_this, "wrongdirection", "lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
+}
+
+TEST(107_specialwidths)
+{
+  run_test (_this, "specialwidths", "lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
+}
+
+TEST(108_scanchain)
+{
+  run_test (_this, "scanchain", "def:test.def", "au.oas.gz", default_options (), false);
+}
+
+TEST(109_foreigncell)
+{
+  run_test (_this, "foreigncell", "gds:foreign.gds+lef:in_tech.lef+lef:in.lef+def:in.def", "au.oas.gz", default_options (), false);
+
+  db::LEFDEFReaderOptions options = default_options ();
+
+  run_test (_this, "foreigncell", "gds:foreign.gds+lef:in_tech.lef+lef:in2.lef+def:in.def", "au_default.oas.gz", options, false);
+
+  options.set_macro_resolution_mode (1);
+
+  run_test (_this, "foreigncell", "gds:foreign.gds+lef:in_tech.lef+lef:in2.lef+def:in.def", "au_ignore_foreign.oas.gz", options, false);
+
+  options.set_macro_resolution_mode (2);
+
+  run_test (_this, "foreigncell", "gds:foreign.gds+lef:in_tech.lef+lef:in.lef+def:in.def", "au_always_foreign.oas.gz", options, false);
+}
+
+TEST(110_lefpins)
+{
+  db::LEFDEFReaderOptions options = default_options ();
+  options.set_produce_lef_pins (false);
+  run_test (_this, "lefpins", "lef:in_tech.lef+lef:in.lef+def:in.def", "au_no_lefpins.oas.gz", options, false);
+
+  options.set_produce_lef_pins (true);
+  options.set_lef_pins_datatype (10);
+  options.set_lef_pins_suffix (".LEFPIN");
+
+  run_test (_this, "lefpins", "lef:in_tech.lef+lef:in.lef+def:in.def", "au_lefpins_mapped.oas.gz", options, false);
+}
+
+TEST(111_mapfile)
+{
+  db::LEFDEFReaderOptions options = default_options ();
+  options.set_map_file ("test.map");
+
+  run_test (_this, "mapfile", "read:in.def", "au.oas.gz", options, false);
+}

@@ -42,7 +42,7 @@ namespace db
  *
  *  This implementation will create new layers if required.
  */
-class DirectLayerMapping
+class DB_PUBLIC DirectLayerMapping
   : public ImportLayerMapping 
 {
 public:

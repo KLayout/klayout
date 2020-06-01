@@ -13,6 +13,11 @@
 * Bugfix: %GITHUB%/issues/570
       Perimenter can be included in antenna area for the
       antenna check
+* Bugfix: width of cell and library side panels could not be 
+      reduced below the width of the selection boxes in the
+      header
+* Bugfix: cell view selection header text did not get updated
+      when saving the layout to a different file
 
 0.26.5          (2020-05-02):
 

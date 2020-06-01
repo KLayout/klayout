@@ -31,6 +31,7 @@
 #include "tlObject.h"
 
 #include <string>
+#include <set>
 
 namespace db
 {
@@ -108,18 +109,38 @@ public:
    *  If this attribute is non-empty, the library is selected only when the given technology is
    *  used for the layout.
    */
-  const std::string &get_technology () const
+  const std::set<std::string> &get_technologies () const
   {
-    return m_technology;
+    return m_technologies;
   }
 
   /**
-   *  @brief Sets the technology name this library is associated with
+   *  @brief Gets a value indicating whether this library is associated with the given technology
    */
-  void set_technology (const std::string &t)
-  {
-    m_technology = t;
-  }
+  bool is_for_technology (const std::string &name) const;
+
+  /**
+   *  @brief Gets a value indicating whether the library is associated with any technology
+   */
+  bool for_technologies () const;
+
+  /**
+   *  @brief Sets the technology name this library is associated with
+   *
+   *  This will reset the list of technologies to this one.
+   *  If the given technology string is empty, the list of technologies will be cleared.
+   */
+  void set_technology (const std::string &t);
+
+  /**
+   *  @brief Clears the list of technologies this library is associated with
+   */
+  void clear_technologies ();
+
+  /**
+   *  @brief Additionally associate the library with the given technology
+   */
+  void add_technology (const std::string &tech);
 
   /**
    *  @brief Getter for the description property
@@ -198,7 +219,7 @@ public:
 private:
   std::string m_name;
   std::string m_description;
-  std::string m_technology;
+  std::set<std::string> m_technologies;
   lib_id_type m_id;
   db::Layout m_layout;
   std::map<db::Layout *, int> m_referrers;

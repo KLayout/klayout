@@ -68,6 +68,16 @@ static void delete_lib (db::Library *lib)
   db::LibraryManager::instance ().delete_lib (lib);
 }
 
+static std::string get_technology (db::Library *lib)
+{
+  const std::set<std::string> &techs = lib->get_technologies ();
+  if (techs.empty ()) {
+    return std::string ();
+  } else {
+    return *techs.begin ();
+  }
+}
+
 Class<db::Library> decl_Library ("db", "Library",
   gsi::constructor ("new", &new_lib,
     "@brief Creates a new, empty library"
@@ -111,18 +121,47 @@ Class<db::Library> decl_Library ("db", "Library",
   gsi::method ("description=", &db::Library::set_description, gsi::arg ("description"),
     "@brief Sets the libraries' description text\n"
   ) +
-  gsi::method ("technology", &db::Library::get_technology,
+  gsi::method_ext ("#technology", &get_technology,
     "@brief Returns name of the technology the library is associated with\n"
     "If this attribute is a non-empty string, this library is only offered for "
     "selection if the current layout uses this technology.\n"
     "\n"
-    "This attribute has been introduced in version 0.25."
+    "This attribute has been introduced in version 0.25. In version 0.27 this attribute is deprecated as "
+    "a library can now be associated with multiple technologies."
   ) +
   gsi::method ("technology=", &db::Library::set_technology, gsi::arg ("technology"),
     "@brief sets the name of the technology the library is associated with\n"
     "\n"
     "See \\technology for details. "
-    "This attribute has been introduced in version 0.25."
+    "This attribute has been introduced in version 0.25. In version 0.27, a library can be associated with "
+    "multiple technologies and this method will revert the selection to a single one. Passing an empty string "
+    "is equivalent to \\clear_technologies."
+  ) +
+  gsi::method ("clear_technologies", &db::Library::clear_technologies,
+    "@brief Clears the list of technologies the library is associated with.\n"
+    "See also \\add_technology.\n"
+    "\n"
+    "This method has been introduced in version 0.27"
+  ) +
+  gsi::method ("add_technology", &db::Library::add_technology, gsi::arg ("tech"),
+    "@brief Additionally associates the library with the given technology.\n"
+    "See also \\clear_technologies.\n"
+    "\n"
+    "This method has been introduced in version 0.27"
+  ) +
+  gsi::method ("is_for_technology", &db::Library::is_for_technology, gsi::arg ("tech"),
+    "@brief Returns a value indicating whether the library is associated with the given technology.\n"
+    "This method has been introduced in version 0.27"
+  ) +
+  gsi::method ("for_technologies", &db::Library::for_technologies,
+    "@brief Returns a value indicating whether the library is associated with any technology.\n"
+    "The method is equivalent to checking whether the \\technologies list is empty.\n"
+    "\n"
+    "This method has been introduced in version 0.27"
+  ) +
+  gsi::method ("technologies", &db::Library::get_technologies,
+    "@brief Gets the list of technologies this library is associated with.\n"
+    "This method has been introduced in version 0.27"
   ) +
   gsi::method ("layout_const", (const db::Layout &(db::Library::*)() const) &db::Library::layout,
     "@brief The layout object where the cells reside that this library defines (const version)\n"

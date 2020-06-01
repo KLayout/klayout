@@ -230,7 +230,8 @@ LibrariesView::LibrariesView (lay::LayoutView *view, QWidget *parent, const char
   ly->setContentsMargins (0, 0, 0, 0);
 
   mp_selector = new QComboBox (this);
-  mp_selector->setObjectName (QString::fromUtf8 ("cellview_selection"));
+  mp_selector->setObjectName (QString::fromUtf8 ("library_selection"));
+  mp_selector->setSizePolicy (QSizePolicy::Ignored, QSizePolicy::Fixed);
   ly->addWidget (mp_selector);
 
   mp_search_frame = new QFrame (this);

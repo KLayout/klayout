@@ -260,6 +260,7 @@ HierarchyControlPanel::HierarchyControlPanel (lay::LayoutView *view, QWidget *pa
 
   mp_selector = new QComboBox (this);
   mp_selector->setObjectName (QString::fromUtf8 ("cellview_selection"));
+  mp_selector->setSizePolicy (QSizePolicy::Ignored, QSizePolicy::Fixed);
   ly->addWidget (mp_selector);
 
   mp_search_frame = new QFrame (this);

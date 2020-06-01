@@ -131,7 +131,15 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
 
   //  normalize the layout by writing to OASIS and reading from ..
 
-  std::string tmp_file = _this->tmp_file ("tmp.oas");
+  //  generate a "unique" name ...
+  unsigned int hash = 0;
+  if (au) {
+    for (const char *cp = au; *cp; ++cp) {
+      hash = (hash << 4) ^ (hash >> 4) ^ ((unsigned int) *cp);
+    }
+  }
+
+  std::string tmp_file = _this->tmp_file (tl::sprintf ("tmp_%x.oas", hash));
 
   {
     tl::OutputStream stream (tmp_file);

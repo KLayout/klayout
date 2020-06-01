@@ -730,19 +730,30 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
       } else {
 
         bool prefixed = false;
-        bool can_have_rect_or_polygon = true;
+        bool can_have_rect_polygon_or_via = true;
 
         if ((was_shield = test ("SHIELD")) == true || test ("NOSHIELD") || test ("ROUTED") || test ("FIXED") || test ("COVER")) {
           if (was_shield) {
             take ();
           }
           prefixed = true;
-          can_have_rect_or_polygon = test ("+");
+          can_have_rect_polygon_or_via = test ("+");
         }
 
         bool any = false;
 
-        if (can_have_rect_or_polygon && test ("POLYGON")) {
+        if (can_have_rect_polygon_or_via) {
+          if (test ("SHAPE")) {
+            take ();
+            test ("+");
+          }
+          if (test ("MASK")) {
+            get_long ();
+            test ("+");
+          }
+        }
+
+        if (can_have_rect_polygon_or_via && test ("POLYGON")) {
 
           std::string ln = get ();
 
@@ -760,7 +771,7 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
 
           any = true;
 
-        } else if (can_have_rect_or_polygon && test ("RECT")) {
+        } else if (can_have_rect_polygon_or_via && test ("RECT")) {
 
           std::string ln = get ();
 
@@ -774,6 +785,24 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
             } else {
               design.shapes (dl.second).insert (p);
             }
+          }
+
+          any = true;
+
+        } else if (can_have_rect_polygon_or_via && test ("VIA")) {
+
+          std::string vn = get ();
+          db::FTrans ft = get_orient (true /*optional*/);
+
+          test ("(");
+          db::Vector pt = get_vector (scale);
+          test (")");
+
+          std::map<std::string, ViaDesc>::const_iterator vd = m_via_desc.find (vn);
+          if (vd != m_via_desc.end ()) {
+            design.insert (db::CellInstArray (db::CellInst (vd->second.cell->cell_index ()), db::Trans (ft.rot (), pt)));
+          } else {
+            error (tl::to_string (tr ("Invalid via name: ")) + vn);
           }
 
           any = true;

@@ -1582,6 +1582,8 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
       db::Shape last_array;
 
       size_t current_quad_id = 0;
+      size_t current_array_quad_id = 0;
+
       db::ShapeIterator shape (shapes.begin_touching (*v, db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::Paths, mp_prop_sel, m_inv_prop_sel));
       while (! shape.at_end ()) {
 
@@ -1596,16 +1598,18 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
         }
 
         if (skip) {
-
           shape.skip_quad ();
+          continue;
+        }
 
-        } else {
+        if (shape.in_array ()) {
 
-          bool simplified = false;
-
-          if (shape.in_array () && last_array != shape.array ()) {
+          if (last_array != shape.array ()) {
 
             last_array = shape.array ();
+            current_array_quad_id = 0;
+
+            bool simplified = false;
 
             if (last_array.type () == db::Shape::PolygonPtrArray) {
               simplified = draw_array_simplified<db::Shape::polygon_ptr_array_type> (mp_renderer.get (), last_array, frame, vertex, trans);
@@ -1619,16 +1623,41 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
               simplified = draw_array_simplified<db::Shape::short_box_array_type> (mp_renderer.get (), last_array, frame, vertex, trans);
             }
 
+            if (simplified) {
+              shape.finish_array ();
+              //  continue with the next shape, array or quad
+              continue;
+            }
+
           }
 
-          if (simplified) {
-            shape.finish_array ();
-          } else {
-            mp_renderer->draw (*shape, trans, fill, frame, vertex, text);
-            ++shape;
+        } else {
+          current_array_quad_id = 0;
+        }
+
+        //  try whether the array quad can be simplified
+
+        size_t aqid = shape.array_quad_id ();
+        if (aqid != 0 && aqid != current_array_quad_id) {
+
+          current_array_quad_id = aqid;
+
+          db::DBox qbbox = trans * shape.array_quad_box ();
+          if (qbbox.width () < 1.5 && qbbox.height () < 1.5) {
+
+            //  draw a single box instead of the quad
+            mp_renderer->draw (qbbox, fill, frame, vertex, text);
+            shape.skip_array_quad ();
+
+            //  continue with the next shape, array or quad
+            continue;
+
           }
 
         }
+
+        mp_renderer->draw (*shape, trans, fill, frame, vertex, text);
+        ++shape;
 
       }
 

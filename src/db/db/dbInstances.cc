@@ -640,13 +640,12 @@ OverlappingInstanceIteratorTraits::init (instance_iterator<OverlappingInstanceIt
 //  ChildCellIterator implementation
 
 ChildCellIterator::ChildCellIterator ()
-  : m_iter (), m_end (), mp_insts (0)
+  : m_iter (), m_end ()
 { }
 
 ChildCellIterator::ChildCellIterator (const instances_type *insts)
   : m_iter (insts->begin_sorted_insts ()),
-    m_end (insts->end_sorted_insts ()),
-    mp_insts (insts)
+    m_end (insts->end_sorted_insts ())
 { }
 
 cell_index_type 

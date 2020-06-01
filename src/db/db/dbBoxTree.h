@@ -577,12 +577,16 @@ private:
     return m_quad < 4;
   }
 
-  //  down one level
+  //  down as many levels as required for the next non-empty quad
   //  returns true if this is possible
   bool down ()
   {
-    box_tree_node *c = mp_node->child (m_quad);
-    if (c) {
+    while (true) {
+
+      box_tree_node *c = mp_node->child (m_quad);
+      if (! c) {
+        return false;
+      }
 
       mp_node = c;
       m_quad = -1;
@@ -595,12 +599,11 @@ private:
         //  nothing to visit: up again
         up ();
         return false;
-      } else {
+      } else if (m_quad < 0) {
+        //  stay in main chunk
         return true;
       }
 
-    } else {
-      return false;
     }
   }
 
@@ -670,7 +673,7 @@ private:
  *  whose box overlaps or touches a specified test box.
  */
 
-template <class Box, class Obj, class BoxConv, size_t min_bin = 100, size_t min_quads = 100>
+template <class Box, class Obj, class BoxConv, size_t min_bin = 100, size_t min_quads = 100, unsigned int thin_aspect = 4>
 class box_tree 
 {
 public:
@@ -1175,7 +1178,16 @@ private:
 
     //  the bins are: overall, ur, ul, ll, lr, empty
     element_iterator qloc [6] = { from, from, from, from, from, from };
-    point_type center (bbox.center ());
+    point_type center;
+    if (bbox.width () < thin_aspect * bbox.height ()) {
+      //  separate by height only
+      center = point_type (bbox.left (), bbox.bottom () + bbox.height () / 2);
+    } else if (bbox.height () < thin_aspect * bbox.width ()) {
+      //  separate by width only
+      center = point_type (bbox.left () + bbox.width () / 2, bbox.bottom ());
+    } else {
+      center = bbox.center ();
+    }
 
     for (element_iterator e = from; e != to; ++e) {
 
@@ -1578,12 +1590,16 @@ private:
     return m_quad < 4;
   }
 
-  //  down one level
+  //  down as many levels as required for the next non-empty quad
   //  returns true if this is possible
   bool down ()
   {
-    box_tree_node *c = mp_node->child (m_quad);
-    if (c) {
+    while (true) {
+
+      box_tree_node *c = mp_node->child (m_quad);
+      if (! c) {
+        return false;
+      }
 
       mp_node = c;
       m_quad = -1;
@@ -1596,12 +1612,11 @@ private:
         //  nothing to visit: up again
         up ();
         return false;
-      } else {
+      } else if (m_quad < 0) {
+        //  stay in main chunk
         return true;
       }
 
-    } else {
-      return false;
     }
   }
 
@@ -1638,7 +1653,7 @@ private:
  *  is sorted.
  */
 
-template <class Box, class Obj, class BoxConv, size_t min_bin = 100, size_t min_quads = 100>
+template <class Box, class Obj, class BoxConv, size_t min_bin = 100, size_t min_quads = 100, unsigned int thin_aspect = 4>
 class unstable_box_tree 
 {
 public:
@@ -2103,7 +2118,16 @@ private:
     } 
 
     obj_iterator qloc [5] = { from, from, from, from, from };
-    point_type center (bbox.center ());
+    point_type center;
+    if (bbox.width () < thin_aspect * bbox.height ()) {
+      //  separate by height only
+      center = point_type (bbox.left (), bbox.bottom () + bbox.height () / 2);
+    } else if (bbox.height () < thin_aspect * bbox.width ()) {
+      //  separate by width only
+      center = point_type (bbox.left () + bbox.width () / 2, bbox.bottom ());
+    } else {
+      center = bbox.center ();
+    }
 
     for (obj_iterator e = from; e != to; ++e) {
 

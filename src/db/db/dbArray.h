@@ -70,7 +70,11 @@ struct basic_array_iterator
 
   virtual long index_a () const { return -1; }
   virtual long index_b () const { return -1; }
-  
+
+  virtual size_t quad_id () const { return 0; }
+  virtual box_type quad_box () const { return box_type::world (); }
+  virtual void skip_quad () { }
+
   virtual disp_type get () const = 0;
   
   virtual basic_array_iterator<Coord> *clone () const = 0;
@@ -806,6 +810,21 @@ struct iterated_array_iterator
     return new iterated_array_iterator <Coord> (*this);
   }
 
+  virtual size_t quad_id () const
+  {
+    return m_t.quad_id ();
+  }
+
+  virtual box_type quad_box () const
+  {
+    return m_t.quad_box ();
+  }
+
+  virtual void skip_quad ()
+  {
+    m_t.skip_quad ();
+  }
+
 private:
   box_tree_const_iterator m_b, m_e;
   box_tree_touching_iterator m_t;
@@ -1420,6 +1439,36 @@ struct array_iterator
     return mp_base ? mp_base->index_b () : -1;
   }
 
+  /**
+   *  @brief For iterators supporting quads (iterated arrays), this method will return the quad ID
+   */
+  size_t quad_id () const
+  {
+    return mp_base ? mp_base->quad_id () : 0;
+  }
+
+  /**
+   *  @brief For iterators supporting quads (iterated arrays), this method will return the quad bounding box
+   *
+   *  Note that this method will only return a valid quad box is the quad_id is non-null.
+   *
+   *  This method will return the bounding box of all array offsets in the quad.
+   */
+  db::box<Coord> quad_box () const
+  {
+    return mp_base ? mp_base->quad_box () : db::box<Coord>::world ();
+  }
+
+  /**
+   *  @brief For iterators supporting quads (iterated arrays), this method will skip the current quad
+   */
+  void skip_quad ()
+  {
+    if (mp_base) {
+      mp_base->skip_quad ();
+    }
+  }
+
 private:
   trans_type m_trans;
   basic_array_iterator <Coord> *mp_base;
@@ -1832,6 +1881,32 @@ struct array
       }
     } else {
       return rb * (m_trans.fp_trans () * bc (m_obj));
+    }
+  }
+
+  /**
+   *  @brief Gets the bounding box from the iterator's current quad
+   *
+   *  The bounding box is that of all objects in the current quad and
+   *  is confined to the array's total bounding box.
+   */
+  template <class Iter, class BoxConv>
+  box_type quad_box (const Iter &iter, const BoxConv &bc) const
+  {
+    box_type bb;
+    if (mp_base) {
+      bb = mp_base->bbox (box_type (0, 0, 0, 0));
+    }
+    bb &= iter.quad_box ();
+
+    if (mp_base) {
+      if (mp_base->is_complex ()) {
+        return bb * box_type (mp_base->complex_trans (simple_trans_type (m_trans)) * bc (m_obj));
+      } else {
+        return bb * (m_trans * bc (m_obj));
+      }
+    } else {
+      return bb * (m_trans * bc (m_obj));
     }
   }
 

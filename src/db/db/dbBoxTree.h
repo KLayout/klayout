@@ -168,19 +168,20 @@ public:
   typedef typename Tree::coord_type coord_type;
   typedef typename Tree::box_type box_type;
 
-  box_tree_node (box_tree_node *parent, const point_type &center, unsigned int quad) 
-    : m_center (center)
+  box_tree_node (box_tree_node *parent, const point_type &center, const box_type &qbox, unsigned int quad)
   {
-    for (int i = 0; i < 5; ++i) {
-      m_lenq[i] = 0;
+    point_type corner;
+    if (quad == 0) {
+      corner = qbox.upper_right ();
+    } else if (quad == 1) {
+      corner = qbox.upper_left ();
+    } else if (quad == 2) {
+      corner = qbox.lower_left ();
+    } else if (quad == 3) {
+      corner = qbox.lower_right ();
     }
-    for (int i = 0; i < 4; ++i) {
-      mp_children[i] = 0;
-    }
-    mp_parent = (box_tree_node *)((char *) parent + quad);
-    if (parent) {
-      parent->mp_children [quad] = this;
-    }
+
+    init (parent, center, corner, quad);
   }
 
   ~box_tree_node ()
@@ -195,7 +196,7 @@ public:
 
   box_tree_node *clone (box_tree_node *parent = 0, unsigned int quad = 0) const
   {
-    box_tree_node *n = new box_tree_node (parent, m_center, quad);
+    box_tree_node *n = new box_tree_node (parent, m_center, m_corner, quad);
     for (unsigned int i = 0; i < 5; ++i) {
       n->m_lenq[i] = m_lenq[i];
     }
@@ -249,14 +250,52 @@ public:
     return m_center;
   }
 
+  box_type quad_box (int quad) const
+  {
+    box_type qb = box_type::world ();
+    if (parent ()) {
+      qb = box_type (m_corner, parent ()->center ());
+    }
+
+    switch (quad) {
+    case 0: return box_type (m_center, qb.upper_right ());
+    case 1: return box_type (m_center, qb.upper_left ());
+    case 2: return box_type (m_center, qb.lower_left ());
+    case 3: return box_type (m_center, qb.lower_right ());
+    default: return qb;
+    }
+  }
+
 private:
   box_tree_node *mp_parent;
   size_t m_lenq [5];
   box_tree_node *mp_children [4];
-  point_type m_center;
+  point_type m_center, m_corner;
 
   box_tree_node (const box_tree_node &d);
   box_tree_node &operator= (const box_tree_node &d);
+
+  box_tree_node (box_tree_node *parent, const point_type &center, const point_type &corner, unsigned int quad)
+  {
+    init (parent, center, corner, quad);
+  }
+
+  void init (box_tree_node *parent, const point_type &center, const point_type &corner, unsigned int quad)
+  {
+    m_center = center;
+    m_corner = corner;
+
+    for (int i = 0; i < 5; ++i) {
+      m_lenq[i] = 0;
+    }
+    for (int i = 0; i < 4; ++i) {
+      mp_children[i] = 0;
+    }
+    mp_parent = (box_tree_node *)((char *) parent + quad);
+    if (parent) {
+      parent->mp_children [quad] = this;
+    }
+  }
 };
 
 /**
@@ -459,28 +498,9 @@ public:
   box_type quad_box () const
   {
     if (! mp_node) {
-
       return box_type::world ();
-
     } else {
-
-      point_type c = mp_node->center ();
-      box_type qb;
-      if (! mp_node->parent ()) {
-        qb = box_type::world ();
-      } else {
-        point_type pc = mp_node->parent ()->center ();
-        qb = box_type (c - (pc - c), pc);
-      }
-
-      switch (m_quad) {
-      case 0: return box_type (c, qb.upper_right ());
-      case 1: return box_type (c, qb.upper_left ());
-      case 2: return box_type (c, qb.lower_left ());
-      case 3: return box_type (c, qb.lower_right ());
-      default: return qb;
-      }
-
+      return mp_node->quad_box (m_quad);
     }
   }
 
@@ -1179,10 +1199,10 @@ private:
     //  the bins are: overall, ur, ul, ll, lr, empty
     element_iterator qloc [6] = { from, from, from, from, from, from };
     point_type center;
-    if (bbox.width () < thin_aspect * bbox.height ()) {
+    if (bbox.width () < bbox.height () / thin_aspect) {
       //  separate by height only
       center = point_type (bbox.left (), bbox.bottom () + bbox.height () / 2);
-    } else if (bbox.height () < thin_aspect * bbox.width ()) {
+    } else if (bbox.height () < bbox.width () / thin_aspect) {
       //  separate by width only
       center = point_type (bbox.left () + bbox.width () / 2, bbox.bottom ());
     } else {
@@ -1236,7 +1256,7 @@ private:
     if (nn >= min_quads) {
 
       //  create a new node representing this tree
-      box_tree_node *node = new box_tree_node (parent, center, quad);
+      box_tree_node *node = new box_tree_node (parent, center, bbox, quad);
       if (parent == 0) {
         mp_root = node;
       }
@@ -1472,28 +1492,9 @@ public:
   box_type quad_box () const
   {
     if (! mp_node) {
-
       return box_type::world ();
-
     } else {
-
-      point_type c = mp_node->center ();
-      box_type qb;
-      if (! mp_node->parent ()) {
-        qb = box_type::world ();
-      } else {
-        point_type pc = mp_node->parent ()->center ();
-        qb = box_type (c - (pc - c), pc);
-      }
-
-      switch (m_quad) {
-      case 0: return box_type (c, qb.upper_right ());
-      case 1: return box_type (c, qb.upper_left ());
-      case 2: return box_type (c, qb.lower_left ());
-      case 3: return box_type (c, qb.lower_right ());
-      default: return qb;
-      }
-
+      return mp_node->quad_box (m_quad);
     }
   }
 
@@ -2119,10 +2120,10 @@ private:
 
     obj_iterator qloc [5] = { from, from, from, from, from };
     point_type center;
-    if (bbox.width () < thin_aspect * bbox.height ()) {
+    if (bbox.width () < bbox.height () / thin_aspect) {
       //  separate by height only
       center = point_type (bbox.left (), bbox.bottom () + bbox.height () / 2);
-    } else if (bbox.height () < thin_aspect * bbox.width ()) {
+    } else if (bbox.height () < bbox.width () / thin_aspect) {
       //  separate by width only
       center = point_type (bbox.left () + bbox.width () / 2, bbox.bottom ());
     } else {
@@ -2182,7 +2183,7 @@ private:
     if (nn >= min_quads) {
 
       //  create a new node representing this tree
-      box_tree_node *node = new box_tree_node (parent, center, quad);
+      box_tree_node *node = new box_tree_node (parent, center, bbox, quad);
       if (parent == 0) {
         mp_root = node;
       }

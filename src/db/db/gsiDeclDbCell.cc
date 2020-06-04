@@ -371,17 +371,17 @@ struct cell_inst_array_defs
 
   static bool less (const C *i, const C &other)
   {
-    return *i < other;
+    return i->less (other);
   }
 
   static bool equal (const C *i, const C &other)
   {
-    return *i == other;
+    return i->equal (other);
   }
 
   static bool not_equal (const C *i, const C &other)
   {
-    return ! equal (i, other);
+    return ! i->equal (other);
   }
 
   static gsi::Methods methods (bool new_doc)

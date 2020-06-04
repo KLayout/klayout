@@ -1189,6 +1189,8 @@ PrintingDifferenceReceiver::print_cell_inst (const db::CellInstArrayWithProperti
   unsigned long amax, bmax;
   if (ci.is_regular_array (a, b, amax, bmax)) {
     enough (tl::info) << "[a=" << a.to_string () << ", b=" << b.to_string () << ", na=" << amax << ", nb=" << bmax << "]" << tl::noendl;
+  } else if (ci.size () > 1) {
+    enough (tl::info) << " (+" << (ci.size () - 1) << " irregular locations)" << tl::noendl;
   } else {
     enough (tl::info) << "" << tl::noendl;
   }
@@ -1208,6 +1210,8 @@ PrintingDifferenceReceiver::print_cell_inst (const db::CellInstArrayWithProperti
   unsigned long amax, bmax;
   if (ci.is_regular_array (a, b, amax, bmax)) {
     enough (tl::info) << "[a=" << a.to_string () << ", b=" << b.to_string () << ", na=" << amax << ", nb=" << bmax << "]" << tl::noendl;
+  } else if (ci.size () > 1) {
+    enough (tl::info) << " (+" << (ci.size () - 1) << " irregular locations)" << tl::noendl;
   } else {
     enough (tl::info) << "" << tl::noendl;
   }

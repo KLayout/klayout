@@ -232,6 +232,7 @@ bool TestBase::do_test (bool editable, bool slow)
 {
   m_editable = editable;
   m_slow = slow;
+  m_any_failed = false;
 
   //  Ensures the test temp directory is present
   std::string tmpdir = tl::combine_path (tl::absolute_file_path (testtmp ()), m_testdir);

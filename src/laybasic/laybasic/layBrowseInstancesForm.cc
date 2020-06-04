@@ -702,7 +702,15 @@ BrowseInstancesForm::fill_cell_instances (const db::ICplxTrans &t, const db::Lay
 
       std::string aref;
       if (r > 1 || c > 1) {
-        aref = tl::sprintf ("[%ld,%ld]", c, r);
+        aref = "[";
+        aref += tl::to_string (c);
+        aref += ",";
+        aref += tl::to_string (r);
+        aref += "]";
+      } else if (parent_inst.size () > 1) {
+        aref = "(+";
+        aref += tl::to_string (parent_inst.size () - 1);
+        aref += "x)";
       }
 
       std::string new_path;

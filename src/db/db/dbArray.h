@@ -1642,6 +1642,32 @@ struct array
   }
 
   /**
+   *  @brief The iterated array constructor
+   *
+   *  This is basically a convenience function that creates
+   *  an appropriate basic_array object.
+   */
+  template <class Iter>
+  array (const Obj &obj, const trans_type &trans, Iter from, Iter to)
+    : m_obj (obj), m_trans (trans), mp_base (new iterated_array <coord_type> (from, to))
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief The complex iterated array constructor
+   *
+   *  This is basically a convenience function that creates
+   *  an appropriate basic_array object.
+   */
+  template <class Iter>
+  array (const Obj &obj, const complex_trans_type &ct, Iter from, Iter to)
+    : m_obj (obj), m_trans (ct), mp_base (new iterated_complex_array <coord_type> (ct.rcos (), ct.mag (), from, to))
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
    *  @brief The singular complex instance constructor
    *
    *  This is basically a convenience function that creates

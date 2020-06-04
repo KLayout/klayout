@@ -389,3 +389,9 @@ TEST(111_mapfile)
 
   run_test (_this, "mapfile", "read:in.def", "au.oas.gz", options, false);
 }
+
+TEST(112_via_properties)
+{
+  run_test (_this, "via_properties", "lef:in.lef", "au.oas.gz", default_options (), false);
+}
+

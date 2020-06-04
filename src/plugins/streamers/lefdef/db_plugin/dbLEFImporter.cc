@@ -361,6 +361,13 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
 
       expect (";");
 
+    } else if (test ("PROPERTY")) {
+
+      //  skip properties
+      while (! at_end () && ! test (";")) {
+        take ();
+      }
+
     } else {
       //  stop at unknown token
       break;
@@ -405,7 +412,7 @@ LEFImporter::read_nondefaultrule (db::Layout & /*layout*/)
       }
 
     } else {
-      while (! test (";")) {
+      while (! at_end () && ! test (";")) {
         take ();
       }
     }

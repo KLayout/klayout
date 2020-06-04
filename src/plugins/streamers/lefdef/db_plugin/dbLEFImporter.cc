@@ -941,6 +941,8 @@ LEFImporter::read_macro (Layout &layout)
 void 
 LEFImporter::do_read (db::Layout &layout)
 {
+  db::LayoutLocker locker (&layout);
+
   //  TODO: what to do with that value?
   //  double dbu_mic = 1000;
 

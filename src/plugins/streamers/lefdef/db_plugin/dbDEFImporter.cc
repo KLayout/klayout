@@ -1210,6 +1210,8 @@ DEFImporter::read_components (std::list<std::pair<std::string, CellInstArray> > 
 void 
 DEFImporter::do_read (db::Layout &layout)
 {
+  db::LayoutLocker locker (&layout);
+
   double dbu_mic = 1000.0;
   double scale = 1.0 / (dbu_mic * layout.dbu ());
 
@@ -1404,8 +1406,6 @@ DEFImporter::do_read (db::Layout &layout)
   db::Cell *others_cell = &design;
 
   if (! groups.empty () && options ().separate_groups ()) {
-
-    db::LayoutLocker locker (&layout);
 
     others_cell = &layout.cell (layout.add_cell ("NOGROUP"));
     design.insert (db::CellInstArray (others_cell->cell_index (), db::Trans ()));

@@ -798,6 +798,15 @@ END
     assert_equal((a5_15.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(501, 0)))).to_s, "")
     assert_equal((a5_29.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(502, 0)))).to_s, "")
 
+    b5_5 = l2n.antenna_check(rpoly, 2.0, 0.0, rmetal2, 1.0, 1.0, 2.5)
+    b5_15 = l2n.antenna_check(rpoly, 2.0, 0.0, rmetal2, 1.0, 1.0, 7.5)
+    b5_29 = l2n.antenna_check(rpoly, 2.0, 0.0, rmetal2, 1.0, 1.0, 14.5)
+
+    # Note: flatten.merged performs some normalization
+    assert_equal((b5_5.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(500, 0)))).to_s, "")
+    assert_equal((b5_15.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(501, 0)))).to_s, "")
+    assert_equal((b5_29.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(502, 0)))).to_s, "")
+
     # --- antenna check gate perimeter included
 
     l2n._destroy
@@ -829,6 +838,15 @@ END
     assert_equal((a6_3.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(600, 0)))).to_s, "")
     assert_equal((a6_5.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(601, 0)))).to_s, "")
     assert_equal((a6_9.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(602, 0)))).to_s, "")
+
+    b6_3 = l2n.antenna_check(rpoly, 1.0, 0.3, rmetal2, 2.0, 0.0, 6)
+    b6_5 = l2n.antenna_check(rpoly, 1.0, 0.3, rmetal2, 2.0, 0.0, 10)
+    b6_9 = l2n.antenna_check(rpoly, 1.0, 0.3, rmetal2, 2.0, 0.0, 18)
+
+    # Note: flatten.merged performs some normalization
+    assert_equal((b6_3.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(600, 0)))).to_s, "")
+    assert_equal((b6_5.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(601, 0)))).to_s, "")
+    assert_equal((b6_9.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(602, 0)))).to_s, "")
 
   end
 

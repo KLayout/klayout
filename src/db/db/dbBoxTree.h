@@ -187,9 +187,9 @@ public:
   ~box_tree_node ()
   {
     for (int i = 0; i < 4; ++i) {
-      if (mp_children [i]) {
-        delete mp_children [i];
-        mp_children [i] = 0;
+      box_tree_node *c = child (i);
+      if (c) {
+        delete c;
       }
     }
   }
@@ -197,12 +197,14 @@ public:
   box_tree_node *clone (box_tree_node *parent = 0, unsigned int quad = 0) const
   {
     box_tree_node *n = new box_tree_node (parent, m_center, m_corner, quad);
-    for (unsigned int i = 0; i < 5; ++i) {
-      n->m_lenq[i] = m_lenq[i];
-    }
+    n->m_lenq = m_lenq;
+    n->m_len = m_len;
     for (unsigned int i = 0; i < 4; ++i) {
-      if (mp_children[i]) {
-        mp_children[i]->clone (n, i);
+      box_tree_node *c = child (i);
+      if (c) {
+        c->clone (n, i);
+      } else {
+        n->m_childrefs [i] = m_childrefs [i];
       }
     }
     return n;
@@ -210,17 +212,39 @@ public:
 
   box_tree_node *child (int i) const
   {
-    return mp_children [i];
+    if ((m_childrefs [i] & 1) == 0) {
+      return reinterpret_cast<box_tree_node *> (m_childrefs [i]);
+    } else {
+      return 0;
+    }
   }
 
   void lenq (int i, size_t l) 
   {
-    m_lenq[i + 1] = l;
+    if (i < 0) {
+      m_lenq = l;
+    } else {
+      box_tree_node *c = child (i);
+      if (c) {
+        c->m_len = l;
+      } else {
+        m_childrefs [i] = l * 2 + 1;
+      }
+    }
   }
 
   size_t lenq (int i) const
   {
-    return m_lenq[i + 1];
+    if (i < 0) {
+      return m_lenq;
+    } else {
+      box_tree_node *c = child (i);
+      if (c) {
+        return c->m_len;
+      } else {
+        return m_childrefs [i] >> 1;
+      }
+    }
   }
 
   box_tree_node *parent () const
@@ -239,8 +263,8 @@ public:
       stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
     }
     for (int i = 0; i < 4; ++i) {
-      if (mp_children [i]) {
-        mp_children [i]->mem_stat (stat, purpose, cat, no_self, parent);
+      if (child (i)) {
+        child (i)->mem_stat (stat, purpose, cat, no_self, parent);
       }
     }
   }
@@ -268,8 +292,8 @@ public:
 
 private:
   box_tree_node *mp_parent;
-  size_t m_lenq [5];
-  box_tree_node *mp_children [4];
+  size_t m_lenq, m_len;
+  size_t m_childrefs [4];
   point_type m_center, m_corner;
 
   box_tree_node (const box_tree_node &d);
@@ -285,15 +309,15 @@ private:
     m_center = center;
     m_corner = corner;
 
-    for (int i = 0; i < 5; ++i) {
-      m_lenq[i] = 0;
-    }
+    m_lenq = m_len = 0;
     for (int i = 0; i < 4; ++i) {
-      mp_children[i] = 0;
+      m_childrefs [i] = 0;
     }
+
     mp_parent = (box_tree_node *)((char *) parent + quad);
     if (parent) {
-      parent->mp_children [quad] = this;
+      m_len = (parent->m_childrefs [quad] >> 1);
+      parent->m_childrefs [quad] = size_t (this);
     }
   }
 };

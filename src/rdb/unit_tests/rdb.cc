@@ -20,8 +20,6 @@
 
 */
 
-
-
 #include "rdb.h"
 #include "tlUnitTest.h"
 #include "dbBox.h"

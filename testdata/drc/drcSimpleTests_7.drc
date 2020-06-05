@@ -52,3 +52,10 @@ antenna_check(area_and_perimeter(gate, 70.nm), area_only(metal2), 5.0, diode).ou
 antenna_check(area_and_perimeter(gate, 0.07), area_only(metal2), 10.0, diode).output(410)
 antenna_check(area_and_perimeter(gate, 0.07), area_only(metal2), 50.0, diode).output(450)
 
+antenna_check(perimeter_only(gate, 0.07.um), area_only(metal2), 1.0, diode).output(501)
+antenna_check(perimeter_only(gate, 0.07.um), area_only(metal2), 1.5, diode).output(502)
+antenna_check(perimeter_only(gate, 0.07.um), area_only(metal2), 2.0, diode).output(503)
+antenna_check(perimeter_only(gate, 70.nm), area_only(metal2), 5.0, diode).output(505)
+antenna_check(perimeter_only(gate, 0.07), area_only(metal2), 10.0, diode).output(510)
+antenna_check(perimeter_only(gate, 0.07), area_only(metal2), 50.0, diode).output(550)
+

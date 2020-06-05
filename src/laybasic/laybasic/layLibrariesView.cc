@@ -210,7 +210,8 @@ LibrariesView::LibrariesView (lay::LayoutView *view, QWidget *parent, const char
   ly->setContentsMargins (0, 0, 0, 0);
 
   mp_selector = new QComboBox (this);
-  mp_selector->setObjectName (QString::fromUtf8 ("cellview_selection"));
+  mp_selector->setObjectName (QString::fromUtf8 ("library_selection"));
+  mp_selector->setSizePolicy (QSizePolicy::Ignored, QSizePolicy::Fixed);
   ly->addWidget (mp_selector);
 
   mp_search_frame = new QFrame (this);
@@ -771,9 +772,10 @@ LibrariesView::display_string (int n) const
   if (! lib->get_description ().empty ()) {
     text += " - " + lib->get_description ();
   }
-  if (! lib->get_technology ().empty ()) {
+  if (lib->for_technologies ()) {
     text += " ";
-    text += tl::to_string (QObject::tr ("[Technology %1]").arg (tl::to_qstring (lib->get_technology ())));
+    std::string tn = tl::join (std::vector<std::string> (lib->get_technologies ().begin (), lib->get_technologies ().end ()), ",");
+    text += tl::to_string (QObject::tr ("[Technology %1]").arg (tl::to_qstring (tn)));
   }
   return text;
 }

@@ -600,15 +600,16 @@ LibrarySelectionComboBox::update_list ()
   for (db::LibraryManager::iterator l = db::LibraryManager::instance ().begin (); l != db::LibraryManager::instance ().end (); ++l) {
 
     db::Library *lib = db::LibraryManager::instance ().lib (l->second);
-    if (! m_tech_set || lib->get_technology ().empty () || m_tech == lib->get_technology ()) {
+    if (! m_tech_set || !lib->for_technologies ()|| lib->is_for_technology (m_tech)) {
 
       std::string item_text = lib->get_name ();
       if (! lib->get_description ().empty ()) {
         item_text += " - " + lib->get_description ();
       }
-      if (m_tech_set && !lib->get_technology ().empty ()) {
+      if (m_tech_set && lib->for_technologies ()) {
         item_text += " ";
-        item_text += tl::to_string (QObject::tr ("[Technology %1]").arg (tl::to_qstring (lib->get_technology ())));
+        std::string tn = tl::join (std::vector<std::string> (lib->get_technologies ().begin (), lib->get_technologies ().end ()), ",");
+        item_text += tl::to_string (QObject::tr ("[Technology %1]").arg (tl::to_qstring (tn)));
       }
 
       addItem (tl::to_qstring (item_text), QVariant ((unsigned int) lib->get_id ()));

@@ -794,9 +794,10 @@ LibrariesView::display_string (int n) const
   if (! lib->get_description ().empty ()) {
     text += " - " + lib->get_description ();
   }
-  if (! lib->get_technology ().empty ()) {
+  if (lib->for_technologies ()) {
     text += " ";
-    text += tl::to_string (QObject::tr ("[Technology %1]").arg (tl::to_qstring (lib->get_technology ())));
+    std::string tn = tl::join (std::vector<std::string> (lib->get_technologies ().begin (), lib->get_technologies ().end ()), ",");
+    text += tl::to_string (QObject::tr ("[Technology %1]").arg (tl::to_qstring (tn)));
   }
   return text;
 }

@@ -205,7 +205,7 @@ LibraryController::sync_files ()
               }
             }
 
-            tl::log << "Registering as '" << lib->get_name () << "' for tech '" << lib->get_technology () << "'";
+            tl::log << "Registering as '" << lib->get_name () << "' for tech '" << p->second << "'";
             new_lib_files.insert (std::make_pair (lib_path, std::make_pair (lib->get_name (), fi.lastModified ())));
 
             db::LibraryManager::instance ().register_lib (lib.release ());

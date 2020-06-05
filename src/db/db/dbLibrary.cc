@@ -46,6 +46,39 @@ Library::~Library ()
   // .. nothing yet ..
 }
 
+bool
+Library::is_for_technology (const std::string &name) const
+{
+  return m_technologies.find (name) != m_technologies.end ();
+}
+
+bool
+Library::for_technologies () const
+{
+  return ! m_technologies.empty ();
+}
+
+void
+Library::set_technology (const std::string &t)
+{
+  m_technologies.clear ();
+  if (! t.empty ()) {
+    m_technologies.insert (t);
+  }
+}
+
+void
+Library::clear_technologies ()
+{
+  m_technologies.clear ();
+}
+
+void
+Library::add_technology (const std::string &tech)
+{
+  m_technologies.insert (tech);
+}
+
 void 
 Library::register_proxy (db::LibraryProxy *lib_proxy, db::Layout *ly)
 {

@@ -135,7 +135,7 @@ TechBaseEditorPage::setup ()
 
     for (db::LibraryManager::iterator l = db::LibraryManager::instance ().begin (); l != db::LibraryManager::instance ().end (); ++l) {
       const db::Library *lib = db::LibraryManager::instance ().lib (l->second);
-      if (lib->get_technology () == tech ()->name ()) {
+      if (lib->is_for_technology (tech ()->name ())) {
         std::string text = lib->get_name ();
         if (! lib->get_description ().empty ()) {
           text += " - " + lib->get_description ();

@@ -122,11 +122,15 @@ module DRC
     end
     
     def area_only(r)
-      DRCAreaAndPerimeter::new(r, 0.0)
+      DRCAreaAndPerimeter::new(r, 1.0, 0.0)
+    end
+    
+    def perimeter_only(r, f)
+      DRCAreaAndPerimeter::new(r, 0.0, f)
     end
     
     def area_and_perimeter(r, f)
-      DRCAreaAndPerimeter::new(r, f)
+      DRCAreaAndPerimeter::new(r, 1.0, f)
     end
     
     # %DRC%

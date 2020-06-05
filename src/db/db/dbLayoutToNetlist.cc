@@ -1180,7 +1180,7 @@ db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::Poin
   }
 }
 
-db::Region LayoutToNetlist::antenna_check (const db::Region &gate, double gate_perimeter_factor, const db::Region &metal, double metal_perimeter_factor, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes)
+db::Region LayoutToNetlist::antenna_check (const db::Region &gate, double gate_area_factor, double gate_perimeter_factor, const db::Region &metal, double metal_area_factor, double metal_perimeter_factor, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes)
 {
   //  TODO: that's basically too much .. we only need the clusters
   if (! m_netlist_extracted) {
@@ -1210,12 +1210,18 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, double gate_p
       deliver_shapes_of_net_recursive (0, m_net_clusters, *cid, *c, layer_of (gate), db::ICplxTrans (), rgate, 0);
       deliver_shapes_of_net_recursive (0, m_net_clusters, *cid, *c, layer_of (metal), db::ICplxTrans (), rmetal, 0);
 
-      double agate = rgate.area () * dbu * dbu;
+      double agate = 0.0;
+      if (fabs (gate_area_factor) > 1e-6) {
+        agate += rgate.area () * dbu * dbu * gate_area_factor;
+      }
       if (fabs (gate_perimeter_factor) > 1e-6) {
         agate += rgate.perimeter () * dbu * gate_perimeter_factor;
       }
 
-      double ametal = rmetal.area () * dbu * dbu;
+      double ametal = 0.0;
+      if (fabs (metal_area_factor) > 1e-6) {
+        ametal += rmetal.area () * dbu * dbu * metal_area_factor;
+      }
       if (fabs (metal_perimeter_factor) > 1e-6) {
         ametal += rmetal.perimeter () * dbu * metal_perimeter_factor;
       }

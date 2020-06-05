@@ -2639,8 +2639,16 @@ TEST(10_Antenna)
     a5_5.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (500, 0)));
     a5_15.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (501, 0)));
     a5_29.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (502, 0)));
-  }
 
+    //  with area factor
+    db::Region b5_5 = l2n.antenna_check (*rpoly, 2.0, 0.0, *rmetal2, 1.0, 1.0, 2.5);
+    db::Region b5_15 = l2n.antenna_check (*rpoly, 2.0, 0.0, *rmetal2, 1.0, 1.0, 7.5);
+    db::Region b5_29 = l2n.antenna_check (*rpoly, 2.0, 0.0, *rmetal2, 1.0, 1.0, 14.5);
+
+    b5_5.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (550, 0)));
+    b5_15.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (551, 0)));
+    b5_29.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (552, 0)));
+  }
 
   {
     db::LayoutToNetlist l2n (&dss);
@@ -2672,6 +2680,15 @@ TEST(10_Antenna)
     a6_3.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (600, 0)));
     a6_5.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (601, 0)));
     a6_9.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (602, 0)));
+
+    //  with area factor
+    db::Region b6_3 = l2n.antenna_check (*rpoly, 1.0, 0.3, *rmetal2, 2.0, 0.0, 6);
+    db::Region b6_5 = l2n.antenna_check (*rpoly, 1.0, 0.3, *rmetal2, 2.0, 0.0, 10);
+    db::Region b6_9 = l2n.antenna_check (*rpoly, 1.0, 0.3, *rmetal2, 2.0, 0.0, 18);
+
+    b6_3.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (650, 0)));
+    b6_5.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (651, 0)));
+    b6_9.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (652, 0)));
   }
 
   std::string au = tl::testsrc ();

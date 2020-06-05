@@ -733,9 +733,9 @@ public:
    *  The area computation of gate and metal happens by taking the polygon
    *  area (A) and perimeter (P) into account:
    *
-   *    A(antenna) = A + P * f
+   *    A(antenna) = A + P * t
    *
-   *  where f is the perimeter factor. The unit of the area factor is
+   *  where t is the perimeter factor. The unit of this area factor is
    *  micrometers.
    *
    *  The limit ratio can be modified by the presence of connections to
@@ -750,7 +750,10 @@ public:
    *  regardless of the diode's area.
    *  In other words: any diode will make the net safe against antenna discharge.
    */
-  db::Region antenna_check (const db::Region &gate, double gate_perimeter_factor, const db::Region &metal, double metal_perimeter_factor, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes = std::vector<std::pair<const db::Region *, double> > ());
+  db::Region antenna_check (const db::Region &gate, double gate_perimeter_factor, const db::Region &metal, double metal_perimeter_factor, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes = std::vector<std::pair<const db::Region *, double> > ())
+  {
+    return antenna_check (gate, 1.0, gate_perimeter_factor, metal, 1.0, metal_perimeter_factor, ratio, diodes);
+  }
 
   /**
    *  @brief Variant of the antennna check not using the perimeter
@@ -758,8 +761,20 @@ public:
    */
   db::Region antenna_check (const db::Region &gate, const db::Region &metal, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes = std::vector<std::pair<const db::Region *, double> > ())
   {
-    return antenna_check (gate, 0.0, metal, 0.0, ratio, diodes);
+    return antenna_check (gate, 1.0, 0.0, metal, 1.0, 0.0, ratio, diodes);
   }
+
+  /**
+   *  @brief Variant of the antenna check providing an area scale factor
+   *
+   *  This version provides an additional area scale factor f, so the effective area becomes
+   *
+   *    A(antenna) = A * f + P * t
+   *
+   *  where f is the area scale factor and t the perimeter scale factor. This version allows to ignore the
+   *  area contribution entirely and switch to a perimeter-based antenna check by setting f to zero.
+   */
+  db::Region antenna_check (const db::Region &gate, double gate_area_factor, double gate_perimeter_factor, const db::Region &metal, double metal_area_factor, double metal_perimeter_factor, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes = std::vector<std::pair<const db::Region *, double> > ());
 
   /**
    *  @brief Saves the database to the given path

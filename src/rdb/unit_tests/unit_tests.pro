@@ -8,6 +8,7 @@ include($$PWD/../../lib_ut.pri)
 
 SOURCES = \
   rdb.cc \
+    rdbRVEReaderTests.cc
 
 INCLUDEPATH += $$RDB_INC $$TL_INC $$DB_INC $$GSI_INC
 DEPENDPATH += $$RDB_INC $$TL_INC $$DB_INC $$GSI_INC

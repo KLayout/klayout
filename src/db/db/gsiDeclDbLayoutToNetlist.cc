@@ -98,7 +98,7 @@ static std::vector<std::string> l2n_layer_names (const db::LayoutToNetlist *l2n)
   return ln;
 }
 
-static db::Region antenna_check2 (db::LayoutToNetlist *l2n, const db::Region &poly, double poly_perimeter_factor, const db::Region &metal, double metal_perimeter_factor, double ratio, const std::vector<tl::Variant> &diodes)
+static db::Region antenna_check3 (db::LayoutToNetlist *l2n, const db::Region &poly, double poly_area_factor, double poly_perimeter_factor, const db::Region &metal, double metal_area_factor, double metal_perimeter_factor, double ratio, const std::vector<tl::Variant> &diodes)
 {
   std::vector<std::pair<const db::Region *, double> > diode_pairs;
 
@@ -127,12 +127,17 @@ static db::Region antenna_check2 (db::LayoutToNetlist *l2n, const db::Region &po
 
   }
 
-  return l2n->antenna_check (poly, poly_perimeter_factor, metal, metal_perimeter_factor, ratio, diode_pairs);
+  return l2n->antenna_check (poly, poly_area_factor, poly_perimeter_factor, metal, metal_area_factor, metal_perimeter_factor, ratio, diode_pairs);
+}
+
+static db::Region antenna_check2 (db::LayoutToNetlist *l2n, const db::Region &poly, double poly_perimeter_factor, const db::Region &metal, double metal_perimeter_factor, double ratio, const std::vector<tl::Variant> &diodes)
+{
+  return antenna_check3 (l2n, poly, 1, poly_perimeter_factor, metal, 1, metal_perimeter_factor, ratio, diodes);
 }
 
 static db::Region antenna_check (db::LayoutToNetlist *l2n, const db::Region &poly, const db::Region &metal, double ratio, const std::vector<tl::Variant> &diodes)
 {
-  return antenna_check2 (l2n, poly, 0, metal, 0, ratio, diodes);
+  return antenna_check3 (l2n, poly, 1, 0, metal, 1, 0, ratio, diodes);
 }
 
 Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
@@ -617,13 +622,30 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
    "The effective area is computed using:\n"
    "\n"
    "@code\n"
-   "Aeff = A + P * f\n"
+   "Aeff = A + P * t\n"
    "@/code\n"
    "\n"
-   "Here Aeff is the area used in the check, A is the polygon area, P the perimeter and f the perimeter factor. "
-   "This formula applies to gate polygon area/perimeter with 'gate_perimeter_factor' for f and metal polygon area/perimeter "
+   "Here Aeff is the area used in the check, A is the polygon area, P the perimeter and t the perimeter factor. "
+   "This formula applies to gate polygon area/perimeter with 'gate_perimeter_factor' for t and metal polygon area/perimeter "
    "with 'metal_perimeter_factor'. The perimeter_factor has the dimension of micrometers and can be thought of as the width "
    "of the material. Essentially the side walls of the material are taking into account for the surface area as well.\n"
+   "\n"
+   "This variant has been introduced in version 0.26.6.\n"
+  ) +
+  gsi::method_ext ("antenna_check", &antenna_check3, gsi::arg ("gate"), gsi::arg ("gate_area_factor"), gsi::arg ("gate_perimeter_factor"), gsi::arg ("metal"), gsi::arg ("metal_area_factor"), gsi::arg ("metal_perimeter_factor"), gsi::arg ("ratio"), gsi::arg ("diodes", std::vector<tl::Variant> (), "[]"),
+   "@brief Runs an antenna check on the extracted clusters taking the perimeter into account and providing an area factor\n"
+   "\n"
+   "This (most generic) version of the \\antenna_check method allows taking the perimeter of gate or metal into account and also "
+   "provides a scaling factor for the area part.\n"
+   "The effective area is computed using:\n"
+   "\n"
+   "@code\n"
+   "Aeff = A * f + P * t\n"
+   "@/code\n"
+   "\n"
+   "Here f is the area factor and t the perimeter factor. A is the polygon area and P the polygon perimeter. "
+   "A use case for this variant is to set the area factor to zero. This way, only perimeter contributions are "
+   "considered.\n"
    "\n"
    "This variant has been introduced in version 0.26.6.\n"
   ),

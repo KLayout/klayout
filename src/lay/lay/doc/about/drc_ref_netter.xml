@@ -167,6 +167,18 @@ errors = antenna_check(area_and_perimeter(gate, 0.0), ...)
 errors = antenna_check(gate, ...)
 </pre>
 </p><p>
+Finally there is also "perimeter_only". When using this 
+specification with a thickness value, the area is computed
+from the perimeter alone:
+</p><p>
+<pre>
+A(eff) = P * t
+</pre>
+</p><p>
+<pre>
+errors = antenna_check(perimeter_only(gate, 0.5), ...)
+</pre>
+</p><p>
 The error shapes produced by the antenna check are copies
 of the metal shapes on the metal layers of each network 
 violating the antenna rule.

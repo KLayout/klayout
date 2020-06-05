@@ -117,10 +117,12 @@ module DRC
   # optional perimeter factor
   class DRCAreaAndPerimeter
     attr_accessor :region
+    attr_accessor :area_factor
     attr_accessor :perimeter_factor
-    def initialize(r, f)
+    def initialize(r, f, t)
       self.region = r
-      self.perimeter_factor = f
+      self.area_factor = f
+      self.perimeter_factor = t
     end
   end
 

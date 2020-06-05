@@ -370,6 +370,18 @@ module DRC
     # errors = antenna_check(gate, ...)
     # @/code
     #
+    # Finally there is also "perimeter_only". When using this 
+    # specification with a thickness value, the area is computed
+    # from the perimeter alone:
+    #
+    # @code
+    # A(eff) = P * t
+    # @/code
+    #
+    # @code
+    # errors = antenna_check(perimeter_only(gate, 0.5), ...)
+    # @/code
+    #
     # The error shapes produced by the antenna check are copies
     # of the metal shapes on the metal layers of each network 
     # violating the antenna rule.
@@ -377,11 +389,13 @@ module DRC
     def antenna_check(agate, ametal, ratio, *diodes)
 
       gate_perimeter_factor = 0.0
+      gate_area_factor = 1.0
       if agate.is_a?(DRC::DRCLayer)
         gate = agate
       elsif agate.is_a?(DRC::DRCAreaAndPerimeter)
         gate = agate.region
         gate_perimeter_factor = agate.perimeter_factor
+        gate_area_factor = agate.area_factor
         if ! gate.is_a?(DRC::DRCLayer)
           raise("gate with area or area_and_perimeter: input argument must be a layer")
         end
@@ -392,11 +406,13 @@ module DRC
       gate.requires_region("Netter#antenna_check (gate argument)")
 
       metal_perimeter_factor = 0.0
+      metal_area_factor = 1.0
       if ametal.is_a?(DRC::DRCLayer)
         metal = ametal
       elsif ametal.is_a?(DRC::DRCAreaAndPerimeter)
         metal = ametal.region
         metal_perimeter_factor = ametal.perimeter_factor
+        metal_area_factor = ametal.area_factor
         if ! metal.is_a?(DRC::DRCLayer)
           raise("metal with area or area_and_perimeter: input argument must be a layer")
         end
@@ -421,7 +437,7 @@ module DRC
         end
       end
 
-      DRC::DRCLayer::new(@engine, @engine._cmd(l2n_data, :antenna_check, gate.data, gate_perimeter_factor, metal.data, metal_perimeter_factor, ratio, dl))
+      DRC::DRCLayer::new(@engine, @engine._cmd(l2n_data, :antenna_check, gate.data, gate_area_factor, gate_perimeter_factor, metal.data, metal_area_factor, metal_perimeter_factor, ratio, dl))
 
     end
 

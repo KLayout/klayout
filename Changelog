@@ -1,6 +1,8 @@
 
 0.26.6          (2020-xx-xx):
 
+* Enhancement: %GITHUB%/issues/522
+      Skip comment lines with // in RVE DB reader
 * Bugfix: %GITHUB%/issues/547
       Doc fixes, better error messages on some Shape methods
 * Bugfix: %GITHUB%/issues/555

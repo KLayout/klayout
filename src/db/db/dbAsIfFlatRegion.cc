@@ -810,7 +810,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   check.set_min_projection (min_projection);
   check.set_max_projection (max_projection);
 
-  edge2edge_check<db::FlatEdgePairs> edge_check (check, *result, different_polygons, other != 0);
+  edge2edge_check<db::FlatEdgePairs> edge_check (check, *result, different_polygons, other != 0 /*requires different layers*/, true /*shielded*/);
   poly2poly_check<db::FlatEdgePairs> poly_check (edge_check);
 
   do {
@@ -832,7 +832,7 @@ AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord 
   check.set_min_projection (min_projection);
   check.set_max_projection (max_projection);
 
-  edge2edge_check<db::FlatEdgePairs> edge_check (check, *result, false, false);
+  edge2edge_check<db::FlatEdgePairs> edge_check (check, *result, false /*=same polygons*/, false /*=same layers*/, true /*shielded*/);
   poly2poly_check<db::FlatEdgePairs> poly_check (edge_check);
 
   do {

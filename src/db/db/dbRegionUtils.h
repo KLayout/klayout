@@ -368,7 +368,7 @@ class DB_PUBLIC Edge2EdgeCheckBase
   : public db::box_scanner_receiver<db::Edge, size_t>
 {
 public:
-  Edge2EdgeCheckBase (const EdgeRelationFilter &check, bool different_polygons, bool requires_different_layers);
+  Edge2EdgeCheckBase (const EdgeRelationFilter &check, bool different_polygons, bool requires_different_layers, bool with_shielding);
 
   /**
    *  @brief Call this to initiate a new pass until the return value is false
@@ -379,6 +379,11 @@ public:
    *  @brief Reimplementation of the box_scanner_receiver interface
    */
   void add (const db::Edge *o1, size_t p1, const db::Edge *o2, size_t p2);
+
+  /**
+   *  @brief Reimplementation of the box_scanner_receiver interface
+   */
+  void finish (const Edge *o, const size_t &);
 
   /**
    *  @brief Gets a value indicating whether the check requires different layers
@@ -401,12 +406,36 @@ public:
   void set_different_polygons (bool f);
 
   /**
+   *  @brief Sets a flag indicating that this class wants negative edge output
+   */
+  void set_has_negative_edge_output (bool f)
+  {
+    m_has_negative_edge_output = f;
+  }
+
+  /**
+   *  @brief Sets a flag indicating that this class wants normal edge pair output
+   */
+  void set_has_edge_pair_output (bool f)
+  {
+    m_has_edge_pair_output = f;
+  }
+
+  /**
    *  @brief Gets the distance value
    */
   EdgeRelationFilter::distance_type distance () const;
 
 protected:
-  virtual void put (const db::EdgePair &edge) const = 0;
+  /**
+   *  @brief Normal edge pair output (violations)
+   */
+  virtual void put (const db::EdgePair & /*edge*/) const { }
+
+  /**
+   *  @brief Negative edge output
+   */
+  virtual void put_negative (const db::Edge & /*edge*/, int /*layer*/) const { }
 
 private:
   const EdgeRelationFilter *mp_check;
@@ -416,19 +445,24 @@ private:
   std::vector<db::EdgePair> m_ep;
   std::multimap<std::pair<db::Edge, size_t>, size_t> m_e2ep;
   std::vector<bool> m_ep_discarded;
+  bool m_with_shielding;
+  bool m_has_edge_pair_output;
+  bool m_has_negative_edge_output;
   unsigned int m_pass;
 };
 
 /**
- *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
+ *  @brief A helper class for the DRC functionality
+ *
+ *  This class implements the edge-to-edge part of the polygon DRC.
  */
 template <class Output>
 class DB_PUBLIC_TEMPLATE edge2edge_check
   : public Edge2EdgeCheckBase
 {
 public:
-  edge2edge_check (const EdgeRelationFilter &check, Output &output, bool different_polygons, bool requires_different_layers)
-    : Edge2EdgeCheckBase (check, different_polygons, requires_different_layers), mp_output (&output)
+  edge2edge_check (const EdgeRelationFilter &check, Output &output, bool different_polygons, bool requires_different_layers, bool with_shielding)
+    : Edge2EdgeCheckBase (check, different_polygons, requires_different_layers, with_shielding), mp_output (&output)
   {
     //  .. nothing yet ..
   }
@@ -441,6 +475,82 @@ protected:
 
 private:
   Output *mp_output;
+};
+
+/**
+ *  @brief A helper class for the DRC functionality
+ *
+ *  This class implements the edge-to-edge part of the polygon DRC.
+ *  This version allows delivery of the negative edges.
+ */
+template <class Output, class NegativeEdgeOutput>
+class DB_PUBLIC_TEMPLATE edge2edge_check_with_negative_output
+  : public Edge2EdgeCheckBase
+{
+public:
+  edge2edge_check_with_negative_output (const EdgeRelationFilter &check, Output &output, NegativeEdgeOutput &l1_negative_output, NegativeEdgeOutput &l2_negative_output, bool different_polygons, bool requires_different_layers, bool with_shielding)
+    : Edge2EdgeCheckBase (check, different_polygons, requires_different_layers, with_shielding),
+      mp_output (&output),
+      mp_l1_negative_output (&l1_negative_output),
+      mp_l2_negative_output (&l2_negative_output)
+  {
+    set_has_negative_edge_output (true);
+  }
+
+protected:
+  void put (const db::EdgePair &ep) const
+  {
+    mp_output->insert (ep);
+  }
+
+  void put_negative (const db::Edge &edge, int layer) const
+  {
+    if (layer == 0) {
+      mp_l1_negative_output->insert (edge);
+    }
+    if (layer == 1) {
+      mp_l2_negative_output->insert (edge);
+    }
+  }
+
+private:
+  Output *mp_output;
+  NegativeEdgeOutput *mp_l1_negative_output, *mp_l2_negative_output;
+};
+
+/**
+ *  @brief A helper class for the DRC functionality
+ *
+ *  This class implements the edge-to-edge part of the polygon DRC.
+ *  This version has only negative edge output.
+ */
+template <class Output, class NegativeEdgeOutput>
+class DB_PUBLIC_TEMPLATE edge2edge_check_negative
+  : public Edge2EdgeCheckBase
+{
+public:
+  edge2edge_check_negative (const EdgeRelationFilter &check, NegativeEdgeOutput &l1_negative_output, NegativeEdgeOutput &l2_negative_output, bool different_polygons, bool requires_different_layers, bool with_shielding)
+    : Edge2EdgeCheckBase (check, different_polygons, requires_different_layers, with_shielding),
+      mp_l1_negative_output (&l1_negative_output),
+      mp_l2_negative_output (&l2_negative_output)
+  {
+    set_has_negative_edge_output (true);
+    set_has_edge_pair_output (false);
+  }
+
+protected:
+  void put_negative (const db::Edge &edge, int layer) const
+  {
+    if (layer == 0) {
+      mp_l1_negative_output->insert (edge);
+    }
+    if (layer == 1) {
+      mp_l2_negative_output->insert (edge);
+    }
+  }
+
+private:
+  NegativeEdgeOutput *mp_l1_negative_output, *mp_l2_negative_output;
 };
 
 /**

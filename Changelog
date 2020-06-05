@@ -14,6 +14,8 @@
       Perimenter can be included in antenna area for the
       antenna check. This also includes a mode in which only
       the perimeter is considered.
+* Enhancement: %GITHUB%/issues/560
+      A library can be associated with multiple technologies now.
 * Bugfix: width of cell and library side panels could not be 
       reduced below the width of the selection boxes in the
       header

@@ -4681,7 +4681,9 @@ LayoutView::active_library_changed (int /*index*/)
 void
 LayoutView::cellview_changed (unsigned int index)
 {
-  mp_hierarchy_panel->do_update_content (index);
+  if (mp_hierarchy_panel) {
+    mp_hierarchy_panel->do_update_content (index);
+  }
 
   cellview_changed_event (index);
 

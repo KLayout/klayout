@@ -428,14 +428,17 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::TextRef, db::PolygonRef> &interactions, std::unordered_set<db::TextRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::TextRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::TextRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
+    tl_assert (results.size () == 1);
+    std::unordered_set<db::TextRef> &result = results.front ();
+
     db::box_scanner2<db::TextRef, size_t, db::Polygon, size_t> scanner;
 
     std::set<db::PolygonRef> others;
     for (shape_interactions<db::TextRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       for (shape_interactions<db::TextRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        others.insert (interactions.intruder_shape (*j));
+        others.insert (interactions.intruder_shape (*j).second);
       }
     }
 
@@ -524,14 +527,17 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout *layout, const shape_interactions<db::TextRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void compute_local (db::Layout *layout, const shape_interactions<db::TextRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
+    tl_assert (results.size () == 1);
+    std::unordered_set<db::PolygonRef> &result = results.front ();
+
     db::box_scanner2<db::TextRef, size_t, db::Polygon, size_t> scanner;
 
     std::set<db::PolygonRef> others;
     for (shape_interactions<db::TextRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       for (shape_interactions<db::TextRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        others.insert (interactions.intruder_shape (*j));
+        others.insert (interactions.intruder_shape (*j).second);
       }
     }
 

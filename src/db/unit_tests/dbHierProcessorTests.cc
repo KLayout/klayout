@@ -55,18 +55,19 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void compute_local (db::Layout *layout, const db::shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t max_vertex_count, double area_ratio) const
+  virtual void compute_local (db::Layout *layout, const db::shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
   {
     db::shape_interactions<db::PolygonRef, db::PolygonRef> sized_interactions = interactions;
     for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = sized_interactions.begin (); i != sized_interactions.end (); ++i) {
       for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        const db::PolygonRef &ref = interactions.intruder_shape (*j);
-        db::Polygon poly = ref.obj ().transformed (ref.trans ());
+        const std::pair<unsigned int, db::PolygonRef> &intruder = interactions.intruder_shape (*j);
+        db::Polygon poly = intruder.second.obj ().transformed (intruder.second.trans ());
         poly.size (m_dist, m_dist);
-        sized_interactions.add_intruder_shape (*j, db::PolygonRef (poly, layout->shape_repository ()));
+        sized_interactions.add_intruder_shape (*j, intruder.first, db::PolygonRef (poly, layout->shape_repository ()));
       }
     }
-    BoolAndOrNotLocalOperation::compute_local (layout, sized_interactions, result, max_vertex_count, area_ratio);
+
+    BoolAndOrNotLocalOperation::compute_local (layout, sized_interactions, results, max_vertex_count, area_ratio);
   }
 
   db::Coord dist () const
@@ -91,26 +92,28 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void compute_local (db::Layout *layout, const db::shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t max_vertex_count, double area_ratio) const
+  virtual void compute_local (db::Layout *layout, const db::shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
   {
     db::shape_interactions<db::PolygonRef, db::PolygonRef> sized_interactions = interactions;
     for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = sized_interactions.begin (); i != sized_interactions.end (); ++i) {
 
       const db::PolygonRef &ref = interactions.subject_shape (i->first);
+
       db::Polygon poly = ref.obj ().transformed (ref.trans ());
       poly.size (m_dist / 2, m_dist / 2);
       sized_interactions.add_subject_shape (i->first, db::PolygonRef (poly, layout->shape_repository ()));
 
       for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        const db::PolygonRef &ref = interactions.intruder_shape (*j);
+        unsigned int il = interactions.intruder_shape (*j).first;
+        const db::PolygonRef &ref = interactions.intruder_shape (*j).second;
         db::Polygon poly = ref.obj ().transformed (ref.trans ());
         poly.size (m_dist / 2, m_dist / 2);
-        sized_interactions.add_intruder_shape (*j, db::PolygonRef (poly, layout->shape_repository ()));
+        sized_interactions.add_intruder_shape (*j, il, db::PolygonRef (poly, layout->shape_repository ()));
       }
 
     }
 
-    SelfOverlapMergeLocalOperation::compute_local (layout, sized_interactions, result, max_vertex_count, area_ratio);
+    SelfOverlapMergeLocalOperation::compute_local (layout, sized_interactions, results, max_vertex_count, area_ratio);
   }
 
   db::Coord dist () const
@@ -149,7 +152,15 @@ static std::string contexts_to_s (db::Layout *layout, db::local_processor_contex
     if (cc != contexts.context_map ().end ()) {
       int index = 1;
       for (db::local_processor_cell_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef>::iterator j = cc->second.begin (); j != cc->second.end (); ++j) {
-        res += tl::sprintf ("%s[%d] %d insts, %d shapes (%d times)\n", layout->cell_name (*i), index, int (j->first.first.size ()), int (j->first.second.size ()), int (j->second.size ()));
+        size_t nshapes = 0;
+        for (std::map<unsigned int, std::set<db::PolygonRef> >::const_iterator i = j->first.second.begin (); i != j->first.second.end (); ++i) {
+          nshapes += i->second.size ();
+        }
+        if (j->first.first.size () > 1) {
+          res += tl::sprintf ("%s[%d] %d insts, %d shapes/%d layers (%d times)\n", layout->cell_name (*i), index, int (j->first.first.size ()), int (nshapes), int (j->first.second.size ()), int (j->second.size ()));
+        } else {
+          res += tl::sprintf ("%s[%d] %d insts, %d shapes (%d times)\n", layout->cell_name (*i), index, int (j->first.first.size ()), int (nshapes), int (j->second.size ()));
+        }
         index += 1;
       }
     }
@@ -233,9 +244,12 @@ static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode m
       proc.run (lop, l1, l2, lout);
     } else {
       db::local_processor_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef> contexts;
-      proc.compute_contexts (contexts, lop, l1, l2);
+      std::vector<unsigned int> ilv, olv;
+      ilv.push_back (l2);
+      olv.push_back (lout);
+      proc.compute_contexts (contexts, lop, l1, ilv);
       *context_doc = contexts_to_s (&layout_org, contexts);
-      proc.compute_results (contexts, lop, lout);
+      proc.compute_results (contexts, lop, olv);
     }
 
   } else {
@@ -251,9 +265,12 @@ static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode m
       proc.run (lop, l1, l2, lout);
     } else {
       db::local_processor_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef> contexts;
-      proc.compute_contexts (contexts, lop, l1, l2);
+      std::vector<unsigned int> ilv, olv;
+      ilv.push_back (l2);
+      olv.push_back (lout);
+      proc.compute_contexts (contexts, lop, l1, ilv);
       *context_doc = contexts_to_s (&layout_org, contexts);
-      proc.compute_results (contexts, lop, lout);
+      proc.compute_results (contexts, lop, olv);
     }
 
   }

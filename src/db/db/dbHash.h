@@ -420,6 +420,23 @@ namespace std
       return hf;
     }
   };
+
+  /**
+   *  @brief Generic hash for an ordered map
+   */
+  template <class T1, class T2>
+  struct hash<std::map<T1, T2> >
+  {
+    size_t operator() (const std::map<T1, T2> &o) const
+    {
+      size_t hf = 0;
+      for (typename std::map<T1, T2>::const_iterator i = o.begin (); i != o.end (); ++i) {
+        hf = hfunc (hf, std::hash <T1> () (i->first));
+        hf = hfunc (hf, std::hash <T2> () (i->second));
+      }
+      return hf;
+    }
+  };
 }
 
 #endif

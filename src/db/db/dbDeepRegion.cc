@@ -1267,8 +1267,11 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::EdgePair> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
+    tl_assert (results.size () == 1);
+    std::unordered_set<db::EdgePair> &result = results.front ();
+
     edge2edge_check<std::unordered_set<db::EdgePair> > edge_check (m_check, result, m_different_polygons, m_has_other, true /*shielded*/);
     poly2poly_check<std::unordered_set<db::EdgePair> > poly_check (edge_check);
 
@@ -1280,7 +1283,7 @@ public:
       std::set<db::PolygonRef> others;
       for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
         for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-          others.insert (interactions.intruder_shape (*j));
+          others.insert (interactions.intruder_shape (*j).second);
         }
       }
 
@@ -1305,7 +1308,7 @@ public:
       for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
         polygons.insert (interactions.subject_shape (i->first));
         for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-          polygons.insert (interactions.intruder_shape (*j));
+          polygons.insert (interactions.intruder_shape (*j).second);
         }
       }
 
@@ -1443,14 +1446,17 @@ public:
     return m_touching ? 1 : 0;
   }
 
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
+    tl_assert (results.size () == 1);
+    std::unordered_set<db::PolygonRef> &result = results.front ();
+
     db::EdgeProcessor ep;
 
     std::set<db::PolygonRef> others;
     for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        others.insert (interactions.intruder_shape (*j));
+        others.insert (interactions.intruder_shape (*j).second);
       }
     }
 
@@ -1525,14 +1531,17 @@ public:
     return m_touching ? 1 : 0;
   }
 
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
+    tl_assert (results.size () == 1);
+    std::unordered_set<db::PolygonRef> &result = results.front ();
+
     db::EdgeProcessor ep;
 
     std::set<db::PolygonRef> others;
     for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        others.insert (interactions.intruder_shape (*j));
+        others.insert (interactions.intruder_shape (*j).second);
       }
     }
 
@@ -1641,8 +1650,11 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
+    tl_assert (results.size () == 1);
+    std::unordered_set<db::PolygonRef> &result = results.front ();
+
     db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> scanner;
 
     ResultInserter inserter (layout, result);
@@ -1650,7 +1662,7 @@ public:
 
     for (shape_interactions<db::PolygonRef, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       for (shape_interactions<db::PolygonRef, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        scanner.insert2 (& interactions.intruder_shape (*j), 0);
+        scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
       }
     }
 
@@ -1706,8 +1718,11 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
+    tl_assert (results.size () == 1);
+    std::unordered_set<db::Edge> &result = results.front ();
+
     db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> scanner;
 
     EdgeResultInserter inserter (result);
@@ -1715,7 +1730,7 @@ public:
 
     for (shape_interactions<db::PolygonRef, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       for (shape_interactions<db::PolygonRef, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        scanner.insert2 (& interactions.intruder_shape (*j), 0);
+        scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
       }
     }
 
@@ -1777,8 +1792,11 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::TextRef> &interactions, std::unordered_set<db::TextRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::TextRef> &interactions, std::vector<std::unordered_set<db::TextRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
+    tl_assert (results.size () == 1);
+    std::unordered_set<db::TextRef> &result = results.front ();
+
     db::box_scanner2<db::Polygon, size_t, db::TextRef, size_t> scanner;
 
     TextResultInserter inserter (result);
@@ -1786,7 +1804,7 @@ public:
 
     for (shape_interactions<db::PolygonRef, db::TextRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       for (shape_interactions<db::PolygonRef, db::TextRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        scanner.insert2 (& interactions.intruder_shape (*j), 0);
+        scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
       }
     }
 
@@ -1830,8 +1848,11 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::TextRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::TextRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
+    tl_assert (results.size () == 1);
+    std::unordered_set<db::PolygonRef> &result = results.front ();
+
     db::box_scanner2<db::Polygon, size_t, db::TextRef, size_t> scanner;
 
     ResultInserter inserter (layout, result);
@@ -1839,7 +1860,7 @@ public:
 
     for (shape_interactions<db::PolygonRef, db::Text>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       for (shape_interactions<db::PolygonRef, db::Text>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        scanner.insert2 (& interactions.intruder_shape (*j), 0);
+        scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
       }
     }
 

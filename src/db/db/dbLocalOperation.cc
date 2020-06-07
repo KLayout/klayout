@@ -59,8 +59,11 @@ BoolAndOrNotLocalOperation::description () const
 }
 
 void
-BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t max_vertex_count, double area_ratio) const
+BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
 {
+  tl_assert (results.size () == 1);
+  std::unordered_set<db::PolygonRef> &result = results.front ();
+
   db::EdgeProcessor ep;
 
   size_t p1 = 0, p2 = 1;
@@ -68,7 +71,7 @@ BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const shape_inter
   std::set<db::PolygonRef> others;
   for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
     for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-      others.insert (interactions.intruder_shape (*j));
+      others.insert (interactions.intruder_shape (*j).second);
     }
   }
 
@@ -120,8 +123,12 @@ SelfOverlapMergeLocalOperation::SelfOverlapMergeLocalOperation (unsigned int wra
   //  .. nothing yet ..
 }
 
-void SelfOverlapMergeLocalOperation::compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+void
+SelfOverlapMergeLocalOperation::compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
+  tl_assert (results.size () == 1);
+  std::unordered_set<db::PolygonRef> &result = results.front ();
+
   if (m_wrap_count == 0) {
     return;
   }
@@ -147,7 +154,7 @@ void SelfOverlapMergeLocalOperation::compute_local (db::Layout *layout, const sh
       //  set does not take care to list just one copy of the same item on the intruder side.
       if (seen.find (*o) == seen.end ()) {
         seen.insert (*o);
-        const db::PolygonRef &intruder = interactions.intruder_shape (*o);
+        const db::PolygonRef &intruder = interactions.intruder_shape (*o).second;
         for (db::PolygonRef::polygon_edge_iterator e = intruder.begin_edge (); ! e.at_end(); ++e) {
           ep.insert (*e, p2);
         }
@@ -204,8 +211,11 @@ EdgeBoolAndOrNotLocalOperation::description () const
 }
 
 void
-EdgeBoolAndOrNotLocalOperation::compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+EdgeBoolAndOrNotLocalOperation::compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
+  tl_assert (results.size () == 1);
+  std::unordered_set<db::Edge> &result = results.front ();
+
   EdgeBooleanClusterCollector<std::unordered_set<db::Edge> > cluster_collector (&result, m_op);
 
   db::box_scanner<db::Edge, size_t> scanner;
@@ -213,7 +223,7 @@ EdgeBoolAndOrNotLocalOperation::compute_local (db::Layout * /*layout*/, const sh
   std::set<db::Edge> others;
   for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
     for (shape_interactions<db::Edge, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-      others.insert (interactions.intruder_shape (*j));
+      others.insert (interactions.intruder_shape (*j).second);
     }
   }
 
@@ -272,14 +282,17 @@ EdgeToPolygonLocalOperation::description () const
 }
 
 void
-EdgeToPolygonLocalOperation::compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+EdgeToPolygonLocalOperation::compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
+  tl_assert (results.size () == 1);
+  std::unordered_set<db::Edge> &result = results.front ();
+
   db::EdgeProcessor ep;
 
   std::set<db::PolygonRef> others;
   for (shape_interactions<db::Edge, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
     for (shape_interactions<db::Edge, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-      others.insert (interactions.intruder_shape (*j));
+      others.insert (interactions.intruder_shape (*j).second);
     }
   }
 

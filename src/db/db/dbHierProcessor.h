@@ -56,7 +56,7 @@ public:
   typedef container::const_iterator iterator;
   typedef container::value_type::second_type::const_iterator iterator2;
   typedef typename std::unordered_map<unsigned int, TS>::const_iterator subject_iterator;
-  typedef typename std::unordered_map<unsigned int, TI>::const_iterator intruder_iterator;
+  typedef typename std::unordered_map<unsigned int, std::pair<unsigned int, TI> >::const_iterator intruder_iterator;
 
   shape_interactions ();
 
@@ -92,13 +92,13 @@ public:
 
   bool has_intruder_shape_id (unsigned int id) const;
   bool has_subject_shape_id (unsigned int id) const;
-  void add_intruder_shape (unsigned int id, const TI &shape);
+  void add_intruder_shape (unsigned int id, unsigned int layer, const TI &shape);
   void add_subject_shape (unsigned int id, const TS &shape);
   void add_subject (unsigned int id, const TS &shape);
   void add_interaction (unsigned int subject_id, unsigned int intruder_id);
   const std::vector<unsigned int> &intruders_for (unsigned int subject_id) const;
   const TS &subject_shape (unsigned int id) const;
-  const TI &intruder_shape (unsigned int id) const;
+  const std::pair<unsigned int, TI> &intruder_shape (unsigned int id) const;
 
   unsigned int next_id ()
   {
@@ -108,7 +108,7 @@ public:
 private:
   std::unordered_map<unsigned int, std::vector<unsigned int> > m_interactions;
   std::unordered_map<unsigned int, TS> m_subject_shapes;
-  std::unordered_map<unsigned int, TI> m_intruder_shapes;
+  std::unordered_map<unsigned int, std::pair<unsigned int, TI> > m_intruder_shapes;
   unsigned int m_id;
 };
 
@@ -139,16 +139,22 @@ public:
   local_processor_cell_context (const local_processor_cell_context &other);
 
   void add (db::local_processor_cell_context<TS, TI, TR> *parent_context, db::Cell *parent, const db::ICplxTrans &cell_inst);
-  void propagate (const std::unordered_set<TR> &res);
+  void propagate (unsigned int layer, const std::unordered_set<TR> &res);
 
-  std::unordered_set<TR> &propagated ()
+  std::unordered_set<TR> &propagated (unsigned int l)
   {
-    return m_propagated;
+    return m_propagated [l];
   }
 
-  const std::unordered_set<TR> &propagated () const
+  const std::unordered_set<TR> &propagated (unsigned int l) const
   {
-    return m_propagated;
+    typename std::map<unsigned int, std::unordered_set<TR> >::const_iterator i = m_propagated.find (l);
+    if (i != m_propagated.end ()) {
+      return i->second;
+    } else {
+      static std::unordered_set<TR> s_empty;
+      return s_empty;
+    }
   }
 
   size_t size () const
@@ -174,7 +180,7 @@ public:
   }
 
 private:
-  std::unordered_set<TR> m_propagated;
+  std::map<unsigned int, std::unordered_set<TR> > m_propagated;
   std::vector<local_processor_cell_drop<TS, TI, TR> > m_drops;
   tl::Mutex m_lock;
 };
@@ -183,7 +189,7 @@ template <class TS, class TI, class TR>
 class DB_PUBLIC local_processor_cell_contexts
 {
 public:
-  typedef std::pair<std::set<CellInstArray>, std::set<TI> > context_key_type;
+  typedef std::pair<std::set<CellInstArray>, std::map<unsigned int, std::set<TI> > > context_key_type;
   typedef std::unordered_map<context_key_type, db::local_processor_cell_context<TS, TI, TR> > context_map_type;
   typedef typename context_map_type::const_iterator iterator;
 
@@ -192,7 +198,7 @@ public:
 
   db::local_processor_cell_context<TS, TI, TR> *find_context (const context_key_type &intruders);
   db::local_processor_cell_context<TS, TI, TR> *create (const context_key_type &intruders);
-  void compute_results (const local_processor_contexts<TS, TI, TR> &contexts, db::Cell *cell, const local_operation<TS, TI, TR> *op, unsigned int output_layer, const local_processor<TS, TI, TR> *proc);
+  void compute_results (const local_processor_contexts<TS, TI, TR> &contexts, db::Cell *cell, const local_operation<TS, TI, TR> *op, const std::vector<unsigned int> &output_layer, const local_processor<TS, TI, TR> *proc);
 
   size_t size () const
   {
@@ -222,13 +228,13 @@ public:
   typedef typename contexts_per_cell_type::iterator iterator;
 
   local_processor_contexts ()
-    : m_subject_layer (0), m_intruder_layer (0)
+    : m_subject_layer (0), m_intruder_layers ()
   {
     //  .. nothing yet ..
   }
 
   local_processor_contexts (const local_processor_contexts &other)
-    : m_contexts_per_cell (other.m_contexts_per_cell), m_subject_layer (other.m_subject_layer), m_intruder_layer (other.m_intruder_layer)
+    : m_contexts_per_cell (other.m_contexts_per_cell), m_subject_layer (other.m_subject_layer), m_intruder_layers (other.m_intruder_layers)
   {
     //  .. nothing yet ..
   }
@@ -272,14 +278,14 @@ public:
     return m_subject_layer;
   }
 
-  void set_intruder_layer (unsigned int l)
+  void set_intruder_layers (const std::vector<unsigned int> &l)
   {
-    m_intruder_layer = l;
+    m_intruder_layers = l;
   }
 
-  unsigned int intruder_layer () const
+  const std::vector<unsigned int> &intruder_layers () const
   {
-    return m_intruder_layer;
+    return m_intruder_layers;
   }
 
   tl::Mutex &lock () const
@@ -289,7 +295,8 @@ public:
 
 private:
   contexts_per_cell_type m_contexts_per_cell;
-  unsigned int m_subject_layer, m_intruder_layer;
+  unsigned int m_subject_layer;
+  std::vector<unsigned int> m_intruder_layers;
   mutable tl::Mutex m_lock;
 };
 
@@ -335,7 +342,7 @@ class DB_PUBLIC local_processor_result_computation_task
   : public tl::Task
 {
 public:
-  local_processor_result_computation_task (const local_processor<TS, TI, TR> *proc, local_processor_contexts<TS, TI, TR> &contexts, db::Cell *cell, local_processor_cell_contexts<TS, TI, TR> *cell_contexts, const local_operation<TS, TI, TR> *op, unsigned int output_layer);
+  local_processor_result_computation_task (const local_processor<TS, TI, TR> *proc, local_processor_contexts<TS, TI, TR> &contexts, db::Cell *cell, local_processor_cell_contexts<TS, TI, TR> *cell_contexts, const local_operation<TS, TI, TR> *op, const std::vector<unsigned int> &output_layers);
   void perform ();
 
 private:
@@ -344,7 +351,7 @@ private:
   db::Cell *mp_cell;
   local_processor_cell_contexts<TS, TI, TR> *mp_cell_contexts;
   const local_operation<TS, TI, TR> *mp_op;
-  unsigned int m_output_layer;
+  std::vector<unsigned int> m_output_layers;
 };
 
 template <class TS, class TI, class TR>
@@ -370,9 +377,11 @@ class DB_PUBLIC local_processor
 public:
   local_processor (db::Layout *layout, db::Cell *top, const std::set<db::cell_index_type> *breakout_cells = 0);
   local_processor (db::Layout *subject_layout, db::Cell *subject_top, const db::Layout *intruder_layout, const db::Cell *intruder_cell, const std::set<db::cell_index_type> *subject_breakout_cells = 0, const std::set<db::cell_index_type> *intruder_breakout_cells = 0);
-  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer);
-  void compute_contexts (local_processor_contexts<TS, TI, TR> &contexts, const local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer) const;
-  void compute_results (local_processor_contexts<TS, TI, TR> &contexts, const local_operation<TS, TI, TR> *op, unsigned int output_layer) const;
+  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layers);
+  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers, const std::vector<unsigned int> &output_layers);
+  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers, unsigned int output_layer);
+  void compute_contexts (local_processor_contexts<TS, TI, TR> &contexts, const local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers) const;
+  void compute_results (local_processor_contexts<TS, TI, TR> &contexts, const local_operation<TS, TI, TR> *op, const std::vector<unsigned int> &output_layers) const;
 
   void set_description (const std::string &d)
   {
@@ -445,8 +454,8 @@ private:
   void do_compute_contexts (db::local_processor_cell_context<TS, TI, TR> *cell_context, const db::local_processor_contexts<TS, TI, TR> &contexts, db::local_processor_cell_context<TS, TI, TR> *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, db::Coord dist) const;
   void issue_compute_contexts (db::local_processor_contexts<TS, TI, TR> &contexts, db::local_processor_cell_context<TS, TI, TR> *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, db::Coord dist) const;
   void push_results (db::Cell *cell, unsigned int output_layer, const std::unordered_set<TR> &result) const;
-  void compute_local_cell (const db::local_processor_contexts<TS, TI, TR> &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const local_operation<TS, TI, TR> *op, const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, std::unordered_set<TR> &result) const;
-  std::pair<bool, db::CellInstArray> effective_instance (local_processor_contexts<TS, TI, TR> &contexts, db::cell_index_type subject_cell_index, db::cell_index_type intruder_cell_index, const db::ICplxTrans &ti2s, db::Coord dist) const;
+  void compute_local_cell (const db::local_processor_contexts<TS, TI, TR> &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const local_operation<TS, TI, TR> *op, const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, std::vector<std::unordered_set<TR> > &result) const;
+  std::pair<bool, db::CellInstArray> effective_instance (unsigned int subject_layer, db::cell_index_type subject_cell_index, unsigned int intruder_layer, db::cell_index_type intruder_cell_index, const db::ICplxTrans &ti2s, db::Coord dist) const;
 
   bool subject_cell_is_breakout (db::cell_index_type ci) const
   {

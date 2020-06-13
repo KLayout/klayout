@@ -44,6 +44,12 @@ namespace db
 {
 
 /**
+ *  @brief Correct a path relative to the stream and technology
+ */
+DB_PLUGIN_PUBLIC
+std::string correct_path (const std::string &fn, const db::Layout &layout, const std::string &base_path);
+
+/**
  *  @brief Generic base class of DXF reader exceptions
  */
 class DB_PLUGIN_PUBLIC LEFDEFReaderException
@@ -619,46 +625,19 @@ public:
   /**
    *  @brief Constructor
    */
-  LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout &layout);
+  LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout &layout, const std::string &base_path = std::string ());
 
   /**
-   *  @brief Provides an explicit layer mapping
-   *  This method is used when reading the layer map file.
-   */
-  void map_layer_explicit (const std::string &n, LayerPurpose purpose, const LayerProperties &lp, unsigned int layer);
-
-  /**
-   *  @brief Provides an explicit layer mapping
-   *  If this flag is set, the layer mapping specified in the reader options are ignored.
-   */
-  void set_explicit_layer_mapping (bool f);
-
-  /**
-   *  @brief Reads a map file
+   *  @brief Reads the given map file
+   *
+   *  Usually this file is read by the constructor. This method is provided for test purposes.
    */
   void read_map_file (const std::string &path, db::Layout &layout);
-
-  /**
-   *  @brief Sets the layer map
-   */
-  virtual void set_layer_map (const db::LayerMap &lm, bool create_layers)
-  {
-    m_layer_map = lm;
-    m_create_layers = create_layers;
-  }
 
   /**
    *  @brief Gets the layer map
    */
   const db::LayerMap &layer_map () const
-  {
-    return m_layer_map;
-  }
-
-  /**
-   *  @brief Gets the layer map (non-const version)
-   */
-  db::LayerMap &layer_map ()
   {
     return m_layer_map;
   }
@@ -708,6 +687,7 @@ private:
   const LEFDEFReaderOptions *mp_tech_comp;
 
   std::pair <bool, unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose);
+  void map_layer_explicit (const std::string &n, LayerPurpose purpose, const LayerProperties &lp, unsigned int layer);
 };
 
 /**

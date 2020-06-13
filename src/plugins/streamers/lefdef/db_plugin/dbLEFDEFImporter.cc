@@ -23,6 +23,7 @@
 
 #include "dbLEFDEFImporter.h"
 #include "dbLayoutUtils.h"
+#include "dbTechnology.h"
 
 #include "tlStream.h"
 #include "tlProgress.h"
@@ -32,6 +33,39 @@
 
 namespace db
 {
+
+// -----------------------------------------------------------------------------------
+//  Path resolution utility
+
+std::string correct_path (const std::string &fn, const db::Layout &layout, const std::string &base_path)
+{
+  if (! tl::is_absolute (fn)) {
+
+    //  if a technology is given and the file can be found in the technology's base path, take it
+    //  from there.
+    std::string tn = layout.meta_info_value ("technology");
+    const db::Technology *tech = 0;
+    if (! tn.empty ()) {
+      tech = db::Technologies::instance ()->technology_by_name (tn);
+    }
+
+    if (tech && ! tech->base_path ().empty ()) {
+      std::string new_fn = tl::combine_path (tech->base_path (), fn);
+      if (tl::file_exists (new_fn)) {
+        return new_fn;
+      }
+    }
+
+    if (! base_path.empty ()) {
+      return tl::combine_path (base_path, fn);
+    } else {
+      return fn;
+    }
+
+  } else {
+    return fn;
+  }
+}
 
 // -----------------------------------------------------------------------------------
 //  LEFDEFTechnologyComponent implementation
@@ -157,15 +191,24 @@ LEFDEFReaderOptions::format_name () const
 // -----------------------------------------------------------------------------------
 //  LEFDEFLayerDelegate implementation
 
-LEFDEFReaderState::LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout &layout)
-  : m_create_layers (true), m_has_explicit_layer_mapping (false), m_laynum (1), mp_tech_comp (tc)
+LEFDEFReaderState::LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout &layout, const std::string &base_path)
+  : m_create_layers (true), m_laynum (1), mp_tech_comp (tc)
 {
-  if (tc) {
-    m_layer_map = tc->layer_map ();
-    m_create_layers = tc->read_all_layers ();
-  }
+  m_has_explicit_layer_mapping = ! tc->map_file ().empty ();
+  if (m_has_explicit_layer_mapping) {
 
-  m_layer_map.prepare (layout);
+    read_map_file (correct_path (tc->map_file (), layout, base_path), layout);
+
+  } else {
+
+    if (tc) {
+      m_layer_map = tc->layer_map ();
+      m_create_layers = tc->read_all_layers ();
+    }
+
+    m_layer_map.prepare (layout);
+
+  }
 }
 
 void
@@ -176,17 +219,9 @@ LEFDEFReaderState::register_layer (const std::string &ln)
 }
 
 void
-LEFDEFReaderState::set_explicit_layer_mapping (bool f)
-{
-  m_has_explicit_layer_mapping = f;
-  if (! f) {
-    m_layers.clear ();
-  }
-}
-
-void
 LEFDEFReaderState::map_layer_explicit (const std::string &n, LayerPurpose purpose, const db::LayerProperties &lp, unsigned int layer)
 {
+  tl_assert (m_has_explicit_layer_mapping);
   m_layers [std::make_pair (n, purpose)] = std::make_pair (true, layer);
   m_layer_map.map (lp, layer);
 }
@@ -194,6 +229,8 @@ LEFDEFReaderState::map_layer_explicit (const std::string &n, LayerPurpose purpos
 void
 LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 {
+  tl_assert (m_has_explicit_layer_mapping);
+
   tl::log << tl::to_string (tr ("Reading LEF/DEF map file")) << " " << path;
 
   tl::InputFile file (path);
@@ -298,8 +335,6 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
     }
 
   }
-
-  set_explicit_layer_mapping (true);
 
   db::DirectLayerMapping lm (&layout);
   for (std::map<std::pair<std::string, LayerPurpose>, db::LayerProperties>::const_iterator i = layer_map.begin (); i != layer_map.end (); ++i) {

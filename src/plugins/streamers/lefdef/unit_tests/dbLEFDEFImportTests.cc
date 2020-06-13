@@ -61,7 +61,7 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
 
   tl::Extractor ex (filename);
 
-  db::LEFDEFReaderState ld (&options, layout);
+  db::LEFDEFReaderState ld (&options, layout, fn_path);
 
   db::DEFImporter imp;
 

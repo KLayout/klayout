@@ -352,10 +352,12 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
 
       if (iterate) {
         std::vector<db::Trans> ti = get_iteration (layout);
-        for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
-          cell.insert (db::CellInstArray (db::CellInst (vc->cell_index ()), *t * db::Trans (points [0])));
+        if (vc) {
+          for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
+            cell.insert (db::CellInstArray (db::CellInst (vc->cell_index ()), *t * db::Trans (points [0])));
+          }
         }
-      } else {
+      } else if (vc) {
         cell.insert (db::CellInstArray (db::CellInst (vc->cell_index ()), db::Trans (points [0])));
       }
 

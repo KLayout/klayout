@@ -109,32 +109,6 @@ private:
   tl::InputStream &m_stream;
   db::LayerMap m_layer_map;
 
-  std::string correct_path (const std::string &fn, const db::Layout &layout)
-  {
-    if (! tl::is_absolute (fn)) {
-
-      //  if a technology is given and the file can be found in the technology's base path, take it
-      //  from there.
-      std::string tn = layout.meta_info_value ("technology");
-      const db::Technology *tech = 0;
-      if (! tn.empty ()) {
-        tech = db::Technologies::instance ()->technology_by_name (tn);
-      }
-
-      if (tech && ! tech->base_path ().empty ()) {
-        std::string new_fn = tl::combine_path (tech->base_path (), fn);
-        if (tl::file_exists (new_fn)) {
-          return new_fn;
-        }
-      }
-
-      return tl::combine_path (tl::dirname (m_stream.absolute_path ()), fn);
-
-    } else {
-      return fn;
-    }
-  }
-
   const db::LayerMap &read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &options, bool import_lef)
   {
     const db::LEFDEFReaderOptions *lefdef_options = dynamic_cast<const db::LEFDEFReaderOptions *> (options.get_options (format ()));
@@ -143,11 +117,7 @@ private:
       lefdef_options = &default_options;
     }
 
-    db::LEFDEFReaderState state (lefdef_options, layout);
-
-    if (! lefdef_options->map_file ().empty ()) {
-      state.read_map_file (correct_path (lefdef_options->map_file (), layout), layout);
-    }
+    db::LEFDEFReaderState state (lefdef_options, layout, tl::dirname (m_stream.absolute_path ()));
 
     layout.dbu (lefdef_options->dbu ());
 
@@ -159,7 +129,7 @@ private:
 
       for (std::vector<std::string>::const_iterator l = lefdef_options->begin_lef_files (); l != lefdef_options->end_lef_files (); ++l) {
 
-        std::string lp = correct_path (*l, layout);
+        std::string lp = correct_path (*l, layout, tl::dirname (m_stream.absolute_path ()));
 
         tl::InputStream lef_stream (lp);
         tl::log << tl::to_string (tr ("Reading")) << " " << lp;
@@ -178,7 +148,7 @@ private:
 
       for (std::vector<std::string>::const_iterator l = lefdef_options->begin_lef_files (); l != lefdef_options->end_lef_files (); ++l) {
 
-        std::string lp = correct_path (*l, layout);
+        std::string lp = correct_path (*l, layout, tl::dirname (m_stream.absolute_path ()));
 
         tl::InputStream lef_stream (lp);
         tl::log << tl::to_string (tr ("Reading")) << " " << lp;

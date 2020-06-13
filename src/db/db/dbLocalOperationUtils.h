@@ -63,7 +63,7 @@ private:
   const Trans m_trans;
 };
 
-class PolygonRefGenerator
+class DB_PUBLIC PolygonRefGenerator
   : public PolygonSink
 {
 public:
@@ -82,7 +82,7 @@ private:
   std::unordered_set<db::PolygonRef> *mp_polyrefs;
 };
 
-class EdgeToEdgeSetGenerator
+class DB_PUBLIC EdgeToEdgeSetGenerator
   : public EdgeSink
 {
 public:
@@ -100,7 +100,7 @@ private:
   std::unordered_set<db::Edge> *mp_edges;
 };
 
-class PolygonRefToShapesGenerator
+class DB_PUBLIC PolygonRefToShapesGenerator
   : public PolygonSink
 {
 public:
@@ -119,7 +119,7 @@ private:
   db::Shapes *mp_shapes;
 };
 
-class PolygonSplitter
+class DB_PUBLIC PolygonSplitter
   : public PolygonSink
 {
 public:

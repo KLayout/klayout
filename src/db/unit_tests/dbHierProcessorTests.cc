@@ -27,6 +27,10 @@
 #include "dbTestSupport.h"
 #include "dbReader.h"
 #include "dbCommonReader.h"
+#include "dbEdgeProcessor.h"
+#include "dbPolygonGenerators.h"
+#include "dbLocalOperationUtils.h"
+#include "dbPolygon.h"
 
 static std::string testdata (const std::string &fn)
 {
@@ -39,7 +43,8 @@ enum TestMode
   TMNot = 1,
   TMAndSwapped = 2,
   TMNotSwapped = 3,
-  TMSelfOverlap = 4
+  TMSelfOverlap = 4,
+  TMAndNot = 5
 };
 
 /**
@@ -77,6 +82,88 @@ public:
 
 private:
   db::Coord m_dist;
+};
+
+/**
+ *  @brief A new processor class providing two outputs for two inputs: one for AND and one for NOT
+ */
+class BoolAndPlusNotLocalOperation
+  : public db::local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>
+{
+public:
+  BoolAndPlusNotLocalOperation ()
+    : db::local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual std::string description () const
+  {
+    return std::string ();
+  }
+
+  void compute_local (db::Layout *layout, const db::shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    tl_assert (results.size () == 2);
+
+    db::EdgeProcessor ep;
+
+    //  0: and, 1: not
+    for (unsigned int gen = 0; gen < 2; ++gen) {
+
+      std::unordered_set<db::PolygonRef> &result = results [gen];
+      ep.clear ();
+
+      size_t p1 = 0, p2 = 1;
+
+      std::set<db::PolygonRef> others;
+      for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+        for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+          others.insert (interactions.intruder_shape (*j).second);
+        }
+      }
+
+      for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+
+        const db::PolygonRef &subject = interactions.subject_shape (i->first);
+        if (others.find (subject) != others.end ()) {
+          if (gen == 0) {
+            result.insert (subject);
+          }
+        } else if (i->second.empty ()) {
+          //  shortcut (not: keep, and: drop)
+          if (gen != 0) {
+            result.insert (subject);
+          }
+        } else {
+          for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+            ep.insert (*e, p1);
+          }
+          p1 += 2;
+        }
+
+      }
+
+      if (! others.empty () || p1 > 0) {
+
+        for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
+          for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
+            ep.insert (*e, p2);
+          }
+          p2 += 2;
+        }
+
+        db::BooleanOp op (gen == 0 ? db::BooleanOp::And : db::BooleanOp::ANotB);
+        db::PolygonRefGenerator pr (layout, result);
+        db::PolygonSplitter splitter (pr, area_ratio, max_vertex_count);
+        db::PolygonGenerator pg (splitter, true, true);
+        ep.set_base_verbosity (50);
+        ep.process (pg, op);
+
+      }
+
+    }
+  }
 };
 
 /**
@@ -169,11 +256,11 @@ static std::string contexts_to_s (db::Layout *layout, db::local_processor_contex
   return res;
 }
 
-static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc, bool single, db::Coord dist, unsigned int nthreads = 0)
+static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num1, int out_layer_num2, std::string *context_doc, bool single, db::Coord dist, unsigned int nthreads = 0)
 {
   db::Layout layout_org;
 
-  unsigned int l1 = 0, l2 = 0, lout = 0;
+  unsigned int l1 = 0, l2 = 0, lout1 = 0, lout2 = 0;
   db::LayerMap lmap;
   bool swap = (mode == TMAndSwapped || mode == TMNotSwapped);
 
@@ -197,10 +284,17 @@ static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode m
       layout_org.set_properties (l2, p);
     }
 
-    p.layer = out_layer_num;
+    p.layer = out_layer_num1;
     p.datatype = 0;
-    lmap.map (db::LDPair (out_layer_num, 0), lout = layout_org.insert_layer ());
-    layout_org.set_properties (lout, p);
+    lmap.map (db::LDPair (out_layer_num1, 0), lout1 = layout_org.insert_layer ());
+    layout_org.set_properties (lout1, p);
+
+    if (out_layer_num2 >= 0) {
+      p.layer = out_layer_num2;
+      p.datatype = 0;
+      lmap.map (db::LDPair (out_layer_num2, 0), lout2 = layout_org.insert_layer ());
+      layout_org.set_properties (lout2, p);
+    }
 
     db::LoadLayoutOptions options;
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
@@ -208,7 +302,10 @@ static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode m
     reader.read (layout_org, options);
   }
 
-  layout_org.clear_layer (lout);
+  layout_org.clear_layer (lout1);
+  if (out_layer_num2 >= 0) {
+    layout_org.clear_layer (lout2);
+  }
   normalize_layer (layout_org, l1);
   if (l1 != l2) {
     normalize_layer (layout_org, l2);
@@ -219,7 +316,11 @@ static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode m
   db::SelfOverlapMergeLocalOperation self_intersect_op (2);
   BoolAndOrNotWithSizedLocalOperation sized_bool_op (mode == TMAnd || mode == TMAndSwapped, dist);
   SelfOverlapWithSizedLocalOperation sized_self_intersect_op (2, dist);
-  if (mode == TMSelfOverlap) {
+  BoolAndPlusNotLocalOperation andnot;
+
+  if (mode == TMAndNot) {
+    lop = &andnot;
+  } else if (mode == TMSelfOverlap) {
     if (dist > 0) {
       lop = &sized_self_intersect_op;
     } else {
@@ -233,6 +334,13 @@ static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode m
     }
   }
 
+  std::vector<unsigned int> ilv, olv;
+  ilv.push_back (l2);
+  olv.push_back (lout1);
+  if (out_layer_num2 >= 0) {
+    olv.push_back (lout2);
+  }
+
   if (single) {
 
     db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()));
@@ -241,12 +349,9 @@ static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode m
     proc.set_max_vertex_count (16);
 
     if (! context_doc) {
-      proc.run (lop, l1, l2, lout);
+      proc.run (lop, l1, ilv, olv);
     } else {
       db::local_processor_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef> contexts;
-      std::vector<unsigned int> ilv, olv;
-      ilv.push_back (l2);
-      olv.push_back (lout);
       proc.compute_contexts (contexts, lop, l1, ilv);
       *context_doc = contexts_to_s (&layout_org, contexts);
       proc.compute_results (contexts, lop, olv);
@@ -262,12 +367,9 @@ static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode m
     proc.set_max_vertex_count (16);
 
     if (! context_doc) {
-      proc.run (lop, l1, l2, lout);
+      proc.run (lop, l1, ilv, olv);
     } else {
       db::local_processor_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef> contexts;
-      std::vector<unsigned int> ilv, olv;
-      ilv.push_back (l2);
-      olv.push_back (lout);
       proc.compute_contexts (contexts, lop, l1, ilv);
       *context_doc = contexts_to_s (&layout_org, contexts);
       proc.compute_results (contexts, lop, olv);
@@ -280,22 +382,27 @@ static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode m
 
 static void run_test_bool (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc = 0, unsigned int nthreads = 0)
 {
-  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, true, 0, nthreads);
+  run_test_bool_gen (_this, file, mode, out_layer_num, -1, context_doc, true, 0, nthreads);
 }
 
 static void run_test_bool2 (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc = 0, unsigned int nthreads = 0)
 {
-  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, false, 0, nthreads);
+  run_test_bool_gen (_this, file, mode, out_layer_num, -1, context_doc, false, 0, nthreads);
 }
 
 static void run_test_bool_with_size (tl::TestBase *_this, const char *file, TestMode mode, db::Coord dist, int out_layer_num, std::string *context_doc = 0, unsigned int nthreads = 0)
 {
-  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, true, dist, nthreads);
+  run_test_bool_gen (_this, file, mode, out_layer_num, -1, context_doc, true, dist, nthreads);
 }
 
 static void run_test_bool2_with_size (tl::TestBase *_this, const char *file, TestMode mode, db::Coord dist, int out_layer_num, std::string *context_doc = 0, unsigned int nthreads = 0)
 {
-  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, false, dist, nthreads);
+  run_test_bool_gen (_this, file, mode, out_layer_num, -1, context_doc, false, dist, nthreads);
+}
+
+static void run_test_bool22 (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num1, int out_layer_num2, std::string *context_doc = 0, unsigned int nthreads = 0)
+{
+  run_test_bool_gen (_this, file, mode, out_layer_num1, out_layer_num2, context_doc, false, 0, nthreads);
 }
 
 TEST(BasicAnd1)
@@ -1134,5 +1241,11 @@ TEST(RedundantHierarchyNot2)
 {
   //  Redundant hierarchy, NOT
   run_test_bool2 (_this, "hlp16.gds", TMNot, 101);
+}
+
+TEST(MultipleOutputs)
+{
+  //  Redundant hierarchy, NOT
+  run_test_bool22 (_this, "hlp17.oas", TMAndNot, 100, 101);
 }
 

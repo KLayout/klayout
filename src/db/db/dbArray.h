@@ -2508,7 +2508,7 @@ struct array
     }
     db::mem_stat (stat, purpose, cat, m_obj, true, (void *) this);
     if (mp_base) {
-      db::mem_stat (stat, purpose, cat, *mp_base, false, (void *) this);
+      mp_base->mem_stat (stat, purpose, cat, false, (void *) this);
     }
   }
 

@@ -96,6 +96,27 @@ polygons will be written to the output (labels: red, input2: blue):
 </tr>
 </table>
 </p>
+<a name="andnot"/><h2>"andnot" - Computes Boolean AND and NOT results at the same time</h2>
+<keyword name="andnot"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.andnot(other)</tt></li>
+</ul>
+<p>
+This method returns a two-element array containing one layer for the
+AND result and one for the NOT result.
+</p><p>
+This method is available for polygon layers.
+</p><p>
+It can be used to initialize two variables with the AND and NOT results:
+</p><p>
+<pre>
+(and_result, not_result) = l1.andnot(l2)
+</pre>
+</p><p>
+As the AND and NOT results are computed in the same sweep, calling this
+method is faster than calling AND and NOT separately.
+</p>
 <a name="area"/><h2>"area" - Returns the total area of the polygons in the region</h2>
 <keyword name="area"/>
 <p>Usage:</p>

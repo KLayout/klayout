@@ -29,6 +29,7 @@
 #include "layNetlistBrowser.h"
 #include "layViewObject.h"
 #include "layColorPalette.h"
+#include "tlEvents.h"
 
 namespace lay
 {
@@ -45,6 +46,46 @@ public:
   ~NetlistBrowserDialog ();
 
   void load (int lay_index, int cv_index);
+
+  /**
+   *  @brief This event is emitted after the current database changed
+   */
+  tl::Event current_db_changed_event;
+
+  /**
+   *  @brief This event is emitted when a shape is probed
+   */
+  tl::event<db::Net *, std::vector<db::SubCircuit *> > probe_event;
+
+  /**
+   *  @brief Gets the current database
+   */
+  db::LayoutToNetlist *db ();
+
+  /**
+   *  @brief Gets the selected nets
+   */
+  const std::vector<const db::Net *> &selected_nets () const;
+
+  /**
+   *  @brief Gets the selected devices
+   */
+  const std::vector<const db::Device *> &selected_devices () const;
+
+  /**
+   *  @brief Gets the selected subcircuits
+   */
+  const std::vector<const db::SubCircuit *> &selected_subcircuits () const;
+
+  /**
+   *  @brief Gets the selected circuits
+   */
+  const std::vector<const db::Circuit *> &selected_circuits () const;
+
+  /**
+   *  @brief An event indicating that the selection has changed
+   */
+  tl::Event selection_changed_event;
 
 private:
   //  implementation of the lay::Browser interface
@@ -63,6 +104,11 @@ private:
   void cellviews_changed ();
   void cellview_changed (int index);
   void l2ndbs_changed ();
+
+  void selection_changed ()
+  {
+    selection_changed_event ();
+  }
 
 public slots:
   void cv_index_changed (int);

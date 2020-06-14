@@ -33,6 +33,7 @@
 #include "dbLayoutUtils.h"
 
 #include "tlObject.h"
+#include "tlEvents.h"
 
 #include <QFrame>
 
@@ -90,25 +91,14 @@ public:
   /**
    *  @brief Attaches the page to a L2N DB
    */
-  void set_l2ndb (db::LayoutToNetlist *database)
-  {
-    set_db (database);
-  }
+  void set_db (db::LayoutToNetlist *database);
 
   /**
-   *  @brief Attaches the page to a LVS DB
+   *  @brief Gets the database the page is connected to
    */
-  void set_lvsdb (db::LayoutVsSchematic *database)
+  db::LayoutToNetlist *db ()
   {
-    set_db (database);
-  }
-
-  /**
-   *  @brief Detaches the page from any DB
-   */
-  void reset_db ()
-  {
-    set_db (0);
+    return mp_database.get ();
   }
 
   /**
@@ -161,6 +151,43 @@ public:
    *  @brief Updates net highlights
    */
   void update_highlights ();
+
+  /**
+   *  @brief Gets the selected nets
+   */
+  const std::vector<const db::Net *> &current_nets () const
+  {
+    return m_current_nets;
+  }
+
+  /**
+   *  @brief Gets the selected devices
+   */
+  const std::vector<const db::Device *> &current_devices () const
+  {
+    return m_current_devices;
+  }
+
+  /**
+   *  @brief Gets the selected subcircuits
+   */
+  const std::vector<const db::SubCircuit *> &current_subcircuits () const
+  {
+    return m_current_subcircuits;
+  }
+
+  /**
+   *  @brief Gets the selected circuits
+   */
+  const std::vector<const db::Circuit *> &current_circuits () const
+  {
+    return m_current_circuits;
+  }
+
+  /**
+   *  @brief An event indicating that the selection has changed
+   */
+  tl::Event selection_changed_event;
 
 public slots:
   void export_all ();
@@ -216,7 +243,6 @@ private:
   tl::DeferredMethod<NetlistBrowserPage> dm_rerun_macro;
   db::ContextCache m_cell_context_cache;
 
-  void set_db (db::LayoutToNetlist *l2ndb);
   void setup_trees ();
   void add_to_history (void *id, bool fwd);
   void navigate_to (void *id, bool forward = true);

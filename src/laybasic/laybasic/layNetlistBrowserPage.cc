@@ -795,11 +795,17 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
   m_signals_enabled = se;
 
   clear_markers ();
-  highlight (std::vector<const db::Net *> (), std::vector<const db::Device *> (), std::vector<const db::SubCircuit *> (), std::vector<const db::Circuit *> ());
+
+  m_current_nets.clear ();
+  m_current_devices.clear ();
+  m_current_subcircuits.clear ();
+  m_current_circuits.clear ();
 
   m_cell_context_cache = db::ContextCache (mp_database.get () ? mp_database->internal_layout () : 0);
 
   setup_trees ();
+
+  selection_changed_event ();
 }
 
 void
@@ -901,6 +907,8 @@ NetlistBrowserPage::highlight (const std::vector<const db::Net *> &nets, const s
       adjust_view ();
       update_highlights ();
     }
+
+    selection_changed ();
 
   }
 }

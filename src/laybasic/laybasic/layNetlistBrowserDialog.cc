@@ -120,11 +120,63 @@ NetlistBrowserDialog::NetlistBrowserDialog (lay::Dispatcher *root, lay::LayoutVi
   connect (sticky_cbx, SIGNAL (clicked ()), this, SLOT (sticky_mode_clicked ()));
 
   cellviews_changed ();
+
+  browser_page->selection_changed_event.add (this, &NetlistBrowserDialog::selection_changed);
 }
 
 NetlistBrowserDialog::~NetlistBrowserDialog ()
 {
   tl::Object::detach_from_all_events ();
+}
+
+db::LayoutToNetlist *
+NetlistBrowserDialog::db ()
+{
+  return browser_page->db ();
+}
+
+const std::vector<const db::Net *> &
+NetlistBrowserDialog::selected_nets () const
+{
+  if (browser_page) {
+    return browser_page->current_nets ();
+  } else {
+    static std::vector<const db::Net *> empty;
+    return empty;
+  }
+}
+
+const std::vector<const db::Device *> &
+NetlistBrowserDialog::selected_devices () const
+{
+  if (browser_page) {
+    return browser_page->current_devices ();
+  } else {
+    static std::vector<const db::Device *> empty;
+    return empty;
+  }
+}
+
+const std::vector<const db::SubCircuit *> &
+NetlistBrowserDialog::selected_subcircuits () const
+{
+  if (browser_page) {
+    return browser_page->current_subcircuits ();
+  } else {
+    static std::vector<const db::SubCircuit *> empty;
+    return empty;
+  }
+}
+
+const std::vector<const db::Circuit *> &
+NetlistBrowserDialog::selected_circuits () const
+{
+  if (browser_page) {
+    return browser_page->current_circuits ();
+  } else {
+    static std::vector<const db::Circuit *> empty;
+    return empty;
+  }
 }
 
 void
@@ -254,7 +306,8 @@ NetlistBrowserDialog::probe_net (const db::DPoint &p, bool trace_path)
 
   }
 
-  const db::Net *net = 0;
+  db::Net *net = 0;
+  std::vector<db::SubCircuit *> sc_path;
 
   db::LayoutToNetlist *l2ndb = view ()->get_l2ndb (m_l2n_index);
   if (l2ndb) {
@@ -281,13 +334,17 @@ NetlistBrowserDialog::probe_net (const db::DPoint &p, bool trace_path)
     //  probe the net
 
     for (std::vector<db::Region *>::const_iterator r = regions.begin (); r != regions.end () && !net; ++r) {
-      net = l2ndb->probe_net (**r, start_point);
+      sc_path.clear ();
+      net = l2ndb->probe_net (**r, start_point, &sc_path);
     }
 
   }
 
   //  select the net if one was found
   browser_page->select_net (net);
+
+  //  emits the probe event
+  probe_event (net, sc_path);
 }
 
 void
@@ -421,9 +478,15 @@ BEGIN_PROTECTED
       tl::log << tl::to_string (QObject::tr ("Loading file: ")) << l2ndb->filename ();
       tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Loading")));
 
-      browser_page->set_l2ndb (0);
-      l2ndb->load (l2ndb->filename ());
-      browser_page->set_l2ndb (l2ndb);
+      browser_page->set_db (0);
+      try {
+        l2ndb->load (l2ndb->filename ());
+        browser_page->set_db (l2ndb);
+        current_db_changed_event ();
+      } catch (...) {
+        current_db_changed_event ();
+        throw;
+      }
 
     }
 
@@ -707,6 +770,8 @@ NetlistBrowserDialog::update_content ()
     central_stack->setCurrentIndex (1);
   }
 
+  bool db_changed = false;
+
   m_saveas_action->setEnabled (l2ndb != 0);
   m_export_action->setEnabled (l2ndb != 0);
   m_unload_action->setEnabled (l2ndb != 0);
@@ -714,7 +779,10 @@ NetlistBrowserDialog::update_content ()
   m_reload_action->setEnabled (l2ndb != 0);
 
   browser_page->enable_updates (false);  //  Avoid building the internal lists several times ...
-  browser_page->set_l2ndb (l2ndb);
+  if (browser_page->db () != l2ndb) {
+    db_changed = true;
+    browser_page->set_db (l2ndb);
+  }
   browser_page->set_max_shape_count (m_max_shape_count);
   browser_page->set_highlight_style (m_marker_color, m_marker_line_width, m_marker_vertex_size, m_marker_halo, m_marker_dither_pattern, m_marker_intensity, m_use_original_colors, m_auto_color_enabled ? &m_auto_colors : 0);
   browser_page->set_window (m_window, m_window_dim);
@@ -740,6 +808,10 @@ NetlistBrowserDialog::update_content ()
   if (l2ndb_cb->currentIndex () != m_l2n_index) {
     l2ndb_cb->setCurrentIndex (m_l2n_index);
   }
+
+  if (db_changed) {
+    current_db_changed_event ();
+  }
 }
 
 void
@@ -751,8 +823,16 @@ NetlistBrowserDialog::deactivated ()
     lay::Dispatcher::instance ()->config_set (cfg_l2ndb_window_state, lay::save_dialog_state (this, false /*don't store the section sizes*/).c_str ());
   }
 
-  browser_page->set_l2ndb (0);
+  bool db_changed = false;
+  if (browser_page->db () != 0) {
+    db_changed = true;
+    browser_page->set_db (0);
+  }
   browser_page->set_view (0, 0);
+
+  if (db_changed) {
+    current_db_changed_event ();
+  }
 }
 
 void

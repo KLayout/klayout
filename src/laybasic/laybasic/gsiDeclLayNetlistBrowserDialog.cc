@@ -23,6 +23,7 @@
 
 #include "gsiDecl.h"
 #include "gsiDeclBasic.h"
+#include "gsiSignals.h"
 #include "layNetlistBrowserDialog.h"
 #include "layLayoutView.h"
 
@@ -42,8 +43,39 @@ namespace gsi
 {
 
 Class<lay::NetlistBrowserDialog> decl_NetlistBrowserDialog ("lay", "NetlistBrowserDialog",
-  gsi::Methods (),
-  "@brief ..."
+  gsi::event ("current_db_changed_event", &lay::NetlistBrowserDialog::current_db_changed_event,
+    "@brief This event is triggered when the current database is changed.\n"
+    "The current database can be obtained with \\db."
+  ) +
+  gsi::event ("selection_changed_event", &lay::NetlistBrowserDialog::selection_changed_event,
+    "@brief This event is triggered when the selection changed.\n"
+    "The selection can be obtained with \\selected_nets, \\selected_devices, \\selected_subcircuits and \\selected_circuits."
+  ) +
+  gsi::event ("probe_event", &lay::NetlistBrowserDialog::probe_event, gsi::arg ("net"), gsi::arg ("subcircuit_path"),
+    "@brief This event is triggered when a net is probed.\n"
+    "'subcircuit_path' will contain the subcircuit objects leading to the probed net from the netlist databases' top circuit. "
+    "This path may not be complete - it may contain null entries if a cell instance can't be associated with a subcircuit."
+  ) +
+  gsi::method ("db", &lay::NetlistBrowserDialog::db,
+    "@brief Gets the database the browser is connected to.\n"
+  ) +
+  gsi::method ("selected_nets", &lay::NetlistBrowserDialog::selected_nets,
+    "@brief Gets the nets currently selected in the netlist database browser.\n"
+  ) +
+  gsi::method ("selected_nets", &lay::NetlistBrowserDialog::selected_devices,
+    "@brief Gets the devices currently selected in the netlist database browser.\n"
+  ) +
+  gsi::method ("selected_nets", &lay::NetlistBrowserDialog::selected_subcircuits,
+    "@brief Gets the subcircuits currently selected in the netlist database browser.\n"
+  ) +
+  gsi::method ("selected_nets", &lay::NetlistBrowserDialog::selected_circuits,
+    "@brief Gets the circuits currently selected in the netlist database browser.\n"
+  ),
+  "@brief Represents the netlist browser dialog.\n"
+  "This dialog is a part of the \\LayoutView class and can be obtained through \\LayoutView#netlist_browser.\n"
+  "This interface allows to interact with the browser - mainly to get information about state changes.\n"
+  "\n"
+  "This class has been introduced in version 0.27.\n"
 );
 
 static lay::NetlistBrowserDialog *netlist_browser (lay::LayoutView *lv)

@@ -1698,21 +1698,83 @@ private:
   int m_pn, m_ps;
 };
 
+const size_t skip_info_storage_threshold = 1;
+
 class EdgeProcessorStates
 {
 public:
   struct SkipInfo
   {
-    SkipInfo (size_t _skip, size_t _skip_res)
-      : skip (_skip), skip_res (_skip_res)
-    { }
+    SkipInfo (size_t _skip, const std::vector<size_t> &_skip_res)
+      : skip (_skip), m_skip_res_n (0), m_skip_res (0)
+    {
+      set_skip_res (_skip_res.begin (), _skip_res.end ());
+    }
 
     SkipInfo ()
-      : skip (0), skip_res (0)
+      : skip (0), m_skip_res_n (0), m_skip_res (0)
     { }
 
+    SkipInfo (const SkipInfo &si)
+      : skip (0), m_skip_res_n (0), m_skip_res (0)
+    {
+      operator= (si);
+    }
+
+    ~SkipInfo ()
+    {
+      if (m_skip_res_n > skip_info_storage_threshold) {
+        delete[] skip_res ();
+      }
+    }
+
+    SkipInfo &operator= (const SkipInfo &si)
+    {
+      if (&si != this) {
+        skip = si.skip;
+        const size_t *n = si.skip_res ();
+        set_skip_res (n, n + si.m_skip_res_n);
+      }
+      return *this;
+    }
+
+    template <class Iter>
+    void set_skip_res (Iter b, Iter e)
+    {
+      if (m_skip_res_n > skip_info_storage_threshold) {
+        delete[] (reinterpret_cast<size_t *> (m_skip_res));
+      }
+
+      m_skip_res_n = e - b;
+      if (m_skip_res_n <= skip_info_storage_threshold) {
+        if (b == e) {
+          m_skip_res = 0;
+        } else {
+          m_skip_res = *b;
+        }
+      } else {
+        size_t *t = new size_t[m_skip_res_n];
+        m_skip_res = reinterpret_cast<size_t> (t);
+        for (Iter i = b; i != e; ++i) {
+          *t++ = *i;
+        }
+      }
+    }
+
+    const size_t *skip_res () const
+    {
+      if (m_skip_res_n <= skip_info_storage_threshold) {
+        return &m_skip_res;
+      } else {
+        return reinterpret_cast<const size_t *> (m_skip_res);
+      }
+    }
+
     size_t skip;
-    size_t skip_res;
+
+  private:
+    size_t m_skip_res_n;
+    size_t m_skip_res;
   };
 
   EdgeProcessorStates (const std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > &procs)
@@ -1905,15 +1967,14 @@ public:
    *
    *  This method will return true if at least one of the edge sinks received the edge
    */
-  bool push_edge (const db::Edge &e)
+  void push_edge (const db::Edge &e)
   {
-    bool any = false;
-    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
+    size_t i = 0;
+    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s, ++i) {
       if (s->push_edge (e)) {
-        any = true;
+        ++m_nres [i];
       }
     }
-    return any;
   }
 
   /**
@@ -1922,26 +1983,33 @@ public:
    *  This is for optimization of the polygon generation. Stitching of edges does not happen if
    *  there are no news.
    */
-  void skip_n (size_t n)
+  void skip_n (const SkipInfo &si)
   {
+    const size_t *n = si.skip_res ();
     for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
-      s->skip_n (n);
+      s->skip_n (*n++);
     }
   }
 
   /**
    *  @brief Gets a new SkipInfo entry
    */
-  size_t skip_entry (size_t skip, size_t skip_res)
+  size_t skip_entry (size_t skip, const std::vector<size_t> &skip_res)
   {
     if (! m_skip_queue.empty ()) {
+
       size_t n = m_skip_queue.front ();
       m_skip_queue.pop_front ();
-      m_skip_info[n] = SkipInfo (skip, skip_res);
+      m_skip_info[n].skip = skip;
+      m_skip_info[n].set_skip_res (skip_res.begin (), skip_res.end ());
+
       return n + 1;
+
     } else {
+
       m_skip_info.push_back (SkipInfo (skip, skip_res));
       return m_skip_info.size ();
+
     }
   }
 
@@ -1979,11 +2047,31 @@ public:
     }
   }
 
+  /**
+   *  @brief Begins an interval that can potentially be skipped
+   */
+  void begin_skip_interval ()
+  {
+    m_nres.clear ();
+    m_nres.resize (m_states.size (), size_t (0));
+  }
+
+  /**
+   *  @brief Finishes an interval that can potentially be skipped
+   *
+   *  Returns the index of a new skip interval entry containing the skip information.
+   */
+  size_t end_skip_interval (size_t skip)
+  {
+    return skip_entry (skip, m_nres);
+  }
+
 private:
   std::vector<EdgeProcessorState> m_states;
   bool m_selects_edges, m_prefer_touch;
   std::vector<SkipInfo> m_skip_info;
   std::list<size_t> m_skip_queue;
+  std::vector<size_t> m_nres;
 };
 
 }
@@ -2266,14 +2354,14 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
 
         const EdgeProcessorStates::SkipInfo &skip_info = gs.skip_info (c->data);
 #ifdef DEBUG_EDGE_PROCESSOR
-        printf ("X %ld->%d,%d\n", long (c->data), int (skip_info.skip), int (skip_info.skip_res));
+        printf ("X %ld->%d\n", long (c->data), int (skip_info.skip));
 #endif
 
         if (skip_info.skip != 0 && (c + skip_info.skip >= future || (c + skip_info.skip)->data != 0)) {
 
           tl_assert (c + skip_info.skip <= future);
 
-          gs.skip_n (skip_info.skip_res);
+          gs.skip_n (skip_info);
 
           //  skip this interval - has not changed
           c += skip_info.skip;
@@ -2281,7 +2369,7 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
         } else {
 
           std::vector <WorkEdge>::iterator c0 = c;
-          size_t n_res = 0;
+          gs.begin_skip_interval ();
 
           do {
 
@@ -2388,9 +2476,7 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
               gs.end_coincident ();
 
               if (e != mp_work_edges->end ()) {
-                if (gs.push_edge (*e)) {
-                  ++n_res;
-                }
+                gs.push_edge (*e);
               }
 
             }
@@ -2402,7 +2488,7 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
           } while (c != future && ! gs.is_reset ());
 
           //  TODO: assert that there is no overflow here:
-          c0->data = gs.skip_entry (std::distance (c0, c), n_res);
+          c0->data = gs.end_skip_interval (std::distance (c0, c));
 
         }
 

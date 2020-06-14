@@ -663,9 +663,21 @@ public:
   void clear (); 
 
   /**
-   *  @brief Process the edges stored currently
+   *  @brief Performs the actual processing
+   *
+   *  This method will use the edges stored so far and runs it through the
+   *  scanline algorithm.
    */
   void process (db::EdgeSink &es, EdgeEvaluatorBase &op);
+
+  /**
+   *  @brief Performs the actual processing
+   *
+   *  This version allows giving multiple edge sinks and evaluators.
+   *  Each evaluator is worked on separately and feeds the corresponding
+   *  edge sink.
+   */
+  void process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > &gen);
 
   /**
    *  @brief Merge the given polygons in a simple "non-zero wrapcount" fashion

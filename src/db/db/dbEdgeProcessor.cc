@@ -446,7 +446,7 @@ static inline double edge_xaty2 (db::Edge e, db::Coord y)
 }
 
 /**
- *  @brief A compare operator for edged
+ *  @brief A compare operator for edges
  *  This operator will compare edges by their x position on the scanline
  *  In Addition to EdgeXAtYCompare, this operator will also compare the 
  *  direction of the edges. Edges are equal if the position at which they cross
@@ -1540,10 +1540,397 @@ get_intersections_per_band_any (std::vector <CutPoints> &cutpoints, std::vector 
 void 
 EdgeProcessor::process (db::EdgeSink &es, EdgeEvaluatorBase &op)
 {
+  std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > procs;
+  procs.push_back (std::make_pair (&es, &op));
+  process (procs);
+}
+
+namespace
+{
+
+class EdgeProcessorState
+{
+public:
+  EdgeProcessorState (db::EdgeSink *es, db::EdgeEvaluatorBase *op)
+    : mp_es (es), mp_op (op), m_vertex (false),
+      m_x (0), m_y (0), m_hx (0), m_ho (0), m_pn (0), m_ps (0)
+  { }
+
+  void start ()
+  {
+    mp_es->start ();
+  }
+
+  void flush ()
+  {
+    mp_es->flush ();
+  }
+
+  void reset ()
+  {
+    mp_op->reset ();
+  }
+
+  bool is_reset ()
+  {
+    return mp_op->is_reset ();
+  }
+
+  void reserve (size_t n)
+  {
+    mp_op->reserve (n);
+  }
+
+  void begin_scanline (db::Coord y)
+  {
+    m_y = y;
+    m_x = 0;
+    m_hx = 0;
+    m_ho = 0;
+    m_vertex = false;
+    mp_es->begin_scanline (y);
+  }
+
+  void end_scanline (db::Coord y)
+  {
+    mp_es->end_scanline (y);
+  }
+
+  void next_vertex (double x)
+  {
+    m_x = db::coord_traits<db::Coord>::rounded (x);
+    m_vertex = false;
+  }
+
+  void end_vertex ()
+  {
+    if (m_vertex) {
+      m_hx = m_x;
+      m_ho = mp_op->compare_ns ();
+    }
+  }
+
+  void next_coincident ()
+  {
+    m_pn = m_ps = 0;
+  }
+
+  void end_coincident ()
+  {
+    if (! m_vertex && (m_ps != 0 || m_pn != 0)) {
+
+      if (m_ho != 0) {
+        db::Edge he (db::Point (m_hx, m_y), db::Point (db::coord_traits<db::Coord>::rounded (m_x), m_y));
+        if (m_ho > 0) {
+          he.swap_points ();
+        }
+        mp_es->put (he);
+#ifdef DEBUG_EDGE_PROCESSOR
+        printf ("put(%s)\n", he.to_string ().c_str ());
+#endif
+      }
+
+      m_vertex = true;
+
+    }
+  }
+
+  void north_edge (bool prefer_touch, EdgeEvaluatorBase::property_type prop)
+  {
+    m_pn += mp_op->edge (true, prefer_touch, prop);
+  }
+
+  void south_edge (bool prefer_touch, EdgeEvaluatorBase::property_type prop)
+  {
+    m_ps += mp_op->edge (false, prefer_touch, prop);
+  }
+
+  void select_edge (const WorkEdge &e)
+  {
+    if (mp_op->select_edge (e.dy () == 0, e.prop)) {
+      mp_es->put (e);
+#ifdef DEBUG_EDGE_PROCESSOR
+      printf ("put(%s)\n", e.to_string().c_str());
+#endif
+    }
+  }
+
+  bool push_edge (const db::Edge &e)
+  {
+    if (m_pn != 0) {
+
+      db::Edge edge (e);
+      if ((m_pn > 0 && edge.dy () < 0) || (m_pn < 0 && edge.dy () > 0)) {
+        edge.swap_points ();
+      }
+
+      if (edge_ymin (edge) == m_y) {
+        mp_es->put (edge);
+#ifdef DEBUG_EDGE_PROCESSOR
+        printf ("put(%s)\n", edge.to_string().c_str());
+#endif
+      } else {
+        mp_es->crossing_edge (edge);
+#ifdef DEBUG_EDGE_PROCESSOR
+        printf ("xing(%s)\n", edge.to_string().c_str());
+#endif
+      }
+
+      return true;
+
+    } else {
+      return false;
+    }
+  }
+
+  void skip_n (size_t n)
+  {
+    mp_es->skip_n (n);
+  }
+
+private:
+  db::EdgeSink *mp_es;
+  db::EdgeEvaluatorBase *mp_op;
+
+  bool m_vertex;
+  db::Coord m_x, m_y, m_hx;
+  int m_ho;
+  int m_pn, m_ps;
+};
+
+class EdgeProcessorStates
+{
+public:
+  EdgeProcessorStates (const std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > &procs)
+    : m_selects_edges (false), m_prefer_touch (false)
+  {
+    m_states.reserve (procs.size ());
+    for (std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> >::const_iterator p = procs.begin (); p != procs.end (); ++p) {
+
+      m_states.push_back (EdgeProcessorState (p->first, p->second));
+
+      if (p->second->selects_edges ()) {
+        m_selects_edges = true;
+      }
+
+      if (p->second->prefer_touch ()) {
+        m_prefer_touch = true;
+      }
+
+    }
+  }
+
+  /**
+   *  @brief Returns true if the processors want to select edges
+   */
+  bool selects_edges () const
+  {
+    return m_selects_edges;
+  }
+
+  /**
+   *  @brief Returns true if the processors prefer touching mode
+   */
+  bool prefer_touch () const
+  {
+    return m_prefer_touch;
+  }
+
+  /**
+   *  @brief Initial event
+   *  This method is called when the scan is initiated
+   */
+  void start ()
+  {
+    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
+      s->start ();
+    }
+  }
+
+  /**
+   *  @brief Final event
+   *  This method is called after the scan terminated
+   */
+  void flush ()
+  {
+    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
+      s->flush ();
+    }
+  }
+
+  /**
+   *  @brief Reset status event
+   *  This method is to ensure the state of the operator is reset.
+   */
+  void reset ()
+  {
+    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
+      s->reset ();
+    }
+  }
+
+  /**
+   *  @brief Gets a value indicating whether all operators are reset
+   */
+  bool is_reset ()
+  {
+    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
+      if (! s->is_reset ()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   *  @brief Reserve memory n edges
+   */
+  void reserve (size_t n)
+  {
+    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
+      s->reserve (n);
+    }
+  }
+
+  /**
+   *  @brief Begin scanline event
+   *  This method is called at the beginning of a new scanline
+   */
+  void begin_scanline (db::Coord y)
+  {
+    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
+      s->begin_scanline (y);
+    }
+  }
+
+  /**
+   *  @brief End scanline event
+   *  This method is called at the end of a scanline
+   */
+  void end_scanline (db::Coord y)
+  {
+    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
+      s->end_scanline (y);
+    }
+  }
+
+  /**
+   *  @brief Announces a batch of edges crossing the same point
+   */
+  void next_vertex (double x)
+  {
+    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
+      s->next_vertex (x);
+    }
+  }
+
+  /**
+   *  @brief Finishes the vertex
+   */
+  void end_vertex ()
+  {
+    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
+      s->end_vertex ();
+    }
+  }
+
+  /**
+   *  @brief Announces a batch of edges crossing the same point and begin coincident
+   *  This event is a sub-event of "next_vertex".
+   */
+  void next_coincident ()
+  {
+    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
+      s->next_coincident ();
+    }
+  }
+
+  /**
+   *  @brief Announces a batch of edges crossing the same point and begin coincident
+   *  This event is a sub-event of "next_vertex".
+   */
+  void end_coincident ()
+  {
+    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
+      s->end_coincident ();
+    }
+  }
+
+  /**
+   *  @brief Announces an edge north to the scanline
+   */
+  void north_edge (bool prefer_touch, EdgeEvaluatorBase::property_type prop)
+  {
+    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
+      s->north_edge (prefer_touch, prop);
+    }
+  }
+
+  /**
+   *  @brief Announces an edge south of the scanline
+   */
+  void south_edge (bool prefer_touch, EdgeEvaluatorBase::property_type prop)
+  {
+    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
+      s->south_edge (prefer_touch, prop);
+    }
+  }
+
+  /**
+   *  @brief Gives the generators an opportunity to select the given edge
+   */
+  void select_edge (const WorkEdge &e)
+  {
+    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
+      s->select_edge (e);
+    }
+  }
+
+  /**
+   *  @brief Delivers an edge to the edge sink if present
+   *
+   *  This method will return true if at least one of the edge sinks received the edge
+   */
+  bool push_edge (const db::Edge &e)
+  {
+    bool any = false;
+    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
+      if (s->push_edge (e)) {
+        any = true;
+      }
+    }
+    return any;
+  }
+
+  /**
+   *  @brief Skips n edges on the edge sink
+   *
+   *  This is for optimization of the polygon generation. Stitching of edges does not happen if
+   *  there are no news.
+   */
+  void skip_n (size_t n)
+  {
+    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
+      s->skip_n (n);
+    }
+  }
+
+private:
+  std::vector<EdgeProcessorState> m_states;
+  bool m_selects_edges, m_prefer_touch;
+};
+
+}
+
+void
+EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > &gen)
+{
   tl::SelfTimer timer (tl::verbosity () >= m_base_verbosity, "EdgeProcessor: process");
 
-  bool prefer_touch = op.prefer_touch (); 
-  bool selects_edges = op.selects_edges (); 
+  EdgeProcessorStates gs (gen);
+
+  bool prefer_touch = gs.prefer_touch ();
+  bool selects_edges = gs.selects_edges ();
   
   db::Coord y;
   std::vector <WorkEdge>::iterator future;
@@ -1551,8 +1938,8 @@ EdgeProcessor::process (db::EdgeSink &es, EdgeEvaluatorBase &op)
   //  step 1: preparation
 
   if (mp_work_edges->empty ()) {
-    es.start ();
-    es.flush ();
+    gs.start ();
+    gs.flush ();
     return;
   }
 
@@ -1759,10 +2146,10 @@ EdgeProcessor::process (db::EdgeSink &es, EdgeEvaluatorBase &op)
 
   //  step 4: compute the result edges 
   
-  es.start (); // call this as late as possible. This way, input containers can be identical with output containers ("clear" is done after the input is read)
+  gs.start (); // call this as late as possible. This way, input containers can be identical with output containers ("clear" is done after the input is read)
 
-  op.reset ();
-  op.reserve (n_props);
+  gs.reset ();
+  gs.reserve (n_props);
 
   std::sort (mp_work_edges->begin (), mp_work_edges->end (), edge_ymin_compare<db::Coord> ());
 
@@ -1795,9 +2182,9 @@ EdgeProcessor::process (db::EdgeSink &es, EdgeEvaluatorBase &op)
     }
 
     db::Coord ysl = y;
-    es.begin_scanline (y);
+    gs.begin_scanline (y);
 
-    tl_assert (op.is_reset ()); // HINT: for development
+    tl_assert (gs.is_reset ()); // HINT: for development
 
     if (current != future) {
 
@@ -1810,9 +2197,6 @@ EdgeProcessor::process (db::EdgeSink &es, EdgeEvaluatorBase &op)
       printf ("\n");
 #endif
 
-      db::Coord hx = 0;
-      int ho = 0;
-
       size_t new_skip_unit = std::distance (current, future);
 
       for (std::vector <WorkEdge>::iterator c = current; c != future; ) {
@@ -1823,11 +2207,12 @@ EdgeProcessor::process (db::EdgeSink &es, EdgeEvaluatorBase &op)
         printf ("X %ld->%d,%d\n", long (c->data), int (skip), int (skip_res));
 #endif
 
+        //  @@@ can't work with the multi-output scheme!!!!
         if (skip != 0 && (c + skip >= future || (c + skip)->data != 0)) {
 
           tl_assert (c + skip <= future);
 
-          es.skip_n (skip_res);
+          gs.skip_n (skip_res);
 
           c->data = skip + new_skip_unit * skip_res;
 
@@ -1859,14 +2244,14 @@ EdgeProcessor::process (db::EdgeSink &es, EdgeEvaluatorBase &op)
 
             //  compute edges that occure at this vertex
             
-            bool vertex = false;
+            gs.next_vertex (x);
             
             //  treat all edges crossing the scanline in a certain point
             for (std::vector <WorkEdge>::iterator cc = c; cc != f; ) {
 
-              std::vector <WorkEdge>::iterator e = mp_work_edges->end ();
+              gs.next_coincident ();
 
-              int pn = 0, ps = 0;
+              std::vector <WorkEdge>::iterator e = mp_work_edges->end ();
 
               std::vector <WorkEdge>::iterator cc0 = cc;
 
@@ -1899,10 +2284,10 @@ EdgeProcessor::process (db::EdgeSink &es, EdgeEvaluatorBase &op)
                   
                   if ((cc->dy () > 0) == prefer_touch) {
                     if (edge_ymax (*cc) > y) {
-                      pn += op.edge (true, prefer_touch, cc->prop);
+                      gs.north_edge (prefer_touch, cc->prop);
                     }
                     if (edge_ymin (*cc) < y) {
-                      ps += op.edge (false, prefer_touch, cc->prop);
+                      gs.south_edge (prefer_touch, cc->prop);
                     }
                   }
 
@@ -1914,16 +2299,11 @@ EdgeProcessor::process (db::EdgeSink &es, EdgeEvaluatorBase &op)
 
               //  Give the edge selection operator a chance to select edges now
               if (selects_edges) {
-
                 for (std::vector <WorkEdge>::iterator sc = cc0; sc != fc; ++sc) {
-                  if (edge_ymin (*sc) == y && op.select_edge (sc->dy () == 0, sc->prop)) {
-                    es.put (*sc);
-#ifdef DEBUG_EDGE_PROCESSOR
-                    printf ("put(%s)\n", sc->to_string().c_str());
-#endif
+                  if (edge_ymin (*sc) == y) {
+                    gs.select_edge (*sc);
                   }
                 }
-
               }
 
               //  report the closing or opening edges in the opposite order 
@@ -1936,67 +2316,30 @@ EdgeProcessor::process (db::EdgeSink &es, EdgeEvaluatorBase &op)
 
                 if (fc->dy () != 0 && (fc->dy () > 0) != prefer_touch) {
                   if (edge_ymax (*fc) > y) {
-                    pn += op.edge (true, ! prefer_touch, fc->prop);
+                    gs.north_edge (! prefer_touch, fc->prop);
                   }
                   if (edge_ymin (*fc) < y) {
-                    ps += op.edge (false, ! prefer_touch, fc->prop);
+                    gs.south_edge (! prefer_touch, fc->prop);
                   }
                 }
 
               } while (fc != cc0);
 
-              if (! vertex && (ps != 0 || pn != 0)) {
-
-                if (ho != 0) {
-                  db::Edge he (db::Point (hx, y), db::Point (db::coord_traits<db::Coord>::rounded (x), y));
-                  if (ho > 0) {
-                    he.swap_points ();
-                  }
-                  es.put (he);
-#ifdef DEBUG_EDGE_PROCESSOR
-                  printf ("put(%s)\n", he.to_string().c_str());
-#endif
-                } 
-
-                vertex = true;
-
-              }
+              gs.end_coincident ();
 
               if (e != mp_work_edges->end ()) {
-
-                db::Edge edge (*e);
-
-                if ((pn > 0 && edge.dy () < 0) || (pn < 0 && edge.dy () > 0)) {
-                  edge.swap_points ();
-                }
-
-                if (pn != 0) {
+                if (gs.push_edge (*e)) {
                   ++n_res;
-                  if (edge_ymin (edge) == y) {
-                    es.put (edge);
-#ifdef DEBUG_EDGE_PROCESSOR
-                    printf ("put(%s)\n", edge.to_string().c_str());
-#endif
-                  } else {
-                    es.crossing_edge (edge);
-#ifdef DEBUG_EDGE_PROCESSOR
-                    printf ("xing(%s)\n", edge.to_string().c_str());
-#endif
-                  }
                 }
-
               }
 
             }
 
-            if (vertex) {
-              hx = db::coord_traits<db::Coord>::rounded (x);
-              ho = op.compare_ns ();
-            }
+            gs.end_vertex ();
 
             c = f;
 
-          } while (c != future && ! op.is_reset ());
+          } while (c != future && ! gs.is_reset ());
 
           //  TODO: assert that there is no overflow here:
           c0->data = size_t (std::distance (c0, c) + new_skip_unit * n_res);
@@ -2057,13 +2400,13 @@ EdgeProcessor::process (db::EdgeSink &es, EdgeEvaluatorBase &op)
     
     }
 
-    tl_assert (op.is_reset ()); // HINT: for development (second)
+    tl_assert (gs.is_reset ()); // HINT: for development (second)
 
-    es.end_scanline (ysl);
+    gs.end_scanline (ysl);
 
   }
 
-  es.flush ();
+  gs.flush ();
 
 }
 

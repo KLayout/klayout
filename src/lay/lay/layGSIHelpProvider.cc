@@ -285,16 +285,6 @@ static DocumentationParser &cls_documentation (const gsi::ClassBase *cls)
   }
 }
 
-static const std::string &aliased_name (const gsi::ClassBase *cls)
-{
-  const std::string &alias = cls_documentation (cls).alias;
-  if (alias.empty ()) {
-    return cls->name ();
-  } else {
-    return alias;
-  }
-}
-
 static std::string make_qualified_name (const gsi::ClassBase *cls)
 {
   std::string qname;
@@ -703,9 +693,9 @@ type_to_s (const gsi::ArgType &a, bool linked, bool for_return)
       s += "new ";
     }
     if (linked) {
-      s += "<a href=\"" + escape_xml (class_doc_url (aliased_name (a.cls ()))) + "\">" + escape_xml (aliased_name (a.cls ())) + "</a>";
+      s += "<a href=\"" + escape_xml (class_doc_url (make_qualified_name (a.cls ()))) + "\">" + escape_xml (make_qualified_name (a.cls ())) + "</a>";
     } else {
-      s += aliased_name (a.cls ());
+      s += make_qualified_name (a.cls ());
     }
     break;
   case gsi::T_vector:

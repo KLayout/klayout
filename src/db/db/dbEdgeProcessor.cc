@@ -1701,6 +1701,20 @@ private:
 class EdgeProcessorStates
 {
 public:
+  struct SkipInfo
+  {
+    SkipInfo (size_t _skip, size_t _skip_res)
+      : skip (_skip), skip_res (_skip_res)
+    { }
+
+    SkipInfo ()
+      : skip (0), skip_res (0)
+    { }
+
+    size_t skip;
+    size_t skip_res;
+  };
+
   EdgeProcessorStates (const std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > &procs)
     : m_selects_edges (false), m_prefer_touch (false)
   {
@@ -1915,9 +1929,61 @@ public:
     }
   }
 
+  /**
+   *  @brief Gets a new SkipInfo entry
+   */
+  size_t skip_entry (size_t skip, size_t skip_res)
+  {
+    if (! m_skip_queue.empty ()) {
+      size_t n = m_skip_queue.front ();
+      m_skip_queue.pop_front ();
+      m_skip_info[n] = SkipInfo (skip, skip_res);
+      return n + 1;
+    } else {
+      m_skip_info.push_back (SkipInfo (skip, skip_res));
+      return m_skip_info.size ();
+    }
+  }
+
+  /**
+   *  @brief Gets the SkipInfo for a given index
+   */
+  const SkipInfo &skip_info (size_t n)
+  {
+    if (n == 0) {
+      static SkipInfo empty;
+      return empty;
+    } else {
+      return m_skip_info [n - 1];
+    }
+  }
+
+  /**
+   *  @brief Releases a SkipInfo entry
+   */
+  void release_skip_entry (size_t n)
+  {
+    m_skip_queue.push_front (n - 1);
+  }
+
+  /**
+   *  @brief Resets a SkipInfo entry
+   *
+   *  A convenience function to reset and release a SkipInfo entry
+   */
+  void reset_skip_entry (size_t &n)
+  {
+    if (n != 0) {
+      release_skip_entry (n);
+      n = 0;
+    }
+  }
+
 private:
   std::vector<EdgeProcessorState> m_states;
   bool m_selects_edges, m_prefer_touch;
+  std::vector<SkipInfo> m_skip_info;
+  std::list<size_t> m_skip_queue;
 };
 
 }
@@ -2154,7 +2220,6 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
   std::sort (mp_work_edges->begin (), mp_work_edges->end (), edge_ymin_compare<db::Coord> ());
 
   y = edge_ymin ((*mp_work_edges) [0]);
-  size_t skip_unit = 1;
 
   future = mp_work_edges->begin ();
   for (std::vector <WorkEdge>::iterator current = mp_work_edges->begin (); current != mp_work_edges->end (); ) {
@@ -2197,27 +2262,21 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
       printf ("\n");
 #endif
 
-      size_t new_skip_unit = std::distance (current, future);
-
       for (std::vector <WorkEdge>::iterator c = current; c != future; ) {
 
-        size_t skip = c->data % skip_unit;
-        size_t skip_res = c->data / skip_unit;
+        const EdgeProcessorStates::SkipInfo &skip_info = gs.skip_info (c->data);
 #ifdef DEBUG_EDGE_PROCESSOR
-        printf ("X %ld->%d,%d\n", long (c->data), int (skip), int (skip_res));
+        printf ("X %ld->%d,%d\n", long (c->data), int (skip_info.skip), int (skip_info.skip_res));
 #endif
 
-        //  @@@ can't work with the multi-output scheme!!!!
-        if (skip != 0 && (c + skip >= future || (c + skip)->data != 0)) {
+        if (skip_info.skip != 0 && (c + skip_info.skip >= future || (c + skip_info.skip)->data != 0)) {
 
-          tl_assert (c + skip <= future);
+          tl_assert (c + skip_info.skip <= future);
 
-          gs.skip_n (skip_res);
-
-          c->data = skip + new_skip_unit * skip_res;
+          gs.skip_n (skip_info.skip_res);
 
           //  skip this interval - has not changed
-          c += skip;
+          c += skip_info.skip;
 
         } else {
 
@@ -2226,7 +2285,8 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
 
           do {
 
-            c->data = 0;
+            gs.reset_skip_entry (c->data);
+
             std::vector <WorkEdge>::iterator f = c + 1;
 
             //  HINT: "volatile" forces x and xx into memory and disables FPU register optimisation.
@@ -2238,7 +2298,7 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
               if (xx != x) {
                 break;
               }
-              f->data = 0;
+              gs.reset_skip_entry (f->data);
               ++f;
             }
 
@@ -2342,13 +2402,11 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
           } while (c != future && ! gs.is_reset ());
 
           //  TODO: assert that there is no overflow here:
-          c0->data = size_t (std::distance (c0, c) + new_skip_unit * n_res);
+          c0->data = gs.skip_entry (std::distance (c0, c), n_res);
 
         }
 
       }
-
-      skip_unit = new_skip_unit;
 
       y = yy;
 
@@ -2359,7 +2417,6 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
       printf ("\n");
 #endif
       std::vector <WorkEdge>::iterator c0 = current;
-      std::vector <WorkEdge>::iterator last_interval = future;
       current = future;
 
       bool valid = true;
@@ -2368,7 +2425,6 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
 
         --c;
 
-        bool start_interval = (c->data != 0);
         size_t data = c->data;
         c->data = 0;
 
@@ -2384,10 +2440,18 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
           valid = false;
         }
 
-        if (start_interval && current != future) {
-          current->data = valid ? data : 0;
-          last_interval = current;
+        if (data != 0 && current != future) {
+          if (valid) {
+            current->data = data;
+            data = 0;
+          } else {
+            current->data = 0;
+          }
           valid = true;
+        }
+
+        if (data) {
+          gs.release_skip_entry (data);
         }
 
       }

@@ -1698,11 +1698,29 @@ private:
   int m_pn, m_ps;
 };
 
+//  NOTE: set this to 0 to force memory-allocation storage for SkipInfo always (testing)
 const size_t skip_info_storage_threshold = 1;
 
+/**
+ *  @brief Encapsulates the state of the edge processor's generation stage
+ *
+ *  The generation state may involve multiple generators and output sinks. This
+ *  class provides a single interface to handle the case of single and multiple
+ *  receivers in a uniform way.
+ */
 class EdgeProcessorStates
 {
 public:
+  /**
+   *  @brief A structure holding the "skip information"
+   *
+   *  Skipping intervals with a known behavior is an optimization to improvee
+   *  the scanner's performance. This object keeps the information required to
+   *  properly implement the skipping. It keeps both the edge skip count per
+   *  interval ("skip") as well as the corresponding skip count for the
+   *  generated edges. As multiple edge receivers can be supplied, the result
+   *  skip count is a individual one per generator and edge receiver.
+   */
   struct SkipInfo
   {
     SkipInfo (size_t _skip, const std::vector<size_t> &_skip_res)
@@ -1777,6 +1795,9 @@ public:
     size_t m_skip_res;
   };
 
+  /**
+   *  @brief Creates a generator stage state object from the given sinks and operators
+   */
   EdgeProcessorStates (const std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > &procs)
     : m_selects_edges (false), m_prefer_touch (false)
   {
@@ -1992,28 +2013,6 @@ public:
   }
 
   /**
-   *  @brief Gets a new SkipInfo entry
-   */
-  size_t skip_entry (size_t skip, const std::vector<size_t> &skip_res)
-  {
-    if (! m_skip_queue.empty ()) {
-
-      size_t n = m_skip_queue.front ();
-      m_skip_queue.pop_front ();
-      m_skip_info[n].skip = skip;
-      m_skip_info[n].set_skip_res (skip_res.begin (), skip_res.end ());
-
-      return n + 1;
-
-    } else {
-
-      m_skip_info.push_back (SkipInfo (skip, skip_res));
-      return m_skip_info.size ();
-
-    }
-  }
-
-  /**
    *  @brief Gets the SkipInfo for a given index
    */
   const SkipInfo &skip_info (size_t n)
@@ -2063,7 +2062,19 @@ public:
    */
   size_t end_skip_interval (size_t skip)
   {
-    return skip_entry (skip, m_nres);
+    size_t n = 0;
+
+    if (! m_skip_queue.empty ()) {
+      n = m_skip_queue.front ();
+      m_skip_queue.pop_front ();
+    } else {
+      n = m_skip_info.size ();
+      m_skip_info.push_back (SkipInfo ());
+    }
+
+    m_skip_info[n].skip = skip;
+    m_skip_info[n].set_skip_res (m_nres.begin (), m_nres.end ());
+    return n + 1;
   }
 
 private:

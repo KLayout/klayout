@@ -43,15 +43,15 @@ namespace gsi
 {
 
 Class<lay::NetlistBrowserDialog> decl_NetlistBrowserDialog ("lay", "NetlistBrowserDialog",
-  gsi::event ("current_db_changed_event", &lay::NetlistBrowserDialog::current_db_changed_event,
+  gsi::event ("on_current_db_changed", &lay::NetlistBrowserDialog::current_db_changed_event,
     "@brief This event is triggered when the current database is changed.\n"
     "The current database can be obtained with \\db."
   ) +
-  gsi::event ("selection_changed_event", &lay::NetlistBrowserDialog::selection_changed_event,
+  gsi::event ("on_selection_changed", &lay::NetlistBrowserDialog::selection_changed_event,
     "@brief This event is triggered when the selection changed.\n"
     "The selection can be obtained with \\selected_nets, \\selected_devices, \\selected_subcircuits and \\selected_circuits."
   ) +
-  gsi::event ("probe_event", &lay::NetlistBrowserDialog::probe_event, gsi::arg ("net"), gsi::arg ("subcircuit_path"),
+  gsi::event ("on_probe", &lay::NetlistBrowserDialog::probe_event, gsi::arg ("net"), gsi::arg ("subcircuit_path"),
     "@brief This event is triggered when a net is probed.\n"
     "'subcircuit_path' will contain the subcircuit objects leading to the probed net from the netlist databases' top circuit. "
     "This path may not be complete - it may contain null entries if a cell instance can't be associated with a subcircuit."

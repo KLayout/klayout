@@ -83,6 +83,7 @@ public:
   virtual RegionDelegate *and_with (const Region &other) const;
   virtual RegionDelegate *not_with (const Region &other) const;
   virtual RegionDelegate *xor_with (const Region &other) const;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> andnot_with (const Region &) const;
 
   virtual RegionDelegate *add_in_place (const Region &other);
   virtual RegionDelegate *add (const Region &other) const;
@@ -184,6 +185,7 @@ private:
   void ensure_merged_polygons_valid () const;
   const DeepLayer &merged_deep_layer () const;
   DeepLayer and_or_not_with(const DeepRegion *other, bool and_op) const;
+  std::pair<DeepLayer, DeepLayer> and_and_not_with (const DeepRegion *other) const;
   EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
   EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
   virtual RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const;

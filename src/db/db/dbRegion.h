@@ -1146,6 +1146,17 @@ public:
   }
 
   /**
+   *  @brief Two-bool ANDNOT operation
+   *
+   *  The first region delivered will be the AND result, the second one the NOT result.
+   */
+  std::pair<Region, Region> andnot (const Region &other) const
+  {
+    std::pair<RegionDelegate *, RegionDelegate *> res = mp_delegate->andnot_with (other);
+    return std::make_pair (Region (res.first), Region (res.second));
+  }
+
+  /**
    *  @brief Selects all polygons of this region which are completly outside polygons from the other region
    *
    *  Merged semantics applies.

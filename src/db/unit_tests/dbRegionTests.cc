@@ -202,6 +202,13 @@ TEST(3)
   EXPECT_EQ ((db::Region () & r).to_string (), "");
   EXPECT_EQ ((db::Region () & r).empty (), true);
 
+  EXPECT_EQ (r.andnot(rr).first.to_string (), "(10,20;10,220;110,220;110,20)");
+  EXPECT_EQ (rr.andnot(r).first.to_string (), "(10,20;10,220;110,220;110,20)");
+  EXPECT_EQ (r.andnot(db::Region ()).first.to_string (), "");
+  EXPECT_EQ (r.andnot(db::Region ()).first.empty (), true);
+  EXPECT_EQ (db::Region ().andnot(r).first.to_string (), "");
+  EXPECT_EQ (db::Region ().andnot(r).first.empty (), true);
+
   r &= rr;
   EXPECT_EQ (r.is_box (), true);
   EXPECT_EQ (r.empty (), false);
@@ -288,6 +295,14 @@ TEST(7)
   EXPECT_EQ ((db::Region () - r).to_string (), "");
   EXPECT_EQ ((db::Region () - r).empty (), true);
   EXPECT_EQ ((db::Region () - r).is_merged (), true);
+
+  EXPECT_EQ (r.andnot(db::Region (db::Box (db::Point (10, 20), db::Point (110, 220)))).second.to_string (), "(-100,-100;-100,400;200,400;200,-100/10,20;110,20;110,220;10,220)");
+  EXPECT_EQ (r.andnot(db::Region ()).second.to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,400;200,400;200,-100)");
+  EXPECT_EQ (r.andnot(db::Region ()).second.empty (), false);
+  EXPECT_EQ (r.andnot(db::Region ()).second.is_merged (), false);
+  EXPECT_EQ (db::Region ().andnot(r).second.to_string (), "");
+  EXPECT_EQ (db::Region ().andnot(r).second.empty (), true);
+  EXPECT_EQ (db::Region ().andnot(r).second.is_merged (), true);
 
   r -= db::Region (db::Box (db::Point (10, 20), db::Point (110, 220)));
   EXPECT_EQ (r.is_box (), false);

@@ -548,6 +548,17 @@ static db::EdgePairs separation2 (const db::Region *r, const db::Region &other, 
                               max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> ());
 }
 
+static std::vector<db::Region> andnot (const db::Region *r, const db::Region &other)
+{
+  std::pair<db::Region, db::Region> rp = r->andnot (other);
+
+  std::vector<db::Region> res;
+  res.resize (2, db::Region ());
+  res [0] = rp.first;
+  res [1] = rp.second;
+  return res;
+}
+
 static int euclidian_metrics ()
 {
   return db::Euclidian;
@@ -1311,6 +1322,16 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
   ) + 
+  method_ext ("andnot", &andnot, gsi::arg ("other"),
+    "@brief Returns the boolean AND and NOT between self and the other region\n"
+    "\n"
+    "@return A two-element array of regions with the first one being the AND result and the second one being the NOT result\n"
+    "\n"
+    "This method will compute the boolean AND and NOT between two regions simultaneously. "
+    "Because this requires a single sweep only, using this method is faster than doing AND and NOT separately.\n"
+    "\n"
+    "This method has been added in version 0.27.\n"
+  ) +
   method ("&", &db::Region::operator&, gsi::arg ("other"),
     "@brief Returns the boolean AND between self and the other region\n"
     "\n"

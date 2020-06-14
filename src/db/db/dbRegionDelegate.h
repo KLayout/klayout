@@ -263,6 +263,7 @@ public:
   virtual RegionDelegate *or_with (const Region &other) const = 0;
   virtual RegionDelegate *add_in_place (const Region &other) = 0;
   virtual RegionDelegate *add (const Region &other) const = 0;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> andnot_with (const Region &other) const = 0;
 
   virtual RegionDelegate *selected_outside (const Region &other) const = 0;
   virtual RegionDelegate *selected_not_outside (const Region &other) const = 0;

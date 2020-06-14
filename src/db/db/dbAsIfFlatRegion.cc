@@ -1115,6 +1115,71 @@ AsIfFlatRegion::not_with (const Region &other) const
   }
 }
 
+
+std::pair<RegionDelegate *, RegionDelegate *>
+AsIfFlatRegion::andnot_with (const Region &other) const
+{
+  if (empty ()) {
+
+    //  Nothing to do
+    return std::make_pair (new EmptyRegion (), new EmptyRegion ());
+
+  } else if (other.empty () && ! strict_handling ()) {
+
+    //  Nothing to do
+    return std::make_pair (new EmptyRegion (), clone ());
+
+  } else if (! bbox ().overlaps (other.bbox ()) && ! strict_handling ()) {
+
+    //  Nothing to do
+    return std::make_pair (new EmptyRegion (), clone ());
+
+  } else {
+
+    //  Generic case
+    db::EdgeProcessor ep (report_progress (), progress_desc ());
+    ep.set_base_verbosity (base_verbosity ());
+
+    //  count edges and reserve memory
+    size_t n = 0;
+    for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
+      n += p->vertices ();
+    }
+    for (RegionIterator p (other.begin ()); ! p.at_end (); ++p) {
+      n += p->vertices ();
+    }
+    ep.reserve (n);
+
+    //  insert the polygons into the processor
+    n = 0;
+    for (RegionIterator p (begin ()); ! p.at_end (); ++p, n += 2) {
+      ep.insert (*p, n);
+    }
+    n = 1;
+    for (RegionIterator p (other.begin ()); ! p.at_end (); ++p, n += 2) {
+      ep.insert (*p, n);
+    }
+
+    std::auto_ptr<FlatRegion> new_region1 (new FlatRegion (true));
+    db::BooleanOp op1 (db::BooleanOp::And);
+    db::ShapeGenerator pc1 (new_region1->raw_polygons (), true /*clear*/);
+    db::PolygonGenerator pg1 (pc1, false /*don't resolve holes*/, min_coherence ());
+
+    std::auto_ptr<FlatRegion> new_region2 (new FlatRegion (true));
+    db::BooleanOp op2 (db::BooleanOp::ANotB);
+    db::ShapeGenerator pc2 (new_region2->raw_polygons (), true /*clear*/);
+    db::PolygonGenerator pg2 (pc2, false /*don't resolve holes*/, min_coherence ());
+
+    std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > procs;
+    procs.push_back (std::make_pair (&pg1, &op1));
+    procs.push_back (std::make_pair (&pg2, &op2));
+    ep.process (procs);
+
+    return std::make_pair (new_region1.release (), new_region2.release ());
+
+  }
+}
+
 RegionDelegate *
 AsIfFlatRegion::xor_with (const Region &other) const
 {

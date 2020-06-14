@@ -172,6 +172,13 @@ TEST(3_BoolAndNot)
   db::Region r42minus3  = r42 - r3;
   db::Region r42minus42 = r42 - r42;
 
+  db::Region tr2minus3   = r2.andnot (r3).second;
+  db::Region tr2minusbox = r2.andnot (box).second;
+  db::Region tr2minus42  = r2.andnot (r42).second;
+  db::Region trboxminus3 = box.andnot (r3).second;
+  db::Region tr42minus3  = r42.andnot (r3).second;
+  db::Region tr42minus42 = r42.andnot (r42).second;
+
   db::Region r2and3   = r2 & r3;
   db::Region r2andbox = r2 & box;
   db::Region r2and42  = r2 & r42;
@@ -179,27 +186,58 @@ TEST(3_BoolAndNot)
   db::Region r42and3  = r42 & r3;
   db::Region r42and42 = r42 & r42;
 
+  db::Region tr2and3   = r2.andnot (r3).first;
+  db::Region tr2andbox = r2.andnot (box).first;
+  db::Region tr2and42  = r2.andnot (r42).first;
+  db::Region trboxand3 = box.andnot (r3).first;
+  db::Region tr42and3  = r42.andnot (r3).first;
+  db::Region tr42and42 = r42.andnot (r42).first;
+
   EXPECT_EQ (r2and3.is_merged (), false);
 
-  db::Layout target;
-  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+  {
+    db::Layout target;
+    unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
 
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r2minus3);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r2minusbox);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r2minus42);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), rboxminus3);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), r42minus3);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (15, 0)), r42minus42);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r2minus3);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r2minusbox);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r2minus42);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), rboxminus3);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), r42minus3);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (15, 0)), r42minus42);
 
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r2and3);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r2andbox);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), r2and42);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 0)), rboxand3);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (24, 0)), r42and3);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (25, 0)), r42and42);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r2and3);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r2andbox);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), r2and42);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 0)), rboxand3);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (24, 0)), r42and3);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (25, 0)), r42and42);
 
-  CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au3.gds");
+    CHECKPOINT();
+    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au3.gds");
+  }
+
+  {
+    db::Layout target;
+    unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), tr2minus3);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), tr2minusbox);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), tr2minus42);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), trboxminus3);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), tr42minus3);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (15, 0)), tr42minus42);
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), tr2and3);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), tr2andbox);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), tr2and42);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 0)), trboxand3);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (24, 0)), tr42and3);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (25, 0)), tr42and42);
+
+    CHECKPOINT();
+    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au3b.gds");
+  }
 }
 
 TEST(4_Add)

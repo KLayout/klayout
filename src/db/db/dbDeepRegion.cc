@@ -542,6 +542,31 @@ DeepRegion::not_with (const Region &other) const
   }
 }
 
+std::pair<RegionDelegate *, RegionDelegate *>
+DeepRegion::andnot_with (const Region &other) const
+{
+  const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
+
+  if (empty ()) {
+
+    return std::make_pair (clone (), clone ());
+
+  } else if (other.empty ()) {
+
+    return std::make_pair (other.delegate ()->clone (), clone ());
+
+  } else if (! other_deep) {
+
+    return AsIfFlatRegion::andnot_with (other);
+
+  } else {
+
+    std::pair<DeepLayer, DeepLayer> res = and_and_not_with (other_deep);
+    return std::make_pair (new DeepRegion (res.first), new DeepRegion (res.second));
+
+  }
+}
+
 DeepLayer
 DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op) const
 {
@@ -558,6 +583,32 @@ DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op) const
   proc.run (&op, deep_layer ().layer (), other->deep_layer ().layer (), dl_out.layer ());
 
   return dl_out;
+}
+
+std::pair<DeepLayer, DeepLayer>
+DeepRegion::and_and_not_with (const DeepRegion *other) const
+{
+  DeepLayer dl_out1 (deep_layer ().derived ());
+  DeepLayer dl_out2 (deep_layer ().derived ());
+
+  db::TwoBoolAndNotLocalOperation op;
+
+  db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (deep_layer ().store ()->threads ());
+  proc.set_area_ratio (deep_layer ().store ()->max_area_ratio ());
+  proc.set_max_vertex_count (deep_layer ().store ()->max_vertex_count ());
+
+  std::vector<unsigned int> il;
+  il.push_back (other->deep_layer ().layer ());
+
+  std::vector<unsigned int> ol;
+  ol.push_back (dl_out1.layer ());
+  ol.push_back (dl_out2.layer ());
+
+  proc.run (&op, deep_layer ().layer (), il, ol);
+
+  return std::make_pair (dl_out1, dl_out2);
 }
 
 RegionDelegate *

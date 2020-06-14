@@ -1309,6 +1309,35 @@ CODE
     end
     
     # %DRC%
+    # @name andnot
+    # @brief Computes Boolean AND and NOT results at the same time
+    # @synopsis layer.andnot(other)
+    # This method returns a two-element array containing one layer for the
+    # AND result and one for the NOT result.
+    #
+    # This method is available for polygon layers.
+    #
+    # It can be used to initialize two variables with the AND and NOT results:
+    #
+    # @code
+    # (and_result, not_result) = l1.andnot(l2)
+    # @/code
+    #
+    # As the AND and NOT results are computed in the same sweep, calling this
+    # method is faster than calling AND and NOT separately.
+   
+    def andnot(other)
+
+      requires_region("andnot")
+      other.requires_region("andnot")
+
+      res = @engine._tcmd_a2(@data, 0, @data.class, @data.class, :andnot, other.data)
+
+      [ DRCLayer::new(@engine, res[0]), DRCLayer::new(@engine, res[1]) ]
+
+    end
+
+    # %DRC%
     # @name &
     # @brief Boolean AND operation
     # @synopsis self & other

@@ -1494,6 +1494,61 @@ CODE
       
     end
 
+    # used for two-element array output methods (e.g. andnot)
+    def _tcmd_a2(obj, border, result_cls1, result_cls2, method, *args)
+    
+      if @tx && @ty
+      
+        tp = RBA::TilingProcessor::new
+        tp.dbu = self.dbu
+        tp.scale_to_dbu = false
+        tp.tile_size(@tx, @ty)
+        bx = [ @bx || 0.0, border * self.dbu ].max
+        by = [ @by || 0.0, border * self.dbu ].max
+        tp.tile_border(bx, by)
+
+        res1 = result_cls1.new
+        tp.output("res1", res1)
+        res2 = result_cls2.new
+        tp.output("res2", res2)
+        res = [ res1, res2 ]
+        tp.input("self", obj)
+        tp.threads = (@tt || 1)
+        args.each_with_index do |a,i|
+          if a.is_a?(RBA::Edges) || a.is_a?(RBA::Region) || a.is_a?(RBA::EdgePairs) || a.is_a?(RBA::Texts)
+            tp.input("a#{i}", a)
+          else
+            tp.var("a#{i}", a)
+          end
+        end
+        av = args.size.times.collect { |i| "a#{i}" }.join(", ")
+        tp.queue("var rr = self.#{method}(#{av}); _output(res1, rr[0]); _output(res2, rr[1])")
+        run_timed("\"#{method}\" in: #{src_line}", obj) do
+          tp.execute("Tiled \"#{method}\" in: #{src_line}")
+        end
+        
+      else
+
+        if @dss
+          @dss.threads = (@tt || 1)
+        end
+
+        res = nil
+        run_timed("\"#{method}\" in: #{src_line}", obj) do
+          res = obj.send(method, *args)
+        end
+
+      end
+      
+      # enable progress
+      if obj.is_a?(RBA::Region)
+        obj.disable_progress
+      end
+      
+      res
+      
+    end
+
     # used for area and perimeter only    
     def _tdcmd(obj, border, method)
     

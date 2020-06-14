@@ -258,11 +258,14 @@ class DBRegion_TestClass < TestBase
     r2 = RBA::Region::new(RBA::Box::new(-10, -20, 80, 160))
 
     assert_equal((r1 & r2).to_s, "(10,20;10,160;80,160;80,20)")
+    assert_equal(r1.andnot(r2).size, 2)
+    assert_equal(r1.andnot(r2)[0].to_s, "(10,20;10,160;80,160;80,20)")
     rr = r1.dup
     rr &= r2
     assert_equal(rr.to_s, "(10,20;10,160;80,160;80,20)")
     
     assert_equal((r1 - r2).to_s, "(80,20;80,160;10,160;10,200;100,200;100,20)")
+    assert_equal(r1.andnot(r2)[1].to_s, "(80,20;80,160;10,160;10,200;100,200;100,20)")
     rr = r1.dup
     rr -= r2
     assert_equal(rr.to_s, "(80,20;80,160;10,160;10,200;100,200;100,20)")

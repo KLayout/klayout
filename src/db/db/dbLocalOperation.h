@@ -127,6 +127,22 @@ private:
 };
 
 /**
+ *  @brief Implements a boolean AND plus NOT operation
+ *
+ *  This processor delivers two outputs: the first one having the AND result, the second
+ *  one having the NOT result.
+ */
+class DB_PUBLIC TwoBoolAndNotLocalOperation
+  : public local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>
+{
+public:
+  TwoBoolAndNotLocalOperation ();
+
+  virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &result, size_t max_vertex_count, double area_ratio) const;
+  virtual std::string description () const;
+};
+
+/**
  *  @brief Implements a merge operation with an overlap count
  *  With a given wrap_count, the result will only contains shapes where
  *  the original shapes overlap at least "wrap_count" times.

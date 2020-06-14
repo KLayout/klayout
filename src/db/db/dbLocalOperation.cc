@@ -116,6 +116,86 @@ BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const shape_inter
 }
 
 // ---------------------------------------------------------------------------------------------
+//  TwoBoolAndNotLocalOperation implementation
+
+TwoBoolAndNotLocalOperation::TwoBoolAndNotLocalOperation ()
+  : db::local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> ()
+{
+  //  .. nothing yet ..
+}
+
+void
+TwoBoolAndNotLocalOperation::compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  tl_assert (results.size () == 2);
+
+  db::EdgeProcessor ep;
+
+  std::unordered_set<db::PolygonRef> &result0 = results [0];
+  std::unordered_set<db::PolygonRef> &result1 = results [1];
+
+  size_t p1 = 0, p2 = 1;
+
+  std::set<db::PolygonRef> others;
+  for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+      others.insert (interactions.intruder_shape (*j).second);
+    }
+  }
+
+  for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+
+    const db::PolygonRef &subject = interactions.subject_shape (i->first);
+    if (others.find (subject) != others.end ()) {
+      result0.insert (subject);
+    } else if (i->second.empty ()) {
+      //  shortcut (not: keep, and: drop)
+      result1.insert (subject);
+    } else {
+      for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+        ep.insert (*e, p1);
+      }
+      p1 += 2;
+    }
+
+  }
+
+  if (! others.empty () || p1 > 0) {
+
+    for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
+      for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
+        ep.insert (*e, p2);
+      }
+      p2 += 2;
+    }
+
+    db::BooleanOp op0 (db::BooleanOp::And);
+    db::PolygonRefGenerator pr0 (layout, result0);
+    db::PolygonSplitter splitter0 (pr0, area_ratio, max_vertex_count);
+    db::PolygonGenerator pg0 (splitter0, true, true);
+
+    db::BooleanOp op1 (db::BooleanOp::ANotB);
+    db::PolygonRefGenerator pr1 (layout, result1);
+    db::PolygonSplitter splitter1 (pr1, area_ratio, max_vertex_count);
+    db::PolygonGenerator pg1 (splitter1, true, true);
+
+    ep.set_base_verbosity (50);
+
+    std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > procs;
+    procs.push_back (std::make_pair (&pg0, &op0));
+    procs.push_back (std::make_pair (&pg1, &op1));
+    ep.process (procs);
+
+  }
+
+}
+
+std::string TwoBoolAndNotLocalOperation::description () const
+{
+  return tl::to_string (tr ("ANDNOT operation"));
+}
+
+// ---------------------------------------------------------------------------------------------
 
 SelfOverlapMergeLocalOperation::SelfOverlapMergeLocalOperation (unsigned int wrap_count)
   : m_wrap_count (wrap_count)

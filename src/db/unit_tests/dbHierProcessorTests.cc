@@ -108,61 +108,63 @@ public:
 
     db::EdgeProcessor ep;
 
-    //  0: and, 1: not
-    for (unsigned int gen = 0; gen < 2; ++gen) {
+    std::unordered_set<db::PolygonRef> &result0 = results [0];
+    std::unordered_set<db::PolygonRef> &result1 = results [1];
 
-      std::unordered_set<db::PolygonRef> &result = results [gen];
-      ep.clear ();
+    size_t p1 = 0, p2 = 1;
 
-      size_t p1 = 0, p2 = 1;
-
-      std::set<db::PolygonRef> others;
-      for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-        for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-          others.insert (interactions.intruder_shape (*j).second);
-        }
+    std::set<db::PolygonRef> others;
+    for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+        others.insert (interactions.intruder_shape (*j).second);
       }
+    }
 
-      for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
 
-        const db::PolygonRef &subject = interactions.subject_shape (i->first);
-        if (others.find (subject) != others.end ()) {
-          if (gen == 0) {
-            result.insert (subject);
-          }
-        } else if (i->second.empty ()) {
-          //  shortcut (not: keep, and: drop)
-          if (gen != 0) {
-            result.insert (subject);
-          }
-        } else {
-          for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
-            ep.insert (*e, p1);
-          }
-          p1 += 2;
+      const db::PolygonRef &subject = interactions.subject_shape (i->first);
+      if (others.find (subject) != others.end ()) {
+        result0.insert (subject);
+      } else if (i->second.empty ()) {
+        //  shortcut (not: keep, and: drop)
+        result1.insert (subject);
+      } else {
+        for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+          ep.insert (*e, p1);
         }
-
-      }
-
-      if (! others.empty () || p1 > 0) {
-
-        for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
-          for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
-            ep.insert (*e, p2);
-          }
-          p2 += 2;
-        }
-
-        db::BooleanOp op (gen == 0 ? db::BooleanOp::And : db::BooleanOp::ANotB);
-        db::PolygonRefGenerator pr (layout, result);
-        db::PolygonSplitter splitter (pr, area_ratio, max_vertex_count);
-        db::PolygonGenerator pg (splitter, true, true);
-        ep.set_base_verbosity (50);
-        ep.process (pg, op);
-
+        p1 += 2;
       }
 
     }
+
+    if (! others.empty () || p1 > 0) {
+
+      for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
+        for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
+          ep.insert (*e, p2);
+        }
+        p2 += 2;
+      }
+
+      db::BooleanOp op0 (db::BooleanOp::And);
+      db::PolygonRefGenerator pr0 (layout, result0);
+      db::PolygonSplitter splitter0 (pr0, area_ratio, max_vertex_count);
+      db::PolygonGenerator pg0 (splitter0, true, true);
+
+      db::BooleanOp op1 (db::BooleanOp::ANotB);
+      db::PolygonRefGenerator pr1 (layout, result1);
+      db::PolygonSplitter splitter1 (pr1, area_ratio, max_vertex_count);
+      db::PolygonGenerator pg1 (splitter1, true, true);
+
+      ep.set_base_verbosity (50);
+
+      std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > procs;
+      procs.push_back (std::make_pair (&pg0, &op0));
+      procs.push_back (std::make_pair (&pg1, &op1));
+      ep.process (procs);
+
+    }
+
   }
 };
 

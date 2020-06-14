@@ -1041,9 +1041,9 @@ LayoutToNetlist::build_nets (const std::vector<const db::Net *> *nets, const db:
   }
 }
 
-db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::DPoint &point)
+db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::DPoint &point, std::vector<db::SubCircuit *> *sc_path_out)
 {
-  return probe_net (of_region, db::CplxTrans (internal_layout ()->dbu ()).inverted () * point);
+  return probe_net (of_region, db::CplxTrans (internal_layout ()->dbu ()).inverted () * point, sc_path_out);
 }
 
 size_t LayoutToNetlist::search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::NetShape> &test_cluster, std::vector<db::InstElement> &rev_inst_path)
@@ -1077,7 +1077,7 @@ size_t LayoutToNetlist::search_net (const db::ICplxTrans &trans, const db::Cell 
   return 0;
 }
 
-db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::Point &point)
+db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::Point &point, std::vector<db::SubCircuit *> *sc_path_out)
 {
   if (! m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has not been extracted yet")));
@@ -1142,38 +1142,57 @@ db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::Poin
 
     }
 
+    std::vector<db::SubCircuit *> sc_path;
+
+    db::Net *topmost_net = net;
+
     //  follow the path up in the net hierarchy using the transformation and the upper cell index as the
     //  guide line
-    while (! inst_path.empty () && net->pin_count () > 0) {
+    while (circuit && ! inst_path.empty ()) {
 
       cell_indexes.pop_back ();
 
-      const db::Pin *pin = circuit->pin_by_id (net->begin_pins ()->pin_id ());
-      tl_assert (pin != 0);
+      const db::Pin *pin = 0;
+      if (net && net->pin_count () > 0) {
+        pin = circuit->pin_by_id (net->begin_pins ()->pin_id ());
+        tl_assert (pin != 0);
+      }
 
       db::DCplxTrans dtrans = dbu_trans * inst_path.back ().complex_trans () * dbu_trans_inv;
 
       //  try to find a parent circuit which connects to this net
       db::Circuit *upper_circuit = 0;
+      db::SubCircuit *subcircuit = 0;
       db::Net *upper_net = 0;
-      for (db::Circuit::refs_iterator r = circuit->begin_refs (); r != circuit->end_refs () && ! upper_net; ++r) {
+      for (db::Circuit::refs_iterator r = circuit->begin_refs (); r != circuit->end_refs () && ! upper_circuit; ++r) {
         if (r->trans ().equal (dtrans) && r->circuit () && r->circuit ()->cell_index () == cell_indexes.back ()) {
-          upper_net = r->net_for_pin (pin->id ());
-          upper_circuit = r->circuit ();
+          subcircuit = r.operator-> ();
+          if (pin) {
+            upper_net = subcircuit->net_for_pin (pin->id ());
+          }
+          upper_circuit = subcircuit->circuit ();
         }
       }
 
+      net = upper_net;
+
       if (upper_net) {
-        circuit = upper_circuit;
-        net = upper_net;
-        inst_path.pop_back ();
+        topmost_net = upper_net;
       } else {
-        break;
+        sc_path.push_back (subcircuit);
       }
+
+      circuit = upper_circuit;
+      inst_path.pop_back ();
 
     }
 
-    return net;
+    if (sc_path_out) {
+      std::reverse (sc_path.begin (), sc_path.end ());
+      *sc_path_out = sc_path;
+    }
+
+    return topmost_net;
 
   } else {
     return 0;

@@ -466,6 +466,21 @@ Class<db::SubCircuit> decl_dbSubCircuit (decl_dbNetlistObject, "db", "SubCircuit
   gsi::method_ext ("disconnect_pin", &gsi::subcircuit_disconnect_pin1, gsi::arg ("pin"),
     "@brief Disconnects the given pin from any net.\n"
     "This version takes a \\Pin reference instead of a pin ID."
+  ) +
+  gsi::method ("trans", &db::SubCircuit::trans,
+    "@brief Gets the physical transformation for the subcircuit.\n"
+    "\n"
+    "This property applies to subcircuits derived from a layout. It specifies the "
+    "placement of the respective cell.\n"
+    "\n"
+    "This property has been introduced in version 0.27."
+  ) +
+  gsi::method ("trans=", &db::SubCircuit::set_trans, gsi::arg ("trans"),
+    "@brief Sets the physical transformation for the subcircuit.\n"
+    "\n"
+    "See \\trans for details about this property.\n"
+    "\n"
+    "This property has been introduced in version 0.27."
   ),
   "@brief A subcircuit inside a circuit.\n"
   "Circuits may instantiate other circuits as subcircuits similar to cells "

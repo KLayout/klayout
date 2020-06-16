@@ -30,6 +30,9 @@
 #include "dbLayoutToNetlist.h"
 #include "dbLayoutVsSchematic.h"
 
+#include "tlList.h"
+#include "tlTypeTraits.h"
+
 #include <QAbstractItemModel>
 #include <QColor>
 
@@ -88,6 +91,101 @@ private:
 // ----------------------------------------------------------------------------------
 //  NetlistBrowserModel definition
 
+class NetlistBrowserModel;
+
+/**
+ *  @brief A base class for the item data object
+ */
+class NetlistModelItemData
+  : public tl::list_node<NetlistModelItemData>
+{
+public:
+  typedef tl::list<NetlistModelItemData>::iterator iterator;
+
+  NetlistModelItemData ()
+    : mp_parent (0), m_children_made (false), m_index (0)
+  { }
+
+  NetlistModelItemData (NetlistModelItemData *parent)
+    : mp_parent (parent), m_children_made (false), m_index (0)
+  { }
+
+  virtual int children () = 0;
+  virtual NetlistModelItemData *parent () { return mp_parent; }
+
+  virtual QIcon icon () = 0;
+  virtual QString text (int column, NetlistBrowserModel *model) = 0;
+  virtual QString search_text () = 0;
+  virtual std::string tooltip (NetlistBrowserModel *model) = 0;
+  virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model) = 0;
+
+  void ensure_children (NetlistBrowserModel *model)
+  {
+    if (! m_children_made) {
+
+      m_children.clear ();
+      m_children_per_index.clear ();
+
+      do_ensure_children (model);
+
+      size_t n = 0;
+      for (iterator i = begin (); i != end (); ++i) {
+        ++n;
+      }
+      m_children_per_index.reserve (n);
+
+      size_t index = 0;
+      for (iterator i = begin (); i != end (); ++i) {
+        m_children_per_index.push_back (i.operator-> ());
+        i->set_index (index++);
+      }
+
+      m_children_made = true;
+
+    }
+  }
+
+  void push_back (NetlistModelItemData *child)
+  {
+    m_children.push_back (child);
+  }
+
+  iterator begin () { return m_children.begin (); }
+  iterator end ()   { return m_children.end (); }
+
+  size_t child_count () { return m_children_per_index.size (); }
+  size_t index () { return m_index; }
+
+  NetlistModelItemData *child (size_t n)
+  {
+    return (n < m_children_per_index.size () ? m_children_per_index [n] : 0);
+  }
+
+private:
+  NetlistModelItemData *mp_parent;
+  tl::list<NetlistModelItemData> m_children;
+  std::vector<NetlistModelItemData *> m_children_per_index;
+  bool m_children_made;
+  size_t m_index;
+
+  void set_index (size_t index) { m_index = index; }
+
+  virtual void do_ensure_children (NetlistBrowserModel *model) = 0;
+};
+
+}
+
+namespace tl {
+  //  disable copying for NetlistModelItemData
+  template<> struct type_traits<lay::NetlistModelItemData>
+  {
+    typedef false_tag has_copy_constructor;
+  };
+}
+
+namespace lay
+{
+
 /**
  *  @brief The NetlistBrowserModel
  *
@@ -130,6 +228,26 @@ public:
   int status_column () const
   {
     return m_status_column;
+  }
+
+  int object_column () const
+  {
+    return m_object_column;
+  }
+
+  int first_column () const
+  {
+    return m_first_column;
+  }
+
+  int second_column () const
+  {
+    return m_second_column;
+  }
+
+  IndexedNetlistModel *indexer ()
+  {
+    return mp_indexer.get ();
   }
 
   std::pair<const db::Net *, const db::Net *> net_from_index (const QModelIndex &index) const;
@@ -236,6 +354,7 @@ private:
   int m_status_column;
   int m_first_column;
   int m_second_column;
+  std::auto_ptr<NetlistModelItemData> m_root;
 };
 
 } // namespace lay

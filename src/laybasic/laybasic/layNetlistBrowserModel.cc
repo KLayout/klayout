@@ -2271,6 +2271,7 @@ NetlistBrowserModel::data (const QModelIndex &index, int role) const
   return QVariant ();
 }
 
+// @@@
 static QString build_url (void *id, const std::string &tag, const std::string &title)
 {
   if (id == no_id) {
@@ -2594,10 +2595,13 @@ NetlistBrowserModel::flags (const QModelIndex & /*index*/) const
 bool
 NetlistBrowserModel::hasChildren (const QModelIndex &parent) const
 {
-  NetlistModelItemData *d = (NetlistModelItemData *) (parent.internalPointer ());
-  if (! d) {
-    return false;
+  NetlistModelItemData *d = 0;
+  if (parent.isValid ()) {
+    d = (NetlistModelItemData *) (parent.internalPointer ());
   } else {
+    d = mp_root.get ();
+  }
+  if (d) {
     d->ensure_children (const_cast<NetlistBrowserModel *> (this));
     return d->begin () != d->end ();
   }
@@ -2635,15 +2639,17 @@ QModelIndex
 NetlistBrowserModel::index (int row, int column, const QModelIndex &parent) const
 {
   NetlistModelItemData *d = 0;
-  if (parent.isValid ()) {
+  if (! parent.isValid ()) {
+    d = mp_root.get ();
+  } else {
     d = (NetlistModelItemData *) (parent.internalPointer ());
   }
-  if (! d) {
-    d = mp_root.get ();
+  if (d) {
+    d->ensure_children (const_cast<NetlistBrowserModel *> (this));
+    return createIndex (row, column, (void *) d->child (size_t (row)));
+  } else {
+    return QModelIndex ();
   }
-
-  d->ensure_children (const_cast<NetlistBrowserModel *> (this));
-  return createIndex (row, column, (void *) d->child (size_t (row)));
 }
 
 void
@@ -2748,10 +2754,14 @@ NetlistBrowserModel::parent (const QModelIndex &index) const
 int
 NetlistBrowserModel::rowCount (const QModelIndex &parent) const
 {
-  NetlistModelItemData *d = (NetlistModelItemData *) (parent.internalPointer ());
-  if (! d) {
-    return 0;
+  NetlistModelItemData *d = 0;
+  if (parent.isValid ()) {
+    d = (NetlistModelItemData *) (parent.internalPointer ());
   } else {
+    d = mp_root.get ();
+  }
+  if (d) {
+    d->ensure_children (const_cast<NetlistBrowserModel *> (this));
     return int (d->child_count ());
   }
 }

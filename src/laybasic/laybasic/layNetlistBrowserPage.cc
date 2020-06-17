@@ -411,7 +411,7 @@ NetlistBrowserPage::selected_circuits ()
 
   QModelIndexList selection = directory_tree->selectionModel ()->selectedIndexes ();
   for (QModelIndexList::const_iterator i = selection.begin (); i != selection.end (); ++i) {
-    if (i->column () == 0 && model->is_circuit_index (*i)) {
+    if (i->column () == 0) {
       const db::Circuit *circuit = model->circuit_from_index (*i).first;
       if (circuit) {
         circuits.push_back (circuit);

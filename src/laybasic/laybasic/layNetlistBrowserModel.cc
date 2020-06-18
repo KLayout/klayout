@@ -1607,7 +1607,8 @@ CircuitNetDeviceTerminalItemData::do_ensure_children (NetlistBrowserModel * /*mo
 {
   size_t n = std::max (rows_for (m_tp.first), rows_for (m_tp.second));
   for (size_t i = 0; i < n; ++i) {
-    std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> termdefs = terminal_defs_from_terminal_refs (m_tp);
+    std::pair<const db::DeviceClass *, const db::DeviceClass *> device_classes = device_classes_from_devices (dp ());
+    std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> termdefs = terminal_defs_from_device_classes (device_classes, i);
     IndexedNetlistModel::net_pair nets = nets_from_device_terminals (dp (), termdefs);
     push_back (new CircuitNetDeviceTerminalOthersItemData (this, nets, termdefs));
   }

@@ -2604,6 +2604,8 @@ NetlistBrowserModel::hasChildren (const QModelIndex &parent) const
   if (d) {
     d->ensure_children (const_cast<NetlistBrowserModel *> (this));
     return d->begin () != d->end ();
+  } else {
+    return false;
   }
 }
 
@@ -2747,7 +2749,7 @@ NetlistBrowserModel::parent (const QModelIndex &index) const
   if (! d || ! d->parent ()) {
     return QModelIndex ();
   } else {
-    return createIndex (d->parent ()->index (), index.column (), (void *) d->parent ());
+    return createIndex (d->parent ()->index (), 0, (void *) d->parent ());
   }
 }
 

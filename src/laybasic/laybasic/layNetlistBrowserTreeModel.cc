@@ -382,7 +382,7 @@ NetlistBrowserTreeModel::parent (const QModelIndex &index) const
 
       nprod /= nnlast;
 
-      return createIndex (int (ids / nprod - 1), index.column (), reinterpret_cast<void *> (ids));
+      return createIndex (int (ids / nprod - 1), 0, reinterpret_cast<void *> (ids));
 
     }
 

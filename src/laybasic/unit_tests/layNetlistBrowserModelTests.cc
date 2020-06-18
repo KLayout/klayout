@@ -48,6 +48,7 @@ TEST (1)
   EXPECT_EQ (model->rowCount (inv2Index), 14);
   //  Pins
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2Index), Qt::UserRole).toString ()), "IN");
+  EXPECT_EQ (model->parent (model->index (0, 0, inv2Index)) == model->parent (model->index (0, 3, inv2Index)), true);
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2Index), Qt::DisplayRole).toString ()), "IN");
   EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, inv2Index), Qt::DisplayRole).toString ()), "$1");
   EXPECT_EQ (tl::to_string (model->data (model->index (2, 0, inv2Index), Qt::DisplayRole).toString ()), "OUT");
@@ -55,6 +56,7 @@ TEST (1)
   EXPECT_EQ (tl::to_string (model->data (model->index (4, 0, inv2Index), Qt::DisplayRole).toString ()), "$4");
   //  Nets
   EXPECT_EQ (tl::to_string (model->data (model->index (5, 0, inv2Index), Qt::UserRole).toString ()), "NIN");
+  EXPECT_EQ (model->parent (model->index (5, 0, inv2Index)) == model->parent (model->index (5, 3, inv2Index)), true);
   EXPECT_EQ (tl::to_string (model->data (model->index (5, 0, inv2Index), Qt::DisplayRole).toString ()), "NIN");
   EXPECT_EQ (tl::to_string (model->data (model->index (5, 2, inv2Index), Qt::DisplayRole).toString ()), "NIN (3)");
   EXPECT_EQ (tl::to_string (model->data (model->index (6, 0, inv2Index), Qt::DisplayRole).toString ()), "NOUT");
@@ -68,6 +70,7 @@ TEST (1)
   //  No Subcircuits
   //  Devices
   EXPECT_EQ (tl::to_string (model->data (model->index (10, 0, inv2Index), Qt::UserRole).toString ()), "$1|PMOS");
+  EXPECT_EQ (model->parent (model->index (10, 0, inv2Index)) == model->parent (model->index (10, 3, inv2Index)), true);
   EXPECT_EQ (tl::to_string (model->data (model->index (10, 0, inv2Index), Qt::DisplayRole).toString ()), "PMOS [L=0.25, W=0.95, AS=0.49875, AD=0.26125, PS=2.95, PD=1.5]");
   EXPECT_EQ (tl::to_string (model->data (model->index (10, 2, inv2Index), Qt::DisplayRole).toString ()), "$1");
   EXPECT_EQ (tl::to_string (model->data (model->index (11, 0, inv2Index), Qt::DisplayRole).toString ()), "PMOS [L=0.25, W=0.95, AS=0.26125, AD=0.49875, PS=1.5, PD=2.95]");
@@ -83,6 +86,7 @@ TEST (1)
   //  Pins
   //  Nets
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, ringoIndex), Qt::UserRole).toString ()), "FB");
+  EXPECT_EQ (model->parent (model->index (0, 0, ringoIndex)) == model->parent (model->index (0, 3, ringoIndex)), true);
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, ringoIndex), Qt::DisplayRole).toString ()), "FB (2)");
   EXPECT_EQ (tl::to_string (model->data (model->index (1, 2, ringoIndex), Qt::DisplayRole).toString ()), "VDD (10)");
   EXPECT_EQ (tl::to_string (model->data (model->index (2, 2, ringoIndex), Qt::DisplayRole).toString ()), "VSS (10)");
@@ -97,6 +101,7 @@ TEST (1)
   EXPECT_EQ (tl::to_string (model->data (model->index (11, 2, ringoIndex), Qt::DisplayRole).toString ()), "$12 (2)");
   //  Subcircuits
   EXPECT_EQ (tl::to_string (model->data (model->index (12, 0, ringoIndex), Qt::UserRole).toString ()), "INV2|$1");
+  EXPECT_EQ (model->parent (model->index (12, 0, ringoIndex)) == model->parent (model->index (12, 3, ringoIndex)), true);
   EXPECT_EQ (tl::to_string (model->data (model->index (12, 0, ringoIndex), Qt::DisplayRole).toString ()), "<a href='int:circuit?id=0'>INV2</a>");
   EXPECT_EQ (tl::to_string (model->data (model->index (12, 2, ringoIndex), Qt::DisplayRole).toString ()), "$1");
   EXPECT_EQ (tl::to_string (model->data (model->index (21, 0, ringoIndex), Qt::DisplayRole).toString ()), "<a href='int:circuit?id=0'>INV2</a>");
@@ -122,12 +127,14 @@ TEST (1)
   EXPECT_EQ (model->rowCount (inv2NOutIndex), 3);
 
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2NOutIndex), Qt::UserRole).toString ()), "D|PMOS|$2");
+  EXPECT_EQ (model->parent (model->index (0, 0, inv2NOutIndex)) == model->parent (model->index (0, 3, inv2NOutIndex)), true);
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2NOutIndex), Qt::DisplayRole).toString ()), "D / PMOS [L=0.25, W=0.95, AS=0.26125, AD=0.49875, PS=1.5, PD=2.95]");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, inv2NOutIndex), Qt::DisplayRole).toString ()), "<a href='int:device?id=24'>$2</a>");
   EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, inv2NOutIndex), Qt::DisplayRole).toString ()), "D / NMOS [L=0.25, W=0.95, AS=0.26125, AD=0.49875, PS=1.5, PD=2.95]");
   EXPECT_EQ (tl::to_string (model->data (model->index (1, 2, inv2NOutIndex), Qt::DisplayRole).toString ()), "<a href='int:device?id=56'>$4</a>");
   EXPECT_EQ (tl::to_string (model->data (model->index (2, 0, inv2NOutIndex), Qt::DisplayRole).toString ()), "<a href='int:pin?id=18'>OUT</a>");
   EXPECT_EQ (tl::to_string (model->data (model->index (2, 2, inv2NOutIndex), Qt::DisplayRole).toString ()), "");
+  EXPECT_EQ (model->parent (model->index (2, 0, inv2NOutIndex)) == model->parent (model->index (2, 3, inv2NOutIndex)), true);
 
   //  no children for pins on nets
   QModelIndex inv2NOutPinOutIndex = model->index (2, 0, inv2NOutIndex);
@@ -136,7 +143,10 @@ TEST (1)
   EXPECT_EQ (model->rowCount (inv2NOutPinOutIndex), 0);
 
   //  a MOS3 transistor has three other terminals
-  QModelIndex inv2NOutDeviceIndex = model->index (0, 0, inv2NOutIndex);
+  QModelIndex inv2NOutDeviceIndex = model->index (0, 2, inv2NOutIndex);
+  QModelIndex b = model->index (0, 0, inv2NOutIndex);
+  EXPECT_EQ (b.parent () == inv2NOutDeviceIndex.parent (), true);
+  EXPECT_EQ (b.model () == inv2NOutDeviceIndex.model (), true);
   EXPECT_EQ (model->parent (inv2NOutDeviceIndex) == inv2NOutIndex, true);
   EXPECT_EQ (model->hasChildren (inv2NOutDeviceIndex), true);
   EXPECT_EQ (model->rowCount (inv2NOutDeviceIndex), 3);
@@ -264,7 +274,7 @@ TEST (2)
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2Pin0Index), Qt::UserRole).toString ()), "$1|1");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2Pin0Index), Qt::DisplayRole).toString ()), "$1 ⇔ 1");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, inv2Pin0Index), Qt::DisplayRole).toString ()), "<a href='int:net?id=9'>$1</a>");
-  std::pair<const db::Net *, const db::Net *> nets = model->net_from_index (model->index_from_id ((void *) 9, 0));
+  std::pair<const db::Net *, const db::Net *> nets = model->net_from_index (model->index (0, 0, inv2Pin0Index));
   EXPECT_EQ (nets.first != 0, true);
   if (nets.first != 0) {
     EXPECT_EQ (nets.first->expanded_name (), "$1");

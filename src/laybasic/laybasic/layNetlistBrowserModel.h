@@ -201,8 +201,6 @@ public:
   virtual QModelIndex parent (const QModelIndex &index) const;
   virtual int rowCount (const QModelIndex &parent) const;
 
-  QModelIndex index_from_id (void *id, int column) const;
-
   int status_column () const
   {
     return m_status_column;

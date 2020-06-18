@@ -520,6 +520,7 @@ NetlistBrowserPage::select_color_for_net ()
 void
 NetlistBrowserPage::navigate_to (void *id, bool fwd)
 {
+#if 0 // @@@
   NetlistBrowserTreeModel *tree_model = dynamic_cast<NetlistBrowserTreeModel *> (hierarchy_tree->model ());
   NetlistBrowserModel *netlist_model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
   if (! tree_model || ! netlist_model) {
@@ -547,6 +548,7 @@ NetlistBrowserPage::navigate_to (void *id, bool fwd)
   add_to_history (id, fwd);
 
   selection_changed ();
+#endif
 }
 
 void

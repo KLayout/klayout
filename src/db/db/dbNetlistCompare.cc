@@ -2790,26 +2790,20 @@ void align (Iter i1, Iter i2, Iter j1, Iter j2, Distance distance)
     vj.push_back (j);
   }
 
-  while (vi.size () < vj.size ()) {
-    vi.push_back (Iter ());
-  }
+  size_t sz = std::max (vi.size (), vj.size ());
 
-  while (vj.size () < vi.size ()) {
-    vj.push_back (Iter ());
-  }
-
-  if (vi.size () <= 1) {
+  if (sz <= 1) {
     return;
   }
 
   //  Caution: this is an O(2) algorithm ...
   bool any_swapped = true;
-  for (size_t n = 0; n < vi.size () - 1 && any_swapped; ++n) {
+  for (size_t n = 0; n < sz - 1 && any_swapped; ++n) {
 
     any_swapped = false;
 
-    for (size_t m = n + 1; m < vj.size (); ++m) {
-      if (vi [n] == Iter () || vi [m] == Iter () || vj [n] == Iter () || vj [m] == Iter ()) {
+    for (size_t m = n + 1; m < sz; ++m) {
+      if (n >= vi.size () || m >= vi.size () || n >= vj.size () || m >= vj.size ()) {
         continue;
       } else if (distance (*vi [n], *vj [m]) + distance (*vi [m], *vj [n]) < distance (*vi [n], *vj [n]) + distance (*vi [m], *vj [m])) {
         //  this will reduce the overall distance:

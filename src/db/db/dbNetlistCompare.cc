@@ -1533,8 +1533,6 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
     }
   }
 
-  std::sort (m_nodes.begin (), m_nodes.end ());
-
   for (std::vector<NetGraphNode>::const_iterator i = m_nodes.begin (); i != m_nodes.end (); ++i) {
     m_net_index.insert (std::make_pair (i->net (), i - m_nodes.begin ()));
   }

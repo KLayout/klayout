@@ -288,6 +288,26 @@ public:
   }
 
   /**
+   *  @brief Sets a value indicating depth-first traversal
+   *
+   *  With depth first (the default), the algorithm looks for further identities before moving to another
+   *  node. With breadth first (false), the algorithm will work in "waves" rather than digging deerly
+   *  into the direction of a node.
+   */
+  void set_depth_first (bool df)
+  {
+    m_depth_first = df;
+  }
+
+  /**
+   *  @brief Gets a value indicating depth-first traversal
+   */
+  bool depth_first () const
+  {
+    return m_depth_first;
+  }
+
+  /**
    *  @brief Gets the list of circuits without matching circuit in the other netlist
    *  The result can be used to flatten these circuits prior to compare.
    *  Mismatching top level circuits are not reported because they cannot be flattened.
@@ -341,6 +361,7 @@ protected:
   double m_res_threshold;
   size_t m_max_n_branch;
   size_t m_max_depth;
+  bool m_depth_first;
   bool m_dont_consider_net_names;
 };
 

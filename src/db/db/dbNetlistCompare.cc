@@ -616,13 +616,14 @@ class NetGraph;
 struct CompareData
 {
   CompareData ()
-    : other (0), max_depth (0), max_n_branch (0), dont_consider_net_names (false), logger (0),
+    : other (0), max_depth (0), max_n_branch (0), depth_first (true), dont_consider_net_names (false), logger (0),
       circuit_pin_mapper (0), subcircuit_equivalence (0), device_equivalence (0)
   { }
 
   NetGraph *other;
   size_t max_depth;
   size_t max_n_branch;
+  bool depth_first;
   bool dont_consider_net_names;
   NetlistCompareLogger *logger;
   CircuitPinMapper *circuit_pin_mapper;
@@ -2328,16 +2329,15 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
         }
       }
 
-      //  continue here. In tentative mode continue because we want to know if we generate a contradiction
-      if (tentative) {
-
+      if (data->depth_first || tentative) {
         size_t bt_count = derive_node_identities (ni, depth + 1, n_branch, tentative, with_ambiguous, data);
         if (bt_count == failed_match) {
-          return failed_match;
+          if (tentative) {
+            return failed_match;
+          }
+        } else {
+          new_nodes += bt_count;
         }
-
-        new_nodes += bt_count;
-
       }
 
       new_nodes += 1;
@@ -2501,16 +2501,15 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
           }
         }
 
-        //  continue here. In tentative mode continue because we want to know if we generate a contradiction
-        if (tentative) {
-
+        if (data->depth_first || tentative) {
           size_t bt_count = derive_node_identities (ni, depth + 1, n_branch, tentative, with_ambiguous, data);
           if (bt_count == failed_match) {
-            return failed_match;
+            if (tentative) {
+              return failed_match;
+            }
+          } else {
+            new_nodes += bt_count;
           }
-
-          new_nodes += bt_count;
-
         }
 
         new_nodes += 1;
@@ -2733,6 +2732,7 @@ NetlistComparer::NetlistComparer (NetlistCompareLogger *logger)
 
   m_max_depth = 50;
   m_max_n_branch = 500;
+  m_depth_first = true;
 
   m_dont_consider_net_names = false;
 }
@@ -3080,6 +3080,42 @@ compute_device_key (const db::Device &device, const db::NetGraph &g, bool strict
   return k;
 }
 
+static std::vector<std::pair<size_t, size_t> >
+compute_device_key_for_this (const db::Device &device, const db::NetGraph &g, bool strict, bool &mapped)
+{
+  std::vector<std::pair<size_t, size_t> > k = compute_device_key (device, g, strict);
+
+  mapped = true;
+  for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
+    if (! g.begin () [i->second].has_other ()) {
+      i->second = invalid_id;  //  normalization
+      mapped = false;
+    }
+  }
+
+  std::sort (k.begin (), k.end ());
+  return k;
+}
+
+static std::vector<std::pair<size_t, size_t> >
+compute_device_key_for_other (const db::Device &device, const db::NetGraph &g, bool strict, bool &mapped)
+{
+  std::vector<std::pair<size_t, size_t> > k = compute_device_key (device, g, strict);
+
+  mapped = true;
+  for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
+    if (! g.begin () [i->second].has_other ()) {
+      i->second = invalid_id;  //  normalization
+      mapped = false;
+    } else {
+      i->second = g.begin () [i->second].other_net_index ();
+    }
+  }
+
+  std::sort (k.begin (), k.end ());
+  return k;
+}
+
 static bool
 compute_subcircuit_key (const db::SubCircuit &subcircuit, const db::NetGraph &g, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, std::vector<std::pair<size_t, size_t> > &k)
 {
@@ -3112,6 +3148,46 @@ compute_subcircuit_key (const db::SubCircuit &subcircuit, const db::NetGraph &g,
   }
 
   return true;
+}
+
+static std::vector<std::pair<size_t, size_t> >
+compute_subcircuit_key_for_this (const db::SubCircuit &subcircuit, const db::NetGraph &g, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, bool &mapped)
+{
+  std::vector<std::pair<size_t, size_t> > k;
+  if (! compute_subcircuit_key (subcircuit, g, circuit_map, pin_map, k)) {
+    k.clear ();
+  }
+
+  mapped = true;
+  for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end () && mapped; ++i) {
+    if (! g.begin () [i->second].has_other ()) {
+      mapped = false;
+    }
+  }
+
+  std::sort (k.begin (), k.end ());
+  return k;
+}
+
+static std::vector<std::pair<size_t, size_t> >
+compute_subcircuit_key_for_other (const db::SubCircuit &subcircuit, const db::NetGraph &g, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, bool &mapped)
+{
+  std::vector<std::pair<size_t, size_t> > k;
+  if (! compute_subcircuit_key (subcircuit, g, circuit_map, pin_map, k)) {
+    k.clear ();
+  }
+
+  mapped = true;
+  for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
+    if (! g.begin () [i->second].has_other ()) {
+      mapped = false;
+    } else {
+      i->second = g.begin () [i->second].other_net_index ();
+    }
+  }
+
+  std::sort (k.begin (), k.end ());
+  return k;
 }
 
 namespace {
@@ -3297,7 +3373,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   bool good = false;
 
-  for (int pass = 0; pass < 2 /*&& ! good*/; ++pass) {
+  for (int pass = 0; pass < 2 && ! good; ++pass) {
 
     if (options ()->debug_netcompare) {
       if (pass > 0) {
@@ -3324,6 +3400,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
           data.other = &g2;
           data.max_depth = m_max_depth;
           data.max_n_branch = m_max_n_branch;
+          data.depth_first = m_depth_first;
           data.dont_consider_net_names = m_dont_consider_net_names;
           data.circuit_pin_mapper = &circuit_pin_mapper;
           data.subcircuit_equivalence = &subcircuit_equivalence;
@@ -3375,6 +3452,9 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
         for (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator>  >::const_iterator n = other_nodes.begin (); n != other_nodes.end () && good; ++n) {
           good = is_passive_net (n->first->net (), c22_circuit_and_pin_mapping);
         }
+        if (options ()->debug_netcompare) {
+          tl::info << "Stopped with " << nodes.size () << "/" << other_nodes.size () << " nodes left unresolved " << (good ? "(accepted)" : "(not accepted)");
+        }
         //  this assumes that we don't gain anything here. Stop now.
         break;
       }
@@ -3416,6 +3496,9 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   for (db::NetGraph::node_iterator i = g1.begin (); i != g1.end (); ++i) {
     if (! i->has_other ()) {
+      if (options ()->debug_netcompare) {
+        tl::info << "Unresolved net from left: " << i->net ()->expanded_name () << " " << (good ? "(accepted)" : "(not accepted)");
+      }
       if (mp_logger) {
         if (good) {
           mp_logger->match_nets (i->net (), 0);
@@ -3432,6 +3515,9 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   for (db::NetGraph::node_iterator i = g2.begin (); i != g2.end (); ++i) {
     if (! i->has_other ()) {
+      if (options ()->debug_netcompare) {
+        tl::info << "Unresolved net from right: " << i->net ()->expanded_name () << " " << (good ? "(accepted)" : "(not accepted)");
+      }
       if (mp_logger) {
         if (good) {
           mp_logger->match_nets (0, i->net ());
@@ -3672,6 +3758,69 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
   typedef std::vector<std::pair<std::vector<std::pair<size_t, size_t> >, std::pair<const db::Device *, size_t> > > unmatched_list;
   unmatched_list unmatched_a, unmatched_b;
 
+  //  check mapping of devices whose equivalence is established topologically
+
+  for (db::Circuit::const_device_iterator d = c1->begin_devices (); d != c1->end_devices (); ++d) {
+
+    if (! device_filter.filter (d.operator-> ())) {
+      continue;
+    }
+
+    const db::Device *d_other = device_eq.other (d.operator-> ());
+    if (! d_other) {
+      continue;
+    }
+
+    size_t device_cat = device_categorizer.cat_for_device (d.operator-> ());
+    if (! device_cat) {
+      //  device is ignored
+      continue;
+    }
+
+    size_t device_cat_other = device_categorizer.cat_for_device (d_other);
+    if (! device_cat_other) {
+      //  device is ignored
+      continue;
+    }
+
+    bool mapped1 = true, mapped2 = true;
+    std::vector<std::pair<size_t, size_t> > k = compute_device_key_for_this (*d, g1, device_categorizer.is_strict_device_category (device_cat), mapped1);
+    std::vector<std::pair<size_t, size_t> > k_other = compute_device_key_for_other (*d_other, g2, device_categorizer.is_strict_device_category (device_cat_other), mapped2);
+
+    if (! mapped1 || ! mapped2 || k != k_other) {
+
+      //  topological mismatch
+      if (mp_logger) {
+        mp_logger->device_mismatch (d.operator-> (), d_other);
+      }
+      good = false;
+
+    } else {
+
+      db::DeviceCompare dc;
+
+      if (! dc.equals (std::make_pair (d.operator-> (), device_cat), std::make_pair (d_other, device_cat_other))) {
+        if (device_cat != device_cat_other) {
+          if (mp_logger) {
+            mp_logger->match_devices_with_different_device_classes (d.operator-> (), d_other);
+          }
+          good = false;
+        } else {
+          if (mp_logger) {
+            mp_logger->match_devices_with_different_parameters (d.operator-> (), d_other);
+          }
+          good = false;
+        }
+      } else {
+        if (mp_logger) {
+          mp_logger->match_devices (d.operator-> (), d_other);
+        }
+      }
+
+    }
+
+  }
+
   for (db::Circuit::const_device_iterator d = c1->begin_devices (); d != c1->end_devices (); ++d) {
 
     if (! device_filter.filter (d.operator-> ())) {
@@ -3688,17 +3837,8 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
       continue;
     }
 
-    std::vector<std::pair<size_t, size_t> > k = compute_device_key (*d, g1, device_categorizer.is_strict_device_category (device_cat));
-
     bool mapped = true;
-    for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
-      if (! g1.begin () [i->second].has_other ()) {
-        i->second = invalid_id;  //  normalization
-        mapped = false;
-      }
-    }
-
-    std::sort (k.begin (), k.end ());
+    std::vector<std::pair<size_t, size_t> > k = compute_device_key_for_this (*d, g1, device_categorizer.is_strict_device_category (device_cat), mapped);
 
     if (! mapped) {
       if (mp_logger) {
@@ -3718,52 +3858,37 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
       continue;
     }
 
+    if (device_eq.other (d.operator-> ())) {
+      continue;
+    }
+
     size_t device_cat = device_categorizer.cat_for_device (d.operator-> ());
     if (! device_cat) {
       //  device is ignored
       continue;
     }
 
-    const db::Device *c1_device = device_eq.other (d.operator-> ());
+    const db::Device *c1_device = 0;
     size_t c1_device_cat = 0;
 
-    if (c1_device) {
+    bool mapped = true;
+    std::vector<std::pair<size_t, size_t> > k = compute_device_key_for_other (*d, g2, device_categorizer.is_strict_device_category (device_cat), mapped);
 
-      c1_device_cat = device_categorizer.cat_for_device (c1_device);
+    std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::Device *, size_t> >::iterator dm = device_map.find (k);
+
+    if (! mapped || dm == device_map.end () || dm->first != k) {
+
+      if (mp_logger) {
+        unmatched_b.push_back (std::make_pair (k, std::make_pair (d.operator-> (), device_cat)));
+      }
+      good = false;
 
     } else {
 
-      std::vector<std::pair<size_t, size_t> > k = compute_device_key (*d, g2, device_categorizer.is_strict_device_category (device_cat));
+      c1_device = dm->second.first;
+      c1_device_cat = dm->second.second;
 
-      bool mapped = true;
-      for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
-        if (! g2.begin () [i->second].has_other ()) {
-          i->second = invalid_id;  //  normalization
-          mapped = false;
-        } else {
-          i->second = g2.begin () [i->second].other_net_index ();
-        }
-      }
-
-      std::sort (k.begin (), k.end ());
-
-      std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::Device *, size_t> >::iterator dm = device_map.find (k);
-
-      if (! mapped || dm == device_map.end () || dm->first != k) {
-
-        if (mp_logger) {
-          unmatched_b.push_back (std::make_pair (k, std::make_pair (d.operator-> (), device_cat)));
-        }
-        good = false;
-
-      } else {
-
-        c1_device = dm->second.first;
-        c1_device_cat = dm->second.second;
-
-        device_map.erase (dm);
-
-      }
+      device_map.erase (dm);
 
     }
 
@@ -3886,28 +4011,55 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
       continue;
     }
 
+    const db::SubCircuit *sc_other = subcircuit_eq.other (sc.operator-> ());
+    if (! sc_other) {
+      continue;
+    }
+
+    size_t sc_cat_other = circuit_categorizer.cat_for_subcircuit (sc_other);
+    if (! sc_cat_other) {
+      //  subcircuit is ignored
+      continue;
+    }
+
+    bool mapped1 = true, mapped2 = true;
+    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key_for_this (*sc, g1, &c12_circuit_and_pin_mapping, &circuit_pin_mapper, mapped1);
+    std::vector<std::pair<size_t, size_t> > k_other = compute_subcircuit_key_for_other (*sc_other, g2, &c22_circuit_and_pin_mapping, &circuit_pin_mapper, mapped2);
+
+    if (! mapped1 || ! mapped2 || k != k_other || sc_cat != sc_cat_other) {
+      if (mp_logger) {
+        mp_logger->subcircuit_mismatch (sc.operator-> (), sc_other);
+      }
+      good = false;
+    } else {
+      if (mp_logger) {
+        mp_logger->match_subcircuits (sc.operator-> (), sc_other);
+      }
+    }
+
+  }
+
+  for (db::Circuit::const_subcircuit_iterator sc = c1->begin_subcircuits (); sc != c1->end_subcircuits (); ++sc) {
+
+    size_t sc_cat = circuit_categorizer.cat_for_subcircuit (sc.operator-> ());
+    if (! sc_cat) {
+      //  subcircuit is ignored
+      continue;
+    }
+
     if (subcircuit_eq.other (sc.operator-> ())) {
       continue;
     }
 
-    std::vector<std::pair<size_t, size_t> > k;
-    bool valid = compute_subcircuit_key (*sc, g1, &c12_circuit_and_pin_mapping, &circuit_pin_mapper, k);
-
     bool mapped = true;
-    for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end () && mapped; ++i) {
-      if (! g1.begin () [i->second].has_other ()) {
-        mapped = false;
-      }
-    }
-
-    std::sort (k.begin (), k.end ());
+    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key_for_this (*sc, g1, &c12_circuit_and_pin_mapping, &circuit_pin_mapper, mapped);
 
     if (! mapped) {
       if (mp_logger) {
         mp_logger->subcircuit_mismatch (sc.operator-> (), 0);
       }
       good = false;
-    } else if (valid) {
+    } else if (! k.empty ()) {
       //  TODO: report devices which cannot be distiguished topologically?
       subcircuit_map.insert (std::make_pair (k, std::make_pair (sc.operator-> (), sc_cat)));
     }
@@ -3925,87 +4077,68 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
       continue;
     }
 
-    const db::SubCircuit *c1_subcircuit = subcircuit_eq.other (sc.operator-> ());
+    if (subcircuit_eq.other (sc.operator-> ())) {
+      continue;
+    }
 
-    if (c1_subcircuit) {
+    bool mapped = true;
+    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key_for_other (*sc, g2, &c22_circuit_and_pin_mapping, &circuit_pin_mapper, mapped);
+
+    std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> >::iterator scm = subcircuit_map.find (k);
+
+    if (! mapped || scm == subcircuit_map.end () || scm->first != k) {
 
       if (mp_logger) {
-        mp_logger->match_subcircuits (c1_subcircuit, sc.operator-> ());
+        unmatched_b.push_back (std::make_pair (k, sc.operator-> ()));
       }
+      good = false;
 
     } else {
 
-      std::vector<std::pair<size_t, size_t> > k;
-      compute_subcircuit_key (*sc, g2, &c22_circuit_and_pin_mapping, &circuit_pin_mapper, k);
+      db::SubCircuitCompare scc;
 
-      bool mapped = true;
-      for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
-        if (! g2.begin () [i->second].has_other ()) {
-          mapped = false;
-        } else {
-          i->second = g2.begin () [i->second].other_net_index ();
+      std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> >::iterator scm_start = scm;
+
+      bool found = false;
+      size_t nscm = 0;
+      while (! found && scm != subcircuit_map.end () && scm->first == k) {
+        ++nscm;
+        if (scc.equals (scm->second, std::make_pair (sc.operator-> (), sc_cat))) {
+          found = true;
         }
       }
 
-      std::sort (k.begin (), k.end ());
+      if (! found) {
 
-      std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> >::iterator scm = subcircuit_map.find (k);
+        if (nscm == 1) {
 
-      if (! mapped || scm == subcircuit_map.end ()) {
+          //  unique match, but doesn't fit: report this one as paired, but mismatching:
+          if (mp_logger) {
+            mp_logger->subcircuit_mismatch (scm_start->second.first, sc.operator-> ());
+          }
 
-        if (mp_logger) {
-          unmatched_b.push_back (std::make_pair (k, sc.operator-> ()));
+          //  no longer look for this one
+          subcircuit_map.erase (scm_start);
+
+        } else {
+
+          //  no unqiue match
+          if (mp_logger) {
+            mp_logger->subcircuit_mismatch (0, sc.operator-> ());
+          }
+
         }
+
         good = false;
 
       } else {
 
-        db::SubCircuitCompare scc;
-
-        std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> >::iterator scm_start = scm;
-
-        bool found = false;
-        size_t nscm = 0;
-        while (! found && scm != subcircuit_map.end () && scm->first == k) {
-          ++nscm;
-          if (scc.equals (scm->second, std::make_pair (sc.operator-> (), sc_cat))) {
-            found = true;
-          }
+        if (mp_logger) {
+          mp_logger->match_subcircuits (scm->second.first, sc.operator-> ());
         }
 
-        if (! found) {
-
-          if (nscm == 1) {
-
-            //  unique match, but doesn't fit: report this one as paired, but mismatching:
-            if (mp_logger) {
-              mp_logger->subcircuit_mismatch (scm_start->second.first, sc.operator-> ());
-            }
-
-            //  no longer look for this one
-            subcircuit_map.erase (scm_start);
-
-          } else {
-
-            //  no unqiue match
-            if (mp_logger) {
-              mp_logger->subcircuit_mismatch (0, sc.operator-> ());
-            }
-
-          }
-
-          good = false;
-
-        } else {
-
-          if (mp_logger) {
-            mp_logger->match_subcircuits (scm->second.first, sc.operator-> ());
-          }
-
-          //  no longer look for this one
-          subcircuit_map.erase (scm);
-
-        }
+        //  no longer look for this one
+        subcircuit_map.erase (scm);
 
       }
 

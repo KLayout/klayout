@@ -3151,11 +3151,12 @@ compute_subcircuit_key (const db::SubCircuit &subcircuit, const db::NetGraph &g,
 }
 
 static std::vector<std::pair<size_t, size_t> >
-compute_subcircuit_key_for_this (const db::SubCircuit &subcircuit, const db::NetGraph &g, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, bool &mapped)
+compute_subcircuit_key_for_this (const db::SubCircuit &subcircuit, const db::NetGraph &g, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, bool &mapped, bool &valid)
 {
+  valid = true;
   std::vector<std::pair<size_t, size_t> > k;
   if (! compute_subcircuit_key (subcircuit, g, circuit_map, pin_map, k)) {
-    k.clear ();
+    valid = false;
   }
 
   mapped = true;
@@ -3170,11 +3171,12 @@ compute_subcircuit_key_for_this (const db::SubCircuit &subcircuit, const db::Net
 }
 
 static std::vector<std::pair<size_t, size_t> >
-compute_subcircuit_key_for_other (const db::SubCircuit &subcircuit, const db::NetGraph &g, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, bool &mapped)
+compute_subcircuit_key_for_other (const db::SubCircuit &subcircuit, const db::NetGraph &g, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, bool &mapped, bool &valid)
 {
+  valid = true;
   std::vector<std::pair<size_t, size_t> > k;
   if (! compute_subcircuit_key (subcircuit, g, circuit_map, pin_map, k)) {
-    k.clear ();
+    valid = false;
   }
 
   mapped = true;
@@ -3766,67 +3768,6 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
       continue;
     }
 
-    const db::Device *d_other = device_eq.other (d.operator-> ());
-    if (! d_other) {
-      continue;
-    }
-
-    size_t device_cat = device_categorizer.cat_for_device (d.operator-> ());
-    if (! device_cat) {
-      //  device is ignored
-      continue;
-    }
-
-    size_t device_cat_other = device_categorizer.cat_for_device (d_other);
-    if (! device_cat_other) {
-      //  device is ignored
-      continue;
-    }
-
-    bool mapped1 = true, mapped2 = true;
-    std::vector<std::pair<size_t, size_t> > k = compute_device_key_for_this (*d, g1, device_categorizer.is_strict_device_category (device_cat), mapped1);
-    std::vector<std::pair<size_t, size_t> > k_other = compute_device_key_for_other (*d_other, g2, device_categorizer.is_strict_device_category (device_cat_other), mapped2);
-
-    if (! mapped1 || ! mapped2 || k != k_other) {
-
-      //  topological mismatch
-      if (mp_logger) {
-        mp_logger->device_mismatch (d.operator-> (), d_other);
-      }
-      good = false;
-
-    } else {
-
-      db::DeviceCompare dc;
-
-      if (! dc.equals (std::make_pair (d.operator-> (), device_cat), std::make_pair (d_other, device_cat_other))) {
-        if (device_cat != device_cat_other) {
-          if (mp_logger) {
-            mp_logger->match_devices_with_different_device_classes (d.operator-> (), d_other);
-          }
-          good = false;
-        } else {
-          if (mp_logger) {
-            mp_logger->match_devices_with_different_parameters (d.operator-> (), d_other);
-          }
-          good = false;
-        }
-      } else {
-        if (mp_logger) {
-          mp_logger->match_devices (d.operator-> (), d_other);
-        }
-      }
-
-    }
-
-  }
-
-  for (db::Circuit::const_device_iterator d = c1->begin_devices (); d != c1->end_devices (); ++d) {
-
-    if (! device_filter.filter (d.operator-> ())) {
-      continue;
-    }
-
     if (device_eq.other (d.operator-> ())) {
       continue;
     }
@@ -3858,10 +3799,6 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
       continue;
     }
 
-    if (device_eq.other (d.operator-> ())) {
-      continue;
-    }
-
     size_t device_cat = device_categorizer.cat_for_device (d.operator-> ());
     if (! device_cat) {
       //  device is ignored
@@ -3871,24 +3808,56 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
     const db::Device *c1_device = 0;
     size_t c1_device_cat = 0;
 
-    bool mapped = true;
-    std::vector<std::pair<size_t, size_t> > k = compute_device_key_for_other (*d, g2, device_categorizer.is_strict_device_category (device_cat), mapped);
+    const db::Device *d_this = device_eq.other (d.operator-> ());
+    if (d_this) {
 
-    std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::Device *, size_t> >::iterator dm = device_map.find (k);
-
-    if (! mapped || dm == device_map.end () || dm->first != k) {
-
-      if (mp_logger) {
-        unmatched_b.push_back (std::make_pair (k, std::make_pair (d.operator-> (), device_cat)));
+      size_t device_cat_this = device_categorizer.cat_for_device (d_this);
+      if (! device_cat_this) {
+        //  device is ignored
+        continue;
       }
-      good = false;
+
+      bool mapped1 = true, mapped2 = true;
+      std::vector<std::pair<size_t, size_t> > k_this = compute_device_key_for_this (*d_this, g1, device_categorizer.is_strict_device_category (device_cat_this), mapped1);
+      std::vector<std::pair<size_t, size_t> > k = compute_device_key_for_other (*d, g2, device_categorizer.is_strict_device_category (device_cat), mapped2);
+
+      if (! mapped1 || ! mapped2 || k != k_this) {
+
+        //  topological mismatch
+        if (mp_logger) {
+          mp_logger->device_mismatch (d_this, d.operator-> ());
+        }
+        good = false;
+
+      } else {
+
+        c1_device = d_this;
+        c1_device_cat = device_cat_this;
+
+      }
 
     } else {
 
-      c1_device = dm->second.first;
-      c1_device_cat = dm->second.second;
+      bool mapped = true;
+      std::vector<std::pair<size_t, size_t> > k = compute_device_key_for_other (*d, g2, device_categorizer.is_strict_device_category (device_cat), mapped);
 
-      device_map.erase (dm);
+      std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::Device *, size_t> >::iterator dm = device_map.find (k);
+
+      if (! mapped || dm == device_map.end () || dm->first != k) {
+
+        if (mp_logger) {
+          unmatched_b.push_back (std::make_pair (k, std::make_pair (d.operator-> (), device_cat)));
+        }
+        good = false;
+
+      } else {
+
+        c1_device = dm->second.first;
+        c1_device_cat = dm->second.second;
+
+        device_map.erase (dm);
+
+      }
 
     }
 
@@ -4011,55 +3980,19 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
       continue;
     }
 
-    const db::SubCircuit *sc_other = subcircuit_eq.other (sc.operator-> ());
-    if (! sc_other) {
-      continue;
-    }
-
-    size_t sc_cat_other = circuit_categorizer.cat_for_subcircuit (sc_other);
-    if (! sc_cat_other) {
-      //  subcircuit is ignored
-      continue;
-    }
-
-    bool mapped1 = true, mapped2 = true;
-    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key_for_this (*sc, g1, &c12_circuit_and_pin_mapping, &circuit_pin_mapper, mapped1);
-    std::vector<std::pair<size_t, size_t> > k_other = compute_subcircuit_key_for_other (*sc_other, g2, &c22_circuit_and_pin_mapping, &circuit_pin_mapper, mapped2);
-
-    if (! mapped1 || ! mapped2 || k != k_other || sc_cat != sc_cat_other) {
-      if (mp_logger) {
-        mp_logger->subcircuit_mismatch (sc.operator-> (), sc_other);
-      }
-      good = false;
-    } else {
-      if (mp_logger) {
-        mp_logger->match_subcircuits (sc.operator-> (), sc_other);
-      }
-    }
-
-  }
-
-  for (db::Circuit::const_subcircuit_iterator sc = c1->begin_subcircuits (); sc != c1->end_subcircuits (); ++sc) {
-
-    size_t sc_cat = circuit_categorizer.cat_for_subcircuit (sc.operator-> ());
-    if (! sc_cat) {
-      //  subcircuit is ignored
-      continue;
-    }
-
     if (subcircuit_eq.other (sc.operator-> ())) {
       continue;
     }
 
-    bool mapped = true;
-    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key_for_this (*sc, g1, &c12_circuit_and_pin_mapping, &circuit_pin_mapper, mapped);
+    bool mapped = true, valid = true;
+    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key_for_this (*sc, g1, &c12_circuit_and_pin_mapping, &circuit_pin_mapper, mapped, valid);
 
     if (! mapped) {
       if (mp_logger) {
         mp_logger->subcircuit_mismatch (sc.operator-> (), 0);
       }
       good = false;
-    } else if (! k.empty ()) {
+    } else if (valid) {
       //  TODO: report devices which cannot be distiguished topologically?
       subcircuit_map.insert (std::make_pair (k, std::make_pair (sc.operator-> (), sc_cat)));
     }
@@ -4077,68 +4010,93 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
       continue;
     }
 
-    if (subcircuit_eq.other (sc.operator-> ())) {
-      continue;
-    }
+    const db::SubCircuit *sc_this = subcircuit_eq.other (sc.operator-> ());
+    if (sc_this) {
 
-    bool mapped = true;
-    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key_for_other (*sc, g2, &c22_circuit_and_pin_mapping, &circuit_pin_mapper, mapped);
-
-    std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> >::iterator scm = subcircuit_map.find (k);
-
-    if (! mapped || scm == subcircuit_map.end () || scm->first != k) {
-
-      if (mp_logger) {
-        unmatched_b.push_back (std::make_pair (k, sc.operator-> ()));
+      size_t sc_cat_this = circuit_categorizer.cat_for_subcircuit (sc_this);
+      if (! sc_cat_this) {
+        //  subcircuit is ignored
+        continue;
       }
-      good = false;
+
+      bool mapped1 = true, mapped2 = true;
+      bool valid1 = true, valid2 = true;
+      std::vector<std::pair<size_t, size_t> > k_this = compute_subcircuit_key_for_this (*sc_this, g1, &c12_circuit_and_pin_mapping, &circuit_pin_mapper, mapped1, valid1);
+      std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key_for_other (*sc, g2, &c22_circuit_and_pin_mapping, &circuit_pin_mapper, mapped2, valid2);
+
+      if (! valid1 || ! valid2 || ! mapped1 || ! mapped2 || k_this != k || sc_cat != sc_cat_this) {
+        if (mp_logger) {
+          mp_logger->subcircuit_mismatch (sc_this, sc.operator-> ());
+        }
+        good = false;
+      } else {
+        if (mp_logger) {
+          mp_logger->match_subcircuits (sc_this, sc.operator-> ());
+        }
+      }
 
     } else {
 
-      db::SubCircuitCompare scc;
+      bool mapped = true, valid = true;
+      std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key_for_other (*sc, g2, &c22_circuit_and_pin_mapping, &circuit_pin_mapper, mapped, valid);
 
-      std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> >::iterator scm_start = scm;
+      std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> >::iterator scm = subcircuit_map.find (k);
 
-      bool found = false;
-      size_t nscm = 0;
-      while (! found && scm != subcircuit_map.end () && scm->first == k) {
-        ++nscm;
-        if (scc.equals (scm->second, std::make_pair (sc.operator-> (), sc_cat))) {
-          found = true;
+      if (! mapped || scm == subcircuit_map.end () || scm->first != k) {
+
+        if (mp_logger) {
+          unmatched_b.push_back (std::make_pair (k, sc.operator-> ()));
         }
-      }
-
-      if (! found) {
-
-        if (nscm == 1) {
-
-          //  unique match, but doesn't fit: report this one as paired, but mismatching:
-          if (mp_logger) {
-            mp_logger->subcircuit_mismatch (scm_start->second.first, sc.operator-> ());
-          }
-
-          //  no longer look for this one
-          subcircuit_map.erase (scm_start);
-
-        } else {
-
-          //  no unqiue match
-          if (mp_logger) {
-            mp_logger->subcircuit_mismatch (0, sc.operator-> ());
-          }
-
-        }
-
         good = false;
 
       } else {
 
-        if (mp_logger) {
-          mp_logger->match_subcircuits (scm->second.first, sc.operator-> ());
+        db::SubCircuitCompare scc;
+
+        std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> >::iterator scm_start = scm;
+
+        bool found = false;
+        size_t nscm = 0;
+        while (! found && scm != subcircuit_map.end () && scm->first == k) {
+          ++nscm;
+          if (scc.equals (scm->second, std::make_pair (sc.operator-> (), sc_cat))) {
+            found = true;
+          }
         }
 
-        //  no longer look for this one
-        subcircuit_map.erase (scm);
+        if (! found) {
+
+          if (nscm == 1) {
+
+            //  unique match, but doesn't fit: report this one as paired, but mismatching:
+            if (mp_logger) {
+              mp_logger->subcircuit_mismatch (scm_start->second.first, sc.operator-> ());
+            }
+
+            //  no longer look for this one
+            subcircuit_map.erase (scm_start);
+
+          } else {
+
+            //  no unqiue match
+            if (mp_logger) {
+              mp_logger->subcircuit_mismatch (0, sc.operator-> ());
+            }
+
+          }
+
+          good = false;
+
+        } else {
+
+          if (mp_logger) {
+            mp_logger->match_subcircuits (scm->second.first, sc.operator-> ());
+          }
+
+          //  no longer look for this one
+          subcircuit_map.erase (scm);
+
+        }
 
       }
 

@@ -52,6 +52,23 @@ TEST(InputPipe2)
   EXPECT_NE (ret, 0);
 }
 
+TEST(OutputPipe1)
+{
+  std::string tf = tmp_file ("pipe_out");
+
+  {
+    tl::OutputPipe pipe ("cat >" + tf);
+    tl::OutputStream str (pipe);
+    str << "Hello, world!";
+  }
+
+  {
+    tl::InputStream is (tf);
+    std::string s = is.read_all ();
+    EXPECT_EQ (s, "Hello, world!");
+  }
+}
+
 TEST(TextOutputStream)
 {
   std::string fn = tmp_file ("test.txt");

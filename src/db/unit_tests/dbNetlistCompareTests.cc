@@ -2933,6 +2933,67 @@ TEST(18_ClockTree)
     "end_circuit TXEE TXEE MATCH"
   );
   EXPECT_EQ (good, true);
+
+  comp.set_depth_first (false);
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  txt = logger.text ();
+  //  because L/R matching is ambiguous, we need to do this to
+  //  establish reproducability on different platforms:
+  txt = tl::replaced (txt, "L", "X");
+  txt = tl::replaced (txt, "R", "X");
+
+  EXPECT_EQ (txt,
+    "begin_circuit INV INV\n"
+    "match_nets VDD VDD\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_nets VSS VSS\n"
+    "match_pins IN IN\n"
+    "match_pins OUT OUT\n"
+    "match_pins VDD VDD\n"
+    "match_pins VSS VSS\n"
+    "match_devices $1 $1\n"
+    "match_devices $2 $2\n"
+    "end_circuit INV INV MATCH\n"
+    "begin_circuit TXEE TXEE\n"
+    "match_nets IN IN\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets S S\n"
+    "match_ambiguous_nets SX SX\n"
+    "match_ambiguous_nets SX SX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TX TX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits T T\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TX TX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXX TXX\n"
+    "end_circuit TXEE TXEE MATCH"
+  );
+  EXPECT_EQ (good, true);
 }
 
 TEST(19_SymmetricCircuit)

@@ -544,9 +544,11 @@ main_cont (int &argc, char **argv)
     bool debug_mode = false;
     bool continue_flag = false;
     int repeat = 1;
+    std::string output;
 
     tl::CommandLineOptions cmd;
     cmd << tl::arg ("-a", &xml_format, "Provide XML output format (JUnit format)")
+        << tl::arg ("-o=log", &output, "Sends output to the given file")
         << tl::arg ("-l", &list_tests, "Lists tests and exits")
         << tl::arg ("-e", &editable, "Uses editable mode")
         << tl::arg ("-ne", &non_editable, "Uses non-editable mode")
@@ -596,7 +598,17 @@ main_cont (int &argc, char **argv)
     tl::set_continue_flag (continue_flag);
     tl::set_debug_mode (debug_mode);
 
+    FILE *output_file = 0;
+
     try {
+
+      if (! output.empty ()) {
+        output_file = fopen (output.c_str (), "w");
+        if (! output_file) {
+          throw tl::Exception (std::string ("Unable to open log file for writing :") + output);
+        }
+        console.send_to (output_file);
+      }
 
       ut::ctrl << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
       ut::ctrl << "<testsuites>";
@@ -652,8 +664,20 @@ main_cont (int &argc, char **argv)
 
       ut::ctrl << "</testsuites>";
 
+      if (output_file) {
+        console.send_to (stdout);
+        fclose (output_file);
+      }
+
     } catch (...) {
+
       ut::ctrl << "</testsuites>";
+
+      if (output_file) {
+        console.send_to (stdout);
+        fclose (output_file);
+      }
+
       throw;
     }
 

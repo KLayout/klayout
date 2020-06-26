@@ -52,6 +52,8 @@ public:
   TestConsole (FILE *file);
   ~TestConsole ();
 
+  void send_to (FILE *file);
+
   void write_str (const char *text, output_stream os);
   void raw_write (const char *text);
   virtual void flush ();
@@ -85,6 +87,7 @@ private:
 
   void redirect ();
   void restore ();
+  void prepare_file ();
 };
 
 }

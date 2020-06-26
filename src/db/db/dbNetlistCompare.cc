@@ -617,7 +617,7 @@ struct CompareData
 {
   CompareData ()
     : other (0), max_depth (0), max_n_branch (0), depth_first (true), dont_consider_net_names (false), logger (0),
-      circuit_pin_mapper (0), subcircuit_equivalence (0), device_equivalence (0)
+      circuit_pin_mapper (0), subcircuit_equivalence (0), device_equivalence (0), progress (0)
   { }
 
   NetGraph *other;
@@ -629,6 +629,7 @@ struct CompareData
   CircuitPinMapper *circuit_pin_mapper;
   SubCircuitEquivalenceTracker *subcircuit_equivalence;
   DeviceEquivalenceTracker *device_equivalence;
+  tl::RelativeProgress *progress;
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1921,6 +1922,8 @@ static bool edges_are_compatible (const NetGraphNode::edge_type &e, const NetGra
 size_t
 NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGraphNode::edge_iterator ee, NetGraphNode::edge_iterator e_other, NetGraphNode::edge_iterator ee_other, size_t net_index, size_t other_net_index, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data)
 {
+  //  NOTE: we can skip edges to known nodes because we did a pre-analysis making sure those are compatible
+
   std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> > nodes;
   nodes.reserve (ee - e);
 
@@ -2085,17 +2088,106 @@ NetGraph::derive_node_identities (size_t net_index, size_t depth, size_t n_branc
 
   }
 
-  bool any = false;
-  for (NetGraphNode::edge_iterator e = n->begin (); e != n->end () && ! any; ++e) {
-    any = ! node (e->second.first).has_other ();
+  //  do a pre-analysis filtering out all nodes with fully satisfied edges or which provide a contradiction
+
+  bool analysis_required = false;
+
+  for (NetGraphNode::edge_iterator e = n->begin (); e != n->end (); ) {
+
+    NetGraphNode::edge_iterator ee = e;
+    ++ee;
+
+    while (ee != n->end () && ee->first == e->first) {
+      ++ee;
+    }
+
+    NetGraphNode::edge_iterator e_other = n_other->find_edge (e->first);
+    if (e_other != n_other->end ()) {
+
+      NetGraphNode::edge_iterator ee_other = e_other;
+      ++ee_other;
+
+      while (ee_other != n_other->end () && ee_other->first == e_other->first) {
+        ++ee_other;
+      }
+
+      std::vector<const NetGraphNode *> nodes;
+      nodes.reserve (ee - e);
+
+      std::vector<const NetGraphNode *> other_nodes_translated;
+      other_nodes_translated.reserve (ee - e);
+
+      tl_assert (e->first == e_other->first);
+
+      for (NetGraphNode::edge_iterator i = e; i != ee; ++i) {
+        if (i->second.first != net_index) {
+          const NetGraphNode *nn = &node (i->second.first);
+          if (nn->has_other ()) {
+            nodes.push_back (nn);
+          } else {
+            analysis_required = true;
+          }
+        }
+      }
+
+      for (NetGraphNode::edge_iterator i = e_other; i != ee_other; ++i) {
+        if (i->second.first != other_net_index) {
+          const NetGraphNode *nn = &data->other->node (i->second.first);
+          if (nn->has_other ()) {
+            other_nodes_translated.push_back (&node (nn->other_net_index ()));
+          } else {
+            analysis_required = true;
+          }
+        }
+      }
+
+      std::sort (nodes.begin (), nodes.end ());
+      std::sort (other_nodes_translated.begin (), other_nodes_translated.end ());
+
+      //  No fit, we can shortcut
+      if (nodes != other_nodes_translated) {
+        return tentative ? failed_match : 0;
+      }
+
+    } else if (tentative) {
+      //  in tentative mode an exact match is required: no having the same edges for a node disqualifies the node
+      //  as matching.
+      return failed_match;
+    }
+
+    e = ee;
+
   }
-  for (NetGraphNode::edge_iterator e = n_other->begin (); e != n_other->end () && ! any; ++e) {
-    any = ! data->other->node (e->second.first).has_other ();
+
+  if (tentative) {
+
+    //  in tentative mode, again an exact match is required
+
+    for (NetGraphNode::edge_iterator e_other = n_other->begin (); e_other != n_other->end (); ) {
+
+      NetGraphNode::edge_iterator ee_other = e_other;
+      ++ee_other;
+
+      while (ee_other != n_other->end () && ee_other->first == e_other->first) {
+        ++ee_other;
+      }
+
+      NetGraphNode::edge_iterator e = n->find_edge (e_other->first);
+      if (e == n->end ()) {
+        return failed_match;
+      }
+
+      e_other = ee_other;
+
+    }
+
   }
-  if (! any) {
-    //  all target nodes are satisfied - skip
+
+  if (! analysis_required) {
     return 0;
   }
+
+  //  do a detailed analysis
 
   size_t new_nodes = 0;
 
@@ -2139,43 +2231,9 @@ NetGraph::derive_node_identities (size_t net_index, size_t depth, size_t n_branc
         new_nodes += bt_count;
       }
 
-    } else if (tentative) {
-      //  in tentative mode an exact match is required: no having the same edges for a node disqualifies the node
-      //  as matching.
-      if (options ()->debug_netcompare) {
-        tl::info << indent(depth) << "=> rejected pair for missing edge.";
-      }
-      return failed_match;
     }
 
     e = ee;
-
-  }
-
-  if (tentative) {
-
-    //  in tentative mode, again an exact match is required
-
-    for (NetGraphNode::edge_iterator e_other = n_other->begin (); e_other != n_other->end (); ) {
-
-      NetGraphNode::edge_iterator ee_other = e_other;
-      ++ee_other;
-
-      while (ee_other != n_other->end () && ee_other->first == e_other->first) {
-        ++ee_other;
-      }
-
-      NetGraphNode::edge_iterator e = n->find_edge (e_other->first);
-      if (e == n->end ()) {
-        if (options ()->debug_netcompare) {
-          tl::info << indent(depth) << "=> rejected pair for missing edge.";
-        }
-        return failed_match;
-      }
-
-      e_other = ee_other;
-
-    }
 
   }
 
@@ -2320,12 +2378,15 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
       if (options ()->debug_netcompare) {
         tl::info << indent_s << "deduced match (singular): " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
       }
-      if (data->logger && ! tentative) {
-        if (! (node (ni) == data->other->node (other_ni))) {
-          //  this is a mismatch but we continue, because that is the only candidate
-          data->logger->net_mismatch (n->net (), n_other->net ());
-        } else {
-          data->logger->match_nets (n->net (), n_other->net ());
+      if (! tentative) {
+        ++*data->progress;
+        if (data->logger) {
+          if (! (node (ni) == data->other->node (other_ni))) {
+            //  this is a mismatch but we continue, because that is the only candidate
+            data->logger->net_mismatch (n->net (), n_other->net ());
+          } else {
+            data->logger->match_nets (n->net (), n_other->net ());
+          }
         }
       }
 
@@ -2492,12 +2553,15 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
         if (options ()->debug_netcompare) {
           tl::info << indent_s << "deduced match (singular): " << nr->n1->first->net ()->expanded_name () << " vs. " << nr->n2->first->net ()->expanded_name ();
         }
-        if (data->logger && ! tentative) {
-          if (! (node (ni) == data->other->node (other_ni))) {
-            //  this is a mismatch, but we continue with this
-            data->logger->net_mismatch (nr->n1->first->net (), nr->n2->first->net ());
-          } else {
-            data->logger->match_nets (nr->n1->first->net (), nr->n2->first->net ());
+        if (! tentative) {
+          ++*data->progress;
+          if (data->logger) {
+            if (! (node (ni) == data->other->node (other_ni))) {
+              //  this is a mismatch, but we continue with this
+              data->logger->net_mismatch (nr->n1->first->net (), nr->n2->first->net ());
+            } else {
+              data->logger->match_nets (nr->n1->first->net (), nr->n2->first->net ());
+            }
           }
         }
 
@@ -2670,6 +2734,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
               tl::info << indent_s << "deduced match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
             }
           }
+
           if (data->logger) {
             bool ambiguous = equivalent_other_nodes.has_attribute (p->second);
             if (ambiguous) {
@@ -2678,6 +2743,8 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
               data->logger->match_nets (p->first->net (), p->second->net ());
             }
           }
+
+          ++*data->progress;
 
         }
 
@@ -2944,6 +3011,8 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 
   std::map<const db::Circuit *, CircuitMapper> c12_pin_mapping, c22_pin_mapping;
 
+  tl::RelativeProgress progress (tl::to_string (tr ("Comparing netlists")), a->circuit_count (), 1);
+
   for (db::Netlist::const_bottom_up_circuit_iterator c = a->begin_bottom_up (); c != a->end_bottom_up (); ++c) {
 
     const db::Circuit *ca = c.operator-> ();
@@ -3006,6 +3075,8 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
       }
 
     }
+
+    ++progress;
 
   }
 
@@ -3371,6 +3442,8 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   int iter = 0;
 
+  tl::RelativeProgress progress (tl::to_string (tr ("Comparing circuits ")) + c1->name () + "/" + c2->name (), std::max (g1.end () - g1.begin (), g2.end () - g2.begin ()), 1);
+
   //  two passes: one without ambiguities, the second one with
 
   bool good = false;
@@ -3408,6 +3481,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
           data.subcircuit_equivalence = &subcircuit_equivalence;
           data.device_equivalence = &device_equivalence;
           data.logger = mp_logger;
+          data.progress = &progress;
 
           size_t ni = g1.derive_node_identities (i1 - g1.begin (), 0, 1, 0 /*not tentative*/, pass > 0 /*with ambiguities*/, &data);
           if (ni > 0 && ni != failed_match) {
@@ -3473,6 +3547,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       data.subcircuit_equivalence = &subcircuit_equivalence;
       data.device_equivalence = &device_equivalence;
       data.logger = mp_logger;
+      data.progress = &progress;
 
       size_t ni = g1.derive_node_identities_from_node_set (nodes, other_nodes, 0, 1, 0 /*not tentatively*/, pass > 0 /*with ambiguities*/, &data);
       if (ni > 0 && ni != failed_match) {

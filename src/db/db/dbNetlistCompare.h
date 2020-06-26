@@ -38,6 +38,8 @@ class DeviceCategorizer;
 class CircuitCategorizer;
 class CircuitMapper;
 class NetGraph;
+class SubCircuitEquivalenceTracker;
+class DeviceEquivalenceTracker;
 
 /**
  * @brief A receiver for netlist compare events
@@ -286,6 +288,26 @@ public:
   }
 
   /**
+   *  @brief Sets a value indicating depth-first traversal
+   *
+   *  With depth first (the default), the algorithm looks for further identities before moving to another
+   *  node. With breadth first (false), the algorithm will work in "waves" rather than digging deerly
+   *  into the direction of a node.
+   */
+  void set_depth_first (bool df)
+  {
+    m_depth_first = df;
+  }
+
+  /**
+   *  @brief Gets a value indicating depth-first traversal
+   */
+  bool depth_first () const
+  {
+    return m_depth_first;
+  }
+
+  /**
    *  @brief Gets the list of circuits without matching circuit in the other netlist
    *  The result can be used to flatten these circuits prior to compare.
    *  Mismatching top level circuits are not reported because they cannot be flattened.
@@ -326,8 +348,8 @@ protected:
   bool all_subcircuits_verified (const db::Circuit *c, const std::set<const db::Circuit *> &verified_circuits) const;
   static void derive_pin_equivalence (const db::Circuit *ca, const db::Circuit *cb, CircuitPinMapper *circuit_pin_mapper);
   void do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping, bool &pin_mismatch, bool &good) const;
-  void do_device_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, const db::DeviceFilter &device_filter, DeviceCategorizer &device_categorizer, bool &good) const;
-  void do_subcircuit_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, CircuitCategorizer &circuit_categorizer, const db::CircuitPinMapper &circuit_pin_mapper, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping, bool &good) const;
+  void do_device_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, const db::DeviceFilter &device_filter, DeviceCategorizer &device_categorizer, db::DeviceEquivalenceTracker &device_eq, bool &good) const;
+  void do_subcircuit_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, CircuitCategorizer &circuit_categorizer, const db::CircuitPinMapper &circuit_pin_mapper, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping, db::SubCircuitEquivalenceTracker &subcircuit_eq, bool &good) const;
   bool handle_pin_mismatch (const NetGraph &g1, const db::Circuit *c1, const db::Pin *pin1, const NetGraph &g2, const db::Circuit *c2, const db::Pin *p2) const;
 
   mutable NetlistCompareLogger *mp_logger;
@@ -339,6 +361,7 @@ protected:
   double m_res_threshold;
   size_t m_max_n_branch;
   size_t m_max_depth;
+  bool m_depth_first;
   bool m_dont_consider_net_names;
 };
 

@@ -645,8 +645,8 @@ END
 begin_circuit BUF BUF
 match_nets INT $10
 match_nets IN IN
-net_mismatch OUT OUT
 net_mismatch INT2 $11
+net_mismatch OUT OUT
 match_pins $0 $1
 match_pins $1 $3
 match_pins $2 $0
@@ -715,8 +715,8 @@ END
 begin_circuit BUF BUF
 net_mismatch INT $10
 match_nets IN IN
-match_nets OUT OUT
 net_mismatch INT2 $11
+match_nets OUT OUT
 match_pins $0 $1
 match_pins $1 $3
 match_pins $2 $0

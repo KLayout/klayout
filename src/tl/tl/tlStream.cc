@@ -1019,7 +1019,7 @@ InputPipe::read (char *b, size_t n)
   size_t ret = fread (b, 1, n, m_file);
   if (ret < n) {
     if (ferror (m_file)) {
-      throw FilePReadErrorException (m_source, ferror (m_file));
+      throw FilePReadErrorException (m_source, errno);
     }
   }
 
@@ -1049,7 +1049,7 @@ OutputPipe::OutputPipe (const std::string &path)
 OutputPipe::~OutputPipe ()
 {
   if (m_file != NULL) {
-    fclose (m_file);
+    _pclose (m_file);
     m_file = NULL;
   }
 }
@@ -1061,7 +1061,7 @@ OutputPipe::write (const char *b, size_t n)
   size_t ret = fwrite (b, 1, n, m_file);
   if (ret < n) {
     if (ferror (m_file)) {
-      throw FilePWriteErrorException (m_source, ferror (m_file));
+      throw FilePWriteErrorException (m_source, errno);
     }
   }
 }

@@ -1,4 +1,17 @@
 
+0.26.7          (2020-xx-xx):
+
+* Bugfix: %GITHUB%/issues/493
+      LVS asserted on MacOS
+* Enhancement: MacOS compatibility
+      Some bug fixed that happened specifically on MacOS.
+      1.) A segfault that happened in LVS
+      2.) Some classes were not properly registered for usage in scripts.
+* Enhancement: LVS netlist compare
+      The algorithm was improved to provide better reproducibility. The
+      detection of matching paths in the presence of ambiguities was 
+      improved.
+
 0.26.6          (2020-06-05):
 
 * Enhancement: %GITHUB%/issues/522

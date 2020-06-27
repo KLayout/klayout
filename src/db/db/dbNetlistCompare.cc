@@ -1138,6 +1138,7 @@ private:
 
   size_t derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGraphNode::edge_iterator ee, NetGraphNode::edge_iterator e_other, NetGraphNode::edge_iterator ee_other, size_t net_index, size_t other_net_index, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data);
   size_t derive_node_identities_from_ambiguity_group (const NodeRange &nr, DeviceMapperForTargetNode &dm, DeviceMapperForTargetNode &dm_other, SubCircuitMapperForTargetNode &scm, SubCircuitMapperForTargetNode &scm_other, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data);
+  size_t derive_node_identities_from_singular_match (const NetGraphNode *n, const NetGraphNode::edge_iterator &e, const NetGraphNode *n_other, const NetGraphNode::edge_iterator &e_other, DeviceMapperForTargetNode &dm, DeviceMapperForTargetNode &dm_other, SubCircuitMapperForTargetNode &scm, SubCircuitMapperForTargetNode &scm_other, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data, bool consider_net_names);
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -2501,7 +2502,7 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
 }
 
 size_t
-NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> > &nodes, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> > &other_nodes, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data)
+NetGraph::derive_node_identities_from_singular_match (const NetGraphNode *n, const NetGraphNode::edge_iterator &e, const NetGraphNode *n_other, const NetGraphNode::edge_iterator &e_other, DeviceMapperForTargetNode &dm, DeviceMapperForTargetNode &dm_other, SubCircuitMapperForTargetNode &scm, SubCircuitMapperForTargetNode &scm_other, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data, bool consider_net_names)
 {
   std::string indent_s;
   if (options ()->debug_netcompare) {
@@ -2509,7 +2510,93 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
     indent_s += "*" + tl::to_string (n_branch) + " ";
   }
 
-  size_t new_nodes = 0;
+  if (! edges_are_compatible (*e, *e_other, *data->device_equivalence, *data->subcircuit_equivalence)) {
+
+    if (options ()->debug_netcompare) {
+      tl::info << indent(depth) << "=> rejected because edges are incompatible with already established device or subcircuit equivalences";
+    }
+    return tentative ? failed_match : 0;
+
+  } else if (! n->has_any_other () && ! n_other->has_any_other ()) {
+
+    //  in tentative mode, reject this choice if both nets are named and
+    //  their names differ -> this favors net matching by name
+
+    if (tentative && consider_net_names && net_names_are_different (n->net (), n_other->net ())) {
+      if (options ()->debug_netcompare) {
+        tl::info << indent_s << "rejecting pair as names are not identical: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
+      }
+      return failed_match;
+    }
+
+    //  A single candiate: just take this one -> this may render
+    //  inexact matches, but further propagates net pairing
+
+    size_t ni = node_index_for_net (n->net ());
+    size_t other_ni = data->other->node_index_for_net (n_other->net ());
+
+    TentativeNodeMapping::map_pair (tentative, this, ni, data->other, other_ni, dm, dm_other, *data->device_equivalence, scm, scm_other, *data->subcircuit_equivalence, depth);
+
+    if (options ()->debug_netcompare) {
+      tl::info << indent_s << "deduced match (singular): " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
+    }
+    if (! tentative) {
+      ++*data->progress;
+      if (data->logger) {
+        if (! (node (ni) == data->other->node (other_ni))) {
+          //  this is a mismatch, but we continue with this
+          data->logger->net_mismatch (n->net (), n_other->net ());
+        } else {
+          data->logger->match_nets (n->net (), n_other->net ());
+        }
+      }
+    }
+
+    size_t new_nodes = 1;
+
+    if (data->depth_first || tentative) {
+      size_t bt_count = derive_node_identities (ni, depth + 1, n_branch, tentative, with_ambiguous, data);
+      if (bt_count == failed_match) {
+        if (tentative) {
+          return failed_match;
+        }
+      } else {
+        new_nodes += bt_count;
+      }
+    }
+
+    return new_nodes;
+
+  } else if (n->has_unknown_other ()) {
+
+    //  accept any other net
+    return 0;
+
+  } else if (n->has_other ()) {
+
+    //  this decision leads to a contradiction
+    if (data->other->node_index_for_net (n_other->net ()) != n->other_net_index ()) {
+      return failed_match;
+    } else {
+      return 0;
+    }
+
+  } else {
+
+    //  mismatch of assignment state
+    return failed_match;
+
+  }
+}
+
+size_t
+NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> > &nodes, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> > &other_nodes, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data)
+{
+  std::string indent_s;
+  if (options ()->debug_netcompare) {
+    indent_s = indent (depth);
+    indent_s += "*" + tl::to_string (n_branch) + " ";
+  }
 
   if (depth > data->max_depth) {
     if (options ()->debug_netcompare) {
@@ -2534,81 +2621,15 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
 
   if (nodes.size () == 1 && other_nodes.size () == 1) {
 
-    const NetGraphNode *n = nodes.front ().first;
-    const NetGraphNode *n_other = other_nodes.front ().first;
-
-    //  reject the transition if the edges provide a contradiction to already established equivalences
-
-    if (! edges_are_compatible (*nodes.front ().second, *other_nodes.front ().second, *data->device_equivalence, *data->subcircuit_equivalence)) {
-
-      if (options ()->debug_netcompare) {
-        tl::info << indent(depth) << "=> rejected because edges are incompatible with already established device or subcircuit equivalences";
-      }
-      return tentative ? failed_match : 0;
-
-    } else if (! n->has_any_other () && ! n_other->has_any_other ()) {
-
-      //  a single candiate: just take this one -> this may render
-      //  inexact matches, but further propagates net pairing
-
-      size_t ni = node_index_for_net (n->net ());
-      size_t other_ni = data->other->node_index_for_net (n_other->net ());
-
-      TentativeNodeMapping::map_pair (tentative, this, ni, data->other, other_ni, dm, dm_other, *data->device_equivalence, scm, scm_other, *data->subcircuit_equivalence, depth);
-
-      if (options ()->debug_netcompare) {
-        tl::info << indent_s << "deduced match (singular): " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
-      }
-      if (! tentative) {
-        ++*data->progress;
-        if (data->logger) {
-          if (! (node (ni) == data->other->node (other_ni))) {
-            //  this is a mismatch but we continue, because that is the only candidate
-            data->logger->net_mismatch (n->net (), n_other->net ());
-          } else {
-            data->logger->match_nets (n->net (), n_other->net ());
-          }
-        }
-      }
-
-      if (data->depth_first || tentative) {
-        size_t bt_count = derive_node_identities (ni, depth + 1, n_branch, tentative, with_ambiguous, data);
-        if (bt_count == failed_match) {
-          if (tentative) {
-            return failed_match;
-          }
-        } else {
-          new_nodes += bt_count;
-        }
-      }
-
-      new_nodes += 1;
-
-    } else if (n->has_unknown_other ()) {
-
-      //  accept this solution as the pairing is possible
-
-    } else if (n->has_other ()) {
-
-      //  this decision leads to a contradiction
-      if (data->other->node_index_for_net (n_other->net ()) != n->other_net_index ()) {
-        return failed_match;
-      }
-
-    } else {
-
-      //  mismatch of assignment state
-      return failed_match;
-
-    }
-
-    return new_nodes;
+    return derive_node_identities_from_singular_match (nodes.front ().first, nodes.front ().second, other_nodes.front ().first, other_nodes.front ().second,
+                                                       dm, dm_other, scm, scm_other, depth, n_branch, tentative, with_ambiguous, data, false /*don't consider net names*/);
 
   }
 
   //  Determine the range of nodes with same identity
 
   std::vector<NodeRange> node_ranges;
+  size_t new_nodes = 0;
 
   std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator n1 = nodes.begin ();
   std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator n2 = other_nodes.begin ();
@@ -2704,78 +2725,12 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
 
     } else if (nr->num == 1) {
 
-      if (! edges_are_compatible (*nr->n1->second, *nr->n2->second, *data->device_equivalence, *data->subcircuit_equivalence)) {
-
-        if (options ()->debug_netcompare) {
-          tl::info << indent(depth) << "=> rejected because edges are incompatible with already established device or subcircuit equivalences";
-        }
-        return tentative ? failed_match : 0;
-
-      } else if (! nr->n1->first->has_any_other () && ! nr->n2->first->has_any_other ()) {
-
-        //  in tentative mode, reject this choice if both nets are named and
-        //  their names differ -> this favors net matching by name
-
-        if (tentative && ! data->dont_consider_net_names && net_names_are_different (nr->n1->first->net (), nr->n2->first->net ())) {
-          if (options ()->debug_netcompare) {
-            tl::info << indent_s << "rejecting pair as names are not identical: " << nr->n1->first->net ()->expanded_name () << " vs. " << nr->n2->first->net ()->expanded_name ();
-          }
-          return failed_match;
-        }
-
-        //  A single candiate: just take this one -> this may render
-        //  inexact matches, but further propagates net pairing
-
-        size_t ni = node_index_for_net (nr->n1->first->net ());
-        size_t other_ni = data->other->node_index_for_net (nr->n2->first->net ());
-
-        TentativeNodeMapping::map_pair (tentative, this, ni, data->other, other_ni, dm, dm_other, *data->device_equivalence, scm, scm_other, *data->subcircuit_equivalence, depth);
-
-        if (options ()->debug_netcompare) {
-          tl::info << indent_s << "deduced match (singular): " << nr->n1->first->net ()->expanded_name () << " vs. " << nr->n2->first->net ()->expanded_name ();
-        }
-        if (! tentative) {
-          ++*data->progress;
-          if (data->logger) {
-            if (! (node (ni) == data->other->node (other_ni))) {
-              //  this is a mismatch, but we continue with this
-              data->logger->net_mismatch (nr->n1->first->net (), nr->n2->first->net ());
-            } else {
-              data->logger->match_nets (nr->n1->first->net (), nr->n2->first->net ());
-            }
-          }
-        }
-
-        if (data->depth_first || tentative) {
-          size_t bt_count = derive_node_identities (ni, depth + 1, n_branch, tentative, with_ambiguous, data);
-          if (bt_count == failed_match) {
-            if (tentative) {
-              return failed_match;
-            }
-          } else {
-            new_nodes += bt_count;
-          }
-        }
-
-        new_nodes += 1;
-
-      } else if (nr->n1->first->has_unknown_other ()) {
-
-        //  accept any other net
-
-      } else if (nr->n1->first->has_other ()) {
-
-        //  this decision leads to a contradiction
-        if (data->other->node_index_for_net (nr->n2->first->net ()) != nr->n1->first->other_net_index ()) {
-          return failed_match;
-        }
-
-      } else {
-
-        //  mismatch of assignment state
+      size_t n = derive_node_identities_from_singular_match (nr->n1->first, nr->n1->second, nr->n2->first, nr->n2->second, dm, dm_other, scm, scm_other, depth, n_branch, tentative, with_ambiguous, data, ! data->dont_consider_net_names);
+      if (n == failed_match) {
         return failed_match;
-
       }
+
+      new_nodes += n;
 
     } else if (nr->num * n_branch > data->max_n_branch) {
 

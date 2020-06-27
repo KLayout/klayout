@@ -1147,8 +1147,8 @@ TEST(5_BufferTwoPathsDifferentDeviceClasses)
     "begin_circuit BUF BUF\n"
     "match_nets INT $10\n"
     "match_nets IN IN\n"
-    "net_mismatch OUT OUT\n"
     "net_mismatch INT2 $11\n"
+    "net_mismatch OUT OUT\n"
     "match_pins $0 $1\n"
     "match_pins $1 $3\n"
     "match_pins $2 $0\n"
@@ -1212,8 +1212,35 @@ TEST(6_BufferTwoPathsAdditionalResistor)
     "begin_circuit BUF BUF\n"
     "net_mismatch INT $10\n"
     "match_nets IN IN\n"
+    "net_mismatch INT2 $11\n"
+    "match_nets OUT OUT\n"
+    "match_pins $0 $1\n"
+    "match_pins $1 $3\n"
+    "match_pins $2 $0\n"
+    "match_pins $3 $2\n"
+    "match_devices $1 $1\n"
+    "match_devices $3 $2\n"
+    "match_devices $5 $3\n"
+    "match_devices $7 $4\n"
+    "match_devices $2 $5\n"
+    "match_devices $4 $6\n"
+    "match_devices $6 $7\n"
+    "match_devices $8 $8\n"
+    "device_mismatch (null) $9\n"
+    "end_circuit BUF BUF NOMATCH"
+  );
+  EXPECT_EQ (good, false);
+
+  comp.set_depth_first (false);
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit BUF BUF\n"
+    "net_mismatch INT $10\n"
     "match_nets OUT OUT\n"
     "net_mismatch INT2 $11\n"
+    "match_nets IN IN\n"
     "match_pins $0 $1\n"
     "match_pins $1 $3\n"
     "match_pins $2 $0\n"
@@ -1274,9 +1301,9 @@ TEST(6_BufferTwoPathsAdditionalDevices)
     "match_nets INT $11\n"
     "net_mismatch VDD VDD\n"
     "match_nets IN IN\n"
+    "net_mismatch INT2 $10\n"
     "net_mismatch VSS VSS\n"
     "net_mismatch OUT OUT\n"
-    "net_mismatch INT2 $10\n"
     "match_pins $0 $1\n"
     "match_pins $1 $3\n"
     "match_pins $2 $0\n"
@@ -2679,6 +2706,57 @@ TEST(17_InherentlyAmbiguousDecoder)
   );
 
   EXPECT_EQ (good, true);
+
+  comp.set_depth_first (false);
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit NAND NAND\n"
+    "match_nets VSS VSS\n"
+    "match_nets INT INT\n"
+    "match_nets OUT OUT\n"
+    "match_nets VDD VDD\n"
+    "match_nets B B\n"
+    "match_nets A A\n"
+    "match_pins $0 $0\n"
+    "match_pins $1 $1\n"
+    "match_pins $2 $2\n"
+    "match_pins $3 $3\n"
+    "match_pins $4 $4\n"
+    "match_devices $1 $1\n"
+    "match_devices $2 $2\n"
+    "match_devices $3 $3\n"
+    "match_devices $4 $4\n"
+    "end_circuit NAND NAND MATCH\n"
+    "begin_circuit DECODER DECODER\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets NA NA\n"
+    "match_nets NB NB\n"
+    "match_nets B B\n"
+    "match_nets NQ1 NQ1\n"
+    "match_nets NQ3 NQ3\n"
+    "match_nets NQ2 NQ2\n"
+    "match_nets NQ0 NQ0\n"
+    "match_pins $0 $1\n"
+    "match_pins $1 $0\n"
+    "match_pins $2 $2\n"
+    "match_pins $3 $3\n"
+    "match_pins $4 $4\n"
+    "match_pins $5 $5\n"
+    "match_pins $6 $6\n"
+    "match_pins $7 $7\n"
+    "match_subcircuits $1 $1\n"
+    "match_subcircuits $2 $2\n"
+    "match_subcircuits $4 $3\n"
+    "match_subcircuits $6 $4\n"
+    "match_subcircuits $3 $5\n"
+    "match_subcircuits $5 $6\n"
+    "end_circuit DECODER DECODER MATCH"
+  );
+
+  EXPECT_EQ (good, true);
 }
 
 TEST(18_ClockTree)
@@ -2739,6 +2817,128 @@ TEST(18_ClockTree)
   bool good = comp.compare (&nl1, &nl2);
 
   std::string txt = logger.text ();
+  //  because L/R matching is ambiguous, we need to do this to
+  //  establish reproducability on different platforms:
+  txt = tl::replaced (txt, "L", "X");
+  txt = tl::replaced (txt, "R", "X");
+
+  EXPECT_EQ (txt,
+    "begin_circuit INV INV\n"
+    "match_nets VDD VDD\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_nets VSS VSS\n"
+    "match_pins IN IN\n"
+    "match_pins OUT OUT\n"
+    "match_pins VDD VDD\n"
+    "match_pins VSS VSS\n"
+    "match_devices $1 $1\n"
+    "match_devices $2 $2\n"
+    "end_circuit INV INV MATCH\n"
+    "begin_circuit TXEE TXEE\n"
+    "match_nets IN IN\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets S S\n"
+    "match_ambiguous_nets SX SX\n"
+    "match_ambiguous_nets SX SX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TX TX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits T T\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TX TX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXX TXX\n"
+    "end_circuit TXEE TXEE MATCH"
+  );
+  EXPECT_EQ (good, true);
+
+  comp.set_depth_first (false);
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  txt = logger.text ();
+  //  because L/R matching is ambiguous, we need to do this to
+  //  establish reproducability on different platforms:
+  txt = tl::replaced (txt, "L", "X");
+  txt = tl::replaced (txt, "R", "X");
+
+  EXPECT_EQ (txt,
+    "begin_circuit INV INV\n"
+    "match_nets VDD VDD\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_nets VSS VSS\n"
+    "match_pins IN IN\n"
+    "match_pins OUT OUT\n"
+    "match_pins VDD VDD\n"
+    "match_pins VSS VSS\n"
+    "match_devices $1 $1\n"
+    "match_devices $2 $2\n"
+    "end_circuit INV INV MATCH\n"
+    "begin_circuit TXEE TXEE\n"
+    "match_nets IN IN\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets S S\n"
+    "match_ambiguous_nets SX SX\n"
+    "match_ambiguous_nets SX SX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TX TX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits T T\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TX TX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXX TXX\n"
+    "end_circuit TXEE TXEE MATCH"
+  );
+  EXPECT_EQ (good, true);
+
+  comp.set_depth_first (false);
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  txt = logger.text ();
   //  because L/R matching is ambiguous, we need to do this to
   //  establish reproducability on different platforms:
   txt = tl::replaced (txt, "L", "X");
@@ -2924,8 +3124,8 @@ TEST(19_SymmetricCircuit)
     "match_nets $14 WELL\n"
     "match_nets nn2 NN2\n"
     "match_nets nn2_ NN2_\n"
-    "match_nets q0 Q0\n"
-    "match_nets q1 Q1\n"
+    "match_ambiguous_nets q0 Q0\n"
+    "match_ambiguous_nets q1 Q1\n"
     "match_nets $11 CS0\n"
     "match_nets q0_ Q0_\n"
     "match_nets $6 NET181\n"
@@ -2940,6 +3140,105 @@ TEST(19_SymmetricCircuit)
     "match_nets $4 NET200\n"
     "match_nets a0_ A0_\n"
     "match_nets $34 HNET48\n"
+    "match_pins VDD VDD\n"
+    "match_pins nn1_ NN1_\n"
+    "match_pins nn1 NN1\n"
+    "match_pins q0 Q0\n"
+    "match_pins q0_ Q0_\n"
+    "match_pins q1_ Q1_\n"
+    "match_pins q1 Q1\n"
+    "match_pins nn2 NN2\n"
+    "match_pins nn2_ NN2_\n"
+    "match_pins a0 A0\n"
+    "match_pins a0_ A0_\n"
+    "match_pins g1 G1\n"
+    "match_pins g0 G0\n"
+    "match_pins gtp NN3\n"
+    "match_pins VSS VSS\n"
+    "match_pins WELL WELL\n"
+    "match_devices $30 0\n"
+    "match_devices $29 1\n"
+    "match_devices $9 10\n"
+    "match_devices $10 11\n"
+    "match_devices $36 12\n"
+    "match_devices $35 13\n"
+    "match_devices $34 14\n"
+    "match_devices $38 15\n"
+    "match_devices $37 16\n"
+    "match_devices $33 17\n"
+    "match_devices $27 18\n"
+    "match_devices $28 19\n"
+    "match_devices $17 2\n"
+    "match_devices $31 20\n"
+    "match_devices $32 21\n"
+    "match_devices $22 22\n"
+    "match_devices $26 23\n"
+    "match_devices $23 24\n"
+    "match_devices $43 25\n"
+    "match_devices $20 26\n"
+    "match_devices $25 27\n"
+    "match_devices $15 28\n"
+    "match_devices $14 29\n"
+    "match_devices $16 3\n"
+    "match_devices $18 30\n"
+    "match_devices $21 31\n"
+    "match_devices $13 32\n"
+    "match_devices $19 33\n"
+    "match_devices $7 34\n"
+    "match_devices $8 35\n"
+    "match_devices $24 36\n"
+    "match_devices $3 37\n"
+    "match_devices $6 38\n"
+    "match_devices $4 39\n"
+    "match_devices $39 4\n"
+    "match_devices $5 40\n"
+    "match_devices $2 41\n"
+    "match_devices $1 42\n"
+    "match_devices $40 5\n"
+    "match_devices $11 6\n"
+    "match_devices $12 7\n"
+    "match_devices $41 8\n"
+    "match_devices $42 9\n"
+    "end_circuit DECODE DECODE MATCH"
+  );
+  EXPECT_EQ (good, true);
+
+  comp.set_depth_first (false);
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit DECODE DECODE\n"
+    "match_nets $41 WL1_EN_\n"
+    "match_nets VDD VDD\n"
+    "match_nets $39 NET194\n"
+    "match_nets g0 G0\n"
+    "match_nets $40 HNET52\n"
+    "match_nets VSS VSS\n"
+    "match_nets $42 NET189\n"
+    "match_nets gtp NN3\n"
+    "match_nets $37 NET193\n"
+    "match_nets g1 G1\n"
+    "match_nets $44 YI\n"
+    "match_nets $14 WELL\n"
+    "match_nets nn2 NN2\n"
+    "match_nets nn2_ NN2_\n"
+    "match_ambiguous_nets q0 Q0\n"
+    "match_ambiguous_nets q1 Q1\n"
+    "match_nets $11 CS0\n"
+    "match_nets q0_ Q0_\n"
+    "match_nets $4 NET200\n"
+    "match_nets $13 CS1\n"
+    "match_nets q1_ Q1_\n"
+    "match_nets $9 NET175\n"
+    "match_nets a0 A0\n"
+    "match_nets a0_ A0_\n"
+    "match_nets $35 HNET44\n"
+    "match_nets $34 HNET48\n"
+    "match_nets $6 NET181\n"
+    "match_nets $8 NET215\n"
+    "match_nets nn1 NN1\n"
+    "match_nets nn1_ NN1_\n"
     "match_pins VDD VDD\n"
     "match_pins nn1_ NN1_\n"
     "match_pins nn1 NN1\n"
@@ -3576,7 +3875,7 @@ TEST(23_NodesRemovedWithError)
     "pin_mismatch (null) BULK\n"
     "pin_mismatch (null) $6\n"
     "match_subcircuits $1 $1\n"
-    "match_subcircuits $2 $2\n"
+    "subcircuit_mismatch $2 $2\n"
     "end_circuit INV2PAIR INV2PAIR NOMATCH\n"
     "circuit_skipped RINGO RINGO"
   );

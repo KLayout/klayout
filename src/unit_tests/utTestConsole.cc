@@ -197,10 +197,25 @@ TestConsole::TestConsole (FILE *file)
 {
   ms_instance = this;
 
+  prepare_file ();
+  redirect ();
+}
+
+TestConsole::~TestConsole ()
+{
+  restore ();
+
+  if (ms_instance == this) {
+    ms_instance = 0;
+  }
+}
+
+void TestConsole::prepare_file ()
+{
 #if defined(_MSC_VER)
   m_file_is_tty = false;
 #else
-  m_file_is_tty = isatty (fileno (file));
+  m_file_is_tty = isatty (fileno (m_file));
 #endif
 
 #if !defined(_WIN32)
@@ -211,16 +226,15 @@ TestConsole::TestConsole (FILE *file)
     m_rows = std::max (0, (int) ws.ws_row);
   }
 #endif
-
-  redirect ();
 }
 
-TestConsole::~TestConsole ()
+void
+TestConsole::send_to (FILE *file)
 {
-  restore ();
-
-  if (ms_instance == this) {
-    ms_instance = 0;
+  if (file != m_file) {
+    flush ();
+    m_file = file;
+    prepare_file ();
   }
 }
 

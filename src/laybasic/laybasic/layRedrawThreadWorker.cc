@@ -809,14 +809,30 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
 
               } else {
 
-                //  The array (or single instance) must be iterated instance
-                //  by instance
-                for (db::CellInstArray::iterator p = cell_inst.begin_touching (*v, bc); ! p.at_end (); ++p) {
+                size_t qid = 0;
+
+                //  The array (or single instance) must be iterated instance by instance
+                for (db::CellInstArray::iterator p = cell_inst.begin_touching (*v, bc); ! p.at_end (); ) {
 
                   test_snapshot (0);
                   db::ICplxTrans t (cell_inst.complex_trans (*p));
                   db::Box new_vp = db::Box (t.inverted () * *v);
                   draw_boxes (drawing_context, new_ci, trans * t, new_vp, level + 1);
+
+                  if (p.quad_id () > 0 && p.quad_id () != qid) {
+
+                    qid = p.quad_id ();
+
+                    //  if the quad is very small we don't gain anything from looking further into the quad - skip this one
+                    db::DBox qb = trans * cell_inst.quad_box (p, bc);
+                    if (qb.width () < 1.0 && qb.height () < 1.0) {
+                      p.skip_quad ();
+                      continue;
+                    }
+
+                  }
+
+                  ++p;
 
                 }
 
@@ -986,7 +1002,6 @@ RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_ty
             ++inst;
 
           }
-
         }
 
       }
@@ -1582,6 +1597,8 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
       db::Shape last_array;
 
       size_t current_quad_id = 0;
+      size_t current_array_quad_id = 0;
+
       db::ShapeIterator shape (shapes.begin_touching (*v, db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::Paths, mp_prop_sel, m_inv_prop_sel));
       while (! shape.at_end ()) {
 
@@ -1596,16 +1613,18 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
         }
 
         if (skip) {
-
           shape.skip_quad ();
+          continue;
+        }
 
-        } else {
+        if (shape.in_array ()) {
 
-          bool simplified = false;
-
-          if (shape.in_array () && last_array != shape.array ()) {
+          if (last_array != shape.array ()) {
 
             last_array = shape.array ();
+            current_array_quad_id = 0;
+
+            bool simplified = false;
 
             if (last_array.type () == db::Shape::PolygonPtrArray) {
               simplified = draw_array_simplified<db::Shape::polygon_ptr_array_type> (mp_renderer.get (), last_array, frame, vertex, trans);
@@ -1619,16 +1638,41 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
               simplified = draw_array_simplified<db::Shape::short_box_array_type> (mp_renderer.get (), last_array, frame, vertex, trans);
             }
 
+            if (simplified) {
+              shape.finish_array ();
+              //  continue with the next shape, array or quad
+              continue;
+            }
+
           }
 
-          if (simplified) {
-            shape.finish_array ();
-          } else {
-            mp_renderer->draw (*shape, trans, fill, frame, vertex, text);
-            ++shape;
+        } else {
+          current_array_quad_id = 0;
+        }
+
+        //  try whether the array quad can be simplified
+
+        size_t aqid = shape.array_quad_id ();
+        if (aqid != 0 && aqid != current_array_quad_id) {
+
+          current_array_quad_id = aqid;
+
+          db::DBox qbbox = trans * shape.array_quad_box ();
+          if (qbbox.width () < 1.5 && qbbox.height () < 1.5) {
+
+            //  draw a single box instead of the quad
+            mp_renderer->draw (qbbox, fill, frame, vertex, text);
+            shape.skip_array_quad ();
+
+            //  continue with the next shape, array or quad
+            continue;
+
           }
 
         }
+
+        mp_renderer->draw (*shape, trans, fill, frame, vertex, text);
+        ++shape;
 
       }
 
@@ -1727,7 +1771,9 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
 
             } else if (anything) {
 
-              for (db::CellInstArray::iterator p = cell_inst.begin_touching (*v, bc); ! p.at_end (); ++p) {
+              size_t qid = 0;
+
+              for (db::CellInstArray::iterator p = cell_inst.begin_touching (*v, bc); ! p.at_end (); ) {
 
                 if (! m_draw_array_border_instances || 
                     p.index_a () <= 0 || (unsigned long)p.index_a () == amax - 1 || p.index_b () <= 0 || (unsigned long)p.index_b () == bmax - 1) {
@@ -1735,6 +1781,21 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
                   db::ICplxTrans t (cell_inst.complex_trans (*p));
                   db::Box new_vp = db::Box (t.inverted () * *v);
                   draw_layer (from_level, to_level, new_ci, trans * t, new_vp, level + 1, fill, frame, vertex, text, update_snapshot);
+
+                  if (p.quad_id () > 0 && p.quad_id () != qid) {
+
+                    qid = p.quad_id ();
+
+                    //  if the quad is very small we don't gain anything from looking further into the quad - skip this one
+                    db::DBox qb = trans * cell_inst.quad_box (p, bc);
+                    if (qb.width () < 1.0 && qb.height () < 1.0) {
+                      p.skip_quad ();
+                      continue;
+                    }
+
+                  }
+
+                  ++p;
 
                 } 
 

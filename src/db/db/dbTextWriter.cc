@@ -198,42 +198,51 @@ TextWriter::write (const db::Layout &layout)
     
     for (db::Cell::const_iterator inst = cref.begin (); ! inst.at_end (); ++inst) {
 
-      std::string pfx = "";
-
-      if (inst->has_prop_id () && inst->prop_id () != 0) {
-        pfx = "p $props";
-        write_props (layout, inst->prop_id ());
-      }
-
       db::Vector a, b;
       unsigned long amax, bmax;
 
       bool is_reg = inst->is_regular_array (a, b, amax, bmax);
 
-      *this << (is_reg ? "aref" : "sref") << pfx << " {" << layout.cell_name (inst->cell_index ()) << "}";
+      for (db::CellInstArray::iterator i = inst->begin (); ! i.at_end (); ++i) {
 
-      db::Trans t = inst->front ();
+        std::string pfx = "";
 
-      if (inst->is_complex ()) {
-        *this << " " << inst->complex_trans ().angle ();
-        *this << " " << (inst->complex_trans ().is_mirror () ? 1 : 0);
-        *this << " " << inst->complex_trans ().mag ();
-      } else {
-        *this << " " << (t.rot () % 4) * 90.0;
-        *this << " " << (t.is_mirror () ? 1 : 0);
-        *this << " " << 1.0;
+        if (inst->has_prop_id () && inst->prop_id () != 0) {
+          pfx = "p $props";
+          write_props (layout, inst->prop_id ());
+        }
+
+        *this << (is_reg ? "aref" : "sref") << pfx << " {" << layout.cell_name (inst->cell_index ()) << "}";
+
+        db::Trans t = *i;
+
+        if (inst->is_complex ()) {
+          db::CellInstArray::complex_trans_type ct = inst->complex_trans (t);
+          *this << " " << ct.angle ();
+          *this << " " << (ct.is_mirror () ? 1 : 0);
+          *this << " " << ct.mag ();
+        } else {
+          *this << " " << (t.rot () % 4) * 90.0;
+          *this << " " << (t.is_mirror () ? 1 : 0);
+          *this << " " << 1.0;
+        }
+
+        if (is_reg) {
+          *this << " " << int (std::max ((unsigned long) 1, amax));
+          *this << " " << int (std::max ((unsigned long) 1, bmax));
+        }
+        *this << " " << t.disp ();
+        if (is_reg) {
+          *this << " " << (t.disp () + a * (long) amax);
+          *this << " " << (t.disp () + b * (long) bmax);
+        }
+        *this << endl ();
+
+        if (is_reg) {
+          break;
+        }
+
       }
-
-      if (is_reg) {
-        *this << " " << int (std::max ((unsigned long) 1, amax));
-        *this << " " << int (std::max ((unsigned long) 1, bmax));
-      } 
-      *this << " " << t.disp ();
-      if (is_reg) {
-        *this << " " << (t.disp () + a * (long) amax);
-        *this << " " << (t.disp () + b * (long) bmax);
-      }
-      *this << endl ();
 
     }
 

@@ -97,6 +97,8 @@ TestDifferenceReceiver::print_cell_inst (const db::CellInstArrayWithProperties &
   unsigned long amax, bmax;
   if (ci.is_regular_array (a, b, amax, bmax)) {
     m_os << "[a=" << a.to_string () << ", b=" << b.to_string () << ", na=" << amax << ", nb=" << bmax << "]";
+  } else if (ci.size () > 1) {
+    m_os << " (+" << (ci.size () - 1) << " irregular placements)";
   }
   if (ci.properties_id () != 0) {
     m_os << " [" << ci.properties_id () << "]" << std::endl;
@@ -112,6 +114,8 @@ TestDifferenceReceiver::print_cell_inst (const db::CellInstArrayWithProperties &
   unsigned long amax, bmax;
   if (ci.is_regular_array (a, b, amax, bmax)) {
     m_os << "[a=" << a.to_string () << ", b=" << b.to_string () << ", na=" << amax << ", nb=" << bmax << "]";
+  } else if (ci.size () > 1) {
+    m_os << " (+" << (ci.size () - 1) << " irregular placements)";
   }
   if (ci.properties_id () != 0) {
     m_os << " [" << ci.properties_id () << "]" << std::endl;

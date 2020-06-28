@@ -283,6 +283,12 @@ namespace std
         h = hfunc (b, h);
         h = hfunc (na, h);
         h = hfunc (nb, h);
+      } else if (o.size () > 1) {
+        //  iterated array
+        typename db::array <db::CellInst, db::simple_trans<C> >::iterator i = o.begin ();
+        while (! (++i).at_end ()) {
+          h = hfunc (*i, h);
+        }
       }
 
       if (o.is_complex ()) {

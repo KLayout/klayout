@@ -538,6 +538,18 @@ Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
     "@brief Gets the maximum branch complexity\n"
     "See \\max_branch_complexity= for details."
   ) +
+  gsi::method ("dont_consider_net_names=", &db::NetlistComparer::set_dont_consider_net_names, gsi::arg ("f"),
+    "@brief Sets a value indicating whether net names shall not be considered\n"
+    "If this value is set to true, net names will not be considered when resolving ambiguities.\n"
+    "Not considering net names usually is more expensive. The default is 'false' indicating that\n"
+    "net names will be considered for ambiguity resolution.\n"
+    "\n"
+    "This property has been introduced in version 0.26.7.\n"
+  ) +
+  gsi::method ("dont_consider_net_names", &db::NetlistComparer::dont_consider_net_names,
+    "@brief Gets a value indicating whether net names shall not be considered\n"
+    "See \\dont_consider_net_names= for details."
+  ) +
   gsi::method_ext ("unmatched_circuits_a", &unmatched_circuits_a, gsi::arg ("a"), gsi::arg ("b"),
     "@brief Returns a list of circuits in A for which there is not corresponding circuit in B\n"
     "This list can be used to flatten these circuits so they do not participate in the compare process.\n"

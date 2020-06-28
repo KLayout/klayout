@@ -2324,9 +2324,20 @@ static bool net_names_are_different (const db::Net *a, const db::Net *b)
   }
 }
 
+static bool net_names_are_equal (const db::Net *a, const db::Net *b)
+{
+  if (! a || ! b || a->name ().empty () || b->name ().empty ()) {
+    return false;
+  } else {
+    return name_compare (a->name (), b->name ()) == 0;
+  }
+}
+
 size_t
 NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, DeviceMapperForTargetNode &dm, DeviceMapperForTargetNode &dm_other, SubCircuitMapperForTargetNode &scm, SubCircuitMapperForTargetNode &scm_other, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data)
 {
+  tl::AbsoluteProgress progress (tl::to_string (tr ("Deriving match for ambiguous net group")));
+
   std::string indent_s;
   if (options ()->debug_netcompare) {
     indent_s = indent (depth);
@@ -2334,16 +2345,14 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
   }
 
   size_t new_nodes = 0;
+  size_t complexity = nr.num;
 
   //  sort the ambiguity group such that net names match best
 
   std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> > pairs;
   tl::equivalence_clusters<const NetGraphNode *> equivalent_other_nodes;
-  std::set<const NetGraphNode *> seen;
 
-  if (! data->dont_consider_net_names) {
-    sort_node_range_by_best_match (nr);
-  }
+  sort_node_range_by_best_match (nr);
 
   {
 
@@ -2374,14 +2383,13 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
       std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i1 = *ii1;
 
       bool any = false;
+      std::vector<std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator>::iterator to_remove = iters2.end ();
 
-      for (std::vector<std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator>::const_iterator ii2 = iters2.begin (); ii2 != iters2.end (); ++ii2) {
+      for (std::vector<std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator>::iterator ii2 = iters2.begin (); ii2 != iters2.end (); ++ii2) {
+
+        ++progress;
 
         std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i2 = *ii2;
-
-        if (seen.find (i2->first) != seen.end ()) {
-          continue;
-        }
 
         //  try this candidate in tentative mode
         if (options ()->debug_netcompare) {
@@ -2395,39 +2403,65 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
           continue;
         }
 
-        size_t ni = node_index_for_net (i1->first->net ());
-        size_t other_ni = data->other->node_index_for_net (i2->first->net ());
-
-        TentativeNodeMapping tn;
-        TentativeNodeMapping::map_pair_from_unknown (&tn, this, ni, data->other, other_ni, dm, dm_other, *data->device_equivalence, scm, scm_other, *data->subcircuit_equivalence, depth);
-
-        size_t bt_count = derive_node_identities (ni, depth + 1, nr.num * n_branch, &tn, with_ambiguous, data);
-
-        if (bt_count != failed_match) {
+        if (! data->dont_consider_net_names && net_names_are_equal (i1->first->net (), i2->first->net ())) {
 
           if (options ()->debug_netcompare) {
-            tl::info << indent_s << "match found";
+            tl::info << indent_s << "=> accepted for identical names";
           }
-          //  we have a match ...
 
-          if (any) {
+          //  utilize net names to propose a match
+          new_nodes += 1;
+          pairs.push_back (std::make_pair (i1->first, i2->first));
+          to_remove = ii2;
+          any = true;
+          break;
 
-            //  there is already a known pair, so we can mark *i2 and the previous *i2 as equivalent
-            //  (makes them ambiguous)
-            equivalent_other_nodes.same (i2->first, pairs.back ().second);
+        } else {
 
-          } else {
+          size_t ni = node_index_for_net (i1->first->net ());
+          size_t other_ni = data->other->node_index_for_net (i2->first->net ());
 
-            //  identified a new pair
-            new_nodes += bt_count + 1;
-            pairs.push_back (std::make_pair (i1->first, i2->first));
-            seen.insert (i2->first);
-            any = true;
+          TentativeNodeMapping tn;
+          TentativeNodeMapping::map_pair_from_unknown (&tn, this, ni, data->other, other_ni, dm, dm_other, *data->device_equivalence, scm, scm_other, *data->subcircuit_equivalence, depth);
+
+          size_t bt_count = derive_node_identities (ni, depth + 1, complexity * n_branch, &tn, with_ambiguous, data);
+
+          if (bt_count != failed_match) {
+
+            if (options ()->debug_netcompare) {
+              tl::info << indent_s << "match found";
+            }
+            //  we have a match ...
+
+            if (any) {
+
+              //  there is already a known pair, so we can mark *i2 and the previous *i2 as equivalent
+              //  (makes them ambiguous)
+              equivalent_other_nodes.same (i2->first, pairs.back ().second);
+
+            } else {
+
+              //  identified a new pair
+              new_nodes += bt_count + 1;
+              pairs.push_back (std::make_pair (i1->first, i2->first));
+              to_remove = ii2;
+              any = true;
+
+              //  no ambiguity analysis in tentative mode - we can stop now
+              if (tentative) {
+                break;
+              }
+
+            }
 
           }
 
         }
 
+      }
+
+      if (to_remove != iters2.end ()) {
+        iters2.erase (to_remove);
       }
 
       if (! any && tentative) {
@@ -2480,7 +2514,7 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
 
       size_t ni = node_index_for_net (p->first->net ());
 
-      size_t bt_count = derive_node_identities (ni, depth + 1, nr.num * n_branch, tentative, with_ambiguous, data);
+      size_t bt_count = derive_node_identities (ni, depth + 1, complexity * n_branch, tentative, with_ambiguous, data);
       tl_assert (bt_count != failed_match);
 
     }

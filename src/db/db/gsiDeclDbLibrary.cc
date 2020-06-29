@@ -78,7 +78,18 @@ static std::string get_technology (db::Library *lib)
   }
 }
 
+static void dummy_destroy (db::Library *) { }
+
 Class<db::Library> decl_Library ("db", "Library",
+  gsi::method_ext ("_destroy", &dummy_destroy,
+    "@brief An inactive substitute for _destroy (delete the object)\n"
+    "As libraries need to be kept if cells are using them, library objects must "
+    "not be deleted. Hence the default '_destroy' implementation must not be called. "
+    "To keep old code working, this substitute is provided. It just returns without "
+    "deleting the object.\n"
+    "\n"
+    "This method has been introduced in version 0.26.7."
+  ) +
   gsi::constructor ("new", &new_lib,
     "@brief Creates a new, empty library"
   ) +

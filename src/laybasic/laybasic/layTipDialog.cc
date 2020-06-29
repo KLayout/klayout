@@ -128,12 +128,9 @@ TipDialog::no_pressed ()
   accept ();
 }
 
-bool
-TipDialog::do_exec_dialog (button_type *button)
+static std::pair<bool, int>
+tip_dialog_status (const std::string &key)
 {
-  bool must_show = true;
-  mp_res = button;
-
   std::string th;
   if (lay::Dispatcher::instance ()) {
     lay::Dispatcher::instance ()->config_get (cfg_tip_window_hidden, th);
@@ -148,20 +145,39 @@ TipDialog::do_exec_dialog (button_type *button)
     }
     int r = -1;
     ex.test ("=") && ex.try_read (r);
-    if (k == m_key) {
-      if (r >= 0) {
-        *mp_res = button_type (r);
-      }
-      must_show = false;
-      break;
+    if (k == key) {
+      return std::make_pair (false, r);
     }
     ex.test (",");
   }
 
-  if (must_show) {
+  return std::make_pair (true, -1);
+}
+
+bool
+TipDialog::will_be_shown ()
+{
+  return tip_dialog_status (m_key).first;
+}
+
+bool
+TipDialog::do_exec_dialog (button_type *button)
+{
+  mp_res = button;
+
+  std::string th;
+  if (lay::Dispatcher::instance ()) {
+    lay::Dispatcher::instance ()->config_get (cfg_tip_window_hidden, th);
+  }
+
+  std::pair<bool, int> td_status = tip_dialog_status (m_key);
+  if (td_status.first) {
     exec ();
     return true;
   } else {
+    if (td_status.second >= 0) {
+      *mp_res = button_type (td_status.second);
+    }
     return false;
   }
 }

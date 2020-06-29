@@ -14,6 +14,7 @@ node("master") {
   stage("Checkout sources") {
 
     checkout scm
+    checkout_private()
 
   }
 

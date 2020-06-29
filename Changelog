@@ -11,6 +11,11 @@
       The algorithm was improved to provide better reproducibility. The
       detection of matching paths in the presence of ambiguities was 
       improved.
+      In addition, the netlist compare now favours net names for resolving
+      ambiguities. So if nets are named the same in the layout and the
+      schematic, ambiguities are resolved based on these names. This is 
+      usually more efficient. A new function is available to turn this
+      feature off: "consider_net_names(false)".
 
 0.26.6          (2020-06-05):
 

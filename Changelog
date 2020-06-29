@@ -3,7 +3,7 @@
 
 * Bugfix: %GITHUB%/issues/493
       LVS asserted on MacOS
-* Enhancement: MacOS compatibility
+* Bugfix: %GITHUB%/issues/381 and more
       Some bug fixed that happened specifically on MacOS.
       1.) A segfault that happened in LVS
       2.) Some classes were not properly registered for usage in scripts.

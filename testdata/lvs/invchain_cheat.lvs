@@ -126,5 +126,7 @@ connect_global(bulk, "SUBSTRATE")
 netlist.simplify
 align
 
+consider_net_names(false)
+
 compare
 

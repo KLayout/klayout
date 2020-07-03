@@ -407,3 +407,41 @@ TEST(6)
     "layer_map('1/0';'3/10-*';'2/0 : 2/0';'2/42 : 2/42';'2/1-41,43-* : */*')"
   );
 }
+
+// issue #592
+TEST(7)
+{
+  db::Layout ly;
+
+  unsigned int l1 = ly.insert_layer (db::LayerProperties (85, 0));
+  unsigned int l2 = ly.insert_layer (db::LayerProperties (185, 0));
+  ly.insert_layer ();
+  ly.insert_layer ();
+
+  db::LayerMap lm;
+  lm.map (db::LayerProperties (10001, 0), l1);
+  lm.map (db::LayerProperties (10000, 0), l2);
+
+  EXPECT_EQ (layers_to_string (ly), "85/0,185/0,,");
+
+  lm.prepare (ly);
+
+  EXPECT_EQ (layers_to_string (ly), "85/0,185/0,,");
+
+  std::pair<bool, unsigned int> p;
+  p = lm.logical (db::LayerProperties (85, 0));
+  EXPECT_EQ (p.first, false);
+  EXPECT_EQ (p.second, (unsigned int) 0);
+
+  p = lm.logical (db::LayerProperties (185, 0));
+  EXPECT_EQ (p.first, false);
+  EXPECT_EQ (p.second, (unsigned int) 0);
+
+  p = lm.logical (db::LayerProperties (10000, 0));
+  EXPECT_EQ (p.first, true);
+  EXPECT_EQ (p.second, (unsigned int) 1);
+
+  p = lm.logical (db::LayerProperties (10001, 0));
+  EXPECT_EQ (p.first, true);
+  EXPECT_EQ (p.second, (unsigned int) 0);
+}

@@ -66,6 +66,11 @@ public:
   ~TipDialog ();
 
   /**
+   *  @brief Returns true, if the tip dialog will be shown
+   */
+  bool will_be_shown ();
+
+  /**
    *  @brief Show the dialog
    *
    *  This method is intended for the "close_buttons" style. It will show the dialog and return true, 

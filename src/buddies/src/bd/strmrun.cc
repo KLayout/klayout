@@ -87,5 +87,6 @@ BD_PUBLIC int strmrun (int argc, char *argv[])
 
   lym::Macro macro;
   macro.load_from (script);
+  macro.set_file_path (script);
   return macro.run ();
 }

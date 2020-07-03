@@ -251,6 +251,7 @@ void Macro::load_from (const std::string &fn)
   }
 
   m_modified = true;
+  m_is_file = true;
   on_changed ();
 }
 
@@ -293,9 +294,6 @@ void Macro::load_from_string (const std::string &text, const std::string &url)
 void Macro::load ()
 {
   load_from (path ());
-  m_modified = false;
-  m_is_file = true;
-  on_changed ();
 }
 
 bool 
@@ -449,13 +447,13 @@ void Macro::reset_modified ()
 
 bool Macro::rename (const std::string &n)
 {
-  if (m_is_file) {
+  if (m_is_file && parent ()) {
     std::string suffix = suffix_for_format (m_interpreter, m_dsl_interpreter, m_format);
     if (tl::verbosity () >= 20) {
       tl::log << "Renaming macro " << path () << " to " << n;
     }
     QFile f (tl::to_qstring (path ()));
-    if (! f.rename (QFileInfo (QDir (tl::to_qstring (mp_parent->path ())), tl::to_qstring (n + suffix)).filePath ())) {
+    if (! f.rename (QFileInfo (QDir (tl::to_qstring (parent ()->path ())), tl::to_qstring (n + suffix)).filePath ())) {
       return false;
     }
   }
@@ -1294,14 +1292,15 @@ MacroCollection::add_folder (const std::string &description, const std::string &
   begin_changes ();
 
   MacroCollection *mc = m_folders.insert (std::make_pair (path, new MacroCollection ())).first->second;
-  mc->set_parent (this);
   mc->set_name (path);
   mc->set_description (description);
   mc->set_category (cat);
   mc->set_readonly (readonly);
   mc->scan (path);
+  mc->set_parent (this);
 
   on_changed ();
+  on_macro_changed (0);
 
   return mc;
 }
@@ -1376,7 +1375,6 @@ void MacroCollection::scan (const std::string &path)
             }
             if (! found) {
               Macro *m = m_macros.insert (std::make_pair (n, new Macro ()))->second;
-              m->set_parent (this);
               m->set_interpreter (interpreter);
               m->set_autorun_default (autorun);
               m->set_autorun (autorun);
@@ -1387,6 +1385,7 @@ void MacroCollection::scan (const std::string &path)
               m->set_readonly (m_readonly);
               m->reset_modified ();
               m->set_is_file ();
+              m->set_parent (this);
             }
 
           }
@@ -1425,6 +1424,7 @@ void MacroCollection::scan (const std::string &path)
       try {
 
         std::string n = tl::to_string (QFileInfo (*f).completeBaseName ());
+        std::string mp = tl::to_string (dir.absoluteFilePath (*f));
 
         Macro::Format format = Macro::NoFormat;
         Macro::Interpreter interpreter = Macro::None;
@@ -1451,10 +1451,11 @@ void MacroCollection::scan (const std::string &path)
             m->set_autorun (autorun);
             m->set_interpreter (interpreter);
             m->set_dsl_interpreter (dsl_name);
-            m->set_parent (this);
             m->set_name (n);
-            m->load ();
+            m->load_from (mp);
+            m->reset_modified ();
             m->set_readonly (m_readonly);
+            m->set_parent (this);
           }
 
         }
@@ -1478,12 +1479,12 @@ void MacroCollection::scan (const std::string &path)
         MacroCollection *&mc = m_folders.insert (std::make_pair (n, (MacroCollection *) 0)).first->second;
         if (! mc) {
           mc = new MacroCollection ();
-          mc->set_parent (this);
           mc->set_name (n);
           mc->set_virtual_mode (NotVirtual);
           bool ro = (m_readonly || ! QFileInfo (dir.filePath (*f)).isWritable ());
           mc->set_readonly (ro);
           mc->scan (tl::to_string (dir.filePath (*f)));
+          mc->set_parent (this);
         }
 
       } catch (tl::Exception &ex) {

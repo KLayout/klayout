@@ -668,17 +668,20 @@ BEGIN_PROTECTED
       }
     }
 
-    if (collection && (force_add || (collection->begin () == collection->end () && collection->begin_children () == collection->end_children ()))) {
+    bool open_template_dialog = false;
+    if (! force_add && collection && (collection->begin () == collection->end () && collection->begin_children () == collection->end_children ())) {
+      TipDialog td (this,
+                    tl::to_string (QObject::tr ("<html><body>To get started with the macro development feature, read the documentation provided: <a href=\"int:/about/macro_editor.xml\">About Macro Development</a>.</body></html>")),
+                    "macro-editor-basic-tips");
+      open_template_dialog = td.exec_dialog () && td.will_be_shown ();
+    }
+
+    if (collection && (force_add || open_template_dialog)) {
       lym::Macro *m = new_macro ();
       if (force_add && m) {
         set_run_macro (m);
       }
     }
-
-    TipDialog td (this,
-                  tl::to_string (QObject::tr ("<html><body>To get started with the macro development feature, read the documentation provided: <a href=\"int:/about/macro_editor.xml\">About Macro Development</a>.</body></html>")),
-                  "macro-editor-basic-tips");
-    td.exec_dialog ();
 
   } else {
 

@@ -1636,6 +1636,28 @@ static db::Instance cell_inst_dtransform_into_cplx (db::Cell *cell, const db::In
   return cell->transform_into (inst, dbu_trans.inverted () * t * dbu_trans);
 }
 
+static void cell_dtransform_simple (db::Cell *cell, const db::DTrans &t)
+{
+  const db::Layout *layout = cell->layout ();
+  if (! layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot use a micrometer-unit transformation")));
+  }
+
+  db::CplxTrans dbu_trans (layout->dbu ());
+  cell->transform (db::Trans (dbu_trans.inverted () * db::DCplxTrans (t) * dbu_trans));
+}
+
+static void cell_dtransform_cplx (db::Cell *cell, const db::DCplxTrans &t)
+{
+  const db::Layout *layout = cell->layout ();
+  if (! layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot use a micrometer-unit transformation")));
+  }
+
+  db::CplxTrans dbu_trans (layout->dbu ());
+  cell->transform (dbu_trans.inverted () * t * dbu_trans);
+}
+
 static void cell_dtransform_into_simple (db::Cell *cell, const db::DTrans &t)
 {
   const db::Layout *layout = cell->layout ();
@@ -2461,6 +2483,46 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "however, the transformation is given in micrometer units and is translated to database units internally.\n"
     "\n"
     "This variant has been introduced in version 0.25."
+  ) +
+  gsi::method ("transform", (void (db::Cell::*)(const db::Trans &)) &db::Cell::transform, gsi::arg ("trans"),
+    "@brief Transforms the cell by the given integer transformation\n"
+    "\n"
+    "This method transforms all instances and all shapes by the given transformation. "
+    "There is a variant called \\transform_into which applies the transformation to instances "
+    "in a way such that it can be applied recursively to the child cells.\n"
+    "\n"
+    "This method has been introduced in version 0.26.7."
+  ) +
+  gsi::method ("transform", (void (db::Cell::*)(const db::ICplxTrans &)) &db::Cell::transform, gsi::arg ("trans"),
+    "@brief Transforms the cell by the given complex integer transformation\n"
+    "\n"
+    "This method transforms all instances and all shapes by the given transformation. "
+    "There is a variant called \\transform_into which applies the transformation to instances "
+    "in a way such that it can be applied recursively to the child cells. The difference is important in "
+    "the presence of magnifications: \"transform\" will leave magnified instances while \"transform_into\" "
+    "will not do so but expect the magnification to be applied inside the called cells too.\n"
+    "\n"
+    "This method has been introduced in version 0.26.7."
+  ) +
+  gsi::method_ext ("transform", &cell_dtransform_simple, gsi::arg ("trans"),
+    "@brief Transforms the cell by the given, micrometer-unit transformation\n"
+    "\n"
+    "This method transforms all instances and all shapes by the given transformation. "
+    "There is a variant called \\transform_into which applies the transformation to instances "
+    "in a way such that it can be applied recursively to the child cells.\n"
+    "\n"
+    "This method has been introduced in version 0.26.7."
+  ) +
+  gsi::method_ext ("transform", &cell_dtransform_cplx, gsi::arg ("trans"),
+    "@brief Transforms the cell by the given, micrometer-unit transformation\n"
+    "\n"
+    "This method transforms all instances and all shapes by the given transformation. "
+    "There is a variant called \\transform_into which applies the transformation to instances "
+    "in a way such that it can be applied recursively to the child cells. The difference is important in "
+    "the presence of magnifications: \"transform\" will leave magnified instances while \"transform_into\" "
+    "will not do so but expect the magnification to be applied inside the called cells too.\n"
+    "\n"
+    "This method has been introduced in version 0.26.7."
   ) +
   gsi::method_ext ("transform_into", &cell_dtransform_into_simple, gsi::arg ("trans"),
     "@brief Transforms the cell into a new coordinate system with the given transformation where the transformation is in micrometer units\n"

@@ -722,6 +722,14 @@ TEST(3a)
   c0.transform_into (db::ICplxTrans (ti));
   inst = *c0.begin ();
   EXPECT_EQ (inst.to_string (), "cell_index=1 m90 -334,0");
+
+  c0.transform (db::Trans (5));
+  inst = *c0.begin ();
+  EXPECT_EQ (inst.to_string (), "cell_index=1 r270 0,-334");
+
+  c0.transform (db::ICplxTrans (ti));
+  inst = *c0.begin ();
+  EXPECT_EQ (inst.to_string (), "cell_index=1 r315 *2.5 600,-570");
 }
 
 TEST(3b) 
@@ -787,6 +795,73 @@ TEST(3b)
  
     EXPECT_EQ (c0.shapes (0).begin (db::ShapeIterator::All)->to_string (), "box (0,250;2500,3000) prop_id=17"); 
     EXPECT_EQ (c1.shapes (1).begin (db::ShapeIterator::All)->to_string (), "box (0,250;2500,3000)"); 
+
+  }
+}
+
+TEST(3c)
+{
+  ::pi = 0;
+
+  db::Manager m (true);
+  db::Layout g (&m);
+  db::Cell &c0 (g.cell (g.add_cell ()));
+  db::Cell &c1 (g.cell (g.add_cell ()));
+
+  db::Trans t (db::Vector (100, -100));
+  c0.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (c1.cell_index ()), t), 5));
+
+  db::Box b (0, 100, 1000, 1200);
+  c0.shapes (0).insert (db::BoxWithProperties (b, 17));
+  c1.shapes (1).insert (b);
+
+  //  Note: this requires editable mode since db::Shapes::erase is permitted in editable mode only
+  //  (erase is triggered by undo)
+  if (db::default_editable_mode ()) {
+
+    m.transaction ("t");
+    c0.transform (db::ICplxTrans (2.5));
+    m.commit ();
+
+    EXPECT_EQ (c1.cell_instances (), size_t (0));
+    EXPECT_EQ (c0.cell_instances (), size_t (1));
+    EXPECT_EQ (c0.begin ()->to_string (), "cell_index=1 r0 *2.5 250,-250 prop_id=5");
+
+    EXPECT_EQ (c0.shapes (0).size (), size_t (1));
+    EXPECT_EQ (c0.shapes (1).size (), size_t (0));
+    EXPECT_EQ (c1.shapes (0).size (), size_t (0));
+    EXPECT_EQ (c1.shapes (1).size (), size_t (1));
+
+    EXPECT_EQ (c0.shapes (0).begin (db::ShapeIterator::All)->to_string (), "box (0,250;2500,3000) prop_id=17");
+    EXPECT_EQ (c1.shapes (1).begin (db::ShapeIterator::All)->to_string (), "box (0,100;1000,1200)");
+
+    m.undo ();
+
+    EXPECT_EQ (c1.cell_instances (), size_t (0));
+    EXPECT_EQ (c0.cell_instances (), size_t (1));
+    EXPECT_EQ (c0.begin ()->to_string (), "cell_index=1 r0 100,-100 prop_id=5");
+
+    EXPECT_EQ (c0.shapes (0).size (), size_t (1));
+    EXPECT_EQ (c0.shapes (1).size (), size_t (0));
+    EXPECT_EQ (c1.shapes (0).size (), size_t (0));
+    EXPECT_EQ (c1.shapes (1).size (), size_t (1));
+
+    EXPECT_EQ (c0.shapes (0).begin (db::ShapeIterator::All)->to_string (), "box (0,100;1000,1200) prop_id=17");
+    EXPECT_EQ (c1.shapes (1).begin (db::ShapeIterator::All)->to_string (), "box (0,100;1000,1200)");
+
+    m.redo ();
+
+    EXPECT_EQ (c1.cell_instances (), size_t (0));
+    EXPECT_EQ (c0.cell_instances (), size_t (1));
+    EXPECT_EQ (c0.begin ()->to_string (), "cell_index=1 r0 *2.5 250,-250 prop_id=5");
+
+    EXPECT_EQ (c0.shapes (0).size (), size_t (1));
+    EXPECT_EQ (c0.shapes (1).size (), size_t (0));
+    EXPECT_EQ (c1.shapes (0).size (), size_t (0));
+    EXPECT_EQ (c1.shapes (1).size (), size_t (1));
+
+    EXPECT_EQ (c0.shapes (0).begin (db::ShapeIterator::All)->to_string (), "box (0,250;2500,3000) prop_id=17");
+    EXPECT_EQ (c1.shapes (1).begin (db::ShapeIterator::All)->to_string (), "box (0,100;1000,1200)");
 
   }
 }

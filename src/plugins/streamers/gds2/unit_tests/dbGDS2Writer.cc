@@ -1129,6 +1129,40 @@ TEST(117)
   EXPECT_EQ (pp == poly, true);
 }
 
+//  error on duplicate cell name
+TEST(118)
+{
+  db::Manager m (false);
+  db::Layout layout_org (&m);
+
+  db::cell_index_type cid1 = layout_org.add_cell ("A");
+  db::cell_index_type cid2 = layout_org.add_cell ("B");
+  layout_org.rename_cell (cid2, "A");  //  creates a duplicate cell
+
+  db::LayerProperties lp;
+  lp.layer = 1;
+  lp.datatype = 0;
+  unsigned int lid = layout_org.insert_layer (lp);
+
+  layout_org.cell (cid1).shapes (lid).insert (db::Box (0, 0, 1000, 2000));
+  layout_org.cell (cid2).shapes (lid).insert (db::Box (0, 0, 1000, 2000));
+
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_117.gds");
+
+  bool error = false;
+  try {
+    tl::OutputStream stream (tmp_file);
+    db::SaveLayoutOptions options;
+    db::Writer writer (options);
+    writer.write (layout_org, stream);
+  } catch (tl::Exception &ex) {
+    tl::warn << ex.msg ();
+    error = true;
+  }
+
+  EXPECT_EQ (error, true);
+}
+
 //  Extreme fracturing by max. points
 TEST(120)
 {
@@ -1153,3 +1187,4 @@ TEST(166)
   opt.max_vertex_count = 4;
   run_test (_this, "t166.oas.gz", "t166_au.gds.gz", false, opt);
 }
+

@@ -305,7 +305,7 @@ LayerMap::prepare (db::Layout &layout)
 
   //  In addition, map other existing layers as well, so merging of layout is somewhat better supported
   for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
-    if (mapped_layers.find ((*l).first) == mapped_layers.end ()) {
+    if (! (*l).second->is_null () && mapped_layers.find ((*l).first) == mapped_layers.end ()) {
       map (*(*l).second, (*l).first);
     }
   }

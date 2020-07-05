@@ -165,8 +165,8 @@ TipDialog::do_exec_dialog (button_type *button)
   mp_res = button;
 
   std::string th;
-  if (lay::Dispatcher::instance ()) {
-    lay::Dispatcher::instance ()->config_get (cfg_tip_window_hidden, th);
+  if (lay::PluginRoot::instance ()) {
+    lay::PluginRoot::instance ()->config_get (cfg_tip_window_hidden, th);
   }
 
   std::pair<bool, int> td_status = tip_dialog_status (m_key);

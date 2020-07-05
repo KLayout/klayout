@@ -21,8 +21,8 @@
 */
 
 
-#ifndef HDR_layDialogs
-#define HDR_layDialogs
+#ifndef HDR_layBooleanOperationsDialogs
+#define HDR_layBooleanOperationsDialogs
 
 #include "ui_BooleanOptionsDialog.h"
 #include "ui_SizingOptionsDialog.h"

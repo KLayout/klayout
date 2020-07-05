@@ -26,6 +26,7 @@
 #include "tlClassRegistry.h"
 #include "tlStream.h"
 #include "tlExpression.h"
+#include "tlInternational.h"
 
 namespace db
 {
@@ -327,7 +328,7 @@ SaveLayoutOptions::get_valid_layers (const db::Layout &layout, std::vector <std:
 }
 
 void 
-SaveLayoutOptions::get_cells (const db::Layout &layout, std::set <db::cell_index_type> &cells, const std::vector <std::pair <unsigned int, db::LayerProperties> > &valid_layers) const
+SaveLayoutOptions::get_cells (const db::Layout &layout, std::set <db::cell_index_type> &cells, const std::vector <std::pair <unsigned int, db::LayerProperties> > &valid_layers, bool require_unique_names) const
 {
   if (m_all_cells) {
 
@@ -405,6 +406,26 @@ SaveLayoutOptions::get_cells (const db::Layout &layout, std::set <db::cell_index
 
     for (std::set <db::cell_index_type>::const_iterator c = empty_cells.begin (); c != empty_cells.end (); ++c) {
       cells.erase (*c);
+    }
+
+  }
+
+  if (require_unique_names) {
+
+    std::map<std::string, unsigned int> use_count;
+    for (std::set <db::cell_index_type>::const_iterator c = cells.begin (); c != cells.end (); ++c) {
+      use_count.insert (std::make_pair (std::string (layout.cell_name (*c)), 0)).first->second += 1;
+    }
+
+    std::vector<std::string> multi;
+    for (std::map<std::string, unsigned int>::const_iterator u = use_count.begin (); u != use_count.end (); ++u) {
+      if (u->second > 1) {
+        multi.push_back (u->first);
+      }
+    }
+
+    if (! multi.empty ()) {
+      throw tl::Exception (tl::to_string (tr ("The following cell name(s) are used for more than one cell - can't write this layout:\n  ")) + tl::join (multi, "\n  "));
     }
 
   }

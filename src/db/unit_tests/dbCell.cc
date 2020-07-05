@@ -803,7 +803,7 @@ TEST(3c)
 {
   ::pi = 0;
 
-  db::Manager m (true);
+  db::Manager m;
   db::Layout g (&m);
   db::Cell &c0 (g.cell (g.add_cell ()));
   db::Cell &c1 (g.cell (g.add_cell ()));

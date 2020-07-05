@@ -1132,7 +1132,7 @@ TEST(117)
 //  error on duplicate cell name
 TEST(118)
 {
-  db::Manager m (false);
+  db::Manager m;
   db::Layout layout_org (&m);
 
   db::cell_index_type cid1 = layout_org.add_cell ("A");

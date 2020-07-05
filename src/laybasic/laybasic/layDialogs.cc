@@ -900,32 +900,38 @@ AlignCellOptionsDialog::~AlignCellOptionsDialog ()
 }
 
 bool 
-AlignCellOptionsDialog::exec_dialog (int &mode_x, int &mode_y, bool &visible_only, bool &adjust_calls)
+AlignCellOptionsDialog::exec_dialog (AlignCellOptions &data)
 {
-  mp_ui->vis_only_cbx->setChecked (visible_only);
-  mp_ui->adjust_calls_cbx->setChecked (adjust_calls);
+  mp_ui->vis_only_cbx->setChecked (data.visible_only);
+  mp_ui->adjust_calls_cbx->setChecked (data.adjust_parents);
 
   QToolButton *buttons[3][3] = { { mp_ui->lb, mp_ui->cb, mp_ui->rb }, { mp_ui->lc, mp_ui->cc, mp_ui->rc }, { mp_ui->lt, mp_ui->ct, mp_ui->rt } };
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      buttons[i][j]->setChecked (j - 1 == mode_x && i - 1 == mode_y);
+      buttons[i][j]->setChecked (j - 1 == data.mode_x && i - 1 == data.mode_y);
     }
   }
 
+  mp_ui->x_le->setText (tl::to_qstring (tl::micron_to_string (data.xpos)));
+  mp_ui->y_le->setText (tl::to_qstring (tl::micron_to_string (data.ypos)));
+
   if (QDialog::exec ()) {
 
-    visible_only = mp_ui->vis_only_cbx->isChecked ();
-    adjust_calls = mp_ui->adjust_calls_cbx->isChecked ();
+    data.visible_only = mp_ui->vis_only_cbx->isChecked ();
+    data.adjust_parents = mp_ui->adjust_calls_cbx->isChecked ();
 
     for (int i = 0; i < 3; ++i) {
       for (int j = 0; j < 3; ++j) {
         if (buttons[i][j]->isChecked ()) {
-          mode_x = j - 1;
-          mode_y = i - 1;
+          data.mode_x = j - 1;
+          data.mode_y = i - 1;
         }
       }
     }
+
+    tl::from_string (tl::to_string (mp_ui->x_le->text ()), data.xpos);
+    tl::from_string (tl::to_string (mp_ui->y_le->text ()), data.ypos);
 
     return true;
 
@@ -934,7 +940,21 @@ AlignCellOptionsDialog::exec_dialog (int &mode_x, int &mode_y, bool &visible_onl
   }
 }
 
-void 
+void
+AlignCellOptionsDialog::accept ()
+{
+BEGIN_PROTECTED;
+
+  double x = 0.0;
+  tl::from_string (tl::to_string (mp_ui->x_le->text ()), x);
+  tl::from_string (tl::to_string (mp_ui->y_le->text ()), x);
+
+  QDialog::accept ();
+
+END_PROTECTED;
+}
+
+void
 AlignCellOptionsDialog::button_clicked ()
 {
   QToolButton *buttons[3][3] = { { mp_ui->lb, mp_ui->cb, mp_ui->rb }, { mp_ui->lc, mp_ui->cc, mp_ui->rc }, { mp_ui->lt, mp_ui->ct, mp_ui->rt } };

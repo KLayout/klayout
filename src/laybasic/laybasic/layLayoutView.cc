@@ -51,7 +51,6 @@
 #include "layConverters.h"
 #include "layGridNet.h"
 #include "layMove.h"
-#include "layDialogs.h"
 #include "layZoomBox.h"
 #include "layMouseTracker.h"
 #include "layTipDialog.h"
@@ -426,10 +425,6 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
   m_sel_inside_pcells = false;
   m_move_to_origin_mode_x = 0;
   m_move_to_origin_mode_y = 0;
-  m_align_cell_origin_mode_x = -1;
-  m_align_cell_origin_mode_y = -1;
-  m_align_cell_origin_visible_layers = false;
-  m_align_cell_adjust_parents = true;
   m_del_cell_mode = 0;
   m_layer_hier_mode = 0;
   m_add_other_layers = false;
@@ -5234,7 +5229,7 @@ LayoutView::cm_align_cell_origin ()
     }
 
     lay::AlignCellOptionsDialog dialog (this);
-    if (dialog.exec_dialog (m_align_cell_origin_mode_x, m_align_cell_origin_mode_y, m_align_cell_origin_visible_layers, m_align_cell_adjust_parents)) {
+    if (dialog.exec_dialog (m_align_cell_options)) {
 
       clear_selection ();
 
@@ -5244,7 +5239,7 @@ LayoutView::cm_align_cell_origin ()
 
       db::Box bbox; 
 
-      if (m_align_cell_origin_visible_layers) {
+      if (m_align_cell_options.visible_only) {
         for (lay::LayerPropertiesConstIterator l = begin_layers (); !l.at_end (); ++l) {
           if (! l->has_children () && l->layer_index () >= 0 && l->cellview_index () == cv_index && l->visible (true /*real*/)) {
             bbox += cell->bbox (l->layer_index ());
@@ -5255,7 +5250,7 @@ LayoutView::cm_align_cell_origin ()
       }
 
       db::Coord refx, refy;
-      switch (m_align_cell_origin_mode_x) {
+      switch (m_align_cell_options.mode_x) {
       case -1:
         refx = bbox.left ();
         break;
@@ -5266,7 +5261,7 @@ LayoutView::cm_align_cell_origin ()
         refx = bbox.center ().x ();
         break;
       }
-      switch (m_align_cell_origin_mode_y) {
+      switch (m_align_cell_options.mode_y) {
       case -1:
         refy = bbox.bottom ();
         break;
@@ -5278,9 +5273,10 @@ LayoutView::cm_align_cell_origin ()
         break;
       }
 
-      db::Trans t (db::Vector (-refx, -refy));
       db::Layout &layout = cellview (cv_index)->layout ();
       db::Cell &nc_cell = layout.cell (cell->cell_index ());
+
+      db::Trans t (db::Vector (-refx + db::coord_traits<db::Coord>::rounded (m_align_cell_options.xpos / layout.dbu ()), -refy + db::coord_traits<db::Coord>::rounded (m_align_cell_options.ypos / layout.dbu ())));
 
       for (unsigned int i = 0; i < layout.layers (); ++i) {
         if (layout.is_valid_layer (i)) {
@@ -5295,7 +5291,7 @@ LayoutView::cm_align_cell_origin ()
         nc_cell.transform (*inst, t);
       }
 
-      if (m_align_cell_adjust_parents) {
+      if (m_align_cell_options.adjust_parents) {
 
         std::vector<std::pair<db::Cell *, db::Instance> > insts_to_modify;
         for (db::Cell::parent_inst_iterator pi = nc_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {

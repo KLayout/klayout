@@ -1,10 +1,32 @@
 
-0.26.7          (2020-xx-xx):
+0.26.7          (2020-07-06):
 
+* Enhancement: %GITHUB%/issues/603
+      The "adjust origin" feature now allows specifying the target 
+      coordinates for the adjustment.
+* Enhancement: %GITHUB%/issues/586
+      As a safety feature, the stream writers now refuse to write layouts 
+      with cells carrying the same names. Writing such layers would result
+      in corrupted or invalid layout files.
+* Enhancements: %GITHUB%/issues/591
+      Two enhancements in the macro editor: 
+      1.) A crash happening when adding a new location was fixed
+      2.) The template selection popup can now be disabled by dismissing the 
+          tip dialog.
+* Bugfix: %GITHUB%/issues/596
+      Library#_destroy was crashing the application. As this function must not 
+      be called, it's rerouted to "nothing" for backward compatibility.
+* Bugfix: %GITHUB%/issues/592
+      Reading a file into a layout with unnamed layers caused problems with
+      layer mapping specs. 
+* Bugfix: %GITHUB%/issues/589 (tentative)
+      On Anaconda-based builds for MacOS 10.15 (Catalina) a loss of instances
+      was observed. This could be traced down to compiler/library incompatibilities
+      but not further. 
 * Bugfix: %GITHUB%/issues/493
       LVS asserted on MacOS
 * Bugfix: %GITHUB%/issues/381 and more
-      Some bug fixed that happened specifically on MacOS.
+      Some bugs fixed that happened specifically on MacOS.
       1.) A segfault that happened in LVS
       2.) Some classes were not properly registered for usage in scripts.
 * Enhancement: LVS netlist compare

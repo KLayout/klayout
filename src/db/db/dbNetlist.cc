@@ -265,6 +265,10 @@ void Netlist::unlock ()
 
 const tl::vector<Circuit *> &Netlist::child_circuits (Circuit *circuit)
 {
+  if (circuit->netlist () != this) {
+    throw tl::Exception (tl::to_string (tr ("Circuit not within given netlist")));
+  }
+
   if (! m_valid_topology) {
     validate_topology ();
   }
@@ -275,6 +279,10 @@ const tl::vector<Circuit *> &Netlist::child_circuits (Circuit *circuit)
 
 const tl::vector<Circuit *> &Netlist::parent_circuits (Circuit *circuit)
 {
+  if (circuit->netlist () != this) {
+    throw tl::Exception (tl::to_string (tr ("Circuit not within given netlist")));
+  }
+
   if (! m_valid_topology) {
     validate_topology ();
   }
@@ -364,18 +372,39 @@ void Netlist::clear ()
 
 void Netlist::add_circuit (Circuit *circuit)
 {
+  if (! circuit) {
+    return;
+  }
+  if (circuit->netlist ()) {
+    throw tl::Exception (tl::to_string (tr ("Circuit already contained in a netlist")));
+  }
+
   m_circuits.push_back (circuit);
   circuit->set_netlist (this);
 }
 
 void Netlist::remove_circuit (Circuit *circuit)
 {
+  if (! circuit) {
+    return;
+  }
+  if (circuit->netlist () != this) {
+    throw tl::Exception (tl::to_string (tr ("Circuit not within given netlist")));
+  }
+
   circuit->set_netlist (0);
   m_circuits.erase (circuit);
 }
 
 void Netlist::purge_circuit (Circuit *circuit)
 {
+  if (! circuit) {
+    return;
+  }
+  if (circuit->netlist () != this) {
+    throw tl::Exception (tl::to_string (tr ("Circuit not within given netlist")));
+  }
+
   circuit->blank ();
   remove_circuit (circuit);
 }
@@ -406,7 +435,12 @@ void Netlist::flatten_circuits (const std::vector<Circuit *> &circuits)
 
 void Netlist::flatten_circuit (Circuit *circuit)
 {
-  tl_assert (circuit != 0);
+  if (! circuit) {
+    return;
+  }
+  if (circuit->netlist () != this) {
+    throw tl::Exception (tl::to_string (tr ("Circuit not within given netlist")));
+  }
 
   std::vector<db::SubCircuit *> refs;
   for (db::Circuit::refs_iterator sc = circuit->begin_refs (); sc != circuit->end_refs (); ++sc) {
@@ -448,24 +482,52 @@ DeviceClass *Netlist::device_class_by_name (const std::string &name)
 
 void Netlist::add_device_class (DeviceClass *device_class)
 {
+  if (! device_class) {
+    return;
+  }
+  if (device_class->netlist ()) {
+    throw tl::Exception (tl::to_string (tr ("Device class already contained in a netlist")));
+  }
+
   m_device_classes.push_back (device_class);
   device_class->set_netlist (this);
 }
 
 void Netlist::remove_device_class (DeviceClass *device_class)
 {
+  if (! device_class) {
+    return;
+  }
+  if (device_class->netlist () != this) {
+    throw tl::Exception (tl::to_string (tr ("Device class not within given netlist")));
+  }
+
   device_class->set_netlist (0);
   m_device_classes.erase (device_class);
 }
 
 void Netlist::add_device_abstract (DeviceAbstract *device_abstract)
 {
+  if (! device_abstract) {
+    return;
+  }
+  if (device_abstract->netlist ()) {
+    throw tl::Exception (tl::to_string (tr ("Device abstract already contained in a netlist")));
+  }
+
   m_device_abstracts.push_back (device_abstract);
   device_abstract->set_netlist (this);
 }
 
 void Netlist::remove_device_abstract (DeviceAbstract *device_abstract)
 {
+  if (! device_abstract) {
+    return;
+  }
+  if (device_abstract->netlist () != this) {
+    throw tl::Exception (tl::to_string (tr ("Device abstract not within given netlist")));
+  }
+
   device_abstract->set_netlist (0);
   m_device_abstracts.erase (device_abstract);
 }

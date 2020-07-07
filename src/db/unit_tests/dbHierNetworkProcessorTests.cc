@@ -1287,3 +1287,70 @@ TEST(120_HierClustersCombArrays)
   run_hc_test (_this, "comb2.gds", "comb2_au1.gds");
   run_hc_test_with_backannotation (_this, "comb2.gds", "comb2_au2.gds");
 }
+
+static size_t root_nets (const db::connected_clusters<db::PolygonRef> &cc)
+{
+  size_t n = 0;
+  for (db::connected_clusters<db::PolygonRef>::const_iterator c = cc.begin (); c != cc.end (); ++c) {
+    if (cc.is_root (c->id ())) {
+      ++n;
+    }
+  }
+  return n;
+}
+
+//  issue #609
+TEST(200_issue609)
+{
+  db::Layout ly;
+  unsigned int l1 = 0, l2 = 0;
+
+  {
+    db::LayerProperties p;
+    db::LayerMap lmap;
+
+    p.layer = 1;
+    p.datatype = 0;
+    lmap.map (db::LDPair (p.layer, p.datatype), l1 = ly.insert_layer ());
+    ly.set_properties (l1, p);
+
+    p.layer = 2;
+    p.datatype = 0;
+    lmap.map (db::LDPair (p.layer, p.datatype), l2 = ly.insert_layer ());
+    ly.set_properties (l2, p);
+
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/issue-609.oas.gz";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  std::vector<std::string> strings;
+  normalize_layer (ly, strings, l1);
+  normalize_layer (ly, strings, l2);
+
+  //  connect 1 to 1, 1 to 2 and 1 to 3, but *not* 2 to 3
+  db::Connectivity conn;
+  conn.connect (l1, l1);
+  conn.connect (l2, l2);
+  conn.connect (l1, l2);
+
+  db::hier_clusters<db::PolygonRef> hc;
+  hc.build (ly, ly.cell (*ly.begin_top_down ()), conn);
+
+  std::vector<std::pair<db::Polygon::area_type, unsigned int> > net_layers;
+
+  db::Layout::top_down_const_iterator td = ly.begin_top_down ();
+  EXPECT_EQ (td != ly.end_top_down (), true);
+
+  //  result needs to be a single net
+  EXPECT_EQ (root_nets (hc.clusters_per_cell (*td)), size_t (1));
+  for ( ; td != ly.end_top_down (); ++td) {
+    EXPECT_EQ (root_nets (hc.clusters_per_cell (*td)), size_t (0));
+  }
+}

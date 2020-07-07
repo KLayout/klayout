@@ -1291,8 +1291,8 @@ TEST(120_HierClustersCombArrays)
 static size_t root_nets (const db::connected_clusters<db::PolygonRef> &cc)
 {
   size_t n = 0;
-  for (db::connected_clusters<db::PolygonRef>::const_iterator c = cc.begin (); c != cc.end (); ++c) {
-    if (cc.is_root (c->id ())) {
+  for (db::connected_clusters<db::PolygonRef>::all_iterator c = cc.begin_all (); !c.at_end (); ++c) {
+    if (cc.is_root (*c)) {
       ++n;
     }
   }
@@ -1334,7 +1334,7 @@ TEST(200_issue609)
   normalize_layer (ly, strings, l1);
   normalize_layer (ly, strings, l2);
 
-  //  connect 1 to 1, 1 to 2 and 1 to 3, but *not* 2 to 3
+  //  connect 1 to 1, 1 to 2
   db::Connectivity conn;
   conn.connect (l1, l1);
   conn.connect (l2, l2);
@@ -1343,13 +1343,12 @@ TEST(200_issue609)
   db::hier_clusters<db::PolygonRef> hc;
   hc.build (ly, ly.cell (*ly.begin_top_down ()), conn);
 
-  std::vector<std::pair<db::Polygon::area_type, unsigned int> > net_layers;
-
   db::Layout::top_down_const_iterator td = ly.begin_top_down ();
   EXPECT_EQ (td != ly.end_top_down (), true);
+  EXPECT_EQ (root_nets (hc.clusters_per_cell (*td)), size_t (1));
+  ++td;
 
   //  result needs to be a single net
-  EXPECT_EQ (root_nets (hc.clusters_per_cell (*td)), size_t (1));
   for ( ; td != ly.end_top_down (); ++td) {
     EXPECT_EQ (root_nets (hc.clusters_per_cell (*td)), size_t (0));
   }

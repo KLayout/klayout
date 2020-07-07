@@ -333,19 +333,39 @@ void Circuit::remove_pin (size_t id)
 
 void Circuit::add_net (Net *net)
 {
+  if (! net) {
+    return;
+  }
+  if (net->circuit ()) {
+    throw tl::Exception (tl::to_string (tr ("Net already part of a circuit")));
+  }
+
   m_nets.push_back (net);
   net->set_circuit (this);
 }
 
 void Circuit::remove_net (Net *net)
 {
+  if (! net) {
+    return;
+  }
+  if (net->circuit () != this) {
+    throw tl::Exception (tl::to_string (tr ("Net not withing given circuit")));
+  }
+
   m_nets.erase (net);
 }
 
 void Circuit::join_nets (Net *net, Net *with)
 {
+  if (! net) {
+    return;
+  }
   if (net == with || ! with) {
     return;
+  }
+  if (net->circuit () != this || with->circuit () != this) {
+    throw tl::Exception (tl::to_string (tr ("Nets not withing given circuit")));
   }
 
   while (with->begin_terminals () != with->end_terminals ()) {
@@ -372,6 +392,13 @@ void Circuit::join_nets (Net *net, Net *with)
 
 void Circuit::add_device (Device *device)
 {
+  if (! device) {
+    return;
+  }
+  if (device->circuit ()) {
+    throw tl::Exception (tl::to_string (tr ("Device already in a circuit")));
+  }
+
   device->set_circuit (this);
 
   size_t id = 0;
@@ -386,11 +413,25 @@ void Circuit::add_device (Device *device)
 
 void Circuit::remove_device (Device *device)
 {
+  if (! device) {
+    return;
+  }
+  if (device->circuit () != this) {
+    throw tl::Exception (tl::to_string (tr ("Device not withing given circuit")));
+  }
+
   m_devices.erase (device);
 }
 
 void Circuit::add_subcircuit (SubCircuit *subcircuit)
 {
+  if (! subcircuit) {
+    return;
+  }
+  if (subcircuit->circuit ()) {
+    throw tl::Exception (tl::to_string (tr ("Subcircuit already in a circuit")));
+  }
+
   subcircuit->set_circuit (this);
 
   size_t id = 0;
@@ -405,6 +446,13 @@ void Circuit::add_subcircuit (SubCircuit *subcircuit)
 
 void Circuit::remove_subcircuit (SubCircuit *subcircuit)
 {
+  if (! subcircuit) {
+    return;
+  }
+  if (subcircuit->circuit () != this) {
+    throw tl::Exception (tl::to_string (tr ("Subcircuit not withing given circuit")));
+  }
+
   m_subcircuits.erase (subcircuit);
 }
 
@@ -420,7 +468,12 @@ void Circuit::unregister_ref (SubCircuit *r)
 
 void Circuit::flatten_subcircuit (SubCircuit *subcircuit)
 {
-  tl_assert (subcircuit != 0);
+  if (! subcircuit) {
+    return;
+  }
+  if (subcircuit->circuit () != this) {
+    throw tl::Exception (tl::to_string (tr ("Subcircuit not withing given circuit")));
+  }
 
   const db::Circuit *c = subcircuit->circuit_ref ();
 

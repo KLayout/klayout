@@ -761,13 +761,71 @@ inline bool less_array_delegates (const db::ArrayBase *a, const db::ArrayBase *b
  */
 struct InstanceToInstanceInteraction
 {
-  InstanceToInstanceInteraction (db::cell_index_type _ci1, const db::ArrayBase *_array1, db::cell_index_type _ci2, const db::ArrayBase *_array2, const db::ICplxTrans &_t21)
-    : ci1 (_ci1), ci2 (_ci2), array1 (_array1), array2 (_array2), t21 (_t21)
-  { }
+  InstanceToInstanceInteraction (db::cell_index_type _ci1, const db::ArrayBase *_array1, db::cell_index_type _ci2, const db::ArrayBase *_array2, const db::ICplxTrans &_tn, const db::ICplxTrans &_t21)
+    : ci1 (_ci1), ci2 (_ci2), array1 (0), array2 (0), t21 (_t21)
+  {
+    if (_array1) {
+      array1 = _array1->basic_clone ();
+      static_cast<db::basic_array<db::Coord> *> (array1)->transform (_tn);
+    }
+
+    if (_array2) {
+      array2 = _array2->basic_clone ();
+      static_cast<db::basic_array<db::Coord> *> (array2)->transform (_tn);
+    }
+  }
 
   InstanceToInstanceInteraction ()
     : ci1 (0), ci2 (0), array1 (0), array2 (0)
-  { }
+  {
+    //  .. nothing yet ..
+  }
+
+  InstanceToInstanceInteraction (const InstanceToInstanceInteraction &other)
+    : ci1 (other.ci1), ci2 (other.ci2),
+      array1 (other.array1 ? other.array1->basic_clone () : 0),
+      array2 (other.array2 ? other.array2->basic_clone () : 0),
+      t21 (other.t21)
+  {
+    //  .. nothing yet ..
+  }
+
+  InstanceToInstanceInteraction &operator= (const InstanceToInstanceInteraction &other)
+  {
+    if (this != &other) {
+
+      ci1 = other.ci1;
+      ci2 = other.ci2;
+
+      if (array1) {
+        delete array1;
+      }
+      array1 = other.array1 ? other.array1->basic_clone () : 0;
+
+      if (array2) {
+        delete array2;
+      }
+      array2 = other.array2 ? other.array2->basic_clone () : 0;
+
+      t21 = other.t21;
+
+    }
+
+    return *this;
+  }
+
+  ~InstanceToInstanceInteraction ()
+  {
+    if (array1) {
+      delete array1;
+    }
+    array1 = 0;
+
+    if (array2) {
+      delete array2;
+    }
+    array2 = 0;
+  }
 
   bool operator== (const InstanceToInstanceInteraction &other) const
   {
@@ -796,7 +854,7 @@ struct InstanceToInstanceInteraction
   }
 
   db::cell_index_type ci1, ci2;
-  const db::ArrayBase *array1, *array2;
+  db::ArrayBase *array1, *array2;
   db::ICplxTrans t21;
 };
 

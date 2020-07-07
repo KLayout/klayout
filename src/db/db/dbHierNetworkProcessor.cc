@@ -1273,8 +1273,8 @@ private:
   struct InteractionKeyForClustersType
     : public InstanceToInstanceInteraction
   {
-    InteractionKeyForClustersType (db::cell_index_type _ci1, db::cell_index_type _ci2, const db::ICplxTrans &_t21, const box_type &_box)
-      : InstanceToInstanceInteraction (_ci1, 0, _ci2, 0, _t21), box (_box)
+    InteractionKeyForClustersType (db::cell_index_type _ci1, db::cell_index_type _ci2, const db::ICplxTrans &_t1, const db::ICplxTrans &_t21, const box_type &_box)
+      : InstanceToInstanceInteraction (_ci1, 0, _ci2, 0, _t1, _t21), box (_box)
     { }
 
     bool operator== (const InteractionKeyForClustersType &other) const
@@ -1349,18 +1349,22 @@ private:
 
     InstanceToInstanceInteraction ii_key;
     db::ICplxTrans i1t, i2t;
+    bool fill_cache = false;
 
-    {
+    //  Cache is only used for single instances, non-iterated, simple or regular arrays.
+    if ((! i1element.at_end () || i1.size () == 1 || ! i1.is_iterated_array ()) &&
+        (! i2element.at_end () || i2.size () == 1 || ! i2.is_iterated_array ())) {
+
       i1t = i1element.at_end () ? i1.complex_trans () : i1.complex_trans (*i1element);
       db::ICplxTrans tt1 = t1 * i1t;
 
       i2t = i2element.at_end () ? i2.complex_trans () : i2.complex_trans (*i2element);
       db::ICplxTrans tt2 = t2 * i2t;
 
-      db::ICplxTrans tt21 = tt1.inverted () * tt2;
+      db::ICplxTrans cache_norm = tt1.inverted ();
       ii_key = InstanceToInstanceInteraction (i1.cell_index (), (! i1element.at_end () || i1.size () == 1) ? 0 : i1.cell_inst ().delegate (),
                                               i2.cell_index (), (! i2element.at_end () || i2.size () == 1) ? 0 : i2.cell_inst ().delegate (),
-                                              tt21);
+                                              cache_norm, cache_norm * tt2);
 
       instance_interaction_cache_type::iterator ii = mp_instance_interaction_cache->find (ii_key);
       if (ii != mp_instance_interaction_cache->end ()) {
@@ -1378,6 +1382,9 @@ private:
         return;
 
       }
+
+      fill_cache = true;
+
     }
 
     //  array interactions
@@ -1478,15 +1485,19 @@ private:
     //  return the list of unique interactions
     interacting_clusters.insert (interacting_clusters.end (), sorted_interactions.begin (), sorted_interactions.end ());
 
-    //  normalize transformations in cache
-    db::ICplxTrans i1ti = i1t.inverted (), i2ti = i2t.inverted ();
-    for (std::vector<std::pair<ClusterInstance, ClusterInstance> >::iterator i = sorted_interactions.begin (); i != sorted_interactions.end (); ++i) {
-      i->first.transform (i1ti);
-      i->second.transform (i2ti);
-    }
+    if (fill_cache) {
 
-    cluster_instance_pair_list_type &cached = (*mp_instance_interaction_cache) [ii_key];
-    cached.insert (cached.end (), sorted_interactions.begin (), sorted_interactions.end ());
+      //  normalize transformations for cache
+      db::ICplxTrans i1ti = i1t.inverted (), i2ti = i2t.inverted ();
+      for (std::vector<std::pair<ClusterInstance, ClusterInstance> >::iterator i = sorted_interactions.begin (); i != sorted_interactions.end (); ++i) {
+        i->first.transform (i1ti);
+        i->second.transform (i2ti);
+      }
+
+      cluster_instance_pair_list_type &cached = (*mp_instance_interaction_cache) [ii_key];
+      cached.insert (cached.end (), sorted_interactions.begin (), sorted_interactions.end ());
+
+    }
   }
 
   /**
@@ -1508,7 +1519,7 @@ private:
 
     box_type common2 = common.transformed (t2i);
 
-    InteractionKeyForClustersType ikey (ci1, ci2, t21, common2);
+    InteractionKeyForClustersType ikey (ci1, ci2, t1i, t21, common2);
 
     typename std::map<InteractionKeyForClustersType, std::vector<std::pair<size_t, size_t> > >::const_iterator ici = m_interaction_cache_for_clusters.find (ikey);
     if (ici != m_interaction_cache_for_clusters.end ()) {

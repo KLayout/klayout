@@ -37,6 +37,15 @@ See <a href="/about/lvs_ref_netter.xml#align">Netter#align</a> for a description
 <p>
 See <a href="/about/lvs_ref_netter.xml#compare">Netter#compare</a> for a description of that function.
 </p>
+<a name="consider_net_names"/><h2>"consider_net_names" - Indicates whether the netlist comparer shall use net names</h2>
+<keyword name="consider_net_names"/>
+<p>Usage:</p>
+<ul>
+<li><tt>consider_net_names(f)</tt></li>
+</ul>
+<p>
+See <a href="/about/lvs_ref_netter.xml#consider_net_names">Netter#consider_net_names</a> for a description of that function.
+</p>
 <a name="equivalent_pins"/><h2>"equivalent_pins" - Marks pins as equivalent</h2>
 <keyword name="equivalent_pins"/>
 <p>Usage:</p>

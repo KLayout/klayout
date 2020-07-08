@@ -945,7 +945,6 @@ public:
 
 private:
   inst_iterator_type m_iter, m_end;
-  const instances_type *mp_insts;
 };
 
 /**

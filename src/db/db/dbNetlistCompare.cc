@@ -334,6 +334,63 @@ private:
 };
 
 // --------------------------------------------------------------------------------------------------------------------
+//  A generic equivalence mapper
+
+template <class Obj>
+class generic_equivalence_tracker
+{
+public:
+  generic_equivalence_tracker ()
+  {
+    //  .. nothing yet ..
+  }
+
+  bool map (const Obj *a, const Obj *b)
+  {
+    std::pair<typename std::map<const Obj *, const Obj *>::iterator, bool> inserted1 = m_eq.insert (std::make_pair (a, b));
+    tl_assert (inserted1.first->second == b);
+    std::pair<typename std::map<const Obj *, const Obj *>::iterator, bool> inserted2 = m_eq.insert (std::make_pair (b, a));
+    tl_assert (inserted2.first->second == a);
+    return inserted1.second;
+  }
+
+  void unmap (const Obj *a, const Obj *b)
+  {
+    m_eq.erase (a);
+    m_eq.erase (b);
+  }
+
+  const Obj *other (const Obj *o) const
+  {
+    typename std::map<const Obj *, const Obj *>::const_iterator i = m_eq.find (o);
+    return i == m_eq.end () ? 0 : i->second;
+  }
+
+public:
+  std::map<const Obj *, const Obj *> m_eq;
+};
+
+// --------------------------------------------------------------------------------------------------------------------
+//  A class describing the equivalence between subcircuits we established so far
+
+class SubCircuitEquivalenceTracker
+  : public generic_equivalence_tracker<db::SubCircuit>
+{
+public:
+  SubCircuitEquivalenceTracker () : generic_equivalence_tracker<db::SubCircuit> () { }
+};
+
+// --------------------------------------------------------------------------------------------------------------------
+//  A class describing the equivalence between devices we established so far
+
+class DeviceEquivalenceTracker
+  : public generic_equivalence_tracker<db::Device>
+{
+public:
+  DeviceEquivalenceTracker () : generic_equivalence_tracker<db::Device> () { }
+};
+
+// --------------------------------------------------------------------------------------------------------------------
 //  generic_categorizer definition and implementation
 
 /**
@@ -559,15 +616,21 @@ class NetGraph;
 struct CompareData
 {
   CompareData ()
-    : other (0), max_depth (0), max_n_branch (0), dont_consider_net_names (false), logger (0), circuit_pin_mapper (0)
+    : other (0), max_depth (0), max_n_branch (0), depth_first (true), dont_consider_net_names (false), with_ambiguous (false), logger (0),
+      circuit_pin_mapper (0), subcircuit_equivalence (0), device_equivalence (0), progress (0)
   { }
 
   NetGraph *other;
   size_t max_depth;
   size_t max_n_branch;
+  bool depth_first;
   bool dont_consider_net_names;
+  bool with_ambiguous;
   NetlistCompareLogger *logger;
   CircuitPinMapper *circuit_pin_mapper;
+  SubCircuitEquivalenceTracker *subcircuit_equivalence;
+  DeviceEquivalenceTracker *device_equivalence;
+  tl::RelativeProgress *progress;
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -617,6 +680,16 @@ public:
       subcircuit_pair ().second = subcircuit_category;
       m_id1 = std::numeric_limits<size_t>::max () - pin1_id;
       m_id2 = pin2_id;
+    }
+
+    size_t id1 () const
+    {
+      return m_id1;
+    }
+
+    size_t id2 () const
+    {
+      return m_id2;
     }
 
     bool operator< (const Transition &other) const
@@ -888,13 +961,16 @@ namespace db
 
 struct CompareNodePtr
 {
-  bool operator() (const NetGraphNode *a, const NetGraphNode *b) const
+  bool operator() (const std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> &a, const std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> &b) const
   {
-    return *a < *b;
+    return *a.first < *b.first;
   }
 };
 
 class TentativeNodeMapping;
+struct NodeRange;
+class DeviceMapperForTargetNode;
+class SubCircuitMapperForTargetNode;
 
 std::string indent (size_t depth)
 {
@@ -1040,20 +1116,16 @@ public:
    *
    *  If "tentative" is non-null, assignments will be recorded in the TentativeMapping
    *  audit object and can be undone afterwards when backtracking recursion happens.
-   *
-   *  If "with_ambiguous" is true, ambiguous matches are considered. This will happen
-   *  in a second pass to give exact and unique matches priority over ambiguous matches.
    */
-  size_t derive_node_identities (size_t net_index, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data);
+  size_t derive_node_identities (size_t net_index, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, CompareData *data);
 
   /**
    *  @brief The backtracking driver
    *
    *  This method will analyze the given nodes and call "derive_node_identities" for all nodes
-   *  with a proposed identity. With "with_ambiguous", amiguities are resolved by trying
-   *  different combinations in tentative mode and deciding for one combination if possible.
+   *  with a proposed identity.
    */
-  size_t derive_node_identities_from_node_set (std::vector<const NetGraphNode *> &nodes, std::vector<const NetGraphNode *> &other_nodes, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data);
+  size_t derive_node_identities_from_node_set (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> > &nodes, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> > &other_nodes, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, CompareData *data);
 
 private:
   std::vector<NetGraphNode> m_nodes;
@@ -1061,7 +1133,9 @@ private:
   std::map<const db::Net *, size_t> m_net_index;
   const db::Circuit *mp_circuit;
 
-  size_t derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGraphNode::edge_iterator ee, NetGraphNode::edge_iterator e_other, NetGraphNode::edge_iterator ee_other, size_t net_index, size_t other_net_index, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data);
+  size_t derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGraphNode::edge_iterator ee, NetGraphNode::edge_iterator e_other, NetGraphNode::edge_iterator ee_other, size_t net_index, size_t other_net_index, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, CompareData *data);
+  size_t derive_node_identities_from_ambiguity_group (const NodeRange &nr, DeviceMapperForTargetNode &dm, DeviceMapperForTargetNode &dm_other, SubCircuitMapperForTargetNode &scm, SubCircuitMapperForTargetNode &scm_other, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, CompareData *data);
+  size_t derive_node_identities_from_singular_match (const NetGraphNode *n, const NetGraphNode::edge_iterator &e, const NetGraphNode *n_other, const NetGraphNode::edge_iterator &e_other, DeviceMapperForTargetNode &dm, DeviceMapperForTargetNode &dm_other, SubCircuitMapperForTargetNode &scm, SubCircuitMapperForTargetNode &scm_other, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, CompareData *data, bool consider_net_names);
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1426,7 +1500,8 @@ NetGraphNode::edge_equal (const db::Net *a, const db::Net *b)
  */
 struct NodeRange
 {
-  NodeRange (size_t _num, std::vector<const NetGraphNode *>::iterator _n1, std::vector<const NetGraphNode *>::iterator _nn1, std::vector<const NetGraphNode *>::iterator _n2, std::vector<const NetGraphNode *>::iterator _nn2)
+  NodeRange (size_t _num, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _n1, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _nn1,
+                          std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _n2, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _nn2)
     : num (_num), n1 (_n1), nn1 (_nn1), n2 (_n2), nn2 (_nn2)
   {
     //  .. nothing yet ..
@@ -1438,10 +1513,162 @@ struct NodeRange
   }
 
   size_t num;
-  std::vector<const NetGraphNode *>::iterator n1, nn1, n2, nn2;
+  std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator n1, nn1, n2, nn2;
 };
 
 // --------------------------------------------------------------------------------------------------------------------
+
+struct CatAndIds
+{
+public:
+  CatAndIds (size_t _cat, size_t _id1, size_t _id2)
+    : cat (_cat), id1 (_id1), id2 (_id2)
+  { }
+
+  bool operator== (const CatAndIds &other) const
+  {
+    return cat == other.cat && id1 == other.id1 && id2 == other.id2;
+  }
+
+  bool operator< (const CatAndIds &other) const
+  {
+    if (cat != other.cat) {
+      return cat < other.cat;
+    }
+    if (id1 != other.id1) {
+      return id1 < other.id1;
+    }
+    if (id2 != other.id2) {
+      return id2 < other.id2;
+    }
+    return false;
+  }
+
+  size_t cat, id1, id2;
+};
+
+template <class Obj>
+class generic_mapper_for_target_node
+{
+public:
+  generic_mapper_for_target_node ()
+  {
+    //  .. nothing yet ..
+  }
+
+  static void derive_mapping (const generic_mapper_for_target_node<Obj> &m1, const generic_mapper_for_target_node<Obj> &m2, size_t n1, size_t n2, std::vector<std::pair<const Obj *, const Obj *> > &mapped)
+  {
+    if (m1.empty () || m2.empty ()) {
+      return;
+    }
+
+    const std::set<std::pair<CatAndIds, const Obj *> > &s1 = m1.for_node (n1);
+    const std::set<std::pair<CatAndIds, const Obj *> > &s2 = m2.for_node (n2);
+
+    typename std::set<std::pair<CatAndIds, const Obj *> >::const_iterator i1 = s1.begin (), i2 = s2.begin ();
+
+    while (i1 != s1.end () && i2 != s2.end ()) {
+
+      if (i1->first < i2->first) {
+        ++i1;
+      } else if (i2->first < i1->first) {
+        ++i2;
+      } else {
+        typename std::set<std::pair<CatAndIds, const Obj *> >::const_iterator i10 = i1, i20 = i2;
+        size_t n1 = 0, n2 = 0;
+        while (i1 != s1.end () && i1->first == i10->first) {
+          ++i1;
+          ++n1;
+        }
+        while (i2 != s2.end () && i2->first == i20->first) {
+          ++i2;
+          ++n2;
+        }
+        if (n1 == 1 && n2 == 1) {
+          //  unique mapping - one device of one category
+          mapped.push_back (std::make_pair (i10->second, i20->second));
+        }
+      }
+
+    }
+
+  }
+
+protected:
+  const std::set<std::pair<CatAndIds, const Obj *> > &for_node (size_t ni) const
+  {
+    typename std::map<size_t, std::set<std::pair<CatAndIds, const Obj *> > >::const_iterator d = m_per_target_node.find (ni);
+    tl_assert (d != m_per_target_node.end ());
+    return d->second;
+  }
+
+  std::set<std::pair<CatAndIds, const Obj *> > &for_node_nc (size_t ni)
+  {
+    return m_per_target_node [ni];
+  }
+
+  bool empty () const
+  {
+    return m_per_target_node.empty ();
+  }
+
+private:
+  std::map<size_t, std::set<std::pair<CatAndIds, const Obj *> > > m_per_target_node;
+};
+
+class DeviceMapperForTargetNode
+  : public generic_mapper_for_target_node<db::Device>
+{
+public:
+  DeviceMapperForTargetNode ()
+    : generic_mapper_for_target_node<db::Device> ()
+  {
+    //  .. nothing yet ..
+  }
+
+  void insert (const NetGraphNode::edge_type &e)
+  {
+    if (e.first.empty ()) {
+      //  happens initially
+      return;
+    }
+
+    size_t ni = e.second.first;
+    std::set<std::pair<CatAndIds, const Device *> > &dev = for_node_nc (ni);
+    for (std::vector<NetGraphNode::Transition>::const_iterator j = e.first.begin (); j != e.first.end (); ++j) {
+      if (! j->is_for_subcircuit ()) {
+        dev.insert (std::make_pair (CatAndIds (j->device_pair ().second, j->id1 (), j->id2 ()), j->device_pair ().first));
+      }
+    }
+  }
+};
+
+class SubCircuitMapperForTargetNode
+  : public generic_mapper_for_target_node<db::SubCircuit>
+{
+public:
+  SubCircuitMapperForTargetNode ()
+    : generic_mapper_for_target_node<db::SubCircuit> ()
+  {
+    //  .. nothing yet ..
+  }
+
+  void insert (const NetGraphNode::edge_type &e)
+  {
+    if (e.first.empty ()) {
+      //  happens initially
+      return;
+    }
+
+    size_t ni = e.second.first;
+    std::set<std::pair<CatAndIds, const SubCircuit *> > &sc = for_node_nc (ni);
+    for (std::vector<NetGraphNode::Transition>::const_iterator j = e.first.begin (); j != e.first.end (); ++j) {
+      if (j->is_for_subcircuit ()) {
+        sc.insert (std::make_pair (CatAndIds (j->subcircuit_pair ().second, j->id1 (), j->id2 ()), j->subcircuit_pair ().first));
+      }
+    }
+  }
+};
 
 /**
  *  @brief An audit object which allows reverting tentative node assignments
@@ -1460,26 +1687,46 @@ public:
     for (std::vector<std::pair<NetGraph *, size_t> >::const_iterator i = m_to_undo_to_unknown.begin (); i != m_to_undo_to_unknown.end (); ++i) {
       i->first->identify (i->second, unknown_id);
     }
+    for (std::vector<std::pair<DeviceEquivalenceTracker *, std::pair<const db::Device *, const db::Device *> > >::const_iterator i = m_to_undo_devices.begin (); i != m_to_undo_devices.end (); ++i) {
+      i->first->unmap (i->second.first, i->second.second);
+    }
+    for (std::vector<std::pair<SubCircuitEquivalenceTracker *, std::pair<const db::SubCircuit *, const db::SubCircuit *> > >::const_iterator i = m_to_undo_subcircuits.begin (); i != m_to_undo_subcircuits.end (); ++i) {
+      i->first->unmap (i->second.first, i->second.second);
+    }
   }
 
-  static void map_pair (TentativeNodeMapping *nm, NetGraph *g1, size_t n1, NetGraph *g2, size_t n2)
+  static void map_pair (TentativeNodeMapping *nm, NetGraph *g1, size_t n1, NetGraph *g2, size_t n2,
+                        const DeviceMapperForTargetNode &dm1, const DeviceMapperForTargetNode &dm2, DeviceEquivalenceTracker &device_eq,
+                        const SubCircuitMapperForTargetNode &scm1, const SubCircuitMapperForTargetNode &scm2, SubCircuitEquivalenceTracker &subcircuit_eq,
+                        size_t depth)
   {
     g1->identify (n1, n2);
     g2->identify (n2, n1);
+
     if (nm) {
       nm->keep (g1, n1);
       nm->keep (g2, n2);
     }
+
+    derive_device_equivalence (nm, n1, n2, dm1, dm2, device_eq, depth);
+    derive_subcircuit_equivalence (nm, n1, n2, scm1, scm2, subcircuit_eq, depth);
   }
 
-  static void map_pair_from_unknown (TentativeNodeMapping *nm, NetGraph *g1, size_t n1, NetGraph *g2, size_t n2)
+  static void map_pair_from_unknown (TentativeNodeMapping *nm, NetGraph *g1, size_t n1, NetGraph *g2, size_t n2,
+                                     const DeviceMapperForTargetNode &dm1, const DeviceMapperForTargetNode &dm2, DeviceEquivalenceTracker &device_eq,
+                                     const SubCircuitMapperForTargetNode &scm1, const SubCircuitMapperForTargetNode &scm2, SubCircuitEquivalenceTracker &subcircuit_eq,
+                                     size_t depth)
   {
     g1->identify (n1, n2);
     g2->identify (n2, n1);
+
     if (nm) {
       nm->keep_for_unknown (g1, n1);
       nm->keep_for_unknown (g2, n2);
     }
+
+    derive_device_equivalence (nm, n1, n2, dm1, dm2, device_eq, depth);
+    derive_subcircuit_equivalence (nm, n1, n2, scm1, scm2, subcircuit_eq, depth);
   }
 
   static void map_to_unknown (TentativeNodeMapping *nm, NetGraph *g1, size_t n1)
@@ -1490,8 +1737,48 @@ public:
     }
   }
 
+  static void derive_device_equivalence (TentativeNodeMapping *nm, size_t n1, size_t n2,
+                                         const DeviceMapperForTargetNode &dm1, const DeviceMapperForTargetNode &dm2, DeviceEquivalenceTracker &device_eq, size_t depth)
+  {
+    std::vector<std::pair<const db::Device *, const db::Device *> > device_map;
+    DeviceMapperForTargetNode::derive_mapping (dm1, dm2, n1, n2, device_map);
+
+    for (std::vector<std::pair<const db::Device *, const db::Device *> >::const_iterator dd = device_map.begin (); dd != device_map.end (); ++dd) {
+      if (device_eq.map (dd->first, dd->second)) {
+        if (nm) {
+          nm->keep (&device_eq, dd->first, dd->second);
+        } else {
+          if (options ()->debug_netcompare) {
+            tl::info << indent(depth) << "enforcing device equivalence: " << dd->first->expanded_name () << " vs. " << dd->second->expanded_name ();
+          }
+        }
+      }
+    }
+  }
+
+  static void derive_subcircuit_equivalence (TentativeNodeMapping *nm, size_t n1, size_t n2,
+                                             const SubCircuitMapperForTargetNode &scm1, const SubCircuitMapperForTargetNode &scm2, SubCircuitEquivalenceTracker &subcircuit_eq, size_t depth)
+  {
+    std::vector<std::pair<const db::SubCircuit *, const db::SubCircuit *> > subcircuit_map;
+    SubCircuitMapperForTargetNode::derive_mapping (scm1, scm2, n1, n2, subcircuit_map);
+
+    for (std::vector<std::pair<const db::SubCircuit *, const db::SubCircuit *> >::const_iterator cc = subcircuit_map.begin (); cc != subcircuit_map.end (); ++cc) {
+      if (subcircuit_eq.map (cc->first, cc->second)) {
+        if (nm) {
+          nm->keep (&subcircuit_eq, cc->first, cc->second);
+        } else {
+          if (options ()->debug_netcompare) {
+            tl::info << indent(depth) << "enforcing subcircuit equivalence: " << cc->first->expanded_name () << " vs. " << cc->second->expanded_name ();
+          }
+        }
+      }
+    }
+  }
+
 private:
   std::vector<std::pair<NetGraph *, size_t> > m_to_undo, m_to_undo_to_unknown;
+  std::vector<std::pair<DeviceEquivalenceTracker *, std::pair<const db::Device *, const db::Device *> > > m_to_undo_devices;
+  std::vector<std::pair<SubCircuitEquivalenceTracker *, std::pair<const db::SubCircuit *, const db::SubCircuit *> > > m_to_undo_subcircuits;
 
   void keep (NetGraph *g1, size_t n1)
   {
@@ -1501,6 +1788,16 @@ private:
   void keep_for_unknown (NetGraph *g1, size_t n1)
   {
     m_to_undo_to_unknown.push_back (std::make_pair (g1, n1));
+  }
+
+  void keep (DeviceEquivalenceTracker *dt, const db::Device *a, const db::Device *b)
+  {
+    m_to_undo_devices.push_back (std::make_pair (dt, std::make_pair (a, b)));
+  }
+
+  void keep (SubCircuitEquivalenceTracker *dt, const db::SubCircuit *a, const db::SubCircuit *b)
+  {
+    m_to_undo_subcircuits.push_back (std::make_pair (dt, std::make_pair (a, b)));
   }
 };
 
@@ -1532,8 +1829,6 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
       m_nodes.push_back (node);
     }
   }
-
-  std::sort (m_nodes.begin (), m_nodes.end ());
 
   for (std::vector<NetGraphNode>::const_iterator i = m_nodes.begin (); i != m_nodes.end (); ++i) {
     m_net_index.insert (std::make_pair (i->net (), i - m_nodes.begin ()));
@@ -1579,110 +1874,174 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
   }
 }
 
-size_t
-NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGraphNode::edge_iterator ee, NetGraphNode::edge_iterator e_other, NetGraphNode::edge_iterator ee_other, size_t net_index, size_t other_net_index, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data)
+/**
+ *  @brief Returns true if the edges (given by transition iterators) are compatible with already established device or subcircuit equivalences.
+ */
+static bool edges_are_compatible (const NetGraphNode::edge_type &e, const NetGraphNode::edge_type &e_other, const DeviceEquivalenceTracker &device_eq, const SubCircuitEquivalenceTracker &sc_eq)
 {
-  size_t new_nodes = 0;
+  std::vector<NetGraphNode::Transition>::const_iterator t1 = e.first.begin (), tt1 = e.first.end ();
+  std::vector<NetGraphNode::Transition>::const_iterator t2 = e_other.first.begin (), tt2 = e_other.first.end ();
 
-  std::vector<const NetGraphNode *> nodes;
-  nodes.reserve (ee - e);
+  std::vector<void *> p1, p2;
 
-  std::vector<const NetGraphNode *> other_nodes;
-  other_nodes.reserve (ee - e);
-  if (options ()->debug_netcompare) {
-    tl::info << indent(depth) << "considering transitions:";
+  while (t1 != tt1 && t2 != tt2) {
+
+    std::vector<NetGraphNode::Transition>::const_iterator t10 = t1, t20 = t2;
+
+    p1.clear ();
+    while (t1 != tt1 && *t1 == *t10) {
+      if (t1->is_for_subcircuit ()) {
+        p1.push_back ((void *) sc_eq.other (t1->subcircuit_pair ().first));
+      } else {
+        p1.push_back ((void *) device_eq.other (t1->device_pair ().first));
+      }
+      ++t1;
+    }
+
+    p2.clear ();
+    while (t2 != tt2 && *t2 == *t20) {
+      if (t2->is_for_subcircuit ()) {
+        p2.push_back ((void *) (sc_eq.other (t2->subcircuit_pair ().first) ? t2->subcircuit_pair ().first : 0));
+      } else {
+        p2.push_back ((void *) (device_eq.other (t2->device_pair ().first) ? t2->device_pair ().first : 0));
+      }
+      ++t2;
+    }
+
+    std::sort (p1.begin (), p1.end ());
+    std::sort (p2.begin (), p2.end ());
+
+    if (p1 != p2) {
+      return false;
+    }
+
   }
 
-  bool first = true;
+  tl_assert (t1 == tt1 && t2 == tt2);
+  return true;
+}
+
+size_t
+NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGraphNode::edge_iterator ee, NetGraphNode::edge_iterator e_other, NetGraphNode::edge_iterator ee_other, size_t net_index, size_t other_net_index, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, CompareData *data)
+{
+  //  NOTE: we can skip edges to known nodes because we did a pre-analysis making sure those are compatible
+
+  std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> > nodes;
+  nodes.reserve (ee - e);
+
+  std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> > other_nodes;
+  other_nodes.reserve (ee - e);
+
+  tl_assert (e->first == e_other->first);
 
   for (NetGraphNode::edge_iterator i = e; i != ee; ++i) {
     if (i->second.first != net_index) {
       const NetGraphNode *nn = &node (i->second.first);
-      if (options ()->debug_netcompare) {
-        if (first) {
-          tl::info << indent (depth) << "  here: " << (node (net_index).net () ? node (net_index).net ()->expanded_name ().c_str () : "(null)") << " ->";
-          first = false;
-        }
-        tl::info << indent (depth) << "    " << (nn->net () ? nn->net ()->expanded_name ().c_str() : "(null)") << " via: " << tl::noendl;
-        for (std::vector<NetGraphNode::Transition>::const_iterator t = i->first.begin (); t != i->first.end(); ++t) {
-          tl::info << (t != i->first.begin () ? "; " : "") << t->to_string() << tl::noendl;
-        }
-        tl::info << "";
+      if (! nn->has_other ()) {
+        nodes.push_back (std::make_pair (nn, i));
       }
-      nodes.push_back (nn);
     }
   }
 
   if (! nodes.empty ()) {   //  if non-ambiguous, non-assigned
 
-    first = true;
-
     for (NetGraphNode::edge_iterator i = e_other; i != ee_other; ++i) {
       if (i->second.first != other_net_index) {
         const NetGraphNode *nn = &data->other->node (i->second.first);
-        if (options ()->debug_netcompare) {
-          if (first) {
-            tl::info << indent (depth) << "  there: " << (data->other->node (other_net_index).net () ? data->other->node (other_net_index).net ()->expanded_name ().c_str () : "(null)") << " ->";
-            first = false;
-          }
-          tl::info << indent(depth) << "    " << (nn->net() ? nn->net()->expanded_name().c_str() : "(null)") << " via: " << tl::noendl;
-          for (std::vector<NetGraphNode::Transition>::const_iterator t = i->first.begin (); t != i->first.end(); ++t) {
-            tl::info << (t != i->first.begin () ? "; " : "") << t->to_string() << tl::noendl;
-          }
-          tl::info << "";
+        if (! nn->has_other ()) {
+          other_nodes.push_back (std::make_pair (nn, i));
         }
-        other_nodes.push_back (nn);
       }
     }
 
   }
 
-  if (! nodes.empty () || ! other_nodes.empty ()) {
+  if (nodes.empty () || other_nodes.empty ()) {
+    return 0;
+  }
 
-    std::sort (nodes.begin (), nodes.end (), CompareNodePtr ());
-    std::sort (other_nodes.begin (), other_nodes.end (), CompareNodePtr ());
+  std::sort (nodes.begin (), nodes.end (), CompareNodePtr ());
+  std::sort (other_nodes.begin (), other_nodes.end (), CompareNodePtr ());
 
-    //  for the purpose of match evaluation we require an exact match of the node structure
+  size_t new_nodes = 0;
 
-    if (tentative) {
+  if (options ()->debug_netcompare) {
 
-      if (nodes.size () != other_nodes.size ()) {
-        if (options ()->debug_netcompare) {
-          tl::info << indent(depth) << "=> rejected branch.";
-        }
-        return failed_match;
+    //  print transitions if requested
+
+    tl::info << indent(depth) << "considering transitions:";
+
+    bool first = true;
+
+    for (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i = nodes.begin (); i != nodes.end (); ++i) {
+      const NetGraphNode *nn = i->first;
+      if (first) {
+        tl::info << indent (depth) << "  here: " << (node (net_index).net () ? node (net_index).net ()->expanded_name ().c_str () : "(null)") << " ->";
+        first = false;
       }
+      tl::info << indent (depth) << "    " << (nn->net () ? nn->net ()->expanded_name ().c_str() : "(null)") << " via: " << tl::noendl;
+      for (std::vector<NetGraphNode::Transition>::const_iterator t = i->second->first.begin (); t != i->second->first.end(); ++t) {
+        tl::info << (t != i->second->first.begin () ? "; " : "") << t->to_string() << tl::noendl;
+      }
+      tl::info << "";
+    }
 
-      //  1:1 pairing is less strict
-      if (nodes.size () > 1 || other_nodes.size () > 1) {
-        for (size_t i = 0; i < nodes.size (); ++i) {
-          if (! (*nodes[i] == *other_nodes[i])) {
-            if (options ()->debug_netcompare) {
-              tl::info << indent(depth) << "=> rejected branch.";
-            }
-            return failed_match;
+    first = true;
+
+    for (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i = other_nodes.begin (); i != other_nodes.end (); ++i) {
+      const NetGraphNode *nn = i->first;
+      if (first) {
+        tl::info << indent (depth) << "  there: " << (data->other->node (other_net_index).net () ? data->other->node (other_net_index).net ()->expanded_name ().c_str () : "(null)") << " ->";
+        first = false;
+      }
+      tl::info << indent(depth) << "    " << (nn->net() ? nn->net()->expanded_name().c_str() : "(null)") << " via: " << tl::noendl;
+      for (std::vector<NetGraphNode::Transition>::const_iterator t = i->second->first.begin (); t != i->second->first.end(); ++t) {
+        tl::info << (t != i->second->first.begin () ? "; " : "") << t->to_string() << tl::noendl;
+      }
+      tl::info << "";
+    }
+
+  }
+
+  //  for the purpose of match evaluation we require an exact match of the node structure
+
+  if (tentative) {
+
+    if (nodes.size () != other_nodes.size ()) {
+      if (options ()->debug_netcompare) {
+        tl::info << indent(depth) << "=> rejected branch.";
+      }
+      return failed_match;
+    }
+
+    //  1:1 pairing is less strict
+    if (nodes.size () > 1 || other_nodes.size () > 1) {
+      for (size_t i = 0; i < nodes.size (); ++i) {
+        if (! (*nodes[i].first == *other_nodes[i].first)) {
+          if (options ()->debug_netcompare) {
+            tl::info << indent(depth) << "=> rejected branch.";
           }
+          return failed_match;
         }
       }
-
     }
 
-    //  propagate pairing in picky mode: this means we only accept exact a match if the node set
-    //  is exactly identical and no ambiguous nodes are present when ambiguous nodes are forbidden
+  }
 
-    size_t bt_count = derive_node_identities_from_node_set (nodes, other_nodes, depth, n_branch, tentative, with_ambiguous, data);
+  //  propagate pairing in picky mode: this means we only accept exact a match if the node set
+  //  is exactly identical and no ambiguous nodes are present when ambiguous nodes are forbidden
 
-    if (bt_count == failed_match) {
-      if (tentative) {
-        if (options ()->debug_netcompare) {
-          tl::info << indent(depth) << "=> rejected branch.";
-        }
-        return bt_count;
+  size_t bt_count = derive_node_identities_from_node_set (nodes, other_nodes, depth, n_branch, tentative, data);
+
+  if (bt_count == failed_match) {
+    if (tentative) {
+      if (options ()->debug_netcompare) {
+        tl::info << indent(depth) << "=> rejected branch.";
       }
-    } else {
-      new_nodes += bt_count;
+      return bt_count;
     }
-
+  } else {
+    new_nodes += bt_count;
   }
 
   if (options ()->debug_netcompare) {
@@ -1707,22 +2066,12 @@ static bool has_subcircuits (db::NetGraphNode::edge_iterator e, db::NetGraphNode
 }
 
 size_t
-NetGraph::derive_node_identities (size_t net_index, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data)
+NetGraph::derive_node_identities (size_t net_index, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, CompareData *data)
 {
   NetGraphNode *n = & node (net_index);
 
   size_t other_net_index = n->other_net_index ();
   NetGraphNode *n_other = & data->other->node (other_net_index);
-
-  if (options ()->debug_netcompare) {
-    if (! tentative) {
-      tl::info << indent(depth) << "deducing from pair: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
-    } else {
-      tl::info << indent(depth) << "tentatively deducing from pair: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
-    }
-  }
-
-  size_t new_nodes = 0;
 
   NetGraphNode nn, nn_other;
 
@@ -1739,6 +2088,117 @@ NetGraph::derive_node_identities (size_t net_index, size_t depth, size_t n_branc
     nn_other.expand_subcircuit_nodes (data->other);
     n_other = &nn_other;
 
+  }
+
+  //  do a pre-analysis filtering out all nodes with fully satisfied edges or which provide a contradiction
+
+  bool analysis_required = false;
+
+  for (NetGraphNode::edge_iterator e = n->begin (); e != n->end (); ) {
+
+    NetGraphNode::edge_iterator ee = e;
+    ++ee;
+
+    while (ee != n->end () && ee->first == e->first) {
+      ++ee;
+    }
+
+    NetGraphNode::edge_iterator e_other = n_other->find_edge (e->first);
+    if (e_other != n_other->end ()) {
+
+      NetGraphNode::edge_iterator ee_other = e_other;
+      ++ee_other;
+
+      while (ee_other != n_other->end () && ee_other->first == e_other->first) {
+        ++ee_other;
+      }
+
+      std::vector<const NetGraphNode *> nodes;
+      nodes.reserve (ee - e);
+
+      std::vector<const NetGraphNode *> other_nodes_translated;
+      other_nodes_translated.reserve (ee - e);
+
+      tl_assert (e->first == e_other->first);
+
+      for (NetGraphNode::edge_iterator i = e; i != ee; ++i) {
+        if (i->second.first != net_index) {
+          const NetGraphNode *nn = &node (i->second.first);
+          if (nn->has_other ()) {
+            nodes.push_back (nn);
+          } else {
+            analysis_required = true;
+          }
+        }
+      }
+
+      for (NetGraphNode::edge_iterator i = e_other; i != ee_other; ++i) {
+        if (i->second.first != other_net_index) {
+          const NetGraphNode *nn = &data->other->node (i->second.first);
+          if (nn->has_other ()) {
+            other_nodes_translated.push_back (&node (nn->other_net_index ()));
+          } else {
+            analysis_required = true;
+          }
+        }
+      }
+
+      std::sort (nodes.begin (), nodes.end ());
+      std::sort (other_nodes_translated.begin (), other_nodes_translated.end ());
+
+      //  No fit, we can shortcut
+      if (nodes != other_nodes_translated) {
+        return tentative ? failed_match : 0;
+      }
+
+    } else if (tentative) {
+      //  in tentative mode an exact match is required: no having the same edges for a node disqualifies the node
+      //  as matching.
+      return failed_match;
+    }
+
+    e = ee;
+
+  }
+
+  if (tentative) {
+
+    //  in tentative mode, again an exact match is required
+
+    for (NetGraphNode::edge_iterator e_other = n_other->begin (); e_other != n_other->end (); ) {
+
+      NetGraphNode::edge_iterator ee_other = e_other;
+      ++ee_other;
+
+      while (ee_other != n_other->end () && ee_other->first == e_other->first) {
+        ++ee_other;
+      }
+
+      NetGraphNode::edge_iterator e = n->find_edge (e_other->first);
+      if (e == n->end ()) {
+        return failed_match;
+      }
+
+      e_other = ee_other;
+
+    }
+
+  }
+
+  if (! analysis_required) {
+    return 0;
+  }
+
+  //  do a detailed analysis
+
+  size_t new_nodes = 0;
+
+  if (options ()->debug_netcompare) {
+    if (! tentative) {
+      tl::info << indent(depth) << "deducing from pair: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
+    } else {
+      tl::info << indent(depth) << "tentatively deducing from pair: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
+    }
   }
 
   //  non-ambiguous paths to non-assigned nodes create a node identity on the
@@ -1763,7 +2223,7 @@ NetGraph::derive_node_identities (size_t net_index, size_t depth, size_t n_branc
         ++ee_other;
       }
 
-      size_t bt_count = derive_node_identities_for_edges (e, ee, e_other, ee_other, net_index, other_net_index, depth, n_branch, tentative, with_ambiguous, data);
+      size_t bt_count = derive_node_identities_for_edges (e, ee, e_other, ee_other, net_index, other_net_index, depth, n_branch, tentative, data);
       if (bt_count == failed_match) {
         if (options ()->debug_netcompare) {
           tl::info << indent(depth) << "=> rejected pair.";
@@ -1773,43 +2233,9 @@ NetGraph::derive_node_identities (size_t net_index, size_t depth, size_t n_branc
         new_nodes += bt_count;
       }
 
-    } else if (tentative) {
-      //  in tentative mode an exact match is required: no having the same edges for a node disqualifies the node
-      //  as matching.
-      if (options ()->debug_netcompare) {
-        tl::info << indent(depth) << "=> rejected pair for missing edge.";
-      }
-      return failed_match;
     }
 
     e = ee;
-
-  }
-
-  if (tentative) {
-
-    //  in tentative mode, again an exact match is required
-
-    for (NetGraphNode::edge_iterator e_other = n_other->begin (); e_other != n_other->end (); ) {
-
-      NetGraphNode::edge_iterator ee_other = e_other;
-      ++ee_other;
-
-      while (ee_other != n_other->end () && ee_other->first == e_other->first) {
-        ++ee_other;
-      }
-
-      NetGraphNode::edge_iterator e = n->find_edge (e_other->first);
-      if (e == n->end ()) {
-        if (options ()->debug_netcompare) {
-          tl::info << indent(depth) << "=> rejected pair for missing edge.";
-        }
-        return failed_match;
-      }
-
-      e_other = ee_other;
-
-    }
 
   }
 
@@ -1827,26 +2253,26 @@ namespace {
   struct SortNodeByNet
   {
     public:
-      bool operator() (const NetGraphNode *a, const NetGraphNode *b) const
+      bool operator() (const std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> &a, const std::pair<const NetGraphNode *, NetGraphNode::edge_iterator>b) const
       {
-        tl_assert (a->net () && b->net ());
-        return name_compare (a->net ()->name (), b->net ()->name ()) < 0;
+        tl_assert (a.first->net () && b.first->net ());
+        return name_compare (a.first->net ()->name (), b.first->net ()->name ()) < 0;
       }
   };
 
 }
 
-static void sort_node_range_by_best_match (NodeRange &nr)
+static void sort_node_range_by_best_match (const NodeRange &nr)
 {
   std::stable_sort (nr.n1, nr.nn1, SortNodeByNet ());
   std::stable_sort (nr.n2, nr.nn2, SortNodeByNet ());
 
-  std::vector<const NetGraphNode *> nomatch1, nomatch2;
+  std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> > nomatch1, nomatch2;
   nomatch1.reserve (nr.nn1 - nr.n1);
   nomatch2.reserve (nr.nn2 - nr.n2);
 
-  std::vector<const NetGraphNode *>::const_iterator i = nr.n1, j = nr.n2;
-  std::vector<const NetGraphNode *>::iterator iw = nr.n1, jw = nr.n2;
+  std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i = nr.n1, j = nr.n2;
+  std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator iw = nr.n1, jw = nr.n2;
 
   SortNodeByNet compare;
 
@@ -1895,9 +2321,20 @@ static bool net_names_are_different (const db::Net *a, const db::Net *b)
   }
 }
 
-size_t
-NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *> &nodes, std::vector<const NetGraphNode *> &other_nodes, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data)
+static bool net_names_are_equal (const db::Net *a, const db::Net *b)
 {
+  if (! a || ! b || a->name ().empty () || b->name ().empty ()) {
+    return false;
+  } else {
+    return name_compare (a->name (), b->name ()) == 0;
+  }
+}
+
+size_t
+NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, DeviceMapperForTargetNode &dm, DeviceMapperForTargetNode &dm_other, SubCircuitMapperForTargetNode &scm, SubCircuitMapperForTargetNode &scm_other, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, CompareData *data)
+{
+  tl::AbsoluteProgress progress (tl::to_string (tr ("Deriving match for ambiguous net group")));
+
   std::string indent_s;
   if (options ()->debug_netcompare) {
     indent_s = indent (depth);
@@ -1905,6 +2342,294 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
   }
 
   size_t new_nodes = 0;
+  size_t complexity = nr.num;
+
+  //  sort the ambiguity group such that net names match best
+
+  std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> > pairs;
+  tl::equivalence_clusters<const NetGraphNode *> equivalent_other_nodes;
+
+  sort_node_range_by_best_match (nr);
+
+  {
+
+    //  marks the nodes from the ambiguity group as unknown so we don't revisit them (causing deep recursion)
+    TentativeNodeMapping tn2unknown;
+
+    //  collect and mark the ambiguity combinations to consider
+    std::vector<std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator> iters1, iters2;
+
+    for (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i1 = nr.n1; i1 != nr.nn1; ++i1) {
+      if (! i1->first->has_any_other ()) {
+        iters1.push_back (i1);
+        size_t ni = node_index_for_net (i1->first->net ());
+        TentativeNodeMapping::map_to_unknown (&tn2unknown, this, ni);
+      }
+    }
+
+    for (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i2 = nr.n2; i2 != nr.nn2; ++i2) {
+      if (! i2->first->has_any_other ()) {
+        iters2.push_back (i2);
+        size_t other_ni = data->other->node_index_for_net (i2->first->net ());
+        TentativeNodeMapping::map_to_unknown (&tn2unknown, data->other, other_ni);
+      }
+    }
+
+    for (std::vector<std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator>::const_iterator ii1 = iters1.begin (); ii1 != iters1.end (); ++ii1) {
+
+      std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i1 = *ii1;
+
+      bool any = false;
+      std::vector<std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator>::iterator to_remove = iters2.end ();
+
+      for (std::vector<std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator>::iterator ii2 = iters2.begin (); ii2 != iters2.end (); ++ii2) {
+
+        ++progress;
+
+        std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i2 = *ii2;
+
+        //  try this candidate in tentative mode
+        if (options ()->debug_netcompare) {
+          tl::info << indent_s << "trying in tentative mode: " << i1->first->net ()->expanded_name () << " vs. " << i2->first->net ()->expanded_name ();
+        }
+
+        if (! edges_are_compatible (*i1->second, *i2->second, *data->device_equivalence, *data->subcircuit_equivalence)) {
+          if (options ()->debug_netcompare) {
+            tl::info << indent_s << "=> rejected because edges are incompatible with already established device or subcircuit equivalences";
+          }
+          continue;
+        }
+
+        if (! data->dont_consider_net_names && net_names_are_equal (i1->first->net (), i2->first->net ())) {
+
+          if (options ()->debug_netcompare) {
+            tl::info << indent_s << "=> accepted for identical names";
+          }
+
+          //  utilize net names to propose a match
+          new_nodes += 1;
+          pairs.push_back (std::make_pair (i1->first, i2->first));
+          to_remove = ii2;
+          any = true;
+          break;
+
+        } else {
+
+          size_t ni = node_index_for_net (i1->first->net ());
+          size_t other_ni = data->other->node_index_for_net (i2->first->net ());
+
+          TentativeNodeMapping tn;
+          TentativeNodeMapping::map_pair_from_unknown (&tn, this, ni, data->other, other_ni, dm, dm_other, *data->device_equivalence, scm, scm_other, *data->subcircuit_equivalence, depth);
+
+          size_t bt_count = derive_node_identities (ni, depth + 1, complexity * n_branch, &tn, data);
+
+          if (bt_count != failed_match) {
+
+            if (options ()->debug_netcompare) {
+              tl::info << indent_s << "match found";
+            }
+            //  we have a match ...
+
+            if (any) {
+
+              //  there is already a known pair, so we can mark *i2 and the previous *i2 as equivalent
+              //  (makes them ambiguous)
+              equivalent_other_nodes.same (i2->first, pairs.back ().second);
+              //  we know enough now ...
+              break;
+
+            } else {
+
+              //  identified a new pair
+              new_nodes += bt_count + 1;
+              pairs.push_back (std::make_pair (i1->first, i2->first));
+              to_remove = ii2;
+              any = true;
+
+              //  no ambiguity analysis in tentative mode - we can stop now
+              if (tentative) {
+                break;
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+
+      if (to_remove != iters2.end ()) {
+        iters2.erase (to_remove);
+      }
+
+      if (! any && tentative) {
+        if (options ()->debug_netcompare) {
+          tl::info << indent_s << "mismatch.";
+        }
+        //  a mismatch - stop here.
+        return failed_match;
+      }
+
+    }
+
+  }
+
+  if (! tentative) {
+
+    //  issue the matching pairs
+
+    for (std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> >::const_iterator p = pairs.begin (); p != pairs.end (); ++p) {
+
+      size_t ni = node_index_for_net (p->first->net ());
+      size_t other_ni = data->other->node_index_for_net (p->second->net ());
+
+      TentativeNodeMapping::map_pair (0, this, ni, data->other, other_ni, dm, dm_other, *data->device_equivalence, scm, scm_other, *data->subcircuit_equivalence, depth);
+
+      if (options ()->debug_netcompare) {
+        if (equivalent_other_nodes.has_attribute (p->second)) {
+          tl::info << indent_s << "deduced ambiguous match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
+        } else {
+          tl::info << indent_s << "deduced match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
+        }
+      }
+
+      if (data->logger) {
+        bool ambiguous = equivalent_other_nodes.has_attribute (p->second);
+        if (ambiguous) {
+          data->logger->match_ambiguous_nets (p->first->net (), p->second->net ());
+        } else {
+          data->logger->match_nets (p->first->net (), p->second->net ());
+        }
+      }
+
+      ++*data->progress;
+
+    }
+
+    //  And seek further from these pairs
+
+    for (std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> >::const_iterator p = pairs.begin (); p != pairs.end (); ++p) {
+
+      size_t ni = node_index_for_net (p->first->net ());
+
+      size_t bt_count = derive_node_identities (ni, depth + 1, complexity * n_branch, tentative, data);
+      tl_assert (bt_count != failed_match);
+
+    }
+
+  } else {
+
+    for (std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> >::const_iterator p = pairs.begin (); p != pairs.end (); ++p) {
+
+      size_t ni = node_index_for_net (p->first->net ());
+      size_t other_ni = data->other->node_index_for_net (p->second->net ());
+
+      TentativeNodeMapping::map_pair (tentative, this, ni, data->other, other_ni, dm, dm_other, *data->device_equivalence, scm, scm_other, *data->subcircuit_equivalence, depth);
+
+    }
+
+  }
+
+  return new_nodes;
+}
+
+size_t
+NetGraph::derive_node_identities_from_singular_match (const NetGraphNode *n, const NetGraphNode::edge_iterator &e, const NetGraphNode *n_other, const NetGraphNode::edge_iterator &e_other, DeviceMapperForTargetNode &dm, DeviceMapperForTargetNode &dm_other, SubCircuitMapperForTargetNode &scm, SubCircuitMapperForTargetNode &scm_other, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, CompareData *data, bool consider_net_names)
+{
+  std::string indent_s;
+  if (options ()->debug_netcompare) {
+    indent_s = indent (depth);
+    indent_s += "*" + tl::to_string (n_branch) + " ";
+  }
+
+  if (! edges_are_compatible (*e, *e_other, *data->device_equivalence, *data->subcircuit_equivalence)) {
+
+    if (options ()->debug_netcompare) {
+      tl::info << indent(depth) << "=> rejected because edges are incompatible with already established device or subcircuit equivalences";
+    }
+    return tentative ? failed_match : 0;
+
+  } else if (! n->has_any_other () && ! n_other->has_any_other ()) {
+
+    //  in tentative mode, reject this choice if both nets are named and
+    //  their names differ -> this favors net matching by name
+
+    if (tentative && consider_net_names && net_names_are_different (n->net (), n_other->net ())) {
+      if (options ()->debug_netcompare) {
+        tl::info << indent_s << "rejecting pair as names are not identical: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
+      }
+      return failed_match;
+    }
+
+    //  A single candiate: just take this one -> this may render
+    //  inexact matches, but further propagates net pairing
+
+    size_t ni = node_index_for_net (n->net ());
+    size_t other_ni = data->other->node_index_for_net (n_other->net ());
+
+    TentativeNodeMapping::map_pair (tentative, this, ni, data->other, other_ni, dm, dm_other, *data->device_equivalence, scm, scm_other, *data->subcircuit_equivalence, depth);
+
+    if (options ()->debug_netcompare) {
+      tl::info << indent_s << "deduced match (singular): " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
+    }
+    if (! tentative) {
+      ++*data->progress;
+      if (data->logger) {
+        if (! (node (ni) == data->other->node (other_ni))) {
+          //  this is a mismatch, but we continue with this
+          data->logger->net_mismatch (n->net (), n_other->net ());
+        } else {
+          data->logger->match_nets (n->net (), n_other->net ());
+        }
+      }
+    }
+
+    size_t new_nodes = 1;
+
+    if (data->depth_first || tentative) {
+      size_t bt_count = derive_node_identities (ni, depth + 1, n_branch, tentative, data);
+      if (bt_count == failed_match) {
+        if (tentative) {
+          return failed_match;
+        }
+      } else {
+        new_nodes += bt_count;
+      }
+    }
+
+    return new_nodes;
+
+  } else if (n->has_unknown_other ()) {
+
+    //  accept any other net
+    return 0;
+
+  } else if (n->has_other ()) {
+
+    //  this decision leads to a contradiction
+    if (data->other->node_index_for_net (n_other->net ()) != n->other_net_index ()) {
+      return failed_match;
+    } else {
+      return 0;
+    }
+
+  } else {
+
+    //  mismatch of assignment state
+    return failed_match;
+
+  }
+}
+
+size_t
+NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> > &nodes, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> > &other_nodes, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, CompareData *data)
+{
+  std::string indent_s;
+  if (options ()->debug_netcompare) {
+    indent_s = indent (depth);
+    indent_s += "*" + tl::to_string (n_branch) + " ";
+  }
 
   if (depth > data->max_depth) {
     if (options ()->debug_netcompare) {
@@ -1913,99 +2638,64 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
     return failed_match;
   }
 
+  DeviceMapperForTargetNode dm;
+  SubCircuitMapperForTargetNode scm;
+  for (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i = nodes.begin (); i != nodes.end (); ++i) {
+    dm.insert (*i->second);
+    scm.insert (*i->second);
+  }
+
+  DeviceMapperForTargetNode dm_other;
+  SubCircuitMapperForTargetNode scm_other;
+  for (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i = other_nodes.begin (); i != other_nodes.end (); ++i) {
+    dm_other.insert (*i->second);
+    scm_other.insert (*i->second);
+  }
+
   if (nodes.size () == 1 && other_nodes.size () == 1) {
 
-    if (! nodes.front ()->has_any_other () && ! other_nodes.front ()->has_any_other ()) {
-
-      //  a single candiate: just take this one -> this may render
-      //  inexact matches, but further propagates net pairing
-
-      size_t ni = node_index_for_net (nodes.front ()->net ());
-      size_t other_ni = data->other->node_index_for_net (other_nodes.front ()->net ());
-
-      TentativeNodeMapping::map_pair (tentative, this, ni, data->other, other_ni);
-
-      if (options ()->debug_netcompare) {
-        tl::info << indent_s << "deduced match (singular): " << nodes.front ()->net ()->expanded_name () << " vs. " << other_nodes.front ()->net ()->expanded_name ();
-      }
-      if (data->logger && ! tentative) {
-        if (! (node (ni) == data->other->node (other_ni))) {
-          //  this is a mismatch but we continue, because that is the only candidate
-          data->logger->net_mismatch (nodes.front ()->net (), other_nodes.front ()->net ());
-        } else {
-          data->logger->match_nets (nodes.front ()->net (), other_nodes.front ()->net ());
-        }
-      }
-
-      //  continue here.
-      size_t bt_count = derive_node_identities (ni, depth + 1, n_branch, tentative, with_ambiguous, data);
-
-      if (bt_count != failed_match) {
-        new_nodes += bt_count;
-      } else if (tentative) {
-        return bt_count;
-      }
-
-      new_nodes += 1;
-
-    } else if (nodes.front ()->has_unknown_other ()) {
-
-      //  accept this solution as the pairing is possible
-
-    } else if (nodes.front ()->has_other ()) {
-
-      //  this decision leads to a contradiction
-      if (data->other->node_index_for_net (other_nodes.front ()->net ()) != nodes.front ()->other_net_index ()) {
-        return failed_match;
-      }
-
-    } else {
-
-      //  mismatch of assignment state
-      return failed_match;
-
-    }
-
-    return new_nodes;
+    return derive_node_identities_from_singular_match (nodes.front ().first, nodes.front ().second, other_nodes.front ().first, other_nodes.front ().second,
+                                                       dm, dm_other, scm, scm_other, depth, n_branch, tentative, data, false /*don't consider net names*/);
 
   }
 
   //  Determine the range of nodes with same identity
 
   std::vector<NodeRange> node_ranges;
+  size_t new_nodes = 0;
 
-  std::vector<const NetGraphNode *>::iterator n1 = nodes.begin ();
-  std::vector<const NetGraphNode *>::iterator n2 = other_nodes.begin ();
+  std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator n1 = nodes.begin ();
+  std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator n2 = other_nodes.begin ();
 
   while (n1 != nodes.end () && n2 != other_nodes.end ()) {
 
-    if ((*n1)->has_any_other ()) {
+    if (n1->first->has_other ()) {
       ++n1;
       continue;
-    } else if ((*n2)->has_any_other ()) {
+    } else if (n2->first->has_other ()) {
       ++n2;
       continue;
     }
 
-    if (**n1 < **n2) {
+    if (*n1->first < *n2->first) {
       ++n1;
       continue;
-    } else if (**n2 < **n1) {
+    } else if (*n2->first < *n1->first) {
       ++n2;
       continue;
     }
 
-    std::vector<const NetGraphNode *>::iterator nn1 = n1, nn2 = n2;
+    std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator nn1 = n1, nn2 = n2;
 
     size_t num = 1;
     ++nn1;
     ++nn2;
     while (nn1 != nodes.end () && nn2 != other_nodes.end ()) {
-      if ((*nn1)->has_any_other ()) {
+      if (nn1->first->has_other ()) {
         ++nn1;
-      } else if ((*nn2)->has_any_other ()) {
+      } else if (nn2->first->has_other ()) {
         ++nn2;
-      } else if (! (**nn1 == **n1) || ! (**nn2 == **n2)) {
+      } else if (! (*nn1->first == *n1->first) || ! (*nn2->first == *n2->first)) {
         break;
       } else {
         ++num;
@@ -2014,13 +2704,13 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
       }
     }
 
-    if (num == 1 || with_ambiguous) {
+    if (num == 1 || data->with_ambiguous) {
       node_ranges.push_back (NodeRange (num, n1, nn1, n2, nn2));
     }
 
     //  in tentative mode ambiguous nodes don't make a match without
     //  with_ambiguous
-    if (num > 1 && tentative && ! with_ambiguous) {
+    if (num > 1 && tentative && ! data->with_ambiguous) {
       return failed_match;
     }
 
@@ -2029,7 +2719,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
 
   }
 
-  if (with_ambiguous) {
+  if (data->with_ambiguous) {
     std::stable_sort (node_ranges.begin (), node_ranges.end ());
   }
 
@@ -2038,9 +2728,9 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
     //  node ranges might have changed - adjust to real count and skip leading pairs assigned already
 
     while (nr->n1 != nr->nn1 && nr->n2 != nr->nn2) {
-      if ((*nr->n1)->has_any_other ()) {
+      if (nr->n1->first->has_other ()) {
         ++nr->n1;
-      } else if ((*nr->n2)->has_any_other ()) {
+      } else if (nr->n2->first->has_other ()) {
         ++nr->n2;
       } else {
         break;
@@ -2048,12 +2738,12 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
     }
 
     nr->num = 0;
-    std::vector<const NetGraphNode *>::const_iterator i1 = nr->n1, i2 = nr->n2;
+    std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i1 = nr->n1, i2 = nr->n2;
 
     while (i1 != nr->nn1 && i2 != nr->nn2) {
-      if ((*i1)->has_any_other ()) {
+      if (i1->first->has_other ()) {
         ++i1;
-      } else if ((*i2)->has_any_other ()) {
+      } else if (i2->first->has_other ()) {
         ++i2;
       } else {
         ++nr->num;
@@ -2068,65 +2758,12 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
 
     } else if (nr->num == 1) {
 
-      if (! (*nr->n1)->has_any_other () && ! (*nr->n2)->has_any_other ()) {
-
-        //  in tentative mode, reject this choice if both nets are named and
-        //  their names differ -> this favors net matching by name
-
-        if (tentative && ! data->dont_consider_net_names && net_names_are_different ((*nr->n1)->net (), (*nr->n2)->net ())) {
-          if (options ()->debug_netcompare) {
-            tl::info << indent_s << "rejecting pair as names are not identical: " << (*nr->n1)->net ()->expanded_name () << " vs. " << (*nr->n2)->net ()->expanded_name ();
-          }
-          return failed_match;
-        }
-
-        //  A single candiate: just take this one -> this may render
-        //  inexact matches, but further propagates net pairing
-
-        size_t ni = node_index_for_net ((*nr->n1)->net ());
-        size_t other_ni = data->other->node_index_for_net ((*nr->n2)->net ());
-
-        TentativeNodeMapping::map_pair (tentative, this, ni, data->other, other_ni);
-
-        if (options ()->debug_netcompare) {
-          tl::info << indent_s << "deduced match (singular): " << (*nr->n1)->net ()->expanded_name () << " vs. " << (*nr->n2)->net ()->expanded_name ();
-        }
-        if (data->logger && ! tentative) {
-          if (! (node (ni) == data->other->node (other_ni))) {
-            //  this is a mismatch, but we continue with this
-            data->logger->net_mismatch ((*nr->n1)->net (), (*nr->n2)->net ());
-          } else {
-            data->logger->match_nets ((*nr->n1)->net (), (*nr->n2)->net ());
-          }
-        }
-
-        //  continue here.
-        size_t bt_count = derive_node_identities (ni, depth + 1, n_branch, tentative, with_ambiguous, data);
-
-        if (bt_count != failed_match) {
-          new_nodes += bt_count;
-          new_nodes += 1;
-        } else if (tentative) {
-          new_nodes = bt_count;
-        }
-
-      } else if ((*nr->n1)->has_unknown_other ()) {
-
-        //  accept any other net
-
-      } else if ((*nr->n1)->has_other ()) {
-
-        //  this decision leads to a contradiction
-        if (data->other->node_index_for_net ((*nr->n2)->net ()) != (*nr->n1)->other_net_index ()) {
-          return failed_match;
-        }
-
-      } else {
-
-        //  mismatch of assignment state
+      size_t n = derive_node_identities_from_singular_match (nr->n1->first, nr->n1->second, nr->n2->first, nr->n2->second, dm, dm_other, scm, scm_other, depth, n_branch, tentative, data, ! data->dont_consider_net_names);
+      if (n == failed_match) {
         return failed_match;
-
       }
+
+      new_nodes += n;
 
     } else if (nr->num * n_branch > data->max_n_branch) {
 
@@ -2141,157 +2778,12 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
         tl::info << indent_s << "analyzing ambiguity group with " << nr->num << " members";
       }
 
-      //  sort the ambiguity group such that net names match best
-
-      std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> > pairs;
-      tl::equivalence_clusters<const NetGraphNode *> equivalent_other_nodes;
-      std::set<const NetGraphNode *> seen;
-
-      if (! data->dont_consider_net_names) {
-        sort_node_range_by_best_match (*nr);
+      size_t n = derive_node_identities_from_ambiguity_group (*nr, dm, dm_other, scm, scm_other, depth, n_branch, tentative, data);
+      if (n == failed_match) {
+        return failed_match;
       }
 
-      {
-
-        //  marks the nodes from the ambiguity group as unknown so we don't revisit them (causing deep recursion)
-        TentativeNodeMapping tn2unknown;
-
-        //  collect and mark the ambiguity combinations to consider
-        std::vector<std::vector<const NetGraphNode *>::const_iterator> iters1, iters2;
-
-        for (std::vector<const NetGraphNode *>::const_iterator i1 = nr->n1; i1 != nr->nn1; ++i1) {
-          if (! (*i1)->has_any_other ()) {
-            iters1.push_back (i1);
-            size_t ni = node_index_for_net ((*i1)->net ());
-            TentativeNodeMapping::map_to_unknown (&tn2unknown, this, ni);
-          }
-        }
-
-        for (std::vector<const NetGraphNode *>::const_iterator i2 = nr->n2; i2 != nr->nn2; ++i2) {
-          if (! (*i2)->has_any_other ()) {
-            iters2.push_back (i2);
-            size_t other_ni = data->other->node_index_for_net ((*i2)->net ());
-            TentativeNodeMapping::map_to_unknown (&tn2unknown, data->other, other_ni);
-          }
-        }
-
-        for (std::vector<std::vector<const NetGraphNode *>::const_iterator>::const_iterator ii1 = iters1.begin (); ii1 != iters1.end (); ++ii1) {
-
-          std::vector<const NetGraphNode *>::const_iterator i1 = *ii1;
-
-          bool any = false;
-
-          for (std::vector<std::vector<const NetGraphNode *>::const_iterator>::const_iterator ii2 = iters2.begin (); ii2 != iters2.end (); ++ii2) {
-
-            std::vector<const NetGraphNode *>::const_iterator i2 = *ii2;
-
-            if (seen.find (*i2) != seen.end ()) {
-              continue;
-            }
-
-            size_t ni = node_index_for_net ((*i1)->net ());
-            size_t other_ni = data->other->node_index_for_net ((*i2)->net ());
-
-            TentativeNodeMapping tn;
-            TentativeNodeMapping::map_pair_from_unknown (&tn, this, ni, data->other, other_ni);
-
-            //  try this candidate in tentative mode
-            if (options ()->debug_netcompare) {
-              tl::info << indent_s << "trying in tentative mode: " << (*i1)->net ()->expanded_name () << " vs. " << (*i2)->net ()->expanded_name ();
-            }
-            size_t bt_count = derive_node_identities (ni, depth + 1, nr->num * n_branch, &tn, with_ambiguous, data);
-
-            if (bt_count != failed_match) {
-
-              if (options ()->debug_netcompare) {
-                tl::info << indent_s << "match found";
-              }
-              //  we have a match ...
-
-              if (any) {
-
-                //  there is already a known pair, so we can mark *i2 and the previous *i2 as equivalent
-                //  (makes them ambiguous)
-                equivalent_other_nodes.same (*i2, pairs.back ().second);
-
-              } else {
-
-                //  identified a new pair
-                new_nodes += bt_count + 1;
-                pairs.push_back (std::make_pair (*i1, *i2));
-                seen.insert (*i2);
-                any = true;
-
-              }
-
-            }
-
-          }
-
-          if (! any && tentative) {
-            if (options ()->debug_netcompare) {
-              tl::info << indent_s << "mismatch.";
-            }
-            //  a mismatch - stop here.
-            return failed_match;
-          }
-
-        }
-
-      }
-
-      if (! tentative) {
-
-        //  issue the matching pairs
-
-        for (std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> >::const_iterator p = pairs.begin (); p != pairs.end (); ++p) {
-
-          size_t ni = node_index_for_net (p->first->net ());
-          size_t other_ni = data->other->node_index_for_net (p->second->net ());
-
-          TentativeNodeMapping::map_pair (tentative, this, ni, data->other, other_ni);
-
-          if (options ()->debug_netcompare) {
-            if (equivalent_other_nodes.has_attribute (p->second)) {
-              tl::info << indent_s << "deduced ambiguous match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
-            } else {
-              tl::info << indent_s << "deduced match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
-            }
-          }
-          if (data->logger) {
-            bool ambiguous = equivalent_other_nodes.has_attribute (p->second);
-            if (ambiguous) {
-              data->logger->match_ambiguous_nets (p->first->net (), p->second->net ());
-            } else {
-              data->logger->match_nets (p->first->net (), p->second->net ());
-            }
-          }
-
-        }
-
-        //  And seek further from these pairs
-
-        for (std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> >::const_iterator p = pairs.begin (); p != pairs.end (); ++p) {
-
-          size_t ni = node_index_for_net (p->first->net ());
-
-          size_t bt_count = derive_node_identities (ni, depth + 1, nr->num * n_branch, tentative, with_ambiguous, data);
-          tl_assert (bt_count != failed_match);
-
-        }
-
-      } else {
-
-        for (std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> >::const_iterator p = pairs.begin (); p != pairs.end (); ++p) {
-
-          size_t ni = node_index_for_net (p->first->net ());
-          size_t other_ni = data->other->node_index_for_net (p->second->net ());
-
-          TentativeNodeMapping::map_pair (tentative, this, ni, data->other, other_ni);
-
-        }
-
-      }
+      new_nodes += n;
 
       if (options ()->debug_netcompare) {
         tl::info << indent_s << "finished analysis of ambiguity group with " << nr->num << " members";
@@ -2320,6 +2812,7 @@ NetlistComparer::NetlistComparer (NetlistCompareLogger *logger)
 
   m_max_depth = 50;
   m_max_n_branch = 500;
+  m_depth_first = true;
 
   m_dont_consider_net_names = false;
 }
@@ -2531,6 +3024,8 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 
   std::map<const db::Circuit *, CircuitMapper> c12_pin_mapping, c22_pin_mapping;
 
+  tl::RelativeProgress progress (tl::to_string (tr ("Comparing netlists")), a->circuit_count (), 1);
+
   for (db::Netlist::const_bottom_up_circuit_iterator c = a->begin_bottom_up (); c != a->end_bottom_up (); ++c) {
 
     const db::Circuit *ca = c.operator-> ();
@@ -2561,6 +3056,7 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
     if (all_subcircuits_verified (ca, verified_circuits_a) && all_subcircuits_verified (cb, verified_circuits_b)) {
 
       if (options ()->debug_netcompare) {
+        tl::info << "----------------------------------------------------------------------";
         tl::info << "treating circuit: " << ca->name () << " vs. " << cb->name ();
       }
       if (mp_logger) {
@@ -2592,6 +3088,8 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
       }
 
     }
+
+    ++progress;
 
   }
 
@@ -2663,8 +3161,42 @@ compute_device_key (const db::Device &device, const db::NetGraph &g, bool strict
     k.push_back (std::make_pair (terminal_id, net_id));
   }
 
-  std::sort (k.begin (), k.end ());
+  return k;
+}
 
+static std::vector<std::pair<size_t, size_t> >
+compute_device_key_for_this (const db::Device &device, const db::NetGraph &g, bool strict, bool &mapped)
+{
+  std::vector<std::pair<size_t, size_t> > k = compute_device_key (device, g, strict);
+
+  mapped = true;
+  for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
+    if (! g.begin () [i->second].has_other ()) {
+      i->second = invalid_id;  //  normalization
+      mapped = false;
+    }
+  }
+
+  std::sort (k.begin (), k.end ());
+  return k;
+}
+
+static std::vector<std::pair<size_t, size_t> >
+compute_device_key_for_other (const db::Device &device, const db::NetGraph &g, bool strict, bool &mapped)
+{
+  std::vector<std::pair<size_t, size_t> > k = compute_device_key (device, g, strict);
+
+  mapped = true;
+  for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
+    if (! g.begin () [i->second].has_other ()) {
+      i->second = invalid_id;  //  normalization
+      mapped = false;
+    } else {
+      i->second = g.begin () [i->second].other_net_index ();
+    }
+  }
+
+  std::sort (k.begin (), k.end ());
   return k;
 }
 
@@ -2699,9 +3231,49 @@ compute_subcircuit_key (const db::SubCircuit &subcircuit, const db::NetGraph &g,
 
   }
 
-  std::sort (k.begin (), k.end ());
-
   return true;
+}
+
+static std::vector<std::pair<size_t, size_t> >
+compute_subcircuit_key_for_this (const db::SubCircuit &subcircuit, const db::NetGraph &g, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, bool &mapped, bool &valid)
+{
+  valid = true;
+  std::vector<std::pair<size_t, size_t> > k;
+  if (! compute_subcircuit_key (subcircuit, g, circuit_map, pin_map, k)) {
+    valid = false;
+  }
+
+  mapped = true;
+  for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end () && mapped; ++i) {
+    if (! g.begin () [i->second].has_other ()) {
+      mapped = false;
+    }
+  }
+
+  std::sort (k.begin (), k.end ());
+  return k;
+}
+
+static std::vector<std::pair<size_t, size_t> >
+compute_subcircuit_key_for_other (const db::SubCircuit &subcircuit, const db::NetGraph &g, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, bool &mapped, bool &valid)
+{
+  valid = true;
+  std::vector<std::pair<size_t, size_t> > k;
+  if (! compute_subcircuit_key (subcircuit, g, circuit_map, pin_map, k)) {
+    valid = false;
+  }
+
+  mapped = true;
+  for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
+    if (! g.begin () [i->second].has_other ()) {
+      mapped = false;
+    } else {
+      i->second = g.begin () [i->second].other_net_index ();
+    }
+  }
+
+  std::sort (k.begin (), k.end ());
+  return k;
 }
 
 namespace {
@@ -2790,26 +3362,20 @@ void align (Iter i1, Iter i2, Iter j1, Iter j2, Distance distance)
     vj.push_back (j);
   }
 
-  while (vi.size () < vj.size ()) {
-    vi.push_back (Iter ());
-  }
+  size_t sz = std::max (vi.size (), vj.size ());
 
-  while (vj.size () < vi.size ()) {
-    vj.push_back (Iter ());
-  }
-
-  if (vi.size () <= 1) {
+  if (sz <= 1) {
     return;
   }
 
   //  Caution: this is an O(2) algorithm ...
   bool any_swapped = true;
-  for (size_t n = 0; n < vi.size () - 1 && any_swapped; ++n) {
+  for (size_t n = 0; n < sz - 1 && any_swapped; ++n) {
 
     any_swapped = false;
 
-    for (size_t m = n + 1; m < vj.size (); ++m) {
-      if (vi [n] == Iter () || vi [m] == Iter () || vj [n] == Iter () || vj [m] == Iter ()) {
+    for (size_t m = n + 1; m < sz; ++m) {
+      if (n >= vi.size () || m >= vi.size () || n >= vj.size () || m >= vj.size ()) {
         continue;
       } else if (distance (*vi [n], *vj [m]) + distance (*vi [m], *vj [n]) < distance (*vi [n], *vj [n]) + distance (*vi [m], *vj [m])) {
         //  this will reduce the overall distance:
@@ -2860,6 +3426,8 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
                                    std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping) const
 {
   db::DeviceFilter device_filter (m_cap_threshold, m_res_threshold);
+  SubCircuitEquivalenceTracker subcircuit_equivalence;
+  DeviceEquivalenceTracker device_equivalence;
 
   db::NetGraph g1, g2;
 
@@ -2881,11 +3449,13 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   int iter = 0;
 
+  tl::RelativeProgress progress (tl::to_string (tr ("Comparing circuits ")) + c1->name () + "/" + c2->name (), std::max (g1.end () - g1.begin (), g2.end () - g2.begin ()), 1);
+
   //  two passes: one without ambiguities, the second one with
 
-  bool good;
+  bool good = false;
 
-  for (int pass = 0; pass < 2; ++pass) {
+  for (int pass = 0; pass < 2 && ! good; ++pass) {
 
     if (options ()->debug_netcompare) {
       if (pass > 0) {
@@ -2912,11 +3482,16 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
           data.other = &g2;
           data.max_depth = m_max_depth;
           data.max_n_branch = m_max_n_branch;
+          data.depth_first = m_depth_first;
           data.dont_consider_net_names = m_dont_consider_net_names;
+          data.with_ambiguous = (pass > 0);
           data.circuit_pin_mapper = &circuit_pin_mapper;
+          data.subcircuit_equivalence = &subcircuit_equivalence;
+          data.device_equivalence = &device_equivalence;
           data.logger = mp_logger;
+          data.progress = &progress;
 
-          size_t ni = g1.derive_node_identities (i1 - g1.begin (), 0, 1, 0 /*not tentative*/, pass > 0 /*with ambiguities*/, &data);
+          size_t ni = g1.derive_node_identities (i1 - g1.begin (), 0, 1, 0 /*not tentative*/, &data);
           if (ni > 0 && ni != failed_match) {
             new_identities += ni;
             if (options ()->debug_netcompare) {
@@ -2934,29 +3509,35 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
       //  derive new identities through topology: first collect all nets with the same topological signature
 
-      std::vector<const NetGraphNode *> nodes, other_nodes;
+      std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> > nodes, other_nodes;
+
+      std::vector<NetGraphNode::edge_type> no_edges;
+      no_edges.push_back (NetGraphNode::edge_type ());
 
       nodes.reserve (g1.end () - g1.begin ());
       for (db::NetGraph::node_iterator i1 = g1.begin (); i1 != g1.end (); ++i1) {
         if (! i1->has_other () && i1->net ()) {
-          nodes.push_back (i1.operator-> ());
+          nodes.push_back (std::make_pair (i1.operator-> (), no_edges.begin ()));
         }
       }
 
       other_nodes.reserve (g2.end () - g2.begin ());
       for (db::NetGraph::node_iterator i2 = g2.begin (); i2 != g2.end (); ++i2) {
         if (! i2->has_other () && i2->net ()) {
-          other_nodes.push_back (i2.operator-> ());
+          other_nodes.push_back (std::make_pair (i2.operator-> (), no_edges.begin ()));
         }
       }
 
       if (nodes.empty () || other_nodes.empty ()) {
         //  active mismatched nodes give an error
-        for (std::vector<const NetGraphNode *>::const_iterator n = nodes.begin (); n != nodes.end () && good; ++n) {
-          good = is_passive_net ((*n)->net (), c12_circuit_and_pin_mapping);
+        for (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator>  >::const_iterator n = nodes.begin (); n != nodes.end () && good; ++n) {
+          good = is_passive_net (n->first->net (), c12_circuit_and_pin_mapping);
         }
-        for (std::vector<const NetGraphNode *>::const_iterator n = other_nodes.begin (); n != other_nodes.end () && good; ++n) {
-          good = is_passive_net ((*n)->net (), c22_circuit_and_pin_mapping);
+        for (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator>  >::const_iterator n = other_nodes.begin (); n != other_nodes.end () && good; ++n) {
+          good = is_passive_net (n->first->net (), c22_circuit_and_pin_mapping);
+        }
+        if (options ()->debug_netcompare) {
+          tl::info << "Stopped with " << nodes.size () << "/" << other_nodes.size () << " nodes left unresolved " << (good ? "(accepted)" : "(not accepted)");
         }
         //  this assumes that we don't gain anything here. Stop now.
         break;
@@ -2970,10 +3551,14 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       data.max_depth = m_max_depth;
       data.max_n_branch = m_max_n_branch;
       data.dont_consider_net_names = m_dont_consider_net_names;
+      data.with_ambiguous = (pass > 0);
       data.circuit_pin_mapper = &circuit_pin_mapper;
+      data.subcircuit_equivalence = &subcircuit_equivalence;
+      data.device_equivalence = &device_equivalence;
       data.logger = mp_logger;
+      data.progress = &progress;
 
-      size_t ni = g1.derive_node_identities_from_node_set (nodes, other_nodes, 0, 1, 0 /*not tentative*/, pass > 0 /*with ambiguities*/, &data);
+      size_t ni = g1.derive_node_identities_from_node_set (nodes, other_nodes, 0, 1, 0 /*not tentatively*/, &data);
       if (ni > 0 && ni != failed_match) {
         new_identities += ni;
         if (options ()->debug_netcompare) {
@@ -2982,6 +3567,9 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       }
 
       if (new_identities == 0) {
+        if (options ()->debug_netcompare) {
+          tl::info << "Stopped with " << nodes.size () << "/" << other_nodes.size () << " nodes left unresolved.";
+        }
         good = false;
         break;
       }
@@ -2994,6 +3582,9 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   for (db::NetGraph::node_iterator i = g1.begin (); i != g1.end (); ++i) {
     if (! i->has_other ()) {
+      if (options ()->debug_netcompare) {
+        tl::info << "Unresolved net from left: " << i->net ()->expanded_name () << " " << (good ? "(accepted)" : "(not accepted)");
+      }
       if (mp_logger) {
         if (good) {
           mp_logger->match_nets (i->net (), 0);
@@ -3010,6 +3601,9 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   for (db::NetGraph::node_iterator i = g2.begin (); i != g2.end (); ++i) {
     if (! i->has_other ()) {
+      if (options ()->debug_netcompare) {
+        tl::info << "Unresolved net from right: " << i->net ()->expanded_name () << " " << (good ? "(accepted)" : "(not accepted)");
+      }
       if (mp_logger) {
         if (good) {
           mp_logger->match_nets (0, i->net ());
@@ -3025,8 +3619,8 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
   }
 
   do_pin_assignment (c1, g1, c2, g2, c12_circuit_and_pin_mapping, c22_circuit_and_pin_mapping, pin_mismatch, good);
-  do_device_assignment (c1, g1, c2, g2, device_filter, device_categorizer, good);
-  do_subcircuit_assignment (c1, g1, c2, g2, circuit_categorizer, circuit_pin_mapper, c12_circuit_and_pin_mapping, c22_circuit_and_pin_mapping, good);
+  do_device_assignment (c1, g1, c2, g2, device_filter, device_categorizer, device_equivalence, good);
+  do_subcircuit_assignment (c1, g1, c2, g2, circuit_categorizer, circuit_pin_mapper, c12_circuit_and_pin_mapping, c22_circuit_and_pin_mapping, subcircuit_equivalence, good);
 
   return good;
 }
@@ -3241,7 +3835,7 @@ NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g
 }
 
 void
-NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, const db::DeviceFilter &device_filter, db::DeviceCategorizer &device_categorizer, bool &good) const
+NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, const db::DeviceFilter &device_filter, db::DeviceCategorizer &device_categorizer, DeviceEquivalenceTracker &device_eq, bool &good) const
 {
   //  Report device assignment
 
@@ -3250,9 +3844,15 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
   typedef std::vector<std::pair<std::vector<std::pair<size_t, size_t> >, std::pair<const db::Device *, size_t> > > unmatched_list;
   unmatched_list unmatched_a, unmatched_b;
 
+  //  check mapping of devices whose equivalence is established topologically
+
   for (db::Circuit::const_device_iterator d = c1->begin_devices (); d != c1->end_devices (); ++d) {
 
     if (! device_filter.filter (d.operator-> ())) {
+      continue;
+    }
+
+    if (device_eq.other (d.operator-> ())) {
       continue;
     }
 
@@ -3262,15 +3862,8 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
       continue;
     }
 
-    std::vector<std::pair<size_t, size_t> > k = compute_device_key (*d, g1, device_categorizer.is_strict_device_category (device_cat));
-
     bool mapped = true;
-    for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
-      if (! g1.begin () [i->second].has_other ()) {
-        i->second = invalid_id;  //  normalization
-        mapped = false;
-      }
-    }
+    std::vector<std::pair<size_t, size_t> > k = compute_device_key_for_this (*d, g1, device_categorizer.is_strict_device_category (device_cat), mapped);
 
     if (! mapped) {
       if (mp_logger) {
@@ -3296,52 +3889,83 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
       continue;
     }
 
-    std::vector<std::pair<size_t, size_t> > k = compute_device_key (*d, g2, device_categorizer.is_strict_device_category (device_cat));
+    const db::Device *c1_device = 0;
+    size_t c1_device_cat = 0;
 
-    bool mapped = true;
-    for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
-      if (! g2.begin () [i->second].has_other ()) {
-        i->second = invalid_id;  //  normalization
-        mapped = false;
+    const db::Device *d_this = device_eq.other (d.operator-> ());
+    if (d_this) {
+
+      size_t device_cat_this = device_categorizer.cat_for_device (d_this);
+      if (! device_cat_this) {
+        //  device is ignored
+        continue;
+      }
+
+      bool mapped1 = true, mapped2 = true;
+      std::vector<std::pair<size_t, size_t> > k_this = compute_device_key_for_this (*d_this, g1, device_categorizer.is_strict_device_category (device_cat_this), mapped1);
+      std::vector<std::pair<size_t, size_t> > k = compute_device_key_for_other (*d, g2, device_categorizer.is_strict_device_category (device_cat), mapped2);
+
+      if (! mapped1 || ! mapped2 || k != k_this) {
+
+        //  topological mismatch
+        if (mp_logger) {
+          mp_logger->device_mismatch (d_this, d.operator-> ());
+        }
+        good = false;
+
       } else {
-        i->second = g2.begin () [i->second].other_net_index ();
+
+        c1_device = d_this;
+        c1_device_cat = device_cat_this;
+
       }
-    }
-
-    std::sort (k.begin (), k.end ());
-
-    std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::Device *, size_t> >::iterator dm = device_map.find (k);
-
-    if (! mapped || dm == device_map.end () || dm->first != k) {
-
-      if (mp_logger) {
-        unmatched_b.push_back (std::make_pair (k, std::make_pair (d.operator-> (), device_cat)));
-      }
-      good = false;
 
     } else {
 
+      bool mapped = true;
+      std::vector<std::pair<size_t, size_t> > k = compute_device_key_for_other (*d, g2, device_categorizer.is_strict_device_category (device_cat), mapped);
+
+      std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::Device *, size_t> >::iterator dm = device_map.find (k);
+
+      if (! mapped || dm == device_map.end () || dm->first != k) {
+
+        if (mp_logger) {
+          unmatched_b.push_back (std::make_pair (k, std::make_pair (d.operator-> (), device_cat)));
+        }
+        good = false;
+
+      } else {
+
+        c1_device = dm->second.first;
+        c1_device_cat = dm->second.second;
+
+        device_map.erase (dm);
+
+      }
+
+    }
+
+    if (c1_device) {
+
       db::DeviceCompare dc;
 
-      if (! dc.equals (dm->second, std::make_pair (d.operator-> (), device_cat))) {
-        if (dm->second.second != device_cat) {
+      if (! dc.equals (std::make_pair (c1_device, c1_device_cat), std::make_pair (d.operator-> (), device_cat))) {
+        if (c1_device_cat != device_cat) {
           if (mp_logger) {
-            mp_logger->match_devices_with_different_device_classes (dm->second.first, d.operator-> ());
+            mp_logger->match_devices_with_different_device_classes (c1_device, d.operator-> ());
           }
           good = false;
         } else {
           if (mp_logger) {
-            mp_logger->match_devices_with_different_parameters (dm->second.first, d.operator-> ());
+            mp_logger->match_devices_with_different_parameters (c1_device, d.operator-> ());
           }
           good = false;
         }
       } else {
         if (mp_logger) {
-          mp_logger->match_devices (dm->second.first, d.operator-> ());
+          mp_logger->match_devices (c1_device, d.operator-> ());
         }
       }
-
-      device_map.erase (dm);
 
     }
 
@@ -3426,7 +4050,7 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
 }
 
 void
-NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, CircuitCategorizer &circuit_categorizer, const CircuitPinMapper &circuit_pin_mapper, std::map<const Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping, bool &good) const
+NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, CircuitCategorizer &circuit_categorizer, const CircuitPinMapper &circuit_pin_mapper, std::map<const Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping, SubCircuitEquivalenceTracker &subcircuit_eq, bool &good) const
 {
   //  Report subcircuit assignment
 
@@ -3440,15 +4064,12 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
       continue;
     }
 
-    std::vector<std::pair<size_t, size_t> > k;
-    bool valid = compute_subcircuit_key (*sc, g1, &c12_circuit_and_pin_mapping, &circuit_pin_mapper, k);
-
-    bool mapped = true;
-    for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end () && mapped; ++i) {
-      if (! g1.begin () [i->second].has_other ()) {
-        mapped = false;
-      }
+    if (subcircuit_eq.other (sc.operator-> ())) {
+      continue;
     }
+
+    bool mapped = true, valid = true;
+    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key_for_this (*sc, g1, &c12_circuit_and_pin_mapping, &circuit_pin_mapper, mapped, valid);
 
     if (! mapped) {
       if (mp_logger) {
@@ -3473,75 +4094,93 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
       continue;
     }
 
-    std::vector<std::pair<size_t, size_t> > k;
-    compute_subcircuit_key (*sc, g2, &c22_circuit_and_pin_mapping, &circuit_pin_mapper, k);
+    const db::SubCircuit *sc_this = subcircuit_eq.other (sc.operator-> ());
+    if (sc_this) {
 
-    bool mapped = true;
-    for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
-      if (! g2.begin () [i->second].has_other ()) {
-        mapped = false;
+      size_t sc_cat_this = circuit_categorizer.cat_for_subcircuit (sc_this);
+      if (! sc_cat_this) {
+        //  subcircuit is ignored
+        continue;
+      }
+
+      bool mapped1 = true, mapped2 = true;
+      bool valid1 = true, valid2 = true;
+      std::vector<std::pair<size_t, size_t> > k_this = compute_subcircuit_key_for_this (*sc_this, g1, &c12_circuit_and_pin_mapping, &circuit_pin_mapper, mapped1, valid1);
+      std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key_for_other (*sc, g2, &c22_circuit_and_pin_mapping, &circuit_pin_mapper, mapped2, valid2);
+
+      if (! valid1 || ! valid2 || ! mapped1 || ! mapped2 || k_this != k || sc_cat != sc_cat_this) {
+        if (mp_logger) {
+          mp_logger->subcircuit_mismatch (sc_this, sc.operator-> ());
+        }
+        good = false;
       } else {
-        i->second = g2.begin () [i->second].other_net_index ();
+        if (mp_logger) {
+          mp_logger->match_subcircuits (sc_this, sc.operator-> ());
+        }
       }
-    }
-
-    std::sort (k.begin (), k.end ());
-
-    std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> >::iterator scm = subcircuit_map.find (k);
-
-    if (! mapped || scm == subcircuit_map.end ()) {
-
-      if (mp_logger) {
-        unmatched_b.push_back (std::make_pair (k, sc.operator-> ()));
-      }
-      good = false;
 
     } else {
 
-      db::SubCircuitCompare scc;
+      bool mapped = true, valid = true;
+      std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key_for_other (*sc, g2, &c22_circuit_and_pin_mapping, &circuit_pin_mapper, mapped, valid);
 
-      std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> >::iterator scm_start = scm;
+      std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> >::iterator scm = subcircuit_map.find (k);
 
-      bool found = false;
-      size_t nscm = 0;
-      while (! found && scm != subcircuit_map.end () && scm->first == k) {
-        ++nscm;
-        if (scc.equals (scm->second, std::make_pair (sc.operator-> (), sc_cat))) {
-          found = true;
+      if (! mapped || scm == subcircuit_map.end () || scm->first != k) {
+
+        if (mp_logger) {
+          unmatched_b.push_back (std::make_pair (k, sc.operator-> ()));
         }
-      }
-
-      if (! found) {
-
-        if (nscm == 1) {
-
-          //  unique match, but doesn't fit: report this one as paired, but mismatching:
-          if (mp_logger) {
-            mp_logger->subcircuit_mismatch (scm_start->second.first, sc.operator-> ());
-          }
-
-          //  no longer look for this one
-          subcircuit_map.erase (scm_start);
-
-        } else {
-
-          //  no unqiue match
-          if (mp_logger) {
-            mp_logger->subcircuit_mismatch (0, sc.operator-> ());
-          }
-
-        }
-
         good = false;
 
       } else {
 
-        if (mp_logger) {
-          mp_logger->match_subcircuits (scm->second.first, sc.operator-> ());
+        db::SubCircuitCompare scc;
+
+        std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> >::iterator scm_start = scm;
+
+        bool found = false;
+        size_t nscm = 0;
+        while (! found && scm != subcircuit_map.end () && scm->first == k) {
+          ++nscm;
+          if (scc.equals (scm->second, std::make_pair (sc.operator-> (), sc_cat))) {
+            found = true;
+          }
         }
 
-        //  no longer look for this one
-        subcircuit_map.erase (scm);
+        if (! found) {
+
+          if (nscm == 1) {
+
+            //  unique match, but doesn't fit: report this one as paired, but mismatching:
+            if (mp_logger) {
+              mp_logger->subcircuit_mismatch (scm_start->second.first, sc.operator-> ());
+            }
+
+            //  no longer look for this one
+            subcircuit_map.erase (scm_start);
+
+          } else {
+
+            //  no unqiue match
+            if (mp_logger) {
+              mp_logger->subcircuit_mismatch (0, sc.operator-> ());
+            }
+
+          }
+
+          good = false;
+
+        } else {
+
+          if (mp_logger) {
+            mp_logger->match_subcircuits (scm->second.first, sc.operator-> ());
+          }
+
+          //  no longer look for this one
+          subcircuit_map.erase (scm);
+
+        }
 
       }
 
@@ -3731,12 +4370,15 @@ NetlistComparer::join_symmetric_nets (db::Circuit *circuit)
   //  nodes are identical if the attached devices and circuits are of the same kind and with the same parameters
   //  and connect to other nodes in identical configurations.
 
-  std::vector<const NetGraphNode *> nodes;
+  std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> > nodes;
+
+  std::vector<NetGraphNode::edge_type> no_edges;
+  no_edges.push_back (NetGraphNode::edge_type ());
 
   nodes.reserve (graph.end () - graph.begin ());
   for (db::NetGraph::node_iterator i = graph.begin (); i != graph.end (); ++i) {
     if (! i->has_other () && i->net ()) {
-      nodes.push_back (i.operator-> ());
+      nodes.push_back (std::make_pair (i.operator-> (), no_edges.begin ()));
     }
   }
 
@@ -3746,18 +4388,18 @@ NetlistComparer::join_symmetric_nets (db::Circuit *circuit)
 
   tl::equivalence_clusters<const NetGraphNode *> identical_nodes;
 
-  for (std::vector<const NetGraphNode *>::const_iterator np = nodes.begin (); np + 1 != nodes.end (); ++np) {
-    if (*np[0] == *np[1]) {
-      identical_nodes.same (np[0], np[1]);
+  for (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator np = nodes.begin (); np + 1 != nodes.end (); ++np) {
+    if (*np[0].first == *np[1].first) {
+      identical_nodes.same (np[0].first, np[1].first);
     }
   }
 
   std::vector<std::set<size_t> > symmetry_groups;
   std::set<size_t> visited;
 
-  for (std::vector<const NetGraphNode *>::const_iterator np = nodes.begin (); np != nodes.end (); ++np) {
+  for (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator np = nodes.begin (); np != nodes.end (); ++np) {
 
-    size_t node_id = graph.node_index_for_net (np[0]->net ());
+    size_t node_id = graph.node_index_for_net (np[0].first->net ());
     if (visited.find (node_id) != visited.end ()) {
       continue;
     }

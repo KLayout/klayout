@@ -1122,6 +1122,59 @@ class DBLayout_TestClass < TestBase
 
   end
 
+  # Cell#transform and Cell#transform_into
+  def test_14
+
+    g = RBA::Layout::new
+    c0 = g.create_cell("c0")
+    c1 = g.create_cell("c1")
+
+    t = RBA::Trans::new(RBA::Vector::new(100, -100))
+    inst = c0.insert(RBA::CellInstArray::new(c1.cell_index, t))
+
+    ti = RBA::ICplxTrans::new(2.5, 45.0, false, RBA::Vector::new(10, 20))
+    t = RBA::Trans::new(1)
+
+    assert_equal(inst.to_s, "cell_index=1 r0 100,-100")
+
+    c0.transform_into(t)
+    assert_equal(inst.to_s, "cell_index=1 r0 100,100")
+
+    c0.transform_into(ti)
+    assert_equal(inst.to_s, "cell_index=1 r0 0,354")
+
+    c0.transform(t)
+    assert_equal(inst.to_s, "cell_index=1 r90 -354,0")
+
+    c0.transform(ti)
+    assert_equal(inst.to_s, "cell_index=1 r135 *2.5 -616,-606")
+
+    g = RBA::Layout::new
+    c0 = g.create_cell("c0")
+    c1 = g.create_cell("c1")
+
+    t = RBA::Trans::new(RBA::Vector::new(100, -100))
+    inst = c0.insert(RBA::CellInstArray::new(c1.cell_index, t))
+
+    ti = RBA::DCplxTrans::new(2.5, 45.0, false, RBA::DVector::new(0.01, 0.02))
+    t = RBA::DTrans::new(1)
+
+    assert_equal(inst.to_s, "cell_index=1 r0 100,-100")
+
+    c0.transform_into(t)
+    assert_equal(inst.to_s, "cell_index=1 r0 100,100")
+
+    c0.transform_into(ti)
+    assert_equal(inst.to_s, "cell_index=1 r0 0,354")
+
+    c0.transform(t)
+    assert_equal(inst.to_s, "cell_index=1 r90 -354,0")
+
+    c0.transform(ti)
+    assert_equal(inst.to_s, "cell_index=1 r135 *2.5 -616,-606")
+
+  end
+
 end
 
 load("test_epilogue.rb")

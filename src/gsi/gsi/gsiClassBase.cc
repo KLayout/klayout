@@ -51,6 +51,9 @@ namespace {
 //  we do a initial scan and after this no more write access here.
 typedef std::map<const std::type_info *, const ClassBase *, type_info_compare> ti_to_class_map_t;
 static ti_to_class_map_t *sp_ti_to_class = 0;
+//  NOTE: MacOS/clang seems to have some issue with RTTI across shared objects. This map provides a name-based fallback
+typedef std::map<std::string, const ClassBase *> tname_to_class_map_t;
+static tname_to_class_map_t *sp_tname_to_class = 0;
 
 ClassBase::ClassBase (const std::string &doc, const Methods &mm, bool do_register)
   : m_initialized (false), mp_base (0), mp_parent (0), m_doc (doc), m_methods (mm)
@@ -67,6 +70,10 @@ ClassBase::ClassBase (const std::string &doc, const Methods &mm, bool do_registe
     if (sp_ti_to_class) {
       delete sp_ti_to_class;
       sp_ti_to_class = 0;
+    }
+    if (sp_tname_to_class) {
+      delete sp_tname_to_class;
+      sp_tname_to_class = 0;
     }
 
   }
@@ -753,11 +760,18 @@ static void add_class_to_map (const gsi::ClassBase *c)
   if (! sp_ti_to_class) {
     sp_ti_to_class = new ti_to_class_map_t ();
   }
+  if (! sp_tname_to_class) {
+    sp_tname_to_class = new tname_to_class_map_t ();
+  }
 
-  if (ti && c->is_of_type (*ti) && !sp_ti_to_class->insert (std::make_pair (ti, c)).second) {
-    //  Duplicate registration of this class
-    tl::error << "Duplicate registration of class " << c->name () << " (type " << ti->name () << ")";
-    tl_assert (false);
+  if (ti && c->is_of_type (*ti)) {
+    if (!sp_ti_to_class->insert (std::make_pair (ti, c)).second) {
+      //  Duplicate registration of this class
+      tl::error << "Duplicate registration of class " << c->name () << " (type " << ti->name () << ")";
+      tl_assert (false);
+    } else {
+      sp_tname_to_class->insert (std::make_pair (std::string (ti->name ()), c));
+    }
   }
 }
 
@@ -775,11 +789,19 @@ const ClassBase *class_by_typeinfo_no_assert (const std::type_info &ti)
   if (! sp_ti_to_class) {
     return 0;
   } else {
-    std::map<const std::type_info *, const ClassBase *, type_info_compare>::const_iterator c = sp_ti_to_class->find (&ti);
+    ti_to_class_map_t::const_iterator c = sp_ti_to_class->find (&ti);
     if (c != sp_ti_to_class->end ()) {
       return c->second;
     } else {
-      return 0;
+      //  try name lookup
+      tname_to_class_map_t::const_iterator cn = sp_tname_to_class->find (std::string (ti.name ()));
+      if (cn != sp_tname_to_class->end ()) {
+        //  we can use this typeinfo as alias
+        sp_ti_to_class->insert (std::make_pair (&ti, cn->second));
+        return cn->second;
+      } else {
+        return 0;
+      }
     }
   }
 }

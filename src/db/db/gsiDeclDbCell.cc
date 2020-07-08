@@ -251,6 +251,8 @@ struct cell_inst_array_defs
     unsigned long na = 1, nb = 1;
     if (arr->is_regular_array (a, b, na, nb)) {
       *arr = C (arr->object (), t, a, b, na, nb);
+    } else if (arr->is_iterated_array ()) {
+      throw tl::Exception (tl::to_string (tr ("Can't set the transformation on an iterated array (layout not editable?)")));
     } else {
       *arr = C (arr->object (), t);
     }
@@ -262,6 +264,8 @@ struct cell_inst_array_defs
     unsigned long na = 1, nb = 1;
     if (arr->is_regular_array (a, b, na, nb)) {
       *arr = C (arr->object (), t, a, b, na, nb);
+    } else if (arr->is_iterated_array ()) {
+      throw tl::Exception (tl::to_string (tr ("Can't set the transformation on an iterated array (layout not editable?)")));
     } else {
       *arr = C (arr->object (), t);
     }
@@ -292,6 +296,8 @@ struct cell_inst_array_defs
       s += "*";
       s += tl::to_string (nb);
       s += "]";
+    } else if (arr->size () > 1) {
+      s += std::string (" (+") + tl::to_string (arr->size () - 1) + " irregular locations)";
     }
 
     return s;
@@ -303,13 +309,26 @@ struct cell_inst_array_defs
   {
     typedef db::array<db::CellInst, db::simple_trans<typename T::target_coord_type> > target_array;
 
+    std::vector<typename C::vector_type> iterated;
+    std::vector<typename target_array::vector_type> iterated_transformed;
     typename C::vector_type a, b;
     unsigned long amax = 0, bmax = 0;
+
     if (arr.is_regular_array (a, b, amax, bmax)) {
       if (arr.is_complex ()) {
         return target_array (arr.object (), t * arr.complex_trans () * t.inverted (), t * a, t * b, amax, bmax);
       } else {
         return target_array (arr.object (), typename target_array::trans_type (t * typename C::complex_trans_type (arr.front ()) * t.inverted ()), t * a, t * b, amax, bmax);
+      }
+    } else if (arr.is_iterated_array (&iterated)) {
+      iterated_transformed.reserve (iterated.size ());
+      for (typename std::vector<typename C::vector_type>::const_iterator i = iterated.begin (); i != iterated.end (); ++i) {
+        iterated_transformed.push_back (t * *i);
+      }
+      if (arr.is_complex ()) {
+        return target_array (arr.object (), t * arr.complex_trans () * t.inverted (), iterated_transformed.begin (), iterated_transformed.end ());
+      } else {
+        return target_array (arr.object (), typename target_array::trans_type (t * typename C::complex_trans_type (arr.front ()) * t.inverted ()), iterated_transformed.begin (), iterated_transformed.end ());
       }
     } else if (arr.is_complex ()) {
       return target_array (arr.object (), t * arr.complex_trans () * t.inverted ());
@@ -352,93 +371,17 @@ struct cell_inst_array_defs
 
   static bool less (const C *i, const C &other)
   {
-    if (i->object ().cell_index () != other.object ().cell_index ()) {
-      return i->object ().cell_index () < other.object ().cell_index ();
-    }
-
-    db::vector<coord_type> a, b;
-    unsigned long na = 1, nb = 1;
-    bool r = i->is_regular_array (a, b, na, nb);
-
-    db::vector<coord_type> aother, bother;
-    unsigned long naother = 1, nbother = 1;
-    bool rother = other.is_regular_array (aother, bother, naother, nbother);
-
-    if (r != rother) {
-      return r < rother;
-    } else if (r) {
-      if (a.not_equal (aother)) {
-        return a.less (aother);
-      }
-      if (b.not_equal (bother)) {
-        return b.less (bother);
-      }
-      if (na != naother) {
-        return na < naother;
-      }
-      if (nb != nbother) {
-        return nb < nbother;
-      }
-    }
-
-    bool c = i->is_complex ();
-    bool cother = other.is_complex ();
-
-    if (c != cother) {
-      return c < cother;
-    } else if (c) {
-      return i->complex_trans ().less (other.complex_trans ());
-    } else {
-      return i->front ().less (other.front ());
-    }
+    return i->less (other);
   }
 
   static bool equal (const C *i, const C &other)
   {
-    if (i->object ().cell_index () != other.object ().cell_index ()) {
-      return false;
-    }
-
-    db::vector<coord_type> a, b;
-    unsigned long na = 1, nb = 1;
-    bool r = i->is_regular_array (a, b, na, nb);
-
-    db::vector<coord_type> aother, bother;
-    unsigned long naother = 1, nbother = 1;
-    bool rother = other.is_regular_array (aother, bother, naother, nbother);
-
-    if (r != rother) {
-      return false;
-    } else if (r) {
-      if (a.not_equal (aother)) {
-        return false;
-      }
-      if (b.not_equal (bother)) {
-        return false;
-      }
-      if (na != naother) {
-        return false;
-      }
-      if (nb != nbother) {
-        return false;
-      }
-    }
-
-    bool c = i->is_complex ();
-    bool cother = other.is_complex ();
-
-    if (c != cother) {
-      return false;
-    } else if (c) {
-      return i->complex_trans ().equal (other.complex_trans ());
-    } else {
-      return i->front ().equal (other.front ());
-    }
+    return i->equal (other);
   }
 
   static bool not_equal (const C *i, const C &other)
   {
-    return ! equal (i, other);
+    return ! i->equal (other);
   }
 
   static gsi::Methods methods (bool new_doc)
@@ -508,7 +451,9 @@ struct cell_inst_array_defs
     ) +
     gsi::method ("size", &C::size,
       "@brief Gets the number of single instances in the array\n"
-      "If the instance represents a single instance, the count is 1. Otherwise it is na*nb."
+      "If the instance represents a single instance, the count is 1. Otherwise it is na*nb. "
+      "Starting with version 0.27, there may be iterated instances for which the size is larger than 1, but \\is_regular_array? will return false. "
+      "In this case, use \\each_trans or \\each_cplx_trans to retrieve the individual placements of the iterated instance."
     ) +
     gsi::method_ext ("cell_index", &cell_index,
       "@brief Gets the cell index of the cell instantiated \n"
@@ -1618,6 +1563,28 @@ static db::Instance cell_inst_dtransform_into_cplx (db::Cell *cell, const db::In
   return cell->transform_into (inst, dbu_trans.inverted () * t * dbu_trans);
 }
 
+static void cell_dtransform_simple (db::Cell *cell, const db::DTrans &t)
+{
+  const db::Layout *layout = cell->layout ();
+  if (! layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot use a micrometer-unit transformation")));
+  }
+
+  db::CplxTrans dbu_trans (layout->dbu ());
+  cell->transform (db::Trans (dbu_trans.inverted () * db::DCplxTrans (t) * dbu_trans));
+}
+
+static void cell_dtransform_cplx (db::Cell *cell, const db::DCplxTrans &t)
+{
+  const db::Layout *layout = cell->layout ();
+  if (! layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot use a micrometer-unit transformation")));
+  }
+
+  db::CplxTrans dbu_trans (layout->dbu ());
+  cell->transform (dbu_trans.inverted () * t * dbu_trans);
+}
+
 static void cell_dtransform_into_simple (db::Cell *cell, const db::DTrans &t)
 {
   const db::Layout *layout = cell->layout ();
@@ -2401,6 +2368,46 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "however, the transformation is given in micrometer units and is translated to database units internally.\n"
     "\n"
     "This variant has been introduced in version 0.25."
+  ) +
+  gsi::method ("transform", (void (db::Cell::*)(const db::Trans &)) &db::Cell::transform, gsi::arg ("trans"),
+    "@brief Transforms the cell by the given integer transformation\n"
+    "\n"
+    "This method transforms all instances and all shapes by the given transformation. "
+    "There is a variant called \\transform_into which applies the transformation to instances "
+    "in a way such that it can be applied recursively to the child cells.\n"
+    "\n"
+    "This method has been introduced in version 0.26.7."
+  ) +
+  gsi::method ("transform", (void (db::Cell::*)(const db::ICplxTrans &)) &db::Cell::transform, gsi::arg ("trans"),
+    "@brief Transforms the cell by the given complex integer transformation\n"
+    "\n"
+    "This method transforms all instances and all shapes by the given transformation. "
+    "There is a variant called \\transform_into which applies the transformation to instances "
+    "in a way such that it can be applied recursively to the child cells. The difference is important in "
+    "the presence of magnifications: \"transform\" will leave magnified instances while \"transform_into\" "
+    "will not do so but expect the magnification to be applied inside the called cells too.\n"
+    "\n"
+    "This method has been introduced in version 0.26.7."
+  ) +
+  gsi::method_ext ("transform", &cell_dtransform_simple, gsi::arg ("trans"),
+    "@brief Transforms the cell by the given, micrometer-unit transformation\n"
+    "\n"
+    "This method transforms all instances and all shapes by the given transformation. "
+    "There is a variant called \\transform_into which applies the transformation to instances "
+    "in a way such that it can be applied recursively to the child cells.\n"
+    "\n"
+    "This method has been introduced in version 0.26.7."
+  ) +
+  gsi::method_ext ("transform", &cell_dtransform_cplx, gsi::arg ("trans"),
+    "@brief Transforms the cell by the given, micrometer-unit transformation\n"
+    "\n"
+    "This method transforms all instances and all shapes by the given transformation. "
+    "There is a variant called \\transform_into which applies the transformation to instances "
+    "in a way such that it can be applied recursively to the child cells. The difference is important in "
+    "the presence of magnifications: \"transform\" will leave magnified instances while \"transform_into\" "
+    "will not do so but expect the magnification to be applied inside the called cells too.\n"
+    "\n"
+    "This method has been introduced in version 0.26.7."
   ) +
   gsi::method_ext ("transform_into", &cell_dtransform_into_simple, gsi::arg ("trans"),
     "@brief Transforms the cell into a new coordinate system with the given transformation where the transformation is in micrometer units\n"

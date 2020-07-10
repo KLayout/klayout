@@ -150,7 +150,10 @@ public:
   virtual std::pair<const db::Device *, const db::Device *> devices ();
   virtual std::pair<const db::Pin *, const db::Pin *> pins ();
   virtual std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuits ();
-  virtual std::pair<const db::Net *, const db::Net *> nets ();
+  virtual std::pair<const db::Net *, const db::Net *> nets_of_this ();
+
+  std::pair<const db::Net *, const db::Net *> nets ();
+  bool derived_from_nets (const std::pair<const db::Net *, const db::Net *> &np);
 
 private:
   NetlistModelItemData *mp_parent;

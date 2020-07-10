@@ -434,15 +434,39 @@ static std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalD
   return std::make_pair (termrefs.first ? termrefs.first->terminal_def () : 0, termrefs.second ? termrefs.second->terminal_def () : 0);
 }
 
-static std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> terminal_defs_from_device_classes (const std::pair<const db::DeviceClass *, const db::DeviceClass *> &device_classes, size_t terminal_id)
+static std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> terminal_defs_from_device_classes (IndexedNetlistModel *model, const std::pair<const db::DeviceClass *, const db::DeviceClass *> &device_classes, const std::pair<const db::Device *, const db::Device *> &devices, size_t terminal_id)
 {
   const db::DeviceTerminalDefinition *td1 = 0, *td2 = 0;
   if (device_classes.first && device_classes.first->terminal_definitions ().size () > terminal_id) {
     td1 = &device_classes.first->terminal_definitions () [terminal_id];
   }
-  if (device_classes.second && device_classes.second->terminal_definitions ().size () > terminal_id) {
-    td2 = &device_classes.second->terminal_definitions () [terminal_id];
+
+  if (device_classes.second) {
+
+    size_t second_terminal_id = terminal_id;
+
+    //  Because of terminal swapping we need to look up the second terminal by looking for equivalent terminals which carry the corresponding net
+    if (td1 && devices.first && devices.second) {
+
+      size_t td1_id_norm = device_classes.first->normalize_terminal_id (td1->id ());
+      const db::Net *n2 = model->second_net_for (devices.first->net_for_terminal (terminal_id));
+
+      for (size_t i = 0; i < device_classes.second->terminal_definitions ().size (); ++i) {
+        const db::DeviceTerminalDefinition &td = device_classes.second->terminal_definitions () [i];
+        if (device_classes.second->normalize_terminal_id (td.id ()) == td1_id_norm) {
+          if (devices.second->net_for_terminal (i) == n2) {
+            second_terminal_id = i;
+            break;
+          }
+        }
+      }
+
+    }
+
+    td2 = &device_classes.second->terminal_definitions () [second_terminal_id];
+
   }
+
   return std::make_pair (td1, td2);
 }
 
@@ -511,91 +535,151 @@ static size_t rows_for (const db::NetTerminalRef *ref)
 
 static QIcon icon_for_net ()
 {
-  QIcon icon;
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_48.png")));
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_32.png")));
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_24.png")));
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_16.png")));
+  static QIcon icon;
+  if (icon.isNull ()) {
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_48.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_32.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_24.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_16.png")));
+  }
   return icon;
 }
 
 static QIcon light_icon_for_net ()
 {
-  QIcon icon;
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_light_48.png")));
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_light_32.png")));
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_light_24.png")));
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_light_16.png")));
+  static QIcon icon;
+  if (icon.isNull ()) {
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_light_48.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_light_32.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_light_24.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_light_16.png")));
+  }
   return icon;
 }
 
 static QIcon icon_for_connection ()
 {
-  QIcon icon;
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_48.png")));
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_32.png")));
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_24.png")));
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_16.png")));
+  static QIcon icon;
+  if (icon.isNull ()) {
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_48.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_32.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_24.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_16.png")));
+  }
   return icon;
 }
 
 static QIcon light_icon_for_connection ()
 {
-  QIcon icon;
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_light_48.png")));
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_light_32.png")));
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_light_24.png")));
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_light_16.png")));
+  static QIcon icon;
+  if (icon.isNull ()) {
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_light_48.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_light_32.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_light_24.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_light_16.png")));
+  }
   return icon;
 }
 
 static QIcon icon_for_pin ()
 {
-  QIcon icon;
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_pin_48.png")));
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_pin_32.png")));
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_pin_24.png")));
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_pin_16.png")));
+  static QIcon icon;
+  if (icon.isNull ()) {
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_pin_48.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_pin_32.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_pin_24.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_pin_16.png")));
+  }
   return icon;
 }
 
-static QIcon icon_for_device (const db::DeviceClass *dc)
+static QIcon icon_for_device (const db::DeviceClass *dc, size_t term_id = 0)
 {
-  QIcon icon;
-  //  TODO: inductor, generic device ...
-  if (dynamic_cast<const db::DeviceClassResistor *> (dc)) {
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_48.png")));
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_32.png")));
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_24.png")));
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_16.png")));
-  } else if (dynamic_cast<const db::DeviceClassInductor *> (dc)) {
-    //  fake ...
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_48.png")));
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_32.png")));
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_24.png")));
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_16.png")));
-  } else if (dynamic_cast<const db::DeviceClassCapacitor *> (dc)) {
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_cap_48.png")));
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_cap_32.png")));
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_cap_24.png")));
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_cap_16.png")));
-  } else if (dynamic_cast<const db::DeviceClassDiode *> (dc)) {
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_diode_48.png")));
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_diode_32.png")));
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_diode_24.png")));
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_diode_16.png")));
-  } else if (dynamic_cast<const db::DeviceClassBJT3Transistor *> (dc)) {
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_bjt_48.png")));
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_bjt_32.png")));
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_bjt_24.png")));
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_bjt_16.png")));
-  } else {
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_mos_48.png")));
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_mos_32.png")));
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_mos_24.png")));
-    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_mos_16.png")));
+  static QIcon icon_for_res;
+  static QIcon icon_for_ind;
+  static QIcon icon_for_cap;
+  static QIcon icons_for_diode[2];
+  static QIcon icons_for_bjt[4];
+  static QIcon icons_for_mos[4];
+
+  if (icon_for_res.isNull ()) {
+    icon_for_res.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_48.png")));
+    icon_for_res.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_32.png")));
+    icon_for_res.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_24.png")));
+    icon_for_res.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_16.png")));
   }
-  return icon;
+  if (icon_for_ind.isNull ()) {
+    //  fake ...
+    icon_for_ind.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_48.png")));
+    icon_for_ind.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_32.png")));
+    icon_for_ind.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_24.png")));
+    icon_for_ind.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_16.png")));
+  }
+  if (icon_for_cap.isNull ()) {
+    icon_for_cap.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_cap_48.png")));
+    icon_for_cap.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_cap_32.png")));
+    icon_for_cap.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_cap_24.png")));
+    icon_for_cap.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_cap_16.png")));
+  }
+  if (icons_for_diode[0].isNull ()) {
+    QImage i48 (QString::fromUtf8 (":/images/icon_device_diode_48.png"));
+    QImage i32 (QString::fromUtf8 (":/images/icon_device_diode_32.png"));
+    QImage i24 (QString::fromUtf8 (":/images/icon_device_diode_24.png"));
+    QImage i16 (QString::fromUtf8 (":/images/icon_device_diode_16.png"));
+    QTransform tr;
+    for (size_t i = 0; i < sizeof (icons_for_diode) / sizeof (icons_for_diode [0]); ++i) {
+      icons_for_diode[i].addPixmap (QPixmap::fromImage (i48.transformed (tr)));
+      icons_for_diode[i].addPixmap (QPixmap::fromImage (i32.transformed (tr)));
+      icons_for_diode[i].addPixmap (QPixmap::fromImage (i24.transformed (tr)));
+      icons_for_diode[i].addPixmap (QPixmap::fromImage (i16.transformed (tr)));
+      tr.rotate (180.0);
+    }
+  }
+  if (icons_for_bjt[0].isNull ()) {
+    QImage i48 (QString::fromUtf8 (":/images/icon_device_bjt_48.png"));
+    QImage i32 (QString::fromUtf8 (":/images/icon_device_bjt_32.png"));
+    QImage i24 (QString::fromUtf8 (":/images/icon_device_bjt_24.png"));
+    QImage i16 (QString::fromUtf8 (":/images/icon_device_bjt_16.png"));
+    QTransform tr;
+    for (size_t i = 0; i < sizeof (icons_for_bjt) / sizeof (icons_for_bjt [0]); ++i) {
+      icons_for_bjt[i].addPixmap (QPixmap::fromImage (i48.transformed (tr)));
+      icons_for_bjt[i].addPixmap (QPixmap::fromImage (i32.transformed (tr)));
+      icons_for_bjt[i].addPixmap (QPixmap::fromImage (i24.transformed (tr)));
+      icons_for_bjt[i].addPixmap (QPixmap::fromImage (i16.transformed (tr)));
+      tr.rotate (90.0);
+    }
+  }
+  if (icons_for_mos[0].isNull ()) {
+    QImage i48 (QString::fromUtf8 (":/images/icon_device_mos_48.png"));
+    QImage i32 (QString::fromUtf8 (":/images/icon_device_mos_32.png"));
+    QImage i24 (QString::fromUtf8 (":/images/icon_device_mos_24.png"));
+    QImage i16 (QString::fromUtf8 (":/images/icon_device_mos_16.png"));
+    QTransform tr;
+    for (size_t i = 0; i < sizeof (icons_for_mos) / sizeof (icons_for_mos [0]); ++i) {
+      icons_for_mos[i].addPixmap (QPixmap::fromImage (i48.transformed (tr)));
+      icons_for_mos[i].addPixmap (QPixmap::fromImage (i32.transformed (tr)));
+      icons_for_mos[i].addPixmap (QPixmap::fromImage (i24.transformed (tr)));
+      icons_for_mos[i].addPixmap (QPixmap::fromImage (i16.transformed (tr)));
+      tr.rotate (90.0);
+    }
+  }
+
+  //  TODO: generic device ...
+  if (dynamic_cast<const db::DeviceClassResistor *> (dc)) {
+    return icon_for_res;
+  } else if (dynamic_cast<const db::DeviceClassInductor *> (dc)) {
+    return icon_for_ind;
+  } else if (dynamic_cast<const db::DeviceClassCapacitor *> (dc)) {
+    return icon_for_cap;
+  } else if (dynamic_cast<const db::DeviceClassDiode *> (dc)) {
+    return icons_for_diode [term_id >= sizeof (icons_for_diode) / sizeof (icons_for_diode [0]) ? sizeof (icons_for_diode) / sizeof (icons_for_diode [0]) - 1 : term_id];
+  } else if (dynamic_cast<const db::DeviceClassBJT3Transistor *> (dc) || dynamic_cast<const db::DeviceClassBJT4Transistor *> (dc)) {
+    return icons_for_bjt [term_id >= sizeof (icons_for_bjt) / sizeof (icons_for_bjt [0]) ? sizeof (icons_for_bjt) / sizeof (icons_for_bjt [0]) - 1 : term_id];
+  } else if (dynamic_cast<const db::DeviceClassMOS3Transistor *> (dc) || dynamic_cast<const db::DeviceClassMOS4Transistor *> (dc)) {
+    return icons_for_mos [term_id >= sizeof (icons_for_mos) / sizeof (icons_for_mos [0]) ? sizeof (icons_for_mos) / sizeof (icons_for_mos [0]) - 1 : term_id];
+  } else {
+    return icons_for_mos [0];
+  }
 }
 
 static QIcon icon_for_devices (const std::pair<const db::DeviceClass *, const db::DeviceClass *> &device_classes)
@@ -603,13 +687,35 @@ static QIcon icon_for_devices (const std::pair<const db::DeviceClass *, const db
   return icon_for_device (device_classes.first ? device_classes.first : device_classes.second);
 }
 
+static QIcon icon_for_devices (const std::pair<const db::DeviceClass *, const db::DeviceClass *> &device_classes,
+                               const std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> &terminal_defs)
+{
+  return icon_for_device (device_classes.first ? device_classes.first : device_classes.second, terminal_defs.first ? terminal_defs.first->id () : (terminal_defs.second ? terminal_defs.second->id () : 0));
+}
+
 static QIcon icon_for_circuit ()
 {
-  QIcon icon;
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_circuit_48.png")));
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_circuit_32.png")));
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_circuit_24.png")));
-  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_circuit_16.png")));
+  static QIcon icon;
+  if (icon.isNull ()) {
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_circuit_48.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_circuit_32.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_circuit_24.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_circuit_16.png")));
+  }
+  return icon;
+}
+
+static QIcon icon_for_subcircuit ()
+{
+  static QIcon icon;
+  if (icon.isNull ()) {
+    QTransform tr;
+    tr.rotate (90.0);
+    icon.addPixmap (QPixmap::fromImage (QImage (QString::fromUtf8 (":/images/icon_circuit_48.png"))).transformed (tr));
+    icon.addPixmap (QPixmap::fromImage (QImage (QString::fromUtf8 (":/images/icon_circuit_32.png"))).transformed (tr));
+    icon.addPixmap (QPixmap::fromImage (QImage (QString::fromUtf8 (":/images/icon_circuit_24.png"))).transformed (tr));
+    icon.addPixmap (QPixmap::fromImage (QImage (QString::fromUtf8 (":/images/icon_circuit_16.png"))).transformed (tr));
+  }
   return icon;
 }
 
@@ -812,7 +918,7 @@ public:
     return p->pp ();
   }
 
-  virtual std::pair<const db::Net *, const db::Net *> nets ()
+  virtual std::pair<const db::Net *, const db::Net *> nets_of_this ()
   {
     return m_np;
   }
@@ -841,7 +947,7 @@ public:
     return m_np;
   }
 
-  virtual std::pair<const db::Net *, const db::Net *> nets ()
+  virtual std::pair<const db::Net *, const db::Net *> nets_of_this ()
   {
     return m_np;
   }
@@ -896,7 +1002,7 @@ class CircuitNetDeviceTerminalOthersItemData
   : public NetlistModelItemData
 {
 public:
-  CircuitNetDeviceTerminalOthersItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_pair &np, const std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> &tp);
+  CircuitNetDeviceTerminalOthersItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_pair &np, const std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> &tp, bool is_self);
 
   virtual void do_ensure_children (NetlistBrowserModel *);
   virtual QIcon icon (NetlistBrowserModel *model);
@@ -911,7 +1017,7 @@ public:
     return p->dp ();
   }
 
-  virtual std::pair<const db::Net *, const db::Net *> nets ()
+  virtual std::pair<const db::Net *, const db::Net *> nets_of_this ()
   {
     return m_np;
   }
@@ -919,6 +1025,7 @@ public:
 private:
   std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> m_tp;
   IndexedNetlistModel::net_pair m_np;
+  bool m_net_seen;
 };
 
 // ----------------------------------------------------------------------------------
@@ -973,7 +1080,7 @@ class CircuitNetSubCircuitPinOthersItemData
   : public NetlistModelItemData
 {
 public:
-  CircuitNetSubCircuitPinOthersItemData (NetlistModelItemData *parent, const IndexedNetlistModel::pin_pair &pp);
+  CircuitNetSubCircuitPinOthersItemData (NetlistModelItemData *parent, const IndexedNetlistModel::pin_pair &pp, bool is_self);
 
   virtual void do_ensure_children (NetlistBrowserModel *);
   virtual QIcon icon (NetlistBrowserModel *model);
@@ -1001,6 +1108,7 @@ public:
 
 private:
   IndexedNetlistModel::pin_pair m_pp;
+  bool m_net_seen;
 };
 
 // ----------------------------------------------------------------------------------
@@ -1218,9 +1326,32 @@ NetlistModelItemData::subcircuits ()
 }
 
 std::pair<const db::Net *, const db::Net *>
+NetlistModelItemData::nets_of_this ()
+{
+  return std::pair<const db::Net *, const db::Net *> (0, 0);
+}
+
+std::pair<const db::Net *, const db::Net *>
 NetlistModelItemData::nets ()
 {
-  return mp_parent ? mp_parent->nets () : std::pair<const db::Net *, const db::Net *> (0, 0);
+  std::pair<const db::Net *, const db::Net *> r = nets_of_this ();
+  if (! mp_parent || r.first || r.second) {
+    return r;
+  } else {
+    return mp_parent->nets ();
+  }
+}
+
+bool
+NetlistModelItemData::derived_from_nets (const std::pair<const db::Net *, const db::Net *> &np)
+{
+  if (nets_of_this () == np) {
+    return true;
+  } else if (mp_parent) {
+    return mp_parent->derived_from_nets (np);
+  } else {
+    return false;
+  }
 }
 
 // ----------------------------------------------------------------------------------
@@ -1683,14 +1814,14 @@ CircuitNetDeviceTerminalItemData::CircuitNetDeviceTerminalItemData (NetlistModel
 { }
 
 void
-CircuitNetDeviceTerminalItemData::do_ensure_children (NetlistBrowserModel * /*model*/)
+CircuitNetDeviceTerminalItemData::do_ensure_children (NetlistBrowserModel *model)
 {
   size_t n = std::max (rows_for (m_tp.first), rows_for (m_tp.second));
   for (size_t i = 0; i < n; ++i) {
     std::pair<const db::DeviceClass *, const db::DeviceClass *> device_classes = device_classes_from_devices (dp ());
-    std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> termdefs = terminal_defs_from_device_classes (device_classes, i);
+    std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> termdefs = terminal_defs_from_device_classes (model->indexer (), device_classes, dp (), i);
     IndexedNetlistModel::net_pair nets = nets_from_device_terminals (dp (), termdefs);
-    push_back (new CircuitNetDeviceTerminalOthersItemData (this, nets, termdefs));
+    push_back (new CircuitNetDeviceTerminalOthersItemData (this, nets, termdefs, derived_from_nets (nets)));
   }
 }
 
@@ -1698,7 +1829,7 @@ QIcon
 CircuitNetDeviceTerminalItemData::icon (NetlistBrowserModel * /*model*/)
 {
   std::pair<const db::DeviceClass *, const db::DeviceClass *> device_classes = device_classes_from_devices (dp ());
-  return icon_for_devices (device_classes);
+  return icon_for_devices (device_classes, terminal_defs_from_terminal_refs (m_tp));
 }
 
 QString
@@ -1744,14 +1875,16 @@ CircuitNetDeviceTerminalItemData::status (NetlistBrowserModel *model)
 
 // ----------------------------------------------------------------------------------
 
-CircuitNetDeviceTerminalOthersItemData::CircuitNetDeviceTerminalOthersItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_pair &np, const std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> &tp)
-  : NetlistModelItemData (parent), m_tp (tp), m_np (np)
+CircuitNetDeviceTerminalOthersItemData::CircuitNetDeviceTerminalOthersItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_pair &np, const std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> &tp, bool net_seen)
+  : NetlistModelItemData (parent), m_tp (tp), m_np (np), m_net_seen (net_seen)
 { }
 
 void
 CircuitNetDeviceTerminalOthersItemData::do_ensure_children (NetlistBrowserModel *)
 {
-  //  nothing (leaf node)
+  if (! m_net_seen) {
+    push_back (new CircuitNetItemData (this, nets_from_device_terminals (dp (), m_tp)));
+  }
 }
 
 QIcon
@@ -1766,7 +1899,7 @@ CircuitNetDeviceTerminalOthersItemData::text (int column, NetlistBrowserModel *m
   //  circuit/net/device terminal/more: header column = terminal name, second column = net link
   if (column == model->object_column ()) {
 
-    return escaped (str_from_names (m_tp, model->indexer ()->is_single ()));
+    return escaped (str_from_names (m_tp, model->indexer ()->is_single ())) + (m_net_seen ? tr (" (already seen)") : QString ());
 
   } else if (column == model->first_column () || column == model->second_column ()) {
 
@@ -1817,14 +1950,15 @@ CircuitNetSubCircuitPinItemData::do_ensure_children (NetlistBrowserModel *model)
   size_t n = model->indexer ()->pin_count (circuit_refs);
   for (size_t i = 0; i < n; ++i) {
     IndexedNetlistModel::pin_pair pp = model->indexer ()->pin_from_index (circuit_refs, i).first;
-    push_back (new CircuitNetSubCircuitPinOthersItemData (this, pp));
+    bool is_seen = derived_from_nets (nets_from_subcircuit_pins (subcircuits, pp));
+    push_back (new CircuitNetSubCircuitPinOthersItemData (this, pp, is_seen));
   }
 }
 
 QIcon
 CircuitNetSubCircuitPinItemData::icon (NetlistBrowserModel * /*model*/)
 {
-  return icon_for_pin ();
+  return icon_for_subcircuit ();
 }
 
 QString
@@ -1867,14 +2001,19 @@ CircuitNetSubCircuitPinItemData::status (NetlistBrowserModel *model)
 
 // ----------------------------------------------------------------------------------
 
-CircuitNetSubCircuitPinOthersItemData::CircuitNetSubCircuitPinOthersItemData (NetlistModelItemData *parent, const IndexedNetlistModel::pin_pair &pp)
-  : NetlistModelItemData (parent), m_pp (pp)
+CircuitNetSubCircuitPinOthersItemData::CircuitNetSubCircuitPinOthersItemData (NetlistModelItemData *parent, const IndexedNetlistModel::pin_pair &pp, bool net_seen)
+  : NetlistModelItemData (parent), m_pp (pp), m_net_seen (net_seen)
 { }
 
 void
 CircuitNetSubCircuitPinOthersItemData::do_ensure_children (NetlistBrowserModel *)
 {
-  //  nothing (leaf node)
+  if (! m_net_seen) {
+    IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (sp ());
+    IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (subcircuits);
+    IndexedNetlistModel::net_pair nets = nets_from_circuit_pins (circuit_refs, m_pp);
+    push_back (new CircuitNetItemData (this, nets));
+  }
 }
 
 QIcon
@@ -1892,7 +2031,7 @@ CircuitNetSubCircuitPinOthersItemData::text (int column, NetlistBrowserModel *mo
   IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (subcircuits);
 
   if (column == model->object_column ()) {
-    return model->make_link_to (m_pp, circuit_refs);
+    return model->make_link_to (m_pp, circuit_refs) + (m_net_seen ? tr (" (already seen)") : QString ());
   } else if (column == model->first_column () || column == model->second_column ()) {
     return model->make_link_to (nets_from_subcircuit_pins (subcircuits, m_pp), column);
   }
@@ -2056,7 +2195,8 @@ CircuitSubCircuitPinItemData::CircuitSubCircuitPinItemData (NetlistModelItemData
 void
 CircuitSubCircuitPinItemData::do_ensure_children (NetlistBrowserModel *)
 {
-  //  nothing (leaf node)
+  IndexedNetlistModel::net_pair nets = nets_from_subcircuit_pins (sp (), m_pp);
+  push_back (new CircuitNetItemData (this, nets));
 }
 
 QIcon
@@ -2132,11 +2272,11 @@ CircuitDeviceItemData::CircuitDeviceItemData (NetlistModelItemData *parent, cons
 { }
 
 void
-CircuitDeviceItemData::do_ensure_children (NetlistBrowserModel * /*model*/)
+CircuitDeviceItemData::do_ensure_children (NetlistBrowserModel *model)
 {
   size_t n = std::max (rows_for (dp ().first), rows_for (dp ().second));
   for (size_t i = 0; i < n; ++i) {
-    std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> tp = terminal_defs_from_device_classes (device_classes_from_devices (dp ()), i);
+    std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> tp = terminal_defs_from_device_classes (model->indexer (), device_classes_from_devices (dp ()), dp (), i);
     push_back (new CircuitDeviceTerminalItemData (this, tp));
   }
 }
@@ -2205,7 +2345,8 @@ CircuitDeviceTerminalItemData::CircuitDeviceTerminalItemData (NetlistModelItemDa
 void
 CircuitDeviceTerminalItemData::do_ensure_children (NetlistBrowserModel *)
 {
-  //  nothing (leaf node)
+  IndexedNetlistModel::net_pair nets = nets_from_device_terminals (dp (), m_tp);
+  push_back (new CircuitNetItemData (this, nets));
 }
 
 QIcon
@@ -2846,6 +2987,8 @@ NetlistBrowserModel::rowCount (const QModelIndex &parent) const
   if (d) {
     d->ensure_children (const_cast<NetlistBrowserModel *> (this));
     return int (d->child_count ());
+  } else {
+    return 0;
   }
 }
 

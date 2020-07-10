@@ -142,7 +142,8 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
   QAction *sep;
   directory_tree->addAction (m_show_all_action);
   directory_tree->addAction (actionCollapseAll);
-  directory_tree->addAction (actionExpandAll);
+  //  TODO: this gives a too big tree - confine to single branches?
+  //  directory_tree->addAction (actionExpandAll);
   sep = new QAction (directory_tree);
   sep->setSeparator (true);
   directory_tree->addAction (sep);

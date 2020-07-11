@@ -359,13 +359,15 @@ void NetlistCrossReferenceModel::ensure_subcircuit_data_built () const
 
         for (size_t i = 0; i < sc_pair.first->circuit_ref ()->pin_count (); ++i) {
           const db::NetSubcircuitPinRef *n1 = sc_pair.first->netref_for_pin (i);
-          const db::NetSubcircuitPinRef *n2 = 0;
-          std::multimap<const db::Net *, const db::NetSubcircuitPinRef *>::iterator m = first_net_to_other_netref.find (n1->net ());
-          if (m != first_net_to_other_netref.end () && m->first == n1->net ()) {
-            n2 = m->second;
-            first_net_to_other_netref.erase (m);
+          if (n1) {
+            const db::NetSubcircuitPinRef *n2 = 0;
+            std::multimap<const db::Net *, const db::NetSubcircuitPinRef *>::iterator m = first_net_to_other_netref.find (n1->net ());
+            if (m != first_net_to_other_netref.end () && m->first == n1->net ()) {
+              n2 = m->second;
+              first_net_to_other_netref.erase (m);
+            }
+            sc_data.nets_per_pins.push_back (std::make_pair (n1, n2));
           }
-          sc_data.nets_per_pins.push_back (std::make_pair (n1, n2));
         }
 
         std::sort (sc_data.nets_per_pins.begin (), sc_data.nets_per_pins.end (), CompareNetRefsByPins ());

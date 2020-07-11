@@ -228,7 +228,7 @@ private:
   unsigned int m_cv_index;
   lay::Dispatcher *mp_plugin_root;
   tl::weak_ptr<db::LayoutToNetlist> mp_database;
-  std::vector<void *> m_history;
+  std::vector<QModelIndex> m_history;
   size_t m_history_ptr;
   bool m_signals_enabled;
   std::vector <lay::Marker *> mp_markers;
@@ -244,8 +244,8 @@ private:
   db::ContextCache m_cell_context_cache;
 
   void setup_trees ();
-  void add_to_history (void *id, bool fwd);
-  void navigate_to (void *id, bool forward = true);
+  void add_to_history (const QModelIndex &index, bool fwd);
+  void navigate_to (const QModelIndex &index, bool forward = true);
   void adjust_view ();
   void clear_markers ();
   void highlight (const std::vector<const db::Net *> &nets, const std::vector<const db::Device *> &devices, const std::vector<const db::SubCircuit *> &subcircuits, const std::vector<const db::Circuit *> &circuits);

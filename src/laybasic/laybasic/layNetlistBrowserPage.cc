@@ -307,21 +307,10 @@ NetlistBrowserPage::layer_list_changed (int)
 void
 NetlistBrowserPage::anchor_clicked (const QString &a)
 {
-  QUrl url (a);
-
-  QString ids;
-#if QT_VERSION >= 0x050000
-  ids = QUrlQuery (url.query ()).queryItemValue (QString::fromUtf8 ("id"));
-#else
-  ids = url.queryItemValue (QString::fromUtf8 ("id"));
-#endif
-
-  if (ids.isEmpty ()) {
-    return;
+  NetlistBrowserModel *netlist_model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+  if (netlist_model) {
+    navigate_to (netlist_model->index_from_url (a), true);
   }
-
-  void *id = reinterpret_cast<void *> (ids.toULongLong ());
-  navigate_to (id, true);
 }
 
 void
@@ -356,8 +345,7 @@ NetlistBrowserPage::current_index_changed (const QModelIndex &index)
       return;
     }
 
-    void *id = index.internalPointer ();
-    add_to_history (id, true);
+    add_to_history (index, true);
 
     std::pair<const db::Circuit *, const db::Circuit *> circuits = netlist_model->circuit_from_index (index);
     QModelIndex circuit_index = tree_model->index_from_circuits (circuits);
@@ -519,16 +507,8 @@ NetlistBrowserPage::select_color_for_net ()
 }
 
 void
-NetlistBrowserPage::navigate_to (void *id, bool fwd)
+NetlistBrowserPage::navigate_to (const QModelIndex &index, bool fwd)
 {
-#if 0 // @@@
-  NetlistBrowserTreeModel *tree_model = dynamic_cast<NetlistBrowserTreeModel *> (hierarchy_tree->model ());
-  NetlistBrowserModel *netlist_model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
-  if (! tree_model || ! netlist_model) {
-    return;
-  }
-
-  QModelIndex index = netlist_model->index_from_id (id, 0);
   if (! index.isValid ()) {
     return;
   }
@@ -538,36 +518,43 @@ NetlistBrowserPage::navigate_to (void *id, bool fwd)
 
     directory_tree->setCurrentIndex (index);
 
+    NetlistBrowserTreeModel *tree_model = dynamic_cast<NetlistBrowserTreeModel *> (hierarchy_tree->model ());
+    NetlistBrowserModel *netlist_model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+    if (! tree_model || ! netlist_model) {
+      return;
+    }
+
+    //  @@@ with path!
     std::pair<const db::Circuit *, const db::Circuit *> circuits = netlist_model->circuit_from_index (index);
     QModelIndex circuit_index = tree_model->index_from_circuits (circuits);
     hierarchy_tree->setCurrentIndex (circuit_index);
 
   } catch (...) {
   }
+
   m_signals_enabled = true;
 
-  add_to_history (id, fwd);
+  add_to_history (index, fwd);
 
   selection_changed ();
-#endif
 }
 
 void
-NetlistBrowserPage::add_to_history (void *id, bool fwd)
+NetlistBrowserPage::add_to_history (const QModelIndex &index, bool fwd)
 {
   if (! fwd) {
     if (m_history_ptr > 1) {
       --m_history_ptr;
-      m_history [m_history_ptr - 1] = id;
+      m_history [m_history_ptr - 1] = index;
     }
   } else if (m_history_ptr >= m_history.size ()) {
-    m_history.push_back (id);
+    m_history.push_back (index);
     m_history_ptr = m_history.size ();
   } else {
-    if (m_history [m_history_ptr] != id) {
+    if (m_history [m_history_ptr] != index) {
       m_history.erase (m_history.begin () + m_history_ptr + 1, m_history.end ());
     }
-    m_history [m_history_ptr] = id;
+    m_history [m_history_ptr] = index;
     ++m_history_ptr;
   }
 
@@ -733,7 +720,7 @@ NetlistBrowserPage::find_button_pressed ()
 
   QModelIndex next = find_next (directory_tree, directory_tree->model (), re, directory_tree->currentIndex ());
   if (next.isValid ()) {
-    navigate_to (next.internalPointer ());
+    navigate_to (next);
   }
 }
 

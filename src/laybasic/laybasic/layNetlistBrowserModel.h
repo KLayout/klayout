@@ -229,16 +229,16 @@ public:
     return mp_indexer.get ();
   }
 
-  std::pair<const db::Net *, const db::Net *> net_from_index (const QModelIndex &index);
-  QModelIndex index_from_net (const std::pair<const db::Net *, const db::Net *> &net);
-  QModelIndex index_from_net (const db::Net *net);
-  std::pair<const db::Circuit *, const db::Circuit *> circuit_from_index (const QModelIndex &index);
-  QModelIndex index_from_circuit (const std::pair<const db::Circuit *, const db::Circuit *> &circuit);
-  QModelIndex index_from_circuit (const db::Circuit *circuit);
+  std::pair<const db::Net *, const db::Net *> net_from_index (const QModelIndex &index) const;
+  QModelIndex index_from_net (const std::pair<const db::Net *, const db::Net *> &net) const;
+  QModelIndex index_from_net (const db::Net *net) const;
+  std::pair<const db::Circuit *, const db::Circuit *> circuit_from_index (const QModelIndex &index) const;
+  QModelIndex index_from_circuit (const std::pair<const db::Circuit *, const db::Circuit *> &circuit) const;
+  QModelIndex index_from_circuit (const db::Circuit *circuit) const;
 
-  std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuit_from_index (const QModelIndex &index);
+  std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuit_from_index (const QModelIndex &index) const;
 
-  std::pair<const db::Device *, const db::Device *> device_from_index (const QModelIndex &index);
+  std::pair<const db::Device *, const db::Device *> device_from_index (const QModelIndex &index) const;
 
   void set_item_visibility (QTreeView *view, bool show_all, bool with_warnings);
 
@@ -253,6 +253,8 @@ public:
   QIcon icon_for_nets (const std::pair<const db::Net *, const db::Net *> &net) const;
   QIcon icon_for_connection (const std::pair<const db::Net *, const db::Net *> &net) const;
 
+  QModelIndex index_from_url (const QString &url);
+
 private slots:
   void colors_changed ();
 
@@ -265,6 +267,7 @@ private:
   QString search_text (const QModelIndex &index) const;
   db::NetlistCrossReference::Status status (const QModelIndex &index) const;
   QIcon icon (const QModelIndex &index) const;
+  QString build_url (const QModelIndex &index, const std::string &title) const;
 
   std::pair<const db::Netlist *, const db::Netlist *> netlists () const
   {
@@ -285,7 +288,7 @@ private:
   int m_second_column;
   std::auto_ptr<NetlistModelItemData> mp_root;
 
-  RootItemData *root ();
+  RootItemData *root () const;
 };
 
 } // namespace lay

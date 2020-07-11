@@ -1903,7 +1903,10 @@ void
 CircuitNetDeviceTerminalOthersItemData::do_ensure_children (NetlistBrowserModel *)
 {
   if (! m_net_seen) {
-    push_back (new CircuitNetItemData (this, nets_from_device_terminals (dp (), m_tp)));
+    IndexedNetlistModel::net_pair nets = nets_from_device_terminals (dp (), m_tp);
+    if (nets.first || nets.second) {
+      push_back (new CircuitNetItemData (this, nets));
+    }
   }
 }
 
@@ -2028,7 +2031,10 @@ void
 CircuitNetSubCircuitPinOthersItemData::do_ensure_children (NetlistBrowserModel *)
 {
   if (! m_net_seen) {
-    push_back (new CircuitNetItemData (this, nets_from_pinrefs (pp ())));
+    IndexedNetlistModel::net_pair nets = nets_from_pinrefs (pp ());
+    if (nets.first || nets.second) {
+      push_back (new CircuitNetItemData (this, nets));
+    }
   }
 }
 
@@ -2205,7 +2211,9 @@ void
 CircuitSubCircuitPinItemData::do_ensure_children (NetlistBrowserModel *)
 {
   IndexedNetlistModel::net_pair nets = nets_from_pinrefs (m_pp);
-  push_back (new CircuitNetItemData (this, nets));
+  if (nets.first || nets.second) {
+    push_back (new CircuitNetItemData (this, nets));
+  }
 }
 
 QIcon

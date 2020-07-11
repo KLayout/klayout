@@ -198,6 +198,8 @@ private:
   mutable std::map<pin_pair, size_t> m_pin_index_by_object;
   mutable std::map<subcircuit_pair, size_t> m_subcircuit_index_by_object;
   mutable std::map<device_pair, size_t> m_device_index_by_object;
+  mutable std::map<subcircuit_pair, std::vector<net_subcircuit_pin_pair> > m_subcircuit_pins_by_index;
+  mutable std::list<db::NetSubcircuitPinRef> m_synthetic_pinrefs;
 };
 
 }

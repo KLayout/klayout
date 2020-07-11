@@ -69,7 +69,7 @@ inline const db::Circuit *deref_circuit (const db::Circuit *obj)
 }
 
 template <class Obj>
-static db::ICplxTrans
+static db::DCplxTrans
 trans_for (const Obj *objs, const db::Layout &ly, const db::Cell &cell, db::ContextCache &cc, const db::DCplxTrans &initial = db::DCplxTrans ())
 {
   db::DCplxTrans t = initial;
@@ -89,7 +89,6 @@ trans_for (const Obj *objs, const db::Layout &ly, const db::Cell &cell, db::Cont
   }
 
   db::CplxTrans dbu_trans (ly.dbu ());
-  db::ICplxTrans it = dbu_trans.inverted () * t * dbu_trans;
 
   //  The circuit may not be instantiated and still not be the top cell.
   //  This happens if the subcell does not have connections. In this case
@@ -98,11 +97,11 @@ trans_for (const Obj *objs, const db::Layout &ly, const db::Cell &cell, db::Cont
   if (circuit && ly.is_valid_cell_index (circuit->cell_index ())) {
     std::pair<bool, db::ICplxTrans> tc = cc.find_layout_context (circuit->cell_index (), cell.cell_index ());
     if (tc.first) {
-      it = tc.second * it;
+      t = dbu_trans * tc.second * dbu_trans.inverted () * t;
     }
   }
 
-  return it;
+  return t;
 }
 
 NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
@@ -456,18 +455,11 @@ NetlistBrowserPage::selected_devices ()
 void
 NetlistBrowserPage::selection_changed ()
 {
-  std::vector<const db::Net *> nets = selected_nets ();
-  if (mp_info_dialog) {
-    mp_info_dialog->set_nets (mp_database.get (), nets);
-  }
+  NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+  tl_assert (model != 0);
 
-  std::vector<const db::Device *> devices = selected_devices ();
-
-  std::vector<const db::SubCircuit *> subcircuits = selected_subcircuits ();
-
-  std::vector<const db::Circuit *> circuits = selected_circuits ();
-
-  highlight (nets, devices, subcircuits, circuits);
+  QModelIndex current = directory_tree->selectionModel ()->currentIndex ();
+  highlight (model->netpath_from_index (current));
 }
 
 void
@@ -882,21 +874,15 @@ NetlistBrowserPage::setup_trees ()
 }
 
 void
-NetlistBrowserPage::highlight (const std::vector<const db::Net *> &nets, const std::vector<const db::Device *> &devices, const std::vector<const db::SubCircuit *> &subcircuits, const std::vector<const db::Circuit *> &circuits)
+NetlistBrowserPage::highlight (const NetlistObjectPath &path)
 {
-  if (nets != m_current_nets || devices != m_current_devices || subcircuits != m_current_subcircuits || circuits != m_current_circuits) {
+  if (path != m_current_path) {
 
-    m_current_nets = nets;
-    m_current_devices = devices;
-    m_current_subcircuits = subcircuits;
-    m_current_circuits = circuits;
+    m_current_path = path;
 
     clear_markers ();
-
-    if (! nets.empty () || ! devices.empty () || ! subcircuits.empty () || ! circuits.empty ()) {
-      adjust_view ();
-      update_highlights ();
-    }
+    adjust_view ();
+    update_highlights ();
 
     selection_changed ();
 
@@ -926,7 +912,8 @@ bbox_for_device_abstract (const db::Layout *layout, const db::DeviceAbstract *de
     return db::Box ();
   }
 
-  return layout->cell (device_abstract->cell_index ()).bbox ().transformed (db::CplxTrans (layout->dbu ()).inverted () * trans * db::CplxTrans (layout->dbu ()));}
+  return layout->cell (device_abstract->cell_index ()).bbox ().transformed (db::CplxTrans (layout->dbu ()).inverted () * trans * db::CplxTrans (layout->dbu ()));
+}
 
 static db::Box
 bbox_for_circuit (const db::Layout *layout, const db::Circuit *circuit)
@@ -941,12 +928,6 @@ bbox_for_circuit (const db::Layout *layout, const db::Circuit *circuit)
   }
 
   return layout->cell (circuit->cell_index ()).bbox ();
-}
-
-static db::Box
-bbox_for_subcircuit (const db::Layout *layout, const db::SubCircuit *subcircuit)
-{
-  return bbox_for_circuit (layout, subcircuit->circuit_ref ());
 }
 
 void
@@ -971,51 +952,67 @@ NetlistBrowserPage::adjust_view ()
     return;
   }
 
+  const db::Circuit *circuit = m_current_path.root.first;
+  db::DCplxTrans trans;
 
-  db::Box bbox;
+  if (circuit) {
 
-  for (std::vector<const db::Net *>::const_iterator net = m_current_nets.begin (); net != m_current_nets.end (); ++net) {
+    trans = trans_for (circuit, *layout, *cell, m_cell_context_cache, db::DCplxTrans ());
 
-    db::ICplxTrans net_trans = trans_for (*net, *layout, *cell, m_cell_context_cache);
+    for (std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *> >::const_iterator p = m_current_path.path.begin (); p != m_current_path.path.end () && circuit; ++p) {
+      if (p->first) {
+        circuit = p->first->circuit_ref ();
+        trans = trans * p->first->trans ();
+      } else {
+        circuit = 0;
+      }
+    }
 
-    db::cell_index_type cell_index = (*net)->circuit ()->cell_index ();
-    size_t cluster_id = (*net)->cluster_id ();
+  }
 
-    const db::Connectivity &conn = mp_database->connectivity ();
-    for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+  db::DBox bbox;
 
-      db::Box layer_bbox;
-      db::recursive_cluster_shape_iterator<db::NetShape> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
-      while (! shapes.at_end ()) {
-        layer_bbox += shapes->bbox ();
-        ++shapes;
+  if (circuit) {
+
+    db::Box ebox;
+
+    const db::Device *device = m_current_path.device.first;
+    const db::Net *net = m_current_path.net.first;
+
+    if (device) {
+
+      ebox += bbox_for_device_abstract (layout, device->device_abstract (), db::DCplxTrans ());
+
+      const std::vector<db::DeviceAbstractRef> &oda = device->other_abstracts ();
+      for (std::vector<db::DeviceAbstractRef>::const_iterator a = oda.begin (); a != oda.end (); ++a) {
+        ebox += bbox_for_device_abstract (layout, a->device_abstract, a->trans);
       }
 
-      bbox += net_trans * layer_bbox;
+    } else if (net) {
 
+      db::cell_index_type cell_index = net->circuit ()->cell_index ();
+      size_t cluster_id = net->cluster_id ();
+
+      const db::Connectivity &conn = mp_database->connectivity ();
+      for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+
+        db::Box layer_bbox;
+        db::recursive_cluster_shape_iterator<db::NetShape> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
+        while (! shapes.at_end ()) {
+          layer_bbox += shapes->bbox ();
+          ++shapes;
+        }
+
+        ebox += layer_bbox;
+
+      }
+
+    } else if (circuit) {
+      ebox += bbox_for_circuit (layout, circuit);
     }
 
-  }
+    bbox = trans * db::CplxTrans (layout->dbu ()) * ebox;
 
-  for (std::vector<const db::Device *>::const_iterator device = m_current_devices.begin (); device != m_current_devices.end (); ++device) {
-
-    db::ICplxTrans trans = trans_for (*device, *layout, *cell, m_cell_context_cache, (*device)->trans ());
-
-    bbox += trans * bbox_for_device_abstract (layout, (*device)->device_abstract (), db::DCplxTrans ());
-
-    const std::vector<db::DeviceAbstractRef> &oda = (*device)->other_abstracts ();
-    for (std::vector<db::DeviceAbstractRef>::const_iterator a = oda.begin (); a != oda.end (); ++a) {
-      bbox += trans * bbox_for_device_abstract (layout, a->device_abstract, a->trans);
-    }
-
-  }
-
-  for (std::vector<const db::SubCircuit *>::const_iterator subcircuit = m_current_subcircuits.begin (); subcircuit != m_current_subcircuits.end (); ++subcircuit) {
-    bbox += trans_for (*subcircuit, *layout, *cell, m_cell_context_cache, (*subcircuit)->trans ()) * bbox_for_subcircuit (layout, *subcircuit);
-  }
-
-  for (std::vector<const db::Circuit *>::const_iterator circuit = m_current_circuits.begin (); circuit != m_current_circuits.end (); ++circuit) {
-    bbox += trans_for (*circuit, *layout, *cell, m_cell_context_cache, db::DCplxTrans ()) * bbox_for_circuit (layout, *circuit);
   }
 
   if (! bbox.empty ()) {
@@ -1023,9 +1020,8 @@ NetlistBrowserPage::adjust_view ()
     std::vector<db::DCplxTrans> tv = mp_view->cv_transform_variants (m_cv_index);
 
     db::DBox tv_bbox;
-    db::DBox dbu_bbox = db::CplxTrans (layout->dbu ()) * bbox;
     for (std::vector<db::DCplxTrans>::const_iterator t = tv.begin (); t != tv.end (); ++t) {
-      tv_bbox += *t * dbu_bbox;
+      tv_bbox += *t * bbox;
     }
 
     if (m_window == lay::NetlistBrowserConfig::FitNet) {
@@ -1063,12 +1059,10 @@ bool
 NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, size_t &n_markers, const std::vector<db::DCplxTrans> &tv)
 {
   const db::Layout *layout = mp_database->internal_layout ();
-  const db::Cell *cell = mp_database->internal_top_cell ();
-  db::ICplxTrans device_trans = trans_for (device, *layout, *cell, m_cell_context_cache, device->trans ());
 
   QColor color = make_valid_color (m_colorizer.marker_color ());
 
-  db::Box device_bbox = bbox_for_device_abstract (layout, device->device_abstract (), db::DCplxTrans ());
+  db::Box device_bbox = bbox_for_device_abstract (layout, device->device_abstract (), device->trans ());
   if (! device_bbox.empty ()) {
 
     if (n_markers == m_max_shape_count) {
@@ -1078,7 +1072,7 @@ NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, siz
     ++n_markers;
 
     mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
-    mp_markers.back ()->set (device_bbox, device_trans, tv);
+    mp_markers.back ()->set (device_bbox, db::ICplxTrans (), tv);
     mp_markers.back ()->set_color (color);
     mp_markers.back ()->set_frame_color (color);
     configure_marker (mp_markers.back (), false);
@@ -1088,7 +1082,7 @@ NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, siz
   const std::vector<db::DeviceAbstractRef> &oda = device->other_abstracts ();
   for (std::vector<db::DeviceAbstractRef>::const_iterator a = oda.begin (); a != oda.end (); ++a) {
 
-    db::Box da_box = bbox_for_device_abstract (layout, a->device_abstract, a->trans);
+    db::Box da_box = bbox_for_device_abstract (layout, a->device_abstract, device->trans () * a->trans);
     if (! da_box.empty ()) {
 
       if (n_markers == m_max_shape_count) {
@@ -1098,7 +1092,7 @@ NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, siz
       ++n_markers;
 
       mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
-      mp_markers.back ()->set (da_box, device_trans, tv);
+      mp_markers.back ()->set (da_box, db::ICplxTrans (), tv);
       mp_markers.back ()->set_color (color);
       mp_markers.back ()->set_frame_color (color);
       configure_marker (mp_markers.back (), false);
@@ -1111,39 +1105,9 @@ NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, siz
 }
 
 bool
-NetlistBrowserPage::produce_highlights_for_subcircuit (const db::SubCircuit *subcircuit, size_t &n_markers, const std::vector<db::DCplxTrans> &tv)
-{
-  const db::Layout *layout = mp_database->internal_layout ();
-  const db::Cell *cell = mp_database->internal_top_cell ();
-  db::ICplxTrans subcircuit_trans = trans_for (subcircuit, *layout, *cell, m_cell_context_cache, subcircuit->trans ());
-
-  QColor color = make_valid_color (m_colorizer.marker_color ());
-  db::Box circuit_bbox = bbox_for_subcircuit (layout, subcircuit);
-  if (circuit_bbox.empty ()) {
-    return false;
-  }
-
-  if (n_markers == m_max_shape_count) {
-    return true;
-  }
-
-  ++n_markers;
-
-  mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
-  mp_markers.back ()->set (circuit_bbox, subcircuit_trans, tv);
-  mp_markers.back ()->set_color (color);
-  mp_markers.back ()->set_frame_color (color);
-  configure_marker (mp_markers.back (), false);
-
-  return false;
-}
-
-bool
 NetlistBrowserPage::produce_highlights_for_circuit (const db::Circuit *circuit, size_t &n_markers, const std::vector<db::DCplxTrans> &tv)
 {
   const db::Layout *layout = mp_database->internal_layout ();
-  const db::Cell *cell = mp_database->internal_top_cell ();
-  db::ICplxTrans circuit_trans = trans_for (circuit, *layout, *cell, m_cell_context_cache, db::DCplxTrans ());
 
   QColor color = make_valid_color (m_colorizer.marker_color ());
   db::Box circuit_bbox = bbox_for_circuit (layout, circuit);
@@ -1158,7 +1122,7 @@ NetlistBrowserPage::produce_highlights_for_circuit (const db::Circuit *circuit, 
   ++n_markers;
 
   mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
-  mp_markers.back ()->set (circuit_bbox, circuit_trans, tv);
+  mp_markers.back ()->set (circuit_bbox, db::ICplxTrans (), tv);
   mp_markers.back ()->set_color (color);
   mp_markers.back ()->set_frame_color (color);
   configure_marker (mp_markers.back (), false);
@@ -1170,8 +1134,6 @@ bool
 NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_markers, const std::map<db::LayerProperties, lay::LayerPropertiesConstIterator> &display_by_lp, const std::vector<db::DCplxTrans> &tv)
 {
   const db::Layout *layout = mp_database->internal_layout ();
-  const db::Cell *cell = mp_database->internal_top_cell ();
-  db::ICplxTrans net_trans = trans_for (net, *layout, *cell, m_cell_context_cache);
 
   db::cell_index_type cell_index = net->circuit ()->cell_index ();
   size_t cluster_id = net->cluster_id ();
@@ -1197,7 +1159,7 @@ NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_ma
       }
 
       mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
-      mp_markers.back ()->set (shapes->polygon_ref (), net_trans * shapes.trans (), tv);
+      mp_markers.back ()->set (shapes->polygon_ref (), shapes.trans (), tv);
 
       if (net_color.isValid ()) {
 
@@ -1272,8 +1234,29 @@ NetlistBrowserPage::update_highlights ()
   const db::Layout &original_layout = mp_view->cellview (m_cv_index)->layout ();
 
   const db::Layout *layout = mp_database->internal_layout ();
-  if (! layout) {
+  const db::Cell *cell = mp_database->internal_top_cell ();
+  if (! layout || ! cell) {
     return;
+  }
+
+  //  compute the transformation supplied by the path
+
+  const db::Circuit *circuit = m_current_path.root.first;
+  db::DCplxTrans trans;
+
+  if (circuit) {
+
+    trans = trans_for (circuit, *layout, *cell, m_cell_context_cache, db::DCplxTrans ());
+
+    for (std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *> >::const_iterator p = m_current_path.path.begin (); p != m_current_path.path.end () && circuit; ++p) {
+      if (p->first) {
+        circuit = p->first->circuit_ref ();
+        trans = trans * p->first->trans ();
+      } else {
+        circuit = 0;
+      }
+    }
+
   }
 
   //  a map of display properties vs. layer properties
@@ -1289,32 +1272,18 @@ NetlistBrowserPage::update_highlights ()
 
   //  correct DBU differences between the storage layout and the original layout
   for (std::vector<db::DCplxTrans>::iterator t = tv.begin (); t != tv.end (); ++t) {
-    *t = *t * db::DCplxTrans (layout->dbu () / original_layout.dbu ());
+    *t = *t * trans * db::DCplxTrans (layout->dbu () / original_layout.dbu ());
   }
 
   size_t n_markers = 0;
   bool not_all_shapes_are_shown = false;
 
-  for (std::vector<const db::Net *>::const_iterator net = m_current_nets.begin (); net != m_current_nets.end () && ! not_all_shapes_are_shown; ++net) {
-    if ((*net)->circuit ()) {
-      not_all_shapes_are_shown = produce_highlights_for_net (*net, n_markers, display_by_lp, tv);
-    }
-  }
-
-  for (std::vector<const db::Device *>::const_iterator device = m_current_devices.begin (); device != m_current_devices.end () && ! not_all_shapes_are_shown; ++device) {
-    if ((*device)->circuit ()) {
-      not_all_shapes_are_shown = produce_highlights_for_device (*device, n_markers, tv);
-    }
-  }
-
-  for (std::vector<const db::SubCircuit *>::const_iterator subcircuit = m_current_subcircuits.begin (); subcircuit != m_current_subcircuits.end () && ! not_all_shapes_are_shown; ++subcircuit) {
-    if ((*subcircuit)->circuit ()) {
-      not_all_shapes_are_shown = produce_highlights_for_subcircuit (*subcircuit, n_markers, tv);
-    }
-  }
-
-  for (std::vector<const db::Circuit *>::const_iterator circuit = m_current_circuits.begin (); circuit != m_current_circuits.end () && ! not_all_shapes_are_shown; ++circuit) {
-    not_all_shapes_are_shown = produce_highlights_for_circuit (*circuit, n_markers, tv);
+  if (m_current_path.net.first) {
+    not_all_shapes_are_shown = produce_highlights_for_net (m_current_path.net.first, n_markers, display_by_lp, tv);
+  } else if (m_current_path.device.first) {
+    not_all_shapes_are_shown = produce_highlights_for_device (m_current_path.device.first, n_markers, tv);
+  } else if (circuit) {
+    not_all_shapes_are_shown = produce_highlights_for_circuit (circuit, n_markers, tv);
   }
 
   if (not_all_shapes_are_shown) {

@@ -234,6 +234,9 @@ private:
   std::vector <lay::Marker *> mp_markers;
   bool m_enable_updates;
   bool m_update_needed;
+  //  @@@ TODO: make multiple ...
+  lay::NetlistObjectPath m_current_path;
+  //  @@@ TODO: remove
   std::vector<const db::Net *> m_current_nets;
   std::vector<const db::Device *> m_current_devices;
   std::vector<const db::SubCircuit *> m_current_subcircuits;
@@ -248,7 +251,7 @@ private:
   void navigate_to (const QModelIndex &index, bool forward = true);
   void adjust_view ();
   void clear_markers ();
-  void highlight (const std::vector<const db::Net *> &nets, const std::vector<const db::Device *> &devices, const std::vector<const db::SubCircuit *> &subcircuits, const std::vector<const db::Circuit *> &circuits);
+  void highlight (const lay::NetlistObjectPath &path);
   std::vector<const db::Net *> selected_nets ();
   std::vector<const db::Device *> selected_devices ();
   std::vector<const db::SubCircuit *> selected_subcircuits ();
@@ -258,7 +261,6 @@ private:
   QColor make_valid_color (const QColor &color);
   bool produce_highlights_for_net(const db::Net *net, size_t &n_markers, const std::map<db::LayerProperties, lay::LayerPropertiesConstIterator> &display_by_lp, const std::vector<db::DCplxTrans> &tv);
   bool produce_highlights_for_device (const db::Device *device, size_t &n_markers, const std::vector<db::DCplxTrans> &tv);
-  bool produce_highlights_for_subcircuit (const db::SubCircuit *subcircuit, size_t &n_markers, const std::vector<db::DCplxTrans> &tv);
   bool produce_highlights_for_circuit (const db::Circuit *circuit, size_t &n_markers, const std::vector<db::DCplxTrans> &tv);
   void configure_marker (lay::Marker *marker, bool with_fill);
   void rerun_macro ();

@@ -123,8 +123,8 @@ TEST (1)
 
   QModelIndex inv2PinOutIndexNet = model->index (0, 0, inv2PinOutIndex);
   EXPECT_EQ (model->parent (inv2PinOutIndexNet) == inv2PinOutIndex, true);
-  EXPECT_EQ (model->hasChildren (inv2PinOutIndexNet), false);
-  EXPECT_EQ (model->rowCount (inv2PinOutIndexNet), 0);
+  EXPECT_EQ (model->hasChildren (inv2PinOutIndexNet), true);
+  EXPECT_EQ (model->rowCount (inv2PinOutIndexNet), 3);
 
   //  NOUT net has 1 pin, 2 devices, 0 subcircuits
   QModelIndex inv2NOutIndex = model->index (1, 0, model->index (1, 0, inv2Index));
@@ -206,11 +206,12 @@ TEST (1)
   QModelIndex ringoSubcircuit1Index = model->index (0, 0, sn_subcircuits);
   EXPECT_EQ (model->parent (ringoSubcircuit1Index) == sn_subcircuits, true);
   EXPECT_EQ (model->hasChildren (ringoSubcircuit1Index), true);
-  EXPECT_EQ (model->rowCount (ringoSubcircuit1Index), 5);
+  EXPECT_EQ (model->rowCount (ringoSubcircuit1Index), 6);
 
   EXPECT_EQ (tl::to_string (model->data (model->index (2, 0, ringoSubcircuit1Index), Qt::UserRole).toString ()), "OUT");
   EXPECT_EQ (tl::to_string (model->data (model->index (2, 0, ringoSubcircuit1Index), Qt::DisplayRole).toString ()), "OUT");
   EXPECT_EQ (tl::to_string (model->data (model->index (2, 2, ringoSubcircuit1Index), Qt::DisplayRole).toString ()), "");
+  EXPECT_EQ (tl::to_string (model->data (model->index (5, 0, ringoSubcircuit1Index), Qt::DisplayRole).toString ()), "INV2");
 
   QModelIndex ringoSubcircuit1OutPinIndex = model->index (2, 0, ringoSubcircuit1Index);
   EXPECT_EQ (model->parent (ringoSubcircuit1OutPinIndex) == ringoSubcircuit1Index, true);
@@ -287,7 +288,7 @@ TEST (2)
   //  INV2, pin 0 has one net node
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2Pin0Index), Qt::UserRole).toString ()), "$1|1");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2Pin0Index), Qt::DisplayRole).toString ()), "$1 ⇔ 1");
-  EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, inv2Pin0Index), Qt::DisplayRole).toString ()), "<a href='int:netlist?path=1,1,0'>$1</a>");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, inv2Pin0Index), Qt::DisplayRole).toString ()), "$1 (2)");
   std::pair<const db::Net *, const db::Net *> nets = model->net_from_index (model->index (0, 0, inv2Pin0Index));
   EXPECT_EQ (nets.first != 0, true);
   if (nets.first != 0) {
@@ -297,7 +298,7 @@ TEST (2)
   if (nets.second != 0) {
     EXPECT_EQ (nets.second->expanded_name (), "1");
   }
-  EXPECT_EQ (tl::to_string (model->data (model->index (0, 3, inv2Pin0Index), Qt::DisplayRole).toString ()), "<a href='int:netlist?path=1,1,0'>1</a>");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 3, inv2Pin0Index), Qt::DisplayRole).toString ()), "1 (2)");
 
   //  first of nets in INV2 circuit
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, sn_nets), Qt::UserRole).toString ()), "$1|1");
@@ -421,4 +422,60 @@ TEST (2)
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2PairNet0SubCircuit0Index), Qt::DisplayRole).toString ()), "$0 ⇔ -");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, inv2PairNet0SubCircuit0Index), Qt::DisplayRole).toString ()), "<a href='int:netlist?path=2,1,5'>$7</a>");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 3, inv2PairNet0SubCircuit0Index), Qt::DisplayRole).toString ()), "");
+}
+
+TEST (3)
+{
+  db::LayoutToNetlist l2n;
+  l2n.load (tl::testsrc () + "/testdata/lay/l2n_browser.l2n");
+
+  lay::NetColorizer colorizer;
+  std::auto_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &l2n, &colorizer));
+
+  db::Circuit *root = l2n.netlist ()->circuit_by_name ("RINGO");
+  EXPECT_EQ (root != 0, true);
+
+  lay::NetlistObjectPath path;
+  EXPECT_EQ (model->index_from_netpath (path).isValid (), false);
+
+  path.root.first = root;
+
+  db::Net *net = root->net_by_name ("FB");
+  EXPECT_EQ (net != 0, true);
+
+  path.net.first = net;
+
+  QModelIndex index = model->index_from_netpath (path);
+  EXPECT_EQ (index.isValid (), true);
+
+  EXPECT_EQ (tl::to_string (model->data (index, Qt::UserRole).toString ()), "FB");
+}
+
+TEST (4)
+{
+  db::LayoutToNetlist l2n;
+  l2n.load (tl::testsrc () + "/testdata/lay/l2n_browser.l2n");
+
+  lay::NetColorizer colorizer;
+  std::auto_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &l2n, &colorizer));
+
+  db::Circuit *root = l2n.netlist ()->circuit_by_name ("RINGO");
+  EXPECT_EQ (root != 0, true);
+
+  lay::NetlistObjectPath path;
+  path.root.first = root;
+
+  db::SubCircuit *sc1 = root->begin_subcircuits ().operator-> ();
+  EXPECT_EQ (sc1 != 0, true);
+  path.path.push_back (std::make_pair (sc1, (db::SubCircuit *) 0));
+
+  db::Net *net = sc1->circuit_ref ()->net_by_name ("NOUT");
+  EXPECT_EQ (net != 0, true);
+
+  path.net.first = net;
+
+  QModelIndex index = model->index_from_netpath (path);
+  EXPECT_EQ (index.isValid (), true);
+
+  EXPECT_EQ (tl::to_string (model->data (index, Qt::UserRole).toString ()), "NOUT");
 }

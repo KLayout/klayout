@@ -146,12 +146,23 @@ public:
 
   NetlistModelItemData *child (size_t n);
 
-  virtual std::pair<const db::Circuit *, const db::Circuit *> circuits ();
-  virtual std::pair<const db::Device *, const db::Device *> devices ();
-  virtual std::pair<const db::Pin *, const db::Pin *> pins ();
-  virtual std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuits ();
-  virtual std::pair<const db::Net *, const db::Net *> nets_of_this ();
+  virtual std::pair<const db::Circuit *, const db::Circuit *> circuits_of_this ();
+  std::pair<const db::Circuit *, const db::Circuit *> circuits ();
+  bool derived_from_circuits (const std::pair<const db::Circuit *, const db::Circuit *> &sp);
 
+  virtual std::pair<const db::Device *, const db::Device *> devices_of_this ();
+  std::pair<const db::Device *, const db::Device *> devices ();
+  bool derived_from_devices (const std::pair<const db::Device *, const db::Device *> &sp);
+
+  virtual std::pair<const db::Pin *, const db::Pin *> pins_of_this ();
+  std::pair<const db::Pin *, const db::Pin *> pins ();
+  bool derived_from_pins (const std::pair<const db::Pin *, const db::Pin *> &sp);
+
+  virtual std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuits_of_this ();
+  std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuits ();
+  bool derived_from_subcircuits (const std::pair<const db::SubCircuit *, const db::SubCircuit *> &sp);
+
+  virtual std::pair<const db::Net *, const db::Net *> nets_of_this ();
   std::pair<const db::Net *, const db::Net *> nets ();
   bool derived_from_nets (const std::pair<const db::Net *, const db::Net *> &np);
 
@@ -165,6 +176,29 @@ private:
   void set_index (size_t index) { m_index = index; }
 
   virtual void do_ensure_children (NetlistBrowserModel *model) = 0;
+};
+
+/**
+ *  @brief An object describing the instantiation path of a net
+ */
+struct LAYBASIC_PUBLIC NetlistObjectPath
+{
+  NetlistObjectPath () { }
+
+  bool operator== (const NetlistObjectPath &other) const
+  {
+    return root == other.root && path == other.path && net == other.net && device == other.device;
+  }
+
+  bool operator!= (const NetlistObjectPath &other) const
+  {
+    return ! operator== (other);
+  }
+
+  std::pair<const db::Circuit *, const db::Circuit *> root;
+  std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *> > path;
+  std::pair<const db::Net *, const db::Net *> net;
+  std::pair<const db::Device *, const db::Device *> device;
 };
 
 /**
@@ -229,16 +263,17 @@ public:
     return mp_indexer.get ();
   }
 
-  std::pair<const db::Net *, const db::Net *> net_from_index (const QModelIndex &index) const;
+  std::pair<const db::Net *, const db::Net *> net_from_index (const QModelIndex &index, bool include_parents = true) const;
   QModelIndex index_from_net (const std::pair<const db::Net *, const db::Net *> &net) const;
   QModelIndex index_from_net (const db::Net *net) const;
-  std::pair<const db::Circuit *, const db::Circuit *> circuit_from_index (const QModelIndex &index) const;
+  std::pair<const db::Circuit *, const db::Circuit *> circuit_from_index (const QModelIndex &index, bool include_parents = true) const;
   QModelIndex index_from_circuit (const std::pair<const db::Circuit *, const db::Circuit *> &circuit) const;
   QModelIndex index_from_circuit (const db::Circuit *circuit) const;
+  QModelIndex index_from_subcircuit (const std::pair<const db::SubCircuit *, const db::SubCircuit *> &subcircuits) const;
 
-  std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuit_from_index (const QModelIndex &index) const;
+  std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuit_from_index (const QModelIndex &index, bool include_parents = true) const;
 
-  std::pair<const db::Device *, const db::Device *> device_from_index (const QModelIndex &index) const;
+  std::pair<const db::Device *, const db::Device *> device_from_index (const QModelIndex &index, bool include_parents = true) const;
 
   void set_item_visibility (QTreeView *view, bool show_all, bool with_warnings);
 
@@ -253,7 +288,9 @@ public:
   QIcon icon_for_nets (const std::pair<const db::Net *, const db::Net *> &net) const;
   QIcon icon_for_connection (const std::pair<const db::Net *, const db::Net *> &net) const;
 
-  QModelIndex index_from_url (const QString &url);
+  QModelIndex index_from_url (const QString &url) const;
+  NetlistObjectPath netpath_from_index (const QModelIndex &index) const;
+  QModelIndex index_from_netpath (const NetlistObjectPath &path);
 
 private slots:
   void colors_changed ();

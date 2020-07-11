@@ -355,6 +355,20 @@ IndexedNetlistModel::subcircuit_pair subcircuits_from_pinrefs (const IndexedNetl
 }
 
 static
+IndexedNetlistModel::net_pair nets_from_pinrefs (const IndexedNetlistModel::net_subcircuit_pin_pair &pinrefs)
+{
+  const db::Net *net1 = 0, *net2 = 0;
+  if (pinrefs.first) {
+    net1 = pinrefs.first->net ();
+  }
+  if (pinrefs.second) {
+    net2 = pinrefs.second->net ();
+  }
+
+  return std::make_pair (net1, net2);
+}
+
+static
 IndexedNetlistModel::device_pair devices_from_termrefs (const IndexedNetlistModel::net_terminal_pair &termrefs)
 {
   const db::Device *device1 = 0, *device2 = 0;
@@ -391,6 +405,20 @@ IndexedNetlistModel::pin_pair pins_from_pinrefs (const IndexedNetlistModel::net_
   }
   if (pinrefs.second) {
     pin2 = pinrefs.second->pin ();
+  }
+
+  return std::make_pair (pin1, pin2);
+}
+
+static
+IndexedNetlistModel::pin_pair pins_from_netrefs (const IndexedNetlistModel::net_subcircuit_pin_pair &netrefs)
+{
+  const db::Pin *pin1 = 0, *pin2 = 0;
+  if (netrefs.first) {
+    pin1 = netrefs.first->pin ();
+  }
+  if (netrefs.second) {
+    pin2 = netrefs.second->pin ();
   }
 
   return std::make_pair (pin1, pin2);
@@ -1080,7 +1108,7 @@ class CircuitNetSubCircuitPinOthersItemData
   : public NetlistModelItemData
 {
 public:
-  CircuitNetSubCircuitPinOthersItemData (NetlistModelItemData *parent, const IndexedNetlistModel::pin_pair &pp, bool is_self);
+  CircuitNetSubCircuitPinOthersItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_subcircuit_pin_pair &pp, bool is_self);
 
   virtual void do_ensure_children (NetlistBrowserModel *);
   virtual QIcon icon (NetlistBrowserModel *model);
@@ -1089,25 +1117,18 @@ public:
   virtual std::string tooltip (NetlistBrowserModel * /*model*/);
   virtual db::NetlistCrossReference::Status status (NetlistBrowserModel * /*model*/);
 
-  IndexedNetlistModel::pin_pair pp ()
-  {
-    CircuitNetSubCircuitPinItemData *p = static_cast<CircuitNetSubCircuitPinItemData *> (parent ());
-    return p->pp ();
-  }
-
-  const IndexedNetlistModel::net_subcircuit_pin_pair &sp ()
-  {
-    CircuitNetSubCircuitPinItemData *p = static_cast<CircuitNetSubCircuitPinItemData *> (parent ());
-    return p->sp ();
-  }
-
-  virtual std::pair<const db::Pin *, const db::Pin *> pins ()
+  const IndexedNetlistModel::net_subcircuit_pin_pair &pp ()
   {
     return m_pp;
   }
 
+  virtual std::pair<const db::Pin *, const db::Pin *> pins ()
+  {
+    return std::pair<const db::Pin *, const db::Pin *> (pins_from_netrefs (m_pp));
+  }
+
 private:
-  IndexedNetlistModel::pin_pair m_pp;
+  IndexedNetlistModel::net_subcircuit_pin_pair m_pp;
   bool m_net_seen;
 };
 
@@ -1170,7 +1191,7 @@ class CircuitSubCircuitPinItemData
   : public NetlistModelItemData
 {
 public:
-  CircuitSubCircuitPinItemData (NetlistModelItemData *parent, const IndexedNetlistModel::pin_pair &pp);
+  CircuitSubCircuitPinItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_subcircuit_pin_pair &pp);
 
   virtual void do_ensure_children (NetlistBrowserModel *);
   virtual QIcon icon (NetlistBrowserModel *model);
@@ -1179,19 +1200,18 @@ public:
   virtual std::string tooltip (NetlistBrowserModel *model);
   virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model);
 
-  const IndexedNetlistModel::subcircuit_pair &sp ()
+  IndexedNetlistModel::subcircuit_pair sp ()
   {
-    CircuitSubCircuitItemData *p = static_cast<CircuitSubCircuitItemData *> (parent ());
-    return p->sp ();
+    return subcircuits_from_pinrefs (m_pp);
   }
 
   virtual std::pair<const db::Pin *, const db::Pin *> pins ()
   {
-    return m_pp;
+    return pins_from_netrefs (m_pp);
   }
 
 private:
-  IndexedNetlistModel::pin_pair m_pp;
+  IndexedNetlistModel::net_subcircuit_pin_pair m_pp;
 };
 
 // ----------------------------------------------------------------------------------
@@ -1945,12 +1965,11 @@ void
 CircuitNetSubCircuitPinItemData::do_ensure_children (NetlistBrowserModel *model)
 {
   IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (sp ());
-  IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (subcircuits);
 
-  size_t n = model->indexer ()->pin_count (circuit_refs);
+  size_t n = model->indexer ()->subcircuit_pin_count (subcircuits);
   for (size_t i = 0; i < n; ++i) {
-    IndexedNetlistModel::pin_pair pp = model->indexer ()->pin_from_index (circuit_refs, i).first;
-    bool is_seen = derived_from_nets (nets_from_subcircuit_pins (subcircuits, pp));
+    IndexedNetlistModel::net_subcircuit_pin_pair pp = model->indexer ()->subcircuit_pinref_from_index (subcircuits, i);
+    bool is_seen = derived_from_nets (nets_from_pinrefs (pp));
     push_back (new CircuitNetSubCircuitPinOthersItemData (this, pp, is_seen));
   }
 }
@@ -2001,7 +2020,7 @@ CircuitNetSubCircuitPinItemData::status (NetlistBrowserModel *model)
 
 // ----------------------------------------------------------------------------------
 
-CircuitNetSubCircuitPinOthersItemData::CircuitNetSubCircuitPinOthersItemData (NetlistModelItemData *parent, const IndexedNetlistModel::pin_pair &pp, bool net_seen)
+CircuitNetSubCircuitPinOthersItemData::CircuitNetSubCircuitPinOthersItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_subcircuit_pin_pair &pp, bool net_seen)
   : NetlistModelItemData (parent), m_pp (pp), m_net_seen (net_seen)
 { }
 
@@ -2009,31 +2028,27 @@ void
 CircuitNetSubCircuitPinOthersItemData::do_ensure_children (NetlistBrowserModel *)
 {
   if (! m_net_seen) {
-    IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (sp ());
-    IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (subcircuits);
-    IndexedNetlistModel::net_pair nets = nets_from_circuit_pins (circuit_refs, m_pp);
-    push_back (new CircuitNetItemData (this, nets));
+    push_back (new CircuitNetItemData (this, nets_from_pinrefs (pp ())));
   }
 }
 
 QIcon
 CircuitNetSubCircuitPinOthersItemData::icon (NetlistBrowserModel *model)
 {
-  IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (sp ());
-  return model->icon_for_connection (nets_from_subcircuit_pins (subcircuits, m_pp));
+  return model->icon_for_connection (nets_from_pinrefs (pp ()));
 }
 
 QString
 CircuitNetSubCircuitPinOthersItemData::text (int column, NetlistBrowserModel *model)
 {
   //  circuit/net/device terminal/more: header column = pin name, second column = net link
-  IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (sp ());
+  IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (pp ());
   IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (subcircuits);
 
   if (column == model->object_column ()) {
-    return model->make_link_to (m_pp, circuit_refs) + (m_net_seen ? tr (" (already seen)") : QString ());
+    return model->make_link_to (pins (), circuit_refs) + (m_net_seen ? tr (" (already seen)") : QString ());
   } else if (column == model->first_column () || column == model->second_column ()) {
-    return model->make_link_to (nets_from_subcircuit_pins (subcircuits, m_pp), column);
+    return model->make_link_to (nets_from_pinrefs (pp ()), column);
   }
 
   return QString ();
@@ -2042,19 +2057,15 @@ CircuitNetSubCircuitPinOthersItemData::text (int column, NetlistBrowserModel *mo
 QString
 CircuitNetSubCircuitPinOthersItemData::search_text ()
 {
-  IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (sp ());
-  IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (subcircuits);
-  IndexedNetlistModel::net_pair nets = nets_from_circuit_pins (circuit_refs, m_pp);
-  return tl::to_qstring (combine_search_strings (search_string_from_names (m_pp), search_string_from_expanded_names (nets)));
+  return tl::to_qstring (combine_search_strings (search_string_from_names (pins ()), search_string_from_expanded_names (nets_from_pinrefs (pp ()))));
 }
 
 std::string
 CircuitNetSubCircuitPinOthersItemData::tooltip (NetlistBrowserModel *model)
 {
-  IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (sp ());
   std::string hint;
 
-  if (! model->is_valid_net_pair (nets_from_subcircuit_pins (subcircuits, m_pp))) {
+  if (! model->is_valid_net_pair (nets_from_pinrefs (pp ()))) {
     //  This indicates a wrong connection: the nets are associated in a way which is a not
     //  corresponding to a mapped net pair. Report Mismatch here.
     hint = rewire_subcircuit_pins_status_hint ();
@@ -2066,8 +2077,7 @@ CircuitNetSubCircuitPinOthersItemData::tooltip (NetlistBrowserModel *model)
 db::NetlistCrossReference::Status
 CircuitNetSubCircuitPinOthersItemData::status (NetlistBrowserModel *model)
 {
-  IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (sp ());
-  if (! model->is_valid_net_pair (nets_from_subcircuit_pins (subcircuits, m_pp))) {
+  if (! model->is_valid_net_pair (nets_from_pinrefs (pp ()))) {
     //  This indicates a wrong connection: the nets are associated in a way which is a not
     //  corresponding to a mapped net pair. Report Mismatch here.
     return db::NetlistCrossReference::NoMatch;
@@ -2135,10 +2145,9 @@ CircuitSubCircuitItemData::CircuitSubCircuitItemData (NetlistModelItemData *pare
 void
 CircuitSubCircuitItemData::do_ensure_children (NetlistBrowserModel *model)
 {
-  size_t n = std::max (rows_for (sp ().first), rows_for (sp ().second));
-  IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (sp ());
+  size_t n = model->indexer ()->subcircuit_pin_count (sp ());
   for (size_t i = 0; i < n; ++i) {
-    IndexedNetlistModel::pin_pair pp = model->indexer ()->pin_from_index (circuit_refs, i).first;
+    IndexedNetlistModel::net_subcircuit_pin_pair pp = model->indexer ()->subcircuit_pinref_from_index (sp (), i);
     push_back (new CircuitSubCircuitPinItemData (this, pp));
   }
 }
@@ -2188,14 +2197,14 @@ CircuitSubCircuitItemData::status (NetlistBrowserModel *model)
 
 // ----------------------------------------------------------------------------------
 
-CircuitSubCircuitPinItemData::CircuitSubCircuitPinItemData (NetlistModelItemData *parent, const IndexedNetlistModel::pin_pair &pp)
+CircuitSubCircuitPinItemData::CircuitSubCircuitPinItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_subcircuit_pin_pair &pp)
   : NetlistModelItemData (parent), m_pp (pp)
 { }
 
 void
 CircuitSubCircuitPinItemData::do_ensure_children (NetlistBrowserModel *)
 {
-  IndexedNetlistModel::net_pair nets = nets_from_subcircuit_pins (sp (), m_pp);
+  IndexedNetlistModel::net_pair nets = nets_from_pinrefs (m_pp);
   push_back (new CircuitNetItemData (this, nets));
 }
 
@@ -2208,13 +2217,10 @@ CircuitSubCircuitPinItemData::icon (NetlistBrowserModel * /*model*/)
 QString
 CircuitSubCircuitPinItemData::text (int column, NetlistBrowserModel *model)
 {
-  //  circuit/pin: header column = pin name, other columns net name
-  const IndexedNetlistModel::subcircuit_pair &sp = static_cast<CircuitSubCircuitItemData *> (parent ())->sp ();
-
   if (column == model->object_column ()) {
-    return model->make_link_to (m_pp, circuit_refs_from_subcircuits (sp));
+    return model->make_link_to (pins (), circuit_refs_from_subcircuits (sp ()));
   } else if (column == model->first_column () || column == model->second_column ()) {
-    return model->make_link_to (nets_from_subcircuit_pins (sp, m_pp), column);
+    return model->make_link_to (nets_from_pinrefs (m_pp), column);
   }
 
   return QString ();
@@ -2223,23 +2229,17 @@ CircuitSubCircuitPinItemData::text (int column, NetlistBrowserModel *model)
 QString
 CircuitSubCircuitPinItemData::search_text ()
 {
-  IndexedNetlistModel::net_pair nets = nets_from_subcircuit_pins (sp (), m_pp);
-  return tl::to_qstring (combine_search_strings (search_string_from_names (m_pp), search_string_from_expanded_names (nets)));
+  return tl::to_qstring (combine_search_strings (search_string_from_names (pins ()), search_string_from_expanded_names (nets_from_pinrefs (m_pp))));
 }
 
 std::string
 CircuitSubCircuitPinItemData::tooltip (NetlistBrowserModel *model)
 {
-  IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (sp ());
+  std::string hint;
 
-  std::string hint = model->indexer ()->pin_status_hint (circuit_refs, model->indexer ()->pin_index (m_pp, circuit_refs));
-  if (hint.empty ()) {
-
-    //  Another test here is to check whether the pins may be attached to an invalid net pair
-    if (! model->is_valid_net_pair (nets_from_subcircuit_pins (sp (), m_pp))) {
-      hint = rewire_subcircuit_pins_status_hint ();
-    }
-
+  //  Check whether the pins may be attached to an invalid net pair
+  if (! model->is_valid_net_pair (nets_from_pinrefs (m_pp))) {
+    hint = rewire_subcircuit_pins_status_hint ();
   }
 
   return hint;
@@ -2248,15 +2248,7 @@ CircuitSubCircuitPinItemData::tooltip (NetlistBrowserModel *model)
 db::NetlistCrossReference::Status
 CircuitSubCircuitPinItemData::status (NetlistBrowserModel *model)
 {
-  IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (sp ());
-
-  db::NetlistCrossReference::Status status = model->indexer ()->pin_from_index (circuit_refs, model->indexer ()->pin_index (m_pp, circuit_refs)).second;
-  if (status == db::NetlistCrossReference::Mismatch || status == db::NetlistCrossReference::NoMatch) {
-    return status;
-  }
-
-  //  Another test here is to check whether the pins may be attached to an invalid net pair
-  if (! model->is_valid_net_pair (nets_from_subcircuit_pins (sp (), m_pp))) {
+  if (! model->is_valid_net_pair (nets_from_pinrefs (m_pp))) {
     //  This indicates a wrong connection: the nets are associated in a way which is a not
     //  corresponding to a mapped net pair. Report Mismatch here.
     return db::NetlistCrossReference::NoMatch;

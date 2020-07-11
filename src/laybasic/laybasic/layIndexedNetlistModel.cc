@@ -264,6 +264,12 @@ SingleIndexedNetlistModel::device_count (const circuit_pair &circuits) const
 }
 
 size_t
+SingleIndexedNetlistModel::subcircuit_pin_count (const subcircuit_pair &subcircuits) const
+{
+  return subcircuits.first->circuit_ref ()->pin_count ();
+}
+
+size_t
 SingleIndexedNetlistModel::pin_count (const circuit_pair &circuits) const
 {
   return circuits.first->pin_count ();
@@ -344,6 +350,12 @@ SingleIndexedNetlistModel::net_subcircuit_pinref_from_index (const net_pair &net
 {
   db::Net::const_subcircuit_pin_iterator none;
   return attr_by_object_and_index (nets, index, nets.first->begin_subcircuit_pins (), nets.first->end_subcircuit_pins (), none, none, m_subcircuit_pinref_by_net_and_index, sort_by_pin_name<db::NetSubcircuitPinRef> ());
+}
+
+IndexedNetlistModel::net_subcircuit_pin_pair
+SingleIndexedNetlistModel::subcircuit_pinref_from_index (const subcircuit_pair &subcircuits, size_t index) const
+{
+  return IndexedNetlistModel::net_subcircuit_pin_pair (subcircuits.first->netref_for_pin (index), 0);
 }
 
 IndexedNetlistModel::net_terminal_pair

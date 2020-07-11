@@ -601,6 +601,16 @@ NetlistCrossReference::build_subcircuit_pin_refs (const std::pair<const db::Net 
 
       }
 
+      //  Fallback for swappable pins: match based on the subcircuit alone
+      if (! pb) {
+        std::map<std::pair<const db::SubCircuit *, size_t>, const db::NetSubcircuitPinRef *>::iterator b = s2t_b.lower_bound (std::make_pair (sb, 0));
+        if (b != s2t_b.end () && b->first.first == sb) {
+          pb = b->second;
+          //  remove the entry so we won't find it again
+          s2t_b.erase (b);
+        }
+      }
+
     }
 
     data.subcircuit_pins.push_back (std::make_pair (a->second, pb));

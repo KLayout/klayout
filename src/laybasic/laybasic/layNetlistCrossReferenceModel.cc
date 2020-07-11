@@ -308,6 +308,103 @@ const db::Circuit *NetlistCrossReferenceModel::second_circuit_for (const db::Cir
   return mp_cross_ref->other_circuit_for (first);
 }
 
+namespace {
+
+  struct CompareNetRefsByPins
+  {
+    bool operator () (const std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *> &a,
+                      const std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *> &b)
+    {
+      size_t pin_id1 = a.first ? a.first->pin_id () : (a.second ? a.second->pin_id () : std::numeric_limits<size_t>::max ());
+      size_t pin_id2 = b.first ? b.first->pin_id () : (b.second ? b.second->pin_id () : std::numeric_limits<size_t>::max ());
+      return pin_id1 < pin_id2;
+    }
+  };
+
+}
+
+void NetlistCrossReferenceModel::ensure_subcircuit_data_built () const
+{
+  if (! m_per_subcircuit_data.empty ()) {
+    return;
+  }
+
+  //  Build the net to subcircuit ref table
+  for (db::NetlistCrossReference::circuits_iterator c = mp_cross_ref->begin_circuits (); c != mp_cross_ref->end_circuits (); ++c) {
+
+    const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (*c);
+    if (! data) {
+      continue;
+    }
+
+    for (db::NetlistCrossReference::PerCircuitData::subcircuit_pairs_type::const_iterator sc = data->subcircuits.begin (); sc != data->subcircuits.end (); ++sc) {
+
+      const std::pair<const db::SubCircuit *, const db::SubCircuit *> &sc_pair = sc->pair;
+      if (sc_pair.first && sc_pair.second) {
+
+        PerSubCircuitCacheData &sc_data = m_per_subcircuit_data [sc_pair];
+
+        std::multimap<const db::Net *, const db::NetSubcircuitPinRef *> first_net_to_other_netref;
+        for (size_t i = 0; i < sc_pair.second->circuit_ref ()->pin_count (); ++i) {
+          const db::NetSubcircuitPinRef *n2 = sc_pair.second->netref_for_pin (i);
+          if (n2) {
+            const db::Net *n1 = mp_cross_ref->other_net_for (n2->net ());
+            if (n1) {
+              first_net_to_other_netref.insert (std::make_pair (n1, n2));
+            } else {
+              sc_data.nets_per_pins.push_back (std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *> (0, n2));
+            }
+          }
+        }
+
+        for (size_t i = 0; i < sc_pair.first->circuit_ref ()->pin_count (); ++i) {
+          const db::NetSubcircuitPinRef *n1 = sc_pair.first->netref_for_pin (i);
+          const db::NetSubcircuitPinRef *n2 = 0;
+          std::multimap<const db::Net *, const db::NetSubcircuitPinRef *>::iterator m = first_net_to_other_netref.find (n1->net ());
+          if (m != first_net_to_other_netref.end () && m->first == n1->net ()) {
+            n2 = m->second;
+            first_net_to_other_netref.erase (m);
+          }
+          sc_data.nets_per_pins.push_back (std::make_pair (n1, n2));
+        }
+
+        std::sort (sc_data.nets_per_pins.begin (), sc_data.nets_per_pins.end (), CompareNetRefsByPins ());
+
+      }
+
+    }
+
+  }
+}
+
+size_t NetlistCrossReferenceModel::subcircuit_pin_count (const subcircuit_pair &subcircuits) const
+{
+  ensure_subcircuit_data_built ();
+
+  std::map<std::pair<const db::SubCircuit *, const db::SubCircuit *>, PerSubCircuitCacheData>::const_iterator sc = m_per_subcircuit_data.find (subcircuits);
+  if (sc != m_per_subcircuit_data.end ()) {
+    return sc->second.nets_per_pins.size ();
+  } else {
+    return std::max (subcircuits.first ? subcircuits.first->circuit_ref ()->pin_count () : 0, subcircuits.second ? subcircuits.second->circuit_ref ()->pin_count () : 0);
+  }
+}
+
+IndexedNetlistModel::net_subcircuit_pin_pair NetlistCrossReferenceModel::subcircuit_pinref_from_index (const subcircuit_pair &subcircuits, size_t index) const
+{
+  ensure_subcircuit_data_built ();
+
+  std::map<std::pair<const db::SubCircuit *, const db::SubCircuit *>, PerSubCircuitCacheData>::const_iterator sc = m_per_subcircuit_data.find (subcircuits);
+  if (sc != m_per_subcircuit_data.end ()) {
+    if (index < sc->second.nets_per_pins.size ()) {
+      return sc->second.nets_per_pins [index];
+    } else {
+      return IndexedNetlistModel::net_subcircuit_pin_pair (0, 0);
+    }
+  } else {
+    return IndexedNetlistModel::net_subcircuit_pin_pair (subcircuits.first ? subcircuits.first->netref_for_pin (index) : 0, subcircuits.second ? subcircuits.second->netref_for_pin (index) : 0);
+  }
+}
+
 IndexedNetlistModel::net_subcircuit_pin_pair NetlistCrossReferenceModel::net_subcircuit_pinref_from_index (const net_pair &nets, size_t index) const
 {
   const db::NetlistCrossReference::PerNetData *data = mp_cross_ref->per_net_data_for (nets);

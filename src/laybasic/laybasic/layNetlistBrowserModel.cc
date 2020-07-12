@@ -1101,6 +1101,8 @@ public:
   CircuitPinItemData (NetlistModelItemData *parent, const IndexedNetlistModel::pin_pair &pp);
 
   virtual QIcon icon (NetlistBrowserModel *model);
+  virtual QString text (int column, NetlistBrowserModel *model);
+  virtual QString search_text ();
 
   virtual std::pair<const db::Pin *, const db::Pin *> pins_of_this ()
   {
@@ -1277,12 +1279,14 @@ NetlistModelItemData::circuits ()
 }
 
 bool
-NetlistModelItemData::derived_from_circuits (const std::pair<const db::Circuit *, const db::Circuit *> &sp)
+NetlistModelItemData::derived_from_circuits (const std::pair<const db::Circuit *, const db::Circuit *> &cp)
 {
-  if (circuits_of_this () == sp) {
+  if (! cp.first && ! cp.second) {
+    return false;
+  } else if (circuits_of_this () == cp) {
     return true;
   } else if (mp_parent) {
-    return mp_parent->derived_from_circuits (sp);
+    return mp_parent->derived_from_circuits (cp);
   } else {
     return false;
   }
@@ -1308,7 +1312,9 @@ NetlistModelItemData::devices ()
 bool
 NetlistModelItemData::derived_from_devices (const std::pair<const db::Device *, const db::Device *> &sp)
 {
-  if (devices_of_this () == sp) {
+  if (! sp.first && ! sp.second) {
+    return false;
+  } else if (devices_of_this () == sp) {
     return true;
   } else if (mp_parent) {
     return mp_parent->derived_from_devices (sp);
@@ -1337,7 +1343,9 @@ NetlistModelItemData::pins ()
 bool
 NetlistModelItemData::derived_from_pins (const std::pair<const db::Pin *, const db::Pin *> &sp)
 {
-  if (pins_of_this () == sp) {
+  if (! sp.first && ! sp.second) {
+    return false;
+  } else if (pins_of_this () == sp) {
     return true;
   } else if (mp_parent) {
     return mp_parent->derived_from_pins (sp);
@@ -1366,7 +1374,9 @@ NetlistModelItemData::subcircuits ()
 bool
 NetlistModelItemData::derived_from_subcircuits (const std::pair<const db::SubCircuit *, const db::SubCircuit *> &sp)
 {
-  if (subcircuits_of_this () == sp) {
+  if (! sp.first && ! sp.second) {
+    return false;
+  } else if (subcircuits_of_this () == sp) {
     return true;
   } else if (mp_parent) {
     return mp_parent->derived_from_subcircuits (sp);
@@ -1395,7 +1405,9 @@ NetlistModelItemData::nets ()
 bool
 NetlistModelItemData::derived_from_nets (const std::pair<const db::Net *, const db::Net *> &np)
 {
-  if (nets_of_this () == np) {
+  if (! np.first && ! np.second) {
+    return false;
+  } else if (nets_of_this () == np) {
     return true;
   } else if (mp_parent) {
     return mp_parent->derived_from_nets (np);
@@ -1755,12 +1767,33 @@ CircuitPinItemData::CircuitPinItemData (NetlistModelItemData *parent, const Inde
   : CircuitNetItemData (parent, nets_from_circuit_pins (parent->circuits (), pp)),
     m_pp (pp)
 {
+  //  .. nothing yet ..
 }
 
 QIcon
 CircuitPinItemData::icon (NetlistBrowserModel * /*model*/)
 {
   return icon_for_pin ();
+}
+
+QString
+CircuitPinItemData::text (int column, NetlistBrowserModel *model)
+{
+  if (column == model->object_column ()) {
+    std::string suffix;
+    if (seen ()) {
+      suffix = tl::to_string (tr (" (already seen)"));
+    }
+    return escaped (str_from_expanded_names (m_pp, model->indexer ()->is_single ()) + suffix);
+  } else {
+    return CircuitNetItemData::text (column, model);
+  }
+}
+
+QString
+CircuitPinItemData::search_text ()
+{
+  return tl::to_qstring (combine_search_strings (search_string_from_expanded_names (m_pp), search_string_from_expanded_names (nets ())));
 }
 
 // ----------------------------------------------------------------------------------
@@ -1829,15 +1862,23 @@ CircuitNetItemData::search_text ()
 std::string
 CircuitNetItemData::tooltip (NetlistBrowserModel *model)
 {
-  size_t index = model->indexer ()->net_index (m_np);
-  return model->indexer ()->net_status_hint (circuits (), index);
+  if (m_np.first || m_np.second) {
+    size_t index = model->indexer ()->net_index (m_np);
+    return model->indexer ()->net_status_hint (circuits (), index);
+  } else {
+    return std::string ();
+  }
 }
 
 db::NetlistCrossReference::Status
 CircuitNetItemData::status (NetlistBrowserModel *model)
 {
-  size_t index = model->indexer ()->net_index (m_np);
-  return model->indexer ()->net_from_index (circuits (), index).second;
+  if (m_np.first || m_np.second) {
+    size_t index = model->indexer ()->net_index (m_np);
+    return model->indexer ()->net_from_index (circuits (), index).second;
+  } else {
+    return db::NetlistCrossReference::None;
+  }
 }
 
 // ----------------------------------------------------------------------------------

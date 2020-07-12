@@ -310,15 +310,71 @@ const db::Circuit *NetlistCrossReferenceModel::second_circuit_for (const db::Cir
 
 namespace {
 
-  struct CompareNetRefsByPins
+  //  TODO: borrowed from dbNetlistCrossReference.cc
+
+  static int string_value_compare (const std::string &a, const std::string &b)
   {
-    bool operator () (const std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *> &a,
-                      const std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *> &b)
+    return a == b ? 0 : (a < b ? -1 : 1);
+  }
+
+  template <class Obj>
+  struct by_expanded_name_value_compare
+  {
+    int operator() (const Obj &a, const Obj &b) const
     {
-      size_t pin_id1 = a.first ? a.first->pin_id () : (a.second ? a.second->pin_id () : std::numeric_limits<size_t>::max ());
-      size_t pin_id2 = b.first ? b.first->pin_id () : (b.second ? b.second->pin_id () : std::numeric_limits<size_t>::max ());
-      return pin_id1 < pin_id2;
+      return string_value_compare (a.expanded_name (), b.expanded_name ());
     }
+  };
+
+  template <class Obj> struct net_object_compare;
+
+  template <>
+  struct net_object_compare<db::NetSubcircuitPinRef>
+  {
+    int operator() (const db::NetSubcircuitPinRef &a, const db::NetSubcircuitPinRef &b) const
+    {
+      int ct = by_expanded_name_value_compare<db::SubCircuit> () (*a.subcircuit (), *b.subcircuit ());
+      if (ct == 0) {
+        return by_expanded_name_value_compare<db::Pin> () (*a.pin (), *b.pin ());
+      } else {
+        return ct;
+      }
+    }
+  };
+
+  template <class Obj, class ValueCompare>
+  struct two_pointer_compare
+  {
+    int operator() (const Obj *a, const Obj *b) const
+    {
+      if ((a == 0) != (b == 0)) {
+        return (a == 0) > (b == 0) ? -1 : 1;
+      }
+      if (a != 0) {
+        return ValueCompare () (*a, *b);
+      } else {
+        return 0;
+      }
+    }
+  };
+
+  template <class Obj, class ValueCompare>
+  struct two_pair_compare
+  {
+    bool operator() (const std::pair<const Obj *, const Obj *> &a, const std::pair<const Obj *, const Obj *> &b)
+    {
+      int ct = two_pointer_compare<Obj, ValueCompare> () (a.first, b.first);
+      if (ct != 0) {
+        return ct < 0;
+      }
+      return two_pointer_compare<Obj, ValueCompare> () (a.second, b.second) < 0;
+    }
+  };
+
+  struct SortNetSubCircuitPins
+    : public two_pair_compare<db::NetSubcircuitPinRef, net_object_compare<db::NetSubcircuitPinRef> >
+  {
+    //  .. nothing yet ..
   };
 
 }
@@ -370,7 +426,7 @@ void NetlistCrossReferenceModel::ensure_subcircuit_data_built () const
           }
         }
 
-        std::sort (sc_data.nets_per_pins.begin (), sc_data.nets_per_pins.end (), CompareNetRefsByPins ());
+        std::sort (sc_data.nets_per_pins.begin (), sc_data.nets_per_pins.end (), SortNetSubCircuitPins ());
 
       }
 

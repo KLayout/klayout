@@ -798,11 +798,6 @@ static std::string search_string_from_names (const std::pair<const Obj *, const 
   }
 }
 
-static std::string rewire_subcircuit_pins_status_hint ()
-{
-  return tl::to_string (tr ("Either pins or nets don't form a good pair.\nThis means either pin swapping happens (in this case, the nets will still match)\nor the subcircuit wiring is not correct (you'll see an error on the net)."));
-}
-
 // ----------------------------------------------------------------------------------
 //  item class declarations
 
@@ -1108,36 +1103,6 @@ public:
 
 private:
   IndexedNetlistModel::pin_pair m_pp;
-};
-
-// ----------------------------------------------------------------------------------
-
-//  @@@ TODO: remove?
-class CircuitPinNetItemData
-  : public NetlistModelItemData
-{
-public:
-  CircuitPinNetItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_pair &np);
-
-  virtual void do_ensure_children (NetlistBrowserModel *model);
-  virtual QIcon icon (NetlistBrowserModel *model);
-  virtual QString text (int column, NetlistBrowserModel *model);
-  virtual QString search_text ();
-  virtual std::string tooltip (NetlistBrowserModel *model);
-  virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model);
-
-  IndexedNetlistModel::pin_pair pp ()
-  {
-    return pins ();
-  }
-
-  virtual std::pair<const db::Net *, const db::Net *> nets_of_this ()
-  {
-    return m_np;
-  }
-
-private:
-  IndexedNetlistModel::net_pair m_np;
 };
 
 // ----------------------------------------------------------------------------------
@@ -1790,56 +1755,6 @@ QIcon
 CircuitPinItemData::icon (NetlistBrowserModel * /*model*/)
 {
   return icon_for_pin ();
-}
-
-// ----------------------------------------------------------------------------------
-
-// @@@ remove?
-CircuitPinNetItemData::CircuitPinNetItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_pair &np)
-  : NetlistModelItemData (parent), m_np (np)
-{ }
-
-void
-CircuitPinNetItemData::do_ensure_children (NetlistBrowserModel * /*model*/)
-{
-  //  nothing (leaf node)
-}
-
-QIcon
-CircuitPinNetItemData::icon (NetlistBrowserModel *model)
-{
-  return model->icon_for_connection (m_np);
-}
-
-QString
-CircuitPinNetItemData::text (int column, NetlistBrowserModel *model)
-{
-  //  circuit/pin/net: header column = name, second column link to net
-  if (column == model->object_column ()) {
-    return escaped (str_from_expanded_names (m_np, model->indexer ()->is_single ()));
-  } else if (column == model->first_column () || column == model->second_column ()) {
-    return model->make_link_to (m_np, column);
-  }
-
-  return QString ();
-}
-
-QString
-CircuitPinNetItemData::search_text ()
-{
-  return tl::to_qstring (search_string_from_expanded_names (nets_from_circuit_pins (circuits (), pp ())));
-}
-
-std::string
-CircuitPinNetItemData::tooltip (NetlistBrowserModel * /*model*/)
-{
-  return std::string ();
-}
-
-db::NetlistCrossReference::Status
-CircuitPinNetItemData::status (NetlistBrowserModel * /*model*/)
-{
-  return db::NetlistCrossReference::None;
 }
 
 // ----------------------------------------------------------------------------------

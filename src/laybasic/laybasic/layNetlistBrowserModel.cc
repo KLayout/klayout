@@ -1021,6 +1021,12 @@ public:
     return subcircuits_from_pinrefs (m_sp);
   }
 
+  //  NOTE: this is important as this node acts as parent for nets inside this circuit
+  virtual std::pair<const db::Circuit *, const db::Circuit *> circuits_of_this ()
+  {
+    return circuit_refs_from_subcircuits (subcircuits_of_this ());
+  }
+
   virtual std::pair<const db::Pin *, const db::Pin *> pins_of_this ()
   {
     return m_pp;
@@ -1941,7 +1947,7 @@ CircuitNetDeviceTerminalOthersItemData::search_text ()
 // ----------------------------------------------------------------------------------
 
 CircuitNetSubCircuitPinItemData::CircuitNetSubCircuitPinItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_subcircuit_pin_pair &sp)
-  : NetlistModelItemData (parent), m_sp (sp), m_subcircuit_seen (parent && parent->derived_from_subcircuits (subcircuits ()))
+  : NetlistModelItemData (parent), m_sp (sp), m_subcircuit_seen (parent && parent->derived_from_subcircuits (subcircuits_from_pinrefs (sp)))
 { }
 
 void
@@ -1951,10 +1957,8 @@ CircuitNetSubCircuitPinItemData::do_ensure_children (NetlistBrowserModel *model)
     return;
   }
 
-  IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (sp ());
-  IndexedNetlistModel::circuit_pair circuits = circuit_refs_from_subcircuits (subcircuits);
   IndexedNetlistModel::pin_pair pins = pins_from_pinrefs (m_sp);
-  IndexedNetlistModel::net_pair nets = nets_from_circuit_pins (circuits, pins);
+  IndexedNetlistModel::net_pair nets = nets_from_circuit_pins (circuits (), pins);
 
   //  Because of pin ambiguities the net identity might need to be fixed
   if (nets.first) {
@@ -1974,9 +1978,6 @@ QString
 CircuitNetSubCircuitPinItemData::text (int column, NetlistBrowserModel *model)
 {
   //  circuit/net/pin: header column = pin name, second column empty (for now)
-  IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (sp ());
-  IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (subcircuits);
-
   if (column == model->object_column ()) {
 
     QString suffix;
@@ -1984,10 +1985,10 @@ CircuitNetSubCircuitPinItemData::text (int column, NetlistBrowserModel *model)
       suffix = tr (" (already seen)");
     }
 
-    return model->make_link_to (pp (), circuit_refs) + tl::to_qstring (field_sep) + model->make_link_to (circuit_refs) + suffix;
+    return model->make_link_to (pp (), circuits ()) + tl::to_qstring (field_sep) + model->make_link_to (circuits ()) + suffix;
 
   } else if (column == model->first_column () || column == model->second_column ()) {
-    return model->make_link_to (subcircuits, column);
+    return model->make_link_to (subcircuits (), column);
   }
 
   return QString ();
@@ -1996,23 +1997,19 @@ CircuitNetSubCircuitPinItemData::text (int column, NetlistBrowserModel *model)
 QString
 CircuitNetSubCircuitPinItemData::search_text ()
 {
-  IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (sp ());
-  IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (subcircuits);
-  return tl::to_qstring (combine_search_strings (combine_search_strings (search_string_from_names (pp ()), search_string_from_names (circuit_refs)), search_string_from_expanded_names (subcircuits)));
+  return tl::to_qstring (combine_search_strings (combine_search_strings (search_string_from_names (pp ()), search_string_from_names (circuits ())), search_string_from_expanded_names (subcircuits ())));
 }
 
 std::string
 CircuitNetSubCircuitPinItemData::tooltip (NetlistBrowserModel *model)
 {
-  IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (sp ());
-  return model->indexer ()->subcircuit_status_hint (circuits (), model->indexer ()->subcircuit_index (subcircuits));
+  return model->indexer ()->subcircuit_status_hint (parent ()->circuits (), model->indexer ()->subcircuit_index (subcircuits ()));
 }
 
 db::NetlistCrossReference::Status
 CircuitNetSubCircuitPinItemData::status (NetlistBrowserModel *model)
 {
-  IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (sp ());
-  return model->indexer ()->subcircuit_from_index (circuits (), model->indexer ()->subcircuit_index (subcircuits)).second;
+  return model->indexer ()->subcircuit_from_index (parent ()->circuits (), model->indexer ()->subcircuit_index (subcircuits ())).second;
 }
 
 // ----------------------------------------------------------------------------------

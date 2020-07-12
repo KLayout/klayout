@@ -24,6 +24,7 @@
 #include "layNetlistBrowserTreeModel.h"
 #include "layIndexedNetlistModel.h"
 #include "layNetlistCrossReferenceModel.h"
+#include "layNetlistBrowserModel.h"
 
 #include <QPainter>
 #include <QIcon>
@@ -255,6 +256,45 @@ NetlistBrowserTreeModel::build_circuits_to_index (size_t nprod, const std::pair<
     build_circuits_to_index (child_nprod, cp.first, model, child_index, map);
     --n;
   }
+}
+
+static bool is_compatible (const std::pair<const db::Circuit *, const db::Circuit *> &a, const std::pair<const db::Circuit *, const db::Circuit *> &b)
+{
+  if (a.first && b.first && a.first == b.first) {
+    return true;
+  } else if (a.second && b.second && a.second == b.second) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+QModelIndex
+NetlistBrowserTreeModel::index_from_netpath (const NetlistObjectPath &path) const
+{
+  QModelIndex idx;
+
+  idx = index_from_circuits (path.root);
+
+  for (NetlistObjectPath::path_iterator p = path.path.begin (); p != path.path.end () && idx.isValid (); ++p) {
+
+    std::pair<const db::Circuit *, const db::Circuit *> sc (p->first ? p->first->circuit_ref () : 0, p->second ? p->second->circuit_ref (): 0);
+    std::pair<const db::Circuit *, const db::Circuit *> circuit = circuits_from_index (idx);
+
+    size_t count = mp_indexer->child_circuit_count (circuit);
+    for (size_t n = count; n > 0; ) {
+      --n;
+      std::pair<const db::Circuit *, const db::Circuit *> cc = mp_indexer->child_circuit_from_index (circuit, n).first;
+      if (is_compatible (sc, cc)) {
+        circuit = cc;
+        idx = index (n, 0, idx);
+        break;
+      }
+    }
+
+  }
+
+  return idx;
 }
 
 QModelIndex

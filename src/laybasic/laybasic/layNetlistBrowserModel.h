@@ -183,6 +183,9 @@ private:
  */
 struct LAYBASIC_PUBLIC NetlistObjectPath
 {
+  typedef std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *> > path_type;
+  typedef path_type::const_iterator path_iterator;
+
   NetlistObjectPath () { }
 
   bool operator== (const NetlistObjectPath &other) const

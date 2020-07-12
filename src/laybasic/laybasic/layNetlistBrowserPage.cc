@@ -323,6 +323,7 @@ NetlistBrowserPage::current_tree_index_changed (const QModelIndex &index)
       return;
     }
 
+    //  TODO: this could give a path ...
     std::pair<const db::Circuit *, const db::Circuit *> circuits = tree_model->circuits_from_index (index);
     QModelIndex circuit_index = netlist_model->index_from_circuit (circuits);
 
@@ -346,8 +347,8 @@ NetlistBrowserPage::current_index_changed (const QModelIndex &index)
 
     add_to_history (index, true);
 
-    std::pair<const db::Circuit *, const db::Circuit *> circuits = netlist_model->circuit_from_index (index);
-    QModelIndex circuit_index = tree_model->index_from_circuits (circuits);
+    NetlistObjectPath path = netlist_model->netpath_from_index (index);
+    QModelIndex circuit_index = tree_model->index_from_netpath (path);
 
     m_signals_enabled = false;
     hierarchy_tree->setCurrentIndex (circuit_index);
@@ -516,9 +517,8 @@ NetlistBrowserPage::navigate_to (const QModelIndex &index, bool fwd)
       return;
     }
 
-    //  @@@ with path!
-    std::pair<const db::Circuit *, const db::Circuit *> circuits = netlist_model->circuit_from_index (index);
-    QModelIndex circuit_index = tree_model->index_from_circuits (circuits);
+    lay::NetlistObjectPath path = netlist_model->netpath_from_index (index);
+    QModelIndex circuit_index = tree_model->index_from_netpath (path);
     hierarchy_tree->setCurrentIndex (circuit_index);
 
   } catch (...) {

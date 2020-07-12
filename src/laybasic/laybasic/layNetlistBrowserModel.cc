@@ -899,71 +899,6 @@ private:
 
 // ----------------------------------------------------------------------------------
 
-class CircuitPinItemData
-  : public NetlistModelItemData
-{
-public:
-  CircuitPinItemData (NetlistModelItemData *parent, const IndexedNetlistModel::pin_pair &pp);
-
-  virtual void do_ensure_children (NetlistBrowserModel * /*model*/);
-  virtual QIcon icon (NetlistBrowserModel *model);
-  virtual QString text (int column, NetlistBrowserModel *model);
-  virtual QString search_text ();
-  virtual std::string tooltip (NetlistBrowserModel *model);
-  virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model);
-
-  const IndexedNetlistModel::pin_pair &pp ()
-  {
-    return m_pp;
-  }
-
-  virtual std::pair<const db::Pin *, const db::Pin *> pins_of_this ()
-  {
-    return pp ();
-  }
-
-  virtual std::pair<const db::Net *, const db::Net *> nets_of_this ()
-  {
-    return nets_from_circuit_pins (circuits (), pins_of_this ());
-  }
-
-private:
-  IndexedNetlistModel::pin_pair m_pp;
-  bool m_pin_seen;
-};
-
-// ----------------------------------------------------------------------------------
-
-class CircuitPinNetItemData
-  : public NetlistModelItemData
-{
-public:
-  CircuitPinNetItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_pair &np);
-
-  virtual void do_ensure_children (NetlistBrowserModel *model);
-  virtual QIcon icon (NetlistBrowserModel *model);
-  virtual QString text (int column, NetlistBrowserModel *model);
-  virtual QString search_text ();
-  virtual std::string tooltip (NetlistBrowserModel *model);
-  virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model);
-
-  const IndexedNetlistModel::pin_pair &pp ()
-  {
-    CircuitPinItemData *p = static_cast<CircuitPinItemData *> (parent ());
-    return p->pp ();
-  }
-
-  virtual std::pair<const db::Net *, const db::Net *> nets_of_this ()
-  {
-    return m_np;
-  }
-
-private:
-  IndexedNetlistModel::net_pair m_np;
-};
-
-// ----------------------------------------------------------------------------------
-
 class CircuitNetItemData
   : public NetlistModelItemData
 {
@@ -987,8 +922,14 @@ public:
     return m_np;
   }
 
+  bool seen () const
+  {
+    return m_seen;
+  }
+
 private:
   IndexedNetlistModel::net_pair m_np;
+  bool m_seen;
 };
 
 // ----------------------------------------------------------------------------------
@@ -1035,28 +976,18 @@ private:
 // ----------------------------------------------------------------------------------
 
 class CircuitNetDeviceTerminalOthersItemData
-  : public NetlistModelItemData
+  : public CircuitNetItemData
 {
 public:
-  CircuitNetDeviceTerminalOthersItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_pair &np, const std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> &tp, bool is_self);
+  CircuitNetDeviceTerminalOthersItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_pair &np, const std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> &tp);
 
-  virtual void do_ensure_children (NetlistBrowserModel *);
   virtual QIcon icon (NetlistBrowserModel *model);
   virtual QString text (int column, NetlistBrowserModel *model);
   virtual QString search_text ();
-  virtual std::string tooltip (NetlistBrowserModel *model);
-  virtual db::NetlistCrossReference::Status status (NetlistBrowserModel * /*model*/);
-
-  IndexedNetlistModel::device_pair dp ()
-  {
-    CircuitNetDeviceTerminalItemData *p = static_cast<CircuitNetDeviceTerminalItemData *> (parent ());
-    return p->dp ();
-  }
 
 private:
   std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> m_tp;
   IndexedNetlistModel::net_pair m_np;
-  bool m_net_seen;
 };
 
 // ----------------------------------------------------------------------------------
@@ -1162,6 +1093,55 @@ private:
 
 // ----------------------------------------------------------------------------------
 
+class CircuitPinItemData
+  : public CircuitNetItemData
+{
+public:
+  CircuitPinItemData (NetlistModelItemData *parent, const IndexedNetlistModel::pin_pair &pp);
+
+  virtual QIcon icon (NetlistBrowserModel *model);
+
+  virtual std::pair<const db::Pin *, const db::Pin *> pins_of_this ()
+  {
+    return m_pp;
+  }
+
+private:
+  IndexedNetlistModel::pin_pair m_pp;
+};
+
+// ----------------------------------------------------------------------------------
+
+//  @@@ TODO: remove?
+class CircuitPinNetItemData
+  : public NetlistModelItemData
+{
+public:
+  CircuitPinNetItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_pair &np);
+
+  virtual void do_ensure_children (NetlistBrowserModel *model);
+  virtual QIcon icon (NetlistBrowserModel *model);
+  virtual QString text (int column, NetlistBrowserModel *model);
+  virtual QString search_text ();
+  virtual std::string tooltip (NetlistBrowserModel *model);
+  virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model);
+
+  IndexedNetlistModel::pin_pair pp ()
+  {
+    return pins ();
+  }
+
+  virtual std::pair<const db::Net *, const db::Net *> nets_of_this ()
+  {
+    return m_np;
+  }
+
+private:
+  IndexedNetlistModel::net_pair m_np;
+};
+
+// ----------------------------------------------------------------------------------
+
 class CircuitSubCircuitPinsItemData
   : public NetlistModelItemData
 {
@@ -1187,17 +1167,14 @@ private:
 // ----------------------------------------------------------------------------------
 
 class CircuitSubCircuitPinItemData
-  : public NetlistModelItemData
+  : public CircuitNetItemData
 {
 public:
   CircuitSubCircuitPinItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_subcircuit_pin_pair &pp);
 
-  virtual void do_ensure_children (NetlistBrowserModel *);
   virtual QIcon icon (NetlistBrowserModel *model);
   virtual QString text (int column, NetlistBrowserModel *model);
   virtual QString search_text ();
-  virtual std::string tooltip (NetlistBrowserModel *model);
-  virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model);
 
   IndexedNetlistModel::subcircuit_pair sp ()
   {
@@ -1207,11 +1184,6 @@ public:
   virtual std::pair<const db::Pin *, const db::Pin *> pins_of_this ()
   {
     return pins_from_netrefs (m_pp);
-  }
-
-  virtual std::pair<const db::Net *, const db::Net *> nets_of_this ()
-  {
-    return nets_from_pinrefs (m_pp);
   }
 
 private:
@@ -1250,22 +1222,14 @@ private:
 // ----------------------------------------------------------------------------------
 
 class CircuitDeviceTerminalItemData
-  : public NetlistModelItemData
+  : public CircuitNetItemData
 {
 public:
   CircuitDeviceTerminalItemData (NetlistModelItemData *parent, const std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> &tp);
 
-  virtual void do_ensure_children (NetlistBrowserModel *);
   virtual QIcon icon (NetlistBrowserModel *model);
   virtual QString text (int column, NetlistBrowserModel *model);
   virtual QString search_text ();
-  virtual std::string tooltip (NetlistBrowserModel *model);
-  virtual db::NetlistCrossReference::Status status (NetlistBrowserModel * /*model*/);
-
-  virtual std::pair<const db::Net *, const db::Net *> nets_of_this ()
-  {
-    return nets_from_device_terminals (devices (), m_tp);
-  }
 
 private:
   std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> m_tp;
@@ -1817,61 +1781,15 @@ CircuitItemNodeData::circuit_subcircuit_item (NetlistBrowserModel *model, const 
 // ----------------------------------------------------------------------------------
 
 CircuitPinItemData::CircuitPinItemData (NetlistModelItemData *parent, const IndexedNetlistModel::pin_pair &pp)
-  : NetlistModelItemData (parent), m_pp (pp), m_pin_seen (parent && parent->derived_from_pins (pp))
+  : CircuitNetItemData (parent, nets_from_circuit_pins (parent->circuits (), pp)),
+    m_pp (pp)
 {
-}
-
-void
-CircuitPinItemData::do_ensure_children (NetlistBrowserModel * /*model*/)
-{
-  if (! m_pin_seen) {
-    push_back (new CircuitNetItemData (this, nets_from_circuit_pins (circuits (), pp ())));
-  }
 }
 
 QIcon
 CircuitPinItemData::icon (NetlistBrowserModel * /*model*/)
 {
   return icon_for_pin ();
-}
-
-QString
-CircuitPinItemData::text (int column, NetlistBrowserModel *model)
-{
-  //  pin:
-  //  + single mode:     xname             | <empty>  | <empty>
-  //  + dual mode:       xname(a)/xname(b) | xname(a) | xname(b)
-  if (column == model->object_column ()) {
-    std::string suffix;
-    if (m_pin_seen) {
-      suffix = tl::to_string (tr (" (already seen)"));
-    }
-    return escaped (str_from_expanded_names (pp (), model->indexer ()->is_single ()) + suffix);
-  } else if (!model->indexer ()->is_single () && (column == model->first_column () || column == model->second_column ())) {
-    return escaped (str_from_expanded_name (column == model->first_column () ? pp ().first : pp ().second));
-  }
-
-  return QString ();
-}
-
-QString
-CircuitPinItemData::search_text ()
-{
-  return tl::to_qstring (search_string_from_expanded_names (pp ()));
-}
-
-std::string
-CircuitPinItemData::tooltip (NetlistBrowserModel *model)
-{
-  size_t index = model->indexer ()->pin_index (pp (), circuits ());
-  return model->indexer ()->pin_status_hint (circuits (), index);
-}
-
-db::NetlistCrossReference::Status
-CircuitPinItemData::status (NetlistBrowserModel *model)
-{
-  size_t index = model->indexer ()->pin_index (pp (), circuits ());
-  return model->indexer ()->pin_from_index (circuits (), index).second;
 }
 
 // ----------------------------------------------------------------------------------
@@ -1927,12 +1845,17 @@ CircuitPinNetItemData::status (NetlistBrowserModel * /*model*/)
 // ----------------------------------------------------------------------------------
 
 CircuitNetItemData::CircuitNetItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_pair &np)
-  : NetlistModelItemData (parent), m_np (np)
+  : NetlistModelItemData (parent), m_np (np), m_seen (parent && parent->derived_from_nets (np))
 { }
 
 void
 CircuitNetItemData::do_ensure_children (NetlistBrowserModel *model)
 {
+  //  no subnodes if already seen
+  if (m_seen) {
+    return;
+  }
+
   size_t n;
 
   n = model->indexer ()->net_terminal_count (np ());
@@ -1962,7 +1885,11 @@ CircuitNetItemData::text (int column, NetlistBrowserModel *model)
 {
   //  circuit/net: header column = node count, second column net name
   if (column == model->object_column ()) {
-    return escaped (str_from_expanded_names (m_np, model->indexer ()->is_single ()));
+    std::string suffix;
+    if (seen ()) {
+      suffix = tl::to_string (tr (" (already seen)"));
+    }
+    return escaped (str_from_expanded_names (m_np, model->indexer ()->is_single ()) + suffix);
   } else if (column == model->first_column () && m_np.first) {
     return escaped (m_np.first->expanded_name () + " (" + tl::to_string (m_np.first->pin_count () + m_np.first->terminal_count () + m_np.first->subcircuit_pin_count ()) + ")");
   } else if (column == model->second_column () && m_np.second) {
@@ -2010,7 +1937,7 @@ CircuitNetDeviceTerminalItemData::do_ensure_children (NetlistBrowserModel *model
     std::pair<const db::DeviceClass *, const db::DeviceClass *> device_classes = device_classes_from_devices (dp ());
     std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> termdefs = terminal_defs_from_device_classes (model->indexer (), device_classes, dp (), i);
     IndexedNetlistModel::net_pair nets = nets_from_device_terminals (dp (), termdefs);
-    push_back (new CircuitNetDeviceTerminalOthersItemData (this, nets, termdefs, derived_from_nets (nets)));
+    push_back (new CircuitNetDeviceTerminalOthersItemData (this, nets, termdefs));
   }
 }
 
@@ -2069,25 +1996,14 @@ CircuitNetDeviceTerminalItemData::status (NetlistBrowserModel *model)
 
 // ----------------------------------------------------------------------------------
 
-CircuitNetDeviceTerminalOthersItemData::CircuitNetDeviceTerminalOthersItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_pair &np, const std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> &tp, bool net_seen)
-  : NetlistModelItemData (parent), m_tp (tp), m_np (np), m_net_seen (net_seen)
+CircuitNetDeviceTerminalOthersItemData::CircuitNetDeviceTerminalOthersItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_pair &np, const std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> &tp)
+  : CircuitNetItemData (parent, nets_from_device_terminals (parent->devices (), tp)), m_tp (tp), m_np (np)
 { }
-
-void
-CircuitNetDeviceTerminalOthersItemData::do_ensure_children (NetlistBrowserModel *)
-{
-  if (! m_net_seen) {
-    IndexedNetlistModel::net_pair nets = nets_from_device_terminals (dp (), m_tp);
-    if (nets.first || nets.second) {
-      push_back (new CircuitNetItemData (this, nets));
-    }
-  }
-}
 
 QIcon
 CircuitNetDeviceTerminalOthersItemData::icon (NetlistBrowserModel *model)
 {
-  return model->icon_for_connection (nets_from_device_terminals (dp (), m_tp));
+  return model->icon_for_connection (nets_from_device_terminals (devices (), m_tp));
 }
 
 QString
@@ -2095,41 +2011,16 @@ CircuitNetDeviceTerminalOthersItemData::text (int column, NetlistBrowserModel *m
 {
   //  circuit/net/device terminal/more: header column = terminal name, second column = net link
   if (column == model->object_column ()) {
-
-    return escaped (str_from_names (m_tp, model->indexer ()->is_single ())) + (m_net_seen ? tr (" (already seen)") : QString ());
-
-  } else if (column == model->first_column () || column == model->second_column ()) {
-
-    return model->make_link_to (m_np, column);
-
+    return escaped (str_from_names (m_tp, model->indexer ()->is_single ()) + (seen () ? tl::to_string (tr (" (already seen)")) : std::string ()));
+  } else {
+    return CircuitNetItemData::text (column, model);
   }
-
-  return QString ();
 }
 
 QString
 CircuitNetDeviceTerminalOthersItemData::search_text ()
 {
-  IndexedNetlistModel::net_pair nets = nets_from_device_terminals (dp (), m_tp);
-  return tl::to_qstring (combine_search_strings (search_string_from_names (m_tp), search_string_from_expanded_names (nets)));
-}
-
-std::string
-CircuitNetDeviceTerminalOthersItemData::tooltip (NetlistBrowserModel * /*model*/)
-{
-  return std::string ();
-}
-
-db::NetlistCrossReference::Status
-CircuitNetDeviceTerminalOthersItemData::status (NetlistBrowserModel *model)
-{
-  if (! model->is_valid_net_pair (nets_from_device_terminals (dp (), m_tp))) {
-    //  This indicates a wrong connection: the nets are associated in a way which is a not
-    //  corresponding to a mapped net pair. Report Mismatch here.
-    return db::NetlistCrossReference::NoMatch;
-  }
-
-  return db::NetlistCrossReference::None;
+  return tl::to_qstring (combine_search_strings (search_string_from_names (m_tp), search_string_from_expanded_names (nets_of_this ())));
 }
 
 // ----------------------------------------------------------------------------------
@@ -2371,17 +2262,8 @@ CircuitSubCircuitItemData::status (NetlistBrowserModel *model)
 // ----------------------------------------------------------------------------------
 
 CircuitSubCircuitPinItemData::CircuitSubCircuitPinItemData (NetlistModelItemData *parent, const IndexedNetlistModel::net_subcircuit_pin_pair &pp)
-  : NetlistModelItemData (parent), m_pp (pp)
+  : CircuitNetItemData (parent, nets_from_pinrefs (pp)), m_pp (pp)
 { }
-
-void
-CircuitSubCircuitPinItemData::do_ensure_children (NetlistBrowserModel *)
-{
-  IndexedNetlistModel::net_pair nets = nets_from_pinrefs (m_pp);
-  if (nets.first || nets.second) {
-    push_back (new CircuitNetItemData (this, nets));
-  }
-}
 
 QIcon
 CircuitSubCircuitPinItemData::icon (NetlistBrowserModel * /*model*/)
@@ -2393,43 +2275,16 @@ QString
 CircuitSubCircuitPinItemData::text (int column, NetlistBrowserModel *model)
 {
   if (column == model->object_column ()) {
-    return model->make_link_to (pins (), circuit_refs_from_subcircuits (sp ()));
-  } else if (column == model->first_column () || column == model->second_column ()) {
-    return model->make_link_to (nets_from_pinrefs (m_pp), column);
+    return model->make_link_to (pins (), circuit_refs_from_subcircuits (sp ())) + (seen () ? tr (" (already seen)") : QString ());
+  } else {
+    return CircuitNetItemData::text (column, model);
   }
-
-  return QString ();
 }
 
 QString
 CircuitSubCircuitPinItemData::search_text ()
 {
   return tl::to_qstring (combine_search_strings (search_string_from_names (pins ()), search_string_from_expanded_names (nets_from_pinrefs (m_pp))));
-}
-
-std::string
-CircuitSubCircuitPinItemData::tooltip (NetlistBrowserModel *model)
-{
-  std::string hint;
-
-  //  Check whether the pins may be attached to an invalid net pair
-  if (! model->is_valid_net_pair (nets_from_pinrefs (m_pp))) {
-    hint = rewire_subcircuit_pins_status_hint ();
-  }
-
-  return hint;
-}
-
-db::NetlistCrossReference::Status
-CircuitSubCircuitPinItemData::status (NetlistBrowserModel *model)
-{
-  if (! model->is_valid_net_pair (nets_from_pinrefs (m_pp))) {
-    //  This indicates a wrong connection: the nets are associated in a way which is a not
-    //  corresponding to a mapped net pair. Report Mismatch here.
-    return db::NetlistCrossReference::NoMatch;
-  }
-
-  return db::NetlistCrossReference::None;
 }
 
 // ----------------------------------------------------------------------------------
@@ -2506,63 +2361,33 @@ CircuitDeviceItemData::status (NetlistBrowserModel *model)
 // ----------------------------------------------------------------------------------
 
 CircuitDeviceTerminalItemData::CircuitDeviceTerminalItemData (NetlistModelItemData *parent, const std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> &tp)
-  : NetlistModelItemData (parent), m_tp (tp)
+  : CircuitNetItemData (parent, nets_from_device_terminals (parent->devices (), tp)), m_tp (tp)
 { }
-
-void
-CircuitDeviceTerminalItemData::do_ensure_children (NetlistBrowserModel *)
-{
-  IndexedNetlistModel::net_pair nets = nets_from_device_terminals (devices (), m_tp);
-  push_back (new CircuitNetItemData (this, nets));
-}
 
 QIcon
 CircuitDeviceTerminalItemData::icon (NetlistBrowserModel *model)
 {
-  return model->icon_for_connection (nets_from_device_terminals (devices (), m_tp));
+  return model->icon_for_connection (nets_of_this ());
 }
 
 QString
 CircuitDeviceTerminalItemData::text (int column, NetlistBrowserModel *model)
 {
-  //  circuit/device/terminal: header column = terminal name, second column link to net
   if (column == model->object_column ()) {
-
-    return escaped (str_from_names (m_tp, model->indexer ()->is_single ()));
-
-  } else if (column == model->first_column () || column == model->second_column ()) {
-
-    IndexedNetlistModel::net_pair nets = nets_from_device_terminals (devices (), m_tp);
-    return model->make_link_to (nets, column);
-
+    std::string suffix;
+    if (seen ()) {
+      suffix = tl::to_string (tr (" (already seen)"));
+    }
+    return escaped (str_from_names (m_tp, model->indexer ()->is_single ()) + suffix);
+  } else {
+    return CircuitNetItemData::text (column, model);
   }
-
-  return QString ();
 }
 
 QString
 CircuitDeviceTerminalItemData::search_text ()
 {
-  IndexedNetlistModel::net_pair nets = nets_from_device_terminals (devices (), m_tp);
-  return tl::to_qstring (combine_search_strings (search_string_from_names (m_tp), search_string_from_expanded_names (nets)));
-}
-
-std::string
-CircuitDeviceTerminalItemData::tooltip (NetlistBrowserModel * /*model*/)
-{
-  return std::string ();
-}
-
-db::NetlistCrossReference::Status
-CircuitDeviceTerminalItemData::status (NetlistBrowserModel *model)
-{
-  if (! model->is_valid_net_pair (nets_from_device_terminals (devices (), m_tp))) {
-    //  This indicates a wrong connection: the nets are associated in a way which is a not
-    //  corresponding to a mapped net pair. Report Mismatch here.
-    return db::NetlistCrossReference::NoMatch;
-  }
-
-  return db::NetlistCrossReference::None;
+  return tl::to_qstring (combine_search_strings (search_string_from_names (m_tp), search_string_from_expanded_names (nets_of_this ())));
 }
 
 // ----------------------------------------------------------------------------------

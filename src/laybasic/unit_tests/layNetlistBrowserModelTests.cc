@@ -417,8 +417,8 @@ TEST (3)
   db::Circuit *root = l2n.netlist ()->circuit_by_name ("RINGO");
   EXPECT_EQ (root != 0, true);
 
-  lay::NetlistObjectPath path;
-  EXPECT_EQ (model->index_from_netpath (path).isValid (), false);
+  lay::NetlistObjectsPath path;
+  EXPECT_EQ (model->index_from_path (path).isValid (), false);
 
   path.root.first = root;
 
@@ -427,7 +427,7 @@ TEST (3)
 
   path.net.first = net;
 
-  QModelIndex index = model->index_from_netpath (path);
+  QModelIndex index = model->index_from_path (path);
   EXPECT_EQ (index.isValid (), true);
 
   EXPECT_EQ (tl::to_string (model->data (index, Qt::UserRole).toString ()), "FB");
@@ -444,7 +444,7 @@ TEST (4)
   db::Circuit *root = l2n.netlist ()->circuit_by_name ("RINGO");
   EXPECT_EQ (root != 0, true);
 
-  lay::NetlistObjectPath path;
+  lay::NetlistObjectsPath path;
   path.root.first = root;
 
   db::SubCircuit *sc1 = root->begin_subcircuits ().operator-> ();
@@ -456,8 +456,124 @@ TEST (4)
 
   path.net.first = net;
 
-  QModelIndex index = model->index_from_netpath (path);
+  QModelIndex index = model->index_from_path (path);
   EXPECT_EQ (index.isValid (), true);
 
   EXPECT_EQ (tl::to_string (model->data (index, Qt::UserRole).toString ()), "NOUT");
+}
+
+//  Netlist object path: single vs. pairs - first
+TEST (5)
+{
+  db::LayoutVsSchematic lvs;
+  lvs.load (tl::testsrc () + "/testdata/lay/lvsdb_browser.lvsdb");
+
+  lay::NetColorizer colorizer;
+  std::auto_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &lvs, &colorizer));
+  QModelIndex idx;
+
+  db::Circuit *root = lvs.netlist ()->circuit_by_name ("INV2PAIR");
+  EXPECT_EQ (root != 0, true);
+  db::Circuit *sc = lvs.netlist ()->circuit_by_name ("INV2");
+  EXPECT_EQ (sc != 0, true);
+
+  lay::NetlistObjectPath path;
+  EXPECT_EQ (path.is_null (), true);
+  path.root = root;
+  EXPECT_EQ (path.is_null (), false);
+
+  idx = model->index_from_path (path);
+  EXPECT_EQ (idx.isValid (), true);
+  EXPECT_EQ (tl::to_string (model->data (idx, Qt::UserRole).toString ()), "INV2PAIR|INV2PAIR");
+  EXPECT_EQ (path == model->path_from_index (idx).first (), true);
+
+  path.net = root->net_by_cluster_id (5);
+  idx = model->index_from_path (lay::NetlistObjectsPath::from_first (path));
+  EXPECT_EQ (idx.isValid (), true);
+  EXPECT_EQ (tl::to_string (model->data (idx, Qt::UserRole).toString ()), "$5|4");
+  EXPECT_EQ (path == model->path_from_index (idx).first (), true);
+
+  path.path.push_back (root->subcircuit_by_id (1));
+  EXPECT_EQ (path.path.back () != 0, true);
+  EXPECT_EQ (path.path.back ()->expanded_name (), "$1");
+  EXPECT_EQ (path.path.back ()->circuit_ref ()->name (), "INV2");
+
+  path.net = 0;
+  idx = model->index_from_path (lay::NetlistObjectsPath::from_first (path));
+  EXPECT_EQ (idx.isValid (), true);
+  //  A pure subcircuit path addresses the "Circuit" representative node of the subcircuit
+  EXPECT_EQ (tl::to_string (model->data (idx, Qt::DisplayRole).toString ()), "Circuit");
+  EXPECT_EQ (tl::to_string (model->data (model->parent (idx), Qt::UserRole).toString ()), "INV2|$1");
+  EXPECT_EQ (path == model->path_from_index (idx).first (), true);
+
+  path.net = sc->net_by_cluster_id (2);
+  idx = model->index_from_path (lay::NetlistObjectsPath::from_first (path));
+  EXPECT_EQ (idx.isValid (), true);
+  EXPECT_EQ (tl::to_string (model->data (idx, Qt::UserRole).toString ()), "IN|2");
+  EXPECT_EQ (path == model->path_from_index (idx).first (), true);
+
+  path.net = 0;
+  path.device = sc->device_by_id (1);
+  idx = model->index_from_path (lay::NetlistObjectsPath::from_first (path));
+  EXPECT_EQ (idx.isValid (), true);
+  EXPECT_EQ (tl::to_string (model->data (idx, Qt::UserRole).toString ()), "$1|$1|PMOS|PMOS");
+  EXPECT_EQ (path == model->path_from_index (idx).first (), true);
+}
+
+//  Netlist object path: single vs. pairs - second
+TEST (6)
+{
+  db::LayoutVsSchematic lvs;
+  lvs.load (tl::testsrc () + "/testdata/lay/lvsdb_browser.lvsdb");
+
+  lay::NetColorizer colorizer;
+  std::auto_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &lvs, &colorizer));
+  QModelIndex idx;
+
+  db::Circuit *root = lvs.reference_netlist ()->circuit_by_name ("INV2PAIR");
+  EXPECT_EQ (root != 0, true);
+  db::Circuit *sc = lvs.reference_netlist ()->circuit_by_name ("INV2");
+  EXPECT_EQ (sc != 0, true);
+
+  lay::NetlistObjectPath path;
+  EXPECT_EQ (path.is_null (), true);
+  path.root = root;
+  EXPECT_EQ (path.is_null (), false);
+
+  idx = model->index_from_path (lay::NetlistObjectsPath::from_second (path));
+  EXPECT_EQ (idx.isValid (), true);
+  EXPECT_EQ (tl::to_string (model->data (idx, Qt::UserRole).toString ()), "INV2PAIR|INV2PAIR");
+  EXPECT_EQ (path == model->path_from_index (idx).second (), true);
+
+  path.net = root->net_by_name ("4");
+  idx = model->index_from_path (lay::NetlistObjectsPath::from_second (path));
+  EXPECT_EQ (idx.isValid (), true);
+  EXPECT_EQ (tl::to_string (model->data (idx, Qt::UserRole).toString ()), "$5|4");
+  EXPECT_EQ (path == model->path_from_index (idx).second (), true);
+
+  path.path.push_back (root->subcircuit_by_name ("$2"));
+  EXPECT_EQ (path.path.back () != 0, true);
+  EXPECT_EQ (path.path.back ()->expanded_name (), "$2");
+  EXPECT_EQ (path.path.back ()->circuit_ref ()->name (), "INV2");
+
+  path.net = 0;
+  idx = model->index_from_path (lay::NetlistObjectsPath::from_second (path));
+  EXPECT_EQ (idx.isValid (), true);
+  //  A pure subcircuit path addresses the "Circuit" representative node of the subcircuit
+  EXPECT_EQ (tl::to_string (model->data (idx, Qt::DisplayRole).toString ()), "Circuit");
+  EXPECT_EQ (tl::to_string (model->data (model->parent (idx), Qt::UserRole).toString ()), "INV2|$2");
+  EXPECT_EQ (path == model->path_from_index (idx).second (), true);
+
+  path.net = sc->net_by_name ("2");
+  idx = model->index_from_path (lay::NetlistObjectsPath::from_second (path));
+  EXPECT_EQ (idx.isValid (), true);
+  EXPECT_EQ (tl::to_string (model->data (idx, Qt::UserRole).toString ()), "IN|2");
+  EXPECT_EQ (path == model->path_from_index (idx).second (), true);
+
+  path.net = 0;
+  path.device = sc->device_by_id (1);
+  idx = model->index_from_path (lay::NetlistObjectsPath::from_second (path));
+  EXPECT_EQ (idx.isValid (), true);
+  EXPECT_EQ (tl::to_string (model->data (idx, Qt::UserRole).toString ()), "$1|$1|PMOS|PMOS");
+  EXPECT_EQ (path == model->path_from_index (idx).second (), true);
 }

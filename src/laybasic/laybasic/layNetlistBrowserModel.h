@@ -179,14 +179,22 @@ private:
 };
 
 /**
- *  @brief An object describing the instantiation path of a net
+ *  @brief An object describing the instantiation path of a net, a device or a (sub)circuit pair
+ *
+ *  This object applies to pairs of these objects. A class providing a path for a single
+ *  object is NetlistObjectPath
  */
 struct LAYBASIC_PUBLIC NetlistObjectPath
 {
-  typedef std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *> > path_type;
+  typedef std::list<const db::SubCircuit *> path_type;
   typedef path_type::const_iterator path_iterator;
 
-  NetlistObjectPath () { }
+  NetlistObjectPath () : root (0), net (0), device (0) { }
+
+  bool is_null () const
+  {
+    return ! root;
+  }
 
   bool operator== (const NetlistObjectPath &other) const
   {
@@ -194,6 +202,46 @@ struct LAYBASIC_PUBLIC NetlistObjectPath
   }
 
   bool operator!= (const NetlistObjectPath &other) const
+  {
+    return ! operator== (other);
+  }
+
+  const db::Circuit *root;
+  std::list<const db::SubCircuit *> path;
+  const db::Net *net;
+  const db::Device *device;
+};
+
+/**
+ *  @brief An object describing the instantiation path of a net, a device or a (sub)circuit pair
+ *
+ *  This object applies to pairs of these objects. A class providing a path for a single
+ *  object is NetlistObjectPath
+ */
+struct LAYBASIC_PUBLIC NetlistObjectsPath
+{
+  typedef std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *> > path_type;
+  typedef path_type::const_iterator path_iterator;
+
+  NetlistObjectsPath () { }
+
+  bool is_null () const
+  {
+    return ! root.first && ! root.second;
+  }
+
+  static NetlistObjectsPath from_first(const NetlistObjectPath &p);
+  static NetlistObjectsPath from_second (const NetlistObjectPath &p);
+
+  NetlistObjectPath first () const;
+  NetlistObjectPath second () const;
+
+  bool operator== (const NetlistObjectsPath &other) const
+  {
+    return root == other.root && path == other.path && net == other.net && device == other.device;
+  }
+
+  bool operator!= (const NetlistObjectsPath &other) const
   {
     return ! operator== (other);
   }
@@ -292,8 +340,18 @@ public:
   QIcon icon_for_connection (const std::pair<const db::Net *, const db::Net *> &net) const;
 
   QModelIndex index_from_url (const QString &url) const;
-  NetlistObjectPath netpath_from_index (const QModelIndex &index) const;
-  QModelIndex index_from_netpath (const NetlistObjectPath &path);
+
+  NetlistObjectsPath path_from_index (const QModelIndex &index) const;
+  NetlistObjectPath spath_from_index (const QModelIndex &index) const
+  {
+    return path_from_index (index).first ();
+  }
+
+  QModelIndex index_from_path (const NetlistObjectsPath &path);
+  QModelIndex index_from_path (const NetlistObjectPath &path)
+  {
+    return index_from_path (NetlistObjectsPath::from_first (path));
+  }
 
 private slots:
   void colors_changed ();

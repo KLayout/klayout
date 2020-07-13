@@ -347,7 +347,7 @@ NetlistBrowserPage::current_index_changed (const QModelIndex &index)
 
     add_to_history (index, true);
 
-    NetlistObjectPath path = netlist_model->netpath_from_index (index);
+    NetlistObjectsPath path = netlist_model->path_from_index (index);
     QModelIndex circuit_index = tree_model->index_from_netpath (path);
 
     m_signals_enabled = false;
@@ -460,7 +460,7 @@ NetlistBrowserPage::selection_changed ()
   tl_assert (model != 0);
 
   QModelIndex current = directory_tree->selectionModel ()->currentIndex ();
-  highlight (model->netpath_from_index (current));
+  highlight (model->path_from_index (current));
 }
 
 void
@@ -517,7 +517,7 @@ NetlistBrowserPage::navigate_to (const QModelIndex &index, bool fwd)
       return;
     }
 
-    lay::NetlistObjectPath path = netlist_model->netpath_from_index (index);
+    lay::NetlistObjectsPath path = netlist_model->path_from_index (index);
     QModelIndex circuit_index = tree_model->index_from_netpath (path);
     hierarchy_tree->setCurrentIndex (circuit_index);
 
@@ -874,7 +874,7 @@ NetlistBrowserPage::setup_trees ()
 }
 
 void
-NetlistBrowserPage::highlight (const NetlistObjectPath &path)
+NetlistBrowserPage::highlight (const NetlistObjectsPath &path)
 {
   if (path != m_current_path) {
 

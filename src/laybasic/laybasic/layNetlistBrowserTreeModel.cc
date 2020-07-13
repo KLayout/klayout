@@ -270,13 +270,13 @@ static bool is_compatible (const std::pair<const db::Circuit *, const db::Circui
 }
 
 QModelIndex
-NetlistBrowserTreeModel::index_from_netpath (const NetlistObjectPath &path) const
+NetlistBrowserTreeModel::index_from_netpath (const NetlistObjectsPath &path) const
 {
   QModelIndex idx;
 
   idx = index_from_circuits (path.root);
 
-  for (NetlistObjectPath::path_iterator p = path.path.begin (); p != path.path.end () && idx.isValid (); ++p) {
+  for (NetlistObjectsPath::path_iterator p = path.path.begin (); p != path.path.end () && idx.isValid (); ++p) {
 
     std::pair<const db::Circuit *, const db::Circuit *> sc (p->first ? p->first->circuit_ref () : 0, p->second ? p->second->circuit_ref (): 0);
     std::pair<const db::Circuit *, const db::Circuit *> circuit = circuits_from_index (idx);

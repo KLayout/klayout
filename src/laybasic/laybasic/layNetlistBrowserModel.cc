@@ -37,6 +37,67 @@ namespace lay
 {
 
 // ----------------------------------------------------------------------------------
+//  NetlistObjectPath implementation
+
+NetlistObjectsPath
+NetlistObjectsPath::from_first (const NetlistObjectPath &p)
+{
+  NetlistObjectsPath pp;
+  pp.root.first = p.root;
+  for (NetlistObjectPath::path_iterator i = p.path.begin (); i != p.path.end (); ++i) {
+    pp.path.push_back (std::make_pair (*i, (const db::SubCircuit *) 0));
+  }
+  pp.device.first = p.device;
+  pp.net.first = p.net;
+  return pp;
+}
+
+NetlistObjectsPath
+NetlistObjectsPath::from_second (const NetlistObjectPath &p)
+{
+  NetlistObjectsPath pp;
+  pp.root.second = p.root;
+  for (NetlistObjectPath::path_iterator i = p.path.begin (); i != p.path.end (); ++i) {
+    pp.path.push_back (std::make_pair ((const db::SubCircuit *) 0, *i));
+  }
+  pp.device.second = p.device;
+  pp.net.second = p.net;
+  return pp;
+}
+
+NetlistObjectPath
+NetlistObjectsPath::first () const
+{
+  NetlistObjectPath p;
+  p.root = root.first;
+  for (NetlistObjectsPath::path_iterator i = path.begin (); i != path.end (); ++i) {
+    if (! i->first) {
+      return NetlistObjectPath ();
+    }
+    p.path.push_back (i->first);
+  }
+  p.device = device.first;
+  p.net = net.first;
+  return p;
+}
+
+NetlistObjectPath
+NetlistObjectsPath::second () const
+{
+  NetlistObjectPath p;
+  p.root = root.second;
+  for (NetlistObjectsPath::path_iterator i = path.begin (); i != path.end (); ++i) {
+    if (! i->second) {
+      return NetlistObjectPath ();
+    }
+    p.path.push_back (i->second);
+  }
+  p.device = device.second;
+  p.net = net.second;
+  return p;
+}
+
+// ----------------------------------------------------------------------------------
 //  NetColorizer implementation
 
 NetColorizer::NetColorizer ()
@@ -2435,10 +2496,10 @@ NetlistBrowserModel::data (const QModelIndex &index, int role) const
   return QVariant ();
 }
 
-NetlistObjectPath
-NetlistBrowserModel::netpath_from_index (const QModelIndex &index) const
+NetlistObjectsPath
+NetlistBrowserModel::path_from_index (const QModelIndex &index) const
 {
-  NetlistObjectPath np;
+  NetlistObjectsPath np;
   np.net = net_from_index (index, false);
   np.device = device_from_index (index, false);
 
@@ -2463,7 +2524,7 @@ NetlistBrowserModel::netpath_from_index (const QModelIndex &index) const
 }
 
 QModelIndex
-NetlistBrowserModel::index_from_netpath (const NetlistObjectPath &path)
+NetlistBrowserModel::index_from_path (const NetlistObjectsPath &path)
 {
   QModelIndex index = index_from_circuit (path.root);
 

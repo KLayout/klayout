@@ -235,7 +235,7 @@ private:
   bool m_enable_updates;
   bool m_update_needed;
   //  @@@ TODO: make multiple ...
-  lay::NetlistObjectPath m_current_path;
+  lay::NetlistObjectsPath m_current_path;
   //  @@@ TODO: remove
   std::vector<const db::Net *> m_current_nets;
   std::vector<const db::Device *> m_current_devices;
@@ -251,7 +251,7 @@ private:
   void navigate_to (const QModelIndex &index, bool forward = true);
   void adjust_view ();
   void clear_markers ();
-  void highlight (const lay::NetlistObjectPath &path);
+  void highlight (const lay::NetlistObjectsPath &path);
   std::vector<const db::Net *> selected_nets ();
   std::vector<const db::Device *> selected_devices ();
   std::vector<const db::SubCircuit *> selected_subcircuits ();

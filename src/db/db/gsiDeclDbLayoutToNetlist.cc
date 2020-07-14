@@ -566,7 +566,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "This variant accepts a micrometer-unit location. The location is given in the\n"
     "coordinate space of the initial cell.\n"
     "\n"
-    "The \\sc_path_out parameter has been added in version 0.27.\n"
+    "The \\sc_path_out and \\initial_circuit parameters have been added in version 0.27.\n"
   ) +
   gsi::method ("probe_net", (db::Net *(db::LayoutToNetlist::*) (const db::Region &, const db::Point &, std::vector<db::SubCircuit *> *, db::Circuit *)) &db::LayoutToNetlist::probe_net, gsi::arg ("of_layer"), gsi::arg ("point"), gsi::arg ("sc_path_out", (std::vector<db::SubCircuit *> *) 0, "nil"), gsi::arg ("initial_circuit", (db::Circuit *) 0, "nil"),
     "@brief Finds the net by probing a specific location on the given layer\n"
@@ -574,7 +574,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "This variant accepts a database-unit location. The location is given in the\n"
     "coordinate space of the initial cell.\n"
     "\n"
-    "The \\sc_path_out parameter has been added in version 0.27.\n"
+    "The \\sc_path_out and \\initial_circuit parameters have been added in version 0.27.\n"
   ) +
   gsi::method ("write|write_l2n", &db::LayoutToNetlist::save, gsi::arg ("path"), gsi::arg ("short_format", false),
     "@brief Writes the extracted netlist to a file.\n"

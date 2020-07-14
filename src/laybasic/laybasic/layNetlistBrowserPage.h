@@ -169,6 +169,14 @@ public:
   void update_highlights ();
 
   /**
+   *  @brief Gets the current object's path
+   */
+  const lay::NetlistObjectsPath &current_path () const
+  {
+    return m_current_path;
+  }
+
+  /**
    *  @brief Gets the selected nets
    */
   const std::vector<const db::Net *> &current_nets () const

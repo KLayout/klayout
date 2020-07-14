@@ -54,13 +54,20 @@ public:
 
   /**
    *  @brief This event is emitted when a shape is probed
+   *  The first path is that of the layout, the second that of the schematic in case of a
+   *  LVS database.
    */
-  tl::event<db::Net *, std::vector<db::SubCircuit *> > probe_event;
+  tl::event<lay::NetlistObjectPath, lay::NetlistObjectPath> probe_event;
 
   /**
    *  @brief Gets the current database
    */
   db::LayoutToNetlist *db ();
+
+  /**
+   *  @brief Gets the current object's path
+   */
+  const lay::NetlistObjectsPath &current_path () const;
 
   /**
    *  @brief Gets the selected nets

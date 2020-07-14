@@ -135,6 +135,17 @@ NetlistBrowserDialog::db ()
   return browser_page->db ();
 }
 
+const lay::NetlistObjectsPath &
+NetlistBrowserDialog::current_path () const
+{
+  if (browser_page) {
+    return browser_page->current_path ();
+  } else {
+    static lay::NetlistObjectsPath empty;
+    return empty;
+  }
+}
+
 const std::vector<const db::Net *> &
 NetlistBrowserDialog::selected_nets () const
 {
@@ -357,7 +368,9 @@ NetlistBrowserDialog::probe_net (const db::DPoint &p, bool trace_path)
   browser_page->select_path (path);
 
   //  emits the probe event
-  probe_event (net, sc_path);
+  //  NOTE: browser_page->current_path () will hold the paired path with the schematic side being
+  //  expanded.
+  probe_event (browser_page->current_path ().first (), browser_page->current_path ().second ());
 }
 
 void

@@ -123,7 +123,7 @@ Class<lay::NetlistObjectPath> decl_NetlistObjectPath ("lay", "NetlistObjectPath"
   gsi::method_ext ("device", &device,
     "@brief Gets the device the path points to.\n"
   ) +
-  gsi::method ("is_null", &lay::NetlistObjectPath::is_null,
+  gsi::method ("is_null?", &lay::NetlistObjectPath::is_null,
     "@brief Returns a value indicating whether the path is an empty one.\n"
   ),
   "@brief An object describing the instantiation of an object.\n"
@@ -152,13 +152,13 @@ Class<lay::NetlistBrowserDialog> decl_NetlistBrowserDialog ("lay", "NetlistBrows
   ) +
   gsi::event ("on_selection_changed", &lay::NetlistBrowserDialog::selection_changed_event,
     "@brief This event is triggered when the selection changed.\n"
-    "The selection can be obtained with \\selected_nets, \\selected_devices, \\selected_subcircuits and \\selected_circuits."
+    "The selection can be obtained with \\current_path_first, \\current_path_second, \\selected_nets, \\selected_devices, \\selected_subcircuits and \\selected_circuits."
   ) +
   gsi::event ("on_probe", &lay::NetlistBrowserDialog::probe_event, gsi::arg ("first_path"), gsi::arg ("second_path"),
     "@brief This event is triggered when a net is probed.\n"
-    "The first path will indicate the location of the probed net in terms of "
-    "\\subcircuit_path will contain the subcircuit objects leading to the probed net from the circuit given by \\root_circuit. "
-    "This path may not be complete - it may contain null entries if a cell instance can't be associated with a subcircuit."
+    "The first path will indicate the location of the probed net in terms of two paths: one describing the instantiation of the "
+    "net in layout space and one in schematic space. Both objects are \\NetlistObjectPath objects which hold the root circuit, the "
+    "chain of subcircuits leading to the circuit containing the net and the net itself."
   ) +
   gsi::method ("db", &lay::NetlistBrowserDialog::db,
     "@brief Gets the database the browser is connected to.\n"

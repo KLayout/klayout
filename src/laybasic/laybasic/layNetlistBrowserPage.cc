@@ -473,6 +473,8 @@ NetlistBrowserPage::selection_changed ()
 
   QModelIndex current = directory_tree->selectionModel ()->currentIndex ();
   highlight (model->path_from_index (current));
+
+  selection_changed_event ();
 }
 
 void
@@ -895,8 +897,6 @@ NetlistBrowserPage::highlight (const NetlistObjectsPath &path)
     clear_markers ();
     adjust_view ();
     update_highlights ();
-
-    selection_changed ();
 
   }
 }

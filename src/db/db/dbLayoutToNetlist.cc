@@ -1041,9 +1041,9 @@ LayoutToNetlist::build_nets (const std::vector<const db::Net *> *nets, const db:
   }
 }
 
-db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::DPoint &point, std::vector<db::SubCircuit *> *sc_path_out)
+db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::DPoint &point, std::vector<db::SubCircuit *> *sc_path_out, db::Circuit *initial_circuit)
 {
-  return probe_net (of_region, db::CplxTrans (internal_layout ()->dbu ()).inverted () * point, sc_path_out);
+  return probe_net (of_region, db::CplxTrans (internal_layout ()->dbu ()).inverted () * point, sc_path_out, initial_circuit);
 }
 
 size_t LayoutToNetlist::search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::NetShape> &test_cluster, std::vector<db::InstElement> &rev_inst_path)
@@ -1077,7 +1077,7 @@ size_t LayoutToNetlist::search_net (const db::ICplxTrans &trans, const db::Cell 
   return 0;
 }
 
-db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::Point &point, std::vector<db::SubCircuit *> *sc_path_out)
+db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::Point &point, std::vector<db::SubCircuit *> *sc_path_out, db::Circuit *initial_circuit)
 {
   if (! m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has not been extracted yet")));
@@ -1089,6 +1089,14 @@ db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::Poin
 
   unsigned int layer = layer_of (of_region);
 
+  const db::Cell *top_cell = internal_top_cell ();
+  if (initial_circuit && internal_layout ()->is_valid_cell_index (initial_circuit->cell_index ())) {
+    top_cell = &internal_layout ()->cell (initial_circuit->cell_index ());
+  }
+  if (! top_cell) {
+    return 0;
+  }
+
   //  Prepare a test cluster
   db::Box box (point - db::Vector (1, 1), point + db::Vector (1, 1));
   db::GenericRepository sr;
@@ -1097,7 +1105,7 @@ db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::Poin
 
   std::vector<db::InstElement> inst_path;
 
-  size_t cluster_id = search_net (db::ICplxTrans (), internal_top_cell (), test_cluster, inst_path);
+  size_t cluster_id = search_net (db::ICplxTrans (), top_cell, test_cluster, inst_path);
   if (cluster_id > 0) {
 
     //  search_net delivers the path in reverse order
@@ -1105,7 +1113,7 @@ db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::Poin
 
     std::vector<db::cell_index_type> cell_indexes;
     cell_indexes.reserve (inst_path.size () + 1);
-    cell_indexes.push_back (internal_top_cell ()->cell_index ());
+    cell_indexes.push_back (top_cell->cell_index ());
     for (std::vector<db::InstElement>::const_iterator i = inst_path.begin (); i != inst_path.end (); ++i) {
       cell_indexes.push_back (i->inst_ptr.cell_index ());
     }

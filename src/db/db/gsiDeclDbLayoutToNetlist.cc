@@ -543,7 +543,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method_ext ("build_nets", &build_nets, gsi::arg ("nets"), gsi::arg ("cmap"), gsi::arg ("target"), gsi::arg ("lmap"), gsi::arg ("net_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("netname_prop", tl::Variant (), "nil"), gsi::arg ("hier_mode", db::LayoutToNetlist::BNH_Flatten, "BNH_Flatten"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
     "@brief Like \\build_all_nets, but with the ability to select some nets."
   ) +
-  gsi::method ("probe_net", (db::Net *(db::LayoutToNetlist::*) (const db::Region &, const db::DPoint &, std::vector<db::SubCircuit *> *)) &db::LayoutToNetlist::probe_net, gsi::arg ("of_layer"), gsi::arg ("point"), gsi::arg ("sc_path_out", (std::vector<db::SubCircuit *> *) 0, "nil"),
+  gsi::method ("probe_net", (db::Net *(db::LayoutToNetlist::*) (const db::Region &, const db::DPoint &, std::vector<db::SubCircuit *> *, db::Circuit *)) &db::LayoutToNetlist::probe_net, gsi::arg ("of_layer"), gsi::arg ("point"), gsi::arg ("sc_path_out", (std::vector<db::SubCircuit *> *) 0, "nil"), gsi::arg ("initial_circuit", (db::Circuit *) 0, "nil"),
     "@brief Finds the net by probing a specific location on the given layer\n"
     "\n"
     "This method will find a net looking at the given layer at the specific position.\n"
@@ -551,9 +551,12 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "in the specified location. The function will report the topmost net from far above the\n"
     "hierarchy of circuits as possible.\n"
     "\n"
+    "If \\initial_circuit is given, the probing will start from this circuit and from the "
+    "cell this circuit represents. By default, the probing will start from the top circuit.\n"
+    "\n"
     "If no net is found at all, 0 is returned.\n"
     "\n"
-    "It is recommended to use \\probe on the netlist right after extraction.\n"
+    "It is recommended to use \\probe_net on the netlist right after extraction.\n"
     "Optimization functions such as \\Netlist#purge will remove parts of the net which means\n"
     "shape to net probing may no longer work for these nets.\n"
     "\n"
@@ -565,7 +568,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "The \\sc_path_out parameter has been added in version 0.27.\n"
   ) +
-  gsi::method ("probe_net", (db::Net *(db::LayoutToNetlist::*) (const db::Region &, const db::Point &, std::vector<db::SubCircuit *> *)) &db::LayoutToNetlist::probe_net, gsi::arg ("of_layer"), gsi::arg ("point"), gsi::arg ("sc_path_out", (std::vector<db::SubCircuit *> *) 0, "nil"),
+  gsi::method ("probe_net", (db::Net *(db::LayoutToNetlist::*) (const db::Region &, const db::Point &, std::vector<db::SubCircuit *> *, db::Circuit *)) &db::LayoutToNetlist::probe_net, gsi::arg ("of_layer"), gsi::arg ("point"), gsi::arg ("sc_path_out", (std::vector<db::SubCircuit *> *) 0, "nil"), gsi::arg ("initial_circuit", (db::Circuit *) 0, "nil"),
     "@brief Finds the net by probing a specific location on the given layer\n"
     "See the description of the other \\probe_net variant.\n"
     "This variant accepts a database-unit location. The location is given in the\n"

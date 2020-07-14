@@ -107,6 +107,22 @@ public:
   void select_net (const db::Net *net);
 
   /**
+   *  @brief Selects a netlist object (a circuit, a subcircuit, a net or a device)
+   */
+  void select_path (const lay::NetlistObjectPath &path)
+  {
+    select_path (lay::NetlistObjectsPath::from_first (path));
+  }
+
+  /**
+   *  @brief Selects a netlist object (a circuit, a subcircuit, a net or a device)
+   *
+   *  This variant allows specifying a paired path using either an object from the first,
+   *  the second netlist of both.
+   */
+  void select_path (const lay::NetlistObjectsPath &path);
+
+  /**
    *  @brief Set the window type and window dimensions
    */
   void set_window (lay::NetlistBrowserConfig::net_window_type window_type, double window_dim);

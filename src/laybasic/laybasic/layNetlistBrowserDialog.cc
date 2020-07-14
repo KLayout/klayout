@@ -307,41 +307,54 @@ NetlistBrowserDialog::probe_net (const db::DPoint &p, bool trace_path)
   }
 
   db::Net *net = 0;
+  db::Circuit *root = 0;
   std::vector<db::SubCircuit *> sc_path;
 
   db::LayoutToNetlist *l2ndb = view ()->get_l2ndb (m_l2n_index);
   if (l2ndb) {
 
-    //  determines the corresponding layer inside the database and probe the net from this region and the
-    //  start point.
+    root = l2ndb->netlist ()->circuit_by_name (cv->layout ().cell_name (cv.cell_index ()));
+    if (root) {
 
-    std::vector<db::Region *> regions;
+      //  determines the corresponding layer inside the database and probe the net from this region and the
+      //  start point.
 
-    const db::Connectivity &conn = l2ndb->connectivity ();
-    for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
-      db::LayerProperties lp = l2ndb->internal_layout ()->get_properties (*layer);
-      if (! lp.is_null ()) {
-        db::Region *region = l2ndb->layer_by_index (*layer);
-        if (lp == cv->layout ().get_properties (start_layer)) {
-          //  a matching original layer is looked up with higher prio
-          regions.insert (regions.begin (), region);
-        } else {
-          regions.push_back (region);
+      std::vector<db::Region *> regions;
+
+      const db::Connectivity &conn = l2ndb->connectivity ();
+      for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+        db::LayerProperties lp = l2ndb->internal_layout ()->get_properties (*layer);
+        if (! lp.is_null ()) {
+          db::Region *region = l2ndb->layer_by_index (*layer);
+          if (lp == cv->layout ().get_properties (start_layer)) {
+            //  a matching original layer is looked up with higher prio
+            regions.insert (regions.begin (), region);
+          } else {
+            regions.push_back (region);
+          }
         }
       }
-    }
 
-    //  probe the net
+      //  probe the net
 
-    for (std::vector<db::Region *>::const_iterator r = regions.begin (); r != regions.end () && !net; ++r) {
-      sc_path.clear ();
-      net = l2ndb->probe_net (**r, start_point, &sc_path);
+      for (std::vector<db::Region *>::const_iterator r = regions.begin (); r != regions.end () && !net; ++r) {
+        sc_path.clear ();
+        net = l2ndb->probe_net (**r, start_point, &sc_path, root);
+      }
+
     }
 
   }
 
   //  select the net if one was found
-  browser_page->select_net (net);
+  lay::NetlistObjectPath path;
+  if (net) {
+    path.root = root;
+    path.net = net;
+    path.path = lay::NetlistObjectPath::path_type (sc_path.begin (), sc_path.end ());
+  }
+
+  browser_page->select_path (path);
 
   //  emits the probe event
   probe_event (net, sc_path);

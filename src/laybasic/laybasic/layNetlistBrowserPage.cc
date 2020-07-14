@@ -369,6 +369,18 @@ NetlistBrowserPage::select_net (const db::Net *net)
   }
 }
 
+void
+NetlistBrowserPage::select_path (const lay::NetlistObjectsPath &path)
+{
+  if (path.is_null ()) {
+    directory_tree->clearSelection ();
+  } else {
+    NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+    tl_assert (model != 0);
+    directory_tree->setCurrentIndex (model->index_from_path (path));
+  }
+}
+
 std::vector<const db::Net *>
 NetlistBrowserPage::selected_nets ()
 {
@@ -946,13 +958,20 @@ NetlistBrowserPage::adjust_view ()
     return;
   }
 
+  const db::Layout &original_layout = mp_view->cellview (m_cv_index)->layout ();
+  const db::Circuit *top_circuit = mp_database->netlist ()->circuit_by_name (original_layout.cell_name (mp_view->cellview (m_cv_index).cell_index ()));
+
+  const db::Circuit *circuit = m_current_path.root.first;
+  if (! circuit) {
+    return;
+  }
+
   const db::Layout *layout = mp_database->internal_layout ();
-  const db::Cell *cell = mp_database->internal_top_cell ();
+  const db::Cell *cell = (top_circuit && layout->is_valid_cell_index (top_circuit->cell_index ()) ? &layout->cell (top_circuit->cell_index ()) : mp_database->internal_top_cell ());
   if (! layout || ! cell) {
     return;
   }
 
-  const db::Circuit *circuit = m_current_path.root.first;
   db::DCplxTrans trans;
 
   if (circuit) {
@@ -1232,16 +1251,21 @@ NetlistBrowserPage::update_highlights ()
   }
 
   const db::Layout &original_layout = mp_view->cellview (m_cv_index)->layout ();
+  const db::Circuit *top_circuit = mp_database->netlist ()->circuit_by_name (original_layout.cell_name (mp_view->cellview (m_cv_index).cell_index ()));
+
+  const db::Circuit *circuit = m_current_path.root.first;
+  if (! circuit) {
+    return;
+  }
 
   const db::Layout *layout = mp_database->internal_layout ();
-  const db::Cell *cell = mp_database->internal_top_cell ();
+  const db::Cell *cell = (top_circuit && layout->is_valid_cell_index (top_circuit->cell_index ()) ? &layout->cell (top_circuit->cell_index ()) : mp_database->internal_top_cell ());
   if (! layout || ! cell) {
     return;
   }
 
-  //  compute the transformation supplied by the path
+  //  computes the transformation supplied by the path
 
-  const db::Circuit *circuit = m_current_path.root.first;
   db::DCplxTrans trans;
 
   if (circuit) {

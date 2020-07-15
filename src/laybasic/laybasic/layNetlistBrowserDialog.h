@@ -72,22 +72,7 @@ public:
   /**
    *  @brief Gets the selected nets
    */
-  const std::vector<const db::Net *> &selected_nets () const;
-
-  /**
-   *  @brief Gets the selected devices
-   */
-  const std::vector<const db::Device *> &selected_devices () const;
-
-  /**
-   *  @brief Gets the selected subcircuits
-   */
-  const std::vector<const db::SubCircuit *> &selected_subcircuits () const;
-
-  /**
-   *  @brief Gets the selected circuits
-   */
-  const std::vector<const db::Circuit *> &selected_circuits () const;
+  const std::vector<lay::NetlistObjectsPath> &selected_paths () const;
 
   /**
    *  @brief An event indicating that the selection has changed

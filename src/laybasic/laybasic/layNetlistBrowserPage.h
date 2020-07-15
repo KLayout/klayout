@@ -179,33 +179,9 @@ public:
   /**
    *  @brief Gets the selected nets
    */
-  const std::vector<const db::Net *> &current_nets () const
+  const std::vector<lay::NetlistObjectsPath> &selected_paths () const
   {
-    return m_current_nets;
-  }
-
-  /**
-   *  @brief Gets the selected devices
-   */
-  const std::vector<const db::Device *> &current_devices () const
-  {
-    return m_current_devices;
-  }
-
-  /**
-   *  @brief Gets the selected subcircuits
-   */
-  const std::vector<const db::SubCircuit *> &current_subcircuits () const
-  {
-    return m_current_subcircuits;
-  }
-
-  /**
-   *  @brief Gets the selected circuits
-   */
-  const std::vector<const db::Circuit *> &current_circuits () const
-  {
-    return m_current_circuits;
+    return m_selected_paths;
   }
 
   /**
@@ -258,13 +234,8 @@ private:
   std::vector <lay::Marker *> mp_markers;
   bool m_enable_updates;
   bool m_update_needed;
-  //  @@@ TODO: make multiple ...
   lay::NetlistObjectsPath m_current_path;
-  //  @@@ TODO: remove
-  std::vector<const db::Net *> m_current_nets;
-  std::vector<const db::Device *> m_current_devices;
-  std::vector<const db::SubCircuit *> m_current_subcircuits;
-  std::vector<const db::Circuit *> m_current_circuits;
+  std::vector<lay::NetlistObjectsPath> m_selected_paths;
   lay::NetInfoDialog *mp_info_dialog;
   tl::DeferredMethod<NetlistBrowserPage> dm_update_highlights;
   tl::DeferredMethod<NetlistBrowserPage> dm_rerun_macro;
@@ -275,7 +246,7 @@ private:
   void navigate_to (const QModelIndex &index, bool forward = true);
   void adjust_view ();
   void clear_markers ();
-  void highlight (const lay::NetlistObjectsPath &path);
+  void highlight (const NetlistObjectsPath &current_path, const std::vector<NetlistObjectsPath> &selected_paths);
   std::vector<const db::Net *> selected_nets ();
   std::vector<const db::Device *> selected_devices ();
   std::vector<const db::SubCircuit *> selected_subcircuits ();

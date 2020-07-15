@@ -146,46 +146,13 @@ NetlistBrowserDialog::current_path () const
   }
 }
 
-const std::vector<const db::Net *> &
-NetlistBrowserDialog::selected_nets () const
+const std::vector<lay::NetlistObjectsPath> &
+NetlistBrowserDialog::selected_paths () const
 {
   if (browser_page) {
-    return browser_page->current_nets ();
+    return browser_page->selected_paths ();
   } else {
-    static std::vector<const db::Net *> empty;
-    return empty;
-  }
-}
-
-const std::vector<const db::Device *> &
-NetlistBrowserDialog::selected_devices () const
-{
-  if (browser_page) {
-    return browser_page->current_devices ();
-  } else {
-    static std::vector<const db::Device *> empty;
-    return empty;
-  }
-}
-
-const std::vector<const db::SubCircuit *> &
-NetlistBrowserDialog::selected_subcircuits () const
-{
-  if (browser_page) {
-    return browser_page->current_subcircuits ();
-  } else {
-    static std::vector<const db::SubCircuit *> empty;
-    return empty;
-  }
-}
-
-const std::vector<const db::Circuit *> &
-NetlistBrowserDialog::selected_circuits () const
-{
-  if (browser_page) {
-    return browser_page->current_circuits ();
-  } else {
-    static std::vector<const db::Circuit *> empty;
+    static std::vector<lay::NetlistObjectsPath> empty;
     return empty;
   }
 }

@@ -126,11 +126,44 @@ Class<lay::NetlistObjectPath> decl_NetlistObjectPath ("lay", "NetlistObjectPath"
   gsi::method ("is_null?", &lay::NetlistObjectPath::is_null,
     "@brief Returns a value indicating whether the path is an empty one.\n"
   ),
-  "@brief An object describing the instantiation of an object.\n"
+  "@brief An object describing the instantiation of a netlist object.\n"
   "This class describes the instantiation of a net or a device or a circuit in terms of "
   "a root circuit and a subcircuit chain leading to the indicated object.\n"
   "\n"
   "See \\net= or \\device= for the indicated object, \\path= for the subcircuit chain.\n"
+  "\n"
+  "This class has been introduced in version 0.27.\n"
+);
+
+static lay::NetlistObjectPath first (const lay::NetlistObjectsPath *pp)
+{
+  return pp->first ();
+}
+
+static lay::NetlistObjectPath second (const lay::NetlistObjectsPath *pp)
+{
+  return pp->second ();
+}
+
+Class<lay::NetlistObjectsPath> decl_NetlistObjectsPath ("lay", "NetlistObjectsPath",
+  gsi::method_ext ("first", &first,
+    "@brief Gets the first object's path.\n"
+    "In cases of paired netlists (LVS database), the first path points to the layout netlist object.\n"
+    "For the single netlist, the first path is the only path supplied."
+  ) +
+  gsi::method_ext ("second", &second,
+    "@brief Gets the second object's path.\n"
+    "In cases of paired netlists (LVS database), the first path points to the schematic netlist object.\n"
+    "For the single netlist, the scecond path is always a null path."
+  ),
+  "@brief An object describing the instantiation of a single netlist object or a pair of those.\n"
+  "This class is basically a pair of netlist object paths (see \\NetlistObjectPath). When derived from a single netlist view, "
+  "only the first path is valid and will point to the selected object (a net, a device or a circuit). The second path is null.\n"
+  "\n"
+  "If the path is derived from a paired netlist view (a LVS report view), the first path corresponds to the object in the layout netlist, "
+  "the second one to the object in the schematic netlist.\n"
+  "If the selected object isn't a matched one, either the first or second path may be a null or a partial path without a final net or device object "
+  "or a partial path.\n"
   "\n"
   "This class has been introduced in version 0.27.\n"
 );
@@ -169,18 +202,12 @@ Class<lay::NetlistBrowserDialog> decl_NetlistBrowserDialog ("lay", "NetlistBrows
   gsi::method_ext ("current_path_second", &current_path_second,
     "@brief Gets the path of the current object on the second (schematic in case of LVS database) side.\n"
   ) +
-  // @@@
-  gsi::method ("selected_nets", &lay::NetlistBrowserDialog::selected_nets,
-    "@brief Gets the nets currently selected in the netlist database browser.\n"
+  gsi::method ("current_path", &lay::NetlistBrowserDialog::current_path,
+    "@brief Gets the path of the current object as a path pair (combines layout and schematic object paths in case of a LVS database view).\n"
   ) +
-  gsi::method ("selected_devices", &lay::NetlistBrowserDialog::selected_devices,
-    "@brief Gets the devices currently selected in the netlist database browser.\n"
-  ) +
-  gsi::method ("selected_subcircuits", &lay::NetlistBrowserDialog::selected_subcircuits,
-    "@brief Gets the subcircuits currently selected in the netlist database browser.\n"
-  ) +
-  gsi::method ("selected_circuits", &lay::NetlistBrowserDialog::selected_circuits,
-    "@brief Gets the circuits currently selected in the netlist database browser.\n"
+  gsi::method ("selected_paths", &lay::NetlistBrowserDialog::selected_paths,
+    "@brief Gets the nets currently selected objects (paths) in the netlist database browser.\n"
+    "The result is an array of path pairs. See \\NetlistObjectsPath for details about these pairs."
   ),
   "@brief Represents the netlist browser dialog.\n"
   "This dialog is a part of the \\LayoutView class and can be obtained through \\LayoutView#netlist_browser.\n"

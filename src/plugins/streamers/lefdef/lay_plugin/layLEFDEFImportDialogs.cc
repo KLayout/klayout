@@ -452,7 +452,7 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
   data->set_labels_datatype (datatype_labels->text ().toInt ());
   data->set_separate_groups (separate_groups->isChecked ());
   data->set_map_file (tl::to_string (mapfile_path->text ()));
-  data->set_macro_resolution_mode (foreign_mode->currentIndex ());
+  data->set_macro_resolution_mode (produce_lef_geo->isChecked () ? 0 : 2);
 
   data->clear_lef_files ();
   for (int i = 0; i < lef_files->count (); ++i) {
@@ -515,7 +515,7 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   separate_groups->setChecked (data->separate_groups ());
   mapfile_path->setText (tl::to_qstring (data->map_file ()));
   layer_map_mode->setCurrentIndex (data->map_file ().empty () ? 1 : 0);
-  foreign_mode->setCurrentIndex (data->macro_resolution_mode ());
+  produce_lef_geo->setChecked (data->macro_resolution_mode () == 0);
 
   checkbox_changed ();
 

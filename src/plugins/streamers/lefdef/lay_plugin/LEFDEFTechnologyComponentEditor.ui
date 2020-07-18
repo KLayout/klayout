@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>859</width>
+    <width>628</width>
     <height>868</height>
    </rect>
   </property>
@@ -210,7 +210,7 @@
       <item row="1" column="4">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>FOREIGN macros</string>
+         <string>LEF import</string>
         </property>
        </widget>
       </item>
@@ -241,29 +241,10 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="5" colspan="2">
-       <widget class="QComboBox" name="foreign_mode">
-        <item>
-         <property name="text">
-          <string>Link to external cells for FOREIGN, LEF macros otherwise</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Ignore FOREIGN, Produce LEF macros always</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Always link to external cells</string>
-         </property>
-        </item>
-       </widget>
-      </item>
       <item row="1" column="1" colspan="2">
        <widget class="QCheckBox" name="separate_groups">
         <property name="text">
-         <string>Produce a parent cell for each group</string>
+         <string>Produce a parent cell per group</string>
         </property>
        </widget>
       </item>
@@ -322,6 +303,13 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="1" column="5" colspan="2">
+       <widget class="QCheckBox" name="produce_lef_geo">
+        <property name="text">
+         <string>Produce LEF geometry</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -605,26 +593,13 @@
    <item>
     <widget class="QTabWidget" name="layer_map_mode">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
        <string>Layer Map File</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="2" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>278</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
        <item row="0" column="0">
         <widget class="QLabel" name="label_6">
          <property name="text">
@@ -645,13 +620,29 @@
        <item row="0" column="1">
         <widget class="QLineEdit" name="mapfile_path"/>
        </item>
-       <item row="1" column="1">
+       <item row="1" column="1" colspan="2">
         <widget class="QLabel" name="label_25">
          <property name="text">
           <string>If a layer map file is given, pattern based rules are ignored.
 If used inside a technology, the file will be looked up relative to the technology's base path.</string>
          </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
         </widget>
+       </item>
+       <item row="2" column="0" colspan="3">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>278</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -682,7 +673,14 @@ If used inside a technology, the file will be looked up relative to the technolo
            <number>0</number>
           </property>
           <item row="3" column="7">
-           <widget class="QLineEdit" name="suffix_labels"/>
+           <widget class="QLineEdit" name="suffix_labels">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item row="1" column="6">
            <widget class="QLabel" name="label_23">
@@ -701,10 +699,24 @@ If used inside a technology, the file will be looked up relative to the technolo
            </widget>
           </item>
           <item row="2" column="2">
-           <widget class="QLineEdit" name="suffix_pins"/>
+           <widget class="QLineEdit" name="suffix_pins">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item row="3" column="8">
-           <widget class="QLineEdit" name="datatype_labels"/>
+           <widget class="QLineEdit" name="datatype_labels">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item row="2" column="5">
            <widget class="QCheckBox" name="produce_special_routing">
@@ -714,13 +726,34 @@ If used inside a technology, the file will be looked up relative to the technolo
            </widget>
           </item>
           <item row="4" column="3">
-           <widget class="QLineEdit" name="datatype_obstructions"/>
+           <widget class="QLineEdit" name="datatype_obstructions">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item row="2" column="8">
-           <widget class="QLineEdit" name="datatype_special_routing"/>
+           <widget class="QLineEdit" name="datatype_special_routing">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item row="3" column="3">
-           <widget class="QLineEdit" name="datatype_lef_pins"/>
+           <widget class="QLineEdit" name="datatype_lef_pins">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item row="1" column="1">
            <widget class="QLabel" name="label_12">
@@ -739,13 +772,34 @@ If used inside a technology, the file will be looked up relative to the technolo
            </widget>
           </item>
           <item row="1" column="8">
-           <widget class="QLineEdit" name="datatype_routing"/>
+           <widget class="QLineEdit" name="datatype_routing">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item row="1" column="7">
-           <widget class="QLineEdit" name="suffix_routing"/>
+           <widget class="QLineEdit" name="suffix_routing">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item row="4" column="8">
-           <widget class="QLineEdit" name="datatype_blockages"/>
+           <widget class="QLineEdit" name="datatype_blockages">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item row="2" column="6">
            <widget class="QLabel" name="label_16">
@@ -787,7 +841,14 @@ If used inside a technology, the file will be looked up relative to the technolo
            </widget>
           </item>
           <item row="3" column="2">
-           <widget class="QLineEdit" name="suffix_lef_pins"/>
+           <widget class="QLineEdit" name="suffix_lef_pins">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item row="2" column="1">
            <widget class="QLabel" name="label_13">
@@ -845,7 +906,8 @@ If used inside a technology, the file will be looked up relative to the technolo
           <item row="0" column="7">
            <widget class="QLabel" name="lbl1_2">
             <property name="text">
-             <string>Layer name suffix ...</string>
+             <string>Layer name
+suffix ...</string>
             </property>
            </widget>
           </item>
@@ -857,15 +919,30 @@ If used inside a technology, the file will be looked up relative to the technolo
            </widget>
           </item>
           <item row="1" column="2">
-           <widget class="QLineEdit" name="suffix_via_geometry"/>
+           <widget class="QLineEdit" name="suffix_via_geometry">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item row="2" column="3">
-           <widget class="QLineEdit" name="datatype_pins"/>
+           <widget class="QLineEdit" name="datatype_pins">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item row="0" column="8">
            <widget class="QLabel" name="label_27">
             <property name="text">
-             <string>GDS datatype ...</string>
+             <string>GDS data-
+type ...</string>
             </property>
            </widget>
           </item>
@@ -886,13 +963,34 @@ If used inside a technology, the file will be looked up relative to the technolo
            </widget>
           </item>
           <item row="2" column="7">
-           <widget class="QLineEdit" name="suffix_special_routing"/>
+           <widget class="QLineEdit" name="suffix_special_routing">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item row="1" column="3">
-           <widget class="QLineEdit" name="datatype_via_geometry"/>
+           <widget class="QLineEdit" name="datatype_via_geometry">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item row="4" column="2">
-           <widget class="QLineEdit" name="suffix_obstructions"/>
+           <widget class="QLineEdit" name="suffix_obstructions">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item row="4" column="5">
            <widget class="QCheckBox" name="produce_blockages">
@@ -925,19 +1023,28 @@ If used inside a technology, the file will be looked up relative to the technolo
            </widget>
           </item>
           <item row="4" column="7">
-           <widget class="QLineEdit" name="suffix_blockages"/>
+           <widget class="QLineEdit" name="suffix_blockages">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item row="0" column="2">
            <widget class="QLabel" name="lbl1">
             <property name="text">
-             <string>Layer name suffix ...</string>
+             <string>Layer name
+suffix ...</string>
             </property>
            </widget>
           </item>
           <item row="0" column="3">
            <widget class="QLabel" name="label_3">
             <property name="text">
-             <string>GDS datatype ...</string>
+             <string>GDS data-
+type ...</string>
             </property>
            </widget>
           </item>

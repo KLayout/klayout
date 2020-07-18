@@ -366,6 +366,7 @@ LEFDEFReaderOptionsEditor::LEFDEFReaderOptionsEditor (QWidget *parent)
   connect (browse_mapfile, SIGNAL (clicked ()), this, SLOT (browse_mapfile_clicked ()));
 
   lay::activate_help_links (help_label);
+  lay::activate_help_links (help_label2);
 }
 
 void 

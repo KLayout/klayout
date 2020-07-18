@@ -587,6 +587,16 @@
         </property>
        </widget>
       </item>
+      <item row="4" column="5" colspan="3">
+       <widget class="QLabel" name="help_label2">
+        <property name="text">
+         <string>&lt;html&gt;&lt;body&gt;(&lt;a href=&quot;int:/about/layer_specs.xml&quot;&gt;See here for the layer specification&lt;/a&gt;)&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

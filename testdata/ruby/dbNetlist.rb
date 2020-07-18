@@ -68,8 +68,20 @@ class DBNetlist_TestClass < TestBase
     cc.dont_purge = true
     assert_equal(cc.dont_purge, true)
 
+    begin
+      nl.remove(cc) # not in netlist yet
+      assert_equal(false, true)
+    rescue
+    end
+
     nl.add(cc)
     cc.name = "ABC"
+
+    begin
+      nl.add(cc) # already in netlist
+      assert_equal(false, true)
+    rescue
+    end
 
     names = []
     nl.each_circuit { |i| names << i.name }
@@ -119,8 +131,21 @@ class DBNetlist_TestClass < TestBase
     assert_equal(c.name, "XYZ")
 
     cc = RBA::GenericDeviceClass::new
+
+    begin
+      nl.remove(cc) # not in netlist yet
+      assert_equal(false, true)
+    rescue
+    end
+
     nl.add(cc)
     cc.name = "ABC"
+
+    begin
+      nl.add(cc) # already in netlist
+      assert_equal(false, true)
+    rescue
+    end
 
     names = []
     nl.each_device_class { |i| names << i.name }

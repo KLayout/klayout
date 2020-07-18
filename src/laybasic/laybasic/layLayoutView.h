@@ -50,6 +50,7 @@
 #include "layPlugin.h"
 #include "layDisplayState.h"
 #include "layBookmarkList.h"
+#include "layDialogs.h"
 #include "gsi.h"
 #include "tlException.h"
 #include "tlEvents.h"
@@ -2871,9 +2872,7 @@ private:
   db::LayerProperties m_new_layer_props;
   db::DVector m_move_dist;
   int m_move_to_origin_mode_x, m_move_to_origin_mode_y;
-  int m_align_cell_origin_mode_x, m_align_cell_origin_mode_y;
-  bool m_align_cell_origin_visible_layers;
-  bool m_align_cell_adjust_parents;
+  lay::AlignCellOptions m_align_cell_options;
   int m_del_cell_mode;
   int m_layer_hier_mode;
   int m_duplicate_hier_mode;

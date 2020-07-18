@@ -631,6 +631,20 @@ module LVS
       @comparer_config << lambda { |comparer| comparer.max_branch_complexity = v }
     end
 
+    # %LVS%
+    # @name consider_net_names
+    # @brief Indicates whether the netlist comparer shall use net names
+    # @synopsis consider_net_names(f)
+    # If this value is set to true (the default), the netlist comparer
+    # will employ net names to resolve ambiguities. If set to false,
+    # ambiguities will be resolved based on the topology alone. Topology
+    # resolution is more expensive.
+ 
+    def consider_net_names(value)
+      v = ! value
+      @comparer_config << lambda { |comparer| comparer.dont_consider_net_names = v }
+    end
+
   end
   
 end

@@ -238,6 +238,7 @@ namespace tl
    */
   template <> struct type_traits <db::Library> : public type_traits<void> {
     typedef tl::false_tag has_copy_constructor;
+    typedef tl::false_tag has_public_destructor;
   };
 }
 

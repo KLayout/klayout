@@ -71,5 +71,7 @@ connect_global(ptie, "SUBSTRATE")
 netlist.simplify
 align
 
+consider_net_names(false)
+
 compare
 

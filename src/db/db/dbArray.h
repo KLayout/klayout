@@ -70,7 +70,11 @@ struct basic_array_iterator
 
   virtual long index_a () const { return -1; }
   virtual long index_b () const { return -1; }
-  
+
+  virtual size_t quad_id () const { return 0; }
+  virtual box_type quad_box () const { return box_type::world (); }
+  virtual void skip_quad () { }
+
   virtual disp_type get () const = 0;
   
   virtual basic_array_iterator<Coord> *clone () const = 0;
@@ -111,7 +115,11 @@ struct ArrayBase
 
   virtual bool equal (const ArrayBase *) const = 0;
 
+  virtual bool fuzzy_equal (const ArrayBase *) const = 0;
+
   virtual bool less (const ArrayBase *) const = 0;
+
+  virtual bool fuzzy_less (const ArrayBase *) const = 0;
 
   virtual void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const = 0;
 
@@ -554,11 +562,25 @@ struct regular_array
     return (m_a == d->m_a && m_b == d->m_b && m_amax == d->m_amax && m_bmax == d->m_bmax);
   }
 
+  virtual bool fuzzy_equal (const ArrayBase *b) const
+  {
+    const regular_array<Coord> *d = static_cast<const regular_array<Coord> *> (b);
+    return (m_a.equal (d->m_a) && m_b.equal (d->m_b) && m_amax == d->m_amax && m_bmax == d->m_bmax);
+  }
+
   virtual bool less (const ArrayBase *b) const
   {
     const regular_array<Coord> *d = static_cast<const regular_array<Coord> *> (b);
     return m_a < d->m_a || (m_a == d->m_a && (
            m_b < d->m_b || (m_b == d->m_b && (
+           m_amax < d->m_amax || (m_amax == d->m_amax && m_bmax < d->m_bmax)))));
+  }
+
+  virtual bool fuzzy_less (const ArrayBase *b) const
+  {
+    const regular_array<Coord> *d = static_cast<const regular_array<Coord> *> (b);
+    return m_a.less (d->m_a) || (m_a.equal (d->m_a) && (
+           m_b.less (d->m_b) || (m_b.equal (d->m_b) && (
            m_amax < d->m_amax || (m_amax == d->m_amax && m_bmax < d->m_bmax)))));
   }
 
@@ -702,6 +724,18 @@ struct regular_complex_array
     return regular_array<Coord>::equal (b);
   }
 
+  virtual bool fuzzy_equal (const ArrayBase *b) const
+  {
+    const regular_complex_array<Coord> *d = static_cast<const regular_complex_array<Coord> *> (b);
+    if (fabs (m_acos - d->m_acos) > epsilon) {
+      return false;
+    }
+    if (fabs (m_mag - d->m_mag) > epsilon) {
+      return false;
+    }
+    return regular_array<Coord>::fuzzy_equal (b);
+  }
+
   virtual bool less (const ArrayBase *b) const
   {
     const regular_complex_array<Coord> *d = static_cast<const regular_complex_array<Coord> *> (b);
@@ -712,6 +746,18 @@ struct regular_complex_array
       return m_mag < d->m_mag;
     }
     return regular_array<Coord>::less (b);
+  }
+
+  virtual bool fuzzy_less (const ArrayBase *b) const
+  {
+    const regular_complex_array<Coord> *d = static_cast<const regular_complex_array<Coord> *> (b);
+    if (fabs (m_acos - d->m_acos) > epsilon) {
+      return m_acos < d->m_acos;
+    }
+    if (fabs (m_mag - d->m_mag) > epsilon) {
+      return m_mag < d->m_mag;
+    }
+    return regular_array<Coord>::fuzzy_less (b);
   }
 
   virtual void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
@@ -804,6 +850,21 @@ struct iterated_array_iterator
   virtual basic_array_iterator<Coord> *clone () const 
   {
     return new iterated_array_iterator <Coord> (*this);
+  }
+
+  virtual size_t quad_id () const
+  {
+    return m_t.quad_id ();
+  }
+
+  virtual box_type quad_box () const
+  {
+    return m_t.quad_box ();
+  }
+
+  virtual void skip_quad ()
+  {
+    m_t.skip_quad ();
   }
 
 private:
@@ -964,6 +1025,20 @@ struct iterated_array
     return true;
   }
 
+  virtual bool fuzzy_equal (const ArrayBase *b) const
+  {
+    const iterated_array<Coord> *d = static_cast<const iterated_array<Coord> *> (b);
+    if (m_v.size () != d->m_v.size ()) {
+      return false;
+    }
+    for (const_iterator p1 = m_v.begin (), p2 = d->m_v.begin (); p1 != m_v.end (); ++p1, ++p2) {
+      if (! p1->equal (*p2)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   virtual bool less (const ArrayBase *b) const
   {
     const iterated_array<Coord> *d = static_cast<const iterated_array<Coord> *> (b);
@@ -973,6 +1048,20 @@ struct iterated_array
     for (const_iterator p1 = m_v.begin (), p2 = d->m_v.begin (); p1 != m_v.end (); ++p1, ++p2) {
       if (*p1 != *p2) {
         return (*p1 < *p2);
+      }
+    }
+    return false;
+  }
+
+  virtual bool fuzzy_less (const ArrayBase *b) const
+  {
+    const iterated_array<Coord> *d = static_cast<const iterated_array<Coord> *> (b);
+    if (m_v.size () != d->m_v.size ()) {
+      return (m_v.size () < d->m_v.size ());
+    }
+    for (const_iterator p1 = m_v.begin (), p2 = d->m_v.begin (); p1 != m_v.end (); ++p1, ++p2) {
+      if (! p1->equal (*p2)) {
+        return (p1->less (*p2));
       }
     }
     return false;
@@ -1085,6 +1174,18 @@ struct iterated_complex_array
     return iterated_array<Coord>::equal (b);
   }
 
+  virtual bool fuzzy_equal (const ArrayBase *b) const
+  {
+    const iterated_complex_array<Coord> *d = static_cast<const iterated_complex_array<Coord> *> (b);
+    if (fabs (m_acos - d->m_acos) > epsilon) {
+      return false;
+    }
+    if (fabs (m_mag - d->m_mag) > epsilon) {
+      return false;
+    }
+    return iterated_array<Coord>::fuzzy_equal (b);
+  }
+
   virtual bool less (const ArrayBase *b) const
   {
     const iterated_complex_array<Coord> *d = static_cast<const iterated_complex_array<Coord> *> (b);
@@ -1095,6 +1196,18 @@ struct iterated_complex_array
       return m_mag < d->m_mag;
     }
     return iterated_array<Coord>::less (b);
+  }
+
+  virtual bool fuzzy_less (const ArrayBase *b) const
+  {
+    const iterated_complex_array<Coord> *d = static_cast<const iterated_complex_array<Coord> *> (b);
+    if (fabs (m_acos - d->m_acos) > epsilon) {
+      return m_acos < d->m_acos;
+    }
+    if (fabs (m_mag - d->m_mag) > epsilon) {
+      return m_mag < d->m_mag;
+    }
+    return iterated_array<Coord>::fuzzy_less (b);
   }
 
   virtual complex_trans_type complex_trans (const simple_trans_type &s) const
@@ -1187,7 +1300,12 @@ struct single_complex_inst
     return true;
   }
 
-  virtual bool less (const ArrayBase *b) const 
+  virtual bool fuzzy_equal (const ArrayBase *b) const
+  {
+    return equal (b);
+  }
+
+  virtual bool less (const ArrayBase *b) const
   {
     const double epsilon = 1e-10;
     const single_complex_inst<Coord> *d = static_cast<const single_complex_inst<Coord> *> (b);
@@ -1198,6 +1316,11 @@ struct single_complex_inst
       return m_acos < d->m_acos;
     }
     return false;
+  }
+
+  virtual bool fuzzy_less (const ArrayBase *b) const
+  {
+    return less (b);
   }
 
   virtual void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
@@ -1420,6 +1543,36 @@ struct array_iterator
     return mp_base ? mp_base->index_b () : -1;
   }
 
+  /**
+   *  @brief For iterators supporting quads (iterated arrays), this method will return the quad ID
+   */
+  size_t quad_id () const
+  {
+    return mp_base ? mp_base->quad_id () : 0;
+  }
+
+  /**
+   *  @brief For iterators supporting quads (iterated arrays), this method will return the quad bounding box
+   *
+   *  Note that this method will only return a valid quad box is the quad_id is non-null.
+   *
+   *  This method will return the bounding box of all array offsets in the quad.
+   */
+  db::box<Coord> quad_box () const
+  {
+    return mp_base ? mp_base->quad_box () : db::box<Coord>::world ();
+  }
+
+  /**
+   *  @brief For iterators supporting quads (iterated arrays), this method will skip the current quad
+   */
+  void skip_quad ()
+  {
+    if (mp_base) {
+      mp_base->skip_quad ();
+    }
+  }
+
 private:
   trans_type m_trans;
   basic_array_iterator <Coord> *mp_base;
@@ -1588,6 +1741,32 @@ struct array
   explicit 
   array (const Obj &obj, const trans_type &trans, double acos, double mag)
     : m_obj (obj), m_trans (trans), mp_base (new single_complex_inst <coord_type> (acos, mag))
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief The iterated array constructor
+   *
+   *  This is basically a convenience function that creates
+   *  an appropriate basic_array object.
+   */
+  template <class Iter>
+  array (const Obj &obj, const trans_type &trans, Iter from, Iter to)
+    : m_obj (obj), m_trans (trans), mp_base (new iterated_array <coord_type> (from, to))
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief The complex iterated array constructor
+   *
+   *  This is basically a convenience function that creates
+   *  an appropriate basic_array object.
+   */
+  template <class Iter>
+  array (const Obj &obj, const complex_trans_type &ct, Iter from, Iter to)
+    : m_obj (obj), m_trans (ct), mp_base (new iterated_complex_array <coord_type> (ct.rcos (), ct.mag (), from, to))
   {
     //  .. nothing yet ..
   }
@@ -1836,6 +2015,32 @@ struct array
   }
 
   /**
+   *  @brief Gets the bounding box from the iterator's current quad
+   *
+   *  The bounding box is that of all objects in the current quad and
+   *  is confined to the array's total bounding box.
+   */
+  template <class Iter, class BoxConv>
+  box_type quad_box (const Iter &iter, const BoxConv &bc) const
+  {
+    box_type bb;
+    if (mp_base) {
+      bb = mp_base->bbox (box_type (0, 0, 0, 0));
+    }
+    bb &= iter.quad_box ();
+
+    if (mp_base) {
+      if (mp_base->is_complex ()) {
+        return bb * box_type (mp_base->complex_trans (simple_trans_type (m_trans)) * bc (m_obj));
+      } else {
+        return bb * (m_trans * bc (m_obj));
+      }
+    } else {
+      return bb * (m_trans * bc (m_obj));
+    }
+  }
+
+  /**
    *  @brief The number of single instances in the array
    */
   size_t size () const
@@ -1919,6 +2124,21 @@ struct array
   }
 
   /**
+   *  @brief Compare operator for equality (fuzzy version)
+   */
+  bool equal (const array<Obj, Trans> &d) const
+  {
+    if (! mp_base) {
+      return (m_trans.equal (d.m_trans) && m_obj == d.m_obj && ! d.mp_base);
+    } else {
+      if (! m_trans.equal (d.m_trans) || ! (m_obj == d.m_obj) || type () != d.type ()) {
+        return false;
+      }
+      return mp_base && mp_base->fuzzy_equal (d.mp_base);
+    }
+  }
+
+  /**
    *  @brief A sorting order criterion
    */
   bool operator< (const array<Obj, Trans> &d) const
@@ -1940,6 +2160,31 @@ struct array
       return false;
     } else {
       return mp_base->less (d.mp_base);
+    }
+  }
+
+  /**
+   *  @brief A fuzzy sorting order criterion
+   */
+  bool less (const array<Obj, Trans> &d) const
+  {
+    if (! (m_obj == d.m_obj)) {
+      return (m_obj < d.m_obj);
+    }
+    if (! m_trans.equal (d.m_trans)) {
+      return m_trans.less (d.m_trans);
+    }
+    if (type () != d.type ()) {
+      return (type () < d.type ());
+    }
+    if (mp_base == d.mp_base) {
+      return false;
+    } else if (! mp_base) {
+      return true;
+    } else if (! d.mp_base) {
+      return false;
+    } else {
+      return mp_base->fuzzy_less (d.mp_base);
     }
   }
 
@@ -2263,7 +2508,7 @@ struct array
     }
     db::mem_stat (stat, purpose, cat, m_obj, true, (void *) this);
     if (mp_base) {
-      db::mem_stat (stat, purpose, cat, *mp_base, false, (void *) this);
+      mp_base->mem_stat (stat, purpose, cat, false, (void *) this);
     }
   }
 

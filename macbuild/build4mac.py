@@ -441,14 +441,16 @@ def RunMainBuildBash():
   global DeploymentF
   global DeploymentP
   global PackagePrefix
-  global MacPkgDir       # relative path to package directory
-  global MacBinDir       # relative path to binary directory
-  global MacBuildDir     # relative path to build directory
-  global MacBuildLog     # relative path to build log file
-  global AbsMacPkgDir    # absolute path to package directory
-  global AbsMacBinDir    # absolute path to binary directory
-  global AbsMacBuildDir  # absolute path to build directory
-  global AbsMacBuildLog  # absolute path to build log file
+  global MacPkgDir          # relative path to package directory
+  global MacBinDir          # relative path to binary directory
+  global MacBuildDir        # relative path to build directory
+  global MacBuildDirQAT     # relative path to build directory for QATest
+  global MacBuildLog        # relative path to build log file
+  global AbsMacPkgDir       # absolute path to package directory
+  global AbsMacBinDir       # absolute path to binary directory
+  global AbsMacBuildDir     # absolute path to build directory
+  global AbsMacBuildDirQAT  # absolute path to build directory for QATest
+  global AbsMacBuildLog     # absolute path to build log file
 
   #-----------------------------------------------------
   # [1] Set parameters passed to the main Bash script
@@ -468,14 +470,16 @@ def RunMainBuildBash():
   ruby_python = "R%sP%s" % ( ruby.lower(), python.lower() )
 
   # (C) Target directories and files
-  MacPkgDir      = "./%s%s.pkg.macos-%s-%s-%s"      % (PackagePrefix, qt, Platform, mode, ruby_python)
-  MacBinDir      = "./%s.bin.macos-%s-%s-%s"        % (               qt, Platform, mode, ruby_python)
-  MacBuildDir    = "./%s.build.macos-%s-%s-%s"      % (               qt, Platform, mode, ruby_python)
-  MacBuildLog    = "./%s.build.macos-%s-%s-%s.log"  % (               qt, Platform, mode, ruby_python)
-  AbsMacPkgDir   = "%s/%s%s.pkg.macos-%s-%s-%s"     % (ProjectDir, PackagePrefix, qt, Platform, mode, ruby_python)
-  AbsMacBinDir   = "%s/%s.bin.macos-%s-%s-%s"       % (ProjectDir,                qt, Platform, mode, ruby_python)
-  AbsMacBuildDir = "%s/%s.build.macos-%s-%s-%s"     % (ProjectDir,                qt, Platform, mode, ruby_python)
-  AbsMacBuildLog = "%s/%s.build.macos-%s-%s-%s.log" % (ProjectDir,                qt, Platform, mode, ruby_python)
+  MacPkgDir         = "./%s%s.pkg.macos-%s-%s-%s"      % (PackagePrefix, qt, Platform, mode, ruby_python)
+  MacBinDir         = "./%s.bin.macos-%s-%s-%s"        % (               qt, Platform, mode, ruby_python)
+  MacBuildDir       = "./%s.build.macos-%s-%s-%s"      % (               qt, Platform, mode, ruby_python)
+  MacBuildLog       = "./%s.build.macos-%s-%s-%s.log"  % (               qt, Platform, mode, ruby_python)
+  AbsMacPkgDir      = "%s/%s%s.pkg.macos-%s-%s-%s"     % (ProjectDir, PackagePrefix, qt, Platform, mode, ruby_python)
+  AbsMacBinDir      = "%s/%s.bin.macos-%s-%s-%s"       % (ProjectDir,                qt, Platform, mode, ruby_python)
+  AbsMacBuildDir    = "%s/%s.build.macos-%s-%s-%s"     % (ProjectDir,                qt, Platform, mode, ruby_python)
+  AbsMacBuildLog    = "%s/%s.build.macos-%s-%s-%s.log" % (ProjectDir,                qt, Platform, mode, ruby_python)
+  MacBuildDirQAT    = MacBuildDir    + ".macQAT"
+  AbsMacBuildDirQAT = AbsMacBuildDir + ".macQAT"
 
   # (D) Qt5
   if ModuleQt == 'Qt5MacPorts':
@@ -554,6 +558,45 @@ def RunMainBuildBash():
       print( "### <%s>: successfully built KLayout" % myscript, file=sys.stderr )
       print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
       print( "", file=sys.stderr )
+
+      #------------------------------------------------------------------------
+      # [4] Prepare "*.macQAT/" directory for the QATest.
+      #     Binaries under "*.macQAT/" such as *.dylib will be touched later.
+      #------------------------------------------------------------------------
+      print( "### Preparing <%s>" % MacBuildDirQAT )
+      if os.path.isdir( MacBuildDirQAT ):
+        shutil.rmtree( MacBuildDirQAT )
+
+      os.chdir( MacBuildDir )
+      tarFile = "../macQATest.tar"
+      tarCmdC = "tar cf %s ." % tarFile
+      if subprocess.call( tarCmdC, shell=True ) != 0:
+        print( "", file=sys.stderr )
+        print( "-------------------------------------------------------------", file=sys.stderr )
+        print( "!!! <%s>: failed to create <%s>" % (myscript, tarFile), file=sys.stderr )
+        print( "-------------------------------------------------------------", file=sys.stderr )
+        print( "", file=sys.stderr )
+        return 1
+
+      os.chdir( "../" )
+      os.mkdir( MacBuildDirQAT )
+      os.chdir( MacBuildDirQAT )
+      tarCmdX = "tar xf %s" % tarFile
+      if subprocess.call( tarCmdX, shell=True ) != 0:
+        print( "", file=sys.stderr )
+        print( "-------------------------------------------------------------", file=sys.stderr )
+        print( "!!! <%s>: failed to unpack <%s>" % (myscript, tarFile), file=sys.stderr )
+        print( "-------------------------------------------------------------", file=sys.stderr )
+        print( "", file=sys.stderr )
+        return 1
+
+      os.remove( tarFile )
+      os.chdir( "../" )
+      shutil.copy2( "macbuild/macQAT.sh", MacBuildDirQAT )
+      print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
+      print( "### <%s>: prepared the initial *.macQAT/" % myscript, file=sys.stderr )
+      print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
+      print( "", file=sys.stderr )
       return 0
 
 #------------------------------------------------------------------------------
@@ -573,10 +616,12 @@ def DeployBinariesForBundle():
   global MacPkgDir
   global MacBinDir
   global MacBuildDir
+  global MacBuildDirQAT
   global MacBuildLog
   global AbsMacPkgDir
   global AbsMacBinDir
   global AbsMacBuildDir
+  global AbsMacBuildDirQAT
   global AbsMacBuildLog
   global Version
   global DeployVerbose

@@ -241,16 +241,28 @@ Instance::to_string (bool resolve_cell_name) const
     r = "cell_index=" + tl::to_string (ci.object ().cell_index ());
   }
 
-  if (ci.is_complex ()) {
-    r += " " + ci.complex_trans ().to_string ();
-  } else {
-    r += " " + (*ci.begin ()).to_string ();
-  }
-
   db::vector<coord_type> a, b;
   unsigned long amax, bmax;
   if (ci.is_regular_array (a, b, amax, bmax)) {
+
+    if (ci.is_complex ()) {
+      r += " " + ci.complex_trans ().to_string ();
+    } else {
+      r += " " + (*ci.begin ()).to_string ();
+    }
+
     r += " array=(" + a.to_string () + "," + b.to_string () + " " + tl::to_string (amax) + "x" + tl::to_string (bmax) + ")";
+
+  } else {
+
+    for (db::CellInstArray::iterator i = ci.begin (); ! i.at_end (); ++i) {
+      if (ci.is_complex ()) {
+        r += " " + ci.complex_trans (*i).to_string ();
+      } else {
+        r += " " + (*i).to_string ();
+      }
+    }
+
   }
 
   if (has_prop_id ()) {
@@ -640,13 +652,12 @@ OverlappingInstanceIteratorTraits::init (instance_iterator<OverlappingInstanceIt
 //  ChildCellIterator implementation
 
 ChildCellIterator::ChildCellIterator ()
-  : m_iter (), m_end (), mp_insts (0)
+  : m_iter (), m_end ()
 { }
 
 ChildCellIterator::ChildCellIterator (const instances_type *insts)
   : m_iter (insts->begin_sorted_insts ()),
-    m_end (insts->end_sorted_insts ()),
-    mp_insts (insts)
+    m_end (insts->end_sorted_insts ())
 { }
 
 cell_index_type 

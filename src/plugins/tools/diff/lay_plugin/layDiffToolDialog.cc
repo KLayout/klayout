@@ -224,6 +224,10 @@ RdbDifferenceReceiver::produce_cell_inst (const db::CellInstArrayWithProperties 
   unsigned long amax, bmax;
   if (ci.is_regular_array (a, b, amax, bmax)) {
     r += tl::sprintf (" [a=%s, b=%s, na=%ld, nb=%ld]", a.to_string (), b.to_string (), amax, bmax);
+  } else if (ci.size () > 1) {
+    r += " (+";
+    r += tl::to_string (ci.size () - 1);
+    r += " irregular placements)";
   }
 
   item->add_value (r);

@@ -80,6 +80,7 @@ public:
   virtual size_t net_subcircuit_pin_count (const net_pair &nets) const = 0;
   virtual size_t net_pin_count (const net_pair &nets) const = 0;
   virtual size_t device_count (const circuit_pair &circuits) const = 0;
+  virtual size_t subcircuit_pin_count (const subcircuit_pair &subcircuits) const = 0;
   virtual size_t pin_count (const circuit_pair &circuits) const = 0;
   virtual size_t subcircuit_count (const circuit_pair &circuits) const = 0;
   virtual size_t child_circuit_count (const circuit_pair &circuits) const = 0;
@@ -95,6 +96,7 @@ public:
   virtual const db::Net *second_net_for (const db::Net *first) const = 0;
   virtual const db::Circuit *second_circuit_for (const db::Circuit *first) const = 0;
   virtual net_subcircuit_pin_pair net_subcircuit_pinref_from_index (const net_pair &nets, size_t index) const = 0;
+  virtual net_subcircuit_pin_pair subcircuit_pinref_from_index (const subcircuit_pair &subcircuits, size_t index) const = 0;
   virtual net_terminal_pair net_terminalref_from_index (const net_pair &nets, size_t index) const = 0;
   virtual net_pin_pair net_pinref_from_index (const net_pair &nets, size_t index) const = 0;
   virtual std::pair<device_pair, Status> device_from_index (const circuit_pair &circuits, size_t index) const = 0;
@@ -149,6 +151,7 @@ public:
   virtual size_t net_pin_count (const net_pair &nets) const;
   virtual size_t device_count (const circuit_pair &circuits) const;
   virtual size_t pin_count (const circuit_pair &circuits) const;
+  virtual size_t subcircuit_pin_count (const subcircuit_pair &subcircuits) const;
   virtual size_t subcircuit_count (const circuit_pair &circuits) const;
   virtual size_t child_circuit_count (const circuit_pair &circuits) const;
 
@@ -163,6 +166,7 @@ public:
   virtual const db::Net *second_net_for (const db::Net *first) const;
   virtual const db::Circuit *second_circuit_for (const db::Circuit *first) const;
   virtual net_subcircuit_pin_pair net_subcircuit_pinref_from_index (const net_pair &nets, size_t index) const;
+  virtual net_subcircuit_pin_pair subcircuit_pinref_from_index (const subcircuit_pair &subcircuits, size_t index) const;
   virtual net_terminal_pair net_terminalref_from_index (const net_pair &nets, size_t index) const;
   virtual net_pin_pair net_pinref_from_index (const net_pair &nets, size_t index) const;
   virtual std::pair<device_pair, Status> device_from_index (const circuit_pair &circuits, size_t index) const;
@@ -194,6 +198,8 @@ private:
   mutable std::map<pin_pair, size_t> m_pin_index_by_object;
   mutable std::map<subcircuit_pair, size_t> m_subcircuit_index_by_object;
   mutable std::map<device_pair, size_t> m_device_index_by_object;
+  mutable std::map<subcircuit_pair, std::vector<net_subcircuit_pin_pair> > m_subcircuit_pins_by_index;
+  mutable std::list<db::NetSubcircuitPinRef> m_synthetic_pinrefs;
 };
 
 }

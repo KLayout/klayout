@@ -161,7 +161,10 @@ void MacroTreeModel::macro_changed ()
 
 void MacroTreeModel::update_data ()
 {
-  emit dataChanged (index (0, 0, QModelIndex ()), index (rowCount (QModelIndex()) - 1, 0, QModelIndex ()));
+  int rc = rowCount (QModelIndex());
+  if (rc > 0) {
+    emit dataChanged (index (0, 0, QModelIndex ()), index (rc - 1, 0, QModelIndex ()));
+  }
 }
 
 void MacroTreeModel::about_to_change ()

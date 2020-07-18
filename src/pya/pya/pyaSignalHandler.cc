@@ -138,7 +138,10 @@ void SignalHandler::call (const gsi::MethodBase *meth, gsi::SerialArgs &args, gs
     std::vector<PythonRef> callables;
     callables.reserve (m_cbfuncs.size ());
     for (std::vector<CallbackFunction>::const_iterator c = m_cbfuncs.begin (); c != m_cbfuncs.end (); ++c) {
-      callables.push_back (c->callable ());
+      PythonRef callable = c->callable ();
+      if (callable) {
+        callables.push_back (c->callable ());
+      }
     }
 
     PythonRef result;

@@ -64,7 +64,6 @@ DEFImporter::read_lef (tl::InputStream &stream, db::Layout &layout, LEFDEFReader
   m_lef_importer.read (stream, layout, state);
 }
 
-
 void
 DEFImporter::read_polygon (db::Polygon &poly, double scale)
 {
@@ -152,7 +151,7 @@ DEFImporter::read_diearea (db::Layout &layout, db::Cell &design, double scale)
   if (points.size () >= 2) {
 
     //  create outline shape
-    std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Outline);
+    std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Outline, 0);
     if (dl.first) {
       if (points.size () == 2) {
         design.shapes (dl.second).insert (db::Box (points [0], points [1]));
@@ -300,7 +299,7 @@ DEFImporter::read_blockages (db::Layout &layout, db::Cell &design, double scale)
         db::Polygon p;
         read_polygon (p, scale);
 
-        std::pair <bool, unsigned int> dl = open_layer (layout, layer, layer.empty () ? PlacementBlockage : Blockage);
+        std::pair <bool, unsigned int> dl = open_layer (layout, layer, layer.empty () ? PlacementBlockage : Blockage, 0);
         if (dl.first) {
           design.shapes (dl.second).insert (p);
         }
@@ -310,7 +309,7 @@ DEFImporter::read_blockages (db::Layout &layout, db::Cell &design, double scale)
         db::Polygon p;
         read_rect (p, scale);
 
-        std::pair <bool, unsigned int> dl = open_layer (layout, layer, layer.empty () ? PlacementBlockage : Blockage);
+        std::pair <bool, unsigned int> dl = open_layer (layout, layer, layer.empty () ? PlacementBlockage : Blockage, 0);
         if (dl.first) {
           design.shapes (dl.second).insert (p);
         }
@@ -517,12 +516,12 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
     std::vector<db::Point> pts;
 
     double x = 0.0, y = 0.0;
+    unsigned int mask = 0;
 
     while (true) {
 
       if (test ("MASK")) {
-        //  ignore mask spec
-        get_long ();
+        mask = get_mask (get_long ());
       }
 
       if (test ("RECT")) {
@@ -543,7 +542,7 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
 
         test (")");
 
-        std::pair <bool, unsigned int> dl = open_layer (layout, ln, specialnets ? SpecialRouting : Routing);
+        std::pair <bool, unsigned int> dl = open_layer (layout, ln, specialnets ? SpecialRouting : Routing, mask);
         if (dl.first) {
 
           db::Point p (x, y);
@@ -568,8 +567,7 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
         while (peek ("(") || peek ("MASK")) {
 
           if (test ("MASK")) {
-            //  ignore MASK spec
-            get_long ();
+            mask = get_mask (get_long ());
           }
 
           if (! test ("(")) {
@@ -597,7 +595,7 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
         }
 
         if (pts.size () > 1) {
-          std::pair <bool, unsigned int> dl = open_layer (layout, ln, specialnets ? SpecialRouting : Routing);
+          std::pair <bool, unsigned int> dl = open_layer (layout, ln, specialnets ? SpecialRouting : Routing, mask);
           if (dl.first) {
             produce_routing_geometry (design, style, dl.second, prop_id, pts, ext, w);
           }
@@ -695,6 +693,7 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
     while (test ("+")) {
 
       bool was_shield = false;
+      unsigned int mask = 0;
 
       if (! specialnets && test ("SUBNET")) {
 
@@ -748,7 +747,7 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
             test ("+");
           }
           if (test ("MASK")) {
-            get_long ();
+            mask = get_mask (get_long ());
             test ("+");
           }
         }
@@ -760,7 +759,7 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
           db::Polygon p;
           read_polygon (p, scale);
 
-          std::pair <bool, unsigned int> dl = open_layer (layout, ln, specialnets ? SpecialRouting : Routing);
+          std::pair <bool, unsigned int> dl = open_layer (layout, ln, specialnets ? SpecialRouting : Routing, mask);
           if (dl.first) {
             if (prop_id != 0) {
               design.shapes (dl.second).insert (db::object_with_properties<db::Polygon> (p, prop_id));
@@ -778,7 +777,7 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
           db::Polygon p;
           read_rect (p, scale);
 
-          std::pair <bool, unsigned int> dl = open_layer (layout, ln, specialnets ? SpecialRouting : Routing);
+          std::pair <bool, unsigned int> dl = open_layer (layout, ln, specialnets ? SpecialRouting : Routing, mask);
           if (dl.first) {
             if (prop_id != 0) {
               design.shapes (dl.second).insert (db::object_with_properties<db::Polygon> (p, prop_id));
@@ -866,6 +865,7 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
     db::Point offset;
     int rows = 1, columns = 1;
     std::string pattern;
+    unsigned int mask = 0;
 
     std::map<std::string, std::vector<db::Polygon> > geometry;
     std::vector<db::Polygon> *top = 0, *cut = 0, *bottom = 0;
@@ -927,7 +927,7 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
 
         if (test ("+")) {
           expect ("MASK");
-          get_long ();
+          mask = get_mask (get_long ());
         }
 
         std::vector<db::Polygon> &polygons = geometry.insert (std::make_pair (ln, std::vector<db::Polygon> ())).first->second;
@@ -940,7 +940,7 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
 
         if (test ("+")) {
           expect ("MASK");
-          get_long ();
+          mask = get_mask (get_long ());
         }
 
         std::vector<db::Polygon> &polygons = geometry.insert (std::make_pair (ln, std::vector<db::Polygon> ())).first->second;
@@ -978,7 +978,7 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
     }
 
     for (std::map<std::string, std::vector<db::Polygon> >::const_iterator g = geometry.begin (); g != geometry.end (); ++g) {
-      std::pair <bool, unsigned int> dl = open_layer (layout, g->first, ViaGeometry);
+      std::pair <bool, unsigned int> dl = open_layer (layout, g->first, ViaGeometry, mask);
       if (dl.first) {
         for (std::vector<db::Polygon>::const_iterator p = g->second.begin (); p != g->second.end (); ++p) {
           cell.shapes (dl.second).insert (*p);
@@ -1000,6 +1000,7 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
     std::string dir;
     std::map <std::string, std::vector <db::Polygon> > geometry;
     db::Trans trans;
+    unsigned int mask = 0;
 
     while (test ("+")) {
 
@@ -1090,7 +1091,7 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
         //  Produce geometry collected so far
         for (std::map<std::string, std::vector<db::Polygon> >::const_iterator g = geometry.begin (); g != geometry.end (); ++g) {
 
-          std::pair <bool, unsigned int> dl = open_layer (layout, g->first, Pins);
+          std::pair <bool, unsigned int> dl = open_layer (layout, g->first, Pins, mask);
           if (dl.first) {
 
             db::properties_id_type prop_id = 0;
@@ -1111,7 +1112,7 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
 
           }
 
-          dl = open_layer (layout, g->first, Label);
+          dl = open_layer (layout, g->first, Label, 0);
           if (dl.first) {
             db::Box bbox;
             if (! g->second.empty ()) {
@@ -1427,7 +1428,7 @@ DEFImporter::do_read (db::Layout &layout)
 
         } else {
 
-          std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Regions);
+          std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Regions, 0);
           if (dl.first) {
             for (std::vector<db::Polygon>::const_iterator p = r->second.begin (); p != r->second.end (); ++p) {
               group_cell->shapes (dl.second).insert (*p);
@@ -1470,7 +1471,7 @@ DEFImporter::do_read (db::Layout &layout)
 
   if (! regions.empty ()) {
 
-    std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Regions);
+    std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Regions, 0);
     if (dl.first) {
 
       for (std::map<std::string, std::vector<db::Polygon> >::const_iterator r = regions.begin (); r != regions.end (); ++r) {

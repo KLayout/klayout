@@ -457,10 +457,10 @@ LEFDEFReaderState::register_layer (const std::string &ln)
 }
 
 void
-LEFDEFReaderState::map_layer_explicit (const std::string &n, LayerPurpose purpose, const db::LayerProperties &lp, unsigned int layer)
+LEFDEFReaderState::map_layer_explicit (const std::string &n, LayerPurpose purpose, const db::LayerProperties &lp, unsigned int layer, unsigned int mask)
 {
   tl_assert (m_has_explicit_layer_mapping);
-  m_layers [std::make_pair (n, purpose)] = std::make_pair (true, layer);
+  m_layers [std::make_pair (n, std::make_pair (purpose, mask))] = std::make_pair (true, layer);
   m_layer_map.map (lp, layer);
 }
 
@@ -581,18 +581,18 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 }
 
 std::pair <bool, unsigned int>
-LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPurpose purpose)
+LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPurpose purpose, unsigned int mask)
 {
-  std::map <std::pair<std::string, LayerPurpose>, std::pair<bool, unsigned int> >::const_iterator nl = m_layers.find (std::make_pair (n, purpose));
+  std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, std::pair<bool, unsigned int> >::const_iterator nl = m_layers.find (std::make_pair (n, std::make_pair (purpose, mask)));
   if (nl == m_layers.end ()) {
 
     std::pair <bool, unsigned int> ll (false, 0);
 
     if (n.empty () || ! m_has_explicit_layer_mapping) {
-      ll = open_layer_uncached (layout, n, purpose);
+      ll = open_layer_uncached (layout, n, purpose, mask);
     }
 
-    m_layers.insert (std::make_pair (std::make_pair (n, purpose), ll));
+    m_layers.insert (std::make_pair (std::make_pair (n, std::make_pair (purpose, mask)), ll));
     return ll;
 
   } else {
@@ -601,7 +601,7 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
 }
 
 std::pair <bool, unsigned int>
-LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n, LayerPurpose purpose)
+LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n, LayerPurpose purpose, unsigned int mask)
 {
   if (n.empty ()) {
 
@@ -698,28 +698,28 @@ LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n
       switch (purpose) {
       case Routing:
       default:
-        name += mp_tech_comp->routing_suffix ();
-        dt += mp_tech_comp->routing_datatype ();
+        name += mp_tech_comp->routing_suffix_per_mask (mask);
+        dt += mp_tech_comp->routing_datatype_per_mask (mask);
         break;
       case SpecialRouting:
-        name += mp_tech_comp->special_routing_suffix ();
-        dt += mp_tech_comp->special_routing_datatype ();
+        name += mp_tech_comp->special_routing_suffix_per_mask (mask);
+        dt += mp_tech_comp->special_routing_datatype_per_mask (mask);
         break;
       case ViaGeometry:
-        name += mp_tech_comp->via_geometry_suffix ();
-        dt += mp_tech_comp->via_geometry_datatype ();
+        name += mp_tech_comp->via_geometry_suffix_per_mask (mask);
+        dt += mp_tech_comp->via_geometry_datatype_per_mask (mask);
         break;
       case Label:
         name += mp_tech_comp->labels_suffix ();
         dt += mp_tech_comp->labels_datatype ();
         break;
       case Pins:
-        name += mp_tech_comp->pins_suffix ();
-        dt += mp_tech_comp->pins_datatype ();
+        name += mp_tech_comp->pins_suffix_per_mask (mask);
+        dt += mp_tech_comp->pins_datatype_per_mask (mask);
         break;
       case LEFPins:
-        name += mp_tech_comp->lef_pins_suffix ();
-        dt += mp_tech_comp->lef_pins_datatype ();
+        name += mp_tech_comp->lef_pins_suffix_per_mask (mask);
+        dt += mp_tech_comp->lef_pins_datatype_per_mask (mask);
         break;
       case Obstructions:
         name += mp_tech_comp->obstructions_suffix ();
@@ -755,12 +755,12 @@ LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n
 
       } else {
 
-        std::map <std::pair<std::string, LayerPurpose>, unsigned int>::const_iterator l = m_unassigned_layers.find (std::make_pair (n, purpose));
+        std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, unsigned int>::const_iterator l = m_unassigned_layers.find (std::make_pair (n, std::make_pair (purpose, mask)));
         if (l != m_unassigned_layers.end ()) {
           return std::pair<bool, unsigned int> (true, l->second);
         } else {
           unsigned int li = layout.insert_layer (db::LayerProperties (name));
-          m_unassigned_layers.insert (std::make_pair (std::make_pair (n, purpose), li));
+          m_unassigned_layers.insert (std::make_pair (std::make_pair (n, std::make_pair (purpose, mask)), li));
           m_layer_map.map (db::LayerProperties (name), li);
           return std::pair<bool, unsigned int> (true, li);
         }
@@ -788,28 +788,28 @@ LEFDEFReaderState::finish (db::Layout &layout)
     used_numbers.insert (ln->second);
   }
 
-  for (std::map<std::pair<std::string, LayerPurpose>, unsigned int>::const_iterator l = m_unassigned_layers.begin (); l != m_unassigned_layers.end (); ++l) {
+  for (std::map<std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, unsigned int>::const_iterator l = m_unassigned_layers.begin (); l != m_unassigned_layers.end (); ++l) {
 
     int dt = 0;
-    switch (l->first.second) {
+    switch (l->first.second.first) {
     case Routing:
     default:
-      dt = mp_tech_comp->routing_datatype ();
+      dt = mp_tech_comp->routing_datatype_per_mask (l->first.second.second);
       break;
     case SpecialRouting:
-      dt = mp_tech_comp->special_routing_datatype ();
+      dt = mp_tech_comp->special_routing_datatype_per_mask (l->first.second.second);
       break;
     case ViaGeometry:
-      dt = mp_tech_comp->via_geometry_datatype ();
+      dt = mp_tech_comp->via_geometry_datatype_per_mask (l->first.second.second);
       break;
     case Label:
       dt = mp_tech_comp->labels_datatype ();
       break;
     case Pins:
-      dt = mp_tech_comp->pins_datatype ();
+      dt = mp_tech_comp->pins_datatype_per_mask (l->first.second.second);
       break;
     case LEFPins:
-      dt = mp_tech_comp->lef_pins_datatype ();
+      dt = mp_tech_comp->lef_pins_datatype_per_mask (l->first.second.second);
       break;
     case Obstructions:
       dt = mp_tech_comp->obstructions_datatype ();
@@ -867,6 +867,15 @@ LEFDEFImporter::LEFDEFImporter ()
 LEFDEFImporter::~LEFDEFImporter ()
 {
   //  .. nothing yet ..
+}
+
+unsigned int
+LEFDEFImporter::get_mask (long m)
+{
+  if (m < 1 || m > 16) {
+    error (tl::to_string (tr ("Invalid mask number: ")) + tl::to_string (m));
+  }
+  return (unsigned int) (m - 1);
 }
 
 void 

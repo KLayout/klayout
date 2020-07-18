@@ -879,7 +879,7 @@ public:
   /**
    *  @brief Create a new layer or return the index of the given layer
    */
-  std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose);
+  std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
 
   /**
    *  @brief Registers a layer (assign a new default layer number)
@@ -910,8 +910,8 @@ public:
   }
 
 private:
-  std::map <std::pair<std::string, LayerPurpose>, std::pair<bool, unsigned int> > m_layers;
-  std::map <std::pair<std::string, LayerPurpose>, unsigned int> m_unassigned_layers;
+  std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, std::pair<bool, unsigned int> > m_layers;
+  std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, unsigned int> m_unassigned_layers;
   db::LayerMap m_layer_map;
   bool m_create_layers;
   bool m_has_explicit_layer_mapping;
@@ -920,8 +920,8 @@ private:
   std::map<std::string, db::Cell *> m_via_cells;
   const LEFDEFReaderOptions *mp_tech_comp;
 
-  std::pair <bool, unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose);
-  void map_layer_explicit (const std::string &n, LayerPurpose purpose, const LayerProperties &lp, unsigned int layer);
+  std::pair <bool, unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
+  void map_layer_explicit (const std::string &n, LayerPurpose purpose, const LayerProperties &lp, unsigned int layer, unsigned int mask);
 };
 
 /**
@@ -1052,11 +1052,16 @@ protected:
   db::Vector get_vector (double scale);
 
   /**
+   *  @brief Turns a number into a mask number
+   */
+  unsigned int get_mask (long m);
+
+  /**
    *  @brief Create a new layer or return the index of the given layer
    */
-  std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose)
+  std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask)
   {
-    return mp_reader_state->open_layer (layout, name, purpose);
+    return mp_reader_state->open_layer (layout, name, purpose, mask);
   }
 
   /**

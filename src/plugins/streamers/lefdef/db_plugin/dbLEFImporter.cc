@@ -160,10 +160,10 @@ static db::Shape insert_shape (db::Cell &cell, unsigned int layer_id, const Shap
 void
 LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose purpose, std::map<std::string, db::Box> *collect_bboxes, db::properties_id_type prop_id)
 {
-  int layer_id = -1;
   std::string layer_name;
   double dbu = layout.dbu ();
   double w = 0.0;
+  unsigned int mask = 0;
 
   while (true) {
 
@@ -177,12 +177,6 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
     } else if (test ("LAYER")) {
 
       layer_name = get ();
-      layer_id = -1;
-
-      std::pair <bool, unsigned int> dl = open_layer (layout, layer_name, purpose);
-      if (dl.first) {
-        layer_id = int (dl.second);
-      }
 
       w = 0.0;
       std::map<std::string, std::pair<double, double> >::const_iterator dw = m_default_widths.find (layer_name);
@@ -204,8 +198,13 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
       std::vector<db::Point> points;
 
       if (test ("MASK")) {
-        //  ignore mask number
-        get_long ();
+        mask = get_mask (get_long ());
+      }
+
+      int layer_id = -1;
+      std::pair <bool, unsigned int> dl = open_layer (layout, layer_name, purpose, mask);
+      if (dl.first) {
+        layer_id = int (dl.second);
       }
 
       bool iterate = test ("ITERATE");
@@ -245,8 +244,13 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
       std::vector<db::Point> points;
 
       if (test ("MASK")) {
-        //  ignore mask number
-        get_long ();
+        mask = get_mask (get_long ());
+      }
+
+      int layer_id = -1;
+      std::pair <bool, unsigned int> dl = open_layer (layout, layer_name, purpose, mask);
+      if (dl.first) {
+        layer_id = int (dl.second);
       }
 
       bool iterate = test ("ITERATE");
@@ -286,8 +290,13 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
       std::vector<db::Point> points;
 
       if (test ("MASK")) {
-        //  ignore mask number
-        get_long ();
+        mask = get_mask (get_long ());
+      }
+
+      int layer_id = -1;
+      std::pair <bool, unsigned int> dl = open_layer (layout, layer_name, purpose, mask);
+      if (dl.first) {
+        layer_id = int (dl.second);
       }
 
       bool iterate = test ("ITERATE");
@@ -329,8 +338,13 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
       bool iterate = test ("ITERATE");
 
       if (test ("MASK")) {
-        //  ignore mask number
-        get_long ();
+        mask = get_mask (get_long ());
+      }
+
+      int layer_id = -1;
+      std::pair <bool, unsigned int> dl = open_layer (layout, layer_name, purpose, mask);
+      if (dl.first) {
+        layer_id = int (dl.second);
       }
 
       double x = 0.0, y = 0.0;
@@ -432,10 +446,11 @@ LEFImporter::read_viadef_by_rule (Layout &layout, db::Cell &cell, ViaDesc &via_d
   int rows = 1, columns = 1;
   std::string pattern;
 
-  std::vector<std::pair<std::string, std::vector<db::Polygon> > > geometry;
-  geometry.push_back (std::pair<std::string, std::vector<db::Polygon> > ());
-  geometry.push_back (std::pair<std::string, std::vector<db::Polygon> > ());
-  geometry.push_back (std::pair<std::string, std::vector<db::Polygon> > ());
+  //  @@@ there is something with masks here ...
+  std::vector<std::pair<std::pair<std::string, unsigned int>, std::vector<db::Polygon> > > geometry;
+  geometry.push_back (std::pair<std::pair<std::string, unsigned int>, std::vector<db::Polygon> > ());
+  geometry.push_back (std::pair<std::pair<std::string, unsigned int>, std::vector<db::Polygon> > ());
+  geometry.push_back (std::pair<std::pair<std::string, unsigned int>, std::vector<db::Polygon> > ());
 
   while (! test ("END")) {
 
@@ -504,9 +519,9 @@ LEFImporter::read_viadef_by_rule (Layout &layout, db::Cell &cell, ViaDesc &via_d
 
     } else if (test ("LAYERS")) {
 
-      via_desc.m1 = geometry[0].first = get ();
-      geometry[1].first = get ();
-      via_desc.m2 = geometry[2].first = get ();
+      via_desc.m1 = geometry[0].first.first = get ();
+      geometry[1].first.first = get ();
+      via_desc.m2 = geometry[2].first.first = get ();
 
       test (";");
 
@@ -523,8 +538,8 @@ LEFImporter::read_viadef_by_rule (Layout &layout, db::Cell &cell, ViaDesc &via_d
   create_generated_via (geometry [0].second, geometry [1].second, geometry [2].second,
                         cutsize, cutspacing, be, te, bo, to, offset, rows, columns, pattern);
 
-  for (std::vector<std::pair<std::string, std::vector<db::Polygon> > >::const_iterator g = geometry.begin (); g != geometry.end (); ++g) {
-    std::pair <bool, unsigned int> dl = open_layer (layout, g->first, ViaGeometry);
+  for (std::vector<std::pair<std::pair<std::string, unsigned int>, std::vector<db::Polygon> > >::const_iterator g = geometry.begin (); g != geometry.end (); ++g) {
+    std::pair <bool, unsigned int> dl = open_layer (layout, g->first.first, ViaGeometry, g->first.second);
     if (dl.first) {
       for (std::vector<db::Polygon>::const_iterator p = g->second.begin (); p != g->second.end (); ++p) {
         cell.shapes (dl.second).insert (*p);
@@ -807,7 +822,7 @@ LEFImporter::read_macro (Layout &layout)
           read_geometries (layout, cell, LEFPins, &bboxes, prop_id);
 
           for (std::map <std::string, db::Box>::const_iterator b = bboxes.begin (); b != bboxes.end (); ++b) {
-            std::pair <bool, unsigned int> dl = open_layer (layout, b->first, Label);
+            std::pair <bool, unsigned int> dl = open_layer (layout, b->first, Label, 0);
             if (dl.first) {
               cell.shapes (dl.second).insert (db::Text (label.c_str (), db::Trans (b->second.center () - db::Point ())));
             }
@@ -881,7 +896,7 @@ LEFImporter::read_macro (Layout &layout)
 
       layout.rename_cell (cell.cell_index (), mn.c_str ());
 
-      std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Outline);
+      std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Outline, 0);
       if (dl.first) {
         cell.shapes (dl.second).insert (db::Box (-origin, -origin + size));
       }

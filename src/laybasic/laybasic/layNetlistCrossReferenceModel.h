@@ -48,6 +48,7 @@ public:
   virtual size_t net_count (const circuit_pair &circuits) const;
   virtual size_t net_terminal_count (const net_pair &nets) const;
   virtual size_t net_subcircuit_pin_count (const net_pair &nets) const;
+  virtual size_t subcircuit_pin_count (const subcircuit_pair &subcircuits) const;
   virtual size_t net_pin_count (const net_pair &nets) const;
   virtual size_t device_count (const circuit_pair &circuits) const;
   virtual size_t pin_count (const circuit_pair &circuits) const;
@@ -65,6 +66,7 @@ public:
   virtual const db::Net *second_net_for (const db::Net *first) const;
   virtual const db::Circuit *second_circuit_for (const db::Circuit *first) const;
   virtual net_subcircuit_pin_pair net_subcircuit_pinref_from_index (const net_pair &nets, size_t index) const;
+  virtual net_subcircuit_pin_pair subcircuit_pinref_from_index (const subcircuit_pair &nets, size_t index) const;
   virtual net_terminal_pair net_terminalref_from_index (const net_pair &nets, size_t index) const;
   virtual net_pin_pair net_pinref_from_index (const net_pair &nets, size_t index) const;
   virtual std::pair<device_pair, Status> device_from_index (const circuit_pair &circuits, size_t index) const;
@@ -95,6 +97,11 @@ public:
     std::map<std::pair<const db::SubCircuit *, const db::SubCircuit *>, size_t> index_of_subcircuits;
   };
 
+  struct PerSubCircuitCacheData
+  {
+    std::vector<std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *> > nets_per_pins;
+  };
+
   tl::weak_ptr<db::NetlistCrossReference> mp_cross_ref;
   mutable std::map<net_pair, circuit_pair> m_parents_of_nets;
   mutable std::map<device_pair, circuit_pair> m_parents_of_devices;
@@ -104,6 +111,9 @@ public:
   mutable std::vector<circuit_pair> m_top_level_circuits;
   mutable std::map<std::pair<const db::Circuit *, const db::Circuit *>, PerCircuitCacheData> m_per_circuit_data;
   mutable std::map<std::pair<const db::Circuit *, const db::Circuit *>, size_t> m_index_of_circuits;
+  mutable std::map<std::pair<const db::SubCircuit *, const db::SubCircuit *>, PerSubCircuitCacheData> m_per_subcircuit_data;
+
+  void ensure_subcircuit_data_built () const;
 };
 
 }

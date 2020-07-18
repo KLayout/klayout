@@ -42,6 +42,7 @@ namespace lay
 {
 
 class IndexedNetlistModel;
+struct NetlistObjectsPath;
 
 // ----------------------------------------------------------------------------------
 //  NetlistBrowserTreeModel definition
@@ -77,6 +78,7 @@ public:
 
   std::pair<const db::Circuit *, const db::Circuit *> circuits_from_index (const QModelIndex &index) const;
   QModelIndex index_from_circuits (const std::pair<const db::Circuit *, const db::Circuit *> &circuits) const;
+  QModelIndex index_from_netpath (const NetlistObjectsPath &path) const;
 
 private:
   NetlistBrowserTreeModel (const NetlistBrowserTreeModel &);

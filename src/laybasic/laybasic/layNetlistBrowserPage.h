@@ -33,6 +33,7 @@
 #include "dbLayoutUtils.h"
 
 #include "tlObject.h"
+#include "tlEvents.h"
 
 #include <QFrame>
 
@@ -90,31 +91,36 @@ public:
   /**
    *  @brief Attaches the page to a L2N DB
    */
-  void set_l2ndb (db::LayoutToNetlist *database)
-  {
-    set_db (database);
-  }
+  void set_db (db::LayoutToNetlist *database);
 
   /**
-   *  @brief Attaches the page to a LVS DB
+   *  @brief Gets the database the page is connected to
    */
-  void set_lvsdb (db::LayoutVsSchematic *database)
+  db::LayoutToNetlist *db ()
   {
-    set_db (database);
-  }
-
-  /**
-   *  @brief Detaches the page from any DB
-   */
-  void reset_db ()
-  {
-    set_db (0);
+    return mp_database.get ();
   }
 
   /**
    *  @brief Selects a net or clears the selection if net == 0
    */
   void select_net (const db::Net *net);
+
+  /**
+   *  @brief Selects a netlist object (a circuit, a subcircuit, a net or a device)
+   */
+  void select_path (const lay::NetlistObjectPath &path)
+  {
+    select_path (lay::NetlistObjectsPath::from_first (path));
+  }
+
+  /**
+   *  @brief Selects a netlist object (a circuit, a subcircuit, a net or a device)
+   *
+   *  This variant allows specifying a paired path using either an object from the first,
+   *  the second netlist of both.
+   */
+  void select_path (const lay::NetlistObjectsPath &path);
 
   /**
    *  @brief Set the window type and window dimensions
@@ -162,6 +168,27 @@ public:
    */
   void update_highlights ();
 
+  /**
+   *  @brief Gets the current object's path
+   */
+  const lay::NetlistObjectsPath &current_path () const
+  {
+    return m_current_path;
+  }
+
+  /**
+   *  @brief Gets the selected nets
+   */
+  const std::vector<lay::NetlistObjectsPath> &selected_paths () const
+  {
+    return m_selected_paths;
+  }
+
+  /**
+   *  @brief An event indicating that the selection has changed
+   */
+  tl::Event selection_changed_event;
+
 public slots:
   void export_all ();
   void export_selected ();
@@ -201,28 +228,25 @@ private:
   unsigned int m_cv_index;
   lay::Dispatcher *mp_plugin_root;
   tl::weak_ptr<db::LayoutToNetlist> mp_database;
-  std::vector<void *> m_history;
+  std::vector<QModelIndex> m_history;
   size_t m_history_ptr;
   bool m_signals_enabled;
   std::vector <lay::Marker *> mp_markers;
   bool m_enable_updates;
   bool m_update_needed;
-  std::vector<const db::Net *> m_current_nets;
-  std::vector<const db::Device *> m_current_devices;
-  std::vector<const db::SubCircuit *> m_current_subcircuits;
-  std::vector<const db::Circuit *> m_current_circuits;
+  lay::NetlistObjectsPath m_current_path;
+  std::vector<lay::NetlistObjectsPath> m_selected_paths;
   lay::NetInfoDialog *mp_info_dialog;
   tl::DeferredMethod<NetlistBrowserPage> dm_update_highlights;
   tl::DeferredMethod<NetlistBrowserPage> dm_rerun_macro;
   db::ContextCache m_cell_context_cache;
 
-  void set_db (db::LayoutToNetlist *l2ndb);
   void setup_trees ();
-  void add_to_history (void *id, bool fwd);
-  void navigate_to (void *id, bool forward = true);
+  void add_to_history (const QModelIndex &index, bool fwd);
+  void navigate_to (const QModelIndex &index, bool forward = true);
   void adjust_view ();
   void clear_markers ();
-  void highlight (const std::vector<const db::Net *> &nets, const std::vector<const db::Device *> &devices, const std::vector<const db::SubCircuit *> &subcircuits, const std::vector<const db::Circuit *> &circuits);
+  void highlight (const NetlistObjectsPath &current_path, const std::vector<NetlistObjectsPath> &selected_paths);
   std::vector<const db::Net *> selected_nets ();
   std::vector<const db::Device *> selected_devices ();
   std::vector<const db::SubCircuit *> selected_subcircuits ();
@@ -232,7 +256,6 @@ private:
   QColor make_valid_color (const QColor &color);
   bool produce_highlights_for_net(const db::Net *net, size_t &n_markers, const std::map<db::LayerProperties, lay::LayerPropertiesConstIterator> &display_by_lp, const std::vector<db::DCplxTrans> &tv);
   bool produce_highlights_for_device (const db::Device *device, size_t &n_markers, const std::vector<db::DCplxTrans> &tv);
-  bool produce_highlights_for_subcircuit (const db::SubCircuit *subcircuit, size_t &n_markers, const std::vector<db::DCplxTrans> &tv);
   bool produce_highlights_for_circuit (const db::Circuit *circuit, size_t &n_markers, const std::vector<db::DCplxTrans> &tv);
   void configure_marker (lay::Marker *marker, bool with_fill);
   void rerun_macro ();

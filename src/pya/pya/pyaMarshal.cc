@@ -935,6 +935,12 @@ struct test_arg_func<gsi::VectorType>
 {
   void operator() (bool *ret, PyObject *arg, const gsi::ArgType &atype, bool loose)
   {
+    if ((atype.is_cptr () || atype.is_ptr ()) && arg == Py_None) {
+      //  for ptr or cptr, null is an allowed value
+      *ret = true;
+      return;
+    }
+
     if (! PyTuple_Check (arg) && ! PyList_Check (arg)) {
       *ret = false;
       return;
@@ -971,6 +977,12 @@ struct test_arg_func<gsi::MapType>
 {
   void operator () (bool *ret, PyObject *arg, const gsi::ArgType &atype, bool loose)
   {
+    if ((atype.is_cptr () || atype.is_ptr ()) && arg == Py_None) {
+      //  for ptr or cptr, null is an allowed value
+      *ret = true;
+      return;
+    }
+
     if (! PyDict_Check (arg)) {
       *ret = false;
       return;
@@ -999,6 +1011,7 @@ struct test_arg_func<gsi::MapType>
     }
   }
 };
+
 template <>
 struct test_arg_func<gsi::ObjectType>
 {

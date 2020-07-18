@@ -403,6 +403,34 @@ Class<db::NetlistCrossReference> decl_dbNetlistCrossReference (decl_dbNetlistCom
     "The return value will be nil if no match is found. "
     "Otherwise it is the 'b' net for nets from the 'a' netlist and vice versa."
   ) +
+  gsi::method ("other_circuit_for", &db::NetlistCrossReference::other_circuit_for, gsi::arg ("circuit"),
+    "@brief Gets the matching other circuit for a given primary circuit.\n"
+    "The return value will be nil if no match is found. "
+    "Otherwise it is the 'b' circuit for circuits from the 'a' netlist and vice versa."
+    "\n\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method ("other_device_for", &db::NetlistCrossReference::other_device_for, gsi::arg ("device"),
+    "@brief Gets the matching other device for a given primary device.\n"
+    "The return value will be nil if no match is found. "
+    "Otherwise it is the 'b' device for devices from the 'a' netlist and vice versa."
+    "\n\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method ("other_pin_for", &db::NetlistCrossReference::other_pin_for, gsi::arg ("pin"),
+    "@brief Gets the matching other pin for a given primary pin.\n"
+    "The return value will be nil if no match is found. "
+    "Otherwise it is the 'b' pin for pins from the 'a' netlist and vice versa."
+    "\n\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method ("other_subcircuit_for", &db::NetlistCrossReference::other_subcircuit_for, gsi::arg ("subcircuit"),
+    "@brief Gets the matching other subcircuit for a given primary subcircuit.\n"
+    "The return value will be nil if no match is found. "
+    "Otherwise it is the 'b' subcircuit for subcircuits from the 'a' netlist and vice versa."
+    "\n\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
   gsi::method ("clear", &db::NetlistCrossReference::clear,
     "@hide\n"
   ) +

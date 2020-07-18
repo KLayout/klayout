@@ -61,6 +61,34 @@ public:
   { }
 };
 
+template <class Value>
+const Value &per_mask_value (const std::map<unsigned int, Value> &map, const Value &def, unsigned int mask)
+{
+  typename std::map<unsigned int, Value>::const_iterator i = map.find (mask);
+  return i == map.end () ? def : i->second;
+}
+
+inline bool per_mask_value_is_null (int dt) { return dt < 0; }
+inline bool per_mask_value_is_null (const std::string &pfx) { return pfx.empty (); }
+
+template <class Value>
+void set_per_mask_value (std::map<unsigned int, Value> &map, unsigned int mask, const Value &value)
+{
+  if (per_mask_value_is_null (value)) {
+    map.erase (mask);
+  } else {
+    map [mask] = value;
+  }
+}
+
+template <class Value>
+void get_max_mask_number (unsigned int &mm, const std::map<unsigned int, Value> &map)
+{
+  if (! map.empty ()) {
+    mm = std::max (mm, (--map.end ())->first);
+  }
+}
+
 /**
  *  @brief The LEF/DEF importer technology component
  *
@@ -262,6 +290,42 @@ public:
     m_via_geometry_datatype = s;
   }
 
+  void set_via_geometry_suffix_str (const std::string &s);
+  std::string via_geometry_suffix_str () const;
+
+  void set_via_geometry_datatype_str (const std::string &s);
+  std::string via_geometry_datatype_str () const;
+
+  void clear_via_geometry_suffixes_per_mask ()
+  {
+    m_via_geometry_suffixes.clear ();
+  }
+
+  void clear_via_geometry_datatypes_per_mask ()
+  {
+    m_via_geometry_datatypes.clear ();
+  }
+
+  const std::string &via_geometry_suffix_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_via_geometry_suffixes, m_via_geometry_suffix, mask);
+  }
+
+  void set_via_geometry_suffix_per_mask (unsigned int mask, const std::string &s)
+  {
+    set_per_mask_value (m_via_geometry_suffixes, mask, s);
+  }
+
+  int via_geometry_datatype_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_via_geometry_datatypes, m_via_geometry_datatype, mask);
+  }
+
+  void set_via_geometry_datatype_per_mask (unsigned int mask, int s)
+  {
+    set_per_mask_value (m_via_geometry_datatypes, mask, s);
+  }
+
   const std::string &via_cellname_prefix () const
   {
     return m_via_cellname_prefix;
@@ -302,6 +366,42 @@ public:
     m_pins_datatype = s;
   }
 
+  void set_pins_suffix_str (const std::string &s);
+  std::string pins_suffix_str () const;
+
+  void set_pins_datatype_str (const std::string &s);
+  std::string pins_datatype_str () const;
+
+  void clear_pins_suffixes_per_mask ()
+  {
+    m_pins_suffixes.clear ();
+  }
+
+  void clear_pins_datatypes_per_mask ()
+  {
+    m_pins_datatypes.clear ();
+  }
+
+  const std::string &pins_suffix_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_pins_suffixes, m_pins_suffix, mask);
+  }
+
+  void set_pins_suffix_per_mask (unsigned int mask, const std::string &s)
+  {
+    set_per_mask_value (m_pins_suffixes, mask, s);
+  }
+
+  int pins_datatype_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_pins_datatypes, m_pins_datatype, mask);
+  }
+
+  void set_pins_datatype_per_mask (unsigned int mask, int s)
+  {
+    set_per_mask_value (m_pins_datatypes, mask, s);
+  }
+
   bool produce_lef_pins () const
   {
     return m_produce_lef_pins;
@@ -330,6 +430,42 @@ public:
   void set_lef_pins_datatype (int s)
   {
     m_lef_pins_datatype = s;
+  }
+
+  void set_lef_pins_suffix_str (const std::string &s);
+  std::string lef_pins_suffix_str () const;
+
+  void set_lef_pins_datatype_str (const std::string &s);
+  std::string lef_pins_datatype_str () const;
+
+  void clear_lef_pins_suffixes_per_mask ()
+  {
+    m_lef_pins_suffixes.clear ();
+  }
+
+  void clear_lef_pins_datatypes_per_mask ()
+  {
+    m_lef_pins_datatypes.clear ();
+  }
+
+  const std::string &lef_pins_suffix_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_lef_pins_suffixes, m_lef_pins_suffix, mask);
+  }
+
+  void set_lef_pins_suffix_per_mask (unsigned int mask, const std::string &s)
+  {
+    set_per_mask_value (m_lef_pins_suffixes, mask, s);
+  }
+
+  int lef_pins_datatype_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_lef_pins_datatypes, m_lef_pins_datatype, mask);
+  }
+
+  void set_lef_pins_datatype_per_mask (unsigned int mask, int s)
+  {
+    set_per_mask_value (m_lef_pins_datatypes, mask, s);
   }
 
   bool produce_obstructions () const
@@ -452,6 +588,42 @@ public:
     m_routing_datatype = s;
   }
 
+  void set_routing_suffix_str (const std::string &s);
+  std::string routing_suffix_str () const;
+
+  void set_routing_datatype_str (const std::string &s);
+  std::string routing_datatype_str () const;
+
+  void clear_routing_suffixes_per_mask ()
+  {
+    m_routing_suffixes.clear ();
+  }
+
+  void clear_routing_datatypes_per_mask ()
+  {
+    m_routing_datatypes.clear ();
+  }
+
+  const std::string &routing_suffix_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_routing_suffixes, m_routing_suffix, mask);
+  }
+
+  void set_routing_suffix_per_mask (unsigned int mask, const std::string &s)
+  {
+    set_per_mask_value (m_routing_suffixes, mask, s);
+  }
+
+  int routing_datatype_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_routing_datatypes, m_routing_datatype, mask);
+  }
+
+  void set_routing_datatype_per_mask (unsigned int mask, int s)
+  {
+    set_per_mask_value (m_routing_datatypes, mask, s);
+  }
+
   bool produce_special_routing () const
   {
     return m_produce_special_routing;
@@ -480,6 +652,58 @@ public:
   void set_special_routing_datatype (int s)
   {
     m_special_routing_datatype = s;
+  }
+
+  void set_special_routing_suffix_str (const std::string &s);
+  std::string special_routing_suffix_str () const;
+
+  void set_special_routing_datatype_str (const std::string &s);
+  std::string special_routing_datatype_str () const;
+
+  void clear_special_routing_suffixes_per_mask ()
+  {
+    m_special_routing_suffixes.clear ();
+  }
+
+  void clear_special_routing_datatypes_per_mask ()
+  {
+    m_special_routing_datatypes.clear ();
+  }
+
+  const std::string &special_routing_suffix_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_special_routing_suffixes, m_special_routing_suffix, mask);
+  }
+
+  void set_special_routing_suffix_per_mask (unsigned int mask, const std::string &s)
+  {
+    set_per_mask_value (m_special_routing_suffixes, mask, s);
+  }
+
+  int special_routing_datatype_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_special_routing_datatypes, m_special_routing_datatype, mask);
+  }
+
+  void set_special_routing_datatype_per_mask (unsigned int mask, int s)
+  {
+    set_per_mask_value (m_special_routing_datatypes, mask, s);
+  }
+
+  unsigned int max_mask_number () const
+  {
+    unsigned int mm = 0;
+    get_max_mask_number (mm, m_via_geometry_suffixes);
+    get_max_mask_number (mm, m_via_geometry_datatypes);
+    get_max_mask_number (mm, m_pins_suffixes);
+    get_max_mask_number (mm, m_pins_datatypes);
+    get_max_mask_number (mm, m_lef_pins_suffixes);
+    get_max_mask_number (mm, m_lef_pins_datatypes);
+    get_max_mask_number (mm, m_routing_suffixes);
+    get_max_mask_number (mm, m_routing_datatypes);
+    get_max_mask_number (mm, m_special_routing_suffixes);
+    get_max_mask_number (mm, m_special_routing_datatypes);
+    return mm;
   }
 
   void clear_lef_files ()
@@ -568,13 +792,19 @@ private:
   bool m_produce_via_geometry;
   std::string m_via_geometry_suffix;
   int m_via_geometry_datatype;
+  std::map<unsigned int, std::string> m_via_geometry_suffixes;
+  std::map<unsigned int, int> m_via_geometry_datatypes;
   std::string m_via_cellname_prefix;
   bool m_produce_pins;
   std::string m_pins_suffix;
   int m_pins_datatype;
+  std::map<unsigned int, std::string> m_pins_suffixes;
+  std::map<unsigned int, int> m_pins_datatypes;
   bool m_produce_lef_pins;
   std::string m_lef_pins_suffix;
   int m_lef_pins_datatype;
+  std::map<unsigned int, std::string> m_lef_pins_suffixes;
+  std::map<unsigned int, int> m_lef_pins_datatypes;
   bool m_produce_obstructions;
   std::string m_obstructions_suffix;
   int m_obstructions_datatype;
@@ -587,9 +817,13 @@ private:
   bool m_produce_routing;
   std::string m_routing_suffix;
   int m_routing_datatype;
+  std::map<unsigned int, std::string> m_routing_suffixes;
+  std::map<unsigned int, int> m_routing_datatypes;
   bool m_produce_special_routing;
   std::string m_special_routing_suffix;
   int m_special_routing_datatype;
+  std::map<unsigned int, std::string> m_special_routing_suffixes;
+  std::map<unsigned int, int> m_special_routing_datatypes;
   bool m_separate_groups;
   std::string m_map_file;
   unsigned int m_macro_resolution_mode;

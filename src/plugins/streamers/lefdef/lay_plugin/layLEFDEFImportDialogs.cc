@@ -369,7 +369,7 @@ LEFDEFReaderOptionsEditor::LEFDEFReaderOptionsEditor (QWidget *parent)
   lay::activate_help_links (help_label2);
 }
 
-void 
+void
 LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, const db::Technology * /*tech*/)
 {
   db::LEFDEFReaderOptions *data = dynamic_cast<db::LEFDEFReaderOptions *> (options);
@@ -427,15 +427,15 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
   data->set_produce_placement_blockages (produce_placement_blockages->isChecked ());
   data->set_placement_blockage_layer (tl::to_string (placement_blockage_layer->text ()));
   data->set_produce_via_geometry (produce_via_geometry->isChecked ());
-  data->set_via_geometry_suffix (tl::to_string (suffix_via_geometry->text ()));
-  data->set_via_geometry_datatype (datatype_via_geometry->text ().toInt ());
+  data->set_via_geometry_suffix_str (tl::to_string (suffix_via_geometry->text ()));
+  data->set_via_geometry_datatype_str (tl::to_string (datatype_via_geometry->text ()));
   data->set_via_cellname_prefix (tl::to_string (prefix_via_cellname->text ()));
   data->set_produce_pins (produce_pins->isChecked ());
-  data->set_pins_suffix (tl::to_string (suffix_pins->text ()));
-  data->set_pins_datatype (datatype_pins->text ().toInt ());
+  data->set_pins_suffix_str (tl::to_string (suffix_pins->text ()));
+  data->set_pins_datatype_str (tl::to_string (datatype_pins->text ()));
   data->set_produce_lef_pins (produce_lef_pins->isChecked ());
-  data->set_lef_pins_suffix (tl::to_string (suffix_lef_pins->text ()));
-  data->set_lef_pins_datatype (datatype_lef_pins->text ().toInt ());
+  data->set_lef_pins_suffix_str (tl::to_string (suffix_lef_pins->text ()));
+  data->set_lef_pins_datatype_str (tl::to_string (datatype_lef_pins->text ()));
   data->set_produce_obstructions (produce_obstructions->isChecked ());
   data->set_obstructions_suffix (tl::to_string (suffix_obstructions->text ()));
   data->set_obstructions_datatype (datatype_obstructions->text ().toInt ());
@@ -443,11 +443,11 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
   data->set_blockages_suffix (tl::to_string (suffix_blockages->text ()));
   data->set_blockages_datatype (datatype_blockages->text ().toInt ());
   data->set_produce_routing (produce_routing->isChecked ());
-  data->set_routing_suffix (tl::to_string (suffix_routing->text ()));
-  data->set_routing_datatype (datatype_routing->text ().toInt ());
+  data->set_routing_suffix_str (tl::to_string (suffix_routing->text ()));
+  data->set_routing_datatype_str (tl::to_string (datatype_routing->text ()));
   data->set_produce_special_routing (produce_special_routing->isChecked ());
-  data->set_special_routing_suffix (tl::to_string (suffix_special_routing->text ()));
-  data->set_special_routing_datatype (datatype_special_routing->text ().toInt ());
+  data->set_special_routing_suffix_str (tl::to_string (suffix_special_routing->text ()));
+  data->set_special_routing_datatype_str (tl::to_string (datatype_special_routing->text ()));
   data->set_produce_labels (produce_labels->isChecked ());
   data->set_labels_suffix (tl::to_string (suffix_labels->text ()));
   data->set_labels_datatype (datatype_labels->text ().toInt ());
@@ -489,15 +489,15 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   produce_placement_blockages->setChecked (data->produce_placement_blockages ());
   placement_blockage_layer->setText (tl::to_qstring (data->placement_blockage_layer ()));
   produce_via_geometry->setChecked (data->produce_via_geometry ());
-  suffix_via_geometry->setText (tl::to_qstring (data->via_geometry_suffix ()));
-  datatype_via_geometry->setText (QString::number (data->via_geometry_datatype ()));
+  suffix_via_geometry->setText (tl::to_qstring (data->via_geometry_suffix_str ()));
+  datatype_via_geometry->setText (tl::to_qstring (data->via_geometry_datatype_str ()));
   prefix_via_cellname->setText (tl::to_qstring (data->via_cellname_prefix ()));
   produce_pins->setChecked (data->produce_pins ());
-  suffix_pins->setText (tl::to_qstring (data->pins_suffix ()));
-  datatype_pins->setText (QString::number (data->pins_datatype ()));
+  suffix_pins->setText (tl::to_qstring (data->pins_suffix_str ()));
+  datatype_pins->setText (tl::to_qstring (data->pins_datatype_str ()));
   produce_lef_pins->setChecked (data->produce_lef_pins ());
-  suffix_lef_pins->setText (tl::to_qstring (data->lef_pins_suffix ()));
-  datatype_lef_pins->setText (QString::number (data->lef_pins_datatype ()));
+  suffix_lef_pins->setText (tl::to_qstring (data->lef_pins_suffix_str ()));
+  datatype_lef_pins->setText (tl::to_qstring (data->lef_pins_datatype_str ()));
   produce_obstructions->setChecked (data->produce_obstructions ());
   suffix_obstructions->setText (tl::to_qstring (data->obstructions_suffix ()));
   datatype_obstructions->setText (QString::number (data->obstructions_datatype ()));
@@ -505,11 +505,11 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   suffix_blockages->setText (tl::to_qstring (data->blockages_suffix ()));
   datatype_blockages->setText (QString::number (data->blockages_datatype ()));
   produce_routing->setChecked (data->produce_routing ());
-  suffix_routing->setText (tl::to_qstring (data->routing_suffix ()));
-  datatype_routing->setText (QString::number (data->routing_datatype ()));
+  suffix_routing->setText (tl::to_qstring (data->routing_suffix_str ()));
+  datatype_routing->setText (tl::to_qstring (data->routing_datatype_str ()));
   produce_special_routing->setChecked (data->produce_special_routing ());
-  suffix_special_routing->setText (tl::to_qstring (data->special_routing_suffix ()));
-  datatype_special_routing->setText (QString::number (data->special_routing_datatype ()));
+  suffix_special_routing->setText (tl::to_qstring (data->special_routing_suffix_str ()));
+  datatype_special_routing->setText (tl::to_qstring (data->special_routing_datatype_str ()));
   produce_labels->setChecked (data->produce_labels ());
   suffix_labels->setText (tl::to_qstring (data->labels_suffix ()));
   datatype_labels->setText (QString::number (data->labels_datatype ()));

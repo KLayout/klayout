@@ -260,6 +260,46 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "@brief Sets the via geometry layer datatype value.\n"
     "See \\produce_via_geometry for details about this property.\n"
   ) +
+  gsi::method ("clear_via_geometry_suffixes_per_mask", &db::LEFDEFReaderOptions::clear_via_geometry_suffixes_per_mask,
+    "@brief Clears the via geometry layer name suffix per mask.\n"
+    "See \\produce_via_geometry for details about this property.\n"
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("clear_via_geometry_datatypes_per_mask", &db::LEFDEFReaderOptions::clear_via_geometry_datatypes_per_mask,
+    "@brief Clears the via geometry layer datatypes per mask.\n"
+    "See \\produce_via_geometry for details about this property.\n"
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("via_geometry_suffix_per_mask", &db::LEFDEFReaderOptions::via_geometry_suffix_per_mask, gsi::arg ("mask"),
+    "@brief Gets the via geometry layer name suffix per mask.\n"
+    "See \\produce_via_geometry for details about this property.\n"
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("set_via_geometry_suffix_per_mask", &db::LEFDEFReaderOptions::set_via_geometry_suffix_per_mask, gsi::arg ("mask"), gsi::arg ("suffix"),
+    "@brief Sets the via geometry layer name suffix per mask.\n"
+    "See \\produce_via_geometry for details about this property.\n"
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("via_geometry_datatype", &db::LEFDEFReaderOptions::via_geometry_datatype_per_mask,
+    "@brief Gets the via geometry layer datatype value per mask.\n"
+    "See \\produce_via_geometry for details about this property.\n"
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("set_via_geometry_datatype_per_mask", &db::LEFDEFReaderOptions::set_via_geometry_datatype_per_mask, gsi::arg ("mask"), gsi::arg ("datatype"),
+    "@brief Sets the via geometry layer datatype value.\n"
+    "See \\produce_via_geometry for details about this property.\n"
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
   gsi::method ("via_cellname_prefix", &db::LEFDEFReaderOptions::via_cellname_prefix,
     "@brief Gets the via cellname prefix.\n"
     "Vias are represented by cells. The cell name is formed by combining the via cell name prefix and the via name.\n"
@@ -296,6 +336,46 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "@brief Sets the pin geometry layer datatype value.\n"
     "See \\produce_via_geometry for details about the layer production rules."
   ) +
+  gsi::method ("clear_pins_suffixes_per_mask", &db::LEFDEFReaderOptions::clear_pins_suffixes_per_mask,
+    "@brief Clears the pin layer name suffix per mask.\n"
+    "See \\produce_via_geometry for details about this property.\n"
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("clear_pin_datatypes_per_mask", &db::LEFDEFReaderOptions::clear_pins_datatypes_per_mask,
+    "@brief Clears the pin layer datatypes per mask.\n"
+    "See \\produce_via_geometry for details about this property.\n"
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("pins_suffix_per_mask", &db::LEFDEFReaderOptions::pins_suffix_per_mask, gsi::arg ("mask"),
+    "@brief Gets the pin geometry layer name suffix per mask.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("set_pins_suffix_per_mask", &db::LEFDEFReaderOptions::set_pins_suffix_per_mask, gsi::arg ("mask"), gsi::arg ("suffix"),
+    "@brief Sets the pin geometry layer name suffix per mask.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("pins_datatype", &db::LEFDEFReaderOptions::pins_datatype_per_mask,
+    "@brief Gets the pin geometry layer datatype value per mask.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("set_pins_datatype_per_mask", &db::LEFDEFReaderOptions::set_pins_datatype_per_mask, gsi::arg ("mask"), gsi::arg ("datatype"),
+    "@brief Sets the pin geometry layer datatype value.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
   gsi::method ("produce_lef_pins", &db::LEFDEFReaderOptions::produce_lef_pins,
     "@brief Gets a value indicating whether LEF pin geometries shall be produced.\n"
     "See \\produce_via_geometry for details about the layer production rules."
@@ -319,6 +399,46 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
   gsi::method ("lef_pins_datatype=", &db::LEFDEFReaderOptions::set_lef_pins_datatype, gsi::arg ("datatype"),
     "@brief Sets the LEF pin geometry layer datatype value.\n"
     "See \\produce_via_geometry for details about the layer production rules."
+  ) +
+  gsi::method ("clear_lef_pins_suffixes_per_mask", &db::LEFDEFReaderOptions::clear_lef_pins_suffixes_per_mask,
+    "@brief Clears the LEF pin layer name suffix per mask.\n"
+    "See \\produce_via_geometry for details about this property.\n"
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("clear_lef_pins_datatypes_per_mask", &db::LEFDEFReaderOptions::clear_lef_pins_datatypes_per_mask,
+    "@brief Clears the LEF pin layer datatypes per mask.\n"
+    "See \\produce_via_geometry for details about this property.\n"
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("lef_pins_suffix_per_mask", &db::LEFDEFReaderOptions::lef_pins_suffix_per_mask, gsi::arg ("mask"),
+    "@brief Gets the LEF pin geometry layer name suffix per mask.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("set_lef_pins_suffix_per_mask", &db::LEFDEFReaderOptions::set_lef_pins_suffix_per_mask, gsi::arg ("mask"), gsi::arg ("suffix"),
+    "@brief Sets the LEF pin geometry layer name suffix per mask.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("lef_pins_datatype", &db::LEFDEFReaderOptions::lef_pins_datatype_per_mask,
+    "@brief Gets the LEF pin geometry layer datatype value per mask.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("set_lef_pins_datatype_per_mask", &db::LEFDEFReaderOptions::set_lef_pins_datatype_per_mask, gsi::arg ("mask"), gsi::arg ("datatype"),
+    "@brief Sets the LEF pin geometry layer datatype value.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
   ) +
   gsi::method ("produce_obstructions", &db::LEFDEFReaderOptions::produce_obstructions,
     "@brief Gets a value indicating whether obstruction markers shall be produced.\n"
@@ -416,6 +536,46 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "@brief Sets the routing layer datatype value.\n"
     "See \\produce_via_geometry for details about the layer production rules."
   ) +
+  gsi::method ("clear_routing_suffixes_per_mask", &db::LEFDEFReaderOptions::clear_routing_suffixes_per_mask,
+    "@brief Clears the routing layer name suffix per mask.\n"
+    "See \\produce_via_geometry for details about this property.\n"
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("clear_routing_datatypes_per_mask", &db::LEFDEFReaderOptions::clear_routing_datatypes_per_mask,
+    "@brief Clears the routing layer datatypes per mask.\n"
+    "See \\produce_via_geometry for details about this property.\n"
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("routing_suffix_per_mask", &db::LEFDEFReaderOptions::routing_suffix_per_mask, gsi::arg ("mask"),
+    "@brief Gets the routing geometry layer name suffix per mask.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("set_routing_suffix_per_mask", &db::LEFDEFReaderOptions::set_routing_suffix_per_mask, gsi::arg ("mask"), gsi::arg ("suffix"),
+    "@brief Sets the routing geometry layer name suffix per mask.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("routing_datatype", &db::LEFDEFReaderOptions::routing_datatype_per_mask,
+    "@brief Gets the routing geometry layer datatype value per mask.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("set_routing_datatype_per_mask", &db::LEFDEFReaderOptions::set_routing_datatype_per_mask, gsi::arg ("mask"), gsi::arg ("datatype"),
+    "@brief Sets the routing geometry layer datatype value.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
   gsi::method ("produce_special_routing", &db::LEFDEFReaderOptions::produce_special_routing,
     "@brief Gets a value indicating whether special routing geometry shall be produced.\n"
     "See \\produce_via_geometry for details about the layer production rules.\n"
@@ -451,6 +611,46 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "See \\produce_via_geometry for details about the layer production rules."
     "\n"
     "The differentiation between special and normal routing has been introduced in version 0.27."
+  ) +
+  gsi::method ("clear_special_routing_suffixes_per_mask", &db::LEFDEFReaderOptions::clear_special_routing_suffixes_per_mask,
+    "@brief Clears the special routing layer name suffix per mask.\n"
+    "See \\produce_via_geometry for details about this property.\n"
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("clear_special_routing_datatypes_per_mask", &db::LEFDEFReaderOptions::clear_special_routing_datatypes_per_mask,
+    "@brief Clears the special routing layer datatypes per mask.\n"
+    "See \\produce_via_geometry for details about this property.\n"
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("special_routing_suffix_per_mask", &db::LEFDEFReaderOptions::special_routing_suffix_per_mask, gsi::arg ("mask"),
+    "@brief Gets the special routing geometry layer name suffix per mask.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("set_special_routing_suffix_per_mask", &db::LEFDEFReaderOptions::set_special_routing_suffix_per_mask, gsi::arg ("mask"), gsi::arg ("suffix"),
+    "@brief Sets the special routing geometry layer name suffix per mask.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("special_routing_datatype", &db::LEFDEFReaderOptions::special_routing_datatype_per_mask,
+    "@brief Gets the special routing geometry layer datatype value per mask.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("set_special_routing_datatype_per_mask", &db::LEFDEFReaderOptions::set_special_routing_datatype_per_mask, gsi::arg ("mask"), gsi::arg ("datatype"),
+    "@brief Sets the special routing geometry layer datatype value.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
   ) +
   gsi::method ("separate_groups", &db::LEFDEFReaderOptions::separate_groups,
     "@brief Gets a value indicating whether to create separate parent cells for individual groups.\n"

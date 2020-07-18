@@ -144,14 +144,20 @@ LEFDEFReaderOptions &LEFDEFReaderOptions::operator= (const LEFDEFReaderOptions &
     m_region_layer = d.m_region_layer;
     m_produce_via_geometry = d.m_produce_via_geometry;
     m_via_geometry_suffix = d.m_via_geometry_suffix;
+    m_via_geometry_suffixes = d.m_via_geometry_suffixes;
     m_via_geometry_datatype = d.m_via_geometry_datatype;
+    m_via_geometry_datatypes = d.m_via_geometry_datatypes;
     m_via_cellname_prefix = d.m_via_cellname_prefix;
     m_produce_pins = d.m_produce_pins;
     m_pins_suffix = d.m_pins_suffix;
+    m_pins_suffixes = d.m_pins_suffixes;
     m_pins_datatype = d.m_pins_datatype;
+    m_pins_datatypes = d.m_pins_datatypes;
     m_produce_lef_pins = d.m_produce_lef_pins;
     m_lef_pins_suffix = d.m_lef_pins_suffix;
+    m_lef_pins_suffixes = d.m_lef_pins_suffixes;
     m_lef_pins_datatype = d.m_lef_pins_datatype;
+    m_lef_pins_datatypes = d.m_lef_pins_datatypes;
     m_produce_obstructions = d.m_produce_obstructions;
     m_obstructions_suffix = d.m_obstructions_suffix;
     m_obstructions_datatype = d.m_obstructions_datatype;
@@ -163,10 +169,14 @@ LEFDEFReaderOptions &LEFDEFReaderOptions::operator= (const LEFDEFReaderOptions &
     m_labels_datatype = d.m_labels_datatype;
     m_produce_routing = d.m_produce_routing;
     m_routing_suffix = d.m_routing_suffix;
+    m_routing_suffixes = d.m_routing_suffixes;
     m_routing_datatype = d.m_routing_datatype;
+    m_routing_datatypes = d.m_routing_datatypes;
     m_produce_special_routing = d.m_produce_special_routing;
     m_special_routing_suffix = d.m_special_routing_suffix;
+    m_special_routing_suffixes = d.m_special_routing_suffixes;
     m_special_routing_datatype = d.m_special_routing_datatype;
+    m_special_routing_datatypes = d.m_special_routing_datatypes;
     m_separate_groups = d.m_separate_groups;
     m_map_file = d.m_map_file;
     m_macro_resolution_mode = d.m_macro_resolution_mode;
@@ -186,6 +196,234 @@ LEFDEFReaderOptions::format_name () const
 {
   static const std::string n ("LEFDEF");
   return n;
+}
+
+static void set_datatypes (db::LEFDEFReaderOptions *data, void (db::LEFDEFReaderOptions::*clear) (), void (db::LEFDEFReaderOptions::*set_datatype) (int datatype), void (db::LEFDEFReaderOptions::*set_datatype_per_mask) (unsigned int mask, int datatype), const std::string &s)
+{
+  (data->*clear) ();
+
+  tl::Extractor ex (s.c_str ());
+
+  while (! ex.at_end ()) {
+
+    tl::Extractor ex_saved = ex;
+
+    unsigned int mask = 0;
+    if (ex.try_read (mask) && ex.test (":")) {
+      int dt = 0;
+      ex.read (dt);
+      (data->*set_datatype_per_mask) (std::max ((unsigned int) 1, mask) - 1, dt);
+    } else {
+      ex = ex_saved;
+      int dt = 0;
+      ex.read (dt);
+      (data->*set_datatype) (dt);
+    }
+
+    if (ex.at_end ()) {
+      break;
+    } else {
+      ex.expect (",");
+    }
+
+  }
+}
+
+static void set_suffixes (db::LEFDEFReaderOptions *data, void (db::LEFDEFReaderOptions::*clear) (), void (db::LEFDEFReaderOptions::*set_suffix) (const std::string &suffix), void (db::LEFDEFReaderOptions::*set_suffix_per_mask) (unsigned int mask, const std::string &suffix), const std::string &s)
+{
+  (data->*clear) ();
+
+  tl::Extractor ex (s.c_str ());
+
+  while (! ex.at_end ()) {
+
+    tl::Extractor ex_saved = ex;
+
+    unsigned int mask = 0;
+    if (ex.try_read (mask) && ex.test (":")) {
+      std::string sfx;
+      ex.read_word_or_quoted (sfx);
+      (data->*set_suffix_per_mask) (std::max ((unsigned int) 1, mask) - 1, sfx);
+    } else {
+      ex = ex_saved;
+      std::string sfx;
+      ex.read_word_or_quoted (sfx);
+      (data->*set_suffix) (sfx);
+    }
+
+    if (ex.at_end ()) {
+      break;
+    } else {
+      ex.expect (",");
+    }
+
+  }
+}
+
+static std::string get_datatypes (const db::LEFDEFReaderOptions *data, int (db::LEFDEFReaderOptions::*get_datatype) () const, int (db::LEFDEFReaderOptions::*get_datatype_per_mask) (unsigned int mask) const, unsigned int max_mask)
+{
+  std::string res;
+  int dt0 = (data->*get_datatype) ();
+  if (dt0 >= 0) {
+    res += tl::to_string (dt0);
+  }
+
+  for (unsigned int i = 0; i <= max_mask; ++i) {
+    int dt = (data->*get_datatype_per_mask) (i);
+    if (dt >= 0 && dt != dt0) {
+      if (! res.empty ()) {
+        res += ",";
+      }
+      res += tl::to_string (i + 1);
+      res += ":";
+      res += tl::to_string (dt);
+    }
+  }
+
+  return res;
+}
+
+static std::string get_suffixes (const db::LEFDEFReaderOptions *data, const std::string &(db::LEFDEFReaderOptions::*get_suffix) () const, const std::string &(db::LEFDEFReaderOptions::*get_suffix_per_mask) (unsigned int mask) const, unsigned int max_mask)
+{
+  std::string res;
+  std::string sfx0 = (data->*get_suffix) ();
+  if (! sfx0.empty ()) {
+    res += tl::to_word_or_quoted_string (sfx0);
+  }
+
+  for (unsigned int i = 0; i <= max_mask; ++i) {
+    std::string sfx = (data->*get_suffix_per_mask) (i);
+    if (! sfx.empty () && sfx != sfx0) {
+      if (! res.empty ()) {
+        res += ",";
+      }
+      res += tl::to_string (i + 1);
+      res += ":";
+      res += tl::to_word_or_quoted_string (sfx);
+    }
+  }
+
+  return res;
+}
+
+void
+LEFDEFReaderOptions::set_via_geometry_suffix_str (const std::string &s)
+{
+  set_suffixes (this, &LEFDEFReaderOptions::clear_via_geometry_suffixes_per_mask, &LEFDEFReaderOptions::set_via_geometry_suffix, &LEFDEFReaderOptions::set_via_geometry_suffix_per_mask, s);
+}
+
+std::string
+LEFDEFReaderOptions::via_geometry_suffix_str () const
+{
+  return get_suffixes (this, &LEFDEFReaderOptions::via_geometry_suffix, &LEFDEFReaderOptions::via_geometry_suffix_per_mask, max_mask_number ());
+}
+
+void
+LEFDEFReaderOptions::set_via_geometry_datatype_str (const std::string &s)
+{
+  set_datatypes (this, &LEFDEFReaderOptions::clear_via_geometry_datatypes_per_mask, &LEFDEFReaderOptions::set_via_geometry_datatype, &LEFDEFReaderOptions::set_via_geometry_datatype_per_mask, s);
+}
+
+std::string
+LEFDEFReaderOptions::via_geometry_datatype_str () const
+{
+  return get_datatypes (this, &LEFDEFReaderOptions::via_geometry_datatype, &LEFDEFReaderOptions::via_geometry_datatype_per_mask, max_mask_number ());
+}
+
+void
+LEFDEFReaderOptions::set_pins_suffix_str (const std::string &s)
+{
+  set_suffixes (this, &LEFDEFReaderOptions::clear_pins_suffixes_per_mask, &LEFDEFReaderOptions::set_pins_suffix, &LEFDEFReaderOptions::set_pins_suffix_per_mask, s);
+}
+
+std::string
+LEFDEFReaderOptions::pins_suffix_str () const
+{
+  return get_suffixes (this, &LEFDEFReaderOptions::pins_suffix, &LEFDEFReaderOptions::pins_suffix_per_mask, max_mask_number ());
+}
+
+void
+LEFDEFReaderOptions::set_pins_datatype_str (const std::string &s)
+{
+  set_datatypes (this, &LEFDEFReaderOptions::clear_pins_datatypes_per_mask, &LEFDEFReaderOptions::set_pins_datatype, &LEFDEFReaderOptions::set_pins_datatype_per_mask, s);
+}
+
+std::string
+LEFDEFReaderOptions::pins_datatype_str () const
+{
+  return get_datatypes (this, &LEFDEFReaderOptions::pins_datatype, &LEFDEFReaderOptions::pins_datatype_per_mask, max_mask_number ());
+}
+
+void
+LEFDEFReaderOptions::set_lef_pins_suffix_str (const std::string &s)
+{
+  set_suffixes (this, &LEFDEFReaderOptions::clear_lef_pins_suffixes_per_mask, &LEFDEFReaderOptions::set_lef_pins_suffix, &LEFDEFReaderOptions::set_lef_pins_suffix_per_mask, s);
+}
+
+std::string
+LEFDEFReaderOptions::lef_pins_suffix_str () const
+{
+  return get_suffixes (this, &LEFDEFReaderOptions::lef_pins_suffix, &LEFDEFReaderOptions::lef_pins_suffix_per_mask, max_mask_number ());
+}
+
+void
+LEFDEFReaderOptions::set_lef_pins_datatype_str (const std::string &s)
+{
+  set_datatypes (this, &LEFDEFReaderOptions::clear_lef_pins_datatypes_per_mask, &LEFDEFReaderOptions::set_lef_pins_datatype, &LEFDEFReaderOptions::set_lef_pins_datatype_per_mask, s);
+}
+
+std::string
+LEFDEFReaderOptions::lef_pins_datatype_str () const
+{
+  return get_datatypes (this, &LEFDEFReaderOptions::lef_pins_datatype, &LEFDEFReaderOptions::lef_pins_datatype_per_mask, max_mask_number ());
+}
+
+void
+LEFDEFReaderOptions::set_routing_suffix_str (const std::string &s)
+{
+  set_suffixes (this, &LEFDEFReaderOptions::clear_routing_suffixes_per_mask, &LEFDEFReaderOptions::set_routing_suffix, &LEFDEFReaderOptions::set_routing_suffix_per_mask, s);
+}
+
+std::string
+LEFDEFReaderOptions::routing_suffix_str () const
+{
+  return get_suffixes (this, &LEFDEFReaderOptions::routing_suffix, &LEFDEFReaderOptions::routing_suffix_per_mask, max_mask_number ());
+}
+
+void
+LEFDEFReaderOptions::set_routing_datatype_str (const std::string &s)
+{
+  set_datatypes (this, &LEFDEFReaderOptions::clear_routing_datatypes_per_mask, &LEFDEFReaderOptions::set_routing_datatype, &LEFDEFReaderOptions::set_routing_datatype_per_mask, s);
+}
+
+std::string
+LEFDEFReaderOptions::routing_datatype_str () const
+{
+  return get_datatypes (this, &LEFDEFReaderOptions::routing_datatype, &LEFDEFReaderOptions::routing_datatype_per_mask, max_mask_number ());
+}
+
+void
+LEFDEFReaderOptions::set_special_routing_suffix_str (const std::string &s)
+{
+  set_suffixes (this, &LEFDEFReaderOptions::clear_special_routing_suffixes_per_mask, &LEFDEFReaderOptions::set_special_routing_suffix, &LEFDEFReaderOptions::set_special_routing_suffix_per_mask, s);
+}
+
+std::string
+LEFDEFReaderOptions::special_routing_suffix_str () const
+{
+  return get_suffixes (this, &LEFDEFReaderOptions::special_routing_suffix, &LEFDEFReaderOptions::special_routing_suffix_per_mask, max_mask_number ());
+}
+
+void
+LEFDEFReaderOptions::set_special_routing_datatype_str (const std::string &s)
+{
+  set_datatypes (this, &LEFDEFReaderOptions::clear_special_routing_datatypes_per_mask, &LEFDEFReaderOptions::set_special_routing_datatype, &LEFDEFReaderOptions::set_special_routing_datatype_per_mask, s);
+}
+
+std::string
+LEFDEFReaderOptions::special_routing_datatype_str () const
+{
+  return get_datatypes (this, &LEFDEFReaderOptions::special_routing_datatype, &LEFDEFReaderOptions::special_routing_datatype_per_mask, max_mask_number ());
 }
 
 // -----------------------------------------------------------------------------------

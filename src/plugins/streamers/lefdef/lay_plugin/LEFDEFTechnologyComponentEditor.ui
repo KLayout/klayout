@@ -370,13 +370,26 @@
       </item>
       <item row="0" column="2" colspan="2">
        <widget class="QLabel" name="label_8">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>As properties with name ...</string>
         </property>
        </widget>
       </item>
       <item row="2" column="2" colspan="2">
-       <widget class="QLineEdit" name="inst_prop_name"/>
+       <widget class="QLineEdit" name="inst_prop_name">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
       <item row="0" column="4" rowspan="8">
        <widget class="Line" name="line">
@@ -386,7 +399,14 @@
        </widget>
       </item>
       <item row="2" column="7">
-       <widget class="QLineEdit" name="placement_blockage_layer"/>
+       <widget class="QLineEdit" name="placement_blockage_layer">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
       <item row="2" column="1">
        <widget class="QLabel" name="label_18">
@@ -399,10 +419,23 @@
        </widget>
       </item>
       <item row="3" column="7">
-       <widget class="QLineEdit" name="region_layer"/>
+       <widget class="QLineEdit" name="region_layer">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
       <item row="4" column="0" colspan="4">
        <widget class="QLabel" name="help_label">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>&lt;html&gt;&lt;body&gt;(&lt;a href=&quot;int:/about/variant_notation.xml&quot;&gt;See here for the name notation&lt;/a&gt;)&lt;/body&gt;&lt;/html&gt;</string>
         </property>
@@ -412,7 +445,14 @@
        </widget>
       </item>
       <item row="1" column="2" colspan="2">
-       <widget class="QLineEdit" name="net_prop_name"/>
+       <widget class="QLineEdit" name="net_prop_name">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
       <item row="3" column="1">
        <widget class="QLabel" name="label_20">
@@ -425,7 +465,14 @@
        </widget>
       </item>
       <item row="3" column="2" colspan="2">
-       <widget class="QLineEdit" name="pin_prop_name"/>
+       <widget class="QLineEdit" name="pin_prop_name">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
       <item row="3" column="6">
        <widget class="QLabel" name="label_19">
@@ -490,6 +537,12 @@
       </item>
       <item row="0" column="7">
        <widget class="QLabel" name="label_7">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>On layer with spec ...</string>
         </property>
@@ -536,7 +589,14 @@
        </widget>
       </item>
       <item row="1" column="7">
-       <widget class="QLineEdit" name="outline_layer"/>
+       <widget class="QLineEdit" name="outline_layer">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
       <item row="3" column="5">
        <widget class="QCheckBox" name="produce_regions">
@@ -589,6 +649,12 @@
       </item>
       <item row="4" column="5" colspan="3">
        <widget class="QLabel" name="help_label2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>&lt;html&gt;&lt;body&gt;(&lt;a href=&quot;int:/about/layer_specs.xml&quot;&gt;See here for the layer specification&lt;/a&gt;)&lt;/body&gt;&lt;/html&gt;</string>
         </property>
@@ -731,7 +797,7 @@ If used inside a technology, the file will be looked up relative to the technolo
           <item row="2" column="5">
            <widget class="QCheckBox" name="produce_special_routing">
             <property name="text">
-             <string>Special routing</string>
+             <string>Special routing (*)</string>
             </property>
            </widget>
           </item>
@@ -846,7 +912,7 @@ If used inside a technology, the file will be looked up relative to the technolo
           <item row="1" column="5">
            <widget class="QCheckBox" name="produce_routing">
             <property name="text">
-             <string>Routing</string>
+             <string>Routing (*)</string>
             </property>
            </widget>
           </item>
@@ -895,7 +961,7 @@ If used inside a technology, the file will be looked up relative to the technolo
           <item row="1" column="0">
            <widget class="QCheckBox" name="produce_via_geometry">
             <property name="text">
-             <string>Via geometry</string>
+             <string>Via geometry (*)</string>
             </property>
            </widget>
           </item>
@@ -909,7 +975,7 @@ If used inside a technology, the file will be looked up relative to the technolo
           <item row="3" column="0">
            <widget class="QCheckBox" name="produce_lef_pins">
             <property name="text">
-             <string>LEF Pins</string>
+             <string>LEF Pins (*)</string>
             </property>
            </widget>
           </item>
@@ -924,7 +990,7 @@ suffix ...</string>
           <item row="2" column="0">
            <widget class="QCheckBox" name="produce_pins">
             <property name="text">
-             <string>Pins</string>
+             <string>Pins (*)</string>
             </property>
            </widget>
           </item>
@@ -1069,6 +1135,17 @@ type ...</string>
         </widget>
        </item>
        <item>
+        <widget class="QLabel" name="label_28">
+         <property name="text">
+          <string>(*) Separate suffixes or datatypes can be given for different masks, using the following notation:
+&quot;x,1:y,2:z ...&quot; (which will use x by default, y for MASK 1, z for MASK 2 etc.)</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -1158,9 +1235,49 @@ type ...</string>
   <tabstop>move_lef_files_up</tabstop>
   <tabstop>move_lef_files_down</tabstop>
   <tabstop>dbu</tabstop>
+  <tabstop>prefix_via_cellname</tabstop>
+  <tabstop>separate_groups</tabstop>
+  <tabstop>produce_lef_geo</tabstop>
   <tabstop>produce_net_names</tabstop>
   <tabstop>net_prop_name</tabstop>
+  <tabstop>produce_inst_names</tabstop>
+  <tabstop>inst_prop_name</tabstop>
+  <tabstop>produce_pin_names</tabstop>
+  <tabstop>pin_prop_name</tabstop>
+  <tabstop>produce_outlines</tabstop>
+  <tabstop>outline_layer</tabstop>
+  <tabstop>produce_placement_blockages</tabstop>
+  <tabstop>placement_blockage_layer</tabstop>
+  <tabstop>produce_regions</tabstop>
+  <tabstop>region_layer</tabstop>
+  <tabstop>layer_map_mode</tabstop>
+  <tabstop>produce_via_geometry</tabstop>
+  <tabstop>suffix_via_geometry</tabstop>
+  <tabstop>datatype_via_geometry</tabstop>
+  <tabstop>produce_pins</tabstop>
+  <tabstop>suffix_pins</tabstop>
+  <tabstop>datatype_pins</tabstop>
+  <tabstop>produce_lef_pins</tabstop>
+  <tabstop>suffix_lef_pins</tabstop>
+  <tabstop>datatype_lef_pins</tabstop>
+  <tabstop>produce_obstructions</tabstop>
+  <tabstop>suffix_obstructions</tabstop>
+  <tabstop>datatype_obstructions</tabstop>
+  <tabstop>produce_routing</tabstop>
+  <tabstop>suffix_routing</tabstop>
+  <tabstop>datatype_routing</tabstop>
+  <tabstop>produce_special_routing</tabstop>
+  <tabstop>suffix_special_routing</tabstop>
+  <tabstop>datatype_special_routing</tabstop>
+  <tabstop>produce_labels</tabstop>
+  <tabstop>suffix_labels</tabstop>
+  <tabstop>datatype_labels</tabstop>
+  <tabstop>produce_blockages</tabstop>
+  <tabstop>suffix_blockages</tabstop>
+  <tabstop>datatype_blockages</tabstop>
   <tabstop>read_all_cbx</tabstop>
+  <tabstop>mapfile_path</tabstop>
+  <tabstop>browse_mapfile</tabstop>
  </tabstops>
  <resources>
   <include location="../../../../lay/lay/layResources.qrc"/>

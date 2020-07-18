@@ -278,14 +278,26 @@ class LEFDEFFormatDeclaration
       tl::make_member (&LEFDEFReaderOptions::produce_regions, &LEFDEFReaderOptions::set_produce_regions, "produce-regions") +
       tl::make_member (&LEFDEFReaderOptions::region_layer, &LEFDEFReaderOptions::set_region_layer, "region-layer") +
       tl::make_member (&LEFDEFReaderOptions::produce_via_geometry, &LEFDEFReaderOptions::set_produce_via_geometry, "produce-via-geometry") +
-      tl::make_member (&LEFDEFReaderOptions::via_geometry_suffix, &LEFDEFReaderOptions::set_via_geometry_suffix, "via-geometry-suffix") +
-      tl::make_member (&LEFDEFReaderOptions::via_geometry_datatype, &LEFDEFReaderOptions::set_via_geometry_datatype, "via-geometry-datatype") +
+      //  for backward compatibility
+      tl::make_member (&LEFDEFReaderOptions::set_via_geometry_suffix, "special-via_geometry-suffix") +
+      tl::make_member (&LEFDEFReaderOptions::set_via_geometry_datatype, "special-via_geometry-datatype") +
+      //  new:
+      tl::make_member (&LEFDEFReaderOptions::via_geometry_suffix_str, &LEFDEFReaderOptions::set_via_geometry_suffix_str, "special-via_geometry-suffix-string") +
+      tl::make_member (&LEFDEFReaderOptions::via_geometry_datatype_str, &LEFDEFReaderOptions::set_via_geometry_datatype_str, "special-via_geometry-datatype-string") +
       tl::make_member (&LEFDEFReaderOptions::produce_pins, &LEFDEFReaderOptions::set_produce_pins, "produce-pins") +
-      tl::make_member (&LEFDEFReaderOptions::pins_suffix, &LEFDEFReaderOptions::set_pins_suffix, "pins-suffix") +
-      tl::make_member (&LEFDEFReaderOptions::pins_datatype, &LEFDEFReaderOptions::set_pins_datatype, "pins-datatype") +
+      //  for backward compatibility
+      tl::make_member (&LEFDEFReaderOptions::set_pins_suffix, "special-pins-suffix") +
+      tl::make_member (&LEFDEFReaderOptions::set_pins_datatype, "special-pins-datatype") +
+      //  new:
+      tl::make_member (&LEFDEFReaderOptions::pins_suffix_str, &LEFDEFReaderOptions::set_pins_suffix_str, "special-pins-suffix-string") +
+      tl::make_member (&LEFDEFReaderOptions::pins_datatype_str, &LEFDEFReaderOptions::set_pins_datatype_str, "special-pins-datatype-string") +
       tl::make_member (&LEFDEFReaderOptions::produce_lef_pins, &LEFDEFReaderOptions::set_produce_lef_pins, "produce-lef-pins") +
-      tl::make_member (&LEFDEFReaderOptions::lef_pins_suffix, &LEFDEFReaderOptions::set_lef_pins_suffix, "lef-pins-suffix") +
-      tl::make_member (&LEFDEFReaderOptions::lef_pins_datatype, &LEFDEFReaderOptions::set_lef_pins_datatype, "lef-pins-datatype") +
+      //  for backward compatibility
+      tl::make_member (&LEFDEFReaderOptions::set_lef_pins_suffix, "special-lef_pins-suffix") +
+      tl::make_member (&LEFDEFReaderOptions::set_lef_pins_datatype, "special-lef_pins-datatype") +
+      //  new:
+      tl::make_member (&LEFDEFReaderOptions::lef_pins_suffix_str, &LEFDEFReaderOptions::set_lef_pins_suffix_str, "special-lef_pins-suffix-string") +
+      tl::make_member (&LEFDEFReaderOptions::lef_pins_datatype_str, &LEFDEFReaderOptions::set_lef_pins_datatype_str, "special-lef_pins-datatype-string") +
       tl::make_member (&LEFDEFReaderOptions::produce_obstructions, &LEFDEFReaderOptions::set_produce_obstructions, "produce-obstructions") +
       tl::make_member (&LEFDEFReaderOptions::obstructions_suffix, &LEFDEFReaderOptions::set_obstructions_suffix, "obstructions-suffix") +
       tl::make_member (&LEFDEFReaderOptions::obstructions_datatype, &LEFDEFReaderOptions::set_obstructions_datatype, "obstructions-datatype") +
@@ -296,11 +308,19 @@ class LEFDEFFormatDeclaration
       tl::make_member (&LEFDEFReaderOptions::labels_suffix, &LEFDEFReaderOptions::set_labels_suffix, "labels-suffix") +
       tl::make_member (&LEFDEFReaderOptions::labels_datatype, &LEFDEFReaderOptions::set_labels_datatype, "labels-datatype") +
       tl::make_member (&LEFDEFReaderOptions::produce_routing, &LEFDEFReaderOptions::set_produce_routing, "produce-routing") +
-      tl::make_member (&LEFDEFReaderOptions::routing_suffix, &LEFDEFReaderOptions::set_routing_suffix, "routing-suffix") +
-      tl::make_member (&LEFDEFReaderOptions::routing_datatype, &LEFDEFReaderOptions::set_routing_datatype, "routing-datatype") +
+      //  for backward compatibility
+      tl::make_member (&LEFDEFReaderOptions::set_routing_suffix, "special-routing-suffix") +
+      tl::make_member (&LEFDEFReaderOptions::set_routing_datatype, "special-routing-datatype") +
+      //  new:
+      tl::make_member (&LEFDEFReaderOptions::routing_suffix_str, &LEFDEFReaderOptions::set_routing_suffix_str, "special-routing-suffix-string") +
+      tl::make_member (&LEFDEFReaderOptions::routing_datatype_str, &LEFDEFReaderOptions::set_routing_datatype_str, "special-routing-datatype-string") +
       tl::make_member (&LEFDEFReaderOptions::produce_special_routing, &LEFDEFReaderOptions::set_produce_special_routing, "produce-special-routing") +
-      tl::make_member (&LEFDEFReaderOptions::special_routing_suffix, &LEFDEFReaderOptions::set_special_routing_suffix, "special-routing-suffix") +
-      tl::make_member (&LEFDEFReaderOptions::special_routing_datatype, &LEFDEFReaderOptions::set_special_routing_datatype, "special-routing-datatype") +
+      //  for backward compatibility
+      tl::make_member (&LEFDEFReaderOptions::set_special_routing_suffix, "special-routing-suffix") +
+      tl::make_member (&LEFDEFReaderOptions::set_special_routing_datatype, "special-routing-datatype") +
+      //  new:
+      tl::make_member (&LEFDEFReaderOptions::special_routing_suffix_str, &LEFDEFReaderOptions::set_special_routing_suffix_str, "special-routing-suffix-string") +
+      tl::make_member (&LEFDEFReaderOptions::special_routing_datatype_str, &LEFDEFReaderOptions::set_special_routing_datatype_str, "special-routing-datatype-string") +
       tl::make_member (&LEFDEFReaderOptions::begin_lef_files, &LEFDEFReaderOptions::end_lef_files, &LEFDEFReaderOptions::push_lef_file, "lef-files") +
       tl::make_member (&LEFDEFReaderOptions::macro_resolution_mode, &LEFDEFReaderOptions::set_macro_resolution_mode, "macro-resolution-mode", MacroResolutionModeConverter ()) +
       tl::make_member (&LEFDEFReaderOptions::separate_groups, &LEFDEFReaderOptions::set_separate_groups, "separate-groups") +

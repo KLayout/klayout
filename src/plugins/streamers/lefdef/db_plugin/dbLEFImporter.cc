@@ -169,7 +169,7 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
     if (test ("CLASS")) {
 
       //  accept CLASS token for PORT definitions
-      while (! test (";")) {
+      while (! at_end () && ! test (";")) {
         take ();
       }
 
@@ -183,7 +183,7 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
         w = dw->second.first;
       }
 
-      while (! test (";")) {
+      while (! at_end () && ! test (";")) {
         take ();
       }
 
@@ -418,7 +418,7 @@ LEFImporter::read_nondefaultrule (db::Layout & /*layout*/)
           test (";");
           m_nondefault_widths[n][l] = std::make_pair (w, w);
         } else {
-          while (! test (";")) {
+          while (! at_end () && ! test (";")) {
             take ();
           }
         }
@@ -528,7 +528,7 @@ LEFImporter::read_viadef_by_rule (RuleBasedViaGenerator *vg, ViaDesc &via_desc, 
 
     } else {
 
-      while (! test (";")) {
+      while (! at_end () && ! test (";")) {
         take ();
       }
 
@@ -561,7 +561,7 @@ LEFImporter::read_viadef_by_geometry (GeometryBasedViaGenerator *vg, ViaDesc &vi
         routing_layers.push_back (layer_name);
       }
 
-      while (! test (";")) {
+      while (! at_end () && ! test (";")) {
         take ();
       }
 
@@ -610,6 +610,13 @@ LEFImporter::read_viadef_by_geometry (GeometryBasedViaGenerator *vg, ViaDesc &vi
       vg->add_box (layer_name, b, mask);
 
       expect (";");
+
+    } else if (test ("PROPERTY")) {
+
+      //  skip properties
+      while (! at_end () && ! test (";")) {
+        take ();
+      }
 
     } else {
       //  stop at unknown token
@@ -726,7 +733,7 @@ LEFImporter::read_layer (Layout & /*layout*/)
           take ();
         }
       }
-      while (! test (";")) {
+      while (! at_end () && ! test (";")) {
         take ();
       }
 
@@ -767,7 +774,7 @@ LEFImporter::read_layer (Layout & /*layout*/)
 
     } else {
 
-      while (! test (";")) {
+      while (! at_end () && ! test (";")) {
         take ();
       }
 
@@ -886,7 +893,7 @@ LEFImporter::read_macro (Layout &layout)
           expect ("END");
 
         } else {
-          while (! test (";")) {
+          while (! at_end () && ! test (";")) {
             take ();
           }
         }
@@ -941,7 +948,7 @@ LEFImporter::read_macro (Layout &layout)
       expect (";");
 
     } else {
-      while (! test (";")) {
+      while (! at_end () && ! test (";")) {
         take ();
       }
     }
@@ -1047,7 +1054,7 @@ LEFImporter::do_read (db::Layout &layout)
           /* dbu_mic = */ get_double ();
           expect (";");
         } else {
-          while (! test (";")) {
+          while (! at_end () && ! test (";")) {
             take ();
           }
         }
@@ -1109,7 +1116,7 @@ LEFImporter::do_read (db::Layout &layout)
       read_macro (layout);
 
     } else {
-      while (! test (";")) {
+      while (! at_end () && ! test (";")) {
         take ();
       }
     }

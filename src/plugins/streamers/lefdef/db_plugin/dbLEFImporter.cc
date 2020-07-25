@@ -163,7 +163,6 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
   std::string layer_name;
   double dbu = layout.dbu ();
   double w = 0.0;
-  unsigned int mask = 0;
 
   while (true) {
 
@@ -197,6 +196,7 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
 
       std::vector<db::Point> points;
 
+      unsigned int mask = 0;
       if (test ("MASK")) {
         mask = get_mask (get_long ());
       }
@@ -243,6 +243,7 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
 
       std::vector<db::Point> points;
 
+      unsigned int mask = 0;
       if (test ("MASK")) {
         mask = get_mask (get_long ());
       }
@@ -289,6 +290,7 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
 
       std::vector<db::Point> points;
 
+      unsigned int mask = 0;
       if (test ("MASK")) {
         mask = get_mask (get_long ());
       }
@@ -337,9 +339,14 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
       //  note: the 5.8 spec says ITERATE comes before MASK for VIA
       bool iterate = test ("ITERATE");
 
+      unsigned int mask = 0;
       if (test ("MASK")) {
         mask = get_mask (get_long ());
       }
+
+      unsigned int mask_bottom = mask % 10;
+      unsigned int mask_cut = (mask / 10) % 10;
+      unsigned int mask_top = (mask / 100) % 10;
 
       int layer_id = -1;
       std::pair <bool, unsigned int> dl = open_layer (layout, layer_name, purpose, mask);
@@ -359,7 +366,7 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
       points.push_back (db::Vector (db::DVector (x / dbu, y / dbu)));
 
       std::string vn = get ();
-      db::Cell *vc = reader_state ()->via_cell (vn);
+      db::Cell *vc = reader_state ()->via_cell (vn, layout, mask_bottom, mask_cut, mask_top, this);
       if (! vc) {
         warn (tl::to_string (tr ("Unknown via: ")) + vn);
       }
@@ -437,21 +444,8 @@ LEFImporter::read_nondefaultrule (db::Layout & /*layout*/)
 }
 
 void
-LEFImporter::read_viadef_by_rule (Layout &layout, db::Cell &cell, ViaDesc &via_desc, const std::string & /*n*/)
+LEFImporter::read_viadef_by_rule (RuleBasedViaGenerator *vg, ViaDesc &via_desc, const std::string & /*n*/, double dbu)
 {
-  db::Vector cutsize, cutspacing;
-  db::Vector be, te;
-  db::Vector bo, to;
-  db::Point offset;
-  int rows = 1, columns = 1;
-  std::string pattern;
-
-  //  @@@ there is something with masks here ...
-  std::vector<std::pair<std::pair<std::string, unsigned int>, std::vector<db::Polygon> > > geometry;
-  geometry.push_back (std::pair<std::pair<std::string, unsigned int>, std::vector<db::Polygon> > ());
-  geometry.push_back (std::pair<std::pair<std::string, unsigned int>, std::vector<db::Polygon> > ());
-  geometry.push_back (std::pair<std::pair<std::string, unsigned int>, std::vector<db::Polygon> > ());
-
   while (! test ("END")) {
 
     double x, y;
@@ -460,7 +454,7 @@ LEFImporter::read_viadef_by_rule (Layout &layout, db::Cell &cell, ViaDesc &via_d
 
       x = get_double ();
       y = get_double ();
-      cutsize = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
+      vg->set_cutsize (db::Vector (db::DVector (x / dbu, y / dbu)));
 
       test (";");
 
@@ -468,7 +462,7 @@ LEFImporter::read_viadef_by_rule (Layout &layout, db::Cell &cell, ViaDesc &via_d
 
       x = get_double ();
       y = get_double ();
-      cutspacing = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
+      vg->set_cutspacing (db::Vector (db::DVector (x / dbu, y / dbu)));
 
       test (";");
 
@@ -476,7 +470,7 @@ LEFImporter::read_viadef_by_rule (Layout &layout, db::Cell &cell, ViaDesc &via_d
 
       x = get_double ();
       y = get_double ();
-      offset = db::Point (db::DPoint (x / layout.dbu (), y / layout.dbu ()));
+      vg->set_offset (db::Point (db::DPoint (x / dbu, y / dbu)));
 
       test (";");
 
@@ -484,11 +478,11 @@ LEFImporter::read_viadef_by_rule (Layout &layout, db::Cell &cell, ViaDesc &via_d
 
       x = get_double ();
       y = get_double ();
-      be = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
+      vg->set_be (db::Vector (db::DVector (x / dbu, y / dbu)));
 
       x = get_double ();
       y = get_double ();
-      te = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
+      vg->set_te (db::Vector (db::DVector (x / dbu, y / dbu)));
 
       test (";");
 
@@ -496,32 +490,39 @@ LEFImporter::read_viadef_by_rule (Layout &layout, db::Cell &cell, ViaDesc &via_d
 
       x = get_double ();
       y = get_double ();
-      bo = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
+      vg->set_bo (db::Vector (db::DVector (x / dbu, y / dbu)));
 
       x = get_double ();
       y = get_double ();
-      to = db::Vector (db::DVector (x / layout.dbu (), y / layout.dbu ()));
+      vg->set_to (db::Vector (db::DVector (x / dbu, y / dbu)));
 
       test (";");
 
     } else if (test ("ROWCOL")) {
 
-      rows = get_long ();
-      columns = get_long ();
+      vg->set_rows (get_long ());
+      vg->set_columns (get_long ());
 
       test (";");
 
     } else if (test ("PATTERN")) {
 
-      pattern = get ();
+      vg->set_pattern (get ());
 
       test (";");
 
     } else if (test ("LAYERS")) {
 
-      via_desc.m1 = geometry[0].first.first = get ();
-      geometry[1].first.first = get ();
-      via_desc.m2 = geometry[2].first.first = get ();
+      std::string lb, lc, lt;
+      lb = get ();
+      lc = get ();
+      lt = get ();
+      via_desc.m1 = lb;
+      via_desc.m2 = lt;
+
+      vg->set_bottom_layer (lb);
+      vg->set_cut_layer (lc);
+      vg->set_top_layer (lt);
 
       test (";");
 
@@ -534,22 +535,10 @@ LEFImporter::read_viadef_by_rule (Layout &layout, db::Cell &cell, ViaDesc &via_d
     }
 
   }
-
-  create_generated_via (geometry [0].second, geometry [1].second, geometry [2].second,
-                        cutsize, cutspacing, be, te, bo, to, offset, rows, columns, pattern);
-
-  for (std::vector<std::pair<std::pair<std::string, unsigned int>, std::vector<db::Polygon> > >::const_iterator g = geometry.begin (); g != geometry.end (); ++g) {
-    std::pair <bool, unsigned int> dl = open_layer (layout, g->first.first, ViaGeometry, g->first.second);
-    if (dl.first) {
-      for (std::vector<db::Polygon>::const_iterator p = g->second.begin (); p != g->second.end (); ++p) {
-        cell.shapes (dl.second).insert (*p);
-      }
-    }
-  }
 }
 
 void
-LEFImporter::read_viadef_by_geometry (Layout &layout, db::Cell &cell, ViaDesc &via_desc, const std::string &n)
+LEFImporter::read_viadef_by_geometry (GeometryBasedViaGenerator *vg, ViaDesc &via_desc, const std::string &n, double dbu)
 {
   //  ignore resistance spec
   if (test ("RESISTANCE")) {
@@ -557,17 +546,79 @@ LEFImporter::read_viadef_by_geometry (Layout &layout, db::Cell &cell, ViaDesc &v
     test (";");
   }
 
-  std::map<std::string, db::Box> bboxes;
-  read_geometries (layout, cell, ViaGeometry, &bboxes);
+  std::string layer_name;
+  std::set<std::string> seen_layers;
+  std::vector<std::string> routing_layers;
+
+  while (true) {
+
+    if (test ("LAYER")) {
+
+      layer_name = get ();
+
+      if (m_routing_layers.find (layer_name) != m_routing_layers.end () && seen_layers.find (layer_name) == seen_layers.end ()) {
+        seen_layers.insert (layer_name);
+        routing_layers.push_back (layer_name);
+      }
+
+      while (! test (";")) {
+        take ();
+      }
+
+    } else if (test ("POLYGON")) {
+
+      std::vector<db::Point> points;
+
+      unsigned int mask = 0;
+      if (test ("MASK")) {
+        mask = get_mask (get_long ());
+      }
+
+      while (! peek (";")) {
+        test ("(");
+        double x = get_double ();
+        double y = get_double ();
+        points.push_back (db::Point (db::DPoint (x / dbu, y / dbu)));
+        test (")");
+      }
+
+      db::Polygon p;
+      p.assign_hull (points.begin (), points.end ());
+
+      vg->add_polygon (layer_name, p, mask);
+
+      expect (";");
+
+    } else if (test ("RECT")) {
+
+      std::vector<db::Point> points;
+
+      unsigned int mask = 0;
+      if (test ("MASK")) {
+        mask = get_mask (get_long ());
+      }
+
+      for (int i = 0; i < 2; ++i) {
+        test ("(");
+        double x = get_double ();
+        double y = get_double ();
+        points.push_back (db::Point (db::DPoint (x / dbu, y / dbu)));
+        test (")");
+      }
+
+      db::Box b (points [0], points [1]);
+      vg->add_polygon (layer_name, db::Polygon (b), mask);
+
+      expect (";");
+
+    } else {
+      //  stop at unknown token
+      break;
+    }
+
+  }
 
   //  determine m1 and m2 layers
-
-  std::vector<std::string> routing_layers;
-  for (std::map<std::string, db::Box>::const_iterator b = bboxes.begin (); b != bboxes.end (); ++b) {
-    if (m_routing_layers.find (b->first) != m_routing_layers.end ()) {
-      routing_layers.push_back (b->first);
-    }
-  }
 
   if (routing_layers.size () == 2) {
     via_desc.m1 = routing_layers[0];
@@ -586,22 +637,20 @@ LEFImporter::read_viadef (Layout &layout)
 {
   std::string n = get ();
 
-  //  produce a cell for vias
-  std::string cellname = options ().via_cellname_prefix () + n;
-  db::Cell &cell = layout.cell (layout.add_cell (cellname.c_str ()));
-  reader_state ()->register_via_cell (n, &cell);
-
   ViaDesc &via_desc = m_vias[n];
-  via_desc.cell = &cell;
 
   while (test ("DEFAULT") || test ("TOPOFSTACKONLY"))
     ;
   test (";");
 
   if (test ("VIARULE")) {
-    read_viadef_by_rule (layout, cell, via_desc, n);
+    std::auto_ptr<RuleBasedViaGenerator> vg (new RuleBasedViaGenerator ());
+    read_viadef_by_rule (vg.get (), via_desc, n, layout.dbu ());
+    reader_state ()->register_via_cell (n, vg.release ());
   } else {
-    read_viadef_by_geometry (layout, cell, via_desc, n);
+    std::auto_ptr<GeometryBasedViaGenerator> vg (new GeometryBasedViaGenerator ());
+    read_viadef_by_geometry (vg.get (), via_desc, n, layout.dbu ());
+    reader_state ()->register_via_cell (n, vg.release ());
   }
 
   test ("VIA");
@@ -636,6 +685,12 @@ LEFImporter::read_layer (Layout & /*layout*/)
         m_cut_layers.insert (ln);
       }
       expect (";");
+
+    } else if (test ("MASK")) {
+
+      unsigned int num = (unsigned int) std::max (1l, get_long ());
+      test (";");
+      m_num_masks [ln] = num;
 
     } else if (test ("WIDTH")) {
 
@@ -879,6 +934,11 @@ LEFImporter::read_macro (Layout &layout)
 
       read_geometries (layout, cell, Obstructions);
       expect ("END");
+
+    } else if (test ("FIXEDMASK")) {
+
+      //  we do actually expect FIXEDMASK to be the case always.
+      expect (";");
 
     } else {
       while (! test (";")) {

@@ -68,6 +68,206 @@ std::string correct_path (const std::string &fn, const db::Layout &layout, const
 }
 
 // -----------------------------------------------------------------------------------
+//  Utilities
+
+static bool is_hex_digit (char c)
+{
+  char cup = toupper (c);
+  return (cup >= 'A' && cup <= 'F') || (c >= '0' && c <= '9');
+}
+
+static int hex_value (char c)
+{
+  char cup = toupper (c);
+  if (cup >= 'A' && cup <= 'F') {
+    return (cup - 'A') + 10;
+  } else if (c >= '0' && c <= '9') {
+    return c - '0';
+  } else {
+    return 0;
+  }
+}
+
+// -----------------------------------------------------------------------------------
+//  RuleBasedViaGenerator implementation
+
+RuleBasedViaGenerator::RuleBasedViaGenerator ()
+  : LEFDEFViaGenerator (), m_bottom_mask (0), m_cut_mask (0), m_top_mask (0), m_rows (1), m_columns (1)
+{ }
+
+void
+RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm)
+{
+  if (mask_bottom == 0) {
+    mask_bottom = m_bottom_mask;
+  }
+  if (mask_cut == 0) {
+    mask_cut = m_cut_mask;
+  }
+  if (mask_top == 0) {
+    mask_top = m_top_mask;
+  }
+
+  unsigned int num_cut_masks = nm ? nm->number_of_masks (m_cut_layer) : 1;
+
+  //  NOTE: missing cuts due to pattern holes don't change mask assignment
+
+  db::Vector vs ((m_cutsize.x () * m_columns + m_cutspacing.x () * (m_columns - 1)) / 2, (m_cutsize.y () * m_rows + m_cutspacing.y () * (m_rows - 1)) / 2);
+  db::Box via_box (m_offset - vs, m_offset + vs);
+
+  std::pair <bool, unsigned int> dl (false, 0);
+
+  dl = reader.open_layer (layout, m_bottom_layer, ViaGeometry, mask_bottom);
+  if (dl.first) {
+    cell.shapes (dl.second).insert (db::Polygon (via_box.enlarged (m_be).moved (m_bo)));
+  }
+
+  dl = reader.open_layer (layout, m_top_layer, ViaGeometry, mask_top);
+  if (dl.first) {
+    cell.shapes (dl.second).insert (db::Polygon (via_box.enlarged (m_te).moved (m_bo)));
+  }
+
+  const char *p = m_pattern.c_str ();
+  int rp = m_pattern.empty () ? -1 : 0;
+  const char *p0 = p, *p1 = p;
+
+  for (int r = 0; r < m_rows; ++r) {
+
+    if (rp == 0) {
+
+      if (*p) {
+
+        //  read a new row specification
+        rp = 0;
+        while (*p && is_hex_digit (*p)) {
+          rp = (rp * 16) + hex_value (*p++);
+        }
+        if (*p == '_') {
+          ++p;
+        }
+
+        p0 = p;
+        if (*p) {
+          while (*p && (is_hex_digit (*p) || toupper (*p) == 'R')) {
+            ++p;
+          }
+        }
+        p1 = p;
+        if (*p == '_') {
+          ++p;
+        }
+
+      }
+
+    }
+
+    if (rp != 0) {
+
+      if (rp > 0) {
+        --rp;
+      }
+
+      const char *pp = p0;
+      unsigned int d = 0;
+      int cp = (p == p0 ? -1 : 0);
+      int bit = 0;
+
+      for (int c = 0; c < m_columns; ++c) {
+
+        if (cp == 0) {
+
+          d = 0;
+          cp = 4;
+          bit = 0;
+
+          if (*pp && pp < p1 && toupper (*pp) == 'R') {
+
+            ++pp;
+            if (*pp && pp < p1) {
+              cp = 4 * hex_value (*pp++);
+              if (*pp && pp < p1) {
+                d = (unsigned int) hex_value (*pp++);
+              }
+            }
+
+          } else if (*pp && pp < p1) {
+
+            d = (unsigned int) hex_value (*pp++);
+
+          }
+
+          if (cp > 0) {
+            --cp;
+          }
+
+        } else if (cp > 0) {
+
+          --cp;
+
+        } else {
+
+          d = 0xf;
+
+        }
+
+        if ((d & (0x8 >> (bit++ % 4))) != 0) {
+
+          db::Vector vbl ((m_cutsize + m_cutspacing).x () * c, (m_cutsize + m_cutspacing).y () * r);
+          db::Box vb (via_box.lower_left () + vbl, via_box.lower_left () + vbl + m_cutsize);
+
+          unsigned int cm = 0;
+          if (mask_cut > 0) {
+            //  This is the core algorithm for mask assignment in patterned vias
+            cm = (mask_cut + r + c - 1) % num_cut_masks + 1;
+          }
+
+          dl = reader.open_layer (layout, m_cut_layer, ViaGeometry, cm);
+          if (dl.first) {
+            cell.shapes (dl.second).insert (db::Polygon (vb));
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+}
+
+// -----------------------------------------------------------------------------------
+//  GeometryBasedViaGenerator implementation
+
+GeometryBasedViaGenerator::GeometryBasedViaGenerator ()
+  : LEFDEFViaGenerator ()
+{ }
+
+void
+GeometryBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, unsigned int /*mask_bottom*/, unsigned int /*mask_cut*/, unsigned int /*mask_top*/, const LEFDEFNumberOfMasks * /*nm*/)
+{
+  for (std::map <std::string, std::list<std::pair<unsigned int, db::Polygon> > >::const_iterator g = m_geometries.begin (); g != m_geometries.end (); ++g) {
+
+    for (std::list<std::pair<unsigned int, db::Polygon> >::const_iterator i = g->second.begin (); i != g->second.end (); ++i) {
+
+      std::pair <bool, unsigned int> dl (false, 0);
+
+      dl = reader.open_layer (layout, g->first, ViaGeometry, i->first);
+      if (dl.first) {
+        cell.shapes (dl.second).insert (i->second);
+      }
+
+    }
+
+  }
+}
+
+void
+GeometryBasedViaGenerator::add_polygon (const std::string &ln, const db::Polygon &poly, unsigned int mask)
+{
+  m_geometries [ln].push_back (std::make_pair (mask, poly));
+}
+
+// -----------------------------------------------------------------------------------
 //  LEFDEFTechnologyComponent implementation
 
 LEFDEFReaderOptions::LEFDEFReaderOptions ()
@@ -449,6 +649,15 @@ LEFDEFReaderState::LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout 
   }
 }
 
+LEFDEFReaderState::~LEFDEFReaderState ()
+{
+  for (std::map<std::string, LEFDEFViaGenerator *>::const_iterator i = m_via_generators.begin (); i != m_via_generators.end (); ++i) {
+    delete i->second;
+  }
+
+  m_via_generators.clear ();
+}
+
 void
 LEFDEFReaderState::register_layer (const std::string &ln)
 {
@@ -484,7 +693,7 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
   purpose_translation ["VIA"] = ViaGeometry;
   purpose_translation ["BLOCKAGE"] = Blockage;
 
-  std::map<std::pair<std::string, LayerPurpose>, db::LayerProperties> layer_map;
+  std::map<std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, db::LayerProperties> layer_map;
 
   while (! ts.at_end ()) {
 
@@ -504,15 +713,15 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 
         if (w1 == "DIEAREA") {
 
-          layer_map [std::make_pair (std::string (), Outline)] = db::LayerProperties (layer, datatype, "OUTLINE");
+          layer_map [std::make_pair (std::string (), std::make_pair (Outline, (unsigned int) 0))] = db::LayerProperties (layer, datatype, "OUTLINE");
 
         } else if (w1 == "REGIONS") {
 
-          layer_map [std::make_pair (std::string (), Regions)] = db::LayerProperties (layer, datatype, "REGIONS");
+          layer_map [std::make_pair (std::string (), std::make_pair (Regions, (unsigned int) 0))] = db::LayerProperties (layer, datatype, "REGIONS");
 
         } else if (w1 == "BLOCKAGE") {
 
-          layer_map [std::make_pair (std::string (), PlacementBlockage)] = db::LayerProperties (layer, datatype, "PLACEMENT_BLK");
+          layer_map [std::make_pair (std::string (), std::make_pair (PlacementBlockage, (unsigned int) 0))] = db::LayerProperties (layer, datatype, "PLACEMENT_BLK");
 
         } else if (w1 == "NAME") {
 
@@ -530,7 +739,7 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 
           std::string final_name = tl::join (layers, "/") + ".LABEL";
           for (std::vector<std::string>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-            layer_map [std::make_pair (*l, Label)] = db::LayerProperties (layer, datatype, final_name);
+            layer_map [std::make_pair (*l, std::make_pair (Label, (unsigned int) 0))] = db::LayerProperties (layer, datatype, final_name);
           }
 
         } else {
@@ -542,15 +751,30 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
           //    "(M1,PINS): M1.NET/PINS"
           //  (separating, translating and recombing the purposes)
 
-          std::set<LayerPurpose> translated_purposes;
+          std::set<std::pair<LayerPurpose, unsigned int> > translated_purposes;
           std::string purpose_str;
+
           std::vector<std::string> purposes = tl::split (w2, ",");
           for (std::vector<std::string>::const_iterator p = purposes.begin (); p != purposes.end (); ++p) {
 
-            std::map<std::string, LayerPurpose>::const_iterator i = purpose_translation.find (tl::to_upper_case (*p));
+            std::string p_uc = tl::to_upper_case (*p);
+            tl::Extractor ex (p_uc.c_str ());
+
+            std::string ps;
+            ex.read (ps);
+
+            unsigned int mask = 0;
+
+            if (ex.test (":")) {
+              if (ex.test ("MASK") && ex.test (":")) {
+                ex.read (mask);
+              }
+            }
+
+            std::map<std::string, LayerPurpose>::const_iterator i = purpose_translation.find (ps);
             if (i != purpose_translation.end ()) {
 
-              translated_purposes.insert (i->second);
+              translated_purposes.insert (std::make_pair (i->second, mask));
 
               if (! purpose_str.empty ()) {
                 purpose_str += "/";
@@ -558,11 +782,12 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
               purpose_str += i->first;
 
             }
+
           }
 
           std::string final_name = w1 + "." + purpose_str;
 
-          for (std::set<LayerPurpose>::const_iterator p = translated_purposes.begin (); p != translated_purposes.end (); ++p) {
+          for (std::set<std::pair<LayerPurpose, unsigned int> >::const_iterator p = translated_purposes.begin (); p != translated_purposes.end (); ++p) {
             layer_map [std::make_pair (w1, *p)] = db::LayerProperties (layer, datatype, final_name);
           }
 
@@ -575,8 +800,8 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
   }
 
   db::DirectLayerMapping lm (&layout);
-  for (std::map<std::pair<std::string, LayerPurpose>, db::LayerProperties>::const_iterator i = layer_map.begin (); i != layer_map.end (); ++i) {
-    map_layer_explicit (i->first.first, i->first.second, i->second, lm.map_layer (i->second).second);
+  for (std::map<std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, db::LayerProperties>::const_iterator i = layer_map.begin (); i != layer_map.end (); ++i) {
+    map_layer_explicit (i->first.first, i->first.second.first, i->second, lm.map_layer (i->second).second, i->first.second.second);
   }
 }
 
@@ -840,16 +1065,52 @@ LEFDEFReaderState::finish (db::Layout &layout)
 }
 
 void
-LEFDEFReaderState::register_via_cell (const std::string &vn, db::Cell *cell)
+LEFDEFReaderState::register_via_cell (const std::string &vn, LEFDEFViaGenerator *generator)
 {
-  m_via_cells [vn] = cell;
+  if (m_via_generators.find (vn) != m_via_generators.end ()) {
+    delete m_via_generators [vn];
+  }
+  m_via_generators [vn] = generator;
 }
 
 db::Cell *
-LEFDEFReaderState::via_cell (const std::string &vn)
+LEFDEFReaderState::via_cell (const std::string &vn, db::Layout &layout, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm)
 {
-  std::map<std::string, db::Cell *>::const_iterator i = m_via_cells.find (vn);
-  return i != m_via_cells.end () ? i->second : 0;
+  ViaKey vk (vn, mask_bottom, mask_cut, mask_top);
+  std::map<ViaKey, db::Cell *>::const_iterator i = m_via_cells.find (vk);
+  if (i == m_via_cells.end ()) {
+
+    db::Cell *cell = 0;
+
+    std::map<std::string, LEFDEFViaGenerator *>::const_iterator g = m_via_generators.find (vn);
+    if (g != m_via_generators.end ()) {
+
+      LEFDEFViaGenerator *vg = g->second;
+
+      std::string mask_suffix;
+      if (mask_bottom > 0 || mask_cut > 0 || mask_top > 0) {
+        mask_suffix += "_";
+        mask_suffix += tl::to_string (mask_bottom);
+        mask_suffix += "_";
+        mask_suffix += tl::to_string (mask_cut);
+        mask_suffix += "_";
+        mask_suffix += tl::to_string (mask_top);
+      }
+
+      std::string cn = mp_tech_comp->via_cellname_prefix () + vn + mask_suffix;
+      cell = &layout.cell (layout.add_cell (cn.c_str ()));
+
+      vg->create_cell (*this, layout, *cell, mask_bottom, mask_cut, mask_bottom, nm);
+
+    }
+
+    m_via_cells[vk] = cell;
+    return cell;
+
+  } else {
+    tl_assert (! i->second || i->second->layout () == &layout);
+    return i->second;
+  }
 }
 
 // -----------------------------------------------------------------------------------
@@ -872,10 +1133,7 @@ LEFDEFImporter::~LEFDEFImporter ()
 unsigned int
 LEFDEFImporter::get_mask (long m)
 {
-  if (m < 1 || m > 16) {
-    error (tl::to_string (tr ("Invalid mask number: ")) + tl::to_string (m));
-  }
-  return (unsigned int) (m - 1);
+  return (unsigned int) m;
 }
 
 void 
@@ -1144,141 +1402,6 @@ LEFDEFImporter::next ()
   }
 
   return m_last_token;
-}
-
-static bool is_hex_digit (char c)
-{
-  char cup = toupper (c);
-  return (cup >= 'A' && cup <= 'F') || (c >= '0' && c <= '9');
-}
-
-static int hex_value (char c)
-{
-  char cup = toupper (c);
-  if (cup >= 'A' && cup <= 'F') {
-    return (cup - 'A') + 10;
-  } else if (c >= '0' && c <= '9') {
-    return c - '0';
-  } else {
-    return 0;
-  }
-}
-
-void 
-LEFDEFImporter::create_generated_via (std::vector<db::Polygon> &bottom,
-                                      std::vector<db::Polygon> &cut,
-                                      std::vector<db::Polygon> &top,
-                                      const db::Vector &cutsize,
-                                      const db::Vector &cutspacing,
-                                      const db::Vector &be, const db::Vector &te,
-                                      const db::Vector &bo, const db::Vector &to,
-                                      const db::Point &o,
-                                      int rows, int columns,
-                                      const std::string &pattern)
-{
-  db::Vector vs ((cutsize.x () * columns + cutspacing.x () * (columns - 1)) / 2, (cutsize.y () * rows + cutspacing.y () * (rows - 1)) / 2);
-  db::Box via_box (o - vs, o + vs);
-
-  bottom.push_back (db::Polygon (via_box.enlarged (be).moved (bo)));
-  top.push_back (db::Polygon (via_box.enlarged (te).moved (to)));
-
-  const char *p = pattern.c_str ();
-  int rp = pattern.empty () ? -1 : 0;
-  const char *p0 = p, *p1 = p;
-
-  for (int r = 0; r < rows; ++r) {
-
-    if (rp == 0) {
-
-      if (*p) {
-
-        //  read a new row specification
-        rp = 0;
-        while (*p && is_hex_digit (*p)) {
-          rp = (rp * 16) + hex_value (*p++);
-        }
-        if (*p == '_') {
-          ++p;
-        }
-
-        p0 = p;
-        if (*p) {
-          while (*p && (is_hex_digit (*p) || toupper (*p) == 'R')) {
-            ++p;
-          }
-        }
-        p1 = p;
-        if (*p == '_') {
-          ++p;
-        }
-
-      }
-
-    }
-
-    if (rp != 0) {
-
-      if (rp > 0) {
-        --rp;
-      }
-
-      const char *pp = p0;
-      unsigned int d = 0;
-      int cp = (p == p0 ? -1 : 0);
-      int bit = 0;
-
-      for (int c = 0; c < columns; ++c) {
-
-        if (cp == 0) {
-
-          d = 0;
-          cp = 4;
-          bit = 0;
-
-          if (*pp && pp < p1 && toupper (*pp) == 'R') {
-
-            ++pp;
-            if (*pp && pp < p1) {
-              cp = 4 * hex_value (*pp++);
-              if (*pp && pp < p1) {
-                d = (unsigned int) hex_value (*pp++);
-              }
-            }
-
-          } else if (*pp && pp < p1) {
-
-            d = (unsigned int) hex_value (*pp++);
-
-          }
-
-          if (cp > 0) {
-            --cp;
-          }
-
-        } else if (cp > 0) {
-
-          --cp;
-
-        } else {
-
-          d = 0xf;
-
-        }
-
-        if ((d & (0x8 >> (bit++ % 4))) != 0) {
-
-          db::Vector vbl ((cutsize + cutspacing).x () * c, (cutsize + cutspacing).y () * r);
-          db::Box vb (via_box.lower_left () + vbl, via_box.lower_left () + vbl + cutsize);
-          cut.push_back (db::Polygon (vb));
-
-        }
-
-      }
-
-    }
-
-  }
-
 }
 
 db::FTrans

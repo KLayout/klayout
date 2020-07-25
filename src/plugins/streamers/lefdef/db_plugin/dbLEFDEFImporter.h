@@ -43,6 +43,8 @@ namespace tl
 namespace db
 {
 
+class LEFDEFReaderState;
+
 /**
  *  @brief Correct a path relative to the stream and technology
  */
@@ -849,6 +851,86 @@ enum LayerPurpose
 };
 
 /**
+ *  @brief An interface for resolving the number of masks from a layer name
+ */
+class DB_PLUGIN_PUBLIC LEFDEFNumberOfMasks
+{
+public:
+  LEFDEFNumberOfMasks () { }
+  virtual ~LEFDEFNumberOfMasks () { }
+
+  virtual unsigned int number_of_masks (const std::string &layer_name) const = 0;
+};
+
+/**
+ *  @brief Provides a via generator base class
+ */
+class DB_PLUGIN_PUBLIC LEFDEFViaGenerator
+{
+public:
+  LEFDEFViaGenerator () { }
+  virtual ~LEFDEFViaGenerator () { }
+
+  virtual void create_cell (LEFDEFReaderState &reader, db::Layout &layout, db::Cell &cell, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm) = 0;
+};
+
+/**
+ *  @brief Provides a via generator implementation for rule-based vias
+ */
+class DB_PLUGIN_PUBLIC RuleBasedViaGenerator
+  : public LEFDEFViaGenerator
+{
+public:
+  RuleBasedViaGenerator ();
+
+  virtual void create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm);
+
+  void set_cutsize (const db::Vector &cutsize) { m_cutsize = cutsize; }
+  void set_cutspacing (const db::Vector &cutspacing) { m_cutspacing = cutspacing; }
+  void set_offset (const db::Point &offset) { m_offset = offset; }
+  void set_be (const db::Vector &be) { m_be = be; }
+  void set_te (const db::Vector &te) { m_te = te; }
+  void set_bo (const db::Vector &bo) { m_bo = bo; }
+  void set_to (const db::Vector &to) { m_to = to; }
+  void set_rows (int rows) { m_rows = rows; }
+  void set_columns (int columns) { m_columns = columns; }
+  void set_pattern (const std::string &pattern) { m_pattern = pattern; }
+  void set_bottom_layer (const std::string &ln) { m_bottom_layer = ln; }
+  void set_cut_layer (const std::string &ln) { m_cut_layer = ln; }
+  void set_top_layer (const std::string &ln) { m_top_layer = ln; }
+  void set_bottom_mask (unsigned int m) { m_bottom_mask = m; }
+  void set_cut_mask (unsigned int m) { m_cut_mask = m; }
+  void set_top_mask (unsigned int m) { m_top_mask = m; }
+
+private:
+  std::string m_bottom_layer, m_cut_layer, m_top_layer;
+  unsigned int m_bottom_mask, m_cut_mask, m_top_mask;
+  db::Vector m_cutsize, m_cutspacing;
+  db::Vector m_be, m_te;
+  db::Vector m_bo, m_to;
+  db::Point m_offset;
+  int m_rows, m_columns;
+  std::string m_pattern;
+};
+
+/**
+ *  @brief Provides a geometry-based via generator implementation
+ */
+class DB_PLUGIN_PUBLIC GeometryBasedViaGenerator
+  : public LEFDEFViaGenerator
+{
+public:
+  GeometryBasedViaGenerator ();
+
+  virtual void create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *num_cut_masks);
+
+  void add_polygon (const std::string &ln, const db::Polygon &poly, unsigned int mask);
+
+private:
+  std::map <std::string, std::list<std::pair<unsigned int, db::Polygon> > > m_geometries;
+};
+
+/**
  *  @brief Layer handler delegate
  *
  *  This class will handle the creation and management of layers in the LEF/DEF reader context
@@ -860,6 +942,11 @@ public:
    *  @brief Constructor
    */
   LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout &layout, const std::string &base_path = std::string ());
+
+  /**
+   *  @brief Destructor
+   */
+  ~LEFDEFReaderState ();
 
   /**
    *  @brief Reads the given map file
@@ -892,14 +979,16 @@ public:
   void finish (db::Layout &layout);
 
   /**
-   *  @brief Registers a via cell for the via with the given name
+   *  @brief Registers a via generator for the via with the given name
+   *
+   *  The generator is capable of creating a via for a specific mask configuration
    */
-  void register_via_cell (const std::string &vn, db::Cell *cell);
+  void register_via_cell (const std::string &vn, LEFDEFViaGenerator *generator);
 
   /**
    *  @brief Gets the via cell for the given via name or 0 if no such via is registered
    */
-  db::Cell *via_cell (const std::string &vn);
+  db::Cell *via_cell (const std::string &vn, Layout &layout, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm);
 
   /**
    *  @brief Get the technology component pointer
@@ -910,6 +999,45 @@ public:
   }
 
 private:
+  /**
+   *  @brief A key for the via cache
+   */
+  struct ViaKey
+  {
+    ViaKey (const std::string &n, unsigned int mb, unsigned int mc, unsigned int mt)
+      : name (n), mask_bottom (mb), mask_cut (mc), mask_top (mt)
+    { }
+
+    bool operator== (const ViaKey &other) const
+    {
+      return name == other.name && mask_bottom == other.mask_bottom && mask_cut == other.mask_cut && mask_top == other.mask_top;
+    }
+
+    bool operator< (const ViaKey &other) const
+    {
+      if (name != other.name) {
+        return name < other.name;
+      }
+      if (mask_bottom != other.mask_bottom) {
+        return mask_bottom < other.mask_bottom;
+      }
+      if (mask_cut != other.mask_cut) {
+        return mask_cut < other.mask_cut;
+      }
+      if (mask_top != other.mask_top) {
+        return mask_top < other.mask_top;
+      }
+      return false;
+    }
+
+    std::string name;
+    unsigned int mask_bottom, mask_cut, mask_top;
+  };
+
+  //  no copying
+  LEFDEFReaderState (const LEFDEFReaderState &);
+  LEFDEFReaderState &operator= (const LEFDEFReaderState &);
+
   std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, std::pair<bool, unsigned int> > m_layers;
   std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, unsigned int> m_unassigned_layers;
   db::LayerMap m_layer_map;
@@ -917,8 +1045,9 @@ private:
   bool m_has_explicit_layer_mapping;
   int m_laynum;
   std::map<std::string, int> m_default_number;
-  std::map<std::string, db::Cell *> m_via_cells;
+  std::map<ViaKey, db::Cell *> m_via_cells;
   const LEFDEFReaderOptions *mp_tech_comp;
+  std::map<std::string, LEFDEFViaGenerator *> m_via_generators;
 
   std::pair <bool, unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
   void map_layer_explicit (const std::string &n, LayerPurpose purpose, const LayerProperties &lp, unsigned int layer, unsigned int mask);
@@ -929,12 +1058,7 @@ private:
  */
 struct DB_PLUGIN_PUBLIC ViaDesc
 {
-  ViaDesc () : cell (0) { }
-
-  /**
-   *  @brief The cell representing the via
-   */
-  db::Cell *cell;
+  ViaDesc () { }
 
   /**
    *  @brief The names of bottom and top metal respectively
@@ -1151,17 +1275,6 @@ protected:
   {
     return mp_reader_state;
   }
-
-  void create_generated_via (std::vector<db::Polygon> &bottom,
-                             std::vector<db::Polygon> &cut,
-                             std::vector<db::Polygon> &top,
-                             const db::Vector &cutsize,
-                             const db::Vector &cutspacing,
-                             const db::Vector &be, const db::Vector &te,
-                             const db::Vector &bo, const db::Vector &to,
-                             const db::Point &o,
-                             int rows, int columns,
-                             const std::string &pattern);
 
 private:
   tl::AbsoluteProgress *mp_progress;

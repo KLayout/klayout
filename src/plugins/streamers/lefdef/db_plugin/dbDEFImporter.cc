@@ -517,12 +517,18 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
 
     double x = 0.0, y = 0.0;
     unsigned int mask = 0;
+    bool read_mask = true;
 
     while (true) {
 
-      if (test ("MASK")) {
-        mask = get_mask (get_long ());
+      if (read_mask) {
+        mask = 0;
+        if (test ("MASK")) {
+          mask = get_mask (get_long ());
+        }
       }
+
+      read_mask = true;
 
       if (test ("RECT")) {
 
@@ -567,12 +573,18 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
         while (peek ("(") || peek ("MASK")) {
 
           if (test ("MASK")) {
-            mask = get_mask (get_long ());
+            unsigned int m = get_mask (get_long ());
+            if (m != mask) {
+              //  stop here with the segments and use the mask value for the next iteration
+              mask = m;
+              read_mask = false;
+              break;
+            }
           }
 
           if (! test ("(")) {
-            //  We could have a via here: in that case we have swallowed MASK already, but
-            //  since we don't do anything with that, this does not hurt for now.
+            //  We have a via here. MASK is already read, but the value did not change.
+            read_mask = false;
             break;
           }
 
@@ -632,16 +644,27 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
 
         std::map<std::string, ViaDesc>::const_iterator vd = m_via_desc.find (vn);
         if (vd != m_via_desc.end () && ! pts.empty ()) {
-          if (nx <= 1 && ny <= 1) {
-            design.insert (db::CellInstArray (db::CellInst (vd->second.cell->cell_index ()), db::Trans (ft.rot (), db::Vector (pts.back ()))));
-          } else {
-            design.insert (db::CellInstArray (db::CellInst (vd->second.cell->cell_index ()), db::Trans (ft.rot (), db::Vector (pts.back ())), db::Vector (dx, 0), db::Vector (0, dy), (unsigned long) nx, (unsigned long) ny));
+
+          //  For the via, the masks are encoded in a three-digit number (<mask-top> <mask-cut> <mask_bottom>)
+          unsigned int mask_top = (mask / 100) % 10;
+          unsigned int mask_cut = (mask / 10) % 10;
+          unsigned int mask_bottom = mask % 10;
+
+          db::Cell *cell = reader_state ()->via_cell (vn, layout, mask_bottom, mask_cut, mask_top, &m_lef_importer);
+          if (cell) {
+            if (nx <= 1 && ny <= 1) {
+              design.insert (db::CellInstArray (db::CellInst (cell->cell_index ()), db::Trans (ft.rot (), db::Vector (pts.back ()))));
+            } else {
+              design.insert (db::CellInstArray (db::CellInst (cell->cell_index ()), db::Trans (ft.rot (), db::Vector (pts.back ())), db::Vector (dx, 0), db::Vector (0, dy), (unsigned long) nx, (unsigned long) ny));
+            }
           }
+
           if (ln == vd->second.m1) {
             ln = vd->second.m2;
           } else if (ln == vd->second.m2) {
             ln = vd->second.m1;
           }
+
         }
 
         if (! specialnets) {
@@ -799,7 +822,11 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
 
           std::map<std::string, ViaDesc>::const_iterator vd = m_via_desc.find (vn);
           if (vd != m_via_desc.end ()) {
-            design.insert (db::CellInstArray (db::CellInst (vd->second.cell->cell_index ()), db::Trans (ft.rot (), pt)));
+            //  TODO: no mask specification here?
+            db::Cell *cell = reader_state ()->via_cell (vn, layout, 0, 0, 0, &m_lef_importer);
+            if (cell) {
+              design.insert (db::CellInstArray (db::CellInst (cell->cell_index ()), db::Trans (ft.rot (), pt)));
+            }
           } else {
             error (tl::to_string (tr ("Invalid via name: ")) + vn);
           }
@@ -844,7 +871,7 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
 }
 
 void
-DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
+DEFImporter::read_vias (db::Layout & /*layout*/, db::Cell & /*design*/, double scale)
 {
   while (test ("-")) {
 
@@ -852,100 +879,144 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
     ViaDesc &vd = m_via_desc.insert (std::make_pair (n, ViaDesc ())).first->second;
 
     //  produce a cell for vias
-    std::string cellname = options ().via_cellname_prefix () + n;
-    db::Cell &cell = layout.cell (layout.add_cell (cellname.c_str ()));
-    reader_state ()->register_via_cell (n, &cell);
-    vd.cell = &cell;
+    std::auto_ptr<RuleBasedViaGenerator> rule_based_vg;
+    std::auto_ptr<GeometryBasedViaGenerator> geo_based_vg;
 
-    bool has_via_rule = false;
-
-    db::Vector cutsize, cutspacing;
-    db::Vector be, te;
-    db::Vector bo, to;
-    db::Point offset;
-    int rows = 1, columns = 1;
-    std::string pattern;
     unsigned int mask = 0;
 
-    std::map<std::string, std::vector<db::Polygon> > geometry;
-    std::vector<db::Polygon> *top = 0, *cut = 0, *bottom = 0;
+    std::auto_ptr<LEFDEFViaGenerator> via_generator;
+    std::set<std::string> seen_layers;
+    std::vector<std::string> routing_layers;
 
     while (test ("+")) {
 
       if (test ("VIARULE")) {
 
-        has_via_rule = true;
+        if (! rule_based_vg.get ()) {
+          rule_based_vg.reset (new RuleBasedViaGenerator ());
+        }
+
         take ();
 
       } else if (test ("CUTSIZE")) {
 
-        cutsize = get_vector (scale);
+        if (! rule_based_vg.get ()) {
+          rule_based_vg.reset (new RuleBasedViaGenerator ());
+        }
+
+        rule_based_vg->set_cutsize (get_vector (scale));
 
       } else if (test ("CUTSPACING")) {
 
-        cutspacing = get_vector (scale);
+        if (! rule_based_vg.get ()) {
+          rule_based_vg.reset (new RuleBasedViaGenerator ());
+        }
+
+        rule_based_vg->set_cutspacing (get_vector (scale));
 
       } else if (test ("ORIGIN")) {
 
-        offset = get_point (scale);
+        if (! rule_based_vg.get ()) {
+          rule_based_vg.reset (new RuleBasedViaGenerator ());
+        }
+
+        rule_based_vg->set_offset (get_point (scale));
 
       } else if (test ("ENCLOSURE")) {
 
-        be = get_vector (scale);
-        te = get_vector (scale);
+        if (! rule_based_vg.get ()) {
+          rule_based_vg.reset (new RuleBasedViaGenerator ());
+        }
+
+        rule_based_vg->set_be (get_vector (scale));
+        rule_based_vg->set_te (get_vector (scale));
 
       } else if (test ("OFFSET")) {
 
-        bo = get_vector (scale);
-        to = get_vector (scale);
+        if (! rule_based_vg.get ()) {
+          rule_based_vg.reset (new RuleBasedViaGenerator ());
+        }
+
+        rule_based_vg->set_bo (get_vector (scale));
+        rule_based_vg->set_to (get_vector (scale));
 
       } else if (test ("ROWCOL")) {
 
-        rows = get_long ();
-        columns = get_long ();
+        if (! rule_based_vg.get ()) {
+          rule_based_vg.reset (new RuleBasedViaGenerator ());
+        }
+
+        rule_based_vg->set_rows (get_long ());
+        rule_based_vg->set_columns (get_long ());
 
       } else if (test ("PATTERN")) {
 
-        pattern = get ();
+        if (! rule_based_vg.get ()) {
+          rule_based_vg.reset (new RuleBasedViaGenerator ());
+        }
+
+        rule_based_vg->set_pattern (get ());
 
       } else if (test ("LAYERS")) {
+
+        if (! rule_based_vg.get ()) {
+          rule_based_vg.reset (new RuleBasedViaGenerator ());
+        }
 
         std::string bn = get ();
         std::string cn = get ();
         std::string tn = get ();
 
-        bottom = &geometry.insert (std::make_pair (bn, std::vector<db::Polygon> ())).first->second;
-        cut = &geometry.insert (std::make_pair (cn, std::vector<db::Polygon> ())).first->second;
-        top = &geometry.insert (std::make_pair (tn, std::vector<db::Polygon> ())).first->second;
+        rule_based_vg->set_bottom_layer (bn);
+        rule_based_vg->set_cut_layer (cn);
+        rule_based_vg->set_top_layer (tn);
 
         vd.m1 = bn;
         vd.m2 = tn;
 
       } else if (test ("POLYGON")) {
 
+        if (! geo_based_vg.get ()) {
+          geo_based_vg.reset (new GeometryBasedViaGenerator ());
+        }
+
         std::string ln = get ();
+
+        if (m_lef_importer.is_routing_layer (ln) && seen_layers.find (ln) != seen_layers.end ()) {
+          seen_layers.insert (ln);
+          routing_layers.push_back (ln);
+        }
 
         if (test ("+")) {
           expect ("MASK");
           mask = get_mask (get_long ());
         }
 
-        std::vector<db::Polygon> &polygons = geometry.insert (std::make_pair (ln, std::vector<db::Polygon> ())).first->second;
-        polygons.push_back (db::Polygon ());
-        read_polygon (polygons.back (), scale);
+        db::Polygon poly;
+        read_polygon (poly, scale);
+        geo_based_vg->add_polygon (ln, poly, mask);
 
       } else if (test ("RECT")) {
 
+        if (! geo_based_vg.get ()) {
+          geo_based_vg.reset (new GeometryBasedViaGenerator ());
+        }
+
         std::string ln = get ();
+
+        if (m_lef_importer.is_routing_layer (ln) && seen_layers.find (ln) != seen_layers.end ()) {
+          seen_layers.insert (ln);
+          routing_layers.push_back (ln);
+        }
 
         if (test ("+")) {
           expect ("MASK");
           mask = get_mask (get_long ());
         }
 
-        std::vector<db::Polygon> &polygons = geometry.insert (std::make_pair (ln, std::vector<db::Polygon> ())).first->second;
-        polygons.push_back (db::Polygon ());
-        read_rect (polygons.back (), scale);
+        db::Polygon poly;
+        read_polygon (poly, scale);
+        geo_based_vg->add_polygon (ln, poly, mask);
 
       }
 
@@ -954,13 +1025,6 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
     if (vd.m1.empty () && vd.m2.empty ()) {
 
       //  analyze the layers to find the metals
-      std::vector<std::string> routing_layers;
-      for (std::map<std::string, std::vector<db::Polygon> >::const_iterator b = geometry.begin (); b != geometry.end (); ++b) {
-        if (m_lef_importer.is_routing_layer (b->first)) {
-          routing_layers.push_back (b->first);
-        }
-      }
-
       if (routing_layers.size () == 2) {
         vd.m1 = routing_layers[0];
         vd.m2 = routing_layers[1];
@@ -970,21 +1034,17 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
 
     }
 
+    if (rule_based_vg.get () && geo_based_vg.get ()) {
+      error (tl::to_string (tr ("A via can only be defined through a VIARULE or geometry, not both ways")));
+    } else if (rule_based_vg.get ()) {
+      reader_state ()->register_via_cell (n, rule_based_vg.release ());
+    } else if (geo_based_vg.get ()) {
+      reader_state ()->register_via_cell (n, geo_based_vg.release ());
+    } else {
+      error (tl::to_string (tr ("Too little information to generate a via")));
+    }
+
     test (";");
-
-    if (has_via_rule && top && cut && bottom) {
-        create_generated_via (*bottom, *cut, *top,
-                              cutsize, cutspacing, be, te, bo, to, offset, rows, columns, pattern);
-    }
-
-    for (std::map<std::string, std::vector<db::Polygon> >::const_iterator g = geometry.begin (); g != geometry.end (); ++g) {
-      std::pair <bool, unsigned int> dl = open_layer (layout, g->first, ViaGeometry, mask);
-      if (dl.first) {
-        for (std::vector<db::Polygon>::const_iterator p = g->second.begin (); p != g->second.end (); ++p) {
-          cell.shapes (dl.second).insert (*p);
-        }
-      }
-    }
 
   }
 }

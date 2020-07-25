@@ -44,7 +44,7 @@ namespace db
  *  @brief The LEF importer object
  */
 class DB_PLUGIN_PUBLIC LEFImporter
-  : public LEFDEFImporter
+  : public LEFDEFImporter, public LEFDEFNumberOfMasks
 {
 public:
   /**
@@ -108,6 +108,15 @@ public:
   }
 
   /**
+   *  @brief Returns the number of masks for the given layer
+   */
+  virtual unsigned int number_of_masks (const std::string &layer) const
+  {
+    std::map<std::string, unsigned int>::const_iterator nm = m_num_masks.find (layer);
+    return nm != m_num_masks.end () ? nm->second : 1;
+  }
+
+  /**
    *  @brief Gets a map of the vias defined in this LEF file
    *
    *  The map maps the via name to the via description.
@@ -129,13 +138,14 @@ private:
   std::map<std::string, db::Box> m_macro_bboxes_by_name;
   std::map<std::string, ViaDesc> m_vias;
   std::set<std::string> m_routing_layers, m_cut_layers;
+  std::map<std::string, unsigned int> m_num_masks;
 
   std::vector <db::Trans> get_iteration (db::Layout &layout);
   void read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose purpose, std::map<std::string, db::Box> *collect_bboxes = 0, properties_id_type prop_id = 0);
   void read_nondefaultrule (Layout &layout);
   void read_viadef (Layout &layout);
-  void read_viadef_by_rule (Layout &layout, db::Cell &cell, ViaDesc &desc, const std::string &n);
-  void read_viadef_by_geometry (Layout &layout, db::Cell &cell, ViaDesc &desc, const std::string &n);
+  void read_viadef_by_rule (RuleBasedViaGenerator *vg, ViaDesc &desc, const std::string &n, double dbu);
+  void read_viadef_by_geometry (GeometryBasedViaGenerator *vg, ViaDesc &desc, const std::string &n, double dbu);
   void read_layer (Layout &layout);
   void read_macro (Layout &layout);
 };

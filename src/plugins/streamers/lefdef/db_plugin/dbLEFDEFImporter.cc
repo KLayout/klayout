@@ -651,10 +651,9 @@ LEFDEFReaderOptions::special_routing_datatype_str () const
 //  LEFDEFLayerDelegate implementation
 
 LEFDEFReaderState::LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout &layout, const std::string &base_path)
-  : m_create_layers (true), m_laynum (1), mp_tech_comp (tc)
+  : m_create_layers (true), m_has_explicit_layer_mapping (false), m_laynum (1), mp_tech_comp (tc)
 {
-  m_has_explicit_layer_mapping = ! tc->map_file ().empty ();
-  if (m_has_explicit_layer_mapping) {
+  if (! tc->map_file ().empty ()) {
 
     read_map_file (correct_path (tc->map_file (), layout, base_path), layout);
 
@@ -697,7 +696,7 @@ LEFDEFReaderState::map_layer_explicit (const std::string &n, LayerPurpose purpos
 void
 LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 {
-  tl_assert (m_has_explicit_layer_mapping);
+  m_has_explicit_layer_mapping = true;
 
   tl::log << tl::to_string (tr ("Reading LEF/DEF map file")) << " " << path;
 

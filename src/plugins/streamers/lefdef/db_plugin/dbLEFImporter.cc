@@ -607,7 +607,7 @@ LEFImporter::read_viadef_by_geometry (GeometryBasedViaGenerator *vg, ViaDesc &vi
       }
 
       db::Box b (points [0], points [1]);
-      vg->add_polygon (layer_name, db::Polygon (b), mask);
+      vg->add_box (layer_name, b, mask);
 
       expect (";");
 

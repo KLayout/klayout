@@ -245,9 +245,24 @@ GeometryBasedViaGenerator::GeometryBasedViaGenerator ()
 void
 GeometryBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, unsigned int /*mask_bottom*/, unsigned int /*mask_cut*/, unsigned int /*mask_top*/, const LEFDEFNumberOfMasks * /*nm*/)
 {
-  for (std::map <std::string, std::list<std::pair<unsigned int, db::Polygon> > >::const_iterator g = m_geometries.begin (); g != m_geometries.end (); ++g) {
+  for (std::map <std::string, std::list<std::pair<unsigned int, db::Polygon> > >::const_iterator g = m_polygons.begin (); g != m_polygons.end (); ++g) {
 
     for (std::list<std::pair<unsigned int, db::Polygon> >::const_iterator i = g->second.begin (); i != g->second.end (); ++i) {
+
+      std::pair <bool, unsigned int> dl (false, 0);
+
+      dl = reader.open_layer (layout, g->first, ViaGeometry, i->first);
+      if (dl.first) {
+        cell.shapes (dl.second).insert (i->second);
+      }
+
+    }
+
+  }
+
+  for (std::map <std::string, std::list<std::pair<unsigned int, db::Box> > >::const_iterator g = m_boxes.begin (); g != m_boxes.end (); ++g) {
+
+    for (std::list<std::pair<unsigned int, db::Box> >::const_iterator i = g->second.begin (); i != g->second.end (); ++i) {
 
       std::pair <bool, unsigned int> dl (false, 0);
 
@@ -264,7 +279,13 @@ GeometryBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layou
 void
 GeometryBasedViaGenerator::add_polygon (const std::string &ln, const db::Polygon &poly, unsigned int mask)
 {
-  m_geometries [ln].push_back (std::make_pair (mask, poly));
+  m_polygons [ln].push_back (std::make_pair (mask, poly));
+}
+
+void
+GeometryBasedViaGenerator::add_box (const std::string &ln, const db::Box &box, unsigned int mask)
+{
+  m_boxes [ln].push_back (std::make_pair (mask, box));
 }
 
 // -----------------------------------------------------------------------------------

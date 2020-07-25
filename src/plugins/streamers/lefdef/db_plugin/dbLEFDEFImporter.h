@@ -925,9 +925,11 @@ public:
   virtual void create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *num_cut_masks);
 
   void add_polygon (const std::string &ln, const db::Polygon &poly, unsigned int mask);
+  void add_box (const std::string &ln, const db::Box &box, unsigned int mask);
 
 private:
-  std::map <std::string, std::list<std::pair<unsigned int, db::Polygon> > > m_geometries;
+  std::map <std::string, std::list<std::pair<unsigned int, db::Polygon> > > m_polygons;
+  std::map <std::string, std::list<std::pair<unsigned int, db::Box> > > m_boxes;
 };
 
 /**

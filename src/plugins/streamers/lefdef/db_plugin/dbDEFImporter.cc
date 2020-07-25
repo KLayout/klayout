@@ -982,7 +982,7 @@ DEFImporter::read_vias (db::Layout & /*layout*/, db::Cell & /*design*/, double s
 
         std::string ln = get ();
 
-        if (m_lef_importer.is_routing_layer (ln) && seen_layers.find (ln) != seen_layers.end ()) {
+        if (m_lef_importer.is_routing_layer (ln) && seen_layers.find (ln) == seen_layers.end ()) {
           seen_layers.insert (ln);
           routing_layers.push_back (ln);
         }
@@ -1004,7 +1004,7 @@ DEFImporter::read_vias (db::Layout & /*layout*/, db::Cell & /*design*/, double s
 
         std::string ln = get ();
 
-        if (m_lef_importer.is_routing_layer (ln) && seen_layers.find (ln) != seen_layers.end ()) {
+        if (m_lef_importer.is_routing_layer (ln) && seen_layers.find (ln) == seen_layers.end ()) {
           seen_layers.insert (ln);
           routing_layers.push_back (ln);
         }
@@ -1015,7 +1015,7 @@ DEFImporter::read_vias (db::Layout & /*layout*/, db::Cell & /*design*/, double s
         }
 
         db::Polygon poly;
-        read_polygon (poly, scale);
+        read_rect (poly, scale);
         geo_based_vg->add_polygon (ln, poly, mask);
 
       }

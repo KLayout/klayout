@@ -242,37 +242,41 @@ GeometryBasedViaGenerator::GeometryBasedViaGenerator ()
   : LEFDEFViaGenerator ()
 { }
 
+unsigned int
+GeometryBasedViaGenerator::mask_for (const std::string &ln, unsigned int m, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top) const
+{
+  if (m == 0) {
+    if (ln == m_bottom_layer) {
+      return (mask_bottom);
+    } else if (ln == m_cut_layer) {
+      return (mask_cut);
+    } else if (ln == m_top_layer) {
+      return (mask_top);
+    }
+  }
+
+  return m;
+}
+
 void
-GeometryBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, unsigned int /*mask_bottom*/, unsigned int /*mask_cut*/, unsigned int /*mask_top*/, const LEFDEFNumberOfMasks * /*nm*/)
+GeometryBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks * /*nm*/)
 {
   for (std::map <std::string, std::list<std::pair<unsigned int, db::Polygon> > >::const_iterator g = m_polygons.begin (); g != m_polygons.end (); ++g) {
-
     for (std::list<std::pair<unsigned int, db::Polygon> >::const_iterator i = g->second.begin (); i != g->second.end (); ++i) {
-
-      std::pair <bool, unsigned int> dl (false, 0);
-
-      dl = reader.open_layer (layout, g->first, ViaGeometry, i->first);
+      std::pair <bool, unsigned int> dl = reader.open_layer (layout, g->first, ViaGeometry, mask_for (g->first, i->first, mask_bottom, mask_cut, mask_top));
       if (dl.first) {
         cell.shapes (dl.second).insert (i->second);
       }
-
     }
-
   }
 
   for (std::map <std::string, std::list<std::pair<unsigned int, db::Box> > >::const_iterator g = m_boxes.begin (); g != m_boxes.end (); ++g) {
-
     for (std::list<std::pair<unsigned int, db::Box> >::const_iterator i = g->second.begin (); i != g->second.end (); ++i) {
-
-      std::pair <bool, unsigned int> dl (false, 0);
-
-      dl = reader.open_layer (layout, g->first, ViaGeometry, i->first);
+      std::pair <bool, unsigned int> dl = reader.open_layer (layout, g->first, ViaGeometry, mask_for (g->first, i->first, mask_bottom, mask_cut, mask_top));
       if (dl.first) {
         cell.shapes (dl.second).insert (i->second);
       }
-
     }
-
   }
 }
 
@@ -433,7 +437,7 @@ static void set_datatypes (db::LEFDEFReaderOptions *data, void (db::LEFDEFReader
     if (ex.try_read (mask) && ex.test (":")) {
       int dt = 0;
       ex.read (dt);
-      (data->*set_datatype_per_mask) (std::max ((unsigned int) 1, mask) - 1, dt);
+      (data->*set_datatype_per_mask) (std::max ((unsigned int) 1, mask), dt);
     } else {
       ex = ex_saved;
       int dt = 0;
@@ -464,7 +468,7 @@ static void set_suffixes (db::LEFDEFReaderOptions *data, void (db::LEFDEFReaderO
     if (ex.try_read (mask) && ex.test (":")) {
       std::string sfx;
       ex.read_word_or_quoted (sfx);
-      (data->*set_suffix_per_mask) (std::max ((unsigned int) 1, mask) - 1, sfx);
+      (data->*set_suffix_per_mask) (std::max ((unsigned int) 1, mask), sfx);
     } else {
       ex = ex_saved;
       std::string sfx;
@@ -495,7 +499,7 @@ static std::string get_datatypes (const db::LEFDEFReaderOptions *data, int (db::
       if (! res.empty ()) {
         res += ",";
       }
-      res += tl::to_string (i + 1);
+      res += tl::to_string (i);
       res += ":";
       res += tl::to_string (dt);
     }
@@ -518,7 +522,7 @@ static std::string get_suffixes (const db::LEFDEFReaderOptions *data, const std:
       if (! res.empty ()) {
         res += ",";
       }
-      res += tl::to_string (i + 1);
+      res += tl::to_string (i);
       res += ":";
       res += tl::to_word_or_quoted_string (sfx);
     }
@@ -936,46 +940,52 @@ LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n
 
     //  Note: "name" is the decorated name as provided by the tech component's
     //  x_suffix specifications.
-    std::string name (n);
+    std::string name_suffix;
     int dt = 0;
 
     if (mp_tech_comp) {
       switch (purpose) {
       case Routing:
       default:
-        name += mp_tech_comp->routing_suffix_per_mask (mask);
-        dt += mp_tech_comp->routing_datatype_per_mask (mask);
+        name_suffix = mp_tech_comp->routing_suffix_per_mask (mask);
+        dt = mp_tech_comp->routing_datatype_per_mask (mask);
         break;
       case SpecialRouting:
-        name += mp_tech_comp->special_routing_suffix_per_mask (mask);
-        dt += mp_tech_comp->special_routing_datatype_per_mask (mask);
+        name_suffix = mp_tech_comp->special_routing_suffix_per_mask (mask);
+        dt = mp_tech_comp->special_routing_datatype_per_mask (mask);
         break;
       case ViaGeometry:
-        name += mp_tech_comp->via_geometry_suffix_per_mask (mask);
-        dt += mp_tech_comp->via_geometry_datatype_per_mask (mask);
+        name_suffix = mp_tech_comp->via_geometry_suffix_per_mask (mask);
+        dt = mp_tech_comp->via_geometry_datatype_per_mask (mask);
         break;
       case Label:
-        name += mp_tech_comp->labels_suffix ();
-        dt += mp_tech_comp->labels_datatype ();
+        name_suffix = mp_tech_comp->labels_suffix ();
+        dt = mp_tech_comp->labels_datatype ();
         break;
       case Pins:
-        name += mp_tech_comp->pins_suffix_per_mask (mask);
-        dt += mp_tech_comp->pins_datatype_per_mask (mask);
+        name_suffix = mp_tech_comp->pins_suffix_per_mask (mask);
+        dt = mp_tech_comp->pins_datatype_per_mask (mask);
         break;
       case LEFPins:
-        name += mp_tech_comp->lef_pins_suffix_per_mask (mask);
-        dt += mp_tech_comp->lef_pins_datatype_per_mask (mask);
+        name_suffix = mp_tech_comp->lef_pins_suffix_per_mask (mask);
+        dt = mp_tech_comp->lef_pins_datatype_per_mask (mask);
         break;
       case Obstructions:
-        name += mp_tech_comp->obstructions_suffix ();
-        dt += mp_tech_comp->obstructions_datatype ();
+        name_suffix = mp_tech_comp->obstructions_suffix ();
+        dt = mp_tech_comp->obstructions_datatype ();
         break;
       case Blockage:
-        name += mp_tech_comp->blockages_suffix ();
-        dt += mp_tech_comp->blockages_datatype ();
+        name_suffix = mp_tech_comp->blockages_suffix ();
+        dt = mp_tech_comp->blockages_datatype ();
         break;
       }
     }
+
+    if (dt > 0 && name_suffix.empty ()) {
+      name_suffix = "#" + tl::to_string (dt);
+    }
+
+    std::string name = n + name_suffix;
 
     std::pair<bool, unsigned int> ll = m_layer_map.logical (name, layout);
 
@@ -1120,7 +1130,7 @@ LEFDEFReaderState::via_cell (const std::string &vn, db::Layout &layout, unsigned
       std::string cn = mp_tech_comp->via_cellname_prefix () + vn + mask_suffix;
       cell = &layout.cell (layout.add_cell (cn.c_str ()));
 
-      vg->create_cell (*this, layout, *cell, mask_bottom, mask_cut, mask_bottom, nm);
+      vg->create_cell (*this, layout, *cell, mask_bottom, mask_cut, mask_top, nm);
 
     }
 

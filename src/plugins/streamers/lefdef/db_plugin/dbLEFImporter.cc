@@ -556,9 +556,21 @@ LEFImporter::read_viadef_by_geometry (GeometryBasedViaGenerator *vg, ViaDesc &vi
 
       layer_name = get ();
 
-      if (m_routing_layers.find (layer_name) != m_routing_layers.end () && seen_layers.find (layer_name) == seen_layers.end ()) {
-        seen_layers.insert (layer_name);
-        routing_layers.push_back (layer_name);
+      if (m_routing_layers.find (layer_name) != m_routing_layers.end ()) {
+
+        if (routing_layers.size () == 0) {
+          vg->set_bottom_layer (layer_name);
+        } else if (routing_layers.size () == 1) {
+          vg->set_top_layer (layer_name);
+        }
+
+        if (seen_layers.find (layer_name) == seen_layers.end ()) {
+          seen_layers.insert (layer_name);
+          routing_layers.push_back (layer_name);
+        }
+
+      } else {
+        vg->set_cut_layer (layer_name);
       }
 
       while (! at_end () && ! test (";")) {

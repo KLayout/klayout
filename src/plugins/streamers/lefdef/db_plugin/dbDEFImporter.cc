@@ -142,7 +142,7 @@ DEFImporter::read_diearea (db::Layout &layout, db::Cell &design, double scale)
 {
   std::vector<db::Point> points;
 
-  while (! test (";")) {
+  while (! at_end () && ! test (";")) {
     test ("(");
     points.push_back (get_point (scale));
     test (")");
@@ -276,7 +276,7 @@ DEFImporter::read_blockages (db::Layout &layout, db::Cell &design, double scale)
 
     std::string layer;
 
-    while (! test (";")) {
+    while (! at_end () && ! test (";")) {
 
       if (test ("PLACEMENT")) {
 
@@ -570,23 +570,25 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
 
       } else if (peek ("(")) {
 
+        unsigned int new_mask = mask;
+
         while (peek ("(") || peek ("MASK")) {
 
+          new_mask = 0;
           if (test ("MASK")) {
-            unsigned int m = get_mask (get_long ());
-            if (m != mask) {
-              //  stop here with the segments and use the mask value for the next iteration
-              mask = m;
-              read_mask = false;
+
+            new_mask = get_mask (get_long ());
+            read_mask = false;
+
+            if (! peek ("(")) {
+              break;
+            } else if (new_mask != mask) {
               break;
             }
+
           }
 
-          if (! test ("(")) {
-            //  We have a via here. MASK is already read, but the value did not change.
-            read_mask = false;
-            break;
-          }
+          test ("(");
 
           if (! test ("*")) {
             x = get_double ();
@@ -612,6 +614,13 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
             produce_routing_geometry (design, style, dl.second, prop_id, pts, ext, w);
           }
         }
+
+        //  continue a segment with the current point and the new mask
+        if (pts.size () > 1) {
+          pts.erase (pts.begin (), pts.end () - 1);
+        }
+
+        mask = new_mask;
 
       } else if (! peek ("NEW") && ! peek ("+") && ! peek ("-") && ! peek (";")) {
 
@@ -661,9 +670,15 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
 
           if (ln == vd->second.m1) {
             ln = vd->second.m2;
+            mask = mask_top;
           } else if (ln == vd->second.m2) {
             ln = vd->second.m1;
+            mask = mask_bottom;
+          } else {
+            mask = 0;
           }
+
+          read_mask = false;
 
         }
 
@@ -890,6 +905,8 @@ DEFImporter::read_vias (db::Layout & /*layout*/, db::Cell & /*design*/, double s
 
     while (test ("+")) {
 
+      bool is_polygon = false;
+
       if (test ("VIARULE")) {
 
         if (! rule_based_vg.get ()) {
@@ -974,7 +991,7 @@ DEFImporter::read_vias (db::Layout & /*layout*/, db::Cell & /*design*/, double s
         vd.m1 = bn;
         vd.m2 = tn;
 
-      } else if (test ("POLYGON")) {
+      } else if ((is_polygon = test ("POLYGON")) || test ("RECT")) {
 
         if (! geo_based_vg.get ()) {
           geo_based_vg.reset (new GeometryBasedViaGenerator ());
@@ -982,9 +999,23 @@ DEFImporter::read_vias (db::Layout & /*layout*/, db::Cell & /*design*/, double s
 
         std::string ln = get ();
 
-        if (m_lef_importer.is_routing_layer (ln) && seen_layers.find (ln) == seen_layers.end ()) {
-          seen_layers.insert (ln);
-          routing_layers.push_back (ln);
+        if (m_lef_importer.is_routing_layer (ln)) {
+
+          if (routing_layers.size () == 0) {
+            geo_based_vg->set_bottom_layer (ln);
+          } else if (routing_layers.size () == 1) {
+            geo_based_vg->set_top_layer (ln);
+          }
+
+          if (seen_layers.find (ln) == seen_layers.end ()) {
+            seen_layers.insert (ln);
+            routing_layers.push_back (ln);
+          }
+
+        } else if (m_lef_importer.is_cut_layer (ln)) {
+
+          geo_based_vg->set_cut_layer (ln);
+
         }
 
         if (test ("+")) {
@@ -992,31 +1023,19 @@ DEFImporter::read_vias (db::Layout & /*layout*/, db::Cell & /*design*/, double s
           mask = get_mask (get_long ());
         }
 
-        db::Polygon poly;
-        read_polygon (poly, scale);
-        geo_based_vg->add_polygon (ln, poly, mask);
+        if (is_polygon) {
 
-      } else if (test ("RECT")) {
+          db::Polygon poly;
+          read_polygon (poly, scale);
+          geo_based_vg->add_polygon (ln, poly, mask);
 
-        if (! geo_based_vg.get ()) {
-          geo_based_vg.reset (new GeometryBasedViaGenerator ());
+        } else {
+
+          db::Polygon poly;
+          read_rect (poly, scale);
+          geo_based_vg->add_polygon (ln, poly, mask);
+
         }
-
-        std::string ln = get ();
-
-        if (m_lef_importer.is_routing_layer (ln) && seen_layers.find (ln) == seen_layers.end ()) {
-          seen_layers.insert (ln);
-          routing_layers.push_back (ln);
-        }
-
-        if (test ("+")) {
-          expect ("MASK");
-          mask = get_mask (get_long ());
-        }
-
-        db::Polygon poly;
-        read_rect (poly, scale);
-        geo_based_vg->add_polygon (ln, poly, mask);
 
       }
 
@@ -1058,9 +1077,8 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
 
     std::string net;
     std::string dir;
-    std::map <std::string, std::vector <db::Polygon> > geometry;
+    std::map <std::pair<std::string, unsigned int>, std::vector <db::Polygon> > geometry;
     db::Trans trans;
-    unsigned int mask = 0;
 
     while (test ("+")) {
 
@@ -1074,6 +1092,11 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
 
         std::string ln = get ();
 
+        unsigned int mask = 0;
+        if (test ("MASK")) {
+          mask = get_mask (get_long ());
+        }
+
         while (test ("DESIGNRULEWIDTH") || test ("SPACING")) {
           take ();
         }
@@ -1086,11 +1109,16 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
         db::Point pt2 = get_point (scale);
         test (")");
 
-        geometry.insert (std::make_pair (ln, std::vector<db::Polygon> ())).first->second.push_back (db::Polygon (db::Box (pt1, pt2)));
+        geometry.insert (std::make_pair (std::make_pair (ln, mask), std::vector<db::Polygon> ())).first->second.push_back (db::Polygon (db::Box (pt1, pt2)));
 
       } else if (test ("POLYGON")) {
 
         std::string ln = get ();
+
+        unsigned int mask = 0;
+        if (test ("MASK")) {
+          mask = get_mask (get_long ());
+        }
 
         while (test ("DESIGNRULEWIDTH") || test ("SPACING")) {
           take ();
@@ -1100,7 +1128,7 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
 
         double x = 0.0, y = 0.0;
 
-        while (! test ("+") && ! test (";")) {
+        while (! at_end () && ! test ("+") && ! test (";")) {
 
           test ("(");
           if (! test ("*")) {
@@ -1114,7 +1142,7 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
 
         }
 
-        std::vector<db::Polygon> &polygons = geometry.insert (std::make_pair (ln, std::vector<db::Polygon> ())).first->second;
+        std::vector<db::Polygon> &polygons = geometry.insert (std::make_pair (std::make_pair (ln, mask), std::vector<db::Polygon> ())).first->second;
         polygons.push_back (db::Polygon ());
         polygons.back ().assign_hull (points.begin (), points.end ());
 
@@ -1130,6 +1158,11 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
       } else if (test ("PORT")) {
 
         flush = true;
+
+      } else if (test ("VIA")) {
+
+        //  TODO: implement
+        error (tl::to_string (tr ("VIA not supported on pins currently")));
 
       } else {
         while (! peek ("+") && ! peek ("-") && ! peek (";")) {
@@ -1149,9 +1182,9 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
         */
 
         //  Produce geometry collected so far
-        for (std::map<std::string, std::vector<db::Polygon> >::const_iterator g = geometry.begin (); g != geometry.end (); ++g) {
+        for (std::map<std::pair<std::string, unsigned int>, std::vector<db::Polygon> >::const_iterator g = geometry.begin (); g != geometry.end (); ++g) {
 
-          std::pair <bool, unsigned int> dl = open_layer (layout, g->first, Pins, mask);
+          std::pair <bool, unsigned int> dl = open_layer (layout, g->first.first, Pins, g->first.second);
           if (dl.first) {
 
             db::properties_id_type prop_id = 0;
@@ -1172,7 +1205,7 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
 
           }
 
-          dl = open_layer (layout, g->first, Label, 0);
+          dl = open_layer (layout, g->first.first, Label, 0);
           if (dl.first) {
             db::Box bbox;
             if (! g->second.empty ()) {
@@ -1208,7 +1241,7 @@ DEFImporter::read_styles (double scale)
 
     double x = 0.0, y = 0.0;
 
-    while (! test (";")) {
+    while (! at_end () && ! test (";")) {
 
       test ("(");
       if (! test ("*")) {
@@ -1433,6 +1466,13 @@ DEFImporter::do_read (db::Layout &layout)
       expect ("END");
       expect ("STYLES");
 
+    } else if (test ("COMPONENTMASKSHIFT")) {
+
+      warn (tl::to_string (tr ("Component mask shift not supported currently")));
+      while (! at_end () && ! test (";")) {
+        take ();
+      }
+
     } else if (test ("COMPONENTS")) {
 
       get_long ();
@@ -1454,7 +1494,7 @@ DEFImporter::do_read (db::Layout &layout)
       expect ("PINS");
 
     } else {
-      while (! test (";")) {
+      while (! at_end () && ! test (";")) {
         take ();
       }
     }

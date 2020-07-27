@@ -395,3 +395,22 @@ TEST(112_via_properties)
   run_test (_this, "via_properties", "lef:in.lef+def:in.def", "au.oas.gz", default_options (), false);
 }
 
+TEST(113_masks_1)
+{
+  db::LEFDEFReaderOptions options = default_options ();
+  options.set_routing_suffix ("");
+  options.set_routing_datatype_per_mask (1, 100);
+  options.set_routing_datatype_per_mask (2, 200);
+  options.set_special_routing_suffix ("");
+  options.set_special_routing_datatype_per_mask (1, 101);
+  options.set_special_routing_datatype_per_mask (2, 201);
+  options.set_via_geometry_suffix ("");
+  options.set_via_geometry_datatype_per_mask (1, 102);
+  options.set_via_geometry_datatype_per_mask (2, 202);
+  options.set_pins_suffix ("");
+  options.set_pins_datatype_per_mask (1, 110);
+  options.set_pins_datatype_per_mask (2, 210);
+
+  run_test (_this, "masks-1", "lef:in_tech.lef+def:in.def", "au.oas.gz", options, false);
+}
+

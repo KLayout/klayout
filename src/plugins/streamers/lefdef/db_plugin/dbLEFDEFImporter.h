@@ -926,10 +926,16 @@ public:
 
   void add_polygon (const std::string &ln, const db::Polygon &poly, unsigned int mask);
   void add_box (const std::string &ln, const db::Box &box, unsigned int mask);
+  void set_bottom_layer (const std::string &ln) { m_bottom_layer = ln; }
+  void set_cut_layer (const std::string &ln) { m_cut_layer = ln; }
+  void set_top_layer (const std::string &ln) { m_top_layer = ln; }
 
 private:
   std::map <std::string, std::list<std::pair<unsigned int, db::Polygon> > > m_polygons;
   std::map <std::string, std::list<std::pair<unsigned int, db::Box> > > m_boxes;
+  std::string m_bottom_layer, m_cut_layer, m_top_layer;
+
+  unsigned int mask_for (const std::string &ln, unsigned int m, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top) const;
 };
 
 /**

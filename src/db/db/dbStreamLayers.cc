@@ -137,6 +137,17 @@ LayerMap::is_placeholder (unsigned int l) const
   return (m_placeholders.size () > std::numeric_limits<unsigned int>::max () - l);
 }
 
+const db::LayerProperties *
+LayerMap::target (unsigned int l) const
+{
+  std::map<unsigned int, LayerProperties>::const_iterator i = m_target_layers.find (l);
+  if (i != m_target_layers.end ()) {
+    return & i->second;
+  } else {
+    return 0;
+  }
+}
+
 std::pair<bool, unsigned int>
 LayerMap::logical (const db::LayerProperties &p, db::Layout &layout) const
 {

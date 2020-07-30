@@ -1325,7 +1325,7 @@ NetlistModelItemData::child (size_t n)
 std::pair<const db::Circuit *, const db::Circuit *>
 NetlistModelItemData::circuits_of_this ()
 {
-  return std::pair<const db::Circuit *, const db::Circuit *> (0, 0);
+  return std::pair<const db::Circuit *, const db::Circuit *> ((const db::Circuit *) 0, (const db::Circuit *) 0);
 }
 
 std::pair<const db::Circuit *, const db::Circuit *>
@@ -1356,7 +1356,7 @@ NetlistModelItemData::derived_from_circuits (const std::pair<const db::Circuit *
 std::pair<const db::Device *, const db::Device *>
 NetlistModelItemData::devices_of_this ()
 {
-  return std::pair<const db::Device *, const db::Device *> (0, 0);
+  return std::pair<const db::Device *, const db::Device *> ((const db::Device *) 0, (const db::Device *) 0);
 }
 
 std::pair<const db::Device *, const db::Device *>
@@ -1387,7 +1387,7 @@ NetlistModelItemData::derived_from_devices (const std::pair<const db::Device *, 
 std::pair<const db::Pin *, const db::Pin *>
 NetlistModelItemData::pins_of_this ()
 {
-  return std::pair<const db::Pin *, const db::Pin *> (0, 0);
+  return std::pair<const db::Pin *, const db::Pin *> ((const db::Pin *) 0, (const db::Pin *) 0);
 }
 
 std::pair<const db::Pin *, const db::Pin *>
@@ -1418,7 +1418,7 @@ NetlistModelItemData::derived_from_pins (const std::pair<const db::Pin *, const 
 std::pair<const db::SubCircuit *, const db::SubCircuit *>
 NetlistModelItemData::subcircuits_of_this ()
 {
-  return std::pair<const db::SubCircuit *, const db::SubCircuit *> (0, 0);
+  return std::pair<const db::SubCircuit *, const db::SubCircuit *> ((const db::SubCircuit *) 0, (const db::SubCircuit *) 0);
 }
 
 std::pair<const db::SubCircuit *, const db::SubCircuit *>
@@ -1449,7 +1449,7 @@ NetlistModelItemData::derived_from_subcircuits (const std::pair<const db::SubCir
 std::pair<const db::Net *, const db::Net *>
 NetlistModelItemData::nets_of_this ()
 {
-  return std::pair<const db::Net *, const db::Net *> (0, 0);
+  return std::pair<const db::Net *, const db::Net *> ((const db::Net *) 0, (const db::Net *) 0);
 }
 
 std::pair<const db::Net *, const db::Net *>

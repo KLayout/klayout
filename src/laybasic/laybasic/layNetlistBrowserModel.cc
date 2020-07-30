@@ -31,7 +31,9 @@
 #include <QWidget>
 #include <QTreeView>
 #include <QUrl>
-#include <QUrlQuery>
+#if QT_VERSION >= 0x050000
+#  include <QUrlQuery>
+#endif
 
 namespace lay
 {

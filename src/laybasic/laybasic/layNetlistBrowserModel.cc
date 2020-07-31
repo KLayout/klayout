@@ -2956,7 +2956,7 @@ NetlistBrowserModel::circuit_from_index (const QModelIndex &index, bool include_
 {
   NetlistModelItemData *d = (NetlistModelItemData *) (index.internalPointer ());
   if (! d) {
-    return std::pair<const db::Circuit *, const db::Circuit *> (0, 0);
+    return std::pair<const db::Circuit *, const db::Circuit *> ((const db::Circuit *) 0, (const db::Circuit *) 0);
   } else {
     return include_parents ? d->circuits () : d->circuits_of_this ();
   }
@@ -2967,7 +2967,7 @@ NetlistBrowserModel::net_from_index (const QModelIndex &index, bool include_pare
 {
   NetlistModelItemData *d = (NetlistModelItemData *) (index.internalPointer ());
   if (! d) {
-    return std::pair<const db::Net *, const db::Net *> (0, 0);
+    return std::pair<const db::Net *, const db::Net *> ((const db::Net *) 0, (const db::Net *) 0);
   } else {
     return include_parents ? d->nets () : d->nets_of_this ();
   }
@@ -2978,7 +2978,7 @@ NetlistBrowserModel::device_from_index (const QModelIndex &index, bool include_p
 {
   NetlistModelItemData *d = (NetlistModelItemData *) (index.internalPointer ());
   if (! d) {
-    return std::pair<const db::Device *, const db::Device *> (0, 0);
+    return std::pair<const db::Device *, const db::Device *> ((const db::Device *) 0, (const db::Device *) 0);
   } else {
     return include_parents ? d->devices () : d->devices_of_this ();
   }
@@ -2989,7 +2989,7 @@ NetlistBrowserModel::subcircuit_from_index (const QModelIndex &index, bool inclu
 {
   NetlistModelItemData *d = (NetlistModelItemData *) (index.internalPointer ());
   if (! d) {
-    return std::pair<const db::SubCircuit *, const db::SubCircuit *> (0, 0);
+    return std::pair<const db::SubCircuit *, const db::SubCircuit *> ((const db::SubCircuit *) 0, (const db::SubCircuit *) 0);
   } else {
     return include_parents ? d->subcircuits () : d->subcircuits_of_this ();
   }

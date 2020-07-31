@@ -31,7 +31,9 @@
 #include <QWidget>
 #include <QTreeView>
 #include <QUrl>
-#include <QUrlQuery>
+#if QT_VERSION >= 0x050000
+#  include <QUrlQuery>
+#endif
 
 namespace lay
 {
@@ -1325,7 +1327,7 @@ NetlistModelItemData::child (size_t n)
 std::pair<const db::Circuit *, const db::Circuit *>
 NetlistModelItemData::circuits_of_this ()
 {
-  return std::pair<const db::Circuit *, const db::Circuit *> (0, 0);
+  return std::pair<const db::Circuit *, const db::Circuit *> ((const db::Circuit *) 0, (const db::Circuit *) 0);
 }
 
 std::pair<const db::Circuit *, const db::Circuit *>
@@ -1356,7 +1358,7 @@ NetlistModelItemData::derived_from_circuits (const std::pair<const db::Circuit *
 std::pair<const db::Device *, const db::Device *>
 NetlistModelItemData::devices_of_this ()
 {
-  return std::pair<const db::Device *, const db::Device *> (0, 0);
+  return std::pair<const db::Device *, const db::Device *> ((const db::Device *) 0, (const db::Device *) 0);
 }
 
 std::pair<const db::Device *, const db::Device *>
@@ -1387,7 +1389,7 @@ NetlistModelItemData::derived_from_devices (const std::pair<const db::Device *, 
 std::pair<const db::Pin *, const db::Pin *>
 NetlistModelItemData::pins_of_this ()
 {
-  return std::pair<const db::Pin *, const db::Pin *> (0, 0);
+  return std::pair<const db::Pin *, const db::Pin *> ((const db::Pin *) 0, (const db::Pin *) 0);
 }
 
 std::pair<const db::Pin *, const db::Pin *>
@@ -1418,7 +1420,7 @@ NetlistModelItemData::derived_from_pins (const std::pair<const db::Pin *, const 
 std::pair<const db::SubCircuit *, const db::SubCircuit *>
 NetlistModelItemData::subcircuits_of_this ()
 {
-  return std::pair<const db::SubCircuit *, const db::SubCircuit *> (0, 0);
+  return std::pair<const db::SubCircuit *, const db::SubCircuit *> ((const db::SubCircuit *) 0, (const db::SubCircuit *) 0);
 }
 
 std::pair<const db::SubCircuit *, const db::SubCircuit *>
@@ -1449,7 +1451,7 @@ NetlistModelItemData::derived_from_subcircuits (const std::pair<const db::SubCir
 std::pair<const db::Net *, const db::Net *>
 NetlistModelItemData::nets_of_this ()
 {
-  return std::pair<const db::Net *, const db::Net *> (0, 0);
+  return std::pair<const db::Net *, const db::Net *> ((const db::Net *) 0, (const db::Net *) 0);
 }
 
 std::pair<const db::Net *, const db::Net *>
@@ -2954,7 +2956,7 @@ NetlistBrowserModel::circuit_from_index (const QModelIndex &index, bool include_
 {
   NetlistModelItemData *d = (NetlistModelItemData *) (index.internalPointer ());
   if (! d) {
-    return std::pair<const db::Circuit *, const db::Circuit *> (0, 0);
+    return std::pair<const db::Circuit *, const db::Circuit *> ((const db::Circuit *) 0, (const db::Circuit *) 0);
   } else {
     return include_parents ? d->circuits () : d->circuits_of_this ();
   }
@@ -2965,7 +2967,7 @@ NetlistBrowserModel::net_from_index (const QModelIndex &index, bool include_pare
 {
   NetlistModelItemData *d = (NetlistModelItemData *) (index.internalPointer ());
   if (! d) {
-    return std::pair<const db::Net *, const db::Net *> (0, 0);
+    return std::pair<const db::Net *, const db::Net *> ((const db::Net *) 0, (const db::Net *) 0);
   } else {
     return include_parents ? d->nets () : d->nets_of_this ();
   }
@@ -2976,7 +2978,7 @@ NetlistBrowserModel::device_from_index (const QModelIndex &index, bool include_p
 {
   NetlistModelItemData *d = (NetlistModelItemData *) (index.internalPointer ());
   if (! d) {
-    return std::pair<const db::Device *, const db::Device *> (0, 0);
+    return std::pair<const db::Device *, const db::Device *> ((const db::Device *) 0, (const db::Device *) 0);
   } else {
     return include_parents ? d->devices () : d->devices_of_this ();
   }
@@ -2987,7 +2989,7 @@ NetlistBrowserModel::subcircuit_from_index (const QModelIndex &index, bool inclu
 {
   NetlistModelItemData *d = (NetlistModelItemData *) (index.internalPointer ());
   if (! d) {
-    return std::pair<const db::SubCircuit *, const db::SubCircuit *> (0, 0);
+    return std::pair<const db::SubCircuit *, const db::SubCircuit *> ((const db::SubCircuit *) 0, (const db::SubCircuit *) 0);
   } else {
     return include_parents ? d->subcircuits () : d->subcircuits_of_this ();
   }

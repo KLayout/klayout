@@ -356,7 +356,7 @@ IndexedNetlistModel::net_subcircuit_pin_pair
 SingleIndexedNetlistModel::subcircuit_pinref_from_index (const subcircuit_pair &subcircuits, size_t index) const
 {
   if (! subcircuits.first) {
-    return IndexedNetlistModel::net_subcircuit_pin_pair (0, 0);
+    return IndexedNetlistModel::net_subcircuit_pin_pair ((const db::NetSubcircuitPinRef *) 0, (const db::NetSubcircuitPinRef *) 0);
   }
 
   std::map<subcircuit_pair, std::vector<net_subcircuit_pin_pair> >::iterator i = m_subcircuit_pins_by_index.find (subcircuits);
@@ -372,12 +372,12 @@ SingleIndexedNetlistModel::subcircuit_pinref_from_index (const subcircuit_pair &
         m_synthetic_pinrefs.push_back (db::NetSubcircuitPinRef (const_cast<db::SubCircuit *> (subcircuits.first), p->id ()));
         ref = & m_synthetic_pinrefs.back ();
       }
-      refs.push_back (net_subcircuit_pin_pair (ref, 0));
+      refs.push_back (net_subcircuit_pin_pair (ref, (const db::NetSubcircuitPinRef *) 0));
     }
 
   }
 
-  return index < i->second.size () ? i->second [index] : IndexedNetlistModel::net_subcircuit_pin_pair (0, 0);
+  return index < i->second.size () ? i->second [index] : IndexedNetlistModel::net_subcircuit_pin_pair ((const db::NetSubcircuitPinRef *) 0, (const db::NetSubcircuitPinRef *) 0);
 }
 
 IndexedNetlistModel::net_terminal_pair

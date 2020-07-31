@@ -377,7 +377,7 @@ SingleIndexedNetlistModel::subcircuit_pinref_from_index (const subcircuit_pair &
 
   }
 
-  return index < i->second.size () ? i->second [index] : IndexedNetlistModel::net_subcircuit_pin_pair (0, 0);
+  return index < i->second.size () ? i->second [index] : IndexedNetlistModel::net_subcircuit_pin_pair ((const db::NetSubcircuitPinRef *) 0, (const db::NetSubcircuitPinRef *) 0);
 }
 
 IndexedNetlistModel::net_terminal_pair

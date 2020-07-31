@@ -372,7 +372,7 @@ SingleIndexedNetlistModel::subcircuit_pinref_from_index (const subcircuit_pair &
         m_synthetic_pinrefs.push_back (db::NetSubcircuitPinRef (const_cast<db::SubCircuit *> (subcircuits.first), p->id ()));
         ref = & m_synthetic_pinrefs.back ();
       }
-      refs.push_back (net_subcircuit_pin_pair (ref, 0));
+      refs.push_back (net_subcircuit_pin_pair (ref, (const db::NetSubcircuitPinRef *) 0));
     }
 
   }

@@ -783,7 +783,7 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
             tl::Extractor ex (p_uc.c_str ());
 
             std::string ps;
-            ex.read (ps);
+            ex.read_word_or_quoted (ps);
 
             unsigned int mask = 0;
 
@@ -803,6 +803,11 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
               }
               purpose_str += i->first;
 
+            }
+
+            if (mask > 0) {
+              purpose_str += ":";
+              purpose_str += tl::to_string (mask);
             }
 
           }

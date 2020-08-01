@@ -1047,7 +1047,6 @@ private:
   LEFDEFReaderState &operator= (const LEFDEFReaderState &);
 
   std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, std::pair<bool, unsigned int> > m_layers;
-  std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, unsigned int> m_unassigned_layers;
   db::LayerMap m_layer_map;
   bool m_create_layers;
   bool m_has_explicit_layer_mapping;

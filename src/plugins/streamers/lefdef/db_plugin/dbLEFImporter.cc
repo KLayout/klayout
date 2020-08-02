@@ -1046,9 +1046,9 @@ LEFImporter::do_read (db::Layout &layout)
 
     if (test ("END")) {
 
-      //  END LIBRARY terminates the file
       expect ("LIBRARY");
-      break;
+      //  END LIBRARY should terminate the file, but we allow to continue, so we can cat LEF files:
+      //  break;
 
     } else if (test ("VERSION")) {
 

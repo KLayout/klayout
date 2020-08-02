@@ -512,3 +512,12 @@ TEST(113_masks_1)
   )
 }
 
+TEST(114_lef_skips_end_library)
+{
+  db::LEFDEFReaderOptions opt = default_options ();
+  opt.set_produce_pin_names (true);
+  opt.set_pin_property_name (2);
+  opt.set_cell_outline_layer ("OUTLINE (13/0)");
+  run_test (_this, "lef-skips-end-library", "lef:in.lef+def:in.def", "au.oas", opt, false);
+}
+

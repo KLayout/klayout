@@ -408,7 +408,7 @@ void NetlistCrossReferenceModel::ensure_subcircuit_data_built () const
             if (n1) {
               first_net_to_other_netref.insert (std::make_pair (n1, n2));
             } else {
-              sc_data.nets_per_pins.push_back (std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *> (0, n2));
+              sc_data.nets_per_pins.push_back (std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *> ((const db::NetSubcircuitPinRef *) 0, n2));
             }
           }
         }
@@ -456,7 +456,7 @@ IndexedNetlistModel::net_subcircuit_pin_pair NetlistCrossReferenceModel::subcirc
     if (index < sc->second.nets_per_pins.size ()) {
       return sc->second.nets_per_pins [index];
     } else {
-      return IndexedNetlistModel::net_subcircuit_pin_pair (0, 0);
+      return IndexedNetlistModel::net_subcircuit_pin_pair ((const db::NetSubcircuitPinRef *) 0, (const db::NetSubcircuitPinRef *) 0);
     }
   } else {
     return IndexedNetlistModel::net_subcircuit_pin_pair (subcircuits.first ? subcircuits.first->netref_for_pin (index) : 0, subcircuits.second ? subcircuits.second->netref_for_pin (index) : 0);

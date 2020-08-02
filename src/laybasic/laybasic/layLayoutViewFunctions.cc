@@ -84,6 +84,10 @@ LayoutViewFunctions::menu_activated (const std::string &symbol)
     view ()->select (db::DBox (), lay::Editable::Reset);
   } else if (symbol == "cm_select_all") {
     view ()->select (view ()->full_box (), lay::Editable::Replace);
+  } else if (symbol == "cm_select_next_item") {
+    view ()->repeat_selection (lay::Editable::Replace);
+  } else if (symbol == "cm_select_next_item_add") {
+    view ()->repeat_selection (lay::Editable::Add);
   } else if (symbol == "cm_lv_paste") {
     cm_layer_paste ();
   } else if (symbol == "cm_lv_cut") {
@@ -2058,6 +2062,8 @@ public:
     menu_entries.push_back (lay::menu_item ("cm_paste_interactive", "paste_interactive:edit", at, tl::to_string (QObject::tr ("Paste Interactive"))));
     menu_entries.push_back (lay::menu_item ("cm_duplicate_interactive", "duplicate_interactive:edit", at, tl::to_string (QObject::tr ("Duplicate Interactive"))));
     menu_entries.push_back (lay::menu_item ("cm_sel_move_interactive", "sel_move_interactive:edit", at, tl::to_string (QObject::tr ("Move Interactive"))));
+    menu_entries.push_back (lay::menu_item ("cm_select_next_item", "select_next_item:edit", at, tl::to_string (QObject::tr ("Select Next Item(Space)"))));
+    menu_entries.push_back (lay::menu_item ("cm_select_next_item_add", "select_next_item_add:edit", at, tl::to_string (QObject::tr ("Select Next Item too(Shift+Space)"))));
 
     at = "edit_menu.end";
     menu_entries.push_back (lay::menu_item ("cm_undo", "undo:edit", at, tl::to_string (QObject::tr ("Undo(Ctrl+Z)"))));

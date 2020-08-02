@@ -730,6 +730,8 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 
       std::string w1, w2;
       int layer = 0, datatype = 0;
+      size_t max_purpose_str = 10;
+      bool purpose_abbreviated = false;
 
       if (ex.try_read_word (w1) && ex.try_read_word (w2, "._$,/:") && ex.try_read (layer) && ex.try_read (datatype)) {
 
@@ -798,16 +800,30 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 
               translated_purposes.insert (std::make_pair (i->second, mask));
 
-              if (! purpose_str.empty ()) {
-                purpose_str += "/";
+              if (! purpose_abbreviated) {
+
+                if (! purpose_str.empty ()) {
+                  purpose_str += "/";
+                }
+
+                if (purpose_str.size () > max_purpose_str) {
+
+                  purpose_abbreviated = true;
+                  purpose_str += "...";
+
+                } else {
+
+                  purpose_str += i->first;
+
+                  if (mask > 0) {
+                    purpose_str += ":";
+                    purpose_str += tl::to_string (mask);
+                  }
+
+                }
+
               }
-              purpose_str += i->first;
 
-            }
-
-            if (mask > 0) {
-              purpose_str += ":";
-              purpose_str += tl::to_string (mask);
             }
 
           }

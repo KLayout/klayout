@@ -50,7 +50,6 @@
 #include "layPlugin.h"
 #include "layDisplayState.h"
 #include "layBookmarkList.h"
-#include "layDialogs.h"
 #include "gsi.h"
 #include "tlException.h"
 #include "tlEvents.h"
@@ -238,11 +237,27 @@ public:
   }
 
   /**
+   *  @brief Gets the layer control panel
+   */
+  lay::LayerControlPanel *control_panel ()
+  {
+    return mp_control_panel;
+  }
+
+  /**
    *  @brief Gets the container with the hierarchy control panel
    */
   QWidget *hierarchy_control_frame () 
   {
     return mp_hierarchy_frame;
+  }
+
+  /**
+   *  @brief Gets the hierarchy panel
+   */
+  lay::HierarchyControlPanel *hierarchy_panel ()
+  {
+    return mp_hierarchy_panel;
   }
 
   /**
@@ -1959,6 +1974,14 @@ public:
   virtual void drop_url (const std::string &path_or_url);
 
   /**
+   *  @brief Gets a list of all plugins
+   */
+  const std::vector<lay::Plugin *> &plugins ()
+  {
+    return mp_plugins;
+  }
+
+  /**
    *  @brief Localize a plugin by name
    *
    *  This method will return 0, if no such plugin is registered
@@ -2582,81 +2605,6 @@ public slots:
   void pan_right_fast ();
   void pan_down_fast ();
 
-  //  menu callbacks
-  void cm_new_layer ();
-  void cm_clear_layer ();
-  void cm_delete_layer ();
-  void cm_copy_layer ();
-  void cm_align_cell_origin ();
-  void cm_edit_layer ();
-  void cm_lay_convert_to_static ();
-  void cm_lay_flip_x ();
-  void cm_lay_flip_y ();
-  void cm_lay_rot_cw ();
-  void cm_lay_rot_ccw ();
-  void cm_lay_free_rot ();
-  void cm_lay_scale ();
-  void cm_lay_move ();
-  void cm_sel_flip_x ();
-  void cm_sel_flip_y ();
-  void cm_sel_rot_cw ();
-  void cm_sel_rot_ccw ();
-  void cm_sel_free_rot ();
-  void cm_sel_scale ();
-  void cm_sel_move ();
-  void cm_sel_move_to ();
-  void cm_sel_move_interactive ();
-
-  //  forwarded to the layer control panel
-  void cm_new_tab ();
-  void cm_rename_tab ();
-  void cm_remove_tab ();
-  void cm_select_all ();
-  void cm_make_valid ();
-  void cm_make_invalid ();
-  void cm_hide ();
-  void cm_hide_all ();
-  void cm_show ();
-  void cm_show_all ();
-  void cm_show_only ();
-  void cm_rename ();
-  void cm_delete ();
-  void cm_insert ();
-  void cm_group ();
-  void cm_ungroup ();
-  void cm_source ();
-  void cm_sort_by_name ();
-  void cm_sort_by_ild ();
-  void cm_sort_by_idl ();
-  void cm_sort_by_ldi ();
-  void cm_sort_by_dli ();
-  void cm_regroup_by_index ();
-  void cm_regroup_by_datatype ();
-  void cm_regroup_by_layer ();
-  void cm_regroup_flatten ();
-  void cm_expand_all ();
-  void cm_add_missing ();
-  void cm_remove_unused ();
-  void cm_layer_copy ();
-  void cm_layer_cut ();
-  void cm_layer_paste ();
-
-  //  forwarded to the cell control panel
-  void cm_cell_user_properties ();
-  void cm_cell_flatten ();
-  void cm_cell_rename ();
-  void cm_cell_replace ();
-  void cm_cell_delete ();
-  void cm_cell_select ();
-  void cm_open_current_cell ();
-  void cm_cell_hide ();
-  void cm_cell_show ();
-  void cm_cell_show_all ();
-  void cm_cell_copy ();
-  void cm_cell_cut ();
-  void cm_cell_paste ();
-  void cm_cell_convert_to_static ();
-
   //  called by children and owner
   void redraw ();
   void redraw_layer (unsigned int index);
@@ -2869,17 +2817,6 @@ private:
 
   std::vector<lay::Plugin *> mp_plugins;
 
-  db::LayerProperties m_new_layer_props;
-  db::DVector m_move_dist;
-  int m_move_to_origin_mode_x, m_move_to_origin_mode_y;
-  lay::AlignCellOptions m_align_cell_options;
-  int m_del_cell_mode;
-  int m_layer_hier_mode;
-  int m_duplicate_hier_mode;
-  bool m_clear_before;
-  int m_copy_cva, m_copy_cvr;
-  int m_copy_layera, m_copy_layerr;
-
   bool m_visibility_changed;
   bool m_active_cellview_changed_event_enabled;
   tl::DeferredMethod<lay::LayoutView> dm_prop_changed;
@@ -2890,8 +2827,6 @@ private:
   void do_prop_changed ();
   void do_redraw (int layer);
   void do_redraw ();
-  void do_transform (const db::DCplxTrans &tr);
-  void transform_layout (const db::DCplxTrans &tr);
 
   void background_color (QColor c);
   void ctx_color (QColor c);
@@ -2917,11 +2852,6 @@ private:
   void finish_cellviews_changed ();
   void init_layer_properties (LayerProperties &props, const LayerPropertiesList &lp_list) const;
   void merge_dither_pattern (lay::LayerPropertiesList &props);
-
-  void do_cm_duplicate (bool interactive);
-  void do_cm_paste (bool interactive);
-  void cm_new_cell ();
-  void cm_reload ();
 
   //  overrides Editables method to display a message
   void signal_selection_changed ();

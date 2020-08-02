@@ -184,7 +184,8 @@ SOURCES = \
     layDispatcher.cc \
     laySelectCellViewForm.cc \
     layLayoutStatisticsForm.cc \
-    gsiDeclLayNetlistBrowserDialog.cc
+    gsiDeclLayNetlistBrowserDialog.cc \
+    layLayoutViewFunctions.cc
 
 HEADERS = \
   gtf.h \
@@ -285,7 +286,8 @@ HEADERS = \
     layGenericSyntaxHighlighter.h \
     layDispatcher.h \
     laySelectCellViewForm.h \
-    layLayoutStatisticsForm.h
+    layLayoutStatisticsForm.h \
+    layLayoutViewFunctions.h
 
 INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC

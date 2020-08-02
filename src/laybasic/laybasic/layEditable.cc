@@ -444,6 +444,14 @@ Editables::select (const db::DPoint &pt, lay::Editable::SelectionMode mode)
   signal_selection_changed ();
 }
 
+void
+Editables::repeat_selection (Editable::SelectionMode mode)
+{
+  if (m_last_selected_point.is_point ()) {
+    select (m_last_selected_point, mode);
+  }
+}
+
 bool 
 Editables::begin_move (const db::DPoint &p, lay::angle_constraint_type ac)
 {

@@ -321,6 +321,7 @@ class LEFDEFFormatDeclaration
       //  new:
       tl::make_member (&LEFDEFReaderOptions::special_routing_suffix_str, &LEFDEFReaderOptions::set_special_routing_suffix_str, "special-routing-suffix-string") +
       tl::make_member (&LEFDEFReaderOptions::special_routing_datatype_str, &LEFDEFReaderOptions::set_special_routing_datatype_str, "special-routing-datatype-string") +
+      tl::make_member (&LEFDEFReaderOptions::via_cellname_prefix, &LEFDEFReaderOptions::set_via_cellname_prefix, "via-cellname-prefix") +
       tl::make_member (&LEFDEFReaderOptions::begin_lef_files, &LEFDEFReaderOptions::end_lef_files, &LEFDEFReaderOptions::push_lef_file, "lef-files") +
       tl::make_member (&LEFDEFReaderOptions::macro_resolution_mode, &LEFDEFReaderOptions::set_macro_resolution_mode, "macro-resolution-mode", MacroResolutionModeConverter ()) +
       tl::make_member (&LEFDEFReaderOptions::separate_groups, &LEFDEFReaderOptions::set_separate_groups, "separate-groups") +

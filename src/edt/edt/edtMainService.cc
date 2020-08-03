@@ -2010,6 +2010,129 @@ MainService::cm_tap ()
   }
 }
 
+
+/**
+ *  @brief An iterator for the selected objects of all edt services in a layout view
+ */
+class EDT_PUBLIC SelectionIterator
+{
+public:
+  typedef lay::ObjectInstPath value_type;
+  typedef const lay::ObjectInstPath &reference;
+  typedef const lay::ObjectInstPath *pointer;
+
+  /**
+   *  @brief Creates a new iterator iterating over all selected edt objects from the given view
+   *
+   *  If "including_transient" is true, the transient selection will be used as fallback.
+   */
+  SelectionIterator (lay::LayoutView *view, bool including_transient = true)
+    : m_transient_mode (false)
+  {
+    mp_edt_services = view->get_plugins <edt::Service> ();
+
+    m_current_service = mp_edt_services.begin ();
+    if (m_current_service != mp_edt_services.end ()) {
+      m_current_object = (*m_current_service)->selection ().begin ();
+    }
+
+    next ();
+
+    if (at_end () && including_transient) {
+
+      m_transient_mode = true;
+
+      m_current_service = mp_edt_services.begin ();
+      if (m_current_service != mp_edt_services.end ()) {
+        m_current_object = (*m_current_service)->transient_selection ().begin ();
+      }
+
+      next ();
+
+    }
+  }
+
+  /**
+   *  @brief Returns a value indicating whether the transient selection is taken
+   */
+  bool is_transient () const
+  {
+    return m_transient_mode;
+  }
+
+  /**
+   *  @brief Increments the iterator
+   */
+  void operator++ ()
+  {
+    inc ();
+    next ();
+  }
+
+  /**
+   *  @brief Dereferencing
+   */
+  const lay::ObjectInstPath &operator* () const
+  {
+    tl_assert (! at_end ());
+    return *m_current_object;
+  }
+
+  /**
+   *  @brief Arrow operator
+   */
+  const lay::ObjectInstPath *operator-> () const
+  {
+    return & operator* ();
+  }
+
+  /**
+   *  @brief Returns a value indicating whether the iterator has finished
+   */
+  bool at_end () const
+  {
+    return m_current_service == mp_edt_services.end ();
+  }
+
+private:
+  void inc ()
+  {
+    tl_assert (! at_end ());
+    ++m_current_object;
+  }
+
+  void next ()
+  {
+    if (at_end ()) {
+      return;
+    }
+
+    const edt::Service::objects *sel = m_transient_mode ? &(*m_current_service)->transient_selection () : &(*m_current_service)->selection ();
+
+    while (m_current_object == sel->end ()) {
+
+      ++m_current_service;
+
+      if (m_current_service != mp_edt_services.end ()) {
+
+        sel = m_transient_mode ? &(*m_current_service)->transient_selection () : &(*m_current_service)->selection ();
+        m_current_object = sel->begin ();
+
+      } else {
+        break;
+      }
+
+    }
+  }
+
+private:
+  std::vector<edt::Service *> mp_edt_services;
+  std::vector<edt::Service *>::const_iterator m_current_service;
+  edt::Service::obj_iterator m_current_object;
+  bool m_transient_mode;
+};
+
+
 void 
 MainService::cm_change_layer ()
 {
@@ -2018,16 +2141,12 @@ MainService::cm_change_layer ()
 
   int cv_index = -1;
 
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
-
   //  get (common) cellview index of the selected shapes
-  for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
-      if (cv_index >= 0 && cv_index != int (s->cv_index ())) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Selections originate from different layouts - cannot switch layer in this case.")));
-      }
-      cv_index = int (s->cv_index ());
+  for (SelectionIterator s (view ()); ! s.at_end (); ++s) {
+    if (cv_index >= 0 && cv_index != int (s->cv_index ())) {
+      throw tl::Exception (tl::to_string (QObject::tr ("Selections originate from different layouts - cannot switch layer in this case.")));
     }
+    cv_index = int (s->cv_index ());
   }
 
   if (cv_index >= 0) {
@@ -2089,46 +2208,42 @@ MainService::cm_change_layer ()
 
     //  Insert and delete the shape. This exploits the fact, that a shape can be erased multiple times -
     //  this is important since the selection potentially contains the same shape multiple times.
-    for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
+    for (SelectionIterator s (view ()); ! s.at_end (); ++s) {
 
-      for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+      if (!s->is_cell_inst () && int (s->layer ()) != layer) {
 
-        if (!s->is_cell_inst () && int (s->layer ()) != layer) {
+        db::Cell &cell = layout.cell (s->cell_index ());
+        if (cell.shapes (s->layer ()).is_valid (s->shape ())) {
+          cell.shapes (layer).insert (s->shape ());
+          cell.shapes (s->layer ()).erase_shape (s->shape ());
+        }
 
-          db::Cell &cell = layout.cell (s->cell_index ());
-          if (cell.shapes (s->layer ()).is_valid (s->shape ())) {
-            cell.shapes (layer).insert (s->shape ());
-            cell.shapes (s->layer ()).erase_shape (s->shape ());
-          }
+      } else if (s->is_cell_inst ()) {
 
-        } else if (s->is_cell_inst ()) {
+        //  If the selected object is a PCell instance, and there is exactly one visible, writable layer type parameter, change this one
 
-          //  If the selected object is a PCell instance, and there is exactly one visible, writable layer type parameter, change this one
+        db::Instance inst = s->back ().inst_ptr;
+        db::Cell &cell = layout.cell (s->cell_index ());
 
-          db::Instance inst = s->back ().inst_ptr;
-          db::Cell &cell = layout.cell (s->cell_index ());
+        if (cell.is_valid (inst)) {
 
-          if (cell.is_valid (inst)) {
+          const db::PCellDeclaration *pcell_decl = layout.pcell_declaration_for_pcell_variant (inst.cell_index ());
+          if (pcell_decl) {
 
-            const db::PCellDeclaration *pcell_decl = layout.pcell_declaration_for_pcell_variant (inst.cell_index ());
-            if (pcell_decl) {
-
-              size_t layer_par_index = 0;
-              int n_layer_par = 0;
-              for (std::vector<db::PCellParameterDeclaration>::const_iterator d = pcell_decl->parameter_declarations ().begin (); d != pcell_decl->parameter_declarations ().end () && n_layer_par < 2; ++d) {
-                if (d->get_type () == db::PCellParameterDeclaration::t_layer && !d->is_hidden () && !d->is_readonly ()) {
-                  ++n_layer_par;
-                  layer_par_index = size_t (d - pcell_decl->parameter_declarations ().begin ());
-                }
+            size_t layer_par_index = 0;
+            int n_layer_par = 0;
+            for (std::vector<db::PCellParameterDeclaration>::const_iterator d = pcell_decl->parameter_declarations ().begin (); d != pcell_decl->parameter_declarations ().end () && n_layer_par < 2; ++d) {
+              if (d->get_type () == db::PCellParameterDeclaration::t_layer && !d->is_hidden () && !d->is_readonly ()) {
+                ++n_layer_par;
+                layer_par_index = size_t (d - pcell_decl->parameter_declarations ().begin ());
               }
+            }
 
-              if (n_layer_par == 1) {
-                std::vector<tl::Variant> parameters = cell.get_pcell_parameters (inst);
-                tl_assert (layer_par_index < parameters.size ());
-                parameters [layer_par_index] = layout.get_properties (layer);
-                cell.change_pcell_parameters (inst, parameters);
-              }
-
+            if (n_layer_par == 1) {
+              std::vector<tl::Variant> parameters = cell.get_pcell_parameters (inst);
+              tl_assert (layer_par_index < parameters.size ());
+              parameters [layer_par_index] = layout.get_properties (layer);
+              cell.change_pcell_parameters (inst, parameters);
             }
 
           }

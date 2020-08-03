@@ -327,6 +327,93 @@ AlignOptionsDialog::exec_dialog (lay::LayoutView * /*view*/, int &hmode, int &vm
 }
 
 // --------------------------------------------------------------------------------
+//  DistributeOptionsDialog implementation
+
+DistributeOptionsDialog::DistributeOptionsDialog (QWidget *parent)
+  : QDialog (parent)
+{
+  setObjectName (QString::fromUtf8 ("change_layer_options_dialog"));
+
+  Ui::DistributeOptionsDialog::setupUi (this);
+}
+
+DistributeOptionsDialog::~DistributeOptionsDialog ()
+{
+  //  .. nothing yet ..
+}
+
+bool
+DistributeOptionsDialog::exec_dialog (lay::LayoutView *view, bool &hdistribute, int &hmode, double &hpitch, double &hspace, bool &vdistribute, int &vmode, double &vpitch, double &vspace, bool &visible_layers)
+{
+  QRadioButton *hmode_buttons [] = { (QRadioButton *) 0, this->h_left_rb, this->h_center_rb, this->h_right_rb };
+  QRadioButton *vmode_buttons [] = { (QRadioButton *) 0, this->v_top_rb, this->v_center_rb, this->v_bottom_rb };
+  QRadioButton *layers_buttons [] = { this->all_layers_rb, this->visible_layers_rb };
+
+  this->h_distribute->setChecked (hdistribute);
+  for (int i = 1; i < 4; ++i) {
+    hmode_buttons [i]->setChecked (hmode == i);
+  }
+
+  this->h_space->setText (tl::to_qstring (tl::micron_to_string (hspace)));
+  this->h_pitch->setText (tl::to_qstring (tl::micron_to_string (hpitch)));
+
+  this->v_distribute->setChecked (vdistribute);
+  for (int i = 1; i < 4; ++i) {
+    vmode_buttons [i]->setChecked (vmode == i);
+  }
+
+  this->v_space->setText (tl::to_qstring (tl::micron_to_string (vspace)));
+  this->v_pitch->setText (tl::to_qstring (tl::micron_to_string (vpitch)));
+
+  for (int i = 0; i < 2; ++i) {
+    layers_buttons [i]->setChecked (int (visible_layers) == i);
+  }
+
+  if (QDialog::exec ()) {
+
+    hdistribute = this->h_distribute->isChecked ();
+    hmode = -1;
+    for (int i = 1; i < 4; ++i) {
+      if (hmode_buttons [i]->isChecked ()) {
+        hmode = i;
+      }
+    }
+
+    hspace = 0.0;
+    tl::from_string (tl::to_string (this->h_space->text ()), hspace);
+
+    hpitch = 0.0;
+    tl::from_string (tl::to_string (this->h_pitch->text ()), hpitch);
+
+    vdistribute = this->v_distribute->isChecked ();
+    vmode = -1;
+    for (int i = 1; i < 4; ++i) {
+      if (vmode_buttons [i]->isChecked ()) {
+        vmode = i;
+      }
+    }
+
+    vspace = 0.0;
+    tl::from_string (tl::to_string (this->v_space->text ()), vspace);
+
+    vpitch = 0.0;
+    tl::from_string (tl::to_string (this->v_pitch->text ()), vpitch);
+
+    visible_layers = false;
+    for (int i = 0; i < 2; ++i) {
+      if (layers_buttons [i]->isChecked ()) {
+        visible_layers = (i != 0);
+      }
+    }
+
+    return true;
+
+  } else {
+    return false;
+  }
+}
+
+// --------------------------------------------------------------------------------
 //  MakeCellOptionsDialog implementation
 
 MakeCellOptionsDialog::MakeCellOptionsDialog (QWidget *parent)

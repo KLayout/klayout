@@ -26,11 +26,81 @@
 #include "dbLibrary.h"
 
 #include "edtUtils.h"
+#include "edtService.h"
+
 #include "layCellView.h"
 #include "layLayoutView.h"
+#include "layEditable.h"
 #include "tlException.h"
 
 namespace edt {
+
+// -------------------------------------------------------------
+//  SelectionIterator implementation
+
+SelectionIterator::SelectionIterator (lay::LayoutView *view, bool including_transient)
+  : m_transient_mode (false)
+{
+  mp_edt_services = view->get_plugins <edt::Service> ();
+
+  m_current_service = mp_edt_services.begin ();
+  if (m_current_service != mp_edt_services.end ()) {
+    m_current_object = (*m_current_service)->selection ().begin ();
+  }
+
+  next ();
+
+  if (at_end () && including_transient) {
+
+    m_transient_mode = true;
+
+    m_current_service = mp_edt_services.begin ();
+    if (m_current_service != mp_edt_services.end ()) {
+      m_current_object = (*m_current_service)->transient_selection ().begin ();
+    }
+
+    next ();
+
+  }
+}
+
+bool
+SelectionIterator::at_end () const
+{
+  return m_current_service == mp_edt_services.end ();
+}
+
+void
+SelectionIterator::inc ()
+{
+  tl_assert (! at_end ());
+  ++m_current_object;
+}
+
+void
+SelectionIterator::next ()
+{
+  if (at_end ()) {
+    return;
+  }
+
+  const edt::Service::objects *sel = m_transient_mode ? &(*m_current_service)->transient_selection () : &(*m_current_service)->selection ();
+
+  while (m_current_object == sel->end ()) {
+
+    ++m_current_service;
+
+    if (m_current_service != mp_edt_services.end ()) {
+
+      sel = m_transient_mode ? &(*m_current_service)->transient_selection () : &(*m_current_service)->selection ();
+      m_current_object = sel->begin ();
+
+    } else {
+      break;
+    }
+
+  }
+}
 
 // -------------------------------------------------------------
 //  TransformationsVariants implementation

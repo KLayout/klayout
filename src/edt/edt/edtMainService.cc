@@ -64,12 +64,18 @@ MainService::MainService (db::Manager *manager, lay::LayoutView *view, lay::Disp
     m_flatten_insts_levels (std::numeric_limits<int>::max ()),
     m_flatten_prune (false),
     m_align_hmode (0), m_align_vmode (0), m_align_visible_layers (false),
+    m_hdistribute (true),
+    m_distribute_hmode (1), m_distribute_hpitch (0.0), m_distribute_hspace (0.0),
+    m_vdistribute (true),
+    m_distribute_vmode (1), m_distribute_vpitch (0.0), m_distribute_vspace (0.0),
+    m_distribute_visible_layers (false),
     m_origin_mode_x (-1), m_origin_mode_y (-1), m_origin_visible_layers_for_bbox (false),
     m_array_a (0.0, 1.0), m_array_b (1.0, 0.0),
     m_array_na (1), m_array_nb (1),
     m_router (0.0), m_rinner (0.0), m_npoints (64), m_undo_before_apply (true),
     mp_round_corners_dialog (0),
     mp_align_options_dialog (0),
+    mp_distribute_options_dialog (0),
     mp_flatten_inst_options_dialog (0),
     mp_make_cell_options_dialog (0),
     mp_make_array_options_dialog (0)
@@ -98,6 +104,15 @@ MainService::align_options_dialog ()
     mp_align_options_dialog = new edt::AlignOptionsDialog (view ());
   }
   return mp_align_options_dialog;
+}
+
+edt::DistributeOptionsDialog *
+MainService::distribute_options_dialog ()
+{
+  if (! mp_distribute_options_dialog) {
+    mp_distribute_options_dialog = new edt::DistributeOptionsDialog (view ());
+  }
+  return mp_distribute_options_dialog;
 }
 
 lay::FlattenInstOptionsDialog *
@@ -138,6 +153,8 @@ MainService::menu_activated (const std::string &symbol)
     cm_edit_options ();
   } else if (symbol == "edt::sel_align") {
     cm_align ();
+  } else if (symbol == "edt::sel_distribute") {
+    cm_distribute ();
   } else if (symbol == "edt::sel_tap") {
     cm_tap ();
   } else if (symbol == "edt::sel_round_corners") {
@@ -1841,7 +1858,99 @@ MainService::cm_align ()
   }
 }
 
-void 
+void
+MainService::cm_distribute ()
+{
+  tl_assert (view ()->is_editable ());
+  check_no_guiding_shapes ();
+
+  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+
+  if (! distribute_options_dialog ()->exec_dialog (view (), m_hdistribute, m_distribute_hmode, m_distribute_hpitch, m_distribute_hspace,
+                                                            m_vdistribute, m_distribute_vmode, m_distribute_vpitch, m_distribute_vspace,
+                                                            m_align_visible_layers)) {
+    return;
+  }
+
+  db::DBox prim_box;
+  bool has_secondary = false;
+
+  //  get (common) bbox index of the primary selection
+  for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
+    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+
+      if (s->seq () == 0) {
+
+        const db::Layout &layout = view ()->cellview (s->cv_index ())->layout ();
+        db::CplxTrans tr = db::CplxTrans (layout.dbu ()) * s->trans ();
+
+        if (! s->is_cell_inst ()) {
+          prim_box += tr * s->shape ().bbox ();
+        } else {
+          prim_box += inst_bbox (tr, view (), s->cv_index (), s->back (), m_distribute_visible_layers);
+        }
+
+      } else {
+        has_secondary = true;
+      }
+
+    }
+  }
+
+  if (! prim_box.empty ()) {
+
+    view ()->cancel_edits ();
+    manager ()->transaction (tl::to_string (QObject::tr ("Alignment")));
+
+
+
+    //  do the alignment
+    for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
+
+      //  create a transformation vector that describes each shape's transformation
+      std::vector <db::DCplxTrans> tv;
+      tv.reserve ((*es)->selection ().size ());
+
+      for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+
+        db::DVector v;
+
+// @@@
+        if (s->seq () > 0 || !has_secondary) {
+
+          db::Layout &layout = view ()->cellview (s->cv_index ())->layout ();
+          db::CplxTrans tr = db::CplxTrans (layout.dbu ()) * s->trans ();
+
+          if (! s->is_cell_inst ()) {
+
+            db::DBox box = tr * s->shape ().bbox ();
+            v = compute_alignment_vector (prim_box, box, m_distribute_hmode, m_distribute_vmode);
+
+          } else {
+
+            db::DBox box = inst_bbox (tr, view (), s->cv_index (), s->back (), m_distribute_visible_layers);
+            v = compute_alignment_vector (prim_box, box, m_distribute_hmode, m_distribute_vmode);
+
+          }
+
+        }
+// @@@
+
+        tv.push_back (db::DCplxTrans (db::DTrans (v)));
+
+      }
+
+      //  use the "transform" method to transform the shapes and instances (with individual transformations)
+      (*es)->transform (db::DCplxTrans () /*dummy*/, &tv);
+
+    }
+
+    manager ()->commit ();
+
+  }
+}
+
+void
 MainService::cm_make_array ()
 {
   size_t n = 0;
@@ -2009,129 +2118,6 @@ MainService::cm_tap ()
 
   }
 }
-
-
-/**
- *  @brief An iterator for the selected objects of all edt services in a layout view
- */
-class EDT_PUBLIC SelectionIterator
-{
-public:
-  typedef lay::ObjectInstPath value_type;
-  typedef const lay::ObjectInstPath &reference;
-  typedef const lay::ObjectInstPath *pointer;
-
-  /**
-   *  @brief Creates a new iterator iterating over all selected edt objects from the given view
-   *
-   *  If "including_transient" is true, the transient selection will be used as fallback.
-   */
-  SelectionIterator (lay::LayoutView *view, bool including_transient = true)
-    : m_transient_mode (false)
-  {
-    mp_edt_services = view->get_plugins <edt::Service> ();
-
-    m_current_service = mp_edt_services.begin ();
-    if (m_current_service != mp_edt_services.end ()) {
-      m_current_object = (*m_current_service)->selection ().begin ();
-    }
-
-    next ();
-
-    if (at_end () && including_transient) {
-
-      m_transient_mode = true;
-
-      m_current_service = mp_edt_services.begin ();
-      if (m_current_service != mp_edt_services.end ()) {
-        m_current_object = (*m_current_service)->transient_selection ().begin ();
-      }
-
-      next ();
-
-    }
-  }
-
-  /**
-   *  @brief Returns a value indicating whether the transient selection is taken
-   */
-  bool is_transient () const
-  {
-    return m_transient_mode;
-  }
-
-  /**
-   *  @brief Increments the iterator
-   */
-  void operator++ ()
-  {
-    inc ();
-    next ();
-  }
-
-  /**
-   *  @brief Dereferencing
-   */
-  const lay::ObjectInstPath &operator* () const
-  {
-    tl_assert (! at_end ());
-    return *m_current_object;
-  }
-
-  /**
-   *  @brief Arrow operator
-   */
-  const lay::ObjectInstPath *operator-> () const
-  {
-    return & operator* ();
-  }
-
-  /**
-   *  @brief Returns a value indicating whether the iterator has finished
-   */
-  bool at_end () const
-  {
-    return m_current_service == mp_edt_services.end ();
-  }
-
-private:
-  void inc ()
-  {
-    tl_assert (! at_end ());
-    ++m_current_object;
-  }
-
-  void next ()
-  {
-    if (at_end ()) {
-      return;
-    }
-
-    const edt::Service::objects *sel = m_transient_mode ? &(*m_current_service)->transient_selection () : &(*m_current_service)->selection ();
-
-    while (m_current_object == sel->end ()) {
-
-      ++m_current_service;
-
-      if (m_current_service != mp_edt_services.end ()) {
-
-        sel = m_transient_mode ? &(*m_current_service)->transient_selection () : &(*m_current_service)->selection ();
-        m_current_object = sel->begin ();
-
-      } else {
-        break;
-      }
-
-    }
-  }
-
-private:
-  std::vector<edt::Service *> mp_edt_services;
-  std::vector<edt::Service *>::const_iterator m_current_service;
-  edt::Service::obj_iterator m_current_object;
-  bool m_transient_mode;
-};
-
 
 void 
 MainService::cm_change_layer ()

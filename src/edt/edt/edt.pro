@@ -42,7 +42,8 @@ FORMS = \
   PolygonPropertiesPage.ui \
   RoundCornerOptionsDialog.ui \
   TextPropertiesPage.ui \
-    PCellParametersDialog.ui
+    PCellParametersDialog.ui \
+    DistributeOptionsDialog.ui
 
 SOURCES = \
   edtConfig.cc \

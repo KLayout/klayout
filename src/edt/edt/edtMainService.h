@@ -51,6 +51,7 @@ class RoundCornerOptionsDialog;
 class MakeCellOptionsDialog;
 class MakeArrayOptionsDialog;
 class AlignOptionsDialog;
+class DistributeOptionsDialog;
 
 // -------------------------------------------------------------
 
@@ -154,6 +155,11 @@ public:
   void cm_align ();
 
   /**
+   *  @brief Distribute the selected shapes and instances
+   */
+  void cm_distribute ();
+
+  /**
    *  @brief Flatten instances
    */
   void cm_flatten_insts ();
@@ -205,6 +211,13 @@ private:
   int m_align_hmode;
   int m_align_vmode;
   bool m_align_visible_layers;
+  bool m_hdistribute;
+  int m_distribute_hmode;
+  double m_distribute_hpitch, m_distribute_hspace;
+  bool m_vdistribute;
+  int m_distribute_vmode;
+  double m_distribute_vpitch, m_distribute_vspace;
+  bool m_distribute_visible_layers;
   std::string m_make_cell_name;
   int m_origin_mode_x, m_origin_mode_y;
   bool m_origin_visible_layers_for_bbox;
@@ -215,6 +228,7 @@ private:
   bool m_undo_before_apply;
   edt::RoundCornerOptionsDialog *mp_round_corners_dialog;
   edt::AlignOptionsDialog *mp_align_options_dialog;
+  edt::DistributeOptionsDialog *mp_distribute_options_dialog;
   lay::FlattenInstOptionsDialog *mp_flatten_inst_options_dialog;
   edt::MakeCellOptionsDialog *mp_make_cell_options_dialog;
   edt::MakeArrayOptionsDialog *mp_make_array_options_dialog;
@@ -223,6 +237,7 @@ private:
   void check_no_guiding_shapes ();
   edt::RoundCornerOptionsDialog *round_corners_dialog ();
   edt::AlignOptionsDialog *align_options_dialog ();
+  edt::DistributeOptionsDialog *distribute_options_dialog ();
   lay::FlattenInstOptionsDialog *flatten_inst_options_dialog ();
   edt::MakeCellOptionsDialog *make_cell_options_dialog ();
   edt::MakeArrayOptionsDialog *make_array_options_dialog ();

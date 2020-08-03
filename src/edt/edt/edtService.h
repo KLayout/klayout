@@ -44,6 +44,10 @@
 #include <vector>
 #include <QColor>
 
+namespace lay {
+  class LayerPropertiesConstIterator;
+}
+
 namespace edt {
 
 class Service;
@@ -345,6 +349,11 @@ public:
   virtual void edit_cancel ();
 
   /**
+   *  @brief Triggered by tap - gives the new layer and if required the initial point
+   */
+  virtual void tap (const db::DPoint &initial);
+
+  /**
    *  @brief Delete the selected rulers
    *
    *  Used as implementation for "del" and "cut"
@@ -382,6 +391,11 @@ protected:
    *  @brief Update m_markers to reflect the selection
    */
   void selection_to_view ();
+
+  /**
+   *  @brief starts editing at the given point.
+   */
+  void begin_edit (const db::DPoint &p);
 
   /**
    *  @brief Reimplemented by the specific implementation of the shape editors
@@ -526,6 +540,11 @@ protected:
   unsigned int max_shapes_of_instances () const
   {
     return m_max_shapes_of_instances;
+  }
+
+  bool editing () const
+  {
+    return m_editing;
   }
 
 private:

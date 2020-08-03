@@ -32,6 +32,7 @@
 namespace lay
 {
   class CellView;
+  class LayerPropertiesConstIterator;
 }
 
 namespace edt
@@ -57,10 +58,11 @@ protected:
   db::Cell &cell () const              { return *mp_cell; }
   db::Layout &layout () const          { return *mp_layout; }
 
-  void do_mouse_move_inactive (const db::DPoint &p);
+  virtual void do_mouse_move_inactive (const db::DPoint &p);
+  virtual void tap (const db::DPoint &initial);
 
-  bool configure (const std::string &name, const std::string &value);
-  
+  virtual bool configure (const std::string &name, const std::string &value);
+
 protected:
   std::pair <bool, db::DPoint> interpolate (const db::DPoint &m, const db::DPoint &o, const db::DPoint &p) const;
   void deliver_shape (const db::Polygon &poly);

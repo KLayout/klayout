@@ -1997,9 +1997,16 @@ MainService::cm_tap ()
 
   QAction *action = menu->exec (mp);
   if (action) {
+
     int index = action->data ().toInt ();
     lay::LayerPropertiesConstIterator iter = tapped_layers [index];
     view ()->set_current_layer (iter);
+
+    edt::Service *es = dynamic_cast<edt::Service *> (view ()->view_object_widget ()->active_service ());
+    if (es) {
+      es->tap (pt);
+    }
+
   }
 }
 

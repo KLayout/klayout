@@ -710,8 +710,7 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
         //  in this mode, ignore exceptions here since it is rather annoying to have messages popping
         //  up then.
         try {
-          do_begin_edit (p);
-          m_editing = true;
+          begin_edit (p);
         } catch (...) {
           set_edit_marker (0);
         }
@@ -744,8 +743,7 @@ Service::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio
 
         view ()->cancel ();  //  cancel any pending edit operations and clear the selection
         set_edit_marker (0);
-        do_begin_edit (p);
-        m_editing = true;
+        begin_edit (p);
 
       } else {
         if (do_mouse_click (p)) {
@@ -1430,6 +1428,19 @@ Service::move_markers (const db::DTrans &t)
     m_move_trans = t;
 
   }
+}
+
+void
+Service::begin_edit (const db::DPoint &p)
+{
+  do_begin_edit (p);
+  m_editing = true;
+}
+
+void
+Service::tap (const db::DPoint & /*initial*/)
+{
+  //  .. nothing here ..
 }
 
 void 

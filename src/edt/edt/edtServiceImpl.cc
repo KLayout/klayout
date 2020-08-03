@@ -69,17 +69,18 @@ void
 ShapeEditService::get_edit_layer ()
 {
   lay::LayerPropertiesConstIterator cl = view ()->current_layer ();
+
   if (cl.is_null ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("Please select a layer first")));
   }
 
   if (! cl->visible (true)) {
     lay::TipDialog td (QApplication::activeWindow (),
-                       tl::to_string (QObject::tr ("You are about to draw on a hidden layer. The result won't be visible.")), 
+                       tl::to_string (QObject::tr ("You are about to draw on a hidden layer. The result won't be visible.")),
                        "drawing-on-invisible-layer");
     td.exec_dialog ();
   }
-  
+
   int cv_index = cl->cellview_index ();
   const lay::CellView &cv = view ()->cellview (cv_index);
   int layer = cl->layer_index ();
@@ -125,6 +126,16 @@ ShapeEditService::get_edit_layer ()
 
   if (mp_cell->is_proxy ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cannot put a shape into a PCell or library cell")));
+  }
+}
+
+void
+ShapeEditService::tap (const db::DPoint &initial)
+{
+  if (editing ()) {
+    get_edit_layer ();
+  } else {
+    begin_edit (initial);
   }
 }
 

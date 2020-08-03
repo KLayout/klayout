@@ -962,6 +962,35 @@ public:
     return m_view_objects_dismissed;
   }
 
+  /**
+   *  @brief Gets the current mouse position
+   */
+  QPoint mouse_position () const
+  {
+    return m_mouse_pos;
+  }
+
+  /**
+   *  @brief Gets the current mouse position in micrometer units
+   */
+  db::DPoint mouse_position_um () const
+  {
+    return pixel_to_um (m_mouse_pos);
+  }
+
+  /**
+   *  @brief Translates a screen coordinate in micrometer coordinates
+   */
+  db::DPoint pixel_to_um (const QPoint &pt) const;
+
+  /**
+   *  @brief Gets a flag indicating whether the mouse is inside the window
+   */
+  bool mouse_in_window () const
+  {
+    return m_mouse_inside;
+  }
+
 protected:
   /**
    *  @brief Qt focus event handler
@@ -1052,8 +1081,10 @@ private:
   bool m_mouse_pressed_state;
   unsigned int m_mouse_buttons;
   bool m_in_mouse_move;
+  bool m_mouse_inside;
   lay::Cursor::cursor_shape m_cursor, m_default_cursor;
 
+  void ensure_entered ();
   void do_mouse_move ();
   void begin_mouse_event (lay::Cursor::cursor_shape cursor = lay::Cursor::keep);
   void end_mouse_event ();

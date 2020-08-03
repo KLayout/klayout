@@ -61,36 +61,6 @@ namespace lay
 {
 
 // --------------------------------------------------------------------
-//  LCPTreeItemDelegate declaration & implementation
-
-/**
- *  @brief A layer tree widget helper class
- *
- *  A specialization of the ItemDelegate that bypasses the computation
- *  of sizeHint and returns the pixmap's size directly for higher
- *  performance.
- */
-
-class LCPItemDelegate : public QItemDelegate
-{
-public:
-  LCPItemDelegate (QWidget *parent) 
-    : QItemDelegate (parent)
-  { }
-
-private:
-  virtual QSize 
-  sizeHint (const QStyleOptionViewItem &style, const QModelIndex &index) const
-  {
-    if (index.column () == 0) {
-      return QSize (40, 16);
-    } else {
-      return QItemDelegate::sizeHint (style, index);
-    }
-  }
-};
-
-// --------------------------------------------------------------------
 //  LCPTreeWidget declaration & implementation
 
 LCPTreeWidget::LCPTreeWidget (QWidget *parent, lay::LayerTreeModel *model, const char *name)
@@ -98,7 +68,6 @@ LCPTreeWidget::LCPTreeWidget (QWidget *parent, lay::LayerTreeModel *model, const
 {
   setObjectName (QString::fromUtf8 (name));
   setModel (model);
-  setItemDelegate (new LCPItemDelegate (this));
 #if QT_VERSION >= 0x040200
   setAllColumnsShowFocus (true);
 #endif
@@ -326,7 +295,10 @@ LayerControlPanel::LayerControlPanel (lay::LayoutView *view, db::Manager *manage
 
   mp_model = new lay::LayerTreeModel (this, view);
   mp_layer_list = new LCPTreeWidget (this, mp_model, "layer_tree");
+  mp_layer_list->setUniformRowHeights (true);
   mp_model->set_font (mp_layer_list->font ());
+  mp_layer_list->setIconSize (mp_model->icon_size ());
+
   /*
    * At least with Qt 4.2.x setting uniform row heights has a strange side effect: 
    * If a range is selected and the first selection is scrolled out of view, the 
@@ -343,7 +315,6 @@ LayerControlPanel::LayerControlPanel (lay::LayoutView *view, db::Manager *manage
   mp_layer_list->header ()->hide ();
   mp_layer_list->setSelectionMode (QTreeView::ExtendedSelection);
   mp_layer_list->setRootIsDecorated (false);
-  mp_layer_list->setIconSize (QSize (32, 16));
   //  Custom resize mode makes the columns as narrow as possible
 #if QT_VERSION >= 0x050000
   mp_layer_list->header ()->setSectionResizeMode (QHeaderView::ResizeToContents);

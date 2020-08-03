@@ -62,7 +62,7 @@ static int inst_point_sel_tests = 10000;
 
 Finder::Finder (bool point_mode, bool top_level_sel)
   : m_min_level (0), m_max_level (0),
-    mp_layout (0), mp_view (0), m_cv_index (0), m_point_mode (point_mode), m_top_level_sel (top_level_sel)
+    mp_layout (0), mp_view (0), m_cv_index (0), m_point_mode (point_mode), m_catch_all (false), m_top_level_sel (top_level_sel)
 {
   m_distance = std::numeric_limits<double>::max ();
 }
@@ -558,41 +558,32 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const 
 
           if (match) {
 
+            lay::ObjectInstPath found;
+            found.set_cv_index (m_cv_index);
+            found.set_topcell (m_topcell);
+            found.assign_path (path ().begin (), path ().end ());
+            found.set_layer (*l);
+            found.set_shape (*shape);
+
             if (mp_excludes) {
 
               //  with an exclude list first create the selection item so we can check
               //  if it's part of the exclude set.
 
-              lay::ObjectInstPath found;
-              found.set_cv_index (m_cv_index);
-              found.set_topcell (m_topcell);
-              found.assign_path (path ().begin (), path ().end ());
-              found.set_layer (*l);
-              found.set_shape (*shape);
-
               //  in point mode just store the found object that has the least "distance" and is
               //  not in the exclude set
-              if (mp_excludes->find (found) == mp_excludes->end () && closer (d)) {
+              match = (mp_excludes->find (found) == mp_excludes->end ());
 
-                if (m_founds.empty ()) {
-                  m_founds.push_back (found);
-                } else {
-                  m_founds.front () = found;
-                }
-              }
+            }
 
-            } else if (closer (d)) {
+            if (match && (catch_all () || closer (d))) {
 
               //  in point mode just store that found that has the least "distance"
-              if (m_founds.empty ()) {
-                m_founds.push_back (lay::ObjectInstPath ());
+              if (m_founds.empty () || catch_all ()) {
+                m_founds.push_back (found);
               }
 
-              m_founds.back ().set_cv_index (m_cv_index);
-              m_founds.back ().set_topcell (m_topcell);
-              m_founds.back ().assign_path (path ().begin (), path ().end ());
-              m_founds.back ().set_layer (*l);
-              m_founds.back ().set_shape (*shape);
+              m_founds.back () = found;
 
             }
 
@@ -848,52 +839,38 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
 
           if (match) {
 
+            lay::ObjectInstPath found;
+            found.set_cv_index (m_cv_index);
+            found.set_topcell (m_topcell);
+            found.assign_path (path ().begin (), path ().end ());
+
+            //  add the selected instance as the last element of the path
+            db::InstElement el;
+            el.inst_ptr = *inst;
+            if (! m_full_arrays) {
+              el.array_inst = p;
+            }
+            found.add_path (el);
+
             if (mp_excludes) {
 
               //  with an exclude list first create the selection item so we can check
               //  if it's part of the exclude set.
 
-              lay::ObjectInstPath found;
-              found.set_cv_index (m_cv_index);
-              found.set_topcell (m_topcell);
-              found.assign_path (path ().begin (), path ().end ());
-
-              //  add the selected instance as the last element of the path
-              db::InstElement el;
-              el.inst_ptr = *inst;
-              if (! m_full_arrays) {
-                el.array_inst = p;
-              }
-              found.add_path (el);
-
               //  in point mode just store the found object that has the least "distance" and is
               //  not in the exclude set
-              if (mp_excludes->find (found) == mp_excludes->end () && closer (d)) {
-                if (m_founds.empty ()) {
-                  m_founds.push_back (found);
-                } else {
-                  m_founds.front () = found;
-                }
-              }
+              match = (mp_excludes->find (found) == mp_excludes->end ());
 
-            } else if (closer (d)) {
+            }
+
+            if (match && (catch_all () || closer (d))) {
 
               //  in point mode just store that found that has the least "distance"
-              if (m_founds.empty ()) {
+              if (m_founds.empty () || catch_all ()) {
                 m_founds.push_back (lay::ObjectInstPath ());
               }
 
-              m_founds.back ().set_cv_index (m_cv_index);
-              m_founds.back ().set_topcell (m_topcell);
-              m_founds.back ().assign_path (path ().begin (), path ().end ());
-
-              //  add the selected instance as the last element of the path
-              db::InstElement el;
-              el.inst_ptr = *inst;
-              if (! m_full_arrays) {
-                el.array_inst = p;
-              }
-              m_founds.back ().add_path (el);
+              m_founds.back () = found;
 
             }
 

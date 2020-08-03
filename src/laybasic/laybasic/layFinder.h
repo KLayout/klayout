@@ -58,12 +58,41 @@ public:
    *
    *  The point_mode is true, if the finder is supposed to operate in "point mode".
    *  In point mode, the center of the search region is the reference point. In 
-   *  non-point mode, every relevant found inside the search region should be 
-   *  recorded. 
+   *  non-point mode, every relevant found inside the search region will be
+   *  recorded (also see point_mode method).
    *  The base class implementation just stores this flag and provides a read
    *  accessor with the point_mode () method.
    */
   Finder (bool point_mode, bool top_level_sel);
+
+  /**
+   *  @brief Gets a flag indicating whether point mode is enabled
+   *  If point mode is enabled in the constructor, the first will check for objects overlapping the
+   *  point (rather than being inside the box) and by default select a single object only.
+   *  See also "set_catch_all".
+   */
+  bool point_mode () const
+  {
+    return m_point_mode;
+  }
+
+  /**
+   *  @brief Gets a flag indicating the capture all founds even in point mode
+   */
+  bool catch_all () const
+  {
+    return m_catch_all;
+  }
+
+  /**
+   *  @brief Sets a flag indicating the capture all founds even in point mode
+   *  By default, in point mode only the closest found is returned. To catch all
+   *  founds in point mode too, set this flag to true.
+   */
+  void set_catch_all (bool f)
+  {
+    m_catch_all = f;
+  }
 
   /**
    *  @brief Destructor (just provided to please the compiler)
@@ -85,11 +114,6 @@ protected:
   const std::vector<int> &layers () const
   {
     return m_layers;
-  }
-
-  bool point_mode () const
-  {
-    return m_point_mode;
   }
 
   const std::vector<db::InstElement> &path () const
@@ -166,6 +190,7 @@ private:
   std::vector<int> m_layers;
   double m_distance;
   bool m_point_mode;
+  bool m_catch_all;
   bool m_top_level_sel;
   db::box_convert <db::CellInst> m_box_convert;
   db::box_convert <db::Cell> m_cell_box_convert;

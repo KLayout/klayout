@@ -105,6 +105,16 @@ public:
   virtual QModelIndex parent (const QModelIndex &index) const;
 
   /**
+   *  @brief Provides an icon for a given layer style
+   */
+  static QIcon icon_for_layer (const lay::LayerPropertiesConstIterator &iter, lay::LayoutView *view, unsigned int w, unsigned int h, unsigned int di_offset, bool no_state = false);
+
+  /**
+   *  @brief Gets the preferred icon size
+   */
+  QSize icon_size () const;
+
+  /**
    *  @brief Convert a lay::LayerPropertiesConstIterator to a QModelIndex
    */
   QModelIndex index (lay::LayerPropertiesConstIterator iter, int column) const;

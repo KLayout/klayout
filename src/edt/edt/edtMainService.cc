@@ -30,7 +30,11 @@
 #include "tlExceptions.h"
 #include "layLayoutView.h"
 #include "layDialogs.h"
+#include "laySelector.h"
 #include "layCellSelectionForm.h"
+#include "layFinder.h"
+#include "layLayerProperties.h"
+#include "layLayerTreeModel.h"
 #include "tlProgress.h"
 #include "edtPlugin.h"
 #include "edtMainService.h"
@@ -41,6 +45,8 @@
 #include "edtEditorOptionsPages.h"
 
 #include <QMessageBox>
+#include <QFontInfo>
+#include <QWidgetAction>
 
 namespace edt
 {
@@ -1941,20 +1947,59 @@ MainService::cm_make_array ()
 void 
 MainService::cm_tap ()
 {
-  tl_assert (view ()->is_editable ());
-  check_no_guiding_shapes ();
+  if (! view ()->view_object_widget ()->mouse_in_window ()) {
+    return;
+  }
 
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+  lay::ShapeFinder finder (true /*point mode*/, false /*all hierarchy levels*/, db::ShapeIterator::All, 0);
 
-  //  get (common) cellview index of the selected shapes
-  for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
-      const lay::CellView &cv = view ()->cellview (s->cv_index ());
-      if (cv.is_valid () && ! s->is_cell_inst ()) {
-        view ()->set_current_layer (s->cv_index (), cv->layout ().get_properties (s->layer ()));
-        return;
-      }
+  //  capture all objects in point mode (default: capture one only)
+  finder.set_catch_all (true);
+
+  //  go through all visible layers of all cellviews
+  db::DPoint pt = view ()->view_object_widget ()->mouse_position_um ();
+  finder.find (view (), db::DBox (pt, pt));
+
+  std::set<std::pair<unsigned int, unsigned int> > layers_in_selection;
+
+  for (lay::ShapeFinder::iterator f = finder.begin (); f != finder.end (); ++f) {
+    //  ignore guiding shapes
+    if (f->layer () != view ()->cellview (f->cv_index ())->layout ().guiding_shape_layer ()) {
+      layers_in_selection.insert (std::make_pair (f->cv_index (), f->layer ()));
     }
+  }
+
+  std::vector<lay::LayerPropertiesConstIterator> tapped_layers;
+  for (lay::LayerPropertiesConstIterator lp = view ()->begin_layers (view ()->current_layer_list ()); ! lp.at_end (); ++lp) {
+    const lay::LayerPropertiesNode *ln = lp.operator-> ();
+    if (layers_in_selection.find (std::make_pair ((unsigned int) ln->cellview_index (), (unsigned int) ln->layer_index ())) != layers_in_selection.end ()) {
+      tapped_layers.push_back (lp);
+    }
+  }
+
+  if (tapped_layers.empty ()) {
+    return;
+  }
+
+  //  List the layers under the cursor as pop up a menu
+
+  std::auto_ptr<QMenu> menu (new QMenu (view ()));
+  menu->show ();
+
+  int icon_size = menu->style ()->pixelMetric (QStyle::PM_ButtonIconSize);
+
+  QPoint mp = view ()->view_object_widget ()->mapToGlobal (view ()->view_object_widget ()->mouse_position ());
+
+  for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = tapped_layers.begin (); l != tapped_layers.end (); ++l) {
+    QAction *a = menu->addAction (lay::LayerTreeModel::icon_for_layer (*l, view (), icon_size, icon_size, 0, true), tl::to_qstring ((*l)->source (true).to_string ()));
+    a->setData (int (l - tapped_layers.begin ()));
+  }
+
+  QAction *action = menu->exec (mp);
+  if (action) {
+    int index = action->data ().toInt ();
+    lay::LayerPropertiesConstIterator iter = tapped_layers [index];
+    view ()->set_current_layer (iter);
   }
 }
 

@@ -25,6 +25,8 @@
 #ifndef HDR_laySelector
 #define HDR_laySelector
 
+#include "laybasicCommon.h"
+
 #include "layViewObject.h"
 #include "layEditable.h"
 
@@ -37,7 +39,7 @@ class RubberBox;
 class LayoutView;
 class LayoutCanvas;
 
-class SelectionService
+class LAYBASIC_PUBLIC SelectionService
   : public QObject,
     public lay::ViewService
 {
@@ -77,6 +79,7 @@ private:
   virtual void deactivated ();
 
   db::DPoint m_p1, m_p2;
+  db::DPoint m_current_position;
   lay::LayoutView *mp_view;
   lay::RubberBox *mp_box;
   unsigned int m_color;
@@ -86,6 +89,8 @@ private:
   bool m_hover_wait;
   db::DPoint m_hover_point;
   bool m_mouse_in_window;
+
+  void reset_box ();
 };
 
 }

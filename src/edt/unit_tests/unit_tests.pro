@@ -8,6 +8,7 @@ include($$PWD/../../lib_ut.pri)
 
 SOURCES = \
   edtBasicTests.cc \
+    edtDistributeTests.cc
 
 INCLUDEPATH += $$EDT_INC $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC
 DEPENDPATH += $$EDT_INC $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC

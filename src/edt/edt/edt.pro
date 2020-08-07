@@ -21,7 +21,8 @@ HEADERS = \
   edtServiceImpl.h \
   edtUtils.h \
     edtCommon.h \
-    edtPCellParametersDialog.h
+    edtPCellParametersDialog.h \
+    edtDistribute.h
 
 FORMS = \
   AlignOptionsDialog.ui \
@@ -60,7 +61,8 @@ SOURCES = \
   edtServiceImpl.cc \
   edtUtils.cc \
   gsiDeclEdt.cc \
-    edtPCellParametersDialog.cc
+    edtPCellParametersDialog.cc \
+    edtDistribute.cc
 
 INCLUDEPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC

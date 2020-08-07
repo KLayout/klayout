@@ -43,6 +43,7 @@
 #include "edtConfig.h"
 #include "edtDialogs.h"
 #include "edtEditorOptionsPages.h"
+#include "edtDistribute.h"
 
 #include <QMessageBox>
 #include <QFontInfo>
@@ -1872,73 +1873,86 @@ MainService::cm_distribute ()
     return;
   }
 
-  db::DBox prim_box;
-  bool has_secondary = false;
+  if (! m_hdistribute && ! m_vdistribute) {
+    return;
+  }
 
-  //  get (common) bbox index of the primary selection
+  //  count the items
+  size_t n = 0;
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
     for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+      ++n;
+    }
+  }
 
-      if (s->seq () == 0) {
+  std::vector<std::pair<size_t, size_t> > objects_for_service;
+  std::vector<db::DCplxTrans> transformations;
+
+  {
+
+    std::vector<db::DBox> org_boxes;
+    org_boxes.reserve (n);
+
+    edt::distributed_placer<db::DBox, size_t> placer;
+    placer.reserve (n);
+
+    size_t i = 0;
+
+    for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
+
+      objects_for_service.push_back (std::make_pair (i, i));
+
+      for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
 
         const db::Layout &layout = view ()->cellview (s->cv_index ())->layout ();
         db::CplxTrans tr = db::CplxTrans (layout.dbu ()) * s->trans ();
 
+        db::DBox box;
         if (! s->is_cell_inst ()) {
-          prim_box += tr * s->shape ().bbox ();
+          box = tr * s->shape ().bbox ();
         } else {
-          prim_box += inst_bbox (tr, view (), s->cv_index (), s->back (), m_distribute_visible_layers);
+          box = inst_bbox (tr, view (), s->cv_index (), s->back (), m_distribute_visible_layers);
         }
 
-      } else {
-        has_secondary = true;
+        org_boxes.push_back (box);
+        placer.insert (box, i);
+
+        ++i;
+
       }
+
+      objects_for_service.back ().second = i;
 
     }
+
+    if (m_hdistribute && m_vdistribute) {
+      placer.distribute_matrix (int (m_distribute_hmode - 2), m_distribute_hpitch, m_distribute_hspace,
+                                2 - int (m_distribute_vmode), m_distribute_vpitch, m_distribute_vspace);
+    } else if (m_hdistribute) {
+      placer.distribute_h (int (m_distribute_hmode - 2), m_distribute_hpitch, m_distribute_hspace);
+    } else if (m_vdistribute) {
+      placer.distribute_v (2 - int (m_distribute_vmode), m_distribute_vpitch, m_distribute_vspace);
+    }
+
+    transformations.resize (org_boxes.size ());
+
+    for (edt::distributed_placer<db::DBox, size_t>::iterator i = placer.begin (); i != placer.end (); ++i) {
+      transformations[i->second] = db::DCplxTrans (i->first.p1 () - org_boxes[i->second].p1 ());
+    }
+
   }
 
-  if (! prim_box.empty ()) {
-
+  {
     view ()->cancel_edits ();
-    manager ()->transaction (tl::to_string (QObject::tr ("Alignment")));
+    manager ()->transaction (tl::to_string (QObject::tr ("Distribution")));
 
-
-
-    //  do the alignment
+    //  do the distribution
     for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
 
+      size_t ie = es - edt_services.begin ();
+
       //  create a transformation vector that describes each shape's transformation
-      std::vector <db::DCplxTrans> tv;
-      tv.reserve ((*es)->selection ().size ());
-
-      for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
-
-        db::DVector v;
-
-// @@@
-        if (s->seq () > 0 || !has_secondary) {
-
-          db::Layout &layout = view ()->cellview (s->cv_index ())->layout ();
-          db::CplxTrans tr = db::CplxTrans (layout.dbu ()) * s->trans ();
-
-          if (! s->is_cell_inst ()) {
-
-            db::DBox box = tr * s->shape ().bbox ();
-            v = compute_alignment_vector (prim_box, box, m_distribute_hmode, m_distribute_vmode);
-
-          } else {
-
-            db::DBox box = inst_bbox (tr, view (), s->cv_index (), s->back (), m_distribute_visible_layers);
-            v = compute_alignment_vector (prim_box, box, m_distribute_hmode, m_distribute_vmode);
-
-          }
-
-        }
-// @@@
-
-        tv.push_back (db::DCplxTrans (db::DTrans (v)));
-
-      }
+      std::vector <db::DCplxTrans> tv (transformations.begin () + objects_for_service [ie].first, transformations.begin () + objects_for_service [ie].second);
 
       //  use the "transform" method to transform the shapes and instances (with individual transformations)
       (*es)->transform (db::DCplxTrans () /*dummy*/, &tv);

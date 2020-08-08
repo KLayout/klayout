@@ -122,6 +122,21 @@ void do_bin (typename std::vector<std::pair<Box, size_t> >::const_iterator b, ty
   }
 }
 
+/**
+ * @brief Computes the effective box width (rounded to pitch, space added)
+ */
+template <class Box, bool horizontal>
+inline typename Box::coord_type eff_dim (const Box &box, typename Box::coord_type pitch, typename Box::coord_type space)
+{
+  typedef typename Box::coord_type coord_type;
+
+  coord_type d = (horizontal ? box.width () : box.height ()) + space;
+  if (pitch > 0) {
+    d = db::coord_traits<coord_type>::rounded (ceil (double (d) / double (pitch) - 1e-10) * double (pitch));
+  }
+  return d;
+}
+
 template <class Coord>
 struct max_coord_join_op
 {
@@ -130,128 +145,6 @@ struct max_coord_join_op
     a = std::max (a, b);
   }
 };
-
-/**
- *  @brief Computes the actual row/columns positions starting from 0
- *  The positions are the "low" side positions of the boxes (ref = -1)
- */
-template <class Box, class Objects, bool horizontally>
-void compute_positions (int ref, typename Box::coord_type pitch, typename Box::coord_type space, std::vector<std::vector<size_t> > &bins, Objects &objects)
-{
-  typedef typename Box::coord_type coord_type;
-
-  tl::interval_map<coord_type, coord_type> limits;
-
-  coord_type min, max;
-  bool first = true;
-  for (typename Objects::const_iterator o = objects.begin (); o != objects.end (); ++o) {
-    coord_type b1 = box_position<Box, ! horizontally> (o->first, -1);
-    coord_type b2 = box_position<Box, ! horizontally> (o->first, 1);
-    if (first) {
-      min = b1;
-      max = b2;
-      first = false;
-    } else {
-      min = std::min (min, b1);
-      max = std::max (max, b1);
-    }
-  }
-
-  max_coord_join_op<coord_type> join_op;
-
-  limits.add (min, max, (coord_type) 0, join_op);
-
-  //  Determines the next column/row's position as the minimum position which is compatible with
-  //  the space constraint.
-
-  coord_type prev_bin_end = 0;
-  bool prev_bin_end_set = false;
-
-  for (std::vector<std::vector<size_t> >::const_iterator b = bins.begin (); b != bins.end (); ++b) {
-
-    coord_type min_pos = 1;
-    coord_type bin_end = prev_bin_end;
-    bool bin_end_set = prev_bin_end_set;
-
-    coord_type max_limit = 0;
-    for (typename tl::interval_map<coord_type, coord_type>::const_iterator j = limits.begin (); j != limits.end (); ++j) {
-      max_limit = std::max (max_limit, j->second);
-    }
-
-    for (std::vector<size_t>::const_iterator i = b->begin (); i != b->end (); ++i) {
-
-      const Box &box = objects [*i].first;
-
-      coord_type b1 = box_position<Box, ! horizontally> (box, -1);
-      coord_type b2 = box_position<Box, ! horizontally> (box, 1);
-
-      coord_type start = box_position<Box, horizontally> (box, -1);
-      coord_type ref_pos = box_position<Box, horizontally> (box, ref);
-      coord_type end_pos = box_position<Box, horizontally> (box, 1);
-
-      bin_end = bin_end_set ? std::max (end_pos, bin_end) : end_pos;
-      bin_end_set = true;
-
-      if (prev_bin_end_set && db::coord_traits<coord_type>::less (start, prev_bin_end)) {
-
-        //  for boxes overlapping into the previous bin try to shift them into the previous bin
-        for (typename tl::interval_map<coord_type, coord_type>::const_iterator j = limits.find (b1); j != limits.end () && db::coord_traits<coord_type>::less (j->first.first, b2); ++j) {
-          if (db::coord_traits<coord_type>::less (b1, j->first.second)) {
-            min_pos = std::max (min_pos, j->second + space + (ref_pos - start));
-          }
-        }
-
-      } else {
-
-        //  otherwise separate the bins
-        min_pos = std::max (min_pos, max_limit + space + (ref_pos - start));
-
-      }
-
-    }
-
-    prev_bin_end = bin_end;
-    prev_bin_end_set = bin_end_set;
-
-    if (pitch > 0) {
-      min_pos = db::coord_traits<coord_type>::rounded (ceil (double (min_pos) / double (pitch) - 1e-10) * double (pitch));
-    }
-
-    for (std::vector<size_t>::const_iterator i = b->begin (); i != b->end (); ++i) {
-
-      Box &box = objects [*i].first;
-
-      coord_type b1 = box_position<Box, ! horizontally> (box, -1);
-      coord_type b2 = box_position<Box, ! horizontally> (box, 1);
-
-      coord_type start = box_position<Box, horizontally> (box, -1);
-      coord_type ref_pos = box_position<Box, horizontally> (box, ref);
-      coord_type end_pos = box_position<Box, horizontally> (box, 1);
-
-      //  because multiple objects may fall into one bin we need to look up again:
-      coord_type pos = min_pos;
-      for (typename tl::interval_map<coord_type, coord_type>::const_iterator j = limits.find (b1); j != limits.end () && db::coord_traits<coord_type>::less (j->first.first, b2); ++j) {
-        if (db::coord_traits<coord_type>::less (b1, j->first.second)) {
-          pos = std::max (pos, j->second + space + (ref_pos - start));
-        }
-      }
-
-      if (pitch > 0 && ! db::coord_traits<coord_type>::equal (pos, min_pos)) {
-        pos = db::coord_traits<coord_type>::rounded (ceil (double (pos) / double (pitch) - 1e-10) * double (pitch));
-      }
-
-      if (horizontally) {
-        box.move (db::vector<coord_type> (pos - ref_pos, 0));
-      } else {
-        box.move (db::vector<coord_type> (0, pos - ref_pos));
-      }
-
-      limits.add (b1, b2, pos + (end_pos - ref_pos), join_op);
-
-    }
-
-  }
-}
 
 /**
  *  @brief Implements an algorithm for 2d-distributing rectangular objects
@@ -374,6 +267,8 @@ public:
     std::sort (indexed_boxes.begin (), indexed_boxes.end (), box_compare<Box, size_t, false> (vref));
     do_bin<Box, false> (indexed_boxes.begin (), indexed_boxes.end (), vref, vbins);
 
+    //  rewrite the bins to cell occupation lists
+
     std::vector<std::vector<std::vector<size_t> > > cells;
 
     cells.resize (hbins.size ());
@@ -399,31 +294,23 @@ public:
 
     }
 
+    //  initialize the cell widths
+
     std::vector<coord_type> cell_widths, cell_heights;
     cell_widths.resize (hbins.size (), 0);
     cell_heights.resize (vbins.size (), 0);
+
+    //  compute the cell widths as the maximum of the content
 
     for (std::vector<std::vector<std::vector<size_t> > >::const_iterator i = cells.begin (); i != cells.end (); ++i) {
 
       for (std::vector<std::vector<size_t> >::const_iterator j = i->begin (); j != i->end (); ++j) {
 
         coord_type wcell = 0, hcell = 0;
-
         for (std::vector<size_t>::const_iterator k = j->begin (); k != j->end (); ++k) {
-
-          coord_type w = m_objects [*k].first.width () + hspace;
-          if (hpitch > 0) {
-            w = db::coord_traits<coord_type>::rounded (ceil (double (w) / double (hpitch) - 1e-10) * double (hpitch));
-          }
           //  NOTE: intra-cell objects are distributed horizontally
-          wcell += w;
-
-          coord_type h = m_objects [*k].first.height () + vspace;
-          if (vpitch > 0) {
-            h = db::coord_traits<coord_type>::rounded (ceil (double (h) / double (vpitch) - 1e-10) * double (vpitch));
-          }
-          hcell = std::max (hcell, h);
-
+          wcell += eff_dim<Box, true> (m_objects [*k].first, hpitch, hspace);
+          hcell = std::max (hcell, eff_dim<Box, false> (m_objects [*k].first, vpitch, vspace));
         }
 
         cell_widths [i - cells.begin ()] = std::max (cell_widths [i - cells.begin ()], wcell);
@@ -432,6 +319,8 @@ public:
       }
 
     }
+
+    //  Compute the columns and row positions
 
     std::vector<coord_type> cell_xpos, cell_ypos;
     cell_xpos.reserve (cell_widths.size ());
@@ -447,21 +336,16 @@ public:
       y += *i;
     }
 
+    //  Compute the actual coordinates of the objects inside the cells
+
     for (std::vector<std::vector<std::vector<size_t> > >::const_iterator i = cells.begin (); i != cells.end (); ++i) {
 
       for (std::vector<std::vector<size_t> >::const_iterator j = i->begin (); j != i->end (); ++j) {
 
         coord_type wcell = 0;
-
         for (std::vector<size_t>::const_iterator k = j->begin (); k != j->end (); ++k) {
-
-          coord_type w = m_objects [*k].first.width () + hspace;
-          if (hpitch > 0) {
-            w = db::coord_traits<coord_type>::rounded (ceil (double (w) / double (hpitch) - 1e-10) * double (hpitch));
-          }
           //  NOTE: intra-cell objects are distributed horizontally
-          wcell += w;
-
+          wcell += eff_dim<Box, true> (m_objects [*k].first, hpitch, hspace);
         }
 
         coord_type x = cell_xpos [i - cells.begin ()];
@@ -473,15 +357,8 @@ public:
 
         for (std::vector<size_t>::const_iterator k = j->begin (); k != j->end (); ++k) {
 
-          coord_type w = m_objects [*k].first.width () + hspace;
-          if (hpitch > 0) {
-            w = db::coord_traits<coord_type>::rounded (ceil (double (w) / double (hpitch) - 1e-10) * double (hpitch));
-          }
-
-          coord_type h = m_objects [*k].first.height () + vspace;
-          if (vpitch > 0) {
-            h = db::coord_traits<coord_type>::rounded (ceil (double (h) / double (vpitch) - 1e-10) * double (vpitch));
-          }
+          coord_type w = eff_dim<Box, true> (m_objects [*k].first, hpitch, hspace);
+          coord_type h = eff_dim<Box, false> (m_objects [*k].first, vpitch, vspace);
 
           coord_type y = cell_ypos [j - i->begin ()];
           if (vref == 0) {

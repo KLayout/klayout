@@ -467,6 +467,12 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This constant has been introduced in version 0.27.\n"
   ) +
+  gsi::constant ("LV_NoEditorOptionsPanel", (unsigned int) lay::LayoutView::LV_NoEditorOptionsPanel,
+    "@brief With this option, no editor options panel will be provided (see \\editor_options_frame)\n"
+    "Use this value with the constructor's 'options' argument.\n"
+    "\n"
+    "This constant has been introduced in version 0.27.\n"
+  ) +
   gsi::constant ("LV_NoBookmarksView", (unsigned int) lay::LayoutView::LV_NoBookmarksView,
     "@brief With this option, no bookmarks view will be provided (see \\bookmarks_frame)\n"
     "Use this value with the constructor's 'options' argument.\n"

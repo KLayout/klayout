@@ -390,6 +390,7 @@ LayoutView::init (db::Manager *mgr, QWidget * /*parent*/)
   mp_libraries_view = 0;
   mp_bookmarks_view = 0;
   mp_libraries_frame = 0;
+  mp_editor_options_frame = 0;
   mp_bookmarks_frame = 0;
   mp_min_hier_spbx = 0;
   mp_max_hier_spbx = 0;
@@ -557,6 +558,20 @@ LayoutView::init (db::Manager *mgr, QWidget * /*parent*/)
 
   }
 
+  if (is_editable () && (m_options & LV_NoEditorOptionsPanel) == 0 && (m_options & LV_Naked) == 0) {
+
+    QFrame *editor_options_frame = new QFrame (0);
+    editor_options_frame->setObjectName (QString::fromUtf8 ("editor_options_frame"));
+    mp_editor_options_frame = editor_options_frame;
+
+    QVBoxLayout *left_frame_ly = new QVBoxLayout (editor_options_frame);
+    left_frame_ly->setMargin (0);
+    left_frame_ly->setSpacing (0);
+
+    connect (mp_editor_options_frame, SIGNAL (destroyed ()), this, SLOT (side_panel_destroyed ()));
+
+  }
+
   //  occupy services and editables:
   //  these services get deleted by the canvas destructor automatically:
   if ((m_options & LV_NoTracker) == 0) {
@@ -686,6 +701,11 @@ LayoutView::~LayoutView ()
   mp_libraries_frame = 0;
   mp_libraries_view = 0;
 
+  if (mp_editor_options_frame) {
+    delete mp_editor_options_frame;
+  }
+  mp_editor_options_frame = 0;
+
   if (mp_bookmarks_frame) {
     delete mp_bookmarks_frame;
   }
@@ -709,6 +729,8 @@ void LayoutView::side_panel_destroyed ()
   } else if (sender () == mp_libraries_frame) {
     mp_libraries_frame = 0;
     mp_libraries_view = 0;
+  } else if (sender () == mp_editor_options_frame) {
+    mp_editor_options_frame = 0;
   } else if (sender () == mp_bookmarks_frame) {
     mp_bookmarks_frame = 0;
     mp_bookmarks_view = 0;

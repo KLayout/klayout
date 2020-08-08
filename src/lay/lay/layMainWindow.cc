@@ -500,6 +500,14 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
   connect (mp_libs_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
   m_libs_visible = true;
 
+  mp_eo_dock_widget = new QDockWidget (QObject::tr ("Editor Options"), this);
+  mp_eo_dock_widget->hide ();
+  mp_eo_dock_widget->setObjectName (QString::fromUtf8 ("eo_dock_widget"));
+  mp_eo_stack = new ControlWidgetStack (mp_eo_dock_widget, "eo_stack");
+  mp_eo_dock_widget->setWidget (mp_eo_stack);
+  connect (mp_eo_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
+  m_eo_visible = false;
+
   mp_bm_dock_widget = new QDockWidget (QObject::tr ("Bookmarks"), this);
   mp_bm_dock_widget->setObjectName (QString::fromUtf8 ("bookmarks_dock_widget"));
   mp_bm_stack = new ControlWidgetStack (mp_bm_dock_widget, "bookmarks_stack");
@@ -539,6 +547,7 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
   addDockWidget(Qt::LeftDockWidgetArea, mp_navigator_dock_widget);
   addDockWidget(Qt::LeftDockWidgetArea, mp_hp_dock_widget);
   addDockWidget(Qt::LeftDockWidgetArea, mp_libs_dock_widget);
+  addDockWidget(Qt::LeftDockWidgetArea, mp_eo_dock_widget);
   addDockWidget(Qt::RightDockWidgetArea, mp_bm_dock_widget);
   addDockWidget(Qt::RightDockWidgetArea, mp_lp_dock_widget);
   addDockWidget(Qt::RightDockWidgetArea, mp_layer_toolbox_dock_widget);
@@ -925,6 +934,7 @@ MainWindow::close_all ()
     mp_lp_stack->removeWidget (mp_views.size ());
     mp_hp_stack->removeWidget (mp_views.size ());
     mp_libs_stack->removeWidget (mp_views.size ());
+    mp_eo_stack->removeWidget (mp_views.size ());
     mp_bm_stack->removeWidget (mp_views.size ());
     mp_view_stack->removeWidget (mp_views.size ());
 
@@ -1518,6 +1528,12 @@ MainWindow::update_dock_widget_state ()
     mp_libs_dock_widget->hide ();
   }
 
+  if (m_eo_visible) {
+    mp_eo_dock_widget->show ();
+  } else {
+    mp_eo_dock_widget->hide ();
+  }
+
   if (m_bm_visible) {
     mp_bm_dock_widget->show ();
   } else {
@@ -1853,6 +1869,30 @@ MainWindow::select_mode (int m)
       if (a->is_checkable() && a->is_for_mode (m_mode)) {
         a->set_checked (true);
         break;
+      }
+    }
+
+    //  if the current mode supports editing, show the editor options panel
+
+    const lay::PluginDeclaration *pd_sel = 0;
+    for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+      const lay::PluginDeclaration *pd = cls.operator-> ();
+      if (pd->id () == m_mode) {
+        pd_sel = pd;
+      }
+    }
+
+    bool editable = false;
+    if (pd_sel) {
+      editable = pd_sel->editable_enabled ();
+    }
+
+    if (editable != m_eo_visible) {
+      m_eo_visible = editable;
+      if (m_eo_visible) {
+        mp_eo_dock_widget->show ();
+      } else {
+        mp_eo_dock_widget->hide ();
       }
     }
 
@@ -2526,6 +2566,7 @@ MainWindow::select_view (int index)
       mp_hp_stack->raiseWidget (index);
       mp_lp_stack->raiseWidget (index);
       mp_libs_stack->raiseWidget (index);
+      mp_eo_stack->raiseWidget (index);
       mp_bm_stack->raiseWidget (index);
       mp_setup_form->setup ();
 
@@ -2717,6 +2758,7 @@ MainWindow::clone_current_view ()
   mp_lp_stack->addWidget (view->layer_control_frame ());
   mp_hp_stack->addWidget (view->hierarchy_control_frame ());
   mp_libs_stack->addWidget (view->libraries_frame ());
+  mp_eo_stack->addWidget (view->editor_options_frame ());
   mp_bm_stack->addWidget (view->bookmarks_frame ());
 
   bool f = m_disable_tab_selected;
@@ -2965,6 +3007,7 @@ MainWindow::close_view (int index)
       mp_lp_stack->removeWidget (index);
       mp_hp_stack->removeWidget (index);
       mp_libs_stack->removeWidget (index);
+      mp_eo_stack->removeWidget (index);
       mp_bm_stack->removeWidget (index);
 
       view_closed_event (int (index));
@@ -3286,6 +3329,7 @@ MainWindow::create_view ()
   mp_lp_stack->addWidget (mp_views.back ()->layer_control_frame ());
   mp_hp_stack->addWidget (mp_views.back ()->hierarchy_control_frame ());
   mp_libs_stack->addWidget (mp_views.back ()->libraries_frame ());
+  mp_eo_stack->addWidget (mp_views.back ()->editor_options_frame ());
   mp_bm_stack->addWidget (mp_views.back ()->bookmarks_frame ());
 
   bool f = m_disable_tab_selected;
@@ -3349,6 +3393,7 @@ MainWindow::create_or_load_layout (const std::string *filename, const db::LoadLa
       mp_lp_stack->addWidget (mp_views.back ()->layer_control_frame ());
       mp_hp_stack->addWidget (mp_views.back ()->hierarchy_control_frame ());
       mp_libs_stack->addWidget (mp_views.back ()->libraries_frame ());
+      mp_eo_stack->addWidget (mp_views.back ()->editor_options_frame ());
       mp_bm_stack->addWidget (mp_views.back ()->bookmarks_frame ());
 
       bool f = m_disable_tab_selected;
@@ -3824,6 +3869,13 @@ MainWindow::menu_activated (const std::string &symbol)
     cm_help_about ();
   } else if (symbol == "cm_help_about_qt") {
     cm_help_about_qt ();
+  } else if (symbol == "cm_edit_options") {
+
+    if (!m_eo_visible) {
+      mp_eo_dock_widget->show ();
+      m_eo_visible = true;
+    }
+
   } else {
 
     //  Try the plugin declarations
@@ -4188,6 +4240,10 @@ public:
     menu_entries.push_back (lay::submenu ("help_menu", at, tl::to_string (QObject::tr ("&Help"))));
     menu_entries.push_back (lay::submenu ("@secrets", at, tl::to_string (QObject::tr ("Secret Features"))));
     menu_entries.push_back (lay::submenu ("@toolbar", at, std::string ()));
+
+    at = "edit_menu.end";
+    menu_entries.push_back (lay::separator ("edit_options_group:edit_mode", "edit_menu.end"));
+    menu_entries.push_back (lay::menu_item ("cm_edit_options", "edit_options:edit_mode", "edit_menu.end", tl::to_string (QObject::tr ("Editor Options")) + "(F3)"));
 
     at = "file_menu.end";
     menu_entries.push_back (lay::menu_item ("cm_new_layout", "new_layout:edit:edit_mode", at, tl::to_string (QObject::tr ("New Layout"))));

@@ -752,7 +752,7 @@ TextService::do_activated ()
   //  Show editor options dialog to allow entering of width
   std::vector<edt::MainService *> edt_main_services = view ()->get_plugins <edt::MainService> ();
   if (edt_main_services.size () > 0) {
-    edt_main_services [0]->cm_edit_options ();
+    edt_main_services [0]->show_editor_options ();
   }
 
   return true;  //  start editing immediately
@@ -918,7 +918,7 @@ PathService::do_activated ()
   //  Show editor options dialog to allow entering of width
   std::vector<edt::MainService *> edt_main_services = view ()->get_plugins <edt::MainService> ();
   if (edt_main_services.size () > 0) {
-    edt_main_services [0]->cm_edit_options ();
+    edt_main_services [0]->show_editor_options ();
   }
 
   return false;  //  don't start editing immediately
@@ -1123,7 +1123,7 @@ InstService::do_activated ()
   //  Show editor options dialog to allow entering of parameters
   std::vector<edt::MainService *> edt_main_services = view ()->get_plugins <edt::MainService> ();
   if (edt_main_services.size () > 0) {
-    edt_main_services [0]->cm_edit_options ();
+    edt_main_services [0]->show_editor_options ();
   }
 
   m_cv_index = view ()->active_cellview_index ();

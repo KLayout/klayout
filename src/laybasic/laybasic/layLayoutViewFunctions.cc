@@ -2065,7 +2065,7 @@ public:
     menu_entries.push_back (lay::menu_item ("cm_select_next_item", "select_next_item:edit", at, tl::to_string (QObject::tr ("Select Next Item(Space)"))));
     menu_entries.push_back (lay::menu_item ("cm_select_next_item_add", "select_next_item_add:edit", at, tl::to_string (QObject::tr ("Select Next Item too(Shift+Space)"))));
 
-    at = "edit_menu.end";
+    at = "edit_menu.edit_options_group";
     menu_entries.push_back (lay::menu_item ("cm_undo", "undo:edit", at, tl::to_string (QObject::tr ("Undo(Ctrl+Z)"))));
     menu_entries.push_back (lay::menu_item ("cm_redo", "redo:edit", at, tl::to_string (QObject::tr ("Redo(Ctrl+Y)"))));
 

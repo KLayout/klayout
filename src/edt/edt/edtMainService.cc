@@ -150,8 +150,6 @@ MainService::menu_activated (const std::string &symbol)
     cm_descend ();
   } else if (symbol == "edt::ascend") {
     cm_ascend ();
-  } else if (symbol == "edt::edit_options") {
-    cm_edit_options ();
   } else if (symbol == "edt::sel_align") {
     cm_align ();
   } else if (symbol == "edt::sel_distribute") {
@@ -2272,9 +2270,9 @@ MainService::cm_change_layer ()
 }
 
 void  
-MainService::cm_edit_options ()
+MainService::show_editor_options ()
 {
-  show_editor_options_dialog ();
+  show_editor_options_page (view ());
 }
 
 void

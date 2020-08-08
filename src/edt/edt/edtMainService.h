@@ -95,11 +95,6 @@ public:
   void cm_ascend ();
 
   /**
-   *  @brief Edit object options
-   */
-  void cm_edit_options ();
-
-  /**
    *  @brief Change the layer of the shapes in the selection
    */
   void cm_change_layer ();
@@ -193,6 +188,11 @@ public:
    *  @brief Tap operation
    */
   void cm_tap ();
+
+  /**
+   *  @brief Shows the editor options
+   */
+  void show_editor_options ();
 
   /** 
    *  @brief "paste" operation

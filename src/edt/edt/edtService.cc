@@ -795,22 +795,22 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 void
 Service::activated ()
 {
-  //  make all editor option pages visible
-  activate_service (plugin_declaration (), true);
-
   if (view ()->is_editable ()) {
     view ()->cancel ();  //  cancel any pending edit operations and clear the selection
     set_edit_marker (0);
     m_immediate = do_activated ();
     m_editing = false;
   }
+
+  //  make all editor option pages visible
+  activate_service (view (), plugin_declaration (), true);
 }
 
 void   
 Service::deactivated ()
 {
   //  make all editor option pages visible
-  activate_service (plugin_declaration (), false);
+  activate_service (view (), plugin_declaration (), false);
 
   edit_cancel ();
 

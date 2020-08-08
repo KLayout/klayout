@@ -30,7 +30,6 @@ FORMS = \
   CopyModeDialog.ui \
   ChangeLayerOptionsDialog.ui \
   EditablePathPropertiesPage.ui \
-  EditorOptionsDialog.ui \
   EditorOptionsGeneric.ui \
   EditorOptionsInst.ui \
   EditorOptionsPath.ui \

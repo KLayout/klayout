@@ -26,9 +26,11 @@
 
 #include <tlVariant.h>
 
-#include <QDialog>
+#include <QFrame>
 #include <vector>
 #include <string>
+
+class QTabWidget;
 
 namespace Ui
 {
@@ -87,26 +89,30 @@ private:
  *  @brief The object properties dialog
  */
 class EditorOptionsPages
-  : public QDialog
+  : public QFrame
 {
 Q_OBJECT
 
 public:
-  EditorOptionsPages (const std::vector<edt::EditorOptionsPage *> &pages, lay::Dispatcher *root);
+  EditorOptionsPages (QWidget *parent, const std::vector<edt::EditorOptionsPage *> &pages, lay::Dispatcher *root);
   ~EditorOptionsPages ();
 
   void unregister_page (edt::EditorOptionsPage *page);
   void activate_page (edt::EditorOptionsPage *page);
 
+  const std::vector <edt::EditorOptionsPage *> &pages () const
+  {
+    return m_pages;
+  }
+
 public slots:
   void apply ();
   void setup ();
-  void accept ();
 
 private:
   std::vector <edt::EditorOptionsPage *> m_pages;
-  Ui::EditorOptionsDialog *mp_ui;
   lay::Dispatcher *mp_root;
+  QTabWidget *mp_pages;
 
   void update (edt::EditorOptionsPage *page);
   void do_apply ();

@@ -31,6 +31,7 @@
 #include "edtEditorOptionsPages.h"
 
 #include <QApplication>
+#include <QLayout>
 
 namespace edt
 {
@@ -189,7 +190,7 @@ class MainPluginDeclaration
 {
 public:
   MainPluginDeclaration (const std::string &title)
-    : mp_root (0), m_title (title), mp_obj_prop_dialog (0)
+    : mp_root (0), m_title (title)
   {
     //  .. nothing yet ..
   }
@@ -218,8 +219,6 @@ public:
     menu_entries.push_back (lay::menu_item ("edt::descend", "descend", "zoom_menu.end", tl::to_string (QObject::tr ("Descend")) + "(Ctrl+D)"));
     menu_entries.push_back (lay::menu_item ("edt::ascend", "ascend", "zoom_menu.end", tl::to_string (QObject::tr ("Ascend")) + "(Ctrl+A)"));
 
-    menu_entries.push_back (lay::separator ("edit_options_group:edit_mode", "edit_menu.end"));
-    menu_entries.push_back (lay::menu_item ("edt::edit_options", "edit_options:edit_mode", "edit_menu.end", tl::to_string (QObject::tr ("Editor Options")) + "(F3)"));
     menu_entries.push_back (lay::menu_item ("edt::sel_make_array", "make_array:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Make Array"))));
     menu_entries.push_back (lay::separator ("selection_group:edit_mode", "edit_menu.selection_menu.end"));
     menu_entries.push_back (lay::menu_item ("edt::sel_change_layer", "change_layer:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Change Layer"))));
@@ -279,24 +278,6 @@ public:
 
     mp_root = root;
 
-    //  create the editor options dialog
-    m_prop_dialog_pages.push_back (new edt::EditorOptionsGeneric ());
-
-    for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-      const PluginDeclarationBase *pd_base = dynamic_cast<const PluginDeclarationBase *> (&*cls);
-      if (pd_base) {
-        pd_base->get_editor_options_pages (m_prop_dialog_pages, root);
-      }
-    }
-
-    mp_obj_prop_dialog = new edt::EditorOptionsPages (m_prop_dialog_pages, root);
-
-    for (std::vector<edt::EditorOptionsPage *>::const_iterator op = m_prop_dialog_pages.begin (); op != m_prop_dialog_pages.end (); ++op) {
-      if ((*op)->plugin_declaration () != 0) {
-        (*op)->activate (false);
-      }
-    }
-
     //  add entries to the combine mode dialog
     mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_add",   new lay::ConfigureAction (tl::to_string (QObject::tr ("Add<:/cm_add.png>{Add shapes}")),   cfg_edit_combine_mode, CMConverter ().to_string (CM_Add)));
     mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_merge", new lay::ConfigureAction (tl::to_string (QObject::tr ("Merge<:/cm_merge.png>{Merge shapes with background}")), cfg_edit_combine_mode, CMConverter ().to_string (CM_Merge)));
@@ -334,42 +315,6 @@ public:
     }
   }
 
-  virtual void uninitialize (lay::Dispatcher *)
-  {
-    if (mp_obj_prop_dialog) {
-      delete mp_obj_prop_dialog;
-      mp_obj_prop_dialog = 0;
-    }
-  }
-
-  virtual void config_finalize ()
-  {
-    if (mp_obj_prop_dialog && mp_obj_prop_dialog->isVisible ()) {
-      mp_obj_prop_dialog->setup ();
-    }
-  }
-
-  void show_dialog () const
-  {
-    if (mp_obj_prop_dialog) {
-      if (! mp_obj_prop_dialog->isVisible ()) {
-        mp_obj_prop_dialog->setup ();
-        mp_obj_prop_dialog->show ();
-      }
-      mp_obj_prop_dialog->activateWindow ();
-      mp_obj_prop_dialog->raise ();
-    }
-  }
-
-  void activate (const lay::PluginDeclaration *pd, bool active) const
-  {
-    for (std::vector<edt::EditorOptionsPage *>::const_iterator op = m_prop_dialog_pages.begin (); op != m_prop_dialog_pages.end (); ++op) {
-      if ((*op)->plugin_declaration () == pd) {
-        (*op)->activate (active);
-      }
-    }
-  }
-
   void initialized (lay::Dispatcher *root)
   {
     lay::Dispatcher *mp = lay::Dispatcher::instance ();
@@ -398,37 +343,62 @@ public:
 private:
   lay::Dispatcher *mp_root;
   std::string m_title;
-  edt::EditorOptionsPages *mp_obj_prop_dialog;
-  std::vector<edt::EditorOptionsPage *> m_prop_dialog_pages;
 };
 
+static tl::RegisteredClass<lay::PluginDeclaration> config_decl_main (new edt::MainPluginDeclaration (tl::to_string (QObject::tr ("Instances and shapes"))), 4000, "edt::MainService");
+
 void
-show_editor_options_dialog ()
+show_editor_options_page (lay::LayoutView *view)
 {
-  //  look for the plugin declaration and show the dialog
+  if (! view->editor_options_frame ()) {
+    return;
+  }
+
+  std::vector<edt::EditorOptionsPage *> prop_dialog_pages;
+  EditorOptionsGeneric *generic_opt = new EditorOptionsGeneric ();
+  generic_opt->setup (view->dispatcher ());
+  prop_dialog_pages.push_back (generic_opt);
+
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    const MainPluginDeclaration *main_pd = dynamic_cast<const MainPluginDeclaration *> (&*cls);
-    if (main_pd) {
-      main_pd->show_dialog ();
-      break;
+    const PluginDeclarationBase *pd_base = dynamic_cast<const PluginDeclarationBase *> (&*cls);
+    if (pd_base) {
+      pd_base->get_editor_options_pages (prop_dialog_pages, view->dispatcher ());
     }
   }
+
+  for (std::vector<edt::EditorOptionsPage *>::const_iterator op = prop_dialog_pages.begin (); op != prop_dialog_pages.end (); ++op) {
+    (*op)->activate (false);
+  }
+
+  QObjectList children = view->editor_options_frame ()->children ();
+  for (QObjectList::iterator c = children.begin (); c != children.end (); ++c) {
+    if (dynamic_cast<QWidget *> (*c)) {
+      delete *c;
+    }
+  }
+
+  edt::EditorOptionsPages *pages = new edt::EditorOptionsPages (view->editor_options_frame (), prop_dialog_pages, view->dispatcher ());
+  view->editor_options_frame ()->layout ()->addWidget (pages);
 }
 
 void 
-activate_service (const lay::PluginDeclaration *pd, bool active)
+activate_service (lay::LayoutView *view, const lay::PluginDeclaration *pd, bool active)
 {
-  //  look for the plugin declaration and show the dialog
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    const MainPluginDeclaration *main_pd = dynamic_cast<const MainPluginDeclaration *> (&*cls);
-    if (main_pd) {
-      main_pd->activate (pd, active);
-      break;
-    }
+  //  TODO: is there a better way to find the editor options pages?
+  edt::EditorOptionsPages *eo_pages = 0;
+  QObjectList children = view->editor_options_frame ()->children ();
+  for (QObjectList::iterator c = children.begin (); c != children.end () && !eo_pages; ++c) {
+    eo_pages = dynamic_cast<edt::EditorOptionsPages *> (*c);
+  }
+
+  if (!eo_pages) {
+    return;
+  }
+
+  for (std::vector<edt::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
+    (*op)->activate (((*op)->plugin_declaration () == pd || ! (*op)->plugin_declaration ()) && active);
   }
 }
-
-static tl::RegisteredClass<lay::PluginDeclaration> config_decl20 (new edt::MainPluginDeclaration (tl::to_string (QObject::tr ("Instances and shapes"))), 4000, "edt::MainService");
 
 class PartialPluginDeclaration
   : public lay::PluginDeclaration

@@ -175,14 +175,15 @@ public:
     LV_NoLayers = 1, 
     LV_NoHierarchyPanel = 2, 
     LV_NoLibrariesView = 4,
-    LV_NoBookmarksView = 8,
-    LV_Naked = 16,
-    LV_NoZoom = 32,
-    LV_NoGrid = 64,
-    LV_NoMove = 128,
-    LV_NoTracker = 256,
-    LV_NoSelection = 512,
-    LV_NoPlugins = 1024,
+    LV_NoEditorOptionsPanel = 8,
+    LV_NoBookmarksView = 16,
+    LV_Naked = 32,
+    LV_NoZoom = 64,
+    LV_NoGrid = 128,
+    LV_NoMove = 256,
+    LV_NoTracker = 512,
+    LV_NoSelection = 1024,
+    LV_NoPlugins = 2048,
     LV_NoServices = LV_NoMove + LV_NoTracker + LV_NoSelection + LV_NoPlugins
   };
 
@@ -266,6 +267,14 @@ public:
   QWidget *libraries_frame ()
   {
     return mp_libraries_frame;
+  }
+
+  /**
+   *  @brief Gets the container with the editor options
+   */
+  QWidget *editor_options_frame ()
+  {
+    return mp_editor_options_frame;
   }
 
   /**
@@ -2708,7 +2717,7 @@ private:
   lay::HierarchyControlPanel *mp_hierarchy_panel;
   lay::LibrariesView *mp_libraries_view;
   lay::BookmarksView *mp_bookmarks_view;
-  QWidget *mp_control_frame, *mp_hierarchy_frame, *mp_libraries_frame, *mp_bookmarks_frame;
+  QWidget *mp_control_frame, *mp_hierarchy_frame, *mp_libraries_frame, *mp_editor_options_frame, *mp_bookmarks_frame;
   QSpinBox *mp_min_hier_spbx;
   QSpinBox *mp_max_hier_spbx;
   std::list <CellView> m_cellviews;

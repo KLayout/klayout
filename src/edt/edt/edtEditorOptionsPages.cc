@@ -25,10 +25,10 @@
 #include "dbLibrary.h"
 #include "dbLibraryManager.h"
 #include "dbPCellHeader.h"
-#include "edtEditorOptionsPages.h"
 #include "edtPCellParametersPage.h"
 #include "edtConfig.h"
 #include "edtService.h"
+#include "edtEditorOptionsPages.h"
 #include "tlExceptions.h"
 #include "layPlugin.h"
 #include "layLayoutView.h"
@@ -38,6 +38,11 @@
 #include "ui_EditorOptionsPath.h"
 #include "ui_EditorOptionsText.h"
 #include "ui_EditorOptionsInst.h"
+
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QTabWidget>
+#include <QToolButton>
 
 namespace edt
 {
@@ -87,13 +92,27 @@ struct EOPCompareOp
   }
 };
 
-EditorOptionsPages::EditorOptionsPages (const std::vector<edt::EditorOptionsPage *> &pages, lay::Dispatcher *root)
-  : mp_root (root)
+EditorOptionsPages::EditorOptionsPages (QWidget *parent, const std::vector<edt::EditorOptionsPage *> &pages, lay::Dispatcher *root)
+  : QFrame (parent), mp_root (root)
 {
-  mp_ui = new Ui::EditorOptionsDialog ();
-  mp_ui->setupUi (this);
+  QVBoxLayout *ly1 = new QVBoxLayout (this);
+  ly1->setMargin (0);
 
-  connect (mp_ui->apply_pb, SIGNAL (clicked ()), this, SLOT (apply ()));
+  mp_pages = new QTabWidget (this);
+  ly1->addWidget (mp_pages);
+
+  QFrame *f = new QFrame (this);
+  ly1->addWidget (f);
+
+  QToolButton *apply_pb = new QToolButton (f);
+  apply_pb->setText (tr ("Apply"));
+
+  QHBoxLayout *ly2 = new QHBoxLayout (f);
+  ly2->setMargin (0);
+  ly2->addStretch (1);
+  ly2->addWidget (apply_pb);
+
+  connect (apply_pb, SIGNAL (clicked ()), this, SLOT (apply ()));
 
   m_pages = pages;
   for (std::vector <edt::EditorOptionsPage *>::const_iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
@@ -107,11 +126,8 @@ EditorOptionsPages::EditorOptionsPages (const std::vector<edt::EditorOptionsPage
 EditorOptionsPages::~EditorOptionsPages ()
 {
   while (m_pages.size () > 0) {
-    delete m_pages [0];
+    delete m_pages.front ();
   }
-
-  delete mp_ui;
-  mp_ui = 0;
 }
 
 void  
@@ -131,16 +147,14 @@ void
 EditorOptionsPages::activate_page (edt::EditorOptionsPage *page)
 {
   try {
-    page->setup (mp_root);
+    if (page->active ()) {
+      page->setup (mp_root);
+    }
   } catch (...) {
     //  catch any errors related to configuration file errors etc.
   }
-  update (page);
 
-  if (isVisible ()) {
-    activateWindow ();
-    raise ();
-  }
+  update (page);
 }
 
 void   
@@ -148,13 +162,13 @@ EditorOptionsPages::update (edt::EditorOptionsPage *page)
 {
   std::sort (m_pages.begin (), m_pages.end (), EOPCompareOp ());
 
-  while (mp_ui->pages->count () > 0) {
-    mp_ui->pages->removeTab (0);
+  while (mp_pages->count () > 0) {
+    mp_pages->removeTab (0);
   }
   int index = -1;
   for (std::vector <edt::EditorOptionsPage *>::iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
     if ((*p)->active ()) {
-      mp_ui->pages->addTab ((*p)->q_frame (), tl::to_qstring ((*p)->title ()));
+      mp_pages->addTab ((*p)->q_frame (), tl::to_qstring ((*p)->title ()));
       if ((*p) == page) {
         index = int (std::distance (m_pages.begin (), p));
       }
@@ -163,12 +177,12 @@ EditorOptionsPages::update (edt::EditorOptionsPage *page)
     }
   }
   if (index < 0) {
-    index = mp_ui->pages->currentIndex ();
+    index = mp_pages->currentIndex ();
   }
-  if (index >= int (mp_ui->pages->count ())) {
-    index = mp_ui->pages->count () - 1;
+  if (index >= int (mp_pages->count ())) {
+    index = mp_pages->count () - 1;
   }
-  mp_ui->pages->setCurrentIndex (index);
+  mp_pages->setCurrentIndex (index);
 }
 
 void 
@@ -206,15 +220,6 @@ EditorOptionsPages::apply ()
 {
 BEGIN_PROTECTED
   do_apply ();
-END_PROTECTED_W (this)
-}
-
-void
-EditorOptionsPages::accept ()
-{
-BEGIN_PROTECTED
-  do_apply ();
-  QDialog::accept ();
 END_PROTECTED_W (this)
 }
 

@@ -52,14 +52,14 @@ namespace edt
    *
    *  This dialog is a global resource which is managed by the main plugin declaration
    */
-  void show_editor_options_dialog ();
+  void show_editor_options_page (lay::LayoutView *view);
 
   /**
    *  @brief Activate or deactivate a certain service
    *
    *  This will show or hide the editor properties pages for the respective service.
    */
-  void activate_service (const lay::PluginDeclaration *pd, bool active);
+  void activate_service (lay::LayoutView *view, const lay::PluginDeclaration *pd, bool active);
 }
 
 #endif

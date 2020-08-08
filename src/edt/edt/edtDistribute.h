@@ -421,7 +421,7 @@ private:
       coord_type pnew = box_position<Box, horizontally> (current, 1) + space;
 
       if (db::coord_traits<coord_type>::less (0, pitch)) {
-        pnew = coord_type (ceil (double (pnew + offset - p0) / double (pitch) - 1e-10)) * pitch - offset;
+        pnew = coord_type (ceil (double (pnew + offset - p0) / double (pitch) - 1e-10)) * pitch - offset + p0;
       }
 
       db::vector<coord_type> mv;

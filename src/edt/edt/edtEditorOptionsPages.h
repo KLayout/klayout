@@ -41,6 +41,7 @@ namespace Ui
   class EditorOptionsPath;
   class EditorOptionsText;
   class EditorOptionsInst;
+  class EditorOptionsInstPCellParam;
 }
 
 namespace lay
@@ -181,7 +182,7 @@ public:
   virtual QWidget *q_frame () { return this; }
 
   virtual std::string title () const;
-  virtual int order () const { return 20; }
+  virtual int order () const { return 30; }
   void apply (lay::Plugin *root);
   void setup (lay::Plugin *root);
 
@@ -217,12 +218,45 @@ public slots:
   void update_pcell_parameters ();
   void library_changed (int index);
   void cell_name_changed (const QString &s);
+  void update_cell_edits ();
 
 private:
   Ui::EditorOptionsInst *mp_ui;
   lay::Dispatcher *mp_root;
   edt::PCellParametersPage *mp_pcell_parameters;
   int m_cv_index;
+
+  void update_pcell_parameters (const std::vector <tl::Variant> &parameters);
+};
+
+/**
+ *  @brief The instance properties page (PCell parameters)
+ */
+class EditorOptionsInstPCellParam
+  : public QWidget, public EditorOptionsPage
+{
+Q_OBJECT
+
+public:
+  EditorOptionsInstPCellParam (lay::Dispatcher *root);
+  ~EditorOptionsInstPCellParam ();
+
+  virtual QWidget *q_frame () { return this; }
+
+  virtual std::string title () const;
+  virtual int order () const { return 21; }
+  void apply (lay::Plugin *root);
+  void setup (lay::Plugin *root);
+
+public slots:
+  void update_pcell_parameters ();
+
+private:
+  Ui::EditorOptionsInstPCellParam *mp_ui;
+  lay::Dispatcher *mp_root;
+  edt::PCellParametersPage *mp_pcell_parameters;
+  int m_cv_index;
+  std::string m_lib_name, m_cell_name;
 
   void update_pcell_parameters (const std::vector <tl::Variant> &parameters);
 };

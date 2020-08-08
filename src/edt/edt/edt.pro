@@ -43,7 +43,8 @@ FORMS = \
   RoundCornerOptionsDialog.ui \
   TextPropertiesPage.ui \
     PCellParametersDialog.ui \
-    DistributeOptionsDialog.ui
+    DistributeOptionsDialog.ui \
+    EditorOptionsInstPCellParam.ui
 
 SOURCES = \
   edtConfig.cc \

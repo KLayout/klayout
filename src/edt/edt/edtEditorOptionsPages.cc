@@ -38,6 +38,7 @@
 #include "ui_EditorOptionsPath.h"
 #include "ui_EditorOptionsText.h"
 #include "ui_EditorOptionsInst.h"
+#include "ui_EditorOptionsInstPCellParam.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -160,18 +161,23 @@ EditorOptionsPages::activate_page (edt::EditorOptionsPage *page)
 void   
 EditorOptionsPages::update (edt::EditorOptionsPage *page)
 {
-  std::sort (m_pages.begin (), m_pages.end (), EOPCompareOp ());
+  std::vector <edt::EditorOptionsPage *> sorted_pages = m_pages;
+  std::sort (sorted_pages.begin (), sorted_pages.end (), EOPCompareOp ());
+
+  if (! page && m_pages.size () > 0) {
+    page = m_pages.back ();
+  }
 
   while (mp_pages->count () > 0) {
     mp_pages->removeTab (0);
   }
   int index = -1;
-  for (std::vector <edt::EditorOptionsPage *>::iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
+  for (std::vector <edt::EditorOptionsPage *>::iterator p = sorted_pages.begin (); p != sorted_pages.end (); ++p) {
     if ((*p)->active ()) {
-      mp_pages->addTab ((*p)->q_frame (), tl::to_qstring ((*p)->title ()));
       if ((*p) == page) {
-        index = int (std::distance (m_pages.begin (), p));
+        index = mp_pages->count ();
       }
+      mp_pages->addTab ((*p)->q_frame (), tl::to_qstring ((*p)->title ()));
     } else {
       (*p)->q_frame ()->setParent (0);
     }
@@ -522,7 +528,7 @@ EditorOptionsPath::setup (lay::Plugin *root)
 //  EditorOptionsInst implementation
 
 EditorOptionsInst::EditorOptionsInst (lay::Dispatcher *root)
-  : QWidget (), EditorOptionsPage (), mp_root (root), mp_pcell_parameters (0)
+  : QWidget (), EditorOptionsPage (), mp_root (root)
 {
   mp_ui = new Ui::EditorOptionsInst ();
   mp_ui->setupUi (this);
@@ -531,10 +537,6 @@ EditorOptionsInst::EditorOptionsInst (lay::Dispatcher *root)
   connect (mp_ui->browse_pb, SIGNAL (clicked ()), this, SLOT (browse_cell ()));
   connect (mp_ui->lib_cbx, SIGNAL (currentIndexChanged (int)), this, SLOT (library_changed (int)));
   connect (mp_ui->cell_le, SIGNAL (textChanged (const QString &)), this, SLOT (cell_name_changed (const QString &)));
-
-  QHBoxLayout *layout = new QHBoxLayout (mp_ui->pcell_tab);
-  layout->setMargin (0);
-  mp_ui->pcell_tab->setLayout (layout);
 
   m_cv_index = -1;
 }
@@ -554,17 +556,51 @@ EditorOptionsInst::title () const
 void
 EditorOptionsInst::library_changed (int)
 {
+  update_cell_edits ();
+/* @@@
 BEGIN_PROTECTED
   update_pcell_parameters ();
 END_PROTECTED
+@@@*/
 }
 
 void
 EditorOptionsInst::cell_name_changed (const QString &)
 {
+  update_cell_edits ();
+/* @@@
 BEGIN_PROTECTED
   update_pcell_parameters ();
 END_PROTECTED
+@@@*/
+}
+
+void
+EditorOptionsInst::update_cell_edits ()
+{
+  db::Layout *layout = 0;
+
+  //  find the layout the cell has to be looked up: that is either the layout of the current instance or
+  //  the library selected
+  if (mp_ui->lib_cbx->current_library ()) {
+    layout = &mp_ui->lib_cbx->current_library ()->layout ();
+  } else {
+    layout = &lay::LayoutView::current ()->cellview (m_cv_index)->layout ();
+  }
+
+  std::pair<bool, db::pcell_id_type> pc = layout->pcell_by_name (tl::to_string (mp_ui->cell_le->text ()).c_str ());
+  std::pair<bool, db::cell_index_type> cc = layout->cell_by_name (tl::to_string (mp_ui->cell_le->text ()).c_str ());
+
+  //  by the way, update the foreground color of the cell edit box as well (red, if not valid)
+  QPalette pl = mp_ui->cell_le->palette ();
+  if (! pc.first && ! cc.first) {
+    pl.setColor (QPalette::Text, Qt::red);
+    pl.setColor (QPalette::Base, QColor (Qt::red).lighter (180));
+  } else {
+    pl.setColor (QPalette::Text, palette ().color (QPalette::Text));
+    pl.setColor (QPalette::Base, palette ().color (QPalette::Base));
+  }
+  mp_ui->cell_le->setPalette (pl);
 }
 
 void
@@ -608,7 +644,7 @@ BEGIN_PROTECTED
       } else if (layout->is_valid_cell_index (form.selected_cell_index ())) {
         mp_ui->cell_le->setText (tl::to_qstring (layout->cell_name (form.selected_cell_index ())));
       }
-      update_pcell_parameters ();
+      // @@@@update_pcell_parameters ();
     }
 
   }
@@ -640,28 +676,6 @@ EditorOptionsInst::apply (lay::Plugin *root)
   } else {
     root->config_set (cfg_edit_inst_lib_name, std::string ());
   }
-
-  //  pcell parameters
-  std::string param;
-  db::Layout *layout = 0;
-
-  if (mp_ui->lib_cbx->current_library ()) {
-    layout = &mp_ui->lib_cbx->current_library ()->layout ();
-  } else if (m_cv_index >= 0 && lay::LayoutView::current () && lay::LayoutView::current ()->cellview (m_cv_index).is_valid ()) {
-    layout = &lay::LayoutView::current ()->cellview (m_cv_index)->layout ();
-  }
-
-  if (layout && mp_pcell_parameters) {
-    std::pair<bool, db::pcell_id_type> pc = layout->pcell_by_name (tl::to_string (mp_ui->cell_le->text ()).c_str ());
-    if (pc.first) {
-      const db::PCellDeclaration *pc_decl = layout->pcell_declaration (pc.second);
-      if (pc_decl) {
-        param = pcell_parameters_to_string (pc_decl->named_parameters (mp_pcell_parameters->get_parameters ()));
-      }
-    }
-  }
-  
-  root->config_set (cfg_edit_inst_pcell_parameters, param);
 
   //  rotation, scaling
   double angle = 0.0;
@@ -724,61 +738,6 @@ EditorOptionsInst::setup (lay::Plugin *root)
   root->config_get (cfg_edit_inst_lib_name, l);
   mp_ui->lib_cbx->set_current_library (db::LibraryManager::instance ().lib_ptr_by_name (l));
 
-  //  pcell parameters
-  std::string param;
-  root->config_get (cfg_edit_inst_pcell_parameters, param);
-
-  db::Layout *layout = 0;
-  if (mp_ui->lib_cbx->current_library ()) {
-    layout = &mp_ui->lib_cbx->current_library ()->layout ();
-  } else if (m_cv_index >= 0 && lay::LayoutView::current () && lay::LayoutView::current ()->cellview (m_cv_index).is_valid ()) {
-    layout = &lay::LayoutView::current ()->cellview (m_cv_index)->layout ();
-  }
-
-  std::vector<tl::Variant> pv;
-
-  if (layout && mp_pcell_parameters) {
-
-    std::pair<bool, db::pcell_id_type> pc = layout->pcell_by_name (tl::to_string (mp_ui->cell_le->text ()).c_str ());
-
-    if (pc.first) {
-
-      const db::PCellDeclaration *pc_decl = layout->pcell_declaration (pc.second);
-      if (pc_decl) {
-
-        std::map<std::string, tl::Variant> parameters;
-        try {
-          tl::Extractor ex (param.c_str ());
-          ex.test ("!");  //  used to flag PCells
-          while (! ex.at_end ()) {
-            std::string n;
-            ex.read_word_or_quoted (n);
-            ex.test (":");
-            ex.read (parameters.insert (std::make_pair (n, tl::Variant ())).first->second);
-            ex.test (";");
-          }
-        } catch (...) { }
-
-        const std::vector<db::PCellParameterDeclaration> &pcp = pc_decl->parameter_declarations ();
-        for (std::vector<db::PCellParameterDeclaration>::const_iterator pd = pcp.begin (); pd != pcp.end (); ++pd) {
-          std::map<std::string, tl::Variant>::const_iterator p = parameters.find (pd->get_name ());
-          if (p != parameters.end ()) {
-            pv.push_back (p->second);
-          } else {
-            pv.push_back (pd->get_default ());
-          }
-        }
-
-      }
-
-    }
-
-  }
-  
-  try {
-    update_pcell_parameters (pv);
-  } catch (...) { }
-
   //  rotation, scaling
   double angle = 0.0;
   root->config_get (cfg_edit_inst_angle, angle);
@@ -819,43 +778,172 @@ EditorOptionsInst::setup (lay::Plugin *root)
   mp_ui->place_origin_cb->setChecked (place_origin);
 }
 
-void  
-EditorOptionsInst::update_pcell_parameters ()
+// ------------------------------------------------------------------
+//  EditorOptionsInstPCellParam implementation
+
+EditorOptionsInstPCellParam::EditorOptionsInstPCellParam (lay::Dispatcher *root)
+  : QWidget (), EditorOptionsPage (), mp_root (root), mp_pcell_parameters (0)
+{
+  mp_ui = new Ui::EditorOptionsInstPCellParam ();
+  mp_ui->setupUi (this);
+}
+
+EditorOptionsInstPCellParam::~EditorOptionsInstPCellParam ()
+{
+  delete mp_ui;
+  mp_ui = 0;
+}
+
+std::string
+EditorOptionsInstPCellParam::title () const
+{
+  return tl::to_string (QObject::tr ("PCell"));
+}
+
+/* @@@
+void
+EditorOptionsInstPCellParam::library_changed (int)
+{
+BEGIN_PROTECTED
+  update_pcell_parameters ();
+END_PROTECTED
+}
+
+void
+EditorOptionsInstPCellParam::cell_name_changed (const QString &)
+{
+BEGIN_PROTECTED
+  update_pcell_parameters ();
+END_PROTECTED
+}
+*/
+
+void
+EditorOptionsInstPCellParam::apply (lay::Plugin *root)
+{
+  //  pcell parameters
+  std::string param;
+  db::Layout *layout = 0;
+
+  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name);
+  if (lib) {
+    layout = &lib->layout ();
+  } else if (m_cv_index >= 0 && lay::LayoutView::current () && lay::LayoutView::current ()->cellview (m_cv_index).is_valid ()) {
+    layout = &lay::LayoutView::current ()->cellview (m_cv_index)->layout ();
+  }
+
+  if (layout && mp_pcell_parameters) {
+    std::pair<bool, db::pcell_id_type> pc = layout->pcell_by_name (tl::to_string (m_cell_name).c_str ());
+    if (pc.first) {
+      const db::PCellDeclaration *pc_decl = layout->pcell_declaration (pc.second);
+      if (pc_decl) {
+        param = pcell_parameters_to_string (pc_decl->named_parameters (mp_pcell_parameters->get_parameters ()));
+      }
+    }
+  }
+
+  root->config_set (cfg_edit_inst_pcell_parameters, param);
+}
+
+void
+EditorOptionsInstPCellParam::setup (lay::Plugin *root)
+{
+  m_cv_index = -1;
+  if (lay::LayoutView::current ()) {
+    m_cv_index = lay::LayoutView::current ()->active_cellview_index ();
+  }
+
+  //  cell name
+  root->config_get (cfg_edit_inst_cell_name, m_cell_name);
+
+  //  library
+  root->config_get (cfg_edit_inst_lib_name, m_lib_name);
+  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name);
+
+  //  pcell parameters
+  std::string param;
+  root->config_get (cfg_edit_inst_pcell_parameters, param);
+
+  db::Layout *layout = 0;
+  if (lib) {
+    layout = &lib->layout ();
+  } else if (m_cv_index >= 0 && lay::LayoutView::current () && lay::LayoutView::current ()->cellview (m_cv_index).is_valid ()) {
+    layout = &lay::LayoutView::current ()->cellview (m_cv_index)->layout ();
+  }
+
+  std::vector<tl::Variant> pv;
+
+  if (layout && mp_pcell_parameters) {
+
+    std::pair<bool, db::pcell_id_type> pc = layout->pcell_by_name (tl::to_string (m_cell_name).c_str ());
+
+    if (pc.first) {
+
+      const db::PCellDeclaration *pc_decl = layout->pcell_declaration (pc.second);
+      if (pc_decl) {
+
+        std::map<std::string, tl::Variant> parameters;
+        try {
+          tl::Extractor ex (param.c_str ());
+          ex.test ("!");  //  used to flag PCells
+          while (! ex.at_end ()) {
+            std::string n;
+            ex.read_word_or_quoted (n);
+            ex.test (":");
+            ex.read (parameters.insert (std::make_pair (n, tl::Variant ())).first->second);
+            ex.test (";");
+          }
+        } catch (...) { }
+
+        const std::vector<db::PCellParameterDeclaration> &pcp = pc_decl->parameter_declarations ();
+        for (std::vector<db::PCellParameterDeclaration>::const_iterator pd = pcp.begin (); pd != pcp.end (); ++pd) {
+          std::map<std::string, tl::Variant>::const_iterator p = parameters.find (pd->get_name ());
+          if (p != parameters.end ()) {
+            pv.push_back (p->second);
+          } else {
+            pv.push_back (pd->get_default ());
+          }
+        }
+
+      }
+
+    }
+
+  }
+
+  try {
+    update_pcell_parameters (pv);
+  } catch (...) { }
+}
+
+void
+EditorOptionsInstPCellParam::update_pcell_parameters ()
 {
   update_pcell_parameters (std::vector <tl::Variant> ());
 }
 
-void  
-EditorOptionsInst::update_pcell_parameters (const std::vector <tl::Variant> &parameters)
+void
+EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Variant> &parameters)
 {
   db::Layout *layout = 0;
 
+/* @@@
   if (m_cv_index < 0 || !lay::LayoutView::current () || !lay::LayoutView::current ()->cellview (m_cv_index).is_valid ()) {
     mp_ui->param_tab_widget->setTabEnabled (1, false);
     return;
   }
+@@@*/
 
-  //  find the layout the cell has to be looked up: that is either the layout of the current instance or 
+  //  find the layout the cell has to be looked up: that is either the layout of the current instance or
   //  the library selected
-  if (mp_ui->lib_cbx->current_library ()) {
-    layout = &mp_ui->lib_cbx->current_library ()->layout ();
+  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name);
+  if (lib) {
+    layout = &lib->layout ();
   } else {
     layout = &lay::LayoutView::current ()->cellview (m_cv_index)->layout ();
   }
 
-  std::pair<bool, db::pcell_id_type> pc = layout->pcell_by_name (tl::to_string (mp_ui->cell_le->text ()).c_str ());
-  std::pair<bool, db::cell_index_type> cc = layout->cell_by_name (tl::to_string (mp_ui->cell_le->text ()).c_str ());
-
-  //  by the way, update the foreground color of the cell edit box as well (red, if not valid)
-  QPalette pl = mp_ui->cell_le->palette ();
-  if (! pc.first && ! cc.first) {
-    pl.setColor (QPalette::Text, Qt::red);
-    pl.setColor (QPalette::Base, QColor (Qt::red).lighter (180));
-  } else {
-    pl.setColor (QPalette::Text, palette ().color (QPalette::Text));
-    pl.setColor (QPalette::Base, palette ().color (QPalette::Base));
-  }
-  mp_ui->cell_le->setPalette (pl);
+  std::pair<bool, db::pcell_id_type> pc = layout->pcell_by_name (tl::to_string (m_cell_name).c_str ());
 
   PCellParametersPage::State pcp_state;
 
@@ -870,15 +958,15 @@ EditorOptionsInst::update_pcell_parameters (const std::vector <tl::Variant> &par
 
   if (pc.first && layout->pcell_declaration (pc.second)) {
 
-    mp_ui->param_tab_widget->setTabEnabled (1, true);
+    // @@@mp_ui->param_tab_widget->setTabEnabled (1, true);
     lay::LayoutView *view = lay::LayoutView::current ();
-    mp_pcell_parameters = new PCellParametersPage (mp_ui->pcell_tab, &view->cellview (m_cv_index)->layout (), view, m_cv_index, layout->pcell_declaration (pc.second), parameters);
-    mp_ui->pcell_tab->layout ()->addWidget (mp_pcell_parameters);
+    mp_pcell_parameters = new PCellParametersPage (this, &view->cellview (m_cv_index)->layout (), view, m_cv_index, layout->pcell_declaration (pc.second), parameters);
+    this->layout ()->addWidget (mp_pcell_parameters);
 
     mp_pcell_parameters->set_state (pcp_state);
 
   } else {
-    mp_ui->param_tab_widget->setTabEnabled (1, false);
+    // @@@mp_ui->param_tab_widget->setTabEnabled (1, false);
   }
 }
 

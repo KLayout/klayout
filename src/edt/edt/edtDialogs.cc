@@ -343,10 +343,10 @@ DistributeOptionsDialog::~DistributeOptionsDialog ()
 }
 
 bool
-DistributeOptionsDialog::exec_dialog (lay::LayoutView *view, bool &hdistribute, int &hmode, double &hpitch, double &hspace, bool &vdistribute, int &vmode, double &vpitch, double &vspace, bool &visible_layers)
+DistributeOptionsDialog::exec_dialog (lay::LayoutView * /*view*/, bool &hdistribute, int &hmode, double &hpitch, double &hspace, bool &vdistribute, int &vmode, double &vpitch, double &vspace, bool &visible_layers)
 {
-  QRadioButton *hmode_buttons [] = { (QRadioButton *) 0, this->h_left_rb, this->h_center_rb, this->h_right_rb };
-  QRadioButton *vmode_buttons [] = { (QRadioButton *) 0, this->v_top_rb, this->v_center_rb, this->v_bottom_rb };
+  QRadioButton *hmode_buttons [] = { this->h_none_rb, this->h_left_rb, this->h_center_rb, this->h_right_rb };
+  QRadioButton *vmode_buttons [] = { this->v_none_rb, this->v_top_rb, this->v_center_rb, this->v_bottom_rb };
   QRadioButton *layers_buttons [] = { this->all_layers_rb, this->visible_layers_rb };
 
   this->h_distribute->setChecked (hdistribute);

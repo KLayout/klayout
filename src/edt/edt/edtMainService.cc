@@ -1869,7 +1869,7 @@ MainService::cm_distribute ()
 
   if (! distribute_options_dialog ()->exec_dialog (view (), m_hdistribute, m_distribute_hmode, m_distribute_hpitch, m_distribute_hspace,
                                                             m_vdistribute, m_distribute_vmode, m_distribute_vpitch, m_distribute_vspace,
-                                                            m_align_visible_layers)) {
+                                                            m_distribute_visible_layers)) {
     return;
   }
 
@@ -1925,13 +1925,16 @@ MainService::cm_distribute ()
 
     }
 
+    int href = int (m_distribute_hmode - 2);
+    int vref = 2 - int (m_distribute_vmode);
+
     if (m_hdistribute && m_vdistribute) {
-      placer.distribute_matrix (int (m_distribute_hmode - 2), m_distribute_hpitch, m_distribute_hspace,
-                                2 - int (m_distribute_vmode), m_distribute_vpitch, m_distribute_vspace);
+      placer.distribute_matrix (href, m_distribute_hpitch, m_distribute_hspace,
+                                vref, m_distribute_vpitch, m_distribute_vspace);
     } else if (m_hdistribute) {
-      placer.distribute_h (int (m_distribute_hmode - 2), m_distribute_hpitch, m_distribute_hspace);
+      placer.distribute_h (href, vref, m_distribute_hpitch, m_distribute_hspace);
     } else if (m_vdistribute) {
-      placer.distribute_v (2 - int (m_distribute_vmode), m_distribute_vpitch, m_distribute_vspace);
+      placer.distribute_v (vref, href, m_distribute_vpitch, m_distribute_vspace);
     }
 
     transformations.resize (org_boxes.size ());

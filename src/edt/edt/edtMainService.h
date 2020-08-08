@@ -199,6 +199,12 @@ public:
    */
   virtual void paste ();
 
+  /**
+   *  @brief Implementation of "config_finalize"
+   *  This implementation will update the editor option page's parameters.
+   */
+  virtual void config_finalize ();
+
 private:
   //  The layout view that this service is attached to
   lay::LayoutView *mp_view;

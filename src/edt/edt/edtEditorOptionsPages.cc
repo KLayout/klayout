@@ -92,8 +92,8 @@ struct EOPCompareOp
   }
 };
 
-EditorOptionsPages::EditorOptionsPages (QWidget *parent, const std::vector<edt::EditorOptionsPage *> &pages, lay::Dispatcher *root)
-  : QFrame (parent), mp_root (root)
+EditorOptionsPages::EditorOptionsPages (QWidget *parent, const std::vector<edt::EditorOptionsPage *> &pages, lay::Dispatcher *dispatcher)
+  : QFrame (parent), mp_dispatcher (dispatcher)
 {
   QVBoxLayout *ly1 = new QVBoxLayout (this);
   ly1->setMargin (0);
@@ -148,7 +148,7 @@ EditorOptionsPages::activate_page (edt::EditorOptionsPage *page)
 {
   try {
     if (page->active ()) {
-      page->setup (mp_root);
+      page->setup (mp_dispatcher);
     }
   } catch (...) {
     //  catch any errors related to configuration file errors etc.
@@ -192,7 +192,7 @@ EditorOptionsPages::setup ()
 
     for (std::vector <edt::EditorOptionsPage *>::iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
       if ((*p)->active ()) {
-        (*p)->setup (mp_root);
+        (*p)->setup (mp_dispatcher);
       }
     }
 
@@ -210,7 +210,8 @@ EditorOptionsPages::do_apply ()
 {
   for (std::vector <edt::EditorOptionsPage *>::iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
     if ((*p)->active ()) {
-      (*p)->apply (mp_root);
+      //  NOTE: we apply to the root dispatcher, so other dispatchers (views) get informed too.
+      (*p)->apply (mp_dispatcher->dispatcher ());
     }
   }
 }

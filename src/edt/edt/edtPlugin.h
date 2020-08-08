@@ -60,6 +60,11 @@ namespace edt
    *  This will show or hide the editor properties pages for the respective service.
    */
   void activate_service (lay::LayoutView *view, const lay::PluginDeclaration *pd, bool active);
+
+  /**
+   *  @brief Setup the editor option pages for the given view
+   */
+  void setup_pages (lay::LayoutView *view);
 }
 
 #endif

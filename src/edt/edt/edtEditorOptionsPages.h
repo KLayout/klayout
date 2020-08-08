@@ -111,7 +111,7 @@ public slots:
 
 private:
   std::vector <edt::EditorOptionsPage *> m_pages;
-  lay::Dispatcher *mp_root;
+  lay::Dispatcher *mp_dispatcher;
   QTabWidget *mp_pages;
 
   void update (edt::EditorOptionsPage *page);

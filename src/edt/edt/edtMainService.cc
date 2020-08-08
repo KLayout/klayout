@@ -2362,6 +2362,12 @@ private:
   db::cell_index_type m_topcell;
 };
 
+void
+MainService::config_finalize ()
+{
+  setup_pages (view ());
+}
+
 void 
 MainService::paste ()
 {

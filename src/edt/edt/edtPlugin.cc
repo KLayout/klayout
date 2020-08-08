@@ -377,12 +377,12 @@ show_editor_options_page (lay::LayoutView *view)
     }
   }
 
-  edt::EditorOptionsPages *pages = new edt::EditorOptionsPages (view->editor_options_frame (), prop_dialog_pages, view->dispatcher ());
+  edt::EditorOptionsPages *pages = new edt::EditorOptionsPages (view->editor_options_frame (), prop_dialog_pages, view);
   view->editor_options_frame ()->layout ()->addWidget (pages);
 }
 
-void 
-activate_service (lay::LayoutView *view, const lay::PluginDeclaration *pd, bool active)
+static
+edt::EditorOptionsPages *get_pages_widget (lay::LayoutView *view)
 {
   //  TODO: is there a better way to find the editor options pages?
   edt::EditorOptionsPages *eo_pages = 0;
@@ -391,12 +391,32 @@ activate_service (lay::LayoutView *view, const lay::PluginDeclaration *pd, bool 
     eo_pages = dynamic_cast<edt::EditorOptionsPages *> (*c);
   }
 
+  return eo_pages;
+}
+
+void 
+activate_service (lay::LayoutView *view, const lay::PluginDeclaration *pd, bool active)
+{
+  edt::EditorOptionsPages *eo_pages = get_pages_widget (view);
   if (!eo_pages) {
     return;
   }
 
   for (std::vector<edt::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
     (*op)->activate (((*op)->plugin_declaration () == pd || ! (*op)->plugin_declaration ()) && active);
+  }
+}
+
+void
+setup_pages (lay::LayoutView *view)
+{
+  edt::EditorOptionsPages *eo_pages = get_pages_widget (view);
+  if (!eo_pages) {
+    return;
+  }
+
+  for (std::vector<edt::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
+    (*op)->setup (view);
   }
 }
 

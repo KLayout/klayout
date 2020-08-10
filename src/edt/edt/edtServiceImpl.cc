@@ -25,7 +25,6 @@
 #include "edtServiceImpl.h"
 #include "edtPropertiesPages.h"
 #include "edtInstPropertiesPage.h"
-#include "edtPCellParametersDialog.h"
 #include "edtService.h"
 #include "dbEdge.h"
 #include "dbLibrary.h"
@@ -1130,17 +1129,14 @@ InstService::get_default_layer_for_pcell ()
 
 bool
 InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase *data)
-{ 
+{
   const lay::CellDragDropData *cd = dynamic_cast <const lay::CellDragDropData *> (data);
   if (view ()->is_editable () && cd && (cd->layout () == & view ()->active_cellview ()->layout () || cd->library ())) {
 
     view ()->cancel ();
-
     set_edit_marker (0);
 
-    m_cv_index = view ()->active_cellview_index ();
-    m_in_drag_drop = true;
-
+    //  configure from the drag/drop data
     if (cd->library ()) {
       if (m_lib_name != cd->library ()->get_name ()) {
         m_lib_name = cd->library ()->get_name ();
@@ -1155,37 +1151,44 @@ InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase 
     if (cd->is_pcell ()) {
 
       const db::PCellDeclaration *pcell_decl = cd->layout ()->pcell_declaration (cd->cell_index ());
-      if (pcell_decl) {
+      if (! pcell_decl) {
+        return false;
+      }
 
-        if (m_cell_or_pcell_name != pcell_decl->name ()) {
-          m_cell_or_pcell_name = pcell_decl->name ();
-          m_pcell_parameters.clear ();
+      if (m_cell_or_pcell_name != pcell_decl->name ()) {
+        m_cell_or_pcell_name = pcell_decl->name ();
+        m_pcell_parameters.clear ();
+      }
+
+      m_is_pcell = true;
+
+      //  NOTE: we reuse previous parameters for convenience unless PCell or library has changed
+      const std::vector<db::PCellParameterDeclaration> &pd = pcell_decl->parameter_declarations();
+      for (std::vector<db::PCellParameterDeclaration>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
+        if (i->get_type () == db::PCellParameterDeclaration::t_layer && !i->is_hidden () && !i->is_readonly () && i->get_default ().is_nil ()) {
+          m_pcell_parameters.insert (std::make_pair (i->get_name (), get_default_layer_for_pcell ()));
+        } else {
+          m_pcell_parameters.insert (std::make_pair (i->get_name (), i->get_default ()));
         }
-
-        m_is_pcell = true;
-
-        //  NOTE: we reuse previous parameters for convenience unless PCell or library has changed
-        const std::vector<db::PCellParameterDeclaration> &pd = pcell_decl->parameter_declarations();
-        for (std::vector<db::PCellParameterDeclaration>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
-          if (i->get_type () == db::PCellParameterDeclaration::t_layer && !i->is_hidden () && !i->is_readonly () && i->get_default ().is_nil ()) {
-            m_pcell_parameters.insert (std::make_pair (i->get_name (), get_default_layer_for_pcell ()));
-          } else {
-            m_pcell_parameters.insert (std::make_pair (i->get_name (), i->get_default ()));
-          }
-        }
-
-        do_begin_edit (p);
-        return true;
-
       }
 
     } else if (cd->layout ()->is_valid_cell_index (cd->cell_index ())) {
 
       m_cell_or_pcell_name = cd->layout ()->cell_name (cd->cell_index ());
-      do_begin_edit (p);
-      return true;
 
+    } else {
+      return false;
     }
+
+    sync_to_config ();
+    m_in_drag_drop = true;
+
+    view ()->switch_mode (plugin_declaration ()->id ());
+
+    do_begin_edit (p);
+
+    //  action taken.
+    return true;
 
   }
 
@@ -1203,7 +1206,7 @@ InstService::drag_move_event (const db::DPoint &p, const lay::DragDropDataBase *
   }
 }
 
-void  
+void
 InstService::drag_leave_event () 
 { 
   if (m_in_drag_drop) {
@@ -1212,7 +1215,7 @@ InstService::drag_leave_event ()
   }
 }
 
-bool 
+bool
 InstService::selection_applies (const lay::ObjectInstPath &sel) const
 {
   return sel.is_cell_inst ();
@@ -1221,53 +1224,8 @@ InstService::selection_applies (const lay::ObjectInstPath &sel) const
 bool  
 InstService::drop_event (const db::DPoint & /*p*/, const lay::DragDropDataBase * /*data*/) 
 { 
-  if (m_in_drag_drop) {
-
-    const lay::CellView &cv = view ()->cellview (m_cv_index);
-    if (! cv.is_valid ()) {
-      return false;
-    }
-
-    make_cell (cv);
-
-    bool accepted = true;
-
-    if (m_has_valid_cell && mp_pcell_decl) {
-
-      std::vector<tl::Variant> pv = mp_pcell_decl->map_parameters (m_pcell_parameters);
-
-      //  Turn off the drag cursor for the modal dialog
-      QApplication::restoreOverrideCursor ();
-
-      //  for PCells dragged show the parameter dialog for a chance to edit the initial parameters
-      if (! mp_pcell_parameters_dialog.get ()) {
-        mp_pcell_parameters_dialog.reset (new edt::PCellParametersDialog (view ()));
-        mp_pcell_parameters_dialog->parameters_changed_event.add (this, &InstService::apply_edits);
-      }
-
-      if (! mp_pcell_parameters_dialog->exec (mp_current_layout, view (), m_cv_index, mp_pcell_decl, pv)) {
-        accepted = false;
-      } else {
-        m_has_valid_cell = false;
-        m_pcell_parameters = mp_pcell_decl->named_parameters (mp_pcell_parameters_dialog->get_parameters ());
-      }
-
-    }
-
-    set_edit_marker (0);
-
-    if (accepted) {
-      do_finish_edit ();
-    } else {
-      do_cancel_edit ();
-    }
-
-    sync_to_config ();
-    return true;
-
-  } else {
-    return false; 
-  }
+  m_in_drag_drop = false;
+  return false;
 }
 
 void
@@ -1538,6 +1496,8 @@ InstService::do_cancel_edit ()
   m_has_valid_cell = false;
   m_in_drag_drop = false;
 
+  set_edit_marker (0);
+
   //  clean up any proxy cells created so far 
   const lay::CellView &cv = view ()->cellview (m_cv_index);
   if (cv.is_valid ()) {
@@ -1652,16 +1612,6 @@ InstService::config_finalize ()
 }
 
 void
-InstService::apply_edits()
-{
-  if (mp_pcell_decl && mp_pcell_parameters_dialog.get ()) {
-    m_pcell_parameters = mp_pcell_decl->named_parameters (mp_pcell_parameters_dialog->get_parameters ());
-  }
-
-  sync_to_config ();
-}
-
-void
 InstService::update_marker ()
 {
   lay::Marker *marker = dynamic_cast<lay::Marker *> (edit_marker ());
@@ -1685,14 +1635,9 @@ InstService::get_inst (db::CellInstArray &inst)
 
       //  compute the instance's transformation
       db::VCplxTrans pt = (db::CplxTrans (cv->layout ().dbu ()) * m_trans).inverted ();
-      db::ICplxTrans trans;
-      if (m_in_drag_drop) {
-        trans = db::ICplxTrans (1.0, 0.0, false, pt * m_disp - db::Point ());
-      } else {
-        trans = db::ICplxTrans (m_scale, m_angle, m_mirror, pt * m_disp - db::Point ());
-      } 
+      db::ICplxTrans trans = db::ICplxTrans (m_scale, m_angle, m_mirror, pt * m_disp - db::Point ());
 
-      if (! m_in_drag_drop && m_array && m_rows > 0 && m_columns > 0) {
+      if (m_array && m_rows > 0 && m_columns > 0) {
         db::Vector row = db::Vector (pt * db::DVector (m_row_x, m_row_y));
         db::Vector column = db::Vector (pt * db::DVector (m_column_x, m_column_y));
         inst = db::CellInstArray (db::CellInst (ci.second), trans, row, column, m_rows, m_columns);

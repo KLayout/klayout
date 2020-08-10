@@ -2269,12 +2269,6 @@ MainService::cm_change_layer ()
 
 }
 
-void  
-MainService::show_editor_options ()
-{
-  show_editor_options_page (view ());
-}
-
 void
 MainService::check_no_guiding_shapes ()
 {

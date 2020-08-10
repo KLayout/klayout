@@ -189,11 +189,6 @@ public:
    */
   void cm_tap ();
 
-  /**
-   *  @brief Shows the editor options
-   */
-  void show_editor_options ();
-
   /** 
    *  @brief "paste" operation
    */

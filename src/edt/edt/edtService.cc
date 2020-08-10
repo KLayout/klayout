@@ -796,10 +796,16 @@ void
 Service::activated ()
 {
   if (view ()->is_editable ()) {
+
     view ()->cancel ();  //  cancel any pending edit operations and clear the selection
     set_edit_marker (0);
+
     m_immediate = do_activated ();
     m_editing = false;
+
+    //  Show editor options panel
+    show_editor_options_page (view ());
+
   }
 
   //  make all editor option pages visible

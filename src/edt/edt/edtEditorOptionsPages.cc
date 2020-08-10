@@ -873,7 +873,7 @@ EditorOptionsInstPCellParam::setup (lay::Plugin *root)
 
   std::vector<tl::Variant> pv;
 
-  if (layout && mp_pcell_parameters) {
+  if (layout) {
 
     std::pair<bool, db::pcell_id_type> pc = layout->pcell_by_name (tl::to_string (m_cell_name).c_str ());
 

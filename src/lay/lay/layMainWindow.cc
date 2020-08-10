@@ -414,7 +414,43 @@ MainWindow::instance ()
   return mw_instance;
 }
 
-// -----------------------------------
+// -------------------------------------------------------------
+
+static void
+show_dock_widget (QDockWidget *dock_widget, bool visible)
+{
+  if (visible) {
+
+    dock_widget->show ();
+
+    //  NOTE: this is a clumsy way to make sure the dock widget is made the current tab if it's in a tabbed dock
+    //  TODO: is there a better way to do this?
+    QMainWindow *main_window = dynamic_cast<QMainWindow *> (dock_widget->parent ());
+    if (! main_window) {
+      return;
+    }
+
+    //  Look up all children of the main window and find the QTabBars. These are the dock tabs (we don't create others).
+    //  Inside these, look up the right tab by checking the titles.
+    QList<QObject *> mw_children = main_window->children ();
+    for (QList<QObject *>::const_iterator i = mw_children.begin (); i != mw_children.end (); ++i) {
+      QTabBar *tab_bar = dynamic_cast<QTabBar *> (*i);
+      if (tab_bar) {
+        for (int j = 0; j < tab_bar->count (); ++j) {
+          if (tab_bar->tabText (j) == dock_widget->windowTitle ()) {
+            tab_bar->setCurrentIndex (j);
+            return;
+          }
+        }
+      }
+    }
+
+  } else {
+    dock_widget->hide ();
+  }
+}
+
+// -------------------------------------------------------------
 
 MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const char *name, bool undo_enabled)
     : QMainWindow (0),
@@ -759,7 +795,7 @@ MainWindow::init_menu ()
 }
 
 void
-MainWindow::dock_widget_visibility_changed (bool /*visible*/)
+MainWindow::dock_widget_visibility_changed (bool visible)
 {
   if (sender () == mp_lp_dock_widget) {
     dispatcher ()->config_set (cfg_show_layer_panel, tl::to_string (!mp_lp_dock_widget->isHidden ()));
@@ -773,6 +809,8 @@ MainWindow::dock_widget_visibility_changed (bool /*visible*/)
     dispatcher ()->config_set (cfg_show_navigator, tl::to_string (!mp_navigator_dock_widget->isHidden ()));
   } else if (sender () == mp_layer_toolbox_dock_widget) {
     dispatcher ()->config_set (cfg_show_layer_toolbox, tl::to_string (!mp_layer_toolbox_dock_widget->isHidden ()));
+  } else if (sender () == mp_eo_dock_widget) {
+    m_eo_visible = visible;
   }
 }
 
@@ -1889,11 +1927,7 @@ MainWindow::select_mode (int m)
 
     if (editable != m_eo_visible) {
       m_eo_visible = editable;
-      if (m_eo_visible) {
-        mp_eo_dock_widget->show ();
-      } else {
-        mp_eo_dock_widget->hide ();
-      }
+      show_dock_widget (mp_eo_dock_widget, m_eo_visible);
     }
 
   }
@@ -3872,8 +3906,8 @@ MainWindow::menu_activated (const std::string &symbol)
   } else if (symbol == "cm_edit_options") {
 
     if (!m_eo_visible) {
-      mp_eo_dock_widget->show ();
       m_eo_visible = true;
+      show_dock_widget (mp_eo_dock_widget, m_eo_visible);
     }
 
   } else {

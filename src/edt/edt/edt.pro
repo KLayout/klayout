@@ -41,7 +41,6 @@ FORMS = \
   PolygonPropertiesPage.ui \
   RoundCornerOptionsDialog.ui \
   TextPropertiesPage.ui \
-    PCellParametersDialog.ui \
     DistributeOptionsDialog.ui \
     EditorOptionsInstPCellParam.ui
 

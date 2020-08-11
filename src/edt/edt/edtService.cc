@@ -231,6 +231,12 @@ Service::snap2 (const db::DPoint &p, const db::DPoint &plast, bool connect) cons
   return lay::obj_snap (m_snap_to_objects ? view () : 0, plast, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, connect ? connect_ac () : move_ac (), snap_range).second;
 }
 
+void
+Service::service_configuration_changed ()
+{
+  //  The base class implementation does nothing
+}
+
 bool
 Service::configure (const std::string &name, const std::string &value)
 {
@@ -238,27 +244,58 @@ Service::configure (const std::string &name, const std::string &value)
   edt::ACConverter acc;
 
   if (name == cfg_edit_global_grid) {
+
     egc.from_string (value, m_global_grid);
+    service_configuration_changed ();
+
   } else if (name == cfg_edit_show_shapes_of_instances) {
+
     tl::from_string (value, m_show_shapes_of_instances);
+    service_configuration_changed ();
+
   } else if (name == cfg_edit_max_shapes_of_instances) {
+
     tl::from_string (value, m_max_shapes_of_instances);
+    service_configuration_changed ();
+
   } else if (name == cfg_edit_grid) {
+
     egc.from_string (value, m_edit_grid);
+    service_configuration_changed ();
+
     return true;  //  taken
+
   } else if (name == cfg_edit_snap_to_objects) {
+
     tl::from_string (value, m_snap_to_objects);
+    service_configuration_changed ();
+
     return true;  //  taken
+
   } else if (name == cfg_edit_move_angle_mode) {
+
     acc.from_string (value, m_move_ac);
+    service_configuration_changed ();
+
     return true;  //  taken
+
   } else if (name == cfg_edit_connect_angle_mode) {
+
     acc.from_string (value, m_connect_ac);
+    service_configuration_changed ();
+
     return true;  //  taken
+
   } else if (name == cfg_edit_top_level_selection) {
+
     tl::from_string (value, m_top_level_sel);
+    service_configuration_changed ();
+
   } else if (name == cfg_edit_hier_copy_mode) {
+
     tl::from_string (value, m_hier_copy_mode);
+    service_configuration_changed ();
+
   }
 
   return false;  //  not taken

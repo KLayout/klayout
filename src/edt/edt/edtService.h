@@ -456,6 +456,11 @@ protected:
   virtual void do_cancel_edit () { }
 
   /**
+   *  @brief Called when a configuration parameter provided by the service base class has changed
+   */
+  virtual void service_configuration_changed ();
+
+  /**
    *  @brief Install a marker for representing the edited object
    *
    *  The ownership over the marker is transferred to the service object.

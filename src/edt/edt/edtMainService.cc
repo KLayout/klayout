@@ -59,6 +59,7 @@ MainService::MainService (db::Manager *manager, lay::LayoutView *view, lay::Disp
   : lay::Plugin (view),
     lay::Editable (view),
     db::Object (manager),
+    dm_setup_pages (this, &MainService::do_setup_pages),
     mp_view (view),
     mp_root (root),
     m_needs_update (false),
@@ -2358,6 +2359,14 @@ private:
 
 void
 MainService::config_finalize ()
+{
+  //  It's important that the editor option pages are updated last - because the
+  //  configuration change may trigger other configuration changes
+  dm_setup_pages ();
+}
+
+void
+MainService::do_setup_pages ()
 {
   setup_pages (view ());
 }

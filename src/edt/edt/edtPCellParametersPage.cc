@@ -165,6 +165,8 @@ PCellParametersPage::init ()
   mp_parameters_area = 0;
 
   QGridLayout *frame_layout = new QGridLayout (this);
+  //  spacing and margin for tool windows
+  frame_layout->setMargin (0);
   setLayout (frame_layout);
 
   mp_error_icon = new QLabel (this);
@@ -200,6 +202,7 @@ PCellParametersPage::setup (const db::Layout *layout, lay::LayoutView *view, int
   m_widgets.clear ();
 
   mp_parameters_area = new QScrollArea (this);
+  mp_parameters_area->setFrameShape (QFrame::NoFrame);
   QGridLayout *frame_layout = dynamic_cast<QGridLayout *> (QFrame::layout ());
   frame_layout->addWidget (mp_parameters_area, 0, 0, 1, 2);
   frame_layout->setRowStretch (0, 1);
@@ -211,6 +214,9 @@ PCellParametersPage::setup (const db::Layout *layout, lay::LayoutView *view, int
 
   QGridLayout *inner_grid = new QGridLayout (inner_frame);
   inner_frame->setLayout (inner_grid);
+  inner_grid->setMargin (4);
+  inner_grid->setHorizontalSpacing (6);
+  inner_grid->setVerticalSpacing (2);
 
   QWidget *main_frame = inner_frame;
   QGridLayout *main_grid = inner_grid;
@@ -247,6 +253,9 @@ PCellParametersPage::setup (const db::Layout *layout, lay::LayoutView *view, int
         main_grid->addWidget (gb, main_row, 0, 1, 2);
         
         inner_grid = new QGridLayout (gb);
+        inner_grid->setMargin (4);
+        inner_grid->setHorizontalSpacing (6);
+        inner_grid->setVerticalSpacing (2);
         gb->setLayout (inner_grid);
         inner_frame = gb;
 
@@ -286,6 +295,7 @@ PCellParametersPage::setup (const db::Layout *layout, lay::LayoutView *view, int
           QHBoxLayout *hb = new QHBoxLayout (f);
           hb->setMargin (0);
           f->setLayout (hb);
+          f->setFrameShape (QFrame::NoFrame);
 
           QLineEdit *le = new QLineEdit (f);
           le->setEnabled (! p->is_readonly ());

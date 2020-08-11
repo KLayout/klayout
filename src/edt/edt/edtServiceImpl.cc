@@ -1288,10 +1288,6 @@ InstService::do_begin_edit (const db::DPoint &p)
     m_trans = db::VCplxTrans (1.0 / cv->layout ().dbu ()) * tv [0] * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ();
   }
 
-  lay::Marker *marker = new lay::Marker (view (), m_cv_index, ! show_shapes_of_instances (), show_shapes_of_instances () ? max_shapes_of_instances () : 0);
-  marker->set_vertex_shape (lay::ViewOp::Cross);
-  marker->set_vertex_size (9 /*cross vertex size*/);
-  set_edit_marker (marker);
   update_marker ();
 }
 
@@ -1505,18 +1501,33 @@ InstService::do_cancel_edit ()
   }
 }
 
+void
+InstService::service_configuration_changed ()
+{
+  m_needs_update = true;
+}
+
 bool 
 InstService::configure (const std::string &name, const std::string &value)
 {
   if (name == cfg_edit_inst_cell_name) {
-    m_cell_or_pcell_name = value;
-    m_needs_update = true;
+
+    if (value != m_cell_or_pcell_name) {
+      m_cell_or_pcell_name = value;
+      m_needs_update = true;
+    }
+
     return true; // taken
   }
 
   if (name == cfg_edit_inst_lib_name) {
-    m_lib_name = value;
-    m_needs_update = true;
+
+    if (value != m_lib_name) {
+      m_lib_name_previous = m_lib_name;
+      m_lib_name = value;
+      m_needs_update = true;
+    }
+
     return true; // taken
   }
 
@@ -1603,9 +1614,58 @@ void
 InstService::config_finalize ()
 {
   if (m_needs_update) {
+
+    //  if the library or cell name has changed, store the current pcell parameters and try to reuse
+    //  an existing parameter set
+    if (! m_cell_or_pcell_name_previous.empty () && (m_cell_or_pcell_name_previous != m_cell_or_pcell_name || m_lib_name_previous != m_lib_name)) {
+
+      m_stored_pcell_parameters[std::make_pair (m_cell_or_pcell_name_previous, m_lib_name_previous)] = m_pcell_parameters;
+
+      std::map<std::pair<std::string, std::string>, std::map<std::string, tl::Variant> >::const_iterator p = m_stored_pcell_parameters.find (std::make_pair (m_cell_or_pcell_name, m_lib_name));
+      if (p != m_stored_pcell_parameters.end ()) {
+        m_pcell_parameters = p->second;
+      } else {
+        m_pcell_parameters.clear ();
+      }
+
+      m_is_pcell = false;
+
+      const lay::CellView &cv = view ()->cellview (m_cv_index);
+      if (cv.is_valid ()) {
+
+        db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name);
+
+        //  find the layout the cell has to be looked up: that is either the layout of the current instance or
+        //  the library selected
+        const db::Layout *layout;
+        if (lib) {
+          layout = &lib->layout ();
+        } else {
+          layout = &cv->layout ();
+        }
+
+        m_is_pcell = layout->pcell_by_name (m_cell_or_pcell_name.c_str ()).first;
+
+      }
+
+    }
+
     m_has_valid_cell = false;
-    update_marker ();
+    update_marker ();  //  NOTE: sets m_is_pcell
     m_needs_update = false;
+
+    //  remember the current cell or library name
+    m_cell_or_pcell_name_previous = m_cell_or_pcell_name;
+    m_lib_name_previous = m_lib_name;
+
+    //  Reflects any changes in PCell parameters induced by reuse of make_cell (called from update_marker)
+    //  in the configuration
+    if (m_is_pcell) {
+      dispatcher ()->config_set (cfg_edit_inst_pcell_parameters, pcell_parameters_to_string (m_pcell_parameters));
+    } else {
+      dispatcher ()->config_set (cfg_edit_inst_pcell_parameters, std::string ());
+    }
+
   }
 
   edt::Service::config_finalize ();
@@ -1614,13 +1674,16 @@ InstService::config_finalize ()
 void
 InstService::update_marker ()
 {
-  lay::Marker *marker = dynamic_cast<lay::Marker *> (edit_marker ());
-  if (marker) {
+  lay::Marker *marker = new lay::Marker (view (), m_cv_index, ! show_shapes_of_instances (), show_shapes_of_instances () ? max_shapes_of_instances () : 0);
+  marker->set_vertex_shape (lay::ViewOp::Cross);
+  marker->set_vertex_size (9 /*cross vertex size*/);
+  set_edit_marker (marker);
+
+  db::CellInstArray inst;
+  if (get_inst (inst)) {
+    marker->set (inst, m_trans);
+  } else {
     marker->set ();
-    db::CellInstArray inst;
-    if (get_inst (inst)) {
-      marker->set (inst, m_trans);
-    }
   }
 }
 

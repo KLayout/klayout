@@ -220,6 +220,8 @@ public:
 
 protected:
   bool configure (const std::string &name, const std::string &value);
+  void service_configuration_changed ();
+
   void config_finalize ();
 
 private:
@@ -228,7 +230,9 @@ private:
   bool m_mirror;
   db::DPoint m_disp;
   std::string m_cell_or_pcell_name, m_lib_name;
+  std::string m_cell_or_pcell_name_previous, m_lib_name_previous;
   std::map<std::string, tl::Variant> m_pcell_parameters;
+  std::map<std::pair<std::string, std::string>, std::map<std::string, tl::Variant> > m_stored_pcell_parameters;
   bool m_is_pcell;
   bool m_array;
   unsigned int m_rows, m_columns;

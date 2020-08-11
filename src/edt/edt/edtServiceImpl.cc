@@ -1140,13 +1140,10 @@ InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase 
     if (cd->library ()) {
       if (m_lib_name != cd->library ()->get_name ()) {
         m_lib_name = cd->library ()->get_name ();
-        m_pcell_parameters.clear ();
       }
     } else {
       m_lib_name.clear ();
     }
-
-    m_is_pcell = false;
 
     if (cd->is_pcell ()) {
 
@@ -1157,19 +1154,6 @@ InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase 
 
       if (m_cell_or_pcell_name != pcell_decl->name ()) {
         m_cell_or_pcell_name = pcell_decl->name ();
-        m_pcell_parameters.clear ();
-      }
-
-      m_is_pcell = true;
-
-      //  NOTE: we reuse previous parameters for convenience unless PCell or library has changed
-      const std::vector<db::PCellParameterDeclaration> &pd = pcell_decl->parameter_declarations();
-      for (std::vector<db::PCellParameterDeclaration>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
-        if (i->get_type () == db::PCellParameterDeclaration::t_layer && !i->is_hidden () && !i->is_readonly () && i->get_default ().is_nil ()) {
-          m_pcell_parameters.insert (std::make_pair (i->get_name (), get_default_layer_for_pcell ()));
-        } else {
-          m_pcell_parameters.insert (std::make_pair (i->get_name (), i->get_default ()));
-        }
       }
 
     } else if (cd->layout ()->is_valid_cell_index (cd->cell_index ())) {
@@ -1179,6 +1163,8 @@ InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase 
     } else {
       return false;
     }
+
+    switch_cell_or_pcell ();
 
     sync_to_config ();
     m_in_drag_drop = true;
@@ -1610,53 +1596,57 @@ InstService::configure (const std::string &name, const std::string &value)
   return edt::Service::configure (name, value);
 }
 
+void
+InstService::switch_cell_or_pcell ()
+{
+  //  if the library or cell name has changed, store the current pcell parameters and try to reuse
+  //  an existing parameter set
+  if (! m_cell_or_pcell_name_previous.empty () && (m_cell_or_pcell_name_previous != m_cell_or_pcell_name || m_lib_name_previous != m_lib_name)) {
+
+    m_stored_pcell_parameters[std::make_pair (m_cell_or_pcell_name_previous, m_lib_name_previous)] = m_pcell_parameters;
+
+    std::map<std::pair<std::string, std::string>, std::map<std::string, tl::Variant> >::const_iterator p = m_stored_pcell_parameters.find (std::make_pair (m_cell_or_pcell_name, m_lib_name));
+    if (p != m_stored_pcell_parameters.end ()) {
+      m_pcell_parameters = p->second;
+    } else {
+      m_pcell_parameters.clear ();
+    }
+
+  }
+
+  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name);
+  const lay::CellView &cv = view ()->cellview (m_cv_index);
+
+  //  find the layout the cell has to be looked up: that is either the layout of the current instance or
+  //  the library selected
+  const db::Layout *layout = 0;
+  if (lib) {
+    layout = &lib->layout ();
+  } else if (cv.is_valid ()) {
+    layout = &cv->layout ();
+  }
+
+  if (layout) {
+    m_is_pcell = layout->pcell_by_name (m_cell_or_pcell_name.c_str ()).first;
+  } else {
+    m_is_pcell = false;
+  }
+
+  //  remember the current cell or library name
+  m_cell_or_pcell_name_previous = m_cell_or_pcell_name;
+  m_lib_name_previous = m_lib_name;
+}
+
 void 
 InstService::config_finalize ()
 {
   if (m_needs_update) {
 
-    //  if the library or cell name has changed, store the current pcell parameters and try to reuse
-    //  an existing parameter set
-    if (! m_cell_or_pcell_name_previous.empty () && (m_cell_or_pcell_name_previous != m_cell_or_pcell_name || m_lib_name_previous != m_lib_name)) {
-
-      m_stored_pcell_parameters[std::make_pair (m_cell_or_pcell_name_previous, m_lib_name_previous)] = m_pcell_parameters;
-
-      std::map<std::pair<std::string, std::string>, std::map<std::string, tl::Variant> >::const_iterator p = m_stored_pcell_parameters.find (std::make_pair (m_cell_or_pcell_name, m_lib_name));
-      if (p != m_stored_pcell_parameters.end ()) {
-        m_pcell_parameters = p->second;
-      } else {
-        m_pcell_parameters.clear ();
-      }
-
-      m_is_pcell = false;
-
-      const lay::CellView &cv = view ()->cellview (m_cv_index);
-      if (cv.is_valid ()) {
-
-        db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name);
-
-        //  find the layout the cell has to be looked up: that is either the layout of the current instance or
-        //  the library selected
-        const db::Layout *layout;
-        if (lib) {
-          layout = &lib->layout ();
-        } else {
-          layout = &cv->layout ();
-        }
-
-        m_is_pcell = layout->pcell_by_name (m_cell_or_pcell_name.c_str ()).first;
-
-      }
-
-    }
+    switch_cell_or_pcell ();
 
     m_has_valid_cell = false;
-    update_marker ();  //  NOTE: sets m_is_pcell
+    update_marker ();
     m_needs_update = false;
-
-    //  remember the current cell or library name
-    m_cell_or_pcell_name_previous = m_cell_or_pcell_name;
-    m_lib_name_previous = m_lib_name;
 
     //  Reflects any changes in PCell parameters induced by reuse of make_cell (called from update_marker)
     //  in the configuration

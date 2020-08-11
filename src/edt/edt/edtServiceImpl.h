@@ -253,6 +253,7 @@ private:
   std::pair<bool, db::cell_index_type> make_cell (const lay::CellView &cv);
   tl::Variant get_default_layer_for_pcell ();
   void sync_to_config ();
+  void switch_cell_or_pcell ();
 };
 
 }

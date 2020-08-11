@@ -537,12 +537,11 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
   m_libs_visible = true;
 
   mp_eo_dock_widget = new QDockWidget (QObject::tr ("Editor Options"), this);
-  mp_eo_dock_widget->hide ();
   mp_eo_dock_widget->setObjectName (QString::fromUtf8 ("eo_dock_widget"));
   mp_eo_stack = new ControlWidgetStack (mp_eo_dock_widget, "eo_stack");
   mp_eo_dock_widget->setWidget (mp_eo_stack);
   connect (mp_eo_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
-  m_eo_visible = false;
+  m_eo_visible = true;
 
   mp_bm_dock_widget = new QDockWidget (QObject::tr ("Bookmarks"), this);
   mp_bm_dock_widget->setObjectName (QString::fromUtf8 ("bookmarks_dock_widget"));
@@ -939,6 +938,7 @@ MainWindow::show ()
 void
 MainWindow::close_all ()
 {
+  cancel ();
   mp_layer_toolbox->set_view (0);
 
   //  try a smooth shutdown of the current view
@@ -1151,9 +1151,18 @@ MainWindow::config_finalize ()
   // Not set the window state: this ensures we have handled cfg_window_geometry
   // before we restore the state
   if (! m_config_window_state.empty ()) {
+
     QByteArray state = QByteArray::fromBase64 (m_config_window_state.c_str ());
     m_config_window_state.clear ();
+
+    bool eo_visible = m_eo_visible;
+
     restoreState (state);
+
+    //  Keep the editor options visibility state
+    m_eo_visible = eo_visible;
+    show_dock_widget (mp_eo_dock_widget, m_eo_visible);
+
   }
 
   // Update the default grids menu if necessary
@@ -3024,6 +3033,8 @@ void
 MainWindow::close_view (int index)
 {
   if (view (index)) {
+
+    cancel ();
 
     //  this suppresses view_selected events that would otherwise be created
     bool f = m_disable_tab_selected;

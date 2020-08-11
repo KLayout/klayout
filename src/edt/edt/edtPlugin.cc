@@ -403,11 +403,10 @@ activate_service (lay::LayoutView *view, const lay::PluginDeclaration *pd, bool 
     return;
   }
 
-  //  @@@ TODO: this is very inefficient as each "activate" will regenerate the tabs
+  //  TODO: this is very inefficient as each "activate" will regenerate the tabs
   for (std::vector<edt::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
     (*op)->activate (((*op)->plugin_declaration () == pd || ! (*op)->plugin_declaration ()) && active);
   }
-
 }
 
 void

@@ -579,13 +579,18 @@ void
 EditorOptionsInst::update_cell_edits ()
 {
   db::Layout *layout = 0;
+  lay::LayoutView *view = lay::LayoutView::current ();
 
   //  find the layout the cell has to be looked up: that is either the layout of the current instance or
   //  the library selected
   if (mp_ui->lib_cbx->current_library ()) {
     layout = &mp_ui->lib_cbx->current_library ()->layout ();
-  } else {
-    layout = &lay::LayoutView::current ()->cellview (m_cv_index)->layout ();
+  } else if (view && view->cellview (m_cv_index).is_valid ()) {
+    layout = &view->cellview (m_cv_index)->layout ();
+  }
+
+  if (! layout) {
+    return;
   }
 
   std::pair<bool, db::pcell_id_type> pc = layout->pcell_by_name (tl::to_string (mp_ui->cell_le->text ()).c_str ());

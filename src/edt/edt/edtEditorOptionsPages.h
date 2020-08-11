@@ -31,6 +31,7 @@
 #include <string>
 
 class QTabWidget;
+class QLabel;
 
 namespace Ui
 {
@@ -255,6 +256,7 @@ private:
   Ui::EditorOptionsInstPCellParam *mp_ui;
   lay::Dispatcher *mp_root;
   edt::PCellParametersPage *mp_pcell_parameters;
+  QLabel *mp_placeholder_label;
   int m_cv_index;
   std::string m_lib_name, m_cell_name;
 

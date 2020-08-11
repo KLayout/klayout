@@ -782,7 +782,7 @@ EditorOptionsInst::setup (lay::Plugin *root)
 //  EditorOptionsInstPCellParam implementation
 
 EditorOptionsInstPCellParam::EditorOptionsInstPCellParam (lay::Dispatcher *root)
-  : QWidget (), EditorOptionsPage (), mp_root (root), mp_pcell_parameters (0)
+  : QWidget (), EditorOptionsPage (), mp_root (root), mp_pcell_parameters (0), mp_placeholder_label (0)
 {
   mp_ui = new Ui::EditorOptionsInstPCellParam ();
   mp_ui->setupUi (this);
@@ -799,24 +799,6 @@ EditorOptionsInstPCellParam::title () const
 {
   return tl::to_string (QObject::tr ("PCell"));
 }
-
-/* @@@
-void
-EditorOptionsInstPCellParam::library_changed (int)
-{
-BEGIN_PROTECTED
-  update_pcell_parameters ();
-END_PROTECTED
-}
-
-void
-EditorOptionsInstPCellParam::cell_name_changed (const QString &)
-{
-BEGIN_PROTECTED
-  update_pcell_parameters ();
-END_PROTECTED
-}
-*/
 
 void
 EditorOptionsInstPCellParam::apply (lay::Plugin *root)
@@ -926,24 +908,24 @@ void
 EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Variant> &parameters)
 {
   db::Layout *layout = 0;
-
-/* @@@
-  if (m_cv_index < 0 || !lay::LayoutView::current () || !lay::LayoutView::current ()->cellview (m_cv_index).is_valid ()) {
-    mp_ui->param_tab_widget->setTabEnabled (1, false);
-    return;
-  }
-@@@*/
+  lay::LayoutView *view = lay::LayoutView::current ();
 
   //  find the layout the cell has to be looked up: that is either the layout of the current instance or
   //  the library selected
   db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name);
   if (lib) {
     layout = &lib->layout ();
-  } else {
-    layout = &lay::LayoutView::current ()->cellview (m_cv_index)->layout ();
+  } else if (view) {
+    const lay::CellView &cv = view->cellview (m_cv_index);
+    if (cv.is_valid ()) {
+      layout = &cv->layout ();
+    }
   }
 
-  std::pair<bool, db::pcell_id_type> pc = layout->pcell_by_name (tl::to_string (m_cell_name).c_str ());
+  std::pair<bool, db::pcell_id_type> pc (false, 0);
+  if (layout) {
+    pc = layout->pcell_by_name (tl::to_string (m_cell_name).c_str ());
+  }
 
   PCellParametersPage::State pcp_state;
 
@@ -954,19 +936,28 @@ EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Var
     mp_pcell_parameters->deleteLater ();
   }
 
+  if (mp_placeholder_label) {
+    mp_placeholder_label->hide ();
+    mp_placeholder_label->deleteLater ();
+  }
+
   mp_pcell_parameters = 0;
+  mp_placeholder_label = 0;
 
-  if (pc.first && layout->pcell_declaration (pc.second)) {
+  if (pc.first && layout->pcell_declaration (pc.second) && view && view->cellview (m_cv_index).is_valid ()) {
 
-    // @@@mp_ui->param_tab_widget->setTabEnabled (1, true);
-    lay::LayoutView *view = lay::LayoutView::current ();
     mp_pcell_parameters = new PCellParametersPage (this, &view->cellview (m_cv_index)->layout (), view, m_cv_index, layout->pcell_declaration (pc.second), parameters);
     this->layout ()->addWidget (mp_pcell_parameters);
 
     mp_pcell_parameters->set_state (pcp_state);
 
   } else {
-    // @@@mp_ui->param_tab_widget->setTabEnabled (1, false);
+
+    mp_placeholder_label = new QLabel (this);
+    mp_placeholder_label->setText (tr ("Not a PCell"));
+    mp_placeholder_label->setAlignment (Qt::AlignHCenter | Qt::AlignVCenter);
+    this->layout ()->addWidget (mp_placeholder_label);
+
   }
 }
 

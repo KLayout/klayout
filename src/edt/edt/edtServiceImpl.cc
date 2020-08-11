@@ -1138,9 +1138,18 @@ InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase 
 
     //  configure from the drag/drop data
     if (cd->library ()) {
+
+      //  Reject drag & drop if the target technology does not match
+      if (cd->library ()->for_technologies () && view ()->cellview (view ()->active_cellview_index ()).is_valid ()) {
+        if (! cd->library ()->is_for_technology (view ()->cellview (view ()->active_cellview_index ())->tech_name ())) {
+          return false;
+        }
+      }
+
       if (m_lib_name != cd->library ()->get_name ()) {
         m_lib_name = cd->library ()->get_name ();
       }
+
     } else {
       m_lib_name.clear ();
     }

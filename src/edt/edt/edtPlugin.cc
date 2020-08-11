@@ -46,9 +46,9 @@ void get_text_options (std::vector < std::pair<std::string, std::string> > &opti
 }
 
 static 
-void get_text_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::Dispatcher *)
+void get_text_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::Dispatcher *dispatcher)
 {
-  ret.push_back (new edt::EditorOptionsText ());
+  ret.push_back (new edt::EditorOptionsText (dispatcher));
 }
 
 static 
@@ -61,9 +61,9 @@ void get_path_options (std::vector < std::pair<std::string, std::string> > &opti
 }
 
 static 
-void get_path_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::Dispatcher *)
+void get_path_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::Dispatcher *dispatcher)
 {
-  ret.push_back (new EditorOptionsPath ());
+  ret.push_back (new EditorOptionsPath (dispatcher));
 }
 
 static 
@@ -86,10 +86,10 @@ void get_inst_options (std::vector < std::pair<std::string, std::string> > &opti
 }
 
 static 
-void get_inst_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::Dispatcher *root)
+void get_inst_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::Dispatcher *dispatcher)
 {
-  ret.push_back (new EditorOptionsInstPCellParam (root));
-  ret.push_back (new EditorOptionsInst (root));
+  ret.push_back (new EditorOptionsInstPCellParam (dispatcher));
+  ret.push_back (new EditorOptionsInst (dispatcher));
 }
 
 template <class Svc>
@@ -356,8 +356,7 @@ show_editor_options_page (lay::LayoutView *view)
   }
 
   std::vector<edt::EditorOptionsPage *> prop_dialog_pages;
-  EditorOptionsGeneric *generic_opt = new EditorOptionsGeneric ();
-  generic_opt->setup (view->dispatcher ());
+  EditorOptionsGeneric *generic_opt = new EditorOptionsGeneric (view->dispatcher ());
   prop_dialog_pages.push_back (generic_opt);
 
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {

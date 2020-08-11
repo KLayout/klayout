@@ -51,8 +51,8 @@ namespace edt
 // ------------------------------------------------------------------
 //  EditorOptionsPage implementation
 
-EditorOptionsPage::EditorOptionsPage ()
-  : mp_owner (0), m_active (true), mp_plugin_declaration (0)
+EditorOptionsPage::EditorOptionsPage (lay::Dispatcher *dispatcher)
+  : mp_owner (0), m_active (true), mp_plugin_declaration (0), mp_dispatcher (dispatcher)
 {
   //  nothing yet ..
 }
@@ -231,10 +231,42 @@ END_PROTECTED_W (this)
 }
 
 // ------------------------------------------------------------------
+//  Indicates an error on a line edit
+
+static void indicate_error (QLineEdit *le, bool error)
+{
+  //  by the way, update the foreground color of the cell edit box as well (red, if not valid)
+  QPalette pl = le->palette ();
+  if (error) {
+    pl.setColor (QPalette::Active, QPalette::Text, Qt::red);
+    pl.setColor (QPalette::Active, QPalette::Base, QColor (Qt::red).lighter (180));
+  } else {
+    QWidget *pw = dynamic_cast<QWidget *> (le->parent ());
+    tl_assert (pw != 0);
+    pl.setColor (QPalette::Active, QPalette::Text, pw->palette ().color (QPalette::Text));
+    pl.setColor (QPalette::Active, QPalette::Base, pw->palette ().color (QPalette::Base));
+  }
+  le->setPalette (pl);
+}
+
+template <class Value>
+static void configure_from_line_edit (lay::Dispatcher *dispatcher, QLineEdit *le, const std::string &cfg_name)
+{
+  try {
+    Value value = Value (0);
+    tl::from_string (tl::to_string (le->text ()), value);
+    dispatcher->config_set (cfg_name, tl::to_string (value));
+    indicate_error (le, false);
+  } catch (...) {
+    indicate_error (le, true);
+  }
+}
+
+// ------------------------------------------------------------------
 //  EditorOptionsGeneric implementation
 
-EditorOptionsGeneric::EditorOptionsGeneric ()
-  : QWidget (), EditorOptionsPage ()
+EditorOptionsGeneric::EditorOptionsGeneric (lay::Dispatcher *dispatcher)
+  : QWidget (), EditorOptionsPage (dispatcher)
 {
   mp_ui = new Ui::EditorOptionsGeneric ();
   mp_ui->setupUi (this);
@@ -255,7 +287,7 @@ EditorOptionsGeneric::title () const
 }
 
 void  
-EditorOptionsGeneric::apply (lay::Plugin *root) 
+EditorOptionsGeneric::apply (lay::Dispatcher *root)
 {
   //  Edit grid
   
@@ -300,7 +332,7 @@ EditorOptionsGeneric::show_shapes_changed ()
 }
 
 void  
-EditorOptionsGeneric::setup (lay::Plugin *root)
+EditorOptionsGeneric::setup (lay::Dispatcher *root)
 {
   //  Edit grid
 
@@ -355,8 +387,8 @@ EditorOptionsGeneric::setup (lay::Plugin *root)
 // ------------------------------------------------------------------
 //  EditorOptionsText implementation
 
-EditorOptionsText::EditorOptionsText ()
-  : QWidget (), EditorOptionsPage ()
+EditorOptionsText::EditorOptionsText (lay::Dispatcher *dispatcher)
+  : QWidget (), EditorOptionsPage (dispatcher)
 {
   mp_ui = new Ui::EditorOptionsText ();
   mp_ui->setupUi (this);
@@ -375,7 +407,7 @@ EditorOptionsText::title () const
 }
 
 void  
-EditorOptionsText::apply (lay::Plugin *root) 
+EditorOptionsText::apply (lay::Dispatcher *root)
 {
   //  Text string
   root->config_set (cfg_edit_text_string, tl::unescape_string (tl::to_string (mp_ui->text_le->text ())));
@@ -399,7 +431,7 @@ EditorOptionsText::apply (lay::Plugin *root)
 }
 
 void  
-EditorOptionsText::setup (lay::Plugin *root)
+EditorOptionsText::setup (lay::Dispatcher *root)
 {
   //  Text string
   std::string s;
@@ -428,8 +460,8 @@ EditorOptionsText::setup (lay::Plugin *root)
 // ------------------------------------------------------------------
 //  EditorOptionsPath implementation
 
-EditorOptionsPath::EditorOptionsPath ()
-  : QWidget (), EditorOptionsPage ()
+EditorOptionsPath::EditorOptionsPath (lay::Dispatcher *dispatcher)
+  : QWidget (), EditorOptionsPage (dispatcher)
 {
   mp_ui = new Ui::EditorOptionsPath ();
   mp_ui->setupUi (this);
@@ -457,7 +489,7 @@ EditorOptionsPath::type_changed (int type)
 }
 
 void  
-EditorOptionsPath::apply (lay::Plugin *root) 
+EditorOptionsPath::apply (lay::Dispatcher *root)
 {
   //  width
 
@@ -494,7 +526,7 @@ EditorOptionsPath::apply (lay::Plugin *root)
 }
 
 void  
-EditorOptionsPath::setup (lay::Plugin *root)
+EditorOptionsPath::setup (lay::Dispatcher *root)
 {
   //  width
 
@@ -527,16 +559,27 @@ EditorOptionsPath::setup (lay::Plugin *root)
 // ------------------------------------------------------------------
 //  EditorOptionsInst implementation
 
-EditorOptionsInst::EditorOptionsInst (lay::Dispatcher *root)
-  : QWidget (), EditorOptionsPage (), mp_root (root)
+EditorOptionsInst::EditorOptionsInst (lay::Dispatcher *dispatcher)
+  : QWidget (), EditorOptionsPage (dispatcher)
 {
   mp_ui = new Ui::EditorOptionsInst ();
   mp_ui->setupUi (this);
 
   connect (mp_ui->array_grp, SIGNAL (clicked ()), this, SLOT (array_changed ()));
   connect (mp_ui->browse_pb, SIGNAL (clicked ()), this, SLOT (browse_cell ()));
-  connect (mp_ui->lib_cbx, SIGNAL (currentIndexChanged (int)), this, SLOT (library_changed (int)));
-  connect (mp_ui->cell_le, SIGNAL (textChanged (const QString &)), this, SLOT (cell_name_changed (const QString &)));
+  connect (mp_ui->lib_cbx, SIGNAL (currentIndexChanged (int)), this, SLOT (library_changed ()));
+  connect (mp_ui->cell_le, SIGNAL (editingFinished ()), this, SLOT (edited ()));
+  connect (mp_ui->angle_le, SIGNAL (editingFinished ()), this, SLOT (edited ()));
+  connect (mp_ui->scale_le, SIGNAL (editingFinished ()), this, SLOT (edited ()));
+  connect (mp_ui->rows_le, SIGNAL (editingFinished ()), this, SLOT (edited ()));
+  connect (mp_ui->row_x_le, SIGNAL (editingFinished ()), this, SLOT (edited ()));
+  connect (mp_ui->row_y_le, SIGNAL (editingFinished ()), this, SLOT (edited ()));
+  connect (mp_ui->columns_le, SIGNAL (editingFinished ()), this, SLOT (edited ()));
+  connect (mp_ui->column_x_le, SIGNAL (editingFinished ()), this, SLOT (edited ()));
+  connect (mp_ui->column_y_le, SIGNAL (editingFinished ()), this, SLOT (edited ()));
+  connect (mp_ui->mirror_cbx, SIGNAL (clicked ()), this, SLOT (edited ()));
+  connect (mp_ui->array_grp, SIGNAL (clicked ()), this, SLOT (edited ()));
+  connect (mp_ui->place_origin_cb, SIGNAL (clicked ()), this, SLOT (edited ()));
 
   m_cv_index = -1;
 }
@@ -554,25 +597,17 @@ EditorOptionsInst::title () const
 }
 
 void
-EditorOptionsInst::library_changed (int)
+EditorOptionsInst::library_changed ()
 {
   update_cell_edits ();
-/* @@@
-BEGIN_PROTECTED
-  update_pcell_parameters ();
-END_PROTECTED
-@@@*/
+  edited ();
 }
 
 void
-EditorOptionsInst::cell_name_changed (const QString &)
+EditorOptionsInst::cell_name_changed ()
 {
   update_cell_edits ();
-/* @@@
-BEGIN_PROTECTED
-  update_pcell_parameters ();
-END_PROTECTED
-@@@*/
+  edited ();
 }
 
 void
@@ -597,15 +632,7 @@ EditorOptionsInst::update_cell_edits ()
   std::pair<bool, db::cell_index_type> cc = layout->cell_by_name (tl::to_string (mp_ui->cell_le->text ()).c_str ());
 
   //  by the way, update the foreground color of the cell edit box as well (red, if not valid)
-  QPalette pl = mp_ui->cell_le->palette ();
-  if (! pc.first && ! cc.first) {
-    pl.setColor (QPalette::Text, Qt::red);
-    pl.setColor (QPalette::Base, QColor (Qt::red).lighter (180));
-  } else {
-    pl.setColor (QPalette::Text, palette ().color (QPalette::Text));
-    pl.setColor (QPalette::Base, palette ().color (QPalette::Base));
-  }
-  mp_ui->cell_le->setPalette (pl);
+  indicate_error (mp_ui->cell_le, ! pc.first && ! cc.first);
 }
 
 void
@@ -649,12 +676,18 @@ BEGIN_PROTECTED
       } else if (layout->is_valid_cell_index (form.selected_cell_index ())) {
         mp_ui->cell_le->setText (tl::to_qstring (layout->cell_name (form.selected_cell_index ())));
       }
-      // @@@@update_pcell_parameters ();
+      edited ();
     }
 
   }
 
 END_PROTECTED
+}
+
+void
+EditorOptionsInst::edited ()
+{
+  apply (dispatcher ());
 }
 
 void
@@ -667,15 +700,16 @@ EditorOptionsInst::array_changed ()
   mp_ui->columns_le->setEnabled (array);
   mp_ui->column_x_le->setEnabled (array);
   mp_ui->column_y_le->setEnabled (array);
+  edited ();
 }
 
 void  
-EditorOptionsInst::apply (lay::Plugin *root) 
+EditorOptionsInst::apply (lay::Dispatcher *root)
 {
   //  cell name
   root->config_set (cfg_edit_inst_cell_name, tl::to_string (mp_ui->cell_le->text ()));
 
-  //  cell name
+  //  lib name
   if (mp_ui->lib_cbx->current_library ()) {
     root->config_set (cfg_edit_inst_lib_name, mp_ui->lib_cbx->current_library ()->get_name ());
   } else {
@@ -683,36 +717,23 @@ EditorOptionsInst::apply (lay::Plugin *root)
   }
 
   //  rotation, scaling
-  double angle = 0.0;
-  tl::from_string (tl::to_string (mp_ui->angle_le->text ()), angle);
-  root->config_set (cfg_edit_inst_angle, tl::to_string (angle));
+  configure_from_line_edit<double> (root, mp_ui->angle_le, cfg_edit_inst_angle);
 
   bool mirror = mp_ui->mirror_cbx->isChecked ();
   root->config_set (cfg_edit_inst_mirror, tl::to_string (mirror));
 
-  double scale = 1.0;
-  tl::from_string (tl::to_string (mp_ui->scale_le->text ()), scale);
-  root->config_set (cfg_edit_inst_scale, tl::to_string (scale));
+  configure_from_line_edit<double> (root, mp_ui->scale_le, cfg_edit_inst_scale);
 
   //  array
   bool array = mp_ui->array_grp->isChecked ();
   root->config_set (cfg_edit_inst_array, tl::to_string (array));
 
-  int rows = 1, columns = 1;
-  double row_x = 0.0, row_y = 0.0, column_x = 0.0, column_y = 0.0;
-  tl::from_string (tl::to_string (mp_ui->rows_le->text ()), rows);
-  tl::from_string (tl::to_string (mp_ui->row_x_le->text ()), row_x);
-  tl::from_string (tl::to_string (mp_ui->row_y_le->text ()), row_y);
-  tl::from_string (tl::to_string (mp_ui->columns_le->text ()), columns);
-  tl::from_string (tl::to_string (mp_ui->column_x_le->text ()), column_x);
-  tl::from_string (tl::to_string (mp_ui->column_y_le->text ()), column_y);
-
-  root->config_set (cfg_edit_inst_rows, tl::to_string (rows));
-  root->config_set (cfg_edit_inst_row_x, tl::to_string (row_x));
-  root->config_set (cfg_edit_inst_row_y, tl::to_string (row_y));
-  root->config_set (cfg_edit_inst_columns, tl::to_string (columns));
-  root->config_set (cfg_edit_inst_column_x, tl::to_string (column_x));
-  root->config_set (cfg_edit_inst_column_y, tl::to_string (column_y));
+  configure_from_line_edit<int> (root, mp_ui->rows_le, cfg_edit_inst_rows);
+  configure_from_line_edit<double> (root, mp_ui->row_x_le, cfg_edit_inst_row_x);
+  configure_from_line_edit<double> (root, mp_ui->row_y_le, cfg_edit_inst_row_y);
+  configure_from_line_edit<int> (root, mp_ui->columns_le, cfg_edit_inst_columns);
+  configure_from_line_edit<double> (root, mp_ui->column_x_le, cfg_edit_inst_column_x);
+  configure_from_line_edit<double> (root, mp_ui->column_y_le, cfg_edit_inst_column_y);
 
   //  place origin of cell flag
   bool place_origin = mp_ui->place_origin_cb->isChecked ();
@@ -720,28 +741,41 @@ EditorOptionsInst::apply (lay::Plugin *root)
 }
 
 void  
-EditorOptionsInst::setup (lay::Plugin *root)
+EditorOptionsInst::setup (lay::Dispatcher *root)
 {
   m_cv_index = -1;
   if (lay::LayoutView::current ()) {
     m_cv_index = lay::LayoutView::current ()->active_cellview_index ();
   }
-  mp_ui->lib_cbx->update_list ();
-  if (m_cv_index >= 0 && lay::LayoutView::current () && lay::LayoutView::current ()->cellview (m_cv_index).is_valid ()) {
-    mp_ui->lib_cbx->set_technology_filter (lay::LayoutView::current ()->cellview (m_cv_index)->tech_name (), true);
-  } else {
-    mp_ui->lib_cbx->set_technology_filter (std::string (), false);
+
+  try {
+
+    mp_ui->lib_cbx->blockSignals (true);
+
+    mp_ui->lib_cbx->update_list ();
+    if (m_cv_index >= 0 && lay::LayoutView::current () && lay::LayoutView::current ()->cellview (m_cv_index).is_valid ()) {
+      mp_ui->lib_cbx->set_technology_filter (lay::LayoutView::current ()->cellview (m_cv_index)->tech_name (), true);
+    } else {
+      mp_ui->lib_cbx->set_technology_filter (std::string (), false);
+    }
+
+    //  cell name
+    std::string s;
+    root->config_get (cfg_edit_inst_cell_name, s);
+    mp_ui->cell_le->setText (tl::to_qstring (s));
+
+    //  library
+    std::string l;
+    root->config_get (cfg_edit_inst_lib_name, l);
+    mp_ui->lib_cbx->set_current_library (db::LibraryManager::instance ().lib_ptr_by_name (l));
+
+    mp_ui->lib_cbx->blockSignals (false);
+    update_cell_edits ();
+
+  } catch (...) {
+    mp_ui->lib_cbx->blockSignals (false);
+    throw;
   }
-
-  //  cell name
-  std::string s;
-  root->config_get (cfg_edit_inst_cell_name, s);
-  mp_ui->cell_le->setText (tl::to_qstring (s));
-
-  //  library
-  std::string l;
-  root->config_get (cfg_edit_inst_lib_name, l);
-  mp_ui->lib_cbx->set_current_library (db::LibraryManager::instance ().lib_ptr_by_name (l));
 
   //  rotation, scaling
   double angle = 0.0;
@@ -786,8 +820,8 @@ EditorOptionsInst::setup (lay::Plugin *root)
 // ------------------------------------------------------------------
 //  EditorOptionsInstPCellParam implementation
 
-EditorOptionsInstPCellParam::EditorOptionsInstPCellParam (lay::Dispatcher *root)
-  : QWidget (), EditorOptionsPage (), mp_root (root), mp_pcell_parameters (0), mp_placeholder_label (0)
+EditorOptionsInstPCellParam::EditorOptionsInstPCellParam (lay::Dispatcher *dispatcher)
+  : QWidget (), EditorOptionsPage (dispatcher), mp_pcell_parameters (0), mp_placeholder_label (0)
 {
   mp_ui = new Ui::EditorOptionsInstPCellParam ();
   mp_ui->setupUi (this);
@@ -806,7 +840,7 @@ EditorOptionsInstPCellParam::title () const
 }
 
 void
-EditorOptionsInstPCellParam::apply (lay::Plugin *root)
+EditorOptionsInstPCellParam::apply (lay::Dispatcher *root)
 {
   //  pcell parameters
   std::string param;
@@ -833,7 +867,7 @@ EditorOptionsInstPCellParam::apply (lay::Plugin *root)
 }
 
 void
-EditorOptionsInstPCellParam::setup (lay::Plugin *root)
+EditorOptionsInstPCellParam::setup (lay::Dispatcher *root)
 {
   m_cv_index = -1;
   if (lay::LayoutView::current ()) {

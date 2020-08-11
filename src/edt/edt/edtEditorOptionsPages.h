@@ -65,14 +65,14 @@ class EditorOptionsPages;
 class EditorOptionsPage
 {
 public:
-  EditorOptionsPage ();
+  EditorOptionsPage (lay::Dispatcher *dispatcher);
   virtual ~EditorOptionsPage ();
 
   virtual QWidget *q_frame () = 0;
   virtual std::string title () const = 0;
   virtual int order () const = 0;
-  virtual void apply (lay::Plugin *root) = 0;
-  virtual void setup (lay::Plugin *root) = 0;
+  virtual void apply (lay::Dispatcher *root) = 0;
+  virtual void setup (lay::Dispatcher *root) = 0;
 
   bool active () const { return m_active; }
   void activate (bool active);
@@ -81,10 +81,17 @@ public:
   const lay::PluginDeclaration *plugin_declaration () const { return mp_plugin_declaration; }
   void set_plugin_declaration (const lay::PluginDeclaration *pd) { mp_plugin_declaration = pd; }
 
+protected:
+  lay::Dispatcher *dispatcher () const
+  {
+    return mp_dispatcher;
+  }
+
 private:
   EditorOptionsPages *mp_owner;
   bool m_active;
   const lay::PluginDeclaration *mp_plugin_declaration;
+  lay::Dispatcher *mp_dispatcher;
 };
 
 /**
@@ -129,15 +136,15 @@ class EditorOptionsGeneric
 Q_OBJECT
 
 public:
-  EditorOptionsGeneric ();
+  EditorOptionsGeneric (lay::Dispatcher *dispatcher);
   ~EditorOptionsGeneric ();
 
   virtual QWidget *q_frame () { return this; }
 
   virtual std::string title () const;
   virtual int order () const { return 0; }
-  void apply (lay::Plugin *root);
-  void setup (lay::Plugin *root);
+  void apply (lay::Dispatcher *root);
+  void setup (lay::Dispatcher *root);
 
 public slots:
   void grid_changed (int);
@@ -154,15 +161,15 @@ class EditorOptionsText
   : public QWidget, public EditorOptionsPage 
 {
 public:
-  EditorOptionsText ();
+  EditorOptionsText (lay::Dispatcher *dispatcher);
   ~EditorOptionsText ();
 
   virtual QWidget *q_frame () { return this; }
 
   virtual std::string title () const;
   virtual int order () const { return 10; }
-  void apply (lay::Plugin *root);
-  void setup (lay::Plugin *root);
+  void apply (lay::Dispatcher *root);
+  void setup (lay::Dispatcher *root);
 
 private:
   Ui::EditorOptionsText *mp_ui;
@@ -177,15 +184,15 @@ class EditorOptionsPath
 Q_OBJECT 
 
 public:
-  EditorOptionsPath ();
+  EditorOptionsPath (lay::Dispatcher *dispatcher);
   ~EditorOptionsPath ();
 
   virtual QWidget *q_frame () { return this; }
 
   virtual std::string title () const;
   virtual int order () const { return 30; }
-  void apply (lay::Plugin *root);
-  void setup (lay::Plugin *root);
+  void apply (lay::Dispatcher *root);
+  void setup (lay::Dispatcher *root);
 
 public slots:
   void type_changed (int);
@@ -210,20 +217,20 @@ public:
 
   virtual std::string title () const;
   virtual int order () const { return 20; }
-  void apply (lay::Plugin *root);
-  void setup (lay::Plugin *root);
+  void apply (lay::Dispatcher *root);
+  void setup (lay::Dispatcher *root);
 
 public slots:
   void array_changed ();
   void browse_cell ();
   void update_pcell_parameters ();
-  void library_changed (int index);
-  void cell_name_changed (const QString &s);
+  void library_changed ();
+  void cell_name_changed ();
   void update_cell_edits ();
+  void edited ();
 
 private:
   Ui::EditorOptionsInst *mp_ui;
-  lay::Dispatcher *mp_root;
   edt::PCellParametersPage *mp_pcell_parameters;
   int m_cv_index;
 
@@ -246,15 +253,14 @@ public:
 
   virtual std::string title () const;
   virtual int order () const { return 21; }
-  void apply (lay::Plugin *root);
-  void setup (lay::Plugin *root);
+  void apply (lay::Dispatcher *root);
+  void setup (lay::Dispatcher *root);
 
 public slots:
   void update_pcell_parameters ();
 
 private:
   Ui::EditorOptionsInstPCellParam *mp_ui;
-  lay::Dispatcher *mp_root;
   edt::PCellParametersPage *mp_pcell_parameters;
   QLabel *mp_placeholder_label;
   int m_cv_index;

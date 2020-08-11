@@ -18,16 +18,16 @@
     <number>6</number>
    </property>
    <property name="leftMargin">
-    <number>9</number>
+    <number>4</number>
    </property>
    <property name="topMargin">
-    <number>9</number>
+    <number>4</number>
    </property>
    <property name="rightMargin">
-    <number>9</number>
+    <number>4</number>
    </property>
    <property name="bottomMargin">
-    <number>9</number>
+    <number>4</number>
    </property>
    <item>
     <widget class="QFrame" name="frame_2">
@@ -106,19 +106,22 @@
      </property>
      <layout class="QGridLayout">
       <property name="leftMargin">
-       <number>9</number>
+       <number>4</number>
       </property>
       <property name="topMargin">
-       <number>9</number>
+       <number>4</number>
       </property>
       <property name="rightMargin">
-       <number>9</number>
+       <number>4</number>
       </property>
       <property name="bottomMargin">
-       <number>9</number>
+       <number>4</number>
       </property>
-      <property name="spacing">
+      <property name="horizontalSpacing">
        <number>6</number>
+      </property>
+      <property name="verticalSpacing">
+       <number>2</number>
       </property>
       <item row="0" column="4" rowspan="3">
        <spacer>
@@ -128,7 +131,7 @@
         <property name="sizeHint" stdset="0">
          <size>
           <width>21</width>
-          <height>81</height>
+          <height>10</height>
          </size>
         </property>
        </spacer>

@@ -590,7 +590,7 @@ LibrarySelectionComboBox::set_technology_filter (const std::string &tech, bool e
 void 
 LibrarySelectionComboBox::update_list ()
 {
-  blockSignals (true);
+  bool wasBlocked = blockSignals (true);
 
   db::Library *lib = current_library ();
 
@@ -620,7 +620,7 @@ LibrarySelectionComboBox::update_list ()
 
   set_current_library (lib);
 
-  blockSignals (false);
+  blockSignals (wasBlocked);
 }
 
 LibrarySelectionComboBox::~LibrarySelectionComboBox ()

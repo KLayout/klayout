@@ -176,6 +176,16 @@ public:
     mp_bglabel->show ();
   }
 
+  void focusInEvent (QFocusEvent *)
+  {
+    for (size_t i = 0; i < m_widgets.size (); ++i) {
+      if (m_widgets [i]->isVisible ()) {
+        m_widgets [i]->setFocus ();
+        break;
+      }
+    }
+  }
+
   void addWidget (QWidget *w)
   {
     m_widgets.push_back (w);
@@ -422,6 +432,7 @@ show_dock_widget (QDockWidget *dock_widget, bool visible)
   if (visible) {
 
     dock_widget->show ();
+    dock_widget->setFocus ();
 
     //  NOTE: this is a clumsy way to make sure the dock widget is made the current tab if it's in a tabbed dock
     //  TODO: is there a better way to do this?
@@ -526,6 +537,7 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
   mp_hp_dock_widget->setObjectName (QString::fromUtf8 ("hp_dock_widget"));
   mp_hp_stack = new ControlWidgetStack (mp_hp_dock_widget, "hp_stack");
   mp_hp_dock_widget->setWidget (mp_hp_stack);
+  mp_hp_dock_widget->setFocusProxy (mp_hp_stack);
   connect (mp_hp_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
   m_hp_visible = true;
 
@@ -533,6 +545,7 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
   mp_libs_dock_widget->setObjectName (QString::fromUtf8 ("libs_dock_widget"));
   mp_libs_stack = new ControlWidgetStack (mp_libs_dock_widget, "libs_stack");
   mp_libs_dock_widget->setWidget (mp_libs_stack);
+  mp_libs_dock_widget->setFocusProxy (mp_libs_stack);
   connect (mp_libs_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
   m_libs_visible = true;
 
@@ -540,6 +553,7 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
   mp_eo_dock_widget->setObjectName (QString::fromUtf8 ("eo_dock_widget"));
   mp_eo_stack = new ControlWidgetStack (mp_eo_dock_widget, "eo_stack");
   mp_eo_dock_widget->setWidget (mp_eo_stack);
+  mp_eo_dock_widget->setFocusProxy (mp_eo_stack);
   connect (mp_eo_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
   m_eo_visible = true;
 
@@ -547,6 +561,7 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
   mp_bm_dock_widget->setObjectName (QString::fromUtf8 ("bookmarks_dock_widget"));
   mp_bm_stack = new ControlWidgetStack (mp_bm_dock_widget, "bookmarks_stack");
   mp_bm_dock_widget->setWidget (mp_bm_stack);
+  mp_bm_dock_widget->setFocusProxy (mp_bm_stack);
   connect (mp_bm_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
   m_bm_visible = true;
 
@@ -558,6 +573,7 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
   mp_layer_toolbox_dock_widget->setObjectName (QString::fromUtf8 ("lt_dock_widget"));
   mp_layer_toolbox = new LayerToolbox (mp_layer_toolbox_dock_widget, "layer_toolbox");
   mp_layer_toolbox_dock_widget->setWidget (mp_layer_toolbox);
+  mp_layer_toolbox_dock_widget->setFocusProxy (mp_layer_toolbox);
   connect (mp_layer_toolbox_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
   m_layer_toolbox_visible = true;
 
@@ -565,6 +581,7 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
   mp_lp_dock_widget->setObjectName (QString::fromUtf8 ("lp_dock_widget"));
   mp_lp_stack = new ControlWidgetStack (mp_lp_dock_widget, "lp_stack");
   mp_lp_dock_widget->setWidget (mp_lp_stack);
+  mp_lp_dock_widget->setFocusProxy (mp_lp_stack);
   connect (mp_lp_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
   m_lp_visible = true;
 
@@ -572,6 +589,7 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
   mp_navigator_dock_widget->setObjectName (QString::fromUtf8 ("navigator_dock_widget"));
   mp_navigator = new Navigator (this);
   mp_navigator_dock_widget->setWidget (mp_navigator);
+  mp_navigator_dock_widget->setFocusProxy (mp_navigator);
   connect (mp_navigator_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
   m_navigator_visible = true;
 
@@ -3916,10 +3934,8 @@ MainWindow::menu_activated (const std::string &symbol)
     cm_help_about_qt ();
   } else if (symbol == "cm_edit_options") {
 
-    if (!m_eo_visible) {
-      m_eo_visible = true;
-      show_dock_widget (mp_eo_dock_widget, m_eo_visible);
-    }
+    m_eo_visible = true;
+    show_dock_widget (mp_eo_dock_widget, m_eo_visible);
 
   } else {
 
@@ -4371,8 +4387,8 @@ public:
     menu_entries.push_back (lay::separator ("macros_group", at));
 
     at = "@toolbar.end";
-    menu_entries.push_back (lay::menu_item ("cm_prev_display_state", "prev_display_state", at, tl::to_string (QObject::tr ("Back(Shift+Tab)<:/back.png>"))));
-    menu_entries.push_back (lay::menu_item ("cm_next_display_state", "next_display_state", at, tl::to_string (QObject::tr ("Forward(Tab)<:/forward.png>"))));
+    menu_entries.push_back (lay::menu_item ("cm_prev_display_state", "prev_display_state", at, tl::to_string (QObject::tr ("Back<:/back.png>"))));
+    menu_entries.push_back (lay::menu_item ("cm_next_display_state", "next_display_state", at, tl::to_string (QObject::tr ("Forward<:/forward.png>"))));
     menu_entries.push_back (lay::separator ("toolbar_post_navigation_group", at));
   }
 };

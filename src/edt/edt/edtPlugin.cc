@@ -379,6 +379,7 @@ show_editor_options_page (lay::LayoutView *view)
 
   edt::EditorOptionsPages *pages = new edt::EditorOptionsPages (view->editor_options_frame (), prop_dialog_pages, view);
   view->editor_options_frame ()->layout ()->addWidget (pages);
+  view->editor_options_frame ()->setFocusProxy (pages);
 }
 
 static

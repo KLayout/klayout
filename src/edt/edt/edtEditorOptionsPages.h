@@ -63,7 +63,10 @@ class EditorOptionsPages;
  *  @brief The base class for a object properties page 
  */
 class EditorOptionsPage
+  : public QWidget
 {
+Q_OBJECT
+
 public:
   EditorOptionsPage (lay::Dispatcher *dispatcher);
   virtual ~EditorOptionsPage ();
@@ -80,6 +83,12 @@ public:
 
   const lay::PluginDeclaration *plugin_declaration () const { return mp_plugin_declaration; }
   void set_plugin_declaration (const lay::PluginDeclaration *pd) { mp_plugin_declaration = pd; }
+
+protected slots:
+  void edited ()
+  {
+    apply (dispatcher ());
+  }
 
 protected:
   lay::Dispatcher *dispatcher () const
@@ -108,6 +117,7 @@ public:
 
   void unregister_page (edt::EditorOptionsPage *page);
   void activate_page (edt::EditorOptionsPage *page);
+  void focusInEvent (QFocusEvent *event);
 
   const std::vector <edt::EditorOptionsPage *> &pages () const
   {
@@ -131,7 +141,7 @@ private:
  *  @brief The generic properties page
  */
 class EditorOptionsGeneric
-  : public QWidget, public EditorOptionsPage
+  : public EditorOptionsPage
 {
 Q_OBJECT
 
@@ -158,7 +168,7 @@ private:
  *  @brief The text properties page
  */
 class EditorOptionsText
-  : public QWidget, public EditorOptionsPage 
+  : public EditorOptionsPage
 {
 public:
   EditorOptionsText (lay::Dispatcher *dispatcher);
@@ -179,7 +189,7 @@ private:
  *  @brief The path properties page
  */
 class EditorOptionsPath
-  : public QWidget, public EditorOptionsPage 
+  : public EditorOptionsPage
 {
 Q_OBJECT 
 
@@ -205,7 +215,7 @@ private:
  *  @brief The instance properties page
  */
 class EditorOptionsInst
-  : public QWidget, public EditorOptionsPage 
+  : public EditorOptionsPage
 {
 Q_OBJECT 
 
@@ -220,14 +230,13 @@ public:
   void apply (lay::Dispatcher *root);
   void setup (lay::Dispatcher *root);
 
-public slots:
+private slots:
   void array_changed ();
   void browse_cell ();
   void update_pcell_parameters ();
   void library_changed ();
   void cell_name_changed ();
   void update_cell_edits ();
-  void edited ();
 
 private:
   Ui::EditorOptionsInst *mp_ui;
@@ -241,7 +250,7 @@ private:
  *  @brief The instance properties page (PCell parameters)
  */
 class EditorOptionsInstPCellParam
-  : public QWidget, public EditorOptionsPage
+  : public EditorOptionsPage
 {
 Q_OBJECT
 
@@ -256,7 +265,7 @@ public:
   void apply (lay::Dispatcher *root);
   void setup (lay::Dispatcher *root);
 
-public slots:
+private slots:
   void update_pcell_parameters ();
 
 private:

@@ -52,7 +52,7 @@ namespace edt
 //  EditorOptionsPage implementation
 
 EditorOptionsPage::EditorOptionsPage (lay::Dispatcher *dispatcher)
-  : mp_owner (0), m_active (true), mp_plugin_declaration (0), mp_dispatcher (dispatcher)
+  : QWidget (0), mp_owner (0), m_active (true), mp_plugin_declaration (0), mp_dispatcher (dispatcher)
 {
   //  nothing yet ..
 }
@@ -128,6 +128,15 @@ EditorOptionsPages::~EditorOptionsPages ()
 {
   while (m_pages.size () > 0) {
     delete m_pages.front ();
+  }
+}
+
+void
+EditorOptionsPages::focusInEvent (QFocusEvent * /*event*/)
+{
+  //  Sends the focus to the current page's last focus owner
+  if (mp_pages->currentWidget () && mp_pages->currentWidget ()->focusWidget ()) {
+    mp_pages->currentWidget ()->focusWidget ()->setFocus ();
   }
 }
 
@@ -266,7 +275,7 @@ static void configure_from_line_edit (lay::Dispatcher *dispatcher, QLineEdit *le
 //  EditorOptionsGeneric implementation
 
 EditorOptionsGeneric::EditorOptionsGeneric (lay::Dispatcher *dispatcher)
-  : QWidget (), EditorOptionsPage (dispatcher)
+  : EditorOptionsPage (dispatcher)
 {
   mp_ui = new Ui::EditorOptionsGeneric ();
   mp_ui->setupUi (this);
@@ -388,7 +397,7 @@ EditorOptionsGeneric::setup (lay::Dispatcher *root)
 //  EditorOptionsText implementation
 
 EditorOptionsText::EditorOptionsText (lay::Dispatcher *dispatcher)
-  : QWidget (), EditorOptionsPage (dispatcher)
+  : EditorOptionsPage (dispatcher)
 {
   mp_ui = new Ui::EditorOptionsText ();
   mp_ui->setupUi (this);
@@ -461,7 +470,7 @@ EditorOptionsText::setup (lay::Dispatcher *root)
 //  EditorOptionsPath implementation
 
 EditorOptionsPath::EditorOptionsPath (lay::Dispatcher *dispatcher)
-  : QWidget (), EditorOptionsPage (dispatcher)
+  : EditorOptionsPage (dispatcher)
 {
   mp_ui = new Ui::EditorOptionsPath ();
   mp_ui->setupUi (this);
@@ -560,7 +569,7 @@ EditorOptionsPath::setup (lay::Dispatcher *root)
 //  EditorOptionsInst implementation
 
 EditorOptionsInst::EditorOptionsInst (lay::Dispatcher *dispatcher)
-  : QWidget (), EditorOptionsPage (dispatcher)
+  : EditorOptionsPage (dispatcher)
 {
   mp_ui = new Ui::EditorOptionsInst ();
   mp_ui->setupUi (this);
@@ -682,12 +691,6 @@ BEGIN_PROTECTED
   }
 
 END_PROTECTED
-}
-
-void
-EditorOptionsInst::edited ()
-{
-  apply (dispatcher ());
 }
 
 void
@@ -821,7 +824,7 @@ EditorOptionsInst::setup (lay::Dispatcher *root)
 //  EditorOptionsInstPCellParam implementation
 
 EditorOptionsInstPCellParam::EditorOptionsInstPCellParam (lay::Dispatcher *dispatcher)
-  : QWidget (), EditorOptionsPage (dispatcher), mp_pcell_parameters (0), mp_placeholder_label (0)
+  : EditorOptionsPage (dispatcher), mp_pcell_parameters (0), mp_placeholder_label (0)
 {
   mp_ui = new Ui::EditorOptionsInstPCellParam ();
   mp_ui->setupUi (this);
@@ -853,17 +856,21 @@ EditorOptionsInstPCellParam::apply (lay::Dispatcher *root)
     layout = &lay::LayoutView::current ()->cellview (m_cv_index)->layout ();
   }
 
+  bool ok = true;
+
   if (layout && mp_pcell_parameters) {
     std::pair<bool, db::pcell_id_type> pc = layout->pcell_by_name (tl::to_string (m_cell_name).c_str ());
     if (pc.first) {
       const db::PCellDeclaration *pc_decl = layout->pcell_declaration (pc.second);
       if (pc_decl) {
-        param = pcell_parameters_to_string (pc_decl->named_parameters (mp_pcell_parameters->get_parameters ()));
+        param = pcell_parameters_to_string (pc_decl->named_parameters (mp_pcell_parameters->get_parameters (&ok)));
       }
     }
   }
 
-  root->config_set (cfg_edit_inst_pcell_parameters, param);
+  if (ok) {
+    root->config_set (cfg_edit_inst_pcell_parameters, param);
+  }
 }
 
 void
@@ -874,11 +881,24 @@ EditorOptionsInstPCellParam::setup (lay::Dispatcher *root)
     m_cv_index = lay::LayoutView::current ()->active_cellview_index ();
   }
 
+  bool needs_update = (mp_pcell_parameters == 0);
+
   //  cell name
-  root->config_get (cfg_edit_inst_cell_name, m_cell_name);
+  std::string cn;
+  root->config_get (cfg_edit_inst_cell_name, cn);
+  if (cn != m_cell_name) {
+    m_cell_name = cn;
+    needs_update = true;
+  }
 
   //  library
-  root->config_get (cfg_edit_inst_lib_name, m_lib_name);
+  std::string ln;
+  root->config_get (cfg_edit_inst_lib_name, ln);
+  if (ln != m_lib_name) {
+    m_lib_name = ln;
+    needs_update = true;
+  }
+
   db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name);
 
   //  pcell parameters
@@ -932,8 +952,17 @@ EditorOptionsInstPCellParam::setup (lay::Dispatcher *root)
 
   }
 
+  if (! needs_update) {
+    bool ok = false;
+    if (mp_pcell_parameters->get_parameters (&ok) != pv || ! ok) {
+      needs_update = true;
+    }
+  }
+
   try {
-    update_pcell_parameters (pv);
+    if (needs_update) {
+      update_pcell_parameters (pv);
+    }
   } catch (...) { }
 }
 
@@ -985,10 +1014,12 @@ EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Var
 
   if (pc.first && layout->pcell_declaration (pc.second) && view && view->cellview (m_cv_index).is_valid ()) {
 
-    mp_pcell_parameters = new PCellParametersPage (this, &view->cellview (m_cv_index)->layout (), view, m_cv_index, layout->pcell_declaration (pc.second), parameters);
+    mp_pcell_parameters = new PCellParametersPage (this, true /*dense*/);
+    mp_pcell_parameters->setup (&view->cellview (m_cv_index)->layout (), view, m_cv_index, layout->pcell_declaration (pc.second), parameters);
     this->layout ()->addWidget (mp_pcell_parameters);
 
     mp_pcell_parameters->set_state (pcp_state);
+    connect (mp_pcell_parameters, SIGNAL (edited ()), this, SLOT (edited ()));
 
   } else {
 

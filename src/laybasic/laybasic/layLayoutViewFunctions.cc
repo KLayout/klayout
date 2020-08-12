@@ -2185,8 +2185,8 @@ public:
     menu_entries.push_back (lay::separator ("zoom_group", at));
     menu_entries.push_back (lay::menu_item ("cm_zoom_fit", "zoom_fit", at, tl::to_string (QObject::tr ("Zoom Fit(F2)"))));
     menu_entries.push_back (lay::menu_item ("cm_zoom_fit_sel", "zoom_fit_sel", at, tl::to_string (QObject::tr ("Zoom Fit Selection(Shift+F2)"))));
-    menu_entries.push_back (lay::menu_item ("cm_zoom_in", "zoom_in", at, tl::to_string (QObject::tr ("Zoom In(Return)"))));
-    menu_entries.push_back (lay::menu_item ("cm_zoom_out", "zoom_out", at, tl::to_string (QObject::tr ("Zoom Out(Shift+Return)"))));
+    menu_entries.push_back (lay::menu_item ("cm_zoom_in", "zoom_in", at, tl::to_string (QObject::tr ("Zoom In(Ctrl++)"))));
+    menu_entries.push_back (lay::menu_item ("cm_zoom_out", "zoom_out", at, tl::to_string (QObject::tr ("Zoom Out(Ctrl+-)"))));
     /* disabled because that interferes with the use of the arrow keys for moving the selection
     MenuLayoutEntry::separator ("pan_group");
     menu_entries.push_back (lay::menu_item ("cm_pan_up", "pan_up", at, tl::to_string (QObject::tr ("Pan Up(Up)"))));

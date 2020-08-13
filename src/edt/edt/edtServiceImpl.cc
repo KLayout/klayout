@@ -1673,16 +1673,22 @@ InstService::config_finalize ()
 void
 InstService::update_marker ()
 {
-  lay::Marker *marker = new lay::Marker (view (), m_cv_index, ! show_shapes_of_instances (), show_shapes_of_instances () ? max_shapes_of_instances () : 0);
-  marker->set_vertex_shape (lay::ViewOp::Cross);
-  marker->set_vertex_size (9 /*cross vertex size*/);
-  set_edit_marker (marker);
+  if (editing ()) {
 
-  db::CellInstArray inst;
-  if (get_inst (inst)) {
-    marker->set (inst, m_trans);
+    lay::Marker *marker = new lay::Marker (view (), m_cv_index, ! show_shapes_of_instances (), show_shapes_of_instances () ? max_shapes_of_instances () : 0);
+    marker->set_vertex_shape (lay::ViewOp::Cross);
+    marker->set_vertex_size (9 /*cross vertex size*/);
+    set_edit_marker (marker);
+
+    db::CellInstArray inst;
+    if (get_inst (inst)) {
+      marker->set (inst, m_trans);
+    } else {
+      marker->set ();
+    }
+
   } else {
-    marker->set ();
+    set_edit_marker (0);
   }
 }
 

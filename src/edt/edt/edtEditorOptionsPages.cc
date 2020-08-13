@@ -242,18 +242,20 @@ END_PROTECTED_W (this)
 // ------------------------------------------------------------------
 //  Indicates an error on a line edit
 
-static void indicate_error (QLineEdit *le, bool error)
+static void indicate_error (QLineEdit *le, const tl::Exception *ex)
 {
   //  by the way, update the foreground color of the cell edit box as well (red, if not valid)
   QPalette pl = le->palette ();
-  if (error) {
+  if (ex) {
     pl.setColor (QPalette::Active, QPalette::Text, Qt::red);
     pl.setColor (QPalette::Active, QPalette::Base, QColor (Qt::red).lighter (180));
+    le->setToolTip (tl::to_qstring (ex->msg ()));
   } else {
     QWidget *pw = dynamic_cast<QWidget *> (le->parent ());
     tl_assert (pw != 0);
     pl.setColor (QPalette::Active, QPalette::Text, pw->palette ().color (QPalette::Text));
     pl.setColor (QPalette::Active, QPalette::Base, pw->palette ().color (QPalette::Base));
+    le->setToolTip (QString ());
   }
   le->setPalette (pl);
 }
@@ -265,9 +267,9 @@ static void configure_from_line_edit (lay::Dispatcher *dispatcher, QLineEdit *le
     Value value = Value (0);
     tl::from_string (tl::to_string (le->text ()), value);
     dispatcher->config_set (cfg_name, tl::to_string (value));
-    indicate_error (le, false);
-  } catch (...) {
-    indicate_error (le, true);
+    indicate_error (le, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (le, &ex);
   }
 }
 
@@ -281,6 +283,16 @@ EditorOptionsGeneric::EditorOptionsGeneric (lay::Dispatcher *dispatcher)
   mp_ui->setupUi (this);
 
   connect (mp_ui->grid_cb, SIGNAL (activated (int)), this, SLOT (grid_changed (int)));
+
+  connect (mp_ui->edit_grid_le, SIGNAL (editingFinished ()), this, SLOT (edited ()));
+  connect (mp_ui->grid_cb, SIGNAL (activated (int)), this, SLOT (edited ()));
+  connect (mp_ui->move_angle_cb, SIGNAL (activated (int)), this, SLOT (edited ()));
+  connect (mp_ui->conn_angle_cb, SIGNAL (activated (int)), this, SLOT (edited ()));
+  connect (mp_ui->hier_sel_cbx, SIGNAL (clicked ()), this, SLOT (edited ()));
+  connect (mp_ui->hier_copy_mode_cbx, SIGNAL (activated (int)), this, SLOT (edited ()));
+  connect (mp_ui->snap_objects_cbx, SIGNAL (clicked ()), this, SLOT (edited ()));
+  connect (mp_ui->max_shapes_le, SIGNAL (editingFinished ()), this, SLOT (edited ()));
+  connect (mp_ui->show_shapes_cbx, SIGNAL (clicked ()), this, SLOT (edited ()));
 }
 
 EditorOptionsGeneric::~EditorOptionsGeneric ()
@@ -300,16 +312,21 @@ EditorOptionsGeneric::apply (lay::Dispatcher *root)
 {
   //  Edit grid
   
-  db::DVector eg;
   EditGridConverter egc;
   if (mp_ui->grid_cb->currentIndex () == 0) {
-    eg = db::DVector (-1.0, -1.0);
+    root->config_set (cfg_edit_grid, egc.to_string (db::DVector (-1.0, -1.0)));
   } else if (mp_ui->grid_cb->currentIndex () == 1) {
-    eg = db::DVector ();
+    root->config_set (cfg_edit_grid, egc.to_string (db::DVector ()));
   } else {
-    egc.from_string_picky (tl::to_string (mp_ui->edit_grid_le->text ()), eg);
+    try {
+      db::DVector eg;
+      egc.from_string_picky (tl::to_string (mp_ui->edit_grid_le->text ()), eg);
+      indicate_error (mp_ui->edit_grid_le, 0);
+      root->config_set (cfg_edit_grid, egc.to_string (eg));
+    } catch (tl::Exception &ex) {
+      indicate_error (mp_ui->edit_grid_le, &ex);
+    }
   }
-  root->config_set (cfg_edit_grid, egc.to_string (eg));
 
   //  Edit & move angle
 
@@ -641,7 +658,8 @@ EditorOptionsInst::update_cell_edits ()
   std::pair<bool, db::cell_index_type> cc = layout->cell_by_name (tl::to_string (mp_ui->cell_le->text ()).c_str ());
 
   //  by the way, update the foreground color of the cell edit box as well (red, if not valid)
-  indicate_error (mp_ui->cell_le, ! pc.first && ! cc.first);
+  tl::Exception ex ("No cell or PCell with this name");
+  indicate_error (mp_ui->cell_le, (! pc.first && ! cc.first) ? &ex : 0);
 }
 
 void

@@ -458,6 +458,18 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>grid_cb</tabstop>
+  <tabstop>edit_grid_le</tabstop>
+  <tabstop>snap_objects_cbx</tabstop>
+  <tabstop>conn_angle_cb</tabstop>
+  <tabstop>move_angle_cb</tabstop>
+  <tabstop>hier_sel_cbx</tabstop>
+  <tabstop>hier_copy_mode_cbx</tabstop>
+  <tabstop>show_shapes_cbx</tabstop>
+  <tabstop>max_shapes_le</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

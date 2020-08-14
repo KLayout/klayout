@@ -102,19 +102,6 @@ EditorOptionsPages::EditorOptionsPages (QWidget *parent, const std::vector<edt::
   mp_pages = new QTabWidget (this);
   ly1->addWidget (mp_pages);
 
-  QFrame *f = new QFrame (this);
-  ly1->addWidget (f);
-
-  QToolButton *apply_pb = new QToolButton (f);
-  apply_pb->setText (tr ("Apply"));
-
-  QHBoxLayout *ly2 = new QHBoxLayout (f);
-  ly2->setMargin (0);
-  ly2->addStretch (1);
-  ly2->addWidget (apply_pb);
-
-  connect (apply_pb, SIGNAL (clicked ()), this, SLOT (apply ()));
-
   m_pages = pages;
   for (std::vector <edt::EditorOptionsPage *>::const_iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
     (*p)->set_owner (this);
@@ -339,9 +326,7 @@ EditorOptionsGeneric::apply (lay::Dispatcher *root)
   root->config_set (cfg_edit_hier_copy_mode, tl::to_string ((cpm < 0 || cpm > 1) ? -1 : cpm));
   root->config_set (cfg_edit_snap_to_objects, tl::to_string (mp_ui->snap_objects_cbx->isChecked ()));
 
-  unsigned int max_shapes = 1000;
-  tl::from_string (tl::to_string (mp_ui->max_shapes_le->text ()), max_shapes);
-  root->config_set (cfg_edit_max_shapes_of_instances, tl::to_string (max_shapes));
+  configure_from_line_edit<unsigned int> (root, mp_ui->max_shapes_le, cfg_edit_max_shapes_of_instances);
   root->config_set (cfg_edit_show_shapes_of_instances, tl::to_string (mp_ui->show_shapes_cbx->isChecked ()));
 }
 
@@ -375,6 +360,7 @@ EditorOptionsGeneric::setup (lay::Dispatcher *root)
     mp_ui->edit_grid_le->setText (tl::to_qstring (egc.to_string (eg)));
   }
   grid_changed (mp_ui->grid_cb->currentIndex ());
+  indicate_error (mp_ui->edit_grid_le, 0);
 
   //  edit & move angle
 
@@ -404,6 +390,7 @@ EditorOptionsGeneric::setup (lay::Dispatcher *root)
   unsigned int max_shapes = 1000;
   root->config_get (cfg_edit_max_shapes_of_instances, max_shapes);
   mp_ui->max_shapes_le->setText (tl::to_qstring (tl::to_string (max_shapes)));
+  indicate_error (mp_ui->max_shapes_le, 0);
 
   bool show_shapes = true;
   root->config_get (cfg_edit_show_shapes_of_instances, show_shapes);
@@ -418,6 +405,11 @@ EditorOptionsText::EditorOptionsText (lay::Dispatcher *dispatcher)
 {
   mp_ui = new Ui::EditorOptionsText ();
   mp_ui->setupUi (this);
+
+  connect (mp_ui->text_le, SIGNAL (editingFinished ()), this, SLOT (edited ()));
+  connect (mp_ui->halign_cbx, SIGNAL (activated (int)), this, SLOT (edited ()));
+  connect (mp_ui->valign_cbx, SIGNAL (activated (int)), this, SLOT (edited ()));
+  connect (mp_ui->size_le, SIGNAL (editingFinished ()), this, SLOT (edited ()));
 }
 
 EditorOptionsText::~EditorOptionsText ()
@@ -493,6 +485,11 @@ EditorOptionsPath::EditorOptionsPath (lay::Dispatcher *dispatcher)
   mp_ui->setupUi (this);
 
   connect (mp_ui->type_cb, SIGNAL (currentIndexChanged (int)), this, SLOT (type_changed (int)));
+
+  connect (mp_ui->width_le, SIGNAL (editingFinished ()), this, SLOT (edited ()));
+  connect (mp_ui->type_cb, SIGNAL (activated (int)), this, SLOT (edited ()));
+  connect (mp_ui->start_ext_le, SIGNAL (editingFinished ()), this, SLOT (edited ()));
+  connect (mp_ui->end_ext_le, SIGNAL (editingFinished ()), this, SLOT (edited ()));
 }
 
 EditorOptionsPath::~EditorOptionsPath ()
@@ -519,9 +516,7 @@ EditorOptionsPath::apply (lay::Dispatcher *root)
 {
   //  width
 
-  double w = 0.0;
-  tl::from_string (tl::to_string (mp_ui->width_le->text ()), w);
-  root->config_set (cfg_edit_path_width, tl::to_string (w));
+  configure_from_line_edit<double> (root, mp_ui->width_le, cfg_edit_path_width);
 
   //  path type and extensions 
 
@@ -535,14 +530,10 @@ EditorOptionsPath::apply (lay::Dispatcher *root)
 
   } else if (mp_ui->type_cb->currentIndex () == 2) {
 
-    double bgnext = 0.0, endext = 0.0;
     root->config_set (cfg_edit_path_ext_type, "variable");
 
-    tl::from_string (tl::to_string (mp_ui->start_ext_le->text ()), bgnext);
-    root->config_set (cfg_edit_path_ext_var_begin, tl::to_string (bgnext));
-
-    tl::from_string (tl::to_string (mp_ui->end_ext_le->text ()), endext);
-    root->config_set (cfg_edit_path_ext_var_end, tl::to_string (endext));
+    configure_from_line_edit<double> (root, mp_ui->start_ext_le, cfg_edit_path_ext_var_begin);
+    configure_from_line_edit<double> (root, mp_ui->end_ext_le, cfg_edit_path_ext_var_end);
 
   } else if (mp_ui->type_cb->currentIndex () == 3) {
 
@@ -559,6 +550,7 @@ EditorOptionsPath::setup (lay::Dispatcher *root)
   double w = 0.0;
   root->config_get (cfg_edit_path_width, w);
   mp_ui->width_le->setText (tl::to_qstring (tl::to_string (w)));
+  indicate_error (mp_ui->width_le, 0);
 
   //  path type and extensions 
 
@@ -579,7 +571,9 @@ EditorOptionsPath::setup (lay::Dispatcher *root)
   root->config_get (cfg_edit_path_ext_var_begin, bgnext);
   root->config_get (cfg_edit_path_ext_var_end, endext);
   mp_ui->start_ext_le->setText (tl::to_qstring (tl::to_string (bgnext)));
+  indicate_error (mp_ui->start_ext_le, 0);
   mp_ui->end_ext_le->setText (tl::to_qstring (tl::to_string (endext)));
+  indicate_error (mp_ui->end_ext_le, 0);
 }
 
 // ------------------------------------------------------------------
@@ -802,6 +796,7 @@ EditorOptionsInst::setup (lay::Dispatcher *root)
   double angle = 0.0;
   root->config_get (cfg_edit_inst_angle, angle);
   mp_ui->angle_le->setText (tl::to_qstring (tl::to_string (angle)));
+  indicate_error (mp_ui->angle_le, 0);
 
   bool mirror = false;
   root->config_get (cfg_edit_inst_mirror, mirror);
@@ -810,6 +805,7 @@ EditorOptionsInst::setup (lay::Dispatcher *root)
   double scale = 1.0;
   root->config_get (cfg_edit_inst_scale, scale);
   mp_ui->scale_le->setText (tl::to_qstring (tl::to_string (scale)));
+  indicate_error (mp_ui->scale_le, 0);
 
   //  array
   bool array = false;
@@ -826,11 +822,17 @@ EditorOptionsInst::setup (lay::Dispatcher *root)
   root->config_get (cfg_edit_inst_column_y, column_y);
 
   mp_ui->rows_le->setText (tl::to_qstring (tl::to_string (rows)));
+  indicate_error (mp_ui->rows_le, 0);
   mp_ui->row_x_le->setText (tl::to_qstring (tl::to_string (row_x)));
+  indicate_error (mp_ui->row_x_le, 0);
   mp_ui->row_y_le->setText (tl::to_qstring (tl::to_string (row_y)));
+  indicate_error (mp_ui->row_y_le, 0);
   mp_ui->columns_le->setText (tl::to_qstring (tl::to_string (columns)));
+  indicate_error (mp_ui->columns_le, 0);
   mp_ui->column_x_le->setText (tl::to_qstring (tl::to_string (column_x)));
+  indicate_error (mp_ui->column_x_le, 0);
   mp_ui->column_y_le->setText (tl::to_qstring (tl::to_string (column_y)));
+  indicate_error (mp_ui->column_y_le, 0);
 
   //  place origin of cell flag
   bool place_origin = false;

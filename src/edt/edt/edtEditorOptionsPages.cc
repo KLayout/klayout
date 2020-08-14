@@ -44,6 +44,7 @@
 #include <QVBoxLayout>
 #include <QTabWidget>
 #include <QToolButton>
+#include <QCompleter>
 
 namespace edt
 {
@@ -623,16 +624,16 @@ EditorOptionsInst::library_changed ()
   edited ();
 }
 
-void
-EditorOptionsInst::cell_name_changed ()
-{
-  update_cell_edits ();
-  edited ();
-}
+//  Maximum number of cells for which to offer a cell name completer
+const static size_t max_cells = 10000;
 
 void
 EditorOptionsInst::update_cell_edits ()
 {
+  if (mp_ui->cell_le->completer ()) {
+    mp_ui->cell_le->completer ()->deleteLater ();
+  }
+
   db::Layout *layout = 0;
   lay::LayoutView *view = lay::LayoutView::current ();
 
@@ -646,6 +647,24 @@ EditorOptionsInst::update_cell_edits ()
 
   if (! layout) {
     return;
+  }
+
+  QStringList cellnames;
+  if (layout->cells () < max_cells) {
+    for (db::Layout::iterator c = layout->begin (); c != layout->end (); ++c) {
+      cellnames.push_back (tl::to_qstring (layout->cell_name (c->cell_index ())));
+    }
+    for (db::Layout::pcell_iterator pc = layout->begin_pcells (); pc != layout->end_pcells () && size_t (cellnames.size ()) < max_cells; ++pc) {
+      cellnames.push_back (tl::to_qstring (pc->first));
+    }
+  }
+
+  if (size_t (cellnames.size ()) < max_cells) {
+    QCompleter *completer = new QCompleter (cellnames, this);
+    completer->setCaseSensitivity (Qt::CaseSensitive);
+    mp_ui->cell_le->setCompleter (completer);
+  } else {
+    mp_ui->cell_le->setCompleter (0);
   }
 
   std::pair<bool, db::pcell_id_type> pc = layout->pcell_by_name (tl::to_string (mp_ui->cell_le->text ()).c_str ());

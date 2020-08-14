@@ -235,7 +235,6 @@ private slots:
   void browse_cell ();
   void update_pcell_parameters ();
   void library_changed ();
-  void cell_name_changed ();
   void update_cell_edits ();
 
 private:

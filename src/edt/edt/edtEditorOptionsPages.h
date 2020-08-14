@@ -24,6 +24,8 @@
 #ifndef HDR_edtEditorOptionsPages
 #define HDR_edtEditorOptionsPages
 
+#include "edtEditorOptionsPage.h"
+
 #include <tlVariant.h>
 
 #include <QFrame>
@@ -56,52 +58,6 @@ namespace edt
 {
 
 class PCellParametersPage;
-
-class EditorOptionsPages;
-
-/**
- *  @brief The base class for a object properties page 
- */
-class EditorOptionsPage
-  : public QWidget
-{
-Q_OBJECT
-
-public:
-  EditorOptionsPage (lay::Dispatcher *dispatcher);
-  virtual ~EditorOptionsPage ();
-
-  virtual QWidget *q_frame () = 0;
-  virtual std::string title () const = 0;
-  virtual int order () const = 0;
-  virtual void apply (lay::Dispatcher *root) = 0;
-  virtual void setup (lay::Dispatcher *root) = 0;
-
-  bool active () const { return m_active; }
-  void activate (bool active);
-  void set_owner (EditorOptionsPages *owner);
-
-  const lay::PluginDeclaration *plugin_declaration () const { return mp_plugin_declaration; }
-  void set_plugin_declaration (const lay::PluginDeclaration *pd) { mp_plugin_declaration = pd; }
-
-protected slots:
-  void edited ()
-  {
-    apply (dispatcher ());
-  }
-
-protected:
-  lay::Dispatcher *dispatcher () const
-  {
-    return mp_dispatcher;
-  }
-
-private:
-  EditorOptionsPages *mp_owner;
-  bool m_active;
-  const lay::PluginDeclaration *mp_plugin_declaration;
-  lay::Dispatcher *mp_dispatcher;
-};
 
 /**
  *  @brief The object properties dialog
@@ -149,8 +105,6 @@ public:
   EditorOptionsGeneric (lay::Dispatcher *dispatcher);
   ~EditorOptionsGeneric ();
 
-  virtual QWidget *q_frame () { return this; }
-
   virtual std::string title () const;
   virtual int order () const { return 0; }
   void apply (lay::Dispatcher *root);
@@ -174,8 +128,6 @@ public:
   EditorOptionsText (lay::Dispatcher *dispatcher);
   ~EditorOptionsText ();
 
-  virtual QWidget *q_frame () { return this; }
-
   virtual std::string title () const;
   virtual int order () const { return 10; }
   void apply (lay::Dispatcher *root);
@@ -196,8 +148,6 @@ Q_OBJECT
 public:
   EditorOptionsPath (lay::Dispatcher *dispatcher);
   ~EditorOptionsPath ();
-
-  virtual QWidget *q_frame () { return this; }
 
   virtual std::string title () const;
   virtual int order () const { return 30; }
@@ -223,8 +173,6 @@ public:
   EditorOptionsInst (lay::Dispatcher *root);
   ~EditorOptionsInst ();
 
-  virtual QWidget *q_frame () { return this; }
-
   virtual std::string title () const;
   virtual int order () const { return 20; }
   void apply (lay::Dispatcher *root);
@@ -233,7 +181,6 @@ public:
 private slots:
   void array_changed ();
   void browse_cell ();
-  void update_pcell_parameters ();
   void library_changed ();
   void update_cell_edits ();
 
@@ -241,8 +188,6 @@ private:
   Ui::EditorOptionsInst *mp_ui;
   edt::PCellParametersPage *mp_pcell_parameters;
   int m_cv_index;
-
-  void update_pcell_parameters (const std::vector <tl::Variant> &parameters);
 };
 
 /**
@@ -256,8 +201,6 @@ Q_OBJECT
 public:
   EditorOptionsInstPCellParam (lay::Dispatcher *root);
   ~EditorOptionsInstPCellParam ();
-
-  virtual QWidget *q_frame () { return this; }
 
   virtual std::string title () const;
   virtual int order () const { return 21; }

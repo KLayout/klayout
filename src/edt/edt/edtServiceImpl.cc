@@ -26,6 +26,7 @@
 #include "edtPropertiesPages.h"
 #include "edtInstPropertiesPage.h"
 #include "edtService.h"
+#include "edtPlugin.h"
 #include "dbEdge.h"
 #include "dbLibrary.h"
 #include "dbLibraryManager.h"
@@ -1165,6 +1166,10 @@ InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase 
         m_cell_or_pcell_name = pcell_decl->name ();
       }
 
+      if (! cd->pcell_params ().empty ()) {
+        m_pcell_parameters = pcell_decl->named_parameters (cd->pcell_params ());
+      }
+
     } else if (cd->layout ()->is_valid_cell_index (cd->cell_index ())) {
 
       m_cell_or_pcell_name = cd->layout ()->cell_name (cd->cell_index ());
@@ -1451,6 +1456,8 @@ InstService::do_finish_edit ()
       db::Instance i = cv->layout ().cell (cv.cell_index ()).insert (inst);
       cv->layout ().cleanup ();
       manager ()->commit ();
+
+      commit_recent (view ());
 
       if (m_in_drag_drop) {
 

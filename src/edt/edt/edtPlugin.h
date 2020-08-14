@@ -65,6 +65,11 @@ namespace edt
    *  @brief Setup the editor option pages for the given view
    */
   void setup_pages (lay::LayoutView *view);
+
+  /**
+   *  @brief Commits the current configuration for the recently used configuration list
+   */
+  void commit_recent (lay::LayoutView *view);
 }
 
 #endif

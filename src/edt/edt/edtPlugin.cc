@@ -29,6 +29,7 @@
 #include "edtMainService.h"
 #include "edtPartialService.h"
 #include "edtEditorOptionsPages.h"
+#include "edtRecentConfigurationPage.h"
 
 #include <QApplication>
 #include <QLayout>
@@ -85,9 +86,26 @@ void get_inst_options (std::vector < std::pair<std::string, std::string> > &opti
   options.push_back (std::pair<std::string, std::string> (cfg_edit_show_shapes_of_instances, "true"));
 }
 
+edt::RecentConfigurationPage::ConfigurationDescriptor inst_cfg_descriptors[] =
+{
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_cell_name, tl::to_string (tr ("Cell name")), edt::RecentConfigurationPage::Text),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_angle, tl::to_string (tr ("Angle")), edt::RecentConfigurationPage::Double),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_mirror, tl::to_string (tr ("Mirror")), edt::RecentConfigurationPage::Bool),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_scale, tl::to_string (tr ("Scale")), edt::RecentConfigurationPage::Double),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_array, tl::to_string (tr ("Array")), edt::RecentConfigurationPage::Bool),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_rows, tl::to_string (tr ("Rows")), edt::RecentConfigurationPage::Double),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_row_x, tl::to_string (tr ("Row step (x)")), edt::RecentConfigurationPage::Double),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_row_y, tl::to_string (tr ("Row step (y)")), edt::RecentConfigurationPage::Double),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_columns, tl::to_string (tr ("Columns")), edt::RecentConfigurationPage::Double),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_column_x, tl::to_string (tr ("Column step (x)")), edt::RecentConfigurationPage::Double),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_column_y, tl::to_string (tr ("Column step (y)")), edt::RecentConfigurationPage::Double)
+};
+
 static 
 void get_inst_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::Dispatcher *dispatcher)
 {
+  ret.push_back (new RecentConfigurationPage (dispatcher, 22, tl::to_string (tr ("Recent")),
+                        &inst_cfg_descriptors[0], &inst_cfg_descriptors[sizeof (inst_cfg_descriptors) / sizeof (inst_cfg_descriptors[0])]));
   ret.push_back (new EditorOptionsInstPCellParam (dispatcher));
   ret.push_back (new EditorOptionsInst (dispatcher));
 }
@@ -419,6 +437,19 @@ setup_pages (lay::LayoutView *view)
 
   for (std::vector<edt::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
     (*op)->setup (view);
+  }
+}
+
+void
+commit_recent (lay::LayoutView *view)
+{
+  edt::EditorOptionsPages *eo_pages = get_pages_widget (view);
+  if (!eo_pages) {
+    return;
+  }
+
+  for (std::vector<edt::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
+    (*op)->commit_recent (view);
   }
 }
 

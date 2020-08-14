@@ -50,40 +50,6 @@ namespace edt
 {
 
 // ------------------------------------------------------------------
-//  EditorOptionsPage implementation
-
-EditorOptionsPage::EditorOptionsPage (lay::Dispatcher *dispatcher)
-  : QWidget (0), mp_owner (0), m_active (true), mp_plugin_declaration (0), mp_dispatcher (dispatcher)
-{
-  //  nothing yet ..
-}
-
-EditorOptionsPage::~EditorOptionsPage ()
-{
-  set_owner (0);
-}
-
-void 
-EditorOptionsPage::set_owner (EditorOptionsPages *owner)
-{
-  if (mp_owner) {
-    mp_owner->unregister_page (this);
-  }
-  mp_owner = owner;
-}
-
-void  
-EditorOptionsPage::activate (bool active)
-{
-  if (m_active != active) {
-    m_active = active;
-    if (mp_owner) {
-      mp_owner->activate_page (this);
-    }
-  }
-}
-
-// ------------------------------------------------------------------
 //  EditorOptionsPages implementation
 
 struct EOPCompareOp
@@ -174,9 +140,9 @@ EditorOptionsPages::update (edt::EditorOptionsPage *page)
       if ((*p) == page) {
         index = mp_pages->count ();
       }
-      mp_pages->addTab ((*p)->q_frame (), tl::to_qstring ((*p)->title ()));
+      mp_pages->addTab (*p, tl::to_qstring ((*p)->title ()));
     } else {
-      (*p)->q_frame ()->setParent (0);
+      (*p)->setParent (0);
     }
   }
   if (index < 0) {

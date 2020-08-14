@@ -73,6 +73,10 @@ CellDragDropData::serialized () const
   stream << (quintptr) mp_library;
   stream << m_cell_index;
   stream << m_is_pcell;
+  stream << int (m_pcell_params.size ());
+  for (std::vector<tl::Variant>::const_iterator i = m_pcell_params.begin (); i != m_pcell_params.end (); ++i) {
+    stream << tl::to_qstring (i->to_parsable_string ());
+  }
 
   return data;
 }
@@ -94,6 +98,19 @@ CellDragDropData::deserialize (const QByteArray &ba)
     mp_library = reinterpret_cast <const db::Library *> (p);
     stream >> m_cell_index;
     stream >> m_is_pcell;
+
+    m_pcell_params.clear ();
+    int n = 0;
+    stream >> n;
+    while (n-- > 0) {
+      QString s;
+      stream >> s;
+      std::string stl_s = tl::to_string (s);
+      tl::Extractor ex (stl_s.c_str ());
+      m_pcell_params.push_back (tl::Variant ());
+      ex.read (m_pcell_params.back ());
+    }
+
     return true;
 
   } else {

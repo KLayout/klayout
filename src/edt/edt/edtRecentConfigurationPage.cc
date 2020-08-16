@@ -29,6 +29,8 @@
 namespace edt
 {
 
+static const size_t max_entries = 100;
+
 void
 RecentConfigurationPage::init ()
 {
@@ -36,6 +38,8 @@ RecentConfigurationPage::init ()
   ly->setMargin (0);
 
   mp_tree_widget = new QTreeWidget (this);
+  mp_tree_widget->setRootIsDecorated (false);
+  mp_tree_widget->setUniformRowHeights (true);
   ly->addWidget (mp_tree_widget);
 
   mp_tree_widget->setColumnCount (int (m_cfg.size ()));
@@ -46,7 +50,7 @@ RecentConfigurationPage::init ()
   }
   mp_tree_widget->setHeaderLabels (column_labels);
 
-  update_list ();
+  update_list (get_stored_values ());
 }
 
 RecentConfigurationPage::~RecentConfigurationPage ()
@@ -54,9 +58,59 @@ RecentConfigurationPage::~RecentConfigurationPage ()
   //  .. nothing yet ..
 }
 
+std::string RecentConfigurationPage::title () const
+{
+  return tl::to_string (tr ("Recent"));
+}
+
+int RecentConfigurationPage::order () const
+{
+  return 100;
+}
+
+std::list<std::vector<std::string> >
+RecentConfigurationPage::get_stored_values () const
+{
+  std::string serialized_list = dispatcher ()->config_get (m_recent_cfg_name);
+
+  std::list<std::vector<std::string> > values;
+  tl::Extractor ex (serialized_list.c_str ());
+  while (! ex.at_end ()) {
+
+    values.push_back (std::vector<std::string> ());
+    while (! ex.at_end () && ! ex.test (";")) {
+      values.back ().push_back (std::string ());
+      ex.read_word_or_quoted (values.back ().back ());
+      ex.test (",");
+    }
+
+  }
+
+  return values;
+}
+
+void
+RecentConfigurationPage::set_stored_values (const std::list<std::vector<std::string> > &values) const
+{
+  std::string serialized_list;
+  for (std::list<std::vector<std::string> >::const_iterator v = values.begin (); v != values.end (); ++v) {
+    if (v != values.begin ()) {
+      serialized_list += ";";
+    }
+    for (std::vector<std::string>::const_iterator s = v->begin (); s != v->end (); ++s) {
+      serialized_list += tl::to_word_or_quoted_string (*s);
+      serialized_list += ",";
+    }
+  }
+
+  dispatcher ()->config_set (m_recent_cfg_name, serialized_list);
+}
+
 void
 render_to (QTreeWidgetItem *item, int column, const std::string &v, RecentConfigurationPage::ConfigurationRendering rendering)
 {
+  //  store original value
+  item->setData (column, Qt::UserRole, tl::to_qstring (v));
 
   // @@@ rendering
   item->setText (column, tl::to_qstring (v));
@@ -64,10 +118,10 @@ render_to (QTreeWidgetItem *item, int column, const std::string &v, RecentConfig
 }
 
 void
-RecentConfigurationPage::update_list ()
+RecentConfigurationPage::update_list (const std::list<std::vector<std::string> > &stored_values)
 {
   int row = 0;
-  for (std::list<std::vector<std::string> >::const_iterator v = m_stored_values.begin (); v != m_stored_values.end (); ++v, ++row) {
+  for (std::list<std::vector<std::string> >::const_iterator v = stored_values.begin (); v != stored_values.end (); ++v, ++row) {
 
     QTreeWidgetItem *item = 0;
     if (row < mp_tree_widget->topLevelItemCount ()) {
@@ -102,16 +156,24 @@ RecentConfigurationPage::commit_recent (lay::Dispatcher *root)
     values.push_back (root->config_get (c->cfg_name));
   }
 
-  for (std::list<std::vector<std::string> >::iterator v = m_stored_values.begin (); v != m_stored_values.end (); ++v) {
+  std::list<std::vector<std::string> > stored_values = get_stored_values ();
+
+  for (std::list<std::vector<std::string> >::iterator v = stored_values.begin (); v != stored_values.end (); ++v) {
     if (*v == values) {
-      m_stored_values.erase (v);
+      stored_values.erase (v);
       break;
     }
   }
 
-  m_stored_values.push_front (values);
+  stored_values.push_front (values);
 
-  update_list ();
+  while (stored_values.size () > max_entries) {
+    stored_values.erase (--stored_values.end ());
+  }
+
+  set_stored_values (stored_values);
+
+  update_list (stored_values);
 }
 
 }

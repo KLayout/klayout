@@ -88,7 +88,10 @@ void get_inst_options (std::vector < std::pair<std::string, std::string> > &opti
 
 edt::RecentConfigurationPage::ConfigurationDescriptor inst_cfg_descriptors[] =
 {
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_cell_name, tl::to_string (tr ("Cell name")), edt::RecentConfigurationPage::Text),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_lib_name, tl::to_string (tr ("Library")), edt::RecentConfigurationPage::Text),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_cell_name, tl::to_string (tr ("Cell")), edt::RecentConfigurationPage::Text),
+  //  encode this into the cell?
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_pcell_parameters, tl::to_string (tr ("PCell parameters")), edt::RecentConfigurationPage::PCellParamters),
   edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_angle, tl::to_string (tr ("Angle")), edt::RecentConfigurationPage::Double),
   edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_mirror, tl::to_string (tr ("Mirror")), edt::RecentConfigurationPage::Bool),
   edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_scale, tl::to_string (tr ("Scale")), edt::RecentConfigurationPage::Double),
@@ -104,7 +107,7 @@ edt::RecentConfigurationPage::ConfigurationDescriptor inst_cfg_descriptors[] =
 static 
 void get_inst_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::Dispatcher *dispatcher)
 {
-  ret.push_back (new RecentConfigurationPage (dispatcher, 22, tl::to_string (tr ("Recent")),
+  ret.push_back (new RecentConfigurationPage (dispatcher, "edit-recent-inst-param",
                         &inst_cfg_descriptors[0], &inst_cfg_descriptors[sizeof (inst_cfg_descriptors) / sizeof (inst_cfg_descriptors[0])]));
   ret.push_back (new EditorOptionsInstPCellParam (dispatcher));
   ret.push_back (new EditorOptionsInst (dispatcher));

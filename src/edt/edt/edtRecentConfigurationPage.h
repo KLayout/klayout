@@ -66,29 +66,29 @@ public:
   };
 
   template <class Iter>
-  RecentConfigurationPage (lay::Dispatcher *dispatcher, int order, const std::string &title, Iter begin_cfg, Iter end_cfg)
-    : EditorOptionsPage (dispatcher), m_title (title), m_order (order), m_cfg (begin_cfg, end_cfg)
+  RecentConfigurationPage (lay::Dispatcher *dispatcher, const std::string &recent_cfg_name, Iter begin_cfg, Iter end_cfg)
+    : EditorOptionsPage (dispatcher), m_recent_cfg_name (recent_cfg_name), m_cfg (begin_cfg, end_cfg)
   {
     init ();
   }
 
   virtual ~RecentConfigurationPage ();
 
-  virtual std::string title () const { return m_title; }
-  virtual int order () const { return m_order; }
+  virtual std::string title () const;
+  virtual int order () const;
   virtual void apply (lay::Dispatcher * /*root*/) { }
   virtual void setup (lay::Dispatcher * /*root*/) { }
   virtual void commit_recent (lay::Dispatcher *root);
 
 private:
-  std::string m_title;
-  int m_order;
+  std::string m_recent_cfg_name;
   std::list<ConfigurationDescriptor> m_cfg;
   QTreeWidget *mp_tree_widget;
-  std::list<std::vector<std::string> > m_stored_values;
 
   void init ();
-  void update_list ();
+  void update_list (const std::list<std::vector<std::string> > &stored_values);
+  std::list<std::vector<std::string> > get_stored_values () const;
+  void set_stored_values (const std::list<std::vector<std::string> > &values) const;
 };
 
 }

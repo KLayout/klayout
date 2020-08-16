@@ -1417,6 +1417,14 @@ InstService::do_mouse_transform (const db::DPoint &p, db::DFTrans trans)
   m_column_x = c.x ();
   m_column_y = c.y ();
 
+  dispatcher ()->config_set (cfg_edit_inst_angle, m_angle);
+  dispatcher ()->config_set (cfg_edit_inst_mirror, m_mirror);
+  dispatcher ()->config_set (cfg_edit_inst_row_x, m_row_x);
+  dispatcher ()->config_set (cfg_edit_inst_row_y, m_row_y);
+  dispatcher ()->config_set (cfg_edit_inst_column_x, m_column_x);
+  dispatcher ()->config_set (cfg_edit_inst_column_y, m_column_y);
+  dispatcher ()->config_end ();
+
   //  honour the new transformation
   do_mouse_move (p);
 }
@@ -1535,78 +1543,171 @@ InstService::configure (const std::string &name, const std::string &value)
 
   if (name == cfg_edit_inst_pcell_parameters) {
 
-    m_pcell_parameters = pcell_parameters_from_string (value);
-    m_is_pcell = ! value.empty ();
+    std::map<std::string, tl::Variant> pcp = pcell_parameters_from_string (value);
+    if (pcp != m_pcell_parameters) {
 
-    m_needs_update = true;
+      m_pcell_parameters = pcp;
+      m_is_pcell = ! value.empty ();
+
+      m_needs_update = true;
+
+    }
+
     return true; // taken
 
   }
 
   if (name == cfg_edit_inst_place_origin) {
-    tl::from_string (value, m_place_origin);
-    m_needs_update = true;
+
+    bool f;
+    tl::from_string (value, f);
+
+    if (f != m_place_origin) {
+      m_place_origin = f;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_scale) {
-    tl::from_string (value, m_scale);
-    m_needs_update = true;
+
+    double s;
+    tl::from_string (value, s);
+
+    if (fabs (s - m_scale) > 1e-10) {
+      m_scale = s;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_angle) {
-    tl::from_string (value, m_angle);
-    m_needs_update = true;
+
+    double a;
+    tl::from_string (value, a);
+
+    if (fabs (a - m_angle) > 1e-10) {
+      m_angle = a;
+      m_needs_update = true;
+    }
+
     return true; // taken
   }
 
   if (name == cfg_edit_inst_mirror) {
-    tl::from_string (value, m_mirror);
-    m_needs_update = true;
+
+    bool f;
+    tl::from_string (value, f);
+
+    if (f != m_mirror) {
+      m_mirror = f;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_array) {
-    tl::from_string (value, m_array);
-    m_needs_update = true;
+
+    bool f;
+    tl::from_string (value, f);
+
+    if (f != m_array) {
+      m_array = f;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_rows) {
-    tl::from_string (value, m_rows);
-    m_needs_update = true;
+
+    unsigned int v;
+    tl::from_string (value, v);
+
+    if (v != m_rows) {
+      m_rows = v;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_row_x) {
-    tl::from_string (value, m_row_x);
-    m_needs_update = true;
+
+    double v;
+    tl::from_string (value, v);
+
+    if (! db::coord_traits<double>::equal (m_row_x, v)) {
+      m_row_x = v;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_row_y) {
-    tl::from_string (value, m_row_y);
-    m_needs_update = true;
+
+    double v;
+    tl::from_string (value, v);
+
+    if (! db::coord_traits<double>::equal (m_row_y, v)) {
+      m_row_y = v;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_columns) {
-    tl::from_string (value, m_columns);
-    m_needs_update = true;
+
+    unsigned int v;
+    tl::from_string (value, v);
+
+    if (v != m_columns) {
+      m_columns = v;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_column_x) {
-    tl::from_string (value, m_column_x);
-    m_needs_update = true;
+
+    double v;
+    tl::from_string (value, v);
+
+    if (! db::coord_traits<double>::equal (m_column_x, v)) {
+      m_column_x = v;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_column_y) {
-    tl::from_string (value, m_column_y);
-    m_needs_update = true;
+
+    double v;
+    tl::from_string (value, v);
+
+    if (! db::coord_traits<double>::equal (m_column_y, v)) {
+      m_column_y = v;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   return edt::Service::configure (name, value);

@@ -52,7 +52,12 @@ public:
     Double = 2,
     Int = 3,
     Layer = 4,
-    PCellParamters = 5
+    PCellParameters = 5,
+    CellLibraryName = 6,
+    CellDisplayName = 7,
+    ArrayFlag = 8,
+    DoubleIfArray = 9,
+    IntIfArray = 10
   };
 
   struct ConfigurationDescriptor
@@ -80,6 +85,9 @@ public:
   virtual void setup (lay::Dispatcher * /*root*/) { }
   virtual void commit_recent (lay::Dispatcher *root);
 
+private slots:
+  void item_clicked (QTreeWidgetItem *item);
+
 private:
   std::string m_recent_cfg_name;
   std::list<ConfigurationDescriptor> m_cfg;
@@ -89,6 +97,7 @@ private:
   void update_list (const std::list<std::vector<std::string> > &stored_values);
   std::list<std::vector<std::string> > get_stored_values () const;
   void set_stored_values (const std::list<std::vector<std::string> > &values) const;
+  void render_to (QTreeWidgetItem *item, int column, const std::vector<std::string> &values, RecentConfigurationPage::ConfigurationRendering rendering);
 };
 
 }

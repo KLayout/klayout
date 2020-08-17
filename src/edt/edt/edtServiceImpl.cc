@@ -1093,7 +1093,7 @@ InstService::InstService (db::Manager *manager, lay::LayoutView *view)
     m_array (false), m_rows (1), m_columns (1), 
     m_row_x (0.0), m_row_y (0.0), m_column_x (0.0), m_column_y (0.0),
     m_place_origin (false), m_reference_transaction_id (0),
-    m_needs_update (true), m_has_valid_cell (false), m_in_drag_drop (false), 
+    m_needs_update (true), m_parameters_changed (false), m_has_valid_cell (false), m_in_drag_drop (false),
     m_current_cell (0), mp_current_layout (0), mp_pcell_decl (0), m_cv_index (-1)
 { 
   //  .. nothing yet ..
@@ -1137,6 +1137,8 @@ InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase 
     view ()->cancel ();
     set_edit_marker (0);
 
+    bool switch_parameters = true;
+
     //  configure from the drag/drop data
     if (cd->library ()) {
 
@@ -1168,6 +1170,7 @@ InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase 
 
       if (! cd->pcell_params ().empty ()) {
         m_pcell_parameters = pcell_decl->named_parameters (cd->pcell_params ());
+        switch_parameters = false;
       }
 
     } else if (cd->layout ()->is_valid_cell_index (cd->cell_index ())) {
@@ -1178,7 +1181,7 @@ InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase 
       return false;
     }
 
-    switch_cell_or_pcell ();
+    switch_cell_or_pcell (switch_parameters);
 
     sync_to_config ();
     m_in_drag_drop = true;
@@ -1550,6 +1553,7 @@ InstService::configure (const std::string &name, const std::string &value)
       m_is_pcell = ! value.empty ();
 
       m_needs_update = true;
+      m_parameters_changed = true;
 
     }
 
@@ -1714,7 +1718,7 @@ InstService::configure (const std::string &name, const std::string &value)
 }
 
 void
-InstService::switch_cell_or_pcell ()
+InstService::switch_cell_or_pcell (bool switch_parameters)
 {
   //  if the library or cell name has changed, store the current pcell parameters and try to reuse
   //  an existing parameter set
@@ -1722,11 +1726,15 @@ InstService::switch_cell_or_pcell ()
 
     m_stored_pcell_parameters[std::make_pair (m_cell_or_pcell_name_previous, m_lib_name_previous)] = m_pcell_parameters;
 
-    std::map<std::pair<std::string, std::string>, std::map<std::string, tl::Variant> >::const_iterator p = m_stored_pcell_parameters.find (std::make_pair (m_cell_or_pcell_name, m_lib_name));
-    if (p != m_stored_pcell_parameters.end ()) {
-      m_pcell_parameters = p->second;
-    } else {
-      m_pcell_parameters.clear ();
+    if (switch_parameters) {
+
+      std::map<std::pair<std::string, std::string>, std::map<std::string, tl::Variant> >::const_iterator p = m_stored_pcell_parameters.find (std::make_pair (m_cell_or_pcell_name, m_lib_name));
+      if (p != m_stored_pcell_parameters.end ()) {
+        m_pcell_parameters = p->second;
+      } else {
+        m_pcell_parameters.clear ();
+      }
+
     }
 
   }
@@ -1759,21 +1767,31 @@ InstService::config_finalize ()
 {
   if (m_needs_update) {
 
-    switch_cell_or_pcell ();
+    //  don't switch parameters if they have been updated explicitly
+    //  since the last "config_finalize". This means the sender of the configuration events
+    //  wants the parameters to be set in a specific way. Don't interfere.
+    bool switch_parameters = ! m_parameters_changed;
+
+    switch_cell_or_pcell (switch_parameters);
 
     m_has_valid_cell = false;
     update_marker ();
-    m_needs_update = false;
 
-    //  Reflects any changes in PCell parameters induced by reuse of make_cell (called from update_marker)
-    //  in the configuration
-    if (m_is_pcell) {
-      dispatcher ()->config_set (cfg_edit_inst_pcell_parameters, pcell_parameters_to_string (m_pcell_parameters));
-    } else {
-      dispatcher ()->config_set (cfg_edit_inst_pcell_parameters, std::string ());
+    if (switch_parameters) {
+      //  Reflects any changes in PCell parameters in the configuration
+      //  TODO: it's somewhat questionable to do this inside "config_finalize" as this method is supposed
+      //  to reflect changes rather than induce some.
+      if (m_is_pcell) {
+        dispatcher ()->config_set (cfg_edit_inst_pcell_parameters, pcell_parameters_to_string (m_pcell_parameters));
+      } else {
+        dispatcher ()->config_set (cfg_edit_inst_pcell_parameters, std::string ());
+      }
     }
 
   }
+
+  m_needs_update = false;
+  m_parameters_changed = false;
 
   edt::Service::config_finalize ();
 }

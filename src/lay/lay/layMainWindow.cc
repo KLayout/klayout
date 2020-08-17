@@ -2603,6 +2603,8 @@ MainWindow::select_view (int index)
 
   try {
 
+    cancel ();
+
     tl_assert (index >= 0 && index < int (views ()));
 
     mp_tab_bar->setCurrentIndex (index);

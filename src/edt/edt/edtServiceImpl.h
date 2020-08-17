@@ -239,7 +239,7 @@ private:
   double m_row_x, m_row_y, m_column_x, m_column_y;
   bool m_place_origin;
   db::Manager::transaction_id_t m_reference_transaction_id;
-  bool m_needs_update;
+  bool m_needs_update, m_parameters_changed;
   bool m_has_valid_cell;
   bool m_in_drag_drop;
   db::cell_index_type m_current_cell;
@@ -253,7 +253,7 @@ private:
   std::pair<bool, db::cell_index_type> make_cell (const lay::CellView &cv);
   tl::Variant get_default_layer_for_pcell ();
   void sync_to_config ();
-  void switch_cell_or_pcell ();
+  void switch_cell_or_pcell (bool switch_parameters);
 };
 
 }

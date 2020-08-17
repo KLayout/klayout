@@ -21,10 +21,14 @@
 */
 
 #include "edtRecentConfigurationPage.h"
+#include "edtUtils.h"
 #include "layDispatcher.h"
+#include "dbLibraryManager.h"
+#include "dbLibrary.h"
 
 #include <QVBoxLayout>
 #include <QHeaderView>
+#include <QLabel>
 
 namespace edt
 {
@@ -37,10 +41,18 @@ RecentConfigurationPage::init ()
   QVBoxLayout *ly = new QVBoxLayout (this);
   ly->setMargin (0);
 
+  QLabel *label = new QLabel (this);
+  label->setText (tr ("Click to select a recent configuration"));
+  ly->addWidget (label);
+
   mp_tree_widget = new QTreeWidget (this);
   mp_tree_widget->setRootIsDecorated (false);
   mp_tree_widget->setUniformRowHeights (true);
+  mp_tree_widget->setSelectionMode (QAbstractItemView::NoSelection);
+  mp_tree_widget->setAllColumnsShowFocus (true);
   ly->addWidget (mp_tree_widget);
+
+  connect (mp_tree_widget, SIGNAL (itemClicked (QTreeWidgetItem *, int)), this, SLOT (item_clicked (QTreeWidgetItem *)));
 
   mp_tree_widget->setColumnCount (int (m_cfg.size ()));
 
@@ -107,13 +119,112 @@ RecentConfigurationPage::set_stored_values (const std::list<std::vector<std::str
 }
 
 void
-render_to (QTreeWidgetItem *item, int column, const std::string &v, RecentConfigurationPage::ConfigurationRendering rendering)
+RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std::vector<std::string> &values, RecentConfigurationPage::ConfigurationRendering rendering)
 {
   //  store original value
-  item->setData (column, Qt::UserRole, tl::to_qstring (v));
+  item->setData (column, Qt::UserRole, tl::to_qstring (values [column]));
 
-  // @@@ rendering
-  item->setText (column, tl::to_qstring (v));
+  switch (rendering) {
+
+  case RecentConfigurationPage::ArrayFlag:
+  case RecentConfigurationPage::Bool:
+    {
+      bool f = false;
+      tl::from_string (values [column], f);
+      static QString checkmark = QString::fromUtf8 ("\xe2\x9c\x93");
+      item->setText (column, f ? checkmark : QString ()); // "checkmark"
+    }
+    break;
+
+  case RecentConfigurationPage::Layer:
+    // @@@
+    item->setText (column, tl::to_qstring (values [column]));
+    break;
+
+  case RecentConfigurationPage::Int:
+  case RecentConfigurationPage::Double:
+  case RecentConfigurationPage::Text:
+  case RecentConfigurationPage::CellLibraryName:
+    item->setText (column, tl::to_qstring (values [column]));
+    break;
+
+  case RecentConfigurationPage::IntIfArray:
+  case RecentConfigurationPage::DoubleIfArray:
+    {
+      bool is_array = false;
+      int flag_column = 0;
+      for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end (); ++c, ++flag_column) {
+        if (c->rendering == RecentConfigurationPage::ArrayFlag) {
+          tl::from_string (values [flag_column], is_array);
+          break;
+        }
+      }
+
+      if (is_array) {
+        item->setText (column, tl::to_qstring (values [column]));
+      } else {
+        item->setText (column, QString ());
+      }
+    }
+    break;
+
+  case RecentConfigurationPage::CellDisplayName:
+    {
+      //  search for a libname
+      int libname_column = 0;
+      const db::Library *lib = 0;
+      for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end (); ++c, ++libname_column) {
+        if (c->rendering == RecentConfigurationPage::CellLibraryName) {
+          lib = db::LibraryManager::instance ().lib_ptr_by_name (values [libname_column]);
+          break;
+        }
+      }
+
+      if (lib) {
+
+        //  search for a PCell parameters
+        int pcp_column = 0;
+        std::map<std::string, tl::Variant> pcp;
+        for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end (); ++c, ++pcp_column) {
+          if (c->rendering == RecentConfigurationPage::PCellParameters) {
+            pcp = pcell_parameters_from_string (values [pcp_column]);
+            break;
+          }
+        }
+
+        std::pair<bool, db::Layout::pcell_id_type> pcid = lib->layout ().pcell_by_name (values [column].c_str ());
+        if (pcid.first) {
+          const db::PCellDeclaration *pc_decl = lib->layout ().pcell_declaration (pcid.second);
+          if (pc_decl) {
+            item->setText (column, tl::to_qstring (pc_decl->get_display_name (pc_decl->map_parameters (pcp))));
+            break;
+          }
+        }
+
+      }
+
+      item->setText (column, tl::to_qstring (values [column]));
+    }
+    break;
+
+  case RecentConfigurationPage::PCellParameters:
+    {
+      std::map<std::string, tl::Variant> pcp;
+      pcp = pcell_parameters_from_string (values [column]);
+      std::string r;
+      for (std::map<std::string, tl::Variant>::const_iterator p = pcp.begin (); p != pcp.end (); ++p) {
+        if (p != pcp.begin ()) {
+          r += ",";
+        }
+        r += p->first;
+        r += "=";
+        r += p->second.to_string ();
+      }
+
+      item->setText (column, tl::to_qstring (r));
+    }
+    break;
+  }
 
 }
 
@@ -134,7 +245,7 @@ RecentConfigurationPage::update_list (const std::list<std::vector<std::string> >
     int column = 0;
     for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end (); ++c, ++column) {
       if (column < int (v->size ())) {
-        render_to (item, column, (*v) [column], c->rendering);
+        render_to (item, column, *v, c->rendering);
       }
     }
 
@@ -145,6 +256,17 @@ RecentConfigurationPage::update_list (const std::list<std::vector<std::string> >
   }
 
   mp_tree_widget->header ()->resizeSections (QHeaderView::ResizeToContents);
+}
+
+void
+RecentConfigurationPage::item_clicked (QTreeWidgetItem *item)
+{
+  int column = 0;
+  for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end (); ++c, ++column) {
+    std::string v = tl::to_string (item->data (column, Qt::UserRole).toString ());
+    dispatcher ()->config_set (c->cfg_name, v);
+  }
+  dispatcher ()->config_end ();
 }
 
 void

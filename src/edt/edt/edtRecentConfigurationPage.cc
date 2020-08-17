@@ -24,6 +24,7 @@
 #include "edtUtils.h"
 #include "layDispatcher.h"
 #include "layLayoutView.h"
+#include "layLayerTreeModel.h"
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
 
@@ -119,6 +120,31 @@ RecentConfigurationPage::set_stored_values (const std::list<std::vector<std::str
   dispatcher ()->config_set (m_recent_cfg_name, serialized_list);
 }
 
+static lay::LayerPropertiesConstIterator
+lp_iter_from_string (lay::LayoutView *view, const std::string &s)
+{
+  //  parse the layer spec (<layer-props>[@<cv-index>])
+  db::LayerProperties lp;
+  tl::Extractor ex (s.c_str ());
+  lp.read (ex);
+  int cv_index = 0;
+  if (ex.test ("@")) {
+    ex.read (cv_index);
+  }
+
+  //  rename the ones that got shifted.
+  lay::LayerPropertiesConstIterator l = view->begin_layers ();
+  while (! l.at_end ()) {
+    if (l->source (true).cv_index () == int (cv_index) && l->source (true).layer_props ().log_equal (lp)) {
+      return l;
+    }
+    ++l;
+  }
+
+  return l;
+}
+
+
 void
 RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std::vector<std::string> &values, RecentConfigurationPage::ConfigurationRendering rendering)
 {
@@ -138,8 +164,15 @@ RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std
     break;
 
   case RecentConfigurationPage::Layer:
-    // @@@
-    item->setText (column, tl::to_qstring (values [column]));
+    {
+      //  @@@ TODO: icons should be updated if style changes?
+      int icon_size = mp_view->style ()->pixelMetric (QStyle::PM_ButtonIconSize);
+      lay::LayerPropertiesConstIterator l = lp_iter_from_string (mp_view, values [column]);
+      if (! l.at_end ()) {
+        item->setIcon (column, lay::LayerTreeModel::icon_for_layer (l, mp_view, icon_size, icon_size, 0, true));
+      }
+      item->setText (column, tl::to_qstring (values [column]));
+    }
     break;
 
   case RecentConfigurationPage::Int:
@@ -295,6 +328,7 @@ RecentConfigurationPage::commit_recent (lay::Dispatcher *root)
   std::vector<std::string> values;
   values.reserve (m_cfg.size ());
   for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end (); ++c) {
+
     if (c->rendering == Layer) {
 
       std::string s;

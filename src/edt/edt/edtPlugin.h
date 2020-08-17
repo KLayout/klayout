@@ -44,7 +44,7 @@ namespace edt
     : public lay::PluginDeclaration
   {
   public:
-    virtual void get_editor_options_pages (std::vector<edt::EditorOptionsPage *> &, lay::Dispatcher *) const = 0;
+    virtual void get_editor_options_pages (std::vector<edt::EditorOptionsPage *> &, lay::LayoutView *, lay::Dispatcher *) const = 0;
   };
 
   /**

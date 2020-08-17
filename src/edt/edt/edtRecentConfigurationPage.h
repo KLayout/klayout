@@ -29,6 +29,11 @@
 #include <list>
 #include <QTreeWidget>
 
+namespace lay
+{
+  class LayoutView;
+}
+
 namespace edt
 {
 
@@ -71,8 +76,8 @@ public:
   };
 
   template <class Iter>
-  RecentConfigurationPage (lay::Dispatcher *dispatcher, const std::string &recent_cfg_name, Iter begin_cfg, Iter end_cfg)
-    : EditorOptionsPage (dispatcher), m_recent_cfg_name (recent_cfg_name), m_cfg (begin_cfg, end_cfg)
+  RecentConfigurationPage (lay::LayoutView *view, lay::Dispatcher *dispatcher, const std::string &recent_cfg_name, Iter begin_cfg, Iter end_cfg)
+    : EditorOptionsPage (dispatcher), mp_view (view), m_recent_cfg_name (recent_cfg_name), m_cfg (begin_cfg, end_cfg)
   {
     init ();
   }
@@ -89,6 +94,7 @@ private slots:
   void item_clicked (QTreeWidgetItem *item);
 
 private:
+  lay::LayoutView *mp_view;
   std::string m_recent_cfg_name;
   std::list<ConfigurationDescriptor> m_cfg;
   QTreeWidget *mp_tree_widget;

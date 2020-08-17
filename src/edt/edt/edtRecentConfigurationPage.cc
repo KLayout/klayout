@@ -23,6 +23,7 @@
 #include "edtRecentConfigurationPage.h"
 #include "edtUtils.h"
 #include "layDispatcher.h"
+#include "layLayoutView.h"
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
 
@@ -263,9 +264,28 @@ RecentConfigurationPage::item_clicked (QTreeWidgetItem *item)
 {
   int column = 0;
   for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end (); ++c, ++column) {
+
     std::string v = tl::to_string (item->data (column, Qt::UserRole).toString ());
-    dispatcher ()->config_set (c->cfg_name, v);
+
+    if (c->rendering == Layer) {
+
+      //  "getting" a layer means making it current
+      db::LayerProperties lp;
+      tl::Extractor ex (v.c_str ());
+      lp.read (ex);
+      int cv_index = 0;
+      if (ex.test ("@")) {
+        ex.read (cv_index);
+      }
+
+      mp_view->set_current_layer (cv_index, lp);
+
+    } else {
+      dispatcher ()->config_set (c->cfg_name, v);
+    }
+
   }
+
   dispatcher ()->config_end ();
 }
 
@@ -275,7 +295,30 @@ RecentConfigurationPage::commit_recent (lay::Dispatcher *root)
   std::vector<std::string> values;
   values.reserve (m_cfg.size ());
   for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end (); ++c) {
-    values.push_back (root->config_get (c->cfg_name));
+    if (c->rendering == Layer) {
+
+      std::string s;
+
+      if (mp_view->current_layer ()->is_visual ()) {
+
+        int cv_index = mp_view->current_layer ()->cellview_index ();
+        const lay::CellView &cv = mp_view->cellview (cv_index);
+        int li = mp_view->current_layer ()->layer_index ();
+        if (cv.is_valid () && cv->layout ().is_valid_layer (li)) {
+          s = cv->layout ().get_properties (li).to_string ();
+          if (cv_index > 0) {
+             s += "@" + tl::to_string (cv_index);
+          }
+        }
+
+      }
+
+      values.push_back (s);
+
+    } else {
+      values.push_back (root->config_get (c->cfg_name));
+    }
+
   }
 
   std::list<std::vector<std::string> > stored_values = get_stored_values ();

@@ -47,7 +47,7 @@ void get_text_options (std::vector < std::pair<std::string, std::string> > &opti
 }
 
 static 
-void get_text_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::Dispatcher *dispatcher)
+void get_text_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::LayoutView *, lay::Dispatcher *dispatcher)
 {
   ret.push_back (new edt::EditorOptionsText (dispatcher));
 }
@@ -61,9 +61,20 @@ void get_path_options (std::vector < std::pair<std::string, std::string> > &opti
   options.push_back (std::pair<std::string, std::string> (cfg_edit_path_ext_var_end, "0.0"));
 }
 
-static 
-void get_path_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::Dispatcher *dispatcher)
+edt::RecentConfigurationPage::ConfigurationDescriptor path_cfg_descriptors[] =
 {
+  edt::RecentConfigurationPage::ConfigurationDescriptor ("", tl::to_string (tr ("Layer")), edt::RecentConfigurationPage::Layer),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_width, tl::to_string (tr ("Width")), edt::RecentConfigurationPage::Double),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_ext_type, tl::to_string (tr ("Ends")), edt::RecentConfigurationPage::Int),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_ext_var_begin, tl::to_string (tr ("Begin ext.")), edt::RecentConfigurationPage::Double),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_ext_var_end, tl::to_string (tr ("End ext.")), edt::RecentConfigurationPage::Double)
+};
+
+static
+void get_path_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
+{
+  ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-path-param",
+                        &path_cfg_descriptors[0], &path_cfg_descriptors[sizeof (path_cfg_descriptors) / sizeof (path_cfg_descriptors[0])]));
   ret.push_back (new EditorOptionsPath (dispatcher));
 }
 
@@ -103,10 +114,10 @@ edt::RecentConfigurationPage::ConfigurationDescriptor inst_cfg_descriptors[] =
   edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_pcell_parameters, tl::to_string (tr ("PCell parameters")), edt::RecentConfigurationPage::PCellParameters)
 };
 
-static 
-void get_inst_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::Dispatcher *dispatcher)
+static
+void get_inst_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
 {
-  ret.push_back (new RecentConfigurationPage (dispatcher, "edit-recent-inst-param",
+  ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-inst-param",
                         &inst_cfg_descriptors[0], &inst_cfg_descriptors[sizeof (inst_cfg_descriptors) / sizeof (inst_cfg_descriptors[0])]));
   ret.push_back (new EditorOptionsInstPCellParam (dispatcher));
   ret.push_back (new EditorOptionsInst (dispatcher));
@@ -119,7 +130,7 @@ class PluginDeclaration
 public:
   PluginDeclaration (const std::string &title, const std::string &mouse_mode, 
                      void (*option_get_f) (std::vector < std::pair<std::string, std::string> > &) = 0,
-                     void (*pages_f) (std::vector <edt::EditorOptionsPage *> &, lay::Dispatcher *) = 0)
+                     void (*pages_f) (std::vector <edt::EditorOptionsPage *> &, lay::LayoutView *, lay::Dispatcher *) = 0)
     : m_title (title), m_mouse_mode (mouse_mode), mp_option_get_f (option_get_f), mp_pages_f (pages_f)
   {
     //  .. nothing yet ..
@@ -142,11 +153,11 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void get_editor_options_pages (std::vector<edt::EditorOptionsPage *> &pages, lay::Dispatcher *root) const
+  virtual void get_editor_options_pages (std::vector<edt::EditorOptionsPage *> &pages, lay::LayoutView *view, lay::Dispatcher *root) const
   {
     if (mp_pages_f != 0) {
       size_t nstart = pages.size ();
-      (*mp_pages_f) (pages, root);
+      (*mp_pages_f) (pages, view, root);
       while (nstart < pages.size ()) {
         pages [nstart++]->set_plugin_declaration (this);
       }
@@ -177,7 +188,7 @@ private:
   std::string m_mouse_mode;
 
   void (*mp_option_get_f) (std::vector < std::pair<std::string, std::string> > &options);
-  void (*mp_pages_f) (std::vector <edt::EditorOptionsPage *> &, lay::Dispatcher *);
+  void (*mp_pages_f) (std::vector <edt::EditorOptionsPage *> &, lay::LayoutView *, lay::Dispatcher *);
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl1 (
@@ -382,7 +393,7 @@ show_editor_options_page (lay::LayoutView *view)
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
     const PluginDeclarationBase *pd_base = dynamic_cast<const PluginDeclarationBase *> (&*cls);
     if (pd_base) {
-      pd_base->get_editor_options_pages (prop_dialog_pages, view->dispatcher ());
+      pd_base->get_editor_options_pages (prop_dialog_pages, view, view->dispatcher ());
     }
   }
 

@@ -965,6 +965,8 @@ PathService::do_finish_edit ()
   m_points.pop_back ();
 
   deliver_shape (get_path ());
+
+  commit_recent (view ());
 }
 
 void

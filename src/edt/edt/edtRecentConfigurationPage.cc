@@ -55,6 +55,7 @@ RecentConfigurationPage::init ()
   ly->addWidget (mp_tree_widget);
 
   connect (mp_tree_widget, SIGNAL (itemClicked (QTreeWidgetItem *, int)), this, SLOT (item_clicked (QTreeWidgetItem *)));
+  mp_view->layer_list_changed_event.add (this, &RecentConfigurationPage::layers_changed);
 
   mp_tree_widget->setColumnCount (int (m_cfg.size ()));
 
@@ -165,21 +166,30 @@ RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std
 
   case RecentConfigurationPage::Layer:
     {
-      //  @@@ TODO: icons should be updated if style changes?
       int icon_size = mp_view->style ()->pixelMetric (QStyle::PM_ButtonIconSize);
       lay::LayerPropertiesConstIterator l = lp_iter_from_string (mp_view, values [column]);
-      if (! l.at_end ()) {
+      if (! l.is_null () && ! l.at_end ()) {
         item->setIcon (column, lay::LayerTreeModel::icon_for_layer (l, mp_view, icon_size, icon_size, 0, true));
+        item->setText (column, tl::to_qstring (values [column]));
+      } else {
+        item->setIcon (column, QIcon ());
+        item->setText (column, tl::to_qstring ("(" + values [column] + ")"));
       }
-      item->setText (column, tl::to_qstring (values [column]));
     }
     break;
 
   case RecentConfigurationPage::Int:
   case RecentConfigurationPage::Double:
   case RecentConfigurationPage::Text:
-  case RecentConfigurationPage::CellLibraryName:
     item->setText (column, tl::to_qstring (values [column]));
+    break;
+
+  case RecentConfigurationPage::CellLibraryName:
+    if (values [column].empty ()) {
+      item->setText (column, tr ("(local)"));
+    } else {
+      item->setText (column, tl::to_qstring (values [column]));
+    }
     break;
 
   case RecentConfigurationPage::IntIfArray:
@@ -263,6 +273,12 @@ RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std
 }
 
 void
+RecentConfigurationPage::layers_changed (int)
+{
+  update_list (get_stored_values ());
+}
+
+void
 RecentConfigurationPage::update_list (const std::list<std::vector<std::string> > &stored_values)
 {
   int row = 0;
@@ -333,7 +349,7 @@ RecentConfigurationPage::commit_recent (lay::Dispatcher *root)
 
       std::string s;
 
-      if (mp_view->current_layer ()->is_visual ()) {
+      if (!(mp_view->current_layer ().is_null () || mp_view->current_layer ().at_end ()) && mp_view->current_layer ()->is_visual ()) {
 
         int cv_index = mp_view->current_layer ()->cellview_index ();
         const lay::CellView &cv = mp_view->cellview (cv_index);

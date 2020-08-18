@@ -51,7 +51,7 @@ ShapeEditService::ShapeEditService (db::Manager *manager, lay::LayoutView *view,
   : edt::Service (manager, view, shape_types), 
     m_layer (0), m_cv_index (0), mp_cell (0), mp_layout (0), m_combine_mode (CM_Add)
 {
-  //  .. nothing yet ..
+  view->current_layer_changed_event.add (this, &ShapeEditService::update_edit_layer);
 }
 
 bool 
@@ -74,19 +74,19 @@ ShapeEditService::get_edit_layer ()
     throw tl::Exception (tl::to_string (QObject::tr ("Please select a layer first")));
   }
 
-  if (! cl->visible (true)) {
-    lay::TipDialog td (QApplication::activeWindow (),
-                       tl::to_string (QObject::tr ("You are about to draw on a hidden layer. The result won't be visible.")),
-                       "drawing-on-invisible-layer");
-    td.exec_dialog ();
-  }
-
   int cv_index = cl->cellview_index ();
   const lay::CellView &cv = view ()->cellview (cv_index);
   int layer = cl->layer_index ();
 
   if (cv_index < 0 || ! cv.is_valid ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("Please select a cell first")));
+  }
+
+  if (! cl->visible (true)) {
+    lay::TipDialog td (QApplication::activeWindow (),
+                       tl::to_string (QObject::tr ("You are about to draw on a hidden layer. The result won't be visible.")),
+                       "drawing-on-invisible-layer");
+    td.exec_dialog ();
   }
 
   if (layer < 0 || ! cv->layout ().is_valid_layer ((unsigned int) layer)) {
@@ -127,6 +127,69 @@ ShapeEditService::get_edit_layer ()
   if (mp_cell->is_proxy ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cannot put a shape into a PCell or library cell")));
   }
+}
+
+void
+ShapeEditService::update_edit_layer (const lay::LayerPropertiesConstIterator &cl)
+{
+  if (! editing ()) {
+    return;
+  }
+
+  if (cl.is_null () || cl->has_children ()) {
+    return;
+  }
+
+  int cv_index = cl->cellview_index ();
+  const lay::CellView &cv = view ()->cellview (cv_index);
+  int layer = cl->layer_index ();
+
+  if (cv_index < 0 || ! cv.is_valid ()) {
+    return;
+  }
+
+  if (cv->layout ().cell (cv.cell_index ()).is_proxy ()) {
+    return;
+  }
+
+  if (! cl->visible (true)) {
+    lay::TipDialog td (QApplication::activeWindow (),
+                       tl::to_string (QObject::tr ("You are now drawing on a hidden layer. The result won't be visible.")),
+                       "drawing-on-invisible-layer");
+    td.exec_dialog ();
+  }
+
+  if (layer < 0 || ! cv->layout ().is_valid_layer ((unsigned int) layer)) {
+
+    //  create this layer now
+    const lay::ParsedLayerSource &source = cl->source (true /*real*/);
+
+    db::LayerProperties db_lp;
+    if (source.has_name ()) {
+      db_lp.name = source.name ();
+    }
+    db_lp.layer = source.layer ();
+    db_lp.datatype = source.datatype ();
+
+    cv->layout ().insert_layer (db_lp);
+
+    //  update the layer index inside the layer view
+    cl->realize_source ();
+
+    //  Hint: we could have taken the new index from insert_layer, but this
+    //  is a nice test:
+    layer = cl->layer_index ();
+    tl_assert (layer >= 0);
+
+  }
+
+  m_layer = (unsigned int) layer;
+  m_cv_index = (unsigned int) cv_index;
+  m_trans = (cl->trans ().front () * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ()).inverted ();
+  mp_layout = &(cv->layout ());
+  mp_cell = &(mp_layout->cell (cv.cell_index ()));
+
+  current_layer_changed ();
 }
 
 void

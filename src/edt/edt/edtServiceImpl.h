@@ -66,6 +66,7 @@ protected:
   void deliver_shape (const db::Polygon &poly);
   void deliver_shape (const db::Path &path);
   void deliver_shape (const db::Box &box);
+  virtual void current_layer_changed () { }
 
 private:
   db::VCplxTrans m_trans;
@@ -74,6 +75,8 @@ private:
   db::Cell *mp_cell;
   db::Layout *mp_layout;
   combine_mode_type m_combine_mode;
+
+  void update_edit_layer (const lay::LayerPropertiesConstIterator &iter);
 };
 
 /**

@@ -595,6 +595,7 @@ LayoutView::init (db::Manager *mgr, QWidget * /*parent*/)
     connect (mp_control_frame, SIGNAL (destroyed ()), this, SLOT (side_panel_destroyed ()));
     connect (mp_control_panel, SIGNAL (tab_changed ()), this, SLOT (layer_tab_changed ()));
     connect (mp_control_panel, SIGNAL (order_changed ()), this, SLOT (layer_order_changed ()));
+    connect (mp_control_panel, SIGNAL (current_layer_changed (const lay::LayerPropertiesConstIterator &)), this, SLOT (current_layer_changed_slot (const lay::LayerPropertiesConstIterator &)));
     /*
     connect (mp_control_panel, SIGNAL (marked_changed ()), this, SLOT (prop_changed ()));
     connect (mp_control_panel, SIGNAL (width_changed ()), this, SLOT (prop_changed ()));
@@ -5322,6 +5323,12 @@ LayoutView::layer_snapshot () const
     ++l;
   }
   return state;
+}
+
+void
+LayoutView::current_layer_changed_slot (const lay::LayerPropertiesConstIterator &iter)
+{
+  current_layer_changed_event (iter);
 }
 
 void 

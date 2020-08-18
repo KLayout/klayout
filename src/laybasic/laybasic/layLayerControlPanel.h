@@ -284,6 +284,7 @@ public:
 signals:
   void order_changed ();
   void tab_changed ();
+  void current_layer_changed (const lay::LayerPropertiesConstIterator &iter);
 
 public slots:
   void cm_new_tab ();
@@ -321,6 +322,7 @@ public slots:
   void tab_context_menu (const QPoint &pt);  
   void group_collapsed (const QModelIndex &index);
   void group_expanded (const QModelIndex &index);
+  void current_index_changed (const QModelIndex &index);
   void up_clicked ();
   void upup_clicked ();
   void down_clicked ();

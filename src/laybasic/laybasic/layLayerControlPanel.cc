@@ -299,17 +299,12 @@ LayerControlPanel::LayerControlPanel (lay::LayoutView *view, db::Manager *manage
   mp_model->set_font (mp_layer_list->font ());
   mp_layer_list->setIconSize (mp_model->icon_size ());
 
-  /*
-   * At least with Qt 4.2.x setting uniform row heights has a strange side effect: 
-   * If a range is selected and the first selection is scrolled out of view, the 
-   * range does not include the first element after having clicked at the second.
-  mp_layer_list->setUniformRowHeights (true);
-  */
   l->addWidget (mp_layer_list);
   connect (mp_layer_list, SIGNAL (double_clicked (const QModelIndex &, Qt::KeyboardModifiers)), this, SLOT (double_clicked (const QModelIndex &, Qt::KeyboardModifiers)));
   connect (mp_layer_list, SIGNAL (collapsed (const QModelIndex &)), this, SLOT (group_collapsed (const QModelIndex &)));
   connect (mp_layer_list, SIGNAL (expanded (const QModelIndex &)), this, SLOT (group_expanded (const QModelIndex &)));
   connect (mp_layer_list, SIGNAL (search_triggered (const QString &)), this, SLOT (search_triggered (const QString &)));
+  connect (mp_layer_list->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_index_changed (const QModelIndex &)));
   mp_layer_list->setContextMenuPolicy (Qt::CustomContextMenu);
   connect (mp_layer_list, SIGNAL(customContextMenuRequested (const QPoint &)), this, SLOT (context_menu (const QPoint &)));
   mp_layer_list->header ()->hide ();
@@ -2039,6 +2034,17 @@ LayerControlPanel::update_required (int f)
   }
 
   m_do_update_content_dm ();
+}
+
+void
+LayerControlPanel::current_index_changed (const QModelIndex &index)
+{
+  lay::LayerPropertiesConstIterator iter = mp_model->iterator (index);
+  if (! iter.is_null () && ! iter.at_end ()) {
+    emit current_layer_changed (iter);
+  } else {
+    emit current_layer_changed (lay::LayerPropertiesConstIterator ());
+  }
 }
 
 void

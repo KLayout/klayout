@@ -745,6 +745,12 @@ public:
   tl::event<int> current_layer_list_changed_event;
 
   /**
+   *  @brief An event signalling that the current layer has changed
+   */
+  tl::event<const lay::LayerPropertiesConstIterator &> current_layer_changed_event;
+
+
+  /**
    *  @brief An event signalling that the visibility of some cells has changed
    */
   tl::Event cell_visibility_changed_event;
@@ -2538,6 +2544,14 @@ public:
    */
   void create_plugins (const lay::PluginDeclaration *except_this = 0);
 
+  /**
+   *  @brief Gets the full field box
+   *
+   *  This is the box to which the view will zoom on zoom_fit().
+   *  This box is supposed to cover everything inside the view.
+   */
+  db::DBox full_box () const;
+
 public slots:
   /**
    *  @brief Store the current state on the "previous states" stack
@@ -2593,12 +2607,9 @@ public slots:
   void select_cell_dispatch (const cell_path_type &path, int cellview_index);
 
   /**
-   *  @brief Gets the full field box
-   *
-   *  This is the box to which the view will zoom on zoom_fit().
-   *  This box is supposed to cover everything inside the view.
+   *  @brief Called when the current layer changed
    */
-  db::DBox full_box () const;
+  void current_layer_changed_slot (const lay::LayerPropertiesConstIterator &iter);
 
   //  zoom slots
   void zoom_fit ();
@@ -2684,6 +2695,11 @@ signals:
    *  @brief The view initiated a mode change
    */
   void mode_change (int m);
+
+  /**
+   *  @brief The current layer changed
+   */
+  void current_layer_changed (const lay::LayerPropertiesConstIterator &l);
 
 protected:
   /**

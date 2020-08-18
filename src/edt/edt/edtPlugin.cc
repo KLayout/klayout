@@ -462,7 +462,9 @@ commit_recent (lay::LayoutView *view)
   }
 
   for (std::vector<edt::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
-    (*op)->commit_recent (view);
+    if ((*op)->active ()) {
+      (*op)->commit_recent (view);
+    }
   }
 }
 

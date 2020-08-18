@@ -25,6 +25,7 @@
 #define HDR_edtRecentConfigurationPage
 
 #include "edtEditorOptionsPage.h"
+#include "tlObject.h"
 
 #include <list>
 #include <QTreeWidget>
@@ -45,7 +46,7 @@ class EditorOptionsPages;
  *  @brief The base class for a object properties page
  */
 class RecentConfigurationPage
-  : public EditorOptionsPage
+  : public EditorOptionsPage, public tl::Object
 {
 Q_OBJECT
 
@@ -104,6 +105,7 @@ private:
   std::list<std::vector<std::string> > get_stored_values () const;
   void set_stored_values (const std::list<std::vector<std::string> > &values) const;
   void render_to (QTreeWidgetItem *item, int column, const std::vector<std::string> &values, RecentConfigurationPage::ConfigurationRendering rendering);
+  void layers_changed (int);
 };
 
 }

@@ -935,7 +935,7 @@ private:
   std::map <std::string, std::list<std::pair<unsigned int, db::Box> > > m_boxes;
   std::string m_bottom_layer, m_cut_layer, m_top_layer;
 
-  unsigned int mask_for (const std::string &ln, unsigned int m, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top) const;
+  unsigned int mask_for (const std::string &ln, unsigned int m, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm) const;
 };
 
 /**

@@ -897,8 +897,6 @@ DEFImporter::read_vias (db::Layout & /*layout*/, db::Cell & /*design*/, double s
     std::auto_ptr<RuleBasedViaGenerator> rule_based_vg;
     std::auto_ptr<GeometryBasedViaGenerator> geo_based_vg;
 
-    unsigned int mask = 0;
-
     std::auto_ptr<LEFDEFViaGenerator> via_generator;
     std::set<std::string> seen_layers;
     std::vector<std::string> routing_layers;
@@ -1018,6 +1016,7 @@ DEFImporter::read_vias (db::Layout & /*layout*/, db::Cell & /*design*/, double s
 
         }
 
+        unsigned int mask = 0;
         if (test ("+")) {
           expect ("MASK");
           mask = get_mask (get_long ());

@@ -308,6 +308,12 @@ TEST(21)
   run_test (_this, "def12", "lef:test.lef+def:test.def", "au.oas.gz", opt);
 }
 
+TEST(22)
+{
+  db::LEFDEFReaderOptions opt = default_options ();
+  run_test (_this, "def13", "map:test.map+lef:test.lef_5.8+def:top.def.gz", "au.oas.gz", opt);
+}
+
 TEST(100)
 {
   run_test (_this, "issue-172", "lef:in.lef+def:in.def", "au.oas.gz", default_options (), false);

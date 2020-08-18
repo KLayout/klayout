@@ -37,7 +37,19 @@
 namespace edt
 {
 
-static 
+edt::RecentConfigurationPage::ConfigurationDescriptor shape_cfg_descriptors[] =
+{
+  edt::RecentConfigurationPage::ConfigurationDescriptor ("", tl::to_string (tr ("Layer")), edt::RecentConfigurationPage::Layer),
+};
+
+static
+void get_shape_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
+{
+  ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-shape-param",
+                        &shape_cfg_descriptors[0], &shape_cfg_descriptors[sizeof (shape_cfg_descriptors) / sizeof (shape_cfg_descriptors[0])]));
+}
+
+static
 void get_text_options (std::vector < std::pair<std::string, std::string> > &options)
 {
   options.push_back (std::pair<std::string, std::string> (cfg_edit_text_string, "ABC"));
@@ -46,9 +58,20 @@ void get_text_options (std::vector < std::pair<std::string, std::string> > &opti
   options.push_back (std::pair<std::string, std::string> (cfg_edit_text_valign, "bottom"));
 }
 
-static 
-void get_text_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::LayoutView *, lay::Dispatcher *dispatcher)
+edt::RecentConfigurationPage::ConfigurationDescriptor text_cfg_descriptors[] =
 {
+  edt::RecentConfigurationPage::ConfigurationDescriptor ("", tl::to_string (tr ("Layer")), edt::RecentConfigurationPage::Layer),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_string, tl::to_string (tr ("Text")), edt::RecentConfigurationPage::Text),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_size, tl::to_string (tr ("Size")), edt::RecentConfigurationPage::Double),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_halign, tl::to_string (tr ("Hor. align")), edt::RecentConfigurationPage::Text),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_valign, tl::to_string (tr ("Vert. align")), edt::RecentConfigurationPage::Text)
+};
+
+static
+void get_text_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
+{
+  ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-text-param",
+                        &text_cfg_descriptors[0], &text_cfg_descriptors[sizeof (text_cfg_descriptors) / sizeof (text_cfg_descriptors[0])]));
   ret.push_back (new edt::EditorOptionsText (dispatcher));
 }
 
@@ -192,12 +215,12 @@ private:
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl1 (
-  new edt::PluginDeclaration<edt::PolygonService> (tl::to_string (QObject::tr ("Polygons")), "polygon:edit_mode\t" + tl::to_string (QObject::tr ("Polygon")) + "<:polygon.png>" + tl::to_string (QObject::tr ("{Create a polygon}"))), 
+  new edt::PluginDeclaration<edt::PolygonService> (tl::to_string (QObject::tr ("Polygons")), "polygon:edit_mode\t" + tl::to_string (QObject::tr ("Polygon")) + "<:polygon.png>" + tl::to_string (QObject::tr ("{Create a polygon}")), 0, &get_shape_editor_options_pages),
   4010, 
   "edt::Service(Polygons)"
 );
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl2 (
-  new edt::PluginDeclaration<edt::BoxService> (tl::to_string (QObject::tr ("Boxes")), "box:edit_mode\t" + tl::to_string (QObject::tr ("Box")) + "\t<:box.png>" + tl::to_string (QObject::tr ("{Create a box}"))), 
+  new edt::PluginDeclaration<edt::BoxService> (tl::to_string (QObject::tr ("Boxes")), "box:edit_mode\t" + tl::to_string (QObject::tr ("Box")) + "\t<:box.png>" + tl::to_string (QObject::tr ("{Create a box}")), 0, &get_shape_editor_options_pages),
   4011, 
   "edt::Service(Boxes)"
 );

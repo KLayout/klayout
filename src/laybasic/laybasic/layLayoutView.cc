@@ -543,14 +543,13 @@ LayoutView::init (db::Manager *mgr, QWidget * /*parent*/)
 
   if ((m_options & LV_NoLibrariesView) == 0 && (m_options & LV_Naked) == 0) {
 
-    QFrame *libraries_frame = new QFrame (0);
-    libraries_frame->setObjectName (QString::fromUtf8 ("libs_frame"));
-    mp_libraries_frame = libraries_frame;
-    QVBoxLayout *left_frame_ly = new QVBoxLayout (libraries_frame);
+    mp_libraries_frame = new QFrame (0);
+    mp_libraries_frame->setObjectName (QString::fromUtf8 ("libs_frame"));
+    QVBoxLayout *left_frame_ly = new QVBoxLayout (mp_libraries_frame);
     left_frame_ly->setMargin (0);
     left_frame_ly->setSpacing (0);
 
-    mp_libraries_view = new lay::LibrariesView (this, libraries_frame, "libs");
+    mp_libraries_view = new lay::LibrariesView (this, mp_libraries_frame, "libs");
     left_frame_ly->addWidget (mp_libraries_view, 1 /*stretch*/);
 
     connect (mp_libraries_view, SIGNAL (active_library_changed (int)), this, SLOT (active_library_changed (int)));
@@ -560,11 +559,10 @@ LayoutView::init (db::Manager *mgr, QWidget * /*parent*/)
 
   if (is_editable () && (m_options & LV_NoEditorOptionsPanel) == 0 && (m_options & LV_Naked) == 0) {
 
-    QFrame *editor_options_frame = new QFrame (0);
-    editor_options_frame->setObjectName (QString::fromUtf8 ("editor_options_frame"));
-    mp_editor_options_frame = editor_options_frame;
+    mp_editor_options_frame = new QFrame (0);
+    mp_editor_options_frame->setObjectName (QString::fromUtf8 ("editor_options_frame"));
 
-    QVBoxLayout *left_frame_ly = new QVBoxLayout (editor_options_frame);
+    QVBoxLayout *left_frame_ly = new QVBoxLayout (mp_editor_options_frame);
     left_frame_ly->setMargin (0);
     left_frame_ly->setSpacing (0);
 

@@ -440,6 +440,7 @@ void
 PolygonService::do_finish_edit ()
 {
   deliver_shape (get_polygon ());
+  commit_recent (view ());
 }
 
 db::Polygon
@@ -737,6 +738,7 @@ void
 BoxService::do_finish_edit ()
 {
   deliver_shape (get_box ());
+  commit_recent (view ());
 }
 
 void 
@@ -853,6 +855,8 @@ TextService::do_finish_edit ()
   manager ()->transaction (tl::to_string (QObject::tr ("Create text"))); 
   cell ().shapes (layer ()).insert (get_text ());
   manager ()->commit ();
+
+  commit_recent (view ());
 
   if (! view ()->text_visible ()) {
 

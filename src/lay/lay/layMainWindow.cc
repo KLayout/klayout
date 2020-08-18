@@ -551,6 +551,7 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
 
   mp_eo_dock_widget = new QDockWidget (QObject::tr ("Editor Options"), this);
   mp_eo_dock_widget->setObjectName (QString::fromUtf8 ("eo_dock_widget"));
+  mp_eo_dock_widget->setMinimumHeight (150);
   mp_eo_stack = new ControlWidgetStack (mp_eo_dock_widget, "eo_stack");
   mp_eo_dock_widget->setWidget (mp_eo_stack);
   mp_eo_dock_widget->setFocusProxy (mp_eo_stack);

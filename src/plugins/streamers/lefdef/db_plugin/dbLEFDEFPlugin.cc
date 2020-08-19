@@ -164,7 +164,7 @@ private:
 
         if (tl::file_exists (input_dir)) {
 
-          std::vector<std::string> entries = tl::dir_entries (input_dir);
+          std::vector<std::string> entries = tl::dir_entries (input_dir, true, false, true);
           for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
 
             if (is_lef_format (*e)) {

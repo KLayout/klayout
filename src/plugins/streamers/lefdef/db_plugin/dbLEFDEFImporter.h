@@ -851,9 +851,9 @@ enum LayerPurpose
   Routing = 0,        //  from DEF only
   SpecialRouting,     //  from DEF only
   ViaGeometry,        //  from LEF+DEF
-  Label,              //  from LEF+DEF
   Pins,               //  from DEF
   LEFPins,            //  from LEF
+  Label,              //  from LEF+DEF
   Obstructions,       //  from LEF only
   Outline,            //  from LEF+DEF
   Blockage,           //  from DEF only

@@ -729,6 +729,11 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
   purpose_translation ["VIA"] = ViaGeometry;
   purpose_translation ["BLOCKAGE"] = Blockage;
 
+  std::map<LayerPurpose, std::string> purpose_translation_rev;
+  for (std::map<std::string, LayerPurpose>::const_iterator i = purpose_translation.begin (); i != purpose_translation.end (); ++i) {
+    purpose_translation_rev.insert (std::make_pair (i->second, i->first));
+  }
+
   std::map<std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, db::LayerProperties> layer_map;
 
   while (! ts.at_end ()) {
@@ -745,7 +750,6 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
       std::string w1, w2;
       int layer = 0, datatype = 0;
       size_t max_purpose_str = 10;
-      bool purpose_abbreviated = false;
 
       if (ex.try_read_word (w1) && ex.try_read_word (w2, "._$,/:") && ex.try_read (layer) && ex.try_read (datatype)) {
 
@@ -790,9 +794,12 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
           //  (separating, translating and recombing the purposes)
 
           std::set<std::pair<LayerPurpose, unsigned int> > translated_purposes;
-          std::string purpose_str;
 
           std::vector<std::string> purposes = tl::split (w2, ",");
+          std::reverse (purposes.begin (), purposes.end ());
+
+          unsigned int mask = 0;
+
           for (std::vector<std::string>::const_iterator p = purposes.begin (); p != purposes.end (); ++p) {
 
             std::string p_uc = tl::to_upper_case (*p);
@@ -800,8 +807,6 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 
             std::string ps;
             ex.read_word_or_quoted (ps);
-
-            unsigned int mask = 0;
 
             if (ex.test (":")) {
               if (ex.test ("MASK") && ex.test (":")) {
@@ -811,33 +816,31 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 
             std::map<std::string, LayerPurpose>::const_iterator i = purpose_translation.find (ps);
             if (i != purpose_translation.end ()) {
-
               translated_purposes.insert (std::make_pair (i->second, mask));
+            }
 
-              if (! purpose_abbreviated) {
+          }
 
-                if (! purpose_str.empty ()) {
-                  purpose_str += "/";
-                }
+          //  create a visual description string for the combined purposes
+          std::string purpose_str;
 
-                if (purpose_str.size () > max_purpose_str) {
+          for (std::set<std::pair<LayerPurpose, unsigned int> >::const_iterator p = translated_purposes.begin (); p != translated_purposes.end (); ++p) {
 
-                  purpose_abbreviated = true;
-                  purpose_str += "...";
+            if (p != translated_purposes.begin ()) {
+              purpose_str += "/";
+            }
 
-                } else {
+            std::string ps = purpose_translation_rev [p->first];
+            if (p->second > 0) {
+              ps += ":";
+              ps += tl::to_string (p->second);
+            }
 
-                  purpose_str += i->first;
-
-                  if (mask > 0) {
-                    purpose_str += ":";
-                    purpose_str += tl::to_string (mask);
-                  }
-
-                }
-
-              }
-
+            if ((purpose_str + ps).size () > max_purpose_str) {
+              purpose_str += "...";
+              break;
+            } else {
+              purpose_str += ps;
             }
 
           }

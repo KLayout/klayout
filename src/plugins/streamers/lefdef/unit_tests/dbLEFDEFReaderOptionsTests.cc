@@ -312,6 +312,10 @@ TEST(1)
   EXPECT_EQ (options.lef_files ().size (), size_t (1));
   EXPECT_EQ (*options.begin_lef_files (), "ABC.lef");
 
+  EXPECT_EQ (options.read_lef_with_def (), true);
+  options.set_read_lef_with_def (false);
+  EXPECT_EQ (options.read_lef_with_def (), false);
+
 
   options.set_map_file ("ABC.map");
   EXPECT_EQ (options.map_file (), "ABC.map");

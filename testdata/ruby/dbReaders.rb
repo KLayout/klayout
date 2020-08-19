@@ -353,6 +353,10 @@ class DBReaders_TestClass < TestBase
     conf.lef_files = [ "u.lef", "v.lef" ]
     assert_equal(conf.lef_files.join(","), "u.lef,v.lef")
 
+    assert_equal(conf.read_lef_with_def, true)
+    conf.read_lef_with_def = false
+    assert_equal(conf.read_lef_with_def, false)
+
   end
 
   # MAG Options

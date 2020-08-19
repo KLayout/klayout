@@ -158,22 +158,26 @@ private:
 
       //  Additionally read all LEF files next to the DEF file
 
-      std::string input_dir = tl::absolute_path (m_stream.absolute_path ());
+      if (lefdef_options->read_lef_with_def ()) {
 
-      if (tl::file_exists (input_dir)) {
+        std::string input_dir = tl::absolute_path (m_stream.absolute_path ());
 
-        std::vector<std::string> entries = tl::dir_entries (input_dir);
-        for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
+        if (tl::file_exists (input_dir)) {
 
-          if (is_lef_format (*e)) {
+          std::vector<std::string> entries = tl::dir_entries (input_dir);
+          for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
 
-            std::string lp = tl::combine_path (input_dir, *e);
+            if (is_lef_format (*e)) {
 
-            tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file: ")) + lp);
+              std::string lp = tl::combine_path (input_dir, *e);
 
-            tl::InputStream lef_stream (lp);
-            tl::log << tl::to_string (tr ("Reading")) << " " << lp;
-            importer.read_lef (lef_stream, layout, state);
+              tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file: ")) + lp);
+
+              tl::InputStream lef_stream (lp);
+              tl::log << tl::to_string (tr ("Reading")) << " " << lp;
+              importer.read_lef (lef_stream, layout, state);
+
+            }
 
           }
 
@@ -323,6 +327,7 @@ class LEFDEFFormatDeclaration
       tl::make_member (&LEFDEFReaderOptions::special_routing_datatype_str, &LEFDEFReaderOptions::set_special_routing_datatype_str, "special-routing-datatype-string") +
       tl::make_member (&LEFDEFReaderOptions::via_cellname_prefix, &LEFDEFReaderOptions::set_via_cellname_prefix, "via-cellname-prefix") +
       tl::make_member (&LEFDEFReaderOptions::begin_lef_files, &LEFDEFReaderOptions::end_lef_files, &LEFDEFReaderOptions::push_lef_file, "lef-files") +
+      tl::make_member (&LEFDEFReaderOptions::read_lef_with_def, &LEFDEFReaderOptions::set_read_lef_with_def, "read-lef-with-def") +
       tl::make_member (&LEFDEFReaderOptions::macro_resolution_mode, &LEFDEFReaderOptions::set_macro_resolution_mode, "macro-resolution-mode", MacroResolutionModeConverter ()) +
       tl::make_member (&LEFDEFReaderOptions::separate_groups, &LEFDEFReaderOptions::set_separate_groups, "separate-groups") +
       tl::make_member (&LEFDEFReaderOptions::map_file, &LEFDEFReaderOptions::set_map_file, "map-file")

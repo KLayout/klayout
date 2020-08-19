@@ -712,6 +712,20 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
   gsi::method ("lef_files=", &db::LEFDEFReaderOptions::set_lef_files,
     "@brief Sets the list technology LEF files to additionally import\n"
     "See \\lef_files for details."
+  ) +
+  gsi::method ("read_lef_with_def", &db::LEFDEFReaderOptions::read_lef_with_def,
+    "@brief Gets a value indicating whether to read all LEF files in the same directory than the DEF file.\n"
+    "If this property is set to true (the default), the DEF reader will automatically consume all LEF files "
+    "next to the DEF file in addition to the LEF files specified with \\lef_files. If set to false, only the "
+    "LEF files specified with \\lef_files will be read.\n"
+    "\n"
+    "This property has been added in version 0.27.\n"
+  ) +
+  gsi::method ("read_lef_with_def=", &db::LEFDEFReaderOptions::set_read_lef_with_def, gsi::arg ("flag"),
+    "@brief Sets a value indicating whether to read all LEF files in the same directory than the DEF file.\n"
+    "See \\read_lef_with_def for details about this property.\n"
+    "\n"
+    "This property has been added in version 0.27.\n"
   ),
   "@brief Detailed LEF/DEF reader options\n"
   "This class is a aggregate belonging to the \\LoadLayoutOptions class. It provides options for the LEF/DEF reader. "

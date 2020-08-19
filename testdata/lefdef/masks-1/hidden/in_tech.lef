@@ -24,9 +24,9 @@ END M2
 
 VIA square 
     LAYER M0PO ;
-        RECT -0.06 -0.06 0.06 0.06 ;
+        RECT -0.08 -0.08 0.08 0.08 ;
     LAYER VIA0 ;
-        RECT -0.06 -0.06 0.06 0.06 ;
+        RECT -0.08 -0.08 0.08 0.08 ;
     LAYER M1 ;
-        RECT -0.06 -0.06 0.06 0.06 ;
+        RECT -0.08 -0.08 0.08 0.08 ;
 END square

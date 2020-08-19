@@ -738,6 +738,16 @@ public:
     m_lef_files = lf;
   }
 
+  bool read_lef_with_def () const
+  {
+    return m_read_lef_with_def;
+  }
+
+  void set_read_lef_with_def (bool f)
+  {
+    m_read_lef_with_def = f;
+  }
+
   bool separate_groups () const
   {
     return m_separate_groups;
@@ -829,6 +839,7 @@ private:
   bool m_separate_groups;
   std::string m_map_file;
   unsigned int m_macro_resolution_mode;
+  bool m_read_lef_with_def;
   std::vector<std::string> m_lef_files;
 };
 

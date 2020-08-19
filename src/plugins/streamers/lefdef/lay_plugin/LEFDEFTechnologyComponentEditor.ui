@@ -41,7 +41,7 @@
       </size>
      </property>
      <property name="title">
-      <string>LEF Files (specify what LEF files to use additionally)</string>
+      <string>LEF Files</string>
      </property>
      <property name="flat">
       <bool>true</bool>
@@ -187,6 +187,13 @@
           </widget>
          </item>
         </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="read_lef_with_def">
+        <property name="text">
+         <string>for DEF: also read all LEF files in the same directory than the DEF file</string>
+        </property>
        </widget>
       </item>
      </layout>

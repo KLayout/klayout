@@ -349,7 +349,8 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
     m_special_routing_datatype (0),
     m_separate_groups (false),
     m_map_file (),
-    m_macro_resolution_mode (0)
+    m_macro_resolution_mode (false),
+    m_read_lef_with_def (true)
 {
   //  .. nothing yet ..
 }
@@ -418,6 +419,7 @@ LEFDEFReaderOptions &LEFDEFReaderOptions::operator= (const LEFDEFReaderOptions &
     m_map_file = d.m_map_file;
     m_macro_resolution_mode = d.m_macro_resolution_mode;
     m_lef_files = d.m_lef_files;
+    m_read_lef_with_def = d.m_read_lef_with_def;
   }
   return *this;
 }

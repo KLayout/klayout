@@ -355,6 +355,7 @@ static gsi::Methods methods_QPdfWriter () {
   methods += new qt_gsi::GenericMethod ("setTitle|title=", "@brief Method void QPdfWriter::setTitle(const QString &title)\n", false, &_init_f_setTitle_2025, &_call_f_setTitle_2025);
   methods += new qt_gsi::GenericMethod (":title", "@brief Method QString QPdfWriter::title()\n", true, &_init_f_title_c0, &_call_f_title_c0);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QPdfWriter::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QPdfWriter::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QPdfWriter::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QPdfWriter::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   methods += new qt_gsi::GenericMethod ("asQObject", "@brief Delivers the base class interface QObject of QPdfWriter\nClass QPdfWriter is derived from multiple base classes. This method delivers the QObject base class aspect.", false, &_init_f_QPdfWriter_as_QObject, &_call_f_QPdfWriter_as_QObject);
@@ -472,6 +473,13 @@ public:
     } else {
       return QPdfWriter::newPage();
     }
+  }
+
+  //  [emitter impl] void QPdfWriter::objectNameChanged(const QString &objectName)
+  void emitter_QPdfWriter_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QPdfWriter::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QPdfWriter::setMargins(const QPagedPaintDevice::Margins &m)
@@ -960,6 +968,24 @@ static void _set_callback_cbs_newPage_0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
+// emitter void QPdfWriter::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QPdfWriter_Adaptor *)cls)->emitter_QPdfWriter_objectNameChanged_4567 (arg1);
+}
+
+
 // QPaintEngine *QPdfWriter::paintEngine()
 
 static void _init_cbs_paintEngine_c0_0 (qt_gsi::GenericMethod *decl)
@@ -1192,6 +1218,7 @@ static gsi::Methods methods_QPdfWriter_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*metric", "@hide", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0, &_set_callback_cbs_metric_c3445_0);
   methods += new qt_gsi::GenericMethod ("newPage", "@brief Virtual method bool QPdfWriter::newPage()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_newPage_0_0, &_call_cbs_newPage_0_0);
   methods += new qt_gsi::GenericMethod ("newPage", "@hide", false, &_init_cbs_newPage_0_0, &_call_cbs_newPage_0_0, &_set_callback_cbs_newPage_0_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QPdfWriter::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*paintEngine", "@brief Virtual method QPaintEngine *QPdfWriter::paintEngine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0);
   methods += new qt_gsi::GenericMethod ("*paintEngine", "@hide", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0, &_set_callback_cbs_paintEngine_c0_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QPdfWriter::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);

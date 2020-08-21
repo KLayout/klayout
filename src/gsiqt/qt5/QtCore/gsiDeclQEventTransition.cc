@@ -190,6 +190,10 @@ static gsi::Methods methods_QEventTransition () {
   methods += new qt_gsi::GenericMethod ("setEventSource|eventSource=", "@brief Method void QEventTransition::setEventSource(QObject *object)\n", false, &_init_f_setEventSource_1302, &_call_f_setEventSource_1302);
   methods += new qt_gsi::GenericMethod ("setEventType|eventType=", "@brief Method void QEventTransition::setEventType(QEvent::Type type)\n", false, &_init_f_setEventType_1565, &_call_f_setEventType_1565);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QEventTransition::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QEventTransition::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("targetStateChanged()", "targetStateChanged", "@brief Signal declaration for QEventTransition::targetStateChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("targetStatesChanged()", "targetStatesChanged", "@brief Signal declaration for QEventTransition::targetStatesChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("triggered()", "triggered", "@brief Signal declaration for QEventTransition::triggered()\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QEventTransition::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QEventTransition::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -275,6 +279,31 @@ public:
     } else {
       return QEventTransition::eventFilter(arg1, arg2);
     }
+  }
+
+  //  [emitter impl] void QEventTransition::objectNameChanged(const QString &objectName)
+  void emitter_QEventTransition_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QEventTransition::objectNameChanged(const QString &objectName)'");
+  }
+
+  //  [emitter impl] void QEventTransition::targetStateChanged()
+  void emitter_QEventTransition_targetStateChanged_3938()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QEventTransition::targetStateChanged()'");
+  }
+
+  //  [emitter impl] void QEventTransition::targetStatesChanged()
+  void emitter_QEventTransition_targetStatesChanged_3938()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QEventTransition::targetStatesChanged()'");
+  }
+
+  //  [emitter impl] void QEventTransition::triggered()
+  void emitter_QEventTransition_triggered_3938()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QEventTransition::triggered()'");
   }
 
   //  [adaptor impl] void QEventTransition::childEvent(QChildEvent *)
@@ -616,6 +645,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QEventTransition::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QEventTransition_Adaptor *)cls)->emitter_QEventTransition_objectNameChanged_4567 (arg1);
+}
+
+
 // void QEventTransition::onTransition(QEvent *event)
 
 static void _init_cbs_onTransition_1217_0 (qt_gsi::GenericMethod *decl)
@@ -686,6 +733,34 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
+// emitter void QEventTransition::targetStateChanged()
+
+static void _init_emitter_targetStateChanged_3938 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_targetStateChanged_3938 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QEventTransition_Adaptor *)cls)->emitter_QEventTransition_targetStateChanged_3938 ();
+}
+
+
+// emitter void QEventTransition::targetStatesChanged()
+
+static void _init_emitter_targetStatesChanged_3938 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_targetStatesChanged_3938 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QEventTransition_Adaptor *)cls)->emitter_QEventTransition_targetStatesChanged_3938 ();
+}
+
+
 // void QEventTransition::timerEvent(QTimerEvent *)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
@@ -707,6 +782,20 @@ static void _call_cbs_timerEvent_1730_0 (const qt_gsi::GenericMethod * /*decl*/,
 static void _set_callback_cbs_timerEvent_1730_0 (void *cls, const gsi::Callback &cb)
 {
   ((QEventTransition_Adaptor *)cls)->cb_timerEvent_1730_0 = cb;
+}
+
+
+// emitter void QEventTransition::triggered()
+
+static void _init_emitter_triggered_3938 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_triggered_3938 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QEventTransition_Adaptor *)cls)->emitter_QEventTransition_triggered_3938 ();
 }
 
 
@@ -733,13 +822,17 @@ static gsi::Methods methods_QEventTransition_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*eventTest", "@brief Virtual method bool QEventTransition::eventTest(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventTest_1217_0, &_call_cbs_eventTest_1217_0);
   methods += new qt_gsi::GenericMethod ("*eventTest", "@hide", false, &_init_cbs_eventTest_1217_0, &_call_cbs_eventTest_1217_0, &_set_callback_cbs_eventTest_1217_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QEventTransition::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QEventTransition::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*onTransition", "@brief Virtual method void QEventTransition::onTransition(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_onTransition_1217_0, &_call_cbs_onTransition_1217_0);
   methods += new qt_gsi::GenericMethod ("*onTransition", "@hide", false, &_init_cbs_onTransition_1217_0, &_call_cbs_onTransition_1217_0, &_set_callback_cbs_onTransition_1217_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QEventTransition::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QEventTransition::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QEventTransition::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
+  methods += new qt_gsi::GenericMethod ("emit_targetStateChanged", "@brief Emitter for signal void QEventTransition::targetStateChanged()\nCall this method to emit this signal.", false, &_init_emitter_targetStateChanged_3938, &_call_emitter_targetStateChanged_3938);
+  methods += new qt_gsi::GenericMethod ("emit_targetStatesChanged", "@brief Emitter for signal void QEventTransition::targetStatesChanged()\nCall this method to emit this signal.", false, &_init_emitter_targetStatesChanged_3938, &_call_emitter_targetStatesChanged_3938);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QEventTransition::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("emit_triggered", "@brief Emitter for signal void QEventTransition::triggered()\nCall this method to emit this signal.", false, &_init_emitter_triggered_3938, &_call_emitter_triggered_3938);
   return methods;
 }
 

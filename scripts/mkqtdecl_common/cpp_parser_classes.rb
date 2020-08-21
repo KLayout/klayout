@@ -452,7 +452,7 @@ end
 
 module PExternBlock
   def cpp
-    self.get_cpp.collect do |d| 
+    (self.get_cpp || []).collect do |d| 
       if d.is_a?(CPPDeclaration)
         d.storage_class = :extern
       end

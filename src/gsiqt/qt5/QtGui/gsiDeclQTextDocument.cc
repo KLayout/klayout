@@ -1628,6 +1628,7 @@ static gsi::Methods methods_QTextDocument () {
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QTextDocument::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("documentLayoutChanged()", "documentLayoutChanged", "@brief Signal declaration for QTextDocument::documentLayoutChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("modificationChanged(bool)", "modificationChanged", gsi::arg("m"), "@brief Signal declaration for QTextDocument::modificationChanged(bool m)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QTextDocument::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("redoAvailable(bool)", "redoAvailable", gsi::arg("arg1"), "@brief Signal declaration for QTextDocument::redoAvailable(bool)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("undoAvailable(bool)", "undoAvailable", gsi::arg("arg1"), "@brief Signal declaration for QTextDocument::undoAvailable(bool)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("undoCommandAdded()", "undoCommandAdded", "@brief Signal declaration for QTextDocument::undoCommandAdded()\nYou can bind a procedure to this signal.");
@@ -1788,6 +1789,13 @@ public:
   void emitter_QTextDocument_modificationChanged_864(bool m)
   {
     emit QTextDocument::modificationChanged(m);
+  }
+
+  //  [emitter impl] void QTextDocument::objectNameChanged(const QString &objectName)
+  void emitter_QTextDocument_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QTextDocument::objectNameChanged(const QString &objectName)'");
   }
 
   //  [emitter impl] void QTextDocument::redoAvailable(bool)
@@ -2300,6 +2308,24 @@ static void _call_emitter_modificationChanged_864 (const qt_gsi::GenericMethod *
 }
 
 
+// emitter void QTextDocument::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QTextDocument_Adaptor *)cls)->emitter_QTextDocument_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QTextDocument::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -2454,6 +2480,7 @@ static gsi::Methods methods_QTextDocument_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*loadResource", "@brief Virtual method QVariant QTextDocument::loadResource(int type, const QUrl &name)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_loadResource_2360_0, &_call_cbs_loadResource_2360_0);
   methods += new qt_gsi::GenericMethod ("*loadResource", "@hide", false, &_init_cbs_loadResource_2360_0, &_call_cbs_loadResource_2360_0, &_set_callback_cbs_loadResource_2360_0);
   methods += new qt_gsi::GenericMethod ("emit_modificationChanged", "@brief Emitter for signal void QTextDocument::modificationChanged(bool m)\nCall this method to emit this signal.", false, &_init_emitter_modificationChanged_864, &_call_emitter_modificationChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QTextDocument::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QTextDocument::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("emit_redoAvailable", "@brief Emitter for signal void QTextDocument::redoAvailable(bool)\nCall this method to emit this signal.", false, &_init_emitter_redoAvailable_864, &_call_emitter_redoAvailable_864);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QTextDocument::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);

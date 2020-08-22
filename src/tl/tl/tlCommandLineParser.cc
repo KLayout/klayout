@@ -558,7 +558,10 @@ CommandLineOptions::parse (int argc, char *argv[])
         if (ex.test ("=")) {
           arg->take_value (ex);
         } else {
-          arg->mark_present (arg->option ().inverted);
+          arg->mark_present ();
+        }
+        if (arg->option ().inverted) {
+          arg->invert_present ();
         }
 
       }

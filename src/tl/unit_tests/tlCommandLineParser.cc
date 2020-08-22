@@ -75,6 +75,26 @@ TEST(1)
   EXPECT_EQ (b, 0);
   EXPECT_EQ (c, false);
 
+  b = 0;
+  c = true;
+  {
+    const char *argv[] = { "x", "u", "-cc=false" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
+  }
+  EXPECT_EQ (a, "u");
+  EXPECT_EQ (b, 0);
+  EXPECT_EQ (c, true);
+
+  b = 0;
+  c = true;
+  {
+    const char *argv[] = { "x", "u", "-cc=true" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
+  }
+  EXPECT_EQ (a, "u");
+  EXPECT_EQ (b, 0);
+  EXPECT_EQ (c, false);
+
   {
     const char *argv[] = { "x", "u", "-c", "-cc" };
     cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);

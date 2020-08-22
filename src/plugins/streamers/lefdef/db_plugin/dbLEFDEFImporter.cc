@@ -76,7 +76,7 @@ static bool is_hex_digit (char c)
   return (cup >= 'A' && cup <= 'F') || (c >= '0' && c <= '9');
 }
 
-static int hex_value (char c)
+static unsigned int hex_value (char c)
 {
   char cup = toupper (c);
   if (cup >= 'A' && cup <= 'F') {
@@ -88,16 +88,42 @@ static int hex_value (char c)
   }
 }
 
+static std::vector<unsigned int> string2masks (const std::string &s)
+{
+  std::vector<unsigned int> res;
+  res.reserve (s.size ());
+
+  for (const char *cp = s.c_str (); *cp; ++cp) {
+    if (! is_hex_digit (*cp)) {
+      throw tl::Exception ("Not a hex string: " + s);
+    }
+    res.push_back (hex_value (*cp));
+  }
+
+  return res;
+}
+
+static unsigned int mask (const std::vector<unsigned int> &masks, unsigned int index)
+{
+  if (index < (unsigned int) masks.size ()) {
+    return masks [index];
+  } else {
+    return 0;
+  }
+}
+
 // -----------------------------------------------------------------------------------
 //  RuleBasedViaGenerator implementation
 
 RuleBasedViaGenerator::RuleBasedViaGenerator ()
-  : LEFDEFViaGenerator (), m_bottom_mask (0), m_cut_mask (0), m_top_mask (0), m_rows (1), m_columns (1)
+  : LEFDEFLayoutGenerator (), m_bottom_mask (0), m_cut_mask (0), m_top_mask (0), m_rows (1), m_columns (1)
 { }
 
 void
-RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm)
+RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm)
 {
+  unsigned int mask_bottom = mask (masks, 0), mask_cut = mask (masks, 1), mask_top = mask (masks, 2);
+
   if (mask_bottom == 0) {
     mask_bottom = m_bottom_mask;
   }
@@ -238,31 +264,27 @@ RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, d
 // -----------------------------------------------------------------------------------
 //  GeometryBasedViaGenerator implementation
 
-GeometryBasedViaGenerator::GeometryBasedViaGenerator ()
-  : LEFDEFViaGenerator ()
+GeometryBasedLayoutGenerator::GeometryBasedLayoutGenerator ()
+  : LEFDEFLayoutGenerator ()
 { }
 
 unsigned int
-GeometryBasedViaGenerator::mask_for (const std::string &ln, unsigned int m, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm) const
+GeometryBasedLayoutGenerator::mask_for (const std::string &ln, unsigned int m, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm) const
 {
-  if (m == 0 || ! nm) {
+  for (std::vector<std::string>::const_iterator l = m_maskshift_layers.begin (); l != m_maskshift_layers.end (); ++l) {
 
-    if (ln == m_bottom_layer) {
-      return mask_bottom;
-    } else if (ln == m_cut_layer) {
-      return mask_cut;
-    } else if (ln == m_top_layer) {
-      return mask_top;
-    }
+    if (*l == ln) {
 
-  } else {
+      unsigned int mm = mask (masks, (unsigned int) (l - m_maskshift_layers.begin ()));
 
-    if (ln == m_bottom_layer) {
-      return mask_bottom > 0 ? ((m + mask_bottom - 2) % nm->number_of_masks (m_bottom_layer) + 1) : m;
-    } else if (ln == m_cut_layer) {
-      return mask_cut > 0 ? ((m + mask_cut - 2) % nm->number_of_masks (m_cut_layer) + 1) : m;
-    } else if (ln == m_top_layer) {
-      return mask_top > 0 ? ((m + mask_top - 2) % nm->number_of_masks (m_top_layer) + 1) : m;
+      if (m == 0 || ! nm) {
+        m = mm;
+      } else if (m > 0) {
+        m = (m + mm - 2) % nm->number_of_masks (ln) + 1;
+      }
+
+      break;
+
     }
 
   }
@@ -271,11 +293,11 @@ GeometryBasedViaGenerator::mask_for (const std::string &ln, unsigned int m, unsi
 }
 
 void
-GeometryBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm)
+GeometryBasedLayoutGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm)
 {
   for (std::map <std::string, std::list<std::pair<unsigned int, db::Polygon> > >::const_iterator g = m_polygons.begin (); g != m_polygons.end (); ++g) {
     for (std::list<std::pair<unsigned int, db::Polygon> >::const_iterator i = g->second.begin (); i != g->second.end (); ++i) {
-      std::pair <bool, unsigned int> dl = reader.open_layer (layout, g->first, ViaGeometry, mask_for (g->first, i->first, mask_bottom, mask_cut, mask_top, nm));
+      std::pair <bool, unsigned int> dl = reader.open_layer (layout, g->first, ViaGeometry, mask_for (g->first, i->first, masks, nm));
       if (dl.first) {
         cell.shapes (dl.second).insert (i->second);
       }
@@ -284,7 +306,7 @@ GeometryBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layou
 
   for (std::map <std::string, std::list<std::pair<unsigned int, db::Box> > >::const_iterator g = m_boxes.begin (); g != m_boxes.end (); ++g) {
     for (std::list<std::pair<unsigned int, db::Box> >::const_iterator i = g->second.begin (); i != g->second.end (); ++i) {
-      std::pair <bool, unsigned int> dl = reader.open_layer (layout, g->first, ViaGeometry, mask_for (g->first, i->first, mask_bottom, mask_cut, mask_top, nm));
+      std::pair <bool, unsigned int> dl = reader.open_layer (layout, g->first, ViaGeometry, mask_for (g->first, i->first, masks, nm));
       if (dl.first) {
         cell.shapes (dl.second).insert (i->second);
       }
@@ -293,13 +315,13 @@ GeometryBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layou
 }
 
 void
-GeometryBasedViaGenerator::add_polygon (const std::string &ln, const db::Polygon &poly, unsigned int mask)
+GeometryBasedLayoutGenerator::add_polygon (const std::string &ln, const db::Polygon &poly, unsigned int mask)
 {
   m_polygons [ln].push_back (std::make_pair (mask, poly));
 }
 
 void
-GeometryBasedViaGenerator::add_box (const std::string &ln, const db::Box &box, unsigned int mask)
+GeometryBasedLayoutGenerator::add_box (const std::string &ln, const db::Box &box, unsigned int mask)
 {
   m_boxes [ln].push_back (std::make_pair (mask, box));
 }
@@ -687,7 +709,7 @@ LEFDEFReaderState::LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout 
 
 LEFDEFReaderState::~LEFDEFReaderState ()
 {
-  for (std::map<std::string, LEFDEFViaGenerator *>::const_iterator i = m_via_generators.begin (); i != m_via_generators.end (); ++i) {
+  for (std::map<std::string, LEFDEFLayoutGenerator *>::const_iterator i = m_via_generators.begin (); i != m_via_generators.end (); ++i) {
     delete i->second;
   }
 
@@ -1166,7 +1188,7 @@ LEFDEFReaderState::finish (db::Layout &layout)
 }
 
 void
-LEFDEFReaderState::register_via_cell (const std::string &vn, LEFDEFViaGenerator *generator)
+LEFDEFReaderState::register_via_cell (const std::string &vn, LEFDEFLayoutGenerator *generator)
 {
   if (m_via_generators.find (vn) != m_via_generators.end ()) {
     delete m_via_generators [vn];
@@ -1183,10 +1205,10 @@ LEFDEFReaderState::via_cell (const std::string &vn, db::Layout &layout, unsigned
 
     db::Cell *cell = 0;
 
-    std::map<std::string, LEFDEFViaGenerator *>::const_iterator g = m_via_generators.find (vn);
+    std::map<std::string, LEFDEFLayoutGenerator *>::const_iterator g = m_via_generators.find (vn);
     if (g != m_via_generators.end ()) {
 
-      LEFDEFViaGenerator *vg = g->second;
+      LEFDEFLayoutGenerator *vg = g->second;
 
       std::string mask_suffix;
       if (mask_bottom > 0 || mask_cut > 0 || mask_top > 0) {
@@ -1201,7 +1223,13 @@ LEFDEFReaderState::via_cell (const std::string &vn, db::Layout &layout, unsigned
       std::string cn = mp_tech_comp->via_cellname_prefix () + vn + mask_suffix;
       cell = &layout.cell (layout.add_cell (cn.c_str ()));
 
-      vg->create_cell (*this, layout, *cell, mask_bottom, mask_cut, mask_top, nm);
+      std::vector<unsigned int> masks;
+      masks.reserve (3);
+      masks.push_back (mask_bottom);
+      masks.push_back (mask_cut);
+      masks.push_back (mask_top);
+
+      vg->create_cell (*this, layout, *cell, masks, nm);
 
     }
 

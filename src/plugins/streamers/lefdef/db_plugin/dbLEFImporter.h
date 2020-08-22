@@ -141,11 +141,13 @@ private:
   std::map<std::string, unsigned int> m_num_masks;
 
   std::vector <db::Trans> get_iteration (db::Layout &layout);
+  // @@@
   void read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose purpose, std::map<std::string, db::Box> *collect_bboxes = 0, properties_id_type prop_id = 0);
+  // void read_geometries (GeometryBasedLayoutGenerator *lg, LayerPurpose purpose, std::map<std::string, db::Box> *collect_bboxes = 0, properties_id_type prop_id = 0);
   void read_nondefaultrule (Layout &layout);
   void read_viadef (Layout &layout);
   void read_viadef_by_rule (RuleBasedViaGenerator *vg, ViaDesc &desc, const std::string &n, double dbu);
-  void read_viadef_by_geometry (GeometryBasedViaGenerator *vg, ViaDesc &desc, const std::string &n, double dbu);
+  void read_viadef_by_geometry (GeometryBasedLayoutGenerator *lg, ViaDesc &desc, const std::string &n, double dbu);
   void read_layer (Layout &layout);
   void read_macro (Layout &layout);
 };

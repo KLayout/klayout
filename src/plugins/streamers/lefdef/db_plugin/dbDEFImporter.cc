@@ -895,9 +895,9 @@ DEFImporter::read_vias (db::Layout & /*layout*/, db::Cell & /*design*/, double s
 
     //  produce a cell for vias
     std::auto_ptr<RuleBasedViaGenerator> rule_based_vg;
-    std::auto_ptr<GeometryBasedViaGenerator> geo_based_vg;
+    std::auto_ptr<GeometryBasedLayoutGenerator> geo_based_vg;
 
-    std::auto_ptr<LEFDEFViaGenerator> via_generator;
+    std::auto_ptr<LEFDEFLayoutGenerator> via_generator;
     std::set<std::string> seen_layers;
     std::vector<std::string> routing_layers;
 
@@ -992,7 +992,7 @@ DEFImporter::read_vias (db::Layout & /*layout*/, db::Cell & /*design*/, double s
       } else if ((is_polygon = test ("POLYGON")) || test ("RECT")) {
 
         if (! geo_based_vg.get ()) {
-          geo_based_vg.reset (new GeometryBasedViaGenerator ());
+          geo_based_vg.reset (new GeometryBasedLayoutGenerator ());
         }
 
         std::string ln = get ();
@@ -1000,9 +1000,9 @@ DEFImporter::read_vias (db::Layout & /*layout*/, db::Cell & /*design*/, double s
         if (m_lef_importer.is_routing_layer (ln)) {
 
           if (routing_layers.size () == 0) {
-            geo_based_vg->set_bottom_layer (ln);
+            geo_based_vg->set_maskshift_layer (0, ln);
           } else if (routing_layers.size () == 1) {
-            geo_based_vg->set_top_layer (ln);
+            geo_based_vg->set_maskshift_layer (2, ln);
           }
 
           if (seen_layers.find (ln) == seen_layers.end ()) {
@@ -1012,7 +1012,7 @@ DEFImporter::read_vias (db::Layout & /*layout*/, db::Cell & /*design*/, double s
 
         } else if (m_lef_importer.is_cut_layer (ln)) {
 
-          geo_based_vg->set_cut_layer (ln);
+          geo_based_vg->set_maskshift_layer (1, ln);
 
         }
 
@@ -1267,6 +1267,11 @@ DEFImporter::read_components (std::list<std::pair<std::string, CellInstArray> > 
     std::string inst_name = get ();
     std::string model = get ();
 
+    db::FTrans ft;
+    db::Vector d;
+    bool is_placed = false;
+    std::string maskshift;
+
     std::pair<db::Cell *, db::Trans> ct = m_lef_importer.macro_by_name (model);
 
     while (test ("+")) {
@@ -1277,15 +1282,13 @@ DEFImporter::read_components (std::list<std::pair<std::string, CellInstArray> > 
         db::Point pt = get_point (scale);
         test (")");
 
-        db::FTrans ft = get_orient (false /*mandatory*/);
-        db::Vector d = pt - m_lef_importer.macro_bbox_by_name (model).transformed (ft).lower_left ();
+        ft = get_orient (false /*mandatory*/);
+        d = pt - m_lef_importer.macro_bbox_by_name (model).transformed (ft).lower_left ();
+        is_placed = true;
 
-        if (ct.first) {
-          db::CellInstArray inst (db::CellInst (ct.first->cell_index ()), db::Trans (ft.rot (), d) * ct.second);
-          instances.push_back (std::make_pair (inst_name, inst));
-        } else {
-          warn (tl::to_string (tr ("Macro not found in LEF file: ")) + model);
-        }
+      } else if (test ("MASKSHIFT")) {
+
+        maskshift = get ();
 
       } else {
         while (! peek ("+") && ! peek ("-") && ! peek (";")) {
@@ -1296,6 +1299,15 @@ DEFImporter::read_components (std::list<std::pair<std::string, CellInstArray> > 
     }
 
     expect (";");
+
+    if (is_placed) {
+      if (ct.first) {
+        db::CellInstArray inst (db::CellInst (ct.first->cell_index ()), db::Trans (ft.rot (), d) * ct.second);
+        instances.push_back (std::make_pair (inst_name, inst));
+      } else {
+        warn (tl::to_string (tr ("Macro not found in LEF file: ")) + model);
+      }
+    }
 
   }
 }
@@ -1467,9 +1479,9 @@ DEFImporter::do_read (db::Layout &layout)
 
     } else if (test ("COMPONENTMASKSHIFT")) {
 
-      warn (tl::to_string (tr ("Component mask shift not supported currently")));
+      m_component_maskshift.clear ();
       while (! at_end () && ! test (";")) {
-        take ();
+        m_component_maskshift.push_back (get ());
       }
 
     } else if (test ("COMPONENTS")) {

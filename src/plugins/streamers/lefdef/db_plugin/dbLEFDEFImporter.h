@@ -876,25 +876,25 @@ public:
 /**
  *  @brief Provides a via generator base class
  */
-class DB_PLUGIN_PUBLIC LEFDEFViaGenerator
+class DB_PLUGIN_PUBLIC LEFDEFLayoutGenerator
 {
 public:
-  LEFDEFViaGenerator () { }
-  virtual ~LEFDEFViaGenerator () { }
+  LEFDEFLayoutGenerator () { }
+  virtual ~LEFDEFLayoutGenerator () { }
 
-  virtual void create_cell (LEFDEFReaderState &reader, db::Layout &layout, db::Cell &cell, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm) = 0;
+  virtual void create_cell (LEFDEFReaderState &reader, db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm) = 0;
 };
 
 /**
  *  @brief Provides a via generator implementation for rule-based vias
  */
 class DB_PLUGIN_PUBLIC RuleBasedViaGenerator
-  : public LEFDEFViaGenerator
+  : public LEFDEFLayoutGenerator
 {
 public:
   RuleBasedViaGenerator ();
 
-  virtual void create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm);
+  virtual void create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm);
 
   void set_cutsize (const db::Vector &cutsize) { m_cutsize = cutsize; }
   void set_cutspacing (const db::Vector &cutspacing) { m_cutspacing = cutspacing; }
@@ -927,26 +927,31 @@ private:
 /**
  *  @brief Provides a geometry-based via generator implementation
  */
-class DB_PLUGIN_PUBLIC GeometryBasedViaGenerator
-  : public LEFDEFViaGenerator
+class DB_PLUGIN_PUBLIC GeometryBasedLayoutGenerator
+  : public LEFDEFLayoutGenerator
 {
 public:
-  GeometryBasedViaGenerator ();
+  GeometryBasedLayoutGenerator ();
 
-  virtual void create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *num_cut_masks);
+  virtual void create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *num_cut_masks);
 
   void add_polygon (const std::string &ln, const db::Polygon &poly, unsigned int mask);
   void add_box (const std::string &ln, const db::Box &box, unsigned int mask);
-  void set_bottom_layer (const std::string &ln) { m_bottom_layer = ln; }
-  void set_cut_layer (const std::string &ln) { m_cut_layer = ln; }
-  void set_top_layer (const std::string &ln) { m_top_layer = ln; }
+
+  void set_maskshift_layers (const std::vector<std::string> &ln) { m_maskshift_layers = ln; }
+
+  void set_maskshift_layer (unsigned int l, const std::string &s)
+  {
+    m_maskshift_layers.resize (l + 1, std::string ());
+    m_maskshift_layers[l] = s;
+  }
 
 private:
   std::map <std::string, std::list<std::pair<unsigned int, db::Polygon> > > m_polygons;
   std::map <std::string, std::list<std::pair<unsigned int, db::Box> > > m_boxes;
-  std::string m_bottom_layer, m_cut_layer, m_top_layer;
+  std::vector<std::string> m_maskshift_layers;
 
-  unsigned int mask_for (const std::string &ln, unsigned int m, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm) const;
+  unsigned int mask_for (const std::string &ln, unsigned int m, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm) const;
 };
 
 /**
@@ -1002,7 +1007,7 @@ public:
    *
    *  The generator is capable of creating a via for a specific mask configuration
    */
-  void register_via_cell (const std::string &vn, LEFDEFViaGenerator *generator);
+  void register_via_cell (const std::string &vn, LEFDEFLayoutGenerator *generator);
 
   /**
    *  @brief Gets the via cell for the given via name or 0 if no such via is registered
@@ -1065,7 +1070,7 @@ private:
   std::map<std::string, int> m_default_number;
   std::map<ViaKey, db::Cell *> m_via_cells;
   const LEFDEFReaderOptions *mp_tech_comp;
-  std::map<std::string, LEFDEFViaGenerator *> m_via_generators;
+  std::map<std::string, LEFDEFLayoutGenerator *> m_via_generators;
 
   std::pair <bool, unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
   void map_layer_explicit (const std::string &n, LayerPurpose purpose, const LayerProperties &lp, unsigned int layer, unsigned int mask);

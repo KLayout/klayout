@@ -66,6 +66,7 @@ private:
   std::map<std::string, std::map<std::string, db::Coord> > m_nondefault_widths;
   std::map<std::string, ViaDesc> m_via_desc;
   std::map<int, db::Polygon> m_styles;
+  std::vector<std::string> m_component_maskshift;
 
   void read_polygon (db::Polygon &poly, double scale);
   void read_rect (db::Polygon &poly, double scale);

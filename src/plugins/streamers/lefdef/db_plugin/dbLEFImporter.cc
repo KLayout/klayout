@@ -538,7 +538,7 @@ LEFImporter::read_viadef_by_rule (RuleBasedViaGenerator *vg, ViaDesc &via_desc, 
 }
 
 void
-LEFImporter::read_viadef_by_geometry (GeometryBasedViaGenerator *vg, ViaDesc &via_desc, const std::string &n, double dbu)
+LEFImporter::read_viadef_by_geometry (GeometryBasedLayoutGenerator *lg, ViaDesc &via_desc, const std::string &n, double dbu)
 {
   //  ignore resistance spec
   if (test ("RESISTANCE")) {
@@ -559,9 +559,9 @@ LEFImporter::read_viadef_by_geometry (GeometryBasedViaGenerator *vg, ViaDesc &vi
       if (m_routing_layers.find (layer_name) != m_routing_layers.end ()) {
 
         if (routing_layers.size () == 0) {
-          vg->set_bottom_layer (layer_name);
+          lg->set_maskshift_layer (0, layer_name);
         } else if (routing_layers.size () == 1) {
-          vg->set_top_layer (layer_name);
+          lg->set_maskshift_layer (2, layer_name);
         }
 
         if (seen_layers.find (layer_name) == seen_layers.end ()) {
@@ -570,7 +570,7 @@ LEFImporter::read_viadef_by_geometry (GeometryBasedViaGenerator *vg, ViaDesc &vi
         }
 
       } else {
-        vg->set_cut_layer (layer_name);
+        lg->set_maskshift_layer (1, layer_name);
       }
 
       while (! at_end () && ! test (";")) {
@@ -597,7 +597,7 @@ LEFImporter::read_viadef_by_geometry (GeometryBasedViaGenerator *vg, ViaDesc &vi
       db::Polygon p;
       p.assign_hull (points.begin (), points.end ());
 
-      vg->add_polygon (layer_name, p, mask);
+      lg->add_polygon (layer_name, p, mask);
 
       expect (";");
 
@@ -619,7 +619,7 @@ LEFImporter::read_viadef_by_geometry (GeometryBasedViaGenerator *vg, ViaDesc &vi
       }
 
       db::Box b (points [0], points [1]);
-      vg->add_box (layer_name, b, mask);
+      lg->add_box (layer_name, b, mask);
 
       expect (";");
 
@@ -667,7 +667,7 @@ LEFImporter::read_viadef (Layout &layout)
     read_viadef_by_rule (vg.get (), via_desc, n, layout.dbu ());
     reader_state ()->register_via_cell (n, vg.release ());
   } else {
-    std::auto_ptr<GeometryBasedViaGenerator> vg (new GeometryBasedViaGenerator ());
+    std::auto_ptr<GeometryBasedLayoutGenerator> vg (new GeometryBasedLayoutGenerator ());
     read_viadef_by_geometry (vg.get (), via_desc, n, layout.dbu ());
     reader_state ()->register_via_cell (n, vg.release ());
   }

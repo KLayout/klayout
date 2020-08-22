@@ -739,7 +739,7 @@ If used inside a technology, the file will be looked up relative to the technolo
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>150</height>
+           <height>0</height>
           </size>
          </property>
          <layout class="QGridLayout" name="gridLayout_3">

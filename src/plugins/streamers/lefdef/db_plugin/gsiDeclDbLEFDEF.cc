@@ -220,6 +220,32 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "@brief Sets the layer on which to produce the placement blockage.\n"
     "See \\placement_blockage_layer for details.\n"
   ) +
+  gsi::method ("produce_regions", &db::LEFDEFReaderOptions::produce_regions,
+    "@brief Gets a value indicating whether to produce regions.\n"
+    "If set to true, polygons will be produced representing the regions on the layer given by \\region_layer.\n"
+    "\n"
+    "The attribute has been introduced in version 0.27."
+  ) +
+  gsi::method ("produce_regions=", &db::LEFDEFReaderOptions::set_produce_regions, gsi::arg ("produce"),
+    "@brief Sets a value indicating whether to produce regions.\n"
+    "See \\produce_regions for details.\n"
+    "\n"
+    "The attribute has been introduced in version 0.27."
+  ) +
+  gsi::method ("region_layer", &db::LEFDEFReaderOptions::region_layer,
+    "@brief Gets the layer on which to produce the regions.\n"
+    "This attribute is a string correspondig to the string representation of \\LayerInfo. "
+    "This string can be either a layer number, a layer/datatype pair, a name or a combination of both. See \\LayerInfo for details."
+    "The setter for this attribute is \\region_layer=. See also \\produce_regions.\n"
+    "\n"
+    "The attribute has been introduced in version 0.27."
+  ) +
+  gsi::method ("region_layer=", &db::LEFDEFReaderOptions::set_region_layer,
+    "@brief Sets the layer on which to produce the regions.\n"
+    "See \\region_layer for details.\n"
+    "\n"
+    "The attribute has been introduced in version 0.27."
+  ) +
   gsi::method ("produce_via_geometry", &db::LEFDEFReaderOptions::produce_via_geometry,
     "@brief Sets a value indicating whether via geometries shall be produced.\n"
     "\n"
@@ -300,6 +326,18 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "\n\n"
     "Mask specific rules have been introduced in version 0.27."
   ) +
+  gsi::method ("via_geometry_suffix_str", &db::LEFDEFReaderOptions::via_geometry_suffix_str,
+    "@hide"
+  ) +
+  gsi::method ("via_geometry_suffix_str=", &db::LEFDEFReaderOptions::set_via_geometry_suffix_str, gsi::arg ("suffix"),
+    "@hide"
+  ) +
+  gsi::method ("via_geometry_datatype_str", &db::LEFDEFReaderOptions::via_geometry_datatype_str,
+    "@hide"
+  ) +
+  gsi::method ("via_geometry_datatype_str=", &db::LEFDEFReaderOptions::set_via_geometry_datatype_str, gsi::arg ("datatype"),
+    "@hide"
+  ) +
   gsi::method ("via_cellname_prefix", &db::LEFDEFReaderOptions::via_cellname_prefix,
     "@brief Gets the via cellname prefix.\n"
     "Vias are represented by cells. The cell name is formed by combining the via cell name prefix and the via name.\n"
@@ -376,6 +414,18 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "\n\n"
     "Mask specific rules have been introduced in version 0.27."
   ) +
+  gsi::method ("pins_suffix_str", &db::LEFDEFReaderOptions::pins_suffix_str,
+    "@hide"
+  ) +
+  gsi::method ("pins_suffix_str=", &db::LEFDEFReaderOptions::set_pins_suffix_str, gsi::arg ("suffix"),
+    "@hide"
+  ) +
+  gsi::method ("pins_datatype_str", &db::LEFDEFReaderOptions::pins_datatype_str,
+    "@hide"
+  ) +
+  gsi::method ("pins_datatype_str=", &db::LEFDEFReaderOptions::set_pins_datatype_str, gsi::arg ("datatype"),
+    "@hide"
+  ) +
   gsi::method ("produce_lef_pins", &db::LEFDEFReaderOptions::produce_lef_pins,
     "@brief Gets a value indicating whether LEF pin geometries shall be produced.\n"
     "See \\produce_via_geometry for details about the layer production rules."
@@ -439,6 +489,18 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
     "\n\n"
     "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("lef_pins_suffix_str", &db::LEFDEFReaderOptions::lef_pins_suffix_str,
+    "@hide"
+  ) +
+  gsi::method ("lef_pins_suffix_str=", &db::LEFDEFReaderOptions::set_lef_pins_suffix_str, gsi::arg ("suffix"),
+    "@hide"
+  ) +
+  gsi::method ("lef_pins_datatype_str", &db::LEFDEFReaderOptions::lef_pins_datatype_str,
+    "@hide"
+  ) +
+  gsi::method ("lef_pins_datatype_str=", &db::LEFDEFReaderOptions::set_lef_pins_datatype_str, gsi::arg ("datatype"),
+    "@hide"
   ) +
   gsi::method ("produce_obstructions", &db::LEFDEFReaderOptions::produce_obstructions,
     "@brief Gets a value indicating whether obstruction markers shall be produced.\n"
@@ -576,6 +638,18 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "\n\n"
     "Mask specific rules have been introduced in version 0.27."
   ) +
+  gsi::method ("routing_suffix_str", &db::LEFDEFReaderOptions::routing_suffix_str,
+    "@hide"
+  ) +
+  gsi::method ("routing_suffix_str=", &db::LEFDEFReaderOptions::set_routing_suffix_str, gsi::arg ("suffix"),
+    "@hide"
+  ) +
+  gsi::method ("routing_datatype_str", &db::LEFDEFReaderOptions::routing_datatype_str,
+    "@hide"
+  ) +
+  gsi::method ("routing_datatype_str=", &db::LEFDEFReaderOptions::set_routing_datatype_str, gsi::arg ("datatype"),
+    "@hide"
+  ) +
   gsi::method ("produce_special_routing", &db::LEFDEFReaderOptions::produce_special_routing,
     "@brief Gets a value indicating whether special routing geometry shall be produced.\n"
     "See \\produce_via_geometry for details about the layer production rules.\n"
@@ -651,6 +725,18 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
     "\n\n"
     "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("special_routing_suffix_str", &db::LEFDEFReaderOptions::special_routing_suffix_str,
+    "@hide"
+  ) +
+  gsi::method ("special_routing_suffix_str=", &db::LEFDEFReaderOptions::set_special_routing_suffix_str, gsi::arg ("suffix"),
+    "@hide"
+  ) +
+  gsi::method ("special_routing_datatype_str", &db::LEFDEFReaderOptions::special_routing_datatype_str,
+    "@hide"
+  ) +
+  gsi::method ("special_routing_datatype_str=", &db::LEFDEFReaderOptions::set_special_routing_datatype_str, gsi::arg ("datatype"),
+    "@hide"
   ) +
   gsi::method ("separate_groups", &db::LEFDEFReaderOptions::separate_groups,
     "@brief Gets a value indicating whether to create separate parent cells for individual groups.\n"

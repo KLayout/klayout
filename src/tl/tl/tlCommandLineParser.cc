@@ -512,7 +512,7 @@ CommandLineOptions::parse (int argc, char *argv[])
       ex.read_word (n);
       std::map<std::string, ArgBase *>::const_iterator a = arg_by_short_option.find (n);
       if (a == arg_by_short_option.end ()) {
-        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unknown command line option --%1 (use -h for help)")), n));
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unknown command line option -%1 (use -h for help)")), n));
       }
       arg = a->second;
 

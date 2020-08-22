@@ -43,7 +43,7 @@ GenericReaderOptions::GenericReaderOptions ()
   m_gds2_allow_multi_xy_records = load_options.get_option_by_name ("gds2_allow_multi_xy_records").to_bool ();
 
   m_oasis_read_all_properties = load_options.get_option_by_name ("oasis_read_all_properties").to_bool ();
-  m_oasis_expect_strict_mode = load_options.get_option_by_name ("oasis_expect_strict_mode").to_bool ();
+  m_oasis_expect_strict_mode = (load_options.get_option_by_name ("oasis_expect_strict_mode").to_int () > 0);
 
   m_create_other_layers = load_options.get_option_by_name ("cif_create_other_layers").to_bool ();
   m_cif_wire_mode = load_options.get_option_by_name ("cif_wire_mode").to_uint ();
@@ -633,7 +633,7 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options) const
   load_options.set_option_by_name ("gds2_allow_multi_xy_records", m_gds2_allow_multi_xy_records);
 
   load_options.set_option_by_name ("oasis_read_all_properties", m_oasis_read_all_properties);
-  load_options.set_option_by_name ("oasis_expect_strict_mode", m_oasis_expect_strict_mode);
+  load_options.set_option_by_name ("oasis_expect_strict_mode", m_oasis_expect_strict_mode ? 1 : 0);
 
   load_options.set_option_by_name ("cif_layer_map", tl::Variant::make_variant (m_layer_map));
   load_options.set_option_by_name ("cif_create_other_layers", m_create_other_layers);

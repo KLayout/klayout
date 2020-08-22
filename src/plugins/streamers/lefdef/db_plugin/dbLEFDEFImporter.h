@@ -44,12 +44,18 @@ namespace db
 {
 
 class LEFDEFReaderState;
+struct MacroDesc;
 
 /**
  *  @brief Correct a path relative to the stream and technology
  */
 DB_PLUGIN_PUBLIC
 std::string correct_path (const std::string &fn, const db::Layout &layout, const std::string &base_path);
+
+/**
+ *  @brief Convers a string to a MASKSHIFT index list
+ */
+std::vector<unsigned int> string2masks (const std::string &s);
 
 /**
  *  @brief Generic base class of DXF reader exceptions
@@ -883,6 +889,7 @@ public:
   virtual ~LEFDEFLayoutGenerator () { }
 
   virtual void create_cell (LEFDEFReaderState &reader, db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm) = 0;
+  virtual std::vector<std::string> maskshift_layers () const = 0;
 };
 
 /**
@@ -895,6 +902,15 @@ public:
   RuleBasedViaGenerator ();
 
   virtual void create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm);
+
+  virtual std::vector<std::string> maskshift_layers () const
+  {
+    std::vector<std::string> msl;
+    msl.push_back (m_bottom_layer);
+    msl.push_back (m_cut_layer);
+    msl.push_back (m_top_layer);
+    return msl;
+  }
 
   void set_cutsize (const db::Vector &cutsize) { m_cutsize = cutsize; }
   void set_cutspacing (const db::Vector &cutspacing) { m_cutspacing = cutspacing; }
@@ -931,12 +947,23 @@ class DB_PLUGIN_PUBLIC GeometryBasedLayoutGenerator
   : public LEFDEFLayoutGenerator
 {
 public:
+  struct Via {
+    Via () : bottom_mask (0), cut_mask (0), top_mask (0) { }
+    std::string name;
+    unsigned int bottom_mask, cut_mask, top_mask;
+    db::Trans trans;
+  };
+
   GeometryBasedLayoutGenerator ();
 
   virtual void create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *num_cut_masks);
+  virtual std::vector<std::string> maskshift_layers () const { return m_maskshift_layers; }
 
-  void add_polygon (const std::string &ln, const db::Polygon &poly, unsigned int mask);
-  void add_box (const std::string &ln, const db::Box &box, unsigned int mask);
+  void add_polygon (const std::string &ln, LayerPurpose purpose, const db::Polygon &poly, unsigned int mask, properties_id_type prop_id);
+  void add_box (const std::string &ln, LayerPurpose purpose, const db::Box &box, unsigned int mask, properties_id_type prop_id);
+  void add_path (const std::string &ln, LayerPurpose purpose, const db::Path &path, unsigned int mask, properties_id_type prop_id);
+  void add_via (const std::string &vn, const db::Trans &trans, unsigned int bottom_mask, unsigned int cut_mask, unsigned int top_mask);
+  void add_text (const std::string &ln, LayerPurpose purpose, const db::Text &text, unsigned int mask, db::properties_id_type prop_id);
 
   void set_maskshift_layers (const std::vector<std::string> &ln) { m_maskshift_layers = ln; }
 
@@ -949,8 +976,8 @@ public:
   }
 
 private:
-  std::map <std::string, std::list<std::pair<unsigned int, db::Polygon> > > m_polygons;
-  std::map <std::string, std::list<std::pair<unsigned int, db::Box> > > m_boxes;
+  std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, db::Shapes> m_shapes;
+  std::list<Via> m_vias;
   std::vector<std::string> m_maskshift_layers;
 
   unsigned int mask_for (const std::string &ln, unsigned int m, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm) const;
@@ -1017,6 +1044,28 @@ public:
   db::Cell *via_cell (const std::string &vn, Layout &layout, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm);
 
   /**
+   *  @brief Gets the via generator for a given via name or 0 if there is no such generator
+   */
+  LEFDEFLayoutGenerator *via_generator (const std::string &vn);
+
+  /**
+   *  @brief Registers a macro generator for the macro with the given name
+   *
+   *  The generator is capable of creating a macro for a specific mask configuration
+   */
+  void register_macro_cell (const std::string &mn, LEFDEFLayoutGenerator *generator);
+
+  /**
+   *  @brief Gets the macro cell for the given macro name or 0 if no such maco is registered
+   */
+  std::pair<db::Cell *, db::Trans> macro_cell (const std::string &mn, Layout &layout, const std::vector<unsigned int> &masks, const MacroDesc &macro_desc, const LEFDEFNumberOfMasks *nm);
+
+  /**
+   *  @brief Gets the macro generator for a given macro name or 0 if there is no such generator
+   */
+  LEFDEFLayoutGenerator *macro_generator (const std::string &mn);
+
+  /**
    *  @brief Get the technology component pointer
    */
   const LEFDEFReaderOptions *tech_comp () const
@@ -1060,6 +1109,35 @@ private:
     unsigned int mask_bottom, mask_cut, mask_top;
   };
 
+  /**
+   *  @brief A key for the via cache
+   */
+  struct MacroKey
+  {
+    MacroKey (const std::string &n, const std::vector<unsigned int> &m)
+      : name (n), masks (m)
+    { }
+
+    bool operator== (const MacroKey &other) const
+    {
+      return name == other.name && masks == other.masks;
+    }
+
+    bool operator< (const MacroKey &other) const
+    {
+      if (name != other.name) {
+        return name < other.name;
+      }
+      if (masks != other.masks) {
+        return masks < other.masks;
+      }
+      return false;
+    }
+
+    std::string name;
+    std::vector<unsigned int> masks;
+  };
+
   //  no copying
   LEFDEFReaderState (const LEFDEFReaderState &);
   LEFDEFReaderState &operator= (const LEFDEFReaderState &);
@@ -1070,9 +1148,11 @@ private:
   bool m_has_explicit_layer_mapping;
   int m_laynum;
   std::map<std::string, int> m_default_number;
-  std::map<ViaKey, db::Cell *> m_via_cells;
   const LEFDEFReaderOptions *mp_tech_comp;
+  std::map<ViaKey, db::Cell *> m_via_cells;
   std::map<std::string, LEFDEFLayoutGenerator *> m_via_generators;
+  std::map<MacroKey, std::pair<db::Cell *, db::Trans> > m_macro_cells;
+  std::map<std::string, LEFDEFLayoutGenerator *> m_macro_generators;
 
   std::pair <bool, unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
   void map_layer_explicit (const std::string &n, LayerPurpose purpose, const LayerProperties &lp, unsigned int layer, unsigned int mask);
@@ -1089,6 +1169,34 @@ struct DB_PLUGIN_PUBLIC ViaDesc
    *  @brief The names of bottom and top metal respectively
    */
   std::string m1, m2;
+};
+
+/**
+ *  @brief A structure describing a macro
+ */
+struct DB_PLUGIN_PUBLIC MacroDesc
+{
+  MacroDesc () { }
+
+  /**
+   *  @brief The name of the FOREIGN cell if present
+   */
+  std::string foreign_name;
+
+  /**
+   *  @brief The transformation of the FOREIGN cell
+   */
+  db::Trans foreign_trans;
+
+  /**
+   *  @brief The origin
+   */
+  db::Point origin;
+
+  /**
+   *  @brief The bounding box
+   */
+  db::Box bbox;
 };
 
 /**

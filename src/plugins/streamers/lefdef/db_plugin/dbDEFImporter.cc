@@ -1028,13 +1028,13 @@ DEFImporter::read_vias (db::Layout & /*layout*/, db::Cell & /*design*/, double s
 
           db::Polygon poly;
           read_polygon (poly, scale);
-          geo_based_vg->add_polygon (ln, poly, mask);
+          geo_based_vg->add_polygon (ln, ViaGeometry, poly, mask, 0);
 
         } else {
 
           db::Polygon poly;
           read_rect (poly, scale);
-          geo_based_vg->add_polygon (ln, poly, mask);
+          geo_based_vg->add_polygon (ln, ViaGeometry, poly, mask, 0);
 
         }
 
@@ -1262,7 +1262,7 @@ DEFImporter::read_styles (double scale)
 }
 
 void
-DEFImporter::read_components (std::list<std::pair<std::string, CellInstArray> > &instances, double scale)
+DEFImporter::read_components (db::Layout &layout, std::list<std::pair<std::string, CellInstArray> > &instances, double scale)
 {
   while (test ("-")) {
 
@@ -1273,8 +1273,6 @@ DEFImporter::read_components (std::list<std::pair<std::string, CellInstArray> > 
     db::Vector d;
     bool is_placed = false;
     std::string maskshift;
-
-    std::pair<db::Cell *, db::Trans> ct = m_lef_importer.macro_by_name (model);
 
     while (test ("+")) {
 
@@ -1303,12 +1301,22 @@ DEFImporter::read_components (std::list<std::pair<std::string, CellInstArray> > 
     expect (";");
 
     if (is_placed) {
-      if (ct.first) {
-        db::CellInstArray inst (db::CellInst (ct.first->cell_index ()), db::Trans (ft.rot (), d) * ct.second);
-        instances.push_back (std::make_pair (inst_name, inst));
-      } else {
+
+      std::map<std::string, MacroDesc>::const_iterator m = m_lef_importer.macros ().find (model);
+      if (m == m_lef_importer.macros ().end ()) {
+
         warn (tl::to_string (tr ("Macro not found in LEF file: ")) + model);
+
+      } else {
+
+        std::pair<db::Cell *, db::Trans> ct = reader_state ()->macro_cell (model, layout, string2masks (maskshift), m->second, &m_lef_importer);
+        if (ct.first) {
+          db::CellInstArray inst (db::CellInst (ct.first->cell_index ()), db::Trans (ft.rot (), d) * ct.second);
+          instances.push_back (std::make_pair (inst_name, inst));
+        }
+
       }
+
     }
 
   }
@@ -1491,7 +1499,7 @@ DEFImporter::do_read (db::Layout &layout)
       get_long ();
       expect (";");
 
-      read_components (instances, scale);
+      read_components (layout, instances, scale);
 
       expect ("END");
       expect ("COMPONENTS");

@@ -43,18 +43,7 @@ LEFImporter::~LEFImporter ()
   //  .. nothing yet ..
 }
 
-db::Box
-LEFImporter::macro_bbox_by_name (const std::string &name) const
-{
-  std::map<std::string, db::Box>::const_iterator m = m_macro_bboxes_by_name.find (name);
-  if (m != m_macro_bboxes_by_name.end ()) {
-    return m->second;
-  } else {
-    return db::Box ();
-  }
-}
-
-double 
+double
 LEFImporter::layer_ext (const std::string &layer, double def_ext) const
 {
   std::map<std::string, double>::const_iterator l = m_default_ext.find (layer);
@@ -105,19 +94,8 @@ LEFImporter::layer_width (const std::string &layer, const std::string &nondefaul
   }
 }
 
-std::pair<db::Cell *, db::Trans>
-LEFImporter::macro_by_name (const std::string &name) const
-{
-  std::map<std::string, std::pair<db::Cell *, db::Trans> >::const_iterator m = m_macros_by_name.find (name);
-  if (m != m_macros_by_name.end ()) {
-    return m->second;
-  } else {
-    return std::make_pair ((db::Cell *) 0, db::Trans ());
-  }
-}
-
 std::vector <db::Trans> 
-LEFImporter::get_iteration (db::Layout &layout)
+LEFImporter::get_iteration (double dbu)
 {
   test ("DO");
   long nx = get_long ();
@@ -131,7 +109,7 @@ LEFImporter::get_iteration (db::Layout &layout)
   std::vector <db::Trans> t;
   for (long i = 0; i < nx; ++i) {
     for (long j = 0; j < ny; ++j) {
-      t.push_back (db::Trans (db::Vector (db::DVector (dx * i / layout.dbu (), dy * j / layout.dbu ()))));
+      t.push_back (db::Trans (db::Vector (db::DVector (dx * i / dbu, dy * j / dbu))));
     }
   }
   return t;
@@ -158,10 +136,9 @@ static db::Shape insert_shape (db::Cell &cell, unsigned int layer_id, const Shap
 }
 
 void
-LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose purpose, std::map<std::string, db::Box> *collect_bboxes, db::properties_id_type prop_id)
+LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, LayerPurpose purpose, std::map<std::string, db::Box> *collect_boxes_for_labels, db::properties_id_type prop_id)
 {
   std::string layer_name;
-  double dbu = layout.dbu ();
   double w = 0.0;
 
   while (true) {
@@ -201,12 +178,6 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
         mask = get_mask (get_long ());
       }
 
-      int layer_id = -1;
-      std::pair <bool, unsigned int> dl = open_layer (layout, layer_name, purpose, mask);
-      if (dl.first) {
-        layer_id = int (dl.second);
-      }
-
       bool iterate = test ("ITERATE");
 
       while (! peek (";") && ! peek ("DO")) {
@@ -221,20 +192,24 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
       db::Path p (points.begin (), points.end (), iw, iw / 2, iw / 2, false);
 
       if (iterate) {
-        std::vector<db::Trans> ti = get_iteration (layout);
-        if (layer_id >= 0) {
-          for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
-            db::Shape s = insert_shape (cell, layer_id, p, *t, prop_id);
-            if (collect_bboxes) {
-              collect_bboxes->insert (std::make_pair (layer_name, db::Box ())).first->second = s.bbox ();
-            }
+
+        std::vector<db::Trans> ti = get_iteration (dbu);
+
+        for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
+          db::Path pt = p.transformed (*t);
+          lg->add_path (layer_name, purpose, pt, mask, prop_id);
+          if (collect_boxes_for_labels) {
+            collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = pt.box ();
           }
         }
-      } else if (layer_id >= 0) {
-        db::Shape s = insert_shape (cell, layer_id, p, prop_id);
-        if (collect_bboxes) {
-          collect_bboxes->insert (std::make_pair (layer_name, db::Box ())).first->second = s.bbox ();
+
+      } else {
+
+        lg->add_path (layer_name, purpose, p, mask, prop_id);
+        if (collect_boxes_for_labels) {
+          collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = p.box ();
         }
+
       }
 
       expect (";");
@@ -246,12 +221,6 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
       unsigned int mask = 0;
       if (test ("MASK")) {
         mask = get_mask (get_long ());
-      }
-
-      int layer_id = -1;
-      std::pair <bool, unsigned int> dl = open_layer (layout, layer_name, purpose, mask);
-      if (dl.first) {
-        layer_id = int (dl.second);
       }
 
       bool iterate = test ("ITERATE");
@@ -268,20 +237,23 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
       p.assign_hull (points.begin (), points.end ());
 
       if (iterate) {
-        std::vector<db::Trans> ti = get_iteration (layout);
-        if (layer_id >= 0) {
-          for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
-            db::Shape s = insert_shape (cell, layer_id, p, *t, prop_id);
-            if (collect_bboxes) {
-              collect_bboxes->insert (std::make_pair (layer_name, db::Box ())).first->second = s.bbox ();
-            }
+
+        std::vector<db::Trans> ti = get_iteration (dbu);
+        for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
+          db::Polygon pt = p.transformed (*t);
+          lg->add_polygon (layer_name, purpose, pt, mask, prop_id);
+          if (collect_boxes_for_labels) {
+            collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = pt.box ();
           }
         }
-      } else if (layer_id >= 0) {
-        db::Shape s = insert_shape (cell, layer_id, p, prop_id);
-        if (collect_bboxes) {
-          collect_bboxes->insert (std::make_pair (layer_name, db::Box ())).first->second = s.bbox ();
+
+      } else {
+
+        lg->add_polygon (layer_name, purpose, p, mask, prop_id);
+        if (collect_boxes_for_labels) {
+          collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = p.box ();
         }
+
       }
 
       expect (";");
@@ -295,39 +267,39 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
         mask = get_mask (get_long ());
       }
 
-      int layer_id = -1;
-      std::pair <bool, unsigned int> dl = open_layer (layout, layer_name, purpose, mask);
-      if (dl.first) {
-        layer_id = int (dl.second);
-      }
-
       bool iterate = test ("ITERATE");
 
       for (int i = 0; i < 2; ++i) {
+
         test ("(");
         double x = get_double ();
         double y = get_double ();
         points.push_back (db::Point (db::DPoint (x / dbu, y / dbu)));
         test (")");
+
       }
 
       db::Box b (points [0], points [1]);
 
       if (iterate) {
-        std::vector<db::Trans> ti = get_iteration (layout);
-        if (layer_id >= 0) {
-          for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
-            db::Shape s = insert_shape (cell, layer_id, b, *t, prop_id);
-            if (collect_bboxes) {
-              collect_bboxes->insert (std::make_pair (layer_name, db::Box ())).first->second = s.bbox ();
-            }
+
+        std::vector<db::Trans> ti = get_iteration (dbu);
+
+        for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
+          db::Box bt = b.transformed (*t);
+          lg->add_box (layer_name, purpose, bt, mask, prop_id);
+          if (collect_boxes_for_labels) {
+            collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = bt;
           }
         }
-      } else if (layer_id >= 0) {
-        db::Shape s = insert_shape (cell, layer_id, b, prop_id);
-        if (collect_bboxes) {
-          collect_bboxes->insert (std::make_pair (layer_name, db::Box ())).first->second = s.bbox ();
+
+      } else {
+
+        lg->add_box (layer_name, purpose, b, mask, prop_id);
+        if (collect_boxes_for_labels) {
+          collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = b;
         }
+
       }
 
       expect (";");
@@ -348,12 +320,6 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
       unsigned int mask_cut = (mask / 10) % 10;
       unsigned int mask_top = (mask / 100) % 10;
 
-      int layer_id = -1;
-      std::pair <bool, unsigned int> dl = open_layer (layout, layer_name, purpose, mask);
-      if (dl.first) {
-        layer_id = int (dl.second);
-      }
-
       double x = 0.0, y = 0.0;
       if (test ("(")) {
         x = get_double ();
@@ -366,20 +332,18 @@ LEFImporter::read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose p
       points.push_back (db::Vector (db::DVector (x / dbu, y / dbu)));
 
       std::string vn = get ();
-      db::Cell *vc = reader_state ()->via_cell (vn, layout, mask_bottom, mask_cut, mask_top, this);
-      if (! vc) {
-        warn (tl::to_string (tr ("Unknown via: ")) + vn);
-      }
 
       if (iterate) {
-        std::vector<db::Trans> ti = get_iteration (layout);
-        if (vc) {
-          for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
-            cell.insert (db::CellInstArray (db::CellInst (vc->cell_index ()), *t * db::Trans (points [0])));
-          }
+
+        std::vector<db::Trans> ti = get_iteration (dbu);
+        for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
+          lg->add_via (vn, *t * db::Trans (points [0]), mask_bottom, mask_cut, mask_top);
         }
-      } else if (vc) {
-        cell.insert (db::CellInstArray (db::CellInst (vc->cell_index ()), db::Trans (points [0])));
+
+      } else {
+
+        lg->add_via (vn, db::Trans (points [0]), mask_bottom, mask_cut, mask_top);
+
       }
 
       expect (";");
@@ -597,7 +561,7 @@ LEFImporter::read_viadef_by_geometry (GeometryBasedLayoutGenerator *lg, ViaDesc 
       db::Polygon p;
       p.assign_hull (points.begin (), points.end ());
 
-      lg->add_polygon (layer_name, p, mask);
+      lg->add_polygon (layer_name, ViaGeometry, p, mask, 0);
 
       expect (";");
 
@@ -619,7 +583,7 @@ LEFImporter::read_viadef_by_geometry (GeometryBasedLayoutGenerator *lg, ViaDesc 
       }
 
       db::Box b (points [0], points [1]);
-      lg->add_box (layer_name, b, mask);
+      lg->add_box (layer_name, ViaGeometry, b, mask, 0);
 
       expect (";");
 
@@ -823,14 +787,15 @@ LEFImporter::read_macro (Layout &layout)
 {
   std::string mn = get ();
 
-  if (m_macros_by_name.find (mn) != m_macros_by_name.end ()) {
+  if (m_macros.find (mn) != m_macros.end ()) {
     error (tl::to_string (tr ("Duplicate MACRO name: ")) + mn);
   }
 
   set_cellname (mn);
 
-  db::Cell &cell = layout.cell (layout.add_cell ());
-  db::Cell *foreign_cell = 0;
+  GeometryBasedLayoutGenerator *mg = new GeometryBasedLayoutGenerator ();
+  reader_state ()->register_macro_cell (mn, mg);
+
   db::Trans foreign_trans;
   std::string foreign_name;
 
@@ -892,14 +857,11 @@ LEFImporter::read_macro (Layout &layout)
             prop_id = layout.properties_repository ().properties_id (props);
           }
 
-          std::map <std::string, db::Box> bboxes;
-          read_geometries (layout, cell, LEFPins, &bboxes, prop_id);
+          std::map <std::string, db::Box> boxes_for_labels;
+          read_geometries (mg, layout.dbu (), LEFPins, &boxes_for_labels, prop_id);
 
-          for (std::map <std::string, db::Box>::const_iterator b = bboxes.begin (); b != bboxes.end (); ++b) {
-            std::pair <bool, unsigned int> dl = open_layer (layout, b->first, Label, 0);
-            if (dl.first) {
-              cell.shapes (dl.second).insert (db::Text (label.c_str (), db::Trans (b->second.center () - db::Point ())));
-            }
+          for (std::map <std::string, db::Box>::const_iterator b = boxes_for_labels.begin (); b != boxes_for_labels.end (); ++b) {
+            mg->add_text (b->first, Label, db::Text (label.c_str (), db::Trans (b->second.center () - db::Point ())), 0, 0);
           }
 
           expect ("END");
@@ -915,10 +877,6 @@ LEFImporter::read_macro (Layout &layout)
 
     } else if (test ("FOREIGN")) {
 
-      if (foreign_cell) {
-        error (tl::to_string (tr ("Duplicate FOREIGN definition")));
-      }
-
       std::string cn = get ();
 
       db::Point vec;
@@ -932,26 +890,24 @@ LEFImporter::read_macro (Layout &layout)
 
       if (options ().macro_resolution_mode () != 1) {
 
-        db::cell_index_type ci;
-        std::pair<bool, db::cell_index_type> c = layout.cell_by_name (cn.c_str ());
-        if (c.first) {
-          ci = c.second;
-        } else {
-          ci = layout.add_cell (cn.c_str ());
-          layout.cell (ci).set_ghost_cell (true);
+        if (! foreign_name.empty ()) {
+          error (tl::to_string (tr ("Duplicate FOREIGN definition")));
         }
 
-        foreign_cell = &layout.cell (ci);
         //  What is the definition of the FOREIGN transformation?
         //  Guessing: this transformation moves the lower-left origin to 0,0
         foreign_trans = db::Trans (db::Point () - vec) * db::Trans (ft);
         foreign_name = cn;
 
+        if (foreign_name != mn) {
+          warn (tl::to_string (tr ("FOREIGN name differs from MACRO name in macro: ")) + mn);
+        }
+
       }
 
     } else if (test ("OBS")) {
 
-      read_geometries (layout, cell, Obstructions);
+      read_geometries (mg, layout.dbu (), Obstructions);
       expect ("END");
 
     } else if (test ("FIXEDMASK")) {
@@ -967,69 +923,14 @@ LEFImporter::read_macro (Layout &layout)
 
   }
 
-  if (! foreign_cell) {
+  mg->add_box (std::string (), Outline, db::Box (-origin, -origin + size), 0, 0);
 
-    if (options ().macro_resolution_mode () != 2) {
-
-      //  actually implement the real cell
-
-      layout.rename_cell (cell.cell_index (), mn.c_str ());
-
-      std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Outline, 0);
-      if (dl.first) {
-        cell.shapes (dl.second).insert (db::Box (-origin, -origin + size));
-      }
-
-      m_macros_by_name.insert (std::make_pair (mn, std::make_pair (&cell, db::Trans ())));
-
-    } else {
-
-      //  macro resolution mode #2 (always create a MACRO reference, no LEF geometry)
-
-      db::cell_index_type ci;
-      std::pair<bool, db::cell_index_type> c = layout.cell_by_name (mn.c_str ());
-      if (c.first) {
-        ci = c.second;
-      } else {
-        ci = layout.add_cell (mn.c_str ());
-        layout.cell (ci).set_ghost_cell (true);
-      }
-
-      layout.delete_cell (cell.cell_index ());
-      m_macros_by_name.insert (std::make_pair (mn, std::make_pair (&layout.cell (ci), db::Trans ())));
-
-    }
-
-  } else if (foreign_name != mn) {
-
-    warn (tl::to_string (tr ("FOREIGN name differs from MACRO name in macro: ")) + mn);
-
-    layout.rename_cell (cell.cell_index (), mn.c_str ());
-
-    //  clear imported LEF geometry with a foreign cell, but provide a level of indirection so we have
-    //  both the MACRO and the FOREIGN name
-
-    for (unsigned int l = 0; l < layout.layers (); ++l) {
-      if (layout.is_valid_layer (l)) {
-        cell.clear (l);
-      }
-    }
-
-    cell.clear_insts ();
-
-    cell.insert (db::CellInstArray (db::CellInst (foreign_cell->cell_index ()), db::Trans (db::Point () - origin) * foreign_trans));
-    m_macros_by_name.insert (std::make_pair (mn, std::make_pair (&cell, db::Trans ())));
-
-  } else {
-
-    //  use FOREIGN cell instead of new one
-
-    layout.delete_cell (cell.cell_index ());
-    m_macros_by_name.insert (std::make_pair (mn, std::make_pair (foreign_cell, db::Trans (db::Point () - origin) * foreign_trans)));
-
-  }
-
-  m_macro_bboxes_by_name.insert (std::make_pair (mn, db::Box (-origin, -origin + size)));
+  MacroDesc macro_desc;
+  macro_desc.foreign_name = foreign_name;
+  macro_desc.foreign_trans = foreign_trans;
+  macro_desc.bbox = db::Box (-origin, -origin + size);
+  macro_desc.origin = origin;
+  m_macros.insert (std::make_pair (mn, macro_desc));
 
   reset_cellname ();
 }

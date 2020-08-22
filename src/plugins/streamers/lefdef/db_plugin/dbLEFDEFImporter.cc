@@ -88,7 +88,7 @@ static unsigned int hex_value (char c)
   }
 }
 
-static std::vector<unsigned int> string2masks (const std::string &s)
+std::vector<unsigned int> string2masks (const std::string &s)
 {
   std::vector<unsigned int> res;
   res.reserve (s.size ());
@@ -99,6 +99,8 @@ static std::vector<unsigned int> string2masks (const std::string &s)
     }
     res.push_back (hex_value (*cp));
   }
+
+  std::reverse (res.begin (), res.end ());
 
   return res;
 }
@@ -273,7 +275,7 @@ GeometryBasedLayoutGenerator::mask_for (const std::string &ln, unsigned int m, c
 {
   for (std::vector<std::string>::const_iterator l = m_maskshift_layers.begin (); l != m_maskshift_layers.end (); ++l) {
 
-    if (*l == ln) {
+    if (! l->empty () && *l == ln) {
 
       unsigned int mm = mask (masks, (unsigned int) (l - m_maskshift_layers.begin ()));
 
@@ -295,35 +297,79 @@ GeometryBasedLayoutGenerator::mask_for (const std::string &ln, unsigned int m, c
 void
 GeometryBasedLayoutGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm)
 {
-  for (std::map <std::string, std::list<std::pair<unsigned int, db::Polygon> > >::const_iterator g = m_polygons.begin (); g != m_polygons.end (); ++g) {
-    for (std::list<std::pair<unsigned int, db::Polygon> >::const_iterator i = g->second.begin (); i != g->second.end (); ++i) {
-      std::pair <bool, unsigned int> dl = reader.open_layer (layout, g->first, ViaGeometry, mask_for (g->first, i->first, masks, nm));
-      if (dl.first) {
-        cell.shapes (dl.second).insert (i->second);
-      }
+  for (std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, db::Shapes>::const_iterator g = m_shapes.begin (); g != m_shapes.end (); ++g) {
+    std::pair <bool, unsigned int> dl = reader.open_layer (layout, g->first.first, g->first.second.first, mask_for (g->first.first, g->first.second.second, masks, nm));
+    if (dl.first) {
+      cell.shapes (dl.second).insert (g->second);
     }
   }
 
-  for (std::map <std::string, std::list<std::pair<unsigned int, db::Box> > >::const_iterator g = m_boxes.begin (); g != m_boxes.end (); ++g) {
-    for (std::list<std::pair<unsigned int, db::Box> >::const_iterator i = g->second.begin (); i != g->second.end (); ++i) {
-      std::pair <bool, unsigned int> dl = reader.open_layer (layout, g->first, ViaGeometry, mask_for (g->first, i->first, masks, nm));
-      if (dl.first) {
-        cell.shapes (dl.second).insert (i->second);
-      }
+  for (std::list<Via>::const_iterator v = m_vias.begin (); v != m_vias.end (); ++v) {
+
+    LEFDEFLayoutGenerator *g = reader.via_generator (v->name);
+    if (! g) {
+      continue;
     }
+
+    std::vector<std::string> msl = g->maskshift_layers ();
+    msl.resize (3, std::string ());
+
+    db::Cell *vc = reader.via_cell (v->name, layout,
+                                    mask_for (msl [0], v->bottom_mask, masks, nm),
+                                    mask_for (msl [1], v->cut_mask, masks, nm),
+                                    mask_for (msl [2], v->top_mask, masks, nm),
+                                    nm);
+
+    if (vc) {
+      cell.insert (db::CellInstArray (db::CellInst (vc->cell_index ()), v->trans));
+    }
+
+  }
+}
+
+template <class Shape>
+static db::Shape insert_shape (db::Shapes &shapes, const Shape &shape, db::properties_id_type prop_id)
+{
+  if (prop_id == 0) {
+    return shapes.insert (shape);
+  } else {
+    return shapes.insert (db::object_with_properties<Shape> (shape, prop_id));
   }
 }
 
 void
-GeometryBasedLayoutGenerator::add_polygon (const std::string &ln, const db::Polygon &poly, unsigned int mask)
+GeometryBasedLayoutGenerator::add_polygon (const std::string &ln, LayerPurpose purpose, const db::Polygon &poly, unsigned int mask, db::properties_id_type prop_id)
 {
-  m_polygons [ln].push_back (std::make_pair (mask, poly));
+  insert_shape (m_shapes [std::make_pair (ln, std::make_pair (purpose, mask))], poly, prop_id);
 }
 
 void
-GeometryBasedLayoutGenerator::add_box (const std::string &ln, const db::Box &box, unsigned int mask)
+GeometryBasedLayoutGenerator::add_box (const std::string &ln, LayerPurpose purpose, const db::Box &box, unsigned int mask, db::properties_id_type prop_id)
 {
-  m_boxes [ln].push_back (std::make_pair (mask, box));
+  insert_shape (m_shapes [std::make_pair (ln, std::make_pair (purpose, mask))], box, prop_id);
+}
+
+void
+GeometryBasedLayoutGenerator::add_path (const std::string &ln, LayerPurpose purpose, const db::Path &path, unsigned int mask, db::properties_id_type prop_id)
+{
+  insert_shape (m_shapes [std::make_pair (ln, std::make_pair (purpose, mask))], path, prop_id);
+}
+
+void
+GeometryBasedLayoutGenerator::add_text (const std::string &ln, LayerPurpose purpose, const db::Text &text, unsigned int mask, db::properties_id_type prop_id)
+{
+  insert_shape (m_shapes [std::make_pair (ln, std::make_pair (purpose, mask))], text, prop_id);
+}
+
+void
+GeometryBasedLayoutGenerator::add_via (const std::string &vn, const db::Trans &trans, unsigned int bottom_mask, unsigned int cut_mask, unsigned int top_mask)
+{
+  m_vias.push_back (Via ());
+  m_vias.back ().name = vn;
+  m_vias.back ().trans = trans;
+  m_vias.back ().bottom_mask = bottom_mask;
+  m_vias.back ().cut_mask = cut_mask;
+  m_vias.back ().top_mask = top_mask;
 }
 
 // -----------------------------------------------------------------------------------
@@ -714,6 +760,12 @@ LEFDEFReaderState::~LEFDEFReaderState ()
   }
 
   m_via_generators.clear ();
+
+  for (std::map<std::string, LEFDEFLayoutGenerator *>::const_iterator i = m_macro_generators.begin (); i != m_macro_generators.end (); ++i) {
+    delete i->second;
+  }
+
+  m_macro_generators.clear ();
 }
 
 void
@@ -1196,6 +1248,17 @@ LEFDEFReaderState::register_via_cell (const std::string &vn, LEFDEFLayoutGenerat
   m_via_generators [vn] = generator;
 }
 
+LEFDEFLayoutGenerator *
+LEFDEFReaderState::via_generator (const std::string &vn)
+{
+  std::map<std::string, LEFDEFLayoutGenerator *>::const_iterator g = m_via_generators.find (vn);
+  if (g != m_via_generators.end ()) {
+    return g->second;
+  } else {
+    return 0;
+  }
+}
+
 db::Cell *
 LEFDEFReaderState::via_cell (const std::string &vn, db::Layout &layout, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm)
 {
@@ -1240,6 +1303,109 @@ LEFDEFReaderState::via_cell (const std::string &vn, db::Layout &layout, unsigned
     tl_assert (! i->second || i->second->layout () == &layout);
     return i->second;
   }
+}
+
+void
+LEFDEFReaderState::register_macro_cell (const std::string &mn, LEFDEFLayoutGenerator *generator)
+{
+  if (m_macro_generators.find (mn) != m_macro_generators.end ()) {
+    delete m_macro_generators [mn];
+  }
+  m_macro_generators [mn] = generator;
+}
+
+LEFDEFLayoutGenerator *
+LEFDEFReaderState::macro_generator (const std::string &mn)
+{
+  std::map<std::string, LEFDEFLayoutGenerator *>::const_iterator g = m_macro_generators.find (mn);
+  if (g != m_macro_generators.end ()) {
+    return g->second;
+  } else {
+    return 0;
+  }
+}
+
+std::pair<db::Cell *, db::Trans>
+LEFDEFReaderState::macro_cell (const std::string &mn, Layout &layout, const std::vector<unsigned int> &masks, const MacroDesc &macro_desc, const LEFDEFNumberOfMasks *nm)
+{
+  MacroKey mk (mn, masks);
+  std::map<MacroKey, std::pair<db::Cell *, db::Trans> >::const_iterator i = m_macro_cells.find (mk);
+  if (i != m_macro_cells.end ()) {
+    tl_assert (! i->second.first || i->second.first->layout () == &layout);
+    return i->second;
+  }
+
+  db::Cell *cell = 0;
+  db::Trans tr;
+
+  std::map<std::string, LEFDEFLayoutGenerator *>::const_iterator g = m_macro_generators.find (mn);
+  if (g == m_macro_generators.end ()) {
+    return std::make_pair ((db::Cell *) 0, db::Trans ());
+  }
+
+  LEFDEFLayoutGenerator *mg = g->second;
+
+  if (! macro_desc.foreign_name.empty ()) {
+
+    db::cell_index_type ci;
+    std::pair<bool, db::cell_index_type> c = layout.cell_by_name (macro_desc.foreign_name.c_str ());
+    if (c.first) {
+      ci = c.second;
+    } else {
+      ci = layout.add_cell (macro_desc.foreign_name.c_str ());
+      layout.cell (ci).set_ghost_cell (true);
+    }
+
+    db::Cell *foreign_cell = &layout.cell (ci);
+
+    if (macro_desc.foreign_name != mn) {
+
+      //  create an indirection for renaming the cell
+      cell = &layout.cell (layout.add_cell (mn.c_str ()));
+      cell->insert (db::CellInstArray (db::CellInst (foreign_cell->cell_index ()), db::Trans (db::Point () - macro_desc.origin) * macro_desc.foreign_trans));
+
+    } else {
+
+      //  use FOREIGN cell instead of new one
+      cell = foreign_cell;
+      tr = db::Trans (db::Point () - macro_desc.origin) * macro_desc.foreign_trans;
+
+    }
+
+  } else if (tech_comp ()->macro_resolution_mode () == 2) {
+
+    //  create a ghost cell always
+
+    db::cell_index_type ci;
+    std::pair<bool, db::cell_index_type> c = layout.cell_by_name (mn.c_str ());
+    if (c.first) {
+      ci = c.second;
+    } else {
+      ci = layout.add_cell (mn.c_str ());
+      layout.cell (ci).set_ghost_cell (true);
+    }
+
+    cell = &layout.cell (ci);
+
+  } else {
+
+    //  actually implement the real cell
+
+    std::string mask_suffix;
+    for (std::vector<unsigned int>::const_iterator m = masks.begin (); m != masks.end (); ++m) {
+      mask_suffix += "_";
+      mask_suffix += tl::to_string (*m);
+    }
+
+    std::string cn = mn + mask_suffix;
+
+    cell = &layout.cell (layout.add_cell (cn.c_str ()));
+    mg->create_cell (*this, layout, *cell, masks, nm);
+
+  }
+
+  m_macro_cells [mk] = std::make_pair (cell, tr);
+  return std::make_pair (cell, tr);
 }
 
 // -----------------------------------------------------------------------------------

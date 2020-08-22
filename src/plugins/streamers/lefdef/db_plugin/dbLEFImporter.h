@@ -58,14 +58,6 @@ public:
   ~LEFImporter ();
 
   /**
-   *  @brief Get the cell for a macro name
-   *
-   *  Returns 0 if the name is not a valid macro name. Otherwise it returns the pointer
-   *  to the corresponding db::Cell object.
-   */
-  std::pair<db::Cell *, db::Trans> macro_by_name (const std::string &macro_name) const;
-
-  /**
    *  @brief Get the cell bbox for the given macro name
    */
   db::Box macro_bbox_by_name (const std::string &macro_name) const;
@@ -126,6 +118,16 @@ public:
     return m_vias;
   }
 
+  /**
+   *  @brief Gets the
+   *
+   *  The map maps the macro name to the macro description.
+   */
+  const std::map<std::string, MacroDesc> &macros () const
+  {
+    return m_macros;
+  }
+
 protected:
   void do_read (db::Layout &layout);
 
@@ -134,16 +136,13 @@ private:
   std::map<std::string, std::pair<double, double> > m_default_widths;
   std::map<std::string, double> m_default_ext;
   std::map<std::string, std::pair<double, double> > m_min_widths;
-  std::map<std::string, std::pair<db::Cell *, db::Trans> > m_macros_by_name;
-  std::map<std::string, db::Box> m_macro_bboxes_by_name;
+  std::map<std::string, MacroDesc> m_macros;
   std::map<std::string, ViaDesc> m_vias;
   std::set<std::string> m_routing_layers, m_cut_layers;
   std::map<std::string, unsigned int> m_num_masks;
 
-  std::vector <db::Trans> get_iteration (db::Layout &layout);
-  // @@@
-  void read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose purpose, std::map<std::string, db::Box> *collect_bboxes = 0, properties_id_type prop_id = 0);
-  // void read_geometries (GeometryBasedLayoutGenerator *lg, LayerPurpose purpose, std::map<std::string, db::Box> *collect_bboxes = 0, properties_id_type prop_id = 0);
+  std::vector <db::Trans> get_iteration (double dbu);
+  void read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, LayerPurpose purpose, std::map<std::string, db::Box> *collect_bboxes = 0, properties_id_type prop_id = 0);
   void read_nondefaultrule (Layout &layout);
   void read_viadef (Layout &layout);
   void read_viadef_by_rule (RuleBasedViaGenerator *vg, ViaDesc &desc, const std::string &n, double dbu);

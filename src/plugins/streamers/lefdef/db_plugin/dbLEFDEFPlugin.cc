@@ -140,6 +140,8 @@ private:
       tl::log << tl::to_string (tr ("Reading")) << " " << m_stream.source ();
       importer.read (m_stream, layout, state);
 
+      importer.finish_lef (layout);
+
     } else {
 
       tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading DEF file")));

@@ -65,6 +65,8 @@ static db::LayerMap run_test (tl::TestBase *_this, const char *lef_dir, const ch
   db::LEFDEFReaderState ld (&options, layout, fn_path);
 
   db::DEFImporter imp;
+  bool any_def = false;
+  bool any_lef = false;
 
   while (! ex.at_end ()) {
 
@@ -85,6 +87,8 @@ static db::LayerMap run_test (tl::TestBase *_this, const char *lef_dir, const ch
       tl::InputStream stream (fn);
       imp.read (stream, layout, ld);
 
+      any_def = true;
+
     } else if (ex.test ("lef:")) {
 
       std::string fn = fn_path, f;
@@ -93,6 +97,8 @@ static db::LayerMap run_test (tl::TestBase *_this, const char *lef_dir, const ch
 
       tl::InputStream stream (fn);
       imp.read_lef (stream, layout, ld);
+
+      any_lef = true;
 
     } else if (ex.test ("gds:")) {
 
@@ -116,6 +122,8 @@ static db::LayerMap run_test (tl::TestBase *_this, const char *lef_dir, const ch
       lo.set_options (options);
       reader.read (layout, lo);
 
+      any_def = true;
+
     } else {
 
       break;
@@ -126,6 +134,10 @@ static db::LayerMap run_test (tl::TestBase *_this, const char *lef_dir, const ch
       break;
     }
 
+  }
+
+  if (! any_def && any_lef) {
+    imp.finish_lef (layout);
   }
 
   ld.finish (layout);
@@ -198,7 +210,8 @@ TEST(1)
 
 TEST(2)
 {
-  run_test (_this, "lef2", "lef:in.lef", "au.oas.gz", default_options ());
+  //  Also tests ability of plugin to properly read LEF
+  run_test (_this, "lef2", "read:in.lef", "au.oas.gz", default_options ());
 }
 
 TEST(3)

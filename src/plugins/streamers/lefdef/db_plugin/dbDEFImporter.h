@@ -58,6 +58,11 @@ public:
    */
   void read_lef (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderState &state);
 
+  /**
+   *  @brief Provided for test purposes
+   */
+  void finish_lef (Layout &layout);
+
 protected:
   void do_read (db::Layout &layout);
 

@@ -58,11 +58,6 @@ public:
   ~LEFImporter ();
 
   /**
-   *  @brief Get the cell bbox for the given macro name
-   */
-  db::Box macro_bbox_by_name (const std::string &macro_name) const;
-
-  /**
    *  @brief Get the width for a layer with the given name
    *
    *  Returns the given default width if the layer is not found.
@@ -127,6 +122,14 @@ public:
   {
     return m_macros;
   }
+
+  /**
+   *  @brief Finishes reading a LEF file
+   *
+   *  This method will create all the macros, so they become visible.
+   *  When reading a LEF as component for a DEF, this method will not be called.
+   */
+  void finish_lef (db::Layout &layout);
 
 protected:
   void do_read (db::Layout &layout);

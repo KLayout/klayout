@@ -188,26 +188,30 @@ LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, Laye
         test (")");
       }
 
-      db::Coord iw = db::coord_traits<db::Coord>::rounded (w / dbu);
-      db::Path p (points.begin (), points.end (), iw, iw / 2, iw / 2, false);
+      if (lg) {
 
-      if (iterate) {
+        db::Coord iw = db::coord_traits<db::Coord>::rounded (w / dbu);
+        db::Path p (points.begin (), points.end (), iw, iw / 2, iw / 2, false);
 
-        std::vector<db::Trans> ti = get_iteration (dbu);
+        if (iterate) {
 
-        for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
-          db::Path pt = p.transformed (*t);
-          lg->add_path (layer_name, purpose, pt, mask, prop_id);
-          if (collect_boxes_for_labels) {
-            collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = pt.box ();
+          std::vector<db::Trans> ti = get_iteration (dbu);
+
+          for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
+            db::Path pt = p.transformed (*t);
+            lg->add_path (layer_name, purpose, pt, mask, prop_id);
+            if (collect_boxes_for_labels) {
+              collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = pt.box ();
+            }
           }
-        }
 
-      } else {
+        } else {
 
-        lg->add_path (layer_name, purpose, p, mask, prop_id);
-        if (collect_boxes_for_labels) {
-          collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = p.box ();
+          lg->add_path (layer_name, purpose, p, mask, prop_id);
+          if (collect_boxes_for_labels) {
+            collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = p.box ();
+          }
+
         }
 
       }
@@ -233,25 +237,29 @@ LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, Laye
         test (")");
       }
 
-      db::Polygon p;
-      p.assign_hull (points.begin (), points.end ());
+      if (lg) {
 
-      if (iterate) {
+        db::Polygon p;
+        p.assign_hull (points.begin (), points.end ());
 
-        std::vector<db::Trans> ti = get_iteration (dbu);
-        for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
-          db::Polygon pt = p.transformed (*t);
-          lg->add_polygon (layer_name, purpose, pt, mask, prop_id);
-          if (collect_boxes_for_labels) {
-            collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = pt.box ();
+        if (iterate) {
+
+          std::vector<db::Trans> ti = get_iteration (dbu);
+          for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
+            db::Polygon pt = p.transformed (*t);
+            lg->add_polygon (layer_name, purpose, pt, mask, prop_id);
+            if (collect_boxes_for_labels) {
+              collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = pt.box ();
+            }
           }
-        }
 
-      } else {
+        } else {
 
-        lg->add_polygon (layer_name, purpose, p, mask, prop_id);
-        if (collect_boxes_for_labels) {
-          collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = p.box ();
+          lg->add_polygon (layer_name, purpose, p, mask, prop_id);
+          if (collect_boxes_for_labels) {
+            collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = p.box ();
+          }
+
         }
 
       }
@@ -279,25 +287,29 @@ LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, Laye
 
       }
 
-      db::Box b (points [0], points [1]);
+      if (lg) {
 
-      if (iterate) {
+        db::Box b (points [0], points [1]);
 
-        std::vector<db::Trans> ti = get_iteration (dbu);
+        if (iterate) {
 
-        for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
-          db::Box bt = b.transformed (*t);
-          lg->add_box (layer_name, purpose, bt, mask, prop_id);
-          if (collect_boxes_for_labels) {
-            collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = bt;
+          std::vector<db::Trans> ti = get_iteration (dbu);
+
+          for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
+            db::Box bt = b.transformed (*t);
+            lg->add_box (layer_name, purpose, bt, mask, prop_id);
+            if (collect_boxes_for_labels) {
+              collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = bt;
+            }
           }
-        }
 
-      } else {
+        } else {
 
-        lg->add_box (layer_name, purpose, b, mask, prop_id);
-        if (collect_boxes_for_labels) {
-          collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = b;
+          lg->add_box (layer_name, purpose, b, mask, prop_id);
+          if (collect_boxes_for_labels) {
+            collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = b;
+          }
+
         }
 
       }
@@ -333,16 +345,20 @@ LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, Laye
 
       std::string vn = get ();
 
-      if (iterate) {
+      if (lg) {
 
-        std::vector<db::Trans> ti = get_iteration (dbu);
-        for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
-          lg->add_via (vn, *t * db::Trans (points [0]), mask_bottom, mask_cut, mask_top);
+        if (iterate) {
+
+          std::vector<db::Trans> ti = get_iteration (dbu);
+          for (std::vector<db::Trans>::const_iterator t = ti.begin (); t != ti.end (); ++t) {
+            lg->add_via (vn, *t * db::Trans (points [0]), mask_bottom, mask_cut, mask_top);
+          }
+
+        } else {
+
+          lg->add_via (vn, db::Trans (points [0]), mask_bottom, mask_cut, mask_top);
+
         }
-
-      } else {
-
-        lg->add_via (vn, db::Trans (points [0]), mask_bottom, mask_cut, mask_top);
 
       }
 
@@ -850,18 +866,24 @@ LEFImporter::read_macro (Layout &layout)
           }
           */
 
-          db::properties_id_type prop_id = 0;
-          if (produce_pin_props ()) {
-            db::PropertiesRepository::properties_set props;
-            props.insert (std::make_pair (pin_prop_name_id (), tl::Variant (label)));
-            prop_id = layout.properties_repository ().properties_id (props);
-          }
+          if (reader_state ()->tech_comp ()->produce_lef_pins ()) {
 
-          std::map <std::string, db::Box> boxes_for_labels;
-          read_geometries (mg, layout.dbu (), LEFPins, &boxes_for_labels, prop_id);
+            db::properties_id_type prop_id = 0;
+            if (produce_pin_props ()) {
+              db::PropertiesRepository::properties_set props;
+              props.insert (std::make_pair (pin_prop_name_id (), tl::Variant (label)));
+              prop_id = layout.properties_repository ().properties_id (props);
+            }
 
-          for (std::map <std::string, db::Box>::const_iterator b = boxes_for_labels.begin (); b != boxes_for_labels.end (); ++b) {
-            mg->add_text (b->first, Label, db::Text (label.c_str (), db::Trans (b->second.center () - db::Point ())), 0, 0);
+            std::map <std::string, db::Box> boxes_for_labels;
+            read_geometries (mg, layout.dbu (), LEFPins, &boxes_for_labels, prop_id);
+
+            for (std::map <std::string, db::Box>::const_iterator b = boxes_for_labels.begin (); b != boxes_for_labels.end (); ++b) {
+              mg->add_text (b->first, Label, db::Text (label.c_str (), db::Trans (b->second.center () - db::Point ())), 0, 0);
+            }
+
+          } else {
+            read_geometries (0, layout.dbu (), LEFPins, 0, 0);
           }
 
           expect ("END");
@@ -907,7 +929,12 @@ LEFImporter::read_macro (Layout &layout)
 
     } else if (test ("OBS")) {
 
-      read_geometries (mg, layout.dbu (), Obstructions);
+      if (reader_state ()->tech_comp ()->produce_obstructions ()) {
+        read_geometries (mg, layout.dbu (), Obstructions);
+      } else {
+        read_geometries (0, layout.dbu (), Obstructions);
+      }
+
       expect ("END");
 
     } else if (test ("FIXEDMASK")) {
@@ -1034,6 +1061,14 @@ LEFImporter::do_read (db::Layout &layout)
       }
     }
 
+  }
+}
+
+void
+LEFImporter::finish_lef (db::Layout &layout)
+{
+  for (std::map<std::string, MacroDesc>::const_iterator m = m_macros.begin (); m != m_macros.end (); ++m) {
+    reader_state ()->macro_cell (m->first, layout, std::vector<unsigned int> (), m->second, this);
   }
 }
 

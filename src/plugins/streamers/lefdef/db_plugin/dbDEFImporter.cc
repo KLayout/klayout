@@ -65,6 +65,12 @@ DEFImporter::read_lef (tl::InputStream &stream, db::Layout &layout, LEFDEFReader
 }
 
 void
+DEFImporter::finish_lef (db::Layout &layout)
+{
+  m_lef_importer.finish_lef (layout);
+}
+
+void
 DEFImporter::read_polygon (db::Polygon &poly, double scale)
 {
   std::vector<db::Point> points;
@@ -1274,6 +1280,11 @@ DEFImporter::read_components (db::Layout &layout, std::list<std::pair<std::strin
     bool is_placed = false;
     std::string maskshift;
 
+    std::map<std::string, MacroDesc>::const_iterator m = m_lef_importer.macros ().find (model);
+    if (m == m_lef_importer.macros ().end ()) {
+      error (tl::to_string (tr ("Macro not found in LEF file: ")) + model);
+    }
+
     while (test ("+")) {
 
       if (test ("PLACED") || test ("FIXED") || test ("COVER")) {
@@ -1283,7 +1294,7 @@ DEFImporter::read_components (db::Layout &layout, std::list<std::pair<std::strin
         test (")");
 
         ft = get_orient (false /*mandatory*/);
-        d = pt - m_lef_importer.macro_bbox_by_name (model).transformed (ft).lower_left ();
+        d = pt - m->second.bbox.transformed (ft).lower_left ();
         is_placed = true;
 
       } else if (test ("MASKSHIFT")) {
@@ -1302,19 +1313,10 @@ DEFImporter::read_components (db::Layout &layout, std::list<std::pair<std::strin
 
     if (is_placed) {
 
-      std::map<std::string, MacroDesc>::const_iterator m = m_lef_importer.macros ().find (model);
-      if (m == m_lef_importer.macros ().end ()) {
-
-        warn (tl::to_string (tr ("Macro not found in LEF file: ")) + model);
-
-      } else {
-
-        std::pair<db::Cell *, db::Trans> ct = reader_state ()->macro_cell (model, layout, string2masks (maskshift), m->second, &m_lef_importer);
-        if (ct.first) {
-          db::CellInstArray inst (db::CellInst (ct.first->cell_index ()), db::Trans (ft.rot (), d) * ct.second);
-          instances.push_back (std::make_pair (inst_name, inst));
-        }
-
+      std::pair<db::Cell *, db::Trans> ct = reader_state ()->macro_cell (model, layout, string2masks (maskshift), m->second, &m_lef_importer);
+      if (ct.first) {
+        db::CellInstArray inst (db::CellInst (ct.first->cell_index ()), db::Trans (ft.rot (), d) * ct.second);
+        instances.push_back (std::make_pair (inst_name, inst));
       }
 
     }

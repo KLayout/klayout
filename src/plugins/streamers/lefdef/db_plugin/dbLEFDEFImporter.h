@@ -942,7 +942,9 @@ public:
 
   void set_maskshift_layer (unsigned int l, const std::string &s)
   {
-    m_maskshift_layers.resize (l + 1, std::string ());
+    if (m_maskshift_layers.size () <= size_t (l)) {
+      m_maskshift_layers.resize (l + 1, std::string ());
+    }
     m_maskshift_layers[l] = s;
   }
 

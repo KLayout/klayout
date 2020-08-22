@@ -279,7 +279,7 @@ GeometryBasedLayoutGenerator::mask_for (const std::string &ln, unsigned int m, c
 
       if (m == 0 || ! nm) {
         m = mm;
-      } else if (m > 0) {
+      } else if (mm > 0) {
         m = (m + mm - 2) % nm->number_of_masks (ln) + 1;
       }
 

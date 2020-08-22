@@ -999,15 +999,17 @@ DEFImporter::read_vias (db::Layout & /*layout*/, db::Cell & /*design*/, double s
 
         if (m_lef_importer.is_routing_layer (ln)) {
 
-          if (routing_layers.size () == 0) {
-            geo_based_vg->set_maskshift_layer (0, ln);
-          } else if (routing_layers.size () == 1) {
-            geo_based_vg->set_maskshift_layer (2, ln);
-          }
-
           if (seen_layers.find (ln) == seen_layers.end ()) {
+
+            if (routing_layers.size () == 0) {
+              geo_based_vg->set_maskshift_layer (0, ln);
+            } else if (routing_layers.size () == 1) {
+              geo_based_vg->set_maskshift_layer (2, ln);
+            }
+
             seen_layers.insert (ln);
             routing_layers.push_back (ln);
+
           }
 
         } else if (m_lef_importer.is_cut_layer (ln)) {

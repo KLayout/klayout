@@ -473,7 +473,7 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
       m_disable_tab_selected (false),
       m_exited (false),
       dm_do_update_menu (this, &MainWindow::do_update_menu),
-      dm_do_update_file_menu (this, &MainWindow::do_update_file_menu),
+      dm_do_update_mru_menus (this, &MainWindow::do_update_mru_menus),
       dm_exit (this, &MainWindow::exit),
       m_grid_micron (0.001),
       m_default_grids_updated (true),
@@ -1334,7 +1334,49 @@ MainWindow::configure (const std::string &name, const std::string &value)
       }
     }
 
-    dm_do_update_file_menu ();
+    dm_do_update_mru_menus ();
+
+    return true;
+
+  } else if (name == cfg_mru_sessions) {
+
+    tl::Extractor ex (value.c_str ());
+
+    m_mru_sessions.clear ();
+    while (! ex.at_end ()) {
+      m_mru_sessions.push_back (value);
+      ex.read_quoted (m_mru_sessions.back ());
+    }
+
+    dm_do_update_mru_menus ();
+
+    return true;
+
+  } else if (name == cfg_mru_layer_properties) {
+
+    tl::Extractor ex (value.c_str ());
+
+    m_mru_layer_properties.clear ();
+    while (! ex.at_end ()) {
+      m_mru_layer_properties.push_back (value);
+      ex.read_quoted (m_mru_layer_properties.back ());
+    }
+
+    dm_do_update_mru_menus ();
+
+    return true;
+
+  } else if (name == cfg_mru_bookmarks) {
+
+    tl::Extractor ex (value.c_str ());
+
+    m_mru_bookmarks.clear ();
+    while (! ex.at_end ()) {
+      m_mru_bookmarks.push_back (value);
+      ex.read_quoted (m_mru_bookmarks.back ());
+    }
+
+    dm_do_update_mru_menus ();
 
     return true;
 
@@ -2249,6 +2291,7 @@ MainWindow::cm_save_layer_props ()
     std::string fn;
     if (mp_lprops_fdia->get_save (fn, tl::to_string (QObject::tr ("Save Layer Properties File")))) {
       current_view ()->save_layer_props (fn);
+      add_to_other_mru (fn, cfg_mru_layer_properties);
     }
   } else {
     throw tl::Exception (tl::to_string (QObject::tr ("No view open to save the layer properties from")));
@@ -2291,6 +2334,8 @@ MainWindow::cm_load_layer_props ()
         load_layer_properties (fn, false /*current view only*/, false /*don't add default*/);
       }
 
+      add_to_other_mru (fn, cfg_mru_layer_properties);
+
     }
   } else {
     throw tl::Exception (tl::to_string (QObject::tr ("No view open to load the layer properties for")));
@@ -2332,6 +2377,7 @@ MainWindow::cm_save_session ()
     std::string fn = m_current_session;
     if (mp_session_fdia->get_save (fn, tl::to_string (QObject::tr ("Save Session File")))) {
       save_session (fn);
+      add_to_other_mru (fn, cfg_mru_sessions);
     }
 
   }
@@ -2347,7 +2393,10 @@ MainWindow::cm_restore_session ()
     int dirty_layouts = dirty_files (df_list);
 
     if (dirty_layouts == 0) {
+
       restore_session (fn);
+      add_to_other_mru (fn, cfg_mru_sessions);
+
     } else {
 
       QMessageBox mbox (this);
@@ -2361,6 +2410,7 @@ MainWindow::cm_restore_session ()
 
       if (mbox.clickedButton() == discard_button) {
         restore_session (fn);
+        add_to_other_mru (fn, cfg_mru_sessions);
       }
 
     }
@@ -2375,6 +2425,7 @@ MainWindow::cm_save_bookmarks ()
     std::string fn;
     if (mp_bookmarks_fdia->get_save (fn, tl::to_string (QObject::tr ("Save Bookmarks File")))) {
       current_view ()->bookmarks ().save (fn);
+      add_to_other_mru (fn, cfg_mru_bookmarks);
     }
   } else {
     throw tl::Exception (tl::to_string (QObject::tr ("No view open to save the bookmarks from")));
@@ -2390,6 +2441,7 @@ MainWindow::cm_load_bookmarks ()
       BookmarkList bookmarks;
       bookmarks.load (fn);
       current_view ()->bookmarks (bookmarks);
+      add_to_other_mru (fn, cfg_mru_bookmarks);
     }
   } else {
     throw tl::Exception (tl::to_string (QObject::tr ("No view open to load the bookmarks for")));
@@ -3118,6 +3170,8 @@ MainWindow::add_mru (const std::string &fn_rel)
   add_mru (fn_rel, m_initial_technology);
 }
 
+const size_t max_mru = 16;
+
 void
 MainWindow::add_mru (const std::string &fn_rel, const std::string &tech)
 {
@@ -3133,7 +3187,7 @@ MainWindow::add_mru (const std::string &fn_rel, const std::string &tech)
 
   new_mru.push_back (std::make_pair (fn, tech));
 
-  if (new_mru.size () > 10) {
+  if (new_mru.size () > max_mru) {
     new_mru.erase (new_mru.begin ());
   }
 
@@ -3150,6 +3204,47 @@ MainWindow::add_mru (const std::string &fn_rel, const std::string &tech)
   }
 
   dispatcher ()->config_set (cfg_mru, config_str);
+}
+
+void
+MainWindow::add_to_other_mru (const std::string &fn_rel, const std::string &cfg)
+{
+  std::vector <std::string> *mru_ptr;
+  if (cfg == cfg_mru_sessions) {
+    mru_ptr = &m_mru_sessions;
+  } else if (cfg == cfg_mru_layer_properties) {
+    mru_ptr = &m_mru_layer_properties;
+  } else if (cfg == cfg_mru_bookmarks) {
+    mru_ptr = &m_mru_bookmarks;
+  } else {
+    tl_assert (false);
+  }
+
+  std::vector <std::string> new_mru = *mru_ptr;
+  std::string fn (tl::InputStream::absolute_path (fn_rel));
+
+  for (std::vector<std::string>::iterator mru = new_mru.begin (); mru != new_mru.end (); ++mru) {
+    if (*mru == fn) {
+      new_mru.erase (mru);
+      break;
+    }
+  }
+
+  new_mru.push_back (fn);
+
+  if (new_mru.size () > max_mru) {
+    new_mru.erase (new_mru.begin ());
+  }
+
+  std::string config_str;
+  for (std::vector<std::string>::const_iterator mru = new_mru.begin (); mru != new_mru.end (); ++mru) {
+    if (! config_str.empty ()) {
+      config_str += " ";
+    }
+    config_str += tl::to_quoted_string (*mru);
+  }
+
+  dispatcher ()->config_set (cfg, config_str);
 }
 
 namespace
@@ -3173,10 +3268,64 @@ private:
   size_t m_n;
 };
 
+class OpenRecentSessionAction
+  : public lay::Action
+{
+public:
+  OpenRecentSessionAction (lay::MainWindow *mw, size_t n)
+    : lay::Action (), mp_mw (mw), m_n (n)
+  { }
+
+  void triggered ()
+  {
+    mp_mw->open_recent_session (m_n);
+  }
+
+private:
+  lay::MainWindow *mp_mw;
+  size_t m_n;
+};
+
+class OpenRecentLayerPropertiesAction
+  : public lay::Action
+{
+public:
+  OpenRecentLayerPropertiesAction (lay::MainWindow *mw, size_t n)
+    : lay::Action (), mp_mw (mw), m_n (n)
+  { }
+
+  void triggered ()
+  {
+    mp_mw->open_recent_layer_properties (m_n);
+  }
+
+private:
+  lay::MainWindow *mp_mw;
+  size_t m_n;
+};
+
+class OpenRecentBookmarksAction
+  : public lay::Action
+{
+public:
+  OpenRecentBookmarksAction (lay::MainWindow *mw, size_t n)
+    : lay::Action (), mp_mw (mw), m_n (n)
+  { }
+
+  void triggered ()
+  {
+    mp_mw->open_recent_bookmarks (m_n);
+  }
+
+private:
+  lay::MainWindow *mp_mw;
+  size_t m_n;
+};
+
 }
 
 void
-MainWindow::do_update_file_menu ()
+MainWindow::do_update_mru_menus ()
 {
   std::string mru_menu = "file_menu.open_recent_menu";
 
@@ -3195,6 +3344,84 @@ MainWindow::do_update_file_menu ()
         size_t i = std::distance (m_mru.begin (), mru);
         Action *action = new OpenRecentAction (this, i);
         action->set_title (mru->first);
+        menu ()->insert_item (mru_menu + ".end", tl::sprintf ("open_recent_%d", i + 1), action);
+      }
+
+    } else {
+      open_recent_action->set_enabled (false);
+    }
+
+  }
+
+  mru_menu = "file_menu.open_recent_menu_sessions";
+
+  if (menu ()->is_valid (mru_menu)) {
+
+    Action *open_recent_action = menu ()->action (mru_menu);
+    open_recent_action->set_enabled (true);
+
+    if (m_mru_sessions.size () > 0 && edits_enabled ()) {
+
+      //  rebuild MRU menu
+      menu ()->clear_menu (mru_menu);
+
+      for (std::vector<std::string>::iterator mru = m_mru_sessions.end (); mru != m_mru_sessions.begin (); ) {
+        --mru;
+        size_t i = std::distance (m_mru_sessions.begin (), mru);
+        Action *action = new OpenRecentSessionAction (this, i);
+        action->set_title (*mru);
+        menu ()->insert_item (mru_menu + ".end", tl::sprintf ("open_recent_%d", i + 1), action);
+      }
+
+    } else {
+      open_recent_action->set_enabled (false);
+    }
+
+  }
+
+  mru_menu = "file_menu.open_recent_menu_layer_props";
+
+  if (menu ()->is_valid (mru_menu)) {
+
+    Action *open_recent_action = menu ()->action (mru_menu);
+    open_recent_action->set_enabled (true);
+
+    if (m_mru_layer_properties.size () > 0 && edits_enabled ()) {
+
+      //  rebuild MRU menu
+      menu ()->clear_menu (mru_menu);
+
+      for (std::vector<std::string>::iterator mru = m_mru_layer_properties.end (); mru != m_mru_layer_properties.begin (); ) {
+        --mru;
+        size_t i = std::distance (m_mru_layer_properties.begin (), mru);
+        Action *action = new OpenRecentLayerPropertiesAction (this, i);
+        action->set_title (*mru);
+        menu ()->insert_item (mru_menu + ".end", tl::sprintf ("open_recent_%d", i + 1), action);
+      }
+
+    } else {
+      open_recent_action->set_enabled (false);
+    }
+
+  }
+
+  mru_menu = "bookmark_menu.open_recent_menu_bookmarks";
+
+  if (menu ()->is_valid (mru_menu)) {
+
+    Action *open_recent_action = menu ()->action (mru_menu);
+    open_recent_action->set_enabled (true);
+
+    if (m_mru_bookmarks.size () > 0 && edits_enabled ()) {
+
+      //  rebuild MRU menu
+      menu ()->clear_menu (mru_menu);
+
+      for (std::vector<std::string>::iterator mru = m_mru_bookmarks.end (); mru != m_mru_bookmarks.begin (); ) {
+        --mru;
+        size_t i = std::distance (m_mru_bookmarks.begin (), mru);
+        Action *action = new OpenRecentBookmarksAction (this, i);
+        action->set_title (*mru);
         menu ()->insert_item (mru_menu + ".end", tl::sprintf ("open_recent_%d", i + 1), action);
       }
 
@@ -3254,6 +3481,52 @@ MainWindow::open_recent (size_t n)
   if (can_open) {
     load_layout (fn, tech, m_open_mode);
     add_mru (fn, tech);  //  make it the latest
+  }
+
+  END_PROTECTED
+}
+
+void
+MainWindow::open_recent_session (size_t n)
+{
+  BEGIN_PROTECTED
+
+  if (n < m_mru_sessions.size ()) {
+    std::string fn = m_mru_sessions [n];
+    restore_session (fn);
+    add_to_other_mru (fn, cfg_mru_sessions);  //  make it the latest
+  }
+
+  END_PROTECTED
+}
+
+void
+MainWindow::open_recent_layer_properties (size_t n)
+{
+  BEGIN_PROTECTED
+
+  if (n < m_mru_layer_properties.size ()) {
+    std::string fn = m_mru_layer_properties [n];
+    load_layer_properties (fn, false /*current view only*/, false /*don't add default*/);
+    add_to_other_mru (fn, cfg_mru_layer_properties);  //  make it the latest
+  }
+
+  END_PROTECTED
+}
+
+void
+MainWindow::open_recent_bookmarks (size_t n)
+{
+  BEGIN_PROTECTED
+
+  if (n < m_mru_bookmarks.size ()) {
+    std::string fn = m_mru_bookmarks [n];
+    if (current_view ()) {
+      BookmarkList bookmarks;
+      bookmarks.load (fn);
+      current_view ()->bookmarks (bookmarks);
+      add_to_other_mru (fn, cfg_mru_bookmarks);
+    }
   }
 
   END_PROTECTED
@@ -4094,10 +4367,12 @@ MainWindow::dropEvent(QDropEvent *event)
       if (suffix == QString::fromUtf8 ("lyp")) {
 
         load_layer_properties (tl::to_string (path), false /*current view only*/, false /*don't add a default*/);
+        add_to_other_mru (tl::to_string (path), cfg_mru_layer_properties);
 
       } else if (suffix == QString::fromUtf8 ("lys")) {
 
         restore_session (tl::to_string (path));
+        add_to_other_mru (tl::to_string (path), cfg_mru_sessions);
 
       } else if (suffix == QString::fromUtf8 ("lyb")) {
 
@@ -4105,6 +4380,7 @@ MainWindow::dropEvent(QDropEvent *event)
           BookmarkList bookmarks;
           bookmarks.load (tl::to_string (path));
           current_view ()->bookmarks (bookmarks);
+          add_to_other_mru (tl::to_string (path), cfg_mru_bookmarks);
         }
 
       } else {
@@ -4340,9 +4616,11 @@ public:
     menu_entries.push_back (lay::separator ("layer_group", at));
     menu_entries.push_back (lay::menu_item ("cm_load_layer_props", "load_layer_props:edit", at, tl::to_string (QObject::tr ("Load Layer Properties"))));
     menu_entries.push_back (lay::menu_item ("cm_save_layer_props", "save_layer_props:edit", at, tl::to_string (QObject::tr ("Save Layer Properties"))));
+    menu_entries.push_back (lay::submenu ("open_recent_menu_layer_props:edit", at, tl::to_string (QObject::tr ("Recent Layer Properties"))));
     menu_entries.push_back (lay::separator ("session_group", at));
     menu_entries.push_back (lay::menu_item ("cm_restore_session", "restore_session:edit", at, tl::to_string (QObject::tr ("Restore Session"))));
     menu_entries.push_back (lay::menu_item ("cm_save_session", "save_session", at, tl::to_string (QObject::tr ("Save Session"))));
+    menu_entries.push_back (lay::submenu ("open_recent_menu_sessions:edit", at, tl::to_string (QObject::tr ("Recent Sessions"))));
     menu_entries.push_back (lay::separator ("log_group", at));
     menu_entries.push_back (lay::menu_item ("cm_view_log", "view_log", at, tl::to_string (QObject::tr ("Log Viewer"))));
     menu_entries.push_back (lay::separator ("print_group", at));

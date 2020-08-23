@@ -564,17 +564,22 @@ public:
   tl::event<int> view_created_event;
 
   /**
-   *  @brief Add an entry to the MRU list with the initial technology
+   *  @brief Adds an entry to the MRU list with the initial technology
    */
   void add_mru (const std::string &fn);
 
   /**
-   *  @brief Add an entry to the MRU list
+   *  @brief Adds an entry to the MRU list
    */
   void add_mru (const std::string &fn, const std::string &tech);
 
   /**
-   *  @brief Get the technology used for loading or creating layouts
+   *  @brief Adds an entry to a specific MRU list given by the "cfg" configuration option
+   */
+  void add_to_other_mru (const std::string &fn_rel, const std::string &cfg);
+
+  /**
+   *  @brief Gets the technology used for loading or creating layouts
    */
   const std::string &initial_technology () 
   {
@@ -582,7 +587,7 @@ public:
   }
 
   /**
-   *  @brief Set the initial technology used for loading or creating layouts
+   *  @brief Sets the initial technology used for loading or creating layouts
    */
   void set_initial_technology (const std::string &tech)
   {
@@ -637,6 +642,9 @@ public slots:
   void close_current_view ();
   void tab_close_requested (int);
   void open_recent (size_t n);
+  void open_recent_session (size_t n);
+  void open_recent_layer_properties (size_t n);
+  void open_recent_bookmarks (size_t n);
   void view_selected (int index);
   void view_title_changed ();
 
@@ -670,7 +678,7 @@ protected slots:
 protected:
   void update_content ();
   void do_update_menu ();
-  void do_update_file_menu ();
+  void do_update_mru_menus ();
 
 private:
   TextProgressDelegate m_text_progress;
@@ -700,6 +708,7 @@ private:
   std::vector <lay::LayoutView *> mp_views;
   int m_open_mode;
   std::vector<std::pair<std::string, std::string> > m_mru;
+  std::vector<std::string> m_mru_sessions, m_mru_layer_properties, m_mru_bookmarks;
   QStatusBar *mp_status_bar;
   QStackedWidget *mp_main_stack_widget;
   ProgressWidget *mp_progress_widget;
@@ -712,7 +721,7 @@ private:
   bool m_disable_tab_selected;
   bool m_exited;
   tl::DeferredMethod<MainWindow> dm_do_update_menu;
-  tl::DeferredMethod<MainWindow> dm_do_update_file_menu;
+  tl::DeferredMethod<MainWindow> dm_do_update_mru_menus;
   tl::DeferredMethod<MainWindow> dm_exit;
   QTimer m_message_timer;
   QTimer m_file_changed_timer;

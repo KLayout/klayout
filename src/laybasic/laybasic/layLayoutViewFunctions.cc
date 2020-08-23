@@ -2160,6 +2160,7 @@ public:
     menu_entries.push_back (lay::menu_item ("cm_manage_bookmarks", "manage_bookmarks", at, tl::to_string (QObject::tr ("Manage Bookmarks"))));
     menu_entries.push_back (lay::menu_item ("cm_load_bookmarks", "load_bookmarks", at, tl::to_string (QObject::tr ("Load Bookmarks"))));
     menu_entries.push_back (lay::menu_item ("cm_save_bookmarks", "save_bookmarks", at, tl::to_string (QObject::tr ("Save Bookmarks"))));
+    menu_entries.push_back (lay::submenu ("open_recent_menu_bookmarks", at, tl::to_string (QObject::tr ("Recent Bookmark Files"))));
 
     at = "zoom_menu.end";
     menu_entries.push_back (lay::submenu ("global_trans", at, tl::to_string (QObject::tr ("Global Transformation"))));

@@ -295,8 +295,10 @@ unsigned int
 GeometryBasedLayoutGenerator::mask_for (const std::string &ln, unsigned int m, unsigned int mshift, const LEFDEFNumberOfMasks *nm) const
 {
   //  for FIXEDMASK we don't do any mask shifting
-  if (m_fixedmask || m == 0 || mshift == 0 || !nm) {
+  if (m_fixedmask || mshift == 0) {
     return m;
+  } else if (m == 0) {
+    return mshift;
   } else {
     return (m + mshift - 2) % nm->number_of_masks (ln) + 1;
   }

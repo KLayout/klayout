@@ -274,17 +274,17 @@ TEST(14)
 
 TEST(15)
 {
-  run_test (_this, "def6", "lef:cells.lef+lef:tech.lef+def:in.def.gz", "au.oas.gz", default_options ());
+  run_test (_this, "def6", "lef:cells.lef+lef:tech.lef+def:in.def.gz", "au-new.oas.gz", default_options ());
 }
 
 TEST(16)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_placement_blockage_layer ("PLACEMENT_BLK (11/0)");
-  run_test (_this, "def7", "lef:cells.lef+lef:tech.lef+def:in.def.gz", "au.oas.gz", options);
+  run_test (_this, "def7", "lef:cells.lef+lef:tech.lef+def:in.def.gz", "au-new.oas.gz", options);
 
   options.set_placement_blockage_layer ("PLACEMENT_BLK (60/0)");
-  run_test (_this, "def7", "map:in.map+lef:cells.lef+lef:tech.lef+def:in.def.gz", "au_with_map_file.oas.gz", options);
+  run_test (_this, "def7", "map:in.map+lef:cells.lef+lef:tech.lef+def:in.def.gz", "au_with_map_file-new.oas.gz", options);
 }
 
 TEST(17)

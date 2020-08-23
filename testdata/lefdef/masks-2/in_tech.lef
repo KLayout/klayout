@@ -1,0 +1,41 @@
+LAYER M0PO 
+    TYPE MASTERSLICE ;
+    WIDTH 0.02 ;
+    MASK 2 ;
+END M0PO
+LAYER VIA0
+    TYPE CUT ;
+    MASK 2 ;
+END VIA0
+LAYER M1
+    TYPE MASTERSLICE ;
+    WIDTH 0.024 ;
+    MASK 2 ;
+END M1
+LAYER VIA1
+    TYPE CUT ;
+    MASK 2 ;
+END VIA1
+LAYER M2
+    TYPE MASTERSLICE ;
+    WIDTH 0.03 ;
+    MASK 2 ;
+END M2
+
+VIA square 
+    LAYER M0PO ;
+        RECT MASK 2 -0.06 -0.06 0.06 0.06 ;
+    LAYER VIA0 ;
+        RECT -0.06 -0.06 0.06 0.06 ;
+    LAYER M1 ;
+        RECT MASK 1 -0.06 -0.06 0.06 0.06 ;
+END square
+
+VIA square_nomask
+    LAYER M0PO ;
+        RECT -0.06 -0.06 0.06 0.06 ;
+    LAYER VIA0 ;
+        RECT -0.06 -0.06 0.06 0.06 ;
+    LAYER M1 ;
+        RECT -0.06 -0.06 0.06 0.06 ;
+END square_nomask

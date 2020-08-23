@@ -1,25 +1,25 @@
 LAYER M0PO 
     TYPE MASTERSLICE ;
     WIDTH 0.02 ;
-    MASKS 2 ;
+    MASK 2 ;
 END M0PO
 LAYER VIA0
     TYPE CUT ;
-    MASKS 2 ;
+    MASK 2 ;
 END VIA0
 LAYER M1
     TYPE MASTERSLICE ;
     WIDTH 0.024 ;
-    MASKS 2 ;
+    MASK 2 ;
 END M1
 LAYER VIA1
     TYPE CUT ;
-    MASKS 2 ;
+    MASK 2 ;
 END VIA1
 LAYER M2
     TYPE MASTERSLICE ;
     WIDTH 0.03 ;
-    MASKS 2 ;
+    MASK 2 ;
 END M2
 
 VIA square 

@@ -939,7 +939,7 @@ LEFImporter::read_macro (Layout &layout)
 
     } else if (test ("FIXEDMASK")) {
 
-      //  we do actually expect FIXEDMASK to be the case always.
+      mg->set_fixedmask (true);
       expect (";");
 
     } else {
@@ -1068,7 +1068,7 @@ void
 LEFImporter::finish_lef (db::Layout &layout)
 {
   for (std::map<std::string, MacroDesc>::const_iterator m = m_macros.begin (); m != m_macros.end (); ++m) {
-    reader_state ()->macro_cell (m->first, layout, std::vector<unsigned int> (), m->second, this);
+    reader_state ()->macro_cell (m->first, layout, std::vector<std::string> (), std::vector<unsigned int> (), m->second, this);
   }
 }
 

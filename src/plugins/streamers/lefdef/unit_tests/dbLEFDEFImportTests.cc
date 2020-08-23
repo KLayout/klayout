@@ -541,6 +541,14 @@ TEST(114_lef_skips_end_library)
   run_test (_this, "lef-skips-end-library", "lef:in.lef+def:in.def", "au.oas", opt, false);
 }
 
+TEST(115_componentmaskshift)
+{
+  db::LEFDEFReaderOptions options = default_options ();
+  options.set_map_file ("in.map");
+
+  run_test (_this, "masks-2", "lef:in_tech.lef+lef:in.lef+def:in.def", "au.oas.gz", options, false);
+}
+
 TEST(200_lefdef_plugin)
 {
   db::Layout ly;

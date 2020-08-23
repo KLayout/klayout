@@ -122,8 +122,11 @@ RuleBasedViaGenerator::RuleBasedViaGenerator ()
 { }
 
 void
-RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm)
+RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<std::string> *maskshift_layers, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm)
 {
+  //  will not be used with an external maskshift layer stack
+  tl_assert (maskshift_layers == 0);
+
   unsigned int mask_bottom = mask (masks, 0), mask_cut = mask (masks, 1), mask_top = mask (masks, 2);
 
   if (mask_bottom == 0) {
@@ -267,41 +270,61 @@ RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, d
 //  GeometryBasedViaGenerator implementation
 
 GeometryBasedLayoutGenerator::GeometryBasedLayoutGenerator ()
-  : LEFDEFLayoutGenerator ()
-{ }
+  : LEFDEFLayoutGenerator (), m_fixedmask (false)
+{
+  //  .. nothing yet ..
+}
 
 unsigned int
-GeometryBasedLayoutGenerator::mask_for (const std::string &ln, unsigned int m, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm) const
+GeometryBasedLayoutGenerator::get_maskshift (const std::string &ln, const std::vector<std::string> *msl, const std::vector<unsigned int> &masks)
 {
-  for (std::vector<std::string>::const_iterator l = m_maskshift_layers.begin (); l != m_maskshift_layers.end (); ++l) {
-
-    if (! l->empty () && *l == ln) {
-
-      unsigned int mm = mask (masks, (unsigned int) (l - m_maskshift_layers.begin ()));
-
-      if (m == 0 || ! nm) {
-        m = mm;
-      } else if (mm > 0) {
-        m = (m + mm - 2) % nm->number_of_masks (ln) + 1;
-      }
-
-      break;
-
-    }
-
+  if (! msl) {
+    msl = &m_maskshift_layers;
   }
 
-  return m;
+  for (std::vector<std::string>::const_iterator l = msl->begin (); l != msl->end (); ++l) {
+    if (! l->empty () && *l == ln) {
+      return mask (masks, (unsigned int) (l - msl->begin ()));
+    }
+  }
+
+  return 0;
+}
+
+unsigned int
+GeometryBasedLayoutGenerator::mask_for (const std::string &ln, unsigned int m, unsigned int mshift, const LEFDEFNumberOfMasks *nm) const
+{
+  //  for FIXEDMASK we don't do any mask shifting
+  if (m_fixedmask || m == 0 || mshift == 0 || !nm) {
+    return m;
+  } else {
+    return (m + mshift - 2) % nm->number_of_masks (ln) + 1;
+  }
+}
+
+unsigned int
+GeometryBasedLayoutGenerator::combine_maskshifts (const std::string &ln, unsigned int mshift1, unsigned int mshift2, const LEFDEFNumberOfMasks *nm) const
+{
+  if (mshift1 == 0 || mshift2 == 0) {
+    return mshift1 + mshift2;
+  } else {
+    return (mshift1 + mshift2 - 2) % nm->number_of_masks (ln) + 1;
+  }
 }
 
 void
-GeometryBasedLayoutGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm)
+GeometryBasedLayoutGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<std::string> *ext_msl, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm)
 {
   for (std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, db::Shapes>::const_iterator g = m_shapes.begin (); g != m_shapes.end (); ++g) {
-    std::pair <bool, unsigned int> dl = reader.open_layer (layout, g->first.first, g->first.second.first, mask_for (g->first.first, g->first.second.second, masks, nm));
+
+    unsigned int mshift = get_maskshift (g->first.first, ext_msl, masks);
+    unsigned int mask = mask_for (g->first.first, g->first.second.second, mshift, nm);
+
+    std::pair <bool, unsigned int> dl = reader.open_layer (layout, g->first.first, g->first.second.first, mask);
     if (dl.first) {
       cell.shapes (dl.second).insert (g->second);
     }
+
   }
 
   for (std::list<Via>::const_iterator v = m_vias.begin (); v != m_vias.end (); ++v) {
@@ -314,10 +337,14 @@ GeometryBasedLayoutGenerator::create_cell (LEFDEFReaderState &reader, Layout &la
     std::vector<std::string> msl = g->maskshift_layers ();
     msl.resize (3, std::string ());
 
+    unsigned mshift_bottom = get_maskshift (msl [0], ext_msl, masks);
+    unsigned mshift_cut = get_maskshift (msl [1], ext_msl, masks);
+    unsigned mshift_top = get_maskshift (msl [2], ext_msl, masks);
+
     db::Cell *vc = reader.via_cell (v->name, layout,
-                                    mask_for (msl [0], v->bottom_mask, masks, nm),
-                                    mask_for (msl [1], v->cut_mask, masks, nm),
-                                    mask_for (msl [2], v->top_mask, masks, nm),
+                                    combine_maskshifts (msl [0], v->bottom_mask, mshift_bottom, nm),
+                                    combine_maskshifts (msl [1], v->cut_mask, mshift_cut, nm),
+                                    combine_maskshifts (msl [2], v->top_mask, mshift_top, nm),
                                     nm);
 
     if (vc) {
@@ -1292,7 +1319,7 @@ LEFDEFReaderState::via_cell (const std::string &vn, db::Layout &layout, unsigned
       masks.push_back (mask_cut);
       masks.push_back (mask_top);
 
-      vg->create_cell (*this, layout, *cell, masks, nm);
+      vg->create_cell (*this, layout, *cell, 0, masks, nm);
 
     }
 
@@ -1326,9 +1353,22 @@ LEFDEFReaderState::macro_generator (const std::string &mn)
 }
 
 std::pair<db::Cell *, db::Trans>
-LEFDEFReaderState::macro_cell (const std::string &mn, Layout &layout, const std::vector<unsigned int> &masks, const MacroDesc &macro_desc, const LEFDEFNumberOfMasks *nm)
+LEFDEFReaderState::macro_cell (const std::string &mn, Layout &layout, const std::vector<std::string> &maskshift_layers, const std::vector<unsigned int> &masks, const MacroDesc &macro_desc, const LEFDEFNumberOfMasks *nm)
 {
-  MacroKey mk (mn, masks);
+  std::map<std::string, LEFDEFLayoutGenerator *>::const_iterator g = m_macro_generators.find (mn);
+  if (g == m_macro_generators.end ()) {
+    return std::make_pair ((db::Cell *) 0, db::Trans ());
+  }
+
+  LEFDEFLayoutGenerator *mg = g->second;
+
+  MacroKey mk;
+  if (mg->is_fixedmask ()) {
+    mk = MacroKey (mn, std::vector<unsigned int> ());
+  } else {
+    mk = MacroKey (mn, masks);
+  }
+
   std::map<MacroKey, std::pair<db::Cell *, db::Trans> >::const_iterator i = m_macro_cells.find (mk);
   if (i != m_macro_cells.end ()) {
     tl_assert (! i->second.first || i->second.first->layout () == &layout);
@@ -1337,13 +1377,6 @@ LEFDEFReaderState::macro_cell (const std::string &mn, Layout &layout, const std:
 
   db::Cell *cell = 0;
   db::Trans tr;
-
-  std::map<std::string, LEFDEFLayoutGenerator *>::const_iterator g = m_macro_generators.find (mn);
-  if (g == m_macro_generators.end ()) {
-    return std::make_pair ((db::Cell *) 0, db::Trans ());
-  }
-
-  LEFDEFLayoutGenerator *mg = g->second;
 
   if (! macro_desc.foreign_name.empty ()) {
 
@@ -1392,15 +1425,22 @@ LEFDEFReaderState::macro_cell (const std::string &mn, Layout &layout, const std:
     //  actually implement the real cell
 
     std::string mask_suffix;
-    for (std::vector<unsigned int>::const_iterator m = masks.begin (); m != masks.end (); ++m) {
-      mask_suffix += "_";
-      mask_suffix += tl::to_string (*m);
+    if (! mg->is_fixedmask ()) {
+      for (std::vector<unsigned int>::const_iterator m = masks.begin (); m != masks.end (); ++m) {
+        mask_suffix += "_";
+        mask_suffix += tl::to_string (*m);
+      }
     }
 
     std::string cn = mn + mask_suffix;
 
     cell = &layout.cell (layout.add_cell (cn.c_str ()));
-    mg->create_cell (*this, layout, *cell, masks, nm);
+
+    if (mg->is_fixedmask ()) {
+      mg->create_cell (*this, layout, *cell, 0, std::vector<unsigned int> (), nm);
+    } else {
+      mg->create_cell (*this, layout, *cell, &maskshift_layers, masks, nm);
+    }
 
   }
 

@@ -1313,7 +1313,7 @@ DEFImporter::read_components (db::Layout &layout, std::list<std::pair<std::strin
 
     if (is_placed) {
 
-      std::pair<db::Cell *, db::Trans> ct = reader_state ()->macro_cell (model, layout, string2masks (maskshift), m->second, &m_lef_importer);
+      std::pair<db::Cell *, db::Trans> ct = reader_state ()->macro_cell (model, layout, m_component_maskshift, string2masks (maskshift), m->second, &m_lef_importer);
       if (ct.first) {
         db::CellInstArray inst (db::CellInst (ct.first->cell_index ()), db::Trans (ft.rot (), d) * ct.second);
         instances.push_back (std::make_pair (inst_name, inst));
@@ -1495,6 +1495,9 @@ DEFImporter::do_read (db::Layout &layout)
       while (! at_end () && ! test (";")) {
         m_component_maskshift.push_back (get ());
       }
+
+      //  because we treat the layers bottom first ..
+      std::reverse (m_component_maskshift.begin (), m_component_maskshift.end ());
 
     } else if (test ("COMPONENTS")) {
 

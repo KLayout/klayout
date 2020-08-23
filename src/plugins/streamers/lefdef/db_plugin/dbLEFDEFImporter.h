@@ -888,8 +888,9 @@ public:
   LEFDEFLayoutGenerator () { }
   virtual ~LEFDEFLayoutGenerator () { }
 
-  virtual void create_cell (LEFDEFReaderState &reader, db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm) = 0;
+  virtual void create_cell (LEFDEFReaderState &reader, db::Layout &layout, db::Cell &cell, const std::vector<std::string> *maskshift_layers, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm) = 0;
   virtual std::vector<std::string> maskshift_layers () const = 0;
+  virtual bool is_fixedmask () const = 0;
 };
 
 /**
@@ -901,7 +902,7 @@ class DB_PLUGIN_PUBLIC RuleBasedViaGenerator
 public:
   RuleBasedViaGenerator ();
 
-  virtual void create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm);
+  virtual void create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<std::string> *maskshift_layers, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm);
 
   virtual std::vector<std::string> maskshift_layers () const
   {
@@ -910,6 +911,11 @@ public:
     msl.push_back (m_cut_layer);
     msl.push_back (m_top_layer);
     return msl;
+  }
+
+  virtual bool is_fixedmask () const
+  {
+    return false;
   }
 
   void set_cutsize (const db::Vector &cutsize) { m_cutsize = cutsize; }
@@ -947,17 +953,11 @@ class DB_PLUGIN_PUBLIC GeometryBasedLayoutGenerator
   : public LEFDEFLayoutGenerator
 {
 public:
-  struct Via {
-    Via () : bottom_mask (0), cut_mask (0), top_mask (0) { }
-    std::string name;
-    unsigned int bottom_mask, cut_mask, top_mask;
-    db::Trans trans;
-  };
-
   GeometryBasedLayoutGenerator ();
 
-  virtual void create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *num_cut_masks);
+  virtual void create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<std::string> *maskshift_layers, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *num_cut_masks);
   virtual std::vector<std::string> maskshift_layers () const { return m_maskshift_layers; }
+  virtual bool is_fixedmask () const { return m_fixedmask; }
 
   void add_polygon (const std::string &ln, LayerPurpose purpose, const db::Polygon &poly, unsigned int mask, properties_id_type prop_id);
   void add_box (const std::string &ln, LayerPurpose purpose, const db::Box &box, unsigned int mask, properties_id_type prop_id);
@@ -975,12 +975,27 @@ public:
     m_maskshift_layers[l] = s;
   }
 
+  void set_fixedmask (bool f)
+  {
+    m_fixedmask = f;
+  }
+
 private:
+  struct Via {
+    Via () : bottom_mask (0), cut_mask (0), top_mask (0) { }
+    std::string name;
+    unsigned int bottom_mask, cut_mask, top_mask;
+    db::Trans trans;
+  };
+
   std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, db::Shapes> m_shapes;
   std::list<Via> m_vias;
   std::vector<std::string> m_maskshift_layers;
+  bool m_fixedmask;
 
-  unsigned int mask_for (const std::string &ln, unsigned int m, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm) const;
+  unsigned int get_maskshift (const std::string &ln, const std::vector<std::string> *maskshift_layers, const std::vector<unsigned int> &masks);
+  unsigned int mask_for (const std::string &ln, unsigned int m, unsigned int mshift, const LEFDEFNumberOfMasks *nm) const;
+  unsigned int combine_maskshifts (const std::string &ln, unsigned int mshift1, unsigned int mshift2, const LEFDEFNumberOfMasks *nm) const;
 };
 
 /**
@@ -1058,7 +1073,7 @@ public:
   /**
    *  @brief Gets the macro cell for the given macro name or 0 if no such maco is registered
    */
-  std::pair<db::Cell *, db::Trans> macro_cell (const std::string &mn, Layout &layout, const std::vector<unsigned int> &masks, const MacroDesc &macro_desc, const LEFDEFNumberOfMasks *nm);
+  std::pair<db::Cell *, db::Trans> macro_cell (const std::string &mn, Layout &layout, const std::vector<std::string> &maskshift_layers, const std::vector<unsigned int> &masks, const MacroDesc &macro_desc, const LEFDEFNumberOfMasks *nm);
 
   /**
    *  @brief Gets the macro generator for a given macro name or 0 if there is no such generator
@@ -1114,6 +1129,9 @@ private:
    */
   struct MacroKey
   {
+    MacroKey ()
+    { }
+
     MacroKey (const std::string &n, const std::vector<unsigned int> &m)
       : name (n), masks (m)
     { }

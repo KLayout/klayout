@@ -855,10 +855,10 @@ private:
 enum LayerPurpose 
 {
   Routing = 0,        //  from DEF only
-  SpecialRouting,     //  from DEF only
-  ViaGeometry,        //  from LEF+DEF
   Pins,               //  from DEF
+  SpecialRouting,     //  from DEF only
   LEFPins,            //  from LEF
+  ViaGeometry,        //  from LEF+DEF
   Label,              //  from LEF+DEF
   Obstructions,       //  from LEF only
   Outline,            //  from LEF+DEF

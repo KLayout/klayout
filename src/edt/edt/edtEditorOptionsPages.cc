@@ -29,6 +29,7 @@
 #include "edtConfig.h"
 #include "edtService.h"
 #include "edtEditorOptionsPages.h"
+#include "edtPropertiesPageUtils.h"
 #include "tlExceptions.h"
 #include "layPlugin.h"
 #include "layLayoutView.h"
@@ -195,24 +196,6 @@ END_PROTECTED_W (this)
 
 // ------------------------------------------------------------------
 //  Indicates an error on a line edit
-
-static void indicate_error (QLineEdit *le, const tl::Exception *ex)
-{
-  //  by the way, update the foreground color of the cell edit box as well (red, if not valid)
-  QPalette pl = le->palette ();
-  if (ex) {
-    pl.setColor (QPalette::Active, QPalette::Text, Qt::red);
-    pl.setColor (QPalette::Active, QPalette::Base, QColor (Qt::red).lighter (180));
-    le->setToolTip (tl::to_qstring (ex->msg ()));
-  } else {
-    QWidget *pw = dynamic_cast<QWidget *> (le->parent ());
-    tl_assert (pw != 0);
-    pl.setColor (QPalette::Active, QPalette::Text, pw->palette ().color (QPalette::Text));
-    pl.setColor (QPalette::Active, QPalette::Base, pw->palette ().color (QPalette::Base));
-    le->setToolTip (QString ());
-  }
-  le->setPalette (pl);
-}
 
 template <class Value>
 static void configure_from_line_edit (lay::Dispatcher *dispatcher, QLineEdit *le, const std::string &cfg_name)

@@ -65,6 +65,7 @@ protected:
   bool m_enable_cb_callback;
   db::properties_id_type m_prop_id;
   edt::PCellParametersPage *mp_pcell_parameters;
+  std::list<std::pair<size_t, lay::ObjectInstPath> > m_saved_selection;
 
   virtual bool readonly ();
   virtual void apply (); 

@@ -80,6 +80,11 @@ Editables::Editables (db::Manager *manager)
 Editables::~Editables ()
 {
   cancel_edits ();
+
+  if (mp_properties_dialog) {
+    delete mp_properties_dialog;
+    mp_properties_dialog = 0;
+  }
 }
 
 void 
@@ -610,9 +615,8 @@ Editables::cancel_edits ()
 {
   //  close the property dialog
   if (mp_properties_dialog) {
-    delete mp_properties_dialog;
+    mp_properties_dialog->hide ();
   }
-  mp_properties_dialog = 0;
 
   //  cancel any edit operations
   for (iterator e = begin (); e != end (); ++e) {
@@ -623,7 +627,10 @@ Editables::cancel_edits ()
 void
 Editables::show_properties (QWidget *parent)
 {
-  cancel_edits ();
+  //  re-create a new properties dialog
+  if (mp_properties_dialog) {
+    delete mp_properties_dialog;
+  }
   mp_properties_dialog = new lay::PropertiesDialog (parent, manager (), this);
   mp_properties_dialog->show ();
 }

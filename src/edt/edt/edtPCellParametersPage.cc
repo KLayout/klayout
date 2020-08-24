@@ -22,6 +22,7 @@
 
 
 #include "edtPCellParametersPage.h"
+#include "edtPropertiesPageUtils.h"
 #include "layWidgets.h"
 #include "tlScriptError.h"
 
@@ -37,24 +38,6 @@
 
 namespace edt
 {
-
-static void indicate_error (QLineEdit *le, const tl::Exception *ex)
-{
-  //  by the way, update the foreground color of the cell edit box as well (red, if not valid)
-  QPalette pl = le->palette ();
-  if (ex) {
-    pl.setColor (QPalette::Active, QPalette::Text, Qt::red);
-    pl.setColor (QPalette::Active, QPalette::Base, QColor (Qt::red).lighter (180));
-    le->setToolTip (tl::to_qstring (ex->msg ()));
-  } else {
-    QWidget *pw = dynamic_cast<QWidget *> (le->parent ());
-    tl_assert (pw != 0);
-    pl.setColor (QPalette::Active, QPalette::Text, pw->palette ().color (QPalette::Text));
-    pl.setColor (QPalette::Active, QPalette::Base, pw->palette ().color (QPalette::Base));
-    le->setToolTip (QString ());
-  }
-  le->setPalette (pl);
-}
 
 static void set_value (const db::PCellParameterDeclaration &p, const db::Layout * /*layout*/, QWidget *widget, const tl::Variant &value)
 {

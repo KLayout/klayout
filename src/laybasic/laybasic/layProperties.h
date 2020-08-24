@@ -48,6 +48,8 @@ class Editable;
 class LAYBASIC_PUBLIC PropertiesPage
   : public QFrame
 {
+Q_OBJECT
+
 public:
   /**
    *  @brief The constructor attaching the properties page to a parent widget
@@ -140,7 +142,7 @@ public:
    */
   virtual void operator++ () = 0;
 
-  /** 
+  /**
    *  @brief Update the display
    *
    *  This method is called by the dialog to transfer data from the
@@ -218,6 +220,12 @@ public:
   {
     return mp_manager;
   }
+
+signals:
+  /**
+   *  @brief This signal is emitted if a value has been changed
+   */
+  void edited ();
 
 private:
   db::Manager *mp_manager;

@@ -35,7 +35,7 @@ namespace lay
 
 PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, lay::Editables *editables)
   : QDialog (0 /*parent*/),
-    mp_manager (manager), mp_editables (editables), m_index (-1)
+    mp_manager (manager), mp_editables (editables), m_index (-1), m_auto_applied (false), m_transaction_id (0)
 {
   mp_editables->enable_edits (false);
 
@@ -49,6 +49,7 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
     mp_properties_pages.push_back (e->properties_page (mp_manager, content_frame));
     if (mp_properties_pages.back ()) {
       mp_stack->addWidget (mp_properties_pages.back ());
+      connect (mp_properties_pages.back (), SIGNAL (edited ()), this, SLOT (apply ()));
     }
   }
 
@@ -130,8 +131,9 @@ PropertiesDialog::next_pressed ()
 BEGIN_PROTECTED
 
   if (! mp_properties_pages [m_index]->readonly ()) {
-    db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")));
+    db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")), m_transaction_id);
     mp_properties_pages [m_index]->apply ();
+    m_transaction_id = t.id ();
   }
 
   //  advance the current entry
@@ -171,8 +173,9 @@ PropertiesDialog::prev_pressed ()
 BEGIN_PROTECTED
 
   if (! mp_properties_pages [m_index]->readonly ()) {
-    db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")));
+    db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")), m_transaction_id);
     mp_properties_pages [m_index]->apply ();
+    m_transaction_id = t.id ();
   }
 
   if (mp_properties_pages [m_index]->at_begin ()) {
@@ -256,23 +259,50 @@ PropertiesDialog::apply_to_all_pressed ()
 {
 BEGIN_PROTECTED
 
-  db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes to all")));
+  {
+    db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes to all")), m_transaction_id);
 
-  mp_properties_pages [m_index]->apply_to_all ();
-  mp_properties_pages [m_index]->update ();
+    mp_properties_pages [m_index]->apply_to_all ();
+    mp_properties_pages [m_index]->update ();
+
+    m_transaction_id = t.id ();
+  }
 
 END_PROTECTED
 }
 
-void 
+void
+PropertiesDialog::apply ()
+{
+BEGIN_PROTECTED
+
+  db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Auto-apply changes")), m_transaction_id);
+
+  try {
+
+    mp_properties_pages [m_index]->apply ();
+    mp_properties_pages [m_index]->update ();
+
+  } catch (tl::Exception &) {
+    //  we assume the page somehow indicates the error and does not apply the values
+  }
+
+  m_transaction_id = t.id ();
+
+END_PROTECTED
+}
+
+void
 PropertiesDialog::apply_pressed ()
 {
 BEGIN_PROTECTED
 
-  db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")));
+  db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")), m_transaction_id);
 
   mp_properties_pages [m_index]->apply ();
   mp_properties_pages [m_index]->update ();
+
+  m_transaction_id = t.id ();
 
 END_PROTECTED
 }
@@ -280,6 +310,17 @@ END_PROTECTED
 void 
 PropertiesDialog::cancel_pressed ()
 {
+  //  undo whatever we've done so far
+  if (m_transaction_id > 0) {
+
+    //  because undo does not maintain a valid selection we clear it
+    mp_editables->clear_selection ();
+
+    mp_manager->undo ();
+    m_transaction_id = 0;
+
+  }
+
   //  make sure that the property pages are no longer used ..
   disconnect ();
   //  close the dialog
@@ -293,10 +334,12 @@ BEGIN_PROTECTED
 
   if (! mp_properties_pages [m_index]->readonly ()) {
 
-    db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")));
+    db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")), m_transaction_id);
 
     mp_properties_pages [m_index]->apply ();
     mp_properties_pages [m_index]->update ();
+
+    m_transaction_id = t.id ();
 
   }
 

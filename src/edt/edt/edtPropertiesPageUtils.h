@@ -33,6 +33,8 @@
 
 #include <vector>
 
+class QLineEdit;
+
 namespace edt
 {
 
@@ -477,6 +479,11 @@ db::Point point_from_dpoint (const db::DPoint &dp, double dbu, bool du, const db
  *  See coord_from_dcoord for a description of the arguments.
  */
 db::Coord coord_from_string (const char *txt, double dbu, bool du, const db::VCplxTrans &t);
+
+/**
+ *  @brief Configures a QLineEdit to indicate a format error
+ */
+void indicate_error (QLineEdit *le, const tl::Exception *ex);
 
 }
 

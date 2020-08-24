@@ -627,6 +627,11 @@ Editables::cancel_edits ()
 void
 Editables::show_properties (QWidget *parent)
 {
+  if (selection_size () == 0) {
+    //  try to use the transient selection for the real one
+    transient_to_selection ();
+  }
+
   //  re-create a new properties dialog
   if (mp_properties_dialog) {
     delete mp_properties_dialog;

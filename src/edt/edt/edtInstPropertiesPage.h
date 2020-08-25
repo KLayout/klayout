@@ -65,13 +65,12 @@ protected:
   bool m_enable_cb_callback;
   db::properties_id_type m_prop_id;
   edt::PCellParametersPage *mp_pcell_parameters;
-  std::list<std::pair<size_t, lay::ObjectInstPath> > m_saved_selection;
 
   virtual bool readonly ();
   virtual void apply (); 
-  virtual void apply_to_all ();
+  virtual void apply_to_all (bool relative);
   virtual bool can_apply_to_all () const;
-  void do_apply (bool current_only);
+  void do_apply (bool current_only, bool relative);
   virtual ChangeApplicator *create_applicator (db::Cell &cell, const db::Instance &inst, double dbu);
 
 protected slots:

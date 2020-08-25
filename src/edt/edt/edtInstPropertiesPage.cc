@@ -65,20 +65,42 @@ InstPropertiesPage::InstPropertiesPage (edt::Service *service, db::Manager *mana
   connect (lib_cbx, SIGNAL (currentIndexChanged (int)), this, SLOT (library_changed (int)));
   connect (cell_name_le, SIGNAL (textChanged (const QString &)), this, SLOT (cell_name_changed (const QString &)));
 
-  connect (lib_cbx, SIGNAL (activated (int)), this, SIGNAL (edited ()));
-  connect (cell_name_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
-  connect (array_grp, SIGNAL (clicked ()), this, SIGNAL (edited ()));
-  connect (rows_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
-  connect (columns_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
-  connect (row_x_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
-  connect (row_y_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
-  connect (column_x_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
-  connect (column_y_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
-  connect (pos_x_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
-  connect (pos_y_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
-  connect (angle_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
-  connect (mag_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
-  connect (mirror_cbx, SIGNAL (clicked ()), this, SIGNAL (edited ()));
+  if (! readonly ()) {
+
+    connect (lib_cbx, SIGNAL (activated (int)), this, SIGNAL (edited ()));
+    connect (cell_name_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (array_grp, SIGNAL (clicked ()), this, SIGNAL (edited ()));
+    connect (rows_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (columns_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (row_x_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (row_y_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (column_x_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (column_y_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (pos_x_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (pos_y_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (angle_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (mag_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (mirror_cbx, SIGNAL (clicked ()), this, SIGNAL (edited ()));
+
+  } else {
+
+    browse_pb->setEnabled (false);
+    cell_name_le->setReadOnly (true);
+    rows_le->setReadOnly (true);
+    columns_le->setReadOnly (true);
+    row_x_le->setReadOnly (true);
+    row_y_le->setReadOnly (true);
+    column_x_le->setReadOnly (true);
+    column_y_le->setReadOnly (true);
+    pos_x_le->setReadOnly (true);
+    pos_y_le->setReadOnly (true);
+    angle_le->setReadOnly (true);
+    mag_le->setReadOnly (true);
+    lib_cbx->setEnabled (false);
+    array_grp->setEnabled (false);
+    mirror_cbx->setEnabled (false);
+
+  }
 
   QHBoxLayout *layout = new QHBoxLayout (pcell_tab);
   layout->setMargin (0);
@@ -580,7 +602,7 @@ InstPropertiesPage::recompute_selection_ptrs (const std::vector<lay::ObjectInstP
 }
 
 void 
-InstPropertiesPage::do_apply (bool current_only)
+InstPropertiesPage::do_apply (bool current_only, bool relative)
 {
   lay::LayerState layer_state = mp_service->view ()->layer_snapshot ();
   unsigned int cv_index = m_selection_ptrs [m_index]->cv_index ();
@@ -609,32 +631,7 @@ InstPropertiesPage::do_apply (bool current_only)
 
   bool relative_mode = false;
   if (! current_only && applicator->supports_relative_mode ()) {
-
-    static bool s_relative_mode = true;
-
-    QMessageBox mb (QMessageBox::Question, 
-                    tr ("Apply Changes To All"), 
-                    tr ("For this operation absolute or relative mode is available which affects the way parameters of the selected objects are changed:\n\n"
-                        "In absolute mode, they will be set to the given value. In relative mode, they will be adjusted by the same amount.\n"),
-                    QMessageBox::NoButton, this);
-
-    mb.addButton (tr ("Cancel"), QMessageBox::RejectRole);
-    QPushButton *absolute = mb.addButton (tr ("Absolute"), QMessageBox::NoRole);
-    QPushButton *relative = mb.addButton (tr ("Relative"), QMessageBox::YesRole);
-    
-    mb.setDefaultButton (s_relative_mode ? relative : absolute);
-
-    mb.exec ();
-
-    if (mb.clickedButton () == absolute) {
-      s_relative_mode = relative_mode = false;
-    } else if (mb.clickedButton () == relative) {
-      s_relative_mode = relative_mode = true;
-    } else {
-      //  Cancel pressed
-      return;
-    }
-
+    relative_mode = relative;
   }
 
   //  Note: using the apply-all scheme for applying a single change may look like overhead.
@@ -692,9 +689,6 @@ InstPropertiesPage::do_apply (bool current_only)
 
         size_t index = p - m_selection_ptrs.begin ();
 
-        //  save previous selection so we can restore it
-        m_saved_selection.push_back (std::make_pair (index, new_sel[index]));
-
         //  change selection to new instance
         new_sel[index].back ().inst_ptr = new_inst;
 
@@ -729,7 +723,7 @@ InstPropertiesPage::do_apply (bool current_only)
 void 
 InstPropertiesPage::apply ()
 {
-  do_apply (true);
+  do_apply (true, false);
 }
 
 bool
@@ -739,9 +733,9 @@ InstPropertiesPage::can_apply_to_all () const
 }
 
 void 
-InstPropertiesPage::apply_to_all ()
+InstPropertiesPage::apply_to_all (bool relative)
 {
-  do_apply (false);
+  do_apply (false, relative);
 }
 
 void

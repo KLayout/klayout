@@ -56,13 +56,15 @@ public:
   virtual void operator++ ();
   virtual void leave ();
 
+protected:
+  virtual bool readonly ();
+
 private:
   virtual void update ();
   virtual void apply ();
-  virtual void apply_to_all ();
+  virtual void apply_to_all (bool relative);
   virtual bool can_apply_to_all () const;
-  virtual void do_apply (bool current_only);
-  virtual bool readonly ();
+  virtual void do_apply (bool current_only, bool relative);
   void recompute_selection_ptrs (const std::vector<lay::ObjectInstPath> &new_sel);
 
 protected:
@@ -104,6 +106,12 @@ public:
 protected:
   virtual QCheckBox *dbu_checkbox () const { return dbu_cb; }
   virtual QCheckBox *abs_checkbox () const { return abs_cb; }
+
+public slots:
+  void text_changed ();
+
+private:
+  bool m_in_text_changed;
 };
 
 class BoxPropertiesPage
@@ -167,6 +175,9 @@ public:
 protected:
   virtual QCheckBox *dbu_checkbox () const { return dbu_cb; }
   virtual QCheckBox *abs_checkbox () const { return abs_cb; }
+
+private:
+  bool m_in_text_changed;
 };
 
 class EditablePathPropertiesPage
@@ -187,6 +198,10 @@ protected:
 
 public slots:
   void type_selected (int); 
+  void text_changed ();
+
+private:
+  bool m_in_text_changed;
 };
 
 }

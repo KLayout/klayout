@@ -64,8 +64,8 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
   content_frame->setLayout (mp_stack);
 
   //  disable the apply button for first ..
-  apply_button->setEnabled (false);
-  apply_to_all_button->setEnabled (false);
+  apply_to_all_cbx->setEnabled (false);
+  relative_cbx->setEnabled (false);
   ok_button->setEnabled (false);
 
   //  as a proposal, the start button can be enabled in most cases
@@ -87,22 +87,28 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
 
   //  if at end disable the "Next" button and return (this may only happen at the first call)
   if (m_index >= int (mp_properties_pages.size ())) {
+
     next_button->setEnabled (false);
     mp_stack->setCurrentWidget (dummy);
-    apply_button->setEnabled (false);
-    apply_to_all_button->setEnabled (false);
+    apply_to_all_cbx->setEnabled (false);
+    apply_to_all_cbx->setChecked (false);
+    relative_cbx->setEnabled (false);
+    relative_cbx->setChecked (false);
     ok_button->setEnabled (false);
+
   } else {
+
     next_button->setEnabled (any_next ());
     mp_properties_pages [m_index]->update ();
     mp_stack->setCurrentWidget (mp_properties_pages [m_index]);
-    apply_button->setEnabled (! mp_properties_pages [m_index]->readonly ());
-    apply_to_all_button->setEnabled (! mp_properties_pages [m_index]->readonly () && mp_properties_pages [m_index]->can_apply_to_all ());
+    apply_to_all_cbx->setEnabled (! mp_properties_pages [m_index]->readonly () && mp_properties_pages [m_index]->can_apply_to_all ());
+    apply_to_all_cbx->setChecked (false);
+    relative_cbx->setEnabled (apply_to_all_cbx->isEnabled () && apply_to_all_cbx->isChecked ());
+    relative_cbx->setChecked (true);
     ok_button->setEnabled (! mp_properties_pages [m_index]->readonly ());
+
   }
 
-  connect (apply_button, SIGNAL (clicked ()), this, SLOT (apply_pressed ()));
-  connect (apply_to_all_button, SIGNAL (clicked ()), this, SLOT (apply_to_all_pressed ()));
   connect (ok_button, SIGNAL (clicked ()), this, SLOT (ok_pressed ()));
   connect (cancel_button, SIGNAL (clicked ()), this, SLOT (cancel_pressed ()));
   connect (prev_button, SIGNAL (clicked ()), this, SLOT (prev_pressed ()));
@@ -159,8 +165,8 @@ BEGIN_PROTECTED
 
   prev_button->setEnabled (true);
   next_button->setEnabled (any_next ());
-  apply_button->setEnabled (! mp_properties_pages [m_index]->readonly ());
-  apply_to_all_button->setEnabled (! mp_properties_pages [m_index]->readonly () && mp_properties_pages [m_index]->can_apply_to_all ());
+  apply_to_all_cbx->setEnabled (! mp_properties_pages [m_index]->readonly () && mp_properties_pages [m_index]->can_apply_to_all ());
+  relative_cbx->setEnabled (apply_to_all_cbx->isEnabled () && apply_to_all_cbx->isChecked ());
   ok_button->setEnabled (! mp_properties_pages [m_index]->readonly ());
   mp_properties_pages [m_index]->update ();
 
@@ -203,8 +209,8 @@ BEGIN_PROTECTED
 
   next_button->setEnabled (true);
   prev_button->setEnabled (any_prev ());
-  apply_button->setEnabled (! mp_properties_pages [m_index]->readonly ());
-  apply_to_all_button->setEnabled (! mp_properties_pages [m_index]->readonly () && mp_properties_pages [m_index]->can_apply_to_all ());
+  apply_to_all_cbx->setEnabled (! mp_properties_pages [m_index]->readonly () && mp_properties_pages [m_index]->can_apply_to_all ());
+  relative_cbx->setEnabled (apply_to_all_cbx->isEnabled () && apply_to_all_cbx->isChecked ());
   ok_button->setEnabled (! mp_properties_pages [m_index]->readonly ());
   mp_properties_pages [m_index]->update ();
 
@@ -254,23 +260,6 @@ PropertiesDialog::any_prev () const
   return (index >= 0);
 }
 
-void 
-PropertiesDialog::apply_to_all_pressed ()
-{
-BEGIN_PROTECTED
-
-  {
-    db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes to all")), m_transaction_id);
-
-    mp_properties_pages [m_index]->apply_to_all ();
-    mp_properties_pages [m_index]->update ();
-
-    m_transaction_id = t.id ();
-  }
-
-END_PROTECTED
-}
-
 void
 PropertiesDialog::apply ()
 {
@@ -280,27 +269,16 @@ BEGIN_PROTECTED
 
   try {
 
-    mp_properties_pages [m_index]->apply ();
+    if (apply_to_all_cbx->isChecked () && mp_properties_pages [m_index]->can_apply_to_all ()) {
+      mp_properties_pages [m_index]->apply_to_all (relative_cbx->isChecked ());
+    } else {
+      mp_properties_pages [m_index]->apply ();
+    }
     mp_properties_pages [m_index]->update ();
 
   } catch (tl::Exception &) {
     //  we assume the page somehow indicates the error and does not apply the values
   }
-
-  m_transaction_id = t.id ();
-
-END_PROTECTED
-}
-
-void
-PropertiesDialog::apply_pressed ()
-{
-BEGIN_PROTECTED
-
-  db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")), m_transaction_id);
-
-  mp_properties_pages [m_index]->apply ();
-  mp_properties_pages [m_index]->update ();
 
   m_transaction_id = t.id ();
 

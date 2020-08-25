@@ -483,7 +483,7 @@ db::Coord coord_from_string (const char *txt, double dbu, bool du, const db::VCp
 /**
  *  @brief Configures a QLineEdit to indicate a format error
  */
-void indicate_error (QLineEdit *le, const tl::Exception *ex);
+void indicate_error (QWidget *le, const tl::Exception *ex);
 
 }
 

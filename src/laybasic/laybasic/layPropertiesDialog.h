@@ -92,8 +92,6 @@ public slots:
   void apply ();
   void next_pressed ();
   void prev_pressed ();
-  void apply_pressed ();
-  void apply_to_all_pressed ();
   void cancel_pressed ();
   void ok_pressed ();
 

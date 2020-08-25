@@ -557,7 +557,7 @@ LayoutView::init (db::Manager *mgr, QWidget * /*parent*/)
 
   }
 
-  if (is_editable () && (m_options & LV_NoEditorOptionsPanel) == 0 && (m_options & LV_Naked) == 0) {
+  if ((m_options & LV_NoEditorOptionsPanel) == 0 && (m_options & LV_Naked) == 0) {
 
     mp_editor_options_frame = new QFrame (0);
     mp_editor_options_frame->setObjectName (QString::fromUtf8 ("editor_options_frame"));

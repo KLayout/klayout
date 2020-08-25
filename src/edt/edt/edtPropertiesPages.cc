@@ -24,6 +24,7 @@
 #include "edtPropertiesPages.h"
 #include "edtPropertiesPageUtils.h"
 #include "edtDialogs.h"
+#include "edtPropertiesPageUtils.h"
 #include "layDialogs.h"
 #include "layObjectInstPath.h"
 #include "layLayoutView.h"
@@ -174,7 +175,7 @@ ShapePropertiesPage::recompute_selection_ptrs (const std::vector<lay::ObjectInst
 }
 
 void 
-ShapePropertiesPage::do_apply (bool current_only)
+ShapePropertiesPage::do_apply (bool current_only, bool relative)
 {
   std::auto_ptr<ChangeApplicator> applicator;
 
@@ -203,32 +204,7 @@ ShapePropertiesPage::do_apply (bool current_only)
   //  Ask whether to use relative or absolute mode
   bool relative_mode = false;
   if (! current_only && applicator->supports_relative_mode ()) {
-
-    static bool s_relative_mode = true;
-
-    QMessageBox mb (QMessageBox::Question, 
-                    tr ("Apply Changes To All"), 
-                    tr ("For this operation absolute or relative mode is available which affects the way parameters of the selected objects are changed:\n\n"
-                        "In absolute mode, they will be set to the given value. In relative mode, they will be adjusted by the same amount.\n"),
-                    QMessageBox::NoButton, this);
-
-    mb.addButton (tr ("Cancel"), QMessageBox::RejectRole);
-    QPushButton *absolute = mb.addButton (tr ("Absolute"), QMessageBox::NoRole);
-    QPushButton *relative = mb.addButton (tr ("Relative"), QMessageBox::YesRole);
-    
-    mb.setDefaultButton (s_relative_mode ? relative : absolute);
-
-    mb.exec ();
-
-    if (mb.clickedButton () == absolute) {
-      s_relative_mode = relative_mode = false;
-    } else if (mb.clickedButton () == relative) {
-      s_relative_mode = relative_mode = true;
-    } else {
-      //  Cancel pressed
-      return;
-    }
-
+    relative_mode = relative;
   }
 
   //  Note: using the apply-all scheme for applying a single change may look like overhead.
@@ -333,7 +309,7 @@ ShapePropertiesPage::do_apply (bool current_only)
 void 
 ShapePropertiesPage::apply ()
 {
-  do_apply (true);
+  do_apply (true, false);
 }
 
 bool
@@ -343,9 +319,9 @@ ShapePropertiesPage::can_apply_to_all () const
 }
 
 void 
-ShapePropertiesPage::apply_to_all ()
+ShapePropertiesPage::apply_to_all (bool relative)
 {
-  do_apply (false);
+  do_apply (false, relative);
 }
 
 void 
@@ -391,7 +367,9 @@ void
 ShapePropertiesPage::show_props ()
 {
   lay::UserPropertiesForm props_form (this);
-  props_form.show (mp_service->view (), m_selection_ptrs [m_index]->cv_index (), m_prop_id);
+  if (props_form.show (mp_service->view (), m_selection_ptrs [m_index]->cv_index (), m_prop_id)) {
+    emit edited ();
+  }
 }
 
 bool 
@@ -404,13 +382,19 @@ ShapePropertiesPage::readonly ()
 //  PolygonPropertiesPage implementation
 
 PolygonPropertiesPage::PolygonPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
-  : ShapePropertiesPage (service, manager, parent)
+  : ShapePropertiesPage (service, manager, parent), m_in_text_changed (false)
 {
   setupUi (this);
   setup ();
 
   connect (inst_pb, SIGNAL (clicked ()), this, SLOT (show_inst ()));
   connect (prop_pb, SIGNAL (clicked ()), this, SLOT (show_props ()));
+
+  if (! readonly ()) {
+    connect (pointListEdit, SIGNAL (textChanged ()), this, SLOT (text_changed ()));
+  } else {
+    pointListEdit->setReadOnly (true);
+  }
 }
 
 void 
@@ -448,61 +432,87 @@ PolygonPropertiesPage::do_update (const db::Shape &shape, double dbu, const std:
 
   }
 
-  pointListEdit->setText (tl::to_qstring (ptlist));
+  if (! m_in_text_changed) {
+    pointListEdit->blockSignals (true);
+    pointListEdit->setText (tl::to_qstring (ptlist));
+    pointListEdit->blockSignals (false);
+  }
+
   pointCountLabel->setText (tl::to_qstring (tl::sprintf (tl::to_string (QObject::tr ("(%lu points)")), poly.vertices ())));
+}
+
+void
+PolygonPropertiesPage::text_changed ()
+{
+  m_in_text_changed = true;
+  try {
+    emit edited ();
+  } catch (tl::Exception &) {
+    //  ignore exceptions
+  }
+  m_in_text_changed = false;
 }
 
 ChangeApplicator *
 PolygonPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape &shape, double dbu)
 {
-  std::string text (tl::to_string (pointListEdit->toPlainText ()));
-  tl::Extractor ex (text.c_str ());
-
-  db::VCplxTrans t = db::CplxTrans (trans ()).inverted ();
-  bool du = dbu_units ();
-
   db::Polygon poly;
 
-  if (*ex.skip () == '(') {
+  try {
 
-    db::DPolygon dp;
-    ex.read (dp);
+    std::string text (tl::to_string (pointListEdit->toPlainText ()));
+    tl::Extractor ex (text.c_str ());
 
-    poly = db::Polygon (dp.transformed (db::DCplxTrans (t) * db::DCplxTrans (du ? 1.0 : 1.0 / dbu)));
+    db::VCplxTrans t = db::CplxTrans (trans ()).inverted ();
+    bool du = dbu_units ();
 
-  } else {
+    if (*ex.skip () == '(') {
 
-    unsigned int h = 0;
-    while (! ex.at_end ()) {
+      db::DPolygon dp;
+      ex.read (dp);
 
-      std::vector <db::Point> points;
+      poly = db::Polygon (dp.transformed (db::DCplxTrans (t) * db::DCplxTrans (du ? 1.0 : 1.0 / dbu)));
 
-      while (! ex.at_end () && ! ex.test ("/")) {
+    } else {
 
-        double dx = 0.0, dy = 0.0;
-        ex.read (dx);
-        ex.test (",");
-        ex.read (dy);
-        ex.test (";");
+      unsigned int h = 0;
+      while (! ex.at_end ()) {
 
-        points.push_back (point_from_dpoint (db::DPoint (dx, dy), dbu, du, t));
+        std::vector <db::Point> points;
+
+        while (! ex.at_end () && ! ex.test ("/")) {
+
+          double dx = 0.0, dy = 0.0;
+          ex.read (dx);
+          ex.test (",");
+          ex.read (dy);
+          ex.test (";");
+
+          points.push_back (point_from_dpoint (db::DPoint (dx, dy), dbu, du, t));
+
+        }
+
+        if (points.size () < 3) {
+          throw tl::Exception (tl::to_string (QObject::tr ("Polygon must have at least three points")));
+        }
+
+        if (h == 0) {
+          poly.assign_hull (points.begin (), points.end (), false /*not compressed*/);
+        } else {
+          poly.insert_hole (points.begin (), points.end (), false /*not compressed*/);
+        }
+
+        ++h;
 
       }
-
-      if (points.size () < 3) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Polygon must have at least three points")));
-      }
-
-      if (h == 0) {
-        poly.assign_hull (points.begin (), points.end (), false /*not compressed*/);
-      } else {
-        poly.insert_hole (points.begin (), points.end (), false /*not compressed*/);
-      }
-
-      ++h;
 
     }
 
+    indicate_error (pointListEdit, 0);
+
+  } catch (tl::Exception &ex) {
+    indicate_error (pointListEdit, &ex);
+    throw;
   }
 
   db::Polygon org_poly;
@@ -525,15 +535,32 @@ BoxPropertiesPage::BoxPropertiesPage (edt::Service *service, db::Manager *manage
   setup ();
 
   mode_tab->setCurrentIndex (s_coordinateMode ? 0 : 1);
-  connect (mode_tab, SIGNAL (currentChanged (int)), this, SLOT (changed ()));
-  connect (x1_le_1, SIGNAL (editingFinished ()), this, SLOT (changed ()));
-  connect (y1_le_1, SIGNAL (editingFinished ()), this, SLOT (changed ()));
-  connect (x2_le_1, SIGNAL (editingFinished ()), this, SLOT (changed ()));
-  connect (y2_le_1, SIGNAL (editingFinished ()), this, SLOT (changed ()));
-  connect (w_le_2, SIGNAL (editingFinished ()), this, SLOT (changed ()));
-  connect (h_le_2, SIGNAL (editingFinished ()), this, SLOT (changed ()));
-  connect (cx_le_2, SIGNAL (editingFinished ()), this, SLOT (changed ()));
-  connect (cy_le_2, SIGNAL (editingFinished ()), this, SLOT (changed ()));
+
+  if (! readonly ()) {
+
+    connect (mode_tab, SIGNAL (currentChanged (int)), this, SLOT (changed ()));
+    connect (x1_le_1, SIGNAL (editingFinished ()), this, SLOT (changed ()));
+    connect (y1_le_1, SIGNAL (editingFinished ()), this, SLOT (changed ()));
+    connect (x2_le_1, SIGNAL (editingFinished ()), this, SLOT (changed ()));
+    connect (y2_le_1, SIGNAL (editingFinished ()), this, SLOT (changed ()));
+    connect (w_le_2, SIGNAL (editingFinished ()), this, SLOT (changed ()));
+    connect (h_le_2, SIGNAL (editingFinished ()), this, SLOT (changed ()));
+    connect (cx_le_2, SIGNAL (editingFinished ()), this, SLOT (changed ()));
+    connect (cy_le_2, SIGNAL (editingFinished ()), this, SLOT (changed ()));
+
+  } else {
+
+    x1_le_1->setReadOnly (true);
+    y1_le_1->setReadOnly (true);
+    x2_le_1->setReadOnly (true);
+    y2_le_1->setReadOnly (true);
+    w_le_2->setReadOnly (true);
+    h_le_2->setReadOnly (true);
+    cx_le_2->setReadOnly (true);
+    cy_le_2->setReadOnly (true);
+
+  }
+
   connect (inst_pb, SIGNAL (clicked ()), this, SLOT (show_inst ()));
   connect (prop_pb, SIGNAL (clicked ()), this, SLOT (show_props ()));
 }
@@ -576,11 +603,44 @@ BoxPropertiesPage::get_box (int mode) const
 {
   if (mode == 0) {
 
+    bool has_error = false;
     double x1 = 0.0, y1 = 0.0, x2 = 0.0, y2 = 0.0;
-    tl::from_string (tl::to_string (x1_le_1->text ()), x1);
-    tl::from_string (tl::to_string (y1_le_1->text ()), y1);
-    tl::from_string (tl::to_string (x2_le_1->text ()), x2);
-    tl::from_string (tl::to_string (y2_le_1->text ()), y2);
+
+    try {
+      tl::from_string (tl::to_string (x1_le_1->text ()), x1);
+      indicate_error (x1_le_1, 0);
+    } catch (tl::Exception &ex) {
+      indicate_error (x1_le_1, &ex);
+      has_error = true;
+    }
+
+    try {
+      tl::from_string (tl::to_string (y1_le_1->text ()), y1);
+      indicate_error (y1_le_1, 0);
+    } catch (tl::Exception &ex) {
+      indicate_error (y1_le_1, &ex);
+      has_error = true;
+    }
+
+    try {
+      tl::from_string (tl::to_string (x2_le_1->text ()), x2);
+      indicate_error (x2_le_1, 0);
+    } catch (tl::Exception &ex) {
+      indicate_error (x2_le_1, &ex);
+      has_error = true;
+    }
+
+    try {
+      tl::from_string (tl::to_string (y2_le_1->text ()), y2);
+      indicate_error (y2_le_1, 0);
+    } catch (tl::Exception &ex) {
+      indicate_error (y2_le_1, &ex);
+      has_error = true;
+    }
+
+    if (has_error) {
+      throw tl::Exception (tl::to_string (tr ("Invalid values - see highlighted entry boxes")));
+    }
 
     if (m_lr_swapped) {
       std::swap (x1, x2);
@@ -603,11 +663,44 @@ BoxPropertiesPage::get_box (int mode) const
 
   } else {
 
+    bool has_error = false;
     double cx = 0.0, cy = 0.0, w = 0.0, h = 0.0;
-    tl::from_string (tl::to_string (cx_le_2->text ()), cx);
-    tl::from_string (tl::to_string (cy_le_2->text ()), cy);
-    tl::from_string (tl::to_string (w_le_2->text ()), w);
-    tl::from_string (tl::to_string (h_le_2->text ()), h);
+
+    try {
+      tl::from_string (tl::to_string (cx_le_2->text ()), cx);
+      indicate_error (cx_le_2, 0);
+    } catch (tl::Exception &ex) {
+      indicate_error (cx_le_2, &ex);
+      has_error = true;
+    }
+
+    try {
+      tl::from_string (tl::to_string (cy_le_2->text ()), cy);
+      indicate_error (cy_le_2, 0);
+    } catch (tl::Exception &ex) {
+      indicate_error (cy_le_2, &ex);
+      has_error = true;
+    }
+
+    try {
+      tl::from_string (tl::to_string (w_le_2->text ()), w);
+      indicate_error (w_le_2, 0);
+    } catch (tl::Exception &ex) {
+      indicate_error (w_le_2, &ex);
+      has_error = true;
+    }
+
+    try {
+      tl::from_string (tl::to_string (h_le_2->text ()), h);
+      indicate_error (h_le_2, 0);
+    } catch (tl::Exception &ex) {
+      indicate_error (h_le_2, &ex);
+      has_error = true;
+    }
+
+    if (has_error) {
+      throw tl::Exception (tl::to_string (tr ("Invalid values - see highlighted entry boxes")));
+    }
 
     db::VCplxTrans t = db::VCplxTrans (trans ().inverted ());
     bool du = dbu_units ();
@@ -664,6 +757,8 @@ BoxPropertiesPage::changed ()
     set_box (get_box (m_tab_index));
   } catch (...) {
   }
+
+  emit edited ();
 }
 
 // -------------------------------------------------------------------------
@@ -677,6 +772,28 @@ TextPropertiesPage::TextPropertiesPage (edt::Service *service, db::Manager *mana
 
   connect (inst_pb, SIGNAL (clicked ()), this, SLOT (show_inst ()));
   connect (prop_pb, SIGNAL (clicked ()), this, SLOT (show_props ()));
+
+  if (! readonly ()) {
+
+    connect (text_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (x_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (y_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (size_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (orient_cbx, SIGNAL (activated (int)), this, SIGNAL (edited ()));
+    connect (halign_cbx, SIGNAL (activated (int)), this, SIGNAL (edited ()));
+    connect (valign_cbx, SIGNAL (activated (int)), this, SIGNAL (edited ()));
+
+  } else {
+
+    text_le->setReadOnly (true);
+    x_le->setReadOnly (true);
+    y_le->setReadOnly (true);
+    size_le->setReadOnly (true);
+    orient_cbx->setEnabled (false);
+    halign_cbx->setEnabled (false);
+    valign_cbx->setEnabled (false);
+
+  }
 }
 
 void 
@@ -707,12 +824,28 @@ TextPropertiesPage::do_update (const db::Shape &shape, double dbu, const std::st
 ChangeApplicator *
 TextPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape &shape, double dbu)
 {
+  bool has_error = false;
+
   db::VCplxTrans t = db::CplxTrans (trans ()).inverted ();
   bool du = dbu_units ();
 
   double x = 0.0, y = 0.0;
-  tl::from_string (tl::to_string (x_le->text ()), x);
-  tl::from_string (tl::to_string (y_le->text ()), y);
+
+  try {
+    tl::from_string (tl::to_string (x_le->text ()), x);
+    indicate_error (x_le, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (x_le, &ex);
+    has_error = true;
+  }
+
+  try {
+    tl::from_string (tl::to_string (y_le->text ()), y);
+    indicate_error (y_le, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (y_le, &ex);
+    has_error = true;
+  }
 
   db::Vector tp = db::Vector (point_from_dpoint (db::DPoint (x, y), dbu, du, t));
   db::Trans tt (orient_cbx->currentIndex (), tp);
@@ -739,7 +872,13 @@ TextPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape 
 
   db::Coord size = 0;
   if (! size_le->text ().isEmpty ()) {
-    size = coord_from_string (tl::to_string (size_le->text ()).c_str (), dbu, du, t);
+    try {
+      size = coord_from_string (tl::to_string (size_le->text ()).c_str (), dbu, du, t);
+      indicate_error (size_le, 0);
+    } catch (tl::Exception &ex) {
+      indicate_error (size_le, &ex);
+      has_error = true;
+    }
   }
   if (size != org_text.size ()) {
     appl->add (new TextSizeChangeApplicator (size));
@@ -749,6 +888,10 @@ TextPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape 
     appl->add (new TextStringChangeApplicator (str));
   }
 
+  if (has_error) {
+    throw tl::Exception (tl::to_string (tr ("Invalid values - see highlighted entry boxes")));
+  }
+
   return appl.release ();
 }
 
@@ -756,16 +899,22 @@ TextPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape 
 //  PathPropertiesPage implementation
 
 PathPropertiesPage::PathPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
-  : ShapePropertiesPage (service, manager, parent)
+  : ShapePropertiesPage (service, manager, parent), m_in_text_changed (false)
 {
   setupUi (this);
   setup ();
 
   connect (inst_pb, SIGNAL (clicked ()), this, SLOT (show_inst ()));
   connect (prop_pb, SIGNAL (clicked ()), this, SLOT (show_props ()));
+
+  ptlist_le->setReadOnly (true);
+  width_le->setReadOnly (true);
+  start_ext_le->setReadOnly (true);
+  end_ext_le->setReadOnly (true);
+  round_cb->setEnabled (false);
 }
 
-void 
+void
 PathPropertiesPage::do_update (const db::Shape &shape, double dbu, const std::string &lname)
 {
   layer_lbl->setText (tl::to_qstring (lname));
@@ -788,7 +937,12 @@ PathPropertiesPage::do_update (const db::Shape &shape, double dbu, const std::st
     }
     ptlist += coords_to_string (t * *pt, dbu, du);
   }
-  ptlist_le->setText (tl::to_qstring (ptlist));
+
+  if (! m_in_text_changed) {
+    ptlist_le->blockSignals (true);
+    ptlist_le->setText (tl::to_qstring (ptlist));
+    ptlist_le->blockSignals (false);
+  }
 
   width_le->setText (tl::to_qstring (coord_to_string (t.ctrans (path.width ()), dbu, du)));
   start_ext_le->setText (tl::to_qstring (coord_to_string (t.ctrans (path.extensions ().first), dbu, du)));
@@ -797,68 +951,16 @@ PathPropertiesPage::do_update (const db::Shape &shape, double dbu, const std::st
 }
 
 ChangeApplicator *
-PathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape &shape, double dbu)
+PathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape & /*shape*/, double /*dbu*/)
 {
-  db::VCplxTrans t = db::CplxTrans (trans ()).inverted ();
-  bool du = dbu_units ();
-
-  std::string text (tl::to_string (ptlist_le->toPlainText ()));
-  tl::Extractor ex (text.c_str ());
-
-  std::vector <db::Point> points;
-
-  while (! ex.at_end ()) {
-
-    double dx = 0.0, dy = 0.0;
-    ex.read (dx);
-    ex.read (dy);
-
-    points.push_back (point_from_dpoint (db::DPoint (dx, dy), dbu, du, t));
-
-  }
-
-  if (points.size () < 1) {
-    throw tl::Exception (tl::to_string (QObject::tr ("The path must have at least one point")));
-  }
-
-  db::Coord w = coord_from_string (tl::to_string (width_le->text ()).c_str (), dbu, du, t);
-  db::Coord se = coord_from_string (tl::to_string (start_ext_le->text ()).c_str (), dbu, du, t);
-  db::Coord ee = coord_from_string (tl::to_string (end_ext_le->text ()).c_str (), dbu, du, t);
-  bool round = round_cb->isChecked ();
-
-  std::auto_ptr<CombinedChangeApplicator> appl;
-
-  db::Path org_path;
-  shape.path (org_path);
-  std::vector <db::Point> org_points;
-  for (db::Path::iterator p = org_path.begin (); p != org_path.end (); ++p) {
-    org_points.push_back (*p);
-  }
-
-  if (org_points != points) {
-    appl->add (new PathPointsChangeApplicator (points, org_points));
-  }
-  if (w != org_path.width ()) {
-    appl->add (new PathWidthChangeApplicator (w, org_path.width ()));
-  }
-  if (se != org_path.extensions ().first) {
-    appl->add (new PathStartExtensionChangeApplicator (se));
-  }
-  if (ee != org_path.extensions ().second) {
-    appl->add (new PathEndExtensionChangeApplicator (ee));
-  }
-  if (round != org_path.round ()) {
-    appl->add (new PathRoundEndChangeApplicator (round));
-  }
-
-  return appl.release ();
+  return 0;
 }
 
 // -------------------------------------------------------------------------
 //  EditablePathPropertiesPage implementation
 
 EditablePathPropertiesPage::EditablePathPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
-  : ShapePropertiesPage (service, manager, parent)
+  : ShapePropertiesPage (service, manager, parent), m_in_text_changed (false)
 {
   setupUi (this);
   setup ();
@@ -866,6 +968,12 @@ EditablePathPropertiesPage::EditablePathPropertiesPage (edt::Service *service, d
   connect (inst_pb, SIGNAL (clicked ()), this, SLOT (show_inst ()));
   connect (prop_pb, SIGNAL (clicked ()), this, SLOT (show_props ()));
   connect (type_cb, SIGNAL (currentIndexChanged (int)), this, SLOT (type_selected (int)));
+
+  connect (ptlist_le, SIGNAL (textChanged ()), this, SLOT (text_changed ()));
+  connect (width_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+  connect (start_ext_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+  connect (end_ext_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+  connect (type_cb, SIGNAL (activated (int)), this, SIGNAL (edited ()));
 }
 
 static int 
@@ -886,7 +994,19 @@ path_type_choice (const db::Path &path)
   }
 }
 
-void 
+void
+EditablePathPropertiesPage::text_changed ()
+{
+  m_in_text_changed = true;
+  try {
+    emit edited ();
+  } catch (tl::Exception &) {
+    //  ignore exceptions
+  }
+  m_in_text_changed = false;
+}
+
+void
 EditablePathPropertiesPage::do_update (const db::Shape &shape, double dbu, const std::string &lname)
 {
   layer_lbl->setText (tl::to_qstring (lname));
@@ -909,7 +1029,12 @@ EditablePathPropertiesPage::do_update (const db::Shape &shape, double dbu, const
     }
     ptlist += coords_to_string (t * *pt, dbu, du);
   }
-  ptlist_le->setText (tl::to_qstring (ptlist));
+
+  if (! m_in_text_changed) {
+    ptlist_le->blockSignals (true);
+    ptlist_le->setText (tl::to_qstring (ptlist));
+    ptlist_le->blockSignals (false);
+  }
 
   db::Coord w = path.width ();
   db::Coord se = path.extensions ().first;
@@ -921,6 +1046,10 @@ EditablePathPropertiesPage::do_update (const db::Shape &shape, double dbu, const
   end_ext_le->setText (tl::to_qstring (coord_to_string (t.ctrans (ee), dbu, du)));
 
   int type_choice = path_type_choice (path);
+  if (type_cb->currentIndex () == 2) {
+    //  keep "variable" mode, otherwise if's difficult to switch to it
+    type_choice = 2;
+  }
   type_cb->setCurrentIndex (type_choice);
   type_selected (type_choice);
 }
@@ -928,6 +1057,8 @@ EditablePathPropertiesPage::do_update (const db::Shape &shape, double dbu, const
 ChangeApplicator *
 EditablePathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape &shape, double dbu)
 {
+  bool has_error = false;
+
   db::VCplxTrans t = db::CplxTrans (trans ()).inverted ();
   bool du = dbu_units ();
 
@@ -936,21 +1067,37 @@ EditablePathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db
 
   std::vector <db::Point> points;
 
-  while (! ex.at_end ()) {
+  try {
 
-    double dx = 0.0, dy = 0.0;
-    ex.read (dx);
-    ex.read (dy);
+    while (! ex.at_end ()) {
 
-    points.push_back (point_from_dpoint (db::DPoint (dx, dy), dbu, du, t));
+      double dx = 0.0, dy = 0.0;
+      ex.read (dx);
+      ex.read (dy);
 
+      points.push_back (point_from_dpoint (db::DPoint (dx, dy), dbu, du, t));
+
+    }
+
+    if (points.size () < 1) {
+      throw tl::Exception (tl::to_string (QObject::tr ("The path must have at least one point")));
+    }
+
+    indicate_error (ptlist_le, 0);
+
+  } catch (tl::Exception &ex) {
+    indicate_error (ptlist_le, &ex);
+    has_error = true;
   }
 
-  if (points.size () < 1) {
-    throw tl::Exception (tl::to_string (QObject::tr ("The path must have at least one point")));
+  db::Coord w = 0;
+  try {
+    w = coord_from_string (tl::to_string (width_le->text ()).c_str (), dbu, du, t);
+    indicate_error (width_le, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (width_le, &ex);
+    has_error = true;
   }
-
-  db::Coord w = coord_from_string (tl::to_string (width_le->text ()).c_str (), dbu, du, t);
 
   db::Coord se = 0, ee = 0;
   switch (type_cb->currentIndex ()) {
@@ -961,8 +1108,20 @@ EditablePathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db
     se = ee = std::numeric_limits <db::Coord>::min ();  //  force to half width
     break;
   case 2: // variable
-    se = coord_from_string (tl::to_string (start_ext_le->text ()).c_str (), dbu, du, t);
-    ee = coord_from_string (tl::to_string (end_ext_le->text ()).c_str (), dbu, du, t);
+    try {
+      se = coord_from_string (tl::to_string (start_ext_le->text ()).c_str (), dbu, du, t);
+      indicate_error (start_ext_le, 0);
+    } catch (tl::Exception &ex) {
+      indicate_error (start_ext_le, &ex);
+      has_error = true;
+    }
+    try {
+      ee = coord_from_string (tl::to_string (end_ext_le->text ()).c_str (), dbu, du, t);
+      indicate_error (end_ext_le, 0);
+    } catch (tl::Exception &ex) {
+      indicate_error (end_ext_le, &ex);
+      has_error = true;
+    }
     break;
   } 
 
@@ -987,6 +1146,10 @@ EditablePathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db
     appl->add (new PathStartExtensionChangeApplicator (se));
     appl->add (new PathEndExtensionChangeApplicator (ee));
     appl->add (new PathRoundEndChangeApplicator (type_cb->currentIndex () == 3));
+  }
+
+  if (has_error) {
+    throw tl::Exception (tl::to_string (tr ("Invalid values - see highlighted entry boxes")));
   }
 
   return appl.release ();

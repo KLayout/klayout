@@ -198,7 +198,7 @@ public:
    *  If nothing was changed, the objects may be left untouched.
    *  The dialog will start a transaction on the manager object.
    */
-  virtual void apply_to_all () 
+  virtual void apply_to_all (bool /*relative*/)
   {
     //  default implementation is empty.
   }

@@ -787,7 +787,7 @@ coords_to_string (const db::DPoint &dp, double dbu, bool du, const char *sep)
 }
 
 void
-indicate_error (QLineEdit *le, const tl::Exception *ex)
+indicate_error (QWidget *le, const tl::Exception *ex)
 {
   //  by the way, update the foreground color of the cell edit box as well (red, if not valid)
   QPalette pl = le->palette ();

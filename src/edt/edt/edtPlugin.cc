@@ -502,7 +502,7 @@ commit_recent (lay::LayoutView *view)
 }
 
 class PartialPluginDeclaration
-  : public lay::PluginDeclaration
+  : public PluginDeclarationBase
 {
 public:
   PartialPluginDeclaration (const std::string &title, const std::string &mouse_mode)
@@ -514,6 +514,11 @@ public:
   virtual void get_options (std::vector < std::pair<std::string, std::string> > & /*options*/) const
   {
     //  .. nothing yet ..
+  }
+
+  virtual void get_editor_options_pages (std::vector<edt::EditorOptionsPage *> & /*pages*/, lay::LayoutView * /*view*/, lay::Dispatcher * /*root*/) const
+  {
+    //  .. no specific ones ..
   }
 
   virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *root, lay::LayoutView *view) const

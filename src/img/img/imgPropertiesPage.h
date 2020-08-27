@@ -64,7 +64,7 @@ public:
 
 private slots:
   void browse ();
-  void value_return_pressed ();
+  void value_changed ();
   void color_mapping_changed ();
   void brightness_slider_changed (int value);
   void brightness_spinbox_changed (int value);
@@ -83,8 +83,7 @@ private slots:
   void red_to_blue ();
   void blue_to_red ();
   void reverse_color_order ();
-  void min_max_return_pressed ();
-  void preview_checked ();
+  void min_max_value_changed ();
   void reset_pressed ();
   void save_pressed ();
   void define_landmarks_pressed ();
@@ -95,11 +94,12 @@ private:
   img::Service *mp_service;
   img::Object *mp_direct_image;
   bool m_no_signals;
+  bool m_in_color_mapping_signal;
 
   void recompute_histogram ();
   void invalidate ();
   void init ();
-  void preview ();
+  void get_xmin_xmax (double &xmin, double &xmax, bool &has_error_out);
 };
 
 }

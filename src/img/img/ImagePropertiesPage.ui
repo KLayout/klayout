@@ -1059,16 +1059,6 @@ p, li { white-space: pre-wrap; }
           <number>0</number>
          </property>
          <item>
-          <widget class="QCheckBox" name="preview_cbx">
-           <property name="text">
-            <string>Preview (Auto apply)</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
           <spacer>
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -1141,7 +1131,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>g_sb</tabstop>
   <tabstop>b_slider</tabstop>
   <tabstop>b_sb</tabstop>
-  <tabstop>preview_cbx</tabstop>
   <tabstop>reset_pb</tabstop>
   <tabstop>contrast_sb</tabstop>
   <tabstop>gamma_sb</tabstop>

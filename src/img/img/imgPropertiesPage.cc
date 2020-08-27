@@ -36,6 +36,27 @@ const double min_gamma = 0.3;
 const double max_gamma = 3.0;
 
 // -------------------------------------------------------------------------
+
+void
+indicate_error (QWidget *le, const tl::Exception *ex)
+{
+  //  by the way, update the foreground color of the cell edit box as well (red, if not valid)
+  QPalette pl = le->palette ();
+  if (ex) {
+    pl.setColor (QPalette::Active, QPalette::Text, Qt::red);
+    pl.setColor (QPalette::Active, QPalette::Base, QColor (Qt::red).lighter (180));
+    le->setToolTip (tl::to_qstring (ex->msg ()));
+  } else {
+    QWidget *pw = dynamic_cast<QWidget *> (le->parent ());
+    tl_assert (pw != 0);
+    pl.setColor (QPalette::Active, QPalette::Text, pw->palette ().color (QPalette::Text));
+    pl.setColor (QPalette::Active, QPalette::Base, pw->palette ().color (QPalette::Base));
+    le->setToolTip (QString ());
+  }
+  le->setPalette (pl);
+}
+
+// -------------------------------------------------------------------------
 //  PropertiesPage implementation
 
 PropertiesPage::PropertiesPage (img::Service *service, db::Manager *manager, QWidget *parent)
@@ -73,6 +94,7 @@ void
 PropertiesPage::init ()
 {
   m_no_signals = false;
+  m_in_color_mapping_signal = false;
 
   setupUi (this);
 
@@ -108,6 +130,7 @@ PropertiesPage::init ()
   connect (browse_pb, SIGNAL (clicked ()), this, SLOT (browse ()));
   connect (colors, SIGNAL (color_changed (std::pair<QColor, QColor>)), false_color_control, SLOT (set_current_color (std::pair<QColor, QColor>)));
   connect (false_color_control, SIGNAL (selection_changed (std::pair<QColor, QColor>)), colors, SLOT (set_color (std::pair<QColor, QColor>)));
+  connect (false_color_control, SIGNAL (color_mapping_changed ()), this, SLOT (color_mapping_changed ()));
 
   connect (brightness_slider, SIGNAL (valueChanged (int)), this, SLOT (brightness_slider_changed (int)));
   connect (brightness_sb, SIGNAL (valueChanged (int)), this, SLOT (brightness_spinbox_changed (int)));
@@ -122,15 +145,22 @@ PropertiesPage::init ()
   connect (b_slider, SIGNAL (valueChanged (int)), this, SLOT (blue_slider_changed (int)));
   connect (b_sb, SIGNAL (valueChanged (double)), this, SLOT (blue_spinbox_changed (double)));
 
-  connect (false_color_control, SIGNAL (color_mapping_changed ()), this, SLOT (color_mapping_changed ()));
-  connect (false_color_control, SIGNAL (selection_changed ()), this, SLOT (color_mapping_changed ()));
-  connect (from_le, SIGNAL (returnPressed ()), this, SLOT (min_max_return_pressed ()));
-  connect (to_le, SIGNAL (returnPressed ()), this, SLOT (min_max_return_pressed ()));
-  connect (value_le, SIGNAL (returnPressed ()), this, SLOT (value_return_pressed ()));
+  connect (from_le, SIGNAL (editingFinished ()), this, SLOT (min_max_value_changed ()));
+  connect (to_le, SIGNAL (editingFinished ()), this, SLOT (min_max_value_changed ()));
+  connect (value_le, SIGNAL (editingFinished ()), this, SLOT (value_changed ()));
 
+  connect (width_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+  connect (height_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+  connect (x_offset_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+  connect (y_offset_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+  connect (angle_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+  connect (shear_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+  connect (persp_tx_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+  connect (persp_ty_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+
+  connect (mirror_cbx, SIGNAL (clicked ()), this, SIGNAL (edited ()));
   connect (reset_pb, SIGNAL (clicked ()), this, SLOT (reset_pressed ()));
   connect (save_pb, SIGNAL (clicked ()), this, SLOT (save_pressed ()));
-  connect (preview_cbx, SIGNAL (clicked ()), this, SLOT (preview_checked ()));
   connect (define_landmarks_pb, SIGNAL (clicked ()), this, SLOT (define_landmarks_pressed ()));
 }
 
@@ -202,11 +232,42 @@ PropertiesPage::readonly ()
   return false;
 }
 
-void 
-PropertiesPage::min_max_return_pressed ()
+void
+PropertiesPage::get_xmin_xmax (double &xmin, double &xmax, bool &has_error_out)
 {
-BEGIN_PROTECTED
+  bool has_error = false;
 
+  try {
+    tl::from_string (tl::to_string (from_le->text ()), xmin);
+    indicate_error (from_le, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (from_le, &ex);
+    has_error = true;
+  }
+
+  try {
+    tl::from_string (tl::to_string (to_le->text ()), xmax);
+    indicate_error (to_le, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (to_le, &ex);
+    has_error = true;
+  }
+
+  if (! has_error && xmin >= xmax) {
+    tl::Exception ex (tl::to_string (QObject::tr ("Invalid data value range (min. value must be less than max. value)")));
+    indicate_error (from_le, &ex);
+    indicate_error (to_le, &ex);
+    has_error = true;
+  }
+
+  if (has_error) {
+    has_error_out = true;
+  }
+}
+
+void 
+PropertiesPage::min_max_value_changed ()
+{
   value_le->setText (QString ());
   value_le->setEnabled (false);
 
@@ -214,10 +275,11 @@ BEGIN_PROTECTED
   colors->set_single_mode (false);
 
   double xmin, xmax;
-  tl::from_string (tl::to_string (from_le->text ()), xmin);
-  tl::from_string (tl::to_string (to_le->text ()), xmax);
-  if (xmin >= xmax) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid data value range (min. value must be less than max. value)")));
+  bool has_error = false;
+  get_xmin_xmax (xmin, xmax, has_error);
+
+  if (has_error) {
+    return;
   }
 
   if (false_color_control->has_selection () && false_color_control->selected_node () > 0 && false_color_control->selected_node () < int (false_color_control->nodes ().size ()) - 1) {
@@ -236,9 +298,7 @@ BEGIN_PROTECTED
 
   recompute_histogram ();
 
-  preview ();
-
-END_PROTECTED
+  emit edited ();
 }
 
 void
@@ -246,22 +306,20 @@ PropertiesPage::color_mapping_changed ()
 {
   if (! m_no_signals) {
 
+    bool has_error = false;
+
     value_le->setText (QString ());
     value_le->setEnabled (false);
 
     colors->setEnabled (false_color_control->has_selection ());
     colors->set_single_mode (false);
 
-    try {
+    if (false_color_control->has_selection () && false_color_control->selected_node () > 0 && false_color_control->selected_node () < int (false_color_control->nodes ().size ()) - 1) {
 
-      if (false_color_control->has_selection () && false_color_control->selected_node () > 0 && false_color_control->selected_node () < int (false_color_control->nodes ().size ()) - 1) {
+      double xmin, xmax;
+      get_xmin_xmax (xmin, xmax, has_error);
 
-        double xmin, xmax;
-        tl::from_string (tl::to_string (from_le->text ()), xmin);
-        tl::from_string (tl::to_string (to_le->text ()), xmax);
-        if (xmin >= xmax) {
-          throw tl::Exception ("");
-        }
+      if (! has_error) {
 
         double x = false_color_control->nodes () [false_color_control->selected_node ()].first;
         double xx = x * (xmax - xmin) + xmin;
@@ -269,46 +327,57 @@ PropertiesPage::color_mapping_changed ()
         value_le->setText (tl::to_qstring (tl::sprintf ("%.4g", xx)));
         value_le->setEnabled (true);
 
-      } else if (false_color_control->has_selection ()) {
-
-        colors->set_single_mode (true);
-
       }
 
-    } catch (...) { }
+    } else if (false_color_control->has_selection ()) {
 
-    preview ();
+      colors->set_single_mode (true);
+
+    }
+
+    if (! has_error) {
+      m_in_color_mapping_signal = true;
+      emit edited ();
+      m_in_color_mapping_signal = false;
+    }
 
   }
 }
 
 void
-PropertiesPage::value_return_pressed ()
+PropertiesPage::value_changed ()
 {
-BEGIN_PROTECTED
+  double xx = 0;
+  bool has_error = false;
 
   double xmin, xmax;
-  tl::from_string (tl::to_string (from_le->text ()), xmin);
-  tl::from_string (tl::to_string (to_le->text ()), xmax);
-  if (xmin >= xmax) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid data value range (min. value must be less than max. value)")));
-  }
+  get_xmin_xmax (xmin, xmax, has_error);
 
   double x = 0.0;
-  tl::from_string (tl::to_string (value_le->text ()), x);
-
-  double xx = (x - xmin) / (xmax - xmin);
-  if (xx < 0 || xx > 1.0) {
-    throw tl::Exception (tl::to_string (QObject::tr ("The position entered (%g) must be between the minimum (%g) and maximum (%g) value")), x, xmin, xmax);
+  try {
+    tl::from_string (tl::to_string (value_le->text ()), x);
+    indicate_error (value_le, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (value_le, &ex);
+    has_error = true;
   }
 
-  m_no_signals = true;
-  false_color_control->set_current_position (xx);
-  m_no_signals = false;
+  xx = (x - xmin) / (xmax - xmin);
+  if (! has_error && (xx < 0 || xx > 1.0)) {
+    tl::Exception ex (tl::to_string (QObject::tr ("The position entered (%g) must be between the minimum (%g) and maximum (%g) value")), x, xmin, xmax);
+    indicate_error (value_le, &ex);
+    has_error = true;
+  }
 
-  preview ();
+  if (! has_error) {
 
-END_PROTECTED
+    m_no_signals = true;
+    false_color_control->set_current_position (xx);
+    m_no_signals = false;
+
+    emit edited ();
+
+  }
 }
 
 inline double 
@@ -320,6 +389,10 @@ round_to_zero (double x)
 void 
 PropertiesPage::update ()
 {
+  if (m_in_color_mapping_signal) {
+    return;
+  }
+
   m_no_signals = true;
 
   if (mp_service) {
@@ -498,7 +571,7 @@ PropertiesPage::brightness_slider_changed (int value)
 
   m_no_signals = true;
   brightness_sb->setValue (value);
-  preview ();
+  emit edited ();
   m_no_signals = false;
 }
 
@@ -511,7 +584,7 @@ PropertiesPage::brightness_spinbox_changed (int value)
 
   m_no_signals = true;
   brightness_slider->setValue (value);
-  preview ();
+  emit edited ();
   m_no_signals = false;
 }
 
@@ -524,7 +597,7 @@ PropertiesPage::contrast_slider_changed (int value)
 
   m_no_signals = true;
   contrast_sb->setValue (value);
-  preview ();
+  emit edited ();
   m_no_signals = false;
 }
 
@@ -537,7 +610,7 @@ PropertiesPage::contrast_spinbox_changed (int value)
 
   m_no_signals = true;
   contrast_slider->setValue (value);
-  preview ();
+  emit edited ();
   m_no_signals = false;
 }
 
@@ -556,7 +629,7 @@ PropertiesPage::gamma_spinbox_changed (double value)
     gamma_slider->setValue (50 + int (0.5 + (value - 1.0) / (max_gamma - 1.0) * 50.0));
   }
 
-  preview ();
+  emit edited ();
 
   m_no_signals = false;
 }
@@ -578,7 +651,7 @@ PropertiesPage::gamma_slider_changed (int value)
   }
 
   gamma_sb->setValue (gamma);
-  preview ();
+  emit edited ();
 
   m_no_signals = false;
 }
@@ -595,7 +668,7 @@ PropertiesPage::red_slider_changed (int value)
   double gain = value * 0.02;
 
   r_sb->setValue (gain);
-  preview ();
+  emit edited ();
 
   m_no_signals = false;
 }
@@ -610,7 +683,7 @@ PropertiesPage::red_spinbox_changed (double value)
   m_no_signals = true;
 
   r_slider->setValue (int (0.5 + value * 50.0));
-  preview ();
+  emit edited ();
 
   m_no_signals = false;
 }
@@ -627,7 +700,7 @@ PropertiesPage::green_slider_changed (int value)
   double gain = value * 0.02;
 
   g_sb->setValue (gain);
-  preview ();
+  emit edited ();
 
   m_no_signals = false;
 }
@@ -642,7 +715,7 @@ PropertiesPage::green_spinbox_changed (double value)
   m_no_signals = true;
 
   g_slider->setValue (int (0.5 + value * 50.0));
-  preview ();
+  emit edited ();
 
   m_no_signals = false;
 }
@@ -659,7 +732,7 @@ PropertiesPage::blue_slider_changed (int value)
   double gain = value * 0.02;
 
   b_sb->setValue (gain);
-  preview ();
+  emit edited ();
 
   m_no_signals = false;
 }
@@ -674,9 +747,9 @@ PropertiesPage::blue_spinbox_changed (double value)
   m_no_signals = true;
 
   b_slider->setValue (int (0.5 + value * 50.0));
-  preview ();
+  emit edited ();
 
-  m_no_signals = false;
+  m_no_signals = false;  
 }
 
 void  
@@ -686,6 +759,7 @@ PropertiesPage::black_to_white ()
   nodes.push_back (std::make_pair (0.0, std::make_pair (QColor (0, 0, 0), QColor (0, 0, 0))));
   nodes.push_back (std::make_pair (1.0, std::make_pair (QColor (255, 255, 255), QColor (255, 255, 255))));
   false_color_control->set_nodes (nodes);
+  emit edited ();
 }
 
 void  
@@ -695,6 +769,7 @@ PropertiesPage::white_to_black ()
   nodes.push_back (std::make_pair (0.0, std::make_pair (QColor (255, 255, 255), QColor (255, 255, 255))));
   nodes.push_back (std::make_pair (1.0, std::make_pair (QColor (0, 0, 0), QColor (0, 0, 0))));
   false_color_control->set_nodes (nodes);
+  emit edited ();
 }
 
 void  
@@ -704,7 +779,7 @@ PropertiesPage::red_to_blue ()
   nodes.push_back (std::make_pair (0.0, std::make_pair (QColor (255, 0, 0), QColor (255, 0, 0))));
   nodes.push_back (std::make_pair (1.0, std::make_pair (QColor (0, 0, 255), QColor (0, 0, 255))));
   false_color_control->set_nodes (nodes);
-
+  emit edited ();
 }
 
 void  
@@ -714,6 +789,7 @@ PropertiesPage::blue_to_red ()
   nodes.push_back (std::make_pair (0.0, std::make_pair (QColor (0, 0, 255), QColor (0, 0, 255))));
   nodes.push_back (std::make_pair (1.0, std::make_pair (QColor (255, 0, 0), QColor (255, 0, 0))));
   false_color_control->set_nodes (nodes);
+  emit edited ();
 }
 
 void  
@@ -725,11 +801,14 @@ PropertiesPage::reverse_color_order ()
     std::swap (nodes [i].second.first, nodes [nodes.size () - 1 - i].second.second);
   }
   false_color_control->set_nodes (nodes);
+  emit edited ();
 }
 
 void 
 PropertiesPage::apply ()
 {
+  bool has_error = false;
+
   db::Matrix3d matrix = mp_direct_image->matrix ();
 
   //  The observer distance for perspective distortion is the average of the images width and height.
@@ -741,45 +820,89 @@ PropertiesPage::apply ()
   double w = matrix.mag_x (), h = matrix.mag_y (), x = matrix.disp ().x (), y = matrix.disp ().y (), 
          a = matrix.angle (), sa = matrix.shear_angle (), tx = matrix.perspective_tilt_x (z), ty = matrix.perspective_tilt_y (z);
 
-  bool mirror;
-
-  if (width_le->text () != tl::to_qstring (tl::micron_to_string (matrix.mag_x ()))) {
+  try {
     tl::from_string (tl::to_string (width_le->text ()), w);
+    if (w <= 0.0 || h <= 0.0) {
+      throw tl::Exception (tl::to_string (QObject::tr ("Pixel width or height must be positive, non-null values")));
+    }
+    indicate_error (width_le, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (width_le, &ex);
+    has_error = true;
   }
-  if (height_le->text () != tl::to_qstring (tl::micron_to_string (matrix.mag_y ()))) {
+
+  try {
     tl::from_string (tl::to_string (height_le->text ()), h);
+    indicate_error (height_le, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (height_le, &ex);
+    has_error = true;
   }
-  if (x_offset_le->text () != tl::to_qstring (tl::micron_to_string (round_to_zero (matrix.disp ().x ())))) {
+
+  try {
     tl::from_string (tl::to_string (x_offset_le->text ()), x);
+    indicate_error (x_offset_le, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (x_offset_le, &ex);
+    has_error = true;
   }
-  if (y_offset_le->text () != tl::to_qstring (tl::micron_to_string (round_to_zero (matrix.disp ().y ())))) {
+
+  try {
     tl::from_string (tl::to_string (y_offset_le->text ()), y);
+    indicate_error (y_offset_le, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (y_offset_le, &ex);
+    has_error = true;
   }
-  if (angle_le->text () != tl::to_qstring (tl::to_string (round_to_zero (matrix.angle ())))) {
+
+  try {
     tl::from_string (tl::to_string (angle_le->text ()), a);
+    indicate_error (angle_le, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (angle_le, &ex);
+    has_error = true;
   }
-  if (shear_le->text () != tl::to_qstring (tl::to_string (round_to_zero (matrix.shear_angle ())))) {
+
+  try {
     tl::from_string (tl::to_string (shear_le->text ()), sa);
+    if (sa <= -45 || sa >= 45) {
+      throw tl::Exception (tl::to_string (QObject::tr ("The shear angle must be larger than -45 and less than 45 degree")));
+    }
+    indicate_error (shear_le, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (shear_le, &ex);
+    has_error = true;
   }
-  if (persp_tx_le->text () != tl::to_qstring (tl::to_string (round_to_zero (matrix.perspective_tilt_x (z))))) {
+
+  try {
     tl::from_string (tl::to_string (persp_tx_le->text ()), tx);
+    if (tx <= -90 || tx >= 90) {
+      throw tl::Exception (tl::to_string (QObject::tr ("The perspective tilt angles must be larger than -90 and less than 90 degree")));
+    }
+    indicate_error (persp_tx_le, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (persp_tx_le, &ex);
+    has_error = true;
   }
-  if (persp_ty_le->text () != tl::to_qstring (tl::to_string (round_to_zero (matrix.perspective_tilt_y (z))))) {
+
+  try {
     tl::from_string (tl::to_string (persp_ty_le->text ()), ty);
+    if (ty <= -90 || ty >= 90) {
+      throw tl::Exception (tl::to_string (QObject::tr ("The perspective tilt angles must be larger than -90 and less than 90 degree")));
+    }
+    indicate_error (persp_ty_le, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (persp_ty_le, &ex);
+    has_error = true;
   }
 
-  mirror = mirror_cbx->isChecked ();
+  bool mirror = mirror_cbx->isChecked ();
 
-  if (w <= 0.0 || h <= 0.0) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Pixel width or height must be positive, non-null values")));
-  }
+  double xmin, xmax;
+  get_xmin_xmax (xmin, xmax, has_error);
 
-  if (sa <= -45 || sa >= 45) {
-    throw tl::Exception (tl::to_string (QObject::tr ("The shear angle must be larger than -45 and less than 45 degree")));
-  }
-
-  if (tx <= -90 || tx >= 90 || ty <= -90 || ty >= 90) {
-    throw tl::Exception (tl::to_string (QObject::tr ("The perspective tilt angles must be larger than -90 and less than 90 degree")));
+  if (has_error) {
+    throw tl::Exception (tl::to_string (tr ("At least one value is invalid - see highlighted entry fields")));
   }
 
   //  Compute the new observer distance
@@ -789,13 +912,6 @@ PropertiesPage::apply ()
 
   matrix = db::Matrix3d::disp (db::DVector (x, y)) * db::Matrix3d::perspective (tx, ty, z) * db::Matrix3d::rotation (a) * db::Matrix3d::shear (sa) * db::Matrix3d::mag (w, h) * db::Matrix3d::mirror (mirror);
   mp_direct_image->set_matrix (matrix);
-
-  double xmin, xmax;
-  tl::from_string (tl::to_string (from_le->text ()), xmin);
-  tl::from_string (tl::to_string (to_le->text ()), xmax);
-  if (xmin >= xmax) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid data value range (min. value must be less than max. value)")));
-  }
 
   mp_direct_image->set_min_value (xmin);
   mp_direct_image->set_max_value (xmax);
@@ -891,30 +1007,7 @@ PropertiesPage::reset_pressed ()
 
   m_no_signals = false;
 
-  preview ();
-}
-
-void
-PropertiesPage::preview_checked ()
-{
-  preview ();
-}
-
-void
-PropertiesPage::preview ()
-{
-  if (preview_cbx->isChecked ()) {
-
-    BEGIN_PROTECTED_CLEANUP
-
-    apply (); // this is a HACK, because it changes the current object
-
-    END_PROTECTED_CLEANUP
-    {
-      preview_cbx->setChecked (false);
-    }
-
-  }
+  emit edited ();
 }
 
 void
@@ -922,7 +1015,9 @@ PropertiesPage::define_landmarks_pressed ()
 {
   if (mp_direct_image) {
     img::LandmarksDialog dialog (this, *mp_direct_image);
-    dialog.exec ();
+    if (dialog.exec ()) {
+      emit edited ();
+    }
   }
 }
 

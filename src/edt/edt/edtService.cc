@@ -818,6 +818,8 @@ Service::deactivated ()
 
   edit_cancel ();
 
+  remove_editor_options_page (view ());
+
   m_immediate = false;
 }
 

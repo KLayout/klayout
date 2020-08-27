@@ -424,16 +424,26 @@ show_editor_options_page (lay::LayoutView *view)
     (*op)->activate (false);
   }
 
+  remove_editor_options_page (view);
+
+  edt::EditorOptionsPages *pages = new edt::EditorOptionsPages (view->editor_options_frame (), prop_dialog_pages, view);
+  view->editor_options_frame ()->layout ()->addWidget (pages);
+  view->editor_options_frame ()->setFocusProxy (pages);
+}
+
+void
+remove_editor_options_page (lay::LayoutView *view)
+{
+  if (! view->editor_options_frame ()) {
+    return;
+  }
+
   QObjectList children = view->editor_options_frame ()->children ();
   for (QObjectList::iterator c = children.begin (); c != children.end (); ++c) {
     if (dynamic_cast<QWidget *> (*c)) {
       delete *c;
     }
   }
-
-  edt::EditorOptionsPages *pages = new edt::EditorOptionsPages (view->editor_options_frame (), prop_dialog_pages, view);
-  view->editor_options_frame ()->layout ()->addWidget (pages);
-  view->editor_options_frame ()->setFocusProxy (pages);
 }
 
 static

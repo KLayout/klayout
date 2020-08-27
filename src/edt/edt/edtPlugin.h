@@ -48,11 +48,14 @@ namespace edt
   };
 
   /**
-   *  @brief Show the editor options dialog
-   *
-   *  This dialog is a global resource which is managed by the main plugin declaration
+   *  @brief Creates an editor options page and installs it inside the view
    */
   void show_editor_options_page (lay::LayoutView *view);
+
+  /**
+   *  @brief Removes the editor options page from the view
+   */
+  void remove_editor_options_page (lay::LayoutView *view);
 
   /**
    *  @brief Activate or deactivate a certain service

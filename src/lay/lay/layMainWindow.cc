@@ -165,7 +165,7 @@ class ControlWidgetStack
 {
 public:
   ControlWidgetStack (QWidget *parent = 0, const char *name = 0)
-    : QFrame (parent)
+    : QFrame (parent), mp_current_widget (0)
   {
     setObjectName (QString::fromUtf8 (name));
 
@@ -217,6 +217,9 @@ public:
   void removeWidget (size_t index)
   {
     if (index < m_widgets.size ()) {
+      if (mp_current_widget == m_widgets [index]) {
+        mp_current_widget = 0;
+      }
       m_widgets.erase (m_widgets.begin () + index);
     }
     if (m_widgets.size () == 0) {
@@ -224,13 +227,20 @@ public:
     }
   }
 
+  QWidget *currentWidget () const
+  {
+    return mp_current_widget;
+  }
+
   void raiseWidget (size_t index)
   {
+    mp_current_widget = 0;
     bool any_visible = false;
     for (size_t i = 0; i < m_widgets.size (); ++i) {
       if (m_widgets [i]) {
         if (i == index) {
           m_widgets [i]->show ();
+          mp_current_widget = m_widgets [i];
           any_visible = true;
         } else {
           m_widgets [i]->hide ();
@@ -259,6 +269,11 @@ public:
     return mp_bglabel;
   }
 
+  size_t count () const
+  {
+    return m_widgets.size ();
+  }
+
 protected:
   virtual void resizeEvent (QResizeEvent *)
   {
@@ -277,6 +292,7 @@ protected:
   }
 
   std::vector <QWidget *> m_widgets;
+  QWidget *mp_current_widget;
   QLabel *mp_bglabel;
 };
 
@@ -1990,13 +2006,17 @@ MainWindow::select_mode (int m)
       }
     }
 
-    bool editable = false;
+    bool eo_visible = false;
     if (pd_sel) {
-      editable = pd_sel->editable_enabled ();
+      eo_visible = pd_sel->editable_enabled ();
+    }
+    if (eo_visible && (!mp_eo_stack->currentWidget () || !mp_eo_stack->currentWidget ()->findChild<QWidget *> ())) {
+      //
+      eo_visible = false;
     }
 
-    if (editable != m_eo_visible) {
-      m_eo_visible = editable;
+    if (eo_visible != m_eo_visible) {
+      m_eo_visible = eo_visible;
       show_dock_widget (mp_eo_dock_widget, m_eo_visible);
     }
 

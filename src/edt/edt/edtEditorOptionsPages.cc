@@ -153,6 +153,8 @@ EditorOptionsPages::update (edt::EditorOptionsPage *page)
     index = mp_pages->count () - 1;
   }
   mp_pages->setCurrentIndex (index);
+
+  setVisible (mp_pages->count () > 0);
 }
 
 void 

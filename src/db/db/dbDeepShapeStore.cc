@@ -977,7 +977,7 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
 
     //  Add new cells for the variants and (possible) devices which are cells added during the device
     //  extraction process
-    std::vector<std::pair<db::cell_index_type, db::cell_index_type> > new_pairs = cm->second.create_missing_mapping2 (*into_layout, into_cell, *source_layout, source_top, excluded_cells, included_cells);
+    std::vector<std::pair<db::cell_index_type, db::cell_index_type> > new_pairs = cm->second.create_missing_mapping2 (*into_layout, *source_layout, source_top, excluded_cells, included_cells);
 
     //  the variant's originals we are going to delete
     std::set<db::cell_index_type> cells_to_delete;

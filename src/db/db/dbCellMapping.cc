@@ -269,6 +269,17 @@ void CellMapping::clear ()
   m_b2a_mapping.clear ();
 }
 
+std::vector<db::cell_index_type> CellMapping::source_cells () const
+{
+  std::vector<db::cell_index_type> s;
+  s.reserve (m_b2a_mapping.size ());
+  for (iterator m = begin (); m != end (); ++m) {
+    s.push_back (m->first);
+  }
+  return s;
+}
+
+
 void 
 CellMapping::create_single_mapping (const db::Layout & /*layout_a*/, db::cell_index_type cell_index_a, const db::Layout & /*layout_b*/, db::cell_index_type cell_index_b)
 {

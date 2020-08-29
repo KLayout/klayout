@@ -185,21 +185,21 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "This method has been introduced in version 0.26.4."
   ) +
   gsi::method ("produce_cell_outlines", &db::LEFDEFReaderOptions::produce_cell_outlines,
-    "@brief Gets a value indicating whether to produce cell outlines.\n"
+    "@brief Gets a value indicating whether to produce cell outlines (diearea).\n"
     "If set to true, cell outlines will be produced on the layer given by \\cell_outline_layer. "
   ) +
   gsi::method ("produce_cell_outlines=", &db::LEFDEFReaderOptions::set_produce_cell_outlines, gsi::arg ("produce"),
-    "@brief Sets a value indicating whether to produce cell outlines.\n"
+    "@brief Sets a value indicating whether to produce cell outlines (diearea).\n"
     "See \\produce_cell_outlines for details.\n"
   ) +
   gsi::method ("cell_outline_layer", &db::LEFDEFReaderOptions::cell_outline_layer,
-    "@brief Gets the layer on which to produce the cell outline.\n"
+    "@brief Gets the layer on which to produce the cell outline (diearea).\n"
     "This attribute is a string correspondig to the string representation of \\LayerInfo. "
     "This string can be either a layer number, a layer/datatype pair, a name or a combination of both. See \\LayerInfo for details.\n"
     "The setter for this attribute is \\cell_outline_layer=. See also \\produce_cell_outlines."
   ) +
   gsi::method ("cell_outline_layer=", &db::LEFDEFReaderOptions::set_cell_outline_layer, gsi::arg ("spec"),
-    "@brief Sets the layer on which to produce the cell outline.\n"
+    "@brief Sets the layer on which to produce the cell outline (diearea).\n"
     "See \\cell_outline_layer for details.\n"
   ) +
   gsi::method ("produce_placement_blockages", &db::LEFDEFReaderOptions::produce_placement_blockages,

@@ -887,6 +887,10 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
             layer_map [std::make_pair (*l, std::make_pair (Label, (unsigned int) 0))] = db::LayerProperties (layer, datatype, final_name);
           }
 
+        } else if (w1 == "COMP") {
+
+          //  ignore "COMP (ALL) ..."
+
         } else {
 
           //  converts a line like

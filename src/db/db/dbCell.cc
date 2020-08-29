@@ -26,6 +26,9 @@
 #include "dbManager.h"
 #include "dbBox.h"
 #include "dbPCellVariant.h"
+#include "dbLayoutUtils.h"
+#include "dbLayerMapping.h"
+#include "dbCellMapping.h"
 
 #include <limits>
 
@@ -724,6 +727,314 @@ Cell::set_name (const std::string &name)
 {
   tl_assert (layout () != 0);
   layout ()->rename_cell (cell_index (), name.c_str ());
+}
+
+void
+Cell::copy_shapes (const db::Cell &source_cell, const db::LayerMapping &layer_mapping)
+{
+  if (this == &source_cell) {
+    throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same cell")));
+  }
+
+  db::Layout *target_layout = layout ();
+  if (! target_layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
+  }
+  const db::Layout *source_layout = source_cell.layout ();
+  if (! source_layout) {
+    throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
+  }
+
+  if (target_layout != source_layout) {
+    db::PropertyMapper pm (*target_layout, *source_layout);
+    db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
+    for (std::map<unsigned int, unsigned int>::const_iterator lm = layer_mapping.begin (); lm != layer_mapping.end (); ++lm) {
+      shapes (lm->second).insert_transformed (source_cell.shapes (lm->first), trans, pm);
+    }
+  } else {
+    for (std::map<unsigned int, unsigned int>::const_iterator lm = layer_mapping.begin (); lm != layer_mapping.end (); ++lm) {
+      shapes (lm->second).insert (source_cell.shapes (lm->first));
+    }
+  }
+}
+
+void
+Cell::copy_shapes (const db::Cell &source_cell)
+{
+  if (this == &source_cell) {
+    throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same cell")));
+  }
+  db::Layout *target_layout = layout ();
+  if (! target_layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
+  }
+
+  if (target_layout != source_cell.layout ()) {
+    if (! source_cell.layout ()) {
+      throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
+    }
+    db::LayerMapping lm;
+    lm.create_full (*target_layout, *source_cell.layout ());
+    this->copy_shapes (source_cell, lm);
+  } else {
+    for (db::Layout::layer_iterator l = target_layout->begin_layers (); l != target_layout->end_layers (); ++l) {
+      shapes ((*l).first).insert (source_cell.shapes ((*l).first));
+    }
+  }
+}
+
+void
+Cell::copy_instances (const db::Cell &source_cell)
+{
+  if (this == &source_cell) {
+    throw tl::Exception (tl::to_string (tr ("Cannot copy instances within the same cell")));
+  }
+  if (layout () != source_cell.layout ()) {
+    throw tl::Exception (tl::to_string (tr ("Cells do not reside in the same layout")));
+  }
+
+  for (db::Cell::const_iterator i = source_cell.begin (); ! i.at_end (); ++i) {
+    insert (*i);
+  }
+}
+
+std::vector<db::cell_index_type>
+Cell::copy_tree (const db::Cell &source_cell)
+{
+  if (this == &source_cell) {
+    throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same cell")));
+  }
+
+  db::Layout *target_layout = layout ();
+  if (! target_layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
+  }
+  const db::Layout *source_layout = source_cell.layout ();
+  if (! source_layout) {
+    throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
+  }
+
+  db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
+
+  db::CellMapping cm;
+  std::vector <db::cell_index_type> new_cells = cm.create_single_mapping_full (*target_layout, cell_index (), *source_layout, source_cell.cell_index ());
+
+  db::LayerMapping lm;
+  lm.create_full (*target_layout, *source_cell.layout ());
+
+  std::vector <db::cell_index_type> source_cells;
+  source_cells.push_back (source_cell.cell_index ());
+  db::copy_shapes (*target_layout, *source_layout, trans, source_cells, cm.table (), lm.table ());
+
+  return new_cells;
+}
+
+void
+Cell::copy_tree_shapes (const db::Cell &source_cell, const db::CellMapping &cm)
+{
+  if (this == &source_cell) {
+    throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same cell")));
+  }
+
+  db::Layout *target_layout = layout ();
+  if (! target_layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
+  }
+  const db::Layout *source_layout = source_cell.layout ();
+  if (! source_layout) {
+    throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
+  }
+
+  db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
+
+  db::LayerMapping lm;
+  lm.create_full (*target_layout, *source_cell.layout ());
+
+  std::vector <db::cell_index_type> source_cells;
+  source_cells.push_back (source_cell.cell_index ());
+  db::copy_shapes (*target_layout, *source_layout, trans, source_cells, cm.table (), lm.table ());
+}
+
+void
+Cell::copy_tree_shapes (const db::Cell &source_cell, const db::CellMapping &cm, const db::LayerMapping &lm)
+{
+  if (this == &source_cell) {
+    throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same cell")));
+  }
+
+  db::Layout *target_layout = layout ();
+  if (! target_layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
+  }
+  const db::Layout *source_layout = source_cell.layout ();
+  if (! source_layout) {
+    throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
+  }
+
+  db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
+
+  std::vector <db::cell_index_type> source_cells;
+  source_cells.push_back (source_cell.cell_index ());
+  db::copy_shapes (*target_layout, *source_layout, trans, source_cells, cm.table (), lm.table ());
+}
+
+void
+Cell::move_shapes (db::Cell &source_cell, const db::LayerMapping &layer_mapping)
+{
+  if (this == &source_cell) {
+    throw tl::Exception (tl::to_string (tr ("Cannot move shapes within the same cell")));
+  }
+
+  db::Layout *target_layout = layout ();
+  if (! target_layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
+  }
+  db::Layout *source_layout = source_cell.layout ();
+  if (! source_layout) {
+    throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
+  }
+
+  if (target_layout != source_layout) {
+    db::PropertyMapper pm (*target_layout, *source_layout);
+    db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
+    for (std::map<unsigned int, unsigned int>::const_iterator lm = layer_mapping.begin (); lm != layer_mapping.end (); ++lm) {
+      shapes (lm->second).insert_transformed (source_cell.shapes (lm->first), trans, pm);
+      source_cell.shapes (lm->first).clear ();
+    }
+  } else {
+    for (std::map<unsigned int, unsigned int>::const_iterator lm = layer_mapping.begin (); lm != layer_mapping.end (); ++lm) {
+      shapes (lm->second).insert (source_cell.shapes (lm->first));
+      source_cell.shapes (lm->first).clear ();
+    }
+  }
+}
+
+void
+Cell::move_shapes (db::Cell &source_cell)
+{
+  if (this == &source_cell) {
+    throw tl::Exception (tl::to_string (tr ("Cannot move shapes within the same cell")));
+  }
+  db::Layout *target_layout = layout ();
+  if (! target_layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
+  }
+
+  if (target_layout != source_cell.layout ()) {
+    if (! source_cell.layout ()) {
+      throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
+    }
+    db::LayerMapping lm;
+    lm.create_full (*target_layout, *source_cell.layout ());
+    move_shapes (source_cell, lm);
+  } else {
+    for (db::Layout::layer_iterator l = target_layout->begin_layers (); l != target_layout->end_layers (); ++l) {
+      shapes ((*l).first).insert (source_cell.shapes ((*l).first));
+      source_cell.shapes ((*l).first).clear ();
+    }
+  }
+}
+
+void
+Cell::move_instances (db::Cell &source_cell)
+{
+  if (this == &source_cell) {
+    throw tl::Exception (tl::to_string (tr ("Cannot move instances within the same cell")));
+  }
+  if (layout () != source_cell.layout ()) {
+    throw tl::Exception (tl::to_string (tr ("Cells do not reside in the same layout")));
+  }
+
+  for (db::Cell::const_iterator i = source_cell.begin (); ! i.at_end (); ++i) {
+    insert (*i);
+  }
+
+  source_cell.clear_insts ();
+}
+
+std::vector<db::cell_index_type>
+Cell::move_tree (db::Cell &source_cell)
+{
+  if (this == &source_cell) {
+    throw tl::Exception (tl::to_string (tr ("Cannot move shapes within the same cell")));
+  }
+
+  db::Layout *target_layout = layout ();
+  if (! target_layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
+  }
+  db::Layout *source_layout = source_cell.layout ();
+  if (! source_layout) {
+    throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
+  }
+
+  db::PropertyMapper pm (*target_layout, *source_layout);
+  db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
+
+  db::CellMapping cm;
+  std::vector <db::cell_index_type> new_cells = cm.create_single_mapping_full (*target_layout, cell_index (), *source_layout, source_cell.cell_index ());
+
+  db::LayerMapping lm;
+  lm.create_full (*target_layout, *source_cell.layout ());
+
+  std::vector <db::cell_index_type> source_cells;
+  source_cells.push_back (source_cell.cell_index ());
+  db::move_shapes (*target_layout, *source_layout, trans, source_cells, cm.table (), lm.table ());
+
+  source_layout->prune_subcells (source_cell.cell_index ());
+
+  return new_cells;
+}
+
+void
+Cell::move_tree_shapes (db::Cell &source_cell, const db::CellMapping &cm)
+{
+  if (this == &source_cell) {
+    throw tl::Exception (tl::to_string (tr ("Cannot move shapes within the same cell")));
+  }
+
+  db::Layout *target_layout = layout ();
+  if (! target_layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
+  }
+  db::Layout *source_layout = source_cell.layout ();
+  if (! source_layout) {
+    throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
+  }
+
+  db::PropertyMapper pm (*target_layout, *source_layout);
+  db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
+
+  db::LayerMapping lm;
+  lm.create_full (*target_layout, *source_cell.layout ());
+
+  std::vector <db::cell_index_type> source_cells;
+  source_cells.push_back (source_cell.cell_index ());
+  db::move_shapes (*target_layout, *source_layout, trans, source_cells, cm.table (), lm.table ());
+}
+
+void
+Cell::move_tree_shapes (db::Cell &source_cell, const db::CellMapping &cm, const db::LayerMapping &lm)
+{
+  if (this == &source_cell) {
+    throw tl::Exception (tl::to_string (tr ("Cannot move shapes within the same cell")));
+  }
+
+  db::Layout *target_layout = layout ();
+  if (! target_layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
+  }
+  db::Layout *source_layout = source_cell.layout ();
+  if (! source_layout) {
+    throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
+  }
+
+  db::PropertyMapper pm (*target_layout, *source_layout);
+  db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
+
+  std::vector <db::cell_index_type> source_cells;
+  source_cells.push_back (source_cell.cell_index ());
+  db::move_shapes (*target_layout, *source_layout, trans, source_cells, cm.table (), lm.table ());
 }
 
 }

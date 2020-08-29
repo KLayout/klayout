@@ -2143,6 +2143,45 @@ END
 
   end
 
+  def test_21
+
+    # dup cells
+   
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
+
+    b = RBA::Box.new(0, 100, 1000, 1200)
+    c0.shapes(0).insert(b)
+    c1.shapes(0).insert(b)
+    c2.shapes(0).insert(b)
+    c3.shapes(0).insert(b)
+    b = RBA::Box.new(1, 101, 1001, 1201)
+    s = c0.shapes(1).insert(b)
+    s.set_property("p", 17)
+
+    tt = RBA::Trans.new
+    s = c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    s.set_property("p", 18)
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
+
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
+
+    c9 = c0.dup
+
+    assert_equal(c9.name, "c0$1")
+    assert_equal(collect(c9.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
+    assert_equal(collect(c9.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
+
+  end
+
   # Iterating while flatten
   def test_issue200
 

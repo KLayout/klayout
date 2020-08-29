@@ -32,6 +32,7 @@
 #include "dbLEFDEFImporter.h"
 #include "dbLayoutUtils.h"
 #include "dbTechnology.h"
+#include "dbCellMapping.h"
 
 namespace db
 {
@@ -191,6 +192,35 @@ private:
 
       tl::log << tl::to_string (tr ("Reading")) << " " << m_stream.source ();
       importer.read (m_stream, layout, state);
+
+      //  Resolve unresolved COMPONENT cells
+
+      std::map<std::string, db::cell_index_type> foreign_cells = state.foreign_cells ();
+      db::cell_index_type seen = std::numeric_limits<db::cell_index_type>::max ();
+
+      std::vector<db::Layout *> macro_layouts = lefdef_options->macro_layouts ();
+      for (std::vector<db::Layout *>::const_iterator m = macro_layouts.begin (); m != macro_layouts.end (); ++m) {
+
+        std::vector<db::cell_index_type> target_cells, source_cells;
+
+        //  collect the cells to pull in
+        for (std::map<std::string, db::cell_index_type>::iterator f = foreign_cells.begin (); f != foreign_cells.end (); ++f) {
+          if (f->second != seen) {
+            std::pair<bool, db::cell_index_type> cp = (*m)->cell_by_name (f->first.c_str ());
+            if (cp.first) {
+              target_cells.push_back (f->second);
+              source_cells.push_back (cp.second);
+              layout.cell (f->second).set_ghost_cell (false);
+              f->second = seen;
+            }
+          }
+        }
+
+        db::CellMapping cm;
+        cm.create_multi_mapping_full (layout, target_cells, **m, source_cells);
+        layout.copy_tree_shapes (**m, cm);
+
+      }
 
     }
 

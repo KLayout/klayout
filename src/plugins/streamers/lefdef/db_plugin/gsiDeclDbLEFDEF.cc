@@ -775,16 +775,38 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "are three modes available:\n"
     "\n"
     "@ul\n"
-    "  @li 0: propduce LEF geometry unless a FOREIGN cell is specified (default) @/li\n"
+    "  @li 0: produce LEF geometry unless a FOREIGN cell is specified (default) @/li\n"
     "  @li 1: produce LEF geometry always and ignore FOREIGN @/li\n"
-    "  @li 2: produce a placeholder cell always (even if FOREIGN isn't given) @/li\n"
+    "  @li 2: Never produce LEF geometry @/li\n"
     "@/ul\n"
+    "\n"
+    "If substitution layouts are specified with \\macro_layouts, these are used to provide "
+    "macro layouts in case no LEF geometry is taken.\n"
     "\n"
     "This property has been added in version 0.27.\n"
   ) +
   gsi::method ("macro_resolution_mode=", &db::LEFDEFReaderOptions::set_macro_resolution_mode, gsi::arg ("mode"),
     "@brief Sets the macro resolution mode.\n"
     "See \\macro_resolution_mode for details about this property.\n"
+    "\n"
+    "This property has been added in version 0.27.\n"
+  ) +
+  gsi::method ("macro_layouts", &db::LEFDEFReaderOptions::macro_layouts,
+    "@brief Gets the layout objects used for resolving LEF macros in the DEF reader.\n"
+    "The DEF reader can either use LEF geometry or use a separate source of layouts for the "
+    "LEF macros. The \\macro_resolution_mode controls whether to use LEF geometry. If LEF geometry is not "
+    "used, the DEF reader will look up macro cells from the \\macro_layouts and pull cell layouts from there.\n"
+    "\n"
+    "The LEF cells are looked up by name from the macro layouts in the order these are given in this array.\n"
+    "\n"
+    "This property has been added in version 0.27.\n"
+  ) +
+  gsi::method ("macro_layouts=", &db::LEFDEFReaderOptions::set_macro_layouts,
+    "@brief Sets the layout objects used for resolving LEF macros in the DEF reader.\n"
+    "See \\macro_layouts for more details about this property.\n"
+    "\n"
+    "Layout objects specified in the array for this property are not owned by the \\LEFDEFReaderConfiguration object. "
+    "Be sure to keep some other reference to these Layout objects if you are storing away the LEF/DEF reader configuration object.\n"
     "\n"
     "This property has been added in version 0.27.\n"
   ) +

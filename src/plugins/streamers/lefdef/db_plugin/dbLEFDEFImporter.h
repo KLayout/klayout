@@ -791,6 +791,24 @@ public:
     m_macro_resolution_mode = m;
   }
 
+  void set_macro_layouts (const std::vector<db::Layout *> &layouts)
+  {
+    for (std::vector<db::Layout *>::const_iterator l = layouts.begin (); l != layouts.end (); ++l) {
+      m_macro_layouts.push_back (*l);
+    }
+  }
+
+  std::vector<db::Layout *> macro_layouts () const
+  {
+    std::vector<db::Layout *> res;
+    for (tl::weak_collection<db::Layout>::const_iterator m = m_macro_layouts.begin (); m != m_macro_layouts.end (); ++m) {
+      if (m.operator-> ()) {
+        res.push_back (const_cast<db::Layout *> (m.operator-> ()));
+      }
+    }
+    return res;
+  }
+
 private:
   bool m_read_all_layers;
   db::LayerMap m_layer_map;
@@ -847,6 +865,7 @@ private:
   unsigned int m_macro_resolution_mode;
   bool m_read_lef_with_def;
   std::vector<std::string> m_lef_files;
+  tl::weak_collection<db::Layout> m_macro_layouts;
 };
 
 /**
@@ -1088,6 +1107,14 @@ public:
     return mp_tech_comp;
   }
 
+  /**
+   *  @brief Gets a map of foreign cells vs. name
+   */
+  const std::map<std::string, db::cell_index_type> &foreign_cells () const
+  {
+    return m_foreign_cells;
+  }
+
 private:
   /**
    *  @brief A key for the via cache
@@ -1171,9 +1198,11 @@ private:
   std::map<std::string, LEFDEFLayoutGenerator *> m_via_generators;
   std::map<MacroKey, std::pair<db::Cell *, db::Trans> > m_macro_cells;
   std::map<std::string, LEFDEFLayoutGenerator *> m_macro_generators;
+  std::map<std::string, db::cell_index_type> m_foreign_cells;
 
   std::pair <bool, unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
   void map_layer_explicit (const std::string &n, LayerPurpose purpose, const LayerProperties &lp, unsigned int layer, unsigned int mask);
+  db::cell_index_type foreign_cell(Layout &layout, const std::string &name);
 };
 
 /**

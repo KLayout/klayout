@@ -517,6 +517,7 @@ LEFDEFReaderOptions &LEFDEFReaderOptions::operator= (const LEFDEFReaderOptions &
     m_macro_resolution_mode = d.m_macro_resolution_mode;
     m_lef_files = d.m_lef_files;
     m_read_lef_with_def = d.m_read_lef_with_def;
+    set_macro_layouts (d.macro_layouts ());
   }
   return *this;
 }
@@ -1358,6 +1359,20 @@ LEFDEFReaderState::macro_generator (const std::string &mn)
   }
 }
 
+db::cell_index_type
+LEFDEFReaderState::foreign_cell (Layout &layout, const std::string &name)
+{
+  std::map<std::string, db::cell_index_type>::const_iterator c = m_foreign_cells.find (name);
+  if (c != m_foreign_cells.end ()) {
+    return c->second;
+  } else {
+    db::cell_index_type ci = layout.add_cell (name.c_str ());
+    layout.cell (ci).set_ghost_cell (true);
+    m_foreign_cells.insert (std::make_pair (name, ci));
+    return ci;
+  }
+}
+
 std::pair<db::Cell *, db::Trans>
 LEFDEFReaderState::macro_cell (const std::string &mn, Layout &layout, const std::vector<std::string> &maskshift_layers, const std::vector<unsigned int> &masks, const MacroDesc &macro_desc, const LEFDEFNumberOfMasks *nm)
 {
@@ -1386,15 +1401,7 @@ LEFDEFReaderState::macro_cell (const std::string &mn, Layout &layout, const std:
 
   if (! macro_desc.foreign_name.empty ()) {
 
-    db::cell_index_type ci;
-    std::pair<bool, db::cell_index_type> c = layout.cell_by_name (macro_desc.foreign_name.c_str ());
-    if (c.first) {
-      ci = c.second;
-    } else {
-      ci = layout.add_cell (macro_desc.foreign_name.c_str ());
-      layout.cell (ci).set_ghost_cell (true);
-    }
-
+    db::cell_index_type ci = foreign_cell (layout, macro_desc.foreign_name);
     db::Cell *foreign_cell = &layout.cell (ci);
 
     if (macro_desc.foreign_name != mn) {
@@ -1415,15 +1422,7 @@ LEFDEFReaderState::macro_cell (const std::string &mn, Layout &layout, const std:
 
     //  create a ghost cell always
 
-    db::cell_index_type ci;
-    std::pair<bool, db::cell_index_type> c = layout.cell_by_name (mn.c_str ());
-    if (c.first) {
-      ci = c.second;
-    } else {
-      ci = layout.add_cell (mn.c_str ());
-      layout.cell (ci).set_ghost_cell (true);
-    }
-
+    db::cell_index_type ci = foreign_cell (layout, mn);
     cell = &layout.cell (ci);
 
   } else {

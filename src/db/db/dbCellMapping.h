@@ -197,6 +197,11 @@ public:
   }
 
   /**
+   *  @brief Gets the source cells
+   */
+  std::vector<db::cell_index_type> source_cells () const;
+
+  /**
    *  @brief Access to the mapping table
    */
   const std::map <db::cell_index_type, db::cell_index_type> &table () const 

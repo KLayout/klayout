@@ -340,6 +340,26 @@ END_PROTECTED
 // -----------------------------------------------------------------------------------------------
 //  LEFDEF technology components editor
 
+static void
+indicate_error (QWidget *le, const tl::Exception *ex)
+{
+  //  by the way, update the foreground color of the cell edit box as well (red, if not valid)
+  QPalette pl = le->palette ();
+  if (ex) {
+    pl.setColor (QPalette::Active, QPalette::Text, Qt::red);
+    pl.setColor (QPalette::Active, QPalette::Base, QColor (Qt::red).lighter (180));
+    le->setToolTip (tl::to_qstring (ex->msg ()));
+  } else {
+    QWidget *pw = dynamic_cast<QWidget *> (le->parent ());
+    tl_assert (pw != 0);
+    pl.setColor (QPalette::Active, QPalette::Text, pw->palette ().color (QPalette::Text));
+    pl.setColor (QPalette::Active, QPalette::Base, pw->palette ().color (QPalette::Base));
+    le->setToolTip (QString ());
+  }
+  le->setPalette (pl);
+}
+
+
 LEFDEFReaderOptionsEditor::LEFDEFReaderOptionsEditor (QWidget *parent)
   : lay::StreamReaderOptionsPage (parent), mp_tech (0)
 {
@@ -377,6 +397,8 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
     return;
   }
 
+  bool has_error = false;
+
   data->set_read_all_layers (read_all_cbx->isChecked ());
   data->set_layer_map (layer_map->get_layer_map ());
   data->set_produce_net_names (produce_net_names->isChecked ());
@@ -391,33 +413,88 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
   data->set_dbu (dbu_value);
 
   //  parse the net property name (may throw an exception)
-  {
+  try {
     std::string np = tl::to_string (net_prop_name->text ());
     tl::Extractor ex (np.c_str ());
     tl::Variant v;
     ex.read (v);
     ex.expect_end ();
     data->set_net_property_name (v);
+    indicate_error (net_prop_name, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (net_prop_name, &ex);
+    has_error = true;
   }
 
   //  parse the inst property name (may throw an exception)
-  {
+  try {
     std::string np = tl::to_string (inst_prop_name->text ());
     tl::Extractor ex (np.c_str ());
     tl::Variant v;
     ex.read (v);
     ex.expect_end ();
     data->set_inst_property_name (v);
+    indicate_error (inst_prop_name, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (inst_prop_name, &ex);
+    has_error = true;
   }
 
   //  parse the pin property name (may throw an exception)
-  {
+  try {
     std::string np = tl::to_string (pin_prop_name->text ());
     tl::Extractor ex (np.c_str ());
     tl::Variant v;
     ex.read (v);
     ex.expect_end ();
     data->set_pin_property_name (v);
+    indicate_error (pin_prop_name, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (pin_prop_name, &ex);
+    has_error = true;
+  }
+
+  //  check the outline layer spec
+  try {
+    db::LayerProperties lp;
+    std::string s = tl::to_string (outline_layer->text ());
+    tl::Extractor ex (s.c_str ());
+    lp.read (ex);
+    ex.expect_end ();
+    indicate_error (outline_layer, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (outline_layer, &ex);
+    has_error = true;
+  }
+
+  //  check the region layer spec
+  try {
+    db::LayerProperties lp;
+    std::string s = tl::to_string (region_layer->text ());
+    tl::Extractor ex (s.c_str ());
+    lp.read (ex);
+    ex.expect_end ();
+    indicate_error (region_layer, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (region_layer, &ex);
+    has_error = true;
+  }
+
+  //  check the blockage layer spec
+  try {
+    db::LayerProperties lp;
+    std::string s = tl::to_string (placement_blockage_layer->text ());
+    tl::Extractor ex (s.c_str ());
+    lp.read (ex);
+    ex.expect_end ();
+    indicate_error (placement_blockage_layer, 0);
+  } catch (tl::Exception &ex) {
+    indicate_error (placement_blockage_layer, &ex);
+    has_error = true;
+  }
+
+  if (has_error) {
+    throw tl::Exception (tl::to_string (tr ("Some values are not correct - see highlighted entry fields")));
   }
 
   data->set_produce_cell_outlines (produce_outlines->isChecked ());

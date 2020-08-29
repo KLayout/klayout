@@ -1620,7 +1620,7 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "hierarchy already. After having completed the cell mapping, use \\copy_tree_shapes to copy over the shapes from "
     "the source to the target layout.\n"
     "\n"
-    "This method has been added in version 0.27.\n"
+    "This method has been added in version 0.26.8.\n"
   ) +
   gsi::method_ext ("copy_tree_shapes", &copy_tree_shapes3, gsi::arg ("source_layout"), gsi::arg ("cell_mapping"), gsi::arg ("layer_mapping"),
     "@brief Copies the shapes for all given mappings in the \\CellMapping object using the given layer mapping\n"
@@ -1634,7 +1634,7 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "hierarchy already. After having completed the cell mapping, use \\copy_tree_shapes to copy over the shapes from "
     "the source to the target layout.\n"
     "\n"
-    "This method has been added in version 0.27.\n"
+    "This method has been added in version 0.26.8.\n"
   ) +
   gsi::method_ext ("move_tree_shapes", &move_tree_shapes2, gsi::arg ("source_layout"), gsi::arg ("cell_mapping"),
     "@brief Moves the shapes for all given mappings in the \\CellMapping object\n"
@@ -1642,7 +1642,7 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "This method acts like the corresponding \\copy_tree_shapes method, but removes the shapes from the source layout "
     "after they have been copied.\n"
     "\n"
-    "This method has been added in version 0.27.\n"
+    "This method has been added in version 0.26.8.\n"
   ) +
   gsi::method_ext ("move_tree_shapes", &move_tree_shapes3, gsi::arg ("source_layout"), gsi::arg ("cell_mapping"), gsi::arg ("layer_mapping"),
     "@brief Moves the shapes for all given mappings in the \\CellMapping object using the given layer mapping\n"
@@ -1650,7 +1650,7 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "This method acts like the corresponding \\copy_tree_shapes method, but removes the shapes from the source layout "
     "after they have been copied.\n"
     "\n"
-    "This method has been added in version 0.27.\n"
+    "This method has been added in version 0.26.8.\n"
   ) +
   gsi::method_ext ("scale_and_snap", &scale_and_snap1, gsi::arg ("cell"), gsi::arg ("grid"), gsi::arg ("mult"), gsi::arg ("div"),
     "@brief Scales and snaps the layout below a given cell by the given rational factor and snaps to the given grid\n"

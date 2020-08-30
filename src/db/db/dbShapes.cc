@@ -234,6 +234,20 @@ Shapes::swap (Shapes &d)
   m_layers.swap (d.m_layers);
 }
 
+static
+Shapes::shape_type safe_insert_text (Shapes &shapes, const Shapes::shape_type &shape, tl::func_delegate_base <db::properties_id_type> &pm)
+{
+  //  for texts referring to a string repository we go the safe way and
+  //  simply instantiate and re-insert the text:
+  Shapes::shape_type::text_type p;
+  shape.text (p);
+  if (! shape.has_prop_id ()) {
+    return shapes.insert (p);
+  } else {
+    return shapes.insert (db::object_with_properties<Shapes::shape_type::text_type> (p, pm (shape.prop_id ())));
+  }
+}
+
 Shapes::shape_type 
 Shapes::do_insert (const Shapes::shape_type &shape, const Shapes::unit_trans_type & /*t*/, tl::func_delegate_base <db::properties_id_type> &pm)
 {
@@ -352,19 +366,23 @@ Shapes::do_insert (const Shapes::shape_type &shape, const Shapes::unit_trans_typ
   case shape_type::ShortBoxArray:
     return (insert_by_tag (shape_type::short_box_array_type::tag (), shape, pm));
   case shape_type::Text:
-  case shape_type::TextRef:
-  case shape_type::TextPtrArrayMember:
     {
-      //  because texts can refer to a string repository we go the safe way and 
-      //  simply instantiate and re-insert the text:
-      shape_type::text_type p;
-      shape.text (p);
-      if (! shape.has_prop_id ()) {
-        return insert (p);
+      if (shape.text ().string_ref () != 0) {
+        return safe_insert_text (*this, shape, pm);
       } else {
-        return insert (db::object_with_properties<shape_type::text_type> (p, pm (shape.prop_id ())));
+        return (insert_by_tag (shape_type::text_type::tag (), shape, pm));
       }
     }
+  case shape_type::TextRef:
+    {
+      if (shape.text_ref ().obj ().string_ref () != 0) {
+        return safe_insert_text (*this, shape, pm);
+      } else {
+        return (insert_by_tag (shape_type::text_ref_type::tag (), shape, pm));
+      }
+    }
+  case shape_type::TextPtrArrayMember:
+    return safe_insert_text (*this, shape, pm);
   case shape_type::TextPtrArray:
     tl_assert (layout () != 0);  //  cannot translate the array members
     return insert_array_by_tag (shape_type::text_ptr_array_type::tag (), shape, shape_repository (), pm);

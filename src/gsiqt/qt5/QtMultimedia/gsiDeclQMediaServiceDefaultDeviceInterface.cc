@@ -151,8 +151,8 @@ gsi::Class<QMediaServiceDefaultDeviceInterface> &qtdecl_QMediaServiceDefaultDevi
 static gsi::Methods methods_QMediaServiceDefaultDeviceInterface_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMediaServiceDefaultDeviceInterface::QMediaServiceDefaultDeviceInterface()\nThis method creates an object of class QMediaServiceDefaultDeviceInterface.", &_init_ctor_QMediaServiceDefaultDeviceInterface_Adaptor_0, &_call_ctor_QMediaServiceDefaultDeviceInterface_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("defaultDevice", "@hide", true, &_init_cbs_defaultDevice_c2309_0, &_call_cbs_defaultDevice_c2309_0);
-  methods += new qt_gsi::GenericMethod ("defaultDevice", "@brief Virtual method QByteArray QMediaServiceDefaultDeviceInterface::defaultDevice(const QByteArray &service)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_defaultDevice_c2309_0, &_call_cbs_defaultDevice_c2309_0, &_set_callback_cbs_defaultDevice_c2309_0);
+  methods += new qt_gsi::GenericMethod ("defaultDevice", "@brief Virtual method QByteArray QMediaServiceDefaultDeviceInterface::defaultDevice(const QByteArray &service)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_defaultDevice_c2309_0, &_call_cbs_defaultDevice_c2309_0);
+  methods += new qt_gsi::GenericMethod ("defaultDevice", "@hide", true, &_init_cbs_defaultDevice_c2309_0, &_call_cbs_defaultDevice_c2309_0, &_set_callback_cbs_defaultDevice_c2309_0);
   return methods;
 }
 

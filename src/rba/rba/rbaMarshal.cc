@@ -956,7 +956,7 @@ struct test_arg_func<gsi::VectorType>
     if ((atype.is_cptr () || atype.is_ptr ()) && arg == Qnil) {
       //  for pointers to vectors, nil is a valid value
       *ret = true;
-    } if (TYPE (arg) != T_ARRAY) {
+    } else if (TYPE (arg) != T_ARRAY) {
       *ret = false;
     } else {
 

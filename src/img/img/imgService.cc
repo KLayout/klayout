@@ -34,8 +34,10 @@
 #include "laybasicConfig.h"
 #include "layLayoutCanvas.h"
 #include "layProperties.h"
+#include "layTipDialog.h"
 #include "tlExceptions.h"
 #include "imgService.h"
+#include "imgPlugin.h"
 #include "ui_AddNewImageDialog.h"
 
 #include <QApplication>
@@ -247,37 +249,6 @@ struct SortImagePtrByZOrder
   }
 };
 
-static const db::DUserObject *find_image (lay::LayoutView *view, const db::DPoint &p, const db::DBox &search_box, double l, double &dmin, const std::map<img::Service::obj_iterator, unsigned int> *exclude = 0)
-{
-  std::vector <const db::DUserObject *> images;
-
-  //  get valid images and sort by reverse z order (top one first)
-  lay::AnnotationShapes::touching_iterator r = view->annotation_shapes ().begin_touching (search_box);
-  while (! r.at_end ()) {
-    const img::Object *image = dynamic_cast<const img::Object *> ((*r).ptr ());
-    if (image && image->is_visible () && (! exclude || exclude->find (view->annotation_shapes ().iterator_from_pointer (&*r)) == exclude->end ())) {
-      images.push_back (&*r);
-    }
-    ++r;
-  }
-
-  std::stable_sort (images.begin (), images.end (), SortImagePtrByZOrder ());
-
-  //  look for the "closest" image to the search box
-  dmin = std::numeric_limits <double>::max ();
-  const db::DUserObject *found = 0;
-
-  for (std::vector <const db::DUserObject *>::const_iterator robj = images.begin (); robj != images.end (); ++robj) {
-    double d = std::numeric_limits <double>::max ();
-    if (is_selected (*dynamic_cast<const img::Object *> ((*robj)->ptr ()), p, view->box (), l, d)) {
-      found = *robj;
-      dmin = d;
-    }
-  }
-
-  return found;
-}
-
 // -------------------------------------------------------------
 
 View::View (img::Service *service, obj_iterator image_ref, img::View::Mode mode)
@@ -440,7 +411,8 @@ Service::Service (db::Manager *manager, lay::LayoutView *view)
     mp_transient_view (0),
     m_move_mode (Service::move_none),
     m_moved_landmark (0),
-    m_keep_selection_for_landmark (false)
+    m_keep_selection_for_landmark (false),
+    m_images_visible (true)
 { 
   // place images behind the grid
   z_order (-1);
@@ -465,10 +437,29 @@ Service::annotations_changed ()
   images_changed_event ();
 }
 
-bool 
-Service::configure (const std::string & /*name*/, const std::string & /*value*/)
+void
+Service::show_images (bool f)
 {
-  return false;
+  if (m_images_visible != f) {
+    m_images_visible = f;
+    view ()->redraw ();
+  }
+}
+
+bool 
+Service::configure (const std::string &name, const std::string &value)
+{
+  if (name == cfg_images_visible) {
+
+    bool v = true;
+    tl::from_string (value, v);
+    show_images (v);
+
+    return true;
+
+  } else {
+    return false;
+  }
 }
 
 void 
@@ -649,7 +640,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
     m_p1 = p;
     double dmin = std::numeric_limits <double>::max ();
 
-    const db::DUserObject *robj = find_image (mp_view, p, search_dbox, l, dmin);
+    const db::DUserObject *robj = find_image (p, search_dbox, l, dmin);
     if (robj) {
 
       const img::Object *iobj = dynamic_cast<const img::Object *> (robj->ptr ());
@@ -919,6 +910,42 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
   m_move_mode = move_none;
 }
 
+const db::DUserObject *
+Service::find_image (const db::DPoint &p, const db::DBox &search_box, double l, double &dmin, const std::map<img::Service::obj_iterator, unsigned int> *exclude)
+{
+  if (! m_images_visible) {
+    return 0;
+  }
+
+  std::vector <const db::DUserObject *> images;
+
+  //  get valid images and sort by reverse z order (top one first)
+  lay::AnnotationShapes::touching_iterator r = mp_view->annotation_shapes ().begin_touching (search_box);
+  while (! r.at_end ()) {
+    const img::Object *image = dynamic_cast<const img::Object *> ((*r).ptr ());
+    if (image && image->is_visible () && (! exclude || exclude->find (mp_view->annotation_shapes ().iterator_from_pointer (&*r)) == exclude->end ())) {
+      images.push_back (&*r);
+    }
+    ++r;
+  }
+
+  std::stable_sort (images.begin (), images.end (), SortImagePtrByZOrder ());
+
+  //  look for the "closest" image to the search box
+  dmin = std::numeric_limits <double>::max ();
+  const db::DUserObject *found = 0;
+
+  for (std::vector <const db::DUserObject *>::const_iterator robj = images.begin (); robj != images.end (); ++robj) {
+    double d = std::numeric_limits <double>::max ();
+    if (is_selected (*dynamic_cast<const img::Object *> ((*robj)->ptr ()), p, mp_view->box (), l, d)) {
+      found = *robj;
+      dmin = d;
+    }
+  }
+
+  return found;
+}
+
 void
 Service::selection_to_view (img::View::Mode mode)
 {
@@ -1134,7 +1161,7 @@ Service::click_proximity (const db::DPoint &pos, lay::Editable::SelectionMode mo
 
   //  point selection: look for the "closest" images
   double dmin = std::numeric_limits <double>::max ();
-  const db::DUserObject *robj = find_image (mp_view, pos, search_dbox, l, dmin, exclude);
+  const db::DUserObject *robj = find_image (pos, search_dbox, l, dmin, exclude);
 
   //  return the proximity value
   if (robj) {
@@ -1157,7 +1184,7 @@ Service::transient_select (const db::DPoint &pos)
 
   //  point selection: look for the "closest" image
   double dmin = std::numeric_limits <double>::max ();
-  const db::DUserObject *robj = find_image (mp_view, pos, search_dbox, l, dmin, &m_previous_selection);
+  const db::DUserObject *robj = find_image (pos, search_dbox, l, dmin, &m_previous_selection);
 
   //  create the transient marker for the object found 
   if (robj) {
@@ -1200,6 +1227,10 @@ Service::clear_transient_selection ()
 bool
 Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
 {
+  if (! m_images_visible) {
+    return false;
+  }
+
   bool needs_update = false;
   bool any_selected = false;
 
@@ -1274,7 +1305,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
 
       //  point selection: look for the "closest" image
       double dmin = std::numeric_limits <double>::max ();
-      const db::DUserObject *robj = find_image (mp_view, box.p1 (), search_dbox, l, dmin, exclude);
+      const db::DUserObject *robj = find_image (box.p1 (), search_dbox, l, dmin, exclude);
 
       //  select the one that was found
       if (robj) {
@@ -1381,6 +1412,10 @@ Service::change_image_by_id (size_t id, const img::Object &to)
 void
 Service::render_bg (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
 {
+  if (! m_images_visible) {
+    return;
+  }
+
   std::vector <const img::Object *> images;
 
   lay::AnnotationShapes::touching_iterator user_object = mp_view->annotation_shapes ().begin_touching (vp.box ());
@@ -1409,11 +1444,29 @@ void
 Service::menu_activated (const std::string &symbol)
 {
   if (symbol == "img::clear_all_images") {
+
     manager ()->transaction (tl::to_string (QObject::tr ("Clear all images"))); 
     clear_images ();
     manager ()->commit ();
+
   } else if (symbol == "img::add_image") {
+
+    if (! images_visible ()) {
+      lay::TipDialog td (QApplication::activeWindow (),
+                    tl::to_string (QObject::tr ("Images are not visible. If you add an image you will not see it.\n\n"
+                                                "Choose 'View/Show Images' to make images visible.")),
+                    "add-image-while-not-visible",
+                    lay::TipDialog::okcancel_buttons);
+      lay::TipDialog::button_type button = lay::TipDialog::null_button;
+      td.exec_dialog (button);
+      if (button == lay::TipDialog::cancel_button) {
+        //  Don't bother the user with more dialogs.
+        return;
+      }
+    }
+
     add_image ();
+
   } else if (symbol == "img::bring_to_back") {
     bring_to_back ();
   } else if (symbol == "img::bring_to_front") {

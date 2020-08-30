@@ -29,6 +29,7 @@
 #include "dbPolygonTools.h"
 #include "dbBoxScanner.h"
 #include "dbDeepRegion.h"
+#include "dbNetShape.h"
 #include "tlProgress.h"
 #include "tlLog.h"
 #include "tlTimer.h"
@@ -43,9 +44,9 @@ namespace db
 
 // ------------------------------------------------------------------------------
 
-template <class Container, class Shape, class Trans> void insert_transformed (db::Layout &layout, Container &shapes, const Shape &s, const Trans &t);
+template <class Shape, class Trans> void insert_transformed (db::Layout &layout, db::Shapes &shapes, const Shape &s, const Trans &t);
 
-template <class Container, class Trans> void insert_transformed (db::Layout &layout, Container &shapes, const db::PolygonRef &s, const Trans &t)
+template <class Trans> void insert_transformed (db::Layout &layout, db::Shapes &shapes, const db::PolygonRef &s, const Trans &t)
 {
   db::Polygon poly = s.obj ();
   poly.transform (s.trans ());
@@ -55,7 +56,32 @@ template <class Container, class Trans> void insert_transformed (db::Layout &lay
   shapes.insert (db::PolygonRef (poly, layout.shape_repository ()));
 }
 
-template <class Container, class Trans> void insert_transformed (db::Layout & /*layout*/, Container &shapes, const db::Edge &s, const Trans &t)
+template <class Trans> void insert_transformed (db::Layout &layout, db::Shapes &shapes, const db::NetShape &s, const Trans &t)
+{
+  if (s.type () == db::NetShape::Polygon) {
+
+    db::PolygonRef pr = s.polygon_ref ();
+    db::Polygon poly = pr.obj ();
+    poly.transform (pr.trans ());
+    if (! t.is_unity ()) {
+      poly.transform (t);
+    }
+    shapes.insert (db::PolygonRef (poly, layout.shape_repository ()));
+
+  } else if (s.type () == db::NetShape::Text) {
+
+    db::TextRef tr = s.text_ref ();
+    db::Text text = tr.obj ();
+    text.transform (tr.trans ());
+    if (! t.is_unity ()) {
+      text.transform (t);
+    }
+    shapes.insert (db::TextRef (text, layout.shape_repository ()));
+
+  }
+}
+
+template <class Trans> void insert_transformed (db::Layout & /*layout*/, db::Shapes &shapes, const db::Edge &s, const Trans &t)
 {
   shapes.insert (s.transformed (t));
 }
@@ -239,6 +265,20 @@ interaction_test (const db::PolygonRef &a, const db::PolygonRef &b, const db::un
 
 template <class Trans>
 static bool
+interaction_test (const db::NetShape &a, const db::NetShape &b, const Trans &trans, db::Connectivity::edge_connectivity_type)
+{
+  return a.interacts_with_transformed (b, trans);
+}
+
+template <class C>
+static bool
+interaction_test (const db::NetShape &a, const db::NetShape &b, const db::unit_trans<C> &, db::Connectivity::edge_connectivity_type)
+{
+  return a.interacts_with (b);
+}
+
+template <class Trans>
+static bool
 interaction_test (const db::Edge &a, const db::Edge &b, const Trans &trans, db::Connectivity::edge_connectivity_type ec)
 {
   db::Edge bt = b.transformed (trans);
@@ -272,6 +312,8 @@ bool Connectivity::interacts (const T &a, unsigned int la, const T &b, unsigned 
 }
 
 //  explicit instantiations
+template DB_PUBLIC bool Connectivity::interacts<db::NetShape> (const db::NetShape &a, unsigned int la, const db::NetShape &b, unsigned int lb, const db::UnitTrans &trans) const;
+template DB_PUBLIC bool Connectivity::interacts<db::NetShape> (const db::NetShape &a, unsigned int la, const db::NetShape &b, unsigned int lb, const db::ICplxTrans &trans) const;
 template DB_PUBLIC bool Connectivity::interacts<db::PolygonRef> (const db::PolygonRef &a, unsigned int la, const db::PolygonRef &b, unsigned int lb, const db::UnitTrans &trans) const;
 template DB_PUBLIC bool Connectivity::interacts<db::PolygonRef> (const db::PolygonRef &a, unsigned int la, const db::PolygonRef &b, unsigned int lb, const db::ICplxTrans &trans) const;
 template DB_PUBLIC bool Connectivity::interacts<db::Edge> (const db::Edge &a, unsigned int la, const db::Edge &b, unsigned int lb, const db::UnitTrans &trans) const;
@@ -630,8 +672,10 @@ size_t local_cluster<T>::split (double max_area_ratio, Iter &output) const
 }
 
 //  explicit instantiations
+template class DB_PUBLIC local_cluster<db::NetShape>;
 template class DB_PUBLIC local_cluster<db::PolygonRef>;
 template class DB_PUBLIC local_cluster<db::Edge>;
+template DB_PUBLIC size_t local_cluster<db::NetShape>::split<std::back_insert_iterator<std::list<local_cluster<db::NetShape> > > > (double, std::back_insert_iterator<std::list<local_cluster<db::NetShape> > > &) const;
 template DB_PUBLIC size_t local_cluster<db::PolygonRef>::split<std::back_insert_iterator<std::list<local_cluster<db::PolygonRef> > > > (double, std::back_insert_iterator<std::list<local_cluster<db::PolygonRef> > > &) const;
 template DB_PUBLIC size_t local_cluster<db::Edge>::split<std::back_insert_iterator<std::list<local_cluster<db::Edge> > > > (double, std::back_insert_iterator<std::list<local_cluster<db::Edge> > > &) const;
 
@@ -747,10 +791,10 @@ namespace
 
 template <class T, class BoxTree>
 struct cluster_building_receiver
-  : public db::box_scanner_receiver<T, std::pair<unsigned int, unsigned int> >
+  : public db::box_scanner_receiver<T, std::pair<unsigned int, size_t> >
 {
   typedef typename local_cluster<T>::id_type id_type;
-  typedef std::pair<const T *, std::pair<unsigned int, unsigned int> > shape_value;
+  typedef std::pair<const T *, std::pair<unsigned int, size_t> > shape_value;
   typedef std::vector<shape_value> shape_vector;
   typedef std::set<size_t> global_nets;
   typedef std::pair<shape_vector, global_nets> cluster_value;
@@ -778,7 +822,7 @@ struct cluster_building_receiver
     }
   }
 
-  void add (const T *s1, std::pair<unsigned int, unsigned int> p1, const T *s2, std::pair<unsigned int, unsigned int> p2)
+  void add (const T *s1, std::pair<unsigned int, size_t> p1, const T *s2, std::pair<unsigned int, size_t> p2)
   {
     if (! mp_conn->interacts (*s1, p1.first, *s2, p2.first)) {
       return;
@@ -824,7 +868,7 @@ struct cluster_building_receiver
     }
   }
 
-  void finish (const T *s, std::pair<unsigned int, unsigned> p)
+  void finish (const T *s, std::pair<unsigned int, size_t> p)
   {
     //  if the shape has not been handled yet, insert a single cluster with only this shape
     typename std::map<const T *, typename std::list<cluster_value>::iterator>::iterator ic = m_shape_to_clusters.find (s);
@@ -886,22 +930,108 @@ private:
   }
 };
 
+template <class T>
+struct addressable_shape_delivery
+{
+  const T *operator () (const db::Shape &shape)
+  {
+    typename T::tag object_tag;
+    return shape.basic_ptr (object_tag);
+  }
+};
+
+template <>
+struct addressable_shape_delivery<db::NetShape>
+{
+  const NetShape *operator () (const db::Shape &shape)
+  {
+    if (shape.type () == db::Shape::TextRef) {
+      m_heap.push_back (db::NetShape (shape.text_ref ()));
+      return &m_heap.back ();
+    } else if (shape.type () == db::Shape::PolygonRef) {
+      m_heap.push_back (db::NetShape (shape.polygon_ref ()));
+      return &m_heap.back ();
+    } else {
+      tl_assert (false);
+    }
+  }
+
+private:
+  std::list<NetShape> m_heap;
+};
+
+template <class T>
+struct attr_accessor
+{
+  size_t operator() (const db::Shape &shape) const
+  {
+    return shape.prop_id ();
+  }
+};
+
+template <>
+struct attr_accessor<db::NetShape>
+{
+  size_t operator() (const db::Shape &shape) const
+  {
+    //  NOTE: the attribute is
+    //   * odd: a StringRef pointer's value
+    //   * even: a Property ID times 2
+    if (shape.type () == db::Shape::TextRef) {
+      return db::text_ref_to_attr (&shape.text_ref ().obj ());
+    } else {
+      return db::prop_id_to_attr (shape.prop_id ());
+    }
+  }
+};
+
+template <class T> struct get_shape_flags { };
+
+template <>
+struct get_shape_flags<db::Edge>
+{
+  db::ShapeIterator::flags_type operator() () const
+  {
+    return db::ShapeIterator::Edges;
+  }
+};
+
+template <>
+struct get_shape_flags<db::PolygonRef>
+{
+  db::ShapeIterator::flags_type operator() () const
+  {
+    return db::ShapeIterator::Polygons;
+  }
+};
+
+template <>
+struct get_shape_flags<db::NetShape>
+{
+  db::ShapeIterator::flags_type operator() () const
+  {
+    return db::ShapeIterator::flags_type (db::ShapeIterator::Polygons | db::ShapeIterator::Texts);
+  }
+};
+
 }
 
 template <class T>
 void
-local_clusters<T>::build_clusters (const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence, bool report_progress)
+local_clusters<T>::build_clusters (const db::Cell &cell, const db::Connectivity &conn, const tl::equivalence_clusters<size_t> *attr_equivalence, bool report_progress)
 {
   static std::string desc = tl::to_string (tr ("Building local clusters"));
 
-  db::box_scanner<T, std::pair<unsigned int, unsigned int> > bs (report_progress, desc);
-  typename T::tag object_tag;
+  db::box_scanner<T, std::pair<unsigned int, size_t> > bs (report_progress, desc);
   db::box_convert<T> bc;
+  addressable_shape_delivery<T> heap;
+  attr_accessor<T> attr;
+  db::ShapeIterator::flags_type shape_flags = get_shape_flags<T> () ();
 
   for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
     const db::Shapes &shapes = cell.shapes (*l);
     for (db::Shapes::shape_iterator s = shapes.begin (shape_flags); ! s.at_end (); ++s) {
-      bs.insert (s->basic_ptr (object_tag), std::make_pair (*l, (unsigned int) s->prop_id ()));
+      bs.insert (heap (*s), std::make_pair (*l, attr (*s)));
     }
   }
 
@@ -916,9 +1046,9 @@ local_clusters<T>::build_clusters (const db::Cell &cell, db::ShapeIterator::flag
 
 template <class T>
 void
-local_clusters<T>::apply_attr_equivalences (const tl::equivalence_clusters<unsigned int> &attr_equivalence)
+local_clusters<T>::apply_attr_equivalences (const tl::equivalence_clusters<size_t> &attr_equivalence)
 {
-  tl::equivalence_clusters<unsigned int> eq;
+  tl::equivalence_clusters<size_t> eq;
 
   //  collect all local attributes (the ones which are present in attr_equivalence) into "eq"
   //  and form equivalences for multi-attribute clusters.
@@ -939,18 +1069,18 @@ local_clusters<T>::apply_attr_equivalences (const tl::equivalence_clusters<unsig
 
   //  identify the layout clusters joined into one attribute cluster and join them
 
-  std::map<tl::equivalence_clusters<unsigned int>::cluster_id_type, std::set<size_t> > c2c;
+  std::map<tl::equivalence_clusters<size_t>::cluster_id_type, std::set<size_t> > c2c;
 
   for (const_iterator c = begin (); c != end (); ++c) {
     for (typename local_cluster<T>::attr_iterator a = c->begin_attr (); a != c->end_attr (); ++a) {
-      tl::equivalence_clusters<unsigned int>::cluster_id_type cl = attr_equivalence.cluster_id (*a);
+      tl::equivalence_clusters<size_t>::cluster_id_type cl = attr_equivalence.cluster_id (*a);
       if (cl > 0) {
         c2c [cl].insert (c->id ());
       }
     }
   }
 
-  for (std::map<tl::equivalence_clusters<unsigned int>::cluster_id_type, std::set<size_t> >::const_iterator c = c2c.begin (); c != c2c.end (); ++c) {
+  for (std::map<tl::equivalence_clusters<size_t>::cluster_id_type, std::set<size_t> >::const_iterator c = c2c.begin (); c != c2c.end (); ++c) {
     if (c->second.size () > 1) {
       std::set<size_t>::const_iterator cl0 = c->second.begin ();
       std::set<size_t>::const_iterator cl = cl0;
@@ -962,6 +1092,7 @@ local_clusters<T>::apply_attr_equivalences (const tl::equivalence_clusters<unsig
 }
 
 //  explicit instantiations
+template class DB_PUBLIC local_clusters<db::NetShape>;
 template class DB_PUBLIC local_clusters<db::PolygonRef>;
 template class DB_PUBLIC local_clusters<db::Edge>;
 
@@ -984,6 +1115,7 @@ connected_clusters_iterator<T>::connected_clusters_iterator (const connected_clu
 }
 
 //  explicit instantiations
+template class DB_PUBLIC connected_clusters_iterator<db::NetShape>;
 template class DB_PUBLIC connected_clusters_iterator<db::PolygonRef>;
 template class DB_PUBLIC connected_clusters_iterator<db::Edge>;
 
@@ -1053,6 +1185,7 @@ connected_clusters<T>::find_cluster_with_connection (const ClusterInstance &inst
 }
 
 //  explicit instantiations
+template class DB_PUBLIC connected_clusters<db::NetShape>;
 template class DB_PUBLIC connected_clusters<db::PolygonRef>;
 template class DB_PUBLIC connected_clusters<db::Edge>;
 
@@ -1133,11 +1266,11 @@ void hier_clusters<T>::clear ()
 
 template <class T>
 void
-hier_clusters<T>::build (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const std::map<db::cell_index_type, tl::equivalence_clusters<unsigned int> > *attr_equivalence, const std::set<db::cell_index_type> *breakout_cells)
+hier_clusters<T>::build (const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const std::map<db::cell_index_type, tl::equivalence_clusters<size_t> > *attr_equivalence, const std::set<db::cell_index_type> *breakout_cells)
 {
   clear ();
   cell_clusters_box_converter<T> cbc (layout, *this);
-  do_build (cbc, layout, cell, shape_flags, conn, attr_equivalence, breakout_cells);
+  do_build (cbc, layout, cell, conn, attr_equivalence, breakout_cells);
 }
 
 namespace
@@ -1273,8 +1406,8 @@ private:
   struct InteractionKeyForClustersType
     : public InstanceToInstanceInteraction
   {
-    InteractionKeyForClustersType (db::cell_index_type _ci1, db::cell_index_type _ci2, const db::ICplxTrans &_t21, const box_type &_box)
-      : InstanceToInstanceInteraction (_ci1, 0, _ci2, 0, _t21), box (_box)
+    InteractionKeyForClustersType (db::cell_index_type _ci1, db::cell_index_type _ci2, const db::ICplxTrans &_t1, const db::ICplxTrans &_t21, const box_type &_box)
+      : InstanceToInstanceInteraction (_ci1, 0, _ci2, 0, _t1, _t21), box (_box)
     { }
 
     bool operator== (const InteractionKeyForClustersType &other) const
@@ -1349,18 +1482,22 @@ private:
 
     InstanceToInstanceInteraction ii_key;
     db::ICplxTrans i1t, i2t;
+    bool fill_cache = false;
 
-    {
+    //  Cache is only used for single instances, non-iterated, simple or regular arrays.
+    if ((! i1element.at_end () || i1.size () == 1 || ! i1.is_iterated_array ()) &&
+        (! i2element.at_end () || i2.size () == 1 || ! i2.is_iterated_array ())) {
+
       i1t = i1element.at_end () ? i1.complex_trans () : i1.complex_trans (*i1element);
       db::ICplxTrans tt1 = t1 * i1t;
 
       i2t = i2element.at_end () ? i2.complex_trans () : i2.complex_trans (*i2element);
       db::ICplxTrans tt2 = t2 * i2t;
 
-      db::ICplxTrans tt21 = tt1.inverted () * tt2;
+      db::ICplxTrans cache_norm = tt1.inverted ();
       ii_key = InstanceToInstanceInteraction (i1.cell_index (), (! i1element.at_end () || i1.size () == 1) ? 0 : i1.cell_inst ().delegate (),
                                               i2.cell_index (), (! i2element.at_end () || i2.size () == 1) ? 0 : i2.cell_inst ().delegate (),
-                                              tt21);
+                                              cache_norm, cache_norm * tt2);
 
       instance_interaction_cache_type::iterator ii = mp_instance_interaction_cache->find (ii_key);
       if (ii != mp_instance_interaction_cache->end ()) {
@@ -1378,6 +1515,9 @@ private:
         return;
 
       }
+
+      fill_cache = true;
+
     }
 
     //  array interactions
@@ -1478,15 +1618,19 @@ private:
     //  return the list of unique interactions
     interacting_clusters.insert (interacting_clusters.end (), sorted_interactions.begin (), sorted_interactions.end ());
 
-    //  normalize transformations in cache
-    db::ICplxTrans i1ti = i1t.inverted (), i2ti = i2t.inverted ();
-    for (std::vector<std::pair<ClusterInstance, ClusterInstance> >::iterator i = sorted_interactions.begin (); i != sorted_interactions.end (); ++i) {
-      i->first.transform (i1ti);
-      i->second.transform (i2ti);
-    }
+    if (fill_cache) {
 
-    cluster_instance_pair_list_type &cached = (*mp_instance_interaction_cache) [ii_key];
-    cached.insert (cached.end (), sorted_interactions.begin (), sorted_interactions.end ());
+      //  normalize transformations for cache
+      db::ICplxTrans i1ti = i1t.inverted (), i2ti = i2t.inverted ();
+      for (std::vector<std::pair<ClusterInstance, ClusterInstance> >::iterator i = sorted_interactions.begin (); i != sorted_interactions.end (); ++i) {
+        i->first.transform (i1ti);
+        i->second.transform (i2ti);
+      }
+
+      cluster_instance_pair_list_type &cached = (*mp_instance_interaction_cache) [ii_key];
+      cached.insert (cached.end (), sorted_interactions.begin (), sorted_interactions.end ());
+
+    }
   }
 
   /**
@@ -1508,7 +1652,7 @@ private:
 
     box_type common2 = common.transformed (t2i);
 
-    InteractionKeyForClustersType ikey (ci1, ci2, t21, common2);
+    InteractionKeyForClustersType ikey (ci1, ci2, t1i, t21, common2);
 
     typename std::map<InteractionKeyForClustersType, std::vector<std::pair<size_t, size_t> > >::const_iterator ici = m_interaction_cache_for_clusters.find (ikey);
     if (ici != m_interaction_cache_for_clusters.end ()) {
@@ -1939,7 +2083,7 @@ hier_clusters<T>::propagate_cluster_inst (const db::Layout &layout, const db::Ce
 
 template <class T>
 void
-hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const std::map<db::cell_index_type, tl::equivalence_clusters<unsigned int> > *attr_equivalence, const std::set<db::cell_index_type> *breakout_cells)
+hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const std::map<db::cell_index_type, tl::equivalence_clusters<size_t> > *attr_equivalence, const std::set<db::cell_index_type> *breakout_cells)
 {
   tl::SelfTimer timer (tl::verbosity () > m_base_verbosity, tl::to_string (tr ("Computing shape clusters")));
 
@@ -1957,8 +2101,8 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
 
       //  look for the net label joining spec - for the top cell the "top_cell_index" entry is looked for.
       //  If there is no such entry or the cell is not the top cell, look for the entry by cell index.
-      std::map<db::cell_index_type, tl::equivalence_clusters<unsigned int> >::const_iterator ae;
-      const tl::equivalence_clusters<unsigned int> *ec = 0;
+      std::map<db::cell_index_type, tl::equivalence_clusters<size_t> >::const_iterator ae;
+      const tl::equivalence_clusters<size_t> *ec = 0;
       if (attr_equivalence) {
         if (*c == cell.cell_index ()) {
           ae = attr_equivalence->find (top_cell_index);
@@ -1974,7 +2118,7 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
         }
       }
 
-      build_local_cluster (layout, layout.cell (*c), shape_flags, conn, ec);
+      build_local_cluster (layout, layout.cell (*c), conn, ec);
 
       ++progress;
 
@@ -2021,7 +2165,7 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
 
 template <class T>
 void
-hier_clusters<T>::build_local_cluster (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence)
+hier_clusters<T>::build_local_cluster (const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const tl::equivalence_clusters<size_t> *attr_equivalence)
 {
   std::string msg = tl::to_string (tr ("Computing local clusters for cell: ")) + std::string (layout.cell_name (cell.cell_index ()));
   if (tl::verbosity () >= m_base_verbosity + 20) {
@@ -2030,7 +2174,7 @@ hier_clusters<T>::build_local_cluster (const db::Layout &layout, const db::Cell 
   tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 20, msg);
 
   connected_clusters<T> &local = m_per_cell_clusters [cell.cell_index ()];
-  local.build_clusters (cell, shape_flags, conn, attr_equivalence, true);
+  local.build_clusters (cell, conn, attr_equivalence, true);
 }
 
 template <class T>
@@ -2336,6 +2480,7 @@ hier_clusters<T>::return_to_hierarchy (db::Layout &layout, const std::map<unsign
 }
 
 //  explicit instantiations
+template class DB_PUBLIC hier_clusters<db::NetShape>;
 template class DB_PUBLIC hier_clusters<db::PolygonRef>;
 template class DB_PUBLIC hier_clusters<db::Edge>;
 
@@ -2460,6 +2605,7 @@ void recursive_cluster_shape_iterator<T>::down (db::cell_index_type ci, typename
 }
 
 //  explicit instantiations
+template class DB_PUBLIC recursive_cluster_shape_iterator<db::NetShape>;
 template class DB_PUBLIC recursive_cluster_shape_iterator<db::PolygonRef>;
 template class DB_PUBLIC recursive_cluster_shape_iterator<db::Edge>;
 
@@ -2533,6 +2679,7 @@ void recursive_cluster_iterator<T>::down (db::cell_index_type ci, typename db::l
 }
 
 //  explicit instantiations
+template class DB_PUBLIC recursive_cluster_iterator<db::NetShape>;
 template class DB_PUBLIC recursive_cluster_iterator<db::PolygonRef>;
 template class DB_PUBLIC recursive_cluster_iterator<db::Edge>;
 
@@ -2614,6 +2761,7 @@ incoming_cluster_connections<T>::ensure_computed_parent (db::cell_index_type ci)
 }
 
 //  explicit instantiations
+template class DB_PUBLIC incoming_cluster_connections<db::NetShape>;
 template class DB_PUBLIC incoming_cluster_connections<db::PolygonRef>;
 template class DB_PUBLIC incoming_cluster_connections<db::Edge>;
 

@@ -256,6 +256,7 @@ void NetlistSpiceReader::read (tl::InputStream &stream, db::Netlist &netlist)
   mp_stream.reset (new tl::TextInputStream (stream));
   mp_netlist = &netlist;
   mp_circuit = 0;
+  mp_anonymous_top_circuit = 0;
   mp_nets_by_name.reset (0);
   m_global_nets.clear ();
   m_circuits_read.clear ();
@@ -267,6 +268,8 @@ void NetlistSpiceReader::read (tl::InputStream &stream, db::Netlist &netlist)
     while (! at_end ()) {
       read_card ();
     }
+
+    build_global_nets ();
 
     mp_delegate->finish (&netlist);
     finish ();
@@ -286,6 +289,48 @@ void NetlistSpiceReader::read (tl::InputStream &stream, db::Netlist &netlist)
 
   }
 }
+
+void NetlistSpiceReader::build_global_nets ()
+{
+  for (std::vector<std::string>::const_iterator gn = m_global_nets.begin (); gn != m_global_nets.end (); ++gn) {
+
+    for (db::Netlist::bottom_up_circuit_iterator c = mp_netlist->begin_bottom_up (); c != mp_netlist->end_bottom_up (); ++c) {
+
+      if (c.operator-> () == mp_anonymous_top_circuit) {
+        //  no pins for the anonymous top circuit
+        continue;
+      }
+
+      db::Net *net = c->net_by_name (*gn);
+      if (! net || net->pin_count () > 0) {
+        //  only add a pin for a global net if there is a net with this name
+        //  don't add a pin if it already has one
+        continue;
+      }
+
+      const db::Pin &pin = c->add_pin (*gn);
+      c->connect_pin (pin.id (), net);
+
+      for (db::Circuit::refs_iterator r = c->begin_refs (); r != c->end_refs (); ++r) {
+
+        db::SubCircuit &sc = *r;
+
+        db::Net *pnet = sc.circuit ()->net_by_name (*gn);
+        if (! pnet) {
+          pnet = new db::Net ();
+          pnet->set_name (*gn);
+          sc.circuit ()->add_net (pnet);
+        }
+
+        sc.connect_pin (pin.id (), pnet);
+
+      }
+
+    }
+
+  }
+}
+
 
 void NetlistSpiceReader::finish ()
 {
@@ -419,7 +464,10 @@ bool NetlistSpiceReader::read_card ()
 
       while (! ex.at_end ()) {
         std::string n = read_name (ex);
-        m_global_nets.push_back (n);
+        if (m_global_net_names.find (n) == m_global_net_names.end ()) {
+          m_global_nets.push_back (n);
+          m_global_net_names.insert (n);
+        }
       }
 
     } else if (ex.test_without_case ("subckt")) {
@@ -574,11 +622,8 @@ void NetlistSpiceReader::ensure_circuit ()
     mp_circuit = new db::Circuit ();
     //  TODO: make top name configurable
     mp_circuit->set_name (".TOP");
+    mp_anonymous_top_circuit = mp_circuit;
     mp_netlist->add_circuit (mp_circuit);
-
-    for (std::vector<std::string>::const_iterator gn = m_global_nets.begin (); gn != m_global_nets.end (); ++gn) {
-      make_net (*gn);
-    }
 
   }
 }
@@ -825,13 +870,10 @@ void NetlistSpiceReader::read_subcircuit (const std::string &sc_name, const std:
     for (std::vector<db::Net *>::const_iterator i = nets.begin (); i != nets.end (); ++i) {
       cc->add_pin (std::string ());
     }
-    for (std::vector<std::string>::const_iterator gn = m_global_nets.begin (); gn != m_global_nets.end (); ++gn) {
-      cc->add_pin (std::string ());
-    }
 
   } else {
 
-    if (cc->pin_count () != nets.size () + m_global_nets.size ()) {
+    if (cc->pin_count () != nets.size ()) {
       error (tl::sprintf (tl::to_string (tr ("Pin count mismatch between circuit definition and circuit call: %d expected, got %d")), int (cc->pin_count ()), int (nets.size ())));
     }
 
@@ -842,11 +884,6 @@ void NetlistSpiceReader::read_subcircuit (const std::string &sc_name, const std:
 
   for (std::vector<db::Net *>::const_iterator i = nets.begin (); i != nets.end (); ++i) {
     sc->connect_pin (i - nets.begin (), *i);
-  }
-
-  for (std::vector<std::string>::const_iterator gn = m_global_nets.begin (); gn != m_global_nets.end (); ++gn) {
-    db::Net *net = make_net (*gn);
-    sc->connect_pin (gn - m_global_nets.begin () + nets.size (), net);
   }
 }
 
@@ -889,13 +926,10 @@ void NetlistSpiceReader::read_circuit (tl::Extractor &ex, const std::string &nc)
     for (std::vector<std::string>::const_iterator i = nn.begin (); i != nn.end (); ++i) {
       cc->add_pin (std::string ());
     }
-    for (std::vector<std::string>::const_iterator gn = m_global_nets.begin (); gn != m_global_nets.end (); ++gn) {
-      cc->add_pin (std::string ());
-    }
 
   } else {
 
-    if (cc->pin_count () != nn.size () + m_global_nets.size ()) {
+    if (cc->pin_count () != nn.size ()) {
       error (tl::sprintf (tl::to_string (tr ("Pin count mismatch between implicit (through call) and explicit circuit definition: %d expected, got %d in circuit %s")), int (cc->pin_count ()), int (nn.size ()), nc));
     }
 
@@ -919,14 +953,6 @@ void NetlistSpiceReader::read_circuit (tl::Extractor &ex, const std::string &nc)
     if (! i->empty ()) {
       mp_circuit->rename_pin (pin_id, net->name ());
     }
-    mp_circuit->connect_pin (pin_id, net);
-  }
-
-  //  produce pins for the global nets
-  for (std::vector<std::string>::const_iterator gn = m_global_nets.begin (); gn != m_global_nets.end (); ++gn) {
-    db::Net *net = make_net (*gn);
-    size_t pin_id = gn - m_global_nets.begin () + nn.size ();
-    mp_circuit->rename_pin (pin_id, net->name ());
     mp_circuit->connect_pin (pin_id, net);
   }
 

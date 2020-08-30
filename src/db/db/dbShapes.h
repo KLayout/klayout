@@ -319,6 +319,33 @@ public:
     advance (-1);
   }
 
+  /**
+   *  @brief Gets the arrays quad ID
+   *
+   *  The arrays quad ID is a unique identifier for the current quad for iterated arrays. This can be used to
+   *  detect whether the iterator entered a new quad and optimize the search in that case.
+   */
+  size_t array_quad_id () const;
+
+  /**
+   *  @brief Gets the quad box
+   *
+   *  Gets the box the current quad uses. This box may be larger than the actual shape containers
+   *  bounding box. Specifically if there is no quad tree at all, this box is the world box.
+   */
+  db::Box array_quad_box () const;
+
+  /**
+   *  @brief Skips the current quad
+   *
+   *  Moves to the next quad. This method can be used to shortcut searching if we are inside
+   *  a quad that is not relevant for the search.
+   */
+  void skip_array_quad ()
+  {
+    advance (2);
+  }
+
 private:
   //  a helper union for the iter_size union 
   //  (basically computing the size required for all iterators for a certain shape/array type)
@@ -417,6 +444,12 @@ private:
   template <class Sh, class StableTag> db::Box quad_box_by_shape (TouchingRegionTag) const;
   template <class Sh, class StableTag> db::Box quad_box_by_shape (OverlappingRegionTag) const;
   template <class RegionTag, class StableTag> db::Box quad_box_generic () const;
+
+  template <class Iter, class Array> db::Box get_array_quad_box () const;
+  template <class Iter> size_t get_array_quad_id () const;
+
+  template <class Iter> void do_skip_array_quad_iter ();
+  void do_skip_array_quad ();
 
   template <class Sh, class StableTag, class RegionTag> bool advance_shape (int &mode);
   template <class Array> void init_array_iter (NoRegionTag);

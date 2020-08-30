@@ -23,9 +23,11 @@
 
 #include "imgPropertiesPage.h"
 #include "imgLandmarksDialog.h"
+#include "imgStream.h"
 #include "layLayoutView.h"
 #include "layFileDialog.h"
 #include "tlExceptions.h"
+#include "tlFileUtils.h"
 
 namespace img
 {
@@ -100,11 +102,12 @@ PropertiesPage::init ()
   connect (action, SIGNAL (triggered ()), this, SLOT (reverse_color_order ()));
   false_color_control->addAction (action);
 
-  color_pb->set_color (QColor ());
+  colors->set_color (std::make_pair (QColor (), QColor ()));
+  colors->setEnabled (false);
 
   connect (browse_pb, SIGNAL (clicked ()), this, SLOT (browse ()));
-  connect (color_pb, SIGNAL (color_changed (QColor)), false_color_control, SLOT (set_current_color (QColor)));
-  connect (false_color_control, SIGNAL (selection_changed (QColor)), color_pb, SLOT (set_color (QColor)));
+  connect (colors, SIGNAL (color_changed (std::pair<QColor, QColor>)), false_color_control, SLOT (set_current_color (std::pair<QColor, QColor>)));
+  connect (false_color_control, SIGNAL (selection_changed (std::pair<QColor, QColor>)), colors, SLOT (set_color (std::pair<QColor, QColor>)));
 
   connect (brightness_slider, SIGNAL (valueChanged (int)), this, SLOT (brightness_slider_changed (int)));
   connect (brightness_sb, SIGNAL (valueChanged (int)), this, SLOT (brightness_spinbox_changed (int)));
@@ -126,6 +129,7 @@ PropertiesPage::init ()
   connect (value_le, SIGNAL (returnPressed ()), this, SLOT (value_return_pressed ()));
 
   connect (reset_pb, SIGNAL (clicked ()), this, SLOT (reset_pressed ()));
+  connect (save_pb, SIGNAL (clicked ()), this, SLOT (save_pressed ()));
   connect (preview_cbx, SIGNAL (clicked ()), this, SLOT (preview_checked ()));
   connect (define_landmarks_pb, SIGNAL (clicked ()), this, SLOT (define_landmarks_pressed ()));
 }
@@ -206,7 +210,8 @@ BEGIN_PROTECTED
   value_le->setText (QString ());
   value_le->setEnabled (false);
 
-  color_pb->setEnabled (false_color_control->has_selection ());
+  colors->setEnabled (false_color_control->has_selection ());
+  colors->set_single_mode (false);
 
   double xmin, xmax;
   tl::from_string (tl::to_string (from_le->text ()), xmin);
@@ -222,6 +227,10 @@ BEGIN_PROTECTED
 
     value_le->setText (tl::to_qstring (tl::sprintf ("%.4g", xx)));
     value_le->setEnabled (true);
+
+  } else if (false_color_control->has_selection ()) {
+
+    colors->set_single_mode (true);
 
   }
 
@@ -240,7 +249,8 @@ PropertiesPage::color_mapping_changed ()
     value_le->setText (QString ());
     value_le->setEnabled (false);
 
-    color_pb->setEnabled (false_color_control->has_selection ());
+    colors->setEnabled (false_color_control->has_selection ());
+    colors->set_single_mode (false);
 
     try {
 
@@ -258,6 +268,10 @@ PropertiesPage::color_mapping_changed ()
 
         value_le->setText (tl::to_qstring (tl::sprintf ("%.4g", xx)));
         value_le->setEnabled (true);
+
+      } else if (false_color_control->has_selection ()) {
+
+        colors->set_single_mode (true);
 
       }
 
@@ -668,27 +682,27 @@ PropertiesPage::blue_spinbox_changed (double value)
 void  
 PropertiesPage::black_to_white ()
 {
-  std::vector <std::pair <double, QColor> > nodes;
-  nodes.push_back (std::make_pair (0.0, QColor (0, 0, 0)));
-  nodes.push_back (std::make_pair (1.0, QColor (255, 255, 255)));
+  std::vector <std::pair <double, std::pair<QColor, QColor> > > nodes;
+  nodes.push_back (std::make_pair (0.0, std::make_pair (QColor (0, 0, 0), QColor (0, 0, 0))));
+  nodes.push_back (std::make_pair (1.0, std::make_pair (QColor (255, 255, 255), QColor (255, 255, 255))));
   false_color_control->set_nodes (nodes);
 }
 
 void  
 PropertiesPage::white_to_black ()
 {
-  std::vector <std::pair <double, QColor> > nodes;
-  nodes.push_back (std::make_pair (0.0, QColor (255, 255, 255)));
-  nodes.push_back (std::make_pair (1.0, QColor (0, 0, 0)));
+  std::vector <std::pair <double, std::pair<QColor, QColor> > > nodes;
+  nodes.push_back (std::make_pair (0.0, std::make_pair (QColor (255, 255, 255), QColor (255, 255, 255))));
+  nodes.push_back (std::make_pair (1.0, std::make_pair (QColor (0, 0, 0), QColor (0, 0, 0))));
   false_color_control->set_nodes (nodes);
 }
 
 void  
 PropertiesPage::red_to_blue ()
 {
-  std::vector <std::pair <double, QColor> > nodes;
-  nodes.push_back (std::make_pair (0.0, QColor (255, 0, 0)));
-  nodes.push_back (std::make_pair (1.0, QColor (0, 0, 255)));
+  std::vector <std::pair <double, std::pair<QColor, QColor> > > nodes;
+  nodes.push_back (std::make_pair (0.0, std::make_pair (QColor (255, 0, 0), QColor (255, 0, 0))));
+  nodes.push_back (std::make_pair (1.0, std::make_pair (QColor (0, 0, 255), QColor (0, 0, 255))));
   false_color_control->set_nodes (nodes);
 
 }
@@ -696,18 +710,19 @@ PropertiesPage::red_to_blue ()
 void  
 PropertiesPage::blue_to_red ()
 {
-  std::vector <std::pair <double, QColor> > nodes;
-  nodes.push_back (std::make_pair (0.0, QColor (0, 0, 255)));
-  nodes.push_back (std::make_pair (1.0, QColor (255, 0, 0)));
+  std::vector <std::pair <double, std::pair<QColor, QColor> > > nodes;
+  nodes.push_back (std::make_pair (0.0, std::make_pair (QColor (0, 0, 255), QColor (0, 0, 255))));
+  nodes.push_back (std::make_pair (1.0, std::make_pair (QColor (255, 0, 0), QColor (255, 0, 0))));
   false_color_control->set_nodes (nodes);
 }
 
 void  
 PropertiesPage::reverse_color_order ()
 {
-  std::vector <std::pair <double, QColor> > nodes (false_color_control->nodes ());
+  std::vector <std::pair <double, std::pair<QColor, QColor> > > nodes (false_color_control->nodes ());
   for (size_t i = 0; i < nodes.size () / 2; ++i) {
-    std::swap (nodes [i].second, nodes [nodes.size () - 1 - i].second);
+    std::swap (nodes [i].second.second, nodes [nodes.size () - 1 - i].second.first);
+    std::swap (nodes [i].second.first, nodes [nodes.size () - 1 - i].second.second);
   }
   false_color_control->set_nodes (nodes);
 }
@@ -821,6 +836,31 @@ BEGIN_PROTECTED
       s_filename = filename;
       update ();
     }
+  }
+
+END_PROTECTED
+}
+
+void
+PropertiesPage::save_pressed ()
+{
+BEGIN_PROTECTED
+
+  apply ();
+
+  lay::FileDialog file_dialog (this, tl::to_string (QObject::tr ("Save As KLayout Image File")), tl::to_string (QObject::tr ("KLayout image files (*.lyimg);;All files (*)")));
+
+  std::string filename = mp_direct_image->filename ();
+  if (! filename.empty () && tl::extension (filename) != "lyimg") {
+    filename = tl::basename (filename) + ".lyimg";
+  }
+
+  if (file_dialog.get_save (filename)) {
+
+    tl::OutputFile file (filename);
+    tl::OutputStream stream (file);
+    img::ImageStreamer::write (stream, *mp_direct_image);
+
   }
 
 END_PROTECTED

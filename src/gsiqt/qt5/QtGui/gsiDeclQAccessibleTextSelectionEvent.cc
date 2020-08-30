@@ -227,8 +227,8 @@ static gsi::Methods methods_QAccessibleTextSelectionEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAccessibleTextSelectionEvent::QAccessibleTextSelectionEvent(QObject *obj, int start, int end)\nThis method creates an object of class QAccessibleTextSelectionEvent.", &_init_ctor_QAccessibleTextSelectionEvent_Adaptor_2620, &_call_ctor_QAccessibleTextSelectionEvent_Adaptor_2620);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAccessibleTextSelectionEvent::QAccessibleTextSelectionEvent(QAccessibleInterface *iface, int start, int end)\nThis method creates an object of class QAccessibleTextSelectionEvent.", &_init_ctor_QAccessibleTextSelectionEvent_Adaptor_3940, &_call_ctor_QAccessibleTextSelectionEvent_Adaptor_3940);
-  methods += new qt_gsi::GenericMethod ("accessibleInterface", "@hide", true, &_init_cbs_accessibleInterface_c0_0, &_call_cbs_accessibleInterface_c0_0);
-  methods += new qt_gsi::GenericMethod ("accessibleInterface", "@brief Virtual method QAccessibleInterface *QAccessibleTextSelectionEvent::accessibleInterface()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_accessibleInterface_c0_0, &_call_cbs_accessibleInterface_c0_0, &_set_callback_cbs_accessibleInterface_c0_0);
+  methods += new qt_gsi::GenericMethod ("accessibleInterface", "@brief Virtual method QAccessibleInterface *QAccessibleTextSelectionEvent::accessibleInterface()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_accessibleInterface_c0_0, &_call_cbs_accessibleInterface_c0_0);
+  methods += new qt_gsi::GenericMethod ("accessibleInterface", "@hide", true, &_init_cbs_accessibleInterface_c0_0, &_call_cbs_accessibleInterface_c0_0, &_set_callback_cbs_accessibleInterface_c0_0);
   return methods;
 }
 

@@ -67,15 +67,6 @@ public:
     //  .. nothing yet ..
   }
 
-  /** 
-   *  @brief The copy constructor
-   */
-  repository (const repository<Sh> &d)
-    : m_set (d.m_set)
-  {
-    //  .. nothing yet ..
-  }
-
   /**
    *  @brief Insert a shape into the repository
    *
@@ -174,6 +165,15 @@ public:
   db::repository< db::text<C> > &repository (db::object_tag< db::text<C> > /*tag*/)
   {
     return m_text_repository;
+  }
+
+  /**
+   *  @brief Return the repository by tag
+   */
+  template <class Sh>
+  const db::repository<Sh> &repository (db::object_tag<Sh> tag) const
+  {
+    return const_cast<generic_repository<C> *> (this)->repository (tag);
   }
 
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const

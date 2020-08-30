@@ -421,6 +421,19 @@ public:
   {
     return mp_view;
   }
+
+  /**
+   *  @brief Shows or hides the images
+   */
+  void show_images (bool f);
+
+  /**
+   *  @brief Returns a value indicating whether images are shown or hidden
+   */
+  bool images_visible () const
+  {
+    return m_images_visible;
+  }
   
   /**
    *  @brief Implement the menu response function
@@ -477,6 +490,8 @@ private:
   size_t m_moved_landmark;
   //  Flag indicating that we want to keep the selection after the landmark was moved
   bool m_keep_selection_for_landmark;
+  //  Flag indicating whether images are visible
+  bool m_images_visible;
 
   void show_message ();
 
@@ -505,6 +520,11 @@ private:
    *  Used as implementation for "copy" and "cut"
    */
   void copy_selected ();
+
+  /**
+   *  @brief Finds an image object from the given point
+   */
+  const db::DUserObject *find_image (const db::DPoint &p, const db::DBox &search_box, double l, double &dmin, const std::map<img::Service::obj_iterator, unsigned int> *exclude = 0);
 
   /**
    *  @brief Update m_selected_image_views to reflect the selection

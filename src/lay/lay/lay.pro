@@ -165,7 +165,8 @@ RESOURCES = layBuildInMacros.qrc \
     layHelpResources.qrc \
     layMacroTemplates.qrc \
     layResources.qrc \
-    laySaltTemplates.qrc
+    laySaltTemplates.qrc \
+    layDRCLVSHelpResources.qrc
 
 INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LAYBASIC_INC $$ANT_INC $$IMG_INC $$EDT_INC $$LYM_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LAYBASIC_INC $$ANT_INC $$IMG_INC $$EDT_INC $$LYM_INC

@@ -31,6 +31,9 @@ namespace db
 
 static HierarchyBuilderShapeInserter def_inserter;
 
+static HierarchyBuilder::cell_map_type null_map;
+static HierarchyBuilder::cell_map_type::const_iterator null_iterator = null_map.end ();
+
 // -------------------------------------------------------------------------------------------
 
 int
@@ -168,7 +171,7 @@ HierarchyBuilder::reset ()
   m_cell_map.clear ();
   m_cells_seen.clear ();
   m_cell_stack.clear ();
-  m_cm_entry = cell_map_type::const_iterator ();
+  m_cm_entry = null_iterator;
   m_cm_new_entry = false;
 }
 
@@ -263,14 +266,14 @@ HierarchyBuilder::end (const RecursiveShapeIterator *iter)
   m_cells_seen.clear ();
   mp_initial_cell = m_cell_stack.empty () ? 0 : m_cell_stack.front ().second.front ();
   m_cell_stack.clear ();
-  m_cm_entry = cell_map_type::const_iterator ();
+  m_cm_entry = null_iterator;
   m_cm_new_entry = false;
 }
 
 void
 HierarchyBuilder::enter_cell (const RecursiveShapeIterator * /*iter*/, const db::Cell * /*cell*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
 {
-  tl_assert (m_cm_entry != m_cell_map.end () && m_cm_entry != cell_map_type::const_iterator ());
+  tl_assert (m_cm_entry != m_cell_map.end () && m_cm_entry != null_iterator);
 
   m_cells_seen.insert (m_cm_entry->first);
 
@@ -701,6 +704,24 @@ void EdgePairBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape
 {
   if (shape.is_edge_pair ()) {
     target->insert (shape.edge_pair ().transformed (trans));
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+
+TextBuildingHierarchyBuilderShapeReceiver::TextBuildingHierarchyBuilderShapeReceiver (db::Layout *layout)
+  : mp_layout (layout)
+{
+  //  .. nothing yet ..
+}
+
+void TextBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, const db::ICplxTrans &trans, const db::Box & /*region*/, const db::RecursiveShapeReceiver::box_tree_type * /*complex_region*/, db::Shapes *target)
+{
+  if (shape.is_text ()) {
+    //  NOTE: we intentionally skip all the text attributes (font etc.) here because in the context
+    //  of a text collections we're only interested in the locations.
+    db::Text t (shape.text_string (), shape.text_trans ());
+    target->insert (db::TextRef (t.transformed (trans), mp_layout->shape_repository ()));
   }
 }
 

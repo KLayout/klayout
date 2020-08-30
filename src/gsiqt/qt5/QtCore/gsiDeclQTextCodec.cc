@@ -683,16 +683,16 @@ gsi::Class<QTextCodec> &qtdecl_QTextCodec ();
 static gsi::Methods methods_QTextCodec_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTextCodec::QTextCodec()\nThis method creates an object of class QTextCodec.", &_init_ctor_QTextCodec_Adaptor_0, &_call_ctor_QTextCodec_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("aliases", "@hide", true, &_init_cbs_aliases_c0_0, &_call_cbs_aliases_c0_0);
-  methods += new qt_gsi::GenericMethod ("aliases", "@brief Virtual method QList<QByteArray> QTextCodec::aliases()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_aliases_c0_0, &_call_cbs_aliases_c0_0, &_set_callback_cbs_aliases_c0_0);
-  methods += new qt_gsi::GenericMethod ("*convertFromUnicode", "@hide", true, &_init_cbs_convertFromUnicode_c5514_0, &_call_cbs_convertFromUnicode_c5514_0);
-  methods += new qt_gsi::GenericMethod ("*convertFromUnicode", "@brief Virtual method QByteArray QTextCodec::convertFromUnicode(const QChar *in, int length, QTextCodec::ConverterState *state)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_convertFromUnicode_c5514_0, &_call_cbs_convertFromUnicode_c5514_0, &_set_callback_cbs_convertFromUnicode_c5514_0);
-  methods += new qt_gsi::GenericMethod ("*convertToUnicode", "@hide", true, &_init_cbs_convertToUnicode_c5465_0, &_call_cbs_convertToUnicode_c5465_0);
-  methods += new qt_gsi::GenericMethod ("*convertToUnicode", "@brief Virtual method QString QTextCodec::convertToUnicode(const char *in, int length, QTextCodec::ConverterState *state)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_convertToUnicode_c5465_0, &_call_cbs_convertToUnicode_c5465_0, &_set_callback_cbs_convertToUnicode_c5465_0);
-  methods += new qt_gsi::GenericMethod ("mibEnum", "@hide", true, &_init_cbs_mibEnum_c0_0, &_call_cbs_mibEnum_c0_0);
-  methods += new qt_gsi::GenericMethod ("mibEnum", "@brief Virtual method int QTextCodec::mibEnum()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_mibEnum_c0_0, &_call_cbs_mibEnum_c0_0, &_set_callback_cbs_mibEnum_c0_0);
-  methods += new qt_gsi::GenericMethod ("name", "@hide", true, &_init_cbs_name_c0_0, &_call_cbs_name_c0_0);
-  methods += new qt_gsi::GenericMethod ("name", "@brief Virtual method QByteArray QTextCodec::name()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_name_c0_0, &_call_cbs_name_c0_0, &_set_callback_cbs_name_c0_0);
+  methods += new qt_gsi::GenericMethod ("aliases", "@brief Virtual method QList<QByteArray> QTextCodec::aliases()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_aliases_c0_0, &_call_cbs_aliases_c0_0);
+  methods += new qt_gsi::GenericMethod ("aliases", "@hide", true, &_init_cbs_aliases_c0_0, &_call_cbs_aliases_c0_0, &_set_callback_cbs_aliases_c0_0);
+  methods += new qt_gsi::GenericMethod ("*convertFromUnicode", "@brief Virtual method QByteArray QTextCodec::convertFromUnicode(const QChar *in, int length, QTextCodec::ConverterState *state)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_convertFromUnicode_c5514_0, &_call_cbs_convertFromUnicode_c5514_0);
+  methods += new qt_gsi::GenericMethod ("*convertFromUnicode", "@hide", true, &_init_cbs_convertFromUnicode_c5514_0, &_call_cbs_convertFromUnicode_c5514_0, &_set_callback_cbs_convertFromUnicode_c5514_0);
+  methods += new qt_gsi::GenericMethod ("*convertToUnicode", "@brief Virtual method QString QTextCodec::convertToUnicode(const char *in, int length, QTextCodec::ConverterState *state)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_convertToUnicode_c5465_0, &_call_cbs_convertToUnicode_c5465_0);
+  methods += new qt_gsi::GenericMethod ("*convertToUnicode", "@hide", true, &_init_cbs_convertToUnicode_c5465_0, &_call_cbs_convertToUnicode_c5465_0, &_set_callback_cbs_convertToUnicode_c5465_0);
+  methods += new qt_gsi::GenericMethod ("mibEnum", "@brief Virtual method int QTextCodec::mibEnum()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_mibEnum_c0_0, &_call_cbs_mibEnum_c0_0);
+  methods += new qt_gsi::GenericMethod ("mibEnum", "@hide", true, &_init_cbs_mibEnum_c0_0, &_call_cbs_mibEnum_c0_0, &_set_callback_cbs_mibEnum_c0_0);
+  methods += new qt_gsi::GenericMethod ("name", "@brief Virtual method QByteArray QTextCodec::name()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_name_c0_0, &_call_cbs_name_c0_0);
+  methods += new qt_gsi::GenericMethod ("name", "@hide", true, &_init_cbs_name_c0_0, &_call_cbs_name_c0_0, &_set_callback_cbs_name_c0_0);
   return methods;
 }
 

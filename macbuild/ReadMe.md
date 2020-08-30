@@ -1,4 +1,4 @@
-Relevant KLayout version: 0.26.4
+Relevant KLayout version: 0.26.5
 
 # 1. Introduction
 This directory **`macbuild`** contains different files required for building KLayout (http://www.klayout.de/) version 0.26.1 or later for different 64-bit Mac OSXs including:
@@ -24,6 +24,11 @@ Alternatively, you can use "Qt5" from Homebrew (https://brew.sh/) which is usual
 "Qt5" from Anaconda3 (https://www.anaconda.com/) which is usually located under:
 ```
 $HOME/opt/anaconda3/pkgs/qt-{version}
+```
+
+If you have installed Anaconda3 under $HOME/opt/anaconda3/, make a symbolic link:
+```
+/Applications/anaconda3/ ---> $HOME/opt/anaconda3/
 ```
 
 # 3. Script language support: Ruby and Python
@@ -220,8 +225,8 @@ $ cd /where/'build.sh'/exists
 $ ./makeDMG4mac.py -p ST-qt5MP.pkg.macos-Catalina-release-RsysPsys -m
 ```
 This command will generate the two files below:<br>
-* **`ST-klayout-0.26.4-macOS-Catalina-1-qt5MP-RsysPsys.dmg`**      ---(1) the main DMG file
-* **`ST-klayout-0.26.4-macOS-Catalina-1-qt5MP-RsysPsys.dmg.md5`**  ---(2) MD5-value text file
+* **`ST-klayout-0.26.5-macOS-Catalina-1-qt5MP-RsysPsys.dmg`**      ---(1) the main DMG file
+* **`ST-klayout-0.26.5-macOS-Catalina-1-qt5MP-RsysPsys.dmg.md5`**  ---(2) MD5-value text file
 
 # Known issues
 Because we assume some specific versions of non-OS-standard Ruby and Python, updating MacPorts, Homebrew, or Anaconda3 may cause build- and link errors.<br>

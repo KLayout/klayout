@@ -260,10 +260,10 @@ gsi::Class<QTextObjectInterface> &qtdecl_QTextObjectInterface ();
 static gsi::Methods methods_QTextObjectInterface_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTextObjectInterface::QTextObjectInterface()\nThis method creates an object of class QTextObjectInterface.", &_init_ctor_QTextObjectInterface_Adaptor_0, &_call_ctor_QTextObjectInterface_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("drawObject", "@hide", false, &_init_cbs_drawObject_8010_0, &_call_cbs_drawObject_8010_0);
-  methods += new qt_gsi::GenericMethod ("drawObject", "@brief Virtual method void QTextObjectInterface::drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_drawObject_8010_0, &_call_cbs_drawObject_8010_0, &_set_callback_cbs_drawObject_8010_0);
-  methods += new qt_gsi::GenericMethod ("intrinsicSize", "@hide", false, &_init_cbs_intrinsicSize_4938_0, &_call_cbs_intrinsicSize_4938_0);
-  methods += new qt_gsi::GenericMethod ("intrinsicSize", "@brief Virtual method QSizeF QTextObjectInterface::intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_intrinsicSize_4938_0, &_call_cbs_intrinsicSize_4938_0, &_set_callback_cbs_intrinsicSize_4938_0);
+  methods += new qt_gsi::GenericMethod ("drawObject", "@brief Virtual method void QTextObjectInterface::drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_drawObject_8010_0, &_call_cbs_drawObject_8010_0);
+  methods += new qt_gsi::GenericMethod ("drawObject", "@hide", false, &_init_cbs_drawObject_8010_0, &_call_cbs_drawObject_8010_0, &_set_callback_cbs_drawObject_8010_0);
+  methods += new qt_gsi::GenericMethod ("intrinsicSize", "@brief Virtual method QSizeF QTextObjectInterface::intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_intrinsicSize_4938_0, &_call_cbs_intrinsicSize_4938_0);
+  methods += new qt_gsi::GenericMethod ("intrinsicSize", "@hide", false, &_init_cbs_intrinsicSize_4938_0, &_call_cbs_intrinsicSize_4938_0, &_set_callback_cbs_intrinsicSize_4938_0);
   return methods;
 }
 

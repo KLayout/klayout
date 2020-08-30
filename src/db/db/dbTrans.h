@@ -153,8 +153,16 @@ struct unit_trans
   /**
    *  @brief Copy ctor (which basically does nothing)
    */
+  unit_trans (const unit_trans<C> &)
+  {
+    // .. nothing else ..
+  }
+
+  /**
+   *  @brief Copy ctor (which basically does nothing)
+   */
   template <class D>
-  explicit unit_trans (const unit_trans<D> &)
+  unit_trans (const unit_trans<D> &)
   {
     // .. nothing else ..
   }
@@ -236,6 +244,15 @@ struct unit_trans
    *  @brief Assignment (which basically does nothing)
    */
   unit_trans &operator= (const unit_trans &) 
+  {
+    return *this;
+  }
+
+  /**
+   *  @brief Assignment (which basically does nothing)
+   */
+  template <class D>
+  unit_trans &operator= (const unit_trans<D> &) 
   {
     return *this;
   }
@@ -730,11 +747,20 @@ public:
   /**
    *  @brief The "conversion" from the unit transformation to a displacement
    */
-  explicit disp_trans (unit_trans<C>)
+  disp_trans (unit_trans<C>)
     : m_u ()
   {
     // .. nothing else ..
   }
+
+  /**
+   *  @brief The copy constructor 
+   *
+   *  @param d The source from which to copy
+   */
+  disp_trans (const disp_trans<C> &d)
+    : m_u (d.disp ())
+  { }
 
   /**
    *  @brief The copy constructor that converts also
@@ -745,7 +771,7 @@ public:
    *  @param d The source from which to copy
    */
   template <class D>
-  explicit disp_trans (const disp_trans<D> &d)
+  disp_trans (const disp_trans<D> &d)
     : m_u (d.disp ())
   { }
 
@@ -777,6 +803,25 @@ public:
     : m_u (ct.disp ())
   {
     // .. nothing else ..
+  }
+
+  /**
+   *  @brief Assignment
+   */
+  disp_trans &operator= (const disp_trans<C> &d)
+  {
+    m_u = d.disp ();
+    return *this;
+  }
+
+  /**
+   *  @brief Assignment with type conversion
+   */
+  template <class D>
+  disp_trans &operator= (const disp_trans<D> &d)
+  {
+    m_u = d.disp ();
+    return *this;
   }
 
   /**
@@ -1091,6 +1136,18 @@ public:
   { }
 
   /**
+   *  @brief Assignment
+   *
+   *  @param d The source from which to take the data
+   */
+  simple_trans &operator= (const simple_trans<C> &d)
+  { 
+    fixpoint_trans<C>::operator= (d);
+    m_u = d.disp ();
+    return *this;
+  }
+
+  /**
    *  @brief The copy constructor that converts to a different coordinate type also
    *
    *  The copy constructor allows converting between different
@@ -1102,6 +1159,22 @@ public:
   explicit simple_trans (const simple_trans<D> &d)
     : fixpoint_trans<C> (d.rot ()), m_u (d.disp ())
   { }
+
+  /**
+   *  @brief Assignment which also converts
+   *
+   *  This assignment implementation will also convert
+   *  between different coordinate types if possible.
+   *
+   *  @param d The source from which to take the data
+   */
+  template <class D>
+  simple_trans &operator= (const simple_trans<D> &d)
+  { 
+    fixpoint_trans<C>::operator= (d);
+    m_u = d.disp ();
+    return *this;
+  }
 
   /**
    *  @brief The standard constructor using angle and mirror flag

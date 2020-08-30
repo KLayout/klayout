@@ -121,6 +121,18 @@ module DRC
       DRCAsDots::new(false)
     end
     
+    def area_only(r)
+      DRCAreaAndPerimeter::new(r, 1.0, 0.0)
+    end
+    
+    def perimeter_only(r, f)
+      DRCAreaAndPerimeter::new(r, 0.0, f)
+    end
+    
+    def area_and_perimeter(r, f)
+      DRCAreaAndPerimeter::new(r, 1.0, f)
+    end
+    
     # %DRC%
     # @brief Defines SPICE output format (with options) 
     # @name write_spice
@@ -1083,11 +1095,31 @@ module DRC
     # %DRC%
     # @name labels 
     # @brief Gets the labels (text) from an original layer
-    # @synopsis labels
+    # @synopsis labels(args)
     # See \Source#labels for a description of that function.
  
     def labels(*args)
       layout.labels(*args)
+    end
+    
+    # %DRC%
+    # @name edges 
+    # @brief Gets the edges from an original layer
+    # @synopsis edges(args)
+    # See \Source#edges for a description of that function.
+ 
+    def edges(*args)
+      layout.edges(*args)
+    end
+    
+    # %DRC%
+    # @name edge_pairs 
+    # @brief Gets the edges from an original layer
+    # @synopsis edge_pairs(args)
+    # See \Source#edge_pairs for a description of that function.
+ 
+    def edge_pairs(*args)
+      layout.edge_pairs(*args)
     end
     
     # %DRC%
@@ -1428,7 +1460,7 @@ CODE
         tp.input("self", obj)
         tp.threads = (@tt || 1)
         args.each_with_index do |a,i|
-          if a.is_a?(RBA::Edges) || a.is_a?(RBA::Region)
+          if a.is_a?(RBA::Edges) || a.is_a?(RBA::Region) || a.is_a?(RBA::EdgePairs) || a.is_a?(RBA::Texts)
             tp.input("a#{i}", a)
           else
             tp.var("a#{i}", a)
@@ -1747,6 +1779,29 @@ CODE
       @l2ndb_index = i
     end
 
+    def _prep_value(a)
+      if a.is_a?(RBA::DPoint)
+        RBA::Point::from_dpoint(a * (1.0 / self.dbu.to_f))
+      elsif a.is_a?(RBA::DCplxTrans)
+        RBA::ICplxTrans::from_dtrans(RBA::DCplxTrans::new(1.0 / self.dbu.to_f) * a * RBA::DCplxTrans::new(self.dbu.to_f))
+      elsif a.is_a?(RBA::DTrans)
+        RBA::ICplxTrans::from_dtrans(RBA::DCplxTrans::new(1.0 / self.dbu.to_f) * RBA::DCplxTrans::new(a) * RBA::DCplxTrans::new(self.dbu.to_f))
+      elsif a.is_a?(Float)
+        (0.5 + a / self.dbu).floor.to_i
+      else
+        a
+      end
+    end
+    
+    def _prep_value_area(a)
+      dbu2 = self.dbu.to_f * self.dbu.to_f
+      if a.is_a?(Float)
+        (0.5 + a / dbu2).floor.to_i
+      else
+        a
+      end
+    end
+    
   private
 
     def _make_string(v)
@@ -1757,11 +1812,11 @@ CODE
       end
     end
 
-    def _input(layout, cell_index, layers, sel, box, clip, overlapping, shape_flags)
+    def _input(layout, cell_index, layers, sel, box, clip, overlapping, shape_flags, cls)
     
       if layers.empty? && ! @deep
 
-        r = RBA::Region::new
+        r = cls.new
        
       else
     
@@ -1795,13 +1850,13 @@ CODE
           # object which keeps the DSS.
           @dss.text_property_name = "LABEL"
           @dss.text_enlargement = 1
-          r = RBA::Region::new(iter, @dss, RBA::ICplxTrans::new(sf.to_f))
+          r = cls.new(iter, @dss, RBA::ICplxTrans::new(sf.to_f))
         else
-          r = RBA::Region::new(iter, RBA::ICplxTrans::new(sf.to_f))
+          r = cls.new(iter, RBA::ICplxTrans::new(sf.to_f))
         end
         
         # clip if a box is specified
-        if box && clip
+        if box && clip && (cls == RBA::Region || cls == RBA::Edge)
           r &= RBA::Region::new(box)
         end
       

@@ -15,8 +15,10 @@ def run_testsuite(dm, ic, tiled = false, hier = false)
   lb = 100
 
   a = polygons(RBA::LayerInfo::new(1, 0))
+  at = labels(1)
   b = polygons(2)
   c = polygons(3)
+  d = polygons(4)
   x = polygons(10)
   y = polygons(11)
   empty = polygons(1000)
@@ -604,6 +606,70 @@ def run_testsuite(dm, ic, tiled = false, hier = false)
   p.output(lb + 4, dm)
   p = b.edges.intersections(c.edges)
   p.output(lb + 5, dm)
+  
+  lb += 10 #450
+  message "--- texts and filters #{lb}"
+  
+  p = at
+  p.output(lb, dm)
+  p = at.texts
+  p.output(lb + 1, dm)
+  p = at.texts("A*")
+  p.output(lb + 2, dm)
+  p = at.texts(pattern("A*"))
+  p.output(lb + 3, dm)
+  p = at.texts(pattern("A*"), as_dots)
+  p.output(lb + 4, dm)
+  p = at.texts(text("A*"), as_boxes)
+  p.output(lb + 5, dm)
+  p = at.texts_not("A*")
+  p.output(lb + 6, dm)
+  p = at.texts_not(pattern("A*"))
+  p.output(lb + 7, dm)
+  p = at.texts_not(pattern("A*"), as_dots)
+  p.output(lb + 8, dm)
+  p = at.texts_not(text("A*"), as_boxes)
+  p.output(lb + 9, dm)
+  
+  lb += 10 #460
+  message "--- texts and polygon booleans and interactions #{lb}"
+  
+  p = at & d
+  p.output(lb, dm)
+  p = d.interacting(at)
+  p.output(lb + 1, dm)
+  ddup = d.dup
+  ddup.select_interacting(at)
+  ddup.output(lb + 1, dm + 1)
+  p = at.interacting(d)
+  p.output(lb + 2, dm)
+  atdup = at.dup
+  atdup.select_interacting(d)
+  atdup.output(lb + 2, dm + 1)
+  p = d.pull_interacting(at)
+  p.output(lb + 3, dm)
+  p = at.pull_interacting(d)
+  p.output(lb + 4, dm)
+  p = at - d
+  p.output(lb + 5, dm)
+  p = d.not_interacting(at)
+  p.output(lb + 6, dm)
+  ddup = d.dup
+  ddup.select_not_interacting(at)
+  ddup.output(lb + 6, dm + 1)
+  p = at.not_interacting(d)
+  p.output(lb + 7, dm)
+  atdup = at.dup
+  atdup.select_not_interacting(d)
+  atdup.output(lb + 7, dm + 1)
+  p = d.interacting(at)
+  p.output(lb + 8, dm)
+  p = d.not_interacting(at)
+  p.output(lb + 8, dm + 1)
+  p = d.pull_interacting(at)
+  p.output(lb + 9, dm)
+  p = at.pull_interacting(d)
+  p.output(lb + 9, dm + 1)
   
 end
 

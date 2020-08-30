@@ -35,7 +35,7 @@ namespace db {
  *  @brief A deep, polygon-set delegate
  */
 class DB_PUBLIC DeepRegion
-  : public AsIfFlatRegion
+  : public AsIfFlatRegion, public DeepShapeCollectionDelegateBase
 {
 public:
   typedef db::layer<db::Polygon, db::unstable_layer_tag> polygon_layer_type;
@@ -159,27 +159,23 @@ public:
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
 
-  const DeepLayer &deep_layer () const
+  virtual DeepShapeCollectionDelegateBase *deep ()
   {
-    return m_deep_layer;
+    return this;
   }
 
-  DeepLayer &deep_layer ()
-  {
-    return m_deep_layer;
-  }
+  void set_is_merged (bool f);
 
 protected:
   virtual void merged_semantics_changed ();
   virtual void min_coherence_changed ();
-  void set_is_merged (bool f);
 
 private:
   friend class DeepEdges;
+  friend class DeepTexts;
 
   DeepRegion &operator= (const DeepRegion &other);
 
-  DeepLayer m_deep_layer;
   mutable DeepLayer m_merged_polygons;
   mutable bool m_merged_polygons_valid;
   bool m_is_merged;
@@ -192,8 +188,11 @@ private:
   EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
   virtual RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const;
   virtual RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse) const;
+  virtual RegionDelegate *selected_interacting_generic (const Texts &other, bool inverse) const;
   virtual RegionDelegate *pull_generic (const Region &other, int mode, bool touching) const;
   virtual EdgesDelegate *pull_generic (const Edges &other) const;
+  virtual TextsDelegate *pull_generic (const Texts &other) const;
+  DeepRegion *apply_filter (const PolygonFilterBase &filter) const;
 
   template <class Result, class OutputContainer> OutputContainer *processed_impl (const polygon_processor<Result> &filter) const;
 };

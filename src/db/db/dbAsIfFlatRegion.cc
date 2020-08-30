@@ -25,6 +25,7 @@
 #include "dbFlatRegion.h"
 #include "dbFlatEdgePairs.h"
 #include "dbFlatEdges.h"
+#include "dbFlatTexts.h"
 #include "dbEmptyRegion.h"
 #include "dbEmptyEdgePairs.h"
 #include "dbEmptyEdges.h"
@@ -53,6 +54,23 @@ AsIfFlatRegion::AsIfFlatRegion ()
 AsIfFlatRegion::~AsIfFlatRegion ()
 {
   //  .. nothing yet ..
+}
+
+AsIfFlatRegion::AsIfFlatRegion (const AsIfFlatRegion &other)
+  : RegionDelegate (other), m_bbox_valid (false)
+{
+  operator= (other);
+}
+
+AsIfFlatRegion &
+AsIfFlatRegion::operator= (const AsIfFlatRegion &other)
+{
+  if (this != &other) {
+    m_bbox_valid = other.m_bbox_valid;
+    m_bbox = other.m_bbox;
+  }
+
+  return *this;
 }
 
 std::string
@@ -365,6 +383,50 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse) 
 }
 
 RegionDelegate *
+AsIfFlatRegion::selected_interacting_generic (const Texts &other, bool inverse) const
+{
+  if (other.empty ()) {
+    if (! inverse) {
+      return new EmptyRegion ();
+    } else {
+      return clone ();
+    }
+  } else if (empty ()) {
+    return clone ();
+  }
+
+  db::box_scanner2<db::Polygon, size_t, db::Text, size_t> scanner (report_progress (), progress_desc ());
+  scanner.reserve1 (size ());
+  scanner.reserve2 (other.size ());
+
+  std::auto_ptr<FlatRegion> output (new FlatRegion (true));
+  region_to_text_interaction_filter<FlatRegion, db::Text> filter (*output, inverse);
+
+  AddressablePolygonDelivery p (begin_merged (), has_valid_merged_polygons ());
+
+  for ( ; ! p.at_end (); ++p) {
+    scanner.insert1 (p.operator-> (), 0);
+    if (inverse) {
+      filter.preset (p.operator-> ());
+    }
+  }
+
+  AddressableTextDelivery e (other.addressable_texts ());
+
+  for ( ; ! e.at_end (); ++e) {
+    scanner.insert2 (e.operator-> (), 0);
+  }
+
+  scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Text> ());
+
+  if (inverse) {
+    filter.fill_output ();
+  }
+
+  return output.release ();
+}
+
+RegionDelegate *
 AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const
 {
   db::EdgeProcessor ep (report_progress (), progress_desc ());
@@ -440,7 +502,7 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
   std::auto_ptr<FlatEdges> output (new FlatEdges (false));
   region_to_edge_interaction_filter<Shapes, db::Edge> filter (output->raw_edges (), false);
 
-  AddressablePolygonDelivery p (begin (), has_valid_merged_polygons ());
+  AddressablePolygonDelivery p (begin (), has_valid_polygons ());
 
   for ( ; ! p.at_end (); ++p) {
     scanner.insert1 (p.operator-> (), 0);
@@ -453,6 +515,39 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
   }
 
   scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
+
+  return output.release ();
+}
+
+TextsDelegate *
+AsIfFlatRegion::pull_generic (const Texts &other) const
+{
+  if (other.empty ()) {
+    return other.delegate ()->clone ();
+  } else if (empty ()) {
+    return new EmptyTexts ();
+  }
+
+  db::box_scanner2<db::Polygon, size_t, db::Text, size_t> scanner (report_progress (), progress_desc ());
+  scanner.reserve1 (size ());
+  scanner.reserve2 (other.size ());
+
+  std::auto_ptr<FlatTexts> output (new FlatTexts (false));
+  region_to_text_interaction_filter<Shapes, db::Text, db::Text> filter (output->raw_texts (), false);
+
+  AddressablePolygonDelivery p (begin (), has_valid_polygons ());
+
+  for ( ; ! p.at_end (); ++p) {
+    scanner.insert1 (p.operator-> (), 0);
+  }
+
+  AddressableTextDelivery e (other.addressable_texts ());
+
+  for ( ; ! e.at_end (); ++e) {
+    scanner.insert2 (e.operator-> (), 0);
+  }
+
+  scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Text> ());
 
   return output.release ();
 }

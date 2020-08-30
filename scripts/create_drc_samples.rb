@@ -2,9 +2,45 @@
 # Run with:
 # ./klayout -z -r ./create_drc_samples.rb -t -c klayoutrc_drc_samples
 
+class QRCGenerator
+
+  def res_path 
+    "src/lay/lay"
+  end
+
+  def img_path
+    "doc/images"
+  end
+
+  def initialize
+    @path = res_path + "/" + "layDRCLVSHelpResources.qrc"
+    @file = File.open(@path, "w")
+    @file.puts("<RCC>")
+    @file.puts(" <qresource prefix=\"/help/images\">")
+  end
+
+  def <<(str)
+    @file.puts(str)
+  end
+
+  def finish
+    @file.puts(" </qresource>")
+    @file.puts("</RCC>")
+    @file.close
+    puts "---> resource file written to #{@path}"
+  end
+
+  def self.instance
+    @@inst ||= QRCGenerator::new
+    @@inst
+  end
+
+end
+
 def run_demo(gen, cmd, out)
 
-  img_path = "src/lay/lay/doc/images"
+  res_path = QRCGenerator::instance.res_path
+  img_path = QRCGenerator::instance.img_path
 
   mw = RBA::Application::instance::main_window
 
@@ -81,7 +117,9 @@ def run_demo(gen, cmd, out)
     input1 = input(1, 0)
     input = input1
     input2 = input(2, 0)
-    #{cmd}.data
+    labels1 = labels(1, 0)
+    labels = labels1
+    (#{cmd}).data
 SCRIPT
 
   if data.is_a?(RBA::Region)
@@ -101,14 +139,18 @@ SCRIPT
   elsif data.is_a?(RBA::EdgePairs)
     cell.shapes(lout_poly).insert_as_polygons(data, 1)
     cell.shapes(lout).insert(data.edges)
+  elsif data.is_a?(RBA::Texts)
+    cell.shapes(lout).insert(data)
   end
 
   view.update_content
-  view.save_image(img_path + "/" + out, 400, 400)
+  view.save_image(res_path + "/" + img_path + "/" + out, 400, 400)
 
-  puts "---> written #{img_path}/#{out}"
+  puts "---> written #{res_path}/#{img_path}/#{out}"
 
   mw.close_all
+
+  QRCGenerator::instance << "  <file alias=\"#{out}\">#{img_path}/#{out}</file>"
 
 end
 
@@ -630,4 +672,42 @@ gen = Gen::new
 run_demo gen, "input.corners.sized(0.1)", "drc_corners1.png"
 run_demo gen, "input.corners(90.0).sized(0.1)", "drc_corners2.png"
 run_demo gen, "input.corners(-90.0 .. -45.0).sized(0.1)", "drc_corners3.png"
+
+
+class Gen
+  def produce(s1, s2)
+    s1.insert(RBA::Text::new("ABC", RBA::Trans::new(RBA::Vector::new(0, 2000))))
+    s1.insert(RBA::Text::new("A", RBA::Trans::new(RBA::Vector::new(0, 6000))))
+    s1.insert(RBA::Text::new("XYZ", RBA::Trans::new(RBA::Vector::new(4000, 2000))))
+    s1.insert(RBA::Text::new("A*", RBA::Trans::new(RBA::Vector::new(4000, 6000))))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "labels.texts(\"A*\")", "drc_texts1.png"
+run_demo gen, "labels.texts(text(\"A*\"))", "drc_texts2.png"
+
+class Gen
+  def produce(s1, s2)
+    s1.insert(RBA::Text::new("T1", RBA::Trans::new(RBA::Vector::new(0, 2000))))
+    s1.insert(RBA::Text::new("T2", RBA::Trans::new(RBA::Vector::new(2000, 2000))))
+    s1.insert(RBA::Text::new("T3", RBA::Trans::new(RBA::Vector::new(4000, 2000))))
+    pts = [ 
+      RBA::Point::new(2000, 0),
+      RBA::Point::new(2000, 4000),
+      RBA::Point::new(6000, 4000),
+      RBA::Point::new(6000, 0)
+    ];
+    s2.insert(RBA::Polygon::new(pts))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "labels & input2", "drc_textpoly1.png"
+run_demo gen, "labels - input2", "drc_textpoly2.png"
+
+
+QRCGenerator::instance.finish
 

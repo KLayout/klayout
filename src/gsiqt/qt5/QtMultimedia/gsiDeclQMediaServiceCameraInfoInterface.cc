@@ -211,10 +211,10 @@ gsi::Class<QMediaServiceCameraInfoInterface> &qtdecl_QMediaServiceCameraInfoInte
 static gsi::Methods methods_QMediaServiceCameraInfoInterface_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMediaServiceCameraInfoInterface::QMediaServiceCameraInfoInterface()\nThis method creates an object of class QMediaServiceCameraInfoInterface.", &_init_ctor_QMediaServiceCameraInfoInterface_Adaptor_0, &_call_ctor_QMediaServiceCameraInfoInterface_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("cameraOrientation", "@hide", true, &_init_cbs_cameraOrientation_c2309_0, &_call_cbs_cameraOrientation_c2309_0);
-  methods += new qt_gsi::GenericMethod ("cameraOrientation", "@brief Virtual method int QMediaServiceCameraInfoInterface::cameraOrientation(const QByteArray &device)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_cameraOrientation_c2309_0, &_call_cbs_cameraOrientation_c2309_0, &_set_callback_cbs_cameraOrientation_c2309_0);
-  methods += new qt_gsi::GenericMethod ("cameraPosition", "@hide", true, &_init_cbs_cameraPosition_c2309_0, &_call_cbs_cameraPosition_c2309_0);
-  methods += new qt_gsi::GenericMethod ("cameraPosition", "@brief Virtual method QCamera::Position QMediaServiceCameraInfoInterface::cameraPosition(const QByteArray &device)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_cameraPosition_c2309_0, &_call_cbs_cameraPosition_c2309_0, &_set_callback_cbs_cameraPosition_c2309_0);
+  methods += new qt_gsi::GenericMethod ("cameraOrientation", "@brief Virtual method int QMediaServiceCameraInfoInterface::cameraOrientation(const QByteArray &device)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_cameraOrientation_c2309_0, &_call_cbs_cameraOrientation_c2309_0);
+  methods += new qt_gsi::GenericMethod ("cameraOrientation", "@hide", true, &_init_cbs_cameraOrientation_c2309_0, &_call_cbs_cameraOrientation_c2309_0, &_set_callback_cbs_cameraOrientation_c2309_0);
+  methods += new qt_gsi::GenericMethod ("cameraPosition", "@brief Virtual method QCamera::Position QMediaServiceCameraInfoInterface::cameraPosition(const QByteArray &device)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_cameraPosition_c2309_0, &_call_cbs_cameraPosition_c2309_0);
+  methods += new qt_gsi::GenericMethod ("cameraPosition", "@hide", true, &_init_cbs_cameraPosition_c2309_0, &_call_cbs_cameraPosition_c2309_0, &_set_callback_cbs_cameraPosition_c2309_0);
   return methods;
 }
 

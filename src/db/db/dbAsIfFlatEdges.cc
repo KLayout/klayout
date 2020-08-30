@@ -59,6 +59,22 @@ AsIfFlatEdges::~AsIfFlatEdges ()
   //  .. nothing yet ..
 }
 
+AsIfFlatEdges::AsIfFlatEdges (const AsIfFlatEdges &other)
+  : EdgesDelegate (other), m_bbox_valid (false)
+{
+  operator= (other);
+}
+
+AsIfFlatEdges &
+AsIfFlatEdges::operator= (const AsIfFlatEdges &other)
+{
+  if (this != &other) {
+    m_bbox_valid = other.m_bbox_valid;
+    m_bbox = other.m_bbox;
+  }
+  return *this;
+}
+
 std::string
 AsIfFlatEdges::to_string (size_t nmax) const
 {
@@ -170,7 +186,7 @@ AsIfFlatEdges::pull_generic (const Edges &edges) const
 {
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
 
-  AddressableEdgeDelivery e (begin (), true);
+  AddressableEdgeDelivery e (begin (), has_valid_edges ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert (e.operator-> (), 1);
@@ -497,7 +513,7 @@ AsIfFlatEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Co
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve (size () + (other ? other->size () : 0));
 
-  AddressableEdgeDelivery e (begin_merged (), has_valid_edges ());
+  AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
 
   size_t n = 0;
   for ( ; ! e.at_end (); ++e) {

@@ -156,13 +156,19 @@ module LVS
     # See \Netter#max_depth for a description of that function.
 
     # %LVS%
+    # @name consider_net_names
+    # @brief Indicates whether the netlist comparer shall use net names
+    # @synopsis consider_net_names(f)
+    # See \Netter#consider_net_names for a description of that function.
+
+    # %LVS%
     # @name tolerance
     # @brief Specifies compare tolerances for certain device parameters
     # @synopsis tolerance(device_class_name, parameter_name, absolute_tolerance [, relative_tolerance])
     # @synopsis tolerance(device_class_name, parameter_name [, :absolute => absolute_tolerance] [, :relative => relative_tolerance])
     # See \Netter#tolerance for a description of that function.
 
-    %w(schematic compare join_symmetric_nets tolerance align same_nets same_circuits same_device_classes equivalent_pins min_caps max_res max_depth max_branch_complexity).each do |f|
+    %w(schematic compare join_symmetric_nets tolerance align same_nets same_circuits same_device_classes equivalent_pins min_caps max_res max_depth max_branch_complexity consider_net_names).each do |f|
       eval <<"CODE"
         def #{f}(*args)
           _netter.#{f}(*args)

@@ -422,3 +422,68 @@ TEST(11_ErrorOnCircuitRedefinition)
   EXPECT_EQ (tl::replaced (msg, path, "?"), "Redefinition of circuit SUBCKT in ?, line 20");
 }
 
+TEST(12_IgnoreDuplicateGlobals)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader12.cir");
+
+  db::NetlistSpiceReader reader;
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit .TOP ();\n"
+    "  device RES $1 (A=VDD,B=GND) (R=1000,L=0,W=0,A=0,P=0);\n"
+    "  subcircuit FILLER_CAP '0' (VDD=VDD,GND=GND);\n"
+    "end;\n"
+    "circuit FILLER_CAP (VDD=VDD,GND=GND);\n"
+    "  device NMOS '0' (S=GND,G=VDD,D=GND,B=GND) (L=10,W=10,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+}
+
+TEST(13_NoGlobalNetsIfNotUsed)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader13.cir");
+
+  db::NetlistSpiceReader reader;
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit .TOP ();\n"
+    "  device RES $1 (A=VDD,B=NC) (R=1000,L=0,W=0,A=0,P=0);\n"
+    "  subcircuit C10 '1' (VDD=VDD,GND=GND);\n"
+    "end;\n"
+    "circuit C10 (VDD=VDD,GND=GND);\n"
+    "  subcircuit C1 '1' (VDD=VDD,GND=GND);\n"
+    "  subcircuit C2 '2' ();\n"
+    "  subcircuit C3 '3' (VDD=VDD,GND=GND);\n"
+    "  subcircuit C4 '4' (VDD=VDD,GND=GND);\n"
+    "end;\n"
+    "circuit FILLER_CAP (VDD=VDD,GND=GND);\n"
+    "  device NMOS '1' (S=GND,G=VDD,D=GND,B=GND) (L=10,W=10,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+    "circuit DUMMY ();\n"
+    "  device NMOS '1' (S=A,G=A,D=A,B=B) (L=1,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+    "circuit C1 (VDD=VDD,GND=GND);\n"
+    "  subcircuit FILLER_CAP '1' (VDD=VDD,GND=GND);\n"
+    "  subcircuit DUMMY '2' ();\n"
+    "end;\n"
+    "circuit C2 ();\n"
+    "  subcircuit DUMMY '1' ();\n"
+    "end;\n"
+    "circuit C3 (VDD=VDD,GND=GND);\n"
+    "  device NMOS '1' (S=GND,G=VDD,D=GND,B=GND) (L=10,W=10,AS=0,AD=0,PS=0,PD=0);\n"
+    "  subcircuit FILLER_CAP '1' (VDD=VDD,GND=GND);\n"
+    "end;\n"
+    "circuit C4 (VDD=VDD,GND=GND);\n"
+    "  subcircuit C1 '3' (VDD=VDD,GND=GND);\n"
+    "end;\n"
+  );
+}
+

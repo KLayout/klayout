@@ -83,7 +83,7 @@ public:
     std::vector <db::DPoint> points;
     std::vector <db::DEdge> edges;
 
-    ex = tl::Extractor (m_input_stream.get_line ().c_str ());
+    ex = tl::Extractor (get_line ().c_str ());
     ex.read (s, " ");
     ex.read (res);
 
@@ -99,7 +99,7 @@ public:
     std::string cat_name;
     id_type waived_tag_id = db.tags ().tag ("waived").id ();
 
-    while (! m_input_stream.at_end ()) {
+    while (! at_end ()) {
 
       //  TODO: check if this is correct: when a new category is started the 
       //  cell name is reset. Any shape not having a specific cell will go into the
@@ -108,7 +108,7 @@ public:
 
       //  Read the category name unless we have some already (that we got when parsing the shapes).
       if (cat_name.empty ()) {
-        ex = tl::Extractor (m_input_stream.get_line ().c_str ());
+        ex = tl::Extractor (get_line ().c_str ());
         const char *start = ex.skip ();
         if (! *start) {
           break;
@@ -127,11 +127,11 @@ public:
       Category *cath = db.create_category (cat_name);
       cat_name.clear ();
 
-      if (m_input_stream.at_end ()) {
+      if (at_end ()) {
         error (tl::to_string (tr ("Unexpected end of file")));
       }
 
-      ex = tl::Extractor (m_input_stream.get_line ().c_str ());
+      ex = tl::Extractor (get_line ().c_str ());
       size_t n1, n2, n3;
       ex.read (n1);
       ex.read (n2);
@@ -142,11 +142,11 @@ public:
       std::string desc;
       for (size_t i = 0; i < n3; ++i) {
 
-        if (m_input_stream.at_end ()) {
+        if (at_end ()) {
           error (tl::to_string (tr ("Unexpected end of file")));
         }
 
-        std::string l = m_input_stream.get_line ();
+        std::string l = get_line ();
         if (l.size () > 3 && l[0] == 'W' && l[1] == 'E' && isdigit (l[2])) {
 
           size_t n = 0;
@@ -178,12 +178,12 @@ public:
         bool waived = (w != waivers.end ());
         //  TODO: add waiver string somehow ...
 
-        if (m_input_stream.at_end ()) {
+        if (at_end ()) {
           warn (tl::to_string (tr ("Unexpected end of file before the specified number of shapes was read - stopping.")));
           break;
         }
 
-        s = m_input_stream.get_line ();
+        s = get_line ();
 
         ex = tl::Extractor (s.c_str ());
 
@@ -221,11 +221,11 @@ public:
 
         while (true) {
         
-          if (m_input_stream.at_end ()) {
+          if (at_end ()) {
             error (tl::to_string (tr ("Unexpected end of file")));
           }
 
-          ex = tl::Extractor (m_input_stream.get_line ().c_str ());
+          ex = tl::Extractor (get_line ().c_str ());
           char c = *ex.skip ();
 
           if (isalpha (c)) {
@@ -238,7 +238,7 @@ public:
               ex.read_word (cell_name, "_.$-");
 
               int m11 = 1, m12 = 0, m21 = 0, m22 = 1;
-              int x = 0, y = 0;
+              int64_t x = 0, y = 0;
 
               bool cspace = (ex.test ("c") || ex.test ("C"));
 
@@ -340,15 +340,15 @@ public:
 
             if (point > 0) {
 
-              if (m_input_stream.at_end ()) {
+              if (at_end ()) {
                 error (tl::to_string (tr ("Unexpected end of file")));
               }
 
-              ex = tl::Extractor (m_input_stream.get_line ().c_str ());
+              ex = tl::Extractor (get_line ().c_str ());
 
             }
 
-            int x, y;
+            int64_t x, y;
             ex.read (x);
             ex.read (y);
             ex.expect_end ();
@@ -368,19 +368,19 @@ public:
 
             if (point > 0) {
 
-              if (m_input_stream.at_end ()) {
+              if (at_end ()) {
                 error (tl::to_string (tr ("Unexpected end of file")));
               }
 
-              ex = tl::Extractor (m_input_stream.get_line ().c_str ());
+              ex = tl::Extractor (get_line ().c_str ());
 
             }
 
-            int x1, y1;
+            int64_t x1, y1;
             ex.read (x1);
             ex.read (y1);
 
-            int x2, y2;
+            int64_t x2, y2;
             ex.read (x2);
             ex.read (y2);
 
@@ -424,6 +424,26 @@ public:
 private:
   tl::TextInputStream m_input_stream;
   tl::AbsoluteProgress m_progress;
+  std::string m_line;
+
+  bool at_end ()
+  {
+    return m_input_stream.at_end ();
+  }
+
+  const std::string &get_line ()
+  {
+    m_line.clear ();
+    while (! m_input_stream.at_end ()) {
+      m_line = m_input_stream.get_line ();
+      //  skip lines starting with "//" (#522)
+      if (m_line.size () < 2 || m_line[0] != '/' || m_line[1] != '/') {
+        break;
+      }
+      m_line.clear ();
+    }
+    return m_line;
+  }
 
   void warn (const std::string &msg)
   { 

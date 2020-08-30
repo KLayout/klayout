@@ -38,7 +38,7 @@ RegionDelegate::RegionDelegate ()
 }
 
 RegionDelegate::RegionDelegate (const RegionDelegate &other)
-  : tl::UniqueId ()
+  : ShapeCollectionDelegateBase ()
 {
   operator= (other);
 }

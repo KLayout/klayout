@@ -240,13 +240,13 @@ public:
    *  derived by boolean operations for example.
    *  Named regions are persisted inside the LayoutToNetlist object.
    */
-  void register_layer (const db::Region &region, const std::string &name);
+  void register_layer (const ShapeCollection &collection, const std::string &name);
 
   /**
-   *  @brief Gets the name of the given region
-   *  Returns an empty string if the region does not have a name.
+   *  @brief Gets the name of the given collection
+   *  Returns an empty string if the collection does not have a name.
    */
-  std::string name (const db::Region &region) const;
+  std::string name (const ShapeCollection &coll) const;
 
   /**
    *  @brief Gets the name of the given layer by index
@@ -272,7 +272,11 @@ public:
    *  Persisted regions have a name and are kept inside the LayoutToNetlist
    *  object.
    */
-  bool is_persisted (const db::Region &region) const;
+  template <class Collection>
+  bool is_persisted (const Collection &coll) const
+  {
+    return m_name_of_layer.find (layer_of (coll)) != m_name_of_layer.end ();
+  }
 
   /**
    *  @brief Gets the region (layer) with the given name
@@ -329,10 +333,10 @@ public:
   db::Region *make_layer (unsigned int layer_index, const std::string &name = std::string ());
 
   /**
-   *  @brief Creates a new region representing an original layer taking texts only
+   *  @brief Creates a new text collection representing an original layer taking texts only
    *  See "make_layer" for details.
    */
-  db::Region *make_text_layer (unsigned int layer_index, const std::string &name = std::string ());
+  db::Texts *make_text_layer (unsigned int layer_index, const std::string &name = std::string ());
 
   /**
    *  @brief Creates a new region representing an original layer taking polygons and texts
@@ -346,13 +350,13 @@ public:
    *  This method will run device extraction for the given extractor. The layer map is specific
    *  for the extractor and uses the region objects derived with "make_layer" and it's variants.
    *
-   *  In addition, derived regions can be passed too. Certain limitations apply. It's safe to use
+   *  In addition, derived regions/text collections can be passed too. Certain limitations apply. It's safe to use
    *  boolean operations for deriving layers. Other operations are applicable as long as they are
    *  capable of delivering hierarchical layers.
    *
    *  If errors occur, the device extractor will contain theses errors.
    */
-  void extract_devices (db::NetlistDeviceExtractor &extractor, const std::map<std::string, db::Region *> &layers);
+  void extract_devices (db::NetlistDeviceExtractor &extractor, const std::map<std::string, db::ShapeCollection *> &layers);
 
   /**
    *  @brief Defines an intra-layer connection for the given layer.
@@ -367,13 +371,46 @@ public:
    *  @brief Defines an inter-layer connection for the given layers.
    *  The conditions mentioned with intra-layer "connect" apply for this method too.
    */
-  void connect (const db::Region &a, const db::Region &b);
+  void connect (const db::Region &a, const db::Region &b)
+  {
+    connect_impl (a, b);
+  }
+
+  /**
+   *  @brief Defines an inter-layer connection for the given layers.
+   *  As one layer is a texts layer, this connection will basically add net labels.
+   */
+  void connect (const db::Region &a, const db::Texts &b)
+  {
+    connect_impl (a, b);
+  }
+
+  /**
+   *  @brief Defines an inter-layer connection for the given layers.
+   *  As one layer is a texts layer, this connection will basically add net labels.
+   */
+  void connect (const db::Texts &a, const db::Region &b)
+  {
+    connect_impl (b, a);
+  }
 
   /**
    *  @brief Connects the given layer with a global net with the given name
    *  Returns the global net ID
    */
-  size_t connect_global (const db::Region &l, const std::string &gn);
+  void connect_global (const db::Region &l, const std::string &gn)
+  {
+    connect_global_impl (l, gn);
+  }
+
+  /**
+   *  @brief Connects the given text layer with a global net with the given name
+   *  Returns the global net ID
+   */
+  void connect_global (const db::Texts &l, const std::string &gn)
+  {
+    connect_global_impl (l, gn);
+  }
 
   /**
    *  @brief Gets the global net name for a given global net ID
@@ -470,7 +507,11 @@ public:
    *  This method is required to derive the internal layer index - for example for
    *  investigating the cluster tree.
    */
-  unsigned int layer_of (const db::Region &region) const;
+  template <class Collection>
+  unsigned int layer_of (const Collection &coll) const
+  {
+    return deep_layer_of (coll).layer ();
+  }
 
   /**
    *  @brief Creates a cell mapping for copying shapes from the internal layout to the given target layout.
@@ -522,7 +563,7 @@ public:
    *  NOTE: the layer and cell indexes used inside this structure refer to the
    *  internal layout.
    */
-  const db::hier_clusters<db::PolygonRef> &net_clusters () const
+  const db::hier_clusters<db::NetShape> &net_clusters () const
   {
     return m_net_clusters;
   }
@@ -530,7 +571,7 @@ public:
   /**
    *  @brief Gets the hierarchical shape clusters derived in the net extraction (non-conver version)
    */
-  db::hier_clusters<db::PolygonRef> &net_clusters ()
+  db::hier_clusters<db::NetShape> &net_clusters ()
   {
     return m_net_clusters;
   }
@@ -668,8 +709,11 @@ public:
    *
    *  This variant accepts a micrometer-unit location. The location is given in the
    *  coordinate space of the initial cell.
+   *
+   *  The subcircuit path leading to the topmost net is stored in *sc_path_out if this
+   *  pointer is non-null.
    */
-  db::Net *probe_net (const db::Region &of_region, const db::DPoint &point);
+  db::Net *probe_net (const db::Region &of_region, const db::DPoint &point, std::vector<SubCircuit *> *sc_path_out = 0, Circuit *initial_circuit = 0);
 
   /**
    *  @brief Finds the net by probing a specific location on the given layer
@@ -677,7 +721,7 @@ public:
    *  This variant accepts a database-unit location. The location is given in the
    *  coordinate space of the initial cell.
    */
-  db::Net *probe_net (const db::Region &of_region, const db::Point &point);
+  db::Net *probe_net (const db::Region &of_region, const db::Point &point, std::vector<SubCircuit *> *sc_path_out = 0, Circuit *initial_circuit = 0);
 
   /**
    *  @brief Runs an antenna check on the extracted clusters
@@ -688,6 +732,14 @@ public:
    *  on the cluster. Of all clusters where the antenna ratio is larger than
    *  the limit ratio all metal shapes are copied to the output region as
    *  error markers.
+   *
+   *  The area computation of gate and metal happens by taking the polygon
+   *  area (A) and perimeter (P) into account:
+   *
+   *    A(antenna) = A + P * t
+   *
+   *  where t is the perimeter factor. The unit of this area factor is
+   *  micrometers.
    *
    *  The limit ratio can be modified by the presence of connections to
    *  other layers (specifically designating diodes for charge removal).
@@ -701,7 +753,31 @@ public:
    *  regardless of the diode's area.
    *  In other words: any diode will make the net safe against antenna discharge.
    */
-  db::Region antenna_check (const db::Region &gate, const db::Region &metal, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes = std::vector<std::pair<const db::Region *, double> > ());
+  db::Region antenna_check (const db::Region &gate, double gate_perimeter_factor, const db::Region &metal, double metal_perimeter_factor, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes = std::vector<std::pair<const db::Region *, double> > ())
+  {
+    return antenna_check (gate, 1.0, gate_perimeter_factor, metal, 1.0, metal_perimeter_factor, ratio, diodes);
+  }
+
+  /**
+   *  @brief Variant of the antennna check not using the perimeter
+   *  This version uses 0 for the perimeter factor hence not taking into account the perimeter at all.
+   */
+  db::Region antenna_check (const db::Region &gate, const db::Region &metal, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes = std::vector<std::pair<const db::Region *, double> > ())
+  {
+    return antenna_check (gate, 1.0, 0.0, metal, 1.0, 0.0, ratio, diodes);
+  }
+
+  /**
+   *  @brief Variant of the antenna check providing an area scale factor
+   *
+   *  This version provides an additional area scale factor f, so the effective area becomes
+   *
+   *    A(antenna) = A * f + P * t
+   *
+   *  where f is the area scale factor and t the perimeter scale factor. This version allows to ignore the
+   *  area contribution entirely and switch to a perimeter-based antenna check by setting f to zero.
+   */
+  db::Region antenna_check (const db::Region &gate, double gate_area_factor, double gate_perimeter_factor, const db::Region &metal, double metal_area_factor, double metal_perimeter_factor, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes = std::vector<std::pair<const db::Region *, double> > ());
 
   /**
    *  @brief Saves the database to the given path
@@ -744,7 +820,7 @@ private:
   tl::weak_ptr<db::DeepShapeStore> mp_dss;
   unsigned int m_layout_index;
   db::Connectivity m_conn;
-  db::hier_clusters<db::PolygonRef> m_net_clusters;
+  db::hier_clusters<db::NetShape> m_net_clusters;
   std::auto_ptr<db::Netlist> mp_netlist;
   std::set<db::DeepLayer> m_dlrefs;
   std::map<std::string, db::DeepLayer> m_named_regions;
@@ -786,15 +862,17 @@ private:
 
   void init ();
   void ensure_netlist ();
-  size_t search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::PolygonRef> &test_cluster, std::vector<db::InstElement> &rev_inst_path);
+  size_t search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<NetShape> &test_cluster, std::vector<db::InstElement> &rev_inst_path);
   void build_net_rec (const db::Net &net, db::Layout &target, cell_index_type circuit_cell, const db::CellMapping &cmap, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, cell_reuse_table_type &reuse_table, const ICplxTrans &tr) const;
   void build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, cell_reuse_table_type &reuse_table, const ICplxTrans &tr) const;
   void build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const Net *net, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, cell_reuse_table_type &reuse_table, const ICplxTrans &tr) const;
-  db::DeepLayer deep_layer_of (const db::Region &region) const;
+  db::DeepLayer deep_layer_of (const ShapeCollection &coll) const;
   void ensure_layout () const;
   std::string make_new_name (const std::string &stem = std::string ());
   db::properties_id_type make_netname_propid (db::Layout &ly, const tl::Variant &netname_prop, const db::Net &net) const;
   db::CellMapping make_cell_mapping_into (db::Layout &layout, db::Cell &cell, const std::vector<const db::Net *> *nets, bool with_device_cells);
+  void connect_impl (const db::ShapeCollection &a, const db::ShapeCollection &b);
+  void connect_global_impl (const db::ShapeCollection &l, const std::string &gn);
 
   //  implementation of NetlistManipulationCallbacks
   virtual size_t link_net_to_parent_circuit (const Net *subcircuit_net, Circuit *parent_circuit, const DCplxTrans &trans);

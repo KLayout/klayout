@@ -270,12 +270,12 @@ gsi::Class<QMimeSource> &qtdecl_QMimeSource ();
 static gsi::Methods methods_QMimeSource_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMimeSource::QMimeSource()\nThis method creates an object of class QMimeSource.", &_init_ctor_QMimeSource_Adaptor_0, &_call_ctor_QMimeSource_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("encodedData", "@hide", true, &_init_cbs_encodedData_c1731_0, &_call_cbs_encodedData_c1731_0);
-  methods += new qt_gsi::GenericMethod ("encodedData", "@brief Virtual method QByteArray QMimeSource::encodedData(const char *)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_encodedData_c1731_0, &_call_cbs_encodedData_c1731_0, &_set_callback_cbs_encodedData_c1731_0);
-  methods += new qt_gsi::GenericMethod ("format", "@hide", true, &_init_cbs_format_c767_1, &_call_cbs_format_c767_1);
-  methods += new qt_gsi::GenericMethod ("format", "@brief Virtual method const char *QMimeSource::format(int n)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_format_c767_1, &_call_cbs_format_c767_1, &_set_callback_cbs_format_c767_1);
-  methods += new qt_gsi::GenericMethod ("provides", "@hide", true, &_init_cbs_provides_c1731_0, &_call_cbs_provides_c1731_0);
-  methods += new qt_gsi::GenericMethod ("provides", "@brief Virtual method bool QMimeSource::provides(const char *)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_provides_c1731_0, &_call_cbs_provides_c1731_0, &_set_callback_cbs_provides_c1731_0);
+  methods += new qt_gsi::GenericMethod ("encodedData", "@brief Virtual method QByteArray QMimeSource::encodedData(const char *)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_encodedData_c1731_0, &_call_cbs_encodedData_c1731_0);
+  methods += new qt_gsi::GenericMethod ("encodedData", "@hide", true, &_init_cbs_encodedData_c1731_0, &_call_cbs_encodedData_c1731_0, &_set_callback_cbs_encodedData_c1731_0);
+  methods += new qt_gsi::GenericMethod ("format", "@brief Virtual method const char *QMimeSource::format(int n)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_format_c767_1, &_call_cbs_format_c767_1);
+  methods += new qt_gsi::GenericMethod ("format", "@hide", true, &_init_cbs_format_c767_1, &_call_cbs_format_c767_1, &_set_callback_cbs_format_c767_1);
+  methods += new qt_gsi::GenericMethod ("provides", "@brief Virtual method bool QMimeSource::provides(const char *)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_provides_c1731_0, &_call_cbs_provides_c1731_0);
+  methods += new qt_gsi::GenericMethod ("provides", "@hide", true, &_init_cbs_provides_c1731_0, &_call_cbs_provides_c1731_0, &_set_callback_cbs_provides_c1731_0);
   return methods;
 }
 

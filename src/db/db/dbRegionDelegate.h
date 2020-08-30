@@ -28,9 +28,10 @@
 
 #include "dbPolygon.h"
 #include "dbEdges.h"
+#include "dbTexts.h"
 #include "dbEdgePairs.h"
 #include "dbEdgePairRelations.h"
-#include "tlUniqueId.h"
+#include "dbShapeCollection.h"
 
 #include <list>
 
@@ -134,32 +135,9 @@ public:
   virtual bool wants_variants () const = 0;
 };
 
-/**
- *  @brief A polygon-to-polygon processor base class
- */
-class DB_PUBLIC PolygonProcessorBase
-  : public polygon_processor<db::Polygon>
-{
-  //  .. nothing yet ..
-};
-
-/**
- *  @brief A polygon-to-edge processor base class
- */
-class DB_PUBLIC PolygonToEdgeProcessorBase
-  : public polygon_processor<db::Edge>
-{
-  //  .. nothing yet ..
-};
-
-/**
- *  @brief A polygon-to-edge pair processor base class
- */
-class DB_PUBLIC PolygonToEdgePairProcessorBase
-  : public polygon_processor<db::EdgePair>
-{
-  //  .. nothing yet ..
-};
+typedef shape_collection_processor<db::Polygon, db::Polygon> PolygonProcessorBase;
+typedef shape_collection_processor<db::Polygon, db::Edge> PolygonToEdgeProcessorBase;
+typedef shape_collection_processor<db::Polygon, db::EdgePair> PolygonToEdgePairProcessorBase;
 
 /**
  *  @brief The region iterator delegate
@@ -182,7 +160,7 @@ public:
  *  @brief The delegate for the actual region implementation
  */
 class DB_PUBLIC RegionDelegate
-  : public tl::UniqueId
+  : public db::ShapeCollectionDelegateBase
 {
 public:
   typedef db::Coord coord_type;
@@ -294,12 +272,15 @@ public:
   virtual RegionDelegate *selected_not_interacting (const Region &other) const = 0;
   virtual RegionDelegate *selected_interacting (const Edges &other) const = 0;
   virtual RegionDelegate *selected_not_interacting (const Edges &other) const = 0;
+  virtual RegionDelegate *selected_interacting (const Texts &other) const = 0;
+  virtual RegionDelegate *selected_not_interacting (const Texts &other) const = 0;
   virtual RegionDelegate *selected_overlapping (const Region &other) const = 0;
   virtual RegionDelegate *selected_not_overlapping (const Region &other) const = 0;
   virtual RegionDelegate *pull_inside (const Region &other) const = 0;
   virtual RegionDelegate *pull_interacting (const Region &other) const = 0;
   virtual EdgesDelegate *pull_interacting (const Edges &other) const = 0;
   virtual RegionDelegate *pull_overlapping (const Region &other) const = 0;
+  virtual TextsDelegate *pull_interacting (const Texts &other) const = 0;
   virtual RegionDelegate *in (const Region &other, bool invert) const = 0;
 
   virtual const db::Polygon *nth (size_t n) const = 0;

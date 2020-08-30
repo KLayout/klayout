@@ -40,7 +40,7 @@ class DeepRegion;
  *  @brief Provides hierarchical edges implementation
  */
 class DB_PUBLIC DeepEdges
-  : public db::AsIfFlatEdges
+  : public db::AsIfFlatEdges, public db::DeepShapeCollectionDelegateBase
 {
 public:
   DeepEdges ();
@@ -144,26 +144,21 @@ public:
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
 
-  const DeepLayer &deep_layer () const
+  virtual DeepShapeCollectionDelegateBase *deep ()
   {
-    return m_deep_layer;
+    return this;
   }
 
-  DeepLayer &deep_layer ()
-  {
-    return m_deep_layer;
-  }
+  void set_is_merged (bool f);
 
 protected:
   virtual void merged_semantics_changed ();
-  void set_is_merged (bool f);
 
 private:
   friend class DeepRegion;
 
   DeepEdges &operator= (const DeepEdges &other);
 
-  DeepLayer m_deep_layer;
   mutable DeepLayer m_merged_edges;
   mutable bool m_merged_edges_valid;
   bool m_is_merged;
@@ -178,6 +173,8 @@ private:
   virtual RegionDelegate *pull_generic (const Region &region) const;
   virtual EdgesDelegate *selected_interacting_generic (const Edges &edges, bool invert) const;
   virtual EdgesDelegate *selected_interacting_generic (const Region &region, bool invert) const;
+  DeepEdges *apply_filter (const EdgeFilterBase &filter) const;
+
   template <class Result, class OutputContainer> OutputContainer *processed_impl (const edge_processor<Result> &filter) const;
 };
 

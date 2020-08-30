@@ -133,6 +133,52 @@ errors = antenna_check(gate, metal1, 50.0, [ diode, 10.0 ])
 Multiple diode specifications are allowed. Just add them 
 to the antenna_check call.
 </p><p>
+You can include the perimeter into the area computation for
+the gate or metal layer or both. The physical picture
+is this: the side walls of the material contribute to the 
+surface too. As the side wall area can be estimated by taking
+the perimeter times some material thickness, the effective 
+area is: 
+</p><p>
+<pre>
+A(eff) = A + P * t
+</pre>
+</p><p>
+Here A is the area of the polygons and P is their perimeter.
+t is the "thickness" in micrometer units. To specify such
+a condition, use the following notation:
+</p><p>
+<pre>
+errors = antenna_check(area_and_perimeter(gate, 0.5), ...)
+</pre>
+</p><p>
+"area_and_perimeter" takes the polygon layer and the 
+thickness (0.5 micrometers in this case). 
+This notation can be applied to both gate and
+metal layers. A detailed notation for the usual,
+area-only case is available as well for completeness:
+</p><p>
+<pre>
+errors = antenna_check(area_only(gate), ...)
+
+# this is equivalent to a zero thickness:
+errors = antenna_check(area_and_perimeter(gate, 0.0), ...)
+# or the standard case:
+errors = antenna_check(gate, ...)
+</pre>
+</p><p>
+Finally there is also "perimeter_only". When using this 
+specification with a thickness value, the area is computed
+from the perimeter alone:
+</p><p>
+<pre>
+A(eff) = P * t
+</pre>
+</p><p>
+<pre>
+errors = antenna_check(perimeter_only(gate, 0.5), ...)
+</pre>
+</p><p>
 The error shapes produced by the antenna check are copies
 of the metal shapes on the metal layers of each network 
 violating the antenna rule.
@@ -153,12 +199,18 @@ See <a href="#connect">connect</a> for more details.
 <li><tt>connect(a, b)</tt></li>
 </ul>
 <p>
-a and b must be polygon layers. After calling this function, the
+a and b must be polygon or text layers. After calling this function, the
 Netter regards all overlapping or touching shapes on these layers
 to form an electrical connection between the materials formed by
 these layers. This also implies intra-layer connections: shapes
 on these layers touching or overlapping other shapes on these
 layers will form bigger, electrically connected areas.
+</p><p>
+Texts will be used to assign net names to the nets. The preferred
+method is to use <a href="#labels">labels</a> to create a text layer from a design 
+layer. When using <a href="#input">input</a>, text labels are carried implicitly
+with the polygons but at the cost of small dummy shapes (2x2 DBU
+marker polygons) and limited functionality.
 </p><p>
 Multiple connect calls must be made to form larger connectivity
 stacks across multiple layers. Such stacks may include forks and
@@ -177,7 +229,7 @@ can be cleared with <a href="#clear_connections">clear_connections</a>.
 Connects the shapes from the given layer l to a global net with the given name.
 Global nets are common to all cells. Global nets automatically connect to parent
 cells throughs implied pins. An example is the substrate (bulk) net which connects
-to shapes belonging to tie-down diodes.
+to shapes belonging to tie-down diodes. "l" can be a polygon or text layer.
 </p>
 <a name="connect_implicit"/><h2>"connect_implicit" - Specifies a search pattern for labels which create implicit net connections</h2>
 <keyword name="connect_implicit"/>

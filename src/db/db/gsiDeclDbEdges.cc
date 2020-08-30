@@ -325,12 +325,9 @@ static db::Region pull_interacting (const db::Edges *r, const db::Region &other)
 
 static db::Region extents2 (const db::Edges *r, db::Coord dx, db::Coord dy)
 {
-  db::Region e;
-  e.reserve (r->size ());
-  for (db::Edges::const_iterator i = r->begin (); ! i.at_end (); ++i) {
-    e.insert (i->bbox ().enlarged (db::Vector (dx, dy)));
-  }
-  return e;
+  db::Region output;
+  r->processed (output, db::extents_processor<db::Edge> (dx, dy));
+  return output;
 }
 
 static db::Region extents1 (const db::Edges *r, db::Coord d)
@@ -412,7 +409,9 @@ static size_t id (const db::Edges *e)
   return tl::id_of (e->delegate ());
 }
 
-Class<db::Edges> dec_Edges ("db", "Edges",
+extern Class<db::ShapeCollection> decl_dbShapeCollection;
+
+Class<db::Edges> dec_Edges (decl_dbShapeCollection, "db", "Edges",
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
     "\n"
@@ -426,13 +425,13 @@ Class<db::Edges> dec_Edges ("db", "Edges",
   constructor ("new", &new_a1, gsi::arg ("array"),
     "@brief Constructor from a polygon array\n"
     "\n"
-    "This constructor creates a region from an array of polygons.\n"
+    "This constructor creates an edge collection from an array of polygons.\n"
     "The edges form the contours of the polygons.\n"
   ) +
   constructor ("new", &new_a2, gsi::arg ("array"),
     "@brief Constructor from an edge array\n"
     "\n"
-    "This constructor creates a region from an array of edges.\n"
+    "This constructor creates an edge collection from an array of edges.\n"
   ) +
   constructor ("new", &new_b, gsi::arg ("box"),
     "@brief Box constructor\n"
@@ -859,7 +858,7 @@ Class<db::Edges> dec_Edges ("db", "Edges",
   method ("interacting", (db::Edges (db::Edges::*) (const db::Edges &) const)  &db::Edges::selected_interacting, gsi::arg ("other"),
     "@brief Returns the edges of this edge collection which overlap or touch edges from the other edge collection\n"
     "\n"
-    "@return A new edge collection containing the edges overlapping or touching edges from the other region\n"
+    "@return A new edge collection containing the edges overlapping or touching edges from the other edge collection\n"
     "\n"
     "This method does not merge the edges before they are selected. If you want to select coherent "
     "edges, make sure the edge collection is merged before this method is used.\n"
@@ -867,7 +866,7 @@ Class<db::Edges> dec_Edges ("db", "Edges",
   method ("not_interacting", (db::Edges (db::Edges::*) (const db::Edges &) const)  &db::Edges::selected_not_interacting, gsi::arg ("other"),
     "@brief Returns the edges of this edge collection which do not overlap or touch edges from the other edge collection\n"
     "\n"
-    "@return A new edge collection containing the edges not overlapping or touching edges from the other region\n"
+    "@return A new edge collection containing the edges not overlapping or touching edges from the other edge collection\n"
     "\n"
     "This method does not merge the edges before they are selected. If you want to select coherent "
     "edges, make sure the edge collection is merged before this method is used.\n"
@@ -889,7 +888,7 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
   method ("interacting", (db::Edges (db::Edges::*) (const db::Region &) const)  &db::Edges::selected_interacting, gsi::arg ("other"),
-    "@brief Returns the edges from this region which overlap or touch polygons from the region\n"
+    "@brief Returns the edges from this edge collection which overlap or touch polygons from the region\n"
     "\n"
     "@return A new edge collection containing the edges overlapping or touching polygons from the region\n"
     "\n"
@@ -897,7 +896,7 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
   method ("not_interacting", (db::Edges (db::Edges::*) (const db::Region &) const)  &db::Edges::selected_not_interacting, gsi::arg ("other"),
-    "@brief Returns the edges from this region which do not overlap or touch polygons from the region\n"
+    "@brief Returns the edges from this edge collection which do not overlap or touch polygons from the region\n"
     "\n"
     "@return A new edge collection containing the edges not overlapping or touching polygons from the region\n"
     "\n"
@@ -905,7 +904,7 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
   method ("select_interacting", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_interacting, gsi::arg ("other"),
-    "@brief Selects the edges from this region which overlap or touch polygons from the region\n"
+    "@brief Selects the edges from this edge collection which overlap or touch polygons from the region\n"
     "\n"
     "@return The edge collection after the edges have been selected (self)\n"
     "\n"
@@ -913,7 +912,7 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
   method ("select_not_interacting", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_not_interacting, gsi::arg ("other"),
-    "@brief Selects the edges from this region which do not overlap or touch polygons from the region\n"
+    "@brief Selects the edges from this edge collection which do not overlap or touch polygons from the region\n"
     "\n"
     "@return The edge collection after the edges have been selected (self)\n"
     "\n"

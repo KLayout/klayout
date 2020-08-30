@@ -500,22 +500,22 @@ gsi::Class<QAccessibleTableCellInterface> &qtdecl_QAccessibleTableCellInterface 
 static gsi::Methods methods_QAccessibleTableCellInterface_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAccessibleTableCellInterface::QAccessibleTableCellInterface()\nThis method creates an object of class QAccessibleTableCellInterface.", &_init_ctor_QAccessibleTableCellInterface_Adaptor_0, &_call_ctor_QAccessibleTableCellInterface_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("columnExtent", "@hide", true, &_init_cbs_columnExtent_c0_0, &_call_cbs_columnExtent_c0_0);
-  methods += new qt_gsi::GenericMethod ("columnExtent", "@brief Virtual method int QAccessibleTableCellInterface::columnExtent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_columnExtent_c0_0, &_call_cbs_columnExtent_c0_0, &_set_callback_cbs_columnExtent_c0_0);
-  methods += new qt_gsi::GenericMethod ("columnHeaderCells", "@hide", true, &_init_cbs_columnHeaderCells_c0_0, &_call_cbs_columnHeaderCells_c0_0);
-  methods += new qt_gsi::GenericMethod ("columnHeaderCells", "@brief Virtual method QList<QAccessibleInterface*> QAccessibleTableCellInterface::columnHeaderCells()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_columnHeaderCells_c0_0, &_call_cbs_columnHeaderCells_c0_0, &_set_callback_cbs_columnHeaderCells_c0_0);
-  methods += new qt_gsi::GenericMethod ("columnIndex", "@hide", true, &_init_cbs_columnIndex_c0_0, &_call_cbs_columnIndex_c0_0);
-  methods += new qt_gsi::GenericMethod ("columnIndex", "@brief Virtual method int QAccessibleTableCellInterface::columnIndex()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_columnIndex_c0_0, &_call_cbs_columnIndex_c0_0, &_set_callback_cbs_columnIndex_c0_0);
-  methods += new qt_gsi::GenericMethod ("isSelected", "@hide", true, &_init_cbs_isSelected_c0_0, &_call_cbs_isSelected_c0_0);
-  methods += new qt_gsi::GenericMethod ("isSelected", "@brief Virtual method bool QAccessibleTableCellInterface::isSelected()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isSelected_c0_0, &_call_cbs_isSelected_c0_0, &_set_callback_cbs_isSelected_c0_0);
-  methods += new qt_gsi::GenericMethod ("rowExtent", "@hide", true, &_init_cbs_rowExtent_c0_0, &_call_cbs_rowExtent_c0_0);
-  methods += new qt_gsi::GenericMethod ("rowExtent", "@brief Virtual method int QAccessibleTableCellInterface::rowExtent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_rowExtent_c0_0, &_call_cbs_rowExtent_c0_0, &_set_callback_cbs_rowExtent_c0_0);
-  methods += new qt_gsi::GenericMethod ("rowHeaderCells", "@hide", true, &_init_cbs_rowHeaderCells_c0_0, &_call_cbs_rowHeaderCells_c0_0);
-  methods += new qt_gsi::GenericMethod ("rowHeaderCells", "@brief Virtual method QList<QAccessibleInterface*> QAccessibleTableCellInterface::rowHeaderCells()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_rowHeaderCells_c0_0, &_call_cbs_rowHeaderCells_c0_0, &_set_callback_cbs_rowHeaderCells_c0_0);
-  methods += new qt_gsi::GenericMethod ("rowIndex", "@hide", true, &_init_cbs_rowIndex_c0_0, &_call_cbs_rowIndex_c0_0);
-  methods += new qt_gsi::GenericMethod ("rowIndex", "@brief Virtual method int QAccessibleTableCellInterface::rowIndex()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_rowIndex_c0_0, &_call_cbs_rowIndex_c0_0, &_set_callback_cbs_rowIndex_c0_0);
-  methods += new qt_gsi::GenericMethod ("table", "@hide", true, &_init_cbs_table_c0_0, &_call_cbs_table_c0_0);
-  methods += new qt_gsi::GenericMethod ("table", "@brief Virtual method QAccessibleInterface *QAccessibleTableCellInterface::table()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_table_c0_0, &_call_cbs_table_c0_0, &_set_callback_cbs_table_c0_0);
+  methods += new qt_gsi::GenericMethod ("columnExtent", "@brief Virtual method int QAccessibleTableCellInterface::columnExtent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_columnExtent_c0_0, &_call_cbs_columnExtent_c0_0);
+  methods += new qt_gsi::GenericMethod ("columnExtent", "@hide", true, &_init_cbs_columnExtent_c0_0, &_call_cbs_columnExtent_c0_0, &_set_callback_cbs_columnExtent_c0_0);
+  methods += new qt_gsi::GenericMethod ("columnHeaderCells", "@brief Virtual method QList<QAccessibleInterface*> QAccessibleTableCellInterface::columnHeaderCells()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_columnHeaderCells_c0_0, &_call_cbs_columnHeaderCells_c0_0);
+  methods += new qt_gsi::GenericMethod ("columnHeaderCells", "@hide", true, &_init_cbs_columnHeaderCells_c0_0, &_call_cbs_columnHeaderCells_c0_0, &_set_callback_cbs_columnHeaderCells_c0_0);
+  methods += new qt_gsi::GenericMethod ("columnIndex", "@brief Virtual method int QAccessibleTableCellInterface::columnIndex()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_columnIndex_c0_0, &_call_cbs_columnIndex_c0_0);
+  methods += new qt_gsi::GenericMethod ("columnIndex", "@hide", true, &_init_cbs_columnIndex_c0_0, &_call_cbs_columnIndex_c0_0, &_set_callback_cbs_columnIndex_c0_0);
+  methods += new qt_gsi::GenericMethod ("isSelected", "@brief Virtual method bool QAccessibleTableCellInterface::isSelected()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isSelected_c0_0, &_call_cbs_isSelected_c0_0);
+  methods += new qt_gsi::GenericMethod ("isSelected", "@hide", true, &_init_cbs_isSelected_c0_0, &_call_cbs_isSelected_c0_0, &_set_callback_cbs_isSelected_c0_0);
+  methods += new qt_gsi::GenericMethod ("rowExtent", "@brief Virtual method int QAccessibleTableCellInterface::rowExtent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_rowExtent_c0_0, &_call_cbs_rowExtent_c0_0);
+  methods += new qt_gsi::GenericMethod ("rowExtent", "@hide", true, &_init_cbs_rowExtent_c0_0, &_call_cbs_rowExtent_c0_0, &_set_callback_cbs_rowExtent_c0_0);
+  methods += new qt_gsi::GenericMethod ("rowHeaderCells", "@brief Virtual method QList<QAccessibleInterface*> QAccessibleTableCellInterface::rowHeaderCells()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_rowHeaderCells_c0_0, &_call_cbs_rowHeaderCells_c0_0);
+  methods += new qt_gsi::GenericMethod ("rowHeaderCells", "@hide", true, &_init_cbs_rowHeaderCells_c0_0, &_call_cbs_rowHeaderCells_c0_0, &_set_callback_cbs_rowHeaderCells_c0_0);
+  methods += new qt_gsi::GenericMethod ("rowIndex", "@brief Virtual method int QAccessibleTableCellInterface::rowIndex()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_rowIndex_c0_0, &_call_cbs_rowIndex_c0_0);
+  methods += new qt_gsi::GenericMethod ("rowIndex", "@hide", true, &_init_cbs_rowIndex_c0_0, &_call_cbs_rowIndex_c0_0, &_set_callback_cbs_rowIndex_c0_0);
+  methods += new qt_gsi::GenericMethod ("table", "@brief Virtual method QAccessibleInterface *QAccessibleTableCellInterface::table()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_table_c0_0, &_call_cbs_table_c0_0);
+  methods += new qt_gsi::GenericMethod ("table", "@hide", true, &_init_cbs_table_c0_0, &_call_cbs_table_c0_0, &_set_callback_cbs_table_c0_0);
   return methods;
 }
 

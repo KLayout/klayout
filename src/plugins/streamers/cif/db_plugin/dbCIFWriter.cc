@@ -165,26 +165,21 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
           }
           
           double a = t.angle();
-          while (a < 0) {
-            a += 360.0;
-          }
-          double ya = 0.0, xa = 0.0;
-          if (a < 45 || a > 315) {
-            xa = 1.0;
-            ya = tan(a / 180.0 * M_PI);
-          } else if (a < 135) {
-            xa = 1.0 / tan(a / 180.0 * M_PI);
-            ya = 1.0;
-          } else if (a < 225) {
-            xa = -1.0;
-            ya = tan(a / 180.0 * M_PI);
+          double xa = cos(a / 180.0 * M_PI);
+          double ya = sin(a / 180.0 * M_PI);
+
+          //  normalize xa or ya whichever is better
+          double n;
+          if (fabs (xa) >= M_SQRT1_2) {
+            n = 1.0 / fabs (xa);
           } else {
-            xa = 1.0 / tan(a / 180.0 * M_PI);
-            ya = -1.0;
-          } 
+            n = 1.0 / fabs (ya);
+          }
+          xa *= n;
+          ya *= n;
 
           //  TODO: that can be done smarter ...
-          while (fabs (xa - floor (0.5 + xa)) > 1e-3 || fabs (ya - floor (0.5 + ya)) > 1e-3) {
+          for (int n = 0; n < 20 && (fabs (xa - floor (0.5 + xa)) > 1e-3 || fabs (ya - floor (0.5 + ya)) > 1e-3); ++n) {
             xa *= 2.0;
             ya *= 2.0;
           }

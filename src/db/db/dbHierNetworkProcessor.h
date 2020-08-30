@@ -31,6 +31,7 @@
 #include "dbCell.h"
 #include "dbInstElement.h"
 #include "tlEquivalenceClusters.h"
+#include "tlAssert.h"
 
 #include <map>
 #include <list>
@@ -505,7 +506,7 @@ public:
    *  cluster joining may happen in this case, because multi-attribute
    *  assignment might create connections too.
    */
-  void build_clusters (const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence = 0, bool report_progress = false);
+  void build_clusters (const db::Cell &cell, const db::Connectivity &conn, const tl::equivalence_clusters<size_t> *attr_equivalence = 0, bool report_progress = false);
 
   /**
    *  @brief Creates and inserts a new clusters
@@ -540,7 +541,7 @@ private:
   tree_type m_clusters;
   size_t m_next_dummy_id;
 
-  void apply_attr_equivalences (const tl::equivalence_clusters<unsigned int> &attr_equivalence);
+  void apply_attr_equivalences (const tl::equivalence_clusters<size_t> &attr_equivalence);
 };
 
 /**
@@ -761,13 +762,71 @@ inline bool less_array_delegates (const db::ArrayBase *a, const db::ArrayBase *b
  */
 struct InstanceToInstanceInteraction
 {
-  InstanceToInstanceInteraction (db::cell_index_type _ci1, const db::ArrayBase *_array1, db::cell_index_type _ci2, const db::ArrayBase *_array2, const db::ICplxTrans &_t21)
-    : ci1 (_ci1), ci2 (_ci2), array1 (_array1), array2 (_array2), t21 (_t21)
-  { }
+  InstanceToInstanceInteraction (db::cell_index_type _ci1, const db::ArrayBase *_array1, db::cell_index_type _ci2, const db::ArrayBase *_array2, const db::ICplxTrans &_tn, const db::ICplxTrans &_t21)
+    : ci1 (_ci1), ci2 (_ci2), array1 (0), array2 (0), t21 (_t21)
+  {
+    if (_array1) {
+      array1 = _array1->basic_clone ();
+      static_cast<db::basic_array<db::Coord> *> (array1)->transform (_tn);
+    }
+
+    if (_array2) {
+      array2 = _array2->basic_clone ();
+      static_cast<db::basic_array<db::Coord> *> (array2)->transform (_tn);
+    }
+  }
 
   InstanceToInstanceInteraction ()
     : ci1 (0), ci2 (0), array1 (0), array2 (0)
-  { }
+  {
+    //  .. nothing yet ..
+  }
+
+  InstanceToInstanceInteraction (const InstanceToInstanceInteraction &other)
+    : ci1 (other.ci1), ci2 (other.ci2),
+      array1 (other.array1 ? other.array1->basic_clone () : 0),
+      array2 (other.array2 ? other.array2->basic_clone () : 0),
+      t21 (other.t21)
+  {
+    //  .. nothing yet ..
+  }
+
+  InstanceToInstanceInteraction &operator= (const InstanceToInstanceInteraction &other)
+  {
+    if (this != &other) {
+
+      ci1 = other.ci1;
+      ci2 = other.ci2;
+
+      if (array1) {
+        delete array1;
+      }
+      array1 = other.array1 ? other.array1->basic_clone () : 0;
+
+      if (array2) {
+        delete array2;
+      }
+      array2 = other.array2 ? other.array2->basic_clone () : 0;
+
+      t21 = other.t21;
+
+    }
+
+    return *this;
+  }
+
+  ~InstanceToInstanceInteraction ()
+  {
+    if (array1) {
+      delete array1;
+    }
+    array1 = 0;
+
+    if (array2) {
+      delete array2;
+    }
+    array2 = 0;
+  }
 
   bool operator== (const InstanceToInstanceInteraction &other) const
   {
@@ -796,7 +855,7 @@ struct InstanceToInstanceInteraction
   }
 
   db::cell_index_type ci1, ci2;
-  const db::ArrayBase *array1, *array2;
+  db::ArrayBase *array1, *array2;
   db::ICplxTrans t21;
 };
 
@@ -998,7 +1057,7 @@ public:
   /**
    *  @brief Builds a hierarchy of clusters from a cell hierarchy and given connectivity
    */
-  void build (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const std::map<db::cell_index_type, tl::equivalence_clusters<unsigned int> > *attr_equivalence = 0, const std::set<cell_index_type> *breakout_cells = 0);
+  void build (const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const std::map<db::cell_index_type, tl::equivalence_clusters<size_t> > *attr_equivalence = 0, const std::set<cell_index_type> *breakout_cells = 0);
 
   /**
    *  @brief Gets the connected clusters for a given cell
@@ -1036,10 +1095,10 @@ public:
   size_t propagate_cluster_inst (const db::Layout &layout, const Cell &cell, const ClusterInstance &ci, db::cell_index_type parent_ci, bool with_self);
 
 private:
-  void build_local_cluster (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence);
+  void build_local_cluster (const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const tl::equivalence_clusters<size_t> *attr_equivalence);
   void build_hier_connections (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const std::set<cell_index_type> *breakout_cells, instance_interaction_cache_type &instance_interaction_cache);
   void build_hier_connections_for_cells (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const std::vector<db::cell_index_type> &cells, const db::Connectivity &conn, const std::set<cell_index_type> *breakout_cells, tl::RelativeProgress &progress, instance_interaction_cache_type &instance_interaction_cache);
-  void do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const std::map<db::cell_index_type, tl::equivalence_clusters<unsigned int> > *attr_equivalence, const std::set<cell_index_type> *breakout_cells);
+  void do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const std::map<cell_index_type, tl::equivalence_clusters<size_t> > *attr_equivalence, const std::set<cell_index_type> *breakout_cells);
 
   std::map<db::cell_index_type, connected_clusters<T> > m_per_cell_clusters;
   int m_base_verbosity;
@@ -1334,6 +1393,49 @@ private:
   void ensure_computed (db::cell_index_type ci) const;
   void ensure_computed_parent (db::cell_index_type ci) const;
 };
+
+/**
+ *  @brief A helper function generating an attribute ID from a property ID
+ *  This function is used to provide a generic attribute wrapping a property ID and a text ID.
+ */
+inline size_t prop_id_to_attr (db::properties_id_type id)
+{
+  return size_t (id) * 2;
+}
+
+/**
+ *  @brief Gets a value indicating whether the attribute is a property ID
+ */
+inline bool is_prop_id_attr (size_t attr)
+{
+  return (attr & 1) == 0;
+}
+
+/**
+ *  @brief Gets the property ID from an attribute
+ */
+inline db::properties_id_type prop_id_from_attr (size_t attr)
+{
+  return attr / 2;
+}
+
+/**
+ *  @brief A helper function generating an attribute from a StringRef
+ */
+inline size_t text_ref_to_attr (const db::Text *tr)
+{
+  return size_t (tr) + 1;
+}
+
+/**
+ *  @brief Gets the text value from an attribute ID
+ */
+inline const char *text_from_attr (size_t attr)
+{
+  tl_assert ((attr & 1) != 0);
+  const db::Text *t = reinterpret_cast<const db::Text *> (attr - 1);
+  return t->string ();
+}
 
 }
 

@@ -364,6 +364,21 @@ private:
 };
 
 /**
+ *  @brief A data structure holding the options for the "align cell" dialog
+ */
+struct LAYBASIC_PUBLIC AlignCellOptions
+{
+  AlignCellOptions ()
+    : mode_x (-1), mode_y (-1), xpos (0.0), ypos (0.0), visible_only (false), adjust_parents (true)
+  { }
+
+  int mode_x, mode_y;
+  double xpos, ypos;
+  bool visible_only;
+  bool adjust_parents;
+};
+
+/**
  *  @brief The merge operation options
  */
 class LAYBASIC_PUBLIC AlignCellOptionsDialog 
@@ -375,10 +390,11 @@ public:
   AlignCellOptionsDialog (QWidget *parent);
   virtual ~AlignCellOptionsDialog ();
 
-  bool exec_dialog (int &mode_x, int &mode_y, bool &visible_only, bool &adjust_calls);
+  bool exec_dialog (AlignCellOptions &data);
 
 private slots:
   void button_clicked ();
+  void accept ();
 
 private:
   Ui::AlignCellOptionsDialog *mp_ui;

@@ -27,6 +27,7 @@
 #include "dbCommon.h"
 
 #include "dbPolygon.h"
+#include "dbText.h"
 
 #include <vector>
 #include <limits>
@@ -346,6 +347,18 @@ bool interact_pe (const Polygon &poly, const Edge &edge)
   return false;
 }
 
+/**
+ *  @brief Determines whether the text is inside the polygon
+ */
+template <class Polygon, class Text>
+bool interact_pt (const Polygon &poly, const Text &text)
+{
+  typedef typename Text::point_type point_type;
+  point_type p;
+  p += text.trans ().disp ();
+  return (poly.box ().contains (p) && db::inside_poly (poly.begin_edge (), p) >= 0);
+}
+
 //  Some specializations that map all combinations to template versions
 inline bool interact (const db::Box &box1,              const db::Box &box2)                { return box1.touches (box2); }
 inline bool interact (const db::DBox &box1,             const db::DBox &box2)               { return box1.touches (box2); }
@@ -365,6 +378,10 @@ inline bool interact (const db::DPolygon &poly1,        const db::DPolygon &poly
 inline bool interact (const db::DSimplePolygon &poly1,  const db::DPolygon &poly2)          { return interact_pp (poly1, poly2); }
 inline bool interact (const db::DPolygon &poly1,        const db::DSimplePolygon &poly2)    { return interact_pp (poly1, poly2); }
 inline bool interact (const db::DSimplePolygon &poly1,  const db::DSimplePolygon &poly2)    { return interact_pp (poly1, poly2); }
+inline bool interact (const db::Polygon &poly,          const db::Text &text)               { return interact_pt (poly, text); }
+inline bool interact (const db::SimplePolygon &poly,    const db::Text &text)               { return interact_pt (poly, text); }
+inline bool interact (const db::DPolygon &poly,         const db::DText &text)              { return interact_pt (poly, text); }
+inline bool interact (const db::DSimplePolygon &poly,   const db::DText &text)              { return interact_pt (poly, text); }
 
 /**
  *  @brief Extract a corner radius from a contour

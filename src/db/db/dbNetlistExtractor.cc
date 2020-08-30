@@ -23,6 +23,7 @@
 #include "dbNetlistExtractor.h"
 #include "dbDeepShapeStore.h"
 #include "dbNetlistDeviceExtractor.h"
+#include "dbShapeRepository.h"
 #include "tlGlobPattern.h"
 
 namespace db
@@ -50,9 +51,9 @@ void NetlistExtractor::set_include_floating_subcircuits (bool f)
 }
 
 static void
-build_net_name_equivalence (const db::Layout *layout, db::property_names_id_type net_name_id, const std::string &joined_net_names, tl::equivalence_clusters<unsigned int> &eq)
+build_net_name_equivalence (const db::Layout *layout, db::property_names_id_type net_name_id, const std::string &joined_net_names, tl::equivalence_clusters<size_t> &eq)
 {
-  std::map<std::string, std::set<unsigned int> > prop_by_name;
+  std::map<std::string, std::set<size_t> > prop_by_name;
   tl::GlobPattern jn_pattern (joined_net_names);
 
   for (db::PropertiesRepository::iterator i = layout->properties_repository ().begin (); i != layout->properties_repository ().end (); ++i) {
@@ -60,15 +61,23 @@ build_net_name_equivalence (const db::Layout *layout, db::property_names_id_type
       if (p->first == net_name_id) {
         std::string nn = p->second.to_string ();
         if (jn_pattern.match (nn)) {
-          prop_by_name [nn].insert (i->first);
+          prop_by_name [nn].insert (db::prop_id_to_attr (i->first));
         }
       }
     }
   }
 
-  for (std::map<std::string, std::set<unsigned int> >::const_iterator pn = prop_by_name.begin (); pn != prop_by_name.end (); ++pn) {
-    std::set<unsigned int>::const_iterator p = pn->second.begin ();
-    std::set<unsigned int>::const_iterator p0 = p;
+  const db::repository<db::Text> &text_repository = layout->shape_repository ().repository (db::object_tag<db::Text> ());
+  for (db::repository<db::Text>::iterator t = text_repository.begin (); t != text_repository.end (); ++t) {
+    std::string nn = t->string ();
+    if (jn_pattern.match (nn)) {
+      prop_by_name [nn].insert (db::text_ref_to_attr (t.operator-> ()));
+    }
+  }
+
+  for (std::map<std::string, std::set<size_t> >::const_iterator pn = prop_by_name.begin (); pn != prop_by_name.end (); ++pn) {
+    std::set<size_t>::const_iterator p = pn->second.begin ();
+    std::set<size_t>::const_iterator p0 = p;
     while (p != pn->second.end ()) {
       eq.same (*p0, *p);
       ++p;
@@ -93,9 +102,9 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
   m_terminal_annot_name_id = mp_layout->properties_repository ().get_id_of_name (db::NetlistDeviceExtractor::terminal_id_property_name ());
   m_device_annot_name_id = mp_layout->properties_repository ().get_id_of_name (db::NetlistDeviceExtractor::device_id_property_name ());
 
-  //  the big part: actually extract the nets
+  //  build an attribute equivalence map which lists the "attribute IDs" which are identical in terms of net names
 
-  std::map<db::cell_index_type, tl::equivalence_clusters<unsigned int> > net_name_equivalence;
+  std::map<db::cell_index_type, tl::equivalence_clusters<size_t> > net_name_equivalence;
   if (m_text_annot_name_id.first) {
     if (! m_joined_net_names.empty ()) {
       build_net_name_equivalence (mp_layout, m_text_annot_name_id.second, m_joined_net_names, net_name_equivalence [hier_clusters_type::top_cell_index]);
@@ -107,7 +116,10 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
       }
     }
   }
-  mp_clusters->build (*mp_layout, *mp_cell, db::ShapeIterator::Polygons, conn, &net_name_equivalence);
+
+  //  the big part: actually extract the nets
+
+  mp_clusters->build (*mp_layout, *mp_cell, conn, &net_name_equivalence);
 
   //  reverse lookup for Circuit vs. cell index
   std::map<db::cell_index_type, db::Circuit *> circuits;
@@ -181,7 +193,7 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
 
     for (connected_clusters_type::all_iterator c = clusters.begin_all (); ! c.at_end (); ++c) {
 
-      const db::local_cluster<db::PolygonRef> &lc = clusters.cluster_by_id (*c);
+      const db::local_cluster<db::NetShape> &lc = clusters.cluster_by_id (*c);
       if (clusters.connections_for_cluster (*c).empty () && lc.empty ()) {
         //  this is an entirely empty cluster so we skip it.
         //  Such clusters are left over when joining clusters.
@@ -204,8 +216,8 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
 
       //  add the global names as second priority
       if (net_names.empty ()) {
-        const db::local_cluster<db::PolygonRef>::global_nets &gn = lc.get_global_nets ();
-        for (db::local_cluster<db::PolygonRef>::global_nets::const_iterator g = gn.begin (); g != gn.end (); ++g) {
+        const db::local_cluster<db::NetShape>::global_nets &gn = lc.get_global_nets ();
+        for (db::local_cluster<db::NetShape>::global_nets::const_iterator g = gn.begin (); g != gn.end (); ++g) {
           net_names.insert (conn.global_net_name (*g));
         }
       }
@@ -250,7 +262,13 @@ NetlistExtractor::make_device_abstract_connections (db::DeviceAbstract *dm, cons
 
       for (local_cluster_type::attr_iterator a = dc->begin_attr (); a != dc->end_attr (); ++a) {
 
-        const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (*a);
+        if (! db::is_prop_id_attr (*a)) {
+          continue;
+        }
+
+        db::properties_id_type pi = db::prop_id_from_attr (*a);
+
+        const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (pi);
         for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
           if (j->first == m_terminal_annot_name_id.second) {
             dm->set_cluster_id_for_terminal (j->second.to<size_t> (), dc->id ());
@@ -282,12 +300,22 @@ void NetlistExtractor::collect_labels (const connected_clusters_type &clusters,
   const local_cluster_type &lc = clusters.cluster_by_id (cid);
   for (local_cluster_type::attr_iterator a = lc.begin_attr (); a != lc.end_attr (); ++a) {
 
-    const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (*a);
-    for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
+    if (db::is_prop_id_attr (*a)) {
 
-      if (m_text_annot_name_id.first && j->first == m_text_annot_name_id.second) {
-        net_names.insert (j->second.to_string ());
+      db::properties_id_type pi = db::prop_id_from_attr (*a);
+
+      const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (pi);
+      for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
+
+        if (m_text_annot_name_id.first && j->first == m_text_annot_name_id.second) {
+          net_names.insert (j->second.to_string ());
+        }
+
       }
+
+    } else {
+
+      net_names.insert (db::text_from_attr (*a));
 
     }
 
@@ -343,13 +371,19 @@ void NetlistExtractor::connect_devices (db::Circuit *circuit,
       continue;
     }
 
-    const db::local_cluster<db::PolygonRef> &dc = mp_clusters->clusters_per_cell (inst_cell_index).cluster_by_id (i->id ());
+    const db::local_cluster<db::NetShape> &dc = mp_clusters->clusters_per_cell (inst_cell_index).cluster_by_id (i->id ());
 
     //  connect the net to the terminal of the device: take the terminal ID from the properties on the
     //  device cluster
     for (local_cluster_type::attr_iterator a = dc.begin_attr (); a != dc.end_attr (); ++a) {
 
-      const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (*a);
+      if (! db::is_prop_id_attr (*a)) {
+        continue;
+      }
+
+      db::properties_id_type pi = db::prop_id_from_attr (*a);
+
+      const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (pi);
       for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
 
         if (m_terminal_annot_name_id.first && j->first == m_terminal_annot_name_id.second) {

@@ -29,6 +29,7 @@
 #include "dbHierNetworkProcessor.h"
 #include "dbDeepShapeStore.h"
 #include "dbRegion.h"
+#include "dbNetShape.h"
 
 #include "gsiObject.h"
 
@@ -204,8 +205,8 @@ public:
   typedef error_list::const_iterator error_iterator;
   typedef std::vector<db::NetlistDeviceExtractorLayerDefinition> layer_definitions;
   typedef layer_definitions::const_iterator layer_definitions_iterator;
-  typedef std::map<std::string, db::Region *> input_layers;
-  typedef db::hier_clusters<db::PolygonRef> hier_clusters_type;
+  typedef std::map<std::string, db::ShapeCollection *> input_layers;
+  typedef db::hier_clusters<db::NetShape> hier_clusters_type;
 
   /**
    *  @brief Constructor
@@ -260,8 +261,6 @@ public:
    *  the nets later to associate nets with device terminals.
    *
    *  The definition of the input layers is device class specific.
-   *
-   *  NOTE: The extractor expects "PolygonRef" type layers.
    */
   void extract (Layout &layout, Cell &cell, const std::vector<unsigned int> &layers, Netlist *netlist, hier_clusters_type &clusters, double device_scaling = 1.0, const std::set<cell_index_type> *breakout_cells = 0);
 
@@ -521,11 +520,11 @@ private:
       return false;
     }
 
-    std::map<size_t, std::map<unsigned int, std::set<db::PolygonRef> > > geometry;
+    std::map<size_t, std::map<unsigned int, std::set<db::NetShape> > > geometry;
     std::map<size_t, double> parameters;
   };
 
-  typedef std::map<unsigned int, std::vector<db::PolygonRef> > geometry_per_layer_type;
+  typedef std::map<unsigned int, std::vector<db::NetShape> > geometry_per_layer_type;
   typedef std::map<size_t, geometry_per_layer_type> geometry_per_terminal_type;
 
   tl::weak_ptr<db::Netlist> m_netlist;

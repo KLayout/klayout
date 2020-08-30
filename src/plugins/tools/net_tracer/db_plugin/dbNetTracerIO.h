@@ -375,6 +375,7 @@ public:
 
   NetTracerTechnologyComponent ();
   NetTracerTechnologyComponent (const NetTracerTechnologyComponent &d);
+  NetTracerTechnologyComponent &operator= (const NetTracerTechnologyComponent &d);
 
   const_iterator begin () const
   {

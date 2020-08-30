@@ -354,120 +354,130 @@ GDS2WriterBase::write_inst (double sf, const db::Instance &instance, bool normal
 
   bool is_reg = instance.is_regular_array (a, b, amax, bmax);
 
-  db::Trans t = instance.front ();
+  for (db::CellInstArray::iterator ii = instance.begin (); ! ii.at_end (); ++ii) {
 
-  if (normalize) {
+    db::Trans t = *ii;
 
-    //  try to normalize orthogonal arrays into "Cadence notation", that is 
-    //  column and row vectors are positive in the coordinate system of the 
-    //  rotated array.
-    
-    if (is_reg) {
+    if (normalize) {
 
-      if (amax < 2) {
-        a = db::Vector ();
-      }
-      if (bmax < 2) {
-        b = db::Vector ();
-      }
+      //  try to normalize orthogonal arrays into "Cadence notation", that is
+      //  column and row vectors are positive in the coordinate system of the
+      //  rotated array.
 
-      //  normalisation only works for orthogonal vectors, parallel to x or y axis, which are not parallel
-      if ((a.x () == 0 || a.y () == 0) && (b.x () == 0 || b.y () == 0) && !((a.x () != 0 && b.x () != 0) || (a.y () != 0 && b.y () != 0))) {
-      
-        db::FTrans fp = db::FTrans(t.rot ()).inverted ();
-      
-        a.transform (fp);
-        b.transform (fp);
+      if (is_reg) {
 
-        db::Vector p;
-        for (int i = 0; i < 2; ++i) {
+        if (amax < 2) {
+          a = db::Vector ();
+        }
+        if (bmax < 2) {
+          b = db::Vector ();
+        }
 
-          db::Vector   *q = (i == 0) ? &a : &b;
-          unsigned long n = (i == 0) ? amax : bmax;
+        //  normalisation only works for orthogonal vectors, parallel to x or y axis, which are not parallel
+        if ((a.x () == 0 || a.y () == 0) && (b.x () == 0 || b.y () == 0) && !((a.x () != 0 && b.x () != 0) || (a.y () != 0 && b.y () != 0))) {
 
-          if (n == 0) {
-            *q = db::Vector ();
-          } else {
-            if (q->x () < 0) {
-              p += db::Vector ((n - 1) * q->x (), 0);
-              q->set_x (-q->x ());
-            } 
-            if (q->y () < 0) {
-              p += db::Vector (0, (n - 1) * q->y ());
-              q->set_y (-q->y ());
-            } 
+          db::FTrans fp = db::FTrans(t.rot ()).inverted ();
+
+          a.transform (fp);
+          b.transform (fp);
+
+          db::Vector p;
+          for (int i = 0; i < 2; ++i) {
+
+            db::Vector   *q = (i == 0) ? &a : &b;
+            unsigned long n = (i == 0) ? amax : bmax;
+
+            if (n == 0) {
+              *q = db::Vector ();
+            } else {
+              if (q->x () < 0) {
+                p += db::Vector ((n - 1) * q->x (), 0);
+                q->set_x (-q->x ());
+              }
+              if (q->y () < 0) {
+                p += db::Vector (0, (n - 1) * q->y ());
+                q->set_y (-q->y ());
+              }
+            }
+
           }
 
+          if (a.x () != 0 || b.y () != 0) {
+            std::swap (a, b);
+            std::swap (amax, bmax);
+          }
+
+          fp = db::FTrans (t.rot ());
+          a.transform (fp);
+          b.transform (fp);
+
+          t = t * db::Trans (p);
+
         }
-
-        if (a.x () != 0 || b.y () != 0) {
-          std::swap (a, b);
-          std::swap (amax, bmax);
-        }
-
-        fp = db::FTrans (t.rot ());
-        a.transform (fp);
-        b.transform (fp);
-
-        t = t * db::Trans (p);
 
       }
 
     }
 
-  }
+    write_record_size (4);
+    write_record (is_reg ? sAREF : sSREF);
 
-  write_record_size (4);
-  write_record (is_reg ? sAREF : sSREF);
+    write_string_record (sSNAME, m_cell_name_map.cell_name (instance.cell_index ()));
 
-  write_string_record (sSNAME, m_cell_name_map.cell_name (instance.cell_index ()));
+    if (t.rot () != 0 || instance.is_complex ()) {
 
-  if (t.rot () != 0 || instance.is_complex ()) {
+      write_record_size (6);
+      write_record (sSTRANS);
+      write_short (t.is_mirror () ? 0x8000 : 0);
 
-    write_record_size (6);
-    write_record (sSTRANS);
-    write_short (t.is_mirror () ? 0x8000 : 0);
-
-    if (instance.is_complex ()) {
-      write_record_size (4 + 8);
-      write_record (sMAG);
-      write_double (instance.complex_trans ().mag ());
-      write_record_size (4 + 8);
-      write_record (sANGLE);
-      write_double (instance.complex_trans ().angle ());
-    } else {
-      if ((t.rot () % 4) != 0) {
+      if (instance.is_complex ()) {
+        db::CellInstArray::complex_trans_type ct = instance.complex_trans (t);
+        write_record_size (4 + 8);
+        write_record (sMAG);
+        write_double (ct.mag ());
         write_record_size (4 + 8);
         write_record (sANGLE);
-        write_double ((t.rot () % 4) * 90.0);
+        write_double (ct.angle ());
+      } else {
+        if ((t.rot () % 4) != 0) {
+          write_record_size (4 + 8);
+          write_record (sANGLE);
+          write_double ((t.rot () % 4) * 90.0);
+        }
       }
+
+    }
+
+    if (is_reg) {
+      write_record_size (4 + 2 * 2);
+      write_record (sCOLROW);
+      if (amax > 32767 || bmax > 32767) {
+        throw tl::Exception (tl::to_string (tr ("Cannot write array references with more than 32767 columns or rows to GDS2 streams")));
+      }
+      write_short (std::max ((unsigned long) 1, bmax));
+      write_short (std::max ((unsigned long) 1, amax));
+    }
+
+    write_record_size (4 + (is_reg ? 3 : 1) * 2 * 4);
+    write_record (sXY);
+    write_int (scale (sf, t.disp ().x ()));
+    write_int (scale (sf, t.disp ().y ()));
+
+    if (is_reg) {
+      write_int (scale (sf, t.disp ().x () + b.x () * bmax));
+      write_int (scale (sf, t.disp ().y () + b.y () * bmax));
+      write_int (scale (sf, t.disp ().x () + a.x () * amax));
+      write_int (scale (sf, t.disp ().y () + a.y () * amax));
+    }
+
+    finish (layout, prop_id);
+
+    if (is_reg) {
+      //  we have already written all instances
+      break;
     }
 
   }
-
-  if (is_reg) {
-    write_record_size (4 + 2 * 2);
-    write_record (sCOLROW);
-    if (amax > 32767 || bmax > 32767) {
-      throw tl::Exception (tl::to_string (tr ("Cannot write array references with more than 32767 columns or rows to GDS2 streams")));
-    }
-    write_short (std::max ((unsigned long) 1, bmax));
-    write_short (std::max ((unsigned long) 1, amax));
-  }
-
-  write_record_size (4 + (is_reg ? 3 : 1) * 2 * 4);
-  write_record (sXY);
-  write_int (scale (sf, t.disp ().x ()));
-  write_int (scale (sf, t.disp ().y ()));
-
-  if (is_reg) {
-    write_int (scale (sf, t.disp ().x () + b.x () * bmax));
-    write_int (scale (sf, t.disp ().y () + b.y () * bmax));
-    write_int (scale (sf, t.disp ().x () + a.x () * amax));
-    write_int (scale (sf, t.disp ().y () + a.y () * amax));
-  }
-
-  finish (layout, prop_id);
 }
 
 void

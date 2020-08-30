@@ -23,6 +23,7 @@
 
 #include "imgObject.h"
 #include "imgWidgets.h" // for interpolate_color()
+#include "imgStream.h"
 #include "tlLog.h"
 #include "tlTimer.h"
 #include "layPlugin.h"
@@ -50,8 +51,8 @@ namespace img
 DataMapping::DataMapping ()
   : brightness (0.0), contrast (0.0), gamma (1.0), red_gain (1.0), green_gain (1.0), blue_gain (1.0)
 {
-  false_color_nodes.push_back (std::make_pair (0.0, QColor (0, 0, 0)));
-  false_color_nodes.push_back (std::make_pair (1.0, QColor (255, 255, 255)));
+  false_color_nodes.push_back (std::make_pair (0.0, std::make_pair (QColor (0, 0, 0), QColor (0, 0, 0))));
+  false_color_nodes.push_back (std::make_pair (1.0, std::make_pair (QColor (255, 255, 255), QColor (255, 255, 255))));
 }
 
 bool 
@@ -91,7 +92,10 @@ DataMapping::operator== (const DataMapping &d) const
     if (fabs (false_color_nodes[i].first - d.false_color_nodes[i].first) > epsilon) {
       return false;
     }
-    if (false_color_nodes[i].second != d.false_color_nodes[i].second) {
+    if (false_color_nodes[i].second.first != d.false_color_nodes[i].second.first) {
+      return false;
+    }
+    if (false_color_nodes[i].second.second != d.false_color_nodes[i].second.second) {
       return false;
     }
   }
@@ -136,8 +140,11 @@ DataMapping::operator< (const DataMapping &d) const
     if (fabs (false_color_nodes[i].first - d.false_color_nodes[i].first) > epsilon) {
       return false_color_nodes[i].first < d.false_color_nodes[i].first;
     }
-    if (false_color_nodes[i].second != d.false_color_nodes[i].second) {
-      return false_color_nodes[i].second.rgb () < d.false_color_nodes[i].second.rgb ();
+    if (false_color_nodes[i].second.first != d.false_color_nodes[i].second.first) {
+      return false_color_nodes[i].second.first.rgb () < d.false_color_nodes[i].second.first.rgb ();
+    }
+    if (false_color_nodes[i].second.second != d.false_color_nodes[i].second.second) {
+      return false_color_nodes[i].second.second.rgb () < d.false_color_nodes[i].second.second.rgb ();
     }
   }
 
@@ -186,10 +193,10 @@ DataMapping::create_data_mapping (bool monochrome, double xmin, double xmax, uns
     for (unsigned int i = 1; i < false_color_nodes.size (); ++i) {
 
       int h1, s1, v1;
-      false_color_nodes [i - 1].second.getHsv (&h1, &s1, &v1);
+      false_color_nodes [i - 1].second.second.getHsv (&h1, &s1, &v1);
 
       int h2, s2, v2;
-      false_color_nodes [i].second.getHsv (&h2, &s2, &v2);
+      false_color_nodes [i].second.first.getHsv (&h2, &s2, &v2);
 
       //  The number of steps is chosen such that the full HSV band divides into approximately 200 steps
       double nsteps = 0.5 * sqrt (double (h1 - h2) * double (h1 - h2) + double (s1 - s2) * double (s1 - s2) + double (v1 - v2) * double (v1 - v2));
@@ -220,11 +227,11 @@ DataMapping::create_data_mapping (bool monochrome, double xmin, double xmax, uns
 
     double ylast = 0.0;
     if (channel == 0) {
-      ylast = false_color_nodes.back ().second.red ();
+      ylast = false_color_nodes.back ().second.second.red ();
     } else if (channel == 1) {
-      ylast = false_color_nodes.back ().second.green ();
+      ylast = false_color_nodes.back ().second.second.green ();
     } else if (channel == 2) {
-      ylast = false_color_nodes.back ().second.blue ();
+      ylast = false_color_nodes.back ().second.second.blue ();
     }
 
     gray_to_color->push_back (false_color_nodes.back ().first, ylast / 255.0);
@@ -618,21 +625,21 @@ public:
     size_t n = data_length ();
     for (unsigned int i = 0; i < 3; ++i) {
       if (mp_color_data[i]) {
-        stat->add (typeid (float []), (void *) mp_color_data[i], sizeof (n * sizeof (float)), sizeof (n * sizeof (float)), (void *) this, purpose, cat);
+        stat->add (typeid (float []), (void *) mp_color_data[i], n * sizeof (float), n * sizeof (float), (void *) this, purpose, cat);
       }
       if (mp_color_byte_data[i]) {
-        stat->add (typeid (unsigned char []), (void *) mp_color_byte_data[i], sizeof (n * sizeof (unsigned char)), sizeof (n * sizeof (unsigned char)), (void *) this, purpose, cat);
+        stat->add (typeid (unsigned char []), (void *) mp_color_byte_data[i], n * sizeof (unsigned char), n * sizeof (unsigned char), (void *) this, purpose, cat);
       }
     }
 
     if (mp_mask) {
-      stat->add (typeid (unsigned char []), (void *) mp_mask, sizeof (n * sizeof (unsigned char)), sizeof (n * sizeof (unsigned char)), (void *) this, purpose, cat);
+      stat->add (typeid (unsigned char []), (void *) mp_mask, n * sizeof (unsigned char), n * sizeof (unsigned char), (void *) this, purpose, cat);
     }
     if (mp_data) {
-      stat->add (typeid (float []), (void *) mp_data, sizeof (n * sizeof (float)), sizeof (n * sizeof (float)), (void *) this, purpose, cat);
+      stat->add (typeid (float []), (void *) mp_data, n * sizeof (float), n * sizeof (float), (void *) this, purpose, cat);
     }
     if (mp_byte_data) {
-      stat->add (typeid (unsigned char []), (void *) mp_byte_data, sizeof (n * sizeof (unsigned char)), sizeof (n * sizeof (unsigned char)), (void *) this, purpose, cat);
+      stat->add (typeid (unsigned char []), (void *) mp_byte_data, n * sizeof (unsigned char), n * sizeof (unsigned char), (void *) this, purpose, cat);
     }
   }
 
@@ -704,31 +711,16 @@ Object::Object ()
   mp_pixel_data = 0;
 }
 
-Object::Object (size_t w, size_t h, const db::DCplxTrans &trans, bool color)
+Object::Object (size_t w, size_t h, const db::DCplxTrans &trans, bool color, bool byte_data)
   : m_trans (trans), m_id (make_id ()), m_min_value (0.0), m_max_value (1.0), m_min_value_set (false), m_max_value_set (false), m_visible (true), m_z_position (0)
 {
   m_updates_enabled = false;
   mp_pixel_data = 0;
 
-  mp_data = new DataHeader (w, h, color, false);
+  mp_data = new DataHeader (w, h, color, byte_data);
   mp_data->add_ref ();
-
-  //  The default data type is float
-  tl_assert (! is_byte_data ());
-
-  if (is_color ()) {
-    for (unsigned int c = 0; c < 3; ++c) {
-      float *d = mp_data->float_data (c);
-      for (size_t i = data_length (); i > 0; --i) {
-        *d++ = 0.0;
-      }
-    }
-  } else {
-    float *d = mp_data->float_data ();
-    for (size_t i = data_length (); i > 0; --i) {
-      *d++ = 0.0;
-    }
-  }
+  clear ();
+  m_updates_enabled = true;
 }
 
 Object::Object (size_t w, size_t h, const db::DCplxTrans &trans, unsigned char *d)
@@ -802,32 +794,15 @@ Object::Object (const std::string &filename, const db::DCplxTrans &trans)
   m_updates_enabled = true;
 }
 
-Object::Object (size_t w, size_t h, const db::Matrix3d &trans, bool color)
+Object::Object (size_t w, size_t h, const db::Matrix3d &trans, bool color, bool byte_data)
   : m_trans (trans), m_id (make_id ()), m_min_value (0.0), m_max_value (1.0), m_min_value_set (false), m_max_value_set (false), m_visible (true), m_z_position (0)
 {
   m_updates_enabled = false;
   mp_pixel_data = 0;
 
-  mp_data = new DataHeader (w, h, color, false);
+  mp_data = new DataHeader (w, h, color, byte_data);
   mp_data->add_ref ();
-
-  //  The default data type is float
-  tl_assert (! is_byte_data ());
-
-  if (is_color ()) {
-    for (unsigned int c = 0; c < 3; ++c) {
-      float *d = mp_data->float_data (c);
-      for (size_t i = data_length (); i > 0; --i) {
-        *d++ = 0.0;
-      }
-    }
-  } else {
-    float *d = mp_data->float_data ();
-    for (size_t i = data_length (); i > 0; --i) {
-      *d++ = 0.0;
-    }
-  }
-
+  clear ();
   m_updates_enabled = true;
 }
 
@@ -1078,6 +1053,48 @@ Object::clone () const
   return new img::Object (*this);
 }
 
+void
+Object::clear ()
+{
+  if (is_byte_data ()) {
+
+    if (is_color ()) {
+
+      for (unsigned int c = 0; c < 3; ++c) {
+        unsigned char *d = mp_data->byte_data (c);
+        for (size_t i = data_length (); i > 0; --i) {
+          *d++ = 0.0;
+        }
+      }
+
+    } else {
+
+      unsigned char *d = mp_data->byte_data ();
+      for (size_t i = data_length (); i > 0; --i) {
+        *d++ = 0.0;
+      }
+
+    }
+
+  } else if (is_color ()) {
+
+    for (unsigned int c = 0; c < 3; ++c) {
+      float *d = mp_data->float_data (c);
+      for (size_t i = data_length (); i > 0; --i) {
+        *d++ = 0.0;
+      }
+    }
+
+  } else {
+
+    float *d = mp_data->float_data ();
+    for (size_t i = data_length (); i > 0; --i) {
+      *d++ = 0.0;
+    }
+
+  }
+}
+
 db::DPolygon
 Object::image_box_poly (const db::DBox vp, const db::DCplxTrans &vpt) const
 {
@@ -1266,18 +1283,33 @@ Object::from_string (const char *str, const char *base_dir)
 
         double x = 0.0;
         lay::ColorConverter cc;
-        QColor c;
+        QColor cl, cr;
         std::string s;
 
         m_data_mapping.false_color_nodes.clear ();
 
         while (! ex.at_end () && ! ex.test ("]")) {
+
           ex.read (x);
+
           ex.test (",");
+
+          s.clear ();
           ex.read_word_or_quoted (s);
-          cc.from_string (s, c);
-          m_data_mapping.false_color_nodes.push_back (std::make_pair (x, c));
+          cc.from_string (s, cl);
+
+          if (ex.test (",")) {
+            s.clear ();
+            ex.read_word_or_quoted (s);
+            cc.from_string (s, cr);
+          } else {
+            cr = cl;
+          }
+
+          m_data_mapping.false_color_nodes.push_back (std::make_pair (x, std::make_pair (cl, cr)));
+
           ex.test (";");
+
         }
 
       } else if (ex.test ("width=")) {
@@ -1456,6 +1488,24 @@ Object::read_file ()
     tl::info << "Reading image file " << m_filename;
   }
 
+  try {
+
+    tl::InputFile file (m_filename);
+    tl::InputStream stream (file);
+    std::auto_ptr<img::Object> read;
+    read.reset (img::ImageStreamer::read (stream));
+    read->m_filename = m_filename;
+
+    //  for now we need to copy here ...
+    *this = *read;
+
+    //  exit on success
+    return;
+
+  } catch (...) {
+    //  continue with other formats ...
+  }
+
   QImage qimage (tl::to_qstring (m_filename));
 
   if (! qimage.isNull ()) {
@@ -1604,7 +1654,12 @@ Object::to_string () const
     for (unsigned int i = 0; i < data_mapping ().false_color_nodes.size (); ++i) {
       os << data_mapping ().false_color_nodes[i].first;
       os << ",";
-      os << tl::to_word_or_quoted_string (cc.to_string (data_mapping ().false_color_nodes[i].second));
+      const std::pair<QColor, QColor> &clr = data_mapping ().false_color_nodes[i].second;
+      os << tl::to_word_or_quoted_string (cc.to_string (clr.first));
+      if (clr.first != clr.second) {
+        os << ",";
+        os << tl::to_word_or_quoted_string (cc.to_string (clr.second));
+      }
       os << ";";
     }
 
@@ -1679,6 +1734,25 @@ Object::to_string () const
   }
   
   return os.str ();
+}
+
+void
+Object::swap (Object &other)
+{
+  m_filename.swap (other.m_filename);
+  std::swap (m_trans, other.m_trans);
+  std::swap (mp_data, other.mp_data);
+  std::swap (m_id, other.m_id);
+  std::swap (m_min_value, other.m_min_value);
+  std::swap (m_max_value, other.m_max_value);
+  std::swap (m_min_value_set, other.m_min_value_set);
+  std::swap (m_max_value_set, other.m_max_value_set);
+  std::swap (m_data_mapping, other.m_data_mapping);
+  std::swap (m_visible, other.m_visible);
+  std::swap (mp_pixel_data, other.mp_pixel_data);
+  m_landmarks.swap (other.m_landmarks);
+  std::swap (m_z_position, other.m_z_position);
+  std::swap (m_updates_enabled, other.m_updates_enabled);
 }
 
 size_t 

@@ -76,13 +76,23 @@ result will be the edges of the first operand which are inside or on the
 borders of the polygons of the second operand.
 </p><p>
 The following images show the effect of the "and" method
-on polygons and edges (layer1: red, layer2: blue):
+on polygons and edges (input1: red, input2: blue):
 </p><p>
 <table>
 <tr>
 <td><img src="/images/drc_and1.png"/></td>
 <td><img src="/images/drc_and2.png"/></td>
 <td><img src="/images/drc_and3.png"/></td>
+</tr>
+</table>
+</p><p>
+The AND operation can be applied between a text and a polygon
+layer. In this case, the texts inside or at the border of the 
+polygons will be written to the output (labels: red, input2: blue):
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_textpoly1.png"/></td>
 </tr>
 </table>
 </p>
@@ -594,7 +604,7 @@ Returns the first edges of the edge pairs in the collection.
 If the layer already is a flat one, this method does nothing.
 If the layer is a hierarchical layer (an original layer or
 a derived layer in deep mode), this method will convert it
-to a flat collection of polygons, edges or edge pairs.
+to a flat collection of texts, polygons, edges or edge pairs.
 </p>
 <a name="holes"/><h2>"holes" - Selects all polygon holes from the input</h2>
 <keyword name="holes"/>
@@ -740,8 +750,9 @@ otherwise individual shapes are selected.
 It returns a new layer containing the selected shapes. A version which modifies self
 is <a href="#select_interacting">select_interacting</a>.
 </p><p>
-This method is available for polygon and edge layers. Edges can be selected
-with respect to other edges or polygons.
+This method is available for polygon, text and edge layers. Edges can be selected
+with respect to other edges or polygons. Texts can be selected with respect to 
+polygons. Polygons can be selected with respect to edges, texts and other polygons.
 </p><p>
 The following image shows the effect of the "interacting" method (input1: red, input2: blue):
 </p><p>
@@ -860,7 +871,7 @@ It is an alias for the "+" operator.
 This method is available for polygon, edge and edge pair layers.
 </p><p>
 The following images show the effect of the "join" method
-on polygons and edges (layer1: red, layer2: blue):
+on polygons and edges (input1: red, input2: blue):
 </p><p>
 <table>
 <tr>
@@ -1030,13 +1041,23 @@ result will be the edges of the first operand which are outside the polygons
 of the second operand.
 </p><p>
 The following images show the effect of the "not" method
-on polygons and edges (layer1: red, layer2: blue):
+on polygons and edges (input1: red, input2: blue):
 </p><p>
 <table>
 <tr>
 <td><img src="/images/drc_not1.png"/></td>
 <td><img src="/images/drc_not2.png"/></td>
 <td><img src="/images/drc_not3.png"/></td>
+</tr>
+</table>
+</p><p>
+The NOT operation can be applied between a text and a polygon
+layer. In this case, the texts outside the polygons will be 
+written to the output (labels: red, input2: blue):
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_textpoly2.png"/></td>
 </tr>
 </table>
 </p>
@@ -1103,8 +1124,9 @@ otherwise individual shapes are selected.
 It returns a new layer containing the selected shapes. A version which modifies self
 is <a href="#select_not_interacting">select_not_interacting</a>.
 </p><p>
-This method is available for polygon and edge layers. Edges can be selected
-with respect to other edges or polygons.
+This method is available for polygon, text and edge layers. Edges can be selected
+with respect to other edges or polygons. Texts can be selected with respect to 
+polygons. Polygons can be selected with respect to edges, texts and other polygons.
 </p><p>
 The following image shows the effect of the "not_interacting" method (input1: red, input2: blue):
 </p><p>
@@ -1216,7 +1238,7 @@ It is an alias for the "|" operator.
 This method is available for polygon and edge layers.
 </p><p>
 The following images show the effect of the "or" method
-on polygons and edges (layer1: red, layer2: blue):
+on polygons and edges (input1: red, input2: blue):
 </p><p>
 <table>
 <tr>
@@ -1318,7 +1340,7 @@ are the same than for <a href="#width">width</a>.
 Distance values can be given as floating-point values (in micron) or integer values (in
 database units). To explicitly specify the unit, use the unit denominators.
 </p><p>
-The following images show the effect of the overlap check (layer1: red, layer2: blue):
+The following images show the effect of the overlap check (input1: red, input2: blue):
 </p><p>
 <table>
 <tr>
@@ -1419,8 +1441,7 @@ provides a way to pull shapes from other to the hierarchy to self.
 </p><p>
 This method will neither modify self nor other.
 </p><p>
-This method is available for polygon layers. Other can be an edge or polygon layer. 
-Edges or polygons can be selected with respect to polygons of self.
+This method is available for polygon, edge and text layers, similar to interacting.
 </p>
 <a name="pull_overlapping"/><h2>"pull_overlapping" - Selects shapes or regions of other which overlap shapes from the this region</h2>
 <keyword name="pull_overlapping"/>
@@ -1634,8 +1655,9 @@ otherwise individual shapes are selected.
 It modifies self to contain the selected shapes. A version which does not modify self
 is <a href="#interacting">interacting</a>.
 </p><p>
-This method is available for polygon and edge layers. Edges can be selected
-with respect to other edges or polygons.
+This method is available for polygon, text and edge layers. Edges can be selected
+with respect to other edges or polygons. Texts can be selected with respect to 
+polygons. Polygons can be selected with respect to edges, texts and other polygons.
 </p>
 <a name="select_not_inside"/><h2>"select_not_inside" - Selects shapes or regions of self which are not inside the other region</h2>
 <keyword name="select_not_inside"/>
@@ -1667,8 +1689,9 @@ otherwise individual shapes are selected.
 It modifies self to contain the selected shapes. A version which does not modify self
 is <a href="#not_interacting">not_interacting</a>.
 </p><p>
-This method is available for polygon and edge layers. Edges can be selected
-with respect to other edges or polygons.
+This method is available for polygon, text and edge layers. Edges can be selected
+with respect to other edges or polygons. Texts can be selected with respect to 
+polygons. Polygons can be selected with respect to edges, texts and other polygons.
 </p>
 <a name="select_not_outside"/><h2>"select_not_outside" - Selects shapes or regions of self which are not outside the other region</h2>
 <keyword name="select_not_outside"/>
@@ -1766,7 +1789,7 @@ are the same than for <a href="#width">width</a>.
 Distance values can be given as floating-point values (in micron) or integer values (in
 database units). To explicitly specify the unit, use the unit denominators.
 </p><p>
-The following image shows the effect of the separation check (layer1: red, layer2: blue):
+The following image shows the effect of the separation check (input1: red, input2: blue):
 </p><p>
 <table>
 <tr>
@@ -1985,6 +2008,12 @@ been created with <a href="#input">input</a>. By default, a small box (2x2 DBU) 
 selected text. By using the "as_dots" option, degenerated point-like edges will be
 produced.
 </p><p>
+The preferred method however is to use true text layers created with <a href="#labels">labels</a>.
+In this case, without specifying "as_dots" or "as_boxes" retains the text
+objects as such a text filtering is applied. In contrast to this, layers generated
+with <a href="#input">input</a> cannot maintain the text nature of the selected objects and 
+produce dots or small polygon boxes in the <a href="#texts">texts</a> method.
+</p><p>
 Texts can be selected either by exact match string or a pattern match with a 
 glob-style pattern. By default, glob-style pattern are used. 
 The options available are:
@@ -2000,13 +2029,38 @@ Here are some examples:
 </p><p>
 <pre>
 # Selects all texts
-t = input(1, 0).texts
+t = labels(1, 0).texts
 # Selects all texts beginning with an "A"
-t = input(1, 0).texts("A*")
-t = input(1, 0).texts(pattern("A*"))
-# Selects all texts whose string is "A*"
-t = input(1, 0).texts(text("A*"))
+t = labels(1, 0).texts("A*")
+t = labels(1, 0).texts(pattern("A*"))
+# Selects all texts whose string is "ABC"
+t = labels(1, 0).texts(text("ABC"))
 </pre>
+</p><p>
+The effect of the operation is shown in these examples:
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_texts1.png"/></td>
+<td><img src="/images/drc_texts2.png"/></td>
+</tr>
+</table>
+</p>
+<a name="texts_not"/><h2>"texts_not" - Selects texts from an original layer not matching a specific selection</h2>
+<keyword name="texts_not"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.texts_not</tt></li>
+<li><tt>layer.texts_not(p)</tt></li>
+<li><tt>layer.texts_not([ options ])</tt></li>
+</ul>
+<p>
+This method can be applied to true text layers obtained with <a href="#labels">labels</a>.
+In this case, without specifying "as_dots" or "as_boxes" retains the text
+objects as such. Only text filtering is applied.
+</p><p>
+Beside that this method acts like <a href="#texts">texts</a>, but will select the text objects
+not matching the filter.
 </p>
 <a name="transform"/><h2>"transform" - Transforms a layer (modifies the layer)</h2>
 <keyword name="transform"/>
@@ -2388,7 +2442,7 @@ It is an alias for the "^" operator.
 This method is available for polygon and edge layers.
 </p><p>
 The following images show the effect of the "xor" method
-on polygons and edges (layer1: red, layer2: blue):
+on polygons and edges (input1: red, input2: blue):
 </p><p>
 <table>
 <tr>

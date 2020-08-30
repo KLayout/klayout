@@ -1965,11 +1965,35 @@ OASISWriter::write (const db::CellInstArray &inst, db::properties_id_type prop_i
 {
   m_progress.set (mp_stream->pos ());
 
+  std::vector<db::Vector> pts;
   db::Vector a, b;
   unsigned long amax, bmax;
-  bool is_reg = inst.is_regular_array (a, b, amax, bmax);
 
-  if (is_reg && (amax > 1 || bmax > 1)) {
+  if (inst.is_iterated_array (&pts) && pts.size () > 1) {
+
+    // Remove the first point which is implicitly contained in the repetition
+    // Note: we can do so because below we instantiate the shape at the front of the array which includes
+    // the first transformation already.
+    db::Vector po = pts.front ();
+    std::vector<db::Vector>::iterator pw = pts.begin();
+    for (std::vector<db::Vector>::iterator p = pw + 1; p != pts.end (); ++p) {
+      *pw++ = *p - po;
+    }
+    pts.erase (pw, pts.end ());
+
+    db::IrregularRepetition *rep_base = new db::IrregularRepetition ();
+    rep_base->points ().swap (pts);
+    db::Repetition array_rep (rep_base);
+
+    if (rep != db::Repetition ()) {
+      for (db::RepetitionIterator r = rep.begin (); ! r.at_end (); ++r) {
+        write_inst_with_rep (inst, prop_id, *r, array_rep);
+      }
+    } else {
+      write_inst_with_rep (inst, prop_id, db::Vector (), array_rep);
+    }
+
+  } else if (inst.is_regular_array (a, b, amax, bmax) && (amax > 1 || bmax > 1)) {
 
     //  we cannot use the repetition - instead we write every single instance and use the repetition 
     //  for the array information

@@ -369,21 +369,21 @@ TEST(20_LocalClustersBasic)
   db::local_clusters<db::PolygonRef> clusters;
   EXPECT_EQ (local_clusters_to_string (clusters, conn), "");
 
-  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  clusters.build_clusters (cell, conn);
   EXPECT_EQ (local_clusters_to_string (clusters, conn), "#1:[0](0,0;0,1000;1000,1000;1000,0)");
 
   //  one more shape
   cell.shapes (0).insert (db::PolygonRef (poly.transformed (db::Trans (db::Vector (10, 20))), repo));
 
   clusters.clear ();
-  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  clusters.build_clusters (cell, conn);
   EXPECT_EQ (local_clusters_to_string (clusters, conn), "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20)");
 
   //  one more shape creating a new cluster
   cell.shapes (2).insert (db::PolygonRef (poly.transformed (db::Trans (db::Vector (0, 1100))), repo));
 
   clusters.clear ();
-  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  clusters.build_clusters (cell, conn);
   EXPECT_EQ (local_clusters_to_string (clusters, conn),
     "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20)\n"
     "#2:[2](0,1100;0,2100;1000,2100;1000,1100)"
@@ -393,7 +393,7 @@ TEST(20_LocalClustersBasic)
   cell.shapes (2).insert (db::PolygonRef (poly.transformed (db::Trans (db::Vector (0, 1000))), repo));
 
   clusters.clear ();
-  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  clusters.build_clusters (cell, conn);
   EXPECT_EQ (local_clusters_to_string (clusters, conn),
     "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20);[2](0,1000;0,2000;1000,2000;1000,1000);[2](0,1100;0,2100;1000,2100;1000,1100)"
   );
@@ -402,7 +402,7 @@ TEST(20_LocalClustersBasic)
   cell.shapes (1).insert (db::PolygonRef (poly.transformed (db::Trans (db::Vector (0, 1100))), repo));
 
   clusters.clear ();
-  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  clusters.build_clusters (cell, conn);
   EXPECT_EQ (local_clusters_to_string (clusters, conn),
     "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20);[2](0,1000;0,2000;1000,2000;1000,1000);[2](0,1100;0,2100;1000,2100;1000,1100)\n"
     "#2:[1](0,1100;0,2100;1000,2100;1000,1100)"
@@ -430,21 +430,21 @@ TEST(21_LocalClustersBasicWithAttributes)
   db::local_clusters<db::PolygonRef> clusters;
   EXPECT_EQ (local_clusters_to_string (clusters, conn), "");
 
-  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  clusters.build_clusters (cell, conn);
   EXPECT_EQ (local_clusters_to_string (clusters, conn), "#1:[0](0,0;0,1000;1000,1000;1000,0)");
 
   //  one more shape
   cell.shapes (0).insert (db::PolygonRefWithProperties (db::PolygonRef (poly.transformed (db::Trans (db::Vector (10, 20))), repo), 1));
 
   clusters.clear ();
-  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  clusters.build_clusters (cell, conn);
   EXPECT_EQ (local_clusters_to_string (clusters, conn), "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20)%1");
 
   //  one more shape creating a new cluster
   cell.shapes (2).insert (db::PolygonRefWithProperties (db::PolygonRef (poly.transformed (db::Trans (db::Vector (0, 1100))), repo), 2));
 
   clusters.clear ();
-  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  clusters.build_clusters (cell, conn);
   EXPECT_EQ (local_clusters_to_string (clusters, conn),
     "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20)%1\n"
     "#2:[2](0,1100;0,2100;1000,2100;1000,1100)%2"
@@ -454,7 +454,7 @@ TEST(21_LocalClustersBasicWithAttributes)
   cell.shapes (2).insert (db::PolygonRefWithProperties (db::PolygonRef (poly.transformed (db::Trans (db::Vector (0, 1000))), repo), 3));
 
   clusters.clear ();
-  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  clusters.build_clusters (cell, conn);
   EXPECT_EQ (local_clusters_to_string (clusters, conn),
     "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20);[2](0,1000;0,2000;1000,2000;1000,1000);[2](0,1100;0,2100;1000,2100;1000,1100)%1%2%3"
   );
@@ -463,7 +463,7 @@ TEST(21_LocalClustersBasicWithAttributes)
   cell.shapes (1).insert (db::PolygonRefWithProperties (db::PolygonRef (poly.transformed (db::Trans (db::Vector (0, 1100))), repo), 4));
 
   clusters.clear ();
-  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  clusters.build_clusters (cell, conn);
   EXPECT_EQ (local_clusters_to_string (clusters, conn),
     "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20);[2](0,1000;0,2000;1000,2000;1000,1000);[2](0,1100;0,2100;1000,2100;1000,1100)%1%2%3\n"
     "#2:[1](0,1100;0,2100;1000,2100;1000,1100)%4"
@@ -491,21 +491,21 @@ TEST(22_LocalClustersWithGlobal)
   db::local_clusters<db::PolygonRef> clusters;
   EXPECT_EQ (local_clusters_to_string (clusters, conn), "");
 
-  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  clusters.build_clusters (cell, conn);
   EXPECT_EQ (local_clusters_to_string (clusters, conn), "#1:[0](0,0;0,1000;1000,1000;1000,0)");
 
   //  one more shape
   cell.shapes (0).insert (db::PolygonRefWithProperties (db::PolygonRef (poly.transformed (db::Trans (db::Vector (10, 20))), repo), 1));
 
   clusters.clear ();
-  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  clusters.build_clusters (cell, conn);
   EXPECT_EQ (local_clusters_to_string (clusters, conn), "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20)%1");
 
   //  one more shape creating a new cluster
   cell.shapes (2).insert (db::PolygonRefWithProperties (db::PolygonRef (poly.transformed (db::Trans (db::Vector (0, 1100))), repo), 2));
 
   clusters.clear ();
-  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  clusters.build_clusters (cell, conn);
   EXPECT_EQ (local_clusters_to_string (clusters, conn),
     "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20)%1\n"
     "#2:[2](0,1100;0,2100;1000,2100;1000,1100)%2"
@@ -514,7 +514,7 @@ TEST(22_LocalClustersWithGlobal)
   conn.connect_global (0, "GLOBAL");
 
   clusters.clear ();
-  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  clusters.build_clusters (cell, conn);
   EXPECT_EQ (local_clusters_to_string (clusters, conn),
     "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20)%1+GLOBAL\n"
     "#2:[2](0,1100;0,2100;1000,2100;1000,1100)%2"
@@ -523,7 +523,7 @@ TEST(22_LocalClustersWithGlobal)
   conn.connect_global (2, "GLOBAL2");
 
   clusters.clear ();
-  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  clusters.build_clusters (cell, conn);
   EXPECT_EQ (local_clusters_to_string (clusters, conn),
     "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20)%1+GLOBAL\n"
     "#2:[2](0,1100;0,2100;1000,2100;1000,1100)%2+GLOBAL2"
@@ -533,7 +533,7 @@ TEST(22_LocalClustersWithGlobal)
 
   //  now, GLOBAL2 will connect these clusters
   clusters.clear ();
-  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  clusters.build_clusters (cell, conn);
   EXPECT_EQ (local_clusters_to_string (clusters, conn),
     "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20);[2](0,1100;0,2100;1000,2100;1000,1100)%1%2+GLOBAL+GLOBAL2"
   );
@@ -570,7 +570,7 @@ TEST(23_LocalClustersWithEdges)
     conn.connect (0);
 
     db::local_clusters<db::Edge> clusters;
-    clusters.build_clusters (cell, db::ShapeIterator::Edges, conn);
+    clusters.build_clusters (cell, conn);
     EXPECT_EQ (local_clusters_to_string (clusters, conn),
       "#1:[0](0,0;0,500);[0](0,500;0,1000)\n"
       "#2:[0](2000,500;1000,250);[0](1500,375;0,0)\n"
@@ -585,7 +585,7 @@ TEST(23_LocalClustersWithEdges)
     conn.connect (0);
 
     db::local_clusters<db::Edge> clusters;
-    clusters.build_clusters (cell, db::ShapeIterator::Edges, conn);
+    clusters.build_clusters (cell, conn);
     EXPECT_EQ (local_clusters_to_string (clusters, conn), "#1:[0](0,0;0,500);[0](0,500;0,1000);[0](1500,375;0,0);[0](0,1000;2000,1000);[0](2000,1000;2000,500);[0](2000,500;1000,250)");
   }
 }
@@ -700,7 +700,7 @@ TEST(40_HierClustersBasic)
   db::Connectivity conn;
   conn.connect (l1, l1);
 
-  hc.build (ly, top, db::ShapeIterator::Polygons, conn);
+  hc.build (ly, top, conn);
 
   int n, nc;
   const db::connected_clusters<db::PolygonRef> *cluster;
@@ -815,7 +815,7 @@ TEST(41_HierClustersRecursiveClusterShapeIterator)
   db::Connectivity conn;
   conn.connect (l1, l1);
 
-  hc.build (ly, top, db::ShapeIterator::Polygons, conn);
+  hc.build (ly, top, conn);
 
   std::string res;
   int n = 0;
@@ -860,7 +860,7 @@ TEST(41_HierClustersRecursiveClusterIterator)
   db::Connectivity conn;
   conn.connect (l1, l1);
 
-  hc.build (ly, top, db::ShapeIterator::Polygons, conn);
+  hc.build (ly, top, conn);
 
   std::string res;
   int n = 0;
@@ -1020,7 +1020,7 @@ static void run_hc_test (tl::TestBase *_this, const std::string &file, const std
   conn.connect_global (l6, "BULK2");
 
   db::hier_clusters<db::PolygonRef> hc;
-  hc.build (ly, ly.cell (*ly.begin_top_down ()), db::ShapeIterator::Polygons, conn);
+  hc.build (ly, ly.cell (*ly.begin_top_down ()), conn);
 
   std::vector<std::pair<db::Polygon::area_type, unsigned int> > net_layers;
 
@@ -1153,7 +1153,7 @@ static void run_hc_test_with_backannotation (tl::TestBase *_this, const std::str
   conn.connect_global (l6, "BULK2");
 
   db::hier_clusters<db::PolygonRef> hc;
-  hc.build (ly, ly.cell (*ly.begin_top_down ()), db::ShapeIterator::Polygons, conn);
+  hc.build (ly, ly.cell (*ly.begin_top_down ()), conn);
 
   std::map<unsigned int, unsigned int> lm;
   lm[l1] = ly.insert_layer (db::LayerProperties (101, 0));
@@ -1286,4 +1286,70 @@ TEST(120_HierClustersCombArrays)
 {
   run_hc_test (_this, "comb2.gds", "comb2_au1.gds");
   run_hc_test_with_backannotation (_this, "comb2.gds", "comb2_au2.gds");
+}
+
+static size_t root_nets (const db::connected_clusters<db::PolygonRef> &cc)
+{
+  size_t n = 0;
+  for (db::connected_clusters<db::PolygonRef>::all_iterator c = cc.begin_all (); !c.at_end (); ++c) {
+    if (cc.is_root (*c)) {
+      ++n;
+    }
+  }
+  return n;
+}
+
+//  issue #609
+TEST(200_issue609)
+{
+  db::Layout ly;
+  unsigned int l1 = 0, l2 = 0;
+
+  {
+    db::LayerProperties p;
+    db::LayerMap lmap;
+
+    p.layer = 1;
+    p.datatype = 0;
+    lmap.map (db::LDPair (p.layer, p.datatype), l1 = ly.insert_layer ());
+    ly.set_properties (l1, p);
+
+    p.layer = 2;
+    p.datatype = 0;
+    lmap.map (db::LDPair (p.layer, p.datatype), l2 = ly.insert_layer ());
+    ly.set_properties (l2, p);
+
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/issue-609.oas.gz";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  std::vector<std::string> strings;
+  normalize_layer (ly, strings, l1);
+  normalize_layer (ly, strings, l2);
+
+  //  connect 1 to 1, 1 to 2
+  db::Connectivity conn;
+  conn.connect (l1, l1);
+  conn.connect (l2, l2);
+  conn.connect (l1, l2);
+
+  db::hier_clusters<db::PolygonRef> hc;
+  hc.build (ly, ly.cell (*ly.begin_top_down ()), conn);
+
+  db::Layout::top_down_const_iterator td = ly.begin_top_down ();
+  EXPECT_EQ (td != ly.end_top_down (), true);
+  EXPECT_EQ (root_nets (hc.clusters_per_cell (*td)), size_t (1));
+  ++td;
+
+  //  result needs to be a single net
+  for ( ; td != ly.end_top_down (); ++td) {
+    EXPECT_EQ (root_nets (hc.clusters_per_cell (*td)), size_t (0));
+  }
 }

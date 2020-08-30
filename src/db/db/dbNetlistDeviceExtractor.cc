@@ -119,9 +119,12 @@ void NetlistDeviceExtractor::initialize (db::Netlist *nl)
   setup ();
 }
 
-static void insert_into_region (const db::PolygonRef &s, const db::ICplxTrans &tr, db::Region &region)
+static void insert_into_region (const db::NetShape &s, const db::ICplxTrans &tr, db::Region &region)
 {
-  region.insert (s.obj ().transformed (tr * db::ICplxTrans (s.trans ())));
+  if (s.type () == db::NetShape::Polygon) {
+    db::PolygonRef pr = s.polygon_ref ();
+    region.insert (pr.obj ().transformed (tr * db::ICplxTrans (pr.trans ())));
+  }
 }
 
 void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, unsigned int layout_index, const NetlistDeviceExtractor::input_layers &layer_map, db::Netlist &nl, hier_clusters_type &clusters, double device_scaling)
@@ -161,10 +164,10 @@ void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, unsigned int layo
     }
 
     tl_assert (l->second != 0);
-    db::DeepRegion *dr = dynamic_cast<db::DeepRegion *> (l->second->delegate ());
+    db::DeepShapeCollectionDelegateBase *dr = l->second->get_delegate ()->deep ();
     if (dr == 0) {
 
-      std::pair<bool, db::DeepLayer> alias = dss.layer_for_flat (tl::id_of (l->second->delegate ()));
+      std::pair<bool, db::DeepLayer> alias = dss.layer_for_flat (tl::id_of (l->second->get_delegate ()));
       if (alias.first) {
         //  use deep layer alias for a given flat one (if found)
         layers.push_back (alias.second.layer ());
@@ -207,8 +210,7 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
 {
   tl_assert (layers.size () == m_layer_definitions.size ());
 
-  typedef db::PolygonRef shape_type;
-  db::ShapeIterator::flags_type shape_iter_flags = db::ShapeIterator::Polygons;
+  typedef db::NetShape shape_type;
 
   mp_layout = &layout;
   m_layers = layers;
@@ -247,7 +249,7 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
 
   db::Connectivity device_conn = get_connectivity (layout, layers);
   db::hier_clusters<shape_type> device_clusters;
-  device_clusters.build (layout, cell, shape_iter_flags, device_conn, 0, breakout_cells);
+  device_clusters.build (layout, cell, device_conn, 0, breakout_cells);
 
   tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Extracting devices")));
 
@@ -365,12 +367,12 @@ void NetlistDeviceExtractor::push_new_devices (const db::Vector &disp_cache)
     DeviceCellKey key;
 
     for (geometry_per_terminal_type::const_iterator t = d->second.second.begin (); t != d->second.second.end (); ++t) {
-      std::map<unsigned int, std::set<db::PolygonRef> > &gt = key.geometry [t->first];
+      std::map<unsigned int, std::set<db::NetShape> > &gt = key.geometry [t->first];
       for (geometry_per_layer_type::const_iterator l = t->second.begin (); l != t->second.end (); ++l) {
-        std::set<db::PolygonRef> &gl = gt [l->first];
-        for (std::vector<db::PolygonRef>::const_iterator p = l->second.begin (); p != l->second.end (); ++p) {
-          db::PolygonRef pr = *p;
-          pr.transform (db::PolygonRef::trans_type (-disp));
+        std::set<db::NetShape> &gl = gt [l->first];
+        for (std::vector<db::NetShape>::const_iterator p = l->second.begin (); p != l->second.end (); ++p) {
+          db::NetShape pr = *p;
+          pr.transform (db::NetShape::trans_type (-disp));
           gl.insert (pr);
         }
       }
@@ -411,10 +413,10 @@ void NetlistDeviceExtractor::push_new_devices (const db::Vector &disp_cache)
         for (geometry_per_layer_type::const_iterator l = t->second.begin (); l != t->second.end (); ++l) {
 
           db::Shapes &shapes = device_cell.shapes (l->first);
-          for (std::vector<db::PolygonRef>::const_iterator s = l->second.begin (); s != l->second.end (); ++s) {
-            db::PolygonRef pr = *s;
-            pr.transform (db::PolygonRef::trans_type (-disp));
-            shapes.insert (db::PolygonRefWithProperties (pr, pi));
+          for (std::vector<db::NetShape>::const_iterator s = l->second.begin (); s != l->second.end (); ++s) {
+            db::NetShape pr = *s;
+            pr.transform (db::NetShape::trans_type (-disp));
+            pr.insert_into (shapes, pi);
           }
 
         }
@@ -542,10 +544,10 @@ void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id
 
   std::pair<db::Device *, geometry_per_terminal_type> &dd = m_new_devices[device->id ()];
   dd.first = device;
-  std::vector<db::PolygonRef> &geo = dd.second[terminal_id][layer_index];
+  std::vector<db::NetShape> &geo = dd.second[terminal_id][layer_index];
 
   for (db::Region::const_iterator p = region.begin_merged (); !p.at_end (); ++p) {
-    geo.push_back (db::PolygonRef (*p, mp_layout->shape_repository ()));
+    geo.push_back (db::NetShape (*p, mp_layout->shape_repository ()));
   }
 }
 
@@ -555,7 +557,7 @@ void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id
   tl_assert (geometry_index < m_layers.size ());
   unsigned int layer_index = m_layers [geometry_index];
 
-  db::PolygonRef pr (polygon, mp_layout->shape_repository ());
+  db::NetShape pr (polygon, mp_layout->shape_repository ());
   std::pair<db::Device *, geometry_per_terminal_type> &dd = m_new_devices[device->id ()];
   dd.first = device;
   dd.second[terminal_id][layer_index].push_back (pr);

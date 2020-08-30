@@ -142,7 +142,7 @@ SearchReplaceResults::size () const
   return std::max (std::max (m_cell_result.size (), m_data_result.size ()), std::max (m_shape_result.size (), m_inst_result.size ())) + (m_has_more ? 1 : 0);
 }
 
-int	
+int 
 SearchReplaceResults::columnCount (const QModelIndex & /*parent*/) const
 {
   //  Note: keep last column count for empty model to avoid resize events for the header
@@ -396,7 +396,7 @@ SearchReplaceResults::data (const QModelIndex &index, int role) const
   return QVariant ();
 }
 
-Qt::ItemFlags	
+Qt::ItemFlags 
 SearchReplaceResults::flags (const QModelIndex & /*index*/) const
 {
   return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
@@ -414,7 +414,7 @@ SearchReplaceResults::hasIndex (int row, int /*column*/, const QModelIndex &pare
   return ! parent.isValid () && row < int (size ());
 }
 
-QModelIndex	
+QModelIndex 
 SearchReplaceResults::index (int row, int column, const QModelIndex &parent) const
 {
   if (! parent.isValid ()) {
@@ -424,13 +424,13 @@ SearchReplaceResults::index (int row, int column, const QModelIndex &parent) con
   }
 }
 
-QModelIndex	
+QModelIndex 
 SearchReplaceResults::parent (const QModelIndex & /*index*/) const
 {
   return QModelIndex ();
 }
 
-int	
+int 
 SearchReplaceResults::rowCount (const QModelIndex &parent) const
 {
   return parent.isValid () ? 0 : int (size ());
@@ -455,7 +455,7 @@ escape_csv (const std::string &s)
   }
 }
 
-void 	
+void  
 SearchReplaceResults::export_csv (const std::string &file)
 {
   std::ofstream output (file.c_str ());
@@ -488,7 +488,7 @@ SearchReplaceResults::export_csv (const std::string &file)
   }
 }
 
-void 	
+void  
 SearchReplaceResults::export_layout (db::Layout &layout)
 {
   if (! m_data_result.empty () || ! m_cell_result.empty () || ! m_inst_result.empty ()) {
@@ -520,7 +520,7 @@ SearchReplaceResults::export_layout (db::Layout &layout)
   }
 }
 
-void 	
+void  
 SearchReplaceResults::export_rdb (rdb::Database &rdb, double dbu)
 {
   if (! m_cell_result.empty ()) {

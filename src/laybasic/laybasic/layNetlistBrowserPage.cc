@@ -69,7 +69,7 @@ inline const db::Circuit *deref_circuit (const db::Circuit *obj)
 }
 
 template <class Obj>
-static db::ICplxTrans
+static db::DCplxTrans
 trans_for (const Obj *objs, const db::Layout &ly, const db::Cell &cell, db::ContextCache &cc, const db::DCplxTrans &initial = db::DCplxTrans ())
 {
   db::DCplxTrans t = initial;
@@ -89,7 +89,6 @@ trans_for (const Obj *objs, const db::Layout &ly, const db::Cell &cell, db::Cont
   }
 
   db::CplxTrans dbu_trans (ly.dbu ());
-  db::ICplxTrans it = dbu_trans.inverted () * t * dbu_trans;
 
   //  The circuit may not be instantiated and still not be the top cell.
   //  This happens if the subcell does not have connections. In this case
@@ -98,11 +97,11 @@ trans_for (const Obj *objs, const db::Layout &ly, const db::Cell &cell, db::Cont
   if (circuit && ly.is_valid_cell_index (circuit->cell_index ())) {
     std::pair<bool, db::ICplxTrans> tc = cc.find_layout_context (circuit->cell_index (), cell.cell_index ());
     if (tc.first) {
-      it = tc.second * it;
+      t = dbu_trans * tc.second * dbu_trans.inverted () * t;
     }
   }
 
-  return it;
+  return t;
 }
 
 NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
@@ -142,7 +141,8 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
   QAction *sep;
   directory_tree->addAction (m_show_all_action);
   directory_tree->addAction (actionCollapseAll);
-  directory_tree->addAction (actionExpandAll);
+  //  TODO: this gives a too big tree - confine to single branches?
+  //  directory_tree->addAction (actionExpandAll);
   sep = new QAction (directory_tree);
   sep->setSeparator (true);
   directory_tree->addAction (sep);
@@ -306,21 +306,10 @@ NetlistBrowserPage::layer_list_changed (int)
 void
 NetlistBrowserPage::anchor_clicked (const QString &a)
 {
-  QUrl url (a);
-
-  QString ids;
-#if QT_VERSION >= 0x050000
-  ids = QUrlQuery (url.query ()).queryItemValue (QString::fromUtf8 ("id"));
-#else
-  ids = url.queryItemValue (QString::fromUtf8 ("id"));
-#endif
-
-  if (ids.isEmpty ()) {
-    return;
+  NetlistBrowserModel *netlist_model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+  if (netlist_model) {
+    navigate_to (netlist_model->index_from_url (a), true);
   }
-
-  void *id = reinterpret_cast<void *> (ids.toULongLong ());
-  navigate_to (id, true);
 }
 
 void
@@ -334,6 +323,7 @@ NetlistBrowserPage::current_tree_index_changed (const QModelIndex &index)
       return;
     }
 
+    //  TODO: this could give a path ...
     std::pair<const db::Circuit *, const db::Circuit *> circuits = tree_model->circuits_from_index (index);
     QModelIndex circuit_index = netlist_model->index_from_circuit (circuits);
 
@@ -355,11 +345,10 @@ NetlistBrowserPage::current_index_changed (const QModelIndex &index)
       return;
     }
 
-    void *id = index.internalPointer ();
-    add_to_history (id, true);
+    add_to_history (index, true);
 
-    std::pair<const db::Circuit *, const db::Circuit *> circuits = netlist_model->circuit_from_index (index);
-    QModelIndex circuit_index = tree_model->index_from_circuits (circuits);
+    NetlistObjectsPath path = netlist_model->path_from_index (index);
+    QModelIndex circuit_index = tree_model->index_from_netpath (path);
 
     m_signals_enabled = false;
     hierarchy_tree->setCurrentIndex (circuit_index);
@@ -377,6 +366,18 @@ NetlistBrowserPage::select_net (const db::Net *net)
     NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
     tl_assert (model != 0);
     directory_tree->setCurrentIndex (model->index_from_net (net));
+  }
+}
+
+void
+NetlistBrowserPage::select_path (const lay::NetlistObjectsPath &path)
+{
+  if (path.is_null ()) {
+    directory_tree->clearSelection ();
+  } else {
+    NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+    tl_assert (model != 0);
+    directory_tree->setCurrentIndex (model->index_from_path (path));
   }
 }
 
@@ -411,7 +412,7 @@ NetlistBrowserPage::selected_circuits ()
 
   QModelIndexList selection = directory_tree->selectionModel ()->selectedIndexes ();
   for (QModelIndexList::const_iterator i = selection.begin (); i != selection.end (); ++i) {
-    if (i->column () == 0 && model->is_circuit_index (*i)) {
+    if (i->column () == 0) {
       const db::Circuit *circuit = model->circuit_from_index (*i).first;
       if (circuit) {
         circuits.push_back (circuit);
@@ -467,18 +468,23 @@ NetlistBrowserPage::selected_devices ()
 void
 NetlistBrowserPage::selection_changed ()
 {
-  std::vector<const db::Net *> nets = selected_nets ();
-  if (mp_info_dialog) {
-    mp_info_dialog->set_nets (mp_database.get (), nets);
+  NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+  tl_assert (model != 0);
+
+  QModelIndexList selected = directory_tree->selectionModel ()->selectedIndexes ();
+
+  std::vector<lay::NetlistObjectsPath> selected_paths;
+  selected_paths.reserve (selected.size ());
+  for (QModelIndexList::const_iterator i = selected.begin (); i != selected.end (); ++i) {
+    if (i->column () == 0) {
+      selected_paths.push_back (model->path_from_index (*i));
+    }
   }
 
-  std::vector<const db::Device *> devices = selected_devices ();
+  QModelIndex current = directory_tree->selectionModel ()->currentIndex ();
+  highlight (model->path_from_index (current), selected_paths);
 
-  std::vector<const db::SubCircuit *> subcircuits = selected_subcircuits ();
-
-  std::vector<const db::Circuit *> circuits = selected_circuits ();
-
-  highlight (nets, devices, subcircuits, circuits);
+  selection_changed_event ();
 }
 
 void
@@ -518,15 +524,8 @@ NetlistBrowserPage::select_color_for_net ()
 }
 
 void
-NetlistBrowserPage::navigate_to (void *id, bool fwd)
+NetlistBrowserPage::navigate_to (const QModelIndex &index, bool fwd)
 {
-  NetlistBrowserTreeModel *tree_model = dynamic_cast<NetlistBrowserTreeModel *> (hierarchy_tree->model ());
-  NetlistBrowserModel *netlist_model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
-  if (! tree_model || ! netlist_model) {
-    return;
-  }
-
-  QModelIndex index = netlist_model->index_from_id (id, 0);
   if (! index.isValid ()) {
     return;
   }
@@ -536,35 +535,42 @@ NetlistBrowserPage::navigate_to (void *id, bool fwd)
 
     directory_tree->setCurrentIndex (index);
 
-    std::pair<const db::Circuit *, const db::Circuit *> circuits = netlist_model->circuit_from_index (index);
-    QModelIndex circuit_index = tree_model->index_from_circuits (circuits);
+    NetlistBrowserTreeModel *tree_model = dynamic_cast<NetlistBrowserTreeModel *> (hierarchy_tree->model ());
+    NetlistBrowserModel *netlist_model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+    if (! tree_model || ! netlist_model) {
+      return;
+    }
+
+    lay::NetlistObjectsPath path = netlist_model->path_from_index (index);
+    QModelIndex circuit_index = tree_model->index_from_netpath (path);
     hierarchy_tree->setCurrentIndex (circuit_index);
 
   } catch (...) {
   }
+
   m_signals_enabled = true;
 
-  add_to_history (id, fwd);
+  add_to_history (index, fwd);
 
   selection_changed ();
 }
 
 void
-NetlistBrowserPage::add_to_history (void *id, bool fwd)
+NetlistBrowserPage::add_to_history (const QModelIndex &index, bool fwd)
 {
   if (! fwd) {
     if (m_history_ptr > 1) {
       --m_history_ptr;
-      m_history [m_history_ptr - 1] = id;
+      m_history [m_history_ptr - 1] = index;
     }
   } else if (m_history_ptr >= m_history.size ()) {
-    m_history.push_back (id);
+    m_history.push_back (index);
     m_history_ptr = m_history.size ();
   } else {
-    if (m_history [m_history_ptr] != id) {
+    if (m_history [m_history_ptr] != index) {
       m_history.erase (m_history.begin () + m_history_ptr + 1, m_history.end ());
     }
-    m_history [m_history_ptr] = id;
+    m_history [m_history_ptr] = index;
     ++m_history_ptr;
   }
 
@@ -730,7 +736,7 @@ NetlistBrowserPage::find_button_pressed ()
 
   QModelIndex next = find_next (directory_tree, directory_tree->model (), re, directory_tree->currentIndex ());
   if (next.isValid ()) {
-    navigate_to (next.internalPointer ());
+    navigate_to (next);
   }
 }
 
@@ -795,11 +801,12 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
   m_signals_enabled = se;
 
   clear_markers ();
-  highlight (std::vector<const db::Net *> (), std::vector<const db::Device *> (), std::vector<const db::SubCircuit *> (), std::vector<const db::Circuit *> ());
 
   m_cell_context_cache = db::ContextCache (mp_database.get () ? mp_database->internal_layout () : 0);
 
   setup_trees ();
+
+  selection_changed_event ();
 }
 
 void
@@ -886,21 +893,16 @@ NetlistBrowserPage::setup_trees ()
 }
 
 void
-NetlistBrowserPage::highlight (const std::vector<const db::Net *> &nets, const std::vector<const db::Device *> &devices, const std::vector<const db::SubCircuit *> &subcircuits, const std::vector<const db::Circuit *> &circuits)
+NetlistBrowserPage::highlight (const NetlistObjectsPath &current_path, const std::vector<NetlistObjectsPath> &selected_paths)
 {
-  if (nets != m_current_nets || devices != m_current_devices || subcircuits != m_current_subcircuits || circuits != m_current_circuits) {
+  if (current_path != m_current_path && selected_paths != m_selected_paths) {
 
-    m_current_nets = nets;
-    m_current_devices = devices;
-    m_current_subcircuits = subcircuits;
-    m_current_circuits = circuits;
+    m_current_path = current_path;
+    m_selected_paths = selected_paths;
 
     clear_markers ();
-
-    if (! nets.empty () || ! devices.empty () || ! subcircuits.empty () || ! circuits.empty ()) {
-      adjust_view ();
-      update_highlights ();
-    }
+    adjust_view ();
+    update_highlights ();
 
   }
 }
@@ -928,7 +930,8 @@ bbox_for_device_abstract (const db::Layout *layout, const db::DeviceAbstract *de
     return db::Box ();
   }
 
-  return layout->cell (device_abstract->cell_index ()).bbox ().transformed (db::CplxTrans (layout->dbu ()).inverted () * trans * db::CplxTrans (layout->dbu ()));}
+  return layout->cell (device_abstract->cell_index ()).bbox ().transformed (db::CplxTrans (layout->dbu ()).inverted () * trans * db::CplxTrans (layout->dbu ()));
+}
 
 static db::Box
 bbox_for_circuit (const db::Layout *layout, const db::Circuit *circuit)
@@ -943,12 +946,6 @@ bbox_for_circuit (const db::Layout *layout, const db::Circuit *circuit)
   }
 
   return layout->cell (circuit->cell_index ()).bbox ();
-}
-
-static db::Box
-bbox_for_subcircuit (const db::Layout *layout, const db::SubCircuit *subcircuit)
-{
-  return bbox_for_circuit (layout, subcircuit->circuit_ref ());
 }
 
 void
@@ -967,57 +964,80 @@ NetlistBrowserPage::adjust_view ()
     return;
   }
 
+  const db::Layout &original_layout = mp_view->cellview (m_cv_index)->layout ();
+  const db::Circuit *top_circuit = mp_database->netlist ()->circuit_by_name (original_layout.cell_name (mp_view->cellview (m_cv_index).cell_index ()));
+
   const db::Layout *layout = mp_database->internal_layout ();
-  const db::Cell *cell = mp_database->internal_top_cell ();
+  const db::Cell *cell = (top_circuit && layout->is_valid_cell_index (top_circuit->cell_index ()) ? &layout->cell (top_circuit->cell_index ()) : mp_database->internal_top_cell ());
   if (! layout || ! cell) {
     return;
   }
 
+  db::DBox bbox;
 
-  db::Box bbox;
+  for (std::vector<lay::NetlistObjectsPath>::const_iterator path = m_selected_paths.begin (); path != m_selected_paths.end (); ++path) {
 
-  for (std::vector<const db::Net *>::const_iterator net = m_current_nets.begin (); net != m_current_nets.end (); ++net) {
+    const db::Circuit *circuit = path->root.first;
+    if (! circuit) {
+      continue;
+    }
 
-    db::ICplxTrans net_trans = trans_for (*net, *layout, *cell, m_cell_context_cache);
+    db::DCplxTrans trans;
 
-    db::cell_index_type cell_index = (*net)->circuit ()->cell_index ();
-    size_t cluster_id = (*net)->cluster_id ();
+    trans = trans_for (circuit, *layout, *cell, m_cell_context_cache, db::DCplxTrans ());
 
-    const db::Connectivity &conn = mp_database->connectivity ();
-    for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+    for (std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *> >::const_iterator p = path->path.begin (); p != path->path.end () && circuit; ++p) {
+      if (p->first) {
+        circuit = p->first->circuit_ref ();
+        trans = trans * p->first->trans ();
+      } else {
+        circuit = 0;
+      }
+    }
 
-      db::Box layer_bbox;
-      db::recursive_cluster_shape_iterator<db::PolygonRef> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
-      while (! shapes.at_end ()) {
-        layer_bbox += shapes.trans () * shapes->box ();
-        ++shapes;
+    if (! circuit) {
+      continue;
+    }
+
+    db::Box ebox;
+
+    const db::Device *device = path->device.first;
+    const db::Net *net = path->net.first;
+
+    if (device) {
+
+      ebox += bbox_for_device_abstract (layout, device->device_abstract (), db::DCplxTrans ());
+
+      const std::vector<db::DeviceAbstractRef> &oda = device->other_abstracts ();
+      for (std::vector<db::DeviceAbstractRef>::const_iterator a = oda.begin (); a != oda.end (); ++a) {
+        ebox += bbox_for_device_abstract (layout, a->device_abstract, a->trans);
       }
 
-      bbox += net_trans * layer_bbox;
+    } else if (net) {
 
+      db::cell_index_type cell_index = net->circuit ()->cell_index ();
+      size_t cluster_id = net->cluster_id ();
+
+      const db::Connectivity &conn = mp_database->connectivity ();
+      for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+
+        db::Box layer_bbox;
+        db::recursive_cluster_shape_iterator<db::NetShape> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
+        while (! shapes.at_end ()) {
+          layer_bbox += shapes->bbox ().transformed (shapes.trans ());
+          ++shapes;
+        }
+
+        ebox += layer_bbox;
+
+      }
+
+    } else if (circuit) {
+      ebox += bbox_for_circuit (layout, circuit);
     }
 
-  }
+    bbox += trans * db::CplxTrans (layout->dbu ()) * ebox;
 
-  for (std::vector<const db::Device *>::const_iterator device = m_current_devices.begin (); device != m_current_devices.end (); ++device) {
-
-    db::ICplxTrans trans = trans_for (*device, *layout, *cell, m_cell_context_cache, (*device)->trans ());
-
-    bbox += trans * bbox_for_device_abstract (layout, (*device)->device_abstract (), db::DCplxTrans ());
-
-    const std::vector<db::DeviceAbstractRef> &oda = (*device)->other_abstracts ();
-    for (std::vector<db::DeviceAbstractRef>::const_iterator a = oda.begin (); a != oda.end (); ++a) {
-      bbox += trans * bbox_for_device_abstract (layout, a->device_abstract, a->trans);
-    }
-
-  }
-
-  for (std::vector<const db::SubCircuit *>::const_iterator subcircuit = m_current_subcircuits.begin (); subcircuit != m_current_subcircuits.end (); ++subcircuit) {
-    bbox += trans_for (*subcircuit, *layout, *cell, m_cell_context_cache, (*subcircuit)->trans ()) * bbox_for_subcircuit (layout, *subcircuit);
-  }
-
-  for (std::vector<const db::Circuit *>::const_iterator circuit = m_current_circuits.begin (); circuit != m_current_circuits.end (); ++circuit) {
-    bbox += trans_for (*circuit, *layout, *cell, m_cell_context_cache, db::DCplxTrans ()) * bbox_for_circuit (layout, *circuit);
   }
 
   if (! bbox.empty ()) {
@@ -1025,9 +1045,8 @@ NetlistBrowserPage::adjust_view ()
     std::vector<db::DCplxTrans> tv = mp_view->cv_transform_variants (m_cv_index);
 
     db::DBox tv_bbox;
-    db::DBox dbu_bbox = db::CplxTrans (layout->dbu ()) * bbox;
     for (std::vector<db::DCplxTrans>::const_iterator t = tv.begin (); t != tv.end (); ++t) {
-      tv_bbox += *t * dbu_bbox;
+      tv_bbox += *t * bbox;
     }
 
     if (m_window == lay::NetlistBrowserConfig::FitNet) {
@@ -1065,12 +1084,10 @@ bool
 NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, size_t &n_markers, const std::vector<db::DCplxTrans> &tv)
 {
   const db::Layout *layout = mp_database->internal_layout ();
-  const db::Cell *cell = mp_database->internal_top_cell ();
-  db::ICplxTrans device_trans = trans_for (device, *layout, *cell, m_cell_context_cache, device->trans ());
 
   QColor color = make_valid_color (m_colorizer.marker_color ());
 
-  db::Box device_bbox = bbox_for_device_abstract (layout, device->device_abstract (), db::DCplxTrans ());
+  db::Box device_bbox = bbox_for_device_abstract (layout, device->device_abstract (), device->trans ());
   if (! device_bbox.empty ()) {
 
     if (n_markers == m_max_shape_count) {
@@ -1080,7 +1097,7 @@ NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, siz
     ++n_markers;
 
     mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
-    mp_markers.back ()->set (device_bbox, device_trans, tv);
+    mp_markers.back ()->set (device_bbox, db::ICplxTrans (), tv);
     mp_markers.back ()->set_color (color);
     mp_markers.back ()->set_frame_color (color);
     configure_marker (mp_markers.back (), false);
@@ -1090,7 +1107,7 @@ NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, siz
   const std::vector<db::DeviceAbstractRef> &oda = device->other_abstracts ();
   for (std::vector<db::DeviceAbstractRef>::const_iterator a = oda.begin (); a != oda.end (); ++a) {
 
-    db::Box da_box = bbox_for_device_abstract (layout, a->device_abstract, a->trans);
+    db::Box da_box = bbox_for_device_abstract (layout, a->device_abstract, device->trans () * a->trans);
     if (! da_box.empty ()) {
 
       if (n_markers == m_max_shape_count) {
@@ -1100,7 +1117,7 @@ NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, siz
       ++n_markers;
 
       mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
-      mp_markers.back ()->set (da_box, device_trans, tv);
+      mp_markers.back ()->set (da_box, db::ICplxTrans (), tv);
       mp_markers.back ()->set_color (color);
       mp_markers.back ()->set_frame_color (color);
       configure_marker (mp_markers.back (), false);
@@ -1113,39 +1130,9 @@ NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, siz
 }
 
 bool
-NetlistBrowserPage::produce_highlights_for_subcircuit (const db::SubCircuit *subcircuit, size_t &n_markers, const std::vector<db::DCplxTrans> &tv)
-{
-  const db::Layout *layout = mp_database->internal_layout ();
-  const db::Cell *cell = mp_database->internal_top_cell ();
-  db::ICplxTrans subcircuit_trans = trans_for (subcircuit, *layout, *cell, m_cell_context_cache, subcircuit->trans ());
-
-  QColor color = make_valid_color (m_colorizer.marker_color ());
-  db::Box circuit_bbox = bbox_for_subcircuit (layout, subcircuit);
-  if (circuit_bbox.empty ()) {
-    return false;
-  }
-
-  if (n_markers == m_max_shape_count) {
-    return true;
-  }
-
-  ++n_markers;
-
-  mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
-  mp_markers.back ()->set (circuit_bbox, subcircuit_trans, tv);
-  mp_markers.back ()->set_color (color);
-  mp_markers.back ()->set_frame_color (color);
-  configure_marker (mp_markers.back (), false);
-
-  return false;
-}
-
-bool
 NetlistBrowserPage::produce_highlights_for_circuit (const db::Circuit *circuit, size_t &n_markers, const std::vector<db::DCplxTrans> &tv)
 {
   const db::Layout *layout = mp_database->internal_layout ();
-  const db::Cell *cell = mp_database->internal_top_cell ();
-  db::ICplxTrans circuit_trans = trans_for (circuit, *layout, *cell, m_cell_context_cache, db::DCplxTrans ());
 
   QColor color = make_valid_color (m_colorizer.marker_color ());
   db::Box circuit_bbox = bbox_for_circuit (layout, circuit);
@@ -1160,7 +1147,7 @@ NetlistBrowserPage::produce_highlights_for_circuit (const db::Circuit *circuit, 
   ++n_markers;
 
   mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
-  mp_markers.back ()->set (circuit_bbox, circuit_trans, tv);
+  mp_markers.back ()->set (circuit_bbox, db::ICplxTrans (), tv);
   mp_markers.back ()->set_color (color);
   mp_markers.back ()->set_frame_color (color);
   configure_marker (mp_markers.back (), false);
@@ -1172,8 +1159,6 @@ bool
 NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_markers, const std::map<db::LayerProperties, lay::LayerPropertiesConstIterator> &display_by_lp, const std::vector<db::DCplxTrans> &tv)
 {
   const db::Layout *layout = mp_database->internal_layout ();
-  const db::Cell *cell = mp_database->internal_top_cell ();
-  db::ICplxTrans net_trans = trans_for (net, *layout, *cell, m_cell_context_cache);
 
   db::cell_index_type cell_index = net->circuit ()->cell_index ();
   size_t cluster_id = net->cluster_id ();
@@ -1187,15 +1172,19 @@ NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_ma
     db::LayerProperties lp = layout->get_properties (*layer);
     std::map<db::LayerProperties, lay::LayerPropertiesConstIterator>::const_iterator display = display_by_lp.find (lp);
 
-    db::recursive_cluster_shape_iterator<db::PolygonRef> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
+    db::recursive_cluster_shape_iterator<db::NetShape> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
     while (! shapes.at_end ()) {
+
+      if (shapes->type () != db::NetShape::Polygon) {
+        continue;
+      }
 
       if (n_markers == m_max_shape_count) {
         return true;
       }
 
       mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
-      mp_markers.back ()->set (*shapes, net_trans * shapes.trans (), tv);
+      mp_markers.back ()->set (shapes->polygon_ref (), shapes.trans (), tv);
 
       if (net_color.isValid ()) {
 
@@ -1268,13 +1257,13 @@ NetlistBrowserPage::update_highlights ()
   }
 
   const db::Layout &original_layout = mp_view->cellview (m_cv_index)->layout ();
+  const db::Circuit *top_circuit = mp_database->netlist ()->circuit_by_name (original_layout.cell_name (mp_view->cellview (m_cv_index).cell_index ()));
 
   const db::Layout *layout = mp_database->internal_layout ();
-  if (! layout) {
+  const db::Cell *cell = (top_circuit && layout->is_valid_cell_index (top_circuit->cell_index ()) ? &layout->cell (top_circuit->cell_index ()) : mp_database->internal_top_cell ());
+  if (! layout || ! cell) {
     return;
   }
-
-  //  a map of display properties vs. layer properties
 
   std::map<db::LayerProperties, lay::LayerPropertiesConstIterator> display_by_lp;
   for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
@@ -1283,36 +1272,55 @@ NetlistBrowserPage::update_highlights ()
     }
   }
 
-  std::vector<db::DCplxTrans> tv = mp_view->cv_transform_variants (m_cv_index);
-
-  //  correct DBU differences between the storage layout and the original layout
-  for (std::vector<db::DCplxTrans>::iterator t = tv.begin (); t != tv.end (); ++t) {
-    *t = *t * db::DCplxTrans (layout->dbu () / original_layout.dbu ());
-  }
-
   size_t n_markers = 0;
   bool not_all_shapes_are_shown = false;
 
-  for (std::vector<const db::Net *>::const_iterator net = m_current_nets.begin (); net != m_current_nets.end () && ! not_all_shapes_are_shown; ++net) {
-    if ((*net)->circuit ()) {
-      not_all_shapes_are_shown = produce_highlights_for_net (*net, n_markers, display_by_lp, tv);
-    }
-  }
+  for (std::vector<lay::NetlistObjectsPath>::const_iterator path = m_selected_paths.begin (); path != m_selected_paths.end (); ++path) {
 
-  for (std::vector<const db::Device *>::const_iterator device = m_current_devices.begin (); device != m_current_devices.end () && ! not_all_shapes_are_shown; ++device) {
-    if ((*device)->circuit ()) {
-      not_all_shapes_are_shown = produce_highlights_for_device (*device, n_markers, tv);
+    const db::Circuit *circuit = path->root.first;
+    if (! circuit) {
+      continue;
     }
-  }
 
-  for (std::vector<const db::SubCircuit *>::const_iterator subcircuit = m_current_subcircuits.begin (); subcircuit != m_current_subcircuits.end () && ! not_all_shapes_are_shown; ++subcircuit) {
-    if ((*subcircuit)->circuit ()) {
-      not_all_shapes_are_shown = produce_highlights_for_subcircuit (*subcircuit, n_markers, tv);
+    //  computes the transformation supplied by the path
+
+    db::DCplxTrans trans = trans_for (circuit, *layout, *cell, m_cell_context_cache, db::DCplxTrans ());
+
+    for (std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *> >::const_iterator p = path->path.begin (); p != path->path.end () && circuit; ++p) {
+      if (p->first) {
+        circuit = p->first->circuit_ref ();
+        trans = trans * p->first->trans ();
+      } else {
+        circuit = 0;
+      }
     }
-  }
 
-  for (std::vector<const db::Circuit *>::const_iterator circuit = m_current_circuits.begin (); circuit != m_current_circuits.end () && ! not_all_shapes_are_shown; ++circuit) {
-    not_all_shapes_are_shown = produce_highlights_for_circuit (*circuit, n_markers, tv);
+    if (! circuit) {
+      continue;
+    }
+
+    //  a map of display properties vs. layer properties
+
+    //  correct DBU differences between the storage layout and the original layout
+    std::vector<db::DCplxTrans> tv = mp_view->cv_transform_variants (m_cv_index);
+    for (std::vector<db::DCplxTrans>::iterator t = tv.begin (); t != tv.end (); ++t) {
+      *t = *t * trans * db::DCplxTrans (layout->dbu () / original_layout.dbu ());
+    }
+
+    if (path->net.first) {
+      if (produce_highlights_for_net (path->net.first, n_markers, display_by_lp, tv)) {
+        not_all_shapes_are_shown = true;
+      }
+    } else if (path->device.first) {
+      if (produce_highlights_for_device (path->device.first, n_markers, tv)) {
+        not_all_shapes_are_shown = true;
+      }
+    } else if (circuit) {
+      if (produce_highlights_for_circuit (circuit, n_markers, tv)) {
+        not_all_shapes_are_shown = true;
+      }
+    }
+
   }
 
   if (not_all_shapes_are_shown) {
@@ -1323,7 +1331,6 @@ NetlistBrowserPage::update_highlights ()
   } else {
     info_label->hide ();
   }
-
 }
 
 void

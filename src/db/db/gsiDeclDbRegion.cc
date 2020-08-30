@@ -259,7 +259,7 @@ static db::Region moved_xy (const db::Region *r, db::Coord x, db::Coord y)
 
 static db::Region extents2 (const db::Region *r, db::Coord dx, db::Coord dy)
 {
-  return r->processed (db::Extents (dx, dy));
+  return r->processed (db::extents_processor<db::Polygon> (dx, dy));
 }
 
 static db::Region extents1 (const db::Region *r, db::Coord d)
@@ -607,7 +607,9 @@ static size_t id (const db::Region *r)
 int td_simple ();
 int po_any ();
 
-Class<db::Region> decl_Region ("db", "Region",
+extern Class<db::ShapeCollection> decl_dbShapeCollection;
+
+Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
     "\n"
@@ -1509,6 +1511,42 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "This method has been introduced in version 0.25\n"
   ) +
+  method ("interacting", (db::Region (db::Region::*) (const db::Texts &) const) &db::Region::selected_interacting, gsi::arg ("other"),
+    "@brief Returns the polygons of this region which overlap or touch texts\n"
+    "\n"
+    "@return A new region containing the polygons overlapping or touching texts\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27\n"
+  ) +
+  method ("not_interacting", (db::Region (db::Region::*) (const db::Texts &) const) &db::Region::selected_not_interacting, gsi::arg ("other"),
+    "@brief Returns the polygons of this region which do not overlap or touch texts\n"
+    "\n"
+    "@return A new region containing the polygons not overlapping or touching texts\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27\n"
+  ) +
+  method ("select_interacting", (db::Region &(db::Region::*) (const db::Texts &)) &db::Region::select_interacting, gsi::arg ("other"),
+    "@brief Selects the polygons of this region which overlap or touch texts\n"
+    "\n"
+    "@return The region after the polygons have been selected (self)\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27\n"
+  ) +
+  method ("select_not_interacting", (db::Region &(db::Region::*) (const db::Texts &)) &db::Region::select_not_interacting, gsi::arg ("other"),
+    "@brief Selects the polygons of this region which do not overlap or touch texts\n"
+    "\n"
+    "@return The region after the polygons have been selected (self)\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27\n"
+  ) +
   method ("overlapping", &db::Region::selected_overlapping, gsi::arg ("other"),
     "@brief Returns the polygons of this region which overlap polygons from the other region\n"
     "\n"
@@ -1579,6 +1617,16 @@ Class<db::Region> decl_Region ("db", "Region",
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
     "This method has been introduced in version 0.26.1\n"
+  ) +
+  method ("pull_interacting", static_cast<db::Texts (db::Region::*) (const db::Texts &) const> (&db::Region::pull_interacting), gsi::arg ("other"),
+    "@brief Returns all texts of \"other\" which are interacting with polygons of this region\n"
+    "See \\pull_inside for a description of the \"pull_...\" methods.\n"
+    "\n"
+    "@return The text collection after the texts have been selected (from other)\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27\n"
   ) +
   method ("is_box?", &db::Region::is_box,
     "@brief Returns true, if the region is a simple box\n"

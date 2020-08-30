@@ -17,6 +17,7 @@ import sys
 import os
 import re
 import shutil
+import zipfile
 import glob
 import platform
 import optparse
@@ -36,6 +37,7 @@ from build4mac_util import *
 def SetGlobals():
   global ProjectDir         # project directory where "build.sh" exists
   global Usage              # string on usage
+  global LatestOS           # the latest generic OS name
   global GenOSName          # generic OS name
   global Platform           # platform
   global PkgDir             # the package directory where "klayout.app" exists
@@ -47,7 +49,7 @@ def SetGlobals():
   global PackagePrefix      # the package prefix: 'ST-', 'LW-', 'HW-', or 'EX-'
   global QtIdentification   # Qt identification
   global RubyPythonID       # Ruby- and Python-identification
-  global Version            # KLayout's version
+  global KLVersion          # KLayout's version
   global OccupiedDS         # approx. occupied disc space
   global BackgroundPNG      # the background PNG image file
   global VolumeIcons        # the volume icon file
@@ -56,6 +58,11 @@ def SetGlobals():
   global VolumeDMG          # the volume name of DMG
   global TargetDMG          # the name of target DMG file
   global RootApplications   # reserved directory name for applications
+  global LatestOSMacPorts   # True if 'LatestOS with MacPorts'
+  global LatestOSHomebrew   # True if 'LatestOS with Homebrew'
+  global LatestOSAnaconda3  # True if 'LatestOS with Anaconda3'
+  global DicLightWeight     # dictionary for LW-* packages
+  global Item3AppleScript   # ITEM_3 in the Apple script
   # auxiliary variables on platform
   global System             # 6-tuple from platform.uname()
   global Node               # - do -
@@ -93,9 +100,11 @@ def SetGlobals():
     quit()
 
   release = int( Release.split(".")[0] ) # take the first of ['19', '0', '0']
+  LatestOS = ""
   if   release == 19:
     GenOSName = "macOS"
     Platform  = "Catalina"
+    LatestOS  = Platform
   elif release == 18:
     GenOSName = "macOS"
     Platform  = "Mojave"
@@ -130,7 +139,7 @@ def SetGlobals():
   PackagePrefix     = ""
   QtIdentification  = ""
   RubyPythonID      = ""
-  Version           = GetKLayoutVersionFrom( "./version.sh" )
+  KLVersion         = GetKLayoutVersionFrom( "./version.sh" )
   OccupiedDS        = -1
   BackgroundPNG     = "KLayoutDMG-Back.png"
   VolumeIcons       = "KLayoutHDD.icns"
@@ -139,6 +148,30 @@ def SetGlobals():
   VolumeDMG         = "KLayout"
   TargetDMG         = ""
   RootApplications  = "/Applications"
+  LatestOSMacPorts  = False
+  LatestOSHomebrew  = False
+  LatestOSAnaconda3 = False
+  DicLightWeight    = dict()
+  Item3AppleScript  = ""
+  # Populate DicLightWeight
+  DicLightWeight[ "ports" ] = dict()
+  DicLightWeight[ "brew" ]  = dict()
+  DicLightWeight[ "ana3" ]  = dict()
+
+  DicLightWeight[ "ports" ]["zip"]   = "macbuild/Resources/script-bundle-P.zip"
+  DicLightWeight[ "ports" ]["src"]   = "script-bundle-P"
+  DicLightWeight[ "ports" ]["des"]   = "MacPortsUser-ReadMeFirst"
+  DicLightWeight[ "ports" ]["item3"] = 'set position of item "MacPortsUser-ReadMeFirst" to {700, 400}'
+
+  DicLightWeight[ "brew" ]["zip"]    = "macbuild/Resources/script-bundle-B.zip"
+  DicLightWeight[ "brew" ]["src"]    = "script-bundle-B"
+  DicLightWeight[ "brew" ]["des"]    = "HomebrewUser-ReadMeFirst"
+  DicLightWeight[ "brew" ]["item3"]  = 'set position of item "HomebrewUser-ReadMeFirst" to {700, 400}'
+
+  DicLightWeight[ "ana3" ]["zip"]    = "macbuild/Resources/script-bundle-A.zip"
+  DicLightWeight[ "ana3" ]["src"]    = "script-bundle-A"
+  DicLightWeight[ "ana3" ]["des"]    = "Anaconda3User-ReadMeFirst"
+  DicLightWeight[ "ana3" ]["item3"]  = 'set position of item "Anaconda3User-ReadMeFirst" to {700, 400}'
 
 #------------------------------------------------------------------------------
 ## To check the contents of the package directory
@@ -156,11 +189,19 @@ def SetGlobals():
 #         on failure, -1
 #------------------------------------------------------------------------------
 def CheckPkgDirectory():
+  global Platform
+  global OpClean
+  global OpMake
   global DefaultBundleName
   global BundleName
   global PackagePrefix
   global QtIdentification
   global RubyPythonID
+  global LatestOSMacPorts
+  global LatestOSHomebrew
+  global LatestOSAnaconda3
+  global DicLightWeight
+  global Item3AppleScript
 
   #-----------------------------------------------------------------------------
   # [1] Check the contents of the package directory
@@ -175,30 +216,12 @@ def CheckPkgDirectory():
     print( "" )
     return -1
 
-  os.chdir(PkgDir)
-  if not os.path.isdir( DefaultBundleName ):
-    print( "! The package directory <%s> does not hold <%s> bundle" % (PkgDir, DefaultBundleName), file=sys.stderr )
-    print( "" )
-    os.chdir(ProjectDir)
-    return -1
-
-  command = "\du -sm %s" % DefaultBundleName
-  sizeApp = int( os.popen(command).read().strip("\n").split("\t")[0] )
-
   #-----------------------------------------------------------------------------
-  # [2] Change the application bundle name on demand
-  #-----------------------------------------------------------------------------
-  if BundleName == "":
-    BundleName = DefaultBundleName
-  else:
-    os.rename( DefaultBundleName, BundleName )
-  os.chdir(ProjectDir)
-
-  #-----------------------------------------------------------------------------
-  # [3] Identify (Qt, Ruby, Python)
+  # [2] Identify (Qt, Ruby, Python) from PkgDir
   #
   #     * ST-qt5MP.pkg.macos-Catalina-release-RsysPsys
   #     * LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
+  #     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb27Phb37
   #     * HW-qt5Brew.pkg.macos-Catalina-release-RsysPhb37
   #     * EX-qt5MP.pkg.macos-Catalina-release-Rmp26Pmp37
   #-----------------------------------------------------------------------------
@@ -213,7 +236,93 @@ def CheckPkgDirectory():
     PackagePrefix    = pkgdirComponents[0]
     QtIdentification = pkgdirComponents[2]
     RubyPythonID     = pkgdirComponents[5]
-    return sizeApp
+
+  #-----------------------------------------------------------------------------
+  # [3] Check if the "LatestOS" with MacPorts / Homebrew / Anaconda3
+  #-----------------------------------------------------------------------------
+  LatestOSMacPorts   = Platform == LatestOS
+  LatestOSMacPorts  &= PackagePrefix == "LW"
+  LatestOSMacPorts  &= QtIdentification == "qt5MP"
+  LatestOSMacPorts  &= RubyPythonID == "Rmp26Pmp37"
+
+  LatestOSHomebrew   = Platform == LatestOS
+  LatestOSHomebrew  &= PackagePrefix == "LW"
+  LatestOSHomebrew  &= QtIdentification == "qt5Brew"
+  LatestOSHomebrew  &= RubyPythonID == "Rhb27Phb37"
+
+  LatestOSAnaconda3  = Platform == LatestOS
+  LatestOSAnaconda3 &= PackagePrefix == "LW"
+  LatestOSAnaconda3 &= QtIdentification == "qt5Ana3"
+  LatestOSAnaconda3 &= RubyPythonID == "Rana3Pana3"
+
+  if LatestOSMacPorts:
+    mydic  = DicLightWeight["ports"]
+    srcDir = PkgDir + "/" + mydic["src"]
+    desDir = PkgDir + "/" + mydic["des"]
+    if OpMake:
+      with zipfile.ZipFile( mydic["zip"], 'r' ) as zip_ref:
+        zip_ref.extractall(PkgDir)
+      os.rename( srcDir, desDir )
+    if OpClean:
+      if os.path.isdir(srcDir):
+        shutil.rmtree(srcDir)
+      if os.path.isdir(desDir):
+        shutil.rmtree(desDir)
+    Item3AppleScript = mydic["item3"]
+
+  if LatestOSHomebrew:
+    mydic  = DicLightWeight["brew"]
+    srcDir = PkgDir + "/" + mydic["src"]
+    desDir = PkgDir + "/" + mydic["des"]
+    if OpMake:
+      with zipfile.ZipFile( mydic["zip"], 'r' ) as zip_ref:
+        zip_ref.extractall(PkgDir)
+      os.rename( srcDir, desDir )
+    if OpClean:
+      if os.path.isdir(srcDir):
+        shutil.rmtree(srcDir)
+      if os.path.isdir(desDir):
+        shutil.rmtree(desDir)
+    Item3AppleScript = mydic["item3"]
+
+  if LatestOSAnaconda3:
+    mydic  = DicLightWeight["ana3"]
+    srcDir = PkgDir + "/" + mydic["src"]
+    desDir = PkgDir + "/" + mydic["des"]
+    if OpMake:
+      with zipfile.ZipFile( mydic["zip"], 'r' ) as zip_ref:
+        zip_ref.extractall(PkgDir)
+      os.rename( srcDir, desDir )
+    if OpClean:
+      if os.path.isdir(srcDir):
+        shutil.rmtree(srcDir)
+      if os.path.isdir(desDir):
+        shutil.rmtree(desDir)
+    Item3AppleScript = mydic["item3"]
+
+  #------------------------------------------------------
+  # [4] Check the presence of the default bundle
+  #------------------------------------------------------
+  os.chdir(PkgDir)
+  if not os.path.isdir( DefaultBundleName ):
+    print( "! The package directory <%s> does not hold <%s> bundle" % (PkgDir, DefaultBundleName), file=sys.stderr )
+    print( "" )
+    os.chdir(ProjectDir)
+    return -1
+
+  #------------------------------------------------------
+  # [5] Check the occupied disk space
+  #------------------------------------------------------
+  command = "\du -sm %s" % DefaultBundleName
+  sizeApp = int( os.popen(command).read().strip("\n").split("\t")[0] )
+
+  #------------------------------------------------------
+  # [6] Change the application bundle name if required
+  #------------------------------------------------------
+  if OpMake and BundleName != "" and BundleName != DefaultBundleName:
+    os.rename( DefaultBundleName, BundleName )
+  os.chdir(ProjectDir)
+  return sizeApp
 
 #------------------------------------------------------------------------------
 ## To get command line parameters
@@ -231,7 +340,7 @@ def ParseCommandLineArguments():
   global PackagePrefix
   global QtIdentification
   global RubyPythonID
-  global Version
+  global KLVersion
   global OccupiedDS
   global TargetDMG
 
@@ -290,7 +399,7 @@ def ParseCommandLineArguments():
     base, ext  = os.path.splitext( os.path.basename(opt.bundle_name) )
     BundleName = base + ".app"
   else:
-    BundleName = ""
+    BundleName = DefaultBundleName
 
   if (OpClean and OpMake) or (not OpClean and not OpMake):
     print( "! Specify <-c|--clean> OR <-m|--make>", file=sys.stderr )
@@ -307,7 +416,7 @@ def ParseCommandLineArguments():
     quit()
   else:
     TargetDMG = "%s-klayout-%s-%s-%s-%d-%s-%s.dmg" \
-                % (PackagePrefix, Version, GenOSName, Platform, DMGSerialNum, QtIdentification, RubyPythonID)
+                % (PackagePrefix, KLVersion, GenOSName, Platform, DMGSerialNum, QtIdentification, RubyPythonID)
   return
 
 #------------------------------------------------------------------------------
@@ -362,8 +471,9 @@ def MakeTargetDMGFile(msg=""):
                       WIN_WIDTH='1000', WIN_HEIGHT='500',
                       FULL_PATH_DS_STORE='/Volumes/%s/.DS_Store' % VolumeDMG,
                       BACKGROUND_PNG_FILE=BackgroundPNG,
-                      ITEM_1='%s' % BundleName,  X1='860', Y1='165',
-                      ITEM_2='Applications',     X2='860', Y2='345',
+                      ITEM_1='%s' % BundleName,  X1='900', Y1='165',
+                      ITEM_2='Applications',     X2='900', Y2='345',
+                      ITEM_3=Item3AppleScript,
                       CHECK_BASH='[ -f " & dotDSStore & " ]; echo $?'
                     )
   try:
@@ -523,10 +633,10 @@ def MakeTargetDMGFile(msg=""):
   print( "        generated MD5 checksum file <%s>" % md5TargetDMG )
   print( "" )
 
-  #-------------------------------------------------------------
-  # [3] Rename the application bundle if required
-  #-------------------------------------------------------------
-  if not BundleName == DefaultBundleName:
+  #-------------------------------------------------------------------------
+  # [3] Rename back the application bundle to the default name if required
+  #-------------------------------------------------------------------------
+  if BundleName != "" and BundleName != DefaultBundleName:
     dirPresent = "%s/%s" % (PkgDir, BundleName)
     dirDefault = "%s/%s" % (PkgDir, DefaultBundleName)
     os.rename( dirPresent, dirDefault )

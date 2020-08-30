@@ -689,7 +689,7 @@ static const char magic_bytes[] = { "%SEMI-OASIS\015\012" };
 void 
 OASISReader::do_read (db::Layout &layout)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 21, "File read");
+  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("File read: ")) + m_stream.source ());
 
   unsigned char r;
   char *mb;
@@ -2018,6 +2018,8 @@ OASISReader::do_read_placement (unsigned char r,
 
   db::Vector pos (mm_placement_x.get (), mm_placement_y.get ());
 
+  const std::vector<db::Vector> *points = 0;
+
   if ((m & 0x8) && read_repetition ()) {
 
     std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
@@ -2034,6 +2036,42 @@ OASISReader::do_read_placement (unsigned char r,
       } else {
         inst = db::CellInstArray (db::CellInst (mm_placement_cell.get ()), 
                                   db::Trans (angle, mirror, pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb);
+      }
+
+      if (pp.first) {
+        instances_with_props.push_back (db::CellInstArrayWithProperties (inst, pp.second));
+      } else {
+        instances.push_back (inst);
+      }
+
+    } else if (! layout.is_editable () && (points = mm_repetition.get ().is_iterated ()) != 0) {
+
+      db::CellInstArray inst;
+
+      if (mag_set || angle < 0) {
+
+        db::ICplxTrans ct (mag, angle_deg, mirror, pos);
+
+        db::CellInstArray::iterated_complex_array_type array (ct.rcos (), ct.mag ());
+        array.reserve (points->size () + 1);
+        array.insert (db::Vector ());
+        array.insert (points->begin (), points->end ());
+        array.sort ();
+
+        inst = db::CellInstArray (db::CellInst (mm_placement_cell.get ()),
+                                  db::Trans (ct), layout.array_repository ().insert (array));
+
+      } else {
+
+        db::CellInstArray::iterated_array_type array;
+        array.reserve (points->size () + 1);
+        array.insert (db::Vector ());
+        array.insert (points->begin (), points->end ());
+        array.sort ();
+
+        inst = db::CellInstArray (db::CellInst (mm_placement_cell.get ()),
+                                  db::Trans (angle, mirror, pos), layout.array_repository ().insert (array));
+
       }
 
       if (pp.first) {

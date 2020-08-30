@@ -98,7 +98,7 @@ static std::vector<std::string> l2n_layer_names (const db::LayoutToNetlist *l2n)
   return ln;
 }
 
-static db::Region antenna_check (db::LayoutToNetlist *l2n, const db::Region &poly, const db::Region &metal, double ratio, const std::vector<tl::Variant> &diodes)
+static db::Region antenna_check3 (db::LayoutToNetlist *l2n, const db::Region &poly, double poly_area_factor, double poly_perimeter_factor, const db::Region &metal, double metal_area_factor, double metal_perimeter_factor, double ratio, const std::vector<tl::Variant> &diodes)
 {
   std::vector<std::pair<const db::Region *, double> > diode_pairs;
 
@@ -127,7 +127,17 @@ static db::Region antenna_check (db::LayoutToNetlist *l2n, const db::Region &pol
 
   }
 
-  return l2n->antenna_check (poly, metal, ratio, diode_pairs);
+  return l2n->antenna_check (poly, poly_area_factor, poly_perimeter_factor, metal, metal_area_factor, metal_perimeter_factor, ratio, diode_pairs);
+}
+
+static db::Region antenna_check2 (db::LayoutToNetlist *l2n, const db::Region &poly, double poly_perimeter_factor, const db::Region &metal, double metal_perimeter_factor, double ratio, const std::vector<tl::Variant> &diodes)
+{
+  return antenna_check3 (l2n, poly, 1, poly_perimeter_factor, metal, 1, metal_perimeter_factor, ratio, diodes);
+}
+
+static db::Region antenna_check (db::LayoutToNetlist *l2n, const db::Region &poly, const db::Region &metal, double ratio, const std::vector<tl::Variant> &diodes)
+{
+  return antenna_check3 (l2n, poly, 1, 0, metal, 1, 0, ratio, diodes);
 }
 
 Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
@@ -237,15 +247,15 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("original_file=", &db::LayoutToNetlist::set_original_file,
     "@brief Sets the original file name of the database\n"
   ) +
-  gsi::method ("layer_name", (std::string (db::LayoutToNetlist::*) (const db::Region &region) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
+  gsi::method ("layer_name", (std::string (db::LayoutToNetlist::*) (const db::ShapeCollection &region) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
     "@brief Gets the name of the given layer\n"
   ) +
   gsi::method ("layer_name", (std::string (db::LayoutToNetlist::*) (unsigned int) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
     "@brief Gets the name of the given layer (by index)\n"
   ) +
-  gsi::method ("register", (void (db::LayoutToNetlist::*) (const db::Region &region, const std::string &)) &db::LayoutToNetlist::register_layer, gsi::arg ("l"), gsi::arg ("n"),
+  gsi::method ("register", (void (db::LayoutToNetlist::*) (const db::ShapeCollection &collection, const std::string &)) &db::LayoutToNetlist::register_layer, gsi::arg ("l"), gsi::arg ("n"),
     "@brief Names the given layer\n"
-    "'l' must be a hierarchical region derived with \\make_layer, \\make_text_layer or \\make_polygon_layer or "
+    "'l' must be a hierarchical \\Region or \\Texts object derived with \\make_layer, \\make_text_layer or \\make_polygon_layer or "
     "a region derived from those by boolean operations or other hierarchical operations.\n"
     "\n"
     "Naming a layer allows the system to indicate the layer in various contexts, i.e. "
@@ -253,6 +263,8 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "They are not discarded when the Region object is destroyed.\n"
     "\n"
     "If required, the system will assign a name automatically."
+    "\n"
+    "This method has been generalized in version 0.27.\n"
   ) +
   gsi::method_ext ("layer_names", &l2n_layer_names,
     "@brief Returns a list of names of the layer kept inside the LayoutToNetlist object."
@@ -266,11 +278,19 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "Only named layers can be retrieved with this method. "
     "The returned object is a copy which represents the named layer."
   ) +
-  gsi::method ("is_persisted?", &db::LayoutToNetlist::is_persisted, gsi::arg ("layer"),
+  gsi::method ("is_persisted?", &db::LayoutToNetlist::is_persisted<db::Region>, gsi::arg ("layer"),
     "@brief Returns true, if the given layer is a persisted region.\n"
     "Persisted layers are kept inside the LayoutToNetlist object and are not released "
     "if their object is destroyed. Named layers are persisted, unnamed layers are not. "
     "Only persisted, named layers can be put into \\connect."
+  ) +
+  gsi::method ("is_persisted?", &db::LayoutToNetlist::is_persisted<db::Texts>, gsi::arg ("layer"),
+    "@brief Returns true, if the given layer is a persisted texts collection.\n"
+    "Persisted layers are kept inside the LayoutToNetlist object and are not released "
+    "if their object is destroyed. Named layers are persisted, unnamed layers are not. "
+    "Only persisted, named layers can be put into \\connect.\n"
+    "\n"
+    "The variant for Texts collections has been added in version 0.27."
   ) +
   gsi::factory ("make_layer", (db::Region *(db::LayoutToNetlist::*) (const std::string &)) &db::LayoutToNetlist::make_layer, gsi::arg ("name", std::string ()),
     "@brief Creates a new, empty hierarchical region\n"
@@ -291,6 +311,8 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "See \\make_layer for details.\n"
     "\n"
     "The name is optional. If given, the layer will already be named accordingly (see \\register).\n"
+    "\n"
+    "Starting with version 0.27, this method returns a \\Texts object."
   ) +
   gsi::factory ("make_polygon_layer", &db::LayoutToNetlist::make_polygon_layer, gsi::arg ("layer_index"), gsi::arg ("name", std::string ()),
     "@brief Creates a new region representing an original layer taking polygons and texts\n"
@@ -321,10 +343,31 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "@brief Defines an inter-layer connection for the given layers.\n"
     "The conditions mentioned with intra-layer \\connect apply for this method too.\n"
   ) +
+  gsi::method ("connect", (void (db::LayoutToNetlist::*) (const db::Region &, const db::Texts &)) &db::LayoutToNetlist::connect, gsi::arg ("a"), gsi::arg ("b"),
+    "@brief Defines an inter-layer connection for the given layers.\n"
+    "The conditions mentioned with intra-layer \\connect apply for this method too.\n"
+    "As one argument is a (hierarchical) text collection, this method is used to attach net labels to polygons.\n"
+    "\n"
+    "This variant has been introduced in version 0.27.\n"
+  ) +
+  gsi::method ("connect", (void (db::LayoutToNetlist::*) (const db::Texts &, const db::Region &)) &db::LayoutToNetlist::connect, gsi::arg ("a"), gsi::arg ("b"),
+    "@brief Defines an inter-layer connection for the given layers.\n"
+    "The conditions mentioned with intra-layer \\connect apply for this method too.\n"
+    "As one argument is a (hierarchical) text collection, this method is used to attach net labels to polygons.\n"
+    "\n"
+    "This variant has been introduced in version 0.27.\n"
+  ) +
   gsi::method ("connect_global", (void (db::LayoutToNetlist::*) (const db::Region &, const std::string &)) &db::LayoutToNetlist::connect_global, gsi::arg ("l"), gsi::arg ("global_net_name"),
     "@brief Defines a connection of the given layer with a global net.\n"
     "This method returns the ID of the global net. Use \\global_net_name to get "
     "the name back from the ID."
+  ) +
+  gsi::method ("connect_global", (void (db::LayoutToNetlist::*) (const db::Texts &, const std::string &)) &db::LayoutToNetlist::connect_global, gsi::arg ("l"), gsi::arg ("global_net_name"),
+    "@brief Defines a connection of the given text layer with a global net.\n"
+    "This method returns the ID of the global net. Use \\global_net_name to get "
+    "the name back from the ID."
+    "\n"
+    "This variant has been introduced in version 0.27.\n"
   ) +
   gsi::method ("global_net_name", &db::LayoutToNetlist::global_net_name, gsi::arg ("global_net_id"),
     "@brief Gets the global net name for the given global net ID."
@@ -378,10 +421,17 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "Usually it should not be required to obtain the internal cell. If you need to do so, make sure not to modify the cell as\n"
     "the functionality of the netlist extractor depends on it."
   ) +
-  gsi::method ("layer_of", &db::LayoutToNetlist::layer_of, gsi::arg ("l"),
+  gsi::method ("layer_of", &db::LayoutToNetlist::layer_of<db::Region>, gsi::arg ("l"),
     "@brief Gets the internal layer for a given extraction layer\n"
     "This method is required to derive the internal layer index - for example for\n"
     "investigating the cluster tree.\n"
+  ) +
+  gsi::method ("layer_of", &db::LayoutToNetlist::layer_of<db::Texts>, gsi::arg ("l"),
+    "@brief Gets the internal layer for a given text collection\n"
+    "This method is required to derive the internal layer index - for example for\n"
+    "investigating the cluster tree.\n"
+    "\n"
+    "The variant for Texts collections has been added in version 0.27.\n"
   ) +
   gsi::method ("cell_mapping_into", (db::CellMapping (db::LayoutToNetlist::*) (db::Layout &, db::Cell &, bool)) &db::LayoutToNetlist::cell_mapping_into, gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("with_device_cells", false),
     "@brief Creates a cell mapping for copying shapes from the internal layout to the given target layout.\n"
@@ -493,7 +543,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method_ext ("build_nets", &build_nets, gsi::arg ("nets"), gsi::arg ("cmap"), gsi::arg ("target"), gsi::arg ("lmap"), gsi::arg ("net_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("netname_prop", tl::Variant (), "nil"), gsi::arg ("hier_mode", db::LayoutToNetlist::BNH_Flatten, "BNH_Flatten"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
     "@brief Like \\build_all_nets, but with the ability to select some nets."
   ) +
-  gsi::method ("probe_net", (db::Net *(db::LayoutToNetlist::*) (const db::Region &, const db::DPoint &)) &db::LayoutToNetlist::probe_net, gsi::arg ("of_layer"), gsi::arg ("point"),
+  gsi::method ("probe_net", (db::Net *(db::LayoutToNetlist::*) (const db::Region &, const db::DPoint &, std::vector<db::SubCircuit *> *, db::Circuit *)) &db::LayoutToNetlist::probe_net, gsi::arg ("of_layer"), gsi::arg ("point"), gsi::arg ("sc_path_out", (std::vector<db::SubCircuit *> *) 0, "nil"), gsi::arg ("initial_circuit", (db::Circuit *) 0, "nil"),
     "@brief Finds the net by probing a specific location on the given layer\n"
     "\n"
     "This method will find a net looking at the given layer at the specific position.\n"
@@ -501,20 +551,30 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "in the specified location. The function will report the topmost net from far above the\n"
     "hierarchy of circuits as possible.\n"
     "\n"
+    "If \\initial_circuit is given, the probing will start from this circuit and from the "
+    "cell this circuit represents. By default, the probing will start from the top circuit.\n"
+    "\n"
     "If no net is found at all, 0 is returned.\n"
     "\n"
-    "It is recommended to use \\probe on the netlist right after extraction.\n"
+    "It is recommended to use \\probe_net on the netlist right after extraction.\n"
     "Optimization functions such as \\Netlist#purge will remove parts of the net which means\n"
     "shape to net probing may no longer work for these nets.\n"
     "\n"
+    "If non-null and an array, 'sc_path_out' will receive a list of \\SubCircuits objects which lead to the "
+    "net from the top circuit of the database.\n"
+    "\n"
     "This variant accepts a micrometer-unit location. The location is given in the\n"
     "coordinate space of the initial cell.\n"
+    "\n"
+    "The \\sc_path_out and \\initial_circuit parameters have been added in version 0.27.\n"
   ) +
-  gsi::method ("probe_net", (db::Net *(db::LayoutToNetlist::*) (const db::Region &, const db::Point &)) &db::LayoutToNetlist::probe_net, gsi::arg ("of_layer"), gsi::arg ("point"),
+  gsi::method ("probe_net", (db::Net *(db::LayoutToNetlist::*) (const db::Region &, const db::Point &, std::vector<db::SubCircuit *> *, db::Circuit *)) &db::LayoutToNetlist::probe_net, gsi::arg ("of_layer"), gsi::arg ("point"), gsi::arg ("sc_path_out", (std::vector<db::SubCircuit *> *) 0, "nil"), gsi::arg ("initial_circuit", (db::Circuit *) 0, "nil"),
     "@brief Finds the net by probing a specific location on the given layer\n"
     "See the description of the other \\probe_net variant.\n"
     "This variant accepts a database-unit location. The location is given in the\n"
     "coordinate space of the initial cell.\n"
+    "\n"
+    "The \\sc_path_out and \\initial_circuit parameters have been added in version 0.27.\n"
   ) +
   gsi::method ("write|write_l2n", &db::LayoutToNetlist::save, gsi::arg ("path"), gsi::arg ("short_format", false),
     "@brief Writes the extracted netlist to a file.\n"
@@ -564,6 +624,40 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
    "# diode_layer1 increases the ratio by 50 per sqaure micrometer area:\n"
    "errors = l2n.antenna(poly, metal, 10.0 [ [ diode_layer, 50.0 ] ])\n"
    "@/code\n"
+  ) +
+  gsi::method_ext ("antenna_check", &antenna_check2, gsi::arg ("gate"), gsi::arg ("gate_perimeter_factor"), gsi::arg ("metal"), gsi::arg ("metal_perimeter_factor"), gsi::arg ("ratio"), gsi::arg ("diodes", std::vector<tl::Variant> (), "[]"),
+   "@brief Runs an antenna check on the extracted clusters taking the perimeter into account\n"
+   "\n"
+   "This version of the \\antenna_check method allows taking the perimeter of gate or metal into account. "
+   "The effective area is computed using:\n"
+   "\n"
+   "@code\n"
+   "Aeff = A + P * t\n"
+   "@/code\n"
+   "\n"
+   "Here Aeff is the area used in the check, A is the polygon area, P the perimeter and t the perimeter factor. "
+   "This formula applies to gate polygon area/perimeter with 'gate_perimeter_factor' for t and metal polygon area/perimeter "
+   "with 'metal_perimeter_factor'. The perimeter_factor has the dimension of micrometers and can be thought of as the width "
+   "of the material. Essentially the side walls of the material are taking into account for the surface area as well.\n"
+   "\n"
+   "This variant has been introduced in version 0.26.6.\n"
+  ) +
+  gsi::method_ext ("antenna_check", &antenna_check3, gsi::arg ("gate"), gsi::arg ("gate_area_factor"), gsi::arg ("gate_perimeter_factor"), gsi::arg ("metal"), gsi::arg ("metal_area_factor"), gsi::arg ("metal_perimeter_factor"), gsi::arg ("ratio"), gsi::arg ("diodes", std::vector<tl::Variant> (), "[]"),
+   "@brief Runs an antenna check on the extracted clusters taking the perimeter into account and providing an area factor\n"
+   "\n"
+   "This (most generic) version of the \\antenna_check method allows taking the perimeter of gate or metal into account and also "
+   "provides a scaling factor for the area part.\n"
+   "The effective area is computed using:\n"
+   "\n"
+   "@code\n"
+   "Aeff = A * f + P * t\n"
+   "@/code\n"
+   "\n"
+   "Here f is the area factor and t the perimeter factor. A is the polygon area and P the polygon perimeter. "
+   "A use case for this variant is to set the area factor to zero. This way, only perimeter contributions are "
+   "considered.\n"
+   "\n"
+   "This variant has been introduced in version 0.26.6.\n"
   ),
   "@brief A generic framework for extracting netlists from layouts\n"
   "\n"

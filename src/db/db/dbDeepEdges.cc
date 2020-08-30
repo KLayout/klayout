@@ -96,14 +96,16 @@ private:
 //  DeepEdges implementation
 
 DeepEdges::DeepEdges (const RecursiveShapeIterator &si, DeepShapeStore &dss, bool as_edges)
-  : AsIfFlatEdges (), m_deep_layer (dss.create_edge_layer (si, as_edges)), m_merged_edges ()
+  : AsIfFlatEdges (), m_merged_edges ()
 {
+  set_deep_layer (dss.create_edge_layer (si, as_edges));
   init ();
 }
 
 DeepEdges::DeepEdges (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool as_edges, bool merged_semantics)
-  : AsIfFlatEdges (), m_deep_layer (dss.create_edge_layer (si, as_edges, trans)), m_merged_edges ()
+  : AsIfFlatEdges (), m_merged_edges ()
 {
+  set_deep_layer (dss.create_edge_layer (si, as_edges, trans));
   init ();
   set_merged_semantics (merged_semantics);
 }
@@ -111,7 +113,7 @@ DeepEdges::DeepEdges (const RecursiveShapeIterator &si, DeepShapeStore &dss, con
 DeepEdges::DeepEdges (const db::Edges &other, DeepShapeStore &dss)
   : AsIfFlatEdges (), m_merged_edges ()
 {
-  m_deep_layer = dss.create_from_flat (other);
+  set_deep_layer (dss.create_from_flat (other));
 
   init ();
   set_merged_semantics (other.merged_semantics ());
@@ -124,8 +126,9 @@ DeepEdges::DeepEdges ()
 }
 
 DeepEdges::DeepEdges (const DeepLayer &dl)
-  : AsIfFlatEdges (), m_deep_layer (dl)
+  : AsIfFlatEdges ()
 {
+  set_deep_layer (dl);
   init ();
 }
 
@@ -135,14 +138,32 @@ DeepEdges::~DeepEdges ()
 }
 
 DeepEdges::DeepEdges (const DeepEdges &other)
-  : AsIfFlatEdges (other),
-    m_deep_layer (other.m_deep_layer.copy ()),
+  : AsIfFlatEdges (other), DeepShapeCollectionDelegateBase (other),
     m_merged_edges_valid (other.m_merged_edges_valid),
     m_is_merged (other.m_is_merged)
 {
   if (m_merged_edges_valid) {
     m_merged_edges = other.m_merged_edges;
   }
+}
+
+DeepEdges &
+DeepEdges::operator= (const DeepEdges &other)
+{
+  if (this != &other) {
+
+    AsIfFlatEdges::operator= (other);
+    DeepShapeCollectionDelegateBase::operator= (other);
+
+    m_merged_edges_valid = other.m_merged_edges_valid;
+    m_is_merged = other.m_is_merged;
+    if (m_merged_edges_valid) {
+      m_merged_edges = other.m_merged_edges;
+    }
+
+  }
+
+  return *this;
 }
 
 void DeepEdges::init ()
@@ -182,7 +203,7 @@ DeepEdges::begin_merged () const
 std::pair<db::RecursiveShapeIterator, db::ICplxTrans>
 DeepEdges::begin_iter () const
 {
-  const db::Layout &layout = m_deep_layer.layout ();
+  const db::Layout &layout = deep_layer ().layout ();
   if (layout.cells () == 0) {
 
     return std::make_pair (db::RecursiveShapeIterator (), db::ICplxTrans ());
@@ -190,7 +211,7 @@ DeepEdges::begin_iter () const
   } else {
 
     const db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
-    db::RecursiveShapeIterator iter (m_deep_layer.layout (), top_cell, m_deep_layer.layer ());
+    db::RecursiveShapeIterator iter (deep_layer ().layout (), top_cell, deep_layer ().layer ());
     return std::make_pair (iter, db::ICplxTrans ());
 
   }
@@ -262,8 +283,8 @@ DeepEdges::iter () const
 bool DeepEdges::equals (const Edges &other) const
 {
   const DeepEdges *other_delegate = dynamic_cast<const DeepEdges *> (other.delegate ());
-  if (other_delegate && &other_delegate->m_deep_layer.layout () == &m_deep_layer.layout ()
-      && other_delegate->m_deep_layer.layer () == m_deep_layer.layer ()) {
+  if (other_delegate && &other_delegate->deep_layer ().layout () == &deep_layer ().layout ()
+      && other_delegate->deep_layer ().layer () == deep_layer ().layer ()) {
     return true;
   } else {
     return AsIfFlatEdges::equals (other);
@@ -273,8 +294,8 @@ bool DeepEdges::equals (const Edges &other) const
 bool DeepEdges::less (const Edges &other) const
 {
   const DeepEdges *other_delegate = dynamic_cast<const DeepEdges *> (other.delegate ());
-  if (other_delegate && &other_delegate->m_deep_layer.layout () == &m_deep_layer.layout ()) {
-    return other_delegate->m_deep_layer.layer () < m_deep_layer.layer ();
+  if (other_delegate && &other_delegate->deep_layer ().layout () == &deep_layer ().layout ()) {
+    return other_delegate->deep_layer ().layer () < deep_layer ().layer ();
   } else {
     return AsIfFlatEdges::less (other);
   }
@@ -384,27 +405,27 @@ DeepEdges::ensure_merged_edges_valid () const
     if (m_is_merged) {
 
       //  NOTE: this will reuse the deep layer reference
-      m_merged_edges = m_deep_layer;
+      m_merged_edges = deep_layer ();
 
     } else {
 
-      m_merged_edges = m_deep_layer.derived ();
+      m_merged_edges = deep_layer ().derived ();
 
       tl::SelfTimer timer (tl::verbosity () > base_verbosity (), "Ensure merged polygons");
 
-      db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
+      db::Layout &layout = const_cast<db::Layout &> (deep_layer ().layout ());
 
       db::hier_clusters<db::Edge> hc;
       db::Connectivity conn;
-      conn.connect (m_deep_layer);
+      conn.connect (deep_layer ());
       hc.set_base_verbosity (base_verbosity() + 10);
-      hc.build (layout, m_deep_layer.initial_cell (), db::ShapeIterator::Edges, conn);
+      hc.build (layout, deep_layer ().initial_cell (), conn);
 
       //  collect the clusters and merge them into big polygons
       //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is
       //  hopefully more efficient that collecting everything and will lead to reuse of parts.
 
-      ClusterMerger cm (m_deep_layer.layer (), hc, report_progress (), progress_desc ());
+      ClusterMerger cm (deep_layer ().layer (), hc, report_progress (), progress_desc ());
       cm.set_base_verbosity (base_verbosity () + 10);
 
       //  TODO: iterate only over the called cells?
@@ -436,17 +457,17 @@ DeepEdges::set_is_merged (bool f)
 void
 DeepEdges::insert_into (db::Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
-  m_deep_layer.insert_into (layout, into_cell, into_layer);
+  deep_layer ().insert_into (layout, into_cell, into_layer);
 }
 
 size_t DeepEdges::size () const
 {
   size_t n = 0;
 
-  const db::Layout &layout = m_deep_layer.layout ();
+  const db::Layout &layout = deep_layer ().layout ();
   db::CellCounter cc (&layout);
   for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
-    n += cc.weight (*c) * layout.cell (*c).shapes (m_deep_layer.layer ()).size ();
+    n += cc.weight (*c) * layout.cell (*c).shapes (deep_layer ().layer ()).size ();
   }
 
   return n;
@@ -454,7 +475,7 @@ size_t DeepEdges::size () const
 
 Box DeepEdges::bbox () const
 {
-  return m_deep_layer.initial_cell ().bbox (m_deep_layer.layer ());
+  return deep_layer ().initial_cell ().bbox (deep_layer ().layer ());
 }
 
 DeepEdges::length_type DeepEdges::length (const db::Box &box) const
@@ -504,157 +525,37 @@ EdgesDelegate *DeepEdges::process_in_place (const EdgeProcessorBase &filter)
 EdgesDelegate *
 DeepEdges::processed (const EdgeProcessorBase &filter) const
 {
-  return processed_impl<db::Edge, db::DeepEdges> (filter);
+  return shape_collection_processed_impl<db::Edge, db::Edge, db::DeepEdges> (filter.requires_raw_input () ? deep_layer () : merged_deep_layer (), filter);
 }
 
 EdgePairsDelegate *
 DeepEdges::processed_to_edge_pairs (const EdgeToEdgePairProcessorBase &filter) const
 {
-  return processed_impl<db::EdgePair, db::DeepEdgePairs> (filter);
+  return shape_collection_processed_impl<db::Edge, db::EdgePair, db::DeepEdgePairs> (filter.requires_raw_input () ? deep_layer () : merged_deep_layer (), filter);
 }
 
 RegionDelegate *
 DeepEdges::processed_to_polygons (const EdgeToPolygonProcessorBase &filter) const
 {
-  return processed_impl<db::Polygon, db::DeepRegion> (filter);
-}
-
-namespace
-{
-
-template <class Result> struct delivery;
-
-template <>
-struct delivery<db::Polygon>
-{
-  delivery (db::Layout *layout, db::Shapes *shapes)
-    : mp_layout (layout), mp_shapes (shapes)
-  { }
-
-  void put (const db::Polygon &result)
-  {
-    tl::MutexLocker locker (&mp_layout->lock ());
-    mp_shapes->insert (db::PolygonRef (result, mp_layout->shape_repository ()));
-  }
-
-private:
-  db::Layout *mp_layout;
-  db::Shapes *mp_shapes;
-};
-
-template <class Result>
-struct delivery
-{
-  delivery (db::Layout *, db::Shapes *shapes)
-    : mp_shapes (shapes)
-  { }
-
-  void put (const Result &result)
-  {
-    mp_shapes->insert (result);
-  }
-
-private:
-  db::Shapes *mp_shapes;
-};
-
-}
-
-template <class Result, class OutputContainer>
-OutputContainer *
-DeepEdges::processed_impl (const edge_processor<Result> &filter) const
-{
-  const db::DeepLayer &edges = filter.requires_raw_input () ? deep_layer () : merged_deep_layer ();
-
-  std::auto_ptr<VariantsCollectorBase> vars;
-  if (filter.vars ()) {
-
-    vars.reset (new db::VariantsCollectorBase (filter.vars ()));
-
-    vars->collect (edges.layout (), edges.initial_cell ());
-
-    if (filter.wants_variants ()) {
-      const_cast<db::DeepLayer &> (edges).separate_variants (*vars);
-    }
-
-  }
-
-  db::Layout &layout = const_cast<db::Layout &> (edges.layout ());
-
-  std::vector<Result> heap;
-  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
-
-  std::auto_ptr<OutputContainer> res (new OutputContainer (edges.derived ()));
-  if (filter.result_must_not_be_merged ()) {
-    res->set_merged_semantics (false);
-  }
-
-  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
-
-    const db::Shapes &s = c->shapes (filter.requires_raw_input () ? edges.layer () : edges.layer ());
-
-    if (vars.get ()) {
-
-      const std::map<db::ICplxTrans, size_t> &vv = vars->variants (c->cell_index ());
-      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
-
-        db::Shapes *st;
-        if (vv.size () == 1) {
-          st = & c->shapes (res->deep_layer ().layer ());
-        } else {
-          st = & to_commit [c->cell_index ()] [v->first];
-        }
-
-        delivery<Result> delivery (&layout, st);
-
-        const db::ICplxTrans &tr = v->first;
-        db::ICplxTrans trinv = tr.inverted ();
-
-        for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
-          heap.clear ();
-          filter.process (si->edge ().transformed (tr), heap);
-          for (typename std::vector<Result>::const_iterator i = heap.begin (); i != heap.end (); ++i) {
-            delivery.put (i->transformed (trinv));
-          }
-        }
-
-      }
-
-    } else {
-
-      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
-      delivery<Result> delivery (&layout, &st);
-
-      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
-        filter.process (si->edge (), heap);
-        for (typename std::vector<Result>::const_iterator i = heap.begin (); i != heap.end (); ++i) {
-          delivery.put (*i);
-        }
-      }
-
-    }
-
-  }
-
-  if (! to_commit.empty () && vars.get ()) {
-    res->deep_layer ().commit_shapes (*vars, to_commit);
-  }
-
-  if (filter.result_is_merged ()) {
-    res->set_is_merged (true);
-  }
-  return res.release ();
+  return shape_collection_processed_impl<db::Edge, db::Polygon, db::DeepRegion> (filter.requires_raw_input () ? deep_layer () : merged_deep_layer (), filter);
 }
 
 EdgesDelegate *
 DeepEdges::filter_in_place (const EdgeFilterBase &filter)
 {
   //  TODO: implement to be really in-place
-  return filtered (filter);
+  *this = *apply_filter (filter);
+  return this;
 }
 
 EdgesDelegate *
 DeepEdges::filtered (const EdgeFilterBase &filter) const
+{
+  return apply_filter (filter);
+}
+
+DeepEdges *
+DeepEdges::apply_filter (const EdgeFilterBase &filter) const
 {
   const db::DeepLayer &edges = filter.requires_raw_input () ? deep_layer () : merged_deep_layer ();
 
@@ -730,7 +631,7 @@ EdgesDelegate *DeepEdges::merged_in_place ()
   ensure_merged_edges_valid ();
 
   //  NOTE: this makes both layers share the same resource
-  m_deep_layer = m_merged_edges;
+  set_deep_layer (m_merged_edges);
 
   return this;
 }
@@ -753,17 +654,17 @@ EdgesDelegate *DeepEdges::merged () const
 DeepLayer
 DeepEdges::and_or_not_with (const DeepEdges *other, EdgeBoolOp op) const
 {
-  DeepLayer dl_out (m_deep_layer.derived ());
+  DeepLayer dl_out (deep_layer ().derived ());
 
   db::EdgeBoolAndOrNotLocalOperation local_op (op);
 
-  db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell ());
+  db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell ());
   proc.set_base_verbosity (base_verbosity ());
-  proc.set_threads (m_deep_layer.store ()->threads ());
-  proc.set_area_ratio (m_deep_layer.store ()->max_area_ratio ());
-  proc.set_max_vertex_count (m_deep_layer.store ()->max_vertex_count ());
+  proc.set_threads (deep_layer ().store ()->threads ());
+  proc.set_area_ratio (deep_layer ().store ()->max_area_ratio ());
+  proc.set_max_vertex_count (deep_layer ().store ()->max_vertex_count ());
 
-  proc.run (&local_op, m_deep_layer.layer (), other->deep_layer ().layer (), dl_out.layer ());
+  proc.run (&local_op, deep_layer ().layer (), other->deep_layer ().layer (), dl_out.layer ());
 
   return dl_out;
 }
@@ -771,17 +672,17 @@ DeepEdges::and_or_not_with (const DeepEdges *other, EdgeBoolOp op) const
 DeepLayer
 DeepEdges::edge_region_op (const DeepRegion *other, bool outside, bool include_borders) const
 {
-  DeepLayer dl_out (m_deep_layer.derived ());
+  DeepLayer dl_out (deep_layer ().derived ());
 
   db::EdgeToPolygonLocalOperation op (outside, include_borders);
 
-  db::local_processor<db::Edge, db::PolygonRef, db::Edge> proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell ());
+  db::local_processor<db::Edge, db::PolygonRef, db::Edge> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell ());
   proc.set_base_verbosity (base_verbosity ());
-  proc.set_threads (m_deep_layer.store ()->threads ());
-  proc.set_area_ratio (m_deep_layer.store ()->max_area_ratio ());
-  proc.set_max_vertex_count (m_deep_layer.store ()->max_vertex_count ());
+  proc.set_threads (deep_layer ().store ()->threads ());
+  proc.set_area_ratio (deep_layer ().store ()->max_area_ratio ());
+  proc.set_max_vertex_count (deep_layer ().store ()->max_vertex_count ());
 
-  proc.run (&op, m_deep_layer.layer (), other->deep_layer ().layer (), dl_out.layer ());
+  proc.run (&op, deep_layer ().layer (), other->deep_layer ().layer (), dl_out.layer ());
 
   return dl_out;
 }
@@ -1051,7 +952,7 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
     db::Connectivity conn (db::Connectivity::EdgesConnectByPoints);
     conn.connect (edges);
     hc.set_base_verbosity (base_verbosity () + 10);
-    hc.build (layout, edges.initial_cell (), db::ShapeIterator::Edges, conn);
+    hc.build (layout, edges.initial_cell (), conn);
 
     //  TODO: iterate only over the called cells?
     for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
@@ -1278,7 +1179,7 @@ public:
       }
     }
 
-    for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (shape_interactions<db::Edge, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       const db::Edge &subject = interactions.subject_shape (i->first);
       scanner.insert1 (&subject, 0);
     }
@@ -1295,7 +1196,7 @@ public:
       edge_to_region_interaction_filter<std::unordered_set<db::Edge> > filter (interacting);
       scanner.process (filter, 1, db::box_convert<db::Edge> (), db::box_convert<db::Polygon> ());
 
-      for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (shape_interactions<db::Edge, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
         const db::Edge &subject = interactions.subject_shape (i->first);
         if (interacting.find (subject) == interacting.end ()) {
           result.insert (subject);
@@ -1374,7 +1275,7 @@ public:
       }
     }
 
-    for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (shape_interactions<db::Edge, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       const db::Edge &subject = interactions.subject_shape (i->first);
       scanner.insert1 (&subject, 1);
     }

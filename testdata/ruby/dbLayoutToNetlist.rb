@@ -68,7 +68,7 @@ class DBLayoutToNetlist_TestClass < TestBase
     # cell mapping with nets
 
     l2n = RBA::LayoutToNetlist::new
-    l2n.read(File.join($ut_testsrc, "testdata", "algo", "l2n_writer_au.txt"))
+    l2n.read(File.join($ut_testsrc, "testdata", "algo", "l2n_reader_in.txt"))
 
     nets = [
       l2n.netlist.circuit_by_name("RINGO").net_by_name("VSS"),
@@ -104,7 +104,7 @@ class DBLayoutToNetlist_TestClass < TestBase
   def test_2_ShapesFromNet
 
     ly = RBA::Layout::new
-    ly.read(File.join($ut_testsrc, "testdata", "algo", "device_extract_l1.gds"))
+    ly.read(File.join($ut_testsrc, "testdata", "algo", "device_extract_l1_with_inv_nodes.gds"))
 
     l2n = RBA::LayoutToNetlist::new(RBA::RecursiveShapeIterator::new(ly, ly.top_cell, []))
 
@@ -133,39 +133,50 @@ class DBLayoutToNetlist_TestClass < TestBase
     assert_equal(l2n.netlist.to_s, <<END)
 circuit TRANS ($1=$1,$2=$2);
 end;
-circuit INV2 (OUT=OUT,$2=$2,$3=$3,$4=$4);
+circuit INV2 (OUT=OUT,$2=$3,$3=$4);
   subcircuit TRANS $1 ($1=$4,$2=OUT);
   subcircuit TRANS $2 ($1=$3,$2=OUT);
   subcircuit TRANS $3 ($1=$2,$2=$4);
   subcircuit TRANS $4 ($1=$2,$2=$3);
 end;
 circuit RINGO ();
-  subcircuit INV2 $1 (OUT=OSC,$2=FB,$3=VSS,$4=VDD);
-  subcircuit INV2 $2 (OUT=$I29,$2=$I20,$3=VSS,$4=VDD);
-  subcircuit INV2 $3 (OUT=$I28,$2=$I19,$3=VSS,$4=VDD);
-  subcircuit INV2 $4 (OUT=$I30,$2=$I21,$3=VSS,$4=VDD);
-  subcircuit INV2 $5 (OUT=$I31,$2=$I22,$3=VSS,$4=VDD);
-  subcircuit INV2 $6 (OUT=$I32,$2=$I23,$3=VSS,$4=VDD);
-  subcircuit INV2 $7 (OUT=$I33,$2=$I24,$3=VSS,$4=VDD);
-  subcircuit INV2 $8 (OUT=$I34,$2=$I25,$3=VSS,$4=VDD);
-  subcircuit INV2 $9 (OUT=$I35,$2=$I26,$3=VSS,$4=VDD);
-  subcircuit INV2 $10 (OUT=$I36,$2=$I27,$3=VSS,$4=VDD);
+  subcircuit INV2 $1 (OUT='FB,OSC',$2=VSS,$3=VDD);
+  subcircuit INV2 $2 (OUT=$I20,$2=VSS,$3=VDD);
+  subcircuit INV2 $3 (OUT=$I19,$2=VSS,$3=VDD);
+  subcircuit INV2 $4 (OUT=$I21,$2=VSS,$3=VDD);
+  subcircuit INV2 $5 (OUT=$I22,$2=VSS,$3=VDD);
+  subcircuit INV2 $6 (OUT=$I23,$2=VSS,$3=VDD);
+  subcircuit INV2 $7 (OUT=$I24,$2=VSS,$3=VDD);
+  subcircuit INV2 $8 (OUT=$I25,$2=VSS,$3=VDD);
+  subcircuit INV2 $9 (OUT=$I26,$2=VSS,$3=VDD);
+  subcircuit INV2 $10 (OUT=$I27,$2=VSS,$3=VDD);
 end;
 END
 
-    assert_equal(l2n.probe_net(rmetal2, RBA::DPoint::new(0.0, 1.8)).to_s, "RINGO:FB")
+    assert_equal(l2n.probe_net(rmetal2, RBA::DPoint::new(0.0, 1.8)).to_s, "RINGO:FB,OSC")
+    sc_path = []
+    assert_equal(l2n.probe_net(rmetal2, RBA::DPoint::new(0.0, 1.8), sc_path).to_s, "RINGO:FB,OSC")
+    assert_equal(sc_path.size, 0)
     assert_equal(l2n.probe_net(rmetal2, RBA::DPoint::new(-2.0, 1.8)).inspect, "nil")
 
-    n = l2n.probe_net(rmetal1, RBA::Point::new(2600, 1000))
-    assert_equal(n.to_s, "RINGO:$I20")
+    n = l2n.probe_net(rmetal1, RBA::Point::new(2600, 1000), nil)
+    assert_equal(n.to_s, "INV2:$2")
+    sc_path = []
+    n = l2n.probe_net(rmetal1, RBA::Point::new(2600, 1000), sc_path)
+    assert_equal(n.to_s, "INV2:$2")
+    assert_equal(sc_path.size, 1)
+    assert_equal(sc_path.collect(&:expanded_name).join(","), "$2")
+    assert_equal(sc_path.collect(&:trans).inject(&:*).to_s, "r0 *1 2.64,0")
 
-    assert_equal(l2n.shapes_of_net(n, rmetal1, true).to_s, "(1660,-420;1660,2420;2020,2420;2020,-420);(1840,820;1840,1180;3220,1180;3220,820);(1660,2420;1660,3180;2020,3180;2020,2420);(1660,-380;1660,380;2020,380;2020,-380)")
+    assert_equal(l2n.shapes_of_net(n, rmetal1, true).to_s, 
+        "(-980,-420;-980,2420;-620,2420;-620,-420);(-800,820;-800,1180;580,1180;580,820);(-980,2420;-980,3180;-620,3180;-620,2420);(-980,-380;-980,380;-620,380;-620,-380)")
 
     shapes = RBA::Shapes::new
     l2n.shapes_of_net(n, rmetal1, true, shapes)
     r = RBA::Region::new
     shapes.each { |s| r.insert(s.polygon) }
-    assert_equal(r.to_s, "(1660,-420;1660,2420;2020,2420;2020,-420);(1840,820;1840,1180;3220,1180;3220,820);(1660,2420;1660,3180;2020,3180;2020,2420);(1660,-380;1660,380;2020,380;2020,-380)")
+    assert_equal(r.to_s, 
+        "(-980,-420;-980,2420;-620,2420;-620,-420);(-800,820;-800,1180;580,1180;580,820);(-980,2420;-980,3180;-620,3180;-620,2420);(-980,-380;-980,380;-620,380;-620,-380)")
 
   end
   
@@ -481,7 +492,7 @@ END
 
     l2n = RBA::LayoutToNetlist::new
 
-    input = File.join($ut_testsrc, "testdata", "algo", "l2n_writer_au.txt")
+    input = File.join($ut_testsrc, "testdata", "algo", "l2n_reader_in.txt")
     l2n.read(input)
 
     tmp = File::join($ut_testtmp, "tmp.txt")
@@ -499,7 +510,7 @@ END
 
     l2n = RBA::LayoutToNetlist::new
 
-    input = File.join($ut_testsrc, "testdata", "algo", "l2n_writer_au.txt")
+    input = File.join($ut_testsrc, "testdata", "algo", "l2n_reader_in.txt")
     l2n.read(input)
 
     # build_all_nets
@@ -757,7 +768,7 @@ END
 
     l2n.extract_netlist
 
-    a4_3 = l2n.antenna_check(rpoly, rmetal1, 3, [ rdiode ] )
+    a4_3 = l2n.antenna_check(rpoly, rmetal1, 3, [ rdiode ])
     a4_10 = l2n.antenna_check(rpoly, rmetal1, 10, [ rdiode ])
     a4_30 = l2n.antenna_check(rpoly, rmetal1, 30, [ rdiode ])
 
@@ -765,6 +776,88 @@ END
     assert_equal((a4_3.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(400, 0)))).to_s, "")
     assert_equal((a4_10.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(401, 0)))).to_s, "")
     assert_equal((a4_30.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(402, 0)))).to_s, "")
+
+    # --- antenna check metal perimeter included
+
+    l2n._destroy
+    l2n = RBA::LayoutToNetlist::new(dss)
+
+    l2n.register(rpoly, "poly")
+    l2n.register(rcont, "cont")
+    l2n.register(rmetal1, "metal1")
+    l2n.register(rvia1, "via1")
+    l2n.register(rmetal2, "metal2")
+
+    l2n.connect(rpoly)
+    l2n.connect(rcont)
+    l2n.connect(rmetal1)
+    l2n.connect(rvia1)
+    l2n.connect(rmetal2)
+    l2n.connect(rpoly, rcont)
+    l2n.connect(rcont, rmetal1)
+    l2n.connect(rmetal1, rvia1)
+    l2n.connect(rvia1, rmetal2)
+
+    l2n.extract_netlist
+
+    a5_5 = l2n.antenna_check(rpoly, 0.0, rmetal2, 1.0, 5)
+    a5_15 = l2n.antenna_check(rpoly, 0.0, rmetal2, 1.0, 15)
+    a5_29 = l2n.antenna_check(rpoly, 0.0, rmetal2, 1.0, 29)
+
+    # Note: flatten.merged performs some normalization
+    assert_equal((a5_5.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(500, 0)))).to_s, "")
+    assert_equal((a5_15.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(501, 0)))).to_s, "")
+    assert_equal((a5_29.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(502, 0)))).to_s, "")
+
+    b5_5 = l2n.antenna_check(rpoly, 2.0, 0.0, rmetal2, 1.0, 1.0, 2.5)
+    b5_15 = l2n.antenna_check(rpoly, 2.0, 0.0, rmetal2, 1.0, 1.0, 7.5)
+    b5_29 = l2n.antenna_check(rpoly, 2.0, 0.0, rmetal2, 1.0, 1.0, 14.5)
+
+    # Note: flatten.merged performs some normalization
+    assert_equal((b5_5.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(500, 0)))).to_s, "")
+    assert_equal((b5_15.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(501, 0)))).to_s, "")
+    assert_equal((b5_29.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(502, 0)))).to_s, "")
+
+    # --- antenna check gate perimeter included
+
+    l2n._destroy
+    l2n = RBA::LayoutToNetlist::new(dss)
+
+    l2n.register(rpoly, "poly")
+    l2n.register(rcont, "cont")
+    l2n.register(rmetal1, "metal1")
+    l2n.register(rvia1, "via1")
+    l2n.register(rmetal2, "metal2")
+
+    l2n.connect(rpoly)
+    l2n.connect(rcont)
+    l2n.connect(rmetal1)
+    l2n.connect(rvia1)
+    l2n.connect(rmetal2)
+    l2n.connect(rpoly, rcont)
+    l2n.connect(rcont, rmetal1)
+    l2n.connect(rmetal1, rvia1)
+    l2n.connect(rvia1, rmetal2)
+
+    l2n.extract_netlist
+
+    a6_3 = l2n.antenna_check(rpoly, 0.3, rmetal2, 0.0, 3)
+    a6_5 = l2n.antenna_check(rpoly, 0.3, rmetal2, 0.0, 5)
+    a6_9 = l2n.antenna_check(rpoly, 0.3, rmetal2, 0.0, 9)
+
+    # Note: flatten.merged performs some normalization
+    assert_equal((a6_3.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(600, 0)))).to_s, "")
+    assert_equal((a6_5.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(601, 0)))).to_s, "")
+    assert_equal((a6_9.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(602, 0)))).to_s, "")
+
+    b6_3 = l2n.antenna_check(rpoly, 1.0, 0.3, rmetal2, 2.0, 0.0, 6)
+    b6_5 = l2n.antenna_check(rpoly, 1.0, 0.3, rmetal2, 2.0, 0.0, 10)
+    b6_9 = l2n.antenna_check(rpoly, 1.0, 0.3, rmetal2, 2.0, 0.0, 18)
+
+    # Note: flatten.merged performs some normalization
+    assert_equal((b6_3.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(600, 0)))).to_s, "")
+    assert_equal((b6_5.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(601, 0)))).to_s, "")
+    assert_equal((b6_9.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(602, 0)))).to_s, "")
 
   end
 

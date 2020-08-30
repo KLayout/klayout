@@ -185,7 +185,8 @@ SOURCES = \
     layDispatcher.cc \
     laySelectCellViewForm.cc \
     layLayoutStatisticsForm.cc \
-    layD25TechnologyComponent.cc
+    layD25TechnologyComponent.cc \
+    gsiDeclLayNetlistBrowserDialog.cc
 
 HEADERS = \
   gtf.h \

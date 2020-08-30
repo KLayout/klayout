@@ -69,7 +69,7 @@ class DBLayoutToNetlistTests(unittest.TestCase):
     ut_testsrc = os.getenv("TESTSRC")
 
     ly = pya.Layout()
-    ly.read(os.path.join(ut_testsrc, "testdata", "algo", "device_extract_l1.gds"))
+    ly.read(os.path.join(ut_testsrc, "testdata", "algo", "device_extract_l1_with_inv_nodes.gds"))
 
     l2n = pya.LayoutToNetlist(pya.RecursiveShapeIterator(ly, ly.top_cell(), []))
 
@@ -97,40 +97,56 @@ class DBLayoutToNetlistTests(unittest.TestCase):
 
     self.assertEqual(str(l2n.netlist()), """circuit TRANS ($1=$1,$2=$2);
 end;
-circuit INV2 (OUT=OUT,$2=$2,$3=$3,$4=$4);
+circuit INV2 (OUT=OUT,$2=$3,$3=$4);
   subcircuit TRANS $1 ($1=$4,$2=OUT);
   subcircuit TRANS $2 ($1=$3,$2=OUT);
   subcircuit TRANS $3 ($1=$2,$2=$4);
   subcircuit TRANS $4 ($1=$2,$2=$3);
 end;
 circuit RINGO ();
-  subcircuit INV2 $1 (OUT=OSC,$2=FB,$3=VSS,$4=VDD);
-  subcircuit INV2 $2 (OUT=$I29,$2=$I20,$3=VSS,$4=VDD);
-  subcircuit INV2 $3 (OUT=$I28,$2=$I19,$3=VSS,$4=VDD);
-  subcircuit INV2 $4 (OUT=$I30,$2=$I21,$3=VSS,$4=VDD);
-  subcircuit INV2 $5 (OUT=$I31,$2=$I22,$3=VSS,$4=VDD);
-  subcircuit INV2 $6 (OUT=$I32,$2=$I23,$3=VSS,$4=VDD);
-  subcircuit INV2 $7 (OUT=$I33,$2=$I24,$3=VSS,$4=VDD);
-  subcircuit INV2 $8 (OUT=$I34,$2=$I25,$3=VSS,$4=VDD);
-  subcircuit INV2 $9 (OUT=$I35,$2=$I26,$3=VSS,$4=VDD);
-  subcircuit INV2 $10 (OUT=$I36,$2=$I27,$3=VSS,$4=VDD);
+  subcircuit INV2 $1 (OUT='FB,OSC',$2=VSS,$3=VDD);
+  subcircuit INV2 $2 (OUT=$I20,$2=VSS,$3=VDD);
+  subcircuit INV2 $3 (OUT=$I19,$2=VSS,$3=VDD);
+  subcircuit INV2 $4 (OUT=$I21,$2=VSS,$3=VDD);
+  subcircuit INV2 $5 (OUT=$I22,$2=VSS,$3=VDD);
+  subcircuit INV2 $6 (OUT=$I23,$2=VSS,$3=VDD);
+  subcircuit INV2 $7 (OUT=$I24,$2=VSS,$3=VDD);
+  subcircuit INV2 $8 (OUT=$I25,$2=VSS,$3=VDD);
+  subcircuit INV2 $9 (OUT=$I26,$2=VSS,$3=VDD);
+  subcircuit INV2 $10 (OUT=$I27,$2=VSS,$3=VDD);
 end;
 """)
 
-    self.assertEqual(str(l2n.probe_net(rmetal2, pya.DPoint(0.0, 1.8))), "RINGO:FB")
+    self.assertEqual(str(l2n.probe_net(rmetal2, pya.DPoint(0.0, 1.8))), "RINGO:FB,OSC")
+    sc_path = []
+    self.assertEqual(str(l2n.probe_net(rmetal2, pya.DPoint(0.0, 1.8), sc_path)), "RINGO:FB,OSC")
+    self.assertEqual(len(sc_path), 0)
     self.assertEqual(repr(l2n.probe_net(rmetal2, pya.DPoint(-2.0, 1.8))), "None")
 
-    n = l2n.probe_net(rmetal1, pya.Point(2600, 1000))
-    self.assertEqual(str(n), "RINGO:$I20")
+    n = l2n.probe_net(rmetal1, pya.Point(2600, 1000), None)
+    self.assertEqual(str(n), "INV2:$2")
+    sc_path = []
+    n = l2n.probe_net(rmetal1, pya.Point(2600, 1000), sc_path)
+    self.assertEqual(str(n), "INV2:$2")
+    self.assertEqual(len(sc_path), 1)
+    a = []
+    t = pya.DCplxTrans()
+    for sc in sc_path:
+      a.append(sc.expanded_name())
+      t = t * sc.trans
+    self.assertEqual(",".join(a), "$2")
+    self.assertEqual(str(t), "r0 *1 2.64,0")
 
-    self.assertEqual(str(l2n.shapes_of_net(n, rmetal1, True)), "(1660,-420;1660,2420;2020,2420;2020,-420);(1840,820;1840,1180;3220,1180;3220,820);(1660,2420;1660,3180;2020,3180;2020,2420);(1660,-380;1660,380;2020,380;2020,-380)")
+    self.assertEqual(str(l2n.shapes_of_net(n, rmetal1, True)), 
+        "(-980,-420;-980,2420;-620,2420;-620,-420);(-800,820;-800,1180;580,1180;580,820);(-980,2420;-980,3180;-620,3180;-620,2420);(-980,-380;-980,380;-620,380;-620,-380)")
 
     shapes = pya.Shapes()
     l2n.shapes_of_net(n, rmetal1, True, shapes)
     r = pya.Region()
-    for s in shapes.each(): 
-      r.insert(s.polygon) 
-    self.assertEqual(str(r), "(1660,-420;1660,2420;2020,2420;2020,-420);(1840,820;1840,1180;3220,1180;3220,820);(1660,2420;1660,3180;2020,3180;2020,2420);(1660,-380;1660,380;2020,380;2020,-380)")
+    for s in shapes.each():
+      r.insert(s.polygon)
+    self.assertEqual(str(r), 
+        "(-980,-420;-980,2420;-620,2420;-620,-420);(-800,820;-800,1180;580,1180;580,820);(-980,2420;-980,3180;-620,3180;-620,2420);(-980,-380;-980,380;-620,380;-620,-380)")
 
   def test_10_LayoutToNetlistExtractionWithoutDevices(self):
 
@@ -443,7 +459,7 @@ end;
 
     l2n = pya.LayoutToNetlist()
 
-    infile = os.path.join(ut_testsrc, "testdata", "algo", "l2n_writer_au.txt")
+    infile = os.path.join(ut_testsrc, "testdata", "algo", "l2n_reader_in.txt")
     l2n.read(infile)
 
     tmp = os.path.join(ut_testtmp, "tmp.txt")

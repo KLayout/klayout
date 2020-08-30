@@ -353,6 +353,20 @@ void insert (X &inserter, const db::EdgePairs &data, const db::Box &tile, bool c
  *  This function is responsible for preparing (i.e. clipping) and delivering the output.
  */
 template <class X>
+void insert (X &inserter, const db::Texts &data, const db::Box &tile, bool clip)
+{
+  for (db::Texts::const_iterator o = data.begin (); ! o.at_end (); ++o) {
+    insert (inserter, *o, tile, clip);
+  }
+}
+
+/**
+ *  @brief Delivery of tiling processor output
+ *  This utility is put between the container and the receiver.
+ *  The inserter is an object having an operator() that takes the object.
+ *  This function is responsible for preparing (i.e. clipping) and delivering the output.
+ */
+template <class X>
 bool insert_var (X &inserter, const tl::Variant &obj, const db::Box &tile, bool clip)
 {
   if (obj.is_user<db::Region> ()) {
@@ -363,6 +377,9 @@ bool insert_var (X &inserter, const tl::Variant &obj, const db::Box &tile, bool 
     return true;
   } else if (obj.is_user<db::Edges> ()) {
     insert (inserter, obj.to_user<db::Edges> (), tile, clip);
+    return true;
+  } else if (obj.is_user<db::Texts> ()) {
+    insert (inserter, obj.to_user<db::Texts> (), tile, clip);
     return true;
   } else if (obj.is_user<db::Box> ()) {
     insert (inserter, obj.to_user<db::Box> (), tile, clip);
@@ -417,6 +434,8 @@ bool insert_var (X &inserter, const tl::Variant &obj, const db::Box &tile, bool 
 class DB_PUBLIC TilingProcessor
 {
 public:
+  enum Type { TypeRegion, TypeEdges, TypeEdgePairs, TypeTexts };
+
   /**
    *  @brief Constructor
    */
@@ -441,7 +460,7 @@ public:
    *  The transformation can be used to convert between database units.  
    *  If "as_region" is false, the input is taken as edge input.
    */
-  void input (const std::string &name, const db::RecursiveShapeIterator &iter, const db::ICplxTrans &trans = db::ICplxTrans (), bool as_region = true, bool merged_semantics = true);
+  void input (const std::string &name, const db::RecursiveShapeIterator &iter, const db::ICplxTrans &trans = db::ICplxTrans (), Type type = TypeRegion, bool merged_semantics = true);
 
   /**
    *  @brief Specifies the output 
@@ -488,6 +507,14 @@ public:
    *  Only edge pairs will be stored.
    */
   void output (const std::string &name, db::EdgePairs &edge_pairs);
+
+  /**
+   *  @brief Specifies output to an text collection
+   *
+   *  This version will specify output to a Texts object.
+   *  Only texts will be stored.
+   */
+  void output (const std::string &name, db::Texts &texts);
 
   /**
    *  @brief Specifies output to an edge collection
@@ -624,11 +651,11 @@ private:
 
   struct InputSpec
   {
-    InputSpec () : region (false), merged_semantics (false) { }
+    InputSpec () : type (TilingProcessor::TypeRegion), merged_semantics (false) { }
     std::string name;
     db::RecursiveShapeIterator iter;
     db::ICplxTrans trans;
-    bool region;
+    TilingProcessor::Type type;
     bool merged_semantics;
   };
 

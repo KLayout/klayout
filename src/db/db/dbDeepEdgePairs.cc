@@ -86,34 +86,33 @@ private:
 
 
 DeepEdgePairs::DeepEdgePairs ()
-  : AsIfFlatEdgePairs (), m_deep_layer ()
+  : AsIfFlatEdgePairs ()
 {
   //  .. nothing yet ..
 }
 
 DeepEdgePairs::DeepEdgePairs (const RecursiveShapeIterator &si, DeepShapeStore &dss)
-  : AsIfFlatEdgePairs (), m_deep_layer (dss.create_edge_pair_layer (si))
+  : AsIfFlatEdgePairs ()
 {
-  //  .. nothing yet ..
+  set_deep_layer (dss.create_edge_pair_layer (si));
 }
 
 DeepEdgePairs::DeepEdgePairs (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans)
-  : AsIfFlatEdgePairs (), m_deep_layer (dss.create_edge_pair_layer (si, trans))
+  : AsIfFlatEdgePairs ()
 {
-  //  .. nothing yet ..
+  set_deep_layer (dss.create_edge_pair_layer (si, trans));
 }
 
 DeepEdgePairs::DeepEdgePairs (const DeepEdgePairs &other)
-  : AsIfFlatEdgePairs (other),
-    m_deep_layer (other.m_deep_layer.copy ())
+  : AsIfFlatEdgePairs (other), db::DeepShapeCollectionDelegateBase (other)
 {
   //  .. nothing yet ..
 }
 
 DeepEdgePairs::DeepEdgePairs (const DeepLayer &dl)
-  : AsIfFlatEdgePairs (), m_deep_layer (dl)
+  : AsIfFlatEdgePairs ()
 {
-  //  .. nothing yet ..
+  set_deep_layer (dl);
 }
 
 DeepEdgePairs::~DeepEdgePairs ()
@@ -133,7 +132,7 @@ EdgePairsIteratorDelegate *DeepEdgePairs::begin () const
 
 std::pair<db::RecursiveShapeIterator, db::ICplxTrans> DeepEdgePairs::begin_iter () const
 {
-  const db::Layout &layout = m_deep_layer.layout ();
+  const db::Layout &layout = deep_layer ().layout ();
   if (layout.cells () == 0) {
 
     return std::make_pair (db::RecursiveShapeIterator (), db::ICplxTrans ());
@@ -141,7 +140,7 @@ std::pair<db::RecursiveShapeIterator, db::ICplxTrans> DeepEdgePairs::begin_iter 
   } else {
 
     const db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
-    db::RecursiveShapeIterator iter (m_deep_layer.layout (), top_cell, m_deep_layer.layer ());
+    db::RecursiveShapeIterator iter (deep_layer ().layout (), top_cell, deep_layer ().layer ());
     return std::make_pair (iter, db::ICplxTrans ());
 
   }
@@ -151,10 +150,10 @@ size_t DeepEdgePairs::size () const
 {
   size_t n = 0;
 
-  const db::Layout &layout = m_deep_layer.layout ();
+  const db::Layout &layout = deep_layer ().layout ();
   db::CellCounter cc (&layout);
   for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
-    n += cc.weight (*c) * layout.cell (*c).shapes (m_deep_layer.layer ()).size ();
+    n += cc.weight (*c) * layout.cell (*c).shapes (deep_layer ().layer ()).size ();
   }
 
   return n;
@@ -167,7 +166,7 @@ std::string DeepEdgePairs::to_string (size_t nmax) const
 
 Box DeepEdgePairs::bbox () const
 {
-  return m_deep_layer.initial_cell ().bbox (m_deep_layer.layer ());
+  return deep_layer ().initial_cell ().bbox (deep_layer ().layer ());
 }
 
 bool DeepEdgePairs::empty () const
@@ -241,14 +240,20 @@ EdgePairsDelegate *DeepEdgePairs::filtered (const EdgePairFilterBase &filter) co
   return AsIfFlatEdgePairs::filtered (filter);
 }
 
+RegionDelegate *
+DeepEdgePairs::processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const
+{
+  return shape_collection_processed_impl<db::EdgePair, db::Polygon, db::DeepRegion> (deep_layer (), filter);
+}
+
 RegionDelegate *DeepEdgePairs::polygons (db::Coord e) const
 {
-  db::DeepLayer new_layer = m_deep_layer.derived ();
-  db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
+  db::DeepLayer new_layer = deep_layer ().derived ();
+  db::Layout &layout = const_cast<db::Layout &> (deep_layer ().layout ());
 
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
     db::Shapes &output = c->shapes (new_layer.layer ());
-    for (db::Shapes::shape_iterator s = c->shapes (m_deep_layer.layer ()).begin (db::ShapeIterator::EdgePairs); ! s.at_end (); ++s) {
+    for (db::Shapes::shape_iterator s = c->shapes (deep_layer ().layer ()).begin (db::ShapeIterator::EdgePairs); ! s.at_end (); ++s) {
       db::Polygon poly = s->edge_pair ().normalized ().to_polygon (e);
       if (poly.vertices () >= 3) {
         output.insert (db::PolygonRef (poly, layout.shape_repository ()));
@@ -261,12 +266,12 @@ RegionDelegate *DeepEdgePairs::polygons (db::Coord e) const
 
 EdgesDelegate *DeepEdgePairs::generic_edges (bool first, bool second) const
 {
-  db::DeepLayer new_layer = m_deep_layer.derived ();
-  db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
+  db::DeepLayer new_layer = deep_layer ().derived ();
+  db::Layout &layout = const_cast<db::Layout &> (deep_layer ().layout ());
 
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
     db::Shapes &output = c->shapes (new_layer.layer ());
-    for (db::Shapes::shape_iterator s = c->shapes (m_deep_layer.layer ()).begin (db::ShapeIterator::EdgePairs); ! s.at_end (); ++s) {
+    for (db::Shapes::shape_iterator s = c->shapes (deep_layer ().layer ()).begin (db::ShapeIterator::EdgePairs); ! s.at_end (); ++s) {
       db::EdgePair ep = s->edge_pair ();
       if (first) {
         output.insert (ep.first ());
@@ -304,8 +309,8 @@ EdgePairsDelegate *DeepEdgePairs::in (const EdgePairs &other, bool invert) const
 bool DeepEdgePairs::equals (const EdgePairs &other) const
 {
   const DeepEdgePairs *other_delegate = dynamic_cast<const DeepEdgePairs *> (other.delegate ());
-  if (other_delegate && &other_delegate->m_deep_layer.layout () == &m_deep_layer.layout ()
-      && other_delegate->m_deep_layer.layer () == m_deep_layer.layer ()) {
+  if (other_delegate && &other_delegate->deep_layer ().layout () == &deep_layer ().layout ()
+      && other_delegate->deep_layer ().layer () == deep_layer ().layer ()) {
     return true;
   } else {
     return AsIfFlatEdgePairs::equals (other);
@@ -315,8 +320,8 @@ bool DeepEdgePairs::equals (const EdgePairs &other) const
 bool DeepEdgePairs::less (const EdgePairs &other) const
 {
   const DeepEdgePairs *other_delegate = dynamic_cast<const DeepEdgePairs *> (other.delegate ());
-  if (other_delegate && &other_delegate->m_deep_layer.layout () == &m_deep_layer.layout ()) {
-    return other_delegate->m_deep_layer.layer () < m_deep_layer.layer ();
+  if (other_delegate && &other_delegate->deep_layer ().layout () == &deep_layer ().layout ()) {
+    return other_delegate->deep_layer ().layer () < deep_layer ().layer ();
   } else {
     return AsIfFlatEdgePairs::less (other);
   }
@@ -324,13 +329,12 @@ bool DeepEdgePairs::less (const EdgePairs &other) const
 
 void DeepEdgePairs::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
-  m_deep_layer.insert_into (layout, into_cell, into_layer);
+  deep_layer ().insert_into (layout, into_cell, into_layer);
 }
 
 void DeepEdgePairs::insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const
 {
-  m_deep_layer.insert_into_as_polygons (layout, into_cell, into_layer, enl);
+  deep_layer ().insert_into_as_polygons (layout, into_cell, into_layer, enl);
 }
-
 
 }

@@ -423,6 +423,15 @@ X::X (const X &x)
   ++s_xinst;
 }
 
+X &X::operator= (const X &x)
+{
+  gsi::ObjectBase::operator= (x);
+  if (this != &x) {
+    m_s = x.m_s;
+  }
+  return *this;
+}
+
 X::~X ()
 { 
   --s_xinst;

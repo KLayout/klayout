@@ -29,8 +29,7 @@
 #include "dbRecursiveShapeIterator.h"
 #include "dbPolygonGenerators.h"
 #include "dbCellVariants.h"
-
-#include "gsiObject.h"
+#include "dbShapeCollection.h"
 
 #include <list>
 
@@ -216,7 +215,7 @@ private:
  *  Polygons inside the region may contain holes if the region is merged.
  */
 class DB_PUBLIC Region
-  : public gsi::ObjectBase
+  : public db::ShapeCollection
 {
 public:
   typedef db::Coord coord_type;
@@ -350,6 +349,14 @@ public:
    *  This method requires the DSS to be singular.
    */
   explicit Region (DeepShapeStore &dss);
+
+  /**
+   *  @brief Implementation of the ShapeCollection interface
+   */
+  ShapeCollectionDelegateBase *get_delegate () const
+  {
+    return mp_delegate;
+  }
 
   /**
    *  @brief Gets the underlying delegate object
@@ -1323,6 +1330,52 @@ public:
   }
 
   /**
+   *  @brief Selects all polygons of this region which overlap or touch texts from the text collection
+   *
+   *  Merged semantics applies.
+   */
+  Region &select_interacting (const Texts &other)
+  {
+    set_delegate (mp_delegate->selected_interacting (other));
+    return *this;
+  }
+
+  /**
+   *  @brief Selects all polygons of this region which do not overlap or touch texts from the text collection
+   *
+   *  Merged semantics applies.
+   */
+  Region &select_not_interacting (const Texts &other)
+  {
+    set_delegate (mp_delegate->selected_not_interacting (other));
+    return *this;
+  }
+
+  /**
+   *  @brief Returns all polygons of this which overlap or touch texts from the text collection
+   *
+   *  This method is an out-of-place version of select_interacting.
+   *
+   *  Merged semantics applies.
+   */
+  Region selected_interacting (const Texts &other) const
+  {
+    return Region (mp_delegate->selected_interacting (other));
+  }
+
+  /**
+   *  @brief Returns all polygons of this which do not overlap or touch texts from the text collection
+   *
+   *  This method is an out-of-place version of select_not_interacting.
+   *
+   *  Merged semantics applies.
+   */
+  Region selected_not_interacting (const Texts &other) const
+  {
+    return Region (mp_delegate->selected_not_interacting (other));
+  }
+
+  /**
    *  @brief Selects all polygons of this region which overlap polygons from the other region
    *
    *  Merged semantics applies.
@@ -1386,6 +1439,16 @@ public:
   Edges pull_interacting (const Edges &other) const
   {
     return Edges (mp_delegate->pull_interacting (other));
+  }
+
+  /**
+   *  @brief Returns all texts of "other" which are interacting (touching or overlapping with) polygons of this region
+   *
+   *  Merged semantics applies.
+   */
+  Texts pull_interacting (const Texts &other) const
+  {
+    return Texts (mp_delegate->pull_interacting (other));
   }
 
   /**
@@ -1612,6 +1675,7 @@ public:
 private:
   friend class Edges;
   friend class EdgePairs;
+  friend class Texts;
 
   RegionDelegate *mp_delegate;
 

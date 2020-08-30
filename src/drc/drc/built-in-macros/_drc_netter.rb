@@ -76,12 +76,18 @@ module DRC
     # @name connect
     # @brief Specifies a connection between two layers
     # @synopsis connect(a, b)
-    # a and b must be polygon layers. After calling this function, the
+    # a and b must be polygon or text layers. After calling this function, the
     # Netter regards all overlapping or touching shapes on these layers
     # to form an electrical connection between the materials formed by
     # these layers. This also implies intra-layer connections: shapes
     # on these layers touching or overlapping other shapes on these
     # layers will form bigger, electrically connected areas.
+    #
+    # Texts will be used to assign net names to the nets. The preferred
+    # method is to use \labels to create a text layer from a design 
+    # layer. When using \input, text labels are carried implicitly
+    # with the polygons but at the cost of small dummy shapes (2x2 DBU
+    # marker polygons) and limited functionality.
     #
     # Multiple connect calls must be made to form larger connectivity
     # stacks across multiple layers. Such stacks may include forks and
@@ -94,13 +100,13 @@ module DRC
 
       a.is_a?(DRC::DRCLayer) || raise("First argument of Netter#connect must be a layer")
       b.is_a?(DRC::DRCLayer) || raise("Second argument of Netter#connect must be a layer")
-      a.requires_region("Netter#connect (first argument)")
-      b.requires_region("Netter#connect (second argument)")
+      a.requires_texts_or_region("Netter#connect (first argument)")
+      b.requires_texts_or_region("Netter#connect (second argument)")
 
       register_layer(a.data)
       register_layer(b.data)
-      @l2n.connect(a.data)
-      @l2n.connect(b.data)
+      a.data.is_a?(RBA::Region) && @l2n.connect(a.data)
+      b.data.is_a?(RBA::Region) && @l2n.connect(b.data)
       @l2n.connect(a.data, b.data)
 
     end
@@ -112,15 +118,15 @@ module DRC
     # Connects the shapes from the given layer l to a global net with the given name.
     # Global nets are common to all cells. Global nets automatically connect to parent
     # cells throughs implied pins. An example is the substrate (bulk) net which connects
-    # to shapes belonging to tie-down diodes.
+    # to shapes belonging to tie-down diodes. "l" can be a polygon or text layer.
     
     def connect_global(l, name)
 
       l.is_a?(DRC::DRCLayer) || raise("Layer argument of Netter#connect_global must be a layer")
-      l.requires_region("Netter#connect_global (layer argument)")
+      l.requires_texts_or_region("Netter#connect_global (layer argument)")
 
       register_layer(l.data)
-      @l2n.connect(l.data)
+      l.data.is_a?(RBA::Region) && @l2n.connect(l.data)
       @l2n.connect_global(l.data, name)
 
     end
@@ -189,7 +195,7 @@ module DRC
       ls = {}
       layer_selection.keys.sort.each do |n|
         l = layer_selection[n]
-        l.requires_region("Netter#extract_devices (#{n} layer)")
+        l.requires_texts_or_region("Netter#extract_devices (#{n} layer)")
         register_layer(l.data)
         ls[n.to_s] = l.data
       end
@@ -330,16 +336,90 @@ module DRC
     # Multiple diode specifications are allowed. Just add them 
     # to the antenna_check call.
     #
+    # You can include the perimeter into the area computation for
+    # the gate or metal layer or both. The physical picture
+    # is this: the side walls of the material contribute to the 
+    # surface too. As the side wall area can be estimated by taking
+    # the perimeter times some material thickness, the effective 
+    # area is: 
+    #
+    # @code
+    # A(eff) = A + P * t
+    # @/code
+    #
+    # Here A is the area of the polygons and P is their perimeter.
+    # t is the "thickness" in micrometer units. To specify such
+    # a condition, use the following notation:
+    #
+    # @code
+    # errors = antenna_check(area_and_perimeter(gate, 0.5), ...)
+    # @/code
+    #
+    # "area_and_perimeter" takes the polygon layer and the 
+    # thickness (0.5 micrometers in this case). 
+    # This notation can be applied to both gate and
+    # metal layers. A detailed notation for the usual,
+    # area-only case is available as well for completeness:
+    #
+    # @code
+    # errors = antenna_check(area_only(gate), ...)
+    # 
+    # # this is equivalent to a zero thickness:
+    # errors = antenna_check(area_and_perimeter(gate, 0.0), ...)
+    # # or the standard case:
+    # errors = antenna_check(gate, ...)
+    # @/code
+    #
+    # Finally there is also "perimeter_only". When using this 
+    # specification with a thickness value, the area is computed
+    # from the perimeter alone:
+    #
+    # @code
+    # A(eff) = P * t
+    # @/code
+    #
+    # @code
+    # errors = antenna_check(perimeter_only(gate, 0.5), ...)
+    # @/code
+    #
     # The error shapes produced by the antenna check are copies
     # of the metal shapes on the metal layers of each network 
     # violating the antenna rule.
 
-    def antenna_check(gate, metal, ratio, *diodes)
+    def antenna_check(agate, ametal, ratio, *diodes)
 
-      gate.is_a?(DRC::DRCLayer) || raise("gate argument of Netter#antenna_check must be a layer")
+      gate_perimeter_factor = 0.0
+      gate_area_factor = 1.0
+      if agate.is_a?(DRC::DRCLayer)
+        gate = agate
+      elsif agate.is_a?(DRC::DRCAreaAndPerimeter)
+        gate = agate.region
+        gate_perimeter_factor = agate.perimeter_factor
+        gate_area_factor = agate.area_factor
+        if ! gate.is_a?(DRC::DRCLayer)
+          raise("gate with area or area_and_perimeter: input argument must be a layer")
+        end
+      else
+        raise("gate argument of Netter#antenna_check must be a layer ")
+      end
+
       gate.requires_region("Netter#antenna_check (gate argument)")
 
-      metal.is_a?(DRC::DRCLayer) || raise("metal argument of Netter#antenna_check must be a layer")
+      metal_perimeter_factor = 0.0
+      metal_area_factor = 1.0
+      if ametal.is_a?(DRC::DRCLayer)
+        metal = ametal
+      elsif ametal.is_a?(DRC::DRCAreaAndPerimeter)
+        metal = ametal.region
+        metal_perimeter_factor = ametal.perimeter_factor
+        metal_area_factor = ametal.area_factor
+        if ! metal.is_a?(DRC::DRCLayer)
+          raise("metal with area or area_and_perimeter: input argument must be a layer")
+        end
+      else
+        raise("metal argument of Netter#antenna_check must be a layer")
+      end
+
       metal.requires_region("Netter#antenna_check (metal argument)")
 
       if !ratio.is_a?(1.class) && !ratio.is_a?(Float)
@@ -357,7 +437,7 @@ module DRC
         end
       end
 
-      DRC::DRCLayer::new(@engine, @engine._cmd(l2n_data, :antenna_check, gate.data, metal.data, ratio, dl))
+      DRC::DRCLayer::new(@engine, @engine._cmd(l2n_data, :antenna_check, gate.data, gate_area_factor, gate_perimeter_factor, metal.data, metal_area_factor, metal_perimeter_factor, ratio, dl))
 
     end
 

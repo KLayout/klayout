@@ -57,7 +57,7 @@ EdgePairs::EdgePairs (EdgePairsDelegate *delegate)
 }
 
 EdgePairs::EdgePairs (const EdgePairs &other)
-  : gsi::ObjectBase (), mp_delegate (other.mp_delegate->clone ())
+  : db::ShapeCollection (), mp_delegate (other.mp_delegate->clone ())
 {
   //  .. nothing yet ..
 }
@@ -141,6 +141,11 @@ EdgePairs::iter () const
   static db::RecursiveShapeIterator def_iter;
   const db::RecursiveShapeIterator *i = mp_delegate->iter ();
   return *(i ? i : &def_iter);
+}
+
+void EdgePairs::processed (Region &output, const EdgePairToPolygonProcessorBase &filter) const
+{
+  output = Region (mp_delegate->processed_to_polygons (filter));
 }
 
 void EdgePairs::polygons (Region &output, db::Coord e) const

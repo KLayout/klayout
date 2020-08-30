@@ -71,11 +71,25 @@ MacroInterpreter::include_expansion (const lym::Macro *macro)
     }
 
     if (ip == Macro::Ruby) {
-      res.second = tl::replaced (res.second, "__FILE__", "RBA::Macro::real_path(__FILE__, __LINE__)");
-      res.second = tl::replaced (res.second, "__LINE__", "RBA::Macro::real_line(__FILE__, __LINE__)");
-    } else if (ip == Macro::Python) {
-      res.second = tl::replaced (res.second, "__file__", "pya.Macro.real_path(__file__, __line__)");
-      res.second = tl::replaced (res.second, "__line__", "pya.Macro.real_line(__file__, __line__)");
+
+      std::string subst;
+      const std::string file_const ("__FILE__");
+      const std::string line_const ("__LINE__");
+
+      for (const char *cp = res.second.c_str (); *cp; ) {
+        if (strncmp (cp, file_const.c_str (), file_const.size ()) == 0 && !isalnum (cp[file_const.size ()]) && cp[file_const.size ()] != '_') {
+          subst += "RBA::Macro::real_path(__FILE__, __LINE__)";
+          cp += file_const.size ();
+        } else if (strncmp (cp, line_const.c_str (), line_const.size ()) == 0 && !isalnum (cp[line_const.size ()]) && cp[line_const.size ()] != '_') {
+          subst += "RBA::Macro::real_line(__FILE__, __LINE__)";
+          cp += line_const.size ();
+        } else {
+          subst += *cp++;
+        }
+      }
+
+      res.second = subst;
+
     }
 
   }

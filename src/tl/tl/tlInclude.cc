@@ -78,7 +78,13 @@ IncludeExpander::read (const std::string &path, tl::InputStream &is, std::string
     tl::Extractor ex (l.c_str ());
     if (ex.test ("#") && ex.test ("%include")) {
 
-      std::string include_path = tl::trim (ex.skip ());
+      std::string include_path;
+      if (*ex.skip () == '"' || *ex.skip () == '\'') {
+        ex.read_quoted (include_path);
+        ex.expect_end ();
+      } else {
+        include_path = tl::trim (ex.skip ());
+      }
 
       //  allow some customization by employing expression interpolation
       include_path = tl::Eval ().interpolate (include_path);

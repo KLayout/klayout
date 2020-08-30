@@ -1,0 +1,14 @@
+
+# %include "a_inc.drc"
+
+# actual "DRC"
+
+source(ly.top_cell)
+
+l1_drc = input(1, 0)
+l2_drc = input(2, 0)
+(l1_drc & l2_drc).output(100, 0)
+
+l100 = ly.layer(100, 0)
+
+puts "Result: " + RBA::Region::new(ly.top_cell.begin_shapes_rec(l100)).to_s + " in " + File.basename(__FILE__) + ":" + __LINE__.to_s

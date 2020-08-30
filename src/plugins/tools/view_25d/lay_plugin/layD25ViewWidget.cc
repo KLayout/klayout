@@ -752,7 +752,7 @@ D25ViewWidget::initializeGL ()
       "uniform highp float mist_factor;\n"
       "uniform highp float mist_add;\n"
       "\n"
-      "vec4 color_by_z(lowp vec4 c, highp float z) {\n"
+      "lowp vec4 color_by_z(lowp vec4 c, highp float z) {\n"
       "  highp float mist_rgb = c.g * mist_factor + mist_add;\n"
       "  lowp vec4 mist_color = vec4(mist_rgb, mist_rgb, mist_rgb, 1.0);\n"
       "  highp float d = 0.12;\n" //  d + dd/2 = 0.15 = 1/?

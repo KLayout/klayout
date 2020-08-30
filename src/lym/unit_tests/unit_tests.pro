@@ -7,7 +7,7 @@ TARGET = lym_tests
 include($$PWD/../../lib_ut.pri)
 
 SOURCES = \
-  lymBasicTests.cc \
+  lymIncludeTests.cc
 
 INCLUDEPATH += $$LYM_INC $$TL_INC $$GSI_INC
 DEPENDPATH += $$LYM_INC $$TL_INC $$GSI_INC

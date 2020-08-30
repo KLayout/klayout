@@ -475,6 +475,7 @@ TextInputStream::get_char ()
       return 0;
     } else if (*c != '\r' && *c) {
       if (*c == '\n') {
+        peek_char ();  // sets at_end if there is no more character
         ++m_next_line;
       }
       return *c;

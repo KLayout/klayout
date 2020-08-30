@@ -35,11 +35,19 @@ class DBLibrary_TestClass < TestBase
     lib.register("RBA-unit-test")
 
     assert_equal(lib.name, "RBA-unit-test")
-    assert_equal(lib.id != 0, true)
+    lib_id = lib.id
+    assert_equal(lib_id != 0, true)
 
     assert_equal(RBA::Library::library_names.member?("RBA-unit-test"), true)
-    assert_equal(RBA::Library::library_by_name("RBA-unit-test").id, lib.id)
+    assert_equal(RBA::Library::library_by_name("RBA-unit-test").id, lib_id)
 
+    # destroy should not do anything as libraries are not to be removed through the destructor
+    lib._destroy
+    assert_equal(RBA::Library::library_by_name("RBA-unit-test").id, lib_id)
+    assert_equal(lib.destroyed?, true)
+
+    lib = RBA::Library::library_by_name("RBA-unit-test")
+    assert_equal(lib.destroyed?, false)
     lib.delete
     assert_equal(RBA::Library::library_by_name("RBA-unit-test"), nil)
 
@@ -84,6 +92,10 @@ class DBLibrary_TestClass < TestBase
     lib = RBA::Library::new
     lib.layout.create_cell("X")
     assert_equal(lib.layout.top_cell.name, "X")
+
+    # this will actually destroy the library as it is not registered
+    lib._destroy
+    assert_equal(lib.destroyed?, true)
 
   end
 

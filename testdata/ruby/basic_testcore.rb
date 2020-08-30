@@ -832,6 +832,7 @@ class Basic_TestClass < TestBase
 
   end
 
+  # TODO: this class is going to be deprecated
   class X < Data
   end
   class Y < Object

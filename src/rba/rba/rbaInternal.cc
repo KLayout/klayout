@@ -402,7 +402,11 @@ Proxy::detach ()
     }
   }
 
-  clear_callbacks ();
+  //  NOTE: m_owned = false might mean the C++ object is already destroyed. We must not
+  //  modify in this case and without is_managed() there is no way of knowing the state.
+  if (m_owned) {
+    clear_callbacks ();
+  }
 
   m_self = Qnil;
   m_obj = 0;

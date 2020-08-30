@@ -30,6 +30,9 @@
 #include "dbLayoutToNetlist.h"
 #include "dbLayoutVsSchematic.h"
 
+#include "tlList.h"
+#include "tlTypeTraits.h"
+
 #include <QAbstractItemModel>
 #include <QColor>
 
@@ -88,6 +91,167 @@ private:
 // ----------------------------------------------------------------------------------
 //  NetlistBrowserModel definition
 
+class NetlistBrowserModel;
+class NetlistModelItemData;
+class RootItemData;
+class CircuitItemData;
+class CircuitNetItemData;
+class CircuitDeviceItemData;
+class CircuitSubCircuitItemData;
+
+}
+
+namespace tl {
+  //  disable copying for NetlistModelItemData
+  template<> struct type_traits<lay::NetlistModelItemData>
+  {
+    typedef false_tag has_copy_constructor;
+  };
+}
+
+namespace lay
+{
+
+/**
+ *  @brief A base class for the item data object
+ */
+class NetlistModelItemData
+  : public tl::list_node<NetlistModelItemData>
+{
+public:
+  typedef tl::list<NetlistModelItemData>::iterator iterator;
+
+  NetlistModelItemData ();
+  NetlistModelItemData (NetlistModelItemData *parent);
+
+  virtual ~NetlistModelItemData ();
+
+  virtual NetlistModelItemData *parent () { return mp_parent; }
+
+  virtual QIcon icon (NetlistBrowserModel *model) = 0;
+  virtual QString text (int column, NetlistBrowserModel *model) = 0;
+  virtual QString search_text () = 0;
+  virtual std::string tooltip (NetlistBrowserModel *model) = 0;
+  virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model) = 0;
+
+  void ensure_children (NetlistBrowserModel *model);
+
+  void push_back (NetlistModelItemData *child);
+
+  iterator begin () { return m_children.begin (); }
+  iterator end ()   { return m_children.end (); }
+
+  size_t child_count () { return m_children_per_index.size (); }
+  size_t index () { return m_index; }
+
+  NetlistModelItemData *child (size_t n);
+
+  virtual std::pair<const db::Circuit *, const db::Circuit *> circuits_of_this ();
+  std::pair<const db::Circuit *, const db::Circuit *> circuits ();
+  bool derived_from_circuits (const std::pair<const db::Circuit *, const db::Circuit *> &sp);
+
+  virtual std::pair<const db::Device *, const db::Device *> devices_of_this ();
+  std::pair<const db::Device *, const db::Device *> devices ();
+  bool derived_from_devices (const std::pair<const db::Device *, const db::Device *> &sp);
+
+  virtual std::pair<const db::Pin *, const db::Pin *> pins_of_this ();
+  std::pair<const db::Pin *, const db::Pin *> pins ();
+  bool derived_from_pins (const std::pair<const db::Pin *, const db::Pin *> &sp);
+
+  virtual std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuits_of_this ();
+  std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuits ();
+  bool derived_from_subcircuits (const std::pair<const db::SubCircuit *, const db::SubCircuit *> &sp);
+
+  virtual std::pair<const db::Net *, const db::Net *> nets_of_this ();
+  std::pair<const db::Net *, const db::Net *> nets ();
+  bool derived_from_nets (const std::pair<const db::Net *, const db::Net *> &np);
+
+private:
+  NetlistModelItemData *mp_parent;
+  tl::list<NetlistModelItemData> m_children;
+  std::vector<NetlistModelItemData *> m_children_per_index;
+  bool m_children_made;
+  size_t m_index;
+
+  void set_index (size_t index) { m_index = index; }
+
+  virtual void do_ensure_children (NetlistBrowserModel *model) = 0;
+};
+
+/**
+ *  @brief An object describing the instantiation path of a net, a device or a (sub)circuit pair
+ *
+ *  This object applies to pairs of these objects. A class providing a path for a single
+ *  object is NetlistObjectPath
+ */
+struct LAYBASIC_PUBLIC NetlistObjectPath
+{
+  typedef std::list<const db::SubCircuit *> path_type;
+  typedef path_type::const_iterator path_iterator;
+
+  NetlistObjectPath () : root (0), net (0), device (0) { }
+
+  bool is_null () const
+  {
+    return ! root;
+  }
+
+  bool operator== (const NetlistObjectPath &other) const
+  {
+    return root == other.root && path == other.path && net == other.net && device == other.device;
+  }
+
+  bool operator!= (const NetlistObjectPath &other) const
+  {
+    return ! operator== (other);
+  }
+
+  const db::Circuit *root;
+  std::list<const db::SubCircuit *> path;
+  const db::Net *net;
+  const db::Device *device;
+};
+
+/**
+ *  @brief An object describing the instantiation path of a net, a device or a (sub)circuit pair
+ *
+ *  This object applies to pairs of these objects. A class providing a path for a single
+ *  object is NetlistObjectPath
+ */
+struct LAYBASIC_PUBLIC NetlistObjectsPath
+{
+  typedef std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *> > path_type;
+  typedef path_type::const_iterator path_iterator;
+
+  NetlistObjectsPath () { }
+
+  bool is_null () const
+  {
+    return ! root.first && ! root.second;
+  }
+
+  static NetlistObjectsPath from_first(const NetlistObjectPath &p);
+  static NetlistObjectsPath from_second (const NetlistObjectPath &p);
+
+  NetlistObjectPath first () const;
+  NetlistObjectPath second () const;
+
+  bool operator== (const NetlistObjectsPath &other) const
+  {
+    return root == other.root && path == other.path && net == other.net && device == other.device;
+  }
+
+  bool operator!= (const NetlistObjectsPath &other) const
+  {
+    return ! operator== (other);
+  }
+
+  std::pair<const db::Circuit *, const db::Circuit *> root;
+  std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *> > path;
+  std::pair<const db::Net *, const db::Net *> net;
+  std::pair<const db::Device *, const db::Device *> device;
+};
+
 /**
  *  @brief The NetlistBrowserModel
  *
@@ -125,30 +289,69 @@ public:
   virtual QModelIndex parent (const QModelIndex &index) const;
   virtual int rowCount (const QModelIndex &parent) const;
 
-  QModelIndex index_from_id (void *id, int column) const;
-
   int status_column () const
   {
     return m_status_column;
   }
 
-  std::pair<const db::Net *, const db::Net *> net_from_index (const QModelIndex &index) const;
-  QModelIndex index_from_net (const std::pair<const db::Net *, const db::Net *> &net) const;
-  QModelIndex index_from_net (const db::Net *net) const;
-  std::pair<const db::Circuit *, const db::Circuit *> circuit_from_index (const QModelIndex &index) const;
-  QModelIndex index_from_circuit (const std::pair<const db::Circuit *, const db::Circuit *> &circuit) const;
-  QModelIndex index_from_circuit (const db::Circuit *circuit) const;
-
-  std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuit_from_index (const QModelIndex &index) const;
-
-  std::pair<const db::Device *, const db::Device *> device_from_index (const QModelIndex &index) const;
-
-  bool is_circuit_index (const QModelIndex &index) const
+  int object_column () const
   {
-    return is_id_circuit (index.internalPointer ());
+    return m_object_column;
   }
 
+  int first_column () const
+  {
+    return m_first_column;
+  }
+
+  int second_column () const
+  {
+    return m_second_column;
+  }
+
+  IndexedNetlistModel *indexer ()
+  {
+    return mp_indexer.get ();
+  }
+
+  std::pair<const db::Net *, const db::Net *> net_from_index (const QModelIndex &index, bool include_parents = true) const;
+  QModelIndex index_from_net (const std::pair<const db::Net *, const db::Net *> &net) const;
+  QModelIndex index_from_net (const db::Net *net) const;
+  std::pair<const db::Circuit *, const db::Circuit *> circuit_from_index (const QModelIndex &index, bool include_parents = true) const;
+  QModelIndex index_from_circuit (const std::pair<const db::Circuit *, const db::Circuit *> &circuit) const;
+  QModelIndex index_from_circuit (const db::Circuit *circuit) const;
+  QModelIndex index_from_subcircuit (const std::pair<const db::SubCircuit *, const db::SubCircuit *> &subcircuits) const;
+
+  std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuit_from_index (const QModelIndex &index, bool include_parents = true) const;
+
+  std::pair<const db::Device *, const db::Device *> device_from_index (const QModelIndex &index, bool include_parents = true) const;
+
   void set_item_visibility (QTreeView *view, bool show_all, bool with_warnings);
+
+  QString make_link_to (const std::pair<const db::Net *, const db::Net *> &nets, int column = 0) const;
+  QString make_link_to (const std::pair<const db::Device *, const db::Device *> &devices, int column = 0) const;
+  QString make_link_to (const std::pair<const db::Pin *, const db::Pin *> &pins, const std::pair<const db::Circuit *, const db::Circuit *> &circuits, int column = 0) const;
+  QString make_link_to (const std::pair<const db::Circuit *, const db::Circuit *> &circuits, int column = 0) const;
+  QString make_link_to (const std::pair<const db::SubCircuit *, const db::SubCircuit *> &sub_circuits, int column = 0) const;
+
+  bool is_valid_net_pair (const std::pair<const db::Net *, const db::Net *> &net) const;
+
+  QIcon icon_for_nets (const std::pair<const db::Net *, const db::Net *> &net) const;
+  QIcon icon_for_connection (const std::pair<const db::Net *, const db::Net *> &net) const;
+
+  QModelIndex index_from_url (const QString &url) const;
+
+  NetlistObjectsPath path_from_index (const QModelIndex &index) const;
+  NetlistObjectPath spath_from_index (const QModelIndex &index) const
+  {
+    return path_from_index (index).first ();
+  }
+
+  QModelIndex index_from_path (const NetlistObjectsPath &path);
+  QModelIndex index_from_path (const NetlistObjectPath &path)
+  {
+    return index_from_path (NetlistObjectsPath::from_first (path));
+  }
 
 private slots:
   void colors_changed ();
@@ -157,72 +360,17 @@ private:
   NetlistBrowserModel (const NetlistBrowserModel &);
   NetlistBrowserModel &operator= (const NetlistBrowserModel &);
 
-  void *make_id_circuit (size_t circuit_index) const;
-  void *make_id_circuit_pin (size_t circuit_index, size_t pin_index) const;
-  void *make_id_circuit_pin_net (size_t circuit_index, size_t pin_index, size_t net_index) const;
-  void *make_id_circuit_net (size_t circuit_index, size_t net_index) const;
-  void *make_id_circuit_net_device_terminal (size_t circuit_index, size_t net_index, size_t terminal_ref_index) const;
-  void *make_id_circuit_net_device_terminal_others (size_t circuit_index, size_t net_index, size_t terminal_ref_index, size_t other_index) const;
-  void *make_id_circuit_net_pin (size_t circuit_index, size_t net_index, size_t pin_index) const;
-  void *make_id_circuit_net_subcircuit_pin (size_t circuit_index, size_t net_index, size_t pin_ref_index) const;
-  void *make_id_circuit_net_subcircuit_pin_others (size_t circuit_index, size_t net_index, size_t pin_ref_index, size_t other_index) const;
-  void *make_id_circuit_subcircuit (size_t circuit_index, size_t subcircuit_index) const;
-  void *make_id_circuit_subcircuit_pin (size_t circuit_index, size_t subcircuit_index, size_t pin_index) const;
-  void *make_id_circuit_device (size_t circuit_index, size_t device_index) const;
-  void *make_id_circuit_device_terminal (size_t circuit_index, size_t device_index, size_t terminal_index) const;
-  bool is_id_circuit (void *id) const;
-  bool is_id_circuit_pin (void *id) const;
-  bool is_id_circuit_pin_net (void *id) const;
-  bool is_id_circuit_net (void *id) const;
-  bool is_id_circuit_net_device_terminal (void *id) const;
-  bool is_id_circuit_net_device_terminal_others (void *id) const;
-  bool is_id_circuit_net_pin (void *id) const;
-  bool is_id_circuit_net_subcircuit_pin (void *id) const;
-  bool is_id_circuit_net_subcircuit_pin_others (void *id) const;
-  bool is_id_circuit_subcircuit (void *id) const;
-  bool is_id_circuit_subcircuit_pin (void *id) const;
-  bool is_id_circuit_device (void *id) const;
-  bool is_id_circuit_device_terminal (void *id) const;
-  size_t circuit_index_from_id (void *id) const;
-  size_t circuit_pin_index_from_id (void *id) const;
-  size_t circuit_device_index_from_id (void *id) const;
-  size_t circuit_device_terminal_index_from_id (void *id) const;
-  size_t circuit_subcircuit_index_from_id (void *id) const;
-  size_t circuit_subcircuit_pin_index_from_id (void *id) const;
-  size_t circuit_net_index_from_id (void *id) const;
-  size_t circuit_net_pin_index_from_id (void *id) const;
-  size_t circuit_net_subcircuit_pin_index_from_id (void *id) const;
-  size_t circuit_net_subcircuit_pin_other_index_from_id (void *id) const;
-  size_t circuit_net_device_terminal_index_from_id (void *id) const;
-  size_t circuit_net_device_terminal_other_index_from_id (void *id) const;
-  std::pair<const db::Circuit *, const db::Circuit *> circuits_from_id (void *id) const;
-  std::pair<const db::Net *, const db::Net *> nets_from_id (void *id) const;
-  std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *> net_subcircuit_pinrefs_from_id (void *id) const;
-  std::pair<const db::NetTerminalRef *, const db::NetTerminalRef *> net_terminalrefs_from_id (void *id) const;
-  std::pair<const db::NetPinRef *, const db::NetPinRef *> net_pinrefs_from_id (void *id) const;
-  std::pair<const db::Device *, const db::Device *> devices_from_id (void *id) const;
-  std::pair<const db::Pin *, const db::Pin *> pins_from_id (void *id) const;
-  std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuits_from_id (void *id) const;
   QString text (const QModelIndex &index) const;
   QVariant tooltip (const QModelIndex &index) const;
   QString search_text (const QModelIndex &index) const;
   db::NetlistCrossReference::Status status (const QModelIndex &index) const;
   QIcon icon (const QModelIndex &index) const;
-  QString make_link_to (const std::pair<const db::Net *, const db::Net *> &nets, int column = 0) const;
-  QString make_link_to (const std::pair<const db::Device *, const db::Device *> &devices, int column = 0) const;
-  QString make_link_to (const std::pair<const db::Pin *, const db::Pin *> &pins, const std::pair<const db::Circuit *, const db::Circuit *> &circuits, int column = 0) const;
-  QString make_link_to (const std::pair<const db::Circuit *, const db::Circuit *> &circuits, int column = 0) const;
-  QString make_link_to (const std::pair<const db::SubCircuit *, const db::SubCircuit *> &sub_circuits, int column = 0) const;
+  QString build_url (const QModelIndex &index, const std::string &title) const;
 
   std::pair<const db::Netlist *, const db::Netlist *> netlists () const
   {
     return std::pair<const db::Netlist *, const db::Netlist *> (mp_l2ndb->netlist (), (const db::Netlist *)0);
   }
-
-  bool is_valid_net_pair (const std::pair<const db::Net *, const db::Net *> &net) const;
-
-  QIcon icon_for_nets (const std::pair<const db::Net *, const db::Net *> &net) const;
-  QIcon icon_for_connection (const std::pair<const db::Net *, const db::Net *> &net) const;
 
   void show_or_hide_items (QTreeView *view, const QModelIndex &parent, bool show_all, bool with_warnings, bool with_children);
 
@@ -236,6 +384,9 @@ private:
   int m_status_column;
   int m_first_column;
   int m_second_column;
+  std::auto_ptr<NetlistModelItemData> mp_root;
+
+  RootItemData *root () const;
 };
 
 } // namespace lay

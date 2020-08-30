@@ -1031,4 +1031,92 @@ TEST(6U)
 
 }
 
+TEST(7)
+{
+  Box2Box conv;
+  TestTree t;
 
+  int n = 200000;
+
+  for (int i = n - 1; i >= 0; --i) {
+    t.insert (db::Box (i * 10, 0, i * 10 + 5, 5));
+  }
+  t.sort (conv);
+
+  {
+    tl::SelfTimer timer ("test 7 lookup");
+    size_t n = 0;
+    for (unsigned int i = 0; i < 2000; ++i) {
+      db::Coord sx = 0, sy = 0;
+      TestTree::touching_iterator it = t.begin_touching (db::Box (db::Point (2000, 0), db::Point (3000, 0)), conv);
+      while (!it.at_end ()) {
+        sx += abs (it->left ());
+        sy += abs (it->bottom ());
+        ++it;
+        ++n;
+      }
+      EXPECT_EQ (sx, 252500);
+      EXPECT_EQ (sy, 0);
+    }
+    EXPECT_EQ (n, size_t (101 * 2000));
+  }
+
+  {
+    tl::SelfTimer timer ("test 7 traverse");
+    db::Coord m = std::numeric_limits<db::Coord>::max ();
+    size_t n = 0;
+    for (unsigned int i = 0; i < 10; ++i) {
+      TestTree::touching_iterator it = t.begin_touching (db::Box (db::Point (-m,-m), db::Point (m, m)), conv);
+      while (!it.at_end ()) {
+        ++it;
+        ++n;
+      }
+    }
+    EXPECT_EQ (n, t.size () * 10);
+  }
+}
+
+TEST(7U)
+{
+  Box2Box conv;
+  UnstableTestTree t;
+
+  int n = 200000;
+
+  for (int i = n - 1; i >= 0; --i) {
+    t.insert (db::Box (i * 10, 0, i * 10 + 5, 5));
+  }
+  t.sort (conv);
+
+  {
+    tl::SelfTimer timer ("test 7U lookup");
+    size_t n = 0;
+    for (unsigned int i = 0; i < 2000; ++i) {
+      db::Coord sx = 0, sy = 0;
+      UnstableTestTree::touching_iterator it = t.begin_touching (db::Box (db::Point (2000, 0), db::Point (3000, 0)), conv);
+      while (!it.at_end ()) {
+        sx += abs (it->left ());
+        sy += abs (it->bottom ());
+        ++it;
+        ++n;
+      }
+      EXPECT_EQ (sx, 252500);
+      EXPECT_EQ (sy, 0);
+    }
+    EXPECT_EQ (n, size_t (101 * 2000));
+  }
+
+  {
+    tl::SelfTimer timer ("test 7U traverse");
+    db::Coord m = std::numeric_limits<db::Coord>::max ();
+    size_t n = 0;
+    for (unsigned int i = 0; i < 10; ++i) {
+      UnstableTestTree::touching_iterator it = t.begin_touching (db::Box (db::Point (-m,-m), db::Point (m, m)), conv);
+      while (!it.at_end ()) {
+        ++it;
+        ++n;
+      }
+    }
+    EXPECT_EQ (n, t.size () * 10);
+  }
+}

@@ -172,6 +172,21 @@ public:
   }
 
   /**
+   *  @brief Gets the net attached to a specific pin as a subcircuit pin ref object
+   *  Returns 0 if no net is attached.
+   */
+  const NetSubcircuitPinRef *netref_for_pin (size_t pin_id) const;
+
+  /**
+   *  @brief Gets the net attached to a specific pin as a subcircuit pin ref object (non-const version)
+   *  Returns 0 if no net is attached.
+   */
+  NetSubcircuitPinRef *netref_for_pin (size_t pin_id)
+  {
+    return const_cast<NetSubcircuitPinRef *> (((const SubCircuit *) this)->netref_for_pin (pin_id));
+  }
+
+  /**
    *  @brief Connects the given pin to the given net
    *  If the net is 0 the pin is disconnected.
    *  If non-null, a NetPinRef object will be inserted into the

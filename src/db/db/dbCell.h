@@ -302,6 +302,30 @@ public:
   }
 
   /**
+   *  @brief Transforms the cell by the given transformation.
+   *
+   *  The transformation is applied to all instances and shapes. Magnified transformations will
+   *  render magnified instances. See \transform_into for a version which avoids this.
+   *
+   *  @param t The transformation to apply
+   */
+  template <class Trans>
+  void transform (const Trans &t)
+  {
+    m_instances.transform (t);
+    for (typename shapes_map::iterator s = m_shapes_map.begin (); s != m_shapes_map.end (); ++s) {
+      if (! s->second.empty ()) {
+        //  Note: don't use the copy ctor here - it will copy the attachment to the manager
+        //  and create problems when destroyed. Plus: swap would be more efficient. But by using
+        //  assign_transformed we get undo support for free.
+        shapes_type d;
+        d = s->second;
+        s->second.assign_transformed (d, t);
+      }
+    }
+  }
+
+  /**
    *  @brief Transforms the cell into a new coordinate system.
    *
    *  The transformation is not applied to the children, but this method enables propagation 

@@ -449,6 +449,7 @@ TEST(1_SimpleInverter)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -470,6 +471,7 @@ TEST(1_SimpleInverter)
 
   db::NetlistCrossReference xref;
   db::NetlistComparer comp_xref (&xref);
+  comp.set_dont_consider_net_names (true);
 
   good = comp_xref.compare (&nl1, &nl2);
 
@@ -519,6 +521,7 @@ TEST(1_SimpleInverterMatchedDeviceClasses)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
   comp.same_device_classes (nl1.device_class_by_name ("PMOS"), nl2.device_class_by_name ("PMOSB"));
 
   bool good = comp.compare (&nl1, &nl2);
@@ -571,6 +574,7 @@ TEST(1_SimpleInverterSkippedDevices)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -594,6 +598,7 @@ TEST(1_SimpleInverterSkippedDevices)
 
   db::NetlistCrossReference xref;
   db::NetlistComparer comp_xref (&xref);
+  comp.set_dont_consider_net_names (true);
 
   good = comp_xref.compare (&nl1, &nl2);
 
@@ -751,6 +756,8 @@ TEST(2_SimpleInverterWithForcedNetAssignment)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
+
   const db::Circuit *ca = nl1.circuit_by_name ("INV");
   const db::Circuit *cb = nl2.circuit_by_name ("INV");
   comp.same_nets (ca->net_by_name ("VDD"), cb->net_by_name ("VDD"));
@@ -797,6 +804,7 @@ TEST(3_Buffer)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -852,6 +860,7 @@ TEST(4_BufferTwoPaths)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -912,6 +921,7 @@ TEST(5_BufferTwoPathsDifferentParameters)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   //  Forcing the power nets into equality makes the parameter error harder to detect
   const db::Circuit *ca = nl1.circuit_by_name ("BUF");
@@ -1134,6 +1144,7 @@ TEST(5_BufferTwoPathsDifferentDeviceClasses)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   //  NOTE: adding this power hint makes the device class error harder to detect
   const db::Circuit *ca = nl1.circuit_by_name ("BUF");
@@ -1147,8 +1158,8 @@ TEST(5_BufferTwoPathsDifferentDeviceClasses)
     "begin_circuit BUF BUF\n"
     "match_nets INT $10\n"
     "match_nets IN IN\n"
-    "net_mismatch OUT OUT\n"
     "net_mismatch INT2 $11\n"
+    "net_mismatch OUT OUT\n"
     "match_pins $0 $1\n"
     "match_pins $1 $3\n"
     "match_pins $2 $0\n"
@@ -1199,6 +1210,7 @@ TEST(6_BufferTwoPathsAdditionalResistor)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   //  Forcing the power nets into equality makes the resistor error harder to detect
   const db::Circuit *ca = nl1.circuit_by_name ("BUF");
@@ -1212,8 +1224,35 @@ TEST(6_BufferTwoPathsAdditionalResistor)
     "begin_circuit BUF BUF\n"
     "net_mismatch INT $10\n"
     "match_nets IN IN\n"
+    "net_mismatch INT2 $11\n"
+    "match_nets OUT OUT\n"
+    "match_pins $0 $1\n"
+    "match_pins $1 $3\n"
+    "match_pins $2 $0\n"
+    "match_pins $3 $2\n"
+    "match_devices $1 $1\n"
+    "match_devices $3 $2\n"
+    "match_devices $5 $3\n"
+    "match_devices $7 $4\n"
+    "match_devices $2 $5\n"
+    "match_devices $4 $6\n"
+    "match_devices $6 $7\n"
+    "match_devices $8 $8\n"
+    "device_mismatch (null) $9\n"
+    "end_circuit BUF BUF NOMATCH"
+  );
+  EXPECT_EQ (good, false);
+
+  comp.set_depth_first (false);
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit BUF BUF\n"
+    "net_mismatch INT $10\n"
     "match_nets OUT OUT\n"
     "net_mismatch INT2 $11\n"
+    "match_nets IN IN\n"
     "match_pins $0 $1\n"
     "match_pins $1 $3\n"
     "match_pins $2 $0\n"
@@ -1266,6 +1305,7 @@ TEST(6_BufferTwoPathsAdditionalDevices)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -1274,9 +1314,9 @@ TEST(6_BufferTwoPathsAdditionalDevices)
     "match_nets INT $11\n"
     "net_mismatch VDD VDD\n"
     "match_nets IN IN\n"
+    "net_mismatch INT2 $10\n"
     "net_mismatch VSS VSS\n"
     "net_mismatch OUT OUT\n"
-    "net_mismatch INT2 $10\n"
     "match_pins $0 $1\n"
     "match_pins $1 $3\n"
     "match_pins $2 $0\n"
@@ -1318,6 +1358,7 @@ TEST(7_Resistors)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -1359,6 +1400,7 @@ TEST(7_ResistorsParameterMismatch)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -1401,6 +1443,7 @@ TEST(7_ResistorsPlusOneDevice)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -1443,6 +1486,7 @@ TEST(8_Diodes)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -1484,6 +1528,7 @@ TEST(8_DiodesDontMatchOnSwappedPins)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -1531,6 +1576,7 @@ TEST(10_SimpleSubCircuits)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -1593,6 +1639,7 @@ TEST(10_SimpleSubCircuitsMatchedNames)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
   EXPECT_EQ (good, false);
@@ -1761,22 +1808,22 @@ TEST(11_MismatchingSubcircuits)
   //  nets are now ambiguous
   EXPECT_EQ (xref2s (xref),
     "TOP:TOP [Match]:\n"
-    " pin $0:$0 [Match]\n"
-    " pin $1:$1 [Match]\n"
-    " pin $2:$2 [Match]\n"
+    " pin $0:$2 [Match]\n"
+    " pin $1:$0 [Match]\n"
+    " pin $2:$1 [Match]\n"
     " pin $3:$3 [Match]\n"
-    " net IN:OUT [MatchWithWarning]\n"
-    "  pin $0:$0\n"
-    "  subcircuit_pin (null):$1[$3]\n"
+    " net IN:IN [MatchWithWarning]\n"
+    "  pin $0:$2\n"
+    "  subcircuit_pin (null):$2[$1]\n"
     "  subcircuit_pin $1[$0]:(null)\n"
-    " net OUT:VDD [MatchWithWarning]\n"
-    "  pin $1:$1\n"
+    " net OUT:OUT [MatchWithWarning]\n"
+    "  pin $1:$0\n"
+    "  subcircuit_pin (null):$1[$3]\n"
+    "  subcircuit_pin $2[$1]:(null)\n"
+    " net VDD:VDD [MatchWithWarning]\n"
+    "  pin $2:$1\n"
     "  subcircuit_pin (null):$1[$0]\n"
     "  subcircuit_pin (null):$2[$0]\n"
-    "  subcircuit_pin $2[$1]:(null)\n"
-    " net VDD:IN [MatchWithWarning]\n"
-    "  pin $2:$2\n"
-    "  subcircuit_pin (null):$2[$1]\n"
     "  subcircuit_pin $1[$2]:(null)\n"
     "  subcircuit_pin $2[$2]:(null)\n"
     " net VSS:VSS [MatchWithWarning]\n"
@@ -1818,6 +1865,7 @@ TEST(12_MismatchingSubcircuitsDuplicates)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -1885,6 +1933,7 @@ TEST(13_MismatchingSubcircuitsAdditionalHierarchy)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -1952,6 +2001,7 @@ TEST(14_Subcircuit2Nand)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
   comp.equivalent_pins (nl2.circuit_by_name ("NAND"), 0, 1);
 
   bool good = comp.compare (&nl1, &nl2);
@@ -2026,6 +2076,7 @@ TEST(14_Subcircuit2NandMismatchNoSwap)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
   //  intentionally missing: comp.equivalent_pins (nl2.circuit_by_name ("NAND"), 0, 1);
 
   bool good = comp.compare (&nl1, &nl2);
@@ -2116,17 +2167,14 @@ TEST(14_Subcircuit2NandMismatchNoSwap)
     " pin $4:$4 [Match]\n"
     " net IN1:INT [Mismatch]\n"
     "  pin $0:(null)\n"
-    "  subcircuit_pin (null):$2[$2]\n"
-    "  subcircuit_pin $1[$0]:(null)\n"
+    "  subcircuit_pin $1[$0]:$2[$2]\n"
     "  subcircuit_pin $2[$0]:$1[$0]\n"
     " net IN2:IN2 [Mismatch]\n"
     "  pin $1:$1\n"
-    "  subcircuit_pin (null):$2[$0]\n"
-    "  subcircuit_pin $1[$1]:(null)\n"
+    "  subcircuit_pin $1[$1]:$2[$0]\n"
     " net INT:IN1 [Mismatch]\n"
     "  pin (null):$0\n"
-    "  subcircuit_pin (null):$2[$1]\n"
-    "  subcircuit_pin $1[$2]:(null)\n"
+    "  subcircuit_pin $1[$2]:$2[$1]\n"
     "  subcircuit_pin $2[$1]:$1[$1]\n"
     " net OUT:OUT [Match]\n"
     "  pin $2:$2\n"
@@ -2177,6 +2225,7 @@ TEST(14_Subcircuit2MatchWithSwap)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
   comp.equivalent_pins (nl2.circuit_by_name ("NAND"), 0, 1);
 
   bool good = comp.compare (&nl1, &nl2);
@@ -2256,6 +2305,7 @@ TEST(15_EmptySubCircuitTest)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -2331,6 +2381,7 @@ TEST(15_EmptySubCircuitWithoutPinNames)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -2413,6 +2464,7 @@ TEST(16_UniqueSubCircuitMatching)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -2552,8 +2604,8 @@ TEST(17_InherentlyAmbiguousDecoder)
     "match_ambiguous_nets NQ1 NQ1\n"
     "match_ambiguous_nets NQ2 NQ2\n"
     "match_nets NQ3 NQ3\n"
-    "match_ambiguous_nets NA NA\n"
-    "match_ambiguous_nets NB NB\n"
+    "match_nets NA NA\n"
+    "match_nets NB NB\n"
     "match_nets B B\n"
     "match_nets A A\n"
     "match_pins $0 $1\n"
@@ -2657,10 +2709,61 @@ TEST(17_InherentlyAmbiguousDecoder)
     "match_nets B B\n"
     "match_nets NB NB\n"
     "match_nets NA NA\n"
-    "match_nets NQ0 NQ0\n"
-    "match_nets NQ2 NQ2\n"
     "match_nets NQ1 NQ1\n"
     "match_nets NQ3 NQ3\n"
+    "match_nets NQ2 NQ2\n"
+    "match_nets NQ0 NQ0\n"
+    "match_pins $0 $1\n"
+    "match_pins $1 $0\n"
+    "match_pins $2 $2\n"
+    "match_pins $3 $3\n"
+    "match_pins $4 $4\n"
+    "match_pins $5 $5\n"
+    "match_pins $6 $6\n"
+    "match_pins $7 $7\n"
+    "match_subcircuits $1 $1\n"
+    "match_subcircuits $2 $2\n"
+    "match_subcircuits $4 $3\n"
+    "match_subcircuits $6 $4\n"
+    "match_subcircuits $3 $5\n"
+    "match_subcircuits $5 $6\n"
+    "end_circuit DECODER DECODER MATCH"
+  );
+
+  EXPECT_EQ (good, true);
+
+  comp.set_depth_first (false);
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit NAND NAND\n"
+    "match_nets VSS VSS\n"
+    "match_nets INT INT\n"
+    "match_nets OUT OUT\n"
+    "match_nets VDD VDD\n"
+    "match_nets B B\n"
+    "match_nets A A\n"
+    "match_pins $0 $0\n"
+    "match_pins $1 $1\n"
+    "match_pins $2 $2\n"
+    "match_pins $3 $3\n"
+    "match_pins $4 $4\n"
+    "match_devices $1 $1\n"
+    "match_devices $2 $2\n"
+    "match_devices $3 $3\n"
+    "match_devices $4 $4\n"
+    "end_circuit NAND NAND MATCH\n"
+    "begin_circuit DECODER DECODER\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets NA NA\n"
+    "match_nets NB NB\n"
+    "match_nets B B\n"
+    "match_nets NQ1 NQ1\n"
+    "match_nets NQ3 NQ3\n"
+    "match_nets NQ2 NQ2\n"
+    "match_nets NQ0 NQ0\n"
     "match_pins $0 $1\n"
     "match_pins $1 $0\n"
     "match_pins $2 $2\n"
@@ -2735,10 +2838,195 @@ TEST(18_ClockTree)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (false);
 
   bool good = comp.compare (&nl1, &nl2);
 
   std::string txt = logger.text ();
+  //  because L/R matching is ambiguous, we need to do this to
+  //  establish reproducability on different platforms:
+  txt = tl::replaced (txt, "L", "X");
+  txt = tl::replaced (txt, "R", "X");
+
+  EXPECT_EQ (txt,
+    "begin_circuit INV INV\n"
+    "match_nets VDD VDD\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_nets VSS VSS\n"
+    "match_pins IN IN\n"
+    "match_pins OUT OUT\n"
+    "match_pins VDD VDD\n"
+    "match_pins VSS VSS\n"
+    "match_devices $1 $1\n"
+    "match_devices $2 $2\n"
+    "end_circuit INV INV MATCH\n"
+    "begin_circuit TXEE TXEE\n"
+    "match_nets IN IN\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets S S\n"
+    "match_nets SX SX\n"
+    "match_nets SX SX\n"
+    "match_nets SXX SXX\n"
+    "match_nets SXX SXX\n"
+    "match_nets SXXX SXXX\n"
+    "match_nets SXXX SXXX\n"
+    "match_nets SXXX SXXX\n"
+    "match_nets SXXX SXXX\n"
+    "match_nets SXX SXX\n"
+    "match_nets SXX SXX\n"
+    "match_nets SXXX SXXX\n"
+    "match_nets SXXX SXXX\n"
+    "match_nets SXXX SXXX\n"
+    "match_nets SXXX SXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TX TX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits T T\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TX TX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXX TXX\n"
+    "end_circuit TXEE TXEE MATCH"
+  );
+  EXPECT_EQ (good, true);
+
+  logger.clear ();
+
+  comp.set_dont_consider_net_names (true);
+  good = comp.compare (&nl1, &nl2);
+
+  txt = logger.text ();
+  //  because L/R matching is ambiguous, we need to do this to
+  //  establish reproducability on different platforms:
+  txt = tl::replaced (txt, "L", "X");
+  txt = tl::replaced (txt, "R", "X");
+
+  EXPECT_EQ (txt,
+    "begin_circuit INV INV\n"
+    "match_nets VDD VDD\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_nets VSS VSS\n"
+    "match_pins IN IN\n"
+    "match_pins OUT OUT\n"
+    "match_pins VDD VDD\n"
+    "match_pins VSS VSS\n"
+    "match_devices $1 $1\n"
+    "match_devices $2 $2\n"
+    "end_circuit INV INV MATCH\n"
+    "begin_circuit TXEE TXEE\n"
+    "match_nets IN IN\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets S S\n"
+    "match_ambiguous_nets SX SX\n"
+    "match_ambiguous_nets SX SX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TX TX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits T T\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TX TX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXX TXX\n"
+    "end_circuit TXEE TXEE MATCH"
+  );
+  EXPECT_EQ (good, true);
+
+  comp.set_depth_first (false);
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  txt = logger.text ();
+  //  because L/R matching is ambiguous, we need to do this to
+  //  establish reproducability on different platforms:
+  txt = tl::replaced (txt, "L", "X");
+  txt = tl::replaced (txt, "R", "X");
+
+  EXPECT_EQ (txt,
+    "begin_circuit INV INV\n"
+    "match_nets VDD VDD\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_nets VSS VSS\n"
+    "match_pins IN IN\n"
+    "match_pins OUT OUT\n"
+    "match_pins VDD VDD\n"
+    "match_pins VSS VSS\n"
+    "match_devices $1 $1\n"
+    "match_devices $2 $2\n"
+    "end_circuit INV INV MATCH\n"
+    "begin_circuit TXEE TXEE\n"
+    "match_nets IN IN\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets S S\n"
+    "match_ambiguous_nets SX SX\n"
+    "match_ambiguous_nets SX SX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TX TX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits T T\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TX TX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXX TXX\n"
+    "end_circuit TXEE TXEE MATCH"
+  );
+  EXPECT_EQ (good, true);
+
+  comp.set_depth_first (false);
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  txt = logger.text ();
   //  because L/R matching is ambiguous, we need to do this to
   //  establish reproducability on different platforms:
   txt = tl::replaced (txt, "L", "X");
@@ -2903,6 +3191,7 @@ TEST(19_SymmetricCircuit)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -2922,24 +3211,123 @@ TEST(19_SymmetricCircuit)
     "match_nets g1 G1\n"
     "match_nets $44 YI\n"
     "match_nets $14 WELL\n"
-    "match_nets $8 NET215\n"
-    "match_nets $9 NET175\n"
-    "match_nets $6 NET181\n"
-    "match_nets $4 NET200\n"
-    "match_nets nn1 NN1\n"
+    "match_ambiguous_nets nn2 NN2\n"
+    "match_ambiguous_nets nn2_ NN2_\n"
+    "match_ambiguous_nets q0 Q0\n"
+    "match_ambiguous_nets q1 Q1\n"
     "match_nets $11 CS0\n"
-    "match_nets $13 CS1\n"
-    "match_nets nn2 NN2\n"
-    "match_nets nn2_ NN2_\n"
-    "match_nets q0 Q0\n"
-    "match_nets q1 Q1\n"
     "match_nets q0_ Q0_\n"
+    "match_nets $6 NET181\n"
+    "match_nets nn1 NN1\n"
+    "match_nets $8 NET215\n"
+    "match_nets $13 CS1\n"
     "match_nets q1_ Q1_\n"
-    "match_nets a0_ A0_\n"
-    "match_nets $34 HNET48\n"
-    "match_nets nn1_ NN1_\n"
     "match_nets a0 A0\n"
     "match_nets $35 HNET44\n"
+    "match_nets nn1_ NN1_\n"
+    "match_nets $9 NET175\n"
+    "match_nets $4 NET200\n"
+    "match_nets a0_ A0_\n"
+    "match_nets $34 HNET48\n"
+    "match_pins VDD VDD\n"
+    "match_pins nn1_ NN1_\n"
+    "match_pins nn1 NN1\n"
+    "match_pins q0 Q0\n"
+    "match_pins q0_ Q0_\n"
+    "match_pins q1_ Q1_\n"
+    "match_pins q1 Q1\n"
+    "match_pins nn2 NN2\n"
+    "match_pins nn2_ NN2_\n"
+    "match_pins a0 A0\n"
+    "match_pins a0_ A0_\n"
+    "match_pins g1 G1\n"
+    "match_pins g0 G0\n"
+    "match_pins gtp NN3\n"
+    "match_pins VSS VSS\n"
+    "match_pins WELL WELL\n"
+    "match_devices $30 0\n"
+    "match_devices $29 1\n"
+    "match_devices $9 10\n"
+    "match_devices $10 11\n"
+    "match_devices $36 12\n"
+    "match_devices $35 13\n"
+    "match_devices $34 14\n"
+    "match_devices $38 15\n"
+    "match_devices $37 16\n"
+    "match_devices $33 17\n"
+    "match_devices $27 18\n"
+    "match_devices $28 19\n"
+    "match_devices $17 2\n"
+    "match_devices $31 20\n"
+    "match_devices $32 21\n"
+    "match_devices $22 22\n"
+    "match_devices $26 23\n"
+    "match_devices $23 24\n"
+    "match_devices $43 25\n"
+    "match_devices $20 26\n"
+    "match_devices $25 27\n"
+    "match_devices $15 28\n"
+    "match_devices $14 29\n"
+    "match_devices $16 3\n"
+    "match_devices $18 30\n"
+    "match_devices $21 31\n"
+    "match_devices $13 32\n"
+    "match_devices $19 33\n"
+    "match_devices $7 34\n"
+    "match_devices $8 35\n"
+    "match_devices $24 36\n"
+    "match_devices $3 37\n"
+    "match_devices $6 38\n"
+    "match_devices $4 39\n"
+    "match_devices $39 4\n"
+    "match_devices $5 40\n"
+    "match_devices $2 41\n"
+    "match_devices $1 42\n"
+    "match_devices $40 5\n"
+    "match_devices $11 6\n"
+    "match_devices $12 7\n"
+    "match_devices $41 8\n"
+    "match_devices $42 9\n"
+    "end_circuit DECODE DECODE MATCH"
+  );
+  EXPECT_EQ (good, true);
+
+  comp.set_depth_first (false);
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit DECODE DECODE\n"
+    "match_nets $41 WL1_EN_\n"
+    "match_nets VDD VDD\n"
+    "match_nets $39 NET194\n"
+    "match_nets g0 G0\n"
+    "match_nets $40 HNET52\n"
+    "match_nets VSS VSS\n"
+    "match_nets $42 NET189\n"
+    "match_nets gtp NN3\n"
+    "match_nets $37 NET193\n"
+    "match_nets g1 G1\n"
+    "match_nets $44 YI\n"
+    "match_nets $14 WELL\n"
+    "match_ambiguous_nets nn2 NN2\n"
+    "match_ambiguous_nets nn2_ NN2_\n"
+    "match_ambiguous_nets q0 Q0\n"
+    "match_ambiguous_nets q1 Q1\n"
+    "match_nets $11 CS0\n"
+    "match_nets q0_ Q0_\n"
+    "match_nets $4 NET200\n"
+    "match_nets $13 CS1\n"
+    "match_nets q1_ Q1_\n"
+    "match_nets $9 NET175\n"
+    "match_nets a0 A0\n"
+    "match_nets a0_ A0_\n"
+    "match_nets $35 HNET44\n"
+    "match_nets $34 HNET48\n"
+    "match_nets $6 NET181\n"
+    "match_nets $8 NET215\n"
+    "match_nets nn1 NN1\n"
+    "match_nets nn1_ NN1_\n"
     "match_pins VDD VDD\n"
     "match_pins nn1_ NN1_\n"
     "match_pins nn1 NN1\n"
@@ -3060,10 +3448,158 @@ TEST(20_BusLikeConnections)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
   std::string txt = logger.text ();
+
+  EXPECT_EQ (txt,
+    "begin_circuit INV INV\n"
+    "match_nets VDD VDD\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_nets VSS VSS\n"
+    "match_pins IN IN\n"
+    "match_pins OUT OUT\n"
+    "match_pins VDD VDD\n"
+    "match_pins VSS VSS\n"
+    "match_devices $1 $1\n"
+    "match_devices $2 $2\n"
+    "end_circuit INV INV MATCH\n"
+    "begin_circuit INV8 INV8\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_ambiguous_nets IN1 A1\n"
+    "match_ambiguous_nets IN2 A2\n"
+    "match_ambiguous_nets IN3 A3\n"
+    "match_ambiguous_nets IN4 A4\n"
+    "match_ambiguous_nets IN5 A5\n"
+    "match_ambiguous_nets IN6 A6\n"
+    "match_ambiguous_nets IN7 A7\n"
+    "match_ambiguous_nets IN8 A8\n"
+    "match_nets OUT1 Q1\n"
+    "match_nets OUT2 Q2\n"
+    "match_nets OUT3 Q3\n"
+    "match_nets OUT4 Q4\n"
+    "match_nets OUT5 Q5\n"
+    "match_nets OUT6 Q6\n"
+    "match_nets OUT7 Q7\n"
+    "match_nets OUT8 Q8\n"
+    "match_pins IN1 A1\n"
+    "match_pins OUT1 Q1\n"
+    "match_pins IN2 A2\n"
+    "match_pins OUT2 Q2\n"
+    "match_pins IN3 A3\n"
+    "match_pins OUT3 Q3\n"
+    "match_pins IN4 A4\n"
+    "match_pins OUT4 Q4\n"
+    "match_pins IN5 A5\n"
+    "match_pins OUT5 Q5\n"
+    "match_pins IN6 A6\n"
+    "match_pins OUT6 Q6\n"
+    "match_pins IN7 A7\n"
+    "match_pins OUT7 Q7\n"
+    "match_pins IN8 A8\n"
+    "match_pins OUT8 Q8\n"
+    "match_pins VDD VDD\n"
+    "match_pins VSS VSS\n"
+    "match_subcircuits I1 I1\n"
+    "match_subcircuits I8 I8\n"
+    "match_subcircuits I3 I3\n"
+    "match_subcircuits I7 I7\n"
+    "match_subcircuits I4 I4\n"
+    "match_subcircuits I2 I2\n"
+    "match_subcircuits I6 I6\n"
+    "match_subcircuits I5 I5\n"
+    "end_circuit INV8 INV8 MATCH\n"
+    "begin_circuit INV8_WRAP INV8_WRAP\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets IN8 A8\n"
+    "match_nets OUT8 Q8\n"
+    "match_nets IN7 A7\n"
+    "match_nets OUT7 Q7\n"
+    "match_nets IN6 A6\n"
+    "match_nets OUT6 Q6\n"
+    "match_nets IN5 A5\n"
+    "match_nets OUT5 Q5\n"
+    "match_nets IN4 A4\n"
+    "match_nets OUT4 Q4\n"
+    "match_nets IN3 A3\n"
+    "match_nets OUT3 Q3\n"
+    "match_nets IN2 A2\n"
+    "match_nets OUT2 Q2\n"
+    "match_nets IN1 A1\n"
+    "match_nets OUT1 Q1\n"
+    "match_pins IN1 A1\n"
+    "match_pins OUT1 Q1\n"
+    "match_pins IN2 A2\n"
+    "match_pins OUT2 Q2\n"
+    "match_pins IN3 A3\n"
+    "match_pins OUT3 Q3\n"
+    "match_pins IN4 A4\n"
+    "match_pins OUT4 Q4\n"
+    "match_pins IN5 A5\n"
+    "match_pins OUT5 Q5\n"
+    "match_pins IN6 A6\n"
+    "match_pins OUT6 Q6\n"
+    "match_pins IN7 A7\n"
+    "match_pins OUT7 Q7\n"
+    "match_pins IN8 A8\n"
+    "match_pins OUT8 Q8\n"
+    "match_pins VDD VDD\n"
+    "match_pins VSS VSS\n"
+    "match_subcircuits INV8 INV8\n"
+    "end_circuit INV8_WRAP INV8_WRAP MATCH\n"
+    "begin_circuit TOP TOP\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets IN8 A8\n"
+    "match_nets OUT8 Q8\n"
+    "match_nets IN7 A7\n"
+    "match_nets OUT7 Q7\n"
+    "match_nets IN6 A6\n"
+    "match_nets OUT6 Q6\n"
+    "match_nets IN5 A5\n"
+    "match_nets OUT5 Q5\n"
+    "match_nets IN4 A4\n"
+    "match_nets OUT4 Q4\n"
+    "match_nets IN3 A3\n"
+    "match_nets OUT3 Q3\n"
+    "match_nets IN2 A2\n"
+    "match_nets OUT2 Q2\n"
+    "match_nets IN1 A1\n"
+    "match_nets OUT1 Q1\n"
+    "match_pins IN1 A1\n"
+    "match_pins OUT1 Q1\n"
+    "match_pins IN2 A2\n"
+    "match_pins OUT2 Q2\n"
+    "match_pins IN3 A3\n"
+    "match_pins OUT3 Q3\n"
+    "match_pins IN4 A4\n"
+    "match_pins OUT4 Q4\n"
+    "match_pins IN5 A5\n"
+    "match_pins OUT5 Q5\n"
+    "match_pins IN6 A6\n"
+    "match_pins OUT6 Q6\n"
+    "match_pins IN7 A7\n"
+    "match_pins OUT7 Q7\n"
+    "match_pins IN8 A8\n"
+    "match_pins OUT8 Q8\n"
+    "match_pins VDD VDD\n"
+    "match_pins VSS VSS\n"
+    "match_subcircuits INV8 INV8\n"
+    "end_circuit TOP TOP MATCH"
+  );
+  EXPECT_EQ (good, true);
+
+  logger.clear ();
+
+  comp.set_dont_consider_net_names (false);
+  good = comp.compare (&nl1, &nl2);
+
+  txt = logger.text ();
 
   EXPECT_EQ (txt,
     "begin_circuit INV INV\n"
@@ -3240,6 +3776,7 @@ TEST(21_BusLikeAmbiguousConnections)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -3412,6 +3949,7 @@ TEST(22_NodesRemoved)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -3532,6 +4070,7 @@ TEST(23_NodesRemovedWithError)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -3631,6 +4170,7 @@ TEST(24_NodesRemovedButConnectedInOther)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -3722,6 +4262,7 @@ TEST(25_JoinSymmetricNets)
 
   db::NetlistComparer comp;
   comp.join_symmetric_nets (nl.circuit_by_name ("NAND2"));
+  comp.set_dont_consider_net_names (true);
 
   //  NOTE $1 and $2 are joined because they are symmetric
   EXPECT_EQ (nl.to_string (),
@@ -3760,6 +4301,7 @@ TEST(25b_JoinSymmetricNetsMultiple)
 
   db::NetlistComparer comp;
   comp.join_symmetric_nets (nl.circuit_by_name ("NAND3"));
+  comp.set_dont_consider_net_names (true);
 
   nl.combine_devices ();
 
@@ -3799,17 +4341,18 @@ TEST(25c_JoinSymmetricNetsMultipleMessedUp)
 
   db::NetlistComparer comp;
   comp.join_symmetric_nets (nl.circuit_by_name ("NOR3"));
+  comp.set_dont_consider_net_names (true);
 
   nl.combine_devices ();
 
   //  NOTE $1 and $2 are joined because they are symmetric
   EXPECT_EQ (nl.to_string (),
     "circuit NOR3 (A=A,C=C,B=B,OUT=OUT,VSS=VSS,VDD=VDD);\n"
-    "  device PMOS $1 (S=$5,G=B,D=$3) (L=0.27,W=3.3,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $1 (S=$6,G=B,D=$3) (L=0.27,W=3.3,AS=0,AD=0,PS=0,PD=0);\n"
     "  device NMOS $2 (S=OUT,G=A,D=VSS) (L=0.23,W=2.05,AS=0,AD=0,PS=0,PD=0);\n"
     "  device PMOS $3 (S=$3,G=A,D=OUT) (L=0.27,W=3.3,AS=0,AD=0,PS=0,PD=0);\n"
     "  device NMOS $4 (S=OUT,G=B,D=VSS) (L=0.23,W=2.05,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device PMOS $8 (S=VDD,G=C,D=$5) (L=0.27,W=3.3,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $8 (S=VDD,G=C,D=$6) (L=0.27,W=3.3,AS=0,AD=0,PS=0,PD=0);\n"
     "  device NMOS $12 (S=VSS,G=C,D=OUT) (L=0.23,W=2.05,AS=0,AD=0,PS=0,PD=0);\n"
     "end;\n"
   )
@@ -3838,6 +4381,7 @@ TEST(26_JoinSymmetricNets)
 
   db::NetlistComparer comp;
   comp.join_symmetric_nets (nl.circuit_by_name ("RESCUBE"));
+  comp.set_dont_consider_net_names (true);
 
   EXPECT_EQ (nl.to_string (),
     "circuit RESCUBE (A=A,B=B);\n"
@@ -3882,6 +4426,7 @@ TEST(27_DontJoinSymmetricNetsWithPins)
 
   db::NetlistComparer comp;
   comp.join_symmetric_nets (nl.circuit_by_name ("NAND2"));
+  comp.set_dont_consider_net_names (true);
 
   //  NOTE $1 and $2 are NOT joined because they have pins
   EXPECT_EQ (nl.to_string (),
@@ -3914,6 +4459,8 @@ TEST(28_NoSymmetryDetectionCases)
     prep_nl (nl, nls);
 
     db::NetlistComparer comp;
+    comp.set_dont_consider_net_names (true);
+
     std::string sref = nl.to_string ();
     comp.join_symmetric_nets (nl.circuit_by_name ("NAND2"));
 
@@ -3936,6 +4483,8 @@ TEST(28_NoSymmetryDetectionCases)
     prep_nl (nl, nls);
 
     db::NetlistComparer comp;
+    comp.set_dont_consider_net_names (true);
+
     std::string sref = nl.to_string ();
     comp.join_symmetric_nets (nl.circuit_by_name ("NAND2"));
 
@@ -3965,6 +4514,7 @@ TEST(28_JoinSymmetricNets)
   prep_nl (nl, nls);
 
   db::NetlistComparer comp;
+  comp.set_dont_consider_net_names (true);
   comp.join_symmetric_nets (nl.circuit_by_name ("INV2LOAD"));
 
   //  NOTE $1 and $2 are joined because they are symmetric

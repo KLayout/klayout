@@ -709,8 +709,11 @@ public:
    *
    *  This variant accepts a micrometer-unit location. The location is given in the
    *  coordinate space of the initial cell.
+   *
+   *  The subcircuit path leading to the topmost net is stored in *sc_path_out if this
+   *  pointer is non-null.
    */
-  db::Net *probe_net (const db::Region &of_region, const db::DPoint &point);
+  db::Net *probe_net (const db::Region &of_region, const db::DPoint &point, std::vector<SubCircuit *> *sc_path_out = 0, Circuit *initial_circuit = 0);
 
   /**
    *  @brief Finds the net by probing a specific location on the given layer
@@ -718,7 +721,7 @@ public:
    *  This variant accepts a database-unit location. The location is given in the
    *  coordinate space of the initial cell.
    */
-  db::Net *probe_net (const db::Region &of_region, const db::Point &point);
+  db::Net *probe_net (const db::Region &of_region, const db::Point &point, std::vector<SubCircuit *> *sc_path_out = 0, Circuit *initial_circuit = 0);
 
   /**
    *  @brief Runs an antenna check on the extracted clusters

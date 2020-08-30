@@ -136,7 +136,7 @@ module Test
         end
 
         @@attribute_observers = StringifyKeyHash.new
-        def register_attribute_observer(attribute_name, observer=Proc.new)
+        def register_attribute_observer(attribute_name, &observer)
           @@attribute_observers[attribute_name] ||= []
           @@attribute_observers[attribute_name] << observer
         end

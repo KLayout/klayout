@@ -1019,7 +1019,7 @@ InputPipe::read (char *b, size_t n)
   size_t ret = fread (b, 1, n, m_file);
   if (ret < n) {
     if (ferror (m_file)) {
-      throw FilePReadErrorException (m_source, ferror (m_file));
+      throw FilePReadErrorException (m_source, errno);
     }
   }
 
@@ -1049,7 +1049,7 @@ OutputPipe::OutputPipe (const std::string &path)
 OutputPipe::~OutputPipe ()
 {
   if (m_file != NULL) {
-    fclose (m_file);
+    _pclose (m_file);
     m_file = NULL;
   }
 }
@@ -1061,7 +1061,7 @@ OutputPipe::write (const char *b, size_t n)
   size_t ret = fwrite (b, 1, n, m_file);
   if (ret < n) {
     if (ferror (m_file)) {
-      throw FilePWriteErrorException (m_source, ferror (m_file));
+      throw FilePWriteErrorException (m_source, errno);
     }
   }
 }
@@ -1106,10 +1106,22 @@ size_t
 InputPipe::read (char *b, size_t n)
 {
   tl_assert (m_file != NULL);
-  size_t ret = fread (b, 1, n, m_file);
-  if (ret < n) {
-    if (ferror (m_file)) {
-      throw FilePReadErrorException (m_source, ferror (m_file));
+
+  bool retry = true;
+  size_t ret = 0;
+
+  while (retry) {
+    retry = false;
+    ret = fread (b, 1, n, m_file);
+    if (ret < n) {
+      if (ferror (m_file)) {
+        if (errno != EINTR) {
+          throw FilePReadErrorException (m_source, errno);
+        } else if (ret == 0) {
+          retry = true;
+          clearerr (m_file);
+        }
+      }
     }
   }
 
@@ -1138,7 +1150,7 @@ OutputPipe::OutputPipe (const std::string &path)
 OutputPipe::~OutputPipe ()
 {
   if (m_file != NULL) {
-    fclose (m_file);
+    pclose (m_file);
     m_file = NULL;
   }  
 }
@@ -1147,10 +1159,11 @@ void
 OutputPipe::write (const char *b, size_t n)
 {
   tl_assert (m_file != NULL);
+
   size_t ret = fwrite (b, 1, n, m_file);
   if (ret < n) {
-    if (ferror (m_file)) {
-      throw FilePWriteErrorException (m_source, ferror (m_file));
+    if (ferror (m_file) && errno != EINTR) {
+      throw FilePReadErrorException (m_source, errno);
     }
   }
 }

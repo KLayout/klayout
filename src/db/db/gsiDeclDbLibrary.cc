@@ -78,7 +78,35 @@ static std::string get_technology (db::Library *lib)
   }
 }
 
-Class<db::Library> decl_Library ("db", "Library",
+static void destroy_lib (db::Library *lib)
+{
+  if (db::LibraryManager::instance ().lib_ptr_by_name (lib->get_name ()) == lib) {
+    //  Library is registered -> do not delete
+  } else {
+    delete lib;
+  }
+}
+
+namespace {
+
+class LibraryClass
+  : public Class<db::Library>
+{
+public:
+  LibraryClass (const char *module, const char *name, const gsi::Methods &methods, const char *description)
+    : Class<db::Library> (module, name, methods, description)
+  { }
+
+  virtual void destroy (void *p) const
+  {
+    db::Library *lib = reinterpret_cast<db::Library *> (p);
+    destroy_lib (lib);
+  }
+};
+
+}
+
+LibraryClass decl_Library ("db", "Library",
   gsi::constructor ("new", &new_lib,
     "@brief Creates a new, empty library"
   ) +

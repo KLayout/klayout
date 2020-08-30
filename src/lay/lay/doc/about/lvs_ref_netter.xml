@@ -85,6 +85,18 @@ corresponding circuits: the unpaired circuit will be flattened then.
 This method will return true, if the netlists are equivalent and false
 otherwise.
 </p>
+<a name="consider_net_names"/><h2>"consider_net_names" - Indicates whether the netlist comparer shall use net names</h2>
+<keyword name="consider_net_names"/>
+<p>Usage:</p>
+<ul>
+<li><tt>consider_net_names(f)</tt></li>
+</ul>
+<p>
+If this value is set to true (the default), the netlist comparer
+will employ net names to resolve ambiguities. If set to false,
+ambiguities will be resolved based on the topology alone. Topology
+resolution is more expensive.
+</p>
 <a name="equivalent_pins"/><h2>"equivalent_pins" - Marks pins as equivalent</h2>
 <keyword name="equivalent_pins"/>
 <p>Usage:</p>

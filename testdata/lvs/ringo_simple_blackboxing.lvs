@@ -83,5 +83,7 @@ netlist.purge
 netlist.combine_devices
 netlist.purge_nets
 
+consider_net_names(false)
+
 compare
 

@@ -119,6 +119,17 @@ const Net *SubCircuit::net_for_pin (size_t pin_id) const
   return 0;
 }
 
+const NetSubcircuitPinRef *SubCircuit::netref_for_pin (size_t pin_id) const
+{
+  if (pin_id < m_pin_refs.size ()) {
+    Net::subcircuit_pin_iterator p = m_pin_refs [pin_id];
+    if (p != Net::subcircuit_pin_iterator ()) {
+      return p.operator-> ();
+    }
+  }
+  return 0;
+}
+
 void SubCircuit::connect_pin (size_t pin_id, Net *net)
 {
   if (net_for_pin (pin_id) == net) {

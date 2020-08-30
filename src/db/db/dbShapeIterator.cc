@@ -546,9 +546,13 @@ ShapeIterator::advance_aref (int &mode)
 
   if (mode && m_array_iterator_valid) {
 
-    if (mode > 0) {
+    if (mode == 1) {
       array_iterator *arr_iter = (array_iterator *) m_ad.iter;
       ++*arr_iter;
+    } else if (mode == 2) {
+      //  skip array quad -> skip rest of array quad and move to shape in the next quad or to end
+      do_skip_array_quad ();
+      mode = 1;
     } else {
       //  skip quad -> skip rest of array and move to next shape array
       skip_array ();  //  sets m_array_iterator_valid = false
@@ -810,7 +814,98 @@ ShapeIterator::quad_box () const
       return quad_box_generic<OverlappingRegionTag, db::unstable_layer_tag> ();
     }
   }
+
   return db::Box ();
+}
+
+template <class Iter>
+void
+ShapeIterator::do_skip_array_quad_iter ()
+{
+  Iter *arr_iter = (Iter *) m_ad.iter;
+  arr_iter->skip_quad ();
+}
+
+void
+ShapeIterator::do_skip_array_quad ()
+{
+  if (m_array_iterator_valid) {
+    if (m_type == PolygonPtrArray) {
+      do_skip_array_quad_iter<polygon_ptr_array_iterator_type> ();
+    } else if (m_type == SimplePolygonPtrArray) {
+      do_skip_array_quad_iter<simple_polygon_ptr_array_iterator_type> ();
+    } else if (m_type == PathPtrArray) {
+      do_skip_array_quad_iter<path_ptr_array_iterator_type> ();
+    } else if (m_type == TextPtrArray) {
+      do_skip_array_quad_iter<text_ptr_array_iterator_type> ();
+    } else if (m_type == BoxArray) {
+      do_skip_array_quad_iter<box_array_iterator_type> ();
+    } else if (m_type == ShortBoxArray) {
+      do_skip_array_quad_iter<short_box_array_iterator_type> ();
+    }
+  }
+}
+
+template <class Iter>
+size_t
+ShapeIterator::get_array_quad_id () const
+{
+  Iter *arr_iter = (Iter *) m_ad.iter;
+  return arr_iter->quad_id ();
+}
+
+size_t
+ShapeIterator::array_quad_id () const
+{
+  if (m_array_iterator_valid) {
+    if (m_type == PolygonPtrArray) {
+      return get_array_quad_id<polygon_ptr_array_iterator_type> ();
+    } else if (m_type == SimplePolygonPtrArray) {
+      return get_array_quad_id<simple_polygon_ptr_array_iterator_type> ();
+    } else if (m_type == PathPtrArray) {
+      return get_array_quad_id<path_ptr_array_iterator_type> ();
+    } else if (m_type == TextPtrArray) {
+      return get_array_quad_id<text_ptr_array_iterator_type> ();
+    } else if (m_type == BoxArray) {
+      return get_array_quad_id<box_array_iterator_type> ();
+    } else if (m_type == ShortBoxArray) {
+      return get_array_quad_id<short_box_array_iterator_type> ();
+    }
+  }
+
+  return 0;
+}
+
+template <class Iter, class Array>
+db::Box
+ShapeIterator::get_array_quad_box () const
+{
+  const Array *arr = m_array.basic_ptr (typename Array::tag ());
+  Iter *arr_iter = (Iter *) m_ad.iter;
+  db::box_convert<typename Array::object_type> bc;
+  return arr->quad_box (*arr_iter, bc);
+}
+
+db::Box
+ShapeIterator::array_quad_box () const
+{
+  if (m_array_iterator_valid) {
+    if (m_type == PolygonPtrArray) {
+      return get_array_quad_box<polygon_ptr_array_iterator_type, polygon_ptr_array_type> ();
+    } else if (m_type == SimplePolygonPtrArray) {
+      return get_array_quad_box<simple_polygon_ptr_array_iterator_type, simple_polygon_ptr_array_type> ();
+    } else if (m_type == PathPtrArray) {
+      return get_array_quad_box<path_ptr_array_iterator_type, path_ptr_array_type> ();
+    } else if (m_type == TextPtrArray) {
+      return get_array_quad_box<text_ptr_array_iterator_type, text_ptr_array_type> ();
+    } else if (m_type == BoxArray) {
+      return get_array_quad_box<box_array_iterator_type, box_array_type> ();
+    } else if (m_type == ShortBoxArray) {
+      return get_array_quad_box<short_box_array_iterator_type, short_box_array_type> ();
+    }
+  }
+
+  return db::Box::world ();
 }
 
 void

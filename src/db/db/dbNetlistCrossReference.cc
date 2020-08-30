@@ -55,6 +55,39 @@ NetlistCrossReference::per_circuit_data_for (const std::pair<const db::Circuit *
   return 0;
 }
 
+const db::Pin *
+NetlistCrossReference::other_pin_for (const db::Pin *pin) const
+{
+  std::map<const db::Pin *, const db::Pin *>::const_iterator i = m_other_pin.find (pin);
+  if (i != m_other_pin.end ()) {
+    return i->second;
+  } else {
+    return 0;
+  }
+}
+
+const db::Device *
+NetlistCrossReference::other_device_for (const db::Device *device) const
+{
+  std::map<const db::Device *, const db::Device *>::const_iterator i = m_other_device.find (device);
+  if (i != m_other_device.end ()) {
+    return i->second;
+  } else {
+    return 0;
+  }
+}
+
+const db::SubCircuit *
+NetlistCrossReference::other_subcircuit_for (const db::SubCircuit *subcircuit) const
+{
+  std::map<const db::SubCircuit *, const db::SubCircuit *>::const_iterator i = m_other_subcircuit.find (subcircuit);
+  if (i != m_other_subcircuit.end ()) {
+    return i->second;
+  } else {
+    return 0;
+  }
+}
+
 const db::Circuit *
 NetlistCrossReference::other_circuit_for (const db::Circuit *circuit) const
 {
@@ -566,6 +599,16 @@ NetlistCrossReference::build_subcircuit_pin_refs (const std::pair<const db::Net 
           s2t_b.erase (b);
         }
 
+      }
+
+      //  Fallback for swappable pins: match based on the subcircuit alone
+      if (! pb) {
+        std::map<std::pair<const db::SubCircuit *, size_t>, const db::NetSubcircuitPinRef *>::iterator b = s2t_b.lower_bound (std::make_pair (sb, 0));
+        if (b != s2t_b.end () && b->first.first == sb) {
+          pb = b->second;
+          //  remove the entry so we won't find it again
+          s2t_b.erase (b);
+        }
       }
 
     }

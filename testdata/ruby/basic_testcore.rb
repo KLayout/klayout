@@ -832,6 +832,7 @@ class Basic_TestClass < TestBase
 
   end
 
+  # TODO: this class is going to be deprecated
   class X < Data
   end
   class Y < Object
@@ -1401,6 +1402,12 @@ class Basic_TestClass < TestBase
       a = RBA::A.a20_get
       a._manage
     end
+
+    # Looks like Ruby is keeping the last A instance in some kind of cache:
+    # this will release it
+    a = RBA::A.new
+    a._destroy
+    a = nil
 
     # makes sure the objects inside the block before are deleted
     GC.start

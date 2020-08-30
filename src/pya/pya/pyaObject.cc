@@ -306,7 +306,11 @@ PYAObjectBase::detach ()
       }
     }
 
-    detach_callbacks ();
+    //  NOTE: m_owned = false might mean the C++ object is already destroyed. We must not
+    //  modify in this case and without is_managed() there is no way of knowing the state.
+    if (m_owned) {
+      detach_callbacks ();
+    }
 
     m_obj = 0;
     m_const_ref = false;

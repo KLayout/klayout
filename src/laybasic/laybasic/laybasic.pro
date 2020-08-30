@@ -183,7 +183,8 @@ SOURCES = \
     layGenericSyntaxHighlighter.cc \
     layDispatcher.cc \
     laySelectCellViewForm.cc \
-    layLayoutStatisticsForm.cc
+    layLayoutStatisticsForm.cc \
+    gsiDeclLayNetlistBrowserDialog.cc
 
 HEADERS = \
   gtf.h \

@@ -236,67 +236,73 @@ SingleIndexedNetlistModel::top_circuit_count () const
 size_t
 SingleIndexedNetlistModel::net_count (const circuit_pair &circuits) const
 {
-  return circuits.first->net_count ();
+  return circuits.first ? circuits.first->net_count () : 0;
 }
 
 size_t
 SingleIndexedNetlistModel::net_terminal_count (const net_pair &nets) const
 {
-  return nets.first->terminal_count ();
+  return nets.first ? nets.first->terminal_count () : 0;
 }
 
 size_t
 SingleIndexedNetlistModel::net_subcircuit_pin_count (const net_pair &nets) const
 {
-  return nets.first->subcircuit_pin_count ();
+  return nets.first ? nets.first->subcircuit_pin_count () : 0;
 }
 
 size_t
 SingleIndexedNetlistModel::net_pin_count (const net_pair &nets) const
 {
-  return nets.first->pin_count ();
+  return nets.first ? nets.first->pin_count () : 0;
 }
 
 size_t
 SingleIndexedNetlistModel::device_count (const circuit_pair &circuits) const
 {
-  return circuits.first->device_count ();
+  return circuits.first ? circuits.first->device_count () : 0;
+}
+
+size_t
+SingleIndexedNetlistModel::subcircuit_pin_count (const subcircuit_pair &subcircuits) const
+{
+  return subcircuits.first ? subcircuits.first->circuit_ref ()->pin_count () : 0;
 }
 
 size_t
 SingleIndexedNetlistModel::pin_count (const circuit_pair &circuits) const
 {
-  return circuits.first->pin_count ();
+  return circuits.first ? circuits.first->pin_count () : 0;
 }
 
 size_t
 SingleIndexedNetlistModel::subcircuit_count (const circuit_pair &circuits) const
 {
-  return circuits.first->subcircuit_count ();
+  return circuits.first ? circuits.first->subcircuit_count () : 0;
 }
 
 size_t
 SingleIndexedNetlistModel::child_circuit_count (const circuit_pair &circuits) const
 {
-  return circuits.first->end_children () - circuits.first->begin_children ();
+  return circuits.first ? (circuits.first->end_children () - circuits.first->begin_children ()) : 0;
 }
 
 IndexedNetlistModel::circuit_pair
 SingleIndexedNetlistModel::parent_of (const net_pair &nets) const
 {
-  return std::make_pair (nets.first->circuit (), (const db::Circuit *) 0);
+  return std::make_pair (nets.first ? nets.first->circuit () : 0, (const db::Circuit *) 0);
 }
 
 IndexedNetlistModel::circuit_pair
 SingleIndexedNetlistModel::parent_of (const device_pair &devices) const
 {
-  return std::make_pair (devices.first->circuit (), (const db::Circuit *) 0);
+  return std::make_pair (devices.first ? devices.first->circuit () : 0, (const db::Circuit *) 0);
 }
 
 IndexedNetlistModel::circuit_pair
 SingleIndexedNetlistModel::parent_of (const subcircuit_pair &subcircuits) const
 {
-  return std::make_pair (subcircuits.first->circuit (), (const db::Circuit *) 0);
+  return std::make_pair (subcircuits.first ? subcircuits.first->circuit () : 0, (const db::Circuit *) 0);
 }
 
 std::pair<IndexedNetlistModel::circuit_pair, IndexedNetlistModel::Status>
@@ -344,6 +350,34 @@ SingleIndexedNetlistModel::net_subcircuit_pinref_from_index (const net_pair &net
 {
   db::Net::const_subcircuit_pin_iterator none;
   return attr_by_object_and_index (nets, index, nets.first->begin_subcircuit_pins (), nets.first->end_subcircuit_pins (), none, none, m_subcircuit_pinref_by_net_and_index, sort_by_pin_name<db::NetSubcircuitPinRef> ());
+}
+
+IndexedNetlistModel::net_subcircuit_pin_pair
+SingleIndexedNetlistModel::subcircuit_pinref_from_index (const subcircuit_pair &subcircuits, size_t index) const
+{
+  if (! subcircuits.first) {
+    return IndexedNetlistModel::net_subcircuit_pin_pair ((const db::NetSubcircuitPinRef *) 0, (const db::NetSubcircuitPinRef *) 0);
+  }
+
+  std::map<subcircuit_pair, std::vector<net_subcircuit_pin_pair> >::iterator i = m_subcircuit_pins_by_index.find (subcircuits);
+  if (i == m_subcircuit_pins_by_index.end ()) {
+
+    i = m_subcircuit_pins_by_index.insert (std::make_pair (subcircuits, std::vector<net_subcircuit_pin_pair> ())).first;
+
+    std::vector<net_subcircuit_pin_pair> &refs = i->second;
+    const db::Circuit *circuit = subcircuits.first->circuit_ref ();
+    for (db::Circuit::const_pin_iterator p = circuit->begin_pins (); p != circuit->end_pins (); ++p) {
+      const db::NetSubcircuitPinRef *ref = subcircuits.first->netref_for_pin (p->id ());
+      if (! ref) {
+        m_synthetic_pinrefs.push_back (db::NetSubcircuitPinRef (const_cast<db::SubCircuit *> (subcircuits.first), p->id ()));
+        ref = & m_synthetic_pinrefs.back ();
+      }
+      refs.push_back (net_subcircuit_pin_pair (ref, (const db::NetSubcircuitPinRef *) 0));
+    }
+
+  }
+
+  return index < i->second.size () ? i->second [index] : IndexedNetlistModel::net_subcircuit_pin_pair ((const db::NetSubcircuitPinRef *) 0, (const db::NetSubcircuitPinRef *) 0);
 }
 
 IndexedNetlistModel::net_terminal_pair

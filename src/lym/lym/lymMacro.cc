@@ -33,6 +33,7 @@
 #include "tlLog.h"
 #include "tlXMLParser.h"
 #include "tlGlobPattern.h"
+#include "tlInclude.h"
 
 #include "rba.h"
 #include "pya.h"
@@ -1020,20 +1021,28 @@ int Macro::run () const
   }
 
   try {
+
     gsi::Interpreter *ip = script_interpreter (interpreter ());
     if (ip) {
+
       if (! prolog ().empty ()) {
         ip->eval_string (prolog ().c_str ());
       }
-      ip->eval_string (text ().c_str (), path ().c_str (), 1);
+
+      std::string expanded_text;
+      tl::IncludeExpander ie = tl::IncludeExpander::expand (path (), text (), expanded_text);
+      ip->eval_string (expanded_text.c_str (), ie.to_string ().c_str (), 1);
+
       if (! epilog ().empty ()) {
         ip->eval_string (epilog ().c_str ());
       }
+
     } else if (interpreter () == lym::Macro::DSLInterpreter) {
       lym::MacroInterpreter::execute_macro (this);
     } else {
       throw tl::Exception (tl::to_string (tr ("Can't run macro (no interpreter): ")) + path ());
     }
+
   } catch (tl::ExitException &ex) {
     return ex.status ();
   }

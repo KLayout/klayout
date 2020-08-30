@@ -8,7 +8,6 @@ DEFINES += MAKE_LYM_LIBRARY
 
 SOURCES = \
   gsiDeclLymMacro.cc \
-  lymInclude.cpp \
   lymMacroInterpreter.cc \
   lymMacro.cc \
 

@@ -20,7 +20,7 @@
 
 */
 
-#include "lymInclude.h"
+#include "tlInclude.h"
 
 #include "tlAssert.h"
 #include "tlString.h"
@@ -29,7 +29,7 @@
 #include "tlExpression.h"
 #include "tlUri.h"
 
-namespace lym
+namespace tl
 {
 
 static const char *valid_fn_chars = "@_:,.\\/-+";
@@ -44,16 +44,27 @@ IncludeExpander::expand (const std::string &path, std::string &expanded_text)
 {
   IncludeExpander ie;
   int lc = 1;
-  read (path, expanded_text, ie, lc);
+  tl::InputStream is (path);
+  ie.read (path, is, expanded_text, ie, lc);
+  return ie;
+}
+
+IncludeExpander
+IncludeExpander::expand (const std::string &path, const std::string &original_text, std::string &expanded_text)
+{
+  IncludeExpander ie;
+  int lc = 1;
+  tl::InputMemoryStream ms (original_text.c_str (), original_text.size ());
+  tl::InputStream is (ms);
+  ie.read (path, is, expanded_text, ie, lc);
   return ie;
 }
 
 void
-IncludeExpander::read (const std::string &path, std::string &expanded_text, IncludeExpander &ie, int &line_counter)
+IncludeExpander::read (const std::string &path, tl::InputStream &is, std::string &expanded_text, IncludeExpander &ie, int &line_counter)
 {
   ie.m_sections [line_counter] = std::make_pair (path, 1 - line_counter);
 
-  tl::InputStream is (path);
   tl::TextInputStream text (is);
 
   int lnum = 0;
@@ -83,7 +94,8 @@ IncludeExpander::read (const std::string &path, std::string &expanded_text, Incl
         include_path = current_uri.resolved (new_uri).to_string ();
       }
 
-      read (include_path, expanded_text, ie, line_counter);
+      tl::InputStream is (include_path);
+      read (include_path, is, expanded_text, ie, line_counter);
 
       emit_section = true;
 
@@ -125,7 +137,7 @@ IncludeExpander::to_string () const
 
     for (std::map<int, std::pair<std::string, int> >::const_iterator m = m_sections.begin (); m != m_sections.end (); ++m) {
       res += tl::to_string (m->first);
-      res += ":";
+      res += "*";
       res += tl::to_word_or_quoted_string (m->second.first, valid_fn_chars);
       res += "*";
       res += tl::to_string (m->second.second);
@@ -153,7 +165,7 @@ IncludeExpander::from_string (const std::string &s)
 
       std::pair<std::string, int> &si = ie.m_sections [ln];
 
-      ex.expect (":");
+      ex.expect ("*");
       ex.read_word_or_quoted (si.first, valid_fn_chars);
       ex.expect ("*");
       ex.read (si.second);

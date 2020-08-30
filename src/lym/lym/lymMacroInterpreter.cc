@@ -27,6 +27,7 @@
 #include "tlInternational.h"
 #include "tlException.h"
 #include "tlClassRegistry.h"
+#include "tlInclude.h"
 
 namespace lym
 {
@@ -48,13 +49,39 @@ MacroInterpreter::can_run (const lym::Macro *macro)
   return false;
 }
 
+std::pair<std::string, std::string>
+MacroInterpreter::include_expansion (const lym::Macro *macro)
+{
+  std::pair<std::string, std::string> res;
+  res.first = tl::IncludeExpander::expand (macro->path (), macro->text (), res.second).to_string ();
+  return res;
+}
+
 void 
 MacroInterpreter::execute_macro (const lym::Macro *macro)
 {
   for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
+
     if (cls.current_name () == macro->dsl_interpreter ()) {
-      cls->execute (macro);
+
+      std::pair<std::string, std::string> et = cls->include_expansion (macro);
+      if (et.first.empty () || et.first == macro->path ()) {
+
+        cls->execute (macro);
+
+      } else {
+
+        //  provide a copy which takes the include-expanded version
+        lym::Macro tmp_macro;
+        tmp_macro.assign (*macro);
+        tmp_macro.set_text (et.second);
+        tmp_macro.set_file_path (et.first);
+        cls->execute (&tmp_macro);
+
+      }
+
       return;
+
     }
   }
 

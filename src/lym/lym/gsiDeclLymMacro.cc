@@ -30,6 +30,7 @@
 
 #include "tlClassRegistry.h"
 #include "tlFileUtils.h"
+#include "tlInclude.h"
 
 #include <cstdio>
 
@@ -101,7 +102,7 @@ class MacroInterpreter
 public:
   MacroInterpreter ()
     : lym::MacroInterpreter (), 
-      mp_registration (0) 
+      mp_registration (0), m_supports_include_expansion (true)
   {
     m_suffix = lym::MacroInterpreter::suffix ();
     m_description = lym::MacroInterpreter::description ();
@@ -118,6 +119,15 @@ public:
       delete *t;
     }
     m_templates.clear ();
+  }
+
+  std::pair<std::string, std::string> include_expansion (const lym::Macro *macro)
+  {
+    if (m_supports_include_expansion) {
+      return MacroInterpreter::include_expansion (macro);
+    } else {
+      return std::pair<std::string, std::string> (macro->path (), macro->text ());
+    }
   }
 
   void register_gsi (const char *name)
@@ -137,6 +147,16 @@ public:
     if (f_execute.can_issue ()) {
       f_execute.issue<MacroInterpreter, const lym::Macro *> (&MacroInterpreter::execute, macro);
     }
+  }
+
+  void set_supports_include_expansion (bool f)
+  {
+    m_supports_include_expansion = f;
+  }
+
+  virtual bool supports_include_expansion () const
+  {
+    return m_supports_include_expansion;
   }
 
   void set_storage_scheme (int scheme)
@@ -231,6 +251,7 @@ private:
   lym::Macro::Interpreter m_debugger_scheme;
   std::string m_suffix;
   std::string m_description;
+  bool m_supports_include_expansion;
 };
 
 int const_PlainTextFormat ()
@@ -294,6 +315,14 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
     "\n"
     "This method must be called after \\register has called.\n"
   ) + 
+  gsi::method ("supports_include_expansion=", &MacroInterpreter::set_supports_include_expansion, gsi::arg ("flag"),
+    "@brief Sets a value indicating whether this interpreter supports the default include file expansion scheme.\n"
+    "If this value is set to true (the default), lines like '# %include ...' will be substituted by the "
+    "content of the file following the '%include' keyword.\n"
+    "Set this value to false if you don't want to support this feature.\n"
+    "\n"
+    "This attribute has been introduced in version 0.27.\n"
+  ) +
   gsi::method ("syntax_scheme=", &gsi::MacroInterpreter::set_syntax_scheme, gsi::arg ("scheme"),
     "@brief Sets a string indicating the syntax highlighter scheme\n"
     "\n"

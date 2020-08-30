@@ -21,16 +21,18 @@
 */
 
 
-#ifndef HDR_lymInclude
-#define HDR_lymInclude
+#ifndef HDR_tlInclude
+#define HDR_tlInclude
 
-#include "lymCommon.h"
+#include "tlCommon.h"
 
 #include <string>
 #include <map>
 
-namespace lym
+namespace tl
 {
+
+class InputStream;
 
 /**
  *  @brief Provide the basic include expansion and file/line mapping mechanism
@@ -44,7 +46,7 @@ namespace lym
  *  The file path is expression-interpolated, hence can access environment variables
  *  through $(env("HOME")) for example.
  */
-class LYM_PUBLIC IncludeExpander
+class TL_PUBLIC IncludeExpander
 {
 public:
   /**
@@ -58,6 +60,14 @@ public:
    *  This method will deliver the expanded text and the include expander object.
    */
   static IncludeExpander expand (const std::string &path, std::string &expanded_text);
+
+  /**
+   *  @brief Provides include expansion
+   *
+   *  This method will deliver the expanded text and the include expander object.
+   *  This version also takes the actual text of the original file.
+   */
+  static IncludeExpander expand (const std::string &path, const std::string &original_text, std::string &expanded_text);
 
   /**
    *  @brief Serializes the include expander information into a string
@@ -82,15 +92,13 @@ public:
    */
   static std::pair<std::string, int> translate_to_original (const std::string &file, int line_number)
   {
-    IncludeExpander ie;
-    ie.from_string (file);
-    return ie.translate_to_original (line_number);
+    return IncludeExpander::from_string (file).translate_to_original (line_number);
   }
 
-public:
+private:
   std::map<int, std::pair<std::string, int> > m_sections;
 
-  static void read (const std::string &path, std::string &expanded_text, IncludeExpander &ie, int &line_counter);
+  void read (const std::string &path, tl::InputStream &is, std::string &expanded_text, IncludeExpander &ie, int &line_counter);
 };
 
 }

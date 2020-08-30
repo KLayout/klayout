@@ -23,17 +23,18 @@
 
 #include "tlUnitTest.h"
 #include "tlFileUtils.h"
-#include "lymInclude.h"
+#include "tlStream.h"
+#include "tlInclude.h"
 
 TEST(1_simple)
 {
-  std::string fn = tl::testsrc () + "/testdata/lym/x.txt";
+  std::string fn = tl::testsrc () + "/testdata/tl/x.txt";
 
   std::string et;
-  lym::IncludeExpander ie = lym::IncludeExpander::expand (fn, et);
+  tl::IncludeExpander ie = tl::IncludeExpander::expand (fn, et);
   EXPECT_EQ (et, "A line\nAnother line\n");
   EXPECT_EQ (ie.to_string (), fn);
-  EXPECT_EQ (lym::IncludeExpander::from_string (ie.to_string ()).to_string (), ie.to_string ());
+  EXPECT_EQ (tl::IncludeExpander::from_string (ie.to_string ()).to_string (), ie.to_string ());
 
   EXPECT_EQ (ie.translate_to_original (2).first, fn);
   EXPECT_EQ (ie.translate_to_original (2).second, 2);
@@ -41,18 +42,18 @@ TEST(1_simple)
 
 TEST(2_single_include)
 {
-  std::string fn = tl::testsrc () + "/testdata/lym/x_inc1.txt";
+  std::string fn = tl::testsrc () + "/testdata/tl/x_inc1.txt";
 
   std::string et;
-  lym::IncludeExpander ie = lym::IncludeExpander::expand (fn, et);
+  tl::IncludeExpander ie = tl::IncludeExpander::expand (fn, tl::InputStream (fn).read_all (), et);
   EXPECT_EQ (et, "A line\nincluded.1\nAnother line\n");
 
-  EXPECT_EQ (ie.to_string (), "@1:" + tl::testsrc () + "/testdata/lym/x_inc1.txt*0;2:" + tl::testsrc () + "/testdata/lym/inc1.txt*-1;3:" + tl::testsrc () + "/testdata/lym/x_inc1.txt*0;");
-  EXPECT_EQ (lym::IncludeExpander::from_string (ie.to_string ()).to_string (), ie.to_string ());
+  EXPECT_EQ (ie.to_string (), "@1*" + tl::testsrc () + "/testdata/tl/x_inc1.txt*0;2*" + tl::testsrc () + "/testdata/tl/inc1.txt*-1;3*" + tl::testsrc () + "/testdata/tl/x_inc1.txt*0;");
+  EXPECT_EQ (tl::IncludeExpander::from_string (ie.to_string ()).to_string (), ie.to_string ());
 
   EXPECT_EQ (ie.translate_to_original (1).first, fn);
   EXPECT_EQ (ie.translate_to_original (1).second, 1);
-  EXPECT_EQ (ie.translate_to_original (2).first, tl::testsrc () + "/testdata/lym/inc1.txt");
+  EXPECT_EQ (ie.translate_to_original (2).first, tl::testsrc () + "/testdata/tl/inc1.txt");
   EXPECT_EQ (ie.translate_to_original (2).second, 1);
   EXPECT_EQ (ie.translate_to_original (3).first, fn);
   EXPECT_EQ (ie.translate_to_original (3).second, 3);
@@ -60,21 +61,21 @@ TEST(2_single_include)
 
 TEST(3_multi_include)
 {
-  std::string fn = tl::testsrc () + "/testdata/lym/x_inc3.txt";
+  std::string fn = tl::testsrc () + "/testdata/tl/x_inc3.txt";
 
   std::string et;
-  lym::IncludeExpander ie = lym::IncludeExpander::expand (fn, et);
+  tl::IncludeExpander ie = tl::IncludeExpander::expand (fn, et);
   EXPECT_EQ (et, "A line\ninclude.3a\nincluded.2a\nincluded.2b\ninclude.3b\nAnother line\n");
 
-  EXPECT_EQ (lym::IncludeExpander::from_string (ie.to_string ()).to_string (), ie.to_string ());
+  EXPECT_EQ (tl::IncludeExpander::from_string (ie.to_string ()).to_string (), ie.to_string ());
 
   EXPECT_EQ (ie.translate_to_original (1).first, fn);
   EXPECT_EQ (ie.translate_to_original (1).second, 1);
-  EXPECT_EQ (ie.translate_to_original (2).first, tl::testsrc () + "/testdata/lym/inc3.txt");
+  EXPECT_EQ (ie.translate_to_original (2).first, tl::testsrc () + "/testdata/tl/inc3.txt");
   EXPECT_EQ (ie.translate_to_original (2).second, 1);
-  EXPECT_EQ (ie.translate_to_original (3).first, tl::testsrc () + "/testdata/lym/inc2.txt");
+  EXPECT_EQ (ie.translate_to_original (3).first, tl::testsrc () + "/testdata/tl/inc2.txt");
   EXPECT_EQ (ie.translate_to_original (3).second, 1);
-  EXPECT_EQ (ie.translate_to_original (5).first, tl::testsrc () + "/testdata/lym/inc3.txt");
+  EXPECT_EQ (ie.translate_to_original (5).first, tl::testsrc () + "/testdata/tl/inc3.txt");
   EXPECT_EQ (ie.translate_to_original (5).second, 3);
   EXPECT_EQ (ie.translate_to_original (6).first, fn);
   EXPECT_EQ (ie.translate_to_original (6).second, 3);
@@ -82,21 +83,21 @@ TEST(3_multi_include)
 
 TEST(4_multi_include_interpolate)
 {
-  std::string fn = tl::testsrc () + "/testdata/lym/x_inc3_ip.txt";
+  std::string fn = tl::testsrc () + "/testdata/tl/x_inc3_ip.txt";
 
   std::string et;
-  lym::IncludeExpander ie = lym::IncludeExpander::expand (fn, et);
+  tl::IncludeExpander ie = tl::IncludeExpander::expand (fn, et);
   EXPECT_EQ (et, "A line\ninclude.3a\nincluded.2a\nincluded.2b\ninclude.3b\nAnother line\n");
 
-  EXPECT_EQ (lym::IncludeExpander::from_string (ie.to_string ()).to_string (), ie.to_string ());
+  EXPECT_EQ (tl::IncludeExpander::from_string (ie.to_string ()).to_string (), ie.to_string ());
 
   EXPECT_EQ (ie.translate_to_original (1).first, fn);
   EXPECT_EQ (ie.translate_to_original (1).second, 1);
-  EXPECT_EQ (ie.translate_to_original (2).first, tl::testsrc () + "/testdata/lym/inc3.txt");
+  EXPECT_EQ (ie.translate_to_original (2).first, tl::testsrc () + "/testdata/tl/inc3.txt");
   EXPECT_EQ (ie.translate_to_original (2).second, 1);
-  EXPECT_EQ (ie.translate_to_original (3).first, tl::testsrc () + "/testdata/lym/inc2.txt");
+  EXPECT_EQ (ie.translate_to_original (3).first, tl::testsrc () + "/testdata/tl/inc2.txt");
   EXPECT_EQ (ie.translate_to_original (3).second, 1);
-  EXPECT_EQ (ie.translate_to_original (5).first, tl::testsrc () + "/testdata/lym/inc3.txt");
+  EXPECT_EQ (ie.translate_to_original (5).first, tl::testsrc () + "/testdata/tl/inc3.txt");
   EXPECT_EQ (ie.translate_to_original (5).second, 3);
   EXPECT_EQ (ie.translate_to_original (6).first, fn);
   EXPECT_EQ (ie.translate_to_original (6).second, 3);

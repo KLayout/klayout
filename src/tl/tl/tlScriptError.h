@@ -60,6 +60,9 @@ struct TL_PUBLIC BacktraceElement
   std::string file;
   int line;
   std::string more_info;
+
+private:
+  void translate_includes ();
 };
 
 /**
@@ -69,17 +72,11 @@ class TL_PUBLIC ScriptError
   : public tl::Exception 
 {
 public:
-  ScriptError (const char *msg, const char *cls, const std::vector <BacktraceElement> &backtrace)
-    : tl::Exception (msg), m_line (-1), m_cls (cls), m_backtrace (backtrace)
-  { }
+  ScriptError (const char *msg, const char *cls, const std::vector <BacktraceElement> &backtrace);
 
-  ScriptError (const char *msg, const char *sourcefile, int line, const char *cls, const std::vector <BacktraceElement> &backtrace)
-    : tl::Exception (msg), m_sourcefile (sourcefile), m_line (line), m_cls (cls), m_backtrace (backtrace)
-  { }
+  ScriptError (const char *msg, const char *sourcefile, int line, const char *cls, const std::vector <BacktraceElement> &backtrace);
 
-  ScriptError (const ScriptError &d)
-    : tl::Exception (d), m_sourcefile (d.m_sourcefile), m_line (d.m_line), m_cls (d.m_cls), m_context (d.m_context), m_backtrace (d.m_backtrace)
-  { }
+  ScriptError (const ScriptError &d);
 
   virtual ~ScriptError ()
   { }
@@ -139,6 +136,8 @@ private:
   std::string m_cls;
   std::string m_context;
   std::vector<BacktraceElement> m_backtrace;
+
+  void translate_includes ();
 };
 
 /**

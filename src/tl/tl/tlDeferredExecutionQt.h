@@ -65,6 +65,7 @@ private slots:
 
 private:
   QTimer m_timer, m_fallback_timer;
+  int m_event_type;
 
   virtual bool event (QEvent *event);
 };

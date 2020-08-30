@@ -296,9 +296,9 @@ TEST(18)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_separate_groups (true);
-  run_test (_this, "def9", "lef:tech.lef+lef:cells_modified.lef+def:in.def", "au.oas.gz", options);
+  run_test (_this, "def9", "lef:tech.lef+lef:cells_modified.lef+def:in.def", "au-new.oas.gz", options);
 
-  run_test (_this, "def9", "lef:tech.lef+lef:cells_modified.lef+def:in.def", "au_nogroups.oas.gz", default_options ());
+  run_test (_this, "def9", "lef:tech.lef+lef:cells_modified.lef+def:in.def", "au_nogroups-new.oas.gz", default_options ());
 }
 
 TEST(19)
@@ -319,7 +319,7 @@ TEST(21)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_cell_outline_layer ("OUTLINE (20/0)");
-  run_test (_this, "def12", "lef:test.lef+def:test.def", "au.oas.gz", opt);
+  run_test (_this, "def12", "lef:test.lef+def:test.def", "au-new.oas.gz", opt);
 }
 
 TEST(22)

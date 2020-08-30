@@ -54,6 +54,32 @@ MacroInterpreter::include_expansion (const lym::Macro *macro)
 {
   std::pair<std::string, std::string> res;
   res.first = tl::IncludeExpander::expand (macro->path (), macro->text (), res.second).to_string ();
+
+  if (res.first != macro->path ()) {
+
+    //  Fix the macro's text such that include expansion does not spoil __FILE__ or __LINE__ variables
+    //  NOTE: this will modify the column for syntax errors. Let's hope this tiny error is acceptable.
+    //  TODO: this substitution may be somewhat naive ...
+
+    Macro::Interpreter ip = macro->interpreter ();
+    if (macro->interpreter () == Macro::DSLInterpreter) {
+      if (syntax_scheme () == "ruby") {
+        ip = Macro::Ruby;
+      } else if (syntax_scheme () == "python") {
+        ip = Macro::Python;
+      }
+    }
+
+    if (ip == Macro::Ruby) {
+      res.second = tl::replaced (res.second, "__FILE__", "RBA::Macro::real_path(__FILE__, __LINE__)");
+      res.second = tl::replaced (res.second, "__LINE__", "RBA::Macro::real_line(__FILE__, __LINE__)");
+    } else if (ip == Macro::Python) {
+      res.second = tl::replaced (res.second, "__file__", "pya.Macro.real_path(__file__, __line__)");
+      res.second = tl::replaced (res.second, "__line__", "pya.Macro.real_line(__file__, __line__)");
+    }
+
+  }
+
   return res;
 }
 

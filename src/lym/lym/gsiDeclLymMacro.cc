@@ -455,6 +455,24 @@ static lym::Macro *macro_by_path (const std::string &path)
   return lym::MacroCollection::root ().find_macro (path);
 }
 
+static std::string real_path (const std::string &path, int line)
+{
+  if (! path.empty () && path[0] == '@') {
+    return tl::IncludeExpander::from_string (path).translate_to_original (line).first;
+  } else {
+    return path;
+  }
+}
+
+static int real_line (const std::string &path, int line)
+{
+  if (! path.empty () && path[0] == '@') {
+    return tl::IncludeExpander::from_string (path).translate_to_original (line).second;
+  } else {
+    return line;
+  }
+}
+
 Class<lym::Macro> decl_Macro ("lay", "Macro",
   gsi::method ("path", &lym::Macro::path,
     "@brief Gets the path of the macro\n"
@@ -551,6 +569,46 @@ Class<lym::Macro> decl_Macro ("lay", "Macro",
   gsi::method ("menu_path=", &lym::Macro::set_menu_path, gsi::arg ("string"),
     "@brief Sets the menu path\n"
     "See \\menu_path for details.\n"
+  ) +
+  gsi::method ("real_path", &real_path,
+    "@brief Gets the real path for an include-encoded path and line number\n"
+    "\n"
+    "When using KLayout's include scheme based on '# %include ...', __FILE__ and __LINE__ (Ruby) or __file__ and __line__ (Python) will "
+    "not have the proper values but encoded file names. This method allows retrieving the real file by using\n"
+    "\n"
+    "@code\n"
+    "# Ruby\n"
+    "real_file = RBA::Macro::real_path(__FILE__, __LINE__)\n"
+    "\n"
+    "# Python\n"
+    "real_file = pya::Macro::real_path(__file__, __line__)\n"
+    "@/code\n"
+    "\n"
+    "This substitution is not required for top-level macros as KLayout's interpreter will automatically use this "
+    "function instead of __FILE__ or __file__. Call this function when you need __FILE__ or __file__ from files "
+    "included through the languages mechanisms such as 'import', 'require' or 'load' where this substitution does not happen.\n"
+    "\n"
+    "This feature has been introduced in version 0.27."
+  ) +
+  gsi::method ("real_line", &real_line,
+    "@brief Gets the real line number for an include-encoded path and line number\n"
+    "\n"
+    "When using KLayout's include scheme based on '# %include ...', __FILE__ and __LINE__ (Ruby) or __file__ and __line__ (Python) will "
+    "not have the proper values but encoded file names. This method allows retrieving the real line number by using\n"
+    "\n"
+    "@code\n"
+    "# Ruby\n"
+    "real_line = RBA::Macro::real_line(__FILE__, __LINE__)\n"
+    "\n"
+    "# Python\n"
+    "real_line = pya::Macro::real_line(__file__, __line__)\n"
+    "@/code\n"
+    "\n"
+    "This substitution is not required for top-level macros as KLayout's interpreter will automatically use this "
+    "function instead of __LINE__ or __line__. Call this function when you need __LINE__ or __line__ from files "
+    "included through the languages mechanisms such as 'import', 'require' or 'load' where this substitution does not happen.\n"
+    "\n"
+    "This feature has been introduced in version 0.27."
   ),
   "@brief A macro class\n"
   "\n"

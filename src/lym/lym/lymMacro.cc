@@ -1025,13 +1025,14 @@ int Macro::run () const
     gsi::Interpreter *ip = script_interpreter (interpreter ());
     if (ip) {
 
+      static lym::MacroInterpreter def_interpreter;
+
       if (! prolog ().empty ()) {
         ip->eval_string (prolog ().c_str ());
       }
 
-      std::string expanded_text;
-      tl::IncludeExpander ie = tl::IncludeExpander::expand (path (), text (), expanded_text);
-      ip->eval_string (expanded_text.c_str (), ie.to_string ().c_str (), 1);
+      std::pair<std::string, std::string> ep = def_interpreter.include_expansion (this);
+      ip->eval_string (ep.second.c_str (), ep.first.c_str (), 1);
 
       if (! epilog ().empty ()) {
         ip->eval_string (epilog ().c_str ());

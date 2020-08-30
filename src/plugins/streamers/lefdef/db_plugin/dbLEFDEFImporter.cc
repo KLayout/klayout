@@ -1365,12 +1365,20 @@ LEFDEFReaderState::foreign_cell (Layout &layout, const std::string &name)
   std::map<std::string, db::cell_index_type>::const_iterator c = m_foreign_cells.find (name);
   if (c != m_foreign_cells.end ()) {
     return c->second;
-  } else {
-    db::cell_index_type ci = layout.add_cell (name.c_str ());
-    layout.cell (ci).set_ghost_cell (true);
-    m_foreign_cells.insert (std::make_pair (name, ci));
-    return ci;
   }
+
+  std::pair<bool, db::cell_index_type> cc = layout.cell_by_name (name.c_str ());
+
+  db::cell_index_type ci;
+  if (cc.first) {
+    ci = cc.second;
+  } else {
+    ci = layout.add_cell (name.c_str ());
+    layout.cell (ci).set_ghost_cell (true);
+  }
+
+  m_foreign_cells.insert (std::make_pair (name, ci));
+  return ci;
 }
 
 std::pair<db::Cell *, db::Trans>

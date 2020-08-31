@@ -776,7 +776,10 @@ ApplicationBase::init_app ()
   //  establish the configuration
   dispatcher ()->config_setup ();
 
-  //  Some info output 
+  //  deferred method processing for those plugins which need this
+  process_events ();
+
+  //  some info output
   if (tl::verbosity () >= 20) {
 
     tl::info << "KLayout path:";
@@ -1504,6 +1507,9 @@ GuiApplication::process_events_impl (QEventLoop::ProcessEventsFlags flags, bool 
     mp_mw->enter_busy_mode (true);
     try {
       QApplication::processEvents (flags);
+      //  Qt seems not to send posted UserEvents in some cases (e.g. in the unit test application with GLib?
+      //  Glib not doing this without a main window visible?). Hence we do this explicitly here.
+      QApplication::sendPostedEvents ();
     } catch (...) {
       //  ignore exceptions
     }

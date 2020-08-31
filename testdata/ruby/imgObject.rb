@@ -396,7 +396,7 @@ class IMG_TestClass < TestBase
 
   end
 
-  def test_4
+  def test_5
 
     tmp = File::join($ut_testtmp, "tmp.lyimg")
 

@@ -67,6 +67,8 @@ class DBPolygon_TestClass < TestBase
     arr = []
     a.each_point_hull { |p| arr.push( p.to_s ) }
     assert_equal( arr, ["5,-10", "5,15", "20,15", "20,-10"] )
+    # with enumerator
+    assert_equal( a.each_point_hull.collect(&:to_s), ["5,-10", "5,15", "20,15", "20,-10"] )
 
     b = a.dup
 
@@ -130,6 +132,8 @@ class DBPolygon_TestClass < TestBase
     arr = []
     a.each_point_hole(0) { |p| arr.push( p.to_s ) }
     assert_equal( arr, ["1,2", "2,2", "2,6"] )
+    # with enumerator
+    assert_equal( a.each_point_hole(0).collect(&:to_s), ["1,2", "2,2", "2,6"] )
 
     arr = []
     a.each_edge { |p| arr.push( p.to_s ) }

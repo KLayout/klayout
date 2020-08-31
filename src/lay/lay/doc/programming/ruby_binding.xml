@@ -500,6 +500,16 @@ a = A::new
 a.each { |i| ... }</pre>
 
   <p>
+  If no block is given, an Enumerator object is created. Enumerators
+  are a Ruby feature. Enumerators support many convenient methods
+  like sort, inject, collect, select etc. Here is an example:
+  </p>
+
+  <pre>
+# turns all elements returned by the iterator into strings and sorts them
+sorted = a.each.collect(&amp;:to_s).sort</pre>
+
+  <p>
   Iterators match very well between C++ and Ruby so there are no real issues here.
   The return type of the iterators is mapped to Ruby's block arguments using the
   same rules than for values returned from C++ methods.

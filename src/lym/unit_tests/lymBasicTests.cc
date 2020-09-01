@@ -100,6 +100,29 @@ TEST(2_RubyInclude)
   EXPECT_EQ (console.text (), "Stop 1: m2.rb:2\nf: a_inc.rb:3\nStop 2: m2.rb:8\n");
 }
 
+TEST(3_RubyInclude)
+{
+  tl_assert (rba::RubyInterpreter::instance () != 0);
+
+  lym::Macro macro;
+
+  macro.set_file_path (tl::testsrc () + "/testdata/lym/m3.rb");
+  macro.set_interpreter (lym::Macro::Ruby);
+  macro.load ();
+
+  TestCollectorConsole console;
+  rba::RubyInterpreter::instance ()->push_console (&console);
+  try {
+    EXPECT_EQ (macro.run (), 0);
+    rba::RubyInterpreter::instance ()->remove_console (&console);
+  } catch (...) {
+    rba::RubyInterpreter::instance ()->remove_console (&console);
+    throw;
+  }
+
+  EXPECT_EQ (console.text (), "An error in " + tl::testsrc () + "/testdata/lym/b_inc.rb:3\n");
+}
+
 TEST(11_DRCBasic)
 {
   tl_assert (rba::RubyInterpreter::instance () != 0);

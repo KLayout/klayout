@@ -162,7 +162,11 @@ IncludeExpander::from_string (const std::string &s)
 
   tl::Extractor ex (s.c_str ());
 
-  if (ex.test ("@")) {
+  if (*ex == '"' || *ex == '\'') {
+
+    ex.read_quoted (ie.m_sections [1].first);
+
+  } else if (ex.test ("@")) {
 
     while (! ex.at_end ()) {
 
@@ -182,8 +186,7 @@ IncludeExpander::from_string (const std::string &s)
 
   } else {
 
-    ex.read_word_or_quoted (ie.m_sections [1].first, valid_fn_chars);
-    ex.expect_end ();
+    ie.m_sections [1].first = s;
 
   }
 

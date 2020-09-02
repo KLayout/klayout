@@ -69,9 +69,9 @@
 #include "layConfig.h"
 #include "layMainWindow.h"
 #include "layHelpDialog.h"
-#include "layHelpSource.h" // because of escape_xml
 #include "layNavigator.h"
 #include "layProgress.h"
+#include "layProgressDialog.h"
 #include "layProgressWidget.h"
 #include "layStream.h"
 #include "layLayerControlPanel.h" // because of LabelWithBackground
@@ -89,10 +89,12 @@
 #include "laySaltController.h"
 #include "layTipDialog.h"
 #include "layMacroController.h"
+#include "layHelpAboutDialog.h"
+#include "layControlWidgetStack.h"
+#include "layViewWidgetStack.h"
 #include "layInit.h"
 #include "antObject.h"
 #include "antService.h"
-#include "ui_HelpAboutDialog.h"
 #include "gsi.h"
 #include "gsiInterpreter.h"
 #include "gtf.h"
@@ -101,334 +103,6 @@ namespace lay
 {
 
 const int max_dirty_files = 15;
-
-// -------------------------------------------------------------
-
-class ProgressDialog
-  : public QDialog,
-    public tl::Object
-{
-public:
-  ProgressDialog (QWidget *parent, lay::ProgressReporter *pr)
-    : QDialog (parent), mp_pr (pr)
-  {
-    QVBoxLayout *vbl = new QVBoxLayout (this);
-    vbl->setMargin (0);
-    vbl->setSpacing (0);
-
-    mp_progress_widget = new ProgressWidget (pr, this, true);
-    mp_progress_widget->setObjectName (QString::fromUtf8 ("progress"));
-    vbl->addWidget (mp_progress_widget);
-
-    setWindowTitle (QObject::tr ("Progress"));
-    setWindowModality (Qt::WindowModal);
-  }
-
-  void closeEvent (QCloseEvent * /*event*/)
-  {
-    if (mp_pr) {
-      //  NOTE: We don't kill on close for now. This creates a too easy way to scrap results.
-      //    mp_pr->signal_break ();
-      //  TODO: there should be a warning saying some jobs are pending.
-    }
-  }
-
-  void set_progress (tl::Progress *progress)
-  {
-    mp_progress_widget->set_progress (progress);
-  }
-
-  void add_widget (QWidget *widget)
-  {
-    mp_progress_widget->add_widget (widget);
-  }
-
-  void remove_widget ()
-  {
-    mp_progress_widget->remove_widget ();
-  }
-
-  QWidget *get_widget () const
-  {
-    return mp_progress_widget->get_widget ();
-  }
-
-private:
-  lay::ProgressWidget *mp_progress_widget;
-  lay::ProgressReporter *mp_pr;
-};
-
-// -------------------------------------------------------------
-
-class ControlWidgetStack
-  : public QFrame
-{
-public:
-  ControlWidgetStack (QWidget *parent = 0, const char *name = 0)
-    : QFrame (parent), mp_current_widget (0)
-  {
-    setObjectName (QString::fromUtf8 (name));
-
-    //  Background ist a simple label without a text currently
-    mp_bglabel = new QLabel (this);
-    mp_bglabel->setAutoFillBackground (true);
-    mp_bglabel->setAlignment (Qt::AlignVCenter | Qt::AlignHCenter);
-    mp_bglabel->show ();
-  }
-
-  void focusInEvent (QFocusEvent *)
-  {
-    for (size_t i = 0; i < m_widgets.size (); ++i) {
-      if (m_widgets [i]->isVisible ()) {
-        m_widgets [i]->setFocus ();
-        break;
-      }
-    }
-  }
-
-  void addWidget (QWidget *w)
-  {
-    m_widgets.push_back (w);
-    w->setParent (this);
-    resize_children ();
-    raiseWidget (m_widgets.size () - 1);
-
-    int mw = 0;
-    for (size_t i = 0; i < m_widgets.size (); ++i) {
-      mw = std::max (m_widgets [i]->sizeHint ().width (), mw);
-      mw = std::max (m_widgets [i]->minimumWidth (), mw);
-    }
-
-    if (mw > minimumWidth ()) {
-      setMinimumWidth (mw);
-      resize (minimumWidth (), height ());
-    }
-  }
-
-  QSize sizeHint () const
-  {
-    int w = 0;
-    for (size_t i = 0; i < m_widgets.size (); ++i) {
-      w = std::max (m_widgets [i]->sizeHint ().width (), w);
-    }
-    return QSize (w, 0);
-  }
-
-  void removeWidget (size_t index)
-  {
-    if (index < m_widgets.size ()) {
-      if (mp_current_widget == m_widgets [index]) {
-        mp_current_widget = 0;
-      }
-      m_widgets.erase (m_widgets.begin () + index);
-    }
-    if (m_widgets.size () == 0) {
-      mp_bglabel->show ();
-    }
-  }
-
-  QWidget *currentWidget () const
-  {
-    return mp_current_widget;
-  }
-
-  void raiseWidget (size_t index)
-  {
-    mp_current_widget = 0;
-    bool any_visible = false;
-    for (size_t i = 0; i < m_widgets.size (); ++i) {
-      if (m_widgets [i]) {
-        if (i == index) {
-          m_widgets [i]->show ();
-          mp_current_widget = m_widgets [i];
-          any_visible = true;
-        } else {
-          m_widgets [i]->hide ();
-        }
-      }
-    }
-
-    if (! any_visible) {
-      mp_bglabel->show ();
-    } else {
-      mp_bglabel->hide ();
-    }
-  }
-
-  QWidget *widget (size_t index)
-  {
-    if (index < m_widgets.size ()) {
-      return m_widgets [index];
-    } else {
-      return 0;
-    }
-  }
-
-  QWidget *background_widget ()
-  {
-    return mp_bglabel;
-  }
-
-  size_t count () const
-  {
-    return m_widgets.size ();
-  }
-
-protected:
-  virtual void resizeEvent (QResizeEvent *)
-  {
-    resize_children ();
-  }
-
-  void resize_children ()
-  {
-    //  set the geometry of all children
-    for (std::vector <QWidget *>::iterator child = m_widgets.begin (); child != m_widgets.end (); ++child) {
-      if (*child) {
-        (*child)->setGeometry (0, 0, width (), height ());
-      }
-    }
-    mp_bglabel->setGeometry (0, 0, width (), height ());
-  }
-
-  std::vector <QWidget *> m_widgets;
-  QWidget *mp_current_widget;
-  QLabel *mp_bglabel;
-};
-
-// -------------------------------------------------------------
-
-class ViewWidgetStack
-  : public QWidget
-{
-public:
-  ViewWidgetStack (QWidget *parent = 0, const char *name = 0)
-    : QWidget (parent)
-  {
-    setObjectName (QString::fromUtf8 (name));
-
-    mp_bglabel = new QLabel (this);
-    mp_bglabel->setAutoFillBackground (true);
-    mp_bglabel->setText (QObject::tr ("<html><body><p><img src=\":/logo.png\"/></p><p>Use File/Open to open a layout</p></body></html>"));
-    mp_bglabel->setAlignment (Qt::AlignVCenter | Qt::AlignHCenter);
-    mp_bglabel->show ();
-  }
-
-  void addWidget (LayoutView *w)
-  {
-    m_widgets.push_back (w);
-    w->setParent (this);
-    resize_children ();
-    raiseWidget (m_widgets.size () - 1);
-
-    updateGeometry ();
-  }
-
-  void removeWidget (size_t index)
-  {
-    if (index < m_widgets.size ()) {
-      m_widgets.erase (m_widgets.begin () + index);
-    }
-    if (m_widgets.size () == 0) {
-      mp_bglabel->show ();
-    }
-  }
-
-  void raiseWidget (size_t index)
-  {
-    if (index < m_widgets.size ()) {
-      mp_bglabel->hide ();
-      m_widgets [index]->show ();
-    } else {
-      mp_bglabel->show ();
-    }
-
-    size_t i = 0;
-    for (std::vector <LayoutView *>::iterator child = m_widgets.begin (); child != m_widgets.end (); ++child, ++i) {
-      if (i != index) {
-        (*child)->hide ();
-      }
-    }
-  }
-
-  LayoutView *widget (size_t index)
-  {
-    if (index < m_widgets.size ()) {
-      return m_widgets [index];
-    } else {
-      return 0;
-    }
-  }
-
-  QWidget *background_widget ()
-  {
-    return mp_bglabel;
-  }
-
-protected:
-  virtual void resizeEvent (QResizeEvent *)
-  {
-    resize_children ();
-  }
-
-  void resize_children ()
-  {
-    //  set the geometry of all children
-    for (std::vector <LayoutView *>::iterator child = m_widgets.begin (); child != m_widgets.end (); ++child) {
-      (*child)->setGeometry (0, 0, width (), height ());
-    }
-    mp_bglabel->setGeometry (0, 0, width (), height ());
-  }
-
-  std::vector <LayoutView *> m_widgets;
-  QLabel *mp_bglabel;
-};
-
-// -------------------------------------------------------------
-
-TextProgressDelegate::TextProgressDelegate (MainWindow *mw, int verbosity)
-  : lay::TextProgress (verbosity), mp_mw (mw)
-{
-  //  .. nothing yet ..
-}
-
-void TextProgressDelegate::update_progress (tl::Progress *progress)
-{
-  if (!mp_mw->update_progress (progress)) {
-    lay::TextProgress::update_progress (progress);
-  }
-}
-
-void TextProgressDelegate::show_progress_bar (bool show)
-{
-  if (!mp_mw->show_progress_bar (show)) {
-    lay::TextProgress::show_progress_bar (show);
-  }
-}
-
-bool TextProgressDelegate::progress_wants_widget () const
-{
-  return mp_mw != 0 && mp_mw->progress_wants_widget ();
-}
-
-void TextProgressDelegate::progress_add_widget (QWidget *widget)
-{
-  if (mp_mw) {
-    mp_mw->progress_add_widget (widget);
-  }
-}
-
-QWidget *TextProgressDelegate::progress_get_widget () const
-{
-  return mp_mw ? mp_mw->progress_get_widget () : 0;
-}
-
-void TextProgressDelegate::progress_remove_widget ()
-{
-  if (mp_mw) {
-    mp_mw->progress_remove_widget ();
-  }
-}
 
 // -------------------------------------------------------------
 
@@ -1004,12 +678,12 @@ MainWindow::close_all ()
 
     lay::LayoutView *view = mp_views.back ();
     mp_views.pop_back ();
-    mp_lp_stack->removeWidget (mp_views.size ());
-    mp_hp_stack->removeWidget (mp_views.size ());
-    mp_libs_stack->removeWidget (mp_views.size ());
-    mp_eo_stack->removeWidget (mp_views.size ());
-    mp_bm_stack->removeWidget (mp_views.size ());
-    mp_view_stack->removeWidget (mp_views.size ());
+    mp_lp_stack->remove_widget (mp_views.size ());
+    mp_hp_stack->remove_widget (mp_views.size ());
+    mp_libs_stack->remove_widget (mp_views.size ());
+    mp_eo_stack->remove_widget (mp_views.size ());
+    mp_bm_stack->remove_widget (mp_views.size ());
+    mp_view_stack->remove_widget (mp_views.size ());
 
     delete view;
 
@@ -2698,12 +2372,12 @@ MainWindow::select_view (int index)
         current_view ()->zoom_box (box);
       }
 
-      mp_view_stack->raiseWidget (index);
-      mp_hp_stack->raiseWidget (index);
-      mp_lp_stack->raiseWidget (index);
-      mp_libs_stack->raiseWidget (index);
-      mp_eo_stack->raiseWidget (index);
-      mp_bm_stack->raiseWidget (index);
+      mp_view_stack->raise_widget (index);
+      mp_hp_stack->raise_widget (index);
+      mp_lp_stack->raise_widget (index);
+      mp_libs_stack->raise_widget (index);
+      mp_eo_stack->raise_widget (index);
+      mp_bm_stack->raise_widget (index);
       mp_setup_form->setup ();
 
     }
@@ -2890,12 +2564,12 @@ MainWindow::clone_current_view ()
 
   mp_layer_toolbox->set_view (current_view ());
 
-  mp_view_stack->addWidget (view);
-  mp_lp_stack->addWidget (view->layer_control_frame ());
-  mp_hp_stack->addWidget (view->hierarchy_control_frame ());
-  mp_libs_stack->addWidget (view->libraries_frame ());
-  mp_eo_stack->addWidget (view->editor_options_frame ());
-  mp_bm_stack->addWidget (view->bookmarks_frame ());
+  mp_view_stack->add_widget (view);
+  mp_lp_stack->add_widget (view->layer_control_frame ());
+  mp_hp_stack->add_widget (view->hierarchy_control_frame ());
+  mp_libs_stack->add_widget (view->libraries_frame ());
+  mp_eo_stack->add_widget (view->editor_options_frame ());
+  mp_bm_stack->add_widget (view->bookmarks_frame ());
 
   bool f = m_disable_tab_selected;
   m_disable_tab_selected = true;
@@ -3141,12 +2815,12 @@ MainWindow::close_view (int index)
       }
 
       mp_tab_bar->removeTab (index);
-      mp_view_stack->removeWidget (index);
-      mp_lp_stack->removeWidget (index);
-      mp_hp_stack->removeWidget (index);
-      mp_libs_stack->removeWidget (index);
-      mp_eo_stack->removeWidget (index);
-      mp_bm_stack->removeWidget (index);
+      mp_view_stack->remove_widget (index);
+      mp_lp_stack->remove_widget (index);
+      mp_hp_stack->remove_widget (index);
+      mp_libs_stack->remove_widget (index);
+      mp_eo_stack->remove_widget (index);
+      mp_bm_stack->remove_widget (index);
 
       view_closed_event (int (index));
 
@@ -3684,12 +3358,12 @@ MainWindow::create_view ()
 
   mp_layer_toolbox->set_view (current_view ());
 
-  mp_view_stack->addWidget (mp_views.back ());
-  mp_lp_stack->addWidget (mp_views.back ()->layer_control_frame ());
-  mp_hp_stack->addWidget (mp_views.back ()->hierarchy_control_frame ());
-  mp_libs_stack->addWidget (mp_views.back ()->libraries_frame ());
-  mp_eo_stack->addWidget (mp_views.back ()->editor_options_frame ());
-  mp_bm_stack->addWidget (mp_views.back ()->bookmarks_frame ());
+  mp_view_stack->add_widget (mp_views.back ());
+  mp_lp_stack->add_widget (mp_views.back ()->layer_control_frame ());
+  mp_hp_stack->add_widget (mp_views.back ()->hierarchy_control_frame ());
+  mp_libs_stack->add_widget (mp_views.back ()->libraries_frame ());
+  mp_eo_stack->add_widget (mp_views.back ()->editor_options_frame ());
+  mp_bm_stack->add_widget (mp_views.back ()->bookmarks_frame ());
 
   bool f = m_disable_tab_selected;
   m_disable_tab_selected = true;
@@ -3748,12 +3422,12 @@ MainWindow::create_or_load_layout (const std::string *filename, const db::LoadLa
 
       mp_layer_toolbox->set_view (current_view ());
 
-      mp_view_stack->addWidget (mp_views.back ());
-      mp_lp_stack->addWidget (mp_views.back ()->layer_control_frame ());
-      mp_hp_stack->addWidget (mp_views.back ()->hierarchy_control_frame ());
-      mp_libs_stack->addWidget (mp_views.back ()->libraries_frame ());
-      mp_eo_stack->addWidget (mp_views.back ()->editor_options_frame ());
-      mp_bm_stack->addWidget (mp_views.back ()->bookmarks_frame ());
+      mp_view_stack->add_widget (mp_views.back ());
+      mp_lp_stack->add_widget (mp_views.back ()->layer_control_frame ());
+      mp_hp_stack->add_widget (mp_views.back ()->hierarchy_control_frame ());
+      mp_libs_stack->add_widget (mp_views.back ()->libraries_frame ());
+      mp_eo_stack->add_widget (mp_views.back ()->editor_options_frame ());
+      mp_bm_stack->add_widget (mp_views.back ()->bookmarks_frame ());
 
       bool f = m_disable_tab_selected;
       m_disable_tab_selected = true;
@@ -4473,108 +4147,6 @@ MainWindow::plugin_removed (lay::PluginDeclaration *cls)
   for (std::vector <lay::LayoutView *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
     (*vp)->create_plugins (cls);
   }
-}
-
-// ------------------------------------------------------------
-//  Implementation of the "help about" dialog
-
-HelpAboutDialog::HelpAboutDialog (QWidget *parent)
-  : QDialog (parent)
-{
-  mp_ui = new Ui::HelpAboutDialog ();
-  mp_ui->setupUi (this);
-
-  std::vector<std::string> build_options;
-  if (lay::ApplicationBase::instance ()->ruby_interpreter ().available ()) {
-    build_options.push_back (tl::to_string (tr ("Ruby interpreter ")) + lay::ApplicationBase::instance ()->ruby_interpreter ().version ());
-  }
-  if (lay::ApplicationBase::instance ()->python_interpreter ().available ()) {
-    build_options.push_back (tl::to_string (tr ("Python interpreter ")) + lay::ApplicationBase::instance ()->python_interpreter ().version ());
-  }
-#if defined(HAVE_QTBINDINGS)
-  build_options.push_back (tl::to_string (tr ("Qt bindings for scripts")));
-#endif
-#if defined(HAVE_64BIT_COORD)
-  build_options.push_back (tl::to_string (tr ("Wide coordinates (64 bit)")));
-#endif
-
-  std::string s;
-
-  s = "<html><body>";
-
-  s += "<h1>";
-  s += escape_xml (std::string (lay::Version::name ()) + " " + lay::Version::version ());
-  s += "</h1>";
-
-  std::vector<std::string> about_paras = tl::split (lay::Version::about_text (), "\n\n");
-  for (std::vector<std::string>::const_iterator p = about_paras.begin (); p != about_paras.end (); ++p) {
-    s += std::string ("<p>") + escape_xml (*p) + "</p>";
-  }
-
-  if (! build_options.empty ()) {
-    s += "<p>";
-    s += "<h4>";
-    s += escape_xml (tl::to_string (QObject::tr ("Build options:")));
-    s += "</h4><ul>";
-    for (std::vector<std::string>::const_iterator bo = build_options.begin (); bo != build_options.end (); ++bo) {
-      s += "<li>";
-      s += escape_xml (*bo);
-      s += "</li>";
-    }
-    s += "</ul>";
-  }
-
-  if (! lay::plugins ().empty () || ! db::plugins ().empty ()) {
-
-    s += "<p>";
-    s += "<h4>";
-    s += escape_xml (tl::to_string (QObject::tr ("Binary extensions:")));
-    s += "</h4><ul>";
-
-    for (std::list<lay::PluginDescriptor>::const_iterator pd = lay::plugins ().begin (); pd != lay::plugins ().end (); ++pd) {
-      s += "<li>";
-      if (! pd->description.empty ()) {
-        s += escape_xml (pd->description);
-      } else {
-        s += escape_xml (pd->path);
-      }
-      if (! pd->version.empty ()) {
-        s += " (" + escape_xml (pd->version) + ")";
-      }
-      s += "</li>";
-    }
-
-    for (std::list<db::PluginDescriptor>::const_iterator pd = db::plugins ().begin (); pd != db::plugins ().end (); ++pd) {
-      s += "<li>";
-      if (! pd->description.empty ()) {
-        s += escape_xml (pd->description);
-      } else {
-        s += escape_xml (pd->path);
-      }
-      if (! pd->version.empty ()) {
-        s += " (" + escape_xml (pd->version) + ")";
-      }
-      s += "</li>";
-    }
-
-    s += "</ul>";
-
-  }
-
-  s += "</body></html>";
-
-  std::string t = tl::to_string (QObject::tr ("About ")) + lay::Version::name ();
-
-  setWindowTitle (tl::to_qstring (t));
-
-  mp_ui->main->setWordWrap (true);
-  mp_ui->main->setText (tl::to_qstring (s));
-}
-
-HelpAboutDialog::~HelpAboutDialog ()
-{
-  delete mp_ui;
-  mp_ui = 0;
 }
 
 // ------------------------------------------------------------

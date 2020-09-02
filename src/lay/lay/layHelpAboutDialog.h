@@ -21,55 +21,32 @@
 */
 
 
-#ifndef HDR_layHelpDialog
-#define HDR_layHelpDialog
+#ifndef HDR_layHelpAboutDialog
+#define HDR_layHelpAboutDialog
 
 #include "layCommon.h"
 
 #include <QDialog>
 
-#include <memory>
-#include <string>
-
-namespace Ui
-{
-  class HelpDialog;
+namespace Ui {
+  class HelpAboutDialog;
 }
 
 namespace lay
 {
 
-class HelpSource;
-class BrowserPanel;
-
 /**
- *  @brief The help dialog (aka assistant)
+ *  @brief A dialog for showing the "help about" dialog
  */
-class HelpDialog 
-  : public QDialog 
+class LAY_PUBLIC HelpAboutDialog
+  : public QDialog
 {
-Q_OBJECT 
-
 public:
-  HelpDialog (QWidget *parent, bool modal = false);
-  ~HelpDialog ();
-
-  void search (const std::string &topic);
-  void load (const std::string &url);
-  void showEvent (QShowEvent *);
-  void hideEvent (QHideEvent *);
-
-protected slots:
-  void title_changed (const QString &t);
+  HelpAboutDialog (QWidget *parent);
+  ~HelpAboutDialog ();
 
 private:
-  Ui::HelpDialog *mp_ui;
-  QRect m_geometry;
-  static lay::HelpSource *mp_help_source;
-  QString m_def_title;
-  bool m_initialized;
-
-  void initialize ();
+  Ui::HelpAboutDialog *mp_ui;
 };
 
 }

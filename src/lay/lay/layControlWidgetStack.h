@@ -21,58 +21,57 @@
 */
 
 
-#ifndef HDR_layHelpDialog
-#define HDR_layHelpDialog
+#ifndef HDR_layControlWidgetStack
+#define HDR_layControlWidgetStack
 
 #include "layCommon.h"
 
-#include <QDialog>
+#include <QFrame>
 
-#include <memory>
-#include <string>
-
-namespace Ui
-{
-  class HelpDialog;
-}
+class QLabel;
 
 namespace lay
 {
 
-class HelpSource;
-class BrowserPanel;
-
-/**
- *  @brief The help dialog (aka assistant)
- */
-class HelpDialog 
-  : public QDialog 
+class ControlWidgetStack
+  : public QFrame
 {
-Q_OBJECT 
-
 public:
-  HelpDialog (QWidget *parent, bool modal = false);
-  ~HelpDialog ();
+  ControlWidgetStack (QWidget *parent = 0, const char *name = 0);
 
-  void search (const std::string &topic);
-  void load (const std::string &url);
-  void showEvent (QShowEvent *);
-  void hideEvent (QHideEvent *);
+  void focusInEvent (QFocusEvent *);
 
-protected slots:
-  void title_changed (const QString &t);
+  QSize sizeHint () const;
 
-private:
-  Ui::HelpDialog *mp_ui;
-  QRect m_geometry;
-  static lay::HelpSource *mp_help_source;
-  QString m_def_title;
-  bool m_initialized;
+  void add_widget (QWidget *w);
+  void remove_widget (size_t index);
+  void raise_widget (size_t index);
+  QWidget *widget (size_t index);
+  QWidget *background_widget ();
 
-  void initialize ();
+  QWidget *currentWidget () const
+  {
+    return mp_current_widget;
+  }
+
+  size_t count () const
+  {
+    return m_widgets.size ();
+  }
+
+protected:
+  virtual void resizeEvent (QResizeEvent *)
+  {
+    resize_children ();
+  }
+
+  void resize_children ();
+
+  std::vector <QWidget *> m_widgets;
+  QWidget *mp_current_widget;
+  QLabel *mp_bglabel;
 };
 
 }
 
 #endif
-

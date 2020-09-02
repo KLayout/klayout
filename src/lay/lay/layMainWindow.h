@@ -20,8 +20,6 @@
 
 */
 
-
-
 #ifndef HDR_layMainWindow
 #define HDR_layMainWindow
 
@@ -46,6 +44,7 @@
 #include "layProgress.h"
 #include "layTextProgress.h"
 #include "layTechnology.h"
+#include "layTextProgressDelegate.h"
 #include "tlException.h"
 #include "tlDeferredExecution.h"
 #include "tlObjectCollection.h"
@@ -60,10 +59,6 @@ class QMenu;
 class QStackedWidget;
 class QDockWidget;
 class QAction;
-
-namespace Ui {
-  class HelpAboutDialog;
-}
 
 namespace lay {
 
@@ -84,38 +79,19 @@ class Navigator;
 class LayerToolbox;
 class MainWindow;
 class HelpDialog;
+class HelpAboutDialog;
+class ControlWidgetStack;
+class ViewWidgetStack;
+class ProgressWidget;
 
 /**
- *  @brief A dialog for showing the "help about" dialog
+ *  @brief A big main window class
+ *
+ *  The main window is the core UI feature of the application.
+ *  The main window is view container, basic controller, configuration root
+ *  and holder of many resources.
+ *  The main window is a singleton.
  */
-class LAY_PUBLIC HelpAboutDialog
-  : public QDialog
-{
-public:
-  HelpAboutDialog (QWidget *parent); 
-  ~HelpAboutDialog ();
-
-private:
-  Ui::HelpAboutDialog *mp_ui;
-};
-
-class TextProgressDelegate
-  : public lay::TextProgress
-{
-public:
-  TextProgressDelegate (MainWindow *mw, int verbosity);
-
-  virtual void update_progress (tl::Progress *progress);
-  virtual void show_progress_bar (bool show);
-  virtual bool progress_wants_widget () const;
-  virtual void progress_add_widget (QWidget *widget);
-  virtual QWidget *progress_get_widget () const;
-  virtual void progress_remove_widget ();
-
-private:
-  MainWindow *mp_mw;
-};
-
 class LAY_PUBLIC MainWindow
   : public QMainWindow,
     public lay::Dispatcher

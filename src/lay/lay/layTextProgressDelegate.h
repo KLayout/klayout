@@ -21,58 +21,35 @@
 */
 
 
-#ifndef HDR_layHelpDialog
-#define HDR_layHelpDialog
+#ifndef HDR_layTextProgressDelegate
+#define HDR_layTextProgressDelegate
 
 #include "layCommon.h"
 
-#include <QDialog>
-
-#include <memory>
-#include <string>
-
-namespace Ui
-{
-  class HelpDialog;
-}
+#include "layTextProgress.h"
 
 namespace lay
 {
 
-class HelpSource;
-class BrowserPanel;
+class MainWindow;
 
-/**
- *  @brief The help dialog (aka assistant)
- */
-class HelpDialog 
-  : public QDialog 
+class TextProgressDelegate
+  : public lay::TextProgress
 {
-Q_OBJECT 
-
 public:
-  HelpDialog (QWidget *parent, bool modal = false);
-  ~HelpDialog ();
+  TextProgressDelegate (MainWindow *mw, int verbosity);
 
-  void search (const std::string &topic);
-  void load (const std::string &url);
-  void showEvent (QShowEvent *);
-  void hideEvent (QHideEvent *);
-
-protected slots:
-  void title_changed (const QString &t);
+  virtual void update_progress (tl::Progress *progress);
+  virtual void show_progress_bar (bool show);
+  virtual bool progress_wants_widget () const;
+  virtual void progress_add_widget (QWidget *widget);
+  virtual QWidget *progress_get_widget () const;
+  virtual void progress_remove_widget ();
 
 private:
-  Ui::HelpDialog *mp_ui;
-  QRect m_geometry;
-  static lay::HelpSource *mp_help_source;
-  QString m_def_title;
-  bool m_initialized;
-
-  void initialize ();
+  MainWindow *mp_mw;
 };
 
 }
 
 #endif
-

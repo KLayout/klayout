@@ -34,6 +34,9 @@
 #endif
 
 #include <QTreeWidgetItem>
+#include <QTextBlock>
+#include <QCompleter>
+#include <QStringListModel>
 
 namespace lay
 {
@@ -73,18 +76,35 @@ BrowserPanel::init ()
   mp_ui->browser->set_panel (this);
   mp_ui->browser->setWordWrapMode (QTextOption::WordWrap);
 
+  mp_ui->browser->addAction (mp_ui->action_find);
+
   connect (mp_ui->back_pb, SIGNAL (clicked ()), this, SLOT (back ()));
   connect (mp_ui->forward_pb, SIGNAL (clicked ()), this, SLOT (forward ()));
   connect (mp_ui->next_topic_pb, SIGNAL (clicked ()), this, SLOT (next ()));
   connect (mp_ui->prev_topic_pb, SIGNAL (clicked ()), this, SLOT (prev ()));
   connect (mp_ui->home_pb, SIGNAL (clicked ()), this, SLOT (home ()));
-  connect (mp_ui->searchEdit, SIGNAL (returnPressed ()), this, SLOT (search_edited ()));
+  connect (mp_ui->search_edit, SIGNAL (textEdited (const QString &)), this, SLOT (search_text_changed (const QString &)));
+  connect (mp_ui->search_edit, SIGNAL (returnPressed ()), this, SLOT (search_edited ()));
+  connect (mp_ui->search_button, SIGNAL (clicked ()), this, SLOT (search_edited ()));
   connect (mp_ui->browser, SIGNAL (textChanged ()), this, SLOT (text_changed ()));
   connect (mp_ui->browser, SIGNAL (backwardAvailable (bool)), mp_ui->back_pb, SLOT (setEnabled (bool)));
   connect (mp_ui->browser, SIGNAL (forwardAvailable (bool)), mp_ui->forward_pb, SLOT (setEnabled (bool)));
   connect (mp_ui->outline_tree, SIGNAL (itemActivated (QTreeWidgetItem *, int)), this, SLOT (outline_item_clicked (QTreeWidgetItem *)));
+  connect (mp_ui->action_find, SIGNAL (triggered ()), this, SLOT (find ()));
+  connect (mp_ui->on_page_search_edit, SIGNAL (textChanged (const QString &)), this, SLOT (page_search_edited ()));
+  connect (mp_ui->on_page_search_edit, SIGNAL (returnPressed ()), this, SLOT (page_search_next ()));
+  connect (mp_ui->on_page_search_next, SIGNAL (clicked ()), this, SLOT (page_search_next ()));
 
-  mp_ui->searchEdit->hide ();
+  mp_completer = new QCompleter (this);
+  mp_completer->setFilterMode (Qt::MatchStartsWith);
+  mp_completer->setCaseSensitivity (Qt::CaseInsensitive);
+  mp_completer->setCompletionMode (QCompleter::UnfilteredPopupCompletion);
+  mp_completer_model = new QStringListModel (mp_completer);
+  mp_completer->setModel (mp_completer_model);
+  mp_ui->search_edit->setCompleter (mp_completer);
+
+  mp_ui->search_frame->hide ();
+  mp_ui->search_edit->hide ();
 
   set_label (std::string ());
 }
@@ -108,6 +128,87 @@ std::string
 BrowserPanel::url () const
 {
   return m_cached_url;
+}
+
+void
+BrowserPanel::find ()
+{
+  mp_ui->search_frame->show ();
+  mp_ui->on_page_search_edit->setFocus();
+}
+
+void
+BrowserPanel::page_search_edited ()
+{
+  m_search_selection.clear ();
+  m_search_index = -1;
+
+  if (mp_ui->on_page_search_edit->text ().size () < 2) {
+    mp_ui->browser->setExtraSelections (m_search_selection);
+    return;
+  }
+
+  QString search_text = mp_ui->on_page_search_edit->text ();
+
+  QTextDocument *doc = mp_ui->browser->document ();
+  for (QTextBlock b = doc->firstBlock (); b.isValid (); b = b.next ()) {
+
+    int from = 0;
+    int index;
+
+    QString t = b.text ();
+
+    while ((index = t.indexOf (search_text, from, Qt::CaseInsensitive)) >= 0) {
+
+      QTextCursor highlight (b);
+      highlight.movePosition (QTextCursor::NextCharacter, QTextCursor::MoveAnchor, index);
+      highlight.movePosition (QTextCursor::NextCharacter, QTextCursor::KeepAnchor, search_text.size ());
+
+      QTextEdit::ExtraSelection extra_selection;
+      extra_selection.cursor = highlight;
+      extra_selection.format.setBackground (QColor (255, 255, 160));
+      m_search_selection.push_back (extra_selection);
+
+      from = index + search_text.size ();
+
+    }
+
+  }
+
+  if (! m_search_selection.empty ()) {
+    m_search_index = 0;
+    mp_ui->browser->setExtraSelections (m_search_selection);
+    mp_ui->browser->setTextCursor (m_search_selection [m_search_index].cursor);
+  }
+}
+
+void
+BrowserPanel::page_search_next ()
+{
+  if (m_search_index >= 0) {
+
+    ++m_search_index;
+    if (m_search_index >= m_search_selection.size ()) {
+      m_search_index = 0;
+    }
+
+    mp_ui->browser->setTextCursor (m_search_selection [m_search_index].cursor);
+
+  }
+}
+
+void
+BrowserPanel::search_text_changed (const QString &text)
+{
+  QList<QString> strings;
+  if (! text.isEmpty () && mp_source.get ()) {
+    std::list<std::string> cl;
+    mp_source->search_completers (tl::to_string (text.toLower ()), cl);
+    for (std::list<std::string>::const_iterator i = cl.begin (); i != cl.end (); ++i) {
+      strings.push_back (tl::to_qstring (*i));
+    }
+  }
+  mp_completer_model->setStringList (strings);
 }
 
 void
@@ -259,15 +360,15 @@ BrowserPanel::search (const std::string &s)
 void
 BrowserPanel::search_edited ()
 {
-  if (mp_ui->searchEdit->text ().size () > 0) {
+  if (mp_ui->search_edit->text ().size () > 0) {
     QUrl url (tl::to_qstring (m_search_url));
 #if QT_VERSION >= 0x050000
     QUrlQuery qi;
-    qi.addQueryItem (tl::to_qstring (m_search_query_item), mp_ui->searchEdit->text ());
+    qi.addQueryItem (tl::to_qstring (m_search_query_item), mp_ui->search_edit->text ());
     url.setQuery (qi);
 #else
     QList<QPair<QString, QString> > qi;
-    qi.push_back (QPair<QString, QString> (tl::to_qstring (m_search_query_item), mp_ui->searchEdit->text ()));
+    qi.push_back (QPair<QString, QString> (tl::to_qstring (m_search_query_item), mp_ui->search_edit->text ()));
     url.setQueryItems (qi);
 #endif
     load (url.toEncoded ().constData ());
@@ -279,7 +380,7 @@ BrowserPanel::set_search_url (const std::string &url, const std::string &query_i
 {
   m_search_url = url;
   m_search_query_item = query_item;
-  mp_ui->searchEdit->setVisible (! url.empty ());
+  mp_ui->search_edit->setVisible (! url.empty ());
 }
 
 void 
@@ -472,6 +573,12 @@ BrowserOutline
 BrowserSource::get_outline (const std::string & /*url*/)
 {
   return BrowserOutline ();
+}
+
+void
+BrowserSource::search_completers (const std::string & /*search_string*/, std::list<std::string> & /*completers*/)
+{
+  //  .. nothing here ..
 }
 
 std::string 

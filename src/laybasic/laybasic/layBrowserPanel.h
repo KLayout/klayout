@@ -30,12 +30,15 @@
 #include "gsiObject.h"
 
 #include <QTextBrowser>
+#include <QCompleter>
 
 #include <string>
 #include <list>
 #include <set>
 
 class QTreeWidgetItem;
+class QCompleter;
+class QStringListModel;
 
 namespace Ui
 {
@@ -203,6 +206,11 @@ public:
    *  If an empty outline is returned, no outline is shown.
    */
   virtual BrowserOutline get_outline (const std::string &url);
+
+  /**
+   *  @brief Gets the search completer items for a given search string
+   */
+  virtual void search_completers (const std::string &search_string, std::list<std::string> &completers);
 
   /**
    *  @brief Get the image for a given "int" URL in an image
@@ -385,7 +393,15 @@ public slots:
    */
   void home ();
 
+  /**
+   *  @brief "find" activated
+   */
+  void find ();
+
 protected slots:
+  void page_search_edited ();
+  void page_search_next();
+  void search_text_changed(const QString &text);
   void search_edited ();
   void text_changed ();
   void outline_item_clicked (QTreeWidgetItem *item);
@@ -408,6 +424,10 @@ private:
   tl::DeferredMethod<BrowserPanel> m_back_dm;
   std::string m_search_url, m_search_query_item;
   QString m_current_title;
+  QList<QTextEdit::ExtraSelection> m_search_selection;
+  int m_search_index;
+  QCompleter *mp_completer;
+  QStringListModel *mp_completer_model;
 
   void init ();
 };

@@ -92,6 +92,7 @@ BrowserPanel::init ()
   connect (mp_ui->outline_tree, SIGNAL (itemActivated (QTreeWidgetItem *, int)), this, SLOT (outline_item_clicked (QTreeWidgetItem *)));
   connect (mp_ui->action_find, SIGNAL (triggered ()), this, SLOT (find ()));
   connect (mp_ui->on_page_search_edit, SIGNAL (textChanged (const QString &)), this, SLOT (page_search_edited ()));
+  connect (mp_ui->search_close_button, SIGNAL (clicked ()), this, SLOT (page_search_edited ()), Qt::QueuedConnection);
   connect (mp_ui->on_page_search_edit, SIGNAL (returnPressed ()), this, SLOT (page_search_next ()));
   connect (mp_ui->on_page_search_next, SIGNAL (clicked ()), this, SLOT (page_search_next ()));
 
@@ -143,7 +144,7 @@ BrowserPanel::page_search_edited ()
   m_search_selection.clear ();
   m_search_index = -1;
 
-  if (mp_ui->on_page_search_edit->text ().size () < 2) {
+  if (! mp_ui->search_frame->isVisible () || mp_ui->on_page_search_edit->text ().size () < 2) {
     mp_ui->browser->setExtraSelections (m_search_selection);
     return;
   }
@@ -219,6 +220,9 @@ BrowserPanel::text_changed ()
     m_current_title = title;
     emit title_changed (title);
   }
+
+  //  refresh on-page search
+  page_search_edited ();
 }
 
 void

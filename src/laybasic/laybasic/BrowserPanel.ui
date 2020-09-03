@@ -253,7 +253,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QToolButton" name="toolButton">
+              <widget class="QToolButton" name="search_close_button">
                <property name="text">
                 <string>...</string>
                </property>
@@ -462,7 +462,7 @@
  </resources>
  <connections>
   <connection>
-   <sender>toolButton</sender>
+   <sender>search_close_button</sender>
    <signal>clicked()</signal>
    <receiver>search_frame</receiver>
    <slot>hide()</slot>

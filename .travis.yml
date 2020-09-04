@@ -7,6 +7,36 @@ branches:
 matrix:
   include:
     # python manylinux packages
+    - name: "cp38-cp38m-manylinux1_x86_64.whl"
+      os: linux
+      sudo: true
+      language: python
+      python: '3.8'
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
+        - PY_VERSION="cp38-cp38m"
+        - DOCKER_BUILD=true
+        - TEST_IN_HOST=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "cp38-cp38m-manylinux1_i686.whl"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_i686"
+        - PY_VERSION="cp38-cp38m"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
 
     - name: "cp37-cp37m-manylinux1_x86_64.whl"
       os: linux

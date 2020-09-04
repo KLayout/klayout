@@ -37,6 +37,7 @@
 #include <QTextBlock>
 #include <QCompleter>
 #include <QStringListModel>
+#include <QScrollBar>
 
 namespace lay
 {
@@ -75,8 +76,13 @@ BrowserPanel::init ()
   mp_ui->browser->setReadOnly (true);
   mp_ui->browser->set_panel (this);
   mp_ui->browser->setWordWrapMode (QTextOption::WordWrap);
+  mp_ui->browser->setLineWrapMode (QTextEdit::FixedPixelWidth);
+  QFontMetrics fm (font ());
+  int text_width = fm.boundingRect ('m').width () * 80;
+  mp_ui->browser->setLineWrapColumnOrWidth (text_width);
 
   mp_ui->browser->addAction (mp_ui->action_find);
+  mp_ui->browser->addAction (mp_ui->action_bookmark);
 
   connect (mp_ui->back_pb, SIGNAL (clicked ()), this, SLOT (back ()));
   connect (mp_ui->forward_pb, SIGNAL (clicked ()), this, SLOT (forward ()));
@@ -90,11 +96,13 @@ BrowserPanel::init ()
   connect (mp_ui->browser, SIGNAL (backwardAvailable (bool)), mp_ui->back_pb, SLOT (setEnabled (bool)));
   connect (mp_ui->browser, SIGNAL (forwardAvailable (bool)), mp_ui->forward_pb, SLOT (setEnabled (bool)));
   connect (mp_ui->outline_tree, SIGNAL (itemActivated (QTreeWidgetItem *, int)), this, SLOT (outline_item_clicked (QTreeWidgetItem *)));
-  connect (mp_ui->action_find, SIGNAL (triggered ()), this, SLOT (find ()));
   connect (mp_ui->on_page_search_edit, SIGNAL (textChanged (const QString &)), this, SLOT (page_search_edited ()));
   connect (mp_ui->search_close_button, SIGNAL (clicked ()), this, SLOT (page_search_edited ()), Qt::QueuedConnection);
   connect (mp_ui->on_page_search_edit, SIGNAL (returnPressed ()), this, SLOT (page_search_next ()));
   connect (mp_ui->on_page_search_next, SIGNAL (clicked ()), this, SLOT (page_search_next ()));
+  connect (mp_ui->action_find, SIGNAL (triggered ()), this, SLOT (find ()));
+  connect (mp_ui->action_bookmark, SIGNAL (triggered ()), this, SLOT (bookmark ()));
+  connect (mp_ui->browser_bookmark_view, SIGNAL (itemDoubleClicked (QTreeWidgetItem *, int)), this, SLOT (bookmark_item_selected (QTreeWidgetItem *)));
 
   mp_completer = new QCompleter (this);
   mp_completer->setFilterMode (Qt::MatchStartsWith);
@@ -108,6 +116,10 @@ BrowserPanel::init ()
   mp_ui->search_edit->hide ();
 
   set_label (std::string ());
+
+  //  TODO: load bookmarks ...
+
+  refresh_bookmark_list ();
 }
 
 BrowserPanel::~BrowserPanel ()
@@ -129,6 +141,78 @@ std::string
 BrowserPanel::url () const
 {
   return m_cached_url;
+}
+
+void
+BrowserPanel::bookmark ()
+{
+  BookmarkItem bm;
+  bm.url = tl::to_string (mp_ui->browser->historyUrl (0).toString ());
+  QString title = mp_ui->browser->document ()->metaInformation (QTextDocument::DocumentTitle);
+  bm.title = tl::to_string (title);
+  bm.position = mp_ui->browser->verticalScrollBar ()->value ();
+
+  add_bookmark (bm);
+  refresh_bookmark_list ();
+}
+
+void
+BrowserPanel::bookmark_item_selected (QTreeWidgetItem *item)
+{
+  int index = mp_ui->browser_bookmark_view->indexOfTopLevelItem (item);
+  if (index < 0 || index >= int (m_bookmarks.size ())) {
+    return;
+  }
+
+  std::list<BookmarkItem>::iterator i = m_bookmarks.begin ();
+  for ( ; i != m_bookmarks.end () && index > 0; --index, ++i)
+    ;
+
+  if (i == m_bookmarks.end ()) {
+    return;
+  }
+
+  BookmarkItem bm = *i;
+  m_bookmarks.erase (i);
+  m_bookmarks.push_front (bm);
+
+  refresh_bookmark_list ();
+  load (bm.url);
+
+  mp_ui->browser->verticalScrollBar ()->setValue (bm.position);
+  mp_ui->browser_bookmark_view->topLevelItem (0)->setSelected (true);
+}
+
+void
+BrowserPanel::clear_bookmarks ()
+{
+  m_bookmarks.clear ();
+}
+
+void
+BrowserPanel::add_bookmark (const BookmarkItem &item)
+{
+  for (std::list<BookmarkItem>::iterator i = m_bookmarks.begin (); i != m_bookmarks.end (); ) {
+    std::list<BookmarkItem>::iterator ii = i;
+    ++ii;
+    if (*i == item) {
+      m_bookmarks.erase (i);
+    }
+    i = ii;
+  }
+  m_bookmarks.push_front (item);
+}
+
+void
+BrowserPanel::refresh_bookmark_list ()
+{
+  mp_ui->browser_bookmark_view->setVisible (! m_bookmarks.empty ());
+
+  mp_ui->browser_bookmark_view->clear ();
+  for (std::list<BookmarkItem>::const_iterator i = m_bookmarks.begin (); i != m_bookmarks.end (); ++i) {
+    QTreeWidgetItem *item = new QTreeWidgetItem (mp_ui->browser_bookmark_view);
+    item->setData (0, Qt::DisplayRole, tl::to_qstring (i->title));
+  }
 }
 
 void

@@ -159,7 +159,16 @@
               </property>
              </column>
             </widget>
-            <widget class="QTreeView" name="browser_bookmark_view"/>
+            <widget class="QTreeWidget" name="browser_bookmark_view">
+             <property name="rootIsDecorated">
+              <bool>false</bool>
+             </property>
+             <column>
+              <property name="text">
+               <string>Bookmarks</string>
+              </property>
+             </column>
+            </widget>
            </widget>
           </item>
          </layout>
@@ -441,6 +450,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="action_bookmark">
+   <property name="text">
+    <string>Bookmark</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
    </property>
   </action>
  </widget>

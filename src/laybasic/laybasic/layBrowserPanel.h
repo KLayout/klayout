@@ -282,6 +282,23 @@ private:
 };
 
 /**
+ *  @brief A structure describing a bookmark item
+ */
+struct LAYBASIC_PUBLIC BookmarkItem
+{
+  BookmarkItem () : position (0) { }
+
+  bool operator== (const BookmarkItem &other) const
+  {
+    return url == other.url && position == other.position;
+  }
+
+  std::string url;
+  std::string title;
+  int position;
+};
+
+/**
  *  @brief A specialisation of QWidget around a TextBrowser that allows loading a specific resource
  */
 class LAYBASIC_PUBLIC BrowserPanel
@@ -398,6 +415,11 @@ public slots:
    */
   void find ();
 
+  /**
+   *  @brief "bookmark" activated
+   */
+  void bookmark();
+
 protected slots:
   void page_search_edited ();
   void page_search_next();
@@ -405,6 +427,7 @@ protected slots:
   void search_edited ();
   void text_changed ();
   void outline_item_clicked (QTreeWidgetItem *item);
+  void bookmark_item_selected (QTreeWidgetItem *item);
 
 protected:
   virtual QVariant loadResource (int type, const QUrl &url);
@@ -428,8 +451,12 @@ private:
   int m_search_index;
   QCompleter *mp_completer;
   QStringListModel *mp_completer_model;
+  std::list<BookmarkItem> m_bookmarks;
 
   void init ();
+  void clear_bookmarks ();
+  void add_bookmark (const BookmarkItem &item);
+  void refresh_bookmark_list ();
 };
 
 }

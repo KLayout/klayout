@@ -88,6 +88,7 @@ BrowserPanel::init ()
   connect (mp_ui->forward_pb, SIGNAL (clicked ()), this, SLOT (forward ()));
   connect (mp_ui->next_topic_pb, SIGNAL (clicked ()), this, SLOT (next ()));
   connect (mp_ui->prev_topic_pb, SIGNAL (clicked ()), this, SLOT (prev ()));
+  connect (mp_ui->bookmark_pb, SIGNAL (clicked ()), this, SLOT (bookmark ()));
   connect (mp_ui->home_pb, SIGNAL (clicked ()), this, SLOT (home ()));
   connect (mp_ui->search_edit, SIGNAL (textEdited (const QString &)), this, SLOT (search_text_changed (const QString &)));
   connect (mp_ui->search_edit, SIGNAL (returnPressed ()), this, SLOT (search_edited ()));
@@ -212,6 +213,7 @@ BrowserPanel::refresh_bookmark_list ()
   for (std::list<BookmarkItem>::const_iterator i = m_bookmarks.begin (); i != m_bookmarks.end (); ++i) {
     QTreeWidgetItem *item = new QTreeWidgetItem (mp_ui->browser_bookmark_view);
     item->setData (0, Qt::DisplayRole, tl::to_qstring (i->title));
+    item->setData (0, Qt::DecorationRole, QIcon (":/bookmark_16.png"));
   }
 }
 

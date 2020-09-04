@@ -22,9 +22,11 @@
 
 
 #include "layBrowserPanel.h"
+#include "layDispatcher.h"
 #include "tlExceptions.h"
 #include "tlInternational.h"
 #include "tlException.h"
+#include "tlString.h"
 
 #include "ui_BrowserPanel.h"
 
@@ -56,9 +58,44 @@ BrowserTextWidget::loadResource (int type, const QUrl &url)
 
 // -------------------------------------------------------------
 
+void
+BookmarkItem::read (tl::Extractor &ex)
+{
+  while (! ex.at_end () && ! ex.test (";")) {
+
+    std::string k, v;
+    ex.read_word (k);
+    ex.test (":");
+    ex.read_word_or_quoted (v, "+-.");
+    ex.test (",");
+
+    if (k == "url") {
+      url = v;
+    } else if (k == "title") {
+      title = v;
+    } else if (k == "position") {
+      tl::from_string (v, position);
+    }
+
+  }
+}
+
+std::string
+BookmarkItem::to_string () const
+{
+  std::string r;
+  r = "url:" + tl::to_quoted_string (url) + ",";
+  r += "title:" + tl::to_quoted_string (title) + ",";
+  r += "position:" + tl::to_string (position) + ";";
+  return r;
+}
+
+// -------------------------------------------------------------
+
 BrowserPanel::BrowserPanel (QWidget *parent)
   : QWidget (parent),
-    m_back_dm (this, &BrowserPanel::back)
+    m_back_dm (this, &BrowserPanel::back),
+    mp_dispatcher (0)
 {
   init ();
 }
@@ -84,6 +121,9 @@ BrowserPanel::init ()
   mp_ui->browser->addAction (mp_ui->action_find);
   mp_ui->browser->addAction (mp_ui->action_bookmark);
 
+  mp_ui->browser_bookmark_view->addAction (mp_ui->action_delete_bookmark);
+  mp_ui->browser_bookmark_view->setContextMenuPolicy (Qt::ActionsContextMenu);
+
   connect (mp_ui->back_pb, SIGNAL (clicked ()), this, SLOT (back ()));
   connect (mp_ui->forward_pb, SIGNAL (clicked ()), this, SLOT (forward ()));
   connect (mp_ui->next_topic_pb, SIGNAL (clicked ()), this, SLOT (next ()));
@@ -103,6 +143,7 @@ BrowserPanel::init ()
   connect (mp_ui->on_page_search_next, SIGNAL (clicked ()), this, SLOT (page_search_next ()));
   connect (mp_ui->action_find, SIGNAL (triggered ()), this, SLOT (find ()));
   connect (mp_ui->action_bookmark, SIGNAL (triggered ()), this, SLOT (bookmark ()));
+  connect (mp_ui->action_delete_bookmark, SIGNAL (triggered ()), this, SLOT (delete_bookmark ()));
   connect (mp_ui->browser_bookmark_view, SIGNAL (itemDoubleClicked (QTreeWidgetItem *, int)), this, SLOT (bookmark_item_selected (QTreeWidgetItem *)));
 
   mp_completer = new QCompleter (this);
@@ -118,8 +159,6 @@ BrowserPanel::init ()
 
   set_label (std::string ());
 
-  //  TODO: load bookmarks ...
-
   refresh_bookmark_list ();
 }
 
@@ -130,6 +169,37 @@ BrowserPanel::~BrowserPanel ()
 
   delete mp_ui;
   mp_ui = 0;
+}
+
+void
+BrowserPanel::set_dispatcher (lay::Dispatcher *dispatcher, const std::string &cfg_bookmarks)
+{
+  mp_dispatcher = dispatcher;
+  m_cfg_bookmarks = cfg_bookmarks;
+
+  m_bookmarks.clear ();
+
+  //  load the bookmarks
+  try {
+
+    if (mp_dispatcher) {
+
+      std::string v;
+      mp_dispatcher->config_get (m_cfg_bookmarks, v);
+
+      tl::Extractor ex (v.c_str ());
+      while (! ex.at_end ()) {
+        m_bookmarks.push_back (BookmarkItem ());
+        m_bookmarks.back ().read (ex);
+      }
+
+    }
+
+  } catch (...) {
+    //  exceptions ignored here
+  }
+
+  refresh_bookmark_list ();
 }
 
 std::string
@@ -155,6 +225,22 @@ BrowserPanel::bookmark ()
 
   add_bookmark (bm);
   refresh_bookmark_list ();
+  store_bookmarks ();
+}
+
+void
+BrowserPanel::store_bookmarks ()
+{
+  if (mp_dispatcher) {
+
+    std::string s;
+    for (std::list<BookmarkItem>::const_iterator i = m_bookmarks.begin (); i != m_bookmarks.end (); ++i) {
+      s += i->to_string ();
+    }
+
+    mp_dispatcher->config_set (m_cfg_bookmarks, s);
+
+  }
 }
 
 void
@@ -178,6 +264,7 @@ BrowserPanel::bookmark_item_selected (QTreeWidgetItem *item)
   m_bookmarks.push_front (bm);
 
   refresh_bookmark_list ();
+  store_bookmarks ();
   load (bm.url);
 
   mp_ui->browser->verticalScrollBar ()->setValue (bm.position);
@@ -205,6 +292,26 @@ BrowserPanel::add_bookmark (const BookmarkItem &item)
 }
 
 void
+BrowserPanel::delete_bookmark ()
+{
+  QTreeWidgetItem *item = mp_ui->browser_bookmark_view->currentItem ();
+  if (! item) {
+    return;
+  }
+
+  int index = mp_ui->browser_bookmark_view->indexOfTopLevelItem (item);
+  std::list<BookmarkItem>::iterator i = m_bookmarks.begin ();
+  for ( ; i != m_bookmarks.end () && index > 0; --index, ++i)
+    ;
+
+  if (i != m_bookmarks.end ()) {
+    m_bookmarks.erase (i);
+    refresh_bookmark_list ();
+    store_bookmarks ();
+  }
+}
+
+void
 BrowserPanel::refresh_bookmark_list ()
 {
   mp_ui->browser_bookmark_view->setVisible (! m_bookmarks.empty ());
@@ -213,6 +320,7 @@ BrowserPanel::refresh_bookmark_list ()
   for (std::list<BookmarkItem>::const_iterator i = m_bookmarks.begin (); i != m_bookmarks.end (); ++i) {
     QTreeWidgetItem *item = new QTreeWidgetItem (mp_ui->browser_bookmark_view);
     item->setData (0, Qt::DisplayRole, tl::to_qstring (i->title));
+    item->setData (0, Qt::ToolTipRole, tl::to_qstring (i->title));
     item->setData (0, Qt::DecorationRole, QIcon (":/bookmark_16.png"));
   }
 }

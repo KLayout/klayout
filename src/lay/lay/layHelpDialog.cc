@@ -24,6 +24,8 @@
 #include "layHelpDialog.h"
 #include "layHelpSource.h"
 #include "layBrowserPanel.h"
+#include "layDispatcher.h"
+#include "layConfig.h"
 #include "tlStaticObjects.h"
 #include "ui_HelpDialog.h"
 
@@ -49,6 +51,7 @@ HelpDialog::HelpDialog (QWidget *parent, bool modal)
   setModal (modal);
 
   mp_ui->button_frame->setVisible (modal);
+  mp_ui->browser_panel->set_dispatcher (lay::Dispatcher::instance (), cfg_assistant_bookmarks);
 
   m_def_title = windowTitle ();
   connect (mp_ui->browser_panel, SIGNAL (title_changed (const QString &)), this, SLOT (title_changed (const QString &)));

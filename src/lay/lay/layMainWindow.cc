@@ -192,7 +192,7 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
 
   init_menu ();
 
-  mp_assistant = new lay::HelpDialog (this);
+  mp_assistant = 0;
 
   mp_pr = new lay::ProgressReporter ();
   mp_pr->set_progress_bar (&m_text_progress);
@@ -3719,6 +3719,10 @@ MainWindow::cm_macro_editor ()
 void
 MainWindow::cm_show_assistant ()
 {
+  if (! mp_assistant) {
+    mp_assistant = new lay::HelpDialog (this);
+  }
+
   if (mp_assistant->isMinimized ()) {
     mp_assistant->showNormal ();
   } else {
@@ -3754,13 +3758,7 @@ MainWindow::show_assistant_url (const std::string &url, bool modal)
 
   } else {
 
-    if (mp_assistant->isMinimized ()) {
-      mp_assistant->showNormal ();
-    } else {
-      mp_assistant->show ();
-    }
-    mp_assistant->activateWindow ();
-    mp_assistant->raise ();
+    cm_show_assistant ();
     mp_assistant->load (url);
 
   }
@@ -3777,13 +3775,7 @@ MainWindow::show_assistant_topic (const std::string &s, bool modal)
 
   } else {
 
-    if (mp_assistant->isMinimized ()) {
-      mp_assistant->showNormal ();
-    } else {
-      mp_assistant->show ();
-    }
-    mp_assistant->activateWindow ();
-    mp_assistant->raise ();
+    cm_show_assistant ();
     mp_assistant->search (s);
 
   }

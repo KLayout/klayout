@@ -60,6 +60,7 @@ static const std::string cfg_layout_file_watcher_enabled ("layout-file-watcher-e
 static const std::string cfg_window_geometry ("window-geometry");
 static const std::string cfg_micron_digits ("digits-micron");
 static const std::string cfg_dbu_digits ("digits-dbu");
+static const std::string cfg_assistant_bookmarks ("assistant-bookmarks");
 
 }
 

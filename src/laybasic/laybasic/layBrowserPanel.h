@@ -49,6 +49,7 @@ namespace lay
 {
 
 class BrowserPanel;
+class Dispatcher;
 
 /**
  *  @brief Specifies the outline of the document
@@ -293,6 +294,9 @@ struct LAYBASIC_PUBLIC BookmarkItem
     return url == other.url && position == other.position;
   }
 
+  void read (tl::Extractor &ex);
+  std::string to_string () const;
+
   std::string url;
   std::string title;
   int position;
@@ -311,13 +315,25 @@ Q_OBJECT
 public:
   /**
    *  @brief Constructor
+   *
+   *  @param p The parent widget
    */
-  BrowserPanel (QWidget *p); 
+  BrowserPanel (QWidget *p);
 
   /**
    *  @brief Dtor
    */
   ~BrowserPanel ();
+
+  /**
+   *  @brief Connects the panel to a configuration dispatcher
+   *
+   *  Doing so allows storing bookmarks and retrieving them.
+   *
+   *  @param dispatcher If given, this interface will be used to retrieve and store the bookmark list
+   *  @param cfg_bookmarks If dispatcher is given, this will be the configuration key to store the bookmarks
+   */
+  void set_dispatcher (lay::Dispatcher *dispatcher, const std::string &cfg_bookmarks);
 
   /**
    *  @brief Connect to a source object
@@ -428,6 +444,7 @@ protected slots:
   void text_changed ();
   void outline_item_clicked (QTreeWidgetItem *item);
   void bookmark_item_selected (QTreeWidgetItem *item);
+  void delete_bookmark ();
 
 protected:
   virtual QVariant loadResource (int type, const QUrl &url);
@@ -452,11 +469,14 @@ private:
   QCompleter *mp_completer;
   QStringListModel *mp_completer_model;
   std::list<BookmarkItem> m_bookmarks;
+  lay::Dispatcher *mp_dispatcher;
+  std::string m_cfg_bookmarks;
 
   void init ();
   void clear_bookmarks ();
   void add_bookmark (const BookmarkItem &item);
   void refresh_bookmark_list ();
+  void store_bookmarks ();
 };
 
 }

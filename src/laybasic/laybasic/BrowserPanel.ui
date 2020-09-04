@@ -142,7 +142,7 @@
              </property>
              <column>
               <property name="text">
-               <string>Bookmarks</string>
+               <string>Favorites</string>
               </property>
              </column>
             </widget>
@@ -462,7 +462,7 @@
    <item row="0" column="9">
     <widget class="QToolButton" name="bookmark_pb">
      <property name="toolTip">
-      <string>Bookmark this location</string>
+      <string>Add this location to the favorites list</string>
      </property>
      <property name="text">
       <string>...</string>
@@ -497,6 +497,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+B</string>
+   </property>
+  </action>
+  <action name="action_delete_bookmark">
+   <property name="text">
+    <string>Delete Entry</string>
    </property>
   </action>
  </widget>

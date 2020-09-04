@@ -83,6 +83,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_micron_digits, "5"));
     options.push_back (std::pair<std::string, std::string> (cfg_dbu_digits, "2"));
     options.push_back (std::pair<std::string, std::string> (cfg_reader_options_show_always, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_assistant_bookmarks, ""));
   }
 
   virtual std::vector<std::pair <std::string, ConfigPage *> > config_pages (QWidget *parent) const 

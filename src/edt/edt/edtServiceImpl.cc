@@ -413,9 +413,19 @@ PolygonService::set_last_point (const db::DPoint &p)
   }
 }
 
-void 
+void
+PolygonService::do_mouse_move_inactive (const db::DPoint &p)
+{
+  lay::PointSnapToObjectResult snap_details = snap2_details (p);
+  set_mouse_cursor (snap_details.snapped_point);
+}
+
+void
 PolygonService::do_mouse_move (const db::DPoint &p)
 {
+  lay::PointSnapToObjectResult snap_details = snap2_details (p);
+  set_mouse_cursor (snap_details.snapped_point);
+
   set_cursor (lay::Cursor::cross);
   if (m_points.size () >= 2) {
     set_last_point (p);

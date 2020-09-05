@@ -1309,7 +1309,7 @@ db::DPoint
 PartialService::snap2 (const db::DPoint &p) const
 {
   double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (sr_pixels);
-  return lay::obj_snap (m_snap_to_objects ? view () : 0, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, snap_range).second;
+  return lay::obj_snap (m_snap_to_objects ? view () : 0, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, snap_range).snapped_point;
 }
 
 void

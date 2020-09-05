@@ -231,11 +231,11 @@ PropertiesPage::snap_to_layout_clicked ()
 
     while (snap_range < max_range) {
 
-      std::pair<bool, db::DPoint> pp = lay::obj_snap (service->view (), snap_p1 ? p2 : p1, snap_p1 ? p1 : p2, g, ac, snap_range);
-      if (pp.first) {
+      lay::PointSnapToObjectResult pp = lay::obj_snap (service->view (), snap_p1 ? p2 : p1, snap_p1 ? p1 : p2, g, ac, snap_range);
+      if (pp.object_snap != lay::PointSnapToObjectResult::NoObject) {
 
-        QString xs = tl::to_qstring (tl::micron_to_string (pp.second.x ()));
-        QString ys = tl::to_qstring (tl::micron_to_string (pp.second.y ()));
+        QString xs = tl::to_qstring (tl::micron_to_string (pp.snapped_point.x ()));
+        QString ys = tl::to_qstring (tl::micron_to_string (pp.snapped_point.y ()));
 
         if (sender () == p1_to_layout) {
           x1->setText (xs);
@@ -262,13 +262,13 @@ PropertiesPage::snap_to_layout_clicked ()
     double snap_range = service->widget ()->mouse_event_trans ().inverted ().ctrans (service->snap_range ());
     snap_range *= 0.5;
 
-    std::pair<bool, db::DEdge> ee = lay::obj_snap2 (service->view (), p1, p2, g, ac, snap_range, snap_range * 1000.0);
-    if (ee.first) {
+    lay::TwoPointSnapToObjectResult ee = lay::obj_snap2 (service->view (), p1, p2, g, ac, snap_range, snap_range * 1000.0);
+    if (ee.any) {
 
-      x1->setText (tl::to_qstring (tl::micron_to_string (ee.second.p1 ().x ())));
-      y1->setText (tl::to_qstring (tl::micron_to_string (ee.second.p1 ().y ())));
-      x2->setText (tl::to_qstring (tl::micron_to_string (ee.second.p2 ().x ())));
-      y2->setText (tl::to_qstring (tl::micron_to_string (ee.second.p2 ().y ())));
+      x1->setText (tl::to_qstring (tl::micron_to_string (ee.first.x ())));
+      y1->setText (tl::to_qstring (tl::micron_to_string (ee.first.y ())));
+      x2->setText (tl::to_qstring (tl::micron_to_string (ee.second.x ())));
+      y2->setText (tl::to_qstring (tl::micron_to_string (ee.second.y ())));
 
       db::Transaction t (manager (), tl::to_string (QObject::tr ("Snap both ruler points")));
       emit edited ();

@@ -1434,14 +1434,14 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
         double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (m_snap_range);
         snap_range *= 0.5;
 
-        std::pair<bool, db::DEdge> ee = lay::obj_snap2 (mp_view, p, g, ac, snap_range, snap_range * 1000.0);
-        if (ee.first) {
+        lay::TwoPointSnapToObjectResult ee = lay::obj_snap2 (mp_view, p, g, ac, snap_range, snap_range * 1000.0);
+        if (ee.any) {
 
           //  begin the transaction
           tl_assert (! manager ()->transacting ());
           manager ()->transaction (tl::to_string (QObject::tr ("Create ruler")));
 
-          m_current = ant::Object (ee.second.p1 (), ee.second.p2 (), 0, tpl);
+          m_current = ant::Object (ee.first, ee.second, 0, tpl);
           show_message ();
 
           insert_ruler (m_current, true);
@@ -1505,9 +1505,9 @@ Service::create_measure_ruler (const db::DPoint &pt, lay::angle_constraint_type 
 
   ant::Template tpl;
 
-  std::pair<bool, db::DEdge> ee = lay::obj_snap2 (mp_view, pt, db::DVector (), ac, snap_range, snap_range * 1000.0);
-  if (ee.first) {
-    return ant::Object (ee.second.p1 (), ee.second.p2 (), 0, tpl);
+  lay::TwoPointSnapToObjectResult ee = lay::obj_snap2 (mp_view, pt, db::DVector (), ac, snap_range, snap_range * 1000.0);
+  if (ee.any) {
+    return ant::Object (ee.first, ee.second, 0, tpl);
   } else {
     return ant::Object (pt, pt, 0, tpl);
   }
@@ -1545,7 +1545,8 @@ Service::snap1 (const db::DPoint &p, bool obj_snap)
   }
 
   double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (m_snap_range);
-  return lay::obj_snap (obj_snap ? mp_view : 0, p, g, snap_range);
+  lay::PointSnapToObjectResult res = lay::obj_snap (obj_snap ? mp_view : 0, p, g, snap_range);
+  return std::make_pair (res.object_snap != lay::PointSnapToObjectResult::NoObject, res.snapped_point);
 }
 
 
@@ -1560,7 +1561,8 @@ Service::snap2 (const db::DPoint &p1, const db::DPoint &p2, const ant::Object *o
   double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (m_snap_range);
   lay::angle_constraint_type snap_mode = ac == lay::AC_Global ? (obj->angle_constraint () == lay::AC_Global ? m_snap_mode : obj->angle_constraint ()) : ac;
 
-  return lay::obj_snap (m_obj_snap && obj->snap () ? mp_view : 0, p1, p2, g, snap_mode, snap_range);
+  lay::PointSnapToObjectResult res = lay::obj_snap (m_obj_snap && obj->snap () ? mp_view : 0, p1, p2, g, snap_mode, snap_range);
+  return std::make_pair (res.object_snap != lay::PointSnapToObjectResult::NoObject, res.snapped_point);
 }
 
 

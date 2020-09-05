@@ -116,6 +116,7 @@ Service::~Service ()
   }
   m_edit_markers.clear ();
 
+  reset_mouse_cursor ();
   clear_transient_selection ();
 }
 
@@ -178,18 +179,24 @@ Service::snap (const db::DPoint &p, const db::DPoint &plast, bool connect) const
 
 const int sr_pixels = 8; // TODO: make variable
 
-db::DPoint 
-Service::snap2 (const db::DPoint &p) const
+lay::PointSnapToObjectResult
+Service::snap2_details (const db::DPoint &p) const
 {
   double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (sr_pixels);
-  return lay::obj_snap (m_snap_to_objects ? view () : 0, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, snap_range).second;
+  return lay::obj_snap (m_snap_to_objects ? view () : 0, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, snap_range);
+}
+
+db::DPoint
+Service::snap2 (const db::DPoint &p) const
+{
+  return snap2_details (p).snapped_point;
 }
 
 db::DPoint 
 Service::snap2 (const db::DPoint &p, const db::DPoint &plast, bool connect) const
 {
   double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (sr_pixels);
-  return lay::obj_snap (m_snap_to_objects ? view () : 0, plast, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, connect ? connect_ac () : move_ac (), snap_range).second;
+  return lay::obj_snap (m_snap_to_objects ? view () : 0, plast, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, connect ? connect_ac () : move_ac (), snap_range).snapped_point;
 }
 
 void
@@ -473,6 +480,71 @@ Service::selection_bbox ()
   return box;
 }
 
+namespace
+{
+
+class MouseCursorViewObject
+  : public lay::ViewObject
+{
+public:
+  MouseCursorViewObject (lay::ViewObjectWidget *widget, const db::DPoint &pt)
+    : lay::ViewObject (widget, false), m_pt (pt)
+  { }
+
+  virtual void render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
+  {
+    int dither_pattern = 0; // solid
+    int lw = int (0.5 + 1.0 / canvas.resolution ());
+
+    std::vector <lay::ViewOp> ops;
+    ops.resize (1);
+    ops[0] = lay::ViewOp (canvas.foreground_color ().rgb (), lay::ViewOp::Copy, 0, (unsigned int) dither_pattern, 0, lay::ViewOp::Rect, lw, 0);
+    lay::CanvasPlane *plane = canvas.plane (ops);
+
+    lay::Renderer &r = canvas.renderer ();
+
+    double rad = 4.0 / canvas.resolution () / vp.trans ().mag ();
+
+    const size_t num_pts = 16;
+    db::DPoint pts [num_pts];
+    for (size_t i = 0; i < num_pts; ++i) {
+      double x = rad * cos (M_PI * 2.0 * double (i) / double (num_pts));
+      double y = rad * sin (M_PI * 2.0 * double (i) / double (num_pts));
+      pts [i] = m_pt + db::DVector (x, y);
+    }
+    db::DPolygon circle;
+    circle.assign_hull (pts, pts + num_pts);
+
+    r.draw (circle, vp.trans (), 0, plane, 0, 0);
+
+    r.draw (db::DEdge (m_pt + db::DVector (0, rad * 0.5), m_pt + db::DVector (0, rad * 4)), vp.trans (), 0, plane, 0, 0);
+    r.draw (db::DEdge (m_pt + db::DVector (rad * 0.5, 0), m_pt + db::DVector (rad * 4, 0)), vp.trans (), 0, plane, 0, 0);
+    r.draw (db::DEdge (m_pt + db::DVector (0, -rad * 0.5), m_pt + db::DVector (0, -rad * 4)), vp.trans (), 0, plane, 0, 0);
+    r.draw (db::DEdge (m_pt + db::DVector (-rad * 0.5, 0), m_pt + db::DVector (-rad * 4, 0)), vp.trans (), 0, plane, 0, 0);
+  }
+
+private:
+  db::DPoint m_pt;
+};
+
+}
+
+void
+Service::set_mouse_cursor (const db::DPoint &pt)
+{
+  reset_mouse_cursor ();
+  m_mouse_cursor_markers.push_back (new MouseCursorViewObject (widget (), pt));
+}
+
+void
+Service::reset_mouse_cursor ()
+{
+  for (std::vector<lay::ViewObject *>::iterator r = m_mouse_cursor_markers.begin (); r != m_mouse_cursor_markers.end (); ++r) {
+    delete *r;
+  }
+  m_mouse_cursor_markers.clear ();
+}
+
 void
 Service::set_edit_marker (lay::ViewObject *edit_marker)
 {
@@ -715,6 +787,8 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
       }
       if (m_editing) {
         do_mouse_move (p);
+      } else {
+        do_mouse_move_inactive (p);
       }
 
       m_alt_ac = lay::AC_Global;
@@ -813,6 +887,8 @@ Service::activated ()
 void   
 Service::deactivated ()
 {
+  reset_mouse_cursor ();
+
   //  make all editor option pages visible
   activate_service (view (), plugin_declaration (), false);
 

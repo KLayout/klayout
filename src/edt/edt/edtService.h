@@ -461,6 +461,16 @@ protected:
   virtual void service_configuration_changed ();
 
   /**
+   *  @brief Sets the mouse cursor to the given point
+   */
+  void set_mouse_cursor (const db::DPoint &pt);
+
+  /**
+   *  @brief Resets the mouse cursor
+   */
+  void reset_mouse_cursor ();
+
+  /**
    *  @brief Install a marker for representing the edited object
    *
    *  The ownership over the marker is transferred to the service object.
@@ -552,6 +562,11 @@ protected:
     return m_editing;
   }
 
+  /**
+   *  @brief Point snapping with detailed return value
+   */
+  lay::PointSnapToObjectResult snap2_details (const db::DPoint &p) const;
+
 private:
   //  The layout view that the editor service is attached to
   lay::LayoutView *mp_view;
@@ -564,6 +579,9 @@ private:
 
   //  The marker representing the object to be edited
   std::vector<lay::ViewObject *> m_edit_markers;
+
+  //  The marker representing the mouse cursor
+  std::vector<lay::ViewObject *> m_mouse_cursor_markers;
 
   //  True, if editing is in progress.
   bool m_editing;

@@ -480,11 +480,6 @@ db::Point point_from_dpoint (const db::DPoint &dp, double dbu, bool du, const db
  */
 db::Coord coord_from_string (const char *txt, double dbu, bool du, const db::VCplxTrans &t);
 
-/**
- *  @brief Configures a QLineEdit to indicate a format error
- */
-void indicate_error (QWidget *le, const tl::Exception *ex);
-
 }
 
 #endif

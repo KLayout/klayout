@@ -26,6 +26,7 @@
 #include "imgStream.h"
 #include "layLayoutView.h"
 #include "layFileDialog.h"
+#include "layQtTools.h"
 #include "tlExceptions.h"
 #include "tlFileUtils.h"
 
@@ -34,27 +35,6 @@ namespace img
 
 const double min_gamma = 0.3;
 const double max_gamma = 3.0;
-
-// -------------------------------------------------------------------------
-
-void
-indicate_error (QWidget *le, const tl::Exception *ex)
-{
-  //  by the way, update the foreground color of the cell edit box as well (red, if not valid)
-  QPalette pl = le->palette ();
-  if (ex) {
-    pl.setColor (QPalette::Active, QPalette::Text, Qt::red);
-    pl.setColor (QPalette::Active, QPalette::Base, QColor (Qt::red).lighter (180));
-    le->setToolTip (tl::to_qstring (ex->msg ()));
-  } else {
-    QWidget *pw = dynamic_cast<QWidget *> (le->parent ());
-    tl_assert (pw != 0);
-    pl.setColor (QPalette::Active, QPalette::Text, pw->palette ().color (QPalette::Text));
-    pl.setColor (QPalette::Active, QPalette::Base, pw->palette ().color (QPalette::Base));
-    le->setToolTip (QString ());
-  }
-  le->setPalette (pl);
-}
 
 // -------------------------------------------------------------------------
 //  PropertiesPage implementation
@@ -239,24 +219,24 @@ PropertiesPage::get_xmin_xmax (double &xmin, double &xmax, bool &has_error_out)
 
   try {
     tl::from_string (tl::to_string (from_le->text ()), xmin);
-    indicate_error (from_le, 0);
+    lay::indicate_error (from_le, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (from_le, &ex);
+    lay::indicate_error (from_le, &ex);
     has_error = true;
   }
 
   try {
     tl::from_string (tl::to_string (to_le->text ()), xmax);
-    indicate_error (to_le, 0);
+    lay::indicate_error (to_le, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (to_le, &ex);
+    lay::indicate_error (to_le, &ex);
     has_error = true;
   }
 
   if (! has_error && xmin >= xmax) {
     tl::Exception ex (tl::to_string (QObject::tr ("Invalid data value range (min. value must be less than max. value)")));
-    indicate_error (from_le, &ex);
-    indicate_error (to_le, &ex);
+    lay::indicate_error (from_le, &ex);
+    lay::indicate_error (to_le, &ex);
     has_error = true;
   }
 
@@ -356,16 +336,16 @@ PropertiesPage::value_changed ()
   double x = 0.0;
   try {
     tl::from_string (tl::to_string (value_le->text ()), x);
-    indicate_error (value_le, 0);
+    lay::indicate_error (value_le, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (value_le, &ex);
+    lay::indicate_error (value_le, &ex);
     has_error = true;
   }
 
   xx = (x - xmin) / (xmax - xmin);
   if (! has_error && (xx < 0 || xx > 1.0)) {
     tl::Exception ex (tl::to_string (QObject::tr ("The position entered (%g) must be between the minimum (%g) and maximum (%g) value")), x, xmin, xmax);
-    indicate_error (value_le, &ex);
+    lay::indicate_error (value_le, &ex);
     has_error = true;
   }
 
@@ -825,41 +805,41 @@ PropertiesPage::apply ()
     if (w <= 0.0 || h <= 0.0) {
       throw tl::Exception (tl::to_string (QObject::tr ("Pixel width or height must be positive, non-null values")));
     }
-    indicate_error (width_le, 0);
+    lay::indicate_error (width_le, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (width_le, &ex);
+    lay::indicate_error (width_le, &ex);
     has_error = true;
   }
 
   try {
     tl::from_string (tl::to_string (height_le->text ()), h);
-    indicate_error (height_le, 0);
+    lay::indicate_error (height_le, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (height_le, &ex);
+    lay::indicate_error (height_le, &ex);
     has_error = true;
   }
 
   try {
     tl::from_string (tl::to_string (x_offset_le->text ()), x);
-    indicate_error (x_offset_le, 0);
+    lay::indicate_error (x_offset_le, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (x_offset_le, &ex);
+    lay::indicate_error (x_offset_le, &ex);
     has_error = true;
   }
 
   try {
     tl::from_string (tl::to_string (y_offset_le->text ()), y);
-    indicate_error (y_offset_le, 0);
+    lay::indicate_error (y_offset_le, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (y_offset_le, &ex);
+    lay::indicate_error (y_offset_le, &ex);
     has_error = true;
   }
 
   try {
     tl::from_string (tl::to_string (angle_le->text ()), a);
-    indicate_error (angle_le, 0);
+    lay::indicate_error (angle_le, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (angle_le, &ex);
+    lay::indicate_error (angle_le, &ex);
     has_error = true;
   }
 
@@ -868,9 +848,9 @@ PropertiesPage::apply ()
     if (sa <= -45 || sa >= 45) {
       throw tl::Exception (tl::to_string (QObject::tr ("The shear angle must be larger than -45 and less than 45 degree")));
     }
-    indicate_error (shear_le, 0);
+    lay::indicate_error (shear_le, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (shear_le, &ex);
+    lay::indicate_error (shear_le, &ex);
     has_error = true;
   }
 
@@ -879,9 +859,9 @@ PropertiesPage::apply ()
     if (tx <= -90 || tx >= 90) {
       throw tl::Exception (tl::to_string (QObject::tr ("The perspective tilt angles must be larger than -90 and less than 90 degree")));
     }
-    indicate_error (persp_tx_le, 0);
+    lay::indicate_error (persp_tx_le, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (persp_tx_le, &ex);
+    lay::indicate_error (persp_tx_le, &ex);
     has_error = true;
   }
 
@@ -890,9 +870,9 @@ PropertiesPage::apply ()
     if (ty <= -90 || ty >= 90) {
       throw tl::Exception (tl::to_string (QObject::tr ("The perspective tilt angles must be larger than -90 and less than 90 degree")));
     }
-    indicate_error (persp_ty_le, 0);
+    lay::indicate_error (persp_ty_le, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (persp_ty_le, &ex);
+    lay::indicate_error (persp_ty_le, &ex);
     has_error = true;
   }
 

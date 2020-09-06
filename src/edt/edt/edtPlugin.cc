@@ -22,6 +22,7 @@
 
 
 #include "layTipDialog.h"
+#include "layEditorOptionsPages.h"
 #include "edtPlugin.h"
 #include "edtConfig.h"
 #include "edtService.h"
@@ -43,7 +44,7 @@ edt::RecentConfigurationPage::ConfigurationDescriptor shape_cfg_descriptors[] =
 };
 
 static
-void get_shape_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
+void get_shape_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
 {
   ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-shape-param",
                         &shape_cfg_descriptors[0], &shape_cfg_descriptors[sizeof (shape_cfg_descriptors) / sizeof (shape_cfg_descriptors[0])]));
@@ -68,7 +69,7 @@ edt::RecentConfigurationPage::ConfigurationDescriptor text_cfg_descriptors[] =
 };
 
 static
-void get_text_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
+void get_text_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
 {
   ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-text-param",
                         &text_cfg_descriptors[0], &text_cfg_descriptors[sizeof (text_cfg_descriptors) / sizeof (text_cfg_descriptors[0])]));
@@ -94,7 +95,7 @@ edt::RecentConfigurationPage::ConfigurationDescriptor path_cfg_descriptors[] =
 };
 
 static
-void get_path_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
+void get_path_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
 {
   ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-path-param",
                         &path_cfg_descriptors[0], &path_cfg_descriptors[sizeof (path_cfg_descriptors) / sizeof (path_cfg_descriptors[0])]));
@@ -138,7 +139,7 @@ edt::RecentConfigurationPage::ConfigurationDescriptor inst_cfg_descriptors[] =
 };
 
 static
-void get_inst_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
+void get_inst_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
 {
   ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-inst-param",
                         &inst_cfg_descriptors[0], &inst_cfg_descriptors[sizeof (inst_cfg_descriptors) / sizeof (inst_cfg_descriptors[0])]));
@@ -153,7 +154,7 @@ class PluginDeclaration
 public:
   PluginDeclaration (const std::string &title, const std::string &mouse_mode, 
                      void (*option_get_f) (std::vector < std::pair<std::string, std::string> > &) = 0,
-                     void (*pages_f) (std::vector <edt::EditorOptionsPage *> &, lay::LayoutView *, lay::Dispatcher *) = 0)
+                     void (*pages_f) (std::vector <lay::EditorOptionsPage *> &, lay::LayoutView *, lay::Dispatcher *) = 0)
     : m_title (title), m_mouse_mode (mouse_mode), mp_option_get_f (option_get_f), mp_pages_f (pages_f)
   {
     //  .. nothing yet ..
@@ -176,7 +177,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void get_editor_options_pages (std::vector<edt::EditorOptionsPage *> &pages, lay::LayoutView *view, lay::Dispatcher *root) const
+  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutView *view, lay::Dispatcher *root) const
   {
     if (mp_pages_f != 0) {
       size_t nstart = pages.size ();
@@ -211,7 +212,7 @@ private:
   std::string m_mouse_mode;
 
   void (*mp_option_get_f) (std::vector < std::pair<std::string, std::string> > &options);
-  void (*mp_pages_f) (std::vector <edt::EditorOptionsPage *> &, lay::LayoutView *, lay::Dispatcher *);
+  void (*mp_pages_f) (std::vector <lay::EditorOptionsPage *> &, lay::LayoutView *, lay::Dispatcher *);
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl1 (
@@ -409,7 +410,7 @@ show_editor_options_page (lay::LayoutView *view)
     return;
   }
 
-  std::vector<edt::EditorOptionsPage *> prop_dialog_pages;
+  std::vector<lay::EditorOptionsPage *> prop_dialog_pages;
   EditorOptionsGeneric *generic_opt = new EditorOptionsGeneric (view->dispatcher ());
   prop_dialog_pages.push_back (generic_opt);
 
@@ -420,13 +421,13 @@ show_editor_options_page (lay::LayoutView *view)
     }
   }
 
-  for (std::vector<edt::EditorOptionsPage *>::const_iterator op = prop_dialog_pages.begin (); op != prop_dialog_pages.end (); ++op) {
+  for (std::vector<lay::EditorOptionsPage *>::const_iterator op = prop_dialog_pages.begin (); op != prop_dialog_pages.end (); ++op) {
     (*op)->activate (false);
   }
 
   remove_editor_options_page (view);
 
-  edt::EditorOptionsPages *pages = new edt::EditorOptionsPages (view->editor_options_frame (), prop_dialog_pages, view);
+  lay::EditorOptionsPages *pages = new lay::EditorOptionsPages (view->editor_options_frame (), prop_dialog_pages, view);
   view->editor_options_frame ()->layout ()->addWidget (pages);
   view->editor_options_frame ()->setFocusProxy (pages);
 }
@@ -447,13 +448,13 @@ remove_editor_options_page (lay::LayoutView *view)
 }
 
 static
-edt::EditorOptionsPages *get_pages_widget (lay::LayoutView *view)
+lay::EditorOptionsPages *get_pages_widget (lay::LayoutView *view)
 {
   //  TODO: is there a better way to find the editor options pages?
-  edt::EditorOptionsPages *eo_pages = 0;
+  lay::EditorOptionsPages *eo_pages = 0;
   QObjectList children = view->editor_options_frame ()->children ();
   for (QObjectList::iterator c = children.begin (); c != children.end () && !eo_pages; ++c) {
-    eo_pages = dynamic_cast<edt::EditorOptionsPages *> (*c);
+    eo_pages = dynamic_cast<lay::EditorOptionsPages *> (*c);
   }
 
   return eo_pages;
@@ -462,13 +463,13 @@ edt::EditorOptionsPages *get_pages_widget (lay::LayoutView *view)
 void 
 activate_service (lay::LayoutView *view, const lay::PluginDeclaration *pd, bool active)
 {
-  edt::EditorOptionsPages *eo_pages = get_pages_widget (view);
+  lay::EditorOptionsPages *eo_pages = get_pages_widget (view);
   if (!eo_pages) {
     return;
   }
 
   //  TODO: this is very inefficient as each "activate" will regenerate the tabs
-  for (std::vector<edt::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
+  for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
     (*op)->activate (((*op)->plugin_declaration () == pd || ! (*op)->plugin_declaration ()) && active);
   }
 }
@@ -476,12 +477,12 @@ activate_service (lay::LayoutView *view, const lay::PluginDeclaration *pd, bool 
 void
 setup_pages (lay::LayoutView *view)
 {
-  edt::EditorOptionsPages *eo_pages = get_pages_widget (view);
+  lay::EditorOptionsPages *eo_pages = get_pages_widget (view);
   if (!eo_pages) {
     return;
   }
 
-  for (std::vector<edt::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
+  for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
     (*op)->setup (view);
   }
 }
@@ -489,12 +490,12 @@ setup_pages (lay::LayoutView *view)
 void
 commit_recent (lay::LayoutView *view)
 {
-  edt::EditorOptionsPages *eo_pages = get_pages_widget (view);
+  lay::EditorOptionsPages *eo_pages = get_pages_widget (view);
   if (!eo_pages) {
     return;
   }
 
-  for (std::vector<edt::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
+  for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
     if ((*op)->active ()) {
       (*op)->commit_recent (view);
     }
@@ -516,7 +517,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void get_editor_options_pages (std::vector<edt::EditorOptionsPage *> & /*pages*/, lay::LayoutView * /*view*/, lay::Dispatcher * /*root*/) const
+  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> & /*pages*/, lay::LayoutView * /*view*/, lay::Dispatcher * /*root*/) const
   {
     //  .. no specific ones ..
   }

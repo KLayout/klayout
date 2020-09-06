@@ -28,6 +28,7 @@
 #include "layDialogs.h"
 #include "layObjectInstPath.h"
 #include "layLayoutView.h"
+#include "layQtTools.h"
 #include "tlExceptions.h"
 #include "tlString.h"
 
@@ -508,10 +509,10 @@ PolygonPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Sha
 
     }
 
-    indicate_error (pointListEdit, 0);
+    lay::indicate_error (pointListEdit, 0);
 
   } catch (tl::Exception &ex) {
-    indicate_error (pointListEdit, &ex);
+    lay::indicate_error (pointListEdit, &ex);
     throw;
   }
 
@@ -608,33 +609,33 @@ BoxPropertiesPage::get_box (int mode) const
 
     try {
       tl::from_string (tl::to_string (x1_le_1->text ()), x1);
-      indicate_error (x1_le_1, 0);
+      lay::indicate_error (x1_le_1, 0);
     } catch (tl::Exception &ex) {
-      indicate_error (x1_le_1, &ex);
+      lay::indicate_error (x1_le_1, &ex);
       has_error = true;
     }
 
     try {
       tl::from_string (tl::to_string (y1_le_1->text ()), y1);
-      indicate_error (y1_le_1, 0);
+      lay::indicate_error (y1_le_1, 0);
     } catch (tl::Exception &ex) {
-      indicate_error (y1_le_1, &ex);
+      lay::indicate_error (y1_le_1, &ex);
       has_error = true;
     }
 
     try {
       tl::from_string (tl::to_string (x2_le_1->text ()), x2);
-      indicate_error (x2_le_1, 0);
+      lay::indicate_error (x2_le_1, 0);
     } catch (tl::Exception &ex) {
-      indicate_error (x2_le_1, &ex);
+      lay::indicate_error (x2_le_1, &ex);
       has_error = true;
     }
 
     try {
       tl::from_string (tl::to_string (y2_le_1->text ()), y2);
-      indicate_error (y2_le_1, 0);
+      lay::indicate_error (y2_le_1, 0);
     } catch (tl::Exception &ex) {
-      indicate_error (y2_le_1, &ex);
+      lay::indicate_error (y2_le_1, &ex);
       has_error = true;
     }
 
@@ -668,33 +669,33 @@ BoxPropertiesPage::get_box (int mode) const
 
     try {
       tl::from_string (tl::to_string (cx_le_2->text ()), cx);
-      indicate_error (cx_le_2, 0);
+      lay::indicate_error (cx_le_2, 0);
     } catch (tl::Exception &ex) {
-      indicate_error (cx_le_2, &ex);
+      lay::indicate_error (cx_le_2, &ex);
       has_error = true;
     }
 
     try {
       tl::from_string (tl::to_string (cy_le_2->text ()), cy);
-      indicate_error (cy_le_2, 0);
+      lay::indicate_error (cy_le_2, 0);
     } catch (tl::Exception &ex) {
-      indicate_error (cy_le_2, &ex);
+      lay::indicate_error (cy_le_2, &ex);
       has_error = true;
     }
 
     try {
       tl::from_string (tl::to_string (w_le_2->text ()), w);
-      indicate_error (w_le_2, 0);
+      lay::indicate_error (w_le_2, 0);
     } catch (tl::Exception &ex) {
-      indicate_error (w_le_2, &ex);
+      lay::indicate_error (w_le_2, &ex);
       has_error = true;
     }
 
     try {
       tl::from_string (tl::to_string (h_le_2->text ()), h);
-      indicate_error (h_le_2, 0);
+      lay::indicate_error (h_le_2, 0);
     } catch (tl::Exception &ex) {
-      indicate_error (h_le_2, &ex);
+      lay::indicate_error (h_le_2, &ex);
       has_error = true;
     }
 
@@ -833,17 +834,17 @@ TextPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape 
 
   try {
     tl::from_string (tl::to_string (x_le->text ()), x);
-    indicate_error (x_le, 0);
+    lay::indicate_error (x_le, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (x_le, &ex);
+    lay::indicate_error (x_le, &ex);
     has_error = true;
   }
 
   try {
     tl::from_string (tl::to_string (y_le->text ()), y);
-    indicate_error (y_le, 0);
+    lay::indicate_error (y_le, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (y_le, &ex);
+    lay::indicate_error (y_le, &ex);
     has_error = true;
   }
 
@@ -874,9 +875,9 @@ TextPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape 
   if (! size_le->text ().isEmpty ()) {
     try {
       size = coord_from_string (tl::to_string (size_le->text ()).c_str (), dbu, du, t);
-      indicate_error (size_le, 0);
+      lay::indicate_error (size_le, 0);
     } catch (tl::Exception &ex) {
-      indicate_error (size_le, &ex);
+      lay::indicate_error (size_le, &ex);
       has_error = true;
     }
   }
@@ -1083,19 +1084,19 @@ EditablePathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db
       throw tl::Exception (tl::to_string (QObject::tr ("The path must have at least one point")));
     }
 
-    indicate_error (ptlist_le, 0);
+    lay::indicate_error (ptlist_le, 0);
 
   } catch (tl::Exception &ex) {
-    indicate_error (ptlist_le, &ex);
+    lay::indicate_error (ptlist_le, &ex);
     has_error = true;
   }
 
   db::Coord w = 0;
   try {
     w = coord_from_string (tl::to_string (width_le->text ()).c_str (), dbu, du, t);
-    indicate_error (width_le, 0);
+    lay::indicate_error (width_le, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (width_le, &ex);
+    lay::indicate_error (width_le, &ex);
     has_error = true;
   }
 
@@ -1110,16 +1111,16 @@ EditablePathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db
   case 2: // variable
     try {
       se = coord_from_string (tl::to_string (start_ext_le->text ()).c_str (), dbu, du, t);
-      indicate_error (start_ext_le, 0);
+      lay::indicate_error (start_ext_le, 0);
     } catch (tl::Exception &ex) {
-      indicate_error (start_ext_le, &ex);
+      lay::indicate_error (start_ext_le, &ex);
       has_error = true;
     }
     try {
       ee = coord_from_string (tl::to_string (end_ext_le->text ()).c_str (), dbu, du, t);
-      indicate_error (end_ext_le, 0);
+      lay::indicate_error (end_ext_le, 0);
     } catch (tl::Exception &ex) {
-      indicate_error (end_ext_le, &ex);
+      lay::indicate_error (end_ext_le, &ex);
       has_error = true;
     }
     break;

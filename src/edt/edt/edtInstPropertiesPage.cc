@@ -31,6 +31,7 @@
 #include "layObjectInstPath.h"
 #include "layLayoutView.h"
 #include "layCellSelectionForm.h"
+#include "layQtTools.h"
 #include "tlExceptions.h"
 #include "tlString.h"
 
@@ -404,10 +405,10 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
       throw tl::Exception (tl::to_string (QObject::tr ("Not a valid cell or PCell name: %s")).c_str (), tl::to_string (cell_name_le->text ()).c_str ());
     }
 
-    indicate_error (cell_name_le, 0);
+    lay::indicate_error (cell_name_le, 0);
 
   } catch (tl::Exception &ex) {
-    indicate_error (cell_name_le, &ex);
+    lay::indicate_error (cell_name_le, &ex);
     has_error = true;
   }
 
@@ -446,17 +447,17 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
 
   try {
     tl::from_string (tl::to_string (pos_x_le->text ()), x);
-    indicate_error (pos_x_le, 0);
+    lay::indicate_error (pos_x_le, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (pos_x_le, &ex);
+    lay::indicate_error (pos_x_le, &ex);
     has_error = true;
   }
 
   try {
     tl::from_string (tl::to_string (pos_y_le->text ()), y);
-    indicate_error (pos_y_le, 0);
+    lay::indicate_error (pos_y_le, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (pos_y_le, &ex);
+    lay::indicate_error (pos_y_le, &ex);
     has_error = true;
   }
 
@@ -471,18 +472,18 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
   double angle = 0.0;
   try {
     tl::from_string (tl::to_string (angle_le->text ()), angle);
-    indicate_error (angle_le, 0);
+    lay::indicate_error (angle_le, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (angle_le, &ex);
+    lay::indicate_error (angle_le, &ex);
     has_error = true;
   }
 
   double mag = 0.0;
   try {
     tl::from_string (tl::to_string (mag_le->text ()), mag);
-    indicate_error (mag_le, 0);
+    lay::indicate_error (mag_le, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (mag_le, &ex);
+    lay::indicate_error (mag_le, &ex);
     has_error = true;
   }
 
@@ -509,49 +510,49 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
 
     try {
       tl::from_string (tl::to_string (column_x_le->text ()), cx);
-      indicate_error (column_x_le, 0);
+      lay::indicate_error (column_x_le, 0);
     } catch (tl::Exception &ex) {
-      indicate_error (column_x_le, &ex);
+      lay::indicate_error (column_x_le, &ex);
       has_error = true;
     }
 
     try {
       tl::from_string (tl::to_string (column_y_le->text ()), cy);
-      indicate_error (column_y_le, 0);
+      lay::indicate_error (column_y_le, 0);
     } catch (tl::Exception &ex) {
-      indicate_error (column_y_le, &ex);
+      lay::indicate_error (column_y_le, &ex);
       has_error = true;
     }
 
     try {
       tl::from_string (tl::to_string (row_x_le->text ()), rx);
-      indicate_error (row_x_le, 0);
+      lay::indicate_error (row_x_le, 0);
     } catch (tl::Exception &ex) {
-      indicate_error (row_x_le, &ex);
+      lay::indicate_error (row_x_le, &ex);
       has_error = true;
     }
 
     try {
       tl::from_string (tl::to_string (row_y_le->text ()), ry);
-      indicate_error (row_y_le, 0);
+      lay::indicate_error (row_y_le, 0);
     } catch (tl::Exception &ex) {
-      indicate_error (row_y_le, &ex);
+      lay::indicate_error (row_y_le, &ex);
       has_error = true;
     }
 
     try {
       tl::from_string (tl::to_string (rows_le->text ()), rows);
-      indicate_error (rows_le, 0);
+      lay::indicate_error (rows_le, 0);
     } catch (tl::Exception &ex) {
-      indicate_error (rows_le, &ex);
+      lay::indicate_error (rows_le, &ex);
       has_error = true;
     }
 
     try {
       tl::from_string (tl::to_string (columns_le->text ()), cols);
-      indicate_error (columns_le, 0);
+      lay::indicate_error (columns_le, 0);
     } catch (tl::Exception &ex) {
-      indicate_error (columns_le, &ex);
+      lay::indicate_error (columns_le, &ex);
       has_error = true;
     }
 
@@ -763,9 +764,9 @@ InstPropertiesPage::update_pcell_parameters ()
   //  indicate an invalid cell name
   if (! pc.first && ! cc.first) {
     tl::Exception ex (tl::to_string (QObject::tr ("Not a valid cell or PCell name: %s")).c_str (), tl::to_string (cell_name_le->text ()).c_str ());
-    indicate_error (cell_name_le, &ex);
+    lay::indicate_error (cell_name_le, &ex);
   } else {
-    indicate_error (cell_name_le, 0);
+    lay::indicate_error (cell_name_le, 0);
   }
 
   if (pc.first && layout->pcell_declaration (pc.second)) {

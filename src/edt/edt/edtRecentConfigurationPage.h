@@ -24,7 +24,7 @@
 #ifndef HDR_edtRecentConfigurationPage
 #define HDR_edtRecentConfigurationPage
 
-#include "edtEditorOptionsPage.h"
+#include "layEditorOptionsPage.h"
 #include "tlObject.h"
 
 #include <list>
@@ -46,7 +46,8 @@ class EditorOptionsPages;
  *  @brief The base class for a object properties page
  */
 class RecentConfigurationPage
-  : public EditorOptionsPage, public tl::Object
+  : public lay::EditorOptionsPage,
+    public tl::Object
 {
 Q_OBJECT
 

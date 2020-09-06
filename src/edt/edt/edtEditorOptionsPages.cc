@@ -34,6 +34,7 @@
 #include "layPlugin.h"
 #include "layLayoutView.h"
 #include "layCellSelectionForm.h"
+#include "layQtTools.h"
 #include "ui_EditorOptionsDialog.h"
 #include "ui_EditorOptionsGeneric.h"
 #include "ui_EditorOptionsPath.h"
@@ -51,153 +52,7 @@ namespace edt
 {
 
 // ------------------------------------------------------------------
-//  EditorOptionsPages implementation
-
-struct EOPCompareOp
-{
-  bool operator() (edt::EditorOptionsPage *a, edt::EditorOptionsPage *b) const
-  {
-    return a->order () < b->order ();
-  }
-};
-
-EditorOptionsPages::EditorOptionsPages (QWidget *parent, const std::vector<edt::EditorOptionsPage *> &pages, lay::Dispatcher *dispatcher)
-  : QFrame (parent), mp_dispatcher (dispatcher)
-{
-  QVBoxLayout *ly1 = new QVBoxLayout (this);
-  ly1->setMargin (0);
-
-  mp_pages = new QTabWidget (this);
-  ly1->addWidget (mp_pages);
-
-  m_pages = pages;
-  for (std::vector <edt::EditorOptionsPage *>::const_iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
-    (*p)->set_owner (this);
-  }
-
-  update (0);
-  setup ();
-}
-
-EditorOptionsPages::~EditorOptionsPages ()
-{
-  while (m_pages.size () > 0) {
-    delete m_pages.front ();
-  }
-}
-
-void
-EditorOptionsPages::focusInEvent (QFocusEvent * /*event*/)
-{
-  //  Sends the focus to the current page's last focus owner
-  if (mp_pages->currentWidget () && mp_pages->currentWidget ()->focusWidget ()) {
-    mp_pages->currentWidget ()->focusWidget ()->setFocus ();
-  }
-}
-
-void  
-EditorOptionsPages::unregister_page (edt::EditorOptionsPage *page)
-{
-  std::vector <edt::EditorOptionsPage *> pages;
-  for (std::vector <edt::EditorOptionsPage *>::const_iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
-    if (*p != page) {
-      pages.push_back (*p);
-    }
-  }
-  m_pages = pages;
-  update (0);
-}
-
-void  
-EditorOptionsPages::activate_page (edt::EditorOptionsPage *page)
-{
-  try {
-    if (page->active ()) {
-      page->setup (mp_dispatcher);
-    }
-  } catch (...) {
-    //  catch any errors related to configuration file errors etc.
-  }
-
-  update (page);
-}
-
-void   
-EditorOptionsPages::update (edt::EditorOptionsPage *page)
-{
-  std::vector <edt::EditorOptionsPage *> sorted_pages = m_pages;
-  std::sort (sorted_pages.begin (), sorted_pages.end (), EOPCompareOp ());
-
-  if (! page && m_pages.size () > 0) {
-    page = m_pages.back ();
-  }
-
-  while (mp_pages->count () > 0) {
-    mp_pages->removeTab (0);
-  }
-  int index = -1;
-  for (std::vector <edt::EditorOptionsPage *>::iterator p = sorted_pages.begin (); p != sorted_pages.end (); ++p) {
-    if ((*p)->active ()) {
-      if ((*p) == page) {
-        index = mp_pages->count ();
-      }
-      mp_pages->addTab (*p, tl::to_qstring ((*p)->title ()));
-    } else {
-      (*p)->setParent (0);
-    }
-  }
-  if (index < 0) {
-    index = mp_pages->currentIndex ();
-  }
-  if (index >= int (mp_pages->count ())) {
-    index = mp_pages->count () - 1;
-  }
-  mp_pages->setCurrentIndex (index);
-
-  setVisible (mp_pages->count () > 0);
-}
-
-void 
-EditorOptionsPages::setup ()
-{
-  try {
-
-    for (std::vector <edt::EditorOptionsPage *>::iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
-      if ((*p)->active ()) {
-        (*p)->setup (mp_dispatcher);
-      }
-    }
-
-    //  make the display consistent with the status (this is important for 
-    //  PCell parameters where the PCell may be asked to modify the parameters)
-    do_apply ();
-
-  } catch (...) {
-    //  catch any errors related to configuration file errors etc.
-  }
-}
-
-void 
-EditorOptionsPages::do_apply ()
-{
-  for (std::vector <edt::EditorOptionsPage *>::iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
-    if ((*p)->active ()) {
-      //  NOTE: we apply to the root dispatcher, so other dispatchers (views) get informed too.
-      (*p)->apply (mp_dispatcher->dispatcher ());
-    }
-  }
-}
-
-void 
-EditorOptionsPages::apply ()
-{
-BEGIN_PROTECTED
-  do_apply ();
-END_PROTECTED_W (this)
-}
-
-// ------------------------------------------------------------------
-//  Indicates an error on a line edit
+//  Configures a value from a line edit
 
 template <class Value>
 static void configure_from_line_edit (lay::Dispatcher *dispatcher, QLineEdit *le, const std::string &cfg_name)
@@ -206,9 +61,9 @@ static void configure_from_line_edit (lay::Dispatcher *dispatcher, QLineEdit *le
     Value value = Value (0);
     tl::from_string (tl::to_string (le->text ()), value);
     dispatcher->config_set (cfg_name, tl::to_string (value));
-    indicate_error (le, 0);
+    lay::indicate_error (le, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (le, &ex);
+    lay::indicate_error (le, &ex);
   }
 }
 
@@ -240,17 +95,17 @@ EditorOptionsGeneric::~EditorOptionsGeneric ()
   mp_ui = 0;
 }
 
-std::string 
+std::string
 EditorOptionsGeneric::title () const
 {
   return tl::to_string (QObject::tr ("Basic Editing"));
 }
 
-void  
+void
 EditorOptionsGeneric::apply (lay::Dispatcher *root)
 {
   //  Edit grid
-  
+
   EditGridConverter egc;
   if (mp_ui->grid_cb->currentIndex () == 0) {
     root->config_set (cfg_edit_grid, egc.to_string (db::DVector (-1.0, -1.0)));
@@ -260,10 +115,10 @@ EditorOptionsGeneric::apply (lay::Dispatcher *root)
     try {
       db::DVector eg;
       egc.from_string_picky (tl::to_string (mp_ui->edit_grid_le->text ()), eg);
-      indicate_error (mp_ui->edit_grid_le, 0);
+      lay::indicate_error (mp_ui->edit_grid_le, 0);
       root->config_set (cfg_edit_grid, egc.to_string (eg));
     } catch (tl::Exception &ex) {
-      indicate_error (mp_ui->edit_grid_le, &ex);
+      lay::indicate_error (mp_ui->edit_grid_le, &ex);
     }
   }
 
@@ -294,7 +149,7 @@ EditorOptionsGeneric::show_shapes_changed ()
   mp_ui->max_shapes_le->setEnabled (mp_ui->show_shapes_cbx->isChecked ());
 }
 
-void  
+void
 EditorOptionsGeneric::setup (lay::Dispatcher *root)
 {
   //  Edit grid
@@ -312,13 +167,13 @@ EditorOptionsGeneric::setup (lay::Dispatcher *root)
     mp_ui->edit_grid_le->setText (tl::to_qstring (egc.to_string (eg)));
   }
   grid_changed (mp_ui->grid_cb->currentIndex ());
-  indicate_error (mp_ui->edit_grid_le, 0);
+  lay::indicate_error (mp_ui->edit_grid_le, 0);
 
   //  edit & move angle
 
   ACConverter acc;
   lay::angle_constraint_type ac;
-  
+
   ac = lay::AC_Any;
   root->config_get (cfg_edit_move_angle_mode, ac, acc);
   mp_ui->move_angle_cb->setCurrentIndex (int (ac));
@@ -342,7 +197,7 @@ EditorOptionsGeneric::setup (lay::Dispatcher *root)
   unsigned int max_shapes = 1000;
   root->config_get (cfg_edit_max_shapes_of_instances, max_shapes);
   mp_ui->max_shapes_le->setText (tl::to_qstring (tl::to_string (max_shapes)));
-  indicate_error (mp_ui->max_shapes_le, 0);
+  lay::indicate_error (mp_ui->max_shapes_le, 0);
 
   bool show_shapes = true;
   root->config_get (cfg_edit_show_shapes_of_instances, show_shapes);
@@ -353,7 +208,7 @@ EditorOptionsGeneric::setup (lay::Dispatcher *root)
 //  EditorOptionsText implementation
 
 EditorOptionsText::EditorOptionsText (lay::Dispatcher *dispatcher)
-  : EditorOptionsPage (dispatcher)
+  : lay::EditorOptionsPage (dispatcher)
 {
   mp_ui = new Ui::EditorOptionsText ();
   mp_ui->setupUi (this);
@@ -431,7 +286,7 @@ EditorOptionsText::setup (lay::Dispatcher *root)
 //  EditorOptionsPath implementation
 
 EditorOptionsPath::EditorOptionsPath (lay::Dispatcher *dispatcher)
-  : EditorOptionsPage (dispatcher)
+  : lay::EditorOptionsPage (dispatcher)
 {
   mp_ui = new Ui::EditorOptionsPath ();
   mp_ui->setupUi (this);
@@ -502,7 +357,7 @@ EditorOptionsPath::setup (lay::Dispatcher *root)
   double w = 0.0;
   root->config_get (cfg_edit_path_width, w);
   mp_ui->width_le->setText (tl::to_qstring (tl::to_string (w)));
-  indicate_error (mp_ui->width_le, 0);
+  lay::indicate_error (mp_ui->width_le, 0);
 
   //  path type and extensions 
 
@@ -523,16 +378,16 @@ EditorOptionsPath::setup (lay::Dispatcher *root)
   root->config_get (cfg_edit_path_ext_var_begin, bgnext);
   root->config_get (cfg_edit_path_ext_var_end, endext);
   mp_ui->start_ext_le->setText (tl::to_qstring (tl::to_string (bgnext)));
-  indicate_error (mp_ui->start_ext_le, 0);
+  lay::indicate_error (mp_ui->start_ext_le, 0);
   mp_ui->end_ext_le->setText (tl::to_qstring (tl::to_string (endext)));
-  indicate_error (mp_ui->end_ext_le, 0);
+  lay::indicate_error (mp_ui->end_ext_le, 0);
 }
 
 // ------------------------------------------------------------------
 //  EditorOptionsInst implementation
 
 EditorOptionsInst::EditorOptionsInst (lay::Dispatcher *dispatcher)
-  : EditorOptionsPage (dispatcher)
+  : lay::EditorOptionsPage (dispatcher)
 {
   mp_ui = new Ui::EditorOptionsInst ();
   mp_ui->setupUi (this);
@@ -623,7 +478,7 @@ EditorOptionsInst::update_cell_edits ()
 
   //  by the way, update the foreground color of the cell edit box as well (red, if not valid)
   tl::Exception ex ("No cell or PCell with this name");
-  indicate_error (mp_ui->cell_le, (! pc.first && ! cc.first) ? &ex : 0);
+  lay::indicate_error (mp_ui->cell_le, (! pc.first && ! cc.first) ? &ex : 0);
 }
 
 void
@@ -766,7 +621,7 @@ EditorOptionsInst::setup (lay::Dispatcher *root)
   double angle = 0.0;
   root->config_get (cfg_edit_inst_angle, angle);
   mp_ui->angle_le->setText (tl::to_qstring (tl::to_string (angle)));
-  indicate_error (mp_ui->angle_le, 0);
+  lay::indicate_error (mp_ui->angle_le, 0);
 
   bool mirror = false;
   root->config_get (cfg_edit_inst_mirror, mirror);
@@ -775,7 +630,7 @@ EditorOptionsInst::setup (lay::Dispatcher *root)
   double scale = 1.0;
   root->config_get (cfg_edit_inst_scale, scale);
   mp_ui->scale_le->setText (tl::to_qstring (tl::to_string (scale)));
-  indicate_error (mp_ui->scale_le, 0);
+  lay::indicate_error (mp_ui->scale_le, 0);
 
   //  array
   bool array = false;
@@ -792,17 +647,17 @@ EditorOptionsInst::setup (lay::Dispatcher *root)
   root->config_get (cfg_edit_inst_column_y, column_y);
 
   mp_ui->rows_le->setText (tl::to_qstring (tl::to_string (rows)));
-  indicate_error (mp_ui->rows_le, 0);
+  lay::indicate_error (mp_ui->rows_le, 0);
   mp_ui->row_x_le->setText (tl::to_qstring (tl::to_string (row_x)));
-  indicate_error (mp_ui->row_x_le, 0);
+  lay::indicate_error (mp_ui->row_x_le, 0);
   mp_ui->row_y_le->setText (tl::to_qstring (tl::to_string (row_y)));
-  indicate_error (mp_ui->row_y_le, 0);
+  lay::indicate_error (mp_ui->row_y_le, 0);
   mp_ui->columns_le->setText (tl::to_qstring (tl::to_string (columns)));
-  indicate_error (mp_ui->columns_le, 0);
+  lay::indicate_error (mp_ui->columns_le, 0);
   mp_ui->column_x_le->setText (tl::to_qstring (tl::to_string (column_x)));
-  indicate_error (mp_ui->column_x_le, 0);
+  lay::indicate_error (mp_ui->column_x_le, 0);
   mp_ui->column_y_le->setText (tl::to_qstring (tl::to_string (column_y)));
-  indicate_error (mp_ui->column_y_le, 0);
+  lay::indicate_error (mp_ui->column_y_le, 0);
 
   //  place origin of cell flag
   bool place_origin = false;
@@ -814,7 +669,7 @@ EditorOptionsInst::setup (lay::Dispatcher *root)
 //  EditorOptionsInstPCellParam implementation
 
 EditorOptionsInstPCellParam::EditorOptionsInstPCellParam (lay::Dispatcher *dispatcher)
-  : EditorOptionsPage (dispatcher), mp_pcell_parameters (0), mp_placeholder_label (0)
+  : lay::EditorOptionsPage (dispatcher), mp_pcell_parameters (0), mp_placeholder_label (0)
 {
   mp_ui = new Ui::EditorOptionsInstPCellParam ();
   mp_ui->setupUi (this);

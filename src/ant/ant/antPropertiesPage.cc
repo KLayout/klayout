@@ -29,27 +29,6 @@ namespace ant
 {
 
 // -------------------------------------------------------------------------
-
-void
-indicate_error (QWidget *le, const tl::Exception *ex)
-{
-  //  by the way, update the foreground color of the cell edit box as well (red, if not valid)
-  QPalette pl = le->palette ();
-  if (ex) {
-    pl.setColor (QPalette::Active, QPalette::Text, Qt::red);
-    pl.setColor (QPalette::Active, QPalette::Base, QColor (Qt::red).lighter (180));
-    le->setToolTip (tl::to_qstring (ex->msg ()));
-  } else {
-    QWidget *pw = dynamic_cast<QWidget *> (le->parent ());
-    tl_assert (pw != 0);
-    pl.setColor (QPalette::Active, QPalette::Text, pw->palette ().color (QPalette::Text));
-    pl.setColor (QPalette::Active, QPalette::Base, pw->palette ().color (QPalette::Base));
-    le->setToolTip (QString ());
-  }
-  le->setPalette (pl);
-}
-
-// -------------------------------------------------------------------------
 //  PropertiesPage implementation
 
 PropertiesPage::PropertiesPage (ant::Service *rulers, db::Manager *manager, QWidget *parent)
@@ -155,33 +134,33 @@ PropertiesPage::get_points (db::DPoint &p1, db::DPoint &p2)
 
   try {
     tl::from_string (tl::to_string (x1->text ()), dx1);
-    indicate_error (x1, 0);
+    lay::indicate_error (x1, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (x1, &ex);
+    lay::indicate_error (x1, &ex);
     has_error = true;
   }
 
   try {
     tl::from_string (tl::to_string (x2->text ()), dx2);
-    indicate_error (x2, 0);
+    lay::indicate_error (x2, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (x2, &ex);
+    lay::indicate_error (x2, &ex);
     has_error = true;
   }
 
   try {
     tl::from_string (tl::to_string (y1->text ()), dy1);
-    indicate_error (y1, 0);
+    lay::indicate_error (y1, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (y1, &ex);
+    lay::indicate_error (y1, &ex);
     has_error = true;
   }
 
   try {
     tl::from_string (tl::to_string (y2->text ()), dy2);
-    indicate_error (y2, 0);
+    lay::indicate_error (y2, 0);
   } catch (tl::Exception &ex) {
-    indicate_error (y2, &ex);
+    lay::indicate_error (y2, &ex);
     has_error = true;
   }
 

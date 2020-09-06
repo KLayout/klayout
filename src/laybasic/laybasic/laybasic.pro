@@ -115,6 +115,8 @@ SOURCES = \
   layEditable.cc \
   layEditStipplesForm.cc \
   layEditStippleWidget.cc \
+  layEditorOptionsPage.cc \
+  layEditorOptionsPages.cc \
   layFileDialog.cc \
   layFinder.cc \
   layFixedFont.cc \
@@ -216,6 +218,8 @@ HEADERS = \
   layEditable.h \
   layEditStipplesForm.h \
   layEditStippleWidget.h \
+  layEditorOptionsPage.h \
+  layEditorOptionsPages.h \
   layFileDialog.h \
   layFinder.h \
   layFixedFont.h \

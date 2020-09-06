@@ -24,7 +24,7 @@
 #ifndef HDR_edtEditorOptionsPages
 #define HDR_edtEditorOptionsPages
 
-#include "edtEditorOptionsPage.h"
+#include "layEditorOptionsPage.h"
 
 #include <tlVariant.h>
 
@@ -60,44 +60,10 @@ namespace edt
 class PCellParametersPage;
 
 /**
- *  @brief The object properties dialog
- */
-class EditorOptionsPages
-  : public QFrame
-{
-Q_OBJECT
-
-public:
-  EditorOptionsPages (QWidget *parent, const std::vector<edt::EditorOptionsPage *> &pages, lay::Dispatcher *root);
-  ~EditorOptionsPages ();
-
-  void unregister_page (edt::EditorOptionsPage *page);
-  void activate_page (edt::EditorOptionsPage *page);
-  void focusInEvent (QFocusEvent *event);
-
-  const std::vector <edt::EditorOptionsPage *> &pages () const
-  {
-    return m_pages;
-  }
-
-public slots:
-  void apply ();
-  void setup ();
-
-private:
-  std::vector <edt::EditorOptionsPage *> m_pages;
-  lay::Dispatcher *mp_dispatcher;
-  QTabWidget *mp_pages;
-
-  void update (edt::EditorOptionsPage *page);
-  void do_apply ();
-};
-
-/**
  *  @brief The generic properties page
  */
 class EditorOptionsGeneric
-  : public EditorOptionsPage
+  : public lay::EditorOptionsPage
 {
 Q_OBJECT
 
@@ -122,7 +88,7 @@ private:
  *  @brief The text properties page
  */
 class EditorOptionsText
-  : public EditorOptionsPage
+  : public lay::EditorOptionsPage
 {
 public:
   EditorOptionsText (lay::Dispatcher *dispatcher);
@@ -141,7 +107,7 @@ private:
  *  @brief The path properties page
  */
 class EditorOptionsPath
-  : public EditorOptionsPage
+  : public lay::EditorOptionsPage
 {
 Q_OBJECT 
 
@@ -165,7 +131,7 @@ private:
  *  @brief The instance properties page
  */
 class EditorOptionsInst
-  : public EditorOptionsPage
+  : public lay::EditorOptionsPage
 {
 Q_OBJECT 
 
@@ -194,7 +160,7 @@ private:
  *  @brief The instance properties page (PCell parameters)
  */
 class EditorOptionsInstPCellParam
-  : public EditorOptionsPage
+  : public lay::EditorOptionsPage
 {
 Q_OBJECT
 

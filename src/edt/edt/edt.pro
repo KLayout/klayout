@@ -22,8 +22,7 @@ HEADERS = \
   edtUtils.h \
     edtCommon.h \
     edtDistribute.h \
-    edtRecentConfigurationPage.h \
-    edtEditorOptionsPage.h
+    edtRecentConfigurationPage.h
 
 FORMS = \
   AlignOptionsDialog.ui \
@@ -62,8 +61,7 @@ SOURCES = \
   edtUtils.cc \
   gsiDeclEdt.cc \
     edtDistribute.cc \
-    edtRecentConfigurationPage.cc \
-    edtEditorOptionsPage.cc
+    edtRecentConfigurationPage.cc
 
 INCLUDEPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC

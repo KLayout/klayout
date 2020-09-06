@@ -24,6 +24,7 @@
 #include "edtPCellParametersPage.h"
 #include "edtPropertiesPageUtils.h"
 #include "layWidgets.h"
+#include "layQtTools.h"
 #include "tlScriptError.h"
 
 #include <QFrame>
@@ -489,11 +490,11 @@ PCellParametersPage::get_parameters (bool *ok)
                 tl::from_string (tl::to_string (le->text ()), v);
 
                 parameters.back () = tl::Variant (v);
-                indicate_error (le, 0);
+                lay::indicate_error (le, 0);
 
               } catch (tl::Exception &ex) {
 
-                indicate_error (le, &ex);
+                lay::indicate_error (le, &ex);
                 edit_error = false;
 
               }
@@ -513,11 +514,11 @@ PCellParametersPage::get_parameters (bool *ok)
                 tl::from_string (tl::to_string (le->text ()), v);
 
                 parameters.back () = tl::Variant (v);
-                indicate_error (le, 0);
+                lay::indicate_error (le, 0);
 
               } catch (tl::Exception &ex) {
 
-                indicate_error (le, &ex);
+                lay::indicate_error (le, &ex);
                 edit_error = false;
 
               }

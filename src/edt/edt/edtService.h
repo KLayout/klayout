@@ -52,8 +52,6 @@ namespace edt {
 
 class Service;
 class PluginDeclarationBase;
-class EditorOptionsPages;
-class EditorOptionsPage;
 
 // -------------------------------------------------------------
 

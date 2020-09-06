@@ -20,21 +20,17 @@
 
 */
 
-#ifndef HDR_edtEditorOptionsPage
-#define HDR_edtEditorOptionsPage
+#ifndef HDR_layEditorOptionsPage
+#define HDR_layEditorOptionsPage
 
 #include <QWidget>
 
 namespace lay
 {
-  class PluginDeclaration;
-  class Dispatcher;
-  class Plugin;
-}
 
-namespace edt
-{
-
+class PluginDeclaration;
+class Dispatcher;
+class Plugin;
 class EditorOptionsPages;
 
 /**

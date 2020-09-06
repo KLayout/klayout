@@ -22,10 +22,10 @@
 
 
 #include "tlInternational.h"
-#include "edtEditorOptionsPage.h"
-#include "edtEditorOptionsPages.h"
+#include "layEditorOptionsPage.h"
+#include "layEditorOptionsPages.h"
 
-namespace edt
+namespace lay
 {
 
 // ------------------------------------------------------------------

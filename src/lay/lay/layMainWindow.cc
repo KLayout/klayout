@@ -92,6 +92,7 @@
 #include "layHelpAboutDialog.h"
 #include "layControlWidgetStack.h"
 #include "layViewWidgetStack.h"
+#include "layEditorOptionsPages.h"
 #include "layInit.h"
 #include "antObject.h"
 #include "antService.h"
@@ -1681,12 +1682,14 @@ MainWindow::select_mode (int m)
     }
 
     bool eo_visible = false;
-    if (pd_sel) {
+    if (mp_eo_stack && pd_sel) {
       eo_visible = pd_sel->editable_enabled ();
     }
-    if (eo_visible && (!mp_eo_stack->currentWidget () || !mp_eo_stack->currentWidget ()->findChild<QWidget *> ())) {
-      //
-      eo_visible = false;
+    if (mp_eo_stack && eo_visible) {
+      lay::EditorOptionsPages *eo_pages = dynamic_cast<lay::EditorOptionsPages *> (mp_eo_stack->currentWidget ());
+      if (! eo_pages || ! eo_pages->has_content ()) {
+        eo_visible = false;
+      }
     }
 
     if (eo_visible != m_eo_visible) {

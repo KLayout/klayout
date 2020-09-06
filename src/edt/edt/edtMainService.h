@@ -194,16 +194,7 @@ public:
    */
   virtual void paste ();
 
-  /**
-   *  @brief Implementation of "config_finalize"
-   *  This implementation will update the editor option page's parameters.
-   */
-  virtual void config_finalize ();
-
 private:
-  //  The deferred execution handler for the config_finalize event
-  tl::DeferredMethod<edt::MainService> dm_setup_pages;
-
   //  The layout view that this service is attached to
   lay::LayoutView *mp_view;
   lay::Dispatcher *mp_root;
@@ -245,7 +236,6 @@ private:
   lay::FlattenInstOptionsDialog *flatten_inst_options_dialog ();
   edt::MakeCellOptionsDialog *make_cell_options_dialog ();
   edt::MakeArrayOptionsDialog *make_array_options_dialog ();
-  void do_setup_pages ();
 };
 
 }

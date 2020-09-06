@@ -66,6 +66,8 @@
 #include "layBookmarkManagementForm.h"
 #include "layNetlistBrowserDialog.h"
 #include "layBookmarksView.h"
+#include "layEditorOptionsFrame.h"
+#include "layEditorOptionsPages.h"
 #include "dbClipboard.h"
 #include "dbLayout.h"
 #include "dbLayoutUtils.h"
@@ -254,7 +256,8 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
     m_editable (editable),
     m_options (options),
     m_annotation_shapes (manager),
-    dm_prop_changed (this, &LayoutView::do_prop_changed) 
+    dm_prop_changed (this, &LayoutView::do_prop_changed),
+    dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
 {
   //  either it's us or the parent has a dispatcher
   tl_assert (dispatcher () != 0);
@@ -272,7 +275,8 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
     m_editable (editable),
     m_options (options),
     m_annotation_shapes (manager),
-    dm_prop_changed (this, &LayoutView::do_prop_changed)
+    dm_prop_changed (this, &LayoutView::do_prop_changed),
+    dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
 {
   //  either it's us or the parent has a dispatcher
   tl_assert (dispatcher () != 0);
@@ -559,12 +563,8 @@ LayoutView::init (db::Manager *mgr, QWidget * /*parent*/)
 
   if ((m_options & LV_NoEditorOptionsPanel) == 0 && (m_options & LV_Naked) == 0) {
 
-    mp_editor_options_frame = new QFrame (0);
-    mp_editor_options_frame->setObjectName (QString::fromUtf8 ("editor_options_frame"));
-
-    QVBoxLayout *left_frame_ly = new QVBoxLayout (mp_editor_options_frame);
-    left_frame_ly->setMargin (0);
-    left_frame_ly->setSpacing (0);
+    mp_editor_options_frame = new lay::EditorOptionsFrame (0);
+    mp_editor_options_frame->populate (this);
 
     connect (mp_editor_options_frame, SIGNAL (destroyed ()), this, SLOT (side_panel_destroyed ()));
 
@@ -717,6 +717,26 @@ QWidget *LayoutView::menu_parent_widget ()
   return this;
 }
 
+lay::EditorOptionsPages *LayoutView::editor_options_pages ()
+{
+  if (! mp_editor_options_frame) {
+    return 0;
+  } else {
+    return mp_editor_options_frame->pages_widget ();
+  }
+}
+
+void LayoutView::do_setup_editor_options_pages ()
+{
+  //  intialize the editor option pages
+  lay::EditorOptionsPages *eo_pages = editor_options_pages ();
+  if (eo_pages) {
+    for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
+      (*op)->setup (this);
+    }
+  }
+}
+
 void LayoutView::side_panel_destroyed ()
 {
   if (sender () == mp_control_frame) {
@@ -867,6 +887,8 @@ void LayoutView::create_plugins (const lay::PluginDeclaration *except_this)
     }
 
   }
+
+  dm_setup_editor_option_pages ();
 
   mode (default_mode ());
 }
@@ -1643,6 +1665,14 @@ LayoutView::configure (const std::string &name, const std::string &value)
   } else {
     return false;
   }
+}
+
+void
+LayoutView::config_finalize ()
+{
+  //  It's important that the editor option pages are updated last - because the
+  //  configuration change may trigger other configuration changes
+  dm_setup_editor_option_pages ();
 }
 
 void 
@@ -5525,11 +5555,13 @@ LayoutView::mode (int m)
   if (m != m_mode) {
 
     m_mode = m;
+    lay::Plugin *active_plugin = 0;
 
     if (m > 0) {
 
       for (std::vector<lay::Plugin *>::iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
         if ((*p)->plugin_declaration ()->id () == m) {
+          active_plugin = *p;
           mp_canvas->activate ((*p)->view_service_interface ());
           break;
         }
@@ -5539,6 +5571,22 @@ LayoutView::mode (int m)
       mp_canvas->activate (mp_selection_service);
     } else if (m == -1 && mp_move_service) {
       mp_canvas->activate (mp_move_service);
+    }
+
+    lay::EditorOptionsPages *eo_pages = editor_options_pages ();
+    if (eo_pages) {
+
+      //  TODO: this is very inefficient as each "activate" will regenerate the tabs
+      for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
+        bool is_active = false;
+        if ((*op)->plugin_declaration () == 0) {
+          is_active = true;
+        } else if (active_plugin && active_plugin->plugin_declaration () == (*op)->plugin_declaration ()) {
+          is_active = true;
+        }
+        (*op)->activate (is_active);
+      }
+
     }
 
   }

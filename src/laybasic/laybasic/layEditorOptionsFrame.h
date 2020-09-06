@@ -20,36 +20,36 @@
 
 */
 
+#ifndef HDR_layEditorOptionsFrame
+#define HDR_layEditorOptionsFrame
 
-#ifndef HDR_edtPlugin
-#define HDR_edtPlugin
-
-#include "layPlugin.h"
-
-#include <vector>
+#include "laybasicCommon.h"
+#include <QFrame>
 
 namespace lay
 {
-  class Dispatcher;
-  class EditorOptionsPage;
-}
 
-namespace edt
+class EditorOptionsPages;
+class LayoutView;
+
+class LAYBASIC_PUBLIC EditorOptionsFrame
+  : public QFrame
 {
-  /**
-   *  @brief A helper class for plugin declarations for editor services
-   */
-  class PluginDeclarationBase
-    : public lay::PluginDeclaration
-  {
-    //  .. nothing yet ..
-  };
+public:
+  EditorOptionsFrame (QWidget *parent);
+  virtual ~EditorOptionsFrame ();
 
-  /**
-   *  @brief Commits the current configuration for the recently used configuration list
-   */
-  void commit_recent (lay::LayoutView *view);
+  void populate (LayoutView *view);
+
+  EditorOptionsPages *pages_widget () const
+  {
+    return mp_pages;
+  }
+
+public:
+  EditorOptionsPages *mp_pages;
+};
+
 }
 
 #endif
-

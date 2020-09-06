@@ -50,6 +50,7 @@
 #include "layPlugin.h"
 #include "layDisplayState.h"
 #include "layBookmarkList.h"
+#include "layEditorOptionsFrame.h"
 #include "gsi.h"
 #include "tlException.h"
 #include "tlEvents.h"
@@ -82,6 +83,7 @@ class MoveService;
 class Browser;
 class ColorButton;
 class ConfigureAction;
+class EditorOptionsPages;
 
 /**
  *  @brief Stores a layer reference to create layers which have been added by some action
@@ -270,6 +272,14 @@ public:
   }
 
   /**
+   *  @brief Gets the container with the bookmarks view
+   */
+  QWidget *bookmarks_frame ()
+  {
+    return mp_bookmarks_frame;
+  }
+
+  /**
    *  @brief Gets the container with the editor options
    */
   QWidget *editor_options_frame ()
@@ -278,12 +288,9 @@ public:
   }
 
   /**
-   *  @brief Gets the container with the bookmarks view
+   *  @brief Gets the editor options pages widget
    */
-  QWidget *bookmarks_frame ()
-  {
-    return mp_bookmarks_frame;
-  }
+  lay::EditorOptionsPages *editor_options_pages ();
 
   /**
    *  @brief Pastes from clipboard
@@ -2733,7 +2740,8 @@ private:
   lay::HierarchyControlPanel *mp_hierarchy_panel;
   lay::LibrariesView *mp_libraries_view;
   lay::BookmarksView *mp_bookmarks_view;
-  QWidget *mp_control_frame, *mp_hierarchy_frame, *mp_libraries_frame, *mp_editor_options_frame, *mp_bookmarks_frame;
+  QWidget *mp_control_frame, *mp_hierarchy_frame, *mp_libraries_frame, *mp_bookmarks_frame;
+  lay::EditorOptionsFrame *mp_editor_options_frame;
   QSpinBox *mp_min_hier_spbx;
   QSpinBox *mp_max_hier_spbx;
   std::list <CellView> m_cellviews;
@@ -2846,6 +2854,8 @@ private:
   bool m_active_cellview_changed_event_enabled;
   tl::DeferredMethod<lay::LayoutView> dm_prop_changed;
 
+  tl::DeferredMethod<lay::LayoutView> dm_setup_editor_option_pages;
+
   void init (db::Manager *mgr, QWidget *parent);
   void init_menu ();
 
@@ -2867,11 +2877,14 @@ private:
   int max_hier_level () const;
   bool set_hier_levels_basic (std::pair<int, int> l);
 
+  void do_setup_editor_options_pages ();
+
   void update_event_handlers ();
   void viewport_changed ();
   void cellview_changed (unsigned int index);
 
   bool configure (const std::string &name, const std::string &value);
+  void config_finalize ();
 
   void do_load_layer_props (const std::string &fn, bool map_cv, int cv_index, bool add_default);
   void finish_cellviews_changed ();

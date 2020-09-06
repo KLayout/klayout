@@ -1062,25 +1062,15 @@ PartialService::move_ac () const
 void  
 PartialService::deactivated ()
 {
-  //  make all editor option pages visible
-  activate_service (view (), plugin_declaration (), false);
-
   //  clear selection when this mode is left
   partial_select (db::DBox (), lay::Editable::Reset);
   clear_partial_transient_selection ();
-  remove_editor_options_page (view ());
 }
 
 void  
 PartialService::activated ()
 {
-  if (view ()->is_editable ()) {
-    //  Show editor options panel
-    show_editor_options_page (view ());
-  }
-
-  //  make all editor option pages visible
-  activate_service (view (), plugin_declaration (), true);
+  //  .. nothing yet ..
 }
 
 void 

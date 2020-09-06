@@ -23,6 +23,8 @@
 #ifndef HDR_layEditorOptionsPage
 #define HDR_layEditorOptionsPage
 
+#include "laybasicCommon.h"
+
 #include <QWidget>
 
 namespace lay
@@ -36,7 +38,7 @@ class EditorOptionsPages;
 /**
  *  @brief The base class for a object properties page
  */
-class EditorOptionsPage
+class LAYBASIC_PUBLIC EditorOptionsPage
   : public QWidget
 {
 Q_OBJECT

@@ -319,10 +319,17 @@ public:
   {
     return false;
   }
-  
+
   virtual bool implements_mouse_mode (std::string & /*title*/) const
   {
     return false;
+  }
+
+  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutView * /*view*/, lay::Dispatcher *dispatcher) const
+  {
+    //  NOTE: we do not set plugin_declaration which makes the page unspecific
+    EditorOptionsGeneric *generic_opt = new EditorOptionsGeneric (dispatcher);
+    pages.push_back (generic_opt);
   }
 
   virtual void initialize (lay::Dispatcher *root)
@@ -404,93 +411,9 @@ private:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl_main (new edt::MainPluginDeclaration (tl::to_string (QObject::tr ("Instances and shapes"))), 4000, "edt::MainService");
 
 void
-show_editor_options_page (lay::LayoutView *view)
-{
-  if (! view->editor_options_frame ()) {
-    return;
-  }
-
-  std::vector<lay::EditorOptionsPage *> prop_dialog_pages;
-  EditorOptionsGeneric *generic_opt = new EditorOptionsGeneric (view->dispatcher ());
-  prop_dialog_pages.push_back (generic_opt);
-
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    const PluginDeclarationBase *pd_base = dynamic_cast<const PluginDeclarationBase *> (&*cls);
-    if (pd_base) {
-      pd_base->get_editor_options_pages (prop_dialog_pages, view, view->dispatcher ());
-    }
-  }
-
-  for (std::vector<lay::EditorOptionsPage *>::const_iterator op = prop_dialog_pages.begin (); op != prop_dialog_pages.end (); ++op) {
-    (*op)->activate (false);
-  }
-
-  remove_editor_options_page (view);
-
-  lay::EditorOptionsPages *pages = new lay::EditorOptionsPages (view->editor_options_frame (), prop_dialog_pages, view);
-  view->editor_options_frame ()->layout ()->addWidget (pages);
-  view->editor_options_frame ()->setFocusProxy (pages);
-}
-
-void
-remove_editor_options_page (lay::LayoutView *view)
-{
-  if (! view->editor_options_frame ()) {
-    return;
-  }
-
-  QObjectList children = view->editor_options_frame ()->children ();
-  for (QObjectList::iterator c = children.begin (); c != children.end (); ++c) {
-    if (dynamic_cast<QWidget *> (*c)) {
-      delete *c;
-    }
-  }
-}
-
-static
-lay::EditorOptionsPages *get_pages_widget (lay::LayoutView *view)
-{
-  //  TODO: is there a better way to find the editor options pages?
-  lay::EditorOptionsPages *eo_pages = 0;
-  QObjectList children = view->editor_options_frame ()->children ();
-  for (QObjectList::iterator c = children.begin (); c != children.end () && !eo_pages; ++c) {
-    eo_pages = dynamic_cast<lay::EditorOptionsPages *> (*c);
-  }
-
-  return eo_pages;
-}
-
-void 
-activate_service (lay::LayoutView *view, const lay::PluginDeclaration *pd, bool active)
-{
-  lay::EditorOptionsPages *eo_pages = get_pages_widget (view);
-  if (!eo_pages) {
-    return;
-  }
-
-  //  TODO: this is very inefficient as each "activate" will regenerate the tabs
-  for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
-    (*op)->activate (((*op)->plugin_declaration () == pd || ! (*op)->plugin_declaration ()) && active);
-  }
-}
-
-void
-setup_pages (lay::LayoutView *view)
-{
-  lay::EditorOptionsPages *eo_pages = get_pages_widget (view);
-  if (!eo_pages) {
-    return;
-  }
-
-  for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
-    (*op)->setup (view);
-  }
-}
-
-void
 commit_recent (lay::LayoutView *view)
 {
-  lay::EditorOptionsPages *eo_pages = get_pages_widget (view);
+  lay::EditorOptionsPages *eo_pages = view->editor_options_pages ();;
   if (!eo_pages) {
     return;
   }

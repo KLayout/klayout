@@ -875,13 +875,7 @@ Service::activated ()
     m_immediate = do_activated ();
     m_editing = false;
 
-    //  Show editor options panel
-    show_editor_options_page (view ());
-
   }
-
-  //  make all editor option pages visible
-  activate_service (view (), plugin_declaration (), true);
 }
 
 void   
@@ -889,12 +883,7 @@ Service::deactivated ()
 {
   reset_mouse_cursor ();
 
-  //  make all editor option pages visible
-  activate_service (view (), plugin_declaration (), false);
-
   edit_cancel ();
-
-  remove_editor_options_page (view ());
 
   m_immediate = false;
 }

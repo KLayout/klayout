@@ -74,7 +74,7 @@ LAYBASIC_PUBLIC void register_help_handler (QObject *object, const char *slot, c
  *  and the exception's text will be used as tooltip. Use this function with
  *  a null ex pointer to clear the error condition.
  */
-void indicate_error (QWidget *le, const tl::Exception *ex);
+LAYBASIC_PUBLIC void indicate_error (QWidget *le, const tl::Exception *ex);
 
 } // namespace lay
 

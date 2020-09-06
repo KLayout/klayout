@@ -24,6 +24,7 @@
 #ifndef HDR_layEditorOptionsPages
 #define HDR_layEditorOptionsPages
 
+#include "laybasicCommon.h"
 #include "layEditorOptionsPage.h"
 
 #include <tlVariant.h>
@@ -45,7 +46,7 @@ class Plugin;
 /**
  *  @brief The object properties dialog
  */
-class EditorOptionsPages
+class LAYBASIC_PUBLIC EditorOptionsPages
   : public QFrame
 {
 Q_OBJECT
@@ -62,6 +63,8 @@ public:
   {
     return m_pages;
   }
+
+  bool has_content () const;
 
 public slots:
   void apply ();

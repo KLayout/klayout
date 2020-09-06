@@ -1685,8 +1685,8 @@ MainWindow::select_mode (int m)
     if (mp_eo_stack && pd_sel) {
       eo_visible = pd_sel->editable_enabled ();
     }
-    if (mp_eo_stack && eo_visible) {
-      lay::EditorOptionsPages *eo_pages = dynamic_cast<lay::EditorOptionsPages *> (mp_eo_stack->currentWidget ());
+    if (current_view () && eo_visible) {
+      lay::EditorOptionsPages *eo_pages = current_view ()->editor_options_pages ();
       if (! eo_pages || ! eo_pages->has_content ()) {
         eo_visible = false;
       }

@@ -327,7 +327,7 @@ RecentConfigurationPage::item_clicked (QTreeWidgetItem *item)
         ex.read (cv_index);
       }
 
-      mp_view->set_current_layer (cv_index, lp);
+      mp_view->set_or_request_current_layer (cv_index, lp);
 
     } else {
       dispatcher ()->config_set (c->cfg_name, v);

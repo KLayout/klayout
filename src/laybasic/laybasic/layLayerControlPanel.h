@@ -250,7 +250,7 @@ public:
    *
    *  This will also select this layer.
    */
-  void set_current_layer (const lay::LayerPropertiesConstIterator &l) const;
+  void set_current_layer (const lay::LayerPropertiesConstIterator &l);
 
   /**
    *  @brief Return the current layer index

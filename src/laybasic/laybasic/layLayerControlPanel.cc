@@ -505,16 +505,14 @@ LayerControlPanel::cm_insert ()
 
     BEGIN_PROTECTED_CLEANUP
 
-    transaction (tl::to_string (QObject::tr ("Insert views")));
+    transaction (tl::to_string (QObject::tr ("Insert layer view")));
 
     props.set_source (tl::to_string (n));
     mp_view->init_layer_properties (props);
+
     const LayerPropertiesNode &lp = mp_view->insert_layer (sel, props);
 
-    if (transacting ()) {
-      manager ()->queue (this, new LayerSelectionClearOp ());
-    }
-    mp_layer_list->set_current (sel);
+    set_current_layer (sel);
 
     commit ();
 
@@ -565,17 +563,11 @@ LayerControlPanel::cm_group ()
 
     mp_view->insert_layer (ins_pos, node);
 
-    if (transacting ()) {
-      manager ()->queue (this, new LayerSelectionClearOp ());
-    }
+    set_current_layer (*sel.rbegin ());
 
     commit ();
 
-    end_updates ();
-
     emit order_changed ();
-
-    mp_layer_list->set_current (*sel.rbegin ());
 
   }
 
@@ -1907,8 +1899,14 @@ LayerControlPanel::do_update_content ()
 }
 
 void
-LayerControlPanel::set_current_layer (const lay::LayerPropertiesConstIterator &l) const
+LayerControlPanel::set_current_layer (const lay::LayerPropertiesConstIterator &l)
 {
+  if (transacting ()) {
+    manager ()->queue (this, new LayerSelectionClearOp ());
+  }
+
+  end_updates ();
+
   mp_layer_list->set_current (l);
 }
 

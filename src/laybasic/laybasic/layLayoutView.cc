@@ -1709,7 +1709,41 @@ LayoutView::enable_edits (bool enable)
   }
 }
 
-void 
+bool
+LayoutView::set_or_request_current_layer (unsigned int cv_index, const db::LayerProperties &lp)
+{
+  bool ok = set_current_layer (cv_index, lp);
+  if (ok) {
+    return true;
+  }
+
+  if (! mp_control_panel) {
+    return false;
+  }
+
+  const lay::CellView &cv = cellview (cv_index);
+  if (! cv.is_valid ()) {
+    return false;
+  }
+
+  if (QMessageBox::question (this, tr ("Create Layer"), tr ("Layer %1 does not exist yet. Create it now?").arg (tl::to_qstring (lp.to_string ()))) == QMessageBox::Yes) {
+
+    lay::LayerPropertiesNode lpn;
+    lpn.set_source (lay::ParsedLayerSource (lp, cv_index));
+    init_layer_properties (lpn);
+
+    transaction (tl::to_string (QObject::tr ("Create new layer")));
+    set_current_layer (lay::LayerPropertiesConstIterator (& insert_layer (end_layers (), lpn)));
+    commit ();
+
+    return true;
+
+  }
+
+  return false;
+}
+
+bool
 LayoutView::set_current_layer (unsigned int cv_index, const db::LayerProperties &lp) 
 {
   //  rename the ones that got shifted.
@@ -1717,13 +1751,14 @@ LayoutView::set_current_layer (unsigned int cv_index, const db::LayerProperties 
   while (! l.at_end ()) {
     if (l->source (true).cv_index () == int (cv_index) && l->source (true).layer_props ().log_equal (lp)) {
       set_current_layer (l);
-      break;
+      return true;
     }
     ++l;
   }
+  return false;
 }
 
-void 
+void
 LayoutView::set_current_layer (const lay::LayerPropertiesConstIterator &l) 
 {
   if (mp_control_panel) {

@@ -27,9 +27,8 @@
 
 #include "edtCommon.h"
 
-#include "layEditable.h"
+#include "layEditorServiceBase.h"
 #include "layPlugin.h"
-#include "layViewObject.h"
 #include "layMarker.h"
 #include "laySnap.h"
 #include "layObjectInstPath.h"
@@ -72,8 +71,7 @@ std::map<std::string, tl::Variant> pcell_parameters_from_string (const std::stri
 // -------------------------------------------------------------
 
 class EDT_PUBLIC Service
-  : public lay::ViewService,
-    public lay::Editable,
+  : public lay::EditorServiceBase,
     public lay::Plugin,
     public db::Object
 {
@@ -459,16 +457,6 @@ protected:
   virtual void service_configuration_changed ();
 
   /**
-   *  @brief Sets the mouse cursor to the given point
-   */
-  void set_mouse_cursor (const db::DPoint &pt);
-
-  /**
-   *  @brief Resets the mouse cursor
-   */
-  void reset_mouse_cursor ();
-
-  /**
    *  @brief Install a marker for representing the edited object
    *
    *  The ownership over the marker is transferred to the service object.
@@ -577,9 +565,6 @@ private:
 
   //  The marker representing the object to be edited
   std::vector<lay::ViewObject *> m_edit_markers;
-
-  //  The marker representing the mouse cursor
-  std::vector<lay::ViewObject *> m_mouse_cursor_markers;
 
   //  True, if editing is in progress.
   bool m_editing;

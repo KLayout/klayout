@@ -118,6 +118,7 @@ SOURCES = \
   layEditorOptionsFrame.cc \
   layEditorOptionsPage.cc \
   layEditorOptionsPages.cc \
+  layEditorServiceBase.cc \
   layFileDialog.cc \
   layFinder.cc \
   layFixedFont.cc \
@@ -222,6 +223,7 @@ HEADERS = \
   layEditorOptionsFrame.h \
   layEditorOptionsPage.h \
   layEditorOptionsPages.h \
+  layEditorServiceBase.h \
   layFileDialog.h \
   layFinder.h \
   layFixedFont.h \

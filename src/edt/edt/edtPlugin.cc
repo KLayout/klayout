@@ -23,6 +23,8 @@
 
 #include "layTipDialog.h"
 #include "layEditorOptionsPages.h"
+#include "layDispatcher.h"
+#include "layLayoutView.h"
 #include "edtPlugin.h"
 #include "edtConfig.h"
 #include "edtService.h"

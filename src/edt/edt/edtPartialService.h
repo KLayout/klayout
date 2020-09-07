@@ -25,10 +25,8 @@
 #ifndef HDR_edtPartialService
 #define HDR_edtPartialService
 
-#include "layEditable.h"
+#include "layEditorServiceBase.h"
 #include "layObjectInstPath.h"
-#include "layLayoutView.h"
-#include "layPlugin.h"
 #include "layViewObject.h"
 #include "layRubberBox.h"
 #include "laySnap.h"
@@ -140,9 +138,7 @@ struct EdgeWithIndex
  */
 class PartialService
   : public QObject,
-    public lay::ViewService,
-    public lay::Editable,
-    public lay::Plugin,
+    public lay::EditorServiceBase,
     public db::Object
 {
 Q_OBJECT

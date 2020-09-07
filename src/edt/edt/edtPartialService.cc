@@ -1010,9 +1010,7 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box,
 
 PartialService::PartialService (db::Manager *manager, lay::LayoutView *view, lay::Dispatcher *root)
   : QObject (),
-    lay::ViewService (view->view_object_widget ()), 
-    lay::Editable (view),
-    lay::Plugin (view),
+    lay::EditorServiceBase (view),
     db::Object (manager),
     mp_view (view),
     mp_root (root),
@@ -1531,13 +1529,16 @@ PartialService::wheel_event (int /*delta*/, bool /*horizonal*/, const db::DPoint
 bool  
 PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
+  clear_mouse_cursors ();
+
   if (m_dragging) {
 
     set_cursor (lay::Cursor::size_all);
 
     m_alt_ac = ac_from_buttons (buttons);
 
-    // drag the vertex or edge/segment
+    //  @@@ Provide object snapping also when moving edges, provide mouse tracking
+    //  drag the vertex or edge/segment
     if (is_single_point_selection ()) {
       //  for a single selected point, m_start is the original position and we snap the target - 
       //  thus, we can bring the point on grid or to an object's edge or vertex 

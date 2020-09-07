@@ -728,9 +728,18 @@ BoxService::update_marker ()
   }
 }
 
-void 
+void
+BoxService::do_mouse_move_inactive (const db::DPoint &p)
+{
+  lay::PointSnapToObjectResult snap_details = snap2_details (p);
+  mouse_cursor_from_snap_details (snap_details);
+}
+
+void
 BoxService::do_mouse_move (const db::DPoint &p)
 {
+  do_mouse_move_inactive (p);
+
   set_cursor (lay::Cursor::cross);
   m_p2 = snap2 (p);
   update_marker ();
@@ -826,9 +835,18 @@ TextService::do_activated ()
   return true;  //  start editing immediately
 }
 
-void 
+void
+TextService::do_mouse_move_inactive (const db::DPoint &p)
+{
+  lay::PointSnapToObjectResult snap_details = snap2_details (p);
+  mouse_cursor_from_snap_details (snap_details);
+}
+
+void
 TextService::do_mouse_move (const db::DPoint &p)
 {
+  do_mouse_move_inactive (p);
+
   set_cursor (lay::Cursor::cross);
   m_text.trans (db::DTrans (m_rot, snap2 (p) - db::DPoint ()));
   update_marker ();
@@ -1010,9 +1028,18 @@ PathService::set_last_point (const db::DPoint &p)
   }
 }
 
-void 
+void
+PathService::do_mouse_move_inactive (const db::DPoint &p)
+{
+  lay::PointSnapToObjectResult snap_details = snap2_details (p);
+  mouse_cursor_from_snap_details (snap_details);
+}
+
+void
 PathService::do_mouse_move (const db::DPoint &p)
 {
+  do_mouse_move_inactive (p);
+
   set_cursor (lay::Cursor::cross);
   if (m_points.size () >= 2) {
     set_last_point (p);
@@ -1454,9 +1481,18 @@ InstService::make_cell (const lay::CellView &cv)
   return std::pair<bool, db::cell_index_type> (true, inst_cell_index);
 }
 
-void 
+void
+InstService::do_mouse_move_inactive (const db::DPoint &p)
+{
+  clear_mouse_cursors ();
+  add_mouse_cursor (snap (p));
+}
+
+void
 InstService::do_mouse_move (const db::DPoint &p)
 {
+  do_mouse_move_inactive (p);
+
   set_cursor (lay::Cursor::cross);
 
   const lay::CellView &cv = view ()->cellview (m_cv_index);

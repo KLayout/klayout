@@ -85,6 +85,11 @@ public:
   void clear_mouse_cursors ();
 
   /**
+   *  @brief Provides a nice mouse tracking cursor from the given snap details
+   */
+  void mouse_cursor_from_snap_details (const lay::PointSnapToObjectResult &snap_details);
+
+  /**
    *  @brief Gets the tracking cursor color
    */
   QColor tracking_cursor_color () const

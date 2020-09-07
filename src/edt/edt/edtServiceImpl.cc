@@ -417,17 +417,7 @@ void
 PolygonService::do_mouse_move_inactive (const db::DPoint &p)
 {
   lay::PointSnapToObjectResult snap_details = snap2_details (p);
-
-  clear_mouse_cursors ();
-
-  add_mouse_cursor (snap_details.snapped_point,
-                    snap_details.object_snap == lay::PointSnapToObjectResult::ObjectVertex ||
-                    (snap_details.object_snap == lay::PointSnapToObjectResult::ObjectUnspecific && snap_details.object_ref.is_degenerate ()));
-
-  if (snap_details.object_snap == lay::PointSnapToObjectResult::ObjectEdge ||
-      (snap_details.object_snap == lay::PointSnapToObjectResult::ObjectUnspecific && ! snap_details.object_ref.is_degenerate ())) {
-    add_edge_marker (snap_details.object_ref, false);
-  }
+  mouse_cursor_from_snap_details (snap_details);
 }
 
 void

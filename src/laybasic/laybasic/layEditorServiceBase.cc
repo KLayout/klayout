@@ -237,6 +237,21 @@ EditorServiceBase::clear_mouse_cursors ()
   m_mouse_cursor_markers.clear ();
 }
 
+void
+EditorServiceBase::mouse_cursor_from_snap_details (const lay::PointSnapToObjectResult &snap_details)
+{
+  clear_mouse_cursors ();
+
+  add_mouse_cursor (snap_details.snapped_point,
+                    snap_details.object_snap == lay::PointSnapToObjectResult::ObjectVertex ||
+                    (snap_details.object_snap == lay::PointSnapToObjectResult::ObjectUnspecific && snap_details.object_ref.is_degenerate ()));
+
+  if (snap_details.object_snap == lay::PointSnapToObjectResult::ObjectEdge ||
+      (snap_details.object_snap == lay::PointSnapToObjectResult::ObjectUnspecific && ! snap_details.object_ref.is_degenerate ())) {
+    add_edge_marker (snap_details.object_ref, false);
+  }
+}
+
 bool
 EditorServiceBase::configure (const std::string &name, const std::string &value)
 {

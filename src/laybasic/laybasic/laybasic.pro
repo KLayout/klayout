@@ -31,6 +31,7 @@ FORMS = \
   LayoutViewConfigPage2a.ui \
   LayoutViewConfigPage2b.ui \
   LayoutViewConfigPage2c.ui \
+  LayoutViewConfigPage2d.ui \
   LayoutViewConfigPage3a.ui \
   LayoutViewConfigPage3b.ui \
   LayoutViewConfigPage3c.ui \

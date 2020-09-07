@@ -23,6 +23,8 @@
 #include "layEditorServiceBase.h"
 #include "layViewport.h"
 #include "layLayoutView.h"
+#include "laybasicConfig.h"
+#include "layConverters.h"
 
 namespace lay
 {
@@ -47,15 +49,50 @@ make_circle (double r, const db::DPoint &center, db::DPolygon &poly, bool as_hol
   }
 }
 
-class MouseCursorViewObject
+class TrackingCursorBase
   : public lay::ViewObject
 {
 public:
-  MouseCursorViewObject (lay::ViewObjectWidget *widget, const db::DPoint &pt, bool solid)
-    : lay::ViewObject (widget, false), m_pt (pt), m_solid (solid)
+  TrackingCursorBase (lay::EditorServiceBase *service, lay::ViewObjectWidget *widget)
+    : lay::ViewObject (widget, false), mp_service (service)
   { }
 
+  uint32_t cursor_color (lay::ViewObjectCanvas &canvas) const
+  {
+    QColor color;
+    if (mp_service) {
+      color = mp_service->tracking_cursor_color ();
+    }
+    if (! color.isValid ()) {
+      color = canvas.foreground_color ();
+    }
+    return color.rgb ();
+  }
+
   virtual void render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
+  {
+    if (mp_service && mp_service->tracking_cursor_enabled ()) {
+      do_render (vp, canvas);
+    }
+  }
+
+protected:
+  virtual void do_render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas) = 0;
+
+private:
+  lay::EditorServiceBase *mp_service;
+};
+
+class MouseCursorViewObject
+  : public TrackingCursorBase
+{
+public:
+  MouseCursorViewObject (lay::EditorServiceBase *service, lay::ViewObjectWidget *widget, const db::DPoint &pt, bool solid)
+    : TrackingCursorBase (service, widget), m_pt (pt), m_solid (solid)
+  { }
+
+protected:
+  virtual void do_render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
   {
     int dither_pattern = 0; // solid
     int cross_dither_pattern = 6;  // dotted
@@ -64,10 +101,10 @@ public:
 
     std::vector <lay::ViewOp> ops;
     ops.resize (1);
-    ops[0] = lay::ViewOp (canvas.foreground_color ().rgb (), lay::ViewOp::Copy, 0, (unsigned int) dither_pattern, 0, lay::ViewOp::Rect, lw, 0);
+    ops[0] = lay::ViewOp (cursor_color (canvas), lay::ViewOp::Copy, 0, (unsigned int) dither_pattern, 0, lay::ViewOp::Rect, lw, 0);
     lay::CanvasPlane *plane = canvas.plane (ops);
 
-    ops[0] = lay::ViewOp (canvas.foreground_color ().rgb (), lay::ViewOp::Copy, 0, (unsigned int) cross_dither_pattern, 0, lay::ViewOp::Rect, lw, 0);
+    ops[0] = lay::ViewOp (cursor_color (canvas), lay::ViewOp::Copy, 0, (unsigned int) cross_dither_pattern, 0, lay::ViewOp::Rect, lw, 0);
     lay::CanvasPlane *cross_plane = canvas.plane (ops);
 
     lay::Renderer &r = canvas.renderer ();
@@ -95,14 +132,15 @@ private:
 };
 
 class EdgeMarkerViewObject
-  : public lay::ViewObject
+  : public TrackingCursorBase
 {
 public:
-  EdgeMarkerViewObject (lay::ViewObjectWidget *widget, const db::DEdge &edge, bool solid)
-    : lay::ViewObject (widget, false), m_edge (edge), m_solid (solid)
+  EdgeMarkerViewObject (lay::EditorServiceBase *service, lay::ViewObjectWidget *widget, const db::DEdge &edge, bool solid)
+    : TrackingCursorBase (service, widget), m_edge (edge), m_solid (solid)
   { }
 
-  virtual void render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
+protected:
+  virtual void do_render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
   {
     if (m_edge.is_degenerate ()) {
       return;
@@ -115,10 +153,10 @@ public:
 
     std::vector <lay::ViewOp> ops;
     ops.resize (1);
-    ops[0] = lay::ViewOp (canvas.foreground_color ().rgb (), lay::ViewOp::Copy, solid_style, 0, 0, lay::ViewOp::Rect, lw, 0);
+    ops[0] = lay::ViewOp (cursor_color (canvas), lay::ViewOp::Copy, solid_style, 0, 0, lay::ViewOp::Rect, lw, 0);
     lay::CanvasPlane *arrow_plane = canvas.plane (ops);
 
-    ops[0] = lay::ViewOp (canvas.foreground_color ().rgb (), lay::ViewOp::Copy, m_solid ? solid_style : dashed_style, 1, 0, lay::ViewOp::Rect, lw, 0);
+    ops[0] = lay::ViewOp (cursor_color (canvas), lay::ViewOp::Copy, m_solid ? solid_style : dashed_style, 1, 0, lay::ViewOp::Rect, lw, 0);
     lay::CanvasPlane *edge_plane = canvas.plane (ops);
 
     lay::Renderer &r = canvas.renderer ();
@@ -166,7 +204,9 @@ private:
 
 EditorServiceBase::EditorServiceBase (lay::LayoutView *view)
   : lay::ViewService (view->view_object_widget ()),
-    lay::Editable (view)
+    lay::Editable (view),
+    lay::Plugin (view),
+    m_cursor_enabled (true)
 {
   //  .. nothing yet ..
 }
@@ -179,13 +219,13 @@ EditorServiceBase::~EditorServiceBase ()
 void
 EditorServiceBase::add_mouse_cursor (const db::DPoint &pt, bool emphasize)
 {
-  m_mouse_cursor_markers.push_back (new MouseCursorViewObject (widget (), pt, emphasize));
+  m_mouse_cursor_markers.push_back (new MouseCursorViewObject (this, widget (), pt, emphasize));
 }
 
 void
 EditorServiceBase::add_edge_marker (const db::DEdge &e, bool emphasize)
 {
-  m_mouse_cursor_markers.push_back (new EdgeMarkerViewObject (widget (), e, emphasize));
+  m_mouse_cursor_markers.push_back (new EdgeMarkerViewObject (this, widget (), e, emphasize));
 }
 
 void
@@ -195,6 +235,48 @@ EditorServiceBase::clear_mouse_cursors ()
     delete *r;
   }
   m_mouse_cursor_markers.clear ();
+}
+
+bool
+EditorServiceBase::configure (const std::string &name, const std::string &value)
+{
+  bool needs_update = false;
+
+  if (name == cfg_tracking_cursor_color) {
+
+    QColor color;
+    lay::ColorConverter ().from_string (value, color);
+
+    if (color != m_cursor_color) {
+      m_cursor_color = color;
+      needs_update = true;
+    }
+
+  } else if (name == cfg_tracking_cursor_enabled) {
+
+    bool f = m_cursor_enabled;
+    tl::from_string (value, f);
+    if (f != m_cursor_enabled) {
+      m_cursor_enabled = f;
+      needs_update = true;
+    }
+
+  }
+
+  if (needs_update) {
+    for (std::vector<lay::ViewObject *>::iterator r = m_mouse_cursor_markers.begin (); r != m_mouse_cursor_markers.end (); ++r) {
+      (*r)->redraw ();
+    }
+  }
+
+  //  NOTE: we don't take the value as other services may be interested too.
+  return false;
+}
+
+void
+EditorServiceBase::deactivated ()
+{
+  clear_mouse_cursors ();
 }
 
 }

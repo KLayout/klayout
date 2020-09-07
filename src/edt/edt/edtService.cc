@@ -62,7 +62,6 @@ ac_from_buttons (unsigned int buttons)
 
 Service::Service (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator::flags_type flags)
   : lay::EditorServiceBase (view),
-    lay::Plugin (view),
     db::Object (manager),
     mp_view (view),
     mp_transient_marker (0), 
@@ -83,7 +82,6 @@ Service::Service (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator
 
 Service::Service (db::Manager *manager, lay::LayoutView *view)
   : lay::EditorServiceBase (view),
-    lay::Plugin (view),
     db::Object (manager),
     mp_view (view),
     mp_transient_marker (0), 
@@ -261,6 +259,8 @@ Service::configure (const std::string &name, const std::string &value)
     tl::from_string (value, m_hier_copy_mode);
     service_configuration_changed ();
 
+  } else {
+    lay::EditorServiceBase::configure (name, value);
   }
 
   return false;  //  not taken
@@ -813,7 +813,7 @@ Service::activated ()
 void   
 Service::deactivated ()
 {
-  clear_mouse_cursors ();
+  lay::EditorServiceBase::deactivated ();
 
   edit_cancel ();
 

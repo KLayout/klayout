@@ -72,7 +72,6 @@ std::map<std::string, tl::Variant> pcell_parameters_from_string (const std::stri
 
 class EDT_PUBLIC Service
   : public lay::EditorServiceBase,
-    public lay::Plugin,
     public db::Object
 {
 public: 
@@ -214,22 +213,6 @@ public:
   QColor color () const
   {
     return m_color;
-  }
-
-  /**
-   *  @brief Obtain the lay::ViewService interface
-   */
-  lay::ViewService *view_service_interface ()
-  {
-    return this;
-  }
-
-  /**
-   *  @brief Obtain the lay::Editable interface
-   */
-  lay::Editable *editable_interface ()
-  {
-    return this;
   }
 
   /**

@@ -27,6 +27,7 @@
 #include "laybasicCommon.h"
 #include "layEditable.h"
 #include "layViewObject.h"
+#include "layPlugin.h"
 
 namespace lay
 {
@@ -38,7 +39,8 @@ namespace lay
  */
 class LAYBASIC_PUBLIC EditorServiceBase
   : public lay::ViewService,
-    public lay::Editable
+    public lay::Editable,
+    public lay::Plugin
 {
 public: 
   /**
@@ -50,6 +52,22 @@ public:
    *  @brief Destructor
    */
   ~EditorServiceBase ();
+
+  /**
+   *  @brief Obtain the lay::ViewService interface
+   */
+  lay::ViewService *view_service_interface ()
+  {
+    return this;
+  }
+
+  /**
+   *  @brief Obtain the lay::Editable interface
+   */
+  lay::Editable *editable_interface ()
+  {
+    return this;
+  }
 
   /**
    *  @brief Adds a mouse cursor to the given point
@@ -66,9 +84,31 @@ public:
    */
   void clear_mouse_cursors ();
 
+  /**
+   *  @brief Gets the tracking cursor color
+   */
+  QColor tracking_cursor_color () const
+  {
+    return m_cursor_color;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the tracking cursor is enabled
+   */
+  bool tracking_cursor_enabled () const
+  {
+    return m_cursor_enabled;
+  }
+
+protected:
+  virtual bool configure (const std::string &name, const std::string &value);
+  virtual void deactivated ();
+
 private:
   //  The marker representing the mouse cursor
   std::vector<lay::ViewObject *> m_mouse_cursor_markers;
+  QColor m_cursor_color;
+  bool m_cursor_enabled;
 };
 
 }

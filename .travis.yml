@@ -16,7 +16,7 @@ matrix:
         - docker
       env:
         - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
-        - PY_VERSION="cp38-cp38m"
+        - PY_VERSION="cp38-cp38"
         - DOCKER_BUILD=true
         - TEST_IN_HOST=true
         - MATRIX_EVAL=""
@@ -31,7 +31,7 @@ matrix:
         - docker
       env:
         - DOCKER_IMAGE="quay.io/pypa/manylinux1_i686"
-        - PY_VERSION="cp38-cp38m"
+        - PY_VERSION="cp38-cp38"
         - DOCKER_BUILD=true
         - MATRIX_EVAL=""
       cache:

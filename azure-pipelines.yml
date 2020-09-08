@@ -25,6 +25,9 @@ jobs:
       cp37-cp37m-win_amd64.whl:
         python.version: '3.7'
         python.architecture: 'x64'
+      cp38-cp38-win_amd64.whl:
+        python.version: '3.8'
+        python.architecture: 'x64'
       cp35-cp35m-win32.whl:
         python.version: '3.5'
         python.architecture: 'x86'
@@ -33,6 +36,9 @@ jobs:
         python.architecture: 'x86'
       cp37-cp37m-win32.whl:
         python.version: '3.7'
+        python.architecture: 'x86'
+      cp38-cp38-win32.whl:
+        python.version: '3.8'
         python.architecture: 'x86'
     maxParallel: 6
 
@@ -118,6 +124,11 @@ jobs:
   steps:
     - checkout: none #skip checking out the default repository resource
     - task: DownloadBuildArtifacts@0
+      displayName: 'Download Build Artifacts wheel-3.8.x64'
+      inputs:
+        artifactName: 'wheel-3.8.x64'
+        downloadPath: '$(System.DefaultWorkingDirectory)'
+    - task: DownloadBuildArtifacts@0
       displayName: 'Download Build Artifacts wheel-3.7.x64'
       inputs:
         artifactName: 'wheel-3.7.x64'
@@ -131,6 +142,11 @@ jobs:
       displayName: 'Download Build Artifacts wheel-3.5.x64'
       inputs:
         artifactName: 'wheel-3.5.x64'
+        downloadPath: '$(System.DefaultWorkingDirectory)'
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Download Build Artifacts wheel-3.8.x86'
+      inputs:
+        artifactName: 'wheel-3.8.x86'
         downloadPath: '$(System.DefaultWorkingDirectory)'
     - task: DownloadBuildArtifacts@0
       displayName: 'Download Build Artifacts wheel-3.7.x86'

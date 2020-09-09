@@ -517,7 +517,6 @@ script:
         docker run --rm -e DOCKER_IMAGE -e PY_VERSION -v `pwd`:/io $DOCKER_IMAGE $PRE_CMD "/io/ci-scripts/docker/docker_build.sh";
         klayout_version=$(python -c 'import setup; print(setup.Config().version())'); 
         mkdir -p deploy/dist-pymod/$klayout_version;
-        python setup.py sdist --formats=gztar,zip --dist-dir=deploy/dist-pymod/$klayout_version;
         cp -a wheelhouse/{klayout-*manylinux1*.whl,*.tar.gz,*.zip} deploy/dist-pymod/$klayout_version;
         if [ "$TEST_IN_HOST" = true ]; then
             pip install klayout --no-index -f ./wheelhouse;

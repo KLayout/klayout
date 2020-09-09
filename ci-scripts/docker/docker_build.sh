@@ -53,7 +53,7 @@ ccache -s
 # Compile wheel and build source distribution
 cd /io
 "/opt/python/$PY_VERSION/bin/python" setup.py bdist_wheel -d /io/wheelhouse/ || exit 1
-"/opt/python/$PY_VERSION/bin/python" setup.py sdist --formats=gztar,zip -d /io/wheelhouse || exit 1
+"/opt/python/$PY_VERSION/bin/python" setup.py sdist --formats=zip -d /io/wheelhouse || exit 1
 
 # Show ccache stats
 echo "Cache stats:"

@@ -1293,11 +1293,11 @@ PartialService::snap (const db::DVector &v) const
 
 const int sr_pixels = 8; //  TODO: make variable
 
-db::DPoint 
+lay::PointSnapToObjectResult
 PartialService::snap2 (const db::DPoint &p) const
 {
   double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (sr_pixels);
-  return lay::obj_snap (m_snap_to_objects ? view () : 0, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, snap_range).snapped_point;
+  return lay::obj_snap (m_snap_to_objects ? view () : 0, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, snap_range);
 }
 
 void
@@ -1537,15 +1537,19 @@ PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, boo
 
     m_alt_ac = ac_from_buttons (buttons);
 
-    //  @@@ Provide object snapping also when moving edges, provide mouse tracking
+    lay::PointSnapToObjectResult snap_details;
+
     //  drag the vertex or edge/segment
     if (is_single_point_selection ()) {
-      //  for a single selected point, m_start is the original position and we snap the target - 
-      //  thus, we can bring the point on grid or to an object's edge or vertex 
-      m_current = snap2 (p);
+      //  for a single selected point, m_start is the original position and we snap the target -
+      //  thus, we can bring the point on grid or to an object's edge or vertex
+      snap_details = snap2 (p);
+      m_current = snap_details.snapped_point;
     } else {
       m_current = m_start + snap (p - m_start);
     }
+
+    mouse_cursor_from_snap_details (snap_details);
     selection_to_view ();
 
     m_alt_ac = lay::AC_Global;

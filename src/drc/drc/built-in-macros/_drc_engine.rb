@@ -48,6 +48,12 @@ module DRC
       @deep = false
       @netter = nil
       @netter_data = nil
+      
+      # initialize the defaults for max_area_ratio, max_vertex_count
+      dss = RBA::DeepShapeStore::new
+      @max_area_ratio = dss.max_area_ratio
+      @max_vertex_count = dss.max_vertex_count
+      dss._destroy
 
       @verbose = false
 
@@ -337,6 +343,10 @@ module DRC
       self.verbose = f
     end
     
+    def verbose=(f)
+      @verbose = f
+    end
+    
     # %DRC%
     # @name silent
     # @brief Resets verbose mode
@@ -345,10 +355,6 @@ module DRC
     
     def silent(f = true)
       self.verbose = !f
-    end
-    
-    def verbose=(f)
-      @verbose = f
     end
     
     # %DRC%
@@ -420,7 +426,7 @@ module DRC
     # %DRC%
     # @name dbu
     # @brief Gets or sets the database unit to use
-    # @synopsis dbu(dbu)
+    # @synopsis dbu(dbu_value)
     # @synopsis dbu
     # Without any argument, this method gets the database unit
     # used inside the DRC engine. 
@@ -441,6 +447,10 @@ module DRC
       end
       @dbu_read = true
       @dbu
+    end
+
+    def dbu=(d)
+      self.dbu(d)
     end
     
     # %DRC%
@@ -469,6 +479,47 @@ module DRC
       @tx = tx.to_f
       @ty = (ty || tx).to_f
       @deep = false
+    end
+
+    def tiles=(t)
+      self.tiles(t)
+    end
+    
+    # %DRC%
+    # @name tile_borders
+    # @brief Specifies a minimum tile border
+    # @synopsis tile_borders(b)
+    # @synopsis tile_borders(bx, by)
+    # The tile border specifies the distance to which shapes are collected into the 
+    # tile. In order words, when processing a tile, shapes within the border distance
+    # participate in the operations.
+    #
+    # For some operations such as booleans (\and, \or, ...), \size and the DRC functions (\width, \space, ...)
+    # a tile border is automatically established. For other operations such as \with_area
+    # or \edges, the exact distance is unknown, because such operations may have a long range.
+    # In that cases, no border is used. The tile_borders function may be used to specify a minimum border
+    # which is used in that case. That allows taking into account at least shapes within the 
+    # given range, although not necessarily all.
+    # 
+    # To reset the tile borders, use \no_borders or "tile_borders(nil)".
+    
+    def tile_borders(bx, by = nil)
+      @bx = bx.to_f
+      @by = (by || bx).to_f
+    end
+    
+    def tile_borders=(b)
+      self.tile_borders(b)
+    end
+    
+    # %DRC%
+    # @name no_borders
+    # @brief Reset the tile borders
+    # @synopsis no_borders
+    # Resets the tile borders - see \tile_borders for a description of tile borders.
+    
+    def no_borders
+      @bx = @by = nil
     end
     
     # %DRC%
@@ -513,39 +564,6 @@ module DRC
     end
     
     # %DRC%
-    # @name tile_borders
-    # @brief Specifies a minimum tile border
-    # @synopsis tile_border(b)
-    # @synopsis tile_border(bx, by)
-    # The tile border specifies the distance to which shapes are collected into the 
-    # tile. In order words, when processing a tile, shapes within the border distance
-    # participate in the operations.
-    #
-    # For some operations such as booleans (\and, \or, ...), \size and the DRC functions (\width, \space, ...)
-    # a tile border is automatically established. For other operations such as \with_area
-    # or \edges, the exact distance is unknown, because such operations may have a long range.
-    # In that cases, no border is used. The tile_borders function may be used to specify a minimum border
-    # which is used in that case. That allows taking into account at least shapes within the 
-    # given range, although not necessarily all.
-    # 
-    # To reset the tile borders, use \no_borders or "tile_borders(nil)".
-    
-    def tile_borders(bx, by = nil)
-      @bx = bx.to_f
-      @by = (by || bx).to_f
-    end
-    
-    # %DRC%
-    # @name no_borders
-    # @brief Reset the tile borders
-    # @synopsis no_borders
-    # Resets the tile borders - see \tile_borders for a description of tile borders.
-    
-    def no_borders
-      @bx = @by = nil
-    end
-    
-    # %DRC%
     # @name flat
     # @brief Disables tiling mode 
     # @synopsis flat
@@ -560,14 +578,84 @@ module DRC
     # @name threads
     # @brief Specifies the number of CPU cores to use in tiling mode
     # @synopsis threads(n)
+    # @synopsis threads
     # If using threads, tiles are distributed on multiple CPU cores for
     # parallelization. Still, all tiles must be processed before the 
-    # operation proceeds with the next statement.
+    # operation proceeds with the next statement. 
+    #
+    # Without an argument, "threads" will return the current number of 
+    # threads
     
-    def threads(n)
-      @tt = n.to_i
+    def threads(n = nil)
+      if n
+        @tt = n.to_i
+      end
+      @tt
+    end
+
+    def threads=(n)
+      self.threads(n)
     end
     
+    # %DRC%
+    # @name max_vertex_count
+    # @brief Gets or sets the maximum vertex count for deep mode fragmentation
+    # @synopsis max_vertex_count(count)
+    # @synopsis max_vertex_count
+    #
+    # In deep mode, polygons with more than the given number of vertexes will be split into
+    # smaller chunks to optimize performance (which is better or less complex polygons).
+    # The default threshold is 16 vertexes. Use this method with a vertex count to set the
+    # value and without an argument to get the current maximum vertex count.
+    # Set the value to zero to disable splitting by vertex count.
+    # 
+    # See also \max_area_ratio for the other option affecting polygon splitting.
+ 
+    def max_vertex_count(count = nil)
+      if count
+        if count.is_a?(1.class)
+          @max_vertex_count = count.to_i
+        else
+          raise("Argument is not an integer number in max_vertex_count")
+        end
+      end
+      @max_vertex_count
+    end
+
+    def max_vertex_count=(count)
+      self.max_vertex_count(count)
+    end
+
+    # %DRC%
+    # @name max_area_ratio
+    # @brief Gets or sets the maximum bounding box to polygon area ratio for deep mode fragmentation
+    # @synopsis max_area_ratio(ratio)
+    # @synopsis max_area_ratio
+    #
+    # In deep mode, polygons with a bounding box to polygon area ratio bigger than the given number
+    # will be split into smaller chunks to optimize performance (which gets better if the polygon's
+    # bounding boxes do not cover a lot of empty space).
+    # The default threshold is 3.0 which means fairly compact polygons. Use this method with a numeric 
+    # argument to set the value and without an argument to get the current maximum area ratio.
+    # Set the value to zero to disable splitting by area ratio.
+    # 
+    # See also \max_vertex_count for the other option affecting polygon splitting.
+ 
+    def max_area_ratio(ratio = nil)
+      if ratio
+        if ratio.is_a?(1.0.class) || ratio.is_a?(1.class)
+          @max_area_ratio = ratio.to_f
+        else
+          raise("Argument is not a number in max_area_ratio")
+        end
+      end
+      @max_area_ratio
+    end
+
+    def max_area_ratio=(ratio)
+      self.max_area_ratio(ratio)
+    end
+
     # %DRC%
     # @name make_layer
     # @brief Creates an empty polygon layer based on the hierarchical scheme selected
@@ -1900,12 +1988,18 @@ CODE
 
         sf = layout.dbu / self.dbu
         if @deep
+
           @dss ||= RBA::DeepShapeStore::new
+
           # TODO: align with LayoutToNetlist by using a "master" L2N
           # object which keeps the DSS.
           @dss.text_property_name = "LABEL"
           @dss.text_enlargement = 1
+          @dss.max_vertex_count = @max_vertex_count
+          @dss.max_area_ratio = @max_area_ratio
+
           r = cls.new(iter, @dss, RBA::ICplxTrans::new(sf.to_f))
+
         else
           r = cls.new(iter, RBA::ICplxTrans::new(sf.to_f))
         end

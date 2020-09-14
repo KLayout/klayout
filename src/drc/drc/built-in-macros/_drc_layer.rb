@@ -18,10 +18,6 @@ module DRC
       @data = data
     end
     
-    def data
-      @data
-    end
-
     # %DRC%
     # @name insert
     # @brief Inserts one or many objects into the layer
@@ -46,15 +42,15 @@ module DRC
       requires_edges_or_region("insert")
       args.each do |a|
         if a.is_a?(RBA::DBox) 
-          @data.insert(RBA::Box::from_dbox(a * (1.0 / @engine.dbu)))
+          self.data.insert(RBA::Box::from_dbox(a * (1.0 / @engine.dbu)))
         elsif a.is_a?(RBA::DPolygon) 
-          @data.insert(RBA::Polygon::from_dpoly(a * (1.0 / @engine.dbu)))
+          self.data.insert(RBA::Polygon::from_dpoly(a * (1.0 / @engine.dbu)))
         elsif a.is_a?(RBA::DSimplePolygon) 
-          @data.insert(RBA::SimplePolygon::from_dpoly(a * (1.0 / @engine.dbu)))
+          self.data.insert(RBA::SimplePolygon::from_dpoly(a * (1.0 / @engine.dbu)))
         elsif a.is_a?(RBA::DPath) 
-          @data.insert(RBA::Path::from_dpath(a * (1.0 / @engine.dbu)))
+          self.data.insert(RBA::Path::from_dpath(a * (1.0 / @engine.dbu)))
         elsif a.is_a?(RBA::DEdge) 
-          @data.insert(RBA::Edge::from_dedge(a * (1.0 / @engine.dbu)))
+          self.data.insert(RBA::Edge::from_dedge(a * (1.0 / @engine.dbu)))
         elsif a.is_a?(Array)
           insert(*a)
         else
@@ -80,7 +76,7 @@ module DRC
     
     def strict
       requires_region("strict")
-      @data.strict_handling = true
+      self.data.strict_handling = true
       self
     end
     
@@ -95,7 +91,7 @@ module DRC
     
     def non_strict
       requires_region("non_strict")
-      @data.strict_handling = false
+      self.data.strict_handling = false
       self
     end
     
@@ -110,7 +106,7 @@ module DRC
     
     def is_strict?
       requires_region("is_strict?")
-      @data.strict_handling?
+      self.data.strict_handling?
     end
     
     # %DRC%
@@ -128,7 +124,7 @@ module DRC
     
     def clean
       requires_edges_or_region("clean")
-      @data.merged_semantics = true
+      self.data.merged_semantics = true
       self
     end
     
@@ -159,7 +155,7 @@ module DRC
     
     def raw
       requires_edges_or_region("raw")
-      @data.merged_semantics = false
+      self.data.merged_semantics = false
       self
     end
     
@@ -172,7 +168,7 @@ module DRC
     
     def is_clean?
       requires_edges_or_region("is_clean?")
-      @data.merged_semantics?
+      self.data.merged_semantics?
     end
     
     # %DRC% 
@@ -184,7 +180,44 @@ module DRC
     
     def is_raw?
       requires_edges_or_region("is_raw?")
-      !@data.merged_semantics?
+      !self.data.merged_semantics?
+    end
+    
+    # %DRC%
+    # @name forget
+    # @brief Cleans up memory for this layer
+    # @synopsis forget
+    #
+    # KLayout's DRC engine is imperative. This means, every command is executed immediately
+    # rather than being compiled and executed later. The advantage of this approach is that
+    # it allows decisions to be taken depending on the content of a layer and to code 
+    # functions that operate directly on the layer's content.
+    #
+    # However, one drawback is that the engine cannot decide when a layer is no longer 
+    # required - it may still be used later in the script. So a layer's data is not cleaned
+    # up automatically.
+    #
+    # In order to save memory for DRC scripts intended for bigger layouts, the DRC script
+    # should clean up layers as soon as they are no longer required. The "forget" method
+    # will free the memory used for the layer's information.
+    #
+    # The recommended approach is:
+    #
+    # @code
+    # l = ... # compute some layer
+    # ...
+    # # once you're done with l:
+    # l.forget
+    # l = nil
+    # @/code
+    #
+    # By setting the layer to nil, it is ensured that it can no longer be accessed.
+
+    def forget
+      if @data
+        @data._destroy
+        @data = nil
+      end
     end
     
     # %DRC%
@@ -197,7 +230,7 @@ module DRC
     # on input layers.
 
     def size
-      @data.size
+      self.data.size
     end
     
     # %DRC%
@@ -216,7 +249,7 @@ module DRC
     # and performing the deep copy may be expensive in terms of CPU time.
     
     def dup
-      DRCLayer::new(@engine, @data.dup)
+      DRCLayer::new(@engine, self.data.dup)
     end
 
     # %DRC%
@@ -253,12 +286,12 @@ module DRC
           if args.size == 1
             a = args[0]
             if a.is_a?(Range)
-              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, @engine._prep_value_area(a.first), @engine._prep_value_area(a.last), #{inv.inspect}))
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._prep_value_area(a.first), @engine._prep_value_area(a.last), #{inv.inspect}))
             else
-              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, @engine._prep_value_area(a), #{inv.inspect}))
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._prep_value_area(a), #{inv.inspect}))
             end
           elsif args.size == 2
-            DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, @engine._prep_value_area(args[0]), @engine._prep_value_area(args[1]), #{inv.inspect}))
+            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._prep_value_area(args[0]), @engine._prep_value_area(args[1]), #{inv.inspect}))
           else
             raise("Invalid number of arguments for method '#{mn}'")
           end
@@ -403,12 +436,12 @@ CODE
           if args.size == 1
             a = args[0]
             if a.is_a?(Range)
-              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, @engine._prep_value(a.first), @engine._prep_value(a.last), #{inv.inspect}))
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._prep_value(a.first), @engine._prep_value(a.last), #{inv.inspect}))
             else
-              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, @engine._prep_value(a), #{inv.inspect}))
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._prep_value(a), #{inv.inspect}))
             end
           elsif args.size == 2
-            DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, @engine._prep_value(args[0]), @engine._prep_value(args[1]), #{inv.inspect}))
+            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._prep_value(args[0]), @engine._prep_value(args[1]), #{inv.inspect}))
           else
             raise("Invalid number of arguments for method '#{mn}'")
           end
@@ -452,12 +485,12 @@ CODE
           if args.size == 1
             a = args[0]
             if a.is_a?(Range)
-              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :with_#{f}, @engine._prep_value(a.first), @engine._prep_value(a.last), #{inv.inspect}))
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :with_#{f}, @engine._prep_value(a.first), @engine._prep_value(a.last), #{inv.inspect}))
             else
-              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :with_#{f}, @engine._prep_value(a), #{inv.inspect}))
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :with_#{f}, @engine._prep_value(a), #{inv.inspect}))
             end
           elsif args.size == 2
-            DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :with_#{f}, @engine._prep_value(args[0]), @engine._prep_value(args[1]), #{inv.inspect}))
+            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :with_#{f}, @engine._prep_value(args[0]), @engine._prep_value(args[1]), #{inv.inspect}))
           else
             raise("Invalid number of arguments for method '#{mn}'")
           end
@@ -516,16 +549,16 @@ CODE
       eval <<"CODE"
       def #{mn}(*args)
         requires_edges_or_region("#{mn}")
-        result_class = @data.is_a?(RBA::Region) ? RBA::EdgePairs : RBA::Edges
+        result_class = self.data.is_a?(RBA::Region) ? RBA::EdgePairs : RBA::Edges
         if args.size == 1
           a = args[0]
           if a.is_a?(Range)
-            DRCLayer::new(@engine, @engine._tcmd(@data, 0, result_class, :with_angle, a.first, a.last, #{inv.inspect}))
+            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, :with_angle, a.first, a.last, #{inv.inspect}))
           else
-            DRCLayer::new(@engine, @engine._tcmd(@data, 0, result_class, :with_angle, a, #{inv.inspect}))
+            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, :with_angle, a, #{inv.inspect}))
           end
         elsif args.size == 2
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, result_class, :with_angle, args[0], args[1], #{inv.inspect}))
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, :with_angle, args[0], args[1], #{inv.inspect}))
         else
           raise("Invalid number of arguments for method '#{mn}'")
         end
@@ -562,7 +595,7 @@ CODE
     
     def rounded_corners(inner, outer, n)
       requires_region("rounded_corners")
-      DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :rounded_corners, @engine._prep_value(inner), @engine._prep_value(outer), n))
+      DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :rounded_corners, @engine._prep_value(inner), @engine._prep_value(outer), n))
     end
     
     # %DRC%
@@ -579,7 +612,7 @@ CODE
     
     def smoothed(d)
       requires_region("smoothed")
-      DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :smoothed, @engine._prep_value(d)))
+      DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :smoothed, @engine._prep_value(d)))
     end
     
     # %DRC%
@@ -677,11 +710,11 @@ CODE
         end
       end
 
-      if @data.is_a?(RBA::Texts)
+      if self.data.is_a?(RBA::Texts)
         if as_pattern
-          result = @engine._tcmd(@data, 0, RBA::Texts, :with_match, pattern, invert)
+          result = @engine._tcmd(self.data, 0, RBA::Texts, :with_match, pattern, invert)
         else
-          result = @engine._tcmd(@data, 0, RBA::Texts, :with_text, pattern, invert)
+          result = @engine._tcmd(self.data, 0, RBA::Texts, :with_text, pattern, invert)
         end
         if as_dots
           return DRCLayer::new(@engine, @engine._tcmd(result, 0, RBA::Region, :edges))
@@ -692,9 +725,9 @@ CODE
         end
       else    
         if as_dots
-          return DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts_dots, pattern, as_pattern))
+          return DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :texts_dots, pattern, as_pattern))
         else
-          return DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts, pattern, as_pattern))
+          return DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :texts, pattern, as_pattern))
         end
       end
 
@@ -756,7 +789,7 @@ CODE
         end
       end
 
-      DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, as_dots ? :corners_dots : :corners, amin, amax))
+      DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, as_dots ? :corners_dots : :corners, amin, amax))
 
     end
 
@@ -937,12 +970,12 @@ CODE
         end
             
         if as_edges
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :extent_refs_edges, *f))
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :extent_refs_edges, *f))
         else
           # add oversize for point- and edge-like regions
           zero_area = (f[0] - f[2]).abs < 1e-7 || (f[1] - f[3]).abs < 1e-7
           f += [ zero_area ? 1 : 0 ] * 2
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :extent_refs, *f))
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :extent_refs, *f))
         end
 
       end
@@ -967,10 +1000,10 @@ CODE
     # @/code
   
     def select(&block)
-      new_data = @data.class.new
+      new_data = self.data.class.new
       t = RBA::CplxTrans::new(@engine.dbu)
-      @engine.run_timed("\"select\" in: #{@engine.src_line}", @data) do
-        @data.send(new_data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
+      @engine.run_timed("\"select\" in: #{@engine.src_line}", self.data) do
+        self.data.send(new_data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
           block.call(object.transformed(t)) && new_data.insert(object)
         end
       end
@@ -989,8 +1022,8 @@ CODE
   
     def each(&block)
       t = RBA::CplxTrans::new(@engine.dbu)
-      @engine.run_timed("\"select\" in: #{@engine.src_line}", @data) do
-        @data.send(@data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
+      @engine.run_timed("\"select\" in: #{@engine.src_line}", self.data) do
+        self.data.send(self.data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
           block.call(object.transformed(t))
         end
       end
@@ -1055,7 +1088,7 @@ CODE
       def #{f}(&block)
 
         if :#{f} == :collect
-          new_data = @data.class.new
+          new_data = self.data.class.new
         elsif :#{f} == :collect_to_region
           new_data = RBA::Region.new
         elsif :#{f} == :collect_to_edges
@@ -1067,8 +1100,8 @@ CODE
         t = RBA::CplxTrans::new(@engine.dbu)
         dbu_trans = RBA::VCplxTrans::new(1.0 / @engine.dbu)
 
-        @engine.run_timed("\\"select\\" in: " + @engine.src_line, @data) do
-          @data.send(new_data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
+        @engine.run_timed("\\"select\\" in: " + @engine.src_line, self.data) do
+          self.data.send(new_data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
             insert_object_into(new_data, block.call(object.transformed(t)), dbu_trans)
           end
         end
@@ -1088,7 +1121,7 @@ CODE
     
     def odd_polygons
       requires_region("ongrid")
-      DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :strange_polygon_check))
+      DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :strange_polygon_check))
     end
     
     # %DRC%
@@ -1106,9 +1139,9 @@ CODE
     def ongrid(*args)
       requires_region("ongrid")
       if args.size == 1
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::EdgePairs, :grid_check, @engine._prep_value(args[0]), @engine._prep_value(args[0])))
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::EdgePairs, :grid_check, @engine._prep_value(args[0]), @engine._prep_value(args[0])))
       elsif args.size == 2
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::EdgePairs, :grid_check, @engine._prep_value(args[0]), @engine._prep_value(args[1])))
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::EdgePairs, :grid_check, @engine._prep_value(args[0]), @engine._prep_value(args[1])))
       else
         raise("Invalid number of arguments for method 'ongrid'")
       end
@@ -1153,13 +1186,13 @@ CODE
         aa = args.collect { |a| @engine._prep_value(a) }
         if :#{f} == :snap && @engine.is_tiled?
           # in tiled mode, no modifying versions are available
-          @data = @engine._tcmd(@data, 0, @data.class, :snapped, gx, gy)
+          self.data = @engine._tcmd(self.data, 0, self.data.class, :snapped, gx, gy)
           self
         elsif :#{f} == :snap
-          @engine._tcmd(@data, 0, @data.class, :#{f}, gx, gy)
+          @engine._tcmd(self.data, 0, self.data.class, :#{f}, gx, gy)
           self
         else
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, gx, gy))
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, gx, gy))
         end
       end
 CODE
@@ -1331,7 +1364,7 @@ CODE
       requires_region("andnot")
       other.requires_region("andnot")
 
-      res = @engine._tcmd_a2(@data, 0, @data.class, @data.class, :andnot, other.data)
+      res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :andnot, other.data)
 
       [ DRCLayer::new(@engine, res[0]), DRCLayer::new(@engine, res[1]) ]
 
@@ -1802,15 +1835,15 @@ CODE
           other.requires_region("#{f}")
         else
           requires_edges_texts_or_region("#{f}")
-          if @data.is_a?(RBA::Text)
+          if self.data.is_a?(RBA::Text)
             other.requires_region("#{f}")
-          elsif @data.is_a?(RBA::Region)
+          elsif self.data.is_a?(RBA::Region)
             other.requires_edges_texts_or_region("#{f}")
           else
             other.requires_edges_or_region("#{f}")
           end
         end
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, other.data.class, :#{f}, other.data))
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, other.data.class, :#{f}, other.data))
       end
 CODE
     end
@@ -1820,7 +1853,7 @@ CODE
       def #{f}(other)
         requires_same_type(other, "#{f}")
         requires_edges_or_region("#{f}")
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
       end
 CODE
     end
@@ -1829,12 +1862,12 @@ CODE
       eval <<"CODE"
       def #{f}(other)
         other.requires_edges_texts_or_region("#{f}")
-        if @data.is_a?(RBA::Texts)
+        if self.data.is_a?(RBA::Texts)
           other.requires_region("#{f}")
         else
           other.requires_edges_or_region("#{f}")
         end
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
       end
 CODE
     end
@@ -1843,7 +1876,7 @@ CODE
       eval <<"CODE"
       def #{f}(other)
         requires_same_type(other, "#{f}")
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
       end
 CODE
     end
@@ -1852,14 +1885,14 @@ CODE
       eval <<"CODE"
       def #{f}(other)
         other.requires_edges_texts_or_region("#{f}")
-        if @data.is_a?(RBA::Text)
+        if self.data.is_a?(RBA::Text)
           other.requires_region("#{f}")
-        elsif @data.is_a?(RBA::Region)
+        elsif self.data.is_a?(RBA::Region)
           other.requires_edges_texts_or_region("#{f}")
         else
           other.requires_edges_or_region("#{f}")
         end
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
       end
 CODE
     end
@@ -1874,19 +1907,19 @@ CODE
           requires_same_type(other, "#{f}")
         else
           requires_edges_texts_or_region("#{f}")
-          if @data.is_a?(RBA::Text)
+          if self.data.is_a?(RBA::Text)
             other.requires_region("#{f}")
-          elsif @data.is_a?(RBA::Region)
+          elsif self.data.is_a?(RBA::Region)
             other.requires_edges_texts_or_region("#{f}")
           else
             other.requires_edges_or_region("#{f}")
           end
         end
         if @engine.is_tiled?
-          @data = @engine._tcmd(@data, 0, @data.class, :#{fi}, other.data)
-          DRCLayer::new(@engine, @data)
+          self.data = @engine._tcmd(self.data, 0, self.data.class, :#{fi}, other.data)
+          DRCLayer::new(@engine, self.data)
         else
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
         end
       end
 CODE
@@ -1897,7 +1930,7 @@ CODE
       def #{f}(other)
         other.requires_region("#{f}")
         requires_edges("#{f}")
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
       end
 CODE
     end
@@ -1907,7 +1940,7 @@ CODE
       def #{f}(other)
         other.requires_edges("#{f}")
         requires_edges("#{f}")
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
       end
 CODE
     end
@@ -1987,7 +2020,7 @@ CODE
       eval <<"CODE"
       def #{f}
         requires_region("#{f}")
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :#{f}))
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :#{f}))
       end
 CODE
     end
@@ -2069,7 +2102,7 @@ CODE
       def #{f}(length, fraction = 0.0)
         requires_edges("#{f}")
         length = @engine._prep_value(length)
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :#{f}, length, fraction))
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :#{f}, length, fraction))
       end
 CODE
     end
@@ -2137,7 +2170,7 @@ CODE
           end
         end
 
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :#{f}, *av))
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :#{f}, *av))
 
       end
 CODE
@@ -2171,7 +2204,7 @@ CODE
       eval <<"CODE"
       def #{f}(dist)
         requires_edges("#{f}")
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :#{f}, @engine._prep_value(dist)))
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :#{f}, @engine._prep_value(dist)))
       end
 CODE
     end
@@ -2191,10 +2224,10 @@ CODE
     %w(edges).each do |f| 
       eval <<"CODE"
       def #{f}
-        if @data.is_a?(RBA::Region)
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :#{f}))
-        elsif @data.is_a?(RBA::EdgePairs)
-          DRCLayer::new(@engine, @engine._cmd(@data, :#{f}))
+        if self.data.is_a?(RBA::Region)
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :#{f}))
+        elsif self.data.is_a?(RBA::EdgePairs)
+          DRCLayer::new(@engine, @engine._cmd(self.data, :#{f}))
         else
           raise "#{f}: Layer must be a polygon or edge pair layer"
         end
@@ -2222,7 +2255,7 @@ CODE
       eval <<"CODE"
       def #{f}
         requires_edge_pairs("#{f}")
-        DRCLayer::new(@engine, @engine._cmd(@data, :#{f}))
+        DRCLayer::new(@engine, @engine._cmd(self.data, :#{f}))
       end
 CODE
     end
@@ -2235,7 +2268,7 @@ CODE
     # micrometer units. 
     
     def bbox
-      RBA::DBox::from_ibox(@data.bbox) * @engine.dbu.to_f
+      RBA::DBox::from_ibox(self.data.bbox) * @engine.dbu.to_f
     end
     
     # %DRC%
@@ -2244,7 +2277,7 @@ CODE
     # @synopsis layer.polygons?
     
     def polygons?
-      @data.is_a?(RBA::Region)
+      self.data.is_a?(RBA::Region)
     end
     
     # %DRC%
@@ -2253,7 +2286,7 @@ CODE
     # @synopsis layer.edges?
     
     def edges?
-      @data.is_a?(RBA::Edges)
+      self.data.is_a?(RBA::Edges)
     end
     
     # %DRC%
@@ -2262,7 +2295,7 @@ CODE
     # @synopsis layer.edge_pairs?
     
     def edge_pairs?
-      @data.is_a?(RBA::EdgePairs)
+      self.data.is_a?(RBA::EdgePairs)
     end
     
     # %DRC%
@@ -2271,7 +2304,7 @@ CODE
     # @synopsis layer.is_deep?
     
     def is_deep?
-      @data.respond_to?(:is_deep?) && @data.is_deep?
+      self.data.respond_to?(:is_deep?) && self.data.is_deep?
     end
     
     # %DRC%
@@ -2289,7 +2322,7 @@ CODE
     
     def area
       requires_region("area")
-      @engine._tdcmd(@data, 0, :area) * (@engine.dbu.to_f * @engine.dbu.to_f)
+      @engine._tdcmd(self.data, 0, :area) * (@engine.dbu.to_f * @engine.dbu.to_f)
     end
     
     # %DRC%
@@ -2308,7 +2341,7 @@ CODE
       requires_region("perimeter")
       # Note: we have to add 1 DBU border to collect the neighbors. It's important
       # to know then since they tell us whether an edge is an outside edge.
-      @engine._tdcmd(@data, 1, :perimeter) * @engine.dbu.to_f
+      @engine._tdcmd(self.data, 1, :perimeter) * @engine.dbu.to_f
     end
     
     # %DRC%
@@ -2322,7 +2355,7 @@ CODE
     
     def is_box?
       requires_region("is_box?")
-      @engine._cmd(@data, :is_box?)
+      @engine._cmd(self.data, :is_box?)
     end
     
     # %DRC%
@@ -2338,7 +2371,7 @@ CODE
     
     def length
       requires_edges("length")
-      @engine._cmd(@data, :length) * @engine.dbu.to_f
+      @engine._cmd(self.data, :length) * @engine.dbu.to_f
     end
     
     # %DRC%
@@ -2352,7 +2385,7 @@ CODE
     # to a flat collection of texts, polygons, edges or edge pairs.
     
     def flatten
-      DRC::DRCLayer::new(@engine, @engine._cmd(@data, :flatten))
+      DRC::DRCLayer::new(@engine, @engine._cmd(self.data, :flatten))
     end
     
     # %DRC%
@@ -2368,7 +2401,7 @@ CODE
     
     def is_merged?
       requires_edges_or_region("is_merged?")
-      @data.is_merged?
+      self.data.is_merged?
     end
     
     # %DRC%
@@ -2377,7 +2410,7 @@ CODE
     # @synopsis layer.is_empty?
     
     def is_empty?
-      @data.is_empty?
+      self.data.is_empty?
     end
     
     # %DRC%
@@ -2685,13 +2718,13 @@ CODE
           if other
             raise("No other layer must be specified for single-layer checks (i.e. width)")
           end
-          DRCLayer::new(@engine, @engine._tcmd(@data, border, RBA::EdgePairs, :#{f}_check, value, whole_edges, metrics, alim, minp, maxp))
+          DRCLayer::new(@engine, @engine._tcmd(self.data, border, RBA::EdgePairs, :#{f}_check, value, whole_edges, metrics, alim, minp, maxp))
         else
           if !other
             raise("The other layer must be specified for two-layer checks (i.e. overlap)")
           end
           requires_same_type(other, "#{f}")
-          DRCLayer::new(@engine, @engine._tcmd(@data, border, RBA::EdgePairs, :#{f}_check, other.data, value, whole_edges, metrics, alim, minp, maxp))
+          DRCLayer::new(@engine, @engine._tcmd(self.data, border, RBA::EdgePairs, :#{f}_check, other.data, value, whole_edges, metrics, alim, minp, maxp))
         end
         
       end  
@@ -2744,12 +2777,12 @@ CODE
           if other
             raise("#{f}: No other layer must be specified for single-layer checks (i.e. width)")
           end
-          DRCLayer::new(@engine, @engine._tcmd(@data, border, RBA::EdgePairs, :#{f}_check, value, whole_edges, metrics, alim, minp, maxp))
+          DRCLayer::new(@engine, @engine._tcmd(self.data, border, RBA::EdgePairs, :#{f}_check, value, whole_edges, metrics, alim, minp, maxp))
         else
           if !other
             raise("#{f}: The other layer must be specified for two-layer checks (i.e. overlap)")
           end
-          DRCLayer::new(@engine, @engine._tcmd(@data, border, RBA::EdgePairs, :#{f}_check, other.data, value, whole_edges, metrics, alim, minp, maxp))
+          DRCLayer::new(@engine, @engine._tcmd(self.data, border, RBA::EdgePairs, :#{f}_check, other.data, value, whole_edges, metrics, alim, minp, maxp))
         end
         
       end  
@@ -2919,13 +2952,13 @@ CODE
         
         if :#{f} == :size && @engine.is_tiled?
           # in tiled mode, no modifying versions are available
-          @data = @engine._tcmd(@data, dist, RBA::Region, :sized, *aa)
+          self.data = @engine._tcmd(self.data, dist, RBA::Region, :sized, *aa)
           self
         elsif :#{f} == :size 
-          @engine._tcmd(@data, dist, RBA::Region, :#{f}, *aa)
+          @engine._tcmd(self.data, dist, RBA::Region, :#{f}, *aa)
           self
         else 
-          DRCLayer::new(@engine, @engine._tcmd(@data, dist, RBA::Region, :#{f}, *aa))
+          DRCLayer::new(@engine, @engine._tcmd(self.data, dist, RBA::Region, :#{f}, *aa))
         end
         
       end
@@ -2948,7 +2981,7 @@ CODE
       requires_edge_pairs("polygons")
       args.size <= 1 || raise("polygons: Method requires 0 or 1 arguments")
       aa = args.collect { |a| @engine._prep_value(a) }
-      DRCLayer::new(@engine, @engine._cmd(@data, :polygons, *aa))
+      DRCLayer::new(@engine, @engine._cmd(self.data, :polygons, *aa))
     end
     
     # %DRC%
@@ -3037,7 +3070,7 @@ CODE
       eval <<"CODE"
       def #{f}(*args)
         aa = args.collect { |a| @engine._prep_value(a) }
-        DRCLayer::new(@engine, @engine._cmd(@data, :#{f}, *aa))
+        DRCLayer::new(@engine, @engine._cmd(self.data, :#{f}, *aa))
       end
 CODE
     end
@@ -3046,7 +3079,7 @@ CODE
       eval <<"CODE"
       def #{f}(*args)
         aa = args.collect { |a| @engine._prep_value(a) }
-        @engine._cmd(@data, :#{f}, *aa)
+        @engine._cmd(self.data, :#{f}, *aa)
         self
       end
 CODE
@@ -3092,7 +3125,7 @@ CODE
     def merged(*args)
       requires_edges_or_region("merged")
       aa = args.collect { |a| @engine._prep_value(a) }
-      DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :merged, *aa))
+      DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :merged, *aa))
     end
     
     def merge(*args)
@@ -3100,9 +3133,9 @@ CODE
       aa = args.collect { |a| @engine._prep_value(a) }
       if @engine.is_tiled?
         # in tiled mode, no modifying versions are available
-        @data = @engine._tcmd(@data, 0, @data.class, :merged, *aa)
+        self.data = @engine._tcmd(self.data, 0, self.data.class, :merged, *aa)
       else
-        @engine._tcmd(@data, 0, @data.class, :merge, *aa)
+        @engine._tcmd(self.data, 0, self.data.class, :merge, *aa)
       end
       self
     end
@@ -3126,7 +3159,7 @@ CODE
     # or report database. 
     
     def output(*args)
-      @engine._vcmd(@engine, :_output, @data, *args)
+      @engine._vcmd(@engine, :_output, self.data, *args)
     end
     
     # %DRC%
@@ -3140,39 +3173,40 @@ CODE
     # of the layer's data. 
     
     def data
+      @data || raise("Trying to access an invalid layer (did you use 'forget' on it?)")
       @data
     end
 
     def requires_region(f)
-      @data.is_a?(RBA::Region) || raise("#{f}: Requires a polygon layer")
+      self.data.is_a?(RBA::Region) || raise("#{f}: Requires a polygon layer")
     end
     
     def requires_texts_or_region(f)
-      @data.is_a?(RBA::Region) || @data.is_a?(RBA::Texts) || raise("#{f}: Requires a polygon or text layer")
+      self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::Texts) || raise("#{f}: Requires a polygon or text layer")
     end
     
     def requires_texts(f)
-      @data.is_a?(RBA::Texts) || raise("#{f}: Requires a text layer")
+      self.data.is_a?(RBA::Texts) || raise("#{f}: Requires a text layer")
     end
     
     def requires_edge_pairs(f)
-      @data.is_a?(RBA::EdgePairs) || raise("#{f}: Requires a edge pair layer")
+      self.data.is_a?(RBA::EdgePairs) || raise("#{f}: Requires a edge pair layer")
     end
     
     def requires_edges(f)
-      @data.is_a?(RBA::Edges) || raise("#{f}: Requires an edge layer")
+      self.data.is_a?(RBA::Edges) || raise("#{f}: Requires an edge layer")
     end
     
     def requires_edges_or_region(f)
-      @data.is_a?(RBA::Edges) || @data.is_a?(RBA::Region) || raise("#{f}: Requires an edge or polygon layer")
+      self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::Region) || raise("#{f}: Requires an edge or polygon layer")
     end
     
     def requires_edges_texts_or_region(f)
-      @data.is_a?(RBA::Edges) || @data.is_a?(RBA::Region) || @data.is_a?(RBA::Texts) || raise("#{f}: Requires an edge, text or polygon layer")
+      self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::Texts) || raise("#{f}: Requires an edge, text or polygon layer")
     end
     
     def requires_same_type(other, f)
-      @data.class == other.data.class || raise("#{f}: Requires input of the same kind")
+      self.data.class == other.data.class || raise("#{f}: Requires input of the same kind")
     end
     
   private

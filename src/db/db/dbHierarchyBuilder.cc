@@ -576,7 +576,7 @@ ReducingHierarchyBuilderShapeReceiver::push (const db::Polygon &shape, const db:
 void
 ReducingHierarchyBuilderShapeReceiver::reduce (const db::Polygon &poly, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
-  if (poly.vertices () > m_max_vertex_count || poly.area_ratio () > m_area_ratio) {
+  if ((m_max_vertex_count >= 4 && poly.vertices () > m_max_vertex_count) || (m_area_ratio > 2.0 && poly.area_ratio () > m_area_ratio)) {
 
     std::vector <db::Polygon> split_polygons;
     db::split_polygon (poly, split_polygons);

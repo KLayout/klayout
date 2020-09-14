@@ -67,6 +67,8 @@ class DBPolygon_TestClass < TestBase
     arr = []
     a.each_point_hull { |p| arr.push( p.to_s ) }
     assert_equal( arr, ["5,-10", "5,15", "20,15", "20,-10"] )
+    # with enumerator
+    assert_equal( a.each_point_hull.collect(&:to_s), ["5,-10", "5,15", "20,15", "20,-10"] )
 
     b = a.dup
 
@@ -130,6 +132,8 @@ class DBPolygon_TestClass < TestBase
     arr = []
     a.each_point_hole(0) { |p| arr.push( p.to_s ) }
     assert_equal( arr, ["1,2", "2,2", "2,6"] )
+    # with enumerator
+    assert_equal( a.each_point_hole(0).collect(&:to_s), ["1,2", "2,2", "2,6"] )
 
     arr = []
     a.each_edge { |p| arr.push( p.to_s ) }
@@ -770,6 +774,19 @@ class DBPolygon_TestClass < TestBase
 
     split = RBA::DSimplePolygon::new(pts).split
     assert_equal(split.collect { |p| p.to_s }.join(";"), "(0,0;0,100;1000,100;1000,0);(0,100;0,1000;100,1000;100,100)")
+
+  end
+
+  def test_voidMethodsReturnSelf
+
+    hull =  [ RBA::Point::new(0, 0),       RBA::Point::new(6000, 0), 
+              RBA::Point::new(6000, 3000), RBA::Point::new(0, 3000) ]
+    hole1 = [ RBA::Point::new(1000, 1000), RBA::Point::new(2000, 1000), 
+              RBA::Point::new(2000, 2000), RBA::Point::new(1000, 2000) ]
+    hole2 = [ RBA::Point::new(3000, 1000), RBA::Point::new(4000, 1000), 
+              RBA::Point::new(4000, 2000), RBA::Point::new(3000, 2000) ]
+    poly = RBA::Polygon::new(hull).insert_hole(hole1).insert_hole(hole2)
+    assert_equal(poly.to_s, "(0,0;0,3000;6000,3000;6000,0/1000,1000;2000,1000;2000,2000;1000,2000/3000,1000;4000,1000;4000,2000;3000,2000)")
 
   end
 

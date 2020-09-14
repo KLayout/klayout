@@ -686,6 +686,15 @@ property_name_from_id (int mid, PyObject *self)
   return cls_decl->name () + "." + mt->property_name (mid);
 }
 
+static gsi::ArgType create_void_type ()
+{
+  gsi::ArgType at;
+  at.init<void> ();
+  return at;
+}
+
+static gsi::ArgType s_void_type = create_void_type ();
+
 static PyObject *
 get_return_value (PYAObjectBase *self, gsi::SerialArgs &retlist, const gsi::MethodBase *meth, tl::Heap &heap)
 {
@@ -695,6 +704,12 @@ get_return_value (PYAObjectBase *self, gsi::SerialArgs &retlist, const gsi::Meth
 
     gsi::IterAdaptorAbstractBase *iter = (gsi::IterAdaptorAbstractBase *) retlist.read<gsi::IterAdaptorAbstractBase *> (heap);
     ret = (PyObject *) PYAIteratorObject::create (self ? self->py_object () : 0, iter, &meth->ret_type ());
+
+  } else if (meth->ret_type () == s_void_type && self != 0) {
+
+    //  simple, yet magical :)
+    ret = self->py_object ();
+    Py_INCREF (ret);
 
   } else {
 

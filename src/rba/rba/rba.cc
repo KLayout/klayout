@@ -89,7 +89,8 @@ public:
   {
     std::vector<tl::BacktraceElement> bt;
     bt.push_back (tl::BacktraceElement (rb_sourcefile (), rb_sourceline ()));
-    rba_get_backtrace_from_array (rb_funcall (rb_mKernel, rb_intern ("caller"), 0), bt, 0);
+    static ID id_caller = rb_intern ("caller");
+    rba_get_backtrace_from_array (rb_funcall (rb_mKernel, id_caller, 0), bt, 0);
     return bt;
   }
 
@@ -113,7 +114,8 @@ public:
     //  But the purpose is a relative compare, so efficiency is not sacrificed here
     //  for unnecessary consistency.
     int d = 1;
-    VALUE backtrace = rb_funcall (rb_mKernel, rb_intern ("caller"), 0);
+    static ID id_caller = rb_intern ("caller");
+    VALUE backtrace = rb_funcall (rb_mKernel, id_caller, 0);
     if (TYPE (backtrace) == T_ARRAY) {
       d += RARRAY_LEN(backtrace);
     }
@@ -885,6 +887,15 @@ method_name_from_id (int mid, VALUE self)
   return cls_decl->name () + "::" + mt->name (mid);
 }
 
+static gsi::ArgType create_void_type ()
+{
+  gsi::ArgType at;
+  at.init<void> ();
+  return at;
+}
+
+static gsi::ArgType s_void_type = create_void_type ();
+
 VALUE
 method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 {
@@ -933,16 +944,18 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
       if (p) {
 
+        static ID id_set = rb_intern ("set");
+
         VALUE signal_handler = p->signal_handler (meth);
 
         if (rb_block_given_p ()) {
 
           VALUE proc = rb_block_proc ();
           RB_GC_GUARD (proc);
-          ret = rba_funcall2_checked (signal_handler, rb_intern ("set"), 1, &proc);
+          ret = rba_funcall2_checked (signal_handler, id_set, 1, &proc);
 
         } else if (argc > 0) {
-          ret = rba_funcall2_checked (signal_handler, rb_intern ("set"), argc, argv);
+          ret = rba_funcall2_checked (signal_handler, id_set, argc, argv);
         } else {
           ret = signal_handler;
         }
@@ -989,6 +1002,24 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
         p->reset ();
       } else {
         p->set (obj, true, false, true, self);
+      }
+
+    } else if (meth->ret_type ().is_iter () && ! rb_block_given_p ()) {
+
+      //  calling an iterator method without block -> deliver an enumerator using "to_enum"
+
+      static ID id_to_enum = rb_intern ("to_enum");
+
+      VALUE method_sym = ID2SYM (rb_intern (meth->primary_name ().c_str ()));
+
+      if (argc == 0) {
+        ret = rba_funcall2_checked (self, id_to_enum, 1, &method_sym);
+      } else {
+        std::vector<VALUE> new_args;
+        new_args.reserve (size_t (argc + 1));
+        new_args.push_back (method_sym);
+        new_args.insert (new_args.end (), argv, argv + argc);
+        ret = rba_funcall2_checked (self, id_to_enum, argc + 1, new_args.begin ().operator-> ());
       }
 
     } else {
@@ -1055,8 +1086,15 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
         }
 
+      } else if (meth->ret_type () == s_void_type) {
+
+        //  simple, yet magical :)
+        return self;
+
       } else {
+
         ret = pop_arg (meth->ret_type (), p, retlist, heap);
+
       }
 
     }

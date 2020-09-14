@@ -339,6 +339,7 @@ static gsi::Methods methods_QStyledItemDelegate () {
   methods += gsi::qt_signal<QWidget *, const qt_gsi::Converter<QAbstractItemDelegate::EndEditHint>::target_type & > ("closeEditor(QWidget *, QAbstractItemDelegate::EndEditHint)", "closeEditor", gsi::arg("editor"), gsi::arg("hint"), "@brief Signal declaration for QStyledItemDelegate::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QWidget * > ("commitData(QWidget *)", "commitData", gsi::arg("editor"), "@brief Signal declaration for QStyledItemDelegate::commitData(QWidget *editor)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QStyledItemDelegate::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QStyledItemDelegate::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QModelIndex & > ("sizeHintChanged(const QModelIndex &)", "sizeHintChanged", gsi::arg("arg1"), "@brief Signal declaration for QStyledItemDelegate::sizeHintChanged(const QModelIndex &)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QStyledItemDelegate::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QStyledItemDelegate::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
@@ -485,6 +486,13 @@ public:
     } else {
       return QStyledItemDelegate::helpEvent(event, view, option, index);
     }
+  }
+
+  //  [emitter impl] void QStyledItemDelegate::objectNameChanged(const QString &objectName)
+  void emitter_QStyledItemDelegate_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QStyledItemDelegate::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QStyledItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index)
@@ -1097,6 +1105,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QStyledItemDelegate::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QStyledItemDelegate_Adaptor *)cls)->emitter_QStyledItemDelegate_objectNameChanged_4567 (arg1);
+}
+
+
 // void QStyledItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index)
 
 static void _init_cbs_paint_c6971_0 (qt_gsi::GenericMethod *decl)
@@ -1355,50 +1381,51 @@ gsi::Class<QStyledItemDelegate> &qtdecl_QStyledItemDelegate ();
 static gsi::Methods methods_QStyledItemDelegate_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStyledItemDelegate::QStyledItemDelegate(QObject *parent)\nThis method creates an object of class QStyledItemDelegate.", &_init_ctor_QStyledItemDelegate_Adaptor_1302, &_call_ctor_QStyledItemDelegate_Adaptor_1302);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QStyledItemDelegate::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QStyledItemDelegate::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("emit_closeEditor", "@brief Emitter for signal void QStyledItemDelegate::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint)\nCall this method to emit this signal.", false, &_init_emitter_closeEditor_4926, &_call_emitter_closeEditor_4926);
   methods += new qt_gsi::GenericMethod ("emit_commitData", "@brief Emitter for signal void QStyledItemDelegate::commitData(QWidget *editor)\nCall this method to emit this signal.", false, &_init_emitter_commitData_1315, &_call_emitter_commitData_1315);
-  methods += new qt_gsi::GenericMethod ("createEditor", "@hide", true, &_init_cbs_createEditor_c6860_0, &_call_cbs_createEditor_c6860_0);
-  methods += new qt_gsi::GenericMethod ("createEditor", "@brief Virtual method QWidget *QStyledItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_createEditor_c6860_0, &_call_cbs_createEditor_c6860_0, &_set_callback_cbs_createEditor_c6860_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QStyledItemDelegate::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("destroyEditor", "@hide", true, &_init_cbs_destroyEditor_c3602_0, &_call_cbs_destroyEditor_c3602_0);
-  methods += new qt_gsi::GenericMethod ("destroyEditor", "@brief Virtual method void QStyledItemDelegate::destroyEditor(QWidget *editor, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_destroyEditor_c3602_0, &_call_cbs_destroyEditor_c3602_0, &_set_callback_cbs_destroyEditor_c3602_0);
+  methods += new qt_gsi::GenericMethod ("createEditor", "@brief Virtual method QWidget *QStyledItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_createEditor_c6860_0, &_call_cbs_createEditor_c6860_0);
+  methods += new qt_gsi::GenericMethod ("createEditor", "@hide", true, &_init_cbs_createEditor_c6860_0, &_call_cbs_createEditor_c6860_0, &_set_callback_cbs_createEditor_c6860_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QStyledItemDelegate::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("destroyEditor", "@brief Virtual method void QStyledItemDelegate::destroyEditor(QWidget *editor, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_destroyEditor_c3602_0, &_call_cbs_destroyEditor_c3602_0);
+  methods += new qt_gsi::GenericMethod ("destroyEditor", "@hide", true, &_init_cbs_destroyEditor_c3602_0, &_call_cbs_destroyEditor_c3602_0, &_set_callback_cbs_destroyEditor_c3602_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QStyledItemDelegate::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QStyledItemDelegate::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("displayText", "@hide", true, &_init_cbs_displayText_c3997_0, &_call_cbs_displayText_c3997_0);
-  methods += new qt_gsi::GenericMethod ("displayText", "@brief Virtual method QString QStyledItemDelegate::displayText(const QVariant &value, const QLocale &locale)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_displayText_c3997_0, &_call_cbs_displayText_c3997_0, &_set_callback_cbs_displayText_c3997_0);
-  methods += new qt_gsi::GenericMethod ("*editorEvent", "@hide", false, &_init_cbs_editorEvent_9073_0, &_call_cbs_editorEvent_9073_0);
-  methods += new qt_gsi::GenericMethod ("*editorEvent", "@brief Virtual method bool QStyledItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_editorEvent_9073_0, &_call_cbs_editorEvent_9073_0, &_set_callback_cbs_editorEvent_9073_0);
-  methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QStyledItemDelegate::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("*eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("*eventFilter", "@brief Virtual method bool QStyledItemDelegate::eventFilter(QObject *object, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("helpEvent", "@hide", false, &_init_cbs_helpEvent_9380_0, &_call_cbs_helpEvent_9380_0);
-  methods += new qt_gsi::GenericMethod ("helpEvent", "@brief Virtual method bool QStyledItemDelegate::helpEvent(QHelpEvent *event, QAbstractItemView *view, const QStyleOptionViewItem &option, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_helpEvent_9380_0, &_call_cbs_helpEvent_9380_0, &_set_callback_cbs_helpEvent_9380_0);
-  methods += new qt_gsi::GenericMethod ("*initStyleOption", "@hide", true, &_init_cbs_initStyleOption_c4962_0, &_call_cbs_initStyleOption_c4962_0);
-  methods += new qt_gsi::GenericMethod ("*initStyleOption", "@brief Virtual method void QStyledItemDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_initStyleOption_c4962_0, &_call_cbs_initStyleOption_c4962_0, &_set_callback_cbs_initStyleOption_c4962_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QStyledItemDelegate::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("displayText", "@brief Virtual method QString QStyledItemDelegate::displayText(const QVariant &value, const QLocale &locale)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_displayText_c3997_0, &_call_cbs_displayText_c3997_0);
+  methods += new qt_gsi::GenericMethod ("displayText", "@hide", true, &_init_cbs_displayText_c3997_0, &_call_cbs_displayText_c3997_0, &_set_callback_cbs_displayText_c3997_0);
+  methods += new qt_gsi::GenericMethod ("*editorEvent", "@brief Virtual method bool QStyledItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_editorEvent_9073_0, &_call_cbs_editorEvent_9073_0);
+  methods += new qt_gsi::GenericMethod ("*editorEvent", "@hide", false, &_init_cbs_editorEvent_9073_0, &_call_cbs_editorEvent_9073_0, &_set_callback_cbs_editorEvent_9073_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QStyledItemDelegate::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("*eventFilter", "@brief Virtual method bool QStyledItemDelegate::eventFilter(QObject *object, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("*eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("helpEvent", "@brief Virtual method bool QStyledItemDelegate::helpEvent(QHelpEvent *event, QAbstractItemView *view, const QStyleOptionViewItem &option, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_helpEvent_9380_0, &_call_cbs_helpEvent_9380_0);
+  methods += new qt_gsi::GenericMethod ("helpEvent", "@hide", false, &_init_cbs_helpEvent_9380_0, &_call_cbs_helpEvent_9380_0, &_set_callback_cbs_helpEvent_9380_0);
+  methods += new qt_gsi::GenericMethod ("*initStyleOption", "@brief Virtual method void QStyledItemDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_initStyleOption_c4962_0, &_call_cbs_initStyleOption_c4962_0);
+  methods += new qt_gsi::GenericMethod ("*initStyleOption", "@hide", true, &_init_cbs_initStyleOption_c4962_0, &_call_cbs_initStyleOption_c4962_0, &_set_callback_cbs_initStyleOption_c4962_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QStyledItemDelegate::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
-  methods += new qt_gsi::GenericMethod ("paint", "@hide", true, &_init_cbs_paint_c6971_0, &_call_cbs_paint_c6971_0);
-  methods += new qt_gsi::GenericMethod ("paint", "@brief Virtual method void QStyledItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paint_c6971_0, &_call_cbs_paint_c6971_0, &_set_callback_cbs_paint_c6971_0);
-  methods += new qt_gsi::GenericMethod ("paintingRoles", "@hide", true, &_init_cbs_paintingRoles_c0_0, &_call_cbs_paintingRoles_c0_0);
-  methods += new qt_gsi::GenericMethod ("paintingRoles", "@brief Virtual method QVector<int> QStyledItemDelegate::paintingRoles()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paintingRoles_c0_0, &_call_cbs_paintingRoles_c0_0, &_set_callback_cbs_paintingRoles_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QStyledItemDelegate::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
+  methods += new qt_gsi::GenericMethod ("paint", "@brief Virtual method void QStyledItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paint_c6971_0, &_call_cbs_paint_c6971_0);
+  methods += new qt_gsi::GenericMethod ("paint", "@hide", true, &_init_cbs_paint_c6971_0, &_call_cbs_paint_c6971_0, &_set_callback_cbs_paint_c6971_0);
+  methods += new qt_gsi::GenericMethod ("paintingRoles", "@brief Virtual method QVector<int> QStyledItemDelegate::paintingRoles()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paintingRoles_c0_0, &_call_cbs_paintingRoles_c0_0);
+  methods += new qt_gsi::GenericMethod ("paintingRoles", "@hide", true, &_init_cbs_paintingRoles_c0_0, &_call_cbs_paintingRoles_c0_0, &_set_callback_cbs_paintingRoles_c0_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QStyledItemDelegate::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QStyledItemDelegate::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QStyledItemDelegate::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("setEditorData", "@hide", true, &_init_cbs_setEditorData_c3602_0, &_call_cbs_setEditorData_c3602_0);
-  methods += new qt_gsi::GenericMethod ("setEditorData", "@brief Virtual method void QStyledItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_setEditorData_c3602_0, &_call_cbs_setEditorData_c3602_0, &_set_callback_cbs_setEditorData_c3602_0);
-  methods += new qt_gsi::GenericMethod ("setModelData", "@hide", true, &_init_cbs_setModelData_c5913_0, &_call_cbs_setModelData_c5913_0);
-  methods += new qt_gsi::GenericMethod ("setModelData", "@brief Virtual method void QStyledItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_setModelData_c5913_0, &_call_cbs_setModelData_c5913_0, &_set_callback_cbs_setModelData_c5913_0);
-  methods += new qt_gsi::GenericMethod ("sizeHint", "@hide", true, &_init_cbs_sizeHint_c5653_0, &_call_cbs_sizeHint_c5653_0);
-  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Virtual method QSize QStyledItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_sizeHint_c5653_0, &_call_cbs_sizeHint_c5653_0, &_set_callback_cbs_sizeHint_c5653_0);
+  methods += new qt_gsi::GenericMethod ("setEditorData", "@brief Virtual method void QStyledItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_setEditorData_c3602_0, &_call_cbs_setEditorData_c3602_0);
+  methods += new qt_gsi::GenericMethod ("setEditorData", "@hide", true, &_init_cbs_setEditorData_c3602_0, &_call_cbs_setEditorData_c3602_0, &_set_callback_cbs_setEditorData_c3602_0);
+  methods += new qt_gsi::GenericMethod ("setModelData", "@brief Virtual method void QStyledItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_setModelData_c5913_0, &_call_cbs_setModelData_c5913_0);
+  methods += new qt_gsi::GenericMethod ("setModelData", "@hide", true, &_init_cbs_setModelData_c5913_0, &_call_cbs_setModelData_c5913_0, &_set_callback_cbs_setModelData_c5913_0);
+  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Virtual method QSize QStyledItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_sizeHint_c5653_0, &_call_cbs_sizeHint_c5653_0);
+  methods += new qt_gsi::GenericMethod ("sizeHint", "@hide", true, &_init_cbs_sizeHint_c5653_0, &_call_cbs_sizeHint_c5653_0, &_set_callback_cbs_sizeHint_c5653_0);
   methods += new qt_gsi::GenericMethod ("emit_sizeHintChanged", "@brief Emitter for signal void QStyledItemDelegate::sizeHintChanged(const QModelIndex &)\nCall this method to emit this signal.", false, &_init_emitter_sizeHintChanged_2395, &_call_emitter_sizeHintChanged_2395);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QStyledItemDelegate::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
-  methods += new qt_gsi::GenericMethod ("updateEditorGeometry", "@hide", true, &_init_cbs_updateEditorGeometry_c6860_0, &_call_cbs_updateEditorGeometry_c6860_0);
-  methods += new qt_gsi::GenericMethod ("updateEditorGeometry", "@brief Virtual method void QStyledItemDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_updateEditorGeometry_c6860_0, &_call_cbs_updateEditorGeometry_c6860_0, &_set_callback_cbs_updateEditorGeometry_c6860_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QStyledItemDelegate::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("updateEditorGeometry", "@brief Virtual method void QStyledItemDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_updateEditorGeometry_c6860_0, &_call_cbs_updateEditorGeometry_c6860_0);
+  methods += new qt_gsi::GenericMethod ("updateEditorGeometry", "@hide", true, &_init_cbs_updateEditorGeometry_c6860_0, &_call_cbs_updateEditorGeometry_c6860_0, &_set_callback_cbs_updateEditorGeometry_c6860_0);
   return methods;
 }
 

@@ -319,6 +319,7 @@ static gsi::Methods methods_QPlainTextDocumentLayout () {
   methods += new qt_gsi::GenericMethod ("setCursorWidth|cursorWidth=", "@brief Method void QPlainTextDocumentLayout::setCursorWidth(int width)\n", false, &_init_f_setCursorWidth_767, &_call_f_setCursorWidth_767);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QPlainTextDocumentLayout::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QSizeF & > ("documentSizeChanged(const QSizeF &)", "documentSizeChanged", gsi::arg("newSize"), "@brief Signal declaration for QPlainTextDocumentLayout::documentSizeChanged(const QSizeF &newSize)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QPlainTextDocumentLayout::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("pageCountChanged(int)", "pageCountChanged", gsi::arg("newPages"), "@brief Signal declaration for QPlainTextDocumentLayout::pageCountChanged(int newPages)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QRectF & > ("update(const QRectF &)", "update", gsi::arg("arg1"), "@brief Signal declaration for QPlainTextDocumentLayout::update(const QRectF &)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QTextBlock & > ("updateBlock(const QTextBlock &)", "updateBlock", gsi::arg("block"), "@brief Signal declaration for QPlainTextDocumentLayout::updateBlock(const QTextBlock &block)\nYou can bind a procedure to this signal.");
@@ -495,6 +496,13 @@ public:
     } else {
       return QPlainTextDocumentLayout::hitTest(arg1, arg2);
     }
+  }
+
+  //  [emitter impl] void QPlainTextDocumentLayout::objectNameChanged(const QString &objectName)
+  void emitter_QPlainTextDocumentLayout_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QPlainTextDocumentLayout::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] int QPlainTextDocumentLayout::pageCount()
@@ -1083,6 +1091,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QPlainTextDocumentLayout::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QPlainTextDocumentLayout_Adaptor *)cls)->emitter_QPlainTextDocumentLayout_objectNameChanged_4567 (arg1);
+}
+
+
 // int QPlainTextDocumentLayout::pageCount()
 
 static void _init_cbs_pageCount_c0_0 (qt_gsi::GenericMethod *decl)
@@ -1294,47 +1320,48 @@ gsi::Class<QPlainTextDocumentLayout> &qtdecl_QPlainTextDocumentLayout ();
 static gsi::Methods methods_QPlainTextDocumentLayout_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPlainTextDocumentLayout::QPlainTextDocumentLayout(QTextDocument *document)\nThis method creates an object of class QPlainTextDocumentLayout.", &_init_ctor_QPlainTextDocumentLayout_Adaptor_1955, &_call_ctor_QPlainTextDocumentLayout_Adaptor_1955);
-  methods += new qt_gsi::GenericMethod ("blockBoundingRect", "@hide", true, &_init_cbs_blockBoundingRect_c2306_0, &_call_cbs_blockBoundingRect_c2306_0);
-  methods += new qt_gsi::GenericMethod ("blockBoundingRect", "@brief Virtual method QRectF QPlainTextDocumentLayout::blockBoundingRect(const QTextBlock &block)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_blockBoundingRect_c2306_0, &_call_cbs_blockBoundingRect_c2306_0, &_set_callback_cbs_blockBoundingRect_c2306_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QPlainTextDocumentLayout::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QPlainTextDocumentLayout::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("blockBoundingRect", "@brief Virtual method QRectF QPlainTextDocumentLayout::blockBoundingRect(const QTextBlock &block)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_blockBoundingRect_c2306_0, &_call_cbs_blockBoundingRect_c2306_0);
+  methods += new qt_gsi::GenericMethod ("blockBoundingRect", "@hide", true, &_init_cbs_blockBoundingRect_c2306_0, &_call_cbs_blockBoundingRect_c2306_0, &_set_callback_cbs_blockBoundingRect_c2306_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QPlainTextDocumentLayout::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QPlainTextDocumentLayout::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QPlainTextDocumentLayout::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QPlainTextDocumentLayout::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("*documentChanged", "@hide", false, &_init_cbs_documentChanged_2085_0, &_call_cbs_documentChanged_2085_0);
-  methods += new qt_gsi::GenericMethod ("*documentChanged", "@brief Virtual method void QPlainTextDocumentLayout::documentChanged(int from, int, int charsAdded)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_documentChanged_2085_0, &_call_cbs_documentChanged_2085_0, &_set_callback_cbs_documentChanged_2085_0);
-  methods += new qt_gsi::GenericMethod ("documentSize", "@hide", true, &_init_cbs_documentSize_c0_0, &_call_cbs_documentSize_c0_0);
-  methods += new qt_gsi::GenericMethod ("documentSize", "@brief Virtual method QSizeF QPlainTextDocumentLayout::documentSize()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_documentSize_c0_0, &_call_cbs_documentSize_c0_0, &_set_callback_cbs_documentSize_c0_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QPlainTextDocumentLayout::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("*documentChanged", "@brief Virtual method void QPlainTextDocumentLayout::documentChanged(int from, int, int charsAdded)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_documentChanged_2085_0, &_call_cbs_documentChanged_2085_0);
+  methods += new qt_gsi::GenericMethod ("*documentChanged", "@hide", false, &_init_cbs_documentChanged_2085_0, &_call_cbs_documentChanged_2085_0, &_set_callback_cbs_documentChanged_2085_0);
+  methods += new qt_gsi::GenericMethod ("documentSize", "@brief Virtual method QSizeF QPlainTextDocumentLayout::documentSize()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_documentSize_c0_0, &_call_cbs_documentSize_c0_0);
+  methods += new qt_gsi::GenericMethod ("documentSize", "@hide", true, &_init_cbs_documentSize_c0_0, &_call_cbs_documentSize_c0_0, &_set_callback_cbs_documentSize_c0_0);
   methods += new qt_gsi::GenericMethod ("emit_documentSizeChanged", "@brief Emitter for signal void QPlainTextDocumentLayout::documentSizeChanged(const QSizeF &newSize)\nCall this method to emit this signal.", false, &_init_emitter_documentSizeChanged_1875, &_call_emitter_documentSizeChanged_1875);
-  methods += new qt_gsi::GenericMethod ("draw", "@hide", false, &_init_cbs_draw_6787_0, &_call_cbs_draw_6787_0);
-  methods += new qt_gsi::GenericMethod ("draw", "@brief Virtual method void QPlainTextDocumentLayout::draw(QPainter *, const QAbstractTextDocumentLayout::PaintContext &)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_draw_6787_0, &_call_cbs_draw_6787_0, &_set_callback_cbs_draw_6787_0);
-  methods += new qt_gsi::GenericMethod ("*drawInlineObject", "@hide", false, &_init_cbs_drawInlineObject_8199_0, &_call_cbs_drawInlineObject_8199_0);
-  methods += new qt_gsi::GenericMethod ("*drawInlineObject", "@brief Virtual method void QPlainTextDocumentLayout::drawInlineObject(QPainter *painter, const QRectF &rect, QTextInlineObject object, int posInDocument, const QTextFormat &format)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_drawInlineObject_8199_0, &_call_cbs_drawInlineObject_8199_0, &_set_callback_cbs_drawInlineObject_8199_0);
-  methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QPlainTextDocumentLayout::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QPlainTextDocumentLayout::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("draw", "@brief Virtual method void QPlainTextDocumentLayout::draw(QPainter *, const QAbstractTextDocumentLayout::PaintContext &)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_draw_6787_0, &_call_cbs_draw_6787_0);
+  methods += new qt_gsi::GenericMethod ("draw", "@hide", false, &_init_cbs_draw_6787_0, &_call_cbs_draw_6787_0, &_set_callback_cbs_draw_6787_0);
+  methods += new qt_gsi::GenericMethod ("*drawInlineObject", "@brief Virtual method void QPlainTextDocumentLayout::drawInlineObject(QPainter *painter, const QRectF &rect, QTextInlineObject object, int posInDocument, const QTextFormat &format)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_drawInlineObject_8199_0, &_call_cbs_drawInlineObject_8199_0);
+  methods += new qt_gsi::GenericMethod ("*drawInlineObject", "@hide", false, &_init_cbs_drawInlineObject_8199_0, &_call_cbs_drawInlineObject_8199_0, &_set_callback_cbs_drawInlineObject_8199_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QPlainTextDocumentLayout::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QPlainTextDocumentLayout::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*format", "@brief Method QTextCharFormat QPlainTextDocumentLayout::format(int pos)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_format_767, &_call_fp_format_767);
   methods += new qt_gsi::GenericMethod ("*formatIndex", "@brief Method int QPlainTextDocumentLayout::formatIndex(int pos)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_formatIndex_767, &_call_fp_formatIndex_767);
-  methods += new qt_gsi::GenericMethod ("frameBoundingRect", "@hide", true, &_init_cbs_frameBoundingRect_c1615_0, &_call_cbs_frameBoundingRect_c1615_0);
-  methods += new qt_gsi::GenericMethod ("frameBoundingRect", "@brief Virtual method QRectF QPlainTextDocumentLayout::frameBoundingRect(QTextFrame *)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_frameBoundingRect_c1615_0, &_call_cbs_frameBoundingRect_c1615_0, &_set_callback_cbs_frameBoundingRect_c1615_0);
-  methods += new qt_gsi::GenericMethod ("hitTest", "@hide", true, &_init_cbs_hitTest_c4147_0, &_call_cbs_hitTest_c4147_0);
-  methods += new qt_gsi::GenericMethod ("hitTest", "@brief Virtual method int QPlainTextDocumentLayout::hitTest(const QPointF &, Qt::HitTestAccuracy)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_hitTest_c4147_0, &_call_cbs_hitTest_c4147_0, &_set_callback_cbs_hitTest_c4147_0);
+  methods += new qt_gsi::GenericMethod ("frameBoundingRect", "@brief Virtual method QRectF QPlainTextDocumentLayout::frameBoundingRect(QTextFrame *)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_frameBoundingRect_c1615_0, &_call_cbs_frameBoundingRect_c1615_0);
+  methods += new qt_gsi::GenericMethod ("frameBoundingRect", "@hide", true, &_init_cbs_frameBoundingRect_c1615_0, &_call_cbs_frameBoundingRect_c1615_0, &_set_callback_cbs_frameBoundingRect_c1615_0);
+  methods += new qt_gsi::GenericMethod ("hitTest", "@brief Virtual method int QPlainTextDocumentLayout::hitTest(const QPointF &, Qt::HitTestAccuracy)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_hitTest_c4147_0, &_call_cbs_hitTest_c4147_0);
+  methods += new qt_gsi::GenericMethod ("hitTest", "@hide", true, &_init_cbs_hitTest_c4147_0, &_call_cbs_hitTest_c4147_0, &_set_callback_cbs_hitTest_c4147_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QPlainTextDocumentLayout::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
-  methods += new qt_gsi::GenericMethod ("pageCount", "@hide", true, &_init_cbs_pageCount_c0_0, &_call_cbs_pageCount_c0_0);
-  methods += new qt_gsi::GenericMethod ("pageCount", "@brief Virtual method int QPlainTextDocumentLayout::pageCount()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_pageCount_c0_0, &_call_cbs_pageCount_c0_0, &_set_callback_cbs_pageCount_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QPlainTextDocumentLayout::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
+  methods += new qt_gsi::GenericMethod ("pageCount", "@brief Virtual method int QPlainTextDocumentLayout::pageCount()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_pageCount_c0_0, &_call_cbs_pageCount_c0_0);
+  methods += new qt_gsi::GenericMethod ("pageCount", "@hide", true, &_init_cbs_pageCount_c0_0, &_call_cbs_pageCount_c0_0, &_set_callback_cbs_pageCount_c0_0);
   methods += new qt_gsi::GenericMethod ("emit_pageCountChanged", "@brief Emitter for signal void QPlainTextDocumentLayout::pageCountChanged(int newPages)\nCall this method to emit this signal.", false, &_init_emitter_pageCountChanged_767, &_call_emitter_pageCountChanged_767);
-  methods += new qt_gsi::GenericMethod ("*positionInlineObject", "@hide", false, &_init_cbs_positionInlineObject_5127_0, &_call_cbs_positionInlineObject_5127_0);
-  methods += new qt_gsi::GenericMethod ("*positionInlineObject", "@brief Virtual method void QPlainTextDocumentLayout::positionInlineObject(QTextInlineObject item, int posInDocument, const QTextFormat &format)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_positionInlineObject_5127_0, &_call_cbs_positionInlineObject_5127_0, &_set_callback_cbs_positionInlineObject_5127_0);
+  methods += new qt_gsi::GenericMethod ("*positionInlineObject", "@brief Virtual method void QPlainTextDocumentLayout::positionInlineObject(QTextInlineObject item, int posInDocument, const QTextFormat &format)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_positionInlineObject_5127_0, &_call_cbs_positionInlineObject_5127_0);
+  methods += new qt_gsi::GenericMethod ("*positionInlineObject", "@hide", false, &_init_cbs_positionInlineObject_5127_0, &_call_cbs_positionInlineObject_5127_0, &_set_callback_cbs_positionInlineObject_5127_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QPlainTextDocumentLayout::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
-  methods += new qt_gsi::GenericMethod ("*resizeInlineObject", "@hide", false, &_init_cbs_resizeInlineObject_5127_0, &_call_cbs_resizeInlineObject_5127_0);
-  methods += new qt_gsi::GenericMethod ("*resizeInlineObject", "@brief Virtual method void QPlainTextDocumentLayout::resizeInlineObject(QTextInlineObject item, int posInDocument, const QTextFormat &format)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_resizeInlineObject_5127_0, &_call_cbs_resizeInlineObject_5127_0, &_set_callback_cbs_resizeInlineObject_5127_0);
+  methods += new qt_gsi::GenericMethod ("*resizeInlineObject", "@brief Virtual method void QPlainTextDocumentLayout::resizeInlineObject(QTextInlineObject item, int posInDocument, const QTextFormat &format)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_resizeInlineObject_5127_0, &_call_cbs_resizeInlineObject_5127_0);
+  methods += new qt_gsi::GenericMethod ("*resizeInlineObject", "@hide", false, &_init_cbs_resizeInlineObject_5127_0, &_call_cbs_resizeInlineObject_5127_0, &_set_callback_cbs_resizeInlineObject_5127_0);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QPlainTextDocumentLayout::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QPlainTextDocumentLayout::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QPlainTextDocumentLayout::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QPlainTextDocumentLayout::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("emit_update", "@brief Emitter for signal void QPlainTextDocumentLayout::update(const QRectF &)\nCall this method to emit this signal.", false, &_init_emitter_update_1862, &_call_emitter_update_1862);
   methods += new qt_gsi::GenericMethod ("emit_updateBlock", "@brief Emitter for signal void QPlainTextDocumentLayout::updateBlock(const QTextBlock &block)\nCall this method to emit this signal.", false, &_init_emitter_updateBlock_2306, &_call_emitter_updateBlock_2306);
   return methods;

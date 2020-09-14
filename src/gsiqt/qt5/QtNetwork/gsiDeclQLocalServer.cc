@@ -399,6 +399,7 @@ static gsi::Methods methods_QLocalServer () {
   methods += new qt_gsi::GenericMethod ("waitForNewConnection", "@brief Method bool QLocalServer::waitForNewConnection(int msec, bool *timedOut)\n", false, &_init_f_waitForNewConnection_1709, &_call_f_waitForNewConnection_1709);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QLocalServer::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("newConnection()", "newConnection", "@brief Signal declaration for QLocalServer::newConnection()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QLocalServer::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("removeServer", "@brief Static method bool QLocalServer::removeServer(const QString &name)\nThis method is static and can be called without an instance.", &_init_f_removeServer_2025, &_call_f_removeServer_2025);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QLocalServer::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QLocalServer::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
@@ -524,6 +525,13 @@ public:
     } else {
       return QLocalServer::nextPendingConnection();
     }
+  }
+
+  //  [emitter impl] void QLocalServer::objectNameChanged(const QString &objectName)
+  void emitter_QLocalServer_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QLocalServer::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QLocalServer::childEvent(QChildEvent *)
@@ -865,6 +873,24 @@ static void _set_callback_cbs_nextPendingConnection_0_0 (void *cls, const gsi::C
 }
 
 
+// emitter void QLocalServer::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QLocalServer_Adaptor *)cls)->emitter_QLocalServer_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QLocalServer::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -943,30 +969,31 @@ gsi::Class<QLocalServer> &qtdecl_QLocalServer ();
 static gsi::Methods methods_QLocalServer_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QLocalServer::QLocalServer(QObject *parent)\nThis method creates an object of class QLocalServer.", &_init_ctor_QLocalServer_Adaptor_1302, &_call_ctor_QLocalServer_Adaptor_1302);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QLocalServer::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QLocalServer::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QLocalServer::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QLocalServer::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QLocalServer::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QLocalServer::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QLocalServer::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QLocalServer::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("hasPendingConnections", "@hide", true, &_init_cbs_hasPendingConnections_c0_0, &_call_cbs_hasPendingConnections_c0_0);
-  methods += new qt_gsi::GenericMethod ("hasPendingConnections", "@brief Virtual method bool QLocalServer::hasPendingConnections()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_hasPendingConnections_c0_0, &_call_cbs_hasPendingConnections_c0_0, &_set_callback_cbs_hasPendingConnections_c0_0);
-  methods += new qt_gsi::GenericMethod ("*incomingConnection", "@hide", false, &_init_cbs_incomingConnection_1339_0, &_call_cbs_incomingConnection_1339_0);
-  methods += new qt_gsi::GenericMethod ("*incomingConnection", "@brief Virtual method void QLocalServer::incomingConnection(quintptr socketDescriptor)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_incomingConnection_1339_0, &_call_cbs_incomingConnection_1339_0, &_set_callback_cbs_incomingConnection_1339_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QLocalServer::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QLocalServer::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QLocalServer::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("hasPendingConnections", "@brief Virtual method bool QLocalServer::hasPendingConnections()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_hasPendingConnections_c0_0, &_call_cbs_hasPendingConnections_c0_0);
+  methods += new qt_gsi::GenericMethod ("hasPendingConnections", "@hide", true, &_init_cbs_hasPendingConnections_c0_0, &_call_cbs_hasPendingConnections_c0_0, &_set_callback_cbs_hasPendingConnections_c0_0);
+  methods += new qt_gsi::GenericMethod ("*incomingConnection", "@brief Virtual method void QLocalServer::incomingConnection(quintptr socketDescriptor)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_incomingConnection_1339_0, &_call_cbs_incomingConnection_1339_0);
+  methods += new qt_gsi::GenericMethod ("*incomingConnection", "@hide", false, &_init_cbs_incomingConnection_1339_0, &_call_cbs_incomingConnection_1339_0, &_set_callback_cbs_incomingConnection_1339_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QLocalServer::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("emit_newConnection", "@brief Emitter for signal void QLocalServer::newConnection()\nCall this method to emit this signal.", false, &_init_emitter_newConnection_0, &_call_emitter_newConnection_0);
-  methods += new qt_gsi::GenericMethod ("nextPendingConnection", "@hide", false, &_init_cbs_nextPendingConnection_0_0, &_call_cbs_nextPendingConnection_0_0);
-  methods += new qt_gsi::GenericMethod ("nextPendingConnection", "@brief Virtual method QLocalSocket *QLocalServer::nextPendingConnection()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_nextPendingConnection_0_0, &_call_cbs_nextPendingConnection_0_0, &_set_callback_cbs_nextPendingConnection_0_0);
+  methods += new qt_gsi::GenericMethod ("nextPendingConnection", "@brief Virtual method QLocalSocket *QLocalServer::nextPendingConnection()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_nextPendingConnection_0_0, &_call_cbs_nextPendingConnection_0_0);
+  methods += new qt_gsi::GenericMethod ("nextPendingConnection", "@hide", false, &_init_cbs_nextPendingConnection_0_0, &_call_cbs_nextPendingConnection_0_0, &_set_callback_cbs_nextPendingConnection_0_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QLocalServer::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QLocalServer::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QLocalServer::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QLocalServer::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QLocalServer::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QLocalServer::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }
 

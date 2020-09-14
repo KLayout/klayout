@@ -630,6 +630,7 @@ static gsi::Methods methods_QMovie () {
   methods += gsi::qt_signal<const qt_gsi::Converter<QImageReader::ImageReaderError>::target_type & > ("error(QImageReader::ImageReaderError)", "error", gsi::arg("error"), "@brief Signal declaration for QMovie::error(QImageReader::ImageReaderError error)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("finished()", "finished", "@brief Signal declaration for QMovie::finished()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("frameChanged(int)", "frameChanged", gsi::arg("frameNumber"), "@brief Signal declaration for QMovie::frameChanged(int frameNumber)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QMovie::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QSize & > ("resized(const QSize &)", "resized", gsi::arg("size"), "@brief Signal declaration for QMovie::resized(const QSize &size)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("started()", "started", "@brief Signal declaration for QMovie::started()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<QMovie::MovieState>::target_type & > ("stateChanged(QMovie::MovieState)", "stateChanged", gsi::arg("state"), "@brief Signal declaration for QMovie::stateChanged(QMovie::MovieState state)\nYou can bind a procedure to this signal.");
@@ -777,6 +778,13 @@ public:
   void emitter_QMovie_frameChanged_767(int frameNumber)
   {
     emit QMovie::frameChanged(frameNumber);
+  }
+
+  //  [emitter impl] void QMovie::objectNameChanged(const QString &objectName)
+  void emitter_QMovie_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QMovie::objectNameChanged(const QString &objectName)'");
   }
 
   //  [emitter impl] void QMovie::resized(const QSize &size)
@@ -1146,6 +1154,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QMovie::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QMovie_Adaptor *)cls)->emitter_QMovie_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QMovie::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -1309,6 +1335,7 @@ static gsi::Methods methods_QMovie_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_finished", "@brief Emitter for signal void QMovie::finished()\nCall this method to emit this signal.", false, &_init_emitter_finished_0, &_call_emitter_finished_0);
   methods += new qt_gsi::GenericMethod ("emit_frameChanged", "@brief Emitter for signal void QMovie::frameChanged(int frameNumber)\nCall this method to emit this signal.", false, &_init_emitter_frameChanged_767, &_call_emitter_frameChanged_767);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QMovie::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QMovie::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QMovie::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("emit_resized", "@brief Emitter for signal void QMovie::resized(const QSize &size)\nCall this method to emit this signal.", false, &_init_emitter_resized_1805, &_call_emitter_resized_1805);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QMovie::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);

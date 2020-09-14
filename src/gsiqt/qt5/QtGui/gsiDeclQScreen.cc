@@ -672,6 +672,7 @@ static gsi::Methods methods_QScreen () {
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QScreen::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QRect & > ("geometryChanged(const QRect &)", "geometryChanged", gsi::arg("geometry"), "@brief Signal declaration for QScreen::geometryChanged(const QRect &geometry)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<double > ("logicalDotsPerInchChanged(double)", "logicalDotsPerInchChanged", gsi::arg("dpi"), "@brief Signal declaration for QScreen::logicalDotsPerInchChanged(double dpi)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QScreen::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & > ("orientationChanged(Qt::ScreenOrientation)", "orientationChanged", gsi::arg("orientation"), "@brief Signal declaration for QScreen::orientationChanged(Qt::ScreenOrientation orientation)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<double > ("physicalDotsPerInchChanged(double)", "physicalDotsPerInchChanged", gsi::arg("dpi"), "@brief Signal declaration for QScreen::physicalDotsPerInchChanged(double dpi)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QSizeF & > ("physicalSizeChanged(const QSizeF &)", "physicalSizeChanged", gsi::arg("size"), "@brief Signal declaration for QScreen::physicalSizeChanged(const QSizeF &size)\nYou can bind a procedure to this signal.");
@@ -772,6 +773,13 @@ public:
   void emitter_QScreen_logicalDotsPerInchChanged_1071(double dpi)
   {
     emit QScreen::logicalDotsPerInchChanged(dpi);
+  }
+
+  //  [emitter impl] void QScreen::objectNameChanged(const QString &objectName)
+  void emitter_QScreen_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QScreen::objectNameChanged(const QString &objectName)'");
   }
 
   //  [emitter impl] void QScreen::orientationChanged(Qt::ScreenOrientation orientation)
@@ -1091,6 +1099,24 @@ static void _call_emitter_logicalDotsPerInchChanged_1071 (const qt_gsi::GenericM
 }
 
 
+// emitter void QScreen::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QScreen_Adaptor *)cls)->emitter_QScreen_objectNameChanged_4567 (arg1);
+}
+
+
 // emitter void QScreen::orientationChanged(Qt::ScreenOrientation orientation)
 
 static void _init_emitter_orientationChanged_2521 (qt_gsi::GenericMethod *decl)
@@ -1291,6 +1317,7 @@ static gsi::Methods methods_QScreen_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_geometryChanged", "@brief Emitter for signal void QScreen::geometryChanged(const QRect &geometry)\nCall this method to emit this signal.", false, &_init_emitter_geometryChanged_1792, &_call_emitter_geometryChanged_1792);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QScreen::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("emit_logicalDotsPerInchChanged", "@brief Emitter for signal void QScreen::logicalDotsPerInchChanged(double dpi)\nCall this method to emit this signal.", false, &_init_emitter_logicalDotsPerInchChanged_1071, &_call_emitter_logicalDotsPerInchChanged_1071);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QScreen::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("emit_orientationChanged", "@brief Emitter for signal void QScreen::orientationChanged(Qt::ScreenOrientation orientation)\nCall this method to emit this signal.", false, &_init_emitter_orientationChanged_2521, &_call_emitter_orientationChanged_2521);
   methods += new qt_gsi::GenericMethod ("emit_physicalDotsPerInchChanged", "@brief Emitter for signal void QScreen::physicalDotsPerInchChanged(double dpi)\nCall this method to emit this signal.", false, &_init_emitter_physicalDotsPerInchChanged_1071, &_call_emitter_physicalDotsPerInchChanged_1071);
   methods += new qt_gsi::GenericMethod ("emit_physicalSizeChanged", "@brief Emitter for signal void QScreen::physicalSizeChanged(const QSizeF &size)\nCall this method to emit this signal.", false, &_init_emitter_physicalSizeChanged_1875, &_call_emitter_physicalSizeChanged_1875);

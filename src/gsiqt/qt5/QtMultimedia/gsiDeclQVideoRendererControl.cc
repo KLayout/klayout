@@ -149,7 +149,6 @@ static gsi::Methods methods_QVideoRendererControl () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("setSurface|surface=", "@brief Method void QVideoRendererControl::setSurface(QAbstractVideoSurface *surface)\n", false, &_init_f_setSurface_2739, &_call_f_setSurface_2739);
   methods += new qt_gsi::GenericMethod (":surface", "@brief Method QAbstractVideoSurface *QVideoRendererControl::surface()\n", true, &_init_f_surface_c0, &_call_f_surface_c0);
-  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QVideoRendererControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QVideoRendererControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QVideoRendererControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -196,12 +195,6 @@ public:
   //  [expose] int QVideoRendererControl::senderSignalIndex()
   int fp_QVideoRendererControl_senderSignalIndex_c0 () const {
     return QVideoRendererControl::senderSignalIndex();
-  }
-
-  //  [emitter impl] void QVideoRendererControl::destroyed(QObject *)
-  void emitter_QVideoRendererControl_destroyed_1302(QObject *arg1)
-  {
-    emit QVideoRendererControl::destroyed(arg1);
   }
 
   //  [adaptor impl] bool QVideoRendererControl::event(QEvent *)
@@ -396,24 +389,6 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QVideoRendererControl_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
-}
-
-
-// emitter void QVideoRendererControl::destroyed(QObject *)
-
-static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
-  decl->add_arg<QObject * > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
-  ((QVideoRendererControl_Adaptor *)cls)->emitter_QVideoRendererControl_destroyed_1302 (arg1);
 }
 
 
@@ -629,27 +604,26 @@ gsi::Class<QVideoRendererControl> &qtdecl_QVideoRendererControl ();
 static gsi::Methods methods_QVideoRendererControl_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QVideoRendererControl::QVideoRendererControl()\nThis method creates an object of class QVideoRendererControl.", &_init_ctor_QVideoRendererControl_Adaptor_0, &_call_ctor_QVideoRendererControl_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QVideoRendererControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QVideoRendererControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QVideoRendererControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QVideoRendererControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QVideoRendererControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QVideoRendererControl::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QVideoRendererControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QVideoRendererControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QVideoRendererControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QVideoRendererControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QVideoRendererControl::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QVideoRendererControl::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QVideoRendererControl::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QVideoRendererControl::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QVideoRendererControl::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("setSurface", "@hide", false, &_init_cbs_setSurface_2739_0, &_call_cbs_setSurface_2739_0);
-  methods += new qt_gsi::GenericMethod ("setSurface", "@brief Virtual method void QVideoRendererControl::setSurface(QAbstractVideoSurface *surface)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setSurface_2739_0, &_call_cbs_setSurface_2739_0, &_set_callback_cbs_setSurface_2739_0);
-  methods += new qt_gsi::GenericMethod ("surface", "@hide", true, &_init_cbs_surface_c0_0, &_call_cbs_surface_c0_0);
-  methods += new qt_gsi::GenericMethod ("surface", "@brief Virtual method QAbstractVideoSurface *QVideoRendererControl::surface()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_surface_c0_0, &_call_cbs_surface_c0_0, &_set_callback_cbs_surface_c0_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QVideoRendererControl::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("setSurface", "@brief Virtual method void QVideoRendererControl::setSurface(QAbstractVideoSurface *surface)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setSurface_2739_0, &_call_cbs_setSurface_2739_0);
+  methods += new qt_gsi::GenericMethod ("setSurface", "@hide", false, &_init_cbs_setSurface_2739_0, &_call_cbs_setSurface_2739_0, &_set_callback_cbs_setSurface_2739_0);
+  methods += new qt_gsi::GenericMethod ("surface", "@brief Virtual method QAbstractVideoSurface *QVideoRendererControl::surface()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_surface_c0_0, &_call_cbs_surface_c0_0);
+  methods += new qt_gsi::GenericMethod ("surface", "@hide", true, &_init_cbs_surface_c0_0, &_call_cbs_surface_c0_0, &_set_callback_cbs_surface_c0_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QVideoRendererControl::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }
 

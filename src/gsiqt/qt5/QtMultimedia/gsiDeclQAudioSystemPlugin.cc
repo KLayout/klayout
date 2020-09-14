@@ -242,7 +242,6 @@ static gsi::Methods methods_QAudioSystemPlugin () {
   methods += new qt_gsi::GenericMethod ("createDeviceInfo", "@brief Method QAbstractAudioDeviceInfo *QAudioSystemPlugin::createDeviceInfo(const QByteArray &device, QAudio::Mode mode)\nThis is a reimplementation of QAudioSystemFactoryInterface::createDeviceInfo", false, &_init_f_createDeviceInfo_3721, &_call_f_createDeviceInfo_3721);
   methods += new qt_gsi::GenericMethod ("createInput", "@brief Method QAbstractAudioInput *QAudioSystemPlugin::createInput(const QByteArray &device)\nThis is a reimplementation of QAudioSystemFactoryInterface::createInput", false, &_init_f_createInput_2309, &_call_f_createInput_2309);
   methods += new qt_gsi::GenericMethod ("createOutput", "@brief Method QAbstractAudioOutput *QAudioSystemPlugin::createOutput(const QByteArray &device)\nThis is a reimplementation of QAudioSystemFactoryInterface::createOutput", false, &_init_f_createOutput_2309, &_call_f_createOutput_2309);
-  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAudioSystemPlugin::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QAudioSystemPlugin::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QAudioSystemPlugin::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   methods += new qt_gsi::GenericMethod ("asQObject", "@brief Delivers the base class interface QObject of QAudioSystemPlugin\nClass QAudioSystemPlugin is derived from multiple base classes. This method delivers the QObject base class aspect.", false, &_init_f_QAudioSystemPlugin_as_QObject, &_call_f_QAudioSystemPlugin_as_QObject);
@@ -364,12 +363,6 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("createOutput");
     }
-  }
-
-  //  [emitter impl] void QAudioSystemPlugin::destroyed(QObject *)
-  void emitter_QAudioSystemPlugin_destroyed_1302(QObject *arg1)
-  {
-    emit QAudioSystemPlugin::destroyed(arg1);
   }
 
   //  [adaptor impl] bool QAudioSystemPlugin::event(QEvent *)
@@ -637,24 +630,6 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
-// emitter void QAudioSystemPlugin::destroyed(QObject *)
-
-static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
-  decl->add_arg<QObject * > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
-  ((QAudioSystemPlugin_Adaptor *)cls)->emitter_QAudioSystemPlugin_destroyed_1302 (arg1);
-}
-
-
 // void QAudioSystemPlugin::disconnectNotify(const QMetaMethod &signal)
 
 static void _init_cbs_disconnectNotify_2394_0 (qt_gsi::GenericMethod *decl)
@@ -824,31 +799,30 @@ gsi::Class<QAudioSystemPlugin> &qtdecl_QAudioSystemPlugin ();
 static gsi::Methods methods_QAudioSystemPlugin_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAudioSystemPlugin::QAudioSystemPlugin(QObject *parent)\nThis method creates an object of class QAudioSystemPlugin.", &_init_ctor_QAudioSystemPlugin_Adaptor_1302, &_call_ctor_QAudioSystemPlugin_Adaptor_1302);
-  methods += new qt_gsi::GenericMethod ("availableDevices", "@hide", true, &_init_cbs_availableDevices_c1520_0, &_call_cbs_availableDevices_c1520_0);
-  methods += new qt_gsi::GenericMethod ("availableDevices", "@brief Virtual method QList<QByteArray> QAudioSystemPlugin::availableDevices(QAudio::Mode)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_availableDevices_c1520_0, &_call_cbs_availableDevices_c1520_0, &_set_callback_cbs_availableDevices_c1520_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QAudioSystemPlugin::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("createDeviceInfo", "@hide", false, &_init_cbs_createDeviceInfo_3721_0, &_call_cbs_createDeviceInfo_3721_0);
-  methods += new qt_gsi::GenericMethod ("createDeviceInfo", "@brief Virtual method QAbstractAudioDeviceInfo *QAudioSystemPlugin::createDeviceInfo(const QByteArray &device, QAudio::Mode mode)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_createDeviceInfo_3721_0, &_call_cbs_createDeviceInfo_3721_0, &_set_callback_cbs_createDeviceInfo_3721_0);
-  methods += new qt_gsi::GenericMethod ("createInput", "@hide", false, &_init_cbs_createInput_2309_0, &_call_cbs_createInput_2309_0);
-  methods += new qt_gsi::GenericMethod ("createInput", "@brief Virtual method QAbstractAudioInput *QAudioSystemPlugin::createInput(const QByteArray &device)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_createInput_2309_0, &_call_cbs_createInput_2309_0, &_set_callback_cbs_createInput_2309_0);
-  methods += new qt_gsi::GenericMethod ("createOutput", "@hide", false, &_init_cbs_createOutput_2309_0, &_call_cbs_createOutput_2309_0);
-  methods += new qt_gsi::GenericMethod ("createOutput", "@brief Virtual method QAbstractAudioOutput *QAudioSystemPlugin::createOutput(const QByteArray &device)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_createOutput_2309_0, &_call_cbs_createOutput_2309_0, &_set_callback_cbs_createOutput_2309_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAudioSystemPlugin::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QAudioSystemPlugin::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QAudioSystemPlugin::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAudioSystemPlugin::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QAudioSystemPlugin::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("availableDevices", "@brief Virtual method QList<QByteArray> QAudioSystemPlugin::availableDevices(QAudio::Mode)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_availableDevices_c1520_0, &_call_cbs_availableDevices_c1520_0);
+  methods += new qt_gsi::GenericMethod ("availableDevices", "@hide", true, &_init_cbs_availableDevices_c1520_0, &_call_cbs_availableDevices_c1520_0, &_set_callback_cbs_availableDevices_c1520_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QAudioSystemPlugin::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("createDeviceInfo", "@brief Virtual method QAbstractAudioDeviceInfo *QAudioSystemPlugin::createDeviceInfo(const QByteArray &device, QAudio::Mode mode)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_createDeviceInfo_3721_0, &_call_cbs_createDeviceInfo_3721_0);
+  methods += new qt_gsi::GenericMethod ("createDeviceInfo", "@hide", false, &_init_cbs_createDeviceInfo_3721_0, &_call_cbs_createDeviceInfo_3721_0, &_set_callback_cbs_createDeviceInfo_3721_0);
+  methods += new qt_gsi::GenericMethod ("createInput", "@brief Virtual method QAbstractAudioInput *QAudioSystemPlugin::createInput(const QByteArray &device)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_createInput_2309_0, &_call_cbs_createInput_2309_0);
+  methods += new qt_gsi::GenericMethod ("createInput", "@hide", false, &_init_cbs_createInput_2309_0, &_call_cbs_createInput_2309_0, &_set_callback_cbs_createInput_2309_0);
+  methods += new qt_gsi::GenericMethod ("createOutput", "@brief Virtual method QAbstractAudioOutput *QAudioSystemPlugin::createOutput(const QByteArray &device)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_createOutput_2309_0, &_call_cbs_createOutput_2309_0);
+  methods += new qt_gsi::GenericMethod ("createOutput", "@hide", false, &_init_cbs_createOutput_2309_0, &_call_cbs_createOutput_2309_0, &_set_callback_cbs_createOutput_2309_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAudioSystemPlugin::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QAudioSystemPlugin::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAudioSystemPlugin::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QAudioSystemPlugin::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QAudioSystemPlugin::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QAudioSystemPlugin::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QAudioSystemPlugin::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QAudioSystemPlugin::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QAudioSystemPlugin::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QAudioSystemPlugin::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }
 

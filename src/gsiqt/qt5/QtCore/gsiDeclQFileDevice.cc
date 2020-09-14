@@ -352,6 +352,7 @@ static gsi::Methods methods_QFileDevice () {
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QFileDevice::aboutToClose()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64 > ("bytesWritten(qint64)", "bytesWritten", gsi::arg("bytes"), "@brief Signal declaration for QFileDevice::bytesWritten(qint64 bytes)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QFileDevice::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QFileDevice::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("readChannelFinished()", "readChannelFinished", "@brief Signal declaration for QFileDevice::readChannelFinished()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("readyRead()", "readyRead", "@brief Signal declaration for QFileDevice::readyRead()\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QFileDevice::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
@@ -557,6 +558,13 @@ public:
     } else {
       return QFileDevice::isSequential();
     }
+  }
+
+  //  [emitter impl] void QFileDevice::objectNameChanged(const QString &objectName)
+  void emitter_QFileDevice_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QFileDevice::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] bool QFileDevice::open(QFlags<QIODevice::OpenModeFlag> mode)
@@ -1147,6 +1155,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QFileDevice::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QFileDevice_Adaptor *)cls)->emitter_QFileDevice_objectNameChanged_4567 (arg1);
+}
+
+
 // bool QFileDevice::open(QFlags<QIODevice::OpenModeFlag> mode)
 
 static void _init_cbs_open_3242_0 (qt_gsi::GenericMethod *decl)
@@ -1531,64 +1557,65 @@ gsi::Class<QFileDevice> &qtdecl_QFileDevice ();
 static gsi::Methods methods_QFileDevice_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericMethod ("emit_aboutToClose", "@brief Emitter for signal void QFileDevice::aboutToClose()\nCall this method to emit this signal.", false, &_init_emitter_aboutToClose_0, &_call_emitter_aboutToClose_0);
-  methods += new qt_gsi::GenericMethod ("atEnd", "@hide", true, &_init_cbs_atEnd_c0_0, &_call_cbs_atEnd_c0_0);
-  methods += new qt_gsi::GenericMethod ("atEnd", "@brief Virtual method bool QFileDevice::atEnd()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_atEnd_c0_0, &_call_cbs_atEnd_c0_0, &_set_callback_cbs_atEnd_c0_0);
-  methods += new qt_gsi::GenericMethod ("bytesAvailable", "@hide", true, &_init_cbs_bytesAvailable_c0_0, &_call_cbs_bytesAvailable_c0_0);
-  methods += new qt_gsi::GenericMethod ("bytesAvailable", "@brief Virtual method qint64 QFileDevice::bytesAvailable()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_bytesAvailable_c0_0, &_call_cbs_bytesAvailable_c0_0, &_set_callback_cbs_bytesAvailable_c0_0);
-  methods += new qt_gsi::GenericMethod ("bytesToWrite", "@hide", true, &_init_cbs_bytesToWrite_c0_0, &_call_cbs_bytesToWrite_c0_0);
-  methods += new qt_gsi::GenericMethod ("bytesToWrite", "@brief Virtual method qint64 QFileDevice::bytesToWrite()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_bytesToWrite_c0_0, &_call_cbs_bytesToWrite_c0_0, &_set_callback_cbs_bytesToWrite_c0_0);
+  methods += new qt_gsi::GenericMethod ("atEnd", "@brief Virtual method bool QFileDevice::atEnd()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_atEnd_c0_0, &_call_cbs_atEnd_c0_0);
+  methods += new qt_gsi::GenericMethod ("atEnd", "@hide", true, &_init_cbs_atEnd_c0_0, &_call_cbs_atEnd_c0_0, &_set_callback_cbs_atEnd_c0_0);
+  methods += new qt_gsi::GenericMethod ("bytesAvailable", "@brief Virtual method qint64 QFileDevice::bytesAvailable()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_bytesAvailable_c0_0, &_call_cbs_bytesAvailable_c0_0);
+  methods += new qt_gsi::GenericMethod ("bytesAvailable", "@hide", true, &_init_cbs_bytesAvailable_c0_0, &_call_cbs_bytesAvailable_c0_0, &_set_callback_cbs_bytesAvailable_c0_0);
+  methods += new qt_gsi::GenericMethod ("bytesToWrite", "@brief Virtual method qint64 QFileDevice::bytesToWrite()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_bytesToWrite_c0_0, &_call_cbs_bytesToWrite_c0_0);
+  methods += new qt_gsi::GenericMethod ("bytesToWrite", "@hide", true, &_init_cbs_bytesToWrite_c0_0, &_call_cbs_bytesToWrite_c0_0, &_set_callback_cbs_bytesToWrite_c0_0);
   methods += new qt_gsi::GenericMethod ("emit_bytesWritten", "@brief Emitter for signal void QFileDevice::bytesWritten(qint64 bytes)\nCall this method to emit this signal.", false, &_init_emitter_bytesWritten_986, &_call_emitter_bytesWritten_986);
-  methods += new qt_gsi::GenericMethod ("canReadLine", "@hide", true, &_init_cbs_canReadLine_c0_0, &_call_cbs_canReadLine_c0_0);
-  methods += new qt_gsi::GenericMethod ("canReadLine", "@brief Virtual method bool QFileDevice::canReadLine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_canReadLine_c0_0, &_call_cbs_canReadLine_c0_0, &_set_callback_cbs_canReadLine_c0_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QFileDevice::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("close", "@hide", false, &_init_cbs_close_0_0, &_call_cbs_close_0_0);
-  methods += new qt_gsi::GenericMethod ("close", "@brief Virtual method void QFileDevice::close()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_close_0_0, &_call_cbs_close_0_0, &_set_callback_cbs_close_0_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QFileDevice::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("canReadLine", "@brief Virtual method bool QFileDevice::canReadLine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_canReadLine_c0_0, &_call_cbs_canReadLine_c0_0);
+  methods += new qt_gsi::GenericMethod ("canReadLine", "@hide", true, &_init_cbs_canReadLine_c0_0, &_call_cbs_canReadLine_c0_0, &_set_callback_cbs_canReadLine_c0_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QFileDevice::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("close", "@brief Virtual method void QFileDevice::close()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_close_0_0, &_call_cbs_close_0_0);
+  methods += new qt_gsi::GenericMethod ("close", "@hide", false, &_init_cbs_close_0_0, &_call_cbs_close_0_0, &_set_callback_cbs_close_0_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QFileDevice::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QFileDevice::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QFileDevice::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QFileDevice::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QFileDevice::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("fileName", "@hide", true, &_init_cbs_fileName_c0_0, &_call_cbs_fileName_c0_0);
-  methods += new qt_gsi::GenericMethod ("fileName", "@brief Virtual method QString QFileDevice::fileName()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_fileName_c0_0, &_call_cbs_fileName_c0_0, &_set_callback_cbs_fileName_c0_0);
-  methods += new qt_gsi::GenericMethod ("isSequential", "@hide", true, &_init_cbs_isSequential_c0_0, &_call_cbs_isSequential_c0_0);
-  methods += new qt_gsi::GenericMethod ("isSequential", "@brief Virtual method bool QFileDevice::isSequential()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isSequential_c0_0, &_call_cbs_isSequential_c0_0, &_set_callback_cbs_isSequential_c0_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QFileDevice::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QFileDevice::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QFileDevice::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("fileName", "@brief Virtual method QString QFileDevice::fileName()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_fileName_c0_0, &_call_cbs_fileName_c0_0);
+  methods += new qt_gsi::GenericMethod ("fileName", "@hide", true, &_init_cbs_fileName_c0_0, &_call_cbs_fileName_c0_0, &_set_callback_cbs_fileName_c0_0);
+  methods += new qt_gsi::GenericMethod ("isSequential", "@brief Virtual method bool QFileDevice::isSequential()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isSequential_c0_0, &_call_cbs_isSequential_c0_0);
+  methods += new qt_gsi::GenericMethod ("isSequential", "@hide", true, &_init_cbs_isSequential_c0_0, &_call_cbs_isSequential_c0_0, &_set_callback_cbs_isSequential_c0_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QFileDevice::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
-  methods += new qt_gsi::GenericMethod ("open", "@hide", false, &_init_cbs_open_3242_0, &_call_cbs_open_3242_0);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Virtual method bool QFileDevice::open(QFlags<QIODevice::OpenModeFlag> mode)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_open_3242_0, &_call_cbs_open_3242_0, &_set_callback_cbs_open_3242_0);
-  methods += new qt_gsi::GenericMethod ("permissions", "@hide", true, &_init_cbs_permissions_c0_0, &_call_cbs_permissions_c0_0);
-  methods += new qt_gsi::GenericMethod ("permissions", "@brief Virtual method QFlags<QFileDevice::Permission> QFileDevice::permissions()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_permissions_c0_0, &_call_cbs_permissions_c0_0, &_set_callback_cbs_permissions_c0_0);
-  methods += new qt_gsi::GenericMethod ("pos", "@hide", true, &_init_cbs_pos_c0_0, &_call_cbs_pos_c0_0);
-  methods += new qt_gsi::GenericMethod ("pos", "@brief Virtual method qint64 QFileDevice::pos()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_pos_c0_0, &_call_cbs_pos_c0_0, &_set_callback_cbs_pos_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QFileDevice::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Virtual method bool QFileDevice::open(QFlags<QIODevice::OpenModeFlag> mode)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_open_3242_0, &_call_cbs_open_3242_0);
+  methods += new qt_gsi::GenericMethod ("open", "@hide", false, &_init_cbs_open_3242_0, &_call_cbs_open_3242_0, &_set_callback_cbs_open_3242_0);
+  methods += new qt_gsi::GenericMethod ("permissions", "@brief Virtual method QFlags<QFileDevice::Permission> QFileDevice::permissions()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_permissions_c0_0, &_call_cbs_permissions_c0_0);
+  methods += new qt_gsi::GenericMethod ("permissions", "@hide", true, &_init_cbs_permissions_c0_0, &_call_cbs_permissions_c0_0, &_set_callback_cbs_permissions_c0_0);
+  methods += new qt_gsi::GenericMethod ("pos", "@brief Virtual method qint64 QFileDevice::pos()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_pos_c0_0, &_call_cbs_pos_c0_0);
+  methods += new qt_gsi::GenericMethod ("pos", "@hide", true, &_init_cbs_pos_c0_0, &_call_cbs_pos_c0_0, &_set_callback_cbs_pos_c0_0);
   methods += new qt_gsi::GenericMethod ("emit_readChannelFinished", "@brief Emitter for signal void QFileDevice::readChannelFinished()\nCall this method to emit this signal.", false, &_init_emitter_readChannelFinished_0, &_call_emitter_readChannelFinished_0);
   methods += new qt_gsi::GenericMethod ("emit_readyRead", "@brief Emitter for signal void QFileDevice::readyRead()\nCall this method to emit this signal.", false, &_init_emitter_readyRead_0, &_call_emitter_readyRead_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QFileDevice::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
-  methods += new qt_gsi::GenericMethod ("reset", "@hide", false, &_init_cbs_reset_0_0, &_call_cbs_reset_0_0);
-  methods += new qt_gsi::GenericMethod ("reset", "@brief Virtual method bool QFileDevice::reset()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_reset_0_0, &_call_cbs_reset_0_0, &_set_callback_cbs_reset_0_0);
-  methods += new qt_gsi::GenericMethod ("resize", "@hide", false, &_init_cbs_resize_986_0, &_call_cbs_resize_986_0);
-  methods += new qt_gsi::GenericMethod ("resize", "@brief Virtual method bool QFileDevice::resize(qint64 sz)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_resize_986_0, &_call_cbs_resize_986_0, &_set_callback_cbs_resize_986_0);
-  methods += new qt_gsi::GenericMethod ("seek", "@hide", false, &_init_cbs_seek_986_0, &_call_cbs_seek_986_0);
-  methods += new qt_gsi::GenericMethod ("seek", "@brief Virtual method bool QFileDevice::seek(qint64 offset)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_seek_986_0, &_call_cbs_seek_986_0, &_set_callback_cbs_seek_986_0);
+  methods += new qt_gsi::GenericMethod ("reset", "@brief Virtual method bool QFileDevice::reset()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_reset_0_0, &_call_cbs_reset_0_0);
+  methods += new qt_gsi::GenericMethod ("reset", "@hide", false, &_init_cbs_reset_0_0, &_call_cbs_reset_0_0, &_set_callback_cbs_reset_0_0);
+  methods += new qt_gsi::GenericMethod ("resize", "@brief Virtual method bool QFileDevice::resize(qint64 sz)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_resize_986_0, &_call_cbs_resize_986_0);
+  methods += new qt_gsi::GenericMethod ("resize", "@hide", false, &_init_cbs_resize_986_0, &_call_cbs_resize_986_0, &_set_callback_cbs_resize_986_0);
+  methods += new qt_gsi::GenericMethod ("seek", "@brief Virtual method bool QFileDevice::seek(qint64 offset)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_seek_986_0, &_call_cbs_seek_986_0);
+  methods += new qt_gsi::GenericMethod ("seek", "@hide", false, &_init_cbs_seek_986_0, &_call_cbs_seek_986_0, &_set_callback_cbs_seek_986_0);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QFileDevice::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QFileDevice::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("*setErrorString", "@brief Method void QFileDevice::setErrorString(const QString &errorString)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_setErrorString_2025, &_call_fp_setErrorString_2025);
   methods += new qt_gsi::GenericMethod ("*setOpenMode", "@brief Method void QFileDevice::setOpenMode(QFlags<QIODevice::OpenModeFlag> openMode)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_setOpenMode_3242, &_call_fp_setOpenMode_3242);
-  methods += new qt_gsi::GenericMethod ("setPermissions", "@hide", false, &_init_cbs_setPermissions_3370_0, &_call_cbs_setPermissions_3370_0);
-  methods += new qt_gsi::GenericMethod ("setPermissions", "@brief Virtual method bool QFileDevice::setPermissions(QFlags<QFileDevice::Permission> permissionSpec)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setPermissions_3370_0, &_call_cbs_setPermissions_3370_0, &_set_callback_cbs_setPermissions_3370_0);
-  methods += new qt_gsi::GenericMethod ("size", "@hide", true, &_init_cbs_size_c0_0, &_call_cbs_size_c0_0);
-  methods += new qt_gsi::GenericMethod ("size", "@brief Virtual method qint64 QFileDevice::size()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_size_c0_0, &_call_cbs_size_c0_0, &_set_callback_cbs_size_c0_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QFileDevice::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
-  methods += new qt_gsi::GenericMethod ("waitForBytesWritten", "@hide", false, &_init_cbs_waitForBytesWritten_767_0, &_call_cbs_waitForBytesWritten_767_0);
-  methods += new qt_gsi::GenericMethod ("waitForBytesWritten", "@brief Virtual method bool QFileDevice::waitForBytesWritten(int msecs)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_waitForBytesWritten_767_0, &_call_cbs_waitForBytesWritten_767_0, &_set_callback_cbs_waitForBytesWritten_767_0);
-  methods += new qt_gsi::GenericMethod ("waitForReadyRead", "@hide", false, &_init_cbs_waitForReadyRead_767_0, &_call_cbs_waitForReadyRead_767_0);
-  methods += new qt_gsi::GenericMethod ("waitForReadyRead", "@brief Virtual method bool QFileDevice::waitForReadyRead(int msecs)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_waitForReadyRead_767_0, &_call_cbs_waitForReadyRead_767_0, &_set_callback_cbs_waitForReadyRead_767_0);
-  methods += new qt_gsi::GenericMethod ("*writeData", "@hide", false, &_init_cbs_writeData_2609_0, &_call_cbs_writeData_2609_0);
-  methods += new qt_gsi::GenericMethod ("*writeData", "@brief Virtual method qint64 QFileDevice::writeData(const char *data, qint64 len)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_writeData_2609_0, &_call_cbs_writeData_2609_0, &_set_callback_cbs_writeData_2609_0);
+  methods += new qt_gsi::GenericMethod ("setPermissions", "@brief Virtual method bool QFileDevice::setPermissions(QFlags<QFileDevice::Permission> permissionSpec)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setPermissions_3370_0, &_call_cbs_setPermissions_3370_0);
+  methods += new qt_gsi::GenericMethod ("setPermissions", "@hide", false, &_init_cbs_setPermissions_3370_0, &_call_cbs_setPermissions_3370_0, &_set_callback_cbs_setPermissions_3370_0);
+  methods += new qt_gsi::GenericMethod ("size", "@brief Virtual method qint64 QFileDevice::size()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_size_c0_0, &_call_cbs_size_c0_0);
+  methods += new qt_gsi::GenericMethod ("size", "@hide", true, &_init_cbs_size_c0_0, &_call_cbs_size_c0_0, &_set_callback_cbs_size_c0_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QFileDevice::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("waitForBytesWritten", "@brief Virtual method bool QFileDevice::waitForBytesWritten(int msecs)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_waitForBytesWritten_767_0, &_call_cbs_waitForBytesWritten_767_0);
+  methods += new qt_gsi::GenericMethod ("waitForBytesWritten", "@hide", false, &_init_cbs_waitForBytesWritten_767_0, &_call_cbs_waitForBytesWritten_767_0, &_set_callback_cbs_waitForBytesWritten_767_0);
+  methods += new qt_gsi::GenericMethod ("waitForReadyRead", "@brief Virtual method bool QFileDevice::waitForReadyRead(int msecs)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_waitForReadyRead_767_0, &_call_cbs_waitForReadyRead_767_0);
+  methods += new qt_gsi::GenericMethod ("waitForReadyRead", "@hide", false, &_init_cbs_waitForReadyRead_767_0, &_call_cbs_waitForReadyRead_767_0, &_set_callback_cbs_waitForReadyRead_767_0);
+  methods += new qt_gsi::GenericMethod ("*writeData", "@brief Virtual method qint64 QFileDevice::writeData(const char *data, qint64 len)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_writeData_2609_0, &_call_cbs_writeData_2609_0);
+  methods += new qt_gsi::GenericMethod ("*writeData", "@hide", false, &_init_cbs_writeData_2609_0, &_call_cbs_writeData_2609_0, &_set_callback_cbs_writeData_2609_0);
   return methods;
 }
 

@@ -391,6 +391,7 @@ static gsi::Methods methods_QBuffer () {
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QBuffer::aboutToClose()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64 > ("bytesWritten(qint64)", "bytesWritten", gsi::arg("bytes"), "@brief Signal declaration for QBuffer::bytesWritten(qint64 bytes)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QBuffer::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QBuffer::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("readChannelFinished()", "readChannelFinished", "@brief Signal declaration for QBuffer::readChannelFinished()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("readyRead()", "readyRead", "@brief Signal declaration for QBuffer::readyRead()\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QBuffer::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);

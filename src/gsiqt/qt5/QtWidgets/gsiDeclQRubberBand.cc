@@ -316,6 +316,7 @@ static gsi::Methods methods_QRubberBand () {
   methods += new qt_gsi::GenericMethod ("shape", "@brief Method QRubberBand::Shape QRubberBand::shape()\n", true, &_init_f_shape_c0, &_call_f_shape_c0);
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QRubberBand::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QRubberBand::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QRubberBand::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QIcon & > ("windowIconChanged(const QIcon &)", "windowIconChanged", gsi::arg("icon"), "@brief Signal declaration for QRubberBand::windowIconChanged(const QIcon &icon)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("windowIconTextChanged(const QString &)", "windowIconTextChanged", gsi::arg("iconText"), "@brief Signal declaration for QRubberBand::windowIconTextChanged(const QString &iconText)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("windowTitleChanged(const QString &)", "windowTitleChanged", gsi::arg("title"), "@brief Signal declaration for QRubberBand::windowTitleChanged(const QString &title)\nYou can bind a procedure to this signal.");
@@ -488,6 +489,13 @@ public:
     } else {
       return QRubberBand::minimumSizeHint();
     }
+  }
+
+  //  [emitter impl] void QRubberBand::objectNameChanged(const QString &objectName)
+  void emitter_QRubberBand_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QRubberBand::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] QPaintEngine *QRubberBand::paintEngine()
@@ -2134,6 +2142,24 @@ static void _set_callback_cbs_nativeEvent_4678_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QRubberBand::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QRubberBand_Adaptor *)cls)->emitter_QRubberBand_objectNameChanged_4567 (arg1);
+}
+
+
 // QPaintEngine *QRubberBand::paintEngine()
 
 static void _init_cbs_paintEngine_c0_0 (qt_gsi::GenericMethod *decl)
@@ -2505,108 +2531,109 @@ gsi::Class<QRubberBand> &qtdecl_QRubberBand ();
 static gsi::Methods methods_QRubberBand_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QRubberBand::QRubberBand(QRubberBand::Shape, QWidget *)\nThis method creates an object of class QRubberBand.", &_init_ctor_QRubberBand_Adaptor_3320, &_call_ctor_QRubberBand_Adaptor_3320);
-  methods += new qt_gsi::GenericMethod ("*actionEvent", "@hide", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
-  methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QRubberBand::actionEvent(QActionEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0, &_set_callback_cbs_actionEvent_1823_0);
-  methods += new qt_gsi::GenericMethod ("*changeEvent", "@hide", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*changeEvent", "@brief Virtual method void QRubberBand::changeEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0, &_set_callback_cbs_changeEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QRubberBand::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*closeEvent", "@hide", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0);
-  methods += new qt_gsi::GenericMethod ("*closeEvent", "@brief Virtual method void QRubberBand::closeEvent(QCloseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0, &_set_callback_cbs_closeEvent_1719_0);
-  methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
-  methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QRubberBand::contextMenuEvent(QContextMenuEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0, &_set_callback_cbs_contextMenuEvent_2363_0);
+  methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QRubberBand::actionEvent(QActionEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
+  methods += new qt_gsi::GenericMethod ("*actionEvent", "@hide", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0, &_set_callback_cbs_actionEvent_1823_0);
+  methods += new qt_gsi::GenericMethod ("*changeEvent", "@brief Virtual method void QRubberBand::changeEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*changeEvent", "@hide", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0, &_set_callback_cbs_changeEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QRubberBand::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*closeEvent", "@brief Virtual method void QRubberBand::closeEvent(QCloseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0);
+  methods += new qt_gsi::GenericMethod ("*closeEvent", "@hide", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0, &_set_callback_cbs_closeEvent_1719_0);
+  methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QRubberBand::contextMenuEvent(QContextMenuEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
+  methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0, &_set_callback_cbs_contextMenuEvent_2363_0);
   methods += new qt_gsi::GenericMethod ("*qt_create", "@brief Method void QRubberBand::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
   methods += new qt_gsi::GenericMethod ("emit_customContextMenuRequested", "@brief Emitter for signal void QRubberBand::customContextMenuRequested(const QPoint &pos)\nCall this method to emit this signal.", false, &_init_emitter_customContextMenuRequested_1916, &_call_emitter_customContextMenuRequested_1916);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QRubberBand::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QRubberBand::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*qt_destroy", "@brief Method void QRubberBand::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QRubberBand::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QRubberBand::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@hide", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0);
-  methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@brief Virtual method void QRubberBand::dragEnterEvent(QDragEnterEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0, &_set_callback_cbs_dragEnterEvent_2109_0);
-  methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@hide", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0);
-  methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@brief Virtual method void QRubberBand::dragLeaveEvent(QDragLeaveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0, &_set_callback_cbs_dragLeaveEvent_2092_0);
-  methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@hide", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0);
-  methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@brief Virtual method void QRubberBand::dragMoveEvent(QDragMoveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0, &_set_callback_cbs_dragMoveEvent_2006_0);
-  methods += new qt_gsi::GenericMethod ("*dropEvent", "@hide", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0);
-  methods += new qt_gsi::GenericMethod ("*dropEvent", "@brief Virtual method void QRubberBand::dropEvent(QDropEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0, &_set_callback_cbs_dropEvent_1622_0);
-  methods += new qt_gsi::GenericMethod ("*enterEvent", "@hide", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*enterEvent", "@brief Virtual method void QRubberBand::enterEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0, &_set_callback_cbs_enterEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QRubberBand::event(QEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QRubberBand::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("*focusInEvent", "@hide", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0);
-  methods += new qt_gsi::GenericMethod ("*focusInEvent", "@brief Virtual method void QRubberBand::focusInEvent(QFocusEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0, &_set_callback_cbs_focusInEvent_1729_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QRubberBand::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@brief Virtual method void QRubberBand::dragEnterEvent(QDragEnterEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0);
+  methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@hide", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0, &_set_callback_cbs_dragEnterEvent_2109_0);
+  methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@brief Virtual method void QRubberBand::dragLeaveEvent(QDragLeaveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0);
+  methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@hide", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0, &_set_callback_cbs_dragLeaveEvent_2092_0);
+  methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@brief Virtual method void QRubberBand::dragMoveEvent(QDragMoveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0);
+  methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@hide", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0, &_set_callback_cbs_dragMoveEvent_2006_0);
+  methods += new qt_gsi::GenericMethod ("*dropEvent", "@brief Virtual method void QRubberBand::dropEvent(QDropEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0);
+  methods += new qt_gsi::GenericMethod ("*dropEvent", "@hide", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0, &_set_callback_cbs_dropEvent_1622_0);
+  methods += new qt_gsi::GenericMethod ("*enterEvent", "@brief Virtual method void QRubberBand::enterEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*enterEvent", "@hide", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0, &_set_callback_cbs_enterEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QRubberBand::event(QEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QRubberBand::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("*focusInEvent", "@brief Virtual method void QRubberBand::focusInEvent(QFocusEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0);
+  methods += new qt_gsi::GenericMethod ("*focusInEvent", "@hide", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0, &_set_callback_cbs_focusInEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusNextChild", "@brief Method bool QRubberBand::focusNextChild()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_focusNextChild_0, &_call_fp_focusNextChild_0);
-  methods += new qt_gsi::GenericMethod ("*focusNextPrevChild", "@hide", false, &_init_cbs_focusNextPrevChild_864_0, &_call_cbs_focusNextPrevChild_864_0);
-  methods += new qt_gsi::GenericMethod ("*focusNextPrevChild", "@brief Virtual method bool QRubberBand::focusNextPrevChild(bool next)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusNextPrevChild_864_0, &_call_cbs_focusNextPrevChild_864_0, &_set_callback_cbs_focusNextPrevChild_864_0);
-  methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@hide", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0);
-  methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@brief Virtual method void QRubberBand::focusOutEvent(QFocusEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0, &_set_callback_cbs_focusOutEvent_1729_0);
+  methods += new qt_gsi::GenericMethod ("*focusNextPrevChild", "@brief Virtual method bool QRubberBand::focusNextPrevChild(bool next)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusNextPrevChild_864_0, &_call_cbs_focusNextPrevChild_864_0);
+  methods += new qt_gsi::GenericMethod ("*focusNextPrevChild", "@hide", false, &_init_cbs_focusNextPrevChild_864_0, &_call_cbs_focusNextPrevChild_864_0, &_set_callback_cbs_focusNextPrevChild_864_0);
+  methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@brief Virtual method void QRubberBand::focusOutEvent(QFocusEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0);
+  methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@hide", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0, &_set_callback_cbs_focusOutEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusPreviousChild", "@brief Method bool QRubberBand::focusPreviousChild()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_focusPreviousChild_0, &_call_fp_focusPreviousChild_0);
-  methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@hide", true, &_init_cbs_hasHeightForWidth_c0_0, &_call_cbs_hasHeightForWidth_c0_0);
-  methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@brief Virtual method bool QRubberBand::hasHeightForWidth()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_hasHeightForWidth_c0_0, &_call_cbs_hasHeightForWidth_c0_0, &_set_callback_cbs_hasHeightForWidth_c0_0);
-  methods += new qt_gsi::GenericMethod ("heightForWidth", "@hide", true, &_init_cbs_heightForWidth_c767_0, &_call_cbs_heightForWidth_c767_0);
-  methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Virtual method int QRubberBand::heightForWidth(int)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_heightForWidth_c767_0, &_call_cbs_heightForWidth_c767_0, &_set_callback_cbs_heightForWidth_c767_0);
-  methods += new qt_gsi::GenericMethod ("*hideEvent", "@hide", false, &_init_cbs_hideEvent_1595_0, &_call_cbs_hideEvent_1595_0);
-  methods += new qt_gsi::GenericMethod ("*hideEvent", "@brief Virtual method void QRubberBand::hideEvent(QHideEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_hideEvent_1595_0, &_call_cbs_hideEvent_1595_0, &_set_callback_cbs_hideEvent_1595_0);
-  methods += new qt_gsi::GenericMethod ("*initPainter", "@hide", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0);
-  methods += new qt_gsi::GenericMethod ("*initPainter", "@brief Virtual method void QRubberBand::initPainter(QPainter *painter)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0, &_set_callback_cbs_initPainter_c1426_0);
+  methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@brief Virtual method bool QRubberBand::hasHeightForWidth()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_hasHeightForWidth_c0_0, &_call_cbs_hasHeightForWidth_c0_0);
+  methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@hide", true, &_init_cbs_hasHeightForWidth_c0_0, &_call_cbs_hasHeightForWidth_c0_0, &_set_callback_cbs_hasHeightForWidth_c0_0);
+  methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Virtual method int QRubberBand::heightForWidth(int)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_heightForWidth_c767_0, &_call_cbs_heightForWidth_c767_0);
+  methods += new qt_gsi::GenericMethod ("heightForWidth", "@hide", true, &_init_cbs_heightForWidth_c767_0, &_call_cbs_heightForWidth_c767_0, &_set_callback_cbs_heightForWidth_c767_0);
+  methods += new qt_gsi::GenericMethod ("*hideEvent", "@brief Virtual method void QRubberBand::hideEvent(QHideEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_hideEvent_1595_0, &_call_cbs_hideEvent_1595_0);
+  methods += new qt_gsi::GenericMethod ("*hideEvent", "@hide", false, &_init_cbs_hideEvent_1595_0, &_call_cbs_hideEvent_1595_0, &_set_callback_cbs_hideEvent_1595_0);
+  methods += new qt_gsi::GenericMethod ("*initPainter", "@brief Virtual method void QRubberBand::initPainter(QPainter *painter)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0);
+  methods += new qt_gsi::GenericMethod ("*initPainter", "@hide", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0, &_set_callback_cbs_initPainter_c1426_0);
   methods += new qt_gsi::GenericMethod ("*initStyleOption", "@brief Method void QRubberBand::initStyleOption(QStyleOptionRubberBand *option)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_initStyleOption_c2848, &_call_fp_initStyleOption_c2848);
-  methods += new qt_gsi::GenericMethod ("*inputMethodEvent", "@hide", false, &_init_cbs_inputMethodEvent_2354_0, &_call_cbs_inputMethodEvent_2354_0);
-  methods += new qt_gsi::GenericMethod ("*inputMethodEvent", "@brief Virtual method void QRubberBand::inputMethodEvent(QInputMethodEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_inputMethodEvent_2354_0, &_call_cbs_inputMethodEvent_2354_0, &_set_callback_cbs_inputMethodEvent_2354_0);
-  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@hide", true, &_init_cbs_inputMethodQuery_c2420_0, &_call_cbs_inputMethodQuery_c2420_0);
-  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Virtual method QVariant QRubberBand::inputMethodQuery(Qt::InputMethodQuery)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_inputMethodQuery_c2420_0, &_call_cbs_inputMethodQuery_c2420_0, &_set_callback_cbs_inputMethodQuery_c2420_0);
+  methods += new qt_gsi::GenericMethod ("*inputMethodEvent", "@brief Virtual method void QRubberBand::inputMethodEvent(QInputMethodEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_inputMethodEvent_2354_0, &_call_cbs_inputMethodEvent_2354_0);
+  methods += new qt_gsi::GenericMethod ("*inputMethodEvent", "@hide", false, &_init_cbs_inputMethodEvent_2354_0, &_call_cbs_inputMethodEvent_2354_0, &_set_callback_cbs_inputMethodEvent_2354_0);
+  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Virtual method QVariant QRubberBand::inputMethodQuery(Qt::InputMethodQuery)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_inputMethodQuery_c2420_0, &_call_cbs_inputMethodQuery_c2420_0);
+  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@hide", true, &_init_cbs_inputMethodQuery_c2420_0, &_call_cbs_inputMethodQuery_c2420_0, &_set_callback_cbs_inputMethodQuery_c2420_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QRubberBand::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
-  methods += new qt_gsi::GenericMethod ("*keyPressEvent", "@hide", false, &_init_cbs_keyPressEvent_1514_0, &_call_cbs_keyPressEvent_1514_0);
-  methods += new qt_gsi::GenericMethod ("*keyPressEvent", "@brief Virtual method void QRubberBand::keyPressEvent(QKeyEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyPressEvent_1514_0, &_call_cbs_keyPressEvent_1514_0, &_set_callback_cbs_keyPressEvent_1514_0);
-  methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@hide", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0);
-  methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@brief Virtual method void QRubberBand::keyReleaseEvent(QKeyEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0, &_set_callback_cbs_keyReleaseEvent_1514_0);
-  methods += new qt_gsi::GenericMethod ("*leaveEvent", "@hide", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*leaveEvent", "@brief Virtual method void QRubberBand::leaveEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0, &_set_callback_cbs_leaveEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*metric", "@hide", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0);
-  methods += new qt_gsi::GenericMethod ("*metric", "@brief Virtual method int QRubberBand::metric(QPaintDevice::PaintDeviceMetric)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0, &_set_callback_cbs_metric_c3445_0);
-  methods += new qt_gsi::GenericMethod ("minimumSizeHint", "@hide", true, &_init_cbs_minimumSizeHint_c0_0, &_call_cbs_minimumSizeHint_c0_0);
-  methods += new qt_gsi::GenericMethod ("minimumSizeHint", "@brief Virtual method QSize QRubberBand::minimumSizeHint()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_minimumSizeHint_c0_0, &_call_cbs_minimumSizeHint_c0_0, &_set_callback_cbs_minimumSizeHint_c0_0);
-  methods += new qt_gsi::GenericMethod ("*mouseDoubleClickEvent", "@hide", false, &_init_cbs_mouseDoubleClickEvent_1738_0, &_call_cbs_mouseDoubleClickEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*mouseDoubleClickEvent", "@brief Virtual method void QRubberBand::mouseDoubleClickEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseDoubleClickEvent_1738_0, &_call_cbs_mouseDoubleClickEvent_1738_0, &_set_callback_cbs_mouseDoubleClickEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*mouseMoveEvent", "@hide", false, &_init_cbs_mouseMoveEvent_1738_0, &_call_cbs_mouseMoveEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*mouseMoveEvent", "@brief Virtual method void QRubberBand::mouseMoveEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseMoveEvent_1738_0, &_call_cbs_mouseMoveEvent_1738_0, &_set_callback_cbs_mouseMoveEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*mousePressEvent", "@hide", false, &_init_cbs_mousePressEvent_1738_0, &_call_cbs_mousePressEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*mousePressEvent", "@brief Virtual method void QRubberBand::mousePressEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mousePressEvent_1738_0, &_call_cbs_mousePressEvent_1738_0, &_set_callback_cbs_mousePressEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@hide", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@brief Virtual method void QRubberBand::mouseReleaseEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0, &_set_callback_cbs_mouseReleaseEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*moveEvent", "@hide", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0);
-  methods += new qt_gsi::GenericMethod ("*moveEvent", "@brief Virtual method void QRubberBand::moveEvent(QMoveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0, &_set_callback_cbs_moveEvent_1624_0);
-  methods += new qt_gsi::GenericMethod ("*nativeEvent", "@hide", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0);
-  methods += new qt_gsi::GenericMethod ("*nativeEvent", "@brief Virtual method bool QRubberBand::nativeEvent(const QByteArray &eventType, void *message, long int *result)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0, &_set_callback_cbs_nativeEvent_4678_0);
-  methods += new qt_gsi::GenericMethod ("paintEngine", "@hide", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0);
-  methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Virtual method QPaintEngine *QRubberBand::paintEngine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0, &_set_callback_cbs_paintEngine_c0_0);
-  methods += new qt_gsi::GenericMethod ("*paintEvent", "@hide", false, &_init_cbs_paintEvent_1725_0, &_call_cbs_paintEvent_1725_0);
-  methods += new qt_gsi::GenericMethod ("*paintEvent", "@brief Virtual method void QRubberBand::paintEvent(QPaintEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_paintEvent_1725_0, &_call_cbs_paintEvent_1725_0, &_set_callback_cbs_paintEvent_1725_0);
+  methods += new qt_gsi::GenericMethod ("*keyPressEvent", "@brief Virtual method void QRubberBand::keyPressEvent(QKeyEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyPressEvent_1514_0, &_call_cbs_keyPressEvent_1514_0);
+  methods += new qt_gsi::GenericMethod ("*keyPressEvent", "@hide", false, &_init_cbs_keyPressEvent_1514_0, &_call_cbs_keyPressEvent_1514_0, &_set_callback_cbs_keyPressEvent_1514_0);
+  methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@brief Virtual method void QRubberBand::keyReleaseEvent(QKeyEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0);
+  methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@hide", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0, &_set_callback_cbs_keyReleaseEvent_1514_0);
+  methods += new qt_gsi::GenericMethod ("*leaveEvent", "@brief Virtual method void QRubberBand::leaveEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*leaveEvent", "@hide", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0, &_set_callback_cbs_leaveEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*metric", "@brief Virtual method int QRubberBand::metric(QPaintDevice::PaintDeviceMetric)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0);
+  methods += new qt_gsi::GenericMethod ("*metric", "@hide", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0, &_set_callback_cbs_metric_c3445_0);
+  methods += new qt_gsi::GenericMethod ("minimumSizeHint", "@brief Virtual method QSize QRubberBand::minimumSizeHint()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_minimumSizeHint_c0_0, &_call_cbs_minimumSizeHint_c0_0);
+  methods += new qt_gsi::GenericMethod ("minimumSizeHint", "@hide", true, &_init_cbs_minimumSizeHint_c0_0, &_call_cbs_minimumSizeHint_c0_0, &_set_callback_cbs_minimumSizeHint_c0_0);
+  methods += new qt_gsi::GenericMethod ("*mouseDoubleClickEvent", "@brief Virtual method void QRubberBand::mouseDoubleClickEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseDoubleClickEvent_1738_0, &_call_cbs_mouseDoubleClickEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mouseDoubleClickEvent", "@hide", false, &_init_cbs_mouseDoubleClickEvent_1738_0, &_call_cbs_mouseDoubleClickEvent_1738_0, &_set_callback_cbs_mouseDoubleClickEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mouseMoveEvent", "@brief Virtual method void QRubberBand::mouseMoveEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseMoveEvent_1738_0, &_call_cbs_mouseMoveEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mouseMoveEvent", "@hide", false, &_init_cbs_mouseMoveEvent_1738_0, &_call_cbs_mouseMoveEvent_1738_0, &_set_callback_cbs_mouseMoveEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mousePressEvent", "@brief Virtual method void QRubberBand::mousePressEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mousePressEvent_1738_0, &_call_cbs_mousePressEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mousePressEvent", "@hide", false, &_init_cbs_mousePressEvent_1738_0, &_call_cbs_mousePressEvent_1738_0, &_set_callback_cbs_mousePressEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@brief Virtual method void QRubberBand::mouseReleaseEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@hide", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0, &_set_callback_cbs_mouseReleaseEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*moveEvent", "@brief Virtual method void QRubberBand::moveEvent(QMoveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0);
+  methods += new qt_gsi::GenericMethod ("*moveEvent", "@hide", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0, &_set_callback_cbs_moveEvent_1624_0);
+  methods += new qt_gsi::GenericMethod ("*nativeEvent", "@brief Virtual method bool QRubberBand::nativeEvent(const QByteArray &eventType, void *message, long int *result)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0);
+  methods += new qt_gsi::GenericMethod ("*nativeEvent", "@hide", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0, &_set_callback_cbs_nativeEvent_4678_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QRubberBand::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
+  methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Virtual method QPaintEngine *QRubberBand::paintEngine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0);
+  methods += new qt_gsi::GenericMethod ("paintEngine", "@hide", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0, &_set_callback_cbs_paintEngine_c0_0);
+  methods += new qt_gsi::GenericMethod ("*paintEvent", "@brief Virtual method void QRubberBand::paintEvent(QPaintEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_paintEvent_1725_0, &_call_cbs_paintEvent_1725_0);
+  methods += new qt_gsi::GenericMethod ("*paintEvent", "@hide", false, &_init_cbs_paintEvent_1725_0, &_call_cbs_paintEvent_1725_0, &_set_callback_cbs_paintEvent_1725_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QRubberBand::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
-  methods += new qt_gsi::GenericMethod ("*redirected", "@hide", true, &_init_cbs_redirected_c1225_0, &_call_cbs_redirected_c1225_0);
-  methods += new qt_gsi::GenericMethod ("*redirected", "@brief Virtual method QPaintDevice *QRubberBand::redirected(QPoint *offset)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_redirected_c1225_0, &_call_cbs_redirected_c1225_0, &_set_callback_cbs_redirected_c1225_0);
-  methods += new qt_gsi::GenericMethod ("*resizeEvent", "@hide", false, &_init_cbs_resizeEvent_1843_0, &_call_cbs_resizeEvent_1843_0);
-  methods += new qt_gsi::GenericMethod ("*resizeEvent", "@brief Virtual method void QRubberBand::resizeEvent(QResizeEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_resizeEvent_1843_0, &_call_cbs_resizeEvent_1843_0, &_set_callback_cbs_resizeEvent_1843_0);
+  methods += new qt_gsi::GenericMethod ("*redirected", "@brief Virtual method QPaintDevice *QRubberBand::redirected(QPoint *offset)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_redirected_c1225_0, &_call_cbs_redirected_c1225_0);
+  methods += new qt_gsi::GenericMethod ("*redirected", "@hide", true, &_init_cbs_redirected_c1225_0, &_call_cbs_redirected_c1225_0, &_set_callback_cbs_redirected_c1225_0);
+  methods += new qt_gsi::GenericMethod ("*resizeEvent", "@brief Virtual method void QRubberBand::resizeEvent(QResizeEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_resizeEvent_1843_0, &_call_cbs_resizeEvent_1843_0);
+  methods += new qt_gsi::GenericMethod ("*resizeEvent", "@hide", false, &_init_cbs_resizeEvent_1843_0, &_call_cbs_resizeEvent_1843_0, &_set_callback_cbs_resizeEvent_1843_0);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QRubberBand::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QRubberBand::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("setVisible", "@hide", false, &_init_cbs_setVisible_864_0, &_call_cbs_setVisible_864_0);
-  methods += new qt_gsi::GenericMethod ("setVisible", "@brief Virtual method void QRubberBand::setVisible(bool visible)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setVisible_864_0, &_call_cbs_setVisible_864_0, &_set_callback_cbs_setVisible_864_0);
-  methods += new qt_gsi::GenericMethod ("*sharedPainter", "@hide", true, &_init_cbs_sharedPainter_c0_0, &_call_cbs_sharedPainter_c0_0);
-  methods += new qt_gsi::GenericMethod ("*sharedPainter", "@brief Virtual method QPainter *QRubberBand::sharedPainter()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_sharedPainter_c0_0, &_call_cbs_sharedPainter_c0_0, &_set_callback_cbs_sharedPainter_c0_0);
-  methods += new qt_gsi::GenericMethod ("*showEvent", "@hide", false, &_init_cbs_showEvent_1634_0, &_call_cbs_showEvent_1634_0);
-  methods += new qt_gsi::GenericMethod ("*showEvent", "@brief Virtual method void QRubberBand::showEvent(QShowEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_showEvent_1634_0, &_call_cbs_showEvent_1634_0, &_set_callback_cbs_showEvent_1634_0);
-  methods += new qt_gsi::GenericMethod ("sizeHint", "@hide", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0);
-  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Virtual method QSize QRubberBand::sizeHint()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0, &_set_callback_cbs_sizeHint_c0_0);
-  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@hide", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
-  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QRubberBand::tabletEvent(QTabletEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0, &_set_callback_cbs_tabletEvent_1821_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QRubberBand::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("setVisible", "@brief Virtual method void QRubberBand::setVisible(bool visible)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setVisible_864_0, &_call_cbs_setVisible_864_0);
+  methods += new qt_gsi::GenericMethod ("setVisible", "@hide", false, &_init_cbs_setVisible_864_0, &_call_cbs_setVisible_864_0, &_set_callback_cbs_setVisible_864_0);
+  methods += new qt_gsi::GenericMethod ("*sharedPainter", "@brief Virtual method QPainter *QRubberBand::sharedPainter()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_sharedPainter_c0_0, &_call_cbs_sharedPainter_c0_0);
+  methods += new qt_gsi::GenericMethod ("*sharedPainter", "@hide", true, &_init_cbs_sharedPainter_c0_0, &_call_cbs_sharedPainter_c0_0, &_set_callback_cbs_sharedPainter_c0_0);
+  methods += new qt_gsi::GenericMethod ("*showEvent", "@brief Virtual method void QRubberBand::showEvent(QShowEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_showEvent_1634_0, &_call_cbs_showEvent_1634_0);
+  methods += new qt_gsi::GenericMethod ("*showEvent", "@hide", false, &_init_cbs_showEvent_1634_0, &_call_cbs_showEvent_1634_0, &_set_callback_cbs_showEvent_1634_0);
+  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Virtual method QSize QRubberBand::sizeHint()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0);
+  methods += new qt_gsi::GenericMethod ("sizeHint", "@hide", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0, &_set_callback_cbs_sizeHint_c0_0);
+  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QRubberBand::tabletEvent(QTabletEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
+  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@hide", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0, &_set_callback_cbs_tabletEvent_1821_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QRubberBand::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*updateMicroFocus", "@brief Method void QRubberBand::updateMicroFocus()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_updateMicroFocus_0, &_call_fp_updateMicroFocus_0);
-  methods += new qt_gsi::GenericMethod ("*wheelEvent", "@hide", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0);
-  methods += new qt_gsi::GenericMethod ("*wheelEvent", "@brief Virtual method void QRubberBand::wheelEvent(QWheelEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0, &_set_callback_cbs_wheelEvent_1718_0);
+  methods += new qt_gsi::GenericMethod ("*wheelEvent", "@brief Virtual method void QRubberBand::wheelEvent(QWheelEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0);
+  methods += new qt_gsi::GenericMethod ("*wheelEvent", "@hide", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0, &_set_callback_cbs_wheelEvent_1718_0);
   methods += new qt_gsi::GenericMethod ("emit_windowIconChanged", "@brief Emitter for signal void QRubberBand::windowIconChanged(const QIcon &icon)\nCall this method to emit this signal.", false, &_init_emitter_windowIconChanged_1787, &_call_emitter_windowIconChanged_1787);
   methods += new qt_gsi::GenericMethod ("emit_windowIconTextChanged", "@brief Emitter for signal void QRubberBand::windowIconTextChanged(const QString &iconText)\nCall this method to emit this signal.", false, &_init_emitter_windowIconTextChanged_2025, &_call_emitter_windowIconTextChanged_2025);
   methods += new qt_gsi::GenericMethod ("emit_windowTitleChanged", "@brief Emitter for signal void QRubberBand::windowTitleChanged(const QString &title)\nCall this method to emit this signal.", false, &_init_emitter_windowTitleChanged_2025, &_call_emitter_windowTitleChanged_2025);

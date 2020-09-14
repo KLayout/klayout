@@ -364,6 +364,7 @@ static gsi::Methods methods_QNetworkDiskCache () {
   methods += new qt_gsi::GenericMethod ("setMaximumCacheSize|maximumCacheSize=", "@brief Method void QNetworkDiskCache::setMaximumCacheSize(qint64 size)\n", false, &_init_f_setMaximumCacheSize_986, &_call_f_setMaximumCacheSize_986);
   methods += new qt_gsi::GenericMethod ("updateMetaData", "@brief Method void QNetworkDiskCache::updateMetaData(const QNetworkCacheMetaData &metaData)\nThis is a reimplementation of QAbstractNetworkCache::updateMetaData", false, &_init_f_updateMetaData_3377, &_call_f_updateMetaData_3377);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QNetworkDiskCache::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QNetworkDiskCache::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QNetworkDiskCache::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QNetworkDiskCache::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -527,6 +528,13 @@ public:
     } else {
       return QNetworkDiskCache::metaData(url);
     }
+  }
+
+  //  [emitter impl] void QNetworkDiskCache::objectNameChanged(const QString &objectName)
+  void emitter_QNetworkDiskCache_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QNetworkDiskCache::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] QIODevice *QNetworkDiskCache::prepare(const QNetworkCacheMetaData &metaData)
@@ -971,6 +979,24 @@ static void _set_callback_cbs_metaData_1701_0 (void *cls, const gsi::Callback &c
 }
 
 
+// emitter void QNetworkDiskCache::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QNetworkDiskCache_Adaptor *)cls)->emitter_QNetworkDiskCache_objectNameChanged_4567 (arg1);
+}
+
+
 // QIODevice *QNetworkDiskCache::prepare(const QNetworkCacheMetaData &metaData)
 
 static void _init_cbs_prepare_3377_0 (qt_gsi::GenericMethod *decl)
@@ -1119,41 +1145,42 @@ gsi::Class<QNetworkDiskCache> &qtdecl_QNetworkDiskCache ();
 static gsi::Methods methods_QNetworkDiskCache_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QNetworkDiskCache::QNetworkDiskCache(QObject *parent)\nThis method creates an object of class QNetworkDiskCache.", &_init_ctor_QNetworkDiskCache_Adaptor_1302, &_call_ctor_QNetworkDiskCache_Adaptor_1302);
-  methods += new qt_gsi::GenericMethod ("cacheSize", "@hide", true, &_init_cbs_cacheSize_c0_0, &_call_cbs_cacheSize_c0_0);
-  methods += new qt_gsi::GenericMethod ("cacheSize", "@brief Virtual method qint64 QNetworkDiskCache::cacheSize()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_cacheSize_c0_0, &_call_cbs_cacheSize_c0_0, &_set_callback_cbs_cacheSize_c0_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QNetworkDiskCache::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("clear", "@hide", false, &_init_cbs_clear_0_0, &_call_cbs_clear_0_0);
-  methods += new qt_gsi::GenericMethod ("clear", "@brief Virtual method void QNetworkDiskCache::clear()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_clear_0_0, &_call_cbs_clear_0_0, &_set_callback_cbs_clear_0_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QNetworkDiskCache::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("data", "@hide", false, &_init_cbs_data_1701_0, &_call_cbs_data_1701_0);
-  methods += new qt_gsi::GenericMethod ("data", "@brief Virtual method QIODevice *QNetworkDiskCache::data(const QUrl &url)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_data_1701_0, &_call_cbs_data_1701_0, &_set_callback_cbs_data_1701_0);
+  methods += new qt_gsi::GenericMethod ("cacheSize", "@brief Virtual method qint64 QNetworkDiskCache::cacheSize()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_cacheSize_c0_0, &_call_cbs_cacheSize_c0_0);
+  methods += new qt_gsi::GenericMethod ("cacheSize", "@hide", true, &_init_cbs_cacheSize_c0_0, &_call_cbs_cacheSize_c0_0, &_set_callback_cbs_cacheSize_c0_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QNetworkDiskCache::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("clear", "@brief Virtual method void QNetworkDiskCache::clear()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_clear_0_0, &_call_cbs_clear_0_0);
+  methods += new qt_gsi::GenericMethod ("clear", "@hide", false, &_init_cbs_clear_0_0, &_call_cbs_clear_0_0, &_set_callback_cbs_clear_0_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QNetworkDiskCache::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("data", "@brief Virtual method QIODevice *QNetworkDiskCache::data(const QUrl &url)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_data_1701_0, &_call_cbs_data_1701_0);
+  methods += new qt_gsi::GenericMethod ("data", "@hide", false, &_init_cbs_data_1701_0, &_call_cbs_data_1701_0, &_set_callback_cbs_data_1701_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QNetworkDiskCache::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QNetworkDiskCache::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QNetworkDiskCache::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QNetworkDiskCache::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("*expire", "@hide", false, &_init_cbs_expire_0_0, &_call_cbs_expire_0_0);
-  methods += new qt_gsi::GenericMethod ("*expire", "@brief Virtual method qint64 QNetworkDiskCache::expire()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_expire_0_0, &_call_cbs_expire_0_0, &_set_callback_cbs_expire_0_0);
-  methods += new qt_gsi::GenericMethod ("insert", "@hide", false, &_init_cbs_insert_1447_0, &_call_cbs_insert_1447_0);
-  methods += new qt_gsi::GenericMethod ("insert", "@brief Virtual method void QNetworkDiskCache::insert(QIODevice *device)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_insert_1447_0, &_call_cbs_insert_1447_0, &_set_callback_cbs_insert_1447_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QNetworkDiskCache::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QNetworkDiskCache::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QNetworkDiskCache::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("*expire", "@brief Virtual method qint64 QNetworkDiskCache::expire()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_expire_0_0, &_call_cbs_expire_0_0);
+  methods += new qt_gsi::GenericMethod ("*expire", "@hide", false, &_init_cbs_expire_0_0, &_call_cbs_expire_0_0, &_set_callback_cbs_expire_0_0);
+  methods += new qt_gsi::GenericMethod ("insert", "@brief Virtual method void QNetworkDiskCache::insert(QIODevice *device)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_insert_1447_0, &_call_cbs_insert_1447_0);
+  methods += new qt_gsi::GenericMethod ("insert", "@hide", false, &_init_cbs_insert_1447_0, &_call_cbs_insert_1447_0, &_set_callback_cbs_insert_1447_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QNetworkDiskCache::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
-  methods += new qt_gsi::GenericMethod ("metaData", "@hide", false, &_init_cbs_metaData_1701_0, &_call_cbs_metaData_1701_0);
-  methods += new qt_gsi::GenericMethod ("metaData", "@brief Virtual method QNetworkCacheMetaData QNetworkDiskCache::metaData(const QUrl &url)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_metaData_1701_0, &_call_cbs_metaData_1701_0, &_set_callback_cbs_metaData_1701_0);
-  methods += new qt_gsi::GenericMethod ("prepare", "@hide", false, &_init_cbs_prepare_3377_0, &_call_cbs_prepare_3377_0);
-  methods += new qt_gsi::GenericMethod ("prepare", "@brief Virtual method QIODevice *QNetworkDiskCache::prepare(const QNetworkCacheMetaData &metaData)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_prepare_3377_0, &_call_cbs_prepare_3377_0, &_set_callback_cbs_prepare_3377_0);
+  methods += new qt_gsi::GenericMethod ("metaData", "@brief Virtual method QNetworkCacheMetaData QNetworkDiskCache::metaData(const QUrl &url)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_metaData_1701_0, &_call_cbs_metaData_1701_0);
+  methods += new qt_gsi::GenericMethod ("metaData", "@hide", false, &_init_cbs_metaData_1701_0, &_call_cbs_metaData_1701_0, &_set_callback_cbs_metaData_1701_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QNetworkDiskCache::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
+  methods += new qt_gsi::GenericMethod ("prepare", "@brief Virtual method QIODevice *QNetworkDiskCache::prepare(const QNetworkCacheMetaData &metaData)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_prepare_3377_0, &_call_cbs_prepare_3377_0);
+  methods += new qt_gsi::GenericMethod ("prepare", "@hide", false, &_init_cbs_prepare_3377_0, &_call_cbs_prepare_3377_0, &_set_callback_cbs_prepare_3377_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QNetworkDiskCache::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
-  methods += new qt_gsi::GenericMethod ("remove", "@hide", false, &_init_cbs_remove_1701_0, &_call_cbs_remove_1701_0);
-  methods += new qt_gsi::GenericMethod ("remove", "@brief Virtual method bool QNetworkDiskCache::remove(const QUrl &url)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_remove_1701_0, &_call_cbs_remove_1701_0, &_set_callback_cbs_remove_1701_0);
+  methods += new qt_gsi::GenericMethod ("remove", "@brief Virtual method bool QNetworkDiskCache::remove(const QUrl &url)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_remove_1701_0, &_call_cbs_remove_1701_0);
+  methods += new qt_gsi::GenericMethod ("remove", "@hide", false, &_init_cbs_remove_1701_0, &_call_cbs_remove_1701_0, &_set_callback_cbs_remove_1701_0);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QNetworkDiskCache::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QNetworkDiskCache::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QNetworkDiskCache::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
-  methods += new qt_gsi::GenericMethod ("updateMetaData", "@hide", false, &_init_cbs_updateMetaData_3377_0, &_call_cbs_updateMetaData_3377_0);
-  methods += new qt_gsi::GenericMethod ("updateMetaData", "@brief Virtual method void QNetworkDiskCache::updateMetaData(const QNetworkCacheMetaData &metaData)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_updateMetaData_3377_0, &_call_cbs_updateMetaData_3377_0, &_set_callback_cbs_updateMetaData_3377_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QNetworkDiskCache::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("updateMetaData", "@brief Virtual method void QNetworkDiskCache::updateMetaData(const QNetworkCacheMetaData &metaData)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_updateMetaData_3377_0, &_call_cbs_updateMetaData_3377_0);
+  methods += new qt_gsi::GenericMethod ("updateMetaData", "@hide", false, &_init_cbs_updateMetaData_3377_0, &_call_cbs_updateMetaData_3377_0, &_set_callback_cbs_updateMetaData_3377_0);
   return methods;
 }
 

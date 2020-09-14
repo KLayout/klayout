@@ -726,6 +726,7 @@ static gsi::Methods methods_QCompleter () {
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QCompleter::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("highlighted(const QString &)", "highlighted_qs", gsi::arg("text"), "@brief Signal declaration for QCompleter::highlighted(const QString &text)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QModelIndex & > ("highlighted(const QModelIndex &)", "highlighted", gsi::arg("index"), "@brief Signal declaration for QCompleter::highlighted(const QModelIndex &index)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QCompleter::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QCompleter::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QCompleter::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -832,6 +833,13 @@ public:
   void emitter_QCompleter_highlighted_2395(const QModelIndex &index)
   {
     emit QCompleter::highlighted(index);
+  }
+
+  //  [emitter impl] void QCompleter::objectNameChanged(const QString &objectName)
+  void emitter_QCompleter_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QCompleter::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] QString QCompleter::pathFromIndex(const QModelIndex &index)
@@ -1255,6 +1263,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QCompleter::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QCompleter_Adaptor *)cls)->emitter_QCompleter_objectNameChanged_4567 (arg1);
+}
+
+
 // QString QCompleter::pathFromIndex(const QModelIndex &index)
 
 static void _init_cbs_pathFromIndex_c2395_0 (qt_gsi::GenericMethod *decl)
@@ -1383,29 +1409,30 @@ static gsi::Methods methods_QCompleter_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCompleter::QCompleter(const QStringList &completions, QObject *parent)\nThis method creates an object of class QCompleter.", &_init_ctor_QCompleter_Adaptor_3631, &_call_ctor_QCompleter_Adaptor_3631);
   methods += new qt_gsi::GenericMethod ("emit_activated_qs", "@brief Emitter for signal void QCompleter::activated(const QString &text)\nCall this method to emit this signal.", false, &_init_emitter_activated_2025, &_call_emitter_activated_2025);
   methods += new qt_gsi::GenericMethod ("emit_activated", "@brief Emitter for signal void QCompleter::activated(const QModelIndex &index)\nCall this method to emit this signal.", false, &_init_emitter_activated_2395, &_call_emitter_activated_2395);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QCompleter::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QCompleter::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QCompleter::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QCompleter::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QCompleter::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QCompleter::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QCompleter::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("*eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("*eventFilter", "@brief Virtual method bool QCompleter::eventFilter(QObject *o, QEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QCompleter::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QCompleter::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("*eventFilter", "@brief Virtual method bool QCompleter::eventFilter(QObject *o, QEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("*eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("emit_highlighted_qs", "@brief Emitter for signal void QCompleter::highlighted(const QString &text)\nCall this method to emit this signal.", false, &_init_emitter_highlighted_2025, &_call_emitter_highlighted_2025);
   methods += new qt_gsi::GenericMethod ("emit_highlighted", "@brief Emitter for signal void QCompleter::highlighted(const QModelIndex &index)\nCall this method to emit this signal.", false, &_init_emitter_highlighted_2395, &_call_emitter_highlighted_2395);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QCompleter::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
-  methods += new qt_gsi::GenericMethod ("pathFromIndex", "@hide", true, &_init_cbs_pathFromIndex_c2395_0, &_call_cbs_pathFromIndex_c2395_0);
-  methods += new qt_gsi::GenericMethod ("pathFromIndex", "@brief Virtual method QString QCompleter::pathFromIndex(const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_pathFromIndex_c2395_0, &_call_cbs_pathFromIndex_c2395_0, &_set_callback_cbs_pathFromIndex_c2395_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QCompleter::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
+  methods += new qt_gsi::GenericMethod ("pathFromIndex", "@brief Virtual method QString QCompleter::pathFromIndex(const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_pathFromIndex_c2395_0, &_call_cbs_pathFromIndex_c2395_0);
+  methods += new qt_gsi::GenericMethod ("pathFromIndex", "@hide", true, &_init_cbs_pathFromIndex_c2395_0, &_call_cbs_pathFromIndex_c2395_0, &_set_callback_cbs_pathFromIndex_c2395_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QCompleter::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QCompleter::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QCompleter::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("splitPath", "@hide", true, &_init_cbs_splitPath_c2025_0, &_call_cbs_splitPath_c2025_0);
-  methods += new qt_gsi::GenericMethod ("splitPath", "@brief Virtual method QStringList QCompleter::splitPath(const QString &path)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_splitPath_c2025_0, &_call_cbs_splitPath_c2025_0, &_set_callback_cbs_splitPath_c2025_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QCompleter::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("splitPath", "@brief Virtual method QStringList QCompleter::splitPath(const QString &path)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_splitPath_c2025_0, &_call_cbs_splitPath_c2025_0);
+  methods += new qt_gsi::GenericMethod ("splitPath", "@hide", true, &_init_cbs_splitPath_c2025_0, &_call_cbs_splitPath_c2025_0, &_set_callback_cbs_splitPath_c2025_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QCompleter::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }
 

@@ -476,6 +476,7 @@ static gsi::Methods methods_QStyleHints () {
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QStyleHints::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("keyboardInputIntervalChanged(int)", "keyboardInputIntervalChanged", gsi::arg("keyboardInputInterval"), "@brief Signal declaration for QStyleHints::keyboardInputIntervalChanged(int keyboardInputInterval)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("mouseDoubleClickIntervalChanged(int)", "mouseDoubleClickIntervalChanged", gsi::arg("mouseDoubleClickInterval"), "@brief Signal declaration for QStyleHints::mouseDoubleClickIntervalChanged(int mouseDoubleClickInterval)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QStyleHints::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("startDragDistanceChanged(int)", "startDragDistanceChanged", gsi::arg("startDragDistance"), "@brief Signal declaration for QStyleHints::startDragDistanceChanged(int startDragDistance)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("startDragTimeChanged(int)", "startDragTimeChanged", gsi::arg("startDragTime"), "@brief Signal declaration for QStyleHints::startDragTimeChanged(int startDragTime)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QStyleHints::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
@@ -572,6 +573,13 @@ public:
   void emitter_QStyleHints_mouseDoubleClickIntervalChanged_767(int mouseDoubleClickInterval)
   {
     emit QStyleHints::mouseDoubleClickIntervalChanged(mouseDoubleClickInterval);
+  }
+
+  //  [emitter impl] void QStyleHints::objectNameChanged(const QString &objectName)
+  void emitter_QStyleHints_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QStyleHints::objectNameChanged(const QString &objectName)'");
   }
 
   //  [emitter impl] void QStyleHints::startDragDistanceChanged(int startDragDistance)
@@ -867,6 +875,24 @@ static void _call_emitter_mouseDoubleClickIntervalChanged_767 (const qt_gsi::Gen
 }
 
 
+// emitter void QStyleHints::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QStyleHints_Adaptor *)cls)->emitter_QStyleHints_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QStyleHints::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -995,6 +1021,7 @@ static gsi::Methods methods_QStyleHints_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QStyleHints::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("emit_keyboardInputIntervalChanged", "@brief Emitter for signal void QStyleHints::keyboardInputIntervalChanged(int keyboardInputInterval)\nCall this method to emit this signal.", false, &_init_emitter_keyboardInputIntervalChanged_767, &_call_emitter_keyboardInputIntervalChanged_767);
   methods += new qt_gsi::GenericMethod ("emit_mouseDoubleClickIntervalChanged", "@brief Emitter for signal void QStyleHints::mouseDoubleClickIntervalChanged(int mouseDoubleClickInterval)\nCall this method to emit this signal.", false, &_init_emitter_mouseDoubleClickIntervalChanged_767, &_call_emitter_mouseDoubleClickIntervalChanged_767);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QStyleHints::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QStyleHints::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QStyleHints::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QStyleHints::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);

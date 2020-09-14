@@ -983,6 +983,7 @@ static gsi::Methods methods_QGridLayout () {
   methods += new qt_gsi::GenericMethod ("takeAt", "@brief Method QLayoutItem *QGridLayout::takeAt(int index)\nThis is a reimplementation of QLayout::takeAt", false, &_init_f_takeAt_767, &_call_f_takeAt_767);
   methods += new qt_gsi::GenericMethod (":verticalSpacing", "@brief Method int QGridLayout::verticalSpacing()\n", true, &_init_f_verticalSpacing_c0, &_call_f_verticalSpacing_c0);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QGridLayout::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QGridLayout::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QGridLayout::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QGridLayout::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -1306,6 +1307,13 @@ public:
     } else {
       return QGridLayout::minimumSize();
     }
+  }
+
+  //  [emitter impl] void QGridLayout::objectNameChanged(const QString &objectName)
+  void emitter_QGridLayout_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QGridLayout::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QGridLayout::setGeometry(const QRect &)
@@ -2059,6 +2067,24 @@ static void _set_callback_cbs_minimumSize_c0_0 (void *cls, const gsi::Callback &
 }
 
 
+// emitter void QGridLayout::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QGridLayout_Adaptor *)cls)->emitter_QGridLayout_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QGridLayout::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -2263,65 +2289,66 @@ static gsi::Methods methods_QGridLayout_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QGridLayout::QGridLayout()\nThis method creates an object of class QGridLayout.", &_init_ctor_QGridLayout_Adaptor_0, &_call_ctor_QGridLayout_Adaptor_0);
   methods += new qt_gsi::GenericMethod ("*addChildLayout", "@brief Method void QGridLayout::addChildLayout(QLayout *l)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_addChildLayout_1341, &_call_fp_addChildLayout_1341);
   methods += new qt_gsi::GenericMethod ("*addChildWidget", "@brief Method void QGridLayout::addChildWidget(QWidget *w)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_addChildWidget_1315, &_call_fp_addChildWidget_1315);
-  methods += new qt_gsi::GenericMethod ("*addItem", "@hide", false, &_init_cbs_addItem_1740_0, &_call_cbs_addItem_1740_0);
-  methods += new qt_gsi::GenericMethod ("*addItem", "@brief Virtual method void QGridLayout::addItem(QLayoutItem *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_addItem_1740_0, &_call_cbs_addItem_1740_0, &_set_callback_cbs_addItem_1740_0);
+  methods += new qt_gsi::GenericMethod ("*addItem", "@brief Virtual method void QGridLayout::addItem(QLayoutItem *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_addItem_1740_0, &_call_cbs_addItem_1740_0);
+  methods += new qt_gsi::GenericMethod ("*addItem", "@hide", false, &_init_cbs_addItem_1740_0, &_call_cbs_addItem_1740_0, &_set_callback_cbs_addItem_1740_0);
   methods += new qt_gsi::GenericMethod ("*adoptLayout", "@brief Method bool QGridLayout::adoptLayout(QLayout *layout)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_adoptLayout_1341, &_call_fp_adoptLayout_1341);
   methods += new qt_gsi::GenericMethod ("*alignmentRect", "@brief Method QRect QGridLayout::alignmentRect(const QRect &)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_alignmentRect_c1792, &_call_fp_alignmentRect_c1792);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QGridLayout::childEvent(QChildEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("controlTypes", "@hide", true, &_init_cbs_controlTypes_c0_0, &_call_cbs_controlTypes_c0_0);
-  methods += new qt_gsi::GenericMethod ("controlTypes", "@brief Virtual method QFlags<QSizePolicy::ControlType> QGridLayout::controlTypes()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_controlTypes_c0_0, &_call_cbs_controlTypes_c0_0, &_set_callback_cbs_controlTypes_c0_0);
-  methods += new qt_gsi::GenericMethod ("count", "@hide", true, &_init_cbs_count_c0_0, &_call_cbs_count_c0_0);
-  methods += new qt_gsi::GenericMethod ("count", "@brief Virtual method int QGridLayout::count()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_count_c0_0, &_call_cbs_count_c0_0, &_set_callback_cbs_count_c0_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QGridLayout::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QGridLayout::childEvent(QChildEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("controlTypes", "@brief Virtual method QFlags<QSizePolicy::ControlType> QGridLayout::controlTypes()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_controlTypes_c0_0, &_call_cbs_controlTypes_c0_0);
+  methods += new qt_gsi::GenericMethod ("controlTypes", "@hide", true, &_init_cbs_controlTypes_c0_0, &_call_cbs_controlTypes_c0_0, &_set_callback_cbs_controlTypes_c0_0);
+  methods += new qt_gsi::GenericMethod ("count", "@brief Virtual method int QGridLayout::count()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_count_c0_0, &_call_cbs_count_c0_0);
+  methods += new qt_gsi::GenericMethod ("count", "@hide", true, &_init_cbs_count_c0_0, &_call_cbs_count_c0_0, &_set_callback_cbs_count_c0_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QGridLayout::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QGridLayout::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QGridLayout::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QGridLayout::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QGridLayout::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("expandingDirections", "@hide", true, &_init_cbs_expandingDirections_c0_0, &_call_cbs_expandingDirections_c0_0);
-  methods += new qt_gsi::GenericMethod ("expandingDirections", "@brief Virtual method QFlags<Qt::Orientation> QGridLayout::expandingDirections()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_expandingDirections_c0_0, &_call_cbs_expandingDirections_c0_0, &_set_callback_cbs_expandingDirections_c0_0);
-  methods += new qt_gsi::GenericMethod ("geometry", "@hide", true, &_init_cbs_geometry_c0_0, &_call_cbs_geometry_c0_0);
-  methods += new qt_gsi::GenericMethod ("geometry", "@brief Virtual method QRect QGridLayout::geometry()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_geometry_c0_0, &_call_cbs_geometry_c0_0, &_set_callback_cbs_geometry_c0_0);
-  methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@hide", true, &_init_cbs_hasHeightForWidth_c0_0, &_call_cbs_hasHeightForWidth_c0_0);
-  methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@brief Virtual method bool QGridLayout::hasHeightForWidth()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_hasHeightForWidth_c0_0, &_call_cbs_hasHeightForWidth_c0_0, &_set_callback_cbs_hasHeightForWidth_c0_0);
-  methods += new qt_gsi::GenericMethod ("heightForWidth", "@hide", true, &_init_cbs_heightForWidth_c767_0, &_call_cbs_heightForWidth_c767_0);
-  methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Virtual method int QGridLayout::heightForWidth(int)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_heightForWidth_c767_0, &_call_cbs_heightForWidth_c767_0, &_set_callback_cbs_heightForWidth_c767_0);
-  methods += new qt_gsi::GenericMethod ("indexOf", "@hide", true, &_init_cbs_indexOf_c1315_0, &_call_cbs_indexOf_c1315_0);
-  methods += new qt_gsi::GenericMethod ("indexOf", "@brief Virtual method int QGridLayout::indexOf(QWidget *)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_indexOf_c1315_0, &_call_cbs_indexOf_c1315_0, &_set_callback_cbs_indexOf_c1315_0);
-  methods += new qt_gsi::GenericMethod ("invalidate", "@hide", false, &_init_cbs_invalidate_0_0, &_call_cbs_invalidate_0_0);
-  methods += new qt_gsi::GenericMethod ("invalidate", "@brief Virtual method void QGridLayout::invalidate()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_invalidate_0_0, &_call_cbs_invalidate_0_0, &_set_callback_cbs_invalidate_0_0);
-  methods += new qt_gsi::GenericMethod ("isEmpty", "@hide", true, &_init_cbs_isEmpty_c0_0, &_call_cbs_isEmpty_c0_0);
-  methods += new qt_gsi::GenericMethod ("isEmpty", "@brief Virtual method bool QGridLayout::isEmpty()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isEmpty_c0_0, &_call_cbs_isEmpty_c0_0, &_set_callback_cbs_isEmpty_c0_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QGridLayout::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QGridLayout::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QGridLayout::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("expandingDirections", "@brief Virtual method QFlags<Qt::Orientation> QGridLayout::expandingDirections()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_expandingDirections_c0_0, &_call_cbs_expandingDirections_c0_0);
+  methods += new qt_gsi::GenericMethod ("expandingDirections", "@hide", true, &_init_cbs_expandingDirections_c0_0, &_call_cbs_expandingDirections_c0_0, &_set_callback_cbs_expandingDirections_c0_0);
+  methods += new qt_gsi::GenericMethod ("geometry", "@brief Virtual method QRect QGridLayout::geometry()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_geometry_c0_0, &_call_cbs_geometry_c0_0);
+  methods += new qt_gsi::GenericMethod ("geometry", "@hide", true, &_init_cbs_geometry_c0_0, &_call_cbs_geometry_c0_0, &_set_callback_cbs_geometry_c0_0);
+  methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@brief Virtual method bool QGridLayout::hasHeightForWidth()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_hasHeightForWidth_c0_0, &_call_cbs_hasHeightForWidth_c0_0);
+  methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@hide", true, &_init_cbs_hasHeightForWidth_c0_0, &_call_cbs_hasHeightForWidth_c0_0, &_set_callback_cbs_hasHeightForWidth_c0_0);
+  methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Virtual method int QGridLayout::heightForWidth(int)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_heightForWidth_c767_0, &_call_cbs_heightForWidth_c767_0);
+  methods += new qt_gsi::GenericMethod ("heightForWidth", "@hide", true, &_init_cbs_heightForWidth_c767_0, &_call_cbs_heightForWidth_c767_0, &_set_callback_cbs_heightForWidth_c767_0);
+  methods += new qt_gsi::GenericMethod ("indexOf", "@brief Virtual method int QGridLayout::indexOf(QWidget *)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_indexOf_c1315_0, &_call_cbs_indexOf_c1315_0);
+  methods += new qt_gsi::GenericMethod ("indexOf", "@hide", true, &_init_cbs_indexOf_c1315_0, &_call_cbs_indexOf_c1315_0, &_set_callback_cbs_indexOf_c1315_0);
+  methods += new qt_gsi::GenericMethod ("invalidate", "@brief Virtual method void QGridLayout::invalidate()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_invalidate_0_0, &_call_cbs_invalidate_0_0);
+  methods += new qt_gsi::GenericMethod ("invalidate", "@hide", false, &_init_cbs_invalidate_0_0, &_call_cbs_invalidate_0_0, &_set_callback_cbs_invalidate_0_0);
+  methods += new qt_gsi::GenericMethod ("isEmpty", "@brief Virtual method bool QGridLayout::isEmpty()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isEmpty_c0_0, &_call_cbs_isEmpty_c0_0);
+  methods += new qt_gsi::GenericMethod ("isEmpty", "@hide", true, &_init_cbs_isEmpty_c0_0, &_call_cbs_isEmpty_c0_0, &_set_callback_cbs_isEmpty_c0_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QGridLayout::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
-  methods += new qt_gsi::GenericMethod ("itemAt", "@hide", true, &_init_cbs_itemAt_c767_0, &_call_cbs_itemAt_c767_0);
-  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Virtual method QLayoutItem *QGridLayout::itemAt(int index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_itemAt_c767_0, &_call_cbs_itemAt_c767_0, &_set_callback_cbs_itemAt_c767_0);
-  methods += new qt_gsi::GenericMethod ("layout", "@hide", false, &_init_cbs_layout_0_0, &_call_cbs_layout_0_0);
-  methods += new qt_gsi::GenericMethod ("layout", "@brief Virtual method QLayout *QGridLayout::layout()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_layout_0_0, &_call_cbs_layout_0_0, &_set_callback_cbs_layout_0_0);
-  methods += new qt_gsi::GenericMethod ("maximumSize", "@hide", true, &_init_cbs_maximumSize_c0_0, &_call_cbs_maximumSize_c0_0);
-  methods += new qt_gsi::GenericMethod ("maximumSize", "@brief Virtual method QSize QGridLayout::maximumSize()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_maximumSize_c0_0, &_call_cbs_maximumSize_c0_0, &_set_callback_cbs_maximumSize_c0_0);
-  methods += new qt_gsi::GenericMethod ("minimumHeightForWidth", "@hide", true, &_init_cbs_minimumHeightForWidth_c767_0, &_call_cbs_minimumHeightForWidth_c767_0);
-  methods += new qt_gsi::GenericMethod ("minimumHeightForWidth", "@brief Virtual method int QGridLayout::minimumHeightForWidth(int)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_minimumHeightForWidth_c767_0, &_call_cbs_minimumHeightForWidth_c767_0, &_set_callback_cbs_minimumHeightForWidth_c767_0);
-  methods += new qt_gsi::GenericMethod ("minimumSize", "@hide", true, &_init_cbs_minimumSize_c0_0, &_call_cbs_minimumSize_c0_0);
-  methods += new qt_gsi::GenericMethod ("minimumSize", "@brief Virtual method QSize QGridLayout::minimumSize()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_minimumSize_c0_0, &_call_cbs_minimumSize_c0_0, &_set_callback_cbs_minimumSize_c0_0);
+  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Virtual method QLayoutItem *QGridLayout::itemAt(int index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_itemAt_c767_0, &_call_cbs_itemAt_c767_0);
+  methods += new qt_gsi::GenericMethod ("itemAt", "@hide", true, &_init_cbs_itemAt_c767_0, &_call_cbs_itemAt_c767_0, &_set_callback_cbs_itemAt_c767_0);
+  methods += new qt_gsi::GenericMethod ("layout", "@brief Virtual method QLayout *QGridLayout::layout()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_layout_0_0, &_call_cbs_layout_0_0);
+  methods += new qt_gsi::GenericMethod ("layout", "@hide", false, &_init_cbs_layout_0_0, &_call_cbs_layout_0_0, &_set_callback_cbs_layout_0_0);
+  methods += new qt_gsi::GenericMethod ("maximumSize", "@brief Virtual method QSize QGridLayout::maximumSize()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_maximumSize_c0_0, &_call_cbs_maximumSize_c0_0);
+  methods += new qt_gsi::GenericMethod ("maximumSize", "@hide", true, &_init_cbs_maximumSize_c0_0, &_call_cbs_maximumSize_c0_0, &_set_callback_cbs_maximumSize_c0_0);
+  methods += new qt_gsi::GenericMethod ("minimumHeightForWidth", "@brief Virtual method int QGridLayout::minimumHeightForWidth(int)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_minimumHeightForWidth_c767_0, &_call_cbs_minimumHeightForWidth_c767_0);
+  methods += new qt_gsi::GenericMethod ("minimumHeightForWidth", "@hide", true, &_init_cbs_minimumHeightForWidth_c767_0, &_call_cbs_minimumHeightForWidth_c767_0, &_set_callback_cbs_minimumHeightForWidth_c767_0);
+  methods += new qt_gsi::GenericMethod ("minimumSize", "@brief Virtual method QSize QGridLayout::minimumSize()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_minimumSize_c0_0, &_call_cbs_minimumSize_c0_0);
+  methods += new qt_gsi::GenericMethod ("minimumSize", "@hide", true, &_init_cbs_minimumSize_c0_0, &_call_cbs_minimumSize_c0_0, &_set_callback_cbs_minimumSize_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QGridLayout::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QGridLayout::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QGridLayout::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QGridLayout::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("setGeometry", "@hide", false, &_init_cbs_setGeometry_1792_0, &_call_cbs_setGeometry_1792_0);
-  methods += new qt_gsi::GenericMethod ("setGeometry", "@brief Virtual method void QGridLayout::setGeometry(const QRect &)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setGeometry_1792_0, &_call_cbs_setGeometry_1792_0, &_set_callback_cbs_setGeometry_1792_0);
-  methods += new qt_gsi::GenericMethod ("sizeHint", "@hide", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0);
-  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Virtual method QSize QGridLayout::sizeHint()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0, &_set_callback_cbs_sizeHint_c0_0);
-  methods += new qt_gsi::GenericMethod ("spacerItem", "@hide", false, &_init_cbs_spacerItem_0_0, &_call_cbs_spacerItem_0_0);
-  methods += new qt_gsi::GenericMethod ("spacerItem", "@brief Virtual method QSpacerItem *QGridLayout::spacerItem()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_spacerItem_0_0, &_call_cbs_spacerItem_0_0, &_set_callback_cbs_spacerItem_0_0);
-  methods += new qt_gsi::GenericMethod ("takeAt", "@hide", false, &_init_cbs_takeAt_767_0, &_call_cbs_takeAt_767_0);
-  methods += new qt_gsi::GenericMethod ("takeAt", "@brief Virtual method QLayoutItem *QGridLayout::takeAt(int index)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_takeAt_767_0, &_call_cbs_takeAt_767_0, &_set_callback_cbs_takeAt_767_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QGridLayout::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
-  methods += new qt_gsi::GenericMethod ("widget", "@hide", false, &_init_cbs_widget_0_0, &_call_cbs_widget_0_0);
-  methods += new qt_gsi::GenericMethod ("widget", "@brief Virtual method QWidget *QGridLayout::widget()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_widget_0_0, &_call_cbs_widget_0_0, &_set_callback_cbs_widget_0_0);
+  methods += new qt_gsi::GenericMethod ("setGeometry", "@brief Virtual method void QGridLayout::setGeometry(const QRect &)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setGeometry_1792_0, &_call_cbs_setGeometry_1792_0);
+  methods += new qt_gsi::GenericMethod ("setGeometry", "@hide", false, &_init_cbs_setGeometry_1792_0, &_call_cbs_setGeometry_1792_0, &_set_callback_cbs_setGeometry_1792_0);
+  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Virtual method QSize QGridLayout::sizeHint()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0);
+  methods += new qt_gsi::GenericMethod ("sizeHint", "@hide", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0, &_set_callback_cbs_sizeHint_c0_0);
+  methods += new qt_gsi::GenericMethod ("spacerItem", "@brief Virtual method QSpacerItem *QGridLayout::spacerItem()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_spacerItem_0_0, &_call_cbs_spacerItem_0_0);
+  methods += new qt_gsi::GenericMethod ("spacerItem", "@hide", false, &_init_cbs_spacerItem_0_0, &_call_cbs_spacerItem_0_0, &_set_callback_cbs_spacerItem_0_0);
+  methods += new qt_gsi::GenericMethod ("takeAt", "@brief Virtual method QLayoutItem *QGridLayout::takeAt(int index)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_takeAt_767_0, &_call_cbs_takeAt_767_0);
+  methods += new qt_gsi::GenericMethod ("takeAt", "@hide", false, &_init_cbs_takeAt_767_0, &_call_cbs_takeAt_767_0, &_set_callback_cbs_takeAt_767_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QGridLayout::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("widget", "@brief Virtual method QWidget *QGridLayout::widget()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_widget_0_0, &_call_cbs_widget_0_0);
+  methods += new qt_gsi::GenericMethod ("widget", "@hide", false, &_init_cbs_widget_0_0, &_call_cbs_widget_0_0, &_set_callback_cbs_widget_0_0);
   methods += new qt_gsi::GenericMethod ("*widgetEvent", "@brief Method void QGridLayout::widgetEvent(QEvent *)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_widgetEvent_1217, &_call_fp_widgetEvent_1217);
   return methods;
 }

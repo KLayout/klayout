@@ -66,8 +66,20 @@ AuthenticationHandler::authenticationRequired (QNetworkReply *reply, QAuthentica
     //  TODO: how to cancel?
     std::string user, passwd;
     if (sp_credential_provider->user_password (tl::to_string (reply->url ().toString ()), tl::to_string (auth->realm ()), true, ++m_retry, user, passwd)) {
-      auth->setPassword (tl::to_qstring (passwd));
-      auth->setUser (tl::to_qstring (user));
+
+      //  this is freaky: Qt sends password as Latin1 encoded for Basic authentication, but apparently some servers
+      //  expect UTF-8 today. So do them a favor and encode UTF8 into Latin1, so it gets valid UTF8 when turned into Latin1 ...
+      //  We do this for Digest and Basic as they apparently both use Latin 1 encoding. But it's unclear whether all servers
+      //  expect UTF-8 encoding.
+      bool is_basic_or_digest = ! auth->option (QString::fromUtf8 ("realm")).isNull ();
+      if (is_basic_or_digest) {
+        auth->setPassword (QString::fromLatin1 (passwd.c_str ()));
+        auth->setUser (QString::fromLatin1 (user.c_str ()));
+      } else {
+        auth->setPassword (tl::to_qstring (passwd));
+        auth->setUser (tl::to_qstring (user));
+      }
+
     }
 
   }
@@ -81,8 +93,20 @@ AuthenticationHandler::proxyAuthenticationRequired (const QNetworkProxy &proxy, 
     //  TODO: how to cancel?
     std::string user, passwd;
     if (sp_credential_provider->user_password (tl::to_string (proxy.hostName ()), tl::to_string (auth->realm ()), true, ++m_proxy_retry, user, passwd)) {
-      auth->setPassword (tl::to_qstring (passwd));
-      auth->setUser (tl::to_qstring (user));
+
+      //  this is freaky: Qt sends password as Latin1 encoded for Basic authentication, but apparently some servers
+      //  expect UTF-8 today. So do them a favor and encode UTF8 into Latin1, so it gets valid UTF8 when turned into Latin1 ...
+      //  We do this for Digest and Basic as they apparently both use Latin 1 encoding. But it's unclear whether all servers
+      //  expect UTF-8 encoding.
+      bool is_basic_or_digest = ! auth->option (QString::fromUtf8 ("realm")).isNull ();
+      if (is_basic_or_digest) {
+        auth->setPassword (QString::fromLatin1 (passwd.c_str ()));
+        auth->setUser (QString::fromLatin1 (user.c_str ()));
+      } else {
+        auth->setPassword (tl::to_qstring (passwd));
+        auth->setUser (tl::to_qstring (user));
+      }
+
     }
 
   }

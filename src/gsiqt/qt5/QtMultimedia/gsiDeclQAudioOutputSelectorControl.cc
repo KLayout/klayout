@@ -70,6 +70,26 @@ static void _call_f_activeOutput_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
+// void QAudioOutputSelectorControl::activeOutputChanged(const QString &name)
+
+
+static void _init_f_activeOutputChanged_2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("name");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_activeOutputChanged_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QAudioOutputSelectorControl *)cls)->activeOutputChanged (arg1);
+}
+
+
 // QList<QString> QAudioOutputSelectorControl::availableOutputs()
 
 
@@ -82,6 +102,22 @@ static void _call_f_availableOutputs_c0 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QList<QString> > ((QList<QString>)((QAudioOutputSelectorControl *)cls)->availableOutputs ());
+}
+
+
+// void QAudioOutputSelectorControl::availableOutputsChanged()
+
+
+static void _init_f_availableOutputsChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_f_availableOutputsChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QAudioOutputSelectorControl *)cls)->availableOutputsChanged ();
 }
 
 
@@ -196,13 +232,12 @@ static gsi::Methods methods_QAudioOutputSelectorControl () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":activeOutput", "@brief Method QString QAudioOutputSelectorControl::activeOutput()\n", true, &_init_f_activeOutput_c0, &_call_f_activeOutput_c0);
+  methods += new qt_gsi::GenericMethod ("activeOutputChanged", "@brief Method void QAudioOutputSelectorControl::activeOutputChanged(const QString &name)\n", false, &_init_f_activeOutputChanged_2025, &_call_f_activeOutputChanged_2025);
   methods += new qt_gsi::GenericMethod ("availableOutputs", "@brief Method QList<QString> QAudioOutputSelectorControl::availableOutputs()\n", true, &_init_f_availableOutputs_c0, &_call_f_availableOutputs_c0);
+  methods += new qt_gsi::GenericMethod ("availableOutputsChanged", "@brief Method void QAudioOutputSelectorControl::availableOutputsChanged()\n", false, &_init_f_availableOutputsChanged_0, &_call_f_availableOutputsChanged_0);
   methods += new qt_gsi::GenericMethod ("defaultOutput", "@brief Method QString QAudioOutputSelectorControl::defaultOutput()\n", true, &_init_f_defaultOutput_c0, &_call_f_defaultOutput_c0);
   methods += new qt_gsi::GenericMethod ("outputDescription", "@brief Method QString QAudioOutputSelectorControl::outputDescription(const QString &name)\n", true, &_init_f_outputDescription_c2025, &_call_f_outputDescription_c2025);
   methods += new qt_gsi::GenericMethod ("setActiveOutput|activeOutput=", "@brief Method void QAudioOutputSelectorControl::setActiveOutput(const QString &name)\n", false, &_init_f_setActiveOutput_2025, &_call_f_setActiveOutput_2025);
-  methods += gsi::qt_signal<const QString & > ("activeOutputChanged(const QString &)", "activeOutputChanged", gsi::arg("name"), "@brief Signal declaration for QAudioOutputSelectorControl::activeOutputChanged(const QString &name)\nYou can bind a procedure to this signal.");
-  methods += gsi::qt_signal ("availableOutputsChanged()", "availableOutputsChanged", "@brief Signal declaration for QAudioOutputSelectorControl::availableOutputsChanged()\nYou can bind a procedure to this signal.");
-  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAudioOutputSelectorControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QAudioOutputSelectorControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QAudioOutputSelectorControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -266,12 +301,6 @@ public:
     }
   }
 
-  //  [emitter impl] void QAudioOutputSelectorControl::activeOutputChanged(const QString &name)
-  void emitter_QAudioOutputSelectorControl_activeOutputChanged_2025(const QString &name)
-  {
-    emit QAudioOutputSelectorControl::activeOutputChanged(name);
-  }
-
   //  [adaptor impl] QList<QString> QAudioOutputSelectorControl::availableOutputs()
   QList<QString> cbs_availableOutputs_c0_0() const
   {
@@ -287,12 +316,6 @@ public:
     }
   }
 
-  //  [emitter impl] void QAudioOutputSelectorControl::availableOutputsChanged()
-  void emitter_QAudioOutputSelectorControl_availableOutputsChanged_0()
-  {
-    emit QAudioOutputSelectorControl::availableOutputsChanged();
-  }
-
   //  [adaptor impl] QString QAudioOutputSelectorControl::defaultOutput()
   QString cbs_defaultOutput_c0_0() const
   {
@@ -306,12 +329,6 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("defaultOutput");
     }
-  }
-
-  //  [emitter impl] void QAudioOutputSelectorControl::destroyed(QObject *)
-  void emitter_QAudioOutputSelectorControl_destroyed_1302(QObject *arg1)
-  {
-    emit QAudioOutputSelectorControl::destroyed(arg1);
   }
 
   //  [adaptor impl] bool QAudioOutputSelectorControl::event(QEvent *)
@@ -484,24 +501,6 @@ static void _set_callback_cbs_activeOutput_c0_0 (void *cls, const gsi::Callback 
 }
 
 
-// emitter void QAudioOutputSelectorControl::activeOutputChanged(const QString &name)
-
-static void _init_emitter_activeOutputChanged_2025 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("name");
-  decl->add_arg<const QString & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_activeOutputChanged_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  ((QAudioOutputSelectorControl_Adaptor *)cls)->emitter_QAudioOutputSelectorControl_activeOutputChanged_2025 (arg1);
-}
-
-
 // QList<QString> QAudioOutputSelectorControl::availableOutputs()
 
 static void _init_cbs_availableOutputs_c0_0 (qt_gsi::GenericMethod *decl)
@@ -518,20 +517,6 @@ static void _call_cbs_availableOutputs_c0_0 (const qt_gsi::GenericMethod * /*dec
 static void _set_callback_cbs_availableOutputs_c0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QAudioOutputSelectorControl_Adaptor *)cls)->cb_availableOutputs_c0_0 = cb;
-}
-
-
-// emitter void QAudioOutputSelectorControl::availableOutputsChanged()
-
-static void _init_emitter_availableOutputsChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_availableOutputsChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ((QAudioOutputSelectorControl_Adaptor *)cls)->emitter_QAudioOutputSelectorControl_availableOutputsChanged_0 ();
 }
 
 
@@ -599,24 +584,6 @@ static void _call_cbs_defaultOutput_c0_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_defaultOutput_c0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QAudioOutputSelectorControl_Adaptor *)cls)->cb_defaultOutput_c0_0 = cb;
-}
-
-
-// emitter void QAudioOutputSelectorControl::destroyed(QObject *)
-
-static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
-  decl->add_arg<QObject * > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
-  ((QAudioOutputSelectorControl_Adaptor *)cls)->emitter_QAudioOutputSelectorControl_destroyed_1302 (arg1);
 }
 
 
@@ -838,17 +805,14 @@ static gsi::Methods methods_QAudioOutputSelectorControl_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAudioOutputSelectorControl::QAudioOutputSelectorControl()\nThis method creates an object of class QAudioOutputSelectorControl.", &_init_ctor_QAudioOutputSelectorControl_Adaptor_0, &_call_ctor_QAudioOutputSelectorControl_Adaptor_0);
   methods += new qt_gsi::GenericMethod ("activeOutput", "@brief Virtual method QString QAudioOutputSelectorControl::activeOutput()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_activeOutput_c0_0, &_call_cbs_activeOutput_c0_0);
   methods += new qt_gsi::GenericMethod ("activeOutput", "@hide", true, &_init_cbs_activeOutput_c0_0, &_call_cbs_activeOutput_c0_0, &_set_callback_cbs_activeOutput_c0_0);
-  methods += new qt_gsi::GenericMethod ("emit_activeOutputChanged", "@brief Emitter for signal void QAudioOutputSelectorControl::activeOutputChanged(const QString &name)\nCall this method to emit this signal.", false, &_init_emitter_activeOutputChanged_2025, &_call_emitter_activeOutputChanged_2025);
   methods += new qt_gsi::GenericMethod ("availableOutputs", "@brief Virtual method QList<QString> QAudioOutputSelectorControl::availableOutputs()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_availableOutputs_c0_0, &_call_cbs_availableOutputs_c0_0);
   methods += new qt_gsi::GenericMethod ("availableOutputs", "@hide", true, &_init_cbs_availableOutputs_c0_0, &_call_cbs_availableOutputs_c0_0, &_set_callback_cbs_availableOutputs_c0_0);
-  methods += new qt_gsi::GenericMethod ("emit_availableOutputsChanged", "@brief Emitter for signal void QAudioOutputSelectorControl::availableOutputsChanged()\nCall this method to emit this signal.", false, &_init_emitter_availableOutputsChanged_0, &_call_emitter_availableOutputsChanged_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QAudioOutputSelectorControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAudioOutputSelectorControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("defaultOutput", "@brief Virtual method QString QAudioOutputSelectorControl::defaultOutput()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_defaultOutput_c0_0, &_call_cbs_defaultOutput_c0_0);
   methods += new qt_gsi::GenericMethod ("defaultOutput", "@hide", true, &_init_cbs_defaultOutput_c0_0, &_call_cbs_defaultOutput_c0_0, &_set_callback_cbs_defaultOutput_c0_0);
-  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QAudioOutputSelectorControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QAudioOutputSelectorControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAudioOutputSelectorControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);

@@ -425,7 +425,6 @@ static gsi::Methods methods_QCameraImageProcessing () {
   methods += new qt_gsi::GenericMethod ("setWhiteBalanceMode|whiteBalanceMode=", "@brief Method void QCameraImageProcessing::setWhiteBalanceMode(QCameraImageProcessing::WhiteBalanceMode mode)\n", false, &_init_f_setWhiteBalanceMode_4334, &_call_f_setWhiteBalanceMode_4334);
   methods += new qt_gsi::GenericMethod (":sharpeningLevel", "@brief Method double QCameraImageProcessing::sharpeningLevel()\n", true, &_init_f_sharpeningLevel_c0, &_call_f_sharpeningLevel_c0);
   methods += new qt_gsi::GenericMethod (":whiteBalanceMode", "@brief Method QCameraImageProcessing::WhiteBalanceMode QCameraImageProcessing::whiteBalanceMode()\n", true, &_init_f_whiteBalanceMode_c0, &_call_f_whiteBalanceMode_c0);
-  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QCameraImageProcessing::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QCameraImageProcessing::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QCameraImageProcessing::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;

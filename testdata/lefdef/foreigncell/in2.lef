@@ -1,0 +1,44 @@
+MACRO macro1
+    CLASS CORE ;
+    ORIGIN 0.035 0.235 ;
+    SIZE 0.07 BY 0.47 ;
+    PIN Z
+        PORT
+        LAYER M1 ;
+        RECT -0.02 0 0.02 0.2 ;
+        RECT -0.03 -0.2 0.01 -0.1 ;
+        VIA  0.0 0.2 square ;
+        VIA  0.01 -0.2 square ;
+        END
+    END Z
+END macro1
+
+MACRO macro2
+    CLASS CORE ;
+    FOREIGN foreign2 -0.15 0.25 ;
+    ORIGIN 0.235 0.035 ;
+    SIZE 0.47 BY 0.07 ;
+    PIN Z
+        PORT
+        LAYER M1 ;
+        RECT 0 -0.02 -0.2 0.02 ;
+        RECT 0.2 -0.03 0.1 0.01 ;
+        VIA  -0.2 0.0 square ;
+        VIA  0.2 0.01 square ;
+        END
+    END Z
+END macro2
+
+MACRO macro3
+    CLASS CORE ;
+    FOREIGN macro3 -1.0 1.0 ;
+    ORIGIN 0.0 0.0 ;
+    SIZE 1.0 BY 1.0 ;
+    PIN Z
+        PORT
+        LAYER M1 ;
+        RECT 0.2 0.2 0.3 0.5 ;
+        END
+    END Z
+END macro3
+

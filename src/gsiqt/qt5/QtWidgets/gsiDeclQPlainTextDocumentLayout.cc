@@ -319,6 +319,7 @@ static gsi::Methods methods_QPlainTextDocumentLayout () {
   methods += new qt_gsi::GenericMethod ("setCursorWidth|cursorWidth=", "@brief Method void QPlainTextDocumentLayout::setCursorWidth(int width)\n", false, &_init_f_setCursorWidth_767, &_call_f_setCursorWidth_767);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QPlainTextDocumentLayout::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QSizeF & > ("documentSizeChanged(const QSizeF &)", "documentSizeChanged", gsi::arg("newSize"), "@brief Signal declaration for QPlainTextDocumentLayout::documentSizeChanged(const QSizeF &newSize)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QPlainTextDocumentLayout::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("pageCountChanged(int)", "pageCountChanged", gsi::arg("newPages"), "@brief Signal declaration for QPlainTextDocumentLayout::pageCountChanged(int newPages)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QRectF & > ("update(const QRectF &)", "update", gsi::arg("arg1"), "@brief Signal declaration for QPlainTextDocumentLayout::update(const QRectF &)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QTextBlock & > ("updateBlock(const QTextBlock &)", "updateBlock", gsi::arg("block"), "@brief Signal declaration for QPlainTextDocumentLayout::updateBlock(const QTextBlock &block)\nYou can bind a procedure to this signal.");
@@ -495,6 +496,13 @@ public:
     } else {
       return QPlainTextDocumentLayout::hitTest(arg1, arg2);
     }
+  }
+
+  //  [emitter impl] void QPlainTextDocumentLayout::objectNameChanged(const QString &objectName)
+  void emitter_QPlainTextDocumentLayout_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QPlainTextDocumentLayout::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] int QPlainTextDocumentLayout::pageCount()
@@ -1083,6 +1091,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QPlainTextDocumentLayout::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QPlainTextDocumentLayout_Adaptor *)cls)->emitter_QPlainTextDocumentLayout_objectNameChanged_4567 (arg1);
+}
+
+
 // int QPlainTextDocumentLayout::pageCount()
 
 static void _init_cbs_pageCount_c0_0 (qt_gsi::GenericMethod *decl)
@@ -1323,6 +1349,7 @@ static gsi::Methods methods_QPlainTextDocumentLayout_Adaptor () {
   methods += new qt_gsi::GenericMethod ("hitTest", "@brief Virtual method int QPlainTextDocumentLayout::hitTest(const QPointF &, Qt::HitTestAccuracy)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_hitTest_c4147_0, &_call_cbs_hitTest_c4147_0);
   methods += new qt_gsi::GenericMethod ("hitTest", "@hide", true, &_init_cbs_hitTest_c4147_0, &_call_cbs_hitTest_c4147_0, &_set_callback_cbs_hitTest_c4147_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QPlainTextDocumentLayout::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QPlainTextDocumentLayout::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("pageCount", "@brief Virtual method int QPlainTextDocumentLayout::pageCount()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_pageCount_c0_0, &_call_cbs_pageCount_c0_0);
   methods += new qt_gsi::GenericMethod ("pageCount", "@hide", true, &_init_cbs_pageCount_c0_0, &_call_cbs_pageCount_c0_0, &_set_callback_cbs_pageCount_c0_0);
   methods += new qt_gsi::GenericMethod ("emit_pageCountChanged", "@brief Emitter for signal void QPlainTextDocumentLayout::pageCountChanged(int newPages)\nCall this method to emit this signal.", false, &_init_emitter_pageCountChanged_767, &_call_emitter_pageCountChanged_767);

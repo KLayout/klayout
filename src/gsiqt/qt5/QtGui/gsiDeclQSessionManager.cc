@@ -401,6 +401,7 @@ static gsi::Methods methods_QSessionManager () {
   methods += new qt_gsi::GenericMethod ("setRestartCommand|restartCommand=", "@brief Method void QSessionManager::setRestartCommand(const QStringList &)\n", false, &_init_f_setRestartCommand_2437, &_call_f_setRestartCommand_2437);
   methods += new qt_gsi::GenericMethod ("setRestartHint|restartHint=", "@brief Method void QSessionManager::setRestartHint(QSessionManager::RestartHint)\n", false, &_init_f_setRestartHint_3216, &_call_f_setRestartHint_3216);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QSessionManager::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QSessionManager::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QSessionManager::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QSessionManager::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;

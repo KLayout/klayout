@@ -205,6 +205,41 @@ class DBCellMapping_TestClass < TestBase
 
   end
 
+  def test_2
+
+    ly = RBA::Layout::new
+
+    a0 = ly.create_cell("a0")
+    a1 = ly.create_cell("a1")
+    a2 = ly.create_cell("a2")
+    a3 = ly.create_cell("a3")
+    a4 = ly.create_cell("a4")
+    a5 = ly.create_cell("a5")
+    
+    a3.insert(RBA::CellInstArray::new(a4.cell_index, RBA::Trans::new))
+    a3.insert(RBA::CellInstArray::new(a5.cell_index, RBA::Trans::new))
+
+    a1.insert(RBA::CellInstArray::new(a4.cell_index, RBA::Trans::new))
+    a1.insert(RBA::CellInstArray::new(a3.cell_index, RBA::Trans::new))
+    a2.insert(RBA::CellInstArray::new(a4.cell_index, RBA::Trans::new))
+
+    ly_target = RBA::Layout::new
+    b0 = ly_target.create_cell("b0")
+    b1 = ly_target.create_cell("b1")
+    b2 = ly_target.create_cell("b2")
+
+    cm = RBA::CellMapping::new
+    cm.for_multi_cells(ly_target, [ b0, b1, b2 ].collect { |c| c.cell_index }, ly, [ a0, a1, a2 ].collect { |c| c.cell_index })
+
+    assert_equal(mapping_to_s(ly_target, ly, cm), "b0=>a0;b1=>a1;b2=>a2")
+
+    cm = RBA::CellMapping::new
+    cm.for_multi_cells_full(ly_target, [ b0, b1, b2 ].collect { |c| c.cell_index }, ly, [ a0, a1, a2 ].collect { |c| c.cell_index })
+
+    assert_equal(mapping_to_s(ly_target, ly, cm), "b0=>a0;b1=>a1;b2=>a2;a3=>a3;a4=>a4;a5=>a5")
+
+  end
+
 end
 
 load("test_epilogue.rb")

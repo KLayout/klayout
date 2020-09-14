@@ -728,6 +728,17 @@ class DBPolygonTests(unittest.TestCase):
     self.assertEqual(str(p1), "(21,42;21,62;41,62;41,42)")
     self.assertEqual(str(pp), "(21,42;21,62;41,62;41,42)")
 
+  def test_voidMethodsReturnSelf(self):
+
+    hull =  [ pya.Point(0, 0),       pya.Point(6000, 0), 
+              pya.Point(6000, 3000), pya.Point(0, 3000) ]
+    hole1 = [ pya.Point(1000, 1000), pya.Point(2000, 1000), 
+              pya.Point(2000, 2000), pya.Point(1000, 2000) ]
+    hole2 = [ pya.Point(3000, 1000), pya.Point(4000, 1000), 
+              pya.Point(4000, 2000), pya.Point(3000, 2000) ]
+    poly = pya.Polygon(hull).insert_hole(hole1).insert_hole(hole2)
+    self.assertEqual(str(poly), "(0,0;0,3000;6000,3000;6000,0/1000,1000;2000,1000;2000,2000;1000,2000/3000,1000;4000,1000;4000,2000;3000,2000)")
+
 # run unit tests
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(DBPolygonTests)

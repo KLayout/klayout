@@ -1839,10 +1839,15 @@ LayerPropertiesList::load (tl::XMLSource &stream, std::vector <lay::LayerPropert
     lay::LayerPropertiesList properties_list;
     layer_prop_list_structure.parse (stream, properties_list); 
     properties_lists.push_back (properties_list);
-  } catch (...) {
-    // "new" way
-    stream.reset ();
-    layer_prop_lists_structure.parse (stream, properties_lists); 
+  } catch (tl::Exception &ex) {
+    try {
+      // "new" way
+      stream.reset ();
+      layer_prop_lists_structure.parse (stream, properties_lists);
+    } catch (tl::Exception &) {
+      //  the first exception is likely to be the root cause, so let's rather throw this one
+      throw ex;
+    }
   }
 }
   

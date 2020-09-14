@@ -299,6 +299,7 @@ static gsi::Methods methods_QGraphicsProxyWidget () {
   methods += gsi::qt_signal ("geometryChanged()", "geometryChanged", "@brief Signal declaration for QGraphicsProxyWidget::geometryChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("heightChanged()", "heightChanged", "@brief Signal declaration for QGraphicsProxyWidget::heightChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("layoutChanged()", "layoutChanged", "@brief Signal declaration for QGraphicsProxyWidget::layoutChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QGraphicsProxyWidget::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("opacityChanged()", "opacityChanged", "@brief Signal declaration for QGraphicsProxyWidget::opacityChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("parentChanged()", "parentChanged", "@brief Signal declaration for QGraphicsProxyWidget::parentChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("rotationChanged()", "rotationChanged", "@brief Signal declaration for QGraphicsProxyWidget::rotationChanged()\nYou can bind a procedure to this signal.");
@@ -542,6 +543,13 @@ public:
   void emitter_QGraphicsProxyWidget_layoutChanged_0()
   {
     emit QGraphicsProxyWidget::layoutChanged();
+  }
+
+  //  [emitter impl] void QGraphicsProxyWidget::objectNameChanged(const QString &objectName)
+  void emitter_QGraphicsProxyWidget_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QGraphicsProxyWidget::objectNameChanged(const QString &objectName)'");
   }
 
   //  [emitter impl] void QGraphicsProxyWidget::opacityChanged()
@@ -2615,6 +2623,24 @@ static void _call_fp_newProxyWidget_2010 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
+// emitter void QGraphicsProxyWidget::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QGraphicsProxyWidget_Adaptor *)cls)->emitter_QGraphicsProxyWidget_objectNameChanged_4567 (arg1);
+}
+
+
 // emitter void QGraphicsProxyWidget::opacityChanged()
 
 static void _init_emitter_opacityChanged_0 (qt_gsi::GenericMethod *decl)
@@ -3489,6 +3515,7 @@ static gsi::Methods methods_QGraphicsProxyWidget_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*moveEvent", "@brief Virtual method void QGraphicsProxyWidget::moveEvent(QGraphicsSceneMoveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveEvent_2935_0, &_call_cbs_moveEvent_2935_0);
   methods += new qt_gsi::GenericMethod ("*moveEvent", "@hide", false, &_init_cbs_moveEvent_2935_0, &_call_cbs_moveEvent_2935_0, &_set_callback_cbs_moveEvent_2935_0);
   methods += new qt_gsi::GenericMethod ("*newProxyWidget", "@brief Method QGraphicsProxyWidget *QGraphicsProxyWidget::newProxyWidget(const QWidget *)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_newProxyWidget_2010, &_call_fp_newProxyWidget_2010);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QGraphicsProxyWidget::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("emit_opacityChanged", "@brief Emitter for signal void QGraphicsProxyWidget::opacityChanged()\nCall this method to emit this signal.", false, &_init_emitter_opacityChanged_0, &_call_emitter_opacityChanged_0);
   methods += new qt_gsi::GenericMethod ("opaqueArea", "@brief Virtual method QPainterPath QGraphicsProxyWidget::opaqueArea()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_opaqueArea_c0_0, &_call_cbs_opaqueArea_c0_0);
   methods += new qt_gsi::GenericMethod ("opaqueArea", "@hide", true, &_init_cbs_opaqueArea_c0_0, &_call_cbs_opaqueArea_c0_0, &_set_callback_cbs_opaqueArea_c0_0);

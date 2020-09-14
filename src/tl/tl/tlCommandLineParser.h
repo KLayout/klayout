@@ -137,7 +137,15 @@ public:
   /**
    *  @brief Marks an option to be present (for boolean options)
    */
-  virtual void mark_present (bool)
+  virtual void mark_present ()
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Inverts the presence of an option (for boolean options)
+   */
+  virtual void invert_present ()
   {
     //  .. nothing yet ..
   }
@@ -231,28 +239,29 @@ inline void extract (tl::Extractor &ex, std::vector<T> &t, bool repeated_hint, b
  *  @brief A helper to mark "presence"
  */
 template <class T>
-inline void mark_presence (T &, bool)
+inline void mark_presence (T &)
 {
   //  .. the default implementation does nothing ..
 }
 
-inline void mark_presence (bool &t, bool invert)
+inline void mark_presence (bool &t)
 {
-  t = !invert;
+  t = true;
 }
 
-template <class C, class T>
-inline void mark_presence_setter (C *, void (C::*) (T), bool)
+/**
+ *  @brief A helper to invert "presence"
+ */
+template <class T>
+inline void invert_presence (T &)
 {
   //  .. the default implementation does nothing ..
 }
 
-template <class C>
-inline void mark_presence_setter (C *c, void (C::*ptr) (bool), bool invert)
+inline void invert_presence (bool &t)
 {
-  (c->*ptr) (!invert);
+  t = !t;
 }
-
 
 /**
  *  @brief A helper template to extract the actual type from (T) or (const T &)
@@ -303,9 +312,14 @@ public:
     extract (ex, *mp_value, option ().repeated);
   }
 
-  virtual void mark_present (bool inverted)
+  virtual void mark_present ()
   {
-    mark_presence (*mp_value, inverted);
+    mark_presence (*mp_value);
+  }
+
+  virtual void invert_present ()
+  {
+    invert_presence (*mp_value);
   }
 
   virtual ArgBase *clone () const
@@ -330,23 +344,30 @@ class arg_method_setter
   : public ArgBase
 {
 public:
+  typedef typename type_without_const_ref<T>::inner_type inner_type;
+
   arg_method_setter (const std::string &option, C *object, void (C::*setter)(T), const std::string &brief_doc, const std::string &long_doc)
-    : ArgBase (option, brief_doc, long_doc), mp_object (object), mp_setter (setter)
+    : ArgBase (option, brief_doc, long_doc), m_value (), mp_object (object), mp_setter (setter)
   {
     //  .. nothing yet ..
   }
 
   virtual void take_value (tl::Extractor &ex)
   {
-    typedef typename type_without_const_ref<T>::inner_type inner_type;
-    inner_type t = inner_type ();
-    extract (ex, t, option ().repeated);
-    (mp_object->*mp_setter) (t);
+    extract (ex, m_value, option ().repeated);
+    (mp_object->*mp_setter) (m_value);
   }
 
-  virtual void mark_present (bool inverted)
+  virtual void mark_present ()
   {
-    mark_presence_setter (mp_object, mp_setter, inverted);
+    mark_presence (m_value);
+    (mp_object->*mp_setter) (m_value);
+  }
+
+  virtual void invert_present ()
+  {
+    invert_presence (m_value);
+    (mp_object->*mp_setter) (m_value);
   }
 
   virtual ArgBase *clone () const
@@ -360,6 +381,7 @@ public:
   }
 
 private:
+  inner_type m_value;
   C *mp_object;
   void (C::*mp_setter)(T);
 };

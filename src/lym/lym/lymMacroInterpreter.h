@@ -139,6 +139,18 @@ public:
   }
 
   /**
+   *  @brief Provides generic include file expansion
+   *
+   *  This method takes a given macro and substitutes include statements of the form '# %include ...' by the
+   *  content of the respective file. Recursive include is supported.
+   *  The return value of this method is a two-element array with two strings: the first one is a path string which
+   *  holds the encoded information for translating back path/line number information into the original paths and
+   *  line numbers. This first string needs to be passed to the actual script interpreter as the 'file path'. The
+   *  second component of the returned array is the text of the macro with the include files substituted.
+   */
+  virtual std::pair<std::string, std::string> include_expansion (const lym::Macro *macro);
+
+  /**
    *  @brief Runs the script for the DSL interpreter with the given name
    *
    *  This method locates the DSL interpreter with the given name and 

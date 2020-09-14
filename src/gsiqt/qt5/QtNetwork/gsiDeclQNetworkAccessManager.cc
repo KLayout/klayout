@@ -676,6 +676,7 @@ static gsi::Methods methods_QNetworkAccessManager () {
   methods += gsi::qt_signal<QNetworkReply * > ("finished(QNetworkReply *)", "finished", gsi::arg("reply"), "@brief Signal declaration for QNetworkAccessManager::finished(QNetworkReply *reply)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<QNetworkAccessManager::NetworkAccessibility>::target_type & > ("networkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)", "networkAccessibleChanged", gsi::arg("accessible"), "@brief Signal declaration for QNetworkAccessManager::networkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility accessible)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("networkSessionConnected()", "networkSessionConnected", "@brief Signal declaration for QNetworkAccessManager::networkSessionConnected()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QNetworkAccessManager::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QNetworkReply *, QSslPreSharedKeyAuthenticator * > ("preSharedKeyAuthenticationRequired(QNetworkReply *, QSslPreSharedKeyAuthenticator *)", "preSharedKeyAuthenticationRequired", gsi::arg("reply"), gsi::arg("authenticator"), "@brief Signal declaration for QNetworkAccessManager::preSharedKeyAuthenticationRequired(QNetworkReply *reply, QSslPreSharedKeyAuthenticator *authenticator)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QNetworkProxy &, QAuthenticator * > ("proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)", "proxyAuthenticationRequired", gsi::arg("proxy"), gsi::arg("authenticator"), "@brief Signal declaration for QNetworkAccessManager::proxyAuthenticationRequired(const QNetworkProxy &proxy, QAuthenticator *authenticator)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QNetworkReply *, const QList<QSslError> & > ("sslErrors(QNetworkReply *, const QList<QSslError> &)", "sslErrors", gsi::arg("reply"), gsi::arg("errors"), "@brief Signal declaration for QNetworkAccessManager::sslErrors(QNetworkReply *reply, const QList<QSslError> &errors)\nYou can bind a procedure to this signal.");
@@ -802,6 +803,13 @@ public:
   void emitter_QNetworkAccessManager_networkSessionConnected_0()
   {
     emit QNetworkAccessManager::networkSessionConnected();
+  }
+
+  //  [emitter impl] void QNetworkAccessManager::objectNameChanged(const QString &objectName)
+  void emitter_QNetworkAccessManager_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QNetworkAccessManager::objectNameChanged(const QString &objectName)'");
   }
 
   //  [emitter impl] void QNetworkAccessManager::preSharedKeyAuthenticationRequired(QNetworkReply *reply, QSslPreSharedKeyAuthenticator *authenticator)
@@ -1201,6 +1209,24 @@ static void _call_emitter_networkSessionConnected_0 (const qt_gsi::GenericMethod
 }
 
 
+// emitter void QNetworkAccessManager::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QNetworkAccessManager_Adaptor *)cls)->emitter_QNetworkAccessManager_objectNameChanged_4567 (arg1);
+}
+
+
 // emitter void QNetworkAccessManager::preSharedKeyAuthenticationRequired(QNetworkReply *reply, QSslPreSharedKeyAuthenticator *authenticator)
 
 static void _init_emitter_preSharedKeyAuthenticationRequired_5436 (qt_gsi::GenericMethod *decl)
@@ -1375,6 +1401,7 @@ static gsi::Methods methods_QNetworkAccessManager_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QNetworkAccessManager::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("emit_networkAccessibleChanged", "@brief Emitter for signal void QNetworkAccessManager::networkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility accessible)\nCall this method to emit this signal.", false, &_init_emitter_networkAccessibleChanged_4770, &_call_emitter_networkAccessibleChanged_4770);
   methods += new qt_gsi::GenericMethod ("emit_networkSessionConnected", "@brief Emitter for signal void QNetworkAccessManager::networkSessionConnected()\nCall this method to emit this signal.", false, &_init_emitter_networkSessionConnected_0, &_call_emitter_networkSessionConnected_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QNetworkAccessManager::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("emit_preSharedKeyAuthenticationRequired", "@brief Emitter for signal void QNetworkAccessManager::preSharedKeyAuthenticationRequired(QNetworkReply *reply, QSslPreSharedKeyAuthenticator *authenticator)\nCall this method to emit this signal.", false, &_init_emitter_preSharedKeyAuthenticationRequired_5436, &_call_emitter_preSharedKeyAuthenticationRequired_5436);
   methods += new qt_gsi::GenericMethod ("emit_proxyAuthenticationRequired", "@brief Emitter for signal void QNetworkAccessManager::proxyAuthenticationRequired(const QNetworkProxy &proxy, QAuthenticator *authenticator)\nCall this method to emit this signal.", false, &_init_emitter_proxyAuthenticationRequired_4652, &_call_emitter_proxyAuthenticationRequired_4652);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QNetworkAccessManager::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);

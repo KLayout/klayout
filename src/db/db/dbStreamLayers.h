@@ -237,6 +237,13 @@ public:
   std::pair<bool, unsigned int> logical (const db::LDPair &p, db::Layout &layout) const;
 
   /**
+   *  @brief Gets the target layer for a given logical layer
+   *
+   *  Returns 0 if no target layer mapping is supplied.
+   */
+  const db::LayerProperties *target (unsigned int l) const;
+
+  /**
    *  @brief String description for the mapping of a logical layer
    *
    *  @return A string describing the mapping (an empty string if

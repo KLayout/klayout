@@ -20,6 +20,7 @@ SOURCES = \
     tlGlobPattern.cc \
     tlHeap.cc \
     tlHttpStream.cc \
+    tlInclude.cc \
     tlInternational.cc \
     tlLog.cc \
     tlObject.cc \
@@ -63,6 +64,7 @@ HEADERS = \
     tlGlobPattern.h \
     tlHeap.h \
     tlHttpStream.h \
+    tlInclude.h \
     tlInternational.h \
     tlIntervalMap.h \
     tlIntervalSet.h \

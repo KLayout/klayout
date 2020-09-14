@@ -200,6 +200,21 @@ public:
    */
   tl::Variant get_option_by_name (const std::string &name);
 
+  /**
+   *  @brief Sets a layout reader option by calling method
+   *
+   *  The name is taken to be a GSI method which is called to set the
+   *  option.
+   */
+  void set_option_by_method (const std::string &name, const tl::Variant &value);
+
+  /**
+   *  @brief Gets a layout reader option by calling a method
+   *
+   *  See "set_option_by_method" for details.
+   */
+  tl::Variant get_option_by_method (const std::string &name);
+
 private:
   std::map <std::string, FormatSpecificReaderOptions *> m_options;
 

@@ -1,4 +1,26 @@
 
+0.26.8          (2020-09-15):
+
+* Enhancement: %GITHUB%/issues/639
+      A new method is available which enables copying of multiple cells
+      into a target layout while maintaining common subcells are single
+      cells.
+* Bugfix: %GITHUB%/issues/637
+      Points have not been selected properly when inside mirrored subcells
+      in partial edit mode.
+* Bugfix: %GITHUB%/issues/629
+      Qt5 QTimer timeout signal was not available to Python or Ruby.
+      This also applied to all "private" signals of Qt5. QTimer is just
+      one important example for this case.
+* Bugfix: %GITHUB%/issues/617
+      A problem with pseudo-const Python/Ruby objects in the netlist API
+      was fixed.
+* Bugfix: %GITHUB%/issues/615
+      Basic authentication for package manager now uses UTF-8 encoding.
+      Most servers expect this kind of encoding today. UTF password 
+      characters are supported this way.
+
+* Bugfix: %GITHUB%/issues/493
 0.26.7          (2020-07-07):
 
 * Bugfix: %GITHUB%/issues/381 and more

@@ -375,6 +375,7 @@ static gsi::Methods methods_QTemporaryFile () {
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QTemporaryFile::aboutToClose()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64 > ("bytesWritten(qint64)", "bytesWritten", gsi::arg("bytes"), "@brief Signal declaration for QTemporaryFile::bytesWritten(qint64 bytes)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QTemporaryFile::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QTemporaryFile::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("readChannelFinished()", "readChannelFinished", "@brief Signal declaration for QTemporaryFile::readChannelFinished()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("readyRead()", "readyRead", "@brief Signal declaration for QTemporaryFile::readyRead()\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("createLocalFile", "@brief Static method QTemporaryFile *QTemporaryFile::createLocalFile(const QString &fileName)\nThis method is static and can be called without an instance.", &_init_f_createLocalFile_2025, &_call_f_createLocalFile_2025);

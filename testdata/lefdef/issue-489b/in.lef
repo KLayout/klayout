@@ -1,6 +1,5 @@
 MACRO dummy
     CLASS CORE ;
-    FOREIGN dummy 0.000 0.000  ;
     ORIGIN 0.000 0.000 ;
     SIZE 0.384 BY 0.480 ;
     SYMMETRY X Y ;

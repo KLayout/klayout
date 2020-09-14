@@ -15,6 +15,7 @@ SOURCES = \
   tlEvents.cc \
   tlExpression.cc \
   tlFileUtils.cc \
+  tlIncludeTests.cc \
   tlIntervalMap.cc \
   tlIntervalSet.cc \
   tlKDTree.cc \

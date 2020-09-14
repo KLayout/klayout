@@ -417,6 +417,7 @@ static gsi::Methods methods_QClipboard () {
   methods += gsi::qt_signal ("dataChanged()", "dataChanged", "@brief Signal declaration for QClipboard::dataChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QClipboard::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("findBufferChanged()", "findBufferChanged", "@brief Signal declaration for QClipboard::findBufferChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QClipboard::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("selectionChanged()", "selectionChanged", "@brief Signal declaration for QClipboard::selectionChanged()\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QClipboard::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QClipboard::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);

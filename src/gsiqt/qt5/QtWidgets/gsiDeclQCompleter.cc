@@ -726,6 +726,7 @@ static gsi::Methods methods_QCompleter () {
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QCompleter::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("highlighted(const QString &)", "highlighted_qs", gsi::arg("text"), "@brief Signal declaration for QCompleter::highlighted(const QString &text)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QModelIndex & > ("highlighted(const QModelIndex &)", "highlighted", gsi::arg("index"), "@brief Signal declaration for QCompleter::highlighted(const QModelIndex &index)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QCompleter::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QCompleter::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QCompleter::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -832,6 +833,13 @@ public:
   void emitter_QCompleter_highlighted_2395(const QModelIndex &index)
   {
     emit QCompleter::highlighted(index);
+  }
+
+  //  [emitter impl] void QCompleter::objectNameChanged(const QString &objectName)
+  void emitter_QCompleter_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QCompleter::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] QString QCompleter::pathFromIndex(const QModelIndex &index)
@@ -1255,6 +1263,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QCompleter::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QCompleter_Adaptor *)cls)->emitter_QCompleter_objectNameChanged_4567 (arg1);
+}
+
+
 // QString QCompleter::pathFromIndex(const QModelIndex &index)
 
 static void _init_cbs_pathFromIndex_c2395_0 (qt_gsi::GenericMethod *decl)
@@ -1397,6 +1423,7 @@ static gsi::Methods methods_QCompleter_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_highlighted_qs", "@brief Emitter for signal void QCompleter::highlighted(const QString &text)\nCall this method to emit this signal.", false, &_init_emitter_highlighted_2025, &_call_emitter_highlighted_2025);
   methods += new qt_gsi::GenericMethod ("emit_highlighted", "@brief Emitter for signal void QCompleter::highlighted(const QModelIndex &index)\nCall this method to emit this signal.", false, &_init_emitter_highlighted_2395, &_call_emitter_highlighted_2395);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QCompleter::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QCompleter::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("pathFromIndex", "@brief Virtual method QString QCompleter::pathFromIndex(const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_pathFromIndex_c2395_0, &_call_cbs_pathFromIndex_c2395_0);
   methods += new qt_gsi::GenericMethod ("pathFromIndex", "@hide", true, &_init_cbs_pathFromIndex_c2395_0, &_call_cbs_pathFromIndex_c2395_0, &_set_callback_cbs_pathFromIndex_c2395_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QCompleter::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);

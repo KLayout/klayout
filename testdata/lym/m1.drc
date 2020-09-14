@@ -1,0 +1,22 @@
+
+# some prep steps
+ly = RBA::Layout::new
+ly.create_cell("TOP")
+l1 = ly.layer(1, 0)
+ly.top_cell.shapes(l1).insert(RBA::Box::new(0, 0, 1000, 2000))
+l2 = ly.layer(2, 0)
+ly.top_cell.shapes(l2).insert(RBA::Box::new(500, 500, 1500, 2500))
+
+# actual "DRC"
+
+source(ly.top_cell)
+
+l1_drc = input(1, 0)
+l2_drc = input(2, 0)
+(l1_drc & l2_drc).output(100, 0)
+
+l100 = ly.layer(100, 0)
+
+puts "Result: " + RBA::Region::new(ly.top_cell.begin_shapes_rec(l100)).to_s + " in " + File.basename(__FILE__) + ":" + __LINE__.to_s
+
+

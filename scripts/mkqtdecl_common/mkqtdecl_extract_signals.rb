@@ -33,7 +33,7 @@ RBA::Class::each_class do |cls|
 
   if cls.name =~ /^Q/ && (cls.name =~ /_Native$/ || !classes[cls.name + "_Native"])
 
-    b = cls.base
+    b = cls
     while b && b.name != "QObject_Native"
       b = b.base
     end

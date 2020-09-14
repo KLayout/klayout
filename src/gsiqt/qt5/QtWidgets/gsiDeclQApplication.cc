@@ -1078,6 +1078,7 @@ static gsi::Methods methods_QApplication () {
   methods += new qt_gsi::GenericMethod ("setAutoSipEnabled|autoSipEnabled=", "@brief Method void QApplication::setAutoSipEnabled(const bool enabled)\n", false, &_init_f_setAutoSipEnabled_1559, &_call_f_setAutoSipEnabled_1559);
   methods += new qt_gsi::GenericMethod ("setStyleSheet|styleSheet=", "@brief Method void QApplication::setStyleSheet(const QString &sheet)\n", false, &_init_f_setStyleSheet_2025, &_call_f_setStyleSheet_2025);
   methods += new qt_gsi::GenericMethod (":styleSheet", "@brief Method QString QApplication::styleSheet()\n", true, &_init_f_styleSheet_c0, &_call_f_styleSheet_c0);
+  methods += gsi::qt_signal ("aboutToQuit()", "aboutToQuit", "@brief Signal declaration for QApplication::aboutToQuit()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("applicationNameChanged()", "applicationNameChanged", "@brief Signal declaration for QApplication::applicationNameChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<Qt::ApplicationState>::target_type & > ("applicationStateChanged(Qt::ApplicationState)", "applicationStateChanged", gsi::arg("state"), "@brief Signal declaration for QApplication::applicationStateChanged(Qt::ApplicationState state)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("applicationVersionChanged()", "applicationVersionChanged", "@brief Signal declaration for QApplication::applicationVersionChanged()\nYou can bind a procedure to this signal.");
@@ -1089,6 +1090,7 @@ static gsi::Methods methods_QApplication () {
   methods += gsi::qt_signal ("fontDatabaseChanged()", "fontDatabaseChanged", "@brief Signal declaration for QApplication::fontDatabaseChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("lastWindowClosed()", "lastWindowClosed", "@brief Signal declaration for QApplication::lastWindowClosed()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<Qt::LayoutDirection>::target_type & > ("layoutDirectionChanged(Qt::LayoutDirection)", "layoutDirectionChanged", gsi::arg("direction"), "@brief Signal declaration for QApplication::layoutDirectionChanged(Qt::LayoutDirection direction)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QApplication::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("organizationDomainChanged()", "organizationDomainChanged", "@brief Signal declaration for QApplication::organizationDomainChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("organizationNameChanged()", "organizationNameChanged", "@brief Signal declaration for QApplication::organizationNameChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QPalette & > ("paletteChanged(const QPalette &)", "paletteChanged", gsi::arg("pal"), "@brief Signal declaration for QApplication::paletteChanged(const QPalette &pal)\nYou can bind a procedure to this signal.");
@@ -1207,6 +1209,12 @@ public:
     return QApplication::senderSignalIndex();
   }
 
+  //  [emitter impl] void QApplication::aboutToQuit()
+  void emitter_QApplication_aboutToQuit_3584()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QApplication::aboutToQuit()'");
+  }
+
   //  [emitter impl] void QApplication::applicationNameChanged()
   void emitter_QApplication_applicationNameChanged_0()
   {
@@ -1301,6 +1309,13 @@ public:
     } else {
       return QApplication::notify(arg1, arg2);
     }
+  }
+
+  //  [emitter impl] void QApplication::objectNameChanged(const QString &objectName)
+  void emitter_QApplication_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QApplication::objectNameChanged(const QString &objectName)'");
   }
 
   //  [emitter impl] void QApplication::organizationDomainChanged()
@@ -1424,6 +1439,20 @@ public:
 };
 
 QApplication_Adaptor::~QApplication_Adaptor() { }
+
+// emitter void QApplication::aboutToQuit()
+
+static void _init_emitter_aboutToQuit_3584 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_aboutToQuit_3584 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QApplication_Adaptor *)cls)->emitter_QApplication_aboutToQuit_3584 ();
+}
+
 
 // emitter void QApplication::applicationNameChanged()
 
@@ -1775,6 +1804,24 @@ static void _set_callback_cbs_notify_2411_0 (void *cls, const gsi::Callback &cb)
 }
 
 
+// emitter void QApplication::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QApplication_Adaptor *)cls)->emitter_QApplication_objectNameChanged_4567 (arg1);
+}
+
+
 // emitter void QApplication::organizationDomainChanged()
 
 static void _init_emitter_organizationDomainChanged_0 (qt_gsi::GenericMethod *decl)
@@ -1952,6 +1999,7 @@ gsi::Class<QApplication> &qtdecl_QApplication ();
 
 static gsi::Methods methods_QApplication_Adaptor () {
   gsi::Methods methods;
+  methods += new qt_gsi::GenericMethod ("emit_aboutToQuit", "@brief Emitter for signal void QApplication::aboutToQuit()\nCall this method to emit this signal.", false, &_init_emitter_aboutToQuit_3584, &_call_emitter_aboutToQuit_3584);
   methods += new qt_gsi::GenericMethod ("emit_applicationNameChanged", "@brief Emitter for signal void QApplication::applicationNameChanged()\nCall this method to emit this signal.", false, &_init_emitter_applicationNameChanged_0, &_call_emitter_applicationNameChanged_0);
   methods += new qt_gsi::GenericMethod ("emit_applicationStateChanged", "@brief Emitter for signal void QApplication::applicationStateChanged(Qt::ApplicationState state)\nCall this method to emit this signal.", false, &_init_emitter_applicationStateChanged_2402, &_call_emitter_applicationStateChanged_2402);
   methods += new qt_gsi::GenericMethod ("emit_applicationVersionChanged", "@brief Emitter for signal void QApplication::applicationVersionChanged()\nCall this method to emit this signal.", false, &_init_emitter_applicationVersionChanged_0, &_call_emitter_applicationVersionChanged_0);
@@ -1976,6 +2024,7 @@ static gsi::Methods methods_QApplication_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_layoutDirectionChanged", "@brief Emitter for signal void QApplication::layoutDirectionChanged(Qt::LayoutDirection direction)\nCall this method to emit this signal.", false, &_init_emitter_layoutDirectionChanged_2316, &_call_emitter_layoutDirectionChanged_2316);
   methods += new qt_gsi::GenericMethod ("notify", "@brief Virtual method bool QApplication::notify(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_notify_2411_0, &_call_cbs_notify_2411_0);
   methods += new qt_gsi::GenericMethod ("notify", "@hide", false, &_init_cbs_notify_2411_0, &_call_cbs_notify_2411_0, &_set_callback_cbs_notify_2411_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QApplication::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("emit_organizationDomainChanged", "@brief Emitter for signal void QApplication::organizationDomainChanged()\nCall this method to emit this signal.", false, &_init_emitter_organizationDomainChanged_0, &_call_emitter_organizationDomainChanged_0);
   methods += new qt_gsi::GenericMethod ("emit_organizationNameChanged", "@brief Emitter for signal void QApplication::organizationNameChanged()\nCall this method to emit this signal.", false, &_init_emitter_organizationNameChanged_0, &_call_emitter_organizationNameChanged_0);
   methods += new qt_gsi::GenericMethod ("emit_paletteChanged", "@brief Emitter for signal void QApplication::paletteChanged(const QPalette &pal)\nCall this method to emit this signal.", false, &_init_emitter_paletteChanged_2113, &_call_emitter_paletteChanged_2113);

@@ -37,6 +37,8 @@
 #include "dbEdgePairs.h"
 #include "dbTexts.h"
 #include "dbLayoutUtils.h"
+#include "dbLayerMapping.h"
+#include "dbCellMapping.h"
 #include "tlStream.h"
 
 namespace gsi
@@ -822,6 +824,56 @@ static void scale_and_snap2 (db::Layout *layout, db::cell_index_type ci, db::Coo
   scale_and_snap (*layout, layout->cell (ci), g, m, d);
 }
 
+static void copy_tree_shapes2 (db::Layout *layout, const db::Layout &source_layout, const db::CellMapping &cm)
+{
+  if (layout == &source_layout) {
+    throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same layout")));
+  }
+
+  db::ICplxTrans trans (source_layout.dbu () / layout->dbu ());
+
+  db::LayerMapping lm;
+  lm.create_full (*layout, source_layout);
+
+  db::copy_shapes (*layout, source_layout, trans, cm.source_cells (), cm.table (), lm.table ());
+}
+
+static void copy_tree_shapes3 (db::Layout *layout, const db::Layout &source_layout, const db::CellMapping &cm, const db::LayerMapping &lm)
+{
+  if (layout == &source_layout) {
+    throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same layout")));
+  }
+
+  db::ICplxTrans trans (source_layout.dbu () / layout->dbu ());
+
+  db::copy_shapes (*layout, source_layout, trans, cm.source_cells (), cm.table (), lm.table ());
+}
+
+static void move_tree_shapes2 (db::Layout *layout, db::Layout &source_layout, const db::CellMapping &cm)
+{
+  if (layout == &source_layout) {
+    throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same layout")));
+  }
+
+  db::ICplxTrans trans (source_layout.dbu () / layout->dbu ());
+
+  db::LayerMapping lm;
+  lm.create_full (*layout, source_layout);
+
+  db::move_shapes (*layout, source_layout, trans, cm.source_cells (), cm.table (), lm.table ());
+}
+
+static void move_tree_shapes3 (db::Layout *layout, db::Layout &source_layout, const db::CellMapping &cm, const db::LayerMapping &lm)
+{
+  if (layout == &source_layout) {
+    throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same layout")));
+  }
+
+  db::ICplxTrans trans (source_layout.dbu () / layout->dbu ());
+
+  db::move_shapes (*layout, source_layout, trans, cm.source_cells (), cm.table (), lm.table ());
+}
+
 Class<db::MetaInfo> decl_LayoutMetaInfo ("db", "LayoutMetaInfo",
   gsi::constructor ("new", &layout_meta_info_ctor, gsi::arg ("name"), gsi::arg ("value"), gsi::arg ("description", std::string ()),
     "@brief Creates a layout meta info object\n"
@@ -1528,6 +1580,49 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "The number of layers reports the maximum (plus 1) layer index used so far. Not all of the layers with "
     "an index in the range of 0 to layers-1 needs to be a valid layer. These layers can be either valid, "
     "special or unused. Use \\is_valid_layer? and \\is_special_layer? to test for the first two states.\n"
+  ) +
+  gsi::method_ext ("copy_tree_shapes", &copy_tree_shapes2, gsi::arg ("source_layout"), gsi::arg ("cell_mapping"),
+    "@brief Copies the shapes for all given mappings in the \\CellMapping object\n"
+    "@param source_layout The layout where to take the shapes from\n"
+    "@param cell_mapping The cell mapping object that determines how cells are identified between source and target layout\n"
+    "\n"
+    "Provide a \\CellMapping object to specify pairs of cells which are mapped from the source layout to this "
+    "layout. When constructing such a cell mapping object for example with \\CellMapping#for_multi_cell_full, use self "
+    "as the target layout. During the cell mapping construction, the cell mapper will usually create a suitable target "
+    "hierarchy already. After having completed the cell mapping, use \\copy_tree_shapes to copy over the shapes from "
+    "the source to the target layout.\n"
+    "\n"
+    "This method has been added in version 0.26.8.\n"
+  ) +
+  gsi::method_ext ("copy_tree_shapes", &copy_tree_shapes3, gsi::arg ("source_layout"), gsi::arg ("cell_mapping"), gsi::arg ("layer_mapping"),
+    "@brief Copies the shapes for all given mappings in the \\CellMapping object using the given layer mapping\n"
+    "@param source_layout The layout where to take the shapes from\n"
+    "@param cell_mapping The cell mapping object that determines how cells are identified between source and target layout\n"
+    "@param layer_mapping Specifies which layers are copied from the source layout to the target layout\n"
+    "\n"
+    "Provide a \\CellMapping object to specify pairs of cells which are mapped from the source layout to this "
+    "layout. When constructing such a cell mapping object for example with \\CellMapping#for_multi_cell_full, use self "
+    "as the target layout. During the cell mapping construction, the cell mapper will usually create a suitable target "
+    "hierarchy already. After having completed the cell mapping, use \\copy_tree_shapes to copy over the shapes from "
+    "the source to the target layout.\n"
+    "\n"
+    "This method has been added in version 0.26.8.\n"
+  ) +
+  gsi::method_ext ("move_tree_shapes", &move_tree_shapes2, gsi::arg ("source_layout"), gsi::arg ("cell_mapping"),
+    "@brief Moves the shapes for all given mappings in the \\CellMapping object\n"
+    "\n"
+    "This method acts like the corresponding \\copy_tree_shapes method, but removes the shapes from the source layout "
+    "after they have been copied.\n"
+    "\n"
+    "This method has been added in version 0.26.8.\n"
+  ) +
+  gsi::method_ext ("move_tree_shapes", &move_tree_shapes3, gsi::arg ("source_layout"), gsi::arg ("cell_mapping"), gsi::arg ("layer_mapping"),
+    "@brief Moves the shapes for all given mappings in the \\CellMapping object using the given layer mapping\n"
+    "\n"
+    "This method acts like the corresponding \\copy_tree_shapes method, but removes the shapes from the source layout "
+    "after they have been copied.\n"
+    "\n"
+    "This method has been added in version 0.26.8.\n"
   ) +
   gsi::method_ext ("scale_and_snap", &scale_and_snap1, gsi::arg ("cell"), gsi::arg ("grid"), gsi::arg ("mult"), gsi::arg ("div"),
     "@brief Scales and snaps the layout below a given cell by the given rational factor and snaps to the given grid\n"

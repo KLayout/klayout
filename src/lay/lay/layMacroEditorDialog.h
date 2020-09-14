@@ -35,6 +35,7 @@
 #include "tlFileSystemWatcher.h"
 #include "tlDeferredExecution.h"
 #include "tlScriptError.h"
+#include "tlInclude.h"
 #include "lymMacro.h"
 #include "gsiInterpreter.h"
 
@@ -290,6 +291,7 @@ private:
   void select_trace (size_t index);
   bool configure (const std::string &name, const std::string &value);
   void config_finalize ();
+  void translate_pseudo_id (size_t &file_id, int &line);
 
   lay::Dispatcher *mp_plugin_root;
   lym::MacroCollection *mp_root;
@@ -312,6 +314,9 @@ private:
   QTextCharFormat m_stderr_format;
   MacroEditorHighlighters m_highlighters;
   std::vector<std::pair<lym::Macro *, MacroEditorPage *> > m_file_to_widget;
+  std::vector<tl::IncludeExpander> m_include_expanders;
+  std::map<std::string, size_t> m_include_paths_to_ids;
+  std::map<std::pair<size_t, int>, std::pair<size_t, int> > m_include_file_id_cache;
   std::vector<lay::MacroEditorTree *> m_macro_trees;
   bool m_in_exec, m_in_breakpoint;
   gsi::Interpreter *mp_exec_controller, *mp_current_interpreter;

@@ -1,0 +1,32 @@
+VERSION 5.8 ;
+DIVIDERCHAR "/" ;
+BUSBITCHARS "[]" ;
+DESIGN chip_top ;
+UNITS DISTANCE MICRONS 1000 ;
+DIEAREA ( 0 0 ) ( 8729280 8199360 ) ;
+SCANCHAINS 9992 ;
+ - chain1
+   + PARTITION part/Y_45_45_0.720000
+   + START whereever/anchor_buf_8 Y
+   + FLOATING
+   dumdidum/_reg_1_reg_2_ ( IN SI ) ( OUT Q )
+   dumdidum/_reg_1_reg_2_ ( IN SI ) ( OUT Q )
+   dumdidum/_reg_1_reg_7_ ( IN SI ) ( OUT Q )
+   dumdidum/_reg_1_reg_8_ ( IN SI ) ( OUT Q )
+   dumdidum/_reg_1_reg_5_ ( IN SI ) ( OUT Q )
+   dumdidum/_reg_1_reg_9_ ( IN SI ) ( OUT Q )
+   dumdidum/_reg_1_reg_6_ ( IN SI ) ( OUT Q )
+   dumdidum/_reg_1_reg_4_ ( IN SI ) ( OUT Q )
+   dumdidum/_reg_1_reg_7_ ( IN SI ) ( OUT Q )
+   dumdidum/_reg_1_reg_1_ ( IN SI ) ( OUT Q )
+   dumdidum/_reg_1_reg_3_ ( IN SI ) ( OUT Q )
+   dumdidum/_reg_1_reg_1_ ( IN SI ) ( OUT Q )
+   dumdidum/_reg_1_reg_0_ ( IN SI ) ( OUT Q )
+   dumdidum/_reg_1_reg_4_ ( IN SI ) ( OUT Q )
+   dumdidum/_reg_1_reg_0_ ( IN SI ) ( OUT Q )
+   dumdidum/_reg_1_reg_6_ ( IN SI ) ( OUT Q )
+   dumdidum/_reg_1_reg_3_ ( IN SI ) ( OUT Q )
+   dumdidum/_reg_1_reg_5_ ( IN SI ) ( OUT Q )
+   + STOP somewhere/LOCKUP D ;
+END SCANCHAINS
+END DESIGN

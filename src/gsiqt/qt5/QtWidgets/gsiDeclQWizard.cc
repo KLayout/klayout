@@ -944,6 +944,7 @@ static gsi::Methods methods_QWizard () {
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QWizard::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("finished(int)", "finished", gsi::arg("result"), "@brief Signal declaration for QWizard::finished(int result)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("helpRequested()", "helpRequested", "@brief Signal declaration for QWizard::helpRequested()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QWizard::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("pageAdded(int)", "pageAdded", gsi::arg("id"), "@brief Signal declaration for QWizard::pageAdded(int id)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("pageRemoved(int)", "pageRemoved", gsi::arg("id"), "@brief Signal declaration for QWizard::pageRemoved(int id)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("rejected()", "rejected", "@brief Signal declaration for QWizard::rejected()\nYou can bind a procedure to this signal.");
@@ -1185,6 +1186,13 @@ public:
     } else {
       return QWizard::nextId();
     }
+  }
+
+  //  [emitter impl] void QWizard::objectNameChanged(const QString &objectName)
+  void emitter_QWizard_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QWizard::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QWizard::open()
@@ -3175,6 +3183,24 @@ static void _set_callback_cbs_nextId_c0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
+// emitter void QWizard::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QWizard_Adaptor *)cls)->emitter_QWizard_objectNameChanged_4567 (arg1);
+}
+
+
 // void QWizard::open()
 
 static void _init_cbs_open_0_0 (qt_gsi::GenericMethod *decl)
@@ -3748,6 +3774,7 @@ static gsi::Methods methods_QWizard_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@hide", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0, &_set_callback_cbs_nativeEvent_4678_0);
   methods += new qt_gsi::GenericMethod ("nextId", "@brief Virtual method int QWizard::nextId()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_nextId_c0_0, &_call_cbs_nextId_c0_0);
   methods += new qt_gsi::GenericMethod ("nextId", "@hide", true, &_init_cbs_nextId_c0_0, &_call_cbs_nextId_c0_0, &_set_callback_cbs_nextId_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QWizard::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("open", "@brief Virtual method void QWizard::open()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_open_0_0, &_call_cbs_open_0_0);
   methods += new qt_gsi::GenericMethod ("open", "@hide", false, &_init_cbs_open_0_0, &_call_cbs_open_0_0, &_set_callback_cbs_open_0_0);
   methods += new qt_gsi::GenericMethod ("emit_pageAdded", "@brief Emitter for signal void QWizard::pageAdded(int id)\nCall this method to emit this signal.", false, &_init_emitter_pageAdded_767, &_call_emitter_pageAdded_767);

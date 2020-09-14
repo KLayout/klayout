@@ -69,6 +69,60 @@
   </p>
 
 
+  <h2>Including other files</h2>
+
+  <p>
+  The DRC script language is based on Ruby which delivers many native language
+  features. Basically, inside a script you can include another script through
+  "load". This will read a file and execute the content of this file in the
+  context of the script it is loaded into.
+  </p>
+
+  <p>
+  Unfortunately, "load" creates a local context for variables. Hence it's not
+  possible for example to use "load" to read a file that defines variables for further 
+  use in the DRC script.
+  </p>
+
+  <p>
+  To overcome this problem, KLayout offers a specific extension which embeds
+  another file into the source by employing some kind of preprocessing.
+  This way, a file can be included into another one like it was pasted at 
+  this place.
+  </p>
+
+  <p>
+  The notation is this:
+  </p>
+
+  <pre>
+# %include to_include.drc
+</pre>
+
+  <p>
+  which will include "include.drc". If no absolute path is given, this file is looked
+  up relative to the file it is included in.
+  </p>
+
+  <p>
+  The file name can be put in quotes as well. Expression interpolation is supported
+  (for the notation see <link href="/about/expressions.xml"/>). Hence it is 
+  possible to access environment variables for example like this:
+  </p>
+
+  <pre>
+# %include $(env("HOME"))/to_include.drc
+</pre>
+
+  <p>
+  Because Ruby does not see the original files, some internals (e.g. 
+  introspection) will report wrong file names and line numbers. In most
+  cases - for example when using "__FILE__" or "__LINE__" or when receiving stack
+  traces and errors - the file names and line numbers will correctly refer
+  to the source files before include file processing.
+  </p>
+
+
   <h2>Input and output</h2>
 
   <p>

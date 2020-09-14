@@ -375,6 +375,7 @@ static gsi::Methods methods_QSystemTrayIcon () {
   methods += gsi::qt_signal<const qt_gsi::Converter<QSystemTrayIcon::ActivationReason>::target_type & > ("activated(QSystemTrayIcon::ActivationReason)", "activated", gsi::arg("reason"), "@brief Signal declaration for QSystemTrayIcon::activated(QSystemTrayIcon::ActivationReason reason)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QSystemTrayIcon::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("messageClicked()", "messageClicked", "@brief Signal declaration for QSystemTrayIcon::messageClicked()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QSystemTrayIcon::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("isSystemTrayAvailable?", "@brief Static method bool QSystemTrayIcon::isSystemTrayAvailable()\nThis method is static and can be called without an instance.", &_init_f_isSystemTrayAvailable_0, &_call_f_isSystemTrayAvailable_0);
   methods += new qt_gsi::GenericStaticMethod ("supportsMessages", "@brief Static method bool QSystemTrayIcon::supportsMessages()\nThis method is static and can be called without an instance.", &_init_f_supportsMessages_0, &_call_f_supportsMessages_0);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QSystemTrayIcon::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
@@ -474,6 +475,13 @@ public:
   void emitter_QSystemTrayIcon_messageClicked_0()
   {
     emit QSystemTrayIcon::messageClicked();
+  }
+
+  //  [emitter impl] void QSystemTrayIcon::objectNameChanged(const QString &objectName)
+  void emitter_QSystemTrayIcon_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QSystemTrayIcon::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QSystemTrayIcon::childEvent(QChildEvent *)
@@ -789,6 +797,24 @@ static void _call_emitter_messageClicked_0 (const qt_gsi::GenericMethod * /*decl
 }
 
 
+// emitter void QSystemTrayIcon::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QSystemTrayIcon_Adaptor *)cls)->emitter_QSystemTrayIcon_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QSystemTrayIcon::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -882,6 +908,7 @@ static gsi::Methods methods_QSystemTrayIcon_Adaptor () {
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QSystemTrayIcon::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("emit_messageClicked", "@brief Emitter for signal void QSystemTrayIcon::messageClicked()\nCall this method to emit this signal.", false, &_init_emitter_messageClicked_0, &_call_emitter_messageClicked_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QSystemTrayIcon::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QSystemTrayIcon::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QSystemTrayIcon::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QSystemTrayIcon::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);

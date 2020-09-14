@@ -688,6 +688,7 @@ static gsi::Methods methods_QFile () {
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QFile::aboutToClose()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64 > ("bytesWritten(qint64)", "bytesWritten", gsi::arg("bytes"), "@brief Signal declaration for QFile::bytesWritten(qint64 bytes)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QFile::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QFile::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("readChannelFinished()", "readChannelFinished", "@brief Signal declaration for QFile::readChannelFinished()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("readyRead()", "readyRead", "@brief Signal declaration for QFile::readyRead()\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("copy", "@brief Static method bool QFile::copy(const QString &fileName, const QString &newName)\nThis method is static and can be called without an instance.", &_init_f_copy_3942, &_call_f_copy_3942);

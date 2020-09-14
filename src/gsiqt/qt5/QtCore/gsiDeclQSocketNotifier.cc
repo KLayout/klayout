@@ -180,7 +180,9 @@ static gsi::Methods methods_QSocketNotifier () {
   methods += new qt_gsi::GenericMethod ("setEnabled|enabled=", "@brief Method void QSocketNotifier::setEnabled(bool)\n", false, &_init_f_setEnabled_864, &_call_f_setEnabled_864);
   methods += new qt_gsi::GenericMethod ("socket", "@brief Method QIntegerForSizeof<void*>::Signed QSocketNotifier::socket()\n", true, &_init_f_socket_c0, &_call_f_socket_c0);
   methods += new qt_gsi::GenericMethod ("type", "@brief Method QSocketNotifier::Type QSocketNotifier::type()\n", true, &_init_f_type_c0, &_call_f_type_c0);
+  methods += gsi::qt_signal<int > ("activated(int)", "activated", gsi::arg("socket"), "@brief Signal declaration for QSocketNotifier::activated(int socket)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QSocketNotifier::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QSocketNotifier::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QSocketNotifier::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QSocketNotifier::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -235,6 +237,13 @@ public:
     return QSocketNotifier::senderSignalIndex();
   }
 
+  //  [emitter impl] void QSocketNotifier::activated(int socket)
+  void emitter_QSocketNotifier_activated_4159(int socket)
+  {
+    __SUPPRESS_UNUSED_WARNING (socket);
+    throw tl::Exception ("Can't emit private signal 'void QSocketNotifier::activated(int socket)'");
+  }
+
   //  [emitter impl] void QSocketNotifier::destroyed(QObject *)
   void emitter_QSocketNotifier_destroyed_1302(QObject *arg1)
   {
@@ -254,6 +263,13 @@ public:
     } else {
       return QSocketNotifier::eventFilter(arg1, arg2);
     }
+  }
+
+  //  [emitter impl] void QSocketNotifier::objectNameChanged(const QString &objectName)
+  void emitter_QSocketNotifier_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QSocketNotifier::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QSocketNotifier::childEvent(QChildEvent *)
@@ -362,6 +378,24 @@ static void _call_ctor_QSocketNotifier_Adaptor_7056 (const qt_gsi::GenericStatic
   const qt_gsi::Converter<QSocketNotifier::Type>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QSocketNotifier::Type>::target_type & >() (args, heap);
   QObject *arg3 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QSocketNotifier_Adaptor *> (new QSocketNotifier_Adaptor (arg1, qt_gsi::QtToCppAdaptor<QSocketNotifier::Type>(arg2).cref(), arg3));
+}
+
+
+// emitter void QSocketNotifier::activated(int socket)
+
+static void _init_emitter_activated_4159 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("socket");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_activated_4159 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QSocketNotifier_Adaptor *)cls)->emitter_QSocketNotifier_activated_4159 (arg1);
 }
 
 
@@ -522,6 +556,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QSocketNotifier::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QSocketNotifier_Adaptor *)cls)->emitter_QSocketNotifier_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QSocketNotifier::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -600,6 +652,7 @@ gsi::Class<QSocketNotifier> &qtdecl_QSocketNotifier ();
 static gsi::Methods methods_QSocketNotifier_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSocketNotifier::QSocketNotifier(QIntegerForSizeof<void*>::Signed socket, QSocketNotifier::Type, QObject *parent)\nThis method creates an object of class QSocketNotifier.", &_init_ctor_QSocketNotifier_Adaptor_7056, &_call_ctor_QSocketNotifier_Adaptor_7056);
+  methods += new qt_gsi::GenericMethod ("emit_activated", "@brief Emitter for signal void QSocketNotifier::activated(int socket)\nCall this method to emit this signal.", false, &_init_emitter_activated_4159, &_call_emitter_activated_4159);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QSocketNotifier::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QSocketNotifier::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
@@ -612,6 +665,7 @@ static gsi::Methods methods_QSocketNotifier_Adaptor () {
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QSocketNotifier::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QSocketNotifier::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QSocketNotifier::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QSocketNotifier::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QSocketNotifier::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QSocketNotifier::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);

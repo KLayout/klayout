@@ -99,6 +99,8 @@ private:
   //  generic
   db::LayerMap m_layer_map;
   bool m_create_other_layers;
+  double m_dbu;
+  bool m_keep_layer_names;
 
   //  common GDS2+OASIS
   bool m_common_enable_text_objects;
@@ -115,11 +117,8 @@ private:
 
   //  CIF
   unsigned int m_cif_wire_mode;
-  double m_cif_dbu;
-  bool m_cif_keep_layer_names;
 
   //  DXF
-  double m_dxf_dbu;
   double m_dxf_unit;
   double m_dxf_text_scaling;
   int m_dxf_polyline_mode;
@@ -127,19 +126,60 @@ private:
   double m_dxf_circle_accuracy;
   double m_dxf_contour_accuracy;
   bool m_dxf_render_texts_as_polygons;
-  bool m_dxf_keep_layer_names;
   bool m_dxf_keep_other_cells;
 
   //  MAGIC
   double m_magic_lambda;
-  double m_magic_dbu;
-  bool m_magic_keep_layer_names;
   bool m_magic_merge;
   std::vector<std::string> m_magic_lib_path;
 
   void set_layer_map (const std::string &lm);
   void set_dbu (double dbu);
   void set_read_named_layers (bool f);
+
+  //  LEFDEF
+  bool m_lefdef_produce_net_names;
+  std::string m_lefdef_net_property_name;
+  bool m_lefdef_produce_inst_names;
+  std::string m_lefdef_inst_property_name;
+  bool m_lefdef_produce_pin_names;
+  std::string m_lefdef_pin_property_name;
+  bool m_lefdef_produce_cell_outlines;
+  std::string m_lefdef_cell_outline_layer;
+  bool m_lefdef_produce_placement_blockages;
+  std::string m_lefdef_placement_blockage_layer;
+  bool m_lefdef_produce_regions;
+  std::string m_lefdef_region_layer;
+  bool m_lefdef_produce_via_geometry;
+  std::string m_lefdef_via_geometry_suffix;
+  std::string m_lefdef_via_geometry_datatype;
+  std::string m_lefdef_via_cellname_prefix;
+  bool m_lefdef_produce_pins;
+  std::string m_lefdef_pins_suffix;
+  std::string m_lefdef_pins_datatype;
+  bool m_lefdef_produce_lef_pins;
+  std::string m_lefdef_lef_pins_suffix;
+  std::string m_lefdef_lef_pins_datatype;
+  bool m_lefdef_produce_obstructions;
+  std::string m_lefdef_obstruction_suffix;
+  int m_lefdef_obstruction_datatype;
+  bool m_lefdef_produce_blockages;
+  std::string m_lefdef_blockage_suffix;
+  int m_lefdef_blockage_datatype;
+  bool m_lefdef_produce_labels;
+  std::string m_lefdef_label_suffix;
+  int m_lefdef_label_datatype;
+  bool m_lefdef_produce_routing;
+  std::string m_lefdef_routing_suffix;
+  std::string m_lefdef_routing_datatype;
+  bool m_lefdef_produce_special_routing;
+  std::string m_lefdef_special_routing_suffix;
+  std::string m_lefdef_special_routing_datatype;
+  std::vector<std::string> m_lefdef_lef_files;
+  bool m_lefdef_read_lef_with_def;
+  bool m_lefdef_separate_groups;
+  std::string m_lefdef_map_file;
+  bool m_lefdef_produce_lef_macros;
 };
 
 }

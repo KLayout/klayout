@@ -6,7 +6,8 @@ TARGET = lefdef_tests
 include($$PWD/../../../../lib_ut.pri)
 
 SOURCES = \
-    dbLEFDEFImport.cc
+    dbLEFDEFImportTests.cc \
+    dbLEFDEFReaderOptionsTests.cc
 
 INCLUDEPATH += $$LAY_INC $$TL_INC $$DB_INC $$GSI_INC $$PWD/../db_plugin $$PWD/../../../common
 DEPENDPATH += $$LAY_INC $$TL_INC $$DB_INC $$GSI_INC $$PWD/../db_plugin $$PWD/../../../common

@@ -398,18 +398,18 @@ public:
    *  @brief Connects the given layer with a global net with the given name
    *  Returns the global net ID
    */
-  void connect_global (const db::Region &l, const std::string &gn)
+  size_t connect_global (const db::Region &l, const std::string &gn)
   {
-    connect_global_impl (l, gn);
+    return connect_global_impl (l, gn);
   }
 
   /**
    *  @brief Connects the given text layer with a global net with the given name
    *  Returns the global net ID
    */
-  void connect_global (const db::Texts &l, const std::string &gn)
+  size_t connect_global (const db::Texts &l, const std::string &gn)
   {
-    connect_global_impl (l, gn);
+    return connect_global_impl (l, gn);
   }
 
   /**
@@ -872,7 +872,7 @@ private:
   db::properties_id_type make_netname_propid (db::Layout &ly, const tl::Variant &netname_prop, const db::Net &net) const;
   db::CellMapping make_cell_mapping_into (db::Layout &layout, db::Cell &cell, const std::vector<const db::Net *> *nets, bool with_device_cells);
   void connect_impl (const db::ShapeCollection &a, const db::ShapeCollection &b);
-  void connect_global_impl (const db::ShapeCollection &l, const std::string &gn);
+  size_t connect_global_impl (const db::ShapeCollection &l, const std::string &gn);
 
   //  implementation of NetlistManipulationCallbacks
   virtual size_t link_net_to_parent_circuit (const Net *subcircuit_net, Circuit *parent_circuit, const DCplxTrans &trans);

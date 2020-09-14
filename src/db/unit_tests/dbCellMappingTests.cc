@@ -453,3 +453,40 @@ TEST(6)
   EXPECT_EQ (l2s (h), "a0top#0:cell_index=1 r90 0,0 array=(0,10,10,0 5x2),cell_index=2 r90 0,0 array=(0,10,10,0 5x2);a4#1:;a5#2:");
 }
 
+//  Multi-mapping
+TEST(7)
+{
+  std::auto_ptr<db::Layout> g (new db::Layout ());
+  db::Cell &a0 (g->cell (g->add_cell ("a0")));
+  db::Cell &a1 (g->cell (g->add_cell ("a1")));
+  db::Cell &a2 (g->cell (g->add_cell ("a2")));
+  db::Cell &a3 (g->cell (g->add_cell ("a3")));
+  db::Cell &a4 = g->cell (g->add_cell ("a4"));
+  db::Cell &a5 = g->cell (g->add_cell ("a5"));
+
+  a3.insert (db::CellInstArray (db::CellInst (a4.cell_index ()), db::Trans ()));
+  a3.insert (db::CellInstArray (db::CellInst (a5.cell_index ()), db::Trans ()));
+
+  a1.insert (db::CellInstArray (db::CellInst (a4.cell_index ()), db::Trans ()));
+  a1.insert (db::CellInstArray (db::CellInst (a3.cell_index ()), db::Trans ()));
+  a2.insert (db::CellInstArray (db::CellInst (a4.cell_index ()), db::Trans ()));
+
+  db::Layout h;
+  db::Cell &b0 (h.cell (h.add_cell ("b0")));
+  db::Cell &b1 (h.cell (h.add_cell ("b1")));
+  db::Cell &b2 (h.cell (h.add_cell ("b2")));
+
+  db::CellMapping cm;
+  std::vector<db::cell_index_type> cib, cia;
+  cia.push_back (a0.cell_index ());
+  cia.push_back (a1.cell_index ());
+  cia.push_back (a2.cell_index ());
+  cib.push_back (b0.cell_index ());
+  cib.push_back (b1.cell_index ());
+  cib.push_back (b2.cell_index ());
+  cm.create_multi_mapping_full (h, cib, *g, cia);
+  EXPECT_EQ (m2s (cm, *g, h), "a0->b0;a1->b1;a2->b2;a3->a3;a4->a4;a5->a5");
+
+  EXPECT_EQ (l2s (h), "b0#0:;b1#1:cell_index=3 r0 0,0,cell_index=4 r0 0,0;b2#2:cell_index=4 r0 0,0;a3#3:cell_index=4 r0 0,0,cell_index=5 r0 0,0;a4#4:;a5#5:");
+}
+

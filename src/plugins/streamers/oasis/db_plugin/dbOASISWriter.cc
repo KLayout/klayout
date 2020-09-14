@@ -2754,7 +2754,7 @@ OASISWriter::write (const db::Path &path, db::properties_id_type prop_id, const 
     if (hw * 2 != w) {
       std::string msg = tl::to_string (tr ("Paths with odd width cannot be written to OASIS files (cell ")) + mp_layout->cell_name (mp_cell->cell_index ()) + tl::to_string (tr (", position ")) + tl::to_string (start.x ()) + ", " + tl::to_string (start.y ()) + " DBU)";
       if (m_options.permissive) {
-        tl::warn << msg << " - " << tl::to_string (tr ("path diameter is rounded"));
+        tl::warn << msg << " - " << tl::sprintf (tl::to_string (tr ("path width is rounded from %d to %d DBU")), w, hw * 2);
       } else {
         throw tl::Exception (msg);
       }

@@ -534,7 +534,7 @@ class QtBinding_TestClass < TestBase
 
     GC.start
 
-    assert_equal(ef.log.select { |s| s !~ /RBA::QKeyEvent(_Native)?: ShortcutOverride/ }.join("\n"), "RBA::QKeyEvent: KeyPress (6)\nRBA::QKeyEvent: KeyPress (6)\nRBA::QKeyEvent: KeyPress (6)")
+    assert_equal(ef.log.select { |s| s !~ /RBA::QKeyEvent(_Native)?: ShortcutOverride/ && s !~ /RBA::QEvent(_Native)/ }.join("\n"), "RBA::QKeyEvent: KeyPress (6)\nRBA::QKeyEvent: KeyPress (6)\nRBA::QKeyEvent: KeyPress (6)")
 
     ef = nil
     ef = EventFilter::new
@@ -670,6 +670,34 @@ class QtBinding_TestClass < TestBase
     assert_equal(wc._destroyed?, false)
     wc._destroy
     assert_equal(wc._destroyed?, true)
+
+  end
+
+  def test_50
+
+    # QObject signals
+
+    w = RBA::QObject::new
+
+    if w.respond_to?(:objectNameChanged)   # Qt5
+
+      on = nil
+      w.objectNameChanged do |name|
+        on = name
+      end
+
+      w.objectName = "uvw"
+      assert_equal(on, "uvw")
+
+    end
+
+    od = false
+    w.destroyed do |name|
+      od = true
+    end
+
+    w._destroy
+    assert_equal(od, true)
 
   end
 

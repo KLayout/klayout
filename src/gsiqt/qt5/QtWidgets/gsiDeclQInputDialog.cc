@@ -1206,6 +1206,7 @@ static gsi::Methods methods_QInputDialog () {
   methods += gsi::qt_signal<int > ("finished(int)", "finished", gsi::arg("result"), "@brief Signal declaration for QInputDialog::finished(int result)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("intValueChanged(int)", "intValueChanged", gsi::arg("value"), "@brief Signal declaration for QInputDialog::intValueChanged(int value)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("intValueSelected(int)", "intValueSelected", gsi::arg("value"), "@brief Signal declaration for QInputDialog::intValueSelected(int value)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QInputDialog::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("rejected()", "rejected", "@brief Signal declaration for QInputDialog::rejected()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("textValueChanged(const QString &)", "textValueChanged", gsi::arg("text"), "@brief Signal declaration for QInputDialog::textValueChanged(const QString &text)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("textValueSelected(const QString &)", "textValueSelected", gsi::arg("text"), "@brief Signal declaration for QInputDialog::textValueSelected(const QString &text)\nYou can bind a procedure to this signal.");
@@ -1458,6 +1459,13 @@ public:
     } else {
       return QInputDialog::minimumSizeHint();
     }
+  }
+
+  //  [emitter impl] void QInputDialog::objectNameChanged(const QString &objectName)
+  void emitter_QInputDialog_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QInputDialog::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QInputDialog::open()
@@ -3339,6 +3347,24 @@ static void _set_callback_cbs_nativeEvent_4678_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QInputDialog::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QInputDialog_Adaptor *)cls)->emitter_QInputDialog_objectNameChanged_4567 (arg1);
+}
+
+
 // void QInputDialog::open()
 
 static void _init_cbs_open_0_0 (qt_gsi::GenericMethod *decl)
@@ -3888,6 +3914,7 @@ static gsi::Methods methods_QInputDialog_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*moveEvent", "@hide", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0, &_set_callback_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@brief Virtual method bool QInputDialog::nativeEvent(const QByteArray &eventType, void *message, long int *result)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@hide", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0, &_set_callback_cbs_nativeEvent_4678_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QInputDialog::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("open", "@brief Virtual method void QInputDialog::open()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_open_0_0, &_call_cbs_open_0_0);
   methods += new qt_gsi::GenericMethod ("open", "@hide", false, &_init_cbs_open_0_0, &_call_cbs_open_0_0, &_set_callback_cbs_open_0_0);
   methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Virtual method QPaintEngine *QInputDialog::paintEngine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0);

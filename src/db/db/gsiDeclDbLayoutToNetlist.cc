@@ -357,12 +357,12 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "This variant has been introduced in version 0.27.\n"
   ) +
-  gsi::method ("connect_global", (void (db::LayoutToNetlist::*) (const db::Region &, const std::string &)) &db::LayoutToNetlist::connect_global, gsi::arg ("l"), gsi::arg ("global_net_name"),
+  gsi::method ("connect_global", (size_t (db::LayoutToNetlist::*) (const db::Region &, const std::string &)) &db::LayoutToNetlist::connect_global, gsi::arg ("l"), gsi::arg ("global_net_name"),
     "@brief Defines a connection of the given layer with a global net.\n"
     "This method returns the ID of the global net. Use \\global_net_name to get "
     "the name back from the ID."
   ) +
-  gsi::method ("connect_global", (void (db::LayoutToNetlist::*) (const db::Texts &, const std::string &)) &db::LayoutToNetlist::connect_global, gsi::arg ("l"), gsi::arg ("global_net_name"),
+  gsi::method ("connect_global", (size_t (db::LayoutToNetlist::*) (const db::Texts &, const std::string &)) &db::LayoutToNetlist::connect_global, gsi::arg ("l"), gsi::arg ("global_net_name"),
     "@brief Defines a connection of the given text layer with a global net.\n"
     "This method returns the ID of the global net. Use \\global_net_name to get "
     "the name back from the ID."

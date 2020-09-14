@@ -270,6 +270,7 @@ static gsi::Methods methods_QAbstractNetworkCache () {
   methods += new qt_gsi::GenericMethod ("remove", "@brief Method bool QAbstractNetworkCache::remove(const QUrl &url)\n", false, &_init_f_remove_1701, &_call_f_remove_1701);
   methods += new qt_gsi::GenericMethod ("updateMetaData", "@brief Method void QAbstractNetworkCache::updateMetaData(const QNetworkCacheMetaData &metaData)\n", false, &_init_f_updateMetaData_3377, &_call_f_updateMetaData_3377);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAbstractNetworkCache::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QAbstractNetworkCache::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QAbstractNetworkCache::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QAbstractNetworkCache::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -430,6 +431,13 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("metaData");
     }
+  }
+
+  //  [emitter impl] void QAbstractNetworkCache::objectNameChanged(const QString &objectName)
+  void emitter_QAbstractNetworkCache_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QAbstractNetworkCache::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] QIODevice *QAbstractNetworkCache::prepare(const QNetworkCacheMetaData &metaData)
@@ -838,6 +846,24 @@ static void _set_callback_cbs_metaData_1701_0 (void *cls, const gsi::Callback &c
 }
 
 
+// emitter void QAbstractNetworkCache::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QAbstractNetworkCache_Adaptor *)cls)->emitter_QAbstractNetworkCache_objectNameChanged_4567 (arg1);
+}
+
+
 // QIODevice *QAbstractNetworkCache::prepare(const QNetworkCacheMetaData &metaData)
 
 static void _init_cbs_prepare_3377_0 (qt_gsi::GenericMethod *decl)
@@ -1008,6 +1034,7 @@ static gsi::Methods methods_QAbstractNetworkCache_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QAbstractNetworkCache::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("metaData", "@brief Virtual method QNetworkCacheMetaData QAbstractNetworkCache::metaData(const QUrl &url)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_metaData_1701_0, &_call_cbs_metaData_1701_0);
   methods += new qt_gsi::GenericMethod ("metaData", "@hide", false, &_init_cbs_metaData_1701_0, &_call_cbs_metaData_1701_0, &_set_callback_cbs_metaData_1701_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QAbstractNetworkCache::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("prepare", "@brief Virtual method QIODevice *QAbstractNetworkCache::prepare(const QNetworkCacheMetaData &metaData)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_prepare_3377_0, &_call_cbs_prepare_3377_0);
   methods += new qt_gsi::GenericMethod ("prepare", "@hide", false, &_init_cbs_prepare_3377_0, &_call_cbs_prepare_3377_0, &_set_callback_cbs_prepare_3377_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QAbstractNetworkCache::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);

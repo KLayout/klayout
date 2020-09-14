@@ -1368,12 +1368,27 @@ static gsi::Methods methods_QStandardItemModel () {
   methods += new qt_gsi::GenericMethod ("takeRow", "@brief Method QList<QStandardItem*> QStandardItemModel::takeRow(int row)\n", false, &_init_f_takeRow_767, &_call_f_takeRow_767);
   methods += new qt_gsi::GenericMethod ("takeVerticalHeaderItem", "@brief Method QStandardItem *QStandardItemModel::takeVerticalHeaderItem(int row)\n", false, &_init_f_takeVerticalHeaderItem_767, &_call_f_takeVerticalHeaderItem_767);
   methods += new qt_gsi::GenericMethod ("verticalHeaderItem", "@brief Method QStandardItem *QStandardItemModel::verticalHeaderItem(int row)\n", true, &_init_f_verticalHeaderItem_c767, &_call_f_verticalHeaderItem_c767);
+  methods += gsi::qt_signal<const QModelIndex &, int, int > ("columnsAboutToBeInserted(const QModelIndex &, int, int)", "columnsAboutToBeInserted", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QStandardItemModel::columnsAboutToBeInserted(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int, const QModelIndex &, int > ("columnsAboutToBeMoved(const QModelIndex &, int, int, const QModelIndex &, int)", "columnsAboutToBeMoved", gsi::arg("sourceParent"), gsi::arg("sourceStart"), gsi::arg("sourceEnd"), gsi::arg("destinationParent"), gsi::arg("destinationColumn"), "@brief Signal declaration for QStandardItemModel::columnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int > ("columnsAboutToBeRemoved(const QModelIndex &, int, int)", "columnsAboutToBeRemoved", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QStandardItemModel::columnsAboutToBeRemoved(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int > ("columnsInserted(const QModelIndex &, int, int)", "columnsInserted", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QStandardItemModel::columnsInserted(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int, const QModelIndex &, int > ("columnsMoved(const QModelIndex &, int, int, const QModelIndex &, int)", "columnsMoved", gsi::arg("parent"), gsi::arg("start"), gsi::arg("end"), gsi::arg("destination"), gsi::arg("column"), "@brief Signal declaration for QStandardItemModel::columnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int > ("columnsRemoved(const QModelIndex &, int, int)", "columnsRemoved", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QStandardItemModel::columnsRemoved(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QModelIndex &, const QModelIndex &, const QVector<int> & > ("dataChanged(const QModelIndex &, const QModelIndex &, const QVector<int> &)", "dataChanged", gsi::arg("topLeft"), gsi::arg("bottomRight"), gsi::arg("roles"), "@brief Signal declaration for QStandardItemModel::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QStandardItemModel::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<Qt::Orientation>::target_type &, int, int > ("headerDataChanged(Qt::Orientation, int, int)", "headerDataChanged", gsi::arg("orientation"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QStandardItemModel::headerDataChanged(Qt::Orientation orientation, int first, int last)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QStandardItem * > ("itemChanged(QStandardItem *)", "itemChanged", gsi::arg("item"), "@brief Signal declaration for QStandardItemModel::itemChanged(QStandardItem *item)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QList<QPersistentModelIndex> &, const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & > ("layoutAboutToBeChanged(const QList<QPersistentModelIndex> &, QAbstractItemModel::LayoutChangeHint)", "layoutAboutToBeChanged", gsi::arg("parents"), gsi::arg("hint"), "@brief Signal declaration for QStandardItemModel::layoutAboutToBeChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QList<QPersistentModelIndex> &, const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & > ("layoutChanged(const QList<QPersistentModelIndex> &, QAbstractItemModel::LayoutChangeHint)", "layoutChanged", gsi::arg("parents"), gsi::arg("hint"), "@brief Signal declaration for QStandardItemModel::layoutChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("modelAboutToBeReset()", "modelAboutToBeReset", "@brief Signal declaration for QStandardItemModel::modelAboutToBeReset()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("modelReset()", "modelReset", "@brief Signal declaration for QStandardItemModel::modelReset()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QStandardItemModel::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int > ("rowsAboutToBeInserted(const QModelIndex &, int, int)", "rowsAboutToBeInserted", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QStandardItemModel::rowsAboutToBeInserted(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int, const QModelIndex &, int > ("rowsAboutToBeMoved(const QModelIndex &, int, int, const QModelIndex &, int)", "rowsAboutToBeMoved", gsi::arg("sourceParent"), gsi::arg("sourceStart"), gsi::arg("sourceEnd"), gsi::arg("destinationParent"), gsi::arg("destinationRow"), "@brief Signal declaration for QStandardItemModel::rowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int > ("rowsAboutToBeRemoved(const QModelIndex &, int, int)", "rowsAboutToBeRemoved", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QStandardItemModel::rowsAboutToBeRemoved(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int > ("rowsInserted(const QModelIndex &, int, int)", "rowsInserted", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QStandardItemModel::rowsInserted(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int, const QModelIndex &, int > ("rowsMoved(const QModelIndex &, int, int, const QModelIndex &, int)", "rowsMoved", gsi::arg("parent"), gsi::arg("start"), gsi::arg("end"), gsi::arg("destination"), gsi::arg("row"), "@brief Signal declaration for QStandardItemModel::rowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int > ("rowsRemoved(const QModelIndex &, int, int)", "rowsRemoved", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QStandardItemModel::rowsRemoved(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QStandardItemModel::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QStandardItemModel::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -1608,6 +1623,64 @@ public:
     } else {
       return QStandardItemModel::columnCount(parent);
     }
+  }
+
+  //  [emitter impl] void QStandardItemModel::columnsAboutToBeInserted(const QModelIndex &parent, int first, int last)
+  void emitter_QStandardItemModel_columnsAboutToBeInserted_7372(const QModelIndex &parent, int first, int last)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (first);
+    __SUPPRESS_UNUSED_WARNING (last);
+    throw tl::Exception ("Can't emit private signal 'void QStandardItemModel::columnsAboutToBeInserted(const QModelIndex &parent, int first, int last)'");
+  }
+
+  //  [emitter impl] void QStandardItemModel::columnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)
+  void emitter_QStandardItemModel_columnsAboutToBeMoved_10318(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)
+  {
+    __SUPPRESS_UNUSED_WARNING (sourceParent);
+    __SUPPRESS_UNUSED_WARNING (sourceStart);
+    __SUPPRESS_UNUSED_WARNING (sourceEnd);
+    __SUPPRESS_UNUSED_WARNING (destinationParent);
+    __SUPPRESS_UNUSED_WARNING (destinationColumn);
+    throw tl::Exception ("Can't emit private signal 'void QStandardItemModel::columnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)'");
+  }
+
+  //  [emitter impl] void QStandardItemModel::columnsAboutToBeRemoved(const QModelIndex &parent, int first, int last)
+  void emitter_QStandardItemModel_columnsAboutToBeRemoved_7372(const QModelIndex &parent, int first, int last)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (first);
+    __SUPPRESS_UNUSED_WARNING (last);
+    throw tl::Exception ("Can't emit private signal 'void QStandardItemModel::columnsAboutToBeRemoved(const QModelIndex &parent, int first, int last)'");
+  }
+
+  //  [emitter impl] void QStandardItemModel::columnsInserted(const QModelIndex &parent, int first, int last)
+  void emitter_QStandardItemModel_columnsInserted_7372(const QModelIndex &parent, int first, int last)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (first);
+    __SUPPRESS_UNUSED_WARNING (last);
+    throw tl::Exception ("Can't emit private signal 'void QStandardItemModel::columnsInserted(const QModelIndex &parent, int first, int last)'");
+  }
+
+  //  [emitter impl] void QStandardItemModel::columnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)
+  void emitter_QStandardItemModel_columnsMoved_10318(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (start);
+    __SUPPRESS_UNUSED_WARNING (end);
+    __SUPPRESS_UNUSED_WARNING (destination);
+    __SUPPRESS_UNUSED_WARNING (column);
+    throw tl::Exception ("Can't emit private signal 'void QStandardItemModel::columnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)'");
+  }
+
+  //  [emitter impl] void QStandardItemModel::columnsRemoved(const QModelIndex &parent, int first, int last)
+  void emitter_QStandardItemModel_columnsRemoved_7372(const QModelIndex &parent, int first, int last)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (first);
+    __SUPPRESS_UNUSED_WARNING (last);
+    throw tl::Exception ("Can't emit private signal 'void QStandardItemModel::columnsRemoved(const QModelIndex &parent, int first, int last)'");
   }
 
   //  [adaptor impl] QVariant QStandardItemModel::data(const QModelIndex &index, int role)
@@ -1871,6 +1944,18 @@ public:
     }
   }
 
+  //  [emitter impl] void QStandardItemModel::modelAboutToBeReset()
+  void emitter_QStandardItemModel_modelAboutToBeReset_3767()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QStandardItemModel::modelAboutToBeReset()'");
+  }
+
+  //  [emitter impl] void QStandardItemModel::modelReset()
+  void emitter_QStandardItemModel_modelReset_3767()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QStandardItemModel::modelReset()'");
+  }
+
   //  [adaptor impl] bool QStandardItemModel::moveColumns(const QModelIndex &sourceParent, int sourceColumn, int count, const QModelIndex &destinationParent, int destinationChild)
   bool cbs_moveColumns_6659_0(const QModelIndex &sourceParent, int sourceColumn, int count, const QModelIndex &destinationParent, int destinationChild)
   {
@@ -1899,6 +1984,13 @@ public:
     } else {
       return QStandardItemModel::moveRows(sourceParent, sourceRow, count, destinationParent, destinationChild);
     }
+  }
+
+  //  [emitter impl] void QStandardItemModel::objectNameChanged(const QString &objectName)
+  void emitter_QStandardItemModel_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QStandardItemModel::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] QModelIndex QStandardItemModel::parent(const QModelIndex &child)
@@ -1989,6 +2081,64 @@ public:
     } else {
       return QStandardItemModel::rowCount(parent);
     }
+  }
+
+  //  [emitter impl] void QStandardItemModel::rowsAboutToBeInserted(const QModelIndex &parent, int first, int last)
+  void emitter_QStandardItemModel_rowsAboutToBeInserted_7372(const QModelIndex &parent, int first, int last)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (first);
+    __SUPPRESS_UNUSED_WARNING (last);
+    throw tl::Exception ("Can't emit private signal 'void QStandardItemModel::rowsAboutToBeInserted(const QModelIndex &parent, int first, int last)'");
+  }
+
+  //  [emitter impl] void QStandardItemModel::rowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)
+  void emitter_QStandardItemModel_rowsAboutToBeMoved_10318(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)
+  {
+    __SUPPRESS_UNUSED_WARNING (sourceParent);
+    __SUPPRESS_UNUSED_WARNING (sourceStart);
+    __SUPPRESS_UNUSED_WARNING (sourceEnd);
+    __SUPPRESS_UNUSED_WARNING (destinationParent);
+    __SUPPRESS_UNUSED_WARNING (destinationRow);
+    throw tl::Exception ("Can't emit private signal 'void QStandardItemModel::rowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)'");
+  }
+
+  //  [emitter impl] void QStandardItemModel::rowsAboutToBeRemoved(const QModelIndex &parent, int first, int last)
+  void emitter_QStandardItemModel_rowsAboutToBeRemoved_7372(const QModelIndex &parent, int first, int last)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (first);
+    __SUPPRESS_UNUSED_WARNING (last);
+    throw tl::Exception ("Can't emit private signal 'void QStandardItemModel::rowsAboutToBeRemoved(const QModelIndex &parent, int first, int last)'");
+  }
+
+  //  [emitter impl] void QStandardItemModel::rowsInserted(const QModelIndex &parent, int first, int last)
+  void emitter_QStandardItemModel_rowsInserted_7372(const QModelIndex &parent, int first, int last)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (first);
+    __SUPPRESS_UNUSED_WARNING (last);
+    throw tl::Exception ("Can't emit private signal 'void QStandardItemModel::rowsInserted(const QModelIndex &parent, int first, int last)'");
+  }
+
+  //  [emitter impl] void QStandardItemModel::rowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)
+  void emitter_QStandardItemModel_rowsMoved_10318(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (start);
+    __SUPPRESS_UNUSED_WARNING (end);
+    __SUPPRESS_UNUSED_WARNING (destination);
+    __SUPPRESS_UNUSED_WARNING (row);
+    throw tl::Exception ("Can't emit private signal 'void QStandardItemModel::rowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)'");
+  }
+
+  //  [emitter impl] void QStandardItemModel::rowsRemoved(const QModelIndex &parent, int first, int last)
+  void emitter_QStandardItemModel_rowsRemoved_7372(const QModelIndex &parent, int first, int last)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (first);
+    __SUPPRESS_UNUSED_WARNING (last);
+    throw tl::Exception ("Can't emit private signal 'void QStandardItemModel::rowsRemoved(const QModelIndex &parent, int first, int last)'");
   }
 
   //  [adaptor impl] bool QStandardItemModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -2616,6 +2766,162 @@ static void _call_cbs_columnCount_c2395_1 (const qt_gsi::GenericMethod * /*decl*
 static void _set_callback_cbs_columnCount_c2395_1 (void *cls, const gsi::Callback &cb)
 {
   ((QStandardItemModel_Adaptor *)cls)->cb_columnCount_c2395_1 = cb;
+}
+
+
+// emitter void QStandardItemModel::columnsAboutToBeInserted(const QModelIndex &parent, int first, int last)
+
+static void _init_emitter_columnsAboutToBeInserted_7372 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("first");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("last");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_columnsAboutToBeInserted_7372 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_columnsAboutToBeInserted_7372 (arg1, arg2, arg3);
+}
+
+
+// emitter void QStandardItemModel::columnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)
+
+static void _init_emitter_columnsAboutToBeMoved_10318 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("sourceParent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("sourceStart");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("sourceEnd");
+  decl->add_arg<int > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("destinationParent");
+  decl->add_arg<const QModelIndex & > (argspec_3);
+  static gsi::ArgSpecBase argspec_4 ("destinationColumn");
+  decl->add_arg<int > (argspec_4);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_columnsAboutToBeMoved_10318 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg4 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
+  ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_columnsAboutToBeMoved_10318 (arg1, arg2, arg3, arg4, arg5);
+}
+
+
+// emitter void QStandardItemModel::columnsAboutToBeRemoved(const QModelIndex &parent, int first, int last)
+
+static void _init_emitter_columnsAboutToBeRemoved_7372 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("first");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("last");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_columnsAboutToBeRemoved_7372 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_columnsAboutToBeRemoved_7372 (arg1, arg2, arg3);
+}
+
+
+// emitter void QStandardItemModel::columnsInserted(const QModelIndex &parent, int first, int last)
+
+static void _init_emitter_columnsInserted_7372 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("first");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("last");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_columnsInserted_7372 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_columnsInserted_7372 (arg1, arg2, arg3);
+}
+
+
+// emitter void QStandardItemModel::columnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)
+
+static void _init_emitter_columnsMoved_10318 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("start");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("end");
+  decl->add_arg<int > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("destination");
+  decl->add_arg<const QModelIndex & > (argspec_3);
+  static gsi::ArgSpecBase argspec_4 ("column");
+  decl->add_arg<int > (argspec_4);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_columnsMoved_10318 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg4 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
+  ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_columnsMoved_10318 (arg1, arg2, arg3, arg4, arg5);
+}
+
+
+// emitter void QStandardItemModel::columnsRemoved(const QModelIndex &parent, int first, int last)
+
+static void _init_emitter_columnsRemoved_7372 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("first");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("last");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_columnsRemoved_7372 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_columnsRemoved_7372 (arg1, arg2, arg3);
 }
 
 
@@ -3409,6 +3715,34 @@ static void _set_callback_cbs_mimeTypes_c0_0 (void *cls, const gsi::Callback &cb
 }
 
 
+// emitter void QStandardItemModel::modelAboutToBeReset()
+
+static void _init_emitter_modelAboutToBeReset_3767 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_modelAboutToBeReset_3767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_modelAboutToBeReset_3767 ();
+}
+
+
+// emitter void QStandardItemModel::modelReset()
+
+static void _init_emitter_modelReset_3767 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_modelReset_3767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_modelReset_3767 ();
+}
+
+
 // bool QStandardItemModel::moveColumns(const QModelIndex &sourceParent, int sourceColumn, int count, const QModelIndex &destinationParent, int destinationChild)
 
 static void _init_cbs_moveColumns_6659_0 (qt_gsi::GenericMethod *decl)
@@ -3476,6 +3810,24 @@ static void _call_cbs_moveRows_6659_0 (const qt_gsi::GenericMethod * /*decl*/, v
 static void _set_callback_cbs_moveRows_6659_0 (void *cls, const gsi::Callback &cb)
 {
   ((QStandardItemModel_Adaptor *)cls)->cb_moveRows_6659_0 = cb;
+}
+
+
+// emitter void QStandardItemModel::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_objectNameChanged_4567 (arg1);
 }
 
 
@@ -3666,6 +4018,162 @@ static void _call_cbs_rowCount_c2395_1 (const qt_gsi::GenericMethod * /*decl*/, 
 static void _set_callback_cbs_rowCount_c2395_1 (void *cls, const gsi::Callback &cb)
 {
   ((QStandardItemModel_Adaptor *)cls)->cb_rowCount_c2395_1 = cb;
+}
+
+
+// emitter void QStandardItemModel::rowsAboutToBeInserted(const QModelIndex &parent, int first, int last)
+
+static void _init_emitter_rowsAboutToBeInserted_7372 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("first");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("last");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_rowsAboutToBeInserted_7372 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_rowsAboutToBeInserted_7372 (arg1, arg2, arg3);
+}
+
+
+// emitter void QStandardItemModel::rowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)
+
+static void _init_emitter_rowsAboutToBeMoved_10318 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("sourceParent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("sourceStart");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("sourceEnd");
+  decl->add_arg<int > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("destinationParent");
+  decl->add_arg<const QModelIndex & > (argspec_3);
+  static gsi::ArgSpecBase argspec_4 ("destinationRow");
+  decl->add_arg<int > (argspec_4);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_rowsAboutToBeMoved_10318 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg4 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
+  ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_rowsAboutToBeMoved_10318 (arg1, arg2, arg3, arg4, arg5);
+}
+
+
+// emitter void QStandardItemModel::rowsAboutToBeRemoved(const QModelIndex &parent, int first, int last)
+
+static void _init_emitter_rowsAboutToBeRemoved_7372 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("first");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("last");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_rowsAboutToBeRemoved_7372 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_rowsAboutToBeRemoved_7372 (arg1, arg2, arg3);
+}
+
+
+// emitter void QStandardItemModel::rowsInserted(const QModelIndex &parent, int first, int last)
+
+static void _init_emitter_rowsInserted_7372 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("first");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("last");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_rowsInserted_7372 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_rowsInserted_7372 (arg1, arg2, arg3);
+}
+
+
+// emitter void QStandardItemModel::rowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)
+
+static void _init_emitter_rowsMoved_10318 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("start");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("end");
+  decl->add_arg<int > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("destination");
+  decl->add_arg<const QModelIndex & > (argspec_3);
+  static gsi::ArgSpecBase argspec_4 ("row");
+  decl->add_arg<int > (argspec_4);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_rowsMoved_10318 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg4 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
+  ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_rowsMoved_10318 (arg1, arg2, arg3, arg4, arg5);
+}
+
+
+// emitter void QStandardItemModel::rowsRemoved(const QModelIndex &parent, int first, int last)
+
+static void _init_emitter_rowsRemoved_7372 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("first");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("last");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_rowsRemoved_7372 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_rowsRemoved_7372 (arg1, arg2, arg3);
 }
 
 
@@ -3972,6 +4480,12 @@ static gsi::Methods methods_QStandardItemModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("columnCount", "@brief Virtual method int QStandardItemModel::columnCount(const QModelIndex &parent)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_columnCount_c2395_1, &_call_cbs_columnCount_c2395_1);
   methods += new qt_gsi::GenericMethod ("columnCount", "@hide", true, &_init_cbs_columnCount_c2395_1, &_call_cbs_columnCount_c2395_1, &_set_callback_cbs_columnCount_c2395_1);
+  methods += new qt_gsi::GenericMethod ("emit_columnsAboutToBeInserted", "@brief Emitter for signal void QStandardItemModel::columnsAboutToBeInserted(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_columnsAboutToBeInserted_7372, &_call_emitter_columnsAboutToBeInserted_7372);
+  methods += new qt_gsi::GenericMethod ("emit_columnsAboutToBeMoved", "@brief Emitter for signal void QStandardItemModel::columnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)\nCall this method to emit this signal.", false, &_init_emitter_columnsAboutToBeMoved_10318, &_call_emitter_columnsAboutToBeMoved_10318);
+  methods += new qt_gsi::GenericMethod ("emit_columnsAboutToBeRemoved", "@brief Emitter for signal void QStandardItemModel::columnsAboutToBeRemoved(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_columnsAboutToBeRemoved_7372, &_call_emitter_columnsAboutToBeRemoved_7372);
+  methods += new qt_gsi::GenericMethod ("emit_columnsInserted", "@brief Emitter for signal void QStandardItemModel::columnsInserted(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_columnsInserted_7372, &_call_emitter_columnsInserted_7372);
+  methods += new qt_gsi::GenericMethod ("emit_columnsMoved", "@brief Emitter for signal void QStandardItemModel::columnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)\nCall this method to emit this signal.", false, &_init_emitter_columnsMoved_10318, &_call_emitter_columnsMoved_10318);
+  methods += new qt_gsi::GenericMethod ("emit_columnsRemoved", "@brief Emitter for signal void QStandardItemModel::columnsRemoved(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_columnsRemoved_7372, &_call_emitter_columnsRemoved_7372);
   methods += new qt_gsi::GenericMethod ("*createIndex", "@brief Method QModelIndex QStandardItemModel::createIndex(int row, int column, void *data)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_createIndex_c2374, &_call_fp_createIndex_c2374);
   methods += new qt_gsi::GenericMethod ("*createIndex", "@brief Method QModelIndex QStandardItemModel::createIndex(int row, int column, quintptr id)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_createIndex_c2657, &_call_fp_createIndex_c2657);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QStandardItemModel::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
@@ -4024,10 +4538,13 @@ static gsi::Methods methods_QStandardItemModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("mimeData", "@hide", true, &_init_cbs_mimeData_c3010_0, &_call_cbs_mimeData_c3010_0, &_set_callback_cbs_mimeData_c3010_0);
   methods += new qt_gsi::GenericMethod ("mimeTypes", "@brief Virtual method QStringList QStandardItemModel::mimeTypes()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_mimeTypes_c0_0, &_call_cbs_mimeTypes_c0_0);
   methods += new qt_gsi::GenericMethod ("mimeTypes", "@hide", true, &_init_cbs_mimeTypes_c0_0, &_call_cbs_mimeTypes_c0_0, &_set_callback_cbs_mimeTypes_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_modelAboutToBeReset", "@brief Emitter for signal void QStandardItemModel::modelAboutToBeReset()\nCall this method to emit this signal.", false, &_init_emitter_modelAboutToBeReset_3767, &_call_emitter_modelAboutToBeReset_3767);
+  methods += new qt_gsi::GenericMethod ("emit_modelReset", "@brief Emitter for signal void QStandardItemModel::modelReset()\nCall this method to emit this signal.", false, &_init_emitter_modelReset_3767, &_call_emitter_modelReset_3767);
   methods += new qt_gsi::GenericMethod ("moveColumns", "@brief Virtual method bool QStandardItemModel::moveColumns(const QModelIndex &sourceParent, int sourceColumn, int count, const QModelIndex &destinationParent, int destinationChild)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveColumns_6659_0, &_call_cbs_moveColumns_6659_0);
   methods += new qt_gsi::GenericMethod ("moveColumns", "@hide", false, &_init_cbs_moveColumns_6659_0, &_call_cbs_moveColumns_6659_0, &_set_callback_cbs_moveColumns_6659_0);
   methods += new qt_gsi::GenericMethod ("moveRows", "@brief Virtual method bool QStandardItemModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveRows_6659_0, &_call_cbs_moveRows_6659_0);
   methods += new qt_gsi::GenericMethod ("moveRows", "@hide", false, &_init_cbs_moveRows_6659_0, &_call_cbs_moveRows_6659_0, &_set_callback_cbs_moveRows_6659_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QStandardItemModel::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("parent", "@brief Virtual method QModelIndex QStandardItemModel::parent(const QModelIndex &child)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_parent_c2395_0, &_call_cbs_parent_c2395_0);
   methods += new qt_gsi::GenericMethod ("parent", "@hide", true, &_init_cbs_parent_c2395_0, &_call_cbs_parent_c2395_0, &_set_callback_cbs_parent_c2395_0);
   methods += new qt_gsi::GenericMethod ("*persistentIndexList", "@brief Method QList<QModelIndex> QStandardItemModel::persistentIndexList()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_persistentIndexList_c0, &_call_fp_persistentIndexList_c0);
@@ -4043,6 +4560,12 @@ static gsi::Methods methods_QStandardItemModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("roleNames", "@hide", true, &_init_cbs_roleNames_c0_0, &_call_cbs_roleNames_c0_0, &_set_callback_cbs_roleNames_c0_0);
   methods += new qt_gsi::GenericMethod ("rowCount", "@brief Virtual method int QStandardItemModel::rowCount(const QModelIndex &parent)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_rowCount_c2395_1, &_call_cbs_rowCount_c2395_1);
   methods += new qt_gsi::GenericMethod ("rowCount", "@hide", true, &_init_cbs_rowCount_c2395_1, &_call_cbs_rowCount_c2395_1, &_set_callback_cbs_rowCount_c2395_1);
+  methods += new qt_gsi::GenericMethod ("emit_rowsAboutToBeInserted", "@brief Emitter for signal void QStandardItemModel::rowsAboutToBeInserted(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_rowsAboutToBeInserted_7372, &_call_emitter_rowsAboutToBeInserted_7372);
+  methods += new qt_gsi::GenericMethod ("emit_rowsAboutToBeMoved", "@brief Emitter for signal void QStandardItemModel::rowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)\nCall this method to emit this signal.", false, &_init_emitter_rowsAboutToBeMoved_10318, &_call_emitter_rowsAboutToBeMoved_10318);
+  methods += new qt_gsi::GenericMethod ("emit_rowsAboutToBeRemoved", "@brief Emitter for signal void QStandardItemModel::rowsAboutToBeRemoved(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_rowsAboutToBeRemoved_7372, &_call_emitter_rowsAboutToBeRemoved_7372);
+  methods += new qt_gsi::GenericMethod ("emit_rowsInserted", "@brief Emitter for signal void QStandardItemModel::rowsInserted(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_rowsInserted_7372, &_call_emitter_rowsInserted_7372);
+  methods += new qt_gsi::GenericMethod ("emit_rowsMoved", "@brief Emitter for signal void QStandardItemModel::rowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)\nCall this method to emit this signal.", false, &_init_emitter_rowsMoved_10318, &_call_emitter_rowsMoved_10318);
+  methods += new qt_gsi::GenericMethod ("emit_rowsRemoved", "@brief Emitter for signal void QStandardItemModel::rowsRemoved(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_rowsRemoved_7372, &_call_emitter_rowsRemoved_7372);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QStandardItemModel::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QStandardItemModel::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("setData", "@brief Virtual method bool QStandardItemModel::setData(const QModelIndex &index, const QVariant &value, int role)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setData_5065_1, &_call_cbs_setData_5065_1);

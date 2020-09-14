@@ -56,6 +56,26 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
+// void QMediaNetworkAccessControl::configurationChanged(const QNetworkConfiguration &configuration)
+
+
+static void _init_f_configurationChanged_3508 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("configuration");
+  decl->add_arg<const QNetworkConfiguration & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_configurationChanged_3508 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QNetworkConfiguration &arg1 = gsi::arg_reader<const QNetworkConfiguration & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QMediaNetworkAccessControl *)cls)->configurationChanged (arg1);
+}
+
+
 // QNetworkConfiguration QMediaNetworkAccessControl::currentConfiguration()
 
 
@@ -147,10 +167,9 @@ namespace gsi
 static gsi::Methods methods_QMediaNetworkAccessControl () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
+  methods += new qt_gsi::GenericMethod ("configurationChanged", "@brief Method void QMediaNetworkAccessControl::configurationChanged(const QNetworkConfiguration &configuration)\n", false, &_init_f_configurationChanged_3508, &_call_f_configurationChanged_3508);
   methods += new qt_gsi::GenericMethod ("currentConfiguration", "@brief Method QNetworkConfiguration QMediaNetworkAccessControl::currentConfiguration()\n", true, &_init_f_currentConfiguration_c0, &_call_f_currentConfiguration_c0);
   methods += new qt_gsi::GenericMethod ("setConfigurations", "@brief Method void QMediaNetworkAccessControl::setConfigurations(const QList<QNetworkConfiguration> &configuration)\n", false, &_init_f_setConfigurations_4123, &_call_f_setConfigurations_4123);
-  methods += gsi::qt_signal<const QNetworkConfiguration & > ("configurationChanged(const QNetworkConfiguration &)", "configurationChanged", gsi::arg("configuration"), "@brief Signal declaration for QMediaNetworkAccessControl::configurationChanged(const QNetworkConfiguration &configuration)\nYou can bind a procedure to this signal.");
-  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QMediaNetworkAccessControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QMediaNetworkAccessControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QMediaNetworkAccessControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -199,12 +218,6 @@ public:
     return QMediaNetworkAccessControl::senderSignalIndex();
   }
 
-  //  [emitter impl] void QMediaNetworkAccessControl::configurationChanged(const QNetworkConfiguration &configuration)
-  void emitter_QMediaNetworkAccessControl_configurationChanged_3508(const QNetworkConfiguration &configuration)
-  {
-    emit QMediaNetworkAccessControl::configurationChanged(configuration);
-  }
-
   //  [adaptor impl] QNetworkConfiguration QMediaNetworkAccessControl::currentConfiguration()
   QNetworkConfiguration cbs_currentConfiguration_c0_0() const
   {
@@ -218,12 +231,6 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("currentConfiguration");
     }
-  }
-
-  //  [emitter impl] void QMediaNetworkAccessControl::destroyed(QObject *)
-  void emitter_QMediaNetworkAccessControl_destroyed_1302(QObject *arg1)
-  {
-    emit QMediaNetworkAccessControl::destroyed(arg1);
   }
 
   //  [adaptor impl] bool QMediaNetworkAccessControl::event(QEvent *)
@@ -382,24 +389,6 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// emitter void QMediaNetworkAccessControl::configurationChanged(const QNetworkConfiguration &configuration)
-
-static void _init_emitter_configurationChanged_3508 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("configuration");
-  decl->add_arg<const QNetworkConfiguration & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_configurationChanged_3508 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QNetworkConfiguration &arg1 = gsi::arg_reader<const QNetworkConfiguration & >() (args, heap);
-  ((QMediaNetworkAccessControl_Adaptor *)cls)->emitter_QMediaNetworkAccessControl_configurationChanged_3508 (arg1);
-}
-
-
 // QNetworkConfiguration QMediaNetworkAccessControl::currentConfiguration()
 
 static void _init_cbs_currentConfiguration_c0_0 (qt_gsi::GenericMethod *decl)
@@ -440,24 +429,6 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QMediaNetworkAccessControl_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
-}
-
-
-// emitter void QMediaNetworkAccessControl::destroyed(QObject *)
-
-static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
-  decl->add_arg<QObject * > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
-  ((QMediaNetworkAccessControl_Adaptor *)cls)->emitter_QMediaNetworkAccessControl_destroyed_1302 (arg1);
 }
 
 
@@ -656,12 +627,10 @@ static gsi::Methods methods_QMediaNetworkAccessControl_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMediaNetworkAccessControl::QMediaNetworkAccessControl()\nThis method creates an object of class QMediaNetworkAccessControl.", &_init_ctor_QMediaNetworkAccessControl_Adaptor_0, &_call_ctor_QMediaNetworkAccessControl_Adaptor_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QMediaNetworkAccessControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("emit_configurationChanged", "@brief Emitter for signal void QMediaNetworkAccessControl::configurationChanged(const QNetworkConfiguration &configuration)\nCall this method to emit this signal.", false, &_init_emitter_configurationChanged_3508, &_call_emitter_configurationChanged_3508);
   methods += new qt_gsi::GenericMethod ("currentConfiguration", "@brief Virtual method QNetworkConfiguration QMediaNetworkAccessControl::currentConfiguration()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_currentConfiguration_c0_0, &_call_cbs_currentConfiguration_c0_0);
   methods += new qt_gsi::GenericMethod ("currentConfiguration", "@hide", true, &_init_cbs_currentConfiguration_c0_0, &_call_cbs_currentConfiguration_c0_0, &_set_callback_cbs_currentConfiguration_c0_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMediaNetworkAccessControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QMediaNetworkAccessControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QMediaNetworkAccessControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMediaNetworkAccessControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);

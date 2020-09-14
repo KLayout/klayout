@@ -188,8 +188,10 @@ class DBNetlist_TestClass < TestBase
   def test_3_Pin
 
     c = RBA::Circuit::new
-    p1 = c.create_pin("A")
+    p1 = c.create_pin("X")
     p2 = c.create_pin("B")
+    assert_equal(p1.name, "X")
+    assert_equal(p2.name, "B")
 
     assert_equal(p1.property(17), nil)
     p1.set_property(17, 42)
@@ -200,7 +202,21 @@ class DBNetlist_TestClass < TestBase
 
     names = []
     c.each_pin { |p| names << p.name }
+    assert_equal(names, [ "X", "B" ])
+    assert_equal(c.pin_by_name("A") == nil, true)
+    assert_equal(c.pin_by_name("X") != nil, true)
+    assert_equal(c.pin_by_name("X").id, 0)
+
+    # modification of pin name
+    c.rename_pin(p1.id, "A")
+    assert_equal(p1.name, "A")
+    assert_equal(p2.name, "B")
+    names = []
+    c.each_pin { |p| names << p.name }
     assert_equal(names, [ "A", "B" ])
+    assert_equal(c.pin_by_name("X") == nil, true)
+    assert_equal(c.pin_by_name("A") != nil, true)
+    assert_equal(c.pin_by_name("A").id, 0)
 
     assert_equal(c.pin_by_id(0) == nil, false)
     assert_equal(c.pin_by_id(1) == nil, false)
@@ -1095,6 +1111,33 @@ circuit NTRANS ($1=$1,$2=$2,$3=$3);
   device NMOS $1 (S=$1,G=$3,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);
 end;
 END
+
+  end
+
+  def test_14_issue617
+
+    netlist = RBA::Netlist::new
+    netlist.from_s(<<"END")
+    circuit TOP ();
+      subcircuit SC1 $1 (A='1', B='2');
+    end;
+    circuit SC1 (A='A', 'B'='B');
+    end;
+END
+
+    def collect_net_names(net)
+      names = []
+      if ! net.name.empty?
+        names << net.name
+      end
+      net.each_subcircuit_pin do |scp|
+        subnet = scp.subcircuit.circuit_ref.net_for_pin(scp.pin_id)
+        names += collect_net_names(subnet)
+      end
+      names
+    end
+
+    assert_equal(collect_net_names(netlist.circuit_by_name("TOP").net_by_name("1")), ["1", "A"])
 
   end
 

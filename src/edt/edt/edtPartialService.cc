@@ -887,7 +887,7 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box,
                 ++ee;
                 unsigned int nn = ee.at_end () ? 0 : n + 1;
 
-                unsigned int r = test_edge (t * *e, d, match);
+                unsigned int r = test_edge (t, *e, d, match);
                 if (r) {
                   edge_sel.clear ();
                   if ((r & 1) == 1) {
@@ -914,7 +914,7 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box,
               ++pt;
               unsigned int n = 0;
               for (; pt != shape->end_point (); ++pt, ++n) {
-                unsigned int r = test_edge (t * db::Edge (p, *pt), d, match);
+                unsigned int r = test_edge (t, db::Edge (p, *pt), d, match);
                 if (r) {
                   edge_sel.clear ();
                   if ((r & 1) == 1) {
@@ -946,7 +946,7 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box,
               ++ee;
               unsigned int nn = ee.at_end () ? 0 : n + 1;
 
-              unsigned int r = test_edge (t * *e, d, match);
+              unsigned int r = test_edge (t, *e, d, match);
               if (r) {
                 edge_sel.clear ();
                 if ((r & 1) == 1) {

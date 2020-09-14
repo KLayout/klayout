@@ -56,6 +56,22 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
+// void QAbstractVideoFilter::activeChanged()
+
+
+static void _init_f_activeChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_f_activeChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QAbstractVideoFilter *)cls)->activeChanged ();
+}
+
+
 // QVideoFilterRunnable *QAbstractVideoFilter::createFilterRunnable()
 
 
@@ -162,11 +178,10 @@ namespace gsi
 static gsi::Methods methods_QAbstractVideoFilter () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
+  methods += new qt_gsi::GenericMethod ("activeChanged", "@brief Method void QAbstractVideoFilter::activeChanged()\n", false, &_init_f_activeChanged_0, &_call_f_activeChanged_0);
   methods += new qt_gsi::GenericMethod ("createFilterRunnable", "@brief Method QVideoFilterRunnable *QAbstractVideoFilter::createFilterRunnable()\n", false, &_init_f_createFilterRunnable_0, &_call_f_createFilterRunnable_0);
   methods += new qt_gsi::GenericMethod ("isActive?|:active", "@brief Method bool QAbstractVideoFilter::isActive()\n", true, &_init_f_isActive_c0, &_call_f_isActive_c0);
   methods += new qt_gsi::GenericMethod ("setActive|active=", "@brief Method void QAbstractVideoFilter::setActive(bool v)\n", false, &_init_f_setActive_864, &_call_f_setActive_864);
-  methods += gsi::qt_signal ("activeChanged()", "activeChanged", "@brief Signal declaration for QAbstractVideoFilter::activeChanged()\nYou can bind a procedure to this signal.");
-  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAbstractVideoFilter::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QAbstractVideoFilter::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QAbstractVideoFilter::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -221,12 +236,6 @@ public:
     return QAbstractVideoFilter::senderSignalIndex();
   }
 
-  //  [emitter impl] void QAbstractVideoFilter::activeChanged()
-  void emitter_QAbstractVideoFilter_activeChanged_0()
-  {
-    emit QAbstractVideoFilter::activeChanged();
-  }
-
   //  [adaptor impl] QVideoFilterRunnable *QAbstractVideoFilter::createFilterRunnable()
   QVideoFilterRunnable * cbs_createFilterRunnable_0_0()
   {
@@ -240,12 +249,6 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("createFilterRunnable");
     }
-  }
-
-  //  [emitter impl] void QAbstractVideoFilter::destroyed(QObject *)
-  void emitter_QAbstractVideoFilter_destroyed_1302(QObject *arg1)
-  {
-    emit QAbstractVideoFilter::destroyed(arg1);
   }
 
   //  [adaptor impl] bool QAbstractVideoFilter::event(QEvent *)
@@ -367,20 +370,6 @@ static void _call_ctor_QAbstractVideoFilter_Adaptor_1302 (const qt_gsi::GenericS
 }
 
 
-// emitter void QAbstractVideoFilter::activeChanged()
-
-static void _init_emitter_activeChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_activeChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ((QAbstractVideoFilter_Adaptor *)cls)->emitter_QAbstractVideoFilter_activeChanged_0 ();
-}
-
-
 // void QAbstractVideoFilter::childEvent(QChildEvent *)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
@@ -445,24 +434,6 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QAbstractVideoFilter_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
-}
-
-
-// emitter void QAbstractVideoFilter::destroyed(QObject *)
-
-static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
-  decl->add_arg<QObject * > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
-  ((QAbstractVideoFilter_Adaptor *)cls)->emitter_QAbstractVideoFilter_destroyed_1302 (arg1);
 }
 
 
@@ -635,14 +606,12 @@ gsi::Class<QAbstractVideoFilter> &qtdecl_QAbstractVideoFilter ();
 static gsi::Methods methods_QAbstractVideoFilter_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAbstractVideoFilter::QAbstractVideoFilter(QObject *parent)\nThis method creates an object of class QAbstractVideoFilter.", &_init_ctor_QAbstractVideoFilter_Adaptor_1302, &_call_ctor_QAbstractVideoFilter_Adaptor_1302);
-  methods += new qt_gsi::GenericMethod ("emit_activeChanged", "@brief Emitter for signal void QAbstractVideoFilter::activeChanged()\nCall this method to emit this signal.", false, &_init_emitter_activeChanged_0, &_call_emitter_activeChanged_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QAbstractVideoFilter::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("createFilterRunnable", "@brief Virtual method QVideoFilterRunnable *QAbstractVideoFilter::createFilterRunnable()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_createFilterRunnable_0_0, &_call_cbs_createFilterRunnable_0_0);
   methods += new qt_gsi::GenericMethod ("createFilterRunnable", "@hide", false, &_init_cbs_createFilterRunnable_0_0, &_call_cbs_createFilterRunnable_0_0, &_set_callback_cbs_createFilterRunnable_0_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAbstractVideoFilter::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QAbstractVideoFilter::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QAbstractVideoFilter::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAbstractVideoFilter::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);

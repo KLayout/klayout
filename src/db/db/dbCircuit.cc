@@ -307,7 +307,7 @@ void Circuit::clear_pins ()
   m_pin_by_id.clear ();
 }
 
-const Pin &Circuit::add_pin (const Pin &pin)
+Pin &Circuit::add_pin (const Pin &pin)
 {
   m_pins.push_back (pin);
   m_pins.back ().set_id (m_pin_by_id.size ());
@@ -315,7 +315,7 @@ const Pin &Circuit::add_pin (const Pin &pin)
   return m_pins.back ();
 }
 
-const Pin &Circuit::add_pin (const std::string &name)
+Pin &Circuit::add_pin (const std::string &name)
 {
   m_pins.push_back (Pin (name));
   m_pins.back ().set_id (m_pin_by_id.size ());

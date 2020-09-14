@@ -528,6 +528,7 @@ static gsi::Methods methods_QItemSelectionModel () {
   methods += gsi::qt_signal<const QModelIndex &, const QModelIndex & > ("currentRowChanged(const QModelIndex &, const QModelIndex &)", "currentRowChanged", gsi::arg("current"), gsi::arg("previous"), "@brief Signal declaration for QItemSelectionModel::currentRowChanged(const QModelIndex &current, const QModelIndex &previous)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QItemSelectionModel::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QAbstractItemModel * > ("modelChanged(QAbstractItemModel *)", "modelChanged", gsi::arg("model"), "@brief Signal declaration for QItemSelectionModel::modelChanged(QAbstractItemModel *model)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QItemSelectionModel::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QItemSelection &, const QItemSelection & > ("selectionChanged(const QItemSelection &, const QItemSelection &)", "selectionChanged", gsi::arg("selected"), gsi::arg("deselected"), "@brief Signal declaration for QItemSelectionModel::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QItemSelectionModel::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QItemSelectionModel::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
@@ -682,6 +683,13 @@ public:
   void emitter_QItemSelectionModel_modelChanged_2419(QAbstractItemModel *model)
   {
     emit QItemSelectionModel::modelChanged(model);
+  }
+
+  //  [emitter impl] void QItemSelectionModel::objectNameChanged(const QString &objectName)
+  void emitter_QItemSelectionModel_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QItemSelectionModel::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QItemSelectionModel::reset()
@@ -1165,6 +1173,24 @@ static void _call_emitter_modelChanged_2419 (const qt_gsi::GenericMethod * /*dec
 }
 
 
+// emitter void QItemSelectionModel::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QItemSelectionModel_Adaptor *)cls)->emitter_QItemSelectionModel_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QItemSelectionModel::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -1387,6 +1413,7 @@ static gsi::Methods methods_QItemSelectionModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QItemSelectionModel::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("emit_modelChanged", "@brief Emitter for signal void QItemSelectionModel::modelChanged(QAbstractItemModel *model)\nCall this method to emit this signal.", false, &_init_emitter_modelChanged_2419, &_call_emitter_modelChanged_2419);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QItemSelectionModel::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QItemSelectionModel::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("reset", "@brief Virtual method void QItemSelectionModel::reset()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_reset_0_0, &_call_cbs_reset_0_0);
   methods += new qt_gsi::GenericMethod ("reset", "@hide", false, &_init_cbs_reset_0_0, &_call_cbs_reset_0_0, &_set_callback_cbs_reset_0_0);

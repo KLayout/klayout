@@ -35,6 +35,9 @@
 #include "dbEdgePairs.h"
 #include "dbEdges.h"
 #include "dbTexts.h"
+#include "dbCellMapping.h"
+#include "dbLayerMapping.h"
+#include "dbLayoutUtils.h"
 #include "tlTimer.h"
 #include "tlLog.h"
 #include "tlInternational.h"
@@ -1169,6 +1172,60 @@ Layout::topological_sort ()
   //  The cell graph is fine.
   return true;
 
+}
+
+void
+Layout::copy_tree_shapes (const db::Layout &source_layout, const db::CellMapping &cm)
+{
+  if (this == &source_layout) {
+    throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same layout")));
+  }
+
+  db::ICplxTrans trans (source_layout.dbu () / dbu ());
+
+  db::LayerMapping lm;
+  lm.create_full (*this, source_layout);
+
+  db::copy_shapes (*this, source_layout, trans, cm.source_cells (), cm.table (), lm.table ());
+}
+
+void
+Layout::copy_tree_shapes (const db::Layout &source_layout, const db::CellMapping &cm, const db::LayerMapping &lm)
+{
+  if (this == &source_layout) {
+    throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same layout")));
+  }
+
+  db::ICplxTrans trans (source_layout.dbu () / dbu ());
+
+  db::copy_shapes (*this, source_layout, trans, cm.source_cells (), cm.table (), lm.table ());
+}
+
+void
+Layout::move_tree_shapes (db::Layout &source_layout, const db::CellMapping &cm)
+{
+  if (this == &source_layout) {
+    throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same layout")));
+  }
+
+  db::ICplxTrans trans (source_layout.dbu () / dbu ());
+
+  db::LayerMapping lm;
+  lm.create_full (*this, source_layout);
+
+  db::move_shapes (*this, source_layout, trans, cm.source_cells (), cm.table (), lm.table ());
+}
+
+void
+Layout::move_tree_shapes (db::Layout &source_layout, const db::CellMapping &cm, const db::LayerMapping &lm)
+{
+  if (this == &source_layout) {
+    throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same layout")));
+  }
+
+  db::ICplxTrans trans (source_layout.dbu () / dbu ());
+
+  db::move_shapes (*this, source_layout, trans, cm.source_cells (), cm.table (), lm.table ());
 }
 
 bool 

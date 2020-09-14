@@ -295,6 +295,11 @@ Class<db::Device> decl_dbDevice (decl_dbNetlistObject, "db", "Device",
   gsi::method ("circuit", (const db::Circuit *(db::Device::*) () const) &db::Device::circuit,
     "@brief Gets the circuit the device lives in."
   ) +
+  gsi::method ("circuit", (db::Circuit *(db::Device::*) ()) &db::Device::circuit,
+    "@brief Gets the circuit the device lives in (non-const version)."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::method ("id", &db::Device::id,
     "@brief Gets the device ID.\n"
     "The ID is a unique integer which identifies the device.\n"
@@ -325,6 +330,12 @@ Class<db::Device> decl_dbDevice (decl_dbNetlistObject, "db", "Device",
   gsi::method ("net_for_terminal", (const db::Net *(db::Device::*) (size_t) const) &db::Device::net_for_terminal, gsi::arg ("terminal_id"),
     "@brief Gets the net connected to the specified terminal.\n"
     "If the terminal is not connected, nil is returned for the net."
+  ) +
+  gsi::method ("net_for_terminal", (db::Net *(db::Device::*) (size_t)) &db::Device::net_for_terminal, gsi::arg ("terminal_id"),
+    "@brief Gets the net connected to the specified terminal (non-const version).\n"
+    "If the terminal is not connected, nil is returned for the net."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
   ) +
   gsi::method ("connect_terminal", &db::Device::connect_terminal, gsi::arg ("terminal_id"), gsi::arg ("net"),
     "@brief Connects the given terminal to the specified net.\n"
@@ -378,6 +389,11 @@ Class<db::DeviceAbstract> decl_dbDeviceAbstract ("db", "DeviceAbstract",
   gsi::method ("netlist", (const db::Netlist *(db::DeviceAbstract::*) () const) &db::DeviceAbstract::netlist,
     "@brief Gets the netlist the device abstract lives in."
   ) +
+  gsi::method ("netlist", (db::Netlist *(db::DeviceAbstract::*) ()) &db::DeviceAbstract::netlist,
+    "@brief Gets the netlist the device abstract lives in (non-const version)."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::method ("device_class", &db::DeviceAbstract::device_class,
     "@brief Gets the device class of the device."
   ) +
@@ -427,9 +443,20 @@ Class<db::SubCircuit> decl_dbSubCircuit (decl_dbNetlistObject, "db", "SubCircuit
   gsi::method ("circuit_ref", (const db::Circuit *(db::SubCircuit::*) () const) &db::SubCircuit::circuit_ref,
     "@brief Gets the circuit referenced by the subcircuit.\n"
   ) +
+  gsi::method ("circuit_ref", (db::Circuit *(db::SubCircuit::*) ()) &db::SubCircuit::circuit_ref,
+    "@brief Gets the circuit referenced by the subcircuit (non-const version).\n"
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::method ("circuit", (const db::Circuit *(db::SubCircuit::*) () const) &db::SubCircuit::circuit,
     "@brief Gets the circuit the subcircuit lives in.\n"
     "This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \\circuit_ref."
+  ) +
+  gsi::method ("circuit", (db::Circuit *(db::SubCircuit::*) ()) &db::SubCircuit::circuit,
+    "@brief Gets the circuit the subcircuit lives in (non-const version).\n"
+    "This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \\circuit_ref."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
   ) +
   gsi::method ("id", &db::SubCircuit::id,
     "@brief Gets the subcircuit ID.\n"
@@ -452,6 +479,12 @@ Class<db::SubCircuit> decl_dbSubCircuit (decl_dbNetlistObject, "db", "SubCircuit
   gsi::method ("net_for_pin", (const db::Net *(db::SubCircuit::*) (size_t) const) &db::SubCircuit::net_for_pin, gsi::arg ("pin_id"),
     "@brief Gets the net connected to the specified pin of the subcircuit.\n"
     "If the pin is not connected, nil is returned for the net."
+  ) +
+  gsi::method ("net_for_pin", (db::Net *(db::SubCircuit::*) (size_t)) &db::SubCircuit::net_for_pin, gsi::arg ("pin_id"),
+    "@brief Gets the net connected to the specified pin of the subcircuit (non-const version).\n"
+    "If the pin is not connected, nil is returned for the net."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
   ) +
   gsi::method ("connect_pin", &db::SubCircuit::connect_pin, gsi::arg ("pin_id"), gsi::arg ("net"),
     "@brief Connects the given pin to the specified net.\n"
@@ -505,8 +538,19 @@ Class<db::NetTerminalRef> decl_dbNetTerminalRef ("db", "NetTerminalRef",
     "@brief Gets the device reference.\n"
     "Gets the device object that this connection is made to."
   ) +
+  gsi::method ("device", (db::Device *(db::NetTerminalRef::*) ()) &db::NetTerminalRef::device,
+    "@brief Gets the device reference (non-const version).\n"
+    "Gets the device object that this connection is made to."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::method ("net", (const db::Net *(db::NetTerminalRef::*) () const) &db::NetTerminalRef::net,
-    "@brief Gets the net this terminal reference is attached to"
+    "@brief Gets the net this terminal reference is attached to."
+  ) +
+  gsi::method ("net", (db::Net *(db::NetTerminalRef::*) ()) &db::NetTerminalRef::net,
+    "@brief Gets the net this terminal reference is attached to (non-const version)."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
   ) +
   gsi::method ("device_class", (const db::DeviceClass *(db::NetTerminalRef::*) () const) &db::NetTerminalRef::device_class,
     "@brief Gets the class of the device which is addressed."
@@ -528,7 +572,12 @@ Class<db::NetPinRef> decl_dbNetPinRef ("db", "NetPinRef",
     "@brief Gets the \\Pin object of the pin the connection is made to."
   ) +
   gsi::method ("net", (const db::Net *(db::NetPinRef::*) () const) &db::NetPinRef::net,
-    "@brief Gets the net this pin reference is attached to"
+    "@brief Gets the net this pin reference is attached to."
+  ) +
+  gsi::method ("net", (db::Net *(db::NetPinRef::*) ()) &db::NetPinRef::net,
+    "@brief Gets the net this pin reference is attached to (non-const version)."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
   ),
   "@brief A connection to an outgoing pin of the circuit.\n"
   "This object is used inside a net (see \\Net) to describe the connections a net makes.\n"
@@ -548,8 +597,20 @@ Class<db::NetSubcircuitPinRef> decl_dbNetSubcircuitPinRef ("db", "NetSubcircuitP
     "This attribute indicates the subcircuit the net attaches to. The "
     "subcircuit lives in the same circuit than the net. "
   ) +
+  gsi::method ("subcircuit", (db::SubCircuit *(db::NetSubcircuitPinRef::*) ()) &db::NetSubcircuitPinRef::subcircuit,
+    "@brief Gets the subcircuit reference (non-const version).\n"
+    "This attribute indicates the subcircuit the net attaches to. The "
+    "subcircuit lives in the same circuit than the net. "
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::method ("net", (const db::Net *(db::NetSubcircuitPinRef::*) () const) &db::NetSubcircuitPinRef::net,
-    "@brief Gets the net this pin reference is attached to"
+    "@brief Gets the net this pin reference is attached to."
+  ) +
+  gsi::method ("net", (db::Net *(db::NetSubcircuitPinRef::*) ()) &db::NetSubcircuitPinRef::net,
+    "@brief Gets the net this pin reference is attached to (non-const version)."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
   ),
   "@brief A connection to a pin of a subcircuit.\n"
   "This object is used inside a net (see \\Net) to describe the connections a net makes.\n"
@@ -596,15 +657,36 @@ Class<db::Net> decl_dbNet (decl_dbNetlistObject, "db", "Net",
     "Pin connections are described by \\NetPinRef objects. Pin connections "
     "are connections to outgoing pins of the circuit the net lives in."
   ) +
+  gsi::iterator ("each_pin", gsi::return_reference (), (db::Net::pin_iterator (db::Net::*) ()) &db::Net::begin_pins, (db::Net::pin_iterator (db::Net::*) ()) &db::Net::end_pins,
+    "@brief Iterates over all outgoing pins the net connects (non-const version).\n"
+    "Pin connections are described by \\NetPinRef objects. Pin connections "
+    "are connections to outgoing pins of the circuit the net lives in."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::iterator ("each_subcircuit_pin", gsi::return_reference (), (db::Net::const_subcircuit_pin_iterator (db::Net::*) () const) &db::Net::begin_subcircuit_pins, (db::Net::const_subcircuit_pin_iterator (db::Net::*) () const) &db::Net::end_subcircuit_pins,
     "@brief Iterates over all subcircuit pins the net connects.\n"
     "Subcircuit pin connections are described by \\NetSubcircuitPinRef objects. These are "
     "connections to specific pins of subcircuits."
   ) +
+  gsi::iterator ("each_subcircuit_pin", gsi::return_reference (), (db::Net::subcircuit_pin_iterator (db::Net::*) ()) &db::Net::begin_subcircuit_pins, (db::Net::subcircuit_pin_iterator (db::Net::*) ()) &db::Net::end_subcircuit_pins,
+    "@brief Iterates over all subcircuit pins the net connects (non-const version).\n"
+    "Subcircuit pin connections are described by \\NetSubcircuitPinRef objects. These are "
+    "connections to specific pins of subcircuits."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::iterator ("each_terminal", gsi::return_reference (), (db::Net::const_terminal_iterator (db::Net::*) () const) &db::Net::begin_terminals, (db::Net::const_terminal_iterator (db::Net::*) () const) &db::Net::end_terminals,
     "@brief Iterates over all terminals the net connects.\n"
     "Terminals connect devices. Terminal connections are described by \\NetTerminalRef "
     "objects."
+  ) +
+  gsi::iterator ("each_terminal", gsi::return_reference (), (db::Net::terminal_iterator (db::Net::*) ()) &db::Net::begin_terminals, (db::Net::terminal_iterator (db::Net::*) ()) &db::Net::end_terminals,
+    "@brief Iterates over all terminals the net connects (non-const version).\n"
+    "Terminals connect devices. Terminal connections are described by \\NetTerminalRef "
+    "objects."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
   ) +
   gsi::method ("is_floating?", &db::Net::is_floating,
     "@brief Returns true, if the net is floating.\n"
@@ -1128,7 +1210,12 @@ static db::SubCircuit *create_subcircuit1 (db::Circuit *c, db::Circuit *cc, cons
   return sc;
 }
 
-static const db::Net *circuit_net_for_pin (const db::Circuit *c, const db::Pin *pin)
+static db::Net *circuit_net_for_pin (db::Circuit *c, const db::Pin *pin)
+{
+  return pin ? c->net_for_pin (pin->id ()) : 0;
+}
+
+static const db::Net *circuit_net_for_pin_const (const db::Circuit *c, const db::Pin *pin)
 {
   return pin ? c->net_for_pin (pin->id ()) : 0;
 }
@@ -1152,25 +1239,49 @@ static void circuit_disconnect_pin1 (db::Circuit *c, const db::Pin *pin)
   }
 }
 
+static db::Pin *create_pin (db::Circuit *circuit, const std::string &name)
+{
+  return & circuit->add_pin (name);
+}
+
 Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
-  gsi::method ("create_pin", (const db::Pin &(db::Circuit::*) (const std::string &)) &db::Circuit::add_pin, gsi::arg ("name"),
+  gsi::method_ext ("create_pin", &create_pin, gsi::arg ("name"),
     "@brief Creates a new \\Pin object inside the circuit\n"
     "This object will describe a pin of the circuit. A circuit connects "
     "to the outside through such a pin. The pin is added after all existing "
     "pins. For more details see the \\Pin class."
+    "\n\n"
+    "Starting with version 0.26.8, this method returns a reference to a \\Pin object rather than a copy."
   ) +
   gsi::method ("remove_pin", &db::Circuit::remove_pin, gsi::arg ("id"),
     "@brief Removes the pin with the given ID from the circuit\n"
     "\n"
     "This method has been introduced in version 0.26.2.\n"
   ) +
+  gsi::method ("rename_pin", &db::Circuit::rename_pin, gsi::arg ("id"), gsi::arg ("new_name"),
+    "@brief Renames the pin with the given ID to 'new_name'\n"
+    "\n"
+    "This method has been introduced in version 0.26.8.\n"
+  ) +
   gsi::iterator ("each_child", (db::Circuit::child_circuit_iterator (db::Circuit::*) ()) &db::Circuit::begin_children, (db::Circuit::child_circuit_iterator (db::Circuit::*) ()) &db::Circuit::end_children,
     "@brief Iterates over the child circuits of this circuit\n"
     "Child circuits are the ones that are referenced from this circuit via subcircuits."
   ) +
+  gsi::iterator ("each_child", (db::Circuit::const_child_circuit_iterator (db::Circuit::*) () const) &db::Circuit::begin_children, (db::Circuit::const_child_circuit_iterator (db::Circuit::*) () const) &db::Circuit::end_children,
+    "@brief Iterates over the child circuits of this circuit (const version)\n"
+    "Child circuits are the ones that are referenced from this circuit via subcircuits."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::iterator ("each_parent", (db::Circuit::parent_circuit_iterator (db::Circuit::*) ()) &db::Circuit::begin_parents, (db::Circuit::parent_circuit_iterator (db::Circuit::*) ()) &db::Circuit::end_parents,
     "@brief Iterates over the parent circuits of this circuit\n"
     "Child circuits are the ones that are referencing this circuit via subcircuits."
+  ) +
+  gsi::iterator ("each_parent", (db::Circuit::const_parent_circuit_iterator (db::Circuit::*) () const) &db::Circuit::begin_parents, (db::Circuit::const_parent_circuit_iterator (db::Circuit::*) () const) &db::Circuit::end_parents,
+    "@brief Iterates over the parent circuits of this circuit (const version)\n"
+    "Child circuits are the ones that are referencing this circuit via subcircuits."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
   ) +
   gsi::method ("has_refs?", &db::Circuit::has_refs,
     "@brief Returns a value indicating whether the circuit has references\n"
@@ -1179,24 +1290,58 @@ Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
   gsi::iterator ("each_ref", (db::Circuit::refs_iterator (db::Circuit::*) ()) &db::Circuit::begin_refs, (db::Circuit::refs_iterator (db::Circuit::*) ()) &db::Circuit::end_refs,
     "@brief Iterates over the subcircuit objects referencing this circuit\n"
   ) +
+  gsi::iterator ("each_ref", (db::Circuit::const_refs_iterator (db::Circuit::*) () const) &db::Circuit::begin_refs, (db::Circuit::const_refs_iterator (db::Circuit::*) () const) &db::Circuit::end_refs,
+    "@brief Iterates over the subcircuit objects referencing this circuit (const version)\n"
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::iterator ("each_pin", (db::Circuit::pin_iterator (db::Circuit::*) ()) &db::Circuit::begin_pins, (db::Circuit::pin_iterator (db::Circuit::*) ()) &db::Circuit::end_pins,
     "@brief Iterates over the pins of the circuit"
+  ) +
+  gsi::iterator ("each_pin", (db::Circuit::const_pin_iterator (db::Circuit::*) () const) &db::Circuit::begin_pins, (db::Circuit::const_pin_iterator (db::Circuit::*) () const) &db::Circuit::end_pins,
+    "@brief Iterates over the pins of the circuit (const version)"
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
   ) +
   gsi::method ("device_by_id", (db::Device *(db::Circuit::*) (size_t)) &db::Circuit::device_by_id, gsi::arg ("id"),
     "@brief Gets the device object for a given ID.\n"
     "If the ID is not a valid device ID, nil is returned."
   ) +
+  gsi::method ("device_by_id", (const db::Device *(db::Circuit::*) (size_t) const) &db::Circuit::device_by_id, gsi::arg ("id"),
+    "@brief Gets the device object for a given ID (const version).\n"
+    "If the ID is not a valid device ID, nil is returned."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::method ("device_by_name", (db::Device *(db::Circuit::*) (const std::string &)) &db::Circuit::device_by_name, gsi::arg ("name"),
     "@brief Gets the device object for a given name.\n"
     "If the ID is not a valid device name, nil is returned."
+  ) +
+  gsi::method ("device_by_name", (const db::Device *(db::Circuit::*) (const std::string &) const) &db::Circuit::device_by_name, gsi::arg ("name"),
+    "@brief Gets the device object for a given name (const version).\n"
+    "If the ID is not a valid device name, nil is returned."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
   ) +
   gsi::method ("subcircuit_by_id", (db::SubCircuit *(db::Circuit::*) (size_t)) &db::Circuit::subcircuit_by_id, gsi::arg ("id"),
     "@brief Gets the subcircuit object for a given ID.\n"
     "If the ID is not a valid subcircuit ID, nil is returned."
   ) +
+  gsi::method ("subcircuit_by_id", (const db::SubCircuit *(db::Circuit::*) (size_t) const) &db::Circuit::subcircuit_by_id, gsi::arg ("id"),
+    "@brief Gets the subcircuit object for a given ID (const version).\n"
+    "If the ID is not a valid subcircuit ID, nil is returned."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::method ("subcircuit_by_name", (db::SubCircuit *(db::Circuit::*) (const std::string &)) &db::Circuit::subcircuit_by_name, gsi::arg ("name"),
     "@brief Gets the subcircuit object for a given name.\n"
     "If the ID is not a valid subcircuit name, nil is returned."
+  ) +
+  gsi::method ("subcircuit_by_name", (const db::SubCircuit *(db::Circuit::*) (const std::string &) const) &db::Circuit::subcircuit_by_name, gsi::arg ("name"),
+    "@brief Gets the subcircuit object for a given name (const version).\n"
+    "If the ID is not a valid subcircuit name, nil is returned."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
   ) +
   gsi::method ("net_by_cluster_id", (db::Net *(db::Circuit::*) (size_t)) &db::Circuit::net_by_cluster_id, gsi::arg ("cluster_id"),
     "@brief Gets the net object corresponding to a specific cluster ID\n"
@@ -1206,13 +1351,31 @@ Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
     "@brief Gets the net object for a given name.\n"
     "If the ID is not a valid net name, nil is returned."
   ) +
+  gsi::method ("net_by_name", (const db::Net *(db::Circuit::*) (const std::string &) const) &db::Circuit::net_by_name, gsi::arg ("name"),
+    "@brief Gets the net object for a given name (const version).\n"
+    "If the ID is not a valid net name, nil is returned."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::method ("pin_by_id", (db::Pin *(db::Circuit::*) (size_t)) &db::Circuit::pin_by_id, gsi::arg ("id"),
     "@brief Gets the \\Pin object corresponding to a specific ID\n"
     "If the ID is not a valid pin ID, nil is returned."
   ) +
+  gsi::method ("pin_by_id", (const db::Pin *(db::Circuit::*) (size_t) const) &db::Circuit::pin_by_id, gsi::arg ("id"),
+    "@brief Gets the \\Pin object corresponding to a specific ID (const version)\n"
+    "If the ID is not a valid pin ID, nil is returned."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::method ("pin_by_name", (db::Pin *(db::Circuit::*) (const std::string &)) &db::Circuit::pin_by_name, gsi::arg ("name"),
     "@brief Gets the \\Pin object corresponding to a specific name\n"
     "If the ID is not a valid pin name, nil is returned."
+  ) +
+  gsi::method ("pin_by_name", (const db::Pin *(db::Circuit::*) (const std::string &) const) &db::Circuit::pin_by_name, gsi::arg ("name"),
+    "@brief Gets the \\Pin object corresponding to a specific name (const version)\n"
+    "If the ID is not a valid pin name, nil is returned."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
   ) +
   gsi::method ("pin_count", &db::Circuit::pin_count,
     "@brief Gets the number of pins in the circuit"
@@ -1238,6 +1401,11 @@ Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
   gsi::iterator ("each_net", (db::Circuit::net_iterator (db::Circuit::*) ()) &db::Circuit::begin_nets, (db::Circuit::net_iterator (db::Circuit::*) ()) &db::Circuit::end_nets,
     "@brief Iterates over the nets of the circuit"
   ) +
+  gsi::iterator ("each_net", (db::Circuit::const_net_iterator (db::Circuit::*) () const) &db::Circuit::begin_nets, (db::Circuit::const_net_iterator (db::Circuit::*) () const) &db::Circuit::end_nets,
+    "@brief Iterates over the nets of the circuit (const version)"
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::method_ext ("create_device", &gsi::create_device1, gsi::arg ("device_class"), gsi::arg ("name", std::string ()),
     "@brief Creates a new bound \\Device object inside the circuit\n"
     "This object describes a device of the circuit. The device is already attached "
@@ -1251,6 +1419,11 @@ Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
   ) +
   gsi::iterator ("each_device", (db::Circuit::device_iterator (db::Circuit::*) ()) &db::Circuit::begin_devices, (db::Circuit::device_iterator (db::Circuit::*) ()) &db::Circuit::end_devices,
     "@brief Iterates over the devices of the circuit"
+  ) +
+  gsi::iterator ("each_device", (db::Circuit::const_device_iterator (db::Circuit::*) () const) &db::Circuit::begin_devices, (db::Circuit::const_device_iterator (db::Circuit::*) () const) &db::Circuit::end_devices,
+    "@brief Iterates over the devices of the circuit (const version)"
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
   ) +
   gsi::method_ext ("create_subcircuit", &gsi::create_subcircuit1, gsi::arg ("circuit"), gsi::arg ("name", std::string ()),
     "@brief Creates a new bound \\SubCircuit object inside the circuit\n"
@@ -1271,6 +1444,11 @@ Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
   gsi::iterator ("each_subcircuit", (db::Circuit::subcircuit_iterator (db::Circuit::*) ()) &db::Circuit::begin_subcircuits, (db::Circuit::subcircuit_iterator (db::Circuit::*) ()) &db::Circuit::end_subcircuits,
     "@brief Iterates over the subcircuits of the circuit"
   ) +
+  gsi::iterator ("each_subcircuit", (db::Circuit::const_subcircuit_iterator (db::Circuit::*) () const) &db::Circuit::begin_subcircuits, (db::Circuit::const_subcircuit_iterator (db::Circuit::*) () const) &db::Circuit::end_subcircuits,
+    "@brief Iterates over the subcircuits of the circuit (const version)"
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::method ("blank", &db::Circuit::blank,
     "@brief Blanks out the circuit\n"
     "This method will remove all the innards of the circuit and just leave the pins. "
@@ -1281,6 +1459,11 @@ Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
   ) +
   gsi::method ("netlist", (db::Netlist *(db::Circuit::*) ()) &db::Circuit::netlist,
     "@brief Gets the netlist object the circuit lives in"
+  ) +
+  gsi::method ("netlist", (const db::Netlist *(db::Circuit::*) () const) &db::Circuit::netlist,
+    "@brief Gets the netlist object the circuit lives in (const version)"
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
   ) +
   gsi::method ("name=", &db::Circuit::set_name, gsi::arg ("name"),
     "@brief Sets the name of the circuit"
@@ -1316,10 +1499,24 @@ Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
     "This is the net object inside the circuit which attaches to the given outward-bound pin.\n"
     "This method returns nil if the pin is not connected or the pin ID is invalid."
   ) +
+  gsi::method ("net_for_pin", (const db::Net *(db::Circuit::*) (size_t) const) &db::Circuit::net_for_pin, gsi::arg ("pin_id"),
+    "@brief Gets the net object attached to a specific pin (const version).\n"
+    "This is the net object inside the circuit which attaches to the given outward-bound pin.\n"
+    "This method returns nil if the pin is not connected or the pin ID is invalid."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::method_ext ("net_for_pin", &gsi::circuit_net_for_pin, gsi::arg ("pin"),
     "@brief Gets the net object attached to a specific pin.\n"
     "This is the net object inside the circuit which attaches to the given outward-bound pin.\n"
     "This method returns nil if the pin is not connected or the pin object is nil."
+  ) +
+  gsi::method_ext ("net_for_pin", &gsi::circuit_net_for_pin_const, gsi::arg ("pin"),
+    "@brief Gets the net object attached to a specific pin (const version).\n"
+    "This is the net object inside the circuit which attaches to the given outward-bound pin.\n"
+    "This method returns nil if the pin is not connected or the pin object is nil."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
   ) +
   gsi::method ("connect_pin", &db::Circuit::connect_pin, gsi::arg ("pin_id"), gsi::arg ("net"),
     "@brief Connects the given pin with the given net.\n"
@@ -1462,6 +1659,22 @@ circuits_by_name (db::Netlist *netlist, const std::string &name_pattern)
   return res;
 }
 
+static std::vector<const db::Circuit *>
+circuits_by_name_const (const db::Netlist *netlist, const std::string &name_pattern)
+{
+  std::vector<const db::Circuit *> res;
+
+  tl::GlobPattern glob (name_pattern);
+  for (db::Netlist::const_circuit_iterator c = netlist->begin_circuits (); c != netlist->end_circuits (); ++c) {
+    const db::Circuit *circuit = c.operator-> ();
+    if (glob.match (circuit->name ())) {
+      res.push_back (circuit);
+    }
+  }
+
+  return res;
+}
+
 Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::method_ext ("add", &gsi::add_circuit, gsi::arg ("circuit"),
     "@brief Adds the circuit to the netlist\n"
@@ -1515,9 +1728,21 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "@brief Gets the circuit object for a given cell index.\n"
     "If the cell index is not valid or no circuit is registered with this index, nil is returned."
   ) +
+  gsi::method ("circuit_by_cell_index", (const db::Circuit *(db::Netlist::*) (db::cell_index_type) const) &db::Netlist::circuit_by_cell_index, gsi::arg ("cell_index"),
+    "@brief Gets the circuit object for a given cell index (const version).\n"
+    "If the cell index is not valid or no circuit is registered with this index, nil is returned."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::method ("circuit_by_name", (db::Circuit *(db::Netlist::*) (const std::string &)) &db::Netlist::circuit_by_name, gsi::arg ("name"),
     "@brief Gets the circuit object for a given name.\n"
     "If the name is not a valid circuit name, nil is returned."
+  ) +
+  gsi::method ("circuit_by_name", (const db::Circuit *(db::Netlist::*) (const std::string &) const) &db::Netlist::circuit_by_name, gsi::arg ("name"),
+    "@brief Gets the circuit object for a given name (const version).\n"
+    "If the name is not a valid circuit name, nil is returned."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
   ) +
   gsi::method_ext ("circuits_by_name", &circuits_by_name, gsi::arg ("name_pattern"),
     "@brief Gets the circuit objects for a given name filter.\n"
@@ -1525,15 +1750,35 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "\n"
     "This method has been introduced in version 0.26.4.\n"
   ) +
+  gsi::method_ext ("circuits_by_name", &circuits_by_name_const, gsi::arg ("name_pattern"),
+    "@brief Gets the circuit objects for a given name filter (const version).\n"
+    "The name filter is a glob pattern. This method will return all \\Circuit objects matching the glob pattern.\n"
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::iterator ("each_circuit_top_down", (db::Netlist::top_down_circuit_iterator (db::Netlist::*) ()) &db::Netlist::begin_top_down, (db::Netlist::top_down_circuit_iterator (db::Netlist::*) ()) &db::Netlist::end_top_down,
     "@brief Iterates over the circuits top-down\n"
     "Iterating top-down means the parent circuits come before the child circuits. "
     "The first \\top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits."
   ) +
+  gsi::iterator ("each_circuit_top_down", (db::Netlist::const_top_down_circuit_iterator (db::Netlist::*) () const) &db::Netlist::begin_top_down, (db::Netlist::const_top_down_circuit_iterator (db::Netlist::*) () const) &db::Netlist::end_top_down,
+    "@brief Iterates over the circuits top-down (const version)\n"
+    "Iterating top-down means the parent circuits come before the child circuits. "
+    "The first \\top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::iterator ("each_circuit_bottom_up", (db::Netlist::bottom_up_circuit_iterator (db::Netlist::*) ()) &db::Netlist::begin_bottom_up, (db::Netlist::bottom_up_circuit_iterator (db::Netlist::*) ()) &db::Netlist::end_bottom_up,
     "@brief Iterates over the circuits bottom-up\n"
     "Iterating bottom-up means the parent circuits come after the child circuits. "
     "This is the basically the reverse order as delivered by \\each_circuit_top_down."
+  ) +
+  gsi::iterator ("each_circuit_bottom_up", (db::Netlist::const_bottom_up_circuit_iterator (db::Netlist::*) () const) &db::Netlist::begin_bottom_up, (db::Netlist::const_bottom_up_circuit_iterator (db::Netlist::*) () const) &db::Netlist::end_bottom_up,
+    "@brief Iterates over the circuits bottom-up (const version)\n"
+    "Iterating bottom-up means the parent circuits come after the child circuits. "
+    "This is the basically the reverse order as delivered by \\each_circuit_top_down."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
   ) +
   gsi::method ("top_circuit_count", &db::Netlist::top_circuit_count,
     "@brief Gets the number of top circuits.\n"
@@ -1542,6 +1787,11 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   ) +
   gsi::iterator ("each_circuit", (db::Netlist::circuit_iterator (db::Netlist::*) ()) &db::Netlist::begin_circuits, (db::Netlist::circuit_iterator (db::Netlist::*) ()) &db::Netlist::end_circuits,
     "@brief Iterates over the circuits of the netlist"
+  ) +
+  gsi::iterator ("each_circuit", (db::Netlist::const_circuit_iterator (db::Netlist::*) () const) &db::Netlist::begin_circuits, (db::Netlist::const_circuit_iterator (db::Netlist::*) () const) &db::Netlist::end_circuits,
+    "@brief Iterates over the circuits of the netlist (const version)"
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
   ) +
   gsi::method_ext ("add", &gsi::add_device_class, gsi::arg ("device_class"),
     "@brief Adds the device class to the netlist\n"
@@ -1558,8 +1808,19 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "@brief Gets the device class for a given name.\n"
     "If the name is not a valid device class name, nil is returned."
   ) +
+  gsi::method ("device_class_by_name", (const db::DeviceClass *(db::Netlist::*) (const std::string &) const) &db::Netlist::device_class_by_name, gsi::arg ("name"),
+    "@brief Gets the device class for a given name (const version).\n"
+    "If the name is not a valid device class name, nil is returned."
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
+  ) +
   gsi::iterator ("each_device_class", (db::Netlist::device_class_iterator (db::Netlist::*) ()) &db::Netlist::begin_device_classes, (db::Netlist::device_class_iterator (db::Netlist::*) ()) &db::Netlist::end_device_classes,
     "@brief Iterates over the device classes of the netlist"
+  ) +
+  gsi::iterator ("each_device_class", (db::Netlist::const_device_class_iterator (db::Netlist::*) () const) &db::Netlist::begin_device_classes, (db::Netlist::const_device_class_iterator (db::Netlist::*) () const) &db::Netlist::end_device_classes,
+    "@brief Iterates over the device classes of the netlist (const version)"
+    "\n\n"
+    "This constness variant has been introduced in version 0.26.8"
   ) +
   gsi::method ("to_s", &db::Netlist::to_string,
     "@brief Converts the netlist to a string representation.\n"

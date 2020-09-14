@@ -502,6 +502,7 @@ static gsi::Methods methods_QAbstractEventDispatcher () {
   methods += gsi::qt_signal ("aboutToBlock()", "aboutToBlock", "@brief Signal declaration for QAbstractEventDispatcher::aboutToBlock()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("awake()", "awake", "@brief Signal declaration for QAbstractEventDispatcher::awake()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAbstractEventDispatcher::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QAbstractEventDispatcher::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("instance", "@brief Static method QAbstractEventDispatcher *QAbstractEventDispatcher::instance(QThread *thread)\nThis method is static and can be called without an instance.", &_init_f_instance_1303, &_call_f_instance_1303);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QAbstractEventDispatcher::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QAbstractEventDispatcher::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
@@ -667,6 +668,13 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("interrupt");
     }
+  }
+
+  //  [emitter impl] void QAbstractEventDispatcher::objectNameChanged(const QString &objectName)
+  void emitter_QAbstractEventDispatcher_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QAbstractEventDispatcher::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] bool QAbstractEventDispatcher::processEvents(QFlags<QEventLoop::ProcessEventsFlag> flags)
@@ -1196,6 +1204,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QAbstractEventDispatcher::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QAbstractEventDispatcher_Adaptor *)cls)->emitter_QAbstractEventDispatcher_objectNameChanged_4567 (arg1);
+}
+
+
 // bool QAbstractEventDispatcher::processEvents(QFlags<QEventLoop::ProcessEventsFlag> flags)
 
 static void _init_cbs_processEvents_3995_0 (qt_gsi::GenericMethod *decl)
@@ -1532,6 +1558,7 @@ static gsi::Methods methods_QAbstractEventDispatcher_Adaptor () {
   methods += new qt_gsi::GenericMethod ("interrupt", "@brief Virtual method void QAbstractEventDispatcher::interrupt()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_interrupt_0_0, &_call_cbs_interrupt_0_0);
   methods += new qt_gsi::GenericMethod ("interrupt", "@hide", false, &_init_cbs_interrupt_0_0, &_call_cbs_interrupt_0_0, &_set_callback_cbs_interrupt_0_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QAbstractEventDispatcher::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QAbstractEventDispatcher::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("processEvents", "@brief Virtual method bool QAbstractEventDispatcher::processEvents(QFlags<QEventLoop::ProcessEventsFlag> flags)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_processEvents_3995_0, &_call_cbs_processEvents_3995_0);
   methods += new qt_gsi::GenericMethod ("processEvents", "@hide", false, &_init_cbs_processEvents_3995_0, &_call_cbs_processEvents_3995_0, &_set_callback_cbs_processEvents_3995_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QAbstractEventDispatcher::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);

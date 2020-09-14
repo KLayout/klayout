@@ -140,8 +140,7 @@ public:
           }
         }
 
-        db::LEFDEFLayerDelegate layers (&options);
-        layers.prepare (*layout);
+        db::LEFDEFReaderState state (&options, *layout);
         layout->dbu (options.dbu ());
 
         if (import_lef) {
@@ -153,11 +152,11 @@ public:
           for (std::vector<std::string>::const_iterator l = options.begin_lef_files (); l != options.end_lef_files (); ++l) {
             tl::InputStream lef_stream (*l);
             tl::log << tl::to_string (QObject::tr ("Reading")) << " " << *l;
-            importer.read (lef_stream, *layout, layers);
+            importer.read (lef_stream, *layout, state);
           }
 
           tl::log << tl::to_string (QObject::tr ("Reading")) << " " << data.file;
-          importer.read (stream, *layout, layers);
+          importer.read (stream, *layout, state);
 
         } else {
 
@@ -177,23 +176,23 @@ public:
             if (fi.isAbsolute ()) {
               tl::InputStream lef_stream (*l);
               tl::log << tl::to_string (QObject::tr ("Reading")) << " " << *l;
-              importer.read_lef (lef_stream, *layout, layers);
+              importer.read_lef (lef_stream, *layout, state);
             } else {
               std::string ex_l = tl::to_string (def_fi.absoluteDir ().absoluteFilePath (tl::to_qstring (*l)));
               tl::InputStream lef_stream (ex_l);
               tl::log << tl::to_string (QObject::tr ("Reading")) << " " << *l;
-              importer.read_lef (lef_stream, *layout, layers);
+              importer.read_lef (lef_stream, *layout, state);
             }
 
           }
 
           tl::log << tl::to_string (QObject::tr ("Reading")) << " " << data.file;
 
-          importer.read (stream, *layout, layers);
+          importer.read (stream, *layout, state);
 
         }
 
-        layers.finish (*layout);
+        state.finish (*layout);
 
         lay::LayoutView *view = lay::LayoutView::current ();
         if (! view || data.mode == 1) {

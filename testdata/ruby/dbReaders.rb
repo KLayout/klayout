@@ -249,6 +249,10 @@ class DBReaders_TestClass < TestBase
     conf.via_geometry_suffix = "XVIA"
     assert_equal(conf.via_geometry_suffix, "XVIA")
 
+    assert_equal(conf.via_cellname_prefix, "VIA_")
+    conf.via_cellname_prefix = "ABC"
+    assert_equal(conf.via_cellname_prefix, "ABC")
+
     assert_equal(conf.via_geometry_datatype, 0)
     conf.via_geometry_datatype = 17
     assert_equal(conf.via_geometry_datatype, 17)
@@ -264,6 +268,18 @@ class DBReaders_TestClass < TestBase
     assert_equal(conf.pins_datatype, 2)
     conf.pins_datatype = 18
     assert_equal(conf.pins_datatype, 18)
+
+    assert_equal(conf.produce_lef_pins, true)
+    conf.produce_lef_pins = false
+    assert_equal(conf.produce_lef_pins, false)
+
+    assert_equal(conf.lef_pins_suffix, ".PIN")
+    conf.lef_pins_suffix = "LEFPIN"
+    assert_equal(conf.lef_pins_suffix, "LEFPIN")
+
+    assert_equal(conf.lef_pins_datatype, 2)
+    conf.lef_pins_datatype = 181
+    assert_equal(conf.lef_pins_datatype, 181)
 
     assert_equal(conf.produce_obstructions, true)
     conf.produce_obstructions = false
@@ -313,9 +329,33 @@ class DBReaders_TestClass < TestBase
     conf.routing_datatype = 22
     assert_equal(conf.routing_datatype, 22)
 
+    assert_equal(conf.produce_special_routing, true)
+    conf.produce_special_routing = false
+    assert_equal(conf.produce_special_routing, false)
+
+    assert_equal(conf.special_routing_suffix, "")
+    conf.special_routing_suffix = "SPROUT"
+    assert_equal(conf.special_routing_suffix, "SPROUT")
+
+    assert_equal(conf.special_routing_datatype, 0)
+    conf.special_routing_datatype = 23
+    assert_equal(conf.special_routing_datatype, 23)
+
+    assert_equal(conf.separate_groups, false)
+    conf.separate_groups = true
+    assert_equal(conf.separate_groups, true)
+
+    assert_equal(conf.map_file, "")
+    conf.map_file = "xyz.map"
+    assert_equal(conf.map_file, "xyz.map")
+
     assert_equal(conf.lef_files.join(","), "")
     conf.lef_files = [ "u.lef", "v.lef" ]
     assert_equal(conf.lef_files.join(","), "u.lef,v.lef")
+
+    assert_equal(conf.read_lef_with_def, true)
+    conf.read_lef_with_def = false
+    assert_equal(conf.read_lef_with_def, false)
 
   end
 

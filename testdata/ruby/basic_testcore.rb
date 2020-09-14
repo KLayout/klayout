@@ -733,6 +733,8 @@ class Basic_TestClass < TestBase
     arr = []
     b.each_b_copy { |bb| arr.push(bb.b2) } 
     assert_equal(arr, ["a", "y", "uu"])
+    # through enumerator
+    assert_equal(b.each_b_copy.collect(&:b2), ["a", "y", "uu"])
 
     arr = []
     b.each_b_copy { |bb| bb.b5(bb.b2 + "x"); arr.push(bb.b2) } 
@@ -745,6 +747,8 @@ class Basic_TestClass < TestBase
     arr = []
     b.each_b_cref { |bb| arr.push(bb.b2) } 
     assert_equal(arr, ["a", "y", "uu"])
+    # through enumerator
+    assert_equal(b.each_b_cref.collect(&:b2), ["a", "y", "uu"])
 
     arr = []
     # this works, since the "const B &" will be converted to a copy
@@ -759,6 +763,8 @@ class Basic_TestClass < TestBase
     arr = []
     b.each_b_cptr { |bb| arr.push(bb.b2) } 
     assert_equal(arr, ["a", "y", "uu"])
+    # through enumerator
+    assert_equal(b.each_b_cptr.collect(&:b2), ["a", "y", "uu"])
 
     arr = []
     # const references cannot be modified
@@ -778,6 +784,8 @@ class Basic_TestClass < TestBase
     arr = []
     b.each_b_ref { |bb| arr.push(bb.b2) } 
     assert_equal(arr, ["a", "y", "uu"])
+    # through enumerator
+    assert_equal(b.each_b_ref.collect(&:b2), ["a", "y", "uu"])
 
     arr = []
     b.each_b_ref { |bb| bb.b5(bb.b2 + "x"); arr.push(bb.b2) } 
@@ -790,6 +798,8 @@ class Basic_TestClass < TestBase
     arr = []
     b.each_b_ptr { |bb| arr.push(bb.b2) } 
     assert_equal(arr, ["ax", "yx", "uux"])
+    # through enumerator
+    assert_equal(b.each_b_ptr.collect(&:b2), ["ax", "yx", "uux"])
 
     arr = []
     b.each_b_ptr { |bb| bb.b5(bb.b2 + "x"); arr.push(bb.b2) } 

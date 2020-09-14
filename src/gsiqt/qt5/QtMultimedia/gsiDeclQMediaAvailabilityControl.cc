@@ -70,6 +70,26 @@ static void _call_f_availability_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
+// void QMediaAvailabilityControl::availabilityChanged(QMultimedia::AvailabilityStatus availability)
+
+
+static void _init_f_availabilityChanged_3555 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("availability");
+  decl->add_arg<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_availabilityChanged_3555 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QMediaAvailabilityControl *)cls)->availabilityChanged (qt_gsi::QtToCppAdaptor<QMultimedia::AvailabilityStatus>(arg1).cref());
+}
+
+
 // static QString QMediaAvailabilityControl::tr(const char *s, const char *c, int n)
 
 
@@ -127,8 +147,7 @@ static gsi::Methods methods_QMediaAvailabilityControl () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("availability", "@brief Method QMultimedia::AvailabilityStatus QMediaAvailabilityControl::availability()\n", true, &_init_f_availability_c0, &_call_f_availability_c0);
-  methods += gsi::qt_signal<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & > ("availabilityChanged(QMultimedia::AvailabilityStatus)", "availabilityChanged", gsi::arg("availability"), "@brief Signal declaration for QMediaAvailabilityControl::availabilityChanged(QMultimedia::AvailabilityStatus availability)\nYou can bind a procedure to this signal.");
-  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QMediaAvailabilityControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += new qt_gsi::GenericMethod ("availabilityChanged", "@brief Method void QMediaAvailabilityControl::availabilityChanged(QMultimedia::AvailabilityStatus availability)\n", false, &_init_f_availabilityChanged_3555, &_call_f_availabilityChanged_3555);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QMediaAvailabilityControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QMediaAvailabilityControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -190,18 +209,6 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("availability");
     }
-  }
-
-  //  [emitter impl] void QMediaAvailabilityControl::availabilityChanged(QMultimedia::AvailabilityStatus availability)
-  void emitter_QMediaAvailabilityControl_availabilityChanged_3555(QMultimedia::AvailabilityStatus availability)
-  {
-    emit QMediaAvailabilityControl::availabilityChanged(availability);
-  }
-
-  //  [emitter impl] void QMediaAvailabilityControl::destroyed(QObject *)
-  void emitter_QMediaAvailabilityControl_destroyed_1302(QObject *arg1)
-  {
-    emit QMediaAvailabilityControl::destroyed(arg1);
   }
 
   //  [adaptor impl] bool QMediaAvailabilityControl::event(QEvent *)
@@ -338,24 +345,6 @@ static void _set_callback_cbs_availability_c0_0 (void *cls, const gsi::Callback 
 }
 
 
-// emitter void QMediaAvailabilityControl::availabilityChanged(QMultimedia::AvailabilityStatus availability)
-
-static void _init_emitter_availabilityChanged_3555 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("availability");
-  decl->add_arg<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_availabilityChanged_3555 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & >() (args, heap);
-  ((QMediaAvailabilityControl_Adaptor *)cls)->emitter_QMediaAvailabilityControl_availabilityChanged_3555 (arg1);
-}
-
-
 // void QMediaAvailabilityControl::childEvent(QChildEvent *)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
@@ -401,24 +390,6 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QMediaAvailabilityControl_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
-}
-
-
-// emitter void QMediaAvailabilityControl::destroyed(QObject *)
-
-static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
-  decl->add_arg<QObject * > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
-  ((QMediaAvailabilityControl_Adaptor *)cls)->emitter_QMediaAvailabilityControl_destroyed_1302 (arg1);
 }
 
 
@@ -593,12 +564,10 @@ static gsi::Methods methods_QMediaAvailabilityControl_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMediaAvailabilityControl::QMediaAvailabilityControl()\nThis method creates an object of class QMediaAvailabilityControl.", &_init_ctor_QMediaAvailabilityControl_Adaptor_0, &_call_ctor_QMediaAvailabilityControl_Adaptor_0);
   methods += new qt_gsi::GenericMethod ("availability", "@brief Virtual method QMultimedia::AvailabilityStatus QMediaAvailabilityControl::availability()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_availability_c0_0, &_call_cbs_availability_c0_0);
   methods += new qt_gsi::GenericMethod ("availability", "@hide", true, &_init_cbs_availability_c0_0, &_call_cbs_availability_c0_0, &_set_callback_cbs_availability_c0_0);
-  methods += new qt_gsi::GenericMethod ("emit_availabilityChanged", "@brief Emitter for signal void QMediaAvailabilityControl::availabilityChanged(QMultimedia::AvailabilityStatus availability)\nCall this method to emit this signal.", false, &_init_emitter_availabilityChanged_3555, &_call_emitter_availabilityChanged_3555);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QMediaAvailabilityControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMediaAvailabilityControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QMediaAvailabilityControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QMediaAvailabilityControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMediaAvailabilityControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);

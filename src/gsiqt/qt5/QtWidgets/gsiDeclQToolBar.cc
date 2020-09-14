@@ -735,6 +735,7 @@ static gsi::Methods methods_QToolBar () {
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QToolBar::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QSize & > ("iconSizeChanged(const QSize &)", "iconSizeChanged", gsi::arg("iconSize"), "@brief Signal declaration for QToolBar::iconSizeChanged(const QSize &iconSize)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("movableChanged(bool)", "movableChanged", gsi::arg("movable"), "@brief Signal declaration for QToolBar::movableChanged(bool movable)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QToolBar::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<Qt::Orientation>::target_type & > ("orientationChanged(Qt::Orientation)", "orientationChanged", gsi::arg("orientation"), "@brief Signal declaration for QToolBar::orientationChanged(Qt::Orientation orientation)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<Qt::ToolButtonStyle>::target_type & > ("toolButtonStyleChanged(Qt::ToolButtonStyle)", "toolButtonStyleChanged", gsi::arg("toolButtonStyle"), "@brief Signal declaration for QToolBar::toolButtonStyleChanged(Qt::ToolButtonStyle toolButtonStyle)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("topLevelChanged(bool)", "topLevelChanged", gsi::arg("topLevel"), "@brief Signal declaration for QToolBar::topLevelChanged(bool topLevel)\nYou can bind a procedure to this signal.");
@@ -947,6 +948,13 @@ public:
   void emitter_QToolBar_movableChanged_864(bool movable)
   {
     emit QToolBar::movableChanged(movable);
+  }
+
+  //  [emitter impl] void QToolBar::objectNameChanged(const QString &objectName)
+  void emitter_QToolBar_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QToolBar::objectNameChanged(const QString &objectName)'");
   }
 
   //  [emitter impl] void QToolBar::orientationChanged(Qt::Orientation orientation)
@@ -2707,6 +2715,24 @@ static void _set_callback_cbs_nativeEvent_4678_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QToolBar::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QToolBar_Adaptor *)cls)->emitter_QToolBar_objectNameChanged_4567 (arg1);
+}
+
+
 // emitter void QToolBar::orientationChanged(Qt::Orientation orientation)
 
 static void _init_emitter_orientationChanged_1913 (qt_gsi::GenericMethod *decl)
@@ -3231,6 +3257,7 @@ static gsi::Methods methods_QToolBar_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*moveEvent", "@hide", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0, &_set_callback_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@brief Virtual method bool QToolBar::nativeEvent(const QByteArray &eventType, void *message, long int *result)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@hide", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0, &_set_callback_cbs_nativeEvent_4678_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QToolBar::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("emit_orientationChanged", "@brief Emitter for signal void QToolBar::orientationChanged(Qt::Orientation orientation)\nCall this method to emit this signal.", false, &_init_emitter_orientationChanged_1913, &_call_emitter_orientationChanged_1913);
   methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Virtual method QPaintEngine *QToolBar::paintEngine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0);
   methods += new qt_gsi::GenericMethod ("paintEngine", "@hide", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0, &_set_callback_cbs_paintEngine_c0_0);

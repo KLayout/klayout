@@ -502,7 +502,7 @@ CommandLineOptions::parse (int argc, char *argv[])
       ex.read_word (n, "_-");
       std::map<std::string, ArgBase *>::const_iterator a = arg_by_long_option.find (n);
       if (a == arg_by_long_option.end ()) {
-        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unknown command line option --%1 (use -h for help)")), n));
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unknown command line option --%s (use -h for help)")), n));
       }
       arg = a->second;
 
@@ -512,14 +512,14 @@ CommandLineOptions::parse (int argc, char *argv[])
       ex.read_word (n);
       std::map<std::string, ArgBase *>::const_iterator a = arg_by_short_option.find (n);
       if (a == arg_by_short_option.end ()) {
-        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unknown command line option --%1 (use -h for help)")), n));
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unknown command line option -%s (use -h for help)")), n));
       }
       arg = a->second;
 
     } else {
 
       if (next_plain_arg == plain_args.end ()) {
-        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unknown command line component %1 - no further plain argument expected (use -h for help)")), arg_as_utf8));
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unknown command line component %s - no further plain argument expected (use -h for help)")), arg_as_utf8));
       }
 
       arg = *next_plain_arg;
@@ -558,7 +558,10 @@ CommandLineOptions::parse (int argc, char *argv[])
         if (ex.test ("=")) {
           arg->take_value (ex);
         } else {
-          arg->mark_present (arg->option ().inverted);
+          arg->mark_present ();
+        }
+        if (arg->option ().inverted) {
+          arg->invert_present ();
         }
 
       }

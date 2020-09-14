@@ -1507,6 +1507,7 @@ static gsi::Methods methods_QFileDialog () {
   methods += gsi::qt_signal<const QStringList & > ("filesSelected(const QStringList &)", "filesSelected", gsi::arg("files"), "@brief Signal declaration for QFileDialog::filesSelected(const QStringList &files)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("filterSelected(const QString &)", "filterSelected", gsi::arg("filter"), "@brief Signal declaration for QFileDialog::filterSelected(const QString &filter)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("finished(int)", "finished", gsi::arg("result"), "@brief Signal declaration for QFileDialog::finished(int result)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QFileDialog::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("rejected()", "rejected", "@brief Signal declaration for QFileDialog::rejected()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QUrl & > ("urlSelected(const QUrl &)", "urlSelected", gsi::arg("url"), "@brief Signal declaration for QFileDialog::urlSelected(const QUrl &url)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QList<QUrl> & > ("urlsSelected(const QList<QUrl> &)", "urlsSelected", gsi::arg("urls"), "@brief Signal declaration for QFileDialog::urlsSelected(const QList<QUrl> &urls)\nYou can bind a procedure to this signal.");
@@ -1768,6 +1769,13 @@ public:
     } else {
       return QFileDialog::minimumSizeHint();
     }
+  }
+
+  //  [emitter impl] void QFileDialog::objectNameChanged(const QString &objectName)
+  void emitter_QFileDialog_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QFileDialog::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QFileDialog::open()
@@ -3760,6 +3768,24 @@ static void _set_callback_cbs_nativeEvent_4678_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QFileDialog::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QFileDialog_Adaptor *)cls)->emitter_QFileDialog_objectNameChanged_4567 (arg1);
+}
+
+
 // void QFileDialog::open()
 
 static void _init_cbs_open_0_0 (qt_gsi::GenericMethod *decl)
@@ -4313,6 +4339,7 @@ static gsi::Methods methods_QFileDialog_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*moveEvent", "@hide", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0, &_set_callback_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@brief Virtual method bool QFileDialog::nativeEvent(const QByteArray &eventType, void *message, long int *result)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@hide", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0, &_set_callback_cbs_nativeEvent_4678_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QFileDialog::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("open", "@brief Virtual method void QFileDialog::open()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_open_0_0, &_call_cbs_open_0_0);
   methods += new qt_gsi::GenericMethod ("open", "@hide", false, &_init_cbs_open_0_0, &_call_cbs_open_0_0, &_set_callback_cbs_open_0_0);
   methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Virtual method QPaintEngine *QFileDialog::paintEngine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0);

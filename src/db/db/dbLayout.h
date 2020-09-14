@@ -67,6 +67,8 @@ class Region;
 class Edges;
 class EdgePairs;
 class Texts;
+class CellMapping;
+class LayerMapping;
 
 template <class Coord> class generic_repository;
 typedef generic_repository<db::Coord> GenericRepository;
@@ -1256,6 +1258,34 @@ public:
    *  layer's index for recycling.
    */
   void delete_layer (unsigned int n);
+
+  /**
+   *  @brief Copies the shapes of certain cells from the given source layout into this layout
+   *
+   *  The affected cells are derived from the cell mapping object.
+   */
+  void copy_tree_shapes (const db::Layout &source_layout, const db::CellMapping &cm);
+
+  /**
+   *  @brief Copies the shapes of certain cells from the given source layout into this layout using the given layer mapping
+   *
+   *  The affected cells are derived from the cell mapping object.
+   */
+  void copy_tree_shapes (const db::Layout &source_layout, const db::CellMapping &cm, const db::LayerMapping &lm);
+
+  /**
+   *  @brief Moves the shapes of certain cells from the given source layout into this layout
+   *
+   *  The affected cells are derived from the cell mapping object.
+   */
+  void move_tree_shapes (db::Layout &source_layout, const db::CellMapping &cm);
+
+  /**
+   *  @brief Moves the shapes of certain cells from the given source layout into this layout using the given layer mapping
+   *
+   *  The affected cells are derived from the cell mapping object.
+   */
+  void move_tree_shapes (db::Layout &source_layout, const db::CellMapping &cm, const db::LayerMapping &lm);
 
   /**
    *  @brief Return true, if the cell index is a valid one

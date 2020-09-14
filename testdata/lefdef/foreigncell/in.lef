@@ -1,0 +1,21 @@
+MACRO macro1
+    CLASS CORE ;
+    FOREIGN foreign1  0.13 0.5 W ;
+    ORIGIN 0.035 0.235 ;
+    SIZE 0.07 BY 0.47 ;
+END macro1
+
+MACRO macro2
+    CLASS CORE ;
+    FOREIGN foreign2 -0.15 0.25 ;
+    ORIGIN 0.235 0.035 ;
+    SIZE 0.47 BY 0.07 ;
+END macro2
+
+MACRO macro3
+    CLASS CORE ;
+    FOREIGN macro3 -1.0 1.0 ;
+    ORIGIN 0.0 0.0 ;
+    SIZE 1.0 BY 0.4 ;
+END macro3
+

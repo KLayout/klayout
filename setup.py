@@ -336,7 +336,6 @@ class Config(object):
             rm = re.search(r"KLAYOUT_PYPI_VERSION\s*=\s*\"(.*?)\".*", version_txt)
             if rm:
                 version_string = rm.group(1)
-                print("KLAYOUT_PYPI_VERSION = " + version_string)
                 return version_string
 
         raise RuntimeError("Unable to obtain version string from version.sh")

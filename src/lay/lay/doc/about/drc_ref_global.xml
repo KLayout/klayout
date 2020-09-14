@@ -255,7 +255,7 @@ See <a href="/about/drc_ref_netter.xml#connect_implicit">Netter#connect_implicit
 <keyword name="dbu"/>
 <p>Usage:</p>
 <ul>
-<li><tt>dbu(dbu)</tt></li>
+<li><tt>dbu(dbu_value)</tt></li>
 <li><tt>dbu</tt></li>
 </ul>
 <p>
@@ -553,6 +553,39 @@ delivered by <a href="#polygon_layer">polygon_layer</a> is not.
 </p><p>
 On the other hand, a layer created by the <a href="#make_layer">make_layer</a> method is not intended to be
 filled with <a href="/about/drc_ref_layer.xml#insert">Layer#insert</a>.
+</p>
+<a name="max_area_ratio"/><h2>"max_area_ratio" - Gets or sets the maximum bounding box to polygon area ratio for deep mode fragmentation</h2>
+<keyword name="max_area_ratio"/>
+<p>Usage:</p>
+<ul>
+<li><tt>max_area_ratio(ratio)</tt></li>
+<li><tt>max_area_ratio</tt></li>
+</ul>
+<p>
+In deep mode, polygons with a bounding box to polygon area ratio bigger than the given number
+will be split into smaller chunks to optimize performance (which gets better if the polygon's
+bounding boxes do not cover a lot of empty space).
+The default threshold is 3.0 which means fairly compact polygons. Use this method with a numeric 
+argument to set the value and without an argument to get the current maximum area ratio.
+Set the value to zero to disable splitting by area ratio.
+</p><p>
+See also <a href="#max_vertex_count">max_vertex_count</a> for the other option affecting polygon splitting.
+</p>
+<a name="max_vertex_count"/><h2>"max_vertex_count" - Gets or sets the maximum vertex count for deep mode fragmentation</h2>
+<keyword name="max_vertex_count"/>
+<p>Usage:</p>
+<ul>
+<li><tt>max_vertex_count(count)</tt></li>
+<li><tt>max_vertex_count</tt></li>
+</ul>
+<p>
+In deep mode, polygons with more than the given number of vertexes will be split into
+smaller chunks to optimize performance (which is better or less complex polygons).
+The default threshold is 16 vertexes. Use this method with a vertex count to set the
+value and without an argument to get the current maximum vertex count.
+Set the value to zero to disable splitting by vertex count.
+</p><p>
+See also <a href="#max_area_ratio">max_area_ratio</a> for the other option affecting polygon splitting.
 </p>
 <a name="mos3"/><h2>"mos3" - Supplies the MOS3 transistor extractor class</h2>
 <keyword name="mos3"/>
@@ -853,18 +886,22 @@ See <a href="#write_spice">write_spice</a> for more details.
 <p>Usage:</p>
 <ul>
 <li><tt>threads(n)</tt></li>
+<li><tt>threads</tt></li>
 </ul>
 <p>
 If using threads, tiles are distributed on multiple CPU cores for
 parallelization. Still, all tiles must be processed before the 
-operation proceeds with the next statement.
+operation proceeds with the next statement. 
+</p><p>
+Without an argument, "threads" will return the current number of 
+threads
 </p>
 <a name="tile_borders"/><h2>"tile_borders" - Specifies a minimum tile border</h2>
 <keyword name="tile_borders"/>
 <p>Usage:</p>
 <ul>
-<li><tt>tile_border(b)</tt></li>
-<li><tt>tile_border(bx, by)</tt></li>
+<li><tt>tile_borders(b)</tt></li>
+<li><tt>tile_borders(bx, by)</tt></li>
 </ul>
 <p>
 The tile border specifies the distance to which shapes are collected into the 

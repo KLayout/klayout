@@ -627,6 +627,38 @@ If the layer is a hierarchical layer (an original layer or
 a derived layer in deep mode), this method will convert it
 to a flat collection of texts, polygons, edges or edge pairs.
 </p>
+<a name="forget"/><h2>"forget" - Cleans up memory for this layer</h2>
+<keyword name="forget"/>
+<p>Usage:</p>
+<ul>
+<li><tt>forget</tt></li>
+</ul>
+<p>
+KLayout's DRC engine is imperative. This means, every command is executed immediately
+rather than being compiled and executed later. The advantage of this approach is that
+it allows decisions to be taken depending on the content of a layer and to code 
+functions that operate directly on the layer's content.
+</p><p>
+However, one drawback is that the engine cannot decide when a layer is no longer 
+required - it may still be used later in the script. So a layer's data is not cleaned
+up automatically.
+</p><p>
+In order to save memory for DRC scripts intended for bigger layouts, the DRC script
+should clean up layers as soon as they are no longer required. The "forget" method
+will free the memory used for the layer's information.
+</p><p>
+The recommended approach is:
+</p><p>
+<pre>
+l = ... # compute some layer
+...
+# once you're done with l:
+l.forget
+l = nil
+</pre>
+</p><p>
+By setting the layer to nil, it is ensured that it can no longer be accessed.
+</p>
 <a name="holes"/><h2>"holes" - Selects all polygon holes from the input</h2>
 <keyword name="holes"/>
 <p>Usage:</p>

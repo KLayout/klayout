@@ -322,13 +322,13 @@ public:
   /**
    *  @brief Adds a pin to this circuit
    */
-  const Pin &add_pin (const std::string &name);
+  Pin &add_pin (const std::string &name);
 
   /**
    *  @brief Adds a pin to this circuit
    *  This version uses the given pin as the template.
    */
-  const Pin &add_pin (const Pin &pin);
+  Pin &add_pin (const Pin &pin);
 
   /**
    *  @brief Removes the pin with the given ID

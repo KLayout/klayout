@@ -460,6 +460,7 @@ static gsi::Methods methods_QNetworkSession () {
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QNetworkSession::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<QNetworkSession::SessionError>::target_type & > ("error(QNetworkSession::SessionError)", "error_sig", gsi::arg("arg1"), "@brief Signal declaration for QNetworkSession::error(QNetworkSession::SessionError)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("newConfigurationActivated()", "newConfigurationActivated", "@brief Signal declaration for QNetworkSession::newConfigurationActivated()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QNetworkSession::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("opened()", "opened", "@brief Signal declaration for QNetworkSession::opened()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QNetworkConfiguration &, bool > ("preferredConfigurationChanged(const QNetworkConfiguration &, bool)", "preferredConfigurationChanged", gsi::arg("config"), gsi::arg("isSeamless"), "@brief Signal declaration for QNetworkSession::preferredConfigurationChanged(const QNetworkConfiguration &config, bool isSeamless)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<QNetworkSession::State>::target_type & > ("stateChanged(QNetworkSession::State)", "stateChanged", gsi::arg("arg1"), "@brief Signal declaration for QNetworkSession::stateChanged(QNetworkSession::State)\nYou can bind a procedure to this signal.");
@@ -570,6 +571,13 @@ public:
   void emitter_QNetworkSession_newConfigurationActivated_0()
   {
     emit QNetworkSession::newConfigurationActivated();
+  }
+
+  //  [emitter impl] void QNetworkSession::objectNameChanged(const QString &objectName)
+  void emitter_QNetworkSession_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QNetworkSession::objectNameChanged(const QString &objectName)'");
   }
 
   //  [emitter impl] void QNetworkSession::opened()
@@ -890,6 +898,24 @@ static void _call_emitter_newConfigurationActivated_0 (const qt_gsi::GenericMeth
 }
 
 
+// emitter void QNetworkSession::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QNetworkSession_Adaptor *)cls)->emitter_QNetworkSession_objectNameChanged_4567 (arg1);
+}
+
+
 // emitter void QNetworkSession::opened()
 
 static void _init_emitter_opened_0 (qt_gsi::GenericMethod *decl)
@@ -1054,6 +1080,7 @@ static gsi::Methods methods_QNetworkSession_Adaptor () {
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QNetworkSession::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("emit_newConfigurationActivated", "@brief Emitter for signal void QNetworkSession::newConfigurationActivated()\nCall this method to emit this signal.", false, &_init_emitter_newConfigurationActivated_0, &_call_emitter_newConfigurationActivated_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QNetworkSession::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("emit_opened", "@brief Emitter for signal void QNetworkSession::opened()\nCall this method to emit this signal.", false, &_init_emitter_opened_0, &_call_emitter_opened_0);
   methods += new qt_gsi::GenericMethod ("emit_preferredConfigurationChanged", "@brief Emitter for signal void QNetworkSession::preferredConfigurationChanged(const QNetworkConfiguration &config, bool isSeamless)\nCall this method to emit this signal.", false, &_init_emitter_preferredConfigurationChanged_4264, &_call_emitter_preferredConfigurationChanged_4264);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QNetworkSession::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);

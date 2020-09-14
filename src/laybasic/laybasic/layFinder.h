@@ -139,11 +139,13 @@ protected:
    *  is less than the one stored in "distance" or "match" is false. If the 
    *  distance is updated, match is set to true.
    *
+   *  "trans" is the transformation to be applied to the edge before the test.
+   *
    *  This method returns a mask indicating which point of the edge was matching.
    *  Bit 0 of this mask indicates the first point is matching, bit 1 indictates the
    *  second point is matching.
    */
-  unsigned int test_edge (const db::Edge &edge, double &distance, bool &match);
+  unsigned int test_edge (const db::ICplxTrans &trans, const db::Edge &edge, double &distance, bool &match);
 
 private:
   void do_find (const db::Cell &cell, int level, const db::ICplxTrans &t);

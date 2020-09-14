@@ -284,7 +284,7 @@ void LayoutToNetlist::connect_impl (const db::ShapeCollection &a, const db::Shap
   m_conn.connect (dla.layer (), dlb.layer ());
 }
 
-void LayoutToNetlist::connect_global_impl (const db::ShapeCollection &l, const std::string &gn)
+size_t LayoutToNetlist::connect_global_impl (const db::ShapeCollection &l, const std::string &gn)
 {
   if (m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
@@ -297,7 +297,7 @@ void LayoutToNetlist::connect_global_impl (const db::ShapeCollection &l, const s
   db::DeepLayer dl = deep_layer_of (l);
   m_dlrefs.insert (dl);
 
-  m_conn.connect_global (dl.layer (), gn);
+  return m_conn.connect_global (dl.layer (), gn);
 }
 
 const std::string &LayoutToNetlist::global_net_name (size_t id) const

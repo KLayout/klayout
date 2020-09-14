@@ -24,6 +24,8 @@
 #include "dbReader.h"
 #include "dbStream.h"
 #include "tlClassRegistry.h"
+#include "tlTimer.h"
+#include "tlLog.h"
 
 namespace db
 {
@@ -72,6 +74,22 @@ Reader::~Reader ()
     delete mp_actual_reader;
     mp_actual_reader = 0;
   }
+}
+
+const db::LayerMap &
+Reader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
+{
+  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading file: ")) + m_stream.source ());
+
+  return mp_actual_reader->read (layout, options);
+}
+
+const db::LayerMap &
+Reader::read (db::Layout &layout)
+{
+  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading file: ")) + m_stream.source ());
+
+  return mp_actual_reader->read (layout);
 }
 
 }

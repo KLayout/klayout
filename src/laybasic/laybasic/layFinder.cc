@@ -112,15 +112,18 @@ Finder::start (lay::LayoutView *view, const lay::CellView &cv, unsigned int cv_i
 }
 
 unsigned int
-Finder::test_edge (const db::Edge &edg, double &distance, bool &match)
+Finder::test_edge (const db::ICplxTrans &trans, const db::Edge &edg, double &distance, bool &match)
 {
+  db::Point p1 = trans * edg.p1 ();
+  db::Point p2 = trans * edg.p2 ();
+
   unsigned int ret = 0;
 
   //  we hit the region with the edge end points - take the closest vertex
-  if (m_region.contains (edg.p1 ()) || m_region.contains (edg.p2 ())) {
+  if (m_region.contains (p1) || m_region.contains (p2)) {
 
-    double d1 = edg.p1 ().double_distance (m_region.center ());
-    double d2 = edg.p2 ().double_distance (m_region.center ());
+    double d1 = p1.double_distance (m_region.center ());
+    double d2 = p2.double_distance (m_region.center ());
 
     //  snap to the point - nothing can get closer
     distance = 0.0;
@@ -136,13 +139,16 @@ Finder::test_edge (const db::Edge &edg, double &distance, bool &match)
   
   //  if the edge cuts through the active region: test the
   //  edge as a whole
-  if (ret == 0 && edg.clipped (m_region).first) {
-    double d = edg.distance_abs (m_region.center ());
-    if (! match || d < distance) {
-      distance = d;
-      ret = 3;
+  if (ret == 0) {
+    db::Edge edg_trans (p1, p2);
+    if (edg_trans.clipped (m_region).first) {
+      double d = edg_trans.distance_abs (m_region.center ());
+      if (! match || d < distance) {
+        distance = d;
+        ret = 3;
+      }
+      match = true;
     }
-    match = true;
   }
 
   return ret;
@@ -488,7 +494,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const 
           if (shape->is_polygon ()) {
 
             for (db::Shape::polygon_edge_iterator e = shape->begin_edge (); ! e.at_end (); ++e) {
-              test_edge (t * *e, d, match);
+              test_edge (t, *e, d, match);
             }
 
             //  test if inside the polygon
@@ -505,7 +511,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const 
               db::Point p (*pt);
               ++pt;
               for (; pt != shape->end_point (); ++pt) {
-                test_edge (t * db::Edge (p, *pt), d, match);
+                test_edge (t, db::Edge (p, *pt), d, match);
                 p = *pt;
               }
             }
@@ -514,7 +520,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const 
             db::Polygon poly;
             shape->polygon (poly);
             for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
-              test_edge (t * *e, d, match);
+              test_edge (t, *e, d, match);
             }
 
             //  test if inside the polygon
@@ -536,7 +542,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const 
               //  convert to polygon and test those edges
               db::Polygon poly (box);
               for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
-                test_edge (t * *e, d, match);
+                test_edge (t, *e, d, match);
               }
 
               if (! match && box.contains (search_box.center ())) {
@@ -832,7 +838,7 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
               db::Polygon poly (cell_inst.complex_trans (*p) * db::Polygon (ibox));
 
               for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
-                test_edge (t * *e, d, match);
+                test_edge (t, *e, d, match);
               }
 
               if (! match && db::inside_poly (poly.begin_edge (), search_box.center ())) {

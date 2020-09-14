@@ -133,26 +133,6 @@ static void _call_f_deleteLater_0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// void QObject::destroyed(QObject *)
-
-
-static void _init_f_destroyed_1302 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
-  decl->add_arg<QObject * > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QObject *)cls)->destroyed (arg1);
-}
-
-
 // bool QObject::disconnect(const char *signal, const QObject *receiver, const char *member)
 
 
@@ -797,7 +777,6 @@ static gsi::Methods methods_QObject () {
   methods += new qt_gsi::GenericMethod ("children", "@brief Method const QList<QObject*> &QObject::children()\n", true, &_init_f_children_c0, &_call_f_children_c0);
   methods += new qt_gsi::GenericMethod ("connect", "@brief Method QMetaObject::Connection QObject::connect(const QObject *sender, const char *signal, const char *member, Qt::ConnectionType type)\n", true, &_init_f_connect_c7342, &_call_f_connect_c7342);
   methods += new qt_gsi::GenericMethod ("deleteLater", "@brief Method void QObject::deleteLater()\n", false, &_init_f_deleteLater_0, &_call_f_deleteLater_0);
-  methods += new qt_gsi::GenericMethod ("destroyed", "@brief Method void QObject::destroyed(QObject *)\n", false, &_init_f_destroyed_1302, &_call_f_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("disconnect", "@brief Method bool QObject::disconnect(const char *signal, const QObject *receiver, const char *member)\n", true, &_init_f_disconnect_c5243, &_call_f_disconnect_c5243);
   methods += new qt_gsi::GenericMethod ("disconnect", "@brief Method bool QObject::disconnect(const QObject *receiver, const char *member)\n", true, &_init_f_disconnect_c3620, &_call_f_disconnect_c3620);
   methods += new qt_gsi::GenericMethod ("dumpObjectInfo", "@brief Method void QObject::dumpObjectInfo()\n", false, &_init_f_dumpObjectInfo_0, &_call_f_dumpObjectInfo_0);
@@ -821,6 +800,8 @@ static gsi::Methods methods_QObject () {
   methods += new qt_gsi::GenericMethod ("signalsBlocked", "@brief Method bool QObject::signalsBlocked()\n", true, &_init_f_signalsBlocked_c0, &_call_f_signalsBlocked_c0);
   methods += new qt_gsi::GenericMethod ("startTimer", "@brief Method int QObject::startTimer(int interval, Qt::TimerType timerType)\n", false, &_init_f_startTimer_2339, &_call_f_startTimer_2339);
   methods += new qt_gsi::GenericMethod ("thread", "@brief Method QThread *QObject::thread()\n", true, &_init_f_thread_c0, &_call_f_thread_c0);
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QObject::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QObject::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("connect", "@brief Static method QMetaObject::Connection QObject::connect(const QObject *sender, const char *signal, const QObject *receiver, const char *member, Qt::ConnectionType)\nThis method is static and can be called without an instance.", &_init_f_connect_9231, &_call_f_connect_9231);
   methods += new qt_gsi::GenericStaticMethod ("connect", "@brief Static method QMetaObject::Connection QObject::connect(const QObject *sender, const QMetaMethod &signal, const QObject *receiver, const QMetaMethod &method, Qt::ConnectionType type)\nThis method is static and can be called without an instance.", &_init_f_connect_10557, &_call_f_connect_10557);
   methods += new qt_gsi::GenericStaticMethod ("disconnect", "@brief Static method bool QObject::disconnect(const QObject *sender, const char *signal, const QObject *receiver, const char *member)\nThis method is static and can be called without an instance.", &_init_f_disconnect_7132, &_call_f_disconnect_7132);
@@ -881,6 +862,12 @@ public:
     return QObject::senderSignalIndex();
   }
 
+  //  [emitter impl] void QObject::destroyed(QObject *)
+  void emitter_QObject_destroyed_1302(QObject *arg1)
+  {
+    emit QObject::destroyed(arg1);
+  }
+
   //  [adaptor impl] bool QObject::event(QEvent *)
   bool cbs_event_1217_0(QEvent *arg1)
   {
@@ -909,6 +896,13 @@ public:
     } else {
       return QObject::eventFilter(arg1, arg2);
     }
+  }
+
+  //  [emitter impl] void QObject::objectNameChanged(const QString &objectName)
+  void emitter_QObject_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QObject::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QObject::childEvent(QChildEvent *)
@@ -1047,6 +1041,24 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QObject::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  ((QObject_Adaptor *)cls)->emitter_QObject_destroyed_1302 (arg1);
+}
+
+
 // void QObject::disconnectNotify(const QMetaMethod &signal)
 
 static void _init_cbs_disconnectNotify_2394_0 (qt_gsi::GenericMethod *decl)
@@ -1138,6 +1150,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QObject::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QObject_Adaptor *)cls)->emitter_QObject_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QObject::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -1220,6 +1250,7 @@ static gsi::Methods methods_QObject_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QObject::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QObject::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QObject::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QObject::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
@@ -1227,6 +1258,7 @@ static gsi::Methods methods_QObject_Adaptor () {
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QObject::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QObject::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QObject::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QObject::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QObject::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QObject::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);

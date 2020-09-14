@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>About Layer Specifications</title>
+
+  <p>
+  Layer specifications are used in various places, for example in layer mapping
+  files (<link href="/about/layer_mapping.xml"/>). 
+  Layer specifications are used inside the database to give a layer a name or 
+  a number/datatype pair or both. Layer specifications are the text representation
+  of <class_doc href="LayerInfo">LayerInfo</class_doc> objects.
+  </p>
+
+  <p>
+  Blanks within layer specifications are ignored and can be put between
+  the different components of the specification.
+  </p>
+
+  <p>
+  A simple number for the specification will indicate a layer with this layer number and a 
+  datatype of zero:
+  </p>
+
+  <pre>17</pre> 
+
+  <p>will give layer 17, datatype 0.
+  </p>
+
+  <p>
+  A number followed by a slash and another number will indicate a layer number 
+  and datatype:
+  </p>
+
+  <pre>17/5</pre> 
+
+  <p>
+  will give layer 17, datatype 5.
+  </p>
+
+  <p>
+  Layers can be named. Named layers are present in DXF, CIF or other formats
+  which don't use the GDS layer/datatype number scheme. Just giving a name 
+  will indicate such a layer:
+  </p>
+
+  <pre>METAL1</pre>
+
+  <p>
+  will give a named layer called "METAL1".
+  </p>
+
+  <p>
+  If you want to use a name that is a number, use quotes:
+  </p>
+
+  <pre>"17"</pre>
+
+  <p>
+  will give a named layer called "17".
+  </p>
+
+  <p>
+  If you want to use a name that includes blanks, put it into quotes
+  as well:
+  </p>
+
+  <pre>"METAL 1"</pre>
+
+  <p>
+  will give a named layer called "METAL 1" (however, such layer names are usually illegal).
+  </p>
+
+  <p>
+  Finally, a layer can have both a name and layer/datatype numbers.
+  In this case, add the layer/datatype number to the name in round
+  brackets:
+  </p>
+
+  <pre>METAL1 (17)</pre>
+
+  <p>
+  will give a layer named "METAL1" with layer 17 and datatype 0 and
+  </p>
+
+  <pre>METAL1 (17/5)</pre>
+
+  <p>
+  will give a layer named "METAL1" with layer 17 and datatype 5.
+  </p>
+
+  <h4>Layer specifications as targets</h4>
+
+  <p>
+  When used in a target context (e.g. for layer mapping), a layer specification
+  can use wildcards and relative layer/datatype specifications.
+  Using "*" instead of a layer or datatype number means to reuse the source 
+  layer or datatype number. Using "+x" or "-x" for layer or datatype number means
+  to add or subtract "x" from the source layer or datatype number.
+  </p>
+
+</doc>
+

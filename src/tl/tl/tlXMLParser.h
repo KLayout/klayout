@@ -1822,12 +1822,12 @@ make_member (void (Parent::*setter) (const Value &), const std::string &name)
  *  @brief Utility: create a XMLMember object
  */
 template <class Value, class Parent>
-XMLMember<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberDummyWriteAdaptor <Value, Parent>, XMLStdConverter <Value> > 
+XMLMember<Value, Parent, XMLMemberDummyReadAdaptor <Value, Parent>, XMLMemberAccWriteAdaptor <Value, Parent>, XMLStdConverter <Value> >
 make_member (void (Parent::*setter) (Value), const std::string &name)
 {
-  return XMLMember<Value, Parent, XMLMemberAccReadAdaptor <Value, Parent>, XMLMemberDummyWriteAdaptor <Value, Parent>, XMLStdConverter <Value> > ( 
-          XMLMemberAccReadAdaptor <Value, Parent> (setter), 
-          XMLMemberDummyWriteAdaptor <Value, Parent> (), name); 
+  return XMLMember<Value, Parent, XMLMemberDummyReadAdaptor <Value, Parent>, XMLMemberAccWriteAdaptor <Value, Parent>, XMLStdConverter <Value> > (
+          XMLMemberDummyReadAdaptor <Value, Parent> (),
+          XMLMemberAccWriteAdaptor <Value, Parent> (setter), name);
 }
 
 /**

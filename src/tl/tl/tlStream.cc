@@ -449,18 +449,26 @@ TextInputStream::read_all (size_t max_count)
 const std::string &
 TextInputStream::get_line ()
 {
-  m_line = m_next_line;
+  int line = m_next_line;
   m_line_buffer.clear ();
 
   while (! at_end ()) {
     char c = get_char ();
-    if (c == '\n' || c == 0) {
+    if (c == '\n') {
+      //  set at_end if there is nothing after this terminal LF -> this will avoid
+      //  emitting an empty dummy line as the last one
+      if (peek_char () == 0) {
+        m_at_end = true;
+      }
+      break;
+    } else if (c == 0) {
       break;
     } else {
       m_line_buffer += c;
     }
   }
 
+  m_line = line;
   return m_line_buffer;
 }
 
@@ -489,7 +497,6 @@ TextInputStream::peek_char ()
     m_line = m_next_line;
     const char *c = m_stream.get (1);
     if (c == 0) {
-      m_at_end = true;
       return 0;
     } else if (*c != '\r' && *c) {
       char cc = *c;

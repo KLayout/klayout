@@ -30,6 +30,7 @@
 
 #include "tlClassRegistry.h"
 #include "tlFileUtils.h"
+#include "tlInclude.h"
 
 #include <cstdio>
 
@@ -101,7 +102,7 @@ class MacroInterpreter
 public:
   MacroInterpreter ()
     : lym::MacroInterpreter (), 
-      mp_registration (0) 
+      mp_registration (0), m_supports_include_expansion (true)
   {
     m_suffix = lym::MacroInterpreter::suffix ();
     m_description = lym::MacroInterpreter::description ();
@@ -118,6 +119,15 @@ public:
       delete *t;
     }
     m_templates.clear ();
+  }
+
+  std::pair<std::string, std::string> include_expansion (const lym::Macro *macro)
+  {
+    if (m_supports_include_expansion) {
+      return lym::MacroInterpreter::include_expansion (macro);
+    } else {
+      return std::pair<std::string, std::string> (macro->path (), macro->text ());
+    }
   }
 
   void register_gsi (const char *name)
@@ -137,6 +147,16 @@ public:
     if (f_execute.can_issue ()) {
       f_execute.issue<MacroInterpreter, const lym::Macro *> (&MacroInterpreter::execute, macro);
     }
+  }
+
+  void set_supports_include_expansion (bool f)
+  {
+    m_supports_include_expansion = f;
+  }
+
+  virtual bool supports_include_expansion () const
+  {
+    return m_supports_include_expansion;
   }
 
   void set_storage_scheme (int scheme)
@@ -231,6 +251,7 @@ private:
   lym::Macro::Interpreter m_debugger_scheme;
   std::string m_suffix;
   std::string m_description;
+  bool m_supports_include_expansion;
 };
 
 int const_PlainTextFormat ()
@@ -294,6 +315,14 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
     "\n"
     "This method must be called after \\register has called.\n"
   ) + 
+  gsi::method ("supports_include_expansion=", &MacroInterpreter::set_supports_include_expansion, gsi::arg ("flag"),
+    "@brief Sets a value indicating whether this interpreter supports the default include file expansion scheme.\n"
+    "If this value is set to true (the default), lines like '# %include ...' will be substituted by the "
+    "content of the file following the '%include' keyword.\n"
+    "Set this value to false if you don't want to support this feature.\n"
+    "\n"
+    "This attribute has been introduced in version 0.27.\n"
+  ) +
   gsi::method ("syntax_scheme=", &gsi::MacroInterpreter::set_syntax_scheme, gsi::arg ("scheme"),
     "@brief Sets a string indicating the syntax highlighter scheme\n"
     "\n"
@@ -426,6 +455,24 @@ static lym::Macro *macro_by_path (const std::string &path)
   return lym::MacroCollection::root ().find_macro (path);
 }
 
+static std::string real_path (const std::string &path, int line)
+{
+  if (! path.empty () && path[0] == '@') {
+    return tl::IncludeExpander::from_string (path).translate_to_original (line).first;
+  } else {
+    return path;
+  }
+}
+
+static int real_line (const std::string &path, int line)
+{
+  if (! path.empty () && path[0] == '@') {
+    return tl::IncludeExpander::from_string (path).translate_to_original (line).second;
+  } else {
+    return line;
+  }
+}
+
 Class<lym::Macro> decl_Macro ("lay", "Macro",
   gsi::method ("path", &lym::Macro::path,
     "@brief Gets the path of the macro\n"
@@ -522,6 +569,59 @@ Class<lym::Macro> decl_Macro ("lay", "Macro",
   gsi::method ("menu_path=", &lym::Macro::set_menu_path, gsi::arg ("string"),
     "@brief Sets the menu path\n"
     "See \\menu_path for details.\n"
+  ) +
+  gsi::method ("real_path", &real_path,
+    "@brief Gets the real path for an include-encoded path and line number\n"
+    "\n"
+    "When using KLayout's include scheme based on '# %include ...', __FILE__ and __LINE__ (Ruby) will "
+    "not have the proper values but encoded file names. This method allows retrieving the real file by using\n"
+    "\n"
+    "@code\n"
+    "# Ruby\n"
+    "real_file = RBA::Macro::real_path(__FILE__, __LINE__)\n"
+    "@/code\n"
+    "\n"
+    "This substitution is not required for top-level macros as KLayout's interpreter will automatically use this "
+    "function instead of __FILE__. Call this function when you need __FILE__ from files "
+    "included through the languages mechanisms such as 'require' or 'load' where this substitution does not happen.\n"
+    "\n"
+    "For Python there is no equivalent for __LINE__, so you always have to use:\n"
+    "\n"
+    "@code\n"
+    "# Python"
+    "import inspect\n"
+    "real_file = pya.Macro.real_path(__file__, inspect.currentframe().f_back.f_lineno)\n"
+    "@/code\n"
+    "\n"
+    "This feature has been introduced in version 0.27."
+  ) +
+  gsi::method ("real_line", &real_line,
+    "@brief Gets the real line number for an include-encoded path and line number\n"
+    "\n"
+    "When using KLayout's include scheme based on '# %include ...', __FILE__ and __LINE__ (Ruby) will "
+    "not have the proper values but encoded file names. This method allows retrieving the real line number by using\n"
+    "\n"
+    "@code\n"
+    "# Ruby\n"
+    "real_line = RBA::Macro::real_line(__FILE__, __LINE__)\n"
+    "\n"
+    "# Python\n"
+    "real_line = pya::Macro::real_line(__file__, __line__)\n"
+    "@/code\n"
+    "\n"
+    "This substitution is not required for top-level macros as KLayout's interpreter will automatically use this "
+    "function instead of __FILE__. Call this function when you need __FILE__ from files "
+    "included through the languages mechanisms such as 'require' or 'load' where this substitution does not happen.\n"
+    "\n"
+    "For Python there is no equivalent for __LINE__, so you always have to use:\n"
+    "\n"
+    "@code\n"
+    "# Python"
+    "import inspect\n"
+    "real_line = pya.Macro.real_line(__file__, inspect.currentframe().f_back.f_lineno)\n"
+    "@/code\n"
+    "\n"
+    "This feature has been introduced in version 0.27."
   ),
   "@brief A macro class\n"
   "\n"

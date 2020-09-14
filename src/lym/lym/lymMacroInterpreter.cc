@@ -27,6 +27,7 @@
 #include "tlInternational.h"
 #include "tlException.h"
 #include "tlClassRegistry.h"
+#include "tlInclude.h"
 
 namespace lym
 {
@@ -48,13 +49,79 @@ MacroInterpreter::can_run (const lym::Macro *macro)
   return false;
 }
 
+std::pair<std::string, std::string>
+MacroInterpreter::include_expansion (const lym::Macro *macro)
+{
+  std::pair<std::string, std::string> res;
+  res.first = tl::IncludeExpander::expand (macro->path (), macro->text (), res.second).to_string ();
+
+  if (res.first != macro->path ()) {
+
+    //  Fix the macro's text such that include expansion does not spoil __FILE__ or __LINE__ variables
+    //  NOTE: this will modify the column for syntax errors. Let's hope this tiny error is acceptable.
+    //  TODO: this substitution may be somewhat naive ...
+
+    Macro::Interpreter ip = macro->interpreter ();
+    if (macro->interpreter () == Macro::DSLInterpreter) {
+      if (syntax_scheme () == "ruby") {
+        ip = Macro::Ruby;
+      } else if (syntax_scheme () == "python") {
+        ip = Macro::Python;
+      }
+    }
+
+    if (ip == Macro::Ruby) {
+
+      std::string subst;
+      const std::string file_const ("__FILE__");
+      const std::string line_const ("__LINE__");
+
+      for (const char *cp = res.second.c_str (); *cp; ) {
+        if (strncmp (cp, file_const.c_str (), file_const.size ()) == 0 && !isalnum (cp[file_const.size ()]) && cp[file_const.size ()] != '_') {
+          subst += "RBA::Macro::real_path(__FILE__, __LINE__)";
+          cp += file_const.size ();
+        } else if (strncmp (cp, line_const.c_str (), line_const.size ()) == 0 && !isalnum (cp[line_const.size ()]) && cp[line_const.size ()] != '_') {
+          subst += "RBA::Macro::real_line(__FILE__, __LINE__)";
+          cp += line_const.size ();
+        } else {
+          subst += *cp++;
+        }
+      }
+
+      res.second = subst;
+
+    }
+
+  }
+
+  return res;
+}
+
 void 
 MacroInterpreter::execute_macro (const lym::Macro *macro)
 {
   for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
+
     if (cls.current_name () == macro->dsl_interpreter ()) {
-      cls->execute (macro);
+
+      std::pair<std::string, std::string> et = cls->include_expansion (macro);
+      if (et.first.empty () || et.first == macro->path ()) {
+
+        cls->execute (macro);
+
+      } else {
+
+        //  provide a copy which takes the include-expanded version
+        lym::Macro tmp_macro;
+        tmp_macro.assign (*macro);
+        tmp_macro.set_text (et.second);
+        tmp_macro.set_file_path (et.first);
+        cls->execute (&tmp_macro);
+
+      }
+
       return;
+
     }
   }
 

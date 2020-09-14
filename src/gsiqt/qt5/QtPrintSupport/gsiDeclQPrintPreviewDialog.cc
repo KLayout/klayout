@@ -160,6 +160,26 @@ static void _call_f_open_2925 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+// void QPrintPreviewDialog::paintRequested(QPrinter *printer)
+
+
+static void _init_f_paintRequested_1443 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("printer");
+  decl->add_arg<QPrinter * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_paintRequested_1443 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QPrinter *arg1 = gsi::arg_reader<QPrinter * >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QPrintPreviewDialog *)cls)->paintRequested (arg1);
+}
+
+
 // QPrinter *QPrintPreviewDialog::printer()
 
 
@@ -254,17 +274,9 @@ static gsi::Methods methods_QPrintPreviewDialog () {
   methods += new qt_gsi::GenericMethod ("done", "@brief Method void QPrintPreviewDialog::done(int result)\nThis is a reimplementation of QDialog::done", false, &_init_f_done_767, &_call_f_done_767);
   methods += new qt_gsi::GenericMethod ("open", "@brief Method void QPrintPreviewDialog::open()\nThis is a reimplementation of QDialog::open", false, &_init_f_open_0, &_call_f_open_0);
   methods += new qt_gsi::GenericMethod ("open", "@brief Method void QPrintPreviewDialog::open(QObject *receiver, const char *member)\n", false, &_init_f_open_2925, &_call_f_open_2925);
+  methods += new qt_gsi::GenericMethod ("paintRequested", "@brief Method void QPrintPreviewDialog::paintRequested(QPrinter *printer)\n", false, &_init_f_paintRequested_1443, &_call_f_paintRequested_1443);
   methods += new qt_gsi::GenericMethod ("printer", "@brief Method QPrinter *QPrintPreviewDialog::printer()\n", false, &_init_f_printer_0, &_call_f_printer_0);
   methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method void QPrintPreviewDialog::setVisible(bool visible)\nThis is a reimplementation of QDialog::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
-  methods += gsi::qt_signal ("accepted()", "accepted", "@brief Signal declaration for QPrintPreviewDialog::accepted()\nYou can bind a procedure to this signal.");
-  methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QPrintPreviewDialog::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");
-  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QPrintPreviewDialog::destroyed(QObject *)\nYou can bind a procedure to this signal.");
-  methods += gsi::qt_signal<int > ("finished(int)", "finished", gsi::arg("result"), "@brief Signal declaration for QPrintPreviewDialog::finished(int result)\nYou can bind a procedure to this signal.");
-  methods += gsi::qt_signal<QPrinter * > ("paintRequested(QPrinter *)", "paintRequested", gsi::arg("printer"), "@brief Signal declaration for QPrintPreviewDialog::paintRequested(QPrinter *printer)\nYou can bind a procedure to this signal.");
-  methods += gsi::qt_signal ("rejected()", "rejected", "@brief Signal declaration for QPrintPreviewDialog::rejected()\nYou can bind a procedure to this signal.");
-  methods += gsi::qt_signal<const QIcon & > ("windowIconChanged(const QIcon &)", "windowIconChanged", gsi::arg("icon"), "@brief Signal declaration for QPrintPreviewDialog::windowIconChanged(const QIcon &icon)\nYou can bind a procedure to this signal.");
-  methods += gsi::qt_signal<const QString & > ("windowIconTextChanged(const QString &)", "windowIconTextChanged", gsi::arg("iconText"), "@brief Signal declaration for QPrintPreviewDialog::windowIconTextChanged(const QString &iconText)\nYou can bind a procedure to this signal.");
-  methods += gsi::qt_signal<const QString & > ("windowTitleChanged(const QString &)", "windowTitleChanged", gsi::arg("title"), "@brief Signal declaration for QPrintPreviewDialog::windowTitleChanged(const QString &title)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QPrintPreviewDialog::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QPrintPreviewDialog::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -388,24 +400,6 @@ public:
     }
   }
 
-  //  [emitter impl] void QPrintPreviewDialog::accepted()
-  void emitter_QPrintPreviewDialog_accepted_0()
-  {
-    emit QPrintPreviewDialog::accepted();
-  }
-
-  //  [emitter impl] void QPrintPreviewDialog::customContextMenuRequested(const QPoint &pos)
-  void emitter_QPrintPreviewDialog_customContextMenuRequested_1916(const QPoint &pos)
-  {
-    emit QPrintPreviewDialog::customContextMenuRequested(pos);
-  }
-
-  //  [emitter impl] void QPrintPreviewDialog::destroyed(QObject *)
-  void emitter_QPrintPreviewDialog_destroyed_1302(QObject *arg1)
-  {
-    emit QPrintPreviewDialog::destroyed(arg1);
-  }
-
   //  [adaptor impl] void QPrintPreviewDialog::done(int result)
   void cbs_done_767_0(int result)
   {
@@ -434,12 +428,6 @@ public:
     } else {
       return QPrintPreviewDialog::exec();
     }
-  }
-
-  //  [emitter impl] void QPrintPreviewDialog::finished(int result)
-  void emitter_QPrintPreviewDialog_finished_767(int result)
-  {
-    emit QPrintPreviewDialog::finished(result);
   }
 
   //  [adaptor impl] bool QPrintPreviewDialog::hasHeightForWidth()
@@ -532,12 +520,6 @@ public:
     }
   }
 
-  //  [emitter impl] void QPrintPreviewDialog::paintRequested(QPrinter *printer)
-  void emitter_QPrintPreviewDialog_paintRequested_1443(QPrinter *printer)
-  {
-    emit QPrintPreviewDialog::paintRequested(printer);
-  }
-
   //  [adaptor impl] void QPrintPreviewDialog::reject()
   void cbs_reject_0_0()
   {
@@ -551,12 +533,6 @@ public:
     } else {
       QPrintPreviewDialog::reject();
     }
-  }
-
-  //  [emitter impl] void QPrintPreviewDialog::rejected()
-  void emitter_QPrintPreviewDialog_rejected_0()
-  {
-    emit QPrintPreviewDialog::rejected();
   }
 
   //  [adaptor impl] void QPrintPreviewDialog::setVisible(bool visible)
@@ -587,24 +563,6 @@ public:
     } else {
       return QPrintPreviewDialog::sizeHint();
     }
-  }
-
-  //  [emitter impl] void QPrintPreviewDialog::windowIconChanged(const QIcon &icon)
-  void emitter_QPrintPreviewDialog_windowIconChanged_1787(const QIcon &icon)
-  {
-    emit QPrintPreviewDialog::windowIconChanged(icon);
-  }
-
-  //  [emitter impl] void QPrintPreviewDialog::windowIconTextChanged(const QString &iconText)
-  void emitter_QPrintPreviewDialog_windowIconTextChanged_2025(const QString &iconText)
-  {
-    emit QPrintPreviewDialog::windowIconTextChanged(iconText);
-  }
-
-  //  [emitter impl] void QPrintPreviewDialog::windowTitleChanged(const QString &title)
-  void emitter_QPrintPreviewDialog_windowTitleChanged_2025(const QString &title)
-  {
-    emit QPrintPreviewDialog::windowTitleChanged(title);
   }
 
   //  [adaptor impl] void QPrintPreviewDialog::actionEvent(QActionEvent *)
@@ -1296,20 +1254,6 @@ static void _set_callback_cbs_accept_0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// emitter void QPrintPreviewDialog::accepted()
-
-static void _init_emitter_accepted_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_accepted_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ((QPrintPreviewDialog_Adaptor *)cls)->emitter_QPrintPreviewDialog_accepted_0 ();
-}
-
-
 // void QPrintPreviewDialog::actionEvent(QActionEvent *)
 
 static void _init_cbs_actionEvent_1823_0 (qt_gsi::GenericMethod *decl)
@@ -1474,24 +1418,6 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// emitter void QPrintPreviewDialog::customContextMenuRequested(const QPoint &pos)
-
-static void _init_emitter_customContextMenuRequested_1916 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("pos");
-  decl->add_arg<const QPoint & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
-  ((QPrintPreviewDialog_Adaptor *)cls)->emitter_QPrintPreviewDialog_customContextMenuRequested_1916 (arg1);
-}
-
-
 // void QPrintPreviewDialog::customEvent(QEvent *)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
@@ -1535,24 +1461,6 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
   bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrintPreviewDialog_Adaptor *)cls)->fp_QPrintPreviewDialog_destroy_1620 (arg1, arg2);
-}
-
-
-// emitter void QPrintPreviewDialog::destroyed(QObject *)
-
-static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
-  decl->add_arg<QObject * > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
-  ((QPrintPreviewDialog_Adaptor *)cls)->emitter_QPrintPreviewDialog_destroyed_1302 (arg1);
 }
 
 
@@ -1789,24 +1697,6 @@ static void _call_cbs_exec_0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 static void _set_callback_cbs_exec_0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QPrintPreviewDialog_Adaptor *)cls)->cb_exec_0_0 = cb;
-}
-
-
-// emitter void QPrintPreviewDialog::finished(int result)
-
-static void _init_emitter_finished_767 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("result");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_finished_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  ((QPrintPreviewDialog_Adaptor *)cls)->emitter_QPrintPreviewDialog_finished_767 (arg1);
 }
 
 
@@ -2390,24 +2280,6 @@ static void _set_callback_cbs_paintEvent_1725_0 (void *cls, const gsi::Callback 
 }
 
 
-// emitter void QPrintPreviewDialog::paintRequested(QPrinter *printer)
-
-static void _init_emitter_paintRequested_1443 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("printer");
-  decl->add_arg<QPrinter * > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_paintRequested_1443 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QPrinter *arg1 = gsi::arg_reader<QPrinter * >() (args, heap);
-  ((QPrintPreviewDialog_Adaptor *)cls)->emitter_QPrintPreviewDialog_paintRequested_1443 (arg1);
-}
-
-
 // exposed int QPrintPreviewDialog::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -2466,20 +2338,6 @@ static void _call_cbs_reject_0_0 (const qt_gsi::GenericMethod * /*decl*/, void *
 static void _set_callback_cbs_reject_0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QPrintPreviewDialog_Adaptor *)cls)->cb_reject_0_0 = cb;
-}
-
-
-// emitter void QPrintPreviewDialog::rejected()
-
-static void _init_emitter_rejected_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_rejected_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ((QPrintPreviewDialog_Adaptor *)cls)->emitter_QPrintPreviewDialog_rejected_0 ();
 }
 
 
@@ -2708,60 +2566,6 @@ static void _set_callback_cbs_wheelEvent_1718_0 (void *cls, const gsi::Callback 
 }
 
 
-// emitter void QPrintPreviewDialog::windowIconChanged(const QIcon &icon)
-
-static void _init_emitter_windowIconChanged_1787 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("icon");
-  decl->add_arg<const QIcon & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_windowIconChanged_1787 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
-  ((QPrintPreviewDialog_Adaptor *)cls)->emitter_QPrintPreviewDialog_windowIconChanged_1787 (arg1);
-}
-
-
-// emitter void QPrintPreviewDialog::windowIconTextChanged(const QString &iconText)
-
-static void _init_emitter_windowIconTextChanged_2025 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("iconText");
-  decl->add_arg<const QString & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_windowIconTextChanged_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  ((QPrintPreviewDialog_Adaptor *)cls)->emitter_QPrintPreviewDialog_windowIconTextChanged_2025 (arg1);
-}
-
-
-// emitter void QPrintPreviewDialog::windowTitleChanged(const QString &title)
-
-static void _init_emitter_windowTitleChanged_2025 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("title");
-  decl->add_arg<const QString & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_windowTitleChanged_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  ((QPrintPreviewDialog_Adaptor *)cls)->emitter_QPrintPreviewDialog_windowTitleChanged_2025 (arg1);
-}
-
-
 namespace gsi
 {
 
@@ -2773,7 +2577,6 @@ static gsi::Methods methods_QPrintPreviewDialog_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPrintPreviewDialog::QPrintPreviewDialog(QPrinter *printer, QWidget *parent, QFlags<Qt::WindowType> flags)\nThis method creates an object of class QPrintPreviewDialog.", &_init_ctor_QPrintPreviewDialog_Adaptor_5037, &_call_ctor_QPrintPreviewDialog_Adaptor_5037);
   methods += new qt_gsi::GenericMethod ("accept", "@brief Virtual method void QPrintPreviewDialog::accept()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_accept_0_0, &_call_cbs_accept_0_0);
   methods += new qt_gsi::GenericMethod ("accept", "@hide", false, &_init_cbs_accept_0_0, &_call_cbs_accept_0_0, &_set_callback_cbs_accept_0_0);
-  methods += new qt_gsi::GenericMethod ("emit_accepted", "@brief Emitter for signal void QPrintPreviewDialog::accepted()\nCall this method to emit this signal.", false, &_init_emitter_accepted_0, &_call_emitter_accepted_0);
   methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QPrintPreviewDialog::actionEvent(QActionEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("*actionEvent", "@hide", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0, &_set_callback_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("*adjustPosition", "@brief Method void QPrintPreviewDialog::adjustPosition(QWidget *)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_adjustPosition_1315, &_call_fp_adjustPosition_1315);
@@ -2786,11 +2589,9 @@ static gsi::Methods methods_QPrintPreviewDialog_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QPrintPreviewDialog::contextMenuEvent(QContextMenuEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0, &_set_callback_cbs_contextMenuEvent_2363_0);
   methods += new qt_gsi::GenericMethod ("*qt_create", "@brief Method void QPrintPreviewDialog::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
-  methods += new qt_gsi::GenericMethod ("emit_customContextMenuRequested", "@brief Emitter for signal void QPrintPreviewDialog::customContextMenuRequested(const QPoint &pos)\nCall this method to emit this signal.", false, &_init_emitter_customContextMenuRequested_1916, &_call_emitter_customContextMenuRequested_1916);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QPrintPreviewDialog::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*qt_destroy", "@brief Method void QPrintPreviewDialog::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
-  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QPrintPreviewDialog::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QPrintPreviewDialog::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("done", "@brief Virtual method void QPrintPreviewDialog::done(int result)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_done_767_0, &_call_cbs_done_767_0);
@@ -2811,7 +2612,6 @@ static gsi::Methods methods_QPrintPreviewDialog_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("exec", "@brief Virtual method int QPrintPreviewDialog::exec()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_exec_0_0, &_call_cbs_exec_0_0);
   methods += new qt_gsi::GenericMethod ("exec", "@hide", false, &_init_cbs_exec_0_0, &_call_cbs_exec_0_0, &_set_callback_cbs_exec_0_0);
-  methods += new qt_gsi::GenericMethod ("emit_finished", "@brief Emitter for signal void QPrintPreviewDialog::finished(int result)\nCall this method to emit this signal.", false, &_init_emitter_finished_767, &_call_emitter_finished_767);
   methods += new qt_gsi::GenericMethod ("*focusInEvent", "@brief Virtual method void QPrintPreviewDialog::focusInEvent(QFocusEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusInEvent", "@hide", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0, &_set_callback_cbs_focusInEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusNextChild", "@brief Method bool QPrintPreviewDialog::focusNextChild()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_focusNextChild_0, &_call_fp_focusNextChild_0);
@@ -2861,13 +2661,11 @@ static gsi::Methods methods_QPrintPreviewDialog_Adaptor () {
   methods += new qt_gsi::GenericMethod ("paintEngine", "@hide", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0, &_set_callback_cbs_paintEngine_c0_0);
   methods += new qt_gsi::GenericMethod ("*paintEvent", "@brief Virtual method void QPrintPreviewDialog::paintEvent(QPaintEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_paintEvent_1725_0, &_call_cbs_paintEvent_1725_0);
   methods += new qt_gsi::GenericMethod ("*paintEvent", "@hide", false, &_init_cbs_paintEvent_1725_0, &_call_cbs_paintEvent_1725_0, &_set_callback_cbs_paintEvent_1725_0);
-  methods += new qt_gsi::GenericMethod ("emit_paintRequested", "@brief Emitter for signal void QPrintPreviewDialog::paintRequested(QPrinter *printer)\nCall this method to emit this signal.", false, &_init_emitter_paintRequested_1443, &_call_emitter_paintRequested_1443);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QPrintPreviewDialog::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*redirected", "@brief Virtual method QPaintDevice *QPrintPreviewDialog::redirected(QPoint *offset)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_redirected_c1225_0, &_call_cbs_redirected_c1225_0);
   methods += new qt_gsi::GenericMethod ("*redirected", "@hide", true, &_init_cbs_redirected_c1225_0, &_call_cbs_redirected_c1225_0, &_set_callback_cbs_redirected_c1225_0);
   methods += new qt_gsi::GenericMethod ("reject", "@brief Virtual method void QPrintPreviewDialog::reject()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_reject_0_0, &_call_cbs_reject_0_0);
   methods += new qt_gsi::GenericMethod ("reject", "@hide", false, &_init_cbs_reject_0_0, &_call_cbs_reject_0_0, &_set_callback_cbs_reject_0_0);
-  methods += new qt_gsi::GenericMethod ("emit_rejected", "@brief Emitter for signal void QPrintPreviewDialog::rejected()\nCall this method to emit this signal.", false, &_init_emitter_rejected_0, &_call_emitter_rejected_0);
   methods += new qt_gsi::GenericMethod ("*resizeEvent", "@brief Virtual method void QPrintPreviewDialog::resizeEvent(QResizeEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_resizeEvent_1843_0, &_call_cbs_resizeEvent_1843_0);
   methods += new qt_gsi::GenericMethod ("*resizeEvent", "@hide", false, &_init_cbs_resizeEvent_1843_0, &_call_cbs_resizeEvent_1843_0, &_set_callback_cbs_resizeEvent_1843_0);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QPrintPreviewDialog::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
@@ -2887,9 +2685,6 @@ static gsi::Methods methods_QPrintPreviewDialog_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*updateMicroFocus", "@brief Method void QPrintPreviewDialog::updateMicroFocus()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_updateMicroFocus_0, &_call_fp_updateMicroFocus_0);
   methods += new qt_gsi::GenericMethod ("*wheelEvent", "@brief Virtual method void QPrintPreviewDialog::wheelEvent(QWheelEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0);
   methods += new qt_gsi::GenericMethod ("*wheelEvent", "@hide", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0, &_set_callback_cbs_wheelEvent_1718_0);
-  methods += new qt_gsi::GenericMethod ("emit_windowIconChanged", "@brief Emitter for signal void QPrintPreviewDialog::windowIconChanged(const QIcon &icon)\nCall this method to emit this signal.", false, &_init_emitter_windowIconChanged_1787, &_call_emitter_windowIconChanged_1787);
-  methods += new qt_gsi::GenericMethod ("emit_windowIconTextChanged", "@brief Emitter for signal void QPrintPreviewDialog::windowIconTextChanged(const QString &iconText)\nCall this method to emit this signal.", false, &_init_emitter_windowIconTextChanged_2025, &_call_emitter_windowIconTextChanged_2025);
-  methods += new qt_gsi::GenericMethod ("emit_windowTitleChanged", "@brief Emitter for signal void QPrintPreviewDialog::windowTitleChanged(const QString &title)\nCall this method to emit this signal.", false, &_init_emitter_windowTitleChanged_2025, &_call_emitter_windowTitleChanged_2025);
   return methods;
 }
 

@@ -1,0 +1,44 @@
+
+VERSION 5.8 ;
+DIVIDERCHAR "/" ;
+BUSBITCHARS "[]" ;
+DESIGN mapfile ;
+UNITS DISTANCE MICRONS 1000 ;
+
+DIEAREA ( 0 0 ) ( 3000 3000 ) ;
+
+COMPONENTMASKSHIFT M2 M1 M0PO ;
+
+COMPONENTS 3 ;
+
+- comp1 mask_macro 
+  + PLACED ( 0 0 ) N ;
+- comp1 mask_macro
+  + MASKSHIFT 2
+  + PLACED ( 1000 0 ) N ;
+- comp1 mask_macro
+  + MASKSHIFT 221
+  + PLACED ( 2000 0 ) N ;
+
+- comp1 nomask_macro 
+  + PLACED ( 0 1000 ) N ;
+- comp1 nomask_macro
+  + MASKSHIFT 2
+  + PLACED ( 1000 1000 ) N ;
+- comp1 nomask_macro
+  + MASKSHIFT 221
+  + PLACED ( 2000 1000 ) N ;
+
+- comp1 fixedmask_macro 
+  + PLACED ( 0 2000 ) N ;
+- comp1 fixedmask_macro
+  + MASKSHIFT 2
+  + PLACED ( 1000 2000 ) N ;
+- comp1 fixedmask_macro
+  + MASKSHIFT 221
+  + PLACED ( 2000 2000 ) N ;
+
+END COMPONENTS ;
+
+END DESIGN
+

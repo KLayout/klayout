@@ -140,7 +140,7 @@ struct XORData
   double tile_size;
   db::Layout *output_layout;
   db::cell_index_type output_cell;
-  std::map<db::LayerProperties, std::pair<int, int> > l2l_map;
+  std::map<db::LayerProperties, std::pair<int, int>, db::LPLogicalLessFunc> l2l_map;
   std::map<std::pair<int, db::LayerProperties>, ResultDescriptor> *results;
 };
 
@@ -299,7 +299,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
     throw tl::Exception ("'" + top_b + "' is not a valid cell name in second layout");
   }
 
-  std::map<db::LayerProperties, std::pair<int, int> > l2l_map;
+  std::map<db::LayerProperties, std::pair<int, int>, db::LPLogicalLessFunc> l2l_map;
 
   for (db::Layout::layer_iterator l = layout_a.begin_layers (); l != layout_a.end_layers (); ++l) {
     l2l_map.insert (std::make_pair (*(*l).second, std::make_pair (-1, -1))).first->second.first = (*l).first;

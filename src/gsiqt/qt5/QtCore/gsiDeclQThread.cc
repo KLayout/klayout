@@ -536,6 +536,9 @@ static gsi::Methods methods_QThread () {
   methods += new qt_gsi::GenericMethod ("terminate", "@brief Method void QThread::terminate()\n", false, &_init_f_terminate_0, &_call_f_terminate_0);
   methods += new qt_gsi::GenericMethod ("wait", "@brief Method bool QThread::wait(unsigned long int time)\n", false, &_init_f_wait_2348, &_call_f_wait_2348);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QThread::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("finished()", "finished", "@brief Signal declaration for QThread::finished()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QThread::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("started()", "started", "@brief Signal declaration for QThread::started()\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("currentThread", "@brief Static method QThread *QThread::currentThread()\nThis method is static and can be called without an instance.", &_init_f_currentThread_0, &_call_f_currentThread_0);
   methods += new qt_gsi::GenericStaticMethod ("currentThreadId", "@brief Static method Qt::HANDLE QThread::currentThreadId()\nThis method is static and can be called without an instance.", &_init_f_currentThreadId_0, &_call_f_currentThreadId_0);
   methods += new qt_gsi::GenericStaticMethod ("idealThreadCount", "@brief Static method int QThread::idealThreadCount()\nThis method is static and can be called without an instance.", &_init_f_idealThreadCount_0, &_call_f_idealThreadCount_0);
@@ -641,6 +644,25 @@ public:
     } else {
       return QThread::eventFilter(arg1, arg2);
     }
+  }
+
+  //  [emitter impl] void QThread::finished()
+  void emitter_QThread_finished_2651()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QThread::finished()'");
+  }
+
+  //  [emitter impl] void QThread::objectNameChanged(const QString &objectName)
+  void emitter_QThread_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QThread::objectNameChanged(const QString &objectName)'");
+  }
+
+  //  [emitter impl] void QThread::started()
+  void emitter_QThread_started_2651()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QThread::started()'");
   }
 
   //  [adaptor impl] void QThread::childEvent(QChildEvent *)
@@ -900,6 +922,20 @@ static void _call_fp_exec_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
+// emitter void QThread::finished()
+
+static void _init_emitter_finished_2651 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_finished_2651 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QThread_Adaptor *)cls)->emitter_QThread_finished_2651 ();
+}
+
+
 // exposed bool QThread::isSignalConnected(const QMetaMethod &signal)
 
 static void _init_fp_isSignalConnected_c2394 (qt_gsi::GenericMethod *decl)
@@ -915,6 +951,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
   tl::Heap heap;
   const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QThread_Adaptor *)cls)->fp_QThread_isSignalConnected_c2394 (arg1));
+}
+
+
+// emitter void QThread::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QThread_Adaptor *)cls)->emitter_QThread_objectNameChanged_4567 (arg1);
 }
 
 
@@ -1003,6 +1057,20 @@ static void _call_fp_setTerminationEnabled_864 (const qt_gsi::GenericStaticMetho
 }
 
 
+// emitter void QThread::started()
+
+static void _init_emitter_started_2651 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_started_2651 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QThread_Adaptor *)cls)->emitter_QThread_started_2651 ();
+}
+
+
 // void QThread::timerEvent(QTimerEvent *)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
@@ -1047,13 +1115,16 @@ static gsi::Methods methods_QThread_Adaptor () {
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QThread::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*exec", "@brief Method int QThread::exec()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_exec_0, &_call_fp_exec_0);
+  methods += new qt_gsi::GenericMethod ("emit_finished", "@brief Emitter for signal void QThread::finished()\nCall this method to emit this signal.", false, &_init_emitter_finished_2651, &_call_emitter_finished_2651);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QThread::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QThread::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QThread::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*run", "@brief Virtual method void QThread::run()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_run_0_0, &_call_cbs_run_0_0);
   methods += new qt_gsi::GenericMethod ("*run", "@hide", false, &_init_cbs_run_0_0, &_call_cbs_run_0_0, &_set_callback_cbs_run_0_0);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QThread::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QThread::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericStaticMethod ("*setTerminationEnabled", "@brief Method void QThread::setTerminationEnabled(bool enabled)\nThis method is protected and can only be called from inside a derived class.", &_init_fp_setTerminationEnabled_864, &_call_fp_setTerminationEnabled_864);
+  methods += new qt_gsi::GenericMethod ("emit_started", "@brief Emitter for signal void QThread::started()\nCall this method to emit this signal.", false, &_init_emitter_started_2651, &_call_emitter_started_2651);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QThread::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;

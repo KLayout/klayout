@@ -1,3 +1,7 @@
+# manually added:
+event("QObject", /::destroyed\s*\(/, "QObject*")
+event("QObject", /::objectNameChanged\s*\(/, "QString")
+# generated:
 event("QAbstractButton", /::destroyed\s*\(/, "QObject*")
 event("QAbstractButton", /::customContextMenuRequested\s*\(/, "QPoint")
 event("QAbstractButton", /::pressed\s*\(/, "")

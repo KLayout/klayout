@@ -269,6 +269,17 @@ void CellMapping::clear ()
   m_b2a_mapping.clear ();
 }
 
+std::vector<db::cell_index_type> CellMapping::source_cells () const
+{
+  std::vector<db::cell_index_type> s;
+  s.reserve (m_b2a_mapping.size ());
+  for (iterator m = begin (); m != end (); ++m) {
+    s.push_back (m->first);
+  }
+  return s;
+}
+
+
 void 
 CellMapping::create_single_mapping (const db::Layout & /*layout_a*/, db::cell_index_type cell_index_a, const db::Layout & /*layout_b*/, db::cell_index_type cell_index_b)
 {
@@ -276,7 +287,19 @@ CellMapping::create_single_mapping (const db::Layout & /*layout_a*/, db::cell_in
   map (cell_index_b, cell_index_a);
 }
 
-void 
+void
+CellMapping::create_multi_mapping (const db::Layout & /*layout_a*/, const std::vector<db::cell_index_type> &cell_index_a, const db::Layout & /*layout_b*/, const std::vector<db::cell_index_type> &cell_index_b)
+{
+  clear ();
+  if (cell_index_a.size () != cell_index_b.size ()) {
+    throw tl::Exception (tl::to_string (tr ("cell index arrays for A and B cells must have same length in 'create_multi_mapping'")));
+  }
+  for (std::vector<db::cell_index_type>::const_iterator ia = cell_index_a.begin (), ib = cell_index_b.begin (); ia != cell_index_a.end (); ++ia, ++ib) {
+    map (*ib, *ia);
+  }
+}
+
+void
 CellMapping::create_from_names (const db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b)
 {
   clear ();
@@ -295,31 +318,33 @@ CellMapping::create_from_names (const db::Layout &layout_a, db::cell_index_type 
 }
 
 std::vector<db::cell_index_type> 
-CellMapping::create_missing_mapping (db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells)
+CellMapping::create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells)
 {
   std::vector<db::cell_index_type> new_cells;
-  do_create_missing_mapping (layout_a, cell_index_a, layout_b, cell_index_b, exclude_cells, include_cells, &new_cells, 0);
+  do_create_missing_mapping (layout_a, layout_b, cell_index_b, exclude_cells, include_cells, &new_cells, 0);
   return new_cells;
 }
 
 std::vector<std::pair<db::cell_index_type, db::cell_index_type> >
-CellMapping::create_missing_mapping2 (db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells)
+CellMapping::create_missing_mapping2 (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells)
 {
   std::vector<std::pair<db::cell_index_type, db::cell_index_type> > cell_pairs;
-  do_create_missing_mapping (layout_a, cell_index_a, layout_b, cell_index_b, exclude_cells, include_cells, 0, &cell_pairs);
+  do_create_missing_mapping (layout_a, layout_b, cell_index_b, exclude_cells, include_cells, 0, &cell_pairs);
   return cell_pairs;
 }
 
 void
-CellMapping::do_create_missing_mapping (db::Layout &layout_a, db::cell_index_type /*cell_index_a*/, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells, std::vector<db::cell_index_type> *new_cells_ptr, std::vector<std::pair<db::cell_index_type, db::cell_index_type> > *mapped_pairs)
+CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells, std::vector<db::cell_index_type> *new_cells_ptr, std::vector<std::pair<db::cell_index_type, db::cell_index_type> > *mapped_pairs)
 {
   std::vector<db::cell_index_type> new_cells_int;
   std::vector<db::cell_index_type> &new_cells = *(new_cells_ptr ? new_cells_ptr : &new_cells_int);
   std::vector<db::cell_index_type> new_cells_b;
 
   std::set<db::cell_index_type> called_b;
-  layout_b.cell (cell_index_b).collect_called_cells (called_b);
-  called_b.insert (cell_index_b);
+  for (std::vector<db::cell_index_type>::const_iterator i = cell_index_b.begin (); i != cell_index_b.end (); ++i) {
+    layout_b.cell (*i).collect_called_cells (called_b);
+    called_b.insert (*i);
+  }
 
   for (std::set<db::cell_index_type>::const_iterator b = called_b.begin (); b != called_b.end (); ++b) {
     if (m_b2a_mapping.find (*b) == m_b2a_mapping.end ()

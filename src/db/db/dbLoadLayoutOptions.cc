@@ -108,32 +108,74 @@ namespace db
   }
 
   void
-  LoadLayoutOptions::set_option_by_name (const std::string &method, const tl::Variant &value)
+  LoadLayoutOptions::set_option_by_method (const std::string &method, const tl::Variant &value)
   {
     //  Utilizes the GSI binding to set the values
-    tl::Variant options_ref = tl::Variant::make_variant_ref (this);
-    const tl::EvalClass *eval_cls = options_ref.user_cls ()->eval_cls ();
-    tl::ExpressionParserContext context;
+    tl::Variant ref = tl::Variant::make_variant_ref (this);
 
-    tl::Variant out;
-    std::vector<tl::Variant> args;
-    args.push_back (value);
-    eval_cls->execute (context, out, options_ref, method + "=", args);
+    tl::Extractor ex (method.c_str ());
+
+    while (! ex.at_end ()) {
+
+      std::string m;
+      ex.read_word (m, "_=");
+      if (! ex.at_end ()) {
+        ex.expect (".");
+      }
+
+      tl::Variant out;
+
+      std::vector<tl::Variant> args;
+      if (ex.at_end ()) {
+        args.push_back (value);
+      }
+      tl::ExpressionParserContext context;
+      ref.user_cls ()->eval_cls ()->execute (context, out, ref, m, args);
+
+      ref = out;
+
+    }
+  }
+
+  tl::Variant
+  LoadLayoutOptions::get_option_by_method (const std::string &method)
+  {
+    //  Utilizes the GSI binding to set the values
+    tl::Variant ref = tl::Variant::make_variant_ref (this);
+
+    tl::Extractor ex (method.c_str ());
+
+    while (! ex.at_end ()) {
+
+      std::string m;
+      ex.read_word (m, "_=");
+      if (! ex.at_end ()) {
+        ex.expect (".");
+      }
+
+      tl::Variant out;
+
+      std::vector<tl::Variant> args;
+      tl::ExpressionParserContext context;
+      ref.user_cls ()->eval_cls ()->execute (context, out, ref, m, args);
+
+      ref = out;
+
+    }
+
+    return ref;
+  }
+
+  void
+  LoadLayoutOptions::set_option_by_name (const std::string &method, const tl::Variant &value)
+  {
+    return set_option_by_method (method + "=", value);
   }
 
   tl::Variant
   LoadLayoutOptions::get_option_by_name (const std::string &method)
   {
-    //  Utilizes the GSI binding to set the values
-    tl::Variant options_ref = tl::Variant::make_variant_ref (this);
-    const tl::EvalClass *eval_cls = options_ref.user_cls ()->eval_cls ();
-    tl::ExpressionParserContext context;
-
-    tl::Variant out;
-    std::vector<tl::Variant> args;
-    eval_cls->execute (context, out, options_ref, method, args);
-
-    return out;
+    return get_option_by_method (method);
   }
 }
 

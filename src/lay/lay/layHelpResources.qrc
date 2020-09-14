@@ -21,6 +21,7 @@
         <file alias="ide_snapshot.png">doc/about/ide_snapshot.png</file>
         <file alias="index.xml">doc/about/index.xml</file>
         <file alias="layer_mapping.xml">doc/about/layer_mapping.xml</file>
+        <file alias="layer_specs.xml">doc/about/layer_specs.xml</file>
         <file alias="layer_sources.xml">doc/about/layer_sources.xml</file>
         <file alias="macro_editor.xml">doc/about/macro_editor.xml</file>
         <file alias="macro_in_menu.xml">doc/about/macro_in_menu.xml</file>

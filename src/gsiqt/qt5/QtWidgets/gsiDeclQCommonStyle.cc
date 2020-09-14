@@ -599,6 +599,7 @@ static gsi::Methods methods_QCommonStyle () {
   methods += new qt_gsi::GenericMethod ("unpolish", "@brief Method void QCommonStyle::unpolish(QWidget *widget)\nThis is a reimplementation of QStyle::unpolish", false, &_init_f_unpolish_1315, &_call_f_unpolish_1315);
   methods += new qt_gsi::GenericMethod ("unpolish", "@brief Method void QCommonStyle::unpolish(QApplication *application)\nThis is a reimplementation of QStyle::unpolish", false, &_init_f_unpolish_1843, &_call_f_unpolish_1843);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QCommonStyle::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QCommonStyle::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QCommonStyle::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QCommonStyle::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -831,6 +832,13 @@ public:
     } else {
       return QCommonStyle::layoutSpacing(control1, control2, orientation, option, widget);
     }
+  }
+
+  //  [emitter impl] void QCommonStyle::objectNameChanged(const QString &objectName)
+  void emitter_QCommonStyle_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QCommonStyle::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] int QCommonStyle::pixelMetric(QStyle::PixelMetric m, const QStyleOption *opt, const QWidget *widget)
@@ -1626,6 +1634,24 @@ static void _set_callback_cbs_layoutSpacing_c11697_2 (void *cls, const gsi::Call
 }
 
 
+// emitter void QCommonStyle::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QCommonStyle_Adaptor *)cls)->emitter_QCommonStyle_objectNameChanged_4567 (arg1);
+}
+
+
 // int QCommonStyle::pixelMetric(QStyle::PixelMetric m, const QStyleOption *opt, const QWidget *widget)
 
 static void _init_cbs_pixelMetric_c6642_2 (qt_gsi::GenericMethod *decl)
@@ -2087,6 +2113,7 @@ static gsi::Methods methods_QCommonStyle_Adaptor () {
   methods += new qt_gsi::GenericMethod ("itemTextRect", "@hide", true, &_init_cbs_itemTextRect_c7544_0, &_call_cbs_itemTextRect_c7544_0, &_set_callback_cbs_itemTextRect_c7544_0);
   methods += new qt_gsi::GenericMethod ("layoutSpacing", "@brief Virtual method int QCommonStyle::layoutSpacing(QSizePolicy::ControlType control1, QSizePolicy::ControlType control2, Qt::Orientation orientation, const QStyleOption *option, const QWidget *widget)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_layoutSpacing_c11697_2, &_call_cbs_layoutSpacing_c11697_2);
   methods += new qt_gsi::GenericMethod ("layoutSpacing", "@hide", true, &_init_cbs_layoutSpacing_c11697_2, &_call_cbs_layoutSpacing_c11697_2, &_set_callback_cbs_layoutSpacing_c11697_2);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QCommonStyle::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("pixelMetric", "@brief Virtual method int QCommonStyle::pixelMetric(QStyle::PixelMetric m, const QStyleOption *opt, const QWidget *widget)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_pixelMetric_c6642_2, &_call_cbs_pixelMetric_c6642_2);
   methods += new qt_gsi::GenericMethod ("pixelMetric", "@hide", true, &_init_cbs_pixelMetric_c6642_2, &_call_cbs_pixelMetric_c6642_2, &_set_callback_cbs_pixelMetric_c6642_2);
   methods += new qt_gsi::GenericMethod ("polish", "@brief Virtual method void QCommonStyle::polish(QPalette &)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_polish_1418_0, &_call_cbs_polish_1418_0);

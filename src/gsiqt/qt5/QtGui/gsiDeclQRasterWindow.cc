@@ -146,6 +146,7 @@ static gsi::Methods methods_QRasterWindow () {
   methods += gsi::qt_signal<int > ("minimumHeightChanged(int)", "minimumHeightChanged", gsi::arg("arg"), "@brief Signal declaration for QRasterWindow::minimumHeightChanged(int arg)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("minimumWidthChanged(int)", "minimumWidthChanged", gsi::arg("arg"), "@brief Signal declaration for QRasterWindow::minimumWidthChanged(int arg)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<Qt::WindowModality>::target_type & > ("modalityChanged(Qt::WindowModality)", "modalityChanged", gsi::arg("modality"), "@brief Signal declaration for QRasterWindow::modalityChanged(Qt::WindowModality modality)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QRasterWindow::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<double > ("opacityChanged(double)", "opacityChanged", gsi::arg("opacity"), "@brief Signal declaration for QRasterWindow::opacityChanged(double opacity)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QScreen * > ("screenChanged(QScreen *)", "screenChanged", gsi::arg("screen"), "@brief Signal declaration for QRasterWindow::screenChanged(QScreen *screen)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<QWindow::Visibility>::target_type & > ("visibilityChanged(QWindow::Visibility)", "visibilityChanged", gsi::arg("visibility"), "@brief Signal declaration for QRasterWindow::visibilityChanged(QWindow::Visibility visibility)\nYou can bind a procedure to this signal.");
@@ -327,6 +328,13 @@ public:
   void emitter_QRasterWindow_modalityChanged_2216(Qt::WindowModality modality)
   {
     emit QRasterWindow::modalityChanged(modality);
+  }
+
+  //  [emitter impl] void QRasterWindow::objectNameChanged(const QString &objectName)
+  void emitter_QRasterWindow_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QRasterWindow::objectNameChanged(const QString &objectName)'");
   }
 
   //  [emitter impl] void QRasterWindow::opacityChanged(double opacity)
@@ -1585,6 +1593,24 @@ static void _set_callback_cbs_nativeEvent_4678_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QRasterWindow::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QRasterWindow_Adaptor *)cls)->emitter_QRasterWindow_objectNameChanged_4567 (arg1);
+}
+
+
 // emitter void QRasterWindow::opacityChanged(double opacity)
 
 static void _init_emitter_opacityChanged_1071 (qt_gsi::GenericMethod *decl)
@@ -2104,6 +2130,7 @@ static gsi::Methods methods_QRasterWindow_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*moveEvent", "@hide", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0, &_set_callback_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@brief Virtual method bool QRasterWindow::nativeEvent(const QByteArray &eventType, void *message, long int *result)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@hide", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0, &_set_callback_cbs_nativeEvent_4678_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QRasterWindow::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("emit_opacityChanged", "@brief Emitter for signal void QRasterWindow::opacityChanged(double opacity)\nCall this method to emit this signal.", false, &_init_emitter_opacityChanged_1071, &_call_emitter_opacityChanged_1071);
   methods += new qt_gsi::GenericMethod ("*paintEvent", "@brief Virtual method void QRasterWindow::paintEvent(QPaintEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_paintEvent_1725_0, &_call_cbs_paintEvent_1725_0);
   methods += new qt_gsi::GenericMethod ("*paintEvent", "@hide", false, &_init_cbs_paintEvent_1725_0, &_call_cbs_paintEvent_1725_0, &_set_callback_cbs_paintEvent_1725_0);

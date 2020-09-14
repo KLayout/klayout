@@ -625,6 +625,7 @@ static gsi::Methods methods_QSqlDriver () {
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QSqlDriver::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("notification(const QString &)", "notification", gsi::arg("name"), "@brief Signal declaration for QSqlDriver::notification(const QString &name)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString &, const qt_gsi::Converter<QSqlDriver::NotificationSource>::target_type &, const QVariant & > ("notification(const QString &, QSqlDriver::NotificationSource, const QVariant &)", "notification_withData", gsi::arg("name"), gsi::arg("source"), gsi::arg("payload"), "@brief Signal declaration for QSqlDriver::notification(const QString &name, QSqlDriver::NotificationSource source, const QVariant &payload)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QSqlDriver::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QSqlDriver::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QSqlDriver::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -891,6 +892,13 @@ public:
   void emitter_QSqlDriver_notification_7365(const QString &name, QSqlDriver::NotificationSource source, const QVariant &payload)
   {
     emit QSqlDriver::notification(name, source, payload);
+  }
+
+  //  [emitter impl] void QSqlDriver::objectNameChanged(const QString &objectName)
+  void emitter_QSqlDriver_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QSqlDriver::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] bool QSqlDriver::open(const QString &db, const QString &user, const QString &password, const QString &host, int port, const QString &connOpts)
@@ -1640,6 +1648,24 @@ static void _call_emitter_notification_7365 (const qt_gsi::GenericMethod * /*dec
 }
 
 
+// emitter void QSqlDriver::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QSqlDriver_Adaptor *)cls)->emitter_QSqlDriver_objectNameChanged_4567 (arg1);
+}
+
+
 // bool QSqlDriver::open(const QString &db, const QString &user, const QString &password, const QString &host, int port, const QString &connOpts)
 
 static void _init_cbs_open_10352_5 (qt_gsi::GenericMethod *decl)
@@ -2075,6 +2101,7 @@ static gsi::Methods methods_QSqlDriver_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QSqlDriver::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("emit_notification", "@brief Emitter for signal void QSqlDriver::notification(const QString &name)\nCall this method to emit this signal.", false, &_init_emitter_notification_2025, &_call_emitter_notification_2025);
   methods += new qt_gsi::GenericMethod ("emit_notification_withData", "@brief Emitter for signal void QSqlDriver::notification(const QString &name, QSqlDriver::NotificationSource source, const QVariant &payload)\nCall this method to emit this signal.", false, &_init_emitter_notification_7365, &_call_emitter_notification_7365);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QSqlDriver::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("open", "@brief Virtual method bool QSqlDriver::open(const QString &db, const QString &user, const QString &password, const QString &host, int port, const QString &connOpts)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_open_10352_5, &_call_cbs_open_10352_5);
   methods += new qt_gsi::GenericMethod ("open", "@hide", false, &_init_cbs_open_10352_5, &_call_cbs_open_10352_5, &_set_callback_cbs_open_10352_5);
   methods += new qt_gsi::GenericMethod ("primaryIndex", "@brief Virtual method QSqlIndex QSqlDriver::primaryIndex(const QString &tableName)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_primaryIndex_c2025_0, &_call_cbs_primaryIndex_c2025_0);

@@ -185,6 +185,7 @@ static gsi::Methods methods_QTapAndHoldGesture () {
   methods += new qt_gsi::GenericMethod (":position", "@brief Method QPointF QTapAndHoldGesture::position()\n", true, &_init_f_position_c0, &_call_f_position_c0);
   methods += new qt_gsi::GenericMethod ("setPosition|position=", "@brief Method void QTapAndHoldGesture::setPosition(const QPointF &pos)\n", false, &_init_f_setPosition_1986, &_call_f_setPosition_1986);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QTapAndHoldGesture::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QTapAndHoldGesture::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("setTimeout|timeout=", "@brief Static method void QTapAndHoldGesture::setTimeout(int msecs)\nThis method is static and can be called without an instance.", &_init_f_setTimeout_767, &_call_f_setTimeout_767);
   methods += new qt_gsi::GenericStaticMethod (":timeout", "@brief Static method int QTapAndHoldGesture::timeout()\nThis method is static and can be called without an instance.", &_init_f_timeout_0, &_call_f_timeout_0);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QTapAndHoldGesture::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
@@ -275,6 +276,13 @@ public:
     } else {
       return QTapAndHoldGesture::eventFilter(arg1, arg2);
     }
+  }
+
+  //  [emitter impl] void QTapAndHoldGesture::objectNameChanged(const QString &objectName)
+  void emitter_QTapAndHoldGesture_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QTapAndHoldGesture::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QTapAndHoldGesture::childEvent(QChildEvent *)
@@ -522,6 +530,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QTapAndHoldGesture::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QTapAndHoldGesture_Adaptor *)cls)->emitter_QTapAndHoldGesture_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QTapAndHoldGesture::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -612,6 +638,7 @@ static gsi::Methods methods_QTapAndHoldGesture_Adaptor () {
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QTapAndHoldGesture::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QTapAndHoldGesture::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QTapAndHoldGesture::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QTapAndHoldGesture::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QTapAndHoldGesture::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QTapAndHoldGesture::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);

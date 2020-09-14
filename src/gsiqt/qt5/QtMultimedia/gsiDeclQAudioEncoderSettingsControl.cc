@@ -208,7 +208,6 @@ static gsi::Methods methods_QAudioEncoderSettingsControl () {
   methods += new qt_gsi::GenericMethod ("setAudioSettings|audioSettings=", "@brief Method void QAudioEncoderSettingsControl::setAudioSettings(const QAudioEncoderSettings &)\n", false, &_init_f_setAudioSettings_3445, &_call_f_setAudioSettings_3445);
   methods += new qt_gsi::GenericMethod ("supportedAudioCodecs", "@brief Method QStringList QAudioEncoderSettingsControl::supportedAudioCodecs()\n", true, &_init_f_supportedAudioCodecs_c0, &_call_f_supportedAudioCodecs_c0);
   methods += new qt_gsi::GenericMethod ("supportedSampleRates", "@brief Method QList<int> QAudioEncoderSettingsControl::supportedSampleRates(const QAudioEncoderSettings &settings, bool *continuous)\n", true, &_init_f_supportedSampleRates_c4387, &_call_f_supportedSampleRates_c4387);
-  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAudioEncoderSettingsControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QAudioEncoderSettingsControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QAudioEncoderSettingsControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -286,12 +285,6 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("codecDescription");
     }
-  }
-
-  //  [emitter impl] void QAudioEncoderSettingsControl::destroyed(QObject *)
-  void emitter_QAudioEncoderSettingsControl_destroyed_1302(QObject *arg1)
-  {
-    emit QAudioEncoderSettingsControl::destroyed(arg1);
   }
 
   //  [adaptor impl] bool QAudioEncoderSettingsControl::event(QEvent *)
@@ -551,24 +544,6 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
-// emitter void QAudioEncoderSettingsControl::destroyed(QObject *)
-
-static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
-  decl->add_arg<QObject * > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
-  ((QAudioEncoderSettingsControl_Adaptor *)cls)->emitter_QAudioEncoderSettingsControl_destroyed_1302 (arg1);
-}
-
-
 // void QAudioEncoderSettingsControl::disconnectNotify(const QMetaMethod &signal)
 
 static void _init_cbs_disconnectNotify_2394_0 (qt_gsi::GenericMethod *decl)
@@ -815,7 +790,6 @@ static gsi::Methods methods_QAudioEncoderSettingsControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("codecDescription", "@hide", true, &_init_cbs_codecDescription_c2025_0, &_call_cbs_codecDescription_c2025_0, &_set_callback_cbs_codecDescription_c2025_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAudioEncoderSettingsControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QAudioEncoderSettingsControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QAudioEncoderSettingsControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAudioEncoderSettingsControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);

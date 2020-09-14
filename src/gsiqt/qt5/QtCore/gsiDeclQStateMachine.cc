@@ -517,8 +517,18 @@ static gsi::Methods methods_QStateMachine () {
   methods += new qt_gsi::GenericMethod ("start", "@brief Method void QStateMachine::start()\n", false, &_init_f_start_0, &_call_f_start_0);
   methods += new qt_gsi::GenericMethod ("stop", "@brief Method void QStateMachine::stop()\n", false, &_init_f_stop_0, &_call_f_stop_0);
   methods += gsi::qt_signal<bool > ("activeChanged(bool)", "activeChanged", gsi::arg("active"), "@brief Signal declaration for QStateMachine::activeChanged(bool active)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("childModeChanged()", "childModeChanged", "@brief Signal declaration for QStateMachine::childModeChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QStateMachine::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("entered()", "entered", "@brief Signal declaration for QStateMachine::entered()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("errorStateChanged()", "errorStateChanged", "@brief Signal declaration for QStateMachine::errorStateChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("exited()", "exited", "@brief Signal declaration for QStateMachine::exited()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("finished()", "finished", "@brief Signal declaration for QStateMachine::finished()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("initialStateChanged()", "initialStateChanged", "@brief Signal declaration for QStateMachine::initialStateChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QStateMachine::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("propertiesAssigned()", "propertiesAssigned", "@brief Signal declaration for QStateMachine::propertiesAssigned()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("runningChanged(bool)", "runningChanged", gsi::arg("running"), "@brief Signal declaration for QStateMachine::runningChanged(bool running)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("started()", "started", "@brief Signal declaration for QStateMachine::started()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("stopped()", "stopped", "@brief Signal declaration for QStateMachine::stopped()\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QStateMachine::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QStateMachine::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -591,10 +601,28 @@ public:
     emit QStateMachine::activeChanged(active);
   }
 
+  //  [emitter impl] void QStateMachine::childModeChanged()
+  void emitter_QStateMachine_childModeChanged_2564()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QStateMachine::childModeChanged()'");
+  }
+
   //  [emitter impl] void QStateMachine::destroyed(QObject *)
   void emitter_QStateMachine_destroyed_1302(QObject *arg1)
   {
     emit QStateMachine::destroyed(arg1);
+  }
+
+  //  [emitter impl] void QStateMachine::entered()
+  void emitter_QStateMachine_entered_3384()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QStateMachine::entered()'");
+  }
+
+  //  [emitter impl] void QStateMachine::errorStateChanged()
+  void emitter_QStateMachine_errorStateChanged_2564()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QStateMachine::errorStateChanged()'");
   }
 
   //  [adaptor impl] bool QStateMachine::eventFilter(QObject *watched, QEvent *event)
@@ -612,10 +640,53 @@ public:
     }
   }
 
+  //  [emitter impl] void QStateMachine::exited()
+  void emitter_QStateMachine_exited_3384()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QStateMachine::exited()'");
+  }
+
+  //  [emitter impl] void QStateMachine::finished()
+  void emitter_QStateMachine_finished_2564()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QStateMachine::finished()'");
+  }
+
+  //  [emitter impl] void QStateMachine::initialStateChanged()
+  void emitter_QStateMachine_initialStateChanged_2564()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QStateMachine::initialStateChanged()'");
+  }
+
+  //  [emitter impl] void QStateMachine::objectNameChanged(const QString &objectName)
+  void emitter_QStateMachine_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QStateMachine::objectNameChanged(const QString &objectName)'");
+  }
+
+  //  [emitter impl] void QStateMachine::propertiesAssigned()
+  void emitter_QStateMachine_propertiesAssigned_2564()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QStateMachine::propertiesAssigned()'");
+  }
+
   //  [emitter impl] void QStateMachine::runningChanged(bool running)
   void emitter_QStateMachine_runningChanged_864(bool running)
   {
     emit QStateMachine::runningChanged(running);
+  }
+
+  //  [emitter impl] void QStateMachine::started()
+  void emitter_QStateMachine_started_3257()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QStateMachine::started()'");
+  }
+
+  //  [emitter impl] void QStateMachine::stopped()
+  void emitter_QStateMachine_stopped_3257()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QStateMachine::stopped()'");
   }
 
   //  [adaptor impl] void QStateMachine::beginMicrostep(QEvent *event)
@@ -928,6 +999,20 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
+// emitter void QStateMachine::childModeChanged()
+
+static void _init_emitter_childModeChanged_2564 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_childModeChanged_2564 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QStateMachine_Adaptor *)cls)->emitter_QStateMachine_childModeChanged_2564 ();
+}
+
+
 // void QStateMachine::customEvent(QEvent *)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
@@ -1042,6 +1127,34 @@ static void _set_callback_cbs_endSelectTransitions_1217_0 (void *cls, const gsi:
 }
 
 
+// emitter void QStateMachine::entered()
+
+static void _init_emitter_entered_3384 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_entered_3384 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QStateMachine_Adaptor *)cls)->emitter_QStateMachine_entered_3384 ();
+}
+
+
+// emitter void QStateMachine::errorStateChanged()
+
+static void _init_emitter_errorStateChanged_2564 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_errorStateChanged_2564 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QStateMachine_Adaptor *)cls)->emitter_QStateMachine_errorStateChanged_2564 ();
+}
+
+
 // bool QStateMachine::event(QEvent *e)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
@@ -1091,6 +1204,48 @@ static void _set_callback_cbs_eventFilter_2411_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QStateMachine::exited()
+
+static void _init_emitter_exited_3384 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_exited_3384 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QStateMachine_Adaptor *)cls)->emitter_QStateMachine_exited_3384 ();
+}
+
+
+// emitter void QStateMachine::finished()
+
+static void _init_emitter_finished_2564 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_finished_2564 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QStateMachine_Adaptor *)cls)->emitter_QStateMachine_finished_2564 ();
+}
+
+
+// emitter void QStateMachine::initialStateChanged()
+
+static void _init_emitter_initialStateChanged_2564 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_initialStateChanged_2564 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QStateMachine_Adaptor *)cls)->emitter_QStateMachine_initialStateChanged_2564 ();
+}
+
+
 // exposed bool QStateMachine::isSignalConnected(const QMetaMethod &signal)
 
 static void _init_fp_isSignalConnected_c2394 (qt_gsi::GenericMethod *decl)
@@ -1106,6 +1261,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
   tl::Heap heap;
   const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QStateMachine_Adaptor *)cls)->fp_QStateMachine_isSignalConnected_c2394 (arg1));
+}
+
+
+// emitter void QStateMachine::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QStateMachine_Adaptor *)cls)->emitter_QStateMachine_objectNameChanged_4567 (arg1);
 }
 
 
@@ -1154,6 +1327,20 @@ static void _call_cbs_onExit_1217_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 static void _set_callback_cbs_onExit_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QStateMachine_Adaptor *)cls)->cb_onExit_1217_0 = cb;
+}
+
+
+// emitter void QStateMachine::propertiesAssigned()
+
+static void _init_emitter_propertiesAssigned_2564 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_propertiesAssigned_2564 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QStateMachine_Adaptor *)cls)->emitter_QStateMachine_propertiesAssigned_2564 ();
 }
 
 
@@ -1221,6 +1408,34 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
+// emitter void QStateMachine::started()
+
+static void _init_emitter_started_3257 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_started_3257 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QStateMachine_Adaptor *)cls)->emitter_QStateMachine_started_3257 ();
+}
+
+
+// emitter void QStateMachine::stopped()
+
+static void _init_emitter_stopped_3257 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_stopped_3257 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QStateMachine_Adaptor *)cls)->emitter_QStateMachine_stopped_3257 ();
+}
+
+
 // void QStateMachine::timerEvent(QTimerEvent *)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
@@ -1261,6 +1476,7 @@ static gsi::Methods methods_QStateMachine_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*beginSelectTransitions", "@hide", false, &_init_cbs_beginSelectTransitions_1217_0, &_call_cbs_beginSelectTransitions_1217_0, &_set_callback_cbs_beginSelectTransitions_1217_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QStateMachine::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("emit_childModeChanged", "@brief Emitter for signal void QStateMachine::childModeChanged()\nCall this method to emit this signal.", false, &_init_emitter_childModeChanged_2564, &_call_emitter_childModeChanged_2564);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QStateMachine::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QStateMachine::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
@@ -1270,19 +1486,28 @@ static gsi::Methods methods_QStateMachine_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*endMicrostep", "@hide", false, &_init_cbs_endMicrostep_1217_0, &_call_cbs_endMicrostep_1217_0, &_set_callback_cbs_endMicrostep_1217_0);
   methods += new qt_gsi::GenericMethod ("*endSelectTransitions", "@brief Virtual method void QStateMachine::endSelectTransitions(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_endSelectTransitions_1217_0, &_call_cbs_endSelectTransitions_1217_0);
   methods += new qt_gsi::GenericMethod ("*endSelectTransitions", "@hide", false, &_init_cbs_endSelectTransitions_1217_0, &_call_cbs_endSelectTransitions_1217_0, &_set_callback_cbs_endSelectTransitions_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_entered", "@brief Emitter for signal void QStateMachine::entered()\nCall this method to emit this signal.", false, &_init_emitter_entered_3384, &_call_emitter_entered_3384);
+  methods += new qt_gsi::GenericMethod ("emit_errorStateChanged", "@brief Emitter for signal void QStateMachine::errorStateChanged()\nCall this method to emit this signal.", false, &_init_emitter_errorStateChanged_2564, &_call_emitter_errorStateChanged_2564);
   methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QStateMachine::event(QEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QStateMachine::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("emit_exited", "@brief Emitter for signal void QStateMachine::exited()\nCall this method to emit this signal.", false, &_init_emitter_exited_3384, &_call_emitter_exited_3384);
+  methods += new qt_gsi::GenericMethod ("emit_finished", "@brief Emitter for signal void QStateMachine::finished()\nCall this method to emit this signal.", false, &_init_emitter_finished_2564, &_call_emitter_finished_2564);
+  methods += new qt_gsi::GenericMethod ("emit_initialStateChanged", "@brief Emitter for signal void QStateMachine::initialStateChanged()\nCall this method to emit this signal.", false, &_init_emitter_initialStateChanged_2564, &_call_emitter_initialStateChanged_2564);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QStateMachine::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QStateMachine::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*onEntry", "@brief Virtual method void QStateMachine::onEntry(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_onEntry_1217_0, &_call_cbs_onEntry_1217_0);
   methods += new qt_gsi::GenericMethod ("*onEntry", "@hide", false, &_init_cbs_onEntry_1217_0, &_call_cbs_onEntry_1217_0, &_set_callback_cbs_onEntry_1217_0);
   methods += new qt_gsi::GenericMethod ("*onExit", "@brief Virtual method void QStateMachine::onExit(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_onExit_1217_0, &_call_cbs_onExit_1217_0);
   methods += new qt_gsi::GenericMethod ("*onExit", "@hide", false, &_init_cbs_onExit_1217_0, &_call_cbs_onExit_1217_0, &_set_callback_cbs_onExit_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_propertiesAssigned", "@brief Emitter for signal void QStateMachine::propertiesAssigned()\nCall this method to emit this signal.", false, &_init_emitter_propertiesAssigned_2564, &_call_emitter_propertiesAssigned_2564);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QStateMachine::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("emit_runningChanged", "@brief Emitter for signal void QStateMachine::runningChanged(bool running)\nCall this method to emit this signal.", false, &_init_emitter_runningChanged_864, &_call_emitter_runningChanged_864);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QStateMachine::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QStateMachine::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
+  methods += new qt_gsi::GenericMethod ("emit_started", "@brief Emitter for signal void QStateMachine::started()\nCall this method to emit this signal.", false, &_init_emitter_started_3257, &_call_emitter_started_3257);
+  methods += new qt_gsi::GenericMethod ("emit_stopped", "@brief Emitter for signal void QStateMachine::stopped()\nCall this method to emit this signal.", false, &_init_emitter_stopped_3257, &_call_emitter_stopped_3257);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QStateMachine::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;

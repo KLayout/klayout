@@ -198,6 +198,7 @@ static gsi::Methods methods_QWidgetAction () {
   methods += gsi::qt_signal ("changed()", "changed", "@brief Signal declaration for QWidgetAction::changed()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QWidgetAction::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("hovered()", "hovered", "@brief Signal declaration for QWidgetAction::hovered()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QWidgetAction::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("toggled(bool)", "toggled", gsi::arg("arg1"), "@brief Signal declaration for QWidgetAction::toggled(bool)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("triggered(bool)", "triggered", gsi::arg("checked"), "@brief Signal declaration for QWidgetAction::triggered(bool checked)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QWidgetAction::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
@@ -269,6 +270,13 @@ public:
   void emitter_QWidgetAction_hovered_0()
   {
     emit QWidgetAction::hovered();
+  }
+
+  //  [emitter impl] void QWidgetAction::objectNameChanged(const QString &objectName)
+  void emitter_QWidgetAction_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QWidgetAction::objectNameChanged(const QString &objectName)'");
   }
 
   //  [emitter impl] void QWidgetAction::toggled(bool)
@@ -679,6 +687,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QWidgetAction::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QWidgetAction_Adaptor *)cls)->emitter_QWidgetAction_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QWidgetAction::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -812,6 +838,7 @@ static gsi::Methods methods_QWidgetAction_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("emit_hovered", "@brief Emitter for signal void QWidgetAction::hovered()\nCall this method to emit this signal.", false, &_init_emitter_hovered_0, &_call_emitter_hovered_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QWidgetAction::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QWidgetAction::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QWidgetAction::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QWidgetAction::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QWidgetAction::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);

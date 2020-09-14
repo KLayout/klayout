@@ -433,6 +433,7 @@ static gsi::Methods methods_QToolButton () {
   methods += gsi::qt_signal<bool > ("clicked(bool)", "clicked", gsi::arg("checked"), "@brief Signal declaration for QToolButton::clicked(bool checked)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QToolButton::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QToolButton::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QToolButton::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("pressed()", "pressed", "@brief Signal declaration for QToolButton::pressed()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("released()", "released", "@brief Signal declaration for QToolButton::released()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("toggled(bool)", "toggled", gsi::arg("checked"), "@brief Signal declaration for QToolButton::toggled(bool checked)\nYou can bind a procedure to this signal.");
@@ -615,6 +616,13 @@ public:
     } else {
       return QToolButton::minimumSizeHint();
     }
+  }
+
+  //  [emitter impl] void QToolButton::objectNameChanged(const QString &objectName)
+  void emitter_QToolButton_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QToolButton::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] QPaintEngine *QToolButton::paintEngine()
@@ -2411,6 +2419,24 @@ static void _set_callback_cbs_nextCheckState_0_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QToolButton::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QToolButton_Adaptor *)cls)->emitter_QToolButton_objectNameChanged_4567 (arg1);
+}
+
+
 // QPaintEngine *QToolButton::paintEngine()
 
 static void _init_cbs_paintEngine_c0_0 (qt_gsi::GenericMethod *decl)
@@ -2929,6 +2955,7 @@ static gsi::Methods methods_QToolButton_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@hide", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0, &_set_callback_cbs_nativeEvent_4678_0);
   methods += new qt_gsi::GenericMethod ("*nextCheckState", "@brief Virtual method void QToolButton::nextCheckState()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_nextCheckState_0_0, &_call_cbs_nextCheckState_0_0);
   methods += new qt_gsi::GenericMethod ("*nextCheckState", "@hide", false, &_init_cbs_nextCheckState_0_0, &_call_cbs_nextCheckState_0_0, &_set_callback_cbs_nextCheckState_0_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QToolButton::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Virtual method QPaintEngine *QToolButton::paintEngine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0);
   methods += new qt_gsi::GenericMethod ("paintEngine", "@hide", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0, &_set_callback_cbs_paintEngine_c0_0);
   methods += new qt_gsi::GenericMethod ("*paintEvent", "@brief Virtual method void QToolButton::paintEvent(QPaintEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_paintEvent_1725_0, &_call_cbs_paintEvent_1725_0);

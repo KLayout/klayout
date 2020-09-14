@@ -1,0 +1,3 @@
+include.3a
+# %include inc2.txt
+include.3b

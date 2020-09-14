@@ -22,6 +22,7 @@
 
 #include "tlScriptError.h"
 #include "tlString.h"
+#include "tlInclude.h"
 
 namespace tl
 {
@@ -32,19 +33,33 @@ namespace tl
 BacktraceElement::BacktraceElement (const std::string &_file, int _line)
   : file (_file), line (_line)
 {
-  // .. nothing yet ..
+  translate_includes ();
 }
 
 BacktraceElement::BacktraceElement (const std::string &_file, int _line, const std::string _more_info)
   : file (_file), line (_line), more_info (_more_info)
 {
-  // .. nothing yet ..
+  translate_includes ();
 }
 
 BacktraceElement::BacktraceElement ()
   : line (0)
 {
   // .. nothing yet ..
+}
+
+void
+BacktraceElement::translate_includes ()
+{
+  if (line < 1) {
+    return;
+  }
+
+  std::pair<std::string, int> fl = tl::IncludeExpander::translate_to_original (file, line);
+  if (fl.second > 0) {
+    file = fl.first;
+    line = fl.second;
+  }
 }
 
 std::string 
@@ -64,20 +79,38 @@ BacktraceElement::to_string() const
 // -------------------------------------------------------------------
 //  ScriptError implementation
 
+ScriptError::ScriptError (const char *msg, const char *cls, const std::vector<BacktraceElement> &backtrace)
+  : tl::Exception (msg), m_line (-1), m_cls (cls), m_backtrace (backtrace)
+{
+  //  .. nothing yet ..
+}
+
+ScriptError::ScriptError (const char *msg, const char *sourcefile, int line, const char *cls, const std::vector<BacktraceElement> &backtrace)
+  : tl::Exception (msg), m_sourcefile (sourcefile), m_line (line), m_cls (cls), m_backtrace (backtrace)
+{
+  translate_includes ();
+}
+
+ScriptError::ScriptError (const ScriptError &d)
+  : tl::Exception (d), m_sourcefile (d.m_sourcefile), m_line (d.m_line), m_cls (d.m_cls), m_context (d.m_context), m_backtrace (d.m_backtrace)
+{
+  //  .. nothing yet ..
+}
+
 std::string
 ScriptError::basic_msg () const
 {
   return tl::Exception::msg ();
 }
 
-std::string 
+std::string
 ScriptError::msg () const
 {
   std::string m = basic_msg ();
 
   if (! m_context.empty ()) {
-    m += tl::to_string (tr (" in ")) + m_context;
-  }
+      m += tl::to_string (tr (" in ")) + m_context;
+    }
 
   for (std::vector<BacktraceElement>::const_iterator bt = backtrace ().begin (); bt != backtrace ().end (); ++bt) {
     m += "\n  ";
@@ -85,6 +118,20 @@ ScriptError::msg () const
   }
 
   return m;
+}
+
+void
+ScriptError::translate_includes ()
+{
+  if (m_line < 1) {
+    return;
+  }
+
+  std::pair<std::string, int> fl = tl::IncludeExpander::translate_to_original (m_sourcefile, m_line);
+  if (fl.second > 0) {
+    m_sourcefile = fl.first;
+    m_line = fl.second;
+  }
 }
 
 }

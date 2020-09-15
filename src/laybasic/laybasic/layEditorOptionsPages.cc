@@ -33,6 +33,7 @@
 #include <QTabWidget>
 #include <QToolButton>
 #include <QCompleter>
+#include <QLineEdit>
 
 namespace lay
 {

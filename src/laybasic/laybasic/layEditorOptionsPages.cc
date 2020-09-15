@@ -27,7 +27,6 @@
 #include "layPlugin.h"
 #include "layLayoutView.h"
 #include "layQtTools.h"
-#include "ui_EditorOptionsGeneric.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>

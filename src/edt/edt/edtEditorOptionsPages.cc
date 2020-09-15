@@ -35,7 +35,6 @@
 #include "layLayoutView.h"
 #include "layCellSelectionForm.h"
 #include "layQtTools.h"
-#include "ui_EditorOptionsDialog.h"
 #include "ui_EditorOptionsGeneric.h"
 #include "ui_EditorOptionsPath.h"
 #include "ui_EditorOptionsText.h"

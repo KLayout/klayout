@@ -97,49 +97,49 @@ EmptyRegion::processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &) co
 }
 
 EdgePairsDelegate *
-EmptyRegion::width_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+EmptyRegion::width_check (db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::space_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+EmptyRegion::space_check (db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::isolated_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+EmptyRegion::isolated_check (db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::notch_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+EmptyRegion::notch_check (db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::enclosing_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+EmptyRegion::enclosing_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::overlap_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+EmptyRegion::overlap_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::separation_check (const Region &, db::Coord, bool , metrics_type, double, distance_type, distance_type) const
+EmptyRegion::separation_check (const Region &, db::Coord, bool , metrics_type, double, distance_type, distance_type, bool) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::inside_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+EmptyRegion::inside_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const
 {
   return new EmptyEdgePairs ();
 }

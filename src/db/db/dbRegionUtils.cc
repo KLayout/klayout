@@ -45,29 +45,31 @@ Edge2EdgeCheckBase::prepare_next_pass ()
 
   if (m_pass == 1) {
 
-    if (m_with_shielding && ! m_ep.empty ()) {
+    if ((m_with_shielding || m_has_negative_edge_output) && ! m_ep.empty ()) {
+
       m_ep_discarded.resize (m_ep.size (), false);
+
+      //  second pass:
       return true;
+
     }
 
-  } else if (m_pass == 2) {
+  }
 
-    if (m_has_edge_pair_output) {
+  if (! m_ep.empty () && m_has_edge_pair_output) {
 
-      std::vector<bool>::const_iterator d = m_ep_discarded.begin ();
-      std::vector<db::EdgePair>::const_iterator ep = m_ep.begin ();
-      while (ep != m_ep.end ()) {
-        bool use_result = true;
-        if (d != m_ep_discarded.end ()) {
-          use_result = ! *d;
-          ++d;
-        }
-        if (use_result) {
-          put (*ep);
-        }
-        ++ep;
+    std::vector<bool>::const_iterator d = m_ep_discarded.begin ();
+    std::vector<db::EdgePair>::const_iterator ep = m_ep.begin ();
+    while (ep != m_ep.end ()) {
+      bool use_result = true;
+      if (d != m_ep_discarded.end ()) {
+        use_result = ! *d;
+        ++d;
       }
-
+      if (use_result) {
+        put (*ep);
+      }
+      ++ep;
     }
 
   }
@@ -206,7 +208,9 @@ Edge2EdgeCheckBase::add (const db::Edge *o1, size_t p1, const db::Edge *o2, size
             ec.add (o1, 0);
 
             for (std::multimap<std::pair<db::Edge, size_t>, size_t>::const_iterator i = i0; i != m_e2ep.end () && i->first == k; ++i) {
-              ec.add (&m_ep [i->second].first (), 1);
+              if (i->second >= m_ep_discarded.size () || !m_ep_discarded [i->second]) {
+                ec.add (&m_ep [i->second].first (), 1);
+              }
             }
 
             ec.finish ();

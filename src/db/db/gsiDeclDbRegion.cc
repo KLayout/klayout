@@ -441,13 +441,14 @@ static db::EdgePairs width1 (const db::Region *r, db::Region::distance_type d)
   return r->width_check (d);
 }
 
-static db::EdgePairs width2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
+static db::EdgePairs width2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
   return r->width_check (d, whole_edges,
                          metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
                          ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                          min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                         max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> ());
+                         max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                         shielded);
 }
 
 static db::EdgePairs space1 (const db::Region *r, db::Region::distance_type d) 
@@ -455,13 +456,14 @@ static db::EdgePairs space1 (const db::Region *r, db::Region::distance_type d)
   return r->space_check (d);
 }
 
-static db::EdgePairs space2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
+static db::EdgePairs space2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
   return r->space_check (d, whole_edges,
                          metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
                          ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                          min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                         max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> ());
+                         max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                         shielded);
 }
 
 static db::EdgePairs notch1 (const db::Region *r, db::Region::distance_type d) 
@@ -469,13 +471,14 @@ static db::EdgePairs notch1 (const db::Region *r, db::Region::distance_type d)
   return r->notch_check (d);
 }
 
-static db::EdgePairs notch2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
+static db::EdgePairs notch2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
   return r->notch_check (d, whole_edges,
                          metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
                          ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                          min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                         max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> ());
+                         max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                         shielded);
 }
 
 static db::EdgePairs isolated1 (const db::Region *r, db::Region::distance_type d) 
@@ -483,13 +486,14 @@ static db::EdgePairs isolated1 (const db::Region *r, db::Region::distance_type d
   return r->isolated_check (d);
 }
 
-static db::EdgePairs isolated2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
+static db::EdgePairs isolated2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
   return r->isolated_check (d, whole_edges,
                             metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
                             ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                             min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                            max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> ());
+                            max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                            shielded);
 }
 
 static db::EdgePairs inside1 (const db::Region *r, const db::Region &other, db::Region::distance_type d) 
@@ -497,13 +501,14 @@ static db::EdgePairs inside1 (const db::Region *r, const db::Region &other, db::
   return r->inside_check (other, d);
 }
 
-static db::EdgePairs inside2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
+static db::EdgePairs inside2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
   return r->inside_check (other, d, whole_edges,
                           metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
                           ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                           min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                          max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> ());
+                          max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                          shielded);
 }
 
 static db::EdgePairs overlap1 (const db::Region *r, const db::Region &other, db::Region::distance_type d) 
@@ -511,13 +516,14 @@ static db::EdgePairs overlap1 (const db::Region *r, const db::Region &other, db:
   return r->overlap_check (other, d);
 }
 
-static db::EdgePairs overlap2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
+static db::EdgePairs overlap2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
   return r->overlap_check (other, d, whole_edges,
                            metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                            min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                           max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> ());
+                           max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                           shielded);
 }
 
 static db::EdgePairs enclosing1 (const db::Region *r, const db::Region &other, db::Region::distance_type d) 
@@ -525,13 +531,14 @@ static db::EdgePairs enclosing1 (const db::Region *r, const db::Region &other, d
   return r->enclosing_check (other, d);
 }
 
-static db::EdgePairs enclosing2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
+static db::EdgePairs enclosing2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
   return r->enclosing_check (other, d, whole_edges,
                              metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
                              ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                              min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                             max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> ());
+                             max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                             shielded);
 }
 
 static db::EdgePairs separation1 (const db::Region *r, const db::Region &other, db::Region::distance_type d) 
@@ -539,13 +546,14 @@ static db::EdgePairs separation1 (const db::Region *r, const db::Region &other, 
   return r->separation_check (other, d);
 }
 
-static db::EdgePairs separation2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
+static db::EdgePairs separation2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
   return r->separation_check (other, d, whole_edges,
                               metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
                               ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                               min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                              max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> ());
+                              max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                              shielded);
 }
 
 static std::vector<db::Region> andnot (const db::Region *r, const db::Region &other)
@@ -1920,7 +1928,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("width_check", &width2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("width_check", &width2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"), gsi::arg ("shielded", true),
     "@brief Performs a width check with options\n"
     "@param d The minimum width for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -1928,6 +1936,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param ignore_angle The angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper limit of the projected length of one edge onto another\n"
+    "@param shielded Enables shielding\n"
     "\n"
     "This version is similar to the simple version with one parameter. In addition, it allows "
     "to specify many more options.\n"
@@ -1949,7 +1958,15 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one limit, pass nil to the respective value.\n"
     "\n"
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
+    "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded' option has been introduced in version 0.27."
   ) +
   method_ext ("space_check", &space1, gsi::arg ("d"),
     "@brief Performs a space check\n"
@@ -1965,7 +1982,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"), gsi::arg ("shielded", true),
     "@brief Performs a space check with options\n"
     "@param d The minimum space for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -1994,7 +2011,15 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one limit, pass nil to the respective value.\n"
     "\n"
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
+    "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded' option has been introduced in version 0.27."
   ) +
   method_ext ("notch_check", &notch1, gsi::arg ("d"),
     "@brief Performs a space check between edges of the same polygon\n"
@@ -2012,7 +2037,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("notch_check", &notch2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("notch_check", &notch2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"), gsi::arg ("shielded", true),
     "@brief Performs a space check between edges of the same polygon with options\n"
     "@param d The minimum space for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -2041,7 +2066,15 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one limit, pass nil to the respective value.\n"
     "\n"
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
+    "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded' option has been introduced in version 0.27."
   ) +
   method_ext ("isolated_check", &isolated1, gsi::arg ("d"),
     "@brief Performs a space check between edges of different polygons\n"
@@ -2059,7 +2092,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("isolated_check", &isolated2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("isolated_check", &isolated2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"), gsi::arg ("shielded", true),
     "@brief Performs a space check between edges of different polygons with options\n"
     "@param d The minimum space for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -2088,7 +2121,15 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one limit, pass nil to the respective value.\n"
     "\n"
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
+    "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded' option has been introduced in version 0.27."
   ) +
   method_ext ("inside_check", &inside1, gsi::arg ("other"), gsi::arg ("d"),
     "@brief Performs a check whether polygons of this region are inside polygons of the other region by some amount\n"
@@ -2101,7 +2142,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("inside_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("inside_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"), gsi::arg ("shielded", true),
     "@brief Performs an inside check with options\n"
     "@param d The minimum distance for which the polygons are checked\n"
     "@param other The other region against which to check\n"
@@ -2131,7 +2172,15 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one limit, pass nil to the respective value.\n"
     "\n"
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
+    "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded' option has been introduced in version 0.27."
   ) +
   method_ext ("overlap_check", &overlap1, gsi::arg ("other"), gsi::arg ("d"),
     "@brief Performs a check whether polygons of this region overlap polygons of the other region by some amount\n"
@@ -2142,7 +2191,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("overlap_check", &overlap2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("overlap_check", &overlap2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"), gsi::arg ("shielded", true),
     "@brief Performs an overlap check with options\n"
     "@param d The minimum overlap for which the polygons are checked\n"
     "@param other The other region against which to check\n"
@@ -2172,7 +2221,15 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one limit, pass nil to the respective value.\n"
     "\n"
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
+    "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded' option has been introduced in version 0.27."
   ) +
   method_ext ("enclosing_check", &enclosing1, gsi::arg ("other"), gsi::arg ("d"),
     "@brief Performs a check whether polygons of this region enclose polygons of the other region by some amount\n"
@@ -2183,7 +2240,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("enclosing_check", &enclosing2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("enclosing_check", &enclosing2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"), gsi::arg ("shielded", true),
     "@brief Performs an enclosing check with options\n"
     "@param d The minimum enclosing distance for which the polygons are checked\n"
     "@param other The other region against which to check\n"
@@ -2213,7 +2270,15 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one limit, pass nil to the respective value.\n"
     "\n"
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
+    "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded' option has been introduced in version 0.27."
   ) +
   method_ext ("separation_check", &separation1, gsi::arg ("other"), gsi::arg ("d"),
     "@brief Performs a check whether polygons of this region are separated from polygons of the other region by some amount\n"
@@ -2224,7 +2289,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("separation_check", &separation2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("separation_check", &separation2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"), gsi::arg ("shielded", true),
     "@brief Performs a separation check with options\n"
     "@param d The minimum separation for which the polygons are checked\n"
     "@param other The other region against which to check\n"
@@ -2254,7 +2319,15 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one limit, pass nil to the respective value.\n"
     "\n"
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
+    "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded' option has been introduced in version 0.27."
   ) +
   method_ext ("area", &area1,
     "@brief The area of the region\n"

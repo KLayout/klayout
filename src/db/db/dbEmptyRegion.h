@@ -61,14 +61,14 @@ public:
 
   virtual Box bbox () const { return Box (); }
 
-  virtual EdgePairsDelegate *width_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
-  virtual EdgePairsDelegate *space_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
-  virtual EdgePairsDelegate *isolated_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
-  virtual EdgePairsDelegate *notch_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
-  virtual EdgePairsDelegate *enclosing_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
-  virtual EdgePairsDelegate *overlap_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
-  virtual EdgePairsDelegate *separation_check (const Region &, db::Coord, bool , metrics_type, double, distance_type, distance_type) const;
-  virtual EdgePairsDelegate *inside_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
+  virtual EdgePairsDelegate *width_check (db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const;
+  virtual EdgePairsDelegate *space_check (db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const;
+  virtual EdgePairsDelegate *isolated_check (db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const;
+  virtual EdgePairsDelegate *notch_check (db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const;
+  virtual EdgePairsDelegate *enclosing_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const;
+  virtual EdgePairsDelegate *overlap_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const;
+  virtual EdgePairsDelegate *separation_check (const Region &, db::Coord, bool , metrics_type, double, distance_type, distance_type, bool) const;
+  virtual EdgePairsDelegate *inside_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const;
   virtual EdgePairsDelegate *grid_check (db::Coord, db::Coord) const;
   virtual EdgePairsDelegate *angle_check (double, double, bool) const;
 

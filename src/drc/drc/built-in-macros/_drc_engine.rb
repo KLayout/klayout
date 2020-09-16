@@ -83,6 +83,14 @@ module DRC
       DRCSizingMode::new(4)
     end
     
+    def shielded
+      DRCShielded::new(true)
+    end
+    
+    def transparent
+      DRCShielded::new(false)
+    end
+    
     def projection_limits(*args)
       DRCProjectionLimits::new(*args)
     end

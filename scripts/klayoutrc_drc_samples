@@ -102,7 +102,7 @@
  <grid-color>#404040</grid-color>
  <grid-micron>0.1</grid-micron>
  <grid-show-ruler>true</grid-show-ruler>
- <grid-style0>lines</grid-style0>
+ <grid-style0>invisible</grid-style0>
  <grid-style1>dots</grid-style1>
  <grid-style2>tenths-dotted-lines</grid-style2>
  <grid-visible>true</grid-visible>

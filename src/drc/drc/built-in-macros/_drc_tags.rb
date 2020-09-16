@@ -126,5 +126,15 @@ module DRC
     end
   end
 
+  # A wrapper for specifying shielded mode
+  class DRCShielded
+    def initialize(f)
+      @value = f
+    end
+    def value
+      @value
+    end
+  end
+ 
 end
 

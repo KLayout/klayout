@@ -102,7 +102,7 @@ def run_demo(gen, cmd, out)
 
   gen.produce(cell.shapes(l1), cell.shapes(l2))
 
-  view.zoom_box(RBA::DBox::new(-2.0, -1.0, 8.0, 9.0))
+  view.zoom_box(RBA::DBox::new(-2.0, -2.0, 8.0, 9.0))
   view.max_hier
 
   t = RBA::Text::new(cmd, -1500, 8500)
@@ -144,7 +144,7 @@ SCRIPT
   end
 
   view.update_content
-  view.save_image(res_path + "/" + img_path + "/" + out, 400, 400)
+  view.save_image(res_path + "/" + img_path + "/" + out, 500, 500)
 
   puts "---> written #{res_path}/#{img_path}/#{out}"
 
@@ -707,6 +707,37 @@ gen = Gen::new
 
 run_demo gen, "labels & input2", "drc_textpoly1.png"
 run_demo gen, "labels - input2", "drc_textpoly2.png"
+
+
+class Gen
+  def produce(s1, s2)
+    s1.insert(RBA::Polygon::new(RBA::Box::new(0, 0, 6000, 2000)))
+    s2.insert(RBA::Polygon::new(RBA::Box::new(3500, 3000, 6000, 4000)))
+    s2.insert(RBA::Polygon::new(RBA::Box::new(0, 5000, 2500, 7000)))
+    s2.insert(RBA::Polygon::new(RBA::Box::new(3500, 5000, 6000, 7000)))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input1.separation(input2, 3.5.um, projection, \n                  shielded)", "drc_shielded1.png"
+run_demo gen, "input1.separation(input2, 3.5.um, projection, \n                  transparent)", "drc_shielded2.png"
+
+
+class Gen
+  def produce(s1, s2)
+    s1.insert(RBA::Polygon::new(RBA::Box::new(0, 0, 2500, 2000)))
+    s1.insert(RBA::Polygon::new(RBA::Box::new(3500, 0, 6000, 2000)))
+    s2.insert(RBA::Polygon::new(RBA::Box::new(3500, 0, 6000, 2000)))
+    s2.insert(RBA::Polygon::new(RBA::Box::new(0, 5000, 2500, 7000)))
+    s2.insert(RBA::Polygon::new(RBA::Box::new(3500, 5000, 6000, 7000)))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input1.separation(input2, 3.5.um, projection, \n                  shielded)", "drc_shielded3.png"
+run_demo gen, "input1.separation(input2, 3.5.um, projection, \n                  transparent)", "drc_shielded4.png"
 
 
 QRCGenerator::instance.finish

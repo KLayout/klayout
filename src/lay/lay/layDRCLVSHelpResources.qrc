@@ -95,5 +95,9 @@
   <file alias="drc_texts2.png">doc/images/drc_texts2.png</file>
   <file alias="drc_textpoly1.png">doc/images/drc_textpoly1.png</file>
   <file alias="drc_textpoly2.png">doc/images/drc_textpoly2.png</file>
+  <file alias="drc_shielded1.png">doc/images/drc_shielded1.png</file>
+  <file alias="drc_shielded2.png">doc/images/drc_shielded2.png</file>
+  <file alias="drc_shielded3.png">doc/images/drc_shielded3.png</file>
+  <file alias="drc_shielded4.png">doc/images/drc_shielded4.png</file>
  </qresource>
 </RCC>

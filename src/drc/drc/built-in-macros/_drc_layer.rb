@@ -2471,6 +2471,8 @@ CODE
     #   @li @b projection_limits(min, max) or projection_limits(min .. max) @/b:
     #         this option makes the check only consider edge pairs whose projected length on
     #         each other is more or equal than min and less than max @/li
+    #   @li @b transparent @/b: performs the check without shielding (polygon layers only) @/li
+    #   @li @b shielded @/b: performs the check with shielding (polygon layers only) @/li
     # @/ul
     #
     # Note that without the angle_limit, acute corners will always be reported, since two 
@@ -2508,6 +2510,18 @@ CODE
     #     @td @img(/images/drc_width4.png) @/td
     #   @/tr
     # @/table
+    #
+    # "shielding" is a concept where an internal or external distance is measured only 
+    # if the opposite edge is not blocked by other edges between. Shielded mode makes 
+    # a difference if very large distances are to be checked and the minimum distance
+    # is much smaller: in this case, a large distance violation may be blocked by features
+    # located between the edges which are checked. With shielding, large distance violations
+    # are not reported in this case. Shielding is also effective at zero distance which has
+    # an adverse effect: Consider a case, where one layer A is a subset of another layer B. If 
+    # you try to check the distance between features of B vs. A, you cannot use shielding, 
+    # because B features which are identical to A features will shield those entirely. 
+    #
+    # Shielding is enabled by default, but can be switched off with the "transparent" option.
     
     # %DRC%
     # @name space
@@ -2685,6 +2699,7 @@ CODE
         alim = nil
         whole_edges = false
         other = nil
+        shielded = nil
 
         n = 1
         args.each do |a|
@@ -2699,6 +2714,8 @@ CODE
           elsif a.is_a?(DRCProjectionLimits)
             minp = @engine._prep_value(a.min)
             maxp = @engine._prep_value(a.max)
+          elsif a.is_a?(DRCShielded)
+            shielded = a.value
           elsif a.is_a?(Float) || a.is_a?(1.class)
             value && raise("Value already specified")
             value = @engine._prep_value(a)
@@ -2711,6 +2728,15 @@ CODE
         if !value
           raise("#{f}: A check value must be specified")
         end
+
+        args = [ value, whole_edges, metrics, alim, minp, maxp ]
+        if shielded != nil
+          if self.data.is_a?(RBA::Region)
+            args << shielded
+          else 
+            raise("#{f}: shielding can only be used for polygon layers")
+          end
+        end
         
         border = (metrics == RBA::Region::Square ? value * 1.5 : value)
         
@@ -2718,13 +2744,13 @@ CODE
           if other
             raise("No other layer must be specified for single-layer checks (i.e. width)")
           end
-          DRCLayer::new(@engine, @engine._tcmd(self.data, border, RBA::EdgePairs, :#{f}_check, value, whole_edges, metrics, alim, minp, maxp))
+          DRCLayer::new(@engine, @engine._tcmd(self.data, border, RBA::EdgePairs, :#{f}_check, *args))
         else
           if !other
             raise("The other layer must be specified for two-layer checks (i.e. overlap)")
           end
           requires_same_type(other, "#{f}")
-          DRCLayer::new(@engine, @engine._tcmd(self.data, border, RBA::EdgePairs, :#{f}_check, other.data, value, whole_edges, metrics, alim, minp, maxp))
+          DRCLayer::new(@engine, @engine._tcmd(self.data, border, RBA::EdgePairs, :#{f}_check, other.data, *args))
         end
         
       end  
@@ -3175,6 +3201,10 @@ CODE
     def data
       @data || raise("Trying to access an invalid layer (did you use 'forget' on it?)")
       @data
+    end
+
+    def data=(d)
+      @data = d
     end
 
     def requires_region(f)

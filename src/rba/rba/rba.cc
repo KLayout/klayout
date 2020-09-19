@@ -1010,7 +1010,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
       static ID id_to_enum = rb_intern ("to_enum");
 
-      VALUE method_sym = ID2SYM (rb_intern2 (meth->primary_name ().c_str (), (long) meth->primary_name ().size ()));
+      VALUE method_sym = ID2SYM (rb_intern (meth->primary_name ().c_str ()));
 
       if (argc == 0) {
         ret = rba_funcall2_checked (self, id_to_enum, 1, &method_sym);

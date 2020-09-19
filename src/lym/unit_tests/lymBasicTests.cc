@@ -28,6 +28,7 @@
 #include "gsiInterpreter.h"
 #include "rba.h"
 #include "pya.h"
+#include "tlFileUtils.h"
 
 class TestCollectorConsole
   : public gsi::Console
@@ -51,6 +52,11 @@ public:
 private:
   std::string m_text;
 };
+
+static std::string np (const std::string &s)
+{
+  return tl::replaced (s, "\\", "/");
+}
 
 #if defined(HAVE_RUBY)
 
@@ -120,7 +126,7 @@ TEST(3_RubyInclude)
     throw;
   }
 
-  EXPECT_EQ (console.text (), "An error in " + tl::testsrc () + "/testdata/lym/b_inc.rb:3\n");
+  EXPECT_EQ (np (console.text ()), np ("An error in " + tl::testsrc () + "/testdata/lym/b_inc.rb:3\n"));
 }
 
 TEST(11_DRCBasic)

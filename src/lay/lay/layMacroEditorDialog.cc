@@ -44,6 +44,7 @@
 #include "tlClassRegistry.h"
 #include "tlExceptions.h"
 #include "tlFileUtils.h"
+#include "tlInclude.h"
 
 #include <cstdio>
 #include <limits>
@@ -2781,6 +2782,9 @@ MacroEditorDialog::start_exec (gsi::Interpreter *ec)
   }
 
   m_file_to_widget.clear ();
+  m_include_expanders.clear ();
+  m_include_paths_to_ids.clear ();
+  m_include_file_id_cache.clear ();
 
   m_last_process_events = tl::Clock::current ();
 
@@ -2825,6 +2829,7 @@ MacroEditorDialog::end_exec (gsi::Interpreter *ec)
   do_update_ui_to_run_mode ();
 }
 
+const size_t pseudo_file_offset = std::numeric_limits<size_t>::max () / 2;
 
 size_t   
 MacroEditorDialog::id_for_path (gsi::Interpreter *, const std::string &path)
@@ -2840,8 +2845,66 @@ MacroEditorDialog::id_for_path (gsi::Interpreter *, const std::string &path)
   if (macro) {
     m_file_to_widget.push_back (std::make_pair (macro, (MacroEditorPage *) 0));
     return m_file_to_widget.size ();
-  } else {
-    return 0;
+  }
+
+  if (! path.empty () && path[0] == '@') {
+    m_include_expanders.push_back (tl::IncludeExpander::from_string (path));
+    return pseudo_file_offset + m_include_expanders.size () - 1;
+  }
+
+  return 0;
+}
+
+void
+MacroEditorDialog::translate_pseudo_id (size_t &file_id, int &line)
+{
+  if (file_id >= pseudo_file_offset) {
+
+    file_id -= pseudo_file_offset;
+
+    std::pair<size_t, int> ck (file_id, line);
+
+    std::map<std::pair<size_t, int>, std::pair<size_t, int> >::iterator ic = m_include_file_id_cache.find (ck);
+    if (ic != m_include_file_id_cache.end ()) {
+
+      file_id = ic->second.first;
+      line = ic->second.second;
+
+    } else {
+
+      if (file_id < m_include_expanders.size ()) {
+
+        std::pair<std::string, int> fp = m_include_expanders [file_id].translate_to_original (line);
+        line = fp.second;
+
+        std::map<std::string, size_t>::const_iterator i = m_include_paths_to_ids.find (fp.first);
+        if (i == m_include_paths_to_ids.end ()) {
+
+          size_t new_id = id_for_path (0, fp.first);
+          if (new_id < pseudo_file_offset) {
+            file_id = new_id;
+          } else {
+            file_id = 0;
+          }
+
+          m_include_paths_to_ids.insert (std::make_pair (fp.first, file_id));
+
+        } else {
+          file_id = i->second;
+        }
+
+      } else {
+
+        //  give up.
+        file_id = 0;
+        line = 0;
+
+      }
+
+      m_include_file_id_cache.insert (std::make_pair (ck, std::make_pair (file_id, line)));
+
+    }
+
   }
 }
 
@@ -2861,6 +2924,9 @@ MacroEditorDialog::exception_thrown (gsi::Interpreter *interpreter, size_t file_
   if (m_in_processing) {
     return;
   }
+
+  //  translate the pseudo file ID and line to the real one (include file processing)
+  translate_pseudo_id (file_id, line);
 
   try {
 
@@ -2957,6 +3023,9 @@ MacroEditorDialog::trace (gsi::Interpreter *interpreter, size_t file_id, int lin
   if (m_current_stack_depth < 0) {
     m_current_stack_depth = stack_trace_provider->stack_depth ();
   }
+
+  //  translate the pseudo file ID and line to the real one (include file processing)
+  translate_pseudo_id (file_id, line);
 
   //  Note: only scripts running in the context of the execution controller (the one who called start_exec)
   //  can be interrupted and single-stepped, but breakpoints can make the debugger stop in other interpreters.

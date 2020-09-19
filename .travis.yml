@@ -7,6 +7,36 @@ branches:
 matrix:
   include:
     # python manylinux packages
+    - name: "cp38-cp38m-manylinux1_x86_64.whl"
+      os: linux
+      sudo: true
+      language: python
+      python: '3.8'
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
+        - PY_VERSION="cp38-cp38"
+        - DOCKER_BUILD=true
+        - TEST_IN_HOST=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "cp38-cp38m-manylinux1_i686.whl"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_i686"
+        - PY_VERSION="cp38-cp38"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
 
     - name: "cp37-cp37m-manylinux1_x86_64.whl"
       os: linux
@@ -487,7 +517,7 @@ script:
         docker run --rm -e DOCKER_IMAGE -e PY_VERSION -v `pwd`:/io $DOCKER_IMAGE $PRE_CMD "/io/ci-scripts/docker/docker_build.sh";
         klayout_version=$(python -c 'import setup; print(setup.Config().version())'); 
         mkdir -p deploy/dist-pymod/$klayout_version;
-        cp -a wheelhouse/klayout-*manylinux1*.whl deploy/dist-pymod/$klayout_version;
+        cp -a wheelhouse/{klayout-*manylinux1*.whl,*.zip} deploy/dist-pymod/$klayout_version;
         if [ "$TEST_IN_HOST" = true ]; then
             pip install klayout --no-index -f ./wheelhouse;
             python testdata/pymod/import_db.py;
@@ -501,6 +531,7 @@ script:
         python setup.py build;
         python setup.py bdist_wheel;
         python setup.py install;
+        python setup.py sdist --formats=zip;
         python testdata/pymod/import_db.py;
         python testdata/pymod/import_rdb.py;
         python testdata/pymod/import_tl.py;
@@ -508,7 +539,7 @@ script:
         python testdata/pymod/pya_tests.py;
         klayout_version=$(python -c 'import setup; print(setup.Config().version())');
         mkdir -p deploy/dist-pymod/$klayout_version;
-        cp -a dist/*.whl deploy/dist-pymod/$klayout_version;
+        cp -a dist/{*.whl,*.zip} deploy/dist-pymod/$klayout_version;
         python -c 'import klayout.db as db; print(dir(db))';
         python -c 'import klayout.rdb as rdb; print(dir(rdb))';
         python -c 'import klayout.tl as tl; print(dir(tl))';

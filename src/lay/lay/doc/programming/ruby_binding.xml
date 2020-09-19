@@ -278,6 +278,29 @@ event._manage
   and pointers/references and also supports "out" parameters.
   </p>
 
+  <h3>"void" as return value</h3>
+
+  <p>
+  While a "void" return value indicates "no return value" in C++, this concept is not 
+  common in Ruby. Ruby methods will always return the last value generated in 
+  a method. 
+  </p>
+
+  <p>
+  For consistency, KLayout's Ruby binding returns "self" from methods in this
+  case. This allows chaining of methods in many cases and fosters compact code:
+  </p>
+
+  <pre>// C++
+class A {
+public:
+  virtual void f() { ... }
+  virtual void g() { ... }
+};
+
+# Ruby
+a = A::new.f.g</pre>
+
   <h3>References and pointers to simple types (FixNum, Float, String)</h3>
 
   <p>

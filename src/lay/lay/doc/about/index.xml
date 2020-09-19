@@ -12,6 +12,7 @@
 
   <topics>
     <topic href="/about/layer_mapping.xml"/>
+    <topic href="/about/layer_specs.xml"/>
     <topic href="/about/transformations.xml"/>
     <topic href="/about/expressions.xml"/>
     <topic href="/about/variant_notation.xml"/>

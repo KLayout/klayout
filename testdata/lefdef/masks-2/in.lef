@@ -1,0 +1,56 @@
+
+MACRO nomask_macro
+    CLASS CORE ;
+    ORIGIN 0.3 0.3 ;
+    SIZE 0.6 BY 0.6 ;
+    PIN Z
+        PORT
+        LAYER M0PO ;
+        RECT -0.07 -0.03 0.07 0.03 ;
+        LAYER M1 ;
+        RECT 0.07 -0.03 0.13 0.03 ;
+        LAYER M2 ;
+        RECT -0.13 -0.03 -0.07 0.03 ;
+        VIA 0.0 0.2 square_nomask ;
+        VIA  0.0 -0.2 square_nomask ;
+        END
+    END Z
+END nomask_macro
+
+MACRO mask_macro
+    CLASS CORE ;
+    ORIGIN 0.3 0.3 ;
+    SIZE 0.6 BY 0.6 ;
+    PIN Z
+        PORT
+        LAYER M0PO ;
+        RECT MASK 2 -0.07 -0.03 0.07 0.03 ;
+        LAYER M1 ;
+        RECT MASK 2 0.07 -0.03 0.13 0.03 ;
+        LAYER M2 ;
+        RECT MASK 1 -0.13 -0.03 -0.07 0.03 ;
+        VIA MASK 200 0.0 0.2 square ;
+        VIA  0.0 -0.2 square ;
+        END
+    END Z
+END mask_macro
+
+MACRO fixedmask_macro
+    CLASS CORE ;
+    FIXEDMASK ;
+    ORIGIN 0.3 0.3 ;
+    SIZE 0.6 BY 0.6 ;
+    PIN Z
+        PORT
+        LAYER M0PO ;
+        RECT MASK 2 -0.07 -0.03 0.07 0.03 ;
+        LAYER M1 ;
+        RECT MASK 2 0.07 -0.03 0.13 0.03 ;
+        LAYER M2 ;
+        RECT MASK 1 -0.13 -0.03 -0.07 0.03 ;
+        VIA MASK 200 0.0 0.2 square ;
+        VIA  0.0 -0.2 square ;
+        END
+    END Z
+END fixedmask_macro
+

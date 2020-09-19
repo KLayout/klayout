@@ -43,6 +43,20 @@ namespace tl
 namespace db
 {
 
+class LEFDEFReaderState;
+struct MacroDesc;
+
+/**
+ *  @brief Correct a path relative to the stream and technology
+ */
+DB_PLUGIN_PUBLIC
+std::string correct_path (const std::string &fn, const db::Layout &layout, const std::string &base_path);
+
+/**
+ *  @brief Convers a string to a MASKSHIFT index list
+ */
+std::vector<unsigned int> string2masks (const std::string &s);
+
 /**
  *  @brief Generic base class of DXF reader exceptions
  */
@@ -54,6 +68,34 @@ public:
     : db::ReaderException (tl::sprintf (tl::to_string (tr ("%s (line=%d, cell=%s, file=%s)")), msg.c_str (), line, cell, fn))
   { }
 };
+
+template <class Value>
+const Value &per_mask_value (const std::map<unsigned int, Value> &map, const Value &def, unsigned int mask)
+{
+  typename std::map<unsigned int, Value>::const_iterator i = map.find (mask);
+  return i == map.end () ? def : i->second;
+}
+
+inline bool per_mask_value_is_null (int dt) { return dt < 0; }
+inline bool per_mask_value_is_null (const std::string &pfx) { return pfx.empty (); }
+
+template <class Value>
+void set_per_mask_value (std::map<unsigned int, Value> &map, unsigned int mask, const Value &value)
+{
+  if (per_mask_value_is_null (value)) {
+    map.erase (mask);
+  } else {
+    map [mask] = value;
+  }
+}
+
+template <class Value>
+void get_max_mask_number (unsigned int &mm, const std::map<unsigned int, Value> &map)
+{
+  if (! map.empty ()) {
+    mm = std::max (mm, (--map.end ())->first);
+  }
+}
 
 /**
  *  @brief The LEF/DEF importer technology component
@@ -256,6 +298,52 @@ public:
     m_via_geometry_datatype = s;
   }
 
+  void set_via_geometry_suffix_str (const std::string &s);
+  std::string via_geometry_suffix_str () const;
+
+  void set_via_geometry_datatype_str (const std::string &s);
+  std::string via_geometry_datatype_str () const;
+
+  void clear_via_geometry_suffixes_per_mask ()
+  {
+    m_via_geometry_suffixes.clear ();
+  }
+
+  void clear_via_geometry_datatypes_per_mask ()
+  {
+    m_via_geometry_datatypes.clear ();
+  }
+
+  const std::string &via_geometry_suffix_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_via_geometry_suffixes, m_via_geometry_suffix, mask);
+  }
+
+  void set_via_geometry_suffix_per_mask (unsigned int mask, const std::string &s)
+  {
+    set_per_mask_value (m_via_geometry_suffixes, mask, s);
+  }
+
+  int via_geometry_datatype_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_via_geometry_datatypes, m_via_geometry_datatype, mask);
+  }
+
+  void set_via_geometry_datatype_per_mask (unsigned int mask, int s)
+  {
+    set_per_mask_value (m_via_geometry_datatypes, mask, s);
+  }
+
+  const std::string &via_cellname_prefix () const
+  {
+    return m_via_cellname_prefix;
+  }
+
+  void set_via_cellname_prefix (const std::string &s)
+  {
+    m_via_cellname_prefix = s;
+  }
+
   bool produce_pins () const
   {
     return m_produce_pins;
@@ -284,6 +372,108 @@ public:
   void set_pins_datatype (int s) 
   {
     m_pins_datatype = s;
+  }
+
+  void set_pins_suffix_str (const std::string &s);
+  std::string pins_suffix_str () const;
+
+  void set_pins_datatype_str (const std::string &s);
+  std::string pins_datatype_str () const;
+
+  void clear_pins_suffixes_per_mask ()
+  {
+    m_pins_suffixes.clear ();
+  }
+
+  void clear_pins_datatypes_per_mask ()
+  {
+    m_pins_datatypes.clear ();
+  }
+
+  const std::string &pins_suffix_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_pins_suffixes, m_pins_suffix, mask);
+  }
+
+  void set_pins_suffix_per_mask (unsigned int mask, const std::string &s)
+  {
+    set_per_mask_value (m_pins_suffixes, mask, s);
+  }
+
+  int pins_datatype_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_pins_datatypes, m_pins_datatype, mask);
+  }
+
+  void set_pins_datatype_per_mask (unsigned int mask, int s)
+  {
+    set_per_mask_value (m_pins_datatypes, mask, s);
+  }
+
+  bool produce_lef_pins () const
+  {
+    return m_produce_lef_pins;
+  }
+
+  void set_produce_lef_pins (bool f)
+  {
+    m_produce_lef_pins = f;
+  }
+
+  const std::string &lef_pins_suffix () const
+  {
+    return m_lef_pins_suffix;
+  }
+
+  void set_lef_pins_suffix (const std::string &s)
+  {
+    m_lef_pins_suffix = s;
+  }
+
+  int lef_pins_datatype () const
+  {
+    return m_lef_pins_datatype;
+  }
+
+  void set_lef_pins_datatype (int s)
+  {
+    m_lef_pins_datatype = s;
+  }
+
+  void set_lef_pins_suffix_str (const std::string &s);
+  std::string lef_pins_suffix_str () const;
+
+  void set_lef_pins_datatype_str (const std::string &s);
+  std::string lef_pins_datatype_str () const;
+
+  void clear_lef_pins_suffixes_per_mask ()
+  {
+    m_lef_pins_suffixes.clear ();
+  }
+
+  void clear_lef_pins_datatypes_per_mask ()
+  {
+    m_lef_pins_datatypes.clear ();
+  }
+
+  const std::string &lef_pins_suffix_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_lef_pins_suffixes, m_lef_pins_suffix, mask);
+  }
+
+  void set_lef_pins_suffix_per_mask (unsigned int mask, const std::string &s)
+  {
+    set_per_mask_value (m_lef_pins_suffixes, mask, s);
+  }
+
+  int lef_pins_datatype_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_lef_pins_datatypes, m_lef_pins_datatype, mask);
+  }
+
+  void set_lef_pins_datatype_per_mask (unsigned int mask, int s)
+  {
+    set_per_mask_value (m_lef_pins_datatypes, mask, s);
   }
 
   bool produce_obstructions () const
@@ -406,6 +596,124 @@ public:
     m_routing_datatype = s;
   }
 
+  void set_routing_suffix_str (const std::string &s);
+  std::string routing_suffix_str () const;
+
+  void set_routing_datatype_str (const std::string &s);
+  std::string routing_datatype_str () const;
+
+  void clear_routing_suffixes_per_mask ()
+  {
+    m_routing_suffixes.clear ();
+  }
+
+  void clear_routing_datatypes_per_mask ()
+  {
+    m_routing_datatypes.clear ();
+  }
+
+  const std::string &routing_suffix_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_routing_suffixes, m_routing_suffix, mask);
+  }
+
+  void set_routing_suffix_per_mask (unsigned int mask, const std::string &s)
+  {
+    set_per_mask_value (m_routing_suffixes, mask, s);
+  }
+
+  int routing_datatype_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_routing_datatypes, m_routing_datatype, mask);
+  }
+
+  void set_routing_datatype_per_mask (unsigned int mask, int s)
+  {
+    set_per_mask_value (m_routing_datatypes, mask, s);
+  }
+
+  bool produce_special_routing () const
+  {
+    return m_produce_special_routing;
+  }
+
+  void set_produce_special_routing (bool f)
+  {
+    m_produce_special_routing = f;
+  }
+
+  const std::string &special_routing_suffix () const
+  {
+    return m_special_routing_suffix;
+  }
+
+  void set_special_routing_suffix (const std::string &s)
+  {
+    m_special_routing_suffix = s;
+  }
+
+  int special_routing_datatype () const
+  {
+    return m_special_routing_datatype;
+  }
+
+  void set_special_routing_datatype (int s)
+  {
+    m_special_routing_datatype = s;
+  }
+
+  void set_special_routing_suffix_str (const std::string &s);
+  std::string special_routing_suffix_str () const;
+
+  void set_special_routing_datatype_str (const std::string &s);
+  std::string special_routing_datatype_str () const;
+
+  void clear_special_routing_suffixes_per_mask ()
+  {
+    m_special_routing_suffixes.clear ();
+  }
+
+  void clear_special_routing_datatypes_per_mask ()
+  {
+    m_special_routing_datatypes.clear ();
+  }
+
+  const std::string &special_routing_suffix_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_special_routing_suffixes, m_special_routing_suffix, mask);
+  }
+
+  void set_special_routing_suffix_per_mask (unsigned int mask, const std::string &s)
+  {
+    set_per_mask_value (m_special_routing_suffixes, mask, s);
+  }
+
+  int special_routing_datatype_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_special_routing_datatypes, m_special_routing_datatype, mask);
+  }
+
+  void set_special_routing_datatype_per_mask (unsigned int mask, int s)
+  {
+    set_per_mask_value (m_special_routing_datatypes, mask, s);
+  }
+
+  unsigned int max_mask_number () const
+  {
+    unsigned int mm = 0;
+    get_max_mask_number (mm, m_via_geometry_suffixes);
+    get_max_mask_number (mm, m_via_geometry_datatypes);
+    get_max_mask_number (mm, m_pins_suffixes);
+    get_max_mask_number (mm, m_pins_datatypes);
+    get_max_mask_number (mm, m_lef_pins_suffixes);
+    get_max_mask_number (mm, m_lef_pins_datatypes);
+    get_max_mask_number (mm, m_routing_suffixes);
+    get_max_mask_number (mm, m_routing_datatypes);
+    get_max_mask_number (mm, m_special_routing_suffixes);
+    get_max_mask_number (mm, m_special_routing_datatypes);
+    return mm;
+  }
+
   void clear_lef_files ()
   {
     m_lef_files.clear ();
@@ -436,6 +744,71 @@ public:
     m_lef_files = lf;
   }
 
+  bool read_lef_with_def () const
+  {
+    return m_read_lef_with_def;
+  }
+
+  void set_read_lef_with_def (bool f)
+  {
+    m_read_lef_with_def = f;
+  }
+
+  bool separate_groups () const
+  {
+    return m_separate_groups;
+  }
+
+  void set_separate_groups (bool f)
+  {
+    m_separate_groups = f;
+  }
+
+  const std::string &map_file () const
+  {
+    return m_map_file;
+  }
+
+  void set_map_file (const std::string &f)
+  {
+    m_map_file = f;
+  }
+
+  /**
+   *  @brief Specify the LEF macro resolution strategy
+   *  Values are:
+   *    0: propduce LEF geometry unless a FOREIGN cell is specified (default)
+   *    1: produce LEF geometry always and ignore FOREIGN
+   *    2: produce a placeholder cell always (even if FOREIGN isn't given)
+   */
+  unsigned int macro_resolution_mode () const
+  {
+    return m_macro_resolution_mode;
+  }
+
+  void set_macro_resolution_mode (unsigned int m)
+  {
+    m_macro_resolution_mode = m;
+  }
+
+  void set_macro_layouts (const std::vector<db::Layout *> &layouts)
+  {
+    for (std::vector<db::Layout *>::const_iterator l = layouts.begin (); l != layouts.end (); ++l) {
+      m_macro_layouts.push_back (*l);
+    }
+  }
+
+  std::vector<db::Layout *> macro_layouts () const
+  {
+    std::vector<db::Layout *> res;
+    for (tl::weak_collection<db::Layout>::const_iterator m = m_macro_layouts.begin (); m != m_macro_layouts.end (); ++m) {
+      if (m.operator-> ()) {
+        res.push_back (const_cast<db::Layout *> (m.operator-> ()));
+      }
+    }
+    return res;
+  }
+
 private:
   bool m_read_all_layers;
   db::LayerMap m_layer_map;
@@ -455,9 +828,19 @@ private:
   bool m_produce_via_geometry;
   std::string m_via_geometry_suffix;
   int m_via_geometry_datatype;
+  std::map<unsigned int, std::string> m_via_geometry_suffixes;
+  std::map<unsigned int, int> m_via_geometry_datatypes;
+  std::string m_via_cellname_prefix;
   bool m_produce_pins;
   std::string m_pins_suffix;
   int m_pins_datatype;
+  std::map<unsigned int, std::string> m_pins_suffixes;
+  std::map<unsigned int, int> m_pins_datatypes;
+  bool m_produce_lef_pins;
+  std::string m_lef_pins_suffix;
+  int m_lef_pins_datatype;
+  std::map<unsigned int, std::string> m_lef_pins_suffixes;
+  std::map<unsigned int, int> m_lef_pins_datatypes;
   bool m_produce_obstructions;
   std::string m_obstructions_suffix;
   int m_obstructions_datatype;
@@ -470,7 +853,19 @@ private:
   bool m_produce_routing;
   std::string m_routing_suffix;
   int m_routing_datatype;
+  std::map<unsigned int, std::string> m_routing_suffixes;
+  std::map<unsigned int, int> m_routing_datatypes;
+  bool m_produce_special_routing;
+  std::string m_special_routing_suffix;
+  int m_special_routing_datatype;
+  std::map<unsigned int, std::string> m_special_routing_suffixes;
+  std::map<unsigned int, int> m_special_routing_datatypes;
+  bool m_separate_groups;
+  std::string m_map_file;
+  unsigned int m_macro_resolution_mode;
+  bool m_read_lef_with_def;
   std::vector<std::string> m_lef_files;
+  tl::weak_collection<db::Layout> m_macro_layouts;
 };
 
 /**
@@ -478,15 +873,148 @@ private:
  */
 enum LayerPurpose 
 {
-  Routing = 0,
-  ViaGeometry = 1,
-  Label = 2,
-  Pins = 3,
-  Obstructions = 4,
-  Outline = 5,
-  Blockage = 6,
-  PlacementBlockage = 7,
-  Region = 8
+  Routing = 0,        //  from DEF only
+  Pins,               //  from DEF
+  SpecialRouting,     //  from DEF only
+  LEFPins,            //  from LEF
+  ViaGeometry,        //  from LEF+DEF
+  Label,              //  from LEF+DEF
+  Obstructions,       //  from LEF only
+  Outline,            //  from LEF+DEF
+  Blockage,           //  from DEF only
+  PlacementBlockage,  //  from DEF only
+  Regions,            //  from DEF only
+};
+
+/**
+ *  @brief An interface for resolving the number of masks from a layer name
+ */
+class DB_PLUGIN_PUBLIC LEFDEFNumberOfMasks
+{
+public:
+  LEFDEFNumberOfMasks () { }
+  virtual ~LEFDEFNumberOfMasks () { }
+
+  virtual unsigned int number_of_masks (const std::string &layer_name) const = 0;
+};
+
+/**
+ *  @brief Provides a via generator base class
+ */
+class DB_PLUGIN_PUBLIC LEFDEFLayoutGenerator
+{
+public:
+  LEFDEFLayoutGenerator () { }
+  virtual ~LEFDEFLayoutGenerator () { }
+
+  virtual void create_cell (LEFDEFReaderState &reader, db::Layout &layout, db::Cell &cell, const std::vector<std::string> *maskshift_layers, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm) = 0;
+  virtual std::vector<std::string> maskshift_layers () const = 0;
+  virtual bool is_fixedmask () const = 0;
+};
+
+/**
+ *  @brief Provides a via generator implementation for rule-based vias
+ */
+class DB_PLUGIN_PUBLIC RuleBasedViaGenerator
+  : public LEFDEFLayoutGenerator
+{
+public:
+  RuleBasedViaGenerator ();
+
+  virtual void create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<std::string> *maskshift_layers, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm);
+
+  virtual std::vector<std::string> maskshift_layers () const
+  {
+    std::vector<std::string> msl;
+    msl.push_back (m_bottom_layer);
+    msl.push_back (m_cut_layer);
+    msl.push_back (m_top_layer);
+    return msl;
+  }
+
+  virtual bool is_fixedmask () const
+  {
+    return false;
+  }
+
+  void set_cutsize (const db::Vector &cutsize) { m_cutsize = cutsize; }
+  void set_cutspacing (const db::Vector &cutspacing) { m_cutspacing = cutspacing; }
+  void set_offset (const db::Point &offset) { m_offset = offset; }
+  void set_be (const db::Vector &be) { m_be = be; }
+  void set_te (const db::Vector &te) { m_te = te; }
+  void set_bo (const db::Vector &bo) { m_bo = bo; }
+  void set_to (const db::Vector &to) { m_to = to; }
+  void set_rows (int rows) { m_rows = rows; }
+  void set_columns (int columns) { m_columns = columns; }
+  void set_pattern (const std::string &pattern) { m_pattern = pattern; }
+  void set_bottom_layer (const std::string &ln) { m_bottom_layer = ln; }
+  void set_cut_layer (const std::string &ln) { m_cut_layer = ln; }
+  void set_top_layer (const std::string &ln) { m_top_layer = ln; }
+  void set_bottom_mask (unsigned int m) { m_bottom_mask = m; }
+  void set_cut_mask (unsigned int m) { m_cut_mask = m; }
+  void set_top_mask (unsigned int m) { m_top_mask = m; }
+
+private:
+  std::string m_bottom_layer, m_cut_layer, m_top_layer;
+  unsigned int m_bottom_mask, m_cut_mask, m_top_mask;
+  db::Vector m_cutsize, m_cutspacing;
+  db::Vector m_be, m_te;
+  db::Vector m_bo, m_to;
+  db::Point m_offset;
+  int m_rows, m_columns;
+  std::string m_pattern;
+};
+
+/**
+ *  @brief Provides a geometry-based via generator implementation
+ */
+class DB_PLUGIN_PUBLIC GeometryBasedLayoutGenerator
+  : public LEFDEFLayoutGenerator
+{
+public:
+  GeometryBasedLayoutGenerator ();
+
+  virtual void create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<std::string> *maskshift_layers, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *num_cut_masks);
+  virtual std::vector<std::string> maskshift_layers () const { return m_maskshift_layers; }
+  virtual bool is_fixedmask () const { return m_fixedmask; }
+
+  void add_polygon (const std::string &ln, LayerPurpose purpose, const db::Polygon &poly, unsigned int mask, properties_id_type prop_id);
+  void add_box (const std::string &ln, LayerPurpose purpose, const db::Box &box, unsigned int mask, properties_id_type prop_id);
+  void add_path (const std::string &ln, LayerPurpose purpose, const db::Path &path, unsigned int mask, properties_id_type prop_id);
+  void add_via (const std::string &vn, const db::Trans &trans, unsigned int bottom_mask, unsigned int cut_mask, unsigned int top_mask);
+  void add_text (const std::string &ln, LayerPurpose purpose, const db::Text &text, unsigned int mask, db::properties_id_type prop_id);
+
+  void set_maskshift_layers (const std::vector<std::string> &ln) { m_maskshift_layers = ln; }
+
+  void set_maskshift_layer (unsigned int l, const std::string &s)
+  {
+    if (m_maskshift_layers.size () <= size_t (l)) {
+      m_maskshift_layers.resize (l + 1, std::string ());
+    }
+    m_maskshift_layers[l] = s;
+  }
+
+  void set_fixedmask (bool f)
+  {
+    m_fixedmask = f;
+  }
+
+private:
+  struct Via {
+    Via () : bottom_mask (0), cut_mask (0), top_mask (0) { }
+    std::string name;
+    unsigned int bottom_mask, cut_mask, top_mask;
+    db::Trans trans;
+  };
+
+  std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, db::Shapes> m_shapes;
+  std::list<Via> m_vias;
+  std::vector<std::string> m_maskshift_layers;
+  bool m_fixedmask;
+
+  unsigned int get_maskshift (const std::string &ln, const std::vector<std::string> *maskshift_layers, const std::vector<unsigned int> &masks);
+  unsigned int mask_for (const std::string &ln, unsigned int m, unsigned int mshift, const LEFDEFNumberOfMasks *nm) const;
+  unsigned int combine_maskshifts (const std::string &ln, unsigned int mshift1, unsigned int mshift2, const LEFDEFNumberOfMasks *nm) const;
 };
 
 /**
@@ -494,25 +1022,28 @@ enum LayerPurpose
  *
  *  This class will handle the creation and management of layers in the LEF/DEF reader context
  */
-class DB_PLUGIN_PUBLIC LEFDEFLayerDelegate
+class DB_PLUGIN_PUBLIC LEFDEFReaderState
 {
 public:
   /**
    *  @brief Constructor
    */
-  LEFDEFLayerDelegate (const LEFDEFReaderOptions *tc);
+  LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout &layout, const std::string &base_path = std::string ());
 
   /**
-   *  @brief Set the layer map
+   *  @brief Destructor
    */
-  virtual void set_layer_map (const db::LayerMap &lm, bool create_layers)
-  {
-    m_layer_map = lm;
-    m_create_layers = create_layers;
-  }
+  ~LEFDEFReaderState ();
 
   /**
-   *  @brief Get the layer map
+   *  @brief Reads the given map file
+   *
+   *  Usually this file is read by the constructor. This method is provided for test purposes.
+   */
+  void read_map_file (const std::string &path, db::Layout &layout);
+
+  /**
+   *  @brief Gets the layer map
    */
   const db::LayerMap &layer_map () const
   {
@@ -522,7 +1053,7 @@ public:
   /**
    *  @brief Create a new layer or return the index of the given layer
    */
-  std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose);
+  std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
 
   /**
    *  @brief Registers a layer (assign a new default layer number)
@@ -530,14 +1061,43 @@ public:
   void register_layer (const std::string &l);
 
   /**
-   *  @brief Prepare, i.e. create layers required by the layer map
-   */
-  void prepare (db::Layout &layout);
-
-  /**
    *  @brief Finish, i.e. assign GDS layer numbers to the layers
    */
   void finish (db::Layout &layout);
+
+  /**
+   *  @brief Registers a via generator for the via with the given name
+   *
+   *  The generator is capable of creating a via for a specific mask configuration
+   */
+  void register_via_cell (const std::string &vn, LEFDEFLayoutGenerator *generator);
+
+  /**
+   *  @brief Gets the via cell for the given via name or 0 if no such via is registered
+   */
+  db::Cell *via_cell (const std::string &vn, Layout &layout, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm);
+
+  /**
+   *  @brief Gets the via generator for a given via name or 0 if there is no such generator
+   */
+  LEFDEFLayoutGenerator *via_generator (const std::string &vn);
+
+  /**
+   *  @brief Registers a macro generator for the macro with the given name
+   *
+   *  The generator is capable of creating a macro for a specific mask configuration
+   */
+  void register_macro_cell (const std::string &mn, LEFDEFLayoutGenerator *generator);
+
+  /**
+   *  @brief Gets the macro cell for the given macro name or 0 if no such maco is registered
+   */
+  std::pair<db::Cell *, db::Trans> macro_cell (const std::string &mn, Layout &layout, const std::vector<std::string> &maskshift_layers, const std::vector<unsigned int> &masks, const MacroDesc &macro_desc, const LEFDEFNumberOfMasks *nm);
+
+  /**
+   *  @brief Gets the macro generator for a given macro name or 0 if there is no such generator
+   */
+  LEFDEFLayoutGenerator *macro_generator (const std::string &mn);
 
   /**
    *  @brief Get the technology component pointer
@@ -547,13 +1107,102 @@ public:
     return mp_tech_comp;
   }
 
+  /**
+   *  @brief Gets a map of foreign cells vs. name
+   */
+  const std::map<std::string, db::cell_index_type> &foreign_cells () const
+  {
+    return m_foreign_cells;
+  }
+
 private:
-  std::map <std::pair<std::string, LayerPurpose>, unsigned int> m_layers;
+  /**
+   *  @brief A key for the via cache
+   */
+  struct ViaKey
+  {
+    ViaKey (const std::string &n, unsigned int mb, unsigned int mc, unsigned int mt)
+      : name (n), mask_bottom (mb), mask_cut (mc), mask_top (mt)
+    { }
+
+    bool operator== (const ViaKey &other) const
+    {
+      return name == other.name && mask_bottom == other.mask_bottom && mask_cut == other.mask_cut && mask_top == other.mask_top;
+    }
+
+    bool operator< (const ViaKey &other) const
+    {
+      if (name != other.name) {
+        return name < other.name;
+      }
+      if (mask_bottom != other.mask_bottom) {
+        return mask_bottom < other.mask_bottom;
+      }
+      if (mask_cut != other.mask_cut) {
+        return mask_cut < other.mask_cut;
+      }
+      if (mask_top != other.mask_top) {
+        return mask_top < other.mask_top;
+      }
+      return false;
+    }
+
+    std::string name;
+    unsigned int mask_bottom, mask_cut, mask_top;
+  };
+
+  /**
+   *  @brief A key for the via cache
+   */
+  struct MacroKey
+  {
+    MacroKey ()
+    { }
+
+    MacroKey (const std::string &n, const std::vector<unsigned int> &m)
+      : name (n), masks (m)
+    { }
+
+    bool operator== (const MacroKey &other) const
+    {
+      return name == other.name && masks == other.masks;
+    }
+
+    bool operator< (const MacroKey &other) const
+    {
+      if (name != other.name) {
+        return name < other.name;
+      }
+      if (masks != other.masks) {
+        return masks < other.masks;
+      }
+      return false;
+    }
+
+    std::string name;
+    std::vector<unsigned int> masks;
+  };
+
+  //  no copying
+  LEFDEFReaderState (const LEFDEFReaderState &);
+  LEFDEFReaderState &operator= (const LEFDEFReaderState &);
+
+  std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, std::pair<bool, unsigned int> > m_layers;
   db::LayerMap m_layer_map;
   bool m_create_layers;
+  bool m_has_explicit_layer_mapping;
   int m_laynum;
   std::map<std::string, int> m_default_number;
   const LEFDEFReaderOptions *mp_tech_comp;
+  std::map<ViaKey, db::Cell *> m_via_cells;
+  std::map<std::string, LEFDEFLayoutGenerator *> m_via_generators;
+  std::map<MacroKey, std::pair<db::Cell *, db::Trans> > m_macro_cells;
+  std::map<std::string, LEFDEFLayoutGenerator *> m_macro_generators;
+  std::map<std::string, db::cell_index_type> m_foreign_cells;
+
+  std::pair <bool, unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
+  void map_layer_explicit (const std::string &n, LayerPurpose purpose, const LayerProperties &lp, unsigned int layer, unsigned int mask);
+  db::cell_index_type foreign_cell(Layout &layout, const std::string &name);
 };
 
 /**
@@ -561,17 +1210,40 @@ private:
  */
 struct DB_PLUGIN_PUBLIC ViaDesc
 {
-  ViaDesc () : cell (0) { }
-
-  /**
-   *  @brief The cell representing the via
-   */
-  db::Cell *cell;
+  ViaDesc () { }
 
   /**
    *  @brief The names of bottom and top metal respectively
    */
   std::string m1, m2;
+};
+
+/**
+ *  @brief A structure describing a macro
+ */
+struct DB_PLUGIN_PUBLIC MacroDesc
+{
+  MacroDesc () { }
+
+  /**
+   *  @brief The name of the FOREIGN cell if present
+   */
+  std::string foreign_name;
+
+  /**
+   *  @brief The transformation of the FOREIGN cell
+   */
+  db::Trans foreign_trans;
+
+  /**
+   *  @brief The origin
+   */
+  db::Point origin;
+
+  /**
+   *  @brief The bounding box
+   */
+  db::Box bbox;
 };
 
 /**
@@ -595,7 +1267,7 @@ public:
    *
    *  This method reads the layout specified into the given layout
    */
-  void read (tl::InputStream &stream, db::Layout &layout, LEFDEFLayerDelegate &layer_delegate);
+  void read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderState &state);
 
 protected:
   /**
@@ -636,6 +1308,16 @@ protected:
   void expect (const std::string &token);
 
   /**
+   *  @brief Test whether the next token matches one of the given ones and raise an error if it does not
+   */
+  void expect (const std::string &token1, const std::string &token2);
+
+  /**
+   *  @brief Test whether the next token matches one of the given ones and raise an error if it does not
+   */
+  void expect (const std::string &token, const std::string &token2, const std::string &token3);
+
+  /**
    *  @brief Gets the next token
    */
   std::string get ();
@@ -656,11 +1338,34 @@ protected:
   long get_long ();
 
   /**
+   *  @brief Gets an orientation code
+   *  The orientation code is read employing the LEF/DEF convention ("N" for r0 etc.)
+   */
+  db::FTrans get_orient (bool optional);
+
+  /**
+   *  @brief Reads a point
+   *  A point is given by two coordinates, x and y
+   */
+  db::Point get_point (double scale);
+
+  /**
+   *  @brief Reads a vector
+   *  A vector is given by two coordinates, x and y
+   */
+  db::Vector get_vector (double scale);
+
+  /**
+   *  @brief Turns a number into a mask number
+   */
+  unsigned int get_mask (long m);
+
+  /**
    *  @brief Create a new layer or return the index of the given layer
    */
-  std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose)
+  std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask)
   {
-    return mp_layer_delegate->open_layer (layout, name, purpose);
+    return mp_reader_state->open_layer (layout, name, purpose, mask);
   }
 
   /**
@@ -668,7 +1373,7 @@ protected:
    */
   void register_layer (const std::string &l)
   {
-    mp_layer_delegate->register_layer (l);
+    mp_reader_state->register_layer (l);
   }
 
   /**
@@ -735,22 +1440,26 @@ protected:
     return m_pin_prop_name_id;
   }
 
-protected:
-  void create_generated_via (std::vector<db::Polygon> &bottom,
-                             std::vector<db::Polygon> &cut,
-                             std::vector<db::Polygon> &top,
-                             const db::Vector &cutsize,
-                             const db::Vector &cutspacing,
-                             const db::Vector &be, const db::Vector &te,
-                             const db::Vector &bo, const db::Vector &to,
-                             const db::Point &o,
-                             int rows, int columns,
-                             const std::string &pattern);
+  /**
+   *  @brief Gets the reader options
+   */
+  const db::LEFDEFReaderOptions &options () const
+  {
+    return m_options;
+  }
+
+  /**
+   *  @brief Gets the reader state object
+   */
+  db::LEFDEFReaderState *reader_state ()
+  {
+    return mp_reader_state;
+  }
 
 private:
   tl::AbsoluteProgress *mp_progress;
   tl::TextInputStream *mp_stream;
-  LEFDEFLayerDelegate *mp_layer_delegate;
+  LEFDEFReaderState *mp_reader_state;
   std::string m_cellname;
   std::string m_fn;
   std::string m_last_token;
@@ -760,6 +1469,7 @@ private:
   db::property_names_id_type m_inst_prop_name_id;
   bool m_produce_pin_props;
   db::property_names_id_type m_pin_prop_name_id;
+  db::LEFDEFReaderOptions m_options;
 
   const std::string &next ();
 };

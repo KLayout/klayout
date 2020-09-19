@@ -1,0 +1,19 @@
+MACRO macro1
+    CLASS CORE ;
+    ORIGIN 0.035 0.235 ;
+    SIZE 0.07 BY 0.47 ;
+    PIN Z
+        PORT
+        LAYER M1 ;
+        RECT -0.02 0 0.02 0.2 ;
+        RECT -0.03 -0.2 0.01 -0.1 ;
+        VIA  0.0 0.2 square ;
+        VIA  0.01 -0.2 square ;
+        END
+    END Z
+    OBS 
+      LAYER M1 ;
+        RECT -0.035 -0.235 0.035 0.235 ;
+    END
+END macro1
+

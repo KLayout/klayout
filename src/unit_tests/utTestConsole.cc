@@ -193,7 +193,7 @@ const char *ANSI_GREEN = "\033[32m";
 const char *ANSI_RESET = "\033[0m";
 
 TestConsole::TestConsole (FILE *file)
-  : m_file (file), m_col (0), m_max_col (250), m_columns (50), m_rows (0), m_file_is_tty (false)
+  : m_file (file), m_col (0), m_max_col (400), m_columns (50), m_rows (0), m_file_is_tty (false)
 {
   ms_instance = this;
 

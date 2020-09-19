@@ -926,9 +926,11 @@ static gsi::Methods methods_QCoreApplication () {
   methods += new qt_gsi::GenericMethod ("installNativeEventFilter", "@brief Method void QCoreApplication::installNativeEventFilter(QAbstractNativeEventFilter *filterObj)\n", false, &_init_f_installNativeEventFilter_3266, &_call_f_installNativeEventFilter_3266);
   methods += new qt_gsi::GenericMethod ("notify", "@brief Method bool QCoreApplication::notify(QObject *, QEvent *)\n", false, &_init_f_notify_2411, &_call_f_notify_2411);
   methods += new qt_gsi::GenericMethod ("removeNativeEventFilter", "@brief Method void QCoreApplication::removeNativeEventFilter(QAbstractNativeEventFilter *filterObj)\n", false, &_init_f_removeNativeEventFilter_3266, &_call_f_removeNativeEventFilter_3266);
+  methods += gsi::qt_signal ("aboutToQuit()", "aboutToQuit", "@brief Signal declaration for QCoreApplication::aboutToQuit()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("applicationNameChanged()", "applicationNameChanged", "@brief Signal declaration for QCoreApplication::applicationNameChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("applicationVersionChanged()", "applicationVersionChanged", "@brief Signal declaration for QCoreApplication::applicationVersionChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QCoreApplication::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QCoreApplication::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("organizationDomainChanged()", "organizationDomainChanged", "@brief Signal declaration for QCoreApplication::organizationDomainChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("organizationNameChanged()", "organizationNameChanged", "@brief Signal declaration for QCoreApplication::organizationNameChanged()\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("addLibraryPath", "@brief Static method void QCoreApplication::addLibraryPath(const QString &)\nThis method is static and can be called without an instance.", &_init_f_addLibraryPath_2025, &_call_f_addLibraryPath_2025);
@@ -1035,6 +1037,12 @@ public:
     return QCoreApplication::senderSignalIndex();
   }
 
+  //  [emitter impl] void QCoreApplication::aboutToQuit()
+  void emitter_QCoreApplication_aboutToQuit_3584()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QCoreApplication::aboutToQuit()'");
+  }
+
   //  [emitter impl] void QCoreApplication::applicationNameChanged()
   void emitter_QCoreApplication_applicationNameChanged_0()
   {
@@ -1081,6 +1089,13 @@ public:
     } else {
       return QCoreApplication::notify(arg1, arg2);
     }
+  }
+
+  //  [emitter impl] void QCoreApplication::objectNameChanged(const QString &objectName)
+  void emitter_QCoreApplication_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QCoreApplication::objectNameChanged(const QString &objectName)'");
   }
 
   //  [emitter impl] void QCoreApplication::organizationDomainChanged()
@@ -1180,6 +1195,20 @@ public:
 };
 
 QCoreApplication_Adaptor::~QCoreApplication_Adaptor() { }
+
+// emitter void QCoreApplication::aboutToQuit()
+
+static void _init_emitter_aboutToQuit_3584 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_aboutToQuit_3584 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QCoreApplication_Adaptor *)cls)->emitter_QCoreApplication_aboutToQuit_3584 ();
+}
+
 
 // emitter void QCoreApplication::applicationNameChanged()
 
@@ -1392,6 +1421,24 @@ static void _set_callback_cbs_notify_2411_0 (void *cls, const gsi::Callback &cb)
 }
 
 
+// emitter void QCoreApplication::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QCoreApplication_Adaptor *)cls)->emitter_QCoreApplication_objectNameChanged_4567 (arg1);
+}
+
+
 // emitter void QCoreApplication::organizationDomainChanged()
 
 static void _init_emitter_organizationDomainChanged_0 (qt_gsi::GenericMethod *decl)
@@ -1497,6 +1544,7 @@ gsi::Class<QCoreApplication> &qtdecl_QCoreApplication ();
 
 static gsi::Methods methods_QCoreApplication_Adaptor () {
   gsi::Methods methods;
+  methods += new qt_gsi::GenericMethod ("emit_aboutToQuit", "@brief Emitter for signal void QCoreApplication::aboutToQuit()\nCall this method to emit this signal.", false, &_init_emitter_aboutToQuit_3584, &_call_emitter_aboutToQuit_3584);
   methods += new qt_gsi::GenericMethod ("emit_applicationNameChanged", "@brief Emitter for signal void QCoreApplication::applicationNameChanged()\nCall this method to emit this signal.", false, &_init_emitter_applicationNameChanged_0, &_call_emitter_applicationNameChanged_0);
   methods += new qt_gsi::GenericMethod ("emit_applicationVersionChanged", "@brief Emitter for signal void QCoreApplication::applicationVersionChanged()\nCall this method to emit this signal.", false, &_init_emitter_applicationVersionChanged_0, &_call_emitter_applicationVersionChanged_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QCoreApplication::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
@@ -1513,6 +1561,7 @@ static gsi::Methods methods_QCoreApplication_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QCoreApplication::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("notify", "@brief Virtual method bool QCoreApplication::notify(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_notify_2411_0, &_call_cbs_notify_2411_0);
   methods += new qt_gsi::GenericMethod ("notify", "@hide", false, &_init_cbs_notify_2411_0, &_call_cbs_notify_2411_0, &_set_callback_cbs_notify_2411_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QCoreApplication::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("emit_organizationDomainChanged", "@brief Emitter for signal void QCoreApplication::organizationDomainChanged()\nCall this method to emit this signal.", false, &_init_emitter_organizationDomainChanged_0, &_call_emitter_organizationDomainChanged_0);
   methods += new qt_gsi::GenericMethod ("emit_organizationNameChanged", "@brief Emitter for signal void QCoreApplication::organizationNameChanged()\nCall this method to emit this signal.", false, &_init_emitter_organizationNameChanged_0, &_call_emitter_organizationNameChanged_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QCoreApplication::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);

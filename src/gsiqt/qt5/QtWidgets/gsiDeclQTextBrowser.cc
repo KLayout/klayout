@@ -538,6 +538,7 @@ static gsi::Methods methods_QTextBrowser () {
   methods += gsi::qt_signal<const QUrl & > ("highlighted(const QUrl &)", "highlighted", gsi::arg("arg1"), "@brief Signal declaration for QTextBrowser::highlighted(const QUrl &)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("highlighted(const QString &)", "highlighted_qs", gsi::arg("arg1"), "@brief Signal declaration for QTextBrowser::highlighted(const QString &)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("historyChanged()", "historyChanged", "@brief Signal declaration for QTextBrowser::historyChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QTextBrowser::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("redoAvailable(bool)", "redoAvailable", gsi::arg("b"), "@brief Signal declaration for QTextBrowser::redoAvailable(bool b)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("selectionChanged()", "selectionChanged", "@brief Signal declaration for QTextBrowser::selectionChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QUrl & > ("sourceChanged(const QUrl &)", "sourceChanged", gsi::arg("arg1"), "@brief Signal declaration for QTextBrowser::sourceChanged(const QUrl &)\nYou can bind a procedure to this signal.");
@@ -839,6 +840,13 @@ public:
     } else {
       return QTextBrowser::minimumSizeHint();
     }
+  }
+
+  //  [emitter impl] void QTextBrowser::objectNameChanged(const QString &objectName)
+  void emitter_QTextBrowser_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QTextBrowser::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] QPaintEngine *QTextBrowser::paintEngine()
@@ -3040,6 +3048,24 @@ static void _set_callback_cbs_nativeEvent_4678_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QTextBrowser::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QTextBrowser_Adaptor *)cls)->emitter_QTextBrowser_objectNameChanged_4567 (arg1);
+}
+
+
 // QPaintEngine *QTextBrowser::paintEngine()
 
 static void _init_cbs_paintEngine_c0_0 (qt_gsi::GenericMethod *decl)
@@ -3812,6 +3838,7 @@ static gsi::Methods methods_QTextBrowser_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*moveEvent", "@hide", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0, &_set_callback_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@brief Virtual method bool QTextBrowser::nativeEvent(const QByteArray &eventType, void *message, long int *result)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@hide", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0, &_set_callback_cbs_nativeEvent_4678_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QTextBrowser::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Virtual method QPaintEngine *QTextBrowser::paintEngine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0);
   methods += new qt_gsi::GenericMethod ("paintEngine", "@hide", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0, &_set_callback_cbs_paintEngine_c0_0);
   methods += new qt_gsi::GenericMethod ("*paintEvent", "@brief Virtual method void QTextBrowser::paintEvent(QPaintEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_paintEvent_1725_0, &_call_cbs_paintEvent_1725_0);

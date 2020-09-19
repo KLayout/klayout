@@ -81,7 +81,30 @@ public:
   std::vector<db::cell_index_type> create_single_mapping_full (db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b)
   {
     create_single_mapping (layout_a, cell_index_a, layout_b, cell_index_b);
-    return create_missing_mapping (layout_a, cell_index_a, layout_b, cell_index_b);
+    return create_missing_mapping (layout_a, layout_b, cell_index_b);
+  }
+
+  /**
+   *  @brief Create a multi-cell mapping
+   *
+   *  The mapping created by this function will map the cells of cell_indexes_b to cell_indexes_a. Both arrays need to have
+   *  the same length.
+   *  This cell mapping will not map the child cells. When used for hierarchical copy this will basically
+   *  flatten the cells on copy.
+   */
+  void create_multi_mapping (const db::Layout &layout_a, const std::vector<db::cell_index_type> &cell_indexes_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_indexes_b);
+
+  /**
+   *  @brief Create a single cell full mapping
+   *
+   *  The mapping created by this function will map the cells of cell_indexes_a to cell_indexes_b. Both arrays need to have
+   *  the same length. In addition, new cells for the child cells of all cell_indexes_b cells are created in layout_a and
+   *  included in the mapping.
+   */
+  std::vector<db::cell_index_type> create_multi_mapping_full (db::Layout &layout_a, const std::vector<db::cell_index_type> &cell_indexes_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_indexes_b)
+  {
+    create_multi_mapping (layout_a, cell_indexes_a, layout_b, cell_indexes_b);
+    return create_missing_mapping (layout_a, layout_b, cell_indexes_b);
   }
 
   /**
@@ -100,7 +123,7 @@ public:
   std::vector<db::cell_index_type> create_from_geometry_full (db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b)
   {
     create_from_geometry (layout_a, cell_index_a, layout_b, cell_index_b);
-    return create_missing_mapping (layout_a, cell_index_a, layout_b, cell_index_b);
+    return create_missing_mapping (layout_a, layout_b, cell_index_b);
   }
 
   /**
@@ -119,7 +142,7 @@ public:
   std::vector<db::cell_index_type> create_from_names_full (db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b)
   {
     create_from_names (layout_a, cell_index_a, layout_b, cell_index_b);
-    return create_missing_mapping (layout_a, cell_index_a, layout_b, cell_index_b);
+    return create_missing_mapping (layout_a, layout_b, cell_index_b);
   }
 
   /**
@@ -174,6 +197,11 @@ public:
   }
 
   /**
+   *  @brief Gets the source cells
+   */
+  std::vector<db::cell_index_type> source_cells () const;
+
+  /**
    *  @brief Access to the mapping table
    */
   const std::map <db::cell_index_type, db::cell_index_type> &table () const 
@@ -184,8 +212,9 @@ public:
   /**
    *  @brief Creates mappings for all cells not mapped yet
    *
-   *  When constructing a cell mapping by explicit mapping (map (a, b)), some cells may be
-   *  left unmapped. This method allows creating mappings for these missing cells by adding
+   *  When constructing a cell mapping by explicit mapping (map (a, b)), some child cells of the
+   *  mapped other cells may be left unmapped.
+   *  This method allows creating mappings for these missing cells by adding
    *  new cells and the corresponding instances into the target layout_a.
    *
    *  If given, "exclude_cells" can specify a list of cells not to map.
@@ -195,7 +224,18 @@ public:
    *
    *  The returned vector lists the new cells.
    */
-  std::vector<db::cell_index_type> create_missing_mapping (db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells = 0, const std::set<db::cell_index_type> *include_cells = 0);
+  std::vector<db::cell_index_type> create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells = 0, const std::set<db::cell_index_type> *include_cells = 0);
+
+  /**
+   *  @brief A convenience version of create_missing_mappings which takes a single cell for cell_index_a and cell_index_b.
+   */
+  std::vector<db::cell_index_type> create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells = 0, const std::set<db::cell_index_type> *include_cells = 0)
+  {
+    std::vector<db::cell_index_type> cib;
+    cib.reserve (1);
+    cib.push_back (cell_index_b);
+    return create_missing_mapping (layout_a, layout_b, cib, exclude_cells, include_cells);
+  }
 
   /**
    *  @brief Like create_missing_mapping, but returns the newly mapped pairs
@@ -203,7 +243,21 @@ public:
    *  The first cell index of the pair is the old cell in layout_a, the second cell index
    *  is the new cell in layout_b.
    */
-  std::vector<std::pair<db::cell_index_type, db::cell_index_type> > create_missing_mapping2 (db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells = 0, const std::set<db::cell_index_type> *include_cells = 0);
+  std::vector<std::pair<db::cell_index_type, db::cell_index_type> > create_missing_mapping2 (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells = 0, const std::set<db::cell_index_type> *include_cells = 0);
+
+  /**
+   *  @brief Like create_missing_mapping, but returns the newly mapped pairs (single-cell version)
+   *
+   *  The first cell index of the pair is the old cell in layout_a, the second cell index
+   *  is the new cell in layout_b.
+   */
+  std::vector<std::pair<db::cell_index_type, db::cell_index_type> > create_missing_mapping2 (db::Layout &layout_a, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells = 0, const std::set<db::cell_index_type> *include_cells = 0)
+  {
+    std::vector<db::cell_index_type> cib;
+    cib.reserve (1);
+    cib.push_back (cell_index_b);
+    return create_missing_mapping2 (layout_a, layout_b, cib, exclude_cells, include_cells);
+  }
 
 private:
   void extract_unique (std::map <db::cell_index_type, std::vector<db::cell_index_type> >::const_iterator cand, 
@@ -213,7 +267,7 @@ private:
   void dump_mapping (const std::map <db::cell_index_type, std::vector<db::cell_index_type> > &candidates, 
                      const db::Layout &layout_a, const db::Layout &layout_b);
 
-  void do_create_missing_mapping (db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells, std::vector<db::cell_index_type> *new_cells, std::vector<std::pair<db::cell_index_type, db::cell_index_type> > *mapped_pairs);
+  void do_create_missing_mapping (db::Layout &layout_a, const db::Layout &layout_b, const std::vector<db::cell_index_type> &cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells, std::vector<db::cell_index_type> *new_cells, std::vector<std::pair<db::cell_index_type, db::cell_index_type> > *mapped_pairs);
 
   std::map <db::cell_index_type, db::cell_index_type> m_b2a_mapping;
 };

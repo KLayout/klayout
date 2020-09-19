@@ -28,33 +28,98 @@ namespace bd
 {
 
 GenericReaderOptions::GenericReaderOptions ()
-  : m_prefix ("i"), m_group_prefix ("Input"), m_create_other_layers (true),
-    m_common_enable_text_objects (true),
-    m_common_enable_properties (true),
-    m_gds2_box_mode (1),
-    m_gds2_allow_big_records (true),
-    m_gds2_allow_multi_xy_records (true),
-    m_oasis_read_all_properties (true),
-    m_oasis_expect_strict_mode (-1),
-    m_cif_wire_mode (0),
-    m_cif_dbu (0.001),
-    m_cif_keep_layer_names (false),
-    m_dxf_dbu (0.001),
-    m_dxf_unit (1.0),
-    m_dxf_text_scaling (100.0),
-    m_dxf_polyline_mode (0),
-    m_dxf_circle_points (100),
-    m_dxf_circle_accuracy (0.0),
-    m_dxf_contour_accuracy (0.0),
-    m_dxf_render_texts_as_polygons (false),
-    m_dxf_keep_layer_names (false),
-    m_dxf_keep_other_cells (false),
-    m_magic_lambda (1.0),
-    m_magic_dbu (0.001),
-    m_magic_keep_layer_names (false),
-    m_magic_merge (true)
+  : m_prefix ("i"), m_group_prefix ("Input"), m_layer_map (), m_create_other_layers (true),
+    m_dbu (0.001), m_keep_layer_names (false)
 {
-  //  .. nothing yet ..
+  //  initialize from the default settings
+
+  db::LoadLayoutOptions load_options;
+
+  m_common_enable_text_objects = load_options.get_option_by_name ("text_enabled").to_bool ();
+  m_common_enable_properties = load_options.get_option_by_name ("properties_enabled").to_bool ();
+
+  m_gds2_box_mode = load_options.get_option_by_name ("gds2_box_mode").to_uint ();
+  m_gds2_allow_big_records = load_options.get_option_by_name ("gds2_allow_big_records").to_bool ();
+  m_gds2_allow_multi_xy_records = load_options.get_option_by_name ("gds2_allow_multi_xy_records").to_bool ();
+
+  m_oasis_read_all_properties = load_options.get_option_by_name ("oasis_read_all_properties").to_bool ();
+  m_oasis_expect_strict_mode = (load_options.get_option_by_name ("oasis_expect_strict_mode").to_int () > 0);
+
+  m_create_other_layers = load_options.get_option_by_name ("cif_create_other_layers").to_bool ();
+  m_cif_wire_mode = load_options.get_option_by_name ("cif_wire_mode").to_uint ();
+
+  m_dxf_unit = load_options.get_option_by_name ("dxf_unit").to_double ();
+  m_dxf_text_scaling = load_options.get_option_by_name ("dxf_text_scaling").to_double ();
+  m_dxf_polyline_mode = load_options.get_option_by_name ("dxf_polyline_mode").to_int ();
+  m_dxf_circle_points = load_options.get_option_by_name ("dxf_circle_points").to_int ();
+  m_dxf_circle_accuracy = load_options.get_option_by_name ("dxf_circle_accuracy").to_double ();
+  m_dxf_contour_accuracy = load_options.get_option_by_name ("dxf_contour_accuracy").to_double ();
+  m_dxf_render_texts_as_polygons = load_options.get_option_by_name ("dxf_render_texts_as_polygons").to_bool ();
+  m_dxf_keep_other_cells = load_options.get_option_by_name ("dxf_keep_other_cells").to_bool ();
+
+  m_magic_lambda = load_options.get_option_by_name ("mag_lambda").to_double ();
+  m_magic_merge = load_options.get_option_by_name ("mag_merge").to_bool ();
+
+  tl::Variant mag_library_paths = load_options.get_option_by_name ("mag_library_paths");
+  for (tl::Variant::const_iterator i = mag_library_paths.begin (); i != mag_library_paths.end (); ++i) {
+    m_magic_lib_path.push_back (i->to_string ());
+  }
+
+  tl::Variant v;
+
+  v = load_options.get_option_by_name ("lefdef_config.net_property_name");
+  m_lefdef_produce_net_names = ! v.is_nil ();
+  m_lefdef_net_property_name = v .to_parsable_string ();
+
+  v = load_options.get_option_by_name ("lefdef_config.instance_property_name");
+  m_lefdef_produce_inst_names = ! v.is_nil ();
+  m_lefdef_inst_property_name = v .to_parsable_string ();
+
+  v = load_options.get_option_by_name ("lefdef_config.pin_property_name");
+  m_lefdef_produce_pin_names = ! v.is_nil ();
+  m_lefdef_pin_property_name = v .to_parsable_string ();
+
+  m_lefdef_produce_cell_outlines = load_options.get_option_by_name ("lefdef_config.produce_cell_outlines").to_bool ();
+  m_lefdef_cell_outline_layer = load_options.get_option_by_name ("lefdef_config.cell_outline_layer").to_string ();
+  m_lefdef_produce_placement_blockages = load_options.get_option_by_name ("lefdef_config.produce_placement_blockages").to_bool ();
+  m_lefdef_placement_blockage_layer = load_options.get_option_by_name ("lefdef_config.placement_blockage_layer").to_string ();
+  m_lefdef_produce_regions = load_options.get_option_by_name ("lefdef_config.produce_regions").to_bool ();
+  m_lefdef_region_layer = load_options.get_option_by_name ("lefdef_config.region_layer").to_string ();
+  m_lefdef_produce_via_geometry = load_options.get_option_by_name ("lefdef_config.produce_via_geometry").to_bool ();
+  m_lefdef_via_geometry_suffix = load_options.get_option_by_name ("lefdef_config.via_geometry_suffix_str").to_string ();
+  m_lefdef_via_geometry_datatype = load_options.get_option_by_name ("lefdef_config.via_geometry_datatype_str").to_string ();
+  m_lefdef_via_cellname_prefix = load_options.get_option_by_name ("lefdef_config.via_cellname_prefix").to_string ();
+  m_lefdef_produce_pins = load_options.get_option_by_name ("lefdef_config.produce_pins").to_bool ();
+  m_lefdef_pins_suffix = load_options.get_option_by_name ("lefdef_config.pins_suffix_str").to_string ();
+  m_lefdef_pins_datatype = load_options.get_option_by_name ("lefdef_config.pins_datatype_str").to_string ();
+  m_lefdef_produce_lef_pins = load_options.get_option_by_name ("lefdef_config.produce_lef_pins").to_bool ();
+  m_lefdef_lef_pins_suffix = load_options.get_option_by_name ("lefdef_config.lef_pins_suffix_str").to_string ();
+  m_lefdef_lef_pins_datatype = load_options.get_option_by_name ("lefdef_config.lef_pins_datatype_str").to_string ();
+  m_lefdef_produce_obstructions = load_options.get_option_by_name ("lefdef_config.produce_obstructions").to_bool ();
+  m_lefdef_obstruction_suffix = load_options.get_option_by_name ("lefdef_config.obstructions_suffix").to_string ();
+  m_lefdef_obstruction_datatype = load_options.get_option_by_name ("lefdef_config.obstructions_datatype").to_int ();
+  m_lefdef_produce_blockages = load_options.get_option_by_name ("lefdef_config.produce_blockages").to_bool ();
+  m_lefdef_blockage_suffix = load_options.get_option_by_name ("lefdef_config.blockages_suffix").to_string ();
+  m_lefdef_blockage_datatype = load_options.get_option_by_name ("lefdef_config.blockages_datatype").to_int ();
+  m_lefdef_produce_labels = load_options.get_option_by_name ("lefdef_config.produce_labels").to_bool ();
+  m_lefdef_label_suffix = load_options.get_option_by_name ("lefdef_config.labels_suffix").to_string ();
+  m_lefdef_label_datatype = load_options.get_option_by_name ("lefdef_config.labels_datatype").to_int ();
+  m_lefdef_produce_routing = load_options.get_option_by_name ("lefdef_config.produce_routing").to_bool ();
+  m_lefdef_routing_suffix = load_options.get_option_by_name ("lefdef_config.routing_suffix_str").to_string ();
+  m_lefdef_routing_datatype = load_options.get_option_by_name ("lefdef_config.routing_datatype_str").to_string ();
+  m_lefdef_produce_special_routing = load_options.get_option_by_name ("lefdef_config.produce_special_routing").to_bool ();
+  m_lefdef_special_routing_suffix = load_options.get_option_by_name ("lefdef_config.special_routing_suffix_str").to_string ();
+  m_lefdef_special_routing_datatype = load_options.get_option_by_name ("lefdef_config.special_routing_datatype_str").to_string ();
+
+  tl::Variant lef_files = load_options.get_option_by_name ("lefdef_config.lef_files");
+  for (tl::Variant::const_iterator i = lef_files.begin (); i != lef_files.end (); ++i) {
+    m_lefdef_lef_files.push_back (i->to_string ());
+  }
+
+  m_lefdef_read_lef_with_def = load_options.get_option_by_name ("lefdef_config.read_lef_with_def").to_bool ();
+  m_lefdef_separate_groups = load_options.get_option_by_name ("lefdef_config.separate_groups").to_bool ();
+  m_lefdef_map_file = load_options.get_option_by_name ("lefdef_config.map_file").to_string ();
+  m_lefdef_produce_lef_macros = (load_options.get_option_by_name ("lefdef_config.macro_resolution_mode").to_int () == 0);
 }
 
 void
@@ -263,6 +328,274 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                    )
       ;
   }
+
+
+  {
+    std::string group ("[" + m_group_prefix + " options - LEF/DEF specific]");
+
+    cmd << tl::arg (group +
+                    "#!--" + m_long_prefix + "lefdef-dont-produce-net-names", &m_lefdef_produce_net_names, "Disables producing net names as shape properties",
+                    "If this option is present, net names will not be emitted as shape properties."
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-net-property-name=spec", &m_lefdef_net_property_name, "Specifies which property name to use for net names",
+                    "This option gives the name of the shape property used to annotate net names. For 'spec' use:\n"
+                    "\n"
+                    "* \"#n\" for property number \"n\" (compatible with GDS2)\n"
+                    "* A plain word for a named property (not compatible with GDS2)\n"
+                    "\n"
+                    "Producing net name annotation properties can be turned off with '--" + m_long_prefix + "lefdef-dont-produce-net-names'."
+                   )
+        << tl::arg (group +
+                    "#!--" + m_long_prefix + "lefdef-dont-produce-instance-names", &m_lefdef_produce_inst_names, "Disables producing DEF macro instance names as instance properties",
+                    "If this option is present, DEF macro instance names will not be emitted as instance properties."
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-instance-property-name=spec", &m_lefdef_inst_property_name, "Specifies which property name to use for DEF macro instance names",
+                    "This option gives the name of the instance property used to annotate DEF macro instance names. "
+                    "For the 'spec' format see '--" + m_long_prefix + "lefdef-net-property-name'."
+                    "\n"
+                    "Producing instance name annotation properties can be turned off with '--" + m_long_prefix + "lefdef-dont-produce-instance-names'."
+                   )
+        << tl::arg (group +
+                    "#!--" + m_long_prefix + "lefdef-dont-produce-pin-names", &m_lefdef_produce_pin_names, "Disables producing pin names as shape or instance properties",
+                    "If this option is present, Pin names will not be emitted as shape or instance properties."
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-pin-property-name=spec", &m_lefdef_pin_property_name, "Specifies which property name to use for pin names",
+                    "This option gives the name of the shape or instance property used to annotate pin names. "
+                    "For the 'spec' format see '--" + m_long_prefix + "lefdef-net-property-name'."
+                    "\n"
+                    "Producing pin name annotation properties can be turned off with '--" + m_long_prefix + "lefdef-dont-produce-pin-names'."
+                   )
+        << tl::arg (group +
+                    "#!--" + m_long_prefix + "lefdef-dont-produce-cell-outlines", &m_lefdef_produce_cell_outlines, "Disables producing cell outlines",
+                    "If this option is present, cell outlines will be skipped. Otherwise the cell outlines will be written to a layer given with '--" + m_long_prefix + "lefdef-cell-outline-layer'."
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-cell-outline-layer=spec", &m_lefdef_cell_outline_layer, "Specifies which layer to use for the cell outlines",
+                    "This option specifies the layer to use for the cell outline polygons. For 'spec' use:\n"
+                    "\n"
+                    "* \"l\" or \"l/d\" for a numerical layer or layer/datatype combination.\n"
+                    "* A plain word for a named layer\n"
+                    "* A name followed by a layer or layer/datatype combination in round brackets for a combined specification\n"
+                    "\n"
+                    "Producing cell outline markers can be turned off with '--" + m_long_prefix + "lefdef-dont-produce-cell-outlines'."
+                   )
+        << tl::arg (group +
+                    "#!--" + m_long_prefix + "lefdef-dont-produce-placement-blockages", &m_lefdef_produce_placement_blockages, "Disables producing blockage markers",
+                    "If this option is present, blockages will be skipped. Otherwise the blockage markers will be written to a layer given with '--" + m_long_prefix + "lefdef-placement-blockage-layer'."
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-placement-blockage-layer=spec", &m_lefdef_placement_blockage_layer, "Specifies which layer to use for the placement blockage markers",
+                    "For the 'spec' format see '--" + m_long_prefix + "lefdef-cell-outline-layer'.\n"
+                    "\n"
+                    "Producing cell placement blockage markers can be turned off with '--" + m_long_prefix + "lefdef-dont-produce-placement-blockages'."
+                   )
+        << tl::arg (group +
+                    "#!--" + m_long_prefix + "lefdef-dont-produce-regions", &m_lefdef_produce_regions, "Disables producing regions",
+                    "If this option is present, regions will be skipped. Otherwise the regions will be written to a layer given with '--" + m_long_prefix + "lefdef-region-layer'."
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-region-layer=spec", &m_lefdef_region_layer, "Specifies which layer to use for the regions",
+                    "For the 'spec' format see '--" + m_long_prefix + "lefdef-cell-outline-layer'.\n"
+                    "\n"
+                    "Producing regions can be turned off with '--" + m_long_prefix + "lefdef-dont-produce-regions'."
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-separate-groups", &m_lefdef_separate_groups, "Specifies to separate groups of regions into a hierarchy",
+                    "This option is used together with '--" + m_long_prefix + "lefdef-produce-regions'. If given, the region polygons will be put "
+                    "into a cell hierarchy where the cells indicate the region groups.\n"
+                   )
+        << tl::arg (group +
+                    "#!--" + m_long_prefix + "lefdef-dont-produce-via-geometry", &m_lefdef_produce_via_geometry, "Skips vias when producing geometry",
+                    "If this option is given, no via geometry will be produced."
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-via-geometry-suffix", &m_lefdef_via_geometry_suffix, "Specifies the via geometry layer suffix in pattern-based mode",
+                    "Use '" + m_long_prefix + "lefdef-via-geometry-suffix' and '--" + m_long_prefix + "lefdef-via-geometry-datatype' together with "
+                    "a layer map (see '-" + m_prefix + "m') to customize where the via geometry will be put.\n"
+                    "\n"
+                    "This option is part of the 'pattern-based' LEF/DEF layer mapping scheme.\n"
+                    "\n"
+                    "The mechanism is this: from the geometry's layer name and the suffix an effective layer name is produced. For example if the "
+                    "geometry is on layer 'M1' and the suffix is '_VIA', the effective layer name will be 'M1_VIA'. This layer is looked up in the "
+                    "layer map. If no such layer is found, the geometry layer name without suffix is looked up. If this layer is found, the datatype "
+                    "is substituted by the datatype specified with the '--" + m_long_prefix + "lefdef-via-geometry-datatype'. So eventually it's "
+                    "possible to use a detailed mapping by layer name + suffix or a generic mapping by layer name + datatype.\n"
+                    "\n"
+                    "Suffix and datatype can be made MASK specific by giving a list of values in the form: \"<generic>,1:<for-mask1>,2:<for-mask2>...\". "
+                    "For example, a datatype specification of \"6,1:61,2:62\" will use datatype 6 for via geometry without a mask assignment, "
+                    "datatype 61 for via geometry assigned to MASK 1 and datatype 62 for via geometry assigned to MASK 2.\n"
+                    "\n"
+                    "An alternative way to provide a layer mapping is through a map file (see '--" + m_long_prefix + "lefdef-map-file')."
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-via-geometry-datatype", &m_lefdef_via_geometry_datatype, "Specifies the via geometry layer datatype in pattern-based mode",
+                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of this option.\n"
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-via-cell-prefix", &m_lefdef_via_cellname_prefix, "Specifies the prefix for the cell names generated for vias",
+                    "Vias will be put into their own cells by the LEF/DEF reader. This option gives a prefix that is used to form the name of "
+                    "these cells. The name is built from the prefix plus the via name.\n"
+                   )
+        << tl::arg (group +
+                    "#!--" + m_long_prefix + "lefdef-dont-produce-pins", &m_lefdef_produce_pins, "Skips pins when producing geometry",
+                    "If this option is given, no pin geometry will be produced."
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-pins-suffix", &m_lefdef_pins_suffix, "Specifies the pin geometry layer suffix in pattern-based mode",
+                    "The pin geometry generation and layer mapping is designed in the same way than via geometry mapping. "
+                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-pins-datatype", &m_lefdef_pins_datatype, "Specifies the pin geometry layer datatype in pattern-based mode",
+                    "The pin geometry generation and layer mapping is designed in the same way than via geometry mapping. "
+                    "See '--" + m_long_prefix + "lefdef-produce-via-geometry' for a description of the mapping scheme.\n"
+                   )
+        << tl::arg (group +
+                    "#!--" + m_long_prefix + "lefdef-dont-produce-lef-pins", &m_lefdef_produce_lef_pins, "Skips LEF pins when producing geometry",
+                    "If this option is given, no LEF pin geometry will be produced."
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-lef-pins-suffix", &m_lefdef_lef_pins_suffix, "Specifies the LEF pin geometry layer suffix in pattern-based mode",
+                    "The LEF pin geometry generation and layer mapping is designed in the same way than via geometry mapping. "
+                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-lef-pins-datatype", &m_lefdef_lef_pins_datatype, "Specifies the LEF pin geometry layer datatype in pattern-based mode",
+                    "The LEF pin geometry generation and layer mapping is designed in the same way than via geometry mapping. "
+                    "See '--" + m_long_prefix + "lefdef-produce-via-geometry' for a description of the mapping scheme.\n"
+                   )
+        << tl::arg (group +
+                    "#!--" + m_long_prefix + "lefdef-dont-produce-routing", &m_lefdef_produce_routing, "Skips routing when producing geometry",
+                    "If this option is given, no routing geometry will be produced."
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-routing-suffix", &m_lefdef_routing_suffix, "Specifies the routing geometry layer suffix in pattern-based mode",
+                    "The routing geometry generation and layer mapping is designed in the same way than via geometry mapping. "
+                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-routing-datatype", &m_lefdef_routing_datatype, "Specifies the routing geometry layer datatype in pattern-based mode",
+                    "The routing geometry generation and layer mapping is designed in the same way than via geometry mapping. "
+                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
+                   )
+        << tl::arg (group +
+                    "#!--" + m_long_prefix + "lefdef-dont-produce-special-routing", &m_lefdef_produce_special_routing, "Skips special routing when producing geometry",
+                    "If this option is given, no special routing geometry will be produced."
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-special-routing-suffix", &m_lefdef_special_routing_suffix, "Specifies the special routing geometry layer suffix in pattern-based mode",
+                    "The special routing geometry generation and layer mapping is designed in the same way than via geometry mapping. "
+                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-special-routing-datatype", &m_lefdef_special_routing_datatype, "Specifies the special routing geometry layer datatype in pattern-based mode",
+                    "The special routing geometry generation and layer mapping is designed in the same way than via geometry mapping. "
+                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
+                   )
+        << tl::arg (group +
+                    "#!--" + m_long_prefix + "lefdef-dont-produce-obstructions", &m_lefdef_produce_obstructions, "Skips obstructions when producing geometry",
+                    "If this option is given, no obstruction marker geometry will be produced."
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-obstruction-suffix", &m_lefdef_obstruction_suffix, "Specifies the obstruction markers layer suffix in pattern-based mode",
+                    "The obstruction marker generation and layer mapping is designed in the same way than via geometry mapping, except the option to use mask specific target layers. "
+                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-obstruction-datatype", &m_lefdef_obstruction_datatype, "Specifies the obstruction markers layer datatype in pattern-based mode",
+                    "The obstruction marker generation and layer mapping is designed in the same way than via geometry mapping, except the option to use mask specific target layers. "
+                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
+                   )
+        << tl::arg (group +
+                    "#!--" + m_long_prefix + "lefdef-dont-produce-blockages", &m_lefdef_produce_blockages, "Skips blockages when producing geometry",
+                    "If this option is given, no blockage geometry will be produced."
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-blockage-suffix", &m_lefdef_blockage_suffix, "Specifies the blockage markers layer suffix in pattern-based mode",
+                    "The blockage marker generation and layer mapping is designed in the same way than via geometry mapping, except the option to use mask specific target layers. "
+                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-blockage-datatype", &m_lefdef_blockage_datatype, "Specifies the blockage markers layer datatype in pattern-based mode",
+                    "The blockage marker generation and layer mapping is designed in the same way than via geometry mapping, except the option to use mask specific target layers. "
+                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
+                   )
+        << tl::arg (group +
+                    "#!--" + m_long_prefix + "lefdef-dont-produce-labels", &m_lefdef_produce_labels, "Skips label when producing geometry",
+                    "If this option is given, no blockage geometry will be produced."
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-label-suffix", &m_lefdef_label_suffix, "Specifies the label markers layer suffix in pattern-based mode",
+                    "The label marker generation and layer mapping is designed in the same way than via geometry mapping, except the option to use mask specific target layers. "
+                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-label-datatype", &m_lefdef_label_datatype, "Specifies the label markers layer datatype in pattern-based mode",
+                    "The label marker generation and layer mapping is designed in the same way than via geometry mapping, except the option to use mask specific target layers. "
+                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
+                   )
+        << tl::arg (group +
+                    "--" + m_long_prefix + "lefdef-map", &m_lefdef_map_file, "Specifies to use a layer map file",
+                    "Use this option to turn off pattern-based layer mapping and to use an explicit mapping file instead. "
+                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the pattern-based mapping scheme.\n"
+                    "\n"
+                    "Using a map file is an alternative way to specify layer mapping. With a layer mapping file, the individual target "
+                    "layers need to specified individually for different layer/purpose combinations.\n"
+                    "\n"
+                    "The mapping file is one layer mapping entry per line. Each line is a layer name, followed by a list of purposes (VIA, PIN ...) "
+                    "and a layer and datatype number. In addition, 'DIEAREA' can be used to map the design outline to a layer. 'NAME' in place of the "
+                    "layer name and using layer/purpose in the purpose column allows mapping labels to specific layers.\n"
+                    "\n"
+                    "This is an example for a layer map file:\n"
+                    "\n"
+                    "DIEAREA ALL                       100      0\n"
+                    "M1      LEFPIN                    12       0\n"
+                    "M1      PIN                       12       2\n"
+                    "M1      NET                       12       3\n"
+                    "M1      SPNET                     12       4\n"
+                    "M1      VIA                       12       5\n"
+                    "M1      BLOCKAGE                  12       10\n"
+                    "NAME    M1/PIN                    12       10\n"
+                    "VIA1    LEFPIN,VIA,PIN,NET,SPNET  13       0\n"
+                    "M2      LEFPIN,PIN,NET,SPNET,VIA  14       0\n"
+                    "\n"
+                    "If a map file is used, only the layers present in the map file are generated. No other layers are produced."
+                   )
+        << tl::arg (group +
+                    "!--" + m_long_prefix + "lefdef-no-lef-macros", &m_lefdef_produce_lef_macros, "Don't produce LEF macro geometry",
+                    "This option applies when reading DEF files.\n"
+                    "\n"
+                    "If this option is present, no geometry will be produced for LEF macros. Instead, a ghost cell with the name of the LEF "
+                    "macro will be produced. If this option is not given, the LEF macros will be inserted in to these cells "
+                    "unless a FOREIGN specification is present in the LEF macro. If a FOREIGN specification is given, LEF geometry is never "
+                    "inserted into a DEF file. Instead ghost cells are created."
+                   )
+        << tl::arg (group +
+                    "!--" + m_long_prefix + "lefdef-no-implicit-lef", &m_lefdef_read_lef_with_def, "Disables reading all LEF files together with DEF files",
+                    "This option applies when reading DEF files.\n"
+                    "\n"
+                    "If this option is given, only the LEF files specified with '--" + m_long_prefix + "lefdef-lef-files' will be read."
+                    "\n"
+                    "If this option is not present, the DEF reader will look for all files with 'LEF' or related extensions "
+                    "in the same place than the DEF file and read these files before the DEF file is read. In addition, it will read the "
+                    "LEF files specified with '--" + m_long_prefix + "lefdef-lef-files'."
+                   )
+        << tl::arg (group +
+                    "--" + m_long_prefix + "lefdef-lefs", &m_lefdef_lef_files, "Specifies which additional LEF files to read",
+                    "This option applies when reading DEF files.\n"
+                    "\n"
+                    "Use a comma-separated list of file names here to specify which LEF files to read. "
+                    "See also '--" + m_long_prefix + "lefdef-read-lef-with-def' for an option to implicitly read all LEF files in the same "
+                    "place than the DEF file.\n"
+                    "\n"
+                    "Relative paths are resolved based on the location of the DEF file which is read."
+                   )
+      ;
+
+  }
 }
 
 void GenericReaderOptions::set_layer_map (const std::string &lm)
@@ -279,16 +612,12 @@ void GenericReaderOptions::set_layer_map (const std::string &lm)
 
 void GenericReaderOptions::set_read_named_layers (bool f)
 {
-  m_dxf_keep_layer_names = f;
-  m_cif_keep_layer_names = f;
-  m_magic_keep_layer_names = f;
+  m_keep_layer_names = f;
 }
 
 void GenericReaderOptions::set_dbu (double dbu)
 {
-  m_dxf_dbu = dbu;
-  m_cif_dbu = dbu;
-  m_magic_dbu = dbu;
+  m_dbu = dbu;
 }
 
 void
@@ -304,17 +633,17 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options) const
   load_options.set_option_by_name ("gds2_allow_multi_xy_records", m_gds2_allow_multi_xy_records);
 
   load_options.set_option_by_name ("oasis_read_all_properties", m_oasis_read_all_properties);
-  load_options.set_option_by_name ("oasis_expect_strict_mode", m_oasis_expect_strict_mode);
+  load_options.set_option_by_name ("oasis_expect_strict_mode", m_oasis_expect_strict_mode ? 1 : 0);
 
   load_options.set_option_by_name ("cif_layer_map", tl::Variant::make_variant (m_layer_map));
   load_options.set_option_by_name ("cif_create_other_layers", m_create_other_layers);
-  load_options.set_option_by_name ("cif_dbu", m_dxf_dbu);
+  load_options.set_option_by_name ("cif_dbu", m_dbu);
   load_options.set_option_by_name ("cif_wire_mode", m_cif_wire_mode);
-  load_options.set_option_by_name ("cif_keep_layer_names", m_cif_keep_layer_names);
+  load_options.set_option_by_name ("cif_keep_layer_names", m_keep_layer_names);
 
   load_options.set_option_by_name ("dxf_layer_map", tl::Variant::make_variant (m_layer_map));
   load_options.set_option_by_name ("dxf_create_other_layers", m_create_other_layers);
-  load_options.set_option_by_name ("dxf_dbu", m_dxf_dbu);
+  load_options.set_option_by_name ("dxf_dbu", m_dbu);
   load_options.set_option_by_name ("dxf_unit", m_dxf_unit);
   load_options.set_option_by_name ("dxf_text_scaling", m_dxf_text_scaling);
   load_options.set_option_by_name ("dxf_polyline_mode", m_dxf_polyline_mode);
@@ -322,16 +651,59 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options) const
   load_options.set_option_by_name ("dxf_circle_accuracy", m_dxf_circle_accuracy);
   load_options.set_option_by_name ("dxf_contour_accuracy", m_dxf_contour_accuracy);
   load_options.set_option_by_name ("dxf_render_texts_as_polygons", m_dxf_render_texts_as_polygons);
-  load_options.set_option_by_name ("dxf_keep_layer_names", m_dxf_keep_layer_names);
+  load_options.set_option_by_name ("dxf_keep_layer_names", m_keep_layer_names);
   load_options.set_option_by_name ("dxf_keep_other_cells", m_dxf_keep_other_cells);
 
   load_options.set_option_by_name ("mag_layer_map", tl::Variant::make_variant (m_layer_map));
   load_options.set_option_by_name ("mag_create_other_layers", m_create_other_layers);
-  load_options.set_option_by_name ("mag_dbu", m_magic_dbu);
+  load_options.set_option_by_name ("mag_dbu", m_dbu);
   load_options.set_option_by_name ("mag_lambda", m_magic_lambda);
   load_options.set_option_by_name ("mag_merge", m_magic_merge);
-  load_options.set_option_by_name ("mag_keep_layer_names", m_magic_keep_layer_names);
+  load_options.set_option_by_name ("mag_keep_layer_names", m_keep_layer_names);
   load_options.set_option_by_name ("mag_library_paths", tl::Variant (m_magic_lib_path.begin (), m_magic_lib_path.end ()));
+
+  load_options.set_option_by_name ("lefdef_config.layer_map", tl::Variant::make_variant (m_layer_map));
+  load_options.set_option_by_name ("lefdef_config.create_other_layers", m_create_other_layers);
+  load_options.set_option_by_name ("lefdef_config.dbu", m_dbu);
+  load_options.set_option_by_name ("lefdef_config.net_property_name", m_lefdef_produce_net_names ? tl::Variant (m_lefdef_net_property_name) : tl::Variant ());
+  load_options.set_option_by_name ("lefdef_config.instance_property_name", m_lefdef_produce_inst_names ? tl::Variant (m_lefdef_inst_property_name) : tl::Variant ());
+  load_options.set_option_by_name ("lefdef_config.pin_property_name", m_lefdef_produce_pin_names ? tl::Variant (m_lefdef_pin_property_name) : tl::Variant ());
+  load_options.set_option_by_name ("lefdef_config.produce_cell_outlines", m_lefdef_produce_cell_outlines);
+  load_options.set_option_by_name ("lefdef_config.cell_outline_layer", m_lefdef_cell_outline_layer);
+  load_options.set_option_by_name ("lefdef_config.produce_placement_blockages", m_lefdef_produce_placement_blockages);
+  load_options.set_option_by_name ("lefdef_config.placement_blockage_layer", m_lefdef_placement_blockage_layer);
+  load_options.set_option_by_name ("lefdef_config.produce_regions", m_lefdef_produce_regions);
+  load_options.set_option_by_name ("lefdef_config.region_layer", m_lefdef_region_layer);
+  load_options.set_option_by_name ("lefdef_config.produce_via_geometry", m_lefdef_produce_via_geometry);
+  load_options.set_option_by_name ("lefdef_config.via_geometry_suffix_str", m_lefdef_via_geometry_suffix);
+  load_options.set_option_by_name ("lefdef_config.via_geometry_datatype_str", m_lefdef_via_geometry_datatype);
+  load_options.set_option_by_name ("lefdef_config.via_cellname_prefix", m_lefdef_via_cellname_prefix);
+  load_options.set_option_by_name ("lefdef_config.produce_pins", m_lefdef_produce_pins);
+  load_options.set_option_by_name ("lefdef_config.pins_suffix_str", m_lefdef_pins_suffix);
+  load_options.set_option_by_name ("lefdef_config.pins_datatype_str", m_lefdef_pins_datatype);
+  load_options.set_option_by_name ("lefdef_config.produce_lef_pins", m_lefdef_produce_lef_pins);
+  load_options.set_option_by_name ("lefdef_config.lef_pins_suffix_str", m_lefdef_lef_pins_suffix);
+  load_options.set_option_by_name ("lefdef_config.lef_pins_datatype_str", m_lefdef_lef_pins_datatype);
+  load_options.set_option_by_name ("lefdef_config.produce_obstructions", m_lefdef_produce_obstructions);
+  load_options.set_option_by_name ("lefdef_config.obstructions_suffix", m_lefdef_obstruction_suffix);
+  load_options.set_option_by_name ("lefdef_config.obstructions_datatype", m_lefdef_obstruction_datatype);
+  load_options.set_option_by_name ("lefdef_config.produce_blockages", m_lefdef_produce_blockages);
+  load_options.set_option_by_name ("lefdef_config.blockages_suffix", m_lefdef_blockage_suffix);
+  load_options.set_option_by_name ("lefdef_config.blockages_datatype", m_lefdef_blockage_datatype);
+  load_options.set_option_by_name ("lefdef_config.produce_labels", m_lefdef_produce_labels);
+  load_options.set_option_by_name ("lefdef_config.labels_suffix", m_lefdef_label_suffix);
+  load_options.set_option_by_name ("lefdef_config.labels_datatype", m_lefdef_label_datatype);
+  load_options.set_option_by_name ("lefdef_config.produce_routing", m_lefdef_produce_routing);
+  load_options.set_option_by_name ("lefdef_config.routing_suffix_str", m_lefdef_routing_suffix);
+  load_options.set_option_by_name ("lefdef_config.routing_datatype_str", m_lefdef_routing_datatype);
+  load_options.set_option_by_name ("lefdef_config.produce_special_routing", m_lefdef_produce_special_routing);
+  load_options.set_option_by_name ("lefdef_config.special_routing_suffix_str", m_lefdef_special_routing_suffix);
+  load_options.set_option_by_name ("lefdef_config.special_routing_datatype_str", m_lefdef_special_routing_datatype);
+  load_options.set_option_by_name ("lefdef_config.lef_files", tl::Variant (m_lefdef_lef_files.begin (), m_lefdef_lef_files.end ()));
+  load_options.set_option_by_name ("lefdef_config.read_lef_with_def", m_lefdef_read_lef_with_def);
+  load_options.set_option_by_name ("lefdef_config.separate_groups", m_lefdef_separate_groups);
+  load_options.set_option_by_name ("lefdef_config.map_file", m_lefdef_map_file);
+  load_options.set_option_by_name ("lefdef_config.macro_resolution_mode", m_lefdef_produce_lef_macros ? 0 : 2);
 }
 
 }

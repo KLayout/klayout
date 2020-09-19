@@ -218,7 +218,6 @@ static gsi::Methods methods_QCameraFeedbackControl () {
   methods += new qt_gsi::GenericMethod ("resetEventFeedback", "@brief Method void QCameraFeedbackControl::resetEventFeedback(QCameraFeedbackControl::EventType)\n", false, &_init_f_resetEventFeedback_3660, &_call_f_resetEventFeedback_3660);
   methods += new qt_gsi::GenericMethod ("setEventFeedbackEnabled", "@brief Method bool QCameraFeedbackControl::setEventFeedbackEnabled(QCameraFeedbackControl::EventType, bool)\n", false, &_init_f_setEventFeedbackEnabled_4416, &_call_f_setEventFeedbackEnabled_4416);
   methods += new qt_gsi::GenericMethod ("setEventFeedbackSound", "@brief Method bool QCameraFeedbackControl::setEventFeedbackSound(QCameraFeedbackControl::EventType, const QString &filePath)\n", false, &_init_f_setEventFeedbackSound_5577, &_call_f_setEventFeedbackSound_5577);
-  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QCameraFeedbackControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QCameraFeedbackControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QCameraFeedbackControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -265,12 +264,6 @@ public:
   //  [expose] int QCameraFeedbackControl::senderSignalIndex()
   int fp_QCameraFeedbackControl_senderSignalIndex_c0 () const {
     return QCameraFeedbackControl::senderSignalIndex();
-  }
-
-  //  [emitter impl] void QCameraFeedbackControl::destroyed(QObject *)
-  void emitter_QCameraFeedbackControl_destroyed_1302(QObject *arg1)
-  {
-    emit QCameraFeedbackControl::destroyed(arg1);
   }
 
   //  [adaptor impl] bool QCameraFeedbackControl::event(QEvent *)
@@ -519,24 +512,6 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QCameraFeedbackControl_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
-}
-
-
-// emitter void QCameraFeedbackControl::destroyed(QObject *)
-
-static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
-  decl->add_arg<QObject * > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
-  ((QCameraFeedbackControl_Adaptor *)cls)->emitter_QCameraFeedbackControl_destroyed_1302 (arg1);
 }
 
 
@@ -835,7 +810,6 @@ static gsi::Methods methods_QCameraFeedbackControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QCameraFeedbackControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QCameraFeedbackControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QCameraFeedbackControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QCameraFeedbackControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);

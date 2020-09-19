@@ -887,6 +887,15 @@ method_name_from_id (int mid, VALUE self)
   return cls_decl->name () + "::" + mt->name (mid);
 }
 
+static gsi::ArgType create_void_type ()
+{
+  gsi::ArgType at;
+  at.init<void> ();
+  return at;
+}
+
+static gsi::ArgType s_void_type = create_void_type ();
+
 VALUE
 method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 {
@@ -1090,8 +1099,15 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
         }
 
+      } else if (meth->ret_type () == s_void_type) {
+
+        //  simple, yet magical :)
+        return self;
+
       } else {
+
         ret = pop_arg (meth->ret_type (), p, retlist, heap);
+
       }
 
     }

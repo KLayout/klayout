@@ -55,6 +55,8 @@ template <class Coord> class generic_repository;
 class Layout;
 class Library;
 class ImportLayerMapping;
+class CellMapping;
+class LayerMapping;
 
 /**
  *  @brief The cell object
@@ -936,6 +938,84 @@ public:
   {
     return mp_layout;
   }
+
+  /**
+   *  @brief Copies the shapes from the source cell's tree to this cell
+   *
+   *  This variant uses the given cell mapping and layer mapping.
+   */
+  void copy_tree_shapes (const db::Cell &source_cell, const db::CellMapping &cm);
+
+  /**
+   *  @brief Copies the shapes from the source cell's tree to this cell
+   *
+   *  This variant uses the given cell mapping and layer mapping.
+   */
+  void copy_tree_shapes (const db::Cell &source_cell, const db::CellMapping &cm, const db::LayerMapping &lm);
+
+  /**
+   *  @brief Copies instances and shapes from the source cell to this cell
+   *
+   *  If the source and target layout are different ones, the whole cell tree of the source cell
+   *  will be copied.
+   *  This will create new cells in the target layout to accomodate the source cell tree.
+   *  Returns an array with the freshly created cells which acommodate the cell tree.
+   */
+  std::vector<db::cell_index_type> copy_tree (const db::Cell &source_cell);
+
+  /**
+   *  @brief Copies the instances from the source to this cell.
+   */
+  void copy_instances (const db::Cell &source_cell);
+
+  /**
+   *  @brief Copies all shapes from the source cell to this cell
+   */
+  void copy_shapes (const db::Cell &source_cell);
+
+  /**
+   *  @brief Copies all shapes from the source cell to this cell using the given layer mapping
+   */
+  void copy_shapes (const db::Cell &source_cell, const db::LayerMapping &layer_mapping);
+
+  /**
+   *  @brief Moves the shapes from the source cell's tree to this cell
+   *
+   *  This variant uses the given cell mapping and layer mapping.
+   */
+  void move_tree_shapes (db::Cell &source_cell, const db::CellMapping &cm);
+
+  /**
+   *  @brief Moves the shapes from the source cell's tree to this cell
+   *
+   *  This variant uses the given cell mapping and layer mapping.
+   */
+  void move_tree_shapes (db::Cell &source_cell, const db::CellMapping &cm, const db::LayerMapping &lm);
+
+  /**
+   *  @brief Moves instances and shapes from the source cell to this cell
+   *
+   *  If the source and target layout are different ones, the whole cell tree of the source cell
+   *  will be copied.
+   *  This will create new cells in the target layout to accomodate the source cell tree.
+   *  Returns an array with the freshly created cells which acommodate the cell tree.
+   */
+  std::vector<db::cell_index_type> move_tree (db::Cell &source_cell);
+
+  /**
+   *  @brief Moves the instances from the source to this cell.
+   */
+  void move_instances (db::Cell &source_cell);
+
+  /**
+   *  @brief Moves all shapes from the source cell to this cell
+   */
+  void move_shapes (db::Cell &source_cell);
+
+  /**
+   *  @brief Moves all shapes from the source cell to this cell using the given layer mapping
+   */
+  void move_shapes (db::Cell &source_cell, const db::LayerMapping &layer_mapping);
 
 protected:
   /**

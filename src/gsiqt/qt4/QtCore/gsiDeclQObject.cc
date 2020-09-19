@@ -746,6 +746,7 @@ static gsi::Methods methods_QObject () {
   methods += new qt_gsi::GenericMethod ("signalsBlocked", "@brief Method bool QObject::signalsBlocked()\n", true, &_init_f_signalsBlocked_c0, &_call_f_signalsBlocked_c0);
   methods += new qt_gsi::GenericMethod ("startTimer", "@brief Method int QObject::startTimer(int interval)\n", false, &_init_f_startTimer_767, &_call_f_startTimer_767);
   methods += new qt_gsi::GenericMethod ("thread", "@brief Method QThread *QObject::thread()\n", true, &_init_f_thread_c0, &_call_f_thread_c0);
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QObject::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("connect", "@brief Static method bool QObject::connect(const QObject *sender, const char *signal, const QObject *receiver, const char *member, Qt::ConnectionType)\nThis method is static and can be called without an instance.", &_init_f_connect_9231, &_call_f_connect_9231);
   methods += new qt_gsi::GenericStaticMethod ("disconnect", "@brief Static method bool QObject::disconnect(const QObject *sender, const char *signal, const QObject *receiver, const char *member)\nThis method is static and can be called without an instance.", &_init_f_disconnect_7132, &_call_f_disconnect_7132);
   methods += new qt_gsi::GenericStaticMethod ("registerUserData", "@brief Static method unsigned int QObject::registerUserData()\nThis method is static and can be called without an instance.", &_init_f_registerUserData_0, &_call_f_registerUserData_0);
@@ -783,11 +784,6 @@ public:
   QObject_Adaptor(QObject *parent) : QObject(parent)
   {
     qt_gsi::QtObjectBase::init (this);
-  }
-
-  //  [expose] void QObject::destroyed(QObject *)
-  void fp_QObject_destroyed_1302 (QObject *arg1) {
-    QObject::destroyed(arg1);
   }
 
   //  [expose] int QObject::receivers(const char *signal)
@@ -858,6 +854,12 @@ public:
     } else {
       QObject::customEvent(arg1);
     }
+  }
+
+  //  [emitter impl] void QObject::destroyed(QObject *)
+  void emitter_QObject_destroyed_1302(QObject *arg1)
+  {
+    emit QObject::destroyed(arg1);
   }
 
   //  [adaptor impl] void QObject::disconnectNotify(const char *signal)
@@ -966,22 +968,21 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
-// exposed void QObject::destroyed(QObject *)
+// emitter void QObject::destroyed(QObject *)
 
-static void _init_fp_destroyed_1302 (qt_gsi::GenericMethod *decl)
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_fp_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QObject_Adaptor *)cls)->fp_QObject_destroyed_1302 (arg1);
+  ((QObject_Adaptor *)cls)->emitter_QObject_destroyed_1302 (arg1);
 }
 
 
@@ -1126,7 +1127,7 @@ static gsi::Methods methods_QObject_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QObject::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*destroyed", "@brief Method void QObject::destroyed(QObject *)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroyed_1302, &_call_fp_destroyed_1302);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QObject::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QObject::disconnectNotify(const char *signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_1731_0, &_call_cbs_disconnectNotify_1731_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_1731_0, &_call_cbs_disconnectNotify_1731_0, &_set_callback_cbs_disconnectNotify_1731_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QObject::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);

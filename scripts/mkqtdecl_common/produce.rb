@@ -1032,6 +1032,9 @@ class Configurator
     if cls != :all_classes && cls !~ /^Q\w+$/
       # don't consider classes which are not plain Qt classes (i.e. templates, internal ones etc.)
       return true
+    elsif cls != :all_classes && cls =~ /^QPrivateSignal$/
+      # drop QPrivateSignal because that's just a marker
+      return true
     else
       dc = (@dropped_classes[:all_classes] || []) + (@dropped_classes[cls] || [])
       if sig != :whole_class
@@ -2052,12 +2055,18 @@ END
             next
           end
 
-          sig = bd.sig(cls)
-          func = bd.type.func
+          if conf.event_args(cls, bd.sig(cls))
 
-          if conf.event_args(cls, sig)
+            # strip QPrivateSignal argument if present
+            bd_short = bd.dup
+            func = bd_short.type.func
+            if func.args.size > 0 && func.args[-1].anonymous_type.to_s =~ /QPrivateSignal/
+              func.args.pop
+            end
+              
+            sig = bd_short.sig(cls)
 
-            hk = bd.hash_str
+            hk = bd_short.hash_str
             n_args = func.max_args
             argnames = n_args.times.collect { |ia| (func.args[ia].name || "arg#{ia + 1}") }
             ant      = n_args.times.collect { |ia| func.args[ia].anonymous_type }
@@ -2484,6 +2493,18 @@ END
 
             if is_qobject && conf.event_args(cls, sig) && bd.storage_class != :static && rt.is_void?
 
+              # if the last argument is a QPrivateSignal we cannot emit
+
+              is_private = false
+              bd_short = bd.dup
+              func = bd_short.type.func
+              if func.args.size > 0 && func.args[-1].anonymous_type.to_s =~ /QPrivateSignal/
+                func.args.pop
+                is_private = true
+              end
+
+              sig = bd_short.sig(cls)
+
               # for events produce an emitter function
 
               i_var = func.max_args - func.min_args   # for backward compatibility
@@ -2499,8 +2520,15 @@ END
               ofile.puts("  //  [emitter impl] #{sig}")
               ofile.puts("  #{rt.to_s} emitter_#{clsn}_#{mn}_#{hk}(#{raw_args})")
               ofile.puts("  {")
-              ofile.puts("    emit #{cls}::#{mid}(#{call_args});");
-              ofile.puts("  }");
+              if is_private
+                argnames.each do |a|
+                  ofile.puts("    __SUPPRESS_UNUSED_WARNING (#{a});")
+                end
+                ofile.puts("    throw tl::Exception (\"Can't emit private signal '#{sig}'\");")
+              else
+                ofile.puts("    emit #{cls}::#{mid}(#{call_args});")
+              end
+              ofile.puts("  }")
 
             elsif bd.virtual
 
@@ -2663,6 +2691,14 @@ END
 
             # for events produce the emitter
 
+            bd_short = bd.dup
+            func = bd_short.type.func
+            if func.args.size > 0 && func.args[-1].anonymous_type.to_s =~ /QPrivateSignal/
+              func.args.pop
+            end
+
+            sig = bd_short.sig(cls)
+
             n_args = func.max_args
             n_min_args = func.min_args
 
@@ -2676,20 +2712,20 @@ END
             ofile.puts("static void _init_emitter_#{mn}_#{hk} (qt_gsi::#{ifc_obj} *decl)")
             ofile.puts("{")
             produce_arg_init(ofile, decl_obj, func)
-            rpf = (conf.returns_new(bd) ? "_new" : "")
+            rpf = (conf.returns_new(bd_short) ? "_new" : "")
             ofile.puts("  decl->set_return#{rpf}<#{rt.gsi_decl_return(decl_obj)} > ();")
             ofile.puts("}")
             ofile.puts("")
             ofile.puts("static void _call_emitter_#{mn}_#{hk} (const qt_gsi::#{ifc_obj} * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) ")
             ofile.puts("{")
             ofile.puts("  __SUPPRESS_UNUSED_WARNING(args);")
-            produce_arg_read(ofile, decl_obj, func, alist, conf.kept_args(bd))
+            produce_arg_read(ofile, decl_obj, func, alist, conf.kept_args(bd_short))
             ofile.puts("  ((#{clsn}_Adaptor *)cls)->emitter_#{clsn}_#{mn}_#{hk} (#{alist.join(', ')});")
             ofile.puts("}")
             ofile.puts("")
 
             const_flag = ""
-            if bd.storage_class != :static
+            if bd_short.storage_class != :static
               const_flag = ", " + const.to_s
             end
             mdecl << "new qt_gsi::#{ifc_obj} (\"emit_#{mn_name}\", \"@brief Emitter for signal #{sig}\\nCall this method to emit this signal.\"#{const_flag}, &_init_emitter_#{mn}_#{hk}, &_call_emitter_#{mn}_#{hk});"

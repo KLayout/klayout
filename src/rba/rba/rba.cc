@@ -1001,16 +1001,29 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
       static ID id_to_enum = rb_intern ("to_enum");
 
-      VALUE method_sym = ID2SYM (rb_intern (meth->primary_name ().c_str ()));
+      VALUE method_sym = ID2SYM (rb_intern2 (meth->primary_name ().c_str (), (long) meth->primary_name ().size ()));
 
       if (argc == 0) {
         ret = rba_funcall2_checked (self, id_to_enum, 1, &method_sym);
       } else {
+#if 0
+	//  this solution does not work on MSVC2017 for unknown reasons and 
+	//  makes the application segfault even without being called
         std::vector<VALUE> new_args;
         new_args.reserve (size_t (argc + 1));
         new_args.push_back (method_sym);
         new_args.insert (new_args.end (), argv, argv + argc);
         ret = rba_funcall2_checked (self, id_to_enum, argc + 1, new_args.begin ().operator-> ());
+#else
+	VALUE new_args[16];
+	tl_assert (argc + 1 <= sizeof(new_args) / sizeof(new_args[0]));
+	VALUE *a = &new_args[0];
+	*a++ = method_sym;
+	for (int i = 0; i < argc; ++i) {
+	  *a++ = argv[i];
+	}
+        ret = rba_funcall2_checked (self, id_to_enum, argc + 1, &new_args[0]);
+#endif
       }
 
     } else {

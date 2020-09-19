@@ -20,7 +20,6 @@
       Most servers expect this kind of encoding today. UTF password 
       characters are supported this way.
 
-* Bugfix: %GITHUB%/issues/493
 0.26.7          (2020-07-07):
 
 * Bugfix: %GITHUB%/issues/381 and more

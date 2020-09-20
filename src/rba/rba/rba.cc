@@ -1025,7 +1025,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
         ret = rba_funcall2_checked (self, id_to_enum, argc + 1, new_args.begin ().operator-> ());
 #else
 	VALUE new_args[16];
-	tl_assert (argc + 1 <= sizeof(new_args) / sizeof(new_args[0]));
+	tl_assert (argc + 1 <= int (sizeof(new_args) / sizeof(new_args[0])));
 	VALUE *a = &new_args[0];
 	*a++ = method_sym;
 	for (int i = 0; i < argc; ++i) {

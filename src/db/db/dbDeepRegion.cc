@@ -1962,7 +1962,7 @@ class InteractingWithTextLocalOperation
 {
 public:
   InteractingWithTextLocalOperation (bool inverse, size_t min_count, size_t max_count)
-    : m_inverse (inverse), m_min_count (min_count), m_max_count (max_count)
+    : m_inverse (inverse), m_min_count (std::max (size_t (1), min_count)), m_max_count (max_count)
   {
     //  .. nothing yet ..
   }

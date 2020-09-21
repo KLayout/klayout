@@ -1946,21 +1946,16 @@ CODE
       # In tiled mode, there are no modifying versions. Emulate using the non-modifying one.
       eval <<"CODE"
       def #{f}(other, *args)
-        if :#{fi} != :interacting && :#{fi} != :not_interacting 
-          requires_edges_or_region("#{f}")
-          requires_same_type(other, "#{f}")
+        requires_edges_texts_or_region("#{f}")
+        if self.data.is_a?(RBA::Text)
+          other.requires_region("#{f}")
+        elsif self.data.is_a?(RBA::Region)
+          other.requires_edges_texts_or_region("#{f}")
         else
-          requires_edges_texts_or_region("#{f}")
-          if self.data.is_a?(RBA::Text)
-            other.requires_region("#{f}")
-          elsif self.data.is_a?(RBA::Region)
-            other.requires_edges_texts_or_region("#{f}")
-          else
-            other.requires_edges_or_region("#{f}")
-          end
+          other.requires_edges_or_region("#{f}")
         end
         if @engine.is_tiled?
-          self.data = @engine._tcmd(self.data, 0, self.data.class, :#{fi}, other.data, *minmax_count(:#{f}, *args))
+          self.data = @engine._tcmd(self.data, 0, self.data.class, :#{fi}, other.data, *minmax_count(:#{fi}, *args))
           DRCLayer::new(@engine, self.data)
         else
           DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data, *minmax_count(:#{f}, *args)))
@@ -1974,19 +1969,8 @@ CODE
       # In tiled mode, there are no modifying versions. Emulate using the non-modifying one.
       eval <<"CODE"
       def #{f}(other)
-        if :#{fi} != :interacting && :#{fi} != :not_interacting 
-          requires_edges_or_region("#{f}")
-          requires_same_type(other, "#{f}")
-        else
-          requires_edges_texts_or_region("#{f}")
-          if self.data.is_a?(RBA::Text)
-            other.requires_region("#{f}")
-          elsif self.data.is_a?(RBA::Region)
-            other.requires_edges_texts_or_region("#{f}")
-          else
-            other.requires_edges_or_region("#{f}")
-          end
-        end
+        requires_edges_or_region("#{f}")
+        requires_same_type(other, "#{f}")
         if @engine.is_tiled?
           self.data = @engine._tcmd(self.data, 0, self.data.class, :#{fi}, other.data)
           DRCLayer::new(@engine, self.data)

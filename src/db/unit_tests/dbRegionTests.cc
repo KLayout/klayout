@@ -1336,7 +1336,7 @@ TEST(30a)
   r.set_merged_semantics (false);
   EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (20, 20), db::Point (30, 30)))).to_string (), "(0,0;0,200;100,200;100,0)");
   EXPECT_EQ (r.selected_not_interacting (db::Edges (db::Edge (db::Point (20, 20), db::Point (30, 30)))).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
-  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (-20, -20), db::Point (30, 30)))).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (-20, -20), db::Point (30, 30)))).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
   EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (-200, -200), db::Point (-190, -190)))).to_string (), "");
   db::Region rr = r;
   r.select_interacting (db::Edges (db::Edge (db::Point (-20, -20), db::Point (-10, -10))));
@@ -1365,7 +1365,7 @@ TEST(30b)
   r.set_merged_semantics (true);
   r.set_min_coherence (true);
   EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (20, 20), db::Point (30, 30)))).to_string (), "(0,0;0,200;100,200;100,0)");
-  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (-20, -20), db::Point (30, 30)))).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (-20, -20), db::Point (30, 30)))).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (-200, -200), db::Point (-190, -190)))).to_string (), "");
   r.select_interacting (db::Edges (db::Edge (db::Point (-20, -20), db::Point (-10, -10))));
   EXPECT_EQ (r.to_string (), "(-100,-100;-100,0;0,0;0,-100)");
@@ -1522,7 +1522,7 @@ TEST(34a)
   db::Texts tt;
   tt.insert (db::Text ("abc", db::Trans (db::Vector (30, 30))));
   tt.insert (db::Text ("xyz", db::Trans (db::Vector (-100, 0))));
-  EXPECT_EQ (r.selected_interacting (tt).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (tt).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
   EXPECT_EQ (r.selected_interacting (db::Texts (db::Text ("abc", db::Trans (db::Vector (300, 30))))).to_string (), "");
   db::Region rr = r;
   r.select_interacting (db::Texts (db::Text ("abc", db::Trans (db::Vector (-10, -10)))));
@@ -1554,7 +1554,7 @@ TEST(34b)
   db::Texts tt;
   tt.insert (db::Text ("abc", db::Trans (db::Vector (30, 30))));
   tt.insert (db::Text ("xyz", db::Trans (db::Vector (-100, 0))));
-  EXPECT_EQ (r.selected_interacting (tt).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (tt).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_interacting (db::Texts (db::Text ("abc", db::Trans (db::Vector (-190, -190))))).to_string (), "");
   r.select_interacting (db::Texts (db::Text ("abc", db::Trans (db::Vector (-10, -10)))));
   EXPECT_EQ (r.to_string (), "(-100,-100;-100,0;0,0;0,-100)");
@@ -1586,6 +1586,221 @@ TEST(34d)
   EXPECT_EQ (r.pull_interacting (db::Texts (db::Text ("abc", db::Trans (db::Vector (30, 30))))).to_string (), "('abc',r0 30,30)");
   EXPECT_EQ (r.pull_interacting (db::Texts (db::Text ("abc", db::Trans (db::Vector (0, 0))))).to_string (), "('abc',r0 0,0)");
   EXPECT_EQ (r.pull_interacting (db::Texts (db::Text ("abc", db::Trans (db::Vector (-190, -190))))).to_string (), "");
+}
+
+TEST(35a_interact_with_count_region)
+{
+  db::Region r;
+  r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
+  r.insert (db::Box (db::Point (-100, -100), db::Point (0, 0)));
+  r.set_merged_semantics (true);
+  r.set_min_coherence (false);
+
+  db::Region empty;
+
+  db::Region rr;
+  rr.insert (db::Box (db::Point (-10, -10), db::Point (10, 0)));
+  rr.insert (db::Box (db::Point (-10, 0), db::Point (10, 10)));
+  rr.insert (db::Box (db::Point (-110, -10), db::Point (-90, 10)));
+  rr.insert (db::Box (db::Point (-110, -210), db::Point (-90, -190)));
+  db::Region rr2 = rr;
+  rr.insert (db::Box (db::Point (90, -10), db::Point (110, 10)));
+  rr.insert (db::Box (db::Point (-110, -110), db::Point (-90, -90)));
+
+  EXPECT_EQ (r.selected_interacting (empty).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 0, 2).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 2).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 1).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 3, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 4, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 5, 5).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 2, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 4, 5).to_string (), "");
+
+  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 1).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 4, 5).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 5, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr2).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 1, 2).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 1, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 2, 5).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 4, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+
+  r.set_merged_semantics (false);
+
+  EXPECT_EQ (r.selected_interacting (empty).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 0, 2).to_string (), "(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 2).to_string (), "(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 4).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 4).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 1).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 3, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+
+  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 1).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "(0,0;0,200;100,200;100,0)");
+}
+
+TEST(35b_interact_with_count_edge)
+{
+  db::Region r;
+  r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
+  r.insert (db::Box (db::Point (-100, -100), db::Point (0, 0)));
+  r.set_merged_semantics (true);
+  r.set_min_coherence (false);
+
+  db::Region empty;
+
+  db::Edges rr;
+  rr.insert (db::Edge (db::Point (-10, -10), db::Point (0, 0)));
+  rr.insert (db::Edge (db::Point (0, 0), db::Point (10, 10)));
+  rr.insert (db::Edge (db::Point (-110, -10), db::Point (-90, 10)));
+  rr.insert (db::Edge (db::Point (-110, -210), db::Point (-90, -190)));
+  db::Edges rr2 = rr;
+  rr.insert (db::Edge (db::Point (90, -10), db::Point (110, 10)));
+  rr.insert (db::Edge (db::Point (-110, -110), db::Point (-90, -90)));
+
+  EXPECT_EQ (r.selected_interacting (empty).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 0, 2).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 2).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 1).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 3, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 4, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 5, 5).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 2, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 4, 5).to_string (), "");
+
+  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 1).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 4, 5).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 5, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr2).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 1, 2).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 1, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 2, 5).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 4, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+
+  r.set_merged_semantics (false);
+
+  EXPECT_EQ (r.selected_interacting (empty).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 0, 2).to_string (), "(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 2).to_string (), "(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 1).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 3, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+
+  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 1).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "(0,0;0,200;100,200;100,0)");
+}
+
+TEST(35c_interact_with_count_text)
+{
+  db::Region r;
+  r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
+  r.insert (db::Box (db::Point (-100, -100), db::Point (0, 0)));
+  r.set_merged_semantics (true);
+  r.set_min_coherence (false);
+
+  db::Region empty;
+
+  db::Texts rr;
+  rr.insert (db::Text ("a", db::Trans (db::Vector (0, 0))));
+  rr.insert (db::Text ("b", db::Trans (db::Vector (-100, 0))));
+  rr.insert (db::Text ("c", db::Trans (db::Vector (-100, -200))));
+  db::Texts rr2 = rr;
+  rr.insert (db::Text ("x", db::Trans (db::Vector (100, 0))));
+  rr.insert (db::Text ("y", db::Trans (db::Vector (-100, -100))));
+
+  EXPECT_EQ (r.selected_interacting (empty).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 0, 2).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 2).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 1).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 3, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 4, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 5, 5).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 2, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 4, 5).to_string (), "");
+
+  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 1).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 4, 5).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 5, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr2).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 1, 2).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 1, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 2, 5).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 4, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+
+  r.set_merged_semantics (false);
+
+  EXPECT_EQ (r.selected_interacting (empty).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 0, 2).to_string (), "(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 2).to_string (), "(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 1).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 3, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+
+  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 1).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "(0,0;0,200;100,200;100,0)");
 }
 
 TEST(100_Processors)

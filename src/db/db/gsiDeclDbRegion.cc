@@ -1476,72 +1476,129 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
   ) + 
-  method ("interacting", (db::Region (db::Region::*) (const db::Region &) const) &db::Region::selected_interacting, gsi::arg ("other"),
+  method ("interacting", (db::Region (db::Region::*) (const db::Region &, size_t, size_t) const) &db::Region::selected_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which overlap or touch polygons from the other region\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with (different) polygons of the other region to make the polygon selected. A polygon is "
+    "selected by this method if the number of polygons interacting with a polygon of this region is between min_count and max_count "
+    "(including max_count).\n"
     "\n"
     "@return A new region containing the polygons overlapping or touching polygons from the other region\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
-  ) + 
-  method ("not_interacting", (db::Region (db::Region::*) (const db::Region &) const) &db::Region::selected_not_interacting, gsi::arg ("other"),
+    "\n"
+    "The min_count and max_count arguments have been added in version 0.27.\n"
+  ) +
+  method ("not_interacting", (db::Region (db::Region::*) (const db::Region &, size_t, size_t) const) &db::Region::selected_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which do not overlap or touch polygons from the other region\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with (different) polygons of the other region to make the polygon not selected. A polygon is not "
+    "selected by this method if the number of polygons interacting with a polygon of this region is between min_count and max_count "
+    "(including max_count).\n"
     "\n"
     "@return A new region containing the polygons not overlapping or touching polygons from the other region\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
-  ) + 
-  method ("select_interacting", (db::Region &(db::Region::*) (const db::Region &)) &db::Region::select_interacting, gsi::arg ("other"),
+    "\n"
+    "The min_count and max_count arguments have been added in version 0.27.\n"
+  ) +
+  method ("select_interacting", (db::Region &(db::Region::*) (const db::Region &, size_t, size_t)) &db::Region::select_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons from this region which overlap or touch polygons from the other region\n"
     "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with (different) polygons of the other region to make the polygon selected. A polygon is "
+    "selected by this method if the number of polygons interacting with a polygon of this region is between min_count and max_count "
+    "(including max_count).\n"
+    "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
-  ) + 
-  method ("select_not_interacting", (db::Region &(db::Region::*) (const db::Region &)) &db::Region::select_not_interacting, gsi::arg ("other"),
+    "\n"
+    "The min_count and max_count arguments have been added in version 0.27.\n"
+  ) +
+  method ("select_not_interacting", (db::Region &(db::Region::*) (const db::Region &, size_t, size_t)) &db::Region::select_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons from this region which do not overlap or touch polygons from the other region\n"
     "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with (different) polygons of the other region to make the polygon not selected. A polygon is not "
+    "selected by this method if the number of polygons interacting with a polygon of this region is between min_count and max_count "
+    "(including max_count).\n"
+    "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
-  ) + 
-  method ("interacting", (db::Region (db::Region::*) (const db::Edges &) const) &db::Region::selected_interacting, gsi::arg ("other"),
+    "\n"
+    "The min_count and max_count arguments have been added in version 0.27.\n"
+  ) +
+  method ("interacting", (db::Region (db::Region::*) (const db::Edges &, size_t, size_t) const) &db::Region::selected_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which overlap or touch edges from the edge collection\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with edges of the edge collection to make the polygon selected. A polygon is "
+    "selected by this method if the number of edges interacting with the polygon is between min_count and max_count "
+    "(including max_count).\n"
     "\n"
     "@return A new region containing the polygons overlapping or touching edges from the edge collection\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
-    "This method has been introduced in version 0.25\n"
+    "This method has been introduced in version 0.25.\n"
+    "The min_count and max_count arguments have been added in version 0.27.\n"
   ) +
-  method ("not_interacting", (db::Region (db::Region::*) (const db::Edges &) const) &db::Region::selected_not_interacting, gsi::arg ("other"),
+  method ("not_interacting", (db::Region (db::Region::*) (const db::Edges &, size_t, size_t) const) &db::Region::selected_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which do not overlap or touch edges from the edge collection\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with edges of the edge collection to make the polygon not selected. A polygon is not "
+    "selected by this method if the number of edges interacting with the polygon is between min_count and max_count "
+    "(including max_count).\n"
     "\n"
     "@return A new region containing the polygons not overlapping or touching edges from the edge collection\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
     "This method has been introduced in version 0.25\n"
+    "The min_count and max_count arguments have been added in version 0.27.\n"
   ) +
-  method ("select_interacting", (db::Region &(db::Region::*) (const db::Edges &)) &db::Region::select_interacting, gsi::arg ("other"),
+  method ("select_interacting", (db::Region &(db::Region::*) (const db::Edges &, size_t, size_t)) &db::Region::select_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons from this region which overlap or touch edges from the edge collection\n"
     "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with edges of the edge collection to make the polygon selected. A polygon is "
+    "selected by this method if the number of edges interacting with the polygon is between min_count and max_count "
+    "(including max_count).\n"
+    "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
     "This method has been introduced in version 0.25\n"
+    "The min_count and max_count arguments have been added in version 0.27.\n"
   ) +
-  method ("select_not_interacting", (db::Region &(db::Region::*) (const db::Edges &)) &db::Region::select_not_interacting, gsi::arg ("other"),
+  method ("select_not_interacting", (db::Region &(db::Region::*) (const db::Edges &, size_t, size_t)) &db::Region::select_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons from this region which do not overlap or touch edges from the edge collection\n"
     "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with edges of the edge collection to make the polygon not selected. A polygon is not "
+    "selected by this method if the number of edges interacting with the polygon is between min_count and max_count "
+    "(including max_count).\n"
+    "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
     "This method has been introduced in version 0.25\n"
+    "The min_count and max_count arguments have been added in version 0.27.\n"
   ) +
-  method ("interacting", (db::Region (db::Region::*) (const db::Texts &) const) &db::Region::selected_interacting, gsi::arg ("other"),
+  method ("interacting", (db::Region (db::Region::*) (const db::Texts &, size_t, size_t) const) &db::Region::selected_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which overlap or touch texts\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with texts of the text collection to make the polygon selected. A polygon is "
+    "selected by this method if the number of texts interacting with the polygon is between min_count and max_count "
+    "(including max_count).\n"
     "\n"
     "@return A new region containing the polygons overlapping or touching texts\n"
     "\n"
@@ -1549,8 +1606,13 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.27\n"
   ) +
-  method ("not_interacting", (db::Region (db::Region::*) (const db::Texts &) const) &db::Region::selected_not_interacting, gsi::arg ("other"),
+  method ("not_interacting", (db::Region (db::Region::*) (const db::Texts &, size_t, size_t) const) &db::Region::selected_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which do not overlap or touch texts\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with texts of the text collection to make the polygon not selected. A polygon is not "
+    "selected by this method if the number of texts interacting with the polygon is between min_count and max_count "
+    "(including max_count).\n"
     "\n"
     "@return A new region containing the polygons not overlapping or touching texts\n"
     "\n"
@@ -1558,17 +1620,27 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.27\n"
   ) +
-  method ("select_interacting", (db::Region &(db::Region::*) (const db::Texts &)) &db::Region::select_interacting, gsi::arg ("other"),
+  method ("select_interacting", (db::Region &(db::Region::*) (const db::Texts &, size_t, size_t)) &db::Region::select_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons of this region which overlap or touch texts\n"
     "\n"
     "@return The region after the polygons have been selected (self)\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with texts of the text collection to make the polygon selected. A polygon is "
+    "selected by this method if the number of texts interacting with the polygon is between min_count and max_count "
+    "(including max_count).\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
     "This method has been introduced in version 0.27\n"
   ) +
-  method ("select_not_interacting", (db::Region &(db::Region::*) (const db::Texts &)) &db::Region::select_not_interacting, gsi::arg ("other"),
+  method ("select_not_interacting", (db::Region &(db::Region::*) (const db::Texts &, size_t, size_t)) &db::Region::select_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons of this region which do not overlap or touch texts\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with texts of the text collection to make the polygon not selected. A polygon is not "
+    "selected by this method if the number of texts interacting with the polygon is between min_count and max_count "
+    "(including max_count).\n"
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"

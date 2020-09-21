@@ -1251,22 +1251,30 @@ public:
   /**
    *  @brief Selects all polygons of this region which overlap or touch polygons from the other region
    *
+   *  The argument (if given) specifies and range of interaction counts: polygons will only be selected
+   *  if the number of interacting (different) polygons from the other region is between min_count and
+   *  max_count (inclusive).
+   *
    *  Merged semantics applies.
    */
-  Region &select_interacting (const Region &other)
+  Region &select_interacting (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
   {
-    set_delegate (mp_delegate->selected_interacting (other));
+    set_delegate (mp_delegate->selected_interacting (other, min_count, max_count));
     return *this;
   }
 
   /**
    *  @brief Selects all polygons of this region which do not overlap or touch polygons from the other region
    *
+   *  The argument (if given) specifies and range of interaction counts: polygons will not be selected
+   *  if the number of interacting (different) polygons from the other region is between min_count and
+   *  max_count (inclusive).
+   *
    *  Merged semantics applies.
    */
-  Region &select_not_interacting (const Region &other)
+  Region &select_not_interacting (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
   {
-    set_delegate (mp_delegate->selected_not_interacting (other));
+    set_delegate (mp_delegate->selected_not_interacting (other, min_count, max_count));
     return *this;
   }
 
@@ -1277,9 +1285,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  Region selected_interacting (const Region &other) const
+  Region selected_interacting (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
   {
-    return Region (mp_delegate->selected_interacting (other));
+    return Region (mp_delegate->selected_interacting (other, min_count, max_count));
   }
 
   /**
@@ -1289,9 +1297,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  Region selected_not_interacting (const Region &other) const
+  Region selected_not_interacting (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
   {
-    return Region (mp_delegate->selected_not_interacting (other));
+    return Region (mp_delegate->selected_not_interacting (other, min_count, max_count));
   }
 
   /**
@@ -1299,9 +1307,9 @@ public:
    *
    *  Merged semantics applies to both operators.
    */
-  Region &select_interacting (const Edges &other)
+  Region &select_interacting (const Edges &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
   {
-    set_delegate (mp_delegate->selected_interacting (other));
+    set_delegate (mp_delegate->selected_interacting (other, min_count, max_count));
     return *this;
   }
 
@@ -1310,9 +1318,9 @@ public:
    *
    *  Merged semantics applies to both operators.
    */
-  Region &select_not_interacting (const Edges &other)
+  Region &select_not_interacting (const Edges &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
   {
-    set_delegate (mp_delegate->selected_not_interacting (other));
+    set_delegate (mp_delegate->selected_not_interacting (other, min_count, max_count));
     return *this;
   }
 
@@ -1323,9 +1331,9 @@ public:
    *
    *  Merged semantics applies to both operators.
    */
-  Region selected_interacting (const Edges &other) const
+  Region selected_interacting (const Edges &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
   {
-    return Region (mp_delegate->selected_interacting (other));
+    return Region (mp_delegate->selected_interacting (other, min_count, max_count));
   }
 
   /**
@@ -1335,9 +1343,9 @@ public:
    *
    *  Merged semantics applies to both operators.
    */
-  Region selected_not_interacting (const Edges &other) const
+  Region selected_not_interacting (const Edges &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
   {
-    return Region (mp_delegate->selected_not_interacting (other));
+    return Region (mp_delegate->selected_not_interacting (other, min_count, max_count));
   }
 
   /**
@@ -1345,9 +1353,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  Region &select_interacting (const Texts &other)
+  Region &select_interacting (const Texts &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
   {
-    set_delegate (mp_delegate->selected_interacting (other));
+    set_delegate (mp_delegate->selected_interacting (other, min_count, max_count));
     return *this;
   }
 
@@ -1356,9 +1364,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  Region &select_not_interacting (const Texts &other)
+  Region &select_not_interacting (const Texts &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
   {
-    set_delegate (mp_delegate->selected_not_interacting (other));
+    set_delegate (mp_delegate->selected_not_interacting (other, min_count, max_count));
     return *this;
   }
 
@@ -1369,9 +1377,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  Region selected_interacting (const Texts &other) const
+  Region selected_interacting (const Texts &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
   {
-    return Region (mp_delegate->selected_interacting (other));
+    return Region (mp_delegate->selected_interacting (other, min_count, max_count));
   }
 
   /**
@@ -1381,9 +1389,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  Region selected_not_interacting (const Texts &other) const
+  Region selected_not_interacting (const Texts &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
   {
-    return Region (mp_delegate->selected_not_interacting (other));
+    return Region (mp_delegate->selected_not_interacting (other, min_count, max_count));
   }
 
   /**

@@ -1673,6 +1673,9 @@ CODE
     # @name interacting
     # @brief Selects shapes or regions of self which touch or overlap shapes from the other region
     # @synopsis layer.interacting(other)
+    # @synopsis layer.interacting(other, count)
+    # @synopsis layer.interacting(other, min_count, max_count)
+    # @synopsis layer.interacting(other, min_count .. max_count)
     # This method selects all shapes or regions from self which touch or overlap shapes from the other
     # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
@@ -1690,11 +1693,25 @@ CODE
     #     @td @img(/images/drc_interacting.png) @/td
     #   @/tr
     # @/table
+    #
+    # If a single count is given, shapes from self are selected only if they do interact with the given
+    # number of (different) shapes from the other layer. If a min and max count is given, shapes from  
+    # self are selected only if they interact with min_count or more, but a maximum of max_count different shapes
+    # from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_interacting2.png) @/td
+    #   @/tr
+    # @/table
     
     # %DRC%
     # @name not_interacting
     # @brief Selects shapes or regions of self which do not touch or overlap shapes from the other region
     # @synopsis layer.not_interacting(other)
+    # @synopsis layer.not_interacting(other, count)
+    # @synopsis layer.not_interacting(other, min_count, max_count)
+    # @synopsis layer.not_interacting(other, min_count .. max_count)
     # This method selects all shapes or regions from self which do not touch or overlap shapes from the other
     # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
@@ -1712,13 +1729,27 @@ CODE
     #     @td @img(/images/drc_not_interacting.png) @/td
     #   @/tr
     # @/table
+    #
+    # If a single count is given, shapes from self are selected only if they do not interact with the given
+    # number of (different) shapes from the other layer. If a min and max count is given, shapes from  
+    # self are selected only if they interact with less than min_count or more than max_count different shapes
+    # from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_not_interacting2.png) @/td
+    #   @/tr
+    # @/table
     
     # %DRC%
     # @name select_interacting
     # @brief Selects shapes or regions of self which touch or overlap shapes from the other region
     # @synopsis layer.select_interacting(other)
+    # @synopsis layer.select_interacting(other, count)
+    # @synopsis layer.select_interacting(other, min_count, max_count)
+    # @synopsis layer.select_interacting(other, min_count .. max_count)
     # This method selects all shapes or regions from self which touch or overlap shapes from the other
-    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
+    # layer. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \interacting.
@@ -1726,13 +1757,21 @@ CODE
     # This method is available for polygon, text and edge layers. Edges can be selected
     # with respect to other edges or polygons. Texts can be selected with respect to 
     # polygons. Polygons can be selected with respect to edges, texts and other polygons.
+    #
+    # If a single count is given, shapes from self are selected only if they do interact with the given
+    # number of (different) shapes from the other layer. If a min and max count is given, shapes from  
+    # self are selected only if they interact with min_count or more, but a maximum of max_count different shapes
+    # from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
     
     # %DRC%
     # @name select_not_interacting
     # @brief Selects shapes or regions of self which do not touch or overlap shapes from the other region
-    # @synopsis layer.select_interacting(other)
+    # @synopsis layer.select_not_interacting(other)
+    # @synopsis layer.select_not_interacting(other, count)
+    # @synopsis layer.select_not_interacting(other, min_count, max_count)
+    # @synopsis layer.select_not_interacting(other, min_count .. max_count)
     # This method selects all shapes or regions from self which do not touch or overlap shapes from the other
-    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
+    # layer. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \not_interacting.
@@ -1740,6 +1779,11 @@ CODE
     # This method is available for polygon, text and edge layers. Edges can be selected
     # with respect to other edges or polygons. Texts can be selected with respect to 
     # polygons. Polygons can be selected with respect to edges, texts and other polygons.
+    #
+    # If a single count is given, shapes from self are selected only if they do not interact with the given
+    # number of (different) shapes from the other layer. If a min and max count is given, shapes from  
+    # self are selected only if they interact with less than min_count or more than max_count different shapes
+    # from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
     
     # %DRC%
     # @name intersections
@@ -1883,7 +1927,7 @@ CODE
 
     %w(interacting not_interacting).each do |f| 
       eval <<"CODE"
-      def #{f}(other)
+      def #{f}(other, *args)
         other.requires_edges_texts_or_region("#{f}")
         if self.data.is_a?(RBA::Text)
           other.requires_region("#{f}")
@@ -1892,12 +1936,40 @@ CODE
         else
           other.requires_edges_or_region("#{f}")
         end
-        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data, *minmax_count(:#{f}, *args)))
       end
 CODE
     end
 
-    %w(interacting not_interacting overlapping not_overlapping inside not_inside outside not_outside).each do |fi|
+    %w(interacting not_interacting).each do |fi|
+      f = "select_" + fi
+      # In tiled mode, there are no modifying versions. Emulate using the non-modifying one.
+      eval <<"CODE"
+      def #{f}(other, *args)
+        if :#{fi} != :interacting && :#{fi} != :not_interacting 
+          requires_edges_or_region("#{f}")
+          requires_same_type(other, "#{f}")
+        else
+          requires_edges_texts_or_region("#{f}")
+          if self.data.is_a?(RBA::Text)
+            other.requires_region("#{f}")
+          elsif self.data.is_a?(RBA::Region)
+            other.requires_edges_texts_or_region("#{f}")
+          else
+            other.requires_edges_or_region("#{f}")
+          end
+        end
+        if @engine.is_tiled?
+          self.data = @engine._tcmd(self.data, 0, self.data.class, :#{fi}, other.data, *minmax_count(:#{f}, *args))
+          DRCLayer::new(@engine, self.data)
+        else
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data, *minmax_count(:#{f}, *args)))
+        end
+      end
+CODE
+    end
+    
+    %w(overlapping not_overlapping inside not_inside outside not_outside).each do |fi|
       f = "select_" + fi
       # In tiled mode, there are no modifying versions. Emulate using the non-modifying one.
       eval <<"CODE"
@@ -3237,6 +3309,42 @@ CODE
     
     def requires_same_type(other, f)
       self.data.class == other.data.class || raise("#{f}: Requires input of the same kind")
+    end
+
+    def minmax_count(f, *args)
+      if args.size == 0
+        return []
+      elsif args.size == 1
+        a = args[0]
+        if a.is_a?(Range)
+          if a.min.to_i <= 0
+            raise("#{f}: min_count argument must be a positive, non-zero number")
+          end
+          return [a.min.to_i, a.max.to_i]
+        elsif !a.is_a?(1.class)
+          raise("#{f}: count argument must be an integer number")
+        elsif a <= 0
+          raise("#{f}: count argument must be a positive, non-zero number")
+        else
+          return [a, a]
+        end
+      elsif args.size == 2
+        amin = args[0]
+        amax = args[1]
+        if !amin.is_a?(1.class)
+          raise("#{f}: min_count argument must be an integer number")
+        elsif !amax.is_a?(1.class)
+          raise("#{f}: max_count argument must be an integer number")
+        elsif amin <= 0
+          raise("#{f}: min_count argument must be a positive, non-zero number")
+        elsif amax < amin
+          raise("#{f}: max_count argument must be larger or equal to min_count")
+        else
+          return [amin, amax]
+        end
+      else
+        raise("#{f}: too many arguments")
+      end
     end
     
   private

@@ -36,11 +36,40 @@
 #include "dbBoxScanner.h"
 #include "dbClip.h"
 #include "dbPolygonTools.h"
+#include "dbHash.h"
 
 #include <sstream>
 
 namespace db
 {
+
+namespace {
+
+struct ResultCountingInserter
+{
+  typedef db::Polygon value_type;
+
+  ResultCountingInserter (std::unordered_map<const db::Polygon *, size_t, std::ptr_hash_from_value<db::Polygon> > &result)
+    : mp_result (&result)
+  {
+    //  .. nothing yet ..
+  }
+
+  void insert (const db::Polygon &p)
+  {
+    (*mp_result)[&p] += 1;
+  }
+
+  void init (const db::Polygon *p)
+  {
+    (*mp_result)[p] = 0;
+  }
+
+private:
+  std::unordered_map<const db::Polygon *, size_t, std::ptr_hash_from_value<db::Polygon> > *mp_result;
+};
+
+}
 
 // -------------------------------------------------------------------------------------------------------------
 //  AsIfFlagRegion implementation
@@ -339,9 +368,11 @@ AsIfFlatRegion::processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &f
 }
 
 RegionDelegate *
-AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse) const
+AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse, size_t min_count, size_t max_count) const
 {
-  if (other.empty ()) {
+  min_count = std::max (size_t (1), min_count);
+
+  if (max_count < min_count || other.empty ()) {
     if (! inverse) {
       return new EmptyRegion ();
     } else {
@@ -351,23 +382,28 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse) 
     return clone ();
   }
 
+  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+
+  std::unordered_map<const db::Polygon *, size_t, std::ptr_hash_from_value<db::Polygon> > counted_results;
+  ResultCountingInserter inserter (counted_results);
+
   db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve1 (size ());
   scanner.reserve2 (other.size ());
 
   std::auto_ptr<FlatRegion> output (new FlatRegion (false));
-  region_to_edge_interaction_filter<Shapes, db::Polygon> filter (output->raw_polygons (), inverse);
+  region_to_edge_interaction_filter<ResultCountingInserter, db::Polygon> filter (inserter, false, counting /*get all in counting mode*/);
 
   AddressablePolygonDelivery p (begin_merged (), has_valid_merged_polygons ());
 
   for ( ; ! p.at_end (); ++p) {
     scanner.insert1 (p.operator-> (), 0);
     if (inverse) {
-      filter.preset (p.operator-> ());
+      inserter.init (p.operator-> ());
     }
   }
 
-  AddressableEdgeDelivery e (other.addressable_edges ());
+  AddressableEdgeDelivery e (counting ? other.addressable_merged_edges () : other.addressable_edges ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert2 (e.operator-> (), 0);
@@ -375,17 +411,24 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse) 
 
   scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
 
-  if (inverse) {
-    filter.fill_output ();
+  //  select hits based on their count
+
+  for (std::unordered_map<const db::Polygon *, size_t, std::ptr_hash_from_value<db::Polygon> >::const_iterator r = counted_results.begin (); r != counted_results.end (); ++r) {
+    bool hit = r->second >= min_count && r->second <= max_count;
+    if (hit != inverse) {
+      output->insert (*r->first);
+    }
   }
 
   return output.release ();
 }
 
 RegionDelegate *
-AsIfFlatRegion::selected_interacting_generic (const Texts &other, bool inverse) const
+AsIfFlatRegion::selected_interacting_generic (const Texts &other, bool inverse, size_t min_count, size_t max_count) const
 {
-  if (other.empty ()) {
+  min_count = std::max (size_t (1), min_count);
+
+  if (max_count < min_count || other.empty ()) {
     if (! inverse) {
       return new EmptyRegion ();
     } else {
@@ -395,19 +438,23 @@ AsIfFlatRegion::selected_interacting_generic (const Texts &other, bool inverse) 
     return clone ();
   }
 
+  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+
+  std::unordered_map<const db::Polygon *, size_t, std::ptr_hash_from_value<db::Polygon> > counted_results;
+  ResultCountingInserter inserter (counted_results);
+
   db::box_scanner2<db::Polygon, size_t, db::Text, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve1 (size ());
   scanner.reserve2 (other.size ());
 
-  std::auto_ptr<FlatRegion> output (new FlatRegion (true));
-  region_to_text_interaction_filter<FlatRegion, db::Text> filter (*output, inverse);
+  region_to_text_interaction_filter<ResultCountingInserter, db::Text> filter (inserter, false, counting /*get all in counting mode*/);
 
   AddressablePolygonDelivery p (begin_merged (), has_valid_merged_polygons ());
 
   for ( ; ! p.at_end (); ++p) {
     scanner.insert1 (p.operator-> (), 0);
     if (inverse) {
-      filter.preset (p.operator-> ());
+      inserter.init (p.operator-> ());
     }
   }
 
@@ -419,23 +466,32 @@ AsIfFlatRegion::selected_interacting_generic (const Texts &other, bool inverse) 
 
   scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Text> ());
 
-  if (inverse) {
-    filter.fill_output ();
+  //  select hits based on their count
+
+  std::auto_ptr<FlatRegion> output (new FlatRegion (true));
+
+  for (std::unordered_map<const db::Polygon *, size_t, std::ptr_hash_from_value<db::Polygon> >::const_iterator r = counted_results.begin (); r != counted_results.end (); ++r) {
+    bool hit = r->second >= min_count && r->second <= max_count;
+    if (hit != inverse) {
+      output->insert (*r->first);
+    }
   }
 
   return output.release ();
 }
 
 RegionDelegate *
-AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const
+AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse, size_t min_count, size_t max_count) const
 {
+  min_count = std::max (size_t (1), min_count);
+
   db::EdgeProcessor ep (report_progress (), progress_desc ());
   ep.set_base_verbosity (base_verbosity ());
 
   //  shortcut
   if (empty ()) {
     return clone ();
-  } else if (other.empty ()) {
+  } else if (max_count < min_count || other.empty ()) {
     //  clear, if b is empty and
     //   * mode is inside or interacting and inverse is false ("inside" or "interacting")
     //   * mode is outside and inverse is true ("not outside")
@@ -446,13 +502,48 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
     }
   }
 
-  for (RegionIterator p = other.begin (); ! p.at_end (); ++p) {
-    if (p->box ().touches (bbox ())) {
-      ep.insert (*p, 0);
+  size_t nstart = 0;
+
+  if (min_count == size_t (1) && max_count == std::numeric_limits<size_t>::max ()) {
+
+    if (mode < 0) {
+
+      //  NOTE: on "inside", the other region must be merged
+      for (RegionIterator p = other.begin_merged (); ! p.at_end (); ++p) {
+        if (p->box ().touches (bbox ())) {
+          ep.insert (*p, nstart);
+        }
+      }
+
+    } else {
+
+      for (RegionIterator p = other.begin (); ! p.at_end (); ++p) {
+        if (p->box ().touches (bbox ())) {
+          ep.insert (*p, nstart);
+        }
+      }
+
     }
+
+    ++nstart;
+
+  } else {
+
+    //  with counting we need to separate the other polygons by different properties
+
+    //  can only have min_count/max_count in interact mode
+    tl_assert (mode == 0);
+
+    for (RegionIterator p = other.begin_merged (); ! p.at_end (); ++p) {
+      if (p->box ().touches (bbox ())) {
+        ep.insert (*p, nstart);
+      }
+      ++nstart;
+    }
+
   }
 
-  size_t n = 1;
+  size_t n = nstart;
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p, ++n) {
     if (mode > 0 || p->box ().touches (other.bbox ())) {
       ep.insert (*p, n);
@@ -467,19 +558,26 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
 
   std::auto_ptr<FlatRegion> output (new FlatRegion (false));
 
+  std::map <size_t, size_t> interaction_counts;
   n = 0;
-  std::set <size_t> selected;
-  for (db::InteractionDetector::iterator i = id.begin (); i != id.end () && i->first == 0; ++i) {
+  for (db::InteractionDetector::iterator i = id.begin (); i != id.end () ; ++i) {
     ++n;
-    selected.insert (i->second);
+    if (i->first < nstart && i->second >= nstart) {
+      interaction_counts [i->second] += 1;
+    }
   }
 
   output->reserve (n);
 
-  n = 1;
+  n = nstart;
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p, ++n) {
-    if ((selected.find (n) == selected.end ()) == inverse) {
-      output->raw_polygons ().insert (*p);
+    size_t count = 0;
+    std::map <size_t, size_t>::const_iterator c = interaction_counts.find (n);
+    if (c != interaction_counts.end ()) {
+      count = c->second;
+    }
+    if ((count >= min_count && count <= max_count) != inverse) {
+      output->insert (*p);
     }
   }
 

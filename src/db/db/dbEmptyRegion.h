@@ -105,12 +105,12 @@ public:
   virtual RegionDelegate *selected_not_outside (const Region &) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_inside (const Region &) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_not_inside (const Region &) const { return new EmptyRegion (); }
-  virtual RegionDelegate *selected_interacting (const Region &) const { return new EmptyRegion (); }
-  virtual RegionDelegate *selected_not_interacting (const Region &) const { return new EmptyRegion (); }
-  virtual RegionDelegate *selected_interacting (const Edges &) const { return new EmptyRegion (); }
-  virtual RegionDelegate *selected_not_interacting (const Edges &) const { return new EmptyRegion (); }
-  virtual RegionDelegate *selected_interacting (const Texts &) const { return new EmptyRegion (); }
-  virtual RegionDelegate *selected_not_interacting (const Texts &) const { return new EmptyRegion (); }
+  virtual RegionDelegate *selected_interacting (const Region &, size_t, size_t) const { return new EmptyRegion (); }
+  virtual RegionDelegate *selected_not_interacting (const Region &, size_t, size_t) const { return new EmptyRegion (); }
+  virtual RegionDelegate *selected_interacting (const Edges &, size_t, size_t) const { return new EmptyRegion (); }
+  virtual RegionDelegate *selected_not_interacting (const Edges &, size_t, size_t) const { return new EmptyRegion (); }
+  virtual RegionDelegate *selected_interacting (const Texts &, size_t, size_t) const { return new EmptyRegion (); }
+  virtual RegionDelegate *selected_not_interacting (const Texts &, size_t, size_t) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_overlapping (const Region &) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_not_overlapping (const Region &) const { return new EmptyRegion (); }
   virtual RegionDelegate *pull_inside (const Region &) const  { return new EmptyRegion (); }

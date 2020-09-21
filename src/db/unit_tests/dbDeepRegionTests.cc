@@ -1689,6 +1689,278 @@ TEST(29_InteractionsWithTexts)
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au29.gds");
 }
 
+TEST(30a_interact_with_count_region)
+{
+  db::DeepShapeStore dss;
+
+  db::Layout ly;
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));
+
+  db::Cell &top = ly.cell (ly.add_cell ("TOP"));
+  db::cell_index_type ci1 = ly.add_cell ("C1");
+  db::Cell &c1 = ly.cell (ci1);
+  db::cell_index_type ci2 = ly.add_cell ("C2");
+  db::Cell &c2 = ly.cell (ci2);
+  top.insert (db::CellInstArray (db::CellInst (ci1), db::Trans ()));
+  top.insert (db::CellInstArray (db::CellInst (ci2), db::Trans ()));
+
+  c1.shapes (l1).insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
+  c1.shapes (l1).insert (db::Box (db::Point (-100, -100), db::Point (0, 0)));
+
+  c2.shapes (l2).insert (db::Box (db::Point (-10, -10), db::Point (10, 0)));
+  c2.shapes (l2).insert (db::Box (db::Point (-10, 0), db::Point (10, 10)));
+  c2.shapes (l2).insert (db::Box (db::Point (-110, -10), db::Point (-90, 10)));
+  c2.shapes (l2).insert (db::Box (db::Point (-110, -210), db::Point (-90, -190)));
+
+  ly.copy_layer (l2, l3);
+  top.shapes (l2).insert (db::Box (db::Point (90, -10), db::Point (110, 10)));
+  top.shapes (l2).insert (db::Box (db::Point (-110, -110), db::Point (-90, -90)));
+
+  db::Region r (db::RecursiveShapeIterator (ly, top, l1), dss);
+  r.set_merged_semantics (true);
+  r.set_min_coherence (false);
+
+  db::Region empty;
+
+  db::Region rr (db::RecursiveShapeIterator (ly, top, l2), dss);
+  db::Region rr2 (db::RecursiveShapeIterator (ly, top, l3), dss);
+
+  EXPECT_EQ (r.selected_interacting (empty).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 0, 2).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 2).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 1).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 3, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 4, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 5, 5).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 2, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 4, 5).to_string (), "");
+
+  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 1).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 4, 5).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 5, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr2).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 1, 2).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 1, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 2, 5).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 4, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+
+  r.set_merged_semantics (false);
+
+  EXPECT_EQ (r.selected_interacting (empty).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 0, 2).to_string (), "(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 2).to_string (), "(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 4).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 4).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 1).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 3, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+
+  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 1).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "(0,0;0,200;100,200;100,0)");
+}
+
+TEST(30b_interact_with_count_edge)
+{
+  db::DeepShapeStore dss;
+
+  db::Layout ly;
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));
+
+  db::Cell &top = ly.cell (ly.add_cell ("TOP"));
+  db::cell_index_type ci1 = ly.add_cell ("C1");
+  db::Cell &c1 = ly.cell (ci1);
+  db::cell_index_type ci2 = ly.add_cell ("C2");
+  db::Cell &c2 = ly.cell (ci2);
+  top.insert (db::CellInstArray (db::CellInst (ci1), db::Trans ()));
+  top.insert (db::CellInstArray (db::CellInst (ci2), db::Trans ()));
+
+  c1.shapes (l1).insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
+  c1.shapes (l1).insert (db::Box (db::Point (-100, -100), db::Point (0, 0)));
+
+  c2.shapes (l2).insert (db::Edge (db::Point (-10, -10), db::Point (0, 0)));
+  c2.shapes (l2).insert (db::Edge (db::Point (0, 0), db::Point (10, 10)));
+  c2.shapes (l2).insert (db::Edge (db::Point (-110, -10), db::Point (-90, 10)));
+  c2.shapes (l2).insert (db::Edge (db::Point (-110, -210), db::Point (-90, -190)));
+
+  ly.copy_layer (l2, l3);
+  top.shapes (l2).insert (db::Edge (db::Point (90, -10), db::Point (110, 10)));
+  top.shapes (l2).insert (db::Edge (db::Point (-110, -110), db::Point (-90, -90)));
+
+  db::Region r (db::RecursiveShapeIterator (ly, top, l1), dss);
+  r.set_merged_semantics (true);
+  r.set_min_coherence (false);
+
+  db::Region empty;
+
+  db::Edges rr (db::RecursiveShapeIterator (ly, top, l2), dss);
+  db::Edges rr2 (db::RecursiveShapeIterator (ly, top, l3), dss);
+
+  EXPECT_EQ (r.selected_interacting (empty).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 0, 2).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 2).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 1).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 3, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 4, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 5, 5).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 2, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 4, 5).to_string (), "");
+
+  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 1).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 4, 5).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 5, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr2).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 1, 2).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 1, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 2, 5).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 4, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+
+  r.set_merged_semantics (false);
+
+  EXPECT_EQ (r.selected_interacting (empty).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 0, 2).to_string (), "(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 2).to_string (), "(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 1).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 3, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+
+  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 1).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "(0,0;0,200;100,200;100,0)");
+}
+
+TEST(30c_interact_with_count_text)
+{
+  db::DeepShapeStore dss;
+
+  db::Layout ly;
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));
+
+  db::Cell &top = ly.cell (ly.add_cell ("TOP"));
+  db::cell_index_type ci1 = ly.add_cell ("C1");
+  db::Cell &c1 = ly.cell (ci1);
+  db::cell_index_type ci2 = ly.add_cell ("C2");
+  db::Cell &c2 = ly.cell (ci2);
+  top.insert (db::CellInstArray (db::CellInst (ci1), db::Trans ()));
+  top.insert (db::CellInstArray (db::CellInst (ci2), db::Trans ()));
+
+  c1.shapes (l1).insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
+  c1.shapes (l1).insert (db::Box (db::Point (-100, -100), db::Point (0, 0)));
+
+  c2.shapes (l2).insert (db::Text ("a", db::Trans (db::Vector (0, 0))));
+  c2.shapes (l2).insert (db::Text ("b", db::Trans (db::Vector (-100, 0))));
+  c2.shapes (l2).insert (db::Text ("c", db::Trans (db::Vector (-100, -200))));
+
+  ly.copy_layer (l2, l3);
+  top.shapes (l2).insert (db::Text ("x", db::Trans (db::Vector (100, 0))));
+  top.shapes (l2).insert (db::Text ("y", db::Trans (db::Vector (-100, -100))));
+
+  db::Region r (db::RecursiveShapeIterator (ly, top, l1), dss);
+  r.set_merged_semantics (true);
+  r.set_min_coherence (false);
+
+  db::Region empty;
+
+  db::Texts rr (db::RecursiveShapeIterator (ly, top, l2), dss);
+  db::Texts rr2 (db::RecursiveShapeIterator (ly, top, l3), dss);
+
+  EXPECT_EQ (r.selected_interacting (empty).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 0, 2).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 2).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 1).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 3, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 4, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr, 5, 5).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 2, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (rr2, 4, 5).to_string (), "");
+
+  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 1).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 4, 5).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 5, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr2).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 1, 2).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 1, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 2, 5).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr2, 4, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+
+  r.set_merged_semantics (false);
+
+  EXPECT_EQ (r.selected_interacting (empty).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 0, 2).to_string (), "(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 2).to_string (), "(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr, 2, 1).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (rr, 3, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+
+  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 1, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 4).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr, 2, 1).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "(0,0;0,200;100,200;100,0)");
+}
+
 TEST(100_Integration)
 {
   db::Layout ly;

@@ -183,34 +183,34 @@ public:
     return selected_interacting_generic (other, -1, true, true);
   }
 
-  virtual RegionDelegate *selected_interacting (const Region &other) const
+  virtual RegionDelegate *selected_interacting (const Region &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, 0, true, false);
+    return selected_interacting_generic (other, 0, true, false, min_count, max_count);
   }
 
-  virtual RegionDelegate *selected_not_interacting (const Region &other) const
+  virtual RegionDelegate *selected_not_interacting (const Region &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, 0, true, true);
+    return selected_interacting_generic (other, 0, true, true, min_count, max_count);
   }
 
-  virtual RegionDelegate *selected_interacting (const Edges &other) const
+  virtual RegionDelegate *selected_interacting (const Edges &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, false);
+    return selected_interacting_generic (other, false, min_count, max_count);
   }
 
-  virtual RegionDelegate *selected_not_interacting (const Edges &other) const
+  virtual RegionDelegate *selected_not_interacting (const Edges &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, true);
+    return selected_interacting_generic (other, true, min_count, max_count);
   }
 
-  virtual RegionDelegate *selected_interacting (const Texts &other) const
+  virtual RegionDelegate *selected_interacting (const Texts &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, false);
+    return selected_interacting_generic (other, false, min_count, max_count);
   }
 
-  virtual RegionDelegate *selected_not_interacting (const Texts &other) const
+  virtual RegionDelegate *selected_not_interacting (const Texts &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, true);
+    return selected_interacting_generic (other, true, min_count, max_count);
   }
 
   virtual RegionDelegate *selected_overlapping (const Region &other) const
@@ -261,9 +261,9 @@ protected:
 
   EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const;
   EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const;
-  virtual RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const;
-  virtual RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse) const;
-  virtual RegionDelegate *selected_interacting_generic (const Texts &other, bool inverse) const;
+  virtual RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const;
+  virtual RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const;
+  virtual RegionDelegate *selected_interacting_generic (const Texts &other, bool inverse, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const;
   virtual RegionDelegate *pull_generic (const Region &other, int mode, bool touching) const;
   virtual EdgesDelegate *pull_generic (const Edges &other) const;
   virtual TextsDelegate *pull_generic (const Texts &other) const;

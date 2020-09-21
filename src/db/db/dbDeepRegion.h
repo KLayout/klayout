@@ -188,9 +188,9 @@ private:
   std::pair<DeepLayer, DeepLayer> and_and_not_with (const DeepRegion *other) const;
   EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const;
   EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const;
-  virtual RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const;
-  virtual RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse) const;
-  virtual RegionDelegate *selected_interacting_generic (const Texts &other, bool inverse) const;
+  virtual RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse, size_t min_count, size_t max_count) const;
+  virtual RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse, size_t min_count, size_t max_count) const;
+  virtual RegionDelegate *selected_interacting_generic (const Texts &other, bool inverse, size_t min_count, size_t max_count) const;
   virtual RegionDelegate *pull_generic (const Region &other, int mode, bool touching) const;
   virtual EdgesDelegate *pull_generic (const Edges &other) const;
   virtual TextsDelegate *pull_generic (const Texts &other) const;

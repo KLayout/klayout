@@ -443,6 +443,19 @@ namespace std
       return hf;
     }
   };
+
+  /**
+   *  @brief Create a pointer hash from the pointer's value
+   */
+  template <class X>
+  struct ptr_hash_from_value
+  {
+    size_t operator() (const X *ptr) const
+    {
+      return ptr ? hash<X> () (*ptr) : 0;
+    }
+  };
+
 }
 
 #endif

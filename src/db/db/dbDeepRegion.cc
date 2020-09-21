@@ -1487,8 +1487,8 @@ class InteractingLocalOperation
   : public local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>
 {
 public:
-  InteractingLocalOperation (int mode, bool touching, bool inverse)
-    : m_mode (mode), m_touching (touching), m_inverse (inverse)
+  InteractingLocalOperation (int mode, bool touching, bool inverse, size_t min_count, size_t max_count)
+    : m_mode (mode), m_touching (touching), m_inverse (inverse), m_min_count (std::max (size_t (1), min_count)), m_max_count (max_count)
   {
     //  .. nothing yet ..
   }
@@ -1512,17 +1512,35 @@ public:
       }
     }
 
-    size_t n = 1;
+    size_t nstart = 0;
+
+    if (m_min_count == size_t (1) && m_max_count == std::numeric_limits<size_t>::max ()) {
+
+      for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
+        for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
+          ep.insert (*e, nstart);
+        }
+      }
+      nstart++;
+
+    } else {
+
+      tl_assert (m_mode == 0);
+
+      for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
+        for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
+          ep.insert (*e, nstart);
+        }
+        nstart++;
+      }
+
+    }
+
+    size_t n = nstart;
     for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i, ++n) {
       const db::PolygonRef &subject = interactions.subject_shape (i->first);
       for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
         ep.insert (*e, n);
-      }
-    }
-
-    for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
-      for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
-        ep.insert (*e, 0);
       }
     }
 
@@ -1532,16 +1550,21 @@ public:
     ep.process (es, id);
     id.finish ();
 
-    n = 0;
-    std::set <size_t> selected;
-    for (db::InteractionDetector::iterator i = id.begin (); i != id.end () && i->first == 0; ++i) {
-      ++n;
-      selected.insert (i->second);
+    std::map <size_t, size_t> interaction_counts;
+    for (db::InteractionDetector::iterator i = id.begin (); i != id.end (); ++i) {
+      if (i->first < nstart && i->second >= nstart) {
+        interaction_counts[i->second] += 1;
+      }
     }
 
-    n = 1;
+    n = nstart;
     for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i, ++n) {
-      if ((selected.find (n) == selected.end ()) == m_inverse) {
+      size_t count = 0;
+      std::map <size_t, size_t>::const_iterator c = interaction_counts.find (n);
+      if (c != interaction_counts.end ()) {
+        count = c->second;
+      }
+      if ((count >= m_min_count && count <= m_max_count) != m_inverse) {
         const db::PolygonRef &subject = interactions.subject_shape (i->first);
         result.insert (subject);
       }
@@ -1566,6 +1589,7 @@ private:
   int m_mode;
   bool m_touching;
   bool m_inverse;
+  size_t m_min_count, m_max_count;
 };
 
 class PullLocalOperation
@@ -1617,10 +1641,8 @@ public:
     ep.process (es, id);
     id.finish ();
 
-    n = 0;
     std::set <size_t> selected;
     for (db::InteractionDetector::iterator i = id.begin (); i != id.end () && i->first == 0; ++i) {
-      ++n;
       selected.insert (i->second);
     }
 
@@ -1667,6 +1689,31 @@ private:
   std::unordered_set<db::PolygonRef> *mp_result;
 };
 
+struct ResultCountingInserter
+{
+  typedef db::Polygon value_type;
+
+  ResultCountingInserter (db::Layout *layout, std::unordered_map<db::PolygonRef, size_t> &result)
+    : mp_layout (layout), mp_result (&result)
+  {
+    //  .. nothing yet ..
+  }
+
+  void insert (const db::Polygon &p)
+  {
+    (*mp_result)[db::PolygonRef (p, mp_layout->shape_repository ())] += 1;
+  }
+
+  void init (const db::Polygon &p)
+  {
+    (*mp_result)[db::PolygonRef (p, mp_layout->shape_repository ())] = 0;
+  }
+
+private:
+  db::Layout *mp_layout;
+  std::unordered_map<db::PolygonRef, size_t> *mp_result;
+};
+
 struct EdgeResultInserter
 {
   typedef db::Edge value_type;
@@ -1690,8 +1737,8 @@ class InteractingWithEdgeLocalOperation
   : public local_operation<db::PolygonRef, db::Edge, db::PolygonRef>
 {
 public:
-  InteractingWithEdgeLocalOperation (bool inverse)
-    : m_inverse (inverse)
+  InteractingWithEdgeLocalOperation (bool inverse, size_t min_count, size_t max_count)
+    : m_inverse (inverse), m_min_count (std::max (size_t (1), min_count)), m_max_count (max_count)
   {
     //  .. nothing yet ..
   }
@@ -1704,18 +1751,23 @@ public:
 
   virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
-    tl_assert (results.size () == 1);
-    std::unordered_set<db::PolygonRef> &result = results.front ();
+    std::unordered_map<db::PolygonRef, size_t> counted_results;
+    bool counting = !(m_min_count == 1 && m_max_count == std::numeric_limits<size_t>::max ());
 
     db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> scanner;
 
-    ResultInserter inserter (layout, result);
-    region_to_edge_interaction_filter<ResultInserter> filter (inserter, m_inverse);
+    ResultCountingInserter inserter (layout, counted_results);
+    region_to_edge_interaction_filter<ResultCountingInserter> filter (inserter, false, counting /*get all in counting mode*/);
 
+    std::set<unsigned int> intruder_ids;
     for (shape_interactions<db::PolygonRef, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       for (shape_interactions<db::PolygonRef, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
+        intruder_ids.insert (*j);
       }
+    }
+
+    for (std::set<unsigned int>::const_iterator j = intruder_ids.begin (); j != intruder_ids.end (); ++j) {
+      scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
     }
 
     std::list<db::Polygon> heap;
@@ -1726,14 +1778,23 @@ public:
 
       scanner.insert1 (&heap.back (), 0);
       if (m_inverse) {
-        filter.preset (&heap.back ());
+        inserter.init (heap.back ());
       }
 
     }
 
     scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
-    if (m_inverse) {
-      filter.fill_output ();
+
+    //  select hits based on their count
+
+    tl_assert (results.size () == 1);
+    std::unordered_set<db::PolygonRef> &result = results.front ();
+
+    for (std::unordered_map<db::PolygonRef, size_t>::const_iterator r = counted_results.begin (); r != counted_results.end (); ++r) {
+      bool hit = r->second >= m_min_count && r->second <= m_max_count;
+      if (hit != m_inverse) {
+        result.insert (r->first);
+      }
     }
   }
 
@@ -1753,6 +1814,7 @@ public:
 
 private:
   bool m_inverse;
+  size_t m_min_count, m_max_count;
 };
 
 class PullWithEdgeLocalOperation
@@ -1860,6 +1922,17 @@ public:
       }
     }
 
+    std::set<unsigned int> intruder_ids;
+    for (shape_interactions<db::PolygonRef, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (shape_interactions<db::PolygonRef, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+        intruder_ids.insert (*j);
+      }
+    }
+
+    for (std::set<unsigned int>::const_iterator j = intruder_ids.begin (); j != intruder_ids.end (); ++j) {
+      scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
+    }
+
     std::list<db::Polygon> heap;
     for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
 
@@ -1888,8 +1961,8 @@ class InteractingWithTextLocalOperation
   : public local_operation<db::PolygonRef, db::TextRef, db::PolygonRef>
 {
 public:
-  InteractingWithTextLocalOperation (bool inverse)
-    : m_inverse (inverse)
+  InteractingWithTextLocalOperation (bool inverse, size_t min_count, size_t max_count)
+    : m_inverse (inverse), m_min_count (min_count), m_max_count (max_count)
   {
     //  .. nothing yet ..
   }
@@ -1902,18 +1975,23 @@ public:
 
   virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::TextRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
-    tl_assert (results.size () == 1);
-    std::unordered_set<db::PolygonRef> &result = results.front ();
+    std::unordered_map<db::PolygonRef, size_t> counted_results;
+    bool counting = !(m_min_count == 1 && m_max_count == std::numeric_limits<size_t>::max ());
 
     db::box_scanner2<db::Polygon, size_t, db::TextRef, size_t> scanner;
 
-    ResultInserter inserter (layout, result);
-    region_to_text_interaction_filter<ResultInserter, db::TextRef> filter (inserter, m_inverse);
+    ResultCountingInserter inserter (layout, counted_results);
+    region_to_text_interaction_filter<ResultCountingInserter, db::TextRef> filter (inserter, false, counting /*get all in counting mode*/);
 
-    for (shape_interactions<db::PolygonRef, db::Text>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      for (shape_interactions<db::PolygonRef, db::Text>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
+    std::set<unsigned int> intruder_ids;
+    for (shape_interactions<db::PolygonRef, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (shape_interactions<db::PolygonRef, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+        intruder_ids.insert (*j);
       }
+    }
+
+    for (std::set<unsigned int>::const_iterator j = intruder_ids.begin (); j != intruder_ids.end (); ++j) {
+      scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
     }
 
     std::list<db::Polygon> heap;
@@ -1924,14 +2002,23 @@ public:
 
       scanner.insert1 (&heap.back (), 0);
       if (m_inverse) {
-        filter.preset (&heap.back ());
+        inserter.init (heap.back ());
       }
 
     }
 
     scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::TextRef> ());
-    if (m_inverse) {
-      filter.fill_output ();
+
+    //  select hits based on their count
+
+    tl_assert (results.size () == 1);
+    std::unordered_set<db::PolygonRef> &result = results.front ();
+
+    for (std::unordered_map<db::PolygonRef, size_t>::const_iterator r = counted_results.begin (); r != counted_results.end (); ++r) {
+      bool hit = r->second >= m_min_count && r->second <= m_max_count;
+      if (hit != m_inverse) {
+        result.insert (r->first);
+      }
     }
   }
 
@@ -1951,13 +2038,16 @@ public:
 
 private:
   bool m_inverse;
+  size_t m_min_count, m_max_count;
 };
 
 }
 
 RegionDelegate *
-DeepRegion::selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const
+DeepRegion::selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse, size_t min_count, size_t max_count) const
 {
+  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+
   //  with these flag set to true, the resulting polygons are broken again.
   bool split_after = false;
 
@@ -1970,12 +2060,12 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
   }
 
   const db::DeepLayer &polygons = merged_deep_layer ();
-  //  NOTE: on "inside", the other polygons must be merged
-  const db::DeepLayer &other_polygons = mode < 0 ? other_deep->merged_deep_layer () : other_deep->deep_layer ();
+  //  NOTE: on "inside" or with counting, the other polygons must be merged
+  const db::DeepLayer &other_polygons = (mode < 0 || counting) ? other_deep->merged_deep_layer () : other_deep->deep_layer ();
 
   DeepLayer dl_out (polygons.derived ());
 
-  db::InteractingLocalOperation op (mode, touching, inverse);
+  db::InteractingLocalOperation op (mode, touching, inverse, min_count, max_count);
 
   db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell (), polygons.breakout_cells (), other_polygons.breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
@@ -1995,8 +2085,10 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
 }
 
 RegionDelegate *
-DeepRegion::selected_interacting_generic (const Edges &other, bool inverse) const
+DeepRegion::selected_interacting_generic (const Edges &other, bool inverse, size_t min_count, size_t max_count) const
 {
+  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+
   //  with these flag set to true, the resulting polygons are broken again.
   bool split_after = false;
 
@@ -2012,7 +2104,7 @@ DeepRegion::selected_interacting_generic (const Edges &other, bool inverse) cons
 
   DeepLayer dl_out (polygons.derived ());
 
-  db::InteractingWithEdgeLocalOperation op (inverse);
+  db::InteractingWithEdgeLocalOperation op (inverse, min_count, max_count);
 
   db::local_processor<db::PolygonRef, db::Edge, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), polygons.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
@@ -2022,7 +2114,7 @@ DeepRegion::selected_interacting_generic (const Edges &other, bool inverse) cons
     proc.set_max_vertex_count (polygons.store ()->max_vertex_count ());
   }
 
-  proc.run (&op, polygons.layer (), other_deep->deep_layer ().layer (), dl_out.layer ());
+  proc.run (&op, polygons.layer (), counting ? other_deep->merged_deep_layer ().layer () : other_deep->deep_layer ().layer (), dl_out.layer ());
 
   db::DeepRegion *res = new db::DeepRegion (dl_out);
   if (! split_after) {
@@ -2129,7 +2221,7 @@ DeepRegion::pull_generic (const Texts &other) const
 }
 
 RegionDelegate *
-DeepRegion::selected_interacting_generic (const Texts &other, bool inverse) const
+DeepRegion::selected_interacting_generic (const Texts &other, bool inverse, size_t min_count, size_t max_count) const
 {
   //  with these flag set to true, the resulting polygons are broken again.
   bool split_after = false;
@@ -2146,7 +2238,7 @@ DeepRegion::selected_interacting_generic (const Texts &other, bool inverse) cons
 
   DeepLayer dl_out (polygons.derived ());
 
-  db::InteractingWithTextLocalOperation op (inverse);
+  db::InteractingWithTextLocalOperation op (inverse, min_count, max_count);
 
   db::local_processor<db::PolygonRef, db::TextRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), polygons.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());

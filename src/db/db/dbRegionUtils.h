@@ -596,7 +596,7 @@ class DB_PUBLIC region_to_edge_interaction_filter_base
   : public db::box_scanner_receiver2<db::Polygon, size_t, db::Edge, size_t>
 {
 public:
-  region_to_edge_interaction_filter_base (bool inverse);
+  region_to_edge_interaction_filter_base (bool inverse, bool get_all);
 
   void preset (const OutputType *s);
   void add (const db::Polygon *p, size_t, const db::Edge *e, size_t);
@@ -607,7 +607,7 @@ protected:
 
 private:
   std::set<const OutputType *> m_seen;
-  bool m_inverse;
+  bool m_inverse, m_get_all;
 };
 
 /**
@@ -618,8 +618,8 @@ class DB_PUBLIC_TEMPLATE region_to_edge_interaction_filter
   : public region_to_edge_interaction_filter_base<OutputType>
 {
 public:
-  region_to_edge_interaction_filter (OutputContainer &output, bool inverse)
-    : region_to_edge_interaction_filter_base<OutputType> (inverse), mp_output (&output)
+  region_to_edge_interaction_filter (OutputContainer &output, bool inverse, bool get_all = false)
+    : region_to_edge_interaction_filter_base<OutputType> (inverse, get_all), mp_output (&output)
   {
     //  .. nothing yet ..
   }
@@ -642,7 +642,7 @@ class DB_PUBLIC region_to_text_interaction_filter_base
   : public db::box_scanner_receiver2<db::Polygon, size_t, TextType, size_t>
 {
 public:
-  region_to_text_interaction_filter_base (bool inverse);
+  region_to_text_interaction_filter_base (bool inverse, bool get_all);
 
   void preset (const OutputType *s);
   void add (const db::Polygon *p, size_t, const TextType *e, size_t);
@@ -653,7 +653,7 @@ protected:
 
 private:
   std::set<const OutputType *> m_seen;
-  bool m_inverse;
+  bool m_inverse, m_get_all;
 };
 
 /**
@@ -664,8 +664,8 @@ class DB_PUBLIC_TEMPLATE region_to_text_interaction_filter
   : public region_to_text_interaction_filter_base<OutputType, TextType>
 {
 public:
-  region_to_text_interaction_filter (OutputContainer &output, bool inverse)
-    : region_to_text_interaction_filter_base<OutputType, TextType> (inverse), mp_output (&output)
+  region_to_text_interaction_filter (OutputContainer &output, bool inverse, bool get_all = false)
+    : region_to_text_interaction_filter_base<OutputType, TextType> (inverse, get_all), mp_output (&output)
   {
     //  .. nothing yet ..
   }

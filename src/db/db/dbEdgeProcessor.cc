@@ -717,7 +717,7 @@ InteractionDetector::edge (bool north, bool enter, property_type p)
         for (std::set <property_type>::const_iterator i = m_inside_n.begin (); i != m_inside_n.end (); ++i) {
           if (*i < p) {
             m_interactions.insert (std::make_pair (*i, p));
-          } else if (*i > p) {
+          } else if (p < *i) {
             m_interactions.insert (std::make_pair (p, *i));
           }
         }
@@ -725,7 +725,7 @@ InteractionDetector::edge (bool north, bool enter, property_type p)
         for (std::set <property_type>::const_iterator i = m_inside_s.begin (); i != m_inside_s.end (); ++i) {
           if (*i < p) {
             m_interactions.insert (std::make_pair (*i, p));
-          } else if (*i > p) {
+          } else if (p < *i) {
             m_interactions.insert (std::make_pair (p, *i));
           }
         }

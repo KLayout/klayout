@@ -245,8 +245,11 @@ public:
    *  Mode -1 (inside) and +1 (outside) requires a single property value for the containing region.
    *  This property value must be specified in the container_id parameter. 
    *  For correct operation, the container_id must be the lowest property ID and
-   *  the interacting edges must have higher property id's.
+   *  the interacting objects must have higher property id's.
    *  The reported interactions will be (container_id,polygon_id) even for outside mode.
+   *
+   *  For mode 0, property ids <= container_id are considered to belong to the first
+   *  container and property ids > container_id to the second container.
    */
   InteractionDetector (int mode = 0, property_type container_id = 0);
 

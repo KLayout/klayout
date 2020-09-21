@@ -364,8 +364,8 @@ Poly2PolyCheckBase::enter (const db::Polygon &o1, size_t p1, const db::Polygon &
 //  RegionToEdgeInteractionFilterBase implementation
 
 template <class OutputType>
-region_to_edge_interaction_filter_base<OutputType>::region_to_edge_interaction_filter_base (bool inverse)
-  : m_inverse (inverse)
+region_to_edge_interaction_filter_base<OutputType>::region_to_edge_interaction_filter_base (bool inverse, bool get_all)
+  : m_inverse (inverse), m_get_all (get_all)
 {
   //  .. nothing yet ..
 }
@@ -384,7 +384,7 @@ region_to_edge_interaction_filter_base<OutputType>::add (const db::Polygon *p, s
   const OutputType *o = 0;
   tl::select (o, p, e);
 
-  if ((m_seen.find (o) == m_seen.end ()) != m_inverse) {
+  if (m_get_all || (m_seen.find (o) == m_seen.end ()) != m_inverse) {
 
     //  A polygon and an edge interact if the edge is either inside completely
     //  of at least one edge of the polygon intersects with the edge
@@ -403,7 +403,9 @@ region_to_edge_interaction_filter_base<OutputType>::add (const db::Polygon *p, s
       if (m_inverse) {
         m_seen.erase (o);
       } else {
-        m_seen.insert (o);
+        if (! m_get_all) {
+          m_seen.insert (o);
+        }
         put (*o);
       }
     }
@@ -428,8 +430,8 @@ template class region_to_edge_interaction_filter_base<db::Edge>;
 //  RegionToTextInteractionFilterBase implementation
 
 template <class OutputType, class TextType>
-region_to_text_interaction_filter_base<OutputType, TextType>::region_to_text_interaction_filter_base (bool inverse)
-  : m_inverse (inverse)
+region_to_text_interaction_filter_base<OutputType, TextType>::region_to_text_interaction_filter_base (bool inverse, bool get_all)
+  : m_inverse (inverse), m_get_all (get_all)
 {
   //  .. nothing yet ..
 }
@@ -448,7 +450,7 @@ region_to_text_interaction_filter_base<OutputType, TextType>::add (const db::Pol
   const OutputType *o = 0;
   tl::select (o, p, t);
 
-  if ((m_seen.find (o) == m_seen.end ()) != m_inverse) {
+  if (m_get_all || (m_seen.find (o) == m_seen.end ()) != m_inverse) {
 
     //  A polygon and an text interact if the text is either inside completely
     //  of at least one text of the polygon intersects with the text
@@ -457,7 +459,9 @@ region_to_text_interaction_filter_base<OutputType, TextType>::add (const db::Pol
       if (m_inverse) {
         m_seen.erase (o);
       } else {
-        m_seen.insert (o);
+        if (! m_get_all) {
+          m_seen.insert (o);
+        }
         put (*o);
       }
     }

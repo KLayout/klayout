@@ -512,6 +512,8 @@ class DBRegion_TestClass < TestBase
     r1.insert(RBA::Box::new(50, 70, 150, 270))
     r1.insert(RBA::Box::new(100, 70, 250, 270))
     r2 = RBA::Region::new(RBA::Box::new(-10, -20, 100, 200))
+    r3 = RBA::Region::new(RBA::Box::new(150, 270, 160, 280))
+    r3 += r2
 
     assert_equal(r1.merged_semantics?, true)
     r1.merged_semantics = false
@@ -520,19 +522,81 @@ class DBRegion_TestClass < TestBase
     assert_equal(r1.inside(r2).to_s, "(10,20;10,200;100,200;100,20)")
     assert_equal(r1.not_inside(r2).to_s, "(50,70;50,270;150,270;150,70);(100,70;100,270;250,270;250,70)")
     assert_equal(r1.interacting(r2).to_s, "(10,20;10,200;100,200;100,20);(50,70;50,270;150,270;150,70);(100,70;100,270;250,270;250,70)")
+    assert_equal(r1.interacting(r3, 1).to_s, "(10,20;10,200;100,200;100,20);(50,70;50,270;150,270;150,70);(100,70;100,270;250,270;250,70)")
+    assert_equal(r1.interacting(r3, 2).to_s, "(50,70;50,270;150,270;150,70);(100,70;100,270;250,270;250,70)")
+    assert_equal(r1.interacting(r3, 3).to_s, "")
+    assert_equal(r1.interacting(r3, 1, 1).to_s, "(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.interacting(r3, 2, 2).to_s, "(50,70;50,270;150,270;150,70);(100,70;100,270;250,270;250,70)")
     assert_equal(r1.not_interacting(r2).to_s, "")
+    assert_equal(r1.not_interacting(r3, 1).to_s, "")
+    assert_equal(r1.not_interacting(r3, 2).to_s, "(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.not_interacting(r3, 3).to_s, "(10,20;10,200;100,200;100,20);(50,70;50,270;150,270;150,70);(100,70;100,270;250,270;250,70)")
+    assert_equal(r1.not_interacting(r3, 1, 1).to_s, "(50,70;50,270;150,270;150,70);(100,70;100,270;250,270;250,70)")
+    assert_equal(r1.not_interacting(r3, 2, 2).to_s, "(10,20;10,200;100,200;100,20)")
     assert_equal(r1.overlapping(r2).to_s, "(10,20;10,200;100,200;100,20);(50,70;50,270;150,270;150,70)")
     assert_equal(r1.not_overlapping(r2).to_s, "(100,70;100,270;250,270;250,70)")
     assert_equal(r1.outside(r2).to_s, "(100,70;100,270;250,270;250,70)")
     assert_equal(r1.not_outside(r2).to_s, "(10,20;10,200;100,200;100,20);(50,70;50,270;150,270;150,70)")
 
+    e2 = RBA::Edges::new(RBA::Edge::new(-10, -20, 100, 200))
+    e3 = RBA::Edges::new(RBA::Edge::new(150, 270, 160, 280))
+    e3 += e2
+
+    assert_equal(r1.interacting(e2).to_s, "(100,70;100,270;250,270;250,70);(50,70;50,270;150,270;150,70);(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.interacting(e3, 1).to_s, "(100,70;100,270;250,270;250,70);(50,70;50,270;150,270;150,70);(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.interacting(e3, 2).to_s, "(100,70;100,270;250,270;250,70);(50,70;50,270;150,270;150,70)")
+    assert_equal(r1.interacting(e3, 3).to_s, "")
+    assert_equal(r1.interacting(e3, 1, 1).to_s, "(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.interacting(e3, 2, 2).to_s, "(100,70;100,270;250,270;250,70);(50,70;50,270;150,270;150,70)")
+    assert_equal(r1.not_interacting(e2).to_s, "")
+    assert_equal(r1.not_interacting(e3, 1).to_s, "")
+    assert_equal(r1.not_interacting(e3, 2).to_s, "(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.not_interacting(e3, 3).to_s, "(100,70;100,270;250,270;250,70);(50,70;50,270;150,270;150,70);(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.not_interacting(e3, 1, 1).to_s, "(100,70;100,270;250,270;250,70);(50,70;50,270;150,270;150,70)")
+    assert_equal(r1.not_interacting(e3, 2, 2).to_s, "(10,20;10,200;100,200;100,20)")
+
+    t2 = RBA::Texts::new(RBA::Text::new("a", RBA::Trans::new(50, 100)))
+    t3 = RBA::Texts::new(RBA::Text::new("b", RBA::Trans::new(150, 270)))
+    t3 += t2
+
+    assert_equal(r1.interacting(t2).to_s, "(50,70;50,270;150,270;150,70);(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.interacting(t3, 1).to_s, "(100,70;100,270;250,270;250,70);(50,70;50,270;150,270;150,70);(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.interacting(t3, 2).to_s, "(50,70;50,270;150,270;150,70)")
+    assert_equal(r1.interacting(t3, 3).to_s, "")
+    assert_equal(r1.interacting(t3, 1, 1).to_s, "(100,70;100,270;250,270;250,70);(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.interacting(t3, 2, 2).to_s, "(50,70;50,270;150,270;150,70)")
+    assert_equal(r1.not_interacting(t2).to_s, "(100,70;100,270;250,270;250,70)")
+    assert_equal(r1.not_interacting(t3, 1).to_s, "")
+    assert_equal(r1.not_interacting(t3, 2).to_s, "(100,70;100,270;250,270;250,70);(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.not_interacting(t3, 3).to_s, "(100,70;100,270;250,270;250,70);(50,70;50,270;150,270;150,70);(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.not_interacting(t3, 1, 1).to_s, "(50,70;50,270;150,270;150,70)")
+    assert_equal(r1.not_interacting(t3, 2, 2).to_s, "(100,70;100,270;250,270;250,70);(10,20;10,200;100,200;100,20)")
+
     rr = r1.dup
     rr.select_interacting(r2)
     assert_equal(rr.to_s, "(10,20;10,200;100,200;100,20);(50,70;50,270;150,270;150,70);(100,70;100,270;250,270;250,70)")
+    rr = r1.dup
+    rr.select_interacting(r3, 2, 2)
+    assert_equal(rr.to_s, "(50,70;50,270;150,270;150,70);(100,70;100,270;250,270;250,70)")
+    rr = r1.dup
+    rr.select_interacting(e3, 2, 2)
+    assert_equal(rr.to_s, "(100,70;100,270;250,270;250,70);(50,70;50,270;150,270;150,70)")
+    rr = r1.dup
+    rr.select_interacting(t3, 2, 2)
+    assert_equal(rr.to_s, "(50,70;50,270;150,270;150,70)")
     
     rr = r1.dup
     rr.select_not_interacting(r2)
     assert_equal(rr.to_s, "")
+    rr = r1.dup
+    rr.select_not_interacting(r3, 2, 2)
+    assert_equal(rr.to_s, "(10,20;10,200;100,200;100,20)")
+    rr = r1.dup
+    rr.select_not_interacting(e3, 2, 2)
+    assert_equal(rr.to_s, "(10,20;10,200;100,200;100,20)")
+    rr = r1.dup
+    rr.select_not_interacting(t3, 2, 2)
+    assert_equal(rr.to_s, "(100,70;100,270;250,270;250,70);(10,20;10,200;100,200;100,20)")
     
     rr = r1.dup
     rr.select_overlapping(r2)

@@ -1673,7 +1673,7 @@ CODE
     # @name interacting
     # @brief Selects shapes or regions of self which touch or overlap shapes from the other region
     # @synopsis layer.interacting(other)
-    # @synopsis layer.interacting(other, count)
+    # @synopsis layer.interacting(other, min_count)
     # @synopsis layer.interacting(other, min_count, max_count)
     # @synopsis layer.interacting(other, min_count .. max_count)
     # This method selects all shapes or regions from self which touch or overlap shapes from the other
@@ -1694,7 +1694,7 @@ CODE
     #   @/tr
     # @/table
     #
-    # If a single count is given, shapes from self are selected only if they do interact with the given
+    # If a single count is given, shapes from self are selected only if they do interact at least with the given
     # number of (different) shapes from the other layer. If a min and max count is given, shapes from  
     # self are selected only if they interact with min_count or more, but a maximum of max_count different shapes
     # from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
@@ -1709,7 +1709,7 @@ CODE
     # @name not_interacting
     # @brief Selects shapes or regions of self which do not touch or overlap shapes from the other region
     # @synopsis layer.not_interacting(other)
-    # @synopsis layer.not_interacting(other, count)
+    # @synopsis layer.not_interacting(other, min_count)
     # @synopsis layer.not_interacting(other, min_count, max_count)
     # @synopsis layer.not_interacting(other, min_count .. max_count)
     # This method selects all shapes or regions from self which do not touch or overlap shapes from the other
@@ -1730,7 +1730,7 @@ CODE
     #   @/tr
     # @/table
     #
-    # If a single count is given, shapes from self are selected only if they do not interact with the given
+    # If a single count is given, shapes from self are selected only if they interact with less than the given
     # number of (different) shapes from the other layer. If a min and max count is given, shapes from  
     # self are selected only if they interact with less than min_count or more than max_count different shapes
     # from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
@@ -1745,7 +1745,7 @@ CODE
     # @name select_interacting
     # @brief Selects shapes or regions of self which touch or overlap shapes from the other region
     # @synopsis layer.select_interacting(other)
-    # @synopsis layer.select_interacting(other, count)
+    # @synopsis layer.select_interacting(other, min_count)
     # @synopsis layer.select_interacting(other, min_count, max_count)
     # @synopsis layer.select_interacting(other, min_count .. max_count)
     # This method selects all shapes or regions from self which touch or overlap shapes from the other
@@ -1758,7 +1758,7 @@ CODE
     # with respect to other edges or polygons. Texts can be selected with respect to 
     # polygons. Polygons can be selected with respect to edges, texts and other polygons.
     #
-    # If a single count is given, shapes from self are selected only if they do interact with the given
+    # If a single count is given, shapes from self are selected only if they do interact at least with the given
     # number of (different) shapes from the other layer. If a min and max count is given, shapes from  
     # self are selected only if they interact with min_count or more, but a maximum of max_count different shapes
     # from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
@@ -1767,7 +1767,7 @@ CODE
     # @name select_not_interacting
     # @brief Selects shapes or regions of self which do not touch or overlap shapes from the other region
     # @synopsis layer.select_not_interacting(other)
-    # @synopsis layer.select_not_interacting(other, count)
+    # @synopsis layer.select_not_interacting(other, min_count)
     # @synopsis layer.select_not_interacting(other, min_count, max_count)
     # @synopsis layer.select_not_interacting(other, min_count .. max_count)
     # This method selects all shapes or regions from self which do not touch or overlap shapes from the other
@@ -1780,7 +1780,7 @@ CODE
     # with respect to other edges or polygons. Texts can be selected with respect to 
     # polygons. Polygons can be selected with respect to edges, texts and other polygons.
     #
-    # If a single count is given, shapes from self are selected only if they do not interact with the given
+    # If a single count is given, shapes from self are selected only if they interact with less than the given
     # number of (different) shapes from the other layer. If a min and max count is given, shapes from  
     # self are selected only if they interact with less than min_count or more than max_count different shapes
     # from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
@@ -3301,16 +3301,20 @@ CODE
       elsif args.size == 1
         a = args[0]
         if a.is_a?(Range)
-          if a.min.to_i <= 0
-            raise("#{f}: min_count argument must be a positive, non-zero number")
+          if a.begin && a.begin.to_i <= 0
+            raise("#{f}: lower bound of range must be a positive, non-zero number")
           end
-          return [a.min.to_i, a.max.to_i]
+          if a.end
+            return [(a.begin || 1).to_i, a.end.to_i]
+          else
+            return [(a.begin || 1).to_i]
+          end
         elsif !a.is_a?(1.class)
           raise("#{f}: count argument must be an integer number")
         elsif a <= 0
           raise("#{f}: count argument must be a positive, non-zero number")
         else
-          return [a, a]
+          return [a]
         end
       elsif args.size == 2
         amin = args[0]

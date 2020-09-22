@@ -1,0 +1,56 @@
+
+# Hierarchical antenna check
+
+source($drc_test_source, "TOP")
+target($drc_test_target)
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+
+l1.interacting(l2, 1).output(100, 0)
+l1.interacting(l2, 2).output(101, 0)
+l1.interacting(l2, 1..2).output(102, 0)
+l1.interacting(l2, 2..).output(103, 0)
+l1.interacting(l2, 1, 2).output(104, 0)
+
+l = l1.dup
+l.select_interacting(l2, 1)
+l.output(200, 0)
+l = l1.dup
+l.select_interacting(l2, 2)
+l.output(201, 0)
+l = l1.dup
+l.select_interacting(l2, 1..2)
+l.output(202, 0)
+l = l1.dup
+l.select_interacting(l2, 2..)
+l.output(203, 0)
+l = l1.dup
+l.select_interacting(l2, 1, 2)
+l.output(204, 0)
+
+l1.not_interacting(l2, 1).output(300, 0)
+l1.not_interacting(l2, 2).output(301, 0)
+l1.not_interacting(l2, 1..2).output(302, 0)
+l1.not_interacting(l2, 2..).output(303, 0)
+l1.not_interacting(l2, 1, 2).output(304, 0)
+
+l = l1.dup
+l.select_not_interacting(l2, 1)
+l.output(400, 0)
+l = l1.dup
+l.select_not_interacting(l2, 2)
+l.output(401, 0)
+l = l1.dup
+l.select_not_interacting(l2, 1..2)
+l.output(402, 0)
+l = l1.dup
+l.select_not_interacting(l2, 2..)
+l.output(403, 0)
+l = l1.dup
+l.select_not_interacting(l2, 1, 2)
+l.output(404, 0)
+

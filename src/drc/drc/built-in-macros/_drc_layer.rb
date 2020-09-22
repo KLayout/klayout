@@ -1702,6 +1702,11 @@ CODE
     # @table
     #   @tr 
     #     @td @img(/images/drc_interacting2.png) @/td
+    #     @td @img(/images/drc_interacting3.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_interacting4.png) @/td
+    #     @td @img(/images/drc_interacting5.png) @/td
     #   @/tr
     # @/table
     
@@ -1738,6 +1743,11 @@ CODE
     # @table
     #   @tr 
     #     @td @img(/images/drc_not_interacting2.png) @/td
+    #     @td @img(/images/drc_not_interacting3.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_not_interacting4.png) @/td
+    #     @td @img(/images/drc_not_interacting5.png) @/td
     #   @/tr
     # @/table
     

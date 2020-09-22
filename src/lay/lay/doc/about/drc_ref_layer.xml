@@ -795,6 +795,9 @@ This method is available for edge layers. The argument must be a polygon layer.
 <p>Usage:</p>
 <ul>
 <li><tt>layer.interacting(other)</tt></li>
+<li><tt>layer.interacting(other, min_count)</tt></li>
+<li><tt>layer.interacting(other, min_count, max_count)</tt></li>
+<li><tt>layer.interacting(other, min_count .. max_count)</tt></li>
 </ul>
 <p>
 This method selects all shapes or regions from self which touch or overlap shapes from the other
@@ -812,6 +815,22 @@ The following image shows the effect of the "interacting" method (input1: red, i
 <table>
 <tr>
 <td><img src="/images/drc_interacting.png"/></td>
+</tr>
+</table>
+</p><p>
+If a single count is given, shapes from self are selected only if they do interact at least with the given
+number of (different) shapes from the other layer. If a min and max count is given, shapes from  
+self are selected only if they interact with min_count or more, but a maximum of max_count different shapes
+from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_interacting2.png"/></td>
+<td><img src="/images/drc_interacting3.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_interacting4.png"/></td>
+<td><img src="/images/drc_interacting5.png"/></td>
 </tr>
 </table>
 </p>
@@ -1169,6 +1188,9 @@ The following image shows the effect of the "not_inside" method (input1: red, in
 <p>Usage:</p>
 <ul>
 <li><tt>layer.not_interacting(other)</tt></li>
+<li><tt>layer.not_interacting(other, min_count)</tt></li>
+<li><tt>layer.not_interacting(other, min_count, max_count)</tt></li>
+<li><tt>layer.not_interacting(other, min_count .. max_count)</tt></li>
 </ul>
 <p>
 This method selects all shapes or regions from self which do not touch or overlap shapes from the other
@@ -1186,6 +1208,22 @@ The following image shows the effect of the "not_interacting" method (input1: re
 <table>
 <tr>
 <td><img src="/images/drc_not_interacting.png"/></td>
+</tr>
+</table>
+</p><p>
+If a single count is given, shapes from self are selected only if they interact with less than the given
+number of (different) shapes from the other layer. If a min and max count is given, shapes from  
+self are selected only if they interact with less than min_count or more than max_count different shapes
+from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_not_interacting2.png"/></td>
+<td><img src="/images/drc_not_interacting3.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_not_interacting4.png"/></td>
+<td><img src="/images/drc_not_interacting5.png"/></td>
 </tr>
 </table>
 </p>
@@ -1700,10 +1738,13 @@ This method is available for polygon layers.
 <p>Usage:</p>
 <ul>
 <li><tt>layer.select_interacting(other)</tt></li>
+<li><tt>layer.select_interacting(other, min_count)</tt></li>
+<li><tt>layer.select_interacting(other, min_count, max_count)</tt></li>
+<li><tt>layer.select_interacting(other, min_count .. max_count)</tt></li>
 </ul>
 <p>
 This method selects all shapes or regions from self which touch or overlap shapes from the other
-region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+layer. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
 otherwise individual shapes are selected.
 It modifies self to contain the selected shapes. A version which does not modify self
 is <a href="#interacting">interacting</a>.
@@ -1711,6 +1752,11 @@ is <a href="#interacting">interacting</a>.
 This method is available for polygon, text and edge layers. Edges can be selected
 with respect to other edges or polygons. Texts can be selected with respect to 
 polygons. Polygons can be selected with respect to edges, texts and other polygons.
+</p><p>
+If a single count is given, shapes from self are selected only if they do interact at least with the given
+number of (different) shapes from the other layer. If a min and max count is given, shapes from  
+self are selected only if they interact with min_count or more, but a maximum of max_count different shapes
+from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
 </p>
 <a name="select_not_inside"/><h2>"select_not_inside" - Selects shapes or regions of self which are not inside the other region</h2>
 <keyword name="select_not_inside"/>
@@ -1733,11 +1779,14 @@ This method is available for polygon layers.
 <keyword name="select_not_interacting"/>
 <p>Usage:</p>
 <ul>
-<li><tt>layer.select_interacting(other)</tt></li>
+<li><tt>layer.select_not_interacting(other)</tt></li>
+<li><tt>layer.select_not_interacting(other, min_count)</tt></li>
+<li><tt>layer.select_not_interacting(other, min_count, max_count)</tt></li>
+<li><tt>layer.select_not_interacting(other, min_count .. max_count)</tt></li>
 </ul>
 <p>
 This method selects all shapes or regions from self which do not touch or overlap shapes from the other
-region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+layer. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
 otherwise individual shapes are selected.
 It modifies self to contain the selected shapes. A version which does not modify self
 is <a href="#not_interacting">not_interacting</a>.
@@ -1745,6 +1794,11 @@ is <a href="#not_interacting">not_interacting</a>.
 This method is available for polygon, text and edge layers. Edges can be selected
 with respect to other edges or polygons. Texts can be selected with respect to 
 polygons. Polygons can be selected with respect to edges, texts and other polygons.
+</p><p>
+If a single count is given, shapes from self are selected only if they interact with less than the given
+number of (different) shapes from the other layer. If a min and max count is given, shapes from  
+self are selected only if they interact with less than min_count or more than max_count different shapes
+from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
 </p>
 <a name="select_not_outside"/><h2>"select_not_outside" - Selects shapes or regions of self which are not outside the other region</h2>
 <keyword name="select_not_outside"/>
@@ -2224,7 +2278,7 @@ located between the edges which are checked. With shielding, large distance viol
 are not reported in this case. Shielding is also effective at zero distance which has
 an adverse effect: Consider a case, where one layer A is a subset of another layer B. If 
 you try to check the distance between features of B vs. A, you cannot use shielding, 
-because B features which are indentical to A features will shield those entirely. 
+because B features which are identical to A features will shield those entirely. 
 </p><p>
 Shielding is enabled by default, but can be switched off with the "transparent" option.
 </p>

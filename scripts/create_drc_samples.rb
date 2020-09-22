@@ -437,6 +437,37 @@ run_demo gen, "input1.edges.outside_part(input2)", "drc_outside_part.png"
 
 class Gen
   def produce(s1, s2)
+    s1.insert(RBA::Box::new(0, 5000, 2000, 7000))
+    s1.insert(RBA::Box::new(4000, 5000, 6000, 7000))
+    s1.insert(RBA::Box::new(0, 0, 2000, 2000))
+    s1.insert(RBA::Box::new(4000, 0, 6000, 2000))
+    s2.insert(RBA::Box::new(2000, 6000, 4000, 7000))
+    s2.insert(RBA::Box::new(4500, 5500, 5500, 6500))
+    s2.insert(RBA::Box::new(5000, 4000, 6000, 5000))
+    s2.insert(RBA::Polygon::new(
+      [ RBA::Point::new(2000, 0),    RBA::Point::new(2000, 3000), 
+        RBA::Point::new(1000, 3000), RBA::Point::new(1000, 2000), 
+        RBA::Point::new(0, 2000),    RBA::Point::new(0, 5000), 
+        RBA::Point::new(1000, 5000),    RBA::Point::new(1000, 4000), 
+        RBA::Point::new(3000, 4000), RBA::Point::new(3000, 0) ]
+    ))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input1.interacting(input2, 1)", "drc_interacting2.png"
+run_demo gen, "input1.interacting(input2, 1, 1)", "drc_interacting3.png"
+run_demo gen, "input1.interacting(input2, 2..)", "drc_interacting4.png"
+run_demo gen, "input1.interacting(input2, 1..2)", "drc_interacting5.png"
+
+run_demo gen, "input1.not_interacting(input2, 1)", "drc_not_interacting2.png"
+run_demo gen, "input1.not_interacting(input2, 1, 1)", "drc_not_interacting3.png"
+run_demo gen, "input1.not_interacting(input2, 2..)", "drc_not_interacting4.png"
+run_demo gen, "input1.not_interacting(input2, 1..2)", "drc_not_interacting5.png"
+
+class Gen
+  def produce(s1, s2)
     s1.insert(RBA::Box::new(0, 1000, 2000, 3000))
     s1.insert(RBA::Box::new(4000, 1000, 6000, 3000))
     s1.insert(RBA::Box::new(4000, 5000, 6000, 7000))

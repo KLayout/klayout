@@ -60,6 +60,7 @@ SOURCES = \
   dbReader.cc \
   dbRecursiveShapeIterator.cc \
   dbRegion.cc \
+  dbRegionLocalOperations.cc \
   dbSaveLayoutOptions.cc \
   dbShape.cc \
   dbShapes2.cc \
@@ -259,6 +260,7 @@ HEADERS = \
   dbReader.h \
   dbRecursiveShapeIterator.h \
   dbRegion.h \
+  dbRegionLocalOperations.h \
   dbSaveLayoutOptions.h \
   dbShape.h \
   dbShapeRepository.h \

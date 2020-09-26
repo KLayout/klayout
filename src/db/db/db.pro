@@ -28,6 +28,7 @@ SOURCES = \
   dbEdges.cc \
   dbFillTool.cc \
   dbFuzzyCellMapping.cc \
+  dbGenericShapeIterator.cc \
   dbGlyphs.cc \
   dbHershey.cc \
   dbInstances.cc \
@@ -63,6 +64,7 @@ SOURCES = \
   dbRegionLocalOperations.cc \
   dbSaveLayoutOptions.cc \
   dbShape.cc \
+  dbShapeFlags.cc \
   dbShapes2.cc \
   dbShapes3.cc \
   dbShapes.cc \
@@ -224,6 +226,7 @@ HEADERS = \
   dbEdgesToContours.h \
   dbFillTool.h \
   dbFuzzyCellMapping.h \
+  dbGenericShapeIterator.h \
   dbHash.h \
   dbHersheyFont.h \
   dbHershey.h \
@@ -263,6 +266,7 @@ HEADERS = \
   dbRegionLocalOperations.h \
   dbSaveLayoutOptions.h \
   dbShape.h \
+  dbShapeFlags.h \
   dbShapeRepository.h \
   dbShapes2.h \
   dbShapeProcessor.h \

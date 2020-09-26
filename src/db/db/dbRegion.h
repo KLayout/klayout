@@ -47,19 +47,14 @@ class TransformationReducer;
  *  The iterator delivers the polygons of the region
  */
 class DB_PUBLIC RegionIterator
+  : public generic_shape_iterator<db::Polygon>
 {
 public:
-  typedef RegionIteratorDelegate::value_type value_type;
-  typedef const value_type &reference;
-  typedef const value_type *pointer;
-  typedef std::forward_iterator_tag iterator_category;
-  typedef void difference_type;
-
   /**
    *  @brief Default constructor
    */
   RegionIterator ()
-    : mp_delegate (0)
+    : generic_shape_iterator<db::Polygon> ()
   {
     //  .. nothing yet ..
   }
@@ -69,27 +64,18 @@ public:
    *  The iterator will take ownership over the delegate
    */
   RegionIterator (RegionIteratorDelegate *delegate)
-    : mp_delegate (delegate)
+    : generic_shape_iterator<db::Polygon> (delegate)
   {
     //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Destructor
-   */
-  ~RegionIterator ()
-  {
-    delete mp_delegate;
-    mp_delegate = 0;
   }
 
   /**
    *  @brief Copy constructor and assignment
    */
   RegionIterator (const RegionIterator &other)
-    : mp_delegate (0)
+    : generic_shape_iterator<db::Polygon> (static_cast<const generic_shape_iterator<db::Polygon> &> (other))
   {
-    operator= (other);
+    //  .. nothing yet ..
   }
 
   /**
@@ -97,19 +83,8 @@ public:
    */
   RegionIterator &operator= (const RegionIterator &other)
   {
-    if (this != &other) {
-      delete mp_delegate;
-      mp_delegate = other.mp_delegate ? other.mp_delegate->clone () : 0;
-    }
+    generic_shape_iterator<db::Polygon>::operator= (other);
     return *this;
-  }
-
-  /**
-   *  @Returns true, if the iterator is at the end
-   */
-  bool at_end () const
-  {
-    return mp_delegate == 0 || mp_delegate->at_end ();
   }
 
   /**
@@ -117,32 +92,9 @@ public:
    */
   RegionIterator &operator++ ()
   {
-    if (mp_delegate) {
-      mp_delegate->increment ();
-    }
+    generic_shape_iterator<db::Polygon>::operator++ ();
     return *this;
   }
-
-  /**
-   *  @brief Access
-   */
-  reference operator* () const
-  {
-    const value_type *value = operator-> ();
-    tl_assert (value != 0);
-    return *value;
-  }
-
-  /**
-   *  @brief Access
-   */
-  pointer operator-> () const
-  {
-    return mp_delegate ? mp_delegate->get () : 0;
-  }
-
-private:
-  RegionIteratorDelegate *mp_delegate;
 };
 
 /**

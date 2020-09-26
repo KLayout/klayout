@@ -79,9 +79,26 @@ public:
     return &m_polygon;
   }
 
+  virtual bool equals (const generic_shape_iterator_delegate_base<value_type> *other) const
+  {
+    const DeepRegionIterator *o = dynamic_cast<const DeepRegionIterator *> (other);
+    return o && o->m_iter == m_iter;
+  }
+
   virtual RegionIteratorDelegate *clone () const
   {
     return new DeepRegionIterator (*this);
+  }
+
+  virtual void do_reset (const db::Box &region, bool overlapping)
+  {
+    m_iter.set_region (region);
+    m_iter.set_overlapping (overlapping);
+  }
+
+  virtual db::Box bbox () const
+  {
+    return m_iter.bbox ();
   }
 
 private:

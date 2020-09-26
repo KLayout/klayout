@@ -32,6 +32,7 @@
 #include "dbEdgePairs.h"
 #include "dbEdgePairRelations.h"
 #include "dbShapeCollection.h"
+#include "dbGenericShapeIterator.h"
 
 #include <list>
 
@@ -142,19 +143,7 @@ typedef shape_collection_processor<db::Polygon, db::EdgePair> PolygonToEdgePairP
 /**
  *  @brief The region iterator delegate
  */
-class DB_PUBLIC RegionIteratorDelegate
-{
-public:
-  RegionIteratorDelegate () { }
-  virtual ~RegionIteratorDelegate () { }
-
-  typedef db::Polygon value_type;
-
-  virtual bool at_end () const = 0;
-  virtual void increment () = 0;
-  virtual const value_type *get () const = 0;
-  virtual RegionIteratorDelegate *clone () const = 0;
-};
+typedef db::generic_shape_iterator_delegate_base <db::Polygon> RegionIteratorDelegate;
 
 /**
  *  @brief The delegate for the actual region implementation

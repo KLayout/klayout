@@ -142,7 +142,7 @@ FlatRegion::ensure_merged_polygons_valid () const
 
 RegionIteratorDelegate *FlatRegion::begin () const
 {
-  return new FlatRegionIterator (m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin (), m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end ());
+  return new FlatRegionIterator (&m_polygons);
 }
 
 RegionIteratorDelegate *FlatRegion::begin_merged () const
@@ -151,7 +151,7 @@ RegionIteratorDelegate *FlatRegion::begin_merged () const
     return begin ();
   } else {
     ensure_merged_polygons_valid ();
-    return new FlatRegionIterator (m_merged_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin (), m_merged_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end ());
+    return new FlatRegionIterator (&m_merged_polygons);
   }
 }
 

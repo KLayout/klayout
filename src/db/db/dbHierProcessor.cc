@@ -1655,6 +1655,13 @@ struct scan_shape2shape_same_layer
 
     scanner.process (rec, dist, db::box_convert<TS> (), db::box_convert<TI> ());
   }
+
+  void
+  operator () (const db::Shapes *, unsigned int, unsigned int, shape_interactions<TS, TI> &, db::Coord) const
+  {
+    //  cannot have different types on the same layer
+    tl_assert (false);
+  }
 };
 
 template <class T>
@@ -1679,13 +1686,28 @@ struct scan_shape2shape_same_layer<T, T>
 
     scanner.process (rec, dist, db::box_convert<T> ());
   }
+
+  void
+  operator () (const db::Shapes *shapes, unsigned int subject_id0, unsigned int intruder_layer, shape_interactions<T, T> &interactions, db::Coord dist) const
+  {
+    db::box_scanner<T, int> scanner;
+    interaction_registration_shape1<T, T> rec (&interactions, intruder_layer);
+
+    unsigned int id = subject_id0;
+    for (db::Shapes::shape_iterator i = shapes->begin (shape_flags<T> ()); !i.at_end (); ++i) {
+      const T *ref = i->basic_ptr (typename T::tag ());
+      scanner.insert (ref, id++);
+    }
+
+    scanner.process (rec, dist, db::box_convert<T> ());
+  }
 };
 
 template <class TS, class TI>
 struct scan_shape2shape_different_layers
 {
   void
-  operator () (db::Layout *layout, const db::Shapes *subject_shapes, const db::Shapes *intruder_shapes, unsigned int subject_id0, const std::set<TI> &intruders, unsigned int intruder_layer, shape_interactions<TS, TI> &interactions, db::Coord dist)
+  operator () (db::Layout *layout, const db::Shapes *subject_shapes, const db::Shapes *intruder_shapes, unsigned int subject_id0, const std::set<TI> *intruders, unsigned int intruder_layer, shape_interactions<TS, TI> &interactions, db::Coord dist) const
   {
     db::box_scanner2<TS, int, TI, int> scanner;
     interaction_registration_shape2shape<TS, TI> rec (layout, &interactions, intruder_layer);
@@ -1697,8 +1719,10 @@ struct scan_shape2shape_different_layers
     }
 
     //  TODO: can we confine this search to the subject's (sized) bounding box?
-    for (typename std::set<TI>::const_iterator i = intruders.begin (); i != intruders.end (); ++i) {
-      scanner.insert2 (i.operator-> (), interactions.next_id ());
+    if (intruders) {
+      for (typename std::set<TI>::const_iterator i = intruders->begin (); i != intruders->end (); ++i) {
+        scanner.insert2 (i.operator-> (), interactions.next_id ());
+      }
     }
 
     if (intruder_shapes) {
@@ -1763,7 +1787,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
       } else {
 
         db::Layout *target_layout = (mp_subject_layout == mp_intruder_layout ? 0 : mp_subject_layout);
-        scan_shape2shape_different_layers<TS, TI> () (target_layout, subject_shapes, intruder_shapes, subject_id0, ipl == intruders.second.end () ? empty_intruders : ipl->second, *il, interactions, op->dist ());
+        scan_shape2shape_different_layers<TS, TI> () (target_layout, subject_shapes, intruder_shapes, subject_id0, &(ipl == intruders.second.end () ? empty_intruders : ipl->second), *il, interactions, op->dist ());
 
       }
 
@@ -1821,6 +1845,88 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
     }
 
     op->compute_local (mp_subject_layout, interactions, result, m_max_vertex_count, m_area_ratio);
+
+  }
+}
+
+template <class TS, class TI, class TR>
+void
+local_processor<TS, TI, TR>::run_flat (const db::Shapes *subject_shapes, const db::Shapes *intruders, const local_operation<TS, TI, TR> *op, db::Shapes *result_shapes) const
+{
+  std::vector<const db::Shapes *> is;
+  is.push_back (intruders);
+
+  std::vector<db::Shapes *> os;
+  os.push_back (result_shapes);
+
+  run_flat (subject_shapes, is, op, os);
+}
+
+template <class TS, class TI, class TR>
+void
+local_processor<TS, TI, TR>::run_flat (const db::Shapes *subject_shapes, const std::vector<const db::Shapes *> &intruders, const local_operation<TS, TI, TR> *op, const std::vector<db::Shapes *> &result_shapes) const
+{
+  tl_assert (mp_subject_top == 0);
+  tl_assert (mp_intruder_top == 0);
+
+  shape_interactions<TS, TI> interactions;
+
+  for (std::vector<const db::Shapes *>::const_iterator il = intruders.begin (); il != intruders.end (); ++il) {
+
+    const db::Shapes *intruder_shapes = *il;
+
+    //  insert dummy interactions to accommodate subject vs. nothing and assign an ID
+    //  range for the subject shapes.
+    unsigned int subject_id0 = 0;
+    for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<TS> ()); !i.at_end (); ++i) {
+
+      unsigned int id = interactions.next_id ();
+      if (subject_id0 == 0) {
+        subject_id0 = id;
+      }
+
+      if (op->on_empty_intruder_hint () != local_operation<TS, TI, TR>::Drop) {
+        const TS *ref = i->basic_ptr (typename TS::tag ());
+        interactions.add_subject (id, *ref);
+      }
+
+    }
+
+    static std::set<TI> empty_intruders;
+
+    if (! subject_shapes->empty () && intruder_shapes) {
+
+      if (intruder_shapes == subject_shapes) {
+        scan_shape2shape_same_layer<TS, TI> () (subject_shapes, subject_id0, (unsigned int) (il - intruders.begin ()), interactions, op->dist ());
+      } else {
+        scan_shape2shape_different_layers<TS, TI> () (0 /*layout*/, subject_shapes, intruder_shapes, subject_id0, 0 /*ext. intruders*/, (unsigned int) (il - intruders.begin ()), interactions, op->dist ());
+      }
+
+    }
+
+  }
+
+  if (interactions.begin () != interactions.end ()) {
+
+    if (interactions.begin_intruders () == interactions.end_intruders ()) {
+
+      typename local_operation<TS, TI, TR>::on_empty_intruder_mode eh = op->on_empty_intruder_hint ();
+      if (eh == local_operation<TS, TI, TR>::Drop) {
+        return;
+      }
+
+    }
+
+    std::vector<std::unordered_set<TR> > result;
+    result.resize (result_shapes.size ());
+    op->compute_local (mp_subject_layout, interactions, result, m_max_vertex_count, m_area_ratio);
+
+    for (std::vector<db::Shapes *>::const_iterator r = result_shapes.begin (); r != result_shapes.end (); ++r) {
+      if (*r) {
+        const std::unordered_set<TR> rs = result [r - result_shapes.begin ()];
+        (*r)->insert (rs.begin (), rs.end ());
+      }
+    }
 
   }
 }

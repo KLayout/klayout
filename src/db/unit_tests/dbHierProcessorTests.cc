@@ -323,6 +323,110 @@ static void run_test_bool22 (tl::TestBase *_this, const char *file, TestMode mod
   run_test_bool_gen (_this, file, mode, out_layer_num1, out_layer_num2, context_doc, false, 0, nthreads);
 }
 
+static void run_test_bool_gen_flat (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num1, int out_layer_num2, db::Coord dist)
+{
+  db::Layout layout_org;
+
+  unsigned int l1 = 0, l2 = 0, lout1 = 0, lout2 = 0;
+  db::LayerMap lmap;
+  bool swap = (mode == TMAndSwapped || mode == TMNotSwapped);
+
+  {
+    tl::InputStream stream (testdata (file));
+    db::Reader reader (stream);
+
+    db::LayerProperties p;
+
+    p.layer = swap ? 2 : 1;
+    p.datatype = 0;
+    lmap.map (db::LDPair (p.layer, p.datatype), l1 = layout_org.insert_layer ());
+    layout_org.set_properties (l1, p);
+
+    p.layer = swap ? 1 : 2;
+    p.datatype = 0;
+    if (mode == TMSelfOverlap) {
+      lmap.map (db::LDPair (p.layer, p.datatype), l2 = l1);
+    } else {
+      lmap.map (db::LDPair (p.layer, p.datatype), l2 = layout_org.insert_layer ());
+      layout_org.set_properties (l2, p);
+    }
+
+    p.layer = out_layer_num1;
+    p.datatype = 0;
+    lmap.map (db::LDPair (out_layer_num1, 0), lout1 = layout_org.insert_layer ());
+    layout_org.set_properties (lout1, p);
+
+    if (out_layer_num2 >= 0) {
+      p.layer = out_layer_num2;
+      p.datatype = 0;
+      lmap.map (db::LDPair (out_layer_num2, 0), lout2 = layout_org.insert_layer ());
+      layout_org.set_properties (lout2, p);
+    }
+
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+    reader.read (layout_org, options);
+  }
+
+  db::Cell &top_cell = layout_org.cell (*layout_org.begin_top_down ());
+  layout_org.flatten (top_cell, -1, true);
+
+  layout_org.clear_layer (lout1);
+  if (out_layer_num2 >= 0) {
+    layout_org.clear_layer (lout2);
+  }
+  normalize_layer (layout_org, l1);
+  if (l1 != l2) {
+    normalize_layer (layout_org, l2);
+  }
+
+  db::local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> *lop = 0;
+  db::BoolAndOrNotLocalOperation bool_op (mode == TMAnd || mode == TMAndSwapped);
+  db::SelfOverlapMergeLocalOperation self_intersect_op (2);
+  BoolAndOrNotWithSizedLocalOperation sized_bool_op (mode == TMAnd || mode == TMAndSwapped, dist);
+  SelfOverlapWithSizedLocalOperation sized_self_intersect_op (2, dist);
+  db::TwoBoolAndNotLocalOperation andnot;
+
+  if (mode == TMAndNot) {
+    lop = &andnot;
+  } else if (mode == TMSelfOverlap) {
+    if (dist > 0) {
+      lop = &sized_self_intersect_op;
+    } else {
+      lop = &self_intersect_op;
+    }
+  } else {
+    if (dist > 0) {
+      lop = &sized_bool_op;
+    } else {
+      lop = &bool_op;
+    }
+  }
+
+  std::vector<const db::Shapes *> ilv;
+  std::vector<db::Shapes *> olv;
+  ilv.push_back (&top_cell.shapes (l2));
+  olv.push_back (&top_cell.shapes (lout1));
+  if (out_layer_num2 >= 0) {
+    olv.push_back (&top_cell.shapes (lout2));
+  }
+
+  db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (&layout_org);
+  proc.set_area_ratio (3.0);
+  proc.set_max_vertex_count (16);
+
+  proc.run_flat (&top_cell.shapes (l1), ilv, lop, olv);
+
+  db::compare_layouts (_this, layout_org, testdata (file), lmap, false /*skip other layers*/, db::AsPolygons);
+}
+
+static void run_test_bool22_flat (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num1, int out_layer_num2)
+{
+  run_test_bool_gen_flat (_this, file, mode, out_layer_num1, out_layer_num2, 0);
+}
+
+
 TEST(BasicAnd1)
 {
   //  Simple flat AND
@@ -1165,5 +1269,11 @@ TEST(MultipleOutputs)
 {
   //  Redundant hierarchy, NOT
   run_test_bool22 (_this, "hlp17.oas", TMAndNot, 100, 101);
+}
+
+TEST(FlatOperation)
+{
+  //  Redundant hierarchy, NOT
+  run_test_bool22_flat (_this, "hlp17_flat.oas", TMAndNot, 100, 101);
 }
 

@@ -259,8 +259,8 @@ protected:
   void update_bbox (const db::Box &box);
   void invalidate_bbox ();
 
-  EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const;
-  EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const;
+  virtual EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const;
+  virtual EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const;
   virtual RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const;
   virtual RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const;
   virtual RegionDelegate *selected_interacting_generic (const Texts &other, bool inverse, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const;

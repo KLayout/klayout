@@ -670,26 +670,6 @@ template class DB_PUBLIC shape_interactions<db::TextRef, db::PolygonRef>;
 namespace
 {
 
-template <class T> unsigned int shape_flags ();
-
-template <>
-inline unsigned int shape_flags<db::PolygonRef> ()
-{
-  return 1 << db::ShapeIterator::PolygonRef;
-}
-
-template <>
-inline unsigned int shape_flags<db::Edge> ()
-{
-  return db::ShapeIterator::Edges;
-}
-
-template <>
-inline unsigned int shape_flags<db::TextRef> ()
-{
-  return db::ShapeIterator::Texts;
-}
-
 template <class TS, class TI>
 struct interaction_registration_shape2shape
   : db::box_scanner_receiver2<TS, unsigned int, TI, unsigned int>
@@ -1657,7 +1637,7 @@ struct scan_shape2shape_same_layer
   }
 
   void
-  operator () (const db::Shapes *, unsigned int, unsigned int, shape_interactions<TS, TI> &, db::Coord) const
+  operator () (const shapes_iterator<TS> &, unsigned int, unsigned int, shape_interactions<TS, TI> &, db::Coord) const
   {
     //  cannot have different types on the same layer
     tl_assert (false);
@@ -1688,15 +1668,14 @@ struct scan_shape2shape_same_layer<T, T>
   }
 
   void
-  operator () (const db::Shapes *shapes, unsigned int subject_id0, unsigned int intruder_layer, shape_interactions<T, T> &interactions, db::Coord dist) const
+  operator () (const shapes_iterator<T> &subjects, unsigned int subject_id0, unsigned int intruder_layer, shape_interactions<T, T> &interactions, db::Coord dist) const
   {
     db::box_scanner<T, int> scanner;
     interaction_registration_shape1<T, T> rec (&interactions, intruder_layer);
 
     unsigned int id = subject_id0;
-    for (db::Shapes::shape_iterator i = shapes->begin (shape_flags<T> ()); !i.at_end (); ++i) {
-      const T *ref = i->basic_ptr (typename T::tag ());
-      scanner.insert (ref, id++);
+    for (shapes_iterator<T> i = subjects; !i.at_end (); ++i) {
+      scanner.insert (i.operator-> (), id++);
     }
 
     scanner.process (rec, dist, db::box_convert<T> ());
@@ -1730,6 +1709,44 @@ struct scan_shape2shape_different_layers
       for (db::Shapes::shape_iterator i = intruder_shapes->begin (shape_flags<TI> ()); !i.at_end (); ++i) {
         scanner.insert2 (i->basic_ptr (typename TI::tag ()), interactions.next_id ());
       }
+    }
+
+    scanner.process (rec, dist, db::box_convert<TS> (), db::box_convert<TI> ());
+  }
+
+  void
+  operator () (db::Layout *layout, const shapes_iterator<TS> &subjects, const shapes_iterator<TI> &intruders, unsigned int subject_id0, unsigned int intruder_layer, shape_interactions<TS, TI> &interactions, db::Coord dist) const
+  {
+    db::box_scanner2<TS, int, TI, int> scanner;
+    interaction_registration_shape2shape<TS, TI> rec (layout, &interactions, intruder_layer);
+
+    db::Box subjects_box = subjects.bbox ();
+    if (subjects_box != db::Box::world ()) {
+      subjects_box.enlarge (db::Vector (dist, dist));
+    }
+
+    db::Box intruders_box = intruders.bbox ();
+    if (intruders_box != db::Box::world ()) {
+      intruders_box.enlarge (db::Vector (dist, dist));
+    }
+
+    db::Box common_box = intruders_box & subjects_box;
+    if (common_box.empty ()) {
+      return;
+    }
+
+    unsigned int id = subject_id0;
+
+    shapes_iterator<TS> is = subjects;
+    is.reset (common_box, true);
+    for ( ; !is.at_end (); ++is) {
+      scanner.insert1 (is.operator-> (), id++);
+    }
+
+    shapes_iterator<TI> ii = intruders;
+    ii.reset (common_box, true);
+    for (; !ii.at_end (); ++ii) {
+      scanner.insert2 (ii.operator-> (), interactions.next_id ());
     }
 
     scanner.process (rec, dist, db::box_convert<TS> (), db::box_convert<TI> ());
@@ -1853,32 +1870,43 @@ template <class TS, class TI, class TR>
 void
 local_processor<TS, TI, TR>::run_flat (const db::Shapes *subject_shapes, const db::Shapes *intruders, const local_operation<TS, TI, TR> *op, db::Shapes *result_shapes) const
 {
-  std::vector<const db::Shapes *> is;
-  is.push_back (intruders);
+  std::vector<shapes_iterator<TI> > is;
+  is.push_back (shapes_iterator<TI> (intruders));
 
   std::vector<db::Shapes *> os;
   os.push_back (result_shapes);
 
-  run_flat (subject_shapes, is, op, os);
+  run_flat (shapes_iterator<TS> (subject_shapes), is, op, os);
 }
 
 template <class TS, class TI, class TR>
 void
 local_processor<TS, TI, TR>::run_flat (const db::Shapes *subject_shapes, const std::vector<const db::Shapes *> &intruders, const local_operation<TS, TI, TR> *op, const std::vector<db::Shapes *> &result_shapes) const
 {
+  std::vector<shapes_iterator<TI> > is;
+  is.reserve (intruders.size ());
+  for (std::vector<const db::Shapes *>::const_iterator i = intruders.begin (); i != intruders.end (); ++i) {
+    is.push_back (shapes_iterator<TI> (*i));
+  }
+
+  run_flat (shapes_iterator<TS> (subject_shapes), is, op, result_shapes);
+}
+
+template <class TS, class TI, class TR>
+void
+local_processor<TS, TI, TR>::run_flat (const shapes_iterator<TS> &subjects, const std::vector<shapes_iterator<TI> > &intruders, const local_operation<TS, TI, TR> *op, const std::vector<db::Shapes *> &result_shapes) const
+{
   tl_assert (mp_subject_top == 0);
   tl_assert (mp_intruder_top == 0);
 
   shape_interactions<TS, TI> interactions;
 
-  for (std::vector<const db::Shapes *>::const_iterator il = intruders.begin (); il != intruders.end (); ++il) {
-
-    const db::Shapes *intruder_shapes = *il;
+  for (typename std::vector<shapes_iterator<TI> >::const_iterator il = intruders.begin (); il != intruders.end (); ++il) {
 
     //  insert dummy interactions to accommodate subject vs. nothing and assign an ID
     //  range for the subject shapes.
     unsigned int subject_id0 = 0;
-    for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<TS> ()); !i.at_end (); ++i) {
+    for (shapes_iterator<TS> i = subjects; !i.at_end (); ++i) {
 
       unsigned int id = interactions.next_id ();
       if (subject_id0 == 0) {
@@ -1886,20 +1914,19 @@ local_processor<TS, TI, TR>::run_flat (const db::Shapes *subject_shapes, const s
       }
 
       if (op->on_empty_intruder_hint () != local_operation<TS, TI, TR>::Drop) {
-        const TS *ref = i->basic_ptr (typename TS::tag ());
-        interactions.add_subject (id, *ref);
+        interactions.add_subject (id, *i);
       }
 
     }
 
     static std::set<TI> empty_intruders;
 
-    if (! subject_shapes->empty () && intruder_shapes) {
+    if (! subjects.at_end ()) {
 
-      if (intruder_shapes == subject_shapes) {
-        scan_shape2shape_same_layer<TS, TI> () (subject_shapes, subject_id0, (unsigned int) (il - intruders.begin ()), interactions, op->dist ());
+      if (*il == subjects) {
+        scan_shape2shape_same_layer<TS, TI> () (subjects, subject_id0, (unsigned int) (il - intruders.begin ()), interactions, op->dist ());
       } else {
-        scan_shape2shape_different_layers<TS, TI> () (0 /*layout*/, subject_shapes, intruder_shapes, subject_id0, 0 /*ext. intruders*/, (unsigned int) (il - intruders.begin ()), interactions, op->dist ());
+        scan_shape2shape_different_layers<TS, TI> () (0 /*layout*/, subjects, *il, subject_id0, (unsigned int) (il - intruders.begin ()), interactions, op->dist ());
       }
 
     }

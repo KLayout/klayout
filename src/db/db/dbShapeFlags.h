@@ -51,6 +51,9 @@ template <> inline unsigned int shape_flags_pure<db::Polygon> ()    { return 1 <
 template <> inline unsigned int shape_flags<db::Edge> ()            { return db::ShapeIterator::Edges; }
 template <> inline unsigned int shape_flags_pure<db::Edge> ()       { return 1 << db::ShapeIterator::Edge; }
 
+template <> inline unsigned int shape_flags<db::EdgePair> ()        { return db::ShapeIterator::EdgePairs; }
+template <> inline unsigned int shape_flags_pure<db::EdgePair> ()   { return 1 << db::ShapeIterator::EdgePair; }
+
 template <> inline unsigned int shape_flags<db::Text> ()            { return db::ShapeIterator::Texts; }
 template <> inline unsigned int shape_flags_pure<db::Text> ()       { return 1 << db::ShapeIterator::Text; }
 

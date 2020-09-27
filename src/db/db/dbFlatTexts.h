@@ -34,44 +34,7 @@ namespace db {
 /**
  *  @brief An iterator delegate for the flat text set
  */
-class DB_PUBLIC FlatTextsIterator
-  : public TextsIteratorDelegate
-{
-public:
-  typedef db::layer<db::Text, db::unstable_layer_tag> edge_pair_layer_type;
-  typedef edge_pair_layer_type::iterator iterator_type;
-
-  FlatTextsIterator (iterator_type from, iterator_type to)
-    : m_from (from), m_to (to)
-  {
-    //  .. nothing yet ..
-  }
-
-  virtual bool at_end () const
-  {
-    return m_from == m_to;
-  }
-
-  virtual void increment ()
-  {
-    ++m_from;
-  }
-
-  virtual const value_type *get () const
-  {
-    return m_from.operator-> ();
-  }
-
-  virtual TextsIteratorDelegate *clone () const
-  {
-    return new FlatTextsIterator (*this);
-  }
-
-private:
-  friend class Texts;
-
-  iterator_type m_from, m_to;
-};
+typedef generic_shapes_iterator_delegate<db::Text> FlatTextsIterator;
 
 /**
  *  @brief The delegate for the actual text set implementation

@@ -48,20 +48,20 @@ class TransformationReducer;
  *
  *  The iterator delivers the edge pairs of the edge pair set
  */
+/**
+ *  @brief An edge set iterator
+ *
+ *  The iterator delivers the edges of the edge set
+ */
 class DB_PUBLIC EdgePairsIterator
+  : public generic_shape_iterator<db::EdgePair>
 {
 public:
-  typedef EdgePairsIteratorDelegate::value_type value_type;
-  typedef const value_type &reference;
-  typedef const value_type *pointer;
-  typedef std::forward_iterator_tag iterator_category;
-  typedef void difference_type;
-
   /**
    *  @brief Default constructor
    */
   EdgePairsIterator ()
-    : mp_delegate (0)
+    : generic_shape_iterator<db::EdgePair> ()
   {
     //  .. nothing yet ..
   }
@@ -71,27 +71,18 @@ public:
    *  The iterator will take ownership over the delegate
    */
   EdgePairsIterator (EdgePairsIteratorDelegate *delegate)
-    : mp_delegate (delegate)
+    : generic_shape_iterator<db::EdgePair> (delegate)
   {
     //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Destructor
-   */
-  ~EdgePairsIterator ()
-  {
-    delete mp_delegate;
-    mp_delegate = 0;
   }
 
   /**
    *  @brief Copy constructor and assignment
    */
   EdgePairsIterator (const EdgePairsIterator &other)
-    : mp_delegate (0)
+    : generic_shape_iterator<db::EdgePair> (static_cast<const generic_shape_iterator<db::EdgePair> &> (other))
   {
-    operator= (other);
+    //  .. nothing yet ..
   }
 
   /**
@@ -99,19 +90,8 @@ public:
    */
   EdgePairsIterator &operator= (const EdgePairsIterator &other)
   {
-    if (this != &other) {
-      delete mp_delegate;
-      mp_delegate = other.mp_delegate ? other.mp_delegate->clone () : 0;
-    }
+    generic_shape_iterator<db::EdgePair>::operator= (other);
     return *this;
-  }
-
-  /**
-   *  @Returns true, if the iterator is at the end
-   */
-  bool at_end () const
-  {
-    return mp_delegate == 0 || mp_delegate->at_end ();
   }
 
   /**
@@ -119,32 +99,9 @@ public:
    */
   EdgePairsIterator &operator++ ()
   {
-    if (mp_delegate) {
-      mp_delegate->increment ();
-    }
+    generic_shape_iterator<db::EdgePair>::operator++ ();
     return *this;
   }
-
-  /**
-   *  @brief Access
-   */
-  reference operator* () const
-  {
-    const value_type *value = operator-> ();
-    tl_assert (value != 0);
-    return *value;
-  }
-
-  /**
-   *  @brief Access
-   */
-  pointer operator-> () const
-  {
-    return mp_delegate ? mp_delegate->get () : 0;
-  }
-
-private:
-  EdgePairsIteratorDelegate *mp_delegate;
 };
 
 typedef addressable_shape_delivery_gen<EdgePairsIterator> AddressableEdgePairDelivery;

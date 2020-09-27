@@ -31,6 +31,7 @@
 #include "dbEdgePairRelations.h"
 #include "dbShapeCollection.h"
 #include "dbShapeCollectionUtils.h"
+#include "dbGenericShapeIterator.h"
 
 #include <list>
 
@@ -141,19 +142,7 @@ class RegionDelegate;
 /**
  *  @brief The edge set iterator delegate
  */
-class DB_PUBLIC EdgesIteratorDelegate
-{
-public:
-  EdgesIteratorDelegate () { }
-  virtual ~EdgesIteratorDelegate () { }
-
-  typedef db::Edge value_type;
-
-  virtual bool at_end () const = 0;
-  virtual void increment () = 0;
-  virtual const value_type *get () const = 0;
-  virtual EdgesIteratorDelegate *clone () const = 0;
-};
+typedef db::generic_shape_iterator_delegate_base <db::Edge> EdgesIteratorDelegate;
 
 /**
  *  @brief The delegate for the actual edge set implementation

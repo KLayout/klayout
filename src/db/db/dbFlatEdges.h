@@ -29,50 +29,14 @@
 #include "dbAsIfFlatEdges.h"
 #include "dbShapes.h"
 #include "dbShapes2.h"
+#include "dbGenericShapeIterator.h"
 
 namespace db {
 
 /**
- *  @brief An iterator delegate for the flat region
+ *  @brief An iterator delegate for the flat edge set
  */
-class DB_PUBLIC FlatEdgesIterator
-  : public EdgesIteratorDelegate
-{
-public:
-  typedef db::layer<db::Edge, db::unstable_layer_tag> edge_layer_type;
-  typedef edge_layer_type::iterator iterator_type;
-
-  FlatEdgesIterator (iterator_type from, iterator_type to)
-    : m_from (from), m_to (to)
-  {
-    //  .. nothing yet ..
-  }
-
-  virtual bool at_end () const
-  {
-    return m_from == m_to;
-  }
-
-  virtual void increment ()
-  {
-    ++m_from;
-  }
-
-  virtual const value_type *get () const
-  {
-    return m_from.operator-> ();
-  }
-
-  virtual EdgesIteratorDelegate *clone () const
-  {
-    return new FlatEdgesIterator (*this);
-  }
-
-private:
-  friend class Edges;
-
-  iterator_type m_from, m_to;
-};
+typedef generic_shapes_iterator_delegate<db::Edge> FlatEdgesIterator;
 
 /**
  *  @brief A flat, edge-set delegate

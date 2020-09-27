@@ -27,6 +27,7 @@
 #include "dbCommon.h"
 #include "dbShapeCollection.h"
 #include "dbShapeCollectionUtils.h"
+#include "dbGenericShapeIterator.h"
 #include "dbText.h"
 
 namespace db {
@@ -41,22 +42,7 @@ class Layout;
 
 typedef shape_collection_processor<db::Text, db::Polygon> TextToPolygonProcessorBase;
 
-/**
- *  @brief The edge pair set iterator delegate
- */
-class DB_PUBLIC TextsIteratorDelegate
-{
-public:
-  TextsIteratorDelegate () { }
-  virtual ~TextsIteratorDelegate () { }
-
-  typedef db::Text value_type;
-
-  virtual bool at_end () const = 0;
-  virtual void increment () = 0;
-  virtual const value_type *get () const = 0;
-  virtual TextsIteratorDelegate *clone () const = 0;
-};
+typedef db::generic_shape_iterator_delegate_base <db::Text> TextsIteratorDelegate;
 
 /**
  *  @brief The delegate for the actual edge set implementation

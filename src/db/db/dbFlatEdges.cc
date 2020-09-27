@@ -133,7 +133,7 @@ FlatEdges::ensure_merged_edges_valid () const
 
 EdgesIteratorDelegate *FlatEdges::begin () const
 {
-  return new FlatEdgesIterator (m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().begin (), m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().end ());
+  return new FlatEdgesIterator (&m_edges);
 }
 
 EdgesIteratorDelegate *FlatEdges::begin_merged () const
@@ -142,7 +142,7 @@ EdgesIteratorDelegate *FlatEdges::begin_merged () const
     return begin ();
   } else {
     ensure_merged_edges_valid ();
-    return new FlatEdgesIterator (m_merged_edges.get_layer<db::Edge, db::unstable_layer_tag> ().begin (), m_merged_edges.get_layer<db::Edge, db::unstable_layer_tag> ().end ());
+    return new FlatEdgesIterator (&m_merged_edges);
   }
 }
 

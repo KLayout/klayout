@@ -28,50 +28,14 @@
 
 #include "dbAsIfFlatEdgePairs.h"
 #include "dbShapes.h"
+#include "dbGenericShapeIterator.h"
 
 namespace db {
 
 /**
  *  @brief An iterator delegate for the flat edge pair set
  */
-class DB_PUBLIC FlatEdgePairsIterator
-  : public EdgePairsIteratorDelegate
-{
-public:
-  typedef db::layer<db::EdgePair, db::unstable_layer_tag> edge_pair_layer_type;
-  typedef edge_pair_layer_type::iterator iterator_type;
-
-  FlatEdgePairsIterator (iterator_type from, iterator_type to)
-    : m_from (from), m_to (to)
-  {
-    //  .. nothing yet ..
-  }
-
-  virtual bool at_end () const
-  {
-    return m_from == m_to;
-  }
-
-  virtual void increment ()
-  {
-    ++m_from;
-  }
-
-  virtual const value_type *get () const
-  {
-    return m_from.operator-> ();
-  }
-
-  virtual EdgePairsIteratorDelegate *clone () const
-  {
-    return new FlatEdgePairsIterator (*this);
-  }
-
-private:
-  friend class EdgePairs;
-
-  iterator_type m_from, m_to;
-};
+typedef generic_shapes_iterator_delegate<db::EdgePair> FlatEdgePairsIterator;
 
 /**
  *  @brief The delegate for the actual edge pair set implementation

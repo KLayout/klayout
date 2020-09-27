@@ -28,6 +28,7 @@
 #include "dbEdgePair.h"
 #include "dbShapeCollection.h"
 #include "dbShapeCollectionUtils.h"
+#include "dbGenericShapeIterator.h"
 
 namespace db {
 
@@ -43,19 +44,7 @@ typedef shape_collection_processor<db::EdgePair, db::Polygon> EdgePairToPolygonP
 /**
  *  @brief The edge pair set iterator delegate
  */
-class DB_PUBLIC EdgePairsIteratorDelegate
-{
-public:
-  EdgePairsIteratorDelegate () { }
-  virtual ~EdgePairsIteratorDelegate () { }
-
-  typedef db::EdgePair value_type;
-
-  virtual bool at_end () const = 0;
-  virtual void increment () = 0;
-  virtual const value_type *get () const = 0;
-  virtual EdgePairsIteratorDelegate *clone () const = 0;
-};
+typedef db::generic_shape_iterator_delegate_base <db::EdgePair> EdgePairsIteratorDelegate;
 
 /**
  *  @brief The delegate for the actual edge set implementation

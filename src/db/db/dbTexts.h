@@ -48,20 +48,16 @@ class TransformationReducer;
  *
  *  The iterator delivers the texts of the text set
  */
+
 class DB_PUBLIC TextsIterator
+  : public generic_shape_iterator<db::Text>
 {
 public:
-  typedef TextsIteratorDelegate::value_type value_type;
-  typedef const value_type &reference;
-  typedef const value_type *pointer;
-  typedef std::forward_iterator_tag iterator_category;
-  typedef void difference_type;
-
   /**
    *  @brief Default constructor
    */
   TextsIterator ()
-    : mp_delegate (0)
+    : generic_shape_iterator<db::Text> ()
   {
     //  .. nothing yet ..
   }
@@ -71,27 +67,18 @@ public:
    *  The iterator will take ownership over the delegate
    */
   TextsIterator (TextsIteratorDelegate *delegate)
-    : mp_delegate (delegate)
+    : generic_shape_iterator<db::Text> (delegate)
   {
     //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Destructor
-   */
-  ~TextsIterator ()
-  {
-    delete mp_delegate;
-    mp_delegate = 0;
   }
 
   /**
    *  @brief Copy constructor and assignment
    */
   TextsIterator (const TextsIterator &other)
-    : mp_delegate (0)
+    : generic_shape_iterator<db::Text> (static_cast<const generic_shape_iterator<db::Text> &> (other))
   {
-    operator= (other);
+    //  .. nothing yet ..
   }
 
   /**
@@ -99,19 +86,8 @@ public:
    */
   TextsIterator &operator= (const TextsIterator &other)
   {
-    if (this != &other) {
-      delete mp_delegate;
-      mp_delegate = other.mp_delegate ? other.mp_delegate->clone () : 0;
-    }
+    generic_shape_iterator<db::Text>::operator= (other);
     return *this;
-  }
-
-  /**
-   *  @Returns true, if the iterator is at the end
-   */
-  bool at_end () const
-  {
-    return mp_delegate == 0 || mp_delegate->at_end ();
   }
 
   /**
@@ -119,32 +95,9 @@ public:
    */
   TextsIterator &operator++ ()
   {
-    if (mp_delegate) {
-      mp_delegate->increment ();
-    }
+    generic_shape_iterator<db::Text>::operator++ ();
     return *this;
   }
-
-  /**
-   *  @brief Access
-   */
-  reference operator* () const
-  {
-    const value_type *value = operator-> ();
-    tl_assert (value != 0);
-    return *value;
-  }
-
-  /**
-   *  @brief Access
-   */
-  pointer operator-> () const
-  {
-    return mp_delegate ? mp_delegate->get () : 0;
-  }
-
-private:
-  TextsIteratorDelegate *mp_delegate;
 };
 
 typedef addressable_shape_delivery_gen<TextsIterator> AddressableTextDelivery;

@@ -66,7 +66,7 @@ void FlatTexts::reserve (size_t n)
 
 TextsIteratorDelegate *FlatTexts::begin () const
 {
-  return new FlatTextsIterator (m_texts.get_layer<db::Text, db::unstable_layer_tag> ().begin (), m_texts.get_layer<db::Text, db::unstable_layer_tag> ().end ());
+  return new FlatTextsIterator (&m_texts);
 }
 
 std::pair<db::RecursiveShapeIterator, db::ICplxTrans> FlatTexts::begin_iter () const

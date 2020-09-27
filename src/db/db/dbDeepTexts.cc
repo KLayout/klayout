@@ -39,13 +39,15 @@ namespace db
 {
 
 /**
- *  @brief An iterator delegate for the deep text collection
+ *  @brief An iterator delegate for the deep region
  *  TODO: this is kind of redundant with OriginalLayerIterator ..
  */
 class DB_PUBLIC DeepTextsIterator
   : public TextsIteratorDelegate
 {
 public:
+  typedef db::Text value_type;
+
   DeepTextsIterator (const db::RecursiveShapeIterator &iter)
     : m_iter (iter)
   {
@@ -65,14 +67,36 @@ public:
     set ();
   }
 
+  virtual bool is_addressable() const
+  {
+    return false;
+  }
+
   virtual const value_type *get () const
   {
     return &m_text;
   }
 
+  virtual bool equals (const generic_shape_iterator_delegate_base<value_type> *other) const
+  {
+    const DeepTextsIterator *o = dynamic_cast<const DeepTextsIterator *> (other);
+    return o && o->m_iter == m_iter;
+  }
+
   virtual TextsIteratorDelegate *clone () const
   {
     return new DeepTextsIterator (*this);
+  }
+
+  virtual void do_reset (const db::Box &region, bool overlapping)
+  {
+    m_iter.set_region (region);
+    m_iter.set_overlapping (overlapping);
+  }
+
+  virtual db::Box bbox () const
+  {
+    return m_iter.bbox ();
   }
 
 private:
@@ -81,14 +105,14 @@ private:
   db::RecursiveShapeIterator m_iter;
   mutable value_type m_text;
 
-  void set () const  {
+  void set () const
+  {
     if (! m_iter.at_end ()) {
       m_iter.shape ().text (m_text);
       m_text.transform (m_iter.trans ());
     }
   }
 };
-
 
 DeepTexts::DeepTexts ()
   : AsIfFlatTexts ()

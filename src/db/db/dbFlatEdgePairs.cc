@@ -66,7 +66,7 @@ void FlatEdgePairs::reserve (size_t n)
 
 EdgePairsIteratorDelegate *FlatEdgePairs::begin () const
 {
-  return new FlatEdgePairsIterator (m_edge_pairs.get_layer<db::EdgePair, db::unstable_layer_tag> ().begin (), m_edge_pairs.get_layer<db::EdgePair, db::unstable_layer_tag> ().end ());
+  return new FlatEdgePairsIterator (&m_edge_pairs);
 }
 
 std::pair<db::RecursiveShapeIterator, db::ICplxTrans> FlatEdgePairs::begin_iter () const

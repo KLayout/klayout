@@ -931,7 +931,7 @@ private:
 };
 
 template <class T>
-struct addressable_shape_delivery
+struct addressable_object_from_shape
 {
   const T *operator () (const db::Shape &shape)
   {
@@ -941,7 +941,7 @@ struct addressable_shape_delivery
 };
 
 template <>
-struct addressable_shape_delivery<db::NetShape>
+struct addressable_object_from_shape<db::NetShape>
 {
   const NetShape *operator () (const db::Shape &shape)
   {
@@ -1024,7 +1024,7 @@ local_clusters<T>::build_clusters (const db::Cell &cell, const db::Connectivity 
 
   db::box_scanner<T, std::pair<unsigned int, size_t> > bs (report_progress, desc);
   db::box_convert<T> bc;
-  addressable_shape_delivery<T> heap;
+  addressable_object_from_shape<T> heap;
   attr_accessor<T> attr;
   db::ShapeIterator::flags_type shape_flags = get_shape_flags<T> () ();
 

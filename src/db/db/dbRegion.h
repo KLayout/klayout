@@ -30,6 +30,7 @@
 #include "dbPolygonGenerators.h"
 #include "dbCellVariants.h"
 #include "dbShapeCollection.h"
+#include "dbGenericShapeIterator.h"
 
 #include <list>
 
@@ -97,60 +98,7 @@ public:
   }
 };
 
-/**
- *  @brief A helper class allowing delivery of addressable polygons
- *
- *  In some applications (i.e. box scanner), polygons need to be taken
- *  by address. The region cannot always deliver adressable polygons.
- *  This class help providing this ability by keeping a temporary copy
- *  if required.
- */
-
-class DB_PUBLIC AddressablePolygonDelivery
-{
-public:
-  AddressablePolygonDelivery ()
-    : m_iter (), m_valid (false)
-  {
-    //  .. nothing yet ..
-  }
-
-  AddressablePolygonDelivery (const RegionIterator &iter, bool valid)
-    : m_iter (iter), m_valid (valid)
-  {
-    if (! m_valid && ! m_iter.at_end ()) {
-      m_heap.push_back (*m_iter);
-    }
-  }
-
-  bool at_end () const
-  {
-    return m_iter.at_end ();
-  }
-
-  AddressablePolygonDelivery &operator++ ()
-  {
-    ++m_iter;
-    if (! m_valid && ! m_iter.at_end ()) {
-      m_heap.push_back (*m_iter);
-    }
-    return *this;
-  }
-
-  const db::Polygon *operator-> () const
-  {
-    if (m_valid) {
-      return m_iter.operator-> ();
-    } else {
-      return &m_heap.back ();
-    }
-  }
-
-private:
-  RegionIterator m_iter;
-  bool m_valid;
-  std::list<db::Polygon> m_heap;
-};
+typedef addressable_shape_delivery<db::Polygon> AddressablePolygonDelivery;
 
 /**
  *  @brief A region
@@ -1546,7 +1494,7 @@ public:
    */
   AddressablePolygonDelivery addressable_polygons () const
   {
-    return AddressablePolygonDelivery (begin (), has_valid_polygons ());
+    return AddressablePolygonDelivery (begin ());
   }
 
   /**
@@ -1565,7 +1513,7 @@ public:
    */
   AddressablePolygonDelivery addressable_merged_polygons () const
   {
-    return AddressablePolygonDelivery (begin_merged (), has_valid_merged_polygons ());
+    return AddressablePolygonDelivery (begin_merged ());
   }
 
   /**

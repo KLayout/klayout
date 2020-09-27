@@ -28,6 +28,7 @@
 #include "dbShape.h"
 #include "dbRecursiveShapeIterator.h"
 #include "dbShapeCollection.h"
+#include "dbGenericShapeIterator.h"
 
 #include <list>
 
@@ -146,60 +147,7 @@ private:
   TextsIteratorDelegate *mp_delegate;
 };
 
-/**
- *  @brief A helper class allowing delivery of addressable texts
- *
- *  In some applications (i.e. box scanner), texts need to be taken
- *  by address. The text set cannot always deliver adressable edges.
- *  This class help providing this ability by keeping a temporary copy
- *  if required.
- */
-
-class DB_PUBLIC AddressableTextDelivery
-{
-public:
-  AddressableTextDelivery ()
-    : m_iter (), m_valid (false)
-  {
-    //  .. nothing yet ..
-  }
-
-  AddressableTextDelivery (const TextsIterator &iter, bool valid)
-    : m_iter (iter), m_valid (valid)
-  {
-    if (! m_valid && ! m_iter.at_end ()) {
-      m_heap.push_back (*m_iter);
-    }
-  }
-
-  bool at_end () const
-  {
-    return m_iter.at_end ();
-  }
-
-  AddressableTextDelivery &operator++ ()
-  {
-    ++m_iter;
-    if (! m_valid && ! m_iter.at_end ()) {
-      m_heap.push_back (*m_iter);
-    }
-    return *this;
-  }
-
-  const db::Text *operator-> () const
-  {
-    if (m_valid) {
-      return m_iter.operator-> ();
-    } else {
-      return &m_heap.back ();
-    }
-  }
-
-private:
-  TextsIterator m_iter;
-  bool m_valid;
-  std::list<db::Text> m_heap;
-};
+typedef addressable_shape_delivery_gen<TextsIterator> AddressableTextDelivery;
 
 class Texts;
 

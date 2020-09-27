@@ -208,27 +208,30 @@ CheckLocalOperation::description () const
 
 // ---------------------------------------------------------------------------------------------------------------
 
-InteractingLocalOperation::InteractingLocalOperation (int mode, bool touching, bool inverse, size_t min_count, size_t max_count)
+template <class TS, class TI, class TR>
+interacting_local_operation<TS, TI, TR>::interacting_local_operation (int mode, bool touching, bool inverse, size_t min_count, size_t max_count)
   : m_mode (mode), m_touching (touching), m_inverse (inverse), m_min_count (std::max (size_t (1), min_count)), m_max_count (max_count)
 {
   //  .. nothing yet ..
 }
 
-db::Coord InteractingLocalOperation::dist () const
+template <class TS, class TI, class TR>
+db::Coord interacting_local_operation<TS, TI, TR>::dist () const
 {
   return m_touching ? 1 : 0;
 }
 
-void InteractingLocalOperation::compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+template <class TS, class TI, class TR>
+void interacting_local_operation<TS, TI, TR>::compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
   tl_assert (results.size () == 1);
-  std::unordered_set<db::PolygonRef> &result = results.front ();
+  std::unordered_set<TR> &result = results.front ();
 
   db::EdgeProcessor ep;
 
-  std::set<db::PolygonRef> others;
-  for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+  std::set<TI> others;
+  for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (typename shape_interactions<TS, TI>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
       others.insert (interactions.intruder_shape (*j).second);
     }
   }
@@ -237,8 +240,8 @@ void InteractingLocalOperation::compute_local (db::Layout * /*layout*/, const sh
 
   if (m_min_count == size_t (1) && m_max_count == std::numeric_limits<size_t>::max ()) {
 
-    for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
-      for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
+    for (typename std::set<TI>::const_iterator o = others.begin (); o != others.end (); ++o) {
+      for (typename TI::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
         ep.insert (*e, nstart);
       }
     }
@@ -248,8 +251,8 @@ void InteractingLocalOperation::compute_local (db::Layout * /*layout*/, const sh
 
     tl_assert (m_mode == 0);
 
-    for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
-      for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
+    for (typename std::set<TI>::const_iterator o = others.begin (); o != others.end (); ++o) {
+      for (typename TI::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
         ep.insert (*e, nstart);
       }
       nstart++;
@@ -258,9 +261,9 @@ void InteractingLocalOperation::compute_local (db::Layout * /*layout*/, const sh
   }
 
   size_t n = nstart;
-  for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i, ++n) {
-    const db::PolygonRef &subject = interactions.subject_shape (i->first);
-    for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+  for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i, ++n) {
+    const TS &subject = interactions.subject_shape (i->first);
+    for (typename TS::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
       ep.insert (*e, n);
     }
   }
@@ -279,33 +282,39 @@ void InteractingLocalOperation::compute_local (db::Layout * /*layout*/, const sh
   }
 
   n = nstart;
-  for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i, ++n) {
+  for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i, ++n) {
     size_t count = 0;
     std::map <size_t, size_t>::const_iterator c = interaction_counts.find (n);
     if (c != interaction_counts.end ()) {
       count = c->second;
     }
     if ((count >= m_min_count && count <= m_max_count) != m_inverse) {
-      const db::PolygonRef &subject = interactions.subject_shape (i->first);
+      const TS &subject = interactions.subject_shape (i->first);
       result.insert (subject);
     }
   }
 }
 
-InteractingLocalOperation::on_empty_intruder_mode
-InteractingLocalOperation::on_empty_intruder_hint () const
+template <class TS, class TI, class TR>
+typename local_operation<TS, TI, TR>::on_empty_intruder_mode
+interacting_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
 {
   if ((m_mode <= 0) != m_inverse) {
-    return Drop;
+    return local_operation<TS, TI, TR>::Drop;
   } else {
-    return Copy;
+    return local_operation<TS, TI, TR>::Copy;
   }
 }
 
-std::string InteractingLocalOperation::description () const
+template <class TS, class TI, class TR>
+std::string interacting_local_operation<TS, TI, TR>::description () const
 {
   return tl::to_string (tr ("Select regions by their geometric relation (interacting, inside, outside ..)"));
 }
+
+//  explicit instantiations
+template class interacting_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class interacting_local_operation<db::Polygon, db::Polygon, db::Polygon>;
 
 // ---------------------------------------------------------------------------------------------------------------
 

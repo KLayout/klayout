@@ -158,6 +158,29 @@ public:
   }
 };
 
+template <>
+class shape_reference_translator<db::Polygon>
+{
+public:
+  typedef db::Polygon shape_type;
+
+  shape_reference_translator (db::Layout * /*target_layout*/)
+  {
+    //  .. nothing yet ..
+  }
+
+  const shape_type &operator() (const shape_type &s) const
+  {
+    return s;
+  }
+
+  template <class Trans>
+  shape_type operator() (const shape_type &s, const Trans &tr) const
+  {
+    return s.transformed (tr);
+  }
+};
+
 template <class Ref, class Trans>
 class shape_reference_translator_with_trans_from_shape_ref
 {
@@ -314,6 +337,7 @@ local_processor_cell_context<TS, TI, TR>::propagate (unsigned int output_layer, 
   }
 }
 
+template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Polygon, db::Polygon>;
 template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::PolygonRef, db::EdgePair>;
@@ -559,6 +583,7 @@ local_processor_cell_contexts<TS, TI, TR>::compute_results (const local_processo
   }
 }
 
+template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Polygon, db::Polygon>;
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::PolygonRef, db::EdgePair>;
@@ -657,6 +682,7 @@ shape_interactions<TS, TI>::intruder_shape (unsigned int id) const
   }
 }
 
+template class DB_PUBLIC shape_interactions<db::Polygon, db::Polygon>;
 template class DB_PUBLIC shape_interactions<db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC shape_interactions<db::PolygonRef, db::Edge>;
 template class DB_PUBLIC shape_interactions<db::PolygonRef, db::TextRef>;
@@ -1011,6 +1037,7 @@ local_processor_context_computation_task<TS, TI, TR>::perform ()
   mp_proc->compute_contexts (*mp_contexts, mp_parent_context, mp_subject_parent, mp_subject_cell, m_subject_cell_inst, mp_intruder_cell, m_intruders, m_dist);
 }
 
+template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Polygon, db::Polygon>;
 template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::PolygonRef, db::EdgePair>;
@@ -1058,6 +1085,7 @@ local_processor_result_computation_task<TS, TI, TR>::perform ()
   }
 }
 
+template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Polygon, db::Polygon>;
 template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::PolygonRef, db::EdgePair>;
@@ -1614,6 +1642,8 @@ local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, T
   }
 }
 
+namespace {
+
 template <class TS, class TI>
 struct scan_shape2shape_same_layer
 {
@@ -1636,13 +1666,6 @@ struct scan_shape2shape_same_layer
 
     scanner.process (rec, dist, db::box_convert<TS> (), db::box_convert<TI> ());
   }
-
-  void
-  operator () (const generic_shape_iterator<TS> &, unsigned int, unsigned int, shape_interactions<TS, TI> &, db::Coord) const
-  {
-    //  cannot have different types on the same layer
-    tl_assert (false);
-  }
 };
 
 template <class T>
@@ -1663,20 +1686,6 @@ struct scan_shape2shape_same_layer<T, T>
     //  TODO: can we confine this search to the subject's (sized) bounding box?
     for (typename std::set<T>::const_iterator i = intruders.begin (); i != intruders.end (); ++i) {
       scanner.insert (i.operator-> (), interactions.next_id ());
-    }
-
-    scanner.process (rec, dist, db::box_convert<T> ());
-  }
-
-  void
-  operator () (const generic_shape_iterator<T> &subjects, unsigned int subject_id0, unsigned int intruder_layer, shape_interactions<T, T> &interactions, db::Coord dist) const
-  {
-    db::box_scanner<T, int> scanner;
-    interaction_registration_shape1<T, T> rec (&interactions, intruder_layer);
-
-    unsigned int id = subject_id0;
-    for (generic_shape_iterator<T> i = subjects; !i.at_end (); ++i) {
-      scanner.insert (i.operator-> (), id++);
     }
 
     scanner.process (rec, dist, db::box_convert<T> ());
@@ -1714,45 +1723,9 @@ struct scan_shape2shape_different_layers
 
     scanner.process (rec, dist, db::box_convert<TS> (), db::box_convert<TI> ());
   }
-
-  void
-  operator () (db::Layout *layout, const generic_shape_iterator<TS> &subjects, const generic_shape_iterator<TI> &intruders, unsigned int subject_id0, unsigned int intruder_layer, shape_interactions<TS, TI> &interactions, db::Coord dist) const
-  {
-    db::box_scanner2<TS, int, TI, int> scanner;
-    interaction_registration_shape2shape<TS, TI> rec (layout, &interactions, intruder_layer);
-
-    db::Box subjects_box = subjects.bbox ();
-    if (subjects_box != db::Box::world ()) {
-      subjects_box.enlarge (db::Vector (dist, dist));
-    }
-
-    db::Box intruders_box = intruders.bbox ();
-    if (intruders_box != db::Box::world ()) {
-      intruders_box.enlarge (db::Vector (dist, dist));
-    }
-
-    db::Box common_box = intruders_box & subjects_box;
-    if (common_box.empty ()) {
-      return;
-    }
-
-    unsigned int id = subject_id0;
-
-    generic_shape_iterator<TS> is = subjects;
-    is.reset (common_box, true);
-    for ( ; !is.at_end (); ++is) {
-      scanner.insert1 (is.operator-> (), id++);
-    }
-
-    generic_shape_iterator<TI> ii = intruders;
-    ii.reset (common_box, true);
-    for (; !ii.at_end (); ++ii) {
-      scanner.insert2 (ii.operator-> (), interactions.next_id ());
-    }
-
-    scanner.process (rec, dist, db::box_convert<TS> (), db::box_convert<TI> ());
-  }
 };
+
+}
 
 template <class TS, class TI, class TR>
 void
@@ -1893,45 +1866,142 @@ local_processor<TS, TI, TR>::run_flat (const db::Shapes *subject_shapes, const s
   run_flat (generic_shape_iterator<TS> (subject_shapes), is, op, result_shapes);
 }
 
+namespace {
+
+template <class TS, class TI>
+struct scan_shape2shape_same_layer_flat
+{
+  void
+  operator () (const generic_shape_iterator<TS> &, bool, unsigned int, shape_interactions<TS, TI> &, db::Coord) const
+  {
+    //  cannot have different types on the same layer
+    tl_assert (false);
+  }
+};
+
+template <class T>
+struct scan_shape2shape_same_layer_flat<T, T>
+{
+  void
+  operator () (const generic_shape_iterator<T> &subjects, bool needs_isolated_subjects, unsigned int intruder_layer, shape_interactions<T, T> &interactions, db::Coord dist) const
+  {
+    db::box_scanner<T, int> scanner;
+    interaction_registration_shape1<T, T> rec (&interactions, intruder_layer);
+
+    addressable_shape_delivery<T> is (subjects);
+    for ( ; !is.at_end (); ++is) {
+
+      unsigned int id = interactions.next_id ();
+
+      const T *shape = is.operator-> ();
+      scanner.insert (shape, id);
+
+      //  create subject for subject vs. nothing interactions
+      if (needs_isolated_subjects) {
+        interactions.add_subject (id, *shape);
+      }
+
+    }
+
+    scanner.process (rec, dist, db::box_convert<T> ());
+  }
+};
+
+template <class TS, class TI>
+struct scan_shape2shape_different_layers_flat
+{
+  void
+  operator () (const generic_shape_iterator<TS> &subjects, const generic_shape_iterator<TI> &intruders, bool needs_isolated_subjects, unsigned int intruder_layer, shape_interactions<TS, TI> &interactions, db::Coord dist) const
+  {
+    db::box_scanner2<TS, int, TI, int> scanner;
+    interaction_registration_shape2shape<TS, TI> rec (0 /*layout*/, &interactions, intruder_layer);
+
+    db::Box subjects_box = subjects.bbox ();
+    if (subjects_box != db::Box::world ()) {
+      subjects_box.enlarge (db::Vector (dist, dist));
+    }
+
+    db::Box intruders_box = intruders.bbox ();
+    if (intruders_box != db::Box::world ()) {
+      intruders_box.enlarge (db::Vector (dist, dist));
+    }
+
+    db::Box common_box = intruders_box & subjects_box;
+    if (common_box.empty ()) {
+
+      if (needs_isolated_subjects) {
+        for (generic_shape_iterator<TS> is = subjects; ! is.at_end (); ++is) {
+          //  create subject for subject vs. nothing interactions
+          interactions.add_subject (interactions.next_id (), *is);
+        }
+      }
+
+      return;
+
+    }
+
+    addressable_shape_delivery<TS> is;
+
+    if (needs_isolated_subjects) {
+
+      box_convert<TS> bcs;
+
+      is = addressable_shape_delivery<TS> (subjects);
+      for ( ; !is.at_end (); ++is) {
+
+        unsigned int id = interactions.next_id ();
+        const TS *shape = is.operator-> ();
+
+        if (bcs (*shape).overlaps (common_box)) {
+          scanner.insert1 (shape, id);
+        }
+
+        //  create subject for subject vs. nothing interactions
+        interactions.add_subject (id, *shape);
+
+      }
+
+    } else {
+
+      is = addressable_shape_delivery<TS> (subjects.confined (common_box, true));
+      for ( ; !is.at_end (); ++is) {
+        scanner.insert1 (is.operator-> (), interactions.next_id ());
+      }
+
+    }
+
+    addressable_shape_delivery<TI> ii (intruders.confined (common_box, true));
+    for (; !ii.at_end (); ++ii) {
+      scanner.insert2 (ii.operator-> (), interactions.next_id ());
+    }
+
+    scanner.process (rec, dist, db::box_convert<TS> (), db::box_convert<TI> ());
+
+  }
+};
+
+}
+
 template <class TS, class TI, class TR>
 void
 local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subjects, const std::vector<generic_shape_iterator<TI> > &intruders, const local_operation<TS, TI, TR> *op, const std::vector<db::Shapes *> &result_shapes) const
 {
+  if (subjects.at_end ()) {
+    return;
+  }
+
   tl_assert (mp_subject_top == 0);
   tl_assert (mp_intruder_top == 0);
 
   shape_interactions<TS, TI> interactions;
+  bool needs_isolated_subjects = (op->on_empty_intruder_hint () != local_operation<TS, TI, TR>::Drop);
 
   for (typename std::vector<generic_shape_iterator<TI> >::const_iterator il = intruders.begin (); il != intruders.end (); ++il) {
-
-    //  insert dummy interactions to accommodate subject vs. nothing and assign an ID
-    //  range for the subject shapes.
-    unsigned int subject_id0 = 0;
-    for (generic_shape_iterator<TS> i = subjects; !i.at_end (); ++i) {
-
-      unsigned int id = interactions.next_id ();
-      if (subject_id0 == 0) {
-        subject_id0 = id;
-      }
-
-      if (op->on_empty_intruder_hint () != local_operation<TS, TI, TR>::Drop) {
-        interactions.add_subject (id, *i);
-      }
-
+    if (*il == subjects) {
+      scan_shape2shape_same_layer_flat<TS, TI> () (subjects, needs_isolated_subjects, (unsigned int) (il - intruders.begin ()), interactions, op->dist ());
+    } else {
+      scan_shape2shape_different_layers_flat<TS, TI> () (subjects, *il, needs_isolated_subjects, (unsigned int) (il - intruders.begin ()), interactions, op->dist ());
     }
-
-    static std::set<TI> empty_intruders;
-
-    if (! subjects.at_end ()) {
-
-      if (*il == subjects) {
-        scan_shape2shape_same_layer<TS, TI> () (subjects, subject_id0, (unsigned int) (il - intruders.begin ()), interactions, op->dist ());
-      } else {
-        scan_shape2shape_different_layers<TS, TI> () (0 /*layout*/, subjects, *il, subject_id0, (unsigned int) (il - intruders.begin ()), interactions, op->dist ());
-      }
-
-    }
-
   }
 
   if (interactions.begin () != interactions.end ()) {
@@ -1959,6 +2029,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
   }
 }
 
+template class DB_PUBLIC local_processor<db::Polygon, db::Polygon, db::Polygon>;
 template class DB_PUBLIC local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC local_processor<db::PolygonRef, db::Edge, db::Edge>;

@@ -37,6 +37,8 @@
 #include "dbClip.h"
 #include "dbPolygonTools.h"
 #include "dbHash.h"
+#include "dbRegionLocalOperations.h"
+#include "dbHierProcessor.h"
 
 #include <sstream>
 
@@ -394,7 +396,7 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse, 
   std::auto_ptr<FlatRegion> output (new FlatRegion (false));
   region_to_edge_interaction_filter<ResultCountingInserter, db::Polygon> filter (inserter, false, counting /*get all in counting mode*/);
 
-  AddressablePolygonDelivery p (begin_merged (), has_valid_merged_polygons ());
+  AddressablePolygonDelivery p (begin_merged ());
 
   for ( ; ! p.at_end (); ++p) {
     scanner.insert1 (p.operator-> (), 0);
@@ -449,7 +451,7 @@ AsIfFlatRegion::selected_interacting_generic (const Texts &other, bool inverse, 
 
   region_to_text_interaction_filter<ResultCountingInserter, db::Text> filter (inserter, false, counting /*get all in counting mode*/);
 
-  AddressablePolygonDelivery p (begin_merged (), has_valid_merged_polygons ());
+  AddressablePolygonDelivery p (begin_merged ());
 
   for ( ; ! p.at_end (); ++p) {
     scanner.insert1 (p.operator-> (), 0);
@@ -485,9 +487,6 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
 {
   min_count = std::max (size_t (1), min_count);
 
-  db::EdgeProcessor ep (report_progress (), progress_desc ());
-  ep.set_base_verbosity (base_verbosity ());
-
   //  shortcut
   if (empty ()) {
     return clone ();
@@ -501,6 +500,32 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
       return clone ();
     }
   }
+
+#if 1
+
+  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+
+  db::RegionIterator polygons (begin_merged ());
+
+  db::interacting_local_operation<db::Polygon, db::Polygon, db::Polygon> op (mode, touching, inverse, min_count, max_count);
+
+  db::local_processor<db::Polygon, db::Polygon, db::Polygon> proc;
+  proc.set_base_verbosity (base_verbosity ());
+
+  std::vector<generic_shape_iterator<db::Polygon> > others;
+  others.push_back ((mode < 0 || counting) ? other.begin_merged () : other.begin ());
+
+  std::auto_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
+  std::vector<db::Shapes *> results;
+  results.push_back (&output->raw_polygons ());
+
+  proc.run_flat (polygons, others, &op, results);
+
+  return output.release ();
+
+#else
+  db::EdgeProcessor ep (report_progress (), progress_desc ());
+  ep.set_base_verbosity (base_verbosity ());
 
   size_t nstart = 0;
 
@@ -582,6 +607,7 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
   }
 
   return output.release ();
+#endif
 }
 
 EdgesDelegate *
@@ -600,7 +626,7 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
   std::auto_ptr<FlatEdges> output (new FlatEdges (false));
   region_to_edge_interaction_filter<Shapes, db::Edge> filter (output->raw_edges (), false);
 
-  AddressablePolygonDelivery p (begin (), has_valid_polygons ());
+  AddressablePolygonDelivery p (begin ());
 
   for ( ; ! p.at_end (); ++p) {
     scanner.insert1 (p.operator-> (), 0);
@@ -633,7 +659,7 @@ AsIfFlatRegion::pull_generic (const Texts &other) const
   std::auto_ptr<FlatTexts> output (new FlatTexts (false));
   region_to_text_interaction_filter<Shapes, db::Text, db::Text> filter (output->raw_texts (), false);
 
-  AddressablePolygonDelivery p (begin (), has_valid_polygons ());
+  AddressablePolygonDelivery p (begin ());
 
   for ( ; ! p.at_end (); ++p) {
     scanner.insert1 (p.operator-> (), 0);
@@ -879,7 +905,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   db::box_scanner<db::Polygon, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve (size () + (other ? other->size () : 0));
 
-  AddressablePolygonDelivery p (begin_merged (), has_valid_merged_polygons ());
+  AddressablePolygonDelivery p (begin_merged ());
 
   size_t n = 0;
   for ( ; ! p.at_end (); ++p) {

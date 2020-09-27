@@ -74,6 +74,11 @@ public:
     set ();
   }
 
+  virtual bool is_addressable() const
+  {
+    return false;
+  }
+
   virtual const value_type *get () const
   {
     return &m_polygon;

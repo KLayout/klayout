@@ -50,6 +50,11 @@ namespace
       set ();
     }
 
+    virtual bool is_addressable() const
+    {
+      return false;
+    }
+
     virtual bool at_end () const
     {
       return m_rec_iter.at_end ();

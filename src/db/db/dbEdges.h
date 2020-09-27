@@ -28,6 +28,7 @@
 #include "dbRecursiveShapeIterator.h"
 #include "dbCellVariants.h"
 #include "dbShapeCollection.h"
+#include "dbGenericShapeIterator.h"
 
 #include <list>
 
@@ -142,60 +143,7 @@ private:
   EdgesIteratorDelegate *mp_delegate;
 };
 
-/**
- *  @brief A helper class allowing delivery of addressable edges
- *
- *  In some applications (i.e. box scanner), edges need to be taken
- *  by address. The edge set cannot always deliver adressable edges.
- *  This class help providing this ability by keeping a temporary copy
- *  if required.
- */
-
-class DB_PUBLIC AddressableEdgeDelivery
-{
-public:
-  AddressableEdgeDelivery ()
-    : m_iter (), m_valid (false)
-  {
-    //  .. nothing yet ..
-  }
-
-  AddressableEdgeDelivery (const EdgesIterator &iter, bool valid)
-    : m_iter (iter), m_valid (valid)
-  {
-    if (! m_valid && ! m_iter.at_end ()) {
-      m_heap.push_back (*m_iter);
-    }
-  }
-
-  bool at_end () const
-  {
-    return m_iter.at_end ();
-  }
-
-  AddressableEdgeDelivery &operator++ ()
-  {
-    ++m_iter;
-    if (! m_valid && ! m_iter.at_end ()) {
-      m_heap.push_back (*m_iter);
-    }
-    return *this;
-  }
-
-  const db::Edge *operator-> () const
-  {
-    if (m_valid) {
-      return m_iter.operator-> ();
-    } else {
-      return &m_heap.back ();
-    }
-  }
-
-private:
-  EdgesIterator m_iter;
-  bool m_valid;
-  std::list<db::Edge> m_heap;
-};
+typedef addressable_shape_delivery_gen<EdgesIterator> AddressableEdgeDelivery;
 
 class Edges;
 

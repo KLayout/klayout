@@ -92,42 +92,24 @@ private:
   std::unordered_map<TR, size_t> *mp_result;
 };
 
-struct EdgeResultInserter
+template <class TR>
+struct simple_result_inserter
 {
-  typedef db::Edge value_type;
+  typedef TR value_type;
 
-  EdgeResultInserter (std::unordered_set<db::Edge> &result)
+  simple_result_inserter<TR> (std::unordered_set<TR> &result)
     : mp_result (&result)
   {
     //  .. nothing yet ..
   }
 
-  void insert (const db::Edge &e)
+  void insert (const TR &e)
   {
     (*mp_result).insert (e);
   }
 
 private:
-  std::unordered_set<db::Edge> *mp_result;
-};
-
-struct TextResultInserter
-{
-  typedef db::TextRef value_type;
-
-  TextResultInserter (std::unordered_set<db::TextRef> &result)
-    : mp_result (&result)
-  {
-    //  .. nothing yet ..
-  }
-
-  void insert (const db::TextRef &e)
-  {
-    (*mp_result).insert (e);
-  }
-
-private:
-  std::unordered_set<db::TextRef> *mp_result;
+  std::unordered_set<TR> *mp_result;
 };
 
 }
@@ -495,84 +477,39 @@ template class interacting_with_edge_local_operation<db::Polygon, db::Edge, db::
 
 // ---------------------------------------------------------------------------------------------------------------
 
-PullWithEdgeLocalOperation::PullWithEdgeLocalOperation ()
+template <class TS, class TI, class TR>
+pull_with_edge_local_operation<TS, TI, TR>::pull_with_edge_local_operation ()
 {
   //  .. nothing yet ..
 }
 
-db::Coord PullWithEdgeLocalOperation::dist () const
+template <class TS, class TI, class TR>
+db::Coord pull_with_edge_local_operation<TS, TI, TR>::dist () const
 {
   //  touching is sufficient
   return 1;
 }
 
-void PullWithEdgeLocalOperation::compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+template <class TS, class TI, class TR>
+void pull_with_edge_local_operation<TS, TI, TR>::compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
   tl_assert (results.size () == 1);
-  std::unordered_set<db::Edge> &result = results.front ();
+  std::unordered_set<TR> &result = results.front ();
 
-  db::box_scanner2<db::PolygonRef, size_t, db::Edge, size_t> scanner;
+  db::box_scanner2<TS, size_t, TI, size_t> scanner;
 
-  EdgeResultInserter inserter (result);
-  region_to_edge_interaction_filter<db::PolygonRef, db::Edge, EdgeResultInserter> filter (inserter, false);
+  simple_result_inserter<TR> inserter (result);
+  region_to_edge_interaction_filter<TS, TI, simple_result_inserter<TR> > filter (inserter, false);
 
-  for (shape_interactions<db::PolygonRef, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-    for (shape_interactions<db::PolygonRef, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-      scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
-    }
-  }
-
-  std::list<db::PolygonRef> heap;
-  for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-    const db::PolygonRef &subject = interactions.subject_shape (i->first);
+  std::list<TS> heap;
+  for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    const TS &subject = interactions.subject_shape (i->first);
     scanner.insert1 (push_polygon_to_heap (layout, subject, heap), 0);
   }
 
-  scanner.process (filter, 1, db::box_convert<db::PolygonRef> (), db::box_convert<db::Edge> ());
-}
-
-PullWithEdgeLocalOperation::on_empty_intruder_mode PullWithEdgeLocalOperation::on_empty_intruder_hint () const
-{
-  return Drop;
-}
-
-std::string PullWithEdgeLocalOperation::description () const
-{
-  return tl::to_string (tr ("Pull edges from second by their geometric relation to first"));
-}
-
-// ---------------------------------------------------------------------------------------------------------------
-
-PullWithTextLocalOperation::PullWithTextLocalOperation ()
-{
-  //  .. nothing yet ..
-}
-
-db::Coord PullWithTextLocalOperation::dist () const
-{
-  //  touching is sufficient
-  return 1;
-}
-
-void PullWithTextLocalOperation::compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::TextRef> &interactions, std::vector<std::unordered_set<db::TextRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
-{
-  tl_assert (results.size () == 1);
-  std::unordered_set<db::TextRef> &result = results.front ();
-
-  db::box_scanner2<db::Polygon, size_t, db::TextRef, size_t> scanner;
-
-  TextResultInserter inserter (result);
-  region_to_text_interaction_filter<db::Polygon, db::TextRef, TextResultInserter> filter (inserter, false);
-
-  for (shape_interactions<db::PolygonRef, db::TextRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-    for (shape_interactions<db::PolygonRef, db::TextRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-      scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
-    }
-  }
-
   std::set<unsigned int> intruder_ids;
-  for (shape_interactions<db::PolygonRef, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-    for (shape_interactions<db::PolygonRef, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+  for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (typename shape_interactions<TS, TI>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
       intruder_ids.insert (*j);
     }
   }
@@ -581,28 +518,90 @@ void PullWithTextLocalOperation::compute_local (db::Layout *, const shape_intera
     scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
   }
 
-  std::list<db::Polygon> heap;
-  for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+  scanner.process (filter, 1, db::box_convert<TS> (), db::box_convert<TI> ());
+}
 
-    const db::PolygonRef &subject = interactions.subject_shape (i->first);
-    heap.push_back (subject.obj ().transformed (subject.trans ()));
+template <class TS, class TI, class TR>
+typename local_operation<TS, TI, TR>::on_empty_intruder_mode pull_with_edge_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
+{
+  return local_operation<TS, TI, TR>::Drop;
+}
 
-    scanner.insert1 (&heap.back (), 0);
+template <class TS, class TI, class TR>
+std::string pull_with_edge_local_operation<TS, TI, TR>::description () const
+{
+  return tl::to_string (tr ("Pull edges from second by their geometric relation to first"));
+}
 
+template class pull_with_edge_local_operation<db::PolygonRef, db::Edge, db::Edge>;
+template class pull_with_edge_local_operation<db::Polygon, db::Edge, db::Edge>;
+
+// ---------------------------------------------------------------------------------------------------------------
+
+template <class TS, class TI, class TR>
+pull_with_text_local_operation<TS, TI, TR>::pull_with_text_local_operation ()
+{
+  //  .. nothing yet ..
+}
+
+template <class TS, class TI, class TR>
+db::Coord pull_with_text_local_operation<TS, TI, TR>::dist () const
+{
+  //  touching is sufficient
+  return 1;
+}
+
+template <class TS, class TI, class TR>
+void pull_with_text_local_operation<TS, TI, TR>::compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+{
+  tl_assert (results.size () == 1);
+  std::unordered_set<TR> &result = results.front ();
+
+  db::box_scanner2<TS, size_t, TI, size_t> scanner;
+
+  simple_result_inserter<TR> inserter (result);
+  region_to_text_interaction_filter<TS, TI, simple_result_inserter<TR> > filter (inserter, false);
+
+  for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (typename shape_interactions<TS, TI>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+      scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
+    }
   }
 
-  scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::TextRef> ());
+  std::set<unsigned int> intruder_ids;
+  for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (typename shape_interactions<TS, TI>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+      intruder_ids.insert (*j);
+    }
+  }
+
+  for (std::set<unsigned int>::const_iterator j = intruder_ids.begin (); j != intruder_ids.end (); ++j) {
+    scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
+  }
+
+  std::list<TS> heap;
+  for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    const TS *subject = push_polygon_to_heap (layout, interactions.subject_shape (i->first), heap);
+    scanner.insert1 (subject, 0);
+  }
+
+  scanner.process (filter, 1, db::box_convert<TS> (), db::box_convert<TI> ());
 }
 
-PullWithTextLocalOperation::on_empty_intruder_mode PullWithTextLocalOperation::on_empty_intruder_hint () const
+template <class TS, class TI, class TR>
+typename local_operation<TS, TI, TR>::on_empty_intruder_mode pull_with_text_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
 {
-  return Drop;
+  return local_operation<TS, TI, TR>::Drop;
 }
 
-std::string PullWithTextLocalOperation::description () const
+template <class TS, class TI, class TR>
+std::string pull_with_text_local_operation<TS, TI, TR>::description () const
 {
   return tl::to_string (tr ("Pull texts from second by their geometric relation to first"));
 }
+
+template class pull_with_text_local_operation<db::PolygonRef, db::TextRef, db::TextRef>;
+template class pull_with_text_local_operation<db::Polygon, db::Text, db::Text>;
 
 // ---------------------------------------------------------------------------------------------------------------
 

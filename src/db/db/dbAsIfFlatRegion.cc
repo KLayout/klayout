@@ -665,21 +665,21 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
     return new EmptyEdges ();
   }
 
-#if 0 // @@@ defined(USE_LOCAL_PROCESSOR)
+#if defined(USE_LOCAL_PROCESSOR)
 
-  db::RegionIterator polygons (begin_merged ());
+  db::RegionIterator polygons (begin ());
 
-  db::pull_local_operation (<db::Polygon, db::Text, db::Polygon> op (inverse, min_count, max_count);
+  db::pull_with_edge_local_operation <db::Polygon, db::Edge, db::Edge> op;
 
-  db::local_processor<db::Polygon, db::Text, db::Polygon> proc;
+  db::local_processor<db::Polygon, db::Edge, db::Edge> proc;
   proc.set_base_verbosity (base_verbosity ());
 
-  std::vector<generic_shape_iterator<db::Text> > others;
-  others.push_back (other.begin ());
+  std::vector<generic_shape_iterator<db::Edge> > others;
+  others.push_back (other.begin_merged ());
 
-  std::auto_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
+  std::auto_ptr<FlatEdges> output (new FlatEdges (merged_semantics ()));
   std::vector<db::Shapes *> results;
-  results.push_back (&output->raw_polygons ());
+  results.push_back (&output->raw_edges ());
 
   proc.run_flat (polygons, others, &op, results);
 
@@ -715,6 +715,27 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
 TextsDelegate *
 AsIfFlatRegion::pull_generic (const Texts &other) const
 {
+#if defined(USE_LOCAL_PROCESSOR)
+
+  db::RegionIterator polygons (begin ());
+
+  db::pull_with_text_local_operation <db::Polygon, db::Text, db::Text> op;
+
+  db::local_processor<db::Polygon, db::Text, db::Text> proc;
+  proc.set_base_verbosity (base_verbosity ());
+
+  std::vector<generic_shape_iterator<db::Text> > others;
+  others.push_back (other.begin ());
+
+  std::auto_ptr<FlatTexts> output (new FlatTexts (merged_semantics ()));
+  std::vector<db::Shapes *> results;
+  results.push_back (&output->raw_texts ());
+
+  proc.run_flat (polygons, others, &op, results);
+
+  return output.release ();
+
+#else
   if (other.empty ()) {
     return other.delegate ()->clone ();
   } else if (empty ()) {
@@ -743,6 +764,7 @@ AsIfFlatRegion::pull_generic (const Texts &other) const
   scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Text> ());
 
   return output.release ();
+#endif
 }
 
 RegionDelegate *

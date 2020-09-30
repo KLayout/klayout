@@ -109,17 +109,20 @@ private:
 
 typedef interacting_with_edge_local_operation<db::PolygonRef, db::Edge, db::PolygonRef> InteractingWithEdgeLocalOperation;
 
-class PullWithEdgeLocalOperation
-  : public local_operation<db::PolygonRef, db::Edge, db::Edge>
+template <class TS, class TI, class TR>
+class pull_with_edge_local_operation
+  : public local_operation<TS, TI, TR>
 {
 public:
-  PullWithEdgeLocalOperation ();
+  pull_with_edge_local_operation ();
 
   virtual db::Coord dist () const;
-  virtual void compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const;
+  virtual void compute_local (db::Layout *, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
+  virtual typename local_operation<TS, TI, TR>::on_empty_intruder_mode on_empty_intruder_hint () const;
   virtual std::string description () const;
 };
+
+typedef pull_with_edge_local_operation<db::PolygonRef, db::Edge, db::Edge> PullWithEdgeLocalOperation;
 
 template <class TS, class TI, class TR>
 class interacting_with_text_local_operation
@@ -140,17 +143,20 @@ private:
 
 typedef interacting_with_text_local_operation<db::PolygonRef, db::TextRef, db::PolygonRef> InteractingWithTextLocalOperation;
 
-class PullWithTextLocalOperation
-  : public local_operation<db::PolygonRef, db::TextRef, db::TextRef>
+template <class TS, class TI, class TR>
+class pull_with_text_local_operation
+  : public local_operation<TS, TI, TR>
 {
 public:
-  PullWithTextLocalOperation ();
+  pull_with_text_local_operation ();
 
   virtual db::Coord dist () const;
-  virtual void compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::TextRef> &interactions, std::vector<std::unordered_set<db::TextRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const;
+  virtual void compute_local (db::Layout *, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
+  virtual typename local_operation<TS, TI, TR>::on_empty_intruder_mode on_empty_intruder_hint () const;
   virtual std::string description () const;
 };
+
+typedef pull_with_text_local_operation<db::PolygonRef, db::TextRef, db::TextRef> PullWithTextLocalOperation;
 
 } // namespace db
 

@@ -388,6 +388,27 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse, 
 
   bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
+#if defined(USE_LOCAL_PROCESSOR)
+
+  db::RegionIterator polygons (begin_merged ());
+
+  db::interacting_with_edge_local_operation<db::Polygon, db::Edge, db::Polygon> op (inverse, min_count, max_count);
+
+  db::local_processor<db::Polygon, db::Edge, db::Polygon> proc;
+  proc.set_base_verbosity (base_verbosity ());
+
+  std::vector<generic_shape_iterator<db::Edge> > others;
+  others.push_back (counting ? other.begin_merged () : other.begin ());
+
+  std::auto_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
+  std::vector<db::Shapes *> results;
+  results.push_back (&output->raw_polygons ());
+
+  proc.run_flat (polygons, others, &op, results);
+
+  return output.release ();
+
+#else
   std::unordered_map<const db::Polygon *, size_t, std::ptr_hash_from_value<db::Polygon> > counted_results;
   ResultCountingInserter inserter (counted_results);
 
@@ -425,6 +446,7 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse, 
   }
 
   return output.release ();
+#endif
 }
 
 RegionDelegate *
@@ -643,6 +665,28 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
     return new EmptyEdges ();
   }
 
+#if 0 // @@@ defined(USE_LOCAL_PROCESSOR)
+
+  db::RegionIterator polygons (begin_merged ());
+
+  db::pull_local_operation (<db::Polygon, db::Text, db::Polygon> op (inverse, min_count, max_count);
+
+  db::local_processor<db::Polygon, db::Text, db::Polygon> proc;
+  proc.set_base_verbosity (base_verbosity ());
+
+  std::vector<generic_shape_iterator<db::Text> > others;
+  others.push_back (other.begin ());
+
+  std::auto_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
+  std::vector<db::Shapes *> results;
+  results.push_back (&output->raw_polygons ());
+
+  proc.run_flat (polygons, others, &op, results);
+
+  return output.release ();
+
+#else
+
   db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve1 (size ());
   scanner.reserve2 (other.size ());
@@ -665,6 +709,7 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
   scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
 
   return output.release ();
+#endif
 }
 
 TextsDelegate *
@@ -703,6 +748,27 @@ AsIfFlatRegion::pull_generic (const Texts &other) const
 RegionDelegate *
 AsIfFlatRegion::pull_generic (const Region &other, int mode, bool touching) const
 {
+#if defined(USE_LOCAL_PROCESSOR)
+
+  db::RegionIterator polygons (begin ());
+
+  db::pull_local_operation <db::Polygon, db::Polygon, db::Polygon> op (mode, touching);
+
+  db::local_processor<db::Polygon, db::Polygon, db::Polygon> proc;
+  proc.set_base_verbosity (base_verbosity ());
+
+  std::vector<generic_shape_iterator<db::Polygon> > others;
+  others.push_back (other.begin_merged ());
+
+  std::auto_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
+  std::vector<db::Shapes *> results;
+  results.push_back (&output->raw_polygons ());
+
+  proc.run_flat (polygons, others, &op, results);
+
+  return output.release ();
+
+#else
   db::EdgeProcessor ep (report_progress (), progress_desc ());
   ep.set_base_verbosity (base_verbosity ());
 
@@ -751,6 +817,7 @@ AsIfFlatRegion::pull_generic (const Region &other, int mode, bool touching) cons
   }
 
   return output.release ();
+#endif
 }
 
 template <class Trans>

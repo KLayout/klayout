@@ -34,6 +34,19 @@ namespace
 
 // ---------------------------------------------------------------------------------------------------------------
 
+static inline const db::Polygon *push_polygon_to_heap (db::Layout *, const db::Polygon &p, std::list<db::Polygon> &)
+{
+  return &p;
+}
+
+static inline const db::PolygonRef *push_polygon_to_heap (db::Layout *layout, const db::PolygonRef &p, std::list<db::PolygonRef> &heap)
+{
+  db::PolygonRef ref = db::PolygonRef (p, layout->shape_repository ());
+  heap.push_back (ref);
+  return &heap.back ();
+}
+
+
 struct ResultInserter
 {
   typedef db::Polygon value_type;
@@ -54,29 +67,29 @@ private:
   std::unordered_set<db::PolygonRef> *mp_result;
 };
 
-struct ResultCountingInserter
+template <class TR>
+struct result_counting_inserter
 {
-  typedef db::Polygon value_type;
+  typedef TR value_type;
 
-  ResultCountingInserter (db::Layout *layout, std::unordered_map<db::PolygonRef, size_t> &result)
-    : mp_layout (layout), mp_result (&result)
+  result_counting_inserter (std::unordered_map<TR, size_t> &result)
+    : mp_result (&result)
   {
     //  .. nothing yet ..
   }
 
-  void insert (const db::Polygon &p)
+  void insert (const TR &p)
   {
-    (*mp_result)[db::PolygonRef (p, mp_layout->shape_repository ())] += 1;
+    (*mp_result)[p] += 1;
   }
 
-  void init (const db::Polygon &p)
+  void init (const TR &p)
   {
-    (*mp_result)[db::PolygonRef (p, mp_layout->shape_repository ())] = 0;
+    (*mp_result)[p] = 0;
   }
 
 private:
-  db::Layout *mp_layout;
-  std::unordered_map<db::PolygonRef, size_t> *mp_result;
+  std::unordered_map<TR, size_t> *mp_result;
 };
 
 struct EdgeResultInserter
@@ -405,10 +418,10 @@ void InteractingWithEdgeLocalOperation::compute_local (db::Layout *layout, const
   std::unordered_map<db::PolygonRef, size_t> counted_results;
   bool counting = !(m_min_count == 1 && m_max_count == std::numeric_limits<size_t>::max ());
 
-  db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> scanner;
+  db::box_scanner2<db::PolygonRef, size_t, db::Edge, size_t> scanner;
 
-  ResultCountingInserter inserter (layout, counted_results);
-  region_to_edge_interaction_filter<ResultCountingInserter> filter (inserter, false, counting /*get all in counting mode*/);
+  result_counting_inserter<db::PolygonRef> inserter (counted_results);
+  region_to_edge_interaction_filter<db::PolygonRef, db::Edge, result_counting_inserter<db::PolygonRef> > filter (inserter, false, counting /*get all in counting mode*/);
 
   std::set<unsigned int> intruder_ids;
   for (shape_interactions<db::PolygonRef, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
@@ -421,20 +434,21 @@ void InteractingWithEdgeLocalOperation::compute_local (db::Layout *layout, const
     scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
   }
 
-  std::list<db::Polygon> heap;
+  std::list<db::PolygonRef> heap;
   for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
 
     const db::PolygonRef &subject = interactions.subject_shape (i->first);
-    heap.push_back (subject.obj ().transformed (subject.trans ()));
 
-    scanner.insert1 (&heap.back (), 0);
+    const db::PolygonRef *addressable = push_polygon_to_heap (layout, subject, heap);
+
+    scanner.insert1 (addressable, 0);
     if (m_inverse) {
-      inserter.init (heap.back ());
+      inserter.init (*addressable);
     }
 
   }
 
-  scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
+  scanner.process (filter, 1, db::box_convert<db::PolygonRef> (), db::box_convert<db::Edge> ());
 
   //  select hits based on their count
 
@@ -476,15 +490,15 @@ db::Coord PullWithEdgeLocalOperation::dist () const
   return 1;
 }
 
-void PullWithEdgeLocalOperation::compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+void PullWithEdgeLocalOperation::compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
   tl_assert (results.size () == 1);
   std::unordered_set<db::Edge> &result = results.front ();
 
-  db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> scanner;
+  db::box_scanner2<db::PolygonRef, size_t, db::Edge, size_t> scanner;
 
   EdgeResultInserter inserter (result);
-  region_to_edge_interaction_filter<EdgeResultInserter> filter (inserter, false);
+  region_to_edge_interaction_filter<db::PolygonRef, db::Edge, EdgeResultInserter> filter (inserter, false);
 
   for (shape_interactions<db::PolygonRef, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
     for (shape_interactions<db::PolygonRef, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
@@ -492,17 +506,13 @@ void PullWithEdgeLocalOperation::compute_local (db::Layout *, const shape_intera
     }
   }
 
-  std::list<db::Polygon> heap;
+  std::list<db::PolygonRef> heap;
   for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-
     const db::PolygonRef &subject = interactions.subject_shape (i->first);
-    heap.push_back (subject.obj ().transformed (subject.trans ()));
-
-    scanner.insert1 (&heap.back (), 0);
-
+    scanner.insert1 (push_polygon_to_heap (layout, subject, heap), 0);
   }
 
-  scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
+  scanner.process (filter, 1, db::box_convert<db::PolygonRef> (), db::box_convert<db::Edge> ());
 }
 
 PullWithEdgeLocalOperation::on_empty_intruder_mode PullWithEdgeLocalOperation::on_empty_intruder_hint () const
@@ -536,7 +546,7 @@ void PullWithTextLocalOperation::compute_local (db::Layout *, const shape_intera
   db::box_scanner2<db::Polygon, size_t, db::TextRef, size_t> scanner;
 
   TextResultInserter inserter (result);
-  region_to_text_interaction_filter<TextResultInserter, db::TextRef> filter (inserter, false);
+  region_to_text_interaction_filter<db::Polygon, db::TextRef, TextResultInserter> filter (inserter, false);
 
   for (shape_interactions<db::PolygonRef, db::TextRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
     for (shape_interactions<db::PolygonRef, db::TextRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
@@ -580,31 +590,35 @@ std::string PullWithTextLocalOperation::description () const
 
 // ---------------------------------------------------------------------------------------------------------------
 
-InteractingWithTextLocalOperation::InteractingWithTextLocalOperation (bool inverse, size_t min_count, size_t max_count)
+template <class TS, class TI, class TR>
+interacting_with_text_local_operation<TS, TI, TR>::interacting_with_text_local_operation (bool inverse, size_t min_count, size_t max_count)
   : m_inverse (inverse), m_min_count (std::max (size_t (1), min_count)), m_max_count (max_count)
 {
   //  .. nothing yet ..
 }
 
-db::Coord InteractingWithTextLocalOperation::dist () const
+template <class TS, class TI, class TR>
+db::Coord interacting_with_text_local_operation<TS, TI, TR>::dist () const
 {
   //  touching is sufficient
   return 1;
 }
 
-void InteractingWithTextLocalOperation::compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::TextRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+
+template <class TS, class TI, class TR>
+void interacting_with_text_local_operation<TS, TI, TR>::compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
-  std::unordered_map<db::PolygonRef, size_t> counted_results;
+  std::unordered_map<TR, size_t> counted_results;
   bool counting = !(m_min_count == 1 && m_max_count == std::numeric_limits<size_t>::max ());
 
-  db::box_scanner2<db::Polygon, size_t, db::TextRef, size_t> scanner;
+  db::box_scanner2<TR, size_t, TI, size_t> scanner;
 
-  ResultCountingInserter inserter (layout, counted_results);
-  region_to_text_interaction_filter<ResultCountingInserter, db::TextRef> filter (inserter, false, counting /*get all in counting mode*/);
+  result_counting_inserter<TR> inserter (counted_results);
+  region_to_text_interaction_filter<TS, TI, result_counting_inserter<TR> > filter (inserter, false, counting /*get all in counting mode*/);
 
   std::set<unsigned int> intruder_ids;
-  for (shape_interactions<db::PolygonRef, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-    for (shape_interactions<db::PolygonRef, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+  for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (typename shape_interactions<TS, TI>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
       intruder_ids.insert (*j);
     }
   }
@@ -613,27 +627,26 @@ void InteractingWithTextLocalOperation::compute_local (db::Layout *layout, const
     scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
   }
 
-  std::list<db::Polygon> heap;
-  for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+  std::list<TR> heap;
+  for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
 
-    const db::PolygonRef &subject = interactions.subject_shape (i->first);
-    heap.push_back (subject.obj ().transformed (subject.trans ()));
+    const TR *addressable = push_polygon_to_heap (layout, interactions.subject_shape (i->first), heap);
 
-    scanner.insert1 (&heap.back (), 0);
+    scanner.insert1 (addressable, 0);
     if (m_inverse) {
-      inserter.init (heap.back ());
+      inserter.init (*addressable);
     }
 
   }
 
-  scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::TextRef> ());
+  scanner.process (filter, 1, db::box_convert<TR> (), db::box_convert<TI> ());
 
   //  select hits based on their count
 
   tl_assert (results.size () == 1);
-  std::unordered_set<db::PolygonRef> &result = results.front ();
+  std::unordered_set<TR> &result = results.front ();
 
-  for (std::unordered_map<db::PolygonRef, size_t>::const_iterator r = counted_results.begin (); r != counted_results.end (); ++r) {
+  for (typename std::unordered_map<TR, size_t>::const_iterator r = counted_results.begin (); r != counted_results.end (); ++r) {
     bool hit = r->second >= m_min_count && r->second <= m_max_count;
     if (hit != m_inverse) {
       result.insert (r->first);
@@ -641,18 +654,24 @@ void InteractingWithTextLocalOperation::compute_local (db::Layout *layout, const
   }
 }
 
-InteractingWithTextLocalOperation::on_empty_intruder_mode InteractingWithTextLocalOperation::on_empty_intruder_hint () const
+template <class TS, class TI, class TR>
+typename local_operation<TS, TI, TR>::on_empty_intruder_mode interacting_with_text_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
 {
   if (!m_inverse) {
-    return Drop;
+    return local_operation<TS, TI, TR>::Drop;
   } else {
-    return Copy;
+    return local_operation<TS, TI, TR>::Copy;
   }
 }
 
-std::string InteractingWithTextLocalOperation::description () const
+template <class TS, class TI, class TR>
+std::string interacting_with_text_local_operation<TS, TI, TR>::description () const
 {
   return tl::to_string (tr ("Select regions by their geometric relation to texts"));
 }
+
+//  explicit instantiations
+template class interacting_with_text_local_operation<db::PolygonRef, db::TextRef, db::PolygonRef>;
+template class interacting_with_text_local_operation<db::Polygon, db::Text, db::Polygon>;
 
 }

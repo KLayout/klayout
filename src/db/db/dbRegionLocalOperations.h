@@ -127,21 +127,24 @@ public:
   virtual std::string description () const;
 };
 
-class InteractingWithTextLocalOperation
-  : public local_operation<db::PolygonRef, db::TextRef, db::PolygonRef>
+template <class TS, class TI, class TR>
+class interacting_with_text_local_operation
+  : public local_operation<TS, TI, TR>
 {
 public:
-  InteractingWithTextLocalOperation (bool inverse, size_t min_count, size_t max_count);
+  interacting_with_text_local_operation (bool inverse, size_t min_count, size_t max_count);
 
   virtual db::Coord dist () const;
-  virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::TextRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const;
+  virtual void compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
+  virtual typename local_operation<TS, TI, TR>::on_empty_intruder_mode on_empty_intruder_hint () const;
   virtual std::string description () const;
 
 private:
   bool m_inverse;
   size_t m_min_count, m_max_count;
 };
+
+typedef interacting_with_text_local_operation<db::PolygonRef, db::TextRef, db::PolygonRef> InteractingWithTextLocalOperation;
 
 } // namespace db
 

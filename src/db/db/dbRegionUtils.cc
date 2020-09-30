@@ -363,23 +363,23 @@ Poly2PolyCheckBase::enter (const db::Polygon &o1, size_t p1, const db::Polygon &
 // -------------------------------------------------------------------------------------
 //  RegionToEdgeInteractionFilterBase implementation
 
-template <class OutputType>
-region_to_edge_interaction_filter_base<OutputType>::region_to_edge_interaction_filter_base (bool inverse, bool get_all)
+template <class PolygonType, class EdgeType, class OutputType>
+region_to_edge_interaction_filter_base<PolygonType, EdgeType, OutputType>::region_to_edge_interaction_filter_base (bool inverse, bool get_all)
   : m_inverse (inverse), m_get_all (get_all)
 {
   //  .. nothing yet ..
 }
 
-template <class OutputType>
+template <class PolygonType, class EdgeType, class OutputType>
 void
-region_to_edge_interaction_filter_base<OutputType>::preset (const OutputType *s)
+region_to_edge_interaction_filter_base<PolygonType, EdgeType, OutputType>::preset (const OutputType *s)
 {
   m_seen.insert (s);
 }
 
-template <class OutputType>
+template <class PolygonType, class EdgeType, class OutputType>
 void
-region_to_edge_interaction_filter_base<OutputType>::add (const db::Polygon *p, size_t, const db::Edge *e, size_t)
+region_to_edge_interaction_filter_base<PolygonType, EdgeType, OutputType>::add (const PolygonType *p, size_t, const EdgeType *e, size_t)
 {
   const OutputType *o = 0;
   tl::select (o, p, e);
@@ -392,7 +392,7 @@ region_to_edge_interaction_filter_base<OutputType>::add (const db::Polygon *p, s
     if (p->box ().contains (e->p1 ()) && db::inside_poly (p->begin_edge (), e->p1 ()) >= 0) {
       interacts = true;
     } else {
-      for (db::Polygon::polygon_edge_iterator pe = p->begin_edge (); ! pe.at_end () && ! interacts; ++pe) {
+      for (typename PolygonType::polygon_edge_iterator pe = p->begin_edge (); ! pe.at_end () && ! interacts; ++pe) {
         if ((*pe).intersect (*e)) {
           interacts = true;
         }
@@ -413,9 +413,9 @@ region_to_edge_interaction_filter_base<OutputType>::add (const db::Polygon *p, s
   }
 }
 
-template <class OutputType>
+template <class PolygonType, class EdgeType, class OutputType>
 void
-region_to_edge_interaction_filter_base<OutputType>::fill_output ()
+region_to_edge_interaction_filter_base<PolygonType, EdgeType, OutputType>::fill_output ()
 {
   for (typename std::set<const OutputType *>::const_iterator s = m_seen.begin (); s != m_seen.end (); ++s) {
     put (**s);
@@ -423,29 +423,31 @@ region_to_edge_interaction_filter_base<OutputType>::fill_output ()
 }
 
 //  explicit instantiations
-template class region_to_edge_interaction_filter_base<db::Polygon>;
-template class region_to_edge_interaction_filter_base<db::Edge>;
+template class region_to_edge_interaction_filter_base<db::Polygon, db::Edge, db::Polygon>;
+template class region_to_edge_interaction_filter_base<db::PolygonRef, db::Edge, db::PolygonRef>;
+template class region_to_edge_interaction_filter_base<db::Polygon, db::Edge, db::Edge>;
+template class region_to_edge_interaction_filter_base<db::PolygonRef, db::Edge, db::Edge>;
 
 // -------------------------------------------------------------------------------------
 //  RegionToTextInteractionFilterBase implementation
 
-template <class OutputType, class TextType>
-region_to_text_interaction_filter_base<OutputType, TextType>::region_to_text_interaction_filter_base (bool inverse, bool get_all)
+template <class PolygonType, class TextType, class OutputType>
+region_to_text_interaction_filter_base<PolygonType, TextType, OutputType>::region_to_text_interaction_filter_base (bool inverse, bool get_all)
   : m_inverse (inverse), m_get_all (get_all)
 {
   //  .. nothing yet ..
 }
 
-template <class OutputType, class TextType>
+template <class PolygonType, class TextType, class OutputType>
 void
-region_to_text_interaction_filter_base<OutputType, TextType>::preset (const OutputType *s)
+region_to_text_interaction_filter_base<PolygonType, TextType, OutputType>::preset (const OutputType *s)
 {
   m_seen.insert (s);
 }
 
-template <class OutputType, class TextType>
+template <class PolygonType, class TextType, class OutputType>
 void
-region_to_text_interaction_filter_base<OutputType, TextType>::add (const db::Polygon *p, size_t, const TextType *t, size_t)
+region_to_text_interaction_filter_base<PolygonType, TextType, OutputType>::add (const PolygonType *p, size_t, const TextType *t, size_t)
 {
   const OutputType *o = 0;
   tl::select (o, p, t);
@@ -469,9 +471,9 @@ region_to_text_interaction_filter_base<OutputType, TextType>::add (const db::Pol
   }
 }
 
-template <class OutputType, class TextType>
+template <class PolygonType, class TextType, class OutputType>
 void
-region_to_text_interaction_filter_base<OutputType, TextType>::fill_output ()
+region_to_text_interaction_filter_base<PolygonType, TextType, OutputType>::fill_output ()
 {
   for (typename std::set<const OutputType *>::const_iterator s = m_seen.begin (); s != m_seen.end (); ++s) {
     put (**s);
@@ -479,10 +481,11 @@ region_to_text_interaction_filter_base<OutputType, TextType>::fill_output ()
 }
 
 //  explicit instantiations
-template class region_to_text_interaction_filter_base<db::Polygon, db::TextRef>;
-template class region_to_text_interaction_filter_base<db::Polygon, db::Text>;
-template class region_to_text_interaction_filter_base<db::Text, db::Text>;
-template class region_to_text_interaction_filter_base<db::TextRef, db::TextRef>;
+template class region_to_text_interaction_filter_base<db::PolygonRef, db::TextRef, db::PolygonRef>;
+template class region_to_text_interaction_filter_base<db::Polygon, db::Text, db::Polygon>;
+template class region_to_text_interaction_filter_base<db::Polygon, db::Text, db::Text>;
+template class region_to_text_interaction_filter_base<db::Polygon, db::TextRef, db::TextRef>;
+template class region_to_text_interaction_filter_base<db::PolygonRef, db::TextRef, db::TextRef>;
 
 // -------------------------------------------------------------------------------------
 //  Polygon snapping

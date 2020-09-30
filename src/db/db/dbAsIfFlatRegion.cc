@@ -42,6 +42,8 @@
 
 #include <sstream>
 
+#define USE_LOCAL_PROCESSOR   // @@@
+
 namespace db
 {
 
@@ -394,7 +396,7 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse, 
   scanner.reserve2 (other.size ());
 
   std::auto_ptr<FlatRegion> output (new FlatRegion (false));
-  region_to_edge_interaction_filter<ResultCountingInserter, db::Polygon> filter (inserter, false, counting /*get all in counting mode*/);
+  region_to_edge_interaction_filter<db::Polygon, db::Edge, ResultCountingInserter> filter (inserter, false, counting /*get all in counting mode*/);
 
   AddressablePolygonDelivery p (begin_merged ());
 
@@ -440,6 +442,27 @@ AsIfFlatRegion::selected_interacting_generic (const Texts &other, bool inverse, 
     return clone ();
   }
 
+#if defined(USE_LOCAL_PROCESSOR)
+
+  db::RegionIterator polygons (begin_merged ());
+
+  db::interacting_with_text_local_operation<db::Polygon, db::Text, db::Polygon> op (inverse, min_count, max_count);
+
+  db::local_processor<db::Polygon, db::Text, db::Polygon> proc;
+  proc.set_base_verbosity (base_verbosity ());
+
+  std::vector<generic_shape_iterator<db::Text> > others;
+  others.push_back (other.begin ());
+
+  std::auto_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
+  std::vector<db::Shapes *> results;
+  results.push_back (&output->raw_polygons ());
+
+  proc.run_flat (polygons, others, &op, results);
+
+  return output.release ();
+
+#else
   bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   std::unordered_map<const db::Polygon *, size_t, std::ptr_hash_from_value<db::Polygon> > counted_results;
@@ -480,6 +503,7 @@ AsIfFlatRegion::selected_interacting_generic (const Texts &other, bool inverse, 
   }
 
   return output.release ();
+#endif
 }
 
 RegionDelegate *
@@ -501,7 +525,7 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
     }
   }
 
-#if 1
+#if defined(USE_LOCAL_PROCESSOR)
 
   bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
@@ -624,7 +648,7 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
   scanner.reserve2 (other.size ());
 
   std::auto_ptr<FlatEdges> output (new FlatEdges (false));
-  region_to_edge_interaction_filter<Shapes, db::Edge> filter (output->raw_edges (), false);
+  region_to_edge_interaction_filter<db::Polygon, db::Edge, db::Shapes, db::Edge> filter (output->raw_edges (), false);
 
   AddressablePolygonDelivery p (begin ());
 
@@ -657,7 +681,7 @@ AsIfFlatRegion::pull_generic (const Texts &other) const
   scanner.reserve2 (other.size ());
 
   std::auto_ptr<FlatTexts> output (new FlatTexts (false));
-  region_to_text_interaction_filter<Shapes, db::Text, db::Text> filter (output->raw_texts (), false);
+  region_to_text_interaction_filter<db::Polygon, db::Text, db::Shapes, db::Text> filter (output->raw_texts (), false);
 
   AddressablePolygonDelivery p (begin ());
 

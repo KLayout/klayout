@@ -556,16 +556,17 @@ private:
 /**
  *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
  */
-class DB_PUBLIC Poly2PolyCheckBase
-  : public db::box_scanner_receiver<db::Polygon, size_t>
+template <class PolygonType>
+class DB_PUBLIC poly2poly_check_base
+  : public db::box_scanner_receiver<PolygonType, size_t>
 {
 public:
-  Poly2PolyCheckBase (Edge2EdgeCheckBase &output);
+  poly2poly_check_base (Edge2EdgeCheckBase &output);
 
-  void finish (const db::Polygon *o, size_t p);
-  void enter (const db::Polygon &o, size_t p);
-  void add (const db::Polygon *o1, size_t p1, const db::Polygon *o2, size_t p2);
-  void enter (const db::Polygon &o1, size_t p1, const db::Polygon &o2, size_t p2);
+  void finish (const PolygonType *o, size_t p);
+  void enter (const PolygonType&o, size_t p);
+  void add (const PolygonType *o1, size_t p1, const PolygonType *o2, size_t p2);
+  void enter (const PolygonType &o1, size_t p1, const PolygonType &o2, size_t p2);
 
 private:
   db::Edge2EdgeCheckBase *mp_output;
@@ -576,13 +577,13 @@ private:
 /**
  *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
  */
-template <class Output>
+template <class PolygonType, class Output>
 class DB_PUBLIC_TEMPLATE poly2poly_check
-  : public Poly2PolyCheckBase
+  : public poly2poly_check_base<PolygonType>
 {
 public:
   poly2poly_check (edge2edge_check<Output> &output)
-    : Poly2PolyCheckBase (output)
+    : poly2poly_check_base<PolygonType> (output)
   {
     //  .. nothing yet ..
   }

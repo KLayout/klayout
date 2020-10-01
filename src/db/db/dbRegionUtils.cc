@@ -282,71 +282,86 @@ Edge2EdgeCheckBase::distance () const
 // -------------------------------------------------------------------------------------
 //  Poly2PolyCheckBase implementation
 
-Poly2PolyCheckBase::Poly2PolyCheckBase (Edge2EdgeCheckBase &output)
+template <class PolygonType>
+poly2poly_check_base<PolygonType>::poly2poly_check_base (Edge2EdgeCheckBase &output)
   : mp_output (& output)
 {
   //  .. nothing yet ..
 }
 
+template <class PolygonType>
 void
-Poly2PolyCheckBase::finish (const db::Polygon *o, size_t p)
+poly2poly_check_base<PolygonType>::finish (const PolygonType *o, size_t p)
 {
   enter (*o, p);
 }
 
+static size_t vertices (const db::Polygon &p)
+{
+  return p.vertices ();
+}
+
+static size_t vertices (const db::PolygonRef &p)
+{
+  return p.obj ().vertices ();
+}
+
+template <class PolygonType>
 void
-Poly2PolyCheckBase::enter (const db::Polygon &o, size_t p)
+poly2poly_check_base<PolygonType>::enter (const PolygonType &o, size_t p)
 {
   if (! mp_output->requires_different_layers () && ! mp_output->different_polygons ()) {
 
     //  finally we check the polygons vs. itself for checks involving intra-polygon interactions
 
     m_scanner.clear ();
-    m_scanner.reserve (o.vertices ());
+    m_scanner.reserve (vertices (o));
 
     m_edges.clear ();
-    m_edges.reserve (o.vertices ());
+    m_edges.reserve (vertices (o));
 
-    for (db::Polygon::polygon_edge_iterator e = o.begin_edge (); ! e.at_end (); ++e) {
+    for (typename PolygonType::polygon_edge_iterator e = o.begin_edge (); ! e.at_end (); ++e) {
       m_edges.push_back (*e);
       m_scanner.insert (& m_edges.back (), p);
     }
 
-    tl_assert (m_edges.size () == o.vertices ());
+    tl_assert (m_edges.size () == vertices (o));
 
     m_scanner.process (*mp_output, mp_output->distance (), db::box_convert<db::Edge> ());
 
   }
 }
 
+template <class PolygonType>
 void
-Poly2PolyCheckBase::add (const db::Polygon *o1, size_t p1, const db::Polygon *o2, size_t p2)
+poly2poly_check_base<PolygonType>::add (const PolygonType *o1, size_t p1, const PolygonType *o2, size_t p2)
 {
   enter (*o1, p1, *o2, p2);
 }
 
+template <class PolygonType>
 void
-Poly2PolyCheckBase::enter (const db::Polygon &o1, size_t p1, const db::Polygon &o2, size_t p2)
+poly2poly_check_base<PolygonType>::enter (const PolygonType &o1, size_t p1, const PolygonType &o2, size_t p2)
 {
   if ((! mp_output->different_polygons () || p1 != p2) && (! mp_output->requires_different_layers () || ((p1 ^ p2) & 1) != 0)) {
 
     m_scanner.clear ();
-    m_scanner.reserve (o1.vertices () + o2.vertices ());
+    m_scanner.reserve (vertices (o1) + vertices (o2));
 
     m_edges.clear ();
-    m_edges.reserve (o1.vertices () + o2.vertices ());
+    m_edges.reserve (vertices (o1) + vertices (o2));
 
-    for (db::Polygon::polygon_edge_iterator e = o1.begin_edge (); ! e.at_end (); ++e) {
+    for (typename PolygonType::polygon_edge_iterator e = o1.begin_edge (); ! e.at_end (); ++e) {
       m_edges.push_back (*e);
       m_scanner.insert (& m_edges.back (), p1);
     }
 
-    for (db::Polygon::polygon_edge_iterator e = o2.begin_edge (); ! e.at_end (); ++e) {
+    for (typename PolygonType::polygon_edge_iterator e = o2.begin_edge (); ! e.at_end (); ++e) {
       m_edges.push_back (*e);
       m_scanner.insert (& m_edges.back (), p2);
     }
 
-    tl_assert (m_edges.size () == o1.vertices () + o2.vertices ());
+    tl_assert (m_edges.size () == vertices (o1) + vertices (o2));
 
     //  temporarily disable intra-polygon check in that step .. we do that later in finish()
     //  if required (#650).
@@ -359,6 +374,10 @@ Poly2PolyCheckBase::enter (const db::Polygon &o1, size_t p1, const db::Polygon &
 
   }
 }
+
+//  explicit instantiations
+template class poly2poly_check_base<db::Polygon>;
+template class poly2poly_check_base<db::PolygonRef>;
 
 // -------------------------------------------------------------------------------------
 //  RegionToEdgeInteractionFilterBase implementation

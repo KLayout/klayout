@@ -92,6 +92,7 @@ public:
   {
     m_iter.set_region (region);
     m_iter.set_overlapping (overlapping);
+    set ();
   }
 
   virtual db::Box bbox () const

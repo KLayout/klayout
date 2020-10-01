@@ -99,6 +99,7 @@ public:
   {
     m_iter.set_region (region);
     m_iter.set_overlapping (overlapping);
+    set ();
   }
 
   virtual db::Box bbox () const
@@ -1390,7 +1391,7 @@ DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, b
     for (db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::Polygons); ! s.at_end (); ++s) {
 
       edge2edge_check<db::Shapes> edge_check (check, result, false, false, shielded);
-      poly2poly_check<db::Shapes> poly_check (edge_check);
+      poly2poly_check<db::Polygon, db::Shapes> poly_check (edge_check);
 
       db::Polygon poly;
       s->polygon (poly);

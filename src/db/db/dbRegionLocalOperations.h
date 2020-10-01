@@ -31,16 +31,17 @@
 namespace db
 {
 
-class CheckLocalOperation
-  : public local_operation<db::PolygonRef, db::PolygonRef, db::EdgePair>
+template <class TS, class TI, class TR>
+class check_local_operation
+  : public local_operation<TS, TI, TR>
 {
 public:
-  CheckLocalOperation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool shielded);
+  check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool shielded);
 
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
+  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
 
   virtual db::Coord dist () const;
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const;
+  virtual typename local_operation<TS, TI, TR>::on_empty_intruder_mode on_empty_intruder_hint () const;
   virtual std::string description () const;
 
 private:
@@ -49,6 +50,8 @@ private:
   bool m_has_other;
   bool m_shielded;
 };
+
+typedef check_local_operation<db::PolygonRef, db::PolygonRef, db::EdgePair> CheckLocalOperation;
 
 template <class TS, class TI, class TR>
 class interacting_local_operation

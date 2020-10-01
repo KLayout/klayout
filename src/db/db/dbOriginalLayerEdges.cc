@@ -87,6 +87,7 @@ namespace
         m_rec_iter.set_region (m_iter_trans.inverted () * region);
       }
       m_rec_iter.set_overlapping (overlapping);
+      set ();
     }
 
     virtual db::Box bbox () const

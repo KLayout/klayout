@@ -116,90 +116,95 @@ private:
 
 // ---------------------------------------------------------------------------------------------------------------
 
-CheckLocalOperation::CheckLocalOperation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool shielded)
+template <class TS, class TI, class TR>
+check_local_operation<TS, TI, TR>::check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool shielded)
   : m_check (check), m_different_polygons (different_polygons), m_has_other (has_other), m_shielded (shielded)
 {
   //  .. nothing yet ..
 }
 
+template <class TS, class TI, class TR>
 void
-CheckLocalOperation::compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+check_local_operation<TS, TI, TR>::compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
   tl_assert (results.size () == 1);
-  std::unordered_set<db::EdgePair> &result = results.front ();
+  std::unordered_set<TR> &result = results.front ();
 
-  edge2edge_check<std::unordered_set<db::EdgePair> > edge_check (m_check, result, m_different_polygons, m_has_other, m_shielded);
-  poly2poly_check<std::unordered_set<db::EdgePair> > poly_check (edge_check);
+  edge2edge_check<std::unordered_set<TR> > edge_check (m_check, result, m_different_polygons, m_has_other, m_shielded);
+  poly2poly_check<TS, std::unordered_set<TR> > poly_check (edge_check);
 
-  std::list<db::Polygon> heap;
-  db::box_scanner<db::Polygon, size_t> scanner;
+  std::list<TS> heap;
+  db::box_scanner<TS, size_t> scanner;
+  std::unordered_set<TI> polygons;
 
   if (m_has_other) {
 
-    std::set<db::PolygonRef> others;
-    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        others.insert (interactions.intruder_shape (*j).second);
-      }
-    }
-
-    size_t n = 0;
-    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      const db::PolygonRef &subject = interactions.subject_shape (i->first);
-      heap.push_back (subject.obj ().transformed (subject.trans ()));
-      scanner.insert (& heap.back (), n);
-      n += 2;
-    }
-
-    n = 1;
-    for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
-      heap.push_back (o->obj ().transformed (o->trans ()));
-      scanner.insert (& heap.back (), n);
-      n += 2;
-    }
-
-  } else {
-
-    std::set<db::PolygonRef> polygons;
-    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      polygons.insert (interactions.subject_shape (i->first));
-      for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+    for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (typename shape_interactions<TS, TI>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
         polygons.insert (interactions.intruder_shape (*j).second);
       }
     }
 
     size_t n = 0;
-    for (std::set<db::PolygonRef>::const_iterator o = polygons.begin (); o != polygons.end (); ++o) {
-      heap.push_back (o->obj ().transformed (o->trans ()));
-      scanner.insert (& heap.back (), n);
+    for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      const TS &subject = interactions.subject_shape (i->first);
+      scanner.insert (push_polygon_to_heap (layout, subject, heap), n);
+      n += 2;
+    }
+
+    n = 1;
+    for (typename std::unordered_set<TI>::const_iterator o = polygons.begin (); o != polygons.end (); ++o) {
+      scanner.insert (push_polygon_to_heap (layout, *o, heap), n);
+      n += 2;
+    }
+
+  } else {
+
+    for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      polygons.insert (interactions.subject_shape (i->first));
+      for (typename shape_interactions<TS, TI>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+        polygons.insert (interactions.intruder_shape (*j).second);
+      }
+    }
+
+    size_t n = 0;
+    for (typename std::unordered_set<TI>::const_iterator o = polygons.begin (); o != polygons.end (); ++o) {
+      scanner.insert (push_polygon_to_heap (layout, *o, heap), n);
       n += 2;
     }
 
   }
 
   do {
-    scanner.process (poly_check, m_check.distance (), db::box_convert<db::Polygon> ());
+    scanner.process (poly_check, m_check.distance (), db::box_convert<TS> ());
   } while (edge_check.prepare_next_pass ());
 }
 
+template <class TS, class TI, class TR>
 db::Coord
-CheckLocalOperation::dist () const
+check_local_operation<TS, TI, TR>::dist () const
 {
   //  TODO: will the distance be sufficient? Or should we take somewhat more?
   return m_check.distance ();
 }
 
-CheckLocalOperation::on_empty_intruder_mode
-CheckLocalOperation::on_empty_intruder_hint () const
+template <class TS, class TI, class TR>
+typename db::local_operation<TS, TI, TR>::on_empty_intruder_mode
+check_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
 {
-  return m_different_polygons ? Drop : Ignore;
+  return m_different_polygons ? db::local_operation<TS, TI, TR>::Drop : db::local_operation<TS, TI, TR>::Ignore;
 }
 
+template <class TS, class TI, class TR>
 std::string
-CheckLocalOperation::description () const
+check_local_operation<TS, TI, TR>::description () const
 {
   return tl::to_string (tr ("Generic DRC check"));
 }
+
+//  explicit instantiations
+template class check_local_operation<db::PolygonRef, db::PolygonRef, db::EdgePair>;
+template class check_local_operation<db::Polygon, db::Polygon, db::EdgePair>;
 
 // ---------------------------------------------------------------------------------------------------------------
 

@@ -1013,6 +1013,34 @@ AsIfFlatRegion::scaled_and_snapped (db::Coord gx, db::Coord mx, db::Coord dx, db
 EdgePairsDelegate *
 AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const
 {
+#if defined(USE_LOCAL_PROCESSOR)
+
+  db::RegionIterator polygons (begin_merged ());
+
+  EdgeRelationFilter check (rel, d, metrics);
+  check.set_include_zero (false);
+  check.set_whole_edges (whole_edges);
+  check.set_ignore_angle (ignore_angle);
+  check.set_min_projection (min_projection);
+  check.set_max_projection (max_projection);
+
+  db::check_local_operation<db::Polygon, db::Polygon, db::EdgePair> op (check, different_polygons, other != 0, shielded);
+
+  db::local_processor<db::Polygon, db::Polygon, db::EdgePair> proc;
+  proc.set_base_verbosity (base_verbosity ());
+
+  std::vector<generic_shape_iterator<db::Polygon> > others;
+  others.push_back (other ? other->begin () : begin_merged ());
+
+  std::auto_ptr<FlatEdgePairs> output (new FlatEdgePairs ());
+  std::vector<db::Shapes *> results;
+  results.push_back (&output->raw_edge_pairs ());
+
+  proc.run_flat (polygons, others, &op, results);
+
+  return output.release ();
+
+#else
   std::auto_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
 
   db::box_scanner<db::Polygon, size_t> scanner (report_progress (), progress_desc ());
@@ -1055,6 +1083,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   } while (edge_check.prepare_next_pass ());
 
   return result.release ();
+#endif
 }
 
 EdgePairsDelegate *
@@ -1070,7 +1099,7 @@ AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord 
   check.set_max_projection (max_projection);
 
   edge2edge_check<db::FlatEdgePairs> edge_check (check, *result, false /*=same polygons*/, false /*=same layers*/, shielded);
-  poly2poly_check<db::FlatEdgePairs> poly_check (edge_check);
+  poly2poly_check<db::Polygon, db::FlatEdgePairs> poly_check (edge_check);
 
   do {
 

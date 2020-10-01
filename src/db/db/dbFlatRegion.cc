@@ -193,47 +193,42 @@ Box FlatRegion::compute_bbox () const
 
 RegionDelegate *FlatRegion::filter_in_place (const PolygonFilterBase &filter)
 {
-  polygon_iterator_type pw = m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin ();
-  for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
+  db::layer<db::Polygon, db::unstable_layer_tag> &poly_layer = m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ();
+
+  polygon_iterator_type pw = poly_layer.begin ();
+  for (RegionIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
     if (filter.selected (*p)) {
-      if (pw == m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end ()) {
-        m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().insert (*p);
-        pw = m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end ();
+      if (pw == poly_layer.end ()) {
+        poly_layer.insert (*p);
+        poly_layer.end ();
       } else {
-        m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().replace (pw++, *p);
+        poly_layer.replace (pw++, *p);
       }
     }
   }
 
-  m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().erase (pw, m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end ());
+  poly_layer.erase (pw, poly_layer.end ());
+
   m_merged_polygons.clear ();
-  m_is_merged = merged_semantics ();
+  m_is_merged = filter.requires_raw_input () ? false : merged_semantics ();
 
   return this;
 }
 
 RegionDelegate *FlatRegion::process_in_place (const PolygonProcessorBase &filter)
 {
+  db::layer<db::Polygon, db::unstable_layer_tag> &poly_layer = m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ();
+  db::layer<db::Polygon, db::unstable_layer_tag> out;
+
   std::vector<db::Polygon> poly_res;
-
-  polygon_iterator_type pw = m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin ();
   for (RegionIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
-
     poly_res.clear ();
     filter.process (*p, poly_res);
-
-    for (std::vector<db::Polygon>::const_iterator pr = poly_res.begin (); pr != poly_res.end (); ++pr) {
-      if (pw == m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end ()) {
-        m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().insert (*pr);
-        pw = m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end ();
-      } else {
-        m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().replace (pw++, *pr);
-      }
-    }
-
+    out.insert (poly_res.begin (), poly_res.end ());
   }
 
-  m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().erase (pw, m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end ());
+  poly_layer.swap (out);
+
   m_merged_polygons.clear ();
   m_is_merged = filter.result_is_merged () && merged_semantics ();
 

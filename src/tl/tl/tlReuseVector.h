@@ -910,6 +910,17 @@ public:
     return mp_rdata;
   }
 
+  /**
+   *  @brief Swaps the vector with another one
+   */
+  void swap (reuse_vector &other)
+  {
+    std::swap (mp_start, other.mp_start);
+    std::swap (mp_finish, other.mp_finish);
+    std::swap (mp_capacity, other.mp_capacity);
+    std::swap (mp_rdata, other.mp_rdata);
+  }
+
 private:
   value_type *mp_start, *mp_finish, *mp_capacity;
   ReuseData *mp_rdata;

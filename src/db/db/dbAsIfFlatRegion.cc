@@ -727,7 +727,7 @@ AsIfFlatRegion::pull_generic (const Texts &other) const
   std::vector<generic_shape_iterator<db::Text> > others;
   others.push_back (other.begin ());
 
-  std::auto_ptr<FlatTexts> output (new FlatTexts (merged_semantics ()));
+  std::auto_ptr<FlatTexts> output (new FlatTexts ());
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_texts ());
 

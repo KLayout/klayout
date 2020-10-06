@@ -300,6 +300,31 @@ private:
 };
 
 /**
+ *  @brief A sizing processor
+ */
+class DB_PUBLIC PolygonSizer
+  : public db::PolygonProcessorBase
+{
+public:
+  PolygonSizer (db::Coord dx, db::Coord dy, unsigned int mode);
+  ~PolygonSizer ();
+
+  virtual const TransformationReducer *vars () const { return m_vars; }
+
+  void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
+
+  virtual bool result_is_merged () const;
+  virtual bool result_must_not_be_merged () const { return false; }
+  virtual bool requires_raw_input () const { return false; }
+  virtual bool wants_variants () const { return true; }
+
+private:
+  TransformationReducer *m_vars;
+  db::Coord m_dx, m_dy;
+  unsigned int m_mode;
+};
+
+/**
  *  @brief Computes the Minkowsky sum between the polygons and the given object
  *  The object can be Edge, Polygon, Box and std::vector<Point>
  */

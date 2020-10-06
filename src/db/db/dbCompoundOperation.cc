@@ -25,6 +25,37 @@ namespace db
 
 // ---------------------------------------------------------------------------------------------
 
+void
+CompoundRegionOperationNode::compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  std::vector<std::unordered_set<db::Polygon> > intermediate;
+  do_compute_local (layout, interactions, intermediate, max_vertex_count, area_ratio);
+
+  tl_assert (layout != 0);
+  for (std::vector<std::unordered_set<db::Polygon> >::const_iterator r = intermediate.begin (); r != intermediate.end (); ++r) {
+    results.push_back (std::unordered_set<db::PolygonRef> ());
+    for (std::unordered_set<db::Polygon>::const_iterator p = r->begin (); p != r->end (); ++p) {
+      results.back ().insert (db::PolygonRef (*p, layout->shape_repository ()));
+    }
+  }
+}
+
+void
+CompoundRegionOperationNode::compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  std::vector<std::unordered_set<db::PolygonRef> > intermediate;
+  do_compute_local (layout, interactions, intermediate, max_vertex_count, area_ratio);
+
+  for (std::vector<std::unordered_set<db::PolygonRef> >::const_iterator r = intermediate.begin (); r != intermediate.end (); ++r) {
+    results.push_back (std::unordered_set<db::Polygon> ());
+    for (std::unordered_set<db::PolygonRef>::const_iterator p = r->begin (); p != r->end (); ++p) {
+      results.back ().insert (p->obj ().transformed (p->trans ()));
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+
 CompoundRegionOperationPrimaryNode::CompoundRegionOperationPrimaryNode ()
 {
   //  .. nothing yet ..
@@ -151,6 +182,11 @@ CompoundRegionMultiInputOperationNode::CompoundRegionMultiInputOperationNode (co
   for (std::vector<CompoundRegionOperationNode *>::const_iterator c = children.begin (); c != children.end (); ++c) {
     m_children.push_back (*c);
   }
+  init ();
+}
+
+CompoundRegionMultiInputOperationNode::CompoundRegionMultiInputOperationNode ()
+{
   init ();
 }
 

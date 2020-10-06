@@ -181,4 +181,35 @@ void PolygonBreaker::process (const db::Polygon &poly, std::vector<db::Polygon> 
   }
 }
 
+// -----------------------------------------------------------------------------------
+//  PolygonSizer implementation
+
+PolygonSizer::PolygonSizer (db::Coord dx, db::Coord dy, unsigned int mode)
+  : m_dx (dx), m_dy (dy), m_mode (mode)
+{
+  if (dx == dy) {
+    m_vars = new db::MagnificationReducer ();
+  } else {
+    m_vars = new db::XYAnisotropyAndMagnificationReducer ();
+  }
+}
+
+PolygonSizer::~PolygonSizer ()
+{
+  delete m_vars;
+}
+
+void PolygonSizer::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
+{
+  db::PolygonContainer pr (result);
+  db::PolygonGenerator pg2 (pr, false /*don't resolve holes*/, true /*min. coherence*/);
+  db::SizingPolygonFilter siz (pg2, m_dx, m_dy, m_mode);
+  siz.put (poly);
+}
+
+bool PolygonSizer::result_is_merged () const
+{
+  return (m_dx < 0 && m_dy < 0);
+}
+
 }

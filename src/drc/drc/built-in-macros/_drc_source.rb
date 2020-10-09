@@ -165,7 +165,7 @@ module DRC
     # will enable the cell. Hence, every cell that has a "B" in the instantiation path 
     # is enabled.
     #
-    # The following code will just select "B" without it's children, because in the 
+    # The following code will just select "B" without its children, because in the 
     # first "-*" selection, all cells including the children of "B" are disabled:
     #
     # @code
@@ -175,7 +175,7 @@ module DRC
     # @/code
     # 
     # The short form "-" will disable the top cell. This code is identical to the first example
-    # and will start with a disabled top cell regardless of it's name:
+    # and will start with a disabled top cell regardless of its name:
     # 
     # @code
     # layout_with_selection = source.select("-", "+B")

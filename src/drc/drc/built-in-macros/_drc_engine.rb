@@ -1253,7 +1253,7 @@ module DRC
     # @/code
     #
     # (Technically, the cheat code block is a Ruby Proc and cannot create variables
-    # outside it's scope. Hence the results of this code block have to be passed
+    # outside its scope. Hence the results of this code block have to be passed
     # through the "cheat" method).
     # 
     # To apply cheats for device extraction, use the following scheme:

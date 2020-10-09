@@ -104,7 +104,7 @@ cells T*
 </pre>
 
   <p>
-  A cell expression can already be used by it's own. The report of such a query will simply contain the cells
+  A cell expression can already be used by its own. The report of such a query will simply contain the cells
   selected by that expression. If combined with an action, such expressions already provide useful manipulation
   functionality.
   </p>
@@ -243,7 +243,7 @@ cells TOP..A
   is used in (including top cells and all child contexts). Used after a cell, it will return the cell 
   plus all child cells in each possible context. Used before a cell it will deliver all contexts that cell
   is used in every top cells. 
-  The following query will deliver "TOP" plus all it's direct and indirect children:
+  The following query will deliver "TOP" plus all its direct and indirect children:
   </p>
 
   <pre>
@@ -398,7 +398,7 @@ with shapes on layer 6 from instances of TOP.. do initial_cell.shapes(&lt;10/0&g
 </pre>
 
   <p>
-  That expression reads all shapes of cell "TOP" and it's children, inserts them into a new layer 10, datatype 0 and
+  That expression reads all shapes of cell "TOP" and its children, inserts them into a new layer 10, datatype 0 and
   transforms the shape after it has been inserted. This expression makes use of the variables "initial_cell" (a Cell object
   representing the root cell of the cell query), "shape" (a pointer to the currently selected shape and "path_trans"
   (a Trans object representing the transformation of the current shape into the root cell of the query). 

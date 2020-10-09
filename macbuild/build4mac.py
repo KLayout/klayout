@@ -73,11 +73,11 @@ def SetGlobals():
   Usage += "                        :   MP26: use Ruby 2.6 from MacPorts                             | \n"
   Usage += "                        :   HB27: use Ruby 2.7 from Homebrew                             | \n"
   Usage += "                        :   Ana3: use Ruby 2.5 from Anaconda3                            | \n"
-  Usage += "   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP37', 'HB37', 'Ana3']   | sys \n"
+  Usage += "   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3']   | sys \n"
   Usage += "                        :    nil: don't bind Python                                      | \n"
   Usage += "                        :    Sys: use OS-bundled Python 2.7 [ElCapitan -- Catalina]      | \n"
-  Usage += "                        :   MP37: use Python 3.7 from MacPorts                           | \n"
-  Usage += "                        :   HB37: use Python 3.7 from Homebrew                           | \n"
+  Usage += "                        :   MP38: use Python 3.8 from MacPorts                           | \n"
+  Usage += "                        :   HB38: use Python 3.8 from Homebrew                           | \n"
   Usage += "                        :   Ana3: use Python 3.7 from Anaconda3                          | \n"
   Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                      | disabled \n"
   Usage += "   [-m|--make <option>] : option passed to 'make'                                        | '-j4' \n"
@@ -195,7 +195,7 @@ def ParseCommandLineArguments():
 
   p.add_option( '-p', '--python',
                 dest='type_python',
-                help="Python type=['nil', 'Sys', 'MP37', 'HB37', 'Ana3']" )
+                help="Python type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3']" )
 
   p.add_option( '-n', '--noqtbinding',
                 action='store_true',
@@ -332,8 +332,8 @@ def ParseCommandLineArguments():
   candidates         = dict()
   candidates['NIL']  = 'nil'
   candidates['SYS']  = 'Sys'
-  candidates['MP37'] = 'MP37'
-  candidates['HB37'] = 'HB37'
+  candidates['MP38'] = 'MP38'
+  candidates['HB38'] = 'HB38'
   candidates['ANA3'] = 'Ana3'
   try:
     choicePython = candidates[ opt.type_python.upper() ]
@@ -355,11 +355,11 @@ def ParseCommandLineArguments():
         ModulePython = 'PythonSierra'
       elif Platform == "ElCapitan":
         ModulePython = 'PythonElCapitan'
-    elif choicePython == "MP37":
-      ModulePython = 'Python37MacPorts'
+    elif choicePython == "MP38":
+      ModulePython = 'Python38MacPorts'
       NonOSStdLang = True
-    elif choicePython == "HB37":
-      ModulePython = 'Python37Brew'
+    elif choicePython == "HB38":
+      ModulePython = 'Python38Brew'
       NonOSStdLang = True
     elif choicePython == "Ana3":
       ModulePython = 'PythonAnaconda3'
@@ -374,12 +374,12 @@ def ParseCommandLineArguments():
   # Set of modules chosen
   ModuleSet = ( choiceQt5, choiceRuby, choicePython )
 
-  NoQtBindings  = opt.no_qt_binding
-  MakeOptions   = opt.make_option
-  DebugMode     = opt.debug_build
-  CheckComOnly  = opt.check_command
-  DeploymentF   = opt.deploy_full
-  DeploymentP   = opt.deploy_partial
+  NoQtBindings = opt.no_qt_binding
+  MakeOptions  = opt.make_option
+  DebugMode    = opt.debug_build
+  CheckComOnly = opt.check_command
+  DeploymentF  = opt.deploy_full
+  DeploymentP  = opt.deploy_partial
 
   if DeploymentF and DeploymentP:
     print("")
@@ -409,9 +409,9 @@ def ParseCommandLineArguments():
       if (ModuleRuby in RubySys) and (ModulePython in PythonSys):
         PackagePrefix = "ST-"
         message      += "a standard (ST-) package including Qt5 and using OS-bundled Ruby and Python..."
-      elif ModulePython == 'Python37Brew':
+      elif ModulePython == 'Python38Brew':
         PackagePrefix = "HW-"
-        message      += "a heavyweight (HW-) package including Qt5 and Python3.7 from Homebrew..."
+        message      += "a heavyweight (HW-) package including Qt5 and Python3.8 from Homebrew..."
       else:
         PackagePrefix = "EX-"
         message      += "a package with exceptional (EX-) combinations of different modules..."
@@ -593,6 +593,7 @@ def RunMainBuildBash():
       os.remove( tarFile )
       os.chdir( "../" )
       shutil.copy2( "macbuild/macQAT.sh", MacBuildDirQAT )
+      shutil.copy2( "macbuild/macQAT.py", MacBuildDirQAT )
       print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
       print( "### <%s>: prepared the initial *.macQAT/" % myscript, file=sys.stderr )
       print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
@@ -905,10 +906,6 @@ def DeployBinariesForBundle():
       deploytool = Qt5MacPorts['deploy']
       app_bundle = "klayout.app"
       options    = macdepQtOpt + verbose
-    # To use Qt5 from Homebrew on Catalina...
-    #   in "/usr/local/opt/python/lib/"
-    #         Python.framework -> ../Frameworks/Python.framework/ <=== this symbolic was needed
-    #         pkgconfig/
     elif ModuleQt == 'Qt5Brew':
       deploytool = Qt5Brew['deploy']
       app_bundle = "klayout.app"
@@ -932,39 +929,52 @@ def DeployBinariesForBundle():
       os.chdir(ProjectDir)
       return 1
 
-    #-------------------------------------------------------------
-    # [9] Special deployment of Python3.7 from Homebrew
-    #-------------------------------------------------------------
-    deploymentPython37HB = (ModulePython == 'Python37Brew')
-    if deploymentPython37HB and NonOSStdLang:
+    #-----------------------------------------------------------------------------------------------
+    # [9] Special deployment of Python3.8 from Homebrew
+    #     To use Python3.8 from Homebrew on Catalina...
+    #       in "/usr/local/opt/python/lib/"
+    #             Python.framework -> ../Frameworks/Python.framework/ <=== this symbolic was needed
+    #             pkgconfig/
+    #-----------------------------------------------------------------------------------------------
+    deploymentPython38HB = (ModulePython == 'Python38Brew')
+    if deploymentPython38HB and NonOSStdLang:
       from build4mac_util import WalkFrameworkPaths, PerformChanges
 
-      bundlePath = AbsMacPkgDir + '/klayout.app'
-      bundleExecPathAbs = '%s/Contents/MacOS/' % bundlePath
+      pythonHBVer         = "3.8" # 'pinned' to this version as of KLayout version 0.26.7 (2020-09-13)
+      bundlePath          = AbsMacPkgDir + '/klayout.app'
+      bundleExecPathAbs   = '%s/Contents/MacOS/' % bundlePath
       pythonFrameworkPath = '%s/Contents/Frameworks/Python.framework' % bundlePath
+      testTarget          = '%s/Versions/%s/lib/python%s/test' % (pythonFrameworkPath, pythonHBVer, pythonHBVer)
+      resourceTarget1     = '%s/Versions/%s/Resources' % (pythonFrameworkPath, pythonHBVer)
+      resourceTarget2     = '%s/Resources' % pythonFrameworkPath
+      binTarget           = '%s/Versions/%s/bin' % (pythonFrameworkPath, pythonHBVer)
+      sitepackagesTarget  = '%s/Versions/%s/lib/python%s/site-packages' % (pythonFrameworkPath, pythonHBVer, pythonHBVer)
+      sitepackagesSource  = '%s/Versions/%s/lib/python%s/site-packages' % (HBPython38FrameworkPath, pythonHBVer, pythonHBVer)
 
       print( "" )
-      print( " [9] Optional deployment of Python from %s ..." % HBPython37FrameworkPath )
+      print( " [9] Optional deployment of Python from %s ..." % HBPython38FrameworkPath )
       print( "  [9.1] Copying Python Framework" )
 
-      cmd1 = "rm -rf %s" % pythonFrameworkPath
-      cmd2 = "rsync -a --safe-links %s/ %s" % (HBPython37FrameworkPath, pythonFrameworkPath)
-      cmd3 = "mkdir %s/Versions/3.7/lib/python3.7/site-packages/" % pythonFrameworkPath
-      cmd4 = "cp -RL %s/Versions/3.7/lib/python3.7/site-packages/{pip*,pkg_resources,setuptools*,wheel*} " % \
-              HBPython37FrameworkPath
-      cmd4 += "%s/Versions/3.7/lib/python3.7/site-packages/" % pythonFrameworkPath
-      cmd5 = "rm -rf %s/Versions/3.7/lib/python3.7/test" % pythonFrameworkPath
-      cmd6 = "rm -rf %s/Versions/3.7/Resources" % pythonFrameworkPath
-      cmd7 = "rm -rf %s/Versions/3.7/bin" % pythonFrameworkPath
+      cmd01 = "rm -rf %s" % pythonFrameworkPath
+      cmd02 = "rsync -a --safe-links %s/ %s" % (HBPython38FrameworkPath, pythonFrameworkPath)
+
+      cmd03 = "rm -rf %s" % testTarget
+      cmd04 = "rm -rf %s" % resourceTarget1
+      cmd05 = "unlink %s" % resourceTarget2
+      cmd06 = "rm -rf %s" % binTarget
+
+      cmd07 = "mkdir %s" % sitepackagesTarget
+      cmd08 = "cp -RL %s/{pip*,pkg_resources,setuptools*,wheel*} %s" % (sitepackagesSource, sitepackagesTarget)
 
       shell_commands = list()
-      shell_commands.append(cmd1)
-      shell_commands.append(cmd2)
-      shell_commands.append(cmd3)
-      shell_commands.append(cmd4)
-      shell_commands.append(cmd5)
-      shell_commands.append(cmd6)
-      shell_commands.append(cmd7)
+      shell_commands.append(cmd01)
+      shell_commands.append(cmd02)
+      shell_commands.append(cmd03)
+      shell_commands.append(cmd04)
+      shell_commands.append(cmd05)
+      shell_commands.append(cmd06)
+      shell_commands.append(cmd07)
+      shell_commands.append(cmd08)
 
       for command in shell_commands:
         if subprocess.call( command, shell=True ) != 0:
@@ -973,14 +983,15 @@ def DeployBinariesForBundle():
           sys.exit(1)
 
       shutil.copy2( sourceDir2 + "/start-console.py", targetDirM )
-      shutil.copy2( sourceDir2 + "/klayout_console", targetDirM )
-      os.chmod( targetDirM + "/klayout_console",      0o0755 )
+      shutil.copy2( sourceDir2 + "/klayout_console",  targetDirM )
+      os.chmod( targetDirM + "/start-console.py", 0o0755 )
+      os.chmod( targetDirM + "/klayout_console",  0o0755 )
 
       print("  [9.2] Relinking dylib dependencies inside Python.framework" )
       print("   [9.2.1] Patching Python Framework" )
       depdict = WalkFrameworkPaths( pythonFrameworkPath )
       appPythonFrameworkPath = '@executable_path/../Frameworks/Python.framework/'
-      PerformChanges(depdict, [(HBPython37FrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
+      PerformChanges(depdict, [(HBPython38FrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
 
       print("   [9.2.2] Patching /usr/local/opt/ libs")
       usrLocalPath = '/usr/local/opt/'
@@ -989,17 +1000,16 @@ def DeployBinariesForBundle():
       depdict = WalkFrameworkPaths(pythonFrameworkPath, search_path_filter=r'\t+/usr/local/(opt|Cellar)')
       PerformChanges(depdict, replacePairs, bundleExecPathAbs)
 
-      print("   [9.2.3] Patching openssl, gdbm, readline, sqlite, tcl-tk, xz")
+      print("   [9.2.3] Patching openssl@1.1, gdbm, readline, sqlite, xz")
       usrLocalPath = '/usr/local/opt'
       appUsrLocalPath = '@executable_path/../Frameworks/'
       replacePairs = [(usrLocalPath, appUsrLocalPath, True)]
-      replacePairs.extend([(openssl_version, '@executable_path/../Frameworks/openssl', True)
-        for openssl_version in glob.glob('/usr/local/Cellar/openssl/*')])
-      depdict = WalkFrameworkPaths([pythonFrameworkPath + '/../openssl',
+      replacePairs.extend([(openssl_version, '@executable_path/../Frameworks/openssl@1.1', True)
+        for openssl_version in glob.glob('/usr/local/Cellar/openssl@1.1/*')])
+      depdict = WalkFrameworkPaths([pythonFrameworkPath + '/../openssl@1.1',
                                     pythonFrameworkPath + '/../gdbm',
                                     pythonFrameworkPath + '/../readline',
                                     pythonFrameworkPath + '/../sqlite',
-                                    pythonFrameworkPath + '/../tcl-tk',
                                     pythonFrameworkPath + '/../xz'], search_path_filter=r'\t+/usr/local/(opt|Cellar)')
 
       PerformChanges(depdict, replacePairs, bundleExecPathAbs)
@@ -1007,21 +1017,21 @@ def DeployBinariesForBundle():
       print("  [9.3] Relinking dylib dependencies for klayout")
       klayoutPath = bundleExecPathAbs
       depdict = WalkFrameworkPaths(klayoutPath, filter_regex=r'klayout$')
-      PerformChanges(depdict, [(HBPython37FrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
+      PerformChanges(depdict, [(HBPython38FrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
 
       libKlayoutPath = bundleExecPathAbs + '../Frameworks'
       depdict = WalkFrameworkPaths(libKlayoutPath, filter_regex=r'libklayout')
-      PerformChanges(depdict, [(HBPython37FrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
+      PerformChanges(depdict, [(HBPython38FrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
 
       print("  [9.4] Patching site.py, pip/, and distutils/")
-      site_module = "%s/Versions/3.7/lib/python3.7/site.py" % pythonFrameworkPath
+      site_module = "%s/Versions/%s/lib/python%s/site.py" % (pythonFrameworkPath, pythonHBVer, pythonHBVer)
       with open(site_module, 'r') as site:
         buf = site.readlines()
       with open(site_module, 'w') as site:
         import re
         for line in buf:
           # This will fool pip into thinking it's inside a virtual environment
-          # and install new packates to the correct site-packages
+          # and install new packages to the correct site-packages
           if re.match("^PREFIXES", line) is not None:
             line = line + "sys.real_prefix = sys.prefix\n"
           # do not allow installation in the user folder.
@@ -1029,7 +1039,24 @@ def DeployBinariesForBundle():
             line = "ENABLE_USER_SITE = False\n"
           site.write(line)
 
-      pip_module = "%s/Versions/3.7/lib/python3.7/site-packages/pip/__init__.py" % pythonFrameworkPath
+      #----------------------------------------------------------------------------------
+      # Typical usage of 'pip' after installation of the DMG package
+      #
+      # $ /Applications/klayout.app/Contents/MacOS/start-console.py
+      # Warning: Populating font family aliases took 195 ms. Replace uses of missing font\
+      # family "Monospace" with one that exists to avoid this cost.
+      # Python 3.7.8 (default, Jul  4 2020, 10:17:17)
+      # [Clang 11.0.3 (clang-1103.0.32.62)] on darwin
+      # Type "help", "copyright", "credits" or "license" for more information.
+      # (KLayout Python Console)
+      # >>> import pip
+      # >>> pip.main( ['install', 'numpy'] )
+      # >>> pip.main( ['install', 'scipy'] )
+      # >>> pip.main( ['install', 'pandas'] )
+      # >>> pip.main( ['install', 'matplotlib'] )
+      #----------------------------------------------------------------------------------
+      pip_module = "%s/Versions/%s/lib/python%s/site-packages/pip/__init__.py" % \
+                   (pythonFrameworkPath, pythonHBVer, pythonHBVer)
       with open(pip_module, 'r') as pip:
         buf = pip.readlines()
       with open(pip_module, 'w') as pip:
@@ -1039,7 +1066,8 @@ def DeployBinariesForBundle():
           line = re.sub("return isolated$", "return isolated or True", line)
           pip.write(line)
 
-      distutilsconfig = "%s/Versions/3.7/lib/python3.7/distutils/distutils.cfg" % pythonFrameworkPath
+      distutilsconfig = "%s/Versions/%s/lib/python%s/distutils/distutils.cfg" % \
+                        (pythonFrameworkPath, pythonHBVer, pythonHBVer)
       with open(distutilsconfig, 'r') as file:
         buf = file.readlines()
       with open(distutilsconfig, 'w') as file:
@@ -1051,7 +1079,7 @@ def DeployBinariesForBundle():
           file.write(line)
 
     #-------------------------------------------------------------
-    # [10] Special deployment of Ruby2.6 from Homebrew?
+    # [10] Special deployment of Ruby2.7 from Homebrew?
     #-------------------------------------------------------------
     deploymentRuby26HB = (ModuleRuby == 'Ruby27Brew')
     if deploymentRuby26HB and NonOSStdLang:
@@ -1059,7 +1087,7 @@ def DeployBinariesForBundle():
       print( "" )
       print( " [10] You have reached optional deployment of Ruby from %s ..." % HBRuby27Path )
       print( "   [!!!] Sorry, the deployed package will not work properly since deployment of" )
-      print( "         Ruby2.6 from Homebrew is not yet supported." )
+      print( "         Ruby2.7 from Homebrew is not yet supported." )
       print( "         Since you have Homebrew development environment, there two options:" )
       print( "           (1) Retry to make a package with '-Y|--DEPLOY' option." )
       print( "               This will not deploy any of Qt5, Python, and Ruby from Homebrew." )

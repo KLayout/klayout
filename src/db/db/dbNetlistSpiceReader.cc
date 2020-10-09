@@ -104,46 +104,66 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
   std::string cn = model;
   db::DeviceClass *cls = circuit->netlist ()->device_class_by_name (cn);
 
-  if (cls) {
+  if (element == "R") {
 
-    //  use given class
-
-  } else if (element == "R") {
-
-    if (cn.empty ()) {
-      cn = "RES";
+    if (cls) {
+      if (! dynamic_cast<db::DeviceClassResistor *>(cls)) {
+        error (tl::sprintf (tl::to_string (tr ("Class %s not a resistor device class as required by 'R' element")), cn));
+      }
+    } else {
+      if (cn.empty ()) {
+        cn = "RES";
+      }
+      cls = make_device_class<db::DeviceClassResistor> (circuit, cn);
     }
-    cls = make_device_class<db::DeviceClassResistor> (circuit, cn);
 
     //  Apply multiplier
     value /= mult;
 
   } else if (element == "L") {
 
-    if (cn.empty ()) {
-      cn = "IND";
+    if (cls) {
+      if (! dynamic_cast<db::DeviceClassInductor *>(cls)) {
+        error (tl::sprintf (tl::to_string (tr ("Class %s not a inductor device class as required by 'L' element")), cn));
+      }
+    } else {
+      if (cn.empty ()) {
+        cn = "IND";
+      }
+      cls = make_device_class<db::DeviceClassInductor> (circuit, cn);
     }
-    cls = make_device_class<db::DeviceClassInductor> (circuit, cn);
 
     //  Apply multiplier
     value /= mult;
 
   } else if (element == "C") {
 
-    if (cn.empty ()) {
-      cn = "CAP";
+    if (cls) {
+      if (! dynamic_cast<db::DeviceClassCapacitor *>(cls)) {
+        error (tl::sprintf (tl::to_string (tr ("Class %s not a capacitor device class as required by 'C' element")), cn));
+      }
+    } else {
+      if (cn.empty ()) {
+        cn = "CAP";
+      }
+      cls = make_device_class<db::DeviceClassCapacitor> (circuit, cn);
     }
-    cls = make_device_class<db::DeviceClassCapacitor> (circuit, cn);
 
     //  Apply multiplier
     value *= mult;
 
   } else if (element == "D") {
 
-    if (cn.empty ()) {
-      cn = "DIODE";
+    if (cls) {
+      if (! dynamic_cast<db::DeviceClassDiode *>(cls)) {
+        error (tl::sprintf (tl::to_string (tr ("Class %s not a diode device class as required by 'D' element")), cn));
+      }
+    } else {
+      if (cn.empty ()) {
+        cn = "DIODE";
+      }
+      cls = make_device_class<db::DeviceClassDiode> (circuit, cn);
     }
-    cls = make_device_class<db::DeviceClassDiode> (circuit, cn);
 
     //  Apply multiplier to "A"
     std::map<std::string, double>::iterator p;
@@ -154,18 +174,26 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
   } else if (element == "Q") {
 
-    if (nets.size () == 3) {
-      if (cn.empty ()) {
-        cn = "BJT3";
-      }
-      cls = make_device_class<db::DeviceClassBJT3Transistor> (circuit, cn);
-    } else if (nets.size () == 4) {
-      if (cn.empty ()) {
-        cn = "BJT4";
-      }
-      cls = make_device_class<db::DeviceClassBJT4Transistor> (circuit, cn);
-    } else {
+    if (nets.size () != 3 && nets.size () != 4) {
       error (tl::to_string (tr ("'Q' element needs to have 3 or 4 terminals")));
+    } else if (cls) {
+      if (nets.size () == 3 && ! dynamic_cast<db::DeviceClassBJT3Transistor *>(cls)) {
+        error (tl::sprintf (tl::to_string (tr ("Class %s not a 3-terminal BJT device class as required by 'Q' element")), cn));
+      } else if (! dynamic_cast<db::DeviceClassBJT4Transistor *>(cls)) {
+        error (tl::sprintf (tl::to_string (tr ("Class %s not a 4-terminal BJT device class as required by 'Q' element")), cn));
+      }
+    } else {
+      if (nets.size () == 3) {
+        if (cn.empty ()) {
+          cn = "BJT3";
+        }
+        cls = make_device_class<db::DeviceClassBJT3Transistor> (circuit, cn);
+      } else {
+        if (cn.empty ()) {
+          cn = "BJT4";
+        }
+        cls = make_device_class<db::DeviceClassBJT4Transistor> (circuit, cn);
+      }
     }
 
     //  Apply multiplier to "AE"
@@ -177,22 +205,28 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
   } else if (element == "M") {
 
-    if (nets.size () == 4) {
-      if (cn.empty ()) {
-        cn = "MOS4";
+    if (cls) {
+      if (! dynamic_cast<db::DeviceClassMOS4Transistor *>(cls)) {
+        error (tl::sprintf (tl::to_string (tr ("Class %s not a 4-terminal MOS device class as required by 'M' element")), cn));
       }
-      cls = make_device_class<db::DeviceClassMOS4Transistor> (circuit, cn);
-
-      //  Apply multiplier to "W"
-      std::map<std::string, double>::iterator p;
-      p = params.find ("W");
-      if (p != params.end ()) {
-        p->second *= mult;
-      }
-
     } else {
-      error (tl::to_string (tr ("'M' element needs to have 4 terminals")));
+      if (nets.size () == 4) {
+        if (cn.empty ()) {
+          cn = "MOS4";
+        }
+        cls = make_device_class<db::DeviceClassMOS4Transistor> (circuit, cn);
+      } else {
+        error (tl::to_string (tr ("'M' element needs to have 4 terminals")));
+      }
     }
+
+    //  Apply multiplier to "W"
+    std::map<std::string, double>::iterator p;
+    p = params.find ("W");
+    if (p != params.end ()) {
+      p->second *= mult;
+    }
+
   } else {
     error (tl::sprintf (tl::to_string (tr ("Not a known element type: '%s'")), element));
   }

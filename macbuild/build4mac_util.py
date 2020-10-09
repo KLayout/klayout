@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#===============================================================================
+#========================================================================================
 # File: "macbuild/build4mac_util.py"
 #
 # Here are utility functions and classes ...
@@ -9,7 +9,7 @@
 #  version 0.26.1 or later on different Apple Mac OSX platforms.
 #
 # This file is imported by 'build4mac.py' script.
-#===============================================================================
+#========================================================================================
 from __future__ import print_function  # to use print() of Python 3 in Python >= 2.7
 import sys
 import os
@@ -18,14 +18,14 @@ import string
 import subprocess
 import shutil
 
-#-------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
 ## To import global dictionaries of different modules
-#-------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
 mydir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append( mydir )
 from build4mac_env  import *
 
-#------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
 ## To decompose strings obtained by 'otool -L <*.dylib>' command and to
 #  generate a dictionary of KLayout's inter-library dependency.
 #
@@ -41,7 +41,7 @@ from build4mac_env  import *
 #      :
 #
 # @return a dictionary
-#------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
 def DecomposeLibraryDependency( depstr ):
   alllines   = depstr.split('\n')
   numlines   = len(alllines)
@@ -53,13 +53,13 @@ def DecomposeLibraryDependency( depstr ):
       supporters.append(supporter)
   return { dependent: supporters }
 
-#------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
 ## To print the contents of a library dependency dictionary
 #
 # @param[in] depdic  dictionary
 # @param[in] pathdic path dictionary
 # @param[in] namedic dictionary name
-#------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
 def PrintLibraryDependencyDictionary( depdic, pathdic, namedic ):
   keys = depdic.keys()
   print("")
@@ -73,13 +73,13 @@ def PrintLibraryDependencyDictionary( depdic, pathdic, namedic ):
       if itemName != keyName and (itemName in pathdic):
         print( "    %s (%s)" % (item, pathdic[itemName]) )
 
-#------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
 ## To set and change identification name of KLayout's dylib
 #
 # @param[in] libdic  inter-library dependency dictionary
 #
 # @return 0 on success; non-zero on failure
-#------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
 def SetChangeIdentificationNameOfDyLib( libdic, pathDic ):
   cmdNameId     = XcodeToolChain['nameID']
   cmdNameChg    = XcodeToolChain['nameCH']
@@ -115,7 +115,7 @@ def SetChangeIdentificationNameOfDyLib( libdic, pathDic ):
   # for-lib
   return 0
 
-#------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
 ## To set the identification names of KLayout's libraries to an executable
 #     and make the application aware of the library locations
 #
@@ -146,7 +146,7 @@ def SetChangeIdentificationNameOfDyLib( libdic, pathDic ):
 #                                       +-- 'strmxor'
 #
 # @return 0 on success; non-zero on failure
-#------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
 def SetChangeLibIdentificationName( executable, relativedir ):
   cmdNameId  = XcodeToolChain['nameID']
   cmdNameChg = XcodeToolChain['nameCH']
@@ -181,15 +181,21 @@ def SetChangeLibIdentificationName( executable, relativedir ):
   # for-lib
   return 0
 
-def WalkLibDependencyTree( dylibPath, depth=0, filter_regex=r'\t+/usr/local/opt'):
-  NOTHINGTODO = []  # return empty list if nothing to do.
-  cmdNameId  = XcodeToolChain['nameID']
-  cmdNameChg = XcodeToolChain['nameCH']
-  otoolCm    = 'otool -L %s | grep -E "%s"' % (dylibPath, filter_regex)
-  otoolOut   = os.popen( otoolCm ).read()
-  exedepdic  = DecomposeLibraryDependency( dylibPath + ":\n" + otoolOut )
-  keys       = exedepdic.keys()
-  deplibs    = exedepdic[ list(keys)[0] ]
+#----------------------------------------------------------------------------------------
+## To make a library dependency dictionary by recursively walk down the lib hierarchy
+#
+# @param[in] dylibPath:     dylib path
+# @param[in] depth:         hierarchy depth (< 5)
+# @param[in] filter_regex:  filter regular expression
+#
+# @return a dictionary
+#----------------------------------------------------------------------------------------
+def WalkLibDependencyTree( dylibPath, depth=0, filter_regex=r'\t+/usr/local/opt' ):
+  otoolCm   = 'otool -L %s | grep -E "%s"' % (dylibPath, filter_regex)
+  otoolOut  = os.popen( otoolCm ).read()
+  exedepdic = DecomposeLibraryDependency( dylibPath + ":\n" + otoolOut )
+  keys      = exedepdic.keys()
+  deplibs   = exedepdic[ list(keys)[0] ]
 
   if depth < 5:
     if len(deplibs) > 0:
@@ -201,9 +207,19 @@ def WalkLibDependencyTree( dylibPath, depth=0, filter_regex=r'\t+/usr/local/opt'
       return deplibs
     return exedepdic
   else:
-    raise RuntimeError("Exceeded maximum recursion depth.")
+    raise RuntimeError( "Exceeded maximum recursion depth." )
 
-def WalkFrameworkPaths(frameworkPaths, filter_regex=r'\.(so|dylib)$', search_path_filter=r'\t+/usr/local/opt'):
+#----------------------------------------------------------------------------------------
+## To make a library dependency dictionary by recursively walk down the Framework
+#
+# @param[in] frameworkPaths:      Framework path
+# @param[in] filter_regex:        filter regular expression
+# @param[in] search_path_filter:  search path filter regular expression
+#
+# @return a dictionary
+#----------------------------------------------------------------------------------------
+def WalkFrameworkPaths( frameworkPaths, filter_regex=r'\.(so|dylib)$',
+                                        search_path_filter=r'\t+/usr/local/opt' ):
 
   if isinstance(frameworkPaths, str):
     frameworkPathsIter = [frameworkPaths]
@@ -225,7 +241,15 @@ def WalkFrameworkPaths(frameworkPaths, filter_regex=r'\.(so|dylib)$', search_pat
       dependency_dict[frameworkPath].append(dict_file)
   return dependency_dict
 
-def WalkDictTree(dependencyDict, visited_files):
+#----------------------------------------------------------------------------------------
+## To make a list of changed libraries
+#
+# @param[in] dependencyDict:  library dependency dictionary
+# @param[in] visited_files:   list of visited files
+#
+# @return a list
+#----------------------------------------------------------------------------------------
+def WalkDictTree( dependencyDict, visited_files ):
   libNameChanges = list()
   for lib, dependencies in dependencyDict.items():
     if lib in visited_files:
@@ -253,31 +277,69 @@ def WalkDictTree(dependencyDict, visited_files):
     visited_files.append(lib)
   return libNameChanges
 
-
-def FindFramework(path, root_path):
+#----------------------------------------------------------------------------------------
+## To find the Framework name from a library name
+#
+# @param[in] path:      path to a library
+# @param[in] root_path: root path
+#
+# @return the path to a Framework
+#----------------------------------------------------------------------------------------
+def FindFramework( path, root_path ):
   relPath = os.path.relpath(path, root_path)
-  return os.path.join(root_path, relPath.split(os.sep)[0])
-def ResolveExecutablePath(path, executable_path):
+  frmPath = os.path.join(root_path, relPath.split(os.sep)[0])
+  #print( "###", frmPath, path, root_path )
+  return frmPath
+
+#----------------------------------------------------------------------------------------
+## To resolve an executable path
+#
+# @param[in] path:            a path to resolve
+# @param[in] executable_path: an executable path
+#
+# @return the resolved path
+#----------------------------------------------------------------------------------------
+def ResolveExecutablePath( path, executable_path ):
   """ Transforms @executable_path into executable_path"""
   p = path.replace("@executable_path", "/%s/" % executable_path)
   return p
 
+#----------------------------------------------------------------------------------------
+## To detect the changed library names
+#
+# @param[in] frameworkDependencyDict: framework dependency dictionary
+#
+# @return a list of changes, each of which is stored in the form of
+#         * ('lib.dylib', ['dep1.dylib', ...])
+#           OR
+#         * ('lib.dylib',)
+#----------------------------------------------------------------------------------------
 def DetectChanges(frameworkDependencyDict):
   visited_files = list()
   libNameChanges = list()
   for framework, libraries in frameworkDependencyDict.items():
     for libraryDict in libraries:
       libNameChanges.extend(WalkDictTree(libraryDict, visited_files))
-  # Changes are stored in libNameChanges in the form of ('lib.dylib', ['dep1.dylib', ...])
-
   return libNameChanges
 
-def PerformChanges(frameworkDependencyDict, replaceFromToPairs=None, executable_path="/tmp/klayout"):
+#----------------------------------------------------------------------------------------
+## To perform the required changes
+#
+# @param[in] frameworkDependencyDict: framework dependency dictionary
+# @param[in] replaceFromToPairs:      (from, to)-pair for replacement
+# @param[in] executable_path:         executable path
+#
+# @return 0 on success; > 0 on failure
+#----------------------------------------------------------------------------------------
+def PerformChanges( frameworkDependencyDict, replaceFromToPairs=None, executable_path="/tmp/klayout" ):
   libNameChanges = DetectChanges(frameworkDependencyDict)
-  cmdNameId = XcodeToolChain['nameID']
+  #print(libNameChanges)
+  cmdNameId  = XcodeToolChain['nameID']
   cmdNameChg = XcodeToolChain['nameCH']
 
-  if replaceFromToPairs is not None:
+  if replaceFromToPairs is None:
+    return 0
+  else:
     for libNameChange in libNameChanges:
       libNameChangeIterator = iter(libNameChange)
       lib = next(libNameChangeIterator)
@@ -300,8 +362,8 @@ def PerformChanges(frameworkDependencyDict, replaceFromToPairs=None, executable_
           destFrameworkPath = ResolveExecutablePath(destFrameworkPath, executable_path)
 
           if not os.path.exists(fileName):
-            print (lib.replace(replaceFrom, replaceTo), "DOES NOT EXIST")
-            print ("COPY", frameworkPath, " -> ", destFrameworkPath)
+            print( "     NOT FOUND:", lib.replace(replaceFrom, replaceTo) )
+            print( "       COPYING:", frameworkPath, " -> ", destFrameworkPath )
             shutil.copytree(frameworkPath, destFrameworkPath)
 
           nameId = lib.replace(replaceFrom, replaceTo)
@@ -316,8 +378,8 @@ def PerformChanges(frameworkDependencyDict, replaceFromToPairs=None, executable_
 
         for dependency in dependencies:
           if dependency.find(replaceFrom) >= 0:
-            print("\tIn:", fileName)
-            print("\tRENAME", dependency, " -> ", dependency.replace(replaceFrom, replaceTo))
+            print( "       IN:", fileName )
+            print( "         RENAMING:", dependency, " -> ", dependency.replace(replaceFrom, replaceTo) )
 
             # Try changing id first
             nameId = dependency.replace(replaceFrom, replaceTo)
@@ -342,15 +404,15 @@ def PerformChanges(frameworkDependencyDict, replaceFromToPairs=None, executable_
               msg = "!!! Failed to set the new identification name to <%s> !!!"
               print( msg % fileName, file=sys.stderr )
               return 1
+    return 0
 
-
-#------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
 ## To get KLayout's version from a file; most likely from 'version.sh'
 #
 # @param[in] verfile   version file from which version is retrieved
 #
 # @return version string
-#------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
 def GetKLayoutVersionFrom( verfile='version.h' ):
   version = "?.?.?"
   try:
@@ -372,14 +434,14 @@ def GetKLayoutVersionFrom( verfile='version.h' ):
       return version
   return version
 
-#------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
 ## To generate the contents of "Info.plist" file from a template
 #
 # @param[in]  keydic    dictionary of four key words ['exe', 'icon', 'bname', 'ver']
 # @param[in]  templfile template file ("macbuild/Resources/Info.plist.template")
 #
 # @return generated strings
-#------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
 def GenerateInfoPlist( keydic, templfile ):
   val_exe   = keydic['exe']
   val_icon  = keydic['icon']

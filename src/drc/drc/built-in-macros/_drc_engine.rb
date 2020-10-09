@@ -1829,7 +1829,7 @@ CODE
         
         sel.each do |s|
           if s == "-"
-            iter.unselect_cells(cell.cell_index)
+            iter.unselect_cells([cell_index])
           elsif s == "-*"
             iter.unselect_all_cells
           elsif s == "+*"

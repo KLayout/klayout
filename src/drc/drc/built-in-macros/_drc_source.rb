@@ -22,13 +22,26 @@ module DRC
       @layout_var = layout_var
       @path = path
       @cell = cell
-      @inside = nil
       @box = nil
-      @layers = nil
       @sel = []
       @clip = false
       @overlapping = false
       @tmp_layers = []
+    end
+
+    # Conceptual deep copy (not including the temp layers)
+    def dup
+      d = DRCSource::new(@engine, @layout, @layout_var, @cell, @path)
+      d._init_internal(@box ? @box.dup : nil, @sel.dup, @clip, @overlapping)
+      d
+    end
+
+    # internal copy initialization
+    def _init_internal(box, sel, clip, overlapping)
+      @box = box
+      @sel = sel
+      @clip = clip
+      @overlapping = overlapping
     end
         
     # %DRC%
@@ -139,19 +152,34 @@ module DRC
     # code:
     #
     # @code
-    # layout_with_selection = layout.select("-TOP", "+B")
-    # l1 = layout_with_selection.input(1, 0)
+    # layout_with_selection = source.select("-TOP", "+B")
+    # l1 = source.input(1, 0)
     # ...
     # @/code
     #
     # Please note that the sample above will deliver the children of "B" because there is 
-    # nothing said about how to proceed with cells other than "TOP" or "B".
+    # nothing said about how to proceed with cells other than "TOP" or "B". Conceptually,
+    # the instantiation path of a cell will be matched against the different filters in the
+    # order they are given.
+    # A matching negative expression will disable the cell, a matching positive expression
+    # will enable the cell. Hence, every cell that has a "B" in the instantiation path 
+    # is enabled.
+    #
     # The following code will just select "B" without it's children, because in the 
     # first "-*" selection, all cells including the children of "B" are disabled:
     #
     # @code
-    # layout_with_selection = layout.select("-*", "+B")
-    # l1 = layout_with_selection.input(1, 0)
+    # layout_with_selection = source.select("-*", "+B")
+    # l1 = source.input(1, 0)
+    # ...
+    # @/code
+    # 
+    # The short form "-" will disable the top cell. This code is identical to the first example
+    # and will start with a disabled top cell regardless of it's name:
+    # 
+    # @code
+    # layout_with_selection = source.select("-", "+B")
+    # l1 = source.input(1, 0)
     # ...
     # @/code
     

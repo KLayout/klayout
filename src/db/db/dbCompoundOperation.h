@@ -23,6 +23,7 @@
 #ifndef HDR_dbCompoundOperation
 #define HDR_dbCompoundOperation
 
+#include "dbCommon.h"
 #include "dbLocalOperation.h"
 #include "dbHierProcessor.h"
 #include "dbRegionDelegate.h"
@@ -46,12 +47,8 @@ class DB_PUBLIC CompoundRegionOperationNode
 public:
   enum  ResultType { Region, Edges, EdgePairs };
 
-  CompoundRegionOperationNode ()
-  {
-    invalidate_cache ();
-  }
-
-  virtual ~CompoundRegionOperationNode () { }
+  CompoundRegionOperationNode ();
+  virtual ~CompoundRegionOperationNode ();
 
   virtual db::Coord dist () const = 0;
   virtual std::string description () const = 0;
@@ -221,10 +218,12 @@ class DB_PUBLIC CompoundRegionOperationPrimaryNode
 {
 public:
   CompoundRegionOperationPrimaryNode ();
+  virtual ~CompoundRegionOperationPrimaryNode ();
 
   virtual std::string description () const;
-
   virtual std::vector<db::Region *> inputs () const;
+  virtual db::Coord dist () const { return 0; }
+  virtual ResultType result_type () const { return Region; }
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const;
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const;
@@ -236,10 +235,12 @@ class DB_PUBLIC CompoundRegionOperationSecondaryNode
 {
 public:
   CompoundRegionOperationSecondaryNode (db::Region *input);
+  virtual ~CompoundRegionOperationSecondaryNode ();
 
   virtual std::string description () const;
-
   virtual std::vector<db::Region *> inputs () const;
+  virtual db::Coord dist () const { return 0; }
+  virtual ResultType result_type () const { return Region; }
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const;
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const;

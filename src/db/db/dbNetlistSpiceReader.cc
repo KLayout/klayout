@@ -177,10 +177,14 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
     if (nets.size () != 3 && nets.size () != 4) {
       error (tl::to_string (tr ("'Q' element needs to have 3 or 4 terminals")));
     } else if (cls) {
-      if (nets.size () == 3 && ! dynamic_cast<db::DeviceClassBJT3Transistor *>(cls)) {
-        error (tl::sprintf (tl::to_string (tr ("Class %s not a 3-terminal BJT device class as required by 'Q' element")), cn));
-      } else if (! dynamic_cast<db::DeviceClassBJT4Transistor *>(cls)) {
-        error (tl::sprintf (tl::to_string (tr ("Class %s not a 4-terminal BJT device class as required by 'Q' element")), cn));
+      if (nets.size () == 3) {
+        if (! dynamic_cast<db::DeviceClassBJT3Transistor *>(cls)) {
+          error (tl::sprintf (tl::to_string (tr ("Class %s not a 3-terminal BJT device class as required by 'Q' element")), cn));
+        }
+      } else {
+        if (! dynamic_cast<db::DeviceClassBJT4Transistor *>(cls)) {
+          error (tl::sprintf (tl::to_string (tr ("Class %s not a 4-terminal BJT device class as required by 'Q' element")), cn));
+        }
       }
     } else {
       if (nets.size () == 3) {

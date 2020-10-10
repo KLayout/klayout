@@ -62,6 +62,14 @@ compare_iterators_with_respect_to_target_hierarchy (const db::RecursiveShapeIter
     return iter1.max_depth () < iter2.max_depth () ? -1 : 1;
   }
 
+  //  take potential selection of cells into account
+  if (iter1.disables () != iter2.disables ()) {
+    return iter1.disables () < iter2.disables () ? -1 : 1;
+  }
+  if (iter1.enables () != iter2.enables ()) {
+    return iter1.enables () < iter2.enables () ? -1 : 1;
+  }
+
   //  if a region is set, the hierarchical appearance is the same only if the layers and
   //  complex region are identical
   if ((iter1.region () == db::Box::world ()) != (iter2.region () == db::Box::world ())) {
@@ -238,11 +246,11 @@ HierarchyBuilder::begin (const RecursiveShapeIterator *iter)
     return;
   }
 
-  std::pair<db::cell_index_type, std::set<db::Box> > key (iter->top_cell ()->cell_index (), std::set<db::Box> ());
+  CellMapKey key (iter->top_cell ()->cell_index (), false, std::set<db::Box> ());
   m_cm_entry = m_cell_map.find (key);
 
   if (m_cm_entry == m_cell_map.end ()) {
-    db::cell_index_type new_top_index = mp_target->add_cell (iter->layout ()->cell_name (key.first));
+    db::cell_index_type new_top_index = mp_target->add_cell (iter->layout ()->cell_name (key.original_cell));
     m_cm_entry = m_cell_map.insert (std::make_pair (key, new_top_index)).first;
   }
 
@@ -300,27 +308,47 @@ HierarchyBuilder::leave_cell (const RecursiveShapeIterator * /*iter*/, const db:
   m_cell_stack.pop_back ();
 }
 
+db::cell_index_type
+HierarchyBuilder::make_cell_variant (const HierarchyBuilder::CellMapKey &key, const std::string &cell_name)
+{
+  m_cm_entry = m_cell_map.find (key);
+  m_cm_new_entry = false;
+
+  db::cell_index_type new_cell;
+
+  if (m_cm_entry == m_cell_map.end ()) {
+
+    std::string cn = cell_name;
+    if (! key.clip_region.empty ()) {
+      cn += "$CLIP_VAR";
+    }
+    if (key.inactive) {
+      cn += "$DIS";
+    }
+    new_cell = mp_target->add_cell (cn.c_str ());
+    m_cm_entry = m_cell_map.insert (std::make_pair (key, new_cell)).first;
+    m_cm_new_entry = true;
+    m_cells_to_be_filled.insert (new_cell);
+
+  } else {
+    new_cell = m_cm_entry->second;
+  }
+
+  return new_cell;
+}
+
 HierarchyBuilder::new_inst_mode
 HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool all)
 {
   if (all) {
 
-    std::pair<db::cell_index_type, std::set<db::Box> > key (inst.object ().cell_index (), std::set<db::Box> ());
-
-    m_cm_entry = m_cell_map.find (key);
-    m_cm_new_entry = false;
-
-    if (m_cm_entry == m_cell_map.end ()) {
-      db::cell_index_type new_cell = mp_target->add_cell (iter->layout ()->cell_name (inst.object ().cell_index ()));
-      m_cm_entry = m_cell_map.insert (std::make_pair (key, new_cell)).first;
-      m_cm_new_entry = true;
-      m_cells_to_be_filled.insert (new_cell);
-    }
+    CellMapKey key (inst.object ().cell_index (), iter->is_child_inactive (inst.object ().cell_index ()), std::set<db::Box> ());
+    db::cell_index_type new_cell = make_cell_variant (key, iter->layout ()->cell_name (inst.object ().cell_index ()));
 
     //  for new cells, create this instance
     if (m_cell_stack.back ().first) {
       db::CellInstArray new_inst (inst, &mp_target->array_repository ());
-      new_inst.object () = db::CellInst (m_cm_entry->second);
+      new_inst.object () = db::CellInst (new_cell);
       new_inst.transform_into (m_trans);
       for (std::vector<db::Cell *>::const_iterator c = m_cell_stack.back ().second.begin (); c != m_cell_stack.back ().second.end (); ++c) {
         (*c)->insert (new_inst);
@@ -353,24 +381,12 @@ HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db:
       return false;
     }
 
-    std::pair<db::cell_index_type, std::set<db::Box> > key (inst.object ().cell_index (), clip_variant.second);
-    m_cm_entry = m_cell_map.find (key);
-    m_cm_new_entry = false;
-
-    if (m_cm_entry == m_cell_map.end ()) {
-      std::string suffix;
-      if (! key.second.empty ()) {
-        suffix = "$CLIP_VAR";
-      }
-      db::cell_index_type new_cell = mp_target->add_cell ((std::string (iter->layout ()->cell_name (inst.object ().cell_index ())) + suffix).c_str ());
-      m_cm_entry = m_cell_map.insert (std::make_pair (key, new_cell)).first;
-      m_cm_new_entry = true;
-      m_cells_to_be_filled.insert (new_cell);
-    }
+    CellMapKey key (inst.object ().cell_index (), iter->is_child_inactive (inst.object ().cell_index ()), clip_variant.second);
+    db::cell_index_type new_cell = make_cell_variant (key, iter->layout ()->cell_name (inst.object ().cell_index ()));
 
     //  for a new cell, create this instance
     if (m_cell_stack.back ().first) {
-      db::CellInstArray new_inst (db::CellInst (m_cm_entry->second), trans);
+      db::CellInstArray new_inst (db::CellInst (new_cell), trans);
       new_inst.transform_into (m_trans);
       for (std::vector<db::Cell *>::const_iterator c = m_cell_stack.back ().second.begin (); c != m_cell_stack.back ().second.end (); ++c) {
         (*c)->insert (new_inst);

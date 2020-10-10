@@ -23,7 +23,7 @@
       are brought up to the current cell's level and removed from the original cell.<br/>
       A non-destructive way of moving a shape up in the hierarchy is to copy and paste the shape. This does an 
       explicit flattening of the shapes selected when inserting them.<br/>
-      <b>Hint:</b> the current implementation removes the selected object from it's original cell. Since it only creates
+      <b>Hint:</b> the current implementation removes the selected object from its original cell. Since it only creates
       new copies for the selected instances, the object ist lost for all other instances of the cell. This may create undesired
       side effects and it is likely that this behaviour will change in future implementations.
       </li>

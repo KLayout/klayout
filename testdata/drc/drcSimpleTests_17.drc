@@ -1,0 +1,42 @@
+
+source($drc_test_source)
+in_cell     = source.select("-", "+S*")
+not_in_cell = source.select("-SPECIAL")
+in_cell_local = source.select("-*", "+SPECIAL")
+not_in_cell_local = source.select("+*", "-SPECIAL")
+
+target($drc_test_target)
+
+deep 
+
+input(2,0).output(2, 0)
+input(3,0).output(3, 0)
+
+flat
+
+in_cell.input(2, 0).output(102, 0)
+in_cell.input(3, 0).output(103, 0)
+
+not_in_cell.input(2, 0).output(202, 0)
+not_in_cell.input(3, 0).output(203, 0)
+
+in_cell_local.input(2, 0).output(302, 0)
+in_cell_local.input(3, 0).output(303, 0)
+
+not_in_cell_local.input(2, 0).output(402, 0)
+not_in_cell_local.input(3, 0).output(403, 0)
+
+deep 
+
+in_cell.input(2, 0).output(502, 0)
+in_cell.input(3, 0).output(503, 0)
+
+not_in_cell.input(2, 0).output(602, 0)
+not_in_cell.input(3, 0).output(603, 0)
+
+in_cell_local.input(2, 0).output(702, 0)
+in_cell_local.input(3, 0).output(703, 0)
+
+not_in_cell_local.input(2, 0).output(802, 0)
+not_in_cell_local.input(3, 0).output(803, 0)
+

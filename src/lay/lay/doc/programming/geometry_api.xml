@@ -36,7 +36,7 @@
   The <class_doc href="Point"/> object represents an integer coordinate in the 2-dimensional layout space,
   expressed in database units. 
   That object provides the x and y coordinates through the <class_doc href="Point#x"/> and <class_doc href="Point#y"/> attributes. Points can be added, 
-  subtracted, the euclidian distance and it's square can be computed using the <class_doc href="Point#distance"/> and <class_doc href="Point#sq_distance"/>
+  subtracted, the euclidian distance and its square can be computed using the <class_doc href="Point#distance"/> and <class_doc href="Point#sq_distance"/>
   methods. The <b>*</b> operator used with a factor as the second operand will scale both the x and y coordinates.
   </p>
 
@@ -113,7 +113,7 @@
     <li><b>Box + Point</b>: computes the box that encloses the box and the point given
     as the second operand. It basically enlarges the first box so it includes the second point as well.
     </li>
-    <li><b>contains?(Point)</b>: returns true, if the point is inside the box or on it's edges.
+    <li><b>contains?(Point)</b>: returns true, if the point is inside the box or on its edges.
     </li>
     <li><b>enlarge(Point)</b>: will enlarge the box by the x and y coordinates of the Point. Basically the x value
     of the point is subtracted from the left side and added to the right. The same way, the y coordinate is added
@@ -272,7 +272,7 @@ box = RBA::Box::new(dbox)
 
   <p>
   A <class_doc href="Path"/> object represents a line with a certain width. The figure above depicts the basic properties
-  of a path. The basic geometry of a path is defined by it's spine - a sequence of points that the path follows.
+  of a path. The basic geometry of a path is defined by its spine - a sequence of points that the path follows.
   By default, a path has rectangular end caps with variable length. The end caps can be round, in which case the extension 
   should be half the path width to avoid paths which are not compatible with the GDS2 format. Round-ended paths return
   true on <class_doc href="Path#is_round?"/>. An example for such a path is depicted in the following figure:
@@ -641,7 +641,7 @@ ly.top_cell.shapes(ly.layer(100, 0)).insert(r11 &amp; r21)
     <class_doc href="EdgePairs"/> edge pair collections, not regions. Each edge pair marks a
     violation of the given check.
   </p>
-  <p><class_doc href="Region#extents"/> replaces each polygon with it's bounding box.</p>
+  <p><class_doc href="Region#extents"/> replaces each polygon with its bounding box.</p>
   <p><class_doc href="Region#grid_check"/> performs an on-grid check returning edge pairs for off-grid markers.</p>
   <p><class_doc href="Region#holes"/> identifies holes and delivers a new region with the holes as filled polygons.</p>
   <p><class_doc href="Region#hulls"/> identifies holes and delivers a new region without the holes.</p>

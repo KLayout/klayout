@@ -10,7 +10,7 @@
   The main window is divided into three parts: the left area is the hierarchy browser and navigator, the 
   center part of the canvas and the right part is the layer list with the layer toolbox.
   The individual components can be rearranged, so the arrangement described is just the default
-  arrangement. You can move a component to a new place by dragging it with it's title bar to 
+  arrangement. You can move a component to a new place by dragging it with its title bar to 
   some other place or detach it from the main window to form a floating separate window.
   </p>
 

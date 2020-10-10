@@ -310,7 +310,7 @@ end</pre>
   is used for the cell tree and cell box labels. To avoid confusion, it should start with the name of the
   PCell. The bracket notation is not mandatory, but it's always a good idea to follow some common style.
   The information delivered by this method should be short but contain enough information so that a 
-  PCell variant can be distinguished from it's sibling. 
+  PCell variant can be distinguished from its sibling. 
   </p>
 
   <p>

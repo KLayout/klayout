@@ -161,7 +161,7 @@ layout.write("my_layout.gds")</pre>
   </p>
 
   <p>
-  A layout can provide and import PCells. PCells are cells that provide it's geometry through program code
+  A layout can provide and import PCells. PCells are cells that provide its geometry through program code
   (for example written in Ruby) and provide parameters which can be adjusted to change the appearance of the 
   cell. For each PCell a "declaration" must be provided which basically contains the code for the 
   PCell and some information about the parameters provided by the PCell. PCells are stored in the layout
@@ -813,7 +813,7 @@ end</pre>
 
   <keyword name="CellInstArray"/>
   <p>
-  Despite it's name, a <class_doc href="CellInstArray"/> object holds a cell reference which is
+  Despite its name, a <class_doc href="CellInstArray"/> object holds a cell reference which is
   not only an array, but also a single instances. The object represents a raw instance, in contrast to the 
   Instance object which is basically a pointer to an instance inside the database. CellInstArray objects as raw instances can be created, 
   copied, modified and stored in the usual containers, but once they are stored inside the Cell object, they can
@@ -1060,7 +1060,7 @@ end</pre>
   The <class_doc href="Shape"/> object provides a unified view to a geometrical primitive inside
   a Shapes container. It also plays an important role for addressing geometrical primitives 
   inside a Shapes container. A Shape object has general methods and specific methods that apply 
-  depending on it's identity.
+  depending on its identity.
   </p>
 
   <h3>General methods</h3>

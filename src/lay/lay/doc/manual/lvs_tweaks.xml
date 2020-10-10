@@ -101,7 +101,7 @@
   act as a wrapper to something else. In layouts, devices are often implemented as PCells and 
   appear as specific cells for no other reason than being implemented in a subcell. The same 
   might happen for schematic subcircuits which wrap a device. "Flattening" means that a circuit
-  is removed and it's contents are integrated into the calling circuits.
+  is removed and its contents are integrated into the calling circuits.
   </p>
 
   <p>

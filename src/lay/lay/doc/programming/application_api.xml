@@ -206,7 +206,7 @@ Application::instance.main_window.views</pre>
     to a large degree, so different colors can be used for example. Markers are objects of class
     Marker (<class_doc href="Marker"/>).
     </li>
-    <li><b>Local configuration</b>: be default, the layout view pulls it's configuration from the global
+    <li><b>Local configuration</b>: be default, the layout view pulls its configuration from the global
     configuration database. It is possible however to override certain configuration parameters for a 
     particular view. This allows for example to set the background color for a particular view without
     affecting the other views.
@@ -703,7 +703,7 @@ layout_view.insert_layer(lp, props)
   Width is a "weak" property. That means that for computing the effective width, child nodes 
   can override the settings inherited from the parent nodes. A width of 0 is considered "not set" and does not
   override parent defined widths. Other properties like visibility are "strong", i.e. 
-  the parent can override the properties set for it's children. Another form of combination is "additive" where
+  the parent can override the properties set for its children. Another form of combination is "additive" where
   the effective property value is the "sum" (or in general combination) of all local properties from parent
   to child.
   </p>

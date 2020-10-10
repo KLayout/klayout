@@ -1396,11 +1396,11 @@ private:
 
 /**
  *  @brief A helper function generating an attribute ID from a property ID
- *  This function is used to provide a generic attribute wrapping a property ID and a text ID.
+ *  This function is used to provide a generic attribute wrapping a property ID, text ID and global net ID
  */
 inline size_t prop_id_to_attr (db::properties_id_type id)
 {
-  return size_t (id) * 2;
+  return size_t (id) * 4;
 }
 
 /**
@@ -1408,7 +1408,7 @@ inline size_t prop_id_to_attr (db::properties_id_type id)
  */
 inline bool is_prop_id_attr (size_t attr)
 {
-  return (attr & 1) == 0;
+  return (attr & 3) == 0;
 }
 
 /**
@@ -1416,7 +1416,32 @@ inline bool is_prop_id_attr (size_t attr)
  */
 inline db::properties_id_type prop_id_from_attr (size_t attr)
 {
-  return attr / 2;
+  return attr / 4;
+}
+
+/**
+ *  @brief A helper function generating an attribute ID from a global net ID
+ *  This function is used to provide a generic attribute wrapping a property ID, text ID and global net ID
+ */
+inline size_t global_net_id_to_attr (size_t id)
+{
+  return size_t (id) * 4 + 2;
+}
+
+/**
+ *  @brief Gets a value indicating whether the attribute is a global net ID
+ */
+inline bool is_global_net_id_attr (size_t attr)
+{
+  return (attr & 3) == 2;
+}
+
+/**
+ *  @brief Gets the global net ID from an attribute
+ */
+inline size_t global_net_id_from_attr (size_t attr)
+{
+  return attr / 4;
 }
 
 /**
@@ -1424,7 +1449,16 @@ inline db::properties_id_type prop_id_from_attr (size_t attr)
  */
 inline size_t text_ref_to_attr (const db::Text *tr)
 {
+  //  NOTE: pointers are 32bit aligned, hence the lower two bits are 0
   return size_t (tr) + 1;
+}
+
+/**
+ *  @brief Gets a value indicating whether the attribute is a StringRef
+ */
+inline bool is_text_ref_attr (size_t attr)
+{
+  return (attr & 3) == 1;
 }
 
 /**

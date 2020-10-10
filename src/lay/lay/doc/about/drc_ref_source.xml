@@ -233,19 +233,34 @@ To disable the TOP cell but enabled a hypothetical cell B below the top cell, us
 code:
 </p><p>
 <pre>
-layout_with_selection = layout.select("-TOP", "+B")
-l1 = layout_with_selection.input(1, 0)
+layout_with_selection = source.select("-TOP", "+B")
+l1 = source.input(1, 0)
 ...
 </pre>
 </p><p>
 Please note that the sample above will deliver the children of "B" because there is 
-nothing said about how to proceed with cells other than "TOP" or "B".
-The following code will just select "B" without it's children, because in the 
+nothing said about how to proceed with cells other than "TOP" or "B". Conceptually,
+the instantiation path of a cell will be matched against the different filters in the
+order they are given.
+A matching negative expression will disable the cell, a matching positive expression
+will enable the cell. Hence, every cell that has a "B" in the instantiation path 
+is enabled.
+</p><p>
+The following code will just select "B" without its children, because in the 
 first "-*" selection, all cells including the children of "B" are disabled:
 </p><p>
 <pre>
-layout_with_selection = layout.select("-*", "+B")
-l1 = layout_with_selection.input(1, 0)
+layout_with_selection = source.select("-*", "+B")
+l1 = source.input(1, 0)
+...
+</pre>
+</p><p>
+The short form "-" will disable the top cell. This code is identical to the first example
+and will start with a disabled top cell regardless of its name:
+</p><p>
+<pre>
+layout_with_selection = source.select("-", "+B")
+l1 = source.input(1, 0)
 ...
 </pre>
 </p>

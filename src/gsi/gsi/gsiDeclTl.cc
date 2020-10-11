@@ -153,6 +153,11 @@ static std::string timer_to_s (const tl::Timer *timer)
 }
 
 Class<tl::Timer> decl_Timer ("tl", "Timer",
+  gsi::method ("memory_size", &tl::Timer::memory_size,
+    "@brief Gets the current memory usage of the process in Bytes\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
   gsi::method ("user", &tl::Timer::sec_user, 
     "@brief Returns the elapsed CPU time in user mode from start to stop in seconds\n"
   ) +

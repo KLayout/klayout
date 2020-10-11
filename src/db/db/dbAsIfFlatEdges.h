@@ -48,7 +48,8 @@ public:
   AsIfFlatEdges ();
   virtual ~AsIfFlatEdges ();
 
-  virtual size_t size () const;
+  virtual size_t count () const;
+  virtual size_t hier_count () const;
   virtual std::string to_string (size_t) const;
   virtual distance_type length (const db::Box &) const;
   virtual Box bbox () const;

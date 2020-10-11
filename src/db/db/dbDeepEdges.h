@@ -73,7 +73,8 @@ public:
   virtual bool equals (const Edges &other) const;
   virtual bool less (const Edges &other) const;
 
-  virtual size_t size () const;
+  virtual size_t count () const;
+  virtual size_t hier_count () const;
   virtual Box bbox () const;
 
   virtual DeepEdges::length_type length (const db::Box &) const;

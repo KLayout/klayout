@@ -37,13 +37,15 @@ TEST(1)
   EXPECT_EQ (ep != db::EdgePairs (), false);
   ep.insert (db::Edge (db::Point (10, 20), db::Point (110, 120)), db::Edge (db::Point (-10, -20), db::Point (90, 80)));
   EXPECT_EQ (ep.empty (), false);
-  EXPECT_EQ (ep.size (), size_t (1));
+  EXPECT_EQ (ep.count (), size_t (1));
+  EXPECT_EQ (ep.hier_count (), size_t (1));
   EXPECT_EQ (ep.bbox ().to_string (), "(-10,-20;110,120)");
   EXPECT_EQ (ep.to_string (), "(10,20;110,120)/(-10,-20;90,80)");
 
   ep.clear ();
   EXPECT_EQ (ep.empty (), true);
-  EXPECT_EQ (ep.size (), size_t (0));
+  EXPECT_EQ (ep.count (), size_t (0));
+  EXPECT_EQ (ep.hier_count (), size_t (0));
   EXPECT_EQ (ep.bbox ().to_string (), "()");
   ep.insert (db::EdgePair (db::Edge (db::Point (10, 20), db::Point (110, 120)), db::Edge (db::Point (-10, -20), db::Point (90, 80))));
   EXPECT_EQ (ep == db::EdgePairs (), false);
@@ -65,14 +67,17 @@ TEST(1)
 
   db::EdgePairs ep2;
   EXPECT_EQ (ep2.empty (), true);
-  EXPECT_EQ (ep2.size (), size_t (0));
+  EXPECT_EQ (ep2.count (), size_t (0));
+  EXPECT_EQ (ep2.hier_count (), size_t (0));
   EXPECT_EQ (ep2.bbox ().to_string (), "()");
   ep2.swap (ep);
   EXPECT_EQ (ep.empty (), true);
-  EXPECT_EQ (ep.size (), size_t (0));
+  EXPECT_EQ (ep.count (), size_t (0));
+  EXPECT_EQ (ep.hier_count (), size_t (0));
   EXPECT_EQ (ep.bbox ().to_string (), "()");
   EXPECT_EQ (ep2.empty (), false);
-  EXPECT_EQ (ep2.size (), size_t (1));
+  EXPECT_EQ (ep2.count (), size_t (1));
+  EXPECT_EQ (ep2.hier_count (), size_t (1));
   EXPECT_EQ (ep2.bbox ().to_string (), "(-20,-110;120,10)");
 }
 

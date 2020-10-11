@@ -367,11 +367,19 @@ public:
   }
 
   /**
-   *  @brief Returns the number of polygons in the region
+   *  @brief Returns the number of (flat) polygons in the region
    */
-  size_t size () const
+  size_t count () const
   {
-    return mp_delegate->size ();
+    return mp_delegate->count ();
+  }
+
+  /**
+   *  @brief Returns the number of (hierarchical) polygons in the region
+   */
+  size_t hier_count () const
+  {
+    return mp_delegate->hier_count ();
   }
 
   /**

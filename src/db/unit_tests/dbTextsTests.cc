@@ -38,13 +38,15 @@ TEST(1)
   EXPECT_EQ (texts != db::Texts (), false);
   texts.insert (db::Text ("abc", db::Trans (db::Vector (100, -200))));
   EXPECT_EQ (texts.empty (), false);
-  EXPECT_EQ (texts.size (), size_t (1));
+  EXPECT_EQ (texts.count (), size_t (1));
+  EXPECT_EQ (texts.hier_count (), size_t (1));
   EXPECT_EQ (texts.bbox ().to_string (), "(100,-200;100,-200)");
   EXPECT_EQ (texts.to_string (), "('abc',r0 100,-200)");
 
   texts.clear ();
   EXPECT_EQ (texts.empty (), true);
-  EXPECT_EQ (texts.size (), size_t (0));
+  EXPECT_EQ (texts.count (), size_t (0));
+  EXPECT_EQ (texts.hier_count (), size_t (0));
   EXPECT_EQ (texts.bbox ().to_string (), "()");
   texts.insert (db::Text ("uvw", db::Trans (db::Vector (110, 210))));
   EXPECT_EQ (texts == db::Texts (), false);
@@ -66,14 +68,17 @@ TEST(1)
 
   db::Texts texts2;
   EXPECT_EQ (texts2.empty (), true);
-  EXPECT_EQ (texts2.size (), size_t (0));
+  EXPECT_EQ (texts2.count (), size_t (0));
+  EXPECT_EQ (texts2.hier_count (), size_t (0));
   EXPECT_EQ (texts2.bbox ().to_string (), "()");
   texts2.swap (texts);
   EXPECT_EQ (texts.empty (), true);
-  EXPECT_EQ (texts.size (), size_t (0));
+  EXPECT_EQ (texts.count (), size_t (0));
+  EXPECT_EQ (texts.hier_count (), size_t (0));
   EXPECT_EQ (texts.bbox ().to_string (), "()");
   EXPECT_EQ (texts2.empty (), false);
-  EXPECT_EQ (texts2.size (), size_t (1));
+  EXPECT_EQ (texts2.count (), size_t (1));
+  EXPECT_EQ (texts2.hier_count (), size_t (1));
   EXPECT_EQ (texts2.bbox ().to_string (), "(210,-110;210,-110)");
 }
 

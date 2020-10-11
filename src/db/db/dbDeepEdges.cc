@@ -485,7 +485,7 @@ DeepEdges::insert_into (db::Layout *layout, db::cell_index_type into_cell, unsig
   deep_layer ().insert_into (layout, into_cell, into_layer);
 }
 
-size_t DeepEdges::size () const
+size_t DeepEdges::count () const
 {
   size_t n = 0;
 
@@ -493,6 +493,18 @@ size_t DeepEdges::size () const
   db::CellCounter cc (&layout);
   for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
     n += cc.weight (*c) * layout.cell (*c).shapes (deep_layer ().layer ()).size ();
+  }
+
+  return n;
+}
+
+size_t DeepEdges::hier_count () const
+{
+  size_t n = 0;
+
+  const db::Layout &layout = deep_layer ().layout ();
+  for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
+    n += layout.cell (*c).shapes (deep_layer ().layer ()).size ();
   }
 
   return n;

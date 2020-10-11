@@ -51,7 +51,8 @@ public:
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_merged_iter () const { return std::make_pair (db::RecursiveShapeIterator (), db::ICplxTrans ()); }
 
   virtual bool empty () const { return true; }
-  virtual size_t size () const { return 0; }
+  virtual size_t count () const { return 0; }
+  virtual size_t hier_count () const { return 0; }
   virtual std::string to_string (size_t) const { return std::string (); }
 
   virtual bool is_box () const { return false; }

@@ -298,11 +298,19 @@ public:
   }
 
   /**
-   *  @brief Returns the number of texts in the text set
+   *  @brief Returns the number of (flat) texts in the text set
    */
-  size_t size () const
+  size_t count () const
   {
-    return mp_delegate->size ();
+    return mp_delegate->count ();
+  }
+
+  /**
+   *  @brief Returns the number of (hierarchical) texts in the text set
+   */
+  size_t hier_count () const
+  {
+    return mp_delegate->hier_count ();
   }
 
   /**

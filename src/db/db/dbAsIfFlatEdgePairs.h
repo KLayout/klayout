@@ -41,7 +41,8 @@ public:
   AsIfFlatEdgePairs (const AsIfFlatEdgePairs &other);
   virtual ~AsIfFlatEdgePairs ();
 
-  virtual size_t size () const;
+  virtual size_t count () const;
+  virtual size_t hier_count () const;
   virtual std::string to_string (size_t) const;
   virtual Box bbox () const;
 

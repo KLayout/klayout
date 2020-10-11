@@ -208,7 +208,8 @@ public:
   virtual bool empty () const = 0;
   virtual bool is_box () const = 0;
   virtual bool is_merged () const = 0;
-  virtual size_t size () const = 0;
+  virtual size_t hier_count () const = 0;
+  virtual size_t count () const = 0;
 
   virtual area_type area (const db::Box &box) const = 0;
   virtual perimeter_type perimeter (const db::Box &box) const = 0;

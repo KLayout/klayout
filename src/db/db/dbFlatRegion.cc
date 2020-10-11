@@ -175,7 +175,12 @@ bool FlatRegion::empty () const
   return m_polygons.empty ();
 }
 
-size_t FlatRegion::size () const
+size_t FlatRegion::count () const
+{
+  return m_polygons.size ();
+}
+
+size_t FlatRegion::hier_count () const
 {
   return m_polygons.size ();
 }

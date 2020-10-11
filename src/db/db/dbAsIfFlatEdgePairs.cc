@@ -93,13 +93,19 @@ AsIfFlatEdgePairs::in (const EdgePairs &other, bool invert) const
 }
 
 size_t
-AsIfFlatEdgePairs::size () const
+AsIfFlatEdgePairs::count () const
 {
   size_t n = 0;
   for (EdgePairsIterator p (begin ()); ! p.at_end (); ++p) {
     ++n;
   }
   return n;
+}
+
+size_t
+AsIfFlatEdgePairs::hier_count () const
+{
+  return count ();
 }
 
 Box AsIfFlatEdgePairs::bbox () const
@@ -228,7 +234,7 @@ AsIfFlatEdgePairs::add (const EdgePairs &other) const
     std::auto_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs (*other_flat));
     new_edge_pairs->invalidate_cache ();
 
-    size_t n = new_edge_pairs->raw_edge_pairs ().size () + size ();
+    size_t n = new_edge_pairs->raw_edge_pairs ().size () + count ();
 
     new_edge_pairs->reserve (n);
 
@@ -242,7 +248,7 @@ AsIfFlatEdgePairs::add (const EdgePairs &other) const
 
     std::auto_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs ());
 
-    size_t n = size () + other.size ();
+    size_t n = count () + other.count ();
 
     new_edge_pairs->reserve (n);
 
@@ -264,7 +270,7 @@ AsIfFlatEdgePairs::equals (const EdgePairs &other) const
   if (empty () != other.empty ()) {
     return false;
   }
-  if (size () != other.size ()) {
+  if (count () != other.count ()) {
     return false;
   }
   EdgePairsIterator o1 (begin ());
@@ -285,8 +291,8 @@ AsIfFlatEdgePairs::less (const EdgePairs &other) const
   if (empty () != other.empty ()) {
     return empty () < other.empty ();
   }
-  if (size () != other.size ()) {
-    return (size () < other.size ());
+  if (count () != other.count ()) {
+    return (count () < other.count ());
   }
   EdgePairsIterator o1 (begin ());
   EdgePairsIterator o2 (other.begin ());

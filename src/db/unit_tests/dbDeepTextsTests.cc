@@ -59,7 +59,8 @@ TEST(1_Basics)
   EXPECT_EQ (texts100.empty (), true);
   EXPECT_EQ (texts2.empty (), false);
   EXPECT_EQ (texts2.bbox ().to_string (), "(-520,0;24040,2800)");
-  EXPECT_EQ (texts2.size (), size_t (40));
+  EXPECT_EQ (texts2.count (), size_t (40));
+  EXPECT_EQ (texts2.hier_count (), size_t (1));
   EXPECT_EQ (texts2.to_string ().substr (0, 42), "('L2',r0 -520,0);('L2',r0 -520,2800);('L2'");
 
   db::Layout target;

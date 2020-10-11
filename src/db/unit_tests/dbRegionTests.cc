@@ -93,7 +93,8 @@ TEST(1)
   EXPECT_EQ (r.is_box (), false);
   EXPECT_EQ (r.to_string (), "(0,0;0,200;100,200;100,0);(10,20;10,220;110,220;110,20)");
   EXPECT_EQ (r.is_merged (), false);
-  EXPECT_EQ (r.size (), size_t (2));
+  EXPECT_EQ (r.count (), size_t (2));
+  EXPECT_EQ (r.hier_count (), size_t (2));
   r.set_merged_semantics (false);
   EXPECT_EQ (r.area (), 40000);
   EXPECT_EQ (r.area (db::Box (db::Point (-10, -10), db::Point (50, 50))), 50 * 50 + 40 * 30);
@@ -123,7 +124,8 @@ TEST(1)
   EXPECT_EQ (r.is_merged (), true);
   EXPECT_EQ (r.is_box (), false);
   EXPECT_EQ (r.empty (), false);
-  EXPECT_EQ (r.size (), size_t (1));
+  EXPECT_EQ (r.count (), size_t (1));
+  EXPECT_EQ (r.hier_count (), size_t (1));
   EXPECT_EQ (r.area (), 23800);
   EXPECT_EQ (r.perimeter (), db::Region::perimeter_type (660));
 
@@ -506,11 +508,11 @@ TEST(15a)
   EXPECT_EQ (r.width_check (15).to_string (), "(0,0;0,10)/(10,10;10,0);(0,10;10,10)/(10,0;0,0)");
   EXPECT_EQ (r.width_check (5).to_string (), "");
   EXPECT_EQ (r.width_check (5, false, db::Euclidian, 91).to_string (), "(0,5;0,10)/(0,10;5,10);(0,0;0,5)/(5,0;0,0);(5,10;10,10)/(10,10;10,5);(10,5;10,0)/(10,0;5,0);(20,45;20,50)/(20,50;25,50);(20,20;20,25)/(25,20;20,20);(35,50;40,50)/(40,50;40,45);(40,25;40,20)/(40,20;35,20)");
-  EXPECT_EQ (r.space_check (15, false, db::Euclidian, 91).to_string (), "(9,10;10,10)/(20,20;20,21);(9,10;10,10)/(21,20;20,20);(10,10;10,9)/(20,20;20,21);(10,10;10,9)/(21,20;20,20)");
-  EXPECT_EQ (r.space_check (15, false, db::Square, 91).to_string (), "(5,10;10,10)/(20,20;20,25);(5,10;10,10)/(25,20;20,20);(10,10;10,5)/(20,20;20,25);(10,10;10,5)/(25,20;20,20)");
-  EXPECT_EQ (r.space_check (15).to_string (), "(9,10;10,10)/(21,20;20,20);(10,10;10,9)/(20,20;20,21)");
-  EXPECT_EQ (r.space_check (15, true).to_string (), "(0,10;10,10)/(40,20;20,20);(10,10;10,0)/(20,20;20,50)");
-  EXPECT_EQ (r.space_check (15, false, db::Square).to_string (), "(5,10;10,10)/(25,20;20,20);(10,10;10,5)/(20,20;20,25)");
+  EXPECT_EQ (r.space_check (15, false, db::Euclidian, 91).to_string (), "(10,10;10,9)/(21,20;20,20);(10,10;10,9)/(20,20;20,21);(9,10;10,10)/(21,20;20,20);(9,10;10,10)/(20,20;20,21)");
+  EXPECT_EQ (r.space_check (15, false, db::Square, 91).to_string (), "(10,10;10,5)/(25,20;20,20);(10,10;10,5)/(20,20;20,25);(5,10;10,10)/(25,20;20,20);(5,10;10,10)/(20,20;20,25)");
+  EXPECT_EQ (r.space_check (15).to_string (), "(10,10;10,9)/(20,20;20,21);(9,10;10,10)/(21,20;20,20)");
+  EXPECT_EQ (r.space_check (15, true).to_string (), "(10,10;10,0)/(20,20;20,50);(0,10;10,10)/(40,20;20,20)");
+  EXPECT_EQ (r.space_check (15, false, db::Square).to_string (), "(10,10;10,5)/(20,20;20,25);(5,10;10,10)/(25,20;20,20)");
 
   r.clear ();
   db::Point pts[] = {
@@ -543,9 +545,9 @@ TEST(15b)
   r.insert (db::Box (db::Point (400, 200), db::Point (500, 300)));
 
   EXPECT_EQ (r.width_check (120, false, db::Projection).to_string (), "(400,200;400,300)/(500,300;500,200)");
-  EXPECT_EQ (r.space_check (120, false, db::Projection).to_string (), "(200,200;200,0)/(300,0;300,200);(200,500;200,300)/(300,300;300,500);(300,200;400,200)/(400,300;300,300)");
+  EXPECT_EQ (r.space_check (120, false, db::Projection).to_string (), "(200,500;200,300)/(300,300;300,500);(300,200;400,200)/(400,300;300,300);(200,200;200,0)/(300,0;300,200)");
   EXPECT_EQ (r.notch_check (120, false, db::Projection).to_string (), "(300,200;400,200)/(400,300;300,300)");
-  EXPECT_EQ (r.isolated_check (120, false, db::Projection).to_string (), "(200,200;200,0)/(300,0;300,200);(200,500;200,300)/(300,300;300,500)");
+  EXPECT_EQ (r.isolated_check (120, false, db::Projection).to_string (), "(300,300;300,500)/(200,500;200,300);(300,0;300,200)/(200,200;200,0)");
 }
 
 TEST(15c) 
@@ -561,9 +563,9 @@ TEST(15c)
   r.insert (db::Box (db::Point (400, 250), db::Point (500, 300)));
 
   EXPECT_EQ (r.width_check (120, false, db::Projection).to_string (), "(400,200;400,300)/(500,300;500,200)");
-  EXPECT_EQ (r.space_check (120, false, db::Projection).to_string (), "(200,200;200,0)/(300,0;300,200);(200,500;200,300)/(300,300;300,500);(300,200;400,200)/(400,300;300,300)");
+  EXPECT_EQ (r.space_check (120, false, db::Projection).to_string (), "(200,500;200,300)/(300,300;300,500);(300,200;400,200)/(400,300;300,300);(200,200;200,0)/(300,0;300,200)");
   EXPECT_EQ (r.notch_check (120, false, db::Projection).to_string (), "(300,200;400,200)/(400,300;300,300)");
-  EXPECT_EQ (r.isolated_check (120, false, db::Projection).to_string (), "(200,200;200,0)/(300,0;300,200);(200,500;200,300)/(300,300;300,500)");
+  EXPECT_EQ (r.isolated_check (120, false, db::Projection).to_string (), "(300,300;300,500)/(200,500;200,300);(300,0;300,200)/(200,200;200,0)");
 }
 
 TEST(15d) 
@@ -578,7 +580,7 @@ TEST(15d)
   r.insert (db::Box (db::Point (600, 200), db::Point (700, 300)));
   r.insert (db::Box (db::Point (0, 140), db::Point (350, 160)));
 
-  EXPECT_EQ (r.space_check (120, false, db::Projection).to_string (), "(0,100;100,100)/(100,140;0,140);(300,100;350,100)/(350,140;300,140);(300,100;400,100)/(400,200;300,200);(600,100;700,100)/(700,200;600,200);(0,160;100,160)/(100,200;0,200);(300,160;350,160)/(350,200;300,200)");
+  EXPECT_EQ (r.space_check (120, false, db::Projection).to_string (), "(300,100;400,100)/(400,200;300,200);(300,160;350,160)/(350,200;300,200);(0,160;100,160)/(100,200;0,200);(350,140;300,140)/(300,100;350,100);(0,100;100,100)/(100,140;0,140);(600,100;700,100)/(700,200;600,200)");
 }
 
 TEST(15e) 
@@ -639,22 +641,22 @@ TEST(16)
 
   EXPECT_EQ (a.inside_check (b, 15).to_string (), "(10,20;10,30)/(0,9;0,41)");
   EXPECT_EQ (a.inside_check (b, 15, true).to_string (), "(10,20;10,30)/(0,0;0,100)");
-  EXPECT_EQ (a.inside_check (b, 15, false, db::Euclidian, 91).to_string (), "(10,20;10,30)/(0,9;0,41);(10,30;15,30)/(0,30;0,41);(15,20;10,20)/(0,9;0,20)");
+  EXPECT_EQ (a.inside_check (b, 15, false, db::Euclidian, 91).to_string (), "(15,20;10,20)/(0,9;0,20);(10,30;15,30)/(0,30;0,41);(10,20;10,30)/(0,9;0,41)");
   EXPECT_EQ (b.enclosing_check (a, 15).to_string (), "(0,9;0,41)/(10,20;10,30)");
   EXPECT_EQ (b.enclosing_check (a, 15, true).to_string (), "(0,0;0,100)/(10,20;10,30)");
-  EXPECT_EQ (b.enclosing_check (a, 15, false, db::Euclidian, 91).to_string (), "(0,9;0,41)/(10,20;10,30);(0,30;0,41)/(10,30;15,30);(0,9;0,20)/(15,20;10,20)");
+  EXPECT_EQ (b.enclosing_check (a, 15, false, db::Euclidian, 91).to_string (), "(0,9;0,20)/(15,20;10,20);(0,30;0,41)/(10,30;15,30);(0,9;0,41)/(10,20;10,30)");
 
   b.clear ();
   b.insert (db::Box (db::Point (30, 0), db::Point (100, 100)));
   EXPECT_EQ (b.separation_check (a, 15).to_string (), "(30,9;30,41)/(20,30;20,20)");
   EXPECT_EQ (b.separation_check (a, 15, true).to_string (), "(30,0;30,100)/(20,30;20,20)");
-  EXPECT_EQ (b.separation_check (a, 15, false, db::Euclidian, 91).to_string (), "(30,30;30,41)/(15,30;20,30);(30,9;30,41)/(20,30;20,20);(30,9;30,20)/(20,20;15,20)");
+  EXPECT_EQ (b.separation_check (a, 15, false, db::Euclidian, 91).to_string (), "(30,9;30,20)/(20,20;15,20);(30,9;30,41)/(20,30;20,20);(30,30;30,41)/(15,30;20,30)");
 
   b.clear ();
   b.insert (db::Box (db::Point (15, 0), db::Point (100, 100)));
   EXPECT_EQ (b.overlap_check (a, 15).to_string (), "(15,6;15,44)/(20,30;20,20)");
   EXPECT_EQ (b.overlap_check (a, 15, true).to_string (), "(15,0;15,100)/(20,30;20,20)");
-  EXPECT_EQ (b.overlap_check (a, 15, false, db::Euclidian, 91).to_string (), "(15,15;15,30)/(15,30;20,30);(15,6;15,44)/(20,30;20,20);(15,20;15,35)/(20,20;15,20)");
+  EXPECT_EQ (b.overlap_check (a, 15, false, db::Euclidian, 91).to_string (), "(15,20;15,35)/(20,20;15,20);(15,6;15,44)/(20,30;20,20);(15,15;15,30)/(15,30;20,30)");
 }
 
 TEST(17) 
@@ -689,7 +691,8 @@ TEST(18a)
     EXPECT_EQ (o.to_string (), "(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60)");
     o = r;
     EXPECT_EQ (o.selected_not_outside (rr).to_string (), "(0,0;0,20;20,20;20,0);(20,30;20,50;40,50;40,30);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)");
-    EXPECT_EQ (o.selected_outside (rr).size () + o.selected_not_outside (rr).size (), size_t (6));
+    EXPECT_EQ (o.selected_outside (rr).count () + o.selected_not_outside (rr).count (), size_t (6));
+    EXPECT_EQ (o.selected_outside (rr).hier_count () + o.selected_not_outside (rr).hier_count (), size_t (6));
     o.select_not_outside (rr);
     EXPECT_EQ (o.to_string (), "(0,0;0,20;20,20;20,0);(20,30;20,50;40,50;40,30);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)");
   }
@@ -699,10 +702,11 @@ TEST(18a)
     o.select_inside (rr);
     EXPECT_EQ (o.to_string (), "(20,30;20,50;40,50;40,30)");
     o = r;
-    EXPECT_EQ (o.selected_not_inside (rr).to_string (), "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)");
-    EXPECT_EQ (o.selected_inside (rr).size () + o.selected_not_inside (rr).size (), size_t (6));
+    EXPECT_EQ (o.selected_not_inside (rr).to_string (), "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(0,60;0,80;60,80;60,60);(70,60;70,80;90,80;90,60);(0,100;0,130;30,130;30,100)");
+    EXPECT_EQ (o.selected_inside (rr).count () + o.selected_not_inside (rr).count (), size_t (6));
+    EXPECT_EQ (o.selected_inside (rr).hier_count () + o.selected_not_inside (rr).hier_count (), size_t (6));
     o.select_not_inside (rr);
-    EXPECT_EQ (o.to_string (), "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)");
+    EXPECT_EQ (o.to_string (), "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(0,60;0,80;60,80;60,60);(70,60;70,80;90,80;90,60);(0,100;0,130;30,130;30,100)");
   }
   EXPECT_EQ (r.selected_interacting (rr).to_string (), "(0,0;0,20;20,20;20,0);(20,30;20,50;40,50;40,30);(50,10;50,30;70,30;70,10);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)");
   {
@@ -711,7 +715,8 @@ TEST(18a)
     EXPECT_EQ (o.to_string (), "(0,0;0,20;20,20;20,0);(20,30;20,50;40,50;40,30);(50,10;50,30;70,30;70,10);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)");
     o = r;
     EXPECT_EQ (o.selected_not_interacting (rr).to_string (), "(70,60;70,80;90,80;90,60)");
-    EXPECT_EQ (o.selected_interacting (rr).size () + o.selected_not_interacting (rr).size (), size_t (6));
+    EXPECT_EQ (o.selected_interacting (rr).count () + o.selected_not_interacting (rr).count (), size_t (6));
+    EXPECT_EQ (o.selected_interacting (rr).hier_count () + o.selected_not_interacting (rr).hier_count (), size_t (6));
     o.select_not_interacting (rr);
     EXPECT_EQ (o.to_string (), "(70,60;70,80;90,80;90,60)");
   }
@@ -722,7 +727,8 @@ TEST(18a)
     EXPECT_EQ (o.to_string (), "(0,0;0,20;20,20;20,0);(20,30;20,50;40,50;40,30);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)");
     o = r;
     EXPECT_EQ (o.selected_not_overlapping (rr).to_string (), "(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60)");
-    EXPECT_EQ (o.selected_overlapping (rr).size () + o.selected_not_overlapping (rr).size (), size_t (6));
+    EXPECT_EQ (o.selected_overlapping (rr).count () + o.selected_not_overlapping (rr).count (), size_t (6));
+    EXPECT_EQ (o.selected_overlapping (rr).hier_count () + o.selected_not_overlapping (rr).hier_count (), size_t (6));
     o.select_not_overlapping (rr);
     EXPECT_EQ (o.to_string (), "(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60)");
   }
@@ -898,12 +904,12 @@ TEST(18d)
 
   EXPECT_EQ (r.pull_inside (rr).to_string (), "(10,110;10,120;20,120;20,110)");
 
-  EXPECT_EQ (r.pull_interacting (rr).to_string (), "(10,0;10,90;50,90;50,10;20,10;20,0);(10,110;10,120;20,120;20,110)");
-  EXPECT_EQ (r.pull_overlapping (rr).to_string (), "(10,0;10,90;50,90;50,10;20,10;20,0);(10,110;10,120;20,120;20,110)");
+  EXPECT_EQ (r.pull_interacting (rr).to_string (), "(10,110;10,120;20,120;20,110);(10,0;10,90;50,90;50,10;20,10;20,0)");
+  EXPECT_EQ (r.pull_overlapping (rr).to_string (), "(10,110;10,120;20,120;20,110);(10,0;10,90;50,90;50,10;20,10;20,0)");
 
   rr.set_merged_semantics (false);
-  EXPECT_EQ (r.pull_interacting (rr).to_string (), "(10,0;10,10;20,10;20,0);(10,10;10,90;50,90;50,10);(10,110;10,120;20,120;20,110)");
-  EXPECT_EQ (r.pull_overlapping (rr).to_string (), "(10,10;10,90;50,90;50,10);(10,110;10,120;20,120;20,110)");
+  EXPECT_EQ (r.pull_interacting (rr).to_string (), "(10,110;10,120;20,120;20,110);(10,10;10,90;50,90;50,10);(10,0;10,10;20,10;20,0)");
+  EXPECT_EQ (r.pull_overlapping (rr).to_string (), "(10,110;10,120;20,120;20,110);(10,10;10,90;50,90;50,10)");
 }
 
 TEST(19)
@@ -972,7 +978,8 @@ TEST(20)
     EXPECT_EQ (r1.perimeter (), db::Region::perimeter_type (320));
     EXPECT_EQ (r1.bbox ().to_string (), "(120,20;220,140)");
     EXPECT_EQ (r1.is_box (), false);
-    EXPECT_EQ (r1.size (), size_t (2));
+    EXPECT_EQ (r1.count (), size_t (2));
+    EXPECT_EQ (r1.hier_count (), size_t (2));
     EXPECT_EQ (r1.empty (), false);
 
     db::RegionPerimeterFilter f0 (0, 100, false);
@@ -985,12 +992,14 @@ TEST(20)
     EXPECT_EQ (r2.perimeter (), db::Region::perimeter_type (320));
     EXPECT_EQ (r2.bbox ().to_string (), "(120,20;220,140)");
     EXPECT_EQ (r2.is_box (), false);
-    EXPECT_EQ (r2.size (), size_t (2));
+    EXPECT_EQ (r2.count (), size_t (2));
+    EXPECT_EQ (r2.hier_count (), size_t (2));
     EXPECT_EQ (r2.empty (), false);
     r2.filter (f0);
     EXPECT_EQ (r2.has_valid_polygons (), true);
     EXPECT_EQ (r2.to_string (), "(120,20;120,40;140,40;140,20)");
-    EXPECT_EQ (r2.size (), size_t (1));
+    EXPECT_EQ (r2.count (), size_t (1));
+    EXPECT_EQ (r2.hier_count (), size_t (1));
     EXPECT_EQ (r2.empty (), false);
     EXPECT_EQ (r2.is_box (), true);
     EXPECT_EQ (r2.area (), 400);
@@ -1000,7 +1009,8 @@ TEST(20)
     EXPECT_EQ (r1.has_valid_polygons (), true);
     EXPECT_EQ (r1.to_string (), "(120,20;120,40;140,40;140,20);(160,80;160,140;220,140;220,80);(0,0;0,20;10,20;10,0)");
     EXPECT_EQ (r1.to_string (2), "(120,20;120,40;140,40;140,20);(160,80;160,140;220,140;220,80)...");
-    EXPECT_EQ (r1.size (), size_t (3));
+    EXPECT_EQ (r1.count (), size_t (3));
+    EXPECT_EQ (r1.hier_count (), size_t (3));
     EXPECT_EQ (r1.area (), 4200);
     EXPECT_EQ (r1.perimeter (), db::Region::perimeter_type (380));
 
@@ -1018,7 +1028,8 @@ TEST(20)
     EXPECT_EQ (r1.to_string (), "(120,20;120,40;140,40;140,20)");
     EXPECT_EQ (r1.has_valid_polygons (), false);
     EXPECT_EQ (r1.is_box (), true);
-    EXPECT_EQ (r1.size (), size_t (1));
+    EXPECT_EQ (r1.count (), size_t (1));
+    EXPECT_EQ (r1.hier_count (), size_t (1));
     EXPECT_EQ (r1.empty (), false);
 
     db::Region r2 = r1;
@@ -1030,7 +1041,8 @@ TEST(20)
 
     r1.clear ();
     EXPECT_EQ (r1.has_valid_polygons (), true);
-    EXPECT_EQ (r1.size (), size_t (0));
+    EXPECT_EQ (r1.count (), size_t (0));
+    EXPECT_EQ (r1.hier_count (), size_t (0));
     EXPECT_EQ (r1.empty (), true);
     EXPECT_EQ (r1.perimeter (), db::Region::perimeter_type (0));
     EXPECT_EQ (r1.area (), 0);
@@ -1041,7 +1053,8 @@ TEST(20)
     EXPECT_EQ (r1.to_string (), "(120,20;120,40;140,40;140,20)");
     EXPECT_EQ (r1.has_valid_polygons (), false);
     EXPECT_EQ (r2.has_valid_polygons (), true);
-    EXPECT_EQ (r2.size (), size_t (0));
+    EXPECT_EQ (r2.count (), size_t (0));
+    EXPECT_EQ (r2.hier_count (), size_t (0));
     EXPECT_EQ (r2.empty (), true);
     EXPECT_EQ (r2.perimeter (), db::Region::perimeter_type (0));
     EXPECT_EQ (r2.area (), 0);
@@ -1074,7 +1087,7 @@ TEST(20)
   {
     db::Region r1 (db::RecursiveShapeIterator (ly, ly.cell (top), l2));
     EXPECT_EQ (r1.has_valid_polygons (), false);
-    EXPECT_EQ (r1.space_check (30).to_string (), "(60,10;60,20)/(40,40;40,10);(60,20;70,20)/(92,40;80,40);(70,20;70,12)/(80,40;80,48)");
+    EXPECT_EQ (r1.space_check (30).to_string (), "(60,20;70,20)/(92,40;80,40);(70,20;70,12)/(80,40;80,48);(60,10;60,20)/(40,40;40,10)");
     EXPECT_EQ (r1.space_check (2).to_string (), "");
   }
 
@@ -1083,7 +1096,7 @@ TEST(20)
     EXPECT_EQ (r1.has_valid_polygons (), false);
     db::Region r2 (db::RecursiveShapeIterator (ly, ly.cell (top), l2));
     EXPECT_EQ (r2.has_valid_polygons (), false);
-    EXPECT_EQ (r1.separation_check (r2, 20).to_string (), "(50,0;50,30)/(40,40;40,10);(63,30;80,30)/(97,40;80,40);(50,40;50,57)/(40,40;40,23);(80,70;80,40)/(80,40;80,70)");
+    EXPECT_EQ (r1.separation_check (r2, 20).to_string (), "(50,0;50,30)/(40,40;40,10);(50,40;50,57)/(40,40;40,23);(63,30;80,30)/(97,40;80,40);(80,70;80,40)/(80,40;80,70)");
   }
 
   {

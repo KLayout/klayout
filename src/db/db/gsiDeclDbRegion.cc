@@ -2451,11 +2451,21 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   method ("is_empty?", &db::Region::empty,
     "@brief Returns true if the region is empty\n"
   ) +
-  method ("size|count", (size_t (db::Region::*) () const) &db::Region::size,
-    "@brief Returns the number of polygons in the region\n"
+  method ("count|#size", (size_t (db::Region::*) () const) &db::Region::count,
+    "@brief Returns the (flat) number of polygons in the region\n"
     "\n"
     "This returns the number of raw polygons (not merged polygons if merged semantics is enabled).\n"
+    "The count is computed 'as if flat', i.e. polygons inside a cell are multiplied by the number of times a cell is instantiated.\n"
+    "\n"
     "The 'count' alias has been provided in version 0.26 to avoid ambiguitiy with the 'size' method which applies a geometrical bias."
+  ) +
+  method ("hier_count", (size_t (db::Region::*) () const) &db::Region::hier_count,
+    "@brief Returns the (hierarchical) number of polygons in the region\n"
+    "\n"
+    "This returns the number of raw polygons (not merged polygons if merged semantics is enabled).\n"
+    "The count is computed 'hierarchical', i.e. polygons inside a cell are counted once even if the cell is instantiated multiple times.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
   ) +
   iterator ("each", &db::Region::begin,
     "@brief Returns each polygon of the region\n"

@@ -28,6 +28,7 @@
 #include "dbRegion.h"
 #include "dbEdgesUtils.h"
 #include "dbDeepShapeStore.h"
+#include "dbCellGraphUtils.h"
 #include "tlUnitTest.h"
 #include "tlStream.h"
 
@@ -59,7 +60,25 @@ TEST(1)
 
     edges.push_back (db::Edges (iter, dss));
 
-    EXPECT_EQ (edges.back ().size (), db::Edges (iter).size ());
+    size_t n = 0, nhier = 0;
+    db::CellCounter cc (&ly);
+    for (db::Layout::top_down_const_iterator c = ly.begin_top_down (); c != ly.end_top_down (); ++c) {
+      size_t ns = 0;
+      for (db::Shapes::shape_iterator is = ly.cell (*c).shapes (li1).begin (db::ShapeIterator::Edges); !is.at_end (); ++is) {
+        ++ns;
+      }
+      for (db::Shapes::shape_iterator is = ly.cell (*c).shapes (li1).begin (db::ShapeIterator::Regions); !is.at_end (); ++is) {
+        db::Polygon p;
+        is->polygon (p);
+        ns += p.hull ().size ();
+      }
+      n += cc.weight (*c) * ns;
+      nhier += ns;
+    }
+
+    EXPECT_EQ (db::Edges (iter).count (), n);
+    EXPECT_EQ (edges.back ().count (), n);
+    EXPECT_EQ (edges.back ().hier_count (), nhier);
     EXPECT_EQ (edges.back ().bbox (), db::Edges (iter).bbox ());
 
   }

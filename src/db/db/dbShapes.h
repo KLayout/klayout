@@ -164,6 +164,7 @@ public:
     Texts             = (1 << Text) 
                       | (1 << TextRef) 
                       | (1 << TextPtrArray),
+    Regions           = Polygons | Paths | Boxes,   //  convertible to polygons
     UserObjects       = (1 << UserObject),
     Properties        = (1 << Null),
     All               = (1 << Null) - 1,

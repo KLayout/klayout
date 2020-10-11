@@ -199,7 +199,8 @@ public:
 
   virtual bool empty () const = 0;
   virtual bool is_merged () const = 0;
-  virtual size_t size () const = 0;
+  virtual size_t count () const = 0;
+  virtual size_t hier_count () const = 0;
 
   virtual distance_type length (const db::Box &box) const = 0;
   virtual Box bbox () const = 0;

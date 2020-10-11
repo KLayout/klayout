@@ -636,7 +636,7 @@ bool run_deep_xor (const XORData &xor_data)
           result.layer_output = result.layout->insert_layer (lp);
           xor_res.insert_into (xor_data.output_layout, xor_data.output_cell, result.layer_output);
         } else {
-          result.shape_count = xor_res.size ();
+          result.shape_count = xor_res.count ();
         }
 
         ++tol_index;

@@ -79,7 +79,12 @@ bool FlatEdgePairs::empty () const
   return m_edge_pairs.empty ();
 }
 
-size_t FlatEdgePairs::size () const
+size_t FlatEdgePairs::count () const
+{
+  return m_edge_pairs.size ();
+}
+
+size_t FlatEdgePairs::hier_count () const
 {
   return m_edge_pairs.size ();
 }

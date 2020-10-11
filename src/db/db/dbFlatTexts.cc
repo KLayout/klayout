@@ -79,7 +79,12 @@ bool FlatTexts::empty () const
   return m_texts.empty ();
 }
 
-size_t FlatTexts::size () const
+size_t FlatTexts::count () const
+{
+  return m_texts.size ();
+}
+
+size_t FlatTexts::hier_count () const
 {
   return m_texts.size ();
 }

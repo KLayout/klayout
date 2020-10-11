@@ -166,7 +166,12 @@ bool FlatEdges::empty () const
   return m_edges.empty ();
 }
 
-size_t FlatEdges::size () const
+size_t FlatEdges::count () const
+{
+  return m_edges.size ();
+}
+
+size_t FlatEdges::hier_count () const
 {
   return m_edges.size ();
 }

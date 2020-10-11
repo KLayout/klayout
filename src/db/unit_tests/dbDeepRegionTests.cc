@@ -31,10 +31,11 @@
 #include "dbEdgesUtils.h"
 #include "dbDeepShapeStore.h"
 #include "dbOriginalLayerRegion.h"
+#include "dbCellGraphUtils.h"
 #include "tlUnitTest.h"
 #include "tlStream.h"
 
-TEST(1)
+TEST(1_Basic)
 {
   db::Layout ly;
   {
@@ -62,7 +63,20 @@ TEST(1)
 
     regions.push_back (db::Region (iter, dss));
 
-    EXPECT_EQ (regions.back ().size (), db::Region (iter).size ());
+    size_t n = 0, nhier = 0;
+    db::CellCounter cc (&ly);
+    for (db::Layout::top_down_const_iterator c = ly.begin_top_down (); c != ly.end_top_down (); ++c) {
+      size_t ns = 0;
+      for (db::Shapes::shape_iterator is = ly.cell (*c).shapes (li1).begin (db::ShapeIterator::Regions); !is.at_end (); ++is) {
+        ++ns;
+      }
+      n += cc.weight (*c) * ns;
+      nhier += ns;
+    }
+
+    EXPECT_EQ (db::Region (iter).count (), n);
+    EXPECT_EQ (regions.back ().count (), n);
+    EXPECT_EQ (regions.back ().hier_count (), nhier);
     EXPECT_EQ (regions.back ().bbox (), db::Region (iter).bbox ());
     EXPECT_EQ (regions.back ().is_merged (), false);
 

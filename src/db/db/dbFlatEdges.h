@@ -72,7 +72,8 @@ public:
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_merged_iter () const;
 
   virtual bool empty () const;
-  virtual size_t size () const;
+  virtual size_t count () const;
+  virtual size_t hier_count () const;
   virtual bool is_merged () const;
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
@@ -119,7 +120,7 @@ public:
   template <class Iter>
   void insert (const Iter &b, const Iter &e)
   {
-    reserve (size () + (e - b));
+    reserve (count () + (e - b));
     for (Iter i = b; i != e; ++i) {
       insert (*i);
     }

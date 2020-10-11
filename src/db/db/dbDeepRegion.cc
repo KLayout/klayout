@@ -741,7 +741,7 @@ DeepRegion::is_box () const
 }
 
 size_t
-DeepRegion::size () const
+DeepRegion::count () const
 {
   size_t n = 0;
 
@@ -749,6 +749,19 @@ DeepRegion::size () const
   db::CellCounter cc (&layout);
   for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
     n += cc.weight (*c) * layout.cell (*c).shapes (deep_layer ().layer ()).size ();
+  }
+
+  return n;
+}
+
+size_t
+DeepRegion::hier_count () const
+{
+  size_t n = 0;
+
+  const db::Layout &layout = deep_layer ().layout ();
+  for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
+    n += layout.cell (*c).shapes (deep_layer ().layer ()).size ();
   }
 
   return n;

@@ -312,11 +312,19 @@ public:
   }
 
   /**
-   *  @brief Returns the number of edge pairs in the edge pair set
+   *  @brief Returns the number of (flat) edge pairs in the edge pair set
    */
-  size_t size () const
+  size_t count () const
   {
-    return mp_delegate->size ();
+    return mp_delegate->count ();
+  }
+
+  /**
+   *  @brief Returns the number of (hierarchical) edge pairs in the edge pair set
+   */
+  size_t hier_count () const
+  {
+    return mp_delegate->hier_count ();
   }
 
   /**

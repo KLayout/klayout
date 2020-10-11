@@ -53,7 +53,8 @@ public:
   virtual EdgePairsIteratorDelegate *begin () const;
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const;
 
-  virtual size_t size () const;
+  virtual size_t count () const;
+  virtual size_t hier_count () const;
   virtual std::string to_string (size_t) const;
   virtual Box bbox () const;
   virtual bool empty () const;

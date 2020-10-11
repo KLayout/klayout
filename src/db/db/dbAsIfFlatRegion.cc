@@ -167,13 +167,19 @@ AsIfFlatRegion::in (const Region &other, bool invert) const
 }
 
 size_t
-AsIfFlatRegion::size () const
+AsIfFlatRegion::count () const
 {
   size_t n = 0;
   for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
     ++n;
   }
   return n;
+}
+
+size_t
+AsIfFlatRegion::hier_count () const
+{
+  return count ();
 }
 
 bool
@@ -1563,7 +1569,7 @@ AsIfFlatRegion::add (const Region &other) const
     new_region->set_is_merged (false);
     new_region->invalidate_cache ();
 
-    size_t n = new_region->raw_polygons ().size () + size ();
+    size_t n = new_region->raw_polygons ().size () + count ();
 
     new_region->reserve (n);
 
@@ -1577,7 +1583,7 @@ AsIfFlatRegion::add (const Region &other) const
 
     std::auto_ptr<FlatRegion> new_region (new FlatRegion (false /*not merged*/));
 
-    size_t n = size () + other.size ();
+    size_t n = count () + other.count ();
 
     new_region->reserve (n);
 
@@ -1611,7 +1617,7 @@ AsIfFlatRegion::equals (const Region &other) const
   if (empty () != other.empty ()) {
     return false;
   }
-  if (size () != other.size ()) {
+  if (count () != other.count ()) {
     return false;
   }
   RegionIterator o1 (begin ());
@@ -1632,8 +1638,8 @@ AsIfFlatRegion::less (const Region &other) const
   if (empty () != other.empty ()) {
     return empty () < other.empty ();
   }
-  if (size () != other.size ()) {
-    return (size () < other.size ());
+  if (count () != other.count ()) {
+    return (count () < other.count ());
   }
   RegionIterator o1 (begin ());
   RegionIterator o2 (other.begin ());

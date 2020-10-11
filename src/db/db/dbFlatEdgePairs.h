@@ -65,7 +65,8 @@ public:
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const;
 
   virtual bool empty () const;
-  virtual size_t size () const;
+  virtual size_t count () const;
+  virtual size_t hier_count () const;
 
   virtual EdgePairsDelegate *filter_in_place (const EdgePairFilterBase &filter);
 

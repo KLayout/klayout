@@ -81,7 +81,8 @@ TEST(1)
   r += db::Edges (db::Box (db::Point (10, 0), db::Point (110, 200)));
   EXPECT_EQ (r.to_string (), "(0,0;0,200);(0,200;100,200);(100,200;100,0);(100,0;0,0);(10,0;10,200);(10,200;110,200);(110,200;110,0);(110,0;10,0)");
   EXPECT_EQ (r.is_merged (), false);
-  EXPECT_EQ (r.size (), size_t (8));
+  EXPECT_EQ (r.count (), size_t (8));
+  EXPECT_EQ (r.hier_count (), size_t (8));
   r.set_merged_semantics (false);
   EXPECT_EQ (r.length (), db::Edges::length_type (1200));
   EXPECT_EQ (r.length (db::Box (db::Point (-10, -10), db::Point (50, 50))), db::Edges::length_type (190));
@@ -97,7 +98,8 @@ TEST(1)
   EXPECT_EQ (r.bbox ().to_string (), "(0,0;110,200)");
   EXPECT_EQ (r.is_merged (), true);
   EXPECT_EQ (r.empty (), false);
-  EXPECT_EQ (r.size (), size_t (6));
+  EXPECT_EQ (r.count (), size_t (6));
+  EXPECT_EQ (r.hier_count (), size_t (6));
   EXPECT_EQ (r.length (), db::Edges::length_type (1020));
 
   r.clear ();
@@ -581,13 +583,13 @@ TEST(12)
   b.insert (db::Box (db::Point (30, 0), db::Point (100, 100)));
   EXPECT_EQ (b.separation_check (a, 15).to_string (), "(30,9;30,41)/(20,30;20,20)");
   EXPECT_EQ (b.separation_check (a, 15, true).to_string (), "(30,0;30,100)/(20,30;20,20)");
-  EXPECT_EQ (b.separation_check (a, 15, false, db::Euclidian, 91).to_string (), "(30,30;30,41)/(15,30;20,30);(30,9;30,41)/(20,30;20,20);(30,9;30,20)/(20,20;15,20)");
+  EXPECT_EQ (b.separation_check (a, 15, false, db::Euclidian, 91).to_string (), "(30,9;30,20)/(20,20;15,20);(30,9;30,41)/(20,30;20,20);(30,30;30,41)/(15,30;20,30)");
 
   b.clear ();
   b.insert (db::Box (db::Point (15, 0), db::Point (100, 100)));
   EXPECT_EQ (b.overlap_check (a, 15).to_string (), "(15,6;15,44)/(20,30;20,20)");
   EXPECT_EQ (b.overlap_check (a, 15, true).to_string (), "(15,0;15,100)/(20,30;20,20)");
-  EXPECT_EQ (b.overlap_check (a, 15, false, db::Euclidian, 91).to_string (), "(15,15;15,30)/(15,30;20,30);(15,6;15,44)/(20,30;20,20);(15,20;15,35)/(20,20;15,20)");
+  EXPECT_EQ (b.overlap_check (a, 15, false, db::Euclidian, 91).to_string (), "(15,20;15,35)/(20,20;15,20);(15,6;15,44)/(20,30;20,20);(15,15;15,30)/(15,30;20,30)");
 }
 
 TEST(20)
@@ -641,7 +643,8 @@ TEST(20)
     EXPECT_EQ (r1.length (), db::Edges::length_type (200));
     EXPECT_EQ (r1.has_valid_edges (), false);
     EXPECT_EQ (r1.bbox ().to_string (), "(120,20;220,140)");
-    EXPECT_EQ (r1.size (), size_t (6));
+    EXPECT_EQ (r1.count (), size_t (6));
+    EXPECT_EQ (r1.hier_count (), size_t (6));
     EXPECT_EQ (r1.empty (), false);
 
     db::EdgeLengthFilter f0 (0, 50, false);
@@ -653,12 +656,14 @@ TEST(20)
     EXPECT_EQ (r2.has_valid_edges (), false);
     EXPECT_EQ (r2.length (), db::Edges::length_type (200));
     EXPECT_EQ (r2.bbox ().to_string (), "(120,20;220,140)");
-    EXPECT_EQ (r2.size (), size_t (6));
+    EXPECT_EQ (r2.count (), size_t (6));
+    EXPECT_EQ (r2.hier_count (), size_t (6));
     EXPECT_EQ (r2.empty (), false);
     r2.filter (f0);
     EXPECT_EQ (r2.has_valid_edges (), true);
     EXPECT_EQ (r2.to_string (), "(120,20;120,40);(120,40;140,40);(140,40;140,20);(140,20;120,20)");
-    EXPECT_EQ (r2.size (), size_t (4));
+    EXPECT_EQ (r2.count (), size_t (4));
+    EXPECT_EQ (r2.hier_count (), size_t (4));
     EXPECT_EQ (r2.empty (), false);
     EXPECT_EQ (r2.length (), db::Edges::length_type (80));
 
@@ -666,7 +671,8 @@ TEST(20)
     EXPECT_EQ (r1.has_valid_edges (), true);
     EXPECT_EQ (r1.to_string (), "(120,20;120,40);(120,40;140,40);(140,40;140,20);(140,20;120,20);(160,80;160,140);(220,80;160,80);(0,0;0,20);(0,20;10,20);(10,20;10,0);(10,0;0,0)");
     EXPECT_EQ (r1.to_string (2), "(120,20;120,40);(120,40;140,40)...");
-    EXPECT_EQ (r1.size (), size_t (10));
+    EXPECT_EQ (r1.count (), size_t (10));
+    EXPECT_EQ (r1.hier_count (), size_t (10));
     EXPECT_EQ (r1.length (), db::Edges::length_type (260));
 
     rr = r1.filtered (f0);
@@ -682,7 +688,8 @@ TEST(20)
     EXPECT_EQ (r1.has_valid_edges (), false);
     EXPECT_EQ (r1.to_string (), "(120,20;120,40);(120,40;140,40);(140,40;140,20);(140,20;120,20)");
     EXPECT_EQ (r1.has_valid_edges (), false);
-    EXPECT_EQ (r1.size (), size_t (4));
+    EXPECT_EQ (r1.count (), size_t (4));
+    EXPECT_EQ (r1.hier_count (), size_t (4));
     EXPECT_EQ (r1.empty (), false);
 
     db::Edges r2 = r1;
@@ -694,7 +701,8 @@ TEST(20)
 
     r1.clear ();
     EXPECT_EQ (r1.has_valid_edges (), true);
-    EXPECT_EQ (r1.size (), size_t (0));
+    EXPECT_EQ (r1.count (), size_t (0));
+    EXPECT_EQ (r1.hier_count (), size_t (0));
     EXPECT_EQ (r1.empty (), true);
     EXPECT_EQ (r1.length (), db::Edges::length_type (0));
 
@@ -704,7 +712,8 @@ TEST(20)
     EXPECT_EQ (r1.to_string (), "(120,20;120,40);(120,40;140,40);(140,40;140,20);(140,20;120,20)");
     EXPECT_EQ (r1.has_valid_edges (), false);
     EXPECT_EQ (r2.has_valid_edges (), true);
-    EXPECT_EQ (r2.size (), size_t (0));
+    EXPECT_EQ (r2.count (), size_t (0));
+    EXPECT_EQ (r2.hier_count (), size_t (0));
     EXPECT_EQ (r2.empty (), true);
     EXPECT_EQ (r2.length (), db::Edges::length_type (0));
   }

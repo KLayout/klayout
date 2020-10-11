@@ -1519,8 +1519,21 @@ Class<db::Edges> dec_Edges (decl_dbShapeCollection, "db", "Edges",
   method ("is_empty?", &db::Edges::empty,
     "@brief Returns true if the edge collection is empty\n"
   ) +
-  method ("size", (size_t (db::Edges::*) () const) &db::Edges::size,
-    "@brief Returns the number of edges in the edge collection\n"
+  method ("count|#size", (size_t (db::Edges::*) () const) &db::Edges::count,
+    "@brief Returns the (flat) number of edges in the edge collection\n"
+    "\n"
+    "This returns the number of raw edges (not merged edges if merged semantics is enabled).\n"
+    "The count is computed 'as if flat', i.e. edges inside a cell are multiplied by the number of times a cell is instantiated.\n"
+    "\n"
+    "Starting with version 0.27, the method is called 'count' for consistency with \\Region. 'size' is still provided as an alias."
+  ) +
+  method ("hier_count", (size_t (db::Edges::*) () const) &db::Edges::hier_count,
+    "@brief Returns the (hierarchical) number of edges in the edge collection\n"
+    "\n"
+    "This returns the number of raw edges (not merged edges if merged semantics is enabled).\n"
+    "The count is computed 'hierarchical', i.e. edges inside a cell are counted once even if the cell is instantiated multiple times.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
   ) +
   gsi::iterator ("each", &db::Edges::begin,
     "@brief Returns each edge of the region\n"

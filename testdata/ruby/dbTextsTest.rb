@@ -31,7 +31,8 @@ class DBTexts_TestClass < TestBase
     r = RBA::Texts::new
     assert_equal(r.to_s, "")
     assert_equal(r.is_empty?, true)
-    assert_equal(r.size, 0)
+    assert_equal(r.count, 0)
+    assert_equal(r.hier_count, 0)
     assert_equal(r.bbox.to_s, "()")
     data_id = r.data_id
 
@@ -47,7 +48,8 @@ class DBTexts_TestClass < TestBase
     assert_equal(r.extents(5, 10).to_s, "(105,200;105,220;115,220;115,200)")
     assert_equal(r.edges.to_s, "(110,210;110,210)")
     assert_equal(r.is_empty?, false)
-    assert_equal(r.size, 1)
+    assert_equal(r.count, 1)
+    assert_equal(r.hier_count, 1)
     assert_equal(r[0].to_s, "('uvw',r0 110,210)")
     assert_equal(r[1].to_s, "")
     assert_equal(r.bbox.to_s, "(110,210;110,210)")
@@ -81,7 +83,8 @@ class DBTexts_TestClass < TestBase
 
     assert_equal(r.to_s, "")
     assert_equal(r.is_empty?, true)
-    assert_equal(r.size, 0)
+    assert_equal(r.count, 0)
+    assert_equal(r.hier_count, 0)
     assert_equal(r.bbox.to_s, "()")
 
     texts = RBA::Texts::new
@@ -148,7 +151,8 @@ class DBTexts_TestClass < TestBase
     assert_equal(r.to_s(30), "('abc',r0 100,-200);('abc',r0 100,-100);('abc',r0 300,-100)")
     assert_equal(r.to_s(2), "('abc',r0 100,-200);('abc',r0 100,-100)...")
     assert_equal(r.is_empty?, false)
-    assert_equal(r.size, 3)
+    assert_equal(r.count, 3)
+    assert_equal(r.hier_count, 3)
 
     assert_equal(r.has_valid_texts?, false)
     assert_equal(r.bbox.to_s, "(100,-200;300,-100)")
@@ -166,7 +170,8 @@ class DBTexts_TestClass < TestBase
     assert_equal(r.to_s(30), "('abc',r0 100,-200);('abc',r0 100,-100);('abc',r0 300,-100)")
     assert_equal(r.to_s(2), "('abc',r0 100,-200);('abc',r0 100,-100)...")
     assert_equal(r.is_empty?, false)
-    assert_equal(r.size, 3)
+    assert_equal(r.count, 3)
+    assert_equal(r.hier_count, 1)
 
     assert_equal(r.has_valid_texts?, false)
     assert_equal(r.bbox.to_s, "(100,-200;300,-100)")

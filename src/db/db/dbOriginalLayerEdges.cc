@@ -285,7 +285,7 @@ OriginalLayerEdges::ensure_merged_edges_valid () const
     EdgeBooleanClusterCollectorToShapes cluster_collector (&tmp, EdgeOr);
 
     db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
-    scanner.reserve (size ());
+    scanner.reserve (count ());
 
     AddressableEdgeDelivery e (begin (), has_valid_edges ());
 

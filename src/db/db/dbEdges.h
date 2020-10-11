@@ -375,11 +375,19 @@ public:
   }
 
   /**
-   *  @brief Returns the number of edges in the edge set
+   *  @brief Returns the number of (flat) edges in the edge set
    */
-  size_t size () const
+  size_t count () const
   {
-    return mp_delegate->size ();
+    return mp_delegate->count ();
+  }
+
+  /**
+   *  @brief Returns the number of (hierarchical) edges in the edge set
+   */
+  size_t hier_count () const
+  {
+    return mp_delegate->hier_count ();
   }
 
   /**

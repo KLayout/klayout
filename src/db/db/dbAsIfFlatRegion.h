@@ -47,7 +47,8 @@ public:
   virtual ~AsIfFlatRegion ();
 
   virtual bool is_box () const;
-  virtual size_t size () const;
+  virtual size_t count () const;
+  virtual size_t hier_count () const;
 
   virtual area_type area (const db::Box &box) const;
   virtual perimeter_type perimeter (const db::Box &box) const;

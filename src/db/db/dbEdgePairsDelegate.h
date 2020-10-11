@@ -83,7 +83,8 @@ public:
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const = 0;
 
   virtual bool empty () const = 0;
-  virtual size_t size () const = 0;
+  virtual size_t count () const = 0;
+  virtual size_t hier_count () const = 0;
 
   virtual Box bbox () const = 0;
 

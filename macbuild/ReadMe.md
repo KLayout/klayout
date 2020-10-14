@@ -1,4 +1,4 @@
-Relevant KLayout version: 0.26.7
+Relevant KLayout version: 0.26.8
 
 # 1. Introduction
 This directory **`macbuild`** contains different files required for building KLayout (http://www.klayout.de/) version 0.26.1 or later for different 64-bit Mac OSXs including:
@@ -66,10 +66,10 @@ $ [python] ./build4mac.py
                         :   Qt5MacPorts: use Qt5 from MacPorts                           |
                         :       Qt5Brew: use Qt5 from Homebrew                           |
                         :       Qt5Ana3: use Qt5 from Anaconda3                          |
-   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP26', 'HB27', 'Ana3']   | sys
+   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP27', 'HB27', 'Ana3']   | sys
                         :    nil: don't bind Ruby                                        |
                         :    Sys: use OS-bundled Ruby [2.0 - 2.6] depending on OS        |
-                        :   MP26: use Ruby 2.6 from MacPorts                             |
+                        :   MP27: use Ruby 2.7 from MacPorts                             |
                         :   HB27: use Ruby 2.7 from Homebrew                             |
                         :   Ana3: use Ruby 2.5 from Anaconda3                            |
    [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3']   | sys

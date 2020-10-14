@@ -55,7 +55,7 @@ Qt5Ana3 = { 'qmake' : '/Applications/anaconda3/bin/qmake',
 #-----------------------------------------------------
 RubyNil = [ 'nil' ]
 RubySys = [ 'RubyElCapitan', 'RubySierra', 'RubyHighSierra', 'RubyMojave', 'RubyCatalina' ]
-RubyExt = [ 'Ruby26MacPorts', 'Ruby27Brew', 'RubyAnaconda3' ]
+RubyExt = [ 'Ruby27MacPorts', 'Ruby27Brew', 'RubyAnaconda3' ]
 Rubies  = RubyNil + RubySys + RubyExt
 
 #-----------------------------------------------------
@@ -110,12 +110,12 @@ RubyCatalina    = { 'exe': '/System/Library/Frameworks/Ruby.framework/Versions/2
                     'lib': '/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/libruby.dylib'
                   }
 
-# Ruby 2.6 from MacPorts (https://www.macports.org/) *+*+*+ EXPERIMENTAL *+*+*+
-#  install with 'sudo port install ruby26'
-# [Key Type Name] = 'MP26'
-Ruby26MacPorts  = { 'exe': '/opt/local/bin/ruby2.6',
-                    'inc': '/opt/local/include/ruby-2.6.0',
-                    'lib': '/opt/local/lib/libruby.2.6.dylib'
+# Ruby 2.7 from MacPorts (https://www.macports.org/) *+*+*+ EXPERIMENTAL *+*+*+
+#  install with 'sudo port install ruby27'
+# [Key Type Name] = 'MP27'
+Ruby27MacPorts  = { 'exe': '/opt/local/bin/ruby2.7',
+                    'inc': '/opt/local/include/ruby-2.7.0',
+                    'lib': '/opt/local/lib/libruby.2.7.dylib'
                   }
 
 # Ruby 2.7 from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
@@ -144,7 +144,7 @@ RubyDictionary  = { 'nil'           : None,
                     'RubyHighSierra': RubyHighSierra,
                     'RubyMojave'    : RubyMojave,
                     'RubyCatalina'  : RubyCatalina,
-                    'Ruby26MacPorts': Ruby26MacPorts,
+                    'Ruby27MacPorts': Ruby27MacPorts,
                     'Ruby27Brew'    : Ruby27Brew,
                     'RubyAnaconda3' : RubyAnaconda3
                   }

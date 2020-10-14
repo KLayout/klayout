@@ -208,8 +208,36 @@ class DB_PUBLIC HierarchyBuilder
   : public db::RecursiveShapeReceiver
 {
 public:
+  struct CellMapKey
+  {
+    CellMapKey ()
+      : original_cell (0), inactive (false)
+    { }
 
-  typedef std::map<std::pair<db::cell_index_type, std::set<db::Box> >, db::cell_index_type> cell_map_type;
+    CellMapKey (db::cell_index_type _original_cell, bool _inactive, const std::set<db::Box> &_clip_region)
+      : original_cell (_original_cell), inactive (_inactive), clip_region (_clip_region)
+    { }
+
+    bool operator== (const CellMapKey &other) const
+    {
+      return original_cell == other.original_cell && inactive == other.inactive && clip_region == other.clip_region;
+    }
+
+    bool operator< (const CellMapKey &other) const
+    {
+      if (original_cell != other.original_cell) { return original_cell < other.original_cell; }
+      if (inactive != other.inactive) { return inactive < other.inactive; }
+      if (clip_region != other.clip_region) { return clip_region < other.clip_region; }
+      return false;
+    }
+
+    db::cell_index_type original_cell;
+    bool inactive;
+    std::set<db::Box> clip_region;
+  };
+
+
+  typedef std::map<CellMapKey, db::cell_index_type> cell_map_type;
   typedef std::map<db::cell_index_type, std::vector<db::cell_index_type> > original_target_to_variants_map_type;
   typedef std::map<db::cell_index_type, db::cell_index_type> variant_to_original_target_map_type;
 
@@ -329,6 +357,8 @@ public:
   db::cell_index_type original_target_for_variant (db::cell_index_type ci) const;
 
 private:
+  db::cell_index_type make_cell_variant (const HierarchyBuilder::CellMapKey &key, const std::string &cell_name);
+
   tl::weak_ptr<db::Layout> mp_target;
   HierarchyBuilderShapeReceiver *mp_pipe;
   bool m_initial_pass;

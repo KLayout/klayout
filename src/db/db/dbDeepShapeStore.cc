@@ -911,7 +911,7 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
     cm = m_delivery_mapping_cache.insert (std::make_pair (key, db::CellMapping ())).first;
 
     //  collects the cell mappings we skip because they are variants (variant building or box variants)
-    std::map<db::cell_index_type, std::pair<db::cell_index_type, std::set<db::Box> > > cm_skipped_variants;
+    std::map<db::cell_index_type, db::HierarchyBuilder::CellMapKey> cm_skipped_variants;
 
     if (into_layout == original_builder.source ().layout () && &into_layout->cell (into_cell) == original_builder.source ().top_cell ()) {
 
@@ -925,14 +925,14 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
         HierarchyBuilder::cell_map_type::const_iterator mm = m;
         ++mm;
         bool skip = original_builder.is_variant (m->second);   //  skip variant cells
-        while (mm != original_builder.end_cell_map () && mm->first.first == m->first.first) {
+        while (mm != original_builder.end_cell_map () && mm->first.original_cell == m->first.original_cell) {
           //  we have cell (box) variants and cannot simply map
           ++mm;
           skip = true;
         }
 
         if (! skip) {
-          cm->second.map (m->second, m->first.first);
+          cm->second.map (m->second, m->first.original_cell);
         } else {
           for (HierarchyBuilder::cell_map_type::const_iterator n = m; n != mm; ++n) {
             tl_assert (cm_skipped_variants.find (n->second) == cm_skipped_variants.end ());
@@ -968,17 +968,19 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
 
       db::cell_index_type var_org = original_builder.original_target_for_variant (np->first);
 
-      std::map<db::cell_index_type, std::pair<db::cell_index_type, std::set<db::Box> > >::const_iterator icm = cm_skipped_variants.find (var_org);
+      std::map<db::cell_index_type, db::HierarchyBuilder::CellMapKey>::const_iterator icm = cm_skipped_variants.find (var_org);
       if (icm != cm_skipped_variants.end ()) {
 
         //  create the variant clone in the original layout too and delete this cell
-        VariantsCollectorBase::copy_shapes (*into_layout, np->second, icm->second.first);
-        cells_to_delete.insert (icm->second.first);
+        VariantsCollectorBase::copy_shapes (*into_layout, np->second, icm->second.original_cell);
+        cells_to_delete.insert (icm->second.original_cell);
 
         //  forget the original cell (now separated into variants) and map the variants back into the
         //  DSS layout
         original_builder.unmap (icm->second);
-        original_builder.map (std::make_pair (np->second, icm->second.second), np->first);
+        db::HierarchyBuilder::CellMapKey k = icm->second;
+        k.original_cell = np->second;
+        original_builder.map (k, np->first);
 
         //  forget the variant as now it's a real cell in the source layout
         original_builder.unregister_variant (np->first);

@@ -864,10 +864,9 @@ RecursiveShapeIterator::new_cell (RecursiveShapeReceiver *receiver) const
     m_layer = m_layers.front ();
   }
 
-  if (! m_start.empty () && m_start.find (cell_index ()) != m_start.end ()) {
-    set_inactive (false);
-  } else if (! m_stop.empty () && m_stop.find (cell_index ()) != m_stop.end ()) {
-    set_inactive (true);
+  bool new_cell_inactive = is_child_inactive (cell_index ());
+  if (is_inactive () != new_cell_inactive) {
+    set_inactive (new_cell_inactive);
   }
 
   new_layer ();
@@ -973,6 +972,18 @@ RecursiveShapeIterator::is_outside_complex_region (const db::Box &box) const
   } else {
     return m_local_complex_region_stack.back ().begin_touching (box, db::box_convert<db::Box> ()).at_end ();
   }
+}
+
+bool
+RecursiveShapeIterator::is_child_inactive (db::cell_index_type new_child) const
+{
+  bool inactive = is_inactive ();
+  if (! m_start.empty () && m_start.find (new_child) != m_start.end ()) {
+    inactive = false;
+  } else if (! m_stop.empty () && m_stop.find (new_child) != m_stop.end ()) {
+    inactive = true;
+  }
+  return inactive;
 }
 
 void

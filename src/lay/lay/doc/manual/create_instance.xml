@@ -57,7 +57,7 @@
   <p>
   KLayout offers a unique feature for the PCell implementation: a PCell can employ "guiding shapes".
   "Guiding shapes" are shapes that do not appear as layout themselves but are used by the PCell
-  to derive it's geometry from. For example the "rounded path" PCell of the "Basic" library 
+  to derive its geometry from. For example the "rounded path" PCell of the "Basic" library 
   uses a path as a guiding shape. This path is manipulated to obtain the final shape. 
   </p>
 

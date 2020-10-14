@@ -67,10 +67,10 @@ def SetGlobals():
   Usage += "                        :   Qt5MacPorts: use Qt5 from MacPorts                           | \n"
   Usage += "                        :       Qt5Brew: use Qt5 from Homebrew                           | \n"
   Usage += "                        :       Qt5Ana3: use Qt5 from Anaconda3                          | \n"
-  Usage += "   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP26', 'HB27', 'Ana3']   | sys \n"
+  Usage += "   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP27', 'HB27', 'Ana3']   | sys \n"
   Usage += "                        :    nil: don't bind Ruby                                        | \n"
   Usage += "                        :    Sys: use OS-bundled Ruby [2.0 - 2.6] depending on OS        | \n"
-  Usage += "                        :   MP26: use Ruby 2.6 from MacPorts                             | \n"
+  Usage += "                        :   MP27: use Ruby 2.7 from MacPorts                             | \n"
   Usage += "                        :   HB27: use Ruby 2.7 from Homebrew                             | \n"
   Usage += "                        :   Ana3: use Ruby 2.5 from Anaconda3                            | \n"
   Usage += "   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3']   | sys \n"
@@ -191,7 +191,7 @@ def ParseCommandLineArguments():
 
   p.add_option( '-r', '--ruby',
                 dest='type_ruby',
-                help="Ruby type=['nil', 'Sys', 'MP26', 'HB27', 'Ana3']" )
+                help="Ruby type=['nil', 'Sys', 'MP27', 'HB27', 'Ana3']" )
 
   p.add_option( '-p', '--python',
                 dest='type_python',
@@ -288,7 +288,7 @@ def ParseCommandLineArguments():
   candidates         = dict()
   candidates['NIL']  = 'nil'
   candidates['SYS']  = 'Sys'
-  candidates['MP26'] = 'MP26'
+  candidates['MP27'] = 'MP27'
   candidates['HB27'] = 'HB27'
   candidates['ANA3'] = 'Ana3'
   try:
@@ -312,8 +312,8 @@ def ParseCommandLineArguments():
         ModuleRuby = 'RubySierra'
       elif Platform == "ElCapitan":
         ModuleRuby = 'RubyElCapitan'
-    elif choiceRuby == "MP26":
-      ModuleRuby   = 'Ruby26MacPorts'
+    elif choiceRuby == "MP27":
+      ModuleRuby   = 'Ruby27MacPorts'
       NonOSStdLang = True
     elif choiceRuby == "HB27":
       ModuleRuby   = 'Ruby27Brew'

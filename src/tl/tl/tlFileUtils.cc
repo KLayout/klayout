@@ -59,6 +59,13 @@
 
 #endif
 
+#if defined(__FreeBSD__)
+
+#include <sys/types.h>
+#include <sys/sysctl.h>
+
+#endif
+
 namespace tl
 {
 
@@ -815,6 +822,16 @@ get_inst_path_internal ()
     //  TODO: does this correctly translate paths? (MacOS uses UTF-8 encoding with D-like normalization)
     return tl::absolute_path (buffer);
   }
+
+#elif defined (__FreeBSD__)
+
+  char path[PATH_MAX];
+  size_t len = PATH_MAX;
+  const int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1};
+  if (sysctl(&mib[0], 4, &path, &len, NULL, 0) == 0) {
+    return tl::absolute_path(path);
+  }
+  return "";
 
 #else
 

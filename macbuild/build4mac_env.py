@@ -107,6 +107,7 @@ RubyMojave      = { 'exe': '/System/Library/Frameworks/Ruby.framework/Versions/2
 CatalinaSDK = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk"
 RubyCatalina    = { 'exe': '/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby',
                     'inc': '%s/System/Library/Frameworks/Ruby.framework/Headers' % CatalinaSDK,
+                    'inc2': '%s/System/Library/Frameworks/Ruby.framework/Headers/ruby' % CatalinaSDK,
                     'lib': '/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/libruby.dylib'
                   }
 
@@ -220,6 +221,21 @@ Python38Brew    = { 'exe': '%s/Versions/3.8/bin/python3.8' % HBPython38Framework
                     'inc': '%s/Versions/3.8/include/python3.8' % HBPython38FrameworkPath,
                     'lib': '%s/Versions/3.8/lib/libpython3.8.dylib' % HBPython38FrameworkPath
                   }
+
+# # Latest Python from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
+# #   install with 'brew install python'
+# # [Key Type Name] = 'HBAuto'
+
+# import glob
+# # In my system, there are four candidates: (python, python3, python@3, python@3.8)
+# # Hard to tell which is going to be available to the user. Picking the last one
+# HBAutoFrameworkPath = glob.glob("/usr/local/opt/python*/Frameworks/Python.framework/")[-1]
+# # expand 3* into _py_version, there should be only one, but I am taking no chances.
+# HBAutoFrameworkVersionPath, _py_version = os.path.split(glob.glob("%s/Versions/3*" % HBAutoFrameworkPath)[0])
+# PythonAutoBrew = {  'exe': '%s/bin/python%s' % (HBAutoFrameworkVersionPath, _py_version),
+#                     'inc': '%s/include/python%s' % (HBAutoFrameworkVersionPath, _py_version),
+#                     'lib': glob.glob("%s/lib/*.dylib" % HBAutoFrameworkVersionPath)[0]
+#                   }
 
 # Python 3.8 bundled with anaconda3 installed under /Applications/anaconda3/ *+*+*+ EXPERIMENTAL *+*+*+
 # The standard installation deploys the tool under $HOME/opt/anaconda3/.

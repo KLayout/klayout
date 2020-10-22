@@ -551,6 +551,8 @@ def get_build_parameters(config):
         parameters['ruby'] = RubyDictionary[ModuleRuby]['exe']
         parameters['rbinc'] = RubyDictionary[ModuleRuby]['inc']
         parameters['rblib'] = RubyDictionary[ModuleRuby]['lib']
+        if 'inc2' in RubyDictionary[ModuleRuby]:
+            parameters['rbinc2'] = RubyDictionary[ModuleRuby]['inc2']
 
     # (H) about Python
     if ModulePython != "nil":
@@ -617,6 +619,8 @@ def run_build_command(config, parameters):
         cmd_args += " \\\n  -ruby   %s" % parameters['ruby']
         cmd_args += " \\\n  -rbinc  %s" % parameters['rbinc']
         cmd_args += " \\\n  -rblib  %s" % parameters['rblib']
+        if 'rbinc2' in parameters:
+            cmd_args += " \\\n  -rbinc2  %s" % parameters['rbinc2']
     else:
         cmd_args += " \\\n  -noruby"
 

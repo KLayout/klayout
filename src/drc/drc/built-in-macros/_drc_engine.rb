@@ -369,27 +369,30 @@ module DRC
     # @name info 
     # @brief Outputs as message to the logger window
     # @synopsis info(message)
+    # @synopsis info(message, indent)
     # Prints the message to the log window in verbose mode.
     # In non-verbose more, nothing is printed.
     # \log is a function that always prints a message.
     
-    def info(arg)
-      @verbose && log(arg)
+    def info(arg, indent = 0)
+      @verbose && log(arg, indent)
     end
     
     # %DRC%
     # @name log 
     # @brief Outputs as message to the logger window
     # @synopsis log(message)
+    # @synopsis log(message, indent)
     # Prints the message to the log window.
     # \info is a function that prints a message only if 
     # verbose mode is enabled.
     
-    def log(arg)
+    def log(arg, indent = 0)
+      str = ("  " * indent) + arg
       if @log_file
-        @log_file.puts(arg)
+        @log_file.puts(str)
       else
-        RBA::Logger::info(arg)
+        RBA::Logger::info(str)
       end
     end
     
@@ -1512,7 +1515,7 @@ CODE
       info(desc)
 
       # enable progress
-      if obj.is_a?(RBA::Region) || obj.is_a?(RBA::Edges) || obj.is_a?(RBA::EdgePairs)
+      if obj.is_a?(RBA::Region) || obj.is_a?(RBA::Edges) || obj.is_a?(RBA::EdgePairs) || obj.is_a?(RBA::Texts)
         obj.enable_progress(desc)
       end
       
@@ -1522,10 +1525,30 @@ CODE
       res = yield
       t.stop
 
-      info("Elapsed: #{'%.3f'%(t.sys+t.user)}s")
+      if @verbose
+
+        # Report result statistics
+        if res.is_a?(RBA::Region)
+          info("Polygons (raw): #{res.count} (flat)  #{res.hier_count} (hierarchical)", 1)
+        elsif res.is_a?(RBA::Edges)
+          info("Edges: #{res.count} (flat)  #{res.hier_count} (hierarchical)", 1)
+        elsif res.is_a?(RBA::EdgePairs)
+          info("Edge pairs: #{res.count} (flat)  #{res.hier_count} (hierarchical)", 1)
+        elsif res.is_a?(RBA::Texts)
+          info("Texts: #{res.count} (flat)  #{res.hier_count} (hierarchical)", 1)
+        end
+
+        mem = RBA::Timer::memory_size
+        if mem > 0
+          info("Elapsed: #{'%.3f'%(t.sys+t.user)}s  Memory: #{'%.2f'%(mem/(1024*1024))}M", 1)
+        else
+          info("Elapsed: #{'%.3f'%(t.sys+t.user)}s", 1)
+        end
+
+      end
 
       # disable progress
-      if obj.is_a?(RBA::Region) || obj.is_a?(RBA::Edges) || obj.is_a?(RBA::EdgePairs)
+      if obj.is_a?(RBA::Region) || obj.is_a?(RBA::Edges) || obj.is_a?(RBA::EdgePairs) || obj.is_a?(RBA::Texts)
         obj.disable_progress
       end
           

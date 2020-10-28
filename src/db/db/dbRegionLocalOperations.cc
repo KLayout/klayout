@@ -46,6 +46,31 @@ static inline const db::PolygonRef *push_polygon_to_heap (db::Layout *layout, co
   return &heap.back ();
 }
 
+static inline bool needs_merge (const std::unordered_set<db::PolygonRef> &polygons)
+{
+  if (polygons.empty ()) {
+    return false;
+  } else if (polygons.size () > 1) {
+    return true;
+  } else if (polygons.begin ()->obj ().is_box ()) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+static inline bool needs_merge (const std::unordered_set<db::Polygon> &polygons)
+{
+  if (polygons.empty ()) {
+    return false;
+  } else if (polygons.size () > 1) {
+    return true;
+  } else if (polygons.begin ()->is_box ()) {
+    return false;
+  } else {
+    return true;
+  }
+}
 
 struct ResultInserter
 {
@@ -117,8 +142,8 @@ private:
 // ---------------------------------------------------------------------------------------------------------------
 
 template <class TS, class TI, class TR>
-check_local_operation<TS, TI, TR>::check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool shielded)
-  : m_check (check), m_different_polygons (different_polygons), m_has_other (has_other), m_shielded (shielded)
+check_local_operation<TS, TI, TR>::check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool other_is_merged, bool shielded)
+  : m_check (check), m_different_polygons (different_polygons), m_has_other (has_other), m_other_is_merged (other_is_merged), m_shielded (shielded)
 {
   //  .. nothing yet ..
 }
@@ -150,6 +175,30 @@ check_local_operation<TS, TI, TR>::compute_local (db::Layout *layout, const shap
       const TS &subject = interactions.subject_shape (i->first);
       scanner.insert (push_polygon_to_heap (layout, subject, heap), n);
       n += 2;
+    }
+
+    //  merge the intruders to remove inner edges
+
+    if (! m_other_is_merged && needs_merge (polygons)) {
+
+      db::EdgeProcessor ep;
+
+      ep.clear ();
+      size_t i = 0;
+      for (typename std::unordered_set<TI>::const_iterator o = polygons.begin (); o != polygons.end (); ++o) {
+        for (typename TI::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
+          ep.insert (*e, i);
+        }
+        ++i;
+      }
+
+      polygons.clear ();
+
+      db::polygon_ref_generator<TI> ps (layout, polygons);
+      db::PolygonGenerator pg (ps, false /*don't resolve holes*/, false);
+      db::SimpleMerge op (1 /*wc>0*/);
+      ep.process (pg, op);
+
     }
 
     n = 1;

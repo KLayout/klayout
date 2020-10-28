@@ -2228,3 +2228,40 @@ TEST(issue_400_with_region)
   CHECKPOINT();
   db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au400c.gds");
 }
+
+TEST(issue_663_separation_from_inside)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/issue-663.oas.gz";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l10 = ly.get_layer (db::LayerProperties (10, 0));
+  unsigned int l11 = ly.get_layer (db::LayerProperties (11, 0));
+
+  db::DeepShapeStore dss;
+
+  db::Region r1_flat (db::RecursiveShapeIterator (ly, top_cell, l1));
+  db::Region r2_flat (db::RecursiveShapeIterator (ly, top_cell, l2));
+
+  db::Region r1_deep (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+  db::Region r2_deep (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+
+  db::EdgePairs ep_flat = r1_flat.separation_check (r2_flat, 2000);
+  db::EdgePairs ep_deep = r1_deep.separation_check (r2_deep, 2000);
+
+  ep_flat.insert_into_as_polygons (&ly, top_cell_index, l10, 0);
+  ep_deep.insert_into_as_polygons (&ly, top_cell_index, l11, 0);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au663.gds");
+}

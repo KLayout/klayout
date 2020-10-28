@@ -27,6 +27,7 @@
 #include "dbCommon.h"
 #include "dbEdgePairRelations.h"
 #include "dbLocalOperation.h"
+#include "dbEdgeProcessor.h"
 
 namespace db
 {
@@ -36,7 +37,7 @@ class check_local_operation
   : public local_operation<TS, TI, TR>
 {
 public:
-  check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool shielded);
+  check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool other_is_merged, bool shielded);
 
   virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
 
@@ -48,6 +49,7 @@ private:
   EdgeRelationFilter m_check;
   bool m_different_polygons;
   bool m_has_other;
+  bool m_other_is_merged;
   bool m_shielded;
 };
 

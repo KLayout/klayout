@@ -28,21 +28,6 @@ namespace db
 {
 
 // -----------------------------------------------------------------------------------------------
-//  class PolygonRefGenerator
-
-PolygonRefGenerator::PolygonRefGenerator (db::Layout *layout, std::unordered_set<db::PolygonRef> &polyrefs)
-  : PolygonSink (), mp_layout (layout), mp_polyrefs (&polyrefs)
-{
-  //  .. nothing yet ..
-}
-
-void PolygonRefGenerator::put (const db::Polygon &polygon)
-{
-  tl::MutexLocker locker (&mp_layout->lock ());
-  mp_polyrefs->insert (db::PolygonRef (polygon, mp_layout->shape_repository ()));
-}
-
-// -----------------------------------------------------------------------------------------------
 //  class EdgeToEdgeSetGenerator
 
 EdgeToEdgeSetGenerator::EdgeToEdgeSetGenerator (std::unordered_set<db::Edge> &edges)

@@ -42,7 +42,7 @@
 
 #include <sstream>
 
-#define USE_LOCAL_PROCESSOR   // @@@
+#define USE_LOCAL_PROCESSOR   // comment out for original implementation based on a single scan
 
 namespace db
 {
@@ -419,8 +419,8 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse, 
   ResultCountingInserter inserter (counted_results);
 
   db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> scanner (report_progress (), progress_desc ());
-  scanner.reserve1 (size ());
-  scanner.reserve2 (other.size ());
+  scanner.reserve1 (count ());
+  scanner.reserve2 (other.count ());
 
   std::auto_ptr<FlatRegion> output (new FlatRegion (false));
   region_to_edge_interaction_filter<db::Polygon, db::Edge, ResultCountingInserter> filter (inserter, false, counting /*get all in counting mode*/);
@@ -497,10 +497,10 @@ AsIfFlatRegion::selected_interacting_generic (const Texts &other, bool inverse, 
   ResultCountingInserter inserter (counted_results);
 
   db::box_scanner2<db::Polygon, size_t, db::Text, size_t> scanner (report_progress (), progress_desc ());
-  scanner.reserve1 (size ());
-  scanner.reserve2 (other.size ());
+  scanner.reserve1 (count ());
+  scanner.reserve2 (other.count ());
 
-  region_to_text_interaction_filter<ResultCountingInserter, db::Text> filter (inserter, false, counting /*get all in counting mode*/);
+  region_to_text_interaction_filter<db::Polygon, db::Text, ResultCountingInserter> filter (inserter, false, counting /*get all in counting mode*/);
 
   AddressablePolygonDelivery p (begin_merged ());
 
@@ -694,8 +694,8 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
 #else
 
   db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> scanner (report_progress (), progress_desc ());
-  scanner.reserve1 (size ());
-  scanner.reserve2 (other.size ());
+  scanner.reserve1 (count ());
+  scanner.reserve2 (other.count ());
 
   std::auto_ptr<FlatEdges> output (new FlatEdges (false));
   region_to_edge_interaction_filter<db::Polygon, db::Edge, db::Shapes, db::Edge> filter (output->raw_edges (), false);
@@ -749,8 +749,8 @@ AsIfFlatRegion::pull_generic (const Texts &other) const
   }
 
   db::box_scanner2<db::Polygon, size_t, db::Text, size_t> scanner (report_progress (), progress_desc ());
-  scanner.reserve1 (size ());
-  scanner.reserve2 (other.size ());
+  scanner.reserve1 (count ());
+  scanner.reserve2 (other.count ());
 
   std::auto_ptr<FlatTexts> output (new FlatTexts (false));
   region_to_text_interaction_filter<db::Polygon, db::Text, db::Shapes, db::Text> filter (output->raw_texts (), false);
@@ -1030,7 +1030,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   check.set_min_projection (min_projection);
   check.set_max_projection (max_projection);
 
-  db::check_local_operation<db::Polygon, db::Polygon, db::EdgePair> op (check, different_polygons, other != 0, shielded);
+  db::check_local_operation<db::Polygon, db::Polygon, db::EdgePair> op (check, different_polygons, other != 0, other->is_merged (), shielded);
 
   db::local_processor<db::Polygon, db::Polygon, db::EdgePair> proc;
   proc.set_base_verbosity (base_verbosity ());
@@ -1050,7 +1050,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   std::auto_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
 
   db::box_scanner<db::Polygon, size_t> scanner (report_progress (), progress_desc ());
-  scanner.reserve (size () + (other ? other->size () : 0));
+  scanner.reserve (count () + (other ? other->count () : 0));
 
   AddressablePolygonDelivery p (begin_merged ());
 
@@ -1082,7 +1082,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   check.set_max_projection (max_projection);
 
   edge2edge_check<db::FlatEdgePairs> edge_check (check, *result, different_polygons, other != 0 /*requires different layers*/, shielded);
-  poly2poly_check<db::FlatEdgePairs> poly_check (edge_check);
+  poly2poly_check<db::Polygon, db::FlatEdgePairs> poly_check (edge_check);
 
   do {
     scanner.process (poly_check, d, db::box_convert<db::Polygon> ());

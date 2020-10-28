@@ -30,6 +30,7 @@
 #include "dbLayout.h"
 #include "dbPolygonGenerators.h"
 #include "dbHash.h"
+#include "tlThreads.h"
 
 #include <unordered_set>
 
@@ -63,24 +64,64 @@ private:
   const Trans m_trans;
 };
 
-class DB_PUBLIC PolygonRefGenerator
+template <class T>
+class DB_PUBLIC polygon_ref_generator;
+
+template <>
+class DB_PUBLIC polygon_ref_generator<db::PolygonRef>
   : public PolygonSink
 {
 public:
   /**
    *  @brief Constructor
    */
-  PolygonRefGenerator (db::Layout *layout, std::unordered_set<db::PolygonRef> &polyrefs);
+  polygon_ref_generator (db::Layout *layout, std::unordered_set<db::PolygonRef> &polyrefs)
+    : PolygonSink (), mp_layout (layout), mp_polyrefs (&polyrefs)
+  {
+    //  .. nothing yet ..
+  }
 
   /**
    *  @brief Implementation of the PolygonSink interface
    */
-  virtual void put (const db::Polygon &polygon);
+  void put (const db::Polygon &polygon)
+  {
+    tl::MutexLocker locker (&mp_layout->lock ());
+    mp_polyrefs->insert (db::PolygonRef (polygon, mp_layout->shape_repository ()));
+  }
 
 private:
   db::Layout *mp_layout;
   std::unordered_set<db::PolygonRef> *mp_polyrefs;
 };
+
+template <>
+class DB_PUBLIC polygon_ref_generator<db::Polygon>
+  : public PolygonSink
+{
+public:
+  /**
+   *  @brief Constructor
+   */
+  polygon_ref_generator (db::Layout *, std::unordered_set<db::Polygon> &polygons)
+    : mp_polygons (&polygons)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Implementation of the PolygonSink interface
+   */
+  virtual void put (const db::Polygon &polygon)
+  {
+    mp_polygons->insert (polygon);
+  }
+
+private:
+  std::unordered_set<db::Polygon> *mp_polygons;
+};
+
+typedef polygon_ref_generator<db::PolygonRef> PolygonRefGenerator;
 
 class DB_PUBLIC EdgeToEdgeSetGenerator
   : public EdgeSink

@@ -493,6 +493,7 @@ public:
   virtual void transform_into (Shapes *target, const Trans &trans, GenericRepository &rep, ArrayRepository &array_rep, pm_delegate_type &pm) const = 0;
   virtual void transform_into (Shapes *target, const ICplxTrans &trans, GenericRepository &rep, ArrayRepository &array_rep) const = 0;
   virtual void transform_into (Shapes *target, const ICplxTrans &trans, GenericRepository &rep, ArrayRepository &array_rep, pm_delegate_type &pm) const = 0;
+  virtual void insert_into (Shapes *target) = 0;
   virtual void deref_into (Shapes *target) = 0;
   virtual void deref_into (Shapes *target, pm_delegate_type &pm) = 0;
   virtual void deref_and_transform_into (Shapes *target, const Trans &trans) = 0;

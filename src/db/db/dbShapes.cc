@@ -174,9 +174,15 @@ Shapes::do_insert (const Shapes &d)
   if (layout () == d.layout ()) {
 
     //  both shape containers reside in the same repository space - simply copy
-    m_layers.reserve (d.m_layers.size ());
-    for (tl::vector<LayerBase *>::const_iterator l = d.m_layers.begin (); l != d.m_layers.end (); ++l) {
-      m_layers.push_back ((*l)->clone (this, manager ()));
+    if (m_layers.empty ()) {
+      m_layers.reserve (d.m_layers.size ());
+      for (tl::vector<LayerBase *>::const_iterator l = d.m_layers.begin (); l != d.m_layers.end (); ++l) {
+        m_layers.push_back ((*l)->clone (this, manager ()));
+      }
+    } else {
+      for (tl::vector<LayerBase *>::const_iterator l = d.m_layers.begin (); l != d.m_layers.end (); ++l) {
+        (*l)->insert_into (this);
+      }
     }
 
   } else if (layout () == 0) {

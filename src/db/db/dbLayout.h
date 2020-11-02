@@ -1065,8 +1065,7 @@ public:
    *  @brief Delete the subcells of the given cells which are not used otherwise
    *
    *  All subcells referenced directy or indirectly but not used otherwise
-   *  are deleted as well. This basically prunes the cell tree by this cell.
-   *  All instances of this cell are deleted as well.
+   *  are deleted as well.
    *  This method is more efficent than calling prune_subcells for single cells multiple times.
    *
    *  @param from A begin iterator delivering the cell id's to delete
@@ -1085,8 +1084,7 @@ public:
    *  @brief Delete the subcells of the given cells which are not used otherwise
    *
    *  All subcells referenced directy or indirectly but not used otherwise
-   *  are deleted as well. This basically prunes the cell tree by this cell.
-   *  All instances of this cell are deleted as well.
+   *  are deleted as well.
    *  This method is more efficent than calling prune_subcells for single cells multiple times.
    *
    *  @param cells A set of cell id's to prune

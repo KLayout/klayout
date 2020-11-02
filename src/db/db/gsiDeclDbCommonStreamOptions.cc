@@ -25,6 +25,7 @@
 #include "dbCommonReader.h"
 #include "dbLoadLayoutOptions.h"
 #include "gsiDecl.h"
+#include "gsiEnums.h"
 
 namespace dn
 {
@@ -159,6 +160,36 @@ gsi::ClassExt<db::LoadLayoutOptions> common_reader_options (
   ),
   ""
 );
+
+
+gsi::EnumIn<db::LoadLayoutOptions, db::CommonReader::CellConflictResolution> decl_dbCommonReader_CellConflictResolution ("db", "CellConflictResolution",
+  gsi::enum_const ("AddToCell", db::CommonReader::AddToCell,
+    "@brief Add content to existing cell\n"
+    "This is the mode use in before version 0.27. Content of new cells is simply added to existing cells with the same name."
+  ) +
+  gsi::enum_const ("OverwriteCell", db::CommonReader::OverwriteCell,
+    "@brief The old cell is overwritten entirely (including child cells which are not used otherwise)\n"
+  ) +
+  gsi::enum_const ("SkipNewCell", db::CommonReader::SkipNewCell,
+    "@brief The new cell is skipped entirely (including child cells which are not used otherwise)\n"
+  ) +
+  gsi::enum_const ("RenameCell", db::CommonReader::RenameCell,
+    "@brief The new cell will be renamed to become unique\n"
+  ),
+  "@brief This enum specifies how cell conflicts are handled if a layout read into another layout and a cell name conflict arises. "
+  "Until version 0.26.8 and before, the mode was always 'AddToCell'. On reading, a cell was 'reopened' when encountering a cell name "
+  "which already existed. This mode is still the default. The other modes are made available to support other ways of merging layouts.\n"
+  "\n"
+  "Proxy cells are never modified in the existing layout. Proxy cells are always local to their layout file. So if the existing cell is "
+  "a proxy cell, the new cell will be renamed.\n"
+  "\n"
+  "If the new or existing cell is a ghost cell, both cells are merged always.\n"
+  "\n"
+  "This enum was introduced in version 0.27.\n"
+);
+
+//  Inject the NetlistCrossReference::Status declarations into NetlistCrossReference:
+gsi::ClassExt<db::LoadLayoutOptions> inject_CellConflictResolution_in_parent (decl_dbCommonReader_CellConflictResolution.defs ());
 
 }
 

@@ -144,9 +144,12 @@ OASISReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   m_read_all_properties = oasis_options.read_all_properties;
   m_expect_strict_mode = oasis_options.expect_strict_mode;
 
+  set_cell_conflict_resolution (common_options.cell_conflict_resolution);
+
   layout.start_changes ();
   try {
     do_read (layout);
+    finish (layout);
     layout.end_changes ();
   } catch (...) {
     layout.end_changes ();
@@ -758,17 +761,11 @@ OASISReader::do_read (db::Layout &layout)
   id_mode propstring_id_mode = any;
   id_mode propname_id_mode = any;
 
-  m_cellnames.clear ();
   m_cellname_properties.clear ();
   m_textstrings.clear ();
   m_propstrings.clear ();
   m_propnames.clear ();
   m_layernames.clear ();
-  m_cells_by_id.clear ();
-  m_cells_by_name.clear ();
-  m_defined_cells_by_id.clear ();
-  m_defined_cells_by_name.clear ();
-  m_mapped_cellnames.clear ();
 
   m_instances.clear ();
   m_instances_with_props.clear ();
@@ -826,9 +823,7 @@ OASISReader::do_read (db::Layout &layout)
         get (id);
       }
 
-      if (! m_cellnames.insert (std::make_pair (id, name)).second) {
-        error (tl::sprintf (tl::to_string (tr ("A CELLNAME with id %ld is present already")), id));
-      }
+      rename_cell (layout, id, name);
 
       reset_modal_variables ();
 
@@ -1150,37 +1145,11 @@ OASISReader::do_read (db::Layout &layout)
 
         unsigned long id = 0;
         get (id);
-        if (! m_defined_cells_by_id.insert (id).second) {
+        if (has_cell (id)) {
           error (tl::sprintf (tl::to_string (tr ("A cell with id %ld is defined already")), id));
         }
 
-        std::map <unsigned long, db::cell_index_type>::const_iterator c = m_cells_by_id.find (id);
-        if (c != m_cells_by_id.end ()) {
-
-          cell_index = c->second;
-          layout.cell (cell_index).set_ghost_cell (false);
-
-        } else {
-
-          std::map <unsigned long, std::string>::const_iterator name = m_cellnames.find (id);
-          if (name == m_cellnames.end ()) {
-
-            cell_index = layout.add_cell ();
-            //  force a cell rename to empty to avoid name clashes of the generated
-            //  $x names with the same inside the OASIS file.
-            layout.rename_cell (cell_index, "");
-            m_forward_references.insert (std::make_pair (id, cell_index));
-
-          } else {
-
-            cell_index = make_cell (layout, name->second.c_str (), false);
-            m_cells_by_name.insert (std::make_pair (name->second, cell_index));
-
-          }
-
-          m_cells_by_id.insert (std::make_pair (id, cell_index));
-
-        }
+        cell_index = make_cell (layout, id);
 
       } else {
 
@@ -1189,22 +1158,11 @@ OASISReader::do_read (db::Layout &layout)
         }
 
         std::string name = get_str ();
-        if (! m_defined_cells_by_name.insert (name).second) {
+        if (has_cell (name)) {
           error (tl::sprintf (tl::to_string (tr ("A cell with name %s is defined already")), name.c_str ()));
         }
 
-        std::map <std::string, db::cell_index_type>::const_iterator c = m_cells_by_name.find (name);
-        if (c != m_cells_by_name.end ()) {
-
-          cell_index = c->second;
-          layout.cell (cell_index).set_ghost_cell (false);
-
-        } else {
-
-          cell_index = make_cell (layout, name.c_str (), false);
-          m_cells_by_name.insert (std::make_pair (name, cell_index));
-
-        }
+        cell_index = make_cell (layout, name);
 
       }
 
@@ -1326,72 +1284,16 @@ OASISReader::do_read (db::Layout &layout)
 
   }
 
-  for (std::map <unsigned long, db::cell_index_type>::const_iterator fw = m_forward_references.begin (); fw != m_forward_references.end (); ++fw) {
-
-    std::map <unsigned long, std::string>::const_iterator cn = m_cellnames.find (fw->first);
-    if (cn == m_cellnames.end ()) {
-
-      error (tl::sprintf (tl::to_string (tr ("No cellname defined for cell name id %ld")), fw->first));
-
-    } else {
-
-      std::pair<bool, db::cell_index_type> c = layout.cell_by_name (cn->second.c_str ()); 
-      if (c.first) {
-
-        //  needed, since we have disabled updates
-        layout.force_update ();
-
-        //  add-on reading of forward-referenced cell: need to copy the new cell to the original one plus 
-        //  change instances of the new cell and delete the new cell then.
-
-        const db::Cell &new_cell = layout.cell (fw->second);
-        db::Cell &org_cell = layout.cell (c.second);
-
-        //  copy over the instances
-        for (db::Cell::const_iterator i = new_cell.begin (); ! i.at_end (); ++i) {
-          org_cell.insert (*i);
-        }
-
-        //  copy over the shapes
-        for (unsigned int l = 0; l < layout.layers (); ++l) {
-          if (layout.is_valid_layer (l) && ! new_cell.shapes (l).empty ()) {
-            org_cell.shapes (l).insert (new_cell.shapes (l));
-          }
-        }
-
-        //  replace all instances of the new cell with the original one
-        std::vector<std::pair<db::cell_index_type, db::Instance> > parents;
-        for (db::Cell::parent_inst_iterator pi = new_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
-          parents.push_back (std::make_pair (pi->parent_cell_index (), pi->child_inst ()));
-        }
-
-        for (std::vector<std::pair<db::cell_index_type, db::Instance> >::const_iterator p = parents.begin (); p != parents.end (); ++p) {
-          db::CellInstArray ia = p->second.cell_inst ();
-          ia.object ().cell_index (org_cell.cell_index ());
-          layout.cell (p->first).replace (p->second, ia);
-        }
-
-        //  finally delete the new cell
-        layout.delete_cell (new_cell.cell_index ());
-
-      } else {
-        layout.rename_cell (fw->second, cn->second.c_str ());
-      }
-
-    }
-
-  }
-
   //  attach the properties found in CELLNAME to the cells (which may have other properties)
   for (std::map<unsigned long, db::properties_id_type>::const_iterator p = m_cellname_properties.begin (); p != m_cellname_properties.end (); ++p) {
 
-    std::map <unsigned long, db::cell_index_type>::const_iterator c = m_cells_by_id.find (p->first);
-    if (c != m_cells_by_id.end ()) {
+    std::pair<bool, db::cell_index_type> c = cell_by_id (p->first);
+    if (c.first) {
 
       db::PropertiesRepository::properties_set cnp = layout.properties_repository ().properties (p->second);
 
       //  Merge existing properties with the ones from CELLNAME
-      db::Cell &cell = layout.cell (c->second);
+      db::Cell &cell = layout.cell (c.second);
       if (cell.prop_id () != 0) {
         db::PropertiesRepository::properties_set cp = layout.properties_repository ().properties (cell.prop_id ());
         cnp.insert (cp.begin (), cp.end ());
@@ -1844,54 +1746,6 @@ OASISReader::read_repetition ()
   return mm_repetition.get ().size () > 1;
 }
 
-db::cell_index_type
-OASISReader::make_cell (db::Layout &layout, const char *cn, bool for_instance)
-{
-  db::cell_index_type ci = 0;
-
-  //  map to the real name which maybe a different one due to localization
-  //  of proxy cells (they are not to be reopened)
-  bool is_mapped = false;
-  if (! m_mapped_cellnames.empty ()) {
-    std::map<tl::string, tl::string>::const_iterator n = m_mapped_cellnames.find (cn);
-    if (n != m_mapped_cellnames.end ()) {
-      cn = n->second.c_str ();
-      is_mapped = true;
-    }
-  }
-
-  std::pair<bool, db::cell_index_type> c = layout.cell_by_name (cn);
-  if (c.first && (is_mapped || ! layout.cell (c.second).is_proxy ())) {
-
-    //  cell already there: just add instance (cell might have been created through forward reference)
-    //  NOTE: we don't address "reopened" proxies as proxies are always local to a layout
-
-    ci = c.second;
-
-    //  mark the cell as read
-    if (! for_instance) {
-      layout.cell (ci).set_ghost_cell (false);
-    }
-
-  } else {
-
-    ci = layout.add_cell (cn);
-
-    if (for_instance) {
-      //  mark this cell a "ghost cell" until it's actually read
-      layout.cell (ci).set_ghost_cell (true);
-    }
-
-    if (c.first) {
-      //  this cell has been given a new name: remember this name for localization
-      m_mapped_cellnames.insert (std::make_pair (cn, layout.cell_name (ci)));
-    }
-
-  }
-
-  return ci;
-}
-
 void 
 OASISReader::do_read_placement (unsigned char r,
                                 bool xy_absolute,
@@ -1909,31 +1763,8 @@ OASISReader::do_read_placement (unsigned char r,
       //  cell by id
       unsigned long id;
       get (id);
-      std::map <unsigned long, db::cell_index_type>::const_iterator cid = m_cells_by_id.find (id);
-      if (cid == m_cells_by_id.end ()) {
 
-        //  create the cell
-        std::map <unsigned long, std::string>::const_iterator name = m_cellnames.find (id);
-        if (name == m_cellnames.end ()) {
-
-          mm_placement_cell = layout.add_cell ();
-          m_forward_references.insert (std::make_pair (id, mm_placement_cell.get ()));
-
-          //  temporarily mark as "ghost cell"
-          layout.cell (mm_placement_cell.get ()).set_ghost_cell (true);
-
-        } else {
-
-          mm_placement_cell = make_cell (layout, name->second.c_str (), true);
-          m_cells_by_name.insert (std::make_pair (name->second, mm_placement_cell.get ()));
-         
-        }
-
-        m_cells_by_id.insert (std::make_pair (id, mm_placement_cell.get ()));
-
-      } else {
-        mm_placement_cell = cid->second;
-      }
+      mm_placement_cell = cell_for_instance (layout, id);
 
     } else {
 
@@ -1941,15 +1772,7 @@ OASISReader::do_read_placement (unsigned char r,
       std::string name;
       get_str (name);
 
-      std::map <std::string, db::cell_index_type>::const_iterator cid = m_cells_by_name.find (name);
-      if (cid == m_cells_by_name.end ()) {
-
-        mm_placement_cell = make_cell (layout, name.c_str (), true);
-        m_cells_by_name.insert (std::make_pair (name, mm_placement_cell.get ()));
-
-      } else {
-        mm_placement_cell = cid->second;
-      }
+      mm_placement_cell = cell_for_instance (layout, name);
 
     }
 

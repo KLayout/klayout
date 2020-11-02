@@ -84,7 +84,7 @@ GDS2ReaderBase::~GDS2ReaderBase ()
 }
 
 const LayerMap &
-GDS2ReaderBase::basic_read (db::Layout &layout, const LayerMap &layer_map, bool create_other_layers, bool enable_text_objects, bool enable_properties, bool allow_multi_xy_records, unsigned int box_mode)
+GDS2ReaderBase::basic_read (db::Layout &layout, const LayerMap &layer_map, bool create_other_layers, bool enable_text_objects, bool enable_properties, bool allow_multi_xy_records, unsigned int box_mode, db::CommonReader::CellConflictResolution cc_resolution)
 {
   m_layer_map = layer_map;
   m_layer_map.prepare (layout);
@@ -95,9 +95,17 @@ GDS2ReaderBase::basic_read (db::Layout &layout, const LayerMap &layer_map, bool 
   m_box_mode = box_mode;
   m_create_layers = create_other_layers;
 
+  set_cell_conflict_resolution (cc_resolution);
+
   layout.start_changes ();
-  do_read (layout);
-  layout.end_changes ();
+  try {
+    do_read (layout);
+    finish (layout);
+    layout.end_changes ();
+  } catch (...) {
+    layout.end_changes ();
+    throw;
+  }
 
   return m_layer_map;
 }
@@ -235,7 +243,6 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 {
   m_cellname = "";
   m_libname = "";
-  m_mapped_cellnames.clear ();
 
   //  read header
   if (get_record () != sHEADER) {
@@ -349,7 +356,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
     } else {
 
-      db::cell_index_type cell_index = make_cell (layout, m_cellname.c_str (), false);
+      db::cell_index_type cell_index = make_cell (layout, m_cellname);
 
       db::Cell *cell = &layout.cell (cell_index);
 
@@ -359,8 +366,6 @@ GDS2ReaderBase::do_read (db::Layout &layout)
         if (layout.recover_proxy_as (cell_index, ctx->second.begin (), ctx->second.end (), &layer_mapping)) {
           //  ignore everything in that cell since it is created by the import:
           cell = 0;
-          //  marks the cell for begin addressed by REF's despite being a proxy:
-          m_mapped_cellnames.insert (std::make_pair (m_cellname, m_cellname));
         }
       }
       
@@ -973,54 +978,6 @@ GDS2ReaderBase::read_box (db::Layout &layout, db::Cell &cell)
   }
 }
 
-db::cell_index_type
-GDS2ReaderBase::make_cell (db::Layout &layout, const char *cn, bool for_instance)
-{
-  db::cell_index_type ci = 0;
-
-  //  map to the real name which maybe a different one due to localization
-  //  of proxy cells (they are not to be reopened)
-  bool is_mapped = false;
-  if (! m_mapped_cellnames.empty ()) {
-    std::map<tl::string, tl::string>::const_iterator n = m_mapped_cellnames.find (cn);
-    if (n != m_mapped_cellnames.end ()) {
-      cn = n->second.c_str ();
-      is_mapped = true;
-    }
-  }
-
-  std::pair<bool, db::cell_index_type> c = layout.cell_by_name (cn);
-  if (c.first && (is_mapped || ! layout.cell (c.second).is_proxy ())) {
-
-    //  cell already there: just add instance (cell might have been created through forward reference)
-    //  NOTE: we don't address "reopened" proxies as proxies are always local to a layout
-
-    ci = c.second;
-
-    //  mark the cell as read
-    if (! for_instance) {
-      layout.cell (ci).set_ghost_cell (false);
-    }
-
-  } else {
-
-    ci = layout.add_cell (cn);
-
-    if (for_instance) {
-      //  mark this cell a "ghost cell" until it's actually read
-      layout.cell (ci).set_ghost_cell (true);
-    }
-
-    if (c.first) {
-      //  this cell has been given a new name: remember this name for localization
-      m_mapped_cellnames.insert (std::make_pair (cn, layout.cell_name (ci)));
-    }
-
-  }
-
-  return ci;
-}
-
 void 
 GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, tl::vector<db::CellInstArray> &instances, tl::vector<db::CellInstArrayWithProperties> &instances_with_props)
 {
@@ -1033,7 +990,7 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
     error (tl::to_string (tr ("SNAME record expected")));
   }
 
-  db::cell_index_type ci = make_cell (layout, get_string (), true);
+  db::cell_index_type ci = cell_for_instance (layout, get_string ());
 
   bool mirror = false;
   int angle = 0;

@@ -727,7 +727,17 @@ public:
    */
   cell_index_type add_cell (const char *name = 0);
 
-  /** 
+  /**
+   *  @brief Add a cell without a name
+   *
+   *  The cell is created, but cannot be found by name. The name returned is an empty string.
+   *  The cell is created with the purpose of being renamed later.
+   *
+   *  @return The index of the new cell
+   */
+  cell_index_type add_anonymous_cell ();
+
+  /**
    *  @brief Rename a cell
    *
    *  Rename the cell with the given id.

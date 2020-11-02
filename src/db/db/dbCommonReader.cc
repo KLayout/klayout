@@ -59,7 +59,7 @@ CommonReader::make_cell (db::Layout &layout, const std::string &cn)
 
   } else {
 
-    db::cell_index_type ci = layout.add_cell ();
+    db::cell_index_type ci = layout.add_anonymous_cell ();
 
     m_name_map [cn] = std::make_pair (null_id, ci);
     return ci;
@@ -103,7 +103,7 @@ CommonReader::make_cell (db::Layout &layout, size_t id)
 
   } else {
 
-    db::cell_index_type ci = layout.add_cell ();
+    db::cell_index_type ci = layout.add_anonymous_cell ();
 
     m_id_map [id] = std::make_pair (std::string (), ci);
     return ci;
@@ -136,7 +136,7 @@ CommonReader::rename_cell (db::Layout &layout, size_t id, const std::string &cn)
 
   if (iid != m_id_map.end () && iname != m_name_map.end ()) {
 
-    if (iid->second.first != cn) {
+    if (! iid->second.first.empty () && iid->second.first != cn) {
       common_reader_error (tl::sprintf (tl::to_string (tr ("Cell named %s with ID %ld was already given name %s")), cn, id, iid->second.first));
     }
 
@@ -149,20 +149,26 @@ CommonReader::rename_cell (db::Layout &layout, size_t id, const std::string &cn)
 
     }
 
+    iid->second.first = cn;
+    iname->second.first = id;
+
   } else if (iid != m_id_map.end ()) {
 
     m_name_map [cn] = std::make_pair (id, iid->second.second);
+    iid->second.first = cn;
 
   } else if (iname != m_name_map.end ()) {
 
     m_id_map [id] = std::make_pair (cn, iname->second.second);
+    iname->second.first = id;
 
   } else {
 
-    db::cell_index_type ci = layout.add_cell ();
+    db::cell_index_type ci = layout.add_anonymous_cell ();
+    layout.cell (ci).set_ghost_cell (true);
 
-    m_id_map [id] = std::make_pair (std::string (), ci);
-    m_name_map [cn] = std::make_pair (null_id, ci);
+    m_id_map [id] = std::make_pair (cn, ci);
+    m_name_map [cn] = std::make_pair (id, ci);
 
   }
 }
@@ -179,7 +185,7 @@ CommonReader::cell_for_instance (db::Layout &layout, size_t id)
 
   } else {
 
-    db::cell_index_type ci = layout.add_cell ();
+    db::cell_index_type ci = layout.add_anonymous_cell ();
     layout.cell (ci).set_ghost_cell (true);
 
     m_id_map [id] = std::make_pair (std::string (), ci);
@@ -200,7 +206,7 @@ CommonReader::cell_for_instance (db::Layout &layout, const std::string &cn)
 
   } else {
 
-    db::cell_index_type ci = layout.add_cell ();
+    db::cell_index_type ci = layout.add_anonymous_cell ();
     layout.cell (ci).set_ghost_cell (true);
 
     m_name_map [cn] = std::make_pair (null_id, ci);
@@ -259,43 +265,83 @@ CommonReader::finish (db::Layout &layout)
     common_reader_error (tl::to_string (tr ("Some cell IDs don't have a name (see previous warnings)")));
   }
 
-  for (std::map<std::string, std::pair<size_t, db::cell_index_type> >::const_iterator i = m_name_map.begin (); i != m_name_map.end (); ++i) {
+  //  check if we need to resolve conflicts
 
-    if (layout.has_cell (i->first.c_str ())) {
+  bool has_conflict = false;
+  for (std::map<std::string, std::pair<size_t, db::cell_index_type> >::const_iterator i = m_name_map.begin (); i != m_name_map.end () && ! has_conflict; ++i) {
+    has_conflict = layout.cell_by_name (i->first.c_str ()).first;
+  }
 
-      db::cell_index_type ci_org = layout.cell_by_name (i->first.c_str ()).second;
-      db::cell_index_type ci_new = i->second.second;
+  if (! has_conflict) {
 
-      if (m_cc_resolution == RenameCell || layout.cell (ci_org).is_proxy ()) {
+    //  no conflict - plain rename
 
-        //  NOTE: we never reopen proxies (they are always local to their layout). Instead we
-        //  always rename for proxies
-        layout.rename_cell (i->second.second, i->first.c_str ());
+    for (std::map<std::string, std::pair<size_t, db::cell_index_type> >::const_iterator i = m_name_map.begin (); i != m_name_map.end () && ! has_conflict; ++i) {
+      layout.rename_cell (i->second.second, i->first.c_str ());
+    }
 
-      } else {
+  } else {
 
-        //  we have a cell conflict
-        layout.force_update ();
+    //  elaborate conflict resolution
 
-        if (m_cc_resolution == OverwriteCell && ! layout.cell (ci_new).is_ghost_cell ()) {
+    layout.force_update ();
 
-          layout.prune_subcells (ci_org);
-          layout.cell (ci_org).clear_shapes ();
+    std::map<db::cell_index_type, std::string> new_cells;
+    for (std::map<std::string, std::pair<size_t, db::cell_index_type> >::const_iterator i = m_name_map.begin (); i != m_name_map.end (); ++i) {
+      new_cells.insert (std::make_pair (i->second.second, i->first));
+    }
 
-        } else if (m_cc_resolution == SkipNewCell && ! layout.cell (ci_org).is_ghost_cell ()) {
+    //  NOTE: by iterating bottom up we don't need to update the layout (we need the parents for merge_cell)
+    for (db::Layout::bottom_up_iterator bu = layout.begin_bottom_up (); bu != layout.end_bottom_up (); ++bu) {
 
-          layout.prune_subcells (ci_new);
-          layout.cell (ci_new).clear_shapes ();
+      db::cell_index_type ci_new = *bu;
+
+      if (new_cells.find (ci_new) == new_cells.end ()) {
+        //  not a new cell
+        continue;
+      } else if (! layout.is_valid_cell_index (ci_new)) {
+        //  this can happen if the new cell has been deleted by "prune_subcells"
+        continue;
+      }
+
+      std::map<db::cell_index_type, std::string>::const_iterator i = new_cells.find (ci_new);
+
+      std::pair<bool, db::cell_index_type> c2n = layout.cell_by_name (i->second.c_str ());
+      db::cell_index_type ci_org = c2n.second;
+
+      if (c2n.first) {
+
+        if (m_cc_resolution == RenameCell || layout.cell (ci_org).is_proxy ()) {
+
+          //  NOTE: we never reopen proxies (they are always local to their layout). Instead we
+          //  always rename for proxies
+          layout.rename_cell (ci_new, layout.uniquify_cell_name (i->second.c_str ()).c_str ());
+
+        } else {
+
+          //  we have a cell conflict
+
+          if (m_cc_resolution == OverwriteCell && ! layout.cell (ci_new).is_ghost_cell ()) {
+
+            layout.prune_subcells (ci_org);
+            layout.cell (ci_org).clear_shapes ();
+
+          } else if (m_cc_resolution == SkipNewCell && ! layout.cell (ci_org).is_ghost_cell ()) {
+
+            layout.prune_subcells (ci_new);
+            layout.cell (ci_new).clear_shapes ();
+
+          }
+
+          merge_cell (layout, ci_org, ci_new);
 
         }
 
-        merge_cell (layout, ci_org, ci_new);
+      } else {
+
+        layout.rename_cell (ci_new, layout.uniquify_cell_name (i->second.c_str ()).c_str ());
 
       }
-
-    } else {
-
-      layout.rename_cell (i->second.second, i->first.c_str ());
 
     }
 

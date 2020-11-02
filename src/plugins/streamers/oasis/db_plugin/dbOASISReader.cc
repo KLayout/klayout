@@ -1145,7 +1145,9 @@ OASISReader::do_read (db::Layout &layout)
 
         unsigned long id = 0;
         get (id);
-        if (has_cell (id)) {
+
+        std::pair<bool, db::cell_index_type> cc = cell_by_id (id);
+        if (cc.first && ! layout.cell (cc.second).is_ghost_cell ()) {
           error (tl::sprintf (tl::to_string (tr ("A cell with id %ld is defined already")), id));
         }
 
@@ -1158,7 +1160,9 @@ OASISReader::do_read (db::Layout &layout)
         }
 
         std::string name = get_str ();
-        if (has_cell (name)) {
+
+        std::pair<bool, db::cell_index_type> cc = cell_by_name (name);
+        if (cc.first && ! layout.cell (cc.second).is_ghost_cell ()) {
           error (tl::sprintf (tl::to_string (tr ("A cell with name %s is defined already")), name.c_str ()));
         }
 

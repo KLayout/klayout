@@ -366,6 +366,8 @@ TEST(Bug_121_1)
     reader.read (layout);
   }
 
+  fflush(stdout);
+
   std::string fn_au (tl::testsrc () + "/testdata/gds/bug_121_au1.gds");
   db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
 }

@@ -85,6 +85,16 @@ static void set_properties_enabled (db::LoadLayoutOptions *options, bool l)
   options->get_options<db::CommonReaderOptions> ().enable_properties = l;
 }
 
+static db::CommonReader::CellConflictResolution get_cell_conflict_resolution (const db::LoadLayoutOptions *options)
+{
+  return options->get_options<db::CommonReaderOptions> ().cell_conflict_resolution;
+}
+
+static void set_cell_conflict_resolution (db::LoadLayoutOptions *options, db::CommonReader::CellConflictResolution cc)
+{
+  options->get_options<db::CommonReaderOptions> ().cell_conflict_resolution = cc;
+}
+
 //  extend lay::LoadLayoutOptions with the Common options
 static
 gsi::ClassExt<db::LoadLayoutOptions> common_reader_options (
@@ -157,6 +167,22 @@ gsi::ClassExt<db::LoadLayoutOptions> common_reader_options (
     "@param enabled True, if properties should be read."
     "\n"
     "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration."
+  ) +
+  gsi::method_ext ("cell_conflict_resolution", &get_cell_conflict_resolution,
+    "@brief Gets the cell conflict resolution mode\n"
+    "\n"
+    "Multiple layout files can be collected into a single Layout object by reading file after file into the Layout object. "
+    "Cells with same names are considered a conflict. This mode indicates how such conflicts are resolved. See \\CellConflictResolution "
+    "for the values allowed. The default mode is \\CellConflictResolution#AddToCell.\n"
+    "\n"
+    "This option has been introduced in version 0.27."
+  ) +
+  gsi::method_ext ("cell_conflict_resolution=", &set_cell_conflict_resolution, gsi::arg ("mode"),
+    "@brief Sets the cell conflict resolution mode\n"
+    "\n"
+    "See \\cell_conflict_resolution for details about this option.\n"
+    "\n"
+    "This option has been introduced in version 0.27."
   ),
   ""
 );

@@ -1150,6 +1150,12 @@ OASISWriter::reset_modal_variables ()
   mm_last_value_list.reset ();
 }
 
+static bool must_write_cell (const db::Cell &cref)
+{
+  //  don't write ghost cells if not empty and don't write proxy cells which are not employed
+  return (! cref.is_ghost_cell () || ! cref.empty ()) && (! cref.is_proxy () || ! cref.is_top ());
+}
+
 void 
 OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options)
 {
@@ -1184,13 +1190,13 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
   cells_by_index.reserve (cell_set.size ());
 
   for (db::Layout::bottom_up_const_iterator cell = layout.begin_bottom_up (); cell != layout.end_bottom_up (); ++cell) {
-    if (cell_set.find (*cell) != cell_set.end ()) {
+    if (cell_set.find (*cell) != cell_set.end () && must_write_cell (layout.cell (*cell))) {
       cells.push_back (*cell);
     }
   }
 
   for (db::Layout::const_iterator cell = layout.begin (); cell != layout.end (); ++cell) {
-    if (cell_set.find (cell->cell_index ()) != cell_set.end ()) {
+    if (cell_set.find (cell->cell_index ()) != cell_set.end () && must_write_cell (layout.cell (cell->cell_index ()))) {
       cells_by_index.push_back (cell->cell_index ());
     }
   }
@@ -1594,79 +1600,73 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
     const db::Cell &cref (layout.cell (*cell));
     mp_cell = &cref;
 
-    //  don't write ghost cells unless they are not empty (any more)
-    //  also don't write proxy cells which are not employed
-    if ((! cref.is_ghost_cell () || ! cref.empty ()) && (! cref.is_proxy () || ! cref.is_top ())) {
+    //  cell header
 
-      //  cell header 
+    cell_positions.insert (std::make_pair (*cell, mp_stream->pos ()));
 
-      cell_positions.insert (std::make_pair (*cell, mp_stream->pos ()));
+    write_record_id (13);  // CELL
+    write ((unsigned long) *cell);
 
-      write_record_id (13);  // CELL
-      write ((unsigned long) *cell);
+    reset_modal_variables ();
 
-      reset_modal_variables ();
+    if (m_options.write_cblocks) {
+      begin_cblock ();
+    }
 
-      if (m_options.write_cblocks) {
-        begin_cblock ();
-      }
+    //  context information as property named KLAYOUT_CONTEXT
+    if (cref.is_proxy () && options.write_context_info ()) {
 
-      //  context information as property named KLAYOUT_CONTEXT
-      if (cref.is_proxy () && options.write_context_info ()) {
+      context_prop_strings.clear ();
 
-        context_prop_strings.clear ();
+      if (layout.get_context_info (*cell, context_prop_strings)) {
 
-        if (layout.get_context_info (*cell, context_prop_strings)) {
+        write_record_id (28);
+        write_byte (char (0xf6));
+        std::map <std::string, unsigned long>::const_iterator pni = m_propnames.find (klayout_context_name);
+        tl_assert (pni != m_propnames.end ());
+        write (pni->second);
 
-          write_record_id (28);
-          write_byte (char (0xf6)); 
-          std::map <std::string, unsigned long>::const_iterator pni = m_propnames.find (klayout_context_name);
-          tl_assert (pni != m_propnames.end ());
-          write (pni->second);
+        write ((unsigned long) context_prop_strings.size ());
 
-          write ((unsigned long) context_prop_strings.size ());
-
-          for (std::vector <std::string>::const_iterator c = context_prop_strings.begin (); c != context_prop_strings.end (); ++c) {
-            write_byte (14); // b-string by reference number
-            std::map <std::string, unsigned long>::const_iterator psi = m_propstrings.find (*c);
-            tl_assert (psi != m_propstrings.end ());
-            write (psi->second);
-          }
-
-          mm_last_property_name = klayout_context_name;
-          mm_last_property_is_sprop = false;
-          mm_last_value_list.reset ();
-
+        for (std::vector <std::string>::const_iterator c = context_prop_strings.begin (); c != context_prop_strings.end (); ++c) {
+          write_byte (14); // b-string by reference number
+          std::map <std::string, unsigned long>::const_iterator psi = m_propstrings.find (*c);
+          tl_assert (psi != m_propstrings.end ());
+          write (psi->second);
         }
 
+        mm_last_property_name = klayout_context_name;
+        mm_last_property_is_sprop = false;
+        mm_last_value_list.reset ();
+
       }
-
-      if (cref.prop_id () != 0) {
-        write_props (cref.prop_id ());
-      }
-
-      //  instances
-      if (cref.cell_instances () > 0) {
-        write_insts (cell_set);
-      }
-
-      //  shapes
-      for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-        const db::Shapes &shapes = cref.shapes (l->first);
-        if (! shapes.empty ()) {
-          write_shapes (l->second, shapes);
-          m_progress.set (mp_stream->pos ());
-        }
-      }
-
-      //  end CBLOCK if required
-      if (m_options.write_cblocks) {
-        end_cblock ();
-      } 
-
-      //  end of cell
 
     }
+
+    if (cref.prop_id () != 0) {
+      write_props (cref.prop_id ());
+    }
+
+    //  instances
+    if (cref.cell_instances () > 0) {
+      write_insts (cell_set);
+    }
+
+    //  shapes
+    for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = layers.begin (); l != layers.end (); ++l) {
+      const db::Shapes &shapes = cref.shapes (l->first);
+      if (! shapes.empty ()) {
+        write_shapes (l->second, shapes);
+        m_progress.set (mp_stream->pos ());
+      }
+    }
+
+    //  end CBLOCK if required
+    if (m_options.write_cblocks) {
+      end_cblock ();
+    }
+
+    //  end of cell
 
   }
 

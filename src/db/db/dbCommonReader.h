@@ -106,6 +106,11 @@ public:
   void rename_cell (db::Layout &layout, size_t id, const std::string &cn);
 
   /**
+   *  @brief Gets the name for a given cell ID if known, otherwise returns an empty string
+   */
+  const std::string &name_for_id (size_t id) const;
+
+  /**
    *  @brief Returns a cell reference by ID
    *  If the cell does not exist, it's created. It is marked as ghost cell until
    *  "make_cell" is called.
@@ -139,6 +144,7 @@ protected:
 private:
   std::map<size_t, std::pair<std::string, db::cell_index_type> > m_id_map;
   std::map<std::string, std::pair<size_t, db::cell_index_type> > m_name_map;
+  std::map<size_t, std::string> m_name_for_id;
   CellConflictResolution m_cc_resolution;
 };
 

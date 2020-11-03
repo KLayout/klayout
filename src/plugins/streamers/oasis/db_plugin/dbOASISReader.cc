@@ -1153,6 +1153,11 @@ OASISReader::do_read (db::Layout &layout)
 
         cell_index = make_cell (layout, id);
 
+        m_cellname = name_for_id (id);
+        if (m_cellname.empty ()) {
+          m_cellname = std::string ("#") + tl::to_string (id);
+        }
+
       } else {
 
         if (m_expect_strict_mode == 1) {
@@ -1167,6 +1172,8 @@ OASISReader::do_read (db::Layout &layout)
         }
 
         cell_index = make_cell (layout, name);
+
+        m_cellname = name;
 
       }
 
@@ -3260,7 +3267,6 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
   m_instances_with_props.clear ();
 
   m_progress.set (m_stream.pos ());
-  m_cellname = layout.cell_name (cell_index);
 
   bool xy_absolute = true;
 

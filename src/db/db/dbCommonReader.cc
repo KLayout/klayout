@@ -128,9 +128,23 @@ CommonReader::cell_by_id (size_t id) const
   }
 }
 
+const std::string &
+CommonReader::name_for_id (size_t id) const
+{
+  std::map<size_t, std::string>::const_iterator n = m_name_for_id.find (id);
+  if (n != m_name_for_id.end ()) {
+    return n->second;
+  } else {
+    static std::string empty;
+    return empty;
+  }
+}
+
 void
 CommonReader::rename_cell (db::Layout &layout, size_t id, const std::string &cn)
 {
+  m_name_for_id.insert (std::make_pair (id, cn));
+
   std::map<size_t, std::pair<std::string, db::cell_index_type> >::iterator iid = m_id_map.find (id);
   std::map<std::string, std::pair<size_t, db::cell_index_type> >::iterator iname = m_name_map.find (cn);
 
@@ -256,7 +270,7 @@ CommonReader::finish (db::Layout &layout)
 
   for (std::map<size_t, std::pair<std::string, db::cell_index_type> >::const_iterator i = m_id_map.begin (); i != m_id_map.end (); ++i) {
     if (i->second.first.empty ()) {
-      common_reader_warn (tl::sprintf (tl::to_string (tr ("Cell name missing for ID %ld")), i->first));
+      common_reader_warn (tl::sprintf (tl::to_string (tr ("No cellname defined for cell name id %ld")), i->first));
       any_missing = true;
     }
   }

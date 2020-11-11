@@ -1152,8 +1152,14 @@ OASISWriter::reset_modal_variables ()
 
 static bool must_write_cell (const db::Cell &cref)
 {
-  //  don't write ghost cells if not empty and don't write proxy cells which are not employed
-  return (! cref.is_ghost_cell () || ! cref.empty ()) && (! cref.is_proxy () || ! cref.is_top ());
+  //  Don't write proxy cells which are not employed
+  return ! cref.is_proxy () || ! cref.is_top ();
+}
+
+static bool skip_cell_body (const db::Cell &cref)
+{
+  //  Skip cell bodies for ghost cells unless empty (they are not longer ghost cells in this case)
+  return cref.is_ghost_cell () && cref.empty ();
 }
 
 void 
@@ -1599,6 +1605,11 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
     //  cell body 
     const db::Cell &cref (layout.cell (*cell));
     mp_cell = &cref;
+
+    //  skip cell body if the cell is not to be written
+    if (skip_cell_body (cref)) {
+      continue;
+    }
 
     //  cell header
 

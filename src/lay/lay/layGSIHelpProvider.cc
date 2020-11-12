@@ -419,9 +419,6 @@ replace_references (const std::string &t, const gsi::ClassBase *cls_base)
     }
 
     for (RecursiveClassIterator c; ! c.at_end (); ++c) {
-if (id.find ("CellConflict") != std::string::npos) {
-printf("@@@ %s <-> %s\n", c->qname().c_str(), id.c_str()); fflush(stdout);
-}
       if (c->qname () == id) {
         r += "<a href=\"";
         if (mid.empty ()) {

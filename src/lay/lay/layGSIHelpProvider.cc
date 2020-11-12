@@ -318,6 +318,55 @@ real_class (const gsi::ClassBase *cls)
   return cls->declaration () ? cls->declaration () : cls;
 }
 
+namespace {
+
+class RecursiveClassIterator
+{
+public:
+  typedef const gsi::ClassBase &reference;
+  typedef const gsi::ClassBase *pointer;
+
+  RecursiveClassIterator ()
+  {
+    if (gsi::ClassBase::begin_classes () != gsi::ClassBase::end_classes ()) {
+      m_cls_iter_stack.push_back (std::make_pair (gsi::ClassBase::begin_classes (), gsi::ClassBase::end_classes ()));
+    }
+  }
+
+  bool at_end () const
+  {
+    return m_cls_iter_stack.empty ();
+  }
+
+  RecursiveClassIterator &operator++ ()
+  {
+    if (operator* ().begin_child_classes () != operator* ().end_child_classes ()) {
+      m_cls_iter_stack.push_back (std::make_pair (operator* ().begin_child_classes (), operator* ().end_child_classes ()));
+    } else {
+      while (! m_cls_iter_stack.empty () && ++m_cls_iter_stack.back ().first == m_cls_iter_stack.back ().second) {
+        m_cls_iter_stack.pop_back ();
+      }
+    }
+
+    return *this;
+  }
+
+  const gsi::ClassBase &operator* () const
+  {
+    return *m_cls_iter_stack.back ().first;
+  }
+
+  const gsi::ClassBase *operator-> () const
+  {
+    return m_cls_iter_stack.back ().first.operator-> ();
+  }
+
+private:
+  std::list<std::pair<gsi::ClassBase::class_iterator, gsi::ClassBase::class_iterator> > m_cls_iter_stack;
+};
+
+}
+
 static std::string
 replace_references (const std::string &t, const gsi::ClassBase *cls_base)
 {
@@ -341,7 +390,7 @@ replace_references (const std::string &t, const gsi::ClassBase *cls_base)
     r += std::string (t, q, p - q);
 
     size_t pp = ++p;
-    while (p < t.size () && (t[p] == '_' || isalnum (t [p]))) {
+    while (p < t.size () && (t[p] == '_' || t[p] == ':' || isalnum (t [p]))) {
       ++p;
     }
     if (p < t.size () && (t[p] == '?' || t [p] == '=')) {
@@ -369,8 +418,11 @@ replace_references (const std::string &t, const gsi::ClassBase *cls_base)
       found = true;
     }
 
-    for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes () && !found; ++c) {
-      if (c->name () == id) {
+    for (RecursiveClassIterator c; ! c.at_end (); ++c) {
+if (id.find ("CellConflict") != std::string::npos) {
+printf("@@@ %s <-> %s\n", c->qname().c_str(), id.c_str()); fflush(stdout);
+}
+      if (c->qname () == id) {
         r += "<a href=\"";
         if (mid.empty ()) {
           r += escape_xml (class_doc_url (id));

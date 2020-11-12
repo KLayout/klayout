@@ -172,8 +172,8 @@ gsi::ClassExt<db::LoadLayoutOptions> common_reader_options (
     "@brief Gets the cell conflict resolution mode\n"
     "\n"
     "Multiple layout files can be collected into a single Layout object by reading file after file into the Layout object. "
-    "Cells with same names are considered a conflict. This mode indicates how such conflicts are resolved. See \\CellConflictResolution "
-    "for the values allowed. The default mode is \\CellConflictResolution#AddToCell.\n"
+    "Cells with same names are considered a conflict. This mode indicates how such conflicts are resolved. See \\LoadLayoutOptions::CellConflictResolution "
+    "for the values allowed. The default mode is \\LoadLayoutOptions::CellConflictResolution#AddToCell.\n"
     "\n"
     "This option has been introduced in version 0.27."
   ) +

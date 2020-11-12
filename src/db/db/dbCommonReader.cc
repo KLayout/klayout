@@ -305,55 +305,60 @@ CommonReader::finish (db::Layout &layout)
       new_cells.insert (std::make_pair (i->second.second, i->first));
     }
 
-    //  NOTE: by iterating bottom up we don't need to update the layout (we need the parents for merge_cell)
+    std::vector<std::pair<db::cell_index_type, db::cell_index_type> > cells_with_conflict;
+
+    //  First treat all the cells without conflict
     for (db::Layout::bottom_up_iterator bu = layout.begin_bottom_up (); bu != layout.end_bottom_up (); ++bu) {
 
       db::cell_index_type ci_new = *bu;
+      std::map<db::cell_index_type, std::string>::const_iterator i = new_cells.find (ci_new);
 
-      if (new_cells.find (ci_new) == new_cells.end ()) {
+      if (i == new_cells.end ()) {
         //  not a new cell
         continue;
-      } else if (! layout.is_valid_cell_index (ci_new)) {
-        //  this can happen if the new cell has been deleted by "prune_subcells"
-        continue;
       }
-
-      std::map<db::cell_index_type, std::string>::const_iterator i = new_cells.find (ci_new);
 
       std::pair<bool, db::cell_index_type> c2n = layout.cell_by_name (i->second.c_str ());
       db::cell_index_type ci_org = c2n.second;
 
-      if (c2n.first) {
+      //  NOTE: proxy cells are never resolved. "RenameCell" is a plain and simple case.
+      if (c2n.first && m_cc_resolution != RenameCell && ! layout.cell (ci_org).is_proxy ()) {
+        cells_with_conflict.push_back (std::make_pair (ci_new, ci_org));
+      } else {
+        layout.rename_cell (ci_new, layout.uniquify_cell_name (i->second.c_str ()).c_str ());
+      }
 
-        if (m_cc_resolution == RenameCell || layout.cell (ci_org).is_proxy ()) {
+    }
 
-          //  NOTE: we never reopen proxies (they are always local to their layout). Instead we
-          //  always rename for proxies
-          layout.rename_cell (ci_new, layout.uniquify_cell_name (i->second.c_str ()).c_str ());
+    //  Then treat all the cells with conflict
+    for (std::vector<std::pair<db::cell_index_type, db::cell_index_type> >::const_iterator cc = cells_with_conflict.begin (); cc != cells_with_conflict.end (); ++cc) {
 
-        } else {
+      db::cell_index_type ci_new = cc->first;
+      db::cell_index_type ci_org = cc->second;
 
-          //  we have a cell conflict
+      //  we have a cell conflict
 
-          if (m_cc_resolution == OverwriteCell && ! layout.cell (ci_new).is_ghost_cell ()) {
+      layout.force_update ();
 
-            layout.prune_subcells (ci_org);
-            layout.cell (ci_org).clear_shapes ();
+      if (m_cc_resolution == OverwriteCell && ! layout.cell (ci_new).is_ghost_cell ()) {
 
-          } else if (m_cc_resolution == SkipNewCell && ! layout.cell (ci_org).is_ghost_cell ()) {
+        layout.prune_subcells (ci_org);
+        layout.cell (ci_org).clear_shapes ();
 
-            layout.prune_subcells (ci_new);
-            layout.cell (ci_new).clear_shapes ();
+        merge_cell (layout, ci_org, ci_new);
 
-          }
+      } else if (m_cc_resolution == SkipNewCell && ! layout.cell (ci_org).is_ghost_cell ()) {
 
-          merge_cell (layout, ci_org, ci_new);
+        layout.prune_subcells (ci_new);
+        layout.cell (ci_new).clear_shapes ();
 
-        }
+        //  we need the instances of the cell we just cleaned
+        layout.force_update ();
+        merge_cell (layout, ci_org, ci_new);
 
       } else {
 
-        layout.rename_cell (ci_new, layout.uniquify_cell_name (i->second.c_str ()).c_str ());
+        merge_cell (layout, ci_org, ci_new);
 
       }
 

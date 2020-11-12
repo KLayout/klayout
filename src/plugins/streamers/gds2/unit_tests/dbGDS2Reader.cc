@@ -436,3 +436,100 @@ TEST(3_AdvancedMapping)
   std::string fn_au (tl::testsrc () + "/testdata/gds/alm_au.gds");
   db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
 }
+
+TEST(4_CollectModeRename)
+{
+  db::Manager m (false);
+  db::Layout layout (&m);
+
+  db::LoadLayoutOptions options;
+  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::CommonReader::RenameCell;
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_basic.gds");
+    db::Reader reader (file);
+    reader.read (layout, options);
+  }
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_added.gds");
+    db::Reader reader (file);
+    reader.read (layout, options);
+  }
+
+  std::string fn_au (tl::testsrc () + "/testdata/gds/collect_rename_au.gds");
+  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+}
+
+TEST(4_CollectModeOverwrite)
+{
+  db::Manager m (false);
+  db::Layout layout (&m);
+
+  db::LoadLayoutOptions options;
+  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::CommonReader::OverwriteCell;
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_basic.gds");
+    db::Reader reader (file);
+    reader.read (layout, options);
+  }
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_added.gds");
+    db::Reader reader (file);
+    reader.read (layout, options);
+  }
+
+  std::string fn_au (tl::testsrc () + "/testdata/gds/collect_overwrite_au.gds");
+  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+}
+
+TEST(4_CollectModeSkip)
+{
+  db::Manager m (false);
+  db::Layout layout (&m);
+
+  db::LoadLayoutOptions options;
+  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::CommonReader::SkipNewCell;
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_basic.gds");
+    db::Reader reader (file);
+    reader.read (layout, options);
+  }
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_added.gds");
+    db::Reader reader (file);
+    reader.read (layout, options);
+  }
+
+  std::string fn_au (tl::testsrc () + "/testdata/gds/collect_skip_au.gds");
+  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+}
+
+TEST(4_CollectModeAdd)
+{
+  db::Manager m (false);
+  db::Layout layout (&m);
+
+  db::LoadLayoutOptions options;
+  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::CommonReader::AddToCell;
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_basic.gds");
+    db::Reader reader (file);
+    reader.read (layout, options);
+  }
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_added.gds");
+    db::Reader reader (file);
+    reader.read (layout, options);
+  }
+
+  std::string fn_au (tl::testsrc () + "/testdata/gds/collect_add_au.gds");
+  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+}
+

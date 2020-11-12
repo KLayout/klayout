@@ -1809,6 +1809,7 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "If no property with that key exists, it will create one. Using that method is more "
     "convenient than creating a new property set with a new ID and assigning that properties ID.\n"
     "This method may change the properties ID. "
+    "Note: GDS only supports integer keys. OASIS supports numeric and string keys. "
     "\n"
     "This method has been introduced in version 0.23."
   ) + 
@@ -3821,6 +3822,7 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "If no property with that key exists, it will create one. Using that method is more "
     "convenient than creating a new property set with a new ID and assigning that properties ID.\n"
     "This method may change the properties ID. "
+    "Note: GDS only supports integer keys. OASIS supports numeric and string keys. "
     "Calling this method may invalidate any iterators. It should not be called inside a "
     "loop iterating over instances.\n"
     "\n"

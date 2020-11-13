@@ -1038,12 +1038,13 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "This method has been introduced in version 0.24."
   ) + 
   gsi::method_ext ("set_property", &set_layout_property,
-    "@brief Set the user property with the given key to the given value\n"
+    "@brief Sets the user property with the given key to the given value\n"
     "@args key, value\n"
     "This method is a convenience method that sets the property with the given key to the given value. "
     "If no property with that key exists, it will create one. Using that method is more "
     "convenient than creating a new property set with a new ID and assigning that properties ID.\n"
     "This method may change the properties ID. "
+    "Note: GDS only supports integer keys. OASIS supports numeric and string keys. "
     "\n"
     "This method has been introduced in version 0.24."
   ) + 

@@ -13,13 +13,13 @@
   </p>
 
   <ul>
-    <li><b>Shallow delete:</b> Just the cell (it's shapes and instances) are deleted, not
+    <li><b>Shallow delete:</b> Just the cell (its shapes and instances) are deleted, not
       any cells referenced by this cell. Since cells might no longer be referenced after
       that, they may appear as new top cells in the layout.</li>
-    <li><b>Deep delete:</b> The cell and all it's subcells are deleted, unless the subcells are
+    <li><b>Deep delete:</b> The cell and all its subcells are deleted, unless the subcells are
       referenced otherwise (by cells that are not deleted).
       In this delete mode a complete hierarchy of cells can be removed without side effects.</li>
-    <li><b>Complete delete:</b> The cell and all it's subcells are deleted, even if other cells
+    <li><b>Complete delete:</b> The cell and all its subcells are deleted, even if other cells
       would reference these subcells.</li>
   </ul>
 

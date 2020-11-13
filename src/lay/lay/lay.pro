@@ -190,6 +190,10 @@ win32 {
   LIBS += -lpsapi -ldbghelp
 }
 
+*bsd* {
+  LIBS += -lexecinfo
+}
+
 # Note: this accounts for UI-generated headers placed into the output folders in
 # shadow builds:
 INCLUDEPATH += $$DESTDIR/laybasic/laybasic

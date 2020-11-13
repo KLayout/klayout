@@ -679,9 +679,16 @@ class QtBinding_TestClass < TestBase
 
     w = RBA::QObject::new
 
-    on = nil
-    w.objectNameChanged do |name|
-      on = name
+    if w.respond_to?(:objectNameChanged)   # Qt5
+
+      on = nil
+      w.objectNameChanged do |name|
+        on = name
+      end
+
+      w.objectName = "uvw"
+      assert_equal(on, "uvw")
+
     end
 
     od = false
@@ -689,12 +696,7 @@ class QtBinding_TestClass < TestBase
       od = true
     end
 
-    w.objectName = "uvw"
-
-    assert_equal(on, "uvw")
-
     w._destroy
-
     assert_equal(od, true)
 
   end

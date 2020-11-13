@@ -179,8 +179,8 @@ def SetGlobals():
 # The package directory name should look like:
 #     * ST-qt5MP.pkg.macos-Catalina-release-RsysPsys      --- (1)
 #     * LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
-#     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb26Phb37
-#     * LW-qt5MP.pkg.macos-Catalina-release-Rmp26Pmp37
+#     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb26Phb38
+#     * LW-qt5MP.pkg.macos-Catalina-release-Rmp26Pmp38
 #
 # Generated DMG will be, for example,
 #     (1) ---> ST-klayout-0.26.1-macOS-Catalina-1-qt5MP-RsysPsys.dmg
@@ -221,9 +221,9 @@ def CheckPkgDirectory():
   #
   #     * ST-qt5MP.pkg.macos-Catalina-release-RsysPsys
   #     * LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
-  #     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb27Phb37
-  #     * HW-qt5Brew.pkg.macos-Catalina-release-RsysPhb37
-  #     * EX-qt5MP.pkg.macos-Catalina-release-Rmp26Pmp37
+  #     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb27Phb38
+  #     * HW-qt5Brew.pkg.macos-Catalina-release-RsysPhb38
+  #     * EX-qt5MP.pkg.macos-Catalina-release-Rmp26Pmp38
   #-----------------------------------------------------------------------------
   patQRP = u'(ST|LW|HW|EX)([-])(qt5[0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-]release[-])([0-9A-Za-z]+)'
   regQRP = re.compile(patQRP)
@@ -243,12 +243,12 @@ def CheckPkgDirectory():
   LatestOSMacPorts   = Platform == LatestOS
   LatestOSMacPorts  &= PackagePrefix == "LW"
   LatestOSMacPorts  &= QtIdentification == "qt5MP"
-  LatestOSMacPorts  &= RubyPythonID == "Rmp26Pmp37"
+  LatestOSMacPorts  &= RubyPythonID == "Rmp26Pmp38"
 
   LatestOSHomebrew   = Platform == LatestOS
   LatestOSHomebrew  &= PackagePrefix == "LW"
   LatestOSHomebrew  &= QtIdentification == "qt5Brew"
-  LatestOSHomebrew  &= RubyPythonID == "Rhb27Phb37"
+  LatestOSHomebrew  &= RubyPythonID == "Rhb27Phb38"
 
   LatestOSAnaconda3  = Platform == LatestOS
   LatestOSAnaconda3 &= PackagePrefix == "LW"

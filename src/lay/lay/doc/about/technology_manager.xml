@@ -37,7 +37,7 @@
       edited. Instead, a library installed in the system comes with a technology 
       association itself.</li>
     <li>File format options: technology specific file reader or writer options can be
-      given. When a layout is saved, it will use the writer options from it's technology.
+      given. When a layout is saved, it will use the writer options from its technology.
       When loading a layout, the reader options from the active technology will be used.</li>
   </ul>
 

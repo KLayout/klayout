@@ -162,7 +162,7 @@ module DRC
     # @li \global#capacitor_with_bulk - A capacitor with a separate bulk terminal @/li
     # @/ul
     #
-    # Each device class (e.g. n-MOS/p-MOS or high Vt/low Vt) needs it's own instance
+    # Each device class (e.g. n-MOS/p-MOS or high Vt/low Vt) needs its own instance
     # of device extractor. The device extractor beside the algorithm and specific 
     # extraction settings defines the name of the device to be built.
     #

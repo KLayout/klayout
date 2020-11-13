@@ -51,7 +51,7 @@ void NetlistExtractor::set_include_floating_subcircuits (bool f)
 }
 
 static void
-build_net_name_equivalence (const db::Layout *layout, db::property_names_id_type net_name_id, const std::string &joined_net_names, tl::equivalence_clusters<size_t> &eq)
+build_net_name_equivalence (const db::Layout *layout, const db::Connectivity &conn, db::property_names_id_type net_name_id, const std::string &joined_net_names, tl::equivalence_clusters<size_t> &eq)
 {
   std::map<std::string, std::set<size_t> > prop_by_name;
   tl::GlobPattern jn_pattern (joined_net_names);
@@ -64,6 +64,14 @@ build_net_name_equivalence (const db::Layout *layout, db::property_names_id_type
           prop_by_name [nn].insert (db::prop_id_to_attr (i->first));
         }
       }
+    }
+  }
+
+  //  include pseudo-attributes for global nets to implement "join_with" for global nets
+  for (size_t gid = 0; gid < conn.global_nets (); ++gid) {
+    const std::string &gn = conn.global_net_name (gid);
+    if (jn_pattern.match (gn)) {
+      prop_by_name [gn].insert (db::global_net_id_to_attr (gid));
     }
   }
 
@@ -107,12 +115,12 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
   std::map<db::cell_index_type, tl::equivalence_clusters<size_t> > net_name_equivalence;
   if (m_text_annot_name_id.first) {
     if (! m_joined_net_names.empty ()) {
-      build_net_name_equivalence (mp_layout, m_text_annot_name_id.second, m_joined_net_names, net_name_equivalence [hier_clusters_type::top_cell_index]);
+      build_net_name_equivalence (mp_layout, conn, m_text_annot_name_id.second, m_joined_net_names, net_name_equivalence [hier_clusters_type::top_cell_index]);
     }
     for (std::list<std::pair<std::string, std::string> >::const_iterator m = m_joined_net_names_per_cell.begin (); m != m_joined_net_names_per_cell.end (); ++m) {
       std::pair<bool, db::cell_index_type> cp = mp_layout->cell_by_name (m->first.c_str ());
       if (cp.first) {
-        build_net_name_equivalence (mp_layout, m_text_annot_name_id.second, m->second, net_name_equivalence [cp.second]);
+        build_net_name_equivalence (mp_layout, conn, m_text_annot_name_id.second, m->second, net_name_equivalence [cp.second]);
       }
     }
   }
@@ -313,7 +321,7 @@ void NetlistExtractor::collect_labels (const connected_clusters_type &clusters,
 
       }
 
-    } else {
+    } else if (db::is_text_ref_attr (*a)) {
 
       net_names.insert (db::text_from_attr (*a));
 

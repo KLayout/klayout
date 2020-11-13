@@ -130,7 +130,7 @@
   <p>
   If the match expression includes a numerical range or wildcards
   for the layer or datatype number, by default all these layers
-  will be combined into a single one, where it's layer or datatype number is derived
+  will be combined into a single one, where its layer or datatype number is derived
   from the least permitted number.
   </p>
 

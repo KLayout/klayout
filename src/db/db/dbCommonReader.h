@@ -141,6 +141,11 @@ protected:
    */
   void merge_cell (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index) const;
 
+  /**
+   * @brief Merge (and delete) the src_cell into target_cell without instances
+   */
+  void merge_cell_without_instances (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index) const;
+
 private:
   std::map<size_t, std::pair<std::string, db::cell_index_type> > m_id_map;
   std::map<std::string, std::pair<size_t, db::cell_index_type> > m_name_map;

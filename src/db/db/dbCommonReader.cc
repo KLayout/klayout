@@ -237,8 +237,20 @@ CommonReader::merge_cell (db::Layout &layout, db::cell_index_type target_cell_in
 
   //  copy over the instances
   for (db::Cell::const_iterator i = src_cell.begin (); ! i.at_end (); ++i) {
-    target_cell.insert (*i);
+    //  NOTE: cell indexed may be invalid because we delete subcells without update()
+    if (layout.is_valid_cell_index (i->cell_index ())) {
+      target_cell.insert (*i);
+    }
   }
+
+  merge_cell_without_instances (layout, target_cell_index, src_cell_index);
+}
+
+void
+CommonReader::merge_cell_without_instances (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index) const
+{
+  const db::Cell &src_cell = layout.cell (src_cell_index);
+  db::Cell &target_cell = layout.cell (target_cell_index);
 
   //  copy over the shapes
   for (unsigned int l = 0; l < layout.layers (); ++l) {
@@ -338,11 +350,17 @@ CommonReader::finish (db::Layout &layout)
 
       //  we have a cell conflict
 
-      layout.force_update ();
-
       if (m_cc_resolution == OverwriteCell && ! layout.cell (ci_new).is_ghost_cell ()) {
 
-        layout.prune_subcells (ci_org);
+        if (! layout.cell (ci_org).begin ().at_end ()) {
+
+          //  NOTE: because prune_subcells needs the parents for sub cells and we are going do delete
+          //  the current cell, we cannot save the "update()" just by traversing bottom-up.
+          layout.force_update ();
+          layout.prune_subcells (ci_org);
+
+        }
+
         layout.cell (ci_org).clear_shapes ();
 
         merge_cell (layout, ci_org, ci_new);
@@ -352,9 +370,8 @@ CommonReader::finish (db::Layout &layout)
         layout.prune_subcells (ci_new);
         layout.cell (ci_new).clear_shapes ();
 
-        //  we need the instances of the cell we just cleaned
-        layout.force_update ();
-        merge_cell (layout, ci_org, ci_new);
+        //  NOTE: ignore instances -> this saves us a layout update
+        merge_cell_without_instances (layout, ci_org, ci_new);
 
       } else {
 

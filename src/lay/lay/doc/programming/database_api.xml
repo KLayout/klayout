@@ -473,6 +473,13 @@ shape.set_property(1, "NewValue")</pre>
   and "delete_property" also are provided for cells and cell instances (<class_doc href="Cell"/> and <class_doc href="Instance"/>).
   </p>
 
+  <p>
+  <b>Note:</b> The GDS format does not have string names for properties. As a result GDS only supports numeric property keys.
+  OASIS, on the other hand, can handle string and numeric property "names". When saving layouts in GDS format, KLayout tries
+  to convert the properties' names into numbers if possible (i.e. if it sees that the string is a number). If it can't, then
+  the property is not saved. When the layout is read by KLayout upon opening, it gets converted to integer.
+  </p>
+
   <h2>The LayerInfo class</h2>
 
   <keyword name="LayerInfo"/>

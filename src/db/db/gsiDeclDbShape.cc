@@ -1292,6 +1292,7 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "If no property with that key exists, it will create one. Using that method is more "
     "convenient than creating a new property set with a new ID and assigning that properties ID.\n"
     "This method may change the properties ID. "
+    "Note: GDS only supports integer keys. OASIS supports numeric and string keys. "
     "Calling this method will invalidate any iterators. It should not be called inside a "
     "loop iterating over shapes.\n"
     "\n"

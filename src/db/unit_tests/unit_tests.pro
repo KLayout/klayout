@@ -34,6 +34,7 @@ SOURCES = \
     dbPolygonToolsTests.cc \
     dbTechnologyTests.cc \
     dbStreamLayerTests.cc \
+    dbD25TechnologyComponentTests.cc \
     dbVectorTests.cc \
     dbVariableWidthPathTests.cc \
     dbTransTests.cc \

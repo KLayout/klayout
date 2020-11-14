@@ -32,6 +32,128 @@ namespace db
 {
 
 /**
+ *  @brief A common reader base for GDS2 and OASIS providing common services for both readers
+ */
+class DB_PUBLIC CommonReader
+  : public ReaderBase
+{
+public:
+  /**
+   *  @brief The CellConflictResolution enum
+   */
+  enum CellConflictResolution
+  {
+    AddToCell = 0,
+    OverwriteCell = 1,
+    SkipNewCell = 2,
+    RenameCell = 3
+  };
+
+  /**
+   *  @brief Constructor
+   */
+  CommonReader ();
+
+  /**
+   *  @brief Sets the cell name conflict resolution mode
+   */
+  void set_cell_conflict_resolution (CellConflictResolution cc_resolution)
+  {
+    m_cc_resolution = cc_resolution;
+  }
+
+  /**
+   *  @brief Sets the cell name conflict resolution mode
+   */
+  CellConflictResolution cell_conflict_resolution () const
+  {
+    return m_cc_resolution;
+  }
+
+  /**
+   *  @brief Make a cell from a name
+   */
+  db::cell_index_type make_cell (db::Layout &layout, const std::string &cn);
+
+  /**
+   *  @brief Returns true, if there is a cell with the given name already
+   */
+  bool has_cell (const std::string &cn) const;
+
+  /**
+   *  @brief Returns a pair with a bool (indicating whether the cell name is known) and the cell index for this name
+   */
+  std::pair<bool, db::cell_index_type> cell_by_name (const std::string &name) const;
+
+  /**
+   *  @brief Make a cell from an ID (OASIS)
+   */
+  db::cell_index_type make_cell (db::Layout &layout, size_t id);
+
+  /**
+   *  @brief Returns true, if there is a cell with the given ID alreay
+   */
+  bool has_cell (size_t id) const;
+
+  /**
+   *  @brief Returns a pair with a bool (indicating whether the cell ID is known) and the cell index for this ID
+   */
+  std::pair<bool, db::cell_index_type> cell_by_id (size_t id) const;
+
+  /**
+   *  @brief Registers a cell name for an ID
+   */
+  void rename_cell (db::Layout &layout, size_t id, const std::string &cn);
+
+  /**
+   *  @brief Gets the name for a given cell ID if known, otherwise returns an empty string
+   */
+  const std::string &name_for_id (size_t id) const;
+
+  /**
+   *  @brief Returns a cell reference by ID
+   *  If the cell does not exist, it's created. It is marked as ghost cell until
+   *  "make_cell" is called.
+   */
+  db::cell_index_type cell_for_instance (db::Layout &layout, size_t id);
+
+  /**
+   *  @brief Returns a cell reference by name
+   *  Same as the previous method, but acting on cell names.
+   */
+  db::cell_index_type cell_for_instance (db::Layout &layout, const std::string &cn);
+
+  /**
+   *  @brief Finishes the reading process
+   *
+   *  This method will first check if all cells IDs got a name.
+   *  After this, the cells are renamed and cell conflict resolution will happen in the
+   *  specified way (cell_conflict_resolution attribute).
+   */
+  void finish (db::Layout &layout);
+
+protected:
+  virtual void common_reader_error (const std::string &msg) = 0;
+  virtual void common_reader_warn (const std::string &msg) = 0;
+
+  /**
+   * @brief Merge (and delete) the src_cell into target_cell
+   */
+  void merge_cell (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index) const;
+
+  /**
+   * @brief Merge (and delete) the src_cell into target_cell without instances
+   */
+  void merge_cell_without_instances (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index) const;
+
+private:
+  std::map<size_t, std::pair<std::string, db::cell_index_type> > m_id_map;
+  std::map<std::string, std::pair<size_t, db::cell_index_type> > m_name_map;
+  std::map<size_t, std::string> m_name_for_id;
+  CellConflictResolution m_cc_resolution;
+};
+
+/**
  *  @brief Structure that holds the GDS2 and OASIS specific options for the reader
  */
 class DB_PUBLIC CommonReaderOptions
@@ -44,7 +166,8 @@ public:
   CommonReaderOptions ()
     : create_other_layers (true),
       enable_text_objects (true),
-      enable_properties (true)
+      enable_properties (true),
+      cell_conflict_resolution (CommonReader::AddToCell)
   {
     //  .. nothing yet ..
   }
@@ -82,6 +205,22 @@ public:
    *  If this flag is set to true, user properties are read. Otherwise they are ignored.
    */
   bool enable_properties;
+
+  /**
+   *  @brief Specifies the cell merge behavior
+   *
+   *  This enum controls how cells are read if a cell with the requested name already
+   *  exists.
+   *
+   *  AddToCell       In this mode, instances or shapes are added to any existing cell
+   *  OverwriteCell   Overwrite existing cell. If the existing cell has children, those are removed unless used otherwise
+   *  SkipNewCell     Ignore the new cell and it's children
+   *  RenameCell      Rename the new cell
+   *
+   *  If the existing opr the new cell is a ghost cell, AddToCell is applied always. In other words,
+   *  ghost cells are always merged.
+   */
+  CommonReader::CellConflictResolution cell_conflict_resolution;
 
   /** 
    *  @brief Implementation of FormatSpecificReaderOptions

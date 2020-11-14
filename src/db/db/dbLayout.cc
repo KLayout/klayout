@@ -1068,14 +1068,41 @@ Layout::add_cell (const char *name)
   return new_index;
 }
 
+cell_index_type
+Layout::add_anonymous_cell ()
+{
+  std::string b;
+
+  //  create a new cell
+  cell_index_type new_index = allocate_new_cell ();
+
+  cell_type *new_cell = new cell_type (new_index, *this);
+  m_cells.push_back_ptr (new_cell);
+  m_cell_ptrs [new_index] = new_cell;
+
+  //  enter it's index and cell_name
+  register_cell_name (0, new_index);
+
+  if (manager () && manager ()->transacting ()) {
+    manager ()->queue (this, new NewRemoveCellOp (new_index, m_cell_names [new_index], false /*new*/, 0));
+  }
+
+  return new_index;
+}
+
 void 
 Layout::register_cell_name (const char *name, cell_index_type ci)
 {
   //  enter it's index and cell_name
   char *cp;
 
-  cp = new char [strlen (name) + 1];
-  strcpy (cp, name);
+  if (name == 0) {
+    cp = new char [1];
+    *cp = 0;
+  } else {
+    cp = new char [strlen (name) + 1];
+    strcpy (cp, name);
+  }
 
   while (m_cell_names.size () < ci) {
     char *e = new char [1];
@@ -1090,7 +1117,9 @@ Layout::register_cell_name (const char *name, cell_index_type ci)
     m_cell_names.push_back (cp);
   }
 
-  m_cell_map.insert (std::make_pair (cp, ci));
+  if (name) {
+    m_cell_map.insert (std::make_pair (cp, ci));
+  }
 }
 
 void

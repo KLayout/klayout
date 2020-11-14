@@ -53,6 +53,14 @@ class DBReaders_TestClass < TestBase
     opt.properties_enabled = false
     assert_equal(opt.properties_enabled?, false)
 
+    assert_equal(opt.cell_conflict_resolution, RBA::LoadLayoutOptions::AddToCell)
+    opt.cell_conflict_resolution = RBA::LoadLayoutOptions::OverwriteCell
+    assert_equal(opt.cell_conflict_resolution, RBA::LoadLayoutOptions::OverwriteCell)
+    opt.cell_conflict_resolution = RBA::LoadLayoutOptions::SkipNewCell
+    assert_equal(opt.cell_conflict_resolution, RBA::LoadLayoutOptions::SkipNewCell)
+    opt.cell_conflict_resolution = RBA::LoadLayoutOptions::RenameCell
+    assert_equal(opt.cell_conflict_resolution, RBA::LoadLayoutOptions::RenameCell)
+
   end
 
   # GDS2 Options

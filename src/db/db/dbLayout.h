@@ -727,7 +727,17 @@ public:
    */
   cell_index_type add_cell (const char *name = 0);
 
-  /** 
+  /**
+   *  @brief Add a cell without a name
+   *
+   *  The cell is created, but cannot be found by name. The name returned is an empty string.
+   *  The cell is created with the purpose of being renamed later.
+   *
+   *  @return The index of the new cell
+   */
+  cell_index_type add_anonymous_cell ();
+
+  /**
    *  @brief Rename a cell
    *
    *  Rename the cell with the given id.
@@ -1065,8 +1075,7 @@ public:
    *  @brief Delete the subcells of the given cells which are not used otherwise
    *
    *  All subcells referenced directy or indirectly but not used otherwise
-   *  are deleted as well. This basically prunes the cell tree by this cell.
-   *  All instances of this cell are deleted as well.
+   *  are deleted as well.
    *  This method is more efficent than calling prune_subcells for single cells multiple times.
    *
    *  @param from A begin iterator delivering the cell id's to delete
@@ -1085,8 +1094,7 @@ public:
    *  @brief Delete the subcells of the given cells which are not used otherwise
    *
    *  All subcells referenced directy or indirectly but not used otherwise
-   *  are deleted as well. This basically prunes the cell tree by this cell.
-   *  All instances of this cell are deleted as well.
+   *  are deleted as well.
    *  This method is more efficent than calling prune_subcells for single cells multiple times.
    *
    *  @param cells A set of cell id's to prune

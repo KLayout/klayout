@@ -33,6 +33,7 @@
 #include "dbOASISFormat.h"
 #include "dbStreamLayers.h"
 #include "dbPropertiesRepository.h"
+#include "dbCommonReader.h"
 
 #include "tlException.h"
 #include "tlInternational.h"
@@ -62,7 +63,7 @@ public:
  *  @brief The OASIS format stream reader
  */
 class DB_PLUGIN_PUBLIC OASISReader
-  : public ReaderBase, 
+  : public CommonReader,
     public OASISDiagnostics
 {
 public: 
@@ -118,6 +119,7 @@ public:
    */
   virtual const char *format () const { return "OASIS"; }
 
+protected:
   /**
    *  @brief Issue an error with positional information
    *
@@ -131,6 +133,9 @@ public:
    *  Reimplements OASISDiagnostics
    */
   virtual void warn (const std::string &txt);
+
+  virtual void common_reader_error (const std::string &msg) { error (msg); }
+  virtual void common_reader_warn (const std::string &msg) { warn (msg); }
 
 private:
   friend class OASISReaderLayerMapping;
@@ -194,7 +199,6 @@ private:
   modal_variable<bool> mm_last_property_is_sprop;
   modal_variable<property_value_list> mm_last_value_list;
 
-  std::map <unsigned long, std::string> m_cellnames;
   std::map <unsigned long, db::properties_id_type> m_cellname_properties;
   std::map <unsigned long, std::string> m_textstrings;
   std::map <unsigned long, const db::StringRef *> m_text_forward_references;
@@ -205,17 +209,10 @@ private:
   tl::vector<db::CellInstArray> m_instances;
   tl::vector<db::CellInstArrayWithProperties> m_instances_with_props;
 
-  std::map <unsigned long, db::cell_index_type> m_cells_by_id;
-  std::map <unsigned long, db::cell_index_type> m_forward_references;
-  std::map <std::string, db::cell_index_type> m_cells_by_name;
   bool m_create_layers;
   bool m_read_texts;
   bool m_read_properties;
   bool m_read_all_properties;
-
-  std::set <unsigned long> m_defined_cells_by_id;
-  std::set <std::string> m_defined_cells_by_name;
-  std::map <tl::string, tl::string> m_mapped_cellnames;
 
   std::map <unsigned long, db::property_names_id_type> m_propname_forward_references;
   std::map <unsigned long, std::string> m_propvalue_forward_references;
@@ -238,7 +235,6 @@ private:
   void do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index_type cell_index, db::Layout &layout);
   void do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index, db::Layout &layout);
   void do_read_circle (bool xy_absolute,db::cell_index_type cell_index, db::Layout &layout);
-  db::cell_index_type make_cell (db::Layout &layout, const char *cn, bool for_instance);
 
   void reset_modal_variables ();
 

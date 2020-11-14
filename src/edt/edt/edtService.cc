@@ -60,49 +60,8 @@ ac_from_buttons (unsigned int buttons)
 
 // -------------------------------------------------------------
 
-std::string pcell_parameters_to_string (const std::map<std::string, tl::Variant> &parameters)
-{
-  std::string param;
-
-  param = "!";  //  flags PCells
-  for (std::map<std::string, tl::Variant>::const_iterator p = parameters.begin (); p != parameters.end (); ++p) {
-    param += tl::to_word_or_quoted_string (p->first);
-    param += ":";
-    param += p->second.to_parsable_string ();
-    param += ";";
-  }
-
-  return param;
-}
-
-std::map<std::string, tl::Variant> pcell_parameters_from_string (const std::string &s)
-{
-  tl::Extractor ex (s.c_str ());
-  std::map<std::string, tl::Variant> pm;
-
-  ex.test ("!");
-
-  try {
-    while (! ex.at_end ()) {
-      std::string n;
-      ex.read_word_or_quoted (n);
-      ex.test (":");
-      ex.read (pm.insert (std::make_pair (n, tl::Variant ())).first->second);
-      ex.test (";");
-    }
-  } catch (...) {
-    //  ignore errors
-  }
-
-  return pm;
-}
-
-// -------------------------------------------------------------
-
 Service::Service (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator::flags_type flags)
-  : lay::ViewService (view->view_object_widget ()), 
-    lay::Editable (view),
-    lay::Plugin (view),
+  : lay::EditorServiceBase (view),
     db::Object (manager),
     mp_view (view),
     mp_transient_marker (0), 
@@ -122,9 +81,7 @@ Service::Service (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator
 }
 
 Service::Service (db::Manager *manager, lay::LayoutView *view)
-  : lay::ViewService (view->view_object_widget ()), 
-    lay::Editable (view),
-    lay::Plugin (view),
+  : lay::EditorServiceBase (view),
     db::Object (manager),
     mp_view (view),
     mp_transient_marker (0), 
@@ -217,18 +174,30 @@ Service::snap (const db::DPoint &p, const db::DPoint &plast, bool connect) const
 
 const int sr_pixels = 8; // TODO: make variable
 
-db::DPoint 
-Service::snap2 (const db::DPoint &p) const
+lay::PointSnapToObjectResult
+Service::snap2_details (const db::DPoint &p) const
 {
   double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (sr_pixels);
-  return lay::obj_snap (m_snap_to_objects ? view () : 0, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, snap_range).second;
+  return lay::obj_snap (m_snap_to_objects ? view () : 0, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, snap_range);
+}
+
+db::DPoint
+Service::snap2 (const db::DPoint &p) const
+{
+  return snap2_details (p).snapped_point;
 }
 
 db::DPoint 
 Service::snap2 (const db::DPoint &p, const db::DPoint &plast, bool connect) const
 {
   double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (sr_pixels);
-  return lay::obj_snap (m_snap_to_objects ? view () : 0, plast, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, connect ? connect_ac () : move_ac (), snap_range).second;
+  return lay::obj_snap (m_snap_to_objects ? view () : 0, plast, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, connect ? connect_ac () : move_ac (), snap_range).snapped_point;
+}
+
+void
+Service::service_configuration_changed ()
+{
+  //  The base class implementation does nothing
 }
 
 bool
@@ -238,27 +207,60 @@ Service::configure (const std::string &name, const std::string &value)
   edt::ACConverter acc;
 
   if (name == cfg_edit_global_grid) {
+
     egc.from_string (value, m_global_grid);
+    service_configuration_changed ();
+
   } else if (name == cfg_edit_show_shapes_of_instances) {
+
     tl::from_string (value, m_show_shapes_of_instances);
+    service_configuration_changed ();
+
   } else if (name == cfg_edit_max_shapes_of_instances) {
+
     tl::from_string (value, m_max_shapes_of_instances);
+    service_configuration_changed ();
+
   } else if (name == cfg_edit_grid) {
+
     egc.from_string (value, m_edit_grid);
+    service_configuration_changed ();
+
     return true;  //  taken
+
   } else if (name == cfg_edit_snap_to_objects) {
+
     tl::from_string (value, m_snap_to_objects);
+    service_configuration_changed ();
+
     return true;  //  taken
+
   } else if (name == cfg_edit_move_angle_mode) {
+
     acc.from_string (value, m_move_ac);
+    service_configuration_changed ();
+
     return true;  //  taken
+
   } else if (name == cfg_edit_connect_angle_mode) {
+
     acc.from_string (value, m_connect_ac);
+    service_configuration_changed ();
+
     return true;  //  taken
+
   } else if (name == cfg_edit_top_level_selection) {
+
     tl::from_string (value, m_top_level_sel);
+    service_configuration_changed ();
+
   } else if (name == cfg_edit_hier_copy_mode) {
+
     tl::from_string (value, m_hier_copy_mode);
+    service_configuration_changed ();
+
+  } else {
+    lay::EditorServiceBase::configure (name, value);
   }
 
   return false;  //  not taken
@@ -710,14 +712,15 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
         //  in this mode, ignore exceptions here since it is rather annoying to have messages popping
         //  up then.
         try {
-          do_begin_edit (p);
-          m_editing = true;
+          begin_edit (p);
         } catch (...) {
           set_edit_marker (0);
         }
       }
       if (m_editing) {
         do_mouse_move (p);
+      } else {
+        do_mouse_move_inactive (p);
       }
 
       m_alt_ac = lay::AC_Global;
@@ -744,8 +747,7 @@ Service::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio
 
         view ()->cancel ();  //  cancel any pending edit operations and clear the selection
         set_edit_marker (0);
-        do_begin_edit (p);
-        m_editing = true;
+        begin_edit (p);
 
       } else {
         if (do_mouse_click (p)) {
@@ -797,22 +799,21 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 void
 Service::activated ()
 {
-  //  make all editor option pages visible
-  activate_service (plugin_declaration (), true);
-
   if (view ()->is_editable ()) {
+
     view ()->cancel ();  //  cancel any pending edit operations and clear the selection
     set_edit_marker (0);
+
     m_immediate = do_activated ();
     m_editing = false;
+
   }
 }
 
 void   
 Service::deactivated ()
 {
-  //  make all editor option pages visible
-  activate_service (plugin_declaration (), false);
+  lay::EditorServiceBase::deactivated ();
 
   edit_cancel ();
 
@@ -1430,6 +1431,19 @@ Service::move_markers (const db::DTrans &t)
     m_move_trans = t;
 
   }
+}
+
+void
+Service::begin_edit (const db::DPoint &p)
+{
+  do_begin_edit (p);
+  m_editing = true;
+}
+
+void
+Service::tap (const db::DPoint & /*initial*/)
+{
+  //  .. nothing here ..
 }
 
 void 

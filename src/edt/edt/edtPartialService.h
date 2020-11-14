@@ -25,10 +25,8 @@
 #ifndef HDR_edtPartialService
 #define HDR_edtPartialService
 
-#include "layEditable.h"
+#include "layEditorServiceBase.h"
 #include "layObjectInstPath.h"
-#include "layLayoutView.h"
-#include "layPlugin.h"
 #include "layViewObject.h"
 #include "layRubberBox.h"
 #include "laySnap.h"
@@ -140,9 +138,7 @@ struct EdgeWithIndex
  */
 class PartialService
   : public QObject,
-    public lay::ViewService,
-    public lay::Editable,
-    public lay::Plugin,
+    public lay::EditorServiceBase,
     public db::Object
 {
 Q_OBJECT
@@ -326,7 +322,7 @@ private:
 
   db::DPoint snap (const db::DPoint &p) const;
   db::DVector snap (const db::DVector &p) const;
-  db::DPoint snap2 (const db::DPoint &p) const;
+  lay::PointSnapToObjectResult snap2 (const db::DPoint &p) const;
 
   void enter_edge (const EdgeWithIndex &e, size_t &nmarker, partial_objects::const_iterator sel, const std::map <PointWithIndex, db::Point> &new_points, const std::map <EdgeWithIndex, db::Edge> &new_edges, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient);
   void enter_vertices (size_t &nmarker, partial_objects::const_iterator sel, const std::map <PointWithIndex, db::Point> &new_points, const std::map <EdgeWithIndex, db::Edge> &new_edges, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool transient);

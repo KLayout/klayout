@@ -706,9 +706,7 @@ View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
 //  ant::Service implementation
 
 Service::Service (db::Manager *manager, lay::LayoutView *view)
-  : lay::ViewService (view->view_object_widget ()), 
-    lay::Editable (view),
-    lay::Plugin (view),
+  : lay::EditorServiceBase (view),
     lay::Drawing (1/*number of planes*/, view->drawings ()),
     db::Object (manager),
     m_halo (true),
@@ -801,7 +799,7 @@ Service::configure (const std::string &name, const std::string &value)
     m_current_template = n;
 
   } else {
-    taken = false;
+    lay::EditorServiceBase::configure (name, value);
   }
 
   return taken;
@@ -1434,14 +1432,14 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
         double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (m_snap_range);
         snap_range *= 0.5;
 
-        std::pair<bool, db::DEdge> ee = lay::obj_snap2 (mp_view, p, g, ac, snap_range, snap_range * 1000.0);
-        if (ee.first) {
+        lay::TwoPointSnapToObjectResult ee = lay::obj_snap2 (mp_view, p, g, ac, snap_range, snap_range * 1000.0);
+        if (ee.any) {
 
           //  begin the transaction
           tl_assert (! manager ()->transacting ());
           manager ()->transaction (tl::to_string (QObject::tr ("Create ruler")));
 
-          m_current = ant::Object (ee.second.p1 (), ee.second.p2 (), 0, tpl);
+          m_current = ant::Object (ee.first, ee.second, 0, tpl);
           show_message ();
 
           insert_ruler (m_current, true);
@@ -1505,17 +1503,31 @@ Service::create_measure_ruler (const db::DPoint &pt, lay::angle_constraint_type 
 
   ant::Template tpl;
 
-  std::pair<bool, db::DEdge> ee = lay::obj_snap2 (mp_view, pt, db::DVector (), ac, snap_range, snap_range * 1000.0);
-  if (ee.first) {
-    return ant::Object (ee.second.p1 (), ee.second.p2 (), 0, tpl);
+  lay::TwoPointSnapToObjectResult ee = lay::obj_snap2 (mp_view, pt, db::DVector (), ac, snap_range, snap_range * 1000.0);
+  if (ee.any) {
+    return ant::Object (ee.first, ee.second, 0, tpl);
   } else {
     return ant::Object (pt, pt, 0, tpl);
   }
 }
 
-bool 
+bool
 Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio) 
 {
+  if (prio) {
+
+    lay::PointSnapToObjectResult snap_details;
+    if (m_drawing) {
+      snap_details = snap2_details (m_p1, p, mp_active_ruler->ruler (), ac_from_buttons (buttons));
+    } else {
+      const ant::Template &tpl = current_template ();
+      snap_details = snap1_details (p, m_obj_snap && tpl.snap ());
+    }
+
+    mouse_cursor_from_snap_details (snap_details);
+
+  }
+
   if (m_drawing && prio) {
 
     set_cursor (lay::Cursor::cross);
@@ -1532,12 +1544,14 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 void 
 Service::deactivated ()
 {
+  lay::EditorServiceBase::deactivated ();
+
   drag_cancel ();
   clear_transient_selection ();
 }
 
-std::pair<bool, db::DPoint> 
-Service::snap1 (const db::DPoint &p, bool obj_snap)
+lay::PointSnapToObjectResult
+Service::snap1_details (const db::DPoint &p, bool obj_snap)
 {
   db::DVector g;
   if (m_grid_snap) {
@@ -1548,9 +1562,16 @@ Service::snap1 (const db::DPoint &p, bool obj_snap)
   return lay::obj_snap (obj_snap ? mp_view : 0, p, g, snap_range);
 }
 
+std::pair<bool, db::DPoint>
+Service::snap1 (const db::DPoint &p, bool obj_snap)
+{
+  lay::PointSnapToObjectResult res = snap1_details (p, obj_snap);
+  return std::make_pair (res.object_snap != lay::PointSnapToObjectResult::NoObject, res.snapped_point);
+}
 
-std::pair <bool, db::DPoint>
-Service::snap2 (const db::DPoint &p1, const db::DPoint &p2, const ant::Object *obj, lay::angle_constraint_type ac)
+
+lay::PointSnapToObjectResult
+Service::snap2_details (const db::DPoint &p1, const db::DPoint &p2, const ant::Object *obj, lay::angle_constraint_type ac)
 {
   db::DVector g;
   if (m_grid_snap) {
@@ -1561,6 +1582,13 @@ Service::snap2 (const db::DPoint &p1, const db::DPoint &p2, const ant::Object *o
   lay::angle_constraint_type snap_mode = ac == lay::AC_Global ? (obj->angle_constraint () == lay::AC_Global ? m_snap_mode : obj->angle_constraint ()) : ac;
 
   return lay::obj_snap (m_obj_snap && obj->snap () ? mp_view : 0, p1, p2, g, snap_mode, snap_range);
+}
+
+std::pair <bool, db::DPoint>
+Service::snap2 (const db::DPoint &p1, const db::DPoint &p2, const ant::Object *obj, lay::angle_constraint_type ac)
+{
+  lay::PointSnapToObjectResult res = snap2_details (p1, p2, obj, ac);
+  return std::make_pair (res.object_snap != lay::PointSnapToObjectResult::NoObject, res.snapped_point);
 }
 
 

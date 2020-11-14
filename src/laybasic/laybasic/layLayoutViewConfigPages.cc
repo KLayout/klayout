@@ -31,6 +31,7 @@
 #include "ui_LayoutViewConfigPage2a.h"
 #include "ui_LayoutViewConfigPage2b.h"
 #include "ui_LayoutViewConfigPage2c.h"
+#include "ui_LayoutViewConfigPage2d.h"
 #include "ui_LayoutViewConfigPage3a.h"
 #include "ui_LayoutViewConfigPage3b.h"
 #include "ui_LayoutViewConfigPage3c.h"
@@ -387,6 +388,42 @@ LayoutViewConfigPage2c::commit (lay::Dispatcher *root)
   root->config_set (cfg_sel_transient_mode, mp_ui->transient_mode_cb->isChecked ());
   root->config_set (cfg_sel_inside_pcells_mode, mp_ui->sel_inside_pcells_cb->isChecked ());
   root->config_set (cfg_search_range, (unsigned int) mp_ui->search_range_spinbx->value ());
+}
+
+// ------------------------------------------------------------
+//  LayoutConfigPage2d implementation
+
+LayoutViewConfigPage2d::LayoutViewConfigPage2d (QWidget *parent)
+  : lay::ConfigPage (parent)
+{
+  mp_ui = new Ui::LayoutViewConfigPage2d ();
+  mp_ui->setupUi (this);
+}
+
+LayoutViewConfigPage2d::~LayoutViewConfigPage2d ()
+{
+  delete mp_ui;
+  mp_ui = 0;
+}
+
+void
+LayoutViewConfigPage2d::setup (lay::Dispatcher *root)
+{
+  QColor color;
+  root->config_get (cfg_tracking_cursor_color, color, lay::ColorConverter ());
+  mp_ui->color_pb->set_color (color);
+
+  bool enabled = 0;
+  root->config_get (cfg_tracking_cursor_enabled, enabled);
+  mp_ui->tracking_cb->setChecked (enabled);
+}
+
+void
+LayoutViewConfigPage2d::commit (lay::Dispatcher *root)
+{
+  lay::ColorConverter cc;
+  root->config_set (cfg_tracking_cursor_color, mp_ui->color_pb->get_color (), cc);
+  root->config_set (cfg_tracking_cursor_enabled, mp_ui->tracking_cb->isChecked ());
 }
 
 // ------------------------------------------------------------
@@ -1516,6 +1553,8 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_sel_halo, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_sel_transient_mode, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_sel_inside_pcells_mode, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_tracking_cursor_enabled, "true"));
+    options.push_back (std::pair<std::string, std::string> (cfg_tracking_cursor_color, cc.to_string (QColor ())));
     options.push_back (std::pair<std::string, std::string> (cfg_background_color, cc.to_string (QColor ())));
     options.push_back (std::pair<std::string, std::string> (cfg_ctx_color, cc.to_string (QColor ())));
     options.push_back (std::pair<std::string, std::string> (cfg_ctx_dimming, "50"));
@@ -1571,6 +1610,7 @@ public:
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|Optimization")),    new LayoutViewConfigPage3f (parent)));
 
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Selection")),   new LayoutViewConfigPage2c (parent)));
+    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Tracking")),    new LayoutViewConfigPage2d (parent)));
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Layer Properties")),  new LayoutViewConfigPage5 (parent)));
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Units")),       new LayoutViewConfigPage3c (parent)));
 

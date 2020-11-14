@@ -27,8 +27,11 @@
 #include <limits>
 #include <list>
 #include <utility>
+#include <vector>
 
 #include <QDialog>
+
+#include "layObjectInstPath.h"
 
 #include "dbInstElement.h"
 #include "dbClipboardData.h"
@@ -41,6 +44,18 @@ namespace lay
 }
 
 namespace edt {
+
+class Service;
+
+/**
+ *  @brief Serializes PCell parameters to a string
+ */
+std::string pcell_parameters_to_string (const std::map<std::string, tl::Variant> &parameters);
+
+/**
+ *  @brief Deerializes PCell parameters from a string
+ */
+std::map<std::string, tl::Variant> pcell_parameters_from_string (const std::string &s);
 
 /**
  *  @brief Fetch PCell parameters from a cell and merge the guiding shapes into them
@@ -77,6 +92,73 @@ public:
 private:
   std::map <unsigned int, std::vector<db::DCplxTrans> > m_per_cv_tv;
   std::map < std::pair<unsigned int, unsigned int>, std::vector<db::DCplxTrans> > m_per_cv_and_layer_tv;
+};
+
+/**
+ *  @brief An iterator for the selected objects of all edt services in a layout view
+ */
+class SelectionIterator
+{
+public:
+  typedef lay::ObjectInstPath value_type;
+  typedef const lay::ObjectInstPath &reference;
+  typedef const lay::ObjectInstPath *pointer;
+
+  /**
+   *  @brief Creates a new iterator iterating over all selected edt objects from the given view
+   *
+   *  If "including_transient" is true, the transient selection will be used as fallback.
+   */
+  SelectionIterator (lay::LayoutView *view, bool including_transient = true);
+
+  /**
+   *  @brief Returns a value indicating whether the transient selection is taken
+   */
+  bool is_transient () const
+  {
+    return m_transient_mode;
+  }
+
+  /**
+   *  @brief Increments the iterator
+   */
+  void operator++ ()
+  {
+    inc ();
+    next ();
+  }
+
+  /**
+   *  @brief Dereferencing
+   */
+  const lay::ObjectInstPath &operator* () const
+  {
+    tl_assert (! at_end ());
+    return *m_current_object;
+  }
+
+  /**
+   *  @brief Arrow operator
+   */
+  const lay::ObjectInstPath *operator-> () const
+  {
+    return & operator* ();
+  }
+
+  /**
+   *  @brief Returns a value indicating whether the iterator has finished
+   */
+  bool at_end () const;
+
+private:
+  void inc ();
+  void next ();
+
+private:
+  std::vector<edt::Service *> mp_edt_services;
+  std::vector<edt::Service *>::const_iterator m_current_service;
+  std::set<lay::ObjectInstPath>::const_iterator m_current_object;
+  bool m_transient_mode;
 };
 
 } // namespace edt

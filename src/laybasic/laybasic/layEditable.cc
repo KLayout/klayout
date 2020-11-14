@@ -80,6 +80,11 @@ Editables::Editables (db::Manager *manager)
 Editables::~Editables ()
 {
   cancel_edits ();
+
+  if (mp_properties_dialog) {
+    delete mp_properties_dialog;
+    mp_properties_dialog = 0;
+  }
 }
 
 void 
@@ -444,6 +449,14 @@ Editables::select (const db::DPoint &pt, lay::Editable::SelectionMode mode)
   signal_selection_changed ();
 }
 
+void
+Editables::repeat_selection (Editable::SelectionMode mode)
+{
+  if (m_last_selected_point.is_point ()) {
+    select (m_last_selected_point, mode);
+  }
+}
+
 bool 
 Editables::begin_move (const db::DPoint &p, lay::angle_constraint_type ac)
 {
@@ -602,9 +615,8 @@ Editables::cancel_edits ()
 {
   //  close the property dialog
   if (mp_properties_dialog) {
-    delete mp_properties_dialog;
+    mp_properties_dialog->hide ();
   }
-  mp_properties_dialog = 0;
 
   //  cancel any edit operations
   for (iterator e = begin (); e != end (); ++e) {
@@ -615,7 +627,15 @@ Editables::cancel_edits ()
 void
 Editables::show_properties (QWidget *parent)
 {
-  cancel_edits ();
+  if (selection_size () == 0) {
+    //  try to use the transient selection for the real one
+    transient_to_selection ();
+  }
+
+  //  re-create a new properties dialog
+  if (mp_properties_dialog) {
+    delete mp_properties_dialog;
+  }
   mp_properties_dialog = new lay::PropertiesDialog (parent, manager (), this);
   mp_properties_dialog->show ();
 }

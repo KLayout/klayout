@@ -32,12 +32,11 @@
 namespace lay
 {
   class CellView;
+  class LayerPropertiesConstIterator;
 }
 
 namespace edt
 {
-
-class PCellParametersDialog;
 
 /**
  *  @brief Implementation of the edt::Service for generic shape editing
@@ -57,15 +56,17 @@ protected:
   db::Cell &cell () const              { return *mp_cell; }
   db::Layout &layout () const          { return *mp_layout; }
 
-  void do_mouse_move_inactive (const db::DPoint &p);
+  virtual void do_mouse_move_inactive (const db::DPoint &p);
+  virtual void tap (const db::DPoint &initial);
 
-  bool configure (const std::string &name, const std::string &value);
-  
+  virtual bool configure (const std::string &name, const std::string &value);
+
 protected:
   std::pair <bool, db::DPoint> interpolate (const db::DPoint &m, const db::DPoint &o, const db::DPoint &p) const;
   void deliver_shape (const db::Polygon &poly);
   void deliver_shape (const db::Path &path);
   void deliver_shape (const db::Box &box);
+  virtual void current_layer_changed () { }
 
 private:
   db::VCplxTrans m_trans;
@@ -74,6 +75,8 @@ private:
   db::Cell *mp_cell;
   db::Layout *mp_layout;
   combine_mode_type m_combine_mode;
+
+  void update_edit_layer (const lay::LayerPropertiesConstIterator &iter);
 };
 
 /**
@@ -88,6 +91,7 @@ public:
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
   virtual void do_begin_edit (const db::DPoint &p);
   virtual void do_mouse_move (const db::DPoint &p);
+  virtual void do_mouse_move_inactive (const db::DPoint &p);
   virtual bool do_mouse_click (const db::DPoint &p);
   virtual void do_finish_edit ();
   virtual void do_cancel_edit ();
@@ -117,6 +121,7 @@ public:
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
   virtual void do_begin_edit (const db::DPoint &p);
   virtual void do_mouse_move (const db::DPoint &p);
+  virtual void do_mouse_move_inactive (const db::DPoint &p);
   virtual bool do_mouse_click (const db::DPoint &p);
   virtual void do_finish_edit ();
   virtual void do_cancel_edit ();
@@ -143,6 +148,7 @@ public:
   virtual void do_begin_edit (const db::DPoint &p);
   virtual void do_mouse_transform (const db::DPoint &p, db::DFTrans trans);
   virtual void do_mouse_move (const db::DPoint &p);
+  virtual void do_mouse_move_inactive (const db::DPoint &p);
   virtual bool do_mouse_click (const db::DPoint &p);
   virtual void do_finish_edit ();
   virtual void do_cancel_edit ();
@@ -174,6 +180,7 @@ public:
   virtual void do_begin_edit (const db::DPoint &p);
   virtual void do_mouse_move (const db::DPoint &p);
   virtual bool do_mouse_click (const db::DPoint &p);
+  virtual void do_mouse_move_inactive (const db::DPoint &p);
   virtual void do_finish_edit ();
   virtual void do_cancel_edit ();
   virtual bool do_activated ();
@@ -206,6 +213,7 @@ public:
   
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
   virtual void do_begin_edit (const db::DPoint &p);
+  virtual void do_mouse_move_inactive (const db::DPoint &p);
   virtual void do_mouse_move (const db::DPoint &p);
   virtual bool do_mouse_click (const db::DPoint &p);
   virtual void do_mouse_transform (const db::DPoint &p, db::DFTrans trans);
@@ -220,6 +228,8 @@ public:
 
 protected:
   bool configure (const std::string &name, const std::string &value);
+  void service_configuration_changed ();
+
   void config_finalize ();
 
 private:
@@ -228,14 +238,16 @@ private:
   bool m_mirror;
   db::DPoint m_disp;
   std::string m_cell_or_pcell_name, m_lib_name;
+  std::string m_cell_or_pcell_name_previous, m_lib_name_previous;
   std::map<std::string, tl::Variant> m_pcell_parameters;
+  std::map<std::pair<std::string, std::string>, std::map<std::string, tl::Variant> > m_stored_pcell_parameters;
   bool m_is_pcell;
   bool m_array;
   unsigned int m_rows, m_columns;
   double m_row_x, m_row_y, m_column_x, m_column_y;
   bool m_place_origin;
   db::Manager::transaction_id_t m_reference_transaction_id;
-  bool m_needs_update;
+  bool m_needs_update, m_parameters_changed;
   bool m_has_valid_cell;
   bool m_in_drag_drop;
   db::cell_index_type m_current_cell;
@@ -243,14 +255,13 @@ private:
   const db::PCellDeclaration *mp_pcell_decl;
   int m_cv_index;
   db::ICplxTrans m_trans;
-  std::auto_ptr<edt::PCellParametersDialog> mp_pcell_parameters_dialog;
 
   void update_marker ();
-  void apply_edits ();
   bool get_inst (db::CellInstArray &inst);
   std::pair<bool, db::cell_index_type> make_cell (const lay::CellView &cv);
   tl::Variant get_default_layer_for_pcell ();
   void sync_to_config ();
+  void switch_cell_or_pcell (bool switch_parameters);
 };
 
 }

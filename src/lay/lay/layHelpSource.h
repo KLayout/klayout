@@ -82,8 +82,9 @@ public:
   virtual QImage get_image (const std::string &url);
   virtual std::string get_css (const std::string &url);
 
-  virtual std::string next_topic (const std::string &url);
+  virtual void search_completers(const std::string &search_string, std::list<std::string> &completers);
 
+  virtual std::string next_topic (const std::string &url);
   virtual std::string prev_topic (const std::string &url);
 
   QDomDocument get_dom (const std::string &u);

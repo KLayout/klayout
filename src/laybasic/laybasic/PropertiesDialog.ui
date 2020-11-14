@@ -17,7 +17,16 @@
    <property name="spacing">
     <number>6</number>
    </property>
-   <property name="margin">
+   <property name="leftMargin">
+    <number>9</number>
+   </property>
+   <property name="topMargin">
+    <number>9</number>
+   </property>
+   <property name="rightMargin">
+    <number>9</number>
+   </property>
+   <property name="bottomMargin">
     <number>9</number>
    </property>
    <item>
@@ -54,7 +63,16 @@
       <property name="spacing">
        <number>6</number>
       </property>
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -69,7 +87,7 @@
          <string>Previous</string>
         </property>
         <property name="icon">
-         <iconset resource="layResources.qrc">
+         <iconset resource="../../lay/lay/layResources.qrc">
           <normaloff>:/left.png</normaloff>:/left.png</iconset>
         </property>
         <property name="default">
@@ -89,11 +107,44 @@
          <string>Next</string>
         </property>
         <property name="icon">
-         <iconset resource="layResources.qrc">
+         <iconset resource="../../lay/lay/layResources.qrc">
           <normaloff>:/right.png</normaloff>:/right.png</iconset>
         </property>
         <property name="default">
          <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>10</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="apply_to_all_cbx">
+        <property name="text">
+         <string>Change all</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="relative_cbx">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Relative</string>
         </property>
        </widget>
       </item>
@@ -121,20 +172,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="apply_button">
-        <property name="text">
-         <string>Apply</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="apply_to_all_button">
-        <property name="text">
-         <string>Apply To All</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QPushButton" name="cancel_button">
         <property name="text">
          <string>Cancel</string>
@@ -148,7 +185,24 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="layResources.qrc"/>
+  <include location="../../lay/lay/layResources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>apply_to_all_cbx</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>relative_cbx</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>260</x>
+     <y>372</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>320</x>
+     <y>372</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

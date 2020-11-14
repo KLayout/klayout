@@ -135,6 +135,8 @@
         <file alias="fit_bottom.png">images/fit_bottom.png</file>
         <file alias="unlocked_16.png">images/unlocked_16.png</file>
         <file alias="locked_16.png">images/locked_16.png</file>
+        <file alias="bookmark.png">images/bookmark.png</file>
+        <file alias="bookmark_16.png">images/bookmark_16.png</file>
     </qresource>
     <qresource prefix="/syntax">
         <file alias="ruby.xml">syntax/ruby.xml</file>

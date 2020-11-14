@@ -27,9 +27,8 @@
 
 #include "edtCommon.h"
 
-#include "layEditable.h"
+#include "layEditorServiceBase.h"
 #include "layPlugin.h"
-#include "layViewObject.h"
 #include "layMarker.h"
 #include "laySnap.h"
 #include "layObjectInstPath.h"
@@ -44,12 +43,14 @@
 #include <vector>
 #include <QColor>
 
+namespace lay {
+  class LayerPropertiesConstIterator;
+}
+
 namespace edt {
 
 class Service;
 class PluginDeclarationBase;
-class EditorOptionsPages;
-class EditorOptionsPage;
 
 // -------------------------------------------------------------
 
@@ -70,9 +71,7 @@ std::map<std::string, tl::Variant> pcell_parameters_from_string (const std::stri
 // -------------------------------------------------------------
 
 class EDT_PUBLIC Service
-  : public lay::ViewService,
-    public lay::Editable,
-    public lay::Plugin,
+  : public lay::EditorServiceBase,
     public db::Object
 {
 public: 
@@ -217,22 +216,6 @@ public:
   }
 
   /**
-   *  @brief Obtain the lay::ViewService interface
-   */
-  lay::ViewService *view_service_interface ()
-  {
-    return this;
-  }
-
-  /**
-   *  @brief Obtain the lay::Editable interface
-   */
-  lay::Editable *editable_interface ()
-  {
-    return this;
-  }
-
-  /**
    *  @brief Get the selection container
    */
   const objects &selection () const
@@ -345,6 +328,11 @@ public:
   virtual void edit_cancel ();
 
   /**
+   *  @brief Triggered by tap - gives the new layer and if required the initial point
+   */
+  virtual void tap (const db::DPoint &initial);
+
+  /**
    *  @brief Delete the selected rulers
    *
    *  Used as implementation for "del" and "cut"
@@ -382,6 +370,11 @@ protected:
    *  @brief Update m_markers to reflect the selection
    */
   void selection_to_view ();
+
+  /**
+   *  @brief starts editing at the given point.
+   */
+  void begin_edit (const db::DPoint &p);
 
   /**
    *  @brief Reimplemented by the specific implementation of the shape editors
@@ -440,6 +433,11 @@ protected:
    *  This method is called when the edit operation should be cancelled
    */
   virtual void do_cancel_edit () { }
+
+  /**
+   *  @brief Called when a configuration parameter provided by the service base class has changed
+   */
+  virtual void service_configuration_changed ();
 
   /**
    *  @brief Install a marker for representing the edited object
@@ -527,6 +525,16 @@ protected:
   {
     return m_max_shapes_of_instances;
   }
+
+  bool editing () const
+  {
+    return m_editing;
+  }
+
+  /**
+   *  @brief Point snapping with detailed return value
+   */
+  lay::PointSnapToObjectResult snap2_details (const db::DPoint &p) const;
 
 private:
   //  The layout view that the editor service is attached to

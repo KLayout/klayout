@@ -64,6 +64,7 @@ private:
   bool m_enable_cb_callback;
 
   const ant::Object &current () const;
+  void get_points(db::DPoint &p1, db::DPoint &p2);
 };
 
 }

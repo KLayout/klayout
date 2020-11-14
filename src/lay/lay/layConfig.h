@@ -40,6 +40,9 @@ static const std::string cfg_synchronized_views ("synchronized-views");
 static const std::string cfg_edit_mode ("edit-mode");
 static const std::string cfg_custom_macro_paths ("custom-macro-paths");
 static const std::string cfg_mru ("mru");
+static const std::string cfg_mru_layer_properties ("mru-layer-properties");
+static const std::string cfg_mru_sessions ("mru-sessions");
+static const std::string cfg_mru_bookmarks ("mru-bookmarks");
 static const std::string cfg_technologies ("technology-data");
 static const std::string cfg_key_bindings ("key-bindings");
 static const std::string cfg_menu_items_hidden ("menu-items-hidden");
@@ -57,6 +60,7 @@ static const std::string cfg_layout_file_watcher_enabled ("layout-file-watcher-e
 static const std::string cfg_window_geometry ("window-geometry");
 static const std::string cfg_micron_digits ("digits-micron");
 static const std::string cfg_dbu_digits ("digits-dbu");
+static const std::string cfg_assistant_bookmarks ("assistant-bookmarks");
 
 }
 

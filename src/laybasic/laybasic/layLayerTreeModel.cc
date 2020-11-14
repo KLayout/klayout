@@ -32,6 +32,7 @@
 #include <QTreeView>
 #include <QModelIndex>
 #include <QString>
+#include <QFontInfo>
 
 #include <string.h>
 
@@ -558,6 +559,161 @@ LayerTreeModel::empty_within_view_predicate (const QModelIndex &index) const
   }
 }
 
+LAYBASIC_PUBLIC
+QIcon
+LayerTreeModel::icon_for_layer (const lay::LayerPropertiesConstIterator &iter, lay::LayoutView *view, unsigned int w, unsigned int h, unsigned int di_off, bool no_state)
+{
+  h = std::max ((unsigned int) 16, h);
+  w = std::max ((unsigned int) 16, w);
+
+  lay::color_t def_color   = 0x808080;
+  lay::color_t fill_color  = iter->has_fill_color (true)  ? iter->eff_fill_color (true)  : def_color;
+  lay::color_t frame_color = iter->has_frame_color (true) ? iter->eff_frame_color (true) : def_color;
+
+  QImage image (w, h, QImage::Format_ARGB32);
+  image.fill (view->background_color ().rgb ());
+
+  //  upper scanline is a dummy one
+  uint32_t *sl0 = (uint32_t *) image.scanLine (0);
+  uint32_t transparent = QColor (Qt::transparent).rgba ();
+  for (size_t i = 0; i < w; ++i) {
+    *sl0++ = transparent;
+  }
+
+  //  TODO: adjust the resolution according to the oversampling mode
+  lay::Bitmap fill (w, h, 1.0);
+  lay::Bitmap frame (w, h, 1.0);
+  lay::Bitmap text (w, h, 1.0);
+  lay::Bitmap vertex (w, h, 1.0);
+
+  unsigned int wp = w - 1;
+
+  if (! no_state && ! iter->visible (true)) {
+
+    wp = w / 4;
+
+    //  Show the arrow if it is invisible also locally.
+    if (! iter->visible (false)) {
+
+      unsigned int aw = h / 4;
+      unsigned int ap = w / 2 - 1;
+      for (unsigned int i = 0; i <= aw; ++i) {
+        text.fill (h / 2 - 1 - i, ap, ap + aw - i + 1);
+        text.fill (h / 2 - 1 + i, ap, ap + aw - i + 1);
+      }
+
+    }
+
+  }
+
+  if (! no_state && view->no_stipples ()) {
+    //  Show a partial stipple pattern only for "no stipple" mode
+    for (unsigned int i = 1; i < h - 2; ++i) {
+      fill.fill (i, w - 1 - w / 4, w);
+    }
+  } else {
+    for (unsigned int i = 1; i < h - 2; ++i) {
+      fill.fill (i, w - 1 - wp, w);
+    }
+  }
+
+  int lw = iter->width (true);
+  if (lw < 0) {
+    //  default line width is 0 for parents and 1 for leafs
+    lw = iter->has_children () ? 0 : 1;
+  }
+
+  int p0 = lw / 2;
+  p0 = std::max (0, std::min (int (w / 4 - 1), p0));
+
+  int p1 = (lw - 1) / 2;
+  p1 = std::max (0, std::min (int (w / 4 - 1), p1));
+
+  int p0x = p0, p1x = p1;
+  unsigned int ddx = 0;
+  unsigned int ddy = h - 2 - p1 - p0;
+  if (iter->xfill (true)) {
+    ddx = wp - p0 - p1 - 1;
+  }
+  unsigned int d = ddx / 2;
+
+  frame.fill (p0, w - 1 - (wp - p1), w);
+  frame.fill (h - 2 - p1, w - 1 - (wp - p1), w);
+
+  for (unsigned int i = p0; i < h - 2; ++i) {
+
+    frame.fill (i, w - 1 - p0, w - p0);
+    frame.fill (i, w - 1 - (wp - p1), w - (wp - p1));
+    frame.fill (i, w - 1 - p0x, w - p0x);
+    frame.fill (i, w - 1 - (wp - p1x), w - (wp - p1x));
+
+    while (d < ddx) {
+      d += ddy;
+      frame.fill (i, w - 1 - p0x, w - p0x);
+      frame.fill (i, w - 1 - (wp - p1x), w - (wp - p1x));
+      ++p0x;
+      ++p1x;
+    }
+
+    if (d >= ddx) {
+      d -= ddx;
+    }
+
+  }
+
+  if (! no_state && ! iter->valid (true)) {
+
+    unsigned int bp = w - 1 - ((w * 7) / 8 - 1);
+    unsigned int be = bp + h / 2;
+    unsigned int bw = h / 4 - 1;
+    unsigned int by = h / 2 - 1;
+
+    for (unsigned int i = 0; i < bw + 2; ++i) {
+      fill.clear (by - i, bp - 1, be);
+      fill.clear (by + i, bp - 1, be);
+    }
+
+    for (unsigned int i = 0; i < bw; ++i) {
+      text.fill (by - i, bp + bw - i - 1, bp + bw - i + 1);
+      text.fill (by - i - 1, bp + bw - i - 1, bp + bw - i + 1);
+      text.fill (by - i, bp + bw + i, bp + bw + i + 2);
+      text.fill (by - i - 1, bp + bw + i, bp + bw + i + 2);
+      text.fill (by + i, bp + bw - i - 1, bp + bw - i + 1);
+      text.fill (by + i + 1, bp + bw - i - 1, bp + bw - i + 1);
+      text.fill (by + i, bp + bw + i, bp + bw + i + 2);
+      text.fill (by + i + 1, bp + bw + i, bp + bw + i + 2);
+    }
+
+  }
+
+  vertex.fill (h / 2 - 1, w - 1 - wp / 2, w - wp / 2);
+
+  lay::ViewOp::Mode mode = lay::ViewOp::Copy;
+
+  //  create fill
+  single_bitmap_to_image (lay::ViewOp (fill_color, mode, 0, iter->eff_dither_pattern (true), di_off), fill, &image, view->dither_pattern (), view->line_styles (), w, h);
+  //  create frame
+  if (lw == 0) {
+    single_bitmap_to_image (lay::ViewOp (frame_color, mode, 0 /*solid line*/, 2 /*dotted*/, 0), frame, &image, view->dither_pattern (), view->line_styles (), w, h);
+  } else {
+    single_bitmap_to_image (lay::ViewOp (frame_color, mode, iter->eff_line_style (true), 0, 0, lay::ViewOp::Rect, lw), frame, &image, view->dither_pattern (), view->line_styles (), w, h);
+  }
+  //  create text
+  single_bitmap_to_image (lay::ViewOp (frame_color, mode, 0, 0, 0), text, &image, view->dither_pattern (), view->line_styles (), w, h);
+  //  create vertex
+  single_bitmap_to_image (lay::ViewOp (frame_color, mode, 0, 0, 0, lay::ViewOp::Cross, iter->marked (true) ? 9/*mark size*/ : 0), vertex, &image, view->dither_pattern (), view->line_styles (),  w, h);
+
+  QPixmap pixmap = QPixmap::fromImage (image); // Qt 4.6.0 workaround
+  return QIcon (pixmap);
+}
+
+QSize
+LayerTreeModel::icon_size () const
+{
+  unsigned int is = ((QFontInfo (m_font).pixelSize () + 15) / 16) * 16;
+  return QSize (is * 2, is);
+}
+
 QVariant 
 LayerTreeModel::data (const QModelIndex &index, int role) const 
 {
@@ -567,6 +723,16 @@ LayerTreeModel::data (const QModelIndex &index, int role) const
     if (iter.is_null () || iter.at_end ()) {
 
       return QVariant ();
+
+    } else if (role == Qt::SizeHintRole) {
+
+      if (index.column () == 0) {
+        //  NOTE: for some reason, the widget clips the icon when inside a tree and needs a some what bigger width ..
+        QSize is = icon_size ();
+        return QVariant (is + QSize (is.width () / 4, 0));
+      } else {
+        return QVariant ();
+      }
 
     } else if (role == Qt::DisplayRole || role == Qt::EditRole) {
 
@@ -593,142 +759,10 @@ LayerTreeModel::data (const QModelIndex &index, int role) const
           }
         }
 
-        unsigned int w = 32;
-        unsigned int h = 16;
-          
+        QSize is = icon_size ();
+
         if (animate_visible) {
-
-          lay::color_t def_color   = 0x808080;
-          lay::color_t fill_color  = iter->has_fill_color (true)  ? iter->eff_fill_color (true)  : def_color;
-          lay::color_t frame_color = iter->has_frame_color (true) ? iter->eff_frame_color (true) : def_color;
-
-          QImage image (w, h, QImage::Format_RGB32);
-          image.fill (m_background_color.rgb ());
-
-          //  TODO: adjust the resolution according to the oversampling mode
-          lay::Bitmap fill (w, h, 1.0);
-          lay::Bitmap frame (w, h, 1.0);
-          lay::Bitmap text (w, h, 1.0);
-          lay::Bitmap vertex (w, h, 1.0);
-
-          unsigned int mask_w      = 31;
-          unsigned int mask_all    = 0xfffffffe;
-          unsigned int mask_left   = 0x80000000;
-          unsigned int mask_right  = 0x00000002;
-          unsigned int mask_center = 0x00010000;
-
-          if (! iter->visible (true)) {
-
-            mask_w      = 8;
-            mask_all    = 0xff800000;
-            mask_left   = 0x80000000;
-            mask_right  = 0x00800000;
-            mask_center = 0x08000000;
-
-            //  Show the arrow if it is invisible also locally.
-            if (! iter->visible (false)) {
-              text.scanline (4) [0]  = 0x00008000 << 1;
-              text.scanline (5) [0]  = 0x00018000 << 1;
-              text.scanline (6) [0]  = 0x00038000 << 1;
-              text.scanline (7) [0]  = 0x00078000 << 1;
-              text.scanline (8) [0]  = 0x00038000 << 1;
-              text.scanline (9) [0]  = 0x00018000 << 1;
-              text.scanline (10) [0] = 0x00008000 << 1;
-            }
-
-          }
-
-          if (mp_view->no_stipples ()) {
-            //  Show a partial stipple pattern only for "no stipple" mode
-            for (unsigned int i = 1; i < h - 2; ++i) {
-              fill.scanline (i) [0] = 0xff800000;
-            }
-          } else {
-            for (unsigned int i = 1; i < h - 2; ++i) {
-              fill.scanline (i) [0] = mask_all;
-            }
-          }
-
-          int lw = iter->width (true);
-          if (lw < 0) {
-            //  default line width is 0 for parents and 1 for leafs
-            lw = iter->has_children () ? 0 : 1;
-          }
-
-          int p0 = lw / 2;
-          int p1 = (lw - 1) / 2;
-          if (p0 < 0) {
-            p0 = 0;
-          } else if (p0 > 7) {
-            p0 = 7;
-          }
-          if (p1 < 0) {
-            p1 = 0;
-          } else if (p1 > 7) {
-            p1 = 7;
-          }
-
-          int p0x = p0, p1x = p1;
-          unsigned int ddx = 0;
-          unsigned int ddy = h - 2 - p1 - p0;
-          if (iter->xfill (true)) {
-            ddx = mask_w - p0 - p1 - 1;
-          }
-          unsigned int d = ddx / 2;
-
-          frame.scanline (p0) [0] = mask_all << p1;
-          for (unsigned int i = p0; i < h - 2; ++i) {
-            frame.scanline (i) [0] |= (mask_left >> p0) | (mask_right << p1);
-            frame.scanline (i) [0] |= (mask_left >> p0x) | (mask_right << p1x);
-            while (d < ddx) {
-              d += ddy;
-              frame.scanline (i) [0] |= (mask_left >> p0x) | (mask_right << p1x);
-              ++p0x;
-              ++p1x;
-            }
-            if (d >= ddx) {
-              d -= ddx;
-            }
-          }
-          frame.scanline (h - 2 - p1) [0] = mask_all << p1;
-
-          if (! iter->valid (true)) {
-
-            text.scanline (4) [0]  |= 0x00000c60;
-            text.scanline (5) [0]  |= 0x00000ee0;
-            text.scanline (6) [0]  |= 0x000007c0;
-            text.scanline (7) [0]  |= 0x00000380;
-            text.scanline (8) [0]  |= 0x000007c0;
-            text.scanline (9) [0]  |= 0x00000ee0;
-            text.scanline (10) [0] |= 0x00000c60;
-
-            for (unsigned int i = 3; i < 12; ++i) {
-              fill.scanline (i) [0] &= ~0x00001ff0;
-              frame.scanline (i) [0] &= ~0x00001ff0;
-            }
-
-          }
-
-          vertex.scanline (h / 2 - 1) [0] = mask_center;
-
-          lay::ViewOp::Mode mode = lay::ViewOp::Copy;
-
-          //  create fill 
-          single_bitmap_to_image (lay::ViewOp (fill_color, mode, 0, iter->eff_dither_pattern (true), di_off), fill, &image, mp_view->dither_pattern (), mp_view->line_styles (), w, h);
-          //  create frame 
-          if (lw == 0) {
-            single_bitmap_to_image (lay::ViewOp (frame_color, mode, 0 /*solid line*/, 2 /*dotted*/, 0), frame, &image, mp_view->dither_pattern (), mp_view->line_styles (), w, h);
-          } else {
-            single_bitmap_to_image (lay::ViewOp (frame_color, mode, iter->eff_line_style (true), 0, 0, lay::ViewOp::Rect, lw), frame, &image, mp_view->dither_pattern (), mp_view->line_styles (), w, h);
-          }
-          //  create text 
-          single_bitmap_to_image (lay::ViewOp (frame_color, mode, 0, 0, 0), text, &image, mp_view->dither_pattern (), mp_view->line_styles (), w, h);
-          //  create vertex 
-          single_bitmap_to_image (lay::ViewOp (frame_color, mode, 0, 0, 0, lay::ViewOp::Cross, iter->marked (true) ? 9/*mark size*/ : 0), vertex, &image, mp_view->dither_pattern (),mp_view->line_styles (),  w, h);
-
-          QPixmap pixmap = QPixmap::fromImage (image); // Qt 4.6.0 workaround
-          return QVariant (QIcon (pixmap));
-
+          return QVariant (icon_for_layer (iter, mp_view, is.width (), is.height (), di_off));
         } else {
           return QVariant (QIcon ());
         }

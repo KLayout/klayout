@@ -31,6 +31,11 @@
 #include <memory>
 #include <string>
 
+namespace Ui
+{
+  class HelpDialog;
+}
+
 namespace lay
 {
 
@@ -58,7 +63,7 @@ protected slots:
   void title_changed (const QString &t);
 
 private:
-  lay::BrowserPanel *mp_browser_panel;
+  Ui::HelpDialog *mp_ui;
   QRect m_geometry;
   static lay::HelpSource *mp_help_source;
   QString m_def_title;

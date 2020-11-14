@@ -494,6 +494,13 @@ public:
   void select (const db::DPoint &pt, Editable::SelectionMode mode);
 
   /**
+   *  @brief Repeat the previous selection
+   *
+   *  This method will not do anything if there is no previous, click-at selection.
+   */
+  void repeat_selection (Editable::SelectionMode mode);
+
+  /**
    *  @brief Start "move" operation
    *
    *  @param sel Should be true if the selection is to be dragged.

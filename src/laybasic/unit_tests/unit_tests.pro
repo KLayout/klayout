@@ -13,10 +13,10 @@ SOURCES = \
   layLayerProperties.cc \
   layParsedLayerSource.cc \
   layRenderer.cc \
-  laySnap.cc \
   layNetlistBrowserModelTests.cc \
     layNetlistBrowserTreeModelTests.cc \
-    layAbstractMenuTests.cc
+    layAbstractMenuTests.cc \
+  laySnapTests.cc
 
 INCLUDEPATH += $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC $$OUT_PWD/../laybasic
 DEPENDPATH += $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC $$OUT_PWD/../laybasic

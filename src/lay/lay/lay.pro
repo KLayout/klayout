@@ -9,9 +9,11 @@ DEFINES += MAKE_LAY_LIBRARY
 HEADERS = \
     layApplication.h \
     layClipDialog.h \
+    layControlWidgetStack.h \
     layCrashMessage.h \
     layFillDialog.h \
     layGSIHelpProvider.h \
+    layHelpAboutDialog.h \
     layHelpDialog.h \
     layHelpProvider.h \
     layHelpSource.h \
@@ -25,6 +27,7 @@ HEADERS = \
     layMainWindow.h \
     layNavigator.h \
     layProgress.h \
+    layProgressDialog.h \
     layProgressWidget.h \
     layResourceHelpProvider.h \
     layRuntimeErrorForm.h \
@@ -35,6 +38,7 @@ HEADERS = \
     laySettingsForm.h \
     layTechSetupDialog.h \
     layTextProgress.h \
+    layTextProgressDelegate.h \
     layVersion.h \
     layCommon.h \
     layConfig.h \
@@ -57,7 +61,8 @@ HEADERS = \
     layMacroEditorSetupPage.h \
     layPasswordDialog.h \
     layForceLink.h \
-    layInit.h
+    layInit.h \
+    layViewWidgetStack.h
 
 FORMS = \
     ClipDialog.ui \
@@ -66,6 +71,7 @@ FORMS = \
     DeleteModeDialog.ui \
     FillDialog.ui \
     HelpAboutDialog.ui \
+    HelpDialog.ui \
     LogViewerDialog.ui \
     MacroEditorDialog.ui \
     MacroPropertiesDialog.ui \
@@ -112,9 +118,11 @@ SOURCES = \
     gsiDeclLayMainWindow.cc \
     layApplication.cc \
     layClipDialog.cc \
+    layControlWidgetStack.cc \
     layCrashMessage.cc \
     layFillDialog.cc \
     layGSIHelpProvider.cc \
+    layHelpAboutDialog.cc \
     layHelpDialog.cc \
     layHelpProvider.cc \
     layHelpSource.cc \
@@ -128,6 +136,7 @@ SOURCES = \
     layMainWindow.cc \
     layNavigator.cc \
     layProgress.cc \
+    layProgressDialog.cc \
     layProgressWidget.cc \
     layResourceHelpProvider.cc \
     layRuntimeErrorForm.cc \
@@ -139,6 +148,7 @@ SOURCES = \
     laySettingsForm.cc \
     layTechSetupDialog.cc \
     layTextProgress.cc \
+    layTextProgressDelegate.cc \
     layVersion.cc \
     layMacroController.cc \
     layTechnologyController.cc \
@@ -159,7 +169,8 @@ SOURCES = \
     layMacroEditorSetupPage.cc \
     layPasswordDialog.cc \
     layForceLink.cc \
-    layInit.cc
+    layInit.cc \
+    layViewWidgetStack.cc
 
 RESOURCES = layBuildInMacros.qrc \
     layHelpResources.qrc \

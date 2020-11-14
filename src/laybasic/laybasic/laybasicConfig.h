@@ -75,6 +75,9 @@ static const std::string cfg_sel_line_style ("sel-line-style");
 static const std::string cfg_sel_transient_mode ("sel-transient-mode");
 static const std::string cfg_sel_inside_pcells_mode ("sel-inside-pcells-mode");
 
+static const std::string cfg_tracking_cursor_color ("tracking-cursor-color");
+static const std::string cfg_tracking_cursor_enabled ("tracking-cursor-enabled");
+
 static const std::string cfg_markers_visible ("markers-visible");
 
 static const std::string cfg_min_inst_label_size ("min-inst-label-size");

@@ -31,6 +31,7 @@
 #include "layObjectInstPath.h"
 #include "layLayoutView.h"
 #include "layCellSelectionForm.h"
+#include "layQtTools.h"
 #include "tlExceptions.h"
 #include "tlString.h"
 
@@ -64,6 +65,43 @@ InstPropertiesPage::InstPropertiesPage (edt::Service *service, db::Manager *mana
   connect (browse_pb, SIGNAL (clicked ()), this, SLOT (browse_cell ()));
   connect (lib_cbx, SIGNAL (currentIndexChanged (int)), this, SLOT (library_changed (int)));
   connect (cell_name_le, SIGNAL (textChanged (const QString &)), this, SLOT (cell_name_changed (const QString &)));
+
+  if (! readonly ()) {
+
+    connect (lib_cbx, SIGNAL (activated (int)), this, SIGNAL (edited ()));
+    connect (cell_name_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (array_grp, SIGNAL (clicked ()), this, SIGNAL (edited ()));
+    connect (rows_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (columns_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (row_x_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (row_y_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (column_x_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (column_y_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (pos_x_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (pos_y_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (angle_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (mag_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (mirror_cbx, SIGNAL (clicked ()), this, SIGNAL (edited ()));
+
+  } else {
+
+    browse_pb->setEnabled (false);
+    cell_name_le->setReadOnly (true);
+    rows_le->setReadOnly (true);
+    columns_le->setReadOnly (true);
+    row_x_le->setReadOnly (true);
+    row_y_le->setReadOnly (true);
+    column_x_le->setReadOnly (true);
+    column_y_le->setReadOnly (true);
+    pos_x_le->setReadOnly (true);
+    pos_y_le->setReadOnly (true);
+    angle_le->setReadOnly (true);
+    mag_le->setReadOnly (true);
+    lib_cbx->setEnabled (false);
+    array_grp->setEnabled (false);
+    mirror_cbx->setEnabled (false);
+
+  }
 
   QHBoxLayout *layout = new QHBoxLayout (pcell_tab);
   layout->setMargin (0);
@@ -125,12 +163,19 @@ BEGIN_PROTECTED
   }
 
   if (form.exec ()) {
+
+    cell_name_le->blockSignals (true);
     if (form.selected_cell_is_pcell ()) {
       cell_name_le->setText (tl::to_qstring (layout->pcell_header (form.selected_pcell_id ())->get_name ()));
     } else if (layout->is_valid_cell_index (form.selected_cell_index ())) {
       cell_name_le->setText (tl::to_qstring (layout->cell_name (form.selected_cell_index ())));
     }
+    cell_name_le->blockSignals (false);
+
     update_pcell_parameters ();
+
+    emit edited ();
+
   }
 
 END_PROTECTED
@@ -140,7 +185,9 @@ void
 InstPropertiesPage::show_props ()
 {
   lay::UserPropertiesForm props_form (this);
-  props_form.show (mp_service->view (), m_selection_ptrs [m_index]->cv_index (), m_prop_id);
+  if (props_form.show (mp_service->view (), m_selection_ptrs [m_index]->cv_index (), m_prop_id)) {
+    emit edited ();
+  }
 }
 
 void
@@ -222,6 +269,7 @@ InstPropertiesPage::update ()
   db::cell_index_type def_cell_index = pos->back ().inst_ptr.cell_index ();
   const db::Cell &def_cell = def_layout->cell (def_cell_index);
 
+  lib_cbx->blockSignals (true);
   std::pair<db::Library *, db::cell_index_type> dl = def_layout->defining_library (def_cell_index);
   lib_cbx->set_technology_filter (cv->tech_name (), true);
   lib_cbx->set_current_library (dl.first);
@@ -229,13 +277,16 @@ InstPropertiesPage::update ()
     def_layout = &dl.first->layout ();
     def_cell_index = dl.second;
   }
+  lib_cbx->blockSignals (false);
 
   std::pair<bool, db::pcell_id_type> pci = def_layout->is_pcell_instance (def_cell_index);
+  cell_name_le->blockSignals (true);
   if (pci.first && def_layout->pcell_declaration (pci.second)) {
     cell_name_le->setText (tl::to_qstring (def_layout->pcell_header (pci.second)->get_name ()));
   } else {
     cell_name_le->setText (tl::to_qstring (def_layout->cell_name (def_cell_index)));
   }
+  cell_name_le->blockSignals (false);
 
   db::Vector rowv, columnv;
   unsigned long rows, columns;
@@ -325,6 +376,9 @@ InstPropertiesPage::readonly ()
 ChangeApplicator *
 InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance & /*inst*/, double dbu)
 {
+  bool has_error = false;
+  bool has_pcell_error = false;
+
   std::auto_ptr<CombinedChangeApplicator> appl (new CombinedChangeApplicator ());
 
   edt::Service::obj_iterator pos = m_selection_ptrs [m_index];
@@ -343,34 +397,69 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
     layout = &cv->layout ();
   }
 
-  std::pair<bool, db::cell_index_type> ci = layout->cell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
-  std::pair<bool, db::pcell_id_type> pci = layout->pcell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
-  if (! ci.first && ! pci.first) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Not a valid cell name: %s")).c_str (), tl::to_string (cell_name_le->text ()).c_str ());
+  try {
+
+    std::pair<bool, db::cell_index_type> ci = layout->cell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
+    std::pair<bool, db::pcell_id_type> pci = layout->pcell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
+    if (! ci.first && ! pci.first) {
+      throw tl::Exception (tl::to_string (QObject::tr ("Not a valid cell or PCell name: %s")).c_str (), tl::to_string (cell_name_le->text ()).c_str ());
+    }
+
+    lay::indicate_error (cell_name_le, 0);
+
+  } catch (tl::Exception &ex) {
+    lay::indicate_error (cell_name_le, &ex);
+    has_error = true;
   }
 
-  db::cell_index_type inst_cell_index = ci.second;
+  try {
 
-  //  instantiate the PCell
-  if (pci.first) {
-    tl_assert (mp_pcell_parameters != 0);
-    tl_assert (layout->pcell_declaration (pci.second) == mp_pcell_parameters->pcell_decl ());
-    inst_cell_index = layout->get_pcell_variant (pci.second, mp_pcell_parameters->get_parameters ());
-  }
+    std::pair<bool, db::cell_index_type> ci = layout->cell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
+    std::pair<bool, db::pcell_id_type> pci = layout->pcell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
+    tl_assert (ci.first || pci.first);
 
-  //  reference the library
-  if (lib) {
-    layout = & cv->layout ();
-    inst_cell_index = layout->get_lib_proxy (lib, inst_cell_index);
-  }
+    db::cell_index_type inst_cell_index = 0;
 
-  if (inst_cell_index != pos->back ().inst_ptr.cell_index ()) {
-    appl->add (new ChangeTargetCellApplicator (inst_cell_index));
+    //  instantiate the PCell
+    if (pci.first) {
+      tl_assert (mp_pcell_parameters != 0);
+      tl_assert (layout->pcell_declaration (pci.second) == mp_pcell_parameters->pcell_decl ());
+      inst_cell_index = layout->get_pcell_variant (pci.second, mp_pcell_parameters->get_parameters ());
+    } else {
+      inst_cell_index = ci.second;
+    }
+
+    //  reference the library
+    if (lib) {
+      layout = & cv->layout ();
+      inst_cell_index = layout->get_lib_proxy (lib, inst_cell_index);
+    }
+
+    if (inst_cell_index != pos->back ().inst_ptr.cell_index ()) {
+      appl->add (new ChangeTargetCellApplicator (inst_cell_index));
+    }
+
+  } catch (tl::Exception &ex) {
+    has_pcell_error = true;
   }
 
   double x = 0.0, y = 0.0;
-  tl::from_string (tl::to_string (pos_x_le->text ()), x);
-  tl::from_string (tl::to_string (pos_y_le->text ()), y);
+
+  try {
+    tl::from_string (tl::to_string (pos_x_le->text ()), x);
+    lay::indicate_error (pos_x_le, 0);
+  } catch (tl::Exception &ex) {
+    lay::indicate_error (pos_x_le, &ex);
+    has_error = true;
+  }
+
+  try {
+    tl::from_string (tl::to_string (pos_y_le->text ()), y);
+    lay::indicate_error (pos_y_le, 0);
+  } catch (tl::Exception &ex) {
+    lay::indicate_error (pos_y_le, &ex);
+    has_error = true;
+  }
 
   db::DCplxTrans t;
   if (abs_cb->isChecked ()) {
@@ -381,20 +470,32 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
 
   bool mirror = mirror_cbx->isChecked ();
   double angle = 0.0;
-  tl::from_string (tl::to_string (angle_le->text ()), angle);
+  try {
+    tl::from_string (tl::to_string (angle_le->text ()), angle);
+    lay::indicate_error (angle_le, 0);
+  } catch (tl::Exception &ex) {
+    lay::indicate_error (angle_le, &ex);
+    has_error = true;
+  }
 
   double mag = 0.0;
-  tl::from_string (tl::to_string (mag_le->text ()), mag);
+  try {
+    tl::from_string (tl::to_string (mag_le->text ()), mag);
+    lay::indicate_error (mag_le, 0);
+  } catch (tl::Exception &ex) {
+    lay::indicate_error (mag_le, &ex);
+    has_error = true;
+  }
 
   angle -= (floor (angle / 360.0) + 1.0) * 360.0;
   while (angle < -1e-6) {
     angle += 360.0;
   }
 
-  db::CellInstArray::complex_trans_type tr = pos->back ().inst_ptr.complex_trans ();
+  db::CellInstArray::complex_trans_type trans = pos->back ().inst_ptr.complex_trans ();
 
-  if (fabs (angle - tr.angle ()) > 1e-6 || mirror != tr.is_mirror () || fabs (mag - tr.mag ()) > 1e-6 || ! disp.equal (tr.disp () * dbu)) {
-    appl->add (new ChangeInstanceTransApplicator (angle, tr.angle (), mirror, tr.is_mirror (), mag, tr.mag (), disp, tr.disp () * dbu));
+  if (fabs (angle - trans.angle ()) > 1e-6 || mirror != trans.is_mirror () || fabs (mag - trans.mag ()) > 1e-6 || ! disp.equal (trans.disp () * dbu)) {
+    appl->add (new ChangeInstanceTransApplicator (angle, trans.angle (), mirror, trans.is_mirror (), mag, trans.mag (), disp, trans.disp () * dbu));
   }
 
   db::CellInstArray::vector_type a_org, b_org;
@@ -407,12 +508,53 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
     double rx = 0.0, ry = 0.0;
     unsigned long rows = 0, cols = 0;
 
-    tl::from_string (tl::to_string (column_x_le->text ()), cx);
-    tl::from_string (tl::to_string (column_y_le->text ()), cy);
-    tl::from_string (tl::to_string (row_x_le->text ()), rx);
-    tl::from_string (tl::to_string (row_y_le->text ()), ry);
-    tl::from_string (tl::to_string (rows_le->text ()), rows);
-    tl::from_string (tl::to_string (columns_le->text ()), cols);
+    try {
+      tl::from_string (tl::to_string (column_x_le->text ()), cx);
+      lay::indicate_error (column_x_le, 0);
+    } catch (tl::Exception &ex) {
+      lay::indicate_error (column_x_le, &ex);
+      has_error = true;
+    }
+
+    try {
+      tl::from_string (tl::to_string (column_y_le->text ()), cy);
+      lay::indicate_error (column_y_le, 0);
+    } catch (tl::Exception &ex) {
+      lay::indicate_error (column_y_le, &ex);
+      has_error = true;
+    }
+
+    try {
+      tl::from_string (tl::to_string (row_x_le->text ()), rx);
+      lay::indicate_error (row_x_le, 0);
+    } catch (tl::Exception &ex) {
+      lay::indicate_error (row_x_le, &ex);
+      has_error = true;
+    }
+
+    try {
+      tl::from_string (tl::to_string (row_y_le->text ()), ry);
+      lay::indicate_error (row_y_le, 0);
+    } catch (tl::Exception &ex) {
+      lay::indicate_error (row_y_le, &ex);
+      has_error = true;
+    }
+
+    try {
+      tl::from_string (tl::to_string (rows_le->text ()), rows);
+      lay::indicate_error (rows_le, 0);
+    } catch (tl::Exception &ex) {
+      lay::indicate_error (rows_le, &ex);
+      has_error = true;
+    }
+
+    try {
+      tl::from_string (tl::to_string (columns_le->text ()), cols);
+      lay::indicate_error (columns_le, 0);
+    } catch (tl::Exception &ex) {
+      lay::indicate_error (columns_le, &ex);
+      has_error = true;
+    }
 
     db::DVector rv = db::DVector (dpoint_from_dpoint (db::DPoint (rx, ry), dbu, du, t));
     db::DVector cv = db::DVector (dpoint_from_dpoint (db::DPoint (cx, cy), dbu, du, t));
@@ -430,6 +572,14 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
 
     appl->add (new InstanceRemoveArrayApplicator ());
 
+  }
+
+  if (has_error || has_pcell_error) {
+    throw tl::Exception (tl::to_string (tr ("At least one value and PCell parameter is not correct - see hightlighted entry fields or the PCell error indicator")));
+  } else if (has_error) {
+    throw tl::Exception (tl::to_string (tr ("At least one value is not correct - see hightlighted entry fields")));
+  } else if (has_pcell_error) {
+    throw tl::Exception (tl::to_string (tr ("At least one PCell parameter is not correct - see hightlighted entry fields or the PCell error indicator")));
   }
 
   return appl.release ();
@@ -453,7 +603,7 @@ InstPropertiesPage::recompute_selection_ptrs (const std::vector<lay::ObjectInstP
 }
 
 void 
-InstPropertiesPage::do_apply (bool current_only)
+InstPropertiesPage::do_apply (bool current_only, bool relative)
 {
   lay::LayerState layer_state = mp_service->view ()->layer_snapshot ();
   unsigned int cv_index = m_selection_ptrs [m_index]->cv_index ();
@@ -482,32 +632,7 @@ InstPropertiesPage::do_apply (bool current_only)
 
   bool relative_mode = false;
   if (! current_only && applicator->supports_relative_mode ()) {
-
-    static bool s_relative_mode = true;
-
-    QMessageBox mb (QMessageBox::Question, 
-                    tr ("Apply Changes To All"), 
-                    tr ("For this operation absolute or relative mode is available which affects the way parameters of the selected objects are changed:\n\n"
-                        "In absolute mode, they will be set to the given value. In relative mode, they will be adjusted by the same amount.\n"),
-                    QMessageBox::NoButton, this);
-
-    mb.addButton (tr ("Cancel"), QMessageBox::RejectRole);
-    QPushButton *absolute = mb.addButton (tr ("Absolute"), QMessageBox::NoRole);
-    QPushButton *relative = mb.addButton (tr ("Relative"), QMessageBox::YesRole);
-    
-    mb.setDefaultButton (s_relative_mode ? relative : absolute);
-
-    mb.exec ();
-
-    if (mb.clickedButton () == absolute) {
-      s_relative_mode = relative_mode = false;
-    } else if (mb.clickedButton () == relative) {
-      s_relative_mode = relative_mode = true;
-    } else {
-      //  Cancel pressed
-      return;
-    }
-
+    relative_mode = relative;
   }
 
   //  Note: using the apply-all scheme for applying a single change may look like overhead.
@@ -599,7 +724,7 @@ InstPropertiesPage::do_apply (bool current_only)
 void 
 InstPropertiesPage::apply ()
 {
-  do_apply (true);
+  do_apply (true, false);
 }
 
 bool
@@ -609,9 +734,9 @@ InstPropertiesPage::can_apply_to_all () const
 }
 
 void 
-InstPropertiesPage::apply_to_all ()
+InstPropertiesPage::apply_to_all (bool relative)
 {
-  do_apply (false);
+  do_apply (false, relative);
 }
 
 void
@@ -636,16 +761,13 @@ InstPropertiesPage::update_pcell_parameters ()
   std::pair<bool, db::pcell_id_type> pc = layout->pcell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
   std::pair<bool, db::cell_index_type> cc = layout->cell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
 
-  //  by the way, update the foreground color of the cell edit box as well (red, if not valid)
-  QPalette pl = cell_name_le->palette ();
+  //  indicate an invalid cell name
   if (! pc.first && ! cc.first) {
-    pl.setColor (QPalette::Text, Qt::red);
-    pl.setColor (QPalette::Base, QColor (Qt::red).lighter (180));
+    tl::Exception ex (tl::to_string (QObject::tr ("Not a valid cell or PCell name: %s")).c_str (), tl::to_string (cell_name_le->text ()).c_str ());
+    lay::indicate_error (cell_name_le, &ex);
   } else {
-    pl.setColor (QPalette::Text, palette ().color (QPalette::Text));
-    pl.setColor (QPalette::Base, palette ().color (QPalette::Base));
+    lay::indicate_error (cell_name_le, 0);
   }
-  cell_name_le->setPalette (pl);
 
   if (pc.first && layout->pcell_declaration (pc.second)) {
 
@@ -686,13 +808,14 @@ InstPropertiesPage::update_pcell_parameters ()
         mp_pcell_parameters->deleteLater ();
       }
 
-      mp_pcell_parameters = new PCellParametersPage (pcell_tab, &cv->layout (), mp_service->view (), pos->cv_index (), layout->pcell_declaration (pc.second), parameters);
+      mp_pcell_parameters = new PCellParametersPage (pcell_tab);
+      connect (mp_pcell_parameters, SIGNAL (edited ()), this, SIGNAL (edited ()));
+      mp_pcell_parameters->setup (&cv->layout (), mp_service->view (), pos->cv_index (), layout->pcell_declaration (pc.second), parameters);
       pcell_tab->layout ()->addWidget (mp_pcell_parameters);
 
     }
 
     param_tab_widget->setTabEnabled (1, true);
-    param_tab_widget->setCurrentIndex (1);
 
   } else {
 
@@ -704,8 +827,11 @@ InstPropertiesPage::update_pcell_parameters ()
 
     mp_pcell_parameters = 0;
 
-    param_tab_widget->setCurrentIndex (0);
+    if (param_tab_widget->currentIndex () == 1) {
+      param_tab_widget->setCurrentIndex (0);
+    }
     param_tab_widget->setTabEnabled (1, false);
+
   }
 
 }

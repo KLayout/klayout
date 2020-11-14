@@ -30,7 +30,11 @@
 #include "tlExceptions.h"
 #include "layLayoutView.h"
 #include "layDialogs.h"
+#include "laySelector.h"
 #include "layCellSelectionForm.h"
+#include "layFinder.h"
+#include "layLayerProperties.h"
+#include "layLayerTreeModel.h"
 #include "tlProgress.h"
 #include "edtPlugin.h"
 #include "edtMainService.h"
@@ -39,8 +43,11 @@
 #include "edtConfig.h"
 #include "edtDialogs.h"
 #include "edtEditorOptionsPages.h"
+#include "edtDistribute.h"
 
 #include <QMessageBox>
+#include <QFontInfo>
+#include <QWidgetAction>
 
 namespace edt
 {
@@ -58,12 +65,18 @@ MainService::MainService (db::Manager *manager, lay::LayoutView *view, lay::Disp
     m_flatten_insts_levels (std::numeric_limits<int>::max ()),
     m_flatten_prune (false),
     m_align_hmode (0), m_align_vmode (0), m_align_visible_layers (false),
+    m_hdistribute (true),
+    m_distribute_hmode (1), m_distribute_hpitch (0.0), m_distribute_hspace (0.0),
+    m_vdistribute (true),
+    m_distribute_vmode (1), m_distribute_vpitch (0.0), m_distribute_vspace (0.0),
+    m_distribute_visible_layers (false),
     m_origin_mode_x (-1), m_origin_mode_y (-1), m_origin_visible_layers_for_bbox (false),
     m_array_a (0.0, 1.0), m_array_b (1.0, 0.0),
     m_array_na (1), m_array_nb (1),
     m_router (0.0), m_rinner (0.0), m_npoints (64), m_undo_before_apply (true),
     mp_round_corners_dialog (0),
     mp_align_options_dialog (0),
+    mp_distribute_options_dialog (0),
     mp_flatten_inst_options_dialog (0),
     mp_make_cell_options_dialog (0),
     mp_make_array_options_dialog (0)
@@ -92,6 +105,15 @@ MainService::align_options_dialog ()
     mp_align_options_dialog = new edt::AlignOptionsDialog (view ());
   }
   return mp_align_options_dialog;
+}
+
+edt::DistributeOptionsDialog *
+MainService::distribute_options_dialog ()
+{
+  if (! mp_distribute_options_dialog) {
+    mp_distribute_options_dialog = new edt::DistributeOptionsDialog (view ());
+  }
+  return mp_distribute_options_dialog;
 }
 
 lay::FlattenInstOptionsDialog *
@@ -128,10 +150,10 @@ MainService::menu_activated (const std::string &symbol)
     cm_descend ();
   } else if (symbol == "edt::ascend") {
     cm_ascend ();
-  } else if (symbol == "edt::edit_options") {
-    cm_edit_options ();
   } else if (symbol == "edt::sel_align") {
     cm_align ();
+  } else if (symbol == "edt::sel_distribute") {
+    cm_distribute ();
   } else if (symbol == "edt::sel_tap") {
     cm_tap ();
   } else if (symbol == "edt::sel_round_corners") {
@@ -1835,7 +1857,115 @@ MainService::cm_align ()
   }
 }
 
-void 
+void
+MainService::cm_distribute ()
+{
+  tl_assert (view ()->is_editable ());
+  check_no_guiding_shapes ();
+
+  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+
+  if (! distribute_options_dialog ()->exec_dialog (view (), m_hdistribute, m_distribute_hmode, m_distribute_hpitch, m_distribute_hspace,
+                                                            m_vdistribute, m_distribute_vmode, m_distribute_vpitch, m_distribute_vspace,
+                                                            m_distribute_visible_layers)) {
+    return;
+  }
+
+  if (! m_hdistribute && ! m_vdistribute) {
+    return;
+  }
+
+  //  count the items
+  size_t n = 0;
+  for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
+    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+      ++n;
+    }
+  }
+
+  std::vector<std::pair<size_t, size_t> > objects_for_service;
+  std::vector<db::DCplxTrans> transformations;
+
+  {
+
+    std::vector<db::DBox> org_boxes;
+    org_boxes.reserve (n);
+
+    edt::distributed_placer<db::DBox, size_t> placer;
+    placer.reserve (n);
+
+    size_t i = 0;
+
+    for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
+
+      objects_for_service.push_back (std::make_pair (i, i));
+
+      for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+
+        const db::Layout &layout = view ()->cellview (s->cv_index ())->layout ();
+        db::CplxTrans tr = db::CplxTrans (layout.dbu ()) * s->trans ();
+
+        db::DBox box;
+        if (! s->is_cell_inst ()) {
+          box = tr * s->shape ().bbox ();
+        } else {
+          box = inst_bbox (tr, view (), s->cv_index (), s->back (), m_distribute_visible_layers);
+        }
+
+        org_boxes.push_back (box);
+        placer.insert (box, i);
+
+        ++i;
+
+      }
+
+      objects_for_service.back ().second = i;
+
+    }
+
+    int href = int (m_distribute_hmode - 2);
+    int vref = 2 - int (m_distribute_vmode);
+
+    if (m_hdistribute && m_vdistribute) {
+      placer.distribute_matrix (href, m_distribute_hpitch, m_distribute_hspace,
+                                vref, m_distribute_vpitch, m_distribute_vspace);
+    } else if (m_hdistribute) {
+      placer.distribute_h (href, vref, m_distribute_hpitch, m_distribute_hspace);
+    } else if (m_vdistribute) {
+      placer.distribute_v (vref, href, m_distribute_vpitch, m_distribute_vspace);
+    }
+
+    transformations.resize (org_boxes.size ());
+
+    for (edt::distributed_placer<db::DBox, size_t>::iterator i = placer.begin (); i != placer.end (); ++i) {
+      transformations[i->second] = db::DCplxTrans (i->first.p1 () - org_boxes[i->second].p1 ());
+    }
+
+  }
+
+  {
+    view ()->cancel_edits ();
+    manager ()->transaction (tl::to_string (QObject::tr ("Distribution")));
+
+    //  do the distribution
+    for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
+
+      size_t ie = es - edt_services.begin ();
+
+      //  create a transformation vector that describes each shape's transformation
+      std::vector <db::DCplxTrans> tv (transformations.begin () + objects_for_service [ie].first, transformations.begin () + objects_for_service [ie].second);
+
+      //  use the "transform" method to transform the shapes and instances (with individual transformations)
+      (*es)->transform (db::DCplxTrans () /*dummy*/, &tv);
+
+    }
+
+    manager ()->commit ();
+
+  }
+}
+
+void
 MainService::cm_make_array ()
 {
   size_t n = 0;
@@ -1941,20 +2071,66 @@ MainService::cm_make_array ()
 void 
 MainService::cm_tap ()
 {
-  tl_assert (view ()->is_editable ());
-  check_no_guiding_shapes ();
+  if (! view ()->view_object_widget ()->mouse_in_window ()) {
+    return;
+  }
 
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+  lay::ShapeFinder finder (true /*point mode*/, false /*all hierarchy levels*/, db::ShapeIterator::All, 0);
 
-  //  get (common) cellview index of the selected shapes
-  for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
-      const lay::CellView &cv = view ()->cellview (s->cv_index ());
-      if (cv.is_valid () && ! s->is_cell_inst ()) {
-        view ()->set_current_layer (s->cv_index (), cv->layout ().get_properties (s->layer ()));
-        return;
-      }
+  //  capture all objects in point mode (default: capture one only)
+  finder.set_catch_all (true);
+
+  //  go through all visible layers of all cellviews
+  db::DPoint pt = view ()->view_object_widget ()->mouse_position_um ();
+  finder.find (view (), db::DBox (pt, pt));
+
+  std::set<std::pair<unsigned int, unsigned int> > layers_in_selection;
+
+  for (lay::ShapeFinder::iterator f = finder.begin (); f != finder.end (); ++f) {
+    //  ignore guiding shapes
+    if (f->layer () != view ()->cellview (f->cv_index ())->layout ().guiding_shape_layer ()) {
+      layers_in_selection.insert (std::make_pair (f->cv_index (), f->layer ()));
     }
+  }
+
+  std::vector<lay::LayerPropertiesConstIterator> tapped_layers;
+  for (lay::LayerPropertiesConstIterator lp = view ()->begin_layers (view ()->current_layer_list ()); ! lp.at_end (); ++lp) {
+    const lay::LayerPropertiesNode *ln = lp.operator-> ();
+    if (layers_in_selection.find (std::make_pair ((unsigned int) ln->cellview_index (), (unsigned int) ln->layer_index ())) != layers_in_selection.end ()) {
+      tapped_layers.push_back (lp);
+    }
+  }
+
+  if (tapped_layers.empty ()) {
+    return;
+  }
+
+  //  List the layers under the cursor as pop up a menu
+
+  std::auto_ptr<QMenu> menu (new QMenu (view ()));
+  menu->show ();
+
+  int icon_size = menu->style ()->pixelMetric (QStyle::PM_ButtonIconSize);
+
+  QPoint mp = view ()->view_object_widget ()->mapToGlobal (view ()->view_object_widget ()->mouse_position ());
+
+  for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = tapped_layers.begin (); l != tapped_layers.end (); ++l) {
+    QAction *a = menu->addAction (lay::LayerTreeModel::icon_for_layer (*l, view (), icon_size, icon_size, 0, true), tl::to_qstring ((*l)->source (true).to_string ()));
+    a->setData (int (l - tapped_layers.begin ()));
+  }
+
+  QAction *action = menu->exec (mp);
+  if (action) {
+
+    int index = action->data ().toInt ();
+    lay::LayerPropertiesConstIterator iter = tapped_layers [index];
+    view ()->set_current_layer (iter);
+
+    edt::Service *es = dynamic_cast<edt::Service *> (view ()->view_object_widget ()->active_service ());
+    if (es) {
+      es->tap (pt);
+    }
+
   }
 }
 
@@ -1966,16 +2142,12 @@ MainService::cm_change_layer ()
 
   int cv_index = -1;
 
-  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
-
   //  get (common) cellview index of the selected shapes
-  for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
-      if (cv_index >= 0 && cv_index != int (s->cv_index ())) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Selections originate from different layouts - cannot switch layer in this case.")));
-      }
-      cv_index = int (s->cv_index ());
+  for (SelectionIterator s (view ()); ! s.at_end (); ++s) {
+    if (cv_index >= 0 && cv_index != int (s->cv_index ())) {
+      throw tl::Exception (tl::to_string (QObject::tr ("Selections originate from different layouts - cannot switch layer in this case.")));
     }
+    cv_index = int (s->cv_index ());
   }
 
   if (cv_index >= 0) {
@@ -2037,46 +2209,42 @@ MainService::cm_change_layer ()
 
     //  Insert and delete the shape. This exploits the fact, that a shape can be erased multiple times -
     //  this is important since the selection potentially contains the same shape multiple times.
-    for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
+    for (SelectionIterator s (view ()); ! s.at_end (); ++s) {
 
-      for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+      if (!s->is_cell_inst () && int (s->layer ()) != layer) {
 
-        if (!s->is_cell_inst () && int (s->layer ()) != layer) {
+        db::Cell &cell = layout.cell (s->cell_index ());
+        if (cell.shapes (s->layer ()).is_valid (s->shape ())) {
+          cell.shapes (layer).insert (s->shape ());
+          cell.shapes (s->layer ()).erase_shape (s->shape ());
+        }
 
-          db::Cell &cell = layout.cell (s->cell_index ());
-          if (cell.shapes (s->layer ()).is_valid (s->shape ())) {
-            cell.shapes (layer).insert (s->shape ());
-            cell.shapes (s->layer ()).erase_shape (s->shape ());
-          }
+      } else if (s->is_cell_inst ()) {
 
-        } else if (s->is_cell_inst ()) {
+        //  If the selected object is a PCell instance, and there is exactly one visible, writable layer type parameter, change this one
 
-          //  If the selected object is a PCell instance, and there is exactly one visible, writable layer type parameter, change this one
+        db::Instance inst = s->back ().inst_ptr;
+        db::Cell &cell = layout.cell (s->cell_index ());
 
-          db::Instance inst = s->back ().inst_ptr;
-          db::Cell &cell = layout.cell (s->cell_index ());
+        if (cell.is_valid (inst)) {
 
-          if (cell.is_valid (inst)) {
+          const db::PCellDeclaration *pcell_decl = layout.pcell_declaration_for_pcell_variant (inst.cell_index ());
+          if (pcell_decl) {
 
-            const db::PCellDeclaration *pcell_decl = layout.pcell_declaration_for_pcell_variant (inst.cell_index ());
-            if (pcell_decl) {
-
-              size_t layer_par_index = 0;
-              int n_layer_par = 0;
-              for (std::vector<db::PCellParameterDeclaration>::const_iterator d = pcell_decl->parameter_declarations ().begin (); d != pcell_decl->parameter_declarations ().end () && n_layer_par < 2; ++d) {
-                if (d->get_type () == db::PCellParameterDeclaration::t_layer && !d->is_hidden () && !d->is_readonly ()) {
-                  ++n_layer_par;
-                  layer_par_index = size_t (d - pcell_decl->parameter_declarations ().begin ());
-                }
+            size_t layer_par_index = 0;
+            int n_layer_par = 0;
+            for (std::vector<db::PCellParameterDeclaration>::const_iterator d = pcell_decl->parameter_declarations ().begin (); d != pcell_decl->parameter_declarations ().end () && n_layer_par < 2; ++d) {
+              if (d->get_type () == db::PCellParameterDeclaration::t_layer && !d->is_hidden () && !d->is_readonly ()) {
+                ++n_layer_par;
+                layer_par_index = size_t (d - pcell_decl->parameter_declarations ().begin ());
               }
+            }
 
-              if (n_layer_par == 1) {
-                std::vector<tl::Variant> parameters = cell.get_pcell_parameters (inst);
-                tl_assert (layer_par_index < parameters.size ());
-                parameters [layer_par_index] = layout.get_properties (layer);
-                cell.change_pcell_parameters (inst, parameters);
-              }
-
+            if (n_layer_par == 1) {
+              std::vector<tl::Variant> parameters = cell.get_pcell_parameters (inst);
+              tl_assert (layer_par_index < parameters.size ());
+              parameters [layer_par_index] = layout.get_properties (layer);
+              cell.change_pcell_parameters (inst, parameters);
             }
 
           }
@@ -2099,12 +2267,6 @@ MainService::cm_change_layer ()
     throw tl::Exception (tl::to_string (QObject::tr ("Nothing selected to switch layers for")));
   }
 
-}
-
-void  
-MainService::cm_edit_options ()
-{
-  show_editor_options_dialog ();
 }
 
 void

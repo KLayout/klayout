@@ -38,6 +38,7 @@ namespace Ui {
   class LayoutViewConfigPage2a;
   class LayoutViewConfigPage2b;
   class LayoutViewConfigPage2c;
+  class LayoutViewConfigPage2d;
   class LayoutViewConfigPage3a;
   class LayoutViewConfigPage3b;
   class LayoutViewConfigPage3c;
@@ -138,7 +139,23 @@ private:
   Ui::LayoutViewConfigPage2c *mp_ui;
 };
 
-class LayoutViewConfigPage3a 
+class LayoutViewConfigPage2d
+  : public lay::ConfigPage
+{
+Q_OBJECT
+
+public:
+  LayoutViewConfigPage2d (QWidget *parent);
+  ~LayoutViewConfigPage2d ();
+
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
+
+private:
+  Ui::LayoutViewConfigPage2d *mp_ui;
+};
+
+class LayoutViewConfigPage3a
   : public lay::ConfigPage
 {
 Q_OBJECT

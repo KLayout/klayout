@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>AlignOptionsDialog</class>
- <widget class="QDialog" name="AlignOptionsDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="AlignOptionsDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,26 +10,26 @@
     <height>392</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Alignment Options</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" >
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
       <string>Horizontal alignment</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_3" >
-      <item row="0" column="0" >
-       <widget class="QRadioButton" name="h_none_rb" >
-        <property name="text" >
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="0">
+       <widget class="QRadioButton" name="h_none_rb">
+        <property name="text">
          <string/>
         </property>
-        <property name="icon" >
-         <iconset resource="layResources.qrc" >
+        <property name="icon">
+         <iconset resource="../../lay/lay/layResources.qrc">
           <normaloff>:/align_none.png</normaloff>:/align_none.png</iconset>
         </property>
-        <property name="iconSize" >
+        <property name="iconSize">
          <size>
           <width>32</width>
           <height>32</height>
@@ -36,16 +37,16 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="2" >
-       <widget class="QRadioButton" name="h_left_rb" >
-        <property name="text" >
+      <item row="0" column="2">
+       <widget class="QRadioButton" name="h_left_rb">
+        <property name="text">
          <string/>
         </property>
-        <property name="icon" >
-         <iconset resource="layResources.qrc" >
+        <property name="icon">
+         <iconset resource="../../lay/lay/layResources.qrc">
           <normaloff>:/align_left.png</normaloff>:/align_left.png</iconset>
         </property>
-        <property name="iconSize" >
+        <property name="iconSize">
          <size>
           <width>32</width>
           <height>32</height>
@@ -53,16 +54,16 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="4" >
-       <widget class="QRadioButton" name="h_center_rb" >
-        <property name="text" >
+      <item row="0" column="4">
+       <widget class="QRadioButton" name="h_center_rb">
+        <property name="text">
          <string/>
         </property>
-        <property name="icon" >
-         <iconset resource="layResources.qrc" >
+        <property name="icon">
+         <iconset resource="../../lay/lay/layResources.qrc">
           <normaloff>:/align_hcenter.png</normaloff>:/align_hcenter.png</iconset>
         </property>
-        <property name="iconSize" >
+        <property name="iconSize">
          <size>
           <width>32</width>
           <height>32</height>
@@ -70,16 +71,16 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="6" >
-       <widget class="QRadioButton" name="h_right_rb" >
-        <property name="text" >
+      <item row="0" column="6">
+       <widget class="QRadioButton" name="h_right_rb">
+        <property name="text">
          <string/>
         </property>
-        <property name="icon" >
-         <iconset resource="layResources.qrc" >
+        <property name="icon">
+         <iconset resource="../../lay/lay/layResources.qrc">
           <normaloff>:/align_right.png</normaloff>:/align_right.png</iconset>
         </property>
-        <property name="iconSize" >
+        <property name="iconSize">
          <size>
           <width>32</width>
           <height>32</height>
@@ -87,12 +88,12 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="7" >
-       <spacer name="horizontalSpacer_3" >
-        <property name="orientation" >
+      <item row="0" column="7">
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" stdset="0" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>243</width>
           <height>20</height>
@@ -100,55 +101,55 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_5" >
-        <property name="text" >
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
          <string>none</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="1" column="2" >
-       <widget class="QLabel" name="label_6" >
-        <property name="text" >
+      <item row="1" column="2">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
          <string>left</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="1" column="4" >
-       <widget class="QLabel" name="label_7" >
-        <property name="text" >
+      <item row="1" column="4">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
          <string>center</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="1" column="6" >
-       <widget class="QLabel" name="label_8" >
-        <property name="text" >
+      <item row="1" column="6">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
          <string>right</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <spacer name="horizontalSpacer" >
-        <property name="orientation" >
+      <item row="0" column="1">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
-        <property name="sizeHint" stdset="0" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
           <height>20</height>
@@ -156,15 +157,15 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="3" >
-       <spacer name="horizontalSpacer_4" >
-        <property name="orientation" >
+      <item row="0" column="3">
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
-        <property name="sizeHint" stdset="0" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
           <height>20</height>
@@ -172,15 +173,15 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="5" >
-       <spacer name="horizontalSpacer_5" >
-        <property name="orientation" >
+      <item row="0" column="5">
+       <spacer name="horizontalSpacer_5">
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
-        <property name="sizeHint" stdset="0" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
           <height>20</height>
@@ -192,21 +193,21 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_2" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
       <string>Vertical alignment</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2" >
-      <item row="0" column="0" >
-       <widget class="QRadioButton" name="v_none_rb" >
-        <property name="text" >
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QRadioButton" name="v_none_rb">
+        <property name="text">
          <string/>
         </property>
-        <property name="icon" >
-         <iconset resource="layResources.qrc" >
+        <property name="icon">
+         <iconset resource="../../lay/lay/layResources.qrc">
           <normaloff>:/align_none.png</normaloff>:/align_none.png</iconset>
         </property>
-        <property name="iconSize" >
+        <property name="iconSize">
          <size>
           <width>32</width>
           <height>32</height>
@@ -214,16 +215,16 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="2" >
-       <widget class="QRadioButton" name="v_top_rb" >
-        <property name="text" >
+      <item row="0" column="2">
+       <widget class="QRadioButton" name="v_top_rb">
+        <property name="text">
          <string/>
         </property>
-        <property name="icon" >
-         <iconset resource="layResources.qrc" >
+        <property name="icon">
+         <iconset resource="../../lay/lay/layResources.qrc">
           <normaloff>:/align_top.png</normaloff>:/align_top.png</iconset>
         </property>
-        <property name="iconSize" >
+        <property name="iconSize">
          <size>
           <width>32</width>
           <height>32</height>
@@ -231,16 +232,16 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="4" >
-       <widget class="QRadioButton" name="v_center_rb" >
-        <property name="text" >
+      <item row="0" column="4">
+       <widget class="QRadioButton" name="v_center_rb">
+        <property name="text">
          <string/>
         </property>
-        <property name="icon" >
-         <iconset resource="layResources.qrc" >
+        <property name="icon">
+         <iconset resource="../../lay/lay/layResources.qrc">
           <normaloff>:/align_vcenter.png</normaloff>:/align_vcenter.png</iconset>
         </property>
-        <property name="iconSize" >
+        <property name="iconSize">
          <size>
           <width>32</width>
           <height>32</height>
@@ -248,12 +249,12 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="7" >
-       <spacer name="horizontalSpacer_2" >
-        <property name="orientation" >
+      <item row="0" column="7">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" stdset="0" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>243</width>
           <height>34</height>
@@ -261,56 +262,56 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label" >
-        <property name="text" >
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
          <string>none</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="1" column="2" >
-       <widget class="QLabel" name="label_2" >
-        <property name="text" >
+      <item row="1" column="2">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
          <string>top</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="1" column="4" >
-       <widget class="QLabel" name="label_3" >
-        <property name="text" >
+      <item row="1" column="4">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
          <string>center</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="1" column="6" >
-       <widget class="QLabel" name="label_4" >
-        <property name="text" >
+      <item row="1" column="6">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
          <string>bottom</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="0" column="6" >
-       <widget class="QRadioButton" name="v_bottom_rb" >
-        <property name="text" >
+      <item row="0" column="6">
+       <widget class="QRadioButton" name="v_bottom_rb">
+        <property name="text">
          <string/>
         </property>
-        <property name="icon" >
-         <iconset resource="layResources.qrc" >
+        <property name="icon">
+         <iconset resource="../../lay/lay/layResources.qrc">
           <normaloff>:/align_bottom.png</normaloff>:/align_bottom.png</iconset>
         </property>
-        <property name="iconSize" >
+        <property name="iconSize">
          <size>
           <width>32</width>
           <height>32</height>
@@ -318,15 +319,15 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <spacer name="horizontalSpacer_6" >
-        <property name="orientation" >
+      <item row="0" column="1">
+       <spacer name="horizontalSpacer_6">
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
-        <property name="sizeHint" stdset="0" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
           <height>20</height>
@@ -334,15 +335,15 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="3" >
-       <spacer name="horizontalSpacer_7" >
-        <property name="orientation" >
+      <item row="0" column="3">
+       <spacer name="horizontalSpacer_7">
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
-        <property name="sizeHint" stdset="0" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
           <height>20</height>
@@ -350,15 +351,15 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="5" >
-       <spacer name="horizontalSpacer_8" >
-        <property name="orientation" >
+      <item row="0" column="5">
+       <spacer name="horizontalSpacer_8">
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
-        <property name="sizeHint" stdset="0" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
           <height>20</height>
@@ -370,21 +371,21 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_3" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
       <string>Layers for alignment of instances</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout" >
-      <item row="1" column="0" >
-       <widget class="QRadioButton" name="visible_layers_rb" >
-        <property name="text" >
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="0">
+       <widget class="QRadioButton" name="visible_layers_rb">
+        <property name="text">
          <string>Use visible layers only</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0" >
-       <widget class="QRadioButton" name="all_layers_rb" >
-        <property name="text" >
+      <item row="0" column="0">
+       <widget class="QRadioButton" name="all_layers_rb">
+        <property name="text">
          <string>Use all layers</string>
         </property>
        </widget>
@@ -393,11 +394,11 @@
     </widget>
    </item>
    <item>
-    <spacer name="verticalSpacer" >
-     <property name="orientation" >
+    <spacer name="verticalSpacer">
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" stdset="0" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>488</width>
        <height>16</height>
@@ -406,11 +407,11 @@
     </spacer>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox" >
-     <property name="orientation" >
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="standardButtons" >
+     <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
@@ -431,7 +432,7 @@
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
-  <include location="layResources.qrc" />
+  <include location="../../lay/lay/layResources.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -440,11 +441,11 @@
    <receiver>AlignOptionsDialog</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>248</x>
      <y>254</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>157</x>
      <y>274</y>
     </hint>
@@ -456,11 +457,11 @@
    <receiver>AlignOptionsDialog</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>316</x>
      <y>260</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
     </hint>

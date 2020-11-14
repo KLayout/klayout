@@ -54,6 +54,7 @@ class ViewService;
 class Editable;
 class Drawing;
 class TechnologyComponentProvider;
+class EditorOptionsPage;
 
 /**
  *  @brief The base class for configuration pages
@@ -234,7 +235,7 @@ public:
   {
     return std::vector<std::pair <std::string, ConfigPage *> > ();
   }
-  
+
   /**
    *  @brief The global configuration 
    *
@@ -317,7 +318,7 @@ public:
   }
 
   /**
-   *  @brief Fetch the menu objects for this plugin
+   *  @brief Fetches the menu objects for this plugin
    *
    *  The implementation of this method is supposed to call the base
    *  class'es "get_menu_entries" method and add it's own entries.
@@ -328,7 +329,7 @@ public:
   }
 
   /**
-   *  @brief Create a plugin object of the respective kind
+   *  @brief Creates a plugin object of the respective kind
    *
    *  This method may return 0 for "dummy" plugins that just register menu entries
    *  or configuration options.
@@ -339,7 +340,7 @@ public:
   }
 
   /**
-   *  @brief Tell if the plugin implements the "lay::Editable" interface
+   *  @brief Tells if the plugin implements the "lay::Editable" interface
    *
    *  This method is supposed to return true if the plugin implements the 
    *  lay::Editable interface and wants to be listed as an "edit" mode in the
@@ -350,9 +351,22 @@ public:
   {
     return false;
   }
-  
+
   /**
-   *  @brief Tell if the plugin implements a "lay::ViewService" active mouse mode
+   *  @brief Gets the editor options pages
+   *
+   *  Editor options pages are shown in the editor options dockable tool widget. Each plugin can create such pages
+   *  and these will be shown in tabs inside this widget.
+   *
+   *  The new pages are returned in the "pages" vector. The layout view will take ownership of these pages.
+   */
+  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> & /*pages*/, lay::LayoutView * /*view*/, lay::Dispatcher * /*dispatcher*/) const
+  {
+    //  .. no pages in the default implementation ..
+  }
+
+  /**
+   *  @brief Tells if the plugin implements a "lay::ViewService" active mouse mode
    *
    *  This method is supposed to return true if the plugin implements the 
    *  lay::ViewService interface and wants to be listed as an mouse mode in the

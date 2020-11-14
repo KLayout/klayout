@@ -126,7 +126,7 @@ private:
 
   virtual std::string path () const;
   virtual const char *get_string ();
-  virtual void get_string (tl::string &s) const;
+  virtual void get_string (std::string &s) const;
   virtual int get_int ();
   virtual short get_short ();
   virtual unsigned short get_ushort ();

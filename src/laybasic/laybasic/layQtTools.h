@@ -32,6 +32,11 @@ class QLabel;
 class QWidget;
 class QObject;
 
+namespace tl
+{
+  class Exception;
+}
+
 namespace lay
 {
 
@@ -62,6 +67,14 @@ LAYBASIC_PUBLIC void activate_modal_help_links (QLabel *label);
  */
 LAYBASIC_PUBLIC void register_help_handler (QObject *object, const char *slot, const char *modal_slot);
 
+/**
+ *  @brief Configures a QLineEdit or other widget to indicate an error
+ *
+ *  When a non-null ex pointer is passed, the background will be turned red
+ *  and the exception's text will be used as tooltip. Use this function with
+ *  a null ex pointer to clear the error condition.
+ */
+LAYBASIC_PUBLIC void indicate_error (QWidget *le, const tl::Exception *ex);
 
 } // namespace lay
 

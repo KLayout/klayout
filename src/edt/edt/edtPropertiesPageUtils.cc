@@ -26,6 +26,8 @@
 #include "dbShapes.h"
 #include "dbLayout.h"
 
+#include <QLineEdit>
+
 namespace edt
 {
 

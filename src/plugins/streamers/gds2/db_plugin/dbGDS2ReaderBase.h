@@ -29,6 +29,7 @@
 #include "dbLayout.h"
 #include "dbReader.h"
 #include "dbStreamLayers.h"
+#include "dbCommonReader.h"
 
 #include "tlException.h"
 #include "tlInternational.h"
@@ -49,7 +50,7 @@ struct GDS2XY
  *  @brief The GDS2 format basic stream reader
  */
 class DB_PLUGIN_PUBLIC GDS2ReaderBase
-  : public ReaderBase
+  : public CommonReader
 {
 public: 
   /**
@@ -86,20 +87,21 @@ protected:
    *  @param enable_properties A flag indicating whether to read user properties
    *  @param allow_multi_xy_records If true, tries to check for multiple XY records for BOUNDARY elements
    *  @param box_mode How to treat BOX records (0: ignore, 1: as rectangles, 2: as boundaries, 3: error)
+   *  @param cc_resolution The cell name conflict resolution mode
    *  @return The LayerMap object that tells where which layer was loaded
    */
-  const LayerMap &basic_read (db::Layout &layout, const LayerMap &layer_map, bool create_other_layers, bool enable_text_objects, bool enable_properties, bool allow_multi_xy_records, unsigned int box_mode);
+  const LayerMap &basic_read (db::Layout &layout, const LayerMap &layer_map, bool create_other_layers, bool enable_text_objects, bool enable_properties, bool allow_multi_xy_records, unsigned int box_mode, db::CommonReader::CellConflictResolution cc_resolution);
 
   /**
    *  @brief Accessor method to the current cellname
    */
-  const tl::string &cellname () const { return m_cellname; }
+  const std::string &cellname () const { return m_cellname; }
 
 private:
   friend class GDS2ReaderLayerMapping;
 
   LayerMap m_layer_map;
-  tl::string m_cellname;
+  std::string m_cellname;
   std::string m_libname;
   double m_dbu, m_dbuu;
   bool m_create_layers;
@@ -109,7 +111,6 @@ private:
   unsigned int m_box_mode;
   std::map <tl::string, std::vector<std::string> > m_context_info;
   std::vector <db::Point> m_all_points;
-  std::map <tl::string, tl::string> m_mapped_cellnames;
 
   void read_context_info_cell ();
   void read_boundary (db::Layout &layout, db::Cell &cell, bool from_box_record);
@@ -117,7 +118,6 @@ private:
   void read_text (db::Layout &layout, db::Cell &cell);
   void read_box (db::Layout &layout, db::Cell &cell);
   void read_ref (db::Layout &layout, db::Cell &cell, bool array, tl::vector<db::CellInstArray> &instances, tl::vector<db::CellInstArrayWithProperties> &insts_wp);
-  db::cell_index_type make_cell (db::Layout &layout, const char *cn, bool for_instance);
 
   void do_read (db::Layout &layout);
 
@@ -125,12 +125,15 @@ private:
   std::pair <bool, db::properties_id_type> finish_element (db::PropertiesRepository &rep);
   void finish_element ();
 
+  virtual void common_reader_error (const std::string &msg) { error (msg); }
+  virtual void common_reader_warn (const std::string &msg) { warn (msg); }
+
   virtual void error (const std::string &txt) = 0;
   virtual void warn (const std::string &txt) = 0;
 
   virtual std::string path () const = 0;
   virtual const char *get_string () = 0;
-  virtual void get_string (tl::string &s) const = 0;
+  virtual void get_string (std::string &s) const = 0;
   virtual int get_int () = 0;
   virtual short get_short () = 0;
   virtual unsigned short get_ushort () = 0;

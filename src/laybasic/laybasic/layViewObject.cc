@@ -73,6 +73,10 @@ CellDragDropData::serialized () const
   stream << (quintptr) mp_library;
   stream << m_cell_index;
   stream << m_is_pcell;
+  stream << int (m_pcell_params.size ());
+  for (std::vector<tl::Variant>::const_iterator i = m_pcell_params.begin (); i != m_pcell_params.end (); ++i) {
+    stream << tl::to_qstring (i->to_parsable_string ());
+  }
 
   return data;
 }
@@ -94,6 +98,19 @@ CellDragDropData::deserialize (const QByteArray &ba)
     mp_library = reinterpret_cast <const db::Library *> (p);
     stream >> m_cell_index;
     stream >> m_is_pcell;
+
+    m_pcell_params.clear ();
+    int n = 0;
+    stream >> n;
+    while (n-- > 0) {
+      QString s;
+      stream >> s;
+      std::string stl_s = tl::to_string (s);
+      tl::Extractor ex (stl_s.c_str ());
+      m_pcell_params.push_back (tl::Variant ());
+      ex.read (m_pcell_params.back ());
+    }
+
     return true;
 
   } else {
@@ -272,6 +289,7 @@ ViewObjectWidget::ViewObjectWidget (QWidget *parent, const char *name)
     m_mouse_pressed_state (false),
     m_mouse_buttons (0),
     m_in_mouse_move (false),
+    m_mouse_inside (false),
     m_cursor (lay::Cursor::none),
     m_default_cursor (lay::Cursor::none)
 {
@@ -363,6 +381,14 @@ ViewObjectWidget::set_default_cursor (lay::Cursor::cursor_shape cursor)
   }
 }
 
+void
+ViewObjectWidget::ensure_entered ()
+{
+  if (! m_mouse_inside) {
+    enterEvent (0);
+  }
+}
+
 void 
 ViewObjectWidget::begin_mouse_event (lay::Cursor::cursor_shape cursor)
 {
@@ -434,7 +460,7 @@ BEGIN_PROTECTED
   const DragDropDataBase *dd = get_drag_drop_data (event->mimeData ());
   if (dd) {
 
-    db::DPoint p = m_trans.inverted () * db::DPoint (event->pos ().x (), height () - 1 - event->pos ().y ());
+    db::DPoint p = pixel_to_um (event->pos ());
 
     bool done = drag_enter_event (p, dd);
     service_iterator svc = begin_services ();
@@ -479,7 +505,7 @@ BEGIN_PROTECTED
   const DragDropDataBase *dd = get_drag_drop_data (event->mimeData ());
   if (dd) {
 
-    db::DPoint p = m_trans.inverted () * db::DPoint (event->pos ().x (), height () - 1 - event->pos ().y ());
+    db::DPoint p = pixel_to_um (event->pos ());
 
     bool done = drag_move_event (p, dd);
     service_iterator svc = begin_services ();
@@ -503,7 +529,7 @@ BEGIN_PROTECTED
   const DragDropDataBase *dd = get_drag_drop_data (event->mimeData ());
   if (dd) {
 
-    db::DPoint p = m_trans.inverted () * db::DPoint (event->pos ().x (), height () - 1 - event->pos ().y ());
+    db::DPoint p = pixel_to_um (event->pos ());
 
     bool done = drop_event (p, dd);
     service_iterator svc = begin_services ();
@@ -523,6 +549,7 @@ void
 ViewObjectWidget::mouseMoveEvent (QMouseEvent *e)
 {
 BEGIN_PROTECTED  
+  ensure_entered ();
   m_mouse_pos = e->pos ();
   m_mouse_buttons = qt_to_buttons (e->buttons (), e->modifiers ());
   do_mouse_move ();
@@ -543,7 +570,7 @@ ViewObjectWidget::do_mouse_move ()
 
     bool done = false; 
     
-    db::DPoint p = m_trans.inverted () * db::DPoint (m_mouse_pressed.x (), height () - 1 - m_mouse_pressed.y ());
+    db::DPoint p = pixel_to_um (m_mouse_pressed);
 
     for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
       std::list<ViewService *>::iterator gg = g;
@@ -578,7 +605,7 @@ ViewObjectWidget::do_mouse_move ()
 
     bool done = false; 
 
-    db::DPoint p = m_trans.inverted () * db::DPoint (m_mouse_pos.x (), height () - 1 - m_mouse_pos.y ());
+    db::DPoint p = pixel_to_um (m_mouse_pos);
 
     for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
       std::list<ViewService *>::iterator gg = g;
@@ -614,6 +641,7 @@ void
 ViewObjectWidget::mouseDoubleClickEvent (QMouseEvent *e)
 {
 BEGIN_PROTECTED  
+  ensure_entered ();
   begin_mouse_event (lay::Cursor::none);
 
   setFocus ();
@@ -626,7 +654,7 @@ BEGIN_PROTECTED
 
   unsigned int buttons = qt_to_buttons (e->buttons (), e->modifiers ());
 
-  db::DPoint p = m_trans.inverted () * db::DPoint (e->pos ().x (), height () - 1 - e->pos ().y ());
+  db::DPoint p = pixel_to_um (e->pos ());
 
   for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
     std::list<ViewService *>::iterator gg = g;
@@ -659,6 +687,8 @@ void
 ViewObjectWidget::enterEvent (QEvent * /*event*/)
 {
 BEGIN_PROTECTED  
+  m_mouse_inside = true;
+
   begin_mouse_event ();
 
   bool done = false; 
@@ -723,12 +753,15 @@ BEGIN_PROTECTED
 
   end_mouse_event ();
 END_PROTECTED
+
+  m_mouse_inside = false;
 }
 
 void 
 ViewObjectWidget::wheelEvent (QWheelEvent *e)
 {
 BEGIN_PROTECTED  
+  ensure_entered ();
   begin_mouse_event ();
 
   e->ignore ();
@@ -738,7 +771,7 @@ BEGIN_PROTECTED
   unsigned int buttons = qt_to_buttons (e->buttons (), e->modifiers ());
   bool horizonal = (e->orientation () == Qt::Horizontal);
 
-  db::DPoint p = m_trans.inverted () * db::DPoint (e->pos ().x (), height () - 1 - e->pos ().y ());
+  db::DPoint p = pixel_to_um (e->pos ());
 
   for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
     std::list<ViewService *>::iterator gg = g;
@@ -770,6 +803,7 @@ END_PROTECTED
 void 
 ViewObjectWidget::mousePressEvent (QMouseEvent *e)
 {
+  ensure_entered ();
   setFocus ();
 
   m_mouse_pos = e->pos ();
@@ -784,12 +818,13 @@ void
 ViewObjectWidget::mouseReleaseEvent (QMouseEvent *e)
 {
 BEGIN_PROTECTED  
+  ensure_entered ();
   begin_mouse_event ();
 
   bool done = false; 
 
   m_mouse_pos = e->pos ();
-  db::DPoint p = m_trans.inverted () * db::DPoint (e->pos ().x (), height () - 1 - e->pos ().y ());
+  db::DPoint p = pixel_to_um (e->pos ());
 
   for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
     std::list<ViewService *>::iterator gg = g;
@@ -836,6 +871,12 @@ BEGIN_PROTECTED
 END_PROTECTED
 
   m_mouse_pressed_state = false;
+}
+
+db::DPoint
+ViewObjectWidget::pixel_to_um (const QPoint &pt) const
+{
+  return m_trans.inverted () * db::DPoint (pt.x (), height () - 1 - pt.y ());
 }
 
 void

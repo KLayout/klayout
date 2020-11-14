@@ -61,6 +61,9 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_synchronized_views, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_default_grids, "0.01,0.005,0.001"));
     options.push_back (std::pair<std::string, std::string> (cfg_mru, ""));
+    options.push_back (std::pair<std::string, std::string> (cfg_mru_sessions, ""));
+    options.push_back (std::pair<std::string, std::string> (cfg_mru_layer_properties, ""));
+    options.push_back (std::pair<std::string, std::string> (cfg_mru_bookmarks, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_technologies, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_show_navigator, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_navigator_all_hier_levels, "false"));
@@ -80,6 +83,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_micron_digits, "5"));
     options.push_back (std::pair<std::string, std::string> (cfg_dbu_digits, "2"));
     options.push_back (std::pair<std::string, std::string> (cfg_reader_options_show_always, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_assistant_bookmarks, ""));
   }
 
   virtual std::vector<std::pair <std::string, ConfigPage *> > config_pages (QWidget *parent) const 

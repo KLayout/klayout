@@ -554,6 +554,21 @@ HelpSource::get_outline (const std::string &u)
   return ol;
 }
 
+void
+HelpSource::search_completers (const std::string &string, std::list<std::string> &completers)
+{
+  size_t n = 0;
+  const size_t max_completers = 100;
+
+  //  first produce all hits with match
+  for (std::vector <IndexEntry>::const_iterator i = m_index.begin (); i < m_index.end () && n < max_completers; ++i) {
+    if (i->normalized_key.find (string) != std::string::npos) {
+      completers.push_back (i->key);
+      ++n;
+    }
+  }
+}
+
 std::string
 HelpSource::next_topic (const std::string &url)
 {

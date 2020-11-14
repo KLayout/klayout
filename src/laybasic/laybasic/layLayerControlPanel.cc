@@ -61,36 +61,6 @@ namespace lay
 {
 
 // --------------------------------------------------------------------
-//  LCPTreeItemDelegate declaration & implementation
-
-/**
- *  @brief A layer tree widget helper class
- *
- *  A specialization of the ItemDelegate that bypasses the computation
- *  of sizeHint and returns the pixmap's size directly for higher
- *  performance.
- */
-
-class LCPItemDelegate : public QItemDelegate
-{
-public:
-  LCPItemDelegate (QWidget *parent) 
-    : QItemDelegate (parent)
-  { }
-
-private:
-  virtual QSize 
-  sizeHint (const QStyleOptionViewItem &style, const QModelIndex &index) const
-  {
-    if (index.column () == 0) {
-      return QSize (40, 16);
-    } else {
-      return QItemDelegate::sizeHint (style, index);
-    }
-  }
-};
-
-// --------------------------------------------------------------------
 //  LCPTreeWidget declaration & implementation
 
 LCPTreeWidget::LCPTreeWidget (QWidget *parent, lay::LayerTreeModel *model, const char *name)
@@ -98,7 +68,6 @@ LCPTreeWidget::LCPTreeWidget (QWidget *parent, lay::LayerTreeModel *model, const
 {
   setObjectName (QString::fromUtf8 (name));
   setModel (model);
-  setItemDelegate (new LCPItemDelegate (this));
 #if QT_VERSION >= 0x040200
   setAllColumnsShowFocus (true);
 #endif
@@ -326,24 +295,21 @@ LayerControlPanel::LayerControlPanel (lay::LayoutView *view, db::Manager *manage
 
   mp_model = new lay::LayerTreeModel (this, view);
   mp_layer_list = new LCPTreeWidget (this, mp_model, "layer_tree");
-  mp_model->set_font (mp_layer_list->font ());
-  /*
-   * At least with Qt 4.2.x setting uniform row heights has a strange side effect: 
-   * If a range is selected and the first selection is scrolled out of view, the 
-   * range does not include the first element after having clicked at the second.
   mp_layer_list->setUniformRowHeights (true);
-  */
+  mp_model->set_font (mp_layer_list->font ());
+  mp_layer_list->setIconSize (mp_model->icon_size ());
+
   l->addWidget (mp_layer_list);
   connect (mp_layer_list, SIGNAL (double_clicked (const QModelIndex &, Qt::KeyboardModifiers)), this, SLOT (double_clicked (const QModelIndex &, Qt::KeyboardModifiers)));
   connect (mp_layer_list, SIGNAL (collapsed (const QModelIndex &)), this, SLOT (group_collapsed (const QModelIndex &)));
   connect (mp_layer_list, SIGNAL (expanded (const QModelIndex &)), this, SLOT (group_expanded (const QModelIndex &)));
   connect (mp_layer_list, SIGNAL (search_triggered (const QString &)), this, SLOT (search_triggered (const QString &)));
+  connect (mp_layer_list->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_index_changed (const QModelIndex &)));
   mp_layer_list->setContextMenuPolicy (Qt::CustomContextMenu);
   connect (mp_layer_list, SIGNAL(customContextMenuRequested (const QPoint &)), this, SLOT (context_menu (const QPoint &)));
   mp_layer_list->header ()->hide ();
   mp_layer_list->setSelectionMode (QTreeView::ExtendedSelection);
   mp_layer_list->setRootIsDecorated (false);
-  mp_layer_list->setIconSize (QSize (32, 16));
   //  Custom resize mode makes the columns as narrow as possible
 #if QT_VERSION >= 0x050000
   mp_layer_list->header ()->setSectionResizeMode (QHeaderView::ResizeToContents);
@@ -539,16 +505,14 @@ LayerControlPanel::cm_insert ()
 
     BEGIN_PROTECTED_CLEANUP
 
-    transaction (tl::to_string (QObject::tr ("Insert views")));
+    transaction (tl::to_string (QObject::tr ("Insert layer view")));
 
     props.set_source (tl::to_string (n));
     mp_view->init_layer_properties (props);
+
     const LayerPropertiesNode &lp = mp_view->insert_layer (sel, props);
 
-    if (transacting ()) {
-      manager ()->queue (this, new LayerSelectionClearOp ());
-    }
-    mp_layer_list->set_current (sel);
+    set_current_layer (sel);
 
     commit ();
 
@@ -599,17 +563,11 @@ LayerControlPanel::cm_group ()
 
     mp_view->insert_layer (ins_pos, node);
 
-    if (transacting ()) {
-      manager ()->queue (this, new LayerSelectionClearOp ());
-    }
+    set_current_layer (*sel.rbegin ());
 
     commit ();
 
-    end_updates ();
-
     emit order_changed ();
-
-    mp_layer_list->set_current (*sel.rbegin ());
 
   }
 
@@ -1941,8 +1899,14 @@ LayerControlPanel::do_update_content ()
 }
 
 void
-LayerControlPanel::set_current_layer (const lay::LayerPropertiesConstIterator &l) const
+LayerControlPanel::set_current_layer (const lay::LayerPropertiesConstIterator &l)
 {
+  if (transacting ()) {
+    manager ()->queue (this, new LayerSelectionClearOp ());
+  }
+
+  end_updates ();
+
   mp_layer_list->set_current (l);
 }
 
@@ -2068,6 +2032,17 @@ LayerControlPanel::update_required (int f)
   }
 
   m_do_update_content_dm ();
+}
+
+void
+LayerControlPanel::current_index_changed (const QModelIndex &index)
+{
+  lay::LayerPropertiesConstIterator iter = mp_model->iterator (index);
+  if (! iter.is_null () && ! iter.at_end ()) {
+    emit current_layer_changed (iter);
+  } else {
+    emit current_layer_changed (lay::LayerPropertiesConstIterator ());
+  }
 }
 
 void

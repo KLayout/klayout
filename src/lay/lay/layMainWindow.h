@@ -20,8 +20,6 @@
 
 */
 
-
-
 #ifndef HDR_layMainWindow
 #define HDR_layMainWindow
 
@@ -46,6 +44,7 @@
 #include "layProgress.h"
 #include "layTextProgress.h"
 #include "layTechnology.h"
+#include "layTextProgressDelegate.h"
 #include "tlException.h"
 #include "tlDeferredExecution.h"
 #include "tlObjectCollection.h"
@@ -60,10 +59,6 @@ class QMenu;
 class QStackedWidget;
 class QDockWidget;
 class QAction;
-
-namespace Ui {
-  class HelpAboutDialog;
-}
 
 namespace lay {
 
@@ -84,38 +79,19 @@ class Navigator;
 class LayerToolbox;
 class MainWindow;
 class HelpDialog;
+class HelpAboutDialog;
+class ControlWidgetStack;
+class ViewWidgetStack;
+class ProgressWidget;
 
 /**
- *  @brief A dialog for showing the "help about" dialog
+ *  @brief A big main window class
+ *
+ *  The main window is the core UI feature of the application.
+ *  The main window is view container, basic controller, configuration root
+ *  and holder of many resources.
+ *  The main window is a singleton.
  */
-class LAY_PUBLIC HelpAboutDialog
-  : public QDialog
-{
-public:
-  HelpAboutDialog (QWidget *parent); 
-  ~HelpAboutDialog ();
-
-private:
-  Ui::HelpAboutDialog *mp_ui;
-};
-
-class TextProgressDelegate
-  : public lay::TextProgress
-{
-public:
-  TextProgressDelegate (MainWindow *mw, int verbosity);
-
-  virtual void update_progress (tl::Progress *progress);
-  virtual void show_progress_bar (bool show);
-  virtual bool progress_wants_widget () const;
-  virtual void progress_add_widget (QWidget *widget);
-  virtual QWidget *progress_get_widget () const;
-  virtual void progress_remove_widget ();
-
-private:
-  MainWindow *mp_mw;
-};
-
 class LAY_PUBLIC MainWindow
   : public QMainWindow,
     public lay::Dispatcher
@@ -564,17 +540,22 @@ public:
   tl::event<int> view_created_event;
 
   /**
-   *  @brief Add an entry to the MRU list with the initial technology
+   *  @brief Adds an entry to the MRU list with the initial technology
    */
   void add_mru (const std::string &fn);
 
   /**
-   *  @brief Add an entry to the MRU list
+   *  @brief Adds an entry to the MRU list
    */
   void add_mru (const std::string &fn, const std::string &tech);
 
   /**
-   *  @brief Get the technology used for loading or creating layouts
+   *  @brief Adds an entry to a specific MRU list given by the "cfg" configuration option
+   */
+  void add_to_other_mru (const std::string &fn_rel, const std::string &cfg);
+
+  /**
+   *  @brief Gets the technology used for loading or creating layouts
    */
   const std::string &initial_technology () 
   {
@@ -582,7 +563,7 @@ public:
   }
 
   /**
-   *  @brief Set the initial technology used for loading or creating layouts
+   *  @brief Sets the initial technology used for loading or creating layouts
    */
   void set_initial_technology (const std::string &tech)
   {
@@ -637,6 +618,9 @@ public slots:
   void close_current_view ();
   void tab_close_requested (int);
   void open_recent (size_t n);
+  void open_recent_session (size_t n);
+  void open_recent_layer_properties (size_t n);
+  void open_recent_bookmarks (size_t n);
   void view_selected (int index);
   void view_title_changed ();
 
@@ -670,7 +654,7 @@ protected slots:
 protected:
   void update_content ();
   void do_update_menu ();
-  void do_update_file_menu ();
+  void do_update_mru_menus ();
 
 private:
   TextProgressDelegate m_text_progress;
@@ -680,9 +664,9 @@ private:
   QToolBar *mp_tool_bar;
   QDockWidget *mp_navigator_dock_widget;
   lay::Navigator *mp_navigator;
-  QDockWidget *mp_hp_dock_widget, *mp_lp_dock_widget, *mp_libs_dock_widget, *mp_bm_dock_widget;
-  ControlWidgetStack *mp_hp_stack, *mp_lp_stack, *mp_libs_stack, *mp_bm_stack;
-  bool m_hp_visible, m_lp_visible, m_libs_visible, m_bm_visible, m_navigator_visible, m_layer_toolbox_visible;
+  QDockWidget *mp_hp_dock_widget, *mp_lp_dock_widget, *mp_libs_dock_widget, *mp_eo_dock_widget, *mp_bm_dock_widget;
+  ControlWidgetStack *mp_hp_stack, *mp_lp_stack, *mp_libs_stack, *mp_eo_stack, *mp_bm_stack;
+  bool m_hp_visible, m_lp_visible, m_libs_visible, m_eo_visible, m_bm_visible, m_navigator_visible, m_layer_toolbox_visible;
   QDockWidget *mp_layer_toolbox_dock_widget;
   lay::LayerToolbox *mp_layer_toolbox;
   ViewWidgetStack *mp_view_stack;
@@ -700,6 +684,7 @@ private:
   std::vector <lay::LayoutView *> mp_views;
   int m_open_mode;
   std::vector<std::pair<std::string, std::string> > m_mru;
+  std::vector<std::string> m_mru_sessions, m_mru_layer_properties, m_mru_bookmarks;
   QStatusBar *mp_status_bar;
   QStackedWidget *mp_main_stack_widget;
   ProgressWidget *mp_progress_widget;
@@ -712,7 +697,7 @@ private:
   bool m_disable_tab_selected;
   bool m_exited;
   tl::DeferredMethod<MainWindow> dm_do_update_menu;
-  tl::DeferredMethod<MainWindow> dm_do_update_file_menu;
+  tl::DeferredMethod<MainWindow> dm_do_update_mru_menus;
   tl::DeferredMethod<MainWindow> dm_exit;
   QTimer m_message_timer;
   QTimer m_file_changed_timer;

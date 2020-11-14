@@ -22,6 +22,9 @@
 
 
 #include "layTipDialog.h"
+#include "layEditorOptionsPages.h"
+#include "layDispatcher.h"
+#include "layLayoutView.h"
 #include "edtPlugin.h"
 #include "edtConfig.h"
 #include "edtService.h"
@@ -29,13 +32,27 @@
 #include "edtMainService.h"
 #include "edtPartialService.h"
 #include "edtEditorOptionsPages.h"
+#include "edtRecentConfigurationPage.h"
 
 #include <QApplication>
+#include <QLayout>
 
 namespace edt
 {
 
-static 
+edt::RecentConfigurationPage::ConfigurationDescriptor shape_cfg_descriptors[] =
+{
+  edt::RecentConfigurationPage::ConfigurationDescriptor ("", tl::to_string (tr ("Layer")), edt::RecentConfigurationPage::Layer),
+};
+
+static
+void get_shape_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
+{
+  ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-shape-param",
+                        &shape_cfg_descriptors[0], &shape_cfg_descriptors[sizeof (shape_cfg_descriptors) / sizeof (shape_cfg_descriptors[0])]));
+}
+
+static
 void get_text_options (std::vector < std::pair<std::string, std::string> > &options)
 {
   options.push_back (std::pair<std::string, std::string> (cfg_edit_text_string, "ABC"));
@@ -44,10 +61,21 @@ void get_text_options (std::vector < std::pair<std::string, std::string> > &opti
   options.push_back (std::pair<std::string, std::string> (cfg_edit_text_valign, "bottom"));
 }
 
-static 
-void get_text_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::Dispatcher *)
+edt::RecentConfigurationPage::ConfigurationDescriptor text_cfg_descriptors[] =
 {
-  ret.push_back (new edt::EditorOptionsText ());
+  edt::RecentConfigurationPage::ConfigurationDescriptor ("", tl::to_string (tr ("Layer")), edt::RecentConfigurationPage::Layer),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_string, tl::to_string (tr ("Text")), edt::RecentConfigurationPage::Text),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_size, tl::to_string (tr ("Size")), edt::RecentConfigurationPage::Double),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_halign, tl::to_string (tr ("Hor. align")), edt::RecentConfigurationPage::Text),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_valign, tl::to_string (tr ("Vert. align")), edt::RecentConfigurationPage::Text)
+};
+
+static
+void get_text_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
+{
+  ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-text-param",
+                        &text_cfg_descriptors[0], &text_cfg_descriptors[sizeof (text_cfg_descriptors) / sizeof (text_cfg_descriptors[0])]));
+  ret.push_back (new edt::EditorOptionsText (dispatcher));
 }
 
 static 
@@ -59,10 +87,21 @@ void get_path_options (std::vector < std::pair<std::string, std::string> > &opti
   options.push_back (std::pair<std::string, std::string> (cfg_edit_path_ext_var_end, "0.0"));
 }
 
-static 
-void get_path_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::Dispatcher *)
+edt::RecentConfigurationPage::ConfigurationDescriptor path_cfg_descriptors[] =
 {
-  ret.push_back (new EditorOptionsPath ());
+  edt::RecentConfigurationPage::ConfigurationDescriptor ("", tl::to_string (tr ("Layer")), edt::RecentConfigurationPage::Layer),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_width, tl::to_string (tr ("Width")), edt::RecentConfigurationPage::Double),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_ext_type, tl::to_string (tr ("Ends")), edt::RecentConfigurationPage::Int),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_ext_var_begin, tl::to_string (tr ("Begin ext.")), edt::RecentConfigurationPage::Double),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_ext_var_end, tl::to_string (tr ("End ext.")), edt::RecentConfigurationPage::Double)
+};
+
+static
+void get_path_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
+{
+  ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-path-param",
+                        &path_cfg_descriptors[0], &path_cfg_descriptors[sizeof (path_cfg_descriptors) / sizeof (path_cfg_descriptors[0])]));
+  ret.push_back (new EditorOptionsPath (dispatcher));
 }
 
 static 
@@ -84,10 +123,30 @@ void get_inst_options (std::vector < std::pair<std::string, std::string> > &opti
   options.push_back (std::pair<std::string, std::string> (cfg_edit_show_shapes_of_instances, "true"));
 }
 
-static 
-void get_inst_editor_options_pages (std::vector<edt::EditorOptionsPage *> &ret, lay::Dispatcher *root)
+edt::RecentConfigurationPage::ConfigurationDescriptor inst_cfg_descriptors[] =
 {
-  ret.push_back (new EditorOptionsInst (root));
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_lib_name, tl::to_string (tr ("Library")), edt::RecentConfigurationPage::CellLibraryName),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_cell_name, tl::to_string (tr ("Cell")), edt::RecentConfigurationPage::CellDisplayName),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_angle, tl::to_string (tr ("Angle")), edt::RecentConfigurationPage::Double),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_mirror, tl::to_string (tr ("Mirror")), edt::RecentConfigurationPage::Bool),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_scale, tl::to_string (tr ("Scale")), edt::RecentConfigurationPage::Double),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_array, tl::to_string (tr ("Array")), edt::RecentConfigurationPage::ArrayFlag),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_rows, tl::to_string (tr ("Rows")), edt::RecentConfigurationPage::IntIfArray),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_row_x, tl::to_string (tr ("Row step (x)")), edt::RecentConfigurationPage::DoubleIfArray),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_row_y, tl::to_string (tr ("Row step (y)")), edt::RecentConfigurationPage::DoubleIfArray),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_columns, tl::to_string (tr ("Columns")), edt::RecentConfigurationPage::IntIfArray),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_column_x, tl::to_string (tr ("Column step (x)")), edt::RecentConfigurationPage::DoubleIfArray),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_column_y, tl::to_string (tr ("Column step (y)")), edt::RecentConfigurationPage::DoubleIfArray),
+  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_pcell_parameters, tl::to_string (tr ("PCell parameters")), edt::RecentConfigurationPage::PCellParameters)
+};
+
+static
+void get_inst_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
+{
+  ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-inst-param",
+                        &inst_cfg_descriptors[0], &inst_cfg_descriptors[sizeof (inst_cfg_descriptors) / sizeof (inst_cfg_descriptors[0])]));
+  ret.push_back (new EditorOptionsInstPCellParam (dispatcher));
+  ret.push_back (new EditorOptionsInst (dispatcher));
 }
 
 template <class Svc>
@@ -97,7 +156,7 @@ class PluginDeclaration
 public:
   PluginDeclaration (const std::string &title, const std::string &mouse_mode, 
                      void (*option_get_f) (std::vector < std::pair<std::string, std::string> > &) = 0,
-                     void (*pages_f) (std::vector <edt::EditorOptionsPage *> &, lay::Dispatcher *) = 0)
+                     void (*pages_f) (std::vector <lay::EditorOptionsPage *> &, lay::LayoutView *, lay::Dispatcher *) = 0)
     : m_title (title), m_mouse_mode (mouse_mode), mp_option_get_f (option_get_f), mp_pages_f (pages_f)
   {
     //  .. nothing yet ..
@@ -120,11 +179,11 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void get_editor_options_pages (std::vector<edt::EditorOptionsPage *> &pages, lay::Dispatcher *root) const
+  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutView *view, lay::Dispatcher *root) const
   {
     if (mp_pages_f != 0) {
       size_t nstart = pages.size ();
-      (*mp_pages_f) (pages, root);
+      (*mp_pages_f) (pages, view, root);
       while (nstart < pages.size ()) {
         pages [nstart++]->set_plugin_declaration (this);
       }
@@ -155,16 +214,16 @@ private:
   std::string m_mouse_mode;
 
   void (*mp_option_get_f) (std::vector < std::pair<std::string, std::string> > &options);
-  void (*mp_pages_f) (std::vector <edt::EditorOptionsPage *> &, lay::Dispatcher *);
+  void (*mp_pages_f) (std::vector <lay::EditorOptionsPage *> &, lay::LayoutView *, lay::Dispatcher *);
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl1 (
-  new edt::PluginDeclaration<edt::PolygonService> (tl::to_string (QObject::tr ("Polygons")), "polygon:edit_mode\t" + tl::to_string (QObject::tr ("Polygon")) + "<:polygon.png>" + tl::to_string (QObject::tr ("{Create a polygon}"))), 
+  new edt::PluginDeclaration<edt::PolygonService> (tl::to_string (QObject::tr ("Polygons")), "polygon:edit_mode\t" + tl::to_string (QObject::tr ("Polygon")) + "<:polygon.png>" + tl::to_string (QObject::tr ("{Create a polygon}")), 0, &get_shape_editor_options_pages),
   4010, 
   "edt::Service(Polygons)"
 );
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl2 (
-  new edt::PluginDeclaration<edt::BoxService> (tl::to_string (QObject::tr ("Boxes")), "box:edit_mode\t" + tl::to_string (QObject::tr ("Box")) + "\t<:box.png>" + tl::to_string (QObject::tr ("{Create a box}"))), 
+  new edt::PluginDeclaration<edt::BoxService> (tl::to_string (QObject::tr ("Boxes")), "box:edit_mode\t" + tl::to_string (QObject::tr ("Box")) + "\t<:box.png>" + tl::to_string (QObject::tr ("{Create a box}")), 0, &get_shape_editor_options_pages),
   4011, 
   "edt::Service(Boxes)"
 );
@@ -189,7 +248,7 @@ class MainPluginDeclaration
 {
 public:
   MainPluginDeclaration (const std::string &title)
-    : mp_root (0), m_title (title), mp_obj_prop_dialog (0)
+    : mp_root (0), m_title (title)
   {
     //  .. nothing yet ..
   }
@@ -218,13 +277,12 @@ public:
     menu_entries.push_back (lay::menu_item ("edt::descend", "descend", "zoom_menu.end", tl::to_string (QObject::tr ("Descend")) + "(Ctrl+D)"));
     menu_entries.push_back (lay::menu_item ("edt::ascend", "ascend", "zoom_menu.end", tl::to_string (QObject::tr ("Ascend")) + "(Ctrl+A)"));
 
-    menu_entries.push_back (lay::separator ("edit_options_group:edit_mode", "edit_menu.end"));
-    menu_entries.push_back (lay::menu_item ("edt::edit_options", "edit_options:edit_mode", "edit_menu.end", tl::to_string (QObject::tr ("Editor Options")) + "(F3)"));
     menu_entries.push_back (lay::menu_item ("edt::sel_make_array", "make_array:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Make Array"))));
     menu_entries.push_back (lay::separator ("selection_group:edit_mode", "edit_menu.selection_menu.end"));
     menu_entries.push_back (lay::menu_item ("edt::sel_change_layer", "change_layer:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Change Layer"))));
     menu_entries.push_back (lay::menu_item ("edt::sel_tap", "tap:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Tap")) + "(T)"));
     menu_entries.push_back (lay::menu_item ("edt::sel_align", "align:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Align"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_distribute", "distribute:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Distribute"))));
     menu_entries.push_back (lay::menu_item ("edt::sel_round_corners", "round_corners:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Round Corners"))));
     menu_entries.push_back (lay::menu_item ("edt::sel_size", "size:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Size Shapes"))));
     menu_entries.push_back (lay::menu_item ("edt::sel_union", "union:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Merge Shapes"))));
@@ -263,10 +321,17 @@ public:
   {
     return false;
   }
-  
+
   virtual bool implements_mouse_mode (std::string & /*title*/) const
   {
     return false;
+  }
+
+  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutView * /*view*/, lay::Dispatcher *dispatcher) const
+  {
+    //  NOTE: we do not set plugin_declaration which makes the page unspecific
+    EditorOptionsGeneric *generic_opt = new EditorOptionsGeneric (dispatcher);
+    pages.push_back (generic_opt);
   }
 
   virtual void initialize (lay::Dispatcher *root)
@@ -277,24 +342,6 @@ public:
     }
 
     mp_root = root;
-
-    //  create the editor options dialog
-    m_prop_dialog_pages.push_back (new edt::EditorOptionsGeneric ());
-
-    for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-      const PluginDeclarationBase *pd_base = dynamic_cast<const PluginDeclarationBase *> (&*cls);
-      if (pd_base) {
-        pd_base->get_editor_options_pages (m_prop_dialog_pages, root);
-      }
-    }
-
-    mp_obj_prop_dialog = new edt::EditorOptionsPages (m_prop_dialog_pages, root);
-
-    for (std::vector<edt::EditorOptionsPage *>::const_iterator op = m_prop_dialog_pages.begin (); op != m_prop_dialog_pages.end (); ++op) {
-      if ((*op)->plugin_declaration () != 0) {
-        (*op)->activate (false);
-      }
-    }
 
     //  add entries to the combine mode dialog
     mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_add",   new lay::ConfigureAction (tl::to_string (QObject::tr ("Add<:/cm_add.png>{Add shapes}")),   cfg_edit_combine_mode, CMConverter ().to_string (CM_Add)));
@@ -333,42 +380,6 @@ public:
     }
   }
 
-  virtual void uninitialize (lay::Dispatcher *)
-  {
-    if (mp_obj_prop_dialog) {
-      delete mp_obj_prop_dialog;
-      mp_obj_prop_dialog = 0;
-    }
-  }
-
-  virtual void config_finalize ()
-  {
-    if (mp_obj_prop_dialog && mp_obj_prop_dialog->isVisible ()) {
-      mp_obj_prop_dialog->setup ();
-    }
-  }
-
-  void show_dialog () const
-  {
-    if (mp_obj_prop_dialog) {
-      if (! mp_obj_prop_dialog->isVisible ()) {
-        mp_obj_prop_dialog->setup ();
-        mp_obj_prop_dialog->show ();
-      }
-      mp_obj_prop_dialog->activateWindow ();
-      mp_obj_prop_dialog->raise ();
-    }
-  }
-
-  void activate (const lay::PluginDeclaration *pd, bool active) const
-  {
-    for (std::vector<edt::EditorOptionsPage *>::const_iterator op = m_prop_dialog_pages.begin (); op != m_prop_dialog_pages.end (); ++op) {
-      if ((*op)->plugin_declaration () == pd) {
-        (*op)->activate (active);
-      }
-    }
-  }
-
   void initialized (lay::Dispatcher *root)
   {
     lay::Dispatcher *mp = lay::Dispatcher::instance ();
@@ -397,40 +408,27 @@ public:
 private:
   lay::Dispatcher *mp_root;
   std::string m_title;
-  edt::EditorOptionsPages *mp_obj_prop_dialog;
-  std::vector<edt::EditorOptionsPage *> m_prop_dialog_pages;
 };
 
+static tl::RegisteredClass<lay::PluginDeclaration> config_decl_main (new edt::MainPluginDeclaration (tl::to_string (QObject::tr ("Instances and shapes"))), 4000, "edt::MainService");
+
 void
-show_editor_options_dialog ()
+commit_recent (lay::LayoutView *view)
 {
-  //  look for the plugin declaration and show the dialog
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    const MainPluginDeclaration *main_pd = dynamic_cast<const MainPluginDeclaration *> (&*cls);
-    if (main_pd) {
-      main_pd->show_dialog ();
-      break;
+  lay::EditorOptionsPages *eo_pages = view->editor_options_pages ();;
+  if (!eo_pages) {
+    return;
+  }
+
+  for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
+    if ((*op)->active ()) {
+      (*op)->commit_recent (view);
     }
   }
 }
-
-void 
-activate_service (const lay::PluginDeclaration *pd, bool active)
-{
-  //  look for the plugin declaration and show the dialog
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    const MainPluginDeclaration *main_pd = dynamic_cast<const MainPluginDeclaration *> (&*cls);
-    if (main_pd) {
-      main_pd->activate (pd, active);
-      break;
-    }
-  }
-}
-
-static tl::RegisteredClass<lay::PluginDeclaration> config_decl20 (new edt::MainPluginDeclaration (tl::to_string (QObject::tr ("Instances and shapes"))), 4000, "edt::MainService");
 
 class PartialPluginDeclaration
-  : public lay::PluginDeclaration
+  : public PluginDeclarationBase
 {
 public:
   PartialPluginDeclaration (const std::string &title, const std::string &mouse_mode)
@@ -442,6 +440,11 @@ public:
   virtual void get_options (std::vector < std::pair<std::string, std::string> > & /*options*/) const
   {
     //  .. nothing yet ..
+  }
+
+  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> & /*pages*/, lay::LayoutView * /*view*/, lay::Dispatcher * /*root*/) const
+  {
+    //  .. no specific ones ..
   }
 
   virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *root, lay::LayoutView *view) const

@@ -37,6 +37,7 @@
 #include "ui_InstantiationForm.h"
 #include "ui_ChangeLayerOptionsDialog.h"
 #include "ui_AlignOptionsDialog.h"
+#include "ui_DistributeOptionsDialog.h"
 #include "ui_CopyModeDialog.h"
 #include "ui_MakeCellOptionsDialog.h"
 #include "ui_MakeArrayOptionsDialog.h"
@@ -125,6 +126,22 @@ public:
   virtual ~AlignOptionsDialog ();
 
   bool exec_dialog (lay::LayoutView *view, int &hmode, int &vmode, bool &visible_layers);
+};
+
+/**
+ *  @brief Distribute function options dialog
+ */
+class DistributeOptionsDialog
+  : public QDialog,
+    public Ui::DistributeOptionsDialog
+{
+Q_OBJECT
+
+public:
+  DistributeOptionsDialog (QWidget *parent);
+  virtual ~DistributeOptionsDialog ();
+
+  bool exec_dialog (lay::LayoutView *view, bool &hdistribute, int &hmode, double &hpitch, double &hspace, bool &vdistribute, int &vmode, double &vpitch, double &vspace, bool &visible_layers);
 };
 
 /**

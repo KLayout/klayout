@@ -64,7 +64,7 @@ GDS2Reader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   --m_recnum;
   m_reclen = 0;
 
-  return basic_read (layout, m_common_options.layer_map, m_common_options.create_other_layers, m_common_options.enable_text_objects, m_common_options.enable_properties, m_options.allow_multi_xy_records, m_options.box_mode);
+  return basic_read (layout, m_common_options.layer_map, m_common_options.create_other_layers, m_common_options.enable_text_objects, m_common_options.enable_properties, m_options.allow_multi_xy_records, m_options.box_mode, m_common_options.cell_conflict_resolution);
 }
 
 const LayerMap &
@@ -210,7 +210,7 @@ GDS2Reader::get_string ()
 }
 
 void
-GDS2Reader::get_string (tl::string &s) const
+GDS2Reader::get_string (std::string &s) const
 {
   s.assign ((const char *) mp_rec_buf, 0, m_reclen);
 }

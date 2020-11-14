@@ -50,7 +50,7 @@
 #include "layPlugin.h"
 #include "layDisplayState.h"
 #include "layBookmarkList.h"
-#include "layDialogs.h"
+#include "layEditorOptionsFrame.h"
 #include "gsi.h"
 #include "tlException.h"
 #include "tlEvents.h"
@@ -83,6 +83,7 @@ class MoveService;
 class Browser;
 class ColorButton;
 class ConfigureAction;
+class EditorOptionsPages;
 
 /**
  *  @brief Stores a layer reference to create layers which have been added by some action
@@ -176,14 +177,15 @@ public:
     LV_NoLayers = 1, 
     LV_NoHierarchyPanel = 2, 
     LV_NoLibrariesView = 4,
-    LV_NoBookmarksView = 8,
-    LV_Naked = 16,
-    LV_NoZoom = 32,
-    LV_NoGrid = 64,
-    LV_NoMove = 128,
-    LV_NoTracker = 256,
-    LV_NoSelection = 512,
-    LV_NoPlugins = 1024,
+    LV_NoEditorOptionsPanel = 8,
+    LV_NoBookmarksView = 16,
+    LV_Naked = 32,
+    LV_NoZoom = 64,
+    LV_NoGrid = 128,
+    LV_NoMove = 256,
+    LV_NoTracker = 512,
+    LV_NoSelection = 1024,
+    LV_NoPlugins = 2048,
     LV_NoServices = LV_NoMove + LV_NoTracker + LV_NoSelection + LV_NoPlugins
   };
 
@@ -238,11 +240,27 @@ public:
   }
 
   /**
+   *  @brief Gets the layer control panel
+   */
+  lay::LayerControlPanel *control_panel ()
+  {
+    return mp_control_panel;
+  }
+
+  /**
    *  @brief Gets the container with the hierarchy control panel
    */
   QWidget *hierarchy_control_frame () 
   {
     return mp_hierarchy_frame;
+  }
+
+  /**
+   *  @brief Gets the hierarchy panel
+   */
+  lay::HierarchyControlPanel *hierarchy_panel ()
+  {
+    return mp_hierarchy_panel;
   }
 
   /**
@@ -260,6 +278,19 @@ public:
   {
     return mp_bookmarks_frame;
   }
+
+  /**
+   *  @brief Gets the container with the editor options
+   */
+  QWidget *editor_options_frame ()
+  {
+    return mp_editor_options_frame;
+  }
+
+  /**
+   *  @brief Gets the editor options pages widget
+   */
+  lay::EditorOptionsPages *editor_options_pages ();
 
   /**
    *  @brief Pastes from clipboard
@@ -721,6 +752,12 @@ public:
   tl::event<int> current_layer_list_changed_event;
 
   /**
+   *  @brief An event signalling that the current layer has changed
+   */
+  tl::event<const lay::LayerPropertiesConstIterator &> current_layer_changed_event;
+
+
+  /**
    *  @brief An event signalling that the visibility of some cells has changed
    */
   tl::Event cell_visibility_changed_event;
@@ -743,8 +780,18 @@ public:
    *
    *  This method will look up that layer in the layer view tree and select that layer.
    *  This method will also select this layer.
+   *
+   *  Returns false if the layer is not a valid one.
    */
-  void set_current_layer (unsigned int cv_index, const db::LayerProperties &properties);
+  bool set_current_layer (unsigned int cv_index, const db::LayerProperties &properties);
+
+  /**
+   *  @brief Sets the currently active layer by layer properties and cell view index
+   *
+   *  If the layer does not exist, the user will be asked whether to create the layer.
+   *  Returns false if the layer is not a valid one and the user defined to create the layer.
+   */
+  bool set_or_request_current_layer (unsigned int cv_index, const db::LayerProperties &properties);
 
   /**
    *  @brief Sets the currently active layer
@@ -1959,6 +2006,14 @@ public:
   virtual void drop_url (const std::string &path_or_url);
 
   /**
+   *  @brief Gets a list of all plugins
+   */
+  const std::vector<lay::Plugin *> &plugins ()
+  {
+    return mp_plugins;
+  }
+
+  /**
    *  @brief Localize a plugin by name
    *
    *  This method will return 0, if no such plugin is registered
@@ -2506,6 +2561,14 @@ public:
    */
   void create_plugins (const lay::PluginDeclaration *except_this = 0);
 
+  /**
+   *  @brief Gets the full field box
+   *
+   *  This is the box to which the view will zoom on zoom_fit().
+   *  This box is supposed to cover everything inside the view.
+   */
+  db::DBox full_box () const;
+
 public slots:
   /**
    *  @brief Store the current state on the "previous states" stack
@@ -2561,12 +2624,9 @@ public slots:
   void select_cell_dispatch (const cell_path_type &path, int cellview_index);
 
   /**
-   *  @brief Gets the full field box
-   *
-   *  This is the box to which the view will zoom on zoom_fit().
-   *  This box is supposed to cover everything inside the view.
+   *  @brief Called when the current layer changed
    */
-  db::DBox full_box () const;
+  void current_layer_changed_slot (const lay::LayerPropertiesConstIterator &iter);
 
   //  zoom slots
   void zoom_fit ();
@@ -2581,81 +2641,6 @@ public slots:
   void pan_up_fast ();
   void pan_right_fast ();
   void pan_down_fast ();
-
-  //  menu callbacks
-  void cm_new_layer ();
-  void cm_clear_layer ();
-  void cm_delete_layer ();
-  void cm_copy_layer ();
-  void cm_align_cell_origin ();
-  void cm_edit_layer ();
-  void cm_lay_convert_to_static ();
-  void cm_lay_flip_x ();
-  void cm_lay_flip_y ();
-  void cm_lay_rot_cw ();
-  void cm_lay_rot_ccw ();
-  void cm_lay_free_rot ();
-  void cm_lay_scale ();
-  void cm_lay_move ();
-  void cm_sel_flip_x ();
-  void cm_sel_flip_y ();
-  void cm_sel_rot_cw ();
-  void cm_sel_rot_ccw ();
-  void cm_sel_free_rot ();
-  void cm_sel_scale ();
-  void cm_sel_move ();
-  void cm_sel_move_to ();
-  void cm_sel_move_interactive ();
-
-  //  forwarded to the layer control panel
-  void cm_new_tab ();
-  void cm_rename_tab ();
-  void cm_remove_tab ();
-  void cm_select_all ();
-  void cm_make_valid ();
-  void cm_make_invalid ();
-  void cm_hide ();
-  void cm_hide_all ();
-  void cm_show ();
-  void cm_show_all ();
-  void cm_show_only ();
-  void cm_rename ();
-  void cm_delete ();
-  void cm_insert ();
-  void cm_group ();
-  void cm_ungroup ();
-  void cm_source ();
-  void cm_sort_by_name ();
-  void cm_sort_by_ild ();
-  void cm_sort_by_idl ();
-  void cm_sort_by_ldi ();
-  void cm_sort_by_dli ();
-  void cm_regroup_by_index ();
-  void cm_regroup_by_datatype ();
-  void cm_regroup_by_layer ();
-  void cm_regroup_flatten ();
-  void cm_expand_all ();
-  void cm_add_missing ();
-  void cm_remove_unused ();
-  void cm_layer_copy ();
-  void cm_layer_cut ();
-  void cm_layer_paste ();
-
-  //  forwarded to the cell control panel
-  void cm_cell_user_properties ();
-  void cm_cell_flatten ();
-  void cm_cell_rename ();
-  void cm_cell_replace ();
-  void cm_cell_delete ();
-  void cm_cell_select ();
-  void cm_open_current_cell ();
-  void cm_cell_hide ();
-  void cm_cell_show ();
-  void cm_cell_show_all ();
-  void cm_cell_copy ();
-  void cm_cell_cut ();
-  void cm_cell_paste ();
-  void cm_cell_convert_to_static ();
 
   //  called by children and owner
   void redraw ();
@@ -2728,6 +2713,11 @@ signals:
    */
   void mode_change (int m);
 
+  /**
+   *  @brief The current layer changed
+   */
+  void current_layer_changed (const lay::LayerPropertiesConstIterator &l);
+
 protected:
   /**
    *  @brief Establish the view operations
@@ -2761,6 +2751,7 @@ private:
   lay::LibrariesView *mp_libraries_view;
   lay::BookmarksView *mp_bookmarks_view;
   QWidget *mp_control_frame, *mp_hierarchy_frame, *mp_libraries_frame, *mp_bookmarks_frame;
+  lay::EditorOptionsFrame *mp_editor_options_frame;
   QSpinBox *mp_min_hier_spbx;
   QSpinBox *mp_max_hier_spbx;
   std::list <CellView> m_cellviews;
@@ -2869,20 +2860,11 @@ private:
 
   std::vector<lay::Plugin *> mp_plugins;
 
-  db::LayerProperties m_new_layer_props;
-  db::DVector m_move_dist;
-  int m_move_to_origin_mode_x, m_move_to_origin_mode_y;
-  lay::AlignCellOptions m_align_cell_options;
-  int m_del_cell_mode;
-  int m_layer_hier_mode;
-  int m_duplicate_hier_mode;
-  bool m_clear_before;
-  int m_copy_cva, m_copy_cvr;
-  int m_copy_layera, m_copy_layerr;
-
   bool m_visibility_changed;
   bool m_active_cellview_changed_event_enabled;
   tl::DeferredMethod<lay::LayoutView> dm_prop_changed;
+
+  tl::DeferredMethod<lay::LayoutView> dm_setup_editor_option_pages;
 
   void init (db::Manager *mgr, QWidget *parent);
   void init_menu ();
@@ -2890,8 +2872,6 @@ private:
   void do_prop_changed ();
   void do_redraw (int layer);
   void do_redraw ();
-  void do_transform (const db::DCplxTrans &tr);
-  void transform_layout (const db::DCplxTrans &tr);
 
   void background_color (QColor c);
   void ctx_color (QColor c);
@@ -2907,21 +2887,19 @@ private:
   int max_hier_level () const;
   bool set_hier_levels_basic (std::pair<int, int> l);
 
+  void do_setup_editor_options_pages ();
+
   void update_event_handlers ();
   void viewport_changed ();
   void cellview_changed (unsigned int index);
 
   bool configure (const std::string &name, const std::string &value);
+  void config_finalize ();
 
   void do_load_layer_props (const std::string &fn, bool map_cv, int cv_index, bool add_default);
   void finish_cellviews_changed ();
   void init_layer_properties (LayerProperties &props, const LayerPropertiesList &lp_list) const;
   void merge_dither_pattern (lay::LayerPropertiesList &props);
-
-  void do_cm_duplicate (bool interactive);
-  void do_cm_paste (bool interactive);
-  void cm_new_cell ();
-  void cm_reload ();
 
   //  overrides Editables method to display a message
   void signal_selection_changed ();

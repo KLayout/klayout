@@ -61,7 +61,7 @@ GDS2ReaderText::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   db::GDS2ReaderOptions gds2_options = options.get_options<db::GDS2ReaderOptions> ();
   db::CommonReaderOptions common_options = options.get_options<db::CommonReaderOptions> ();
 
-  return basic_read (layout, common_options.layer_map, common_options.create_other_layers, common_options.enable_text_objects, common_options.enable_properties, false, gds2_options.box_mode);
+  return basic_read (layout, common_options.layer_map, common_options.create_other_layers, common_options.enable_text_objects, common_options.enable_properties, false, gds2_options.box_mode, common_options.cell_conflict_resolution);
 }
 
 const LayerMap &
@@ -259,7 +259,7 @@ GDS2ReaderText::get_double ()
 }
 
 void
-GDS2ReaderText::get_string (tl::string &s) const
+GDS2ReaderText::get_string (std::string &s) const
 {
   //  TODO: get rid of this const_cast hack
   s = (const_cast<GDS2ReaderText *> (this))->reader.skip ();

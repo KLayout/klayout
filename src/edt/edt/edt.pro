@@ -21,7 +21,8 @@ HEADERS = \
   edtServiceImpl.h \
   edtUtils.h \
     edtCommon.h \
-    edtPCellParametersDialog.h
+    edtDistribute.h \
+    edtRecentConfigurationPage.h
 
 FORMS = \
   AlignOptionsDialog.ui \
@@ -29,7 +30,6 @@ FORMS = \
   CopyModeDialog.ui \
   ChangeLayerOptionsDialog.ui \
   EditablePathPropertiesPage.ui \
-  EditorOptionsDialog.ui \
   EditorOptionsGeneric.ui \
   EditorOptionsInst.ui \
   EditorOptionsPath.ui \
@@ -42,7 +42,8 @@ FORMS = \
   PolygonPropertiesPage.ui \
   RoundCornerOptionsDialog.ui \
   TextPropertiesPage.ui \
-    PCellParametersDialog.ui
+    DistributeOptionsDialog.ui \
+    EditorOptionsInstPCellParam.ui
 
 SOURCES = \
   edtConfig.cc \
@@ -59,7 +60,8 @@ SOURCES = \
   edtServiceImpl.cc \
   edtUtils.cc \
   gsiDeclEdt.cc \
-    edtPCellParametersDialog.cc
+    edtDistribute.cc \
+    edtRecentConfigurationPage.cc
 
 INCLUDEPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC

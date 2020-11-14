@@ -1070,7 +1070,7 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
         prev_action = a->second;
         present_actions.erase (*a);
       } else {
-        prev_action = insert_action_after (mbar, prev_action, c->action ().qaction ());
+        prev_action = insert_action_after (mbar, prev_action, c->action ()->qaction ());
       }
 
     }
@@ -1136,7 +1136,7 @@ AbstractMenu::build (QMenu *m, std::list<AbstractMenuItem> &items)
         prev_action = a->second;
         present_actions.erase (*a);
       } else {
-        prev_action = insert_action_after (m, prev_action, c->action ().qaction ());
+        prev_action = insert_action_after (m, prev_action, c->action ()->qaction ());
       }
 
     }

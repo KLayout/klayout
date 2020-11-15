@@ -1030,7 +1030,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   check.set_min_projection (min_projection);
   check.set_max_projection (max_projection);
 
-  db::check_local_operation<db::Polygon, db::Polygon, db::EdgePair> op (check, different_polygons, other != 0, other->is_merged (), shielded);
+  db::check_local_operation<db::Polygon, db::Polygon, db::EdgePair> op (check, different_polygons, other != 0, other && other->is_merged (), shielded);
 
   db::local_processor<db::Polygon, db::Polygon, db::EdgePair> proc;
   proc.set_base_verbosity (base_verbosity ());

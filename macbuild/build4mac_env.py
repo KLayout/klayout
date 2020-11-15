@@ -103,8 +103,21 @@ RubyMojave      = { 'exe': '/System/Library/Frameworks/Ruby.framework/Versions/2
 # Bundled with Catalina (10.15)
 #   !!! Catalina does not allow to hack the "/System" directory; it's READ ONLY even for the super user!
 #       Hence, we need to refer to the Ruby header file in "Xcode.app" directly.
+#
+#   With the major release of "macOS Big Sur (11.0)" in November 2020, Xcode has been updated, too.
+#     (base) MacBookPro2{kazzz-s}(1)$ pwd
+#     /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/include/ruby-2.6.0
+#
+#     (base) MacBookPro2{kazzz-s}(2)$ ll
+#     total 4
+#     drwxr-xr-x  6 root wheel 192 11 15 20:57 .
+#     drwxr-xr-x  3 root wheel  96 10 20 05:33 ..
+#     drwxr-xr-x 23 root wheel 736 10 24 11:57 ruby
+#     -rw-r--r--  1 root wheel 868 10 19 19:32 ruby.h
+#     lrwxr-xr-x  1 root wheel  19 11 15 20:57 universal-darwin19 -> universal-darwin20/ <=== manually created this symbolic link
+#     drwxr-xr-x  6 root wheel 192 10 20 05:33 universal-darwin20
 # [Key Type Name] = 'Sys'
-CatalinaSDK = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk"
+CatalinaSDK = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
 RubyCatalina    = { 'exe': '/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby',
                     'inc': '%s/System/Library/Frameworks/Ruby.framework/Headers' % CatalinaSDK,
                     'lib': '/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/libruby.dylib'

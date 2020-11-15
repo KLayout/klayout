@@ -963,6 +963,26 @@ AbstractMenu::build_detached (const std::string &name, QFrame *mbar)
   menu_layout->addStretch (1);
 }
 
+static QAction *insert_action_after (QWidget *widget, QAction *after, QAction *action)
+{
+  QList<QAction *> actions = widget->actions ();
+
+  QAction *before = 0;
+  if (after == 0) {
+    if (! actions.isEmpty ()) {
+      before = actions.front ();
+    }
+  } else {
+    int index = actions.indexOf (after);
+    if (index >= 0 && index + 1 < actions.size ()) {
+      before = actions [index + 1];
+    }
+  }
+  widget->insertAction (before, action);
+
+  return action;
+}
+
 void
 AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
 {
@@ -978,6 +998,8 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
       present_actions.insert (std::make_pair (id_from_action (*i), *i));
     }
   }
+
+  QAction *prev_action = 0;
 
   for (std::list<AbstractMenuItem>::iterator c = m_root.children.begin (); c != m_root.children.end (); ++c) {
 
@@ -1015,19 +1037,20 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
         if (c->menu () == 0) {
           QMenu *menu = new QMenu (mp_dispatcher->menu_parent_widget ());
           menu->setTitle (tl::to_qstring (c->action ()->get_title ()));
-          mbar->addMenu (menu);
           c->set_action (new Action (menu), true);
+          prev_action = insert_action_after (mbar, prev_action, menu->menuAction ());
         } else {
           //  Move the action to the end if present in the menu already
           std::set<std::pair<size_t, QAction *> >::iterator a = present_actions.find (std::make_pair (id_from_action (c->menu ()->menuAction ()), c->menu ()->menuAction ()));
           if (a != present_actions.end ()) {
             if (s_can_move_menu) {
               mbar->removeAction (a->second);
-              mbar->addMenu (c->menu ());
+              insert_action_after (mbar, prev_action, a->second);
             }
+            prev_action = a->second;
             present_actions.erase (*a);
           } else {
-            mbar->addMenu (c->menu ());
+            prev_action = insert_action_after (mbar, prev_action, c->menu ()->menuAction ());
           }
         }
 
@@ -1036,17 +1059,20 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
       }
 
     } else if (mbar) {
+
       //  Move the action to the end if present in the menu already
       std::set<std::pair<size_t, QAction *> >::iterator a = present_actions.find (std::make_pair (id_from_action (c->action ()->qaction ()), c->action ()->qaction ()));
       if (a != present_actions.end ()) {
         if (s_can_move_menu) {
           mbar->removeAction (a->second);
-          mbar->addAction (c->action ()->qaction ());
+          insert_action_after (mbar, prev_action, a->second);
         }
+        prev_action = a->second;
         present_actions.erase (*a);
       } else {
-        mbar->addAction (c->action ()->qaction ());
+        prev_action = insert_action_after (mbar, prev_action, c->action ()->qaction ());
       }
+
     }
 
   }
@@ -1068,6 +1094,8 @@ AbstractMenu::build (QMenu *m, std::list<AbstractMenuItem> &items)
     present_actions.insert (std::make_pair (id_from_action (*i), *i));
   }
 
+  QAction *prev_action = 0;
+
   for (std::list<AbstractMenuItem>::iterator c = items.begin (); c != items.end (); ++c) {
 
     if (c->has_submenu ()) {
@@ -1077,19 +1105,20 @@ AbstractMenu::build (QMenu *m, std::list<AbstractMenuItem> &items)
         //  menu with a given action. The action is provided by addMenu instead.
         QMenu *menu = new QMenu (mp_dispatcher->menu_parent_widget ());
         menu->setTitle (tl::to_qstring (c->action ()->get_title ()));
-        m->addMenu (menu);
         c->set_action (new Action (menu), true);
+        prev_action = insert_action_after (m, prev_action, menu->menuAction ());
       } else {
         //  Move the action to the end if present in the menu already
         std::set<std::pair<size_t, QAction *> >::iterator a = present_actions.find (std::make_pair (id_from_action (c->menu ()->menuAction ()), c->menu ()->menuAction ()));
         if (a != present_actions.end ()) {
           if (s_can_move_menu) {
             m->removeAction (a->second);
-            m->addMenu (c->menu ());
+            insert_action_after (m, prev_action, a->second);
           }
+          prev_action = a->second;
           present_actions.erase (*a);
         } else {
-          m->addMenu (c->menu ());
+          prev_action = insert_action_after (m, prev_action, c->menu ()->menuAction ());
         }
       }
 
@@ -1102,11 +1131,12 @@ AbstractMenu::build (QMenu *m, std::list<AbstractMenuItem> &items)
       if (a != present_actions.end ()) {
         if (s_can_move_menu) {
           m->removeAction (a->second);
-          m->addAction (c->action ()->qaction ());
+          insert_action_after (m, prev_action, a->second);
         }
+        prev_action = a->second;
         present_actions.erase (*a);
       } else {
-        m->addAction (c->action ()->qaction ());
+        prev_action = insert_action_after (m, prev_action, c->action ()->qaction ());
       }
 
     }

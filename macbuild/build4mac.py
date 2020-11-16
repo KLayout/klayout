@@ -479,7 +479,7 @@ def parse_cli_args(config):
 #
 # @return 0 on success; non-zero on failure
 #------------------------------------------------------------------------------
-def RunMainBuildBash(config):
+def get_build_parameters(config):
     ProjectDir    = config['ProjectDir']     #
     Platform      = config['Platform']       #
     BuildBash     = config['BuildBash']      #
@@ -584,6 +584,15 @@ def RunMainBuildBash(config):
     # config['AbsMacBuildDirQAT'] = AbsMacBuildDirQAT  # absolute path to build directory for QATest
     # config['AbsMacBuildLog']    = AbsMacBuildLog     # absolute path to build log file
 
+    return parameters
+
+def run_build_command(config, parameters):
+    BuildBash = config['BuildBash']
+    DeploymentF = config['DeploymentF']
+    DeploymentP = config['DeploymentP']
+    MacBuildLog = config['MacBuildLog']
+    CheckComOnly = config['CheckComOnly']
+
     #-----------------------------------------------------
     # [2] Make the consolidated command line
     #-----------------------------------------------------
@@ -591,6 +600,8 @@ def RunMainBuildBash(config):
     command += " \\\n  %s" % BuildBash
     command += parameters
     command += "  2>&1 | tee %s" % MacBuildLog
+    command += "; test ${PIPESTATUS[0]} -eq 0"  # tee always exits with 0
+
     if CheckComOnly:
         print(command)
         sys.exit(0)
@@ -600,62 +611,63 @@ def RunMainBuildBash(config):
     #-----------------------------------------------------
     if DeploymentF or DeploymentP:
         return 0
-    else:
-        myscript = "build4mac.py"
-        if subprocess.call( command, shell=True ) != 0:
-            print( "", file=sys.stderr )
-            print( "-------------------------------------------------------------", file=sys.stderr )
-            print( "!!! <%s>: failed to build KLayout" % myscript, file=sys.stderr )
-            print( "-------------------------------------------------------------", file=sys.stderr )
-            print( "", file=sys.stderr )
-            return 1
-        else:
-            print( "", file=sys.stderr )
-            print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
-            print( "### <%s>: successfully built KLayout" % myscript, file=sys.stderr )
-            print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
-            print( "", file=sys.stderr )
 
-            #------------------------------------------------------------------------
-            # [4] Prepare "*.macQAT/" directory for the QATest.
-            #     Binaries under "*.macQAT/" such as *.dylib will be touched later.
-            #------------------------------------------------------------------------
-            print( "### Preparing <%s>" % MacBuildDirQAT )
-            if os.path.isdir( MacBuildDirQAT ):
-                shutil.rmtree( MacBuildDirQAT )
+    myscript = os.path.basename(__file__)
+    ret = subprocess.call( command, shell=True )
+    if ret != 0:
+        print( "", file=sys.stderr )
+        print( "-------------------------------------------------------------", file=sys.stderr )
+        print( "!!! <%s>: failed to build KLayout" % myscript, file=sys.stderr )
+        print( "-------------------------------------------------------------", file=sys.stderr )
+        print( "", file=sys.stderr )
+        return 1
 
-            os.chdir( MacBuildDir )
-            tarFile = "../macQATest.tar"
-            tarCmdC = "tar cf %s ." % tarFile
-            if subprocess.call( tarCmdC, shell=True ) != 0:
-                print( "", file=sys.stderr )
-                print( "-------------------------------------------------------------", file=sys.stderr )
-                print( "!!! <%s>: failed to create <%s>" % (myscript, tarFile), file=sys.stderr )
-                print( "-------------------------------------------------------------", file=sys.stderr )
-                print( "", file=sys.stderr )
-                return 1
+    print( "", file=sys.stderr )
+    print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
+    print( "### <%s>: successfully built KLayout" % myscript, file=sys.stderr )
+    print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
+    print( "", file=sys.stderr )
 
-            os.chdir( "../" )
-            os.mkdir( MacBuildDirQAT )
-            os.chdir( MacBuildDirQAT )
-            tarCmdX = "tar xf %s" % tarFile
-            if subprocess.call( tarCmdX, shell=True ) != 0:
-                print( "", file=sys.stderr )
-                print( "-------------------------------------------------------------", file=sys.stderr )
-                print( "!!! <%s>: failed to unpack <%s>" % (myscript, tarFile), file=sys.stderr )
-                print( "-------------------------------------------------------------", file=sys.stderr )
-                print( "", file=sys.stderr )
-                return 1
+    #------------------------------------------------------------------------
+    # [4] Prepare "*.macQAT/" directory for the QATest.
+    #     Binaries under "*.macQAT/" such as *.dylib will be touched later.
+    #------------------------------------------------------------------------
+    print( "### Preparing <%s>" % MacBuildDirQAT )
+    if os.path.isdir( MacBuildDirQAT ):
+        shutil.rmtree( MacBuildDirQAT )
 
-            os.remove( tarFile )
-            os.chdir( "../" )
-            shutil.copy2( "macbuild/macQAT.sh", MacBuildDirQAT )
-            shutil.copy2( "macbuild/macQAT.py", MacBuildDirQAT )
-            print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
-            print( "### <%s>: prepared the initial *.macQAT/" % myscript, file=sys.stderr )
-            print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
-            print( "", file=sys.stderr )
-            return 0
+    os.chdir( MacBuildDir )
+    tarFile = "../macQATest.tar"
+    tarCmdC = "tar cf %s ." % tarFile
+    if subprocess.call( tarCmdC, shell=True ) != 0:
+        print( "", file=sys.stderr )
+        print( "-------------------------------------------------------------", file=sys.stderr )
+        print( "!!! <%s>: failed to create <%s>" % (myscript, tarFile), file=sys.stderr )
+        print( "-------------------------------------------------------------", file=sys.stderr )
+        print( "", file=sys.stderr )
+        return 1
+
+    os.chdir( "../" )
+    os.mkdir( MacBuildDirQAT )
+    os.chdir( MacBuildDirQAT )
+    tarCmdX = "tar xf %s" % tarFile
+    if subprocess.call( tarCmdX, shell=True ) != 0:
+        print( "", file=sys.stderr )
+        print( "-------------------------------------------------------------", file=sys.stderr )
+        print( "!!! <%s>: failed to unpack <%s>" % (myscript, tarFile), file=sys.stderr )
+        print( "-------------------------------------------------------------", file=sys.stderr )
+        print( "", file=sys.stderr )
+        return 1
+
+    os.remove( tarFile )
+    os.chdir( "../" )
+    shutil.copy2( "macbuild/macQAT.sh", MacBuildDirQAT )
+    shutil.copy2( "macbuild/macQAT.py", MacBuildDirQAT )
+    print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
+    print( "### <%s>: prepared the initial *.macQAT/" % myscript, file=sys.stderr )
+    print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
+    print( "", file=sys.stderr )
+    return 0
 
 #------------------------------------------------------------------------------
 ## For making a bundle (klayout.app), deploy built binaries and libraries
@@ -1168,8 +1180,8 @@ def main():
     #----------------------------------------------------------
     # [The main build stage]
     #----------------------------------------------------------
-    ret = RunMainBuildBash(config)
-
+    parameters = get_build_parameters(config)
+    ret = run_build_command(config, parameters)
     print(config)
     return config
 

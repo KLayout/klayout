@@ -81,6 +81,10 @@ public:
 
   virtual std::string to_string (size_t nmax) const;
 
+  virtual EdgePairsDelegate *cop_to_edge_pairs (db::CompoundRegionOperationNode &node);
+  virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node);
+  virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node);
+
   virtual RegionDelegate *and_with (const Region &other) const;
   virtual RegionDelegate *not_with (const Region &other) const;
   virtual RegionDelegate *xor_with (const Region &other) const;
@@ -132,6 +136,15 @@ protected:
   virtual void merged_semantics_changed ();
   virtual void min_coherence_changed ();
 
+  virtual EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const;
+  virtual EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const;
+  virtual RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse, size_t min_count, size_t max_count) const;
+  virtual RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse, size_t min_count, size_t max_count) const;
+  virtual RegionDelegate *selected_interacting_generic (const Texts &other, bool inverse, size_t min_count, size_t max_count) const;
+  virtual RegionDelegate *pull_generic (const Region &other, int mode, bool touching) const;
+  virtual EdgesDelegate *pull_generic (const Edges &other) const;
+  virtual TextsDelegate *pull_generic (const Texts &other) const;
+
 private:
   friend class DeepEdges;
   friend class DeepTexts;
@@ -147,14 +160,6 @@ private:
   const DeepLayer &merged_deep_layer () const;
   DeepLayer and_or_not_with(const DeepRegion *other, bool and_op) const;
   std::pair<DeepLayer, DeepLayer> and_and_not_with (const DeepRegion *other) const;
-  EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const;
-  EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const;
-  virtual RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse, size_t min_count, size_t max_count) const;
-  virtual RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse, size_t min_count, size_t max_count) const;
-  virtual RegionDelegate *selected_interacting_generic (const Texts &other, bool inverse, size_t min_count, size_t max_count) const;
-  virtual RegionDelegate *pull_generic (const Region &other, int mode, bool touching) const;
-  virtual EdgesDelegate *pull_generic (const Edges &other) const;
-  virtual TextsDelegate *pull_generic (const Texts &other) const;
   DeepRegion *apply_filter (const PolygonFilterBase &filter) const;
 
   template <class Result, class OutputContainer> OutputContainer *processed_impl (const polygon_processor<Result> &filter) const;

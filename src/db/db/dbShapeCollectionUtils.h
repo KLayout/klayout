@@ -32,6 +32,7 @@
 #include "dbCellVariants.h"
 #include "dbShapeCollection.h"
 #include "dbDeepShapeStore.h"
+#include "tlObject.h"
 
 #include <list>
 
@@ -44,6 +45,7 @@ namespace db {
  */
 template <class Shape, class Result>
 class DB_PUBLIC_TEMPLATE shape_collection_processor
+  : public tl::Object
 {
 public:
   /**

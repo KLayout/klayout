@@ -32,6 +32,7 @@
 #include "dbEdgePairs.h"
 #include "dbRegionProcessors.h"
 #include "dbRegionLocalOperations.h"
+#include "dbTypes.h"
 
 #include "gsiObject.h"
 #include "tlObject.h"
@@ -40,6 +41,16 @@
 
 namespace db
 {
+
+/**
+ *  @brief A node of the compound operation tree
+ *
+ *  A compound operation if formed of a tree of basic operations. The root node
+ *  will act as the main entrance and is fed into a local processor for performing
+ *  the complex operation.
+ *
+ *  The tree nodes will
+ */
 
 class DB_PUBLIC CompoundRegionOperationNode
   : public gsi::ObjectBase, public tl::Object
@@ -50,8 +61,10 @@ public:
   CompoundRegionOperationNode ();
   virtual ~CompoundRegionOperationNode ();
 
+  std::string description () const;
+  void set_description (const std::string &d);
+
   virtual db::Coord dist () const = 0;
-  virtual std::string description () const = 0;
   virtual std::vector<db::Region *> inputs () const = 0;
 
   //  specifies the result type
@@ -71,36 +84,84 @@ public:
 
   void compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
   {
-    do_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
   }
 
   void compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const;
 
   void compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
   {
-    do_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
   }
 
   void compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const
   {
-    do_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
   }
 
   void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
   {
-    do_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
   }
 
   void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const;
 
   void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
   {
-    do_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
   }
 
   void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const
   {
-    do_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  }
+
+  void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  }
+
+  void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const;
+
+  void compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Edge> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  }
+
+  void compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Edge> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const;
+
+  void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  }
+
+  void compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  }
+
+  void compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  }
+
+  void compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const;
+
+  void compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  }
+
+  void compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::Polygon> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const;
+
+  void compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  }
+
+  void compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::Polygon> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
   }
 
   template <class T>
@@ -143,14 +204,25 @@ public:
 
 protected:
   //  the different computation slots
-  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Polygon, db::Polygon> & /*interactions*/,       std::vector<std::unordered_set<db::Polygon> > &    /*results*/, size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
-  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Polygon, db::Polygon> & /*interactions*/,       std::vector<std::unordered_set<db::Edge> > &       /*results*/, size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
-  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Polygon, db::Polygon> & /*interactions*/,       std::vector<std::unordered_set<db::EdgePair> > &   /*results*/, size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
-  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> & /*interactions*/, std::vector<std::unordered_set<db::PolygonRef> > & /*results*/, size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
-  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> & /*interactions*/, std::vector<std::unordered_set<db::Edge> > &       /*results*/, size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
-  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> & /*interactions*/, std::vector<std::unordered_set<db::EdgePair> > &   /*results*/, size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Polygon, db::Polygon> & /*interactions*/,       std::vector<std::unordered_set<db::Polygon> > & /*results*/,     size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Polygon, db::Polygon> & /*interactions*/,       std::vector<std::unordered_set<db::Edge> > & /*results*/,        size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Polygon, db::Polygon> & /*interactions*/,       std::vector<std::unordered_set<db::EdgePair> > & /*results*/,    size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> & /*interactions*/, std::vector<std::unordered_set<db::PolygonRef> > & /*results*/,  size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> & /*interactions*/, std::vector<std::unordered_set<db::Edge> > & /*results*/,        size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> & /*interactions*/, std::vector<std::unordered_set<db::EdgePair> > & /*results*/,    size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::Edge> & /*interactions*/,       std::vector<std::unordered_set<db::PolygonRef> > & /*results*/,  size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Polygon, db::Edge> & /*interactions*/,          std::vector<std::unordered_set<db::Polygon> > & /*results*/,     size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::Edge> & /*interactions*/,       std::vector<std::unordered_set<db::Edge> > & /*results*/,        size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Polygon, db::Edge> & /*interactions*/,          std::vector<std::unordered_set<db::Edge> > & /*results*/,        size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::PolygonRef> & /*interactions*/,       std::vector<std::unordered_set<db::PolygonRef> > & /*results*/,  size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Polygon> & /*interactions*/,          std::vector<std::unordered_set<db::Polygon> > & /*results*/,     size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::PolygonRef> & /*interactions*/,       std::vector<std::unordered_set<db::Edge> > & /*results*/,        size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Polygon> & /*interactions*/,          std::vector<std::unordered_set<db::Edge> > & /*results*/,        size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
+
+  virtual std::string generated_description () const;
 
 private:
+  std::string m_description;
   mutable std::vector<std::unordered_set<db::PolygonRef> > m_cache_polyref;
   mutable bool m_cache_polyref_valid;
   mutable std::vector<std::unordered_set<db::Polygon> > m_cache_poly;
@@ -165,10 +237,10 @@ private:
   void get_cache (std::vector<std::unordered_set<db::Edge> > *&cache_ptr, bool *&valid) const       { cache_ptr = &m_cache_edge;      valid = &m_cache_edge_valid; }
   void get_cache (std::vector<std::unordered_set<db::EdgePair> > *&cache_ptr, bool *&valid) const   { cache_ptr = &m_cache_edge_pair; valid = &m_cache_edge_pair_valid; }
 
-  template <class T, class TR>
-  void implement_compute_local (db::Layout *layout, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio) const
+  template <class TS, class TI, class TR>
+  void implement_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio) const
   {
-    std::vector<std::unordered_set<db::PolygonRef> > *cache = 0;
+    std::vector<std::unordered_set<TR> > *cache = 0;
     bool *valid = 0;
     get_cache (cache, valid);
     if (*valid) {
@@ -220,7 +292,6 @@ public:
   CompoundRegionOperationPrimaryNode ();
   virtual ~CompoundRegionOperationPrimaryNode ();
 
-  virtual std::string description () const;
   virtual std::vector<db::Region *> inputs () const;
   virtual db::Coord dist () const { return 0; }
   virtual ResultType result_type () const { return Region; }
@@ -237,7 +308,6 @@ public:
   CompoundRegionOperationSecondaryNode (db::Region *input);
   virtual ~CompoundRegionOperationSecondaryNode ();
 
-  virtual std::string description () const;
   virtual std::vector<db::Region *> inputs () const;
   virtual db::Coord dist () const { return 0; }
   virtual ResultType result_type () const { return Region; }
@@ -280,7 +350,7 @@ public:
   ~CompoundRegionMultiInputOperationNode ();
 
   virtual db::Coord dist () const;
-  virtual std::string description () const;
+  virtual std::string generated_description () const;
 
   virtual std::vector<db::Region *> inputs () const
   {
@@ -357,7 +427,7 @@ public:
 
   CompoundRegionLogicalBoolOperationNode (LogicalOp op, bool invert, const std::vector<CompoundRegionOperationNode *> &inputs);
 
-  virtual std::string description () const;
+  virtual std::string generated_description () const;
 
   //  specifies the result type
   virtual ResultType result_type () const { return Region; }
@@ -390,7 +460,7 @@ public:
 
   CompoundRegionGeometricalBoolOperationNode (GeometricalOp op, CompoundRegionOperationNode *a, CompoundRegionOperationNode *b);
 
-  virtual std::string description () const;
+  virtual std::string generated_description () const;
 
   //  specifies the result type
   virtual ResultType result_type () const;
@@ -410,61 +480,6 @@ private:
   void implement_bool (db::Layout *layout, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio) const;
 };
 
-  //  @@@ move to .cc
-  template <class T>
-  struct generic_result_adaptor
-  {
-  public:
-    static void insert (db::Layout *, const db::Shape &shape, std::unordered_set<db::Edge> &result)
-    {
-      result.insert (shape.edge ());
-    }
-
-    static void insert (db::Layout *, const db::Shape &shape, std::unordered_set<db::Polygon> &result)
-    {
-      db::Polygon p;
-      shape.polygon (p);
-      result.insert (p);
-    }
-
-    static void insert (db::Layout *layout, const db::Shape &shape, std::unordered_set<db::PolygonRef> &result)
-    {
-      db::Polygon p;
-      shape.polygon (p);
-      result.insert (db::PolygonRef (p, layout->shape_repository ()));
-    }
-
-    generic_result_adaptor<db::Edge> (std::vector<std::unordered_set<T> > *results)
-      : mp_results (results)
-    {
-      m_intermediate.reserve (results->size ());
-      for (size_t i = 0; i < results->size (); ++i) {
-        m_shapes.push_back (db::Shapes ());
-        m_intermediate.push_back (&m_shapes.back ());
-      }
-    }
-
-    const std::vector<db::Shapes *> &results ()
-    {
-      return m_intermediate;
-    }
-
-    void finish (db::Layout *layout)
-    {
-      for (size_t i = 0; i < m_intermediate.size (); ++i) {
-        for (db::Shapes::shape_iterator s = m_intermediate [i]->begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
-          insert (layout, *s, (*mp_results)[i]);
-        }
-      }
-    }
-
-  private:
-    std::vector<std::unordered_set<T> > *mp_results;
-    std::vector<db::Shapes *> m_intermediate;
-    std::list<db::Shapes> m_shapes;
-  };
-
-
 template <class TS, class TI, class TR>
 class DB_PUBLIC compound_region_generic_operation_node
   : public CompoundRegionMultiInputOperationNode
@@ -478,25 +493,24 @@ public:
    *  CompoundRegionOperationSecondaryNode nodes need to be provided. If no derived node
    *  is requested for input, the input-less constructor may be used which is more efficient.
    */
-  compound_region_generic_operation_node (const db::local_operation<TS, TI, TR> *op, const std::vector<CompoundRegionOperationNode *> &inputs, const db::TransformationReducer *vars = 0, bool want_variants = false, const std::string &description = "generic")
-    : CompoundRegionMultiInputOperationNode (inputs), m_op (op), m_description (description), mp_vars (vars), m_wants_variants (want_variants)
+  compound_region_generic_operation_node (const db::local_operation<TS, TI, TR> *op, const std::vector<CompoundRegionOperationNode *> &inputs, const db::TransformationReducer *vars = 0, bool want_variants = false)
+    : CompoundRegionMultiInputOperationNode (inputs), m_op (op), mp_vars (vars), m_wants_variants (want_variants)
   {
     //  .. nothing yet ..
   }
 
-  compound_region_generic_operation_node (const db::local_operation<TS, TI, TR> *op, CompoundRegionOperationNode *input, const db::TransformationReducer *vars = 0, bool want_variants = false, const std::string &description = "generic")
-    : CompoundRegionMultiInputOperationNode (input), m_op (op), m_description (description), mp_vars (vars), m_wants_variants (want_variants)
+  compound_region_generic_operation_node (const db::local_operation<TS, TI, TR> *op, CompoundRegionOperationNode *input, const db::TransformationReducer *vars = 0, bool want_variants = false)
+    : CompoundRegionMultiInputOperationNode (input), m_op (op), mp_vars (vars), m_wants_variants (want_variants)
   {
     //  .. nothing yet ..
   }
 
-  compound_region_generic_operation_node (const db::local_operation<TS, TI, TR> *op, CompoundRegionOperationNode *a, CompoundRegionOperationNode *b, const db::TransformationReducer *vars = 0, bool want_variants = false, const std::string &description = "generic")
-    : CompoundRegionMultiInputOperationNode (a, b), m_op (op), m_description (description), mp_vars (vars), m_wants_variants (want_variants)
+  compound_region_generic_operation_node (const db::local_operation<TS, TI, TR> *op, CompoundRegionOperationNode *a, CompoundRegionOperationNode *b, const db::TransformationReducer *vars = 0, bool want_variants = false)
+    : CompoundRegionMultiInputOperationNode (a, b), m_op (op), mp_vars (vars), m_wants_variants (want_variants)
   {
     //  .. nothing yet ..
   }
 
-  virtual std::string description () const { return m_description; }
   virtual ResultType result_type () const { return compound_operation_type_traits<TR>::type (); }
   virtual const db::TransformationReducer *vars () const  { return mp_vars; }
   virtual bool wants_variants () const { return m_wants_variants; }
@@ -511,102 +525,36 @@ public:
     }
   }
 
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
-  {
-    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
-  }
-
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
-  {
-    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
-  }
-
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
-  {
-    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
-  }
-
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
-  {
-    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
-  }
-
 protected:
-  compound_region_generic_operation_node (const db::local_operation<TS, TI, TR> *op, const std::vector<db::Region *> &inputs, const db::TransformationReducer *vars = 0, bool want_variants = false, const std::string &description = "generic")
-    : CompoundRegionMultiInputOperationNode (), m_inputs (inputs), m_op (op), m_description (description), mp_vars (vars), m_wants_variants (want_variants)
+  compound_region_generic_operation_node (const db::local_operation<TS, TI, TR> *op, const std::vector<db::Region *> &inputs, const db::TransformationReducer *vars = 0, bool want_variants = false)
+    : CompoundRegionMultiInputOperationNode (), m_op (op), mp_vars (vars), m_wants_variants (want_variants), m_inputs (inputs)
   {
     //  .. nothing yet ..
   }
 
-  compound_region_generic_operation_node (const db::local_operation<TS, TI, TR> *op, db::Region *input, const db::TransformationReducer *vars = 0, bool want_variants = false, const std::string &description = "generic")
-    : CompoundRegionMultiInputOperationNode (), m_op (op), m_description (description), mp_vars (vars), m_wants_variants (want_variants)
+  compound_region_generic_operation_node (const db::local_operation<TS, TI, TR> *op, db::Region *input, const db::TransformationReducer *vars = 0, bool want_variants = false)
+    : CompoundRegionMultiInputOperationNode (), m_op (op), mp_vars (vars), m_wants_variants (want_variants)
   {
     m_inputs.push_back (input);
   }
 
-  compound_region_generic_operation_node (const db::local_operation<TS, TI, TR> *op, db::Region *a, db::Region *b, const db::TransformationReducer *vars = 0, bool want_variants = false, const std::string &description = "generic")
-    : CompoundRegionMultiInputOperationNode (), m_op (op), m_description (description), mp_vars (vars), m_wants_variants (want_variants)
+  compound_region_generic_operation_node (const db::local_operation<TS, TI, TR> *op, db::Region *a, db::Region *b, const db::TransformationReducer *vars = 0, bool want_variants = false)
+    : CompoundRegionMultiInputOperationNode (), m_op (op), mp_vars (vars), m_wants_variants (want_variants)
   {
     m_inputs.push_back (a);
     m_inputs.push_back (b);
   }
 
+  template <class TTS, class TTI, class TTR>
+  void implement_compute_local (db::Layout *layout, const shape_interactions<TTS, TTI> &interactions, std::vector<std::unordered_set<TTR> > &results, size_t max_vertex_count, double area_ratio) const;
+
 private:
   const db::local_operation<TS, TI, TR> *m_op;
-  std::string m_description;
   const db::TransformationReducer *mp_vars;
   bool m_wants_variants;
   std::vector<db::Region *> m_inputs;
   //  required if the inner processor is a PolygonRef type while the outer interface needs Polygon
   db::Layout m_aux_layout;
-
-  template <class TT, class TTR>
-  void implement_compute_local (db::Layout *layout, const shape_interactions<TT, TT> &interactions, std::vector<std::unordered_set<TTR> > &results, size_t max_vertex_count, double area_ratio) const
-  {
-    generic_result_adaptor <TTR> adaptor (&results);
-
-    if (! layout) {
-      layout = const_cast<db::Layout *> (&m_aux_layout);
-    }
-
-    shape_interactions<TS, TI> internal;
-
-    const CompoundRegionOperationNode *self = child (0);
-    std::vector<std::unordered_set<TS> > self_result;
-
-    shape_interactions<TT, TT> self_interactions_heap;
-    const shape_interactions<TT, TT> &self_interactions = interactions_for_child (interactions, 0, self_interactions_heap);
-
-    self->compute_local (layout, self_interactions, self_result, max_vertex_count, area_ratio);
-
-    db::generic_shape_iterator <TS> is (self_result.front ().begin (), self_result.front ().end ());
-
-    std::vector<db::generic_shape_iterator<TI> > iiv;
-    std::vector<std::unordered_set<TI> > intruder_results;
-    intruder_results.reserve (children () - 1);  //  important, so that the memory layout will not change while we generate them
-
-    for (unsigned int ci = 1; ci < children (); ++ci) {
-
-      const CompoundRegionOperationNode *intruder = child (ci);
-      std::vector<std::unordered_set<TI> > intruder_result;
-
-      shape_interactions<TT, TT> intruder_interactions_heap;
-      const shape_interactions<TT, TT> &intruder_interactions = interactions_for_child (interactions, ci, intruder_interactions_heap);
-
-      intruder->compute_local (layout, intruder_interactions, intruder_result, max_vertex_count, area_ratio);
-
-      intruder_results.push_back (std::unordered_set<TI> ());
-      intruder_results.back ().swap (intruder_result.front ());
-
-      iiv.push_back (db::generic_shape_iterator<TI> (intruder_results.back ().begin (), intruder_results.back ().end ()));
-
-    }
-
-    db::local_processor <TS, TI, TR> proc (layout);
-    proc.run_flat (is, iiv, m_op, adaptor.results ());
-
-    adaptor.finish (layout);
-  }
 };
 
 class DB_PUBLIC CompoundRegionInteractOperationNode
@@ -625,9 +573,19 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual std::string description () const
+  std::string generated_description () const
   {
     return std::string ("interact") + compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon>::description ();
+  }
+
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  }
+
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
   }
 
 private:
@@ -644,9 +602,19 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual std::string description () const
+  std::string generated_description () const
   {
     return std::string ("interact") + compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon>::description ();
+  }
+
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Edge> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  }
+
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
   }
 
 private:
@@ -654,28 +622,68 @@ private:
 };
 
 class DB_PUBLIC CompoundRegionPullOperationNode
-  : public CompoundRegionMultiInputOperationNode
+  : public compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon>
 {
 public:
-  enum  GeometricalOp { And, Not, Or, Xor };
+  CompoundRegionPullOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b, int mode, bool touching)
+    : compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon> (&m_op, a, b), m_op (mode, touching)
+  {
+    //  .. nothing yet ..
+  }
 
-  CompoundRegionPullOperationNode (GeometricalOp op, const CompoundRegionOperationNode *a, const CompoundRegionOperationNode *b);
+  CompoundRegionPullOperationNode (db::Region *a, db::Region *b, int mode, bool touching)
+    : compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon> (&m_op, a, b), m_op (mode, touching)
+  {
+    //  .. nothing yet ..
+  }
 
-  virtual std::string description () const;
+  std::string generated_description () const
+  {
+    return std::string ("pull") + compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon>::description ();
+  }
 
-  //  specifies the result type
-  virtual ResultType result_type () const;
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  }
 
-  //  the different computation slots
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const;
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const;
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const;
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const;
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  }
 
 private:
-  GeometricalOp m_op;
+  db::pull_local_operation<db::Polygon, db::Polygon, db::Polygon> m_op;
 };
 
+class DB_PUBLIC CompoundRegionPullWithEdgeOperationNode
+  : public compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon>
+{
+public:
+  CompoundRegionPullWithEdgeOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b, int mode, bool touching)
+    : compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon> (&m_op, a, b), m_op (mode, touching)
+  {
+    //  .. nothing yet ..
+  }
+
+  std::string generated_description () const
+  {
+    return std::string ("pull") + compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon>::description ();
+  }
+
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Edge> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  }
+
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  }
+
+private:
+  db::pull_local_operation<db::Polygon, db::Edge, db::Polygon> m_op;
+};
 
 
 /**
@@ -694,7 +702,7 @@ class DB_PUBLIC CompoundRegionLogicalCaseSelectOperationNode
 public:
   CompoundRegionLogicalCaseSelectOperationNode (bool multi_layer, const std::vector<CompoundRegionOperationNode *> &inputs);
 
-  virtual std::string description () const;
+  virtual std::string generated_description () const;
 
   //  specifies the result type
   virtual ResultType result_type () const { return Region; }
@@ -723,8 +731,6 @@ class DB_PUBLIC CompoundRegionFilterOperationNode
 {
 public:
   CompoundRegionFilterOperationNode (PolygonFilterBase *filter, CompoundRegionOperationNode *input);
-
-  virtual std::string description () const;
 
   //  specifies the result type
   virtual ResultType result_type () const { return Region; }
@@ -763,8 +769,6 @@ class DB_PUBLIC CompoundRegionProcessingOperationNode
 {
 public:
   CompoundRegionProcessingOperationNode (PolygonProcessorBase *proc, CompoundRegionOperationNode *input);
-
-  virtual std::string description () const;
 
   //  specifies the result type
   virtual ResultType result_type () const { return Region; }
@@ -825,8 +829,6 @@ class DB_PUBLIC CompoundRegionToEdgeProcessingOperationNode
 public:
   CompoundRegionToEdgeProcessingOperationNode (PolygonToEdgeProcessorBase *proc, CompoundRegionOperationNode *input);
 
-  virtual std::string description () const;
-
   //  specifies the result type
   virtual ResultType result_type () const { return Edges; }
 
@@ -858,13 +860,21 @@ private:
   }
 };
 
+/**
+ *  @brief A wrapper for a generic edge-pair producing node
+ *
+ *  This node takes polygons for input. It will produce edge pairs by means of the PolygonToEdgePairProcessorBase object.
+ */
 class DB_PUBLIC CompoundRegionToEdgePairProcessingOperationNode
   : public CompoundRegionMultiInputOperationNode
 {
 public:
+  /**
+   *  @brief Constructor
+   *  @param proc The processor which turns polygons into edge pairs (it's reimplementation) - the node will *not* take ownership
+   *  @param input The node for the original (the node will take ownership)
+   */
   CompoundRegionToEdgePairProcessingOperationNode (PolygonToEdgePairProcessorBase *proc, CompoundRegionOperationNode *input);
-
-  virtual std::string description () const;
 
   //  specifies the result type
   virtual ResultType result_type () const { return EdgePairs; }
@@ -876,7 +886,7 @@ public:
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const;
 
 private:
-  PolygonToEdgePairProcessorBase *mp_proc;
+  tl::weak_ptr<PolygonToEdgePairProcessorBase> mp_proc;
 
   void processed (db::Layout *, const db::Polygon &p, std::vector<db::EdgePair> &res) const;
   void processed (db::Layout *layout, const db::PolygonRef &p, std::vector<db::EdgePair> &res) const;
@@ -897,16 +907,56 @@ private:
   }
 };
 
+/**
+ *  @brief A wrapper for a generic DRC check node
+ *
+ *  This node takes polygons for input. It will produce edge pairs as result of the DRC check.
+ */
+class DB_PUBLIC CompoundRegionCheckOperationNode
+  : public CompoundRegionMultiInputOperationNode
+{
+public:
+  /**
+   *  @brief Constructor
+   *  @param input The node for the original (the node will take ownership)
+   */
+  CompoundRegionCheckOperationNode (db::CompoundRegionOperationNode *input, db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, db::metrics_type metrics, double ignore_angle, db::coord_traits<db::Coord>::distance_type min_projection, db::coord_traits<db::Coord>::distance_type max_projection, bool shielded);
 
+  //  specifies the result type
+  virtual ResultType result_type () const { return EdgePairs; }
+
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const;
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const;
+
+private:
+  db::EdgeRelationFilter m_check;
+  bool m_different_polygons;
+  bool m_shielded;
+};
+
+
+/**
+ *  @brief The generic local operation
+ *
+ *  This local operation executes the operation tree within a local processor.
+ *  When put into a local processor, the operation tree will be executed on each interaction.
+ */
 template <class TS, class TI, class TR>
 class DB_PUBLIC compound_local_operation
   : public local_operation<TS, TI, TR>
 {
 public:
+  /**
+   *  @brief Constructor
+   *
+   *  Creates a local operation which utilizes the operation tree. "node" is the root of the operation tree.
+   *  Ownership of the node is *not* transferred to the local operation.
+   */
   compound_local_operation<TS, TI, TR> (CompoundRegionOperationNode *node)
     : mp_node (node)
   { }
 
+protected:
   virtual void compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio) const
   {
     for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
@@ -937,7 +987,20 @@ public:
   std::vector<db::Region *> inputs () const { return mp_node->inputs (); }
 
 private:
-  std::auto_ptr<CompoundRegionOperationNode> mp_node;
+  tl::weak_ptr<CompoundRegionOperationNode> mp_node;
+};
+
+}
+
+namespace tl
+{
+
+template <>
+struct tl::type_traits<db::CompoundRegionOperationNode>
+  : public tl::type_traits<void>
+{
+  typedef false_tag has_copy_constructor;
+  typedef false_tag has_default_constructor;
 };
 
 }

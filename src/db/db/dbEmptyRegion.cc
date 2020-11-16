@@ -97,6 +97,24 @@ EmptyRegion::processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &) co
 }
 
 EdgePairsDelegate *
+EmptyRegion::cop_to_edge_pairs (db::CompoundRegionOperationNode &)
+{
+  return new EmptyEdgePairs ();
+}
+
+RegionDelegate *
+EmptyRegion::cop_to_region (db::CompoundRegionOperationNode &)
+{
+  return new EmptyRegion ();
+}
+
+EdgesDelegate *
+EmptyRegion::cop_to_edges (db::CompoundRegionOperationNode &)
+{
+  return new EmptyEdges ();
+}
+
+EdgePairsDelegate *
 EmptyRegion::width_check (db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const
 {
   return new EmptyEdgePairs ();

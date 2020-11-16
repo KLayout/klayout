@@ -94,6 +94,7 @@ SOURCES = \
   gsiDeclDbCell.cc \
   gsiDeclDbCellMapping.cc \
   gsiDeclDbCommonStreamOptions.cc \
+  gsiDeclDbCompoundOperation.cc \
   gsiDeclDbEdge.cc \
   gsiDeclDbEdgePair.cc \
   gsiDeclDbEdgePairs.cc \

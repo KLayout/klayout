@@ -39,6 +39,7 @@
 #include "dbHash.h"
 #include "dbRegionLocalOperations.h"
 #include "dbHierProcessor.h"
+#include "dbCompoundOperation.h"
 
 #include <sstream>
 
@@ -1014,6 +1015,84 @@ AsIfFlatRegion::scaled_and_snapped (db::Coord gx, db::Coord mx, db::Coord dx, db
   }
 
   return new_region.release ();
+}
+
+EdgePairsDelegate *
+AsIfFlatRegion::cop_to_edge_pairs (db::CompoundRegionOperationNode &node)
+{
+  db::local_processor<db::Polygon, db::Polygon, db::EdgePair> proc;
+  proc.set_base_verbosity (base_verbosity ());
+
+  std::vector<generic_shape_iterator<db::Polygon> > others;
+  std::vector<db::Region *> inputs = node.inputs ();
+  for (std::vector<db::Region *>::const_iterator i = inputs.begin (); i != inputs.end (); ++i) {
+    //  @@@ in case of *i == null - what to do?
+    others.push_back (*i ? (*i)->begin () : begin ());
+  }
+
+  //  @@@ really always "merged"?
+  db::RegionIterator polygons (begin_merged ());
+
+  std::auto_ptr<FlatEdgePairs> output (new FlatEdgePairs ());
+  std::vector<db::Shapes *> results;
+  results.push_back (&output->raw_edge_pairs ());
+
+  compound_local_operation<db::Polygon, db::Polygon, db::EdgePair> op (&node);
+  proc.run_flat (polygons, others, &op, results);
+
+  return output.release ();
+}
+
+RegionDelegate *
+AsIfFlatRegion::cop_to_region (db::CompoundRegionOperationNode &node)
+{
+  db::local_processor<db::Polygon, db::Polygon, db::Polygon> proc;
+  proc.set_base_verbosity (base_verbosity ());
+
+  std::vector<generic_shape_iterator<db::Polygon> > others;
+  std::vector<db::Region *> inputs = node.inputs ();
+  for (std::vector<db::Region *>::const_iterator i = inputs.begin (); i != inputs.end (); ++i) {
+    //  @@@ in case of *i == null - what to do?
+    others.push_back (*i ? (*i)->begin () : begin ());
+  }
+
+  //  @@@ really always "merged"?
+  db::RegionIterator polygons (begin_merged ());
+
+  std::auto_ptr<FlatRegion> output (new FlatRegion ());
+  std::vector<db::Shapes *> results;
+  results.push_back (&output->raw_polygons ());
+
+  compound_local_operation<db::Polygon, db::Polygon, db::Polygon> op (&node);
+  proc.run_flat (polygons, others, &op, results);
+
+  return output.release ();
+}
+
+EdgesDelegate *
+AsIfFlatRegion::cop_to_edges (db::CompoundRegionOperationNode &node)
+{
+  db::local_processor<db::Polygon, db::Polygon, db::Edge> proc;
+  proc.set_base_verbosity (base_verbosity ());
+
+  std::vector<generic_shape_iterator<db::Polygon> > others;
+  std::vector<db::Region *> inputs = node.inputs ();
+  for (std::vector<db::Region *>::const_iterator i = inputs.begin (); i != inputs.end (); ++i) {
+    //  @@@ in case of *i == null - what to do?
+    others.push_back (*i ? (*i)->begin () : begin ());
+  }
+
+  //  @@@ really always "merged"?
+  db::RegionIterator polygons (begin_merged ());
+
+  std::auto_ptr<FlatEdges> output (new FlatEdges ());
+  std::vector<db::Shapes *> results;
+  results.push_back (&output->raw_edges ());
+
+  compound_local_operation<db::Polygon, db::Polygon, db::Edge> op (&node);
+  proc.run_flat (polygons, others, &op, results);
+
+  return output.release ();
 }
 
 EdgePairsDelegate *

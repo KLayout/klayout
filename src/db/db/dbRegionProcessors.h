@@ -328,12 +328,12 @@ private:
  *  @brief Computes the Minkowsky sum between the polygons and the given object
  *  The object can be Edge, Polygon, Box and std::vector<Point>
  */
-template <class Object>
+template <class K>
 class DB_PUBLIC_TEMPLATE minkowsky_sum_computation
   : public db::PolygonProcessorBase
 {
 public:
-  minkowsky_sum_computation (const Object &q)
+  minkowsky_sum_computation (const K &q)
     : m_q (q)
   {
     //  .. nothing yet ..
@@ -352,7 +352,7 @@ public:
   virtual bool wants_variants () const { return true; }
 
 private:
-  Object m_q;
+  K m_q;
   db::MagnificationAndOrientationReducer m_vars;
 };
 

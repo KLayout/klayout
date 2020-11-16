@@ -29,6 +29,8 @@
 #include "dbDeepEdges.h"
 #include "dbFlatEdges.h"
 #include "dbPolygonTools.h"
+#include "dbCompoundOperation.h"
+#include "gsiClassBase.h"
 #include "tlGlobPattern.h"
 
 namespace db
@@ -325,6 +327,41 @@ Region::flat_region ()
   }
 
   return region;
+}
+
+EdgePairs
+Region::cop_to_edge_pairs (db::CompoundRegionOperationNode &node)
+{
+  tl_assert (node.result_type () == db::CompoundRegionOperationNode::EdgePairs);
+  return EdgePairs (mp_delegate->cop_to_edge_pairs (node));
+}
+
+Region
+Region::cop_to_region (db::CompoundRegionOperationNode &node)
+{
+  tl_assert (node.result_type () == db::CompoundRegionOperationNode::Region);
+  return Region (mp_delegate->cop_to_region (node));
+}
+
+Edges
+Region::cop_to_edges (db::CompoundRegionOperationNode &node)
+{
+  tl_assert (node.result_type () == db::CompoundRegionOperationNode::Edges);
+  return Edges (mp_delegate->cop_to_edges (node));
+}
+
+tl::Variant
+Region::cop (db::CompoundRegionOperationNode &node)
+{
+  if (node.result_type () == db::CompoundRegionOperationNode::EdgePairs) {
+    return tl::Variant::make_variant (new EdgePairs (mp_delegate->cop_to_edge_pairs (node)));
+  } else if (node.result_type () == db::CompoundRegionOperationNode::Edges) {
+    return tl::Variant::make_variant (new Edges (mp_delegate->cop_to_edges (node)));
+  } else if (node.result_type () == db::CompoundRegionOperationNode::Region) {
+    return tl::Variant::make_variant (new Region (mp_delegate->cop_to_region (node)));
+  } else {
+    return tl::Variant ();
+  }
 }
 
 Region &

@@ -56,6 +56,10 @@ public:
 
   virtual std::string to_string (size_t nmax) const;
 
+  virtual EdgePairsDelegate *cop_to_edge_pairs (db::CompoundRegionOperationNode &node);
+  virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node);
+  virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node);
+
   EdgePairsDelegate *width_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const
   {
     return run_single_polygon_check (db::WidthRelation, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded);

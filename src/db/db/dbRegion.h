@@ -41,6 +41,7 @@ class FlatRegion;
 class EmptyRegion;
 class DeepShapeStore;
 class TransformationReducer;
+class CompoundRegionOperationNode;
 
 /**
  *  @brief A region iterator
@@ -606,6 +607,38 @@ public:
   {
     return EdgePairs (mp_delegate->processed_to_edge_pairs (filter));
   }
+
+  /**
+   *  @brief Performs a compound operation rendering edge pairs
+   *
+   *  The compound operation needs to feature edge pair output, e.g.
+   *  node.result_type() needs to be EdgePairs.
+   */
+  EdgePairs cop_to_edge_pairs (db::CompoundRegionOperationNode &node);
+
+  /**
+   *  @brief Performs a compound operation rendering a region
+   *
+   *  The compound operation needs to feature region output, e.g.
+   *  node.result_type() needs to be Region.
+   */
+  Region cop_to_region (db::CompoundRegionOperationNode &node);
+
+  /**
+   *  @brief Performs a compound operation rendering edges
+   *
+   *  The compound operation needs to feature region output, e.g.
+   *  node.result_type() needs to be Edges.
+   */
+  Edges cop_to_edges (db::CompoundRegionOperationNode &node);
+
+  /**
+   *  @brief A universal form of the compound operation
+   *
+   *  The returned variant will be of the type requested by the
+   *  compound operation node.
+   */
+  tl::Variant cop (db::CompoundRegionOperationNode &node);
 
   /**
    *  @brief Applies a width check and returns EdgePairs which correspond to violation markers

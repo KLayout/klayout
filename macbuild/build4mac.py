@@ -498,15 +498,14 @@ def get_build_parameters(config):
     #-----------------------------------------------------
     # [1] Set parameters passed to the main Bash script
     #-----------------------------------------------------
-    parameters = ""
+    parameters = dict()
 
     # (A) debug or release
-    if DebugMode:
+    parameters['debug_mode'] = True  # True if debug, False if release
+    if parameters["debug_mode"]:
         mode        = "debug"
-        parameters += "  -debug"
     else:
         mode        = "release"
-        parameters += "  -release"
 
     # (B) Modules
     (qt, ruby, python) = ModuleSet  # ( 'qt5MP', 'Sys', 'Sys' )
@@ -521,57 +520,43 @@ def get_build_parameters(config):
     # AbsMacBinDir      = "%s/%s.bin.macos-%s-%s-%s"       % (ProjectDir,                qt, Platform, mode, ruby_python)
     # AbsMacBuildDir    = "%s/%s.build.macos-%s-%s-%s"     % (ProjectDir,                qt, Platform, mode, ruby_python)
     # AbsMacBuildLog    = "%s/%s.build.macos-%s-%s-%s.log" % (ProjectDir,                qt, Platform, mode, ruby_python)
-    AbsMacPkgDir      = "%s/%s"                          % (ProjectDir, MacPkgDir)
-    AbsMacBinDir      = "%s/%s"                          % (ProjectDir, MacBinDir)
-    AbsMacBuildDir    = "%s/%s"                          % (ProjectDir, MacBuildDir)
-    AbsMacBuildLog    = "%s/%s"                          % (ProjectDir, MacBuildLog)
+    # AbsMacPkgDir      = "%s/%s"                          % (ProjectDir, MacPkgDir)
+    # AbsMacBinDir      = "%s/%s"                          % (ProjectDir, MacBinDir)
+    # AbsMacBuildDir    = "%s/%s"                          % (ProjectDir, MacBuildDir)
+    # AbsMacBuildLog    = "%s/%s"                          % (ProjectDir, MacBuildLog)
 
     MacBuildDirQAT    = MacBuildDir    + ".macQAT"
-    AbsMacBuildDirQAT = AbsMacBuildDir + ".macQAT"
 
     # (D) Qt5
     if ModuleQt == 'Qt5MacPorts':
-        parameters    += " \\\n  -qt5"
-        parameters    += " \\\n  -qmake  %s" % Qt5MacPorts['qmake']
-        parameters    += " \\\n  -bin    %s" % MacBinDir
-        parameters    += " \\\n  -build  %s" % MacBuildDir
+        parameters['qmake'] = Qt5MacPorts['qmake']
     elif ModuleQt == 'Qt5Brew':
-        parameters    += " \\\n  -qt5"
-        parameters    += " \\\n  -qmake  %s" % Qt5Brew['qmake']
-        parameters    += " \\\n  -bin    %s" % MacBinDir
-        parameters    += " \\\n  -build  %s" % MacBuildDir
+        parameters['qmake'] = Qt5Brew['qmake']
     elif ModuleQt == 'Qt5Ana3':
-        parameters    += " \\\n  -qt5"
-        parameters    += " \\\n  -qmake  %s" % Qt5Ana3['qmake']
-        parameters    += " \\\n  -bin    %s" % MacBinDir
-        parameters    += " \\\n  -build  %s" % MacBuildDir
-    parameters += " \\\n  -rpath    %s" % "@executable_path/../Frameworks"
+        parameters['qmake'] = Qt5Ana3['qmake']
+
+    parameters['bin'] = MacBinDir
+    parameters['build'] = MacBuildDir
+    parameters['rpath'] = "@executable_path/../Frameworks"
 
     # (E) want Qt bindings with Ruby scripts?
-    if NoQtBindings:
-        parameters += " \\\n  -without-qtbinding"
-    else:
-        parameters += " \\\n  -with-qtbinding"
+    parameters['no_qt_bindings'] = NoQtBindings
 
     # (F) options to `make` tool
     if not MakeOptions == "":
-        parameters += " \\\n  -option %s" % MakeOptions
+        parameters['make_options'] = MakeOptions
 
     # (G) about Ruby
-    if ModuleRuby == "nil":
-        parameters += " \\\n  -noruby"
-    else:
-        parameters += " \\\n  -ruby   %s" % RubyDictionary[ModuleRuby]['exe']
-        parameters += " \\\n  -rbinc  %s" % RubyDictionary[ModuleRuby]['inc']
-        parameters += " \\\n  -rblib  %s" % RubyDictionary[ModuleRuby]['lib']
+    if ModuleRuby != "nil":
+        parameters['ruby'] = RubyDictionary[ModuleRuby]['exe']
+        parameters['rbinc'] = RubyDictionary[ModuleRuby]['inc']
+        parameters['rblib'] = RubyDictionary[ModuleRuby]['lib']
 
     # (H) about Python
-    if ModulePython == "nil":
-        parameters += " \\\n  -nopython"
-    else:
-        parameters += " \\\n  -python %s" % PythonDictionary[ModulePython]['exe']
-        parameters += " \\\n  -pyinc  %s" % PythonDictionary[ModulePython]['inc']
-        parameters += " \\\n  -pylib  %s" % PythonDictionary[ModulePython]['lib']
+    if ModulePython != "nil":
+        parameters['python'] = PythonDictionary[ModulePython]['exe']
+        parameters['pyinc'] = PythonDictionary[ModulePython]['inc']
+        parameters['pylib'] = PythonDictionary[ModulePython]['lib']
 
     config['MacPkgDir']         = MacPkgDir          # relative path to package directory
     config['MacBinDir']         = MacBinDir          # relative path to binary directory
@@ -594,11 +579,61 @@ def run_build_command(config, parameters):
     CheckComOnly = config['CheckComOnly']
 
     #-----------------------------------------------------
+    # [1] Set parameters passed to the main Bash script
+    #-----------------------------------------------------
+
+    cmd_args = ""
+
+    # (A) debug or release
+    if parameters["debug_mode"]:
+        mode        = "debug"
+        cmd_args += "  -debug"
+    else:
+        mode        = "release"
+        cmd_args += "  -release"
+
+    # (C) Target directories and files
+    MacBuildDirQAT    = parameters['build']    + ".macQAT"
+
+    # (D) Qt5
+    cmd_args    += " \\\n  -qt5"
+    cmd_args    += " \\\n  -qmake  %s" % parameters['qmake']
+    cmd_args    += " \\\n  -bin    %s" % parameters['bin']
+    cmd_args    += " \\\n  -build  %s" % parameters['build']
+    cmd_args += " \\\n  -rpath    %s" % parameters['rpath']
+
+    # (E) want Qt bindings with Ruby scripts?
+    if parameters['no_qt_bindings']:
+        cmd_args += " \\\n  -without-qtbinding"
+    else:
+        cmd_args += " \\\n  -with-qtbinding"
+
+    # (F) options to `make` tool
+    if 'make_options' in parameters:
+        cmd_args += " \\\n  -option %s" % parameters['make_options']
+
+    # (G) about Ruby
+    if 'ruby' in parameters:
+        cmd_args += " \\\n  -ruby   %s" % parameters['ruby']
+        cmd_args += " \\\n  -rbinc  %s" % parameters['rbinc']
+        cmd_args += " \\\n  -rblib  %s" % parameters['rblib']
+    else:
+        cmd_args += " \\\n  -noruby"
+
+    # (H) about Python
+    if 'python' in parameters:
+        cmd_args += " \\\n  -python %s" % parameters['python']
+        cmd_args += " \\\n  -pyinc  %s" % parameters['pyinc']
+        cmd_args += " \\\n  -pylib  %s" % parameters['pylib']
+    else:
+        cmd_args += " \\\n  -nopython"
+
+    #-----------------------------------------------------
     # [2] Make the consolidated command line
     #-----------------------------------------------------
     command  = "time"
     command += " \\\n  %s" % BuildBash
-    command += parameters
+    command += cmd_args
     command += "  2>&1 | tee %s" % MacBuildLog
     command += "; test ${PIPESTATUS[0]} -eq 0"  # tee always exits with 0
 
@@ -1181,6 +1216,7 @@ def main():
     # [The main build stage]
     #----------------------------------------------------------
     parameters = get_build_parameters(config)
+    print(parameters)
     ret = run_build_command(config, parameters)
     print(config)
     return config

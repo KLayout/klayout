@@ -6,7 +6,7 @@ ifndef PYTHON_VERSION
     PYTHON_VERSION := HB38
 endif
 ifndef MACOS_VERSION
-	MACOS_VERSION := HighSierra
+	MACOS_VERSION := Catalina
 endif
 
 .ONESHELL:
@@ -15,11 +15,11 @@ default: help
 
 help:
 	@echo "For Mac OS only"
-	@echo "make build PYTHON_VERSION=B37"
-	@echo "make deploy PYTHON_VERSION=B37"
+	@echo "make build PYTHON_VERSION=HB38"
+	@echo "make deploy PYTHON_VERSION=HB38"
 	@echo "make test MACOS_VERSION=HighSierra"
-	@echo "Valid Mac OS Versions: [Yosemite, ElCapitan, Sierra, HighSierra]"
-	@echo "Valid Python Version: [nil, Sys, B37]"
+	@echo "Valid Mac OS Versions: [Yosemite, ElCapitan, Sierra, HighSierra, Mojave, Catalina]"
+	@echo "Valid Python Version: [nil, Sys, HB38]"
 
 build:
 	@echo "Building for Mac $(GITCOMMIT)"
@@ -29,7 +29,7 @@ build:
 deploy:
 	@echo "Deploying 4 Mac $(GITCOMMIT)"
 	./build4mac.py -p $(PYTHON_VERSION) -q Qt5Brew -y
-	
+
 test:
 	@echo "Testing 4 Mac $(GITCOMMIT)"
 	qt5.pkg.macos-$(MACOS_VERSION)-release/klayout.app/Contents/MacOS/klayout -b -r test-pylib-script.py; \

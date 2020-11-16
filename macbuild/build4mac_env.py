@@ -104,7 +104,7 @@ RubyMojave      = { 'exe': '/System/Library/Frameworks/Ruby.framework/Versions/2
 #   !!! Catalina does not allow to hack the "/System" directory; it's READ ONLY even for the super user!
 #       Hence, we need to refer to the Ruby header file in "Xcode.app" directly.
 # [Key Type Name] = 'Sys'
-CatalinaSDK = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk"
+CatalinaSDK = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk"
 RubyCatalina    = { 'exe': '/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby',
                     'inc': '%s/System/Library/Frameworks/Ruby.framework/Headers' % CatalinaSDK,
                     'inc2': '%s/System/Library/Frameworks/Ruby.framework/Headers/ruby' % CatalinaSDK,

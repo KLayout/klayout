@@ -501,7 +501,7 @@ def get_build_parameters(config):
     parameters = dict()
 
     # (A) debug or release
-    parameters['debug_mode'] = True  # True if debug, False if release
+    parameters['debug_mode'] = DebugMode  # True if debug, False if release
     if parameters["debug_mode"]:
         mode        = "debug"
     else:
@@ -1214,15 +1214,17 @@ def DeployBinariesForBundle():
 ## The main function
 #------------------------------------------------------------------------------
 def main():
+    import pprint
+    pp = pprint.PrettyPrinter(indent=4)
     config = get_default_config()
     parse_cli_args(config)
     #----------------------------------------------------------
     # [The main build stage]
     #----------------------------------------------------------
     parameters = get_build_parameters(config)
-    print(parameters)
+    pp.pprint(parameters)
     ret = run_build_command(config, parameters)
-    print(config)
+    pp.pprint(config)
     return config
 
     if not DeploymentF and not DeploymentP:

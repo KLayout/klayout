@@ -60,3 +60,8 @@ dist/
 
 # IDEs
 .vscode
+
+
+# Macos artifacts
+*.dmg
+*.dmg.md5

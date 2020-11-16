@@ -101,7 +101,7 @@ def get_default_config():
 
     ProjectDir = os.getcwd()
     BuildBash  = "./build.sh"
-    (System, Node, Release, Version, Machine, Processor) = platform.uname()
+    (System, Node, Release, MacVersion, Machine, Processor) = platform.uname()
 
     if not System == "Darwin":
         print("")
@@ -192,7 +192,7 @@ def get_default_config():
     config['System'] = System                     # 6-tuple from platform.uname()
     config['Node'] = Node                         # - do -
     config['Release'] = Release                   # - do -
-    config['Version'] = Version                   # - do -
+    config['MacVersion'] = MacVersion             # - do -
     config['Machine'] = Machine                   # - do -
     config['Processor'] = Processor               # - do -
     return config
@@ -439,7 +439,7 @@ def parse_cli_args(config):
         message = "### You are going to make "
         if DeploymentP:
             PackagePrefix = "LW-"
-            message      += "a llightweight (LW-) package excluding Qt5, Ruby, and Python..."
+            message      += "a lightweight (LW-) package excluding Qt5, Ruby, and Python..."
         elif DeploymentF:
             if (ModuleRuby in RubySys) and (ModulePython in PythonSys):
                 PackagePrefix = "ST-"
@@ -534,10 +534,13 @@ def get_build_parameters(config):
     # (D) Qt5
     if ModuleQt == 'Qt5MacPorts':
         parameters['qmake'] = Qt5MacPorts['qmake']
+        parameters['deploy_tool'] = Qt5MacPorts['deploy']
     elif ModuleQt == 'Qt5Brew':
         parameters['qmake'] = Qt5Brew['qmake']
+        parameters['deploy_tool'] = Qt5Brew['deploy']
     elif ModuleQt == 'Qt5Ana3':
         parameters['qmake'] = Qt5Ana3['qmake']
+        parameters['deploy_tool'] = Qt5Ana3['deploy']
 
     parameters['bin'] = MacBinDir
     parameters['build'] = MacBuildDir
@@ -574,6 +577,9 @@ def get_build_parameters(config):
     # config['AbsMacBuildDir']    = AbsMacBuildDir     # absolute path to build directory
     # config['AbsMacBuildDirQAT'] = AbsMacBuildDirQAT  # absolute path to build directory for QATest
     # config['AbsMacBuildLog']    = AbsMacBuildLog     # absolute path to build log file
+
+    # Extra parameteres needed for deployment
+    parameters['project_dir'] = ProjectDir
 
     return parameters
 
@@ -713,18 +719,20 @@ def run_build_command(parameters):
 #
 # @return 0 on success; non-zero on failure
 #------------------------------------------------------------------------------
-def DeployBinariesForBundle():
-    global ProjectDir
-    global ModuleQt
-    global NonOSStdLang
-    global DeploymentF
-    global DeploymentP
-    global MacPkgDir
-    global MacBinDir
-    global MacBuildDir
-    global MacBuildLog
-    global Version
-    global DeployVerbose
+def DeployBinariesForBundle(config, parameters):
+    NonOSStdLang   = config['NonOSStdLang']
+    DeploymentF    = config['DeploymentF']
+    DeploymentP    = config['DeploymentP']
+    MacPkgDir      = config['MacPkgDir']
+    Version        = config['Version']
+    DeployVerbose  = config['DeployVerbose']
+    ModuleRuby     = config['ModuleRuby']
+    ModulePython   = config['ModulePython']
+
+    ProjectDir  = parameters['project_dir']
+    MacBinDir   = parameters['bin']
+    MacBuildDir = parameters['build']
+    MacBuildLog = parameters['logfile']
 
     AbsMacPkgDir     = "%s/%s" % (ProjectDir, MacPkgDir)
     AbsMacBinDir     = "%s/%s" % (ProjectDir, MacBinDir)
@@ -1006,18 +1014,9 @@ def DeployBinariesForBundle():
         # [8] Deploy Qt Frameworks
         #-------------------------------------------------------------
         verbose = " -verbose=%d" % DeployVerbose
-        if ModuleQt == 'Qt5MacPorts':
-            deploytool = Qt5MacPorts['deploy']
-            app_bundle = "klayout.app"
-            options    = macdepQtOpt + verbose
-        elif ModuleQt == 'Qt5Brew':
-            deploytool = Qt5Brew['deploy']
-            app_bundle = "klayout.app"
-            options    = macdepQtOpt + verbose
-        elif ModuleQt == 'Qt5Ana3':
-            deploytool = Qt5Ana3['deploy']
-            app_bundle = "klayout.app"
-            options    = macdepQtOpt + verbose
+        app_bundle = "klayout.app"
+        options = macdepQtOpt + verbose
+        deploytool = parameters['deploy_tool']
 
         # Without the following, the plugin cocoa would not be found properly.
         shutil.copy2( sourceDir2 + "/qt.conf", targetDirM )
@@ -1232,7 +1231,7 @@ def main():
         #   Deployment of dynamic link libraries, executables and
         #   resources to make the main "klayout.app" bundle
         #----------------------------------------------------------
-        ret = DeployBinariesForBundle()
+        ret = DeployBinariesForBundle(config, parameters)
         if not ret == 0:
             sys.exit(1)
 

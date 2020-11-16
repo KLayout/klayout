@@ -37,6 +37,8 @@ build-*
 bin-*
 mkqtdecl.tmp
 testtmp
+*build.macos*
+*bin.macos*
 
 # private data
 private
@@ -54,3 +56,7 @@ src/klayout.pro.user
 *.egg-info/
 build/
 dist/
+
+
+# IDEs
+.vscode

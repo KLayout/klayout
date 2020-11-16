@@ -675,7 +675,7 @@ def run_build_command(config, parameters):
     if os.path.isdir( MacBuildDirQAT ):
         shutil.rmtree( MacBuildDirQAT )
 
-    os.chdir( MacBuildDir )
+    os.chdir( parameters['build'] )
     tarFile = "../macQATest.tar"
     tarCmdC = "tar cf %s ." % tarFile
     if subprocess.call( tarCmdC, shell=True ) != 0:

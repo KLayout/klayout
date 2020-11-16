@@ -28,32 +28,32 @@ from build4mac_util import *
 ## To set global variables including present directory and platform info.
 #-------------------------------------------------------------------------------
 def SetGlobals(config):
-    global ProjectDir         # project directory where "build.sh" exists
-    global Usage              # string on usage
-    global BuildBash          # the main build Bash script
-    global Platform           # platform
-    global ModuleQt           # Qt module to be used
-    global ModuleRuby         # Ruby module to be used
-    global ModulePython       # Python module to be used
-    global NonOSStdLang       # True if non-OS-standard language is chosen
-    global NoQtBindings       # True if not creating Qt bindings for Ruby scripts
-    global MakeOptions        # options passed to `make`
-    global DebugMode          # True if debug mode build
-    global CheckComOnly       # True if only for checking the command line parameters to "build.sh"
-    global DeploymentF        # True if fully (including Qt's Frameworks) deploy the binaries for bundles
-    global DeploymentP        # True if partially deploy the binaries excluding Qt's Frameworks
-    global PackagePrefix      # the package prefix: 'ST-', 'LW-', 'HW-', or 'EX-'
-    global DeployVerbose      # -verbose=<0-3> level passed to 'macdeployqt' tool
-    global Version            # KLayout's version
-    global ModuleSet          # (Qt, Ruby, Python)-tuple
-    # auxiliary variables on platform
-    global System             # 6-tuple from platform.uname()
-    global Node               # - do -
-    global Release            # - do -
-    global Version            # - do -
-    global Machine            # - do -
-    global Processor          # - do -
-    global Bit                # machine bit-size
+    # global ProjectDir         # project directory where "build.sh" exists
+    # global Usage              # string on usage
+    # global BuildBash          # the main build Bash script
+    # global Platform           # platform
+    # global ModuleQt           # Qt module to be used
+    # global ModuleRuby         # Ruby module to be used
+    # global ModulePython       # Python module to be used
+    # global NonOSStdLang       # True if non-OS-standard language is chosen
+    # global NoQtBindings       # True if not creating Qt bindings for Ruby scripts
+    # global MakeOptions        # options passed to `make`
+    # global DebugMode          # True if debug mode build
+    # global CheckComOnly       # True if only for checking the command line parameters to "build.sh"
+    # global DeploymentF        # True if fully (including Qt's Frameworks) deploy the binaries for bundles
+    # global DeploymentP        # True if partially deploy the binaries excluding Qt's Frameworks
+    # global PackagePrefix      # the package prefix: 'ST-', 'LW-', 'HW-', or 'EX-'
+    # global DeployVerbose      # -verbose=<0-3> level passed to 'macdeployqt' tool
+    # global Version            # KLayout's version
+    # global ModuleSet          # (Qt, Ruby, Python)-tuple
+    # # auxiliary variables on platform
+    # global System             # 6-tuple from platform.uname()
+    # global Node               # - do -
+    # global Release            # - do -
+    # global Version            # - do -
+    # global Machine            # - do -
+    # global Processor          # - do -
+    # global Bit                # machine bit-size
 
     Usage  = "\n"
     Usage += "---------------------------------------------------------------------------------------------------------\n"
@@ -420,6 +420,34 @@ def ParseCommandLineArguments():
         print( "" )
         if CheckComOnly:
             sys.exit(0)
+
+    config['ProjectDir'] = ProjectDir             # project directory where "build.sh" exists
+    config['Usage'] = Usage                       # string on usage
+    config['BuildBash'] = BuildBash               # the main build Bash script
+    config['Platform'] = Platform                 # platform
+    config['ModuleQt'] = ModuleQt                 # Qt module to be used
+    config['ModuleRuby'] = ModuleRuby             # Ruby module to be used
+    config['ModulePython'] = ModulePython         # Python module to be used
+    config['NonOSStdLang'] = NonOSStdLang         # True if non-OS-standard language is chosen
+    config['NoQtBindings'] = NoQtBindings         # True if not creating Qt bindings for Ruby scripts
+    config['MakeOptions'] = MakeOptions           # options passed to `make`
+    config['DebugMode'] = DebugMode               # True if debug mode build
+    config['CheckComOnly'] = CheckComOnly         # True if only for checking the command line parameters to "build.sh"
+    config['DeploymentF'] = DeploymentF           # True if fully (including Qt's Frameworks) deploy the binaries for bundles
+    config['DeploymentP'] = DeploymentP           # True if partially deploy the binaries excluding Qt's Frameworks
+    config['PackagePrefix'] = PackagePrefix       # the package prefix: 'ST-', 'LW-', 'HW-', or 'EX-'
+    config['DeployVerbose'] = DeployVerbose       # -verbose=<0-3> level passed to 'macdeployqt' tool
+    config['Version'] = Version                   # KLayout's version
+    config['ModuleSet'] = ModuleSet               # (Qt, Ruby, Python)-tuple
+    # auxiliary variables on platform
+    config['System'] = System                     # 6-tuple from platform.uname()
+    config['Node'] = Node                         # - do -
+    config['Release'] = Release                   # - do -
+    config['Version'] = Version                   # - do -
+    config['Machine'] = Machine                   # - do -
+    config['Processor'] = Processor               # - do -
+    config['Bit'] = Bit                           # machine bit-size
+    return config
 
 #------------------------------------------------------------------------------
 ## To run the main Bash script "build.sh" with appropriate options

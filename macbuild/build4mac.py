@@ -500,6 +500,9 @@ def get_build_parameters(config):
     #-----------------------------------------------------
     parameters = dict()
 
+    parameters['build_cmd'] = BuildBash
+    parameters['check_cmd_only'] = CheckComOnly
+
     # (A) debug or release
     parameters['debug_mode'] = DebugMode  # True if debug, False if release
     if parameters["debug_mode"]:
@@ -526,6 +529,7 @@ def get_build_parameters(config):
     # AbsMacBuildLog    = "%s/%s"                          % (ProjectDir, MacBuildLog)
 
     MacBuildDirQAT    = MacBuildDir    + ".macQAT"
+    parameters['logfile'] = MacBuildLog
 
     # (D) Qt5
     if ModuleQt == 'Qt5MacPorts':
@@ -573,12 +577,7 @@ def get_build_parameters(config):
 
     return parameters
 
-def run_build_command(config, parameters):
-    BuildBash = config['BuildBash']
-    DeploymentF = config['DeploymentF']
-    DeploymentP = config['DeploymentP']
-    MacBuildLog = config['MacBuildLog']
-    CheckComOnly = config['CheckComOnly']
+def run_build_command(parameters):
 
     #-----------------------------------------------------
     # [1] Set parameters passed to the main Bash script
@@ -636,20 +635,18 @@ def run_build_command(config, parameters):
     # [2] Make the consolidated command line
     #-----------------------------------------------------
     command  = "time"
-    command += " \\\n  %s" % BuildBash
+    command += " \\\n  %s" % parameters['build_cmd']
     command += cmd_args
-    command += "  2>&1 | tee %s" % MacBuildLog
-    command += "; test ${PIPESTATUS[0]} -eq 0"  # tee always exits with 0
+    command += "  2>&1 | tee %s; \\\n" % parameters['logfile']
+    command += "test ${PIPESTATUS[0]} -eq 0"  # tee always exits with 0
 
-    if CheckComOnly:
+    if parameters['check_cmd_only']:
         print(command)
         sys.exit(0)
 
     #-----------------------------------------------------
     # [3] Invoke the main Bash script; takes time:-)
     #-----------------------------------------------------
-    if DeploymentF or DeploymentP:
-        return 0
 
     myscript = os.path.basename(__file__)
     ret = subprocess.call( command, shell=True )
@@ -1223,11 +1220,10 @@ def main():
     #----------------------------------------------------------
     parameters = get_build_parameters(config)
     pp.pprint(parameters)
-    ret = run_build_command(config, parameters)
-    pp.pprint(config)
-    return config
 
-    if not DeploymentF and not DeploymentP:
+    if not config['DeploymentF'] and not config['DeploymentP']:
+        ret = run_build_command(parameters)
+        pp.pprint(config)
         if not ret == 0:
             sys.exit(1)
     else:

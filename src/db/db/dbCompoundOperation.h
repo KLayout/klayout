@@ -768,7 +768,8 @@ class DB_PUBLIC CompoundRegionProcessingOperationNode
   : public CompoundRegionMultiInputOperationNode
 {
 public:
-  CompoundRegionProcessingOperationNode (PolygonProcessorBase *proc, CompoundRegionOperationNode *input);
+  CompoundRegionProcessingOperationNode (PolygonProcessorBase *proc, CompoundRegionOperationNode *input, bool owns_proc = false);
+  ~CompoundRegionProcessingOperationNode ();
 
   //  specifies the result type
   virtual ResultType result_type () const { return Region; }
@@ -781,6 +782,7 @@ public:
 
 private:
   PolygonProcessorBase *mp_proc;
+  bool m_owns_proc;
 
   void processed (db::Layout *, const db::Polygon &p, std::vector<db::Polygon> &res) const;
   void processed (db::Layout *layout, const db::PolygonRef &p, std::vector<db::PolygonRef> &res) const;
@@ -827,7 +829,8 @@ class DB_PUBLIC CompoundRegionToEdgeProcessingOperationNode
   : public CompoundRegionMultiInputOperationNode
 {
 public:
-  CompoundRegionToEdgeProcessingOperationNode (PolygonToEdgeProcessorBase *proc, CompoundRegionOperationNode *input);
+  CompoundRegionToEdgeProcessingOperationNode (PolygonToEdgeProcessorBase *proc, CompoundRegionOperationNode *input, bool owns_proc = false);
+  ~CompoundRegionToEdgeProcessingOperationNode ();
 
   //  specifies the result type
   virtual ResultType result_type () const { return Edges; }
@@ -840,6 +843,7 @@ public:
 
 private:
   PolygonToEdgeProcessorBase *mp_proc;
+  bool m_owns_proc;
 
   void processed (db::Layout *, const db::Polygon &p, std::vector<db::Edge> &res) const;
   void processed (db::Layout *layout, const db::PolygonRef &p, std::vector<db::Edge> &res) const;
@@ -871,10 +875,11 @@ class DB_PUBLIC CompoundRegionToEdgePairProcessingOperationNode
 public:
   /**
    *  @brief Constructor
-   *  @param proc The processor which turns polygons into edge pairs (it's reimplementation) - the node will *not* take ownership
+   *  @param proc The processor which turns polygons into edge pairs (it's reimplementation) - the node will *not* take ownership unless owns_proc is true
    *  @param input The node for the original (the node will take ownership)
    */
-  CompoundRegionToEdgePairProcessingOperationNode (PolygonToEdgePairProcessorBase *proc, CompoundRegionOperationNode *input);
+  CompoundRegionToEdgePairProcessingOperationNode (PolygonToEdgePairProcessorBase *proc, CompoundRegionOperationNode *input, bool owns_proc = false);
+  ~CompoundRegionToEdgePairProcessingOperationNode ();
 
   //  specifies the result type
   virtual ResultType result_type () const { return EdgePairs; }
@@ -886,7 +891,8 @@ public:
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const;
 
 private:
-  tl::weak_ptr<PolygonToEdgePairProcessorBase> mp_proc;
+ PolygonToEdgePairProcessorBase *mp_proc;
+  bool m_owns_proc;
 
   void processed (db::Layout *, const db::Polygon &p, std::vector<db::EdgePair> &res) const;
   void processed (db::Layout *layout, const db::PolygonRef &p, std::vector<db::EdgePair> &res) const;
@@ -921,6 +927,11 @@ public:
    *  @param input The node for the original (the node will take ownership)
    */
   CompoundRegionCheckOperationNode (db::CompoundRegionOperationNode *input, db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, db::metrics_type metrics, double ignore_angle, db::coord_traits<db::Coord>::distance_type min_projection, db::coord_traits<db::Coord>::distance_type max_projection, bool shielded);
+
+  /**
+   *  @brief Constructor for the single-layer check
+   */
+  CompoundRegionCheckOperationNode (db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, db::metrics_type metrics, double ignore_angle, db::coord_traits<db::Coord>::distance_type min_projection, db::coord_traits<db::Coord>::distance_type max_projection, bool shielded);
 
   //  specifies the result type
   virtual ResultType result_type () const { return EdgePairs; }

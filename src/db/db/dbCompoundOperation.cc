@@ -30,7 +30,6 @@ TODO:
 * Transform variants?
 * "result is merged"?
 * "requires raw input"?
-* Make nodes shared pointers/GSI objects for better compatibility with GSI, at least "keep" them.
 
 * edge pair to edge generation nodes (first, second)
 
@@ -281,6 +280,7 @@ CompoundTransformationReducer::is_translation_invariant () const
 CompoundRegionMultiInputOperationNode::CompoundRegionMultiInputOperationNode (const std::vector<CompoundRegionOperationNode *> &children)
 {
   for (std::vector<CompoundRegionOperationNode *>::const_iterator c = children.begin (); c != children.end (); ++c) {
+    (*c)->keep ();
     m_children.push_back (*c);
   }
   init ();
@@ -943,10 +943,18 @@ CompoundRegionFilterOperationNode::is_selected (const db::PolygonRef &p) const
 
 // ---------------------------------------------------------------------------------------------
 
-CompoundRegionProcessingOperationNode::CompoundRegionProcessingOperationNode (PolygonProcessorBase *proc, CompoundRegionOperationNode *input)
-  : CompoundRegionMultiInputOperationNode (input), mp_proc (proc)
+CompoundRegionProcessingOperationNode::CompoundRegionProcessingOperationNode (PolygonProcessorBase *proc, CompoundRegionOperationNode *input, bool owns_proc)
+  : CompoundRegionMultiInputOperationNode (input), mp_proc (proc), m_owns_proc (owns_proc)
 {
   set_description ("processor");
+}
+
+CompoundRegionProcessingOperationNode::~CompoundRegionProcessingOperationNode ()
+{
+  if (m_owns_proc) {
+    delete mp_proc;
+    mp_proc = 0;
+  }
 }
 
 void
@@ -979,10 +987,18 @@ CompoundRegionProcessingOperationNode::processed (db::Layout *layout, const db::
 
 // ---------------------------------------------------------------------------------------------
 
-CompoundRegionToEdgeProcessingOperationNode::CompoundRegionToEdgeProcessingOperationNode (PolygonToEdgeProcessorBase *proc, CompoundRegionOperationNode *input)
-  : CompoundRegionMultiInputOperationNode (input), mp_proc (proc)
+CompoundRegionToEdgeProcessingOperationNode::CompoundRegionToEdgeProcessingOperationNode (PolygonToEdgeProcessorBase *proc, CompoundRegionOperationNode *input, bool owns_proc)
+  : CompoundRegionMultiInputOperationNode (input), mp_proc (proc), m_owns_proc (owns_proc)
 {
   set_description ("processor");
+}
+
+CompoundRegionToEdgeProcessingOperationNode::~CompoundRegionToEdgeProcessingOperationNode ()
+{
+  if (m_owns_proc) {
+    delete mp_proc;
+    mp_proc = 0;
+  }
 }
 
 void
@@ -1011,10 +1027,18 @@ CompoundRegionToEdgeProcessingOperationNode::processed (db::Layout *, const db::
 
 // ---------------------------------------------------------------------------------------------
 
-CompoundRegionToEdgePairProcessingOperationNode::CompoundRegionToEdgePairProcessingOperationNode (PolygonToEdgePairProcessorBase *proc, CompoundRegionOperationNode *input)
-  : CompoundRegionMultiInputOperationNode (input), mp_proc (proc)
+CompoundRegionToEdgePairProcessingOperationNode::CompoundRegionToEdgePairProcessingOperationNode (PolygonToEdgePairProcessorBase *proc, CompoundRegionOperationNode *input, bool owns_proc)
+  : CompoundRegionMultiInputOperationNode (input), mp_proc (proc), m_owns_proc (owns_proc)
 {
   set_description ("processor");
+}
+
+CompoundRegionToEdgePairProcessingOperationNode::~CompoundRegionToEdgePairProcessingOperationNode ()
+{
+  if (m_owns_proc) {
+    delete mp_proc;
+    mp_proc = 0;
+  }
 }
 
 void
@@ -1045,6 +1069,18 @@ CompoundRegionToEdgePairProcessingOperationNode::processed (db::Layout *, const 
 
 CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (CompoundRegionOperationNode *input, db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, db::metrics_type metrics, double ignore_angle, db::coord_traits<db::Coord>::distance_type min_projection, db::coord_traits<db::Coord>::distance_type max_projection, bool shielded)
   : CompoundRegionMultiInputOperationNode (input), m_check (rel, d, metrics), m_different_polygons (different_polygons), m_shielded (shielded)
+{
+  set_description ("check");
+
+  m_check.set_include_zero (false);
+  m_check.set_whole_edges (whole_edges);
+  m_check.set_ignore_angle (ignore_angle);
+  m_check.set_min_projection (min_projection);
+  m_check.set_max_projection (max_projection);
+}
+
+CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, db::metrics_type metrics, double ignore_angle, db::coord_traits<db::Coord>::distance_type min_projection, db::coord_traits<db::Coord>::distance_type max_projection, bool shielded)
+  : CompoundRegionMultiInputOperationNode (), m_check (rel, d, metrics), m_different_polygons (different_polygons), m_shielded (shielded)
 {
   set_description ("check");
 

@@ -813,6 +813,26 @@ LEFDEFReaderState::map_layer_explicit (const std::string &n, LayerPurpose purpos
   m_layer_map.map (lp, layer);
 }
 
+static bool try_read_layers (tl::Extractor &ex, std::vector<int> &layers)
+{
+  int l = 0;
+  if (! ex.try_read (l)) {
+    return false;
+  }
+  layers.push_back (l);
+
+  if (ex.test (",")) {
+    do {
+      if (! ex.try_read (l)) {
+        return false;
+      }
+      layers.push_back (l);
+    } while (ex.test (","));
+  }
+
+  return true;
+}
+
 void
 LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 {
@@ -832,6 +852,7 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
   purpose_translation ["NET"] = Routing;
   purpose_translation ["VIA"] = ViaGeometry;
   purpose_translation ["BLOCKAGE"] = Blockage;
+  purpose_translation ["ALL"] = All;
 
   std::map<LayerPurpose, std::string> purpose_translation_rev;
   for (std::map<std::string, LayerPurpose>::const_iterator i = purpose_translation.begin (); i != purpose_translation.end (); ++i) {
@@ -853,112 +874,154 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 
       std::string w1, w2;
       int layer = 0, datatype = 0;
+      std::vector<int> layers;
       size_t max_purpose_str = 10;
 
-      if (ex.try_read_word (w1) && ex.try_read_word (w2, "._$,/:") && ex.try_read (layer) && ex.try_read (datatype)) {
+      if (! ex.try_read_word (w1) || ! ex.try_read_word (w2, "._$,/:") || ! try_read_layers (ex, layers) || ! ex.try_read (datatype)) {
+        tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d not understood - skipped")), path, ts.line_number ());
+        continue;
+      }
 
-        if (w1 == "DIEAREA") {
+      if (layers.size () > 1) {
+        tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: mapping to multiple layers not supported currently - first one taken")), path, ts.line_number ());
+      }
+      layer = layers.front ();
 
-          layer_map [std::make_pair (std::string (), std::make_pair (Outline, (unsigned int) 0))] = db::LayerProperties (layer, datatype, "OUTLINE");
+      if (w1 == "DIEAREA") {
 
-        } else if (w1 == "REGIONS") {
+        layer_map [std::make_pair (std::string (), std::make_pair (Outline, (unsigned int) 0))] = db::LayerProperties (layer, datatype, "OUTLINE");
 
-          layer_map [std::make_pair (std::string (), std::make_pair (Regions, (unsigned int) 0))] = db::LayerProperties (layer, datatype, "REGIONS");
+      } else if (w1 == "REGIONS") {
 
-        } else if (w1 == "BLOCKAGE") {
+        layer_map [std::make_pair (std::string (), std::make_pair (Regions, (unsigned int) 0))] = db::LayerProperties (layer, datatype, "REGIONS");
 
-          layer_map [std::make_pair (std::string (), std::make_pair (PlacementBlockage, (unsigned int) 0))] = db::LayerProperties (layer, datatype, "PLACEMENT_BLK");
+      } else if (w1 == "BLOCKAGE") {
 
-        } else if (w1 == "NAME") {
+        layer_map [std::make_pair (std::string (), std::make_pair (PlacementBlockage, (unsigned int) 0))] = db::LayerProperties (layer, datatype, "PLACEMENT_BLK");
 
-          //  converts a line like
-          //    "NAME M1/PINS,M2/PINS ..."
-          //  into a canonical name mapping like
-          //    "(M1/LABELS): M1.LABEL"
-          //    "(M2/LABELS): M2.LABEL"
+      } else if (w1 == "NAME") {
 
-          std::vector<std::string> layers;
-          std::vector<std::string> purposes = tl::split (w2, ",");
-          for (std::vector<std::string>::const_iterator p = purposes.begin (); p != purposes.end (); ++p) {
+        //  converts a line like
+        //    "NAME M1/PINS,M2/PINS ..."
+        //  into a canonical name mapping like
+        //    "(M1/LABELS): M1.LABEL"
+        //    "(M2/LABELS): M2.LABEL"
+
+        std::vector<std::string> layers;
+        std::vector<std::string> purposes = tl::split (w2, ",");
+        for (std::vector<std::string>::const_iterator p = purposes.begin (); p != purposes.end (); ++p) {
+          if (*p == "DIEAREA" || *p == "ALL" || *p == "COMP") {
+            tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: NAME record ignored for entity: %s")), path, ts.line_number (), *p);
+          } else {
             layers.push_back (tl::split (*p, "/").front ());
           }
+        }
 
-          std::string final_name = tl::join (layers, "/") + ".LABEL";
-          for (std::vector<std::string>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-            layer_map [std::make_pair (*l, std::make_pair (Label, (unsigned int) 0))] = db::LayerProperties (layer, datatype, final_name);
-          }
+        std::string final_name = tl::join (layers, "/") + ".LABEL";
+        for (std::vector<std::string>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
+          layer_map [std::make_pair (*l, std::make_pair (Label, (unsigned int) 0))] = db::LayerProperties (layer, datatype, final_name);
+        }
 
-        } else if (w1 == "COMP") {
+      } else if (w1 == "COMP") {
 
-          //  ignore "COMP (ALL) ..."
+        //  ignore "COMP (ALL) ..."
+        tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: COMP entry ignored")), path, ts.line_number ());
 
-        } else {
+      } else {
 
-          //  converts a line like
-          //    "M1 SPNET,NET,PINS,LEFPINS ..."
-          //  into a canonical name mapping like
-          //    "(M1,NET):  M1.NET/PINS"
-          //    "(M1,PINS): M1.NET/PINS"
-          //  (separating, translating and recombing the purposes)
+        //  converts a line like
+        //    "M1 SPNET,NET,PINS,LEFPINS ..."
+        //  into a canonical name mapping like
+        //    "(M1,NET):  M1.NET/PINS"
+        //    "(M1,PINS): M1.NET/PINS"
+        //  (separating, translating and recombing the purposes)
 
-          std::set<std::pair<LayerPurpose, unsigned int> > translated_purposes;
+        std::set<std::pair<LayerPurpose, unsigned int> > translated_purposes;
 
-          std::vector<std::string> purposes = tl::split (w2, ",");
-          std::reverse (purposes.begin (), purposes.end ());
+        std::vector<std::string> purposes = tl::split (w2, ",");
+        std::reverse (purposes.begin (), purposes.end ());
 
-          unsigned int mask = 0;
+        unsigned int mask = 0;
 
-          for (std::vector<std::string>::const_iterator p = purposes.begin (); p != purposes.end (); ++p) {
+        for (std::vector<std::string>::const_iterator p = purposes.begin (); p != purposes.end (); ++p) {
 
-            std::string p_uc = tl::to_upper_case (*p);
-            tl::Extractor ex (p_uc.c_str ());
+          std::string p_uc = tl::to_upper_case (*p);
+          tl::Extractor ex (p_uc.c_str ());
 
-            std::string ps;
-            ex.read_word_or_quoted (ps);
+          std::string ps;
+          ex.read_word_or_quoted (ps);
 
-            if (ex.test (":")) {
+          std::map<std::string, LayerPurpose>::const_iterator i = purpose_translation.find (ps);
+          if (i != purpose_translation.end ()) {
+
+            if (i->second == All) {
+              for (std::map<std::string, LayerPurpose>::const_iterator p = purpose_translation.begin (); p != purpose_translation.end (); ++p) {
+                if (p->second != All) {
+                  translated_purposes.insert (std::make_pair (p->second, mask));
+                }
+              }
+            } else {
+              translated_purposes.insert (std::make_pair (i->second, mask));
+            }
+
+            if (i->second == Routing) {
+
+              if (ex.test (":VOLTAGE:")) {
+                double f = 0.0;
+                ex.read (f);
+                tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: NET voltage constraint ignored for layer %s")), path, ts.line_number (), w1);
+              }
+
+            } else if (i->second == ViaGeometry) {
+
+              if (ex.test (":SIZE:")) {
+                std::string sz;
+                ex.read_word (sz);
+                tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: VIA size constraint ignored for layer %s")), path, ts.line_number (), w1);
+              }
+
+            }
+
+            if (ex.test (":MASK:")) {
               if (ex.test ("MASK") && ex.test (":")) {
                 ex.read (mask);
               }
             }
 
-            std::map<std::string, LayerPurpose>::const_iterator i = purpose_translation.find (ps);
-            if (i != purpose_translation.end ()) {
-              translated_purposes.insert (std::make_pair (i->second, mask));
-            }
-
+          } else {
+            tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: purpose %s ignored for layer %s")), path, ts.line_number (), ps, w1);
           }
 
-          //  create a visual description string for the combined purposes
-          std::string purpose_str;
+        }
 
-          for (std::set<std::pair<LayerPurpose, unsigned int> >::const_iterator p = translated_purposes.begin (); p != translated_purposes.end (); ++p) {
+        //  create a visual description string for the combined purposes
+        std::string purpose_str;
 
-            if (p != translated_purposes.begin ()) {
-              purpose_str += "/";
-            }
+        for (std::set<std::pair<LayerPurpose, unsigned int> >::const_iterator p = translated_purposes.begin (); p != translated_purposes.end (); ++p) {
 
-            std::string ps = purpose_translation_rev [p->first];
-            if (p->second > 0) {
-              ps += ":";
-              ps += tl::to_string (p->second);
-            }
-
-            if ((purpose_str + ps).size () > max_purpose_str) {
-              purpose_str += "...";
-              break;
-            } else {
-              purpose_str += ps;
-            }
-
+          if (p != translated_purposes.begin ()) {
+            purpose_str += "/";
           }
 
-          std::string final_name = w1 + "." + purpose_str;
-
-          for (std::set<std::pair<LayerPurpose, unsigned int> >::const_iterator p = translated_purposes.begin (); p != translated_purposes.end (); ++p) {
-            layer_map [std::make_pair (w1, *p)] = db::LayerProperties (layer, datatype, final_name);
+          std::string ps = purpose_translation_rev [p->first];
+          if (p->second > 0) {
+            ps += ":";
+            ps += tl::to_string (p->second);
           }
 
+          if ((purpose_str + ps).size () > max_purpose_str) {
+            purpose_str += "...";
+            break;
+          } else {
+            purpose_str += ps;
+          }
+
+        }
+
+        std::string final_name = w1 + "." + purpose_str;
+
+        for (std::set<std::pair<LayerPurpose, unsigned int> >::const_iterator p = translated_purposes.begin (); p != translated_purposes.end (); ++p) {
+          layer_map [std::make_pair (w1, *p)] = db::LayerProperties (layer, datatype, final_name);
         }
 
       }

@@ -884,6 +884,7 @@ enum LayerPurpose
   Blockage,           //  from DEF only
   PlacementBlockage,  //  from DEF only
   Regions,            //  from DEF only
+  All                 //  from DEF only
 };
 
 /**

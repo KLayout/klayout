@@ -699,8 +699,24 @@ TEST(116_layer_mapping)
       "layer_map('OUTLINE : OUTLINE (18/1)')"
     )
   }
+}
 
+TEST(117_mapfile_all)
+{
+  db::LEFDEFReaderOptions options = default_options ();
 
+  db::Layout layout;
+  db::LayerMap lm_read = read (layout, "mapfile", "lef:in.lef+def:in.def+map:all.map", options, false);
+  EXPECT_EQ (lm_read.to_string (),
+    "layer_map("
+      "'OUTLINE : OUTLINE (1/0)';"
+      "'M1.BLK;M1.LEFOBS;M1.LEFPIN;M1.NET;M1.PIN;M1.SPNET;M1.VIA : \\'M1.NET/PIN/...\\' (22/2)';"
+      "'\\'M1.NET:1\\' : \\'M1.NET:1\\' (7/0)';"
+      "'\\'M1.PIN:1\\';\\'M1.SPNET:1\\';\\'M1.VIA:1\\' : \\'M1.NET:1/...\\' (6/0)';"
+      "'M1.LABEL : M1.LABEL (28/1)';"
+      "'M1_TEXT.LABEL : M1_TEXT.LABEL (29/0)'"
+    ")"
+  )
 }
 
 TEST(200_lefdef_plugin)

@@ -1305,6 +1305,9 @@ LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n
     if (! ll.first) {
       ll = m_layer_map.logical (n, layout);
       generic_match = true;
+    } else if (n == name) {
+      //  no suffix defined in tech component -> treat as generic match and combine datatypes
+      generic_match = true;
     }
 
     if (ll.first) {

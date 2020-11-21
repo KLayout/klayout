@@ -1060,14 +1060,85 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
   }
 }
 
+static std::string purpose_to_name (LayerPurpose purpose)
+{
+  switch (purpose) {
+  case Outline:
+    return "OUTLINE";
+  case Regions:
+    return "REGION";
+  case PlacementBlockage:
+    return "BLOCKAGE";
+  case Routing:
+    return "NET";
+  case SpecialRouting:
+    return "SPNET";
+  case ViaGeometry:
+    return "VIA";
+  case Label:
+    return "LABEL";
+  case Pins:
+    return "PIN";
+  case LEFPins:
+    return "LEFPIN";
+  case Obstructions:
+    return "LEFOBS";
+  case Blockage:
+    return "BLK";
+  case All:
+    return "ALL";
+  }
+
+  return std::string ();
+}
+
+/**
+ *  @brief Implements implicit layer mapping
+ *
+ *  This is how Implicit layer mapping works:
+ *
+ *  1. For named layers (e.g. routing, pin, etc.
+ *
+ *  A decorated name is formed from the basic name and the purpose string (e.g. "M1" -> "M1.PIN").
+ *  With the example of "M1" and purpose Pin (decorated name "M1.PIN") and with a tech component datatype specification
+ *  of "5" for "Pin", the layer map entries have the following effect:
+ *
+ *     Layer map                     Result
+ *
+ *     (nothing)                     M1.PIN (default/5)          (only if "create_all_layers" is ON, "default" is a default number assigned by the reader)
+ *     M1.PIN : 1/0                  M1.PIN (1/0)
+ *     M1.PIN : 1/17                 M1.PIN (1/17)
+ *     M1 : 1/0                      M1.PIN (1/5)
+ *     M1 : 1/2                      M1.PIN (1/7)                (datatypes will add)
+ *     M1                            M1.PIN (default/5)
+ *     M1 : METAL1                   METAL1.PIN (default/5)      (name is taken from layer map and decorated)
+ *     M1 : METAL1 (1/2)             METAL1.PIN (1/7)
+ *     M1.PIN : METAL1_PIN           METAL1_PIN (default/5)      (specific name is used without decoration)
+ *     M1.PIN : METAL1_PIN (1/17)    METAL1_PIN (1/17)           (full and specific mapping)
+ *
+ *  2. For general layers (e.g. outline)
+ *
+ *  By default, the name, layer and datatype are taken from the tech component's specification. The specification may
+ *  lack the layer and datatype and even the name. If the name is missing, it is generated from the purpose.
+ *
+ *  Here are some examples for the mapping of "OUTLINE":
+ *
+ *    Tech component        Layer map          Result
+ *
+ *    (nothing)             (nothing)          OUTLINE            (only if "create_all_layers" is ON)
+ *    OUTL                  (nothing)          OUTL (default/0)   ("default" is a default number assigned by the reader)
+ *    OUTL (4/17)           (nothing)          OUTL (4/17)
+ *    OUTL                  OUTL : 5/1         OUTL (5/1)
+ *    OUTL (4/17)           OUTL : 4/11        OUTL 4/11
+ *    OUTL (4/17)           4/17 : 4/11        OUTL 4/11
+ *    4/17                  4/17 : 4/11        OUTLINE 4/11
+ */
+
 std::pair <bool, unsigned int>
 LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n, LayerPurpose purpose, unsigned int mask)
 {
   if (n.empty ()) {
 
-    //  NOTE: the canonical name is independent from the tech component's settings
-    //  as is "(name)". It's used for implementing the automatic map file import
-    //  feature.
     std::string ld;
     bool produce = false;
 
@@ -1093,6 +1164,42 @@ LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n
     } catch (...) {
       lp.layer = 0;
       lp.datatype = 0;
+    }
+
+    //  if no name is given, derive one from the purpose
+    if (lp.name.empty ()) {
+      lp.name = purpose_to_name (purpose);
+    }
+
+    if (lp.layer < 0) {
+      std::map<std::string, int>::const_iterator ldef = m_default_number.find (lp.name);
+      if (ldef != m_default_number.end ()) {
+        lp.layer = ldef->second;
+        lp.datatype = 0;
+      }
+    }
+
+    //  employ the layer map to find the target layer
+    std::pair<bool, unsigned int> ll = m_layer_map.logical (lp, layout);
+
+    if (ll.first) {
+
+      //  If the layer map provides a target, use that one for the layer
+      const db::LayerProperties *lpp = m_layer_map.target (ll.second);
+      if (lpp) {
+        if (! lpp->name.empty ()) {
+          lp.name = lpp->name;
+        }
+        if (lpp->datatype >= 0) {
+          lp.datatype = lpp->datatype;
+        }
+        if (lpp->layer >= 0) {
+          lp.layer = lpp->layer;
+        }
+      }
+
+    } else if (! m_create_layers) {
+      return std::make_pair (false, 0);
     }
 
     for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
@@ -1139,8 +1246,6 @@ LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n
       }
     }
 
-    //  Note: "name" is the decorated name as provided by the tech component's
-    //  x_suffix specifications.
     std::string name_suffix;
     int dt = 0;
 
@@ -1182,8 +1287,10 @@ LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n
       }
     }
 
+    //  "name" is the decorated name as provided by the tech component's x_suffix specifications.
     std::string name = n + name_suffix;
 
+    //  Assign a layer number (a default one for now) and the datatype from the tech component's x_datatype specification.
     db::LayerProperties lp (name);
     lp.datatype = dt;
     std::map<std::string, int>::const_iterator ldef = m_default_number.find (n);
@@ -1191,21 +1298,31 @@ LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n
       lp.layer = ldef->second;
     }
 
+    //  Route the layer through the layer map, first the decorated name and if there is no mapping, the
+    //  undecorated one.
     std::pair<bool, unsigned int> ll = m_layer_map.logical (name, layout);
+    bool generic_match = false;
     if (! ll.first) {
       ll = m_layer_map.logical (n, layout);
+      generic_match = true;
     }
 
     if (ll.first) {
 
+      //  If the layer map provides a target, use that one for the layer
+      //  Datatypes from the target and the tech component's x_datatype specification are additive
       const db::LayerProperties *lpp = m_layer_map.target (ll.second);
       if (lpp) {
         lp = *lpp;
-        if (lp.datatype >= 0) {
+        if (lp.datatype < 0) {
+          lp.datatype = dt;
+        } else if (generic_match) {
           lp.datatype += dt;
         }
         if (lp.name.empty ()) {
           lp.name = name;
+        } else if (generic_match) {
+          lp.name += name_suffix;
         }
       }
 
@@ -1254,44 +1371,7 @@ LEFDEFReaderState::finish (db::Layout &layout)
       continue;
     }
 
-    std::string ps;
-
-    switch (l->first.second.first) {
-    case Outline:
-      ps = "OUTLINE";
-      break;
-    case Regions:
-      ps = "REGION";
-      break;
-    case PlacementBlockage:
-      ps = "PLACEMENT_BLK";
-      break;
-    case Routing:
-    default:
-      ps = "NET";
-      break;
-    case SpecialRouting:
-      ps = "SPNET";
-      break;
-    case ViaGeometry:
-      ps = "VIA";
-      break;
-    case Label:
-      ps = "LABEL";
-      break;
-    case Pins:
-      ps = "PIN";
-      break;
-    case LEFPins:
-      ps = "LEFPIN";
-      break;
-    case Obstructions:
-      ps = "OBS";
-      break;
-    case Blockage:
-      ps = "BLK";
-      break;
-    }
+    std::string ps = purpose_to_name (l->first.second.first);
 
     unsigned int layer_index = l->second.second;
     db::LayerProperties lp = layout.get_properties (layer_index);
@@ -1336,7 +1416,7 @@ LEFDEFReaderState::finish (db::Layout &layout)
 
   }
 
-  //  On return we deliver the "canonical" map
+  //  On return we deliver the "canonical" map which lists the decorated name vs. the real ones.
   m_layer_map = lm;
 }
 

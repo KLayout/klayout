@@ -954,16 +954,6 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
           std::map<std::string, LayerPurpose>::const_iterator i = purpose_translation.find (ps);
           if (i != purpose_translation.end ()) {
 
-            if (i->second == All) {
-              for (std::map<std::string, LayerPurpose>::const_iterator p = purpose_translation.begin (); p != purpose_translation.end (); ++p) {
-                if (p->second != All) {
-                  translated_purposes.insert (std::make_pair (p->second, mask));
-                }
-              }
-            } else {
-              translated_purposes.insert (std::make_pair (i->second, mask));
-            }
-
             if (i->second == Routing) {
 
               if (ex.test (":VOLTAGE:")) {
@@ -982,14 +972,28 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 
             }
 
-            if (ex.test (":MASK:")) {
-              if (ex.test ("MASK") && ex.test (":")) {
-                ex.read (mask);
+          }
+
+          if (ex.test (":MASK:")) {
+            ex.read (mask);
+          }
+
+          if (i == purpose_translation.end ()) {
+
+            tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: purpose %s ignored for layer %s")), path, ts.line_number (), ps, w1);
+
+          } else if (i->second == All) {
+
+            for (std::map<std::string, LayerPurpose>::const_iterator p = purpose_translation.begin (); p != purpose_translation.end (); ++p) {
+              if (p->second != All) {
+                translated_purposes.insert (std::make_pair (p->second, mask));
               }
             }
 
           } else {
-            tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: purpose %s ignored for layer %s")), path, ts.line_number (), ps, w1);
+
+            translated_purposes.insert (std::make_pair (i->second, mask));
+
           }
 
         }

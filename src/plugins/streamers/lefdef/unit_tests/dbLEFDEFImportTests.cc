@@ -549,6 +549,18 @@ TEST(115_componentmaskshift)
   run_test (_this, "masks-2", "lef:in_tech.lef+lef:in.lef+def:in.def", "au.oas.gz", options, false);
 }
 
+TEST(116_name_to_ld_target_mapping)
+{
+  db::LEFDEFReaderOptions options = default_options ();
+  db::LayerMap lm = db::LayerMap::from_string_file_format ("metal1: 1\nvia1: 2\nmetal2: 3\nOUTLINE: 42/17");
+  options.set_layer_map (lm);
+
+  db::LayerMap lm_read = run_test (_this, "via_properties", "lef:in.lef+def:in.def", "au.oas.gz", options, false);
+  EXPECT_EQ (lm_read.to_string (),
+    "layer_map('OUTLINE : OUTLINE (4/0)';'metal1.VIA : metal1 (1/0)';'metal2.VIA : metal2 (3/0)';'via1.VIA : via1 (2/0)')"
+  )
+}
+
 TEST(200_lefdef_plugin)
 {
   db::Layout ly;

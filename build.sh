@@ -532,6 +532,11 @@ if [ "$BIN" = "" ]; then
   BIN=$CURR_DIR/bin-$CONFIG
 fi
 
+if [ "$QMAKE_CCACHE" = 1 ]; then
+  echo "    Compilation caching is activated."
+else
+  echo "    Compilation caching is deactivated!"
+fi
 echo "    Installation target: $BIN"
 echo "    Build directory: $BUILD"
 

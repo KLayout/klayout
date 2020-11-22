@@ -559,7 +559,6 @@ LayerTreeModel::empty_within_view_predicate (const QModelIndex &index) const
   }
 }
 
-LAYBASIC_PUBLIC
 QIcon
 LayerTreeModel::icon_for_layer (const lay::LayerPropertiesConstIterator &iter, lay::LayoutView *view, unsigned int w, unsigned int h, unsigned int di_off, bool no_state)
 {

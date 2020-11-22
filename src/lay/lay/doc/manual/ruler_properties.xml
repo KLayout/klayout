@@ -20,7 +20,7 @@
       The Alignment of the labels can be specified too: whether the appear left or right-aligned
       or centered.
     </li>
-    <li><b>Style:</b> the style determines how the ruler or it's components are drawn. This can be
+    <li><b>Style:</b> the style determines how the ruler or its components are drawn. This can be
       "ruler-like" (with ticks), arrow style, a plain line or with cross markers at the end.
     </li>
     <li><b>Outline:</b> the outline determines how the two points forming the ruler are connected
@@ -31,7 +31,7 @@
     </li>
     <li><b>Angle constraint:</b> the orientation of the ruler can be restricted in several ways, i.e. 
       just being horizontal. By default, the ruler uses the global setting. It can however be configured 
-      to provide it's own constraint.
+      to provide its own constraint.
     </li>
     <li><b>Object snapping:</b> each ruler can be configure to snap to the closest object edge or vertex.
       By default, the rulers use the global setting. It may be disabled however for each ruler.

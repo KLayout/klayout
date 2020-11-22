@@ -23,6 +23,7 @@ import platform
 import optparse
 import subprocess
 import hashlib
+import string
 
 #-------------------------------------------------------------------------------
 ## To import global dictionaries of different modules and utility functions
@@ -41,6 +42,7 @@ def SetGlobals():
   global GenOSName          # generic OS name
   global Platform           # platform
   global PkgDir             # the package directory where "klayout.app" exists
+  global UnsafePkg          # flags whether to proceed to making "invalid" dmg
   global OpClean            # 'clean' operation
   global OpMake             # 'make' operation
   global DefaultBundleName  # the default bundle name 'klayout.app'
@@ -87,6 +89,8 @@ def SetGlobals():
   Usage += "                        :   <-c|--clean> and <-m|--make> are mutually exclusive      | \n"
   Usage += "   [-b|--bundle <name>] : forcibly use this bundle name in the DMG                   | '' \n"
   Usage += "   [-s|--serial <num>]  : DMG serial number                                          | 1 \n"
+  Usage += "   <-u|--unsafe>        : Ignores a few checks (use with caution)                    | disabled \n"
+  Usage += "   <-t|--targetdmg>     : Specify output .dmg filename                               | chosen by script \n"
   Usage += "   [-?|--?]             : print this usage and exit                                  | disabled \n"
   Usage += "-------------------------------------------------------------------------------------+------------------\n"
 
@@ -131,6 +135,7 @@ def SetGlobals():
     sys.exit(1)
 
   PkgDir            = ""
+  UnsafePkg         = False
   OpClean           = False
   OpMake            = False
   DefaultBundleName = "klayout.app"
@@ -179,8 +184,8 @@ def SetGlobals():
 # The package directory name should look like:
 #     * ST-qt5MP.pkg.macos-Catalina-release-RsysPsys      --- (1)
 #     * LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
-#     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb26Phb37
-#     * LW-qt5MP.pkg.macos-Catalina-release-Rmp26Pmp37
+#     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb26Phb38
+#     * LW-qt5MP.pkg.macos-Catalina-release-Rmp26Pmp38
 #
 # Generated DMG will be, for example,
 #     (1) ---> ST-klayout-0.26.1-macOS-Catalina-1-qt5MP-RsysPsys.dmg
@@ -189,6 +194,8 @@ def SetGlobals():
 #         on failure, -1
 #------------------------------------------------------------------------------
 def CheckPkgDirectory():
+  global PkgDir
+  global UnsafePkg
   global Platform
   global OpClean
   global OpMake
@@ -221,84 +228,87 @@ def CheckPkgDirectory():
   #
   #     * ST-qt5MP.pkg.macos-Catalina-release-RsysPsys
   #     * LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
-  #     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb27Phb37
-  #     * HW-qt5Brew.pkg.macos-Catalina-release-RsysPhb37
-  #     * EX-qt5MP.pkg.macos-Catalina-release-Rmp26Pmp37
+  #     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb27Phb38
+  #     * HW-qt5Brew.pkg.macos-Catalina-release-RsysPhb38
+  #     * EX-qt5MP.pkg.macos-Catalina-release-Rmp26Pmp38
   #-----------------------------------------------------------------------------
   patQRP = u'(ST|LW|HW|EX)([-])(qt5[0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-]release[-])([0-9A-Za-z]+)'
   regQRP = re.compile(patQRP)
   if not regQRP.match(PkgDir):
     print( "! Cannot identify (Qt, Ruby, Python) from the package directory name" )
-    print( "" )
-    return -1
+    if UnsafePkg:
+      print( "! Ignoring..." )
+    else:
+      print( "" )
+      return -1
   else:
     pkgdirComponents = regQRP.match(PkgDir).groups()
     PackagePrefix    = pkgdirComponents[0]
     QtIdentification = pkgdirComponents[2]
     RubyPythonID     = pkgdirComponents[5]
 
-  #-----------------------------------------------------------------------------
-  # [3] Check if the "LatestOS" with MacPorts / Homebrew / Anaconda3
-  #-----------------------------------------------------------------------------
-  LatestOSMacPorts   = Platform == LatestOS
-  LatestOSMacPorts  &= PackagePrefix == "LW"
-  LatestOSMacPorts  &= QtIdentification == "qt5MP"
-  LatestOSMacPorts  &= RubyPythonID == "Rmp26Pmp37"
+    #-----------------------------------------------------------------------------
+    # [3] Check if the "LatestOS" with MacPorts / Homebrew / Anaconda3
+    #-----------------------------------------------------------------------------
+    LatestOSMacPorts   = Platform == LatestOS
+    LatestOSMacPorts  &= PackagePrefix == "LW"
+    LatestOSMacPorts  &= QtIdentification == "qt5MP"
+    LatestOSMacPorts  &= RubyPythonID == "Rmp26Pmp38"
 
-  LatestOSHomebrew   = Platform == LatestOS
-  LatestOSHomebrew  &= PackagePrefix == "LW"
-  LatestOSHomebrew  &= QtIdentification == "qt5Brew"
-  LatestOSHomebrew  &= RubyPythonID == "Rhb27Phb37"
+    LatestOSHomebrew   = Platform == LatestOS
+    LatestOSHomebrew  &= PackagePrefix == "LW"
+    LatestOSHomebrew  &= QtIdentification == "qt5Brew"
+    LatestOSHomebrew  &= RubyPythonID == "Rhb27Phb38"
 
-  LatestOSAnaconda3  = Platform == LatestOS
-  LatestOSAnaconda3 &= PackagePrefix == "LW"
-  LatestOSAnaconda3 &= QtIdentification == "qt5Ana3"
-  LatestOSAnaconda3 &= RubyPythonID == "Rana3Pana3"
+    LatestOSAnaconda3  = Platform == LatestOS
+    LatestOSAnaconda3 &= PackagePrefix == "LW"
+    LatestOSAnaconda3 &= QtIdentification == "qt5Ana3"
+    LatestOSAnaconda3 &= RubyPythonID == "Rana3Pana3"
 
-  if LatestOSMacPorts:
-    mydic  = DicLightWeight["ports"]
-    srcDir = PkgDir + "/" + mydic["src"]
-    desDir = PkgDir + "/" + mydic["des"]
-    if OpMake:
-      with zipfile.ZipFile( mydic["zip"], 'r' ) as zip_ref:
-        zip_ref.extractall(PkgDir)
-      os.rename( srcDir, desDir )
-    if OpClean:
-      if os.path.isdir(srcDir):
-        shutil.rmtree(srcDir)
-      if os.path.isdir(desDir):
-        shutil.rmtree(desDir)
-    Item3AppleScript = mydic["item3"]
+    if LatestOSMacPorts:
+      mydic  = DicLightWeight["ports"]
+      srcDir = PkgDir + "/" + mydic["src"]
+      desDir = PkgDir + "/" + mydic["des"]
+      if OpMake:
+        with zipfile.ZipFile( mydic["zip"], 'r' ) as zip_ref:
+          zip_ref.extractall(PkgDir)
+        os.rename( srcDir, desDir )
+      if OpClean:
+        if os.path.isdir(srcDir):
+          shutil.rmtree(srcDir)
+        if os.path.isdir(desDir):
+          shutil.rmtree(desDir)
+      Item3AppleScript = mydic["item3"]
 
-  if LatestOSHomebrew:
-    mydic  = DicLightWeight["brew"]
-    srcDir = PkgDir + "/" + mydic["src"]
-    desDir = PkgDir + "/" + mydic["des"]
-    if OpMake:
-      with zipfile.ZipFile( mydic["zip"], 'r' ) as zip_ref:
-        zip_ref.extractall(PkgDir)
-      os.rename( srcDir, desDir )
-    if OpClean:
-      if os.path.isdir(srcDir):
-        shutil.rmtree(srcDir)
-      if os.path.isdir(desDir):
-        shutil.rmtree(desDir)
-    Item3AppleScript = mydic["item3"]
+    if LatestOSHomebrew:
+      mydic  = DicLightWeight["brew"]
+      srcDir = PkgDir + "/" + mydic["src"]
+      desDir = PkgDir + "/" + mydic["des"]
+      if OpMake:
+        with zipfile.ZipFile( mydic["zip"], 'r' ) as zip_ref:
+          zip_ref.extractall(PkgDir)
+        os.rename( srcDir, desDir )
+      if OpClean:
+        if os.path.isdir(srcDir):
+          shutil.rmtree(srcDir)
+        if os.path.isdir(desDir):
+          shutil.rmtree(desDir)
+      Item3AppleScript = mydic["item3"]
 
-  if LatestOSAnaconda3:
-    mydic  = DicLightWeight["ana3"]
-    srcDir = PkgDir + "/" + mydic["src"]
-    desDir = PkgDir + "/" + mydic["des"]
-    if OpMake:
-      with zipfile.ZipFile( mydic["zip"], 'r' ) as zip_ref:
-        zip_ref.extractall(PkgDir)
-      os.rename( srcDir, desDir )
-    if OpClean:
-      if os.path.isdir(srcDir):
-        shutil.rmtree(srcDir)
-      if os.path.isdir(desDir):
-        shutil.rmtree(desDir)
-    Item3AppleScript = mydic["item3"]
+    if LatestOSAnaconda3:
+      mydic  = DicLightWeight["ana3"]
+      srcDir = PkgDir + "/" + mydic["src"]
+      desDir = PkgDir + "/" + mydic["des"]
+      if OpMake:
+        with zipfile.ZipFile( mydic["zip"], 'r' ) as zip_ref:
+          zip_ref.extractall(PkgDir)
+        os.rename( srcDir, desDir )
+      if OpClean:
+        if os.path.isdir(srcDir):
+          shutil.rmtree(srcDir)
+        if os.path.isdir(desDir):
+          shutil.rmtree(desDir)
+      Item3AppleScript = mydic["item3"]
 
   #------------------------------------------------------
   # [4] Check the presence of the default bundle
@@ -337,6 +347,7 @@ def ParseCommandLineArguments():
   global OpMake
   global BundleName
   global DMGSerialNum
+  global UnsafePkg
   global PackagePrefix
   global QtIdentification
   global RubyPythonID
@@ -369,6 +380,16 @@ def ParseCommandLineArguments():
                 dest='dmg_serial',
                 help="DMG serial number" )
 
+  p.add_option( '-t', '--targetdmg',
+                dest='target_dmg',
+                help="output DMG filename" )
+
+  p.add_option( '-z', '--unsafe',
+                action='store_true',
+                dest='unsafe',
+                default=False,
+                help="If set, do not check whether pkg folder is empty" )
+
   p.add_option( '-?', '--??',
                 action='store_true',
                 dest='checkusage',
@@ -379,7 +400,9 @@ def ParseCommandLineArguments():
                   operation_clean   = False,
                   operation_make    = False,
                   bundle_name       = "",
+                  target_dmg        = "",
                   dmg_serial        = "1",
+                  unsafe            = False,
                   checkusage        = False )
 
   #-----------------------------------------------------------
@@ -394,6 +417,7 @@ def ParseCommandLineArguments():
   OpClean      = opt.operation_clean
   OpMake       = opt.operation_make
   DMGSerialNum = int(opt.dmg_serial)
+  UnsafePkg    = opt.unsafe
 
   if not opt.bundle_name == "":
     base, ext  = os.path.splitext( os.path.basename(opt.bundle_name) )
@@ -410,10 +434,13 @@ def ParseCommandLineArguments():
   # [2] Check the PKG directory to set QtIdentification, RubyPythonID, and BundleName
   #------------------------------------------------------------------------------------
   OccupiedDS = CheckPkgDirectory()
-  if not 0 < OccupiedDS:
+  if not 0 < OccupiedDS and not UnsafePkg:
     print( "! Failed to check the PKG directory" )
     print( "" )
     quit()
+
+  if opt.target_dmg != "":
+    TargetDMG = opt.target_dmg
   else:
     TargetDMG = "%s-klayout-%s-%s-%s-%d-%s-%s.dmg" \
                 % (PackagePrefix, KLVersion, GenOSName, Platform, DMGSerialNum, QtIdentification, RubyPythonID)
@@ -663,7 +690,8 @@ def CleanUp(msg=""):
   os.chdir(ProjectDir)
   dmgs = glob.glob( "*.dmg*" )
   for item in dmgs:
-    os.system( "rm -Rf %s" % item )
+    print("Removing %s" % item)
+    os.system( "rm -Rf -- \"%s\"" % item )
 
   #----------------------------------------------------
   # [3] Clean up AppleScript if any

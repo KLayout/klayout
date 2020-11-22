@@ -127,8 +127,16 @@
         <file alias="folder_12.png">images/folder_12.png</file>
         <file alias="file_12.png">images/file_12.png</file>
         <file alias="empty_12.png">images/empty_12.png</file>
+        <file alias="fit_front.png">images/fit_front.png</file>
+        <file alias="fit_back.png">images/fit_back.png</file>
+        <file alias="fit_left.png">images/fit_left.png</file>
+        <file alias="fit_right.png">images/fit_right.png</file>
+        <file alias="fit_top.png">images/fit_top.png</file>
+        <file alias="fit_bottom.png">images/fit_bottom.png</file>
         <file alias="unlocked_16.png">images/unlocked_16.png</file>
         <file alias="locked_16.png">images/locked_16.png</file>
+        <file alias="bookmark.png">images/bookmark.png</file>
+        <file alias="bookmark_16.png">images/bookmark_16.png</file>
     </qresource>
     <qresource prefix="/syntax">
         <file alias="ruby.xml">syntax/ruby.xml</file>

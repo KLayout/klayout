@@ -247,6 +247,17 @@ public:
   void fill (unsigned int y, unsigned int x1, unsigned int x2);
 
   /**
+   *  @brief Clears the given part of the scanline
+   *
+   *  Same as fill(), but resets the bits.
+   *
+   *  @param y The scanline
+   *  @param x1 The start coordinate
+   *  @param x2 The end coordinate
+   */
+  void clear (unsigned int y, unsigned int x1, unsigned int x2);
+
+  /**
    *  @brief Merges the "from" bitmap into this
    *
    *  The merge operation will copy all bits from "from" into this with the given displacement.

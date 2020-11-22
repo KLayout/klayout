@@ -835,6 +835,13 @@ layer_class<Sh, StableTag>::transform_into (Shapes *target, const ICplxTrans &tr
 }
 
 template <class Sh, class StableTag>
+void
+layer_class<Sh, StableTag>::insert_into (Shapes *target)
+{
+  target->insert (m_layer.begin (), m_layer.end ());
+}
+
+template <class Sh, class StableTag>
 void 
 layer_class<Sh, StableTag>::deref_into (Shapes *target) 
 {
@@ -870,6 +877,7 @@ layer_class<Sh, StableTag>::deref_and_transform_into (Shapes *target, const Tran
 {
   deref_and_transform_into_shapes deref_op (target);
   for (typename layer_type::iterator s = m_layer.begin (); s != m_layer.end (); ++s) {
+
     deref_op (*s, trans, pm);
   }
 }

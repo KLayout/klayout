@@ -104,9 +104,10 @@ RubyMojave      = { 'exe': '/System/Library/Frameworks/Ruby.framework/Versions/2
 #   !!! Catalina does not allow to hack the "/System" directory; it's READ ONLY even for the super user!
 #       Hence, we need to refer to the Ruby header file in "Xcode.app" directly.
 # [Key Type Name] = 'Sys'
-CatalinaSDK = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk"
+CatalinaSDK = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk"
 RubyCatalina    = { 'exe': '/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby',
                     'inc': '%s/System/Library/Frameworks/Ruby.framework/Headers' % CatalinaSDK,
+                    'inc2': '%s/System/Library/Frameworks/Ruby.framework/Headers/ruby' % CatalinaSDK,
                     'lib': '/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/libruby.dylib'
                   }
 
@@ -154,7 +155,7 @@ RubyDictionary  = { 'nil'           : None,
 #-----------------------------------------------------
 PythonNil = [ 'nil' ]
 PythonSys = [ 'PythonElCapitan', 'PythonSierra', 'PythonHighSierra', 'PythonMojave', 'PythonCatalina' ]
-PythonExt = [ 'Python37MacPorts', 'Python37Brew', 'PythonAnaconda3' ]
+PythonExt = [ 'Python38MacPorts', 'Python38Brew', 'PythonAnaconda3' ]
 Pythons   = PythonNil + PythonSys + PythonExt
 
 #-----------------------------------------------------
@@ -204,30 +205,45 @@ PythonCatalina  = { 'exe': '/System/Library/Frameworks/Python.framework/Versions
                     'lib': '/System/Library/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib'
                   }
 
-# Python 3.7 from MacPorts (https://www.macports.org/) *+*+*+ EXPERIMENTAL *+*+*+
-#   install with 'sudo port install python37'
-# [Key Type Name] = 'MP37'
-Python37MacPorts= { 'exe': '/opt/local/Library/Frameworks/Python.framework/Versions/3.7/bin/python3.7m',
-                    'inc': '/opt/local/Library/Frameworks/Python.framework/Versions/3.7/include/python3.7m',
-                    'lib': '/opt/local/Library/Frameworks/Python.framework/Versions/3.7/lib/libpython3.7m.dylib'
+# Python 3.8 from MacPorts (https://www.macports.org/) *+*+*+ EXPERIMENTAL *+*+*+
+#   install with 'sudo port install python38'
+# [Key Type Name] = 'MP38'
+Python38MacPorts= { 'exe': '/opt/local/Library/Frameworks/Python.framework/Versions/3.8/bin/python3.8',
+                    'inc': '/opt/local/Library/Frameworks/Python.framework/Versions/3.8/include/python3.8',
+                    'lib': '/opt/local/Library/Frameworks/Python.framework/Versions/3.8/lib/libpython3.8.dylib'
                   }
 
-# Python 3.7 from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
+# Python 3.8 from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
 #   install with 'brew install python'
-# [Key Type Name] = 'HB37'
-HBPython37FrameworkPath = '/usr/local/opt/python3/Frameworks/Python.framework'
-Python37Brew    = { 'exe': '%s/Versions/3.7/bin/python3.7m' % HBPython37FrameworkPath,
-                    'inc': '%s/Versions/3.7/include/python3.7m' % HBPython37FrameworkPath,
-                    'lib': '%s/Versions/3.7/lib/libpython3.7m.dylib' % HBPython37FrameworkPath
+# [Key Type Name] = 'HB38'
+HBPython38FrameworkPath = '/usr/local/opt/python3/Frameworks/Python.framework'
+Python38Brew    = { 'exe': '%s/Versions/3.8/bin/python3.8' % HBPython38FrameworkPath,
+                    'inc': '%s/Versions/3.8/include/python3.8' % HBPython38FrameworkPath,
+                    'lib': '%s/Versions/3.8/lib/libpython3.8.dylib' % HBPython38FrameworkPath
                   }
 
-# Python 3.7 bundled with anaconda3 installed under /Applications/anaconda3/ *+*+*+ EXPERIMENTAL *+*+*+
+# # Latest Python from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
+# #   install with 'brew install python'
+# # [Key Type Name] = 'HBAuto'
+
+# import glob
+# # In my system, there are four candidates: (python, python3, python@3, python@3.8)
+# # Hard to tell which is going to be available to the user. Picking the last one
+# HBAutoFrameworkPath = glob.glob("/usr/local/opt/python*/Frameworks/Python.framework/")[-1]
+# # expand 3* into _py_version, there should be only one, but I am taking no chances.
+# HBAutoFrameworkVersionPath, _py_version = os.path.split(glob.glob("%s/Versions/3*" % HBAutoFrameworkPath)[0])
+# PythonAutoBrew = {  'exe': '%s/bin/python%s' % (HBAutoFrameworkVersionPath, _py_version),
+#                     'inc': '%s/include/python%s' % (HBAutoFrameworkVersionPath, _py_version),
+#                     'lib': glob.glob("%s/lib/*.dylib" % HBAutoFrameworkVersionPath)[0]
+#                   }
+
+# Python 3.8 bundled with anaconda3 installed under /Applications/anaconda3/ *+*+*+ EXPERIMENTAL *+*+*+
 # The standard installation deploys the tool under $HOME/opt/anaconda3/.
 # If so, you need to make a symbolic link: /Applications/anaconda3 ---> $HOME/opt/anaconda3/
 # [Key Type Name] = 'Ana3'
-PythonAnaconda3 = { 'exe': '/Applications/anaconda3/bin/python3.7m',
-                    'inc': '/Applications/anaconda3/include/python3.7m',
-                    'lib': '/Applications/anaconda3/lib/libpython3.7m.dylib'
+PythonAnaconda3 = { 'exe': '/Applications/anaconda3/bin/python3.8',
+                    'inc': '/Applications/anaconda3/include/python3.8',
+                    'lib': '/Applications/anaconda3/lib/libpython3.8.dylib'
                   }
 
 # Consolidated dictionary kit for Python
@@ -237,8 +253,8 @@ PythonDictionary= { 'nil'             : None,
                     'PythonHighSierra': PythonHighSierra,
                     'PythonMojave'    : PythonMojave,
                     'PythonCatalina'  : PythonCatalina,
-                    'Python37MacPorts': Python37MacPorts,
-                    'Python37Brew'    : Python37Brew,
+                    'Python38MacPorts': Python38MacPorts,
+                    'Python38Brew'    : Python38Brew,
                     'PythonAnaconda3' : PythonAnaconda3
                   }
 

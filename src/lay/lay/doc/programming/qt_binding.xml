@@ -165,7 +165,7 @@ end</pre>
   </p>
 
   <p>
-  When a Qt object is created in Ruby space with a parent, it's 
+  When a Qt object is created in Ruby space with a parent, its 
   ownership is passed to the parent. It is safe however to keep a reference to that object, because
   KLayout's Ruby binding employs a special Ruby class internally (a proxy) which keeps track of the lifetime
   of the Qt object. If the parent is destroyed, the Qt object is destroyed as well. The internal Qt object will

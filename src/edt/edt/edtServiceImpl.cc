@@ -25,8 +25,8 @@
 #include "edtServiceImpl.h"
 #include "edtPropertiesPages.h"
 #include "edtInstPropertiesPage.h"
-#include "edtPCellParametersDialog.h"
 #include "edtService.h"
+#include "edtPlugin.h"
 #include "dbEdge.h"
 #include "dbLibrary.h"
 #include "dbLibraryManager.h"
@@ -51,7 +51,7 @@ ShapeEditService::ShapeEditService (db::Manager *manager, lay::LayoutView *view,
   : edt::Service (manager, view, shape_types), 
     m_layer (0), m_cv_index (0), mp_cell (0), mp_layout (0), m_combine_mode (CM_Add)
 {
-  //  .. nothing yet ..
+  view->current_layer_changed_event.add (this, &ShapeEditService::update_edit_layer);
 }
 
 bool 
@@ -69,23 +69,24 @@ void
 ShapeEditService::get_edit_layer ()
 {
   lay::LayerPropertiesConstIterator cl = view ()->current_layer ();
+
   if (cl.is_null ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("Please select a layer first")));
   }
 
-  if (! cl->visible (true)) {
-    lay::TipDialog td (QApplication::activeWindow (),
-                       tl::to_string (QObject::tr ("You are about to draw on a hidden layer. The result won't be visible.")), 
-                       "drawing-on-invisible-layer");
-    td.exec_dialog ();
-  }
-  
   int cv_index = cl->cellview_index ();
   const lay::CellView &cv = view ()->cellview (cv_index);
   int layer = cl->layer_index ();
 
   if (cv_index < 0 || ! cv.is_valid ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("Please select a cell first")));
+  }
+
+  if (! cl->visible (true)) {
+    lay::TipDialog td (QApplication::activeWindow (),
+                       tl::to_string (QObject::tr ("You are about to draw on a hidden layer. The result won't be visible.")),
+                       "drawing-on-invisible-layer");
+    td.exec_dialog ();
   }
 
   if (layer < 0 || ! cv->layout ().is_valid_layer ((unsigned int) layer)) {
@@ -125,6 +126,79 @@ ShapeEditService::get_edit_layer ()
 
   if (mp_cell->is_proxy ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cannot put a shape into a PCell or library cell")));
+  }
+}
+
+void
+ShapeEditService::update_edit_layer (const lay::LayerPropertiesConstIterator &cl)
+{
+  if (! editing ()) {
+    return;
+  }
+
+  if (cl.is_null () || cl->has_children ()) {
+    return;
+  }
+
+  int cv_index = cl->cellview_index ();
+  const lay::CellView &cv = view ()->cellview (cv_index);
+  int layer = cl->layer_index ();
+
+  if (cv_index < 0 || ! cv.is_valid ()) {
+    return;
+  }
+
+  if (cv->layout ().cell (cv.cell_index ()).is_proxy ()) {
+    return;
+  }
+
+  if (! cl->visible (true)) {
+    lay::TipDialog td (QApplication::activeWindow (),
+                       tl::to_string (QObject::tr ("You are now drawing on a hidden layer. The result won't be visible.")),
+                       "drawing-on-invisible-layer");
+    td.exec_dialog ();
+  }
+
+  if (layer < 0 || ! cv->layout ().is_valid_layer ((unsigned int) layer)) {
+
+    //  create this layer now
+    const lay::ParsedLayerSource &source = cl->source (true /*real*/);
+
+    db::LayerProperties db_lp;
+    if (source.has_name ()) {
+      db_lp.name = source.name ();
+    }
+    db_lp.layer = source.layer ();
+    db_lp.datatype = source.datatype ();
+
+    cv->layout ().insert_layer (db_lp);
+
+    //  update the layer index inside the layer view
+    cl->realize_source ();
+
+    //  Hint: we could have taken the new index from insert_layer, but this
+    //  is a nice test:
+    layer = cl->layer_index ();
+    tl_assert (layer >= 0);
+
+  }
+
+  m_layer = (unsigned int) layer;
+  m_cv_index = (unsigned int) cv_index;
+  m_trans = (cl->trans ().front () * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ()).inverted ();
+  mp_layout = &(cv->layout ());
+  mp_cell = &(mp_layout->cell (cv.cell_index ()));
+
+  current_layer_changed ();
+}
+
+void
+ShapeEditService::tap (const db::DPoint &initial)
+{
+  if (editing ()) {
+    get_edit_layer ();
+  } else {
+    begin_edit (initial);
   }
 }
 
@@ -339,9 +413,18 @@ PolygonService::set_last_point (const db::DPoint &p)
   }
 }
 
-void 
+void
+PolygonService::do_mouse_move_inactive (const db::DPoint &p)
+{
+  lay::PointSnapToObjectResult snap_details = snap2_details (p);
+  mouse_cursor_from_snap_details (snap_details);
+}
+
+void
 PolygonService::do_mouse_move (const db::DPoint &p)
 {
+  do_mouse_move_inactive (p);
+
   set_cursor (lay::Cursor::cross);
   if (m_points.size () >= 2) {
     set_last_point (p);
@@ -366,6 +449,7 @@ void
 PolygonService::do_finish_edit ()
 {
   deliver_shape (get_polygon ());
+  commit_recent (view ());
 }
 
 db::Polygon
@@ -644,9 +728,18 @@ BoxService::update_marker ()
   }
 }
 
-void 
+void
+BoxService::do_mouse_move_inactive (const db::DPoint &p)
+{
+  lay::PointSnapToObjectResult snap_details = snap2_details (p);
+  mouse_cursor_from_snap_details (snap_details);
+}
+
+void
 BoxService::do_mouse_move (const db::DPoint &p)
 {
+  do_mouse_move_inactive (p);
+
   set_cursor (lay::Cursor::cross);
   m_p2 = snap2 (p);
   update_marker ();
@@ -663,6 +756,7 @@ void
 BoxService::do_finish_edit ()
 {
   deliver_shape (get_box ());
+  commit_recent (view ());
 }
 
 void 
@@ -738,18 +832,21 @@ TextService::do_activated ()
 {
   m_rot = 0;
 
-  //  Show editor options dialog to allow entering of width
-  std::vector<edt::MainService *> edt_main_services = view ()->get_plugins <edt::MainService> ();
-  if (edt_main_services.size () > 0) {
-    edt_main_services [0]->cm_edit_options ();
-  }
-
   return true;  //  start editing immediately
 }
 
-void 
+void
+TextService::do_mouse_move_inactive (const db::DPoint &p)
+{
+  lay::PointSnapToObjectResult snap_details = snap2_details (p);
+  mouse_cursor_from_snap_details (snap_details);
+}
+
+void
 TextService::do_mouse_move (const db::DPoint &p)
 {
+  do_mouse_move_inactive (p);
+
   set_cursor (lay::Cursor::cross);
   m_text.trans (db::DTrans (m_rot, snap2 (p) - db::DPoint ()));
   update_marker ();
@@ -785,6 +882,8 @@ TextService::do_finish_edit ()
   manager ()->transaction (tl::to_string (QObject::tr ("Create text"))); 
   cell ().shapes (layer ()).insert (get_text ());
   manager ()->commit ();
+
+  commit_recent (view ());
 
   if (! view ()->text_visible ()) {
 
@@ -904,12 +1003,6 @@ PathService::do_begin_edit (const db::DPoint &p)
 bool
 PathService::do_activated ()
 {
-  //  Show editor options dialog to allow entering of width
-  std::vector<edt::MainService *> edt_main_services = view ()->get_plugins <edt::MainService> ();
-  if (edt_main_services.size () > 0) {
-    edt_main_services [0]->cm_edit_options ();
-  }
-
   return false;  //  don't start editing immediately
 }
 
@@ -935,9 +1028,18 @@ PathService::set_last_point (const db::DPoint &p)
   }
 }
 
-void 
+void
+PathService::do_mouse_move_inactive (const db::DPoint &p)
+{
+  lay::PointSnapToObjectResult snap_details = snap2_details (p);
+  mouse_cursor_from_snap_details (snap_details);
+}
+
+void
 PathService::do_mouse_move (const db::DPoint &p)
 {
+  do_mouse_move_inactive (p);
+
   set_cursor (lay::Cursor::cross);
   if (m_points.size () >= 2) {
     set_last_point (p);
@@ -966,6 +1068,8 @@ PathService::do_finish_edit ()
   m_points.pop_back ();
 
   deliver_shape (get_path ());
+
+  commit_recent (view ());
 }
 
 void
@@ -1094,7 +1198,7 @@ InstService::InstService (db::Manager *manager, lay::LayoutView *view)
     m_array (false), m_rows (1), m_columns (1), 
     m_row_x (0.0), m_row_y (0.0), m_column_x (0.0), m_column_y (0.0),
     m_place_origin (false), m_reference_transaction_id (0),
-    m_needs_update (true), m_has_valid_cell (false), m_in_drag_drop (false), 
+    m_needs_update (true), m_parameters_changed (false), m_has_valid_cell (false), m_in_drag_drop (false),
     m_current_cell (0), mp_current_layout (0), mp_pcell_decl (0), m_cv_index (-1)
 { 
   //  .. nothing yet ..
@@ -1109,12 +1213,6 @@ InstService::properties_page (db::Manager *manager, QWidget *parent)
 bool
 InstService::do_activated ()
 {
-  //  Show editor options dialog to allow entering of parameters
-  std::vector<edt::MainService *> edt_main_services = view ()->get_plugins <edt::MainService> ();
-  if (edt_main_services.size () > 0) {
-    edt_main_services [0]->cm_edit_options ();
-  }
-
   m_cv_index = view ()->active_cellview_index ();
   m_has_valid_cell = false;
 
@@ -1137,62 +1235,68 @@ InstService::get_default_layer_for_pcell ()
 
 bool
 InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase *data)
-{ 
+{
   const lay::CellDragDropData *cd = dynamic_cast <const lay::CellDragDropData *> (data);
   if (view ()->is_editable () && cd && (cd->layout () == & view ()->active_cellview ()->layout () || cd->library ())) {
 
     view ()->cancel ();
-
     set_edit_marker (0);
 
-    m_cv_index = view ()->active_cellview_index ();
-    m_in_drag_drop = true;
+    bool switch_parameters = true;
 
+    //  configure from the drag/drop data
     if (cd->library ()) {
+
+      //  Reject drag & drop if the target technology does not match
+      if (cd->library ()->for_technologies () && view ()->cellview (view ()->active_cellview_index ()).is_valid ()) {
+        if (! cd->library ()->is_for_technology (view ()->cellview (view ()->active_cellview_index ())->tech_name ())) {
+          return false;
+        }
+      }
+
       if (m_lib_name != cd->library ()->get_name ()) {
         m_lib_name = cd->library ()->get_name ();
-        m_pcell_parameters.clear ();
       }
+
     } else {
       m_lib_name.clear ();
     }
 
-    m_is_pcell = false;
-
     if (cd->is_pcell ()) {
 
       const db::PCellDeclaration *pcell_decl = cd->layout ()->pcell_declaration (cd->cell_index ());
-      if (pcell_decl) {
+      if (! pcell_decl) {
+        return false;
+      }
 
-        if (m_cell_or_pcell_name != pcell_decl->name ()) {
-          m_cell_or_pcell_name = pcell_decl->name ();
-          m_pcell_parameters.clear ();
-        }
+      if (m_cell_or_pcell_name != pcell_decl->name ()) {
+        m_cell_or_pcell_name = pcell_decl->name ();
+      }
 
-        m_is_pcell = true;
-
-        //  NOTE: we reuse previous parameters for convenience unless PCell or library has changed
-        const std::vector<db::PCellParameterDeclaration> &pd = pcell_decl->parameter_declarations();
-        for (std::vector<db::PCellParameterDeclaration>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
-          if (i->get_type () == db::PCellParameterDeclaration::t_layer && !i->is_hidden () && !i->is_readonly () && i->get_default ().is_nil ()) {
-            m_pcell_parameters.insert (std::make_pair (i->get_name (), get_default_layer_for_pcell ()));
-          } else {
-            m_pcell_parameters.insert (std::make_pair (i->get_name (), i->get_default ()));
-          }
-        }
-
-        do_begin_edit (p);
-        return true;
-
+      if (! cd->pcell_params ().empty ()) {
+        m_pcell_parameters = pcell_decl->named_parameters (cd->pcell_params ());
+        switch_parameters = false;
       }
 
     } else if (cd->layout ()->is_valid_cell_index (cd->cell_index ())) {
 
       m_cell_or_pcell_name = cd->layout ()->cell_name (cd->cell_index ());
-      do_begin_edit (p);
-      return true;
 
+    } else {
+      return false;
     }
+
+    switch_cell_or_pcell (switch_parameters);
+
+    sync_to_config ();
+    m_in_drag_drop = true;
+
+    view ()->switch_mode (plugin_declaration ()->id ());
+
+    do_begin_edit (p);
+
+    //  action taken.
+    return true;
 
   }
 
@@ -1210,7 +1314,7 @@ InstService::drag_move_event (const db::DPoint &p, const lay::DragDropDataBase *
   }
 }
 
-void  
+void
 InstService::drag_leave_event () 
 { 
   if (m_in_drag_drop) {
@@ -1219,7 +1323,7 @@ InstService::drag_leave_event ()
   }
 }
 
-bool 
+bool
 InstService::selection_applies (const lay::ObjectInstPath &sel) const
 {
   return sel.is_cell_inst ();
@@ -1228,53 +1332,8 @@ InstService::selection_applies (const lay::ObjectInstPath &sel) const
 bool  
 InstService::drop_event (const db::DPoint & /*p*/, const lay::DragDropDataBase * /*data*/) 
 { 
-  if (m_in_drag_drop) {
-
-    const lay::CellView &cv = view ()->cellview (m_cv_index);
-    if (! cv.is_valid ()) {
-      return false;
-    }
-
-    make_cell (cv);
-
-    bool accepted = true;
-
-    if (m_has_valid_cell && mp_pcell_decl) {
-
-      std::vector<tl::Variant> pv = mp_pcell_decl->map_parameters (m_pcell_parameters);
-
-      //  Turn off the drag cursor for the modal dialog
-      QApplication::restoreOverrideCursor ();
-
-      //  for PCells dragged show the parameter dialog for a chance to edit the initial parameters
-      if (! mp_pcell_parameters_dialog.get ()) {
-        mp_pcell_parameters_dialog.reset (new edt::PCellParametersDialog (view ()));
-        mp_pcell_parameters_dialog->parameters_changed_event.add (this, &InstService::apply_edits);
-      }
-
-      if (! mp_pcell_parameters_dialog->exec (mp_current_layout, view (), m_cv_index, mp_pcell_decl, pv)) {
-        accepted = false;
-      } else {
-        m_has_valid_cell = false;
-        m_pcell_parameters = mp_pcell_decl->named_parameters (mp_pcell_parameters_dialog->get_parameters ());
-      }
-
-    }
-
-    set_edit_marker (0);
-
-    if (accepted) {
-      do_finish_edit ();
-    } else {
-      do_cancel_edit ();
-    }
-
-    sync_to_config ();
-    return true;
-
-  } else {
-    return false; 
-  }
+  m_in_drag_drop = false;
+  return false;
 }
 
 void
@@ -1337,10 +1396,6 @@ InstService::do_begin_edit (const db::DPoint &p)
     m_trans = db::VCplxTrans (1.0 / cv->layout ().dbu ()) * tv [0] * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ();
   }
 
-  lay::Marker *marker = new lay::Marker (view (), m_cv_index, ! show_shapes_of_instances (), show_shapes_of_instances () ? max_shapes_of_instances () : 0);
-  marker->set_vertex_shape (lay::ViewOp::Cross);
-  marker->set_vertex_size (9 /*cross vertex size*/);
-  set_edit_marker (marker);
   update_marker ();
 }
 
@@ -1426,9 +1481,18 @@ InstService::make_cell (const lay::CellView &cv)
   return std::pair<bool, db::cell_index_type> (true, inst_cell_index);
 }
 
-void 
+void
+InstService::do_mouse_move_inactive (const db::DPoint &p)
+{
+  clear_mouse_cursors ();
+  add_mouse_cursor (snap (p));
+}
+
+void
 InstService::do_mouse_move (const db::DPoint &p)
 {
+  do_mouse_move_inactive (p);
+
   set_cursor (lay::Cursor::cross);
 
   const lay::CellView &cv = view ()->cellview (m_cv_index);
@@ -1470,6 +1534,14 @@ InstService::do_mouse_transform (const db::DPoint &p, db::DFTrans trans)
   m_column_x = c.x ();
   m_column_y = c.y ();
 
+  dispatcher ()->config_set (cfg_edit_inst_angle, m_angle);
+  dispatcher ()->config_set (cfg_edit_inst_mirror, m_mirror);
+  dispatcher ()->config_set (cfg_edit_inst_row_x, m_row_x);
+  dispatcher ()->config_set (cfg_edit_inst_row_y, m_row_y);
+  dispatcher ()->config_set (cfg_edit_inst_column_x, m_column_x);
+  dispatcher ()->config_set (cfg_edit_inst_column_y, m_column_y);
+  dispatcher ()->config_end ();
+
   //  honour the new transformation
   do_mouse_move (p);
 }
@@ -1510,6 +1582,8 @@ InstService::do_finish_edit ()
       cv->layout ().cleanup ();
       manager ()->commit ();
 
+      commit_recent (view ());
+
       if (m_in_drag_drop) {
 
         lay::ObjectInstPath sel;
@@ -1545,6 +1619,8 @@ InstService::do_cancel_edit ()
   m_has_valid_cell = false;
   m_in_drag_drop = false;
 
+  set_edit_marker (0);
+
   //  clean up any proxy cells created so far 
   const lay::CellView &cv = view ()->cellview (m_cv_index);
   if (cv.is_valid ()) {
@@ -1552,132 +1628,307 @@ InstService::do_cancel_edit ()
   }
 }
 
+void
+InstService::service_configuration_changed ()
+{
+  m_needs_update = true;
+}
+
 bool 
 InstService::configure (const std::string &name, const std::string &value)
 {
   if (name == cfg_edit_inst_cell_name) {
-    m_cell_or_pcell_name = value;
-    m_needs_update = true;
+
+    if (value != m_cell_or_pcell_name) {
+      m_cell_or_pcell_name = value;
+      m_needs_update = true;
+    }
+
     return true; // taken
   }
 
   if (name == cfg_edit_inst_lib_name) {
-    m_lib_name = value;
-    m_needs_update = true;
+
+    if (value != m_lib_name) {
+      m_lib_name_previous = m_lib_name;
+      m_lib_name = value;
+      m_needs_update = true;
+    }
+
     return true; // taken
   }
 
   if (name == cfg_edit_inst_pcell_parameters) {
 
-    m_pcell_parameters = pcell_parameters_from_string (value);
-    m_is_pcell = ! value.empty ();
+    std::map<std::string, tl::Variant> pcp = pcell_parameters_from_string (value);
+    if (pcp != m_pcell_parameters) {
 
-    m_needs_update = true;
+      m_pcell_parameters = pcp;
+      m_is_pcell = ! value.empty ();
+
+      m_needs_update = true;
+      m_parameters_changed = true;
+
+    }
+
     return true; // taken
 
   }
 
   if (name == cfg_edit_inst_place_origin) {
-    tl::from_string (value, m_place_origin);
-    m_needs_update = true;
+
+    bool f;
+    tl::from_string (value, f);
+
+    if (f != m_place_origin) {
+      m_place_origin = f;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_scale) {
-    tl::from_string (value, m_scale);
-    m_needs_update = true;
+
+    double s;
+    tl::from_string (value, s);
+
+    if (fabs (s - m_scale) > 1e-10) {
+      m_scale = s;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_angle) {
-    tl::from_string (value, m_angle);
-    m_needs_update = true;
+
+    double a;
+    tl::from_string (value, a);
+
+    if (fabs (a - m_angle) > 1e-10) {
+      m_angle = a;
+      m_needs_update = true;
+    }
+
     return true; // taken
   }
 
   if (name == cfg_edit_inst_mirror) {
-    tl::from_string (value, m_mirror);
-    m_needs_update = true;
+
+    bool f;
+    tl::from_string (value, f);
+
+    if (f != m_mirror) {
+      m_mirror = f;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_array) {
-    tl::from_string (value, m_array);
-    m_needs_update = true;
+
+    bool f;
+    tl::from_string (value, f);
+
+    if (f != m_array) {
+      m_array = f;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_rows) {
-    tl::from_string (value, m_rows);
-    m_needs_update = true;
+
+    unsigned int v;
+    tl::from_string (value, v);
+
+    if (v != m_rows) {
+      m_rows = v;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_row_x) {
-    tl::from_string (value, m_row_x);
-    m_needs_update = true;
+
+    double v;
+    tl::from_string (value, v);
+
+    if (! db::coord_traits<double>::equal (m_row_x, v)) {
+      m_row_x = v;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_row_y) {
-    tl::from_string (value, m_row_y);
-    m_needs_update = true;
+
+    double v;
+    tl::from_string (value, v);
+
+    if (! db::coord_traits<double>::equal (m_row_y, v)) {
+      m_row_y = v;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_columns) {
-    tl::from_string (value, m_columns);
-    m_needs_update = true;
+
+    unsigned int v;
+    tl::from_string (value, v);
+
+    if (v != m_columns) {
+      m_columns = v;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_column_x) {
-    tl::from_string (value, m_column_x);
-    m_needs_update = true;
+
+    double v;
+    tl::from_string (value, v);
+
+    if (! db::coord_traits<double>::equal (m_column_x, v)) {
+      m_column_x = v;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_column_y) {
-    tl::from_string (value, m_column_y);
-    m_needs_update = true;
+
+    double v;
+    tl::from_string (value, v);
+
+    if (! db::coord_traits<double>::equal (m_column_y, v)) {
+      m_column_y = v;
+      m_needs_update = true;
+    }
+
     return true; // taken
+
   }
 
   return edt::Service::configure (name, value);
+}
+
+void
+InstService::switch_cell_or_pcell (bool switch_parameters)
+{
+  //  if the library or cell name has changed, store the current pcell parameters and try to reuse
+  //  an existing parameter set
+  if (! m_cell_or_pcell_name_previous.empty () && (m_cell_or_pcell_name_previous != m_cell_or_pcell_name || m_lib_name_previous != m_lib_name)) {
+
+    m_stored_pcell_parameters[std::make_pair (m_cell_or_pcell_name_previous, m_lib_name_previous)] = m_pcell_parameters;
+
+    if (switch_parameters) {
+
+      std::map<std::pair<std::string, std::string>, std::map<std::string, tl::Variant> >::const_iterator p = m_stored_pcell_parameters.find (std::make_pair (m_cell_or_pcell_name, m_lib_name));
+      if (p != m_stored_pcell_parameters.end ()) {
+        m_pcell_parameters = p->second;
+      } else {
+        m_pcell_parameters.clear ();
+      }
+
+    }
+
+  }
+
+  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name);
+  const lay::CellView &cv = view ()->cellview (m_cv_index);
+
+  //  find the layout the cell has to be looked up: that is either the layout of the current instance or
+  //  the library selected
+  const db::Layout *layout = 0;
+  if (lib) {
+    layout = &lib->layout ();
+  } else if (cv.is_valid ()) {
+    layout = &cv->layout ();
+  }
+
+  if (layout) {
+    m_is_pcell = layout->pcell_by_name (m_cell_or_pcell_name.c_str ()).first;
+  } else {
+    m_is_pcell = false;
+  }
+
+  //  remember the current cell or library name
+  m_cell_or_pcell_name_previous = m_cell_or_pcell_name;
+  m_lib_name_previous = m_lib_name;
 }
 
 void 
 InstService::config_finalize ()
 {
   if (m_needs_update) {
+
+    //  don't switch parameters if they have been updated explicitly
+    //  since the last "config_finalize". This means the sender of the configuration events
+    //  wants the parameters to be set in a specific way. Don't interfere.
+    bool switch_parameters = ! m_parameters_changed;
+
+    switch_cell_or_pcell (switch_parameters);
+
     m_has_valid_cell = false;
     update_marker ();
-    m_needs_update = false;
+
+    if (switch_parameters) {
+      //  Reflects any changes in PCell parameters in the configuration
+      //  TODO: it's somewhat questionable to do this inside "config_finalize" as this method is supposed
+      //  to reflect changes rather than induce some.
+      if (m_is_pcell) {
+        dispatcher ()->config_set (cfg_edit_inst_pcell_parameters, pcell_parameters_to_string (m_pcell_parameters));
+      } else {
+        dispatcher ()->config_set (cfg_edit_inst_pcell_parameters, std::string ());
+      }
+    }
+
   }
+
+  m_needs_update = false;
+  m_parameters_changed = false;
 
   edt::Service::config_finalize ();
 }
 
 void
-InstService::apply_edits()
-{
-  if (mp_pcell_decl && mp_pcell_parameters_dialog.get ()) {
-    m_pcell_parameters = mp_pcell_decl->named_parameters (mp_pcell_parameters_dialog->get_parameters ());
-  }
-
-  sync_to_config ();
-}
-
-void
 InstService::update_marker ()
 {
-  lay::Marker *marker = dynamic_cast<lay::Marker *> (edit_marker ());
-  if (marker) {
-    marker->set ();
+  if (editing ()) {
+
+    lay::Marker *marker = new lay::Marker (view (), m_cv_index, ! show_shapes_of_instances (), show_shapes_of_instances () ? max_shapes_of_instances () : 0);
+    marker->set_vertex_shape (lay::ViewOp::Cross);
+    marker->set_vertex_size (9 /*cross vertex size*/);
+    set_edit_marker (marker);
+
     db::CellInstArray inst;
     if (get_inst (inst)) {
       marker->set (inst, m_trans);
+    } else {
+      marker->set ();
     }
+
+  } else {
+    set_edit_marker (0);
   }
 }
 
@@ -1692,14 +1943,9 @@ InstService::get_inst (db::CellInstArray &inst)
 
       //  compute the instance's transformation
       db::VCplxTrans pt = (db::CplxTrans (cv->layout ().dbu ()) * m_trans).inverted ();
-      db::ICplxTrans trans;
-      if (m_in_drag_drop) {
-        trans = db::ICplxTrans (1.0, 0.0, false, pt * m_disp - db::Point ());
-      } else {
-        trans = db::ICplxTrans (m_scale, m_angle, m_mirror, pt * m_disp - db::Point ());
-      } 
+      db::ICplxTrans trans = db::ICplxTrans (m_scale, m_angle, m_mirror, pt * m_disp - db::Point ());
 
-      if (! m_in_drag_drop && m_array && m_rows > 0 && m_columns > 0) {
+      if (m_array && m_rows > 0 && m_columns > 0) {
         db::Vector row = db::Vector (pt * db::DVector (m_row_x, m_row_y));
         db::Vector column = db::Vector (pt * db::DVector (m_column_x, m_column_y));
         inst = db::CellInstArray (db::CellInst (ci.second), trans, row, column, m_rows, m_columns);

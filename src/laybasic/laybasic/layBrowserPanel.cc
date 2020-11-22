@@ -22,9 +22,11 @@
 
 
 #include "layBrowserPanel.h"
+#include "layDispatcher.h"
 #include "tlExceptions.h"
 #include "tlInternational.h"
 #include "tlException.h"
+#include "tlString.h"
 
 #include "ui_BrowserPanel.h"
 
@@ -34,6 +36,10 @@
 #endif
 
 #include <QTreeWidgetItem>
+#include <QTextBlock>
+#include <QCompleter>
+#include <QStringListModel>
+#include <QScrollBar>
 
 namespace lay
 {
@@ -52,9 +58,44 @@ BrowserTextWidget::loadResource (int type, const QUrl &url)
 
 // -------------------------------------------------------------
 
+void
+BookmarkItem::read (tl::Extractor &ex)
+{
+  while (! ex.at_end () && ! ex.test (";")) {
+
+    std::string k, v;
+    ex.read_word (k);
+    ex.test (":");
+    ex.read_word_or_quoted (v, "+-.");
+    ex.test (",");
+
+    if (k == "url") {
+      url = v;
+    } else if (k == "title") {
+      title = v;
+    } else if (k == "position") {
+      tl::from_string (v, position);
+    }
+
+  }
+}
+
+std::string
+BookmarkItem::to_string () const
+{
+  std::string r;
+  r = "url:" + tl::to_quoted_string (url) + ",";
+  r += "title:" + tl::to_quoted_string (title) + ",";
+  r += "position:" + tl::to_string (position) + ";";
+  return r;
+}
+
+// -------------------------------------------------------------
+
 BrowserPanel::BrowserPanel (QWidget *parent)
   : QWidget (parent),
-    m_back_dm (this, &BrowserPanel::back)
+    m_back_dm (this, &BrowserPanel::back),
+    mp_dispatcher (0)
 {
   init ();
 }
@@ -72,21 +113,53 @@ BrowserPanel::init ()
   mp_ui->browser->setReadOnly (true);
   mp_ui->browser->set_panel (this);
   mp_ui->browser->setWordWrapMode (QTextOption::WordWrap);
+  mp_ui->browser->setLineWrapMode (QTextEdit::FixedPixelWidth);
+  QFontMetrics fm (font ());
+  int text_width = fm.boundingRect ('m').width () * 80;
+  mp_ui->browser->setLineWrapColumnOrWidth (text_width);
+
+  mp_ui->browser->addAction (mp_ui->action_find);
+  mp_ui->browser->addAction (mp_ui->action_bookmark);
+
+  mp_ui->browser_bookmark_view->addAction (mp_ui->action_delete_bookmark);
+  mp_ui->browser_bookmark_view->setContextMenuPolicy (Qt::ActionsContextMenu);
 
   connect (mp_ui->back_pb, SIGNAL (clicked ()), this, SLOT (back ()));
   connect (mp_ui->forward_pb, SIGNAL (clicked ()), this, SLOT (forward ()));
   connect (mp_ui->next_topic_pb, SIGNAL (clicked ()), this, SLOT (next ()));
   connect (mp_ui->prev_topic_pb, SIGNAL (clicked ()), this, SLOT (prev ()));
+  connect (mp_ui->bookmark_pb, SIGNAL (clicked ()), this, SLOT (bookmark ()));
   connect (mp_ui->home_pb, SIGNAL (clicked ()), this, SLOT (home ()));
-  connect (mp_ui->searchEdit, SIGNAL (returnPressed ()), this, SLOT (search_edited ()));
+  connect (mp_ui->search_edit, SIGNAL (textEdited (const QString &)), this, SLOT (search_text_changed (const QString &)));
+  connect (mp_ui->search_edit, SIGNAL (returnPressed ()), this, SLOT (search_edited ()));
+  connect (mp_ui->search_button, SIGNAL (clicked ()), this, SLOT (search_edited ()));
   connect (mp_ui->browser, SIGNAL (textChanged ()), this, SLOT (text_changed ()));
   connect (mp_ui->browser, SIGNAL (backwardAvailable (bool)), mp_ui->back_pb, SLOT (setEnabled (bool)));
   connect (mp_ui->browser, SIGNAL (forwardAvailable (bool)), mp_ui->forward_pb, SLOT (setEnabled (bool)));
   connect (mp_ui->outline_tree, SIGNAL (itemActivated (QTreeWidgetItem *, int)), this, SLOT (outline_item_clicked (QTreeWidgetItem *)));
+  connect (mp_ui->on_page_search_edit, SIGNAL (textChanged (const QString &)), this, SLOT (page_search_edited ()));
+  connect (mp_ui->search_close_button, SIGNAL (clicked ()), this, SLOT (page_search_edited ()), Qt::QueuedConnection);
+  connect (mp_ui->on_page_search_edit, SIGNAL (returnPressed ()), this, SLOT (page_search_next ()));
+  connect (mp_ui->on_page_search_next, SIGNAL (clicked ()), this, SLOT (page_search_next ()));
+  connect (mp_ui->action_find, SIGNAL (triggered ()), this, SLOT (find ()));
+  connect (mp_ui->action_bookmark, SIGNAL (triggered ()), this, SLOT (bookmark ()));
+  connect (mp_ui->action_delete_bookmark, SIGNAL (triggered ()), this, SLOT (delete_bookmark ()));
+  connect (mp_ui->browser_bookmark_view, SIGNAL (itemDoubleClicked (QTreeWidgetItem *, int)), this, SLOT (bookmark_item_selected (QTreeWidgetItem *)));
 
-  mp_ui->searchEdit->hide ();
+  mp_completer = new QCompleter (this);
+  mp_completer->setFilterMode (Qt::MatchStartsWith);
+  mp_completer->setCaseSensitivity (Qt::CaseInsensitive);
+  mp_completer->setCompletionMode (QCompleter::UnfilteredPopupCompletion);
+  mp_completer_model = new QStringListModel (mp_completer);
+  mp_completer->setModel (mp_completer_model);
+  mp_ui->search_edit->setCompleter (mp_completer);
+
+  mp_ui->search_frame->hide ();
+  mp_ui->search_edit->hide ();
 
   set_label (std::string ());
+
+  refresh_bookmark_list ();
 }
 
 BrowserPanel::~BrowserPanel ()
@@ -96,6 +169,37 @@ BrowserPanel::~BrowserPanel ()
 
   delete mp_ui;
   mp_ui = 0;
+}
+
+void
+BrowserPanel::set_dispatcher (lay::Dispatcher *dispatcher, const std::string &cfg_bookmarks)
+{
+  mp_dispatcher = dispatcher;
+  m_cfg_bookmarks = cfg_bookmarks;
+
+  m_bookmarks.clear ();
+
+  //  load the bookmarks
+  try {
+
+    if (mp_dispatcher) {
+
+      std::string v;
+      mp_dispatcher->config_get (m_cfg_bookmarks, v);
+
+      tl::Extractor ex (v.c_str ());
+      while (! ex.at_end ()) {
+        m_bookmarks.push_back (BookmarkItem ());
+        m_bookmarks.back ().read (ex);
+      }
+
+    }
+
+  } catch (...) {
+    //  exceptions ignored here
+  }
+
+  refresh_bookmark_list ();
 }
 
 std::string
@@ -111,6 +215,198 @@ BrowserPanel::url () const
 }
 
 void
+BrowserPanel::bookmark ()
+{
+  BookmarkItem bm;
+  bm.url = tl::to_string (mp_ui->browser->historyUrl (0).toString ());
+  QString title = mp_ui->browser->document ()->metaInformation (QTextDocument::DocumentTitle);
+  bm.title = tl::to_string (title);
+  bm.position = mp_ui->browser->verticalScrollBar ()->value ();
+
+  add_bookmark (bm);
+  refresh_bookmark_list ();
+  store_bookmarks ();
+}
+
+void
+BrowserPanel::store_bookmarks ()
+{
+  if (mp_dispatcher) {
+
+    std::string s;
+    for (std::list<BookmarkItem>::const_iterator i = m_bookmarks.begin (); i != m_bookmarks.end (); ++i) {
+      s += i->to_string ();
+    }
+
+    mp_dispatcher->config_set (m_cfg_bookmarks, s);
+
+  }
+}
+
+void
+BrowserPanel::bookmark_item_selected (QTreeWidgetItem *item)
+{
+  int index = mp_ui->browser_bookmark_view->indexOfTopLevelItem (item);
+  if (index < 0 || index >= int (m_bookmarks.size ())) {
+    return;
+  }
+
+  std::list<BookmarkItem>::iterator i = m_bookmarks.begin ();
+  for ( ; i != m_bookmarks.end () && index > 0; --index, ++i)
+    ;
+
+  if (i == m_bookmarks.end ()) {
+    return;
+  }
+
+  BookmarkItem bm = *i;
+  m_bookmarks.erase (i);
+  m_bookmarks.push_front (bm);
+
+  refresh_bookmark_list ();
+  store_bookmarks ();
+  load (bm.url);
+
+  mp_ui->browser->verticalScrollBar ()->setValue (bm.position);
+  mp_ui->browser_bookmark_view->topLevelItem (0)->setSelected (true);
+}
+
+void
+BrowserPanel::clear_bookmarks ()
+{
+  m_bookmarks.clear ();
+}
+
+void
+BrowserPanel::add_bookmark (const BookmarkItem &item)
+{
+  for (std::list<BookmarkItem>::iterator i = m_bookmarks.begin (); i != m_bookmarks.end (); ) {
+    std::list<BookmarkItem>::iterator ii = i;
+    ++ii;
+    if (*i == item) {
+      m_bookmarks.erase (i);
+    }
+    i = ii;
+  }
+  m_bookmarks.push_front (item);
+}
+
+void
+BrowserPanel::delete_bookmark ()
+{
+  QTreeWidgetItem *item = mp_ui->browser_bookmark_view->currentItem ();
+  if (! item) {
+    return;
+  }
+
+  int index = mp_ui->browser_bookmark_view->indexOfTopLevelItem (item);
+  std::list<BookmarkItem>::iterator i = m_bookmarks.begin ();
+  for ( ; i != m_bookmarks.end () && index > 0; --index, ++i)
+    ;
+
+  if (i != m_bookmarks.end ()) {
+    m_bookmarks.erase (i);
+    refresh_bookmark_list ();
+    store_bookmarks ();
+  }
+}
+
+void
+BrowserPanel::refresh_bookmark_list ()
+{
+  mp_ui->browser_bookmark_view->setVisible (! m_bookmarks.empty ());
+
+  mp_ui->browser_bookmark_view->clear ();
+  for (std::list<BookmarkItem>::const_iterator i = m_bookmarks.begin (); i != m_bookmarks.end (); ++i) {
+    QTreeWidgetItem *item = new QTreeWidgetItem (mp_ui->browser_bookmark_view);
+    item->setData (0, Qt::DisplayRole, tl::to_qstring (i->title));
+    item->setData (0, Qt::ToolTipRole, tl::to_qstring (i->title));
+    item->setData (0, Qt::DecorationRole, QIcon (":/bookmark_16.png"));
+  }
+}
+
+void
+BrowserPanel::find ()
+{
+  mp_ui->search_frame->show ();
+  mp_ui->on_page_search_edit->setFocus();
+}
+
+void
+BrowserPanel::page_search_edited ()
+{
+  m_search_selection.clear ();
+  m_search_index = -1;
+
+  if (! mp_ui->search_frame->isVisible () || mp_ui->on_page_search_edit->text ().size () < 2) {
+    mp_ui->browser->setExtraSelections (m_search_selection);
+    return;
+  }
+
+  QString search_text = mp_ui->on_page_search_edit->text ();
+
+  QTextDocument *doc = mp_ui->browser->document ();
+  for (QTextBlock b = doc->firstBlock (); b.isValid (); b = b.next ()) {
+
+    int from = 0;
+    int index;
+
+    QString t = b.text ();
+
+    while ((index = t.indexOf (search_text, from, Qt::CaseInsensitive)) >= 0) {
+
+      QTextCursor highlight (b);
+      highlight.movePosition (QTextCursor::NextCharacter, QTextCursor::MoveAnchor, index);
+      highlight.movePosition (QTextCursor::NextCharacter, QTextCursor::KeepAnchor, search_text.size ());
+
+      QTextEdit::ExtraSelection extra_selection;
+      extra_selection.cursor = highlight;
+      extra_selection.format.setBackground (QColor (255, 255, 160));
+      m_search_selection.push_back (extra_selection);
+
+      from = index + search_text.size ();
+
+    }
+
+  }
+
+  if (! m_search_selection.empty ()) {
+    m_search_index = 0;
+    mp_ui->browser->setExtraSelections (m_search_selection);
+    mp_ui->browser->setTextCursor (m_search_selection [m_search_index].cursor);
+  }
+}
+
+void
+BrowserPanel::page_search_next ()
+{
+  if (m_search_index >= 0) {
+
+    ++m_search_index;
+    if (m_search_index >= m_search_selection.size ()) {
+      m_search_index = 0;
+    }
+
+    mp_ui->browser->setTextCursor (m_search_selection [m_search_index].cursor);
+
+  }
+}
+
+void
+BrowserPanel::search_text_changed (const QString &text)
+{
+  QList<QString> strings;
+  if (! text.isEmpty () && mp_source.get ()) {
+    std::list<std::string> cl;
+    mp_source->search_completers (tl::to_string (text.toLower ()), cl);
+    for (std::list<std::string>::const_iterator i = cl.begin (); i != cl.end (); ++i) {
+      strings.push_back (tl::to_qstring (*i));
+    }
+  }
+  mp_completer_model->setStringList (strings);
+}
+
+void
 BrowserPanel::text_changed ()
 {
   QString title = mp_ui->browser->document ()->metaInformation (QTextDocument::DocumentTitle);
@@ -118,6 +414,9 @@ BrowserPanel::text_changed ()
     m_current_title = title;
     emit title_changed (title);
   }
+
+  //  refresh on-page search
+  page_search_edited ();
 }
 
 void
@@ -259,15 +558,15 @@ BrowserPanel::search (const std::string &s)
 void
 BrowserPanel::search_edited ()
 {
-  if (mp_ui->searchEdit->text ().size () > 0) {
+  if (mp_ui->search_edit->text ().size () > 0) {
     QUrl url (tl::to_qstring (m_search_url));
 #if QT_VERSION >= 0x050000
     QUrlQuery qi;
-    qi.addQueryItem (tl::to_qstring (m_search_query_item), mp_ui->searchEdit->text ());
+    qi.addQueryItem (tl::to_qstring (m_search_query_item), mp_ui->search_edit->text ());
     url.setQuery (qi);
 #else
     QList<QPair<QString, QString> > qi;
-    qi.push_back (QPair<QString, QString> (tl::to_qstring (m_search_query_item), mp_ui->searchEdit->text ()));
+    qi.push_back (QPair<QString, QString> (tl::to_qstring (m_search_query_item), mp_ui->search_edit->text ()));
     url.setQueryItems (qi);
 #endif
     load (url.toEncoded ().constData ());
@@ -279,7 +578,7 @@ BrowserPanel::set_search_url (const std::string &url, const std::string &query_i
 {
   m_search_url = url;
   m_search_query_item = query_item;
-  mp_ui->searchEdit->setVisible (! url.empty ());
+  mp_ui->search_edit->setVisible (! url.empty ());
 }
 
 void 
@@ -472,6 +771,12 @@ BrowserOutline
 BrowserSource::get_outline (const std::string & /*url*/)
 {
   return BrowserOutline ();
+}
+
+void
+BrowserSource::search_completers (const std::string & /*search_string*/, std::list<std::string> & /*completers*/)
+{
+  //  .. nothing here ..
 }
 
 std::string 

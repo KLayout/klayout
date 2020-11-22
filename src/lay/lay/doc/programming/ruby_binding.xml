@@ -119,7 +119,7 @@ cell.shapes(layer).insert(box)</pre>
   An exception to the lifetime control rule given above are Qt objects: a common pattern is to create Qt objects 
   and add them to a container (i.e. widgets to a dialog). This implies a lifetime control transfer from
   Ruby to C++. RBA handles that case by explicitly transferring control when a QObject or one of the
-  derived objects is created with a parent reference in Ruby code. Qt implements it's own mechanism of controlling
+  derived objects is created with a parent reference in Ruby code. Qt implements its own mechanism of controlling
   the lifetime which includes monitoring of the lifetime of child objects. This feature makes transferring the
   control feasible for these kind of objects. For some Qt methods which are know to transfer the ownership 
   of an object, the ownership is transferred explicitly.

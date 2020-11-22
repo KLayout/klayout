@@ -726,7 +726,7 @@ private:
   bool m_directed;
 };
 
-static std::pair <bool, db::DPoint>
+static PointSnapToObjectResult
 do_obj_snap (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double snap_range, const std::vector <db::DEdge> &cutlines)
 {
   db::DPoint dp (pt);
@@ -753,25 +753,45 @@ do_obj_snap (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &gri
     }
   }
 
-  if (finder.any () && anyp) {
-    //  if both the projection and the finder are sucessful, decide by a heuristic criterion which to take
-    //  (the projection gets a penalty (of the snap range) to make it count less than the finder's choice)
-    //  This avoids extreme distortions of the ruler due to projection on long edges.
-    if ((dp.distance (closest) + snap_range) * 5.0 < dp.distance (finder.get_found ())) {
-      return std::make_pair (false, closest);
-    } else {
-      return std::make_pair (true, finder.get_found ());
-    }
+  //  if both the projection and the finder are sucessful, decide by a heuristic criterion which to take
+  //  (the projection gets a penalty (of the snap range) to make it count less than the finder's choice)
+  //  This avoids extreme distortions of the ruler due to projection on long edges.
+  if (finder.any () && anyp && (dp.distance (closest) + snap_range) * 5.0 < dp.distance (finder.get_found ())) {
+
+    PointSnapToObjectResult res;
+    res.snapped_point = closest;
+    return res;
+
   } else if (finder.any ()) {
-    return std::make_pair (true, finder.get_found ());
+
+    PointSnapToObjectResult res;
+    res.snapped_point = finder.get_found ();
+    res.object_ref = finder.get_found_edge ();
+    if (finder.is_vertex ()) {
+      res.object_snap = PointSnapToObjectResult::ObjectVertex;
+    } else if (finder.has_found_edge ()) {
+      res.object_snap = PointSnapToObjectResult::ObjectEdge;
+    } else {
+      res.object_snap = PointSnapToObjectResult::ObjectUnspecific;
+    }
+    return res;
+
   } else if (anyp) {
-    return std::make_pair (false, closest);
+
+    PointSnapToObjectResult res;
+    res.snapped_point = closest;
+    return res;
+
   } else {
-    return std::make_pair (false, dp);
+
+    PointSnapToObjectResult res;
+    res.snapped_point = dp;
+    return res;
+
   }
 }
 
-std::pair <bool, db::DEdge>
+static TwoPointSnapToObjectResult
 do_obj_snap2 (lay::LayoutView *view, const db::DPoint &pt1, const db::DPoint &pt2, const db::DVector &grid, double min_search_range, double max_search_range, const std::vector <db::DEdge> &cutlines)
 {
   db::DPoint dp1 (pt1);
@@ -828,15 +848,41 @@ do_obj_snap2 (lay::LayoutView *view, const db::DPoint &pt1, const db::DPoint &pt
 
         finder2.find (view, sr2);
         if (finder2.any_exact ()) {
+
           db::DPoint p2 = finder2.get_found ();
-          return std::make_pair (true, db::DEdge (p1, p2));
+
+          TwoPointSnapToObjectResult res;
+          res.any = true;
+          res.first = p1;
+          res.second = p2;
+
+          res.object_ref_first = finder.get_found_edge ();
+          if (finder.is_vertex ()) {
+            res.object_snap_first = TwoPointSnapToObjectResult::ObjectVertex;
+          } else if (finder.has_found_edge ()) {
+            res.object_snap_first = TwoPointSnapToObjectResult::ObjectEdge;
+          } else {
+            res.object_snap_first = TwoPointSnapToObjectResult::ObjectUnspecific;
+          }
+
+          res.object_ref_second = finder2.get_found_edge ();
+          if (finder2.is_vertex ()) {
+            res.object_snap_second = TwoPointSnapToObjectResult::ObjectVertex;
+          } else if (finder2.has_found_edge ()) {
+            res.object_snap_second = TwoPointSnapToObjectResult::ObjectEdge;
+          } else {
+            res.object_snap_second = TwoPointSnapToObjectResult::ObjectUnspecific;
+          }
+
+          return res;
+
         }
 
         sr2 *= 2.0;
 
       }
 
-      return std::make_pair (false, db::DEdge ());
+      return TwoPointSnapToObjectResult ();
 
     }
 
@@ -844,7 +890,7 @@ do_obj_snap2 (lay::LayoutView *view, const db::DPoint &pt1, const db::DPoint &pt
 
   }
 
-  return std::make_pair (false, db::DEdge ());
+  return TwoPointSnapToObjectResult ();
 }
 
 static void
@@ -868,13 +914,13 @@ make_cutlines (lay::angle_constraint_type snap_mode, const db::DPoint &p1, std::
   }
 }
 
-std::pair <bool, db::DPoint>
+PointSnapToObjectResult
 obj_snap (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double snap_range)
 {
   return do_obj_snap (view, pt, grid, snap_range, std::vector<db::DEdge> ());
 }
 
-std::pair <bool, db::DPoint>
+PointSnapToObjectResult
 obj_snap (lay::LayoutView *view, const db::DPoint &p1, const db::DPoint &p2, const db::DVector &grid, lay::angle_constraint_type snap_mode, double snap_range)
 {
   std::vector <db::DEdge> cutlines;
@@ -882,19 +928,19 @@ obj_snap (lay::LayoutView *view, const db::DPoint &p1, const db::DPoint &p2, con
   return do_obj_snap (view, p2, grid, snap_range, cutlines);
 }
 
-std::pair <bool, db::DEdge>
+TwoPointSnapToObjectResult
 obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double min_search_range, double max_search_range)
 {
   return obj_snap2 (view, pt, pt, grid, min_search_range, max_search_range);
 }
 
-std::pair <bool, db::DEdge>
+TwoPointSnapToObjectResult
 obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, lay::angle_constraint_type ac, double min_search_range, double max_search_range)
 {
   return obj_snap2 (view, pt, pt, grid, ac, min_search_range, max_search_range);
 }
 
-std::pair <bool, db::DEdge>
+TwoPointSnapToObjectResult
 obj_snap2 (lay::LayoutView *view, const db::DPoint &pt1, const db::DPoint &pt2, const db::DVector &grid, double min_search_range, double max_search_range)
 {
   db::DPoint dp1 = lay::snap_xy (pt1, grid);
@@ -903,7 +949,7 @@ obj_snap2 (lay::LayoutView *view, const db::DPoint &pt1, const db::DPoint &pt2, 
   return do_obj_snap2 (view, dp1, dp2, db::DVector (), min_search_range, max_search_range, std::vector<db::DEdge> ());
 }
 
-std::pair <bool, db::DEdge>
+TwoPointSnapToObjectResult
 obj_snap2 (lay::LayoutView *view, const db::DPoint &pt1, const db::DPoint &pt2, const db::DVector &grid, lay::angle_constraint_type snap_mode, double min_search_range, double max_search_range)
 {
   db::DPoint dp1 = lay::snap_xy (pt1, grid);

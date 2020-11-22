@@ -704,6 +704,19 @@ public:
    */
   void push (RecursiveShapeReceiver *receiver);
 
+  /**
+   *  @brief Returns a value indicating whether the current cell is inactive (disabled)
+   */
+  bool is_inactive () const
+  {
+    return (reinterpret_cast<size_t> (mp_cell) & size_t (1)) != 0;
+  }
+
+  /**
+   *  @brief Returns a value indicating whether a new child cell of the current cell will be inactive
+   */
+  bool is_child_inactive (db::cell_index_type new_child) const;
+
 private:
   std::vector<unsigned int> m_layers;
   bool m_has_layers;
@@ -759,11 +772,6 @@ private:
   void down (RecursiveShapeReceiver *receiver) const;
 
   bool is_outside_complex_region (const db::Box &box) const;
-
-  bool is_inactive () const
-  {
-    return (reinterpret_cast<size_t> (mp_cell) & size_t (1)) != 0;
-  }
 
   void set_inactive (bool a) const 
   {

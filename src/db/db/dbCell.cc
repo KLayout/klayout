@@ -506,7 +506,7 @@ Cell::collect_caller_cells (std::set<cell_index_type> &callers, const std::set<c
 {
   if (levels != 0) {
     for (parent_cell_iterator cc = begin_parent_cells (); cc != end_parent_cells (); ++cc) {
-      if (cone.find (*cc) != cone.end () && callers.find (*cc) == callers.end ()) { 
+      if (cone.find (*cc) != cone.end () && callers.find (*cc) == callers.end () && mp_layout->is_valid_cell_index (*cc)) {
         callers.insert (*cc);
         mp_layout->cell (*cc).collect_caller_cells (callers, levels < 0 ? levels : levels - 1);
       }
@@ -519,7 +519,7 @@ Cell::collect_caller_cells (std::set<cell_index_type> &callers, int levels) cons
 {
   if (levels != 0) {
     for (parent_cell_iterator cc = begin_parent_cells (); cc != end_parent_cells (); ++cc) {
-      if (callers.find (*cc) == callers.end ()) { 
+      if (callers.find (*cc) == callers.end () && mp_layout->is_valid_cell_index (*cc)) {
         callers.insert (*cc);
         mp_layout->cell (*cc).collect_caller_cells (callers, levels < 0 ? levels : levels - 1);
       }
@@ -538,7 +538,7 @@ Cell::collect_called_cells (std::set<cell_index_type> &called, int levels) const
 {
   if (levels != 0) {
     for (child_cell_iterator cc = begin_child_cells (); ! cc.at_end (); ++cc) {
-      if (called.find (*cc) == called.end ()) { 
+      if (called.find (*cc) == called.end () && mp_layout->is_valid_cell_index (*cc)) {
         called.insert (*cc);
         mp_layout->cell (*cc).collect_called_cells (called, levels < 0 ? levels : levels - 1);
       }

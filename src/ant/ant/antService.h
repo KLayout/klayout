@@ -27,9 +27,7 @@
 
 #include "antCommon.h"
 
-#include "layViewObject.h"
-#include "layEditable.h"
-#include "layPlugin.h"
+#include "layEditorServiceBase.h"
 #include "layDrawing.h"
 #include "laySnap.h"
 #include "layAnnotationShapes.h"
@@ -180,9 +178,7 @@ private:
 // -------------------------------------------------------------
 
 class ANT_PUBLIC Service
-  : public lay::ViewService,
-    public lay::Editable,
-    public lay::Plugin,
+  : public lay::EditorServiceBase,
     public lay::Drawing,
     public db::Object
 {
@@ -529,8 +525,10 @@ private:
   unsigned int m_current_template;
 
   std::pair<bool, db::DPoint> snap1 (const db::DPoint &p, bool obj_snap);
+  lay::PointSnapToObjectResult snap1_details (const db::DPoint &p, bool obj_snap);
   std::pair<bool, db::DPoint> snap2 (const db::DPoint &p1, const db::DPoint &p2, const ant::Object *obj, lay::angle_constraint_type ac);
-  
+  lay::PointSnapToObjectResult snap2_details (const db::DPoint &p1, const db::DPoint &p2, const ant::Object *obj, lay::angle_constraint_type ac);
+
   const ant::Template &current_template () const;
 
   void show_message ();

@@ -28,7 +28,7 @@
       cells with the same name will be used as child cells.
     </li>
     <li>
-      <b>Deep copy</b>: In deep copy mode, the cell plus it's child cells are copied. All cells will be carried
+      <b>Deep copy</b>: In deep copy mode, the cell plus its child cells are copied. All cells will be carried
       along and when pasting the cell, copies of all children will be created as well.
     </li>
   </ul>    

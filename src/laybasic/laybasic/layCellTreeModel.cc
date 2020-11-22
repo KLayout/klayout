@@ -28,6 +28,7 @@
 #include "dbPCellVariant.h"
 #include "dbLibraryProxy.h"
 #include "dbLibrary.h"
+#include "dbLibraryManager.h"
 
 #include <QTreeView>
 #include <QPalette>
@@ -604,14 +605,53 @@ CellTreeModel::mimeData(const QModelIndexList &indexes) const
 {
   for (QModelIndexList::const_iterator i = indexes.begin (); i != indexes.end (); ++i) {
 
-    if (i->isValid()) {
+    if (! i->isValid()) {
+      continue;
+    }
 
-      if (is_pcell (*i)) {
-        lay::CellDragDropData data (mp_layout, mp_library, pcell_id (*i), true);
-        return data.to_mime_data ();
-      } else if (cell (*i)) {
-        lay::CellDragDropData data (mp_layout, mp_library, cell_index (*i), false);
-        return data.to_mime_data ();
+    if (is_pcell (*i)) {
+
+      lay::CellDragDropData data (mp_layout, mp_library, pcell_id (*i), true);
+      return data.to_mime_data ();
+
+    } else {
+
+      const db::Cell *c = cell (*i);
+      if (c) {
+
+        //  resolve library proxies
+        const db::Layout *layout = mp_layout;
+        const db::Library *library = mp_library;
+
+        const db::LibraryProxy *lib_proxy;
+        while (layout != 0 && (lib_proxy = dynamic_cast <const db::LibraryProxy *> (c)) != 0) {
+
+          const db::Library *lib = db::LibraryManager::instance ().lib (lib_proxy->lib_id ());
+          if (! lib) {
+            break;
+          }
+
+          library = lib;
+          layout = &lib->layout ();
+
+          if (layout->is_valid_cell_index (lib_proxy->library_cell_index ())) {
+            c = &layout->cell (lib_proxy->library_cell_index ());
+          } else {
+            c = 0;
+          }
+
+        }
+
+        //  identify pcell variants and turn them into PCell drag targets
+        const db::PCellVariant *pcell_var = dynamic_cast<const db::PCellVariant *> (c);
+        if (pcell_var) {
+          lay::CellDragDropData data (layout, library, pcell_var->pcell_id (), true, pcell_var->parameters ());
+          return data.to_mime_data ();
+        } else if (c) {
+          lay::CellDragDropData data (layout, library, c->cell_index (), false);
+          return data.to_mime_data ();
+        }
+
       }
 
     }

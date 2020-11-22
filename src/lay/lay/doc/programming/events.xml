@@ -108,7 +108,7 @@ end</pre>
   <p>
   Events are the callback variant which is the easiest one to use. Using an event it is possible
   to directly attach a block of code to a callback. An event has a specific signature, i.e. 
-  the parameters it provides. The block can obtain this parameters by listing them in it's argument list.
+  the parameters it provides. The block can obtain this parameters by listing them in its argument list.
   </p>
 
   <p>

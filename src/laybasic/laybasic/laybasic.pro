@@ -31,6 +31,7 @@ FORMS = \
   LayoutViewConfigPage2a.ui \
   LayoutViewConfigPage2b.ui \
   LayoutViewConfigPage2c.ui \
+  LayoutViewConfigPage2d.ui \
   LayoutViewConfigPage3a.ui \
   LayoutViewConfigPage3b.ui \
   LayoutViewConfigPage3c.ui \
@@ -73,7 +74,8 @@ FORMS = \
     NetInfoDialog.ui \
     NetExportDialog.ui \
     SelectCellViewForm.ui \
-    LayoutStatistics.ui
+    LayoutStatistics.ui \
+    D25TechnologyComponentEditor.ui
 
 RESOURCES = \
     laybasicResources.qrc \
@@ -115,6 +117,10 @@ SOURCES = \
   layEditable.cc \
   layEditStipplesForm.cc \
   layEditStippleWidget.cc \
+  layEditorOptionsFrame.cc \
+  layEditorOptionsPage.cc \
+  layEditorOptionsPages.cc \
+  layEditorServiceBase.cc \
   layFileDialog.cc \
   layFinder.cc \
   layFixedFont.cc \
@@ -184,7 +190,9 @@ SOURCES = \
     layDispatcher.cc \
     laySelectCellViewForm.cc \
     layLayoutStatisticsForm.cc \
-    gsiDeclLayNetlistBrowserDialog.cc
+    gsiDeclLayNetlistBrowserDialog.cc \
+    layD25TechnologyComponent.cc \
+    layLayoutViewFunctions.cc
 
 HEADERS = \
   gtf.h \
@@ -215,6 +223,10 @@ HEADERS = \
   layEditable.h \
   layEditStipplesForm.h \
   layEditStippleWidget.h \
+  layEditorOptionsFrame.h \
+  layEditorOptionsPage.h \
+  layEditorOptionsPages.h \
+  layEditorServiceBase.h \
   layFileDialog.h \
   layFinder.h \
   layFixedFont.h \
@@ -285,7 +297,9 @@ HEADERS = \
     layGenericSyntaxHighlighter.h \
     layDispatcher.h \
     laySelectCellViewForm.h \
-    layLayoutStatisticsForm.h
+    layLayoutStatisticsForm.h \
+    layD25TechnologyComponent.h \
+    layLayoutViewFunctions.h 
 
 INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC

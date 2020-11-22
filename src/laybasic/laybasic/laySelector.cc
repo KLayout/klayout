@@ -74,10 +74,7 @@ void
 SelectionService::deactivated ()
 {
   mp_view->clear_transient_selection ();
-  if (mp_box) {
-    delete mp_box;
-    mp_box = 0;
-  }
+  reset_box ();
 }
 
 void 
@@ -102,7 +99,20 @@ SelectionService::timeout ()
   mp_view->transient_select (m_hover_point);
 }
 
-bool 
+void
+SelectionService::reset_box ()
+{
+  if (mp_box) {
+
+    widget ()->ungrab_mouse (this);
+
+    delete mp_box;
+    mp_box = 0;
+
+  }
+}
+
+bool
 SelectionService::wheel_event (int /*delta*/, bool /*horizonal*/, const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/)
 {
   return false;
@@ -115,18 +125,30 @@ SelectionService::enter_event (bool /*prio*/)
   return false;
 }
 
-bool 
-SelectionService::leave_event (bool /*prio*/) 
+bool
+SelectionService::leave_event (bool prio)
 {
   m_mouse_in_window = false;
+
   hover_reset ();
+
+  if (prio) {
+    reset_box ();
+  }
+
   return false;
 }
 
 bool 
-SelectionService::mouse_move_event (const db::DPoint &p, unsigned int /*buttons*/, bool prio) 
+SelectionService::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (prio) {
+
+    m_current_position = p;
+
+    if ((buttons & LeftButton) == 0) {
+      reset_box ();
+    }
 
     if (mp_box) {
       m_p2 = p;
@@ -138,6 +160,7 @@ SelectionService::mouse_move_event (const db::DPoint &p, unsigned int /*buttons*
     }
 
   }
+
   return false;
 }
 
@@ -145,6 +168,11 @@ bool
 SelectionService::mouse_double_click_event (const db::DPoint & /*p*/, unsigned int buttons, bool prio)
 {
   hover_reset ();
+
+  if (prio) {
+    reset_box ();
+  }
+
   if (prio && (buttons & lay::LeftButton) != 0) {
     mp_view->show_properties (QApplication::activeWindow ());
     return true;
@@ -157,11 +185,18 @@ bool
 SelectionService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   hover_reset ();
-  if (prio && ! mp_box && (buttons & lay::LeftButton) != 0) {
-    mp_view->stop_redraw (); // TODO: how to restart if selection is aborted?
-    m_buttons = buttons;
-    begin (p);
-    return true;
+
+  if (prio) {
+
+    reset_box ();
+
+    if ((buttons & lay::LeftButton) != 0) {
+      mp_view->stop_redraw (); // TODO: how to restart if selection is aborted?
+      m_buttons = buttons;
+      begin (p);
+      return true;
+    }
+
   }
 
   return false;
@@ -170,7 +205,11 @@ SelectionService::mouse_press_event (const db::DPoint &p, unsigned int buttons, 
 bool 
 SelectionService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio) 
 { 
-  if (prio && mp_view && widget ()->mouse_event_viewport ().contains (p) && (buttons & lay::LeftButton) != 0) { 
+  if (prio) {
+    reset_box ();
+  }
+
+  if (prio && mp_view && widget ()->mouse_event_viewport ().contains (p) && (buttons & lay::LeftButton) != 0) {
 
     lay::Editable::SelectionMode mode = lay::Editable::Replace;
     bool shift = ((buttons & lay::ShiftButton) != 0);
@@ -211,12 +250,10 @@ bool
 SelectionService::mouse_release_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool prio) 
 { 
   hover_reset ();
+
   if (prio && mp_box) {
 
-    widget ()->ungrab_mouse (this);
-
-    delete mp_box;
-    mp_box = 0;
+    reset_box ();
 
     if (mp_view) { 
 

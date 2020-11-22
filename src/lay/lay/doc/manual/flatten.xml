@@ -8,7 +8,7 @@
   <keyword name="Editing"/>
 
   <p>
-  The "flatten cell" operation flattens a cell into all of it's parents.
+  The "flatten cell" operation flattens a cell into all of its parents.
   This basically removes a cell by promoting her shapes and instances up in the hierarchy.
   </p>
 
@@ -16,7 +16,7 @@
   Cell flattening can be applied to single instances or cells as a whole.
   When applied to an instance, the individual instance is resolved into shapes. The 
   instantiated cell will still exist afterwards. When applied to a cell, the cell 
-  will disappear and replaced by it's contents in all places it is used.
+  will disappear and replaced by its contents in all places it is used.
   </p>
 
   <p>

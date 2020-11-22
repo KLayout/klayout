@@ -302,7 +302,7 @@ Predefined device extractors are:
 <li><a href="/about/drc_ref_global.xml#capacitor_with_bulk">global#capacitor_with_bulk</a> - A capacitor with a separate bulk terminal </li>
 </ul>
 </p><p>
-Each device class (e.g. n-MOS/p-MOS or high Vt/low Vt) needs it's own instance
+Each device class (e.g. n-MOS/p-MOS or high Vt/low Vt) needs its own instance
 of device extractor. The device extractor beside the algorithm and specific 
 extraction settings defines the name of the device to be built.
 </p><p>

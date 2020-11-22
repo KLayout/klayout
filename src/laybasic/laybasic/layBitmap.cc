@@ -380,7 +380,38 @@ Bitmap::fill (unsigned int y, unsigned int x1, unsigned int x2)
   }
 }
 
-struct PosCompareF 
+void
+Bitmap::clear (unsigned int y, unsigned int x1, unsigned int x2)
+{
+  unsigned int b1 = x1 / 32;
+
+  uint32_t *sl = scanline (y);
+  sl += b1;
+
+  unsigned int b = x2 / 32 - b1;
+  if (b == 0) {
+
+    *sl &= ~masks [x2 % 32] | masks [x1 % 32];
+
+  } else if (b > 0) {
+
+    *sl++ &= masks [x1 % 32];
+    while (b > 1) {
+      *sl++ = 0;
+      b--;
+    }
+
+    unsigned int m = masks [x2 % 32];
+    //  Hint: if x2==width and width%32==0, sl must not be accessed. This is guaranteed by
+    //  checking if m != 0.
+    if (m) {
+      *sl &= ~m;
+    }
+
+  }
+}
+
+struct PosCompareF
 {
   bool operator() (const RenderEdge &a, const RenderEdge &b) const
   {

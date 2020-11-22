@@ -130,8 +130,8 @@ public:
    *  @param layout the layout where the cell lives in 
    *  @param cell_index The index of the cell
    */
-  CellDragDropData (const db::Layout *layout, const db::Library *library, db::cell_index_type cell_or_pcell_index, bool is_pcell)
-    : mp_layout (layout), mp_library (library), m_cell_index (cell_or_pcell_index), m_is_pcell (is_pcell)
+  CellDragDropData (const db::Layout *layout, const db::Library *library, db::cell_index_type cell_or_pcell_index, bool is_pcell, const std::vector<tl::Variant> &pcell_params = std::vector<tl::Variant> ())
+    : mp_layout (layout), mp_library (library), m_cell_index (cell_or_pcell_index), m_is_pcell (is_pcell), m_pcell_params (pcell_params)
   {
     //  .. nothing yet ..
   }
@@ -150,6 +150,14 @@ public:
   const db::Library *library () const
   {
     return mp_library;
+  }
+
+  /**
+   *  @brief PCell parameters
+   */
+  const std::vector<tl::Variant> &pcell_params () const
+  {
+    return m_pcell_params;
   }
 
   /**
@@ -185,6 +193,7 @@ private:
   const db::Library *mp_library;
   db::cell_index_type m_cell_index;
   bool m_is_pcell;
+  std::vector<tl::Variant> m_pcell_params;
 };
 
 /**
@@ -962,6 +971,35 @@ public:
     return m_view_objects_dismissed;
   }
 
+  /**
+   *  @brief Gets the current mouse position
+   */
+  QPoint mouse_position () const
+  {
+    return m_mouse_pos;
+  }
+
+  /**
+   *  @brief Gets the current mouse position in micrometer units
+   */
+  db::DPoint mouse_position_um () const
+  {
+    return pixel_to_um (m_mouse_pos);
+  }
+
+  /**
+   *  @brief Translates a screen coordinate in micrometer coordinates
+   */
+  db::DPoint pixel_to_um (const QPoint &pt) const;
+
+  /**
+   *  @brief Gets a flag indicating whether the mouse is inside the window
+   */
+  bool mouse_in_window () const
+  {
+    return m_mouse_inside;
+  }
+
 protected:
   /**
    *  @brief Qt focus event handler
@@ -1052,8 +1090,10 @@ private:
   bool m_mouse_pressed_state;
   unsigned int m_mouse_buttons;
   bool m_in_mouse_move;
+  bool m_mouse_inside;
   lay::Cursor::cursor_shape m_cursor, m_default_cursor;
 
+  void ensure_entered ();
   void do_mouse_move ();
   void begin_mouse_event (lay::Cursor::cursor_shape cursor = lay::Cursor::keep);
   void end_mouse_event ();

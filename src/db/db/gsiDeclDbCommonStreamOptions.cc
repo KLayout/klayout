@@ -25,6 +25,7 @@
 #include "dbCommonReader.h"
 #include "dbLoadLayoutOptions.h"
 #include "gsiDecl.h"
+#include "gsiEnums.h"
 
 namespace dn
 {
@@ -82,6 +83,16 @@ static bool get_properties_enabled (const db::LoadLayoutOptions *options)
 static void set_properties_enabled (db::LoadLayoutOptions *options, bool l)
 {
   options->get_options<db::CommonReaderOptions> ().enable_properties = l;
+}
+
+static db::CommonReader::CellConflictResolution get_cell_conflict_resolution (const db::LoadLayoutOptions *options)
+{
+  return options->get_options<db::CommonReaderOptions> ().cell_conflict_resolution;
+}
+
+static void set_cell_conflict_resolution (db::LoadLayoutOptions *options, db::CommonReader::CellConflictResolution cc)
+{
+  options->get_options<db::CommonReaderOptions> ().cell_conflict_resolution = cc;
 }
 
 //  extend lay::LoadLayoutOptions with the Common options
@@ -156,9 +167,55 @@ gsi::ClassExt<db::LoadLayoutOptions> common_reader_options (
     "@param enabled True, if properties should be read."
     "\n"
     "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration."
+  ) +
+  gsi::method_ext ("cell_conflict_resolution", &get_cell_conflict_resolution,
+    "@brief Gets the cell conflict resolution mode\n"
+    "\n"
+    "Multiple layout files can be collected into a single Layout object by reading file after file into the Layout object. "
+    "Cells with same names are considered a conflict. This mode indicates how such conflicts are resolved. See \\LoadLayoutOptions::CellConflictResolution "
+    "for the values allowed. The default mode is \\LoadLayoutOptions::CellConflictResolution#AddToCell.\n"
+    "\n"
+    "This option has been introduced in version 0.27."
+  ) +
+  gsi::method_ext ("cell_conflict_resolution=", &set_cell_conflict_resolution, gsi::arg ("mode"),
+    "@brief Sets the cell conflict resolution mode\n"
+    "\n"
+    "See \\cell_conflict_resolution for details about this option.\n"
+    "\n"
+    "This option has been introduced in version 0.27."
   ),
   ""
 );
+
+
+gsi::EnumIn<db::LoadLayoutOptions, db::CommonReader::CellConflictResolution> decl_dbCommonReader_CellConflictResolution ("db", "CellConflictResolution",
+  gsi::enum_const ("AddToCell", db::CommonReader::AddToCell,
+    "@brief Add content to existing cell\n"
+    "This is the mode use in before version 0.27. Content of new cells is simply added to existing cells with the same name."
+  ) +
+  gsi::enum_const ("OverwriteCell", db::CommonReader::OverwriteCell,
+    "@brief The old cell is overwritten entirely (including child cells which are not used otherwise)\n"
+  ) +
+  gsi::enum_const ("SkipNewCell", db::CommonReader::SkipNewCell,
+    "@brief The new cell is skipped entirely (including child cells which are not used otherwise)\n"
+  ) +
+  gsi::enum_const ("RenameCell", db::CommonReader::RenameCell,
+    "@brief The new cell will be renamed to become unique\n"
+  ),
+  "@brief This enum specifies how cell conflicts are handled if a layout read into another layout and a cell name conflict arises. "
+  "Until version 0.26.8 and before, the mode was always 'AddToCell'. On reading, a cell was 'reopened' when encountering a cell name "
+  "which already existed. This mode is still the default. The other modes are made available to support other ways of merging layouts.\n"
+  "\n"
+  "Proxy cells are never modified in the existing layout. Proxy cells are always local to their layout file. So if the existing cell is "
+  "a proxy cell, the new cell will be renamed.\n"
+  "\n"
+  "If the new or existing cell is a ghost cell, both cells are merged always.\n"
+  "\n"
+  "This enum was introduced in version 0.27.\n"
+);
+
+//  Inject the NetlistCrossReference::Status declarations into NetlistCrossReference:
+gsi::ClassExt<db::LoadLayoutOptions> inject_CellConflictResolution_in_parent (decl_dbCommonReader_CellConflictResolution.defs ());
 
 }
 

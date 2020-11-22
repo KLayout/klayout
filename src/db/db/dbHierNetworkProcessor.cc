@@ -799,10 +799,18 @@ struct cluster_building_receiver
   typedef std::set<size_t> global_nets;
   typedef std::pair<shape_vector, global_nets> cluster_value;
 
-  cluster_building_receiver (const db::Connectivity &conn)
-    : mp_conn (&conn)
+  cluster_building_receiver (const db::Connectivity &conn, const tl::equivalence_clusters<size_t> *attr_equivalence)
+    : mp_conn (&conn), mp_attr_equivalence (attr_equivalence)
   {
-    //  .. nothing yet..
+    if (mp_attr_equivalence) {
+      //  cache the global nets per attribute equivalence cluster
+      for (size_t gid = 0; gid < conn.global_nets (); ++gid) {
+        tl::equivalence_clusters<size_t>::cluster_id_type cl = attr_equivalence->cluster_id (global_net_id_to_attr (gid));
+        if (cl > 0) {
+          m_global_nets_by_attribute_cluster [cl].insert (gid);
+        }
+      }
+    }
   }
 
   void generate_clusters (local_clusters<T> &clusters)
@@ -817,7 +825,32 @@ struct cluster_building_receiver
         cluster->add_attr (s->second.second);
       }
 
-      cluster->set_global_nets (c->second);
+      std::set<size_t> global_nets = c->second;
+
+      //  Add the global nets we derive from the attribute equivalence (join_nets of labelled vs.
+      //  global nets)
+      if (mp_attr_equivalence) {
+
+        for (typename shape_vector::const_iterator s = c->first.begin (); s != c->first.end (); ++s) {
+
+          size_t a = s->second.second;
+          if (a == 0) {
+            continue;
+          }
+
+          tl::equivalence_clusters<size_t>::cluster_id_type cl = mp_attr_equivalence->cluster_id (a);
+          if (cl > 0) {
+            std::map<size_t, std::set<size_t> >::const_iterator gn = m_global_nets_by_attribute_cluster.find (cl);
+            if (gn != m_global_nets_by_attribute_cluster.end ()) {
+              global_nets.insert (gn->second.begin (), gn->second.end ());
+            }
+          }
+
+        }
+
+      }
+
+      cluster->set_global_nets (global_nets);
 
     }
   }
@@ -913,6 +946,8 @@ private:
   std::map<const T *, typename std::list<cluster_value>::iterator> m_shape_to_clusters;
   std::map<size_t, typename std::list<cluster_value>::iterator> m_global_to_clusters;
   std::list<cluster_value> m_clusters;
+  std::map<size_t, std::set<size_t> > m_global_nets_by_attribute_cluster;
+  const tl::equivalence_clusters<size_t> *mp_attr_equivalence;
 
   void join (typename std::list<cluster_value>::iterator ic1, typename std::list<cluster_value>::iterator ic2)
   {
@@ -1035,7 +1070,7 @@ local_clusters<T>::build_clusters (const db::Cell &cell, const db::Connectivity 
     }
   }
 
-  cluster_building_receiver<T, box_type> rec (conn);
+  cluster_building_receiver<T, box_type> rec (conn, attr_equivalence);
   bs.process (rec, 1 /*==touching*/, bc);
   rec.generate_clusters (*this);
 
@@ -1048,36 +1083,27 @@ template <class T>
 void
 local_clusters<T>::apply_attr_equivalences (const tl::equivalence_clusters<size_t> &attr_equivalence)
 {
-  tl::equivalence_clusters<size_t> eq;
-
-  //  collect all local attributes (the ones which are present in attr_equivalence) into "eq"
-  //  and form equivalences for multi-attribute clusters.
-  for (const_iterator c = begin (); c != end (); ++c) {
-    typename local_cluster<T>::attr_iterator a0;
-    for (typename local_cluster<T>::attr_iterator a = c->begin_attr (); a != c->end_attr (); ++a) {
-      if (attr_equivalence.has_attribute (*a)) {
-        if (a0 == typename local_cluster<T>::attr_iterator ()) {
-          a0 = a;
-        }
-        eq.same (*a0, *a);
-      }
-    }
-  }
-
-  //  apply the equivalences implied by attr_equivalence
-  eq.apply_equivalences (attr_equivalence);
-
   //  identify the layout clusters joined into one attribute cluster and join them
 
   std::map<tl::equivalence_clusters<size_t>::cluster_id_type, std::set<size_t> > c2c;
 
   for (const_iterator c = begin (); c != end (); ++c) {
+
     for (typename local_cluster<T>::attr_iterator a = c->begin_attr (); a != c->end_attr (); ++a) {
       tl::equivalence_clusters<size_t>::cluster_id_type cl = attr_equivalence.cluster_id (*a);
       if (cl > 0) {
         c2c [cl].insert (c->id ());
       }
     }
+
+    for (typename local_cluster<T>::global_nets_iterator g = c->begin_global_nets (); g != c->end_global_nets (); ++g) {
+      size_t a = global_net_id_to_attr (*g);
+      tl::equivalence_clusters<size_t>::cluster_id_type cl = attr_equivalence.cluster_id (a);
+      if (cl > 0) {
+        c2c [cl].insert (c->id ());
+      }
+    }
+
   }
 
   for (std::map<tl::equivalence_clusters<size_t>::cluster_id_type, std::set<size_t> >::const_iterator c = c2c.begin (); c != c2c.end (); ++c) {

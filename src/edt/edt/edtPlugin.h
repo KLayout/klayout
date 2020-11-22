@@ -31,35 +31,24 @@
 namespace lay
 {
   class Dispatcher;
+  class EditorOptionsPage;
 }
 
 namespace edt
 {
-  class EditorOptionsPage;
-
   /**
    *  @brief A helper class for plugin declarations for editor services
    */
   class PluginDeclarationBase
     : public lay::PluginDeclaration
   {
-  public:
-    virtual void get_editor_options_pages (std::vector<edt::EditorOptionsPage *> &, lay::Dispatcher *) const = 0;
+    //  .. nothing yet ..
   };
 
   /**
-   *  @brief Show the editor options dialog
-   *
-   *  This dialog is a global resource which is managed by the main plugin declaration
+   *  @brief Commits the current configuration for the recently used configuration list
    */
-  void show_editor_options_dialog ();
-
-  /**
-   *  @brief Activate or deactivate a certain service
-   *
-   *  This will show or hide the editor properties pages for the respective service.
-   */
-  void activate_service (const lay::PluginDeclaration *pd, bool active);
+  void commit_recent (lay::LayoutView *view);
 }
 
 #endif

@@ -33,6 +33,8 @@
 
 #include <vector>
 
+class QLineEdit;
+
 namespace edt
 {
 

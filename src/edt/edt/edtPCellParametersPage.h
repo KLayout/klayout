@@ -25,6 +25,7 @@
 #define HDR_edtPCellParametersPage
 
 #include "dbPCellDeclaration.h"
+#include "tlDeferredExecution.h"
 
 #include <QFrame>
 #include <QScrollArea>
@@ -42,7 +43,7 @@ namespace edt
  *  @brief A QScrollArea that displays and allows editing PCell parameters
  */
 class PCellParametersPage
-  : public QFrame
+  : public QFrame, public tl::Object
 {
 Q_OBJECT
 
@@ -54,31 +55,28 @@ public:
     bool valid;
     int hScrollPosition;
     int vScrollPosition;
+    QString focusWidget;
   };
-
-  /**
-   *  @brief Constructor: creates a page showing the given parameters
-   *
-   *  @param parent The parent widget
-   *  @param layout The layout in which the PCell instance resides
-   *  @param view The layout view from which to take layers for example
-   *  @param cv_index The index of the cellview in "view"
-   *  @param pcell_decl The PCell declaration
-   *  @param parameters The parameter values to show (if empty, the default values are used)
-   */
-  PCellParametersPage (QWidget *parent, const db::Layout *layout, lay::LayoutView *view, int cv_index, const db::PCellDeclaration *pcell_decl, const db::pcell_parameters_type &parameters);
 
   /**
    *  @brief Default constructor
    *
    *  Use "setup" to configure the page.
+   *
+   *  @param dense Use a dense layout if true
    */
-  PCellParametersPage (QWidget *parent);
+  PCellParametersPage (QWidget *parent, bool dense = false);
 
   /**
-   *  @brief Delayed initialization
+   *  @brief initialization
    *
    *  Use this method to setup when the arguments are not available in the constructor
+   *
+   *  @param layout The layout in which the PCell instance resides
+   *  @param view The layout view from which to take layers for example
+   *  @param cv_index The index of the cellview in "view"
+   *  @param pcell_decl The PCell declaration
+   *  @param parameters The parameter values to show (if empty, the default values are used)
    */
   void setup (const db::Layout *layout, lay::LayoutView *view, int cv_index, const db::PCellDeclaration *pcell_decl, const db::pcell_parameters_type &parameters);
 
@@ -94,8 +92,12 @@ public:
 
   /**
    *  @brief Get the current parameters
+   *
+   *  *ok is set to true, if there is no error. In case of an error it's set to false.
+   *  The error is indicated in the error label in the editor page.
+   *  If ok is null, an exception is thrown.
    */
-  std::vector<tl::Variant> get_parameters ();
+  std::vector<tl::Variant> get_parameters (bool *ok = 0);
 
   /**
    *  @brief Get the PCell declaration pointer
@@ -110,10 +112,12 @@ public:
    */
   void set_parameters (const  std::vector<tl::Variant> &values);
 
-public slots:
-  void activated ();
-  void clicked ();
-  
+signals:
+  void edited ();
+
+private slots:
+  void parameter_changed ();
+
 private:
   QScrollArea *mp_parameters_area;
   QLabel *mp_error_label;
@@ -124,8 +128,11 @@ private:
   lay::LayoutView *mp_view;
   int m_cv_index;
   db::pcell_parameters_type m_parameters;
+  bool m_dense;
+  tl::DeferredMethod<PCellParametersPage> dm_parameter_changed;
 
   void init ();
+  void do_parameter_changed ();
 };
 
 }

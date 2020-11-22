@@ -1,4 +1,17 @@
 
+0.26.9          (2020-11-22):
+
+* Bugfix: %GITHUB%/issues/658
+      Menu items were not put into the right place on MacOS.
+* Bugfix: %GITHUB%/issues/652
+      "M" factor scaling was not working for Spice reader.
+* Bugfix: %GITHUB%/issues/651
+      Fixed an issue with DRC "select".
+* Bugfix: Display bug
+      Cell placements with small magnification factors (such that the
+      viewport dimensions exceeded the DBU space when seem from inside
+      the cell) lead to display errors.
+
 0.26.8          (2020-09-15):
 
 * Enhancement: %GITHUB%/issues/639

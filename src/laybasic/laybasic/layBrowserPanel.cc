@@ -110,6 +110,11 @@ BrowserPanel::init ()
   mp_ui = new Ui::BrowserPanel ();
   mp_ui->setupUi (this);
 
+#if QT_VERSION >= 0x050200
+  mp_ui->on_page_search_edit->setClearButtonEnabled (true);
+  mp_ui->search_edit->setClearButtonEnabled (true);
+#endif
+
   mp_ui->browser->setReadOnly (true);
   mp_ui->browser->set_panel (this);
   mp_ui->browser->setWordWrapMode (QTextOption::WordWrap);
@@ -147,7 +152,9 @@ BrowserPanel::init ()
   connect (mp_ui->browser_bookmark_view, SIGNAL (itemDoubleClicked (QTreeWidgetItem *, int)), this, SLOT (bookmark_item_selected (QTreeWidgetItem *)));
 
   mp_completer = new QCompleter (this);
+#if QT_VERSION >= 0x050200
   mp_completer->setFilterMode (Qt::MatchStartsWith);
+#endif
   mp_completer->setCaseSensitivity (Qt::CaseInsensitive);
   mp_completer->setCompletionMode (QCompleter::UnfilteredPopupCompletion);
   mp_completer_model = new QStringListModel (mp_completer);

@@ -160,10 +160,10 @@ equals(HAVE_QT, "0") {
 } else {
 
   DEFINES += HAVE_QT
-  QT += core network xml sql widgets
+  QT += core network xml sql
 
   equals(HAVE_QT5, "1") {
-    QT += designer printsupport
+    QT += designer printsupport widgets
     equals(HAVE_QTBINDINGS, "1") {
       QT += multimedia multimediawidgets xmlpatterns svg gui
     }

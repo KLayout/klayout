@@ -71,7 +71,11 @@ AuthenticationHandler::authenticationRequired (QNetworkReply *reply, QAuthentica
       //  expect UTF-8 today. So do them a favor and encode UTF8 into Latin1, so it gets valid UTF8 when turned into Latin1 ...
       //  We do this for Digest and Basic as they apparently both use Latin 1 encoding. But it's unclear whether all servers
       //  expect UTF-8 encoding.
+#if QT_VERSION >= 0x040700
       bool is_basic_or_digest = ! auth->option (QString::fromUtf8 ("realm")).isNull ();
+#else
+      bool is_basic_or_digest = true;
+#endif
       if (is_basic_or_digest) {
         auth->setPassword (QString::fromLatin1 (passwd.c_str ()));
         auth->setUser (QString::fromLatin1 (user.c_str ()));
@@ -98,7 +102,11 @@ AuthenticationHandler::proxyAuthenticationRequired (const QNetworkProxy &proxy, 
       //  expect UTF-8 today. So do them a favor and encode UTF8 into Latin1, so it gets valid UTF8 when turned into Latin1 ...
       //  We do this for Digest and Basic as they apparently both use Latin 1 encoding. But it's unclear whether all servers
       //  expect UTF-8 encoding.
+#if QT_VERSION >= 0x040700
       bool is_basic_or_digest = ! auth->option (QString::fromUtf8 ("realm")).isNull ();
+#else
+      bool is_basic_or_digest = true;
+#endif
       if (is_basic_or_digest) {
         auth->setPassword (QString::fromLatin1 (passwd.c_str ()));
         auth->setUser (QString::fromLatin1 (user.c_str ()));

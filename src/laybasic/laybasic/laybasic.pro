@@ -298,7 +298,7 @@ HEADERS = \
     layDispatcher.h \
     laySelectCellViewForm.h \
     layLayoutStatisticsForm.h \
-    layD25TechnologyComponent.h
+    layD25TechnologyComponent.h \
     layLayoutViewFunctions.h 
 
 INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC

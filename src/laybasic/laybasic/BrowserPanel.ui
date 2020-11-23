@@ -232,11 +232,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="on_page_search_edit">
-               <property name="clearButtonEnabled">
-                <bool>true</bool>
-               </property>
-              </widget>
+              <widget class="QLineEdit" name="on_page_search_edit"/>
              </item>
              <item>
               <widget class="QToolButton" name="search_close_button">
@@ -430,9 +426,6 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="clearButtonEnabled">
-      <bool>true</bool>
      </property>
     </widget>
    </item>

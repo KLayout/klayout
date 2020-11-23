@@ -25,6 +25,7 @@
 #define HDR_layLayerTreeModel
 
 #include "dbBox.h"
+#include "laybasicCommon.h"
 
 #include <vector>
 #include <set>
@@ -77,7 +78,7 @@ private:
  *  representation or a hierarchical one.
  */
 
-class LayerTreeModel 
+class LAYBASIC_PUBLIC LayerTreeModel
   : public QAbstractItemModel
 {
 Q_OBJECT

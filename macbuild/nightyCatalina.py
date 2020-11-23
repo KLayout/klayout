@@ -10,7 +10,7 @@ import platform
 import optparse
 import subprocess
 
-Variation = [ 'std', 'ports', 'brew', 'ana3' ]
+Variation = [ 'std', 'ports', 'brew', 'brewHW', 'ana3' ]
 
 Usage  = "\n"
 Usage += "------------------------------------------------------------------------------------------\n"
@@ -103,14 +103,15 @@ def BuildDeploy():
   PyBuild = "./build4mac.py"
 
   Build = dict()
-  Build["std"]   = [ '-q', 'Qt5MacPorts', '-r', 'sys',  '-p', 'sys'  ]
-  Build["ports"] = [ '-q', 'Qt5MacPorts', '-r', 'MP26', '-p', 'MP37' ]
-  Build["brew"]  = [ '-q', 'Qt5Brew',     '-r', 'HB27', '-p', 'HB37' ]
-  Build["ana3"]  = [ '-q', 'Qt5Ana3',     '-r', 'Ana3', '-p', 'Ana3' ]
+  Build["std"]    = [ '-q', 'Qt5MacPorts', '-r', 'sys',  '-p', 'sys'  ]
+  Build["ports"]  = [ '-q', 'Qt5MacPorts', '-r', 'MP27', '-p', 'MP38' ]
+  Build["brew"]   = [ '-q', 'Qt5Brew',     '-r', 'HB27', '-p', 'HB38' ]
+  Build["brewHW"] = [ '-q', 'Qt5Brew',     '-r', 'sys',  '-p', 'HB38' ]
+  Build["ana3"]   = [ '-q', 'Qt5Ana3',     '-r', 'Ana3', '-p', 'Ana3' ]
 
   for key in Variation:
     command1 = [ PyBuild ] + Build[key]
-    if key == "std":
+    if key in [ "std", "brewHW" ] :
       command2 = [ PyBuild ] + Build[key] + ['-y']
     else:
       command2 = [ PyBuild ] + Build[key] + ['-Y']
@@ -152,10 +153,11 @@ def DMG_Make( srlDMG ):
   Stash = "./DMGStash"
 
   Pack = dict()
-  Pack["std"]   = [ '-p', 'ST-qt5MP.pkg.macos-Catalina-release-RsysPsys',     '-s', '%d' % srlDMG, '-m' ]
-  Pack["ports"] = [ '-p', 'LW-qt5MP.pkg.macos-Catalina-release-Rmp26Pmp37',   '-s', '%d' % srlDMG, '-m' ]
-  Pack["brew"]  = [ '-p', 'LW-qt5Brew.pkg.macos-Catalina-release-Rhb27Phb37', '-s', '%d' % srlDMG, '-m' ]
-  Pack["ana3"]  = [ '-p', 'LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3', '-s', '%d' % srlDMG, '-m' ]
+  Pack["std"]    = [ '-p', 'ST-qt5MP.pkg.macos-Catalina-release-RsysPsys',     '-s', '%d' % srlDMG, '-m' ]
+  Pack["ports"]  = [ '-p', 'LW-qt5MP.pkg.macos-Catalina-release-Rmp27Pmp38',   '-s', '%d' % srlDMG, '-m' ]
+  Pack["brew"]   = [ '-p', 'LW-qt5Brew.pkg.macos-Catalina-release-Rhb27Phb38', '-s', '%d' % srlDMG, '-m' ]
+  Pack["brewHW"] = [ '-p', 'HW-qt5Brew.pkg.macos-Catalina-release-RsysPhb38',  '-s', '%d' % srlDMG, '-m' ]
+  Pack["ana3"]   = [ '-p', 'LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3', '-s', '%d' % srlDMG, '-m' ]
 
   if os.path.isdir( Stash ):
     shutil.rmtree( Stash )
@@ -190,10 +192,11 @@ def DMG_Clean( srlDMG ):
   Stash = "./DMGStash"
 
   Pack = dict()
-  Pack["std"]   = [ '-p', 'ST-qt5MP.pkg.macos-Catalina-release-RsysPsys',     '-s', '%d' % srlDMG, '-c' ]
-  Pack["ports"] = [ '-p', 'LW-qt5MP.pkg.macos-Catalina-release-Rmp26Pmp37',   '-s', '%d' % srlDMG, '-c' ]
-  Pack["brew"]  = [ '-p', 'LW-qt5Brew.pkg.macos-Catalina-release-Rhb27Phb37', '-s', '%d' % srlDMG, '-c' ]
-  Pack["ana3"]  = [ '-p', 'LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3', '-s', '%d' % srlDMG, '-c' ]
+  Pack["std"]    = [ '-p', 'ST-qt5MP.pkg.macos-Catalina-release-RsysPsys',     '-s', '%d' % srlDMG, '-c' ]
+  Pack["ports"]  = [ '-p', 'LW-qt5MP.pkg.macos-Catalina-release-Rmp27Pmp38',   '-s', '%d' % srlDMG, '-c' ]
+  Pack["brew"]   = [ '-p', 'LW-qt5Brew.pkg.macos-Catalina-release-Rhb27Phb38', '-s', '%d' % srlDMG, '-c' ]
+  Pack["brewHW"] = [ '-p', 'HW-qt5Brew.pkg.macos-Catalina-release-RsysPhb38',  '-s', '%d' % srlDMG, '-c' ]
+  Pack["ana3"]   = [ '-p', 'LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3', '-s', '%d' % srlDMG, '-c' ]
 
   if os.path.isdir( Stash ):
     shutil.rmtree( Stash )

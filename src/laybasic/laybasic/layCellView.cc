@@ -59,6 +59,9 @@ LayoutHandle::LayoutHandle (db::Layout *layout, const std::string &filename)
     m_dirty (false),
     m_save_options_valid (false)
 {
+  //  layouts in the managed layouts space participate in spare proxy cleanup
+  layout->do_cleanup (true);
+
   file_watcher ().add_file (m_filename);
 
   if (! m_filename.empty ()) {

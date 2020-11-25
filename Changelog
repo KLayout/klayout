@@ -7,6 +7,8 @@
       "M" factor scaling was not working for Spice reader.
 * Bugfix: %GITHUB%/issues/651
       Fixed an issue with DRC "select".
+* Bugfix: %GITHUB%/issues/647
+      Text orientation was not considered properly in search & replace
 * Bugfix: Display bug
       Cell placements with small magnification factors (such that the
       viewport dimensions exceeded the DBU space when seem from inside

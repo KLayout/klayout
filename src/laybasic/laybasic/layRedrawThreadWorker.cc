@@ -31,6 +31,15 @@ namespace lay
 const int first_snapshot_delay = 20;
 
 // -------------------------------------------------------------
+
+static inline db::Box safe_transformed_box (const db::Box &box, const db::ICplxTrans &t)
+{
+  db::DBox db = db::CplxTrans (t) * box;
+  db &= db::DBox (db::Box::world ());
+  return db::Box (db);
+}
+
+// -------------------------------------------------------------
 //  RedrawThreadWorker implementation 
 
 RedrawThreadWorker::RedrawThreadWorker (RedrawThread *redraw_thread)
@@ -816,7 +825,7 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
 
                   test_snapshot (0);
                   db::ICplxTrans t (cell_inst.complex_trans (*p));
-                  db::Box new_vp = db::Box (t.inverted () * *v);
+                  db::Box new_vp = safe_transformed_box (*v, t.inverted ());
                   draw_boxes (drawing_context, new_ci, trans * t, new_vp, level + 1);
 
                   if (p.quad_id () > 0 && p.quad_id () != qid) {
@@ -990,7 +999,7 @@ RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_ty
               
                   test_snapshot (0); 
                   db::ICplxTrans t (cell_inst.complex_trans (*p));
-                  db::Box new_vp = db::Box (t.inverted () * *v);
+                  db::Box new_vp = safe_transformed_box (*v, t.inverted ());
                   draw_box_properties (drawing_context, new_ci, trans * t, new_vp, level + 1, cell_inst_prop);
 
                 }
@@ -1474,7 +1483,7 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
                         p.index_a () <= 0 || (unsigned long)p.index_a () == amax - 1 || p.index_b () <= 0 || (unsigned long)p.index_b () == bmax - 1) {
 
                       db::ICplxTrans t (cell_inst.complex_trans (*p));
-                      db::Box new_vp = db::Box (t.inverted () * *v);
+                      db::Box new_vp = safe_transformed_box (*v, t.inverted ());
                       draw_text_layer (drawing_context, new_ci, trans * t, new_vp, level + 1, fill, frame, vertex, text, opt_bitmap);
 
                     } 
@@ -1779,7 +1788,7 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
                     p.index_a () <= 0 || (unsigned long)p.index_a () == amax - 1 || p.index_b () <= 0 || (unsigned long)p.index_b () == bmax - 1) {
 
                   db::ICplxTrans t (cell_inst.complex_trans (*p));
-                  db::Box new_vp = db::Box (t.inverted () * *v);
+                  db::Box new_vp = safe_transformed_box (*v, t.inverted ());
                   draw_layer (from_level, to_level, new_ci, trans * t, new_vp, level + 1, fill, frame, vertex, text, update_snapshot);
 
                   if (p.quad_id () > 0 && p.quad_id () != qid) {

@@ -200,7 +200,7 @@ add_orientation_condition (std::string &expr, QComboBox *op, QComboBox *value, c
     expr += attribute;
     expr += " ";
     expr += tl::to_string (op->currentText ());
-    expr += " Trans." + v;
+    expr += " Trans." + v + ".rot";
 
   }
 }
@@ -308,6 +308,7 @@ add_orientation_assignment (std::string &expr, QComboBox *value, const char *att
     expr += attribute;
     expr += " = Trans.";
     expr += v;
+    expr += ".rot";
 
   }
 }

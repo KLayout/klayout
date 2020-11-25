@@ -439,7 +439,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
       appl->add (new ChangeTargetCellApplicator (inst_cell_index));
     }
 
-  } catch (tl::Exception &ex) {
+  } catch (tl::Exception &) {
     has_pcell_error = true;
   }
 

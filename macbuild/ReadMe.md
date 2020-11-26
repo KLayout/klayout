@@ -1,27 +1,28 @@
-Relevant KLayout version: 0.26.7
+Relevant KLayout version: 0.26.9
 
 # 1. Introduction
-This directory **`macbuild`** contains different files required for building KLayout (http://www.klayout.de/) version 0.26.1 or later for different 64-bit Mac OSXs including:
+This directory **`macbuild`** contains different files required for building KLayout (http://www.klayout.de/) version 0.26.1 or later for different 64-bit Mac OSXs, including:
 * El Capitan  (10.11)
 * Sierra      (10.12)
 * High Sierra (10.13)
 * Mojave      (10.14)
-* Catalina    (10.15)
+* Catalina    (10.15) : the primary development environment
+* Big Sur     (11.0)  : under development for the future support
 
 # 2. Qt5 Frameworks
-By default, Qt frameworks are "Qt5" from MacPorts (https://www.macports.org/) which is usually located under:
+By default, the Qt framework is "Qt5" from MacPorts (https://www.macports.org/), which is usually located under:
 ```
 /opt/local/libexec/qt5/
 ```
 
-Alternatively, you can use "Qt5" from Homebrew (https://brew.sh/) which is usually located under:
+Alternatively, you can use "Qt5" from Homebrew (https://brew.sh/), which is usually located under:
 ```
 /usr/local/opt/qt/
 ```
 
    OR
 
-"Qt5" from Anaconda3 (https://www.anaconda.com/) which is usually located under:
+"Qt5" from Anaconda3 (https://www.anaconda.com/), which is usually located under:
 ```
 $HOME/opt/anaconda3/pkgs/qt-{version}
 ```
@@ -41,9 +42,9 @@ $ /usr/bin/ruby -v
 $ /usr/bin/python --version
   Python 2.7.16
 ```
-Even in the latest OS as of today (December 2019), Python 3.x is not bundled with the OS, and this is the main reason why users want non-OS-standard script language support.
+Even in the latest OS (11.0 Big Sur) as of today (November 2020), Python 3.x is not bundled with the OS, which is why users want non-OS-standard script language support.
 
-To meet such a requirement, the build script **`build4mac.py`** provides several possible combinations of Qt5, Ruy and Python module.<br>
+To meet such a requirement, the build script **`build4mac.py`** provides several possible combinations of Qt5, Ruy, and Python module.<br>
 Some typical use cases are described in Section 6.
 
 # 4. Prerequisites
@@ -66,22 +67,24 @@ $ [python] ./build4mac.py
                         :   Qt5MacPorts: use Qt5 from MacPorts                           |
                         :       Qt5Brew: use Qt5 from Homebrew                           |
                         :       Qt5Ana3: use Qt5 from Anaconda3                          |
-   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP26', 'HB27', 'Ana3']   | sys
+   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP27', 'HB27', 'Ana3']   | sys
                         :    nil: don't bind Ruby                                        |
                         :    Sys: use OS-bundled Ruby [2.0 - 2.6] depending on OS        |
-                        :   MP26: use Ruby 2.6 from MacPorts                             |
+                        :   MP27: use Ruby 2.7 from MacPorts                             |
                         :   HB27: use Ruby 2.7 from Homebrew                             |
                         :   Ana3: use Ruby 2.5 from Anaconda3                            |
-   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3']   | sys
+   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3',   | sys
+                        :                        'HBAuto']                               |
                         :    nil: don't bind Python                                      |
-                        :    Sys: use OS-bundled Python 2.7 [ElCapitan -- Catalina]      |
+                        :    Sys: use OS-bundled Python 2.7 [ElCapitan -- BigSur]        |
                         :   MP38: use Python 3.8 from MacPorts                           |
                         :   HB38: use Python 3.8 from Homebrew                           |
-                        :   Ana3: use Python 3.8 from Anaconda3                          |
+                        :   Ana3: use Python 3.7 from Anaconda3                          |
+                        : HBAuto: use the latest Python 3.x auto-detected from Homebrew  |
    [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                      | disabled
    [-m|--make <option>] : option passed to 'make'                                        | '-j4'
    [-d|--debug]         : enable debug mode build                                        | disabled
-   [-c|--checkcom]      : check command line and exit without building                   | disabled
+   [-c|--checkcom]      : check command-line and exit without building                   | disabled
    [-y|--deploy]        : deploy executables and dylibs including Qt's Frameworks        | disabled
    [-Y|--DEPLOY]        : deploy executables and dylibs for those who built KLayout      | disabled
                         : from the source code and use the tools in the same machine     |
@@ -98,7 +101,7 @@ $ [python] ./build4mac.py
 ```
 
 # 6. Use-cases
-In this section, the actual file- and directory names are those obtained on macOS Catalina.<br>
+In this section, the actual file names and directory names are those obtained on macOS Catalina.<br>
 On different OS, those names differ accordingly.
 
 ### 6A. Standard build using the OS-bundled Ruby and Python
@@ -108,40 +111,40 @@ $ cd /where/'build.sh'/exists
 $ ./build4mac.py
 ```
 2. Confirm successful build (it will take about one hour depending on your machine spec).
-3. Run **`build4mac.py`** again with the same options used in 1. PLUS "-y" to deploy executables and libraries (including Qt's frameworks) under **`klayout.app`** bundle.<br>
+3. Run **`build4mac.py`** again with the same options used in 1. PLUS "-y" to deploy executables and libraries (including Qt's framework) under **`klayout.app`** bundle.<br>
    The buddy command-line tools (strm*) will also be deployed in this step.
 ```
 $ ./build4mac.py -y
 ```
   The application bundle **`klayout.app`** is located under:<br>
-  **`ST-qt5MP.pkg.macos-Catalina-release-RsysPsys`** directory, where the three parts below are important.
+  **`ST-qt5MP.pkg.macos-Catalina-release-RsysPsys`** directory, where the three name parts below are important.
 * "ST-"      means that this is a standard package (LW-, HW-, and EX- are other possibilities explained below).
 * "qt5MP"    means that Qt5 from MacPorts is used.
 * "RsysPsys" means that Ruby is OS-bundled; Python is OS-bundled.
 4. Copy/move the generated application bundle **`klayout.app`** to your **`/Applications`** directory for installation.
 
-If you use "-Y" option instead of "-y" in Step-3, Qt5 frameworks is NOT deployed in the application bundle.<br>
+If you use the "-Y" option instead of the "-y" in Step-3, the Qt5 framework is NOT deployed in the application bundle.<br>
 Then the directory name will be **`LW-qt5MP.pkg.macos-Catalina-release-RsysPsys`**, where
 * "LW-" means that this is a lightweight package.
 
-#### If you build KLayout from the source code AND use it on the same machine, "-Y" option is highly recommended. ####
+#### If you build KLayout from the source code AND run it on the same machine, the "-Y" option is highly recommended. ####
 
-### 6B. Fully MacPorts-flavored build with MacPorts Ruby 2.6 and MacPorts Python 3.8
+### 6B. Fully MacPorts-flavored build with MacPorts Ruby 2.7 and MacPorts Python 3.8
 ```
 $ cd /where/'build.sh'/exists
-$ ./build4mac.py -q qt5macports -r mp26 -p mp38
+$ ./build4mac.py -q qt5macports -r mp27 -p mp38
 ```
 2. Confirm successful build (it will take about one hour depending on your machine spec).
 3. Run **`build4mac.py`** again with the same options used in 1. PLUS "-Y" to deploy executables and libraries under **`klayout.app`** bundle.<br>
    The buddy command-line tools (strm*) will also be deployed in this step.
 ```
-$ ./build4mac.py -q qt5macports -r mp26 -p mp38 -Y
+$ ./build4mac.py -q qt5macports -r mp27 -p mp38 -Y
 ```
   The application bundle **`klayout.app`** is located under:<br>
-  **`LW-qt5MP.pkg.macos-Catalina-release-Rmp26Pmp38`** directory, where
+  **`LW-qt5MP.pkg.macos-Catalina-release-Rmp27Pmp38`** directory, where
 * "LW-"        means that this is a lightweight package.
 * "qt5MP"      means that Qt5 from MacPorts is used.
-* "Rmp26Pmp38" means that Ruby is 2.6 from MacPorts; Python is 3.8 from MacPorts.
+* "Rmp27Pmp38" means that Ruby is 2.7 from MacPorts; Python is 3.8 from MacPorts.
 4. Copy/move the generated application bundle **`klayout.app`** to your **`/Applications`** directory for installation.
 
 ### 6C. Fully Homebrew-flavored build with Homebrew Ruby 2.7 and Homebrew Python 3.8
@@ -168,7 +171,7 @@ $ cd /where/'build.sh'/exists
 $ ./build4mac.py -q qt5brew -r sys -p hb38
 ```
 2. Confirm successful build (it will take about one hour depending on your machine spec).
-3. Run **`build4mac.py`** again with the same options used in 1. PLUS "-y" to deploy executables and libraries (including Qt's frameworks and Python frameworks) under **`klayout.app`** bundle.<br>
+3. Run **`build4mac.py`** again with the same options used in 1. PLUS "-y" to deploy executables and libraries (including Qt's framework and Python framework) under **`klayout.app`** bundle.<br>
    The buddy command-line tools (strm*) will also be deployed in this step.
 ```
 $ ./build4mac.py -q qt5brew -r sys -p hb38 -y
@@ -180,8 +183,8 @@ $ ./build4mac.py -q qt5brew -r sys -p hb38 -y
 * "RsysPhb38"  means that Ruby is OS-bundled; Python is 3.8 from Homebrew.
 4. Copy/move the generated application bundle **`klayout.app`** to your **`/Applications`** directory for installation.
 ### Important ###
-So far, deployment of Homebrew Ruby is not supported. <br>
-Therefore, if you intend to use "-y" option, you need to use "-r sys" for building.
+So far, the deployment of Homebrew Ruby is not supported. <br>
+Therefore, if you intend to use the "-y" option for deployment, you need to use the "-r sys" option for building.
 
 ### 6E. Fully Anaconda3-flavored build with Anaconda3 Ruby 2.5 and Anaconda3 Python 3.8
 ```
@@ -225,8 +228,8 @@ $ cd /where/'build.sh'/exists
 $ ./makeDMG4mac.py -p ST-qt5MP.pkg.macos-Catalina-release-RsysPsys -m
 ```
 This command will generate the two files below:<br>
-* **`ST-klayout-0.26.5-macOS-Catalina-1-qt5MP-RsysPsys.dmg`**      ---(1) the main DMG file
-* **`ST-klayout-0.26.5-macOS-Catalina-1-qt5MP-RsysPsys.dmg.md5`**  ---(2) MD5-value text file
+* **`ST-klayout-0.26.9-macOS-Catalina-1-qt5MP-RsysPsys.dmg`**      ---(1) the main DMG file
+* **`ST-klayout-0.26.9-macOS-Catalina-1-qt5MP-RsysPsys.dmg.md5`**  ---(2) MD5-value text file
 
 # Known issues
 Because we assume some specific versions of non-OS-standard Ruby and Python, updating MacPorts, Homebrew, or Anaconda3 may cause build- and link errors.<br>
@@ -234,7 +237,7 @@ In such cases, you need to update the dictionary contents of **`build4mac_env.py
 
 # Final comments
 No need to say, KLayout is a great tool! <br>
-With the object-oriented script language (both Ruby and Python) support, our error-prone jobs can be simplified and speed-up.<br>
+With the object-oriented script language (both Ruby and Python) support, our error-prone jobs can be greatly simplified and speed-up.<br>
 Building KLayout from its source code is not difficult. Try it with your favorite environment!
 
 [End of File]

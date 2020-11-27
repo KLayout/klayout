@@ -103,7 +103,8 @@ Library::unregister_proxy (db::LibraryProxy *lib_proxy, db::Layout *ly)
       db::cell_index_type ci = c->first;
       m_refcount.erase (c);
       //  remove cells which are itself proxies and are no longer used
-      if (layout ().cell (ci).is_proxy () && layout ().cell (ci).parent_cells () == 0) {
+      db::Cell *lib_cell = &layout ().cell (ci);
+      if (lib_cell && lib_cell->is_proxy () && lib_cell->parent_cells () == 0) {
         layout ().delete_cell (ci);
       }
     }
@@ -190,6 +191,7 @@ Library::remap_to (db::Library *other)
 
       if (! pn.first) {
 
+        //  substitute by static layout cell
         std::string name = r->first->cell_name (ci);
         db::Cell *old_cell = r->first->take_cell (ci);
         r->first->insert_cell (ci, name, new db::Cell (*old_cell));
@@ -201,6 +203,7 @@ Library::remap_to (db::Library *other)
         const db::PCellDeclaration *new_pcell_decl = other->layout ().pcell_declaration (pn.second);
         if (! old_pcell_decl || ! new_pcell_decl) {
 
+          //  substitute by static layout cell
           std::string name = r->first->cell_name (ci);
           db::Cell *old_cell = r->first->take_cell (ci);
           r->first->insert_cell (ci, name, new db::Cell (*old_cell));
@@ -229,7 +232,7 @@ Library::remap_to (db::Library *other)
 
       if (! cn.first) {
 
-        //  unlink this proxy
+        //  unlink this proxy: substitute by static layout cell
         std::string name = r->first->cell_name (ci);
         db::Cell *old_cell = r->first->take_cell (ci);
         r->first->insert_cell (ci, name, new db::Cell (*old_cell));

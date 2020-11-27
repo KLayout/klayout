@@ -238,7 +238,12 @@ LibraryProxy::get_basic_name () const
 {
   Library *lib = LibraryManager::instance ().lib (lib_id ());
   if (lib) {
-    return lib->layout ().cell (library_cell_index ()).get_basic_name ();
+    const db::Cell *lib_cell = &lib->layout ().cell (library_cell_index ());
+    if (! lib_cell) {
+      return "<defunct>";
+    } else {
+      return lib_cell->get_basic_name ();
+    }
   } else {
     return Cell::get_basic_name ();
   }
@@ -249,7 +254,12 @@ LibraryProxy::get_display_name () const
 {
   Library *lib = LibraryManager::instance ().lib (lib_id ());
   if (lib) {
-    return lib->get_name () + "." + lib->layout ().cell (library_cell_index ()).get_display_name ();
+    const db::Cell *lib_cell = &lib->layout ().cell (library_cell_index ());
+    if (! lib_cell) {
+      return lib->get_name () + "." + "<defunct>";
+    } else {
+      return lib->get_name () + "." + lib_cell->get_display_name ();
+    }
   } else {
     return Cell::get_display_name ();
   }
@@ -260,7 +270,12 @@ LibraryProxy::get_qualified_name () const
 {
   Library *lib = LibraryManager::instance ().lib (lib_id ());
   if (lib) {
-    return lib->get_name () + "." + lib->layout ().cell (library_cell_index ()).get_qualified_name ();
+    const db::Cell *lib_cell = &lib->layout ().cell (library_cell_index ());
+    if (! lib_cell) {
+      return lib->get_name () + "." + "<defunct>";
+    } else {
+      return lib->get_name () + "." + lib_cell->get_qualified_name ();
+    }
   } else {
     return Cell::get_qualified_name ();
   }

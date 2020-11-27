@@ -9,3 +9,4 @@ include src/plugins/*/*/db_plugin/*.cc
 include src/plugins/*/db_plugin/*.h
 include src/plugins/*/*/db_plugin/*.h
 recursive-include src/plugins/common *.h
+include version.sh

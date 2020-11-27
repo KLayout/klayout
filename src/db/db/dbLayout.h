@@ -537,6 +537,21 @@ public:
   Layout &operator= (const Layout &d);
 
   /**
+   *  @brief Specifies, if the layout participates in cleanup
+   *
+   *  "cleanup" will be called to get rid of top level proxies.
+   *  This flag controls whether cleanup happens or not. Library
+   *  layouts for example must not loose proxies as they might
+   *  themselves be referenced.
+   *
+   *  The default is OFF.
+   */
+  void do_cleanup (bool f)
+  {
+    m_do_cleanup = f;
+  }
+
+  /**
    *  @brief Clear the layout
    */
   void clear ();
@@ -1697,6 +1712,7 @@ private:
   lib_proxy_map m_lib_proxy_map;
   int m_guiding_shape_layer;
   int m_waste_layer;
+  bool m_do_cleanup;
   bool m_editable;
   meta_info m_meta_info;
   tl::Mutex m_lock;

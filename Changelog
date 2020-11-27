@@ -1,6 +1,9 @@
 
-0.26.9          (2020-11-22):
+0.26.9          (2020-11-27):
 
+* Bugfix: %GITHUB%/issues/685
+      A potential crash was fixed happening when a PCell 
+      library is deleted
 * Bugfix: %GITHUB%/issues/658
       Menu items were not put into the right place on MacOS.
 * Bugfix: %GITHUB%/issues/652

@@ -1159,17 +1159,21 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             # >>> pip.main( ['install', 'pandas'] )
             # >>> pip.main( ['install', 'matplotlib'] )
             #----------------------------------------------------------------------------------
-            pip_module = "%s/Versions/%s/lib/python%s/site-packages/pip/__init__.py" % \
-                                     (pythonFrameworkPath, pythonHBVer, pythonHBVer)
-            with open(pip_module, 'r') as pip:
-                buf = pip.readlines()
-            with open(pip_module, 'w') as pip:
-                import re
-                for line in buf:
-                    # this will reject user's configuration of pip, forcing the isolated mode
-                    line = re.sub("return isolated$", "return isolated or True", line)
-                    pip.write(line)
+            # The following was deprecated after (probably) version 19
+            # pip_module = "%s/Versions/%s/lib/python%s/site-packages/pip/__init__.py" % \
+            #                          (pythonFrameworkPath, pythonHBVer, pythonHBVer)
+            # with open(pip_module, 'r') as pip:
+            #     buf = pip.readlines()
+            # with open(pip_module, 'w') as pip:
+            #     import re
+            #     for line in buf:
+            #         # this will reject user's configuration of pip, forcing the isolated mode
+            #         line = re.sub("return isolated$", "return isolated or True", line)
+            #         pip.write(line)
 
+            # The following will remove prefix= setting in distutils.cfg
+            # This will cause all packages to be installed to sys.prefix
+            # By default, it has prefix=/usr/local
             distutilsconfig = "%s/Versions/%s/lib/python%s/distutils/distutils.cfg" % \
                                                 (pythonFrameworkPath, pythonHBVer, pythonHBVer)
             with open(distutilsconfig, 'r') as file:
@@ -1177,7 +1181,6 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             with open(distutilsconfig, 'w') as file:
                 import re
                 for line in buf:
-                    # This will cause all packages to be installed to sys.prefix
                     if re.match('prefix=', line) is not None:
                         continue
                     file.write(line)

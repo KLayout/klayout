@@ -1,9 +1,6 @@
 
 0.26.9          (2020-11-27):
 
-* Bugfix: %GITHUB%/issues/685
-      A potential crash was fixed happening when a PCell 
-      library is deleted
 * Bugfix: %GITHUB%/issues/658
       Menu items were not put into the right place on MacOS.
 * Bugfix: %GITHUB%/issues/652
@@ -12,6 +9,9 @@
       Fixed an issue with DRC "select".
 * Bugfix: %GITHUB%/issues/647
       Text orientation was not considered properly in search & replace
+* Bugfix: %GITHUB%/issues/646
+      A potential crash was fixed happening when a PCell 
+      library is deleted
 * Bugfix: Display bug
       Cell placements with small magnification factors (such that the
       viewport dimensions exceeded the DBU space when seem from inside

@@ -3,7 +3,7 @@
 GITCOMMIT := $(shell git rev-parse --short HEAD)
 KLAYOUT_VERSION := $(shell source version.sh && echo $$KLAYOUT_VERSION)
 ifndef PYTHON_VERSION
-    PYTHON_VERSION := HB38
+    PYTHON_VERSION := HBAuto
 endif
 ifndef MACOS_VERSION
 	MACOS_VERSION := Catalina
@@ -29,6 +29,10 @@ build:
 deploy:
 	@echo "Deploying 4 Mac $(GITCOMMIT)"
 	./build4mac.py -p $(PYTHON_VERSION) -q Qt5Brew -y
+
+deploy-local:
+	@echo "Deploying 4 Mac $(GITCOMMIT) (local)"
+	./build4mac.py -p $(PYTHON_VERSION) -q Qt5Brew -Y
 
 test:
 	@echo "Testing 4 Mac $(GITCOMMIT)"

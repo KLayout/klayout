@@ -1012,7 +1012,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
         # [8] Deploy Qt Frameworks
         #-------------------------------------------------------------
         verbose = " -verbose=%d" % DeployVerbose
-        app_bundle = "klayout.app"
+        app_bundle = "klayout.app"  # do not change this
         options = macdepQtOpt + verbose
         deploytool = parameters['deploy_tool']
 
@@ -1063,26 +1063,16 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             print( " [9] Optional deployment of Python from %s ..." % HBPythonFrameworkPath )
             print( "  [9.1] Copying Python Framework" )
 
-            cmd01 = "rm -rf %s" % pythonFrameworkPath
-            cmd02 = "rsync -a --safe-links %s/ %s" % (HBPythonFrameworkPath, pythonFrameworkPath)
-
-            cmd03 = "rm -rf %s" % testTarget
-            cmd04 = "rm -rf %s" % resourceTarget1
-            cmd05 = "unlink %s" % resourceTarget2
-            cmd06 = "rm -rf %s" % binTarget
-
-            cmd07 = "mkdir %s" % sitepackagesTarget
-            cmd08 = "cp -RL %s/{pip*,pkg_resources,setuptools*,wheel*} %s" % (sitepackagesSource, sitepackagesTarget)
-
-            shell_commands = list()
-            shell_commands.append(cmd01)
-            shell_commands.append(cmd02)
-            shell_commands.append(cmd03)
-            shell_commands.append(cmd04)
-            shell_commands.append(cmd05)
-            shell_commands.append(cmd06)
-            shell_commands.append(cmd07)
-            shell_commands.append(cmd08)
+            shell_commands = [
+                "rm -rf %s" % pythonFrameworkPath,
+                "rsync -a --safe-links %s/ %s" % (HBPythonFrameworkPath, pythonFrameworkPath),
+                "rm -rf %s" % testTarget,
+                # "rm -rf %s" % resourceTarget1,
+                "unlink %s" % resourceTarget2,
+                "rm -rf %s" % binTarget,
+                "mkdir %s" % sitepackagesTarget,
+                "cp -RL %s/{pip*,pkg_resources,setuptools*,wheel*} %s" % (sitepackagesSource, sitepackagesTarget)
+            ]
 
             for command in shell_commands:
                 if subprocess.call( command, shell=True ) != 0:
@@ -1098,8 +1088,14 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             print("  [9.2] Relinking dylib dependencies inside Python.framework" )
             print("   [9.2.1] Patching Python Framework" )
             depdict = WalkFrameworkPaths( pythonFrameworkPath )
-            appPythonFrameworkPath = '@executable_path/../Frameworks/Python.framework/'
+            appPythonFrameworkPath = '@executable_path/../Frameworks/Python.framework'
             PerformChanges(depdict, [(HBPythonFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
+
+            # Create a python executable in MacOS/python
+            shutil.copy2(resourceTarget1 + '/Python.app/Contents/MacOS/Python', bundleExecPathAbs + '/python')
+            klayoutPath = bundleExecPathAbs
+            depdict = WalkFrameworkPaths(klayoutPath, filter_regex=r'python$', search_path_filter=r'\t+/usr/local/Cellar')
+            PerformChanges(depdict, [(os.path.realpath(HBPythonFrameworkPath), appPythonFrameworkPath, False)], bundleExecPathAbs)
 
             print("   [9.2.2] Patching /usr/local/opt/ libs")
             usrLocalPath = '/usr/local/opt/'
@@ -1208,6 +1204,8 @@ def Deploy_Binaries_For_Bundle(config, parameters):
         print( " [8] Skipped deploying Qt's Frameworks and optional Python/Ruby Frameworks..." )
     print( "##### Finished deploying libraries and executables for <klayout.app> #####" )
     print("")
+    print("### klayout.app is located in %s/klayout.app !" % MacPkgDir)
+
     os.chdir(ProjectDir)
     return 0
 
@@ -1227,7 +1225,7 @@ def Main():
 
     if not config['DeploymentF'] and not config['DeploymentP']:
         ret = Run_Build_Command(parameters)
-        pp.pprint(config)
+        # pp.pprint(config)
         if not ret == 0:
             sys.exit(1)
     else:

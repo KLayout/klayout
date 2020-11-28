@@ -1134,13 +1134,19 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             with open(site_module, 'w') as site:
                 import re
                 for line in buf:
-                    # This will fool pip into thinking it's inside a virtual environment
-                    # and install new packages to the correct site-packages
                     if re.match("^PREFIXES", line) is not None:
-                        line = line + "sys.real_prefix = sys.prefix\n"
+                        # This will fool pip into thinking it's inside a virtual environment
+                        # and install new packages to the correct site-packages
+                        # (probably deprecated, but no harm)
+                        line += "sys.real_prefix = sys.prefix\n"
                     # do not allow installation in the user folder.
                     if re.match("^ENABLE_USER_SITE", line) is not None:
                         line = "ENABLE_USER_SITE = False\n"
+                        # Ordinarily, sys.executable points to klayout.app/Contents/MacOS/klayout
+                        # We want it to point to the newly shipped klayout.app/Contents/MacOS/python
+                        # This way, we can launch subprocesses with subprocess.check_call([sys.executable, ...])
+                        line += "sys._base_executable = os.path.join(os.path.split(sys.executable)[0], 'python')\n"
+                        line += "sys.executable = sys._base_executable\n"
                     site.write(line)
 
             #----------------------------------------------------------------------------------

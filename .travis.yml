@@ -297,7 +297,7 @@ matrix:
             - ccache
           update: true
       env:
-        - MATRIX_EVAL="shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
+        - MATRIX_EVAL="shopt -s expand_aliases; alias python='/usr/local/opt/python@3.9/bin/python3'; alias pip='/usr/local/opt/python@3.9/bin/pip3';"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
@@ -316,7 +316,7 @@ matrix:
             - ccache
           update: true
       env:
-        - MATRIX_EVAL="shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
+        - MATRIX_EVAL="shopt -s expand_aliases; alias python='/usr/local/opt/python@3.8/bin/python3'; alias pip='/usr/local/opt/python@3.8/bin/pip3';"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
@@ -335,7 +335,7 @@ matrix:
             - ccache
           update: true
       env:
-        - MATRIX_EVAL="shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
+        - MATRIX_EVAL="shopt -s expand_aliases; alias python='/usr/local/opt/python@3.7/bin/python3'; alias pip='/usr/local/opt/python@3.7/bin/pip3';"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
@@ -354,6 +354,7 @@ matrix:
             - ccache
           update: true
       env:
+        - MATRIX_EVAL="shopt -s expand_aliases; alias python='/usr/local/opt/python@3.9/bin/python3'; alias pip='/usr/local/opt/python@3.9/bin/pip3';"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
@@ -372,6 +373,7 @@ matrix:
             - ccache
           update: true
       env:
+        - MATRIX_EVAL="shopt -s expand_aliases; alias python='/usr/local/opt/python@3.8/bin/python3'; alias pip='/usr/local/opt/python@3.8/bin/pip3';"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
@@ -390,6 +392,7 @@ matrix:
             - ccache
           update: true
       env:
+        - MATRIX_EVAL="shopt -s expand_aliases; alias python='/usr/local/opt/python@3.7/bin/python3'; alias pip='/usr/local/opt/python@3.7/bin/pip3';"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true

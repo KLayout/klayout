@@ -162,37 +162,6 @@ matrix:
         directories:
         - ccache
 
-    - name: "cp34-cp34m-manylinux1_x86_64.whl"
-      os: linux
-      sudo: true
-      language: python
-      python: '3.4'
-      services:
-        - docker
-      env:
-        - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
-        - PY_VERSION="cp34-cp34m"
-        - DOCKER_BUILD=true
-        - TEST_IN_HOST=true
-        - MATRIX_EVAL=""
-      cache:
-        directories:
-        - ccache
-
-    - name: "cp34-cp34m-manylinux1_i686.whl"
-      os: linux
-      sudo: true
-      services:
-        - docker
-      env:
-        - DOCKER_IMAGE="quay.io/pypa/manylinux1_i686"
-        - PY_VERSION="cp34-cp34m"
-        - DOCKER_BUILD=true
-        - MATRIX_EVAL=""
-      cache:
-        directories:
-        - ccache
-
     - name: "cp27-cp27mu-manylinux1_x86_64.whl"
       os: linux
       sudo: true

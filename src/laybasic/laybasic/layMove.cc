@@ -167,7 +167,7 @@ MoveService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool 
     return true;
   } 
   if (prio && (buttons & lay::LeftButton) != 0) {
-    if (handle_dragging (p, buttons, false, 0)) {
+    if (handle_click (p, buttons, false, 0)) {
       return true;
     }
   } 
@@ -184,10 +184,17 @@ bool
 MoveService::mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (prio) {
+
+    //  stop dragging if required
+    if (m_dragging) {
+      handle_click (p, buttons, false, 0);
+    }
+
     lay::SelectionService *selector = mp_view->selection_service ();
     if (selector) {
       return selector->mouse_double_click_event (p, buttons, prio);
     }
+
   }
   return false;
 }
@@ -220,7 +227,7 @@ bool
 MoveService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (prio && (buttons & lay::LeftButton) != 0) {
-    if (handle_dragging (p, buttons, false, 0)) {
+    if (handle_click (p, buttons, false, 0)) {
       return true;
     }
   } 
@@ -273,11 +280,11 @@ MoveService::begin_move (db::Transaction *transaction, bool selected_after_move)
     pstart.set_y (std::min (pstart.y (), bbox.p2 ().y ()));
   }
 
-  return handle_dragging (pstart, 0, drag_transient, trans_holder.release ());
+  return handle_click (pstart, 0, drag_transient, trans_holder.release ());
 }
 
 bool 
-MoveService::handle_dragging (const db::DPoint &p, unsigned int buttons, bool drag_transient, db::Transaction *transaction)
+MoveService::handle_click (const db::DPoint &p, unsigned int buttons, bool drag_transient, db::Transaction *transaction)
 {
   std::auto_ptr<db::Transaction> trans_holder (transaction);
 

@@ -628,9 +628,14 @@ public:
   void insert (const db::Edge &e, property_type p = 0);
 
   /**
-   *  @brief Insert an polygon 
+   *  @brief Insert a polygon
    */
   void insert (const db::Polygon &q, property_type p = 0);
+
+  /**
+   *  @brief Insert a polygon reference
+   */
+  void insert (const db::PolygonRef &q, property_type p = 0);
 
   /**
    *  @brief Insert a sequence of edges

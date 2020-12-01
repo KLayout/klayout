@@ -989,9 +989,9 @@ protected:
     }
   }
 
-  virtual db::Coord dist () const;
-  virtual typename local_operation<TS, TI, TR>::on_empty_intruder_mode on_empty_intruder_hint () const;
-  virtual std::string description () const;
+  virtual db::Coord dist () const { return mp_node->dist (); }
+  // @@@ TODO: virtual typename local_operation<TS, TI, TR>::on_empty_intruder_mode on_empty_intruder_hint () const { return mp_node->on_empty_intruder_hint (); }
+  virtual std::string description () const { return mp_node->description (); }
 
   const TransformationReducer *vars () const { return mp_node->vars (); }
   bool wants_variants () const { return mp_node->wants_variants (); }

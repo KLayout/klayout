@@ -1034,7 +1034,15 @@ EdgeProcessor::insert (const db::Polygon &q, EdgeProcessor::property_type p)
   }
 }
 
-void 
+void
+EdgeProcessor::insert (const db::PolygonRef &q, EdgeProcessor::property_type p)
+{
+  for (db::PolygonRef::polygon_edge_iterator e = q.begin_edge (); ! e.at_end (); ++e) {
+    insert (*e, p);
+  }
+}
+
+void
 EdgeProcessor::clear ()
 {
   mp_work_edges->clear ();

@@ -290,9 +290,7 @@ void interacting_local_operation<TS, TI, TR>::compute_local (db::Layout * /*layo
   if (m_min_count == size_t (1) && m_max_count == std::numeric_limits<size_t>::max ()) {
 
     for (typename std::set<TI>::const_iterator o = others.begin (); o != others.end (); ++o) {
-      for (typename TI::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
-        ep.insert (*e, nstart);
-      }
+      ep.insert (*o, nstart);
     }
     nstart++;
 
@@ -301,9 +299,7 @@ void interacting_local_operation<TS, TI, TR>::compute_local (db::Layout * /*layo
     tl_assert (m_mode == 0);
 
     for (typename std::set<TI>::const_iterator o = others.begin (); o != others.end (); ++o) {
-      for (typename TI::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
-        ep.insert (*e, nstart);
-      }
+      ep.insert (*o, nstart);
       nstart++;
     }
 
@@ -312,9 +308,7 @@ void interacting_local_operation<TS, TI, TR>::compute_local (db::Layout * /*layo
   size_t n = nstart;
   for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i, ++n) {
     const TS &subject = interactions.subject_shape (i->first);
-    for (typename TS::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
-      ep.insert (*e, n);
-    }
+    ep.insert (subject, n);
   }
 
   db::InteractionDetector id (m_mode, 0);
@@ -364,6 +358,7 @@ std::string interacting_local_operation<TS, TI, TR>::description () const
 //  explicit instantiations
 template class interacting_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class interacting_local_operation<db::Polygon, db::Polygon, db::Polygon>;
+template class interacting_local_operation<db::Polygon, db::Edge, db::Polygon>;
 
 // ---------------------------------------------------------------------------------------------------------------
 

@@ -72,6 +72,12 @@ CompoundRegionOperationNode::set_description (const std::string &d)
   m_description = d;
 }
 
+std::string
+CompoundRegionOperationNode::generated_description () const
+{
+  return std::string ();
+}
+
 // ---------------------------------------------------------------------------------------------
 
 static void translate (db::Layout *layout, const std::vector<std::unordered_set<db::Polygon> > &in, std::vector<std::unordered_set<db::PolygonRef> > &out)
@@ -845,6 +851,11 @@ void compound_region_generic_operation_node<TS, TI, TR>::implement_compute_local
   adaptor.finish (layout);
 }
 
+//  explicit instantiations
+template void compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon>::implement_compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::PolygonRef> &, std::vector<std::unordered_set<db::PolygonRef> > &, size_t, double) const;
+template void compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon>::implement_compute_local (db::Layout *, const shape_interactions<db::Polygon, db::Polygon> &, std::vector<std::unordered_set<db::Polygon> > &, size_t, double) const;
+template void compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon>::implement_compute_local (db::Layout *, const shape_interactions<db::Polygon, db::Edge> &, std::vector<std::unordered_set<db::Polygon> > &, size_t, double) const;
+template void compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon>::implement_compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::Edge> &, std::vector<std::unordered_set<db::PolygonRef> > &, size_t, double) const;
 
 // ---------------------------------------------------------------------------------------------
 

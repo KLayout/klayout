@@ -62,7 +62,7 @@ private:
   virtual void drag_cancel ();
   virtual void deactivated ();
 
-  bool handle_dragging (const db::DPoint &p, unsigned int buttons, bool drag_transient, db::Transaction *transaction);
+  bool handle_click (const db::DPoint &p, unsigned int buttons, bool drag_transient, db::Transaction *transaction);
 
   bool m_dragging;
   bool m_dragging_transient;

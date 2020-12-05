@@ -64,6 +64,9 @@ public:
   std::string description () const;
   void set_description (const std::string &d);
 
+  //  NOTE: it's probably going to be difficult to compute a different value here:
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const { return OnEmptyIntruderHint::Ignore; }
+
   virtual db::Coord dist () const = 0;
   virtual std::vector<db::Region *> inputs () const = 0;
 
@@ -990,7 +993,7 @@ protected:
   }
 
   virtual db::Coord dist () const { return mp_node->dist (); }
-  // @@@ TODO: virtual typename local_operation<TS, TI, TR>::on_empty_intruder_mode on_empty_intruder_hint () const { return mp_node->on_empty_intruder_hint (); }
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const { return mp_node->on_empty_intruder_hint (); }
   virtual std::string description () const { return mp_node->description (); }
 
   const TransformationReducer *vars () const { return mp_node->vars (); }

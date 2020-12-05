@@ -511,7 +511,7 @@ public:
     }
   }
 
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const
   {
     if (m_inverse) {
       return Copy;
@@ -594,7 +594,7 @@ public:
     scanner.process (filter, 1, db::box_convert<db::TextRef> (), db::box_convert<db::Polygon> ());
   }
 
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const
   {
     return Drop;
   }

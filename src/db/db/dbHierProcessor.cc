@@ -1787,7 +1787,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
         subject_id0 = id;
       }
 
-      if (op->on_empty_intruder_hint () != local_operation<TS, TI, TR>::Drop) {
+      if (op->on_empty_intruder_hint () != OnEmptyIntruderHint::Drop) {
         const TS *ref = i->basic_ptr (typename TS::tag ());
         interactions.add_subject (id, *ref);
       }
@@ -1856,8 +1856,8 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
     if (interactions.begin_intruders () == interactions.end_intruders ()) {
 
-      typename local_operation<TS, TI, TR>::on_empty_intruder_mode eh = op->on_empty_intruder_hint ();
-      if (eh == local_operation<TS, TI, TR>::Drop) {
+      OnEmptyIntruderHint eh = op->on_empty_intruder_hint ();
+      if (eh == OnEmptyIntruderHint::Drop) {
         return;
       }
 
@@ -2022,7 +2022,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
   tl_assert (mp_intruder_top == 0);
 
   shape_interactions<TS, TI> interactions;
-  bool needs_isolated_subjects = (op->on_empty_intruder_hint () != local_operation<TS, TI, TR>::Drop);
+  bool needs_isolated_subjects = (op->on_empty_intruder_hint () != OnEmptyIntruderHint::Drop);
 
   for (typename std::vector<generic_shape_iterator<TI> >::const_iterator il = intruders.begin (); il != intruders.end (); ++il) {
     if (*il == subjects) {
@@ -2036,8 +2036,8 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
     if (interactions.begin_intruders () == interactions.end_intruders ()) {
 
-      typename local_operation<TS, TI, TR>::on_empty_intruder_mode eh = op->on_empty_intruder_hint ();
-      if (eh == local_operation<TS, TI, TR>::Drop) {
+      OnEmptyIntruderHint eh = op->on_empty_intruder_hint ();
+      if (eh == OnEmptyIntruderHint::Drop) {
         return;
       }
 

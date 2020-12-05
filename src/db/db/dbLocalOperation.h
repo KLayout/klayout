@@ -40,6 +40,26 @@ namespace db
 template <class TS, class TI> class shape_interactions;
 
 /**
+ *  @brief Indicates the desired behaviour for subject shapes for which there is no intruder
+ */
+enum OnEmptyIntruderHint {
+  /**
+   *  @brief Don't imply a specific behaviour
+   */
+  Ignore = 0,
+
+  /**
+   *  @brief Copy the subject shape
+   */
+  Copy,
+
+  /**
+   *  @brief Drop the subject shape
+   */
+  Drop
+};
+
+/**
  *  @brief A base class for "local operations"
  *  A local operation is any operation whose result can be computed by
  *  combining the results derived from individual shape pairs.
@@ -54,26 +74,6 @@ template <class TS, class TI, class TR>
 class DB_PUBLIC local_operation
 {
 public:
-  /**
-   *  @brief Indicates the desired behaviour for subject shapes for which there is no intruder
-   */
-  enum on_empty_intruder_mode {
-    /**
-     *  @brief Don't imply a specific behaviour
-     */
-    Ignore = 0,
-
-    /**
-     *  @brief Copy the subject shape
-     */
-    Copy,
-
-    /**
-     *  @brief Drop the subject shape
-     */
-    Drop
-  };
-
   /**
    *  @brief Constructor
    */
@@ -95,7 +95,7 @@ public:
   /**
    *  @brief Indicates the desired behaviour when a shape does not have an intruder
    */
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const { return Ignore; }
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const { return Ignore; }
 
   /**
    *  @brief Gets a description text for this operation
@@ -119,7 +119,7 @@ public:
   BoolAndOrNotLocalOperation (bool is_and);
 
   virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &result, size_t max_vertex_count, double area_ratio) const;
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
 private:
@@ -154,7 +154,7 @@ public:
   SelfOverlapMergeLocalOperation (unsigned int wrap_count);
 
   virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &result, size_t max_vertex_count, double area_ratio) const;
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
 private:
@@ -171,7 +171,7 @@ public:
   EdgeBoolAndOrNotLocalOperation (EdgeBoolOp op);
 
   virtual void compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &result, size_t max_vertex_count, double area_ratio) const;
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
   //  edge interaction distance is 1 to force overlap between edges and edge/boxes
@@ -194,7 +194,7 @@ public:
   EdgeToPolygonLocalOperation (bool outside, bool include_borders);
 
   virtual void compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &result, size_t max_vertex_count, double area_ratio) const;
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
   //  edge interaction distance is 1 to force overlap between edges and edge/boxes

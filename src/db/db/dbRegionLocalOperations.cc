@@ -238,10 +238,10 @@ check_local_operation<TS, TI, TR>::dist () const
 }
 
 template <class TS, class TI, class TR>
-typename db::local_operation<TS, TI, TR>::on_empty_intruder_mode
+OnEmptyIntruderHint
 check_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
 {
-  return m_different_polygons ? db::local_operation<TS, TI, TR>::Drop : db::local_operation<TS, TI, TR>::Ignore;
+  return m_different_polygons ? OnEmptyIntruderHint::Drop : OnEmptyIntruderHint::Ignore;
 }
 
 template <class TS, class TI, class TR>
@@ -339,13 +339,13 @@ void interacting_local_operation<TS, TI, TR>::compute_local (db::Layout * /*layo
 }
 
 template <class TS, class TI, class TR>
-typename local_operation<TS, TI, TR>::on_empty_intruder_mode
+OnEmptyIntruderHint
 interacting_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
 {
   if ((m_mode <= 0) != m_inverse) {
-    return local_operation<TS, TI, TR>::Drop;
+    return OnEmptyIntruderHint::Drop;
   } else {
-    return local_operation<TS, TI, TR>::Copy;
+    return OnEmptyIntruderHint::Copy;
   }
 }
 
@@ -424,9 +424,9 @@ void pull_local_operation<TS, TI, TR>::compute_local (db::Layout * /*layout*/, c
 }
 
 template <class TS, class TI, class TR>
-typename local_operation<TS, TI, TR>::on_empty_intruder_mode pull_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
+OnEmptyIntruderHint pull_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
 {
-  return local_operation<TS, TI, TR>::Drop;
+  return OnEmptyIntruderHint::Drop;
 }
 
 template <class TS, class TI, class TR>
@@ -506,12 +506,12 @@ void interacting_with_edge_local_operation<TS, TI, TR>::compute_local (db::Layou
 }
 
 template <class TS, class TI, class TR>
-typename local_operation<TS, TI, TR>::on_empty_intruder_mode interacting_with_edge_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
+OnEmptyIntruderHint interacting_with_edge_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
 {
   if (!m_inverse) {
-    return local_operation<TS, TI, TR>::Drop;
+    return OnEmptyIntruderHint::Drop;
   } else {
-    return local_operation<TS, TI, TR>::Copy;
+    return OnEmptyIntruderHint::Copy;
   }
 }
 
@@ -571,9 +571,9 @@ void pull_with_edge_local_operation<TS, TI, TR>::compute_local (db::Layout *layo
 }
 
 template <class TS, class TI, class TR>
-typename local_operation<TS, TI, TR>::on_empty_intruder_mode pull_with_edge_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
+OnEmptyIntruderHint pull_with_edge_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
 {
-  return local_operation<TS, TI, TR>::Drop;
+  return OnEmptyIntruderHint::Drop;
 }
 
 template <class TS, class TI, class TR>
@@ -638,9 +638,9 @@ void pull_with_text_local_operation<TS, TI, TR>::compute_local (db::Layout *layo
 }
 
 template <class TS, class TI, class TR>
-typename local_operation<TS, TI, TR>::on_empty_intruder_mode pull_with_text_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
+OnEmptyIntruderHint pull_with_text_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
 {
-  return local_operation<TS, TI, TR>::Drop;
+  return OnEmptyIntruderHint::Drop;
 }
 
 template <class TS, class TI, class TR>
@@ -719,12 +719,12 @@ void interacting_with_text_local_operation<TS, TI, TR>::compute_local (db::Layou
 }
 
 template <class TS, class TI, class TR>
-typename local_operation<TS, TI, TR>::on_empty_intruder_mode interacting_with_text_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
+OnEmptyIntruderHint interacting_with_text_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
 {
   if (!m_inverse) {
-    return local_operation<TS, TI, TR>::Drop;
+    return OnEmptyIntruderHint::Drop;
   } else {
-    return local_operation<TS, TI, TR>::Copy;
+    return OnEmptyIntruderHint::Copy;
   }
 }
 

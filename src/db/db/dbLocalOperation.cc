@@ -46,7 +46,7 @@ BoolAndOrNotLocalOperation::BoolAndOrNotLocalOperation (bool is_and)
   //  .. nothing yet ..
 }
 
-local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>::on_empty_intruder_mode
+OnEmptyIntruderHint
 BoolAndOrNotLocalOperation::on_empty_intruder_hint () const
 {
   return m_is_and ? Drop : Copy;
@@ -251,7 +251,7 @@ SelfOverlapMergeLocalOperation::compute_local (db::Layout *layout, const shape_i
   ep.process (pg, op);
 }
 
-SelfOverlapMergeLocalOperation::on_empty_intruder_mode SelfOverlapMergeLocalOperation::on_empty_intruder_hint () const
+OnEmptyIntruderHint SelfOverlapMergeLocalOperation::on_empty_intruder_hint () const
 {
   return m_wrap_count > 1 ? Drop : Copy;
 }
@@ -270,7 +270,7 @@ EdgeBoolAndOrNotLocalOperation::EdgeBoolAndOrNotLocalOperation (EdgeBoolOp op)
   //  .. nothing yet ..
 }
 
-local_operation<db::Edge, db::Edge, db::Edge>::on_empty_intruder_mode
+OnEmptyIntruderHint
 EdgeBoolAndOrNotLocalOperation::on_empty_intruder_hint () const
 {
   return (m_op == EdgeAnd || m_op == EdgeIntersections) ? Drop : Copy;
@@ -349,7 +349,7 @@ EdgeToPolygonLocalOperation::EdgeToPolygonLocalOperation (bool outside, bool inc
   //  .. nothing yet ..
 }
 
-local_operation<db::Edge, db::PolygonRef, db::Edge>::on_empty_intruder_mode
+OnEmptyIntruderHint
 EdgeToPolygonLocalOperation::on_empty_intruder_hint () const
 {
   return m_outside ? Copy : Drop;

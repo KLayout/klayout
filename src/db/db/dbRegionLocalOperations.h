@@ -42,7 +42,7 @@ public:
   virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
 
   virtual db::Coord dist () const;
-  virtual typename local_operation<TS, TI, TR>::on_empty_intruder_mode on_empty_intruder_hint () const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
 private:
@@ -64,7 +64,7 @@ public:
 
   virtual db::Coord dist () const;
   virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
-  virtual typename local_operation<TS, TI, TR>::on_empty_intruder_mode on_empty_intruder_hint () const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
 private:
@@ -85,7 +85,7 @@ public:
 
   virtual db::Coord dist () const;
   virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
-  virtual typename local_operation<TS, TI, TR>::on_empty_intruder_mode on_empty_intruder_hint () const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
 private:
@@ -104,7 +104,7 @@ public:
 
   virtual db::Coord dist () const;
   virtual void compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
-  virtual typename local_operation<TS, TI, TR>::on_empty_intruder_mode on_empty_intruder_hint () const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
 private:
@@ -123,7 +123,7 @@ public:
 
   virtual db::Coord dist () const;
   virtual void compute_local (db::Layout *, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
-  virtual typename local_operation<TS, TI, TR>::on_empty_intruder_mode on_empty_intruder_hint () const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 };
 
@@ -138,7 +138,7 @@ public:
 
   virtual db::Coord dist () const;
   virtual void compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
-  virtual typename local_operation<TS, TI, TR>::on_empty_intruder_mode on_empty_intruder_hint () const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
 private:
@@ -157,7 +157,7 @@ public:
 
   virtual db::Coord dist () const;
   virtual void compute_local (db::Layout *, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
-  virtual typename local_operation<TS, TI, TR>::on_empty_intruder_mode on_empty_intruder_hint () const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 };
 

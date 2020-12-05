@@ -21,6 +21,7 @@
 */
 
 #include "gsiDecl.h"
+#include "gsiEnums.h"
 
 #include "dbCompoundOperation.h"
 
@@ -345,6 +346,115 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   "@brief A base class for compound operations\n"
   "\n"
   "This class has been introduced in version 0.27."
+);
+
+gsi::EnumIn<db::CompoundRegionOperationNode, db::CompoundRegionLogicalBoolOperationNode::LogicalOp> decl_dbCompoundRegionLogicalBoolOperationNode_LogicalOp ("db", "LogicalOp",
+  gsi::enum_const ("And", db::CompoundRegionLogicalBoolOperationNode::LogicalOp::And,
+    "@brief Indicates a logical '&&' (and)."
+  ) +
+  gsi::enum_const ("Or", db::CompoundRegionLogicalBoolOperationNode::LogicalOp::Or,
+    "@brief Indicates a logical '||' (or)."
+  ),
+  "@brief This class represents the CompoundRegionOperationNode::LogicalOp enum\n"
+  "\n"
+  "This enum has been introduced in version 0.27."
+);
+
+gsi::EnumIn<db::CompoundRegionOperationNode, db::CompoundRegionGeometricalBoolOperationNode::GeometricalOp> decl_dbCompoundRegionGeometricalBoolOperationNode_GeometricalOp ("db", "GeometricalOp",
+  gsi::enum_const ("And", db::CompoundRegionGeometricalBoolOperationNode::GeometricalOp::And,
+    "@brief Indicates a geometrical '&' (and)."
+  ) +
+  gsi::enum_const ("Not", db::CompoundRegionGeometricalBoolOperationNode::GeometricalOp::Not,
+    "@brief Indicates a geometrical '-' (not)."
+  ) +
+  gsi::enum_const ("Xor", db::CompoundRegionGeometricalBoolOperationNode::GeometricalOp::Xor,
+    "@brief Indicates a geometrical '^' (xor)."
+  ) +
+  gsi::enum_const ("Or", db::CompoundRegionGeometricalBoolOperationNode::GeometricalOp::Or,
+    "@brief Indicates a geometrical '|' (or)."
+  ),
+  "@brief This class represents the CompoundRegionOperationNode::GeometricalOp enum\n"
+  "\n"
+  "This enum has been introduced in version 0.27."
+);
+
+gsi::EnumIn<db::CompoundRegionOperationNode, db::CompoundRegionOperationNode::ResultType> decl_dbCompoundRegionOperationNode_ResultType ("db", "ResultType",
+  gsi::enum_const ("Region", db::CompoundRegionOperationNode::ResultType::Region,
+    "@brief Indicates polygon result type."
+  ) +
+  gsi::enum_const ("Edges", db::CompoundRegionOperationNode::ResultType::Edges,
+    "@brief Indicates edge result type."
+  ) +
+  gsi::enum_const ("EdgePairs", db::CompoundRegionOperationNode::ResultType::EdgePairs,
+    "@brief Indicates edge pair result type."
+  ),
+  "@brief This class represents the CompoundRegionOperationNode::ResultType enum\n"
+  "\n"
+  "This enum has been introduced in version 0.27."
+);
+
+gsi::Enum<db::TrapezoidDecompositionMode> decl_dbTrapezoidDecompositionMode ("db", "TrapezoidDecompositionMode",
+  gsi::enum_const ("TD_simple", db::TrapezoidDecompositionMode::TD_simple,
+    "@brief Indicates unspecific decomposition."
+  ) +
+  gsi::enum_const ("TD_htrapezoids", db::TrapezoidDecompositionMode::TD_htrapezoids,
+    "@brief Indicates horizontal trapezoid decomposition."
+  ) +
+  gsi::enum_const ("TD_vtrapezoids", db::TrapezoidDecompositionMode::TD_vtrapezoids,
+    "@brief Indicates vertical trapezoid decomposition."
+  ),
+  "@brief This class represents the TrapezoidDecompositionMode enum used within trapezoid decomposition\n"
+  "\n"
+  "This enum has been introduced in version 0.27."
+);
+
+gsi::Enum<db::PreferredOrientation> decl_dbPreferredOrientation ("db", "PreferredOrientation",
+  gsi::enum_const ("PO_any", db::PreferredOrientation::PO_any,
+    "@brief Indicates any orientation."
+  ) +
+  gsi::enum_const ("PO_horizontal", db::PreferredOrientation::PO_horizontal,
+    "@brief Indicates horizontal orientation."
+  ) +
+  gsi::enum_const ("PO_vertical", db::PreferredOrientation::PO_vertical,
+    "@brief Indicates vertical orientation."
+  ) +
+  gsi::enum_const ("PO_htrapezoids", db::PreferredOrientation::PO_htrapezoids,
+    "@brief Indicates horizontal trapezoid decomposition."
+  ) +
+  gsi::enum_const ("PO_vtrapezoids", db::PreferredOrientation::PO_vtrapezoids,
+    "@brief Indicates vertical trapezoid decomposition."
+  ),
+  "@brief This class represents the PreferredOrientation enum used within polygon decomposition\n"
+  "\n"
+  "This enum has been introduced in version 0.27."
+);
+
+gsi::Enum<db::metrics_type> decl_dbMetricsType ("db", "MetricsType",
+  gsi::enum_const ("Euclidian", db::metrics_type::Euclidian,
+    "@brief Euclidian metrics\n"
+    "\n"
+    "The distance between two points is defined as the euclidian\n"
+    "distance, i.e. d = sqrt(dx * dx + dy * dy).\n"
+    "All points within a circle with radius r around another point \n"
+    "have a distance less than r to this point.\n"
+  ) +
+  gsi::enum_const ("Square", db::metrics_type::Square,
+    "@brief Square metrics\n"
+    "\n"
+    "The distance between two points is the minimum of x and\n"
+    "y distance, i.e. d = min(abs(dx), abs(dy)).\n"
+    "All points within a square with length 2*r round another point\n"
+    "have a distance less than r to this point.\n"
+  ) +
+  gsi::enum_const ("Projection", db::metrics_type::Projection,
+    "@brief Projection metrics\n"
+    "\n"
+    "The distance between a point and another point on an edge\n"
+    "is measured by the distance of the point to the edge.\n"
+  ),
+  "@brief This class represents the MetricsType enum used within DRC functions\n"
+  "\n"
+  "This enum has been introduced in version 0.27."
 );
 
 }

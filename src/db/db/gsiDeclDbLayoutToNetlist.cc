@@ -722,7 +722,7 @@ gsi::EnumIn<db::LayoutToNetlist, db::LayoutToNetlist::BuildNetHierarchyMode> dec
   "This enum is used for \\LayoutToNetlist#build_all_nets and \\LayoutToNetlist#build_net."
 );
 
-//  Inject the NetlistCrossReference::Status declarations into NetlistCrossReference:
+//  Inject the NetlistCrossReference::BuildNetHierarchyMode declarations into NetlistCrossReference:
 gsi::ClassExt<db::LayoutToNetlist> inject_dbLayoutToNetlist_BuildNetHierarchyMode_in_parent (decl_dbLayoutToNetlist_BuildNetHierarchyMode.defs ());
 
 }

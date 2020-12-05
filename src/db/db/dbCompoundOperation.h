@@ -733,7 +733,8 @@ class DB_PUBLIC CompoundRegionFilterOperationNode
   : public CompoundRegionMultiInputOperationNode
 {
 public:
-  CompoundRegionFilterOperationNode (PolygonFilterBase *filter, CompoundRegionOperationNode *input);
+  CompoundRegionFilterOperationNode (PolygonFilterBase *filter, CompoundRegionOperationNode *input, bool owns_filter = false);
+  ~CompoundRegionFilterOperationNode ();
 
   //  specifies the result type
   virtual ResultType result_type () const { return Region; }
@@ -746,6 +747,7 @@ public:
 
 private:
   PolygonFilterBase *mp_filter;
+  bool m_owns_filter;
 
   bool is_selected (const db::Polygon &p) const;
   bool is_selected (const db::PolygonRef &p) const;

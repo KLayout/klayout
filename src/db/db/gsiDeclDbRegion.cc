@@ -32,6 +32,7 @@
 #include "dbDeepShapeStore.h"
 #include "dbRegion.h"
 #include "dbRegionProcessors.h"
+#include "dbCompoundOperation.h"
 #include "tlGlobPattern.h"
 
 #include <memory>
@@ -630,6 +631,20 @@ static size_t id (const db::Region *r)
   return tl::id_of (r->delegate ());
 }
 
+
+tl::Variant complex_op (db::Region *region, db::CompoundRegionOperationNode *node)
+{
+  if (node->result_type () == db::CompoundRegionOperationNode::Region) {
+    return tl::Variant (region->cop_to_region (*node));
+  } else if (node->result_type () == db::CompoundRegionOperationNode::Edges) {
+    return tl::Variant (region->cop_to_edges (*node));
+  } else if (node->result_type () == db::CompoundRegionOperationNode::EdgePairs) {
+    return tl::Variant (region->cop_to_edge_pairs (*node));
+  } else {
+    return tl::Variant ();
+  }
+}
+
 //  provided by gsiDeclDbPolygon.cc:
 int td_simple ();
 int po_any ();
@@ -847,6 +862,11 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@brief Gets a flag indicating whether minimum coherence is selected\n"
     "See \\min_coherence= for a description of this attribute.\n"
   ) + 
+  method_ext ("complex_op", &complex_op, gsi::arg ("node"),
+    "@brief Executes a complex operation (see \\CompoundRegionOperationNode for details)\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
   method_ext ("with_perimeter", with_perimeter1, gsi::arg ("perimeter"), gsi::arg ("inverse"),
     "@brief Filter the polygons by perimeter\n"
     "Filters the polygons inside the region by perimeter. If \"inverse\" is false, only "

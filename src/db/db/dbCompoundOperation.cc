@@ -467,7 +467,10 @@ void CompoundRegionLogicalBoolOperationNode::implement_compute_local (db::Layout
 
   }
 
-  //  @@@ invert is not handled, this is not a boolean return value
+  if (m_invert) {
+    ok = ! ok;
+  }
+
   if (ok) {
     tl_assert (! results.empty ());
     results.front ().insert (subject_shape);
@@ -922,10 +925,18 @@ template void CompoundRegionLogicalCaseSelectOperationNode::implement_compute_lo
 
 // ---------------------------------------------------------------------------------------------
 
-CompoundRegionFilterOperationNode::CompoundRegionFilterOperationNode (PolygonFilterBase *filter, CompoundRegionOperationNode *input)
-  : CompoundRegionMultiInputOperationNode (input), mp_filter (filter)
+CompoundRegionFilterOperationNode::CompoundRegionFilterOperationNode (PolygonFilterBase *filter, CompoundRegionOperationNode *input, bool owns_filter)
+  : CompoundRegionMultiInputOperationNode (input), mp_filter (filter), m_owns_filter (owns_filter)
 {
   set_description ("filter");
+}
+
+CompoundRegionFilterOperationNode::~CompoundRegionFilterOperationNode ()
+{
+  if (m_owns_filter) {
+    delete mp_filter;
+  }
+  mp_filter = 0;
 }
 
 void

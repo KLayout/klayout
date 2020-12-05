@@ -24,6 +24,7 @@
 #include "gsiEnums.h"
 
 #include "dbCompoundOperation.h"
+#include "dbRegionUtils.h"
 
 namespace gsi
 {
@@ -45,7 +46,7 @@ static db::CompoundRegionOperationNode *new_logical_boolean (db::CompoundRegionL
 
 static db::CompoundRegionOperationNode *new_geometrical_boolean (db::CompoundRegionGeometricalBoolOperationNode::GeometricalOp op, db::CompoundRegionOperationNode *a, db::CompoundRegionOperationNode *b)
 {
-  // @@@ is this correct?
+  //  TODO: is this correct?
   if ((a->result_type () != db::CompoundRegionOperationNode::Region && a->result_type () != db::CompoundRegionOperationNode::Edges) ||
       (b->result_type () != db::CompoundRegionOperationNode::Region && b->result_type () != db::CompoundRegionOperationNode::Edges)) {
     throw tl::Exception ("Inputs for geometrical booleans must be either of Region or Edges type");
@@ -55,7 +56,7 @@ static db::CompoundRegionOperationNode *new_geometrical_boolean (db::CompoundReg
 
 static db::CompoundRegionOperationNode *new_interacting (db::CompoundRegionOperationNode *a, db::CompoundRegionOperationNode *b, bool inverse, size_t min_count, size_t max_count)
 {
-  // @@@ is this correct?
+  //  TODO: is this correct?
   if (a->result_type () != db::CompoundRegionOperationNode::Region) {
     throw tl::Exception ("Primary input for interaction compound operation must be of Region type");
   }
@@ -70,7 +71,7 @@ static db::CompoundRegionOperationNode *new_interacting (db::CompoundRegionOpera
 
 static db::CompoundRegionOperationNode *new_overlapping (db::CompoundRegionOperationNode *a, db::CompoundRegionOperationNode *b, bool inverse, size_t min_count, size_t max_count)
 {
-  // @@@ is this correct?
+  //  TODO: is this correct?
   if (a->result_type () != db::CompoundRegionOperationNode::Region) {
     throw tl::Exception ("Primary input for interaction compound operation must be of Region type");
   }
@@ -83,7 +84,7 @@ static db::CompoundRegionOperationNode *new_overlapping (db::CompoundRegionOpera
 
 static db::CompoundRegionOperationNode *new_inside (db::CompoundRegionOperationNode *a, db::CompoundRegionOperationNode *b, bool inverse)
 {
-  // @@@ is this correct?
+  //  TODO: is this correct?
   if (a->result_type () != db::CompoundRegionOperationNode::Region) {
     throw tl::Exception ("Primary input for interaction compound operation must be of Region type");
   }
@@ -96,7 +97,7 @@ static db::CompoundRegionOperationNode *new_inside (db::CompoundRegionOperationN
 
 static db::CompoundRegionOperationNode *new_outside (db::CompoundRegionOperationNode *a, db::CompoundRegionOperationNode *b, bool inverse)
 {
-  // @@@ is this correct?
+  //  TODO: is this correct?
   if (a->result_type () != db::CompoundRegionOperationNode::Region) {
     throw tl::Exception ("Primary input for interaction compound operation must be of Region type");
   }
@@ -202,6 +203,31 @@ static db::CompoundRegionOperationNode *new_inside_check_node (db::CompoundRegio
   return new db::CompoundRegionCheckOperationNode (input, db::InsideRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded);
 }
 
+static db::CompoundRegionOperationNode *new_perimeter_filter (db::CompoundRegionOperationNode *input, db::coord_traits<db::Coord>::perimeter_type pmin, db::coord_traits<db::Coord>::perimeter_type pmax, bool inverse)
+{
+  return new db::CompoundRegionFilterOperationNode (new db::RegionPerimeterFilter (pmin, pmax, inverse), input, true);
+}
+
+static db::CompoundRegionOperationNode *new_area_filter (db::CompoundRegionOperationNode *input, db::coord_traits<db::Coord>::area_type amin, db::coord_traits<db::Coord>::area_type amax, bool inverse)
+{
+  return new db::CompoundRegionFilterOperationNode (new db::RegionAreaFilter (amin, amax, inverse), input, true);
+}
+
+static db::CompoundRegionOperationNode *new_rectilinear_filter (db::CompoundRegionOperationNode *input, bool inverse)
+{
+  return new db::CompoundRegionFilterOperationNode (new db::RectilinearFilter (inverse), input, true);
+}
+
+static db::CompoundRegionOperationNode *new_rectangle_filter (db::CompoundRegionOperationNode *input, bool inverse)
+{
+  return new db::CompoundRegionFilterOperationNode (new db::RectangleFilter (inverse), input, true);
+}
+
+static db::CompoundRegionOperationNode *new_bbox_filter (db::CompoundRegionOperationNode *input, db::RegionBBoxFilter::parameter_type parameter, db::coord_traits<db::Coord>::distance_type vmin, db::coord_traits<db::Coord>::distance_type vmax, bool inverse)
+{
+  return new db::CompoundRegionFilterOperationNode (new db::RegionBBoxFilter (vmin, vmax, inverse, parameter), input, true);
+}
+
 Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "CompoundRegionOperationNode",
   gsi::constructor ("new_primary", &new_primary,
     "@brief Creates a node object representing the primary input"
@@ -212,127 +238,108 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   gsi::constructor ("new_logical_boolean", &new_logical_boolean, gsi::arg ("op"), gsi::arg ("invert"), gsi::arg ("inputs"),
     "@brief Creates a node representing a logical boolean operation between the inputs.\n"
     "\n"
-    "@@@ TODO.\n"
+    "A logical AND operation will evaluate the arguments and render the subject shape when all arguments are non-empty. "
+    "The logical OR operation will evaluate the arguments and render the subject shape when one argument is non-empty. "
+    "Setting 'inverse' to true will reverse the result and return the subject shape when one argument is empty in the AND case and "
+    "when all arguments are empty in the OR case."
   ) +
   gsi::constructor ("new_geometrical_boolean", &new_geometrical_boolean, gsi::arg ("op"), gsi::arg ("a"), gsi::arg ("b"),
     "@brief Creates a node representing a geometrical boolean operation between the inputs.\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_interacting", &new_interacting, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", std::numeric_limits<size_t>::max (), "unlimited"),
     "@brief Creates a node representing an interacting selection operation between the inputs.\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_overlapping", &new_overlapping, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", std::numeric_limits<size_t>::max (), "unlimited"),
     "@brief Creates a node representing an overlapping selection operation between the inputs.\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_inside", &new_inside, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false),
     "@brief Creates a node representing an inside selection operation between the inputs.\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_outside", &new_outside, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false),
     "@brief Creates a node representing an outside selection operation between the inputs.\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_case", &new_case, gsi::arg ("inputs"),
     "@brief Creates a 'switch ladder' (case statement) compound operation node.\n"
     "\n"
-    "@@@ TODO.\n"
+    "The inputs are treated as a sequence of condition/result pairs: c1,r1,c2,r2 etc. If there is an odd number of inputs, the last "
+    "element is taken as the default result. The implementation will evaluate c1 and if not empty, will render r1. Otherwise, c2 will be evaluated and r2 "
+    "rendered if c2 isn't empty etc. If none of the conditions renders a non-empty set and a default result is present, the default will be "
+    "returned. Otherwise, the result is empty."
   ) +
   gsi::constructor ("new_corners_as_rectangles", &new_corners_as_rectangles_node, gsi::arg ("input"), gsi::arg ("angle_start"), gsi::arg ("angle_end"), gsi::arg ("dim"),
     "@brief Creates a node turning corners into rectangles.\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_corners_as_dots", &new_corners_as_dots_node, gsi::arg ("input"), gsi::arg ("angle_start"), gsi::arg ("angle_end"),
     "@brief Creates a node turning corners into dots (single-point edges).\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_relative_extents", &new_relative_extents_node, gsi::arg ("input"), gsi::arg ("fx1"), gsi::arg ("fy1"), gsi::arg ("fx2"), gsi::arg ("fy2"), gsi::arg ("dx"), gsi::arg ("dy"),
     "@brief Creates a node returning markers at specified locations of the extend (e.g. at the center).\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_relative_extents_as_edges", &new_relative_extents_as_edges_node, gsi::arg ("input"), gsi::arg ("fx1"), gsi::arg ("fy1"), gsi::arg ("fx2"), gsi::arg ("fy2"),
     "@brief Creates a node returning edges at specified locations of the extend (e.g. at the center).\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_convex_decomposition", &new_convex_decomposition_node, gsi::arg ("input"), gsi::arg ("mode"),
     "@brief Creates a node providing a composition into convex pieces.\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_trapezoid_decomposition", &new_trapezoid_decomposition_node, gsi::arg ("input"), gsi::arg ("mode"),
     "@brief Creates a node providing a composition into trapezoids.\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_polygon_breaker_node", &new_polygon_breaker_node, gsi::arg ("input"), gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio"),
     "@brief Creates a node providing a composition into parts with less than the given number of points and a smaller area ratio.\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_size_node", &new_size_node, gsi::arg ("input"), gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("mode"),
     "@brief Creates a node providing sizing.\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_minkowsky_sum", &new_minkowsky_sum_node1, gsi::arg ("input"), gsi::arg ("e"),
     "@brief Creates a node providing a Minkowsky sum with an edge.\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_minkowsky_sum", &new_minkowsky_sum_node2, gsi::arg ("input"), gsi::arg ("p"),
     "@brief Creates a node providing a Minkowsky sum with a polygon.\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_minkowsky_sum", &new_minkowsky_sum_node3, gsi::arg ("input"), gsi::arg ("p"),
     "@brief Creates a node providing a Minkowsky sum with a box.\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_minkowsky_sum", &new_minkowsky_sum_node4, gsi::arg ("input"), gsi::arg ("p"),
     "@brief Creates a node providing a Minkowsky sum with a point sequence forming a contour.\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_width_check", &new_width_check_node, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", 90.0), gsi::arg ("min_projection", db::coord_traits<db::Coord>::distance_type (0)), gsi::arg ("max_projection", std::numeric_limits<db::coord_traits<db::Coord>::distance_type>::max (), "max."), gsi::arg ("shielded", true),
     "@brief Creates a node providing a width check.\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_space_check", &new_space_check_node, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", 90.0), gsi::arg ("min_projection", db::coord_traits<db::Coord>::distance_type (0)), gsi::arg ("max_projection", std::numeric_limits<db::coord_traits<db::Coord>::distance_type>::max (), "max."), gsi::arg ("shielded", true),
     "@brief Creates a node providing a space check.\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_notch_check", &new_notch_check_node, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", 90.0), gsi::arg ("min_projection", db::coord_traits<db::Coord>::distance_type (0)), gsi::arg ("max_projection", std::numeric_limits<db::coord_traits<db::Coord>::distance_type>::max (), "max."), gsi::arg ("shielded", true),
-    "@brief Creates a node providing a space check.\n"
-    "\n"
-    "@@@ TODO.\n"
+    "@brief Creates a node providing a intra-polygon space check.\n"
   ) +
   gsi::constructor ("new_separation_check", &new_separation_check_node, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", 90.0), gsi::arg ("min_projection", db::coord_traits<db::Coord>::distance_type (0)), gsi::arg ("max_projection", std::numeric_limits<db::coord_traits<db::Coord>::distance_type>::max (), "max."), gsi::arg ("shielded", true),
     "@brief Creates a node providing a separation check.\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_overlap_check", &new_overlap_check_node, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", 90.0), gsi::arg ("min_projection", db::coord_traits<db::Coord>::distance_type (0)), gsi::arg ("max_projection", std::numeric_limits<db::coord_traits<db::Coord>::distance_type>::max (), "max."), gsi::arg ("shielded", true),
     "@brief Creates a node providing an overlap check.\n"
-    "\n"
-    "@@@ TODO.\n"
   ) +
   gsi::constructor ("new_inside_check", &new_inside_check_node, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", 90.0), gsi::arg ("min_projection", db::coord_traits<db::Coord>::distance_type (0)), gsi::arg ("max_projection", std::numeric_limits<db::coord_traits<db::Coord>::distance_type>::max (), "max."), gsi::arg ("shielded", true),
     "@brief Creates a node providing an inside (enclosure) check.\n"
-    "\n"
-    "@@@ TODO.\n"
+  ) +
+  gsi::constructor ("new_perimeter_filter", &new_perimeter_filter, gsi::arg ("input"), gsi::arg ("pmin", 0), gsi::arg ("pmax", std::numeric_limits<db::coord_traits<db::Coord>::perimeter_type>::max (), "max"), gsi::arg ("inverse", false),
+    "@brief Creates a node filtering the input by perimeter.\n"
+    "This node renders the input if the perimeter is between pmin and pmax (exclusively). If 'inverse' is set to true, the "
+    "input shape is returned if the perimeter is less than pmin (exclusively) or larger than pmax (inclusively)."
+  ) +
+  gsi::constructor ("new_area_filter", &new_area_filter, gsi::arg ("input"), gsi::arg ("amin", 0), gsi::arg ("amax", std::numeric_limits<db::coord_traits<db::Coord>::area_type>::max (), "max"), gsi::arg ("inverse", false),
+    "@brief Creates a node filtering the input by area.\n"
+    "This node renders the input if the area is between amin and amax (exclusively). If 'inverse' is set to true, the "
+    "input shape is returned if the area is less than amin (exclusively) or larger than amax (inclusively)."
+  ) +
+  gsi::constructor ("new_bbox_filter", &new_bbox_filter, gsi::arg ("input"), gsi::arg ("parameter"), gsi::arg ("pmin", 0), gsi::arg ("pmax", std::numeric_limits<db::coord_traits<db::Coord>::area_type>::max (), "max"), gsi::arg ("inverse", false),
+    "@brief Creates a node filtering the input by bounding box parameters.\n"
+    "This node renders the input if the specified bounding box parameter of the input shape is between pmin and pmax (exclusively). If 'inverse' is set to true, the "
+    "input shape is returned if the parameter is less than pmin (exclusively) or larger than pmax (inclusively)."
+  ) +
+  gsi::constructor ("new_rectilinear_filter", &new_rectilinear_filter, gsi::arg ("input"), gsi::arg ("inverse", false),
+    "@brief Creates a node filtering the input for rectilinear shapes (or non-rectilinear ones with 'inverse' set to 'true').\n"
+  ) +
+  gsi::constructor ("new_rectangle_filter", &new_rectangle_filter, gsi::arg ("input"), gsi::arg ("inverse", false),
+    "@brief Creates a node filtering the input for rectangular shapes (or non-rectangular ones with 'inverse' set to 'true').\n"
   ) +
   method ("description=", &db::CompoundRegionOperationNode::set_description, gsi::arg ("d"),
     "@brief Sets the description for this node"
@@ -343,7 +350,21 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   method ("result_type", &db::CompoundRegionOperationNode::result_type,
     "@brief Gets the result type of this node"
   ),
-  "@brief A base class for compound operations\n"
+  "@brief A base class for compound DRC operations\n"
+  "\n"
+  "This class is not intended to be used directly but rather provide a factory for various incarnations of "
+  "compound operation nodes. Compound operations are a way to specify complex DRC operations put together "
+  "by building a tree of operations. This operation tree then is executed with \\Region#complex_op and will act on "
+  "individual clusters of shapes and their interacting neighbors.\n"
+  "\n"
+  "A basic concept to the compound operations is the 'subject' (primary) and 'intruder' (secondary) input. "
+  "The 'subject' is the Region, 'complex_op' with the operation tree is executed on. 'intruders' are regions inserted into "
+  "the equation through secondary input nodes created with \\new_secondary_node. The algorithm will execute the "
+  "operation tree for every subject shape considering intruder shapes from the secondary inputs. The algorithm will "
+  "only act on subject shapes primarily. As a consequence, 'lonely' intruder shapes without a subject shape are "
+  "not considered at all. Only subject shapes trigger evaluation of the operation tree.\n"
+  "\n"
+  "The search distance for introduder shapes is determined by the operation and computed from the operation's requirements.\n"
   "\n"
   "This class has been introduced in version 0.27."
 );
@@ -453,6 +474,27 @@ gsi::Enum<db::metrics_type> decl_dbMetricsType ("db", "MetricsType",
     "is measured by the distance of the point to the edge.\n"
   ),
   "@brief This class represents the MetricsType enum used within DRC functions\n"
+  "\n"
+  "This enum has been introduced in version 0.27."
+);
+
+gsi::EnumIn<db::RegionBBoxFilter, db::RegionBBoxFilter::parameter_type> decl_dbRegionBBoxFilter_ParameterType ("db", "ParameterType",
+  gsi::enum_const ("BoxWidth", db::RegionBBoxFilter::BoxWidth,
+    "@brief Measures the width of the bounding box\n"
+  ) +
+  gsi::enum_const ("BoxHeight", db::RegionBBoxFilter::BoxHeight,
+    "@brief Measures the height of the bounding box\n"
+  ) +
+  gsi::enum_const ("BoxMaxDim", db::RegionBBoxFilter::BoxMaxDim,
+    "@brief Measures the maximum dimension of the bounding box\n"
+  ) +
+  gsi::enum_const ("BoxMinDim", db::RegionBBoxFilter::BoxMinDim,
+    "@brief Measures the minimum dimension of the bounding box\n"
+  ) +
+  gsi::enum_const ("BoxAverageDim", db::RegionBBoxFilter::BoxAverageDim,
+    "@brief Measures the average of width and height of the bounding box\n"
+  ),
+  "@brief This class represents the parameter type enum used in \\CompoundRegionOperationNode#new_bbox_filter\n"
   "\n"
   "This enum has been introduced in version 0.27."
 );

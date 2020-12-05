@@ -1467,28 +1467,28 @@ DeepRegion::cop_to_edges (db::CompoundRegionOperationNode &node)
 }
 
 EdgePairsDelegate *
-DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const
+DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const
 {
   const db::DeepRegion *other_deep = 0;
   if (other) {
     other_deep = dynamic_cast<const db::DeepRegion *> (other->delegate ());
     if (! other_deep) {
-      return db::AsIfFlatRegion::run_check (rel, different_polygons, other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded);
+      return db::AsIfFlatRegion::run_check (rel, different_polygons, other, d, options);
     }
   }
 
   const db::DeepLayer &polygons = merged_deep_layer ();
 
-  EdgeRelationFilter check (rel, d, metrics);
+  EdgeRelationFilter check (rel, d, options.metrics);
   check.set_include_zero (false);
-  check.set_whole_edges (whole_edges);
-  check.set_ignore_angle (ignore_angle);
-  check.set_min_projection (min_projection);
-  check.set_max_projection (max_projection);
+  check.set_whole_edges (options.whole_edges);
+  check.set_ignore_angle (options.ignore_angle);
+  check.set_min_projection (options.min_projection);
+  check.set_max_projection (options.max_projection);
 
   std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
 
-  db::CheckLocalOperation op (check, different_polygons, other_deep != 0, other && other->is_merged (), shielded);
+  db::CheckLocalOperation op (check, different_polygons, other_deep != 0, other && other->is_merged (), options.shielded);
 
   db::local_processor<db::PolygonRef, db::PolygonRef, db::EdgePair> proc (const_cast<db::Layout *> (&polygons.layout ()),
                                                                           const_cast<db::Cell *> (&polygons.initial_cell ()),
@@ -1506,16 +1506,16 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 }
 
 EdgePairsDelegate *
-DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const
+DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options) const
 {
   const db::DeepLayer &polygons = merged_deep_layer ();
 
-  EdgeRelationFilter check (rel, d, metrics);
+  EdgeRelationFilter check (rel, d, options.metrics);
   check.set_include_zero (false);
-  check.set_whole_edges (whole_edges);
-  check.set_ignore_angle (ignore_angle);
-  check.set_min_projection (min_projection);
-  check.set_max_projection (max_projection);
+  check.set_whole_edges (options.whole_edges);
+  check.set_ignore_angle (options.ignore_angle);
+  check.set_min_projection (options.min_projection);
+  check.set_max_projection (options.max_projection);
 
   db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
@@ -1527,7 +1527,7 @@ DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, b
 
     for (db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::Polygons); ! s.at_end (); ++s) {
 
-      edge2edge_check<db::Shapes> edge_check (check, result, false, false, shielded);
+      edge2edge_check<db::Shapes> edge_check (check, result, false, false, options.shielded);
       poly2poly_check<db::Polygon, db::Shapes> poly_check (edge_check);
 
       db::Polygon poly;

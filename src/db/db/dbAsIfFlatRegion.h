@@ -60,44 +60,44 @@ public:
   virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node);
   virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node);
 
-  EdgePairsDelegate *width_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const
+  EdgePairsDelegate *width_check (db::Coord d, const RegionCheckOptions &options) const
   {
-    return run_single_polygon_check (db::WidthRelation, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded);
+    return run_single_polygon_check (db::WidthRelation, d, options);
   }
 
-  EdgePairsDelegate *space_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const
+  EdgePairsDelegate *space_check (db::Coord d, const RegionCheckOptions &options) const
   {
-    return run_check (db::SpaceRelation, false, 0, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded);
+    return run_check (db::SpaceRelation, false, 0, d, options);
   }
 
-  EdgePairsDelegate *isolated_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const
+  EdgePairsDelegate *isolated_check (db::Coord d, const RegionCheckOptions &options) const
   {
-    return run_check (db::SpaceRelation, true, 0, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded);
+    return run_check (db::SpaceRelation, true, 0, d, options);
   }
 
-  EdgePairsDelegate *notch_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const
+  EdgePairsDelegate *notch_check (db::Coord d, const RegionCheckOptions &options) const
   {
-    return run_single_polygon_check (db::SpaceRelation, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded);
+    return run_single_polygon_check (db::SpaceRelation, d, options);
   }
 
-  EdgePairsDelegate *enclosing_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const
+  EdgePairsDelegate *enclosing_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const
   {
-    return run_check (db::OverlapRelation, true, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded);
+    return run_check (db::OverlapRelation, true, &other, d, options);
   }
 
-  EdgePairsDelegate *overlap_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const
+  EdgePairsDelegate *overlap_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const
   {
-    return run_check (db::WidthRelation, true, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded);
+    return run_check (db::WidthRelation, true, &other, d, options);
   }
 
-  EdgePairsDelegate *separation_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const
+  EdgePairsDelegate *separation_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const
   {
-    return run_check (db::SpaceRelation, true, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded);
+    return run_check (db::SpaceRelation, true, &other, d, options);
   }
 
-  EdgePairsDelegate *inside_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const
+  EdgePairsDelegate *inside_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const
   {
-    return run_check (db::InsideRelation, true, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded);
+    return run_check (db::InsideRelation, true, &other, d, options);
   }
 
   virtual EdgePairsDelegate *grid_check (db::Coord gx, db::Coord gy) const;
@@ -264,8 +264,8 @@ protected:
   void update_bbox (const db::Box &box);
   void invalidate_bbox ();
 
-  virtual EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const;
-  virtual EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const;
+  virtual EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const;
+  virtual EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options) const;
   virtual RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const;
   virtual RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const;
   virtual RegionDelegate *selected_interacting_generic (const Texts &other, bool inverse, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const;

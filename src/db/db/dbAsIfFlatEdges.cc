@@ -512,7 +512,7 @@ AsIfFlatEdges::filtered (const EdgeFilterBase &filter) const
 }
 
 EdgePairsDelegate *
-AsIfFlatEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+AsIfFlatEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, const db::EdgesCheckOptions &options) const
 {
   std::auto_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
 
@@ -538,12 +538,12 @@ AsIfFlatEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Co
     }
   }
 
-  EdgeRelationFilter check (rel, d, metrics);
+  EdgeRelationFilter check (rel, d, options.metrics);
   check.set_include_zero (false);
-  check.set_whole_edges (whole_edges);
-  check.set_ignore_angle (ignore_angle);
-  check.set_min_projection (min_projection);
-  check.set_max_projection (max_projection);
+  check.set_whole_edges (options.whole_edges);
+  check.set_ignore_angle (options.ignore_angle);
+  check.set_min_projection (options.min_projection);
+  check.set_max_projection (options.max_projection);
 
   edge2edge_check_for_edges<db::FlatEdgePairs> edge_check (check, *result, other != 0);
   scanner.process (edge_check, d, db::box_convert<db::Edge> ());

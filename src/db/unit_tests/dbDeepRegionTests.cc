@@ -1074,10 +1074,10 @@ TEST(17_SinglePolygonChecks)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (4, 0)), r4);
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (6, 0)), r6);
 
-    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r3.width_check (260, false, db::Euclidian, 90, 0));
-    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r3.width_check (260, true, db::Projection, 90, 2000));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r3.width_check (260, db::RegionCheckOptions (false, db::Euclidian, 90, 0)));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r3.width_check (260, db::RegionCheckOptions (true, db::Projection, 90, 2000)));
 
-    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r6.notch_check (1300, false, db::Euclidian, 90, 0));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r6.notch_check (1300, db::RegionCheckOptions (false, db::Euclidian, 90, 0)));
 
     CHECKPOINT();
     db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au17.gds");
@@ -1116,12 +1116,12 @@ TEST(18_MultiPolygonChecks)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (4, 0)), r4);
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (6, 0)), r6);
 
-    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r3.space_check (500, false, db::Projection, 90, 0));
-    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r3.space_check (500, true, db::Projection, 90, 300));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r3.space_check (500, db::RegionCheckOptions (false, db::Projection, 90, 0)));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r3.space_check (500, db::RegionCheckOptions (true, db::Projection, 90, 300)));
 
-    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r3.separation_check (r4, 200, false, db::Projection, 90, 0));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r3.separation_check (r4, 200, db::RegionCheckOptions (false, db::Projection, 90, 0)));
 
-    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), r6.enclosing_check (r4, 100, true, db::Projection, 90, 0));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), r6.enclosing_check (r4, 100, db::RegionCheckOptions (true, db::Projection, 90, 0)));
 
     CHECKPOINT();
     db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au18.gds");

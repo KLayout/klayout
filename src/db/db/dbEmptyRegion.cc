@@ -115,49 +115,49 @@ EmptyRegion::cop_to_edges (db::CompoundRegionOperationNode &)
 }
 
 EdgePairsDelegate *
-EmptyRegion::width_check (db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const
+EmptyRegion::width_check (db::Coord, const RegionCheckOptions &) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::space_check (db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const
+EmptyRegion::space_check (db::Coord, const RegionCheckOptions &) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::isolated_check (db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const
+EmptyRegion::isolated_check (db::Coord, const RegionCheckOptions &) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::notch_check (db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const
+EmptyRegion::notch_check (db::Coord, const RegionCheckOptions &) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::enclosing_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const
+EmptyRegion::enclosing_check (const Region &, db::Coord, const RegionCheckOptions &) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::overlap_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const
+EmptyRegion::overlap_check (const Region &, db::Coord, const RegionCheckOptions &) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::separation_check (const Region &, db::Coord, bool , metrics_type, double, distance_type, distance_type, bool) const
+EmptyRegion::separation_check (const Region &, db::Coord, const RegionCheckOptions &) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::inside_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const
+EmptyRegion::inside_check (const Region &, db::Coord, const RegionCheckOptions &) const
 {
   return new EmptyEdgePairs ();
 }

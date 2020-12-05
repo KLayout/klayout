@@ -66,14 +66,14 @@ public:
   virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node);
   virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node);
 
-  virtual EdgePairsDelegate *width_check (db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const;
-  virtual EdgePairsDelegate *space_check (db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const;
-  virtual EdgePairsDelegate *isolated_check (db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const;
-  virtual EdgePairsDelegate *notch_check (db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const;
-  virtual EdgePairsDelegate *enclosing_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const;
-  virtual EdgePairsDelegate *overlap_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const;
-  virtual EdgePairsDelegate *separation_check (const Region &, db::Coord, bool , metrics_type, double, distance_type, distance_type, bool) const;
-  virtual EdgePairsDelegate *inside_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type, bool) const;
+  virtual EdgePairsDelegate *width_check (db::Coord, const RegionCheckOptions &) const;
+  virtual EdgePairsDelegate *space_check (db::Coord, const RegionCheckOptions &) const;
+  virtual EdgePairsDelegate *isolated_check (db::Coord, const RegionCheckOptions &) const;
+  virtual EdgePairsDelegate *notch_check (db::Coord, const RegionCheckOptions &) const;
+  virtual EdgePairsDelegate *enclosing_check (const Region &, db::Coord, const RegionCheckOptions &) const;
+  virtual EdgePairsDelegate *overlap_check (const Region &, db::Coord, const RegionCheckOptions &) const;
+  virtual EdgePairsDelegate *separation_check (const Region &, db::Coord, const RegionCheckOptions &) const;
+  virtual EdgePairsDelegate *inside_check (const Region &, db::Coord, const RegionCheckOptions &) const;
   virtual EdgePairsDelegate *grid_check (db::Coord, db::Coord) const;
   virtual EdgePairsDelegate *angle_check (double, double, bool) const;
 

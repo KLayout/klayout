@@ -1096,20 +1096,20 @@ AsIfFlatRegion::cop_to_edges (db::CompoundRegionOperationNode &node)
 }
 
 EdgePairsDelegate *
-AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const
+AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const
 {
 #if defined(USE_LOCAL_PROCESSOR)
 
   db::RegionIterator polygons (begin_merged ());
 
-  EdgeRelationFilter check (rel, d, metrics);
+  EdgeRelationFilter check (rel, d, options.metrics);
   check.set_include_zero (false);
-  check.set_whole_edges (whole_edges);
-  check.set_ignore_angle (ignore_angle);
-  check.set_min_projection (min_projection);
-  check.set_max_projection (max_projection);
+  check.set_whole_edges (options.whole_edges);
+  check.set_ignore_angle (options.ignore_angle);
+  check.set_min_projection (options.min_projection);
+  check.set_max_projection (options.max_projection);
 
-  db::check_local_operation<db::Polygon, db::Polygon, db::EdgePair> op (check, different_polygons, other != 0, other && other->is_merged (), shielded);
+  db::check_local_operation<db::Polygon, db::Polygon, db::EdgePair> op (check, different_polygons, other != 0, other && other->is_merged (), options.shielded);
 
   db::local_processor<db::Polygon, db::Polygon, db::EdgePair> proc;
   proc.set_base_verbosity (base_verbosity ());
@@ -1153,14 +1153,14 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
 
   }
 
-  EdgeRelationFilter check (rel, d, metrics);
+  EdgeRelationFilter check (rel, d, options.metrics);
   check.set_include_zero (false);
-  check.set_whole_edges (whole_edges);
-  check.set_ignore_angle (ignore_angle);
-  check.set_min_projection (min_projection);
-  check.set_max_projection (max_projection);
+  check.set_whole_edges (options.whole_edges);
+  check.set_ignore_angle (options.ignore_angle);
+  check.set_min_projection (options.min_projection);
+  check.set_max_projection (options.max_projection);
 
-  edge2edge_check<db::FlatEdgePairs> edge_check (check, *result, different_polygons, other != 0 /*requires different layers*/, shielded);
+  edge2edge_check<db::FlatEdgePairs> edge_check (check, *result, different_polygons, other != 0 /*requires different layers*/, options.shielded);
   poly2poly_check<db::Polygon, db::FlatEdgePairs> poly_check (edge_check);
 
   do {
@@ -1172,18 +1172,18 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
 }
 
 EdgePairsDelegate *
-AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, bool shielded) const
+AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options) const
 {
   std::auto_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
 
-  EdgeRelationFilter check (rel, d, metrics);
+  EdgeRelationFilter check (rel, d, options.metrics);
   check.set_include_zero (false);
-  check.set_whole_edges (whole_edges);
-  check.set_ignore_angle (ignore_angle);
-  check.set_min_projection (min_projection);
-  check.set_max_projection (max_projection);
+  check.set_whole_edges (options.whole_edges);
+  check.set_ignore_angle (options.ignore_angle);
+  check.set_min_projection (options.min_projection);
+  check.set_max_projection (options.max_projection);
 
-  edge2edge_check<db::FlatEdgePairs> edge_check (check, *result, false /*=same polygons*/, false /*=same layers*/, shielded);
+  edge2edge_check<db::FlatEdgePairs> edge_check (check, *result, false /*=same polygons*/, false /*=same layers*/, options.shielded);
   poly2poly_check<db::Polygon, db::FlatEdgePairs> poly_check (edge_check);
 
   do {

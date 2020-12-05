@@ -567,30 +567,17 @@ public:
    *  @brief Applies a width check and returns EdgePairs which correspond to violation markers
    *
    *  The width check will create a edge pairs if the width of the area between the 
-   *  edges is less than the specified threshold d. Without "whole_edges", the parts of
-   *  the edges are returned which violate the condition. If "whole_edges" is true, the 
-   *  result will contain the complete edges participating in the result.
+   *  edges is less than the specified threshold d.
    *
-   *  "Width" refers to the space between the "inside" sides of the edges.
-   *
-   *  The metrics parameter specifies which metrics to use. "Euclidian", "Square" and "Projected"
-   *  metrics are available.
-   *
-   *  ignore_angle allows specification of a maximum angle the edges can have to not participate
-   *  in the check. By choosing 90 degree, edges having an angle of 90 degree and larger are not checked,
-   *  but acute corners are for example. 
-   *
-   *  With min_projection and max_projection it is possible to specify how edges must be related 
-   *  to each other. If the length of the projection of either edge on the other is >= min_projection
-   *  or < max_projection, the edges are considered for the check.
+   *  "options" specifies various options to configure the check and it's output.
    *
    *  The order of the edges in the resulting edge pairs is undefined.
    *
    *  Merged semantics applies.
    */
-  EdgePairs width_check (db::Coord d, bool whole_edges = false, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max ()) const
+  EdgePairs width_check (db::Coord d, const db::EdgesCheckOptions &options = db::EdgesCheckOptions ()) const
   {
-    return EdgePairs (mp_delegate->width_check (d, whole_edges, metrics, ignore_angle, min_projection, max_projection));
+    return EdgePairs (mp_delegate->width_check (d, options));
   }
 
   /**
@@ -603,9 +590,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  EdgePairs space_check (db::Coord d, bool whole_edges = false, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max ()) const
+  EdgePairs space_check (db::Coord d, const db::EdgesCheckOptions &options = db::EdgesCheckOptions ()) const
   {
-    return EdgePairs (mp_delegate->space_check (d, whole_edges, metrics, ignore_angle, min_projection, max_projection));
+    return EdgePairs (mp_delegate->space_check (d, options));
   }
 
   /**
@@ -621,9 +608,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  EdgePairs enclosing_check (const Edges &other, db::Coord d, bool whole_edges = false, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max ()) const
+  EdgePairs enclosing_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options = db::EdgesCheckOptions ()) const
   {
-    return EdgePairs (mp_delegate->enclosing_check (other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection));
+    return EdgePairs (mp_delegate->enclosing_check (other, d, options));
   }
 
   /**
@@ -639,9 +626,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  EdgePairs overlap_check (const Edges &other, db::Coord d, bool whole_edges = false, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max ()) const
+  EdgePairs overlap_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options = db::EdgesCheckOptions ()) const
   {
-    return EdgePairs (mp_delegate->overlap_check (other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection));
+    return EdgePairs (mp_delegate->overlap_check (other, d, options));
   }
 
   /**
@@ -657,9 +644,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  EdgePairs separation_check (const Edges &other, db::Coord d, bool whole_edges = false, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max ()) const
+  EdgePairs separation_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options = db::EdgesCheckOptions ()) const
   {
-    return EdgePairs (mp_delegate->separation_check (other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection));
+    return EdgePairs (mp_delegate->separation_check (other, d, options));
   }
 
   /**
@@ -675,9 +662,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  EdgePairs inside_check (const Edges &other, db::Coord d, bool whole_edges = false, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max ()) const
+  EdgePairs inside_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options = db::EdgesCheckOptions ()) const
   {
-    return EdgePairs (mp_delegate->inside_check (other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection));
+    return EdgePairs (mp_delegate->inside_check (other, d, options));
   }
 
   /**

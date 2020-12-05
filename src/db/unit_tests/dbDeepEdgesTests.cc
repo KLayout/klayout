@@ -499,12 +499,12 @@ TEST(9_DRCChecks)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (4, 0)), r4);
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (6, 0)), r6);
 
-    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), e3.space_check (500, false, db::Projection, 90, 0));
-    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e3.space_check (500, true, db::Projection, 90, 300));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), e3.space_check (500, db::EdgesCheckOptions (false, db::Projection, 90, 0)));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e3.space_check (500, db::EdgesCheckOptions (true, db::Projection, 90, 300)));
 
-    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), e3.separation_check (e4, 200, false, db::Projection, 90, 0));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), e3.separation_check (e4, 200, db::EdgesCheckOptions (false, db::Projection, 90, 0)));
 
-    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), e6.enclosing_check (e4, 100, true, db::Projection, 90, 0));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), e6.enclosing_check (e4, 100, db::EdgesCheckOptions (true, db::Projection, 90, 0)));
 
     CHECKPOINT();
     db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au9.gds");

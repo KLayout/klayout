@@ -54,34 +54,34 @@ public:
   virtual distance_type length (const db::Box &) const;
   virtual Box bbox () const;
 
-  virtual EdgePairsDelegate *width_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+  virtual EdgePairsDelegate *width_check (db::Coord d, const db::EdgesCheckOptions &options) const
   {
-    return run_check (db::WidthRelation, 0, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+    return run_check (db::WidthRelation, 0, d, options);
   }
     
-  virtual EdgePairsDelegate *space_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+  virtual EdgePairsDelegate *space_check (db::Coord d, const db::EdgesCheckOptions &options) const
   {
-    return run_check (db::SpaceRelation, 0, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+    return run_check (db::SpaceRelation, 0, d, options);
   }
 
-  virtual EdgePairsDelegate *enclosing_check (const Edges &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+  virtual EdgePairsDelegate *enclosing_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options) const
   {
-    return run_check (db::OverlapRelation, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+    return run_check (db::OverlapRelation, &other, d, options);
   }
 
-  virtual EdgePairsDelegate *overlap_check (const Edges &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+  virtual EdgePairsDelegate *overlap_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options) const
   {
-    return run_check (db::WidthRelation, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+    return run_check (db::WidthRelation, &other, d, options);
   }
 
-  virtual EdgePairsDelegate *separation_check (const Edges &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+  virtual EdgePairsDelegate *separation_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options) const
   {
-    return run_check (db::SpaceRelation, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+    return run_check (db::SpaceRelation, &other, d, options);
   }
 
-  virtual EdgePairsDelegate *inside_check (const Edges &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+  virtual EdgePairsDelegate *inside_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options) const
   {
-    return run_check (db::InsideRelation, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+    return run_check (db::InsideRelation, &other, d, options);
   }
 
   virtual EdgesDelegate *process_in_place (const EdgeProcessorBase &filter)
@@ -181,7 +181,7 @@ public:
 protected:
   void update_bbox (const db::Box &box);
   void invalidate_bbox ();
-  EdgePairsDelegate *run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
+  EdgePairsDelegate *run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, const EdgesCheckOptions &options) const;
   virtual EdgesDelegate *pull_generic (const Edges &edges) const;
   virtual RegionDelegate *pull_generic (const Region &region) const;
   virtual EdgesDelegate *selected_interacting_generic (const Edges &edges, bool inverse) const;

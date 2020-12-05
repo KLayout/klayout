@@ -443,12 +443,13 @@ static db::EdgePairs width1 (const db::Region *r, db::Region::distance_type d)
 
 static db::EdgePairs width2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
-  return r->width_check (d, whole_edges,
-                         metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
-                         ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
-                         min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                         max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
-                         shielded);
+  return r->width_check (d, db::RegionCheckOptions (whole_edges,
+                                metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()),
+                                ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                                min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                                max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                                shielded)
+                        );
 }
 
 static db::EdgePairs space1 (const db::Region *r, db::Region::distance_type d) 
@@ -458,12 +459,13 @@ static db::EdgePairs space1 (const db::Region *r, db::Region::distance_type d)
 
 static db::EdgePairs space2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
-  return r->space_check (d, whole_edges,
-                         metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
-                         ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
-                         min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                         max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
-                         shielded);
+  return r->space_check (d, db::RegionCheckOptions (whole_edges,
+                                metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()),
+                                ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                                min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                                max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                                shielded)
+                        );
 }
 
 static db::EdgePairs notch1 (const db::Region *r, db::Region::distance_type d) 
@@ -473,12 +475,13 @@ static db::EdgePairs notch1 (const db::Region *r, db::Region::distance_type d)
 
 static db::EdgePairs notch2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
-  return r->notch_check (d, whole_edges,
-                         metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
-                         ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
-                         min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                         max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
-                         shielded);
+  return r->notch_check (d, db::RegionCheckOptions (whole_edges,
+                                metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()),
+                                ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                                min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                                max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                                shielded)
+                        );
 }
 
 static db::EdgePairs isolated1 (const db::Region *r, db::Region::distance_type d) 
@@ -488,12 +491,13 @@ static db::EdgePairs isolated1 (const db::Region *r, db::Region::distance_type d
 
 static db::EdgePairs isolated2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
-  return r->isolated_check (d, whole_edges,
-                            metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
-                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
-                            min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                            max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
-                            shielded);
+  return r->isolated_check (d, db::RegionCheckOptions (whole_edges,
+                                  metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()),
+                                  ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                                  min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                                  max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                                  shielded)
+                           );
 }
 
 static db::EdgePairs inside1 (const db::Region *r, const db::Region &other, db::Region::distance_type d) 
@@ -503,12 +507,13 @@ static db::EdgePairs inside1 (const db::Region *r, const db::Region &other, db::
 
 static db::EdgePairs inside2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
-  return r->inside_check (other, d, whole_edges,
-                          metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
-                          ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
-                          min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                          max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
-                          shielded);
+  return r->inside_check (other, d, db::RegionCheckOptions (whole_edges,
+                                        metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()),
+                                        ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                                        min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                                        max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                                        shielded)
+                         );
 }
 
 static db::EdgePairs overlap1 (const db::Region *r, const db::Region &other, db::Region::distance_type d) 
@@ -518,12 +523,13 @@ static db::EdgePairs overlap1 (const db::Region *r, const db::Region &other, db:
 
 static db::EdgePairs overlap2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
-  return r->overlap_check (other, d, whole_edges,
-                           metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
-                           ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
-                           min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                           max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
-                           shielded);
+  return r->overlap_check (other, d, db::RegionCheckOptions (whole_edges,
+                                        metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()),
+                                        ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                                        min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                                        max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                                        shielded)
+                          );
 }
 
 static db::EdgePairs enclosing1 (const db::Region *r, const db::Region &other, db::Region::distance_type d) 
@@ -533,12 +539,13 @@ static db::EdgePairs enclosing1 (const db::Region *r, const db::Region &other, d
 
 static db::EdgePairs enclosing2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
-  return r->enclosing_check (other, d, whole_edges,
-                             metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
-                             ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
-                             min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                             max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
-                             shielded);
+  return r->enclosing_check (other, d, db::RegionCheckOptions (whole_edges,
+                                          metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()),
+                                          ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                                          min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                                          max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                                          shielded)
+                            );
 }
 
 static db::EdgePairs separation1 (const db::Region *r, const db::Region &other, db::Region::distance_type d) 
@@ -548,12 +555,13 @@ static db::EdgePairs separation1 (const db::Region *r, const db::Region &other, 
 
 static db::EdgePairs separation2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
-  return r->separation_check (other, d, whole_edges,
-                              metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
-                              ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
-                              min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                              max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
-                              shielded);
+  return r->separation_check (other, d, db::RegionCheckOptions (whole_edges,
+                                            metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()),
+                                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                                            min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                                            max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                                            shielded)
+                             );
 }
 
 static std::vector<db::Region> andnot (const db::Region *r, const db::Region &other)

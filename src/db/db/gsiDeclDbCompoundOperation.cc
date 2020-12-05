@@ -366,6 +366,8 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   "\n"
   "The search distance for introduder shapes is determined by the operation and computed from the operation's requirements.\n"
   "\n"
+  "NOTE: this feature is experimental and not deployed into the the DRC framework yet.\n"
+  "\n"
   "This class has been introduced in version 0.27."
 );
 

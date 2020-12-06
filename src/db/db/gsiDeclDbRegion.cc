@@ -2527,7 +2527,10 @@ gsi::EnumIn<db::Region, db::RectFilter> decl_Region_RectFilter ("db", "RectFilte
     "@brief Allow errors on two opposite sides"
   ) +
   gsi::enum_const ("ThreeSidesAllowed", db::RectFilter::ThreeSidesAllowed,
-    "@brief Allow errors on three sides"
+    "@brief Allow errors when on three sides"
+  ) +
+  gsi::enum_const ("FourSidesAllowed", db::RectFilter::FourSidesAllowed,
+    "@brief Allow errors when on all sides"
   ),
   "@brief This class represents the error filter mode on rectangles for \\Region#separation and related checks.\n"
   "\n"

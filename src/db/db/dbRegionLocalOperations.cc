@@ -312,10 +312,72 @@ check_local_operation<TS, TI>::compute_local (db::Layout *layout, const shape_in
 
   }
 
-  //  implements filtering on rectangles
+  //  implements error filtering on rectangles
   if (m_rect_filter != RectFilter::NoSideAllowed && ! result.empty ()) {
 
-    //  @@@ TODO: implement @@@
+    std::unordered_set<db::EdgePair> waived;
+
+    for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+
+      const TS &subject = interactions.subject_shape (i->first);
+      if (! subject.is_box ()) {
+        continue;
+      }
+
+      unsigned int p = 1;
+      std::map<db::Edge, unsigned int> edges_with_errors;
+      for (typename TS::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end (); ++e) {
+        edges_with_errors [*e] = p;
+        p <<= 1;
+      }
+
+      unsigned int error_pattern = 0;
+      for (std::unordered_set<db::EdgePair>::const_iterator ep = result.begin (); ep != result.end (); ++ep) {
+        std::map<db::Edge, unsigned int>::iterator i = edges_with_errors.find (ep->first ());
+        if (i != edges_with_errors.end ()) {
+          if ((error_pattern & i->second) == 0) {
+            error_pattern |= i->second;
+          }
+        }
+      }
+
+      if (error_pattern != 0) {
+
+        bool can_be_waived = false;
+
+        //  decode pattern: consider each group of 4 bits and match them against the error pattern in their four rotation variants
+        uint32_t p32 = (uint32_t) m_rect_filter;
+        while (p32 != 0 && ! can_be_waived) {
+
+          uint32_t p4 = p32 & 0xf;
+          p32 >>= 4;
+
+          for (unsigned int r = 0; r < 4 && ! can_be_waived; ++r) {
+            can_be_waived = (error_pattern == p4);
+            p4 = ((p4 << 1) & 0xf) | ((p4 & 0x8) >> 3);
+          }
+
+        }
+
+        if (can_be_waived) {
+
+          for (std::unordered_set<db::EdgePair>::const_iterator ep = result.begin (); ep != result.end (); ++ep) {
+            if (edges_with_errors.find (ep->first ()) != edges_with_errors.end ()) {
+              waived.insert (*ep);
+            }
+          }
+
+        }
+
+      }
+
+    }
+
+    if (! waived.empty ()) {
+      for (std::unordered_set<db::EdgePair>::const_iterator i = waived.begin (); i != waived.end (); ++i) {
+        result.erase (*i);
+      }
+    }
 
   }
 }

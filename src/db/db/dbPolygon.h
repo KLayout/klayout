@@ -3218,6 +3218,14 @@ public:
     return this->obj ().perimeter ();
   }
 
+  /**
+   *  @brief Returns a value indicating whether the polygon is a box
+   */
+  bool is_box () const
+  {
+    return this->obj ().is_box ();
+  }
+
   /** 
    *  @brief Return the transformed object
    * 

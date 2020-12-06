@@ -661,7 +661,6 @@ TEST(15h)
 {
   //  opposite_filter with internal shielding
 
-  //  shielding within opposite error detection
   db::Region r2;
   r2.insert (db::Box (db::Point (0, 0), db::Point (90, 100)));
   r2.insert (db::Box (db::Point (0, 200), db::Point (90, 300)));
@@ -687,6 +686,85 @@ TEST(15h)
   options.opposite_filter = db::OnlyOpposite;
   EXPECT_EQ (r1.separation_check (r2, 40, options).to_string (),
     "(200,100;200,0)/(210,0;210,100);(100,0;100,100)/(90,100;90,0)");
+}
+
+TEST(15i)
+{
+  //  rectangle error filter
+
+  db::Region r;
+  r.insert (db::Box (db::Point (-90, -90), db::Point (90, 90)));
+
+  db::Region rl;
+  rl.insert (db::Box (db::Point (-200, -100), db::Point (-100, 100)));
+
+  db::Region rr;
+  rr.insert (db::Box (db::Point (100, -100), db::Point (200, 100)));
+
+  db::Region rb;
+  rb.insert (db::Box (db::Point (-100, -200), db::Point (100, -100)));
+
+  db::Region rt;
+  rt.insert (db::Box (db::Point (-100, 100), db::Point (100, 200)));
+
+  db::RegionCheckOptions options;
+  options.metrics = db::Projection;
+  options.rect_filter = db::OneSideAllowed;
+
+  EXPECT_EQ (r.separation_check (rl + rr, 40, options).to_string (), "(-90,-90;-90,90)/(-100,90;-100,-90);(90,90;90,-90)/(100,-90;100,90)");
+  EXPECT_EQ (r.separation_check (rl + rt, 40, options).to_string (), "(-90,90;90,90)/(90,100;-90,100);(-90,-90;-90,90)/(-100,90;-100,-90)");
+  EXPECT_EQ (r.separation_check (rl, 40, options).to_string (), "");
+  EXPECT_EQ (r.separation_check (rt, 40, options).to_string (), "");
+  EXPECT_EQ (r.separation_check (rt + rr + rb, 40, options).to_string (), "(90,-90;-90,-90)/(-90,-100;90,-100);(90,90;90,-90)/(100,-90;100,90);(-90,90;90,90)/(90,100;-90,100)");
+
+  options.rect_filter = db::TwoSidesAllowed;
+
+  EXPECT_EQ (r.separation_check (rl + rr, 40, options).to_string (), "");
+  EXPECT_EQ (r.separation_check (rl + rt, 40, options).to_string (), "");
+  EXPECT_EQ (r.separation_check (rl, 40, options).to_string (), "(-90,-90;-90,90)/(-100,90;-100,-90)");
+  EXPECT_EQ (r.separation_check (rt, 40, options).to_string (), "(-90,90;90,90)/(90,100;-90,100)");
+  EXPECT_EQ (r.separation_check (rt + rr + rb, 40, options).to_string (), "(90,-90;-90,-90)/(-90,-100;90,-100);(90,90;90,-90)/(100,-90;100,90);(-90,90;90,90)/(90,100;-90,100)");
+
+  options.rect_filter = db::TwoOppositeSidesAllowed;
+
+  EXPECT_EQ (r.separation_check (rl + rr, 40, options).to_string (), "");
+  EXPECT_EQ (r.separation_check (rl + rt, 40, options).to_string (), "(-90,90;90,90)/(90,100;-90,100);(-90,-90;-90,90)/(-100,90;-100,-90)");
+  EXPECT_EQ (r.separation_check (rl, 40, options).to_string (), "(-90,-90;-90,90)/(-100,90;-100,-90)");
+  EXPECT_EQ (r.separation_check (rt, 40, options).to_string (), "(-90,90;90,90)/(90,100;-90,100)");
+  EXPECT_EQ (r.separation_check (rt + rr + rb, 40, options).to_string (), "(90,-90;-90,-90)/(-90,-100;90,-100);(90,90;90,-90)/(100,-90;100,90);(-90,90;90,90)/(90,100;-90,100)");
+
+  options.rect_filter = db::TwoConnectedSidesAllowed;
+
+  EXPECT_EQ (r.separation_check (rl + rr, 40, options).to_string (), "(-90,-90;-90,90)/(-100,90;-100,-90);(90,90;90,-90)/(100,-90;100,90)");
+  EXPECT_EQ (r.separation_check (rl + rt, 40, options).to_string (), "");
+  EXPECT_EQ (r.separation_check (rl, 40, options).to_string (), "(-90,-90;-90,90)/(-100,90;-100,-90)");
+  EXPECT_EQ (r.separation_check (rt, 40, options).to_string (), "(-90,90;90,90)/(90,100;-90,100)");
+  EXPECT_EQ (r.separation_check (rt + rr + rb, 40, options).to_string (), "(90,-90;-90,-90)/(-90,-100;90,-100);(90,90;90,-90)/(100,-90;100,90);(-90,90;90,90)/(90,100;-90,100)");
+
+  options.rect_filter = db::ThreeSidesAllowed;
+
+  EXPECT_EQ (r.separation_check (rl + rr, 40, options).to_string (), "(-90,-90;-90,90)/(-100,90;-100,-90);(90,90;90,-90)/(100,-90;100,90)");
+  EXPECT_EQ (r.separation_check (rl + rt, 40, options).to_string (), "(-90,90;90,90)/(90,100;-90,100);(-90,-90;-90,90)/(-100,90;-100,-90)");
+  EXPECT_EQ (r.separation_check (rl, 40, options).to_string (), "(-90,-90;-90,90)/(-100,90;-100,-90)");
+  EXPECT_EQ (r.separation_check (rt, 40, options).to_string (), "(-90,90;90,90)/(90,100;-90,100)");
+  EXPECT_EQ (r.separation_check (rt + rr + rb, 40, options).to_string (), "");
+
+  options.rect_filter = db::RectFilter (0x9531);  //  one and two sides allowed
+
+  EXPECT_EQ (r.separation_check (rl + rr, 40, options).to_string (), "");
+  EXPECT_EQ (r.separation_check (rl + rt, 40, options).to_string (), "");
+  EXPECT_EQ (r.separation_check (rl, 40, options).to_string (), "");
+  EXPECT_EQ (r.separation_check (rt, 40, options).to_string (), "");
+  EXPECT_EQ (r.separation_check (rt + rr + rb, 40, options).to_string (), "(90,-90;-90,-90)/(-90,-100;90,-100);(90,90;90,-90)/(100,-90;100,90);(-90,90;90,90)/(90,100;-90,100)");
+
+  options.rect_filter = db::RectFilter (0x31);  //  one and two connected sides allowed
+
+  EXPECT_EQ (r.separation_check (rl + rr, 40, options).to_string (), "(-90,-90;-90,90)/(-100,90;-100,-90);(90,90;90,-90)/(100,-90;100,90)");
+  EXPECT_EQ (r.separation_check (rl + rt, 40, options).to_string (), "");
+  EXPECT_EQ (r.separation_check (rr + rt, 40, options).to_string (), "");
+  EXPECT_EQ (r.separation_check (rl, 40, options).to_string (), "");
+  EXPECT_EQ (r.separation_check (rt, 40, options).to_string (), "");
+  EXPECT_EQ (r.separation_check (rt + rr + rb, 40, options).to_string (), "(90,-90;-90,-90)/(-90,-100;90,-100);(90,90;90,-90)/(100,-90;100,90);(-90,90;90,90)/(90,100;-90,100)");
 }
 
 TEST(16)

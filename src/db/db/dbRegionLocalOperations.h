@@ -34,38 +34,49 @@ namespace db
 
 /**
  *  @brief Specifies an error filter on rectangular shapes
+ *
+ *  There are actually more combinations possible. The bit pattern of the enum value consists
+ *  of groups of 4 bits each specifying an allowed pattern. Rotation is implicit, so it's just
+ *  required to give on incarnation.
+ *
+ *  For example: 0x1953 would be one- or two-sided.
  */
 enum RectFilter
 {
   /**
    *  @brief No filter
    */
-  NoSideAllowed,
+  NoSideAllowed = 0,
 
   /**
    *  @brief Allow errors on one side
    */
-  OneSideAllowed,
+  OneSideAllowed = 0x1,
 
   /**
    *  @brief Allow errors on two sides (not specified which)
    */
-  TwoSidesAllowed,
+  TwoSidesAllowed = 0x953,
 
   /**
    *  @brief Allow errors on two sides ("L" configuration)
    */
-  TwoConnectedSidesAllowed,
+  TwoConnectedSidesAllowed = 0x3,
 
   /**
    *  @brief Allow errors on two opposite sides
    */
-  TwoOppositeSidesAllowed,
+  TwoOppositeSidesAllowed = 0x5,
 
   /**
    *  @brief Allow errors on three sides
    */
-  ThreeSidesAllowed
+  ThreeSidesAllowed = 0x7,
+
+  /**
+   *  @brief Allow errors when on all sides
+   */
+  FourSidesAllowed = 0xf
 };
 
 /**

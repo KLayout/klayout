@@ -240,6 +240,116 @@ gen = Gen::new
 
 run_demo gen, "input1.separation(input2, 1.2, euclidian)", "drc_separation1.png"
 
+class Gen
+  def produce(s1, s2)
+    pts = [ 
+      RBA::Point::new(1000, 0),
+      RBA::Point::new(1000, 6000),
+      RBA::Point::new(2000, 6000),
+      RBA::Point::new(2000, 0),
+    ];
+    s2.insert(RBA::Polygon::new(pts))
+    pts = [ 
+      RBA::Point::new(5000, 2000),
+      RBA::Point::new(5000, 4000),
+      RBA::Point::new(6000, 4000),
+      RBA::Point::new(6000, 2000),
+    ];
+    s2.insert(RBA::Polygon::new(pts))
+    pts = [ 
+      RBA::Point::new(3000, 0),
+      RBA::Point::new(3000, 6000),
+      RBA::Point::new(4000, 6000),
+      RBA::Point::new(4000, 0)
+    ];
+    s1.insert(RBA::Polygon::new(pts))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input1.sep(input2, 1.2, projection)", "drc_separation2.png"
+run_demo gen, "input1.sep(input2, 1.2, projection, not_opposite)", "drc_separation3.png"
+run_demo gen, "input1.sep(input2, 1.2, projection, only_opposite)", "drc_separation4.png"
+
+class Gen
+  def produce(s1, s2)
+    pts = [ 
+      RBA::Point::new(0, 3000),
+      RBA::Point::new(0, 4000),
+      RBA::Point::new(1000, 4000),
+      RBA::Point::new(1000, 3000)
+    ]
+    s2.insert(RBA::Polygon::new(pts))
+    pts = [ 
+      RBA::Point::new(3000, 3000),
+      RBA::Point::new(3000, 4000),
+      RBA::Point::new(4000, 4000),
+      RBA::Point::new(4000, 3000)
+    ]
+    s2.insert(RBA::Polygon::new(pts))
+    pts = [ 
+      RBA::Point::new(6000, 3000),
+      RBA::Point::new(6000, 4000),
+      RBA::Point::new(7000, 4000),
+      RBA::Point::new(7000, 3000)
+    ]
+    s2.insert(RBA::Polygon::new(pts))
+    pts = [ 
+      RBA::Point::new(4500, 1500),
+      RBA::Point::new(4500, 2500),
+      RBA::Point::new(5500, 2500),
+      RBA::Point::new(5500, 1500)
+    ]
+    s2.insert(RBA::Polygon::new(pts))
+    pts = [ 
+      RBA::Point::new(1500, 3000),
+      RBA::Point::new(1500, 4000),
+      RBA::Point::new(2500, 4000),
+      RBA::Point::new(2500, 3000)
+    ]
+    s1.insert(RBA::Polygon::new(pts))
+    pts = [ 
+      RBA::Point::new(3000, 4500),
+      RBA::Point::new(3000, 5500),
+      RBA::Point::new(4000, 5500),
+      RBA::Point::new(4000, 4500)
+    ]
+    s1.insert(RBA::Polygon::new(pts))
+    pts = [ 
+      RBA::Point::new(3000, 1500),
+      RBA::Point::new(3000, 2500),
+      RBA::Point::new(4000, 2500),
+      RBA::Point::new(4000, 1500)
+    ]
+    s1.insert(RBA::Polygon::new(pts))
+    pts = [ 
+      RBA::Point::new(4500, 3000),
+      RBA::Point::new(4500, 4000),
+      RBA::Point::new(5500, 4000),
+      RBA::Point::new(5500, 3000)
+    ]
+    s1.insert(RBA::Polygon::new(pts))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input1.sep(input2, 1.0, projection)", "drc_separation5.png"
+run_demo gen, "input1.sep(input2, 1.0, projection,\n" +
+              "           one_side_allowed)", "drc_separation6.png"
+run_demo gen, "input1.sep(input2, 1.0, projection,\n" + 
+              "           two_sides_allowed)", "drc_separation7.png"
+run_demo gen, "input1.sep(input2, 1.0, projection,\n" +
+              "           two_opposite_sides_allowed)", "drc_separation8.png"
+run_demo gen, "input1.sep(input2, 1.0, projection,\n" + 
+              "           two_connected_sides_allowed)", "drc_separation9.png"
+run_demo gen, "input1.sep(input2, 1.0, projection,\n" +
+              "           three_sides_allowed)", "drc_separation10.png"
+run_demo gen, "input1.sep(input2, 1.0, projection,\n" +
+              "           one_side_allowed,\n" + 
+              "           two_opposite_sides_allowed)", "drc_separation11.png"
+
 # ...
 
 class Gen

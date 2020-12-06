@@ -357,6 +357,7 @@ See <a href="#enclosing">enclosing</a> for a description of that method
 <p>Usage:</p>
 <ul>
 <li><tt>layer.enclosing(other_layer, value [, options])</tt></li>
+<li><tt>layer.enc(other_layer, value [, options])</tt></li>
 </ul>
 <p>
 This method checks whether layer encloses (is bigger than) other_layer by the
@@ -366,6 +367,10 @@ Locations, where both edges coincide will be reported as errors as well. Formall
 such locations form an enclosure with a distance of 0. Locations, where other_layer
 extends outside layer will not be reported as errors. Such regions can be detected
 by <a href="#not_inside">not_inside</a> or a boolean "not" operation.
+</p><p>
+"enc" is the short form of this method.
+</p><p>
+The options are the same as for <a href="#separation">separation</a>.
 </p><p>
 The enclosing method can be applied to both edge or polygon layers. On edge layers 
 the orientation of the edges matters and only edges looking into the same direction
@@ -915,12 +920,15 @@ See <a href="#isolated">isolated</a> for a description of that method
 <p>Usage:</p>
 <ul>
 <li><tt>layer.isolated(value [, options])</tt></li>
+<li><tt>layer.iso(value [, options])</tt></li>
 </ul>
 <p>
 See <a href="#space">space</a> for a description of this method. 
 In contrast to <a href="#space">space</a>, this
 method is available for polygon layers only, since only on such layers 
 different polygons can be identified.
+</p><p>
+"iso" is the short form of this method.
 </p><p>
 The following image shows the effect of the isolated check:
 </p><p>
@@ -1281,7 +1289,8 @@ is <a href="#select_not_overlapping">select_not_overlapping</a>.
 See <a href="#space">space</a> for a description of this method.
 In contrast to <a href="#space">space</a>, this
 method is available for polygon layers only, since only on such layers 
-different polygons can be identified.
+different polygons can be identified. Also, opposite and rectangle error
+filtering is not available for this method.
 </p><p>
 The following image shows the effect of the notch check:
 </p><p>
@@ -1416,6 +1425,8 @@ Locations, where both layers touch will be reported as errors as well. Formally
 such locations form an overlap with a value of 0. Locations, where both regions 
 do not overlap or touch will not be reported. Such regions can be detected 
 with <a href="#outside">outside</a> or by a boolean "not".
+</p><p>
+The options are the same as for <a href="#separation">separation</a>.
 </p><p>
 Formally, the overlap method is a two-layer width check. In contrast to the single-
 layer width method (<a href="#width">width</a>), the zero value also triggers an error and separate
@@ -1880,12 +1891,15 @@ See <a href="#separation">separation</a> for a description of that method
 <p>Usage:</p>
 <ul>
 <li><tt>layer.separation(other_layer, value [, options])</tt></li>
+<li><tt>layer.sep(other_layer, value [, options])</tt></li>
 </ul>
 <p>
 This method performs a two-layer spacing check. Like <a href="#space">space</a>, this method
 can be applied to edge or polygon layers. Locations where edges of the layer
 are closer than the specified distance to the other layer are reported
 as edge pair error markers.
+</p><p>
+"sep" is the short form of this method.
 </p><p>
 In contrast to the <a href="#space">space</a> and related methods, locations where both 
 layers touch are also reported. More specifically, the case of zero spacing
@@ -1901,6 +1915,72 @@ The following image shows the effect of the separation check (input1: red, input
 <table>
 <tr>
 <td><img src="/images/drc_separation1.png"/></td>
+</tr>
+</table>
+</p><p>
+The options for the separation check are those available for the <a href="#width">width</a> or <a href="#space">space</a>
+method plus opposite and rectangle error filtering. 
+</p><p>
+Opposite error filtering will waive errors that are on opposite sides of the original
+figure. The inverse is selection of errors only when there is an error present on
+the opposite side of the original figure. Opposite error waiving or selection is achieved
+through these options inside the DRC function call:
+</p><p>
+<ul>
+<li><b>not_opposite </b>will waive opposite errors </li>
+<li><b>only_opposite </b>will select errors only if there is an opposite one </li>
+</ul>
+</p><p>
+These modes imply partial waiving or selection if "opposite" only applies to a section
+of an error.
+</p><p>
+The following images shows the effect of these options:
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_separation2.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_separation3.png"/></td>
+<td><img src="/images/drc_separation4.png"/></td>
+</tr>
+</table>
+</p><p>
+Rectangle error filtering allows waiving errors based on how they cover the
+sides of an original rectangular figure. This selection only applies to errors
+covering the full edge of the rectangle. Errors covering parts of the rectangle
+edges are not considered in this scheme.
+</p><p>
+The rectangle filter option is enabled by these modes:
+</p><p>
+<ul>
+<li><b>one_side_allowed </b>will waive errors when they appear on one side of the rectangle only </li>
+<li><b>two_sides_allowed </b>will waive errors when they appear on two sides of the rectangle </li>
+<li><b>two_connected_sides_allowed </b>will waive errors when they appear on two connected sides of the rectangle ("L" configuration) </li>
+<li><b>two_opposite_sides_allowed </b>will waive errors when they appear on two opposite sides of the rectangle </li>
+<li><b>three_sides_allowed </b>will waive errors when they appear on three sides of the rectangle </li>
+<li><b>four_sides_allowed </b>will waive errors when they appear on four sides of the rectangle </li>
+</ul>
+</p><p>
+Multiple of these options can be given, which will make errors waived if one of these conditions is met.
+</p><p>
+The following images shows the effect of some rectangle filter modes:
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_separation5.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_separation6.png"/></td>
+<td><img src="/images/drc_separation7.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_separation8.png"/></td>
+<td><img src="/images/drc_separation9.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_separation10.png"/></td>
+<td><img src="/images/drc_separation11.png"/></td>
 </tr>
 </table>
 </p>
@@ -2037,8 +2117,8 @@ The <a href="#notch">notch</a> method is similar, but will only report self-spac
 method will only report space violations to other polygons. <a href="#separation">separation</a> is a two-layer 
 space check where space is checked against polygons of another layer.
 </p><p>
-The options available are the same than for the <a href="#width">width</a> method. Like for the <a href="#width">width</a> 
-method, merged semantics applies.
+Like for the <a href="#width">width</a> method, merged semantics applies.
+</p><p>
 Distance values can be given as floating-point values (in micron) or integer values (in
 database units). To explicitly specify the unit, use the unit denominators.
 </p><p>

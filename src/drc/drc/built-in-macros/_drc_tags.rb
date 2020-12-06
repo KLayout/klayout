@@ -72,6 +72,24 @@ module DRC
     end
   end
   
+  # A wrapper for a rectangle error filter mode 
+  # The purpose of this wrapper is to identify the error filter mode
+  class DRCRectangleErrorFilter
+    attr_accessor :value
+    def initialize(v)
+      self.value = v
+    end
+  end
+  
+  # A wrapper for a opposite error filter mode 
+  # The purpose of this wrapper is to identify the error filter mode
+  class DRCOppositeErrorFilter
+    attr_accessor :value
+    def initialize(v)
+      self.value = v
+    end
+  end
+  
   # A wrapper for a glob-pattern style text selection for
   # some DRC functions. The purpose of this class
   # is to identify the value by the class.

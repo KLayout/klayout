@@ -115,6 +115,38 @@ module DRC
       DRCMetrics::new(RBA::Region::Projection)
     end
     
+    def not_opposite
+      DRCOppositeErrorFilter::new(RBA::Region::NotOpposite)
+    end
+    
+    def only_opposite
+      DRCOppositeErrorFilter::new(RBA::Region::OnlyOpposite)
+    end
+    
+    def one_side_allowed
+      DRCRectangleErrorFilter::new(RBA::Region::OneSideAllowed)
+    end
+    
+    def two_sides_allowed
+      DRCRectangleErrorFilter::new(RBA::Region::TwoSidesAllowed)
+    end
+    
+    def two_connected_sides_allowed
+      DRCRectangleErrorFilter::new(RBA::Region::TwoConnectedSidesAllowed)
+    end
+    
+    def two_opposite_sides_allowed
+      DRCRectangleErrorFilter::new(RBA::Region::TwoOppositeSidesAllowed)
+    end
+    
+    def three_sides_allowed
+      DRCRectangleErrorFilter::new(RBA::Region::ThreeSidesAllowed)
+    end
+    
+    def four_sides_allowed
+      DRCRectangleErrorFilter::new(RBA::Region::FourSidesAllowed)
+    end
+    
     def pattern(p)
       DRCPattern::new(true, p)
     end

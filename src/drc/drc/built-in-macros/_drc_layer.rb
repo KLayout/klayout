@@ -2609,8 +2609,8 @@ CODE
     # method will only report space violations to other polygons. \separation is a two-layer 
     # space check where space is checked against polygons of another layer.
     #
-    # The options available are the same than for the \width method. Like for the \width 
-    # method, merged semantics applies.
+    # Like for the \width method, merged semantics applies.
+    #
     # Distance values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
     #
@@ -2621,16 +2621,20 @@ CODE
     #     @td @img(/images/drc_space1.png) @/td
     #   @/tr
     # @/table
+    #
     
     # %DRC%
     # @name isolated
     # @brief An isolation check
     # @synopsis layer.isolated(value [, options])
+    # @synopsis layer.iso(value [, options])
     #
     # See \space for a description of this method. 
     # In contrast to \space, this
     # method is available for polygon layers only, since only on such layers 
     # different polygons can be identified.
+    #
+    # "iso" is the short form of this method.
     #
     # The following image shows the effect of the isolated check:
     # 
@@ -2648,7 +2652,8 @@ CODE
     # See \space for a description of this method.
     # In contrast to \space, this
     # method is available for polygon layers only, since only on such layers 
-    # different polygons can be identified.
+    # different polygons can be identified. Also, opposite and rectangle error
+    # filtering is not available for this method.
     #
     # The following image shows the effect of the notch check:
     # 
@@ -2662,12 +2667,15 @@ CODE
     # @name separation
     # @brief A two-layer spacing check
     # @synopsis layer.separation(other_layer, value [, options])
+    # @synopsis layer.sep(other_layer, value [, options])
     # 
     # This method performs a two-layer spacing check. Like \space, this method
     # can be applied to edge or polygon layers. Locations where edges of the layer
     # are closer than the specified distance to the other layer are reported
     # as edge pair error markers.
-    # 
+    #
+    # "sep" is the short form of this method.
+    #
     # In contrast to the \space and related methods, locations where both 
     # layers touch are also reported. More specifically, the case of zero spacing
     # will also trigger an error while for \space it will not.
@@ -2684,6 +2692,72 @@ CODE
     #     @td @img(/images/drc_separation1.png) @/td
     #   @/tr
     # @/table
+    #
+    # The options for the separation check are those available for the \width or \space
+    # method plus opposite and rectangle error filtering. 
+    #
+    # Opposite error filtering will waive errors that are on opposite sides of the original
+    # figure. The inverse is selection of errors only when there is an error present on
+    # the opposite side of the original figure. Opposite error waiving or selection is achieved
+    # through these options inside the DRC function call:
+    #
+    # @ul
+    #   @li @b not_opposite @/b will waive opposite errors @/li
+    #   @li @b only_opposite @/b will select errors only if there is an opposite one @/li
+    # @/ul
+    #
+    # These modes imply partial waiving or selection if "opposite" only applies to a section
+    # of an error.
+    #
+    # The following images shows the effect of these options:
+    # 
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_separation2.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_separation3.png) @/td
+    #     @td @img(/images/drc_separation4.png) @/td
+    #   @/tr
+    # @/table
+    #
+    # Rectangle error filtering allows waiving errors based on how they cover the
+    # sides of an original rectangular figure. This selection only applies to errors
+    # covering the full edge of the rectangle. Errors covering parts of the rectangle
+    # edges are not considered in this scheme.
+    #
+    # The rectangle filter option is enabled by these modes:
+    #
+    # @ul
+    #   @li @b one_side_allowed @/b will waive errors when they appear on one side of the rectangle only @/li
+    #   @li @b two_sides_allowed @/b will waive errors when they appear on two sides of the rectangle @/li
+    #   @li @b two_connected_sides_allowed @/b will waive errors when they appear on two connected sides of the rectangle ("L" configuration) @/li
+    #   @li @b two_opposite_sides_allowed @/b will waive errors when they appear on two opposite sides of the rectangle @/li
+    #   @li @b three_sides_allowed @/b will waive errors when they appear on three sides of the rectangle @/li
+    #   @li @b four_sides_allowed @/b will waive errors when they appear on four sides of the rectangle @/li
+    # @/ul
+    #
+    # Multiple of these options can be given, which will make errors waived if one of these conditions is met.
+    # 
+    # The following images shows the effect of some rectangle filter modes:
+    # 
+    # @table 
+    #   @tr 
+    #     @td @img(/images/drc_separation5.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_separation6.png) @/td
+    #     @td @img(/images/drc_separation7.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_separation8.png) @/td
+    #     @td @img(/images/drc_separation9.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_separation10.png) @/td
+    #     @td @img(/images/drc_separation11.png) @/td
+    #   @/tr
+    # @/table
     
     # %DRC% 
     # @name overlap 
@@ -2697,6 +2771,8 @@ CODE
     # such locations form an overlap with a value of 0. Locations, where both regions 
     # do not overlap or touch will not be reported. Such regions can be detected 
     # with \outside or by a boolean "not".
+    #
+    # The options are the same as for \separation.
     # 
     # Formally, the overlap method is a two-layer width check. In contrast to the single-
     # layer width method (\width), the zero value also triggers an error and separate
@@ -2725,6 +2801,7 @@ CODE
     # @name enclosing
     # @brief An enclosing check
     # @synopsis layer.enclosing(other_layer, value [, options])
+    # @synopsis layer.enc(other_layer, value [, options])
     #
     # This method checks whether layer encloses (is bigger than) other_layer by the
     # given dimension. Locations, where this is not the case will be reported in form
@@ -2733,6 +2810,10 @@ CODE
     # such locations form an enclosure with a distance of 0. Locations, where other_layer
     # extends outside layer will not be reported as errors. Such regions can be detected
     # by \not_inside or a boolean "not" operation.
+    #
+    # "enc" is the short form of this method.
+    #
+    # The options are the same as for \separation.
     #
     # The enclosing method can be applied to both edge or polygon layers. On edge layers 
     # the orientation of the edges matters and only edges looking into the same direction
@@ -2752,20 +2833,26 @@ CODE
     #   @/tr
     # @/table
     
-    %w(width space overlap enclosing separation).each do |f|
+    %w(width space overlap enclosing separation isolated notch).each do |f|
       eval <<"CODE"
       def #{f}(*args)
 
-        requires_edges_or_region("#{f}")
+        if :#{f} == :width || :#{f} == :space || :#{f} == :overlap || :#{f} == :enclosing || :#{f} == :separation
+          requires_edges_or_region("#{f}")
+        else
+          requires_region("#{f}")
+        end
         
         value = nil
-        metrics = nil
+        metrics = RBA::Region::Euclidian
         minp = nil
         maxp = nil
         alim = nil
         whole_edges = false
         other = nil
         shielded = nil
+        opposite_filter = RBA::Region::NoOppositeFilter
+        rect_filter = RBA::Region::NoRectFilter
 
         n = 1
         args.each do |a|
@@ -2773,6 +2860,10 @@ CODE
             metrics = a.value
           elsif a.is_a?(DRCWholeEdges)
             whole_edges = a.value
+          elsif a.is_a?(DRCOppositeErrorFilter)
+            opposite_filter = a.value
+          elsif a.is_a?(DRCRectangleErrorFilter)
+            rect_filter = RBA::Region::RectFilter::new(a.value.to_i | rect_filter.to_i)
           elsif a.is_a?(DRCAngleLimit)
             alim = a.value
           elsif a.is_a?(DRCLayer)
@@ -2796,85 +2887,38 @@ CODE
         end
 
         args = [ value, whole_edges, metrics, alim, minp, maxp ]
-        if shielded != nil
-          if self.data.is_a?(RBA::Region)
-            args << shielded
-          else 
-            raise("#{f}: shielding can only be used for polygon layers")
+
+        if self.data.is_a?(RBA::Region)
+          args << shielded
+          if :#{f} != :width && :#{f} != :notch
+            args << opposite_filter
+            args << rect_filter
+          elsif opposite_filter != RBA::Region::NoOppositeFilter
+            raise("#{f}: an opposite error filter cannot be used with this check")
+          elsif rect_filter != RBA::Region::NoRectFilter
+            raise("#{f}: a rectangle error filter cannot be used with this check")
           end
+        elsif shielded != nil
+          raise("#{f}: shielding can only be used for polygon layers")
+        elsif opposite_filter != RBA::Region::NoOppositeFilter
+          raise("#{f}: an opposite error filter can only be used for polygon layers")
+        elsif rect_filter != RBA::Region::NoRectFilter
+          raise("#{f}: a rectangle error filter can only be used for polygon layers")
         end
         
         border = (metrics == RBA::Region::Square ? value * 1.5 : value)
         
-        if "#{f}" == "width" || "#{f}" == "space" || "#{f}" == "notch" || "#{f}" == "isolated"
+        if :#{f} == :width || :#{f} == :space || :#{f} == :notch || :#{f} == :isolated
           if other
-            raise("No other layer must be specified for single-layer checks (i.e. width)")
+            raise("No other layer must be specified for a single-layer check (here: #{f})")
           end
           DRCLayer::new(@engine, @engine._tcmd(self.data, border, RBA::EdgePairs, :#{f}_check, *args))
         else
           if !other
-            raise("The other layer must be specified for two-layer checks (i.e. overlap)")
+            raise("The other layer must be specified for a two-layer check (here: #{f})")
           end
           requires_same_type(other, "#{f}")
           DRCLayer::new(@engine, @engine._tcmd(self.data, border, RBA::EdgePairs, :#{f}_check, other.data, *args))
-        end
-        
-      end  
-CODE
-    end
-    
-    %w(isolated notch).each do |f|
-      eval <<"CODE"
-      def #{f}(*args)
-
-        requires_region("#{f}")
-        
-        value = nil
-        metrics = nil
-        minp = nil
-        maxp = nil
-        alim = nil
-        whole_edges = false
-        other = nil
-
-        n = 1
-        args.each do |a|
-          if a.is_a?(DRCMetrics)
-            metrics = a.value
-          elsif a.is_a?(DRCWholeEdges)
-            whole_edges = a.value
-          elsif a.is_a?(DRCAngleLimit)
-            alim = a.value
-          elsif a.is_a?(DRCLayer)
-            other = a
-          elsif a.is_a?(DRCProjectionLimits)
-            minp = @engine._prep_value(a.min)
-            maxp = @engine._prep_value(a.max)
-          elsif a.is_a?(Float) || a.is_a?(1.class)
-            value && raise("Value already specified")
-            value = @engine._prep_value(a)
-          else
-            raise("#{f}: Parameter #" + n.to_s + " does not have an expected type")
-          end
-          n += 1
-        end
-
-        if !value
-          raise("A check value must be specified")
-        end
-        
-        border = (metrics == RBA::Region::Square ? value * 1.5 : value)
-        
-        if "#{f}" == "width" || "#{f}" == "space" || "#{f}" == "notch" || "#{f}" == "isolated"
-          if other
-            raise("#{f}: No other layer must be specified for single-layer checks (i.e. width)")
-          end
-          DRCLayer::new(@engine, @engine._tcmd(self.data, border, RBA::EdgePairs, :#{f}_check, value, whole_edges, metrics, alim, minp, maxp))
-        else
-          if !other
-            raise("#{f}: The other layer must be specified for two-layer checks (i.e. overlap)")
-          end
-          DRCLayer::new(@engine, @engine._tcmd(self.data, border, RBA::EdgePairs, :#{f}_check, other.data, value, whole_edges, metrics, alim, minp, maxp))
         end
         
       end  

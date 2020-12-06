@@ -352,9 +352,11 @@ check_local_operation<TS, TI>::compute_local (db::Layout *layout, const shape_in
           uint32_t p4 = p32 & 0xf;
           p32 >>= 4;
 
-          for (unsigned int r = 0; r < 4 && ! can_be_waived; ++r) {
-            can_be_waived = (error_pattern == p4);
-            p4 = ((p4 << 1) & 0xf) | ((p4 & 0x8) >> 3);
+          if (p4 > 0) {
+            for (unsigned int r = 0; r < 4 && ! can_be_waived; ++r) {
+              can_be_waived = (error_pattern == p4);
+              p4 = ((p4 << 1) & 0xf) | ((p4 & 0x8) >> 3);
+            }
           }
 
         }

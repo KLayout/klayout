@@ -257,9 +257,9 @@ private:
 
 //  Internal methods exposed for testing purposes
 
-DB_PUBLIC bool projected_near_part_of_edge (bool include_zero, db::Coord d, const db::Edge &e, const db::Edge &g, db::Edge *output);
-DB_PUBLIC bool square_near_part_of_edge (bool include_zero, db::Coord d, const db::Edge &e, const db::Edge &g, db::Edge *output);
-DB_PUBLIC bool euclidian_near_part_of_edge (bool include_zero, db::Coord d, const db::Edge &e, const db::Edge &g, db::Edge *output);
+DB_PUBLIC bool projected_near_part_of_edge (bool include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
+DB_PUBLIC bool square_near_part_of_edge (bool include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
+DB_PUBLIC bool euclidian_near_part_of_edge (bool include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
 DB_PUBLIC db::Edge::distance_type edge_projection (const db::Edge &a, const db::Edge &b);
 
 }

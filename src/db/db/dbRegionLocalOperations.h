@@ -39,7 +39,9 @@ namespace db
  *  of groups of 4 bits each specifying an allowed pattern. Rotation is implicit, so it's just
  *  required to give on incarnation.
  *
- *  For example: 0x1953 would be one- or two-sided.
+ *  For example: 0x153 would be one- or two-sided.
+ *
+ *  The bitmaps are choosen such that they can be or-combined.
  */
 enum RectFilter
 {
@@ -56,27 +58,27 @@ enum RectFilter
   /**
    *  @brief Allow errors on two sides (not specified which)
    */
-  TwoSidesAllowed = 0x953,
+  TwoSidesAllowed = 0x530,
 
   /**
    *  @brief Allow errors on two sides ("L" configuration)
    */
-  TwoConnectedSidesAllowed = 0x3,
+  TwoConnectedSidesAllowed = 0x30,
 
   /**
    *  @brief Allow errors on two opposite sides
    */
-  TwoOppositeSidesAllowed = 0x5,
+  TwoOppositeSidesAllowed = 0x500,
 
   /**
    *  @brief Allow errors on three sides
    */
-  ThreeSidesAllowed = 0x7,
+  ThreeSidesAllowed = 0x7000,
 
   /**
    *  @brief Allow errors when on all sides
    */
-  FourSidesAllowed = 0xf
+  FourSidesAllowed = 0xf0000
 };
 
 /**

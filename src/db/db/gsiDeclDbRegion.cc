@@ -2510,6 +2510,9 @@ gsi::EnumIn<db::Region, db::metrics_type> decl_Region_Metrics ("db", "Metrics",
   "This enum has been introduced in version 0.27."
 );
 
+//  Inject the Region::Metrics declarations into Region:
+gsi::ClassExt<db::Region> inject_Metrics_in_parent (decl_Region_Metrics.defs ());
+
 gsi::EnumIn<db::Region, db::RectFilter> decl_Region_RectFilter ("db", "RectFilter",
   gsi::enum_const ("NoRectFilter", db::RectFilter::NoSideAllowed,
     "@brief Specifies no filtering"
@@ -2537,6 +2540,8 @@ gsi::EnumIn<db::Region, db::RectFilter> decl_Region_RectFilter ("db", "RectFilte
   "This enum has been introduced in version 0.27."
 );
 
+//  Inject the Region::RectFilter declarations into Region:
+gsi::ClassExt<db::Region> inject_RectFilter_in_parent (decl_Region_RectFilter.defs ());
 
 gsi::EnumIn<db::Region, db::OppositeFilter> decl_Region_OppositeFilter ("db", "OppositeFilter",
   gsi::enum_const ("NoOppositeFilter", db::OppositeFilter::NoOppositeFilter,
@@ -2552,6 +2557,9 @@ gsi::EnumIn<db::Region, db::OppositeFilter> decl_Region_OppositeFilter ("db", "O
   "\n"
   "This enum has been introduced in version 0.27."
 );
+
+//  Inject the Region::OppositeFilter declarations into Region:
+gsi::ClassExt<db::Region> inject_OppositeFilter_in_parent (decl_Region_OppositeFilter.defs ());
 
 }
 

@@ -422,6 +422,7 @@ Disables tiling mode. Tiling mode can be enabled again with <a href="#tiles">til
 <p>Usage:</p>
 <ul>
 <li><tt>info(message)</tt></li>
+<li><tt>info(message, indent)</tt></li>
 </ul>
 <p>
 Prints the message to the log window in verbose mode.
@@ -520,6 +521,7 @@ For further methods on the source object see <a href="#Source">Source</a>.
 <p>Usage:</p>
 <ul>
 <li><tt>log(message)</tt></li>
+<li><tt>log(message, indent)</tt></li>
 </ul>
 <p>
 Prints the message to the log window.

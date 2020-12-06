@@ -1109,7 +1109,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   check.set_min_projection (options.min_projection);
   check.set_max_projection (options.max_projection);
 
-  db::check_local_operation<db::Polygon, db::Polygon, db::EdgePair> op (check, different_polygons, other != 0, other && other->is_merged (), options.shielded);
+  db::check_local_operation<db::Polygon, db::Polygon> op (check, different_polygons, other != 0, other && other->is_merged (), options.shielded, options.not_opposite, options.rect_filter);
 
   db::local_processor<db::Polygon, db::Polygon, db::EdgePair> proc;
   proc.set_base_verbosity (base_verbosity ());
@@ -1126,6 +1126,9 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   return output.release ();
 
 #else
+  //  not supported in this implementation
+  tl_assert (! m_options.no_opposite);
+
   std::auto_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
 
   db::box_scanner<db::Polygon, size_t> scanner (report_progress (), progress_desc ());

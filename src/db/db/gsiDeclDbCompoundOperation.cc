@@ -25,6 +25,7 @@
 
 #include "dbCompoundOperation.h"
 #include "dbRegionUtils.h"
+#include "dbRegionLocalOperations.h"
 
 namespace gsi
 {
@@ -173,34 +174,62 @@ static db::CompoundRegionOperationNode *new_minkowsky_sum_node4 (db::CompoundReg
   return new db::CompoundRegionProcessingOperationNode (new db::minkowsky_sum_computation<std::vector<db::Point> > (p), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_width_check_node (db::Coord d, bool whole_edges, db::metrics_type metrics, double ignore_angle, db::coord_traits<db::Coord>::distance_type min_projection, db::coord_traits<db::Coord>::distance_type max_projection, bool shielded)
+static db::CompoundRegionOperationNode *new_check_node (db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool no_opposite, db::RectFilter rect_filter)
 {
-  return new db::CompoundRegionCheckOperationNode (db::WidthRelation, false, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded);
+  return new db::CompoundRegionCheckOperationNode (rel, different_polygons, d,
+    db::RegionCheckOptions (whole_edges,
+                            metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()),
+                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                            min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                            max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                            shielded,
+                            no_opposite,
+                            rect_filter)
+  );
 }
 
-static db::CompoundRegionOperationNode *new_space_check_node (db::Coord d, bool whole_edges, db::metrics_type metrics, double ignore_angle, db::coord_traits<db::Coord>::distance_type min_projection, db::coord_traits<db::Coord>::distance_type max_projection, bool shielded)
+static db::CompoundRegionOperationNode *new_check_node (db::CompoundRegionOperationNode *input, db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool no_opposite, db::RectFilter rect_filter)
 {
-  return new db::CompoundRegionCheckOperationNode (db::SpaceRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded);
+  return new db::CompoundRegionCheckOperationNode (input, rel, different_polygons, d,
+    db::RegionCheckOptions (whole_edges,
+                            metrics,
+                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                            min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                            max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                            shielded,
+                            no_opposite,
+                            rect_filter)
+  );
 }
 
-static db::CompoundRegionOperationNode *new_notch_check_node (db::Coord d, bool whole_edges, db::metrics_type metrics, double ignore_angle, db::coord_traits<db::Coord>::distance_type min_projection, db::coord_traits<db::Coord>::distance_type max_projection, bool shielded)
+static db::CompoundRegionOperationNode *new_width_check_node (db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
-  return new db::CompoundRegionCheckOperationNode (db::SpaceRelation, false, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded);
+  return new_check_node (db::WidthRelation, false, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, false, db::NoSideAllowed);
 }
 
-static db::CompoundRegionOperationNode *new_separation_check_node (db::CompoundRegionOperationNode *input, db::Coord d, bool whole_edges, db::metrics_type metrics, double ignore_angle, db::coord_traits<db::Coord>::distance_type min_projection, db::coord_traits<db::Coord>::distance_type max_projection, bool shielded)
+static db::CompoundRegionOperationNode *new_space_check_node (db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool no_opposite, db::RectFilter rect_filter)
 {
-  return new db::CompoundRegionCheckOperationNode (input, db::SpaceRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded);
+  return new_check_node (db::SpaceRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, no_opposite, rect_filter);
 }
 
-static db::CompoundRegionOperationNode *new_overlap_check_node (db::CompoundRegionOperationNode *input, db::Coord d, bool whole_edges, db::metrics_type metrics, double ignore_angle, db::coord_traits<db::Coord>::distance_type min_projection, db::coord_traits<db::Coord>::distance_type max_projection, bool shielded)
+static db::CompoundRegionOperationNode *new_notch_check_node (db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
-  return new db::CompoundRegionCheckOperationNode (input, db::OverlapRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded);
+  return new_check_node (db::SpaceRelation, false, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, false, db::NoSideAllowed);
 }
 
-static db::CompoundRegionOperationNode *new_inside_check_node (db::CompoundRegionOperationNode *input, db::Coord d, bool whole_edges, db::metrics_type metrics, double ignore_angle, db::coord_traits<db::Coord>::distance_type min_projection, db::coord_traits<db::Coord>::distance_type max_projection, bool shielded)
+static db::CompoundRegionOperationNode *new_separation_check_node (db::CompoundRegionOperationNode *input, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool no_opposite, db::RectFilter rect_filter)
 {
-  return new db::CompoundRegionCheckOperationNode (input, db::InsideRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded);
+  return new_check_node (input, db::SpaceRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, no_opposite, rect_filter);
+}
+
+static db::CompoundRegionOperationNode *new_overlap_check_node (db::CompoundRegionOperationNode *input, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool no_opposite, db::RectFilter rect_filter)
+{
+  return new_check_node (input, db::OverlapRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, no_opposite, rect_filter);
+}
+
+static db::CompoundRegionOperationNode *new_inside_check_node (db::CompoundRegionOperationNode *input, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool no_opposite, db::RectFilter rect_filter)
+{
+  return new_check_node (input, db::InsideRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, no_opposite, rect_filter);
 }
 
 static db::CompoundRegionOperationNode *new_perimeter_filter (db::CompoundRegionOperationNode *input, db::coord_traits<db::Coord>::perimeter_type pmin, db::coord_traits<db::Coord>::perimeter_type pmax, bool inverse)
@@ -302,22 +331,22 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   gsi::constructor ("new_minkowsky_sum", &new_minkowsky_sum_node4, gsi::arg ("input"), gsi::arg ("p"),
     "@brief Creates a node providing a Minkowsky sum with a point sequence forming a contour.\n"
   ) +
-  gsi::constructor ("new_width_check", &new_width_check_node, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", 90.0), gsi::arg ("min_projection", db::coord_traits<db::Coord>::distance_type (0)), gsi::arg ("max_projection", std::numeric_limits<db::coord_traits<db::Coord>::distance_type>::max (), "max."), gsi::arg ("shielded", true),
+  gsi::constructor ("new_width_check", &new_width_check_node, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true),
     "@brief Creates a node providing a width check.\n"
   ) +
-  gsi::constructor ("new_space_check", &new_space_check_node, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", 90.0), gsi::arg ("min_projection", db::coord_traits<db::Coord>::distance_type (0)), gsi::arg ("max_projection", std::numeric_limits<db::coord_traits<db::Coord>::distance_type>::max (), "max."), gsi::arg ("shielded", true),
+  gsi::constructor ("new_space_check", &new_space_check_node, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("not_opposite", false), gsi::arg ("rect_filter", db::NoSideAllowed),
     "@brief Creates a node providing a space check.\n"
   ) +
-  gsi::constructor ("new_notch_check", &new_notch_check_node, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", 90.0), gsi::arg ("min_projection", db::coord_traits<db::Coord>::distance_type (0)), gsi::arg ("max_projection", std::numeric_limits<db::coord_traits<db::Coord>::distance_type>::max (), "max."), gsi::arg ("shielded", true),
+  gsi::constructor ("new_notch_check", &new_notch_check_node, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true),
     "@brief Creates a node providing a intra-polygon space check.\n"
   ) +
-  gsi::constructor ("new_separation_check", &new_separation_check_node, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", 90.0), gsi::arg ("min_projection", db::coord_traits<db::Coord>::distance_type (0)), gsi::arg ("max_projection", std::numeric_limits<db::coord_traits<db::Coord>::distance_type>::max (), "max."), gsi::arg ("shielded", true),
+  gsi::constructor ("new_separation_check", &new_separation_check_node, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("not_opposite", false), gsi::arg ("rect_filter", db::NoSideAllowed),
     "@brief Creates a node providing a separation check.\n"
   ) +
-  gsi::constructor ("new_overlap_check", &new_overlap_check_node, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", 90.0), gsi::arg ("min_projection", db::coord_traits<db::Coord>::distance_type (0)), gsi::arg ("max_projection", std::numeric_limits<db::coord_traits<db::Coord>::distance_type>::max (), "max."), gsi::arg ("shielded", true),
+  gsi::constructor ("new_overlap_check", &new_overlap_check_node, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("not_opposite", false), gsi::arg ("rect_filter", db::NoSideAllowed),
     "@brief Creates a node providing an overlap check.\n"
   ) +
-  gsi::constructor ("new_inside_check", &new_inside_check_node, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", 90.0), gsi::arg ("min_projection", db::coord_traits<db::Coord>::distance_type (0)), gsi::arg ("max_projection", std::numeric_limits<db::coord_traits<db::Coord>::distance_type>::max (), "max."), gsi::arg ("shielded", true),
+  gsi::constructor ("new_inside_check", &new_inside_check_node, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("not_opposite", false), gsi::arg ("rect_filter", db::NoSideAllowed),
     "@brief Creates a node providing an inside (enclosure) check.\n"
   ) +
   gsi::constructor ("new_perimeter_filter", &new_perimeter_filter, gsi::arg ("input"), gsi::arg ("pmin", 0), gsi::arg ("pmax", std::numeric_limits<db::coord_traits<db::Coord>::perimeter_type>::max (), "max"), gsi::arg ("inverse", false),
@@ -448,34 +477,6 @@ gsi::Enum<db::PreferredOrientation> decl_dbPreferredOrientation ("db", "Preferre
     "@brief Indicates vertical trapezoid decomposition."
   ),
   "@brief This class represents the PreferredOrientation enum used within polygon decomposition\n"
-  "\n"
-  "This enum has been introduced in version 0.27."
-);
-
-gsi::Enum<db::metrics_type> decl_dbMetricsType ("db", "MetricsType",
-  gsi::enum_const ("Euclidian", db::metrics_type::Euclidian,
-    "@brief Euclidian metrics\n"
-    "\n"
-    "The distance between two points is defined as the euclidian\n"
-    "distance, i.e. d = sqrt(dx * dx + dy * dy).\n"
-    "All points within a circle with radius r around another point \n"
-    "have a distance less than r to this point.\n"
-  ) +
-  gsi::enum_const ("Square", db::metrics_type::Square,
-    "@brief Square metrics\n"
-    "\n"
-    "The distance between two points is the minimum of x and\n"
-    "y distance, i.e. d = min(abs(dx), abs(dy)).\n"
-    "All points within a square with length 2*r round another point\n"
-    "have a distance less than r to this point.\n"
-  ) +
-  gsi::enum_const ("Projection", db::metrics_type::Projection,
-    "@brief Projection metrics\n"
-    "\n"
-    "The distance between a point and another point on an edge\n"
-    "is measured by the distance of the point to the edge.\n"
-  ),
-  "@brief This class represents the MetricsType enum used within DRC functions\n"
   "\n"
   "This enum has been introduced in version 0.27."
 );

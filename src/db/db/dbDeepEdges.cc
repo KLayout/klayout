@@ -1466,11 +1466,11 @@ EdgesDelegate *DeepEdges::in (const Edges &other, bool invert) const
 namespace
 {
 
-class CheckLocalOperation
+class EdgesCheckLocalOperation
   : public local_operation<db::Edge, db::Edge, db::EdgePair>
 {
 public:
-  CheckLocalOperation (const EdgeRelationFilter &check, bool has_other)
+  EdgesCheckLocalOperation (const EdgeRelationFilter &check, bool has_other)
     : m_check (check), m_has_other (has_other)
   {
     //  .. nothing yet ..
@@ -1572,7 +1572,7 @@ DeepEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Coord 
 
   std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (edges.derived ()));
 
-  db::CheckLocalOperation op (check, other_deep != 0);
+  db::EdgesCheckLocalOperation op (check, other_deep != 0);
 
   db::local_processor<db::Edge, db::Edge, db::EdgePair> proc (const_cast<db::Layout *> (&edges.layout ()),
                                                               const_cast<db::Cell *> (&edges.initial_cell ()),

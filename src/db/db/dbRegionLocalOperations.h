@@ -32,14 +32,50 @@
 namespace db
 {
 
-template <class TS, class TI, class TR>
+/**
+ *  @brief Specifies an error filter on rectangular shapes
+ */
+enum RectFilter
+{
+  /**
+   *  @brief No filter
+   */
+  NoSideAllowed,
+
+  /**
+   *  @brief Allow errors on one side
+   */
+  OneSideAllowed,
+
+  /**
+   *  @brief Allow errors on two sides (not specified which)
+   */
+  TwoSidesAllowed,
+
+  /**
+   *  @brief Allow errors on two sides ("L" configuration)
+   */
+  TwoConnectedSidesAllowed,
+
+  /**
+   *  @brief Allow errors on two opposite sides
+   */
+  TwoOppositeSidesAllowed,
+
+  /**
+   *  @brief Allow errors on three sides
+   */
+  ThreeSidesAllowed
+};
+
+template <class TS, class TI>
 class check_local_operation
-  : public local_operation<TS, TI, TR>
+  : public local_operation<TS, TI, db::EdgePair>
 {
 public:
-  check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool other_is_merged, bool shielded);
+  check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool other_is_merged, bool shielded, bool no_opposite, db::RectFilter rect_filter);
 
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
+  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
 
   virtual db::Coord dist () const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
@@ -51,9 +87,11 @@ private:
   bool m_has_other;
   bool m_other_is_merged;
   bool m_shielded;
+  bool m_no_opposite;
+  db::RectFilter m_rect_filter;
 };
 
-typedef check_local_operation<db::PolygonRef, db::PolygonRef, db::EdgePair> CheckLocalOperation;
+typedef check_local_operation<db::PolygonRef, db::PolygonRef> CheckLocalOperation;
 
 template <class TS, class TI, class TR>
 class interacting_local_operation

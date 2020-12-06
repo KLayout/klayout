@@ -33,6 +33,7 @@
 #include "dbEdgePairRelations.h"
 #include "dbShapeCollection.h"
 #include "dbGenericShapeIterator.h"
+#include "dbRegionLocalOperations.h"
 
 #include <list>
 
@@ -59,13 +60,17 @@ struct DB_PUBLIC RegionCheckOptions
                       double _ignore_angle = 90,
                       distance_type _min_projection = 0,
                       distance_type _max_projection = std::numeric_limits<distance_type>::max (),
-                      bool _shielded = true)
+                      bool _shielded = true,
+                      bool _no_opposite = false,
+                      RectFilter _rect_filter = NoSideAllowed)
     : whole_edges (_whole_edges),
       metrics (_metrics),
       ignore_angle (_ignore_angle),
       min_projection (_min_projection),
       max_projection (_max_projection),
-      shielded (_shielded)
+      shielded (_shielded),
+      not_opposite (_no_opposite),
+      rect_filter (_rect_filter)
   { }
 
   /**
@@ -114,6 +119,18 @@ struct DB_PUBLIC RegionCheckOptions
    *  Set this option to false to disable shielding. By default, shielding is on.
    */
   bool shielded;
+
+  /**
+   *  @brief Suppresses opposite error edges
+   *
+   *  If true, error edges opposite of each other across the respective polygon part cancel.
+   */
+  bool not_opposite;
+
+  /**
+   *  @brief Specifies a filter for error markers on rectangular shapes
+   */
+  RectFilter rect_filter;
 };
 
 /**

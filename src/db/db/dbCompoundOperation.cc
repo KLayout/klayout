@@ -1089,41 +1089,41 @@ CompoundRegionToEdgePairProcessingOperationNode::processed (db::Layout *, const 
 
 // ---------------------------------------------------------------------------------------------
 
-CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (CompoundRegionOperationNode *input, db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, db::metrics_type metrics, double ignore_angle, db::coord_traits<db::Coord>::distance_type min_projection, db::coord_traits<db::Coord>::distance_type max_projection, bool shielded)
-  : CompoundRegionMultiInputOperationNode (input), m_check (rel, d, metrics), m_different_polygons (different_polygons), m_shielded (shielded)
+CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (CompoundRegionOperationNode *input, db::edge_relation_type rel, bool different_polygons, db::Coord d, const db::RegionCheckOptions &options)
+  : CompoundRegionMultiInputOperationNode (input), m_check (rel, d, options.metrics), m_different_polygons (different_polygons), m_options (options)
 {
   set_description ("check");
 
   m_check.set_include_zero (false);
-  m_check.set_whole_edges (whole_edges);
-  m_check.set_ignore_angle (ignore_angle);
-  m_check.set_min_projection (min_projection);
-  m_check.set_max_projection (max_projection);
+  m_check.set_whole_edges (options.whole_edges);
+  m_check.set_ignore_angle (options.ignore_angle);
+  m_check.set_min_projection (options.min_projection);
+  m_check.set_max_projection (options.max_projection);
 }
 
-CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, db::metrics_type metrics, double ignore_angle, db::coord_traits<db::Coord>::distance_type min_projection, db::coord_traits<db::Coord>::distance_type max_projection, bool shielded)
-  : CompoundRegionMultiInputOperationNode (), m_check (rel, d, metrics), m_different_polygons (different_polygons), m_shielded (shielded)
+CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (db::edge_relation_type rel, bool different_polygons, db::Coord d, const db::RegionCheckOptions &options)
+  : CompoundRegionMultiInputOperationNode (), m_check (rel, d, options.metrics), m_different_polygons (different_polygons), m_options (options)
 {
   set_description ("check");
 
   m_check.set_include_zero (false);
-  m_check.set_whole_edges (whole_edges);
-  m_check.set_ignore_angle (ignore_angle);
-  m_check.set_min_projection (min_projection);
-  m_check.set_max_projection (max_projection);
+  m_check.set_whole_edges (options.whole_edges);
+  m_check.set_ignore_angle (options.ignore_angle);
+  m_check.set_min_projection (options.min_projection);
+  m_check.set_max_projection (options.max_projection);
 }
 
 void
 CompoundRegionCheckOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const
 {
-  db::check_local_operation<db::Polygon, db::Polygon, db::EdgePair> op (m_check, m_different_polygons, true, false, m_shielded);
+  db::check_local_operation<db::Polygon, db::Polygon> op (m_check, m_different_polygons, true, false, m_options.shielded, m_options.not_opposite, m_options.rect_filter);
   op.compute_local (layout, interactions, results, max_vertex_count, area_ratio);
 }
 
 void
 CompoundRegionCheckOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const
 {
-  db::check_local_operation<db::PolygonRef, db::PolygonRef, db::EdgePair> op (m_check, m_different_polygons, true, false, m_shielded);
+  db::check_local_operation<db::PolygonRef, db::PolygonRef> op (m_check, m_different_polygons, true, false, m_options.shielded, m_options.not_opposite, m_options.rect_filter);
   op.compute_local (layout, interactions, results, max_vertex_count, area_ratio);
 }
 

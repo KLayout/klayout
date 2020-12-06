@@ -931,12 +931,12 @@ public:
    *  @brief Constructor
    *  @param input The node for the original (the node will take ownership)
    */
-  CompoundRegionCheckOperationNode (db::CompoundRegionOperationNode *input, db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, db::metrics_type metrics, double ignore_angle, db::coord_traits<db::Coord>::distance_type min_projection, db::coord_traits<db::Coord>::distance_type max_projection, bool shielded);
+  CompoundRegionCheckOperationNode (db::CompoundRegionOperationNode *input, db::edge_relation_type rel, bool different_polygons, db::Coord d, const db::RegionCheckOptions &options);
 
   /**
    *  @brief Constructor for the single-layer check
    */
-  CompoundRegionCheckOperationNode (db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, db::metrics_type metrics, double ignore_angle, db::coord_traits<db::Coord>::distance_type min_projection, db::coord_traits<db::Coord>::distance_type max_projection, bool shielded);
+  CompoundRegionCheckOperationNode (db::edge_relation_type rel, bool different_polygons, db::Coord d, const db::RegionCheckOptions &options);
 
   //  specifies the result type
   virtual ResultType result_type () const { return EdgePairs; }
@@ -947,7 +947,7 @@ public:
 private:
   db::EdgeRelationFilter m_check;
   bool m_different_polygons;
-  bool m_shielded;
+  db::RegionCheckOptions m_options;
 };
 
 

@@ -141,22 +141,50 @@ private:
 
 // ---------------------------------------------------------------------------------------------------------------
 
-template <class TS, class TI, class TR>
-check_local_operation<TS, TI, TR>::check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool other_is_merged, bool shielded)
-  : m_check (check), m_different_polygons (different_polygons), m_has_other (has_other), m_other_is_merged (other_is_merged), m_shielded (shielded)
+static inline bool shields_interaction (const db::EdgePair &ep, const db::Edge &q)
+{
+  db::Edge pe1 (ep.first ().p1 (), ep.second ().p2 ());
+  db::Edge pe2 (ep.second ().p1 (), ep.first ().p2 ());
+
+  std::pair<bool, db::Point> ip1 = pe1.intersect_point (q);
+  std::pair<bool, db::Point> ip2 = pe2.intersect_point (q);
+
+  if (ip1.first && ip2.first && ip1.second != pe1.p1 () && ip1.second != pe1.p2 () && ip2.second != pe2.p1 () && ip2.second != pe2.p2 ()) {
+    return ip1.second != ip2.second || (pe1.side_of (q.p1 ()) != 0 && pe2.side_of (q.p2 ()) != 0);
+  } else {
+    return false;
+  }
+}
+
+template <class P>
+static bool shields_interaction (const db::EdgePair &ep, const P &poly)
+{
+  for (typename P::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
+    if (shields_interaction (ep, *e)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+template <class TS, class TI>
+check_local_operation<TS, TI>::check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool other_is_merged, bool shielded, bool no_opposite, db::RectFilter rect_filter)
+  : m_check (check), m_different_polygons (different_polygons), m_has_other (has_other), m_other_is_merged (other_is_merged), m_shielded (shielded), m_no_opposite (no_opposite), m_rect_filter (rect_filter)
 {
   //  .. nothing yet ..
 }
 
-template <class TS, class TI, class TR>
+template <class TS, class TI>
 void
-check_local_operation<TS, TI, TR>::compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+check_local_operation<TS, TI>::compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
   tl_assert (results.size () == 1);
-  std::unordered_set<TR> &result = results.front ();
+  std::unordered_set<db::EdgePair> &result = results.front ();
+  tl_assert (results.empty ());
 
-  edge2edge_check<std::unordered_set<TR> > edge_check (m_check, result, m_different_polygons, m_has_other, m_shielded);
-  poly2poly_check<TS, std::unordered_set<TR> > poly_check (edge_check);
+  edge2edge_check<std::unordered_set<db::EdgePair> > edge_check (m_check, result, m_different_polygons, m_has_other, m_shielded);
+  poly2poly_check<TS, std::unordered_set<db::EdgePair> > poly_check (edge_check);
 
   std::list<TS> heap;
   db::box_scanner<TS, size_t> scanner;
@@ -227,33 +255,89 @@ check_local_operation<TS, TI, TR>::compute_local (db::Layout *layout, const shap
   do {
     scanner.process (poly_check, m_check.distance (), db::box_convert<TS> ());
   } while (edge_check.prepare_next_pass ());
+
+  //  detect and remove parts of the result which have results "opposite"
+  //  ("opposite" is defined by the projection part)
+  if (m_no_opposite && ! result.empty ()) {
+
+    db::EdgeRelationFilter opp (db::WidthRelation, std::numeric_limits<db::EdgeRelationFilter::distance_type>::max (), db::Projection);
+
+    std::vector<db::Edge> projections;
+    std::unordered_set<db::EdgePair> cleaned_result;
+
+    //  filter out opposite edges
+    for (std::unordered_set<db::EdgePair>::const_iterator ep1 = result.begin (); ep1 != result.end (); ++ep1) {
+
+      projections.clear ();
+
+      std::unordered_set<db::EdgePair>::const_iterator ep2 = ep1;
+      ++ep2;
+      for ( ; ep2 != result.end (); ++ep2) {
+
+        db::EdgePair ep_opp;
+        if (opp.check (ep1->first (), ep2->first (), &ep_opp)) {
+
+          bool shielded = false;
+          for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end () && ! shielded; ++i) {
+            shielded = shields_interaction (ep_opp, interactions.subject_shape (i->first));
+          }
+
+          if (! shielded) {
+            projections.push_back (ep_opp.first ());
+          }
+
+        }
+
+      }
+
+      if (! projections.empty ()) {
+        db::Edges ce = db::Edges (ep1->first ()) - db::Edges (projections.begin (), projections.end ());
+        for (db::Edges::const_iterator re = ce.begin (); ! re.at_end (); ++re) {
+          cleaned_result.insert (db::EdgePair (*re, ep1->second ()));
+        }
+      } else {
+        cleaned_result.insert (*ep1);
+      }
+
+    }
+
+    result.swap (cleaned_result);
+
+  }
+
+  //  implements filtering on rectangles
+  if (m_rect_filter != RectFilter::NoSideAllowed && ! result.empty ()) {
+
+    //  @@@ TODO: implement @@@
+
+  }
 }
 
-template <class TS, class TI, class TR>
+template <class TS, class TI>
 db::Coord
-check_local_operation<TS, TI, TR>::dist () const
+check_local_operation<TS, TI>::dist () const
 {
   //  TODO: will the distance be sufficient? Or should we take somewhat more?
   return m_check.distance ();
 }
 
-template <class TS, class TI, class TR>
+template <class TS, class TI>
 OnEmptyIntruderHint
-check_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
+check_local_operation<TS, TI>::on_empty_intruder_hint () const
 {
   return m_different_polygons ? OnEmptyIntruderHint::Drop : OnEmptyIntruderHint::Ignore;
 }
 
-template <class TS, class TI, class TR>
+template <class TS, class TI>
 std::string
-check_local_operation<TS, TI, TR>::description () const
+check_local_operation<TS, TI>::description () const
 {
   return tl::to_string (tr ("Generic DRC check"));
 }
 
 //  explicit instantiations
-template class check_local_operation<db::PolygonRef, db::PolygonRef, db::EdgePair>;
-template class check_local_operation<db::Polygon, db::Polygon, db::EdgePair>;
+template class check_local_operation<db::PolygonRef, db::PolygonRef>;
+template class check_local_operation<db::Polygon, db::Polygon>;
 
 // ---------------------------------------------------------------------------------------------------------------
 

@@ -61,7 +61,7 @@ struct DB_PUBLIC RegionCheckOptions
                       distance_type _min_projection = 0,
                       distance_type _max_projection = std::numeric_limits<distance_type>::max (),
                       bool _shielded = true,
-                      bool _no_opposite = false,
+                      OppositeFilter _opposite_filter = NoOppositeFilter,
                       RectFilter _rect_filter = NoSideAllowed)
     : whole_edges (_whole_edges),
       metrics (_metrics),
@@ -69,7 +69,7 @@ struct DB_PUBLIC RegionCheckOptions
       min_projection (_min_projection),
       max_projection (_max_projection),
       shielded (_shielded),
-      not_opposite (_no_opposite),
+      opposite_filter (_opposite_filter),
       rect_filter (_rect_filter)
   { }
 
@@ -121,11 +121,9 @@ struct DB_PUBLIC RegionCheckOptions
   bool shielded;
 
   /**
-   *  @brief Suppresses opposite error edges
-   *
-   *  If true, error edges opposite of each other across the respective polygon part cancel.
+   *  @brief Specifies the opposite filter
    */
-  bool not_opposite;
+  OppositeFilter opposite_filter;
 
   /**
    *  @brief Specifies a filter for error markers on rectangular shapes

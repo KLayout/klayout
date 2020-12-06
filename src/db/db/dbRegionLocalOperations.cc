@@ -169,8 +169,8 @@ static bool shields_interaction (const db::EdgePair &ep, const P &poly)
 
 
 template <class TS, class TI>
-check_local_operation<TS, TI>::check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool other_is_merged, bool shielded, bool no_opposite, db::RectFilter rect_filter)
-  : m_check (check), m_different_polygons (different_polygons), m_has_other (has_other), m_other_is_merged (other_is_merged), m_shielded (shielded), m_no_opposite (no_opposite), m_rect_filter (rect_filter)
+check_local_operation<TS, TI>::check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool other_is_merged, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter)
+  : m_check (check), m_different_polygons (different_polygons), m_has_other (has_other), m_other_is_merged (other_is_merged), m_shielded (shielded), m_opposite_filter (opposite_filter), m_rect_filter (rect_filter)
 {
   //  .. nothing yet ..
 }
@@ -181,7 +181,7 @@ check_local_operation<TS, TI>::compute_local (db::Layout *layout, const shape_in
 {
   tl_assert (results.size () == 1);
   std::unordered_set<db::EdgePair> &result = results.front ();
-  tl_assert (results.empty ());
+  tl_assert (result.empty ());
 
   edge2edge_check<std::unordered_set<db::EdgePair> > edge_check (m_check, result, m_different_polygons, m_has_other, m_shielded);
   poly2poly_check<TS, std::unordered_set<db::EdgePair> > poly_check (edge_check);
@@ -256,9 +256,9 @@ check_local_operation<TS, TI>::compute_local (db::Layout *layout, const shape_in
     scanner.process (poly_check, m_check.distance (), db::box_convert<TS> ());
   } while (edge_check.prepare_next_pass ());
 
-  //  detect and remove parts of the result which have results "opposite"
-  //  ("opposite" is defined by the projection part)
-  if (m_no_opposite && ! result.empty ()) {
+  //  detect and remove parts of the result which have or do not have results "opposite"
+  //  ("opposite" is defined by the projection of edges "through" the subject shape)
+  if (m_opposite_filter != db::NoOppositeFilter && ! result.empty ()) {
 
     db::EdgeRelationFilter opp (db::WidthRelation, std::numeric_limits<db::EdgeRelationFilter::distance_type>::max (), db::Projection);
 
@@ -270,9 +270,11 @@ check_local_operation<TS, TI>::compute_local (db::Layout *layout, const shape_in
 
       projections.clear ();
 
-      std::unordered_set<db::EdgePair>::const_iterator ep2 = ep1;
-      ++ep2;
-      for ( ; ep2 != result.end (); ++ep2) {
+      for (std::unordered_set<db::EdgePair>::const_iterator ep2 = result.begin (); ep2 != result.end (); ++ep2) {
+
+        if (ep1 == ep2) {
+          continue;
+        }
 
         db::EdgePair ep_opp;
         if (opp.check (ep1->first (), ep2->first (), &ep_opp)) {
@@ -291,11 +293,16 @@ check_local_operation<TS, TI>::compute_local (db::Layout *layout, const shape_in
       }
 
       if (! projections.empty ()) {
-        db::Edges ce = db::Edges (ep1->first ()) - db::Edges (projections.begin (), projections.end ());
+        db::Edges ce;
+        if (m_opposite_filter == db::OnlyOpposite) {
+          ce = db::Edges (ep1->first ()) & db::Edges (projections.begin (), projections.end ());
+        } else if (m_opposite_filter == db::NotOpposite) {
+          ce = db::Edges (ep1->first ()) - db::Edges (projections.begin (), projections.end ());
+        }
         for (db::Edges::const_iterator re = ce.begin (); ! re.at_end (); ++re) {
           cleaned_result.insert (db::EdgePair (*re, ep1->second ()));
         }
-      } else {
+      } else if (m_opposite_filter == db::NotOpposite) {
         cleaned_result.insert (*ep1);
       }
 

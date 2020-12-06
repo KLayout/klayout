@@ -1488,7 +1488,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 
   std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
 
-  db::CheckLocalOperation op (check, different_polygons, other_deep != 0, other && other->is_merged (), options.shielded, options.not_opposite, options.rect_filter);
+  db::CheckLocalOperation op (check, different_polygons, other_deep != 0, other && other->is_merged (), options.shielded, options.opposite_filter, options.rect_filter);
 
   db::local_processor<db::PolygonRef, db::PolygonRef, db::EdgePair> proc (const_cast<db::Layout *> (&polygons.layout ()),
                                                                           const_cast<db::Cell *> (&polygons.initial_cell ()),

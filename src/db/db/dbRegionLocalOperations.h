@@ -68,12 +68,33 @@ enum RectFilter
   ThreeSidesAllowed
 };
 
+/**
+ *  @brief Specifies an error filter for opposite errors
+ */
+enum OppositeFilter
+{
+  /**
+   *  @brief No filter
+   */
+  NoOppositeFilter,
+
+  /**
+   *  @brief Only errors appearing on opposite sides of a figure will be reported
+   */
+  OnlyOpposite,
+
+  /**
+   *  @brief Only errors NOT appearing on opposite sides of a figure will be reported
+   */
+  NotOpposite
+};
+
 template <class TS, class TI>
 class check_local_operation
   : public local_operation<TS, TI, db::EdgePair>
 {
 public:
-  check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool other_is_merged, bool shielded, bool no_opposite, db::RectFilter rect_filter);
+  check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool other_is_merged, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter);
 
   virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
 
@@ -87,7 +108,7 @@ private:
   bool m_has_other;
   bool m_other_is_merged;
   bool m_shielded;
-  bool m_no_opposite;
+  db::OppositeFilter m_opposite_filter;
   db::RectFilter m_rect_filter;
 };
 

@@ -1116,14 +1116,14 @@ CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (db::edge_rel
 void
 CompoundRegionCheckOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const
 {
-  db::check_local_operation<db::Polygon, db::Polygon> op (m_check, m_different_polygons, true, false, m_options.shielded, m_options.not_opposite, m_options.rect_filter);
+  db::check_local_operation<db::Polygon, db::Polygon> op (m_check, m_different_polygons, true, false, m_options.shielded, m_options.opposite_filter, m_options.rect_filter);
   op.compute_local (layout, interactions, results, max_vertex_count, area_ratio);
 }
 
 void
 CompoundRegionCheckOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const
 {
-  db::check_local_operation<db::PolygonRef, db::PolygonRef> op (m_check, m_different_polygons, true, false, m_options.shielded, m_options.not_opposite, m_options.rect_filter);
+  db::check_local_operation<db::PolygonRef, db::PolygonRef> op (m_check, m_different_polygons, true, false, m_options.shielded, m_options.opposite_filter, m_options.rect_filter);
   op.compute_local (layout, interactions, results, max_vertex_count, area_ratio);
 }
 

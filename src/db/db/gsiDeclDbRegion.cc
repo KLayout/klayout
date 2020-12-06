@@ -449,7 +449,7 @@ static db::EdgePairs width2 (const db::Region *r, db::Region::distance_type d, b
                         );
 }
 
-static db::EdgePairs space2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool not_opposite, db::RectFilter rect_filter)
+static db::EdgePairs space2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter)
 {
   return r->space_check (d, db::RegionCheckOptions (whole_edges,
                                             metrics,
@@ -457,7 +457,7 @@ static db::EdgePairs space2 (const db::Region *r, db::Region::distance_type d, b
                                             min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
                                             max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
                                             shielded,
-                                            not_opposite,
+                                            opposite,
                                             rect_filter)
                         );
 }
@@ -473,7 +473,7 @@ static db::EdgePairs notch2 (const db::Region *r, db::Region::distance_type d, b
                         );
 }
 
-static db::EdgePairs isolated2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool not_opposite, db::RectFilter rect_filter)
+static db::EdgePairs isolated2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter)
 {
   return r->isolated_check (d, db::RegionCheckOptions (whole_edges,
                                             metrics,
@@ -481,12 +481,12 @@ static db::EdgePairs isolated2 (const db::Region *r, db::Region::distance_type d
                                             min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
                                             max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
                                             shielded,
-                                            not_opposite,
+                                            opposite,
                                             rect_filter)
                            );
 }
 
-static db::EdgePairs inside2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool not_opposite, db::RectFilter rect_filter)
+static db::EdgePairs inside2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter)
 {
   return r->inside_check (other, d, db::RegionCheckOptions (whole_edges,
                                             metrics,
@@ -494,12 +494,12 @@ static db::EdgePairs inside2 (const db::Region *r, const db::Region &other, db::
                                             min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
                                             max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
                                             shielded,
-                                            not_opposite,
+                                            opposite,
                                             rect_filter)
                          );
 }
 
-static db::EdgePairs overlap2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool not_opposite, db::RectFilter rect_filter)
+static db::EdgePairs overlap2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter)
 {
   return r->overlap_check (other, d, db::RegionCheckOptions (whole_edges,
                                             metrics,
@@ -507,12 +507,12 @@ static db::EdgePairs overlap2 (const db::Region *r, const db::Region &other, db:
                                             min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
                                             max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
                                             shielded,
-                                            not_opposite,
+                                            opposite,
                                             rect_filter)
                           );
 }
 
-static db::EdgePairs enclosing2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool not_opposite, db::RectFilter rect_filter)
+static db::EdgePairs enclosing2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter)
 {
   return r->enclosing_check (other, d, db::RegionCheckOptions (whole_edges,
                                             metrics,
@@ -520,12 +520,12 @@ static db::EdgePairs enclosing2 (const db::Region *r, const db::Region &other, d
                                             min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
                                             max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
                                             shielded,
-                                            not_opposite,
+                                            opposite,
                                             rect_filter)
                             );
 }
 
-static db::EdgePairs separation2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool not_opposite, db::RectFilter rect_filter)
+static db::EdgePairs separation2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter)
 {
   return r->separation_check (other, d, db::RegionCheckOptions (whole_edges,
                                             metrics,
@@ -533,7 +533,7 @@ static db::EdgePairs separation2 (const db::Region *r, const db::Region &other, 
                                             min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
                                             max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
                                             shielded,
-                                            not_opposite,
+                                            opposite,
                                             rect_filter)
                              );
 }
@@ -2015,7 +2015,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "The 'shielded' option has been introduced in version 0.27."
   ) +
-  method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("not_opposite", false), gsi::arg ("rect_filter", db::NoSideAllowed),
+  method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter), gsi::arg ("rect_filter", db::NoSideAllowed),
     "@brief Performs a space check with options\n"
     "@param d The minimum space for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -2023,13 +2023,11 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param ignore_angle The angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper limit of the projected length of one edge onto another\n"
-    "@param shielded Enables shielding\n"
-    "\n"
-    "This version is similar to the simple version with one parameter. In addition, it allows "
-    "to specify many more options.\n"
+    "@param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes\n"
+    "@param rect_filter Specifies an error filter for rectangular input shapes\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
-    "edges which contribute in the space check.\n"
+    "edges which contribute in the width check.\n"
     "\n"
     "\"metrics\" can be one of the constants \\Euclidian, \\Square or \\Projection. See there for "
     "a description of these constants.\n"
@@ -2051,7 +2049,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
     "false. In general, this will improve performance somewhat.\n"
     "\n"
-    "\"not_opposite\" will supress all errors happening on both of two opposite sides of the input figures. "
+    "\"opposite_filter\" specifies whether to require or reject errors happening on opposite sides of a figure. "
     "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
@@ -2098,7 +2096,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "The 'shielded' option has been introduced in version 0.27."
   ) +
-  method_ext ("isolated_check", &isolated2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("not_opposite", false), gsi::arg ("rect_filter", db::NoSideAllowed),
+  method_ext ("isolated_check", &isolated2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter), gsi::arg ("rect_filter", db::NoSideAllowed),
     "@brief Performs a space check between edges of different polygons with options\n"
     "@param d The minimum space for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -2106,185 +2104,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param ignore_angle The angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper limit of the projected length of one edge onto another\n"
-    "@param shielded Enables shielding\n"
-    "\n"
-    "This version is similar to the simple version with one parameter. In addition, it allows "
-    "to specify many more options.\n"
-    "\n"
-    "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
-    "edges which contribute in the space check.\n"
-    "\n"
-    "\"metrics\" can be one of the constants \\Euclidian, \\Square or \\Projection. See there for "
-    "a description of these constants.\n"
-    "Use nil for this value to select the default (Euclidian metrics).\n"
-    "\n"
-    "\"ignore_angle\" specifies the angle limit of two edges. If two edges form an angle equal or "
-    "above the given value, they will not contribute in the check. "
-    "Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.\n"
-    "Use nil for this value to select the default.\n"
-    "\n"
-    "\"min_projection\" and \"max_projection\" allow selecting edges by their projected value upon each other. "
-    "It is sufficient if the projection of one edge on the other matches the specified condition. "
-    "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
-    "If you don't want to specify one limit, pass nil to the respective value.\n"
-    "\n"
-    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
-    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
-    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
-    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
-    "false. In general, this will improve performance somewhat.\n"
-    "\n"
-    "\"not_opposite\" will supress all errors happening on both of two opposite sides of the input figures. "
-    "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
-    "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
-    "\n"
-    "The 'shielded', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
-  ) +
-  method_ext ("inside_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("not_opposite", false), gsi::arg ("rect_filter", db::NoSideAllowed),
-    "@brief Performs an inside check with options\n"
-    "@param d The minimum distance for which the polygons are checked\n"
-    "@param other The other region against which to check\n"
-    "@param whole_edges If true, deliver the whole edges\n"
-    "@param metrics Specify the metrics type\n"
-    "@param ignore_angle The angle above which no check is performed\n"
-    "@param min_projection The lower threshold of the projected length of one edge onto another\n"
-    "@param max_projection The upper limit of the projected length of one edge onto another\n"
-    "@param shielded Enables shielding\n"
-    "\n"
-    "This version is similar to the simple version with one parameter. In addition, it allows "
-    "to specify many more options.\n"
-    "\n"
-    "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
-    "edges which contribute in the width check.\n"
-    "\n"
-    "\"metrics\" can be one of the constants \\Euclidian, \\Square or \\Projection. See there for "
-    "a description of these constants.\n"
-    "Use nil for this value to select the default (Euclidian metrics).\n"
-    "\n"
-    "\"ignore_angle\" specifies the angle limit of two edges. If two edges form an angle equal or "
-    "above the given value, they will not contribute in the check. "
-    "Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.\n"
-    "Use nil for this value to select the default.\n"
-    "\n"
-    "\"min_projection\" and \"max_projection\" allow selecting edges by their projected value upon each other. "
-    "It is sufficient if the projection of one edge on the other matches the specified condition. "
-    "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
-    "If you don't want to specify one limit, pass nil to the respective value.\n"
-    "\n"
-    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
-    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
-    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
-    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
-    "false. In general, this will improve performance somewhat.\n"
-    "\n"
-    "\"not_opposite\" will supress all errors happening on both of two opposite sides of the input figures. "
-    "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
-    "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
-    "\n"
-    "The 'shielded', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
-  ) +
-  method_ext ("overlap_check", &overlap2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("not_opposite", false), gsi::arg ("rect_filter", db::NoSideAllowed),
-    "@brief Performs an overlap check with options\n"
-    "@param d The minimum overlap for which the polygons are checked\n"
-    "@param other The other region against which to check\n"
-    "@param whole_edges If true, deliver the whole edges\n"
-    "@param metrics Specify the metrics type\n"
-    "@param ignore_angle The angle above which no check is performed\n"
-    "@param min_projection The lower threshold of the projected length of one edge onto another\n"
-    "@param max_projection The upper limit of the projected length of one edge onto another\n"
-    "@param shielded Enables shielding\n"
-    "\n"
-    "This version is similar to the simple version with one parameter. In addition, it allows "
-    "to specify many more options.\n"
-    "\n"
-    "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
-    "edges which contribute in the width check.\n"
-    "\n"
-    "\"metrics\" can be one of the constants \\Euclidian, \\Square or \\Projection. See there for "
-    "a description of these constants.\n"
-    "Use nil for this value to select the default (Euclidian metrics).\n"
-    "\n"
-    "\"ignore_angle\" specifies the angle limit of two edges. If two edges form an angle equal or "
-    "above the given value, they will not contribute in the check. "
-    "Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.\n"
-    "Use nil for this value to select the default.\n"
-    "\n"
-    "\"min_projection\" and \"max_projection\" allow selecting edges by their projected value upon each other. "
-    "It is sufficient if the projection of one edge on the other matches the specified condition. "
-    "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
-    "If you don't want to specify one limit, pass nil to the respective value.\n"
-    "\n"
-    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
-    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
-    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
-    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
-    "false. In general, this will improve performance somewhat.\n"
-    "\n"
-    "\"not_opposite\" will supress all errors happening on both of two opposite sides of the input figures. "
-    "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
-    "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
-    "\n"
-    "The 'shielded', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
-  ) +
-  method_ext ("enclosing_check", &enclosing2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("not_opposite", false), gsi::arg ("rect_filter", db::NoSideAllowed),
-    "@brief Performs an enclosing check with options\n"
-    "@param d The minimum enclosing distance for which the polygons are checked\n"
-    "@param other The other region against which to check\n"
-    "@param whole_edges If true, deliver the whole edges\n"
-    "@param metrics Specify the metrics type\n"
-    "@param ignore_angle The angle above which no check is performed\n"
-    "@param min_projection The lower threshold of the projected length of one edge onto another\n"
-    "@param max_projection The upper limit of the projected length of one edge onto another\n"
-    "@param shielded Enables shielding\n"
-    "@param not_opposite Reports error edges only if not opposite to other edges on the original figure\n"
-    "@param rect_filter Filters out certain allowed errors on rectangle input shapes\n"
-    "\n"
-    "This version is similar to the simple version with one parameter. In addition, it allows "
-    "to specify many more options.\n"
-    "\n"
-    "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
-    "edges which contribute in the width check.\n"
-    "\n"
-    "\"metrics\" can be one of the constants \\Euclidian, \\Square or \\Projection. See there for "
-    "a description of these constants.\n"
-    "Use nil for this value to select the default (Euclidian metrics).\n"
-    "\n"
-    "\"ignore_angle\" specifies the angle limit of two edges. If two edges form an angle equal or "
-    "above the given value, they will not contribute in the check. "
-    "Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.\n"
-    "Use nil for this value to select the default.\n"
-    "\n"
-    "\"min_projection\" and \"max_projection\" allow selecting edges by their projected value upon each other. "
-    "It is sufficient if the projection of one edge on the other matches the specified condition. "
-    "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
-    "If you don't want to specify one limit, pass nil to the respective value.\n"
-    "\n"
-    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
-    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
-    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
-    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
-    "false. In general, this will improve performance somewhat.\n"
-    "\n"
-    "\"not_opposite\" will supress all errors happening on both of two opposite sides of the input figures. "
-    "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
-    "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
-    "\n"
-    "The 'shielded', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
-  ) +
-  method_ext ("separation_check", &separation2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("not_opposite", false), gsi::arg ("rect_filter", db::NoSideAllowed),
-    "@brief Performs a separation check with options\n"
-    "@param d The minimum separation for which the polygons are checked\n"
-    "@param other The other region against which to check\n"
-    "@param whole_edges If true, deliver the whole edges\n"
-    "@param metrics Specify the metrics type\n"
-    "@param ignore_angle The angle above which no check is performed\n"
-    "@param min_projection The lower threshold of the projected length of one edge onto another\n"
-    "@param max_projection The upper limit of the projected length of one edge onto another\n"
-    "@param not_opposite Reports error edges only if not opposite to other edges on the original figure\n"
+    "@param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes\n"
     "@param rect_filter Specifies an error filter for rectangular input shapes\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
@@ -2310,7 +2130,175 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
     "false. In general, this will improve performance somewhat.\n"
     "\n"
-    "\"not_opposite\" will supress all errors happening on both of two opposite sides of the input figures. "
+    "\"opposite_filter\" specifies whether to require or reject errors happening on opposite sides of a figure. "
+    "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
+    "\n"
+    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
+  ) +
+  method_ext ("inside_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter), gsi::arg ("rect_filter", db::NoSideAllowed),
+    "@brief Performs an inside check with options\n"
+    "@param d The minimum distance for which the polygons are checked\n"
+    "@param other The other region against which to check\n"
+    "@param whole_edges If true, deliver the whole edges\n"
+    "@param metrics Specify the metrics type\n"
+    "@param ignore_angle The angle above which no check is performed\n"
+    "@param min_projection The lower threshold of the projected length of one edge onto another\n"
+    "@param max_projection The upper limit of the projected length of one edge onto another\n"
+    "@param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes\n"
+    "@param rect_filter Specifies an error filter for rectangular input shapes\n"
+    "\n"
+    "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
+    "edges which contribute in the width check.\n"
+    "\n"
+    "\"metrics\" can be one of the constants \\Euclidian, \\Square or \\Projection. See there for "
+    "a description of these constants.\n"
+    "Use nil for this value to select the default (Euclidian metrics).\n"
+    "\n"
+    "\"ignore_angle\" specifies the angle limit of two edges. If two edges form an angle equal or "
+    "above the given value, they will not contribute in the check. "
+    "Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.\n"
+    "Use nil for this value to select the default.\n"
+    "\n"
+    "\"min_projection\" and \"max_projection\" allow selecting edges by their projected value upon each other. "
+    "It is sufficient if the projection of one edge on the other matches the specified condition. "
+    "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
+    "If you don't want to specify one limit, pass nil to the respective value.\n"
+    "\n"
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
+    "\n"
+    "\"opposite_filter\" specifies whether to require or reject errors happening on opposite sides of a figure. "
+    "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
+    "\n"
+    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
+  ) +
+  method_ext ("overlap_check", &overlap2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter), gsi::arg ("rect_filter", db::NoSideAllowed),
+    "@brief Performs an overlap check with options\n"
+    "@param d The minimum overlap for which the polygons are checked\n"
+    "@param other The other region against which to check\n"
+    "@param whole_edges If true, deliver the whole edges\n"
+    "@param metrics Specify the metrics type\n"
+    "@param ignore_angle The angle above which no check is performed\n"
+    "@param min_projection The lower threshold of the projected length of one edge onto another\n"
+    "@param max_projection The upper limit of the projected length of one edge onto another\n"
+    "@param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes\n"
+    "@param rect_filter Specifies an error filter for rectangular input shapes\n"
+    "\n"
+    "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
+    "edges which contribute in the width check.\n"
+    "\n"
+    "\"metrics\" can be one of the constants \\Euclidian, \\Square or \\Projection. See there for "
+    "a description of these constants.\n"
+    "Use nil for this value to select the default (Euclidian metrics).\n"
+    "\n"
+    "\"ignore_angle\" specifies the angle limit of two edges. If two edges form an angle equal or "
+    "above the given value, they will not contribute in the check. "
+    "Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.\n"
+    "Use nil for this value to select the default.\n"
+    "\n"
+    "\"min_projection\" and \"max_projection\" allow selecting edges by their projected value upon each other. "
+    "It is sufficient if the projection of one edge on the other matches the specified condition. "
+    "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
+    "If you don't want to specify one limit, pass nil to the respective value.\n"
+    "\n"
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
+    "\n"
+    "\"opposite_filter\" specifies whether to require or reject errors happening on opposite sides of a figure. "
+    "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
+    "\n"
+    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
+  ) +
+  method_ext ("enclosing_check", &enclosing2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter), gsi::arg ("rect_filter", db::NoSideAllowed),
+    "@brief Performs an enclosing check with options\n"
+    "@param d The minimum enclosing distance for which the polygons are checked\n"
+    "@param other The other region against which to check\n"
+    "@param whole_edges If true, deliver the whole edges\n"
+    "@param metrics Specify the metrics type\n"
+    "@param ignore_angle The angle above which no check is performed\n"
+    "@param min_projection The lower threshold of the projected length of one edge onto another\n"
+    "@param max_projection The upper limit of the projected length of one edge onto another\n"
+    "@param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes\n"
+    "@param rect_filter Specifies an error filter for rectangular input shapes\n"
+    "\n"
+    "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
+    "edges which contribute in the width check.\n"
+    "\n"
+    "\"metrics\" can be one of the constants \\Euclidian, \\Square or \\Projection. See there for "
+    "a description of these constants.\n"
+    "Use nil for this value to select the default (Euclidian metrics).\n"
+    "\n"
+    "\"ignore_angle\" specifies the angle limit of two edges. If two edges form an angle equal or "
+    "above the given value, they will not contribute in the check. "
+    "Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.\n"
+    "Use nil for this value to select the default.\n"
+    "\n"
+    "\"min_projection\" and \"max_projection\" allow selecting edges by their projected value upon each other. "
+    "It is sufficient if the projection of one edge on the other matches the specified condition. "
+    "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
+    "If you don't want to specify one limit, pass nil to the respective value.\n"
+    "\n"
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
+    "\n"
+    "\"opposite_filter\" specifies whether to require or reject errors happening on opposite sides of a figure. "
+    "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
+    "\n"
+    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
+  ) +
+  method_ext ("separation_check", &separation2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter), gsi::arg ("rect_filter", db::NoSideAllowed),
+    "@brief Performs a separation check with options\n"
+    "@param d The minimum separation for which the polygons are checked\n"
+    "@param other The other region against which to check\n"
+    "@param whole_edges If true, deliver the whole edges\n"
+    "@param metrics Specify the metrics type\n"
+    "@param ignore_angle The angle above which no check is performed\n"
+    "@param min_projection The lower threshold of the projected length of one edge onto another\n"
+    "@param max_projection The upper limit of the projected length of one edge onto another\n"
+    "@param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes\n"
+    "@param rect_filter Specifies an error filter for rectangular input shapes\n"
+    "\n"
+    "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
+    "edges which contribute in the width check.\n"
+    "\n"
+    "\"metrics\" can be one of the constants \\Euclidian, \\Square or \\Projection. See there for "
+    "a description of these constants.\n"
+    "Use nil for this value to select the default (Euclidian metrics).\n"
+    "\n"
+    "\"ignore_angle\" specifies the angle limit of two edges. If two edges form an angle equal or "
+    "above the given value, they will not contribute in the check. "
+    "Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.\n"
+    "Use nil for this value to select the default.\n"
+    "\n"
+    "\"min_projection\" and \"max_projection\" allow selecting edges by their projected value upon each other. "
+    "It is sufficient if the projection of one edge on the other matches the specified condition. "
+    "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
+    "If you don't want to specify one limit, pass nil to the respective value.\n"
+    "\n"
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
+    "\n"
+    "\"opposite_filter\" specifies whether to require or reject errors happening on opposite sides of a figure. "
     "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
@@ -2542,6 +2530,22 @@ gsi::EnumIn<db::Region, db::RectFilter> decl_Region_RectFilter ("db", "RectFilte
     "@brief Allow errors on three sides"
   ),
   "@brief This class represents the error filter mode on rectangles for \\Region#separation and related checks.\n"
+  "\n"
+  "This enum has been introduced in version 0.27."
+);
+
+
+gsi::EnumIn<db::Region, db::OppositeFilter> decl_Region_OppositeFilter ("db", "OppositeFilter",
+  gsi::enum_const ("NoOppositeFilter", db::OppositeFilter::NoOppositeFilter,
+    "@brief No opposite filtering\n"
+  ) +
+  gsi::enum_const ("OnlyOpposite", db::OppositeFilter::OnlyOpposite,
+    "@brief Only errors appearing on opposite sides of a figure will be reported\n"
+  ) +
+  gsi::enum_const ("NotOpposite", db::OppositeFilter::NotOpposite,
+    "@brief Only errors NOT appearing on opposite sides of a figure will be reported\n"
+  ),
+  "@brief This class represents the opposite error filter mode for \\Region#separation and related checks.\n"
   "\n"
   "This enum has been introduced in version 0.27."
 );

@@ -14,3 +14,13 @@ l1.space(3.0, shielded, projection).output(101, 0)
 l2.separation(l1, 3.0, transparent, projection).output(110, 0)
 l2.separation(l1, 3.0, shielded, projection).output(111, 0)
 
+deep 
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+l1.space(3.0, transparent, projection).output(200, 0)
+l1.space(3.0, shielded, projection).output(201, 0)
+l2.separation(l1, 3.0, transparent, projection).output(210, 0)
+l2.separation(l1, 3.0, shielded, projection).output(211, 0)
+

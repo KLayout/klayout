@@ -957,3 +957,83 @@ TEST(21_breaking)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
+TEST(22_opposite_filter)
+{
+  std::string rs = tl::testsrc ();
+  rs += "/testdata/drc/drcSimpleTests_22.drc";
+
+  std::string input = tl::testsrc ();
+  input += "/testdata/drc/drcSimpleTests_22.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/drc/drcSimpleTests_au22.gds";
+
+  std::string output = this->tmp_file ("tmp.gds");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+      , input, output)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (_this, layout, au, db::NoNormalization);
+}
+
+TEST(23_rect_filter)
+{
+  std::string rs = tl::testsrc ();
+  rs += "/testdata/drc/drcSimpleTests_23.drc";
+
+  std::string input = tl::testsrc ();
+  input += "/testdata/drc/drcSimpleTests_23.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/drc/drcSimpleTests_au23.gds";
+
+  std::string output = this->tmp_file ("tmp.gds");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+      , input, output)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (_this, layout, au, db::NoNormalization);
+}
+

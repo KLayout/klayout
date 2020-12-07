@@ -22,6 +22,7 @@
 
 
 #include "gsiDecl.h"
+#include "gsiEnums.h"
 
 #include "dbDeepShapeStore.h"
 #include "dbEdges.h"
@@ -211,90 +212,60 @@ static db::Edges with_angle2 (const db::Edges *r, double amin, double amax, bool
   return r->filtered (f);
 }
 
-static db::EdgePairs width1 (const db::Edges *r, db::Edges::coord_type d) 
-{
-  return r->width_check (d);
-}
-
-static db::EdgePairs width2 (const db::Edges *r, db::Edges::coord_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
+static db::EdgePairs width2 (const db::Edges *r, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection)
 {
   return r->width_check (d, db::EdgesCheckOptions (whole_edges,
-                               metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()),
+                               metrics,
                                ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                                min_projection.is_nil () ? db::Edges::distance_type (0) : min_projection.to<db::Edges::distance_type> (),
                                max_projection.is_nil () ? std::numeric_limits<db::Edges::distance_type>::max () : max_projection.to<db::Edges::distance_type> ())
                          );
 }
 
-static db::EdgePairs space1 (const db::Edges *r, db::Edges::coord_type d) 
-{
-  return r->space_check (d);
-}
-
-static db::EdgePairs space2 (const db::Edges *r, db::Edges::coord_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
+static db::EdgePairs space2 (const db::Edges *r, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection)
 {
   return r->space_check (d, db::EdgesCheckOptions (whole_edges,
-                               metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()),
+                               metrics,
                                ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                                min_projection.is_nil () ? db::Edges::distance_type (0) : min_projection.to<db::Edges::distance_type> (),
                                max_projection.is_nil () ? std::numeric_limits<db::Edges::distance_type>::max () : max_projection.to<db::Edges::distance_type> ())
                          );
 }
 
-static db::EdgePairs inside1 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d) 
-{
-  return r->inside_check (other, d);
-}
-
-static db::EdgePairs inside2 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
+static db::EdgePairs inside2 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection)
 {
   return r->inside_check (other, d, db::EdgesCheckOptions (whole_edges,
-                                        metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()),
+                                        metrics,
                                         ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                                         min_projection.is_nil () ? db::Edges::distance_type (0) : min_projection.to<db::Edges::distance_type> (),
                                         max_projection.is_nil () ? std::numeric_limits<db::Edges::distance_type>::max () : max_projection.to<db::Edges::distance_type> ())
                          );
 }
 
-static db::EdgePairs overlap1 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d) 
-{
-  return r->overlap_check (other, d);
-}
-
-static db::EdgePairs overlap2 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
+static db::EdgePairs overlap2 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection)
 {
   return r->overlap_check (other, d, db::EdgesCheckOptions (whole_edges,
-                                         metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()),
+                                         metrics,
                                          ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                                          min_projection.is_nil () ? db::Edges::distance_type (0) : min_projection.to<db::Edges::distance_type> (),
                                          max_projection.is_nil () ? std::numeric_limits<db::Edges::distance_type>::max () : max_projection.to<db::Edges::distance_type> ())
                           );
 }
 
-static db::EdgePairs enclosing1 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d) 
-{
-  return r->enclosing_check (other, d);
-}
-
-static db::EdgePairs enclosing2 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
+static db::EdgePairs enclosing2 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection)
 {
   return r->enclosing_check (other, d, db::EdgesCheckOptions (whole_edges,
-                                           metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()),
+                                           metrics,
                                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                                            min_projection.is_nil () ? db::Edges::distance_type (0) : min_projection.to<db::Edges::distance_type> (),
                                            max_projection.is_nil () ? std::numeric_limits<db::Edges::distance_type>::max () : max_projection.to<db::Edges::distance_type> ())
                             );
 }
 
-static db::EdgePairs separation1 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d) 
-{
-  return r->separation_check (other, d);
-}
-
-static db::EdgePairs separation2 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
+static db::EdgePairs separation2 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection)
 {
   return r->separation_check (other, d, db::EdgesCheckOptions (whole_edges,
-                                           metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()),
+                                           metrics,
                                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                                            min_projection.is_nil () ? db::Edges::distance_type (0) : min_projection.to<db::Edges::distance_type> (),
                                            max_projection.is_nil () ? std::numeric_limits<db::Edges::distance_type>::max () : max_projection.to<db::Edges::distance_type> ())
@@ -344,21 +315,6 @@ static db::Region extents1 (const db::Edges *r, db::Coord d)
 static db::Region extents0 (const db::Edges *r)
 {
   return extents2 (r, 0, 0);
-}
-
-static int euclidian_metrics ()
-{
-  return db::Euclidian;
-}
-
-static int square_metrics ()
-{
-  return db::Square;
-}
-
-static int projection_metrics ()
-{
-  return db::Projection;
 }
 
 static void insert_r (db::Edges *e, const db::Region &a)
@@ -1097,24 +1053,7 @@ Class<db::Edges> dec_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "@return The transformed edge collection.\n"
   ) +
-  method_ext ("width_check", &width1, gsi::arg ("d"),
-    "@brief Performs a width check between edges\n"
-    "@param d The minimum width for which the edges are checked\n"
-    "@param other The other edge collection against which to check\n"
-    "To understand the overlap check for edges, one has to be familiar with the concept of the inside and outside "
-    "interpretation of an edge. An edge is considered a boundary between \"inside\" and \"outside\" where \"inside\" "
-    "is right to the edge. Although there is not necessarily a contiguous region for edges, the definition of the "
-    "inside part allows one to specify edge relations which are denoted by \"space\", \"width\", \"inside\" and \"enclosing\". "
-    "In that sense, width means that another edge is anti-parallel and left to the edge under test with a distance of less than the given "
-    "threshold."
-    "\n"
-    "This method returns an \\EdgePairs collection which contains the parts of the edges violating the check "
-    "criterion.\n"
-    "\n"
-    "A version of this method is available with more options (i.e. the option the deliver whole edges). "
-    "Other checks with different edge relations are \\space_check, \\inside_check, \\overlap_check, \\separation_check and \\enclosing_check.\n"
-  ) +
-  method_ext ("width_check", &width2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("width_check", &width2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"),
     "@brief Performs a width check with options\n"
     "@param d The minimum width for which the edges are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -1122,9 +1061,6 @@ Class<db::Edges> dec_Edges (decl_dbShapeCollection, "db", "Edges",
     "@param ignore_angle The threshold angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper threshold of the projected length of one edge onto another\n"
-    "\n"
-    "This version is similar to the simple version with one parameter. In addition, it allows "
-    "to specify many more options.\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the width check.\n"
@@ -1143,23 +1079,7 @@ Class<db::Edges> dec_Edges (decl_dbShapeCollection, "db", "Edges",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one threshold, pass nil to the respective value.\n"
   ) +
-  method_ext ("space_check", &space1, gsi::arg ("d"),
-    "@brief Performs a space check between edges\n"
-    "@param d The minimum distance for which the edges are checked\n"
-    "To understand the space check for edges, one has to be familiar with the concept of the inside and outside "
-    "interpretation of an edge. An edge is considered a boundary between \"inside\" and \"outside\" where \"inside\" "
-    "is right to the edge. Although there is not necessarily a contiguous region for edges, the definition of the "
-    "inside part allows one to specify edge relations which are denoted by \"space\", \"width\", \"inside\" and \"enclosing\". "
-    "In that sense, space means that another edge is anti-parallel and right to the edge under test with a distance of less than the given "
-    "threshold."
-    "\n"
-    "This method returns an \\EdgePairs collection which contains the parts of the edges violating the check "
-    "criterion.\n"
-    "\n"
-    "A version of this method is available with more options (i.e. the option the deliver whole edges). "
-    "Other checks with different edge relations are \\width_check, \\inside_check, \\overlap_check, \\separation_check and \\enclosing_check.\n"
-  ) +
-  method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"),
     "@brief Performs a space check with options\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -1167,9 +1087,6 @@ Class<db::Edges> dec_Edges (decl_dbShapeCollection, "db", "Edges",
     "@param ignore_angle The threshold angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper threshold of the projected length of one edge onto another\n"
-    "\n"
-    "This version is similar to the simple version with one parameter. In addition, it allows "
-    "to specify many more options.\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the space check.\n"
@@ -1188,24 +1105,7 @@ Class<db::Edges> dec_Edges (decl_dbShapeCollection, "db", "Edges",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one threshold, pass nil to the respective value.\n"
   ) +
-  method_ext ("inside_check", &inside1, gsi::arg ("other"), gsi::arg ("d"),
-    "@brief Performs an inside check between edges\n"
-    "@param d The minimum distance for which the edges are checked\n"
-    "@param other The other edge collection against which to check\n"
-    "To understand the inside check for edges, one has to be familiar with the concept of the inside and outside "
-    "interpretation of an edge. An edge is considered a boundary between \"inside\" and \"outside\" where \"inside\" "
-    "is right to the edge. Although there is not necessarily a contiguous region for edges, the definition of the "
-    "inside part allows one to specify edge relations which are denoted by \"space\", \"width\", \"inside\" and \"enclosing\". "
-    "In that sense, inside means that another edge is parallel and right to the edge under test with a distance of less than the given "
-    "threshold."
-    "\n"
-    "This method returns an \\EdgePairs collection which contains the parts of the edges violating the check "
-    "criterion.\n"
-    "\n"
-    "A version of this method is available with more options (i.e. the option the deliver whole edges). "
-    "Other checks with different edge relations are \\width_check, \\space_check, \\overlap_check, \\separation_check and \\enclosing_check.\n"
-  ) +
-  method_ext ("inside_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("inside_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"),
     "@brief Performs an inside check with options\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
@@ -1215,9 +1115,6 @@ Class<db::Edges> dec_Edges (decl_dbShapeCollection, "db", "Edges",
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper threshold of the projected length of one edge onto another\n"
     "\n"
-    "This version is similar to the simple version with one parameter. In addition, it allows "
-    "to specify many more options.\n"
-    "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the width check.\n"
     "\n"
@@ -1235,24 +1132,7 @@ Class<db::Edges> dec_Edges (decl_dbShapeCollection, "db", "Edges",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one threshold, pass nil to the respective value.\n"
   ) +
-  method_ext ("enclosing_check", &enclosing1, gsi::arg ("other"), gsi::arg ("d"),
-    "@brief Performs an enclosing check between edges\n"
-    "@param d The minimum distance for which the edges are checked\n"
-    "@param other The other edge collection against which to check\n"
-    "To understand the enclosing check for edges, one has to be familiar with the concept of the inside and outside "
-    "interpretation of an edge. An edge is considered a boundary between \"inside\" and \"outside\" where \"inside\" "
-    "is right to the edge. Although there is not necessarily a contiguous region for edges, the definition of the "
-    "inside part allows one to specify edge relations which are denoted by \"space\", \"width\", \"inside\" and \"enclosing\". "
-    "In that sense, enclosing means that another edge is parallel and left to the edge under test with a distance of less than the given "
-    "threshold."
-    "\n"
-    "This method returns an \\EdgePairs collection which contains the parts of the edges violating the check "
-    "criterion.\n"
-    "\n"
-    "A version of this method is available with more options (i.e. the option the deliver whole edges). "
-    "Other checks with different edge relations are \\width_check, \\space_check, \\overlap_check, \\separation_check and \\inside_check.\n"
-  ) +
-  method_ext ("enclosing_check", &enclosing2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("enclosing_check", &enclosing2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"),
     "@brief Performs an enclosing check with options\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
@@ -1262,8 +1142,32 @@ Class<db::Edges> dec_Edges (decl_dbShapeCollection, "db", "Edges",
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper threshold of the projected length of one edge onto another\n"
     "\n"
-    "This version is similar to the simple version with one parameter. In addition, it allows "
-    "to specify many more options.\n"
+    "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
+    "edges which contribute in the width check.\n"
+    "\n"
+    "\"metrics\" can be one of the constants \\Euclidian, \\Square or \\Projection. See there for "
+    "a description of these constants.\n"
+    "Use nil for this value to select the default (Euclidian metrics).\n"
+    "\n"
+    "\"ignore_angle\" specifies the angle threshold of two edges. If two edges form an angle equal or "
+    "above the given value, they will not contribute in the check. "
+    "Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.\n"
+    "Use nil for this value to select the default.\n"
+    "\n"
+    "\"min_projection\" and \"max_projection\" allow selecting edges by their projected value upon each other. "
+    "It is sufficient if the projection of one edge on the other matches the specified condition. "
+    "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
+    "If you don't want to specify one threshold, pass nil to the respective value.\n"
+  ) +
+  method_ext ("overlap_check", &overlap2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"),
+    "@brief Performs an overlap check with options\n"
+    "@param d The minimum distance for which the edges are checked\n"
+    "@param other The other edge collection against which to check\n"
+    "@param whole_edges If true, deliver the whole edges\n"
+    "@param metrics Specify the metrics type\n"
+    "@param ignore_angle The threshold angle above which no check is performed\n"
+    "@param min_projection The lower threshold of the projected length of one edge onto another\n"
+    "@param max_projection The upper threshold of the projected length of one edge onto another\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the width check.\n"
@@ -1282,22 +1186,7 @@ Class<db::Edges> dec_Edges (decl_dbShapeCollection, "db", "Edges",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one threshold, pass nil to the respective value.\n"
   ) +
-  method_ext ("overlap_check", &overlap1, gsi::arg ("other"), gsi::arg ("d"),
-    "@brief Performs an overlap check between edges\n"
-    "@param d The minimum distance for which the edges are checked\n"
-    "@param other The other edge collection against which to check\n"
-    "Technically, the overlap check is a width check between edges from different collections. "
-    "The check is performed where the edges are orientation towards each other with their 'inside' side "
-    "and they are orientation anti-parallel. This situation is found where two polygons overlap. Hence the "
-    "check is an 'overlap' check.\n"
-    "\n"
-    "This method returns an \\EdgePairs collection which contains the parts of the edges violating the check "
-    "criterion.\n"
-    "\n"
-    "A version of this method is available with more options (i.e. the option the deliver whole edges). "
-    "Other checks with different edge relations are \\width_check, \\space_check, \\enclosing_check, \\separation_check and \\inside_check.\n"
-  ) +
-  method_ext ("overlap_check", &overlap2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("separation_check", &separation2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"),
     "@brief Performs an overlap check with options\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
@@ -1306,54 +1195,6 @@ Class<db::Edges> dec_Edges (decl_dbShapeCollection, "db", "Edges",
     "@param ignore_angle The threshold angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper threshold of the projected length of one edge onto another\n"
-    "\n"
-    "This version is similar to the simple version with one parameter. In addition, it allows "
-    "to specify many more options.\n"
-    "\n"
-    "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
-    "edges which contribute in the width check.\n"
-    "\n"
-    "\"metrics\" can be one of the constants \\Euclidian, \\Square or \\Projection. See there for "
-    "a description of these constants.\n"
-    "Use nil for this value to select the default (Euclidian metrics).\n"
-    "\n"
-    "\"ignore_angle\" specifies the angle threshold of two edges. If two edges form an angle equal or "
-    "above the given value, they will not contribute in the check. "
-    "Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.\n"
-    "Use nil for this value to select the default.\n"
-    "\n"
-    "\"min_projection\" and \"max_projection\" allow selecting edges by their projected value upon each other. "
-    "It is sufficient if the projection of one edge on the other matches the specified condition. "
-    "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
-    "If you don't want to specify one threshold, pass nil to the respective value.\n"
-  ) +
-  method_ext ("separation_check", &separation1, gsi::arg ("other"), gsi::arg ("d"),
-    "@brief Performs an separation check between edges\n"
-    "@param d The minimum distance for which the edges are checked\n"
-    "@param other The other edge collection against which to check\n"
-    "Technically, the separation check is a space check between edges from different collections. "
-    "The check is performed where the edges are orientation towards each other with their 'outside' side "
-    "and they are orientation anti-parallel. This situation is found where two polygons have a space. Hence the "
-    "check is a 'separation' check.\n"
-    "\n"
-    "This method returns an \\EdgePairs collection which contains the parts of the edges violating the check "
-    "criterion.\n"
-    "\n"
-    "A version of this method is available with more options (i.e. the option the deliver whole edges). "
-    "Other checks with different edge relations are \\width_check, \\space_check, \\enclosing_check, \\overlap_check and \\inside_check.\n"
-  ) +
-  method_ext ("separation_check", &separation2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
-    "@brief Performs an overlap check with options\n"
-    "@param d The minimum distance for which the edges are checked\n"
-    "@param other The other edge collection against which to check\n"
-    "@param whole_edges If true, deliver the whole edges\n"
-    "@param metrics Specify the metrics type\n"
-    "@param ignore_angle The threshold angle above which no check is performed\n"
-    "@param min_projection The lower threshold of the projected length of one edge onto another\n"
-    "@param max_projection The upper threshold of the projected length of one edge onto another\n"
-    "\n"
-    "This version is similar to the simple version with one parameter. In addition, it allows "
-    "to specify many more options.\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the width check.\n"
@@ -1601,35 +1442,6 @@ Class<db::Edges> dec_Edges (decl_dbShapeCollection, "db", "Edges",
   method ("disable_progress", &db::Edges::disable_progress,
     "@brief Disable progress reporting\n"
     "Calling this method will disable progress reporting. See \\enable_progress.\n"
-  ) +
-  method ("Euclidian", &euclidian_metrics,
-    "@brief Specifies Euclidian metrics for the check functions\n"
-    "This value can be used for the metrics parameter in the check functions, i.e. \\width_check. "
-    "This value specifies Euclidian metrics, i.e. the distance between two points is measured by:\n"
-    "\n"
-    "@code\n"
-    "d = sqrt(dx^2 + dy^2)\n"
-    "@/code\n"
-    "\n"
-    "All points within a circle with radius d around one point are considered to have a smaller distance than d."
-  ) +
-  method ("Square", &square_metrics,
-    "@brief Specifies square metrics for the check functions\n"
-    "This value can be used for the metrics parameter in the check functions, i.e. \\width_check. "
-    "This value specifies sqaure metrics, i.e. the distance between two points is measured by:\n"
-    "\n"
-    "@code\n"
-    "d = max(abs(dx), abs(dy))\n"
-    "@/code\n"
-    "\n"
-    "All points within a square with length 2*d around one point are considered to have a smaller distance than d in this metrics."
-  ) +
-  method ("Projection", &projection_metrics,
-    "@brief Specifies projected distance metrics for the check functions\n"
-    "This value can be used for the metrics parameter in the check functions, i.e. \\width_check. "
-    "This value specifies projected metrics, i.e. the distance is defined as the minimum distance "
-    "measured perpendicular to one edge. That implies that the distance is defined only where two "
-    "edges have a non-vanishing projection onto each other."
   ),
   "@brief A collection of edges (Not necessarily describing closed contours)\n"
   "\n\n"
@@ -1658,6 +1470,10 @@ Class<db::Edges> dec_Edges (decl_dbShapeCollection, "db", "Edges",
   "\n\n"
   "This class has been introduced in version 0.23.\n"
 );
+
+//  borrow the Metrics constants from Region:
+extern gsi::EnumIn<db::Region, db::metrics_type> decl_Region_Metrics;
+gsi::ClassExt<db::Edges> inject_Metrics_from_Region_in_Edges (decl_Region_Metrics.defs ());
 
 }
 

@@ -232,30 +232,27 @@ public:
    *  @brief Constructor
    *
    *  The mode parameter selects the interaction check mode.
-   *  0 is "overlapping". 
-   *  -1 will select all polygons inside polygons from the other layer.
-   *  -2 will select all polygons enclosing polygons from the other layer.
-   *  +1 will select all polygons outside polygons from the other layer.
+   *  0 is "overlapping" or "touching".
+   *  -1 will select all secondary polygons inside polygons from the primary.
+   *  -2 will select all secondary polygons enclosing polygons from the primary.
+   *  +1 will select all secondary polygons outside polygons from the primary.
    *
-   *  In mode -1 and +1, finish () needs to be called before the interactions
-   *  can be used. In mode -1 and +1, the interactions delivered will contain
-   *  interactions of the reference property vs. the property of the respective
-   *  input polygons (property != reference property). In mode +1 these are 
-   *  pseudo-interactions, because "outside" by definition means non-interacting.
+   *  Use set_include_touching(f) to specify whether to include or not include the touching
+   *  case as interacting for mode 0.
    *
-   *  Mode -1 (inside) and +1 (outside) requires a property value for the containing (primary) region.
+   *  In modes -2, -1 and +1, finish () needs to be called before the interactions
+   *  can be used.
+   *
+   *  All modes require property IDs to differentiate both inputs into primary and secondary.
    *  Property IDs from 0 to the given last primary ID value are considered to belong to
-   *  the primary region.
+   *  the primary region. Property IDs above the last primary ID are considered to belong to
+   *  the secondary region.
    *  This last property ID must be specified in the last_primary_id parameter.
-   *  For correct operation, the secondary input must use property IDs bigger than
-   *  last_primary_id.
-   *  The reported interactions will be (primary_id,polygon_id) even for outside mode.
-   *  For outside mode, the primary_id is always last_primary_id.
-   *
-   *  For mode 0, property ids <= last_primary_id are considered to belong to the first
-   *  container and property ids > container_id to the second container.
+   *  The reported interactions will be (primary_id,secondary_id) even for outside mode.
+   *  For outside mode, the primary_id is always last_primary_id. In outside mode, the
+   *  interactions are pseudo-interactions as by definition outside polygons don't interact.
    */
-  InteractionDetector (int mode = 0, property_type primary_id = 0);
+  InteractionDetector (int mode = 0, property_type last_primary_id = 0);
 
   /**
    *  @brief Sets the "touching" flag

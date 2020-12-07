@@ -1419,78 +1419,81 @@ CODE
     # is "\join". See there for a description of the function.
    
     # %DRC%
-    # @name enclosing
-    # @brief Selects shapes or regions of self which completely enclose one or more shapes from the other region
-    # @synopsis layer.enclosing(other)
-    # @synopsis layer.enclosing(other, min_count)
-    # @synopsis layer.enclosing(other, min_count, max_count)
-    # @synopsis layer.enclosing(other, min_count .. max_count)
-    # This method selects all shapes or regions from self which enclose shapes from the other
+    # @name covering
+    # @brief Selects shapes or regions of self which completely cover (enclose) one or more shapes from the other region
+    # @synopsis layer.covering(other)
+    # @synopsis layer.covering(other, min_count)
+    # @synopsis layer.covering(other, min_count, max_count)
+    # @synopsis layer.covering(other, min_count .. max_count)
+    # This method selects all shapes or regions from self which completly cover shapes from the other
     # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
     # It returns a new layer containing the selected shapes. A version which modifies self
-    # is \select_enclosing.
+    # is \select_covering.
     #
     # This method is available for polygon and edge layers. Edges can be selected
     # with respect to other edges or polygons.
     #
-    # The following image shows the effect of the "enclosing" method:
+    # The following image shows the effect of the "covering" method:
     #
     # @table
     #   @tr 
-    #     @td @img(/images/drc_enclosing.png) @/td
+    #     @td @img(/images/drc_covering.png) @/td
     #   @/tr
     # @/table
     #
     # A range of counts can be specified. If so, the shape from the primary layer is 
-    # only selected when enclosing a given number of shapes from the other layer.
+    # only selected when covering a given number of shapes from the other layer.
     # For the interpretation of the count see \interacting.
+    #
+    # The "covering" attribute is sometimes called "enclosing", but this name is
+    # used for the respective DRC function (see \enclosing).
     
     # %DRC%
-    # @name not_enclosing
-    # @brief Selects shapes or regions of self which do not enclose one or more shapes from the other region
-    # @synopsis layer.not_enclosing(other)
-    # @synopsis layer.not_enclosing(other, min_count)
-    # @synopsis layer.not_enclosing(other, min_count, max_count)
-    # @synopsis layer.not_enclosing(other, min_count .. max_count)
-    # This method selects all shapes or regions from self which do not enclose shapes from the other
+    # @name not_covering
+    # @brief Selects shapes or regions of self which do not cover (enclose) one or more shapes from the other region
+    # @synopsis layer.not_covering(other)
+    # @synopsis layer.not_covering(other, min_count)
+    # @synopsis layer.not_covering(other, min_count, max_count)
+    # @synopsis layer.not_covering(other, min_count .. max_count)
+    # This method selects all shapes or regions from self which do not cover shapes from the other
     # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
-    # otherwise individual shapes are selected. This method returns the inverse of \enclosing
+    # otherwise individual shapes are selected. This method returns the inverse of \covering
     # and provides the same options.
     #
     # This method is available for polygon and edge layers. Edges can be selected
     # with respect to other edges or polygons.
     # It returns a new layer containing the selected shapes. A version which modifies self
-    # is \select_not_enclosing.
+    # is \select_not_covering.
     
     # %DRC%
-    # @name select_enclosing
-    # @brief Selects shapes or regions of self which completely enclose one or more shapes from the other region
-    # @synopsis layer.select_enclosing(other)
-    # @synopsis layer.select_enclosing(other, min_count)
-    # @synopsis layer.select_enclosing(other, min_count, max_count)
-    # @synopsis layer.select_enclosing(other, min_count .. max_count)
-    # This method selects all shapes or regions from self which overlap shapes from the other
+    # @name select_covering
+    # @brief Selects shapes or regions of self which completely cover (enclose) one or more shapes from the other region
+    # @synopsis layer.select_covering(other)
+    # @synopsis layer.select_covering(other, min_count)
+    # @synopsis layer.select_covering(other, min_count, max_count)
+    # @synopsis layer.select_covering(other, min_count .. max_count)
+    # This method selects all shapes or regions from self which cover shapes from the other
     # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
     # It modifies self to contain the selected shapes. A version which does not modify self
-    # is \enclosing.
+    # is \covering.
     #
     # This method is available for polygon and edge layers. Edges can be selected
     # with respect to other edges or polygons.
     
     # %DRC%
-    # @name select_not_enclosing
-    # @brief Selects shapes or regions of self which do not enclose one or more shapes from the other region
-    # @synopsis layer.select_not_enclosing(other)
-    # @synopsis layer.select_not_enclosing(other, min_count)
-    # @synopsis layer.select_not_enclosing(other, min_count, max_count)
-    # @synopsis layer.select_not_enclosing(other, min_count .. max_count)
-    # This method selects all shapes or regions from self which do not enclose shapes from the other
+    # @name select_not_covering
+    # @brief Selects shapes or regions of self which do not cover (enclose) one or more shapes from the other region
+    # @synopsis layer.select_not_covering(other)
+    # @synopsis layer.select_not_covering(other, min_count)
+    # @synopsis layer.select_not_covering(other, min_count, max_count)
+    # @synopsis layer.select_not_covering(other, min_count .. max_count)
+    # This method selects all shapes or regions from self which do not cover shapes from the other
     # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected. 
     # It modifies self to contain the selected shapes. A version which does not modify self
-    # is \not_enclosing.
+    # is \not_covering.
     #
     # This method is available for polygon and edge layers. Edges can be selected
     # with respect to other edges or polygons.
@@ -2068,7 +2071,7 @@ CODE
 CODE
     end
     
-    %w(overlapping not_overlapping enclosing not_enclosing).each do |f| 
+    %w(overlapping not_overlapping covering not_covering).each do |f| 
       eval <<"CODE"
       def #{f}(other, *args)
         requires_same_type(other, "#{f}")
@@ -2078,7 +2081,7 @@ CODE
 CODE
     end
 
-    %w(overlapping not_overlapping enclosing not_enclosing).each do |fi|
+    %w(overlapping not_overlapping covering not_covering).each do |fi|
       f = "select_" + fi
       # In tiled mode, there are no modifying versions. Emulate using the non-modifying one.
       eval <<"CODE"
@@ -3010,7 +3013,7 @@ CODE
         args = [ value, whole_edges, metrics, alim, minp, maxp ]
 
         if self.data.is_a?(RBA::Region)
-          args << shielded
+          args << (shielded == nil ? true : shielded)
           if :#{f} != :width && :#{f} != :notch
             args << opposite_filter
             args << rect_filter

@@ -1406,39 +1406,47 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This operator adds the polygons of the other region to self. "
     "This usually creates unmerged regions and polygons may overlap. Use \\merge if you want to ensure the result region is merged.\n"
   ) + 
-  method ("enclosing", &db::Region::selected_enclosing, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
-    "@brief Returns the polygons of this region which are completely enclosing polygons from the other region\n"
+  method ("covering", &db::Region::selected_enclosing, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Returns the polygons of this region which are completely covering polygons from the other region\n"
     "\n"
-    "@return A new region containing the polygons which are enclosing polygons from the other region\n"
-    "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
-    "\n"
-    "This method has been introduced in version 0.27."
-  ) +
-  method ("not_enclosing", &db::Region::selected_not_enclosing, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
-    "@brief Returns the polygons of this region which are not completely enclosing polygons from the other region\n"
-    "\n"
-    "@return A new region containing the polygons which are not enclosing polygons from the other region\n"
+    "@return A new region containing the polygons which are covering polygons from the other region\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
+    "This attribute is sometimes called 'enclosing' instead of 'covering', but this term is reserved for the respective DRC function.\n"
+    "\n"
     "This method has been introduced in version 0.27."
   ) +
-  method ("select_enclosing", &db::Region::select_enclosing, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
-    "@brief Selects the polygons of this region which are completely enclosing polygons from the other region\n"
+  method ("not_covering", &db::Region::selected_not_enclosing, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Returns the polygons of this region which are not completely covering polygons from the other region\n"
+    "\n"
+    "@return A new region containing the polygons which are not covering polygons from the other region\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This attribute is sometimes called 'enclosing' instead of 'covering', but this term is reserved for the respective DRC function.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
+  method ("select_covering", &db::Region::select_enclosing, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Selects the polygons of this region which are completely covering polygons from the other region\n"
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
+    "This attribute is sometimes called 'enclosing' instead of 'covering', but this term is reserved for the respective DRC function.\n"
+    "\n"
     "This method has been introduced in version 0.27."
   ) +
-  method ("select_not_enclosing", &db::Region::select_not_enclosing, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
-    "@brief Selects the polygons of this region which are not completely enclosing polygons from the other region\n"
+  method ("select_not_covering", &db::Region::select_not_enclosing, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Selects the polygons of this region which are not completely covering polygons from the other region\n"
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This attribute is sometimes called 'enclosing' instead of 'covering', but this term is reserved for the respective DRC function.\n"
     "\n"
     "This method has been introduced in version 0.27."
   ) +

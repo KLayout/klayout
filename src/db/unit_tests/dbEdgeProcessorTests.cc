@@ -1680,14 +1680,15 @@ TEST(26b)
 TEST(26c)
 {
   db::EdgeProcessor ep;
-  ep.insert (db::Polygon (db::Box (db::Point (0, 0), db::Point (100, 100))), 0);
-  ep.insert (db::Polygon (db::Box (db::Point (40, 0), db::Point (140, 100))), 1);
-  ep.insert (db::Polygon (db::Box (db::Point (60, 20), db::Point (160, 120))), 2);
-  ep.insert (db::Polygon (db::Box (db::Point (110, 50), db::Point (210, 150))), 3);
-  ep.insert (db::Polygon (db::Box (db::Point (-100, -100), db::Point (1000, 1000))), 4);
-  ep.insert (db::Polygon (db::Box (db::Point (1000, 1100), db::Point (1100, 1200))), 5);
+  ep.insert (db::Polygon (db::Box (db::Point (-100, -100), db::Point (1000, 1000))), 0);
+  ep.insert (db::Polygon (db::Box (db::Point (1000, 1100), db::Point (1100, 1200))), 1);
+  ep.insert (db::Polygon (db::Box (db::Point (0, 0), db::Point (100, 100))), 2);
+  ep.insert (db::Polygon (db::Box (db::Point (40, 0), db::Point (140, 100))), 3);
+  ep.insert (db::Polygon (db::Box (db::Point (60, 20), db::Point (160, 120))), 4);
+  ep.insert (db::Polygon (db::Box (db::Point (110, 50), db::Point (210, 150))), 5);
+  ep.insert (db::Polygon (db::Box (db::Point (1000, 1100), db::Point (1010, 1110))), 6);
 
-  db::InteractionDetector id (-1, 4); // inside with background #4
+  db::InteractionDetector id (-1, 0); // inside with background #0
   db::EdgeSink es;
   ep.process (es, id);
   id.finish ();
@@ -1701,7 +1702,35 @@ TEST(26c)
   }
 
   //  does not work yet!
-  EXPECT_EQ (s, "4:0,4:1,4:2,4:3");
+  EXPECT_EQ (s, "0:2,0:3,0:4,0:5");
+}
+
+TEST(26d)
+{
+  db::EdgeProcessor ep;
+  ep.insert (db::Polygon (db::Box (db::Point (-100, -100), db::Point (1000, 1000))), 0);
+  ep.insert (db::Polygon (db::Box (db::Point (1000, 1100), db::Point (1100, 1200))), 1);
+  ep.insert (db::Polygon (db::Box (db::Point (0, 0), db::Point (100, 100))), 2);
+  ep.insert (db::Polygon (db::Box (db::Point (40, 0), db::Point (140, 100))), 3);
+  ep.insert (db::Polygon (db::Box (db::Point (60, 20), db::Point (160, 120))), 4);
+  ep.insert (db::Polygon (db::Box (db::Point (110, 50), db::Point (210, 150))), 5);
+  ep.insert (db::Polygon (db::Box (db::Point (1000, 1100), db::Point (1010, 1110))), 6);
+
+  db::InteractionDetector id (-1, 1); // inside with background #0 and #1
+  db::EdgeSink es;
+  ep.process (es, id);
+  id.finish ();
+
+  std::string s;
+  for (db::InteractionDetector::iterator i = id.begin (); i != id.end (); ++i) {
+    if (! s.empty ()) {
+      s += ",";
+    }
+    s += tl::to_string (i->first) + ":" + tl::to_string (i->second);
+  }
+
+  //  does not work yet!
+  EXPECT_EQ (s, "0:2,0:3,0:4,0:5,1:6");
 }
 
 TEST(27)

@@ -373,7 +373,9 @@ static size_t id (const db::Edges *e)
 
 extern Class<db::ShapeCollection> decl_dbShapeCollection;
 
-Class<db::Edges> dec_Edges (decl_dbShapeCollection, "db", "Edges",
+//  NOTE: the Metrics constants are injected into Edges in gsiDeclDbRegion.cc because this is where these constants are instantiated.
+
+Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
     "\n"
@@ -1470,10 +1472,6 @@ Class<db::Edges> dec_Edges (decl_dbShapeCollection, "db", "Edges",
   "\n\n"
   "This class has been introduced in version 0.23.\n"
 );
-
-//  borrow the Metrics constants from Region:
-extern gsi::EnumIn<db::Region, db::metrics_type> decl_Region_Metrics;
-gsi::ClassExt<db::Edges> inject_Metrics_from_Region_in_Edges (decl_Region_Metrics.defs ());
 
 }
 

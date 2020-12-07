@@ -83,6 +83,19 @@ static db::CompoundRegionOperationNode *new_overlapping (db::CompoundRegionOpera
   }
 }
 
+static db::CompoundRegionOperationNode *new_enclosing (db::CompoundRegionOperationNode *a, db::CompoundRegionOperationNode *b, bool inverse, size_t min_count, size_t max_count)
+{
+  //  TODO: is this correct?
+  if (a->result_type () != db::CompoundRegionOperationNode::Region) {
+    throw tl::Exception ("Primary input for interaction compound operation must be of Region type");
+  }
+  if (b->result_type () == db::CompoundRegionOperationNode::Region) {
+    return new db::CompoundRegionInteractOperationNode (a, b, -2, false, inverse, min_count, max_count);
+  } else {
+    throw tl::Exception ("Secondary input for enclosing compound operation must be of Region type");
+  }
+}
+
 static db::CompoundRegionOperationNode *new_inside (db::CompoundRegionOperationNode *a, db::CompoundRegionOperationNode *b, bool inverse)
 {
   //  TODO: is this correct?
@@ -280,6 +293,9 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   ) +
   gsi::constructor ("new_overlapping", &new_overlapping, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", std::numeric_limits<size_t>::max (), "unlimited"),
     "@brief Creates a node representing an overlapping selection operation between the inputs.\n"
+  ) +
+  gsi::constructor ("new_enclosing", &new_enclosing, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", std::numeric_limits<size_t>::max (), "unlimited"),
+    "@brief Creates a node representing an inside selection operation between the inputs.\n"
   ) +
   gsi::constructor ("new_inside", &new_inside, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false),
     "@brief Creates a node representing an inside selection operation between the inputs.\n"

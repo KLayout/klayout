@@ -545,7 +545,7 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
     return clone ();
   } else if (max_count < min_count || other.empty ()) {
     //  clear, if b is empty and
-    //   * mode is inside or interacting and inverse is false ("inside" or "interacting")
+    //   * mode is inside, enclosing or interacting and inverse is false ("inside" or "interacting")
     //   * mode is outside and inverse is true ("not outside")
     if ((mode <= 0) != inverse) {
       return new EmptyRegion ();
@@ -586,7 +586,7 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
 
     if (mode < 0) {
 
-      //  NOTE: on "inside", the other region must be merged
+      //  NOTE: on "inside" or "enclosing", the other region must be merged
       for (RegionIterator p = other.begin_merged (); ! p.at_end (); ++p) {
         if (p->box ().touches (bbox ())) {
           ep.insert (*p, nstart);
@@ -609,8 +609,8 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
 
     //  with counting we need to separate the other polygons by different properties
 
-    //  can only have min_count/max_count in interact mode
-    tl_assert (mode == 0);
+    //  cannot only have min_count/max_count in outside mode
+    tl_assert (mode <= 0);
 
     for (RegionIterator p = other.begin_merged (); ! p.at_end (); ++p) {
       if (p->box ().touches (bbox ())) {
@@ -621,6 +621,9 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
 
   }
 
+  //  there should be at least one element to look at for primary
+  tl_assert (nstart > 0);
+
   size_t n = nstart;
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p, ++n) {
     if (mode > 0 || p->box ().touches (other.bbox ())) {
@@ -628,7 +631,7 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
     }
   }
 
-  db::InteractionDetector id (mode, 0);
+  db::InteractionDetector id (mode, nstart - 1);
   id.set_include_touching (touching);
   db::EdgeSink es;
   ep.process (es, id);

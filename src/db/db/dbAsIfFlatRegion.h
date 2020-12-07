@@ -188,6 +188,16 @@ public:
     return selected_interacting_generic (other, -1, true, true);
   }
 
+  virtual RegionDelegate *selected_enclosing (const Region &other, size_t min_count, size_t max_count) const
+  {
+    return selected_interacting_generic (other, -2, true, false, min_count, max_count);
+  }
+
+  virtual RegionDelegate *selected_not_enclosing (const Region &other, size_t min_count, size_t max_count) const
+  {
+    return selected_interacting_generic (other, -2, true, true, min_count, max_count);
+  }
+
   virtual RegionDelegate *selected_interacting (const Region &other, size_t min_count, size_t max_count) const
   {
     return selected_interacting_generic (other, 0, true, false, min_count, max_count);
@@ -218,14 +228,14 @@ public:
     return selected_interacting_generic (other, true, min_count, max_count);
   }
 
-  virtual RegionDelegate *selected_overlapping (const Region &other) const
+  virtual RegionDelegate *selected_overlapping (const Region &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, 0, false, false);
+    return selected_interacting_generic (other, 0, false, false, min_count, max_count);
   }
 
-  virtual RegionDelegate *selected_not_overlapping (const Region &other) const
+  virtual RegionDelegate *selected_not_overlapping (const Region &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, 0, false, true);
+    return selected_interacting_generic (other, 0, false, true, min_count, max_count);
   }
 
   virtual RegionDelegate *pull_inside (const Region &other) const

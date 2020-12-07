@@ -1419,9 +1419,89 @@ CODE
     # is "\join". See there for a description of the function.
    
     # %DRC%
+    # @name enclosing
+    # @brief Selects shapes or regions of self which completely enclose one or more shapes from the other region
+    # @synopsis layer.enclosing(other)
+    # @synopsis layer.enclosing(other, min_count)
+    # @synopsis layer.enclosing(other, min_count, max_count)
+    # @synopsis layer.enclosing(other, min_count .. max_count)
+    # This method selects all shapes or regions from self which enclose shapes from the other
+    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
+    # otherwise individual shapes are selected.
+    # It returns a new layer containing the selected shapes. A version which modifies self
+    # is \select_enclosing.
+    #
+    # This method is available for polygon and edge layers. Edges can be selected
+    # with respect to other edges or polygons.
+    #
+    # The following image shows the effect of the "enclosing" method:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_enclosing.png) @/td
+    #   @/tr
+    # @/table
+    #
+    # A range of counts can be specified. If so, the shape from the primary layer is 
+    # only selected when enclosing a given number of shapes from the other layer.
+    # For the interpretation of the count see \interacting.
+    
+    # %DRC%
+    # @name not_enclosing
+    # @brief Selects shapes or regions of self which do not enclose one or more shapes from the other region
+    # @synopsis layer.not_enclosing(other)
+    # @synopsis layer.not_enclosing(other, min_count)
+    # @synopsis layer.not_enclosing(other, min_count, max_count)
+    # @synopsis layer.not_enclosing(other, min_count .. max_count)
+    # This method selects all shapes or regions from self which do not enclose shapes from the other
+    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
+    # otherwise individual shapes are selected. This method returns the inverse of \enclosing
+    # and provides the same options.
+    #
+    # This method is available for polygon and edge layers. Edges can be selected
+    # with respect to other edges or polygons.
+    # It returns a new layer containing the selected shapes. A version which modifies self
+    # is \select_not_enclosing.
+    
+    # %DRC%
+    # @name select_enclosing
+    # @brief Selects shapes or regions of self which completely enclose one or more shapes from the other region
+    # @synopsis layer.select_enclosing(other)
+    # @synopsis layer.select_enclosing(other, min_count)
+    # @synopsis layer.select_enclosing(other, min_count, max_count)
+    # @synopsis layer.select_enclosing(other, min_count .. max_count)
+    # This method selects all shapes or regions from self which overlap shapes from the other
+    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
+    # otherwise individual shapes are selected.
+    # It modifies self to contain the selected shapes. A version which does not modify self
+    # is \enclosing.
+    #
+    # This method is available for polygon and edge layers. Edges can be selected
+    # with respect to other edges or polygons.
+    
+    # %DRC%
+    # @name select_not_enclosing
+    # @brief Selects shapes or regions of self which do not enclose one or more shapes from the other region
+    # @synopsis layer.select_not_enclosing(other)
+    # @synopsis layer.select_not_enclosing(other, min_count)
+    # @synopsis layer.select_not_enclosing(other, min_count, max_count)
+    # @synopsis layer.select_not_enclosing(other, min_count .. max_count)
+    # This method selects all shapes or regions from self which do not enclose shapes from the other
+    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
+    # otherwise individual shapes are selected. 
+    # It modifies self to contain the selected shapes. A version which does not modify self
+    # is \not_enclosing.
+    #
+    # This method is available for polygon and edge layers. Edges can be selected
+    # with respect to other edges or polygons.
+
+    # %DRC%
     # @name overlapping
     # @brief Selects shapes or regions of self which overlap shapes from the other region
     # @synopsis layer.overlapping(other)
+    # @synopsis layer.overlapping(other, min_count)
+    # @synopsis layer.overlapping(other, min_count, max_count)
+    # @synopsis layer.overlapping(other, min_count .. max_count)
     # This method selects all shapes or regions from self which overlap shapes from the other
     # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
@@ -1438,17 +1518,25 @@ CODE
     #     @td @img(/images/drc_overlapping.png) @/td
     #   @/tr
     # @/table
+    #
+    # A range of counts can be specified. If so, the shape from the primary layer is 
+    # only selected when overlapping a given number of shapes from the other layer.
+    # For the interpretation of the count see \interacting.
     
     # %DRC%
     # @name not_overlapping
     # @brief Selects shapes or regions of self which do not overlap shapes from the other region
     # @synopsis layer.not_overlapping(other)
+    # @synopsis layer.not_overlapping(other, min_count)
+    # @synopsis layer.not_overlapping(other, min_count, max_count)
+    # @synopsis layer.not_overlapping(other, min_count .. max_count)
     # This method selects all shapes or regions from self which do not overlap shapes from the other
     # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
-    # otherwise individual shapes are selected.
+    # otherwise individual shapes are selected. This method will return the inverse of \overlapping
+    # and provides the same options.
     #
-    # The "not_overlapping" method is equivalent to the \outside method. It is provided
-    # as an alias for consistency.
+    # The "not_overlapping" method is similar to the \outside method. However, "outside" does 
+    # not provide the option to specify counts.
     #
     # This method is available for polygon and edge layers. Edges can be selected
     # with respect to other edges or polygons.
@@ -1459,6 +1547,9 @@ CODE
     # @name select_overlapping
     # @brief Selects shapes or regions of self which overlap shapes from the other region
     # @synopsis layer.select_overlapping(other)
+    # @synopsis layer.select_overlapping(other, min_count)
+    # @synopsis layer.select_overlapping(other, min_count, max_count)
+    # @synopsis layer.select_overlapping(other, min_count .. max_count)
     # This method selects all shapes or regions from self which overlap shapes from the other
     # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
@@ -1472,6 +1563,9 @@ CODE
     # @name select_not_overlapping
     # @brief Selects shapes or regions of self which do not overlap shapes from the other region
     # @synopsis layer.select_not_overlapping(other)
+    # @synopsis layer.select_not_overlapping(other, min_count)
+    # @synopsis layer.select_not_overlapping(other, min_count, max_count)
+    # @synopsis layer.select_not_overlapping(other, min_count .. max_count)
     # This method selects all shapes or regions from self which do not overlap shapes from the other
     # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected. 
@@ -1902,7 +1996,7 @@ CODE
 CODE
     end
 
-    %w(| ^ overlapping not_overlapping inside not_inside outside not_outside in not_in).each do |f| 
+    %w(| ^ inside not_inside outside not_outside in not_in).each do |f| 
       eval <<"CODE"
       def #{f}(other)
         requires_same_type(other, "#{f}")
@@ -1974,7 +2068,34 @@ CODE
 CODE
     end
     
-    %w(overlapping not_overlapping inside not_inside outside not_outside).each do |fi|
+    %w(overlapping not_overlapping enclosing not_enclosing).each do |f| 
+      eval <<"CODE"
+      def #{f}(other, *args)
+        requires_same_type(other, "#{f}")
+        requires_edges_or_region("#{f}")
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data, *minmax_count(:#{f}, *args)))
+      end
+CODE
+    end
+
+    %w(overlapping not_overlapping enclosing not_enclosing).each do |fi|
+      f = "select_" + fi
+      # In tiled mode, there are no modifying versions. Emulate using the non-modifying one.
+      eval <<"CODE"
+      def #{f}(other, *args)
+        requires_edges_or_region("#{f}")
+        requires_same_type(other, "#{f}")
+        if @engine.is_tiled?
+          self.data = @engine._tcmd(self.data, 0, self.data.class, :#{fi}, other.data, *minmax_count(:#{fi}, *args))
+          DRCLayer::new(@engine, self.data)
+        else
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data, *minmax_count(:#{f}, *args)))
+        end
+      end
+CODE
+    end
+    
+    %w(inside not_inside outside not_outside).each do |fi|
       f = "select_" + fi
       # In tiled mode, there are no modifying versions. Emulate using the non-modifying one.
       eval <<"CODE"

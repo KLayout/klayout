@@ -1406,6 +1406,42 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This operator adds the polygons of the other region to self. "
     "This usually creates unmerged regions and polygons may overlap. Use \\merge if you want to ensure the result region is merged.\n"
   ) + 
+  method ("enclosing", &db::Region::selected_enclosing, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Returns the polygons of this region which are completely enclosing polygons from the other region\n"
+    "\n"
+    "@return A new region containing the polygons which are enclosing polygons from the other region\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
+  method ("not_enclosing", &db::Region::selected_not_enclosing, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Returns the polygons of this region which are not completely enclosing polygons from the other region\n"
+    "\n"
+    "@return A new region containing the polygons which are not enclosing polygons from the other region\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
+  method ("select_enclosing", &db::Region::select_enclosing, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Selects the polygons of this region which are completely enclosing polygons from the other region\n"
+    "\n"
+    "@return The region after the polygons have been selected (self)\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
+  method ("select_not_enclosing", &db::Region::select_not_enclosing, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Selects the polygons of this region which are not completely enclosing polygons from the other region\n"
+    "\n"
+    "@return The region after the polygons have been selected (self)\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
   method ("inside", &db::Region::selected_inside, gsi::arg ("other"),
     "@brief Returns the polygons of this region which are completely inside polygons from the other region\n"
     "\n"
@@ -1634,34 +1670,42 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.27\n"
   ) +
-  method ("overlapping", &db::Region::selected_overlapping, gsi::arg ("other"),
+  method ("overlapping", &db::Region::selected_overlapping, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which overlap polygons from the other region\n"
     "\n"
     "@return A new region containing the polygons overlapping polygons from the other region\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The count options have been introduced in version 0.27."
   ) + 
-  method ("not_overlapping", &db::Region::selected_not_overlapping, gsi::arg ("other"),
+  method ("not_overlapping", &db::Region::selected_not_overlapping, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which do not overlap polygons from the other region\n"
     "\n"
     "@return A new region containing the polygons not overlapping polygons from the other region\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
-  ) + 
-  method ("select_overlapping", &db::Region::select_overlapping, gsi::arg ("other"),
+    "\n"
+    "The count options have been introduced in version 0.27."
+  ) +
+  method ("select_overlapping", &db::Region::select_overlapping, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons from this region which overlap polygons from the other region\n"
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
-  ) + 
-  method ("select_not_overlapping", &db::Region::select_not_overlapping, gsi::arg ("other"),
+    "\n"
+    "The count options have been introduced in version 0.27."
+  ) +
+  method ("select_not_overlapping", &db::Region::select_not_overlapping, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons from this region which do not overlap polygons from the other region\n"
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
-  ) + 
+    "\n"
+    "The count options have been introduced in version 0.27."
+  ) +
   method ("pull_inside", &db::Region::pull_inside, gsi::arg ("other"),
     "@brief Returns all polygons of \"other\" which are inside polygons of this region\n"
     "The \"pull_...\" methods are similar to \"select_...\" but work the opposite way: they "

@@ -466,7 +466,9 @@ void interacting_local_operation<TS, TI, TR>::compute_local (db::Layout * /*layo
     ep.insert (subject, n);
   }
 
-  db::InteractionDetector id (m_mode, 0);
+  tl_assert (nstart > 0);
+
+  db::InteractionDetector id (m_mode, nstart - 1);
   id.set_include_touching (m_touching);
   db::EdgeSink es;
   ep.process (es, id);

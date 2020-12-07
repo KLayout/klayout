@@ -16,6 +16,12 @@ l1.interacting(l2, 1..2).output(102, 0)
 l1.interacting(l2, 2..).output(103, 0)
 l1.interacting(l2, 1, 2).output(104, 0)
 
+l1.overlapping(l2, 1).output(110, 0)
+l1.overlapping(l2, 2).output(111, 0)
+l1.overlapping(l2, 1..2).output(112, 0)
+l1.overlapping(l2, 2..).output(113, 0)
+l1.overlapping(l2, 1, 2).output(114, 0)
+
 l = l1.dup
 l.select_interacting(l2, 1)
 l.output(200, 0)
@@ -32,11 +38,33 @@ l = l1.dup
 l.select_interacting(l2, 1, 2)
 l.output(204, 0)
 
+l = l1.dup
+l.select_overlapping(l2, 1)
+l.output(210, 0)
+l = l1.dup
+l.select_overlapping(l2, 2)
+l.output(211, 0)
+l = l1.dup
+l.select_overlapping(l2, 1..2)
+l.output(212, 0)
+l = l1.dup
+l.select_overlapping(l2, 2..)
+l.output(213, 0)
+l = l1.dup
+l.select_overlapping(l2, 1, 2)
+l.output(214, 0)
+
 l1.not_interacting(l2, 1).output(300, 0)
 l1.not_interacting(l2, 2).output(301, 0)
 l1.not_interacting(l2, 1..2).output(302, 0)
 l1.not_interacting(l2, 2..).output(303, 0)
 l1.not_interacting(l2, 1, 2).output(304, 0)
+
+l1.not_overlapping(l2, 1).output(310, 0)
+l1.not_overlapping(l2, 2).output(311, 0)
+l1.not_overlapping(l2, 1..2).output(312, 0)
+l1.not_overlapping(l2, 2..).output(313, 0)
+l1.not_overlapping(l2, 1, 2).output(314, 0)
 
 l = l1.dup
 l.select_not_interacting(l2, 1)
@@ -53,4 +81,20 @@ l.output(403, 0)
 l = l1.dup
 l.select_not_interacting(l2, 1, 2)
 l.output(404, 0)
+
+l = l1.dup
+l.select_not_overlapping(l2, 1)
+l.output(410, 0)
+l = l1.dup
+l.select_not_overlapping(l2, 2)
+l.output(411, 0)
+l = l1.dup
+l.select_not_overlapping(l2, 1..2)
+l.output(412, 0)
+l = l1.dup
+l.select_not_overlapping(l2, 2..)
+l.output(413, 0)
+l = l1.dup
+l.select_not_overlapping(l2, 1, 2)
+l.output(414, 0)
 

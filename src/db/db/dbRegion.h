@@ -1179,6 +1179,52 @@ public:
   }
 
   /**
+   *  @brief Returns all polygons of this which are enclosing polygons from the other region
+   *
+   *  Merged semantics applies.
+   */
+  Region &select_enclosing (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
+  {
+    set_delegate (mp_delegate->selected_enclosing (other, min_count, max_count));
+    return *this;
+  }
+
+  /**
+   *  @brief Returns all polygons of this which are not enclosing polygons from the other region
+   *
+   *  Merged semantics applies.
+   */
+  Region &select_not_enclosing (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
+  {
+    set_delegate (mp_delegate->selected_not_enclosing (other, min_count, max_count));
+    return *this;
+  }
+
+  /**
+   *  @brief Returns all polygons of this which are enclosing polygons from the other region
+   *
+   *  This method is an out-of-place version of select_enclosing.
+   *
+   *  Merged semantics applies.
+   */
+  Region selected_enclosing (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
+  {
+    return Region (mp_delegate->selected_enclosing (other, min_count, max_count));
+  }
+
+  /**
+   *  @brief Returns all polygons of this which are not enclosing polygons from the other region
+   *
+   *  This method is an out-of-place version of select_not_enclosing.
+   *
+   *  Merged semantics applies.
+   */
+  Region selected_not_enclosing (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
+  {
+    return Region (mp_delegate->selected_not_enclosing (other, min_count, max_count));
+  }
+
+  /**
    *  @brief Selects all polygons of this region which overlap or touch polygons from the other region
    *
    *  The argument (if given) specifies and range of interaction counts: polygons will only be selected
@@ -1329,9 +1375,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  Region &select_overlapping (const Region &other)
+  Region &select_overlapping (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
   {
-    set_delegate (mp_delegate->selected_overlapping (other));
+    set_delegate (mp_delegate->selected_overlapping (other, min_count, max_count));
     return *this;
   }
 
@@ -1340,9 +1386,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  Region &select_not_overlapping (const Region &other)
+  Region &select_not_overlapping (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
   {
-    set_delegate (mp_delegate->selected_not_overlapping (other));
+    set_delegate (mp_delegate->selected_not_overlapping (other, min_count, max_count));
     return *this;
   }
 
@@ -1353,9 +1399,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  Region selected_overlapping (const Region &other) const
+  Region selected_overlapping (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
   {
-    return Region (mp_delegate->selected_overlapping (other));
+    return Region (mp_delegate->selected_overlapping (other, min_count, max_count));
   }
 
   /**
@@ -1365,9 +1411,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  Region selected_not_overlapping (const Region &other) const
+  Region selected_not_overlapping (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
   {
-    return Region (mp_delegate->selected_not_overlapping (other));
+    return Region (mp_delegate->selected_not_overlapping (other, min_count, max_count));
   }
 
   /**

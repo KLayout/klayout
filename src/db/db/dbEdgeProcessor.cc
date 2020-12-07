@@ -628,13 +628,13 @@ bool EdgePolygonOp::selects_edges () const
 // -------------------------------------------------------------------------------
 //  InteractionDetector implementation
 
-InteractionDetector::InteractionDetector (int mode, property_type container_id)
-  : m_mode (mode), m_include_touching (true), m_container_id (container_id)
+InteractionDetector::InteractionDetector (int mode, property_type primary_id)
+  : m_mode (mode), m_include_touching (true), m_last_primary_id (primary_id)
 {
   // .. nothing yet ..
 }
 
-void 
+void
 InteractionDetector::reset ()
 {
   m_wcv_n.clear ();
@@ -675,39 +675,64 @@ InteractionDetector::edge (bool north, bool enter, property_type p)
 
       inside->erase (p);
 
-      if (m_mode != 0) {
-
-        //  the container objects are delivered last of all coincident edges
-        //  (due to prefer_touch == true and the sorting of coincident edges by property id)
-        //  hence every remaining parts count as non-interacting (outside)
-        if (p == m_container_id) {
+      if (m_mode < -1) {
+        //  in enclosing mode report primaries open after a secondary ended as non-interactions: these only partially
+        //  overlap and the outside part qualifies this secondary as non-closing (see "finish")
+        if (p > m_last_primary_id) {
           for (std::set <property_type>::const_iterator i = inside->begin (); i != inside->end (); ++i) {
-            if (*i != m_container_id) {
+            if (*i <= m_last_primary_id) {
               m_non_interactions.insert (*i);
             }
           }
         }
-
+      } else if (m_mode != 0) {
+        //  the primary objects are delivered last of all coincident edges
+        //  (due to prefer_touch == true and the sorting of coincident edges by property id)
+        //  hence every remaining parts count as non-interacting (outside)
+        if (p <= m_last_primary_id) {
+          for (std::set <property_type>::const_iterator i = inside->begin (); i != inside->end (); ++i) {
+            if (*i > m_last_primary_id) {
+              m_non_interactions.insert (*i);
+            }
+          }
+        }
       }
 
     } else if (inside_after > inside_before) {
 
       if (m_mode != 0) {
 
-        //  in inside/outside mode we are only interested in interactions with the container_id property
-        if (p != m_container_id) {
-          //  note that the container parts will be delivered first of all coincident 
-          //  edges hence we can check whether the container is present even for coincident
-          //  edges
-          if (inside->find (m_container_id) != inside->end ()) {
-            m_interactions.insert (std::make_pair (m_container_id, p));
+        //  in enclosing/inside/outside mode we are only interested in interactions with a primary
+        if (p > m_last_primary_id) {
+
+          if (m_mode < -1) {
+            //  enclosing mode: report primaries open when a secondary starts as non-interactions: these only partially
+            //  overlap and the outside part qualifies this secondary as non-closing (see "finish")
+            for (std::set <property_type>::const_iterator i = inside->begin (); i != inside->end (); ++i) {
+              if (*i <= m_last_primary_id) {
+                m_non_interactions.insert (*i);
+              }
+            }
           } else {
-            m_non_interactions.insert (p);
+            //  note that the primary parts will be delivered first of all coincident
+            //  edges hence we can check whether the primary is present even for coincident
+            //  edges
+            bool any = false;
+            for (std::set <property_type>::const_iterator i = inside->begin (); i != inside->end (); ++i) {
+              if (*i <= m_last_primary_id) {
+                any = true;
+                m_interactions.insert (std::make_pair (*i, p));
+              }
+            }
+            if (! any) {
+              m_non_interactions.insert (p);
+            }
           }
+
         } else {
           for (std::set <property_type>::const_iterator i = inside->begin (); i != inside->end (); ++i) {
-            if (*i != m_container_id) {
-              m_interactions.insert (std::make_pair (m_container_id, *i));
+            if (*i > m_last_primary_id) {
+              m_interactions.insert (std::make_pair (p, *i));
             }
           }
         }
@@ -750,14 +775,36 @@ InteractionDetector::compare_ns () const
 void
 InteractionDetector::finish ()
 {
-  if (m_mode < 0) {
+  if (m_mode < -1) {
 
-    //  In inside mode remove those objects which have a non-interaction with the container_id property
-    for (std::set<property_type>::const_iterator p = m_non_interactions.begin (); p != m_non_interactions.end (); ++p) {
-      m_interactions.erase (std::make_pair (m_container_id, *p));
+    //  In enclosing mode remove those objects which have an interaction with a primary having a non-interaction
+    std::set<property_type> secondaries_to_delete;
+    for (std::set<std::pair<property_type, property_type> >::iterator i = m_interactions.begin (); i != m_interactions.end (); ++i) {
+      if (i->first <= m_last_primary_id && m_non_interactions.find (i->first) != m_non_interactions.end ()) {
+        secondaries_to_delete.insert (i->second);
+      }
     }
 
-    m_non_interactions.clear ();
+    for (std::set<std::pair<property_type, property_type> >::iterator i = m_interactions.begin (); i != m_interactions.end (); ) {
+      std::set<std::pair<property_type, property_type> >::iterator ii = i;
+      ++ii;
+      if (i->first <= m_last_primary_id && secondaries_to_delete.find (i->second) != secondaries_to_delete.end ()) {
+        m_interactions.erase (i);
+      }
+      i = ii;
+    }
+
+  } else if (m_mode == -1) {
+
+    //  In inside mode remove those objects which have a non-interaction with a primary
+    for (std::set<std::pair<property_type, property_type> >::iterator i = m_interactions.begin (); i != m_interactions.end (); ) {
+      std::set<std::pair<property_type, property_type> >::iterator ii = i;
+      ++ii;
+      if (i->first <= m_last_primary_id && m_non_interactions.find (i->second) != m_non_interactions.end ()) {
+        m_interactions.erase (i);
+      }
+      i = ii;
+    }
 
   } else if (m_mode > 0) {
 
@@ -768,13 +815,12 @@ InteractionDetector::finish ()
 
     m_interactions.clear ();
     for (std::set<property_type>::const_iterator p = m_non_interactions.begin (); p != m_non_interactions.end (); ++p) {
-      m_interactions.insert (m_interactions.end (), std::make_pair (m_container_id, *p));
+      m_interactions.insert (m_interactions.end (), std::make_pair (m_last_primary_id, *p));
     }
-
-    m_non_interactions.clear ();
 
   }
 
+  m_non_interactions.clear ();
 }
 
 // -------------------------------------------------------------------------------

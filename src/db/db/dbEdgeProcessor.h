@@ -234,6 +234,7 @@ public:
    *  The mode parameter selects the interaction check mode.
    *  0 is "overlapping". 
    *  -1 will select all polygons inside polygons from the other layer.
+   *  -2 will select all polygons enclosing polygons from the other layer.
    *  +1 will select all polygons outside polygons from the other layer.
    *
    *  In mode -1 and +1, finish () needs to be called before the interactions
@@ -242,16 +243,19 @@ public:
    *  input polygons (property != reference property). In mode +1 these are 
    *  pseudo-interactions, because "outside" by definition means non-interacting.
    *
-   *  Mode -1 (inside) and +1 (outside) requires a single property value for the containing region.
-   *  This property value must be specified in the container_id parameter. 
-   *  For correct operation, the container_id must be the lowest property ID and
-   *  the interacting objects must have higher property id's.
-   *  The reported interactions will be (container_id,polygon_id) even for outside mode.
+   *  Mode -1 (inside) and +1 (outside) requires a property value for the containing (primary) region.
+   *  Property IDs from 0 to the given last primary ID value are considered to belong to
+   *  the primary region.
+   *  This last property ID must be specified in the last_primary_id parameter.
+   *  For correct operation, the secondary input must use property IDs bigger than
+   *  last_primary_id.
+   *  The reported interactions will be (primary_id,polygon_id) even for outside mode.
+   *  For outside mode, the primary_id is always last_primary_id.
    *
-   *  For mode 0, property ids <= container_id are considered to belong to the first
+   *  For mode 0, property ids <= last_primary_id are considered to belong to the first
    *  container and property ids > container_id to the second container.
    */
-  InteractionDetector (int mode = 0, property_type container_id = 0);
+  InteractionDetector (int mode = 0, property_type primary_id = 0);
 
   /**
    *  @brief Sets the "touching" flag
@@ -308,7 +312,7 @@ public:
 private:
   int m_mode;
   bool m_include_touching;
-  property_type m_container_id;
+  property_type m_last_primary_id;
   std::vector <int> m_wcv_n, m_wcv_s;
   std::set <property_type> m_inside_n, m_inside_s;
   std::set<std::pair<property_type, property_type> > m_interactions;

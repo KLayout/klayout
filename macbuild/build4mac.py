@@ -15,6 +15,7 @@ import glob
 import platform
 import optparse
 import subprocess
+import pprint
 
 #-------------------------------------------------------------------------------
 ## To import global dictionaries of different modules and utility functions
@@ -25,38 +26,11 @@ from build4mac_env  import *
 from build4mac_util import *
 
 #-------------------------------------------------------------------------------
-## To set global variables including present directory and platform info.
+## To get the default configurations
+#
+# @return a dictionary containing the default configuration for the macOS build
 #-------------------------------------------------------------------------------
-def get_default_config():
-    """
-    Returns a dictionary containing the default configuration for the macOS build.
-    """
-    # global ProjectDir         # project directory where "build.sh" exists
-    # global Usage              # string on usage
-    # global BuildBash          # the main build Bash script
-    # global Platform           # platform
-    # global ModuleQt           # Qt module to be used
-    # global ModuleRuby         # Ruby module to be used
-    # global ModulePython       # Python module to be used
-    # global NonOSStdLang       # True if non-OS-standard language is chosen
-    # global NoQtBindings       # True if not creating Qt bindings for Ruby scripts
-    # global MakeOptions        # options passed to `make`
-    # global DebugMode          # True if debug mode build
-    # global CheckComOnly       # True if only for checking the command line parameters to "build.sh"
-    # global DeploymentF        # True if fully (including Qt's Frameworks) deploy the binaries for bundles
-    # global DeploymentP        # True if partially deploy the binaries excluding Qt's Frameworks
-    # global PackagePrefix      # the package prefix: 'ST-', 'LW-', 'HW-', or 'EX-'
-    # global DeployVerbose      # -verbose=<0-3> level passed to 'macdeployqt' tool
-    # global Version            # KLayout's version
-    # global ModuleSet          # (Qt, Ruby, Python)-tuple
-    # # auxiliary variables on platform
-    # global System             # 6-tuple from platform.uname()
-    # global Node               # - do -
-    # global Release            # - do -
-    # global Version            # - do -
-    # global Machine            # - do -
-    # global Processor          # - do -
-
+def Get_Default_Config():
     Usage  = "\n"
     Usage += "---------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'build4mac.py' >>\n"
@@ -69,22 +43,24 @@ def get_default_config():
     Usage += "                        :   Qt5MacPorts: use Qt5 from MacPorts                           | \n"
     Usage += "                        :       Qt5Brew: use Qt5 from Homebrew                           | \n"
     Usage += "                        :       Qt5Ana3: use Qt5 from Anaconda3                          | \n"
-    Usage += "   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP26', 'HB27', 'Ana3']   | sys \n"
+    Usage += "   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP27', 'HB27', 'Ana3']   | sys \n"
     Usage += "                        :    nil: don't bind Ruby                                        | \n"
-    Usage += "                        :    Sys: use OS-bundled Ruby [2.0 - 2.6] depending on OS        | \n"
-    Usage += "                        :   MP26: use Ruby 2.6 from MacPorts                             | \n"
+    Usage += "                        :    Sys: use OS-bundled Ruby [2.0 - 2.7] depending on OS        | \n"
+    Usage += "                        :   MP27: use Ruby 2.7 from MacPorts                             | \n"
     Usage += "                        :   HB27: use Ruby 2.7 from Homebrew                             | \n"
     Usage += "                        :   Ana3: use Ruby 2.5 from Anaconda3                            | \n"
-    Usage += "   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3']   | sys \n"
+    Usage += "   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3',   | sys \n"
+    Usage += "                        :                        'HBAuto']                               | \n"
     Usage += "                        :    nil: don't bind Python                                      | \n"
-    Usage += "                        :    Sys: use OS-bundled Python 2.7 [ElCapitan -- Catalina]      | \n"
+    Usage += "                        :    Sys: use OS-bundled Python 2.7 [ElCapitan -- BigSur]        | \n"
     Usage += "                        :   MP38: use Python 3.8 from MacPorts                           | \n"
     Usage += "                        :   HB38: use Python 3.8 from Homebrew                           | \n"
     Usage += "                        :   Ana3: use Python 3.7 from Anaconda3                          | \n"
+    Usage += "                        : HBAuto: use the latest Python 3.x auto-detected from Homebrew  | \n"
     Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                      | disabled \n"
     Usage += "   [-m|--make <option>] : option passed to 'make'                                        | '-j4' \n"
     Usage += "   [-d|--debug]         : enable debug mode build                                        | disabled \n"
-    Usage += "   [-c|--checkcom]      : check command line and exit without building                   | disabled \n"
+    Usage += "   [-c|--checkcom]      : check command-line and exit without building                   | disabled \n"
     Usage += "   [-y|--deploy]        : deploy executables and dylibs including Qt's Frameworks        | disabled \n"
     Usage += "   [-Y|--DEPLOY]        : deploy executables and dylibs for those who built KLayout      | disabled \n"
     Usage += "                        : from the source code and use the tools in the same machine     | \n"
@@ -137,7 +113,10 @@ def get_default_config():
 
     # Set the default modules
     ModuleQt = "Qt5MacPorts"
-    if   Platform == "Catalina":
+    if   Platform == "BigSur":
+        ModuleRuby   = "RubyBigSur"
+        ModulePython = "PythonBigSur"
+    elif Platform == "Catalina":
         ModuleRuby   = "RubyCatalina"
         ModulePython = "PythonCatalina"
     elif Platform == "Mojave":
@@ -169,131 +148,140 @@ def get_default_config():
     ModuleSet     = ( 'qt5MP', 'Sys', 'Sys' )
 
     config = dict()
-
-    config['ProjectDir'] = ProjectDir             # project directory where "build.sh" exists
-    config['Usage'] = Usage                       # string on usage
-    config['BuildBash'] = BuildBash               # the main build Bash script
-    config['Platform'] = Platform                 # platform
-    config['ModuleQt'] = ModuleQt                 # Qt module to be used
-    config['ModuleRuby'] = ModuleRuby             # Ruby module to be used
-    config['ModulePython'] = ModulePython         # Python module to be used
-    config['NonOSStdLang'] = NonOSStdLang         # True if non-OS-standard language is chosen
-    config['NoQtBindings'] = NoQtBindings         # True if not creating Qt bindings for Ruby scripts
-    config['MakeOptions'] = MakeOptions           # options passed to `make`
-    config['DebugMode'] = DebugMode               # True if debug mode build
-    config['CheckComOnly'] = CheckComOnly         # True if only for checking the command line parameters to "build.sh"
-    config['DeploymentF'] = DeploymentF           # True if fully (including Qt's Frameworks) deploy the binaries for bundles
-    config['DeploymentP'] = DeploymentP           # True if partially deploy the binaries excluding Qt's Frameworks
-    config['PackagePrefix'] = PackagePrefix       # the package prefix: 'ST-', 'LW-', 'HW-', or 'EX-'
-    config['DeployVerbose'] = DeployVerbose       # -verbose=<0-3> level passed to 'macdeployqt' tool
-    config['Version'] = Version                   # KLayout's version
-    config['ModuleSet'] = ModuleSet               # (Qt, Ruby, Python)-tuple
+    config['ProjectDir']    = ProjectDir        # project directory where "build.sh" exists
+    config['Usage']         = Usage             # string on usage
+    config['BuildBash']     = BuildBash         # the main build Bash script
+    config['Platform']      = Platform          # platform
+    config['ModuleQt']      = ModuleQt          # Qt module to be used
+    config['ModuleRuby']    = ModuleRuby        # Ruby module to be used
+    config['ModulePython']  = ModulePython      # Python module to be used
+    config['NonOSStdLang']  = NonOSStdLang      # True if non-OS-standard language is chosen
+    config['NoQtBindings']  = NoQtBindings      # True if not creating Qt bindings for Ruby scripts
+    config['MakeOptions']   = MakeOptions       # options passed to `make`
+    config['DebugMode']     = DebugMode         # True if debug mode build
+    config['CheckComOnly']  = CheckComOnly      # True if only for checking the command line parameters to "build.sh"
+    config['DeploymentF']   = DeploymentF       # True if fully (including Qt's Frameworks) deploy the binaries for bundles
+    config['DeploymentP']   = DeploymentP       # True if partially deploy the binaries excluding Qt's Frameworks
+    config['PackagePrefix'] = PackagePrefix     # the package prefix: 'ST-', 'LW-', 'HW-', or 'EX-'
+    config['DeployVerbose'] = DeployVerbose     # -verbose=<0-3> level passed to 'macdeployqt' tool
+    config['Version']       = Version           # KLayout's version
+    config['ModuleSet']     = ModuleSet         # (Qt, Ruby, Python)-tuple
     # auxiliary variables on platform
-    config['System'] = System                     # 6-tuple from platform.uname()
-    config['Node'] = Node                         # - do -
-    config['Release'] = Release                   # - do -
-    config['MacVersion'] = MacVersion             # - do -
-    config['Machine'] = Machine                   # - do -
-    config['Processor'] = Processor               # - do -
+    config['System']        = System            # 6-tuple from platform.uname()
+    config['Node']          = Node              # - do -
+    config['Release']       = Release           # - do -
+    config['MacVersion']    = MacVersion        # - do -
+    config['Machine']       = Machine           # - do -
+    config['Processor']     = Processor         # - do -
     return config
 
 #------------------------------------------------------------------------------
-## To get command line parameters
+## To parse the command line parameters
+#
+# @param[in] config     dictionary containing the default configuration
+#
+# @return the configuration dictionary updated with the CLI parameters
 #------------------------------------------------------------------------------
-def parse_cli_args(config):
-    Usage         = config['Usage']          #
-    Platform      = config['Platform']       #
-    Release       = config['Release']        #
-    Machine       = config['Machine']        #
-    ModuleQt      = config['ModuleQt']       #
-    ModuleRuby    = config['ModuleRuby']     #
-    ModulePython  = config['ModulePython']   #
-    NonOSStdLang  = config['NonOSStdLang']   #
-    NoQtBindings  = config['NoQtBindings']   #
-    MakeOptions   = config['MakeOptions']    #
-    DebugMode     = config['DebugMode']      #
-    CheckComOnly  = config['CheckComOnly']   #
-    DeploymentF   = config['DeploymentF']    #
-    DeploymentP   = config['DeploymentP']    #
-    PackagePrefix = config['PackagePrefix']  #
-    DeployVerbose = config['DeployVerbose']  #
-    ModuleSet     = config['ModuleSet']      #
+def Parse_CLI_Args(config):
+    #-----------------------------------------------------
+    # [1] Retrieve the configuration
+    #-----------------------------------------------------
+    Usage         = config['Usage']
+    Platform      = config['Platform']
+    Release       = config['Release']
+    Machine       = config['Machine']
+    ModuleQt      = config['ModuleQt']
+    ModuleRuby    = config['ModuleRuby']
+    ModulePython  = config['ModulePython']
+    NonOSStdLang  = config['NonOSStdLang']
+    NoQtBindings  = config['NoQtBindings']
+    MakeOptions   = config['MakeOptions']
+    DebugMode     = config['DebugMode']
+    CheckComOnly  = config['CheckComOnly']
+    DeploymentF   = config['DeploymentF']
+    DeploymentP   = config['DeploymentP']
+    PackagePrefix = config['PackagePrefix']
+    DeployVerbose = config['DeployVerbose']
+    ModuleSet     = config['ModuleSet']
 
-    p = optparse.OptionParser( usage=Usage )
+    #-----------------------------------------------------
+    # [2] Parse the CLI arguments
+    #-----------------------------------------------------
+    p = optparse.OptionParser(usage=Usage)
     p.add_option( '-q', '--qt',
-                                dest='type_qt',
-                                help="Qt type=['Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3']" )
+                    dest='type_qt',
+                    help="Qt type=['Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3']" )
 
     p.add_option( '-r', '--ruby',
-                                dest='type_ruby',
-                                help="Ruby type=['nil', 'Sys', 'MP26', 'HB27', 'Ana3']" )
+                    dest='type_ruby',
+                    help="Ruby type=['nil', 'Sys', 'MP27', 'HB27', 'Ana3']" )
 
     p.add_option( '-p', '--python',
-                                dest='type_python',
-                                help="Python type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3']" )
+                    dest='type_python',
+                    help="Python type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3', 'HBAuto']" )
 
     p.add_option( '-n', '--noqtbinding',
-                                action='store_true',
-                                dest='no_qt_binding',
-                                default=False,
-                                help="do not create Qt bindings for Ruby scripts" )
+                    action='store_true',
+                    dest='no_qt_binding',
+                    default=False,
+                    help="do not create Qt bindings for Ruby scripts" )
 
     p.add_option( '-m', '--make',
-                                dest='make_option',
-                                help="options passed to `make`" )
+                    dest='make_option',
+                    help="options passed to `make`" )
 
     p.add_option( '-d', '--debug',
-                                action='store_true',
-                                dest='debug_build',
-                                default=False,
-                                help="enable debug mode build" )
+                    action='store_true',
+                    dest='debug_build',
+                    default=False,
+                    help="enable debug mode build" )
 
     p.add_option( '-c', '--checkcom',
-                                action='store_true',
-                                dest='check_command',
-                                default=False,
-                                help="check command line and exit without building" )
+                    action='store_true',
+                    dest='check_command',
+                    default=False,
+                    help="check command line and exit without building" )
 
     p.add_option( '-y', '--deploy',
-                                action='store_true',
-                                dest='deploy_full',
-                                default=False,
-                                help="fully deploy built binaries" )
+                    action='store_true',
+                    dest='deploy_full',
+                    default=False,
+                    help="fully deploy built binaries" )
 
     p.add_option( '-Y', '--DEPLOY',
-                                action='store_true',
-                                dest='deploy_partial',
-                                default=False,
-                                help="deploy built binaries when non-OS-standard script language is chosen" )
+                    action='store_true',
+                    dest='deploy_partial',
+                    default=False,
+                    help="deploy built binaries when non-OS-standard script language is chosen" )
 
     p.add_option( '-v', '--verbose',
-                                dest='deploy_verbose',
-                                help="verbose level of `macdeployqt` tool" )
+                    dest='deploy_verbose',
+                    help="verbose level of `macdeployqt` tool" )
 
     p.add_option( '-?', '--??',
-                                action='store_true',
-                                dest='checkusage',
-                                default=False,
-                                help='check usage' )
+                    action='store_true',
+                    dest='checkusage',
+                    default=False,
+                    help='check usage' )
 
     p.set_defaults( type_qt        = "qt5macports",
-                                    type_ruby      = "sys",
-                                    type_python    = "sys",
-                                    no_qt_binding  = False,
-                                    make_option    = "-j4",
-                                    debug_build    = False,
-                                    check_command  = False,
-                                    deploy_full    = False,
-                                    deploy_partial = False,
-                                    deploy_verbose = "1",
-                                    checkusage     = False )
+                    type_ruby      = "sys",
+                    type_python    = "sys",
+                    no_qt_binding  = False,
+                    make_option    = "-j4",
+                    debug_build    = False,
+                    check_command  = False,
+                    deploy_full    = False,
+                    deploy_partial = False,
+                    deploy_verbose = "1",
+                    checkusage     = False )
 
     opt, args = p.parse_args()
     if (opt.checkusage):
         print(Usage)
         sys.exit(0)
 
-    # Determine the Qt type
+    # (A) Determine the Qt type
     candidates                = dict()
     candidates['QT5MACPORTS'] = 'Qt5MacPorts'
     candidates['QT5BREW']     = 'Qt5Brew'
@@ -319,11 +307,11 @@ def parse_cli_args(config):
     # By default, OS-standard (-bundled) script languages (Ruby and Python) are used
     NonOSStdLang = False
 
-    # Determine the Ruby type
+    # (B) Determine the Ruby type
     candidates         = dict()
     candidates['NIL']  = 'nil'
     candidates['SYS']  = 'Sys'
-    candidates['MP26'] = 'MP26'
+    candidates['MP27'] = 'MP27'
     candidates['HB27'] = 'HB27'
     candidates['ANA3'] = 'Ana3'
     try:
@@ -337,7 +325,9 @@ def parse_cli_args(config):
             ModuleRuby = 'nil'
         elif choiceRuby == "Sys":
             choiceRuby = "Sys"
-            if Platform == "Catalina":
+            if Platform == "BigSur":
+                ModuleRuby = 'RubyBigSur'
+            elif Platform == "Catalina":
                 ModuleRuby = 'RubyCatalina'
             elif Platform == "Mojave":
                 ModuleRuby = 'RubyMojave'
@@ -347,8 +337,8 @@ def parse_cli_args(config):
                 ModuleRuby = 'RubySierra'
             elif Platform == "ElCapitan":
                 ModuleRuby = 'RubyElCapitan'
-        elif choiceRuby == "MP26":
-            ModuleRuby   = 'Ruby26MacPorts'
+        elif choiceRuby == "MP27":
+            ModuleRuby   = 'Ruby27MacPorts'
             NonOSStdLang = True
         elif choiceRuby == "HB27":
             ModuleRuby   = 'Ruby27Brew'
@@ -363,13 +353,14 @@ def parse_cli_args(config):
         print(Usage)
         sys.exit(1)
 
-    # Determine the Python type
-    candidates         = dict()
-    candidates['NIL']  = 'nil'
-    candidates['SYS']  = 'Sys'
-    candidates['MP38'] = 'MP38'
-    candidates['HB38'] = 'HB38'
-    candidates['ANA3'] = 'Ana3'
+    # (C) Determine the Python type
+    candidates           = dict()
+    candidates['NIL']    = 'nil'
+    candidates['SYS']    = 'Sys'
+    candidates['MP38']   = 'MP38'
+    candidates['HB38']   = 'HB38'
+    candidates['ANA3']   = 'Ana3'
+    candidates['HBAUTO'] = 'HBAuto'
     try:
         choicePython = candidates[ opt.type_python.upper() ]
     except KeyError:
@@ -380,7 +371,9 @@ def parse_cli_args(config):
         if choicePython ==  "nil":
             ModulePython = 'nil'
         elif choicePython == "Sys":
-            if Platform == "Catalina":
+            if Platform == "BigSur":
+                ModulePython = 'PythonBigSur'
+            elif Platform == "Catalina":
                 ModulePython = 'PythonCatalina'
             elif Platform == "Mojave":
                 ModulePython = 'PythonMojave'
@@ -399,6 +392,9 @@ def parse_cli_args(config):
         elif choicePython == "Ana3":
             ModulePython = 'PythonAnaconda3'
             NonOSStdLang = True
+        elif choicePython == "HBAuto":
+            ModulePython = 'PythonAutoBrew'
+            NonOSStdLang = True
     if ModulePython == '':
         print("")
         print( "!!! Unknown Python type <%s>. Case-insensitive candidates: %s" % \
@@ -406,7 +402,7 @@ def parse_cli_args(config):
         print(Usage)
         sys.exit(1)
 
-    # Set of modules chosen
+    # (D) Set of modules chosen
     ModuleSet = ( choiceQt5, choiceRuby, choicePython )
 
     NoQtBindings = opt.no_qt_binding
@@ -444,9 +440,9 @@ def parse_cli_args(config):
             if (ModuleRuby in RubySys) and (ModulePython in PythonSys):
                 PackagePrefix = "ST-"
                 message      += "a standard (ST-) package including Qt5 and using OS-bundled Ruby and Python..."
-            elif ModulePython == 'Python38Brew':
+            elif ModulePython == 'Python38Brew' or ModulePython == 'PythonAutoBrew':
                 PackagePrefix = "HW-"
-                message      += "a heavyweight (HW-) package including Qt5 and Python3.8 from Homebrew..."
+                message      += "a heavyweight (HW-) package including Qt5 and Python3.8~ from Homebrew..."
             else:
                 PackagePrefix = "EX-"
                 message      += "a package with exceptional (EX-) combinations of different modules..."
@@ -456,93 +452,90 @@ def parse_cli_args(config):
         if CheckComOnly:
             sys.exit(0)
 
-    config['Usage']         = Usage         #
-    config['Platform']      = Platform      #
-    config['ModuleQt']      = ModuleQt      #
-    config['ModuleRuby']    = ModuleRuby    #
-    config['ModulePython']  = ModulePython  #
-    config['NonOSStdLang']  = NonOSStdLang  #
-    config['NoQtBindings']  = NoQtBindings  #
-    config['MakeOptions']   = MakeOptions   #
-    config['DebugMode']     = DebugMode     #
-    config['CheckComOnly']  = CheckComOnly  #
-    config['DeploymentF']   = DeploymentF   #
-    config['DeploymentP']   = DeploymentP   #
-    config['PackagePrefix'] = PackagePrefix #
-    config['DeployVerbose'] = DeployVerbose #
-    config['ModuleSet']     = ModuleSet     #
-
+    #-----------------------------------------------------
+    # [3] Update the configuration to return
+    #-----------------------------------------------------
+    config['Usage']         = Usage
+    config['Platform']      = Platform
+    config['ModuleQt']      = ModuleQt
+    config['ModuleRuby']    = ModuleRuby
+    config['ModulePython']  = ModulePython
+    config['NonOSStdLang']  = NonOSStdLang
+    config['NoQtBindings']  = NoQtBindings
+    config['MakeOptions']   = MakeOptions
+    config['DebugMode']     = DebugMode
+    config['CheckComOnly']  = CheckComOnly
+    config['DeploymentF']   = DeploymentF
+    config['DeploymentP']   = DeploymentP
+    config['PackagePrefix'] = PackagePrefix
+    config['DeployVerbose'] = DeployVerbose
+    config['ModuleSet']     = ModuleSet         #
     return config
 
 #------------------------------------------------------------------------------
 ## To run the main Bash script "build.sh" with appropriate options
 #
-# @return 0 on success; non-zero on failure
+# @param[in] config     dictionary containing the build configuration
+
+# @return a dictionary containing the build parameters
 #------------------------------------------------------------------------------
-def get_build_parameters(config):
-    ProjectDir    = config['ProjectDir']     #
-    Platform      = config['Platform']       #
-    BuildBash     = config['BuildBash']      #
-    ModuleQt      = config['ModuleQt']       #
-    ModuleRuby    = config['ModuleRuby']     #
-    ModulePython  = config['ModulePython']   #
-    ModuleSet     = config['ModuleSet']      #
-    NoQtBindings  = config['NoQtBindings']   #
-    MakeOptions   = config['MakeOptions']    #
-    DebugMode     = config['DebugMode']      #
-    CheckComOnly  = config['CheckComOnly']   #
-    DeploymentF   = config['DeploymentF']    #
-    DeploymentP   = config['DeploymentP']    #
-    PackagePrefix = config['PackagePrefix']  #
+def Get_Build_Parameters(config):
+    #-----------------------------------------------------
+    # [1] Retrieve the configuration
+    #-----------------------------------------------------
+    ProjectDir    = config['ProjectDir']
+    Platform      = config['Platform']
+    BuildBash     = config['BuildBash']
+    ModuleQt      = config['ModuleQt']
+    ModuleRuby    = config['ModuleRuby']
+    ModulePython  = config['ModulePython']
+    ModuleSet     = config['ModuleSet']
+    NoQtBindings  = config['NoQtBindings']
+    MakeOptions   = config['MakeOptions']
+    DebugMode     = config['DebugMode']
+    CheckComOnly  = config['CheckComOnly']
+    DeploymentF   = config['DeploymentF']
+    DeploymentP   = config['DeploymentP']
+    PackagePrefix = config['PackagePrefix']
 
     #-----------------------------------------------------
-    # [1] Set parameters passed to the main Bash script
+    # [2] Set parameters passed to the main Bash script
     #-----------------------------------------------------
     parameters = dict()
-
-    parameters['build_cmd'] = BuildBash
+    parameters['build_cmd']      = BuildBash
     parameters['check_cmd_only'] = CheckComOnly
 
     # (A) debug or release
     parameters['debug_mode'] = DebugMode  # True if debug, False if release
     if parameters["debug_mode"]:
-        mode        = "debug"
+        mode = "debug"
     else:
-        mode        = "release"
+        mode = "release"
 
     # (B) Modules
     (qt, ruby, python) = ModuleSet  # ( 'qt5MP', 'Sys', 'Sys' )
     ruby_python = "R%sP%s" % ( ruby.lower(), python.lower() )
 
     # (C) Target directories and files
-    MacPkgDir         = "%s%s.pkg.macos-%s-%s-%s"        % (PackagePrefix, qt, Platform, mode, ruby_python)
-    MacBinDir         = "%s.bin.macos-%s-%s-%s"          % (               qt, Platform, mode, ruby_python)
-    MacBuildDir       = "%s.build.macos-%s-%s-%s"        % (               qt, Platform, mode, ruby_python)
-    MacBuildLog       = "%s.build.macos-%s-%s-%s.log"    % (               qt, Platform, mode, ruby_python)
-    # AbsMacPkgDir      = "%s/%s%s.pkg.macos-%s-%s-%s"     % (ProjectDir, PackagePrefix, qt, Platform, mode, ruby_python)
-    # AbsMacBinDir      = "%s/%s.bin.macos-%s-%s-%s"       % (ProjectDir,                qt, Platform, mode, ruby_python)
-    # AbsMacBuildDir    = "%s/%s.build.macos-%s-%s-%s"     % (ProjectDir,                qt, Platform, mode, ruby_python)
-    # AbsMacBuildLog    = "%s/%s.build.macos-%s-%s-%s.log" % (ProjectDir,                qt, Platform, mode, ruby_python)
-    # AbsMacPkgDir      = "%s/%s"                          % (ProjectDir, MacPkgDir)
-    # AbsMacBinDir      = "%s/%s"                          % (ProjectDir, MacBinDir)
-    # AbsMacBuildDir    = "%s/%s"                          % (ProjectDir, MacBuildDir)
-    # AbsMacBuildLog    = "%s/%s"                          % (ProjectDir, MacBuildLog)
-
-    MacBuildDirQAT    = MacBuildDir    + ".macQAT"
+    MacPkgDir             = "%s%s.pkg.macos-%s-%s-%s"     % (PackagePrefix, qt, Platform, mode, ruby_python)
+    MacBinDir             = "%s.bin.macos-%s-%s-%s"       % (               qt, Platform, mode, ruby_python)
+    MacBuildDir           = "%s.build.macos-%s-%s-%s"     % (               qt, Platform, mode, ruby_python)
+    MacBuildLog           = "%s.build.macos-%s-%s-%s.log" % (               qt, Platform, mode, ruby_python)
+    MacBuildDirQAT        = MacBuildDir + ".macQAT"
     parameters['logfile'] = MacBuildLog
 
     # (D) Qt5
     if ModuleQt == 'Qt5MacPorts':
-        parameters['qmake'] = Qt5MacPorts['qmake']
+        parameters['qmake']       = Qt5MacPorts['qmake']
         parameters['deploy_tool'] = Qt5MacPorts['deploy']
     elif ModuleQt == 'Qt5Brew':
-        parameters['qmake'] = Qt5Brew['qmake']
+        parameters['qmake']       = Qt5Brew['qmake']
         parameters['deploy_tool'] = Qt5Brew['deploy']
     elif ModuleQt == 'Qt5Ana3':
-        parameters['qmake'] = Qt5Ana3['qmake']
+        parameters['qmake']       = Qt5Ana3['qmake']
         parameters['deploy_tool'] = Qt5Ana3['deploy']
 
-    parameters['bin'] = MacBinDir
+    parameters['bin']   = MacBinDir
     parameters['build'] = MacBuildDir
     parameters['rpath'] = "@executable_path/../Frameworks"
 
@@ -555,7 +548,7 @@ def get_build_parameters(config):
 
     # (G) about Ruby
     if ModuleRuby != "nil":
-        parameters['ruby'] = RubyDictionary[ModuleRuby]['exe']
+        parameters['ruby']  = RubyDictionary[ModuleRuby]['exe']
         parameters['rbinc'] = RubyDictionary[ModuleRuby]['inc']
         parameters['rblib'] = RubyDictionary[ModuleRuby]['lib']
         if 'inc2' in RubyDictionary[ModuleRuby]:
@@ -564,50 +557,49 @@ def get_build_parameters(config):
     # (H) about Python
     if ModulePython != "nil":
         parameters['python'] = PythonDictionary[ModulePython]['exe']
-        parameters['pyinc'] = PythonDictionary[ModulePython]['inc']
-        parameters['pylib'] = PythonDictionary[ModulePython]['lib']
+        parameters['pyinc']  = PythonDictionary[ModulePython]['inc']
+        parameters['pylib']  = PythonDictionary[ModulePython]['lib']
 
-    config['MacPkgDir']         = MacPkgDir          # relative path to package directory
-    config['MacBinDir']         = MacBinDir          # relative path to binary directory
-    config['MacBuildDir']       = MacBuildDir        # relative path to build directory
-    config['MacBuildDirQAT']    = MacBuildDirQAT     # relative path to build directory for QATest
-    config['MacBuildLog']       = MacBuildLog        # relative path to build log file
-    # config['AbsMacPkgDir']      = AbsMacPkgDir       # absolute path to package directory
-    # config['AbsMacBinDir']      = AbsMacBinDir       # absolute path to binary directory
-    # config['AbsMacBuildDir']    = AbsMacBuildDir     # absolute path to build directory
-    # config['AbsMacBuildDirQAT'] = AbsMacBuildDirQAT  # absolute path to build directory for QATest
-    # config['AbsMacBuildLog']    = AbsMacBuildLog     # absolute path to build log file
+    config['MacPkgDir']      = MacPkgDir        # relative path to package directory
+    config['MacBinDir']      = MacBinDir        # relative path to binary directory
+    config['MacBuildDir']    = MacBuildDir      # relative path to build directory
+    config['MacBuildDirQAT'] = MacBuildDirQAT   # relative path to build directory for QATest
+    config['MacBuildLog']    = MacBuildLog      # relative path to build log file
 
-    # Extra parameteres needed for deployment
+    # (I) Extra parameteres needed for deployment
     parameters['project_dir'] = ProjectDir
-
     return parameters
 
-def run_build_command(parameters):
-
+#------------------------------------------------------------------------------
+## To run the main Bash script "build.sh" with appropriate options
+#
+# @param[in] parameters     dictionary containing the build parameters
+#
+# @return 0 on success; non-zero (1), otherwise
+#------------------------------------------------------------------------------
+def Run_Build_Command(parameters):
     #-----------------------------------------------------
     # [1] Set parameters passed to the main Bash script
     #-----------------------------------------------------
-
     cmd_args = ""
 
     # (A) debug or release
     if parameters["debug_mode"]:
-        mode        = "debug"
+        mode      = "debug"
         cmd_args += "  -debug"
     else:
-        mode        = "release"
+        mode      = "release"
         cmd_args += "  -release"
 
     # (C) Target directories and files
-    MacBuildDirQAT    = parameters['build']    + ".macQAT"
+    MacBuildDirQAT = parameters['build'] + ".macQAT"
 
     # (D) Qt5
-    cmd_args    += " \\\n  -qt5"
-    cmd_args    += " \\\n  -qmake  %s" % parameters['qmake']
-    cmd_args    += " \\\n  -bin    %s" % parameters['bin']
-    cmd_args    += " \\\n  -build  %s" % parameters['build']
-    cmd_args += " \\\n  -rpath    %s" % parameters['rpath']
+    cmd_args += " \\\n  -qt5"
+    cmd_args += " \\\n  -qmake %s" % parameters['qmake']
+    cmd_args += " \\\n  -bin   %s" % parameters['bin']
+    cmd_args += " \\\n  -build %s" % parameters['build']
+    cmd_args += " \\\n  -rpath %s" % parameters['rpath']
 
     # (E) want Qt bindings with Ruby scripts?
     if parameters['no_qt_bindings']:
@@ -653,7 +645,6 @@ def run_build_command(parameters):
     #-----------------------------------------------------
     # [3] Invoke the main Bash script; takes time:-)
     #-----------------------------------------------------
-
     myscript = os.path.basename(__file__)
     ret = subprocess.call( command, shell=True )
     if ret != 0:
@@ -717,9 +708,15 @@ def run_build_command(parameters):
 #
 # Reference: "Deploying an Application on Mac OS X" of Qt Assistant.
 #
+# @param[in] config     the build configuration
+# @param[in] parameters the build parameters
+#
 # @return 0 on success; non-zero on failure
 #------------------------------------------------------------------------------
-def DeployBinariesForBundle(config, parameters):
+def Deploy_Binaries_For_Bundle(config, parameters):
+    #-----------------------------------------------------
+    # [0] Retrieve the configuration and build parameters
+    #-----------------------------------------------------
     NonOSStdLang   = config['NonOSStdLang']
     DeploymentF    = config['DeploymentF']
     DeploymentP    = config['DeploymentP']
@@ -729,15 +726,16 @@ def DeployBinariesForBundle(config, parameters):
     ModuleRuby     = config['ModuleRuby']
     ModulePython   = config['ModulePython']
 
-    ProjectDir  = parameters['project_dir']
-    MacBinDir   = parameters['bin']
-    MacBuildDir = parameters['build']
-    MacBuildLog = parameters['logfile']
+    ProjectDir     = parameters['project_dir']
+    MacBinDir      = parameters['bin']
+    MacBuildDir    = parameters['build']
+    MacBuildLog    = parameters['logfile']
 
-    AbsMacPkgDir     = "%s/%s" % (ProjectDir, MacPkgDir)
-    AbsMacBinDir     = "%s/%s" % (ProjectDir, MacBinDir)
-    AbsMacBuildDir   = "%s/%s" % (ProjectDir, MacBuildDir)
-    AbsMacBuildLog   = "%s/%s" % (ProjectDir, MacBuildLog)
+    AbsMacPkgDir   = "%s/%s" % (ProjectDir, MacPkgDir)
+    AbsMacBinDir   = "%s/%s" % (ProjectDir, MacBinDir)
+    AbsMacBuildDir = "%s/%s" % (ProjectDir, MacBuildDir)
+    AbsMacBuildLog = "%s/%s" % (ProjectDir, MacBuildLog)
+
 
     print("")
     print( "##### Started deploying libraries and executables for <klayout.app> #####" )
@@ -1033,17 +1031,24 @@ def DeployBinariesForBundle(config, parameters):
             return 1
 
         #-----------------------------------------------------------------------------------------------
-        # [9] Special deployment of Python3.8 from Homebrew
+        # [9] Special deployment of Python3.8 or newer from Homebrew
         #     To use Python3.8 from Homebrew on Catalina...
-        #       in "/usr/local/opt/python/lib/"
+        #       in "/usr/local/opt/python@3.8/lib/"
         #             Python.framework -> ../Frameworks/Python.framework/ <=== this symbolic was needed
         #             pkgconfig/
         #-----------------------------------------------------------------------------------------------
-        deploymentPython38HB = (ModulePython == 'Python38Brew')
-        if deploymentPython38HB and NonOSStdLang:
+        deploymentPython38HB   = (ModulePython == 'Python38Brew')
+        deploymentPythonAutoHB = (ModulePython == 'PythonAutoBrew')
+        if (deploymentPython38HB or deploymentPythonAutoHB) and NonOSStdLang:
             from build4mac_util import WalkFrameworkPaths, PerformChanges
 
-            pythonHBVer         = "3.8" # 'pinned' to this version as of KLayout version 0.26.7 (2020-09-13)
+            if deploymentPython38HB:
+                HBPythonFrameworkPath = HBPython38FrameworkPath
+                pythonHBVer           = "3.8" # 'pinned' to this version as of KLayout version 0.26.7 (2020-09-13)
+            elif deploymentPythonAutoHB:
+                HBPythonFrameworkPath = HBPythonAutoFrameworkPath
+                pythonHBVer           = HBPythonAutoVersion
+
             bundlePath          = AbsMacPkgDir + '/klayout.app'
             bundleExecPathAbs   = '%s/Contents/MacOS/' % bundlePath
             pythonFrameworkPath = '%s/Contents/Frameworks/Python.framework' % bundlePath
@@ -1052,14 +1057,14 @@ def DeployBinariesForBundle(config, parameters):
             resourceTarget2     = '%s/Resources' % pythonFrameworkPath
             binTarget           = '%s/Versions/%s/bin' % (pythonFrameworkPath, pythonHBVer)
             sitepackagesTarget  = '%s/Versions/%s/lib/python%s/site-packages' % (pythonFrameworkPath, pythonHBVer, pythonHBVer)
-            sitepackagesSource  = '%s/Versions/%s/lib/python%s/site-packages' % (HBPython38FrameworkPath, pythonHBVer, pythonHBVer)
+            sitepackagesSource  = '%s/Versions/%s/lib/python%s/site-packages' % (HBPythonFrameworkPath, pythonHBVer, pythonHBVer)
 
             print( "" )
-            print( " [9] Optional deployment of Python from %s ..." % HBPython38FrameworkPath )
+            print( " [9] Optional deployment of Python from %s ..." % HBPythonFrameworkPath )
             print( "  [9.1] Copying Python Framework" )
 
             cmd01 = "rm -rf %s" % pythonFrameworkPath
-            cmd02 = "rsync -a --safe-links %s/ %s" % (HBPython38FrameworkPath, pythonFrameworkPath)
+            cmd02 = "rsync -a --safe-links %s/ %s" % (HBPythonFrameworkPath, pythonFrameworkPath)
 
             cmd03 = "rm -rf %s" % testTarget
             cmd04 = "rm -rf %s" % resourceTarget1
@@ -1094,7 +1099,7 @@ def DeployBinariesForBundle(config, parameters):
             print("   [9.2.1] Patching Python Framework" )
             depdict = WalkFrameworkPaths( pythonFrameworkPath )
             appPythonFrameworkPath = '@executable_path/../Frameworks/Python.framework/'
-            PerformChanges(depdict, [(HBPython38FrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
+            PerformChanges(depdict, [(HBPythonFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
 
             print("   [9.2.2] Patching /usr/local/opt/ libs")
             usrLocalPath = '/usr/local/opt/'
@@ -1120,11 +1125,11 @@ def DeployBinariesForBundle(config, parameters):
             print("  [9.3] Relinking dylib dependencies for klayout")
             klayoutPath = bundleExecPathAbs
             depdict = WalkFrameworkPaths(klayoutPath, filter_regex=r'klayout$')
-            PerformChanges(depdict, [(HBPython38FrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
+            PerformChanges(depdict, [(HBPythonFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
 
             libKlayoutPath = bundleExecPathAbs + '../Frameworks'
             depdict = WalkFrameworkPaths(libKlayoutPath, filter_regex=r'libklayout')
-            PerformChanges(depdict, [(HBPython38FrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
+            PerformChanges(depdict, [(HBPythonFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
 
             print("  [9.4] Patching site.py, pip/, and distutils/")
             site_module = "%s/Versions/%s/lib/python%s/site.py" % (pythonFrameworkPath, pythonHBVer, pythonHBVer)
@@ -1184,8 +1189,8 @@ def DeployBinariesForBundle(config, parameters):
         #-------------------------------------------------------------
         # [10] Special deployment of Ruby2.7 from Homebrew?
         #-------------------------------------------------------------
-        deploymentRuby26HB = (ModuleRuby == 'Ruby27Brew')
-        if deploymentRuby26HB and NonOSStdLang:
+        deploymentRuby27HB = (ModuleRuby == 'Ruby27Brew')
+        if deploymentRuby27HB and NonOSStdLang:
 
             print( "" )
             print( " [10] You have reached optional deployment of Ruby from %s ..." % HBRuby27Path )
@@ -1209,19 +1214,19 @@ def DeployBinariesForBundle(config, parameters):
 #------------------------------------------------------------------------------
 ## The main function
 #------------------------------------------------------------------------------
-def main():
-    import pprint
-    pp = pprint.PrettyPrinter(indent=4)
-    config = get_default_config()
-    parse_cli_args(config)
+def Main():
+    pp = pprint.PrettyPrinter( indent=4, width=140 )
+    config = Get_Default_Config()
+    Parse_CLI_Args(config)
+
     #----------------------------------------------------------
     # [The main build stage]
     #----------------------------------------------------------
-    parameters = get_build_parameters(config)
+    parameters = Get_Build_Parameters(config)
     pp.pprint(parameters)
 
     if not config['DeploymentF'] and not config['DeploymentP']:
-        ret = run_build_command(parameters)
+        ret = Run_Build_Command(parameters)
         pp.pprint(config)
         if not ret == 0:
             sys.exit(1)
@@ -1231,13 +1236,13 @@ def main():
         #   Deployment of dynamic link libraries, executables and
         #   resources to make the main "klayout.app" bundle
         #----------------------------------------------------------
-        ret = DeployBinariesForBundle(config, parameters)
+        ret = Deploy_Binaries_For_Bundle(config, parameters)
         if not ret == 0:
             sys.exit(1)
 
 #===================================================================================
 if __name__ == "__main__":
-    main()
+    Main()
 
 #---------------
 # End of file

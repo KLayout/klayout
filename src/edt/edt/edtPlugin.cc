@@ -61,18 +61,18 @@ void get_text_options (std::vector < std::pair<std::string, std::string> > &opti
   options.push_back (std::pair<std::string, std::string> (cfg_edit_text_valign, "bottom"));
 }
 
-edt::RecentConfigurationPage::ConfigurationDescriptor text_cfg_descriptors[] =
-{
-  edt::RecentConfigurationPage::ConfigurationDescriptor ("", tl::to_string (tr ("Layer")), edt::RecentConfigurationPage::Layer),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_string, tl::to_string (tr ("Text")), edt::RecentConfigurationPage::Text),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_size, tl::to_string (tr ("Size")), edt::RecentConfigurationPage::Double),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_halign, tl::to_string (tr ("Hor. align")), edt::RecentConfigurationPage::Text),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_valign, tl::to_string (tr ("Vert. align")), edt::RecentConfigurationPage::Text)
-};
-
 static
 void get_text_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
 {
+  static edt::RecentConfigurationPage::ConfigurationDescriptor text_cfg_descriptors[] =
+  {
+    edt::RecentConfigurationPage::ConfigurationDescriptor ("", tl::to_string (tr ("Layer")), edt::RecentConfigurationPage::Layer),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_string, tl::to_string (tr ("Text")), edt::RecentConfigurationPage::Text),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_size, tl::to_string (tr ("Size")), edt::RecentConfigurationPage::Double),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_halign, tl::to_string (tr ("Hor. align")), edt::RecentConfigurationPage::Text),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_text_valign, tl::to_string (tr ("Vert. align")), edt::RecentConfigurationPage::Text)
+  };
+
   ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-text-param",
                         &text_cfg_descriptors[0], &text_cfg_descriptors[sizeof (text_cfg_descriptors) / sizeof (text_cfg_descriptors[0])]));
   ret.push_back (new edt::EditorOptionsText (dispatcher));
@@ -87,18 +87,18 @@ void get_path_options (std::vector < std::pair<std::string, std::string> > &opti
   options.push_back (std::pair<std::string, std::string> (cfg_edit_path_ext_var_end, "0.0"));
 }
 
-edt::RecentConfigurationPage::ConfigurationDescriptor path_cfg_descriptors[] =
-{
-  edt::RecentConfigurationPage::ConfigurationDescriptor ("", tl::to_string (tr ("Layer")), edt::RecentConfigurationPage::Layer),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_width, tl::to_string (tr ("Width")), edt::RecentConfigurationPage::Double),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_ext_type, tl::to_string (tr ("Ends")), edt::RecentConfigurationPage::Int),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_ext_var_begin, tl::to_string (tr ("Begin ext.")), edt::RecentConfigurationPage::Double),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_ext_var_end, tl::to_string (tr ("End ext.")), edt::RecentConfigurationPage::Double)
-};
-
 static
 void get_path_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
 {
+  static edt::RecentConfigurationPage::ConfigurationDescriptor path_cfg_descriptors[] =
+  {
+    edt::RecentConfigurationPage::ConfigurationDescriptor ("", tl::to_string (tr ("Layer")), edt::RecentConfigurationPage::Layer),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_width, tl::to_string (tr ("Width")), edt::RecentConfigurationPage::Double),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_ext_type, tl::to_string (tr ("Ends")), edt::RecentConfigurationPage::Int),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_ext_var_begin, tl::to_string (tr ("Begin ext.")), edt::RecentConfigurationPage::Double),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_path_ext_var_end, tl::to_string (tr ("End ext.")), edt::RecentConfigurationPage::Double)
+  };
+  
   ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-path-param",
                         &path_cfg_descriptors[0], &path_cfg_descriptors[sizeof (path_cfg_descriptors) / sizeof (path_cfg_descriptors[0])]));
   ret.push_back (new EditorOptionsPath (dispatcher));
@@ -123,26 +123,26 @@ void get_inst_options (std::vector < std::pair<std::string, std::string> > &opti
   options.push_back (std::pair<std::string, std::string> (cfg_edit_show_shapes_of_instances, "true"));
 }
 
-edt::RecentConfigurationPage::ConfigurationDescriptor inst_cfg_descriptors[] =
-{
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_lib_name, tl::to_string (tr ("Library")), edt::RecentConfigurationPage::CellLibraryName),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_cell_name, tl::to_string (tr ("Cell")), edt::RecentConfigurationPage::CellDisplayName),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_angle, tl::to_string (tr ("Angle")), edt::RecentConfigurationPage::Double),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_mirror, tl::to_string (tr ("Mirror")), edt::RecentConfigurationPage::Bool),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_scale, tl::to_string (tr ("Scale")), edt::RecentConfigurationPage::Double),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_array, tl::to_string (tr ("Array")), edt::RecentConfigurationPage::ArrayFlag),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_rows, tl::to_string (tr ("Rows")), edt::RecentConfigurationPage::IntIfArray),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_row_x, tl::to_string (tr ("Row step (x)")), edt::RecentConfigurationPage::DoubleIfArray),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_row_y, tl::to_string (tr ("Row step (y)")), edt::RecentConfigurationPage::DoubleIfArray),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_columns, tl::to_string (tr ("Columns")), edt::RecentConfigurationPage::IntIfArray),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_column_x, tl::to_string (tr ("Column step (x)")), edt::RecentConfigurationPage::DoubleIfArray),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_column_y, tl::to_string (tr ("Column step (y)")), edt::RecentConfigurationPage::DoubleIfArray),
-  edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_pcell_parameters, tl::to_string (tr ("PCell parameters")), edt::RecentConfigurationPage::PCellParameters)
-};
-
 static
 void get_inst_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
 {
+  static edt::RecentConfigurationPage::ConfigurationDescriptor inst_cfg_descriptors[] =
+  {
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_lib_name, tl::to_string (tr ("Library")), edt::RecentConfigurationPage::CellLibraryName),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_cell_name, tl::to_string (tr ("Cell")), edt::RecentConfigurationPage::CellDisplayName),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_angle, tl::to_string (tr ("Angle")), edt::RecentConfigurationPage::Double),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_mirror, tl::to_string (tr ("Mirror")), edt::RecentConfigurationPage::Bool),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_scale, tl::to_string (tr ("Scale")), edt::RecentConfigurationPage::Double),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_array, tl::to_string (tr ("Array")), edt::RecentConfigurationPage::ArrayFlag),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_rows, tl::to_string (tr ("Rows")), edt::RecentConfigurationPage::IntIfArray),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_row_x, tl::to_string (tr ("Row step (x)")), edt::RecentConfigurationPage::DoubleIfArray),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_row_y, tl::to_string (tr ("Row step (y)")), edt::RecentConfigurationPage::DoubleIfArray),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_columns, tl::to_string (tr ("Columns")), edt::RecentConfigurationPage::IntIfArray),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_column_x, tl::to_string (tr ("Column step (x)")), edt::RecentConfigurationPage::DoubleIfArray),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_column_y, tl::to_string (tr ("Column step (y)")), edt::RecentConfigurationPage::DoubleIfArray),
+    edt::RecentConfigurationPage::ConfigurationDescriptor (cfg_edit_inst_pcell_parameters, tl::to_string (tr ("PCell parameters")), edt::RecentConfigurationPage::PCellParameters)
+  };
+
   ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-inst-param",
                         &inst_cfg_descriptors[0], &inst_cfg_descriptors[sizeof (inst_cfg_descriptors) / sizeof (inst_cfg_descriptors[0])]));
   ret.push_back (new EditorOptionsInstPCellParam (dispatcher));

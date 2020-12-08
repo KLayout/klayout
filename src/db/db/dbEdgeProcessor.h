@@ -234,7 +234,7 @@ public:
    *  The mode parameter selects the interaction check mode.
    *  0 is "overlapping" or "touching".
    *  -1 will select all secondary polygons inside polygons from the primary.
-   *  -2 will select all secondary polygons enclosing polygons from the primary.
+   *  -2 will select all primary polygons enclosing polygons from the secondary.
    *  +1 will select all secondary polygons outside polygons from the primary.
    *
    *  Use set_include_touching(f) to specify whether to include or not include the touching

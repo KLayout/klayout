@@ -868,6 +868,18 @@ TEST(18a)
     o.select_not_overlapping (rr);
     EXPECT_EQ (o.to_string (), "(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60)");
   }
+  EXPECT_EQ (r.selected_enclosing (rr).to_string (), "(0,100;0,130;30,130;30,100)");
+  {
+    db::Region o = r;
+    o.select_enclosing (rr);
+    EXPECT_EQ (o.to_string (), "(0,100;0,130;30,130;30,100)");
+    o = r;
+    EXPECT_EQ (o.selected_not_enclosing (rr).to_string (), "(0,0;0,20;20,20;20,0);(20,30;20,50;40,50;40,30);(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60);(0,60;0,80;60,80;60,60)");
+    EXPECT_EQ (o.selected_enclosing (rr).count () + o.selected_not_enclosing (rr).count (), size_t (6));
+    EXPECT_EQ (o.selected_enclosing (rr).hier_count () + o.selected_not_enclosing (rr).hier_count (), size_t (6));
+    o.select_not_enclosing (rr);
+    EXPECT_EQ (o.to_string (), "(0,0;0,20;20,20;20,0);(20,30;20,50;40,50;40,30);(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60);(0,60;0,80;60,80;60,60)");
+  }
 }
 
 TEST(18b) 

@@ -1431,8 +1431,7 @@ CODE
     # It returns a new layer containing the selected shapes. A version which modifies self
     # is \select_covering.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # This method is available for polygons only.
     #
     # The following image shows the effect of the "covering" method:
     #
@@ -1461,8 +1460,15 @@ CODE
     # otherwise individual shapes are selected. This method returns the inverse of \covering
     # and provides the same options.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # The following image shows the effect of the "not_covering" method:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_not_covering.png) @/td
+    #   @/tr
+    # @/table
+    #
+    # This method is available for polygons only.
     # It returns a new layer containing the selected shapes. A version which modifies self
     # is \select_not_covering.
     
@@ -1479,8 +1485,7 @@ CODE
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \covering.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # This method is available for polygons only.
     
     # %DRC%
     # @name select_not_covering
@@ -1495,8 +1500,7 @@ CODE
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \not_covering.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # This method is available for polygons only.
 
     # %DRC%
     # @name overlapping
@@ -1511,8 +1515,7 @@ CODE
     # It returns a new layer containing the selected shapes. A version which modifies self
     # is \select_overlapping.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # This method is available for polygons only.
     #
     # The following image shows the effect of the "overlapping" method:
     #
@@ -1541,8 +1544,7 @@ CODE
     # The "not_overlapping" method is similar to the \outside method. However, "outside" does 
     # not provide the option to specify counts.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # This method is available for polygons only.
     # It returns a new layer containing the selected shapes. A version which modifies self
     # is \select_not_overlapping.
     
@@ -1559,8 +1561,7 @@ CODE
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \overlapping.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # This method is available for polygons only.
     
     # %DRC%
     # @name select_not_overlapping
@@ -1575,8 +1576,7 @@ CODE
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \not_overlapping.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # This method is available for polygons only.
     
     # %DRC%
     # @name inside
@@ -2075,7 +2075,7 @@ CODE
       eval <<"CODE"
       def #{f}(other, *args)
         requires_same_type(other, "#{f}")
-        requires_edges_or_region("#{f}")
+        requires_region("#{f}")
         DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data, *minmax_count(:#{f}, *args)))
       end
 CODE
@@ -2086,7 +2086,7 @@ CODE
       # In tiled mode, there are no modifying versions. Emulate using the non-modifying one.
       eval <<"CODE"
       def #{f}(other, *args)
-        requires_edges_or_region("#{f}")
+        requires_region("#{f}")
         requires_same_type(other, "#{f}")
         if @engine.is_tiled?
           self.data = @engine._tcmd(self.data, 0, self.data.class, :#{fi}, other.data, *minmax_count(:#{fi}, *args))
@@ -2103,7 +2103,7 @@ CODE
       # In tiled mode, there are no modifying versions. Emulate using the non-modifying one.
       eval <<"CODE"
       def #{f}(other)
-        requires_edges_or_region("#{f}")
+        requires_region("#{f}")
         requires_same_type(other, "#{f}")
         if @engine.is_tiled?
           self.data = @engine._tcmd(self.data, 0, self.data.class, :#{fi}, other.data)

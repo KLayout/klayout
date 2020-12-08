@@ -190,12 +190,12 @@ public:
 
   virtual RegionDelegate *selected_enclosing (const Region &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, -2, true, false, min_count, max_count);
+    return selected_interacting_generic (other, -2, false, false, min_count, max_count);
   }
 
   virtual RegionDelegate *selected_not_enclosing (const Region &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, -2, true, true, min_count, max_count);
+    return selected_interacting_generic (other, -2, false, true, min_count, max_count);
   }
 
   virtual RegionDelegate *selected_interacting (const Region &other, size_t min_count, size_t max_count) const

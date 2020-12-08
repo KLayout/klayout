@@ -580,7 +580,23 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
   db::EdgeProcessor ep (report_progress (), progress_desc ());
   ep.set_base_verbosity (base_verbosity ());
 
+  size_t n = 0;
   size_t nstart = 0;
+
+  if (mode < -1) {
+
+    //  in enclosing mode self must be primary and other the secondary. For other
+    //  modes it's the other way round
+
+    for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p, ++n) {
+      if (mode > 0 || p->box ().touches (other.bbox ())) {
+        ep.insert (*p, n);
+      }
+    }
+
+    nstart = n;
+
+  }
 
   if (min_count == size_t (1) && max_count == std::numeric_limits<size_t>::max ()) {
 
@@ -589,7 +605,7 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
       //  NOTE: on "inside" or "enclosing", the other region must be merged
       for (RegionIterator p = other.begin_merged (); ! p.at_end (); ++p) {
         if (p->box ().touches (bbox ())) {
-          ep.insert (*p, nstart);
+          ep.insert (*p, n);
         }
       }
 
@@ -597,13 +613,13 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
 
       for (RegionIterator p = other.begin (); ! p.at_end (); ++p) {
         if (p->box ().touches (bbox ())) {
-          ep.insert (*p, nstart);
+          ep.insert (*p, n);
         }
       }
 
     }
 
-    ++nstart;
+    ++n;
 
   } else {
 
@@ -614,22 +630,27 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
 
     for (RegionIterator p = other.begin_merged (); ! p.at_end (); ++p) {
       if (p->box ().touches (bbox ())) {
-        ep.insert (*p, nstart);
+        ep.insert (*p, n);
       }
-      ++nstart;
+      ++n;
+    }
+
+  }
+
+  if (mode >= -1) {
+
+    nstart = n;
+
+    for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p, ++n) {
+      if (mode > 0 || p->box ().touches (other.bbox ())) {
+        ep.insert (*p, n);
+      }
     }
 
   }
 
   //  there should be at least one element to look at for primary
   tl_assert (nstart > 0);
-
-  size_t n = nstart;
-  for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p, ++n) {
-    if (mode > 0 || p->box ().touches (other.bbox ())) {
-      ep.insert (*p, n);
-    }
-  }
 
   db::InteractionDetector id (mode, nstart - 1);
   id.set_include_touching (touching);
@@ -640,17 +661,15 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
   std::auto_ptr<FlatRegion> output (new FlatRegion (false));
 
   std::map <size_t, size_t> interaction_counts;
-  n = 0;
   for (db::InteractionDetector::iterator i = id.begin (); i != id.end () ; ++i) {
-    ++n;
     if (i->first < nstart && i->second >= nstart) {
-      interaction_counts [i->second] += 1;
+      interaction_counts [mode < -1 ? i->first : i->second] += 1;
     }
   }
 
   output->reserve (n);
 
-  n = nstart;
+  n = (mode < -1 ? 0 : nstart);
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p, ++n) {
     size_t count = 0;
     std::map <size_t, size_t>::const_iterator c = interaction_counts.find (n);

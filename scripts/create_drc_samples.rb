@@ -547,6 +547,29 @@ run_demo gen, "input1.edges.outside_part(input2)", "drc_outside_part.png"
 
 class Gen
   def produce(s1, s2)
+    s1.insert(RBA::Box::new(-1000, 0, 1000, 2000))
+    s1.insert(RBA::Box::new(2000, 0, 4000, 2000))
+    s1.insert(RBA::Box::new(5000, 0, 7000, 2000))
+    s1.insert(RBA::Box::new(-1000, 3000, 1000, 5000))
+    s1.insert(RBA::Box::new(2000, 3000, 4000, 5000))
+    s1.insert(RBA::Box::new(5000, 3000, 7000, 5000))
+    s2.insert(RBA::Box::new(0, 500, 1000, 1500))
+    s2.insert(RBA::Box::new(2500, 500, 3500, 1500))
+    s2.insert(RBA::Box::new(4000, 500, 5000, 1500))
+    s2.insert(RBA::Box::new(6250, 500, 7250, 1500))
+    s2.insert(RBA::Box::new(-500, 5000, 500, 6000))
+    s2.insert(RBA::Box::new(2500, 3500, 3500, 4500))
+    s2.insert(RBA::Box::new(6250, 4750, 7250, 5750))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input1.covering(input2)", "drc_covering.png"
+run_demo gen, "input1.not_covering(input2)", "drc_not_covering.png"
+
+class Gen
+  def produce(s1, s2)
     s1.insert(RBA::Box::new(0, 5000, 2000, 7000))
     s1.insert(RBA::Box::new(4000, 5000, 6000, 7000))
     s1.insert(RBA::Box::new(0, 0, 2000, 2000))

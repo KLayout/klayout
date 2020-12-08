@@ -278,6 +278,39 @@ The following images show the effect of this method:
 </tr>
 </table>
 </p>
+<a name="covering"/><h2>"covering" - Selects shapes or regions of self which completely cover (enclose) one or more shapes from the other region</h2>
+<keyword name="covering"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.covering(other)</tt></li>
+<li><tt>layer.covering(other, min_count)</tt></li>
+<li><tt>layer.covering(other, min_count, max_count)</tt></li>
+<li><tt>layer.covering(other, min_count .. max_count)</tt></li>
+</ul>
+<p>
+This method selects all shapes or regions from self which completly cover shapes from the other
+region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+otherwise individual shapes are selected.
+It returns a new layer containing the selected shapes. A version which modifies self
+is <a href="#select_covering">select_covering</a>.
+</p><p>
+This method is available for polygons only.
+</p><p>
+The following image shows the effect of the "covering" method:
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_covering.png"/></td>
+</tr>
+</table>
+</p><p>
+A range of counts can be specified. If so, the shape from the primary layer is 
+only selected when covering a given number of shapes from the other layer.
+For the interpretation of the count see <a href="#interacting">interacting</a>.
+</p><p>
+The "covering" attribute is sometimes called "enclosing", but this name is
+used for the respective DRC function (see <a href="#enclosing">enclosing</a>).
+</p>
 <a name="data"/><h2>"data" - Gets the low-level data object</h2>
 <keyword name="data"/>
 <p>Usage:</p>
@@ -1141,6 +1174,33 @@ written to the output (labels: red, input2: blue):
 </tr>
 </table>
 </p>
+<a name="not_covering"/><h2>"not_covering" - Selects shapes or regions of self which do not cover (enclose) one or more shapes from the other region</h2>
+<keyword name="not_covering"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.not_covering(other)</tt></li>
+<li><tt>layer.not_covering(other, min_count)</tt></li>
+<li><tt>layer.not_covering(other, min_count, max_count)</tt></li>
+<li><tt>layer.not_covering(other, min_count .. max_count)</tt></li>
+</ul>
+<p>
+This method selects all shapes or regions from self which do not cover shapes from the other
+region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+otherwise individual shapes are selected. This method returns the inverse of <a href="#covering">covering</a>
+and provides the same options.
+</p><p>
+The following image shows the effect of the "not_covering" method:
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_not_covering.png"/></td>
+</tr>
+</table>
+</p><p>
+This method is available for polygons only.
+It returns a new layer containing the selected shapes. A version which modifies self
+is <a href="#select_not_covering">select_not_covering</a>.
+</p>
 <a name="not_in"/><h2>"not_in" - Selects shapes or regions of self which are not contained in the other layer</h2>
 <keyword name="not_in"/>
 <p>Usage:</p>
@@ -1265,17 +1325,20 @@ The following image shows the effect of the "not_outside" method (input1: red, i
 <p>Usage:</p>
 <ul>
 <li><tt>layer.not_overlapping(other)</tt></li>
+<li><tt>layer.not_overlapping(other, min_count)</tt></li>
+<li><tt>layer.not_overlapping(other, min_count, max_count)</tt></li>
+<li><tt>layer.not_overlapping(other, min_count .. max_count)</tt></li>
 </ul>
 <p>
 This method selects all shapes or regions from self which do not overlap shapes from the other
 region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
-otherwise individual shapes are selected.
+otherwise individual shapes are selected. This method will return the inverse of <a href="#overlapping">overlapping</a>
+and provides the same options.
 </p><p>
-The "not_overlapping" method is equivalent to the <a href="#outside">outside</a> method. It is provided
-as an alias for consistency.
+The "not_overlapping" method is similar to the <a href="#outside">outside</a> method. However, "outside" does 
+not provide the option to specify counts.
 </p><p>
-This method is available for polygon and edge layers. Edges can be selected
-with respect to other edges or polygons.
+This method is available for polygons only.
 It returns a new layer containing the selected shapes. A version which modifies self
 is <a href="#select_not_overlapping">select_not_overlapping</a>.
 </p>
@@ -1456,6 +1519,9 @@ The following images show the effect of the overlap check (input1: red, input2: 
 <p>Usage:</p>
 <ul>
 <li><tt>layer.overlapping(other)</tt></li>
+<li><tt>layer.overlapping(other, min_count)</tt></li>
+<li><tt>layer.overlapping(other, min_count, max_count)</tt></li>
+<li><tt>layer.overlapping(other, min_count .. max_count)</tt></li>
 </ul>
 <p>
 This method selects all shapes or regions from self which overlap shapes from the other
@@ -1464,8 +1530,7 @@ otherwise individual shapes are selected.
 It returns a new layer containing the selected shapes. A version which modifies self
 is <a href="#select_overlapping">select_overlapping</a>.
 </p><p>
-This method is available for polygon and edge layers. Edges can be selected
-with respect to other edges or polygons.
+This method is available for polygons only.
 </p><p>
 The following image shows the effect of the "overlapping" method:
 </p><p>
@@ -1474,6 +1539,10 @@ The following image shows the effect of the "overlapping" method:
 <td><img src="/images/drc_overlapping.png"/></td>
 </tr>
 </table>
+</p><p>
+A range of counts can be specified. If so, the shape from the primary layer is 
+only selected when overlapping a given number of shapes from the other layer.
+For the interpretation of the count see <a href="#interacting">interacting</a>.
 </p>
 <a name="perimeter"/><h2>"perimeter" - Returns the total perimeter of the polygons in the region</h2>
 <keyword name="perimeter"/>
@@ -1727,6 +1796,24 @@ Here is a (slow) equivalent of the area selection method:
 new_layer = layer.select { |polygon| polygon.area &gt;= 10.0 }
 </pre>
 </p>
+<a name="select_covering"/><h2>"select_covering" - Selects shapes or regions of self which completely cover (enclose) one or more shapes from the other region</h2>
+<keyword name="select_covering"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.select_covering(other)</tt></li>
+<li><tt>layer.select_covering(other, min_count)</tt></li>
+<li><tt>layer.select_covering(other, min_count, max_count)</tt></li>
+<li><tt>layer.select_covering(other, min_count .. max_count)</tt></li>
+</ul>
+<p>
+This method selects all shapes or regions from self which cover shapes from the other
+region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+otherwise individual shapes are selected.
+It modifies self to contain the selected shapes. A version which does not modify self
+is <a href="#covering">covering</a>.
+</p><p>
+This method is available for polygons only.
+</p>
 <a name="select_inside"/><h2>"select_inside" - Selects shapes or regions of self which are inside the other region</h2>
 <keyword name="select_inside"/>
 <p>Usage:</p>
@@ -1768,6 +1855,24 @@ If a single count is given, shapes from self are selected only if they do intera
 number of (different) shapes from the other layer. If a min and max count is given, shapes from  
 self are selected only if they interact with min_count or more, but a maximum of max_count different shapes
 from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
+</p>
+<a name="select_not_covering"/><h2>"select_not_covering" - Selects shapes or regions of self which do not cover (enclose) one or more shapes from the other region</h2>
+<keyword name="select_not_covering"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.select_not_covering(other)</tt></li>
+<li><tt>layer.select_not_covering(other, min_count)</tt></li>
+<li><tt>layer.select_not_covering(other, min_count, max_count)</tt></li>
+<li><tt>layer.select_not_covering(other, min_count .. max_count)</tt></li>
+</ul>
+<p>
+This method selects all shapes or regions from self which do not cover shapes from the other
+region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+otherwise individual shapes are selected. 
+It modifies self to contain the selected shapes. A version which does not modify self
+is <a href="#not_covering">not_covering</a>.
+</p><p>
+This method is available for polygons only.
 </p>
 <a name="select_not_inside"/><h2>"select_not_inside" - Selects shapes or regions of self which are not inside the other region</h2>
 <keyword name="select_not_inside"/>
@@ -1833,6 +1938,9 @@ This method is available for polygon layers.
 <p>Usage:</p>
 <ul>
 <li><tt>layer.select_not_overlapping(other)</tt></li>
+<li><tt>layer.select_not_overlapping(other, min_count)</tt></li>
+<li><tt>layer.select_not_overlapping(other, min_count, max_count)</tt></li>
+<li><tt>layer.select_not_overlapping(other, min_count .. max_count)</tt></li>
 </ul>
 <p>
 This method selects all shapes or regions from self which do not overlap shapes from the other
@@ -1841,8 +1949,7 @@ otherwise individual shapes are selected.
 It modifies self to contain the selected shapes. A version which does not modify self
 is <a href="#not_overlapping">not_overlapping</a>.
 </p><p>
-This method is available for polygon and edge layers. Edges can be selected
-with respect to other edges or polygons.
+This method is available for polygons only.
 </p>
 <a name="select_outside"/><h2>"select_outside" - Selects shapes or regions of self which are outside the other region</h2>
 <keyword name="select_outside"/>
@@ -1866,6 +1973,9 @@ This method is available for polygon layers.
 <p>Usage:</p>
 <ul>
 <li><tt>layer.select_overlapping(other)</tt></li>
+<li><tt>layer.select_overlapping(other, min_count)</tt></li>
+<li><tt>layer.select_overlapping(other, min_count, max_count)</tt></li>
+<li><tt>layer.select_overlapping(other, min_count .. max_count)</tt></li>
 </ul>
 <p>
 This method selects all shapes or regions from self which overlap shapes from the other
@@ -1874,8 +1984,7 @@ otherwise individual shapes are selected.
 It modifies self to contain the selected shapes. A version which does not modify self
 is <a href="#overlapping">overlapping</a>.
 </p><p>
-This method is available for polygon and edge layers. Edges can be selected
-with respect to other edges or polygons.
+This method is available for polygons only.
 </p>
 <a name="sep"/><h2>"sep" - An alias for "separation"</h2>
 <keyword name="sep"/>

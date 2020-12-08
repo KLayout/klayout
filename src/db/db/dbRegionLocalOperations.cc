@@ -441,29 +441,47 @@ void interacting_local_operation<TS, TI, TR>::compute_local (db::Layout * /*layo
   }
 
   size_t nstart = 0;
+  size_t n = 0;
 
-  if (m_min_count == size_t (1) && m_max_count == std::numeric_limits<size_t>::max ()) {
+  if (m_mode < -1) {
 
-    for (typename std::set<TI>::const_iterator o = others.begin (); o != others.end (); ++o) {
-      ep.insert (*o, nstart);
+    //  in enclosing mode self must be primary and other the secondary. For other
+    //  modes it's the other way round
+    for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i, ++n) {
+      const TS &subject = interactions.subject_shape (i->first);
+      ep.insert (subject, n);
     }
-    nstart++;
+
+    nstart = n;
+
+  }
+
+  if (m_mode != -2 && m_min_count == size_t (1) && m_max_count == std::numeric_limits<size_t>::max ()) {
+
+    //  uncounted modes except enclosing (covering) can use one property ID for the primary ("other" input). This is slightly more efficient.
+    for (typename std::set<TI>::const_iterator o = others.begin (); o != others.end (); ++o) {
+      ep.insert (*o, n);
+    }
+    n++;
 
   } else {
 
-    tl_assert (m_mode == 0);
-
     for (typename std::set<TI>::const_iterator o = others.begin (); o != others.end (); ++o) {
-      ep.insert (*o, nstart);
-      nstart++;
+      ep.insert (*o, n);
+      n++;
     }
 
   }
 
-  size_t n = nstart;
-  for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i, ++n) {
-    const TS &subject = interactions.subject_shape (i->first);
-    ep.insert (subject, n);
+  if (m_mode >= -1) {
+
+    nstart = n;
+
+    for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i, ++n) {
+      const TS &subject = interactions.subject_shape (i->first);
+      ep.insert (subject, n);
+    }
+
   }
 
   tl_assert (nstart > 0);
@@ -477,11 +495,15 @@ void interacting_local_operation<TS, TI, TR>::compute_local (db::Layout * /*layo
   std::map <size_t, size_t> interaction_counts;
   for (db::InteractionDetector::iterator i = id.begin (); i != id.end (); ++i) {
     if (i->first < nstart && i->second >= nstart) {
-      interaction_counts[i->second] += 1;
+      if (m_mode < -1) {
+        interaction_counts[i->first] += 1;
+      } else {
+        interaction_counts[i->second] += 1;
+      }
     }
   }
 
-  n = nstart;
+  n = (m_mode < -1 ? 0 : nstart);
   for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i, ++n) {
     size_t count = 0;
     std::map <size_t, size_t>::const_iterator c = interaction_counts.find (n);

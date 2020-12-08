@@ -665,9 +665,9 @@ InteractionDetector::edge (bool north, bool enter, property_type p)
   *wcv += (enter ? 1 : -1);
   bool inside_after = (*wcv != 0);
 
-  //  In "interacting" mode we need to handle both north and south events because
+  //  In "interacting" and "enclosing" mode we need to handle both north and south events because
   //  we have to catch interactions between objects north and south to the scanline
-  if (north || (m_mode == 0 && m_include_touching)) {
+  if (north || (m_mode == 0 && m_include_touching) || (m_mode < -1 && m_include_touching)) {
 
     std::set <property_type> *inside = north ? &m_inside_n : &m_inside_s;
 
@@ -675,25 +675,13 @@ InteractionDetector::edge (bool north, bool enter, property_type p)
 
       inside->erase (p);
 
-      if (m_mode < -1) {
-        //  in enclosing mode report primaries open after a secondary ended as non-interactions: these only partially
-        //  overlap and the outside part qualifies this secondary as non-closing (see "finish")
-        if (p > m_last_primary_id) {
-          for (std::set <property_type>::const_iterator i = inside->begin (); i != inside->end (); ++i) {
-            if (*i <= m_last_primary_id) {
-              m_non_interactions.insert (*i);
-            }
-          }
-        }
-      } else if (m_mode != 0) {
-        //  the primary objects are delivered last of all coincident edges
-        //  (due to prefer_touch == true and the sorting of coincident edges by property id)
-        //  hence every remaining parts count as non-interacting (outside)
-        if (p <= m_last_primary_id) {
-          for (std::set <property_type>::const_iterator i = inside->begin (); i != inside->end (); ++i) {
-            if (*i > m_last_primary_id) {
-              m_non_interactions.insert (*i);
-            }
+      //  the primary objects are delivered last of all coincident edges
+      //  (due to prefer_touch == true and the sorting of coincident edges by property id)
+      //  hence every remaining parts count as non-interacting (outside)
+      if (p <= m_last_primary_id) {
+        for (std::set <property_type>::const_iterator i = inside->begin (); i != inside->end (); ++i) {
+          if (*i > m_last_primary_id) {
+            m_non_interactions.insert (*i);
           }
         }
       }
@@ -702,39 +690,38 @@ InteractionDetector::edge (bool north, bool enter, property_type p)
 
       if (m_mode != 0) {
 
-        //  in enclosing/inside/outside mode we are only interested in interactions with a primary
+        //  enclosing/inside/outside mode
         if (p > m_last_primary_id) {
 
-          if (m_mode < -1) {
-            //  enclosing mode: report primaries open when a secondary starts as non-interactions: these only partially
-            //  overlap and the outside part qualifies this secondary as non-closing (see "finish")
-            for (std::set <property_type>::const_iterator i = inside->begin (); i != inside->end (); ++i) {
-              if (*i <= m_last_primary_id) {
-                m_non_interactions.insert (*i);
-              }
+          //  note that the primary parts will be delivered first of all coincident
+          //  edges hence we can check whether the primary is present even for coincident
+          //  edges
+          bool any = false;
+          for (std::set <property_type>::const_iterator i = inside->begin (); i != inside->end (); ++i) {
+            if (*i <= m_last_primary_id) {
+              any = true;
+              m_interactions.insert (std::make_pair (*i, p));
             }
-          } else {
-            //  note that the primary parts will be delivered first of all coincident
-            //  edges hence we can check whether the primary is present even for coincident
-            //  edges
-            bool any = false;
-            for (std::set <property_type>::const_iterator i = inside->begin (); i != inside->end (); ++i) {
-              if (*i <= m_last_primary_id) {
-                any = true;
-                m_interactions.insert (std::make_pair (*i, p));
-              }
-            }
-            if (! any) {
-              m_non_interactions.insert (p);
-            }
+          }
+          if (! any) {
+            m_non_interactions.insert (p);
           }
 
         } else {
+
           for (std::set <property_type>::const_iterator i = inside->begin (); i != inside->end (); ++i) {
             if (*i > m_last_primary_id) {
+              if (m_mode < -1) {
+                //  enclosing mode: an opening primary (= enclosing one) whith open secondaries means the secondary
+                //  has been opened before and did not close. Because we sort by property ID this must have happened
+                //  before, hence the secondary is overlapping. Make them non-interactions. We still have to record them
+                //  as interactions because this is how we skip the primaries later.
+                m_non_interactions.insert (*i);
+              }
               m_interactions.insert (std::make_pair (p, *i));
             }
           }
+
         }
 
       } else {
@@ -777,18 +764,19 @@ InteractionDetector::finish ()
 {
   if (m_mode < -1) {
 
-    //  In enclosing mode remove those objects which have an interaction with a primary having a non-interaction
-    std::set<property_type> secondaries_to_delete;
+    //  In enclosing mode remove those objects which have an interaction with a secondary having a non-interaction:
+    //  these are the ones where secondaries overlap and stick to the outside.
+    std::set<property_type> primaries_to_delete;
     for (std::set<std::pair<property_type, property_type> >::iterator i = m_interactions.begin (); i != m_interactions.end (); ++i) {
-      if (i->first <= m_last_primary_id && m_non_interactions.find (i->first) != m_non_interactions.end ()) {
-        secondaries_to_delete.insert (i->second);
+      if (m_non_interactions.find (i->second) != m_non_interactions.end ()) {
+        primaries_to_delete.insert (i->first);
       }
     }
 
     for (std::set<std::pair<property_type, property_type> >::iterator i = m_interactions.begin (); i != m_interactions.end (); ) {
       std::set<std::pair<property_type, property_type> >::iterator ii = i;
       ++ii;
-      if (i->first <= m_last_primary_id && secondaries_to_delete.find (i->second) != secondaries_to_delete.end ()) {
+      if (primaries_to_delete.find (i->first) != primaries_to_delete.end ()) {
         m_interactions.erase (i);
       }
       i = ii;
@@ -800,7 +788,7 @@ InteractionDetector::finish ()
     for (std::set<std::pair<property_type, property_type> >::iterator i = m_interactions.begin (); i != m_interactions.end (); ) {
       std::set<std::pair<property_type, property_type> >::iterator ii = i;
       ++ii;
-      if (i->first <= m_last_primary_id && m_non_interactions.find (i->second) != m_non_interactions.end ()) {
+      if (m_non_interactions.find (i->second) != m_non_interactions.end ()) {
         m_interactions.erase (i);
       }
       i = ii;

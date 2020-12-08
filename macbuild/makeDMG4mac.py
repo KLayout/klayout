@@ -256,7 +256,7 @@ def CheckPkgDirectory():
         LatestOSMacPorts   = Platform == LatestOS
         LatestOSMacPorts  &= PackagePrefix == "LW"
         LatestOSMacPorts  &= QtIdentification == "qt5MP"
-        LatestOSMacPorts  &= RubyPythonID == "Rmp26Pmp38"
+        LatestOSMacPorts  &= RubyPythonID == "Rmp27Pmp38"
 
         LatestOSHomebrew   = Platform == LatestOS
         LatestOSHomebrew  &= PackagePrefix == "LW"

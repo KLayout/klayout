@@ -24,6 +24,7 @@
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
 #include "dbCommon.h"
+#include "dbColdProxy.h"
 
 #include "tlAssert.h"
 #include "tlStaticObjects.h"
@@ -158,6 +159,21 @@ LibraryManager::register_lib (Library *library)
   l = m_lib_by_name.find (library->get_name ());
   m_lib_by_name.insert (l, std::make_pair (library->get_name (), id));
 
+  //  take care of cold referrers - these may not get valid
+  //  NOTE: this will try to substitute the cold proxies we may have generated during "remap_to" above, but
+  //  "restore_proxies" takes care not to re-substitute cold proxies.
+
+  const tl::weak_collection<db::ColdProxy> &cold_proxies = db::ColdProxy::cold_proxies_per_lib_name (library->get_name ());
+  std::set<db::Layout *> to_refresh;
+  for (tl::weak_collection<db::ColdProxy>::const_iterator p = cold_proxies.begin (); p != cold_proxies.end (); ++p) {
+    to_refresh.insert (const_cast<db::Layout *> (p->layout ()));
+  }
+
+  for (std::set<db::Layout *>::const_iterator l = to_refresh.begin (); l != to_refresh.end (); ++l) {
+    (*l)->restore_proxies (0);
+  }
+
+  //  issue the change notification
   changed_event ();
 
   return id;

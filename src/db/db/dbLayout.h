@@ -458,6 +458,20 @@ public:
 };
 
 /**
+ *  @brief A binary object representing context information for regenerating library proxies and PCells
+ */
+struct DB_PUBLIC ProxyContextInfo
+{
+  std::string lib_name;
+  std::string cell_name;
+  std::string pcell_name;
+  std::map<std::string, tl::Variant> pcell_parameters;
+
+  static ProxyContextInfo deserialize (std::vector<std::string>::const_iterator from, std::vector<std::string>::const_iterator to);
+  void serialize (std::vector<std::string> &strings);
+};
+
+/**
  *  @brief The layout object
  *
  *  The layout object basically wraps the cell graphs and
@@ -863,8 +877,9 @@ public:
    *  @param parameters The PCell parameters
    *  @param cell_index The cell index which is to be replaced by the PCell variant proxy
    *  @param layer_mapping The optional layer mapping object that maps the PCell layers to the layout's layers
+   *  @param retain_layout Set to true for not using update() on the PCell but to retain existing layout (conservative approach)
    */
-  void get_pcell_variant_as (pcell_id_type pcell_id, const std::vector<tl::Variant> &parameters, cell_index_type cell_index, ImportLayerMapping *layer_mapping = 0);
+  void get_pcell_variant_as (pcell_id_type pcell_id, const std::vector<tl::Variant> &parameters, cell_index_type cell_index, ImportLayerMapping *layer_mapping = 0, bool retain_layout = false);
 
   /** 
    *  @brief Get the PCell variant cell of a existing cell with new parameters
@@ -1010,9 +1025,21 @@ public:
   /**
    *  @brief Get the proxy cell (index) for a given library an cell index (inside that library)
    *
-   *  This method replaces the cell with the given target cell index by a library. 
+   *  @param retain_layout Set to true for not using update() on the PCell but to retain existing layout (conservative approach)
+   *
+   *  This method replaces the cell with the given target cell index by a library.
    */
-  void get_lib_proxy_as (Library *lib, cell_index_type cell_index, cell_index_type target_cell_index, ImportLayerMapping *layer_mapping = 0);
+  void get_lib_proxy_as (Library *lib, cell_index_type cell_index, cell_index_type target_cell_index, ImportLayerMapping *layer_mapping = 0, bool retain_layout = false);
+
+  /**
+   *  @brief Creates a cold proxy representing the given context information
+   */
+  cell_index_type create_cold_proxy (const db::ProxyContextInfo &info);
+
+  /**
+   *  @brief Subsitutes the given cell by a cold proxy representing the given context information
+   */
+  void create_cold_proxy_as (const db::ProxyContextInfo &info, cell_index_type cell_index);
 
   /**
    *  @brief Get the context information for a given cell (for writing into a file)
@@ -1025,6 +1052,11 @@ public:
   bool get_context_info (cell_index_type cell_index, std::vector <std::string> &context_info) const;
 
   /**
+   *  @brief Gets the context information as a binary object
+   */
+  bool get_context_info (cell_index_type cell_index, ProxyContextInfo &context_info) const;
+
+  /**
    *  @brief Recover a proxy cell from the given context info.
    *
    *  Creates a proxy cell from the context information given by two iterators into a string list.
@@ -1034,6 +1066,11 @@ public:
    *  @param to The end iterator for the strings from which to recover the cell
    */
   db::Cell *recover_proxy (std::vector <std::string>::const_iterator from, std::vector <std::string>::const_iterator to);
+
+  /**
+   *  @brief Recover a proxy cell from the given binary context info object.
+   */
+  db::Cell *recover_proxy (const ProxyContextInfo &context_info);
 
   /**
    *  @brief Recover a proxy cell from the given context info.
@@ -1049,6 +1086,27 @@ public:
    *  @return true, if the proxy cell could be created
    */
   bool recover_proxy_as (cell_index_type cell_index, std::vector <std::string>::const_iterator from, std::vector <std::string>::const_iterator to, ImportLayerMapping *layer_mapping = 0);
+
+  /**
+   *  @brief Recover a proxy cell from the given binary context info object
+   *
+   *  See the string-based version of "recover_proxy_as" for details.
+   */
+  bool recover_proxy_as (cell_index_type cell_index, const ProxyContextInfo &context_info, ImportLayerMapping *layer_mapping = 0);
+
+  /**
+   *  @brief Restores proxies as far as possible
+   *
+   *  This feature can be used after a library update to make sure that proxies are updated.
+   *  Library updates may enabled lost connections which are help in cold proxies. This method will recover
+   *  these connections.
+   */
+  void restore_proxies(ImportLayerMapping *layer_mapping = 0);
+
+  /**
+   *  @brief Replaces the given cell index with the new cell
+   */
+  void replace_cell (cell_index_type target_cell_index, db::Cell *new_cell, bool retain_layout);
 
   /**
    *  @brief Delete a cell plus the subcells not used otherwise
@@ -1853,6 +1911,11 @@ private:
    *  @brief Implementation of prune_cells and some prune_subcells variants
    */
   void do_prune_cells_or_subcells (const std::set<cell_index_type> &ids, int levels, bool subcells);
+
+  /**
+   *  @brief Recovers a proxy without considering the library from context_info
+   */
+  db::Cell *recover_proxy_no_lib (const ProxyContextInfo &context_info);
 };
 
 /**

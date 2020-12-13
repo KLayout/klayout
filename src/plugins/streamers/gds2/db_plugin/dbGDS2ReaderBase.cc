@@ -358,17 +358,21 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
       db::cell_index_type cell_index = make_cell (layout, m_cellname);
 
-      db::Cell *cell = &layout.cell (cell_index);
-
+      bool ignore_cell = false;
       std::map <tl::string, std::vector <std::string> >::const_iterator ctx = m_context_info.find (m_cellname);
       if (ctx != m_context_info.end ()) {
         GDS2ReaderLayerMapping layer_mapping (this, &layout, m_create_layers);
         if (layout.recover_proxy_as (cell_index, ctx->second.begin (), ctx->second.end (), &layer_mapping)) {
           //  ignore everything in that cell since it is created by the import:
-          cell = 0;
+          ignore_cell = true;
         }
       }
       
+      db::Cell *cell = 0;
+      if (! ignore_cell) {
+        cell = &layout.cell (cell_index);
+      }
+
       long attr = 0;
       db::PropertiesRepository::properties_set cell_properties;
 

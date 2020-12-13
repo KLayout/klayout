@@ -2472,6 +2472,13 @@ bool
 Layout::get_context_info (cell_index_type cell_index, ProxyContextInfo &info) const
 {
   const db::Cell *cptr = &cell (cell_index);
+
+  const db::ColdProxy *cold_proxy = dynamic_cast <const db::ColdProxy *> (cptr);
+  if (cold_proxy) {
+    info = cold_proxy->context_info ();
+    return true;
+  }
+
   const db::Layout *ly = this;
 
   const db::LibraryProxy *lib_proxy;

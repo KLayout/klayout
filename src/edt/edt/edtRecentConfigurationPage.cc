@@ -219,7 +219,11 @@ RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std
       const db::Library *lib = 0;
       for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end (); ++c, ++libname_column) {
         if (c->rendering == RecentConfigurationPage::CellLibraryName) {
-          lib = db::LibraryManager::instance ().lib_ptr_by_name (values [libname_column], view ()->active_cellview_ref ()->tech_name ());
+          if (view ()->active_cellview ().is_valid ()) {
+            lib = db::LibraryManager::instance ().lib_ptr_by_name (values [libname_column], view ()->active_cellview ()->tech_name ());
+          } else {
+            lib = db::LibraryManager::instance ().lib_ptr_by_name (values [libname_column]);
+          }
           break;
         }
       }

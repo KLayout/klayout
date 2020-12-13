@@ -298,6 +298,7 @@ struct LayerSelectionComboBoxPrivateData
   const db::Layout *layout;
   lay::LayoutView *view;
   int cv_index;
+  db::LayerProperties last_props;
 };
 
 LayerSelectionComboBox::LayerSelectionComboBox (QWidget *parent)
@@ -424,6 +425,14 @@ LayerSelectionComboBox::set_view (lay::LayoutView *view, int cv_index, bool all_
   mp_private->cv_index = cv_index;
   mp_private->all_layers = all_layers;
 
+  view->layer_list_changed_event.add (this, &LayerSelectionComboBox::on_layer_list_changed);
+
+  update_layer_list ();
+}
+
+void
+LayerSelectionComboBox::on_layer_list_changed (int)
+{
   update_layer_list ();
 }
 
@@ -442,7 +451,7 @@ void
 LayerSelectionComboBox::update_layer_list ()
 {
   int i = currentIndex ();
-  db::LayerProperties props;
+  db::LayerProperties props = mp_private->last_props;
   if (i >= 0 && i < int (mp_private->layers.size ())) {
     props = mp_private->layers [i].first;
   }
@@ -522,6 +531,8 @@ LayerSelectionComboBox::update_layer_list ()
 void 
 LayerSelectionComboBox::set_current_layer (const db::LayerProperties &props)
 {
+  mp_private->last_props = props;
+
   for (std::vector <std::pair <db::LayerProperties, int> >::iterator ll = mp_private->layers.begin (); ll != mp_private->layers.end (); ++ll) {
     if (ll->first.log_equal (props)) {
       setCurrentIndex (std::distance (mp_private->layers.begin (), ll));
@@ -562,7 +573,7 @@ LayerSelectionComboBox::current_layer_props () const
 {
   int i = currentIndex ();
   if (i < 0 || i > int (mp_private->layers.size ())) {
-    return db::LayerProperties ();
+    return mp_private->last_props;
   } else {
     return mp_private->layers [i].first;
   }
@@ -600,7 +611,7 @@ LibrarySelectionComboBox::update_list ()
   for (db::LibraryManager::iterator l = db::LibraryManager::instance ().begin (); l != db::LibraryManager::instance ().end (); ++l) {
 
     db::Library *lib = db::LibraryManager::instance ().lib (l->second);
-    if (! m_tech_set || !lib->for_technologies ()|| lib->is_for_technology (m_tech)) {
+    if (! m_tech_set || !lib->for_technologies () || lib->is_for_technology (m_tech)) {
 
       std::string item_text = lib->get_name ();
       if (! lib->get_description ().empty ()) {

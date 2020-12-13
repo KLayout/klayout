@@ -70,14 +70,23 @@ LibraryManager::lib_by_name (const std::string &name, const std::set<std::string
 {
   iterator l = m_lib_by_name.find (name);
   while (l != m_lib_by_name.end () && l->first == name) {
-    bool found = true;
-    for (std::set<std::string>::const_iterator t = for_technologies.begin (); t != for_technologies.end (); ++t) {
-      if (! lib (l->second)->is_for_technology (*t)) {
+    const db::Library *lptr = lib (l->second);
+    bool found = lptr->for_technologies ();
+    for (std::set<std::string>::const_iterator t = for_technologies.begin (); t != for_technologies.end () && found; ++t) {
+      if (! lptr->is_for_technology (*t)) {
         found = false;
-        break;
       }
     }
     if (found) {
+      return std::make_pair (true, l->second);
+    }
+    ++l;
+  }
+
+  //  fallback: technology-unspecific libs
+  l = m_lib_by_name.find (name);
+  while (l != m_lib_by_name.end () && l->first == name) {
+    if (! lib (l->second)->for_technologies ()) {
       return std::make_pair (true, l->second);
     }
     ++l;

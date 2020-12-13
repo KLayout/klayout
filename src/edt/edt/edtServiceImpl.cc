@@ -1854,7 +1854,12 @@ InstService::switch_cell_or_pcell (bool switch_parameters)
   }
 
   const lay::CellView &cv = view ()->cellview (m_cv_index);
-  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name, cv->tech_name ());
+  db::Library *lib = 0;
+  if (cv.is_valid ()) {
+    lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name, cv->tech_name ());
+  } else {
+    lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name);
+  }
 
   //  find the layout the cell has to be looked up: that is either the layout of the current instance or
   //  the library selected

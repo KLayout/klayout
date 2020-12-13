@@ -440,14 +440,13 @@ EditorOptionsInst::update_cell_edits ()
   }
 
   db::Layout *layout = 0;
-  lay::LayoutView *view = lay::LayoutView::current ();
 
   //  find the layout the cell has to be looked up: that is either the layout of the current instance or
   //  the library selected
   if (mp_ui->lib_cbx->current_library ()) {
     layout = &mp_ui->lib_cbx->current_library ()->layout ();
-  } else if (view && view->cellview (m_cv_index).is_valid ()) {
-    layout = &view->cellview (m_cv_index)->layout ();
+  } else if (view ()->cellview (m_cv_index).is_valid ()) {
+    layout = &view ()->cellview (m_cv_index)->layout ();
   }
 
   if (! layout) {
@@ -485,7 +484,7 @@ EditorOptionsInst::browse_cell ()
 {
 BEGIN_PROTECTED
 
-  if (m_cv_index >= 0 && lay::LayoutView::current () && lay::LayoutView::current ()->cellview (m_cv_index).is_valid ()) {
+  if (m_cv_index >= 0 && view ()->cellview (m_cv_index).is_valid ()) {
 
     //  find the layout the cell has to be looked up: that is either the layout of the current instance or 
     //  the library selected
@@ -495,7 +494,7 @@ BEGIN_PROTECTED
       lib = mp_ui->lib_cbx->current_library ();
       layout = &lib->layout ();
     } else {
-      layout = &lay::LayoutView::current ()->cellview (m_cv_index)->layout ();
+      layout = &view ()->cellview (m_cv_index)->layout ();
     }
 
     bool all_cells = (mp_ui->lib_cbx->current_library () != 0 ? false : true);
@@ -605,12 +604,10 @@ EditorOptionsInst::setup (lay::Dispatcher *root)
     std::string techname;
 
     mp_ui->lib_cbx->update_list ();
-    if (m_cv_index >= 0 && lay::LayoutView::current () && lay::LayoutView::current ()->cellview (m_cv_index).is_valid ()) {
-      techname = lay::LayoutView::current ()->cellview (m_cv_index)->tech_name ();
-      mp_ui->lib_cbx->set_technology_filter (techname, true);
-    } else {
-      mp_ui->lib_cbx->set_technology_filter (std::string (), false);
+    if (m_cv_index >= 0 && view ()->cellview (m_cv_index).is_valid ()) {
+      techname = view ()->cellview (m_cv_index)->tech_name ();
     }
+    mp_ui->lib_cbx->set_technology_filter (techname, ! techname.empty ());
 
     //  cell name
     std::string s;
@@ -707,11 +704,11 @@ EditorOptionsInstPCellParam::apply (lay::Dispatcher *root)
   std::string param;
   db::Layout *layout = 0;
 
-  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name, view ()->active_cellview_ref ()->tech_name ());
+  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name, view ()->active_cellview ().is_valid () ? view ()->active_cellview ()->tech_name () : std::string ());
   if (lib) {
     layout = &lib->layout ();
-  } else if (m_cv_index >= 0 && lay::LayoutView::current () && lay::LayoutView::current ()->cellview (m_cv_index).is_valid ()) {
-    layout = &lay::LayoutView::current ()->cellview (m_cv_index)->layout ();
+  } else if (m_cv_index >= 0 && view ()->cellview (m_cv_index).is_valid ()) {
+    layout = &view ()->cellview (m_cv_index)->layout ();
   }
 
   bool ok = true;
@@ -760,7 +757,7 @@ EditorOptionsInstPCellParam::setup (lay::Dispatcher *root)
     needs_update = true;
   }
 
-  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name, view ()->active_cellview_ref ()->tech_name ());
+  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name, view ()->active_cellview ().is_valid () ? view ()->active_cellview ()->tech_name () : std::string ());
 
   //  pcell parameters
   std::string param;
@@ -840,7 +837,7 @@ EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Var
 
   //  find the layout the cell has to be looked up: that is either the layout of the current instance or
   //  the library selected
-  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name, view ()->active_cellview_ref ()->tech_name ());
+  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name, view ()->active_cellview ().is_valid () ? view ()->active_cellview ()->tech_name () : std::string ());
   if (lib) {
     layout = &lib->layout ();
   } else {

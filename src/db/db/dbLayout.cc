@@ -481,7 +481,7 @@ Layout::set_technology_name (const std::string &tech)
 
   }
 
-  if (mapping.empty ()) {
+  if (! mapping.empty ()) {
 
     bool needs_cleanup = false;
 
@@ -495,7 +495,8 @@ Layout::set_technology_name (const std::string &tech)
       db::LibraryProxy *lib_proxy = dynamic_cast<db::LibraryProxy *> (&*c);
       if (lib_proxy && (m = mapping.find (lib_proxy->lib_id ())) != mapping.end ()) {
 
-        db::Cell *lib_cell = &cell (lib_proxy->library_cell_index ());
+        db::Library *lib = db::LibraryManager::instance ().lib (lib_proxy->lib_id ());
+        db::Cell *lib_cell = &lib->layout ().cell (lib_proxy->library_cell_index ());
         db::PCellVariant *lib_pcell = dynamic_cast <db::PCellVariant *> (lib_cell);
         if (lib_pcell) {
           pcells_to_map.push_back (std::make_pair (lib_proxy, lib_pcell));

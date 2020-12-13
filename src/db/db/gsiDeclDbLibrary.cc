@@ -43,9 +43,14 @@ static db::Library *new_lib ()
   return new db::Library ();
 }
 
-static db::Library *library_by_name (const std::string &name)
+static db::Library *library_by_name (const std::string &name, const std::string &for_technology)
 {
-  return db::LibraryManager::instance ().lib_ptr_by_name (name);
+  return db::LibraryManager::instance ().lib_ptr_by_name (name, for_technology);
+}
+
+static db::Library *library_by_id (db::lib_id_type id)
+{
+  return db::LibraryManager::instance ().lib (id);
 }
 
 static std::vector<std::string> library_names ()
@@ -53,6 +58,15 @@ static std::vector<std::string> library_names ()
   std::vector<std::string> r;
   for (db::LibraryManager::iterator l = db::LibraryManager::instance ().begin (); l != db::LibraryManager::instance ().end (); ++l) {
     r.push_back (l->first);
+  }
+  return r;
+}
+
+static std::vector<db::lib_id_type> library_ids ()
+{
+  std::vector<db::lib_id_type> r;
+  for (db::LibraryManager::iterator l = db::LibraryManager::instance ().begin (); l != db::LibraryManager::instance ().end (); ++l) {
+    r.push_back (l->second);
   }
   return r;
 }
@@ -110,22 +124,45 @@ LibraryClass decl_Library ("db", "Library",
   gsi::constructor ("new", &new_lib,
     "@brief Creates a new, empty library"
   ) +
-  gsi::method ("library_by_name", &library_by_name, gsi::arg ("name"),
+  gsi::method ("library_by_name", &library_by_name, gsi::arg ("name"), gsi::arg ("for_technology", std::string (), "unspecific"),
     "@brief Gets a library by name\n"
     "Returns the library object for the given name. If the name is not a valid\n"
     "library name, nil is returned.\n"
+    "\n"
+    "Different libraries can be registered under the same names for different technologies. When a technology name is given in 'for_technologies', "
+    "the first library matching this technology is returned. If no technology is given, the first library is returned.\n"
+    "\n"
+    "The technology selector has been introduced in version 0.27."
+  ) +
+  gsi::method ("library_by_id", &library_by_id, gsi::arg ("id"),
+    "@brief Gets the library object for the given ID\n"
+    "If the ID is not valid, nil is returned.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
   ) +
   gsi::method ("library_names", &library_names,
     "@brief Returns a list of the names of all libraries registered in the system.\n"
+    "\n"
+    "NOTE: starting with version 0.27, the name of a library does not need to be unique if libraries are associated with specific technologies. "
+    "This method will only return the names and it's not possible not unambiguously derive the library object. It is recommended to use "
+    "\\library_ids and \\library_by_id to obtain the library unambiguously."
+  ) +
+  gsi::method ("library_ids", &library_ids,
+    "@brief Returns a list of valid library IDs.\n"
+    "See \\library_names for the reasoning behind this method."
+    "\n"
+    "This method has been introduced in version 0.27."
   ) +
   gsi::method_ext ("register", &register_lib, gsi::arg ("name"),
     "@brief Registers the library with the given name\n"
     "\n"
     "This method can be called in the constructor to register the library after \n"
     "the layout object has been filled with content. If a library with that name\n"
-    "already exists, it will be replaced with this library. \n"
+    "already exists for the same technologies, it will be replaced with this library. \n"
     "\n"
     "This method will set the libraries' name.\n"
+    "\n"
+    "The technology specific bahvior has been introduced in version 0.27."
   ) +
   gsi::method_ext ("delete", &delete_lib,
     "@brief Deletes the library\n"

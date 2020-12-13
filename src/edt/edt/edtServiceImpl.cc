@@ -1414,7 +1414,7 @@ InstService::make_cell (const lay::CellView &cv)
 
   lay::LayerState layer_state = view ()->layer_snapshot ();
 
-  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name);
+  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name, cv->tech_name ());
 
   //  find the layout the cell has to be looked up: that is either the layout of the current instance or 
   //  the library selected
@@ -1853,8 +1853,8 @@ InstService::switch_cell_or_pcell (bool switch_parameters)
 
   }
 
-  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name);
   const lay::CellView &cv = view ()->cellview (m_cv_index);
+  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name, cv->tech_name ());
 
   //  find the layout the cell has to be looked up: that is either the layout of the current instance or
   //  the library selected

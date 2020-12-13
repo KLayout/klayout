@@ -66,14 +66,24 @@ LibraryManager::~LibraryManager ()
 }
 
 std::pair<bool, lib_id_type> 
-LibraryManager::lib_by_name (const std::string &name) const
+LibraryManager::lib_by_name (const std::string &name, const std::set<std::string> &for_technologies) const
 {
   iterator l = m_lib_by_name.find (name);
-  if (l == m_lib_by_name.end ()) {
-    return std::make_pair (false, lib_id_type (0));
-  } else {
-    return std::make_pair (true, l->second);
+  while (l != m_lib_by_name.end () && l->first == name) {
+    bool found = true;
+    for (std::set<std::string>::const_iterator t = for_technologies.begin (); t != for_technologies.end (); ++t) {
+      if (! lib (l->second)->is_for_technology (*t)) {
+        found = false;
+        break;
+      }
+    }
+    if (found) {
+      return std::make_pair (true, l->second);
+    }
+    ++l;
   }
+
+  return std::make_pair (false, lib_id_type (0));
 }
 
 void
@@ -116,14 +126,28 @@ LibraryManager::register_lib (Library *library)
   library->set_id (id);
 
   //  if the new library replaces the old one, remap existing library proxies before deleting the library
-  lib_name_map::iterator ln = m_lib_by_name.find (library->get_name ());
-  if (ln != m_lib_by_name.end () && m_libs [ln->second]) {
-    m_libs [ln->second]->remap_to (library);
-    delete m_libs [ln->second];
-    m_libs [ln->second] = 0;
+  //  (replacement is done only when all technologies are substituted)
+  lib_name_map::iterator l = m_lib_by_name.find (library->get_name ());
+  bool found = false;
+  while (l != m_lib_by_name.end () && l->first == library->get_name ()) {
+    if (m_libs [l->second] && m_libs [l->second]->get_technologies () == library->get_technologies ()) {
+      found = true;
+      break;
+    }
+    ++l;
   }
 
-  m_lib_by_name.insert (std::make_pair (library->get_name (), id)).first->second = id;
+  if (found) {
+    //  substitute
+    m_libs [l->second]->remap_to (library);
+    delete m_libs [l->second];
+    m_libs [l->second] = 0;
+    m_lib_by_name.erase (l);
+  }
+
+  //  insert new lib as first of this name
+  l = m_lib_by_name.find (library->get_name ());
+  m_lib_by_name.insert (l, std::make_pair (library->get_name (), id));
 
   changed_event ();
 

@@ -29,6 +29,7 @@
 #include "gsiObject.h"
 #include "dbLayout.h"
 #include "tlVariant.h"
+#include "tlObject.h"
 
 namespace db
 {
@@ -327,7 +328,8 @@ public:
  *  @brief A declaration for a PCell
  */
 class DB_PUBLIC PCellDeclaration
-  : public gsi::ObjectBase
+  : public gsi::ObjectBase,
+    public tl::Object
 {
 public:
   /**

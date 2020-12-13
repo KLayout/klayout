@@ -25,6 +25,8 @@
 
 #include "laybasicCommon.h"
 
+#include "tlObject.h"
+
 #include <QWidget>
 
 namespace lay
@@ -32,19 +34,21 @@ namespace lay
 
 class PluginDeclaration;
 class Dispatcher;
+class LayoutView;
 class Plugin;
+class CellView;
 class EditorOptionsPages;
 
 /**
  *  @brief The base class for a object properties page
  */
 class LAYBASIC_PUBLIC EditorOptionsPage
-  : public QWidget
+  : public QWidget, public tl::Object
 {
 Q_OBJECT
 
 public:
-  EditorOptionsPage (lay::Dispatcher *dispatcher);
+  EditorOptionsPage (lay::LayoutView *view, lay::Dispatcher *dispatcher);
   virtual ~EditorOptionsPage ();
 
   virtual std::string title () const = 0;
@@ -72,11 +76,24 @@ protected:
     return mp_dispatcher;
   }
 
+  lay::LayoutView *view () const
+  {
+    return mp_view;
+  }
+
+  virtual void active_cellview_changed () { }
+  virtual void technology_changed (const std::string & /*tech*/) { }
+
 private:
   EditorOptionsPages *mp_owner;
   bool m_active;
   const lay::PluginDeclaration *mp_plugin_declaration;
   lay::Dispatcher *mp_dispatcher;
+  lay::LayoutView *mp_view;
+
+  void on_active_cellview_changed ();
+  void on_technology_changed ();
+  void attach_events ();
 };
 
 }

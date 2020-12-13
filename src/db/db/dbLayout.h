@@ -67,6 +67,7 @@ class Region;
 class Edges;
 class EdgePairs;
 class Texts;
+class Technology;
 class CellMapping;
 class LayerMapping;
 
@@ -555,9 +556,28 @@ public:
   }
 
   /**
-   *  @brief Clear the layout
+   *  @brief Clears the layout
    */
   void clear ();
+
+  /**
+   *  @brief Gets the technology name the layout is associated with
+   */
+  const std::string &technology_name () const
+  {
+    return m_tech_name;
+  }
+
+  /**
+   *  @brief Gets the technology object the layout is associated with or null if no valid technology is associated
+   */
+  const db::Technology *technology () const;
+
+  /**
+   *  @brief Changes the technology, the layout is associated with
+   *  Changing the layout may re-assess all the library references as libraries can be technology specific
+   */
+  void set_technology_name (const std::string &tech);
 
   /**
    *  @brief Accessor to the array repository
@@ -1779,6 +1799,7 @@ private:
   bool m_do_cleanup;
   bool m_editable;
   meta_info m_meta_info;
+  std::string m_tech_name;
   tl::Mutex m_lock;
 
   /**

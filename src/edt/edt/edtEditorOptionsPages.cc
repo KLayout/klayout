@@ -69,8 +69,8 @@ static void configure_from_line_edit (lay::Dispatcher *dispatcher, QLineEdit *le
 // ------------------------------------------------------------------
 //  EditorOptionsGeneric implementation
 
-EditorOptionsGeneric::EditorOptionsGeneric (lay::Dispatcher *dispatcher)
-  : EditorOptionsPage (dispatcher)
+EditorOptionsGeneric::EditorOptionsGeneric (lay::LayoutView *view, lay::Dispatcher *dispatcher)
+  : EditorOptionsPage (view, dispatcher)
 {
   mp_ui = new Ui::EditorOptionsGeneric ();
   mp_ui->setupUi (this);
@@ -206,8 +206,8 @@ EditorOptionsGeneric::setup (lay::Dispatcher *root)
 // ------------------------------------------------------------------
 //  EditorOptionsText implementation
 
-EditorOptionsText::EditorOptionsText (lay::Dispatcher *dispatcher)
-  : lay::EditorOptionsPage (dispatcher)
+EditorOptionsText::EditorOptionsText (lay::LayoutView *view, lay::Dispatcher *dispatcher)
+  : lay::EditorOptionsPage (view, dispatcher)
 {
   mp_ui = new Ui::EditorOptionsText ();
   mp_ui->setupUi (this);
@@ -284,8 +284,8 @@ EditorOptionsText::setup (lay::Dispatcher *root)
 // ------------------------------------------------------------------
 //  EditorOptionsPath implementation
 
-EditorOptionsPath::EditorOptionsPath (lay::Dispatcher *dispatcher)
-  : lay::EditorOptionsPage (dispatcher)
+EditorOptionsPath::EditorOptionsPath (lay::LayoutView *view, lay::Dispatcher *dispatcher)
+  : lay::EditorOptionsPage (view, dispatcher)
 {
   mp_ui = new Ui::EditorOptionsPath ();
   mp_ui->setupUi (this);
@@ -385,8 +385,8 @@ EditorOptionsPath::setup (lay::Dispatcher *root)
 // ------------------------------------------------------------------
 //  EditorOptionsInst implementation
 
-EditorOptionsInst::EditorOptionsInst (lay::Dispatcher *dispatcher)
-  : lay::EditorOptionsPage (dispatcher)
+EditorOptionsInst::EditorOptionsInst (lay::LayoutView *view, lay::Dispatcher *dispatcher)
+  : lay::EditorOptionsPage (view, dispatcher)
 {
   mp_ui = new Ui::EditorOptionsInst ();
   mp_ui->setupUi (this);
@@ -579,21 +579,35 @@ EditorOptionsInst::apply (lay::Dispatcher *root)
   root->config_set (cfg_edit_inst_place_origin, tl::to_string (place_origin));
 }
 
-void  
+void
+EditorOptionsInst::technology_changed (const std::string &)
+{
+  //  The layout's technology has changed
+  setup (dispatcher ());
+}
+
+void
+EditorOptionsInst::active_cellview_changed ()
+{
+  //  The active cellview has changed
+  setup (dispatcher ());
+}
+
+void
 EditorOptionsInst::setup (lay::Dispatcher *root)
 {
-  m_cv_index = -1;
-  if (lay::LayoutView::current ()) {
-    m_cv_index = lay::LayoutView::current ()->active_cellview_index ();
-  }
+  m_cv_index = view ()->active_cellview_index ();
 
   try {
 
     mp_ui->lib_cbx->blockSignals (true);
 
+    std::string techname;
+
     mp_ui->lib_cbx->update_list ();
     if (m_cv_index >= 0 && lay::LayoutView::current () && lay::LayoutView::current ()->cellview (m_cv_index).is_valid ()) {
-      mp_ui->lib_cbx->set_technology_filter (lay::LayoutView::current ()->cellview (m_cv_index)->tech_name (), true);
+      techname = lay::LayoutView::current ()->cellview (m_cv_index)->tech_name ();
+      mp_ui->lib_cbx->set_technology_filter (techname, true);
     } else {
       mp_ui->lib_cbx->set_technology_filter (std::string (), false);
     }
@@ -606,7 +620,7 @@ EditorOptionsInst::setup (lay::Dispatcher *root)
     //  library
     std::string l;
     root->config_get (cfg_edit_inst_lib_name, l);
-    mp_ui->lib_cbx->set_current_library (db::LibraryManager::instance ().lib_ptr_by_name (l));
+    mp_ui->lib_cbx->set_current_library (db::LibraryManager::instance ().lib_ptr_by_name (l, techname));
 
     mp_ui->lib_cbx->blockSignals (false);
     update_cell_edits ();
@@ -667,8 +681,8 @@ EditorOptionsInst::setup (lay::Dispatcher *root)
 // ------------------------------------------------------------------
 //  EditorOptionsInstPCellParam implementation
 
-EditorOptionsInstPCellParam::EditorOptionsInstPCellParam (lay::Dispatcher *dispatcher)
-  : lay::EditorOptionsPage (dispatcher), mp_pcell_parameters (0), mp_placeholder_label (0)
+EditorOptionsInstPCellParam::EditorOptionsInstPCellParam (lay::LayoutView *view, lay::Dispatcher *dispatcher)
+  : lay::EditorOptionsPage (view, dispatcher), mp_pcell_parameters (0), mp_placeholder_label (0)
 {
   mp_ui = new Ui::EditorOptionsInstPCellParam ();
   mp_ui->setupUi (this);
@@ -693,7 +707,7 @@ EditorOptionsInstPCellParam::apply (lay::Dispatcher *root)
   std::string param;
   db::Layout *layout = 0;
 
-  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name);
+  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name, view ()->active_cellview_ref ()->tech_name ());
   if (lib) {
     layout = &lib->layout ();
   } else if (m_cv_index >= 0 && lay::LayoutView::current () && lay::LayoutView::current ()->cellview (m_cv_index).is_valid ()) {
@@ -718,12 +732,15 @@ EditorOptionsInstPCellParam::apply (lay::Dispatcher *root)
 }
 
 void
+EditorOptionsInstPCellParam::technology_changed (const std::string &)
+{
+  setup (dispatcher ());
+}
+
+void
 EditorOptionsInstPCellParam::setup (lay::Dispatcher *root)
 {
-  m_cv_index = -1;
-  if (lay::LayoutView::current ()) {
-    m_cv_index = lay::LayoutView::current ()->active_cellview_index ();
-  }
+  m_cv_index = view ()->active_cellview_index ();
 
   bool needs_update = (mp_pcell_parameters == 0);
 
@@ -743,7 +760,7 @@ EditorOptionsInstPCellParam::setup (lay::Dispatcher *root)
     needs_update = true;
   }
 
-  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name);
+  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name, view ()->active_cellview_ref ()->tech_name ());
 
   //  pcell parameters
   std::string param;
@@ -752,8 +769,8 @@ EditorOptionsInstPCellParam::setup (lay::Dispatcher *root)
   db::Layout *layout = 0;
   if (lib) {
     layout = &lib->layout ();
-  } else if (m_cv_index >= 0 && lay::LayoutView::current () && lay::LayoutView::current ()->cellview (m_cv_index).is_valid ()) {
-    layout = &lay::LayoutView::current ()->cellview (m_cv_index)->layout ();
+  } else if (m_cv_index >= 0 && view ()->cellview (m_cv_index).is_valid ()) {
+    layout = &view ()->cellview (m_cv_index)->layout ();
   }
 
   std::vector<tl::Variant> pv;
@@ -820,15 +837,14 @@ void
 EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Variant> &parameters)
 {
   db::Layout *layout = 0;
-  lay::LayoutView *view = lay::LayoutView::current ();
 
   //  find the layout the cell has to be looked up: that is either the layout of the current instance or
   //  the library selected
-  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name);
+  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name, view ()->active_cellview_ref ()->tech_name ());
   if (lib) {
     layout = &lib->layout ();
-  } else if (view) {
-    const lay::CellView &cv = view->cellview (m_cv_index);
+  } else {
+    const lay::CellView &cv = view ()->cellview (m_cv_index);
     if (cv.is_valid ()) {
       layout = &cv->layout ();
     }
@@ -856,10 +872,10 @@ EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Var
   mp_pcell_parameters = 0;
   mp_placeholder_label = 0;
 
-  if (pc.first && layout->pcell_declaration (pc.second) && view && view->cellview (m_cv_index).is_valid ()) {
+  if (pc.first && layout->pcell_declaration (pc.second) && view ()->cellview (m_cv_index).is_valid ()) {
 
     mp_pcell_parameters = new PCellParametersPage (this, true /*dense*/);
-    mp_pcell_parameters->setup (&view->cellview (m_cv_index)->layout (), view, m_cv_index, layout->pcell_declaration (pc.second), parameters);
+    mp_pcell_parameters->setup (&view ()->cellview (m_cv_index)->layout (), view (), m_cv_index, layout->pcell_declaration (pc.second), parameters);
     this->layout ()->addWidget (mp_pcell_parameters);
 
     mp_pcell_parameters->set_state (pcp_state);

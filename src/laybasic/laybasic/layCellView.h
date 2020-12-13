@@ -115,10 +115,7 @@ public:
    *
    *  An empty name indicates the default technology should be used.
    */
-  const std::string &tech_name () const
-  {
-    return m_tech_name;
-  }
+  const std::string &tech_name () const;
 
   /**
    *  @brief Applies the given technology
@@ -300,7 +297,6 @@ private:
   int m_ref_count;
   std::string m_name;
   std::string m_filename;
-  std::string m_tech_name;
   bool m_dirty;
   db::SaveLayoutOptions m_save_options;
   bool m_save_options_valid;

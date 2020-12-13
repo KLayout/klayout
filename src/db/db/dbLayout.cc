@@ -24,6 +24,7 @@
 #include "dbLayout.h"
 #include "dbMemStatistics.h"
 #include "dbTrans.h"
+#include "dbTechnology.h"
 #include "dbShapeRepository.h"
 #include "dbPCellHeader.h"
 #include "dbPCellVariant.h"
@@ -440,6 +441,152 @@ Layout::operator= (const Layout &d)
 
   }
   return *this;
+}
+
+const db::Technology *
+Layout::technology () const
+{
+  return db::Technologies::instance ()->technology_by_name (m_tech_name);
+}
+
+void
+Layout::set_technology_name (const std::string &tech)
+{
+  if (tech == m_tech_name) {
+    return;
+  }
+
+  //  determine which library to map to what
+  std::map<db::lib_id_type, db::lib_id_type> mapping;
+  std::set<db::lib_id_type> seen;
+
+  for (db::Layout::iterator c = begin (); c != end (); ++c) {
+
+    db::LibraryProxy *lib_proxy = dynamic_cast<db::LibraryProxy *> (&*c);
+    if (lib_proxy && seen.find (lib_proxy->lib_id ()) == seen.end ()) {
+
+      seen.insert (lib_proxy->lib_id ());
+
+      std::pair<bool, db::lib_id_type> new_id (false, 0);
+      const db::Library *l = db::LibraryManager::instance ().lib (lib_proxy->lib_id ());
+      if (l) {
+        new_id = db::LibraryManager::instance ().lib_by_name (l->get_name (), tech);
+      }
+
+      if (new_id.first && new_id.second != l->get_id ()) {
+        mapping.insert (std::make_pair (l->get_id (), new_id.second));
+      }
+
+    }
+
+  }
+
+  if (mapping.empty ()) {
+
+    bool needs_cleanup = false;
+
+    std::vector<std::pair<db::LibraryProxy *, db::PCellVariant *> > pcells_to_map;
+    std::vector<db::LibraryProxy *> lib_cells_to_map;
+
+    for (db::Layout::iterator c = begin (); c != end (); ++c) {
+
+      std::map<db::lib_id_type, db::lib_id_type>::const_iterator m;
+
+      db::LibraryProxy *lib_proxy = dynamic_cast<db::LibraryProxy *> (&*c);
+      if (lib_proxy && (m = mapping.find (lib_proxy->lib_id ())) != mapping.end ()) {
+
+        db::Cell *lib_cell = &cell (lib_proxy->library_cell_index ());
+        db::PCellVariant *lib_pcell = dynamic_cast <db::PCellVariant *> (lib_cell);
+        if (lib_pcell) {
+          pcells_to_map.push_back (std::make_pair (lib_proxy, lib_pcell));
+        } else {
+          lib_cells_to_map.push_back (lib_proxy);
+        }
+
+        needs_cleanup = true;
+
+      }
+
+    }
+
+    //  We do PCell resolution before the library proxy resolution. The reason is that
+    //  PCells may generate library proxies in their instantiation. Hence we must instantiate
+    //  the PCells before we can resolve them.
+    for (std::vector<std::pair<db::LibraryProxy *, db::PCellVariant *> >::const_iterator lp = pcells_to_map.begin (); lp != pcells_to_map.end (); ++lp) {
+
+      db::cell_index_type ci = lp->first->Cell::cell_index ();
+      db::PCellVariant *lib_pcell = lp->second;
+
+      std::pair<bool, pcell_id_type> pn = lib_pcell->layout ()->pcell_by_name (lp->first->get_basic_name ().c_str ());
+
+      if (! pn.first) {
+
+        //  substitute by static layout cell
+        //  @@@ TODO: keep reference so we don't loose the connection immediately.
+        std::string name = cell_name (ci);
+        db::Cell *old_cell = take_cell (ci);
+        insert_cell (ci, name, new db::Cell (*old_cell));
+        delete old_cell;
+
+      } else {
+
+        db::Library *new_lib = db::LibraryManager::instance ().lib (mapping [lp->first->lib_id ()]);
+
+        const db::PCellDeclaration *old_pcell_decl = lib_pcell->layout ()->pcell_declaration (lib_pcell->pcell_id ());
+        const db::PCellDeclaration *new_pcell_decl = new_lib->layout ().pcell_declaration (pn.second);
+        if (! old_pcell_decl || ! new_pcell_decl) {
+
+          //  substitute by static layout cell
+          //  @@@ TODO: keep reference so we don't loose the connection immediately.
+          std::string name = cell_name (ci);
+          db::Cell *old_cell = take_cell (ci);
+          insert_cell (ci, name, new db::Cell (*old_cell));
+          delete old_cell;
+
+        } else {
+
+          //  map pcell parameters by name
+          std::map<std::string, tl::Variant> param_by_name = lib_pcell->parameters_by_name ();
+          lp->first->remap (new_lib->get_id (), new_lib->layout ().get_pcell_variant (pn.second, new_pcell_decl->map_parameters (param_by_name)));
+
+        }
+
+      }
+
+    }
+
+    for (std::vector<db::LibraryProxy *>::const_iterator lp = lib_cells_to_map.begin (); lp != lib_cells_to_map.end (); ++lp) {
+
+      db::Library *new_lib = db::LibraryManager::instance ().lib (mapping [(*lp)->lib_id ()]);
+
+      db::cell_index_type ci = (*lp)->Cell::cell_index ();
+
+      std::pair<bool, cell_index_type> cn = new_lib->layout ().cell_by_name ((*lp)->get_basic_name ().c_str ());
+
+      if (! cn.first) {
+
+        //  unlink this proxy: substitute by static layout cell
+        //  @@@ TODO: keep reference so we don't loose the connection immediately.
+        std::string name = cell_name (ci);
+        db::Cell *old_cell = take_cell (ci);
+        insert_cell (ci, name, new db::Cell (*old_cell));
+        delete old_cell;
+
+      } else {
+
+        (*lp)->remap (new_lib->get_id (), cn.second);
+
+      }
+
+    }
+
+    if (needs_cleanup) {
+      cleanup ();
+    }
+
+  }
+
+  m_tech_name = tech;
 }
 
 void
@@ -2224,7 +2371,7 @@ Layout::recover_proxy_as (cell_index_type cell_index, std::vector <std::string>:
   if (ex.test ("LIB=")) {
 
     std::string lib_name = ex.skip ();
-    Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (lib_name);
+    Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (lib_name, m_tech_name);
     if (! lib) {
       return false;
     }
@@ -2284,7 +2431,7 @@ Layout::recover_proxy (std::vector <std::string>::const_iterator from, std::vect
   if (ex.test ("LIB=")) {
 
     std::string lib_name = ex.skip ();
-    Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (lib_name);
+    Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (lib_name, m_tech_name);
     if (! lib) {
       return 0;
     }

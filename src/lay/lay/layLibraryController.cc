@@ -122,7 +122,7 @@ LibraryController::sync_files ()
     m_file_watcher->enable (false);
   }
 
-  std::map<std::string, std::pair<std::string, QDateTime> > new_lib_files;
+  std::map<std::string, LibInfo> new_lib_files;
 
   //  build a list of paths vs. technology
   std::vector<std::pair<std::string, std::string> > paths;
@@ -174,11 +174,11 @@ LibraryController::sync_files ()
           QFileInfo fi (tl::to_qstring (lib_path));
 
           bool needs_load = false;
-          std::map<std::string, std::pair<std::string, QDateTime> >::iterator ll = m_lib_files.find (lib_path);
+          std::map<std::string, LibInfo>::iterator ll = m_lib_files.find (lib_path);
           if (ll == m_lib_files.end ()) {
             needs_load = true;
           } else {
-            if (fi.lastModified () > ll->second.second) {
+            if (fi.lastModified () > ll->second.time) {
               needs_load = true;
             } else {
               new_lib_files.insert (*ll);
@@ -189,7 +189,9 @@ LibraryController::sync_files ()
 
             std::auto_ptr<db::Library> lib (new db::Library ());
             lib->set_description (filename);
-            lib->set_technology (p->second);
+            if (! p->second.empty ()) {
+              lib->set_technology (p->second);
+            }
             lib->set_name (tl::to_string (QFileInfo (*im).baseName ()));
 
             tl::log << "Reading library '" << lib_path << "'";
@@ -205,8 +207,19 @@ LibraryController::sync_files ()
               }
             }
 
-            tl::log << "Registering as '" << lib->get_name () << "' for tech '" << p->second << "'";
-            new_lib_files.insert (std::make_pair (lib_path, std::make_pair (lib->get_name (), fi.lastModified ())));
+            if (! p->second.empty ()) {
+              tl::log << "Registering as '" << lib->get_name () << "' for tech '" << p->second << "'";
+            } else {
+              tl::log << "Registering as '" << lib->get_name () << "'";
+            }
+
+            LibInfo li;
+            li.name = lib->get_name ();
+            li.time = fi.lastModified ();
+            if (! p->second.empty ()) {
+              li.tech.insert (p->second);
+            }
+            new_lib_files.insert (std::make_pair (lib_path, li));
 
             db::LibraryManager::instance ().register_lib (lib.release ());
 
@@ -230,14 +243,14 @@ LibraryController::sync_files ()
 
   std::set<std::string> new_names;
 
-  for (std::map<std::string, std::pair<std::string, QDateTime> >::const_iterator lf = new_lib_files.begin (); lf != new_lib_files.end (); ++lf) {
-    new_names.insert (lf->second.first);
+  for (std::map<std::string, LibInfo>::const_iterator lf = new_lib_files.begin (); lf != new_lib_files.end (); ++lf) {
+    new_names.insert (lf->second.name);
   }
 
-  for (std::map<std::string, std::pair<std::string, QDateTime> >::const_iterator lf = m_lib_files.begin (); lf != m_lib_files.end (); ++lf) {
-    if (new_names.find (lf->second.first) == new_names.end ()) {
+  for (std::map<std::string, LibInfo>::const_iterator lf = m_lib_files.begin (); lf != m_lib_files.end (); ++lf) {
+    if (new_names.find (lf->second.name) == new_names.end ()) {
       try {
-        std::pair<bool, db::lib_id_type> li = db::LibraryManager::instance ().lib_by_name (lf->second.first);
+        std::pair<bool, db::lib_id_type> li = db::LibraryManager::instance ().lib_by_name (lf->second.name, lf->second.tech);
         if (li.first) {
           db::LibraryManager::instance ().delete_lib (db::LibraryManager::instance ().lib (li.second));
         }

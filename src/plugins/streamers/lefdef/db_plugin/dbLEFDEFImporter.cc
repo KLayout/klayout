@@ -43,11 +43,7 @@ std::string correct_path (const std::string &fn, const db::Layout &layout, const
 
     //  if a technology is given and the file can be found in the technology's base path, take it
     //  from there.
-    std::string tn = layout.meta_info_value ("technology");
-    const db::Technology *tech = 0;
-    if (! tn.empty ()) {
-      tech = db::Technologies::instance ()->technology_by_name (tn);
-    }
+    const db::Technology *tech = layout.technology ();
 
     if (tech && ! tech->base_path ().empty ()) {
       std::string new_fn = tl::combine_path (tech->base_path (), fn);

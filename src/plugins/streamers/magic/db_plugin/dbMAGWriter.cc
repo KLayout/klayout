@@ -122,7 +122,7 @@ MAGWriter::write_dummmy_top (const std::set<db::cell_index_type> &cell_set, cons
 
   std::string tech = m_options.tech;
   if (tech.empty ()) {
-    tech = layout.meta_info_value ("technology");
+    tech = layout.technology_name ();
   }
   if (! tech.empty ()) {
     os << "tech " << make_string (tl::to_lower_case (tech)) << "\n";
@@ -177,7 +177,7 @@ MAGWriter::do_write_cell (db::cell_index_type ci, const std::vector <std::pair <
 
   std::string tech = m_options.tech;
   if (tech.empty ()) {
-    tech = layout.meta_info_value ("technology");
+    tech = layout.technology_name ();
   }
   if (! tech.empty ()) {
     os << "tech " << make_string (tl::to_lower_case (tech)) << "\n";

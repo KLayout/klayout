@@ -74,11 +74,7 @@ MAGReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 {
   prepare_layers ();
 
-  mp_klayout_tech = 0;
-  std::string klayout_tech_name = layout.meta_info_value ("technology");
-  if (! klayout_tech_name.empty () && db::Technologies::instance ()->has_technology (klayout_tech_name)) {
-    mp_klayout_tech = db::Technologies::instance ()->technology_by_name (klayout_tech_name);
-  }
+  mp_klayout_tech = layout.technology ();
 
   const db::MAGReaderOptions &specific_options = options.get_options<db::MAGReaderOptions> ();
   m_lambda = specific_options.lambda;

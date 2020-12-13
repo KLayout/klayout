@@ -192,6 +192,7 @@ Library::remap_to (db::Library *other)
       if (! pn.first) {
 
         //  substitute by static layout cell
+        //  @@@ TODO: keep reference so we don't loose the connection immediately.
         std::string name = r->first->cell_name (ci);
         db::Cell *old_cell = r->first->take_cell (ci);
         r->first->insert_cell (ci, name, new db::Cell (*old_cell));
@@ -204,6 +205,7 @@ Library::remap_to (db::Library *other)
         if (! old_pcell_decl || ! new_pcell_decl) {
 
           //  substitute by static layout cell
+          //  @@@ TODO: keep reference so we don't loose the connection immediately.
           std::string name = r->first->cell_name (ci);
           db::Cell *old_cell = r->first->take_cell (ci);
           r->first->insert_cell (ci, name, new db::Cell (*old_cell));
@@ -233,6 +235,7 @@ Library::remap_to (db::Library *other)
       if (! cn.first) {
 
         //  unlink this proxy: substitute by static layout cell
+        //  @@@ TODO: keep reference so we don't loose the connection immediately.
         std::string name = r->first->cell_name (ci);
         db::Cell *old_cell = r->first->take_cell (ci);
         r->first->insert_cell (ci, name, new db::Cell (*old_cell));

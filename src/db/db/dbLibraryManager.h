@@ -33,6 +33,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <set>
 
 namespace db
 {
@@ -50,7 +51,7 @@ class Library;
 class DB_PUBLIC LibraryManager
 {
 public:
-  typedef std::map <std::string, lib_id_type> lib_name_map;
+  typedef std::multimap <std::string, lib_id_type> lib_name_map;
   typedef lib_name_map::const_iterator iterator;
 
   /** 
@@ -90,11 +91,41 @@ public:
   }
 
   /**
-   *  @brief Get the library by name
+   *  @brief Get the library by name which is valid for all given technologies
+   *
+   *  This method looks up a library which is valid for all technologies listed in "for_technologies". It may be
+   *  responsible for more than that too.
    *
    *  @return A pair, the boolean is true, if the name is valid. The second member is the library id.
    */
-  std::pair<bool, lib_id_type> lib_by_name (const std::string &name) const;
+  std::pair<bool, lib_id_type> lib_by_name (const std::string &name, const std::set<std::string> &for_technologies) const;
+
+  /**
+   *  @brief Get the library by name which is valid for the given technology
+   *
+   *  This method looks up a library which is valid for the given technology. It may be
+   *  responsible for more than that too.
+   *
+   *  @return A pair, the boolean is true, if the name is valid. The second member is the library id.
+   */
+  std::pair<bool, lib_id_type> lib_by_name (const std::string &name, const std::string &for_technology) const
+  {
+    std::set<std::string> techs;
+    if (! for_technology.empty ()) {
+      techs.insert (for_technology);
+    }
+    return lib_by_name (name, techs);
+  }
+
+  /**
+   *  @brief Get the library by name for any technology
+   *
+   *  @return A pair, the boolean is true, if the name is valid. The second member is the library id.
+   */
+  std::pair<bool, lib_id_type> lib_by_name (const std::string &name) const
+  {
+    return lib_by_name (name, std::set<std::string> ());
+  }
 
   /**
    *  @brief Get the library by name
@@ -104,6 +135,36 @@ public:
   Library *lib_ptr_by_name (const std::string &name) const
   {
     std::pair<bool, lib_id_type> ll = lib_by_name (name);
+    if (ll.first) {
+      return lib (ll.second);
+    } else {
+      return 0;
+    }
+  }
+
+  /**
+   *  @brief Get the library by name and technology
+   *
+   *  @return The pointer to the library or 0, if there is no library with that name.
+   */
+  Library *lib_ptr_by_name (const std::string &name, const std::string &for_technology) const
+  {
+    std::pair<bool, lib_id_type> ll = lib_by_name (name, for_technology);
+    if (ll.first) {
+      return lib (ll.second);
+    } else {
+      return 0;
+    }
+  }
+
+  /**
+   *  @brief Get the library by name and technology
+   *
+   *  @return The pointer to the library or 0, if there is no library with that name.
+   */
+  Library *lib_ptr_by_name (const std::string &name, const std::set<std::string> &for_technologies) const
+  {
+    std::pair<bool, lib_id_type> ll = lib_by_name (name, for_technologies);
     if (ll.first) {
       return lib (ll.second);
     } else {

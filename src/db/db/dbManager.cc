@@ -156,15 +156,13 @@ Manager::cancel ()
     m_opened = false;
 
     if (m_current->first.begin () != m_current->first.end ()) {
-
       ++m_current;
       undo ();
-
-    } else {
-      //  empty transactions .. just delete
-      erase_transactions (m_current, m_transactions.end ());
-      m_current = m_transactions.end ();
     }
+
+    //  wipe following history as we don't want the cancelled operation to be redoable
+    erase_transactions (m_current, m_transactions.end ());
+    m_current = m_transactions.end ();
 
   }
 }

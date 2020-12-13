@@ -59,6 +59,8 @@ LayoutHandle::LayoutHandle (db::Layout *layout, const std::string &filename)
     m_dirty (false),
     m_save_options_valid (false)
 {
+  layout->technology_changed_event.add (this, &LayoutHandle::on_technology_changed);
+
   //  layouts in the managed layouts space participate in spare proxy cleanup
   layout->do_cleanup (true);
 
@@ -106,6 +108,12 @@ LayoutHandle::~LayoutHandle ()
   }
 
   file_watcher ().remove_file (filename ());
+}
+
+void
+LayoutHandle::on_technology_changed ()
+{
+  technology_changed_event ();
 }
 
 void 
@@ -232,7 +240,6 @@ LayoutHandle::set_tech_name (const std::string &tn)
 {
   if (mp_layout && tn != tech_name ()) {
     mp_layout->set_technology_name (tn);
-    technology_changed_event ();
   }
 }
 

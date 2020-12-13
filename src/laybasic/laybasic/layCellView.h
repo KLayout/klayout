@@ -302,6 +302,8 @@ private:
   bool m_save_options_valid;
   db::LoadLayoutOptions m_load_options;
 
+  void on_technology_changed ();
+
   static std::map <std::string, LayoutHandle *> ms_dict;
   static tl::FileSystemWatcher *mp_file_watcher;
 };

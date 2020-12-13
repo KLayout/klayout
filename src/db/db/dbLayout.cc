@@ -86,6 +86,27 @@ private:
   db::properties_id_type m_from, m_to;
 };
 
+struct SetLayoutTechName
+  : public LayoutOp
+{
+  SetLayoutTechName (const std::string &from, const std::string &to)
+    : m_from (from), m_to (to)
+  { }
+
+  virtual void redo (db::Layout *layout) const
+  {
+    layout->set_technology_name_without_update (m_to);
+  }
+
+  virtual void undo (db::Layout *layout) const
+  {
+    layout->set_technology_name_without_update (m_from);
+  }
+
+private:
+  std::string m_from, m_to;
+};
+
 struct SetLayoutDBU
   : public LayoutOp
 {
@@ -510,6 +531,18 @@ Layout::technology () const
 }
 
 void
+Layout::set_technology_name_without_update (const std::string &tech)
+{
+  if (tech != m_tech_name) {
+    if (manager () && manager ()->transacting ()) {
+      manager ()->queue (this, new SetLayoutTechName (m_tech_name, tech));
+    }
+    m_tech_name = tech;
+    technology_changed_event ();
+  }
+}
+
+void
 Layout::set_technology_name (const std::string &tech)
 {
   if (tech == m_tech_name) {
@@ -666,7 +699,7 @@ Layout::set_technology_name (const std::string &tech)
 
   }
 
-  m_tech_name = tech;
+  set_technology_name_without_update (tech);
 
   //  we may have re-established a connection for pending ("cold") proxies so we can try to restore them
   restore_proxies ();
@@ -2043,9 +2076,20 @@ Layout::replace_cell (cell_index_type target_cell_index, db::Cell *new_cell, boo
     }
   }
 
-  m_cells.erase (iterator (old_cell));
+  if (manager () && manager ()->transacting ()) {
+    //  note the "take" method - this takes out the cell but does not delete it (we need it inside undo)
+    m_cells.take (iterator (old_cell));
+    manager ()->queue (this, new NewRemoveCellOp (target_cell_index, cell_name (target_cell_index), true /*remove*/, old_cell));
+  } else {
+    m_cells.erase (iterator (old_cell));
+  }
+
   m_cells.push_back_ptr (new_cell);
   m_cell_ptrs [target_cell_index] = new_cell;
+
+  if (manager () && manager ()->transacting ()) {
+    manager ()->queue (this, new NewRemoveCellOp (target_cell_index, m_cell_names [target_cell_index], false /*new*/, 0));
+  }
 }
 
 void 
@@ -2060,7 +2104,6 @@ Layout::get_pcell_variant_as (pcell_id_type pcell_id, const std::vector<tl::Vari
   //  this variant must not exist yet for "get as" semantics
   tl_assert (header->get_variant (*this, parameters) == 0);
 
-  tl_assert (! (manager () && manager ()->transacting ()));
   tl_assert (m_cell_ptrs [target_cell_index] != 0);
  
   pcell_variant_type *variant = new pcell_variant_type (target_cell_index, *this, pcell_id, parameters);
@@ -2628,7 +2671,6 @@ Layout::unregister_lib_proxy (db::LibraryProxy *lib_proxy)
 void
 Layout::get_lib_proxy_as (Library *lib, cell_index_type cell_index, cell_index_type target_cell_index, ImportLayerMapping *layer_mapping, bool retain_layout)
 {
-  tl_assert (! (manager () && manager ()->transacting ()));
   tl_assert (m_cell_ptrs [target_cell_index] != 0);
  
   LibraryProxy *proxy = new LibraryProxy (target_cell_index, *this, lib->get_id (), cell_index);
@@ -2710,7 +2752,6 @@ Layout::create_cold_proxy (const db::ProxyContextInfo &info)
 void
 Layout::create_cold_proxy_as (const db::ProxyContextInfo &info, cell_index_type target_cell_index)
 {
-  tl_assert (! (manager () && manager ()->transacting ()));
   tl_assert (m_cell_ptrs [target_cell_index] != 0);
 
   ColdProxy *proxy = new ColdProxy (target_cell_index, *this, info);

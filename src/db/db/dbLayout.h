@@ -594,6 +594,13 @@ public:
   void set_technology_name (const std::string &tech);
 
   /**
+   *  @brief Changes the technology name
+   *  This method will only change the technology name, but does not re-assess the library links.
+   *  It's provided mainly to support undo/redo and testing.
+   */
+  void set_technology_name_without_update (const std::string &tech);
+
+  /**
    *  @brief Accessor to the array repository
    */
   ArrayRepository &array_repository ()
@@ -1815,6 +1822,11 @@ public:
    *  If no object with that name exists, an empty string is returned
    */
   const std::string &meta_info_value (const std::string &name) const;
+
+  /**
+   *  @brief This event is triggered when the technology changes
+   */
+  tl::Event technology_changed_event;
 
 protected:
   /**

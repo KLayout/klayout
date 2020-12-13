@@ -69,19 +69,25 @@ LibraryManager::~LibraryManager ()
 std::pair<bool, lib_id_type> 
 LibraryManager::lib_by_name (const std::string &name, const std::set<std::string> &for_technologies) const
 {
-  iterator l = m_lib_by_name.find (name);
-  while (l != m_lib_by_name.end () && l->first == name) {
-    const db::Library *lptr = lib (l->second);
-    bool found = lptr->for_technologies ();
-    for (std::set<std::string>::const_iterator t = for_technologies.begin (); t != for_technologies.end () && found; ++t) {
-      if (! lptr->is_for_technology (*t)) {
-        found = false;
+  iterator l;
+
+  if (! for_technologies.empty ()) {
+
+    l = m_lib_by_name.find (name);
+    while (l != m_lib_by_name.end () && l->first == name) {
+      const db::Library *lptr = lib (l->second);
+      bool found = lptr->for_technologies ();
+      for (std::set<std::string>::const_iterator t = for_technologies.begin (); t != for_technologies.end () && found; ++t) {
+        if (! lptr->is_for_technology (*t)) {
+          found = false;
+        }
       }
+      if (found) {
+        return std::make_pair (true, l->second);
+      }
+      ++l;
     }
-    if (found) {
-      return std::make_pair (true, l->second);
-    }
-    ++l;
+
   }
 
   //  fallback: technology-unspecific libs

@@ -77,9 +77,9 @@ std::string
 ColdProxy::get_basic_name () const
 {
   if (! mp_context_info->pcell_name.empty ()) {
-    return "<defunc>" + mp_context_info->pcell_name;
+    return "<defunct>" + mp_context_info->pcell_name;
   } else if (! mp_context_info->cell_name.empty ()) {
-    return "<defunc>" + mp_context_info->cell_name;
+    return "<defunct>" + mp_context_info->cell_name;
   } else {
     return Cell::get_basic_name ();
   }

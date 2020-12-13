@@ -519,6 +519,7 @@ Layout::set_technology_name (const std::string &tech)
   //  determine which library to map to what
   std::map<db::lib_id_type, db::lib_id_type> mapping;
   std::set<db::lib_id_type> seen;
+  std::set<db::lib_id_type> lost;
 
   for (db::Layout::iterator c = begin (); c != end (); ++c) {
 
@@ -535,25 +536,32 @@ Layout::set_technology_name (const std::string &tech)
 
       if (new_id.first && new_id.second != l->get_id ()) {
         mapping.insert (std::make_pair (l->get_id (), new_id.second));
+      } else if (! new_id.first) {
+        lost.insert (lib_proxy->lib_id ());
       }
 
     }
 
   }
 
-  if (! mapping.empty ()) {
+  if (! mapping.empty () || ! lost.empty ()) {
 
     bool needs_cleanup = false;
 
     std::vector<std::pair<db::LibraryProxy *, db::PCellVariant *> > pcells_to_map;
     std::vector<db::LibraryProxy *> lib_cells_to_map;
+    std::vector<db::LibraryProxy *> lib_cells_lost;
 
     for (db::Layout::iterator c = begin (); c != end (); ++c) {
 
       std::map<db::lib_id_type, db::lib_id_type>::const_iterator m;
 
       db::LibraryProxy *lib_proxy = dynamic_cast<db::LibraryProxy *> (&*c);
-      if (lib_proxy && (m = mapping.find (lib_proxy->lib_id ())) != mapping.end ()) {
+      if (! lib_proxy) {
+        continue;
+      }
+
+      if ((m = mapping.find (lib_proxy->lib_id ())) != mapping.end ()) {
 
         db::Library *lib = db::LibraryManager::instance ().lib (lib_proxy->lib_id ());
         db::Cell *lib_cell = &lib->layout ().cell (lib_proxy->library_cell_index ());
@@ -563,6 +571,12 @@ Layout::set_technology_name (const std::string &tech)
         } else {
           lib_cells_to_map.push_back (lib_proxy);
         }
+
+        needs_cleanup = true;
+
+      } else if (lost.find (lib_proxy->lib_id ()) != lost.end ()) {
+
+        lib_cells_lost.push_back (lib_proxy);
 
         needs_cleanup = true;
 
@@ -632,6 +646,17 @@ Layout::set_technology_name (const std::string &tech)
         (*lp)->remap (new_lib->get_id (), cn.second);
 
       }
+
+    }
+
+    for (std::vector<db::LibraryProxy *>::const_iterator lp = lib_cells_lost.begin (); lp != lib_cells_lost.end (); ++lp) {
+
+      db::cell_index_type ci = (*lp)->Cell::cell_index ();
+
+      //  substitute by a cold proxy
+      db::ProxyContextInfo info;
+      get_context_info (ci, info);
+      create_cold_proxy_as (info, ci);
 
     }
 

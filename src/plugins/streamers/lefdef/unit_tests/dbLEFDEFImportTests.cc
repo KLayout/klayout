@@ -719,6 +719,11 @@ TEST(117_mapfile_all)
   )
 }
 
+TEST(118_density)
+{
+  run_test (_this, "density", "read:in.lef", "au.oas.gz", default_options (), false);
+}
+
 TEST(200_lefdef_plugin)
 {
   db::Layout ly;
@@ -764,3 +769,4 @@ TEST(201_lefdef_plugin_explicit_lef)
 
   db::compare_layouts (_this, ly, fn_path + "au_plugin_alt_lef.oas.gz", db::WriteOAS);
 }
+

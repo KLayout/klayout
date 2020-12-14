@@ -147,13 +147,20 @@ Manager::last_transaction_id () const
 void
 Manager::cancel ()
 {
+  //  equivalent to commit and undo. But takes care that an empty commit is not followed by undo
+  //  (which would undo the previous transaction!)
   if (m_enabled) {
 
-    //  commit and undo - revert changes done so far
-    commit ();
-    undo ();
+    tl_assert (m_opened);
+    tl_assert (! m_replay);
+    m_opened = false;
 
-    //  delete all following transactions
+    if (m_current->first.begin () != m_current->first.end ()) {
+      ++m_current;
+      undo ();
+    }
+
+    //  wipe following history as we don't want the cancelled operation to be redoable
     erase_transactions (m_current, m_transactions.end ());
     m_current = m_transactions.end ();
 

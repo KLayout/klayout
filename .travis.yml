@@ -162,37 +162,6 @@ matrix:
         directories:
         - ccache
 
-    - name: "cp34-cp34m-manylinux1_x86_64.whl"
-      os: linux
-      sudo: true
-      language: python
-      python: '3.4'
-      services:
-        - docker
-      env:
-        - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
-        - PY_VERSION="cp34-cp34m"
-        - DOCKER_BUILD=true
-        - TEST_IN_HOST=true
-        - MATRIX_EVAL=""
-      cache:
-        directories:
-        - ccache
-
-    - name: "cp34-cp34m-manylinux1_i686.whl"
-      os: linux
-      sudo: true
-      services:
-        - docker
-      env:
-        - DOCKER_IMAGE="quay.io/pypa/manylinux1_i686"
-        - PY_VERSION="cp34-cp34m"
-        - DOCKER_BUILD=true
-        - MATRIX_EVAL=""
-      cache:
-        directories:
-        - ccache
-
     - name: "cp27-cp27mu-manylinux1_x86_64.whl"
       os: linux
       sudo: true
@@ -255,6 +224,229 @@ matrix:
         directories:
         - ccache
 
+    # python 3 osx
+    
+    # MacOS 10.15
+
+    # MacOS 10.15, Python 3.9
+    - name: "cp39-cp39m-macosx_10_15_x86_64.whl"
+      os: osx
+      osx_image: xcode12  # macOS 10.15
+      cache:
+        directories:
+        - ccache
+      addons:
+        homebrew:
+          packages:
+            - python@3.9
+            - ccache
+          update: true
+      env:
+        - MATRIX_EVAL="shopt -s expand_aliases; alias python='/usr/local/opt/python@3.9/bin/python3'; alias pip='/usr/local/opt/python@3.9/bin/pip3';"
+        - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
+        - PYTHON_BUILD=true
+
+    # MacOS 10.15, Python 3.8
+    - name: "cp38-cp38m-macosx_10_15_x86_64.whl"
+      os: osx
+      osx_image: xcode12  # macOS 10.15
+      cache:
+        directories:
+        - ccache
+      addons:
+        homebrew:
+          packages:
+            - python@3.8
+            - ccache
+          update: true
+      env:
+        - MATRIX_EVAL="shopt -s expand_aliases; alias python='/usr/local/opt/python@3.8/bin/python3'; alias pip='/usr/local/opt/python@3.8/bin/pip3';"
+        - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
+        - PYTHON_BUILD=true
+
+    # MacOS 10.15, Python 3.7
+    - name: "cp37-cp37m-macosx_10_15_x86_64.whl"
+      os: osx
+      osx_image: xcode12  # macOS 10.15
+      cache:
+        directories:
+        - ccache
+      addons:
+        homebrew:
+          packages:
+            - python@3.7
+            - ccache
+          update: true
+      env:
+        - MATRIX_EVAL="shopt -s expand_aliases; alias python='/usr/local/opt/python@3.7/bin/python3'; alias pip='/usr/local/opt/python@3.7/bin/pip3';"
+        - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
+        - PYTHON_BUILD=true
+
+    # MacOS 10.14
+
+    # MacOS 10.14, Python 3.9
+    - name: "cp39-cp39m-macosx_10_14_x86_64.whl"
+      os: osx
+      osx_image: xcode11  # macOS 10.14
+      cache:
+        directories:
+        - ccache
+      addons:
+        homebrew:
+          packages:
+            - python@3.9
+            - ccache
+          update: true
+      env:
+        - MATRIX_EVAL="shopt -s expand_aliases; alias python='/usr/local/opt/python@3.9/bin/python3'; alias pip='/usr/local/opt/python@3.9/bin/pip3';"
+        - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
+        - PYTHON_BUILD=true
+
+    # MacOS 10.14, Python 3.8
+    - name: "cp38-cp38m-macosx_10_14_x86_64.whl"
+      os: osx
+      osx_image: xcode11  # macOS 10.14
+      cache:
+        directories:
+        - ccache
+      addons:
+        homebrew:
+          packages:
+            - python@3.8
+            - ccache
+          update: true
+      env:
+        - MATRIX_EVAL="shopt -s expand_aliases; alias python='/usr/local/opt/python@3.8/bin/python3'; alias pip='/usr/local/opt/python@3.8/bin/pip3';"
+        - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
+        - PYTHON_BUILD=true
+
+    # MacOS 10.14, Python 3.7
+    - name: "cp37-cp37m-macosx_10_14_x86_64.whl"
+      os: osx
+      osx_image: xcode11  # macOS 10.14
+      cache:
+        directories:
+        - ccache
+      addons:
+        homebrew:
+          packages:
+            - python@3.7
+            - ccache
+          update: true
+      env:
+        - MATRIX_EVAL="shopt -s expand_aliases; alias python='/usr/local/opt/python@3.7/bin/python3'; alias pip='/usr/local/opt/python@3.7/bin/pip3';"
+        - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
+        - PYTHON_BUILD=true
+
+    # MacOS 10.13
+
+    # MacOS 10.13, Python 3.9
+    - name: "cp39-cp39m-macosx_10_13_x86_64.whl"
+      os: osx
+      osx_image: xcode10.1  # macOS 10.13
+      cache:
+        directories:
+        - ccache
+      addons:
+        homebrew:
+          packages:
+            - python@3.9
+            - ccache
+          update: true
+      env:
+        - MATRIX_EVAL="shopt -s expand_aliases; alias python='/usr/local/opt/python@3.9/bin/python3'; alias pip='/usr/local/opt/python@3.9/bin/pip3';"
+        - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
+        - PYTHON_BUILD=true
+
+    # MacOS 10.13, Python 3.8
+    - name: "cp38-cp38m-macosx_10_13_x86_64.whl"
+      os: osx
+      osx_image: xcode10.1  # macOS 10.13
+      cache:
+        directories:
+        - ccache
+      addons:
+        homebrew:
+          packages:
+            - python@3.8
+            - ccache
+          update: true
+      env:
+        - MATRIX_EVAL="shopt -s expand_aliases; alias python='/usr/local/opt/python@3.8/bin/python3'; alias pip='/usr/local/opt/python@3.8/bin/pip3';"
+        - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
+        - PYTHON_BUILD=true
+
+    # MacOS 10.13, Python 3.7
+    - name: "cp37-cp37m-macosx_10_13_x86_64.whl"
+      os: osx
+      osx_image: xcode10.1  # macOS 10.13
+      cache:
+        directories:
+        - ccache
+      addons:
+        homebrew:
+          packages:
+            - python@3.7
+            - ccache
+          update: true
+      env:
+        - MATRIX_EVAL="shopt -s expand_aliases; alias python='/usr/local/opt/python@3.7/bin/python3'; alias pip='/usr/local/opt/python@3.7/bin/pip3';"
+        - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
+        - PYTHON_BUILD=true
+
+    # MacOS 10.12, Python 3.7
+
+    # - name: "klayout python3 osx10.12"
+    - name: "cp37-cp37m-macosx_10_12_x86_64.whl"
+      os: osx
+      osx_image: xcode9.2  # macOS 10.12
+      cache:
+        directories:
+        - ccache
+      addons:
+        homebrew:
+          packages:
+            - python3
+            - ccache
+          update: true
+      env:
+        - MATRIX_EVAL="shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
+        - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
+        - PYTHON_BUILD=true
+    
+  exclude:
+
+    # No XCode 8.2.1 for Mac OS 10.11
+
+    # - name: "klayout python3 osx10.11"
+    - name: "cp37-cp37m-macosx_10_11_x86_64.whl"
+      os: osx
+      osx_image: xcode8  # macOS 10.11
+      cache:
+        directories:
+        - ccache
+      addons:
+        homebrew:
+          packages:
+            - ccache
+          update: true
+      env:
+        - MATRIX_EVAL="brew update; brew config; brew upgrade python; brew postinstall python; ls -l /usr/local/opt/python/libexec/bin/; shopt -s expand_aliases; alias python='/usr/local/opt/python/libexec/bin/python'; alias pip='/usr/local/opt/python/libexec/bin/pip';"
+        - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
+        - PYTHON_BUILD=true
+
+    # Python 2 is EOL
 
     # python 2 osx
     
@@ -312,99 +504,7 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
 
-    # python 3 osx
-    
-    # - name: "klayout python3 osx10.13"
-    - name: "cp37-cp37m-macosx_10_13_x86_64.whl"
-      os: osx
-      osx_image: xcode9.4  # macOS 10.13
-      cache:
-        directories:
-        - ccache
-      addons:
-        homebrew:
-          packages:
-            - python3
-            - ccache
-          update: true
-      env:
-        - MATRIX_EVAL="shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
-        - ARCHFLAGS="-std=c++11"
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-
-    # - name: "klayout python3.6.6 osx10.13"
-    - name: "cp36-cp36m-macosx_10_13_x86_64.whl"
-      os: osx
-      osx_image: xcode9.4  # macOS 10.13
-      cache:
-        directories:
-        - ccache
-      addons:
-        homebrew:
-          packages:
-            - ccache
-          update: true
-      env:
-        - MATRIX_EVAL="brew update; brew tap sashkab/python; brew install sashkab/python/python36; brew link --force --overwrite python36; shopt -s expand_aliases; alias python='/usr/local/opt/python36/bin/python3.6'; alias pip='/usr/local/opt/python36/bin/pip3.6';"
-        - ARCHFLAGS="-std=c++11"
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-
-    # - name: "klayout python3.5.6 osx10.13"
-    - name: "cp35-cp35m-macosx_10_13_x86_64.whl"
-      os: osx
-      osx_image: xcode9.4  # macOS 10.13
-      cache:
-        directories:
-        - ccache
-      addons:
-        homebrew:
-          packages:
-            - ccache
-          update: true
-      env:
-        - MATRIX_EVAL="brew update; brew tap sashkab/python; brew install sashkab/python/python35; brew link --force --overwrite python35; shopt -s expand_aliases; alias python='/usr/local/opt/python35/bin/python3.5'; alias pip='/usr/local/opt/python35/bin/pip3.5';"
-        - ARCHFLAGS="-std=c++11"
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-    
-    # - name: "klayout python3 osx10.12"
-    - name: "cp37-cp37m-macosx_10_12_x86_64.whl"
-      os: osx
-      osx_image: xcode8.3  # macOS 10.12
-      cache:
-        directories:
-        - ccache
-      addons:
-        homebrew:
-          packages:
-            - python3
-            - ccache
-          update: true
-      env:
-        - MATRIX_EVAL="shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
-        - ARCHFLAGS="-std=c++11"
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-    
-    # - name: "klayout python3 osx10.11"
-    - name: "cp37-cp37m-macosx_10_11_x86_64.whl"
-      os: osx
-      osx_image: xcode8  # macOS 10.11
-      cache:
-        directories:
-        - ccache
-      addons:
-        homebrew:
-          packages:
-            - ccache
-          update: true
-      env:
-        - MATRIX_EVAL="brew update; brew config; brew upgrade python; brew postinstall python; ls -l /usr/local/opt/python/libexec/bin/; shopt -s expand_aliases; alias python='/usr/local/opt/python/libexec/bin/python'; alias pip='/usr/local/opt/python/libexec/bin/pip';"
-        - ARCHFLAGS="-std=c++11"
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
+    # KLayout builds not enabled for now on MacOS
 
     # KLayout builds for mac
     # Python 3

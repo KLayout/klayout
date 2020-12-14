@@ -26,6 +26,12 @@
 -------------------------------------------------------------------------------------------------
 on run (volumeName) -- most likely, the volume name is "KLayout"
     tell application "Finder"
+        repeat 20 times
+            if (exists (disk (volumeName as string))) then
+                exit repeat
+            end if
+            delay 1
+        end repeat
         tell disk (volumeName as string)
             -- [1] Open the volume
             open

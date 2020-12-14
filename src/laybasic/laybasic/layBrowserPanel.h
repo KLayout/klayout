@@ -477,6 +477,7 @@ private:
   void add_bookmark (const BookmarkItem &item);
   void refresh_bookmark_list ();
   void store_bookmarks ();
+  void update_navigation_panel ();
 };
 
 }

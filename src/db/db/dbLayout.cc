@@ -272,6 +272,7 @@ Layout::Layout (db::Manager *manager)
     m_properties_repository (this),
     m_guiding_shape_layer (-1),
     m_waste_layer (-1),
+    m_do_cleanup (false),
     m_editable (db::default_editable_mode ())
 {
   // .. nothing yet ..
@@ -287,6 +288,7 @@ Layout::Layout (bool editable, db::Manager *manager)
     m_properties_repository (this),
     m_guiding_shape_layer (-1),
     m_waste_layer (-1),
+    m_do_cleanup (false),
     m_editable (editable)
 {
   // .. nothing yet ..
@@ -306,6 +308,7 @@ Layout::Layout (const db::Layout &layout)
     m_properties_repository (this),
     m_guiding_shape_layer (-1),
     m_waste_layer (-1),
+    m_do_cleanup (false),
     m_editable (layout.m_editable)
 {
   *this = layout;
@@ -1285,6 +1288,12 @@ Layout::allocate_new_cell ()
 void
 Layout::cleanup (const std::set<db::cell_index_type> &keep)
 {
+  //  only managed layouts will receive cleanup requests. Never library container layouts - these
+  //  cannot know if their proxies are not referenced by other proxies.
+  if (! m_do_cleanup) {
+    return;
+  }
+
   //  deleting cells may create new top cells which need to be deleted as well, hence we iterate
   //  until there are no more cells to delete
   while (true) {

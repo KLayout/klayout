@@ -59,6 +59,7 @@ from setuptools.extension import Extension, Library
 import glob
 import os
 import re
+import sys
 import platform
 from distutils.errors import CompileError
 import distutils.command.build_ext
@@ -102,10 +103,18 @@ def parallelCCompile(self, sources, output_dir=None, macros=None, include_dirs=N
 
 
 # only if python version > 2.6, somehow the travis compiler hangs in 2.6
-import sys
-if sys.version_info[0] * 10 + sys.version_info[1] > 26:
+if sys.version_info[0] * 100 + sys.version_info[1] > 206:
     import distutils.ccompiler
     distutils.ccompiler.CCompiler.compile = parallelCCompile
+
+
+# put a path in quotes if required
+def quote_path(path):
+    # looks like disutils don't need path quoting in version >= 3.9:
+    if " " in path and sys.version_info[0] * 100 + sys.version_info[1] < 309:
+        return "\"" + path + "\""
+    else:
+        return path
 
 
 # TODO: delete (Obsolete)
@@ -252,10 +261,10 @@ class Config(object):
         if platform.system() == "Windows":
             bits = os.getenv("KLAYOUT_BITS")
             if bits:
-                return ["\"-I" + os.path.join(bits, "zlib", "include") + "\"",
-                        "\"-I" + os.path.join(bits, "ptw", "include") + "\"",
-                        "\"-I" + os.path.join(bits, "expat", "include") + "\"",
-                        "\"-I" + os.path.join(bits, "curl", "include") + "\""]
+                return [quote_path("-I" + os.path.join(bits, "zlib", "include")),
+                        quote_path("-I" + os.path.join(bits, "ptw", "include")),
+                        quote_path("-I" + os.path.join(bits, "expat", "include")),
+                        quote_path("-I" + os.path.join(bits, "curl", "include"))]
             else:
                 return []
         elif platform.system() == "Darwin":
@@ -285,10 +294,10 @@ class Config(object):
             args = ["/DLL"]
             bits = os.getenv("KLAYOUT_BITS")
             if bits:
-                args += ["\"/LIBPATH:" + os.path.join(bits, "zlib", "libraries") + "\"",
-                         "\"/LIBPATH:" + os.path.join(bits, "ptw", "libraries") + "\"",
-                         "\"/LIBPATH:" + os.path.join(bits, "expat", "libraries") + "\"",
-                         "\"/LIBPATH:" + os.path.join(bits, "curl", "libraries") + "\""]
+                args += [quote_path("/LIBPATH:" + os.path.join(bits, "zlib", "libraries")),
+                         quote_path("/LIBPATH:" + os.path.join(bits, "ptw", "libraries")),
+                         quote_path("/LIBPATH:" + os.path.join(bits, "expat", "libraries")),
+                         quote_path("/LIBPATH:" + os.path.join(bits, "curl", "libraries"))]
             return args
         elif platform.system() == "Darwin":
             # For the dependency modules, make sure we produce a dylib.

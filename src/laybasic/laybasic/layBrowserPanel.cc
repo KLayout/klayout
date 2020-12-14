@@ -110,6 +110,11 @@ BrowserPanel::init ()
   mp_ui = new Ui::BrowserPanel ();
   mp_ui->setupUi (this);
 
+#if QT_VERSION >= 0x050200
+  mp_ui->on_page_search_edit->setClearButtonEnabled (true);
+  mp_ui->search_edit->setClearButtonEnabled (true);
+#endif
+
   mp_ui->browser->setReadOnly (true);
   mp_ui->browser->set_panel (this);
   mp_ui->browser->setWordWrapMode (QTextOption::WordWrap);
@@ -147,7 +152,9 @@ BrowserPanel::init ()
   connect (mp_ui->browser_bookmark_view, SIGNAL (itemDoubleClicked (QTreeWidgetItem *, int)), this, SLOT (bookmark_item_selected (QTreeWidgetItem *)));
 
   mp_completer = new QCompleter (this);
+#if QT_VERSION >= 0x050200
   mp_completer->setFilterMode (Qt::MatchStartsWith);
+#endif
   mp_completer->setCaseSensitivity (Qt::CaseInsensitive);
   mp_completer->setCompletionMode (QCompleter::UnfilteredPopupCompletion);
   mp_completer_model = new QStringListModel (mp_completer);
@@ -323,6 +330,8 @@ BrowserPanel::refresh_bookmark_list ()
     item->setData (0, Qt::ToolTipRole, tl::to_qstring (i->title));
     item->setData (0, Qt::DecorationRole, QIcon (":/bookmark_16.png"));
   }
+
+  update_navigation_panel ();
 }
 
 void
@@ -475,7 +484,7 @@ BrowserPanel::set_home (const std::string &url)
   QList<int> sizes = mp_ui->splitter->sizes ();
   if (sizes.size () >= 2) {
     int size_outline = 150;
-    sizes[1] += sizes[0] - size_outline;
+    sizes[1] += std::max (width () - 10 - size_outline, 10);
     sizes[0] = size_outline;
   }
   mp_ui->splitter->setSizes (sizes);
@@ -609,6 +618,13 @@ update_item_with_outline (const BrowserOutline &ol, QTreeWidgetItem *item)
 }
 
 void
+BrowserPanel::update_navigation_panel ()
+{
+  bool navigation_visible = mp_ui->outline_tree->topLevelItemCount () > 0 || mp_ui->browser_bookmark_view->topLevelItemCount () > 0;
+  mp_ui->navigation_frame->setVisible (navigation_visible);
+}
+
+void
 BrowserPanel::set_outline (const BrowserOutline &ol)
 {
   if (ol.begin () == ol.end ()) {
@@ -634,6 +650,8 @@ BrowserPanel::set_outline (const BrowserOutline &ol)
     mp_ui->outline_tree->expandAll ();
 
   }
+
+  update_navigation_panel ();
 }
 
 QVariant 

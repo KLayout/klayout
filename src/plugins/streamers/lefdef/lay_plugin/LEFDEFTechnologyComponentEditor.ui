@@ -294,7 +294,7 @@
       <item row="1" column="4">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>LEF import</string>
+         <string>LEF import into DEF</string>
         </property>
        </widget>
       </item>
@@ -708,6 +708,8 @@
          <property name="text">
           <string>If a layer map file is given, pattern based rules are ignored.
 If used inside a technology, the file will be looked up relative to the technology's base path.
+Otherwise it's looked up relative to the LEF or DEF file.
+
 (2*) Die area, Blockage and Region layers in map file will have priority over global production rules above.</string>
          </property>
          <property name="wordWrap">

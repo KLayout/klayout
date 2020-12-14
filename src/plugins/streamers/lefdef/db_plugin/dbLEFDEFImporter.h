@@ -775,7 +775,7 @@ public:
   }
 
   /**
-   *  @brief Specify the LEF macro resolution strategy
+   *  @brief Specify the LEF macro resolution strategy when reading DEF files
    *  Values are:
    *    0: propduce LEF geometry unless a FOREIGN cell is specified (default)
    *    1: produce LEF geometry always and ignore FOREIGN

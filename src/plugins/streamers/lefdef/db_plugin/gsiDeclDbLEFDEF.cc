@@ -770,8 +770,8 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "This property has been added in version 0.27.\n"
   ) +
   gsi::method ("macro_resolution_mode", &db::LEFDEFReaderOptions::macro_resolution_mode,
-    "@brief Gets the macro resolution mode.\n"
-    "This property describes the way LEF macros are turned into GDS cells. There "
+    "@brief Gets the macro resolution mode (LEF macros into DEF).\n"
+    "This property describes the way LEF macros are turned into layout cells when reading DEF. There "
     "are three modes available:\n"
     "\n"
     "@ul\n"
@@ -786,7 +786,7 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "This property has been added in version 0.27.\n"
   ) +
   gsi::method ("macro_resolution_mode=", &db::LEFDEFReaderOptions::set_macro_resolution_mode, gsi::arg ("mode"),
-    "@brief Sets the macro resolution mode.\n"
+    "@brief Sets the macro resolution mode (LEF macros into DEF).\n"
     "See \\macro_resolution_mode for details about this property.\n"
     "\n"
     "This property has been added in version 0.27.\n"

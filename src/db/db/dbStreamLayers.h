@@ -199,7 +199,35 @@ public:
    */
   LayerMap ();
 
-  /** 
+  /**
+   *  @brief Returns the first logical layer for a given layer specification
+   */
+  template <class L>
+  std::pair<bool, unsigned int> first_logical (const L &p) const
+  {
+    std::set<unsigned int> r = logical (p);
+    if (r.empty ()) {
+      return std::make_pair (false, 0);
+    } else {
+      return std::make_pair (true, *r.begin ());
+    }
+  }
+
+  /**
+   *  @brief Returns the first logical layer for a given layer specification
+   */
+  template <class L>
+  std::pair<bool, unsigned int> first_logical (const L &p, db::Layout &layout) const
+  {
+    std::set<unsigned int> r = logical (p, layout);
+    if (r.empty ()) {
+      return std::make_pair (false, 0);
+    } else {
+      return std::make_pair (true, *r.begin ());
+    }
+  }
+
+  /**
    *  @brief Query a layer mapping
    *
    *  @return A pair telling if the layer is mapped (first=true) and
@@ -247,6 +275,21 @@ public:
   std::set<unsigned int> logical (const db::LDPair &p, db::Layout &layout) const;
 
   /**
+   *  @brief Returns a value indicating whether a layer (given by layer/datatype) is mapped
+   */
+  bool is_mapped (const LDPair &p) const;
+
+  /**
+   *  @brief Returns a value indicating whether the given named layer is mapped
+   */
+  bool is_mapped (const std::string &name) const;
+
+  /**
+   *  @brief Returns a value indicating whether a layer is mapped
+   */
+  bool is_mapped (const db::LayerProperties &p) const;
+
+  /**
    *  @brief Gets the target layer for a given logical layer
    *
    *  Returns 0 if no target layer mapping is supplied.
@@ -280,17 +323,81 @@ public:
   std::vector<unsigned int> get_layers () const;
 
   /**
-   *  @brief Map a ldpair to a logical layer 
+   *  @brief Single-map a physical to a logical layer
+   *
+   *  "Single-mapping" substitutes a layer mapping. "Multimapping" (mmap_..)
+   *  adds to a given mapping and allows generating 1:n mappings (m:n in fact).
    */
-  void map (const LDPair &p, unsigned int l);
+  template <class S>
+  void map (const S &p, unsigned int l)
+  {
+    unmap (p);
+    mmap (p, l);
+  }
 
   /**
-   *  @brief Map a name to a logical layer 
+   *  @brief Single-map a physical to a logical layer with a target layer
    */
-  void map (const std::string &name, unsigned int l);
+  template <class S>
+  void map (const S &p, unsigned int l, const LayerProperties &t)
+  {
+    unmap (p);
+    mmap (p, l, t);
+  }
 
   /**
-   *  @brief Map a name or LDPair to a logical layer 
+   *  @brief Single-map a physical layer interval with a target layer
+   */
+  void map (const LDPair &p1, const LDPair &p2, unsigned int l)
+  {
+    unmap (p1, p2);
+    mmap (p1, p2, l);
+  }
+
+  /**
+   *  @brief Single-map a physical layer interval with a target layer
+   */
+  void map (const LDPair &p1, const LDPair &p2, unsigned int l, const LayerProperties &t)
+  {
+    unmap (p1, p2);
+    mmap (p1, p2, l, t);
+  }
+
+  /**
+   *  @brief Single-map a physical layer interval (given by an expression)
+   */
+  void map_expr (const std::string &expr, unsigned int l)
+  {
+    unmap_expr (expr);
+    mmap_expr (expr, l);
+  }
+
+  /**
+   *  @brief Same a map_expr with a string argument but taking the expression for a tl::Extractor
+   */
+  void map_expr (tl::Extractor &ex, unsigned int l)
+  {
+    tl::Extractor ex1 = ex;
+    unmap_expr (ex1);
+    mmap_expr (ex, l);
+  }
+
+  /**
+   *  @brief Multi-map a ldpair to a logical layer
+   *
+   *  "Multimapping" will not substitute but add to the mapping.
+   */
+  void mmap (const LDPair &p, unsigned int l);
+
+  /**
+   *  @brief Multi-map a name to a logical layer
+   *
+   *  "Multimapping" will not substitute but add to the mapping.
+   */
+  void mmap (const std::string &name, unsigned int l);
+
+  /**
+   *  @brief Multi-map a name or LDPair to a logical layer
    *
    *  The algorithm chooses the LDPair from the LayerProperties structure and/or
    *  the name if no LDPair is given. If the source LayerProperties structure does
@@ -299,26 +406,26 @@ public:
    *  @param f The source (where to derive the match expression from)
    *  @param l The logical layer to map to the match expression
    */
-  void map (const LayerProperties &f, unsigned int l);
+  void mmap (const LayerProperties &f, unsigned int l);
 
   /**
-   *  @brief Map a ldpair to a logical layer with a target layer
+   *  @brief Multi-map a ldpair to a logical layer with a target layer
    *
    *  The target layer specifies which layer to create for the 
    *  corresponding input.
    */
-  void map (const LDPair &p, unsigned int l, const LayerProperties &t);
+  void mmap (const LDPair &p, unsigned int l, const LayerProperties &t);
 
   /**
-   *  @brief Map a name to a logical layer with a target layer
+   *  @brief Multi-map a name to a logical layer with a target layer
    *
    *  The target layer specifies which layer to create for the 
    *  corresponding input.
    */
-  void map (const std::string &name, unsigned int l, const LayerProperties &t);
+  void mmap (const std::string &name, unsigned int l, const LayerProperties &t);
 
   /**
-   *  @brief Map a name or LDPair to a logical layer with a target layer
+   *  @brief Multi-map a name or LDPair to a logical layer with a target layer
    *
    *  The algorithm chooses the LDPair from the LayerProperties structure or
    *  the name if no LDPair is given. If the source LayerProperties structure does
@@ -328,23 +435,23 @@ public:
    *  @param l The logical layer to map to the match expression
    *  @param t The target layer to use for the mapped layer
    */
-  void map (const LayerProperties &f, unsigned int l, const LayerProperties &t);
+  void mmap (const LayerProperties &f, unsigned int l, const LayerProperties &t);
 
   /**
-   *  @brief Map a range of ldpair's to a logical layer
+   *  @brief Multi-map a range of ldpair's to a logical layer
    *
    *  The range is given by two pairs p1,p2. The layers
    *  mapped are [p1.l,p2.l], the datatypes mapped are [p1.d,p2.d].
    */
-  void map (const LDPair &p1, const LDPair &p2, unsigned int l);
+  void mmap (const LDPair &p1, const LDPair &p2, unsigned int l);
 
   /**
-   *  @brief Map a range of ldpair's to a logical layer with a target layer
+   *  @brief Multi-map a range of ldpair's to a logical layer with a target layer
    *
    *  The range is given by two pairs p1,p2. The layers
    *  mapped are [p1.l,p2.l], the datatypes mapped are [p1.d,p2.d].
    */
-  void map (const LDPair &p1, const LDPair &p2, unsigned int l, const LayerProperties &t);
+  void mmap (const LDPair &p1, const LDPair &p2, unsigned int l, const LayerProperties &t);
 
   /** 
    *  @brief Map a range given by a string expression to a logical layer
@@ -374,12 +481,12 @@ public:
    *  This method will throw a LayerSpecFormatException if
    *  something is wrong with the format string
    */
-  void map_expr (const std::string &expr, unsigned int l);
+  void mmap_expr (const std::string &expr, unsigned int l);
 
   /**
    *  @brief Same a map_expr with a string argument but taking the expression for a tl::Extractor
    */
-  void map_expr (tl::Extractor &ex, unsigned int l);
+  void mmap_expr (tl::Extractor &ex, unsigned int l);
 
   /**
    *  @brief Unmaps a LDPair

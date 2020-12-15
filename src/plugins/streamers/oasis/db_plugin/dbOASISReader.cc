@@ -557,7 +557,7 @@ OASISReader::warn (const std::string &msg)
 std::pair <bool, unsigned int> 
 OASISReader::open_dl (db::Layout &layout, const LDPair &dl, bool create)
 {
-  std::pair<bool, unsigned int> ll = m_layer_map.logical (dl, layout);
+  std::pair<bool, unsigned int> ll = m_layer_map.first_logical (dl, layout);
   if (ll.first) {
 
     return ll;

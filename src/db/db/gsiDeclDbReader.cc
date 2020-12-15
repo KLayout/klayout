@@ -36,7 +36,7 @@ namespace gsi
   static bool
   lm_is_mapped (const db::LayerMap *layer_map, const db::LayerProperties &lp)
   {
-    return !layer_map->logical (lp).empty ();
+    return layer_map->is_mapped (lp);
   }
 
   static int 
@@ -86,6 +86,36 @@ namespace gsi
   lm_map_string (db::LayerMap *layer_map, std::string &s, unsigned int l)
   {
     layer_map->map_expr (s, l);
+  }
+
+  static void
+  lm_mmap (db::LayerMap *layer_map, const db::LayerProperties &lp, unsigned int l)
+  {
+    layer_map->mmap (lp, l);
+  }
+
+  static void
+  lm_mmap_with_target (db::LayerMap *layer_map, const db::LayerProperties &lp, unsigned int l, const db::LayerProperties &t)
+  {
+    layer_map->mmap (lp, l, t);
+  }
+
+  static void
+  lm_mmap_interval (db::LayerMap *layer_map, const db::LayerProperties &lp1, const db::LayerProperties &lp2, unsigned int l)
+  {
+    layer_map->mmap (ldpair_from_lp (lp1), ldpair_from_lp (lp2), l);
+  }
+
+  static void
+  lm_mmap_interval_with_target (db::LayerMap *layer_map, const db::LayerProperties &lp1, const db::LayerProperties &lp2, unsigned int l, const db::LayerProperties &t)
+  {
+    layer_map->mmap (ldpair_from_lp (lp1), ldpair_from_lp (lp2), l, t);
+  }
+
+  static void
+  lm_mmap_string (db::LayerMap *layer_map, std::string &s, unsigned int l)
+  {
+    layer_map->mmap_expr (s, l);
   }
 
   static void
@@ -214,6 +244,51 @@ namespace gsi
       "\n"
       "Target mapping has been added in version 0.20.\n"
     ) +
+    gsi::method_ext ("mmap", &lm_mmap, gsi::arg ("phys_layer"), gsi::arg ("log_layer"),
+      "@brief Maps a physical layer to a logical one and adds to existing mappings\n"
+      "\n"
+      "This method acts like the corresponding 'map' method, but adds the logical layer to the receivers of the "
+      "given physical one. Hence this method implements 1:n mapping capabilities.\n"
+      "For backward compatibility, 'map' still substitutes mapping.\n"
+      "\n"
+      "Multi-mapping has been added in version 0.27.\n"
+    ) +
+    gsi::method_ext ("mmap", &lm_mmap_with_target, gsi::arg ("phys_layer"), gsi::arg ("log_layer"), gsi::arg ("target_layer"),
+      "@brief Maps a physical layer to a logical one, adds to existing mappings and specifies a target layer\n"
+      "\n"
+      "This method acts like the corresponding 'map' method, but adds the logical layer to the receivers of the "
+      "given physical one. Hence this method implements 1:n mapping capabilities.\n"
+      "For backward compatibility, 'map' still substitutes mapping.\n"
+      "\n"
+      "Multi-mapping has been added in version 0.27.\n"
+    ) +
+    gsi::method_ext ("mmap", &lm_mmap_interval, gsi::arg ("pl_start"), gsi::arg ("pl_stop"), gsi::arg ("log_layer"),
+      "@brief Maps a physical layer from the given interval to a logical one and adds to existing mappings\n"
+      "\n"
+      "This method acts like the corresponding 'map' method, but adds the logical layer to the receivers of the "
+      "given physical one. Hence this method implements 1:n mapping capabilities.\n"
+      "For backward compatibility, 'map' still substitutes mapping.\n"
+      "\n"
+      "Multi-mapping has been added in version 0.27.\n"
+    ) +
+    gsi::method_ext ("mmap", &lm_mmap_interval_with_target, gsi::arg ("pl_start"), gsi::arg ("pl_stop"), gsi::arg ("log_layer"), gsi::arg ("layer_properties"),
+      "@brief Maps a physical layer from the given interval to a logical one, adds to existing mappings and specifies a target layer\n"
+      "\n"
+      "This method acts like the corresponding 'map' method, but adds the logical layer to the receivers of the "
+      "given physical one. Hence this method implements 1:n mapping capabilities.\n"
+      "For backward compatibility, 'map' still substitutes mapping.\n"
+      "\n"
+      "Multi-mapping has been added in version 0.27.\n"
+    ) +
+    gsi::method_ext ("mmap", &lm_mmap_string, gsi::arg ("map_expr"), gsi::arg ("log_layer"),
+      "@brief Maps a physical layer given by an expression to a logical one and adds to existing mappings\n"
+      "\n"
+      "This method acts like the corresponding 'map' method, but adds the logical layer to the receivers of the "
+      "given physical one. Hence this method implements 1:n mapping capabilities.\n"
+      "For backward compatibility, 'map' still substitutes mapping.\n"
+      "\n"
+      "Multi-mapping has been added in version 0.27.\n"
+    ) +
     gsi::method_ext ("unmap", &lm_unmap, gsi::arg ("phys_layer"),
       "@brief Unmaps the given layer\n"
       "Unmapping will remove the specific layer from the mapping. This method allows generating "
@@ -283,17 +358,18 @@ namespace gsi
     "ly.read(\"input.gds\", lo)\n"
     "@/code\n"
     "\n"
-    "1:n mapping is possible: a physical layer can be mapped to multiple logical layers. For this, mapping acts additive. "
+    "1:n mapping is supported: a physical layer can be mapped to multiple logical layers using 'mmap' instead of 'map'. When using this variant, "
+    "mapping acts additive.\n"
     "The following example will map layer 1, datatypes 0 to 255 to logical layer 0, and layer 1, datatype 17 to logical layers "
     "0 plus 1:"
     "\n"
     "@code"
     "lm = RBA::LayerMap::new\n"
-    "lm.map(\"1/0-255\", 0)\n"
-    "lm.map(\"1/17\", 1)\n"
+    "lm.map(\"1/0-255\", 0)   # (can be 'mmap' too)\n"
+    "lm.mmap(\"1/17\", 1)\n"
     "@/code\n"
     "\n"
-    "'unmapping' allows to remove a mapping. This allows creating 'holes' in mapping ranges. The followin example maps "
+    "'unmapping' allows removing a mapping. This allows creating 'holes' in mapping ranges. The followin example maps "
     "layer 1, datatypes 0 to 16 and 18 to 255 to logical layer 0:"
     "\n"
     "@code"

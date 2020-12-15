@@ -1180,7 +1180,7 @@ LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n
     }
 
     //  employ the layer map to find the target layer
-    std::pair<bool, unsigned int> ll = m_layer_map.logical (lp, layout);
+    std::pair<bool, unsigned int> ll = m_layer_map.first_logical (lp, layout);
 
     if (ll.first) {
 
@@ -1300,10 +1300,10 @@ LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n
 
     //  Route the layer through the layer map, first the decorated name and if there is no mapping, the
     //  undecorated one.
-    std::pair<bool, unsigned int> ll = m_layer_map.logical (name, layout);
+    std::pair<bool, unsigned int> ll = m_layer_map.first_logical (name, layout);
     bool generic_match = false;
     if (! ll.first) {
-      ll = m_layer_map.logical (n, layout);
+      ll = m_layer_map.first_logical (n, layout);
       generic_match = true;
     } else if (n == name) {
       //  no suffix defined in tech component -> treat as generic match and combine datatypes

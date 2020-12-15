@@ -29,14 +29,14 @@ TEST(1)
   db::LayerMap lm;
 
   lm.map (db::LDPair (1, 5), 17);
-  EXPECT_EQ (lm.logical (db::LDPair (1, 6)).first, false);
-  EXPECT_EQ (lm.logical (db::LDPair (1, 5)).first, true);
-  EXPECT_EQ (lm.logical (db::LDPair (1, 5)).second, (unsigned int) 17);
+  EXPECT_EQ (lm.first_logical (db::LDPair (1, 6)).first, false);
+  EXPECT_EQ (lm.first_logical (db::LDPair (1, 5)).first, true);
+  EXPECT_EQ (lm.first_logical (db::LDPair (1, 5)).second, (unsigned int) 17);
 
   lm.map (db::LDPair (1, 0), db::LDPair (5,0), 18);
-  EXPECT_EQ (lm.logical (db::LDPair (2, 0)).first, true);
-  EXPECT_EQ (lm.logical (db::LDPair (2, 0)).second, (unsigned int) 18);
-  EXPECT_EQ (lm.logical (db::LDPair (0, 0)).first, false);
+  EXPECT_EQ (lm.first_logical (db::LDPair (2, 0)).first, true);
+  EXPECT_EQ (lm.first_logical (db::LDPair (2, 0)).second, (unsigned int) 18);
+  EXPECT_EQ (lm.first_logical (db::LDPair (0, 0)).first, false);
 
   EXPECT_EQ (lm.mapping_str (18), "1/0;2-5/0");
   EXPECT_EQ (lm.mapping_str (17), "1/5");
@@ -62,16 +62,16 @@ TEST(1)
 
   lm.map_expr ("XP;10/7-8 : XN", 13);
   EXPECT_EQ (lm.mapping_str (13), "10/7-8;XP : XN");
-  EXPECT_EQ (lm.logical ("XP").second, (unsigned int) 13);
-  EXPECT_EQ (lm.logical ("XP").first, true);
-  EXPECT_EQ (lm.logical (db::LDPair(10, 6)).first, false);
-  EXPECT_EQ (lm.logical (db::LDPair(10, 7)).first, true);
-  EXPECT_EQ (lm.logical (db::LDPair(10, 7)).second, (unsigned int) 13);
+  EXPECT_EQ (lm.first_logical ("XP").second, (unsigned int) 13);
+  EXPECT_EQ (lm.first_logical ("XP").first, true);
+  EXPECT_EQ (lm.first_logical (db::LDPair(10, 6)).first, false);
+  EXPECT_EQ (lm.first_logical (db::LDPair(10, 7)).first, true);
+  EXPECT_EQ (lm.first_logical (db::LDPair(10, 7)).second, (unsigned int) 13);
 
   EXPECT_EQ (lm.mapping (13).to_string (), "XN (10/7)");
 
   lm.clear ();
-  EXPECT_EQ (lm.logical (db::LDPair(10, 7)).first, false);
+  EXPECT_EQ (lm.first_logical (db::LDPair(10, 7)).first, false);
   lm.map_expr ("'XP';10/7-8 : XN", 13);
   EXPECT_EQ (lm.mapping_str (13), "10/7-8;XP : XN");
 }
@@ -349,55 +349,55 @@ TEST(6)
   EXPECT_EQ (layers_to_string (ly), "1/0,3/10");
 
   std::pair<bool, unsigned int> p;
-  p = lm.logical (db::LayerProperties (1, 0));
+  p = lm.first_logical (db::LayerProperties (1, 0));
   EXPECT_EQ (p.first, true);
   EXPECT_EQ (p.second, (unsigned int) 0);
 
-  p = lm.logical (db::LayerProperties (2, 0));
+  p = lm.first_logical (db::LayerProperties (2, 0));
   EXPECT_EQ (p.first, false);
 
-  p = lm.logical (db::LayerProperties (3, 0));
+  p = lm.first_logical (db::LayerProperties (3, 0));
   EXPECT_EQ (p.first, false);
 
-  p = lm.logical (db::LayerProperties (3, 10));
+  p = lm.first_logical (db::LayerProperties (3, 10));
   EXPECT_EQ (p.first, true);
   EXPECT_EQ (p.second, (unsigned int) 1);
 
-  p = lm.logical (db::LayerProperties (3, 99));
+  p = lm.first_logical (db::LayerProperties (3, 99));
   EXPECT_EQ (p.first, true);
   EXPECT_EQ (p.second, (unsigned int) 1);
 
   EXPECT_EQ (layers_to_string (ly), "1/0,3/10");
 
   //  this will create layer 2/0 in the layout
-  p = lm.logical (db::LayerProperties (2, 0), ly);
+  p = lm.first_logical (db::LayerProperties (2, 0), ly);
   EXPECT_EQ (p.first, true);
   EXPECT_EQ (p.second, (unsigned int) 2);
 
   EXPECT_EQ (layers_to_string (ly), "1/0,3/10,2/0");
 
-  p = lm.logical (db::LayerProperties (2, 0));
+  p = lm.first_logical (db::LayerProperties (2, 0));
   EXPECT_EQ (p.first, true);
   EXPECT_EQ (p.second, (unsigned int) 2);
 
-  p = lm.logical (db::LayerProperties (2, 0), ly);
+  p = lm.first_logical (db::LayerProperties (2, 0), ly);
   EXPECT_EQ (p.first, true);
   EXPECT_EQ (p.second, (unsigned int) 2);
 
   EXPECT_EQ (layers_to_string (ly), "1/0,3/10,2/0");
 
   //  this will create layer 2/42 in the layout
-  p = lm.logical (db::LayerProperties (2, 42), ly);
+  p = lm.first_logical (db::LayerProperties (2, 42), ly);
   EXPECT_EQ (p.first, true);
   EXPECT_EQ (p.second, (unsigned int) 3);
 
   EXPECT_EQ (layers_to_string (ly), "1/0,3/10,2/0,2/42");
 
-  p = lm.logical (db::LayerProperties (2, 42));
+  p = lm.first_logical (db::LayerProperties (2, 42));
   EXPECT_EQ (p.first, true);
   EXPECT_EQ (p.second, (unsigned int) 3);
 
-  p = lm.logical (db::LayerProperties (2, 42), ly);
+  p = lm.first_logical (db::LayerProperties (2, 42), ly);
   EXPECT_EQ (p.first, true);
   EXPECT_EQ (p.second, (unsigned int) 3);
 
@@ -429,19 +429,91 @@ TEST(7)
   EXPECT_EQ (layers_to_string (ly), "85/0,185/0,,");
 
   std::pair<bool, unsigned int> p;
-  p = lm.logical (db::LayerProperties (85, 0));
+  p = lm.first_logical (db::LayerProperties (85, 0));
   EXPECT_EQ (p.first, false);
   EXPECT_EQ (p.second, (unsigned int) 0);
 
-  p = lm.logical (db::LayerProperties (185, 0));
+  p = lm.first_logical (db::LayerProperties (185, 0));
   EXPECT_EQ (p.first, false);
   EXPECT_EQ (p.second, (unsigned int) 0);
 
-  p = lm.logical (db::LayerProperties (10000, 0));
+  p = lm.first_logical (db::LayerProperties (10000, 0));
   EXPECT_EQ (p.first, true);
   EXPECT_EQ (p.second, (unsigned int) 1);
 
-  p = lm.logical (db::LayerProperties (10001, 0));
+  p = lm.first_logical (db::LayerProperties (10001, 0));
   EXPECT_EQ (p.first, true);
   EXPECT_EQ (p.second, (unsigned int) 0);
 }
+
+//  multi-mapping, unmapping
+TEST(8)
+{
+  db::LayerMap lm;
+
+  unsigned int n = 0;
+
+  //  refinement
+  //  all
+  lm.mmap_expr ("*/*", n++);
+  EXPECT_EQ (lm.mapping_str (0), "*/*");
+  EXPECT_EQ (lm.to_string (),
+    "layer_map('*/*')"
+  );
+  EXPECT_EQ (db::LayerMap::from_string_file_format (lm.to_string_file_format ()).to_string (), lm.to_string ());
+
+  //  some
+  lm.mmap_expr ("*/1-10", n++);
+  EXPECT_EQ (lm.to_string (),
+    "layer_map('+*/0,1-10,11-*';'+*/1-10')"
+  );
+  EXPECT_EQ (db::LayerMap::from_string_file_format (lm.to_string_file_format ()).to_string (), lm.to_string ());
+
+  //  others
+  lm.mmap_expr ("*/5,15", n++);
+
+  EXPECT_EQ (lm.to_string (),
+    "layer_map('+*/0,1-4,5,6-10,11-14,15,16-*';'+*/1-4,5,6-10';'+*/5,15')"
+  );
+  EXPECT_EQ (db::LayerMap::from_string_file_format (lm.to_string_file_format ()).to_string (), lm.to_string ());
+
+  //  NOTE: the leading "+" indicates that the listed layers may go somewhere else, so we can't plainly map them
+  EXPECT_EQ (lm.mapping_str (0), "+*/0,1-4,5,6-10,11-14,15,16-*");
+  EXPECT_EQ (lm.mapping_str (1), "+*/1-4,5,6-10");
+  EXPECT_EQ (lm.mapping_str (2), "+*/5,15");
+  EXPECT_EQ (lm.mapping_str (3), "");
+
+  lm = db::LayerMap ();
+  n = 0;
+
+  //  refinement
+  //  all
+  lm.mmap_expr ("*/*", n++);
+  EXPECT_EQ (lm.mapping_str (0), "*/*");
+  EXPECT_EQ (lm.to_string (),
+    "layer_map('*/*')"
+  );
+  EXPECT_EQ (db::LayerMap::from_string_file_format (lm.to_string_file_format ()).to_string (), lm.to_string ());
+
+  //  some
+  lm.mmap_expr ("1-10/*", n++);
+  EXPECT_EQ (lm.to_string (),
+    "layer_map('+0/*;1-10/*;11-*/*';'+1-10/*')"
+  );
+  EXPECT_EQ (db::LayerMap::from_string_file_format (lm.to_string_file_format ()).to_string (), lm.to_string ());
+
+  //  others
+  lm.mmap_expr ("5,15/*", n++);
+
+  EXPECT_EQ (lm.to_string (),
+    "layer_map('+0/*;1-4/*;5/*;6-10/*;11-14/*;15/*;16-*/*';'+1-4/*;5/*;6-10/*';'+5/*;15/*')"
+  );
+  EXPECT_EQ (db::LayerMap::from_string_file_format (lm.to_string_file_format ()).to_string (), lm.to_string ());
+
+  //  NOTE: the leading "+" indicates that the listed layers may go somewhere else, so we can't plainly map them
+  EXPECT_EQ (lm.mapping_str (0), "+0/*;1-4/*;5/*;6-10/*;11-14/*;15/*;16-*/*");
+  EXPECT_EQ (lm.mapping_str (1), "+1-4/*;5/*;6-10/*");
+  EXPECT_EQ (lm.mapping_str (2), "+5/*;15/*");
+  EXPECT_EQ (lm.mapping_str (3), "");
+}
+

@@ -332,7 +332,7 @@ TEST(2)
     db::Layout layout_piece (&m);
     layout_piece = layout;
 
-    std::pair<bool, unsigned int> jj = map_full.logical (pairs[i]);
+    std::pair<bool, unsigned int> jj = map_full.first_logical (pairs[i]);
     EXPECT_EQ (jj.first, true);
 
     for (unsigned int j = 0; j < layout_piece.layers(); ++j) {

@@ -184,7 +184,7 @@ GDS2ReaderBase::finish_element (db::PropertiesRepository &rep)
 std::pair <bool, unsigned int> 
 GDS2ReaderBase::open_dl (db::Layout &layout, const LDPair &dl, bool create) 
 {
-  std::pair<bool, unsigned int> ll = m_layer_map.logical (dl, layout);
+  std::pair<bool, unsigned int> ll = m_layer_map.first_logical (dl, layout);
   if (ll.first) {
 
     return ll;

@@ -446,6 +446,18 @@ TEST(7)
   EXPECT_EQ (p.second, (unsigned int) 0);
 }
 
+static std::string set2string (const std::set<unsigned int> &set)
+{
+  std::string s;
+  for (std::set<unsigned int>::const_iterator i = set.begin (); i != set.end (); ++i) {
+    if (i != set.begin ()) {
+      s += ",";
+    }
+    s += tl::to_string (*i);
+  }
+  return s;
+}
+
 //  multi-mapping, unmapping
 TEST(8)
 {
@@ -476,6 +488,12 @@ TEST(8)
     "layer_map('+*/0,1-4,5,6-10,11-14,15,16-*';'+*/1-4,5,6-10';'+*/5,15')"
   );
   EXPECT_EQ (db::LayerMap::from_string_file_format (lm.to_string_file_format ()).to_string (), lm.to_string ());
+
+  EXPECT_EQ (set2string (lm.logical (db::LDPair (0, 1000))), "0");
+  EXPECT_EQ (set2string (lm.logical (db::LDPair (1, 1000))), "0");
+  EXPECT_EQ (set2string (lm.logical (db::LDPair (0, 5))), "0,1,2");
+  EXPECT_EQ (set2string (lm.logical (db::LDPair (0, 15))), "0,2");
+  EXPECT_EQ (set2string (lm.logical (db::LDPair (0, 10))), "0,1");
 
   //  NOTE: the leading "+" indicates that the listed layers may go somewhere else, so we can't plainly map them
   EXPECT_EQ (lm.mapping_str (0), "+*/0,1-4,5,6-10,11-14,15,16-*");
@@ -510,10 +528,33 @@ TEST(8)
   );
   EXPECT_EQ (db::LayerMap::from_string_file_format (lm.to_string_file_format ()).to_string (), lm.to_string ());
 
+  EXPECT_EQ (set2string (lm.logical (db::LDPair (1000, 0))), "0");
+  EXPECT_EQ (set2string (lm.logical (db::LDPair (1000, 1))), "0");
+  EXPECT_EQ (set2string (lm.logical (db::LDPair (5, 0))), "0,1,2");
+  EXPECT_EQ (set2string (lm.logical (db::LDPair (15, 0))), "0,2");
+  EXPECT_EQ (set2string (lm.logical (db::LDPair (10, 0))), "0,1");
+
   //  NOTE: the leading "+" indicates that the listed layers may go somewhere else, so we can't plainly map them
   EXPECT_EQ (lm.mapping_str (0), "+0/*;1-4/*;5/*;6-10/*;11-14/*;15/*;16-*/*");
   EXPECT_EQ (lm.mapping_str (1), "+1-4/*;5/*;6-10/*");
   EXPECT_EQ (lm.mapping_str (2), "+5/*;15/*");
   EXPECT_EQ (lm.mapping_str (3), "");
+
+  lm = db::LayerMap ();
+  n = 0;
+
+  lm.mmap_expr ("*/*", n++);
+  EXPECT_EQ (lm.mapping_str (0), "*/*");
+  EXPECT_EQ (lm.to_string (),
+    "layer_map('*/*')"
+  );
+  EXPECT_EQ (db::LayerMap::from_string_file_format (lm.to_string_file_format ()).to_string (), lm.to_string ());
+
+  //  some
+  lm.mmap_expr ("1-10/0-20", n++);
+  EXPECT_EQ (lm.to_string (),
+    "layer_map('+0/*;1-10/0-20,21-*;11-*/*';'+1-10/0-20')"
+  );
+  EXPECT_EQ (db::LayerMap::from_string_file_format (lm.to_string_file_format ()).to_string (), lm.to_string ());
 }
 

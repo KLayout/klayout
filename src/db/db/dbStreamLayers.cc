@@ -502,10 +502,10 @@ void
 LayerMap::mmap (const LayerProperties &f, unsigned int l)
 {
   if (f.name.empty () || is_static_ld (f.layer) || is_static_ld (f.datatype)) {
-    map (db::LDPair (f.layer, f.datatype), l);
+    mmap (db::LDPair (f.layer, f.datatype), l);
   } 
   if (! f.name.empty ()) {
-    map (f.name, l);
+    mmap (f.name, l);
   }
 }
 
@@ -525,10 +525,10 @@ void
 LayerMap::mmap (const LayerProperties &f, unsigned int l, const LayerProperties &t)
 {
   if (f.name.empty () || is_static_ld (f.layer) || is_static_ld (f.datatype)) {
-    map (db::LDPair (f.layer, f.datatype), l, t);
+    mmap (db::LDPair (f.layer, f.datatype), l, t);
   } 
   if (! f.name.empty ()) {
-    map (f.name, l, t);
+    mmap (f.name, l, t);
   }
 }
 

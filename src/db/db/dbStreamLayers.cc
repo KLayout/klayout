@@ -738,6 +738,7 @@ LayerMap::unmap (const LDPair &p1, const LDPair &p2)
   }
 }
 
+
 void
 LayerMap::unmap_expr (const std::string &expr)
 {
@@ -838,6 +839,26 @@ LayerMap::to_string_file_format () const
   return os.str ();
 }
 
+void
+LayerMap::add_expr (const std::string &expr, unsigned int l)
+{
+  tl::Extractor ex (expr.c_str ());
+  add_expr (ex, l);
+  ex.expect_end ();
+}
+
+void
+LayerMap::add_expr (tl::Extractor &ex, unsigned int l)
+{
+  if (ex.test ("+")) {
+    mmap_expr (ex, l);
+  } else if (ex.test ("-")) {
+    unmap_expr (ex);
+  } else {
+    map_expr (ex, l);
+  }
+}
+
 db::LayerMap 
 LayerMap::from_string_file_format (const std::string &s)
 {
@@ -860,13 +881,7 @@ LayerMap::from_string_file_format (const std::string &s)
       } else {
 
         if (! ex.at_end ()) {
-          if (ex.test ("+")) {
-            lm.mmap_expr (ex, l);
-          } else if (ex.test ("-")) {
-            lm.unmap_expr (ex);
-          } else {
-            lm.map_expr (ex, l);
-          }
+          lm.add_expr (ex, l);
           if (ex.test ("#") || ex.test ("//")) {
             //  ignore comments
           } else {
@@ -901,7 +916,7 @@ namespace tl
     while (! ex.test (")") && ! ex.at_end ()) {
       std::string m;
       ex.read_word_or_quoted (m);
-      t.map_expr (m, l);
+      t.add_expr (m, l);
       ++l;
       ex.test (";");
     }
@@ -921,7 +936,7 @@ namespace tl
     while (! ex.test (")") && ! ex.at_end ()) {
       std::string m;
       ex.read_word_or_quoted (m);
-      t.map_expr (m, l);
+      t.add_expr (m, l);
       ++l;
       ex.test (";");
     }

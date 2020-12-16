@@ -522,6 +522,22 @@ public:
   void unmap_expr (tl::Extractor &ex);
 
   /**
+   *  @brief Generic expression mapping
+   *
+   *  This generic mapping function takes a mapping expression. If it starts with "+",
+   *  "mmap" is used, if it starts with "-", "unmap" is used. Otherwise, "map" is used.
+   */
+  void add_expr (const std::string &expr, unsigned int l);
+
+  /**
+   *  @brief Generic expression mapping
+   *
+   *  This generic mapping function takes a mapping expression. If it starts with "+",
+   *  "mmap" is used, if it starts with "-", "unmap" is used. Otherwise, "map" is used.
+   */
+  void add_expr (tl::Extractor &ex, unsigned int l);
+
+  /**
    *  @brief Prepares a layer mapping object for reading
    *
    *  This replaces all layer indexes by ones from the layout or it will create new layers

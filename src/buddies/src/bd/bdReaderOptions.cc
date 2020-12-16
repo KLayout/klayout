@@ -604,7 +604,7 @@ void GenericReaderOptions::set_layer_map (const std::string &lm)
 
   int l = 0;
   while (! ex.at_end ()) {
-    m_layer_map.map_expr (ex, l);
+    m_layer_map.add_expr (ex, l);
     ex.test ("//");
     ++l;
   }

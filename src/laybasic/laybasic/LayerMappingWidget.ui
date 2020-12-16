@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>446</width>
-    <height>205</height>
+    <width>536</width>
+    <height>290</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,6 +29,19 @@
    <property name="spacing">
     <number>6</number>
    </property>
+   <item row="2" column="1">
+    <widget class="QPushButton" name="load_pb">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Load File</string>
+     </property>
+    </widget>
+   </item>
    <item row="2" column="0">
     <widget class="QLabel" name="help_label">
      <property name="sizePolicy">
@@ -45,103 +58,114 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="QPushButton" name="load_pb">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+   <item row="3" column="0" colspan="3">
+    <widget class="QTabWidget" name="tabs">
+     <property name="currentIndex">
+      <number>1</number>
      </property>
-     <property name="text">
-      <string>Load File</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0" rowspan="6" colspan="2">
-    <widget class="QListWidget" name="layer_lv">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Ignored">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="dragEnabled">
-      <bool>true</bool>
-     </property>
-     <property name="dragDropMode">
-      <enum>QAbstractItemView::InternalMove</enum>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::ExtendedSelection</enum>
-     </property>
-     <property name="uniformItemSizes">
-      <bool>true</bool>
-     </property>
-     <property name="sortingEnabled">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2">
-    <widget class="QToolButton" name="add_pb">
-     <property name="toolTip">
-      <string>Add a new layer to the list</string>
-     </property>
-     <property name="text">
-      <string>Add</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../lay/layResources.qrc">
-       <normaloff>:/add.png</normaloff>:/add.png</iconset>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2">
-    <widget class="QToolButton" name="delete_pb">
-     <property name="toolTip">
-      <string>Delete the selected layers from the list</string>
-     </property>
-     <property name="text">
-      <string>Delete</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../lay/layResources.qrc">
-       <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="2" rowspan="3">
-    <spacer>
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>5</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="5" column="2">
-    <widget class="QToolButton" name="edit_pb">
-     <property name="toolTip">
-      <string>Edit the current layer</string>
-     </property>
-     <property name="text">
-      <string>Edit</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../lay/layResources.qrc">
-       <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
-     </property>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>List</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0" rowspan="4">
+        <widget class="QListWidget" name="layer_lv">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Ignored">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="dragEnabled">
+          <bool>true</bool>
+         </property>
+         <property name="dragDropMode">
+          <enum>QAbstractItemView::InternalMove</enum>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::ExtendedSelection</enum>
+         </property>
+         <property name="uniformItemSizes">
+          <bool>true</bool>
+         </property>
+         <property name="sortingEnabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QToolButton" name="add_pb">
+         <property name="toolTip">
+          <string>Add a new layer to the list</string>
+         </property>
+         <property name="text">
+          <string>Add</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../lay/lay/layResources.qrc">
+           <normaloff>:/add.png</normaloff>:/add.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QToolButton" name="delete_pb">
+         <property name="toolTip">
+          <string>Delete the selected layers from the list</string>
+         </property>
+         <property name="text">
+          <string>Delete</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../lay/lay/layResources.qrc">
+           <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QToolButton" name="edit_pb">
+         <property name="toolTip">
+          <string>Edit the current layer</string>
+         </property>
+         <property name="text">
+          <string>Edit</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../lay/lay/layResources.qrc">
+           <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <spacer>
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>5</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Text</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QPlainTextEdit" name="text_edit"/>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
  </widget>
  <resources>
-  <include location="../lay/layResources.qrc"/>
+  <include location="../../lay/lay/layResources.qrc"/>
  </resources>
  <connections/>
 </ui>

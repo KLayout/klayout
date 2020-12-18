@@ -38,7 +38,7 @@ TEST(1)
   EXPECT_EQ (lm.first_logical (db::LDPair (2, 0)).second, (unsigned int) 18);
   EXPECT_EQ (lm.first_logical (db::LDPair (0, 0)).first, false);
 
-  EXPECT_EQ (lm.mapping_str (18), "1/0;2-5/0");
+  EXPECT_EQ (lm.mapping_str (18), "1-5/0");
   EXPECT_EQ (lm.mapping_str (17), "1/5");
 
   lm.map (db::LDPair (2, 2), 18);
@@ -477,7 +477,7 @@ TEST(8)
   //  some
   lm.mmap_expr ("*/1-10", n++);
   EXPECT_EQ (lm.to_string (),
-    "layer_map('+*/0,1-10,11-*';'+*/1-10')"
+    "layer_map('+*/*';'+*/1-10')"
   );
   EXPECT_EQ (db::LayerMap::from_string_file_format (lm.to_string_file_format ()).to_string (), lm.to_string ());
 
@@ -485,7 +485,7 @@ TEST(8)
   lm.mmap_expr ("*/5,15", n++);
 
   EXPECT_EQ (lm.to_string (),
-    "layer_map('+*/0,1-4,5,6-10,11-14,15,16-*';'+*/1-4,5,6-10';'+*/5,15')"
+    "layer_map('+*/*';'+*/1-10';'+*/5,15')"
   );
   EXPECT_EQ (db::LayerMap::from_string_file_format (lm.to_string_file_format ()).to_string (), lm.to_string ());
 
@@ -496,8 +496,8 @@ TEST(8)
   EXPECT_EQ (set2string (lm.logical (db::LDPair (0, 10))), "0,1");
 
   //  NOTE: the leading "+" indicates that the listed layers may go somewhere else, so we can't plainly map them
-  EXPECT_EQ (lm.mapping_str (0), "+*/0,1-4,5,6-10,11-14,15,16-*");
-  EXPECT_EQ (lm.mapping_str (1), "+*/1-4,5,6-10");
+  EXPECT_EQ (lm.mapping_str (0), "+*/*");
+  EXPECT_EQ (lm.mapping_str (1), "+*/1-10");
   EXPECT_EQ (lm.mapping_str (2), "+*/5,15");
   EXPECT_EQ (lm.mapping_str (3), "");
 
@@ -516,7 +516,7 @@ TEST(8)
   //  some
   lm.mmap_expr ("1-10/*", n++);
   EXPECT_EQ (lm.to_string (),
-    "layer_map('+0/*;1-10/*;11-*/*';'+1-10/*')"
+    "layer_map('+*/*';'+1-10/*')"
   );
   EXPECT_EQ (db::LayerMap::from_string_file_format (lm.to_string_file_format ()).to_string (), lm.to_string ());
 
@@ -524,7 +524,7 @@ TEST(8)
   lm.mmap_expr ("5,15/*", n++);
 
   EXPECT_EQ (lm.to_string (),
-    "layer_map('+0/*;1-4/*;5/*;6-10/*;11-14/*;15/*;16-*/*';'+1-4/*;5/*;6-10/*';'+5/*;15/*')"
+    "layer_map('+*/*';'+1-10/*';'+5/*;15/*')"
   );
   EXPECT_EQ (db::LayerMap::from_string_file_format (lm.to_string_file_format ()).to_string (), lm.to_string ());
 
@@ -535,8 +535,8 @@ TEST(8)
   EXPECT_EQ (set2string (lm.logical (db::LDPair (10, 0))), "0,1");
 
   //  NOTE: the leading "+" indicates that the listed layers may go somewhere else, so we can't plainly map them
-  EXPECT_EQ (lm.mapping_str (0), "+0/*;1-4/*;5/*;6-10/*;11-14/*;15/*;16-*/*");
-  EXPECT_EQ (lm.mapping_str (1), "+1-4/*;5/*;6-10/*");
+  EXPECT_EQ (lm.mapping_str (0), "+*/*");
+  EXPECT_EQ (lm.mapping_str (1), "+1-10/*");
   EXPECT_EQ (lm.mapping_str (2), "+5/*;15/*");
   EXPECT_EQ (lm.mapping_str (3), "");
 
@@ -553,7 +553,7 @@ TEST(8)
   //  some
   lm.mmap_expr ("1-10/0-20", n++);
   EXPECT_EQ (lm.to_string (),
-    "layer_map('+0/*;1-10/0-20,21-*;11-*/*';'+1-10/0-20')"
+    "layer_map('+*/*';'+1-10/0-20')"
   );
   EXPECT_EQ (db::LayerMap::from_string_file_format (lm.to_string_file_format ()).to_string (), lm.to_string ());
 }

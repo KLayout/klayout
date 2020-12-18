@@ -173,5 +173,33 @@
     </tr>
   </table>
 
+  <h2>Multi-mapping and unmapping</h2>
+
+  <p>
+  Layer mapping table support an advanced feature which is to duplicate input layers to
+  a number of output layers (1:n) mapping.
+  The feature is enabled by prepending a "+" to the mapping statement. The following
+  statement will first select layer 5/0 and additionally copy it to layer 1000/0:
+  </p>
+
+  <pre>5/0
++5/0: 1000/0
+</pre>
+
+  <p>
+  Unmapping removes the mapping for a specific layer or range. It is specified by prepending "-"
+  to the mapping expression. The following statement will map all datatypes of layer 5 to 0 except
+  for datatype 10 which is not considered.
+  </p>
+
+  <pre>5/*: 5/0
+-5/10
+</pre>
+
+  <p>
+  Unmapping cancels the mappings specified previously, so the order of statements becomes important
+  when using unmapping and multi-mapping.
+  </p>
+
 </doc>
 

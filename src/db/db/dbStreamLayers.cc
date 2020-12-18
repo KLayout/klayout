@@ -262,6 +262,43 @@ static std::string format_interval (ld_type l1, ld_type l2)
   }
 }
 
+static std::vector<std::pair<ld_type, ld_type> >
+extract_dt_intervals (const LayerMap::datatype_map &dt_map, int ll, bool &has_others)
+{
+  std::vector<std::pair<ld_type, ld_type> > res;
+
+  for (LayerMap::datatype_map::const_iterator d = dt_map.begin (); d != dt_map.end (); ) {
+
+    if (d->second.find (ll) != d->second.end ()) {
+
+      std::pair<ld_type, ld_type> dpi = d->first;
+
+      if (d->second.size () > 1) {
+        has_others = true;
+      }
+
+      LayerMap::datatype_map::const_iterator dd = d;
+      ++dd;
+      while (dd != dt_map.end () && dd->first.first == dpi.second && dd->second.find (ll) != dd->second.end ()) {
+        if (dd->second.size () > 1) {
+          has_others = true;
+        }
+        dpi.second = dd->first.second;
+        ++dd;
+      }
+
+      d = dd;
+
+      res.push_back (dpi);
+
+    } else {
+      ++d;
+    }
+
+  }
+  return res;
+}
+
 std::string
 LayerMap::mapping_str (unsigned int ll) const
 {
@@ -269,36 +306,37 @@ LayerMap::mapping_str (unsigned int ll) const
   bool f1 = true;
   bool is_mmap = false;
 
-  for (ld_map::const_iterator l = m_ld_map.begin (); l != m_ld_map.end (); ++l) {
+  for (ld_map::const_iterator l = m_ld_map.begin (); l != m_ld_map.end (); ) {
+
+    std::pair<ld_type, ld_type> lti = l->first;
+
+    std::vector<std::pair<ld_type, ld_type> > dti = extract_dt_intervals (l->second, ll, is_mmap);
+    ++l;
+    while (l != m_ld_map.end () && lti.second == l->first.first && extract_dt_intervals (l->second, ll, is_mmap) == dti) {
+      lti.second = l->first.second;
+      ++l;
+    }
 
     bool f2 = true;
-    for (datatype_map::const_iterator d = l->second.begin (); d != l->second.end (); ++d) {
+    for (std::vector<std::pair<ld_type, ld_type> >::const_iterator d = dti.begin (); d != dti.end (); ++d) {
 
-      if (d->second.find (ll) != d->second.end ()) {
+      //  create a string representation
+      if (!f2) {
+        s += ",";
+      } else {
 
-        if (d->second.size () > 1) {
-          is_mmap = true;
+        if (!f1) {
+          s += ";";
         }
+        f1 = false;
 
-        //  create a string representation
-        if (!f2) {
-          s += ",";
-        } else {
-
-          if (!f1) {
-            s += ";";
-          }
-          f1 = false;
-
-          s += format_interval (l->first.first, l->first.second);
-          s += "/";
-
-        }
-        f2 = false;
-
-        s += format_interval (d->first.first, d->first.second);
+        s += format_interval (lti.first, lti.second);
+        s += "/";
 
       }
+      f2 = false;
+
+      s += format_interval (d->first, d->second);
 
     }
     

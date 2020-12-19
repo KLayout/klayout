@@ -74,6 +74,25 @@ TEST(1)
   EXPECT_EQ (lm.first_logical (db::LDPair(10, 7)).first, false);
   lm.map_expr ("'XP';10/7-8 : XN", 13);
   EXPECT_EQ (lm.mapping_str (13), "10/7-8;XP : XN");
+
+  //  brackets, "add_expr"
+  lm.clear ();
+  lm.add_expr ("[1-10/*]", 1);
+  EXPECT_EQ (lm.mapping_str (1), "1-10/* : */*");
+  lm.add_expr ("-(5/*)", 0);
+  EXPECT_EQ (lm.mapping_str (1), "1-4/*;6-10/* : */*");
+
+  lm.clear ();
+  lm.add_expr ("[1/15]", 1);
+  lm.add_expr ("+(1/5:1001/5)", 1);
+  //  NOTE: the target is taken from the second expression (the last one wins)
+  EXPECT_EQ (lm.mapping_str (1), "1/5,15 : 1001/5");
+
+  lm.clear ();
+  lm.add_expr ("+(1/5:1001/5)", 1);
+  lm.add_expr ("[1/15]", 1);
+  //  NOTE: the target is taken from the second expression (the last one wins)
+  EXPECT_EQ (lm.mapping_str (1), "1/5,15 : */*");
 }
 
 TEST(2) 

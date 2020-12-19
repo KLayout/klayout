@@ -201,5 +201,30 @@
   when using unmapping and multi-mapping.
   </p>
 
+  <h2>Brackets</h2>
+
+  <p>
+  Square brackets can be used to imply mapping to the original layer. When putting square brackets
+  around a mapping expression, the default target is "*/*", which means expansion to the original layer.
+  Hence the following statements are identical:
+  </p>
+
+  <pre>[1-10/*]
+1-10/* : */*
+</pre>
+
+  <p>
+  When combining this with "+" for multi-mapping, put "+" in front of the bracket.
+  </p>
+
+  <p>
+  You can put round brackets around mapping expressions for visual clarity, specifically when
+  combining them with "-" (unmapping) or "+" (multi-mapping):
+  </p>
+
+  <pre>-(1-10/*)
++(17/0 : 1017/0)
+</pre>
+
 </doc>
 

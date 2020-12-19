@@ -635,6 +635,13 @@ LayerMap::mmap_expr (tl::Extractor &ex, unsigned int l)
 {
   try {
 
+    bool round_bracket = false, square_bracket = false;
+    if (ex.test ("(")) {
+      round_bracket = true;
+    } else if (ex.test ("[")) {
+      square_bracket = true;
+    }
+
     do {
 
       tl::Extractor ex_saved = ex;
@@ -678,7 +685,15 @@ LayerMap::mmap_expr (tl::Extractor &ex, unsigned int l)
       LayerProperties lp;
       lp.read (ex, true);
       m_target_layers[l] = lp;
-    } 
+    } else if (square_bracket) {
+      m_target_layers[l] = LayerProperties (db::any_ld (), db::any_ld ());
+    }
+
+    if (round_bracket) {
+      ex.expect (")");
+    } else if (square_bracket) {
+      ex.expect ("]");
+    }
 
   } catch (...) {
     throw LayerSpecFormatException (ex.skip ());
@@ -790,6 +805,13 @@ LayerMap::unmap_expr (tl::Extractor &ex)
 {
   try {
 
+    bool round_bracket = false, square_bracket = false;
+    if (ex.test ("(")) {
+      round_bracket = true;
+    } else if (ex.test ("[")) {
+      square_bracket = true;
+    }
+
     do {
 
       tl::Extractor ex_saved = ex;
@@ -827,6 +849,12 @@ LayerMap::unmap_expr (tl::Extractor &ex)
       //  ignore target layers
       LayerProperties lp;
       lp.read (ex, true);
+    }
+
+    if (round_bracket) {
+      ex.expect (")");
+    } else if (square_bracket) {
+      ex.expect ("]");
     }
 
   } catch (...) {

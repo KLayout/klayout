@@ -32,6 +32,34 @@ namespace db
 // ---------------------------------------------------------------
 //  Common reader implementation
 
+DB_PUBLIC void
+join_layer_names (std::string &s, const std::string &n)
+{
+  if (s == n) {
+    return;
+  }
+
+  if (! s.empty ()) {
+
+    size_t i = s.find (n);
+    if (i != std::string::npos && (i == 0 || s.c_str ()[i - 1] == ';')) {
+      char after = s.c_str ()[i + n.size ()];
+      if (after == 0 || after == ';') {
+        //  n is already contained in s
+        return;
+      }
+    }
+
+    s += ";";
+
+  }
+
+  s += n;
+}
+
+// ---------------------------------------------------------------
+//  Common reader implementation
+
 static const size_t null_id = std::numeric_limits<size_t>::max ();
 
 CommonReader::CommonReader ()
@@ -280,7 +308,7 @@ CommonReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 {
   init (options);
 
-  m_layer_map.prepare (layout);
+  m_common_options.layer_map.prepare (layout);
 
   layout.start_changes ();
   try {
@@ -292,7 +320,7 @@ CommonReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
     throw;
   }
 
-  return m_layer_map;
+  return m_layer_map_out;
 }
 
 const db::LayerMap &
@@ -305,12 +333,23 @@ void
 CommonReader::init (const LoadLayoutOptions &options)
 {
   m_common_options = options.get_options<db::CommonReaderOptions> ();
-  m_layer_map = m_common_options.layer_map;
   m_cc_resolution = m_common_options.cell_conflict_resolution;
   m_create_layers = m_common_options.create_other_layers;
 
+  m_layer_map_out.clear ();
+  m_multi_mapping_placeholders.clear ();
+  m_layer_cache.clear ();
   m_layers_created.clear ();
   m_layer_names.clear ();
+
+  //  create a pseudo-multimapping for single targets
+  for (db::LayerMap::const_iterator_layers li = m_common_options.layer_map.begin (); li != m_common_options.layer_map.end (); ++li) {
+    for (db::LayerMap::const_iterator_datatypes di = li->second.begin (); di != li->second.end (); ++di) {
+      if (di->second.size () == 1) {
+        m_multi_mapping_placeholders.insert (std::make_pair (di->second, *di->second.begin ()));
+      }
+    }
+  }
 }
 
 void
@@ -420,21 +459,77 @@ CommonReader::finish (db::Layout &layout)
     }
 
   }
+
+  //  resolve layer multi-mapping
+
+  for (std::map<std::set<unsigned int>, unsigned int>::const_iterator i = m_multi_mapping_placeholders.begin (); i != m_multi_mapping_placeholders.end (); ++i) {
+
+    if (i->first.size () > 1) {
+
+      bool discard_layer = i->first.find (i->second) == i->first.end ();
+
+      for (std::set<unsigned int>::const_iterator l = i->first.begin (); l != i->first.end (); ++l) {
+
+        //  last one? this one will get a "move"
+        std::set<unsigned int>::const_iterator ll = l;
+        if (discard_layer && ++ll == i->first.end ()) {
+          layout.move_layer (i->second, *l);
+          layout.delete_layer (i->second);
+        } else {
+          layout.copy_layer (i->second, *l);
+        }
+
+      }
+
+    }
+
+  }
+
+  //  rename layers created before if required
+
+  for (std::set<unsigned int>::const_iterator i = m_layers_created.begin (); i != m_layers_created.end (); ++i) {
+
+    const db::LayerProperties &lp = layout.get_properties (*i);
+
+    const tl::interval_map <db::ld_type, std::string> *dtmap = layer_names ().mapped (lp.layer);
+    const std::string *name = 0;
+    if (dtmap) {
+      name = dtmap->mapped (lp.datatype);
+    }
+
+    if (name) {
+      //  need to rename: add a new madding to m_layer_map_out and adjust the layout's layer properties
+      db::LayerProperties lpp = lp;
+      join_layer_names (lpp.name, *name);
+      layout.set_properties (*i, lpp);
+      m_layer_map_out.map (LDPair (lp.layer, lp.datatype), *i, lpp);
+    }
+
+  }
 }
 
 std::pair <bool, unsigned int>
 CommonReader::open_dl (db::Layout &layout, const LDPair &dl)
 {
-  std::pair<bool, unsigned int> ll = m_layer_map.first_logical (dl, layout);
-  if (ll.first) {
-
-    return ll;
-
-  } else if (! m_create_layers) {
-
-    return ll;
-
+  std::map<db::LDPair, std::pair <bool, unsigned int> >::const_iterator lc = m_layer_cache.find (dl);
+  if (lc != m_layer_cache.end ()) {
+    return lc->second;
   } else {
+    std::pair <bool, unsigned int> res = open_dl_uncached (layout, dl);
+    m_layer_cache.insert (std::make_pair (dl, res));
+    return res;
+  }
+}
+
+std::pair <bool, unsigned int>
+CommonReader::open_dl_uncached (db::Layout &layout, const LDPair &dl)
+{
+  const std::set<unsigned int> &li = common_options ().layer_map.logical (dl, layout);
+  if (li.empty ()) {
+
+    if (! m_create_layers) {
+      return std::make_pair (false, (unsigned int) 0);
+    }
 
     //  and create the layer
     db::LayerProperties lp;
@@ -450,17 +545,52 @@ CommonReader::open_dl (db::Layout &layout, const LDPair &dl)
       }
     }
 
-    unsigned int ll = layout.insert_layer (lp);
-    m_layer_map.map (dl, ll, lp);
+    unsigned int nl = layout.insert_layer (lp);
+    m_layer_map_out.map (dl, nl, lp);
 
-    m_layers_created.insert (ll);
+    m_layers_created.insert (nl);
 
-    return std::make_pair (true, ll);
+    return std::make_pair (true, nl);
+
+  } else if (li.size () == 1) {
+
+    m_layer_map_out.map (dl, *li.begin (), layout.get_properties (*li.begin ()));
+
+    return std::make_pair (true, *li.begin ());
+
+  } else {
+
+    std::map<std::set<unsigned int>, unsigned int>::iterator mmp = m_multi_mapping_placeholders.find (li);
+    if (mmp == m_multi_mapping_placeholders.end ()) {
+
+      //  multi-mapping: create a placeholder layer if required
+
+      for (std::set<unsigned int>::const_iterator i = li.begin (); i != li.end (); ++i) {
+        m_layer_map_out.mmap (dl, *i, layout.get_properties (*i));
+      }
+
+      for (std::set<unsigned int>::const_iterator i = li.begin (); i != li.end (); ++i) {
+        std::set<unsigned int> sl;
+        sl.insert (*i);
+        if (m_multi_mapping_placeholders.find (sl) == m_multi_mapping_placeholders.end ()) {
+          //  a layer not used in a single-target context can be used as a placeholder layer (but only once)
+          m_multi_mapping_placeholders.insert (std::make_pair (sl, *i));
+          mmp = m_multi_mapping_placeholders.insert (std::make_pair (li, *i)).first;
+          break;
+        }
+      }
+
+      if (mmp == m_multi_mapping_placeholders.end ()) {
+        //  create a placeholder layer for later
+        mmp = m_multi_mapping_placeholders.insert (std::make_pair (li, layout.insert_layer ())).first;
+      }
+
+    }
+
+    return std::make_pair (true, mmp->second);
 
   }
 }
-
-
 
 // ---------------------------------------------------------------
 //  Common format declaration

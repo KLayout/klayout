@@ -508,12 +508,7 @@ struct LNameJoinOp1
 {
   void operator() (std::string &a, const std::string &b)
   {
-    if (a != b) {
-      if (! a.empty ()) {
-        a += ";";
-      } 
-      a += b;
-    }
+    join_layer_names (a, b);
   }
 };
 
@@ -987,19 +982,6 @@ OASISReader::do_read (db::Layout &layout)
       LNameJoinOp2 op2;
       layer_names ().add (l1, l2 + 1, dt_map, op2);
 
-      //  rename layers created before if required
-      for (std::set<unsigned int>::const_iterator i = layers_created ().begin (); i != layers_created ().end (); ++i) {
-        const db::LayerProperties &lp = layout.get_properties (*i);
-        if (lp.layer >= l1 && lp.layer <= l2 && lp.datatype >= dt1 && lp.datatype <= dt2 && lp.name != name) {
-          //  need to rename: add a new madding to m_layer_map and adjust the layout's layer properties
-          db::LayerProperties lpp = lp;
-          LNameJoinOp1 nj;
-          nj (lpp.name, name);
-          layout.set_properties (*i, lpp);
-          layer_map ().map (LDPair (lp.layer, lp.datatype), *i, lpp);
-        }
-      }
-      
       reset_modal_variables ();
 
       //  ignore properties attached to this name item

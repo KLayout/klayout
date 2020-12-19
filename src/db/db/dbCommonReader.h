@@ -31,6 +31,9 @@
 namespace db
 {
 
+DB_PUBLIC void
+join_layer_names (std::string &s, const std::string &n);
+
 /**
  *  @brief The CellConflictResolution enum
  */
@@ -236,27 +239,11 @@ protected:
   }
 
   /**
-   *  @brief Gets the layer map
-   */
-  db::LayerMap &layer_map ()
-  {
-    return m_layer_map;
-  }
-
-  /**
    *  @brief Gets the layer name map
    */
   layer_name_map &layer_names ()
   {
     return m_layer_names;
-  }
-
-  /**
-   *  @brief Gets the list of layers which have been created
-   */
-  std::set<unsigned int> &layers_created ()
-  {
-    return m_layers_created;
   }
 
   /**
@@ -271,9 +258,13 @@ private:
   CellConflictResolution m_cc_resolution;
   bool m_create_layers;
   db::CommonReaderOptions m_common_options;
-  db::LayerMap m_layer_map;
+  db::LayerMap m_layer_map_out;
   tl::interval_map <db::ld_type, tl::interval_map <db::ld_type, std::string> > m_layer_names;
+  std::map<db::LDPair, std::pair <bool, unsigned int> > m_layer_cache;
+  std::map<std::set<unsigned int>, unsigned int> m_multi_mapping_placeholders;
   std::set<unsigned int> m_layers_created;
+
+  std::pair <bool, unsigned int> open_dl_uncached (db::Layout &layout, const LDPair &dl);
 };
 
 /**

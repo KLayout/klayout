@@ -121,7 +121,7 @@ CatalinaSDK     = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.p
 RubyCatalina    = { 'exe':  '/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby',
                     'inc':  '%s/System/Library/Frameworks/Ruby.framework/Headers' % CatalinaSDK,
                     'inc2': '%s/System/Library/Frameworks/Ruby.framework/Headers/ruby' % CatalinaSDK,
-                    'lib':  '/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/libruby.dylib'
+                    'lib':  '%s/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/libruby.tbd' % CatalinaSDK
                   }
 
 # Bundled with Big Sur (11.0)
@@ -131,7 +131,7 @@ BigSurSDK       = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.p
 RubyBigSur      = { 'exe':  '/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby',
                     'inc':  '%s/System/Library/Frameworks/Ruby.framework/Headers' % BigSurSDK,
                     'inc2': '%s/System/Library/Frameworks/Ruby.framework/Headers/ruby' % BigSurSDK,
-                    'lib':  '/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/libruby.dylib'
+                    'lib':  '%s/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/libruby.tbd' % BigSurSDK
                   }
 
 # Ruby 2.7 from MacPorts (https://www.macports.org/) *+*+*+ EXPERIMENTAL *+*+*+

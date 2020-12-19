@@ -1360,10 +1360,12 @@ std::set<unsigned int> LEFDEFReaderState::open_layer_uncached(db::Layout &layout
       }
 
       bool found = false;
-      for (db::Layout::layer_iterator i = layout.begin_layers (); i != layout.end_layers () && ! found; ++i) {
-        if ((*i).second->log_equal (lp_new)) {
-          found = true;
-          res.insert ((*i).first);
+      if (lp_new.layer >= 0 && lp_new.datatype >= 0) {
+        for (db::Layout::layer_iterator i = layout.begin_layers (); i != layout.end_layers () && ! found; ++i) {
+          if ((*i).second->log_equal (lp_new)) {
+            found = true;
+            res.insert ((*i).first);
+          }
         }
       }
 

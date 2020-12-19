@@ -146,16 +146,16 @@ RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, d
   db::Vector vs ((m_cutsize.x () * m_columns + m_cutspacing.x () * (m_columns - 1)) / 2, (m_cutsize.y () * m_rows + m_cutspacing.y () * (m_rows - 1)) / 2);
   db::Box via_box (m_offset - vs, m_offset + vs);
 
-  std::pair <bool, unsigned int> dl (false, 0);
+  std::set <unsigned int> dl;
 
   dl = reader.open_layer (layout, m_bottom_layer, ViaGeometry, mask_bottom);
-  if (dl.first) {
-    cell.shapes (dl.second).insert (db::Polygon (via_box.enlarged (m_be).moved (m_bo)));
+  for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
+    cell.shapes (*l).insert (db::Polygon (via_box.enlarged (m_be).moved (m_bo)));
   }
 
   dl = reader.open_layer (layout, m_top_layer, ViaGeometry, mask_top);
-  if (dl.first) {
-    cell.shapes (dl.second).insert (db::Polygon (via_box.enlarged (m_te).moved (m_bo)));
+  for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
+    cell.shapes (*l).insert (db::Polygon (via_box.enlarged (m_te).moved (m_bo)));
   }
 
   const char *p = m_pattern.c_str ();
@@ -253,8 +253,8 @@ RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, d
           }
 
           dl = reader.open_layer (layout, m_cut_layer, ViaGeometry, cm);
-          if (dl.first) {
-            cell.shapes (dl.second).insert (db::Polygon (vb));
+          for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
+            cell.shapes (*l).insert (db::Polygon (vb));
           }
 
         }
@@ -322,9 +322,9 @@ GeometryBasedLayoutGenerator::create_cell (LEFDEFReaderState &reader, Layout &la
     unsigned int mshift = get_maskshift (g->first.first, ext_msl, masks);
     unsigned int mask = mask_for (g->first.first, g->first.second.second, mshift, nm);
 
-    std::pair <bool, unsigned int> dl = reader.open_layer (layout, g->first.first, g->first.second.first, mask);
-    if (dl.first) {
-      cell.shapes (dl.second).insert (g->second);
+    std::set <unsigned int> dl = reader.open_layer (layout, g->first.first, g->first.second.first, mask);
+    for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
+      cell.shapes (*l).insert (g->second);
     }
 
   }
@@ -809,7 +809,9 @@ void
 LEFDEFReaderState::map_layer_explicit (const std::string &n, LayerPurpose purpose, const db::LayerProperties &lp, unsigned int layer, unsigned int mask)
 {
   tl_assert (m_has_explicit_layer_mapping);
-  m_layers [std::make_pair (n, std::make_pair (purpose, mask))] = std::make_pair (true, layer);
+  std::set<unsigned int> ll;
+  ll.insert (layer);
+  m_layers [std::make_pair (n, std::make_pair (purpose, mask))] = ll;
   m_layer_map.map (lp, layer);
 }
 
@@ -1040,13 +1042,13 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
   }
 }
 
-std::pair <bool, unsigned int>
+std::set <unsigned int>
 LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPurpose purpose, unsigned int mask)
 {
-  std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, std::pair<bool, unsigned int> >::const_iterator nl = m_layers.find (std::make_pair (n, std::make_pair (purpose, mask)));
+  std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, std::set<unsigned int> >::const_iterator nl = m_layers.find (std::make_pair (n, std::make_pair (purpose, mask)));
   if (nl == m_layers.end ()) {
 
-    std::pair <bool, unsigned int> ll (false, 0);
+    std::set <unsigned int> ll;
 
     if (n.empty () || ! m_has_explicit_layer_mapping) {
       ll = open_layer_uncached (layout, n, purpose, mask);
@@ -1134,8 +1136,7 @@ static std::string purpose_to_name (LayerPurpose purpose)
  *    4/17                  4/17 : 4/11        OUTLINE 4/11
  */
 
-std::pair <bool, unsigned int>
-LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n, LayerPurpose purpose, unsigned int mask)
+std::set<unsigned int> LEFDEFReaderState::open_layer_uncached(db::Layout &layout, const std::string &n, LayerPurpose purpose, unsigned int mask)
 {
   if (n.empty ()) {
 
@@ -1154,7 +1155,7 @@ LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n
     }
 
     if (! produce) {
-      return std::make_pair (false, 0);
+      return std::set<unsigned int> ();
     }
 
     db::LayerProperties lp;
@@ -1180,35 +1181,55 @@ LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n
     }
 
     //  employ the layer map to find the target layer
-    std::pair<bool, unsigned int> ll = m_layer_map.first_logical (lp, layout);
+    std::set<unsigned int> ll = m_layer_map.logical (lp, layout);
+    if (ll.empty () && ! m_create_layers) {
+      return std::set<unsigned int> ();
+    }
 
-    if (ll.first) {
+    std::set<unsigned int> res;
+
+    //  map the layers to targets from the layout
+    //  (NOTE: the other readers will do this in advance, but LEF/DEF is too dynamic)
+
+    bool at_least_once = true;
+    for (std::set<unsigned int>::const_iterator l = ll.begin (); l != ll.end () || at_least_once; ++l) {
+
+      at_least_once = false;
 
       //  If the layer map provides a target, use that one for the layer
-      const db::LayerProperties *lpp = m_layer_map.target (ll.second);
+      db::LayerProperties lp_new = lp;
+      const db::LayerProperties *lpp = (l == ll.end () ? 0 : m_layer_map.target (*l));
       if (lpp) {
         if (! lpp->name.empty ()) {
-          lp.name = lpp->name;
+          lp_new.name = lpp->name;
         }
         if (lpp->datatype >= 0) {
-          lp.datatype = lpp->datatype;
+          lp_new.datatype = lpp->datatype;
         }
         if (lpp->layer >= 0) {
-          lp.layer = lpp->layer;
+          lp_new.layer = lpp->layer;
         }
       }
 
-    } else if (! m_create_layers) {
-      return std::make_pair (false, 0);
-    }
-
-    for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
-      if ((*l).second->log_equal (lp)) {
-        return std::make_pair (true, (*l).first);
+      bool found = false;
+      for (db::Layout::layer_iterator i = layout.begin_layers (); i != layout.end_layers () && ! found; ++i) {
+        if ((*i).second->log_equal (lp_new)) {
+          found = true;
+          res.insert ((*i).first);
+        }
       }
+
+      if (! found) {
+        res.insert (layout.insert_layer (lp_new));
+      }
+
+      if (l == ll.end ()) {
+        break;
+      }
+
     }
 
-    return std::make_pair (true, layout.insert_layer (lp));
+    return res;
 
   } else {
 
@@ -1242,7 +1263,7 @@ LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n
         break;
       }
       if (! produce) {
-        return std::make_pair (false, 0);
+        return std::set<unsigned int> ();
       }
     }
 
@@ -1300,48 +1321,63 @@ LEFDEFReaderState::open_layer_uncached (db::Layout &layout, const std::string &n
 
     //  Route the layer through the layer map, first the decorated name and if there is no mapping, the
     //  undecorated one.
-    std::pair<bool, unsigned int> ll = m_layer_map.first_logical (name, layout);
+    std::set<unsigned int> ll = m_layer_map.logical (name, layout);
     bool generic_match = false;
-    if (! ll.first) {
-      ll = m_layer_map.first_logical (n, layout);
+    if (ll.empty ()) {
+      ll = m_layer_map.logical (n, layout);
       generic_match = true;
     } else if (n == name) {
       //  no suffix defined in tech component -> treat as generic match and combine datatypes
       generic_match = true;
     }
 
-    if (ll.first) {
+    if (ll.empty () && ! m_create_layers) {
+      return std::set<unsigned int> ();
+    }
+
+    std::set<unsigned int> res;
+
+    bool at_least_once = true;
+    for (std::set<unsigned int>::const_iterator l = ll.begin (); l != ll.end () || at_least_once; ++l) {
+
+      at_least_once = false;
 
       //  If the layer map provides a target, use that one for the layer
-      //  Datatypes from the target and the tech component's x_datatype specification are additive
-      const db::LayerProperties *lpp = m_layer_map.target (ll.second);
+      db::LayerProperties lp_new = lp;
+      const db::LayerProperties *lpp = (l == ll.end () ? 0 : m_layer_map.target (*l));
       if (lpp) {
-        lp = *lpp;
-        if (lp.datatype < 0) {
-          lp.datatype = dt;
+        lp_new = *lpp;
+        if (lp_new.datatype < 0) {
+          lp_new.datatype = dt;
         } else if (generic_match) {
-          lp.datatype += dt;
+          lp_new.datatype += dt;
         }
-        if (lp.name.empty ()) {
-          lp.name = name;
+        if (lp_new.name.empty ()) {
+          lp_new.name = name;
         } else if (generic_match) {
-          lp.name += name_suffix;
+          lp_new.name += name_suffix;
         }
       }
 
-    } else if (! m_create_layers) {
-      return std::make_pair (false, 0);
-    }
-
-    if (lp.layer >= 0 && lp.datatype >= 0) {
-      for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
-        if ((*l).second->log_equal (lp)) {
-          return std::make_pair (true, (*l).first);
+      bool found = false;
+      for (db::Layout::layer_iterator i = layout.begin_layers (); i != layout.end_layers () && ! found; ++i) {
+        if ((*i).second->log_equal (lp_new)) {
+          found = true;
+          res.insert ((*i).first);
         }
       }
+
+      if (! found) {
+        res.insert (layout.insert_layer (lp_new));
+      }
+
+      if (l == ll.end ()) {
+        break;
+      }
+
     }
 
-    return std::make_pair (true, layout.insert_layer (lp));
+    return res;
 
   }
 }
@@ -1368,41 +1404,13 @@ LEFDEFReaderState::finish (db::Layout &layout)
 
   db::LayerMap lm;
 
-  for (std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, std::pair<bool, unsigned int> >::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
+  for (std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, std::set<unsigned int> >::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
 
-    if (! l->second.first) {
+    if (l->second.empty ()) {
       continue;
     }
 
     std::string ps = purpose_to_name (l->first.second.first);
-
-    unsigned int layer_index = l->second.second;
-    db::LayerProperties lp = layout.get_properties (layer_index);
-
-    if (lp.layer < 0) {
-
-      std::map<std::string, int>::const_iterator n4n = number_for_name.end ();
-      if (! l->first.first.empty ()) {
-        n4n = number_for_name.find (l->first.first);
-      }
-
-      if (n4n == number_for_name.end ()) {
-        do {
-          ++lnum;
-        } while (used_numbers.find (lnum) != used_numbers.end ());
-        number_for_name.insert (std::make_pair (l->first.first, lnum));
-        lp.layer = lnum;
-      } else {
-        lp.layer = n4n->second;
-      }
-
-    }
-
-    if (lp.datatype < 0) {
-      lp.datatype = 0;
-    }
-
-    layout.set_properties (layer_index, lp);
 
     std::string n = l->first.first;
     if (! n.empty ()) {
@@ -1415,7 +1423,39 @@ LEFDEFReaderState::finish (db::Layout &layout)
       n += tl::to_string (l->first.second.second);
     }
 
-    lm.map (db::LayerProperties (n), l->second.second, lp);
+    for (std::set<unsigned int>::const_iterator li = l->second.begin (); li != l->second.end (); ++li) {
+
+      unsigned int layer_index = *li;
+      db::LayerProperties lp = layout.get_properties (layer_index);
+
+      if (lp.layer < 0) {
+
+        std::map<std::string, int>::const_iterator n4n = number_for_name.end ();
+        if (! l->first.first.empty ()) {
+          n4n = number_for_name.find (l->first.first);
+        }
+
+        if (n4n == number_for_name.end ()) {
+          do {
+            ++lnum;
+          } while (used_numbers.find (lnum) != used_numbers.end ());
+          number_for_name.insert (std::make_pair (l->first.first, lnum));
+          lp.layer = lnum;
+        } else {
+          lp.layer = n4n->second;
+        }
+
+      }
+
+      if (lp.datatype < 0) {
+        lp.datatype = 0;
+      }
+
+      layout.set_properties (layer_index, lp);
+
+      lm.mmap (db::LayerProperties (n), layer_index, lp);
+
+    }
 
   }
 

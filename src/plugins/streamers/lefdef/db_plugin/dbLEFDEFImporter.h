@@ -1054,7 +1054,7 @@ public:
   /**
    *  @brief Create a new layer or return the index of the given layer
    */
-  std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
+  std::set<unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
 
   /**
    *  @brief Registers a layer (assign a new default layer number)
@@ -1188,7 +1188,7 @@ private:
   LEFDEFReaderState (const LEFDEFReaderState &);
   LEFDEFReaderState &operator= (const LEFDEFReaderState &);
 
-  std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, std::pair<bool, unsigned int> > m_layers;
+  std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, std::set<unsigned int> > m_layers;
   db::LayerMap m_layer_map;
   bool m_create_layers;
   bool m_has_explicit_layer_mapping;
@@ -1201,7 +1201,7 @@ private:
   std::map<std::string, LEFDEFLayoutGenerator *> m_macro_generators;
   std::map<std::string, db::cell_index_type> m_foreign_cells;
 
-  std::pair <bool, unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
+  std::set<unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
   void map_layer_explicit (const std::string &n, LayerPurpose purpose, const LayerProperties &lp, unsigned int layer, unsigned int mask);
   db::cell_index_type foreign_cell(Layout &layout, const std::string &name);
 };
@@ -1364,7 +1364,7 @@ protected:
   /**
    *  @brief Create a new layer or return the index of the given layer
    */
-  std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask)
+  std::set<unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask)
   {
     return mp_reader_state->open_layer (layout, name, purpose, mask);
   }

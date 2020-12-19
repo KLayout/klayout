@@ -1202,7 +1202,6 @@ private:
   std::map<std::string, db::cell_index_type> m_foreign_cells;
 
   std::set<unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
-  void map_layer_explicit (const std::string &n, LayerPurpose purpose, const LayerProperties &lp, unsigned int layer, unsigned int mask);
   db::cell_index_type foreign_cell(Layout &layout, const std::string &name);
 };
 

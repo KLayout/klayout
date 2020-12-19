@@ -85,12 +85,12 @@ static void set_properties_enabled (db::LoadLayoutOptions *options, bool l)
   options->get_options<db::CommonReaderOptions> ().enable_properties = l;
 }
 
-static db::CommonReader::CellConflictResolution get_cell_conflict_resolution (const db::LoadLayoutOptions *options)
+static db::CellConflictResolution get_cell_conflict_resolution (const db::LoadLayoutOptions *options)
 {
   return options->get_options<db::CommonReaderOptions> ().cell_conflict_resolution;
 }
 
-static void set_cell_conflict_resolution (db::LoadLayoutOptions *options, db::CommonReader::CellConflictResolution cc)
+static void set_cell_conflict_resolution (db::LoadLayoutOptions *options, db::CellConflictResolution cc)
 {
   options->get_options<db::CommonReaderOptions> ().cell_conflict_resolution = cc;
 }
@@ -188,18 +188,18 @@ gsi::ClassExt<db::LoadLayoutOptions> common_reader_options (
 );
 
 
-gsi::EnumIn<db::LoadLayoutOptions, db::CommonReader::CellConflictResolution> decl_dbCommonReader_CellConflictResolution ("db", "CellConflictResolution",
-  gsi::enum_const ("AddToCell", db::CommonReader::AddToCell,
+gsi::EnumIn<db::LoadLayoutOptions, db::CellConflictResolution> decl_dbCommonReader_CellConflictResolution ("db", "CellConflictResolution",
+  gsi::enum_const ("AddToCell", db::AddToCell,
     "@brief Add content to existing cell\n"
     "This is the mode use in before version 0.27. Content of new cells is simply added to existing cells with the same name."
   ) +
-  gsi::enum_const ("OverwriteCell", db::CommonReader::OverwriteCell,
+  gsi::enum_const ("OverwriteCell", db::OverwriteCell,
     "@brief The old cell is overwritten entirely (including child cells which are not used otherwise)\n"
   ) +
-  gsi::enum_const ("SkipNewCell", db::CommonReader::SkipNewCell,
+  gsi::enum_const ("SkipNewCell", db::SkipNewCell,
     "@brief The new cell is skipped entirely (including child cells which are not used otherwise)\n"
   ) +
-  gsi::enum_const ("RenameCell", db::CommonReader::RenameCell,
+  gsi::enum_const ("RenameCell", db::RenameCell,
     "@brief The new cell will be renamed to become unique\n"
   ),
   "@brief This enum specifies how cell conflicts are handled if a layout read into another layout and a cell name conflict arises. "

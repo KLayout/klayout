@@ -38,35 +38,6 @@ namespace db
 
 // ---------------------------------------------------------------
 
-/**
- *  @brief A utility class that maps the layers for the proxy cell recovery
- */
-class OASISReaderLayerMapping
-  : public db::ImportLayerMapping
-{
-public:
-  OASISReaderLayerMapping (db::OASISReader *reader, db::Layout *layout, bool create)
-    : mp_reader (reader), mp_layout (layout), m_create (create)
-  {
-    //  .. nothing yet .. 
-  }
-
-  std::pair<bool, unsigned int> map_layer (const db::LayerProperties &lprops)
-  {
-    //  named layers that are imported from a library are ignored
-    if (lprops.is_named ()) {
-      return std::make_pair (false, 0);
-    } else {
-      return mp_reader->open_dl (*mp_layout, LDPair (lprops.layer, lprops.datatype), m_create);
-    }
-  }
-
-private:
-  db::OASISReader *mp_reader;
-  db::Layout *mp_layout;
-  bool m_create;
-};
-
 // ---------------------------------------------------------------
 //  OASISReader
 
@@ -101,7 +72,6 @@ OASISReader::OASISReader (tl::InputStream &s)
     mm_last_property_name (this, "last-property-name"),
     mm_last_property_is_sprop (this, "last-property-is-stdprop"),
     mm_last_value_list(this, "last-value-list"),
-    m_create_layers (false),
     m_read_texts (true),
     m_read_properties (true),
     m_read_all_properties (false),
@@ -129,40 +99,17 @@ OASISReader::~OASISReader ()
   //  .. nothing yet ..
 }
 
-const LayerMap &
-OASISReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
+void
+OASISReader::init (const db::LoadLayoutOptions &options)
 {
-  db::OASISReaderOptions oasis_options = options.get_options<db::OASISReaderOptions> ();
-  db::CommonReaderOptions common_options = options.get_options<db::CommonReaderOptions> ();
+  CommonReader::init (options);
 
-  m_layer_map = common_options.layer_map;
-  m_layer_map.prepare (layout);
-  m_layers_created.clear ();
-  m_read_texts = common_options.enable_text_objects;
-  m_read_properties = common_options.enable_properties;
-  m_create_layers = common_options.create_other_layers;
+  m_read_texts = common_options ().enable_text_objects;
+  m_read_properties = common_options ().enable_properties;
+
+  db::OASISReaderOptions oasis_options = options.get_options<db::OASISReaderOptions> ();
   m_read_all_properties = oasis_options.read_all_properties;
   m_expect_strict_mode = oasis_options.expect_strict_mode;
-
-  set_cell_conflict_resolution (common_options.cell_conflict_resolution);
-
-  layout.start_changes ();
-  try {
-    do_read (layout);
-    finish (layout);
-    layout.end_changes ();
-  } catch (...) {
-    layout.end_changes ();
-    throw;
-  }
-
-  return m_layer_map;
-}
-
-const LayerMap &
-OASISReader::read (db::Layout &layout)
-{
-  return read (layout, db::LoadLayoutOptions ());
 }
 
 inline long long 
@@ -554,44 +501,6 @@ OASISReader::warn (const std::string &msg)
   }
 }
 
-std::pair <bool, unsigned int> 
-OASISReader::open_dl (db::Layout &layout, const LDPair &dl, bool create)
-{
-  std::pair<bool, unsigned int> ll = m_layer_map.first_logical (dl, layout);
-  if (ll.first) {
-
-    return ll;
-
-  } else if (! create) {
-
-    return ll;
-
-  } else {
-
-    //  and create the layer
-    db::LayerProperties lp;
-    lp.layer = dl.layer;
-    lp.datatype = dl.datatype;
-
-    //  resolve OASIS name if possible
-    const tl::interval_map <db::ld_type, std::string> *names_dmap = m_layernames.mapped (dl.layer);
-    if (names_dmap != 0) {
-      const std::string *name = names_dmap->mapped (dl.datatype);
-      if (name != 0) {
-        lp.name = *name;
-      }
-    }
-      
-    unsigned int ll = layout.insert_layer (lp);
-    m_layer_map.map (dl, ll, lp);
-
-    m_layers_created.insert (ll);
-
-    return std::make_pair (true, ll);
-
-  }
-}
-
 /**
  *  @brief A helper class to join two datatype layer name map members
  */
@@ -765,7 +674,6 @@ OASISReader::do_read (db::Layout &layout)
   m_textstrings.clear ();
   m_propstrings.clear ();
   m_propnames.clear ();
-  m_layernames.clear ();
 
   m_instances.clear ();
   m_instances_with_props.clear ();
@@ -1077,10 +985,10 @@ OASISReader::do_read (db::Layout &layout)
       LNameJoinOp1 op1;
       dt_map.add (dt1, dt2 + 1, name, op1);
       LNameJoinOp2 op2;
-      m_layernames.add (l1, l2 + 1, dt_map, op2);
+      layer_names ().add (l1, l2 + 1, dt_map, op2);
 
       //  rename layers created before if required
-      for (std::set<unsigned int>::const_iterator i = m_layers_created.begin (); i != m_layers_created.end (); ++i) {
+      for (std::set<unsigned int>::const_iterator i = layers_created ().begin (); i != layers_created ().end (); ++i) {
         const db::LayerProperties &lp = layout.get_properties (*i);
         if (lp.layer >= l1 && lp.layer <= l2 && lp.datatype >= dt1 && lp.datatype <= dt2 && lp.name != name) {
           //  need to rename: add a new madding to m_layer_map and adjust the layout's layer properties
@@ -1088,7 +996,7 @@ OASISReader::do_read (db::Layout &layout)
           LNameJoinOp1 nj;
           nj (lpp.name, name);
           layout.set_properties (*i, lpp);
-          m_layer_map.map (LDPair (lp.layer, lp.datatype), *i, lpp);
+          layer_map ().map (LDPair (lp.layer, lp.datatype), *i, lpp);
         }
       }
       
@@ -2038,7 +1946,7 @@ OASISReader::do_read_text (bool xy_absolute,
 
   std::pair<bool, unsigned int> ll (false, 0);
   if (m_read_texts) {
-    ll = open_dl (layout, LDPair (mm_textlayer.get (), mm_texttype.get ()), m_create_layers);
+    ll = open_dl (layout, LDPair (mm_textlayer.get (), mm_texttype.get ()));
   }
 
   if ((m & 0x4) && read_repetition ()) {
@@ -2180,7 +2088,7 @@ OASISReader::do_read_rectangle (bool xy_absolute,
   db::Box box (db::Point (mm_geometry_x.get (), mm_geometry_y.get ()),
                db::Point (mm_geometry_x.get () + mm_geometry_w.get (), mm_geometry_y.get () + mm_geometry_h.get ()));
 
-  std::pair<bool, unsigned int> ll = open_dl (layout, LDPair (mm_layer.get (), mm_datatype.get ()), m_create_layers);
+  std::pair<bool, unsigned int> ll = open_dl (layout, LDPair (mm_layer.get (), mm_datatype.get ()));
 
   if ((m & 0x4) && read_repetition ()) {
 
@@ -2294,7 +2202,7 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
 
   db::Vector pos (mm_geometry_x.get (), mm_geometry_y.get ());
 
-  std::pair<bool, unsigned int> ll = open_dl (layout, LDPair (mm_layer.get (), mm_datatype.get ()), m_create_layers);
+  std::pair<bool, unsigned int> ll = open_dl (layout, LDPair (mm_layer.get (), mm_datatype.get ()));
 
   if ((m & 0x4) && read_repetition ()) {
 
@@ -2461,7 +2369,7 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
 
   db::Vector pos (mm_geometry_x.get (), mm_geometry_y.get ());
 
-  std::pair<bool, unsigned int> ll = open_dl (layout, LDPair (mm_layer.get (), mm_datatype.get ()), m_create_layers);
+  std::pair<bool, unsigned int> ll = open_dl (layout, LDPair (mm_layer.get (), mm_datatype.get ()));
 
   if ((m & 0x4) && read_repetition ()) {
 
@@ -2620,7 +2528,7 @@ OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index
 
   db::Vector pos (mm_geometry_x.get (), mm_geometry_y.get ());
 
-  std::pair<bool, unsigned int> ll = open_dl (layout, LDPair (mm_layer.get (), mm_datatype.get ()), m_create_layers);
+  std::pair<bool, unsigned int> ll = open_dl (layout, LDPair (mm_layer.get (), mm_datatype.get ()));
 
   db::Point pts [4];
 
@@ -2775,7 +2683,7 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
 
   db::Vector pos (mm_geometry_x.get (), mm_geometry_y.get ());
 
-  std::pair<bool, unsigned int> ll = open_dl (layout, LDPair (mm_layer.get (), mm_datatype.get ()), m_create_layers);
+  std::pair<bool, unsigned int> ll = open_dl (layout, LDPair (mm_layer.get (), mm_datatype.get ()));
 
   db::Point pts [4];
 
@@ -3126,7 +3034,7 @@ OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, d
 
   db::Vector pos (mm_geometry_x.get (), mm_geometry_y.get ());
 
-  std::pair<bool, unsigned int> ll = open_dl (layout, LDPair (mm_layer.get (), mm_datatype.get ()), m_create_layers);
+  std::pair<bool, unsigned int> ll = open_dl (layout, LDPair (mm_layer.get (), mm_datatype.get ()));
 
   //  ignore this circle if the radius is zero
   if (mm_circle_radius.get () <= 0) {
@@ -3444,7 +3352,7 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
 
   //  Restore proxy cell (link to PCell or Library)
   if (has_context) {
-    OASISReaderLayerMapping layer_mapping (this, &layout, m_create_layers);
+    CommonReaderLayerMapping layer_mapping (this, &layout);
     layout.recover_proxy_as (cell_index, context_strings.begin (), context_strings.end (), &layer_mapping);
   }
 

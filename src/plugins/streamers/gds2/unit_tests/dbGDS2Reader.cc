@@ -443,7 +443,7 @@ TEST(4_CollectModeRename)
   db::Layout layout (&m);
 
   db::LoadLayoutOptions options;
-  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::CommonReader::RenameCell;
+  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::RenameCell;
 
   {
     tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_basic.gds");
@@ -467,7 +467,7 @@ TEST(4_CollectModeOverwrite)
   db::Layout layout (&m);
 
   db::LoadLayoutOptions options;
-  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::CommonReader::OverwriteCell;
+  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::OverwriteCell;
 
   {
     tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_basic.gds");
@@ -491,7 +491,7 @@ TEST(4_CollectModeSkip)
   db::Layout layout (&m);
 
   db::LoadLayoutOptions options;
-  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::CommonReader::SkipNewCell;
+  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::SkipNewCell;
 
   {
     tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_basic.gds");
@@ -515,7 +515,7 @@ TEST(4_CollectModeAdd)
   db::Layout layout (&m);
 
   db::LoadLayoutOptions options;
-  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::CommonReader::AddToCell;
+  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::AddToCell;
 
   {
     tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_basic.gds");

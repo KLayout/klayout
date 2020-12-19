@@ -123,20 +123,31 @@ extract_ld (const char *s, int &l, int &d, std::string &n)
 std::pair <bool, unsigned int>
 NamedLayerReader::open_layer (db::Layout &layout, const std::string &n)
 {
+  std::map<std::string, std::pair <bool, unsigned int> >::const_iterator lc = m_layer_cache.find (n);
+  if (lc != m_layer_cache.end ()) {
+    return lc->second;
+  } else {
+    std::pair <bool, unsigned int> res = open_layer_uncached (layout, n);
+    m_layer_cache.insert (std::make_pair (n, res));
+    return res;
+  }
+}
+
+std::pair <bool, unsigned int>
+NamedLayerReader::open_layer_uncached (db::Layout &layout, const std::string &n)
+{
   int l = -1, d = -1;
   std::string on;
 
-  std::pair<bool, unsigned int> ll (false, 0);
-
-  ll = m_layer_map.first_logical (n, layout);
-  if (! ll.first && !m_keep_layer_names) {
+  std::set<unsigned int> li = m_layer_map.logical (n, layout);
+  if (li.empty () && ! m_keep_layer_names) {
 
     if (extract_plain_layer (n.c_str (), l)) {
 
       db::LayerProperties lp;
       lp.layer = l;
       lp.datatype = 0;
-      ll = m_layer_map.first_logical (lp, layout);
+      li = m_layer_map.logical (lp, layout);
 
     } else if (extract_ld (n.c_str (), l, d, on)) {
 
@@ -144,20 +155,33 @@ NamedLayerReader::open_layer (db::Layout &layout, const std::string &n)
       lp.layer = l;
       lp.datatype = d;
       lp.name = on;
-      ll = m_layer_map.first_logical (lp, layout);
+      li = m_layer_map.logical (lp, layout);
 
     }
 
   }
 
-  if (ll.first) {
+  if (! li.empty ()) {
 
-    //  create the layer if it is not part of the layout yet.
-    if (! layout.is_valid_layer (ll.second)) {
-      layout.insert_layer (ll.second, m_layer_map.mapping (ll.second));
+    for (std::set<unsigned int>::const_iterator i = li.begin (); i != li.end (); ++i) {
+      m_layer_map_out.mmap (n, *i, layout.get_properties (*i));
     }
 
-    return ll;
+    if (li.size () == 1) {
+
+      return std::make_pair (true, *li.begin ());
+
+    } else {
+
+      std::map<std::set<unsigned int>, unsigned int>::iterator mmp = m_multi_mapping_placeholders.find (li);
+      if (mmp == m_multi_mapping_placeholders.end ()) {
+        //  create a placeholder layer for later
+        mmp = m_multi_mapping_placeholders.insert (std::make_pair (li, layout.insert_layer ())).first;
+      }
+
+      return std::make_pair (true, mmp->second);
+
+    }
 
   } else if (! m_create_layers) {
 
@@ -188,21 +212,61 @@ NamedLayerReader::open_layer (db::Layout &layout, const std::string &n)
 void
 NamedLayerReader::map_layer (const std::string &name, unsigned int layer)
 {
-  m_layer_map.map (name, layer);
+  m_layer_map_out.map (name, layer);
 }
 
 void
-NamedLayerReader::prepare_layers ()
+NamedLayerReader::prepare_layers (db::Layout &layout)
 {
   m_new_layers.clear ();
   m_next_layer_index = m_layer_map.next_index ();
+
+  m_layer_map_out.clear ();
+  m_multi_mapping_placeholders.clear ();
+  m_layer_cache.clear ();
+
+  m_layer_map.prepare (layout);
+
+  //  create a pseudo-multimapping for single targets
+  for (db::LayerMap::const_iterator_layers li = m_layer_map.begin (); li != m_layer_map.end (); ++li) {
+    for (db::LayerMap::const_iterator_datatypes di = li->second.begin (); di != li->second.end (); ++di) {
+      if (di->second.size () == 1) {
+        m_multi_mapping_placeholders.insert (std::make_pair (di->second, *di->second.begin ()));
+      }
+    }
+  }
 }
 
 void
 NamedLayerReader::finish_layers (db::Layout &layout)
 {
+  //  resolve layer multi-mapping
+
+  for (std::map<std::set<unsigned int>, unsigned int>::const_iterator i = m_multi_mapping_placeholders.begin (); i != m_multi_mapping_placeholders.end (); ++i) {
+
+    if (i->first.size () > 1) {
+
+      bool discard_layer = i->first.find (i->second) == i->first.end ();
+
+      for (std::set<unsigned int>::const_iterator l = i->first.begin (); l != i->first.end (); ++l) {
+
+        //  last one? this one will get a "move"
+        std::set<unsigned int>::const_iterator ll = l;
+        if (discard_layer && ++ll == i->first.end ()) {
+          layout.move_layer (i->second, *l);
+          layout.delete_layer (i->second);
+        } else {
+          layout.copy_layer (i->second, *l);
+        }
+
+      }
+
+    }
+
+  }
+
   //  assign layer numbers to new layers
-  if (! m_new_layers.empty () && !m_keep_layer_names) {
+  if (! m_new_layers.empty () && ! m_keep_layer_names) {
 
     std::set<std::pair<int, int> > used_ld;
     for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {

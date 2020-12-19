@@ -560,31 +560,14 @@ CommonReader::open_dl_uncached (db::Layout &layout, const LDPair &dl)
 
   } else {
 
+    for (std::set<unsigned int>::const_iterator i = li.begin (); i != li.end (); ++i) {
+      m_layer_map_out.mmap (dl, *i, layout.get_properties (*i));
+    }
+
     std::map<std::set<unsigned int>, unsigned int>::iterator mmp = m_multi_mapping_placeholders.find (li);
     if (mmp == m_multi_mapping_placeholders.end ()) {
-
-      //  multi-mapping: create a placeholder layer if required
-
-      for (std::set<unsigned int>::const_iterator i = li.begin (); i != li.end (); ++i) {
-        m_layer_map_out.mmap (dl, *i, layout.get_properties (*i));
-      }
-
-      for (std::set<unsigned int>::const_iterator i = li.begin (); i != li.end (); ++i) {
-        std::set<unsigned int> sl;
-        sl.insert (*i);
-        if (m_multi_mapping_placeholders.find (sl) == m_multi_mapping_placeholders.end ()) {
-          //  a layer not used in a single-target context can be used as a placeholder layer (but only once)
-          m_multi_mapping_placeholders.insert (std::make_pair (sl, *i));
-          mmp = m_multi_mapping_placeholders.insert (std::make_pair (li, *i)).first;
-          break;
-        }
-      }
-
-      if (mmp == m_multi_mapping_placeholders.end ()) {
-        //  create a placeholder layer for later
-        mmp = m_multi_mapping_placeholders.insert (std::make_pair (li, layout.insert_layer ())).first;
-      }
-
+      //  create a placeholder layer
+      mmp = m_multi_mapping_placeholders.insert (std::make_pair (li, layout.insert_layer ())).first;
     }
 
     return std::make_pair (true, mmp->second);

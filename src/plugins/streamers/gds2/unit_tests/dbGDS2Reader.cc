@@ -476,6 +476,47 @@ TEST(3_MultiMapping)
   db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
 }
 
+TEST(3_MultiMapping2)
+{
+  db::Manager m (false);
+  db::Layout layout (&m);
+
+  db::LoadLayoutOptions options;
+  db::LayerMap lm, lm_read;
+
+  unsigned int n = 0;
+  lm.add_expr ("(1/0:1/0)", n++);
+  lm.add_expr ("+(1/0:1000/0)", n++);
+  lm.add_expr ("(4/0:1/0)", n++);
+  lm.add_expr ("(2/0:2/0)", n++);
+  lm.add_expr ("+(2/0:1000/0)", n++);
+  lm.add_expr ("(3/0:3/0)", n++);
+  options.get_options<db::CommonReaderOptions> ().layer_map = lm;
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/t10.gds");
+    db::Reader reader (file);
+    lm_read = reader.read (layout, options);
+  }
+
+  EXPECT_EQ (lm_read.to_string_file_format (),
+    "+1/0;4/0 : 1/0\n"
+    "+1-2/0 : 1000/0\n"
+    "+2/0 : 2/0\n"
+    "3/0 : 3/0\n"
+    "6/0 : 6/0\n"
+    "8/0 : 8/0\n"
+    "5/0 : 5/0\n"
+    "7/0 : 7/0\n"
+    "3/1 : 3/1\n"
+    "6/1 : 6/1\n"
+    "8/1 : 8/1\n"
+  );
+
+  std::string fn_au (tl::testsrc () + "/testdata/gds/alm_au3.gds");
+  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+}
+
 TEST(4_CollectModeRename)
 {
   db::Manager m (false);

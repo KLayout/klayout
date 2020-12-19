@@ -318,9 +318,7 @@ DXFReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   m_stream.reset ();
   m_initial = true;
   m_line_number = 0;
-  db::LayerMap lm = specific_options.layer_map;
-  lm.prepare (layout);
-  set_layer_map (lm);
+  set_layer_map (specific_options.layer_map);
   set_create_layers (specific_options.create_other_layers);
   set_keep_layer_names (specific_options.keep_layer_names);
 
@@ -330,7 +328,7 @@ DXFReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   do_read (layout, top);
   cleanup (layout, top);
 
-  return layer_map ();
+  return layer_map_out ();
 }
 
 const LayerMap &
@@ -379,28 +377,23 @@ DXFReader::open_layer (db::Layout &layout, const std::string &n)
 void
 DXFReader::do_read (db::Layout &layout, db::cell_index_type top)
 {
+  prepare_layers (layout);
+
   //  create the zero layer - this is not mapped to GDS but can be specified in the layer mapping as
   //  a layer named "0".
-  std::pair<bool, unsigned int> ll = layer_map ().first_logical (zero_layer_name, layout);
+  std::pair<bool, unsigned int> ll = open_layer (layout, zero_layer_name);
   if (ll.first) {
 
-    //  create the layer if it is not part of the layout yet.
-    if (! layout.is_valid_layer (ll.second)) {
-      layout.insert_layer (ll.second, layer_map ().mapping (ll.second));
-    }
-
+    //  layer exists
     m_zero_layer = ll.second;
 
   } else {
 
     //  or explicitly create the layer:
-    m_zero_layer = layer_map ().next_index ();
-    layout.insert_layer (m_zero_layer, db::LayerProperties (0, 0, zero_layer_name));
+    m_zero_layer = layout.insert_layer (db::LayerProperties (0, 0, zero_layer_name));
     map_layer (zero_layer_name, m_zero_layer);
 
   }
-
-  prepare_layers ();
 
   // Read sections
   int g;

@@ -54,6 +54,7 @@ public:
    */
   NamedLayerReader ();
 
+protected:
   /**
    *  @brief Sets a value indicating whether to create new layers
    */
@@ -75,9 +76,9 @@ public:
   /**
    *  @brief Gets the layer map
    */
-  const LayerMap &layer_map ()
+  const LayerMap &layer_map_out ()
   {
-    return m_layer_map;
+    return m_layer_map_out;
   }
 
   /**
@@ -96,7 +97,6 @@ public:
     return m_keep_layer_names;
   }
 
-protected:
   /**
    *  @brief Opens a new layer
    *  This method will create or locate a layer for a given name.
@@ -121,7 +121,7 @@ protected:
    *  @brief Prepares reading
    *  This method must be called before the reading is done.
    */
-  void prepare_layers ();
+  void prepare_layers (db::Layout &layout);
 
 private:
   bool m_create_layers;
@@ -129,6 +129,11 @@ private:
   LayerMap m_layer_map;
   unsigned int m_next_layer_index;
   std::map <std::string, unsigned int> m_new_layers;
+  db::LayerMap m_layer_map_out;
+  std::map<std::string, std::pair <bool, unsigned int> > m_layer_cache;
+  std::map<std::set<unsigned int>, unsigned int> m_multi_mapping_placeholders;
+
+  std::pair <bool, unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name);
 };
 
 }

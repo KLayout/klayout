@@ -24,6 +24,8 @@
 #include "dbLoadLayoutOptions.h"
 #include "tlCommandLineParser.h"
 
+#include "tlStream.h"
+
 namespace bd
 {
 
@@ -153,6 +155,13 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "layer is specified, all source layers addressed with the source specification are "
                     "combined into this target layer.\n"
                     "\n"
+                    "To clone layers, add a mapping statement beginning with a '+' character. While other mapping statements "
+                    "redefine mappings established before, mapping statement starting with '+' will clone the layer (1:m mapping).\n"
+                    "\n"
+                    "It's also possible to cancel mappings established before by using an 'unmap' statement. Such a statement "
+                    "begins with a '-' and lists the layers whose mapping is to be removed. This is useful for creating "
+                    "'mapping holes' in sequences.\n"
+                    "\n"
                     "Examples:\n"
                     "\n"
                     "* 1/0 2/0 3/0-255:17/0\n"
@@ -160,6 +169,18 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "\n"
                     "* A:1/0 B:2/0\n"
                     "  Maps named layer A to 1/0 and named layer B to 2/0"
+                    "\n"
+                    "* */*:*/* +10/*:1000/*"
+                    "  Includes all layers, but in addition copy all layers 10 to 1000 while keeping the datatype\n"
+                    "\n"
+                    "* */*:*/* -10/*"
+                    "  Includes all layers, but drops layer 10, all datatypes."
+                   )
+        << tl::arg (group +
+                    "--" + m_long_prefix + "layer-map-file=map", this, &GenericReaderOptions::set_layer_map_file, "Specifies the layer mapping for the input as a file",
+                    "This option specifies the layer selection or mapping like + -" + m_prefix + ", but takes the mapping for the given file. "
+                    "Each line in this file is read as one layer mapping expression. Empty lines or lines starting with a hash (#) character are "
+                    "ignored."
                    )
       ;
   }
@@ -608,6 +629,13 @@ void GenericReaderOptions::set_layer_map (const std::string &lm)
     ex.test ("//");
     ++l;
   }
+}
+
+void GenericReaderOptions::set_layer_map_file (const std::string &lm)
+{
+  tl::InputStream file (lm);
+  tl::TextInputStream text (file);
+  m_layer_map = db::LayerMap::from_string_file_format (text.read_all ());
 }
 
 void GenericReaderOptions::set_read_named_layers (bool f)

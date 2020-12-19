@@ -123,24 +123,30 @@ extract_ld (const char *s, int &l, int &d, std::string &n)
 std::pair <bool, unsigned int>
 NamedLayerReader::open_layer (db::Layout &layout, const std::string &n)
 {
+  return open_layer (layout, n, keep_layer_names (), create_layers ());
+}
+
+std::pair <bool, unsigned int>
+NamedLayerReader::open_layer (db::Layout &layout, const std::string &n, bool keep_layer_name, bool create_layer)
+{
   std::map<std::string, std::pair <bool, unsigned int> >::const_iterator lc = m_layer_cache.find (n);
   if (lc != m_layer_cache.end ()) {
     return lc->second;
   } else {
-    std::pair <bool, unsigned int> res = open_layer_uncached (layout, n);
+    std::pair <bool, unsigned int> res = open_layer_uncached (layout, n, keep_layer_name, create_layer);
     m_layer_cache.insert (std::make_pair (n, res));
     return res;
   }
 }
 
 std::pair <bool, unsigned int>
-NamedLayerReader::open_layer_uncached (db::Layout &layout, const std::string &n)
+NamedLayerReader::open_layer_uncached (db::Layout &layout, const std::string &n, bool keep_layer_name, bool create_layer)
 {
   int l = -1, d = -1;
   std::string on;
 
   std::set<unsigned int> li = m_layer_map.logical (n, layout);
-  if (li.empty () && ! m_keep_layer_names) {
+  if (li.empty () && ! keep_layer_name) {
 
     if (extract_plain_layer (n.c_str (), l)) {
 
@@ -183,7 +189,7 @@ NamedLayerReader::open_layer_uncached (db::Layout &layout, const std::string &n)
 
     }
 
-  } else if (! m_create_layers) {
+  } else if (! create_layer) {
 
     return std::pair<bool, unsigned int> (false, 0);
 
@@ -212,6 +218,7 @@ NamedLayerReader::open_layer_uncached (db::Layout &layout, const std::string &n)
 void
 NamedLayerReader::map_layer (const std::string &name, unsigned int layer)
 {
+  m_layer_cache [name] = std::make_pair (true, layer);
   m_layer_map_out.map (name, layer);
 }
 

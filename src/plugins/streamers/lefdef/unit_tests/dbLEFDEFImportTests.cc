@@ -724,6 +724,24 @@ TEST(118_density)
   run_test (_this, "density", "read:in.lef", "au.oas.gz", default_options (), false);
 }
 
+TEST(119_multimapping)
+{
+  db::LEFDEFReaderOptions options = default_options ();
+  db::LayerMap lm = db::LayerMap::from_string_file_format ("(M1:1/0)\n(M2:3/0)\n+(M1:100/0)\n+(M2:100/0)\n(VIA1:2/0)");
+  options.set_layer_map (lm);
+
+  db::LayerMap lm_read = run_test (_this, "multimap", "def:test.def", "au.oas.gz", options, false);
+  EXPECT_EQ (lm_read.to_string (),
+    "layer_map("
+      "'OUTLINE : OUTLINE (4/0)';"
+      "'+M1.VIA : M1 (1/0)';"
+      "'+M1.VIA;M2.VIA : \\'M1;M2\\' (100/0)';"
+      "'+M2.VIA : M2 (3/0)';"
+      "'VIA1.VIA : VIA1 (2/0)'"
+    ")"
+  )
+}
+
 TEST(200_lefdef_plugin)
 {
   db::Layout ly;

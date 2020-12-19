@@ -55,6 +55,14 @@ public:
 };
 
 /**
+ *  @brief Joins layer names into a single, combined layer
+ *  @param s The first layer name and output
+ *  @param n The name to add
+ */
+DB_PUBLIC void
+join_layer_names (std::string &s, const std::string &n);
+
+/**
  *  @brief The generic reader base class
  */
 class DB_PUBLIC ReaderBase

@@ -31,9 +31,6 @@
 namespace db
 {
 
-DB_PUBLIC void
-join_layer_names (std::string &s, const std::string &n);
-
 /**
  *  @brief The CellConflictResolution enum
  */

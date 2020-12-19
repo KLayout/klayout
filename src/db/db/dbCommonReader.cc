@@ -32,34 +32,6 @@ namespace db
 // ---------------------------------------------------------------
 //  Common reader implementation
 
-DB_PUBLIC void
-join_layer_names (std::string &s, const std::string &n)
-{
-  if (s == n) {
-    return;
-  }
-
-  if (! s.empty ()) {
-
-    size_t i = s.find (n);
-    if (i != std::string::npos && (i == 0 || s.c_str ()[i - 1] == ';')) {
-      char after = s.c_str ()[i + n.size ()];
-      if (after == 0 || after == ';') {
-        //  n is already contained in s
-        return;
-      }
-    }
-
-    s += ";";
-
-  }
-
-  s += n;
-}
-
-// ---------------------------------------------------------------
-//  Common reader implementation
-
 static const size_t null_id = std::numeric_limits<size_t>::max ();
 
 CommonReader::CommonReader ()

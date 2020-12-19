@@ -1359,18 +1359,22 @@ std::set<unsigned int> LEFDEFReaderState::open_layer_uncached(db::Layout &layout
         }
       }
 
-      bool found = false;
+      int lfound = -1;
       if (lp_new.layer >= 0 && lp_new.datatype >= 0) {
-        for (db::Layout::layer_iterator i = layout.begin_layers (); i != layout.end_layers () && ! found; ++i) {
+        for (db::Layout::layer_iterator i = layout.begin_layers (); i != layout.end_layers () && lfound < 0; ++i) {
           if ((*i).second->log_equal (lp_new)) {
-            found = true;
-            res.insert ((*i).first);
+            lfound = int ((*i).first);
           }
         }
       }
 
-      if (! found) {
+      if (lfound < 0) {
         res.insert (layout.insert_layer (lp_new));
+      } else {
+        res.insert ((unsigned int) lfound);
+        db::LayerProperties lp_org = layout.get_properties ((unsigned int) lfound);
+        join_layer_names (lp_org.name, name);
+        layout.set_properties ((unsigned int) lfound, lp_org);
       }
 
       if (l == ll.end ()) {

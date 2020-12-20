@@ -566,22 +566,26 @@ TEST(5)
   EXPECT_EQ (dynamic_cast<db::LibraryProxy *> (cell) != 0, true);
   EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {LIBCELL}\nbox 2 0 {0 0} {200 100}\nend_cell\nend_lib\n");
 
-  m.undo ();
-  EXPECT_EQ (l.technology_name (), "C");
+  if (l.is_editable ()) {
 
-  cell = &l.cell (l.cell_by_name ("LIBCELL").second);
-  EXPECT_EQ (dynamic_cast<db::ColdProxy *> (cell) != 0, true);
-  EXPECT_EQ (cell->get_qualified_name (), "<defunct>LIB.LIBCELL");
-  EXPECT_EQ (cell->get_basic_name (), "<defunct>LIBCELL");
-  EXPECT_EQ (cell->get_display_name (), "<defunct>LIB.LIBCELL");
-  EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {LIBCELL}\nbox 1 0 {0 0} {100 200}\nend_cell\nend_lib\n");
+    m.undo ();
+    EXPECT_EQ (l.technology_name (), "C");
 
-  m.redo ();
+    cell = &l.cell (l.cell_by_name ("LIBCELL").second);
+    EXPECT_EQ (dynamic_cast<db::ColdProxy *> (cell) != 0, true);
+    EXPECT_EQ (cell->get_qualified_name (), "<defunct>LIB.LIBCELL");
+    EXPECT_EQ (cell->get_basic_name (), "<defunct>LIBCELL");
+    EXPECT_EQ (cell->get_display_name (), "<defunct>LIB.LIBCELL");
+    EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {LIBCELL}\nbox 1 0 {0 0} {100 200}\nend_cell\nend_lib\n");
 
-  EXPECT_EQ (l.technology_name (), "B");
-  cell = &l.cell (l.cell_by_name ("LIBCELL").second);
-  EXPECT_EQ (dynamic_cast<db::LibraryProxy *> (cell) != 0, true);
-  EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {LIBCELL}\nbox 2 0 {0 0} {200 100}\nend_cell\nend_lib\n");
+    m.redo ();
+
+    EXPECT_EQ (l.technology_name (), "B");
+    cell = &l.cell (l.cell_by_name ("LIBCELL").second);
+    EXPECT_EQ (dynamic_cast<db::LibraryProxy *> (cell) != 0, true);
+    EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {LIBCELL}\nbox 2 0 {0 0} {200 100}\nend_cell\nend_lib\n");
+
+  }
 
   db::LibraryManager::instance ().delete_lib (lib_a);
   db::LibraryManager::instance ().delete_lib (lib_b);
@@ -629,8 +633,10 @@ TEST(6)
 
   EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {CIRCLE}\nboundary 1 0 {-2071 -5000} {-5000 -2071} {-5000 2071} {-2071 5000} {2071 5000} {5000 2071} {5000 -2071} {2071 -5000} {-2071 -5000}\nend_cell\nend_lib\n");
 
-  m.undo ();
-  EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {CIRCLE}\nboundary 1 0 {-4142 -10000} {-10000 -4142} {-10000 4142} {-4142 10000} {4142 10000} {10000 4142} {10000 -4142} {4142 -10000} {-4142 -10000}\nend_cell\nend_lib\n");
-  m.redo ();
-  EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {CIRCLE}\nboundary 1 0 {-2071 -5000} {-5000 -2071} {-5000 2071} {-2071 5000} {2071 5000} {5000 2071} {5000 -2071} {2071 -5000} {-2071 -5000}\nend_cell\nend_lib\n");
+  if (l.is_editable ()) {
+    m.undo ();
+    EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {CIRCLE}\nboundary 1 0 {-4142 -10000} {-10000 -4142} {-10000 4142} {-4142 10000} {4142 10000} {10000 4142} {10000 -4142} {4142 -10000} {-4142 -10000}\nend_cell\nend_lib\n");
+    m.redo ();
+    EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {CIRCLE}\nboundary 1 0 {-2071 -5000} {-5000 -2071} {-5000 2071} {-2071 5000} {2071 5000} {5000 2071} {5000 -2071} {2071 -5000} {-2071 -5000}\nend_cell\nend_lib\n");
+  }
 }

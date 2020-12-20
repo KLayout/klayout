@@ -113,22 +113,25 @@ private:
   const db::LayerMap &read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &options, bool import_lef)
   {
     const db::LEFDEFReaderOptions *lefdef_options = dynamic_cast<const db::LEFDEFReaderOptions *> (options.get_options (format ()));
-    static db::LEFDEFReaderOptions default_options;
-    if (! lefdef_options) {
-      lefdef_options = &default_options;
+    db::LEFDEFReaderOptions effective_options;
+    if (lefdef_options) {
+      effective_options = *lefdef_options;
     }
 
-    db::LEFDEFReaderState state (lefdef_options, layout, tl::dirname (m_stream.absolute_path ()));
+    db::LEFDEFReaderState state (&effective_options, layout, tl::dirname (m_stream.absolute_path ()));
 
-    layout.dbu (lefdef_options->dbu ());
+    layout.dbu (effective_options.dbu ());
 
     if (import_lef) {
+
+      //  Always produce LEF geometry when reading LEF
+      effective_options.set_macro_resolution_mode (1);
 
       tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file")));
 
       db::LEFImporter importer;
 
-      for (std::vector<std::string>::const_iterator l = lefdef_options->begin_lef_files (); l != lefdef_options->end_lef_files (); ++l) {
+      for (std::vector<std::string>::const_iterator l = effective_options.begin_lef_files (); l != effective_options.end_lef_files (); ++l) {
 
         std::string lp = correct_path (*l, layout, tl::dirname (m_stream.absolute_path ()));
 
@@ -149,7 +152,7 @@ private:
 
       DEFImporter importer;
 
-      for (std::vector<std::string>::const_iterator l = lefdef_options->begin_lef_files (); l != lefdef_options->end_lef_files (); ++l) {
+      for (std::vector<std::string>::const_iterator l = effective_options.begin_lef_files (); l != effective_options.end_lef_files (); ++l) {
 
         std::string lp = correct_path (*l, layout, tl::dirname (m_stream.absolute_path ()));
 
@@ -163,7 +166,7 @@ private:
 
       //  Additionally read all LEF files next to the DEF file
 
-      if (lefdef_options->read_lef_with_def ()) {
+      if (effective_options.read_lef_with_def ()) {
 
         std::string input_dir = tl::absolute_path (m_stream.absolute_path ());
 
@@ -198,7 +201,7 @@ private:
       std::map<std::string, db::cell_index_type> foreign_cells = state.foreign_cells ();
       db::cell_index_type seen = std::numeric_limits<db::cell_index_type>::max ();
 
-      std::vector<db::Layout *> macro_layouts = lefdef_options->macro_layouts ();
+      std::vector<db::Layout *> macro_layouts = effective_options.macro_layouts ();
       for (std::vector<db::Layout *>::const_iterator m = macro_layouts.begin (); m != macro_layouts.end (); ++m) {
 
         std::vector<db::cell_index_type> target_cells, source_cells;

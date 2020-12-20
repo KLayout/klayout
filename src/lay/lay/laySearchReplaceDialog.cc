@@ -504,7 +504,7 @@ SearchReplaceResults::export_layout (db::Layout &layout)
     std::map<unsigned int, db::LayerProperties>::const_iterator lm = m_lp_map.find (layer);
     if (lm != m_lp_map.end ()) {
 
-      std::pair<bool, unsigned int> ll = insert_lm.logical (lm->second);
+      std::pair<bool, unsigned int> ll = insert_lm.first_logical (lm->second);
       if (! ll.first) {
         layer = layout.insert_layer (lm->second);
         insert_lm.map (lm->second, layer, lm->second);

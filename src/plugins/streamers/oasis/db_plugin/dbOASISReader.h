@@ -81,39 +81,6 @@ public:
    */
   ~OASISReader ();
 
-  /** 
-   *  @brief The basic read method 
-   *
-   *  This method will read the stream data and translate this to
-   *  insert calls into the layout object. This will not do much
-   *  on the layout object beside inserting the objects.
-   *  A set of options can be specified with the LoadLayoutOptions
-   *  object.
-   *  The returned map will contain all layers, the passed
-   *  ones and the newly created ones.
-   *
-   *  @param layout The layout object to write to
-   *  @param map The LayerMap object
-   *  @param create true, if new layers should be created
-   *  @return The LayerMap object that tells where which layer was loaded
-   */
-  virtual const LayerMap &read (db::Layout &layout, const LoadLayoutOptions &options);
-
-  /** 
-   *  @brief The basic read method (without mapping)
-   *
-   *  This method will read the stream data and translate this to
-   *  insert calls into the layout object. This will not do much
-   *  on the layout object beside inserting the objects.
-   *  This version will read all input layers and return a map
-   *  which tells which OASIS layer has been read into which logical
-   *  layer.
-   *
-   *  @param layout The layout object to write to
-   *  @return The LayerMap object
-   */
-  virtual const LayerMap &read (db::Layout &layout);
-
   /**
    *  @brief Format
    */
@@ -136,6 +103,8 @@ protected:
 
   virtual void common_reader_error (const std::string &msg) { error (msg); }
   virtual void common_reader_warn (const std::string &msg) { warn (msg); }
+  virtual void init (const LoadLayoutOptions &options);
+  virtual void do_read (db::Layout &layout);
 
 private:
   friend class OASISReaderLayerMapping;
@@ -153,8 +122,6 @@ private:
   };
 
   tl::InputStream &m_stream;
-  LayerMap m_layer_map;
-  std::set<unsigned int> m_layers_created;
   tl::AbsoluteProgress m_progress;
   std::string m_cellname;
   double m_dbu;
@@ -204,12 +171,10 @@ private:
   std::map <unsigned long, const db::StringRef *> m_text_forward_references;
   std::map <unsigned long, std::string> m_propstrings;
   std::map <unsigned long, std::string> m_propnames;
-  tl::interval_map <db::ld_type, tl::interval_map <db::ld_type, std::string> > m_layernames;
 
   tl::vector<db::CellInstArray> m_instances;
   tl::vector<db::CellInstArrayWithProperties> m_instances_with_props;
 
-  bool m_create_layers;
   bool m_read_texts;
   bool m_read_properties;
   bool m_read_all_properties;
@@ -219,7 +184,6 @@ private:
   db::property_names_id_type m_s_gds_property_name_id;
   db::property_names_id_type m_klayout_context_property_name_id;
 
-  void do_read (db::Layout &layout);
   void do_read_cell (db::cell_index_type cell_index, db::Layout &layout);
 
   void do_read_placement (unsigned char r,
@@ -310,8 +274,6 @@ private:
   db::Coord get_coord (long grid = 1);
   db::Coord get_ucoord (unsigned long grid = 1);
   distance_type get_ucoord_as_distance (unsigned long grid = 1);
-
-  std::pair <bool, unsigned int> open_dl (db::Layout &layout, const LDPair &dl, bool create);
 };
 
 }

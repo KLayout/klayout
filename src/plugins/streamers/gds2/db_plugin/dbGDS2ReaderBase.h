@@ -69,42 +69,20 @@ public:
   const std::string &libname () const { return m_libname; }
 
 protected:
-  /** 
-   *  @brief The basic read method 
-   *
-   *  This method will read the stream data and translate this to
-   *  insert calls into the layout object. This will not do much
-   *  on the layout object beside inserting the objects.
-   *  It can be given a couple of options specified with the
-   *  LoadLayoutOptions object.
-   *  The returned map will contain all layers, the passed
-   *  ones and the newly created ones.
-   *
-   *  @param layout The layout object to write to
-   *  @param layer_map The layer mapping on input
-   *  @param create_other_layer A flag indicating whether to read all other layers
-   *  @param enable_text_objects A flag indicating whether to read text objects
-   *  @param enable_properties A flag indicating whether to read user properties
-   *  @param allow_multi_xy_records If true, tries to check for multiple XY records for BOUNDARY elements
-   *  @param box_mode How to treat BOX records (0: ignore, 1: as rectangles, 2: as boundaries, 3: error)
-   *  @param cc_resolution The cell name conflict resolution mode
-   *  @return The LayerMap object that tells where which layer was loaded
-   */
-  const LayerMap &basic_read (db::Layout &layout, const LayerMap &layer_map, bool create_other_layers, bool enable_text_objects, bool enable_properties, bool allow_multi_xy_records, unsigned int box_mode, db::CommonReader::CellConflictResolution cc_resolution);
-
   /**
    *  @brief Accessor method to the current cellname
    */
   const std::string &cellname () const { return m_cellname; }
 
+  virtual void do_read (db::Layout &layout);
+  virtual void init (const LoadLayoutOptions &options);
+
 private:
   friend class GDS2ReaderLayerMapping;
 
-  LayerMap m_layer_map;
   std::string m_cellname;
   std::string m_libname;
   double m_dbu, m_dbuu;
-  bool m_create_layers;
   bool m_read_texts;
   bool m_read_properties;
   bool m_allow_multi_xy_records;
@@ -119,9 +97,6 @@ private:
   void read_box (db::Layout &layout, db::Cell &cell);
   void read_ref (db::Layout &layout, db::Cell &cell, bool array, tl::vector<db::CellInstArray> &instances, tl::vector<db::CellInstArrayWithProperties> &insts_wp);
 
-  void do_read (db::Layout &layout);
-
-  std::pair <bool, unsigned int> open_dl (db::Layout &layout, const LDPair &dl, bool create);
   std::pair <bool, db::properties_id_type> finish_element (db::PropertiesRepository &rep);
   void finish_element ();
 

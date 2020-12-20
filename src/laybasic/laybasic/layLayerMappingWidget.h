@@ -84,11 +84,14 @@ private slots:
   void add_button_pressed ();
   void delete_button_pressed ();
   void edit_button_pressed ();
+  void current_tab_changed (int tab);
 
 private:
   lay::FileDialog *mp_layer_table_file_dialog;
   std::string m_layer_table_file;
   Ui::LayerMappingWidget *mp_ui;
+
+  db::LayerMap get_layer_map_from_tab (int tab) const;
 };
 
 } // namespace lay

@@ -134,6 +134,7 @@ private:
   std::vector<std::string> m_magic_lib_path;
 
   void set_layer_map (const std::string &lm);
+  void set_layer_map_file (const std::string &lm);
   void set_dbu (double dbu);
   void set_read_named_layers (bool f);
 

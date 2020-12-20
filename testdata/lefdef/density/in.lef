@@ -1,0 +1,28 @@
+LAYER M1
+  TYPE ROUTING ;
+END M1
+LAYER VIA1
+  TYPE CUT ;
+END VIA1
+
+MACRO dense
+  CLASS CORE ;
+  ORIGIN 0.0 0.0 ;
+  FOREIGN dense ;
+  SIZE 0.7 BY 0.9 ;
+  OBS
+    LAYER M1 DESIGNRULEWIDTH 0.05 ;
+      RECT 0.04 0.095 0.66 0.685 ;
+    LAYER VIA1 ;
+      RECT 0.285 0.31 0.415 0.36 ;
+      RECT 0.285 0.18 0.415 0.23 ;
+  END
+  DENSITY
+    LAYER M1 ;
+      RECT 0.04 0.09 0.66 0.685 100.0 ;
+    LAYER VIA1 ;
+      RECT 0 0 100 100 45.5 ; #rect from (0,0) to (100,100), density of 45.5%
+      RECT 100 0 200 100 42.2 ; #rect from (100,0) to (200, 100), density of 42.2%
+  END
+END dense
+END LIBRARY

@@ -30,7 +30,11 @@ class DBLayout_TestClass < TestBase
     lmap = RBA::LayerMap::new 
 
     lmap.map( "1/0", 0 )
+    assert_equal(lmap.is_mapped(RBA::LayerInfo::new(1, 0)), true)
+    assert_equal(lmap.is_mapped(RBA::LayerInfo::new(1, 1)), false)
+    assert_equal(lmap.is_mapped(RBA::LayerInfo::new(2, 2)), false)
     lmap.map( "2/2", 0 )
+    assert_equal(lmap.is_mapped(RBA::LayerInfo::new(2, 2)), true)
     lmap.map( "10/2", 0 )
     assert_equal( lmap.mapping_str(0), "1/0;2/2;10/2" )
     
@@ -39,7 +43,7 @@ class DBLayout_TestClass < TestBase
     lmap.map( "4/2", 1 )
     lmap.map( "1/2", 1 )
     lmap.map( "0/0", 1 )
-    assert_equal( lmap.mapping_str(1), "0/0;1/2;2-4/2" )   # could be "0/0;1-4/2" as well ...
+    assert_equal( lmap.mapping_str(1), "0/0;1-4/2" )   # could be "0/0;1-4/2" as well ...
 
     lmap.map( RBA::LayerInfo::new(2, 2), RBA::LayerInfo::new(4, 4), 2 )
     lmap.map( RBA::LayerInfo::new(0, 1), 2 )
@@ -85,6 +89,55 @@ class DBLayout_TestClass < TestBase
     assert_equal( lmap.mapping_str(0), "2/2 : 4/4" )
     assert_equal( lmap.mapping(0).to_s, "4/4" )
     assert_equal( lmap.mapping(2).to_s, "5/5" )
+
+    lmap = RBA::LayerMap::new
+
+    lmap.map("*/*", 0)
+    lmap.unmap(RBA::LayerInfo::new(5, 10))
+    assert_equal(lmap.mapping_str(0), "0-4/*;5/0-9,11-*;6-*/*")
+
+    lmap.clear
+    lmap.map("*/*", 0)
+    lmap.unmap(RBA::LayerInfo::new(5, 10), RBA::LayerInfo::new(16, 21))
+    assert_equal(lmap.mapping_str(0), "0-4/*;5-16/0-9,22-*;17-*/*")
+
+    lmap.clear
+    lmap.map("*/*", 0)
+    lmap.unmap("5-16/10-21")
+    assert_equal(lmap.mapping_str(0), "0-4/*;5-16/0-9,22-*;17-*/*")
+
+    lmap.clear
+    lmap.map("*/*", 0)
+    lmap.mmap(RBA::LayerInfo::new(5, 10), 1)
+    assert_equal(lmap.mapping_str(0), "+*/*")
+    assert_equal(lmap.mapping_str(1), "+5/10")
+    
+    lmap.clear
+    lmap.map("*/*", 0)
+    lmap.mmap(RBA::LayerInfo::new(5, 10), 1, RBA::LayerInfo::new(100, 0))
+    assert_equal(lmap.mapping_str(0), "+*/*")
+    assert_equal(lmap.mapping_str(1), "+5/10 : 100/0")
+    
+    lmap.clear
+    lmap.map("*/*", 0)
+    lmap.mmap(RBA::LayerInfo::new(5, 10), RBA::LayerInfo::new(16, 21), 1)
+    assert_equal(lmap.mapping_str(0), "+*/*")
+    assert_equal(lmap.mapping_str(1), "+5-16/10-21")
+    
+    lmap.clear
+    lmap.map("*/*", 0)
+    lmap.mmap(RBA::LayerInfo::new(5, 10), RBA::LayerInfo::new(16, 21), 1, RBA::LayerInfo::new(100, 0))
+    assert_equal(lmap.mapping_str(0), "+*/*")
+    assert_equal(lmap.mapping_str(1), "+5-16/10-21 : 100/0")
+    
+    lmap.clear
+    lmap.map("*/*", 0)
+    lmap.mmap("5-16/10-21", 1)
+    assert_equal(lmap.mapping_str(0), "+*/*")
+    assert_equal(lmap.mapping_str(1), "+5-16/10-21")
+
+    assert_equal(lmap.logicals(RBA::LayerInfo::new(5, 10)), [ 0, 1 ])
+    assert_equal(lmap.logicals(RBA::LayerInfo::new(0, 10)), [ 0 ])
     
   end
 

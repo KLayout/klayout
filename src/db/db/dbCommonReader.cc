@@ -35,7 +35,7 @@ namespace db
 static const size_t null_id = std::numeric_limits<size_t>::max ();
 
 CommonReader::CommonReader ()
-  : m_cc_resolution (AddToCell)
+  : m_cc_resolution (AddToCell), m_create_layers (false)
 {
   //  .. nothing yet ..
 }
@@ -275,6 +275,46 @@ CommonReader::merge_cell_without_instances (db::Layout &layout, db::cell_index_t
   layout.delete_cell (src_cell.cell_index ());
 }
 
+const db::LayerMap &
+CommonReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
+{
+  init (options);
+
+  m_common_options.layer_map.prepare (layout);
+
+  layout.start_changes ();
+  try {
+    do_read (layout);
+    finish (layout);
+    layout.end_changes ();
+  } catch (...) {
+    layout.end_changes ();
+    throw;
+  }
+
+  return m_layer_map_out;
+}
+
+const db::LayerMap &
+CommonReader::read (db::Layout &layout)
+{
+  return read (layout, db::LoadLayoutOptions ());
+}
+
+void
+CommonReader::init (const LoadLayoutOptions &options)
+{
+  m_common_options = options.get_options<db::CommonReaderOptions> ();
+  m_cc_resolution = m_common_options.cell_conflict_resolution;
+  m_create_layers = m_common_options.create_other_layers;
+
+  m_layer_map_out.clear ();
+  m_multi_mapping_placeholders.clear ();
+  m_layer_cache.clear ();
+  m_layers_created.clear ();
+  m_layer_names.clear ();
+}
+
 void
 CommonReader::finish (db::Layout &layout)
 {
@@ -380,6 +420,120 @@ CommonReader::finish (db::Layout &layout)
       }
 
     }
+
+  }
+
+  //  resolve layer multi-mapping
+
+  for (std::map<std::set<unsigned int>, unsigned int>::const_iterator i = m_multi_mapping_placeholders.begin (); i != m_multi_mapping_placeholders.end (); ++i) {
+
+    if (i->first.size () > 1) {
+
+      bool discard_layer = i->first.find (i->second) == i->first.end ();
+
+      for (std::set<unsigned int>::const_iterator l = i->first.begin (); l != i->first.end (); ++l) {
+
+        //  last one? this one will get a "move"
+        std::set<unsigned int>::const_iterator ll = l;
+        if (discard_layer && ++ll == i->first.end ()) {
+          layout.move_layer (i->second, *l);
+          layout.delete_layer (i->second);
+        } else {
+          layout.copy_layer (i->second, *l);
+        }
+
+      }
+
+    }
+
+  }
+
+  //  rename layers created before if required
+
+  for (std::set<unsigned int>::const_iterator i = m_layers_created.begin (); i != m_layers_created.end (); ++i) {
+
+    const db::LayerProperties &lp = layout.get_properties (*i);
+
+    const tl::interval_map <db::ld_type, std::string> *dtmap = layer_names ().mapped (lp.layer);
+    const std::string *name = 0;
+    if (dtmap) {
+      name = dtmap->mapped (lp.datatype);
+    }
+
+    if (name) {
+      //  need to rename: add a new madding to m_layer_map_out and adjust the layout's layer properties
+      db::LayerProperties lpp = lp;
+      join_layer_names (lpp.name, *name);
+      layout.set_properties (*i, lpp);
+      m_layer_map_out.map (LDPair (lp.layer, lp.datatype), *i, lpp);
+    }
+
+  }
+}
+
+std::pair <bool, unsigned int>
+CommonReader::open_dl (db::Layout &layout, const LDPair &dl)
+{
+  std::map<db::LDPair, std::pair <bool, unsigned int> >::const_iterator lc = m_layer_cache.find (dl);
+  if (lc != m_layer_cache.end ()) {
+    return lc->second;
+  } else {
+    std::pair <bool, unsigned int> res = open_dl_uncached (layout, dl);
+    m_layer_cache.insert (std::make_pair (dl, res));
+    return res;
+  }
+}
+
+std::pair <bool, unsigned int>
+CommonReader::open_dl_uncached (db::Layout &layout, const LDPair &dl)
+{
+  const std::set<unsigned int> &li = common_options ().layer_map.logical (dl, layout);
+  if (li.empty ()) {
+
+    if (! m_create_layers) {
+      return std::make_pair (false, (unsigned int) 0);
+    }
+
+    //  and create the layer
+    db::LayerProperties lp;
+    lp.layer = dl.layer;
+    lp.datatype = dl.datatype;
+
+    //  resolve OASIS name if possible
+    const tl::interval_map <db::ld_type, std::string> *names_dmap = m_layer_names.mapped (dl.layer);
+    if (names_dmap != 0) {
+      const std::string *name = names_dmap->mapped (dl.datatype);
+      if (name != 0) {
+        lp.name = *name;
+      }
+    }
+
+    unsigned int nl = layout.insert_layer (lp);
+    m_layer_map_out.map (dl, nl, lp);
+
+    m_layers_created.insert (nl);
+
+    return std::make_pair (true, nl);
+
+  } else if (li.size () == 1) {
+
+    m_layer_map_out.map (dl, *li.begin (), layout.get_properties (*li.begin ()));
+
+    return std::make_pair (true, *li.begin ());
+
+  } else {
+
+    for (std::set<unsigned int>::const_iterator i = li.begin (); i != li.end (); ++i) {
+      m_layer_map_out.mmap (dl, *i, layout.get_properties (*i));
+    }
+
+    std::map<std::set<unsigned int>, unsigned int>::iterator mmp = m_multi_mapping_placeholders.find (li);
+    if (mmp == m_multi_mapping_placeholders.end ()) {
+      //  create a placeholder layer
+      mmp = m_multi_mapping_placeholders.insert (std::make_pair (li, layout.insert_layer ())).first;
+    }
+
+    return std::make_pair (true, mmp->second);
 
   }
 }

@@ -193,7 +193,6 @@ private:
 
   void do_read (db::Layout &layout, db::cell_index_type top);
 
-  std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &n);
   db::cell_index_type make_layer_variant (db::Layout &layout, const std::string &cellname, db::cell_index_type template_cell, unsigned int layer, double sx, double sy);
   void cleanup (db::Layout &layout, db::cell_index_type top);
 

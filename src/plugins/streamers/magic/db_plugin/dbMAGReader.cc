@@ -83,9 +83,7 @@ MAGReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   m_merge = specific_options.merge;
   mp_current_stream = 0;
 
-  db::LayerMap lm = specific_options.layer_map;
-  lm.prepare (layout);
-  set_layer_map (lm);
+  set_layer_map (specific_options.layer_map);
   set_create_layers (specific_options.create_other_layers);
   set_keep_layer_names (specific_options.keep_layer_names);
 
@@ -106,6 +104,8 @@ MAGReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   m_dbu_trans_inv = db::CplxTrans (m_dbu).inverted ();
   m_tech.clear ();
 
+  prepare_layers (layout);
+
   {
     tl::SelfTimer timer (tl::verbosity () >= 11, "Reading MAGIC file tree");
 
@@ -125,7 +125,7 @@ MAGReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   }
 
   finish_layers (layout);
-  return layer_map ();
+  return layer_map_out ();
 }
 
 void 

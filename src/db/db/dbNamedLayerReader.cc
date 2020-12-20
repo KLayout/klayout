@@ -233,15 +233,6 @@ NamedLayerReader::prepare_layers (db::Layout &layout)
   m_layer_cache.clear ();
 
   m_layer_map.prepare (layout);
-
-  //  create a pseudo-multimapping for single targets
-  for (db::LayerMap::const_iterator_layers li = m_layer_map.begin (); li != m_layer_map.end (); ++li) {
-    for (db::LayerMap::const_iterator_datatypes di = li->second.begin (); di != li->second.end (); ++di) {
-      if (di->second.size () == 1) {
-        m_multi_mapping_placeholders.insert (std::make_pair (di->second, *di->second.begin ()));
-      }
-    }
-  }
 }
 
 void

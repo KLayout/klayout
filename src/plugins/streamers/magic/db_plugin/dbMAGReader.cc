@@ -72,7 +72,7 @@ MAGReader::read (db::Layout &layout)
 const LayerMap &
 MAGReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 {
-  prepare_layers ();
+  prepare_layers (layout);
 
   mp_klayout_tech = layout.technology ();
 

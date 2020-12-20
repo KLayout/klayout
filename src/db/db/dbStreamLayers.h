@@ -254,15 +254,6 @@ public:
   std::set<unsigned int> logical (const db::LayerProperties &p) const;
 
   /**
-   *  @brief A compatibility function for future enhancements
-   *  TODO: remove when lefdef branch is merged
-   */
-  std::pair<bool, unsigned int> first_logical (const db::LayerProperties &p) const
-  {
-    return logical (p);
-  }
-
-  /**
    *  @brief Query or install a layer mapping from a name or LDPair
    *
    *  @return A pair telling if the layer is mapped (first=true) and

@@ -75,7 +75,7 @@ void get_text_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, 
 
   ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-text-param",
                         &text_cfg_descriptors[0], &text_cfg_descriptors[sizeof (text_cfg_descriptors) / sizeof (text_cfg_descriptors[0])]));
-  ret.push_back (new edt::EditorOptionsText (dispatcher));
+  ret.push_back (new edt::EditorOptionsText (view, dispatcher));
 }
 
 static 
@@ -101,7 +101,7 @@ void get_path_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, 
   
   ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-path-param",
                         &path_cfg_descriptors[0], &path_cfg_descriptors[sizeof (path_cfg_descriptors) / sizeof (path_cfg_descriptors[0])]));
-  ret.push_back (new EditorOptionsPath (dispatcher));
+  ret.push_back (new EditorOptionsPath (view, dispatcher));
 }
 
 static 
@@ -145,8 +145,8 @@ void get_inst_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, 
 
   ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-inst-param",
                         &inst_cfg_descriptors[0], &inst_cfg_descriptors[sizeof (inst_cfg_descriptors) / sizeof (inst_cfg_descriptors[0])]));
-  ret.push_back (new EditorOptionsInstPCellParam (dispatcher));
-  ret.push_back (new EditorOptionsInst (dispatcher));
+  ret.push_back (new EditorOptionsInstPCellParam (view, dispatcher));
+  ret.push_back (new EditorOptionsInst (view, dispatcher));
 }
 
 template <class Svc>
@@ -327,10 +327,10 @@ public:
     return false;
   }
 
-  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutView * /*view*/, lay::Dispatcher *dispatcher) const
+  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutView *view, lay::Dispatcher *dispatcher) const
   {
     //  NOTE: we do not set plugin_declaration which makes the page unspecific
-    EditorOptionsGeneric *generic_opt = new EditorOptionsGeneric (dispatcher);
+    EditorOptionsGeneric *generic_opt = new EditorOptionsGeneric (view, dispatcher);
     pages.push_back (generic_opt);
   }
 

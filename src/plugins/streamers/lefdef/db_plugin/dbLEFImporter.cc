@@ -937,6 +937,24 @@ LEFImporter::read_macro (Layout &layout)
 
       expect ("END");
 
+    } else if (test ("DENSITY")) {
+
+      //  read over DENSITY statements
+      while (! test ("END")) {
+        if (test ("LAYER")) {
+          get ();
+          expect (";");
+        } else {
+          expect ("RECT");
+          for (int i = 0; i < 5; ++i) {
+            get_double ();
+          }
+          expect (";");
+        }
+      }
+
+      expect ("END");
+
     } else if (test ("FIXEDMASK")) {
 
       mg->set_fixedmask (true);

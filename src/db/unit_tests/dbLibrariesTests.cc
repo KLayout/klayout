@@ -617,3 +617,86 @@ TEST(3)
   }
 }
 
+TEST(4)
+{
+  tl::weak_ptr<LIBT_A> lib_a1 (new LIBT_A ());
+  lib_a1->add_technology ("X");
+
+  tl::weak_ptr<LIBT_A> lib_a2 (new LIBT_A ());
+  lib_a2->add_technology ("Y");
+
+  tl::weak_ptr<LIBT_A> lib_a3 (new LIBT_A ());
+  lib_a3->add_technology ("X");
+
+  tl::weak_ptr<LIBT_A> lib_a4 (new LIBT_A ());
+
+  try {
+
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").first, false);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Z").first, false);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").first, false);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").first, false);
+
+    db::LibraryManager::instance ().register_lib (lib_a1.get ());
+
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").first, false);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Z").first, false);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").first, false);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").first, true);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").second, lib_a1->get_id ());
+
+    db::LibraryManager::instance ().register_lib (lib_a2.get ());
+
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").first, false);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Z").first, false);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").first, false);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").first, true);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").second, lib_a1->get_id ());
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Y").first, true);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Y").second, lib_a2->get_id ());
+
+    db::LibraryManager::instance ().register_lib (lib_a3.get ());
+    //  lib_a3 replaces lib_a1
+    EXPECT_EQ (lib_a1.get () == 0, true);
+
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").first, false);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Z").first, false);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").first, false);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").first, true);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").second, lib_a3->get_id ());
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Y").first, true);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Y").second, lib_a2->get_id ());
+
+    db::LibraryManager::instance ().register_lib (lib_a4.get ());
+
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").first, true);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").second, lib_a4->get_id ());
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Z").first, true);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Z").second, lib_a4->get_id ());
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").first, true);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").second, lib_a4->get_id ());
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").first, true);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").second, lib_a3->get_id ());
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Y").first, true);
+    EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Y").second, lib_a2->get_id ());
+
+    //  because we switch to editable mode in between we have to clear the repository explicitly. Otherwise it's being cleared
+    //  on next entry of TEST which will cause a segmentation fault if editable mode is different then.
+    if (lib_a1.get ()) { db::LibraryManager::instance ().delete_lib (lib_a1.get ()); }
+    if (lib_a2.get ()) { db::LibraryManager::instance ().delete_lib (lib_a2.get ()); }
+    if (lib_a3.get ()) { db::LibraryManager::instance ().delete_lib (lib_a3.get ()); }
+    if (lib_a4.get ()) { db::LibraryManager::instance ().delete_lib (lib_a4.get ()); }
+
+  } catch (...) {
+
+    //  because we switch to editable mode in between we have to clear the repository explicitly. Otherwise it's being cleared
+    //  on next entry of TEST which will cause a segmentation fault if editable mode is different then.
+    if (lib_a1.get ()) { db::LibraryManager::instance ().delete_lib (lib_a1.get ()); }
+    if (lib_a2.get ()) { db::LibraryManager::instance ().delete_lib (lib_a2.get ()); }
+    if (lib_a3.get ()) { db::LibraryManager::instance ().delete_lib (lib_a3.get ()); }
+    if (lib_a4.get ()) { db::LibraryManager::instance ().delete_lib (lib_a4.get ()); }
+    throw;
+
+  }
+}
+

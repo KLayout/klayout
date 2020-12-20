@@ -119,9 +119,17 @@ private slots:
   void sync_with_external_sources ();
 
 private:
+  struct LibInfo
+  {
+    LibInfo () : name (), time (), tech () { }
+    std::string name;
+    QDateTime time;
+    std::set<std::string> tech;
+  };
+
   tl::FileSystemWatcher *m_file_watcher;
   tl::DeferredMethod<LibraryController> dm_sync_files;
-  std::map<std::string, std::pair<std::string, QDateTime> > m_lib_files;
+  std::map<std::string, LibInfo> m_lib_files;
 
   void sync_files ();
 };

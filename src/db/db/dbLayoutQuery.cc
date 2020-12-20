@@ -228,7 +228,7 @@ public:
   {
     //  get the layers which we have to look for
     for (db::Layout::layer_iterator l = layout->begin_layers (); l != layout->end_layers (); ++l) {
-      if (layers.is_empty () || layers.logical (*(*l).second).first) {
+      if (layers.is_empty () || layers.is_mapped (*(*l).second)) {
         m_layers.push_back ((*l).first);
       }
     }

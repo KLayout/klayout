@@ -35,6 +35,7 @@
 
 #include <map>
 #include <limits>
+#include <set>
 
 namespace db
 {
@@ -161,6 +162,15 @@ struct DB_PUBLIC LDPair
  *  and effectively rename a layer or add layer name information to
  *  a GDS layer/datatype layer.
  *
+ *  "Unmapping" can be used to create "holes" in ranges of layers.
+ *  For example, by first mapping layers 1 to 100, datatype 0 and then
+ *  unmapping layer 50, datatype 0, the layers 1 to 49 and 51 to 100, datatype 0
+ *  are mapped.
+ *
+ *  The layer map supports multi-mapping. That is, one input layer is
+ *  mapped to multiple target layers. It also supports merging but
+ *  mapping different input layers to a single target layer.
+ *
  *  A layer map object can be used as a standalone object or in 
  *  conjunction with a layout object. As a standalone object, the
  *  logical layers (indexes) are simply consecutive numbers.
@@ -178,24 +188,52 @@ class DB_PUBLIC LayerMap
   : public gsi::ObjectBase
 {
 public:
-  typedef tl::interval_map<ld_type, unsigned int> datatype_map;
+  typedef tl::interval_map<ld_type, std::set<unsigned int> > datatype_map;
   typedef tl::interval_map<ld_type, datatype_map> ld_map;
   typedef ld_map::const_iterator const_iterator_layers;
   typedef datatype_map::const_iterator const_iterator_datatypes;
-  typedef std::map<std::string, unsigned int>::const_iterator const_iterator_names;
+  typedef std::map<std::string, std::set<unsigned int> >::const_iterator const_iterator_names;
 
   /**
    *  @brief The constructor for an empty map
    */
   LayerMap ();
 
-  /** 
+  /**
+   *  @brief Returns the first logical layer for a given layer specification
+   */
+  template <class L>
+  std::pair<bool, unsigned int> first_logical (const L &p) const
+  {
+    std::set<unsigned int> r = logical (p);
+    if (r.empty ()) {
+      return std::make_pair (false, 0);
+    } else {
+      return std::make_pair (true, *r.begin ());
+    }
+  }
+
+  /**
+   *  @brief Returns the first logical layer for a given layer specification
+   */
+  template <class L>
+  std::pair<bool, unsigned int> first_logical (const L &p, db::Layout &layout) const
+  {
+    std::set<unsigned int> r = logical (p, layout);
+    if (r.empty ()) {
+      return std::make_pair (false, 0);
+    } else {
+      return std::make_pair (true, *r.begin ());
+    }
+  }
+
+  /**
    *  @brief Query a layer mapping
    *
    *  @return A pair telling if the layer is mapped (first=true) and
    *  the logical layer mapped (second) if this is the case.
    */
-  std::pair<bool, unsigned int> logical (const LDPair &p) const;
+  std::set<unsigned int> logical (const LDPair &p) const;
 
   /** 
    *  @brief Query a layer mapping from a name
@@ -203,7 +241,7 @@ public:
    *  @return A pair telling if the layer is mapped (first=true) and
    *  the logical layer mapped (second) if this is the case.
    */
-  std::pair<bool, unsigned int> logical (const std::string &name) const;
+  std::set<unsigned int> logical (const std::string &name) const;
 
   /** 
    *  @brief Query a layer mapping from a name or LDPair
@@ -213,7 +251,7 @@ public:
    *
    *  @param p The layer that is looked for
    */
-  std::pair<bool, unsigned int> logical (const db::LayerProperties &p) const;
+  std::set<unsigned int> logical (const db::LayerProperties &p) const;
 
   /**
    *  @brief Query or install a layer mapping from a name or LDPair
@@ -227,14 +265,29 @@ public:
    *  the logical layers are placeholder values which will be replaced by
    *  true layers during this method if a new layer is requested.
    */
-  std::pair<bool, unsigned int> logical (const db::LayerProperties &p, db::Layout &layout) const;
+  std::set<unsigned int> logical (const db::LayerProperties &p, db::Layout &layout) const;
 
   /**
    *  @brief Query or install a layer mapping from a LDPair
    *
    *  See the version for LayerProperties about details.
    */
-  std::pair<bool, unsigned int> logical (const db::LDPair &p, db::Layout &layout) const;
+  std::set<unsigned int> logical (const db::LDPair &p, db::Layout &layout) const;
+
+  /**
+   *  @brief Returns a value indicating whether a layer (given by layer/datatype) is mapped
+   */
+  bool is_mapped (const LDPair &p) const;
+
+  /**
+   *  @brief Returns a value indicating whether the given named layer is mapped
+   */
+  bool is_mapped (const std::string &name) const;
+
+  /**
+   *  @brief Returns a value indicating whether a layer is mapped
+   */
+  bool is_mapped (const db::LayerProperties &p) const;
 
   /**
    *  @brief Gets the target layer for a given logical layer
@@ -270,17 +323,81 @@ public:
   std::vector<unsigned int> get_layers () const;
 
   /**
-   *  @brief Map a ldpair to a logical layer 
+   *  @brief Single-map a physical to a logical layer
+   *
+   *  "Single-mapping" substitutes a layer mapping. "Multimapping" (mmap_..)
+   *  adds to a given mapping and allows generating 1:n mappings (m:n in fact).
    */
-  void map (const LDPair &p, unsigned int l);
+  template <class S>
+  void map (const S &p, unsigned int l)
+  {
+    unmap (p);
+    mmap (p, l);
+  }
 
   /**
-   *  @brief Map a name to a logical layer 
+   *  @brief Single-map a physical to a logical layer with a target layer
    */
-  void map (const std::string &name, unsigned int l);
+  template <class S>
+  void map (const S &p, unsigned int l, const LayerProperties &t)
+  {
+    unmap (p);
+    mmap (p, l, t);
+  }
 
   /**
-   *  @brief Map a name or LDPair to a logical layer 
+   *  @brief Single-map a physical layer interval with a target layer
+   */
+  void map (const LDPair &p1, const LDPair &p2, unsigned int l)
+  {
+    unmap (p1, p2);
+    mmap (p1, p2, l);
+  }
+
+  /**
+   *  @brief Single-map a physical layer interval with a target layer
+   */
+  void map (const LDPair &p1, const LDPair &p2, unsigned int l, const LayerProperties &t)
+  {
+    unmap (p1, p2);
+    mmap (p1, p2, l, t);
+  }
+
+  /**
+   *  @brief Single-map a physical layer interval (given by an expression)
+   */
+  void map_expr (const std::string &expr, unsigned int l)
+  {
+    unmap_expr (expr);
+    mmap_expr (expr, l);
+  }
+
+  /**
+   *  @brief Same a map_expr with a string argument but taking the expression for a tl::Extractor
+   */
+  void map_expr (tl::Extractor &ex, unsigned int l)
+  {
+    tl::Extractor ex1 = ex;
+    unmap_expr (ex1);
+    mmap_expr (ex, l);
+  }
+
+  /**
+   *  @brief Multi-map a ldpair to a logical layer
+   *
+   *  "Multimapping" will not substitute but add to the mapping.
+   */
+  void mmap (const LDPair &p, unsigned int l);
+
+  /**
+   *  @brief Multi-map a name to a logical layer
+   *
+   *  "Multimapping" will not substitute but add to the mapping.
+   */
+  void mmap (const std::string &name, unsigned int l);
+
+  /**
+   *  @brief Multi-map a name or LDPair to a logical layer
    *
    *  The algorithm chooses the LDPair from the LayerProperties structure and/or
    *  the name if no LDPair is given. If the source LayerProperties structure does
@@ -289,26 +406,26 @@ public:
    *  @param f The source (where to derive the match expression from)
    *  @param l The logical layer to map to the match expression
    */
-  void map (const LayerProperties &f, unsigned int l);
+  void mmap (const LayerProperties &f, unsigned int l);
 
   /**
-   *  @brief Map a ldpair to a logical layer with a target layer
+   *  @brief Multi-map a ldpair to a logical layer with a target layer
    *
    *  The target layer specifies which layer to create for the 
    *  corresponding input.
    */
-  void map (const LDPair &p, unsigned int l, const LayerProperties &t);
+  void mmap (const LDPair &p, unsigned int l, const LayerProperties &t);
 
   /**
-   *  @brief Map a name to a logical layer with a target layer
+   *  @brief Multi-map a name to a logical layer with a target layer
    *
    *  The target layer specifies which layer to create for the 
    *  corresponding input.
    */
-  void map (const std::string &name, unsigned int l, const LayerProperties &t);
+  void mmap (const std::string &name, unsigned int l, const LayerProperties &t);
 
   /**
-   *  @brief Map a name or LDPair to a logical layer with a target layer
+   *  @brief Multi-map a name or LDPair to a logical layer with a target layer
    *
    *  The algorithm chooses the LDPair from the LayerProperties structure or
    *  the name if no LDPair is given. If the source LayerProperties structure does
@@ -318,23 +435,23 @@ public:
    *  @param l The logical layer to map to the match expression
    *  @param t The target layer to use for the mapped layer
    */
-  void map (const LayerProperties &f, unsigned int l, const LayerProperties &t);
+  void mmap (const LayerProperties &f, unsigned int l, const LayerProperties &t);
 
   /**
-   *  @brief Map a range of ldpair's to a logical layer
+   *  @brief Multi-map a range of ldpair's to a logical layer
    *
    *  The range is given by two pairs p1,p2. The layers
    *  mapped are [p1.l,p2.l], the datatypes mapped are [p1.d,p2.d].
    */
-  void map (const LDPair &p1, const LDPair &p2, unsigned int l);
+  void mmap (const LDPair &p1, const LDPair &p2, unsigned int l);
 
   /**
-   *  @brief Map a range of ldpair's to a logical layer with a target layer
+   *  @brief Multi-map a range of ldpair's to a logical layer with a target layer
    *
    *  The range is given by two pairs p1,p2. The layers
    *  mapped are [p1.l,p2.l], the datatypes mapped are [p1.d,p2.d].
    */
-  void map (const LDPair &p1, const LDPair &p2, unsigned int l, const LayerProperties &t);
+  void mmap (const LDPair &p1, const LDPair &p2, unsigned int l, const LayerProperties &t);
 
   /** 
    *  @brief Map a range given by a string expression to a logical layer
@@ -364,12 +481,61 @@ public:
    *  This method will throw a LayerSpecFormatException if
    *  something is wrong with the format string
    */
-  void map_expr (const std::string &expr, unsigned int l);
+  void mmap_expr (const std::string &expr, unsigned int l);
 
   /**
    *  @brief Same a map_expr with a string argument but taking the expression for a tl::Extractor
    */
-  void map_expr (tl::Extractor &ex, unsigned int l);
+  void mmap_expr (tl::Extractor &ex, unsigned int l);
+
+  /**
+   *  @brief Unmaps a LDPair
+   */
+  void unmap (const LDPair &f);
+
+  /**
+   *  @brief Unmaps the layer with the given name
+   */
+  void unmap (const std::string &name);
+
+  /**
+   *  @brief Unmaps a layer with the given layer properties
+   */
+  void unmap (const LayerProperties &f);
+
+  /**
+   *  @brief Removes any mapping for a range of ldpair's
+   *
+   *  The range is given by two pairs p1,p2. The layers
+   *  between [p1.l,p2.l] and with datatypes between [p1.d,p2.d] are unmapped.
+   */
+  void unmap (const LDPair &p1, const LDPair &p2);
+
+  /**
+   *  @brief Removes any mapping for the layers given by the expression
+   */
+  void unmap_expr (const std::string &expr);
+
+  /**
+   *  @brief Removes any mapping for the layers given by the expression
+   */
+  void unmap_expr (tl::Extractor &ex);
+
+  /**
+   *  @brief Generic expression mapping
+   *
+   *  This generic mapping function takes a mapping expression. If it starts with "+",
+   *  "mmap" is used, if it starts with "-", "unmap" is used. Otherwise, "map" is used.
+   */
+  void add_expr (const std::string &expr, unsigned int l);
+
+  /**
+   *  @brief Generic expression mapping
+   *
+   *  This generic mapping function takes a mapping expression. If it starts with "+",
+   *  "mmap" is used, if it starts with "-", "unmap" is used. Otherwise, "map" is used.
+   */
+  void add_expr (tl::Extractor &ex, unsigned int l);
 
   /**
    *  @brief Prepares a layer mapping object for reading
@@ -454,7 +620,7 @@ public:
 
 private:
   ld_map m_ld_map;
-  std::map<std::string, unsigned int> m_name_map;
+  std::map<std::string, std::set<unsigned int> > m_name_map;
   std::map<unsigned int, LayerProperties> m_target_layers;
   std::vector<LayerProperties> m_placeholders;
   unsigned int m_next_index;
@@ -462,12 +628,12 @@ private:
   void insert (const LDPair &p1, const LDPair &p2, unsigned int l, const LayerProperties *t);
   void insert (const std::string &name, unsigned int l, const LayerProperties *t);
 
-  std::pair<bool, unsigned int> logical_internal (const LDPair &p, bool allow_placeholder) const;
-  std::pair<bool, unsigned int> logical_internal (const std::string &name, bool allow_placeholder) const;
-  std::pair<bool, unsigned int> logical_internal (const db::LayerProperties &p, bool allow_placeholder) const;
+  std::set<unsigned int> logical_internal (const LDPair &p, bool allow_placeholder) const;
+  std::set<unsigned int> logical_internal (const std::string &name, bool allow_placeholder) const;
+  std::set<unsigned int> logical_internal (const db::LayerProperties &p, bool allow_placeholder) const;
 
-  std::pair<bool, unsigned int> substitute_placeholder (const db::LayerProperties &p, unsigned int ph, db::Layout &layout);
-  bool is_placeholder (unsigned int l) const;
+  std::set<unsigned int> substitute_placeholder (const db::LayerProperties &p, const std::set<unsigned int> &ph, db::Layout &layout);
+  bool is_placeholder (const std::set<unsigned int> &l) const;
 };
 
 }

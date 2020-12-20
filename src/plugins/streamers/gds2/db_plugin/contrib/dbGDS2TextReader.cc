@@ -51,23 +51,11 @@ GDS2ReaderText::~GDS2ReaderText()
   //  .. nothing yet ..
 }
   
-const LayerMap &
-GDS2ReaderText::read (db::Layout &layout, const db::LoadLayoutOptions &options)
+void
+GDS2ReaderText::init (const db::LoadLayoutOptions &options)
 {
+  GDS2ReaderBase::init (options);
   storedRecId = 0;
-
-  //  HINT: reuse the standard GDS2 reader options for the text reader. 
-  //  However, the allow_big_records and allow_multi_xy_records options are ignored.
-  db::GDS2ReaderOptions gds2_options = options.get_options<db::GDS2ReaderOptions> ();
-  db::CommonReaderOptions common_options = options.get_options<db::CommonReaderOptions> ();
-
-  return basic_read (layout, common_options.layer_map, common_options.create_other_layers, common_options.enable_text_objects, common_options.enable_properties, false, gds2_options.box_mode, common_options.cell_conflict_resolution);
-}
-
-const LayerMap &
-GDS2ReaderText::read (db::Layout &layout)
-{
-  return read (layout, db::LoadLayoutOptions ());
 }
 
 void

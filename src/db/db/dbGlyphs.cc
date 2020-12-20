@@ -174,9 +174,9 @@ TextGenerator::load_from_data (const char *data, size_t ndata, const std::string
   m_description = description;
   m_name = name;
 
-  std::pair<bool, unsigned int> l1 = map.logical (db::LDPair (1, 0));
-  std::pair<bool, unsigned int> l2 = map.logical (db::LDPair (2, 0));
-  std::pair<bool, unsigned int> l3 = map.logical (db::LDPair (3, 0));
+  std::pair<bool, unsigned int> l1 = map.first_logical (db::LDPair (1, 0));
+  std::pair<bool, unsigned int> l2 = map.first_logical (db::LDPair (2, 0));
+  std::pair<bool, unsigned int> l3 = map.first_logical (db::LDPair (3, 0));
 
   if (l1.first && l2.first) {
     read_from_layout (layout, l1.second, l2.second, l3.second);
@@ -193,9 +193,9 @@ TextGenerator::load_from_file (const std::string &filename)
 
   m_description = filename;
 
-  std::pair<bool, unsigned int> l1 = map.logical (db::LDPair (1, 0));
-  std::pair<bool, unsigned int> l2 = map.logical (db::LDPair (2, 0));
-  std::pair<bool, unsigned int> l3 = map.logical (db::LDPair (3, 0));
+  std::pair<bool, unsigned int> l1 = map.first_logical (db::LDPair (1, 0));
+  std::pair<bool, unsigned int> l2 = map.first_logical (db::LDPair (2, 0));
+  std::pair<bool, unsigned int> l3 = map.first_logical (db::LDPair (3, 0));
 
   if (l1.first && l2.first) {
     read_from_layout (layout, l1.second, l2.second, l3.second);

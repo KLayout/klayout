@@ -24,6 +24,8 @@
 #include "dbLoadLayoutOptions.h"
 #include "tlCommandLineParser.h"
 
+#include "tlStream.h"
+
 namespace bd
 {
 
@@ -153,13 +155,44 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "layer is specified, all source layers addressed with the source specification are "
                     "combined into this target layer.\n"
                     "\n"
+                    "For clarity, source and target specifications can be enclosed in round or square brackets. "
+                    "With square brackets, the default target is '*/*' which results in the expansion of a source "
+                    "layer range.\n"
+                    "\n"
+                    "To clone layers, add a mapping statement beginning with a '+' character. While other mapping statements "
+                    "redefine mappings established before, mapping statement starting with '+' will clone the layer (1:m mapping).\n"
+                    "\n"
+                    "You can cancel mappings established before by using an 'unmap' statement. Such a statement "
+                    "begins with a '-' and lists the layers whose mapping is to be removed. This is useful for creating "
+                    "'mapping holes' in sequences.\n"
+                    "\n"
+                    "If brackets are used, '+' (multi-mapping) and '-' (unmapping) needs to go before the brackets.\n"
+                    "\n"
                     "Examples:\n"
                     "\n"
                     "* 1/0 2/0 3/0-255:17/0\n"
-                    "  Selects 1/0, 2/0 and maps layer 3, datatype 0 to 255 to layer 17, datatype 0\n"
+                    "  Selects 1/0, 2/0 and maps layer 3, datatype 0 to 255 to layer 17, datatype 0.\n"
+                    "  If clarity, the mapping can also be written with brackets like this: '(1/0) (2/0) (3/0-255:17/0)'.\n"
                     "\n"
                     "* A:1/0 B:2/0\n"
-                    "  Maps named layer A to 1/0 and named layer B to 2/0"
+                    "  Maps named layer A to 1/0 and named layer B to 2/0.\n"
+                    "  If clarity, the mapping can also be written with brackets like this: '(A:1/0) (B:2/0)'.\n"
+                    "\n"
+                    "* [*/*] +(10/*:1000)/*\n"
+                    "  Includes all layers, but in addition copies all datatypes of layer 10 to 1000 while keeping the datatype.\n"
+                    "  Note the square bracket which implies range expansion and how the brackets give a visual aid for the "
+                    "  grouping of the mapping parts.\n"
+                    "\n"
+                    "* [*/*] -(10/*)\n"
+                    "  Includes all layers, but drops all datatypes from layer 10 through 'unmapping'.\n"
+                    "  Please note, that this specification requires -" + m_prefix + "s (skip unknown layers) because otherwise the "
+                    "  unmapped layers are still created through the unknown layer fallback path.\n"
+                   )
+        << tl::arg (group +
+                    "--" + m_long_prefix + "layer-map-file=map", this, &GenericReaderOptions::set_layer_map_file, "Specifies the layer mapping for the input as a file",
+                    "This option specifies the layer selection or mapping like -" + m_prefix + "m, but takes the mapping from the given file. "
+                    "Each line in this file is read as one layer mapping expression. "
+                    "Empty lines or lines starting with a hash (#) character or with double slashes (//) are ignored."
                    )
       ;
   }
@@ -604,10 +637,17 @@ void GenericReaderOptions::set_layer_map (const std::string &lm)
 
   int l = 0;
   while (! ex.at_end ()) {
-    m_layer_map.map_expr (ex, l);
+    m_layer_map.add_expr (ex, l);
     ex.test ("//");
     ++l;
   }
+}
+
+void GenericReaderOptions::set_layer_map_file (const std::string &lm)
+{
+  tl::InputStream file (lm);
+  tl::TextInputStream text (file);
+  m_layer_map = db::LayerMap::from_string_file_format (text.read_all ());
 }
 
 void GenericReaderOptions::set_read_named_layers (bool f)

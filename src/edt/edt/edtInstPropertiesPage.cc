@@ -810,7 +810,7 @@ InstPropertiesPage::update_pcell_parameters ()
 
       mp_pcell_parameters = new PCellParametersPage (pcell_tab);
       connect (mp_pcell_parameters, SIGNAL (edited ()), this, SIGNAL (edited ()));
-      mp_pcell_parameters->setup (&cv->layout (), mp_service->view (), pos->cv_index (), layout->pcell_declaration (pc.second), parameters);
+      mp_pcell_parameters->setup (mp_service->view (), pos->cv_index (), layout->pcell_declaration (pc.second), parameters);
       pcell_tab->layout ()->addWidget (mp_pcell_parameters);
 
     }

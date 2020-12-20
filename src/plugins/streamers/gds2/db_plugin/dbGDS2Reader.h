@@ -72,42 +72,13 @@ public:
    */
   ~GDS2Reader ();
 
-  /** 
-   *  @brief The basic read method 
-   *
-   *  This method will read the stream data and translate this to
-   *  insert calls into the layout object. This will not do much
-   *  on the layout object beside inserting the objects.
-   *  It can be given a couple of options specified with the
-   *  LoadLayoutOptions object.
-   *  The returned map will contain all layers, the passed
-   *  ones and the newly created ones.
-   *
-   *  @param layout The layout object to write to
-   *  @param options The generic reader options
-   *  @return The LayerMap object that tells where which layer was loaded
-   */
-  virtual const LayerMap &read (db::Layout &layout, const LoadLayoutOptions &options);
-
-  /** 
-   *  @brief The basic read method (without mapping)
-   *
-   *  This method will read the stream data and translate this to
-   *  insert calls into the layout object. This will not do much
-   *  on the layout object beside inserting the objects.
-   *  This version will read all input layers and return a map
-   *  which tells which GDS2 layer has been read into which logical
-   *  layer.
-   *
-   *  @param layout The layout object to write to
-   *  @return The LayerMap object
-   */
-  virtual const LayerMap &read (db::Layout &layout);
-
   /**
    *  @brief Format
    */
   virtual const char *format () const { return "GDS2"; }
+
+protected:
+  virtual void init (const LoadLayoutOptions &options);
 
 private:
   tl::InputStream &m_stream;
@@ -117,8 +88,7 @@ private:
   unsigned char *mp_rec_buf;
   tl::string m_string_buf;
   short m_stored_rec;
-  db::GDS2ReaderOptions m_options;
-  db::CommonReaderOptions m_common_options;
+  bool m_allow_big_records;
   tl::AbsoluteProgress m_progress;
 
   virtual void error (const std::string &txt);

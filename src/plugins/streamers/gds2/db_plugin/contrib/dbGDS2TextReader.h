@@ -64,42 +64,13 @@ public:
    */
   ~GDS2ReaderText();
 
-  /** 
-   *  @brief The basic read method 
-   *
-   *  This method will read the stream data and translate this to
-   *  insert calls into the layout object. This will not do much
-   *  on the layout object beside inserting the objects.
-   *  It can be given a couple of options specified with the
-   *  LoadLayoutOptions object.
-   *  The returned map will contain all layers, the passed
-   *  ones and the newly created ones.
-   *
-   *  @param layout The layout object to write to
-   *  @param options The generic reader options
-   *  @return The LayerMap object that tells where which layer was loaded
-   */
-  virtual const LayerMap &read (db::Layout &layout, const LoadLayoutOptions &options);
-
-  /** 
-   *  @brief The basic read method (without mapping)
-   *
-   *  This method will read the stream data and translate this to
-   *  insert calls into the layout object. This will not do much
-   *  on the layout object beside inserting the objects.
-   *  This version will read all input layers and return a map
-   *  which tells which GDS2 layer has been read into which logical
-   *  layer.
-   *
-   *  @param layout The layout object to write to
-   *  @return The LayerMap object
-   */
-  virtual const LayerMap &read (db::Layout &layout);
-
   /**
    *  @brief Format
    */
   const char *format () const { return "GDS2Text"; }
+
+protected:
+  virtual void init (const LoadLayoutOptions &options);
 
 private:
   tl::TextInputStream sStream;

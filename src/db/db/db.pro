@@ -19,6 +19,7 @@ SOURCES = \
   dbClipboard.cc \
   dbClipboardData.cc \
   dbClip.cc \
+  dbColdProxy.cc \
   dbCommonReader.cc \
   dbCompoundOperation.cc \
   dbEdge.cc \
@@ -219,6 +220,7 @@ HEADERS = \
   dbClipboardData.h \
   dbClipboard.h \
   dbClip.h \
+  dbColdProxy.h \
   dbCommonReader.h \
   dbCompoundOperation.h \
   dbEdge.h \

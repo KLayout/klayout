@@ -24,11 +24,13 @@
 #include "dbLayout.h"
 #include "dbMemStatistics.h"
 #include "dbTrans.h"
+#include "dbTechnology.h"
 #include "dbShapeRepository.h"
 #include "dbPCellHeader.h"
 #include "dbPCellVariant.h"
 #include "dbPCellDeclaration.h"
 #include "dbLibraryProxy.h"
+#include "dbColdProxy.h"
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
 #include "dbRegion.h"
@@ -82,6 +84,27 @@ struct SetLayoutPropId
 
 private:
   db::properties_id_type m_from, m_to;
+};
+
+struct SetLayoutTechName
+  : public LayoutOp
+{
+  SetLayoutTechName (const std::string &from, const std::string &to)
+    : m_from (from), m_to (to)
+  { }
+
+  virtual void redo (db::Layout *layout) const
+  {
+    layout->set_technology_name_without_update (m_to);
+  }
+
+  virtual void undo (db::Layout *layout) const
+  {
+    layout->set_technology_name_without_update (m_from);
+  }
+
+private:
+  std::string m_from, m_to;
 };
 
 struct SetLayoutDBU
@@ -257,6 +280,65 @@ std::pair<unsigned int, const db::LayerProperties *>
 LayerIterator::operator*() const
 {
   return std::pair<unsigned int, const db::LayerProperties *> (m_layer_index, &m_layout.get_properties (m_layer_index));
+}
+
+// -----------------------------------------------------------------
+//  Implementation of the ProxyContextInfo class
+
+ProxyContextInfo
+ProxyContextInfo::deserialize (std::vector<std::string>::const_iterator from, std::vector<std::string>::const_iterator to)
+{
+  ProxyContextInfo info;
+
+  for (std::vector<std::string>::const_iterator i = from; i != to; ++i) {
+
+    tl::Extractor ex (i->c_str ());
+
+    if (ex.test ("LIB=")) {
+
+      info.lib_name = ex.skip ();
+
+    } else if (ex.test ("P(")) {
+
+      std::pair<std::string, tl::Variant> vv;
+
+      ex.read_word_or_quoted (vv.first);
+      ex.test (")");
+      ex.test ("=");
+      ex.read (vv.second);
+
+      info.pcell_parameters.insert (vv);
+
+    } else if (ex.test ("PCELL=")) {
+
+      info.pcell_name = ex.skip ();
+
+    } else if (ex.test ("CELL=")) {
+
+      info.cell_name = ex.skip ();
+
+    }
+
+  }
+
+  return info;
+}
+
+void
+ProxyContextInfo::serialize (std::vector<std::string> &strings)
+{
+  if (! lib_name.empty ()) {
+    strings.push_back ("LIB=" + lib_name);
+  }
+  for (std::map<std::string, tl::Variant> ::const_iterator p = pcell_parameters.begin (); p != pcell_parameters.end (); ++p) {
+    strings.push_back ("P(" + tl::to_word_or_quoted_string (p->first) + ")=" + p->second.to_parsable_string ());
+  }
+  if (! pcell_name.empty ()) {
+    strings.push_back ("PCELL=" + pcell_name);
+  }
+  if (! cell_name.empty ()) {
+    strings.push_back ("CELL=" + cell_name);
+  }
 }
 
 // -----------------------------------------------------------------
@@ -440,6 +522,187 @@ Layout::operator= (const Layout &d)
 
   }
   return *this;
+}
+
+const db::Technology *
+Layout::technology () const
+{
+  return db::Technologies::instance ()->technology_by_name (m_tech_name);
+}
+
+void
+Layout::set_technology_name_without_update (const std::string &tech)
+{
+  if (tech != m_tech_name) {
+    if (manager () && manager ()->transacting ()) {
+      manager ()->queue (this, new SetLayoutTechName (m_tech_name, tech));
+    }
+    m_tech_name = tech;
+    technology_changed_event ();
+  }
+}
+
+void
+Layout::set_technology_name (const std::string &tech)
+{
+  if (tech == m_tech_name) {
+    return;
+  }
+
+  //  determine which library to map to what
+  std::map<db::lib_id_type, db::lib_id_type> mapping;
+  std::set<db::lib_id_type> seen;
+  std::set<db::lib_id_type> lost;
+
+  for (db::Layout::iterator c = begin (); c != end (); ++c) {
+
+    db::LibraryProxy *lib_proxy = dynamic_cast<db::LibraryProxy *> (&*c);
+    if (lib_proxy && seen.find (lib_proxy->lib_id ()) == seen.end ()) {
+
+      seen.insert (lib_proxy->lib_id ());
+
+      std::pair<bool, db::lib_id_type> new_id (false, 0);
+      const db::Library *l = db::LibraryManager::instance ().lib (lib_proxy->lib_id ());
+      if (l) {
+        new_id = db::LibraryManager::instance ().lib_by_name (l->get_name (), tech);
+      }
+
+      if (new_id.first && new_id.second != l->get_id ()) {
+        mapping.insert (std::make_pair (l->get_id (), new_id.second));
+      } else if (! new_id.first) {
+        lost.insert (lib_proxy->lib_id ());
+      }
+
+    }
+
+  }
+
+  if (! mapping.empty () || ! lost.empty ()) {
+
+    bool needs_cleanup = false;
+
+    std::vector<std::pair<db::LibraryProxy *, db::PCellVariant *> > pcells_to_map;
+    std::vector<db::LibraryProxy *> lib_cells_to_map;
+    std::vector<db::LibraryProxy *> lib_cells_lost;
+
+    for (db::Layout::iterator c = begin (); c != end (); ++c) {
+
+      std::map<db::lib_id_type, db::lib_id_type>::const_iterator m;
+
+      db::LibraryProxy *lib_proxy = dynamic_cast<db::LibraryProxy *> (&*c);
+      if (! lib_proxy) {
+        continue;
+      }
+
+      if ((m = mapping.find (lib_proxy->lib_id ())) != mapping.end ()) {
+
+        db::Library *lib = db::LibraryManager::instance ().lib (lib_proxy->lib_id ());
+        db::Cell *lib_cell = &lib->layout ().cell (lib_proxy->library_cell_index ());
+        db::PCellVariant *lib_pcell = dynamic_cast <db::PCellVariant *> (lib_cell);
+        if (lib_pcell) {
+          pcells_to_map.push_back (std::make_pair (lib_proxy, lib_pcell));
+        } else {
+          lib_cells_to_map.push_back (lib_proxy);
+        }
+
+        needs_cleanup = true;
+
+      } else if (lost.find (lib_proxy->lib_id ()) != lost.end ()) {
+
+        lib_cells_lost.push_back (lib_proxy);
+
+        needs_cleanup = true;
+
+      }
+
+    }
+
+    //  We do PCell resolution before the library proxy resolution. The reason is that
+    //  PCells may generate library proxies in their instantiation. Hence we must instantiate
+    //  the PCells before we can resolve them.
+    for (std::vector<std::pair<db::LibraryProxy *, db::PCellVariant *> >::const_iterator lp = pcells_to_map.begin (); lp != pcells_to_map.end (); ++lp) {
+
+      db::cell_index_type ci = lp->first->Cell::cell_index ();
+      db::PCellVariant *lib_pcell = lp->second;
+
+      std::pair<bool, pcell_id_type> pn = lib_pcell->layout ()->pcell_by_name (lp->first->get_basic_name ().c_str ());
+
+      if (! pn.first) {
+
+        //  substitute by a cold proxy
+        db::ProxyContextInfo info;
+        get_context_info (ci, info);
+        create_cold_proxy_as (info, ci);
+
+      } else {
+
+        db::Library *new_lib = db::LibraryManager::instance ().lib (mapping [lp->first->lib_id ()]);
+
+        const db::PCellDeclaration *old_pcell_decl = lib_pcell->layout ()->pcell_declaration (lib_pcell->pcell_id ());
+        const db::PCellDeclaration *new_pcell_decl = new_lib->layout ().pcell_declaration (pn.second);
+        if (! old_pcell_decl || ! new_pcell_decl) {
+
+          //  substitute by a cold proxy
+          db::ProxyContextInfo info;
+          get_context_info (ci, info);
+          create_cold_proxy_as (info, ci);
+
+        } else {
+
+          //  map pcell parameters by name
+          std::map<std::string, tl::Variant> param_by_name = lib_pcell->parameters_by_name ();
+          lp->first->remap (new_lib->get_id (), new_lib->layout ().get_pcell_variant (pn.second, new_pcell_decl->map_parameters (param_by_name)));
+
+        }
+
+      }
+
+    }
+
+    for (std::vector<db::LibraryProxy *>::const_iterator lp = lib_cells_to_map.begin (); lp != lib_cells_to_map.end (); ++lp) {
+
+      db::Library *new_lib = db::LibraryManager::instance ().lib (mapping [(*lp)->lib_id ()]);
+
+      db::cell_index_type ci = (*lp)->Cell::cell_index ();
+
+      std::pair<bool, cell_index_type> cn = new_lib->layout ().cell_by_name ((*lp)->get_basic_name ().c_str ());
+
+      if (! cn.first) {
+
+        //  unlink this proxy: substitute by a cold proxy
+        db::ProxyContextInfo info;
+        get_context_info (ci, info);
+        create_cold_proxy_as (info, ci);
+
+      } else {
+
+        (*lp)->remap (new_lib->get_id (), cn.second);
+
+      }
+
+    }
+
+    for (std::vector<db::LibraryProxy *>::const_iterator lp = lib_cells_lost.begin (); lp != lib_cells_lost.end (); ++lp) {
+
+      db::cell_index_type ci = (*lp)->Cell::cell_index ();
+
+      //  substitute by a cold proxy
+      db::ProxyContextInfo info;
+      get_context_info (ci, info);
+      create_cold_proxy_as (info, ci);
+
+    }
+
+    if (needs_cleanup) {
+      cleanup ();
+    }
+
+  }
+
+  set_technology_name_without_update (tech);
+
+  //  we may have re-established a connection for pending ("cold") proxies so we can try to restore them
+  restore_proxies ();
 }
 
 void
@@ -1800,8 +2063,37 @@ static const std::vector<tl::Variant> &gauge_parameters (const std::vector<tl::V
   }
 }
 
+void
+Layout::replace_cell (cell_index_type target_cell_index, db::Cell *new_cell, bool retain_layout)
+{
+  invalidate_hier ();
+
+  db::Cell *old_cell = m_cell_ptrs [target_cell_index];
+  if (old_cell) {
+    old_cell->unregister ();
+    if (retain_layout) {
+      new_cell->Cell::operator= (*old_cell);
+    }
+  }
+
+  if (manager () && manager ()->transacting ()) {
+    //  note the "take" method - this takes out the cell but does not delete it (we need it inside undo)
+    m_cells.take (iterator (old_cell));
+    manager ()->queue (this, new NewRemoveCellOp (target_cell_index, cell_name (target_cell_index), true /*remove*/, old_cell));
+  } else {
+    m_cells.erase (iterator (old_cell));
+  }
+
+  m_cells.push_back_ptr (new_cell);
+  m_cell_ptrs [target_cell_index] = new_cell;
+
+  if (manager () && manager ()->transacting ()) {
+    manager ()->queue (this, new NewRemoveCellOp (target_cell_index, m_cell_names [target_cell_index], false /*new*/, 0));
+  }
+}
+
 void 
-Layout::get_pcell_variant_as (pcell_id_type pcell_id, const std::vector<tl::Variant> &p, cell_index_type target_cell_index, ImportLayerMapping *layer_mapping)
+Layout::get_pcell_variant_as (pcell_id_type pcell_id, const std::vector<tl::Variant> &p, cell_index_type target_cell_index, ImportLayerMapping *layer_mapping, bool retain_layout)
 {
   pcell_header_type *header = pcell_header (pcell_id);
   tl_assert (header != 0);
@@ -1812,19 +2104,15 @@ Layout::get_pcell_variant_as (pcell_id_type pcell_id, const std::vector<tl::Vari
   //  this variant must not exist yet for "get as" semantics
   tl_assert (header->get_variant (*this, parameters) == 0);
 
-  tl_assert (! (manager () && manager ()->transacting ()));
   tl_assert (m_cell_ptrs [target_cell_index] != 0);
  
-  invalidate_hier ();
-
-  m_cells.erase (iterator (m_cell_ptrs [target_cell_index]));
-
   pcell_variant_type *variant = new pcell_variant_type (target_cell_index, *this, pcell_id, parameters);
-  m_cells.push_back_ptr (variant);
-  m_cell_ptrs [target_cell_index] = variant;
+  replace_cell (target_cell_index, variant, retain_layout);
 
-  // produce the layout
-  variant->update (layer_mapping);
+  if (! retain_layout) {
+    //  produce the layout unless we retained it
+    variant->update (layer_mapping);
+  }
 }
 
 cell_index_type 
@@ -2168,10 +2456,29 @@ Layout::get_pcell_variant_cell (cell_index_type cell_index, const std::vector<tl
 
 }
 
-bool 
-Layout::get_context_info (cell_index_type cell_index, std::vector <std::string> &context_info) const
+bool
+Layout::get_context_info (cell_index_type cell_index, std::vector <std::string> &strings) const
+{
+  ProxyContextInfo info;
+  if (! get_context_info (cell_index, info)) {
+    return false;
+  } else {
+    info.serialize (strings);
+    return true;
+  }
+}
+
+bool
+Layout::get_context_info (cell_index_type cell_index, ProxyContextInfo &info) const
 {
   const db::Cell *cptr = &cell (cell_index);
+
+  const db::ColdProxy *cold_proxy = dynamic_cast <const db::ColdProxy *> (cptr);
+  if (cold_proxy) {
+    info = cold_proxy->context_info ();
+    return true;
+  }
+
   const db::Layout *ly = this;
 
   const db::LibraryProxy *lib_proxy;
@@ -2185,7 +2492,7 @@ Layout::get_context_info (cell_index_type cell_index, std::vector <std::string> 
       //  one level of library indirection
       ly = &lib->layout ();
       cptr = &ly->cell (lib_proxy->library_cell_index ());
-      context_info.push_back ("LIB=" + lib->get_name ());
+      info.lib_name = lib->get_name ();
 
     }
 
@@ -2199,17 +2506,34 @@ Layout::get_context_info (cell_index_type cell_index, std::vector <std::string> 
     const std::vector<db::PCellParameterDeclaration> &pcp = pcell_decl->parameter_declarations ();
     std::vector<db::PCellParameterDeclaration>::const_iterator pd = pcp.begin ();
     for (std::vector<tl::Variant>::const_iterator p = pcell_variant->parameters ().begin (); p != pcell_variant->parameters ().end () && pd != pcp.end (); ++p, ++pd) {
-      context_info.push_back ("P(" + tl::to_word_or_quoted_string (pd->get_name ()) + ")=" + p->to_parsable_string ());
+      info.pcell_parameters.insert (std::make_pair (pd->get_name (), *p));
     }
 
     const db::PCellHeader *header = ly->pcell_header (pcell_variant->pcell_id ());
-    context_info.push_back ("PCELL=" + header->get_name ());
+    info.pcell_name = header->get_name ();
 
   } else {
-    context_info.push_back ("CELL=" + std::string (ly->cell_name (cptr->cell_index ())));
+    info.cell_name = ly->cell_name (cptr->cell_index ());
   }
 
   return true;
+}
+
+void
+Layout::restore_proxies (ImportLayerMapping *layer_mapping)
+{
+  std::vector<db::ColdProxy *> cold_proxies;
+
+  for (iterator c = begin (); c != end (); ++c) {
+    db::ColdProxy *proxy = dynamic_cast<db::ColdProxy *> (c.operator-> ());
+    if (proxy) {
+      cold_proxies.push_back (proxy);
+    }
+  }
+
+  for (std::vector<db::ColdProxy *>::const_iterator p = cold_proxies.begin (); p != cold_proxies.end (); ++p) {
+    recover_proxy_as ((*p)->cell_index (), (*p)->context_info (), layer_mapping);
+  }
 }
 
 bool
@@ -2219,17 +2543,21 @@ Layout::recover_proxy_as (cell_index_type cell_index, std::vector <std::string>:
     return false;
   }
 
-  tl::Extractor ex (from->c_str ());
+  return recover_proxy_as (cell_index, ProxyContextInfo::deserialize (from, to), layer_mapping);
+}
 
-  if (ex.test ("LIB=")) {
+bool
+Layout::recover_proxy_as (cell_index_type cell_index, const ProxyContextInfo &info, ImportLayerMapping *layer_mapping)
+{
+  if (! info.lib_name.empty ()) {
 
-    std::string lib_name = ex.skip ();
-    Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (lib_name);
-    if (! lib) {
-      return false;
+    db::Cell *lib_cell = 0;
+
+    Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (info.lib_name, m_tech_name);
+    if (lib) {
+      lib_cell = lib->layout ().recover_proxy_no_lib (info);
     }
 
-    db::Cell *lib_cell = lib->layout ().recover_proxy (from + 1, to);
     if (lib_cell) {
       get_lib_proxy_as (lib, lib_cell->cell_index (), cell_index, layer_mapping);
       return true;
@@ -2237,36 +2565,26 @@ Layout::recover_proxy_as (cell_index_type cell_index, std::vector <std::string>:
 
   } else {
 
-    std::map<std::string, tl::Variant> parameters;
+    if (! info.pcell_name.empty ()) {
 
-    while (from != to && (ex = tl::Extractor (from->c_str ())).test ("P(")) {
-
-      std::string name;
-      ex.read_word_or_quoted (name);
-      ex.test (")");
-      ex.test ("=");
-
-      ex.read (parameters.insert (std::make_pair (name, tl::Variant ())).first->second);
-
-      ++from;
-
-    }
-
-    if (ex.test ("PCELL=")) {
-
-      std::pair<bool, pcell_id_type> pc = pcell_by_name (ex.skip ());
+      std::pair<bool, pcell_id_type> pc = pcell_by_name (info.pcell_name.c_str ());
       if (pc.first) {
-        get_pcell_variant_as (pc.second, pcell_declaration (pc.second)->map_parameters (parameters), cell_index, layer_mapping);
+        get_pcell_variant_as (pc.second, pcell_declaration (pc.second)->map_parameters (info.pcell_parameters), cell_index, layer_mapping);
         return true;
       }
 
-    } else if (ex.test ("CELL=")) {
+    } else if (! info.cell_name.empty ()) {
 
-      //  This should not happen. A cell (given by the cell index) cannot be proxy to another cell in the same layout.
+      //  This should not happen. A cell (given by the cell name) cannot be proxy to another cell in the same layout.
       tl_assert (false);
 
     } 
 
+  }
+
+  if (! dynamic_cast<db::ColdProxy *> (m_cell_ptrs [cell_index])) {
+    //  create a cold proxy representing the context information so we can restore it
+    create_cold_proxy_as (info, cell_index);
   }
 
   return false;
@@ -2279,55 +2597,54 @@ Layout::recover_proxy (std::vector <std::string>::const_iterator from, std::vect
     return 0;
   }
 
-  tl::Extractor ex (from->c_str ());
+  return recover_proxy (ProxyContextInfo::deserialize (from, to));
+}
 
-  if (ex.test ("LIB=")) {
+db::Cell *
+Layout::recover_proxy (const ProxyContextInfo &info)
+{
+  if (! info.lib_name.empty ()) {
 
-    std::string lib_name = ex.skip ();
-    Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (lib_name);
-    if (! lib) {
-      return 0;
+    Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (info.lib_name, m_tech_name);
+
+    db::Cell *lib_cell = 0;
+    if (lib) {
+      lib_cell = lib->layout ().recover_proxy_no_lib (info);
     }
 
-    db::Cell *lib_cell = lib->layout ().recover_proxy (from + 1, to);
     if (lib_cell) {
-      cell_index_type cell_index = get_lib_proxy (lib, lib_cell->cell_index ());
-      return &cell (cell_index);
+      return m_cell_ptrs [get_lib_proxy (lib, lib_cell->cell_index ())];
     }
 
   } else {
 
-    std::map<std::string, tl::Variant> parameters;
-
-    while (from != to && (ex = tl::Extractor (from->c_str ())).test ("P(")) {
-
-      std::string name;
-      ex.read_word_or_quoted (name);
-      ex.test (")");
-      ex.test ("=");
-
-      ex.read (parameters.insert (std::make_pair (name, tl::Variant ())).first->second);
-
-      ++from;
-
+    db::Cell *proxy = recover_proxy_no_lib (info);
+    if (proxy) {
+      return proxy;
     }
 
-    if (ex.test ("PCELL=")) {
+  }
 
-      std::pair<bool, pcell_id_type> pc = pcell_by_name (ex.skip ());
-      if (pc.first) {
-        cell_index_type cell_index = get_pcell_variant (pc.second, pcell_declaration (pc.second)->map_parameters (parameters));
-        return &cell (cell_index);
-      }
+  return m_cell_ptrs [create_cold_proxy (info)];
+}
 
-    } else if (ex.test ("CELL=")) {
+db::Cell *
+Layout::recover_proxy_no_lib (const ProxyContextInfo &info)
+{
+  if (! info.pcell_name.empty ()) {
 
-      std::pair<bool, cell_index_type> cc = cell_by_name (ex.skip ());
-      if (cc.first) {
-        return &cell (cc.second);
-      }
+    std::pair<bool, pcell_id_type> pc = pcell_by_name (info.pcell_name.c_str ());
+    if (pc.first) {
+      cell_index_type cell_index = get_pcell_variant (pc.second, pcell_declaration (pc.second)->map_parameters (info.pcell_parameters));
+      return m_cell_ptrs [cell_index];
+    }
 
-    } 
+  } else if (! info.cell_name.empty ()) {
+
+    std::pair<bool, cell_index_type> cc = cell_by_name (info.cell_name.c_str ());
+    if (cc.first) {
+      return m_cell_ptrs [cc.second];
+    }
 
   }
 
@@ -2359,21 +2676,17 @@ Layout::unregister_lib_proxy (db::LibraryProxy *lib_proxy)
 }
 
 void
-Layout::get_lib_proxy_as (Library *lib, cell_index_type cell_index, cell_index_type target_cell_index, ImportLayerMapping *layer_mapping)
+Layout::get_lib_proxy_as (Library *lib, cell_index_type cell_index, cell_index_type target_cell_index, ImportLayerMapping *layer_mapping, bool retain_layout)
 {
-  tl_assert (! (manager () && manager ()->transacting ()));
   tl_assert (m_cell_ptrs [target_cell_index] != 0);
  
-  invalidate_hier ();
-
-  m_cells.erase (iterator (m_cell_ptrs [target_cell_index]));
-
   LibraryProxy *proxy = new LibraryProxy (target_cell_index, *this, lib->get_id (), cell_index);
-  m_cells.push_back_ptr (proxy);
-  m_cell_ptrs [target_cell_index] = proxy;
+  replace_cell (target_cell_index, proxy, retain_layout);
 
-  // produce the layout
-  proxy->update (layer_mapping);
+  if (! retain_layout) {
+    //  produce the layout unless we retained it
+    proxy->update (layer_mapping);
+  }
 }
 
 cell_index_type
@@ -2404,12 +2717,52 @@ Layout::get_lib_proxy (Library *lib, cell_index_type cell_index)
       manager ()->queue (this, new NewRemoveCellOp (new_index, m_cell_names [new_index], false /*new*/, 0));
     }
 
-    // produce the layout
+    //  produce the layout
     proxy->update ();
 
     return new_index;
 
   }
+}
+
+cell_index_type
+Layout::create_cold_proxy (const db::ProxyContextInfo &info)
+{
+  //  create a new unique name
+  std::string b;
+  if (! info.cell_name.empty ()) {
+    b = info.cell_name;
+  } else if (! info.pcell_name.empty ()) {
+    b = info.pcell_name;
+  }
+  if (m_cell_map.find (b.c_str ()) != m_cell_map.end ()) {
+    b = uniquify_cell_name (b.c_str ());
+  }
+
+  //  create a new cell (a LibraryProxy)
+  cell_index_type new_index = allocate_new_cell ();
+
+  ColdProxy *proxy = new ColdProxy (new_index, *this, info);
+  m_cells.push_back_ptr (proxy);
+  m_cell_ptrs [new_index] = proxy;
+
+  //  enter it's index and cell_name
+  register_cell_name (b.c_str (), new_index);
+
+  if (manager () && manager ()->transacting ()) {
+    manager ()->queue (this, new NewRemoveCellOp (new_index, m_cell_names [new_index], false /*new*/, 0));
+  }
+
+  return new_index;
+}
+
+void
+Layout::create_cold_proxy_as (const db::ProxyContextInfo &info, cell_index_type target_cell_index)
+{
+  tl_assert (m_cell_ptrs [target_cell_index] != 0);
+
+  ColdProxy *proxy = new ColdProxy (target_cell_index, *this, info);
+  replace_cell (target_cell_index, proxy, true);
 }
 
 void

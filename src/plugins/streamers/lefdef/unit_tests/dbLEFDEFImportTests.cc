@@ -50,15 +50,12 @@ static db::LEFDEFReaderOptions default_options ()
   return tc;
 }
 
-static db::LayerMap run_test (tl::TestBase *_this, const char *lef_dir, const char *filename, const char *au, const db::LEFDEFReaderOptions &options, bool priv = true)
+static db::LayerMap read (db::Layout &layout, const char *lef_dir, const char *filename, const db::LEFDEFReaderOptions &options, bool priv = true)
 {
   std::string fn_path (priv ? tl::testsrc_private () : tl::testsrc ());
   fn_path += "/testdata/lefdef/";
   fn_path += lef_dir;
   fn_path += "/";
-
-  db::Manager m (false);
-  db::Layout layout (&m), layout2 (&m), layout_au (&m);
 
   tl::Extractor ex (filename);
 
@@ -142,6 +139,16 @@ static db::LayerMap run_test (tl::TestBase *_this, const char *lef_dir, const ch
 
   ld.finish (layout);
 
+  return ld.layer_map ();
+}
+
+static db::LayerMap run_test (tl::TestBase *_this, const char *lef_dir, const char *filename, const char *au, const db::LEFDEFReaderOptions &options, bool priv = true)
+{
+  db::Manager m (false);
+  db::Layout layout (&m), layout2 (&m), layout_au (&m);
+
+  db::LayerMap lm = read (layout, lef_dir, filename, options, priv);
+
   //  normalize the layout by writing to OASIS and reading from ..
 
   //  generate a "unique" name ...
@@ -200,7 +207,7 @@ static db::LayerMap run_test (tl::TestBase *_this, const char *lef_dir, const ch
 
   }
 
-  return ld.layer_map ();
+  return lm;
 }
 
 TEST(1)
@@ -549,6 +556,202 @@ TEST(115_componentmaskshift)
   run_test (_this, "masks-2", "lef:in_tech.lef+lef:in.lef+def:in.def", "au.oas.gz", options, false);
 }
 
+TEST(116_layer_mapping)
+{
+  db::LEFDEFReaderOptions options = default_options ();
+  db::LayerMap lm = db::LayerMap::from_string_file_format ("metal1: 1\nvia1: 2\nmetal2: 3\nOUTLINE: 42/17");
+  options.set_layer_map (lm);
+
+  {
+    db::Layout layout;
+    db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
+    EXPECT_EQ (lm_read.to_string (),
+      "layer_map('OUTLINE : OUTLINE (42/17)';'metal1.VIA : metal1 (1/0)';'metal2.VIA : metal2 (3/0)';'via1.VIA : via1 (2/0)')"
+    )
+  }
+
+  options.set_layer_map (db::LayerMap ());
+
+  {
+    db::Layout layout;
+    db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
+    EXPECT_EQ (lm_read.to_string (),
+      "layer_map('OUTLINE : OUTLINE (4/0)';'metal1.VIA : metal1 (1/0)';'metal2.VIA : metal2 (3/0)';'via1.VIA : via1 (2/0)')"
+    )
+  }
+
+  lm = db::LayerMap::from_string_file_format ("metal1: M1\nmetal1.V: M1_V\nvia1: V1\nmetal2: M2\nOUTLINE: OUTL");
+  options.set_layer_map (lm);
+  options.set_via_geometry_suffix ("V");
+  options.set_via_geometry_datatype (42);
+
+  {
+    db::Layout layout;
+    db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
+    EXPECT_EQ (lm_read.to_string (),
+      "layer_map('OUTLINE : OUTL (4/0)';'metal1.VIA : M1V (1/42)';'metal2.VIA : M2V (3/42)';'via1.VIA : V1V (2/42)')"
+    )
+  }
+
+  lm = db::LayerMap::from_string_file_format ("metal1: M1\nmetal1.V: M1_V\nvia1: V1\nmetal2: M2");
+  options.set_layer_map (lm);
+  options.set_via_geometry_suffix ("V");
+  options.set_via_geometry_datatype (42);
+  options.set_read_all_layers (false);
+
+  {
+    db::Layout layout;
+    db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
+    EXPECT_EQ (lm_read.to_string (),
+      "layer_map('metal1.VIA : M1V (1/42)';'metal2.VIA : M2V (3/42)';'via1.VIA : V1V (2/42)')"
+    )
+  }
+
+  lm = db::LayerMap::from_string_file_format ("metal2: M2 (17/1)");
+  options.set_layer_map (lm);
+
+  {
+    db::Layout layout;
+    db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
+    EXPECT_EQ (lm_read.to_string (),
+      "layer_map('metal2.VIA : M2V (17/43)')"
+    )
+  }
+
+  options.set_produce_via_geometry (false);
+
+  {
+    db::Layout layout;
+    db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
+    EXPECT_EQ (lm_read.to_string (),
+      "layer_map()"
+    )
+  }
+
+  options.set_produce_via_geometry (true);
+  options.set_via_geometry_suffix (".V");
+  lm = db::LayerMap::from_string_file_format ("metal2.V: 17/1");
+  options.set_layer_map (lm);
+
+  {
+    db::Layout layout;
+    db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
+    EXPECT_EQ (lm_read.to_string (),
+      "layer_map('metal2.VIA : metal2.V (17/1)')"
+    )
+  }
+
+  lm = db::LayerMap::from_string_file_format ("metal2.V: m2v (17/5)");
+  options.set_layer_map (lm);
+
+  {
+    db::Layout layout;
+    db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
+    EXPECT_EQ (lm_read.to_string (),
+      "layer_map('metal2.VIA : m2v (17/5)')"
+    )
+  }
+
+  lm = db::LayerMap::from_string_file_format ("OUTLINE: OUTL");
+  options.set_layer_map (lm);
+  options.set_cell_outline_layer ("OUTLINE (42/17)");
+
+  {
+    db::Layout layout;
+    db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
+    EXPECT_EQ (lm_read.to_string (),
+      "layer_map('OUTLINE : OUTL (42/17)')"
+    )
+  }
+
+  lm = db::LayerMap::from_string_file_format ("OUTLINE: OUTL (18/1)");
+  options.set_layer_map (lm);
+  options.set_cell_outline_layer ("OUTLINE (42/17)");
+
+  {
+    db::Layout layout;
+    db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
+    EXPECT_EQ (lm_read.to_string (),
+      "layer_map('OUTLINE : OUTL (18/1)')"
+    )
+  }
+
+  options.set_cell_outline_layer ("OUTLINE (42/17)");
+  lm = db::LayerMap::from_string_file_format ("42/17: OUTL (18/1)");
+  options.set_layer_map (lm);
+
+  {
+    db::Layout layout;
+    db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
+    EXPECT_EQ (lm_read.to_string (),
+      "layer_map('OUTLINE : OUTL (18/1)')"
+    )
+  }
+
+  options.set_cell_outline_layer ("42/17");
+  lm = db::LayerMap::from_string_file_format ("42/17: 18/1");
+  options.set_layer_map (lm);
+
+  {
+    db::Layout layout;
+    db::LayerMap lm_read = read (layout, "via_properties", "lef:in.lef+def:in.def", options, false);
+    EXPECT_EQ (lm_read.to_string (),
+      "layer_map('OUTLINE : OUTLINE (18/1)')"
+    )
+  }
+}
+
+TEST(117_mapfile_all)
+{
+  db::LEFDEFReaderOptions options = default_options ();
+
+  db::Layout layout;
+  db::LayerMap lm_read = read (layout, "mapfile", "lef:in.lef+def:in.def+map:all.map", options, false);
+  EXPECT_EQ (lm_read.to_string (),
+    "layer_map("
+      "'OUTLINE : OUTLINE (1/0)';"
+      "'+M1.LEFOBS;M1.LEFPIN;M1.NET;M1.PIN;M1.SPNET;M1.VIA : \\'M1.NET/PIN/...\\' (1/5)';"
+      "'+M1.NET;M1.SPNET : \\'M1.NET/SPNET\\' (16/0)';"
+      "'+M1.NET : M1.NET (18/0)';"
+      "'+M1.BLK;M1.LEFOBS;M1.LEFPIN;M1.NET;M1.PIN;M1.SPNET;M1.VIA : \\'M1.NET/PIN/...\\' (22/2)';"
+      "'+\\'M1.NET:1\\';\\'M1.PIN:1\\';\\'M1.SPNET:1\\';\\'M1.VIA:1\\' : \\'M1.NET:1/...\\' (6/0)';"
+      "'+\\'M1.NET:1\\' : \\'M1.NET:1\\' (7/0)';"
+      "'+M1.PIN : M1.PIN (3/0)';"
+      "'+M1.PIN : M1.PIN (4/0)';"
+      "'+M1.VIA : M1.VIA (20/0)';"
+      "'+M1.VIA : M1.VIA (21/0)';"
+      "'+M1.LABEL : M1.LABEL (26/0)';"
+      "'+M1.LABEL : M1.LABEL (27/0)';"
+      "'+M1.LABEL : M1.LABEL (28/1)';"
+      "'+M1.BLK : M1.BLOCKAGE (13/0)';"
+      "'M1_TEXT.LABEL : M1_TEXT.LABEL (29/0)'"
+    ")"
+  )
+}
+
+TEST(118_density)
+{
+  run_test (_this, "density", "read:in.lef", "au.oas.gz", default_options (), false);
+}
+
+TEST(119_multimapping)
+{
+  db::LEFDEFReaderOptions options = default_options ();
+  db::LayerMap lm = db::LayerMap::from_string_file_format ("(M1:1/0)\n(M2:3/0)\n+(M1:100/0)\n+(M2:100/0)\n(VIA1:2/0)");
+  options.set_layer_map (lm);
+
+  db::LayerMap lm_read = run_test (_this, "multimap", "def:test.def", "au.oas.gz", options, false);
+  EXPECT_EQ (lm_read.to_string (),
+    "layer_map("
+      "'OUTLINE : OUTLINE (4/0)';"
+      "'+M1.VIA : M1 (1/0)';"
+      "'+M1.VIA;M2.VIA : \\'M1;M2\\' (100/0)';"
+      "'+M2.VIA : M2 (3/0)';"
+      "'VIA1.VIA : VIA1 (2/0)'"
+    ")"
+  )
+}
+
 TEST(200_lefdef_plugin)
 {
   db::Layout ly;
@@ -594,3 +797,4 @@ TEST(201_lefdef_plugin_explicit_lef)
 
   db::compare_layouts (_this, ly, fn_path + "au_plugin_alt_lef.oas.gz", db::WriteOAS);
 }
+

@@ -27,6 +27,7 @@
 #include "layLayerTreeModel.h"
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
+#include "tlLog.h"
 
 #include <QVBoxLayout>
 #include <QHeaderView>
@@ -55,7 +56,7 @@ RecentConfigurationPage::init ()
   ly->addWidget (mp_tree_widget);
 
   connect (mp_tree_widget, SIGNAL (itemClicked (QTreeWidgetItem *, int)), this, SLOT (item_clicked (QTreeWidgetItem *)));
-  mp_view->layer_list_changed_event.add (this, &RecentConfigurationPage::layers_changed);
+  view ()->layer_list_changed_event.add (this, &RecentConfigurationPage::layers_changed);
 
   mp_tree_widget->setColumnCount (int (m_cfg.size ()));
 
@@ -89,16 +90,24 @@ RecentConfigurationPage::get_stored_values () const
   std::string serialized_list = dispatcher ()->config_get (m_recent_cfg_name);
 
   std::list<std::vector<std::string> > values;
-  tl::Extractor ex (serialized_list.c_str ());
-  while (! ex.at_end ()) {
 
-    values.push_back (std::vector<std::string> ());
-    while (! ex.at_end () && ! ex.test (";")) {
-      values.back ().push_back (std::string ());
-      ex.read_word_or_quoted (values.back ().back ());
-      ex.test (",");
+  try {
+
+    tl::Extractor ex (serialized_list.c_str ());
+    while (! ex.at_end ()) {
+
+      values.push_back (std::vector<std::string> ());
+      while (! ex.at_end () && ! ex.test (";")) {
+        values.back ().push_back (std::string ());
+        ex.read_word_or_quoted (values.back ().back ());
+        ex.test (",");
+      }
+
     }
 
+  } catch (tl::Exception &ex) {
+    tl::error << tl::to_string (tr ("Error reading configuration item ")) << m_recent_cfg_name << ": " << ex.msg ();
+    values.clear ();
   }
 
   return values;
@@ -158,7 +167,11 @@ RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std
   case RecentConfigurationPage::Bool:
     {
       bool f = false;
-      tl::from_string (values [column], f);
+      try {
+        tl::from_string (values [column], f);
+      } catch (tl::Exception &ex) {
+        tl::error << tl::to_string (tr ("Configuration error (ArrayFlag/Bool): ")) << ex.msg ();
+      }
       static QString checkmark = QString::fromUtf8 ("\xe2\x9c\x93");
       item->setText (column, f ? checkmark : QString ()); // "checkmark"
     }
@@ -166,10 +179,15 @@ RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std
 
   case RecentConfigurationPage::Layer:
     {
-      int icon_size = mp_view->style ()->pixelMetric (QStyle::PM_ButtonIconSize);
-      lay::LayerPropertiesConstIterator l = lp_iter_from_string (mp_view, values [column]);
+      int icon_size = view ()->style ()->pixelMetric (QStyle::PM_ButtonIconSize);
+      lay::LayerPropertiesConstIterator l;
+      try {
+        l = lp_iter_from_string (view (), values [column]);
+      } catch (tl::Exception &ex) {
+        tl::error << tl::to_string (tr ("Configuration error (Layer): ")) << ex.msg ();
+      }
       if (! l.is_null () && ! l.at_end ()) {
-        item->setIcon (column, lay::LayerTreeModel::icon_for_layer (l, mp_view, icon_size, icon_size, 0, true));
+        item->setIcon (column, lay::LayerTreeModel::icon_for_layer (l, view (), icon_size, icon_size, 0, true));
         item->setText (column, tl::to_qstring (values [column]));
       } else {
         item->setIcon (column, QIcon ());
@@ -199,7 +217,11 @@ RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std
       int flag_column = 0;
       for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end (); ++c, ++flag_column) {
         if (c->rendering == RecentConfigurationPage::ArrayFlag) {
-          tl::from_string (values [flag_column], is_array);
+          try {
+            tl::from_string (values [flag_column], is_array);
+          } catch (tl::Exception &ex) {
+            tl::error << tl::to_string (tr ("Configuration error (IntIfArray/DoubleIfArray): ")) << ex.msg ();
+          }
           break;
         }
       }
@@ -219,7 +241,11 @@ RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std
       const db::Library *lib = 0;
       for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end (); ++c, ++libname_column) {
         if (c->rendering == RecentConfigurationPage::CellLibraryName) {
-          lib = db::LibraryManager::instance ().lib_ptr_by_name (values [libname_column]);
+          if (view ()->active_cellview ().is_valid ()) {
+            lib = db::LibraryManager::instance ().lib_ptr_by_name (values [libname_column], view ()->active_cellview ()->tech_name ());
+          } else {
+            lib = db::LibraryManager::instance ().lib_ptr_by_name (values [libname_column]);
+          }
           break;
         }
       }
@@ -254,7 +280,11 @@ RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std
   case RecentConfigurationPage::PCellParameters:
     {
       std::map<std::string, tl::Variant> pcp;
-      pcp = pcell_parameters_from_string (values [column]);
+      try {
+        pcp = pcell_parameters_from_string (values [column]);
+      } catch (tl::Exception &ex) {
+        tl::error << tl::to_string (tr ("Configuration error (PCellParameters): ")) << ex.msg ();
+      }
       std::string r;
       for (std::map<std::string, tl::Variant>::const_iterator p = pcp.begin (); p != pcp.end (); ++p) {
         if (p != pcp.begin ()) {
@@ -274,6 +304,12 @@ RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std
 
 void
 RecentConfigurationPage::layers_changed (int)
+{
+  update_list (get_stored_values ());
+}
+
+void
+RecentConfigurationPage::technology_changed (const std::string &)
 {
   update_list (get_stored_values ());
 }
@@ -327,7 +363,7 @@ RecentConfigurationPage::item_clicked (QTreeWidgetItem *item)
         ex.read (cv_index);
       }
 
-      mp_view->set_or_request_current_layer (cv_index, lp);
+      view ()->set_or_request_current_layer (cv_index, lp);
 
     } else {
       dispatcher ()->config_set (c->cfg_name, v);
@@ -349,11 +385,11 @@ RecentConfigurationPage::commit_recent (lay::Dispatcher *root)
 
       std::string s;
 
-      if (!(mp_view->current_layer ().is_null () || mp_view->current_layer ().at_end ()) && mp_view->current_layer ()->is_visual ()) {
+      if (!(view ()->current_layer ().is_null () || view ()->current_layer ().at_end ()) && view ()->current_layer ()->is_visual ()) {
 
-        int cv_index = mp_view->current_layer ()->cellview_index ();
-        const lay::CellView &cv = mp_view->cellview (cv_index);
-        int li = mp_view->current_layer ()->layer_index ();
+        int cv_index = view ()->current_layer ()->cellview_index ();
+        const lay::CellView &cv = view ()->cellview (cv_index);
+        int li = view ()->current_layer ()->layer_index ();
         if (cv.is_valid () && cv->layout ().is_valid_layer (li)) {
           s = cv->layout ().get_properties (li).to_string ();
           if (cv_index > 0) {

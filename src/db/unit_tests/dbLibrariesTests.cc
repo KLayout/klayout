@@ -617,3 +617,61 @@ TEST(3)
   }
 }
 
+TEST(4)
+{
+  LIBT_A *lib_a1 = new LIBT_A ();
+  lib_a1->add_technology ("X");
+  db::LibraryManager::instance ().register_lib (lib_a1);
+
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").second, lib_a1->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Z").first, false);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").second, lib_a1->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").second, lib_a1->get_id ());
+
+  LIBT_A *lib_a2 = new LIBT_A ();
+  lib_a2->add_technology ("Y");
+  db::LibraryManager::instance ().register_lib (lib_a2);
+
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").second, lib_a2->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Z").first, false);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").second, lib_a2->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").second, lib_a1->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Y").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Y").second, lib_a2->get_id ());
+
+  LIBT_A *lib_a3 = new LIBT_A ();
+  lib_a3->add_technology ("X");
+  db::LibraryManager::instance ().register_lib (lib_a3);
+
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").second, lib_a3->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Z").first, false);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").second, lib_a3->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").second, lib_a3->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Y").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Y").second, lib_a2->get_id ());
+
+
+  LIBT_A *lib_a4 = new LIBT_A ();
+  db::LibraryManager::instance ().register_lib (lib_a4);
+
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A").second, lib_a3->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Z").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Z").second, lib_a4->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "").second, lib_a3->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "X").second, lib_a3->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Y").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("A", "Y").second, lib_a2->get_id ());
+}
+

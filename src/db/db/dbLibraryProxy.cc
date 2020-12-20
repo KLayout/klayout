@@ -99,8 +99,6 @@ LibraryProxy::remap (lib_id_type lib_id, cell_index_type lib_cell_index)
   m_lib_id = lib_id;
   m_library_cell_index = lib_cell_index;
 
-  //  It's important to register at the new library, but the old library is about to the deleted, so we don't unregister.
-  //  That does not disturb the old library iterating over the layouts.
   db::Library *lib = db::LibraryManager::instance ().lib (m_lib_id);
   if (lib) {
     lib->register_proxy (this, layout ());

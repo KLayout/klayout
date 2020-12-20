@@ -51,6 +51,7 @@ namespace lay
 {
   class PluginDeclaration;
   class Dispatcher;
+  class LayoutView;
   class Plugin;
 }
 
@@ -68,7 +69,7 @@ class EditorOptionsGeneric
 Q_OBJECT
 
 public:
-  EditorOptionsGeneric (lay::Dispatcher *dispatcher);
+  EditorOptionsGeneric (lay::LayoutView *view, lay::Dispatcher *dispatcher);
   ~EditorOptionsGeneric ();
 
   virtual std::string title () const;
@@ -91,7 +92,7 @@ class EditorOptionsText
   : public lay::EditorOptionsPage
 {
 public:
-  EditorOptionsText (lay::Dispatcher *dispatcher);
+  EditorOptionsText (lay::LayoutView *view, lay::Dispatcher *dispatcher);
   ~EditorOptionsText ();
 
   virtual std::string title () const;
@@ -112,7 +113,7 @@ class EditorOptionsPath
 Q_OBJECT 
 
 public:
-  EditorOptionsPath (lay::Dispatcher *dispatcher);
+  EditorOptionsPath (lay::LayoutView *view, lay::Dispatcher *dispatcher);
   ~EditorOptionsPath ();
 
   virtual std::string title () const;
@@ -136,7 +137,7 @@ class EditorOptionsInst
 Q_OBJECT 
 
 public:
-  EditorOptionsInst (lay::Dispatcher *root);
+  EditorOptionsInst (lay::LayoutView *view, lay::Dispatcher *root);
   ~EditorOptionsInst ();
 
   virtual std::string title () const;
@@ -154,6 +155,9 @@ private:
   Ui::EditorOptionsInst *mp_ui;
   edt::PCellParametersPage *mp_pcell_parameters;
   int m_cv_index;
+
+  virtual void technology_changed (const std::string &);
+  virtual void active_cellview_changed ();
 };
 
 /**
@@ -165,7 +169,7 @@ class EditorOptionsInstPCellParam
 Q_OBJECT
 
 public:
-  EditorOptionsInstPCellParam (lay::Dispatcher *root);
+  EditorOptionsInstPCellParam (lay::LayoutView *view, lay::Dispatcher *root);
   ~EditorOptionsInstPCellParam ();
 
   virtual std::string title () const;
@@ -184,6 +188,7 @@ private:
   std::string m_lib_name, m_cell_name;
 
   void update_pcell_parameters (const std::vector <tl::Variant> &parameters);
+  virtual void technology_changed (const std::string &);
 };
 
 }

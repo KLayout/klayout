@@ -285,15 +285,33 @@ bool
 TechnologyController::menu_activated (const std::string &symbol) const
 {
   if (symbol == "technology_selector:apply_technology") {
+
     if (lay::LayoutView::current () && lay::LayoutView::current ()->active_cellview ().is_valid ()) {
-      //  Cancels the current modes - changing the technology may make libraries unavailable
-      //  for example.
+
       if (mp_mw) {
+
+        //  Cancels the current modes - changing the technology may make libraries unavailable
+        //  for example.
         mp_mw->cancel ();
+
+        //  apply technology with undo
+        mp_mw->manager ().transaction (tl::sprintf (tl::to_string (tr ("Apply technology '%s'")), m_current_technology));
+        try {
+          lay::LayoutView::current ()->active_cellview ()->apply_technology (m_current_technology);
+          mp_mw->manager ().commit ();
+        } catch (...) {
+          mp_mw->manager ().cancel ();
+          throw;
+        }
+
+      } else {
+        lay::LayoutView::current ()->active_cellview ()->apply_technology (m_current_technology);
       }
-      lay::LayoutView::current ()->active_cellview ()->apply_technology (m_current_technology);
+
     }
+
     return true;
+
   } else {
     return lay::PluginDeclaration::menu_activated (symbol);
   }

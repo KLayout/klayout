@@ -80,7 +80,7 @@ tl::Variant LayoutContextHandler::eval_double_bracket (const std::string &s) con
 
         std::string tail = cp + 1;
 
-        db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (libname);
+        db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (libname, mp_layout->technology_name ());
         if (! lib) {
           throw tl::Exception (tl::to_string (tr ("Not a valid library name: ")) + libname);
         }

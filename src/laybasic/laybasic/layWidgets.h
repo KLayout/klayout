@@ -26,6 +26,8 @@
 
 #include "laybasicCommon.h"
 
+#include "tlObject.h"
+
 #include <QPushButton>
 #include <QComboBox>
 #include <QLabel>
@@ -170,7 +172,7 @@ private:
  *  This combo box allows selecting a (physical) layer from a layout
  */
 class LAYBASIC_PUBLIC LayerSelectionComboBox
-  : public QComboBox
+  : public QComboBox, public tl::Object
 {
 Q_OBJECT
 
@@ -249,6 +251,7 @@ protected slots:
 private:
   LayerSelectionComboBoxPrivateData *mp_private;
 
+  void on_layer_list_changed (int);
   void update_layer_list ();
 };
 

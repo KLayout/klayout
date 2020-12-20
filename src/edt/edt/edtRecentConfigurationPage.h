@@ -46,8 +46,7 @@ class EditorOptionsPages;
  *  @brief The base class for a object properties page
  */
 class RecentConfigurationPage
-  : public lay::EditorOptionsPage,
-    public tl::Object
+  : public lay::EditorOptionsPage
 {
 Q_OBJECT
 
@@ -79,7 +78,7 @@ public:
 
   template <class Iter>
   RecentConfigurationPage (lay::LayoutView *view, lay::Dispatcher *dispatcher, const std::string &recent_cfg_name, Iter begin_cfg, Iter end_cfg)
-    : EditorOptionsPage (dispatcher), mp_view (view), m_recent_cfg_name (recent_cfg_name), m_cfg (begin_cfg, end_cfg)
+    : EditorOptionsPage (view, dispatcher), m_recent_cfg_name (recent_cfg_name), m_cfg (begin_cfg, end_cfg)
   {
     init ();
   }
@@ -96,7 +95,6 @@ private slots:
   void item_clicked (QTreeWidgetItem *item);
 
 private:
-  lay::LayoutView *mp_view;
   std::string m_recent_cfg_name;
   std::list<ConfigurationDescriptor> m_cfg;
   QTreeWidget *mp_tree_widget;
@@ -107,6 +105,7 @@ private:
   void set_stored_values (const std::list<std::vector<std::string> > &values) const;
   void render_to (QTreeWidgetItem *item, int column, const std::vector<std::string> &values, RecentConfigurationPage::ConfigurationRendering rendering);
   void layers_changed (int);
+  virtual void technology_changed (const std::string &);
 };
 
 }

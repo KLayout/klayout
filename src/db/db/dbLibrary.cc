@@ -191,11 +191,10 @@ Library::remap_to (db::Library *other)
 
       if (! pn.first) {
 
-        //  substitute by static layout cell
-        std::string name = r->first->cell_name (ci);
-        db::Cell *old_cell = r->first->take_cell (ci);
-        r->first->insert_cell (ci, name, new db::Cell (*old_cell));
-        delete old_cell;
+        //  substitute by a cold proxy
+        db::ProxyContextInfo info;
+        r->first->get_context_info (ci, info);
+        r->first->create_cold_proxy_as (info, ci);
 
       } else {
 
@@ -203,11 +202,10 @@ Library::remap_to (db::Library *other)
         const db::PCellDeclaration *new_pcell_decl = other->layout ().pcell_declaration (pn.second);
         if (! old_pcell_decl || ! new_pcell_decl) {
 
-          //  substitute by static layout cell
-          std::string name = r->first->cell_name (ci);
-          db::Cell *old_cell = r->first->take_cell (ci);
-          r->first->insert_cell (ci, name, new db::Cell (*old_cell));
-          delete old_cell;
+          //  substitute by a cold proxy
+          db::ProxyContextInfo info;
+          r->first->get_context_info (ci, info);
+          r->first->create_cold_proxy_as (info, ci);
 
         } else {
 
@@ -232,11 +230,10 @@ Library::remap_to (db::Library *other)
 
       if (! cn.first) {
 
-        //  unlink this proxy: substitute by static layout cell
-        std::string name = r->first->cell_name (ci);
-        db::Cell *old_cell = r->first->take_cell (ci);
-        r->first->insert_cell (ci, name, new db::Cell (*old_cell));
-        delete old_cell;
+        //  substitute by a cold proxy
+        db::ProxyContextInfo info;
+        r->first->get_context_info (ci, info);
+        r->first->create_cold_proxy_as (info, ci);
 
       } else {
 

@@ -20,9 +20,12 @@
 
 */
 
-
-
 #include "dbLayout.h"
+#include "dbLibraryManager.h"
+#include "dbLibrary.h"
+#include "dbColdProxy.h"
+#include "dbLibraryProxy.h"
+#include "dbTextWriter.h"
 #include "tlString.h"
 #include "tlUnitTest.h"
 
@@ -463,4 +466,171 @@ TEST(4)
   ps.insert (std::make_pair (g.properties_repository ().prop_name_id (tl::Variant (1)), tl::Variant ("XXX")));
   prop_id = g.properties_repository ().properties_id (ps);
   EXPECT_EQ (el.property_ids_dirty, true);
+}
+
+static std::string l2s (const db::Layout &layout)
+{
+  tl::OutputStringStream os;
+  tl::OutputStream ostream (os);
+  db::TextWriter writer (ostream);
+  writer.write (layout);
+  return os.string ();
+}
+
+TEST(5)
+{
+  //  Technology management and library substitution
+
+  db::cell_index_type ci;
+  unsigned int li;
+  db::Cell *cell;
+
+  db::Library *lib_a = new db::Library ();
+  lib_a->set_name ("LIB");
+  ci = lib_a->layout ().add_cell ("LIBCELL");
+  li = lib_a->layout ().insert_layer (db::LayerProperties (1, 0));
+  lib_a->layout ().cell (ci).shapes (li).insert (db::Box (0, 0, 100, 200));
+  lib_a->add_technology ("A");
+  db::LibraryManager::instance ().register_lib (lib_a);
+
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("LIB", "A").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("LIB", "A").second, lib_a->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_ptr_by_name ("LIB", "A") == lib_a, true);
+
+  db::Library *lib_b = new db::Library ();
+  lib_b->set_name ("LIB");
+  ci = lib_b->layout ().add_cell ("LIBCELL");
+  li = lib_b->layout ().insert_layer (db::LayerProperties (2, 0));
+  lib_b->layout ().cell (ci).shapes (li).insert (db::Box (0, 0, 200, 100));
+  lib_b->add_technology ("B");
+  db::LibraryManager::instance ().register_lib (lib_b);
+
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("LIB", "B").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("LIB", "B").second, lib_b->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_ptr_by_name ("LIB", "B") == lib_b, true);
+
+  db::Library *lib_c = new db::Library ();
+  lib_c->set_name ("LIB");
+  ci = lib_c->layout ().add_cell ("LIBCELL2");
+  li = lib_c->layout ().insert_layer (db::LayerProperties (2, 0));
+  lib_c->layout ().cell (ci).shapes (li).insert (db::Box (0, 0, 200, 100));
+  lib_c->add_technology ("C");
+  db::LibraryManager::instance ().register_lib (lib_c);
+
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("LIB", "C").first, true);
+  EXPECT_EQ (db::LibraryManager::instance ().lib_by_name ("LIB", "C").second, lib_c->get_id ());
+  EXPECT_EQ (db::LibraryManager::instance ().lib_ptr_by_name ("LIB", "C") == lib_c, true);
+
+  db::Manager m;
+  db::Layout l (&m);
+  EXPECT_EQ (l.technology_name (), "");
+
+  db::ProxyContextInfo info;
+  info.lib_name = "LIB";
+  info.cell_name = "LIBCELL";
+
+  cell = l.recover_proxy (info);
+  EXPECT_EQ (dynamic_cast<db::ColdProxy *> (cell) != 0, true);
+  EXPECT_EQ (cell->get_qualified_name (), "<defunct>LIB.LIBCELL");
+  EXPECT_EQ (cell->get_basic_name (), "<defunct>LIBCELL");
+  EXPECT_EQ (cell->get_display_name (), "<defunct>LIB.LIBCELL");
+
+  EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {LIBCELL}\nend_cell\nend_lib\n");
+
+  //  now restore the proxies
+  l.set_technology_name ("A");
+  EXPECT_EQ (l.technology_name (), "A");
+
+  EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {LIBCELL}\nbox 1 0 {0 0} {100 200}\nend_cell\nend_lib\n");
+
+  //  now switch to cold proxies again as the technology does not have "LIBCELL" (but rather LIBCELL2)
+  l.set_technology_name ("C");
+  EXPECT_EQ (l.technology_name (), "C");
+
+  cell = &l.cell (l.cell_by_name ("LIBCELL").second);
+  EXPECT_EQ (dynamic_cast<db::ColdProxy *> (cell) != 0, true);
+  EXPECT_EQ (cell->get_qualified_name (), "<defunct>LIB.LIBCELL");
+  EXPECT_EQ (cell->get_basic_name (), "<defunct>LIBCELL");
+  EXPECT_EQ (cell->get_display_name (), "<defunct>LIB.LIBCELL");
+
+  //  NOTE: the box on 1/0 retained
+  EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {LIBCELL}\nbox 1 0 {0 0} {100 200}\nend_cell\nend_lib\n");
+
+  //  switch to another LIBCELL, this time using layer 2/0
+  m.transaction ("switch_to_b");
+  l.set_technology_name ("B");
+  m.commit ();
+
+  EXPECT_EQ (l.technology_name (), "B");
+  cell = &l.cell (l.cell_by_name ("LIBCELL").second);
+  EXPECT_EQ (dynamic_cast<db::LibraryProxy *> (cell) != 0, true);
+  EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {LIBCELL}\nbox 2 0 {0 0} {200 100}\nend_cell\nend_lib\n");
+
+  m.undo ();
+  EXPECT_EQ (l.technology_name (), "C");
+
+  cell = &l.cell (l.cell_by_name ("LIBCELL").second);
+  EXPECT_EQ (dynamic_cast<db::ColdProxy *> (cell) != 0, true);
+  EXPECT_EQ (cell->get_qualified_name (), "<defunct>LIB.LIBCELL");
+  EXPECT_EQ (cell->get_basic_name (), "<defunct>LIBCELL");
+  EXPECT_EQ (cell->get_display_name (), "<defunct>LIB.LIBCELL");
+  EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {LIBCELL}\nbox 1 0 {0 0} {100 200}\nend_cell\nend_lib\n");
+
+  m.redo ();
+
+  EXPECT_EQ (l.technology_name (), "B");
+  cell = &l.cell (l.cell_by_name ("LIBCELL").second);
+  EXPECT_EQ (dynamic_cast<db::LibraryProxy *> (cell) != 0, true);
+  EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {LIBCELL}\nbox 2 0 {0 0} {200 100}\nend_cell\nend_lib\n");
+
+  db::LibraryManager::instance ().delete_lib (lib_a);
+  db::LibraryManager::instance ().delete_lib (lib_b);
+  db::LibraryManager::instance ().delete_lib (lib_c);
+}
+
+TEST(6)
+{
+  //  Cold proxies and context serialization
+  db::Cell *cell;
+
+  db::Manager m;
+  db::Layout l (&m);
+
+  EXPECT_EQ (l.technology_name (), "");
+
+  db::ProxyContextInfo info;
+  info.lib_name = "Basic";
+  info.pcell_name = "CIRCLE";
+  info.pcell_parameters ["actual_radius"] = tl::Variant (10.0);
+  info.pcell_parameters ["npoints"] = tl::Variant (8);
+  info.pcell_parameters ["layer"] = tl::Variant (db::LayerProperties (1, 0));
+
+  m.transaction ("import");
+  cell = l.recover_proxy (info);
+  m.commit ();
+  EXPECT_EQ (cell->get_qualified_name (), "Basic.CIRCLE");
+  EXPECT_EQ (cell->get_basic_name (), "CIRCLE");
+  EXPECT_EQ (cell->get_display_name (), "Basic.CIRCLE(l=1/0,r=10,n=8)");
+
+  EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {CIRCLE}\nboundary 1 0 {-4142 -10000} {-10000 -4142} {-10000 4142} {-4142 10000} {4142 10000} {10000 4142} {10000 -4142} {4142 -10000} {-4142 -10000}\nend_cell\nend_lib\n");
+
+  db::ProxyContextInfo info2;
+  l.get_context_info (cell->cell_index (), info2);
+  info2.pcell_parameters ["actual_radius"] = tl::Variant (5.0);
+
+  m.transaction ("modify");
+  db::cell_index_type ci = cell->cell_index ();
+  l.recover_proxy_as (ci, info2);
+  m.commit ();
+  cell = &l.cell (ci);
+  EXPECT_EQ (cell->get_qualified_name (), "Basic.CIRCLE");
+  EXPECT_EQ (cell->get_basic_name (), "CIRCLE");
+  EXPECT_EQ (cell->get_display_name (), "Basic.CIRCLE(l=1/0,r=5,n=8)");
+
+  EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {CIRCLE}\nboundary 1 0 {-2071 -5000} {-5000 -2071} {-5000 2071} {-2071 5000} {2071 5000} {5000 2071} {5000 -2071} {2071 -5000} {-2071 -5000}\nend_cell\nend_lib\n");
+
+  m.undo ();
+  EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {CIRCLE}\nboundary 1 0 {-4142 -10000} {-10000 -4142} {-10000 4142} {-4142 10000} {4142 10000} {10000 4142} {10000 -4142} {4142 -10000} {-4142 -10000}\nend_cell\nend_lib\n");
+  m.redo ();
+  EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {CIRCLE}\nboundary 1 0 {-2071 -5000} {-5000 -2071} {-5000 2071} {-2071 5000} {2071 5000} {5000 2071} {5000 -2071} {2071 -5000} {-2071 -5000}\nend_cell\nend_lib\n");
 }

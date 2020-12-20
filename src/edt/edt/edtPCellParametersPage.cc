@@ -25,6 +25,7 @@
 #include "edtPropertiesPageUtils.h"
 #include "layWidgets.h"
 #include "layQtTools.h"
+#include "layLayoutView.h"
 #include "tlScriptError.h"
 
 #include <QFrame>
@@ -40,7 +41,7 @@
 namespace edt
 {
 
-static void set_value (const db::PCellParameterDeclaration &p, const db::Layout * /*layout*/, QWidget *widget, const tl::Variant &value)
+static void set_value (const db::PCellParameterDeclaration &p, QWidget *widget, const tl::Variant &value)
 {
   if (p.get_choices ().empty ()) {
 
@@ -154,7 +155,6 @@ void
 PCellParametersPage::init ()
 {
   mp_pcell_decl.reset (0);
-  mp_layout = 0;
   mp_view = 0;
   m_cv_index = 0;
   mp_parameters_area = 0;
@@ -183,10 +183,9 @@ PCellParametersPage::init ()
 }
 
 void
-PCellParametersPage::setup (const db::Layout *layout, lay::LayoutView *view, int cv_index, const db::PCellDeclaration *pcell_decl, const db::pcell_parameters_type &parameters)
+PCellParametersPage::setup (lay::LayoutView *view, int cv_index, const db::PCellDeclaration *pcell_decl, const db::pcell_parameters_type &parameters)
 {
   mp_pcell_decl.reset (const_cast<db::PCellDeclaration *> (pcell_decl));  //  no const weak_ptr ...
-  mp_layout = layout;
   mp_view = view;
   m_cv_index = cv_index;
   m_parameters = parameters;
@@ -385,7 +384,7 @@ PCellParametersPage::setup (const db::Layout *layout, lay::LayoutView *view, int
 
     }
 
-    set_value (*p, mp_layout, m_widgets.back (), value);
+    set_value (*p, m_widgets.back (), value);
 
     ++row;
     if (inner_frame == main_frame) {
@@ -592,7 +591,9 @@ PCellParametersPage::get_parameters (bool *ok)
     }
 
     //  coerce the parameters
-    mp_pcell_decl->coerce_parameters (*mp_layout, parameters);
+    if (mp_view->cellview (m_cv_index).is_valid ()) {
+      mp_pcell_decl->coerce_parameters (mp_view->cellview (m_cv_index)->layout (), parameters);
+    }
     set_parameters (parameters);
 
     mp_error_label->hide ();
@@ -642,7 +643,7 @@ PCellParametersPage::set_parameters (const std::vector<tl::Variant> &parameters)
   const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_decl->parameter_declarations ();
   for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pcp.begin (); p != pcp.end (); ++p, ++r) {
     if (r < parameters.size () && m_widgets [r]) {
-      set_value (*p, mp_layout, m_widgets [r], parameters [r]);
+      set_value (*p, m_widgets [r], parameters [r]);
     }
   }
 }

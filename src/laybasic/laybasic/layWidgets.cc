@@ -420,7 +420,7 @@ LayerSelectionComboBox::set_view (lay::LayoutView *view, int cv_index, bool all_
     return;
   }
 
-  mp_private->layout = &view->cellview (cv_index)->layout ();
+  mp_private->layout = 0;
   mp_private->view = view;
   mp_private->cv_index = cv_index;
   mp_private->all_layers = all_layers;
@@ -465,45 +465,60 @@ LayerSelectionComboBox::update_layer_list ()
 
   if (mp_private->view) {
 
-    LPIPairCompareOp cmp_op;
-    std::map<std::pair <db::LayerProperties, int>, std::string, LPIPairCompareOp> name_for_layer (cmp_op);
-    LayerPropertiesConstIterator lp = mp_private->view->begin_layers ();
-    while (! lp.at_end ()) {
-      if (lp->cellview_index () == mp_private->cv_index && ! lp->has_children () && (mp_private->all_layers || lp->layer_index () >= 0) && lp->source (true).layer_props () != db::LayerProperties ()) {
-        std::pair <db::LayerProperties, int> k (lp->source (true).layer_props (), lp->layer_index ());
-        name_for_layer.insert (std::make_pair (k, lp->display_string (mp_private->view, true, true /*always show source*/)));
-        mp_private->layers.push_back (k);
-      }
-      ++lp;
+    const db::Layout *layout = 0;
+
+    const CellView &cv = mp_private->view->cellview (mp_private->cv_index);
+    if (cv.is_valid ()) {
+      layout = & cv->layout ();
     }
 
-    size_t nk = mp_private->layers.size ();
+    if (! layout) {
 
-    for (unsigned int l = 0; l < mp_private->layout->layers (); ++l) {
-      if (mp_private->layout->is_valid_layer (l)) {
-        std::pair <db::LayerProperties, int> k (mp_private->layout->get_properties (l), int (l));
-        if (name_for_layer.find (k) == name_for_layer.end ()) {
+      set_current_layer (-1);
+
+    } else {
+
+      LPIPairCompareOp cmp_op;
+      std::map<std::pair <db::LayerProperties, int>, std::string, LPIPairCompareOp> name_for_layer (cmp_op);
+      LayerPropertiesConstIterator lp = mp_private->view->begin_layers ();
+      while (! lp.at_end ()) {
+        if (lp->cellview_index () == mp_private->cv_index && ! lp->has_children () && (mp_private->all_layers || lp->layer_index () >= 0) && lp->source (true).layer_props () != db::LayerProperties ()) {
+          std::pair <db::LayerProperties, int> k (lp->source (true).layer_props (), lp->layer_index ());
+          name_for_layer.insert (std::make_pair (k, lp->display_string (mp_private->view, true, true /*always show source*/)));
           mp_private->layers.push_back (k);
         }
+        ++lp;
       }
-    }
 
-    std::sort (mp_private->layers.begin () + nk, mp_private->layers.end ());
+      size_t nk = mp_private->layers.size ();
 
-    for (std::vector <std::pair <db::LayerProperties, int> >::iterator ll = mp_private->layers.begin (); ll != mp_private->layers.end (); ++ll) {
-      std::map<std::pair <db::LayerProperties, int>, std::string, LPIPairCompareOp>::const_iterator ln = name_for_layer.find (*ll);
-      if (ln != name_for_layer.end ()) {
-        addItem (tl::to_qstring (ln->second));
-      } else {
-        addItem (tl::to_qstring (ll->first.to_string ()));
+      for (unsigned int l = 0; l < layout->layers (); ++l) {
+        if (layout->is_valid_layer (l)) {
+          std::pair <db::LayerProperties, int> k (layout->get_properties (l), int (l));
+          if (name_for_layer.find (k) == name_for_layer.end ()) {
+            mp_private->layers.push_back (k);
+          }
+        }
       }
-    }
 
-    if (mp_private->new_layer_enabled) {
-      addItem (QObject::tr ("New Layer .."));
-    }
+      std::sort (mp_private->layers.begin () + nk, mp_private->layers.end ());
 
-    set_current_layer (props);
+      for (std::vector <std::pair <db::LayerProperties, int> >::iterator ll = mp_private->layers.begin (); ll != mp_private->layers.end (); ++ll) {
+        std::map<std::pair <db::LayerProperties, int>, std::string, LPIPairCompareOp>::const_iterator ln = name_for_layer.find (*ll);
+        if (ln != name_for_layer.end ()) {
+          addItem (tl::to_qstring (ln->second));
+        } else {
+          addItem (tl::to_qstring (ll->first.to_string ()));
+        }
+      }
+
+      if (mp_private->new_layer_enabled) {
+        addItem (QObject::tr ("New Layer .."));
+      }
+
+      set_current_layer (props);
+
+    }
 
   } else if (mp_private->layout) {
 

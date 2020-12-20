@@ -2576,12 +2576,17 @@ public slots:
   void store_state ();
 
   /**
-   *  @brief Cancel all edit operations and clear the selection
+   *  @brief Cancels all edit operations, clears the selection and resets the mode to "Select"
+   */
+  void cancel_esc ();
+
+  /**
+   *  @brief Cancels all edit operations and clears the selection
    */
   void cancel ();
 
   /**
-   *  @brief Cancel all edit operations but leave selection
+   *  @brief Cancels all edit operations but maintains selection
    */
   void cancel_edits ();
 

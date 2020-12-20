@@ -872,7 +872,7 @@ EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Var
   if (pc.first && layout->pcell_declaration (pc.second) && view ()->cellview (m_cv_index).is_valid ()) {
 
     mp_pcell_parameters = new PCellParametersPage (this, true /*dense*/);
-    mp_pcell_parameters->setup (&view ()->cellview (m_cv_index)->layout (), view (), m_cv_index, layout->pcell_declaration (pc.second), parameters);
+    mp_pcell_parameters->setup (view (), m_cv_index, layout->pcell_declaration (pc.second), parameters);
     this->layout ()->addWidget (mp_pcell_parameters);
 
     mp_pcell_parameters->set_state (pcp_state);

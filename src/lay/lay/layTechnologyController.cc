@@ -290,10 +290,6 @@ TechnologyController::menu_activated (const std::string &symbol) const
 
       if (mp_mw) {
 
-        //  Cancels the current modes - changing the technology may make libraries unavailable
-        //  for example.
-        mp_mw->cancel ();
-
         //  apply technology with undo
         mp_mw->manager ().transaction (tl::sprintf (tl::to_string (tr ("Apply technology '%s'")), m_current_technology));
         try {

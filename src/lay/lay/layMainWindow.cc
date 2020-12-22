@@ -2506,7 +2506,7 @@ void
 MainWindow::cm_new_layout ()
 {
   std::string technology = m_initial_technology;
-  static std::string s_new_cell_cell_name;
+  static std::string s_new_cell_cell_name ("TOP");
   static double s_new_cell_window_size = 2.0;
 
   double dbu = 0.0;

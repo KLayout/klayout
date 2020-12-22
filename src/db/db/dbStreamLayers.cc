@@ -40,10 +40,9 @@ namespace db
 /// A helper class to join two datatype map members
 struct LmapJoinOp1
 {
-  void operator() (unsigned int &a, unsigned int b)
+  void operator() (std::set<unsigned int> &a, const std::set<unsigned int> &b)
   {
-    //  TODO: could also do?: throw an exception ..
-    a = b;
+    a.insert (b.begin (), b.end ());
   }
 };
 
@@ -58,7 +57,27 @@ struct LmapJoinOp2
   }
 };
 
-/// Utility typedefs for the expression parser  
+/// A helper class to implement the unmap operation
+struct LmapEraseDatatypeInterval
+{
+  LmapEraseDatatypeInterval (unsigned int dfrom, unsigned int dto)
+    : m_dfrom (dfrom), m_dto (dto)
+  { }
+
+  void operator() (LayerMap::datatype_map &a, const LayerMap::datatype_map &)
+  {
+    if (is_static_ld (m_dfrom) && is_static_ld (m_dto)) {
+      a.erase (m_dfrom, m_dto + 1);
+    } else {
+      a.clear ();
+    }
+  }
+
+private:
+  unsigned int m_dfrom, m_dto;
+};
+
+/// Utility typedefs for the expression parser
 typedef std::pair<ld_type, ld_type> ld_interval;
 
 /// Utility typedefs for the expression parser  
@@ -71,70 +90,104 @@ LayerMap::LayerMap ()
   //  .. nothing yet ..
 }
 
-std::pair<bool, unsigned int>
+bool
+LayerMap::is_mapped (const LDPair &p) const
+{
+  const datatype_map *dm = m_ld_map.mapped (p.layer);
+  if (!dm) {
+    return false;
+  }
+  const std::set<unsigned int> *l = dm->mapped (p.datatype);
+  return (l && ! l->empty ());
+}
+
+bool
+LayerMap::is_mapped (const std::string &n) const
+{
+  std::map<std::string, std::set<unsigned int> >::const_iterator m = m_name_map.find (n);
+  return m != m_name_map.end () && ! m->second.empty ();
+}
+
+bool
+LayerMap::is_mapped (const db::LayerProperties &p) const
+{
+  std::set<unsigned int> m;
+  if (p.layer >= 0 && p.datatype >= 0) {
+    if (is_mapped (db::LDPair (p.layer, p.datatype))) {
+      return true;
+    }
+  }
+  if (! p.name.empty ()) {
+    return is_mapped (p.name);
+  } else {
+    return false;
+  }
+}
+
+std::set<unsigned int>
 LayerMap::logical (const LDPair &p) const
 {
   return logical_internal (p, false);
 }
 
-std::pair<bool, unsigned int>
+std::set<unsigned int>
 LayerMap::logical (const std::string &n) const
 {
   return logical_internal (n, false);
 }
 
-std::pair<bool, unsigned int>
+std::set<unsigned int>
 LayerMap::logical (const db::LayerProperties &p) const
 {
   return logical_internal (p, false);
 }
 
-std::pair<bool, unsigned int>
+std::set<unsigned int>
 LayerMap::logical_internal (const LDPair &p, bool allow_placeholder) const
 {
   const datatype_map *dm = m_ld_map.mapped (p.layer);
   if (dm) {
-    const unsigned int *l = dm->mapped (p.datatype);
+    const std::set<unsigned int> *l = dm->mapped (p.datatype);
     if (l && (allow_placeholder || ! is_placeholder (*l))) {
-      return std::make_pair (true, *l);
+      return *l;
     }
   }
-  return std::make_pair (false, 0);
+  return std::set<unsigned int> ();
 }
 
-std::pair<bool, unsigned int> 
+std::set<unsigned int>
 LayerMap::logical_internal (const std::string &n, bool allow_placeholder) const
 {
-  std::map<std::string, unsigned int>::const_iterator m = m_name_map.find (n);
+  std::map<std::string, std::set<unsigned int> >::const_iterator m = m_name_map.find (n);
   if (m != m_name_map.end () && (allow_placeholder || ! is_placeholder (m->second))) {
-    return std::make_pair (true, m->second);
+    return m->second;
   } else {
-    return std::make_pair (false, 0);
+    return std::set<unsigned int> ();
   }
 }
 
-std::pair<bool, unsigned int> 
+std::set<unsigned int>
 LayerMap::logical_internal (const db::LayerProperties &p, bool allow_placeholder) const
 {
+  std::set<unsigned int> m;
   if (p.layer >= 0 && p.datatype >= 0) {
-    std::pair<bool, unsigned int> m = logical_internal (db::LDPair (p.layer, p.datatype), allow_placeholder);
-    if (m.first) {
-      return m;
-    }
+    m = logical_internal (db::LDPair (p.layer, p.datatype), allow_placeholder);
   }
-  if (! p.name.empty ()) {
-    std::pair<bool, unsigned int> m = logical_internal (p.name, allow_placeholder);
-    if (m.first) {
-      return m;
-    }
+  if (m.empty () && ! p.name.empty ()) {
+    m = logical_internal (p.name, allow_placeholder);
   }
-  return std::make_pair (false, 0);
+  return m;
 }
 
 bool
-LayerMap::is_placeholder (unsigned int l) const
+LayerMap::is_placeholder (const std::set<unsigned int> &m) const
 {
-  return (m_placeholders.size () > std::numeric_limits<unsigned int>::max () - l);
+  for (std::set<unsigned int>::const_iterator i = m.begin (); i != m.end (); ++i) {
+    if (m_placeholders.size () > std::numeric_limits<unsigned int>::max () - *i) {
+      return true;
+    }
+  }
+  return false;
 }
 
 const db::LayerProperties *
@@ -148,39 +201,52 @@ LayerMap::target (unsigned int l) const
   }
 }
 
-std::pair<bool, unsigned int>
+std::set<unsigned int>
 LayerMap::logical (const db::LayerProperties &p, db::Layout &layout) const
 {
-  std::pair<bool, unsigned int> l = logical_internal (p, true);
-  if (l.first && is_placeholder (l.second)) {
-    return const_cast<LayerMap *> (this)->substitute_placeholder (p, l.second, layout);
+  std::set<unsigned int> l = logical_internal (p, true);
+  if (is_placeholder (l)) {
+    return const_cast<LayerMap *> (this)->substitute_placeholder (p, l, layout);
   } else {
     return l;
   }
 }
 
-std::pair<bool, unsigned int>
+std::set<unsigned int>
 LayerMap::logical (const db::LDPair &p, db::Layout &layout) const
 {
-  std::pair<bool, unsigned int> l = logical_internal (p, true);
-  if (l.first && is_placeholder (l.second)) {
-    return const_cast<LayerMap *> (this)->substitute_placeholder (db::LayerProperties (p.layer, p.datatype), l.second, layout);
+  std::set<unsigned int> l = logical_internal (p, true);
+  if (is_placeholder (l)) {
+    return const_cast<LayerMap *> (this)->substitute_placeholder (db::LayerProperties (p.layer, p.datatype), l, layout);
   } else {
     return l;
   }
 }
 
-std::pair<bool, unsigned int>
-LayerMap::substitute_placeholder (const db::LayerProperties &p, unsigned int ph, db::Layout &layout)
+std::set<unsigned int>
+LayerMap::substitute_placeholder (const db::LayerProperties &p, const std::set<unsigned int> &m, db::Layout &layout)
 {
-  const db::LayerProperties &lp_ph = m_placeholders [std::numeric_limits<unsigned int>::max () - ph];
-  db::LayerProperties lp_new = p;
-  lp_new.layer = db::ld_combine (p.layer, lp_ph.layer);
-  lp_new.datatype = db::ld_combine (p.datatype, lp_ph.datatype);
+  std::set<unsigned int> res;
+  for (std::set<unsigned int>::const_iterator i = m.begin (); i != m.end (); ++i) {
 
-  unsigned int l_new = layout.insert_layer (lp_new);
-  map (p, l_new, lp_new);
-  return std::make_pair (true, l_new);
+    if (m_placeholders.size () > std::numeric_limits<unsigned int>::max () - *i) {
+
+      const db::LayerProperties &lp_ph = m_placeholders [std::numeric_limits<unsigned int>::max () - *i];
+      db::LayerProperties lp_new = p;
+      lp_new.layer = db::ld_combine (p.layer, lp_ph.layer);
+      lp_new.datatype = db::ld_combine (p.datatype, lp_ph.datatype);
+
+      unsigned int l_new = layout.insert_layer (lp_new);
+      map (p, l_new, lp_new);
+      res.insert (l_new);
+
+    } else {
+      res.insert (*i);
+    }
+
+  }
+
+  return res;
 }
 
 static std::string format_interval (ld_type l1, ld_type l2)
@@ -196,44 +262,93 @@ static std::string format_interval (ld_type l1, ld_type l2)
   }
 }
 
+static std::vector<std::pair<ld_type, ld_type> >
+extract_dt_intervals (const LayerMap::datatype_map &dt_map, int ll, bool &has_others)
+{
+  std::vector<std::pair<ld_type, ld_type> > res;
+
+  for (LayerMap::datatype_map::const_iterator d = dt_map.begin (); d != dt_map.end (); ) {
+
+    if (d->second.find (ll) != d->second.end ()) {
+
+      std::pair<ld_type, ld_type> dpi = d->first;
+
+      if (d->second.size () > 1) {
+        has_others = true;
+      }
+
+      LayerMap::datatype_map::const_iterator dd = d;
+      ++dd;
+      while (dd != dt_map.end () && dd->first.first == dpi.second && dd->second.find (ll) != dd->second.end ()) {
+        if (dd->second.size () > 1) {
+          has_others = true;
+        }
+        dpi.second = dd->first.second;
+        ++dd;
+      }
+
+      d = dd;
+
+      res.push_back (dpi);
+
+    } else {
+      ++d;
+    }
+
+  }
+  return res;
+}
+
 std::string
 LayerMap::mapping_str (unsigned int ll) const
 {
   std::string s;
   bool f1 = true;
+  bool is_mmap = false;
 
-  for (ld_map::const_iterator l = m_ld_map.begin (); l != m_ld_map.end (); ++l) {
+  for (ld_map::const_iterator l = m_ld_map.begin (); l != m_ld_map.end (); ) {
+
+    std::pair<ld_type, ld_type> lti = l->first;
+
+    std::vector<std::pair<ld_type, ld_type> > dti = extract_dt_intervals (l->second, ll, is_mmap);
+    ++l;
+    while (l != m_ld_map.end () && lti.second == l->first.first && extract_dt_intervals (l->second, ll, is_mmap) == dti) {
+      lti.second = l->first.second;
+      ++l;
+    }
 
     bool f2 = true;
-    for (datatype_map::const_iterator d = l->second.begin (); d != l->second.end (); ++d) {
-      if (d->second == ll) {
+    for (std::vector<std::pair<ld_type, ld_type> >::const_iterator d = dti.begin (); d != dti.end (); ++d) {
 
-        //  create a string representation
-        if (!f2) {
-          s += ",";
-        } else {
+      //  create a string representation
+      if (!f2) {
+        s += ",";
+      } else {
 
-          if (!f1) {
-            s += ";";
-          }
-          f1 = false;
-
-          s += format_interval (l->first.first, l->first.second);
-          s += "/";
-
+        if (!f1) {
+          s += ";";
         }
-        f2 = false;
+        f1 = false;
 
-        s += format_interval (d->first.first, d->first.second);
+        s += format_interval (lti.first, lti.second);
+        s += "/";
 
       }
+      f2 = false;
+
+      s += format_interval (d->first, d->second);
 
     }
     
   }
 
-  for (std::map <std::string, unsigned int>::const_iterator l = m_name_map.begin (); l != m_name_map.end (); ++l) {
-    if (l->second == ll) {
+  for (std::map <std::string, std::set<unsigned int> >::const_iterator l = m_name_map.begin (); l != m_name_map.end (); ++l) {
+
+    if (l->second.find (ll) != l->second.end ()) {
+
+      if (l->second.size () > 1) {
+        is_mmap = true;
+      }
 
       if (!f1) {
         s += ";";
@@ -243,6 +358,7 @@ LayerMap::mapping_str (unsigned int ll) const
       s += tl::to_word_or_quoted_string (l->first);
 
     }
+
   }
 
   std::map<unsigned int, LayerProperties>::const_iterator t = m_target_layers.find (ll);
@@ -251,7 +367,11 @@ LayerMap::mapping_str (unsigned int ll) const
     s += t->second.to_string (true);
   }
 
-  return s;
+  if (is_mmap) {
+    return "+" + s;
+  } else {
+    return s;
+  }
 }
 
 void
@@ -300,11 +420,19 @@ LayerMap::prepare (db::Layout &layout)
   //  Now remap the indexes
   for (ld_map::iterator l = m_ld_map.begin (); l != m_ld_map.end (); ++l) {
     for (datatype_map::iterator d = l->second.begin (); d != l->second.end (); ++d) {
-      d->second = real_layers [d->second];
+      std::set<unsigned int> dn;
+      for (std::set<unsigned int>::const_iterator i = d->second.begin (); i != d->second.end (); ++i) {
+        dn.insert (real_layers [*i]);
+      }
+      d->second = dn;
     }
   }
-  for (std::map<std::string, unsigned int>::iterator n = m_name_map.begin (); n != m_name_map.end (); ++n) {
-    n->second = real_layers [n->second];
+  for (std::map<std::string, std::set<unsigned int> >::iterator n = m_name_map.begin (); n != m_name_map.end (); ++n) {
+    std::set<unsigned int> dn;
+    for (std::set<unsigned int>::const_iterator i = n->second.begin (); i != n->second.end (); ++i) {
+      dn.insert (real_layers [*i]);
+    }
+    n->second = dn;
   }
 
   std::map<unsigned int, LayerProperties> old_target_layers;
@@ -329,11 +457,11 @@ LayerMap::get_layers () const
 
   for (ld_map::const_iterator l = m_ld_map.begin (); l != m_ld_map.end (); ++l) {
     for (datatype_map::const_iterator d = l->second.begin (); d != l->second.end (); ++d) {
-      layers.insert (d->second);
+      layers.insert (d->second.begin (), d->second.end ());
     }
   }
   for (const_iterator_names n = m_name_map.begin (); n != m_name_map.end (); ++n) {
-    layers.insert(n->second);
+    layers.insert(n->second.begin (), n->second.end ());
   }
 
   return std::vector<unsigned int> (layers.begin (), layers.end ());
@@ -358,7 +486,7 @@ LayerMap::mapping (unsigned int ll) const
       //  no mapping is given. Use the lowest layer and datatype
       for (ld_map::const_iterator l = m_ld_map.begin (); l != m_ld_map.end (); ++l) {
         for (datatype_map::const_iterator d = l->second.begin (); d != l->second.end (); ++d) {
-          if (d->second == ll) {
+          if (d->second.find (ll) != d->second.end ()) {
             p.layer = l->first.first;
             p.datatype = d->first.first;
             break;
@@ -373,7 +501,7 @@ LayerMap::mapping (unsigned int ll) const
     //  no mapping is given. Use the lowest layer and datatype
     for (ld_map::const_iterator l = m_ld_map.begin (); l != m_ld_map.end (); ++l) {
       for (datatype_map::const_iterator d = l->second.begin (); d != l->second.end (); ++d) {
-        if (d->second == ll) {
+        if (d->second.find (ll) != d->second.end ()) {
           p.layer = l->first.first;
           p.datatype = d->first.first;
           break;
@@ -384,8 +512,8 @@ LayerMap::mapping (unsigned int ll) const
   }
 
   if (p.name.empty ()) {
-    for (std::map <std::string, unsigned int>::const_iterator l = m_name_map.begin (); l != m_name_map.end (); ++l) {
-      if (l->second == ll) {
+    for (std::map <std::string, std::set<unsigned int> >::const_iterator l = m_name_map.begin (); l != m_name_map.end (); ++l) {
+      if (l->second.find (ll) != l->second.end ()) {
         p.name = l->first;
         break;
       }
@@ -397,59 +525,59 @@ LayerMap::mapping (unsigned int ll) const
 }
 
 void 
-LayerMap::map (const LDPair &p, unsigned int l)
+LayerMap::mmap (const LDPair &p, unsigned int l)
 {
   insert (p, p, l, (const LayerProperties *) 0);
 }
 
 void 
-LayerMap::map (const std::string &name, unsigned int l)
+LayerMap::mmap (const std::string &name, unsigned int l)
 {
   insert (name, l, (const LayerProperties *) 0);
 }
 
 void 
-LayerMap::map (const LayerProperties &f, unsigned int l)
+LayerMap::mmap (const LayerProperties &f, unsigned int l)
 {
   if (f.name.empty () || is_static_ld (f.layer) || is_static_ld (f.datatype)) {
-    map (db::LDPair (f.layer, f.datatype), l);
+    mmap (db::LDPair (f.layer, f.datatype), l);
   } 
   if (! f.name.empty ()) {
-    map (f.name, l);
+    mmap (f.name, l);
   }
 }
 
 void 
-LayerMap::map (const LDPair &p, unsigned int l, const LayerProperties &t)
+LayerMap::mmap (const LDPair &p, unsigned int l, const LayerProperties &t)
 {
   insert (p, p, l, &t);
 }
 
 void 
-LayerMap::map (const std::string &name, unsigned int l, const LayerProperties &t)
+LayerMap::mmap (const std::string &name, unsigned int l, const LayerProperties &t)
 {
   insert (name, l, &t);
 }
 
 void 
-LayerMap::map (const LayerProperties &f, unsigned int l, const LayerProperties &t)
+LayerMap::mmap (const LayerProperties &f, unsigned int l, const LayerProperties &t)
 {
   if (f.name.empty () || is_static_ld (f.layer) || is_static_ld (f.datatype)) {
-    map (db::LDPair (f.layer, f.datatype), l, t);
+    mmap (db::LDPair (f.layer, f.datatype), l, t);
   } 
   if (! f.name.empty ()) {
-    map (f.name, l, t);
+    mmap (f.name, l, t);
   }
 }
 
 void 
-LayerMap::map (const LDPair &p1, const LDPair &p2, unsigned int l)
+LayerMap::mmap (const LDPair &p1, const LDPair &p2, unsigned int l)
 {
   insert (p1, p2, l, (const LayerProperties *) 0);
 }
 
 void 
-LayerMap::map (const LDPair &p1, const LDPair &p2, unsigned int l, const LayerProperties &lp)
+LayerMap::mmap (const LDPair &p1, const LDPair &p2, unsigned int l, const LayerProperties &lp)
 {
   insert (p1, p2, l, &lp);
 }
@@ -495,17 +623,24 @@ parse_intervals (tl::Extractor &ex, ld_interval_vector &v)
 }
 
 void 
-LayerMap::map_expr (const std::string &expr, unsigned int l)
+LayerMap::mmap_expr (const std::string &expr, unsigned int l)
 {
   tl::Extractor ex (expr.c_str ());
-  map_expr (ex, l);
+  mmap_expr (ex, l);
   ex.expect_end ();
 }
 
 void
-LayerMap::map_expr (tl::Extractor &ex, unsigned int l)
+LayerMap::mmap_expr (tl::Extractor &ex, unsigned int l)
 {
   try {
+
+    bool round_bracket = false, square_bracket = false;
+    if (ex.test ("(")) {
+      round_bracket = true;
+    } else if (ex.test ("[")) {
+      square_bracket = true;
+    }
 
     do {
 
@@ -515,7 +650,7 @@ LayerMap::map_expr (tl::Extractor &ex, unsigned int l)
       ld_type n;
       if (! ex.try_read (n) && ex.try_read_word_or_quoted (name)) {
 
-        m_name_map.insert (std::make_pair (name, l));
+        m_name_map [name].insert (l);
 
       } else {
 
@@ -533,7 +668,9 @@ LayerMap::map_expr (tl::Extractor &ex, unsigned int l)
         datatype_map dm;
         for (ld_interval_vector::const_iterator di = vd.begin (); di != vd.end (); ++di) {
           LmapJoinOp1 op1;
-          dm.add (di->first, di->second + 1, l, op1);
+          std::set<unsigned int> single;
+          single.insert (l);
+          dm.add (di->first, di->second + 1, single, op1);
         }
         for (ld_interval_vector::const_iterator li = vl.begin (); li != vl.end (); ++li) {
           LmapJoinOp2 op2;
@@ -548,7 +685,15 @@ LayerMap::map_expr (tl::Extractor &ex, unsigned int l)
       LayerProperties lp;
       lp.read (ex, true);
       m_target_layers[l] = lp;
-    } 
+    } else if (square_bracket) {
+      m_target_layers[l] = LayerProperties (db::any_ld (), db::any_ld ());
+    }
+
+    if (round_bracket) {
+      ex.expect (")");
+    } else if (square_bracket) {
+      ex.expect ("]");
+    }
 
   } catch (...) {
     throw LayerSpecFormatException (ex.skip ());
@@ -566,7 +711,7 @@ LayerMap::insert (const std::string &name, unsigned int l, const LayerProperties
     m_target_layers[l] = *target;
   }
 
-  m_name_map.insert (std::make_pair (name, l));
+  m_name_map [name].insert (l);
 
   if (l >= m_next_index) {
     m_next_index = l + 1;
@@ -580,13 +725,16 @@ LayerMap::insert (const LDPair &p1, const LDPair &p2, unsigned int l, const Laye
     m_target_layers[l] = *target;
   }
 
+  std::set<unsigned int> single;
+  single.insert (l);
+
   //  create a single-interval list for the datatype range
   LayerMap::datatype_map dt;
   LmapJoinOp1 op1;
   if (db::is_static_ld (p1.datatype) && db::is_static_ld (p2.datatype)) {
-    dt.add (p1.datatype, p2.datatype + 1, l, op1);
+    dt.add (p1.datatype, p2.datatype + 1, single, op1);
   } else {
-    dt.add (0, std::numeric_limits<ld_type>::max (), l, op1);
+    dt.add (0, std::numeric_limits<ld_type>::max (), single, op1);
   }
 
   //  add this to the layers using the special join operator that
@@ -600,6 +748,117 @@ LayerMap::insert (const LDPair &p1, const LDPair &p2, unsigned int l, const Laye
 
   if (l >= m_next_index) {
     m_next_index = l + 1;
+  }
+}
+
+void
+LayerMap::unmap (const LDPair &f)
+{
+  unmap (f, f);
+}
+
+void
+LayerMap::unmap (const std::string &name)
+{
+  m_name_map.erase (name);
+}
+
+void
+LayerMap::unmap (const LayerProperties &f)
+{
+  if (f.name.empty () || is_static_ld (f.layer) || is_static_ld (f.datatype)) {
+    unmap (db::LDPair (f.layer, f.datatype));
+  }
+  if (! f.name.empty ()) {
+    unmap (f.name);
+  }
+}
+
+
+
+void
+LayerMap::unmap (const LDPair &p1, const LDPair &p2)
+{
+  if (m_ld_map.begin () == m_ld_map.end ()) {
+    return;
+  }
+
+  LmapEraseDatatypeInterval op (p1.datatype, p2.datatype);
+  if (db::is_static_ld (p1.layer) && db::is_static_ld (p2.layer)) {
+    m_ld_map.add (p1.layer, p2.layer + 1, LayerMap::datatype_map (), op);
+  } else {
+    m_ld_map.add (m_ld_map.begin ()->first.first, m_ld_map.end ()->first.second, LayerMap::datatype_map (), op);
+  }
+}
+
+
+void
+LayerMap::unmap_expr (const std::string &expr)
+{
+  tl::Extractor ex (expr.c_str ());
+  unmap_expr (ex);
+  ex.expect_end ();
+}
+
+void
+LayerMap::unmap_expr (tl::Extractor &ex)
+{
+  try {
+
+    bool round_bracket = false, square_bracket = false;
+    if (ex.test ("(")) {
+      round_bracket = true;
+    } else if (ex.test ("[")) {
+      square_bracket = true;
+    }
+
+    do {
+
+      tl::Extractor ex_saved = ex;
+
+      std::string name;
+      ld_type n;
+      if (! ex.try_read (n) && ex.try_read_word_or_quoted (name)) {
+
+        m_name_map.erase (name);
+
+      } else {
+
+        ex = ex_saved;
+        ld_interval_vector vl, vd;
+
+        parse_intervals (ex, vl);
+
+        if (ex.test ("/")) {
+          parse_intervals (ex, vd);
+        } else {
+          vd.push_back (ld_interval (0, 0));
+        }
+
+        for (ld_interval_vector::const_iterator li = vl.begin (); li != vl.end (); ++li) {
+          for (ld_interval_vector::const_iterator di = vd.begin (); di != vd.end (); ++di) {
+            unmap (LDPair (li->first, di->first), LDPair (li->second, di->second));
+          }
+        }
+
+      }
+
+    } while (ex.test (";") || ex.test (","));
+
+    if (ex.test (":")) {
+      //  ignore target layers
+      LayerProperties lp;
+      lp.read (ex, true);
+    }
+
+    if (round_bracket) {
+      ex.expect (")");
+    } else if (square_bracket) {
+      ex.expect ("]");
+    }
+
+  } catch (...) {
+    throw LayerSpecFormatException (ex.skip ());
   }
 }
 
@@ -646,6 +905,26 @@ LayerMap::to_string_file_format () const
   return os.str ();
 }
 
+void
+LayerMap::add_expr (const std::string &expr, unsigned int l)
+{
+  tl::Extractor ex (expr.c_str ());
+  add_expr (ex, l);
+  ex.expect_end ();
+}
+
+void
+LayerMap::add_expr (tl::Extractor &ex, unsigned int l)
+{
+  if (ex.test ("+")) {
+    mmap_expr (ex, l);
+  } else if (ex.test ("-")) {
+    unmap_expr (ex);
+  } else {
+    map_expr (ex, l);
+  }
+}
+
 db::LayerMap 
 LayerMap::from_string_file_format (const std::string &s)
 {
@@ -668,7 +947,7 @@ LayerMap::from_string_file_format (const std::string &s)
       } else {
 
         if (! ex.at_end ()) {
-          lm.map_expr (ex, l);
+          lm.add_expr (ex, l);
           if (ex.test ("#") || ex.test ("//")) {
             //  ignore comments
           } else {
@@ -703,7 +982,7 @@ namespace tl
     while (! ex.test (")") && ! ex.at_end ()) {
       std::string m;
       ex.read_word_or_quoted (m);
-      t.map_expr (m, l);
+      t.add_expr (m, l);
       ++l;
       ex.test (";");
     }
@@ -723,7 +1002,7 @@ namespace tl
     while (! ex.test (")") && ! ex.at_end ()) {
       std::string m;
       ex.read_word_or_quoted (m);
-      t.map_expr (m, l);
+      t.add_expr (m, l);
       ++l;
       ex.test (";");
     }

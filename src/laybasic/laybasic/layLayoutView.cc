@@ -2538,7 +2538,7 @@ LayoutView::erase_cellview (unsigned int index)
     return;
   }
 
-  cancel ();
+  cancel_esc ();
 
   //  issue to event that signals a change in the cellviews
   cellviews_about_to_change_event ();
@@ -2703,6 +2703,8 @@ LayoutView::signal_apply_technology (lay::LayoutHandle *layout_handle)
   for (unsigned int i = 0; i < cellviews (); ++i) {
 
     if (cellview (i).handle () == layout_handle) {
+
+      cancel_esc ();
 
       std::string lyp_file;
       const db::Technology *tech = db::Technologies::instance ()->technology_by_name (cellview (i)->tech_name ());
@@ -3056,7 +3058,7 @@ void
 LayoutView::reload_layout (unsigned int cv_index)
 {
   stop ();
-  cancel (); 
+  cancel_esc ();
 
   //  save the current view state
   lay::DisplayState state;
@@ -3949,6 +3951,13 @@ LayoutView::cancel ()
 }
 
 void
+LayoutView::cancel_esc ()
+{
+  cancel ();
+  switch_mode (default_mode ());
+}
+
+void
 LayoutView::bookmark_current_view ()
 {
   QString proposed_name = tl::to_qstring (m_bookmarks.propose_new_bookmark_name ());
@@ -4751,7 +4760,7 @@ LayoutView::select_cellviews_fit (const std::list <CellView> &cvs)
     cellviews_about_to_change_event ();
 
     set_min_hier_levels (0);
-    cancel (); 
+    cancel_esc ();
     m_cellviews = cvs;
     zoom_fit ();
     finish_cellviews_changed ();
@@ -4771,6 +4780,12 @@ void
 LayoutView::active_cellview_changed (int index)
 {
   if (m_active_cellview_changed_event_enabled) {
+
+    //  we need to cancel pending drawing or dragging operations to reflect the new cellview (different target, may have different technology etc.)
+    cancel_esc ();
+
+    //  we need to setup the editor option pages because the technology may have changed
+    dm_setup_editor_option_pages ();
 
     active_cellview_changed_event ();
     active_cellview_changed_with_index_event (index);
@@ -4889,7 +4904,7 @@ LayoutView::select_cellviews (const std::list <CellView> &cvs)
     cellviews_about_to_change_event ();
 
     set_min_hier_levels (0);
-    cancel (); 
+    cancel_esc ();
     m_cellviews = cvs;
     redraw ();
 
@@ -4914,7 +4929,7 @@ LayoutView::select_cellview (int index, const CellView &cv)
 
     cellview_about_to_change_event (index);
 
-    cancel ();
+    cancel_esc ();
     *cellview_iter (index) = cv;
     redraw ();
 

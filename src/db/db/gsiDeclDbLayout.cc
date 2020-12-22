@@ -39,6 +39,7 @@
 #include "dbLayoutUtils.h"
 #include "dbLayerMapping.h"
 #include "dbCellMapping.h"
+#include "dbTechnology.h"
 #include "tlStream.h"
 
 namespace gsi
@@ -750,7 +751,7 @@ static db::Cell *create_cell2 (db::Layout *layout, const std::string &name, cons
 
 static db::Cell *create_cell3 (db::Layout *layout, const std::string &name, const std::string &libname)
 {
-  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (libname);
+  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (libname, layout->technology_name ());
   if (! lib) {
     return 0;
   }
@@ -765,7 +766,7 @@ static db::Cell *create_cell3 (db::Layout *layout, const std::string &name, cons
 
 static db::Cell *create_cell4 (db::Layout *layout, const std::string &name, const std::string &libname, const std::map<std::string, tl::Variant> &params)
 {
-  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (libname);
+  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (libname, layout->technology_name ());
   if (! lib) {
     return 0;
   }
@@ -987,6 +988,21 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "See \\LayoutMetaInfo for details about layouts and meta information.\n"
     "\n"
     "This method has been introduced in version 0.25."
+  ) +
+  gsi::method ("technology_name", &db::Layout::technology_name,
+    "@brief Gets the name of the technology this layout is associated with\n"
+    "This method has been introduced in version 0.27. Before that, the technology has been kept in the 'technology' meta data element."
+  ) +
+  gsi::method ("technology", &db::Layout::technology,
+    "@brief Gets the \\Technology object of the technology this layout is associated with or nil if the layout is not associated with a technology\n"
+    "This method has been introduced in version 0.27. Before that, the technology has been kept in the 'technology' meta data element."
+  ) +
+  gsi::method ("technology_name=", &db::Layout::set_technology_name, gsi::arg ("name"),
+    "@brief Sets the name of the technology this layout is associated with\n"
+    "Changing the technology name will re-assess all library references because libraries can be technology specified. "
+    "Cell layouts may be substituted during this re-assessment.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
   ) +
   gsi::method ("is_editable?", &db::Layout::is_editable,
     "@brief Returns a value indicating whether the layout is editable.\n"

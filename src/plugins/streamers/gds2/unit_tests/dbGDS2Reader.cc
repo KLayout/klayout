@@ -332,7 +332,7 @@ TEST(2)
     db::Layout layout_piece (&m);
     layout_piece = layout;
 
-    std::pair<bool, unsigned int> jj = map_full.logical (pairs[i]);
+    std::pair<bool, unsigned int> jj = map_full.first_logical (pairs[i]);
     EXPECT_EQ (jj.first, true);
 
     for (unsigned int j = 0; j < layout_piece.layers(); ++j) {
@@ -418,7 +418,7 @@ TEST(3_AdvancedMapping)
 
   EXPECT_EQ (lm_read.to_string_file_format (),
     "1/10 : 1/0\n"
-    "2/0-9,21-*\n"
+    "2/0-1 : 2/0\n"
     "1/0 : 1/0\n"
     "1/1 : 1/1\n"
     "1/20 : 1/1020\n"
@@ -427,13 +427,93 @@ TEST(3_AdvancedMapping)
     "2/11 : 2/11\n"
     "42/42 : 142/42\n"
     "100/0 : 200/0\n"
-    "2/12-20 : */*\n"
-    "1/22-30 : 1/*+1000\n"
-    "1/2-9,11-19,31-* : */*\n"
-    "0/*;3-41/*;42/0-41,43-*;43-99/*;100/1-*;101-*/* : *+100/*\n"
   );
 
   std::string fn_au (tl::testsrc () + "/testdata/gds/alm_au.gds");
+  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+}
+
+TEST(3_MultiMapping)
+{
+  db::Manager m (false);
+  db::Layout layout (&m);
+
+  db::LoadLayoutOptions options;
+  db::LayerMap lm, lm_read;
+
+  unsigned int n = 0;
+  lm.map_expr ("*/*: */*", n++);
+  lm.unmap_expr ("1-2/10");
+  lm.mmap_expr ("1-2/10: *+100/*", n++);
+  lm.mmap_expr ("1/10;2/10: 12/1010", n++);
+  lm.mmap_expr ("1/0-1: */*+1000", n++);
+  options.get_options<db::CommonReaderOptions> ().layer_map = lm;
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/alm.gds");
+    db::Reader reader (file);
+    lm_read = reader.read (layout, options);
+  }
+
+  EXPECT_EQ (lm_read.to_string_file_format (),
+    "+1-2/10 : 12/1010\n"
+    "+1/0 : 1/1000\n"
+    "+1/0 : 1/0\n"
+    "+1/1 : 1/1001\n"
+    "+1/1 : 1/1\n"
+    "+1/10 : 101/10\n"
+    "1/20 : 1/20\n"
+    "1/21 : 1/21\n"
+    "2/0 : 2/0\n"
+    "2/1 : 2/1\n"
+    "+2/10 : 102/10\n"
+    "2/11 : 2/11\n"
+    "42/42 : 42/42\n"
+    "100/0 : 100/0\n"
+  );
+
+  std::string fn_au (tl::testsrc () + "/testdata/gds/alm_au2.gds");
+  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+}
+
+TEST(3_MultiMapping2)
+{
+  db::Manager m (false);
+  db::Layout layout (&m);
+
+  db::LoadLayoutOptions options;
+  db::LayerMap lm, lm_read;
+
+  unsigned int n = 0;
+  lm.add_expr ("(1/0:1/0)", n++);
+  lm.add_expr ("+(1/0:1000/0)", n++);
+  lm.add_expr ("(4/0:1/0)", n++);
+  lm.add_expr ("(2/0:2/0)", n++);
+  lm.add_expr ("+(2/0:1000/0)", n++);
+  lm.add_expr ("(3/0:3/0)", n++);
+  options.get_options<db::CommonReaderOptions> ().layer_map = lm;
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/t10.gds");
+    db::Reader reader (file);
+    lm_read = reader.read (layout, options);
+  }
+
+  EXPECT_EQ (lm_read.to_string_file_format (),
+    "+1/0;4/0 : 1/0\n"
+    "+1-2/0 : 1000/0\n"
+    "+2/0 : 2/0\n"
+    "3/0 : 3/0\n"
+    "6/0 : 6/0\n"
+    "8/0 : 8/0\n"
+    "5/0 : 5/0\n"
+    "7/0 : 7/0\n"
+    "3/1 : 3/1\n"
+    "6/1 : 6/1\n"
+    "8/1 : 8/1\n"
+  );
+
+  std::string fn_au (tl::testsrc () + "/testdata/gds/alm_au3.gds");
   db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
 }
 
@@ -443,7 +523,7 @@ TEST(4_CollectModeRename)
   db::Layout layout (&m);
 
   db::LoadLayoutOptions options;
-  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::CommonReader::RenameCell;
+  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::RenameCell;
 
   {
     tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_basic.gds");
@@ -467,7 +547,7 @@ TEST(4_CollectModeOverwrite)
   db::Layout layout (&m);
 
   db::LoadLayoutOptions options;
-  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::CommonReader::OverwriteCell;
+  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::OverwriteCell;
 
   {
     tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_basic.gds");
@@ -491,7 +571,7 @@ TEST(4_CollectModeSkip)
   db::Layout layout (&m);
 
   db::LoadLayoutOptions options;
-  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::CommonReader::SkipNewCell;
+  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::SkipNewCell;
 
   {
     tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_basic.gds");
@@ -515,7 +595,7 @@ TEST(4_CollectModeAdd)
   db::Layout layout (&m);
 
   db::LoadLayoutOptions options;
-  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::CommonReader::AddToCell;
+  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::AddToCell;
 
   {
     tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_basic.gds");

@@ -22,6 +22,7 @@
 
 
 #include "dbGDS2ReaderBase.h"
+#include "dbGDS2Format.h"
 #include "dbGDS2.h"
 #include "dbArray.h"
 
@@ -34,42 +35,12 @@ namespace db
 
 // ---------------------------------------------------------------
 
-/**
- *  @brief A utility class that maps the layers for the proxy cell recovery
- */
-class GDS2ReaderLayerMapping
-  : public db::ImportLayerMapping
-{
-public:
-  GDS2ReaderLayerMapping (db::GDS2ReaderBase *reader, db::Layout *layout, bool create)
-    : mp_reader (reader), mp_layout (layout), m_create (create)
-  {
-    //  .. nothing yet .. 
-  }
-
-  std::pair<bool, unsigned int> map_layer (const db::LayerProperties &lprops)
-  {
-    //  named layers that are imported from a library are ignored
-    if (lprops.is_named ()) {
-      return std::make_pair (false, 0);
-    } else {
-      return mp_reader->open_dl (*mp_layout, LDPair (lprops.layer, lprops.datatype), m_create);
-    }
-  }
-
-private:
-  db::GDS2ReaderBase *mp_reader;
-  db::Layout *mp_layout;
-  bool m_create;
-};
-
 // ---------------------------------------------------------------
 //  GDS2ReaderBase
 
 GDS2ReaderBase::GDS2ReaderBase ()
   : m_dbu (0.001), 
     m_dbuu (1.0), 
-    m_create_layers (true), 
     m_read_texts (true),
     m_read_properties (true),
     m_allow_multi_xy_records (false),
@@ -83,31 +54,18 @@ GDS2ReaderBase::~GDS2ReaderBase ()
   // .. nothing yet ..
 }
 
-const LayerMap &
-GDS2ReaderBase::basic_read (db::Layout &layout, const LayerMap &layer_map, bool create_other_layers, bool enable_text_objects, bool enable_properties, bool allow_multi_xy_records, unsigned int box_mode, db::CommonReader::CellConflictResolution cc_resolution)
+void
+GDS2ReaderBase::init (const db::LoadLayoutOptions &options)
 {
-  m_layer_map = layer_map;
-  m_layer_map.prepare (layout);
-  m_read_texts = enable_text_objects;
-  m_read_properties = enable_properties;
+  CommonReader::init (options);
 
-  m_allow_multi_xy_records = allow_multi_xy_records;
-  m_box_mode = box_mode;
-  m_create_layers = create_other_layers;
+  db::GDS2ReaderOptions gds2_options = options.get_options<db::GDS2ReaderOptions> ();
 
-  set_cell_conflict_resolution (cc_resolution);
+  m_read_texts = common_options ().enable_text_objects;
+  m_read_properties = common_options ().enable_properties;
 
-  layout.start_changes ();
-  try {
-    do_read (layout);
-    finish (layout);
-    layout.end_changes ();
-  } catch (...) {
-    layout.end_changes ();
-    throw;
-  }
-
-  return m_layer_map;
+  m_allow_multi_xy_records = gds2_options.allow_multi_xy_records;
+  m_box_mode = gds2_options.box_mode;
 }
 
 void
@@ -180,34 +138,6 @@ GDS2ReaderBase::finish_element (db::PropertiesRepository &rep)
   }
 }
 
-
-std::pair <bool, unsigned int> 
-GDS2ReaderBase::open_dl (db::Layout &layout, const LDPair &dl, bool create) 
-{
-  std::pair<bool, unsigned int> ll = m_layer_map.logical (dl, layout);
-  if (ll.first) {
-
-    return ll;
-
-  } else if (! create) {
-
-    //  layer not mapped and no layer create is requested
-    return ll;
-
-  } else {
-
-    //  and create the layer
-    db::LayerProperties lp;
-    lp.layer = dl.layer;
-    lp.datatype = dl.datatype;
-
-    unsigned int ll = layout.insert_layer (lp);
-    m_layer_map.map (dl, ll, lp);
-
-    return std::make_pair (true, ll);
-
-  }
-}
 
 inline db::Point 
 pt_conv (const GDS2XY &p) 
@@ -358,17 +288,21 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
       db::cell_index_type cell_index = make_cell (layout, m_cellname);
 
-      db::Cell *cell = &layout.cell (cell_index);
-
+      bool ignore_cell = false;
       std::map <tl::string, std::vector <std::string> >::const_iterator ctx = m_context_info.find (m_cellname);
       if (ctx != m_context_info.end ()) {
-        GDS2ReaderLayerMapping layer_mapping (this, &layout, m_create_layers);
+        CommonReaderLayerMapping layer_mapping (this, &layout);
         if (layout.recover_proxy_as (cell_index, ctx->second.begin (), ctx->second.end (), &layer_mapping)) {
           //  ignore everything in that cell since it is created by the import:
-          cell = 0;
+          ignore_cell = true;
         }
       }
       
+      db::Cell *cell = 0;
+      if (! ignore_cell) {
+        cell = &layout.cell (cell_index);
+      }
+
       long attr = 0;
       db::PropertiesRepository::properties_set cell_properties;
 
@@ -553,7 +487,7 @@ GDS2ReaderBase::read_boundary (db::Layout &layout, db::Cell &cell, bool from_box
   unsigned int xy_length = 0;
   GDS2XY *xy_data = get_xy_data (xy_length);
 
-  std::pair<bool, unsigned int> ll = open_dl (layout, ld, m_create_layers);
+  std::pair<bool, unsigned int> ll = open_dl (layout, ld);
   if (ll.first) {
 
     //  create a box object if possible
@@ -734,7 +668,7 @@ GDS2ReaderBase::read_path (db::Layout &layout, db::Cell &cell)
   unsigned int xy_length = 0;
   GDS2XY *xy_data = get_xy_data (xy_length);
 
-  std::pair<bool, unsigned int> ll = open_dl (layout, ld, m_create_layers);
+  std::pair<bool, unsigned int> ll = open_dl (layout, ld);
   if (ll.first) {
 
     //  this will copy the path:
@@ -825,7 +759,7 @@ GDS2ReaderBase::read_text (db::Layout &layout, db::Cell &cell)
   std::pair<bool, unsigned int> ll (false, 0);
 
   if (m_read_texts) {
-    ll = open_dl (layout, ld, m_create_layers);
+    ll = open_dl (layout, ld);
   }
 
   rec_id = get_record ();
@@ -947,7 +881,7 @@ GDS2ReaderBase::read_box (db::Layout &layout, db::Cell &cell)
   }
   ld.datatype = get_ushort ();
 
-  std::pair<bool, unsigned int> ll = open_dl (layout, ld, m_create_layers);
+  std::pair<bool, unsigned int> ll = open_dl (layout, ld);
 
   if (get_record () != sXY) {
     error (tl::to_string (tr ("XY record expected")));

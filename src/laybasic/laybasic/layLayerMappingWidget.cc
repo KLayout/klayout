@@ -53,6 +53,8 @@ LayerMappingWidget::LayerMappingWidget (QWidget *parent)
 
   mp_ui->layer_lv->viewport ()->acceptDrops ();
 
+  connect (mp_ui->tabs, SIGNAL (currentChanged (int)), this, SLOT (current_tab_changed (int)));
+
   mp_layer_table_file_dialog = new lay::FileDialog (this, 
                                                     tl::to_string (QObject::tr ("Load Layer Table")), 
                                                     tl::to_string (QObject::tr ("Layer properties and text files (*.lyp *.txt);;Layer properties files (*.lyp);;Text files (*.txt);;All files (*)")));
@@ -72,6 +74,8 @@ LayerMappingWidget::set_layer_map (const db::LayerMap &lm)
 {
   std::vector<unsigned int> layer_ids = lm.get_layers ();
 
+  mp_ui->text_edit->setPlainText (tl::to_qstring (lm.to_string_file_format ()));
+
   mp_ui->layer_lv->reset ();
   mp_ui->layer_lv->clear ();
 
@@ -89,15 +93,30 @@ LayerMappingWidget::set_layer_map (const db::LayerMap &lm)
 db::LayerMap 
 LayerMappingWidget::get_layer_map () const
 {
+  return get_layer_map_from_tab (mp_ui->tabs->currentIndex ());
+}
+
+db::LayerMap
+LayerMappingWidget::get_layer_map_from_tab (int tab) const
+{
   db::LayerMap lm;
-  for (int i = 0; i < mp_ui->layer_lv->count (); ++i) {
-    std::string t = tl::to_string (mp_ui->layer_lv->item (i)->data (Qt::DisplayRole).toString ());
-    try {
-      lm.map_expr (t, (unsigned int) i);
-    } catch (...) {
-      mp_ui->layer_lv->setCurrentItem (mp_ui->layer_lv->item (i));
-      throw;
+
+  if (tab == 0) {
+
+    for (int i = 0; i < mp_ui->layer_lv->count (); ++i) {
+      std::string t = tl::to_string (mp_ui->layer_lv->item (i)->data (Qt::DisplayRole).toString ());
+      try {
+        lm.add_expr (t, (unsigned int) i);
+      } catch (...) {
+        mp_ui->layer_lv->setCurrentItem (mp_ui->layer_lv->item (i));
+        throw;
+      }
     }
+
+  } else {
+
+    lm = db::LayerMap::from_string_file_format (tl::to_string (mp_ui->text_edit->toPlainText ()));
+
   }
 
   return lm;
@@ -128,16 +147,18 @@ LayerMappingWidget::load_button_pressed ()
       mp_ui->layer_lv->reset ();
       mp_ui->layer_lv->clear ();
 
+      db::LayerMap lm;
+
       //  use those layers which have cellview index 0
+      unsigned int n = 0;
       for (LayerPropertiesConstIterator lay_iter = props.begin_const_recursive (); ! lay_iter.at_end (); ++lay_iter) {
         if (! lay_iter->has_children () && lay_iter->source (true /*=real*/).cv_index () == 0) {
           db::LayerProperties db_lp = lay_iter->source (true /*=real*/).layer_props ();
-          QListWidgetItem *item = new QListWidgetItem (mp_ui->layer_lv);
-          item->setData (Qt::DisplayRole, tl::to_qstring (db_lp.to_string ()));
-          item->setFlags (item->flags () | Qt::ItemIsEditable);
-          mp_ui->layer_lv->addItem (item);
+          lm.map (db_lp, (unsigned int) n++);
         }
       }
+
+      set_layer_map (lm);
 
       //  if successful, stop now.
       success = true;
@@ -228,6 +249,12 @@ LayerMappingWidget::edit_button_pressed ()
   }
 
   END_PROTECTED
+}
+
+void
+LayerMappingWidget::current_tab_changed (int index)
+{
+  set_layer_map (get_layer_map_from_tab (1 - index));
 }
 
 }

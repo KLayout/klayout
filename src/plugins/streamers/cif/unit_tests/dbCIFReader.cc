@@ -39,13 +39,8 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
     unsigned int ln = 0;
     tl::Extractor ex (map);
     while (! ex.at_end ()) {
-      std::string n;
-      int l;
-      ex.read_word_or_quoted (n);
-      ex.test (":");
-      ex.read (l);
+      lm.add_expr (ex, ln++);
       ex.test (",");
-      lm.map (n, ln++, db::LayerProperties (l, 0));
     }
     opt->layer_map = lm;
     opt->create_other_layers = true;
@@ -171,6 +166,11 @@ TEST(3a)
 TEST(3b)
 {
   run_test (_this, tl::testsrc_private (), "t3.cif.gz", "t3b_au.gds.gz", "CAA:43,CCA:48,CCP:47,CMF:49,CMS:51,CPG:46,CSN:45,CSP:44,CVA:50,CWN:42,XP:26", 0.00012);
+}
+
+TEST(3c)
+{
+  run_test (_this, tl::testsrc_private (), "t3.cif.gz", "t3c_au.gds.gz", "(CPG:1/0) +(CPG:1000/0) (CCP:1/0) (CMF:2/0) +(CMF:1000/0) (CVA:3/0)", 0.00012);
 }
 
 TEST(4)

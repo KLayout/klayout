@@ -43,6 +43,7 @@ GDS2Reader::GDS2Reader (tl::InputStream &s)
     m_recptr (0),
     mp_rec_buf (0),
     m_stored_rec (0),
+    m_allow_big_records (true),
     m_progress (tl::to_string (tr ("Reading GDS2 file")), 10000)
 {
   m_progress.set_format (tl::to_string (tr ("%.0f MB")));
@@ -54,23 +55,16 @@ GDS2Reader::~GDS2Reader ()
   //  .. nothing yet ..
 }
 
-const LayerMap &
-GDS2Reader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
+void
+GDS2Reader::init (const db::LoadLayoutOptions &options)
 {
-  m_options = options.get_options<db::GDS2ReaderOptions> ();
-  m_common_options = options.get_options<db::CommonReaderOptions> ();
+  GDS2ReaderBase::init (options);
+
+  m_allow_big_records = options.get_options<db::GDS2ReaderOptions> ().allow_big_records;
 
   m_recnum = 0;
   --m_recnum;
   m_reclen = 0;
-
-  return basic_read (layout, m_common_options.layer_map, m_common_options.create_other_layers, m_common_options.enable_text_objects, m_common_options.enable_properties, m_options.allow_multi_xy_records, m_options.box_mode, m_common_options.cell_conflict_resolution);
-}
-
-const LayerMap &
-GDS2Reader::read (db::Layout &layout)
-{
-  return read (layout, db::LoadLayoutOptions ());
 }
 
 void 
@@ -108,7 +102,7 @@ GDS2Reader::get_record ()
     error (tl::to_string (tr ("Invalid record length (less than 4)")));
   }
   if (m_reclen >= 0x8000) {
-    if (m_options.allow_big_records) {
+    if (m_allow_big_records) {
       warn (tl::to_string (tr ("Record length larger than 0x8000 encountered: interpreting as unsigned")));
     } else {
       error (tl::to_string (tr ("Record length larger than 0x8000 encountered (reader is configured not to allow such records)")));

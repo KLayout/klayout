@@ -530,16 +530,28 @@ LibrariesView::do_update_content (int lib_index)
 
   size_t imin = (lib_index < 0 ? 0 : (size_t) lib_index);
   size_t imax = (lib_index < 0 ? std::numeric_limits <size_t>::max () : (size_t) lib_index);
+  std::string tech_name;
 
   //  rebuild all events
   detach_from_all_events ();
+
+  mp_view->active_cellview_changed_event.add (this, &LibrariesView::update_required);
+  lay::CellViewRef cv = mp_view->active_cellview_ref ();
+  if (cv.is_valid ()) {
+    cv->technology_changed_event.add (this, &LibrariesView::update_required);
+    tech_name = cv->tech_name ();
+  }
+
   db::LibraryManager::instance ().changed_event.add (this, &LibrariesView::update_required);
 
   std::vector<db::Library *> libraries;
   for (db::LibraryManager::iterator lib = db::LibraryManager::instance ().begin (); lib != db::LibraryManager::instance ().end (); ++lib) {
-    libraries.push_back (db::LibraryManager::instance ().lib (lib->second));
-    libraries.back ()->layout ().hier_changed_event.add (this, &LibrariesView::update_required);
-    libraries.back ()->retired_state_changed_event.add (this, &LibrariesView::update_required);
+    db::Library *lib_ptr = db::LibraryManager::instance ().lib (lib->second);
+    if (! lib_ptr->for_technologies () || lib_ptr->is_for_technology (tech_name)) {
+      libraries.push_back (lib_ptr);
+      libraries.back ()->layout ().hier_changed_event.add (this, &LibrariesView::update_required);
+      libraries.back ()->retired_state_changed_event.add (this, &LibrariesView::update_required);
+    }
   }
 
   for (size_t i = imin; i < libraries.size () && i <= imax; ++i) {

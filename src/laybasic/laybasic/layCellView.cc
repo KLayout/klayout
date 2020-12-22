@@ -59,6 +59,8 @@ LayoutHandle::LayoutHandle (db::Layout *layout, const std::string &filename)
     m_dirty (false),
     m_save_options_valid (false)
 {
+  layout->technology_changed_event.add (this, &LayoutHandle::on_technology_changed);
+
   //  layouts in the managed layouts space participate in spare proxy cleanup
   layout->do_cleanup (true);
 
@@ -106,6 +108,12 @@ LayoutHandle::~LayoutHandle ()
   }
 
   file_watcher ().remove_file (filename ());
+}
+
+void
+LayoutHandle::on_technology_changed ()
+{
+  technology_changed_event ();
 }
 
 void 
@@ -206,13 +214,20 @@ LayoutHandle::remove_ref ()
   }
 }
 
+const std::string &
+LayoutHandle::tech_name () const
+{
+  static std::string s_empty;
+  return mp_layout ? mp_layout->technology_name () : s_empty;
+}
+
 const db::Technology *
 LayoutHandle::technology () const
 {
-  return db::Technologies::instance ()->technology_by_name (m_tech_name);
+  return mp_layout ? mp_layout->technology () : 0;
 }
 
-void 
+void
 LayoutHandle::apply_technology (const std::string &tn)
 {
   set_tech_name (tn);
@@ -223,16 +238,8 @@ LayoutHandle::apply_technology (const std::string &tn)
 void 
 LayoutHandle::set_tech_name (const std::string &tn)
 {
-  if (tn != m_tech_name) {
-    if (db::Technologies::instance ()->has_technology (tn)) {
-      m_tech_name = tn;
-    } else {
-      m_tech_name = std::string ();
-    }
-    if (mp_layout) {
-      mp_layout->add_meta_info (db::MetaInfo ("technology", tl::to_string (tr ("Technology name")), tn));
-    }
-    technology_changed_event ();
+  if (mp_layout && tn != tech_name ()) {
+    mp_layout->set_technology_name (tn);
   }
 }
 
@@ -347,7 +354,7 @@ LayoutHandle::load (const db::LoadLayoutOptions &options, const std::string &tec
 
   //  If there is no technology given and the reader reports one, use this one
   if (technology.empty ()) {
-    std::string tech_from_reader = layout ().meta_info_value ("technology");
+    std::string tech_from_reader = layout ().technology_name ();
     if (! tech_from_reader.empty ()) {
       set_tech_name (tech_from_reader);
     }
@@ -373,7 +380,7 @@ LayoutHandle::load ()
   db::LayerMap new_lmap = reader.read (layout (), m_load_options);
 
   //  Attach the technology from the reader if it reports one
-  std::string tech_from_reader = layout ().meta_info_value ("technology");
+  std::string tech_from_reader = layout ().technology_name ();
   if (! tech_from_reader.empty ()) {
     set_tech_name (tech_from_reader);
   }

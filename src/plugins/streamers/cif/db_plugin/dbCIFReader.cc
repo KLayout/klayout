@@ -59,22 +59,20 @@ CIFReader::~CIFReader ()
 const LayerMap &
 CIFReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 {
-  prepare_layers ();
-
   const db::CIFReaderOptions &specific_options = options.get_options<db::CIFReaderOptions> ();
   m_wire_mode = specific_options.wire_mode;
   m_dbu = specific_options.dbu;
 
-  db::LayerMap lm = specific_options.layer_map;
-  lm.prepare (layout);
-  set_layer_map (lm);
+  set_layer_map (specific_options.layer_map);
   set_create_layers (specific_options.create_other_layers);
   set_keep_layer_names (specific_options.keep_layer_names);
+
+  prepare_layers (layout);
 
   do_read (layout);
 
   finish_layers (layout);
-  return layer_map ();
+  return layer_map_out ();
 }
 
 const LayerMap &

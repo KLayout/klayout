@@ -145,7 +145,7 @@ private:
   std::map<std::string, std::string> m_use_lib_paths;
   db::VCplxTrans m_dbu_trans_inv;
   std::string m_tech;
-  db::Technology *mp_klayout_tech;
+  const db::Technology *mp_klayout_tech;
 
   void do_read (db::Layout &layout, db::cell_index_type to_cell, tl::TextInputStream &stream);
   void do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl::TextInputStream &stream);

@@ -159,12 +159,17 @@ public:
   virtual void end_move (const db::DPoint &p, lay::angle_constraint_type ac);
 
   /**
-   *  @brief Tell the number of selected objects
+   *  @brief Indicates whether objects are selected
+   */
+  virtual bool has_selection ();
+
+  /**
+   *  @brief Indicates how many objects are selected
    */
   virtual size_t selection_size ();
 
   /**
-   *  @brief Tell if anything is selected in the transient selection
+   *  @brief Indicates whether objects are selected in transient mode
    */
   virtual bool has_transient_selection ();
 

@@ -256,11 +256,21 @@ public:
   virtual void paste ();
 
   /**
-   *  @brief Tell the number of selected objects
+   *  @brief Indicates whether there are selection objects
+   */
+  virtual bool has_selection ();
+
+  /**
+   *  @brief Indicates how many objects are selected
    */
   virtual size_t selection_size ();
 
-  /** 
+  /**
+   *  @brief Indicates whether there are selection objects in transient mode
+   */
+  virtual bool has_transient_selection ();
+
+  /**
    *  @brief point selection proximity predicate
    */
   virtual double click_proximity (const db::DPoint &pos, lay::Editable::SelectionMode mode);

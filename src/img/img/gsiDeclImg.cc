@@ -1336,7 +1336,7 @@ static bool has_image_selection (const lay::LayoutView *view)
 {
   std::vector<img::Service *> img = view->get_plugins <img::Service> ();
   for (std::vector<img::Service *>::const_iterator s = img.begin (); s != img.end (); ++s) {
-    if ((*s)->selection_size () > 0) {
+    if ((*s)->has_selection ()) {
       return true;
     }
   }

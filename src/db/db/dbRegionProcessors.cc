@@ -139,6 +139,16 @@ bool RelativeExtentsAsEdges::result_must_not_be_merged () const
 }
 
 // -----------------------------------------------------------------------------------
+//  PolygonToEdgeProcessor implementation
+
+void PolygonToEdgeProcessor::process (const db::Polygon &poly, std::vector<db::Edge> &result) const
+{
+  for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
+    result.push_back (*e);
+  }
+}
+
+// -----------------------------------------------------------------------------------
 //  ConvexDecomposition implementation
 
 void ConvexDecomposition::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const

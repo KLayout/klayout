@@ -25,6 +25,7 @@
 
 #include "dbCompoundOperation.h"
 #include "dbRegionUtils.h"
+#include "dbEdgesUtils.h"
 #include "dbRegionLocalOperations.h"
 
 namespace gsi
@@ -185,6 +186,41 @@ static db::CompoundRegionOperationNode *new_minkowsky_sum_node3 (db::CompoundReg
 static db::CompoundRegionOperationNode *new_minkowsky_sum_node4 (db::CompoundRegionOperationNode *input, const std::vector<db::Point> &p)
 {
   return new db::CompoundRegionProcessingOperationNode (new db::minkowsky_sum_computation<std::vector<db::Point> > (p), input, true /*processor is owned*/);
+}
+
+static db::CompoundRegionOperationNode *new_edges_node (db::CompoundRegionOperationNode *input)
+{
+  return new db::CompoundRegionToEdgeProcessingOperationNode (new db::PolygonToEdgeProcessor (), input, true /*processor is owned*/);
+}
+
+static db::CompoundRegionOperationNode *new_edge_length_filter_node (db::CompoundRegionOperationNode *input, db::Edge::distance_type lmin, db::Edge::distance_type lmax, bool inverse)
+{
+  return new db::CompoundRegionEdgeFilterOperationNode (new db::EdgeLengthFilter (lmin, lmax, inverse), input, true /*processor is owned*/);
+}
+
+static db::CompoundRegionOperationNode *new_edge_orientation_filter_node (db::CompoundRegionOperationNode *input, double amin, double amax, bool inverse)
+{
+  return new db::CompoundRegionEdgeFilterOperationNode (new db::EdgeOrientationFilter (amin, amax, inverse), input, true /*processor is owned*/);
+}
+
+static db::CompoundRegionOperationNode *new_edge_pair_to_polygon_node (db::CompoundRegionOperationNode *input, db::Coord e)
+{
+  return new db::CompoundRegionEdgePairToPolygonProcessingOperationNode (new db::EdgePairToPolygonProcessor (e), input, true /*processor is owned*/);
+}
+
+static db::CompoundRegionOperationNode *new_edge_pair_to_edges_node (db::CompoundRegionOperationNode *input)
+{
+  return new db::CompoundRegionEdgePairToEdgeProcessingOperationNode (new db::EdgePairToEdgesProcessor (), input, true /*processor is owned*/);
+}
+
+static db::CompoundRegionOperationNode *new_edge_pair_to_first_edges_node (db::CompoundRegionOperationNode *input)
+{
+  return new db::CompoundRegionEdgePairToEdgeProcessingOperationNode (new db::EdgePairToFirstEdgesProcessor (), input, true /*processor is owned*/);
+}
+
+static db::CompoundRegionOperationNode *new_edge_pair_to_second_edges_node (db::CompoundRegionOperationNode *input)
+{
+  return new db::CompoundRegionEdgePairToEdgeProcessingOperationNode (new db::EdgePairToSecondEdgesProcessor (), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_check_node (db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter)
@@ -385,6 +421,27 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   ) +
   gsi::constructor ("new_rectangle_filter", &new_rectangle_filter, gsi::arg ("input"), gsi::arg ("inverse", false),
     "@brief Creates a node filtering the input for rectangular shapes (or non-rectangular ones with 'inverse' set to 'true').\n"
+  ) +
+  gsi::constructor ("new_edges", &new_edges_node, gsi::arg ("input"),
+    "@brief Creates a node converting polygons into it's edges.\n"
+  ) +
+  gsi::constructor ("new_edge_length_filter", &new_edge_length_filter_node, gsi::arg ("input"), gsi::arg ("lmin", 0), gsi::arg ("lmax", std::numeric_limits<db::Edge::distance_type>::max (), "max"), gsi::arg ("inverse", false),
+    "@brief Creates a node filtering edges by their length.\n"
+  ) +
+  gsi::constructor ("new_edge_orientation_filter", &new_edge_orientation_filter_node, gsi::arg ("input"), gsi::arg ("amin"), gsi::arg ("amax"), gsi::arg ("inverse", false),
+    "@brief Creates a node filtering edges by their orientation.\n"
+  ) +
+  gsi::constructor ("new_edge_pair_to_polygon", &new_edge_pair_to_polygon_node, gsi::arg ("input"), gsi::arg ("e", 0),
+    "@brief Creates a node converting edge pairs to polygons.\n"
+  ) +
+  gsi::constructor ("new_edge_pair_to_edges", &new_edge_pair_to_edges_node, gsi::arg ("input"),
+    "@brief Creates a node converting edge pairs to two edges each.\n"
+  ) +
+  gsi::constructor ("new_edge_pair_to_first_edges", &new_edge_pair_to_first_edges_node, gsi::arg ("input"),
+    "@brief Creates a node delivering the first edge of each edges pair.\n"
+  ) +
+  gsi::constructor ("new_edge_pair_to_second_edges", &new_edge_pair_to_second_edges_node, gsi::arg ("input"),
+    "@brief Creates a node delivering the second edge of each edges pair.\n"
   ) +
   method ("description=", &db::CompoundRegionOperationNode::set_description, gsi::arg ("d"),
     "@brief Sets the description for this node"

@@ -726,17 +726,19 @@ public:
 
   void add (const TS *ref1, unsigned int id1, const TI *ref2, unsigned int id2)
   {
-    mp_result->add_subject_shape (id1, *ref1);
+    if (!mp_result->has_subject_shape_id (id1)) {
+      mp_result->add_subject_shape (id1, *ref1);
+    }
 
-    if (mp_layout) {
-      //  In order to guarantee the refs come from the subject layout, we'd need to
-      //  rewrite them
-      if (!mp_result->has_intruder_shape_id (id2)) {
+    if (!mp_result->has_intruder_shape_id (id2)) {
+      if (mp_layout) {
+        //  In order to guarantee the refs come from the subject layout, we'd need to
+        //  rewrite them
         db::shape_reference_translator<TI> rt (mp_layout);
         mp_result->add_intruder_shape (id2, m_intruder_layer, rt (*ref2));
+      } else {
+        mp_result->add_intruder_shape (id2, m_intruder_layer, *ref2);
       }
-    } else {
-      mp_result->add_intruder_shape (id2, m_intruder_layer, *ref2);
     }
 
     mp_result->add_interaction (id1, id2);
@@ -761,8 +763,12 @@ public:
 
   void add (const TS *ref1, unsigned int id1, const TI *ref2, unsigned int id2)
   {
-    mp_result->add_subject_shape (id1, *ref1);
-    mp_result->add_intruder_shape (id2, m_intruder_layer, *ref2);
+    if (!mp_result->has_subject_shape_id (id1)) {
+      mp_result->add_subject_shape (id1, *ref1);
+    }
+    if (!mp_result->has_intruder_shape_id (id2)) {
+      mp_result->add_intruder_shape (id2, m_intruder_layer, *ref2);
+    }
     mp_result->add_interaction (id1, id2);
   }
 
@@ -784,8 +790,12 @@ public:
 
   void add (const T *ref1, unsigned int id1, const T *ref2, unsigned int id2)
   {
-    mp_result->add_subject_shape (id1, *ref1);
-    mp_result->add_intruder_shape (id2, m_intruder_layer, *ref2);
+    if (!mp_result->has_subject_shape_id (id1)) {
+      mp_result->add_subject_shape (id1, *ref1);
+    }
+    if (!mp_result->has_intruder_shape_id (id2)) {
+      mp_result->add_intruder_shape (id2, m_intruder_layer, *ref2);
+    }
     mp_result->add_interaction (id1, id2);
   }
 
@@ -1900,7 +1910,7 @@ template <class TS, class TI>
 struct scan_shape2shape_same_layer_flat
 {
   void
-  operator () (const generic_shape_iterator<TS> &, bool, unsigned int, shape_interactions<TS, TI> &, db::Coord) const
+  operator () (unsigned int, shape_interactions<TS, TI> &, db::Coord) const
   {
     //  cannot have different types on the same layer
     tl_assert (false);
@@ -1911,24 +1921,13 @@ template <class T>
 struct scan_shape2shape_same_layer_flat<T, T>
 {
   void
-  operator () (const generic_shape_iterator<T> &subjects, bool needs_isolated_subjects, unsigned int intruder_layer, shape_interactions<T, T> &interactions, db::Coord dist) const
+  operator () (unsigned int intruder_layer, shape_interactions<T, T> &interactions, db::Coord dist) const
   {
     db::box_scanner<T, int> scanner;
     interaction_registration_shape1<T, T> rec (&interactions, intruder_layer);
 
-    addressable_shape_delivery<T> is (subjects);
-    for ( ; !is.at_end (); ++is) {
-
-      unsigned int id = interactions.next_id ();
-
-      const T *shape = is.operator-> ();
-      scanner.insert (shape, id);
-
-      //  create subject for subject vs. nothing interactions
-      if (needs_isolated_subjects) {
-        interactions.add_subject (id, *shape);
-      }
-
+    for (typename shape_interactions<T, T>::subject_iterator s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
+      scanner.insert (&s->second, s->first);
     }
 
     scanner.process (rec, dist, db::box_convert<T> ());
@@ -1936,81 +1935,16 @@ struct scan_shape2shape_same_layer_flat<T, T>
 };
 
 template <class TS, class TI>
-struct add_subjects_vs_nothing_flat
-{
-  void
-  operator () (const generic_shape_iterator<TS> &subjects, shape_interactions<TS, TI> &interactions) const
-  {
-    addressable_shape_delivery<TS> is (subjects);
-    for ( ; !is.at_end (); ++is) {
-      unsigned int id = interactions.next_id ();
-      const TS *shape = is.operator-> ();
-      interactions.add_subject (id, *shape);
-    }
-  }
-};
-
-template <class TS, class TI>
 struct scan_shape2shape_different_layers_flat
 {
   void
-  operator () (const generic_shape_iterator<TS> &subjects, const generic_shape_iterator<TI> &intruders, bool needs_isolated_subjects, unsigned int intruder_layer, shape_interactions<TS, TI> &interactions, db::Coord dist) const
+  operator () (const generic_shape_iterator<TI> &intruders, const db::Box &common_box, unsigned int intruder_layer, shape_interactions<TS, TI> &interactions, db::Coord dist) const
   {
     db::box_scanner2<TS, int, TI, int> scanner;
     interaction_registration_shape2shape<TS, TI> rec (0 /*layout*/, &interactions, intruder_layer);
 
-    db::Box subjects_box = subjects.bbox ();
-    if (subjects_box != db::Box::world ()) {
-      subjects_box.enlarge (db::Vector (dist, dist));
-    }
-
-    db::Box intruders_box = intruders.bbox ();
-    if (intruders_box != db::Box::world ()) {
-      intruders_box.enlarge (db::Vector (dist, dist));
-    }
-
-    db::Box common_box = intruders_box & subjects_box;
-    if (common_box.empty ()) {
-
-      if (needs_isolated_subjects) {
-        for (generic_shape_iterator<TS> is = subjects; ! is.at_end (); ++is) {
-          //  create subject for subject vs. nothing interactions
-          interactions.add_subject (interactions.next_id (), *is);
-        }
-      }
-
-      return;
-
-    }
-
-    addressable_shape_delivery<TS> is;
-
-    if (needs_isolated_subjects) {
-
-      box_convert<TS> bcs;
-
-      is = addressable_shape_delivery<TS> (subjects);
-      for ( ; !is.at_end (); ++is) {
-
-        unsigned int id = interactions.next_id ();
-        const TS *shape = is.operator-> ();
-
-        if (bcs (*shape).overlaps (common_box)) {
-          scanner.insert1 (shape, id);
-        }
-
-        //  create subject for subject vs. nothing interactions
-        interactions.add_subject (id, *shape);
-
-      }
-
-    } else {
-
-      is = addressable_shape_delivery<TS> (subjects.confined (common_box, true));
-      for ( ; !is.at_end (); ++is) {
-        scanner.insert1 (is.operator-> (), interactions.next_id ());
-      }
-
+    for (typename shape_interactions<TS, TI>::subject_iterator s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
+      scanner.insert1 (&s->second, s->first);
     }
 
     addressable_shape_delivery<TI> ii (intruders.confined (common_box, true));
@@ -2039,16 +1973,55 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
   shape_interactions<TS, TI> interactions;
 
   bool needs_isolated_subjects = (op->on_empty_intruder_hint () != OnEmptyIntruderHint::Drop);
-  if (intruders.empty () && needs_isolated_subjects) {
-    add_subjects_vs_nothing_flat<TS, TI> () (subjects, interactions);
+
+  //  build the subjects in the intruders list
+
+  db::Coord dist = op->dist ();
+
+  db::Box subjects_box = subjects.bbox ();
+  if (subjects_box != db::Box::world ()) {
+    subjects_box.enlarge (db::Vector (dist, dist));
   }
 
+  db::Box intruders_box;
   for (typename std::vector<generic_shape_iterator<TI> >::const_iterator il = intruders.begin (); il != intruders.end (); ++il) {
-    if (*il == subjects) {
-      scan_shape2shape_same_layer_flat<TS, TI> () (subjects, needs_isolated_subjects, (unsigned int) (il - intruders.begin ()), interactions, op->dist ());
-    } else {
-      scan_shape2shape_different_layers_flat<TS, TI> () (subjects, *il, needs_isolated_subjects, (unsigned int) (il - intruders.begin ()), interactions, op->dist ());
+    intruders_box += il->bbox ();
+  }
+  if (intruders_box != db::Box::world ()) {
+    intruders_box.enlarge (db::Vector (dist, dist));
+  }
+
+  db::Box common_box = intruders_box & subjects_box;
+  if (common_box.empty ()) {
+
+    if (needs_isolated_subjects) {
+      for (generic_shape_iterator<TS> is = subjects; ! is.at_end (); ++is) {
+        //  create subject for subject vs. nothing interactions
+        interactions.add_subject (interactions.next_id (), *is);
+      }
     }
+
+  } else {
+
+    box_convert<TS> bcs;
+
+    addressable_shape_delivery<TS> is (subjects);
+    for ( ; !is.at_end (); ++is) {
+      const TS *shape = is.operator-> ();
+      if (needs_isolated_subjects || bcs (*shape).overlaps (common_box)) {
+        unsigned int id = interactions.next_id ();
+        interactions.add_subject (id, *shape);
+      }
+    }
+
+    for (typename std::vector<generic_shape_iterator<TI> >::const_iterator il = intruders.begin (); il != intruders.end (); ++il) {
+      if (*il == subjects) {
+        scan_shape2shape_same_layer_flat<TS, TI> () ((unsigned int) (il - intruders.begin ()), interactions, op->dist ());
+      } else {
+        scan_shape2shape_different_layers_flat<TS, TI> () (*il, common_box, (unsigned int) (il - intruders.begin ()), interactions, op->dist ());
+      }
+    }
+
   }
 
   if (interactions.begin () != interactions.end ()) {

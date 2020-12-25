@@ -170,14 +170,14 @@ std::vector<db::Region *> CompoundRegionOperationPrimaryNode::inputs () const
 
 void CompoundRegionOperationPrimaryNode::do_compute_local (db::Layout *, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t, double) const
 {
-  for (shape_interactions<db::Polygon, db::Polygon>::subject_iterator i = interactions.begin_subjects (); i != interactions.begin_subjects (); ++i) {
+  for (shape_interactions<db::Polygon, db::Polygon>::subject_iterator i = interactions.begin_subjects (); i != interactions.end_subjects (); ++i) {
     results.front ().insert (i->second);
   }
 }
 
 void CompoundRegionOperationPrimaryNode::do_compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t, double) const
 {
-  for (shape_interactions<db::PolygonRef, db::PolygonRef>::subject_iterator i = interactions.begin_subjects (); i != interactions.begin_subjects (); ++i) {
+  for (shape_interactions<db::PolygonRef, db::PolygonRef>::subject_iterator i = interactions.begin_subjects (); i != interactions.end_subjects (); ++i) {
     results.front ().insert (i->second);
   }
 }
@@ -320,11 +320,11 @@ CompoundRegionMultiInputOperationNode::init ()
 {
   std::map<db::Region *, unsigned int> input_index;
 
-  for (tl::shared_collection<CompoundRegionOperationNode>::iterator i = m_children.begin (); i != m_children.end (); ++i) {
+  unsigned int child_index = 0;
+  for (tl::shared_collection<CompoundRegionOperationNode>::iterator i = m_children.begin (); i != m_children.end (); ++i, ++child_index) {
 
     std::vector<db::Region *> child_inputs = i->inputs ();
-    unsigned int child_index = 0;
-    for (std::vector<db::Region *>::const_iterator ii = child_inputs.begin (); ii != child_inputs.end (); ++ii, ++child_index) {
+    for (std::vector<db::Region *>::const_iterator ii = child_inputs.begin (); ii != child_inputs.end (); ++ii) {
 
       std::map<db::Region *, unsigned int>::const_iterator im = input_index.find (*ii);
       unsigned int li = (unsigned int) m_inputs.size ();
@@ -335,7 +335,7 @@ CompoundRegionMultiInputOperationNode::init ()
         input_index.insert (std::make_pair (*ii, li));
       }
 
-      m_map_layer_to_child [std::make_pair (child_index, (unsigned int) (ii - child_inputs.begin ()))] = li;
+      m_map_layer_to_child [std::make_pair (child_index, li)] = (unsigned int) (ii - child_inputs.begin ());
 
     }
 

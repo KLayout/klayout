@@ -219,6 +219,21 @@ private:
 };
 
 /**
+ *  @brief A processor that delivers all edges for a polygon
+ */
+class DB_PUBLIC PolygonToEdgeProcessor
+  : public db::PolygonToEdgeProcessorBase
+{
+public:
+  PolygonToEdgeProcessor ()
+  {
+    //  .. nothing yet ..
+  }
+
+  void process (const db::Polygon &poly, std::vector<db::Edge> &result) const;
+};
+
+/**
  *  @brief A decomposition processor to deliver convex-only polygons
  */
 class DB_PUBLIC ConvexDecomposition

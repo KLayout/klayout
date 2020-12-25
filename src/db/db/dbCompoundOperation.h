@@ -85,6 +85,11 @@ public:
    */
   virtual bool wants_variants () const { return false; }
 
+  /**
+   *  @brief Returns true, if the processor wants to have merged primary inputs
+   */
+  virtual bool wants_merged () const { return false; }
+
   void compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
   {
     implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
@@ -362,6 +367,7 @@ public:
 
   virtual const TransformationReducer *vars () const;
   virtual bool wants_variants () const;
+  virtual bool wants_merged () const;
 
   virtual void invalidate_cache () const;
 
@@ -384,7 +390,12 @@ protected:
 
     for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
 
-      child_interactions.add_subject_shape (i->first, interactions.subject_shape (i->first));
+      if (child (child_index)->on_empty_intruder_hint () == OnEmptyIntruderHint::Drop) {
+        child_interactions.add_subject_shape (i->first, interactions.subject_shape (i->first));
+      } else {
+        //  this includes the subject-without-intruder "interaction"
+        child_interactions.add_subject (i->first, interactions.subject_shape (i->first));
+      }
 
       for (typename shape_interactions<TS, TI>::iterator2 ii = i->second.begin (); ii != i->second.end (); ++ii) {
 
@@ -941,6 +952,10 @@ public:
   //  specifies the result type
   virtual ResultType result_type () const { return EdgePairs; }
 
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
+  virtual db::Coord dist () const;
+  virtual bool wants_merged () const;
+
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const;
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const;
 
@@ -981,8 +996,14 @@ protected:
 
       shape_interactions<TS, TI> single_interactions;
 
-      single_interactions.add_subject_shape (i->first, subject_shape);
-      const std::vector<unsigned int> &intruders = single_interactions.intruders_for (i->first);
+      if (on_empty_intruder_hint () == OnEmptyIntruderHint::Drop) {
+        single_interactions.add_subject_shape (i->first, subject_shape);
+      } else {
+        //  this includes the subject-without-intruder "interaction"
+        single_interactions.add_subject (i->first, subject_shape);
+      }
+
+      const std::vector<unsigned int> &intruders = interactions.intruders_for (i->first);
       for (typename std::vector<unsigned int>::const_iterator ii = intruders.begin (); ii != intruders.end (); ++ii) {
         const std::pair<unsigned int, TI> &is = interactions.intruder_shape (*ii);
         single_interactions.add_intruder_shape (*ii, is.first, is.second);

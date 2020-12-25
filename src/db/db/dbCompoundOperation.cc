@@ -163,7 +163,9 @@ CompoundRegionOperationPrimaryNode::~CompoundRegionOperationPrimaryNode ()
 
 std::vector<db::Region *> CompoundRegionOperationPrimaryNode::inputs () const
 {
-  return std::vector<db::Region *> ();
+  std::vector<db::Region *> is;
+  is.push_back (0);
+  return is;
 }
 
 void CompoundRegionOperationPrimaryNode::do_compute_local (db::Layout *, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t, double) const
@@ -299,13 +301,16 @@ CompoundRegionMultiInputOperationNode::CompoundRegionMultiInputOperationNode ()
 
 CompoundRegionMultiInputOperationNode::CompoundRegionMultiInputOperationNode (CompoundRegionOperationNode *child)
 {
+  child->keep ();
   m_children.push_back (child);
   init ();
 }
 
 CompoundRegionMultiInputOperationNode::CompoundRegionMultiInputOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b)
 {
+  a->keep ();
   m_children.push_back (a);
+  b->keep ();
   m_children.push_back (b);
   init ();
 }
@@ -409,6 +414,17 @@ CompoundRegionMultiInputOperationNode::wants_variants () const
 {
   for (tl::shared_collection<CompoundRegionOperationNode>::const_iterator i = m_children.begin (); i != m_children.end (); ++i) {
     if (i->wants_variants ()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool
+CompoundRegionMultiInputOperationNode::wants_merged () const
+{
+  for (tl::shared_collection<CompoundRegionOperationNode>::const_iterator i = m_children.begin (); i != m_children.end (); ++i) {
+    if (i->wants_merged ()) {
       return true;
     }
   }
@@ -1113,18 +1129,58 @@ CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (db::edge_rel
   m_check.set_max_projection (options.max_projection);
 }
 
+db::OnEmptyIntruderHint
+CompoundRegionCheckOperationNode::on_empty_intruder_hint () const
+{
+  return (m_different_polygons || !inputs ().empty ()) ? OnEmptyIntruderHint::Drop : OnEmptyIntruderHint::Ignore;
+}
+
+db::Coord
+CompoundRegionCheckOperationNode::dist () const
+{
+  return m_check.distance ();
+}
+
+bool
+CompoundRegionCheckOperationNode::wants_merged () const
+{
+  return true;
+}
+
 void
 CompoundRegionCheckOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const
 {
-  db::check_local_operation<db::Polygon, db::Polygon> op (m_check, m_different_polygons, true, false, m_options.shielded, m_options.opposite_filter, m_options.rect_filter);
-  op.compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  bool other_merged = (children () > 0 && !inputs ()[0]);
+
+  db::check_local_operation<db::Polygon, db::Polygon> op (m_check, m_different_polygons, children () > 0, other_merged, m_options.shielded, m_options.opposite_filter, m_options.rect_filter);
+
+  tl_assert (results.size () == 1);
+  if (results.front ().empty ()) {
+    op.compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  } else {
+    std::vector<std::unordered_set<db::EdgePair> > r;
+    r.resize (1);
+    op.compute_local (layout, interactions, r, max_vertex_count, area_ratio);
+    results.front ().insert (r.front ().begin (), r.front ().end ());
+  }
 }
 
 void
 CompoundRegionCheckOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const
 {
-  db::check_local_operation<db::PolygonRef, db::PolygonRef> op (m_check, m_different_polygons, true, false, m_options.shielded, m_options.opposite_filter, m_options.rect_filter);
-  op.compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  bool other_merged = (children () > 0 && !inputs ()[0]);
+
+  db::check_local_operation<db::PolygonRef, db::PolygonRef> op (m_check, m_different_polygons, children () > 0, other_merged, m_options.shielded, m_options.opposite_filter, m_options.rect_filter);
+
+  tl_assert (results.size () == 1);
+  if (results.front ().empty ()) {
+    op.compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  } else {
+    std::vector<std::unordered_set<db::EdgePair> > r;
+    r.resize (1);
+    op.compute_local (layout, interactions, r, max_vertex_count, area_ratio);
+    results.front ().insert (r.front ().begin (), r.front ().end ());
+  }
 }
 
 }

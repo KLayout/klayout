@@ -119,6 +119,7 @@ public:
 
   virtual bool selected (const db::EdgePair &edge) const = 0;
   virtual const TransformationReducer *vars () const = 0;
+  virtual bool wants_variants () const = 0;
 };
 
 /**
@@ -385,6 +386,14 @@ public:
    *  with the outputs of the processor.
    */
   void processed (Region &output, const EdgePairToPolygonProcessorBase &filter) const;
+
+  /**
+   *  @brief Processes the edge pairs into edges
+   *
+   *  This method will run the processor over all edge pairs and return a edge collection
+   *  with the outputs of the processor.
+   */
+  void processed (Edges &output, const EdgePairToEdgeProcessorBase &filter) const;
 
   /**
    *  @brief Transforms the edge pair set

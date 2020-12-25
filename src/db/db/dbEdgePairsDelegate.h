@@ -40,6 +40,71 @@ class EdgesDelegate;
 class Layout;
 
 typedef shape_collection_processor<db::EdgePair, db::Polygon> EdgePairToPolygonProcessorBase;
+typedef shape_collection_processor<db::EdgePair, db::Edge> EdgePairToEdgeProcessorBase;
+
+class DB_PUBLIC
+EdgePairToPolygonProcessor
+  : public EdgePairToPolygonProcessorBase
+{
+public:
+  EdgePairToPolygonProcessor (db::Coord e)
+    : m_e (e)
+  { }
+
+  void process(const EdgePair &ep, std::vector<db::Polygon> &res) const
+  {
+    db::Polygon poly = ep.normalized ().to_polygon (m_e);
+    if (poly.vertices () >= 3) {
+      res.push_back (poly);
+    }
+  }
+
+private:
+  db::Coord m_e;
+};
+
+class DB_PUBLIC
+EdgePairToEdgesProcessor
+  : public EdgePairToEdgeProcessorBase
+{
+public:
+  EdgePairToEdgesProcessor ()
+  { }
+
+  void process(const EdgePair &ep, std::vector<db::Edge> &res) const
+  {
+    res.push_back (ep.first ());
+    res.push_back (ep.second ());
+  }
+};
+
+class DB_PUBLIC
+EdgePairToFirstEdgesProcessor
+  : public EdgePairToEdgeProcessorBase
+{
+public:
+  EdgePairToFirstEdgesProcessor ()
+  { }
+
+  void process(const EdgePair &ep, std::vector<db::Edge> &res) const
+  {
+    res.push_back (ep.first ());
+  }
+};
+
+class DB_PUBLIC
+EdgePairToSecondEdgesProcessor
+  : public EdgePairToEdgeProcessorBase
+{
+public:
+  EdgePairToSecondEdgesProcessor ()
+  { }
+
+  void process(const EdgePair &ep, std::vector<db::Edge> &res) const
+  {
+    res.push_back (ep.second ());
+  }
+};
 
 /**
  *  @brief The edge pair set iterator delegate
@@ -91,6 +156,7 @@ public:
   virtual EdgePairsDelegate *filter_in_place (const EdgePairFilterBase &filter) = 0;
   virtual EdgePairsDelegate *filtered (const EdgePairFilterBase &filter) const = 0;
   virtual RegionDelegate *processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const = 0;
+  virtual EdgesDelegate *processed_to_edges (const EdgePairToEdgeProcessorBase &filter) const = 0;
 
   virtual RegionDelegate *polygons (db::Coord e) const = 0;
   virtual EdgesDelegate *edges () const = 0;

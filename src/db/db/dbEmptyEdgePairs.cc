@@ -60,6 +60,12 @@ EmptyEdgePairs::processed_to_polygons (const EdgePairToPolygonProcessorBase &) c
 }
 
 EdgesDelegate *
+EmptyEdgePairs::processed_to_edges (const EdgePairToEdgeProcessorBase &) const
+{
+  return new EmptyEdges ();
+}
+
+EdgesDelegate *
 EmptyEdgePairs::edges () const
 {
   return new EmptyEdges ();

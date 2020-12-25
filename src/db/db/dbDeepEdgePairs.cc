@@ -284,6 +284,12 @@ DeepEdgePairs::processed_to_polygons (const EdgePairToPolygonProcessorBase &filt
   return shape_collection_processed_impl<db::EdgePair, db::Polygon, db::DeepRegion> (deep_layer (), filter);
 }
 
+EdgesDelegate *
+DeepEdgePairs::processed_to_edges (const EdgePairToEdgeProcessorBase &filter) const
+{
+  return shape_collection_processed_impl<db::EdgePair, db::Edge, db::DeepEdges> (deep_layer (), filter);
+}
+
 RegionDelegate *DeepEdgePairs::polygons (db::Coord e) const
 {
   db::DeepLayer new_layer = deep_layer ().derived ();

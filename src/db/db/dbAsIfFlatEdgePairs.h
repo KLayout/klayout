@@ -54,6 +54,7 @@ public:
   virtual EdgePairsDelegate *filtered (const EdgePairFilterBase &) const;
 
   virtual RegionDelegate *processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const;
+  virtual EdgesDelegate *processed_to_edges (const EdgePairToEdgeProcessorBase &filter) const;
 
   virtual EdgePairsDelegate *add_in_place (const EdgePairs &other)
   {

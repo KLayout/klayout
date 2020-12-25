@@ -123,6 +123,11 @@ struct EPTestFilter
     return &m_vars;
   }
 
+  bool wants_variants () const
+  {
+    return false;
+  }
+
 private:
   db::MagnificationReducer m_vars;
 };

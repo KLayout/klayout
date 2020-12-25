@@ -24,6 +24,8 @@
 #include "tlUnitTest.h"
 
 #include "dbRegion.h"
+#include "dbEdgePairs.h"
+#include "dbEdges.h"
 #include "dbCompoundOperation.h"
 #include "dbReader.h"
 #include "dbRecursiveShapeIterator.h"
@@ -79,3 +81,48 @@ TEST(1_Basic)
   CHECKPOINT();
   db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au1.gds");
 }
+
+TEST(2_ChainedOperations)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/drc/compound_2.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::RegionCheckOptions check_options;
+  check_options.metrics = db::Projection;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  db::Region r (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l1));
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  db::Region r2 (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l2));
+
+  db::CompoundRegionCheckOperationNode *width_check = new db::CompoundRegionCheckOperationNode (db::WidthRelation, false /*==same polygon*/, 1050, check_options);
+
+  db::CompoundRegionEdgePairToPolygonProcessingOperationNode ep2p (new db::EdgePairToPolygonProcessor (0), width_check, true);
+  db::Region res = r.cop_to_region (ep2p);
+
+  unsigned int l1000 = ly.get_layer (db::LayerProperties (1000, 0));
+  res.insert_into (&ly, *ly.begin_top_down (), l1000);
+
+  db::CompoundRegionEdgePairToEdgeProcessingOperationNode ep2e1 (new db::EdgePairToFirstEdgesProcessor (), width_check, true);
+  db::Edges eres = r.cop_to_edges (ep2e1);
+
+  unsigned int l1001 = ly.get_layer (db::LayerProperties (1001, 0));
+  eres.insert_into (&ly, *ly.begin_top_down (), l1001);
+
+  db::CompoundRegionEdgePairToEdgeProcessingOperationNode ep2e2 (new db::EdgePairToSecondEdgesProcessor (), width_check, true);
+  eres = r.cop_to_edges (ep2e2);
+
+  unsigned int l1002 = ly.get_layer (db::LayerProperties (1002, 0));
+  eres.insert_into (&ly, *ly.begin_top_down (), l1002);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au2.gds");
+}
+

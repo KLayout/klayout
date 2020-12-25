@@ -981,6 +981,74 @@ CompoundRegionFilterOperationNode::is_selected (const db::PolygonRef &p) const
 
 // ---------------------------------------------------------------------------------------------
 
+CompoundRegionEdgeFilterOperationNode::CompoundRegionEdgeFilterOperationNode (EdgeFilterBase *filter, CompoundRegionOperationNode *input, bool owns_filter)
+  : CompoundRegionMultiInputOperationNode (input), mp_filter (filter), m_owns_filter (owns_filter)
+{
+  set_description ("filter");
+}
+
+CompoundRegionEdgeFilterOperationNode::~CompoundRegionEdgeFilterOperationNode ()
+{
+  if (m_owns_filter) {
+    delete mp_filter;
+  }
+  mp_filter = 0;
+}
+
+void
+CompoundRegionEdgeFilterOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+}
+
+void
+CompoundRegionEdgeFilterOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+}
+
+bool
+CompoundRegionEdgeFilterOperationNode::is_selected (const db::Edge &p) const
+{
+  return mp_filter->selected (p);
+}
+
+// ---------------------------------------------------------------------------------------------
+
+CompoundRegionEdgePairFilterOperationNode::CompoundRegionEdgePairFilterOperationNode (EdgePairFilterBase *filter, CompoundRegionOperationNode *input, bool owns_filter)
+  : CompoundRegionMultiInputOperationNode (input), mp_filter (filter), m_owns_filter (owns_filter)
+{
+  set_description ("filter");
+}
+
+CompoundRegionEdgePairFilterOperationNode::~CompoundRegionEdgePairFilterOperationNode ()
+{
+  if (m_owns_filter) {
+    delete mp_filter;
+  }
+  mp_filter = 0;
+}
+
+void
+CompoundRegionEdgePairFilterOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+}
+
+void
+CompoundRegionEdgePairFilterOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+}
+
+bool
+CompoundRegionEdgePairFilterOperationNode::is_selected (const db::EdgePair &p) const
+{
+  return mp_filter->selected (p);
+}
+
+// ---------------------------------------------------------------------------------------------
+
 CompoundRegionProcessingOperationNode::CompoundRegionProcessingOperationNode (PolygonProcessorBase *proc, CompoundRegionOperationNode *input, bool owns_proc)
   : CompoundRegionMultiInputOperationNode (input), mp_proc (proc), m_owns_proc (owns_proc)
 {
@@ -1010,7 +1078,7 @@ CompoundRegionProcessingOperationNode::do_compute_local (db::Layout *layout, con
 void
 CompoundRegionProcessingOperationNode::processed (db::Layout *, const db::Polygon &p, std::vector<db::Polygon> &res) const
 {
-  return mp_proc->process (p, res);
+  mp_proc->process (p, res);
 }
 
 void
@@ -1054,13 +1122,58 @@ CompoundRegionToEdgeProcessingOperationNode::do_compute_local (db::Layout *layou
 void
 CompoundRegionToEdgeProcessingOperationNode::processed (db::Layout *, const db::Polygon &p, std::vector<db::Edge> &res) const
 {
-  return mp_proc->process (p, res);
+  mp_proc->process (p, res);
 }
 
 void
 CompoundRegionToEdgeProcessingOperationNode::processed (db::Layout *, const db::PolygonRef &p, std::vector<db::Edge> &res) const
 {
   mp_proc->process (p.obj ().transformed (p.trans ()), res);
+}
+
+// ---------------------------------------------------------------------------------------------
+
+CompoundRegionEdgeToPolygonProcessingOperationNode::CompoundRegionEdgeToPolygonProcessingOperationNode (EdgeToPolygonProcessorBase *proc, CompoundRegionOperationNode *input, bool owns_proc)
+  : CompoundRegionMultiInputOperationNode (input), mp_proc (proc), m_owns_proc (owns_proc)
+{
+  set_description ("processor");
+}
+
+CompoundRegionEdgeToPolygonProcessingOperationNode::~CompoundRegionEdgeToPolygonProcessingOperationNode ()
+{
+  if (m_owns_proc) {
+    delete mp_proc;
+    mp_proc = 0;
+  }
+}
+
+void
+CompoundRegionEdgeToPolygonProcessingOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+}
+
+void
+CompoundRegionEdgeToPolygonProcessingOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+}
+
+void
+CompoundRegionEdgeToPolygonProcessingOperationNode::processed (db::Layout *, const db::Edge &e, std::vector<db::Polygon> &res) const
+{
+  mp_proc->process (e, res);
+}
+
+void
+CompoundRegionEdgeToPolygonProcessingOperationNode::processed (db::Layout *layout, const db::Edge &e, std::vector<db::PolygonRef> &res) const
+{
+  std::vector<db::Polygon> polygons;
+  mp_proc->process (e, polygons);
+
+  for (std::vector<db::Polygon>::const_iterator p = polygons.begin (); p != polygons.end (); ++p) {
+    res.push_back (db::PolygonRef (*p, layout->shape_repository ()));
+  }
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1094,13 +1207,86 @@ CompoundRegionToEdgePairProcessingOperationNode::do_compute_local (db::Layout *l
 void
 CompoundRegionToEdgePairProcessingOperationNode::processed (db::Layout *, const db::Polygon &p, std::vector<db::EdgePair> &res) const
 {
-  return mp_proc->process (p, res);
+  mp_proc->process (p, res);
 }
 
 void
 CompoundRegionToEdgePairProcessingOperationNode::processed (db::Layout *, const db::PolygonRef &p, std::vector<db::EdgePair> &res) const
 {
   mp_proc->process (p.obj ().transformed (p.trans ()), res);
+}
+
+// ---------------------------------------------------------------------------------------------
+
+CompoundRegionEdgePairToPolygonProcessingOperationNode::CompoundRegionEdgePairToPolygonProcessingOperationNode (EdgePairToPolygonProcessorBase *proc, CompoundRegionOperationNode *input, bool owns_proc)
+  : CompoundRegionMultiInputOperationNode (input), mp_proc (proc), m_owns_proc (owns_proc)
+{
+  set_description ("processor");
+}
+
+CompoundRegionEdgePairToPolygonProcessingOperationNode::~CompoundRegionEdgePairToPolygonProcessingOperationNode ()
+{
+  if (m_owns_proc) {
+    delete mp_proc;
+    mp_proc = 0;
+  }
+}
+
+void
+CompoundRegionEdgePairToPolygonProcessingOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+}
+
+void
+CompoundRegionEdgePairToPolygonProcessingOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+}
+
+void
+CompoundRegionEdgePairToPolygonProcessingOperationNode::processed (db::Layout *, const db::EdgePair &e, std::vector<db::Polygon> &res) const
+{
+  mp_proc->process (e, res);
+}
+
+void
+CompoundRegionEdgePairToPolygonProcessingOperationNode::processed (db::Layout *layout, const db::EdgePair &e, std::vector<db::PolygonRef> &res) const
+{
+  std::vector<db::Polygon> polygons;
+  mp_proc->process (e, polygons);
+
+  for (std::vector<db::Polygon>::const_iterator p = polygons.begin (); p != polygons.end (); ++p) {
+    res.push_back (db::PolygonRef (*p, layout->shape_repository ()));
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+
+CompoundRegionEdgePairToEdgeProcessingOperationNode::CompoundRegionEdgePairToEdgeProcessingOperationNode (EdgePairToEdgeProcessorBase *proc, CompoundRegionOperationNode *input, bool owns_proc)
+  : CompoundRegionMultiInputOperationNode (input), mp_proc (proc), m_owns_proc (owns_proc)
+{
+  set_description ("processor");
+}
+
+CompoundRegionEdgePairToEdgeProcessingOperationNode::~CompoundRegionEdgePairToEdgeProcessingOperationNode ()
+{
+  if (m_owns_proc) {
+    delete mp_proc;
+    mp_proc = 0;
+  }
+}
+
+void
+CompoundRegionEdgePairToEdgeProcessingOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+}
+
+void
+CompoundRegionEdgePairToEdgeProcessingOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
 }
 
 // ---------------------------------------------------------------------------------------------

@@ -159,6 +159,28 @@ AsIfFlatEdgePairs::processed_to_polygons (const EdgePairToPolygonProcessorBase &
   return region.release ();
 }
 
+EdgesDelegate *
+AsIfFlatEdgePairs::processed_to_edges (const EdgePairToEdgeProcessorBase &filter) const
+{
+  std::auto_ptr<FlatEdges> edges (new FlatEdges ());
+
+  if (filter.result_must_not_be_merged ()) {
+    edges->set_merged_semantics (false);
+  }
+
+  std::vector<db::Edge> res_edges;
+
+  for (EdgePairsIterator e (begin ()); ! e.at_end (); ++e) {
+    res_edges.clear ();
+    filter.process (*e, res_edges);
+    for (std::vector<db::Edge>::const_iterator pr = res_edges.begin (); pr != res_edges.end (); ++pr) {
+      edges->insert (*pr);
+    }
+  }
+
+  return edges.release ();
+}
+
 EdgePairsDelegate *
 AsIfFlatEdgePairs::filtered (const EdgePairFilterBase &filter) const
 {

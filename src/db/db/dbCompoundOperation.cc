@@ -83,20 +83,26 @@ CompoundRegionOperationNode::generated_description () const
 static void translate (db::Layout *layout, const std::vector<std::unordered_set<db::Polygon> > &in, std::vector<std::unordered_set<db::PolygonRef> > &out)
 {
   tl_assert (layout != 0);
+  if (out.size () <= in.size ()) {
+    out.resize (in.size ());
+  }
   for (std::vector<std::unordered_set<db::Polygon> >::const_iterator r = in.begin (); r != in.end (); ++r) {
-    out.push_back (std::unordered_set<db::PolygonRef> ());
+    std::unordered_set<db::PolygonRef> &o = out[r - in.begin ()];
     for (std::unordered_set<db::Polygon>::const_iterator p = r->begin (); p != r->end (); ++p) {
-      out.back ().insert (db::PolygonRef (*p, layout->shape_repository ()));
+      o.insert (db::PolygonRef (*p, layout->shape_repository ()));
     }
   }
 }
 
 static void translate (db::Layout *, const std::vector<std::unordered_set<db::PolygonRef> > &in, std::vector<std::unordered_set<db::Polygon> > &out)
 {
+  if (out.size () <= in.size ()) {
+    out.resize (in.size ());
+  }
   for (std::vector<std::unordered_set<db::PolygonRef> >::const_iterator r = in.begin (); r != in.end (); ++r) {
-    out.push_back (std::unordered_set<db::Polygon> ());
+    std::unordered_set<db::Polygon> &o = out[r - in.begin ()];
     for (std::unordered_set<db::PolygonRef>::const_iterator p = r->begin (); p != r->end (); ++p) {
-      out.back ().insert (p->obj ().transformed (p->trans ()));
+      o.insert (p->obj ().transformed (p->trans ()));
     }
   }
 }
@@ -874,8 +880,8 @@ template DB_PUBLIC void compound_region_generic_operation_node<db::Polygon, db::
 
 // ---------------------------------------------------------------------------------------------
 
-CompoundRegionLogicalCaseSelectOperationNode::CompoundRegionLogicalCaseSelectOperationNode (bool multi_layer, const std::vector<CompoundRegionOperationNode *> &inputs)
-  : CompoundRegionMultiInputOperationNode (inputs), m_multi_layer (multi_layer)
+CompoundRegionLogicalCaseSelectOperationNode::CompoundRegionLogicalCaseSelectOperationNode (const std::vector<CompoundRegionOperationNode *> &inputs)
+  : CompoundRegionMultiInputOperationNode (inputs), m_multi_layer (false)   //  TODO: multi-output mode not supported so far.
 {
   //  .. nothing yet ..
 }

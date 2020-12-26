@@ -483,7 +483,7 @@ void run_test9 (tl::TestBase *_this, bool deep)
   db::CompoundRegionProcessingOperationNode *result_default = new db::CompoundRegionProcessingOperationNode (new db::Extents (), primary, true);
   inputs.push_back (result_default);
 
-  db::CompoundRegionLogicalCaseSelectOperationNode select_node (false, inputs);
+  db::CompoundRegionLogicalCaseSelectOperationNode select_node (inputs);
 
   db::Region res = r.cop_to_region (select_node);
 

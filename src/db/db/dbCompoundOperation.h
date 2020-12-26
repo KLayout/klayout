@@ -668,7 +668,7 @@ class DB_PUBLIC CompoundRegionLogicalCaseSelectOperationNode
   : public CompoundRegionMultiInputOperationNode
 {
 public:
-  CompoundRegionLogicalCaseSelectOperationNode (bool multi_layer, const std::vector<CompoundRegionOperationNode *> &inputs);
+  CompoundRegionLogicalCaseSelectOperationNode (const std::vector<CompoundRegionOperationNode *> &inputs);
 
   virtual std::string generated_description () const;
 

@@ -125,7 +125,7 @@ static db::CompoundRegionOperationNode *new_outside (db::CompoundRegionOperation
 
 static db::CompoundRegionOperationNode *new_case (const std::vector<db::CompoundRegionOperationNode *> &inputs)
 {
-  return new db::CompoundRegionLogicalCaseSelectOperationNode (false, inputs);
+  return new db::CompoundRegionLogicalCaseSelectOperationNode (inputs);
 }
 
 static db::CompoundRegionOperationNode *new_corners_as_rectangles_node (db::CompoundRegionOperationNode *input, double angle_start, double angle_end, db::Coord dim = 1)

@@ -233,3 +233,72 @@ TEST(5_InteractOperation)
   db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au5.gds");
 }
 
+TEST(6_InteractWithEdgeOperation)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/drc/compound_6.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::RegionCheckOptions check_options;
+  check_options.metrics = db::Projection;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  db::Region r (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l1));
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  db::Region r2 (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l2));
+
+  db::CompoundRegionOperationPrimaryNode *primary = new db::CompoundRegionOperationPrimaryNode ();
+  db::CompoundRegionOperationSecondaryNode *secondary = new db::CompoundRegionOperationSecondaryNode (&r2);
+  db::CompoundRegionToEdgeProcessingOperationNode *secondary_edges = new db::CompoundRegionToEdgeProcessingOperationNode (new db::PolygonToEdgeProcessor (), secondary, true);
+
+  db::CompoundRegionInteractWithEdgeOperationNode interact (primary, secondary_edges, 0, true, false);
+
+  db::Region res = r.cop_to_region (interact);
+
+  unsigned int l1000 = ly.get_layer (db::LayerProperties (1000, 0));
+  res.insert_into (&ly, *ly.begin_top_down (), l1000);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au6.gds");
+}
+
+TEST(7_PullOperation)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/drc/compound_7.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::RegionCheckOptions check_options;
+  check_options.metrics = db::Projection;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  db::Region r (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l1));
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  db::Region r2 (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l2));
+
+  db::CompoundRegionOperationPrimaryNode *primary = new db::CompoundRegionOperationPrimaryNode ();
+  db::CompoundRegionOperationSecondaryNode *secondary = new db::CompoundRegionOperationSecondaryNode (&r2);
+
+  db::CompoundRegionPullOperationNode pull (primary, secondary, 0, true);
+
+  db::Region res = r.cop_to_region (pull);
+
+  unsigned int l1000 = ly.get_layer (db::LayerProperties (1000, 0));
+  res.insert_into (&ly, *ly.begin_top_down (), l1000);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au7.gds");
+}
+

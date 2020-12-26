@@ -407,8 +407,8 @@ check_local_operation<TS, TI>::description () const
 }
 
 //  explicit instantiations
-template class check_local_operation<db::PolygonRef, db::PolygonRef>;
-template class check_local_operation<db::Polygon, db::Polygon>;
+template class DB_PUBLIC check_local_operation<db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC check_local_operation<db::Polygon, db::Polygon>;
 
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -535,9 +535,9 @@ std::string interacting_local_operation<TS, TI, TR>::description () const
 }
 
 //  explicit instantiations
-template class interacting_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
-template class interacting_local_operation<db::Polygon, db::Polygon, db::Polygon>;
-template class interacting_local_operation<db::Polygon, db::Edge, db::Polygon>;
+template class DB_PUBLIC interacting_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC interacting_local_operation<db::Polygon, db::Polygon, db::Polygon>;
+template class DB_PUBLIC interacting_local_operation<db::Polygon, db::Edge, db::Polygon>;
 
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -614,8 +614,8 @@ std::string pull_local_operation<TS, TI, TR>::description () const
   return tl::to_string (tr ("Pull regions by their geometrical relation to first"));
 }
 
-template class pull_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
-template class pull_local_operation<db::Polygon, db::Polygon, db::Polygon>;
+template class DB_PUBLIC pull_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC pull_local_operation<db::Polygon, db::Polygon, db::Polygon>;
 
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -700,8 +700,8 @@ std::string interacting_with_edge_local_operation<TS, TI, TR>::description () co
   return tl::to_string (tr ("Select regions by their geometric relation to edges"));
 }
 
-template class interacting_with_edge_local_operation<db::PolygonRef, db::Edge, db::PolygonRef>;
-template class interacting_with_edge_local_operation<db::Polygon, db::Edge, db::Polygon>;
+template class DB_PUBLIC interacting_with_edge_local_operation<db::PolygonRef, db::Edge, db::PolygonRef>;
+template class DB_PUBLIC interacting_with_edge_local_operation<db::Polygon, db::Edge, db::Polygon>;
 
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -761,8 +761,8 @@ std::string pull_with_edge_local_operation<TS, TI, TR>::description () const
   return tl::to_string (tr ("Pull edges from second by their geometric relation to first"));
 }
 
-template class pull_with_edge_local_operation<db::PolygonRef, db::Edge, db::Edge>;
-template class pull_with_edge_local_operation<db::Polygon, db::Edge, db::Edge>;
+template class DB_PUBLIC pull_with_edge_local_operation<db::PolygonRef, db::Edge, db::Edge>;
+template class DB_PUBLIC pull_with_edge_local_operation<db::Polygon, db::Edge, db::Edge>;
 
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -828,8 +828,8 @@ std::string pull_with_text_local_operation<TS, TI, TR>::description () const
   return tl::to_string (tr ("Pull texts from second by their geometric relation to first"));
 }
 
-template class pull_with_text_local_operation<db::PolygonRef, db::TextRef, db::TextRef>;
-template class pull_with_text_local_operation<db::Polygon, db::Text, db::Text>;
+template class DB_PUBLIC pull_with_text_local_operation<db::PolygonRef, db::TextRef, db::TextRef>;
+template class DB_PUBLIC pull_with_text_local_operation<db::Polygon, db::Text, db::Text>;
 
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -914,7 +914,7 @@ std::string interacting_with_text_local_operation<TS, TI, TR>::description () co
 }
 
 //  explicit instantiations
-template class interacting_with_text_local_operation<db::PolygonRef, db::TextRef, db::PolygonRef>;
-template class interacting_with_text_local_operation<db::Polygon, db::Text, db::Polygon>;
+template class DB_PUBLIC interacting_with_text_local_operation<db::PolygonRef, db::TextRef, db::PolygonRef>;
+template class DB_PUBLIC interacting_with_text_local_operation<db::Polygon, db::Text, db::Polygon>;
 
 }

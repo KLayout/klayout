@@ -159,6 +159,27 @@ public:
 //  Extents
 
 /**
+ *  @brief A processor delivering the extents (bounding box) of the merged polygons
+ */
+class DB_PUBLIC Extents
+  : public db::PolygonProcessorBase
+{
+public:
+  Extents ()
+  {
+    //  .. nothing yet ..
+  }
+
+  void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
+
+  virtual const TransformationReducer *vars () const { return 0; }
+  virtual bool result_is_merged () const { return false; }
+  virtual bool result_must_not_be_merged () const { return false; }
+  virtual bool requires_raw_input () const { return false; }
+  virtual bool wants_variants () const { return false; }  //  variants are too common, so don't do this
+};
+
+/**
  *  @brief A processor delivering the relative extents (bounding box) of the merged polygons
  *  This processor allows over- or undersizing of the resulting box by a given amount and delivery
  *  of a box relative to the original box.

@@ -130,20 +130,23 @@ public:
     if (result_type () == Region) {
 
       std::vector<std::unordered_set<T> > res;
+      res.push_back (std::unordered_set<T> ());
       compute_local (layout, interactions, res, max_vertex_count, area_ratio);
-      return ! res.empty ();
+      return ! res.front ().empty ();
 
     } else if (result_type () == Edges) {
 
       std::vector<std::unordered_set<db::Edge> > res;
+      res.push_back (std::unordered_set<db::Edge> ());
       compute_local (layout, interactions, res, max_vertex_count, area_ratio);
-      return ! res.empty ();
+      return ! res.front ().empty ();
 
     } else if (result_type () == EdgePairs) {
 
       std::vector<std::unordered_set<db::EdgePair> > res;
+      res.push_back (std::unordered_set<db::EdgePair> ());
       compute_local (layout, interactions, res, max_vertex_count, area_ratio);
-      return ! res.empty ();
+      return ! res.front ().empty ();
 
     } else {
       return false;
@@ -664,7 +667,7 @@ public:
   virtual std::string generated_description () const;
 
   //  specifies the result type
-  virtual ResultType result_type () const { return Region; }
+  virtual ResultType result_type () const;
 
   //  the different computation slots
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
@@ -677,9 +680,29 @@ public:
     implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
   }
 
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  }
+
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  }
+
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  }
+
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+  }
+
 private:
-  template <class T>
-  void implement_compute_local (db::Layout *layout, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<T> > &results, size_t max_vertex_count, double area_ratio) const;
+  template <class T, class TR>
+  void implement_compute_local (db::Layout *layout, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio) const;
 
   bool m_multi_layer;
 };

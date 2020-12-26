@@ -871,17 +871,26 @@ std::string CompoundRegionLogicalCaseSelectOperationNode::generated_description 
   return r + CompoundRegionMultiInputOperationNode::description ();
 }
 
-template <class T>
-void CompoundRegionLogicalCaseSelectOperationNode::implement_compute_local (db::Layout *layout, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<T> > &results, size_t max_vertex_count, double area_ratio) const
+CompoundRegionLogicalCaseSelectOperationNode::ResultType
+CompoundRegionLogicalCaseSelectOperationNode::result_type () const
+{
+  ResultType result = Region;
+  for (size_t i = 1; i < children (); i += 2) {
+    if (i == 1) {
+      result = child (i)->result_type ();
+    } else {
+      tl_assert (result == child (i)->result_type ());
+    }
+  }
+  return result;
+}
+
+template <class T, class TR>
+void CompoundRegionLogicalCaseSelectOperationNode::implement_compute_local (db::Layout *layout, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio) const
 {
   bool ok = false;
 
   for (unsigned int ci = 0; ci < children (); ++ci) {
-
-    if (! ok && ci % 2 == 1) {
-      //  skip false branches
-      continue;
-    }
 
     shape_interactions<T, T> computed;
     const shape_interactions<T, T> &child_interactions = interactions_for_child<T, T> (interactions, ci, computed);
@@ -890,14 +899,24 @@ void CompoundRegionLogicalCaseSelectOperationNode::implement_compute_local (db::
 
     if (ci % 2 == 0) {
 
-      ok = node->compute_local_bool<T> (layout, child_interactions, max_vertex_count, area_ratio);
+      if (ci + 1 < children ()) {
 
-    } else {
+        ok = node->compute_local_bool<T> (layout, child_interactions, max_vertex_count, area_ratio);
+        continue;
+
+      } else {
+        //  executes the following statement as default branch
+        ok = true;
+      }
+
+    }
+
+    if (ok) {
 
       if (m_multi_layer && results.size () > size_t (ci / 2)) {
 
-        std::vector<std::unordered_set<T> > one;
-        one.push_back (std::unordered_set<T> ());
+        std::vector<std::unordered_set<TR> > one;
+        one.push_back (std::unordered_set<TR> ());
         node->compute_local (layout, child_interactions, one, max_vertex_count, area_ratio);
         results[ci / 2].swap (one.front ());
 

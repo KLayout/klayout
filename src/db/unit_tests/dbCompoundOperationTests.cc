@@ -29,6 +29,7 @@
 #include "dbCompoundOperation.h"
 #include "dbReader.h"
 #include "dbRecursiveShapeIterator.h"
+#include "dbRegionUtils.h"
 #include "dbTestSupport.h"
 
 #include "tlStream.h"
@@ -335,5 +336,61 @@ TEST(8_PullWithEdgeOperation)
 
   CHECKPOINT();
   db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au8.gds");
+}
+
+TEST(9_LogicalSelectOperation)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/drc/compound_9.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::RegionCheckOptions check_options;
+  check_options.metrics = db::Projection;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  db::Region r (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l1));
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  db::Region r2 (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l2));
+
+  //  the if/then ladder is:
+  //
+  //   if (area > 10um2) return sized(+50nm)
+  //   else if (is_rectangle) return sized(-50nm)
+  //   else return bbox
+
+  db::CompoundRegionOperationPrimaryNode *primary = new db::CompoundRegionOperationPrimaryNode ();
+
+  std::vector<db::CompoundRegionOperationNode *> inputs;
+
+  db::CompoundRegionFilterOperationNode *condition1 = new db::CompoundRegionFilterOperationNode (new db::RegionAreaFilter (0, 10000000, true), primary, true);
+  inputs.push_back (condition1);
+
+  db::CompoundRegionSizeOperationNode *result1 = new db::CompoundRegionSizeOperationNode (50, 50, 2, primary);
+  inputs.push_back (result1);
+
+  db::CompoundRegionFilterOperationNode *condition2 = new db::CompoundRegionFilterOperationNode (new db::RectangleFilter (false), primary, true);
+  inputs.push_back (condition2);
+
+  db::CompoundRegionSizeOperationNode *result2 = new db::CompoundRegionSizeOperationNode (-50, -50, 2, primary);
+  inputs.push_back (result2);
+
+  db::CompoundRegionProcessingOperationNode *result_default = new db::CompoundRegionProcessingOperationNode (new db::Extents (), primary, true);
+  inputs.push_back (result_default);
+
+  db::CompoundRegionLogicalCaseSelectOperationNode select_node (false, inputs);
+
+  db::Region res = r.cop_to_region (select_node);
+
+  unsigned int l1000 = ly.get_layer (db::LayerProperties (1000, 0));
+  res.insert_into (&ly, *ly.begin_top_down (), l1000);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au9.gds");
 }
 

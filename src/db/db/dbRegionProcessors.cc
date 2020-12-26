@@ -88,6 +88,17 @@ void CornerDetectorCore::detect_corners (const db::Polygon &poly, const CornerPo
 }
 
 // -----------------------------------------------------------------------------------
+//  Extents implementation
+
+void Extents::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
+{
+  db::Box b = poly.box ();
+  if (! b.empty ()) {
+    result.push_back (db::Polygon (b));
+  }
+}
+
+// -----------------------------------------------------------------------------------
 //  RelativeExtents implementation
 
 void RelativeExtents::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
@@ -105,7 +116,7 @@ void RelativeExtents::process (const db::Polygon &poly, std::vector<db::Polygon>
 
 const TransformationReducer *RelativeExtents::vars () const
 {
-  if (m_dx == 0 && m_dy == 0 && fabs (m_fx1) < db::epsilon && fabs (m_fy1) < db::epsilon && fabs (m_fx2) < db::epsilon && fabs (m_fy2) < db::epsilon) {
+  if (m_dx == 0 && m_dy == 0 && fabs (m_fx1) < db::epsilon && fabs (m_fy1) < db::epsilon && fabs (1.0 - m_fx2) < db::epsilon && fabs (1.0 - m_fy2) < db::epsilon) {
     return 0;
   } else if (m_dx == m_dy && fabs (m_fx1 - m_fy1) < db::epsilon && fabs (1.0 - (m_fx1 + m_fx2)) < db::epsilon  && fabs (m_fx2 - m_fy2) < db::epsilon && fabs (1.0 - (m_fy1 + m_fy2)) < db::epsilon) {
     return & m_isotropic_reducer;

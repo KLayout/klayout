@@ -543,7 +543,7 @@ public:
 
   std::string generated_description () const
   {
-    return std::string ("interact") + compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon>::description ();
+    return std::string ("interact") + compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon>::generated_description ();
   }
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
@@ -572,7 +572,7 @@ public:
 
   std::string generated_description () const
   {
-    return std::string ("interact") + compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon>::description ();
+    return std::string ("interact") + compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon>::generated_description ();
   }
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
@@ -607,7 +607,7 @@ public:
 
   std::string generated_description () const
   {
-    return std::string ("pull") + compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon>::description ();
+    return std::string ("pull") + compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon>::generated_description ();
   }
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
@@ -636,7 +636,7 @@ public:
 
   std::string generated_description () const
   {
-    return std::string ("pull") + compound_region_generic_operation_node<db::Polygon, db::Edge, db::Edge>::description ();
+    return std::string ("pull") + compound_region_generic_operation_node<db::Polygon, db::Edge, db::Edge>::generated_description ();
   }
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
@@ -887,7 +887,7 @@ public:
 
   virtual std::string description () const
   {
-    return std::string ("sized") + CompoundRegionProcessingOperationNode::description ();
+    return std::string ("sized") + CompoundRegionProcessingOperationNode::generated_description ();
   }
 
 private:

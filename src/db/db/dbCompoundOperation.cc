@@ -105,6 +105,7 @@ void
 CompoundRegionOperationNode::compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
 {
   std::vector<std::unordered_set<db::Polygon> > intermediate;
+  intermediate.push_back (std::unordered_set<db::Polygon> ());
   implement_compute_local (layout, interactions, intermediate, max_vertex_count, area_ratio);
   translate (layout, intermediate, results);
 }
@@ -113,6 +114,7 @@ void
 CompoundRegionOperationNode::compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
 {
   std::vector<std::unordered_set<db::PolygonRef> > intermediate;
+  intermediate.push_back (std::unordered_set<db::PolygonRef> ());
   implement_compute_local (layout, interactions, intermediate, max_vertex_count, area_ratio);
   translate (layout, intermediate, results);
 }

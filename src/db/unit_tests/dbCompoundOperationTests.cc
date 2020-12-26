@@ -37,6 +37,25 @@
 
 #include <cstdio>
 
+static void prep_layer (db::Layout &ly, int gds_layer, db::Region &r, db::DeepShapeStore &dss, bool deep)
+{
+  unsigned int li = ly.get_layer (db::LayerProperties (gds_layer, 0));
+  if (deep) {
+    r = db::Region (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), li), dss);
+  } else {
+    r = db::Region (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), li));
+  }
+}
+
+static std::string make_au (const std::string &num, bool deep)
+{
+  if (deep) {
+    return tl::testsrc () + "/testdata/drc/compound_au" + num + "d.gds";
+  } else {
+    return tl::testsrc () + "/testdata/drc/compound_au" + num + ".gds";
+  }
+}
+
 TEST(1_Basic)
 {
   db::Layout ly;
@@ -395,7 +414,7 @@ TEST(9_LogicalSelectOperation)
   db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au9.gds");
 }
 
-TEST(10_LogicalAndNotOperation)
+void run_test10 (tl::TestBase *_this, bool deep)
 {
   db::Layout ly;
   {
@@ -409,11 +428,11 @@ TEST(10_LogicalAndNotOperation)
   db::RegionCheckOptions check_options;
   check_options.metrics = db::Projection;
 
-  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
-  db::Region r (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l1));
+  db::DeepShapeStore dss;
 
-  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
-  db::Region r2 (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l2));
+  db::Region r, r2;
+  prep_layer (ly, 1, r, dss, deep);
+  prep_layer (ly, 2, r2, dss, deep);
 
   db::CompoundRegionOperationPrimaryNode *primary = new db::CompoundRegionOperationPrimaryNode ();
 
@@ -458,10 +477,20 @@ TEST(10_LogicalAndNotOperation)
   res.insert_into (&ly, *ly.begin_top_down (), l1003);
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au10.gds");
+  db::compare_layouts (_this, ly, make_au ("10", deep));
 }
 
-TEST(11_EdgeFilterOperation)
+TEST(10_LogicalAndNotOperation)
+{
+  run_test10 (_this, false);
+}
+
+TEST(10d_EdgeFilterOperation)
+{
+  run_test10 (_this, true);
+}
+
+void run_test11 (tl::TestBase *_this, bool deep)
 {
   db::Layout ly;
   {
@@ -475,11 +504,11 @@ TEST(11_EdgeFilterOperation)
   db::RegionCheckOptions check_options;
   check_options.metrics = db::Projection;
 
-  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
-  db::Region r (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l1));
+  db::DeepShapeStore dss;
 
-  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
-  db::Region r2 (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l2));
+  db::Region r, r2;
+  prep_layer (ly, 1, r, dss, deep);
+  prep_layer (ly, 2, r2, dss, deep);
 
   db::CompoundRegionOperationPrimaryNode *primary = new db::CompoundRegionOperationPrimaryNode ();
   db::CompoundRegionToEdgeProcessingOperationNode *primary_edges = new db::CompoundRegionToEdgeProcessingOperationNode (new db::PolygonToEdgeProcessor (), primary, true);
@@ -498,7 +527,17 @@ TEST(11_EdgeFilterOperation)
   res.insert_into (&ly, *ly.begin_top_down (), l1001);
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au11.gds");
+  db::compare_layouts (_this, ly, make_au ("11", deep));
+}
+
+TEST(11_EdgeFilterOperation)
+{
+  run_test11 (_this, false);
+}
+
+TEST(11d_EdgeFilterOperation)
+{
+  run_test11 (_this, true);
 }
 
 void run_test12 (tl::TestBase *_this, bool deep)
@@ -512,26 +551,14 @@ void run_test12 (tl::TestBase *_this, bool deep)
     reader.read (ly);
   }
 
-  db::DeepShapeStore dss;
-
   db::RegionCheckOptions check_options;
   check_options.metrics = db::Projection;
 
-  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
-  db::Region r;
-  if (deep) {
-    r = db::Region (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l1), dss);
-  } else {
-    r = db::Region (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l1));
-  }
+  db::DeepShapeStore dss;
 
-  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
-  db::Region r2;
-  if (deep) {
-    r2 = db::Region (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l2), dss);
-  } else {
-    r2 = db::Region (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l2));
-  }
+  db::Region r, r2;
+  prep_layer (ly, 1, r, dss, deep);
+  prep_layer (ly, 2, r2, dss, deep);
 
   db::CompoundRegionOperationPrimaryNode *primary = new db::CompoundRegionOperationPrimaryNode ();
   db::CompoundRegionToEdgeProcessingOperationNode *primary_edges = new db::CompoundRegionToEdgeProcessingOperationNode (new db::PolygonToEdgeProcessor (), primary, true);
@@ -575,11 +602,7 @@ void run_test12 (tl::TestBase *_this, bool deep)
   res.insert_into (&ly, *ly.begin_top_down (), l1005);
 
   CHECKPOINT();
-  if (deep) {
-    db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au12d.gds");
-  } else {
-    db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au12.gds");
-  }
+  db::compare_layouts (_this, ly, make_au ("12", deep));
 }
 
 TEST(12_EdgeBooleanOperations)

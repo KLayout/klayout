@@ -492,7 +492,7 @@ CompoundRegionGeometricalBoolOperationNode::result_type () const
   ResultType res_a = child (0)->result_type ();
   ResultType res_b = child (1)->result_type ();
 
-  if (res_a == Region && res_b == Edges && m_op == And) {
+  if (res_a == Edges || (res_a == Region && res_b == Edges && m_op == And)) {
     return Edges;
   } else {
     return res_a;
@@ -620,7 +620,7 @@ template <class T>
 static void
 run_edge_vs_poly_bool (CompoundRegionGeometricalBoolOperationNode::GeometricalOp op, db::Layout *layout, const std::unordered_set<db::Edge> &a, const std::unordered_set<T> &b, std::unordered_set<db::Edge> &res)
 {
-  if (op != CompoundRegionGeometricalBoolOperationNode::And) {
+  if (op != CompoundRegionGeometricalBoolOperationNode::And && op != CompoundRegionGeometricalBoolOperationNode::Not) {
     return;
   }
 
@@ -631,9 +631,9 @@ run_edge_vs_poly_bool (CompoundRegionGeometricalBoolOperationNode::GeometricalOp
   db::Edges ea;
   init_edges (ea, a);
 
-  if (op != CompoundRegionGeometricalBoolOperationNode::And) {
+  if (op == CompoundRegionGeometricalBoolOperationNode::And) {
     write_result (layout, res, ea & rb);
-  } else if (op != CompoundRegionGeometricalBoolOperationNode::Not) {
+  } else if (op == CompoundRegionGeometricalBoolOperationNode::Not) {
     write_result (layout, res, ea - rb);
   }
 }

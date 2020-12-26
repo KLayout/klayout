@@ -26,6 +26,7 @@
 #include "dbRegion.h"
 #include "dbEdgePairs.h"
 #include "dbEdges.h"
+#include "dbEdgesUtils.h"
 #include "dbCompoundOperation.h"
 #include "dbReader.h"
 #include "dbRecursiveShapeIterator.h"
@@ -460,3 +461,107 @@ TEST(10_LogicalAndNotOperation)
   db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au10.gds");
 }
 
+TEST(11_EdgeFilterOperation)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/drc/compound_11.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::RegionCheckOptions check_options;
+  check_options.metrics = db::Projection;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  db::Region r (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l1));
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  db::Region r2 (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l2));
+
+  db::CompoundRegionOperationPrimaryNode *primary = new db::CompoundRegionOperationPrimaryNode ();
+  db::CompoundRegionToEdgeProcessingOperationNode *primary_edges = new db::CompoundRegionToEdgeProcessingOperationNode (new db::PolygonToEdgeProcessor (), primary, true);
+
+  db::CompoundRegionEdgeFilterOperationNode edge_filter (new db::EdgeLengthFilter (3000, 5000, false), primary_edges, true);
+  db::CompoundRegionEdgeFilterOperationNode edge_filterr (new db::EdgeLengthFilter (3000, 5000, true), primary_edges, true);
+
+  db::Edges res = r.cop_to_edges (edge_filter);
+
+  unsigned int l1000 = ly.get_layer (db::LayerProperties (1000, 0));
+  res.insert_into (&ly, *ly.begin_top_down (), l1000);
+
+  res = r.cop_to_edges (edge_filterr);
+
+  unsigned int l1001 = ly.get_layer (db::LayerProperties (1001, 0));
+  res.insert_into (&ly, *ly.begin_top_down (), l1001);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au11.gds");
+}
+
+TEST(12_EdgeBooleanOperations)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/drc/compound_12.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::RegionCheckOptions check_options;
+  check_options.metrics = db::Projection;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  db::Region r (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l1));
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  db::Region r2 (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l2));
+
+  db::CompoundRegionOperationPrimaryNode *primary = new db::CompoundRegionOperationPrimaryNode ();
+  db::CompoundRegionToEdgeProcessingOperationNode *primary_edges = new db::CompoundRegionToEdgeProcessingOperationNode (new db::PolygonToEdgeProcessor (), primary, true);
+
+  db::CompoundRegionOperationSecondaryNode *secondary = new db::CompoundRegionOperationSecondaryNode (&r2);
+  db::CompoundRegionToEdgeProcessingOperationNode *secondary_edges = new db::CompoundRegionToEdgeProcessingOperationNode (new db::PolygonToEdgeProcessor (), secondary, true);
+
+  db::CompoundRegionGeometricalBoolOperationNode geo_bool (db::CompoundRegionGeometricalBoolOperationNode::And, primary_edges, secondary);
+
+  db::Edges res = r.cop_to_edges (geo_bool);
+
+  unsigned int l1000 = ly.get_layer (db::LayerProperties (1000, 0));
+  res.insert_into (&ly, *ly.begin_top_down (), l1000);
+
+  db::CompoundRegionGeometricalBoolOperationNode geo_bool2 (db::CompoundRegionGeometricalBoolOperationNode::Not, primary_edges, secondary);
+
+  res = r.cop_to_edges (geo_bool2);
+
+  unsigned int l1001 = ly.get_layer (db::LayerProperties (1001, 0));
+  res.insert_into (&ly, *ly.begin_top_down (), l1001);
+
+  db::CompoundRegionGeometricalBoolOperationNode geo_bool3 (db::CompoundRegionGeometricalBoolOperationNode::And, primary, secondary_edges);
+
+  res = r.cop_to_edges (geo_bool3);
+
+  unsigned int l1002 = ly.get_layer (db::LayerProperties (1002, 0));
+  res.insert_into (&ly, *ly.begin_top_down (), l1002);
+
+  db::CompoundRegionGeometricalBoolOperationNode geo_bool5 (db::CompoundRegionGeometricalBoolOperationNode::And, primary_edges, secondary_edges);
+
+  res = r.cop_to_edges (geo_bool5);
+
+  unsigned int l1004 = ly.get_layer (db::LayerProperties (1004, 0));
+  res.insert_into (&ly, *ly.begin_top_down (), l1004);
+
+  db::CompoundRegionGeometricalBoolOperationNode geo_bool6 (db::CompoundRegionGeometricalBoolOperationNode::Not, primary_edges, secondary_edges);
+
+  res = r.cop_to_edges (geo_bool6);
+
+  unsigned int l1005 = ly.get_layer (db::LayerProperties (1005, 0));
+  res.insert_into (&ly, *ly.begin_top_down (), l1005);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au12.gds");
+}

@@ -61,6 +61,11 @@ public:
   CompoundRegionOperationNode ();
   virtual ~CompoundRegionOperationNode ();
 
+  const std::string &raw_description () const
+  {
+    return m_description;
+  }
+
   std::string description () const;
   void set_description (const std::string &d);
 
@@ -425,6 +430,7 @@ public:
 
   //  specifies the result type
   virtual ResultType result_type () const;
+  virtual db::Coord dist () const;
 
   //  the different computation slots
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const;

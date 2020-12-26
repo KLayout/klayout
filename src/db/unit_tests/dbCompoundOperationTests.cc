@@ -501,7 +501,7 @@ TEST(11_EdgeFilterOperation)
   db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au11.gds");
 }
 
-TEST(12_EdgeBooleanOperations)
+void run_test12 (tl::TestBase *_this, bool deep)
 {
   db::Layout ly;
   {
@@ -512,14 +512,26 @@ TEST(12_EdgeBooleanOperations)
     reader.read (ly);
   }
 
+  db::DeepShapeStore dss;
+
   db::RegionCheckOptions check_options;
   check_options.metrics = db::Projection;
 
   unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
-  db::Region r (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l1));
+  db::Region r;
+  if (deep) {
+    r = db::Region (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l1), dss);
+  } else {
+    r = db::Region (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l1));
+  }
 
   unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
-  db::Region r2 (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l2));
+  db::Region r2;
+  if (deep) {
+    r2 = db::Region (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l2), dss);
+  } else {
+    r2 = db::Region (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l2));
+  }
 
   db::CompoundRegionOperationPrimaryNode *primary = new db::CompoundRegionOperationPrimaryNode ();
   db::CompoundRegionToEdgeProcessingOperationNode *primary_edges = new db::CompoundRegionToEdgeProcessingOperationNode (new db::PolygonToEdgeProcessor (), primary, true);
@@ -563,5 +575,19 @@ TEST(12_EdgeBooleanOperations)
   res.insert_into (&ly, *ly.begin_top_down (), l1005);
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au12.gds");
+  if (deep) {
+    db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au12d.gds");
+  } else {
+    db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au12.gds");
+  }
+}
+
+TEST(12_EdgeBooleanOperations)
+{
+  run_test12 (_this, false);
+}
+
+TEST(12d_EdgeBooleanOperations)
+{
+  run_test12 (_this, true);
 }

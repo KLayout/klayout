@@ -418,7 +418,7 @@ std::string CompoundRegionLogicalBoolOperationNode::generated_description () con
   } else if (m_op == Or) {
     r += "or";
   }
-  return r + CompoundRegionMultiInputOperationNode::description ();
+  return r + CompoundRegionMultiInputOperationNode::generated_description ();
 }
 
 template <class T>
@@ -482,7 +482,7 @@ CompoundRegionGeometricalBoolOperationNode::generated_description () const
   } else if (m_op == Not) {
     r = "not";
   }
-  r += CompoundRegionMultiInputOperationNode::description ();
+  r += CompoundRegionMultiInputOperationNode::generated_description ();
   return r;
 }
 
@@ -496,6 +496,21 @@ CompoundRegionGeometricalBoolOperationNode::result_type () const
     return Edges;
   } else {
     return res_a;
+  }
+}
+
+db::Coord
+CompoundRegionGeometricalBoolOperationNode::dist () const
+{
+  db::Coord d = CompoundRegionMultiInputOperationNode::dist ();
+
+  ResultType res_a = child (0)->result_type ();
+  ResultType res_b = child (1)->result_type ();
+
+  if (res_a == Region && res_b == Region) {
+    return d;  //  overlapping is sufficient
+  } else {
+    return d + 1;  //  we need "touching" if edges are involved
   }
 }
 
@@ -868,7 +883,7 @@ std::string CompoundRegionLogicalCaseSelectOperationNode::generated_description 
   //  TODO: could be nicer ...
   std::string r;
   r = "if-then";
-  return r + CompoundRegionMultiInputOperationNode::description ();
+  return r + CompoundRegionMultiInputOperationNode::generated_description ();
 }
 
 CompoundRegionLogicalCaseSelectOperationNode::ResultType

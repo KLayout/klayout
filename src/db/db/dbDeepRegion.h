@@ -132,6 +132,8 @@ public:
 
   void set_is_merged (bool f);
 
+  const DeepLayer &merged_deep_layer () const;
+
 protected:
   virtual void merged_semantics_changed ();
   virtual void min_coherence_changed ();
@@ -157,7 +159,6 @@ private:
 
   void init ();
   void ensure_merged_polygons_valid () const;
-  const DeepLayer &merged_deep_layer () const;
   DeepLayer and_or_not_with(const DeepRegion *other, bool and_op) const;
   std::pair<DeepLayer, DeepLayer> and_and_not_with (const DeepRegion *other) const;
   DeepRegion *apply_filter (const PolygonFilterBase &filter) const;

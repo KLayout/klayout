@@ -718,8 +718,8 @@ struct interaction_registration_shape2shape
   : db::box_scanner_receiver2<TS, unsigned int, TI, unsigned int>
 {
 public:
-  interaction_registration_shape2shape (db::Layout *layout, shape_interactions<TS, TI> *result, unsigned int intruder_layer)
-    : mp_result (result), mp_layout (layout), m_intruder_layer (intruder_layer)
+  interaction_registration_shape2shape (db::Layout *layout, shape_interactions<TS, TI> *result, unsigned int intruder_layer_index)
+    : mp_result (result), mp_layout (layout), m_intruder_layer_index (intruder_layer_index)
   {
     //  nothing yet ..
   }
@@ -735,9 +735,9 @@ public:
         //  In order to guarantee the refs come from the subject layout, we'd need to
         //  rewrite them
         db::shape_reference_translator<TI> rt (mp_layout);
-        mp_result->add_intruder_shape (id2, m_intruder_layer, rt (*ref2));
+        mp_result->add_intruder_shape (id2, m_intruder_layer_index, rt (*ref2));
       } else {
-        mp_result->add_intruder_shape (id2, m_intruder_layer, *ref2);
+        mp_result->add_intruder_shape (id2, m_intruder_layer_index, *ref2);
       }
     }
 
@@ -747,7 +747,7 @@ public:
 private:
   shape_interactions<TS, TI> *mp_result;
   db::Layout *mp_layout;
-  unsigned int m_intruder_layer;
+  unsigned int m_intruder_layer_index;
 };
 
 template <class TS, class TI>
@@ -755,8 +755,8 @@ struct interaction_registration_shape1
   : db::box_scanner_receiver2<TS, unsigned int, TI, unsigned int>
 {
 public:
-  interaction_registration_shape1 (shape_interactions<TS, TI> *result, unsigned int intruder_layer)
-    : mp_result (result), m_intruder_layer (intruder_layer)
+  interaction_registration_shape1 (shape_interactions<TS, TI> *result, unsigned int intruder_layer_index)
+    : mp_result (result), m_intruder_layer_index (intruder_layer_index)
   {
     //  nothing yet ..
   }
@@ -767,14 +767,14 @@ public:
       mp_result->add_subject_shape (id1, *ref1);
     }
     if (!mp_result->has_intruder_shape_id (id2)) {
-      mp_result->add_intruder_shape (id2, m_intruder_layer, *ref2);
+      mp_result->add_intruder_shape (id2, m_intruder_layer_index, *ref2);
     }
     mp_result->add_interaction (id1, id2);
   }
 
 private:
   shape_interactions<TS, TI> *mp_result;
-  unsigned int m_intruder_layer;
+  unsigned int m_intruder_layer_index;
 };
 
 template <class T>
@@ -782,8 +782,8 @@ struct interaction_registration_shape1<T, T>
   : db::box_scanner_receiver<T, unsigned int>
 {
 public:
-  interaction_registration_shape1 (shape_interactions<T, T> *result, unsigned int intruder_layer)
-    : mp_result (result), m_intruder_layer (intruder_layer)
+  interaction_registration_shape1 (shape_interactions<T, T> *result, unsigned int intruder_layer_index)
+    : mp_result (result), m_intruder_layer_index (intruder_layer_index)
   {
     //  nothing yet ..
   }
@@ -794,14 +794,14 @@ public:
       mp_result->add_subject_shape (id1, *ref1);
     }
     if (!mp_result->has_intruder_shape_id (id2)) {
-      mp_result->add_intruder_shape (id2, m_intruder_layer, *ref2);
+      mp_result->add_intruder_shape (id2, m_intruder_layer_index, *ref2);
     }
     mp_result->add_interaction (id1, id2);
   }
 
 private:
   shape_interactions<T, T> *mp_result;
-  unsigned int m_intruder_layer;
+  unsigned int m_intruder_layer_index;
 };
 
 template <class TS, class TI>
@@ -809,8 +809,8 @@ struct interaction_registration_shape2inst
   : db::box_scanner_receiver2<TS, unsigned int, db::CellInstArray, unsigned int>
 {
 public:
-  interaction_registration_shape2inst (db::Layout *subject_layout, const db::Layout *intruder_layout, unsigned int intruder_layer, db::Coord dist, shape_interactions<TS, TI> *result)
-    : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), m_intruder_layer (intruder_layer), m_dist (dist), mp_result (result)
+  interaction_registration_shape2inst (db::Layout *subject_layout, const db::Layout *intruder_layout, unsigned int intruder_layer, unsigned int intruder_layer_index, db::Coord dist, shape_interactions<TS, TI> *result)
+    : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), m_intruder_layer (intruder_layer), m_intruder_layer_index (intruder_layer_index), m_dist (dist), mp_result (result)
   {
     //  nothing yet ..
   }
@@ -836,7 +836,7 @@ public:
 private:
   db::Layout *mp_subject_layout;
   const db::Layout *mp_intruder_layout;
-  unsigned int m_intruder_layer;
+  unsigned int m_intruder_layer, m_intruder_layer_index;
   db::Coord m_dist;
   shape_interactions<TS, TI> *mp_result;
   std::unordered_map<TI, unsigned int> m_inst_shape_ids;
@@ -862,7 +862,7 @@ private:
       if (k == m_inst_shape_ids.end ()) {
 
         k = m_inst_shape_ids.insert (std::make_pair (ref2, mp_result->next_id ())).first;
-        mp_result->add_intruder_shape (k->second, m_intruder_layer, ref2);
+        mp_result->add_intruder_shape (k->second, m_intruder_layer_index, ref2);
 
       }
 
@@ -1686,10 +1686,10 @@ template <class TS, class TI>
 struct scan_shape2shape_same_layer
 {
   void
-  operator () (const db::Shapes *subject_shapes, unsigned int subject_id0, const std::set<TI> &intruders, unsigned int intruder_layer, shape_interactions<TS, TI> &interactions, db::Coord dist) const
+  operator () (const db::Shapes *subject_shapes, unsigned int subject_id0, const std::set<TI> &intruders, unsigned int intruder_layer_index, shape_interactions<TS, TI> &interactions, db::Coord dist) const
   {
     db::box_scanner2<TS, int, TI, int> scanner;
-    interaction_registration_shape1<TS, TI> rec (&interactions, intruder_layer);
+    interaction_registration_shape1<TS, TI> rec (&interactions, intruder_layer_index);
 
     unsigned int id = subject_id0;
     for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<TS> ()); !i.at_end (); ++i) {
@@ -1734,10 +1734,10 @@ template <class TS, class TI>
 struct scan_shape2shape_different_layers
 {
   void
-  operator () (db::Layout *layout, const db::Shapes *subject_shapes, const db::Shapes *intruder_shapes, unsigned int subject_id0, const std::set<TI> *intruders, unsigned int intruder_layer, shape_interactions<TS, TI> &interactions, db::Coord dist) const
+  operator () (db::Layout *layout, const db::Shapes *subject_shapes, const db::Shapes *intruder_shapes, unsigned int subject_id0, const std::set<TI> *intruders, unsigned int intruder_layer_index, shape_interactions<TS, TI> &interactions, db::Coord dist) const
   {
     db::box_scanner2<TS, int, TI, int> scanner;
-    interaction_registration_shape2shape<TS, TI> rec (layout, &interactions, intruder_layer);
+    interaction_registration_shape2shape<TS, TI> rec (layout, &interactions, intruder_layer_index);
 
     unsigned int id = subject_id0;
     for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<TS> ()); !i.at_end (); ++i) {
@@ -1790,7 +1790,8 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
   }
 
-  for (std::vector<unsigned int>::const_iterator il = contexts.intruder_layers ().begin (); il != contexts.intruder_layers ().end (); ++il) {
+  unsigned int il_index = 0;
+  for (std::vector<unsigned int>::const_iterator il = contexts.intruder_layers ().begin (); il != contexts.intruder_layers ().end (); ++il, ++il_index) {
 
     const db::Shapes *intruder_shapes = 0;
     if (intruder_cell) {
@@ -1811,12 +1812,12 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
       if (subject_cell == intruder_cell && contexts.subject_layer () == *il) {
 
-        scan_shape2shape_same_layer<TS, TI> () (subject_shapes, subject_id0, ipl == intruders.second.end () ? empty_intruders : ipl->second, *il, interactions, op->dist ());
+        scan_shape2shape_same_layer<TS, TI> () (subject_shapes, subject_id0, ipl == intruders.second.end () ? empty_intruders : ipl->second, il_index, interactions, op->dist ());
 
       } else {
 
         db::Layout *target_layout = (mp_subject_layout == mp_intruder_layout ? 0 : mp_subject_layout);
-        scan_shape2shape_different_layers<TS, TI> () (target_layout, subject_shapes, intruder_shapes, subject_id0, &(ipl == intruders.second.end () ? empty_intruders : ipl->second), *il, interactions, op->dist ());
+        scan_shape2shape_different_layers<TS, TI> () (target_layout, subject_shapes, intruder_shapes, subject_id0, &(ipl == intruders.second.end () ? empty_intruders : ipl->second), il_index, interactions, op->dist ());
 
       }
 
@@ -1825,7 +1826,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
     if (! subject_shapes->empty () && ! ((! intruder_cell || intruder_cell->begin ().at_end ()) && intruders.first.empty ())) {
 
       db::box_scanner2<TS, int, db::CellInstArray, int> scanner;
-      interaction_registration_shape2inst<TS, TI> rec (mp_subject_layout, mp_intruder_layout, *il, op->dist (), &interactions);
+      interaction_registration_shape2inst<TS, TI> rec (mp_subject_layout, mp_intruder_layout, *il, il_index, op->dist (), &interactions);
 
       unsigned int id = subject_id0;
       for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<TS> ()); !i.at_end (); ++i) {
@@ -2014,11 +2015,12 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
       }
     }
 
-    for (typename std::vector<generic_shape_iterator<TI> >::const_iterator il = intruders.begin (); il != intruders.end (); ++il) {
+    unsigned int il_index = 0;
+    for (typename std::vector<generic_shape_iterator<TI> >::const_iterator il = intruders.begin (); il != intruders.end (); ++il, ++il_index) {
       if (*il == subjects) {
-        scan_shape2shape_same_layer_flat<TS, TI> () ((unsigned int) (il - intruders.begin ()), interactions, op->dist ());
+        scan_shape2shape_same_layer_flat<TS, TI> () (il_index, interactions, op->dist ());
       } else {
-        scan_shape2shape_different_layers_flat<TS, TI> () (*il, common_box, (unsigned int) (il - intruders.begin ()), interactions, op->dist ());
+        scan_shape2shape_different_layers_flat<TS, TI> () (*il, common_box, il_index, interactions, op->dist ());
       }
     }
 

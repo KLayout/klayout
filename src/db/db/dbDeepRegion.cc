@@ -1343,22 +1343,37 @@ DeepRegion::in (const Region &other, bool invert) const
   return db::AsIfFlatRegion::in (other, invert);
 }
 
-EdgePairsDelegate *
-DeepRegion::cop_to_edge_pairs (db::CompoundRegionOperationNode &node)
+template <class TR, class Output>
+static
+Output *region_cop_impl (DeepRegion *region, db::CompoundRegionOperationNode &node)
 {
-  std::vector<unsigned int> other_layers;
+  //  Fall back to flat mode if one of the inputs is flat
   std::vector<db::Region *> inputs = node.inputs ();
+  for (std::vector<db::Region *>::const_iterator i = inputs.begin (); i != inputs.end (); ++i) {
+    if (*i && ! dynamic_cast<const db::DeepRegion *> ((*i)->delegate ())) {
+      return 0;
+    }
+  }
+
+  db::local_processor<db::PolygonRef, db::PolygonRef, TR> proc (const_cast<db::Layout *> (&region->deep_layer ().layout ()),
+                                                                const_cast<db::Cell *> (&region->deep_layer ().initial_cell ()),
+                                                                region->deep_layer ().breakout_cells ());
+
+  proc.set_base_verbosity (region->base_verbosity ());
+  proc.set_threads (region->deep_layer ().store ()->threads ());
+
+  bool needs_merged = node.wants_merged ();
+  const db::DeepLayer &polygons (needs_merged ? region->merged_deep_layer () : region->deep_layer ());
+
+  std::vector<unsigned int> other_layers;
   for (std::vector<db::Region *>::const_iterator i = inputs.begin (); i != inputs.end (); ++i) {
 
     if (! *i) {
-      //  @@@ in case of *i == null - what to do?
-      other_layers.push_back (deep_layer ().layer ());
+      other_layers.push_back (polygons.layer ());
     } else {
       const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> ((*i)->delegate ());
-      if (! other_deep) {
-        return db::AsIfFlatRegion::cop_to_edge_pairs (node);
-      }
-      if (&other_deep->deep_layer ().layout () != &deep_layer ().layout () || &other_deep->deep_layer ().initial_cell () != &deep_layer ().initial_cell ()) {
+      tl_assert (other_deep != 0);
+      if (&other_deep->deep_layer ().layout () != &region->deep_layer ().layout () || &other_deep->deep_layer ().initial_cell () != &region->deep_layer ().initial_cell ()) {
         throw tl::Exception (tl::to_string (tr ("Complex DeepRegion operations need to use the same layout and top cell for all inputs")));
       }
       other_layers.push_back (other_deep->deep_layer ().layer ());
@@ -1366,104 +1381,44 @@ DeepRegion::cop_to_edge_pairs (db::CompoundRegionOperationNode &node)
 
   }
 
-  //  @@@ really always "merged"?
-  const db::DeepLayer &polygons = merged_deep_layer ();
-
-  db::local_processor<db::PolygonRef, db::PolygonRef, db::EdgePair> proc (const_cast<db::Layout *> (&deep_layer ().layout ()),
-                                                                          const_cast<db::Cell *> (&deep_layer ().initial_cell ()),
-                                                                          deep_layer ().breakout_cells ());
-
-  proc.set_base_verbosity (base_verbosity ());
-  proc.set_threads (polygons.store ()->threads ());
-
-  compound_local_operation<db::PolygonRef, db::PolygonRef, db::EdgePair> op (&node);
-
-  std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
+  std::auto_ptr<Output> res (new Output (polygons.derived ()));
+  compound_local_operation<db::PolygonRef, db::PolygonRef, TR> op (&node);
   proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer ());
 
   return res.release ();
+}
+
+EdgePairsDelegate *
+DeepRegion::cop_to_edge_pairs (db::CompoundRegionOperationNode &node)
+{
+  DeepEdgePairs *output = region_cop_impl<db::EdgePair, DeepEdgePairs> (this, node);
+  if (! output) {
+    return AsIfFlatRegion::cop_to_edge_pairs (node);
+  } else {
+    return output;
+  }
 }
 
 RegionDelegate *
 DeepRegion::cop_to_region (db::CompoundRegionOperationNode &node)
 {
-  std::vector<unsigned int> other_layers;
-  std::vector<db::Region *> inputs = node.inputs ();
-  for (std::vector<db::Region *>::const_iterator i = inputs.begin (); i != inputs.end (); ++i) {
-
-    if (! *i) {
-      //  @@@ in case of *i == null - what to do?
-      other_layers.push_back (deep_layer ().layer ());
-    } else {
-      const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> ((*i)->delegate ());
-      if (! other_deep) {
-        return db::AsIfFlatRegion::cop_to_region (node);
-      }
-      if (&other_deep->deep_layer ().layout () != &deep_layer ().layout () || &other_deep->deep_layer ().initial_cell () != &deep_layer ().initial_cell ()) {
-        throw tl::Exception (tl::to_string (tr ("Complex DeepRegion operations need to use the same layout and top cell for all inputs")));
-      }
-      other_layers.push_back (other_deep->deep_layer ().layer ());
-    }
-
+  DeepRegion *output = region_cop_impl<db::PolygonRef, db::DeepRegion> (this, node);
+  if (! output) {
+    return AsIfFlatRegion::cop_to_region (node);
+  } else {
+    return output;
   }
-
-  //  @@@ really always "merged"?
-  const db::DeepLayer &polygons = merged_deep_layer ();
-
-  db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&deep_layer ().layout ()),
-                                                                            const_cast<db::Cell *> (&deep_layer ().initial_cell ()),
-                                                                            deep_layer ().breakout_cells ());
-
-  proc.set_base_verbosity (base_verbosity ());
-  proc.set_threads (polygons.store ()->threads ());
-
-  compound_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> op (&node);
-
-  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
-  proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer ());
-
-  return res.release ();
 }
 
 EdgesDelegate *
 DeepRegion::cop_to_edges (db::CompoundRegionOperationNode &node)
 {
-  std::vector<unsigned int> other_layers;
-  std::vector<db::Region *> inputs = node.inputs ();
-  for (std::vector<db::Region *>::const_iterator i = inputs.begin (); i != inputs.end (); ++i) {
-
-    if (! *i) {
-      //  @@@ in case of *i == null - what to do?
-      other_layers.push_back (deep_layer ().layer ());
-    } else {
-      const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> ((*i)->delegate ());
-      if (! other_deep) {
-        return db::AsIfFlatRegion::cop_to_edges (node);
-      }
-      if (&other_deep->deep_layer ().layout () != &deep_layer ().layout () || &other_deep->deep_layer ().initial_cell () != &deep_layer ().initial_cell ()) {
-        throw tl::Exception (tl::to_string (tr ("Complex DeepRegion operations need to use the same layout and top cell for all inputs")));
-      }
-      other_layers.push_back (other_deep->deep_layer ().layer ());
-    }
-
+  DeepEdges *output = region_cop_impl<db::Edge, db::DeepEdges> (this, node);
+  if (! output) {
+    return AsIfFlatRegion::cop_to_edges (node);
+  } else {
+    return output;
   }
-
-  //  @@@ really always "merged"?
-  const db::DeepLayer &polygons = merged_deep_layer ();
-
-  db::local_processor<db::PolygonRef, db::PolygonRef, db::Edge> proc (const_cast<db::Layout *> (&deep_layer ().layout ()),
-                                                                      const_cast<db::Cell *> (&deep_layer ().initial_cell ()),
-                                                                      deep_layer ().breakout_cells ());
-
-  proc.set_base_verbosity (base_verbosity ());
-  proc.set_threads (polygons.store ()->threads ());
-
-  compound_local_operation<db::PolygonRef, db::PolygonRef, db::Edge> op (&node);
-
-  std::auto_ptr<db::DeepEdges> res (new db::DeepEdges (polygons.derived ()));
-  proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer ());
-
-  return res.release ();
 }
 
 EdgePairsDelegate *

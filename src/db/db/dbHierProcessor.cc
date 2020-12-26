@@ -1905,57 +1905,51 @@ local_processor<TS, TI, TR>::run_flat (const db::Shapes *subject_shapes, const s
   run_flat (generic_shape_iterator<TS> (subject_shapes), is, op, result_shapes);
 }
 
-namespace {
+namespace
+{
 
 template <class TS, class TI>
-struct scan_shape2shape_same_layer_flat
+struct interaction_registration_shape1_scanner_combo
 {
-  void
-  operator () (unsigned int, shape_interactions<TS, TI> &, db::Coord) const
+  interaction_registration_shape1_scanner_combo (shape_interactions<TS, TI> *, unsigned int)
   {
-    //  cannot have different types on the same layer
+    //  can't have self-interactions with different types
     tl_assert (false);
+  }
+
+  void insert (const TS *, unsigned int)
+  {
+    //  nothing here.
+  }
+
+  void process (db::Coord)
+  {
+    //  nothing here.
   }
 };
 
 template <class T>
-struct scan_shape2shape_same_layer_flat<T, T>
+struct interaction_registration_shape1_scanner_combo<T, T>
 {
-  void
-  operator () (unsigned int intruder_layer, shape_interactions<T, T> &interactions, db::Coord dist) const
+  interaction_registration_shape1_scanner_combo (shape_interactions<T, T> *interactions, unsigned int intruder_layer_index)
+    : m_scanner (), m_rec (interactions, intruder_layer_index)
   {
-    db::box_scanner<T, int> scanner;
-    interaction_registration_shape1<T, T> rec (&interactions, intruder_layer);
-
-    for (typename shape_interactions<T, T>::subject_iterator s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
-      scanner.insert (&s->second, s->first);
-    }
-
-    scanner.process (rec, dist, db::box_convert<T> ());
+    //  .. nothing yet ..
   }
-};
 
-template <class TS, class TI>
-struct scan_shape2shape_different_layers_flat
-{
-  void
-  operator () (const generic_shape_iterator<TI> &intruders, const db::Box &common_box, unsigned int intruder_layer, shape_interactions<TS, TI> &interactions, db::Coord dist) const
+  void insert (const T *shape, unsigned int id)
   {
-    db::box_scanner2<TS, int, TI, int> scanner;
-    interaction_registration_shape2shape<TS, TI> rec (0 /*layout*/, &interactions, intruder_layer);
-
-    for (typename shape_interactions<TS, TI>::subject_iterator s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
-      scanner.insert1 (&s->second, s->first);
-    }
-
-    addressable_shape_delivery<TI> ii (intruders.confined (common_box, true));
-    for (; !ii.at_end (); ++ii) {
-      scanner.insert2 (ii.operator-> (), interactions.next_id ());
-    }
-
-    scanner.process (rec, dist, db::box_convert<TS> (), db::box_convert<TI> ());
-
+    m_scanner.insert (shape, id);
   }
+
+  void process (db::Coord dist)
+  {
+    m_scanner.process (m_rec, dist, db::box_convert<T> ());
+  }
+
+private:
+  db::box_scanner<T, int> m_scanner;
+  interaction_registration_shape1<T, T> m_rec;
 };
 
 }
@@ -2004,24 +1998,101 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
   } else {
 
-    box_convert<TS> bcs;
+    if (needs_isolated_subjects) {
 
-    addressable_shape_delivery<TS> is (subjects);
-    for ( ; !is.at_end (); ++is) {
-      const TS *shape = is.operator-> ();
-      if (needs_isolated_subjects || bcs (*shape).overlaps (common_box)) {
+      addressable_shape_delivery<TS> is (subjects);
+      for ( ; !is.at_end (); ++is) {
+        const TS *shape = is.operator-> ();
         unsigned int id = interactions.next_id ();
         interactions.add_subject (id, *shape);
       }
-    }
 
-    unsigned int il_index = 0;
-    for (typename std::vector<generic_shape_iterator<TI> >::const_iterator il = intruders.begin (); il != intruders.end (); ++il, ++il_index) {
-      if (*il == subjects) {
-        scan_shape2shape_same_layer_flat<TS, TI> () (il_index, interactions, op->dist ());
-      } else {
-        scan_shape2shape_different_layers_flat<TS, TI> () (*il, common_box, il_index, interactions, op->dist ());
+      unsigned int il_index = 0;
+      for (typename std::vector<generic_shape_iterator<TI> >::const_iterator il = intruders.begin (); il != intruders.end (); ++il, ++il_index) {
+
+        if (*il == subjects) {
+
+          interaction_registration_shape1_scanner_combo<TS, TI> scanner (&interactions, il_index);
+
+          for (typename shape_interactions<TS, TI>::subject_iterator s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
+            scanner.insert (&s->second, s->first);
+          }
+
+          scanner.process (dist);
+
+        } else {
+
+
+          db::box_scanner2<TS, int, TI, int> scanner;
+          interaction_registration_shape2shape<TS, TI> rec (0 /*layout*/, &interactions, il_index);
+
+          for (typename shape_interactions<TS, TI>::subject_iterator s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
+            scanner.insert1 (&s->second, s->first);
+          }
+
+          addressable_shape_delivery<TI> ii ((*il).confined (common_box, true));
+          for (; !ii.at_end (); ++ii) {
+            scanner.insert2 (ii.operator-> (), interactions.next_id ());
+          }
+
+          scanner.process (rec, dist, db::box_convert<TS> (), db::box_convert<TI> ());
+
+        }
       }
+
+    } else {
+
+      unsigned int id_first = 0;
+
+      {
+        //  allocate a range of IDs for the subjects
+        generic_shape_iterator<TS> is (subjects);
+        if (! is.at_end ()) {
+          id_first = interactions.next_id ();
+          while (! (++is).at_end ()) {
+            interactions.next_id ();
+          }
+        }
+      }
+
+      unsigned int il_index = 0;
+      for (typename std::vector<generic_shape_iterator<TI> >::const_iterator il = intruders.begin (); il != intruders.end (); ++il, ++il_index) {
+
+        if (*il == subjects) {
+
+          interaction_registration_shape1_scanner_combo<TS, TI> scanner (&interactions, il_index);
+
+          addressable_shape_delivery<TS> is (subjects.confined (common_box, true));
+          unsigned int id = id_first;
+
+          for ( ; ! is.at_end (); ++is, ++id) {
+            scanner.insert (is.operator-> (), id);
+          }
+
+          scanner.process (dist);
+
+        } else {
+
+          db::box_scanner2<TS, int, TI, int> scanner;
+          interaction_registration_shape2shape<TS, TI> rec (0 /*layout*/, &interactions, il_index);
+
+          addressable_shape_delivery<TS> is (subjects.confined (common_box, true));
+          unsigned int id = id_first;
+
+          for ( ; ! is.at_end (); ++is, ++id) {
+            scanner.insert1 (is.operator-> (), id);
+          }
+
+          addressable_shape_delivery<TI> ii ((*il).confined (common_box, true));
+          for (; !ii.at_end (); ++ii) {
+            scanner.insert2 (ii.operator-> (), interactions.next_id ());
+          }
+
+          scanner.process (rec, dist, db::box_convert<TS> (), db::box_convert<TI> ());
+
+        }
+      }
+
     }
 
   }

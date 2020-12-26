@@ -65,7 +65,7 @@ static db::CompoundRegionOperationNode *new_interacting (db::CompoundRegionOpera
   if (b->result_type () == db::CompoundRegionOperationNode::Region) {
     return new db::CompoundRegionInteractOperationNode (a, b, 0, true, inverse, min_count, max_count);
   } else if (b->result_type () == db::CompoundRegionOperationNode::Edges) {
-    return new db::CompoundRegionInteractWithEdgeOperationNode (a, b, 0, true, inverse, min_count, max_count);
+    return new db::CompoundRegionInteractWithEdgeOperationNode (a, b, inverse, min_count, max_count);
   } else {
     throw tl::Exception ("Secondary input for interaction compound operation must be either of Region or Edges type");
   }

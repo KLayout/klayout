@@ -555,8 +555,8 @@ class DB_PUBLIC CompoundRegionInteractWithEdgeOperationNode
   : public compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon>
 {
 public:
-  CompoundRegionInteractWithEdgeOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b, int mode, bool touching, bool inverse, size_t min_count = 0, size_t max_count = std::numeric_limits<size_t>::max ())
-    : compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon> (&m_op, a, b), m_op (mode, touching, inverse, min_count, max_count)
+  CompoundRegionInteractWithEdgeOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b, bool inverse, size_t min_count = 0, size_t max_count = std::numeric_limits<size_t>::max ())
+    : compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon> (&m_op, a, b), m_op (inverse, min_count, max_count)
   {
     //  .. nothing yet ..
   }
@@ -577,7 +577,7 @@ public:
   }
 
 private:
-  db::interacting_local_operation<db::Polygon, db::Edge, db::Polygon> m_op;
+  db::interacting_with_edge_local_operation<db::Polygon, db::Edge, db::Polygon> m_op;
 };
 
 class DB_PUBLIC CompoundRegionPullOperationNode
@@ -616,32 +616,32 @@ private:
 };
 
 class DB_PUBLIC CompoundRegionPullWithEdgeOperationNode
-  : public compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon>
+  : public compound_region_generic_operation_node<db::Polygon, db::Edge, db::Edge>
 {
 public:
-  CompoundRegionPullWithEdgeOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b, int mode, bool touching)
-    : compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon> (&m_op, a, b), m_op (mode, touching)
+  CompoundRegionPullWithEdgeOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b)
+    : compound_region_generic_operation_node<db::Polygon, db::Edge, db::Edge> (&m_op, a, b), m_op ()
   {
     //  .. nothing yet ..
   }
 
   std::string generated_description () const
   {
-    return std::string ("pull") + compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon>::description ();
+    return std::string ("pull") + compound_region_generic_operation_node<db::Polygon, db::Edge, db::Edge>::description ();
   }
 
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
   {
     implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
   }
 
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
   {
     implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
   }
 
 private:
-  db::pull_local_operation<db::Polygon, db::Edge, db::Polygon> m_op;
+  db::pull_with_edge_local_operation<db::Polygon, db::Edge, db::Edge> m_op;
 };
 
 
@@ -835,8 +835,9 @@ private:
 
     child (0)->compute_local (layout, interactions, one, max_vertex_count, area_ratio);
 
+    std::vector<T> res;
     for (typename std::unordered_set<T>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
-      std::vector<T> res;
+      res.clear ();
       processed (layout, *p, res);
       results.front ().insert (res.begin (), res.end ());
     }
@@ -897,8 +898,9 @@ private:
 
     child (0)->compute_local (layout, interactions, one, max_vertex_count, area_ratio);
 
+    std::vector<T> res;
     for (typename std::unordered_set<db::Edge>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
-      std::vector<T> res;
+      res.clear ();
       processed (layout, *p, res);
       results.front ().insert (res.begin (), res.end ());
     }
@@ -937,8 +939,9 @@ private:
 
     child (0)->compute_local (layout, interactions, one, max_vertex_count, area_ratio);
 
+    std::vector<T> res;
     for (typename std::unordered_set<db::EdgePair>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
-      std::vector<T> res;
+      res.clear ();
       processed (layout, *p, res);
       results.front ().insert (res.begin (), res.end ());
     }
@@ -974,8 +977,9 @@ private:
 
     child (0)->compute_local (layout, interactions, one, max_vertex_count, area_ratio);
 
+    std::vector<db::Edge> res;
     for (typename std::unordered_set<db::EdgePair>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
-      std::vector<db::Edge> res;
+      res.clear ();
       mp_proc->process (*p, res);
       results.front ().insert (res.begin (), res.end ());
     }
@@ -1014,8 +1018,9 @@ private:
 
     child (0)->compute_local (layout, interactions, one, max_vertex_count, area_ratio);
 
+    std::vector<db::Edge> res;
     for (typename std::unordered_set<T>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
-      std::vector<db::Edge> res;
+      res.clear ();
       processed (layout, *p, res);
       results.front ().insert (res.begin (), res.end ());
     }
@@ -1064,8 +1069,9 @@ private:
 
     child (0)->compute_local (layout, interactions, one, max_vertex_count, area_ratio);
 
+    std::vector<db::EdgePair> res;
     for (typename std::unordered_set<T>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
-      std::vector<db::EdgePair> res;
+      res.clear ();
       processed (layout, *p, res);
       results.front ().insert (res.begin (), res.end ());
     }

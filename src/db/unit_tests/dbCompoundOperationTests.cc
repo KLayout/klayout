@@ -257,7 +257,7 @@ TEST(6_InteractWithEdgeOperation)
   db::CompoundRegionOperationSecondaryNode *secondary = new db::CompoundRegionOperationSecondaryNode (&r2);
   db::CompoundRegionToEdgeProcessingOperationNode *secondary_edges = new db::CompoundRegionToEdgeProcessingOperationNode (new db::PolygonToEdgeProcessor (), secondary, true);
 
-  db::CompoundRegionInteractWithEdgeOperationNode interact (primary, secondary_edges, 0, true, false);
+  db::CompoundRegionInteractWithEdgeOperationNode interact (primary, secondary_edges, false);
 
   db::Region res = r.cop_to_region (interact);
 
@@ -300,5 +300,40 @@ TEST(7_PullOperation)
 
   CHECKPOINT();
   db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au7.gds");
+}
+
+TEST(8_PullWithEdgeOperation)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/drc/compound_8.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::RegionCheckOptions check_options;
+  check_options.metrics = db::Projection;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  db::Region r (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l1));
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  db::Region r2 (db::RecursiveShapeIterator (ly, ly.cell (*ly.begin_top_down ()), l2));
+
+  db::CompoundRegionOperationPrimaryNode *primary = new db::CompoundRegionOperationPrimaryNode ();
+  db::CompoundRegionOperationSecondaryNode *secondary = new db::CompoundRegionOperationSecondaryNode (&r2);
+  db::CompoundRegionToEdgeProcessingOperationNode *secondary_edges = new db::CompoundRegionToEdgeProcessingOperationNode (new db::PolygonToEdgeProcessor (), secondary, true);
+
+  db::CompoundRegionPullWithEdgeOperationNode pull (primary, secondary_edges);
+
+  db::Edges res = r.cop_to_edges (pull);
+
+  unsigned int l1000 = ly.get_layer (db::LayerProperties (1000, 0));
+  res.insert_into (&ly, *ly.begin_top_down (), l1000);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au8.gds");
 }
 

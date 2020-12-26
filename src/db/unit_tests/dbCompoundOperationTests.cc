@@ -394,7 +394,7 @@ TEST(9_LogicalSelectOperation)
   db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/drc/compound_au9.gds");
 }
 
-TEST(10_LogicalSelectOperation)
+TEST(10_LogicalAndNotOperation)
 {
   db::Layout ly;
   {

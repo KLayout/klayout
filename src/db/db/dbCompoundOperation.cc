@@ -835,6 +835,7 @@ void compound_region_generic_operation_node<TS, TI, TR>::implement_compute_local
 
   const CompoundRegionOperationNode *self = child (0);
   std::vector<std::unordered_set<TS> > self_result;
+  self_result.push_back (std::unordered_set<TS> ());
 
   shape_interactions<TTS, TTI> self_interactions_heap;
   const shape_interactions<TTS, TTI> &self_interactions = interactions_for_child (interactions, 0, self_interactions_heap);
@@ -851,6 +852,7 @@ void compound_region_generic_operation_node<TS, TI, TR>::implement_compute_local
 
     const CompoundRegionOperationNode *intruder = child (ci);
     std::vector<std::unordered_set<TI> > intruder_result;
+    intruder_result.push_back (std::unordered_set<TI> ());
 
     shape_interactions<TTS, TTI> intruder_interactions_heap;
     const shape_interactions<TTS, TTI> &intruder_interactions = interactions_for_child (interactions, ci, intruder_interactions_heap);

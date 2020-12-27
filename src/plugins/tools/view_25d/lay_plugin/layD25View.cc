@@ -50,6 +50,9 @@ D25View::D25View (QWidget *parent)
   connect (mp_ui->fit_bottom, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
   connect (mp_ui->zoom_slider, SIGNAL (valueChanged (int)), this, SLOT (scale_slider_changed (int)));
   connect (mp_ui->d25_view, SIGNAL (scale_factor_changed (double)), this, SLOT (scale_factor_changed (double)));
+  connect (mp_ui->d25_view, SIGNAL (init_failed ()), this, SLOT (init_failed ()));
+
+  mp_ui->gl_stack->setCurrentIndex (0);
 }
 
 D25View::~D25View ()
@@ -63,6 +66,13 @@ static QString scale_factor_to_string (double f)
   QString s;
   s.sprintf ("x %.3g", f);
   return s;
+}
+
+void
+D25View::init_failed ()
+{
+  mp_ui->error_text->setPlainText (tl::to_qstring (mp_ui->d25_view->error ()));
+  mp_ui->gl_stack->setCurrentIndex (1);
 }
 
 void

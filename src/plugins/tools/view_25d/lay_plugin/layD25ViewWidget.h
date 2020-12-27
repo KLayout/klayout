@@ -104,8 +104,14 @@ public:
     refresh ();
   }
 
+  const std::string &error () const
+  {
+    return m_error;
+  }
+
 signals:
   void scale_factor_changed (double f);
+  void init_failed ();
 
 protected:
   virtual void camera_changed ();
@@ -119,6 +125,7 @@ private:
 
   std::auto_ptr<D25InteractionMode> mp_mode;
   QOpenGLShaderProgram *m_shapes_program, *m_gridplane_program;
+  std::string m_error;
   double m_scale_factor;
   QVector3D m_displacement;
   lay::LayoutView *mp_view;
@@ -126,9 +133,11 @@ private:
   double m_zmin, m_zmax;
 
   std::list<chunks_type> m_vertex_chunks;
+  std::list<chunks_type> m_normals_chunks;
 
   struct LayerInfo {
     const chunks_type *vertex_chunk;
+    const chunks_type *normals_chunk;
     GLfloat color [4];
   };
 
@@ -138,6 +147,7 @@ private:
   void paintGL ();
   void resizeGL (int w, int h);
 
+  void do_initialize_gl ();
   bool prepare_view();
   void render_layout (D25ViewWidget::chunks_type &chunks, const db::Layout &layout, const db::Cell &cell, unsigned int layer, double zstart, double zstop);
   void render_polygon (D25ViewWidget::chunks_type &chunks, const db::Polygon &poly, double dbu, double zstart, double zstop);

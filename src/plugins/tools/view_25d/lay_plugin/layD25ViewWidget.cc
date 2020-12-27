@@ -36,6 +36,9 @@
 #include <QWheelEvent>
 #include <QMouseEvent>
 #include <QKeyEvent>
+#include <QImage>
+#include <QPainter>
+#include <QOpenGLTexture>
 
 #include "math.h"
 
@@ -186,7 +189,7 @@ private:
 
 D25ViewWidget::D25ViewWidget (QWidget *parent)
   : QOpenGLWidget (parent),
-    m_shapes_program (0)
+    m_shapes_program (0), m_gridplane_program (0)
 {
   QSurfaceFormat format;
   format.setDepthBufferSize (24);
@@ -695,6 +698,39 @@ static std::pair<double, double> find_grid (double v)
 void
 D25ViewWidget::initializeGL ()
 {
+  tl_assert (m_shapes_program == 0);
+  tl_assert (m_gridplane_program == 0);
+
+  bool error = false;
+
+  try {
+    do_initialize_gl ();
+  } catch (tl::Exception &ex) {
+    m_error = ex.msg ();
+    error = true;
+  } catch (std::exception &ex) {
+    m_error = ex.what ();
+    error = true;
+  } catch (...) {
+    m_error = "(unspecific error)";
+    error = true;
+  }
+
+  if (error) {
+
+    delete m_shapes_program;
+    m_shapes_program = 0;
+    delete m_gridplane_program;
+    m_gridplane_program = 0;
+
+    emit init_failed ();
+
+  }
+}
+
+void
+D25ViewWidget::do_initialize_gl ()
+{
   QOpenGLFunctions::initializeOpenGLFunctions();
 
   glEnable (GL_BLEND);
@@ -824,8 +860,8 @@ D25ViewWidget::initializeGL ()
 void
 D25ViewWidget::paintGL ()
 {
-  const qreal retinaScale = devicePixelRatio ();
-  glViewport (0, 0, width () * retinaScale, height () * retinaScale);
+  const qreal retina_scale = devicePixelRatio ();
+  glViewport (0, 0, width () * retina_scale, height () * retina_scale);
 
   QColor c = mp_view->background_color ();
   float foreground_rgb = (c.green () > 128 ? 0.0f : 1.0f);
@@ -834,6 +870,12 @@ D25ViewWidget::paintGL ()
   float mist_add = (c.green () > 128 ? 0.8f : 0.2f);
   glClearColor (float (c.red ()) / 255.0f, float (c.green ()) / 255.0f, float (c.blue ()) / 255.0f, 1.0);
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  const int positions = 0;
+
+  if (! m_shapes_program || ! m_gridplane_program) {
+    return;
+  }
 
   QMatrix4x4 scene_trans, scene_trans_wo_y;
 
@@ -845,8 +887,6 @@ D25ViewWidget::paintGL ()
 
   scene_trans_wo_y = scene_trans;
   scene_trans_wo_y.translate (QVector3D (0.0, -m_displacement.y (), 0.0));
-
-  const int positions = 0;
 
   m_shapes_program->bind ();
 

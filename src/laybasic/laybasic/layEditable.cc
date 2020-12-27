@@ -92,7 +92,7 @@ Editables::del (db::Transaction *transaction)
 {
   std::auto_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (QObject::tr ("Delete"))));
 
-  if (selection_size () > 0) {
+  if (has_selection ()) {
 
     try {
 
@@ -118,7 +118,7 @@ Editables::del (db::Transaction *transaction)
 void 
 Editables::cut ()
 {
-  if (selection_size () > 0) {
+  if (has_selection ()) {
 
     cancel_edits ();
 
@@ -136,7 +136,7 @@ Editables::cut ()
 void 
 Editables::copy ()
 {
-  if (selection_size () > 0) {
+  if (has_selection ()) {
     db::Clipboard::instance ().clear ();
     for (iterator e = begin (); e != end (); ++e) {
       e->copy ();
@@ -170,7 +170,7 @@ Editables::transform (const db::DCplxTrans &tr, db::Transaction *transaction)
 {
   std::auto_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (QObject::tr ("Transform"))));
 
-  if (selection_size () > 0) {
+  if (has_selection ()) {
 
     try {
 
@@ -298,19 +298,33 @@ Editables::clear_previous_selection ()
 void 
 Editables::clear_transient_selection ()
 {
+  bool had_transient_selection = false;
   for (iterator e = begin (); e != end (); ++e) {
+    if (e->has_transient_selection ()) {
+      had_transient_selection = true;
+    }
     e->clear_transient_selection ();
   }
 
   //  send a signal to the observers
-  signal_transient_selection_changed ();
+  if (had_transient_selection) {
+    signal_transient_selection_changed ();
+  }
 }
 
 void
 Editables::transient_to_selection ()
 {
+  bool had_transient_selection = false;
+  bool had_selection = false;
   cancel_edits ();
   for (iterator e = begin (); e != end (); ++e) {
+    if (e->has_selection ()) {
+      had_selection = true;
+    }
+    if (e->has_transient_selection ()) {
+      had_transient_selection = true;
+    }
     e->select (db::DBox (), lay::Editable::Reset);  //  clear selection
     e->clear_previous_selection ();
     e->transient_to_selection ();
@@ -318,22 +332,41 @@ Editables::transient_to_selection ()
   }
 
   //  send a signal to the observers
-  signal_transient_selection_changed ();
-  signal_selection_changed ();
+  if (had_transient_selection) {
+    signal_transient_selection_changed ();
+  }
+  if (had_selection || had_transient_selection) {
+    signal_selection_changed ();
+  }
 }
 
 void 
 Editables::clear_selection ()
 {
   cancel_edits ();
+
+  bool had_transient_selection = false;
+  bool had_selection = false;
+
   for (iterator e = begin (); e != end (); ++e) {
+    if (e->has_selection ()) {
+      had_selection = true;
+    }
+    if (e->has_transient_selection ()) {
+      had_transient_selection = true;
+    }
     e->select (db::DBox (), lay::Editable::Reset);  //  clear selection
     e->clear_transient_selection ();
     e->clear_previous_selection ();
   }
 
   //  send a signal to the observers
-  signal_selection_changed ();
+  if (had_transient_selection) {
+    signal_transient_selection_changed ();
+  }
+  if (had_selection) {
+    signal_selection_changed ();
+  }
 }
 
 void 
@@ -479,7 +512,7 @@ Editables::begin_move (const db::DPoint &p, lay::angle_constraint_type ac)
   //  sort the plugins found by the proximity
   std::sort (plugins.begin (), plugins.end (), first_of_pair_cmp_f<double, iterator> ());
 
-  if (selection_size () > 0 && selection_catch_bbox ().contains (p)) {
+  if (has_selection () && selection_catch_bbox ().contains (p)) {
 
     //  if anything is selected and we are within the selection bbox, 
     //  issue a move operation on all editables: first try a Partial mode begin_move
@@ -527,7 +560,7 @@ Editables::begin_move (const db::DPoint &p, lay::angle_constraint_type ac)
     select (p, Editable::Replace);
 
     //  now we assume we have a selection - try to begin_move on this.
-    if (selection_size () > 0) {
+    if (has_selection ()) {
       m_move_selection = true;
       for (iterator e = begin (); e != end (); ++e) {
         e->begin_move (Editable::Selected, p, ac);
@@ -601,7 +634,18 @@ Editables::selection_size ()
   return c;
 }
 
-void 
+bool
+Editables::has_selection ()
+{
+  for (iterator e = begin (); e != end (); ++e) {
+    if (e->has_selection ()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+void
 Editables::edit_cancel ()
 {
   clear_previous_selection ();
@@ -627,7 +671,7 @@ Editables::cancel_edits ()
 void
 Editables::show_properties (QWidget *parent)
 {
-  if (selection_size () == 0) {
+  if (! has_selection ()) {
     //  try to use the transient selection for the real one
     transient_to_selection ();
   }

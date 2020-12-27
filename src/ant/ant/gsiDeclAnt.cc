@@ -1117,7 +1117,7 @@ static bool has_annotation_selection (const lay::LayoutView *view)
 {
   std::vector<ant::Service *> ant_services = view->get_plugins <ant::Service> ();
   for (std::vector<ant::Service *>::const_iterator s = ant_services.begin (); s != ant_services.end (); ++s) {
-    if ((*s)->selection_size () > 0) {
+    if ((*s)->has_selection ()) {
       return true;
     }
   }

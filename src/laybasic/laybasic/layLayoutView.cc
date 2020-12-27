@@ -5246,7 +5246,7 @@ LayoutView::has_selection ()
   } else if (mp_hierarchy_panel && mp_hierarchy_panel->has_focus ()) {
     return mp_hierarchy_panel->has_selection ();
   } else {
-    return lay::Editables::selection_size () > 0;
+    return lay::Editables::has_selection ();
   }
 }
 
@@ -5319,7 +5319,7 @@ LayoutView::copy ()
     mp_control_panel->copy ();
   } else {
 
-    if (lay::Editables::selection_size () == 0) {
+    if (! lay::Editables::has_selection ()) {
       //  try to use the transient selection for the real one
       lay::Editables::transient_to_selection ();
     }
@@ -5341,7 +5341,7 @@ LayoutView::cut ()
     mp_control_panel->cut ();
   } else {
 
-    if (lay::Editables::selection_size () == 0) {
+    if (! lay::Editables::has_selection ()) {
       //  try to use the transient selection for the real one
       lay::Editables::transient_to_selection ();
     }

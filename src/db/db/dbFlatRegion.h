@@ -29,6 +29,7 @@
 #include "dbAsIfFlatRegion.h"
 #include "dbShapes.h"
 #include "dbShapes2.h"
+#include "tlCopyOnWrite.h"
 
 namespace db {
 
@@ -134,14 +135,16 @@ public:
   void transform (const Trans &trans)
   {
     if (! trans.is_unity ()) {
-      for (polygon_iterator_type p = m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin (); p != m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end (); ++p) {
-        m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
+      db::Shapes &polygons = *mp_polygons;
+      for (polygon_iterator_type p = polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin (); p != polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end (); ++p) {
+        polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
       }
       invalidate_cache ();
     }
   }
 
-  db::Shapes &raw_polygons () { return m_polygons; }
+  db::Shapes &raw_polygons () { return *mp_polygons; }
+  const db::Shapes &raw_polygons () const { return *mp_polygons; }
 
 protected:
   virtual void merged_semantics_changed ();
@@ -157,8 +160,8 @@ private:
   FlatRegion &operator= (const FlatRegion &other);
 
   bool m_is_merged;
-  mutable db::Shapes m_polygons;
-  mutable db::Shapes m_merged_polygons;
+  mutable tl::copy_on_write_ptr<db::Shapes> mp_polygons;
+  mutable tl::copy_on_write_ptr<db::Shapes> mp_merged_polygons;
   mutable bool m_merged_polygons_valid;
 
   void init ();

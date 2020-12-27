@@ -30,6 +30,7 @@
 #include "dbShapes.h"
 #include "dbShapes2.h"
 #include "dbGenericShapeIterator.h"
+#include "tlCopyOnWrite.h"
 
 namespace db {
 
@@ -138,14 +139,16 @@ public:
   void transform (const Trans &trans)
   {
     if (! trans.is_unity ()) {
-      for (edge_iterator_type p = m_edges.template get_layer<db::Edge, db::unstable_layer_tag> ().begin (); p != m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().end (); ++p) {
-        m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
+      db::Shapes &e = *mp_edges;
+      for (edge_iterator_type p = e.template get_layer<db::Edge, db::unstable_layer_tag> ().begin (); p != e.get_layer<db::Edge, db::unstable_layer_tag> ().end (); ++p) {
+        e.get_layer<db::Edge, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
       }
       invalidate_cache ();
     }
   }
 
-  db::Shapes &raw_edges () { return m_edges; }
+  db::Shapes &raw_edges () { return *mp_edges; }
+  const db::Shapes &raw_edges () const { return *mp_edges; }
 
 protected:
   virtual void merged_semantics_changed ();
@@ -159,8 +162,8 @@ private:
   FlatEdges &operator= (const FlatEdges &other);
 
   bool m_is_merged;
-  mutable db::Shapes m_edges;
-  mutable db::Shapes m_merged_edges;
+  mutable tl::copy_on_write_ptr<db::Shapes> mp_edges;
+  mutable tl::copy_on_write_ptr<db::Shapes> mp_merged_edges;
   mutable bool m_merged_edges_valid;
 
   void init ();

@@ -202,7 +202,7 @@ gsi::EnumIn<db::LoadLayoutOptions, db::CellConflictResolution> decl_dbCommonRead
   gsi::enum_const ("RenameCell", db::RenameCell,
     "@brief The new cell will be renamed to become unique\n"
   ),
-  "@brief This enum specifies how cell conflicts are handled if a layout read into another layout and a cell name conflict arises. "
+  "@brief This enum specifies how cell conflicts are handled if a layout read into another layout and a cell name conflict arises.\n"
   "Until version 0.26.8 and before, the mode was always 'AddToCell'. On reading, a cell was 'reopened' when encountering a cell name "
   "which already existed. This mode is still the default. The other modes are made available to support other ways of merging layouts.\n"
   "\n"

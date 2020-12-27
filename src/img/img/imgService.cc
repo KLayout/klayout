@@ -1006,7 +1006,7 @@ Service::edit_cancel ()
 void 
 Service::cut ()
 {
-  if (selection_size () > 0) {
+  if (has_selection ()) {
 
     //  copy & delete the selected images
     copy_selected ();
@@ -1052,7 +1052,7 @@ Service::paste ()
 void 
 Service::del ()
 {
-  if (selection_size () > 0) {
+  if (has_selection ()) {
 
     //  delete the selected images
     del_selected ();
@@ -1078,10 +1078,22 @@ Service::del_selected ()
   mp_view->annotation_shapes ().erase_positions (positions.begin (), positions.end ());
 }
 
-size_t 
+bool
+Service::has_selection ()
+{
+  return ! m_selected.empty ();
+}
+
+size_t
 Service::selection_size ()
 {
   return m_selected.size ();
+}
+
+bool
+Service::has_transient_selection ()
+{
+  return mp_transient_view != 0;
 }
 
 void
@@ -1193,7 +1205,7 @@ Service::transient_select (const db::DPoint &pos)
 
     //  if in move mode (which also receives transient_select requests) the move will take the selection,
     //  hence only highlight the transient selection if it's part of the current selection.
-    if (view ()->selection_size () > 0 && view ()->is_move_mode () && m_selected.find (imin) == m_selected.end ()) {
+    if (view ()->has_selection () && view ()->is_move_mode () && m_selected.find (imin) == m_selected.end ()) {
       return false;
     }
 
@@ -1208,7 +1220,7 @@ Service::transient_select (const db::DPoint &pos)
 
   }
 
-  if (any_selected && editables ()->selection_size () == 0) {
+  if (any_selected && ! editables ()->has_selection ()) {
     display_status (true);
   }
 

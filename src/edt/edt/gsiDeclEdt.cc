@@ -525,7 +525,7 @@ static bool has_object_selection (const lay::LayoutView *view)
 {
   std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
-    if ((*s)->selection_size () > 0) {
+    if ((*s)->has_selection ()) {
       return true;
     }
   }

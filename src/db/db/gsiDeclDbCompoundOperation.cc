@@ -223,11 +223,11 @@ static db::CompoundRegionOperationNode *new_edge_pair_to_second_edges_node (db::
   return new db::CompoundRegionEdgePairToEdgeProcessingOperationNode (new db::EdgePairToSecondEdgesProcessor (), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_check_node (db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter)
+static db::CompoundRegionOperationNode *new_check_node (db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter)
 {
   return new db::CompoundRegionCheckOperationNode (rel, different_polygons, d,
     db::RegionCheckOptions (whole_edges,
-                            metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()),
+                            metrics,
                             ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                             min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
                             max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),

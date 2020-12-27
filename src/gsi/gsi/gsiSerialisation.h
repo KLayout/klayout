@@ -1106,8 +1106,8 @@ public:
 //  Variant adaptor framework
 
 /**
- *  @brief A generic adaptor for strings
- *  This is the base class for implementing generic access to strings
+ *  @brief A generic adaptor for variants
+ *  This is the base class for implementing generic access to variants
  */
 class GSI_PUBLIC VariantAdaptor
   : public AdaptorBase
@@ -1145,7 +1145,7 @@ public:
 };
 
 /**
- *  @brief Generic string adaptor implementation
+ *  @brief Generic variant adaptor implementation
  */
 template <class X> 
 class GSI_PUBLIC_TEMPLATE VariantAdaptorImpl
@@ -1274,7 +1274,12 @@ public:
     return *mp_v;
   }
 
-  virtual void set (const tl::Variant &v) 
+  tl::Variant &var_ref_nc ()
+  {
+    return *mp_v;
+  }
+
+  virtual void set (const tl::Variant &v)
   {
     if (! m_is_const) {
       *mp_v = v;

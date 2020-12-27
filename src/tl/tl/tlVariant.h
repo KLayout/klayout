@@ -862,6 +862,11 @@ public:
   void user_destroy ();
 
   /**
+   *  @brief Takes the user object and releases it from the variant
+   */
+  void *user_take ();
+
+  /**
    *  @brief Assigns the object stored in other to self
    *
    *  "other" needs to be a user object and the class of "other" needs to be same as self.

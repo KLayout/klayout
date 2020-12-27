@@ -2460,8 +2460,18 @@ void Variant::user_destroy ()
   void *obj = to_user ();
   if (obj) {
     user_cls ()->destroy (obj);
+    m_type = t_nil;
   }
-  reset ();
+}
+
+void *Variant::user_take ()
+{
+  tl_assert (is_user ());
+  void *obj = to_user ();
+  if (obj) {
+    m_type = t_nil;
+  }
+  return obj;
 }
 
 void Variant::user_assign (const tl::Variant &other)

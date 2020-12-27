@@ -508,11 +508,11 @@ TEST(15a)
   EXPECT_EQ (r.width_check (15).to_string (), "(0,0;0,10)/(10,10;10,0);(0,10;10,10)/(10,0;0,0)");
   EXPECT_EQ (r.width_check (5).to_string (), "");
   EXPECT_EQ (r.width_check (5, db::RegionCheckOptions (false, db::Euclidian, 91)).to_string (), "(0,5;0,10)/(0,10;5,10);(0,0;0,5)/(5,0;0,0);(5,10;10,10)/(10,10;10,5);(10,5;10,0)/(10,0;5,0);(20,45;20,50)/(20,50;25,50);(20,20;20,25)/(25,20;20,20);(35,50;40,50)/(40,50;40,45);(40,25;40,20)/(40,20;35,20)");
-  EXPECT_EQ (r.space_check (15, db::RegionCheckOptions (false, db::Euclidian, 91)).to_string (), "(10,10;10,9)/(21,20;20,20);(10,10;10,9)/(20,20;20,21);(9,10;10,10)/(21,20;20,20);(9,10;10,10)/(20,20;20,21)");
-  EXPECT_EQ (r.space_check (15, db::RegionCheckOptions (false, db::Square, 91)).to_string (), "(10,10;10,5)/(25,20;20,20);(10,10;10,5)/(20,20;20,25);(5,10;10,10)/(25,20;20,20);(5,10;10,10)/(20,20;20,25)");
-  EXPECT_EQ (r.space_check (15).to_string (), "(10,10;10,9)/(20,20;20,21);(9,10;10,10)/(21,20;20,20)");
-  EXPECT_EQ (r.space_check (15, db::RegionCheckOptions (true)).to_string (), "(10,10;10,0)/(20,20;20,50);(0,10;10,10)/(40,20;20,20)");
-  EXPECT_EQ (r.space_check (15, db::RegionCheckOptions (false, db::Square)).to_string (), "(10,10;10,5)/(20,20;20,25);(5,10;10,10)/(25,20;20,20)");
+  EXPECT_EQ (r.space_check (15, db::RegionCheckOptions (false, db::Euclidian, 91)).to_string (), "(21,20;20,20)/(10,10;10,9);(21,20;20,20)/(9,10;10,10);(20,20;20,21)/(10,10;10,9);(20,20;20,21)/(9,10;10,10)");
+  EXPECT_EQ (r.space_check (15, db::RegionCheckOptions (false, db::Square, 91)).to_string (), "(25,20;20,20)/(10,10;10,5);(25,20;20,20)/(5,10;10,10);(20,20;20,25)/(10,10;10,5);(20,20;20,25)/(5,10;10,10)");
+  EXPECT_EQ (r.space_check (15).to_string (), "(21,20;20,20)/(9,10;10,10);(20,20;20,21)/(10,10;10,9)");
+  EXPECT_EQ (r.space_check (15, db::RegionCheckOptions (true)).to_string (), "(40,20;20,20)/(0,10;10,10);(20,20;20,50)/(10,10;10,0)");
+  EXPECT_EQ (r.space_check (15, db::RegionCheckOptions (false, db::Square)).to_string (), "(25,20;20,20)/(5,10;10,10);(20,20;20,25)/(10,10;10,5)");
 
   r.clear ();
   db::Point pts[] = {
@@ -545,9 +545,9 @@ TEST(15b)
   r.insert (db::Box (db::Point (400, 200), db::Point (500, 300)));
 
   EXPECT_EQ (r.width_check (120, db::RegionCheckOptions (false, db::Projection)).to_string (), "(400,200;400,300)/(500,300;500,200)");
-  EXPECT_EQ (r.space_check (120, db::RegionCheckOptions (false, db::Projection)).to_string (), "(200,500;200,300)/(300,300;300,500);(300,200;400,200)/(400,300;300,300);(200,200;200,0)/(300,0;300,200)");
+  EXPECT_EQ (r.space_check (120, db::RegionCheckOptions (false, db::Projection)).to_string (), "(300,200;400,200)/(400,300;300,300);(300,300;300,500)/(200,500;200,300);(300,0;300,200)/(200,200;200,0)");
   EXPECT_EQ (r.notch_check (120, db::RegionCheckOptions (false, db::Projection)).to_string (), "(300,200;400,200)/(400,300;300,300)");
-  EXPECT_EQ (r.isolated_check (120, db::RegionCheckOptions (false, db::Projection)).to_string (), "(300,300;300,500)/(200,500;200,300);(300,0;300,200)/(200,200;200,0)");
+  EXPECT_EQ (r.isolated_check (120, db::RegionCheckOptions (false, db::Projection)).to_string (), "(200,500;200,300)/(300,300;300,500);(200,200;200,0)/(300,0;300,200)");
 }
 
 TEST(15c) 
@@ -563,9 +563,9 @@ TEST(15c)
   r.insert (db::Box (db::Point (400, 250), db::Point (500, 300)));
 
   EXPECT_EQ (r.width_check (120, db::RegionCheckOptions (false, db::Projection)).to_string (), "(400,200;400,300)/(500,300;500,200)");
-  EXPECT_EQ (r.space_check (120, db::RegionCheckOptions (false, db::Projection)).to_string (), "(200,500;200,300)/(300,300;300,500);(300,200;400,200)/(400,300;300,300);(200,200;200,0)/(300,0;300,200)");
+  EXPECT_EQ (r.space_check (120, db::RegionCheckOptions (false, db::Projection)).to_string (), "(300,200;400,200)/(400,300;300,300);(300,300;300,500)/(200,500;200,300);(300,0;300,200)/(200,200;200,0)");
   EXPECT_EQ (r.notch_check (120, db::RegionCheckOptions (false, db::Projection)).to_string (), "(300,200;400,200)/(400,300;300,300)");
-  EXPECT_EQ (r.isolated_check (120, db::RegionCheckOptions (false, db::Projection)).to_string (), "(300,300;300,500)/(200,500;200,300);(300,0;300,200)/(200,200;200,0)");
+  EXPECT_EQ (r.isolated_check (120, db::RegionCheckOptions (false, db::Projection)).to_string (), "(200,500;200,300)/(300,300;300,500);(200,200;200,0)/(300,0;300,200)");
 }
 
 TEST(15d) 
@@ -581,12 +581,12 @@ TEST(15d)
   r.insert (db::Box (db::Point (0, 140), db::Point (350, 160)));
 
   EXPECT_EQ (r.space_check (120, db::RegionCheckOptions (false, db::Projection)).to_string (),
-    "(600,100;700,100)/(700,200;600,200);"
-    "(300,160;350,160)/(350,200;300,200);"
-    "(0,100;100,100)/(100,140;0,140);"
-    "(300,100;350,100)/(350,140;300,140);"
-    "(300,100;400,100)/(400,200;300,200);"
-    "(100,200;0,200)/(0,160;100,160)"
+    "(100,140;0,140)/(0,100;100,100);"
+    "(350,140;300,140)/(300,100;350,100);"
+    "(100,200;0,200)/(0,160;100,160);"
+    "(400,200;300,200)/(300,100;400,100);"
+    "(350,200;300,200)/(300,160;350,160);"
+    "(700,200;600,200)/(600,100;700,100)"
   );
 }
 
@@ -1242,7 +1242,7 @@ TEST(20)
   {
     db::Region r1 (db::RecursiveShapeIterator (ly, ly.cell (top), l2));
     EXPECT_EQ (r1.has_valid_polygons (), false);
-    EXPECT_EQ (r1.space_check (30).to_string (), "(70,20;70,12)/(80,40;80,48);(60,20;70,20)/(92,40;80,40);(40,40;40,10)/(60,10;60,20)");
+    EXPECT_EQ (r1.space_check (30).to_string (), "(40,40;40,10)/(60,10;60,20);(92,40;80,40)/(60,20;70,20);(80,40;80,48)/(70,20;70,12)");
     EXPECT_EQ (r1.space_check (2).to_string (), "");
   }
 

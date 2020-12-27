@@ -46,32 +46,6 @@ static inline const db::PolygonRef *push_polygon_to_heap (db::Layout *layout, co
   return &heap.back ();
 }
 
-static inline bool needs_merge (const std::unordered_set<db::PolygonRef> &polygons)
-{
-  if (polygons.empty ()) {
-    return false;
-  } else if (polygons.size () > 1) {
-    return true;
-  } else if (polygons.begin ()->obj ().is_box ()) {
-    return false;
-  } else {
-    return true;
-  }
-}
-
-static inline bool needs_merge (const std::unordered_set<db::Polygon> &polygons)
-{
-  if (polygons.empty ()) {
-    return false;
-  } else if (polygons.size () > 1) {
-    return true;
-  } else if (polygons.begin ()->is_box ()) {
-    return false;
-  } else {
-    return true;
-  }
-}
-
 struct ResultInserter
 {
   typedef db::Polygon value_type;
@@ -167,12 +141,28 @@ static bool shields_interaction (const db::EdgePair &ep, const P &poly)
   return false;
 }
 
-
 template <class TS, class TI>
 check_local_operation<TS, TI>::check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool other_is_merged, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter)
   : m_check (check), m_different_polygons (different_polygons), m_has_other (has_other), m_other_is_merged (other_is_merged), m_shielded (shielded), m_opposite_filter (opposite_filter), m_rect_filter (rect_filter)
 {
   //  .. nothing yet ..
+}
+
+namespace
+{
+
+template <class T, class S>
+void insert_into_hash (std::unordered_set<T> &, const S &)
+{
+  tl_assert (false);
+}
+
+template <class T>
+void insert_into_hash (std::unordered_set<T> &hash, const T &shape)
+{
+  hash.insert (shape);
+}
+
 }
 
 template <class TS, class TI>
@@ -190,13 +180,14 @@ check_local_operation<TS, TI>::compute_local (db::Layout *layout, const shape_in
   db::box_scanner<TS, size_t> scanner;
   std::unordered_set<TI> polygons;
 
-  if (m_has_other) {
-
-    for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      for (typename shape_interactions<TS, TI>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        polygons.insert (interactions.intruder_shape (*j).second);
-      }
+  std::set<unsigned int> ids;
+  for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (typename shape_interactions<TS, TI>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+      ids.insert (*j);
     }
+  }
+
+  if (m_has_other) {
 
     size_t n = 0;
     for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
@@ -207,14 +198,20 @@ check_local_operation<TS, TI>::compute_local (db::Layout *layout, const shape_in
 
     //  merge the intruders to remove inner edges
 
-    if (! m_other_is_merged && needs_merge (polygons)) {
+    if (ids.empty ()) {
+
+      //  empty intruders
+
+    } else if (! m_other_is_merged && (ids.size () > 1 || ! interactions.intruder_shape (*ids.begin ()).second.is_box ())) {
 
       db::EdgeProcessor ep;
 
       ep.clear ();
       size_t i = 0;
-      for (typename std::unordered_set<TI>::const_iterator o = polygons.begin (); o != polygons.end (); ++o) {
-        for (typename TI::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
+
+      for (std::set<unsigned int>::const_iterator id = ids.begin (); id != ids.end (); ++id) {
+        const TI &is = interactions.intruder_shape (*id).second;
+        for (typename TI::polygon_edge_iterator e = is.begin_edge (); ! e.at_end (); ++e) {
           ep.insert (*e, i);
         }
         ++i;
@@ -227,27 +224,42 @@ check_local_operation<TS, TI>::compute_local (db::Layout *layout, const shape_in
       db::SimpleMerge op (1 /*wc>0*/);
       ep.process (pg, op);
 
-    }
+      n = 1;
+      for (typename std::unordered_set<TI>::const_iterator o = polygons.begin (); o != polygons.end (); ++o) {
+        scanner.insert (push_polygon_to_heap (layout, *o, heap), n);
+        n += 2;
+      }
 
-    n = 1;
-    for (typename std::unordered_set<TI>::const_iterator o = polygons.begin (); o != polygons.end (); ++o) {
-      scanner.insert (push_polygon_to_heap (layout, *o, heap), n);
-      n += 2;
+    } else {
+
+      n = 1;
+      for (std::set<unsigned int>::const_iterator id = ids.begin (); id != ids.end (); ++id) {
+        scanner.insert (push_polygon_to_heap (layout, interactions.intruder_shape (*id).second, heap), n);
+        n += 2;
+      }
+
     }
 
   } else {
 
-    for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      polygons.insert (interactions.subject_shape (i->first));
-      for (typename shape_interactions<TS, TI>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        polygons.insert (interactions.intruder_shape (*j).second);
-      }
-    }
+    //  NOTE: we need to eliminate identical shapes from intruders and subjects because those will shield
 
     size_t n = 0;
-    for (typename std::unordered_set<TI>::const_iterator o = polygons.begin (); o != polygons.end (); ++o) {
-      scanner.insert (push_polygon_to_heap (layout, *o, heap), n);
+
+    for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      //  we can't directly insert because TS may be != TI
+      const TS &ts = interactions.subject_shape (i->first);
+      insert_into_hash (polygons, ts);
+      scanner.insert (push_polygon_to_heap (layout, ts, heap), n);
       n += 2;
+    }
+
+    for (std::set<unsigned int>::const_iterator id = ids.begin (); id != ids.end (); ++id) {
+      const TI &ti = interactions.intruder_shape (*id).second;
+      if (polygons.find (ti) == polygons.end ()) {
+        scanner.insert (push_polygon_to_heap (layout, ti, heap), n);
+        n += 2;
+      }
     }
 
   }

@@ -29,6 +29,7 @@
 #include "dbAsIfFlatEdgePairs.h"
 #include "dbShapes.h"
 #include "dbGenericShapeIterator.h"
+#include "tlCopyOnWrite.h"
 
 namespace db {
 
@@ -109,14 +110,16 @@ public:
   void transform (const Trans &trans)
   {
     if (! trans.is_unity ()) {
-      for (edge_pair_iterator_type p = m_edge_pairs.template get_layer<db::EdgePair, db::unstable_layer_tag> ().begin (); p != m_edge_pairs.template get_layer<db::EdgePair, db::unstable_layer_tag> ().end (); ++p) {
-        m_edge_pairs.get_layer<db::EdgePair, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
+      db::Shapes &ep = *mp_edge_pairs;
+      for (edge_pair_iterator_type p = ep.template get_layer<db::EdgePair, db::unstable_layer_tag> ().begin (); p != ep.template get_layer<db::EdgePair, db::unstable_layer_tag> ().end (); ++p) {
+        ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
       }
       invalidate_cache ();
     }
   }
 
-  db::Shapes &raw_edge_pairs () { return m_edge_pairs; }
+  db::Shapes &raw_edge_pairs () { return *mp_edge_pairs; }
+  const db::Shapes &raw_edge_pairs () const { return *mp_edge_pairs; }
 
 protected:
   virtual Box compute_bbox () const;
@@ -127,7 +130,7 @@ private:
 
   FlatEdgePairs &operator= (const FlatEdgePairs &other);
 
-  mutable db::Shapes m_edge_pairs;
+  mutable tl::copy_on_write_ptr<db::Shapes> mp_edge_pairs;
 };
 
 }

@@ -31,7 +31,7 @@
 namespace lay
 {
 
-const double initial_elevation = 3.0;
+const double initial_elevation = 15.0;
 
 D25View::D25View (QWidget *parent)
   : QDialog (parent)
@@ -110,7 +110,7 @@ D25View::exec_dialog (lay::LayoutView *view)
 
   mp_ui->d25_view->reset ();
   mp_ui->d25_view->set_cam_azimuth (0.0);
-  mp_ui->d25_view->set_cam_elevation (initial_elevation);
+  mp_ui->d25_view->set_cam_elevation (-initial_elevation);
   mp_ui->d25_view->fit ();
 
   int ret = QDialog::exec ();
@@ -140,8 +140,10 @@ D25View::fit_button_clicked ()
     azimuth = -90.0;
     elevation = -initial_elevation;
   } else if (sender () == mp_ui->fit_top) {
+    azimuth = 0;
     elevation = -90;
   } else if (sender () == mp_ui->fit_bottom) {
+    azimuth = 0;
     elevation = 90;
   }
 

@@ -384,9 +384,8 @@ D25ViewWidget::fit ()
   QVector3D new_center (0.0, 0.0, -dv / 2.0 + std::max (0.0, -d / (2.0 * tan (cam_fov () * M_PI / 180.0 / 2.0)) + cam_dist ()));
   QVector3D new_center_in_scene = cam_trans ().inverted ().map (new_center);
 
-  new_center_in_scene.setY (0.0);
-
   m_displacement = (new_center_in_scene - dim * 0.5) / m_scale_factor - bll;
+  m_displacement.setY (0.0);
 
   refresh ();
 

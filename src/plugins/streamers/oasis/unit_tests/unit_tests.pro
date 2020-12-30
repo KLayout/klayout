@@ -6,7 +6,7 @@ TARGET = oasis_tests
 include($$PWD/../../../../lib_ut.pri)
 
 SOURCES = \
-  dbOASISReader.cc \
+  dbOASISReaderTests.cc \
   dbOASISWriter2.cc \
   dbOASISWriter.cc \
 

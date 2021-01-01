@@ -1,0 +1,1104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category/>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>ruby</interpreter>
+ <dsl-interpreter-name/>
+ <text>
+module DRC
+
+class DRCLayer
+
+  def drc(op)
+    requires_region("drc")
+    return DRCLayer::new(@engine, self.data.complex_op(op.create_node))
+  end
+  
+end  
+
+class DRCOpNode
+
+  attr_accessor :description
+  attr_accessor :engine
+  
+  def initialize(engine, node = nil)
+    @node = nil
+    self.engine = engine
+    self.description = "Basic"
+  end
+  
+  def create_node
+    @node
+  end
+  
+  def dump(indent)
+    return indent + self.description
+  end
+  
+  def _build_log_bool_node(other, op)
+    if ! other.is_a?(DRCOpNode)
+      raise("Second argument to #{op.to_s} must be a DRC expression")
+    end
+    if self.is_a?(DRCOpNodeLogicalBool) &amp;&amp; self.op == op
+      self.children &lt;&lt; other
+      return self
+    elsif other.is_a?(DRCOpNodeLogicalBool) &amp;&amp; other.op == op
+      other.children.unshift(self)
+      return other
+    else
+      res = DRCOpNodeLogicalBool::new(op)
+      res.children = [ self, other ]
+      res
+    end
+  end
+
+  %w(and or).each do |f|
+    eval &lt;&lt;"CODE"
+      def #
+      #{f}(other)
+        self._build_log_bool_node(other, :#{f})
+      end
+CODE
+  end
+  
+  def _build_geo_bool_node(other, op)
+    if ! other.is_a?(DRCOpNode)
+      raise("Second argument to #{op.to_s} must be a DRC expression")
+    end
+    DRCOpNodeBool::new(op, self, other)
+  end
+  
+  %w(&amp; - ^ | +).each do |f|
+    eval &lt;&lt;"CODE"
+      def #
+      #{f}(other)
+        self._build_geo_bool_node(other, :#{f})
+      end
+CODE
+  end
+  
+  def !()
+    if self.respond_to?(:inverted)
+      return self.inverted
+    else
+      res = DRCOpNodeCase::new
+      res.children &lt;&lt; self
+      res.children &lt;&lt; nil
+      res.children &lt;&lt; @engine.primary
+    end
+  end
+
+  def _check_numeric(v, symbol)
+    if ! v.is_a?(Float) &amp;&amp; ! v.is_a?(1.class)
+      if symbol
+        raise Exception("Argument '#{symbol}' (#{v.inspect}) isn't numeric in operation '#{self.description}'")
+      else
+        raise Exception("Argument (#{v.inspect}) isn't numeric in operation '#{self.description}'")
+      end
+    end
+  end
+  
+  def _make_value(v, symbol)
+    self._check_numeric(v, symbol)
+    @engine._prep_value(v)
+  end
+  
+  def _make_area_value(v, symbol)
+    self._check_numeric(v, symbol)
+    @engine._prep_area_value(v)
+  end
+  
+  def area
+    DRCOpNodeAreaFilter::new(@engine, self)
+  end
+  
+  def perimeter
+    DRCOpNodePerimeterFilter::new(@engine, self)
+  end
+  
+  def bbox_min
+    DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::BoxMinDim, self)
+  end
+  
+  def bbox_max
+    DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::BoxMaxDim, self)
+  end
+  
+  def bbox_width
+    DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::BoxWidth, self)
+  end
+  
+  def bbox_height
+    DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::BoxHeight, self)
+  end
+  
+  def length
+    DRCOpNodeEdgeLengthFilter::new(@engine, self)
+  end
+  
+  def angle
+    DRCOpNodeEdgeOrientationFilter::new(@engine, self)
+  end
+  
+  def rounded_corners(inner, outer, n)
+    self._check_numeric(n, :n)
+    DRCOpNodeFilter::new(@engine, self, :new_rounded_corners, "rounded_corners", self.make_value(inner, :inner), self.make_value(outer, :outer), n)
+  end
+  
+  def smoothed(d)
+    DRCOpNodeFilter::new(@engine, self, :new_smoothed, "smoothed", self.make_value(d, :d))
+  end
+  
+  def corners(as_dots = DRCAsDots::new(false))
+    if as_dots.is_a?(DRCAsDots)
+      as_dots = as_dots.value
+    else
+      raise("Invalid argument (#{as_dots.inspect}) for 'corners' method")
+    end
+    DRCOpNodeCornersFilter::new(@engine, self, as_dots)
+  end
+  
+  %w(middle extent_refs).each do |f| 
+    eval &lt;&lt;"CODE"
+    def #{f}(*args)
+
+      f = []
+      as_edges = false
+
+      @@std_refs ||= { 
+        :center =&gt; [0.5] * 4,
+        :c =&gt; [0.5] * 4,
+        :bottom_center =&gt; [ 0.5, 0.0, 0.5, 0.0 ],
+        :bc =&gt; [ 0.5, 0.0, 0.5, 0.0 ],
+        :bottom_left =&gt; [ 0.0, 0.0, 0.0, 0.0 ],
+        :bl =&gt; [ 0.0, 0.0, 0.0, 0.0 ],
+        :bottom_right =&gt; [ 1.0, 0.0, 1.0, 0.0 ],
+        :br =&gt; [ 1.0, 0.0, 1.0, 0.0 ],
+        :top_center =&gt; [ 0.5, 1.0, 0.5, 1.0 ],
+        :tc =&gt; [ 0.5, 1.0, 0.5, 1.0 ],
+        :top_left =&gt; [ 0.0, 1.0, 0.0, 1.0 ],
+        :tl =&gt; [ 0.0, 1.0, 0.0, 1.0 ],
+        :top_right =&gt; [ 1.0, 1.0, 1.0, 1.0 ],
+        :tr =&gt; [ 1.0, 1.0, 1.0, 1.0 ],
+        :left_center =&gt; [ 0.0, 0.5, 0.0, 0.5 ],
+        :lc =&gt; [ 0.0, 0.5, 0.0, 0.5 ],
+        :right_center =&gt; [ 1.0, 0.5, 1.0, 0.5 ],
+        :rc =&gt; [ 1.0, 0.5, 1.0, 0.5 ],
+        :south =&gt; [ 0.5, 0.0, 0.5, 0.0 ],
+        :s =&gt; [ 0.5, 0.0, 0.5, 0.0 ],
+        :left =&gt; [ 0.0, 0.0, 0.0, 1.0 ],
+        :l =&gt; [ 0.0, 0.0, 0.0, 1.0 ],
+        :bottom =&gt; [ 1.0, 0.0, 0.0, 0.0 ],
+        :b =&gt; [ 1.0, 0.0, 0.0, 0.0 ],
+        :right =&gt; [ 1.0, 1.0, 1.0, 0.0 ],
+        :r =&gt; [ 1.0, 1.0, 1.0, 0.0 ],
+        :top =&gt; [ 0.0, 1.0, 1.0, 1.0 ],
+        :t =&gt; [ 0.0, 1.0, 1.0, 1.0 ]
+      }
+
+      args.each_with_index do |a,ia|
+        if a.is_a?(1.0.class) &amp;&amp; :#{f} != :middle
+          f &lt;&lt; a 
+        elsif a.is_a?(DRCAsDots)
+          as_edges = a.value
+        elsif @@std_refs[a] &amp;&amp; :#{f} != :middle
+          f = @@std_refs[a]
+        else
+          raise("Invalid argument #" + (ia + 1).to_s + " (" + a.inspect + ") for '#{f}' method on operation '" + self.description + "' - needs to be numeric or 'as_dots/as_edges'")
+        end
+      end
+
+      if f.size == 2
+        f = f + f
+      else
+        f = (f + [0.5] * 4)[0..3]
+      end
+          
+      if as_edges
+        return DRCOpNodeRelativeExtents::new(self, true, *f)
+      else
+        # add oversize for point- and edge-like regions
+        zero_area = (f[0] - f[2]).abs &lt; 1e-7 || (f[1] - f[3]).abs &lt; 1e-7
+        f += [ zero_area ? 1 : 0 ] * 2
+        return DRCOpNodeRelativeExtents::new(self, false, *f)
+      end
+
+    end
+CODE
+  end
+  
+  def odd_polygons
+    return DRCOpNodeFilter(@engine, self, :new_strange_polygons_filter, "odd_polygons")
+  end
+  
+  def rectangles
+    return DRCOpNodeFilter(@engine, self, :new_rectangle_filter, "rectangles")
+  end
+  
+  def rectilinear
+    return DRCOpNodeFilter(@engine, self, :new_rectilinear_filter, "rectilinear")
+  end
+  
+  def holes
+    return DRCOpNodeFilter(@engine, self, :new_holes, "holes")
+  end
+  
+  def hulls
+    return DRCOpNodeFilter(@engine, self, :new_hulls, "hulls")
+  end
+  
+  def edges
+    return DRCOpNodeFilter(@engine, self, :new_edges, "edges")
+  end
+  
+  def sized(*args)
+
+    dist = 0
+    
+    mode = 2
+    values = []
+    args.each_with_index do |a,ia|
+      if a.is_a?(1.class) || a.is_a?(Float)
+        v = self._make_value(a, "argument ##{ia + 1}")
+        v.abs &gt; dist &amp;&amp; dist = v.abs 
+        values.push(v)
+      elsif a.is_a?(DRCSizingMode)
+        mode = a.value
+      end
+    end
+    
+    args = []
+    if values.size &lt; 1
+      raise("sized: Method requires one or two sizing values")
+    elsif values.size &gt; 2
+      raise("sized: Method must not have more than two values")
+    else
+      args &lt;&lt; values[0]
+      args &lt;&lt; values[-1]
+    end
+    args &lt;&lt; mode
+    
+    return DRCOpNodeFilter(@engine, self, :new_sized, "sized", *args)
+
+  end
+  
+  def extents(e = 0)
+    return DRCOpNodeFilter(@engine, self, :new_extents, "extents", self._make_value(e, :e))
+  end
+  
+  def first_edges
+    return DRCOpNodeFilter(@engine, self, :new_edge_pair_to_first_edges, "first_edges")
+  end
+  
+  def second_edges
+    return DRCOpNodeFilter(@engine, self, :new_edge_pair_to_second_edges, "second_edges")
+  end
+
+  def end_segments(length, fraction = 0.0)
+    self._check_numeric(fraction, :fraction)
+    return DRCOpNodeFilter(@engine, self, :new_end_segments, "end_segments", self._make_value(length, :length), fraction)
+  end
+  
+  def start_segments(length, fraction = 0.0)
+    self._check_numeric(fraction, :fraction)
+    return DRCOpNodeFilter(@engine, self, :new_start_segments, "start_segments", self._make_value(length, :length), fraction)
+  end
+  
+  def centers(length, fraction = 0.0)
+    self._check_numeric(fraction, :fraction)
+    return DRCOpNodeFilter(@engine, self, :new_centers, "centers", self._make_value(length, :length), fraction)
+  end
+  
+  def extended(*args)
+  
+    av = [ 0, 0, 0, 0 ]
+    args.each_with_index do |a,i|
+      if a.is_a?(Hash)
+        a[:begin]  &amp;&amp; av[0] = self._make_value(a[:begin], :begin)
+        a[:end]    &amp;&amp; av[1] = self._make_value(a[:end], :end)
+        a[:out]    &amp;&amp; av[2] = self._make_value(a[:out], :out)
+        a[:in]     &amp;&amp; av[3] = self._make_value(a[:in], :in)
+        a[:joined] &amp;&amp; av[4] = true
+      elsif i &lt; 4
+        av[i] = self._make_value(a, "argument " + (i+1).to_s)
+      else
+        raise("Too many arguments for method '#{f}' (1 to 5 expected)")
+      end
+    end
+
+    return DRCOpNodeFilter(@engine, self, :new_extended, "extended", *args)
+    
+  end
+  
+  def extended_in(e)
+    return DRCOpNodeFilter(@engine, self, :new_extended_in, "extended_in", self._make_value(e))
+  end
+  
+  def extended_out(e)
+    return DRCOpNodeFilter(@engine, self, :new_extended_out, "extended_out", self._make_value(e))
+  end
+  
+  def polygons
+    return DRCOpNodeFilter(@engine, self, :new_polygons, "polygons")
+  end
+  
+end
+
+class DRCOpNodeLogicalBool &lt; DRCOpNode
+
+  attr_accessor :children
+  attr_accessor :op
+  
+  def initialize(engine, op)
+    super(engine)
+    self.children = []
+    self.op = op
+    self.description = "Logical #{op.to_s}"
+  end
+
+  def dump(indent)
+    return indent + self.description + "\n" + self.children.collect { |c| c.dump("  " + indent) }.join("\n")
+  end
+
+  def create_node
+    log_op = { :and =&gt; RBA::CompoundOperationNode::LogAnd, :or =&gt; RBA::CompoundOperationNode::LogOr }[self.op]
+    RBA::CompoundOperationNode::new_logical_boolean(log_op, false, self.children.collect { |c| c.create_node })
+  end
+  
+end
+
+class DRCOpNodeBool &lt; DRCOpNode
+
+  attr_accessor :children
+  attr_accessor :op
+  
+  def initialize(engine, op, a, b)
+    super(engine)
+    self.children = [a, b]
+    self.op = op
+    self.description = "Geometrical #{op.to_s}"
+  end
+
+  def dump(indent)
+    return indent + self.description + "\n" + self.children.collect { |c| c.dump("  " + indent) }.join("\n")
+  end
+
+  def create_node
+    bool_op = { :&amp; =&gt; RBA::CompoundOperationNode::And, 
+                :+ =&gt; RBA::CompoundOperationNode::Or,
+                :| =&gt; RBA::CompoundOperationNode::Or,
+                :- =&gt; RBA::CompoundOperationNode::Not,
+                :^ =&gt; RBA::CompoundOperationNode::Xor }[self.op]
+    RBA::CompoundOperationNode::new_logical_boolean(bool_op, false, self.children.collect { |c| c.create_node })
+  end
+  
+end
+
+class DRCOpCase &lt; DRCOpNode
+
+  attr_accessor :children
+  
+  def initialize(engine, children)
+    super(engine)
+    self.children = children
+    self.description = "switch"
+  end
+
+  def dump(indent)
+    return indent + self.description + "\n" + self.children.collect { |c| c.dump("  " + indent) }.join("\n")
+  end
+  
+  def create_node
+    RBA::CompoundOperationNode::new_case(self.children.collect { |c| c.create_node })
+  end
+
+end
+
+class DRCOpNodeWithCompare &lt; DRCOpNode
+  
+  attr_accessor :reverse
+  attr_accessor :original
+  attr_accessor :lt, :le, :gt, :ge, :arg
+  
+  def initialize(engine, original = nil, reverse = false)
+    super(engine)
+    self.reverse = reverse
+    self.original = original
+    self.description = original ? original.description : "BasicWithCompare"
+  end
+  
+  def _description_for_dump
+    self.description
+  end
+  
+  def dump(indent = "")
+    if self.original
+      return "@temp (should not happen)"
+    else
+      cmp = []
+      self.lt &amp;&amp; (cmp &lt;&lt; ("&lt;%.12g" % self.lt))
+      self.le &amp;&amp; (cmp &lt;&lt; ("&lt;=%.12g" % self.le))
+      self.gt &amp;&amp; (cmp &lt;&lt; ("&gt;%.12g" % self.gt))
+      self.ge &amp;&amp; (cmp &lt;&lt; ("&gt;=%.12g" % self.ge))
+      return indent + self.description + " " + cmp.join(" ")
+    end
+  end
+
+  def _check_bounds
+    if (self.lt || self.le) &amp;&amp; (self.gt || self.ge)
+      epsilon = 1e-10
+      lower = self.ge ? self.ge - epsilon : self.gt + epsilon
+      upper = self.le ? self.le + epsilon : self.lt - epsilon
+      if lower &gt; upper - epsilon
+        raise("Lower bound is larger than upper bound")
+      end 
+    end  
+  end
+    
+  def set_lt(value)
+    (self.lt || self.le) &amp;&amp; raise("'" + self.description + "' already has an upper bound of " + ("%.12g" % (self.lt || self.le)))
+    self.lt = value
+    self._check_bounds
+  end    
+
+  def set_le(value)
+    (self.lt || self.le) &amp;&amp; raise("'" + self.description + "' already has an upper bound of " + ("%.12g" % (self.lt || self.le)))
+    self.le = value
+    self._check_bounds
+  end    
+      
+  def set_gt(value)
+    (self.gt || self.ge) &amp;&amp; raise("'" + self.description + "' already has an lower bound of " + ("%.12g" % (self.gt || self.ge)))
+    self.gt = value
+    self._check_bounds
+  end    
+
+  def set_ge(value)
+    (self.gt || self.ge) &amp;&amp; raise("'" + self.description + "' already has an lower bound of " + ("%.12g" % (self.gt || self.ge)))
+    self.ge = value
+    self._check_bounds
+  end
+  
+  def coerce(something)
+    [ DRCOpNodeWithCompare::new(self.engine, self, true), something ]
+  end
+  
+  def _self_or_original
+    return self.original || self
+  end
+  
+  def ==(other)
+    if !(other.is_a?(Float) || other.is_a?(Integer))
+      raise("== operator needs a numerical argument for '" + self.description + "' argument")
+    end
+    res = self._self_or_original
+    res.set_le(other)
+    res.set_ge(other)
+    return res
+  end
+  
+  def &lt;(other)
+    if !(other.is_a?(Float) || other.is_a?(Integer))
+      raise("&lt; operator needs a numerical argument for '" + self.description + "' argument")
+    end
+    res = self._self_or_original
+    if reverse
+      res.set_gt(other)
+    else
+      res.set_lt(other)
+    end
+    return res
+  end
+  
+  def &lt;=(other)
+    if !(other.is_a?(Float) || other.is_a?(Integer))
+      raise("&lt;= operator needs a numerical argument for '" + self.description + "' argument")
+    end
+    res = self._self_or_original
+    if reverse
+      res.set_ge(other)
+    else
+      res.set_le(other)
+    end
+    return res
+  end
+
+  def &gt;(other)
+    if !(other.is_a?(Float) || other.is_a?(Integer))
+      raise("&gt; operator needs a numerical argument for '" + self.description + "' argument")
+    end
+    res = self._self_or_original
+    if reverse
+      res.set_lt(other)
+    else
+      res.set_gt(other)
+    end
+    return res
+  end
+  
+  def &gt;=(other)
+    if !(other.is_a?(Float) || other.is_a?(Integer))
+      raise("&gt;= operator needs a numerical argument for '" + self.description + "' argument")
+    end
+    res = self._self_or_original
+    if reverse
+      res.set_le(other)
+    else
+      res.set_ge(other)
+    end
+    return res
+  end
+  
+end
+
+class DRCOpNodeAreaFilter &lt; DRCOpNodeWithCompare
+
+  attr_accessor :input
+  attr_accessor :inverted
+  
+  def initialize(engine, input)
+    self.super(engine)
+    self.input = input
+    self.inverted = false
+    self.description = "area"
+  end
+
+  def _description_for_dump
+    self.inverted ? "area" : "not_area"
+  end
+  
+  def create_node
+    args = [ self.input.create_node, self.inverse ]
+    args &lt;&lt; (self.gt ? make_area_value(self.gt) + 1 : (self.ge ? make_area_value(self.ge) : 0))
+    if self.lt || self.le
+      args &lt;&lt; self.lt ? make_area_value(self.lt) : make_area_value(self.le) - 1
+    end
+    RBA::CompoundRegionOperationNode::new_area_filter(*args)
+  end
+
+  def inverted
+    res = self.dup
+    res.inverted = !res.inverted
+    return res
+  end
+  
+end
+
+class DRCOpNodeEdgeLengthFilter &lt; DRCOpNodeWithCompare
+
+  attr_accessor :input
+  attr_accessor :inverted
+  
+  def initialize(engine, input)
+    self.super(engine)
+    self.input = input
+    self.inverted = false
+    self.description = "length"
+  end
+  
+  def _description_for_dump
+    self.inverted ? "length" : "not_length"
+  end
+  
+  def create_node
+    args = [ self.input.create_node, self.inverse ]
+    args &lt;&lt; (self.gt ? self._make_value(self.gt, :gt) + 1 : (self.ge ? self._make_value(self.ge, :ge) : 0))
+    if self.lt || self.le
+      args &lt;&lt; self.lt ? self._make_value(self.lt, :lt) : self._make_value(self.le, :le) - 1
+    end
+    RBA::CompoundRegionOperationNode::new_edge_length_filter(*args)
+  end
+
+  def inverted
+    res = self.dup
+    res.inverted = !res.inverted
+    return res
+  end
+  
+end
+
+class DRCOpNodeEdgeOrientationFilter &lt; DRCOpNodeWithCompare
+
+  attr_accessor :input
+  attr_accessor :inverted
+  
+  def initialize(engine, input)
+    self.super(engine)
+    self.input = input
+    self.inverted = false
+    self.description = "angle"
+  end
+  
+  def _description_for_dump
+    self.inverted ? "angle" : "not_angle"
+  end
+  
+  def create_node
+    args = [ self.input.create_node, self.inverse ]
+    angle_delta = 1e-6
+    args &lt;&lt; (self.gt ? self.gt + angle_delta : (self.ge ? self.ge : -180.0))
+    args &lt;&lt; (self.lt ? self.lt : (self.le ? self.le - angle_delta : 180.0))
+    RBA::CompoundRegionOperationNode::new_edge_orientation_filter(*args)
+  end
+
+  def inverted
+    res = self.dup
+    res.inverted = !res.inverted
+    return res
+  end
+  
+end
+
+class DRCOpNodePerimeterFilter &lt; DRCOpNodeWithCompare
+
+  attr_accessor :input
+  attr_accessor :inverted
+  
+  def initialize(engine, input)
+    self.super(engine)
+    self.input = input
+    self.inverted = false
+    self.description = "perimeter"
+  end
+
+  def _description_for_dump
+    self.inverted ? "perimeter" : "not_perimeter"
+  end
+  
+  def create_node
+    args = [ self.input.create_node, self.inverse ]
+    args &lt;&lt; (self.gt ? self._make_value(self.gt, :gt) + 1 : (self.ge ? self._make_value(self.ge, :ge) : 0))
+    if self.lt || self.le
+      args &lt;&lt; self.lt ? self._make_value(self.lt, :lt) : self._make_value(self.le, :le) - 1
+    end
+    RBA::CompoundRegionOperationNode::new_perimeter_filter(*args)
+  end
+
+  def inverted
+    res = self.dup
+    res.inverted = !res.inverted
+    return res
+  end
+  
+end
+
+class DRCOpNodeInteractingWithCount &lt; DRCOpNodeWithCompare
+
+  attr_accessor :a, :b
+  attr_accessor :inverted
+  attr_accessor :op
+  
+  def initialize(engine, a, b, op)
+    self.super(engine)
+    self.a = a
+    self.b = b
+    self.op = op
+    self.inverted = false
+    self.description = (self.inverted ? "" : "not_") + self.op.to_s
+  end
+  
+  def create_node
+    args = [ self.a.create_node, self.b.create_node, self.inverse ]
+    args &lt;&lt; (self.gt ? self.gt + 1 : (self.ge ? self.ge : 0))
+    if self.lt || self.le
+      args &lt;&lt; self.lt ? self.lt : self.le - 1
+    end
+    factory = { :covering =&gt; :new_enclosing,
+                :overlapping =&gt; :new_overlapping,
+                :interacting =&gt; :new_interacting }[self.op]
+    RBA::CompoundRegionOperationNode::send(factory, *args)
+  end
+
+  def inverted
+    res = self.dup
+    res.inverted = !res.inverted
+    return res
+  end
+  
+end
+
+class DRCOpNodeInteracting &lt; DRCOpNode
+
+  attr_accessor :a, :b
+  attr_accessor :inverted
+  attr_accessor :op
+  
+  def initialize(engine, a, b, op)
+    self.super(engine)
+    self.a = a
+    self.b = b
+    self.op = op
+    self.inverted = false
+    self.description = (self.inverted ? "" : "not_") + self.op.to_s
+  end
+  
+  def create_node
+    factory = { :inside =&gt; :new_inside,
+                :outside =&gt; :new_outside }[self.op]
+    RBA::CompoundRegionOperationNode::send(factory, self.a.create_node, self.b.create_node, self.inverse)
+  end
+
+  def inverted
+    res = self.dup
+    res.inverted = !res.inverted
+    return res
+  end
+  
+end
+
+class DRCOpNodeFilter &lt; DRCOpNode
+
+  attr_accessor :input
+  attr_accessor :factory
+  attr_accessor :args
+  
+  def initialize(engine, input, factory, description, args = [])
+    self.super(engine)
+    self.input = input
+    self.factory = factory
+    self.args = args
+    self.description = description
+  end
+  
+  def dump(indent)
+    if self.args.size &gt; 0
+      return self.description + "(" + self.args.collect { |a| a.inspect }.join(",") + ")\n" + input.dump("  " + indent)
+    else
+      return self.description + "\n" + input.dump("  " + indent)
+    end
+  end
+  
+  def create_node
+    RBA::CompoundRegionOperationNode::send(self.factory, self.input.create_node, *args)
+  end
+  
+end
+
+class DRCOpNodeCheck &lt; DRCOpNodeWithCompare
+
+  attr_accessor :other
+  attr_accessor :check
+  attr_accessor :args
+  
+  def initialize(engine, check, other, *args)
+    super(engine)
+    self.check = check
+    self.other = other
+    self.args = args
+    self.description = check.to_s
+  end
+
+  def _description_for_dump
+    if self.args.size &gt; 0
+      return self.description + "(" + self.args.collect { |a| a.inspect }.join(",") + ")"
+    else
+      return self.description
+    end
+  end
+  
+  def create_node
+  
+    if !(self.lt || self.le) &amp;&amp; !(self.gt || self.ge)
+      raise("No value given for check #{self.check}")
+    end
+    
+    factory = { :width =&gt; :new_width_check, :space =&gt; :new_space_check,
+                :notch =&gt; :new_notch_check, :separation =&gt; :new_separation_check,
+                :isolated =&gt; :new_isolated_check, :overlap =&gt; :new_overlap_check, 
+                :enclosing =&gt; :new_inside_check }[self.check]
+
+    res = nil
+    
+    if self.lt || self.le
+      dmin = self.le ? self._make_value(self.le, :le) + 1 : self._make_value(self.lt, :lt)
+      res = RBA::CompoundRegionOperationNode::send(factory, dmin, *self.args)
+    end
+      
+    if self.gt || self.ge
+      dmax = self.ge ? self._make_value(self.ge, :ge) : self._make_value(self.gt, :gt) + 1
+      inv = RBA::CompoundRegionOperationNode::send(factory, dmax, *self.args)
+      # TODO: instead of doing the NOT we could make use of inverse output of the checks
+      # (needs GSI enabling first)
+      if self.check == :width || self.check == :notch
+        # Same polygon check - we need to take both edges of the result
+        to_subtract = RBA::CompoundRegionOperationNode::new_edges(inv)
+      else
+        to_subtract = RBA::CompoundRegionOperationNode::new_edge_pair_to_first_edges(inv)
+      end
+      if res
+        if self.check == :width || self.check == :notch
+          # Same polygon check - we need to take both edges of the result
+          subtract_from = RBA::CompoundRegionOperationNode::new_edges(res)
+        else
+          subtract_from = RBA::CompoundRegionOperationNode::new_edge_pair_to_first_edges(res)
+        end
+      else
+        subtract_from = RBA::CompoundRegionOperationNode::new_edges(RBA::CompoundRegionOperationNode::new_primary)
+      end
+      res = RBA::CompoundRegionOperationNode::new_geometrical_boolean(RBA::CompoundRegionOperationNode::GeometricalOp::Not, subtract_from, to_subtract)
+    end
+    
+    return res
+
+  end
+
+end
+
+class DRCOpNodeBBoxParameterFilter &lt; DRCOpNodeWithCompare
+
+  attr_accessor :input
+  attr_accessor :parameter
+  attr_accessor :inverted
+  
+  def initialize(engine, parameter, input, description)
+    self.super(engine)
+    self.parameter = parameter
+    self.input = input
+    self.inverted = false
+    self.description = description
+  end
+  
+  def create_node
+    args = [ self.input.create_node, self.inverse ]
+    args &lt;&lt; (self.gt ? self._make_value(self.gt, :gt) + 1 : (self.ge ? self._make_value(self.ge, :ge) : 0))
+    if self.lt || self.le
+      args &lt;&lt; self.lt ? self._make_value(self.lt, :lt) : self._make_value(self.le, :le) - 1
+    end
+    RBA::CompoundRegionOperationNode::new_perimeter_filter(*args)
+  end
+
+  def inverted
+    res = self.dup
+    res.inverted = !res.inverted
+    return res
+  end
+  
+end
+
+class DRCOpNodeCornersFilter &lt; DRCOpNodeWithCompare
+
+  attr_accessor :input
+  attr_accessor :parameter
+  attr_accessor :inverted
+  
+  def initialize(engine, as_dots, input)
+    self.super(engine)
+    self.as_dots = as_dots
+    self.input = input
+    self.description = "corners"
+  end
+  
+  def create_node
+    args = [ self.input.create_node ]
+    angle_delta = 1e-6
+    args &lt;&lt; (self.gt ? self.gt + angle_delta : (self.ge ? self.ge : -180.0))
+    args &lt;&lt; (self.lt ? self.lt : (self.le ? self.le - angle_delta : 180.0))
+    if self.as_dots
+      RBA::CompoundRegionOperationNode::new_corners_as_dots_node(*args)
+    else
+      args &lt;&lt; 2 # dimension is 2x2 DBU
+      RBA::CompoundRegionOperationNode::new_corners_as_rectangles_node(*args)
+    end
+  end
+
+end
+
+class DRCOpNodeRelativeExtents &lt; DRCOpNode
+
+  attr_accessor :input
+  attr_accessor :as_edges, :fx1, :fx2, :fy1, :fy2, :dx, :dy
+  
+  def initialize(engine, input, as_edges, fx1, fx2, fy1, fy2, dx = 0, dy = 0)
+    self.super(engine)
+    self.input = input
+    self.as_edges = as_edges
+    self.description = "extents"
+  end
+  
+  def dump(indent)
+    if !self.as_edges
+      return "extents(%.12g,%.12g,%.12g,%.12g,%12g,%.12g)" % [self.fx1, self.fx2, self.fy1, self.fy2, self.dx, self.dy]
+    else
+      return "extents_as_edges(%.12g,%.12g,%.12g,%.12g)" % [self.fx1, self.fx2, self.fy1, self.fy2]
+    end
+  end
+      
+  def create_node
+    if !self.as_edges
+      RBA::CompoundRegionOperationNode::new_relative_extents_as_edges(self.input, self.fx1, self.fx2, self.fy1, self.fy2, self.dx, self.dy)
+    else
+      RBA::CompoundRegionOperationNode::new_relative_extents_as_edges(self.input, self.fx1, self.fx2, self.fy1, self.fy2)
+    end
+  end
+
+end
+
+class DRCEngine
+
+  def switch(*args)
+    anum = 1
+    args.each do |a|
+      if !a.is_a?(DRCOpNode)
+        raise("All inputs to 'switch' need to be valid compound operation expressions (#{anum} isn't)")
+      end
+      anum += 1
+    end
+    res = DRCOpNodeCase::new(self)
+    res.children = args
+    return res
+  end
+  
+  def secondary(layer)
+    layer.requires_region
+    res = DRCOpNode::new(self, RBA::CompoundRegionOperationNode::new_secondary(layer.data))
+    res.description = "secondary"
+    return res
+  end
+  
+  def primary
+    res = DRCOpNode::new(self, RBA::CompoundRegionOperationNode::new_primary)
+    res.description = "primary"
+    return res
+  end
+  
+  %w(area perimeter bbox_min bbox_max bbox_width bbox_height rectangles rectilinear edges odd_polygons hulls holes).each do |f|
+    eval &lt;&lt;"CODE"
+      def #{f}
+        primary.#{f}
+      end
+CODE
+  end
+  
+  def corners(as_dots = DRCAsDots::new(false))
+    return primary.corners(as_dots)
+  end
+  
+  %w(middle extent_refs rounded_corners smoothed sized extents).each do |f|
+    eval &lt;&lt;"CODE"
+      def #{f}(*args)
+        primary.#{f}(*args)
+      end
+CODE
+  end
+  
+  %w(covering overlapping inside outside interacting).each do |f|
+    eval &lt;&lt;"CODE"
+      def #{f}(other)
+        primary.#{f}(other)
+      end
+CODE
+  end
+  
+  def covering(input)
+    return DRCOpNodeInteractingWithCount::new(self, primary, input, :enclosing)
+  end
+  
+  def overlapping
+    return DRCOpNodeInteractingWithCount::new(self, primary, input, :overlapping)
+  end
+  
+  def inside
+    return DRCOpNodeInteracting::new(self, primary, input, :inside)
+  end
+  
+  def outside
+    return DRCOpNodeInteracting::new(self, primary, input, :outside)
+  end
+  
+  def interacting
+    return DRCOpNodeInteractingWithCount::new(self, primary, input, :interacting)
+  end
+  
+  %w(width space overlap enclosing separation isolated notch).each do |f|
+    eval &lt;&lt;"CODE"
+    def #{f}(*args)
+  
+      metrics = RBA::Region::Euclidian
+      minp = nil
+      maxp = nil
+      alim = nil
+      whole_edges = false
+      other = nil
+      shielded = nil
+      opposite_filter = RBA::Region::NoOppositeFilter
+      rect_filter = RBA::Region::NoRectFilter
+  
+      n = 1
+      args.each do |a|
+        if a.is_a?(DRCMetrics)
+          metrics = a.value
+        elsif a.is_a?(DRCWholeEdges)
+          whole_edges = a.value
+        elsif a.is_a?(DRCOppositeErrorFilter)
+          opposite_filter = a.value
+        elsif a.is_a?(DRCRectangleErrorFilter)
+          rect_filter = RBA::Region::RectFilter::new(a.value.to_i | rect_filter.to_i)
+        elsif a.is_a?(DRCAngleLimit)
+          alim = a.value
+        elsif a.is_a?(DRCOpNode)
+          other = a
+        elsif a.is_a?(DRCProjectionLimits)
+          minp = self._make_value(a.min, :pmin)
+          maxp = self._make_value(a.max, :pmax)
+        elsif a.is_a?(DRCShielded)
+          shielded = a.value
+        else
+          raise("#{f}: Parameter #" + n.to_s + " does not have an expected type")
+        end
+        n += 1
+      end
+  
+      args = [ whole_edges, metrics, alim, minp, maxp ]
+  
+      args &lt;&lt; (shielded == nil ? true : shielded)
+      if :#{f} != :width &amp;&amp; :#{f} != :notch
+        args &lt;&lt; opposite_filter
+        args &lt;&lt; rect_filter
+      elsif opposite_filter != RBA::Region::NoOppositeFilter
+        raise("#{f}: an opposite error filter cannot be used with this check")
+      elsif rect_filter != RBA::Region::NoRectFilter
+        raise("#{f}: a rectangle error filter cannot be used with this check")
+      end
+      
+      if :#{f} == :width || :#{f} == :space || :#{f} == :notch || :#{f} == :isolated
+        if other
+          raise("No other layer must be specified for a single-layer check (here: #{f})")
+        end
+      else
+        if !other
+          raise("The other layer must be specified for a two-layer check (here: #{f})")
+        end
+      end
+      
+      DRCOpNodeCheck::new(self, :#{f}, other, *args)
+      
+    end  
+CODE
+  end
+  
+  def iso(*args)
+    isolated(*args)
+  end
+  
+  def sep(*args)
+    separation(*args)
+  end
+  
+  def enc(*args)
+    separation(*args)
+  end
+
+end
+
+end</text>
+</klayout-macro>

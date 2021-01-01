@@ -28,6 +28,7 @@
 
 #include "dbAsIfFlatTexts.h"
 #include "dbShapes.h"
+#include "tlCopyOnWrite.h"
 
 namespace db {
 
@@ -110,14 +111,16 @@ public:
   void transform (const Trans &trans)
   {
     if (! trans.is_unity ()) {
-      for (text_iterator_type p = m_texts.template get_layer<db::Text, db::unstable_layer_tag> ().begin (); p != m_texts.template get_layer<db::Text, db::unstable_layer_tag> ().end (); ++p) {
-        m_texts.get_layer<db::Text, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
+      db::Shapes &texts = *mp_texts;
+      for (text_iterator_type p = texts.template get_layer<db::Text, db::unstable_layer_tag> ().begin (); p != texts.template get_layer<db::Text, db::unstable_layer_tag> ().end (); ++p) {
+        texts.get_layer<db::Text, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
       }
       invalidate_cache ();
     }
   }
 
-  db::Shapes &raw_texts () { return m_texts; }
+  db::Shapes &raw_texts () { return *mp_texts; }
+  const db::Shapes &raw_texts () const { return *mp_texts; }
 
 protected:
   virtual Box compute_bbox () const;
@@ -128,7 +131,7 @@ private:
 
   FlatTexts &operator= (const FlatTexts &other);
 
-  mutable db::Shapes m_texts;
+  mutable tl::copy_on_write_ptr<db::Shapes> mp_texts;
 };
 
 }

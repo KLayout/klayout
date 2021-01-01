@@ -22,6 +22,7 @@
 
 
 #include "dbRegionUtils.h"
+#include "dbPolygonTools.h"
 #include "dbEdgeBoolean.h"
 #include "tlSelect.h"
 
@@ -378,6 +379,137 @@ poly2poly_check_base<PolygonType>::enter (const PolygonType &o1, size_t p1, cons
 //  explicit instantiations
 template class poly2poly_check_base<db::Polygon>;
 template class poly2poly_check_base<db::PolygonRef>;
+
+// -------------------------------------------------------------------------------------
+//  SinglePolygonCheck implementation
+
+SinglePolygonCheck::SinglePolygonCheck (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options)
+  : m_relation (rel), m_d (d), m_options (options)
+{ }
+
+void
+SinglePolygonCheck::process (const db::Polygon &polygon, std::vector<db::EdgePair> &res) const
+{
+  std::unordered_set<db::EdgePair> result;
+
+  EdgeRelationFilter check (m_relation, m_d, m_options.metrics);
+  check.set_include_zero (false);
+  check.set_whole_edges (m_options.whole_edges);
+  check.set_ignore_angle (m_options.ignore_angle);
+  check.set_min_projection (m_options.min_projection);
+  check.set_max_projection (m_options.max_projection);
+
+  edge2edge_check<std::unordered_set<db::EdgePair> > edge_check (check, result, false /*=same polygons*/, false /*=same layers*/, m_options.shielded);
+  poly2poly_check<db::Polygon, std::unordered_set<db::EdgePair> > poly_check (edge_check);
+
+  do {
+    poly_check.enter (polygon, 0);
+  } while (edge_check.prepare_next_pass ());
+
+  res.insert (res.end (), result.begin (), result.end ());
+}
+
+// -------------------------------------------------------------------------------------------------------------
+//  Strange polygon processor
+
+namespace {
+
+/**
+ *  @brief A helper class to implement the strange polygon detector
+ */
+struct StrangePolygonInsideFunc
+{
+  inline bool operator() (int wc) const
+  {
+    return wc < 0 || wc > 1;
+  }
+};
+
+}
+
+StrangePolygonCheckProcessor::StrangePolygonCheckProcessor () { }
+
+StrangePolygonCheckProcessor::~StrangePolygonCheckProcessor () { }
+
+void
+StrangePolygonCheckProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
+{
+  EdgeProcessor ep;
+  ep.insert (poly);
+
+  StrangePolygonInsideFunc inside;
+  db::GenericMerge<StrangePolygonInsideFunc> op (inside);
+  db::PolygonContainer pc (res, false);
+  db::PolygonGenerator pg (pc, false, false);
+  ep.process (pg, op);
+}
+
+// -------------------------------------------------------------------------------------------------------------
+//  Smoothing processor
+
+SmoothingProcessor::SmoothingProcessor (db::Coord d) : m_d (d) { }
+
+SmoothingProcessor::~SmoothingProcessor () { }
+
+void
+SmoothingProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
+{
+  res.push_back (db::smooth (poly, m_d));
+}
+
+// -------------------------------------------------------------------------------------------------------------
+//  Rounded corners processor
+
+RoundedCornersProcessor::RoundedCornersProcessor (double rinner, double router, unsigned int n)
+  : m_rinner (rinner), m_router (router), m_n (n)
+{ }
+
+RoundedCornersProcessor::~RoundedCornersProcessor ()
+{ }
+
+void
+RoundedCornersProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
+{
+  res.push_back (db::compute_rounded (poly, m_rinner, m_router, m_n));
+}
+
+// -------------------------------------------------------------------------------------------------------------
+//  Holes decomposition processor
+
+HolesExtractionProcessor::HolesExtractionProcessor ()
+{
+}
+
+HolesExtractionProcessor::~HolesExtractionProcessor ()
+{
+}
+
+void
+HolesExtractionProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
+{
+  for (size_t i = 0; i < poly.holes (); ++i) {
+    res.push_back (db::Polygon ());
+    res.back ().assign_hull (poly.begin_hole ((unsigned int) i), poly.end_hole ((unsigned int) i));
+  }
+}
+
+// -------------------------------------------------------------------------------------------------------------
+//  Hull decomposition processor
+
+HullExtractionProcessor::HullExtractionProcessor ()
+{
+}
+
+HullExtractionProcessor::~HullExtractionProcessor ()
+{
+}
+
+void
+HullExtractionProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
+{
+  res.push_back (db::Polygon ());
+  res.back ().assign_hull (poly.begin_hull (), poly.end_hull ());
+}
 
 // -------------------------------------------------------------------------------------
 //  RegionToEdgeInteractionFilterBase implementation

@@ -362,6 +362,113 @@ private:
 };
 
 /**
+ *  @brief A polygon processor filtering strange polygons
+ *
+ *  "strange polygons" are those which do not have a specific orientation, e.g.
+ *  "8" shape polygons.
+ */
+class DB_PUBLIC StrangePolygonCheckProcessor
+  : public PolygonProcessorBase
+{
+public:
+  StrangePolygonCheckProcessor ();
+  ~StrangePolygonCheckProcessor ();
+
+  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const;
+
+  virtual const TransformationReducer *vars () const { return 0; }
+  virtual bool result_is_merged () const { return false; }
+  virtual bool requires_raw_input () const { return true; }
+  virtual bool wants_variants () const { return true; }
+  virtual bool result_must_not_be_merged () const { return false; }
+};
+
+/**
+ *  @brief A polygon processor applying smoothing
+ */
+class DB_PUBLIC SmoothingProcessor
+  : public PolygonProcessorBase
+{
+public:
+  SmoothingProcessor (db::Coord d);
+  ~SmoothingProcessor ();
+
+  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const;
+
+  virtual const TransformationReducer *vars () const { return &m_vars; }
+  virtual bool result_is_merged () const { return false; }
+  virtual bool requires_raw_input () const { return false; }
+  virtual bool wants_variants () const { return true; }
+  virtual bool result_must_not_be_merged () const { return false; }
+
+private:
+  db::Coord m_d;
+  db::MagnificationReducer m_vars;
+};
+
+/**
+ *  @brief A polygon processor generating rounded corners
+ */
+class DB_PUBLIC RoundedCornersProcessor
+  : public PolygonProcessorBase
+{
+public:
+  RoundedCornersProcessor (double rinner, double router, unsigned int n);
+  ~RoundedCornersProcessor ();
+
+  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const;
+
+  virtual const TransformationReducer *vars () const { return &m_vars; }
+  virtual bool result_is_merged () const { return true; }   //  we believe so ...
+  virtual bool requires_raw_input () const { return false; }
+  virtual bool wants_variants () const { return true; }
+  virtual bool result_must_not_be_merged () const { return false; }
+
+private:
+  double m_rinner, m_router;
+  unsigned int m_n;
+  db::MagnificationReducer m_vars;
+};
+
+/**
+ *  @brief A polygon processor extracting the holes
+ */
+class DB_PUBLIC HolesExtractionProcessor
+  : public PolygonProcessorBase
+{
+public:
+  HolesExtractionProcessor ();
+  ~HolesExtractionProcessor ();
+
+  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const;
+
+  virtual const TransformationReducer *vars () const { return 0; }
+  virtual bool result_is_merged () const { return true; }   //  we believe so ...
+  virtual bool requires_raw_input () const { return false; }
+  virtual bool wants_variants () const { return true; }
+  virtual bool result_must_not_be_merged () const { return false; }
+};
+
+/**
+ *  @brief A polygon processor extracting the hull
+ */
+class DB_PUBLIC HullExtractionProcessor
+  : public PolygonProcessorBase
+{
+public:
+  HullExtractionProcessor ();
+  ~HullExtractionProcessor ();
+
+  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const;
+
+  virtual const TransformationReducer *vars () const { return 0; }
+  virtual bool result_is_merged () const { return true; }   //  we believe so ...
+  virtual bool requires_raw_input () const { return false; }
+  virtual bool wants_variants () const { return true; }
+  virtual bool result_must_not_be_merged () const { return false; }
+};
+
+/**
  *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
  */
 class DB_PUBLIC Edge2EdgeCheckBase
@@ -587,6 +694,23 @@ public:
   {
     //  .. nothing yet ..
   }
+};
+
+/**
+ *  @brief A class wrapping the single-polygon checks into a polygon-to-edge pair processor
+ */
+class DB_PUBLIC SinglePolygonCheck
+  : public PolygonToEdgePairProcessorBase
+{
+public:
+  SinglePolygonCheck (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options);
+
+  virtual void process (const db::Polygon &polygon, std::vector<db::EdgePair> &res) const;
+
+private:
+  db::edge_relation_type m_relation;
+  db::Coord m_d;
+  db::RegionCheckOptions m_options;
 };
 
 /**

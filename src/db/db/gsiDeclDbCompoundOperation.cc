@@ -27,6 +27,7 @@
 #include "dbRegionUtils.h"
 #include "dbEdgesUtils.h"
 #include "dbRegionLocalOperations.h"
+#include "dbShapeCollectionUtils.h"
 
 namespace gsi
 {
@@ -123,47 +124,86 @@ static db::CompoundRegionOperationNode *new_outside (db::CompoundRegionOperation
   }
 }
 
+static db::CompoundRegionOperationNode *new_hulls (db::CompoundRegionOperationNode *input)
+{
+  return new db::CompoundRegionProcessingOperationNode (new db::HullExtractionProcessor (), input, true /*processor is owned*/);
+}
+
+static db::CompoundRegionOperationNode *new_holes (db::CompoundRegionOperationNode *input)
+{
+  return new db::CompoundRegionProcessingOperationNode (new db::HolesExtractionProcessor (), input, true /*processor is owned*/);
+}
+
+static db::CompoundRegionOperationNode *new_strange_polygons_filter (db::CompoundRegionOperationNode *input)
+{
+  return new db::CompoundRegionProcessingOperationNode (new db::StrangePolygonCheckProcessor (), input, true /*processor is owned*/);
+}
+
+static db::CompoundRegionOperationNode *new_smoothed (db::CompoundRegionOperationNode *input, db::Coord d)
+{
+  return new db::CompoundRegionProcessingOperationNode (new db::SmoothingProcessor (d), input, true /*processor is owned*/);
+}
+
+static db::CompoundRegionOperationNode *new_rounded_corners (db::CompoundRegionOperationNode *input, double rinner, double router, unsigned int n)
+{
+  return new db::CompoundRegionProcessingOperationNode (new db::RoundedCornersProcessor (rinner, router, n), input, true /*processor is owned*/);
+}
+
 static db::CompoundRegionOperationNode *new_case (const std::vector<db::CompoundRegionOperationNode *> &inputs)
 {
   return new db::CompoundRegionLogicalCaseSelectOperationNode (inputs);
 }
 
-static db::CompoundRegionOperationNode *new_corners_as_rectangles_node (db::CompoundRegionOperationNode *input, double angle_start, double angle_end, db::Coord dim = 1)
+static db::CompoundRegionOperationNode *new_corners_as_rectangles (db::CompoundRegionOperationNode *input, double angle_start, double angle_end, db::Coord dim = 1)
 {
   return new db::CompoundRegionProcessingOperationNode (new db::CornersAsRectangles (angle_start, angle_end, dim), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_corners_as_dots_node (db::CompoundRegionOperationNode *input, double angle_start, double angle_end)
+static db::CompoundRegionOperationNode *new_corners_as_dots (db::CompoundRegionOperationNode *input, double angle_start, double angle_end)
 {
   return new db::CompoundRegionToEdgeProcessingOperationNode (new db::CornersAsDots (angle_start, angle_end), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_relative_extents_node (db::CompoundRegionOperationNode *input, double fx1, double fy1, double fx2, double fy2, db::Coord dx, db::Coord dy)
+static db::CompoundRegionOperationNode *new_extents (db::CompoundRegionOperationNode *input, db::Coord e)
+{
+  if (input->result_type () == db::CompoundRegionOperationNode::EdgePairs) {
+    return new db::CompoundRegionEdgePairToPolygonProcessingOperationNode (new db::extents_processor<db::EdgePair> (e, e), input, true /*processor is owned*/);
+  } else if (input->result_type () == db::CompoundRegionOperationNode::EdgePairs) {
+    return new db::CompoundRegionEdgeToPolygonProcessingOperationNode (new db::extents_processor<db::Edge> (e, e), input, true /*processor is owned*/);
+  } else if (input->result_type () == db::CompoundRegionOperationNode::Region) {
+    return new db::CompoundRegionProcessingOperationNode (new db::extents_processor<db::Polygon> (e, e), input, true /*processor is owned*/);
+  } else {
+    input->keep ();
+    return input;
+  }
+}
+
+static db::CompoundRegionOperationNode *new_relative_extents (db::CompoundRegionOperationNode *input, double fx1, double fy1, double fx2, double fy2, db::Coord dx, db::Coord dy)
 {
   return new db::CompoundRegionProcessingOperationNode (new db::RelativeExtents (fx1, fy1, fx2, fy2, dx, dy), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_relative_extents_as_edges_node (db::CompoundRegionOperationNode *input, double fx1, double fy1, double fx2, double fy2)
+static db::CompoundRegionOperationNode *new_relative_extents_as_edges (db::CompoundRegionOperationNode *input, double fx1, double fy1, double fx2, double fy2)
 {
   return new db::CompoundRegionToEdgeProcessingOperationNode (new db::RelativeExtentsAsEdges (fx1, fy1, fx2, fy2), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_convex_decomposition_node (db::CompoundRegionOperationNode *input, db::PreferredOrientation mode)
+static db::CompoundRegionOperationNode *new_convex_decomposition (db::CompoundRegionOperationNode *input, db::PreferredOrientation mode)
 {
   return new db::CompoundRegionProcessingOperationNode (new db::ConvexDecomposition (mode), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_trapezoid_decomposition_node (db::CompoundRegionOperationNode *input, db::TrapezoidDecompositionMode mode)
+static db::CompoundRegionOperationNode *new_trapezoid_decomposition (db::CompoundRegionOperationNode *input, db::TrapezoidDecompositionMode mode)
 {
   return new db::CompoundRegionProcessingOperationNode (new db::TrapezoidDecomposition (mode), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_polygon_breaker_node (db::CompoundRegionOperationNode *input, size_t max_vertex_count, double max_area_ratio)
+static db::CompoundRegionOperationNode *new_polygon_breaker (db::CompoundRegionOperationNode *input, size_t max_vertex_count, double max_area_ratio)
 {
   return new db::CompoundRegionProcessingOperationNode (new db::PolygonBreaker (max_vertex_count, max_area_ratio), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_size_node (db::CompoundRegionOperationNode *input, db::Coord dx, db::Coord dy, unsigned int mode)
+static db::CompoundRegionOperationNode *new_sized (db::CompoundRegionOperationNode *input, db::Coord dx, db::Coord dy, unsigned int mode)
 {
   return new db::CompoundRegionProcessingOperationNode (new db::PolygonSizer (dx, dy, mode), input, true /*processor is owned*/);
 }
@@ -188,37 +228,61 @@ static db::CompoundRegionOperationNode *new_minkowsky_sum_node4 (db::CompoundReg
   return new db::CompoundRegionProcessingOperationNode (new db::minkowsky_sum_computation<std::vector<db::Point> > (p), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_edges_node (db::CompoundRegionOperationNode *input)
+static db::CompoundRegionOperationNode *new_edges (db::CompoundRegionOperationNode *input)
 {
-  return new db::CompoundRegionToEdgeProcessingOperationNode (new db::PolygonToEdgeProcessor (), input, true /*processor is owned*/);
+  if (input->result_type () == db::CompoundRegionOperationNode::EdgePairs) {
+    return new db::CompoundRegionEdgePairToEdgeProcessingOperationNode (new db::EdgePairToEdgesProcessor (), input, true /*processor is owned*/);
+  } else if (input->result_type () == db::CompoundRegionOperationNode::Region) {
+    return new db::CompoundRegionToEdgeProcessingOperationNode (new db::PolygonToEdgeProcessor (), input, true /*processor is owned*/);
+  } else {
+    input->keep ();
+    return input;
+  }
 }
 
-static db::CompoundRegionOperationNode *new_edge_length_filter_node (db::CompoundRegionOperationNode *input, db::Edge::distance_type lmin, db::Edge::distance_type lmax, bool inverse)
+static db::CompoundRegionOperationNode *new_edge_length_filter (db::CompoundRegionOperationNode *input, bool inverse, db::Edge::distance_type lmin, db::Edge::distance_type lmax)
 {
   return new db::CompoundRegionEdgeFilterOperationNode (new db::EdgeLengthFilter (lmin, lmax, inverse), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_edge_orientation_filter_node (db::CompoundRegionOperationNode *input, double amin, double amax, bool inverse)
+static db::CompoundRegionOperationNode *new_edge_orientation_filter (db::CompoundRegionOperationNode *input, bool inverse, double amin, double amax)
 {
   return new db::CompoundRegionEdgeFilterOperationNode (new db::EdgeOrientationFilter (amin, amax, inverse), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_edge_pair_to_polygon_node (db::CompoundRegionOperationNode *input, db::Coord e)
+static db::CompoundRegionOperationNode *new_polygons (db::CompoundRegionOperationNode *input, db::Coord e)
 {
-  return new db::CompoundRegionEdgePairToPolygonProcessingOperationNode (new db::EdgePairToPolygonProcessor (e), input, true /*processor is owned*/);
+  if (input->result_type () == db::CompoundRegionOperationNode::EdgePairs) {
+    return new db::CompoundRegionEdgePairToPolygonProcessingOperationNode (new db::EdgePairToPolygonProcessor (e), input, true /*processor is owned*/);
+  } else if (input->result_type () == db::CompoundRegionOperationNode::Edges) {
+    return new db::CompoundRegionEdgeToPolygonProcessingOperationNode (new db::ExtendedEdgeProcessor (e), input, true /*processor is owned*/);
+  } else {
+    input->keep ();
+    return input;
+  }
 }
 
-static db::CompoundRegionOperationNode *new_edge_pair_to_edges_node (db::CompoundRegionOperationNode *input)
+static db::CompoundRegionOperationNode *new_extended (db::CompoundRegionOperationNode *input, db::Coord ext_b, db::Coord ext_e, db::Coord ext_o, db::Coord ext_i)
 {
-  return new db::CompoundRegionEdgePairToEdgeProcessingOperationNode (new db::EdgePairToEdgesProcessor (), input, true /*processor is owned*/);
+  return new db::CompoundRegionEdgeToPolygonProcessingOperationNode (new db::ExtendedEdgeProcessor (ext_b, ext_e, ext_o, ext_i), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_edge_pair_to_first_edges_node (db::CompoundRegionOperationNode *input)
+static db::CompoundRegionOperationNode *new_extended_in (db::CompoundRegionOperationNode *input, db::Coord e)
+{
+  return new db::CompoundRegionEdgeToPolygonProcessingOperationNode (new db::ExtendedEdgeProcessor (0, 0, 0, e), input, true /*processor is owned*/);
+}
+
+static db::CompoundRegionOperationNode *new_extended_out (db::CompoundRegionOperationNode *input, db::Coord e)
+{
+  return new db::CompoundRegionEdgeToPolygonProcessingOperationNode (new db::ExtendedEdgeProcessor (0, 0, e, 0), input, true /*processor is owned*/);
+}
+
+static db::CompoundRegionOperationNode *new_edge_pair_to_first_edges (db::CompoundRegionOperationNode *input)
 {
   return new db::CompoundRegionEdgePairToEdgeProcessingOperationNode (new db::EdgePairToFirstEdgesProcessor (), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_edge_pair_to_second_edges_node (db::CompoundRegionOperationNode *input)
+static db::CompoundRegionOperationNode *new_edge_pair_to_second_edges (db::CompoundRegionOperationNode *input)
 {
   return new db::CompoundRegionEdgePairToEdgeProcessingOperationNode (new db::EdgePairToSecondEdgesProcessor (), input, true /*processor is owned*/);
 }
@@ -251,42 +315,59 @@ static db::CompoundRegionOperationNode *new_check_node (db::CompoundRegionOperat
   );
 }
 
-static db::CompoundRegionOperationNode *new_width_check_node (db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
+static db::CompoundRegionOperationNode *new_width_check (db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
-  return new_check_node (db::WidthRelation, false, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, db::NoOppositeFilter, db::NoSideAllowed);
+  db::RegionCheckOptions options (whole_edges,
+                                  metrics,
+                                  ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                                  min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                                  max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                                  shielded);
+  return new db::CompoundRegionToEdgePairProcessingOperationNode (new db::SinglePolygonCheck (db::WidthRelation, d, options), new_primary (), true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_space_check_node (db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter)
+static db::CompoundRegionOperationNode *new_space_check (db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter)
+{
+  return new_check_node (db::SpaceRelation, false, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, opposite_filter, rect_filter);
+}
+
+static db::CompoundRegionOperationNode *new_isolated_check (db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter)
 {
   return new_check_node (db::SpaceRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, opposite_filter, rect_filter);
 }
 
-static db::CompoundRegionOperationNode *new_notch_check_node (db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
+static db::CompoundRegionOperationNode *new_notch_check (db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
 {
-  return new_check_node (db::SpaceRelation, false, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, db::NoOppositeFilter, db::NoSideAllowed);
+  db::RegionCheckOptions options (whole_edges,
+                                  metrics,
+                                  ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                                  min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                                  max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                                  shielded);
+  return new db::CompoundRegionToEdgePairProcessingOperationNode (new db::SinglePolygonCheck (db::SpaceRelation, d, options), new_primary (), true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_separation_check_node (db::CompoundRegionOperationNode *input, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter)
+static db::CompoundRegionOperationNode *new_separation_check (db::CompoundRegionOperationNode *input, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter)
 {
   return new_check_node (input, db::SpaceRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, opposite_filter, rect_filter);
 }
 
-static db::CompoundRegionOperationNode *new_overlap_check_node (db::CompoundRegionOperationNode *input, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter)
+static db::CompoundRegionOperationNode *new_overlap_check (db::CompoundRegionOperationNode *input, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter)
 {
   return new_check_node (input, db::OverlapRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, opposite_filter, rect_filter);
 }
 
-static db::CompoundRegionOperationNode *new_inside_check_node (db::CompoundRegionOperationNode *input, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter)
+static db::CompoundRegionOperationNode *new_inside_check (db::CompoundRegionOperationNode *input, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter)
 {
   return new_check_node (input, db::InsideRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, opposite_filter, rect_filter);
 }
 
-static db::CompoundRegionOperationNode *new_perimeter_filter (db::CompoundRegionOperationNode *input, db::coord_traits<db::Coord>::perimeter_type pmin, db::coord_traits<db::Coord>::perimeter_type pmax, bool inverse)
+static db::CompoundRegionOperationNode *new_perimeter_filter (db::CompoundRegionOperationNode *input, bool inverse, db::coord_traits<db::Coord>::perimeter_type pmin, db::coord_traits<db::Coord>::perimeter_type pmax)
 {
   return new db::CompoundRegionFilterOperationNode (new db::RegionPerimeterFilter (pmin, pmax, inverse), input, true);
 }
 
-static db::CompoundRegionOperationNode *new_area_filter (db::CompoundRegionOperationNode *input, db::coord_traits<db::Coord>::area_type amin, db::coord_traits<db::Coord>::area_type amax, bool inverse)
+static db::CompoundRegionOperationNode *new_area_filter (db::CompoundRegionOperationNode *input, bool inverse, db::coord_traits<db::Coord>::area_type amin, db::coord_traits<db::Coord>::area_type amax)
 {
   return new db::CompoundRegionFilterOperationNode (new db::RegionAreaFilter (amin, amax, inverse), input, true);
 }
@@ -301,9 +382,24 @@ static db::CompoundRegionOperationNode *new_rectangle_filter (db::CompoundRegion
   return new db::CompoundRegionFilterOperationNode (new db::RectangleFilter (inverse), input, true);
 }
 
-static db::CompoundRegionOperationNode *new_bbox_filter (db::CompoundRegionOperationNode *input, db::RegionBBoxFilter::parameter_type parameter, db::coord_traits<db::Coord>::distance_type vmin, db::coord_traits<db::Coord>::distance_type vmax, bool inverse)
+static db::CompoundRegionOperationNode *new_bbox_filter (db::CompoundRegionOperationNode *input, db::RegionBBoxFilter::parameter_type parameter, bool inverse, db::coord_traits<db::Coord>::distance_type vmin, db::coord_traits<db::Coord>::distance_type vmax)
 {
   return new db::CompoundRegionFilterOperationNode (new db::RegionBBoxFilter (vmin, vmax, inverse, parameter), input, true);
+}
+
+static db::CompoundRegionOperationNode *new_start_segments (db::CompoundRegionOperationNode *input, db::Edges::length_type length, double fraction)
+{
+  return new db::CompoundRegionEdgeProcessingOperationNode (new db::EdgeSegmentSelector (-1, length, fraction), input, true);
+}
+
+static db::CompoundRegionOperationNode *new_end_segments (db::CompoundRegionOperationNode *input, db::Edges::length_type length, double fraction)
+{
+  return new db::CompoundRegionEdgeProcessingOperationNode (new db::EdgeSegmentSelector (1, length, fraction), input, true);
+}
+
+static db::CompoundRegionOperationNode *new_centers (db::CompoundRegionOperationNode *input, db::Edges::length_type length, double fraction)
+{
+  return new db::CompoundRegionEdgeProcessingOperationNode (new db::EdgeSegmentSelector (0, length, fraction), input, true);
 }
 
 Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "CompoundRegionOperationNode",
@@ -339,6 +435,26 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   gsi::constructor ("new_outside", &new_outside, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false),
     "@brief Creates a node representing an outside selection operation between the inputs.\n"
   ) +
+  gsi::constructor ("new_hulls", &new_hulls, gsi::arg ("input"),
+    "@brief Creates a node extracting the hulls from polygons.\n"
+  ) +
+  gsi::constructor ("new_holes", &new_holes, gsi::arg ("input"),
+    "@brief Creates a node extracting the holes from polygons.\n"
+  ) +
+  gsi::constructor ("new_strange_polygons_filter", &new_strange_polygons_filter, gsi::arg ("input"),
+    "@brief Creates a node extracting strange polygons.\n"
+    "'strange polygons' are ones which cannot be oriented - e.g. '8' shape polygons."
+  ) +
+  gsi::constructor ("new_smoothed", &new_smoothed, gsi::arg ("input"), gsi::arg ("d"),
+    "@brief Creates a node smoothing the polygons.\n"
+    "@param d The tolerance to be applied for the smoothing."
+  ) +
+  gsi::constructor ("new_rounded_corners", &new_rounded_corners, gsi::arg ("input"), gsi::arg ("rinner"), gsi::arg ("router"), gsi::arg ("n"),
+    "@brief Creates a node generating rounded corners.\n"
+    "@param rinner The inner corner radius."
+    "@param router The outer corner radius."
+    "@param n The number if points per full circle."
+  ) +
   gsi::constructor ("new_case", &new_case, gsi::arg ("inputs"),
     "@brief Creates a 'switch ladder' (case statement) compound operation node.\n"
     "\n"
@@ -347,28 +463,32 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
     "rendered if c2 isn't empty etc. If none of the conditions renders a non-empty set and a default result is present, the default will be "
     "returned. Otherwise, the result is empty."
   ) +
-  gsi::constructor ("new_corners_as_rectangles", &new_corners_as_rectangles_node, gsi::arg ("input"), gsi::arg ("angle_start"), gsi::arg ("angle_end"), gsi::arg ("dim"),
+  gsi::constructor ("new_corners_as_rectangles", &new_corners_as_rectangles, gsi::arg ("input"), gsi::arg ("angle_start"), gsi::arg ("angle_end"), gsi::arg ("dim"),
     "@brief Creates a node turning corners into rectangles.\n"
   ) +
-  gsi::constructor ("new_corners_as_dots", &new_corners_as_dots_node, gsi::arg ("input"), gsi::arg ("angle_start"), gsi::arg ("angle_end"),
+  gsi::constructor ("new_corners_as_dots", &new_corners_as_dots, gsi::arg ("input"), gsi::arg ("angle_start"), gsi::arg ("angle_end"),
     "@brief Creates a node turning corners into dots (single-point edges).\n"
   ) +
-  gsi::constructor ("new_relative_extents", &new_relative_extents_node, gsi::arg ("input"), gsi::arg ("fx1"), gsi::arg ("fy1"), gsi::arg ("fx2"), gsi::arg ("fy2"), gsi::arg ("dx"), gsi::arg ("dy"),
-    "@brief Creates a node returning markers at specified locations of the extend (e.g. at the center).\n"
+  gsi::constructor ("new_extents", &new_extents, gsi::arg ("input"), gsi::arg ("e", 0),
+    "@brief Creates a node returning the extents of the objects.\n"
+    "The 'e' parameter provides a generic enlargement which is applied to the boxes. This is helpful to cover dot-like edges or edge pairs in the input."
   ) +
-  gsi::constructor ("new_relative_extents_as_edges", &new_relative_extents_as_edges_node, gsi::arg ("input"), gsi::arg ("fx1"), gsi::arg ("fy1"), gsi::arg ("fx2"), gsi::arg ("fy2"),
-    "@brief Creates a node returning edges at specified locations of the extend (e.g. at the center).\n"
+  gsi::constructor ("new_relative_extents", &new_relative_extents, gsi::arg ("input"), gsi::arg ("fx1"), gsi::arg ("fy1"), gsi::arg ("fx2"), gsi::arg ("fy2"), gsi::arg ("dx"), gsi::arg ("dy"),
+    "@brief Creates a node returning markers at specified locations of the extent (e.g. at the center).\n"
   ) +
-  gsi::constructor ("new_convex_decomposition", &new_convex_decomposition_node, gsi::arg ("input"), gsi::arg ("mode"),
+  gsi::constructor ("new_relative_extents_as_edges", &new_relative_extents_as_edges, gsi::arg ("input"), gsi::arg ("fx1"), gsi::arg ("fy1"), gsi::arg ("fx2"), gsi::arg ("fy2"),
+    "@brief Creates a node returning edges at specified locations of the extent (e.g. at the center).\n"
+  ) +
+  gsi::constructor ("new_convex_decomposition", &new_convex_decomposition, gsi::arg ("input"), gsi::arg ("mode"),
     "@brief Creates a node providing a composition into convex pieces.\n"
   ) +
-  gsi::constructor ("new_trapezoid_decomposition", &new_trapezoid_decomposition_node, gsi::arg ("input"), gsi::arg ("mode"),
+  gsi::constructor ("new_trapezoid_decomposition", &new_trapezoid_decomposition, gsi::arg ("input"), gsi::arg ("mode"),
     "@brief Creates a node providing a composition into trapezoids.\n"
   ) +
-  gsi::constructor ("new_polygon_breaker_node", &new_polygon_breaker_node, gsi::arg ("input"), gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio"),
+  gsi::constructor ("new_polygon_breaker", &new_polygon_breaker, gsi::arg ("input"), gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio"),
     "@brief Creates a node providing a composition into parts with less than the given number of points and a smaller area ratio.\n"
   ) +
-  gsi::constructor ("new_size_node", &new_size_node, gsi::arg ("input"), gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("mode"),
+  gsi::constructor ("new_sized", &new_sized, gsi::arg ("input"), gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("mode"),
     "@brief Creates a node providing sizing.\n"
   ) +
   gsi::constructor ("new_minkowsky_sum", &new_minkowsky_sum_node1, gsi::arg ("input"), gsi::arg ("e"),
@@ -383,35 +503,38 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   gsi::constructor ("new_minkowsky_sum", &new_minkowsky_sum_node4, gsi::arg ("input"), gsi::arg ("p"),
     "@brief Creates a node providing a Minkowsky sum with a point sequence forming a contour.\n"
   ) +
-  gsi::constructor ("new_width_check", &new_width_check_node, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true),
+  gsi::constructor ("new_width_check", &new_width_check, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true),
     "@brief Creates a node providing a width check.\n"
   ) +
-  gsi::constructor ("new_space_check", &new_space_check_node, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter), gsi::arg ("rect_filter", db::NoSideAllowed),
+  gsi::constructor ("new_space_check", &new_space_check, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter), gsi::arg ("rect_filter", db::NoSideAllowed),
     "@brief Creates a node providing a space check.\n"
   ) +
-  gsi::constructor ("new_notch_check", &new_notch_check_node, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true),
+  gsi::constructor ("new_isolated_check", &new_isolated_check, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter), gsi::arg ("rect_filter", db::NoSideAllowed),
+    "@brief Creates a node providing a isolated polygons (space between different polygons) check.\n"
+  ) +
+  gsi::constructor ("new_notch_check", &new_notch_check, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true),
     "@brief Creates a node providing a intra-polygon space check.\n"
   ) +
-  gsi::constructor ("new_separation_check", &new_separation_check_node, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter), gsi::arg ("rect_filter", db::NoSideAllowed),
+  gsi::constructor ("new_separation_check", &new_separation_check, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter), gsi::arg ("rect_filter", db::NoSideAllowed),
     "@brief Creates a node providing a separation check.\n"
   ) +
-  gsi::constructor ("new_overlap_check", &new_overlap_check_node, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter), gsi::arg ("rect_filter", db::NoSideAllowed),
+  gsi::constructor ("new_overlap_check", &new_overlap_check, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter), gsi::arg ("rect_filter", db::NoSideAllowed),
     "@brief Creates a node providing an overlap check.\n"
   ) +
-  gsi::constructor ("new_inside_check", &new_inside_check_node, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter), gsi::arg ("rect_filter", db::NoSideAllowed),
+  gsi::constructor ("new_inside_check", &new_inside_check, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter), gsi::arg ("rect_filter", db::NoSideAllowed),
     "@brief Creates a node providing an inside (enclosure) check.\n"
   ) +
-  gsi::constructor ("new_perimeter_filter", &new_perimeter_filter, gsi::arg ("input"), gsi::arg ("pmin", 0), gsi::arg ("pmax", std::numeric_limits<db::coord_traits<db::Coord>::perimeter_type>::max (), "max"), gsi::arg ("inverse", false),
+  gsi::constructor ("new_perimeter_filter", &new_perimeter_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("pmin", 0), gsi::arg ("pmax", std::numeric_limits<db::coord_traits<db::Coord>::perimeter_type>::max (), "max"),
     "@brief Creates a node filtering the input by perimeter.\n"
     "This node renders the input if the perimeter is between pmin and pmax (exclusively). If 'inverse' is set to true, the "
     "input shape is returned if the perimeter is less than pmin (exclusively) or larger than pmax (inclusively)."
   ) +
-  gsi::constructor ("new_area_filter", &new_area_filter, gsi::arg ("input"), gsi::arg ("amin", 0), gsi::arg ("amax", std::numeric_limits<db::coord_traits<db::Coord>::area_type>::max (), "max"), gsi::arg ("inverse", false),
+  gsi::constructor ("new_area_filter", &new_area_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("amin", 0), gsi::arg ("amax", std::numeric_limits<db::coord_traits<db::Coord>::area_type>::max (), "max"),
     "@brief Creates a node filtering the input by area.\n"
     "This node renders the input if the area is between amin and amax (exclusively). If 'inverse' is set to true, the "
     "input shape is returned if the area is less than amin (exclusively) or larger than amax (inclusively)."
   ) +
-  gsi::constructor ("new_bbox_filter", &new_bbox_filter, gsi::arg ("input"), gsi::arg ("parameter"), gsi::arg ("pmin", 0), gsi::arg ("pmax", std::numeric_limits<db::coord_traits<db::Coord>::area_type>::max (), "max"), gsi::arg ("inverse", false),
+  gsi::constructor ("new_bbox_filter", &new_bbox_filter, gsi::arg ("input"), gsi::arg ("parameter"), gsi::arg ("inverse", false), gsi::arg ("pmin", 0), gsi::arg ("pmax", std::numeric_limits<db::coord_traits<db::Coord>::area_type>::max (), "max"),
     "@brief Creates a node filtering the input by bounding box parameters.\n"
     "This node renders the input if the specified bounding box parameter of the input shape is between pmin and pmax (exclusively). If 'inverse' is set to true, the "
     "input shape is returned if the parameter is less than pmin (exclusively) or larger than pmax (inclusively)."
@@ -422,26 +545,42 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   gsi::constructor ("new_rectangle_filter", &new_rectangle_filter, gsi::arg ("input"), gsi::arg ("inverse", false),
     "@brief Creates a node filtering the input for rectangular shapes (or non-rectangular ones with 'inverse' set to 'true').\n"
   ) +
-  gsi::constructor ("new_edges", &new_edges_node, gsi::arg ("input"),
+  gsi::constructor ("new_edges", &new_edges, gsi::arg ("input"),
     "@brief Creates a node converting polygons into it's edges.\n"
   ) +
-  gsi::constructor ("new_edge_length_filter", &new_edge_length_filter_node, gsi::arg ("input"), gsi::arg ("lmin", 0), gsi::arg ("lmax", std::numeric_limits<db::Edge::distance_type>::max (), "max"), gsi::arg ("inverse", false),
+  gsi::constructor ("new_edge_length_filter", &new_edge_length_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("lmin", 0), gsi::arg ("lmax", std::numeric_limits<db::Edge::distance_type>::max (), "max"),
     "@brief Creates a node filtering edges by their length.\n"
   ) +
-  gsi::constructor ("new_edge_orientation_filter", &new_edge_orientation_filter_node, gsi::arg ("input"), gsi::arg ("amin"), gsi::arg ("amax"), gsi::arg ("inverse", false),
+  gsi::constructor ("new_edge_orientation_filter", &new_edge_orientation_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("amin"), gsi::arg ("amax"),
     "@brief Creates a node filtering edges by their orientation.\n"
   ) +
-  gsi::constructor ("new_edge_pair_to_polygon", &new_edge_pair_to_polygon_node, gsi::arg ("input"), gsi::arg ("e", 0),
-    "@brief Creates a node converting edge pairs to polygons.\n"
+  gsi::constructor ("new_polygons", &new_polygons, gsi::arg ("input"), gsi::arg ("e", 0),
+    "@brief Creates a node converting the input to polygons.\n"
+    "@param e The enlargement parameter when converting edges or edge pairs to polygons.\n"
   ) +
-  gsi::constructor ("new_edge_pair_to_edges", &new_edge_pair_to_edges_node, gsi::arg ("input"),
-    "@brief Creates a node converting edge pairs to two edges each.\n"
-  ) +
-  gsi::constructor ("new_edge_pair_to_first_edges", &new_edge_pair_to_first_edges_node, gsi::arg ("input"),
+  gsi::constructor ("new_edge_pair_to_first_edges", &new_edge_pair_to_first_edges, gsi::arg ("input"),
     "@brief Creates a node delivering the first edge of each edges pair.\n"
   ) +
-  gsi::constructor ("new_edge_pair_to_second_edges", &new_edge_pair_to_second_edges_node, gsi::arg ("input"),
+  gsi::constructor ("new_edge_pair_to_second_edges", &new_edge_pair_to_second_edges, gsi::arg ("input"),
     "@brief Creates a node delivering the second edge of each edges pair.\n"
+  ) +
+  gsi::constructor ("new_start_segments", &new_start_segments, gsi::arg ("input"), gsi::arg ("length"), gsi::arg ("fraction"),
+    "@brief Creates a node delivering a part at the beginning of each input edge.\n"
+  ) +
+  gsi::constructor ("new_end_segments", &new_end_segments, gsi::arg ("input"), gsi::arg ("length"), gsi::arg ("fraction"),
+    "@brief Creates a node delivering a part at the end of each input edge.\n"
+  ) +
+  gsi::constructor ("new_centers", &new_centers, gsi::arg ("input"), gsi::arg ("length"), gsi::arg ("fraction"),
+    "@brief Creates a node delivering a part at the center of each input edge.\n"
+  ) +
+  gsi::constructor ("new_extended", &new_extended, gsi::arg ("input"), gsi::arg ("ext_b"), gsi::arg ("ext_e"), gsi::arg ("ext_o"), gsi::arg ("ext_i"),
+    "@brief Creates a node delivering a polygonized version of the edges with the four extension parameters.\n"
+  ) +
+  gsi::constructor ("new_extended_in", &new_extended_in, gsi::arg ("input"), gsi::arg ("e"),
+    "@brief Creates a node delivering a polygonized, inside-extended version of the edges.\n"
+  ) +
+  gsi::constructor ("new_extended_out", &new_extended_out, gsi::arg ("input"), gsi::arg ("e"),
+    "@brief Creates a node delivering a polygonized, inside-extended version of the edges.\n"
   ) +
   method ("description=", &db::CompoundRegionOperationNode::set_description, gsi::arg ("d"),
     "@brief Sets the description for this node"

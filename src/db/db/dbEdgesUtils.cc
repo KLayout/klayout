@@ -174,4 +174,37 @@ extended_edge (const db::Edge &edge, db::Coord ext_b, db::Coord ext_e, db::Coord
   return poly;
 }
 
+// -------------------------------------------------------------------------------------------------------------
+//  EdgeSegmentSelector processor
+
+EdgeSegmentSelector::EdgeSegmentSelector (int mode, db::Edges::length_type length, double fraction)
+  : m_mode (mode), m_length (length), m_fraction (fraction)
+{ }
+
+EdgeSegmentSelector::~EdgeSegmentSelector ()
+{ }
+
+void
+EdgeSegmentSelector::process (const db::Edge &edge, std::vector<db::Edge> &res) const
+{
+  double l = std::max (edge.double_length () * m_fraction, double (m_length));
+
+  if (m_mode < 0) {
+
+    res.push_back (db::Edge (edge.p1 (), db::Point (db::DPoint (edge.p1 ()) + db::DVector (edge.d ()) * (l / edge.double_length ()))));
+
+  } else if (m_mode > 0) {
+
+    res.push_back (db::Edge (db::Point (db::DPoint (edge.p2 ()) - db::DVector (edge.d ()) * (l / edge.double_length ())), edge.p2 ()));
+
+  } else {
+
+    db::DVector dl = db::DVector (edge.d ()) * (0.5 * l / edge.double_length ());
+    db::DPoint center = db::DPoint (edge.p1 ()) + db::DVector (edge.p2 () - edge.p1 ()) * 0.5;
+
+    res.push_back (db::Edge (db::Point (center - dl), db::Point (center + dl)));
+
+  }
+}
+
 }

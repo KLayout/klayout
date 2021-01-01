@@ -499,7 +499,7 @@ TEST(9_LogicalSelectOperation)
   run_test9 (_this, false);
 }
 
-TEST(9d_EdgeFilterOperation)
+TEST(9d_LogicalSelectOperation)
 {
   run_test9 (_this, true);
 }
@@ -575,7 +575,7 @@ TEST(10_LogicalAndNotOperation)
   run_test10 (_this, false);
 }
 
-TEST(10d_EdgeFilterOperation)
+TEST(10d_LogicalAndNotOperation)
 {
   run_test10 (_this, true);
 }
@@ -704,3 +704,48 @@ TEST(12d_EdgeBooleanOperations)
 {
   run_test12 (_this, true);
 }
+
+void run_test13 (tl::TestBase *_this, bool deep)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/drc/compound_13.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::RegionCheckOptions check_options;
+  check_options.metrics = db::Projection;
+
+  db::DeepShapeStore dss;
+
+  db::Region r, r2;
+  prep_layer (ly, 1, r, dss, deep);
+  prep_layer (ly, 2, r2, dss, deep);
+
+  db::CompoundRegionOperationPrimaryNode *primary = new db::CompoundRegionOperationPrimaryNode ();
+  db::CompoundRegionToEdgeProcessingOperationNode *primary_edges = new db::CompoundRegionToEdgeProcessingOperationNode (new db::PolygonToEdgeProcessor (), primary, true);
+
+  db::CompoundRegionEdgeProcessingOperationNode edge_proc (new db::EdgeSegmentSelector (-1, 1000, 0.1), primary_edges, true);
+
+  db::Edges res = r.cop_to_edges (edge_proc);
+
+  unsigned int l1000 = ly.get_layer (db::LayerProperties (1000, 0));
+  res.insert_into (&ly, *ly.begin_top_down (), l1000);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, make_au ("13", deep));
+}
+
+TEST(13_EdgeProcessor)
+{
+  run_test13 (_this, false);
+}
+
+TEST(13d_EdgeProcessor)
+{
+  run_test13 (_this, true);
+}
+

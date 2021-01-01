@@ -22,25 +22,7 @@
 
 #include "dbCompoundOperation.h"
 #include "dbRegion.h"
-
-/*@@@@
-
-TODO:
-
-* Transform variants?
-* "result is merged"?
-* "requires raw input"?
-
-* edge pair to edge generation nodes (first, second)
-
-* Interactions with shapes over some distance for neighborhood analysis
-
-* Sized subject shapes as inputs for other operations? how to compute distance then?
-
-* how do the logical boolean ops work?
-* what is the "multi_input" for case nodes?
-
-*/
+#include "dbRegionUtils.h"
 
 namespace db
 {
@@ -584,16 +566,41 @@ run_poly_bool (CompoundRegionGeometricalBoolOperationNode::GeometricalOp op, db:
   //  TODO: it's more efficient to feed the EP directly for polygon-to-polygon bools
   db::Region ra, rb;
   init_region (ra, a);
-  init_region (rb, b);
 
-  if (op == CompoundRegionGeometricalBoolOperationNode::And) {
-    write_result (layout, res, ra & rb);
-  } else if (op == CompoundRegionGeometricalBoolOperationNode::Or) {
-    write_result (layout, res, ra + rb);
-  } else if (op == CompoundRegionGeometricalBoolOperationNode::Xor) {
-    write_result (layout, res, ra ^ rb);
-  } else if (op == CompoundRegionGeometricalBoolOperationNode::Not) {
-    write_result (layout, res, ra - rb);
+  if (ra.empty ()) {
+
+    if (op == CompoundRegionGeometricalBoolOperationNode::And || op == CompoundRegionGeometricalBoolOperationNode::Not) {
+      write_result (layout, res, ra);
+    } else if (op == CompoundRegionGeometricalBoolOperationNode::Or || op == CompoundRegionGeometricalBoolOperationNode::Xor) {
+      init_region (rb, b);
+      write_result (layout, res, rb);
+    }
+
+  } else {
+
+    init_region (rb, b);
+    if (rb.empty ()) {
+
+      if (op == CompoundRegionGeometricalBoolOperationNode::And) {
+        write_result (layout, res, rb);
+      } else {
+        write_result (layout, res, ra);
+      }
+
+    } else {
+
+      if (op == CompoundRegionGeometricalBoolOperationNode::And) {
+        write_result (layout, res, ra & rb);
+      } else if (op == CompoundRegionGeometricalBoolOperationNode::Or) {
+        write_result (layout, res, ra + rb);
+      } else if (op == CompoundRegionGeometricalBoolOperationNode::Xor) {
+        write_result (layout, res, ra ^ rb);
+      } else if (op == CompoundRegionGeometricalBoolOperationNode::Not) {
+        write_result (layout, res, ra - rb);
+      }
+
+    }
+
   }
 }
 
@@ -622,9 +629,22 @@ run_poly_vs_edge_bool (CompoundRegionGeometricalBoolOperationNode::GeometricalOp
   init_region (ra, a);
 
   db::Edges eb;
-  init_edges (eb, b);
 
-  write_result (layout, res, eb & ra);
+  if (ra.empty ()) {
+
+    write_result (layout, res, eb);
+
+  } else {
+
+    init_edges (eb, b);
+
+    if (eb.empty ()) {
+      write_result (layout, res, eb);
+    } else {
+      write_result (layout, res, eb & ra);
+    }
+
+  }
 }
 
 static void
@@ -647,17 +667,25 @@ run_edge_vs_poly_bool (CompoundRegionGeometricalBoolOperationNode::GeometricalOp
     return;
   }
 
-  //  TODO: it's more efficient to feed the EP directly for polygon-to-polygon bools
-  db::Region rb;
-  init_region (rb, b);
-
   db::Edges ea;
   init_edges (ea, a);
 
-  if (op == CompoundRegionGeometricalBoolOperationNode::And) {
-    write_result (layout, res, ea & rb);
-  } else if (op == CompoundRegionGeometricalBoolOperationNode::Not) {
-    write_result (layout, res, ea - rb);
+  if (ea.empty ()) {
+
+    write_result (layout, res, ea);
+
+  } else {
+
+    //  TODO: it's more efficient to feed the EP directly for polygon-to-polygon bools
+    db::Region rb;
+    init_region (rb, b);
+
+    if (op == CompoundRegionGeometricalBoolOperationNode::And) {
+      write_result (layout, res, ea & rb);
+    } else if (op == CompoundRegionGeometricalBoolOperationNode::Not) {
+      write_result (layout, res, ea - rb);
+    }
+
   }
 }
 
@@ -678,16 +706,42 @@ run_bool (CompoundRegionGeometricalBoolOperationNode::GeometricalOp op, db::Layo
 {
   db::Edges ea, eb;
   init_edges (ea, a);
-  init_edges (eb, b);
 
-  if (op == CompoundRegionGeometricalBoolOperationNode::And) {
-    write_result (layout, res, ea & eb);
-  } else if (op == CompoundRegionGeometricalBoolOperationNode::Or) {
-    write_result (layout, res, ea + eb);
-  } else if (op == CompoundRegionGeometricalBoolOperationNode::Xor) {
-    write_result (layout, res, ea ^ eb);
-  } else if (op == CompoundRegionGeometricalBoolOperationNode::Not) {
-    write_result (layout, res, ea - eb);
+  if (ea.empty ()) {
+
+    if (op == CompoundRegionGeometricalBoolOperationNode::And || op == CompoundRegionGeometricalBoolOperationNode::Not) {
+      write_result (layout, res, ea);
+    } else if (op == CompoundRegionGeometricalBoolOperationNode::Or || op == CompoundRegionGeometricalBoolOperationNode::Xor) {
+      init_edges (eb, b);
+      write_result (layout, res, eb);
+    }
+
+  } else {
+
+    init_edges (eb, b);
+
+    if (eb.empty ()) {
+
+      if (op == CompoundRegionGeometricalBoolOperationNode::And) {
+        write_result (layout, res, eb);
+      } else {
+        write_result (layout, res, ea);
+      }
+
+    } else {
+
+      if (op == CompoundRegionGeometricalBoolOperationNode::And) {
+        write_result (layout, res, ea & eb);
+      } else if (op == CompoundRegionGeometricalBoolOperationNode::Or) {
+        write_result (layout, res, ea + eb);
+      } else if (op == CompoundRegionGeometricalBoolOperationNode::Xor) {
+        write_result (layout, res, ea ^ eb);
+      } else if (op == CompoundRegionGeometricalBoolOperationNode::Not) {
+        write_result (layout, res, ea - eb);
+      }
+
+    }
+
   }
 }
 
@@ -1150,6 +1204,39 @@ void
 CompoundRegionToEdgeProcessingOperationNode::processed (db::Layout *, const db::PolygonRef &p, std::vector<db::Edge> &res) const
 {
   mp_proc->process (p.obj ().transformed (p.trans ()), res);
+}
+
+// ---------------------------------------------------------------------------------------------
+
+CompoundRegionEdgeProcessingOperationNode::CompoundRegionEdgeProcessingOperationNode (EdgeProcessorBase *proc, CompoundRegionOperationNode *input, bool owns_proc)
+  : CompoundRegionMultiInputOperationNode (input), mp_proc (proc), m_owns_proc (owns_proc)
+{
+  set_description ("processor");
+}
+
+CompoundRegionEdgeProcessingOperationNode::~CompoundRegionEdgeProcessingOperationNode ()
+{
+  if (m_owns_proc) {
+    delete mp_proc;
+    mp_proc = 0;
+  }
+}
+
+void
+CompoundRegionEdgeProcessingOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+}
+
+void
+CompoundRegionEdgeProcessingOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+}
+
+void CompoundRegionEdgeProcessingOperationNode::processed (db::Layout *, const db::Edge &p, std::vector<db::Edge> &res) const
+{
+  mp_proc->process (p, res);
 }
 
 // ---------------------------------------------------------------------------------------------

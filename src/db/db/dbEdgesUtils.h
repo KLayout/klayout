@@ -336,6 +336,55 @@ private:
  */
 db::Polygon extended_edge (const db::Edge &edge, db::Coord ext_b, db::Coord ext_e, db::Coord ext_o, db::Coord ext_i);
 
+/**
+ *  @brief Wraps the extension algorithm into a edge to polygon processor
+ */
+class DB_PUBLIC ExtendedEdgeProcessor
+  : public db::EdgeToPolygonProcessorBase
+{
+public:
+  ExtendedEdgeProcessor (db::Coord e)
+    : m_ext_b (e), m_ext_e (e), m_ext_o (e), m_ext_i (e)
+  { }
+
+  ExtendedEdgeProcessor (db::Coord ext_b, db::Coord ext_e, db::Coord ext_o, db::Coord ext_i)
+    : m_ext_b (ext_b), m_ext_e (ext_e), m_ext_o (ext_o), m_ext_i (ext_i)
+  { }
+
+  virtual void process (const Edge &edge, std::vector<db::Polygon> &res) const
+  {
+    res.push_back (extended_edge (edge, m_ext_b, m_ext_e, m_ext_o, m_ext_i));
+  }
+
+private:
+  db::Coord m_ext_b, m_ext_e, m_ext_o, m_ext_i;
+};
+
+/**
+ * @brief The EdgeSegmentSelector class
+ */
+class DB_PUBLIC EdgeSegmentSelector
+  : public EdgeProcessorBase
+{
+public:
+  EdgeSegmentSelector (int mode, db::Edges::length_type length, double fraction);
+  ~EdgeSegmentSelector ();
+
+  virtual void process (const db::Edge &edge, std::vector<db::Edge> &res) const;
+
+  virtual const TransformationReducer *vars () const { return &m_vars; }
+  virtual bool result_is_merged () const { return false; }
+  virtual bool requires_raw_input () const { return false; }
+  virtual bool result_must_not_be_merged () const { return m_length <= 0; }
+  virtual bool wants_variants () const { return true; }
+
+private:
+  int m_mode;
+  db::Edges::length_type m_length;
+  double m_fraction;
+  db::MagnificationReducer m_vars;
+};
+
 } // namespace db
 
 #endif

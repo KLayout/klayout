@@ -936,6 +936,46 @@ private:
   }
 };
 
+class DB_PUBLIC CompoundRegionEdgeProcessingOperationNode
+  : public CompoundRegionMultiInputOperationNode
+{
+public:
+  CompoundRegionEdgeProcessingOperationNode (EdgeProcessorBase *proc, CompoundRegionOperationNode *input, bool owns_proc = false);
+  ~CompoundRegionEdgeProcessingOperationNode ();
+
+  //  specifies the result type
+  virtual ResultType result_type () const { return Edges; }
+
+  virtual const TransformationReducer *vars () const { return mp_proc->vars (); }
+  virtual bool wants_variants () const { return mp_proc->wants_variants (); }
+  virtual bool wants_merged () const { return true; }
+
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const;
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const;
+
+private:
+  EdgeProcessorBase *mp_proc;
+  bool m_owns_proc;
+
+  void processed (db::Layout *, const db::Edge &p, std::vector<db::Edge> &res) const;
+
+  template <class T>
+  void implement_compute_local (db::Layout *layout, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    std::vector<std::unordered_set<db::Edge> > one;
+    one.push_back (std::unordered_set<db::Edge> ());
+
+    child (0)->compute_local (layout, interactions, one, max_vertex_count, area_ratio);
+
+    std::vector<db::Edge> res;
+    for (typename std::unordered_set<db::Edge>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
+      res.clear ();
+      processed (layout, *p, res);
+      results.front ().insert (res.begin (), res.end ());
+    }
+  }
+};
+
 class DB_PUBLIC CompoundRegionEdgePairToPolygonProcessingOperationNode
   : public CompoundRegionMultiInputOperationNode
 {

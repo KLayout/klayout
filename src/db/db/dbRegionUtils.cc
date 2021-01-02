@@ -152,7 +152,7 @@ Edge2EdgeCheckBase::feed_pseudo_edges (db::box_scanner<db::Edge, size_t> &scanne
 {
   if (m_pass == 1) {
     for (std::set<std::pair<db::Edge, size_t> >::const_iterator e = m_pseudo_edges.begin (); e != m_pseudo_edges.end (); ++e) {
-// @@@printf("@@@ PSEUDO %s[%d]\n", e->first.to_string().c_str(), int(e->second)); fflush(stdout);
+//printf("@@@ PSEUDO %s[%d]\n", e->first.to_string().c_str(), int(e->second)); fflush(stdout);
       scanner.insert (&e->first, e->second);
     }
   }
@@ -189,7 +189,11 @@ Edge2EdgeCheckBase::add (const db::Edge *o1, size_t p1, const db::Edge *o2, size
 
         if (m_has_negative_edge_output) {
           m_pseudo_edges.insert (std::make_pair (db::Edge (ep.first ().p1 (), ep.second ().p2 ()), p1));
-          m_pseudo_edges.insert (std::make_pair (db::Edge (ep.second ().p1 (), ep.first ().p2 ()), p2));
+          m_pseudo_edges.insert (std::make_pair (db::Edge (ep.second ().p1 (), ep.first ().p2 ()), p1));
+          if (p1 != p2) {
+            m_pseudo_edges.insert (std::make_pair (db::Edge (ep.first ().p1 (), ep.second ().p2 ()), p2));
+            m_pseudo_edges.insert (std::make_pair (db::Edge (ep.second ().p1 (), ep.first ().p2 ()), p2));
+          }
         }
 
       }

@@ -231,7 +231,53 @@ TEST(5_LShapeNotch)
     poly_check.enter (poly, 0);
   } while (e2e.prepare_next_pass ());
 
-  EXPECT_EQ (tl::to_string (ep), "(0,0;0,3000),(2000,0;0,0),(2000,500;2000,0),(0,3000;2000,3000),(2000,3000;2000,1500)");
-  EXPECT_EQ (tl::to_string (ee1), "");
+  EXPECT_EQ (tl::to_string (ep), "(1500,1500;1500,2500)/(500,2500;500,1500),(2000,1500;1500,1500)/(1500,500;2000,500)");
+  EXPECT_EQ (tl::to_string (ee1), "(0,0;0,3000),(2000,0;0,0),(2000,500;2000,0),(0,3000;2000,3000),(2000,3000;2000,1500)");
   EXPECT_EQ (tl::to_string (ee2), "");
+}
+
+TEST(6_SeparationLvsBox)
+{
+  std::set<db::EdgePair> ep;
+  std::set<db::Edge> ee1, ee2;
+
+  db::EdgeRelationFilter er (db::SpaceRelation, 1001, db::Projection);
+
+  db::edge2edge_check_with_negative_output<std::set<db::EdgePair>, std::set<db::Edge> > e2e (er, ep, ee1, ee2, false, true /*different layers*/, false);
+
+  db::Point pts1[] = {
+    db::Point (0, 0),
+    db::Point (0, 3000),
+    db::Point (3000, 3000),
+    db::Point (3000, 2000),
+    db::Point (1000, 2000),
+    db::Point (1000, 0)
+  };
+
+  db::Polygon poly1;
+  poly1.assign_hull (pts1, pts1 + sizeof (pts1) / sizeof (pts1[0]));
+
+  db::Point pts2[] = {
+    db::Point (2000, 0),
+    db::Point (2000, 1000),
+    db::Point (3000, 1000),
+    db::Point (3000, 0)
+  };
+
+  db::Polygon poly2;
+  poly2.assign_hull (pts2, pts2 + sizeof (pts2) / sizeof (pts2[0]));
+
+  db::box_scanner<db::Polygon, size_t> scanner;
+  scanner.insert (&poly1, 0);  //  layer 0
+  scanner.insert (&poly2, 1);  //  layer 1
+
+  db::poly2poly_check_base<db::Polygon> poly_check (e2e);
+
+  do {
+    scanner.process (poly_check, er.distance (), db::box_convert<db::Polygon> ());
+  } while (e2e.prepare_next_pass ());
+
+  EXPECT_EQ (tl::to_string (ep), "(1000,1000;1000,0)/(2000,0;2000,1000),(3000,2000;2000,2000)/(2000,1000;3000,1000)");
+  EXPECT_EQ (tl::to_string (ee1), "(0,0;0,3000),(1000,0;0,0),(0,3000;3000,3000),(3000,3000;3000,2000)");
+  EXPECT_EQ (tl::to_string (ee2), "(3000,0;2000,0),(3000,1000;3000,0)");
 }

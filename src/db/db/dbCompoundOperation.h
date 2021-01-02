@@ -245,6 +245,26 @@ struct compound_operation_type_traits<db::EdgePair>
 };
 
 
+class DB_PUBLIC CompoundRegionOperationEmptyNode
+  : public CompoundRegionOperationNode
+{
+public:
+  CompoundRegionOperationEmptyNode (ResultType type)
+    : CompoundRegionOperationNode (), m_type (type)
+  { }
+
+  virtual ~CompoundRegionOperationEmptyNode ()
+  { }
+
+  virtual std::vector<db::Region *> inputs () const { return std::vector<db::Region *> (); }
+  virtual db::Coord dist () const { return 0; }
+  virtual ResultType result_type () const { return m_type; }
+
+private:
+  ResultType m_type;
+};
+
+
 class DB_PUBLIC CompoundRegionOperationPrimaryNode
   : public CompoundRegionOperationNode
 {

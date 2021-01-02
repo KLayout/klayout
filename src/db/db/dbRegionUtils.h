@@ -483,6 +483,12 @@ public:
   bool prepare_next_pass ();
 
   /**
+   *  @brief Before the scanner is run, this method must be called to feed additional edges into the scanner
+   *  (required for negative edge output - cancellation of perpendicular edges)
+   */
+  void feed_pseudo_edges (db::box_scanner<db::Edge, size_t> &scanner);
+
+  /**
    *  @brief Reimplementation of the box_scanner_receiver interface
    */
   void add (const db::Edge *o1, size_t p1, const db::Edge *o2, size_t p2);
@@ -551,6 +557,8 @@ private:
   EdgeRelationFilter::distance_type m_distance;
   std::vector<db::EdgePair> m_ep;
   std::multimap<std::pair<db::Edge, size_t>, size_t> m_e2ep;
+  std::set<std::pair<db::Edge, size_t> > m_pseudo_edges;
+  size_t m_first_pseudo;
   std::vector<bool> m_ep_discarded;
   bool m_with_shielding;
   bool m_has_edge_pair_output;

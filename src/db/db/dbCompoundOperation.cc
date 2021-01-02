@@ -566,41 +566,16 @@ run_poly_bool (CompoundRegionGeometricalBoolOperationNode::GeometricalOp op, db:
   //  TODO: it's more efficient to feed the EP directly for polygon-to-polygon bools
   db::Region ra, rb;
   init_region (ra, a);
+  init_region (rb, b);
 
-  if (ra.empty ()) {
-
-    if (op == CompoundRegionGeometricalBoolOperationNode::And || op == CompoundRegionGeometricalBoolOperationNode::Not) {
-      write_result (layout, res, ra);
-    } else if (op == CompoundRegionGeometricalBoolOperationNode::Or || op == CompoundRegionGeometricalBoolOperationNode::Xor) {
-      init_region (rb, b);
-      write_result (layout, res, rb);
-    }
-
-  } else {
-
-    init_region (rb, b);
-    if (rb.empty ()) {
-
-      if (op == CompoundRegionGeometricalBoolOperationNode::And) {
-        write_result (layout, res, rb);
-      } else {
-        write_result (layout, res, ra);
-      }
-
-    } else {
-
-      if (op == CompoundRegionGeometricalBoolOperationNode::And) {
-        write_result (layout, res, ra & rb);
-      } else if (op == CompoundRegionGeometricalBoolOperationNode::Or) {
-        write_result (layout, res, ra + rb);
-      } else if (op == CompoundRegionGeometricalBoolOperationNode::Xor) {
-        write_result (layout, res, ra ^ rb);
-      } else if (op == CompoundRegionGeometricalBoolOperationNode::Not) {
-        write_result (layout, res, ra - rb);
-      }
-
-    }
-
+  if (op == CompoundRegionGeometricalBoolOperationNode::And) {
+    write_result (layout, res, ra & rb);
+  } else if (op == CompoundRegionGeometricalBoolOperationNode::Or) {
+    write_result (layout, res, ra + rb);
+  } else if (op == CompoundRegionGeometricalBoolOperationNode::Xor) {
+    write_result (layout, res, ra ^ rb);
+  } else if (op == CompoundRegionGeometricalBoolOperationNode::Not) {
+    write_result (layout, res, ra - rb);
   }
 }
 
@@ -629,21 +604,12 @@ run_poly_vs_edge_bool (CompoundRegionGeometricalBoolOperationNode::GeometricalOp
   init_region (ra, a);
 
   db::Edges eb;
+  init_edges (eb, b);
 
-  if (ra.empty ()) {
-
+  if (eb.empty ()) {
     write_result (layout, res, eb);
-
   } else {
-
-    init_edges (eb, b);
-
-    if (eb.empty ()) {
-      write_result (layout, res, eb);
-    } else {
-      write_result (layout, res, eb & ra);
-    }
-
+    write_result (layout, res, eb & ra);
   }
 }
 
@@ -670,22 +636,14 @@ run_edge_vs_poly_bool (CompoundRegionGeometricalBoolOperationNode::GeometricalOp
   db::Edges ea;
   init_edges (ea, a);
 
-  if (ea.empty ()) {
+  //  TODO: it's more efficient to feed the EP directly for polygon-to-polygon bools
+  db::Region rb;
+  init_region (rb, b);
 
-    write_result (layout, res, ea);
-
-  } else {
-
-    //  TODO: it's more efficient to feed the EP directly for polygon-to-polygon bools
-    db::Region rb;
-    init_region (rb, b);
-
-    if (op == CompoundRegionGeometricalBoolOperationNode::And) {
-      write_result (layout, res, ea & rb);
-    } else if (op == CompoundRegionGeometricalBoolOperationNode::Not) {
-      write_result (layout, res, ea - rb);
-    }
-
+  if (op == CompoundRegionGeometricalBoolOperationNode::And) {
+    write_result (layout, res, ea & rb);
+  } else if (op == CompoundRegionGeometricalBoolOperationNode::Not) {
+    write_result (layout, res, ea - rb);
   }
 }
 
@@ -706,45 +664,30 @@ run_bool (CompoundRegionGeometricalBoolOperationNode::GeometricalOp op, db::Layo
 {
   db::Edges ea, eb;
   init_edges (ea, a);
+  init_edges (eb, b);
 
-  if (ea.empty ()) {
-
-    if (op == CompoundRegionGeometricalBoolOperationNode::And || op == CompoundRegionGeometricalBoolOperationNode::Not) {
-      write_result (layout, res, ea);
-    } else if (op == CompoundRegionGeometricalBoolOperationNode::Or || op == CompoundRegionGeometricalBoolOperationNode::Xor) {
-      init_edges (eb, b);
-      write_result (layout, res, eb);
-    }
-
-  } else {
-
-    init_edges (eb, b);
-
-    if (eb.empty ()) {
-
-      if (op == CompoundRegionGeometricalBoolOperationNode::And) {
-        write_result (layout, res, eb);
-      } else {
-        write_result (layout, res, ea);
-      }
-
-    } else {
-
-      if (op == CompoundRegionGeometricalBoolOperationNode::And) {
-        write_result (layout, res, ea & eb);
-      } else if (op == CompoundRegionGeometricalBoolOperationNode::Or) {
-        write_result (layout, res, ea + eb);
-      } else if (op == CompoundRegionGeometricalBoolOperationNode::Xor) {
-        write_result (layout, res, ea ^ eb);
-      } else if (op == CompoundRegionGeometricalBoolOperationNode::Not) {
-        write_result (layout, res, ea - eb);
-      }
-
-    }
-
+  if (op == CompoundRegionGeometricalBoolOperationNode::And) {
+    write_result (layout, res, ea & eb);
+  } else if (op == CompoundRegionGeometricalBoolOperationNode::Or) {
+    write_result (layout, res, ea + eb);
+  } else if (op == CompoundRegionGeometricalBoolOperationNode::Xor) {
+    write_result (layout, res, ea ^ eb);
+  } else if (op == CompoundRegionGeometricalBoolOperationNode::Not) {
+    write_result (layout, res, ea - eb);
   }
 }
 
+template <class T>
+static void copy_results (std::vector<std::unordered_set<T> > &res, const std::vector<std::unordered_set<T> > &in)
+{
+  res.front ().insert (in.front ().begin (), in.front ().end ());
+}
+
+template <class T, class R>
+static void copy_results (std::vector<std::unordered_set<R> > &, const std::vector<std::unordered_set<T> > &)
+{
+  // don't copy
+}
 
 template <class T, class T1, class T2, class TR>
 void
@@ -756,13 +699,45 @@ CompoundRegionGeometricalBoolOperationNode::implement_bool (db::Layout *layout, 
   shape_interactions<T, T> computed_a;
   child (0)->compute_local (layout, interactions_for_child (interactions, 0, computed_a), one_a, max_vertex_count, area_ratio);
 
-  std::vector<std::unordered_set<T2> > one_b;
-  one_b.push_back (std::unordered_set<T2> ());
+  if (one_a.front ().empty ()) {
 
-  shape_interactions<T, T> computed_b;
-  child (1)->compute_local (layout, interactions_for_child (interactions, 1, computed_b), one_b, max_vertex_count, area_ratio);
+    if (m_op == GeometricalOp::And || m_op == GeometricalOp::Not) {
 
-  run_bool (m_op, layout, one_a.front (), one_b.front (), results.front ());
+      //  .. no results ..
+
+    } else {
+
+      std::vector<std::unordered_set<T2> > one_b;
+      one_b.push_back (std::unordered_set<T2> ());
+
+      shape_interactions<T, T> computed_b;
+      child (1)->compute_local (layout, interactions_for_child (interactions, 1, computed_b), one_b, max_vertex_count, area_ratio);
+
+      copy_results (results, one_b);
+
+    }
+
+  } else {
+
+    std::vector<std::unordered_set<T2> > one_b;
+    one_b.push_back (std::unordered_set<T2> ());
+
+    shape_interactions<T, T> computed_b;
+    child (1)->compute_local (layout, interactions_for_child (interactions, 1, computed_b), one_b, max_vertex_count, area_ratio);
+
+    if (one_b.front ().empty ()) {
+
+      if (m_op != GeometricalOp::And) {
+        copy_results (results, one_a);
+      }
+
+    } else {
+
+      run_bool (m_op, layout, one_a.front (), one_b.front (), results.front ());
+
+    }
+
+  }
 }
 
 template <class T, class TR>

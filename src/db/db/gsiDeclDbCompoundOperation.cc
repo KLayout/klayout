@@ -28,9 +28,28 @@
 #include "dbEdgesUtils.h"
 #include "dbRegionLocalOperations.h"
 #include "dbShapeCollectionUtils.h"
+#include "tlString.h"
 
 namespace gsi
 {
+
+template <class P>
+static void check_non_null (P *p, const char *arg)
+{
+  if (!p) {
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("Argument %s must not be null")), arg));
+  }
+}
+
+template <class P>
+static void check_non_null (const std::vector<P *> &pp, const char *arg)
+{
+  for (typename std::vector<P *>::const_iterator p = pp.begin (); p != pp.end (); ++p) {
+    if (!*p) {
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Arguments %s must not be null")), arg));
+    }
+  }
+}
 
 static db::CompoundRegionOperationNode *new_primary ()
 {
@@ -39,16 +58,25 @@ static db::CompoundRegionOperationNode *new_primary ()
 
 static db::CompoundRegionOperationNode *new_secondary (db::Region *region)
 {
+  check_non_null (region, "region");
   return new db::CompoundRegionOperationSecondaryNode (region);
+}
+
+static db::CompoundRegionOperationNode *new_empty (db::CompoundRegionOperationNode::ResultType type)
+{
+  return new db::CompoundRegionOperationEmptyNode (type);
 }
 
 static db::CompoundRegionOperationNode *new_logical_boolean (db::CompoundRegionLogicalBoolOperationNode::LogicalOp op, bool invert, const std::vector<db::CompoundRegionOperationNode *> &inputs)
 {
+  check_non_null (inputs, "inputs");
   return new db::CompoundRegionLogicalBoolOperationNode (op, invert, inputs);
 }
 
 static db::CompoundRegionOperationNode *new_geometrical_boolean (db::CompoundRegionGeometricalBoolOperationNode::GeometricalOp op, db::CompoundRegionOperationNode *a, db::CompoundRegionOperationNode *b)
 {
+  check_non_null (a, "a");
+  check_non_null (b, "b");
   //  TODO: is this correct?
   if ((a->result_type () != db::CompoundRegionOperationNode::Region && a->result_type () != db::CompoundRegionOperationNode::Edges) ||
       (b->result_type () != db::CompoundRegionOperationNode::Region && b->result_type () != db::CompoundRegionOperationNode::Edges)) {
@@ -59,6 +87,8 @@ static db::CompoundRegionOperationNode *new_geometrical_boolean (db::CompoundReg
 
 static db::CompoundRegionOperationNode *new_interacting (db::CompoundRegionOperationNode *a, db::CompoundRegionOperationNode *b, bool inverse, size_t min_count, size_t max_count)
 {
+  check_non_null (a, "a");
+  check_non_null (b, "b");
   //  TODO: is this correct?
   if (a->result_type () != db::CompoundRegionOperationNode::Region) {
     throw tl::Exception ("Primary input for interaction compound operation must be of Region type");
@@ -74,6 +104,8 @@ static db::CompoundRegionOperationNode *new_interacting (db::CompoundRegionOpera
 
 static db::CompoundRegionOperationNode *new_overlapping (db::CompoundRegionOperationNode *a, db::CompoundRegionOperationNode *b, bool inverse, size_t min_count, size_t max_count)
 {
+  check_non_null (a, "a");
+  check_non_null (b, "b");
   //  TODO: is this correct?
   if (a->result_type () != db::CompoundRegionOperationNode::Region) {
     throw tl::Exception ("Primary input for interaction compound operation must be of Region type");
@@ -87,6 +119,8 @@ static db::CompoundRegionOperationNode *new_overlapping (db::CompoundRegionOpera
 
 static db::CompoundRegionOperationNode *new_enclosing (db::CompoundRegionOperationNode *a, db::CompoundRegionOperationNode *b, bool inverse, size_t min_count, size_t max_count)
 {
+  check_non_null (a, "a");
+  check_non_null (b, "b");
   //  TODO: is this correct?
   if (a->result_type () != db::CompoundRegionOperationNode::Region) {
     throw tl::Exception ("Primary input for interaction compound operation must be of Region type");
@@ -100,6 +134,8 @@ static db::CompoundRegionOperationNode *new_enclosing (db::CompoundRegionOperati
 
 static db::CompoundRegionOperationNode *new_inside (db::CompoundRegionOperationNode *a, db::CompoundRegionOperationNode *b, bool inverse)
 {
+  check_non_null (a, "a");
+  check_non_null (b, "b");
   //  TODO: is this correct?
   if (a->result_type () != db::CompoundRegionOperationNode::Region) {
     throw tl::Exception ("Primary input for interaction compound operation must be of Region type");
@@ -113,6 +149,8 @@ static db::CompoundRegionOperationNode *new_inside (db::CompoundRegionOperationN
 
 static db::CompoundRegionOperationNode *new_outside (db::CompoundRegionOperationNode *a, db::CompoundRegionOperationNode *b, bool inverse)
 {
+  check_non_null (a, "a");
+  check_non_null (b, "b");
   //  TODO: is this correct?
   if (a->result_type () != db::CompoundRegionOperationNode::Region) {
     throw tl::Exception ("Primary input for interaction compound operation must be of Region type");
@@ -126,46 +164,55 @@ static db::CompoundRegionOperationNode *new_outside (db::CompoundRegionOperation
 
 static db::CompoundRegionOperationNode *new_hulls (db::CompoundRegionOperationNode *input)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionProcessingOperationNode (new db::HullExtractionProcessor (), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_holes (db::CompoundRegionOperationNode *input)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionProcessingOperationNode (new db::HolesExtractionProcessor (), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_strange_polygons_filter (db::CompoundRegionOperationNode *input)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionProcessingOperationNode (new db::StrangePolygonCheckProcessor (), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_smoothed (db::CompoundRegionOperationNode *input, db::Coord d)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionProcessingOperationNode (new db::SmoothingProcessor (d), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_rounded_corners (db::CompoundRegionOperationNode *input, double rinner, double router, unsigned int n)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionProcessingOperationNode (new db::RoundedCornersProcessor (rinner, router, n), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_case (const std::vector<db::CompoundRegionOperationNode *> &inputs)
 {
+  check_non_null (inputs, "inputs");
   return new db::CompoundRegionLogicalCaseSelectOperationNode (inputs);
 }
 
 static db::CompoundRegionOperationNode *new_corners_as_rectangles (db::CompoundRegionOperationNode *input, double angle_start, double angle_end, db::Coord dim = 1)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionProcessingOperationNode (new db::CornersAsRectangles (angle_start, angle_end, dim), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_corners_as_dots (db::CompoundRegionOperationNode *input, double angle_start, double angle_end)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionToEdgeProcessingOperationNode (new db::CornersAsDots (angle_start, angle_end), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_extents (db::CompoundRegionOperationNode *input, db::Coord e)
 {
+  check_non_null (input, "input");
   if (input->result_type () == db::CompoundRegionOperationNode::EdgePairs) {
     return new db::CompoundRegionEdgePairToPolygonProcessingOperationNode (new db::extents_processor<db::EdgePair> (e, e), input, true /*processor is owned*/);
   } else if (input->result_type () == db::CompoundRegionOperationNode::EdgePairs) {
@@ -180,56 +227,67 @@ static db::CompoundRegionOperationNode *new_extents (db::CompoundRegionOperation
 
 static db::CompoundRegionOperationNode *new_relative_extents (db::CompoundRegionOperationNode *input, double fx1, double fy1, double fx2, double fy2, db::Coord dx, db::Coord dy)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionProcessingOperationNode (new db::RelativeExtents (fx1, fy1, fx2, fy2, dx, dy), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_relative_extents_as_edges (db::CompoundRegionOperationNode *input, double fx1, double fy1, double fx2, double fy2)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionToEdgeProcessingOperationNode (new db::RelativeExtentsAsEdges (fx1, fy1, fx2, fy2), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_convex_decomposition (db::CompoundRegionOperationNode *input, db::PreferredOrientation mode)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionProcessingOperationNode (new db::ConvexDecomposition (mode), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_trapezoid_decomposition (db::CompoundRegionOperationNode *input, db::TrapezoidDecompositionMode mode)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionProcessingOperationNode (new db::TrapezoidDecomposition (mode), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_polygon_breaker (db::CompoundRegionOperationNode *input, size_t max_vertex_count, double max_area_ratio)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionProcessingOperationNode (new db::PolygonBreaker (max_vertex_count, max_area_ratio), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_sized (db::CompoundRegionOperationNode *input, db::Coord dx, db::Coord dy, unsigned int mode)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionProcessingOperationNode (new db::PolygonSizer (dx, dy, mode), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_minkowsky_sum_node1 (db::CompoundRegionOperationNode *input, const db::Edge &e)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionProcessingOperationNode (new db::minkowsky_sum_computation<db::Edge> (e), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_minkowsky_sum_node2 (db::CompoundRegionOperationNode *input, const db::Polygon &p)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionProcessingOperationNode (new db::minkowsky_sum_computation<db::Polygon> (p), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_minkowsky_sum_node3 (db::CompoundRegionOperationNode *input, const db::Box &p)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionProcessingOperationNode (new db::minkowsky_sum_computation<db::Box> (p), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_minkowsky_sum_node4 (db::CompoundRegionOperationNode *input, const std::vector<db::Point> &p)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionProcessingOperationNode (new db::minkowsky_sum_computation<std::vector<db::Point> > (p), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_edges (db::CompoundRegionOperationNode *input)
 {
+  check_non_null (input, "input");
   if (input->result_type () == db::CompoundRegionOperationNode::EdgePairs) {
     return new db::CompoundRegionEdgePairToEdgeProcessingOperationNode (new db::EdgePairToEdgesProcessor (), input, true /*processor is owned*/);
   } else if (input->result_type () == db::CompoundRegionOperationNode::Region) {
@@ -242,16 +300,19 @@ static db::CompoundRegionOperationNode *new_edges (db::CompoundRegionOperationNo
 
 static db::CompoundRegionOperationNode *new_edge_length_filter (db::CompoundRegionOperationNode *input, bool inverse, db::Edge::distance_type lmin, db::Edge::distance_type lmax)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionEdgeFilterOperationNode (new db::EdgeLengthFilter (lmin, lmax, inverse), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_edge_orientation_filter (db::CompoundRegionOperationNode *input, bool inverse, double amin, double amax)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionEdgeFilterOperationNode (new db::EdgeOrientationFilter (amin, amax, inverse), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_polygons (db::CompoundRegionOperationNode *input, db::Coord e)
 {
+  check_non_null (input, "input");
   if (input->result_type () == db::CompoundRegionOperationNode::EdgePairs) {
     return new db::CompoundRegionEdgePairToPolygonProcessingOperationNode (new db::EdgePairToPolygonProcessor (e), input, true /*processor is owned*/);
   } else if (input->result_type () == db::CompoundRegionOperationNode::Edges) {
@@ -264,26 +325,31 @@ static db::CompoundRegionOperationNode *new_polygons (db::CompoundRegionOperatio
 
 static db::CompoundRegionOperationNode *new_extended (db::CompoundRegionOperationNode *input, db::Coord ext_b, db::Coord ext_e, db::Coord ext_o, db::Coord ext_i)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionEdgeToPolygonProcessingOperationNode (new db::ExtendedEdgeProcessor (ext_b, ext_e, ext_o, ext_i), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_extended_in (db::CompoundRegionOperationNode *input, db::Coord e)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionEdgeToPolygonProcessingOperationNode (new db::ExtendedEdgeProcessor (0, 0, 0, e), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_extended_out (db::CompoundRegionOperationNode *input, db::Coord e)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionEdgeToPolygonProcessingOperationNode (new db::ExtendedEdgeProcessor (0, 0, e, 0), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_edge_pair_to_first_edges (db::CompoundRegionOperationNode *input)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionEdgePairToEdgeProcessingOperationNode (new db::EdgePairToFirstEdgesProcessor (), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_edge_pair_to_second_edges (db::CompoundRegionOperationNode *input)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionEdgePairToEdgeProcessingOperationNode (new db::EdgePairToSecondEdgesProcessor (), input, true /*processor is owned*/);
 }
 
@@ -303,6 +369,7 @@ static db::CompoundRegionOperationNode *new_check_node (db::edge_relation_type r
 
 static db::CompoundRegionOperationNode *new_check_node (db::CompoundRegionOperationNode *input, db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionCheckOperationNode (input, rel, different_polygons, d,
     db::RegionCheckOptions (whole_edges,
                             metrics,
@@ -364,41 +431,49 @@ static db::CompoundRegionOperationNode *new_inside_check (db::CompoundRegionOper
 
 static db::CompoundRegionOperationNode *new_perimeter_filter (db::CompoundRegionOperationNode *input, bool inverse, db::coord_traits<db::Coord>::perimeter_type pmin, db::coord_traits<db::Coord>::perimeter_type pmax)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionFilterOperationNode (new db::RegionPerimeterFilter (pmin, pmax, inverse), input, true);
 }
 
 static db::CompoundRegionOperationNode *new_area_filter (db::CompoundRegionOperationNode *input, bool inverse, db::coord_traits<db::Coord>::area_type amin, db::coord_traits<db::Coord>::area_type amax)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionFilterOperationNode (new db::RegionAreaFilter (amin, amax, inverse), input, true);
 }
 
 static db::CompoundRegionOperationNode *new_rectilinear_filter (db::CompoundRegionOperationNode *input, bool inverse)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionFilterOperationNode (new db::RectilinearFilter (inverse), input, true);
 }
 
 static db::CompoundRegionOperationNode *new_rectangle_filter (db::CompoundRegionOperationNode *input, bool inverse)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionFilterOperationNode (new db::RectangleFilter (inverse), input, true);
 }
 
 static db::CompoundRegionOperationNode *new_bbox_filter (db::CompoundRegionOperationNode *input, db::RegionBBoxFilter::parameter_type parameter, bool inverse, db::coord_traits<db::Coord>::distance_type vmin, db::coord_traits<db::Coord>::distance_type vmax)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionFilterOperationNode (new db::RegionBBoxFilter (vmin, vmax, inverse, parameter), input, true);
 }
 
 static db::CompoundRegionOperationNode *new_start_segments (db::CompoundRegionOperationNode *input, db::Edges::length_type length, double fraction)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionEdgeProcessingOperationNode (new db::EdgeSegmentSelector (-1, length, fraction), input, true);
 }
 
 static db::CompoundRegionOperationNode *new_end_segments (db::CompoundRegionOperationNode *input, db::Edges::length_type length, double fraction)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionEdgeProcessingOperationNode (new db::EdgeSegmentSelector (1, length, fraction), input, true);
 }
 
 static db::CompoundRegionOperationNode *new_centers (db::CompoundRegionOperationNode *input, db::Edges::length_type length, double fraction)
 {
+  check_non_null (input, "input");
   return new db::CompoundRegionEdgeProcessingOperationNode (new db::EdgeSegmentSelector (0, length, fraction), input, true);
 }
 
@@ -582,6 +657,9 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   gsi::constructor ("new_extended_out", &new_extended_out, gsi::arg ("input"), gsi::arg ("e"),
     "@brief Creates a node delivering a polygonized, inside-extended version of the edges.\n"
   ) +
+  gsi::constructor ("new_empty", &new_empty, gsi::arg ("type"),
+    "@brief Creates a node delivering an empty result of the given type\n"
+  ) +
   method ("description=", &db::CompoundRegionOperationNode::set_description, gsi::arg ("d"),
     "@brief Sets the description for this node"
   ) +
@@ -613,10 +691,10 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
 );
 
 gsi::EnumIn<db::CompoundRegionOperationNode, db::CompoundRegionLogicalBoolOperationNode::LogicalOp> decl_dbCompoundRegionLogicalBoolOperationNode_LogicalOp ("db", "LogicalOp",
-  gsi::enum_const ("And", db::CompoundRegionLogicalBoolOperationNode::LogicalOp::And,
+  gsi::enum_const ("LogAnd", db::CompoundRegionLogicalBoolOperationNode::LogicalOp::And,
     "@brief Indicates a logical '&&' (and)."
   ) +
-  gsi::enum_const ("Or", db::CompoundRegionLogicalBoolOperationNode::LogicalOp::Or,
+  gsi::enum_const ("LogOr", db::CompoundRegionLogicalBoolOperationNode::LogicalOp::Or,
     "@brief Indicates a logical '||' (or)."
   ),
   "@brief This class represents the CompoundRegionOperationNode::LogicalOp enum\n"

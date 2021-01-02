@@ -639,7 +639,7 @@ private:
  *  This class implements the edge-to-edge part of the polygon DRC.
  *  This version has only negative edge output.
  */
-template <class Output, class NegativeEdgeOutput>
+template <class NegativeEdgeOutput>
 class DB_PUBLIC_TEMPLATE edge2edge_check_negative
   : public Edge2EdgeCheckBase
 {
@@ -669,14 +669,54 @@ private:
 };
 
 /**
+ *  @brief A helper class for the DRC functionality
+ *
+ *  This class implements the edge-to-edge part of the polygon DRC.
+ *  This version has positive or negative output. Negative output is mapped to edge pairs
+ *  as well.
+ */
+template <class Output>
+class DB_PUBLIC_TEMPLATE edge2edge_check_negative_or_positive
+  : public Edge2EdgeCheckBase
+{
+public:
+  edge2edge_check_negative_or_positive (const EdgeRelationFilter &check, Output &output, bool negative_output, bool different_polygons, bool requires_different_layers, bool with_shielding)
+    : Edge2EdgeCheckBase (check, different_polygons, requires_different_layers, with_shielding),
+      mp_output (&output)
+  {
+    set_has_negative_edge_output (negative_output);
+    set_has_edge_pair_output (! negative_output);
+  }
+
+protected:
+  void put_negative (const db::Edge &edge, int layer) const
+  {
+    if (layer == 0) {
+      mp_output->insert (db::EdgePair (edge, edge.swapped_points ()));
+    }
+    if (layer == 1) {
+      mp_output->insert (db::EdgePair (edge.swapped_points (), edge));
+    }
+  }
+
+  void put (const db::EdgePair &edge) const
+  {
+    mp_output->insert (edge);
+  }
+
+private:
+  Output *mp_output;
+};
+
+/**
  *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
  */
 template <class PolygonType>
-class DB_PUBLIC poly2poly_check_base
+class DB_PUBLIC poly2poly_check
   : public db::box_scanner_receiver<PolygonType, size_t>
 {
 public:
-  poly2poly_check_base (Edge2EdgeCheckBase &output);
+  poly2poly_check (Edge2EdgeCheckBase &output);
 
   void finish (const PolygonType *o, size_t p);
   void enter (const PolygonType&o, size_t p);
@@ -687,21 +727,6 @@ private:
   db::Edge2EdgeCheckBase *mp_output;
   db::box_scanner<db::Edge, size_t> m_scanner;
   std::vector<db::Edge> m_edges;
-};
-
-/**
- *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
- */
-template <class PolygonType, class Output>
-class DB_PUBLIC_TEMPLATE poly2poly_check
-  : public poly2poly_check_base<PolygonType>
-{
-public:
-  poly2poly_check (edge2edge_check<Output> &output)
-    : poly2poly_check_base<PolygonType> (output)
-  {
-    //  .. nothing yet ..
-  }
 };
 
 /**

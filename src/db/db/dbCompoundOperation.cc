@@ -1421,7 +1421,7 @@ CompoundRegionCheckOperationNode::do_compute_local (db::Layout *layout, const sh
 {
   bool other_merged = (children () > 0 && !inputs ()[0]);
 
-  db::check_local_operation<db::Polygon, db::Polygon> op (m_check, m_different_polygons, children () > 0, other_merged, m_options.shielded, m_options.opposite_filter, m_options.rect_filter);
+  db::check_local_operation<db::Polygon, db::Polygon> op (m_check, m_different_polygons, children () > 0, other_merged, m_options);
 
   tl_assert (results.size () == 1);
   if (results.front ().empty ()) {
@@ -1439,7 +1439,7 @@ CompoundRegionCheckOperationNode::do_compute_local (db::Layout *layout, const sh
 {
   bool other_merged = (children () > 0 && !inputs ()[0]);
 
-  db::check_local_operation<db::PolygonRef, db::PolygonRef> op (m_check, m_different_polygons, children () > 0, other_merged, m_options.shielded, m_options.opposite_filter, m_options.rect_filter);
+  db::check_local_operation<db::PolygonRef, db::PolygonRef> op (m_check, m_different_polygons, children () > 0, other_merged, m_options);
 
   tl_assert (results.size () == 1);
   if (results.front ().empty ()) {

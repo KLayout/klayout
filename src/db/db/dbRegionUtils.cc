@@ -341,7 +341,7 @@ Edge2EdgeCheckBase::distance () const
 //  Poly2PolyCheckBase implementation
 
 template <class PolygonType>
-poly2poly_check_base<PolygonType>::poly2poly_check_base (Edge2EdgeCheckBase &output)
+poly2poly_check<PolygonType>::poly2poly_check (Edge2EdgeCheckBase &output)
   : mp_output (& output)
 {
   //  .. nothing yet ..
@@ -349,7 +349,7 @@ poly2poly_check_base<PolygonType>::poly2poly_check_base (Edge2EdgeCheckBase &out
 
 template <class PolygonType>
 void
-poly2poly_check_base<PolygonType>::finish (const PolygonType *o, size_t p)
+poly2poly_check<PolygonType>::finish (const PolygonType *o, size_t p)
 {
   enter (*o, p);
 }
@@ -366,7 +366,7 @@ static size_t vertices (const db::PolygonRef &p)
 
 template <class PolygonType>
 void
-poly2poly_check_base<PolygonType>::enter (const PolygonType &o, size_t p)
+poly2poly_check<PolygonType>::enter (const PolygonType &o, size_t p)
 {
   if (! mp_output->requires_different_layers () && ! mp_output->different_polygons ()) {
 
@@ -394,14 +394,14 @@ poly2poly_check_base<PolygonType>::enter (const PolygonType &o, size_t p)
 
 template <class PolygonType>
 void
-poly2poly_check_base<PolygonType>::add (const PolygonType *o1, size_t p1, const PolygonType *o2, size_t p2)
+poly2poly_check<PolygonType>::add (const PolygonType *o1, size_t p1, const PolygonType *o2, size_t p2)
 {
   enter (*o1, p1, *o2, p2);
 }
 
 template <class PolygonType>
 void
-poly2poly_check_base<PolygonType>::enter (const PolygonType &o1, size_t p1, const PolygonType &o2, size_t p2)
+poly2poly_check<PolygonType>::enter (const PolygonType &o1, size_t p1, const PolygonType &o2, size_t p2)
 {
   if ((! mp_output->different_polygons () || p1 != p2) && (! mp_output->requires_different_layers () || ((p1 ^ p2) & 1) != 0)) {
 
@@ -438,8 +438,8 @@ poly2poly_check_base<PolygonType>::enter (const PolygonType &o1, size_t p1, cons
 }
 
 //  explicit instantiations
-template class poly2poly_check_base<db::Polygon>;
-template class poly2poly_check_base<db::PolygonRef>;
+template class poly2poly_check<db::Polygon>;
+template class poly2poly_check<db::PolygonRef>;
 
 // -------------------------------------------------------------------------------------
 //  SinglePolygonCheck implementation
@@ -460,8 +460,8 @@ SinglePolygonCheck::process (const db::Polygon &polygon, std::vector<db::EdgePai
   check.set_min_projection (m_options.min_projection);
   check.set_max_projection (m_options.max_projection);
 
-  edge2edge_check<std::unordered_set<db::EdgePair> > edge_check (check, result, false /*=same polygons*/, false /*=same layers*/, m_options.shielded);
-  poly2poly_check<db::Polygon, std::unordered_set<db::EdgePair> > poly_check (edge_check);
+  edge2edge_check_negative_or_positive <std::unordered_set<db::EdgePair> > edge_check (check, result, m_options.negative, false /*=same polygons*/, false /*=same layers*/, m_options.shielded);
+  poly2poly_check<db::Polygon> poly_check (edge_check);
 
   do {
     poly_check.enter (polygon, 0);

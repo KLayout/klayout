@@ -1443,7 +1443,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 
   std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
 
-  db::CheckLocalOperation op (check, different_polygons, other_deep != 0, other && other->is_merged (), options.shielded, options.opposite_filter, options.rect_filter);
+  db::CheckLocalOperation op (check, different_polygons, other_deep != 0, other && other->is_merged (), options);
 
   db::local_processor<db::PolygonRef, db::PolygonRef, db::EdgePair> proc (const_cast<db::Layout *> (&polygons.layout ()),
                                                                           const_cast<db::Cell *> (&polygons.initial_cell ()),
@@ -1482,8 +1482,8 @@ DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, c
 
     for (db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::Polygons); ! s.at_end (); ++s) {
 
-      edge2edge_check<db::Shapes> edge_check (check, result, false, false, options.shielded);
-      poly2poly_check<db::Polygon, db::Shapes> poly_check (edge_check);
+      edge2edge_check_negative_or_positive<db::Shapes> edge_check (check, result, options.negative, false, false, options.shielded);
+      poly2poly_check<db::Polygon> poly_check (edge_check);
 
       db::Polygon poly;
       s->polygon (poly);

@@ -438,18 +438,21 @@ static db::Region merged_ext2 (db::Region *r, bool min_coherence, int min_wc)
   return r->merged (min_coherence, std::max (0, min_wc - 1));
 }
 
-static db::EdgePairs width2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
+static db::EdgePairs width2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool negative)
 {
   return r->width_check (d, db::RegionCheckOptions (whole_edges,
                                             metrics,
                                             ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                                             min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
                                             max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
-                                            shielded)
+                                            shielded,
+                                            db::NoOppositeFilter,
+                                            db::NoSideAllowed,
+                                            negative)
                         );
 }
 
-static db::EdgePairs space2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter)
+static db::EdgePairs space2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter, bool negative)
 {
   return r->space_check (d, db::RegionCheckOptions (whole_edges,
                                             metrics,
@@ -458,22 +461,26 @@ static db::EdgePairs space2 (const db::Region *r, db::Region::distance_type d, b
                                             max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
                                             shielded,
                                             opposite,
-                                            rect_filter)
+                                            rect_filter,
+                                            negative)
                         );
 }
 
-static db::EdgePairs notch2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded)
+static db::EdgePairs notch2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool negative)
 {
   return r->notch_check (d, db::RegionCheckOptions (whole_edges,
                                             metrics,
                                             ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                                             min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
                                             max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
-                                            shielded)
+                                            shielded,
+                                            db::NoOppositeFilter,
+                                            db::NoSideAllowed,
+                                            negative)
                         );
 }
 
-static db::EdgePairs isolated2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter)
+static db::EdgePairs isolated2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter, bool negative)
 {
   return r->isolated_check (d, db::RegionCheckOptions (whole_edges,
                                             metrics,
@@ -482,11 +489,12 @@ static db::EdgePairs isolated2 (const db::Region *r, db::Region::distance_type d
                                             max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
                                             shielded,
                                             opposite,
-                                            rect_filter)
+                                            rect_filter,
+                                            negative)
                            );
 }
 
-static db::EdgePairs inside2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter)
+static db::EdgePairs inside2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter, bool negative)
 {
   return r->inside_check (other, d, db::RegionCheckOptions (whole_edges,
                                             metrics,
@@ -495,11 +503,12 @@ static db::EdgePairs inside2 (const db::Region *r, const db::Region &other, db::
                                             max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
                                             shielded,
                                             opposite,
-                                            rect_filter)
+                                            rect_filter,
+                                            negative)
                          );
 }
 
-static db::EdgePairs overlap2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter)
+static db::EdgePairs overlap2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter, bool negative)
 {
   return r->overlap_check (other, d, db::RegionCheckOptions (whole_edges,
                                             metrics,
@@ -508,11 +517,12 @@ static db::EdgePairs overlap2 (const db::Region *r, const db::Region &other, db:
                                             max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
                                             shielded,
                                             opposite,
-                                            rect_filter)
+                                            rect_filter,
+                                            negative)
                           );
 }
 
-static db::EdgePairs enclosing2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter)
+static db::EdgePairs enclosing2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter, bool negative)
 {
   return r->enclosing_check (other, d, db::RegionCheckOptions (whole_edges,
                                             metrics,
@@ -521,11 +531,12 @@ static db::EdgePairs enclosing2 (const db::Region *r, const db::Region &other, d
                                             max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
                                             shielded,
                                             opposite,
-                                            rect_filter)
+                                            rect_filter,
+                                            negative)
                             );
 }
 
-static db::EdgePairs separation2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter)
+static db::EdgePairs separation2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter, bool negative)
 {
   return r->separation_check (other, d, db::RegionCheckOptions (whole_edges,
                                             metrics,
@@ -534,7 +545,8 @@ static db::EdgePairs separation2 (const db::Region *r, const db::Region &other, 
                                             max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
                                             shielded,
                                             opposite,
-                                            rect_filter)
+                                            rect_filter,
+                                            negative)
                              );
 }
 
@@ -2027,7 +2039,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return The transformed region.\n"
   ) +
-  method_ext ("width_check", &width2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true),
+  method_ext ("width_check", &width2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("negative", false),
     "@brief Performs a width check with options\n"
     "@param d The minimum width for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -2036,6 +2048,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper limit of the projected length of one edge onto another\n"
     "@param shielded Enables shielding\n"
+    "@param negative If true, edges not violation the condition will be output as pseudo-edge pairs\n"
     "\n"
     "This version is similar to the simple version with one parameter. In addition, it allows "
     "to specify many more options.\n"
@@ -2065,9 +2078,9 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
-    "The 'shielded' option has been introduced in version 0.27."
+    "The 'shielded' and 'negative' options have been introduced in version 0.27."
   ) +
-  method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"),
+  method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"), gsi::arg ("negative", false),
     "@brief Performs a space check with options\n"
     "@param d The minimum space for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -2077,6 +2090,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param max_projection The upper limit of the projected length of one edge onto another\n"
     "@param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes\n"
     "@param rect_filter Specifies an error filter for rectangular input shapes\n"
+    "@param negative If true, edges not violation the condition will be output as pseudo-edge pairs\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the width check.\n"
@@ -2106,9 +2120,9 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
-    "The 'shielded', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
+    "The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
   ) +
-  method_ext ("notch_check", &notch2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true),
+  method_ext ("notch_check", &notch2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("negative", false),
     "@brief Performs a space check between edges of the same polygon with options\n"
     "@param d The minimum space for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -2117,6 +2131,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper limit of the projected length of one edge onto another\n"
     "@param shielded Enables shielding\n"
+    "@param negative If true, edges not violation the condition will be output as pseudo-edge pairs\n"
     "\n"
     "This version is similar to the simple version with one parameter. In addition, it allows "
     "to specify many more options.\n"
@@ -2146,9 +2161,9 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
-    "The 'shielded' option has been introduced in version 0.27."
+    "The 'shielded' and 'negative' options have been introduced in version 0.27."
   ) +
-  method_ext ("isolated_check", &isolated2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"),
+  method_ext ("isolated_check", &isolated2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"), gsi::arg ("negative", false),
     "@brief Performs a space check between edges of different polygons with options\n"
     "@param d The minimum space for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -2158,6 +2173,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param max_projection The upper limit of the projected length of one edge onto another\n"
     "@param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes\n"
     "@param rect_filter Specifies an error filter for rectangular input shapes\n"
+    "@param negative If true, edges not violation the condition will be output as pseudo-edge pairs\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the width check.\n"
@@ -2187,9 +2203,9 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
-    "The 'shielded', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
+    "The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
   ) +
-  method_ext ("inside_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"),
+  method_ext ("inside_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"), gsi::arg ("negative", false),
     "@brief Performs an inside check with options\n"
     "@param d The minimum distance for which the polygons are checked\n"
     "@param other The other region against which to check\n"
@@ -2200,6 +2216,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param max_projection The upper limit of the projected length of one edge onto another\n"
     "@param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes\n"
     "@param rect_filter Specifies an error filter for rectangular input shapes\n"
+    "@param negative If true, edges not violation the condition will be output as pseudo-edge pairs\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the width check.\n"
@@ -2229,9 +2246,9 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
-    "The 'shielded', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
+    "The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
   ) +
-  method_ext ("overlap_check", &overlap2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"),
+  method_ext ("overlap_check", &overlap2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"), gsi::arg ("negative", false),
     "@brief Performs an overlap check with options\n"
     "@param d The minimum overlap for which the polygons are checked\n"
     "@param other The other region against which to check\n"
@@ -2242,6 +2259,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param max_projection The upper limit of the projected length of one edge onto another\n"
     "@param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes\n"
     "@param rect_filter Specifies an error filter for rectangular input shapes\n"
+    "@param negative If true, edges not violation the condition will be output as pseudo-edge pairs\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the width check.\n"
@@ -2271,9 +2289,9 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
-    "The 'shielded', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
+    "The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
   ) +
-  method_ext ("enclosing_check", &enclosing2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"),
+  method_ext ("enclosing_check", &enclosing2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"), gsi::arg ("negative", false),
     "@brief Performs an enclosing check with options\n"
     "@param d The minimum enclosing distance for which the polygons are checked\n"
     "@param other The other region against which to check\n"
@@ -2284,6 +2302,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param max_projection The upper limit of the projected length of one edge onto another\n"
     "@param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes\n"
     "@param rect_filter Specifies an error filter for rectangular input shapes\n"
+    "@param negative If true, edges not violation the condition will be output as pseudo-edge pairs\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the width check.\n"
@@ -2313,9 +2332,9 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
-    "The 'shielded', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
+    "The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
   ) +
-  method_ext ("separation_check", &separation2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"),
+  method_ext ("separation_check", &separation2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"), gsi::arg ("negative", false),
     "@brief Performs a separation check with options\n"
     "@param d The minimum separation for which the polygons are checked\n"
     "@param other The other region against which to check\n"
@@ -2326,6 +2345,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param max_projection The upper limit of the projected length of one edge onto another\n"
     "@param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes\n"
     "@param rect_filter Specifies an error filter for rectangular input shapes\n"
+    "@param negative If true, edges not violation the condition will be output as pseudo-edge pairs\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the width check.\n"
@@ -2355,7 +2375,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
-    "The 'shielded', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
+    "The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
   ) +
   method_ext ("area", &area1,
     "@brief The area of the region\n"

@@ -84,7 +84,7 @@ TEST(1_SimpleLShape)
   db::Polygon poly;
   poly.assign_hull (pts, pts + sizeof (pts) / sizeof (pts[0]));
 
-  db::poly2poly_check_base<db::Polygon> poly_check (e2e);
+  db::poly2poly_check<db::Polygon> poly_check (e2e);
 
   do {
     //  single polygon check
@@ -117,7 +117,7 @@ TEST(2_SimpleLWithBigPart)
   db::Polygon poly;
   poly.assign_hull (pts, pts + sizeof (pts) / sizeof (pts[0]));
 
-  db::poly2poly_check_base<db::Polygon> poly_check (e2e);
+  db::poly2poly_check<db::Polygon> poly_check (e2e);
 
   do {
     //  single polygon check
@@ -152,7 +152,7 @@ TEST(3_SimpleTWithBigPart)
   db::Polygon poly;
   poly.assign_hull (pts, pts + sizeof (pts) / sizeof (pts[0]));
 
-  db::poly2poly_check_base<db::Polygon> poly_check (e2e);
+  db::poly2poly_check<db::Polygon> poly_check (e2e);
 
   do {
     //  single polygon check
@@ -187,7 +187,7 @@ TEST(4_SimpleNotch)
   db::Polygon poly;
   poly.assign_hull (pts, pts + sizeof (pts) / sizeof (pts[0]));
 
-  db::poly2poly_check_base<db::Polygon> poly_check (e2e);
+  db::poly2poly_check<db::Polygon> poly_check (e2e);
 
   do {
     //  single polygon check
@@ -224,7 +224,7 @@ TEST(5_LShapeNotch)
   db::Polygon poly;
   poly.assign_hull (pts, pts + sizeof (pts) / sizeof (pts[0]));
 
-  db::poly2poly_check_base<db::Polygon> poly_check (e2e);
+  db::poly2poly_check<db::Polygon> poly_check (e2e);
 
   do {
     //  single polygon check
@@ -271,7 +271,7 @@ TEST(6_SeparationLvsBox)
   scanner.insert (&poly1, 0);  //  layer 0
   scanner.insert (&poly2, 1);  //  layer 1
 
-  db::poly2poly_check_base<db::Polygon> poly_check (e2e);
+  db::poly2poly_check<db::Polygon> poly_check (e2e);
 
   do {
     scanner.process (poly_check, er.distance (), db::box_convert<db::Polygon> ());

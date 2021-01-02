@@ -142,8 +142,8 @@ static bool shields_interaction (const db::EdgePair &ep, const P &poly)
 }
 
 template <class TS, class TI>
-check_local_operation<TS, TI>::check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool other_is_merged, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter)
-  : m_check (check), m_different_polygons (different_polygons), m_has_other (has_other), m_other_is_merged (other_is_merged), m_shielded (shielded), m_opposite_filter (opposite_filter), m_rect_filter (rect_filter)
+check_local_operation<TS, TI>::check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options)
+  : m_check (check), m_different_polygons (different_polygons), m_has_other (has_other), m_other_is_merged (other_is_merged), m_options (options)
 {
   //  .. nothing yet ..
 }
@@ -173,8 +173,8 @@ check_local_operation<TS, TI>::compute_local (db::Layout *layout, const shape_in
   std::unordered_set<db::EdgePair> &result = results.front ();
   tl_assert (result.empty ());
 
-  edge2edge_check<std::unordered_set<db::EdgePair> > edge_check (m_check, result, m_different_polygons, m_has_other, m_shielded);
-  poly2poly_check<TS, std::unordered_set<db::EdgePair> > poly_check (edge_check);
+  edge2edge_check_negative_or_positive<std::unordered_set<db::EdgePair> > edge_check (m_check, result, m_options.negative, m_different_polygons, m_has_other, m_options.shielded);
+  poly2poly_check<TS> poly_check (edge_check);
 
   std::list<TS> heap;
   db::box_scanner<TS, size_t> scanner;
@@ -270,7 +270,7 @@ check_local_operation<TS, TI>::compute_local (db::Layout *layout, const shape_in
 
   //  detect and remove parts of the result which have or do not have results "opposite"
   //  ("opposite" is defined by the projection of edges "through" the subject shape)
-  if (m_opposite_filter != db::NoOppositeFilter && ! result.empty ()) {
+  if (m_options.opposite_filter != db::NoOppositeFilter && ! result.empty ()) {
 
     db::EdgeRelationFilter opp (db::WidthRelation, std::numeric_limits<db::EdgeRelationFilter::distance_type>::max (), db::Projection);
 
@@ -306,15 +306,15 @@ check_local_operation<TS, TI>::compute_local (db::Layout *layout, const shape_in
 
       if (! projections.empty ()) {
         db::Edges ce;
-        if (m_opposite_filter == db::OnlyOpposite) {
+        if (m_options.opposite_filter == db::OnlyOpposite) {
           ce = db::Edges (ep1->first ()) & db::Edges (projections.begin (), projections.end ());
-        } else if (m_opposite_filter == db::NotOpposite) {
+        } else if (m_options.opposite_filter == db::NotOpposite) {
           ce = db::Edges (ep1->first ()) - db::Edges (projections.begin (), projections.end ());
         }
         for (db::Edges::const_iterator re = ce.begin (); ! re.at_end (); ++re) {
           cleaned_result.insert (db::EdgePair (*re, ep1->second ()));
         }
-      } else if (m_opposite_filter == db::NotOpposite) {
+      } else if (m_options.opposite_filter == db::NotOpposite) {
         cleaned_result.insert (*ep1);
       }
 
@@ -325,7 +325,7 @@ check_local_operation<TS, TI>::compute_local (db::Layout *layout, const shape_in
   }
 
   //  implements error filtering on rectangles
-  if (m_rect_filter != RectFilter::NoSideAllowed && ! result.empty ()) {
+  if (m_options.rect_filter != RectFilter::NoSideAllowed && ! result.empty ()) {
 
     std::unordered_set<db::EdgePair> waived;
 
@@ -358,7 +358,7 @@ check_local_operation<TS, TI>::compute_local (db::Layout *layout, const shape_in
         bool can_be_waived = false;
 
         //  decode pattern: consider each group of 4 bits and match them against the error pattern in their four rotation variants
-        uint32_t p32 = (uint32_t) m_rect_filter;
+        uint32_t p32 = (uint32_t) m_options.rect_filter;
         while (p32 != 0 && ! can_be_waived) {
 
           uint32_t p4 = p32 & 0xf;

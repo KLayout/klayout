@@ -376,7 +376,7 @@ CODE
           a[:in]     && av[3] = @engine._make_value(a[:in])
           a[:joined] && av[4] = true
         elsif i < 4
-          av[i] = @engine._make_value(a).to_s)
+          av[i] = @engine._make_value(a).to_s
         else
           raise("Too many arguments for method '#{f}' (1 to 5 expected)")
         end

@@ -397,6 +397,12 @@ CompoundRegionLogicalBoolOperationNode::CompoundRegionLogicalBoolOperationNode (
   //  .. nothing yet ..
 }
 
+CompoundRegionLogicalBoolOperationNode::ResultType
+CompoundRegionLogicalBoolOperationNode::result_type () const
+{
+  return Region;
+}
+
 std::string CompoundRegionLogicalBoolOperationNode::generated_description () const
 {
   std::string r;

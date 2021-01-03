@@ -78,20 +78,27 @@ module DRC
     end
 
     def set_box(method, *args)
-      box = nil
-      if args.size == 1
-        box = args[0]
-        box.is_a?(RBA::DBox) || raise("'#{method}' method requires a box specification")
-      elsif args.size == 2
-        (args[0].is_a?(RBA::DPoint) && args[1].is_a?(RBA::DPoint)) || raise("'#{method}' method requires a box specification with two points")
-        box = RBA::DBox::new(args[0], args[1])
-      elsif args.size == 4
-        box = RBA::DBox::new(*args)
-      else 
-        raise("Invalid number of arguments for '#{method}' method")
+
+      @engine._context(method) do
+
+        box = nil
+        if args.size == 1
+          box = args[0]
+          box.is_a?(RBA::DBox) || raise("Method requires a box specification")
+        elsif args.size == 2
+          (args[0].is_a?(RBA::DPoint) && args[1].is_a?(RBA::DPoint)) || raise("Method requires a box specification with two points")
+          box = RBA::DBox::new(args[0], args[1])
+        elsif args.size == 4
+          box = RBA::DBox::new(*args)
+        else 
+          raise("Invalid number of arguments (1, 2 or 4 expected)")
+        end
+        @box = RBA::Box::from_dbox(box * (1.0 / @layout.dbu))
+
+        self
+
       end
-      @box = RBA::Box::from_dbox(box * (1.0 / @layout.dbu))
-      self
+
     end
     
     def inplace_clip(*args)
@@ -113,17 +120,21 @@ module DRC
     end
     
     def inplace_cell(arg)
-      @cell = layout.cell(arg)
-      @cell ||= layout.create_cell(arg)
-      self  
+      @engine._context("inplace_cell") do
+        @cell = layout.cell(arg)
+        @cell ||= layout.create_cell(arg)
+        self  
+      end
     end
     
     def inplace_select(*args)
-      args.each do |a|
-        a.is_a?(String) || raise("Invalid arguments to 'select' method - must be strings")
-        @sel.push(a)
+      @engine._context("inplace_select") do
+        args.each do |a|
+          a.is_a?(String) || raise("Invalid arguments - must be strings")
+          @sel.push(a)
+        end
+        self
       end
-      self
     end
     
     # %DRC%
@@ -238,9 +249,11 @@ module DRC
     %w(select cell clip touching overlapping).each do |f|
       eval <<"CODE"
         def #{f}(*args)
-          s = self.dup
-          s.inplace_#{f}(*args)
-          s
+          @engine._context("#{f}") do
+            s = self.dup
+            s.inplace_#{f}(*args)
+            s
+          end
         end
 CODE
     end
@@ -256,13 +269,15 @@ CODE
     # @/code
     
     def extent
-      layer = input
-      if @box
-        layer.insert(RBA::DBox::from_ibox(@box) * @layout.dbu)
-      else
-        layer.insert(RBA::DBox::from_ibox(@cell.bbox) * @layout.dbu)
+      @engine._context("extent") do
+        layer = input
+        if @box
+          layer.insert(RBA::DBox::from_ibox(@box) * @layout.dbu)
+        else
+          layer.insert(RBA::DBox::from_ibox(@cell.bbox) * @layout.dbu)
+        end
+        layer
       end
-      layer
     end
           
     # %DRC%
@@ -309,8 +324,10 @@ CODE
     # Use the global version of "input" without a source object to address the default source.
     
     def input(*args)
-      layers = parse_input_layers(*args)
-      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SAll, RBA::Region))
+      @engine._context("input") do
+        layers = parse_input_layers(*args)
+        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SAll, RBA::Region))
+      end
     end
 
     # %DRC%
@@ -331,8 +348,10 @@ CODE
     # Use the global version of "labels" without a source object to address the default source.
     
     def labels(*args)
-      layers = parse_input_layers(*args)
-      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::STexts, RBA::Texts))
+      @engine._context("labels") do
+        layers = parse_input_layers(*args)
+        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::STexts, RBA::Texts))
+      end
     end
 
     # %DRC%
@@ -352,8 +371,10 @@ CODE
     # Use the global version of "polygons" without a source object to address the default source.
     
     def polygons(*args)
-      layers = parse_input_layers(*args)
-      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SBoxes | RBA::Shapes::SPaths | RBA::Shapes::SPolygons | RBA::Shapes::SEdgePairs, RBA::Region))
+      @engine._context("polygons") do
+        layers = parse_input_layers(*args)
+        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SBoxes | RBA::Shapes::SPaths | RBA::Shapes::SPolygons | RBA::Shapes::SEdgePairs, RBA::Region))
+      end
     end
 
     # %DRC%
@@ -376,8 +397,10 @@ CODE
     # This method has been introduced in version 0.27.
     
     def edges(*args)
-      layers = parse_input_layers(*args)
-      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SBoxes | RBA::Shapes::SPaths | RBA::Shapes::SPolygons | RBA::Shapes::SEdgePairs | RBA::Shapes::SEdges, RBA::Edges))
+      @engine._context("edges") do
+        layers = parse_input_layers(*args)
+        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SBoxes | RBA::Shapes::SPaths | RBA::Shapes::SPolygons | RBA::Shapes::SEdgePairs | RBA::Shapes::SEdges, RBA::Edges))
+      end
     end
 
     # %DRC%
@@ -400,8 +423,10 @@ CODE
     # This method has been introduced in version 0.27.
     
     def edge_pairs(*args)
-      layers = parse_input_layers(*args)
-      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SEdgePairs, RBA::EdgePairs))
+      @engine._context("edge_pairs") do
+        layers = parse_input_layers(*args)
+        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SEdgePairs, RBA::EdgePairs))
+      end
     end
 
     # %DRC%

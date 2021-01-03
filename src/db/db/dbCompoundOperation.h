@@ -409,14 +409,14 @@ class DB_PUBLIC CompoundRegionLogicalBoolOperationNode
   : public CompoundRegionMultiInputOperationNode
 {
 public:
-  enum  LogicalOp { And, Or };
+  enum LogicalOp { And, Or };
 
   CompoundRegionLogicalBoolOperationNode (LogicalOp op, bool invert, const std::vector<CompoundRegionOperationNode *> &inputs);
 
   virtual std::string generated_description () const;
 
   //  specifies the result type
-  virtual ResultType result_type () const { return Region; }
+  virtual ResultType result_type () const;
 
   //  the different computation slots
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const

@@ -92,15 +92,21 @@ module DRC
     end
     
     def projection_limits(*args)
-      DRCProjectionLimits::new(*args)
+      self._context("projection_limits") do
+        DRCProjectionLimits::new(*args)
+      end
     end
     
     def angle_limit(a)
-      DRCAngleLimit::new(a)
+      self._context("angle_limit") do
+        DRCAngleLimit::new(a)
+      end
     end
     
     def whole_edges(f = true)
-      DRCWholeEdges::new(f)
+      self._context("whole_edges") do
+        DRCWholeEdges::new(f)
+      end
     end
     
     def euclidian
@@ -148,11 +154,15 @@ module DRC
     end
     
     def pattern(p)
-      DRCPattern::new(true, p)
+      self._context("pattern") do
+        DRCPattern::new(true, p)
+      end
     end
     
     def text(p)
-      DRCPattern::new(false, p)
+      self._context("text") do
+        DRCPattern::new(false, p)
+      end
     end
 
     def as_dots
@@ -168,15 +178,21 @@ module DRC
     end
     
     def area_only(r)
-      DRCAreaAndPerimeter::new(r, 1.0, 0.0)
+      self._context("area_only") do
+        DRCAreaAndPerimeter::new(r, 1.0, 0.0)
+      end
     end
     
     def perimeter_only(r, f)
-      DRCAreaAndPerimeter::new(r, 0.0, f)
+      self._context("perimeter_only") do
+        DRCAreaAndPerimeter::new(r, 0.0, f)
+      end
     end
     
     def area_and_perimeter(r, f)
-      DRCAreaAndPerimeter::new(r, 1.0, f)
+      self._context("area_and_perimeter") do
+        DRCAreaAndPerimeter::new(r, 1.0, f)
+      end
     end
     
     # %DRC%
@@ -190,14 +206,16 @@ module DRC
     # information comments such as instance coordinates or pin names.
 
     def write_spice(use_net_names = nil, with_comments = nil)
-      writer = RBA::NetlistSpiceWriter::new
-      if use_net_names != nil
-        writer.use_net_names = use_net_names
+      self._context("write_spice") do
+        writer = RBA::NetlistSpiceWriter::new
+        if use_net_names != nil
+          writer.use_net_names = use_net_names
+        end
+        if with_comments != nil
+          writer.with_comments = with_comments
+        end
+        writer
       end
-      if with_comments != nil
-        writer.with_comments = with_comments
-      end
-      writer
     end
 
     # %DRC%
@@ -211,7 +229,9 @@ module DRC
     # about this extractor (non-strict mode applies for 'mos3').
 
     def mos3(name)
-      RBA::DeviceExtractorMOS3Transistor::new(name)
+      self._context("mos3") do
+        RBA::DeviceExtractorMOS3Transistor::new(name)
+      end
     end
 
     # %DRC%
@@ -225,7 +245,9 @@ module DRC
     # about this extractor (non-strict mode applies for 'mos4').
 
     def mos4(name)
-      RBA::DeviceExtractorMOS4Transistor::new(name)
+      self._context("mos4") do
+        RBA::DeviceExtractorMOS4Transistor::new(name)
+      end
     end
 
     # %DRC%
@@ -241,7 +263,9 @@ module DRC
     # about this extractor (strict mode applies for 'dmos3').
 
     def dmos3(name)
-      RBA::DeviceExtractorMOS3Transistor::new(name, true)
+      self._context("dmos3") do
+        RBA::DeviceExtractorMOS3Transistor::new(name, true)
+      end
     end
 
     # %DRC%
@@ -257,7 +281,9 @@ module DRC
     # about this extractor (strict mode applies for 'dmos4').
 
     def dmos4(name)
-      RBA::DeviceExtractorMOS4Transistor::new(name, true)
+      self._context("dmos4") do
+        RBA::DeviceExtractorMOS4Transistor::new(name, true)
+      end
     end
 
     # %DRC%
@@ -271,7 +297,9 @@ module DRC
     # about this extractor.
 
     def bjt3(name)
-      RBA::DeviceExtractorBJT3Transistor::new(name)
+      self._context("bjt3") do
+        RBA::DeviceExtractorBJT3Transistor::new(name)
+      end
     end
 
     # %DRC%
@@ -285,7 +313,9 @@ module DRC
     # about this extractor.
 
     def bjt4(name)
-      RBA::DeviceExtractorBJT4Transistor::new(name)
+      self._context("bjt4") do
+        RBA::DeviceExtractorBJT4Transistor::new(name)
+      end
     end
 
     # %DRC%
@@ -299,7 +329,9 @@ module DRC
     # about this extractor.
 
     def diode(name)
-      RBA::DeviceExtractorDiode::new(name)
+      self._context("diode") do
+        RBA::DeviceExtractorDiode::new(name)
+      end
     end
 
     # %DRC%
@@ -315,7 +347,9 @@ module DRC
     # about this extractor.
 
     def resistor(name, sheet_rho)
-      RBA::DeviceExtractorResistor::new(name, sheet_rho)
+      self._context("resistor") do
+        RBA::DeviceExtractorResistor::new(name, sheet_rho)
+      end
     end
 
     # %DRC%
@@ -330,7 +364,9 @@ module DRC
     # about this extractor.
 
     def resistor_with_bulk(name, sheet_rho)
-      RBA::DeviceExtractorResistorWithBulk::new(name, sheet_rho)
+      self._context("resistor_with_bulk") do
+        RBA::DeviceExtractorResistorWithBulk::new(name, sheet_rho)
+      end
     end
 
     # %DRC%
@@ -344,7 +380,9 @@ module DRC
     # about this extractor.
 
     def capacitor(name, area_cap)
-      RBA::DeviceExtractorCapacitor::new(name, area_cap)
+      self._context("capacitor") do
+        RBA::DeviceExtractorCapacitor::new(name, area_cap)
+      end
     end
 
     # %DRC%
@@ -359,7 +397,9 @@ module DRC
     # about this extractor.
 
     def capacitor_with_bulk(name, area_cap)
-      RBA::DeviceExtractorCapacitorWithBulk::new(name, area_cap)
+      self._context("capacitor_with_bulk") do
+        RBA::DeviceExtractorCapacitorWithBulk::new(name, area_cap)
+      end
     end
 
     # %DRC%
@@ -458,7 +498,7 @@ module DRC
     
     def use_dbu(d)
       if @dbu_read 
-        raise "Cannot change the database unit at this point"
+        raise("Cannot change the database unit at this point")
       end
       # Should have a "context", but no such thing for Float or Fixnum
       1.0.class._dbu = d
@@ -778,62 +818,66 @@ module DRC
     
     def source(arg = nil, arg2 = nil)
     
-      if arg
-      
-        if arg.is_a?(String)
+      self._context("source") do
+
+        if arg
         
-          if arg =~ /^@(\d+)/
-            n = $1.to_i - 1
-            view = RBA::LayoutView::current
-            view || raise("No view open")
-            (n >= 0 && view.cellviews > n) || raise("Invalid layout index @#{n + 1}")
-            cv = view.cellview(n)
-            cv.is_valid? || raise("Invalid layout @#{n + 1}")
-            @def_source = make_source(cv.layout, cv.cell, cv.filename)
-          else
-            layout = RBA::Layout::new
-            info("Reading #{arg} ..")
-            layout.read(arg)
-            cell = nil 
-            if arg2
-              arg2.is_a?(String) || raise("Second argument of 'source' must be a string")
-              cell = layout.cell(arg2)
-              cell || raise("Cell name #{arg2} not found in input layout")
+          if arg.is_a?(String)
+          
+            if arg =~ /^@(\d+)/
+              n = $1.to_i - 1
+              view = RBA::LayoutView::current
+              view || raise("No view open")
+              (n >= 0 && view.cellviews > n) || raise("Invalid layout index @#{n + 1}")
+              cv = view.cellview(n)
+              cv.is_valid? || raise("Invalid layout @#{n + 1}")
+              @def_source = make_source(cv.layout, cv.cell, cv.filename)
+            else
+              layout = RBA::Layout::new
+              info("Reading #{arg} ..")
+              layout.read(arg)
+              cell = nil 
+              if arg2
+                arg2.is_a?(String) || raise("Second argument must be a string")
+                cell = layout.cell(arg2)
+                cell || raise("Cell name #{arg2} not found in input layout")
+              end
+              @def_source = make_source(layout, cell, arg)
             end
-            @def_source = make_source(layout, cell, arg)
-          end
-          
-        elsif arg.is_a?(RBA::Layout)
+            
+          elsif arg.is_a?(RBA::Layout)
 
-          cell = arg2
-          if cell.is_a?(String)
-            cell = arg.cell(cell)
-            cell || raise("Cell name #{cell} not found in input layout")
-          elsif !cell.is_a?(RBA::Cell)
-            raise("Second argument of 'source' must be a string or RBA::Cell object")
-          end
-          @def_source = make_source(arg, cell)
+            cell = arg2
+            if cell.is_a?(String)
+              cell = arg.cell(cell)
+              cell || raise("Cell name #{cell} not found in input layout")
+            elsif !cell.is_a?(RBA::Cell)
+              raise("Second argument must be a string or RBA::Cell object")
+            end
+            @def_source = make_source(arg, cell)
 
-        elsif arg.is_a?(RBA::Cell)
-          @def_source = make_source(arg.layout, arg)
+          elsif arg.is_a?(RBA::Cell)
+            @def_source = make_source(arg.layout, arg)
+          else
+            raise("Invalid argument '" + arg.inspect + "'")
+          end
+        
         else
-          raise("Invalid argument for 'source' method")
+          @def_source || @def_layout || raise("No layout loaded - no default layout. Use 'layout' or 'source' to explicitly specify a layout.")
+          @def_source ||= make_source(@def_layout, @def_cell, @def_path)
         end
-      
-      else
-        @def_source || @def_layout || raise("No layout loaded - no default layout. Use 'layout' or 'source' to explicitly specify a layout.")
-        @def_source ||= make_source(@def_layout, @def_cell, @def_path)
+
+        # make default input also default output if none is set yet.
+        @def_layout ||= @def_source.layout
+        @def_cell ||= @def_source.cell_obj
+        @def_path ||= @def_source.path
+            
+        # use the DBU of the new input as DBU reference
+        @dbu_read || use_dbu(@def_source.layout.dbu)
+
+        @def_source
+
       end
-
-      # make default input also default output if none is set yet.
-      @def_layout ||= @def_source.layout
-      @def_cell ||= @def_source.cell_obj
-      @def_path ||= @def_source.path
-          
-      # use the DBU of the new input as DBU reference
-      @dbu_read || use_dbu(@def_source.layout.dbu)
-
-      @def_source
 
     end
 
@@ -873,43 +917,47 @@ module DRC
     
     def layout(arg = nil, arg2 = nil)
     
-      if arg
-      
-        if arg.is_a?(String)
+      self._context("layout") do
+
+        if arg
         
-          if arg =~ /^@(\d+)/
-            n = $1.to_i - 1
-            view = RBA::LayoutView::current
-            view || raise("No view open")
-            (n >= 0 && view.cellviews > n) || raise("Invalid layout index @#{n + 1}")
-            cv = view.cellview(n)
-            cv.is_valid? || raise("Invalid layout @#{n + 1}")
-            return make_source(cv.layout, cv.cell, cv.filename)
-          else
-            layout = RBA::Layout::new
-            info("Reading #{arg} ..")
-            layout.read(arg)
-            cell = nil 
-            if arg2
-              arg2.is_a?(String) || raise("Second argument of 'source' must be a string")
-              cell = layout.cell(arg2)
-              cell || raise("Cell name #{arg2} not found in input layout")
-            end
-            return make_source(layout, cell, arg)
-          end
+          if arg.is_a?(String)
           
-        elsif arg.is_a?(RBA::Layout)
-          return make_source(layout)
-        elsif arg.is_a?(RBA::Cell)
-          return make_source(arg.layout, arg)
+            if arg =~ /^@(\d+)/
+              n = $1.to_i - 1
+              view = RBA::LayoutView::current
+              view || raise("No view open")
+              (n >= 0 && view.cellviews > n) || raise("Invalid layout index @#{n + 1}")
+              cv = view.cellview(n)
+              cv.is_valid? || raise("Invalid layout @#{n + 1}")
+              return make_source(cv.layout, cv.cell, cv.filename)
+            else
+              layout = RBA::Layout::new
+              info("Reading #{arg} ..")
+              layout.read(arg)
+              cell = nil 
+              if arg2
+                arg2.is_a?(String) || raise("Second argument of 'source' must be a string")
+                cell = layout.cell(arg2)
+                cell || raise("Cell name #{arg2} not found in input layout")
+              end
+              return make_source(layout, cell, arg)
+            end
+            
+          elsif arg.is_a?(RBA::Layout)
+            return make_source(layout)
+          elsif arg.is_a?(RBA::Cell)
+            return make_source(arg.layout, arg)
+          else
+            raise("Invalid argument for 'layout' method")
+          end
+        
         else
-          raise("Invalid argument for 'layout' method")
+          @def_source || @def_layout || raise("No layout loaded - no default layout. Use 'layout' or 'source' to explicitly specify a layout.")
+          @def_source ||= make_source(@def_layout, @def_cell, @def_path)
+          @def_source
         end
-      
-      else
-        @def_source || @def_layout || raise("No layout loaded - no default layout. Use 'layout' or 'source' to explicitly specify a layout.")
-        @def_source ||= make_source(@def_layout, @def_cell, @def_path)
-        @def_source
+
       end
           
     end
@@ -936,41 +984,45 @@ module DRC
       
     def report(description, filename = nil, cellname = nil)
 
-      @output_rdb_file = filename
+      self._context("report") do
 
-      name = filename && File::basename(filename)
-      name ||= "DRC"
-      
-      @output_rdb_index = nil
+        @output_rdb_file = filename
 
-      view = RBA::LayoutView::current
-      if view
-        if self._rdb_index
-          @output_rdb = RBA::ReportDatabase::new("")   # reuse existing name
-          @output_rdb_index = view.replace_rdb(self._rdb_index, @output_rdb)
+        name = filename && File::basename(filename)
+        name ||= "DRC"
+        
+        @output_rdb_index = nil
+
+        view = RBA::LayoutView::current
+        if view
+          if self._rdb_index
+            @output_rdb = RBA::ReportDatabase::new("")   # reuse existing name
+            @output_rdb_index = view.replace_rdb(self._rdb_index, @output_rdb)
+          else
+            @output_rdb = RBA::ReportDatabase::new(name)
+            @output_rdb_index = view.add_rdb(@output_rdb)
+          end
         else
           @output_rdb = RBA::ReportDatabase::new(name)
-          @output_rdb_index = view.add_rdb(@output_rdb)
         end
-      else
-        @output_rdb = RBA::ReportDatabase::new(name)
+        
+        @output_layout = nil
+        @output_cell = nil
+        @output_layout_file = nil
+
+        cn = nil
+        cn ||= @def_cell && @def_cell.name
+        cn ||= source && source.cell_name
+        cn ||= cellname
+
+        cn || raise("No cell name specified - either the source was not specified before 'report' or there is no default source. In the latter case, specify a cell name as the third parameter")
+
+        @output_rdb_cell = @output_rdb.create_cell(cn)
+        @output_rdb.generator = self._generator
+        @output_rdb.top_cell_name = cn
+        @output_rdb.description = description
+
       end
-      
-      @output_layout = nil
-      @output_cell = nil
-      @output_layout_file = nil
-
-      cn = nil
-      cn ||= @def_cell && @def_cell.name
-      cn ||= source && source.cell_name
-      cn ||= cellname
-
-      cn || raise("No cell name specified - either the source was not specified before 'report' or there is no default source. In the latter case, specify a cell name as the third parameter of 'report'")
-
-      @output_rdb_cell = @output_rdb.create_cell(cn)
-      @output_rdb.generator = self._generator
-      @output_rdb.top_cell_name = cn
-      @output_rdb.description = description
       
     end
 
@@ -989,12 +1041,18 @@ module DRC
     # version of the L2N DB format will be used.
     
     def report_netlist(filename = nil, long = nil)
-      @show_l2ndb = true
-      if filename
-        filename.is_a?(String) || raise("Argument must be string in report_netlist")
+
+      self._context("report_netlist") do
+
+        @show_l2ndb = true
+        if filename
+          filename.is_a?(String) || raise("Argument must be string")
+        end
+        @output_l2ndb_file = filename
+        @output_l2ndb_long = long
+
       end
-      @output_l2ndb_file = filename
-      @output_l2ndb_long = long
+
     end
 
     # %DRC%
@@ -1011,16 +1069,22 @@ module DRC
     # See \write_spice for more details.
     
     def target_netlist(filename, format = nil, comment = nil)
-      filename.is_a?(String) || raise("First argument must be string in target_netlist")
-      @target_netlist_file = filename
-      if format
-        format.is_a?(RBA::NetlistWriter) || raise("Second argument must be netlist writer object in target_netlist")
+
+      self._context("target_netlist") do
+
+        filename.is_a?(String) || raise("First argument must be string")
+        @target_netlist_file = filename
+        if format
+          format.is_a?(RBA::NetlistWriter) || raise("Second argument must be netlist writer object")
+        end
+        @target_netlist_format = format
+        if comment
+          comment.is_a?(String) || raise("Third argument must be string")
+        end
+        @target_netlist_comment = comment
+
       end
-      @target_netlist_format = format
-      if comment
-        comment.is_a?(String) || raise("Third argument must be string in target_netlist")
-      end
-      @target_netlist_comment = comment
+
     end
 
     # %DRC%
@@ -1033,28 +1097,32 @@ module DRC
     
     def output_cell(cellname)
 
-      # finish what we got so far
-      _flush
-      
-      if @output_rdb
-      
-        cell = nil
-        @output_rdb.each_cell do |c|
-          if c.name == cellname
-            cell = c
+      self._context("output_cell") do
+
+        # finish what we got so far
+        _flush
+        
+        if @output_rdb
+        
+          cell = nil
+          @output_rdb.each_cell do |c|
+            if c.name == cellname
+              cell = c
+            end
           end
+          
+          cell ||= @output_rdb.create_cell(cellname)
+          @output_rdb_cell = cell
+          
+        else
+        
+          @output_layout ||= @def_layout
+          if @output_layout
+            @output_cell = @output_layout.cell(cellname.to_s) || @output_layout.create_cell(cellname.to_s)
+          end
+          
         end
-        
-        cell ||= @output_rdb.create_cell(cellname)
-        @output_rdb_cell = cell
-        
-      else
-      
-        @output_layout ||= @def_layout
-        if @output_layout
-          @output_cell = @output_layout.cell(cellname.to_s) || @output_layout.create_cell(cellname.to_s)
-        end
-        
+
       end
           
     end
@@ -1085,50 +1153,54 @@ module DRC
     # 
     
     def target(arg, cellname = nil)
-    
-      # finish what we got so far
-      _finish(false)
-          
-      if arg.is_a?(String)
-      
-        if arg =~ /^@(\d+|\+)/
-          view = RBA::LayoutView::current
-          view || raise("No view open")
-          if $1 == "+"
-            n = view.create_layout(true)
-            cellname ||= (@def_cell ? @def_cell.name : "TOP")
-          else
-            n = $1.to_i - 1
-          end
-          (n >= 0 && view.cellviews > n) || raise("Invalid layout index @#{n + 1}")
-          cv = view.cellview(n)
-          cv.is_valid? || raise("Invalid layout @#{n + 1}")
-          @output_layout = cv.layout
-          @output_cell = cellname ? (@output_layout.cell(cellname.to_s) || @output_layout.create_cell(cellname.to_s)) : cv.cell
-          cv.cell = @output_cell
-          @output_layout_file = nil
-        else
-          @output_layout = RBA::Layout::new
-          @output_cell = cellname && @output_layout.create_cell(cellname.to_s)
-          @output_layout_file = arg
-        end
-        
-      elsif arg.is_a?(RBA::Layout)
-      
-        @output_layout = arg
-        @output_cell = cellname && (@output_layout.cell(cellname.to_s) || @output_layout.create_cell(cellname.to_s))
-        @output_layout_file = nil
-        
-      elsif arg.is_a?(RBA::Cell)
-      
-        @output_layout = arg.layout
-        @output_cell = arg
-        @output_layout_file = nil
 
-      else
-        raise("Invalid argument for 'target' method")
-      end
+      self._context("target") do
     
+        # finish what we got so far
+        _finish(false)
+            
+        if arg.is_a?(String)
+        
+          if arg =~ /^@(\d+|\+)/
+            view = RBA::LayoutView::current
+            view || raise("No view open")
+            if $1 == "+"
+              n = view.create_layout(true)
+              cellname ||= (@def_cell ? @def_cell.name : "TOP")
+            else
+              n = $1.to_i - 1
+            end
+            (n >= 0 && view.cellviews > n) || raise("Invalid layout index @#{n + 1}")
+            cv = view.cellview(n)
+            cv.is_valid? || raise("Invalid layout @#{n + 1}")
+            @output_layout = cv.layout
+            @output_cell = cellname ? (@output_layout.cell(cellname.to_s) || @output_layout.create_cell(cellname.to_s)) : cv.cell
+            cv.cell = @output_cell
+            @output_layout_file = nil
+          else
+            @output_layout = RBA::Layout::new
+            @output_cell = cellname && @output_layout.create_cell(cellname.to_s)
+            @output_layout_file = arg
+          end
+          
+        elsif arg.is_a?(RBA::Layout)
+        
+          @output_layout = arg
+          @output_cell = cellname && (@output_layout.cell(cellname.to_s) || @output_layout.create_cell(cellname.to_s))
+          @output_layout_file = nil
+          
+        elsif arg.is_a?(RBA::Cell)
+        
+          @output_layout = arg.layout
+          @output_cell = arg
+          @output_layout_file = nil
+
+        else
+          raise("Invalid argument '" + arg.inspect + "'")
+        end
+    
+      end
+
     end
     
     # %DRC%
@@ -1139,7 +1211,9 @@ module DRC
     # RBA::DBox constructors.
  
     def box(*args)
-      RBA::DBox::new(*args)
+      self._context("box") do
+        RBA::DBox::new(*args)
+      end
     end
     
     # %DRC%
@@ -1150,7 +1224,9 @@ module DRC
     # RBA::DPath constructors.
  
     def path(*args)
-      RBA::DPath::new(*args)
+      self._context("path") do
+        RBA::DPath::new(*args)
+      end
     end
     
     # %DRC%
@@ -1161,7 +1237,9 @@ module DRC
     # RBA::DPolygon constructors.
  
     def polygon(*args)
-      RBA::DPolygon::new(*args)
+      self._context("polygon") do
+        RBA::DPolygon::new(*args)
+      end
     end
     
     # %DRC%
@@ -1177,7 +1255,9 @@ module DRC
     # @/code
     
     def p(x, y)
-      RBA::DPoint::new(x, y)
+      self._context("p") do
+        RBA::DPoint::new(x, y)
+      end
     end
     
     # %DRC%
@@ -1188,7 +1268,9 @@ module DRC
     # RBA::DEdge constructors.
  
     def edge(*args)
-      RBA::DEdge::new(*args)
+      self._context("edge") do
+        RBA::DEdge::new(*args)
+      end
     end
     
     # %DRC%
@@ -1198,7 +1280,9 @@ module DRC
     # See \Source#extent for a description of that function.
  
     def extent
-      layout.extent
+      self._context("extent") do
+        layout.extent
+      end
     end
     
     # %DRC%
@@ -1209,50 +1293,46 @@ module DRC
     # polygons and labels. See \polygons and \labels for more specific versions of
     # this method.
  
-    def input(*args)
-      layout.input(*args)
-    end
-    
     # %DRC%
     # @name polygons 
     # @brief Fetches the polygons (or shapes that can be converted to polygons) from the specified input from the default source
     # @synopsis polygons(args)
     # See \Source#polygons for a description of that function.
  
-    def polygons(*args)
-      layout.polygons(*args)
-    end
-    
     # %DRC%
     # @name labels 
     # @brief Gets the labels (text) from an original layer
     # @synopsis labels(args)
     # See \Source#labels for a description of that function.
  
-    def labels(*args)
-      layout.labels(*args)
-    end
-    
     # %DRC%
     # @name edges 
     # @brief Gets the edges from an original layer
     # @synopsis edges(args)
     # See \Source#edges for a description of that function.
  
-    def edges(*args)
-      layout.edges(*args)
-    end
-    
     # %DRC%
     # @name edge_pairs 
     # @brief Gets the edges from an original layer
     # @synopsis edge_pairs(args)
     # See \Source#edge_pairs for a description of that function.
  
-    def edge_pairs(*args)
-      layout.edge_pairs(*args)
+    %w(
+      edge_pairs
+      edges
+      input
+      labels
+      polygons
+    ).each do |f|
+      eval <<"CODE"
+      def #{f}(*args)
+        self._context("#{f}") do
+          layout.#{f}(*args)
+        end
+      end
+CODE
     end
-    
+
     # %DRC%
     # @name output
     # @brief Outputs a layer to the report database or output layout
@@ -1260,7 +1340,9 @@ module DRC
     # This function is equivalent to "layer.output(args)". See \Layer#output for details about this function.
     
     def output(layer, *args)
-      layer.output(*args)
+      self._context("output") do
+        layer.output(*args)
+      end
     end
     
     # %DRC%
@@ -1290,8 +1372,10 @@ module DRC
     # @/code
  
     def cell(*args)
-      @def_source = layout.cell(*args)
-      output_cell(*args)
+      self._context("cell") do
+        @def_source = layout.cell(*args)
+        output_cell(*args)
+      end
       nil
     end
     
@@ -1302,7 +1386,9 @@ module DRC
     # See \Source#select for a description of that function.
  
     def select(*args)
-      @def_source = layout.select(*args)
+      self._context("select") do
+        @def_source = layout.select(*args)
+      end
       nil
     end
     
@@ -1322,7 +1408,9 @@ module DRC
     # @/code
  
     def clip(*args)
-      @def_source = layout.clip(*args)
+      self._context("clip") do
+        @def_source = layout.clip(*args)
+      end
       nil
     end
 
@@ -1417,41 +1505,145 @@ module DRC
     # Cheats have been introduced in version 0.26.1.
 
     def cheat(*args, &block)
-      if _dss
-        _dss.push_state
-        args.flatten.each { |a| _dss.add_breakout_cells(a.to_s) }
-        ret = block.call
-        _dss.pop_state
-      else
-        ret = block.call
+      self._wrapper_context("cheat") do
+        if _dss
+          _dss.push_state
+          args.flatten.each { |a| _dss.add_breakout_cells(a.to_s) }
+          ret = block.call
+          _dss.pop_state
+        else
+          ret = block.call
+        end
+        ret
       end
-      ret
     end
     
     # make some DRCLayer methods available as functions
     # for the engine
-    %w(join and or xor not 
-       in touching overlapping inside outside interacting
-       select_touching select_overlapping select_inside select_outside select_interacting
-       merge merged rectangles rectilinear non_rectangles non_rectilinear
-       with_area with_perimeter with_angle with_length with_bbox_width with_bbox_area with_bbox_height with_bbox_min with_bbox_max
-       without_area without_perimeter without_length without_angle without_bbox_width without_bbox_area without_bbox_height without_bbox_min without_bbox_max
-       bbox 
-       area length perimeter 
-       is_box? is_empty? is_merged? is_clean? is_raw? polygons? edges? edge_pairs?
-       strict non_strict is_strict?
-       centers end_segments start_segments
-       extended extended_in extended_out
-       extents hulls holes
-       scaled scale rotated rotate
-       move moved transform transformed
-       width space notch isolated overlap
-       size sized 
-       rounded_corners odd_polygons).each do |f|
+    %w(
+      and
+      andnot
+      area
+      bbox 
+      centers
+      corners
+      covering
+      enc
+      enclosing
+      end_segments
+      extended
+      extended_in
+      extended_out
+      extent_refs
+      extents
+      first_edges
+      flatten
+      holes
+      hulls
+      in
+      inside
+      inside_part
+      interacting
+      intersections
+      iso
+      isolated
+      join
+      length
+      merge
+      merged
+      middle
+      move
+      moved
+      non_rectangles
+      non_rectilinear
+      non_strict
+      not 
+      notch
+      not_covering
+      not_in
+      not_inside
+      not_interacting
+      not_outside
+      not_overlapping
+      odd_polygons
+      ongrid
+      or
+      output
+      outside
+      outside_part
+      overlap
+      overlapping
+      perimeter 
+      pull_inside 
+      pull_interacting 
+      pull_overlapping 
+      rectangles
+      rectilinear
+      rotate
+      rotated
+      rounded_corners
+      scale
+      scaled
+      second_edges
+      select_covering
+      select_inside
+      select_interacting
+      select_not_covering
+      select_not_inside
+      select_not_interacting
+      select_not_outside
+      select_not_overlapping
+      select_outside
+      select_overlapping
+      select_touching
+      sep
+      separation
+      size
+      sized 
+      smoothed
+      snap 
+      snapped
+      space
+      start_segments
+      strict
+      texts
+      texts_not
+      touching
+      transform
+      transformed
+      width
+      with_angle
+      with_area
+      with_bbox_area
+      with_bbox_height
+      with_bbox_max
+      with_bbox_min
+      with_bbox_width
+      with_length
+      without_angle
+      without_area
+      without_bbox
+      without_bbox_height
+      without_bbox_max
+      without_bbox_min
+      without_length
+      without_perimeter
+      with_perimeter
+      xor
+    ).each do |f|
       eval <<"CODE"
         def #{f}(*args)
-          obj = args.shift
-          obj.#{f}(*args)
+          self._context("#{f}") do
+            if args[0].is_a?(DRCLayer)
+              obj = args.shift
+              return obj.#{f}(*args)
+            elsif self.respond_to?(:_cop_#{f})
+              # forward to _cop_ implementation for complex DRC operations
+              return self._cop_#{f}(*args)
+            else
+              raise("Function requires at a layer expression for the first argument")
+            end
+          end
         end
 CODE
     end
@@ -1463,7 +1655,9 @@ CODE
     # See \Netter# for more details
  
     def netter
-      DRC::DRCNetter::new
+      self._context("netter") do
+        DRC::DRCNetter::new
+      end
     end
 
     # %DRC%
@@ -1523,10 +1717,22 @@ CODE
     # yet, this method will trigger the extraction process.
     # See \Netter#netlist for a description of this function.
  
-    %w(connect connect_global clear_connections connect_implicit antenna_check l2n_data device_scaling extract_devices netlist).each do |f|
+    %w(
+      antenna_check
+      clear_connections
+      connect
+      connect_global
+      connect_implicit
+      device_scaling
+      extract_devices
+      l2n_data
+      netlist
+    ).each do |f|
       eval <<"CODE"
         def #{f}(*args)
-          _netter.#{f}(*args)
+          self._context("#{f}") do
+            _netter.#{f}(*args)
+          end
         end
 CODE
     end
@@ -1539,6 +1745,22 @@ CODE
         return File::basename($1) + ":" + $2
       else
         return cc
+      end
+    end
+
+    def _wrapper_context(func, *args, &proc)
+      begin
+        return yield(*args)
+      rescue => ex
+        raise("'" + func + "': " + ex.to_s)
+      end
+    end
+    
+    def _context(func, *args, &proc)
+      begin
+        return yield(*args)
+      rescue => ex
+        raise("'" + func + "': " + ex.to_s)
       end
     end
     
@@ -2087,7 +2309,7 @@ CODE
       if @output_rdb
         
         if args.size < 1
-          raise("Invalid number of arguments for 'output' on report - category name and optional description expected")
+          raise("Invalid number of arguments - category name and optional description expected")
         end
 
         cat = @output_rdb.create_category(args[0].to_s)
@@ -2121,12 +2343,12 @@ CODE
           elsif args[0].is_a?(String)
             info = RBA::LayerInfo::from_string(args[0])
           else
-            raise("Invalid parameter type for 'output' - must be string or number")
+            raise("Invalid parameter type - must be string or number")
           end
         elsif args.size == 2 || args.size == 3
           info = RBA::LayerInfo::new(*args)
         else
-          raise("Invalid number of arguments for 'output' - one, two or three arguments expected")
+          raise("Invalid number of arguments - one, two or three arguments expected")
         end
         li = output.find_layer(info)
         if !li

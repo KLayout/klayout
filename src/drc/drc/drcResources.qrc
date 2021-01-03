@@ -6,6 +6,8 @@
         <file alias="_drc_patch.rb">built-in-macros/_drc_patch.rb</file>
         <file alias="_drc_source.rb">built-in-macros/_drc_source.rb</file>
         <file alias="_drc_tags.rb">built-in-macros/_drc_tags.rb</file>
+        <file alias="_drc_complex_ops.rb">built-in-macros/_drc_complex_ops.rb</file>
+        <file alias="_drc_cop_integration.rb">built-in-macros/_drc_cop_integration.rb</file>
         <file alias="drc_interpreters.lym">built-in-macros/drc_interpreters.lym</file>
         <file alias="drc_install.lym">built-in-macros/drc_install.lym</file>
     </qresource>

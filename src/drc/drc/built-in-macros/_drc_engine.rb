@@ -791,7 +791,7 @@ module DRC
     # file. If this function is not used, the currently active layout 
     # is used as input. 
     #
-    # \layout is a similar method which specifies @i a additional @/i input layout.
+    # \layout is a similar method which specifies @i an additional @/i input layout.
     # 
     # "what" specifies what input to use. "what" be either
     #
@@ -2230,6 +2230,22 @@ CODE
       end
     end
     
+    def _check_numeric(v)
+      if ! v.is_a?(Float) && ! v.is_a?(1.class)
+        raise("Argument (#{v.inspect}) isn't numeric")
+      end
+    end
+    
+    def _make_value(v)
+      self._check_numeric(v)
+      self._prep_value(v)
+    end
+    
+    def _make_area_value(v)
+      self._check_numeric(v)
+      self._prep_area_value(v)
+    end
+  
   private
 
     def _make_string(v)

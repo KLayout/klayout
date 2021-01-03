@@ -2,6 +2,30 @@
 
 module DRC
 
+# %DRC%
+# @scope
+# @name DRC
+# @brief DRC Reference: DRC expressions
+#
+# DRC expression objects represent abstract recipes for the \Layer#drc universal DRC function.
+# For example, when using a universal DRC expression like this:
+#
+# @code
+# out = in.drc(width < 2.0)
+# @/code
+#
+# "width < 2.0" forms a DRC expression object. DRC expression objects have methods which
+# manipulate or evaluate the results of this expression. In addition, DRC expressions have a
+# result type, which is either polygon, edge or edge pair. The result type is defined by the
+# expression generating it. In the example above, "width < 2.0" is a DRC width check which
+# renders edge pairs. To obtain polygons from these edge pairs, use the "polygons" method:
+#
+# @code
+# out = in.drc((width < 2.0).polygons)
+# @/code
+# 
+# The following documentation will list the methods available for DRC expression objects.
+  
 class DRCOpNode
 
   attr_accessor :description
@@ -36,11 +60,69 @@ class DRCOpNode
     end
     DRCOpNodeBool::new(@engine, op, self, other)
   end
+
+  # %DRC%
+  # @name &
+  # @brief Boolean AND between the results of two expressions
+  # @synopsis expr & expr
+  # 
+  # The & operator will compute the boolean AND between the results
+  # of two expressions. The expression types need to be edge or polygon.
+  # 
+  # The following example computes the partial edges where width is less than 
+  # 0.3 micrometers and space is less than 0.2 micrometers:
+  #
+  # @code
+  # out = in.drc((width < 0.3).edges & (space < 0.2).edges)
+  # @/code
   
+  # %DRC%
+  # @name |
+  # @brief Boolean OR between the results of two expressions
+  # @synopsis expr | expr
+  #
+  # The | operator will compute the boolean OR between the results of 
+  # two expressions. '+' is basically a synonym. Both expressions
+  # must render the same type.
+
+  # %DRC%
+  # @name +
+  # @brief Boolean OR between the results of two expressions
+  # @synopsis expr + expr
+  #
+  # The + operator will join the results of two expressions.
+   
+  # %DRC%
+  # @name -
+  # @brief Boolean NOT between the results of two expressions
+  # @synopsis expr - expr
+  #
+  # The - operator will compute the difference between the results
+  # of two expressions. The NOT operation is defined for polygons,
+  # edges and polygons subtracted from edges (first argument edge,
+  # second argument polygon).
+  # 
+  # The following example will produce edge markers where the 
+  # width of is less then 0.3 micron but not inside polygons on 
+  # the "waive" layer:
+  #  
+  # @code
+  # out = in.drc((width < 0.3).edges - secondary(waive))
+  # @/code
+  
+  # %DRC%
+  # @name ^
+  # @brief Boolean XOR between the results of two expressions
+  # @synopsis expr - expr
+  #
+  # The ^ operator will compute the XOR (symmetric difference) between the results
+  # of two expressions. The XOR operation is defined for polygons and edges.
+  # Both expressions must be of the same type.
+
   %w(& - ^ | +).each do |f|
     eval <<"CODE"
       def #{f}(other)
-        self.engine._context("#{f}") do
+        @engine._context("#{f}") do
           self._build_geo_bool_node(other, :#{f})
         end
       end
@@ -48,7 +130,7 @@ CODE
   end
   
   def !()
-    self.engine._context("!") do
+    @engine._context("!") do
       if self.respond_to?(:inverted)
         return self.inverted
       else
@@ -58,26 +140,6 @@ CODE
     end
   end
 
-  def _check_numeric(v, symbol)
-    if ! v.is_a?(Float) && ! v.is_a?(1.class)
-      if symbol
-        raise("Argument '#{symbol}' (#{v.inspect}) isn't numeric in operation '#{self.description}'")
-      else
-        raise("Argument (#{v.inspect}) isn't numeric in operation '#{self.description}'")
-      end
-    end
-  end
-  
-  def _make_value(v, symbol)
-    self._check_numeric(v, symbol)
-    @engine._prep_value(v)
-  end
-  
-  def _make_area_value(v, symbol)
-    self._check_numeric(v, symbol)
-    @engine._prep_area_value(v)
-  end
-  
   def area
     DRCOpNodeAreaFilter::new(@engine, self)
   end
@@ -111,20 +173,20 @@ CODE
   end
   
   def rounded_corners(inner, outer, n)
-    self.engine._context("rounded_corners") do
-      self._check_numeric(n, :n)
-      DRCOpNodeFilter::new(@engine, self, :new_rounded_corners, "rounded_corners", self.make_value(inner, :inner), self.make_value(outer, :outer), n)
+    @engine._context("rounded_corners") do
+      @engine._check_numeric(n)
+      DRCOpNodeFilter::new(@engine, self, :new_rounded_corners, "rounded_corners", @engine._make_value(inner), @engine._make_value(outer), n)
     end
   end
   
   def smoothed(d)
-    self.engine._context("smoothed") do
-      DRCOpNodeFilter::new(@engine, self, :new_smoothed, "smoothed", self.make_value(d, :d))
+    @engine._context("smoothed") do
+      DRCOpNodeFilter::new(@engine, self, :new_smoothed, "smoothed", @engine._make_value(d))
     end
   end
   
   def corners(as_dots = DRCAsDots::new(false))
-    self.engine._context("corners") do
+    @engine._context("corners") do
       if as_dots.is_a?(DRCAsDots)
         as_dots = as_dots.value
       else
@@ -138,7 +200,7 @@ CODE
     eval <<"CODE"
     def #{f}(*args)
 
-      self.engine._context("#{f}") do
+      @engine._context("#{f}") do
 
         f = []
         as_edges = false
@@ -233,7 +295,7 @@ CODE
   
   def sized(*args)
 
-    self.engine._context("sized") do
+    @engine._context("sized") do
 
       dist = 0
       
@@ -241,7 +303,7 @@ CODE
       values = []
       args.each_with_index do |a,ia|
         if a.is_a?(1.class) || a.is_a?(Float)
-          v = self._make_value(a, "argument ##{ia + 1}")
+          v = @engine._make_value(a)
           v.abs > dist && dist = v.abs 
           values.push(v)
         elsif a.is_a?(DRCSizingMode)
@@ -267,8 +329,8 @@ CODE
   end
   
   def extents(e = 0)
-    self.engine._context("extents") do
-      DRCOpNodeFilter::new(@engine, self, :new_extents, "extents", self._make_value(e, :e))
+    @engine._context("extents") do
+      DRCOpNodeFilter::new(@engine, self, :new_extents, "extents", @engine._make_value(e))
     end
   end
   
@@ -281,40 +343,40 @@ CODE
   end
 
   def end_segments(length, fraction = 0.0)
-    self.engine._context("end_segments") do
-      self._check_numeric(fraction, :fraction)
-      DRCOpNodeFilter::new(@engine, self, :new_end_segments, "end_segments", self._make_value(length, :length), fraction)
+    @engine._context("end_segments") do
+      @engine._check_numeric(fraction)
+      DRCOpNodeFilter::new(@engine, self, :new_end_segments, "end_segments", @engine._make_value(length), fraction)
     end
   end
   
   def start_segments(length, fraction = 0.0)
-    self.engine._context("start_segments") do
-      self._check_numeric(fraction, :fraction)
-      DRCOpNodeFilter::new(@engine, self, :new_start_segments, "start_segments", self._make_value(length, :length), fraction)
+    @engine._context("start_segments") do
+      @engine._check_numeric(fraction)
+      DRCOpNodeFilter::new(@engine, self, :new_start_segments, "start_segments", @engine._make_value(length), fraction)
     end
   end
   
   def centers(length, fraction = 0.0)
-    self.engine._context("centers") do
-      self._check_numeric(fraction, :fraction)
-      DRCOpNodeFilter::new(@engine, self, :new_centers, "centers", self._make_value(length, :length), fraction)
+    @engine._context("centers") do
+      @engine._check_numeric(fraction)
+      DRCOpNodeFilter::new(@engine, self, :new_centers, "centers", @engine._make_value(length), fraction)
     end
   end
   
   def extended(*args)
   
-    self.engine._context("extended") do
+    @engine._context("extended") do
 
       av = [ 0, 0, 0, 0 ]
       args.each_with_index do |a,i|
         if a.is_a?(Hash)
-          a[:begin]  && av[0] = self._make_value(a[:begin], :begin)
-          a[:end]    && av[1] = self._make_value(a[:end], :end)
-          a[:out]    && av[2] = self._make_value(a[:out], :out)
-          a[:in]     && av[3] = self._make_value(a[:in], :in)
+          a[:begin]  && av[0] = @engine._make_value(a[:begin])
+          a[:end]    && av[1] = @engine._make_value(a[:end])
+          a[:out]    && av[2] = @engine._make_value(a[:out])
+          a[:in]     && av[3] = @engine._make_value(a[:in])
           a[:joined] && av[4] = true
         elsif i < 4
-          av[i] = self._make_value(a, "argument " + (i+1).to_s)
+          av[i] = @engine._make_value(a).to_s)
         else
           raise("Too many arguments for method '#{f}' (1 to 5 expected)")
         end
@@ -327,19 +389,19 @@ CODE
   end
   
   def extended_in(e)
-    self.engine._context("extended_in") do
+    @engine._context("extended_in") do
       DRCOpNodeFilter::new(@engine, self, :new_extended_in, "extended_in", self._make_value(e))
     end
   end
   
   def extended_out(e)
-    self.engine._context("extended_out") do
+    @engine._context("extended_out") do
       DRCOpNodeFilter::new(@engine, self, :new_extended_out, "extended_out", self._make_value(e))
     end
   end
   
   def polygons
-    self.engine._context("polygons") do
+    @engine._context("polygons") do
       DRCOpNodeFilter::new(@engine, self, :new_polygons, "polygons")
     end
   end
@@ -498,7 +560,7 @@ class DRCOpNodeWithCompare < DRCOpNode
   end
   
   def coerce(something)
-    [ DRCOpNodeWithCompare::new(self.engine, self, true), something ]
+    [ DRCOpNodeWithCompare::new(@engine, self, true), something ]
   end
   
   def _self_or_original
@@ -620,9 +682,9 @@ class DRCOpNodeEdgeLengthFilter < DRCOpNodeWithCompare
   
   def do_create_node(cache)
     args = [ self.input.create_node(cache), self.inverse ]
-    args << (self.gt ? self._make_value(self.gt, :gt) + 1 : (self.ge ? self._make_value(self.ge, :ge) : 0))
+    args << (self.gt ? @engine._make_value(self.gt) + 1 : (self.ge ? @engine._make_value(self.ge) : 0))
     if self.lt || self.le
-      args << self.lt ? self._make_value(self.lt, :lt) : self._make_value(self.le, :le) - 1
+      args << self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) - 1
     end
     RBA::CompoundRegionOperationNode::new_edge_length_filter(*args)
   end
@@ -685,9 +747,9 @@ class DRCOpNodePerimeterFilter < DRCOpNodeWithCompare
   
   def do_create_node(cache)
     args = [ self.input.create_node(cache), self.inverse ]
-    args << (self.gt ? self._make_value(self.gt, :gt) + 1 : (self.ge ? self._make_value(self.ge, :ge) : 0))
+    args << (self.gt ? @engine._make_value(self.gt) + 1 : (self.ge ? @engine._make_value(self.ge) : 0))
     if self.lt || self.le
-      args << self.lt ? self._make_value(self.lt, :lt) : self._make_value(self.le, :le) - 1
+      args << self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) - 1
     end
     RBA::CompoundRegionOperationNode::new_perimeter_filter(*args)
   end
@@ -826,14 +888,14 @@ class DRCOpNodeCheck < DRCOpNodeWithCompare
                 :enclosing => :new_inside_check }[self.check]
 
     if self.lt || self.le
-      dmin = self.le ? self._make_value(self.le, :le) + 1 : self._make_value(self.lt, :lt)
+      dmin = self.le ? @engine._make_value(self.le) + 1 : @engine._make_value(self.lt)
       res = RBA::CompoundRegionOperationNode::send(factory, dmin, *self.args)
     else
       res = nil
     end
       
     if self.gt || self.ge
-      dmax = self.ge ? self._make_value(self.ge, :ge) : self._make_value(self.gt, :gt) + 1
+      dmax = self.ge ? @engine._make_value(self.ge) : @engine._make_value(self.gt) + 1
       max_check = RBA::CompoundRegionOperationNode::send(factory, dmax, *self.args + [ true ])
       res_max = RBA::CompoundRegionOperationNode::new_edge_pair_to_first_edges(max_check)
       if res
@@ -871,9 +933,9 @@ class DRCOpNodeBBoxParameterFilter < DRCOpNodeWithCompare
   
   def do_create_node(cache)
     args = [ self.input.create_node(cache), self.inverse ]
-    args << (self.gt ? self._make_value(self.gt, :gt) + 1 : (self.ge ? self._make_value(self.ge, :ge) : 0))
+    args << (self.gt ? @engine._make_value(self.gt) + 1 : (self.ge ? @engine._make_value(self.ge) : 0))
     if self.lt || self.le
-      args << self.lt ? self._make_value(self.lt, :lt) : self._make_value(self.le, :le) - 1
+      args << self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) - 1
     end
     RBA::CompoundRegionOperationNode::new_perimeter_filter(*args)
   end

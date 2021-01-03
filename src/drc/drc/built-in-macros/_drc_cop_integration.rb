@@ -313,8 +313,8 @@ CODE
           elsif a.is_a?(DRCOpNode)
             other = a
           elsif a.is_a?(DRCProjectionLimits)
-            minp = self._prep_value(a.min)
-            maxp = self._prep_value(a.max)
+            minp = self._make_value(a.min)
+            maxp = self._make_value(a.max)
           elsif a.is_a?(DRCShielded)
             shielded = a.value
           else

@@ -3226,6 +3226,22 @@ public:
     return this->obj ().is_box ();
   }
 
+  /**
+   *  @brief Returns a value indicating whether the polygon is rectilinear
+   */
+  bool is_rectilinear () const
+  {
+    return this->obj ().is_rectilinear ();
+  }
+
+  /**
+   *  @brief Returns the number of vertices
+   */
+  size_t vertices () const
+  {
+    return this->obj ().vertices ();
+  }
+
   /** 
    *  @brief Return the transformed object
    * 

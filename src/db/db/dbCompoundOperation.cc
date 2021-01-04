@@ -459,6 +459,24 @@ void CompoundRegionLogicalBoolOperationNode::implement_compute_local (db::Layout
 
 // ---------------------------------------------------------------------------------------------
 
+CompoundRegionCountFilterNode::CompoundRegionCountFilterNode (CompoundRegionOperationNode *input, bool invert, size_t min_count, size_t max_count)
+  : CompoundRegionMultiInputOperationNode (input), m_min_count (min_count), m_max_count (max_count), m_invert (invert)
+{
+  //  .. nothing yet ..
+}
+
+CompoundRegionCountFilterNode::~CompoundRegionCountFilterNode ()
+{
+  //  .. nothing yet ..
+}
+
+std::string CompoundRegionCountFilterNode::generated_description () const
+{
+  return std::string ("count_filter") + CompoundRegionMultiInputOperationNode::generated_description ();
+}
+
+// ---------------------------------------------------------------------------------------------
+
 CompoundRegionGeometricalBoolOperationNode::CompoundRegionGeometricalBoolOperationNode (GeometricalOp op, CompoundRegionOperationNode *a, CompoundRegionOperationNode *b)
   : CompoundRegionMultiInputOperationNode (a, b), m_op (op)
 {
@@ -675,7 +693,7 @@ run_bool (CompoundRegionGeometricalBoolOperationNode::GeometricalOp op, db::Layo
   if (op == CompoundRegionGeometricalBoolOperationNode::And) {
     write_result (layout, res, ea & eb);
   } else if (op == CompoundRegionGeometricalBoolOperationNode::Or) {
-    write_result (layout, res, ea + eb);
+    write_result (layout, res, ea | eb);
   } else if (op == CompoundRegionGeometricalBoolOperationNode::Xor) {
     write_result (layout, res, ea ^ eb);
   } else if (op == CompoundRegionGeometricalBoolOperationNode::Not) {
@@ -992,8 +1010,62 @@ void CompoundRegionLogicalCaseSelectOperationNode::implement_compute_local (db::
 
 }
 
-template void CompoundRegionLogicalCaseSelectOperationNode::implement_compute_local<db::Polygon> (db::Layout *, const shape_interactions<db::Polygon, db::Polygon> &, std::vector<std::unordered_set<db::Polygon> > &, size_t, double) const;
-template void CompoundRegionLogicalCaseSelectOperationNode::implement_compute_local<db::PolygonRef> (db::Layout *, const shape_interactions<db::PolygonRef, db::PolygonRef> &, std::vector<std::unordered_set<db::PolygonRef> > &, size_t, double) const;
+template void CompoundRegionLogicalCaseSelectOperationNode::implement_compute_local<db::Polygon, db::Polygon> (db::Layout *, const shape_interactions<db::Polygon, db::Polygon> &, std::vector<std::unordered_set<db::Polygon> > &, size_t, double) const;
+template void CompoundRegionLogicalCaseSelectOperationNode::implement_compute_local<db::PolygonRef, db::PolygonRef> (db::Layout *, const shape_interactions<db::PolygonRef, db::PolygonRef> &, std::vector<std::unordered_set<db::PolygonRef> > &, size_t, double) const;
+template void CompoundRegionLogicalCaseSelectOperationNode::implement_compute_local<db::Polygon, db::Edge> (db::Layout *, const shape_interactions<db::Polygon, db::Polygon> &, std::vector<std::unordered_set<db::Edge> > &, size_t, double) const;
+template void CompoundRegionLogicalCaseSelectOperationNode::implement_compute_local<db::PolygonRef, db::Edge> (db::Layout *, const shape_interactions<db::PolygonRef, db::PolygonRef> &, std::vector<std::unordered_set<db::Edge> > &, size_t, double) const;
+template void CompoundRegionLogicalCaseSelectOperationNode::implement_compute_local<db::Polygon, db::EdgePair> (db::Layout *, const shape_interactions<db::Polygon, db::Polygon> &, std::vector<std::unordered_set<db::EdgePair> > &, size_t, double) const;
+template void CompoundRegionLogicalCaseSelectOperationNode::implement_compute_local<db::PolygonRef, db::EdgePair> (db::Layout *, const shape_interactions<db::PolygonRef, db::PolygonRef> &, std::vector<std::unordered_set<db::EdgePair> > &, size_t, double) const;
+
+// ---------------------------------------------------------------------------------------------
+
+CompoundRegionJoinOperationNode::CompoundRegionJoinOperationNode (const std::vector<CompoundRegionOperationNode *> &inputs)
+  : CompoundRegionMultiInputOperationNode (inputs)
+{
+  //  .. nothing yet ..
+}
+
+std::string CompoundRegionJoinOperationNode::generated_description () const
+{
+  //  TODO: could be nicer ...
+  std::string r;
+  r = "if-then";
+  return r + CompoundRegionMultiInputOperationNode::generated_description ();
+}
+
+CompoundRegionJoinOperationNode::ResultType
+CompoundRegionJoinOperationNode::result_type () const
+{
+  ResultType result = Region;
+  for (size_t i = 0; i < children (); ++i) {
+    if (i == 0) {
+      result = child (i)->result_type ();
+    } else {
+      tl_assert (result == child (i)->result_type ());
+    }
+  }
+  return result;
+}
+
+template <class T, class TR>
+void CompoundRegionJoinOperationNode::implement_compute_local (db::Layout *layout, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  for (unsigned int ci = 0; ci < children (); ++ci) {
+
+    shape_interactions<T, T> computed;
+    const shape_interactions<T, T> &child_interactions = interactions_for_child<T, T> (interactions, ci, computed);
+
+    child (ci)->compute_local (layout, child_interactions, results, max_vertex_count, area_ratio);
+
+  }
+}
+
+template void CompoundRegionJoinOperationNode::implement_compute_local<db::Polygon, db::Polygon> (db::Layout *, const shape_interactions<db::Polygon, db::Polygon> &, std::vector<std::unordered_set<db::Polygon> > &, size_t, double) const;
+template void CompoundRegionJoinOperationNode::implement_compute_local<db::PolygonRef, db::PolygonRef> (db::Layout *, const shape_interactions<db::PolygonRef, db::PolygonRef> &, std::vector<std::unordered_set<db::PolygonRef> > &, size_t, double) const;
+template void CompoundRegionJoinOperationNode::implement_compute_local<db::Polygon, db::Edge> (db::Layout *, const shape_interactions<db::Polygon, db::Polygon> &, std::vector<std::unordered_set<db::Edge> > &, size_t, double) const;
+template void CompoundRegionJoinOperationNode::implement_compute_local<db::PolygonRef, db::Edge> (db::Layout *, const shape_interactions<db::PolygonRef, db::PolygonRef> &, std::vector<std::unordered_set<db::Edge> > &, size_t, double) const;
+template void CompoundRegionJoinOperationNode::implement_compute_local<db::Polygon, db::EdgePair> (db::Layout *, const shape_interactions<db::Polygon, db::Polygon> &, std::vector<std::unordered_set<db::EdgePair> > &, size_t, double) const;
+template void CompoundRegionJoinOperationNode::implement_compute_local<db::PolygonRef, db::EdgePair> (db::Layout *, const shape_interactions<db::PolygonRef, db::PolygonRef> &, std::vector<std::unordered_set<db::EdgePair> > &, size_t, double) const;
 
 // ---------------------------------------------------------------------------------------------
 

@@ -198,6 +198,11 @@ static db::CompoundRegionOperationNode *new_case (const std::vector<db::Compound
   return new db::CompoundRegionLogicalCaseSelectOperationNode (inputs);
 }
 
+static db::CompoundRegionOperationNode *new_count_filter (db::CompoundRegionOperationNode *input, bool invert, size_t min_count, size_t max_count)
+{
+  return new db::CompoundRegionCountFilterNode (input, invert, min_count, max_count);
+}
+
 static db::CompoundRegionOperationNode *new_corners_as_rectangles (db::CompoundRegionOperationNode *input, double angle_start, double angle_end, db::Coord dim = 1)
 {
   check_non_null (input, "input");
@@ -259,6 +264,12 @@ static db::CompoundRegionOperationNode *new_sized (db::CompoundRegionOperationNo
 {
   check_non_null (input, "input");
   return new db::CompoundRegionProcessingOperationNode (new db::PolygonSizer (dx, dy, mode), input, true /*processor is owned*/);
+}
+
+static db::CompoundRegionOperationNode *new_merged (db::CompoundRegionOperationNode *input, bool min_coherence, unsigned int min_wc)
+{
+  check_non_null (input, "input");
+  return new db::CompoundRegionMergeOperationNode (min_coherence, min_wc, input);
 }
 
 static db::CompoundRegionOperationNode *new_minkowsky_sum_node1 (db::CompoundRegionOperationNode *input, const db::Edge &e)
@@ -542,6 +553,9 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
     "rendered if c2 isn't empty etc. If none of the conditions renders a non-empty set and a default result is present, the default will be "
     "returned. Otherwise, the result is empty."
   ) +
+  gsi::constructor ("new_count_filter", &new_count_filter, gsi::arg ("inputs"), gsi::arg ("invert", false), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", std::numeric_limits<size_t>::max ()),
+    "@brief Creates a node selecting results but their shape count.\n"
+  ) +
   gsi::constructor ("new_corners_as_rectangles", &new_corners_as_rectangles, gsi::arg ("input"), gsi::arg ("angle_start"), gsi::arg ("angle_end"), gsi::arg ("dim"),
     "@brief Creates a node turning corners into rectangles.\n"
   ) +
@@ -569,6 +583,9 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   ) +
   gsi::constructor ("new_sized", &new_sized, gsi::arg ("input"), gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("mode"),
     "@brief Creates a node providing sizing.\n"
+  ) +
+  gsi::constructor ("new_merged", &new_merged, gsi::arg ("input"), gsi::arg ("min_coherence", false), gsi::arg ("min_wc", 0),
+    "@brief Creates a node providing merged input polygons.\n"
   ) +
   gsi::constructor ("new_minkowsky_sum", &new_minkowsky_sum_node1, gsi::arg ("input"), gsi::arg ("e"),
     "@brief Creates a node providing a Minkowsky sum with an edge.\n"

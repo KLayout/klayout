@@ -46,26 +46,6 @@ static inline const db::PolygonRef *push_polygon_to_heap (db::Layout *layout, co
   return &heap.back ();
 }
 
-struct ResultInserter
-{
-  typedef db::Polygon value_type;
-
-  ResultInserter (db::Layout *layout, std::unordered_set<db::PolygonRef> &result)
-    : mp_layout (layout), mp_result (&result)
-  {
-    //  .. nothing yet ..
-  }
-
-  void insert (const db::Polygon &p)
-  {
-    (*mp_result).insert (db::PolygonRef (p, mp_layout->shape_repository ()));
-  }
-
-private:
-  db::Layout *mp_layout;
-  std::unordered_set<db::PolygonRef> *mp_result;
-};
-
 template <class TR>
 struct result_counting_inserter
 {

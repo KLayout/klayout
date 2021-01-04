@@ -749,3 +749,114 @@ TEST(13d_EdgeProcessor)
   run_test13 (_this, true);
 }
 
+void run_test14 (tl::TestBase *_this, bool deep)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/drc/compound_14.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::RegionCheckOptions check_options;
+  check_options.metrics = db::Projection;
+
+  db::DeepShapeStore dss;
+
+  db::Region r, r2;
+  prep_layer (ly, 1, r, dss, deep);
+  prep_layer (ly, 2, r2, dss, deep);
+
+  db::CompoundRegionOperationPrimaryNode *primary = new db::CompoundRegionOperationPrimaryNode ();
+  db::CompoundRegionOperationSecondaryNode *secondary = new db::CompoundRegionOperationSecondaryNode (&r2);
+
+  std::vector<db::CompoundRegionOperationNode *> inputs;
+  inputs.push_back (primary);
+  inputs.push_back (secondary);
+  db::CompoundRegionJoinOperationNode *join = new db::CompoundRegionJoinOperationNode (inputs);
+
+  EXPECT_EQ (join->result_type () == db::CompoundRegionJoinOperationNode::Region, true);
+
+  db::CompoundRegionMergeOperationNode merge1 (false, 0, join);
+  db::CompoundRegionMergeOperationNode merge2 (false, 1, join);
+
+  db::Region res1 = r.cop_to_region (merge1);
+
+  unsigned int l1000 = ly.get_layer (db::LayerProperties (1000, 0));
+  res1.insert_into (&ly, *ly.begin_top_down (), l1000);
+
+  db::Region res2 = r.cop_to_region (merge2);
+
+  unsigned int l1001 = ly.get_layer (db::LayerProperties (1001, 0));
+  res2.insert_into (&ly, *ly.begin_top_down (), l1001);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, make_au ("14", deep));
+}
+
+TEST(14_JoinAndMerged)
+{
+  run_test14 (_this, false);
+}
+
+TEST(14d_JoinAndMerged)
+{
+  run_test14 (_this, true);
+}
+
+void run_test15 (tl::TestBase *_this, bool deep)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/drc/compound_15.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::RegionCheckOptions check_options;
+  check_options.metrics = db::Projection;
+
+  db::DeepShapeStore dss;
+
+  db::Region r, r2;
+  prep_layer (ly, 1, r, dss, deep);
+  prep_layer (ly, 2, r2, dss, deep);
+
+  db::CompoundRegionOperationPrimaryNode *primary = new db::CompoundRegionOperationPrimaryNode ();
+
+  db::CompoundRegionProcessingOperationNode *corners1 = new db::CompoundRegionProcessingOperationNode (new db::CornersAsRectangles (-180.0, 180.0, 1), primary, true /*processor is owned*/);
+  db::CompoundRegionCountFilterNode count1 (corners1, false, 5, 10000);
+
+  db::CompoundRegionToEdgeProcessingOperationNode *corners2 = new db::CompoundRegionToEdgeProcessingOperationNode (new db::CornersAsDots (-180.0, 180.0), primary, true /*processor is owned*/);
+  db::CompoundRegionCountFilterNode count2 (corners2, true, 5, 10000);
+
+  EXPECT_EQ (count1.result_type () == db::CompoundRegionJoinOperationNode::Region, true);
+  EXPECT_EQ (count2.result_type () == db::CompoundRegionJoinOperationNode::Edges, true);
+
+  db::Region res1 = r.cop_to_region (count1);
+
+  unsigned int l1000 = ly.get_layer (db::LayerProperties (1000, 0));
+  res1.insert_into (&ly, *ly.begin_top_down (), l1000);
+
+  db::Edges res2 = r.cop_to_edges (count2);
+
+  unsigned int l1001 = ly.get_layer (db::LayerProperties (1001, 0));
+  res2.insert_into (&ly, *ly.begin_top_down (), l1001);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, make_au ("15", deep));
+}
+
+TEST(15_JoinAndMerged)
+{
+  run_test15 (_this, false);
+}
+
+TEST(15d_JoinAndMerged)
+{
+  run_test15 (_this, true);
+}

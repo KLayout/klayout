@@ -581,7 +581,12 @@ CODE
     #
     # When called on an edge layer, the method selects edges by their angle, 
     # measured against the horizontal axis in the mathematical sense. 
-    # The first version selects
+    #
+    # For this measurement edges are considered without their direction and straight lines. 
+    # A horizontal edge has an angle of zero degree. A vertical one has
+    # an angle of 90 degee. The angle range is from -90 (exclusive) to 90 degree (inclusive).
+    #
+    # The first version of this method selects
     # edges with a angle larger or equal to min and less than max (but not equal).
     # The second version selects edges with exactly the given angle. The third
     # version is identical to the first one. 

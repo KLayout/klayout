@@ -128,50 +128,206 @@ class DRCOpNode
       end
 CODE
   end
+
+  # %DRC%
+  # @name !
+  # @brief Logical not
+  # @synopsis ! expr
+  #
+  # This operator will evaluate the expression after. If this expression renders
+  # an empty result, the operator will return the primary shape. Otherwise it will
+  # return an empty result.
+  # 
+  # This operator can be used together with predicates such a "rectangles" to 
+  # invert their meaning. For example, this code selects all primary shapes which
+  # are not rectangles:
+  #
+  # @code
+  # out = in.drc(! rectangles)
+  # out = in.drc(! primary.rectangles)   # equivalent
+  # @/code
   
   def !()
     @engine._context("!") do
       if self.respond_to?(:inverted)
         return self.inverted
       else
+        # TODO: what if the expression isn't region?
         empty = RBA::CompoundRegionOperationNode::new_empty(RBA::CompoundRegionOperationNode::ResultType::Region)
         DRCOpNodeCase::new(@engine, [ self, DRCOpNode::new(@engine, empty), @engine.primary ])
       end
     end
   end
 
+  # %DRC%
+  # @name area
+  # @brief Selects the primary shape if the area is meeting the condition
+  # @synopsis area (in condition)
+  #
+  # This operation is used in conditions to select shapes based on their area.
+  # It is applicable on polygon expressions. The result will be the input 
+  # polygons if the area condition is met. 
+  #
+  # See \drc for more details about comparison specs.
+  #
+  # The following example will select all polygons with an area less than 2.0 square micrometers:
+  #
+  # @code
+  # out = in.drc(area < 2.0)
+  # out = in.drc(primary.area < 2.0)   # equivalent
+  # @/code
+  
   def area
     DRCOpNodeAreaFilter::new(@engine, self)
   end
+  
+  # %DRC%
+  # @name perimeter
+  # @brief Selects the primary shape if the perimeter is meeting the condition
+  # @synopsis perimeter (in condition)
+  #
+  # This operation is used in conditions to select shapes based on their perimeter.
+  # It is applicable on polygon expressions. The result will be the input 
+  # polygons if the perimeter condition is met. 
+  #
+  # See \drc for more details about comparison specs.
+  #
+  # The following example will select all polygons with a perimeter less than 10 micrometers:
+  #
+  # @code
+  # out = in.drc(perimeter < 10.0)
+  # out = in.drc(primary.perimeter < 10.0)   # equivalent
+  # @/code
   
   def perimeter
     DRCOpNodePerimeterFilter::new(@engine, self)
   end
   
+  # %DRC%
+  # @name bbox_min
+  # @brief Selects the primary shape if its bounding box smaller dimension is meeting the condition
+  # @synopsis bbox_min (in condition)
+  #
+  # This operation is used in conditions to select shapes based on smaller dimension of their bounding boxes.
+  # It is applicable on polygon expressions. The result will be the input 
+  # polygons if the bounding box condition is met. 
+  #
+  # See \drc for more details about comparison specs.
+  #
+  # The following example will select all polygons whose bounding box smaller dimension is larger
+  # than 200 nm:
+  #
+  # @code
+  # out = in.drc(bbox_min > 200.nm)
+  # out = in.drc(primary.bbox_min > 200.nm)   # equivalent
+  # @/code
+  
   def bbox_min
     DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::BoxMinDim, self)
   end
   
+  # %DRC%
+  # @name bbox_max
+  # @brief Selects the primary shape if its bounding box larger dimension is meeting the condition
+  # @synopsis bbox_max (in condition)
+  # 
+  # This operation acts similar to \DRC#bbox_min, but takes the larger dimension of the shape's 
+  # bounding box.
+
   def bbox_max
     DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::BoxMaxDim, self)
   end
   
+  # %DRC%
+  # @name bbox_width
+  # @brief Selects the primary shape if its bounding box width is meeting the condition
+  # @synopsis bbox_width (in condition)
+  # 
+  # This operation acts similar to \DRC#bbox_min, but takes the width of the shape's 
+  # bounding box. In general, it's more advisable to use \DRC#bbox_min or \DRC#bbox_max
+  # because bbox_width implies a certain orientation. This can imply variant formation in 
+  # hierarchical contexts: cells rotated by 90 degree have to be treated differently from
+  # ones not rotated. This usually results in a larger computation effort and larger result files.
+
   def bbox_width
     DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::BoxWidth, self)
   end
   
+  # %DRC%
+  # @name bbox_height
+  # @brief Selects the primary shape if its bounding box height is meeting the condition
+  # @synopsis bbox_height (in condition)
+  # 
+  # This operation acts similar to \DRC#bbox_min, but takes the height of the shape's 
+  # bounding box. In general, it's more advisable to use \DRC#bbox_min or \DRC#bbox_max
+  # because bbox_height implies a certain orientation. This can imply variant formation in 
+  # hierarchical contexts: cells rotated by 90 degree have to be treated differently from
+  # ones not rotated. This usually results in a larger computation effort and larger result files.
+
   def bbox_height
     DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::BoxHeight, self)
   end
   
+  # %DRC%
+  # @name length
+  # @brief Selects edges based on their length
+  # @synopsis length (in condition)
+  # 
+  # This operation will select those edges which are meeting the length
+  # criterion. Non-edge shapes (polygons, edge pairs) will be converted to edges before.
+  #
+  # For example, this code selects all edges from the primary shape which are longer or
+  # equal than 1 micrometer:
+  #
+  # @code
+  # out = in.drc(length >= 1.um) 
+  # out = in.drc(primary.length >= 1.um)   # equivalent
+  # @/code
+
   def length
     DRCOpNodeEdgeLengthFilter::new(@engine, self)
   end
   
+  # %DRC%
+  # @name angle
+  # @brief Selects edges based on their angle
+  # @synopsis angle (in condition)
+  # 
+  # This operation selects edges by their angle, measured against the horizontal 
+  # axis in the mathematical sense. 
+  #
+  # For this measurement edges are considered without their direction and straight lines. 
+  # A horizontal edge has an angle of zero degree. A vertical one has
+  # an angle of 90 degee. The angle range is from -90 (exclusive) to 90 degree (inclusive).
+  #
+  # If the input shapes are not polygons or edge pairs, they are converted to edges 
+  # before the angle test is made.
+  # 
+  # For example, the following code selects all edges from the primary shape which are 45 degree
+  # (up) or 135 degree (down). The "+" will join the results:
+  #
+  # @code
+  # out = in.drc((angle == 45) + (angle == 135)) 
+  # out = in.drc((primary.angle == 45) + (primary.angle == 135))    # equivalent
+  # @/code
+  #
+  # Note that angle checks usually imply the need to rotation variant formation as cells which
+  # are placed unrotated and rotated by 90 degree cannot be considered identical. This imposes
+  # a performance penalty in hierarchical mode. If possible, consider using \DRC#rectilinear for
+  # example to detect shapes with non-manhattan geometry instead of using angle checks.
+
   def angle
     DRCOpNodeEdgeOrientationFilter::new(@engine, self)
   end
   
+  # %DRC%
+  # @name rounded_corners
+  # @brief Applies corner rounding
+  # @synopsis rounded_corners(inner, outer, n)
+  #
+  # This operation acts on polygons and applies corner rounding the the given inner
+  # and outer corner radius and the number of points n per full circle.
+
   def rounded_corners(inner, outer, n)
     @engine._context("rounded_corners") do
       @engine._check_numeric(n)
@@ -179,12 +335,49 @@ CODE
     end
   end
   
+  # %DRC%
+  # @name smoothed
+  # @brief Applies smoothing
+  # @synopsis smoothed(d)
+  #
+  # This operation acts on polygons and applies polygon smoothing with the tolerance d.
+
   def smoothed(d)
     @engine._context("smoothed") do
       DRCOpNodeFilter::new(@engine, self, :new_smoothed, "smoothed", @engine._make_value(d))
     end
   end
   
+  # %DRC%
+  # @name corners (in condition)
+  # @brief Applies smoothing
+  # @synopsis corners
+  # @synopsis corners(as_dots)
+  # @synopsis corners(as_boxes)
+  #
+  # This operation acts on polygons and selects the corners of the polygons.
+  # It can be put into a condition to select corners by their angles. The angle of
+  # a corner is positive for a turn to the left if walking a polygon counterclockwise
+  # and negative for the turn to the right. Angles take values between -180 and 180 degree.
+  #
+  # When using "as_dots" for the argument, the operation will return single-point edges at
+  # the selected corners. With "as_boxes" (the default), small (2x2 DBU) rectangles will be
+  # produced at each selected corner.
+  #
+  # The following example selects all corners:
+  #
+  # @code
+  # out = in.drc(corners)
+  # out = in.drc(primary.corners)    # equivalent
+  # @/code
+  #  
+  # The following example selects all inner corners:
+  #
+  # @code
+  # out = in.drc(corners < 0)
+  # out = in.drc(primary.corners < 0)    # equivalent
+  # @/code
+
   def corners(as_dots = DRCAsDots::new(false))
     @engine._context("corners") do
       if as_dots.is_a?(DRCAsDots)
@@ -196,6 +389,24 @@ CODE
     end
   end
   
+  # %DRC%
+  # @name middle
+  # @brief Returns the centers of polygon bounding boxes
+  # @synopsis middle([ options ])
+  #
+  # The middle operation acts on polygons and has the same effect than \Layer#middle.
+  # It takes the same arguments. It is available as a method on \DRC expressions or
+  # as plain function, in which case it acts on the primary shapes.
+
+  # %DRC%
+  # @name extent_refs
+  # @brief Returns partial references to the boundings boxes of the polygons
+  # @synopsis extent_refs([ options ])
+  #
+  # The extent_refs operation acts on polygons and has the same effect than \Layer#extent_refs.
+  # It takes the same arguments. It is available as a method on \DRC expressions or
+  # as plain function, in which case it acts on the primary shapes.
+
   %w(middle extent_refs).each do |f| 
     eval <<"CODE"
     def #{f}(*args)
@@ -269,30 +480,123 @@ CODE
 CODE
   end
   
+  # %DRC%
+  # @name odd_polygons
+  # @brief Selects all polygons which are non-orientable
+  # @synopsis odd_polygons
+  #
+  # Non-orientable polygons are for example "8"-shape polygons. Such polygons are
+  # usually considered harmful as their definition of covered area is depending on the
+  # wrap count rule in place.
+  #
+  # This operation can be used as a plain function in which case it acts on primary
+  # shapes or can be used as method on another DRC expression.
+  
   def odd_polygons
     return DRCOpNodeFilter::new(@engine, self, :new_strange_polygons_filter, "odd_polygon")
   end
+  
+  # %DRC%
+  # @name rectangles
+  # @brief Selects all polygons which are rectangles
+  # @synopsis rectangles
+  #
+  # This operation can be used as a plain function in which case it acts on primary
+  # shapes or can be used as method on another DRC expression.
+  # The following example selects all rectangles:
+  #
+  # @code
+  # out = in.drc(rectangles)
+  # out = in.drc(primary.rectangles)    # equivalent
+  # @/code
   
   def rectangles
     return DRCOpNodeFilter::new(@engine, self, :new_rectangle_filter, "rectangle")
   end
   
+  # %DRC%
+  # @name rectilinear
+  # @brief Selects all polygons which are rectilinear
+  # @synopsis rectilinear
+  #
+  # Rectilinear polygons only have vertical and horizontal edges. Such polygons are also
+  # called manhattan polygons.
+  #
+  # This operation can be used as a plain function in which case it acts on primary
+  # shapes or can be used as method on another DRC expression.
+  # The following example selects all manhattan polygons:
+  #
+  # @code
+  # out = in.drc(rectilinear)
+  # out = in.drc(primary.rectilinear)    # equivalent
+  # @/code
+  
   def rectilinear
     return DRCOpNodeFilter::new(@engine, self, :new_rectilinear_filter, "rectilinear")
   end
+  
+  # %DRC%
+  # @name holes
+  # @brief Selects all holes from the input polygons
+  # @synopsis holes
+  #
+  # This operation can be used as a plain function in which case it acts on primary
+  # shapes or can be used as method on another DRC expression.
+  # The following example selects all holes with an area larger than 2 square micrometers:
+  #
+  # @code
+  # out = in.drc(holes.area > 2.um)
+  # out = in.drc(primary.holes.area > 2.um)   # equivalent
+  # @/code
   
   def holes
     return DRCOpNodeFilter::new(@engine, self, :new_holes, "holes")
   end
   
+  # %DRC%
+  # @name hulls
+  # @brief Selects all hulls from the input polygons
+  # @synopsis hulls
+  #
+  # The hulls are the outer contours of the input polygons. By selecting hulls only,
+  # all holes will be closed.
+  #
+  # This operation can be used as a plain function in which case it acts on primary
+  # shapes or can be used as method on another DRC expression.
+  # The following example closes all holes:
+  #
+  # @code
+  # out = in.drc(hulls)
+  # out = in.drc(primary.hulls)   # equivalent
+  # @/code
+  
   def hulls
     return DRCOpNodeFilter::new(@engine, self, :new_hulls, "hull")
   end
+  
+  # %DRC%
+  # @name edges
+  # @brief Converts the input shapes into edges
+  # @synopsis edges
+  #
+  # Polygons will be separated into edges forming their contours. Edge pairs will be 
+  # decomposed into individual edges.
+  #
+  # Contrary most other operations, "edges" does not have a plain function equivalent
+  # as this is reserved for the function generating an edges layer.
+  # To generate the edges of the primary shapes, use "primary" explicit as the source
+  # for the edges:
+  #
+  # @code
+  # out = in.drc(primary.edges)
+  # @/code
   
   def edges
     return DRCOpNodeFilter::new(@engine, self, :new_edges, "edges")
   end
   
+  # ....
+
   def sized(*args)
 
     @engine._context("sized") do
@@ -681,12 +985,22 @@ class DRCOpNodeEdgeLengthFilter < DRCOpNodeWithCompare
   end
   
   def do_create_node(cache)
-    args = [ self.input.create_node(cache), self.inverse ]
+
+    n = self.input.create_node(cache)
+
+    # insert an edge conversion node if required
+    if n.result_type != RBA::CompoundRegionOperationNode::ResultType::Edges
+      n = RBA::CompoundRegionOperationNode::new_edges(n)
+    end
+
+    args = [ n, self.inverse ]
     args << (self.gt ? @engine._make_value(self.gt) + 1 : (self.ge ? @engine._make_value(self.ge) : 0))
     if self.lt || self.le
       args << self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) - 1
     end
+
     RBA::CompoundRegionOperationNode::new_edge_length_filter(*args)
+
   end
 
   def inverted
@@ -714,11 +1028,21 @@ class DRCOpNodeEdgeOrientationFilter < DRCOpNodeWithCompare
   end
   
   def do_create_node(cache)
-    args = [ self.input.create_node(cache), self.inverse ]
+
+    n = self.input.create_node(cache)
+
+    # insert an edge conversion node if required
+    if n.result_type != RBA::CompoundRegionOperationNode::ResultType::Edges
+      n = RBA::CompoundRegionOperationNode::new_edges(n)
+    end
+
+    args = [ n, self.inverse ]
     angle_delta = 1e-6
     args << (self.gt ? self.gt + angle_delta : (self.ge ? self.ge : -180.0))
     args << (self.lt ? self.lt : (self.le ? self.le - angle_delta : 180.0))
+
     RBA::CompoundRegionOperationNode::new_edge_orientation_filter(*args)
+
   end
 
   def inverted

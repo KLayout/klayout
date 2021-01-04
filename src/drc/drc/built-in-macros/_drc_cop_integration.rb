@@ -184,28 +184,29 @@ CODE
     # bounding box height satisfies the condition. Conditions can be written as arithmetic comparisons
     # against numeric values. For example, "bbox_height < 2.0" will select all primary shapes whose
     # bounding box height is less than 2 micrometers. See \drc for more details about comparison 
-    # specs.
+    # specs. Plain "bbox_min" is equivalent to "primary.bbox_min" - i.e. it is used on the primary
+    # shape. Also see \DRC#bbox_min.
     
     # %DRC%
     # @name bbox_width
     # @brief Selects primary shapes based on their bounding box width
     # @synopsis bbox_max (in condition)
     #
-    # See \bbox_height for more details.
+    # See \drc, \bbox_height and \DRC#bbox_height for more details.
     
     # %DRC%
     # @name bbox_max
     # @brief Selects primary shapes based on their bounding box height or width, whichever is larger
     # @synopsis bbox_max (in condition)
     #
-    # See \bbox_height for more details.
+    # See \drc, \bbox_max and \DRC#bbox_max for more details.
     
     # %DRC%
     # @name bbox_min
     # @brief Selects primary shapes based on their bounding box height or width, whichever is smaller
     # @synopsis bbox_max (in condition)
     #
-    # See \bbox_height for more details.
+    # See \drc, \bbox_min and \DRC#bbox_min for more details.
     
     %w(
       bbox_height

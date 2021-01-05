@@ -411,7 +411,7 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse, 
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_polygons ());
 
-  proc.run_flat (polygons, others, &op, results);
+  proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
 
   return output.release ();
 
@@ -487,7 +487,7 @@ AsIfFlatRegion::selected_interacting_generic (const Texts &other, bool inverse, 
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_polygons ());
 
-  proc.run_flat (polygons, others, &op, results);
+  proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
 
   return output.release ();
 
@@ -572,7 +572,7 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_polygons ());
 
-  proc.run_flat (polygons, others, &op, results);
+  proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
 
   return output.release ();
 
@@ -710,7 +710,7 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_edges ());
 
-  proc.run_flat (polygons, others, &op, results);
+  proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
 
   return output.release ();
 
@@ -760,7 +760,7 @@ AsIfFlatRegion::pull_generic (const Texts &other) const
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_texts ());
 
-  proc.run_flat (polygons, others, &op, results);
+  proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
 
   return output.release ();
 
@@ -815,7 +815,7 @@ AsIfFlatRegion::pull_generic (const Region &other, int mode, bool touching) cons
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_polygons ());
 
-  proc.run_flat (polygons, others, &op, results);
+  proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
 
   return output.release ();
 
@@ -1050,16 +1050,23 @@ void region_cop_impl (AsIfFlatRegion *region, db::Shapes *output_to, db::Compoun
   db::RegionIterator polygons (needs_merged ? region->begin_merged () : region->begin ());
 
   std::vector<generic_shape_iterator<db::Polygon> > others;
+  std::vector<bool> foreign;
   std::vector<db::Region *> inputs = node.inputs ();
   for (std::vector<db::Region *>::const_iterator i = inputs.begin (); i != inputs.end (); ++i) {
-    others.push_back (*i ? (*i)->begin () : (needs_merged ? region->begin_merged () : region->begin ()));
+    if (*i == subject_regionptr () || *i == foreign_regionptr ()) {
+      others.push_back (needs_merged ? region->begin_merged () : region->begin ());
+      foreign.push_back (*i == foreign_regionptr ());
+    } else {
+      others.push_back ((*i)->begin ());
+      foreign.push_back (false);
+    }
   }
 
   std::vector<db::Shapes *> results;
   results.push_back (output_to);
 
   compound_local_operation<db::Polygon, db::Polygon, TR> op (&node);
-  proc.run_flat (polygons, others, &op, results);
+  proc.run_flat (polygons, others, foreign, &op, results);
 }
 
 EdgePairsDelegate *
@@ -1112,7 +1119,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_edge_pairs ());
 
-  proc.run_flat (polygons, others, &op, results);
+  proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
 
   return output.release ();
 

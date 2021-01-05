@@ -48,6 +48,12 @@ template <class TS, class TI, class TR> class local_processor;
 template <class TS, class TI, class TR> class local_processor_cell_context;
 template <class TS, class TI, class TR> class local_processor_contexts;
 
+inline const db::Shapes *subject_idptr () { return (const db::Shapes *) 0; }
+inline const db::Shapes *foreign_idptr () { return (const db::Shapes *) 1; }
+
+inline unsigned int subject_idlayer() { return std::numeric_limits<unsigned int>::max (); }
+inline unsigned int foreign_idlayer() { return std::numeric_limits<unsigned int>::max () - 1; }
+
 //  TODO: move this somewhere else?
 template <class TS, class TI>
 class DB_PUBLIC shape_interactions
@@ -289,6 +295,20 @@ public:
     return m_intruder_layers;
   }
 
+  inline unsigned int actual_intruder_layer (unsigned int l) const
+  {
+    if (l == foreign_idlayer () || l == subject_idlayer ()) {
+      return m_subject_layer;
+    } else {
+      return l;
+    }
+  }
+
+  inline bool is_foreign (unsigned int l) const
+  {
+    return l == foreign_idlayer ();
+  }
+
   tl::Mutex &lock () const
   {
     return m_lock;
@@ -386,7 +406,7 @@ public:
 
   void run_flat (const db::Shapes *subject_shapes, const db::Shapes *intruders, const local_operation<TS, TI, TR> *op, db::Shapes *result_shapes) const;
   void run_flat (const db::Shapes *subjects, const std::vector<const db::Shapes *> &intruders, const local_operation<TS, TI, TR> *op, const std::vector<db::Shapes *> &result_shapes) const;
-  void run_flat (const generic_shape_iterator<TS> &subjects, const std::vector<generic_shape_iterator<TI> > &intruders, const local_operation<TS, TI, TR> *op, const std::vector<db::Shapes *> &result_shapes) const;
+  void run_flat (const generic_shape_iterator<TS> &subjects, const std::vector<generic_shape_iterator<TI> > &intruders, const std::vector<bool> &foreign, const local_operation<TS, TI, TR> *op, const std::vector<db::Shapes *> &result_shapes) const;
 
   void set_description (const std::string &d)
   {

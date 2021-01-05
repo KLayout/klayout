@@ -183,19 +183,25 @@ static db::CompoundRegionOperationNode *new_strange_polygons_filter (db::Compoun
 static db::CompoundRegionOperationNode *new_smoothed (db::CompoundRegionOperationNode *input, db::Coord d)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionProcessingOperationNode (new db::SmoothingProcessor (d), input, true /*processor is owned*/);
+  return new db::CompoundRegionProcessingOperationNode (new db::SmoothingProcessor (d), input, true /*processor is owned*/, d);
 }
 
 static db::CompoundRegionOperationNode *new_rounded_corners (db::CompoundRegionOperationNode *input, double rinner, double router, unsigned int n)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionProcessingOperationNode (new db::RoundedCornersProcessor (rinner, router, n), input, true /*processor is owned*/);
+  return new db::CompoundRegionProcessingOperationNode (new db::RoundedCornersProcessor (rinner, router, n), input, true /*processor is owned*/, rinner /*dist adder*/);
 }
 
 static db::CompoundRegionOperationNode *new_case (const std::vector<db::CompoundRegionOperationNode *> &inputs)
 {
   check_non_null (inputs, "inputs");
   return new db::CompoundRegionLogicalCaseSelectOperationNode (inputs);
+}
+
+static db::CompoundRegionOperationNode *new_join (const std::vector<db::CompoundRegionOperationNode *> &inputs)
+{
+  check_non_null (inputs, "inputs");
+  return new db::CompoundRegionJoinOperationNode (inputs);
 }
 
 static db::CompoundRegionOperationNode *new_count_filter (db::CompoundRegionOperationNode *input, bool invert, size_t min_count, size_t max_count)
@@ -206,7 +212,7 @@ static db::CompoundRegionOperationNode *new_count_filter (db::CompoundRegionOper
 static db::CompoundRegionOperationNode *new_corners_as_rectangles (db::CompoundRegionOperationNode *input, double angle_start, double angle_end, db::Coord dim = 1)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionProcessingOperationNode (new db::CornersAsRectangles (angle_start, angle_end, dim), input, true /*processor is owned*/);
+  return new db::CompoundRegionProcessingOperationNode (new db::CornersAsRectangles (angle_start, angle_end, dim), input, true /*processor is owned*/, dim /*dist adder*/);
 }
 
 static db::CompoundRegionOperationNode *new_corners_as_dots (db::CompoundRegionOperationNode *input, double angle_start, double angle_end)
@@ -263,7 +269,7 @@ static db::CompoundRegionOperationNode *new_polygon_breaker (db::CompoundRegionO
 static db::CompoundRegionOperationNode *new_sized (db::CompoundRegionOperationNode *input, db::Coord dx, db::Coord dy, unsigned int mode)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionProcessingOperationNode (new db::PolygonSizer (dx, dy, mode), input, true /*processor is owned*/);
+  return new db::CompoundRegionProcessingOperationNode (new db::PolygonSizer (dx, dy, mode), input, true /*processor is owned*/, std::max (0, std::max (dx, dy)) /*dist adder*/);
 }
 
 static db::CompoundRegionOperationNode *new_merged (db::CompoundRegionOperationNode *input, bool min_coherence, unsigned int min_wc)
@@ -544,6 +550,9 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
     "@param rinner The inner corner radius."
     "@param router The outer corner radius."
     "@param n The number if points per full circle."
+  ) +
+  gsi::constructor ("new_join", &new_join, gsi::arg ("inputs"),
+    "@brief Creates a node that joins the inputs.\n"
   ) +
   gsi::constructor ("new_case", &new_case, gsi::arg ("inputs"),
     "@brief Creates a 'switch ladder' (case statement) compound operation node.\n"

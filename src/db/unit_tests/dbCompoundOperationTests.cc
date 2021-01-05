@@ -860,3 +860,49 @@ TEST(15d_JoinAndMerged)
 {
   run_test15 (_this, true);
 }
+
+void run_test16 (tl::TestBase *_this, bool deep)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/drc/compound_16.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::RegionCheckOptions check_options;
+  check_options.metrics = db::Projection;
+
+  db::DeepShapeStore dss;
+
+  db::Region r, r2;
+  prep_layer (ly, 1, r, dss, deep);
+  prep_layer (ly, 2, r2, dss, deep);
+
+  db::CompoundRegionOperationPrimaryNode *primary = new db::CompoundRegionOperationPrimaryNode ();
+  db::CompoundRegionOperationForeignNode *foreign = new db::CompoundRegionOperationForeignNode ();
+
+  db::CompoundRegionProcessingOperationNode *sized = new db::CompoundRegionProcessingOperationNode (new db::PolygonSizer (600, 600, 2), foreign, true /*processor is owned*/, 600 /*dist adder*/);
+
+  db::CompoundRegionGeometricalBoolOperationNode geo_bool (db::CompoundRegionGeometricalBoolOperationNode::And, primary, sized);
+
+  db::Region res1 = r.cop_to_region (geo_bool);
+
+  unsigned int l1000 = ly.get_layer (db::LayerProperties (1000, 0));
+  res1.insert_into (&ly, *ly.begin_top_down (), l1000);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, make_au ("16", deep));
+}
+
+TEST(16_JoinAndMerged)
+{
+  run_test16 (_this, false);
+}
+
+TEST(16d_JoinAndMerged)
+{
+  run_test16 (_this, true);
+}

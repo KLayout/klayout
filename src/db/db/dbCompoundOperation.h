@@ -44,6 +44,10 @@
 namespace db
 {
 
+inline db::Region *subject_regionptr () { return (db::Region *) 0; }
+inline db::Region *foreign_regionptr () { return (db::Region *) 1; }
+inline bool is_subject_regionptr (const db::Region *ptr) { return ptr == subject_regionptr () || ptr == foreign_regionptr (); }
+
 /**
  *  @brief A node of the compound operation tree
  *
@@ -282,6 +286,20 @@ public:
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const;
 };
 
+class DB_PUBLIC CompoundRegionOperationForeignNode
+  : public CompoundRegionOperationNode
+{
+public:
+  CompoundRegionOperationForeignNode ();
+  virtual ~CompoundRegionOperationForeignNode ();
+
+  virtual std::vector<db::Region *> inputs () const;
+  virtual db::Coord dist () const { return 0; }
+  virtual ResultType result_type () const { return Region; }
+
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const;
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const;
+};
 
 class DB_PUBLIC CompoundRegionOperationSecondaryNode
   : public CompoundRegionOperationNode
@@ -976,11 +994,13 @@ class DB_PUBLIC CompoundRegionProcessingOperationNode
   : public CompoundRegionMultiInputOperationNode
 {
 public:
-  CompoundRegionProcessingOperationNode (PolygonProcessorBase *proc, CompoundRegionOperationNode *input, bool owns_proc = false);
+  CompoundRegionProcessingOperationNode (PolygonProcessorBase *proc, CompoundRegionOperationNode *input, bool owns_proc = false, db::Coord dist_adder = 0);
   ~CompoundRegionProcessingOperationNode ();
 
   //  specifies the result type
   virtual ResultType result_type () const { return Region; }
+
+  virtual db::Coord dist () const { return m_dist_adder + CompoundRegionMultiInputOperationNode::dist (); }
 
   virtual const TransformationReducer *vars () const { return mp_proc->vars (); }
   virtual bool wants_variants () const { return mp_proc->wants_variants (); }
@@ -992,6 +1012,7 @@ public:
 private:
   PolygonProcessorBase *mp_proc;
   bool m_owns_proc;
+  db::Coord m_dist_adder;
 
   void processed (db::Layout *, const db::Polygon &p, std::vector<db::Polygon> &res) const;
   void processed (db::Layout *layout, const db::PolygonRef &p, std::vector<db::PolygonRef> &res) const;

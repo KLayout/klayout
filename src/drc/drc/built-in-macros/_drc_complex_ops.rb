@@ -58,7 +58,13 @@ class DRCOpNode
     if ! other.is_a?(DRCOpNode)
       raise("Second argument to #{op.to_s} must be a DRC expression")
     end
-    DRCOpNodeBool::new(@engine, op, self, other)
+    if op == :+
+      a = self.is_a?(DRCOpNodeJoin) ? self.children : [ self ]
+      b = other.is_a?(DRCOpNodeJoin) ? other.children : [ other ]
+      return DRCOpNodeJoin::new(@engine, a + b)
+    else
+      return DRCOpNodeBool::new(@engine, op, self, other)
+    end
   end
 
   # %DRC%
@@ -179,6 +185,35 @@ CODE
   
   def area
     DRCOpNodeAreaFilter::new(@engine, self)
+  end
+  
+  # %DRC%
+  # @name count
+  # @brief Selects a expression result based on the number of (local) shapes
+  # @synopsis count (in condition)
+  #
+  # This operation is used in conditions to select expression results based on their
+  # count. "count" is used as a method on a expression. It will evaluate the expression locally
+  # and return the original result if the shape count in the result is matching the condition.
+  #
+  # See \drc for more details about comparison specs.
+  #
+  # Note that the expression is evaluated locally: for each primary shape, the expression is
+  # evaluated and the count of the resulting edge, edge pair or polygon set is taken.
+  # As the primary input will always have a single item (the local shape), using "count" on
+  # primary does not really make sense. It can be used on derived expressions however.
+  #
+  # The following example selects triangles:
+  # 
+  # @code
+  # out = in.drc(if_any(corners.count == 3))
+  # @/code
+  #
+  # Note "if_any" which selects the primary shape if the argument evaluates to a non-empty
+  # result. Without "if_any" three corners are returned for each triangle.
+  
+  def count
+    DRCOpNodeCountFilter::new(@engine, self)
   end
   
   # %DRC%
@@ -595,6 +630,40 @@ CODE
     return DRCOpNodeFilter::new(@engine, self, :new_edges, "edges")
   end
   
+  # %DRC%
+  # @name merged
+  # @brief Returns the merged input polygons, optionally selecting multi-overlap
+  # @synopsis merged
+  # @synopsis merged(min_count)
+  #
+  # This operation will act on polygons. Without a min_count argument, the merged
+  # polygons will be returned.
+  #
+  # With a min_count argument, the result will include only those parts where more
+  # than the given number of polygons overlap. As the primary input is merged already,
+  # it will always contribute as one.
+  
+  def merged(*args)
+
+    @engine._context("merged") do
+
+      min_wc = 0
+      if args.size > 1
+        raise("merged: Method requires no or one value")
+      end
+      if args.size == 1
+        min_wc = @engine._make_numeric_value(args[0])
+        min_wc = [ 0, (min_wc - 1).to_i ].max
+      end
+
+      min_coherence = true
+        
+      DRCOpNodeFilter::new(@engine, self, :new_merged, "merged", min_coherence, min_wc)
+
+    end
+
+  end
+  
   # ....
 
   def sized(*args)
@@ -744,6 +813,30 @@ class DRCOpNodeLogicalBool < DRCOpNode
   
 end
 
+class DRCOpNodeJoin < DRCOpNode
+
+  attr_accessor :children
+  
+  def initialize(engine, op, a, b)
+    super(engine)
+    self.children = [a, b]
+    self.description = "Join #{op.to_s}"
+  end
+
+  def dump(indent)
+    return indent + self.description + "\n" + self.children.collect { |c| c.dump("  " + indent) }.join("\n")
+  end
+
+  def do_create_node(cache)
+    nodes = self.children.collect { |c| c.create_node(cache) }
+    if nodes.collect(:result_type).sort.uniq.size > 1
+      raise("All inputs to the + operator need to have the same type")
+    end
+    RBA::CompoundRegionOperationNode::new_join(*nodes)
+  end
+  
+end
+
 class DRCOpNodeBool < DRCOpNode
 
   attr_accessor :children
@@ -762,7 +855,6 @@ class DRCOpNodeBool < DRCOpNode
 
   def do_create_node(cache)
     bool_op = { :& => RBA::CompoundRegionOperationNode::GeometricalOp::And, 
-                :+ => RBA::CompoundRegionOperationNode::GeometricalOp::Or,
                 :| => RBA::CompoundRegionOperationNode::GeometricalOp::Or,
                 :- => RBA::CompoundRegionOperationNode::GeometricalOp::Not,
                 :^ => RBA::CompoundRegionOperationNode::GeometricalOp::Xor }[self.op]
@@ -935,6 +1027,39 @@ class DRCOpNodeWithCompare < DRCOpNode
   
 end
 
+class DRCOpNodeCountFilter < DRCOpNodeWithCompare
+
+  attr_accessor :input
+  attr_accessor :inverted
+  
+  def initialize(engine, input)
+    super(engine)
+    self.input = input
+    self.inverted = false
+    self.description = "count"
+  end
+
+  def _description_for_dump
+    self.inverted ? "count" : "not_count"
+  end
+  
+  def do_create_node(cache)
+    args = [ self.input.create_node(cache), self.inverse ]
+    args << (self.gt ? @engine._make_numeric_value(self.gt) + 1 : (self.ge ? @engine._make_numeric_value(self.ge) : 0))
+    if self.lt || self.le
+      args << self.lt ? @engine._make_numeric_value(self.lt) : @engine._make_numeric_value(self.le) - 1
+    end
+    RBA::CompoundRegionOperationNode::new_count_filter(*args)
+  end
+
+  def inverted
+    res = self.dup
+    res.inverted = !res.inverted
+    return res
+  end
+  
+end
+
 class DRCOpNodeAreaFilter < DRCOpNodeWithCompare
 
   attr_accessor :input
@@ -953,9 +1078,9 @@ class DRCOpNodeAreaFilter < DRCOpNodeWithCompare
   
   def do_create_node(cache)
     args = [ self.input.create_node(cache), self.inverse ]
-    args << (self.gt ? make_area_value(self.gt) + 1 : (self.ge ? make_area_value(self.ge) : 0))
+    args << (self.gt ? @engine._make_area_value(self.gt) + 1 : (self.ge ? @engine._make_area_value(self.ge) : 0))
     if self.lt || self.le
-      args << self.lt ? make_area_value(self.lt) : make_area_value(self.le) - 1
+      args << self.lt ? @engine._make_area_value(self.lt) : @engine._make_area_value(self.le) - 1
     end
     RBA::CompoundRegionOperationNode::new_area_filter(*args)
   end

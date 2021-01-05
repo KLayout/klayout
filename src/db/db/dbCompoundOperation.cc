@@ -122,7 +122,7 @@ CompoundRegionOperationPrimaryNode::~CompoundRegionOperationPrimaryNode ()
 std::vector<db::Region *> CompoundRegionOperationPrimaryNode::inputs () const
 {
   std::vector<db::Region *> is;
-  is.push_back (0);
+  is.push_back (subject_regionptr ());
   return is;
 }
 
@@ -169,6 +169,40 @@ void CompoundRegionOperationSecondaryNode::do_compute_local (db::Layout *, const
 }
 
 void CompoundRegionOperationSecondaryNode::do_compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t, double) const
+{
+  for (shape_interactions<db::PolygonRef, db::PolygonRef>::intruder_iterator i = interactions.begin_intruders (); i != interactions.end_intruders (); ++i) {
+    results.front ().insert (i->second.second);
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+
+CompoundRegionOperationForeignNode::CompoundRegionOperationForeignNode ()
+{
+  set_description ("foreign");
+}
+
+CompoundRegionOperationForeignNode::~CompoundRegionOperationForeignNode ()
+{
+  //  .. nothing yet ..
+}
+
+
+std::vector<db::Region *> CompoundRegionOperationForeignNode::inputs () const
+{
+  std::vector<db::Region *> iv;
+  iv.push_back (foreign_regionptr ());
+  return iv;
+}
+
+void CompoundRegionOperationForeignNode::do_compute_local (db::Layout *, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t, double) const
+{
+  for (shape_interactions<db::Polygon, db::Polygon>::intruder_iterator i = interactions.begin_intruders (); i != interactions.end_intruders (); ++i) {
+    results.front ().insert (i->second.second);
+  }
+}
+
+void CompoundRegionOperationForeignNode::do_compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t, double) const
 {
   for (shape_interactions<db::PolygonRef, db::PolygonRef>::intruder_iterator i = interactions.begin_intruders (); i != interactions.end_intruders (); ++i) {
     results.front ().insert (i->second.second);
@@ -916,7 +950,7 @@ void compound_region_generic_operation_node<TS, TI, TR>::implement_compute_local
   }
 
   db::local_processor <TS, TI, TR> proc (layout);
-  proc.run_flat (is, iiv, m_op, adaptor.results ());
+  proc.run_flat (is, iiv, std::vector<bool> (), m_op, adaptor.results ());
 
   adaptor.finish (layout);
 }
@@ -1177,8 +1211,8 @@ CompoundRegionEdgePairFilterOperationNode::is_selected (const db::EdgePair &p) c
 
 // ---------------------------------------------------------------------------------------------
 
-CompoundRegionProcessingOperationNode::CompoundRegionProcessingOperationNode (PolygonProcessorBase *proc, CompoundRegionOperationNode *input, bool owns_proc)
-  : CompoundRegionMultiInputOperationNode (input), mp_proc (proc), m_owns_proc (owns_proc)
+CompoundRegionProcessingOperationNode::CompoundRegionProcessingOperationNode (PolygonProcessorBase *proc, CompoundRegionOperationNode *input, bool owns_proc, db::Coord dist_adder)
+  : CompoundRegionMultiInputOperationNode (input), mp_proc (proc), m_owns_proc (owns_proc), m_dist_adder (dist_adder)
 {
   set_description ("processor");
 }
@@ -1497,7 +1531,7 @@ CompoundRegionCheckOperationNode::wants_merged () const
 void
 CompoundRegionCheckOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const
 {
-  bool other_merged = (children () > 0 && !inputs ()[0]);
+  bool other_merged = (children () > 0 && is_subject_regionptr (inputs ()[0]));
 
   db::check_local_operation<db::Polygon, db::Polygon> op (m_check, m_different_polygons, children () > 0, other_merged, m_options);
 
@@ -1515,7 +1549,7 @@ CompoundRegionCheckOperationNode::do_compute_local (db::Layout *layout, const sh
 void
 CompoundRegionCheckOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const
 {
-  bool other_merged = (children () > 0 && !inputs ()[0]);
+  bool other_merged = (children () > 0 && is_subject_regionptr (inputs ()[0]));
 
   db::check_local_operation<db::PolygonRef, db::PolygonRef> op (m_check, m_different_polygons, children () > 0, other_merged, m_options);
 

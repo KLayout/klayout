@@ -2246,6 +2246,11 @@ CODE
       self._prep_area_value(v)
     end
   
+    def _make_numeric_value(v)
+      self._check_numeric(v)
+      v
+    end
+  
   private
 
     def _make_string(v)

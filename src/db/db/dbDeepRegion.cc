@@ -1350,7 +1350,7 @@ Output *region_cop_impl (DeepRegion *region, db::CompoundRegionOperationNode &no
   //  Fall back to flat mode if one of the inputs is flat
   std::vector<db::Region *> inputs = node.inputs ();
   for (std::vector<db::Region *>::const_iterator i = inputs.begin (); i != inputs.end (); ++i) {
-    if (*i && ! dynamic_cast<const db::DeepRegion *> ((*i)->delegate ())) {
+    if (! is_subject_regionptr (*i) && ! dynamic_cast<const db::DeepRegion *> ((*i)->delegate ())) {
       return 0;
     }
   }
@@ -1368,8 +1368,12 @@ Output *region_cop_impl (DeepRegion *region, db::CompoundRegionOperationNode &no
   std::vector<unsigned int> other_layers;
   for (std::vector<db::Region *>::const_iterator i = inputs.begin (); i != inputs.end (); ++i) {
 
-    if (! *i) {
-      other_layers.push_back (polygons.layer ());
+    if (is_subject_regionptr (*i)) {
+      if (*i == subject_regionptr ()) {
+        other_layers.push_back (subject_idlayer ());
+      } else {
+        other_layers.push_back (foreign_idlayer ());
+      }
     } else {
       const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> ((*i)->delegate ());
       tl_assert (other_deep != 0);

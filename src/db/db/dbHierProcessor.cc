@@ -265,6 +265,31 @@ private:
 // ---------------------------------------------------------------------------------------------
 
 /**
+ *  @brief a utility to capture insert attempts of the wrong type into a box scanner
+ *  These attempts can happen because the generic nature of the interaction detector code
+ */
+
+template <class T, class P>
+void safe_insert2_into_box_scanner (db::box_scanner2 <T, P, T, P> &scanner, const T *t, const P &p)
+{
+  scanner.insert2 (t, p);
+}
+
+template <class T1, class P1, class T2, class P2>
+void safe_insert2_into_box_scanner (db::box_scanner2 <T1, P1, T2, P2> &scanner, const T2 *t, const P2 &p)
+{
+  scanner.insert2 (t, p);
+}
+
+template <class T1, class P1, class T2, class P2>
+void safe_insert2_into_box_scanner (db::box_scanner2 <T1, P1, T2, P2> &, const T1 *, const P1 &)
+{
+  tl_assert (false);
+}
+
+// ---------------------------------------------------------------------------------------------
+
+/**
  *  @brief Safe enlargement of a box
  *  Boxes must not vanish when augmented for overlapping queries. Hence we must not make
  *  the boxes shrinked too much on enlarge.
@@ -744,8 +769,61 @@ public:
     mp_result->add_interaction (id1, id2);
   }
 
+  void same (unsigned int, unsigned int)
+  {
+    //  ignore. Two shapes of a different kind can't be the same.
+  }
+
 private:
   shape_interactions<TS, TI> *mp_result;
+  db::Layout *mp_layout;
+  unsigned int m_intruder_layer_index;
+};
+
+template <class T>
+struct interaction_registration_shape2shape<T, T>
+  : db::box_scanner_receiver2<T, unsigned int, T, unsigned int>
+{
+public:
+  interaction_registration_shape2shape (db::Layout *layout, shape_interactions<T, T> *result, unsigned int intruder_layer_index)
+    : mp_result (result), mp_layout (layout), m_intruder_layer_index (intruder_layer_index)
+  {
+    //  nothing yet ..
+  }
+
+  void add (const T *ref1, unsigned int id1, const T *ref2, unsigned int id2)
+  {
+    if (! m_same.empty () && (m_same.find (std::make_pair (id1, id2)) != m_same.end () || m_same.find (std::make_pair (id2, id1)) != m_same.end ())) {
+      //  ignore self-interactions
+      return;
+    }
+
+    if (!mp_result->has_subject_shape_id (id1)) {
+      mp_result->add_subject_shape (id1, *ref1);
+    }
+
+    if (!mp_result->has_intruder_shape_id (id2)) {
+      if (mp_layout) {
+        //  In order to guarantee the refs come from the subject layout, we'd need to
+        //  rewrite them
+        db::shape_reference_translator<T> rt (mp_layout);
+        mp_result->add_intruder_shape (id2, m_intruder_layer_index, rt (*ref2));
+      } else {
+        mp_result->add_intruder_shape (id2, m_intruder_layer_index, *ref2);
+      }
+    }
+
+    mp_result->add_interaction (id1, id2);
+  }
+
+  void same (unsigned int a, unsigned int b)
+  {
+    m_same.insert (std::make_pair (a, b));
+  }
+
+private:
+  shape_interactions<T, T> *mp_result;
+  std::unordered_set<std::pair<unsigned int, unsigned int> > m_same;
   db::Layout *mp_layout;
   unsigned int m_intruder_layer_index;
 };
@@ -758,7 +836,7 @@ public:
   interaction_registration_shape1 (shape_interactions<TS, TI> *result, unsigned int intruder_layer_index)
     : mp_result (result), m_intruder_layer_index (intruder_layer_index)
   {
-    //  nothing yet ..
+    //  .. nothing yet ..
   }
 
   void add (const TS *ref1, unsigned int id1, const TI *ref2, unsigned int id2)
@@ -946,8 +1024,8 @@ struct interaction_registration_inst2inst
 public:
   typedef std::pair<std::unordered_set<const db::CellInstArray *>, std::map<unsigned int, std::unordered_set<T> > > interaction_value_type;
 
-  interaction_registration_inst2inst (const db::Layout *subject_layout, unsigned int subject_layer, const db::Layout *intruder_layout, unsigned int intruder_layer, db::Coord dist, std::unordered_map<const db::CellInstArray *, interaction_value_type> *result)
-    : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), m_subject_layer (subject_layer), m_intruder_layer (intruder_layer), m_dist (dist), mp_result (result)
+  interaction_registration_inst2inst (const db::Layout *subject_layout, unsigned int subject_layer, const db::Layout *intruder_layout, unsigned int intruder_layer, bool foreign, db::Coord dist, std::unordered_map<const db::CellInstArray *, interaction_value_type> *result)
+    : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), m_subject_layer (subject_layer), m_intruder_layer (intruder_layer), m_dist (dist), mp_result (result), m_foreign (foreign)
   {
     //  nothing yet ..
   }
@@ -959,7 +1037,7 @@ public:
     if (mp_subject_layout != mp_intruder_layout || id1 != id2 || inst1->size () > 1) {
 
       bool ignore = false;
-      if (mp_subject_layout == mp_intruder_layout && m_subject_layer == m_intruder_layer) {
+      if (mp_subject_layout == mp_intruder_layout && m_subject_layer == m_intruder_layer && ! m_foreign) {
         if (m_interactions.find (std::make_pair (id2, id1)) != m_interactions.end ()) {
           //  for self interactions ignore the reverse interactions
           ignore = true;
@@ -981,6 +1059,7 @@ private:
   db::Coord m_dist;
   std::unordered_map<const db::CellInstArray *, std::pair<std::unordered_set<const db::CellInstArray *>, std::map<unsigned int, std::unordered_set<T> > > > *mp_result;
   std::unordered_set<std::pair<unsigned int, unsigned int> > m_interactions;
+  bool m_foreign;
 };
 
 template <class T>
@@ -1339,7 +1418,7 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
   std::map<unsigned int, const db::Shapes *> intruder_shapes;
   if (intruder_cell) {
     for (std::vector<unsigned int>::const_iterator l = contexts.intruder_layers ().begin (); l != contexts.intruder_layers ().end (); ++l) {
-      const db::Shapes *s = &intruder_cell->shapes (*l);
+      const db::Shapes *s = &intruder_cell->shapes (contexts.actual_intruder_layer (*l));
       if (! s->empty ()) {
         intruder_shapes.insert (std::make_pair (*l, s));
       }
@@ -1369,10 +1448,10 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
 //  TODO: can we shortcut this if interactions is empty?
     for (std::vector<unsigned int>::const_iterator il = contexts.intruder_layers ().begin (); il != contexts.intruder_layers ().end (); ++il) {
 
-      db::box_convert <db::CellInstArray, true> inst_bci (*mp_intruder_layout, *il);
+      db::box_convert <db::CellInstArray, true> inst_bci (*mp_intruder_layout, contexts.actual_intruder_layer (*il));
 
       db::box_scanner2<db::CellInstArray, int, db::CellInstArray, int> scanner;
-      interaction_registration_inst2inst<TI> rec (mp_subject_layout, contexts.subject_layer (), mp_intruder_layout, *il, dist, &interactions);
+      interaction_registration_inst2inst<TI> rec (mp_subject_layout, contexts.subject_layer (), mp_intruder_layout, contexts.actual_intruder_layer (*il), contexts.is_foreign (*il), dist, &interactions);
 
       unsigned int id = 0;
 
@@ -1474,7 +1553,7 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
 
           for (std::vector<unsigned int>::const_iterator il = contexts.intruder_layers ().begin (); il != contexts.intruder_layers ().end (); ++il) {
 
-            db::box_convert <db::CellInst, true> inst_bcii (*mp_intruder_layout, *il);
+            db::box_convert <db::CellInst, true> inst_bcii (*mp_intruder_layout, contexts.actual_intruder_layer (*il));
 
             for (std::unordered_set<const db::CellInstArray *>::const_iterator j = i->second.first.begin (); j != i->second.first.end (); ++j) {
               for (db::CellInstArray::iterator k = (*j)->begin_touching (safe_box_enlarged (nbox, -1, -1), inst_bcii); ! k.at_end (); ++k) {
@@ -1482,7 +1561,7 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
                 //  NOTE: no self-interactions
                 if (i->first != *j || tn != tk) {
                   //  optimize the intruder instance so it will be as low as possible
-                  std::pair<bool, db::CellInstArray> ei = effective_instance (contexts.subject_layer (), i->first->object ().cell_index (), *il, (*j)->object ().cell_index (), tni * tk, dist);
+                  std::pair<bool, db::CellInstArray> ei = effective_instance (contexts.subject_layer (), i->first->object ().cell_index (), contexts.actual_intruder_layer (*il), (*j)->object ().cell_index (), tni * tk, dist);
                   if (ei.first) {
                     intruders_below.first.insert (ei.second);
                   }
@@ -1740,9 +1819,9 @@ struct scan_shape2shape_different_layers
     interaction_registration_shape2shape<TS, TI> rec (layout, &interactions, intruder_layer_index);
 
     unsigned int id = subject_id0;
-    for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<TS> ()); !i.at_end (); ++i) {
+    for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<TS> ()); !i.at_end (); ++i, ++id) {
       const TS *ref = i->basic_ptr (typename TS::tag ());
-      scanner.insert1 (ref, id++);
+      scanner.insert1 (ref, id);
     }
 
     //  TODO: can we confine this search to the subject's (sized) bounding box?
@@ -1752,11 +1831,26 @@ struct scan_shape2shape_different_layers
       }
     }
 
-    if (intruder_shapes) {
+    if (intruder_shapes == subject_shapes) {
+
+      //  TODO: can we confine this search to the subject's (sized) bounding box?
+
+      //  special case of intra-layer interactions ("foreign"): mark identical shapes as same so that shapes are not reported interacting with
+      //  themselves.
+      unsigned int id = subject_id0;
+      for (db::Shapes::shape_iterator i = intruder_shapes->begin (shape_flags<TI> ()); !i.at_end (); ++i, ++id) {
+        unsigned int iid = interactions.next_id ();
+        scanner.insert2 (i->basic_ptr (typename TI::tag ()), iid);
+        rec.same (id, iid);
+      }
+
+    } else if (intruder_shapes) {
+
       //  TODO: can we confine this search to the subject's (sized) bounding box?
       for (db::Shapes::shape_iterator i = intruder_shapes->begin (shape_flags<TI> ()); !i.at_end (); ++i) {
         scanner.insert2 (i->basic_ptr (typename TI::tag ()), interactions.next_id ());
       }
+
     }
 
     scanner.process (rec, dist, db::box_convert<TS> (), db::box_convert<TI> ());
@@ -1793,9 +1887,12 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
   unsigned int il_index = 0;
   for (std::vector<unsigned int>::const_iterator il = contexts.intruder_layers ().begin (); il != contexts.intruder_layers ().end (); ++il, ++il_index) {
 
+    unsigned int ail = contexts.actual_intruder_layer (*il);
+    bool foreign = contexts.is_foreign (*il);
+
     const db::Shapes *intruder_shapes = 0;
     if (intruder_cell) {
-      intruder_shapes = &intruder_cell->shapes (*il);
+      intruder_shapes = &intruder_cell->shapes (ail);
       if (intruder_shapes->empty ()) {
         intruder_shapes = 0;
       }
@@ -1803,14 +1900,14 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
     //  local shapes vs. child cell
 
-    db::box_convert<db::CellInstArray, true> inst_bci (*mp_intruder_layout, *il);
+    db::box_convert<db::CellInstArray, true> inst_bci (*mp_intruder_layout, ail);
 
-    typename std::map<unsigned int, std::set<TI> >::const_iterator ipl = intruders.second.find (*il);
+    typename std::map<unsigned int, std::set<TI> >::const_iterator ipl = intruders.second.find (ail);
     static std::set<TI> empty_intruders;
 
     if (! subject_shapes->empty () && (intruder_shapes || ipl != intruders.second.end ())) {
 
-      if (subject_cell == intruder_cell && contexts.subject_layer () == *il) {
+      if (subject_cell == intruder_cell && contexts.subject_layer () == ail && !foreign) {
 
         scan_shape2shape_same_layer<TS, TI> () (subject_shapes, subject_id0, ipl == intruders.second.end () ? empty_intruders : ipl->second, il_index, interactions, op->dist ());
 
@@ -1826,7 +1923,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
     if (! subject_shapes->empty () && ! ((! intruder_cell || intruder_cell->begin ().at_end ()) && intruders.first.empty ())) {
 
       db::box_scanner2<TS, int, db::CellInstArray, int> scanner;
-      interaction_registration_shape2inst<TS, TI> rec (mp_subject_layout, mp_intruder_layout, *il, il_index, op->dist (), &interactions);
+      interaction_registration_shape2inst<TS, TI> rec (mp_subject_layout, mp_intruder_layout, ail, il_index, op->dist (), &interactions);
 
       unsigned int id = subject_id0;
       for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<TS> ()); !i.at_end (); ++i) {
@@ -1835,7 +1932,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
       unsigned int inst_id = 0;
 
-      if (subject_cell == intruder_cell && contexts.subject_layer () == *il) {
+      if (subject_cell == intruder_cell && contexts.subject_layer () == ail) {
 
         //  Same cell, same layer -> no shape to child instance interactions because this will be taken care of
         //  by the instances themselves (and their intruders). This also means, we prefer to deal with
@@ -1884,12 +1981,19 @@ void
 local_processor<TS, TI, TR>::run_flat (const db::Shapes *subject_shapes, const db::Shapes *intruders, const local_operation<TS, TI, TR> *op, db::Shapes *result_shapes) const
 {
   std::vector<generic_shape_iterator<TI> > is;
-  is.push_back (generic_shape_iterator<TI> (intruders));
+  std::vector<bool> foreign;
+  if (intruders == subject_idptr () || intruders == foreign_idptr ()) {
+    is.push_back (generic_shape_iterator<TI> (subject_shapes));
+    foreign.push_back (intruders == foreign_idptr ());
+  } else {
+    is.push_back (generic_shape_iterator<TI> (intruders));
+    foreign.push_back (false);
+  }
 
   std::vector<db::Shapes *> os;
   os.push_back (result_shapes);
 
-  run_flat (generic_shape_iterator<TS> (subject_shapes), is, op, os);
+  run_flat (generic_shape_iterator<TS> (subject_shapes), is, foreign, op, os);
 }
 
 template <class TS, class TI, class TR>
@@ -1898,11 +2002,21 @@ local_processor<TS, TI, TR>::run_flat (const db::Shapes *subject_shapes, const s
 {
   std::vector<generic_shape_iterator<TI> > is;
   is.reserve (intruders.size ());
+
+  std::vector<bool> foreign;
+  foreign.reserve (intruders.size ());
+
   for (std::vector<const db::Shapes *>::const_iterator i = intruders.begin (); i != intruders.end (); ++i) {
-    is.push_back (generic_shape_iterator<TI> (*i));
+    if (*i == subject_idptr () || *i == foreign_idptr ()) {
+      is.push_back (generic_shape_iterator<TI> (subject_shapes));
+      foreign.push_back (*i == foreign_idptr ());
+    } else {
+      is.push_back (generic_shape_iterator<TI> (*i));
+      foreign.push_back (false);
+    }
   }
 
-  run_flat (generic_shape_iterator<TS> (subject_shapes), is, op, result_shapes);
+  run_flat (generic_shape_iterator<TS> (subject_shapes), is, foreign, op, result_shapes);
 }
 
 namespace
@@ -1956,7 +2070,7 @@ private:
 
 template <class TS, class TI, class TR>
 void
-local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subjects, const std::vector<generic_shape_iterator<TI> > &intruders, const local_operation<TS, TI, TR> *op, const std::vector<db::Shapes *> &result_shapes) const
+local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subjects, const std::vector<generic_shape_iterator<TI> > &intruders, const std::vector<bool> &foreign, const local_operation<TS, TI, TR> *op, const std::vector<db::Shapes *> &result_shapes) const
 {
   if (subjects.at_end ()) {
     return;
@@ -2010,7 +2124,9 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
       unsigned int il_index = 0;
       for (typename std::vector<generic_shape_iterator<TI> >::const_iterator il = intruders.begin (); il != intruders.end (); ++il, ++il_index) {
 
-        if (*il == subjects) {
+        bool ff = foreign.size () > il_index && foreign [il_index];
+
+        if (*il == subjects && ! ff) {
 
           interaction_registration_shape1_scanner_combo<TS, TI> scanner (&interactions, il_index);
 
@@ -2022,20 +2138,36 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
         } else {
 
-
-          db::box_scanner2<TS, int, TI, int> scanner;
+          db::box_scanner2<TS, unsigned int, TI, unsigned int> scanner;
           interaction_registration_shape2shape<TS, TI> rec (0 /*layout*/, &interactions, il_index);
 
           for (typename shape_interactions<TS, TI>::subject_iterator s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
             scanner.insert1 (&s->second, s->first);
           }
 
-          addressable_shape_delivery<TI> ii ((*il).confined (common_box, true));
-          for (; !ii.at_end (); ++ii) {
-            scanner.insert2 (ii.operator-> (), interactions.next_id ());
-          }
+          if (*il == subjects) {
 
-          scanner.process (rec, dist, db::box_convert<TS> (), db::box_convert<TI> ());
+            //  this is the case of intra-layer interactions ("foreign"): we pretend we have two layers and
+            //  reject shape self-interactions by registering them as "same"
+
+            for (typename shape_interactions<TS, TI>::subject_iterator s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
+              unsigned int iid = interactions.next_id ();
+              safe_insert2_into_box_scanner (scanner, &s->second, iid);
+              rec.same (s->first, iid);
+            }
+
+            scanner.process (rec, dist, db::box_convert<TS> (), db::box_convert<TI> ());
+
+          } else {
+
+            addressable_shape_delivery<TI> ii ((*il).confined (common_box, true));
+            for (; !ii.at_end (); ++ii) {
+              scanner.insert2 (ii.operator-> (), interactions.next_id ());
+            }
+
+            scanner.process (rec, dist, db::box_convert<TS> (), db::box_convert<TI> ());
+
+          }
 
         }
       }
@@ -2058,7 +2190,9 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
       unsigned int il_index = 0;
       for (typename std::vector<generic_shape_iterator<TI> >::const_iterator il = intruders.begin (); il != intruders.end (); ++il, ++il_index) {
 
-        if (*il == subjects) {
+        bool ff = foreign.size () > il_index && foreign [il_index];
+
+        if (*il == subjects && ! ff) {
 
           interaction_registration_shape1_scanner_combo<TS, TI> scanner (&interactions, il_index);
 
@@ -2073,22 +2207,42 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
         } else {
 
-          db::box_scanner2<TS, int, TI, int> scanner;
+          db::box_scanner2<TS, unsigned int, TI, unsigned int> scanner;
           interaction_registration_shape2shape<TS, TI> rec (0 /*layout*/, &interactions, il_index);
 
-          addressable_shape_delivery<TS> is (subjects.confined (common_box, true));
-          unsigned int id = id_first;
+          if (*il == subjects) {
 
-          for ( ; ! is.at_end (); ++is, ++id) {
-            scanner.insert1 (is.operator-> (), id);
+            //  this is the case of intra-layer interactions ("foreign"): we pretend we have two layers and
+            //  reject shape self-interactions by registering them as "same"
+
+            addressable_shape_delivery<TS> is (subjects.confined (common_box, true));
+
+            unsigned int id = id_first;
+            for ( ; ! is.at_end (); ++is, ++id) {
+              unsigned int iid = interactions.next_id ();
+              scanner.insert1 (is.operator-> (), id);
+              safe_insert2_into_box_scanner (scanner, is.operator-> (), iid);
+              rec.same (id, iid);
+            }
+
+            scanner.process (rec, dist, db::box_convert<TS> (), db::box_convert<TI> ());
+
+          } else {
+
+            addressable_shape_delivery<TS> is (subjects.confined (common_box, true));
+            addressable_shape_delivery<TI> ii ((*il).confined (common_box, true));
+
+            unsigned int id = id_first;
+            for ( ; ! is.at_end (); ++is, ++id) {
+              scanner.insert1 (is.operator-> (), id);
+            }
+            for (; !ii.at_end (); ++ii) {
+              scanner.insert2 (ii.operator-> (), interactions.next_id ());
+            }
+
+            scanner.process (rec, dist, db::box_convert<TS> (), db::box_convert<TI> ());
+
           }
-
-          addressable_shape_delivery<TI> ii ((*il).confined (common_box, true));
-          for (; !ii.at_end (); ++ii) {
-            scanner.insert2 (ii.operator-> (), interactions.next_id ());
-          }
-
-          scanner.process (rec, dist, db::box_convert<TS> (), db::box_convert<TI> ());
 
         }
       }

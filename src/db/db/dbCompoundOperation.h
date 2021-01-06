@@ -1387,7 +1387,12 @@ public:
   CompoundRegionCheckOperationNode (db::CompoundRegionOperationNode *input, db::edge_relation_type rel, bool different_polygons, db::Coord d, const db::RegionCheckOptions &options);
 
   /**
-   *  @brief Constructor for the single-layer check
+   *  @brief Constructor for the two-layer check
+   */
+  CompoundRegionCheckOperationNode (db::CompoundRegionOperationNode *input, db::CompoundRegionOperationNode *other, db::edge_relation_type rel, bool different_polygons, db::Coord d, const db::RegionCheckOptions &options);
+
+  /**
+   *  @brief Constructor for a single-polygon check (width, notch)
    */
   CompoundRegionCheckOperationNode (db::edge_relation_type rel, bool different_polygons, db::Coord d, const db::RegionCheckOptions &options);
 

@@ -1523,7 +1523,7 @@ CODE
     %w(
       enc
       enclosing
-      overlapping
+      overlap
       sep
       separation
     ).each do |f|
@@ -1595,7 +1595,7 @@ CODE
       output
       outside
       outside_part
-      overlap
+      overlapping
       perimeter 
       pull_inside 
       pull_interacting 

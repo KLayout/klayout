@@ -206,9 +206,9 @@ module DRC
     # out = in.drc(primary & foreign.sized(0.5.um))
     # @/code
     
-    def primary
-      res = DRCOpNode::new(self, RBA::CompoundRegionOperationNode::new_primary)
-      res.description = "primary"
+    def foreign
+      res = DRCOpNode::new(self, RBA::CompoundRegionOperationNode::new_foreign)
+      res.description = "foreign"
       return res
     end
     
@@ -773,13 +773,9 @@ CODE
         end
         
         if :#{f} == :width || :#{f} == :space || :#{f} == :notch || :#{f} == :isolated
-          if other
-            raise("No other layer must be specified for a single-layer check")
-          end
+          other && raise("No other layer must be specified for a single-layer check")
         else
-          if !other
-            raise("The other layer must be specified for a two-layer check")
-          end
+          other || raise("The other layer must be specified for a two-layer check")
         end
         
         DRCOpNodeCheck::new(self, :#{f}, other, *args)

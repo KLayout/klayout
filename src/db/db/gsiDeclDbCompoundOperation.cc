@@ -56,6 +56,11 @@ static db::CompoundRegionOperationNode *new_primary ()
   return new db::CompoundRegionOperationPrimaryNode ();
 }
 
+static db::CompoundRegionOperationNode *new_foreign ()
+{
+  return new db::CompoundRegionOperationForeignNode ();
+}
+
 static db::CompoundRegionOperationNode *new_secondary (db::Region *region)
 {
   check_non_null (region, "region");
@@ -372,7 +377,7 @@ static db::CompoundRegionOperationNode *new_edge_pair_to_second_edges (db::Compo
 
 static db::CompoundRegionOperationNode *new_check_node (db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter, bool negative)
 {
-  return new db::CompoundRegionCheckOperationNode (rel, different_polygons, d,
+  return new db::CompoundRegionCheckOperationNode (new_primary (), rel, different_polygons, d,
     db::RegionCheckOptions (whole_edges,
                             metrics,
                             ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
@@ -385,10 +390,10 @@ static db::CompoundRegionOperationNode *new_check_node (db::edge_relation_type r
   );
 }
 
-static db::CompoundRegionOperationNode *new_check_node (db::CompoundRegionOperationNode *input, db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter, bool negative)
+static db::CompoundRegionOperationNode *new_check_node (db::CompoundRegionOperationNode *other, db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter, bool negative)
 {
-  check_non_null (input, "input");
-  return new db::CompoundRegionCheckOperationNode (input, rel, different_polygons, d,
+  check_non_null (other, "other");
+  return new db::CompoundRegionCheckOperationNode (new_primary (), other, rel, different_polygons, d,
     db::RegionCheckOptions (whole_edges,
                             metrics,
                             ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
@@ -435,19 +440,19 @@ static db::CompoundRegionOperationNode *new_notch_check (db::Coord d, bool whole
   return new db::CompoundRegionToEdgePairProcessingOperationNode (new db::SinglePolygonCheck (db::SpaceRelation, d, options), new_primary (), true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_separation_check (db::CompoundRegionOperationNode *input, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter, bool negative)
+static db::CompoundRegionOperationNode *new_separation_check (db::CompoundRegionOperationNode *other, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter, bool negative)
 {
-  return new_check_node (input, db::SpaceRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, opposite_filter, rect_filter, negative);
+  return new_check_node (other, db::SpaceRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, opposite_filter, rect_filter, negative);
 }
 
-static db::CompoundRegionOperationNode *new_overlap_check (db::CompoundRegionOperationNode *input, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter, bool negative)
+static db::CompoundRegionOperationNode *new_overlap_check (db::CompoundRegionOperationNode *other, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter, bool negative)
 {
-  return new_check_node (input, db::OverlapRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, opposite_filter, rect_filter, negative);
+  return new_check_node (other, db::OverlapRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, opposite_filter, rect_filter, negative);
 }
 
-static db::CompoundRegionOperationNode *new_inside_check (db::CompoundRegionOperationNode *input, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter, bool negative)
+static db::CompoundRegionOperationNode *new_inside_check (db::CompoundRegionOperationNode *other, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter, bool negative)
 {
-  return new_check_node (input, db::InsideRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, opposite_filter, rect_filter, negative);
+  return new_check_node (other, db::InsideRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, opposite_filter, rect_filter, negative);
 }
 
 static db::CompoundRegionOperationNode *new_perimeter_filter (db::CompoundRegionOperationNode *input, bool inverse, db::coord_traits<db::Coord>::perimeter_type pmin, db::coord_traits<db::Coord>::perimeter_type pmax)
@@ -501,6 +506,9 @@ static db::CompoundRegionOperationNode *new_centers (db::CompoundRegionOperation
 Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "CompoundRegionOperationNode",
   gsi::constructor ("new_primary", &new_primary,
     "@brief Creates a node object representing the primary input"
+  ) +
+  gsi::constructor ("new_foreign", &new_foreign,
+    "@brief Creates a node object representing the primary input without the current polygon"
   ) +
   gsi::constructor ("new_secondary", &new_secondary, gsi::arg ("region"),
     "@brief Creates a node object representing the secondary input from the given region"
@@ -620,13 +628,13 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   gsi::constructor ("new_notch_check", &new_notch_check, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("negative", false),
     "@brief Creates a node providing a intra-polygon space check.\n"
   ) +
-  gsi::constructor ("new_separation_check", &new_separation_check, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"), gsi::arg ("negative", false),
+  gsi::constructor ("new_separation_check", &new_separation_check, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"), gsi::arg ("negative", false),
     "@brief Creates a node providing a separation check.\n"
   ) +
-  gsi::constructor ("new_overlap_check", &new_overlap_check, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"), gsi::arg ("negative", false),
+  gsi::constructor ("new_overlap_check", &new_overlap_check, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"), gsi::arg ("negative", false),
     "@brief Creates a node providing an overlap check.\n"
   ) +
-  gsi::constructor ("new_inside_check", &new_inside_check, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"), gsi::arg ("negative", false),
+  gsi::constructor ("new_inside_check", &new_inside_check, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"), gsi::arg ("negative", false),
     "@brief Creates a node providing an inside (enclosure) check.\n"
   ) +
   gsi::constructor ("new_perimeter_filter", &new_perimeter_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("pmin", 0), gsi::arg ("pmax", std::numeric_limits<db::coord_traits<db::Coord>::perimeter_type>::max (), "max"),

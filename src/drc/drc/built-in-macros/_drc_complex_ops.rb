@@ -1495,16 +1495,21 @@ class DRCOpNodeCheck < DRCOpNodeWithCompare
                 :isolated => :new_isolated_check, :overlap => :new_overlap_check, 
                 :enclosing => :new_inside_check }[self.check]
 
+    oargs = []
+    if self.other
+      oargs << self.other.create_node(cache)
+    end
+
     if self.lt || self.le
       dmin = self.le ? @engine._make_value(self.le) + 1 : @engine._make_value(self.lt)
-      res = RBA::CompoundRegionOperationNode::send(factory, dmin, *self.args)
+      res = RBA::CompoundRegionOperationNode::send(factory, *(oargs + [ dmin ] + self.args))
     else
       res = nil
     end
       
     if self.gt || self.ge
       dmax = self.ge ? @engine._make_value(self.ge) : @engine._make_value(self.gt) + 1
-      max_check = RBA::CompoundRegionOperationNode::send(factory, dmax, *self.args + [ true ])
+      max_check = RBA::CompoundRegionOperationNode::send(factory, *(oargs + [ dmax ] + self.args + [ true ]))
       if res
         if self.check == :width || self.check == :notch
           # Same polygon check - we need to take both edges of the result

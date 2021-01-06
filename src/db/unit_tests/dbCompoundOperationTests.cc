@@ -84,9 +84,9 @@ void run_test1 (tl::TestBase *_this, bool deep)
   res.insert_into (&ly, *ly.begin_top_down (), l1000);
 
   db::CompoundRegionOperationPrimaryNode *primary = new db::CompoundRegionOperationPrimaryNode ();
-  db::CompoundRegionCheckOperationNode space_check (primary, db::SpaceRelation, true /*==different polygons*/, 1050, check_options);
+  db::CompoundRegionCheckOperationNode isolation_check (primary, db::SpaceRelation, true /*==different polygons*/, 1050, check_options);
 
-  res = r.cop_to_edge_pairs (space_check);
+  res = r.cop_to_edge_pairs (isolation_check);
 
   unsigned int l1001 = ly.get_layer (db::LayerProperties (1001, 0));
   res.insert_into (&ly, *ly.begin_top_down (), l1001);
@@ -98,6 +98,13 @@ void run_test1 (tl::TestBase *_this, bool deep)
 
   unsigned int l1002 = ly.get_layer (db::LayerProperties (1002, 0));
   res.insert_into (&ly, *ly.begin_top_down (), l1002);
+
+  db::CompoundRegionCheckOperationNode space_check (primary, db::SpaceRelation, false /*==all polygons*/, 1050, check_options);
+
+  res = r.cop_to_edge_pairs (space_check);
+
+  unsigned int l1003 = ly.get_layer (db::LayerProperties (1003, 0));
+  res.insert_into (&ly, *ly.begin_top_down (), l1003);
 
   CHECKPOINT();
   db::compare_layouts (_this, ly, make_au ("1", deep));

@@ -1486,6 +1486,18 @@ CompoundRegionEdgePairToEdgeProcessingOperationNode::do_compute_local (db::Layou
 
 // ---------------------------------------------------------------------------------------------
 
+CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (db::edge_relation_type rel, bool different_polygons, db::Coord d, const db::RegionCheckOptions &options)
+  : CompoundRegionMultiInputOperationNode (), m_check (rel, d, options.metrics), m_different_polygons (different_polygons), m_options (options)
+{
+  set_description ("check");
+
+  m_check.set_include_zero (false);
+  m_check.set_whole_edges (options.whole_edges);
+  m_check.set_ignore_angle (options.ignore_angle);
+  m_check.set_min_projection (options.min_projection);
+  m_check.set_max_projection (options.max_projection);
+}
+
 CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (CompoundRegionOperationNode *input, db::edge_relation_type rel, bool different_polygons, db::Coord d, const db::RegionCheckOptions &options)
   : CompoundRegionMultiInputOperationNode (input), m_check (rel, d, options.metrics), m_different_polygons (different_polygons), m_options (options)
 {
@@ -1498,8 +1510,8 @@ CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (CompoundRegi
   m_check.set_max_projection (options.max_projection);
 }
 
-CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (db::edge_relation_type rel, bool different_polygons, db::Coord d, const db::RegionCheckOptions &options)
-  : CompoundRegionMultiInputOperationNode (), m_check (rel, d, options.metrics), m_different_polygons (different_polygons), m_options (options)
+CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (CompoundRegionOperationNode * /*input*/, CompoundRegionOperationNode *other, db::edge_relation_type rel, bool different_polygons, db::Coord d, const db::RegionCheckOptions &options)
+  : CompoundRegionMultiInputOperationNode (other), m_check (rel, d, options.metrics), m_different_polygons (different_polygons), m_options (options)
 {
   set_description ("check");
 

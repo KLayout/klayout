@@ -78,3 +78,13 @@ TEST(1d)
 {
   runTest (_this, "1", true);
 }
+
+TEST(2)
+{
+  runTest (_this, "2", false);
+}
+
+TEST(2d)
+{
+  runTest (_this, "2", true);
+}

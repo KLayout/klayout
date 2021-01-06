@@ -76,8 +76,8 @@ module DRC
     def drc(op)
       @engine._context("drc") do
         requires_region
-        expr.is_a?(DRCOpNode) || raise("A DRC expression is required for the argument (got #{expr.inspect})")
-        return DRCLayer::new(@engine, self.data.complex_op(op.create_node({})))
+        op.is_a?(DRCOpNode) || raise("A DRC expression is required for the argument (got #{op.inspect})")
+        DRCLayer::new(@engine, self.data.complex_op(op.create_node({})))
       end
     end
     
@@ -632,9 +632,13 @@ CODE
     # out = in.drc(0.1.um <= enclosing(other) < 0.2.um)
     # @/code
     #
-    # The result of the enclosing check are edge pairs forming the violation
-    # markers. With a lower limit, these markers are formed by two, identical but opposite edges attached to 
-    # the primary shape. Without a lower limit, the first edge of the marker is attached to the 
+    # The result of the enclosing check are edges or edge pairs forming the markers.
+    # These markers indicate the presence of the specified condition.
+    # 
+    # With a lower and upper limit, the results are edges marking the positions on the 
+    # primary shape where the condition is met.
+    # With a lower limit alone, these markers are formed by two, identical but opposite edges attached to 
+    # the primary shape. Without an upper limit only, the first edge of the marker is attached to the 
     # primary shape while the second edge is attached to the shape of the "other" layer.
     
     # %DRC%
@@ -682,9 +686,10 @@ CODE
     # out = in.drc(0.1.um <= width < 0.2.um)
     # @/code
     #
-    # The result of the width check are edge pairs forming the violation
-    # markers. With a lower limit, these markers are formed by two, identical but opposite edges attached to 
-    # the primary shape. Without a lower limit, both edges are attached to different sides of the primary 
+    # With a lower and upper limit, the results are edges marking the positions on the 
+    # primary shape where the condition is met.
+    # With a lower limit alone, these markers are formed by two, identical but opposite edges attached to 
+    # the primary shape. Without an upper limit only, both edges are attached to different sides of the primary
     # shape.
     
     # %DRC%

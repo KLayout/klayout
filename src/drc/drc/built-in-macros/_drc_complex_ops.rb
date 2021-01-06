@@ -1119,7 +1119,7 @@ class DRCOpNodeWithCompare < DRCOpNode
   end
   
   def _self_or_original
-    return self.original || self
+    return (self.original || self).dup
   end
   
   def ==(other)
@@ -1505,7 +1505,6 @@ class DRCOpNodeCheck < DRCOpNodeWithCompare
     if self.gt || self.ge
       dmax = self.ge ? @engine._make_value(self.ge) : @engine._make_value(self.gt) + 1
       max_check = RBA::CompoundRegionOperationNode::send(factory, dmax, *self.args + [ true ])
-      res_max = RBA::CompoundRegionOperationNode::new_edge_pair_to_first_edges(max_check)
       if res
         if self.check == :width || self.check == :notch
           # Same polygon check - we need to take both edges of the result
@@ -1513,9 +1512,10 @@ class DRCOpNodeCheck < DRCOpNodeWithCompare
         else
           and_with = RBA::CompoundRegionOperationNode::new_edge_pair_to_first_edges(res)
         end
+        res_max = RBA::CompoundRegionOperationNode::new_edge_pair_to_first_edges(max_check)
         res = RBA::CompoundRegionOperationNode::new_geometrical_boolean(RBA::CompoundRegionOperationNode::GeometricalOp::And, and_with, res_max)
       else
-        res = res_max
+        res = max_check
       end
     end
     

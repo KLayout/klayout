@@ -2,11 +2,15 @@
 
 module DRC
 
+  # %DRC%
+  # @scope
+  # @name Layer
+
   class DRCLayer
 
     # %DRC%
     # @name drc
-    # @brief Provides a generic DRC function for use with \DRC expressions
+    # @brief Provides a generic DRC function for use with \DRC# expressions
     # @synopsis layer.drc(expression)
     #
     # This method implement the universal DRC which offers enhanced abilities,
@@ -55,19 +59,19 @@ module DRC
     # @/code
     #
     # Another example computes a boolean AND between two layers before selecting
-    # the ones with an area larger than 1 square micrometer:
+    # the result polygons with an area larger than 1 square micrometer:
     #
     # @code
     # other = ... another layer ..
     # out = in.drc((primary & other).area > 1.0)
     # @/code
     #
-    # The last example shows how the "drc" operation can improve performance: as the
+    # This example demonstrates how the "drc" operation can improve performance: as the
     # boolean operation is computed locally and the result is discarded when no longer required,
     # less shapes need to be stored hence reducing the memory overhead and CPU time required
     # to manage these shapes.
     #
-    # For more details about the expression see the \DRC class documentation. 
+    # For more details about the expression see the \DRC# class documentation. 
 
     def drc(op)
       @engine._context("drc") do
@@ -78,6 +82,10 @@ module DRC
     end
     
   end
+
+  # %DRC%
+  # @scope 
+  # @name global 
 
   class DRCEngine
 
@@ -94,7 +102,7 @@ module DRC
     #   out = in.drc(case(c1, r1, c2, r2, ..., cn, rn, rdef)
     # @/code
     # 
-    # This function will evaluate c1 which is a universal DRC expression (see \drc).
+    # This function will evaluate c1 which is a universal DRC expression (see \Layer#drc).
     # If the result is not empty, "case" will evaluate and return r1. Otherwise it
     # will continue with c2 and the result of this expression is not empty it will
     # return r2. Otherwise it will continue with c3/r3 etc. 
@@ -139,7 +147,7 @@ module DRC
     # @brief Provides secondary input for the "drc" universal DRC function
     # @synopsis secondary(layer)
     #
-    # To supply additional input for the universal DRC expressions (see \drc), use
+    # To supply additional input for the universal DRC expressions (see \Layer#drc), use
     # "secondary" with a layer argument. This example provides a boolean AND
     # between l1 and l2:
     #
@@ -168,7 +176,7 @@ module DRC
     # @brief Represents the primary input of the universal DRC function
     # @synopsis primary
     #
-    # The primary input of the universal DRC function is the layer the \drc function
+    # The primary input of the universal DRC function is the layer the \Layer#drc function
     # is called on.
     
     def primary
@@ -182,7 +190,7 @@ module DRC
     # @brief Represents all other polygons from primary except the current one
     # @synopsis foreign
     #
-    # The primary input of the universal DRC function is the layer the \drc function
+    # The primary input of the universal DRC function is the layer the \Layer#drc function
     # is called on. This operation represents all "other" primary polygons while
     # \primary represents the current polygon.
     #
@@ -218,7 +226,7 @@ module DRC
     # out = in.drc(if_all(area > 0.5, rectangle))
     # @/code
     #
-    # The condition expressions can be of any type (edges, edge pairs and polygons).
+    # The condition expressions may be of any type (edges, edge pairs and polygons).
      
     # %DRC%
     # @name if_any
@@ -270,10 +278,10 @@ CODE
     # @brief Selects primary shapes based on their bounding box height
     # @synopsis bbox_height (in condition)
     #
-    # This method creates a universal DRC expression (see \drc) to select primary shapes whose
-    # bounding box height satisfies the condition. Conditions can be written as arithmetic comparisons
+    # This method creates a universal DRC expression (see \Layer#drc) to select primary shapes whose
+    # bounding box height satisfies the condition. Conditions may be written as arithmetic comparisons
     # against numeric values. For example, "bbox_height < 2.0" will select all primary shapes whose
-    # bounding box height is less than 2 micrometers. See \drc for more details about comparison 
+    # bounding box height is less than 2 micrometers. See \Layer#drc for more details about comparison 
     # specs. Plain "bbox_min" is equivalent to "primary.bbox_min" - i.e. it is used on the primary
     # shape. Also see \DRC#bbox_min.
     
@@ -282,21 +290,21 @@ CODE
     # @brief Selects primary shapes based on their bounding box width
     # @synopsis bbox_max (in condition)
     #
-    # See \drc, \bbox_height and \DRC#bbox_height for more details.
+    # See \Layer#drc, \bbox_height and \DRC#bbox_height for more details.
     
     # %DRC%
     # @name bbox_max
     # @brief Selects primary shapes based on their bounding box height or width, whichever is larger
     # @synopsis bbox_max (in condition)
     #
-    # See \drc, \bbox_max and \DRC#bbox_max for more details.
+    # See \Layer#drc, \bbox_max and \DRC#bbox_max for more details.
     
     # %DRC%
     # @name bbox_min
     # @brief Selects primary shapes based on their bounding box height or width, whichever is smaller
     # @synopsis bbox_max (in condition)
     #
-    # See \drc, \bbox_min and \DRC#bbox_min for more details.
+    # See \Layer#drc, \bbox_min and \DRC#bbox_min for more details.
     
     %w(
       bbox_height
@@ -322,7 +330,7 @@ CODE
     # This function can be used with a layer argument in which case it
     # is equivalent to "layer.area" (see \Layer#area). Without a layer
     # argument, "area" represents an area filter for primary shapes in 
-    # \DRC expressions (see \drc and \DRC#area for more details).
+    # \DRC# expressions (see \Layer#drc and \DRC#area for more details).
     
     # %DRC%
     # @name hulls
@@ -333,7 +341,7 @@ CODE
     # This function can be used with a layer argument in which case it
     # is equivalent to "layer.hulls" (see \Layer#hulls). Without a layer
     # argument, "hulls" represents a hull contour extractor for primary shapes in 
-    # \DRC expressions (see \drc and \DRC#hulls for more details).
+    # \DRC# expressions (see \Layer#drc and \DRC#hulls for more details).
     
     # %DRC%
     # @name holes
@@ -344,7 +352,7 @@ CODE
     # This function can be used with a layer argument in which case it
     # is equivalent to "layer.holes" (see \Layer#hulls). Without a layer
     # argument, "holes" represents a hole extractor for primary shapes in 
-    # \DRC expressions (see \drc and \DRC#hulls for more details).
+    # \DRC# expressions (see \Layer#drc and \DRC#hulls for more details).
     
     # %DRC%
     # @name odd_polygons
@@ -355,7 +363,7 @@ CODE
     # This function can be used with a layer argument in which case it
     # is equivalent to "layer.odd_polygons" (see \Layer#odd_polygons). Without a layer
     # argument, "odd_polygons" represents an odd polygon filter for primary shapes in 
-    # \DRC expressions (see \drc and \DRC#odd_polygons for more details).
+    # \DRC# expressions (see \Layer#drc and \DRC#odd_polygons for more details).
 
     # %DRC%
     # @name perimeter
@@ -366,7 +374,7 @@ CODE
     # This function can be used with a layer argument in which case it
     # is equivalent to "layer.perimeter" (see \Layer#perimeter). Without a layer
     # argument, "perimeter" represents a perimeter filter for primary shapes in 
-    # \DRC expressions (see \drc and \DRC#perimeter for more details).
+    # \DRC# expressions (see \Layer#drc and \DRC#perimeter for more details).
 
     # %DRC%
     # @name rectangles
@@ -377,7 +385,7 @@ CODE
     # This function can be used with a layer argument in which case it
     # is equivalent to "layer.rectangles" (see \Layer#rectangles). Without a layer
     # argument, "rectangles" represents the rectangles filter for primary shapes in 
-    # \DRC expressions (see \drc and \DRC#rectangles for more details).
+    # \DRC# expressions (see \Layer#drc and \DRC#rectangles for more details).
 
     # %DRC%
     # @name rectilinear
@@ -388,7 +396,7 @@ CODE
     # This function can be used with a layer argument in which case it
     # is equivalent to "layer.rectilinear" (see \Layer#rectilinear). Without a layer
     # argument, "rectilinear" represents the rectilinear polygons filter for primary shapes in 
-    # \DRC expressions (see \drc and \DRC#rectilinear for more details).
+    # \DRC# expressions (see \Layer#drc and \DRC#rectilinear for more details).
 
     %w(
       area
@@ -416,7 +424,7 @@ CODE
     # This function can be used with a layer argument in which case it
     # is equivalent to "layer.corners" (see \Layer#corners). Without a layer
     # argument, "corners" represents the corner generator/filter in primary shapes for
-    # \DRC expressions (see \drc and \DRC#corners for more details).
+    # \DRC# expressions (see \Layer#drc and \DRC#corners for more details).
 
     def _cop_corners(as_dots = DRCAsDots::new(false))
       # NOTE: this method is a fallback for the respective global ones which route to DRCLayer or here.
@@ -432,7 +440,7 @@ CODE
     # This function can be used with a layer argument in which case it
     # is equivalent to "layer.extent_refs" (see \Layer#extent_refs). Without a layer
     # argument, "extent_refs" represents the partial extents extractor on primary shapes within
-    # \DRC expressions (see \drc and \DRC#extent_refs for more details).
+    # \DRC# expressions (see \Layer#drc and \DRC#extent_refs for more details).
 
     # %DRC%
     # @name extents
@@ -443,7 +451,7 @@ CODE
     # This function can be used with a layer argument in which case it
     # is equivalent to "layer.extents" (see \Layer#extents). Without a layer
     # argument, "extents" represents the extents generator on primary shapes within
-    # \DRC expressions (see \drc and \DRC#extents for more details).
+    # \DRC# expressions (see \Layer#drc and \DRC#extents for more details).
 
     # %DRC%
     # @name middle
@@ -454,7 +462,7 @@ CODE
     # This function can be used with a layer argument in which case it
     # is equivalent to "layer.middle" (see \Layer#middle). Without a layer
     # argument, "middle" represents the bounding box center marker generator on primary shapes within
-    # \DRC expressions (see \drc and \DRC#middle for more details).
+    # \DRC# expressions (see \Layer#drc and \DRC#middle for more details).
 
     # %DRC%
     # @name rounded_corners
@@ -465,7 +473,7 @@ CODE
     # This function can be used with a layer argument in which case it
     # is equivalent to "layer.rounded_corners" (see \Layer#rounded_corners). Without a layer
     # argument, "rounded_corners" represents the corner rounding algorithm on primary shapes within
-    # \DRC expressions (see \drc and \DRC#rounded_corners for more details).
+    # \DRC# expressions (see \Layer#drc and \DRC#rounded_corners for more details).
       
     # %DRC%
     # @name sized
@@ -478,7 +486,7 @@ CODE
     # This function can be used with a layer argument in which case it
     # is equivalent to "layer.sized" (see \Layer#sized). Without a layer
     # argument, "sized" represents the polygon sizer on primary shapes within
-    # \DRC expressions (see \drc and \DRC#sized for more details).
+    # \DRC# expressions (see \Layer#drc and \DRC#sized for more details).
 
     # %DRC%
     # @name smoothed
@@ -489,7 +497,7 @@ CODE
     # This function can be used with a layer argument in which case it
     # is equivalent to "layer.smoothed" (see \Layer#smoothed). Without a layer
     # argument, "smoothed" represents the polygon smoother on primary shapes within
-    # \DRC expressions (see \drc and \DRC#smoothed for more details).
+    # \DRC# expressions (see \Layer#drc and \DRC#smoothed for more details).
     
     %w(
       extent_refs
@@ -519,7 +527,7 @@ CODE
     # Without a layer argument, this method represents the selector of primary shapes
     # which entirely cover shapes from the other layer. This version can be put into
     # a condition indicating how many shapes of the other layer need to be covered.
-    # Use this variant within \DRC expressions (also see \drc).
+    # Use this variant within \DRC# expressions (also see \Layer#drc).
     #
     # For example, the following statement selects all input shapes which entirely 
     # cover shapes from the "other" layer:
@@ -567,7 +575,7 @@ CODE
     # 
     # Without a layer argument, this method represents the selector of primary shapes
     # which are entirely inside shapes from the other layer. 
-    # Use this variant within \DRC expressions (also see \drc).
+    # Use this variant within \DRC# expressions (also see \Layer#drc).
     
     # %DRC%
     # @name outside
@@ -580,7 +588,7 @@ CODE
     # 
     # Without a layer argument, this method represents the selector of primary shapes
     # which are entirely outside shapes from the other layer. 
-    # Use this variant within \DRC expressions (also see \drc).
+    # Use this variant within \DRC# expressions (also see \Layer#drc).
     
     %w(
       covering
@@ -606,13 +614,13 @@ CODE
     # This function can be used with a layer argument in which case it
     # is equivalent to "layer.enclosing" (see \Layer#enclosing). 
     #
-    # The version without the first layer is intended for use within \DRC expressions
-    # together with the \drc method. In this case, this function needs to be 
+    # The version without the first layer is intended for use within \DRC# expressions
+    # together with the \Layer#drc method. In this case, this function needs to be 
     # put into a condition to specify the check constraints. The other options
     # of \Layer#enclosing (e.g. metrics, projection constraints, angle limits etc.)
     # apply to this version too. 
     #
-    # The conditions can involve an upper and lower limit. The following examples
+    # The conditions may involve an upper and lower limit. The following examples
     # illustrate the use of this function with conditions:
     #
     # @code
@@ -656,13 +664,13 @@ CODE
     # This function can be used with a layer argument in which case it
     # is equivalent to "layer.width" (see \Layer#width). 
     #
-    # The version without a layer it intended for use within \DRC expressions
-    # together with the \drc method. In this case, this function needs to be 
+    # The version without a layer is intended for use within \DRC# expressions
+    # together with the \Layer#drc method. In this case, this function needs to be 
     # put into a condition to specify the check constraints. The other options
     # of \Layer#width (e.g. metrics, projection constraints, angle limits etc.)
     # apply to this version too. 
     #
-    # The conditions can involve an upper and lower limit. The following examples
+    # The conditions may involve an upper and lower limit. The following examples
     # illustrate the use of this function with conditions:
     #
     # @code

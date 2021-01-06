@@ -127,6 +127,14 @@ class Scope < DocItem
     @items = {}
   end
 
+  def merge(other)
+    if !self.brief
+      self.brief = other.brief
+      self.doc = other.doc
+      self.synopsis = other.synopsis
+    end
+  end
+
   def add_doc_item(mod, block)
     item = DocItem::new(mod, block)
     @items[item.name] = item
@@ -136,7 +144,7 @@ class Scope < DocItem
 
   def produce_doc
 
-      doc = <<HEAD
+    doc = <<HEAD
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "klayout_doc.dtd">
 
@@ -197,8 +205,14 @@ class Collector
 
       # is a scope block
       @scopes ||= {}
-      @current_scope = Scope::new(@mod, block)
-      @scopes[@current_scope.name] = @current_scope
+      scope = Scope::new(@mod, block)
+      if ! @scopes[scope.name]
+        @current_scope = scope
+        @scopes[scope.name] = scope
+      else
+        @current_scope = @scopes[scope.name]
+        @current_scope.merge(scope)
+      end
 
     else
       @current_scope && @current_scope.add_doc_item(@mod, block)

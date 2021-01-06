@@ -175,7 +175,7 @@ CODE
   # It is applicable on polygon expressions. The result will be the input 
   # polygons if the area condition is met. 
   #
-  # See \drc for more details about comparison specs.
+  # See \Layer#drc for more details about comparison specs.
   #
   # The following example will select all polygons with an area less than 2.0 square micrometers:
   #
@@ -184,7 +184,7 @@ CODE
   # out = in.drc(primary.area < 2.0)   # equivalent
   # @/code
   #
-  # The area method is available as a plain function or as a method on \DRC expressions.
+  # The area method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.area".
   
   def area
@@ -200,7 +200,7 @@ CODE
   # count. "count" is used as a method on a expression. It will evaluate the expression locally
   # and return the original result if the shape count in the result is matching the condition.
   #
-  # See \drc for more details about comparison specs.
+  # See \Layer#drc for more details about comparison specs.
   #
   # Note that the expression is evaluated locally: for each primary shape, the expression is
   # evaluated and the count of the resulting edge, edge pair or polygon set is taken.
@@ -229,7 +229,7 @@ CODE
   # It is applicable on polygon expressions. The result will be the input 
   # polygons if the perimeter condition is met. 
   #
-  # See \drc for more details about comparison specs.
+  # See \Layer#drc for more details about comparison specs.
   #
   # The following example will select all polygons with a perimeter less than 10 micrometers:
   #
@@ -238,7 +238,7 @@ CODE
   # out = in.drc(primary.perimeter < 10.0)   # equivalent
   # @/code
   #
-  # The perimeter method is available as a plain function or as a method on \DRC expressions.
+  # The perimeter method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.perimeter".
   
   def perimeter
@@ -254,7 +254,7 @@ CODE
   # It is applicable on polygon expressions. The result will be the input 
   # polygons if the bounding box condition is met. 
   #
-  # See \drc for more details about comparison specs.
+  # See \Layer#drc for more details about comparison specs.
   #
   # The following example will select all polygons whose bounding box smaller dimension is larger
   # than 200 nm:
@@ -264,7 +264,7 @@ CODE
   # out = in.drc(primary.bbox_min > 200.nm)   # equivalent
   # @/code
   #
-  # The "bbox_min" method is available as a plain function or as a method on \DRC expressions.
+  # The "bbox_min" method is available as a plain function or as a method on \DRC## expressions.
   # The plain function is equivalent to "primary.bbox_min".
   
   def bbox_min
@@ -279,7 +279,7 @@ CODE
   # This operation acts similar to \DRC#bbox_min, but takes the larger dimension of the shape's 
   # bounding box.
   #
-  # The "bbox_max" method is available as a plain function or as a method on \DRC expressions.
+  # The "bbox_max" method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.bbox_max".
 
   def bbox_max
@@ -297,7 +297,7 @@ CODE
   # hierarchical contexts: cells rotated by 90 degree have to be treated differently from
   # ones not rotated. This usually results in a larger computation effort and larger result files.
   #
-  # The "bbox_width" method is available as a plain function or as a method on \DRC expressions.
+  # The "bbox_width" method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.bbox_width".
 
   def bbox_width
@@ -315,7 +315,7 @@ CODE
   # hierarchical contexts: cells rotated by 90 degree have to be treated differently from
   # ones not rotated. This usually results in a larger computation effort and larger result files.
   #
-  # The "bbox_height" method is available as a plain function or as a method on \DRC expressions.
+  # The "bbox_height" method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.bbox_height".
 
   def bbox_height
@@ -338,7 +338,7 @@ CODE
   # out = in.drc(primary.length >= 1.um)   # equivalent
   # @/code
   #
-  # The "length" method is available as a plain function or as a method on \DRC expressions.
+  # The "length" method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.length".
 
   def length
@@ -373,7 +373,7 @@ CODE
   # a performance penalty in hierarchical mode. If possible, consider using \DRC#rectilinear for
   # example to detect shapes with non-manhattan geometry instead of using angle checks.
   #
-  # The "angle" method is available as a plain function or as a method on \DRC expressions.
+  # The "angle" method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.angle".
 
   def angle
@@ -388,7 +388,7 @@ CODE
   # This operation acts on polygons and applies corner rounding the the given inner
   # and outer corner radius and the number of points n per full circle. See \Layer#rounded_corners for more details.
   #
-  # The "rounded_corners" method is available as a plain function or as a method on \DRC expressions.
+  # The "rounded_corners" method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.rounded_corners".
 
   def rounded_corners(inner, outer, n)
@@ -405,7 +405,7 @@ CODE
   #
   # This operation acts on polygons and applies polygon smoothing with the tolerance d. See \Layer#smoothed for more details.
   #
-  # The "smoothed" method is available as a plain function or as a method on \DRC expressions.
+  # The "smoothed" method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.smoothed".
 
   def smoothed(d)
@@ -444,7 +444,7 @@ CODE
   # out = in.drc(primary.corners < 0)    # equivalent
   # @/code
   #
-  # The "corners" method is available as a plain function or as a method on \DRC expressions.
+  # The "corners" method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.corners".
 
   def corners(as_dots = DRCAsDots::new(false))
@@ -464,7 +464,7 @@ CODE
   # @synopsis expression.middle([ options ])
   #
   # The middle operation acts on polygons and has the same effect than \Layer#middle.
-  # It takes the same arguments. It is available as a method on \DRC expressions or
+  # It takes the same arguments. It is available as a method on \DRC# expressions or
   # as plain function, in which case it acts on the primary shapes.
 
   # %DRC%
@@ -473,7 +473,7 @@ CODE
   # @synopsis expression.extent_refs([ options ])
   #
   # The extent_refs operation acts on polygons and has the same effect than \Layer#extent_refs.
-  # It takes the same arguments. It is available as a method on \DRC expressions or
+  # It takes the same arguments. It is available as a method on \DRC# expressions or
   # as plain function, in which case it acts on the primary shapes.
 
   %w(middle extent_refs).each do |f| 
@@ -677,7 +677,7 @@ CODE
   # than the given number of polygons overlap. As the primary input is merged already,
   # it will always contribute as one.
   #
-  # The "merged" method is available as a plain function or as a method on \DRC expressions.
+  # The "merged" method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.merged".
   
   def merged(*args)
@@ -710,7 +710,7 @@ CODE
   # This method provides the same functionality as \Layer#sized and takes the same
   # arguments. It acts on polygon expressions.
   #
-  # The "sized" method is available as a plain function or as a method on \DRC expressions.
+  # The "sized" method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.sized".
 
   def sized(*args)
@@ -757,7 +757,7 @@ CODE
   # arguments. It returns the bounding boxes of the input objects. It acts on edge
   # edge pair and polygon expressions.
   #
-  # The "extents" method is available as a plain function or as a method on \DRC expressions.
+  # The "extents" method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.extents".
 
   def extents(e = 0)

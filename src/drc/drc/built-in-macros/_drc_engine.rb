@@ -1521,6 +1521,32 @@ CODE
     # make some DRCLayer methods available as functions
     # for the engine
     %w(
+      enc
+      enclosing
+      overlapping
+      sep
+      separation
+    ).each do |f|
+      eval <<"CODE"
+        def #{f}(*args)
+          self._context("#{f}") do
+            if args[0].is_a?(DRCLayer) && args[1].is_a?(DRCLayer)
+              obj = args.shift
+              return obj.#{f}(*args)
+            elsif self.respond_to?(:_cop_#{f})
+              # forward to _cop_ implementation for complex DRC operations
+              return self._cop_#{f}(*args)
+            else
+              raise("Function requires at a layer expression for the first two arguments")
+            end
+          end
+        end
+CODE
+    end
+    
+    # make some DRCLayer methods available as functions
+    # for the engine
+    %w(
       and
       andnot
       area
@@ -1528,8 +1554,6 @@ CODE
       centers
       corners
       covering
-      enc
-      enclosing
       end_segments
       extended
       extended_in
@@ -1572,7 +1596,6 @@ CODE
       outside
       outside_part
       overlap
-      overlapping
       perimeter 
       pull_inside 
       pull_interacting 
@@ -1596,8 +1619,6 @@ CODE
       select_outside
       select_overlapping
       select_touching
-      sep
-      separation
       size
       sized 
       smoothed

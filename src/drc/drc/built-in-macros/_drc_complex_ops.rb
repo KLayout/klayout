@@ -55,6 +55,7 @@ class DRCOpNode
   end
   
   def _build_geo_bool_node(other, op)
+    other = @engine._make_node(other)
     if ! other.is_a?(DRCOpNode)
       raise("Second argument to #{op.to_s} must be a DRC expression")
     end
@@ -70,7 +71,7 @@ class DRCOpNode
   # %DRC%
   # @name &
   # @brief Boolean AND between the results of two expressions
-  # @synopsis expr & expr
+  # @synopsis expression & expression
   # 
   # The & operator will compute the boolean AND between the results
   # of two expressions. The expression types need to be edge or polygon.
@@ -85,7 +86,7 @@ class DRCOpNode
   # %DRC%
   # @name |
   # @brief Boolean OR between the results of two expressions
-  # @synopsis expr | expr
+  # @synopsis expression | expression
   #
   # The | operator will compute the boolean OR between the results of 
   # two expressions. '+' is basically a synonym. Both expressions
@@ -94,14 +95,14 @@ class DRCOpNode
   # %DRC%
   # @name +
   # @brief Boolean OR between the results of two expressions
-  # @synopsis expr + expr
+  # @synopsis expression + expression
   #
   # The + operator will join the results of two expressions.
    
   # %DRC%
   # @name -
   # @brief Boolean NOT between the results of two expressions
-  # @synopsis expr - expr
+  # @synopsis expression - expression
   #
   # The - operator will compute the difference between the results
   # of two expressions. The NOT operation is defined for polygons,
@@ -119,7 +120,7 @@ class DRCOpNode
   # %DRC%
   # @name ^
   # @brief Boolean XOR between the results of two expressions
-  # @synopsis expr - expr
+  # @synopsis expression - expression
   #
   # The ^ operator will compute the XOR (symmetric difference) between the results
   # of two expressions. The XOR operation is defined for polygons and edges.
@@ -138,7 +139,7 @@ CODE
   # %DRC%
   # @name !
   # @brief Logical not
-  # @synopsis ! expr
+  # @synopsis ! expression
   #
   # This operator will evaluate the expression after. If this expression renders
   # an empty result, the operator will return the primary shape. Otherwise it will
@@ -168,7 +169,7 @@ CODE
   # %DRC%
   # @name area
   # @brief Selects the primary shape if the area is meeting the condition
-  # @synopsis area (in condition)
+  # @synopsis expression.area (in condition)
   #
   # This operation is used in conditions to select shapes based on their area.
   # It is applicable on polygon expressions. The result will be the input 
@@ -182,6 +183,9 @@ CODE
   # out = in.drc(area < 2.0)
   # out = in.drc(primary.area < 2.0)   # equivalent
   # @/code
+  #
+  # The area method is available as a plain function or as a method on \DRC expressions.
+  # The plain function is equivalent to "primary.area".
   
   def area
     DRCOpNodeAreaFilter::new(@engine, self)
@@ -190,7 +194,7 @@ CODE
   # %DRC%
   # @name count
   # @brief Selects a expression result based on the number of (local) shapes
-  # @synopsis count (in condition)
+  # @synopsis expression.count (in condition)
   #
   # This operation is used in conditions to select expression results based on their
   # count. "count" is used as a method on a expression. It will evaluate the expression locally
@@ -219,7 +223,7 @@ CODE
   # %DRC%
   # @name perimeter
   # @brief Selects the primary shape if the perimeter is meeting the condition
-  # @synopsis perimeter (in condition)
+  # @synopsis expression.perimeter (in condition)
   #
   # This operation is used in conditions to select shapes based on their perimeter.
   # It is applicable on polygon expressions. The result will be the input 
@@ -233,6 +237,9 @@ CODE
   # out = in.drc(perimeter < 10.0)
   # out = in.drc(primary.perimeter < 10.0)   # equivalent
   # @/code
+  #
+  # The perimeter method is available as a plain function or as a method on \DRC expressions.
+  # The plain function is equivalent to "primary.perimeter".
   
   def perimeter
     DRCOpNodePerimeterFilter::new(@engine, self)
@@ -241,7 +248,7 @@ CODE
   # %DRC%
   # @name bbox_min
   # @brief Selects the primary shape if its bounding box smaller dimension is meeting the condition
-  # @synopsis bbox_min (in condition)
+  # @synopsis expression.bbox_min (in condition)
   #
   # This operation is used in conditions to select shapes based on smaller dimension of their bounding boxes.
   # It is applicable on polygon expressions. The result will be the input 
@@ -256,6 +263,9 @@ CODE
   # out = in.drc(bbox_min > 200.nm)
   # out = in.drc(primary.bbox_min > 200.nm)   # equivalent
   # @/code
+  #
+  # The "bbox_min" method is available as a plain function or as a method on \DRC expressions.
+  # The plain function is equivalent to "primary.bbox_min".
   
   def bbox_min
     DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::BoxMinDim, self)
@@ -264,10 +274,13 @@ CODE
   # %DRC%
   # @name bbox_max
   # @brief Selects the primary shape if its bounding box larger dimension is meeting the condition
-  # @synopsis bbox_max (in condition)
+  # @synopsis expression.bbox_max (in condition)
   # 
   # This operation acts similar to \DRC#bbox_min, but takes the larger dimension of the shape's 
   # bounding box.
+  #
+  # The "bbox_max" method is available as a plain function or as a method on \DRC expressions.
+  # The plain function is equivalent to "primary.bbox_max".
 
   def bbox_max
     DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::BoxMaxDim, self)
@@ -276,13 +289,16 @@ CODE
   # %DRC%
   # @name bbox_width
   # @brief Selects the primary shape if its bounding box width is meeting the condition
-  # @synopsis bbox_width (in condition)
+  # @synopsis expression.bbox_width (in condition)
   # 
   # This operation acts similar to \DRC#bbox_min, but takes the width of the shape's 
   # bounding box. In general, it's more advisable to use \DRC#bbox_min or \DRC#bbox_max
   # because bbox_width implies a certain orientation. This can imply variant formation in 
   # hierarchical contexts: cells rotated by 90 degree have to be treated differently from
   # ones not rotated. This usually results in a larger computation effort and larger result files.
+  #
+  # The "bbox_width" method is available as a plain function or as a method on \DRC expressions.
+  # The plain function is equivalent to "primary.bbox_width".
 
   def bbox_width
     DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::BoxWidth, self)
@@ -291,13 +307,16 @@ CODE
   # %DRC%
   # @name bbox_height
   # @brief Selects the primary shape if its bounding box height is meeting the condition
-  # @synopsis bbox_height (in condition)
+  # @synopsis expression.bbox_height (in condition)
   # 
   # This operation acts similar to \DRC#bbox_min, but takes the height of the shape's 
   # bounding box. In general, it's more advisable to use \DRC#bbox_min or \DRC#bbox_max
   # because bbox_height implies a certain orientation. This can imply variant formation in 
   # hierarchical contexts: cells rotated by 90 degree have to be treated differently from
   # ones not rotated. This usually results in a larger computation effort and larger result files.
+  #
+  # The "bbox_height" method is available as a plain function or as a method on \DRC expressions.
+  # The plain function is equivalent to "primary.bbox_height".
 
   def bbox_height
     DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::BoxHeight, self)
@@ -306,7 +325,7 @@ CODE
   # %DRC%
   # @name length
   # @brief Selects edges based on their length
-  # @synopsis length (in condition)
+  # @synopsis expression.length (in condition)
   # 
   # This operation will select those edges which are meeting the length
   # criterion. Non-edge shapes (polygons, edge pairs) will be converted to edges before.
@@ -318,6 +337,9 @@ CODE
   # out = in.drc(length >= 1.um) 
   # out = in.drc(primary.length >= 1.um)   # equivalent
   # @/code
+  #
+  # The "length" method is available as a plain function or as a method on \DRC expressions.
+  # The plain function is equivalent to "primary.length".
 
   def length
     DRCOpNodeEdgeLengthFilter::new(@engine, self)
@@ -326,7 +348,7 @@ CODE
   # %DRC%
   # @name angle
   # @brief Selects edges based on their angle
-  # @synopsis angle (in condition)
+  # @synopsis expression.angle (in condition)
   # 
   # This operation selects edges by their angle, measured against the horizontal 
   # axis in the mathematical sense. 
@@ -350,6 +372,9 @@ CODE
   # are placed unrotated and rotated by 90 degree cannot be considered identical. This imposes
   # a performance penalty in hierarchical mode. If possible, consider using \DRC#rectilinear for
   # example to detect shapes with non-manhattan geometry instead of using angle checks.
+  #
+  # The "angle" method is available as a plain function or as a method on \DRC expressions.
+  # The plain function is equivalent to "primary.angle".
 
   def angle
     DRCOpNodeEdgeOrientationFilter::new(@engine, self)
@@ -358,10 +383,13 @@ CODE
   # %DRC%
   # @name rounded_corners
   # @brief Applies corner rounding
-  # @synopsis rounded_corners(inner, outer, n)
+  # @synopsis expression.rounded_corners(inner, outer, n)
   #
   # This operation acts on polygons and applies corner rounding the the given inner
-  # and outer corner radius and the number of points n per full circle.
+  # and outer corner radius and the number of points n per full circle. See \Layer#rounded_corners for more details.
+  #
+  # The "rounded_corners" method is available as a plain function or as a method on \DRC expressions.
+  # The plain function is equivalent to "primary.rounded_corners".
 
   def rounded_corners(inner, outer, n)
     @engine._context("rounded_corners") do
@@ -373,9 +401,12 @@ CODE
   # %DRC%
   # @name smoothed
   # @brief Applies smoothing
-  # @synopsis smoothed(d)
+  # @synopsis expression.smoothed(d)
   #
-  # This operation acts on polygons and applies polygon smoothing with the tolerance d.
+  # This operation acts on polygons and applies polygon smoothing with the tolerance d. See \Layer#smoothed for more details.
+  #
+  # The "smoothed" method is available as a plain function or as a method on \DRC expressions.
+  # The plain function is equivalent to "primary.smoothed".
 
   def smoothed(d)
     @engine._context("smoothed") do
@@ -386,9 +417,9 @@ CODE
   # %DRC%
   # @name corners (in condition)
   # @brief Applies smoothing
-  # @synopsis corners
-  # @synopsis corners(as_dots)
-  # @synopsis corners(as_boxes)
+  # @synopsis expression.corners
+  # @synopsis expression.corners(as_dots)
+  # @synopsis expression.corners(as_boxes)
   #
   # This operation acts on polygons and selects the corners of the polygons.
   # It can be put into a condition to select corners by their angles. The angle of
@@ -412,6 +443,9 @@ CODE
   # out = in.drc(corners < 0)
   # out = in.drc(primary.corners < 0)    # equivalent
   # @/code
+  #
+  # The "corners" method is available as a plain function or as a method on \DRC expressions.
+  # The plain function is equivalent to "primary.corners".
 
   def corners(as_dots = DRCAsDots::new(false))
     @engine._context("corners") do
@@ -427,7 +461,7 @@ CODE
   # %DRC%
   # @name middle
   # @brief Returns the centers of polygon bounding boxes
-  # @synopsis middle([ options ])
+  # @synopsis expression.middle([ options ])
   #
   # The middle operation acts on polygons and has the same effect than \Layer#middle.
   # It takes the same arguments. It is available as a method on \DRC expressions or
@@ -436,7 +470,7 @@ CODE
   # %DRC%
   # @name extent_refs
   # @brief Returns partial references to the boundings boxes of the polygons
-  # @synopsis extent_refs([ options ])
+  # @synopsis expression.extent_refs([ options ])
   #
   # The extent_refs operation acts on polygons and has the same effect than \Layer#extent_refs.
   # It takes the same arguments. It is available as a method on \DRC expressions or
@@ -518,7 +552,7 @@ CODE
   # %DRC%
   # @name odd_polygons
   # @brief Selects all polygons which are non-orientable
-  # @synopsis odd_polygons
+  # @synopsis expression.odd_polygons
   #
   # Non-orientable polygons are for example "8"-shape polygons. Such polygons are
   # usually considered harmful as their definition of covered area is depending on the
@@ -534,7 +568,7 @@ CODE
   # %DRC%
   # @name rectangles
   # @brief Selects all polygons which are rectangles
-  # @synopsis rectangles
+  # @synopsis expression.rectangles
   #
   # This operation can be used as a plain function in which case it acts on primary
   # shapes or can be used as method on another DRC expression.
@@ -552,7 +586,7 @@ CODE
   # %DRC%
   # @name rectilinear
   # @brief Selects all polygons which are rectilinear
-  # @synopsis rectilinear
+  # @synopsis expression.rectilinear
   #
   # Rectilinear polygons only have vertical and horizontal edges. Such polygons are also
   # called manhattan polygons.
@@ -573,7 +607,7 @@ CODE
   # %DRC%
   # @name holes
   # @brief Selects all holes from the input polygons
-  # @synopsis holes
+  # @synopsis expression.holes
   #
   # This operation can be used as a plain function in which case it acts on primary
   # shapes or can be used as method on another DRC expression.
@@ -591,7 +625,7 @@ CODE
   # %DRC%
   # @name hulls
   # @brief Selects all hulls from the input polygons
-  # @synopsis hulls
+  # @synopsis expression.hulls
   #
   # The hulls are the outer contours of the input polygons. By selecting hulls only,
   # all holes will be closed.
@@ -612,7 +646,7 @@ CODE
   # %DRC%
   # @name edges
   # @brief Converts the input shapes into edges
-  # @synopsis edges
+  # @synopsis expression.edges
   #
   # Polygons will be separated into edges forming their contours. Edge pairs will be 
   # decomposed into individual edges.
@@ -633,8 +667,8 @@ CODE
   # %DRC%
   # @name merged
   # @brief Returns the merged input polygons, optionally selecting multi-overlap
-  # @synopsis merged
-  # @synopsis merged(min_count)
+  # @synopsis expression.merged
+  # @synopsis expression.merged(min_count)
   #
   # This operation will act on polygons. Without a min_count argument, the merged
   # polygons will be returned.
@@ -642,6 +676,9 @@ CODE
   # With a min_count argument, the result will include only those parts where more
   # than the given number of polygons overlap. As the primary input is merged already,
   # it will always contribute as one.
+  #
+  # The "merged" method is available as a plain function or as a method on \DRC expressions.
+  # The plain function is equivalent to "primary.merged".
   
   def merged(*args)
 
@@ -664,7 +701,17 @@ CODE
 
   end
   
-  # ....
+  # %DRC%
+  # @name sized
+  # @brief Returns the sized version of the input
+  # @synopsis expression.sized(d [, mode])
+  # @synopsis expression.sized(dx, dy [, mode]))
+  #
+  # This method provides the same functionality as \Layer#sized and takes the same
+  # arguments. It acts on polygon expressions.
+  #
+  # The "sized" method is available as a plain function or as a method on \DRC expressions.
+  # The plain function is equivalent to "primary.sized".
 
   def sized(*args)
 
@@ -701,12 +748,40 @@ CODE
 
   end
   
+  # %DRC%
+  # @name extents
+  # @brief Returns the bounding box of each input object
+  # @synopsis expression.extents([ enlargement ])
+  # 
+  # This method provides the same functionality as \Layer#extents and takes the same
+  # arguments. It returns the bounding boxes of the input objects. It acts on edge
+  # edge pair and polygon expressions.
+  #
+  # The "extents" method is available as a plain function or as a method on \DRC expressions.
+  # The plain function is equivalent to "primary.extents".
+
   def extents(e = 0)
     @engine._context("extents") do
       DRCOpNodeFilter::new(@engine, self, :new_extents, "extents", @engine._make_value(e))
     end
   end
   
+  # %DRC%
+  # @name first_edges
+  # @brief Returns the first edges of edge pairs
+  # @synopsis expression.extents([ enlargement ])
+  # 
+  # This method acts on edge pair expressions and returns the first edges of the
+  # edge pairs delivered by the expression.
+
+  # %DRC%
+  # @name second_edges
+  # @brief Returns the second edges of edge pairs
+  # @synopsis expression.extents([ enlargement ])
+  # 
+  # This method acts on edge pair expressions and returns the second edges of the
+  # edge pairs delivered by the expression.
+
   def first_edges
     DRCOpNodeFilter::new(@engine, self, :new_edge_pair_to_first_edges, "first_edges")
   end
@@ -715,6 +790,33 @@ CODE
     DRCOpNodeFilter::new(@engine, self, :new_edge_pair_to_second_edges, "second_edges")
   end
 
+  # %DRC%
+  # @name end_segments 
+  # @brief Returns the part at the end of each edge of the input
+  # @synopsis expression.end_segments(length)
+  # @synopsis expression.end_segments(length, fraction)
+  #
+  # This method acts on edge expressions and delivers a specific part of each edge.
+  # See \layer#end_segments for details about this functionality.
+  
+  # %DRC%
+  # @name start_segments 
+  # @brief Returns the part at the beginning of each edge of the input
+  # @synopsis expression.start_segments(length)
+  # @synopsis expression.start_segments(length, fraction)
+  #
+  # This method acts on edge expressions and delivers a specific part of each edge.
+  # See \layer#start_segments for details about this functionality.
+  
+  # %DRC%
+  # @name centers 
+  # @brief Returns the part at the center of each edge of the input
+  # @synopsis expression.centers(length)
+  # @synopsis expression.end_segments(length, fraction)
+  #
+  # This method acts on edge expressions and delivers a specific part of each edge.
+  # See \layer#centers for details about this functionality.
+  
   def end_segments(length, fraction = 0.0)
     @engine._context("end_segments") do
       @engine._check_numeric(fraction)
@@ -735,6 +837,18 @@ CODE
       DRCOpNodeFilter::new(@engine, self, :new_centers, "centers", @engine._make_value(length), fraction)
     end
   end
+
+  # %DRC%
+  # @name extended
+  # @brief Returns polygons describing an area along the edges of the input
+  # @synopsis expression.extended([:begin => b,] [:end => e,] [:out => o,] [:in => i], [:joined => true])
+  # @synopsis expression.extended(b, e, o, i)
+  # 
+  # This method acts on edge expressions.
+  # It will create a polygon for each edge
+  # tracing the edge with certain offsets to the edge. "o" is the offset applied to the 
+  # outer side of the edge, "i" is the offset applied to the inner side of the edge.
+  # "b" is the offset applied at the beginning and "e" is the offset applied at the end.
   
   def extended(*args)
   
@@ -761,6 +875,30 @@ CODE
     
   end
   
+  # %DRC%
+  # @name extended_in
+  # @brief Returns polygons describing an area along the edges of the input
+  # @synopsis expression.extended_in(d)
+  #
+  # This method acts on edge expressions. Polygons are generated for 
+  # each edge describing the edge drawn with a certain width extending into
+  # the "inside" (the right side when looking from start to end).
+  # This method is basically equivalent to the \extended method:
+  # "extended(0, 0, 0, dist)".
+  # A version extending to the outside is \extended_out.
+  
+  # %DRC%
+  # @name extended_out
+  # @brief Returns polygons describing an area along the edges of the input
+  # @synopsis expression.extended_out(d)
+  #
+  # This method acts on edge expressions. Polygons are generated for 
+  # each edge describing the edge drawn with a certain width extending into
+  # the "outside" (the left side when looking from start to end).
+  # This method is basically equivalent to the \extended method:
+  # "extended(0, 0, dist, 0)".
+  # A version extending to the inside is \extended_in.
+
   def extended_in(e)
     @engine._context("extended_in") do
       DRCOpNodeFilter::new(@engine, self, :new_extended_in, "extended_in", self._make_value(e))
@@ -773,9 +911,30 @@ CODE
     end
   end
   
-  def polygons
+  # %DRC%
+  # @name polygons
+  # @brief Converts the input shapes into polygons
+  # @synopsis expression.polygons([ enlargement ])
+  #
+  # Generates polygons from the input shapes. Polygons stay polygons. Edges and edge pairs
+  # are converted to polygons. For this, the enlargement parameter will specify the 
+  # edge thickness or augmentation applied to edge pairs. With the default enlargement
+  # of zero edges will not be converted to valid polygons and degenerated edge pairs
+  # will not become valid polygons as well.
+  #
+  # Contrary most other operations, "polygons" does not have a plain function equivalent
+  # as this is reserved for the function generating a polygon layer.
+  #
+  # This method is useful for generating polygons from DRC violation markers as shown in
+  # the following example:
+  #
+  # @code
+  # out = in.drc((width < 0.5.um).polygons)
+  # @/code
+  
+  def polygons(e = 0)
     @engine._context("polygons") do
-      DRCOpNodeFilter::new(@engine, self, :new_polygons, "polygons")
+      DRCOpNodeFilter::new(@engine, self, :new_polygons, "polygons", self._make_value(e))
     end
   end
   

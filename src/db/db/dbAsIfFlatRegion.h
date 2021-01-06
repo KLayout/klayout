@@ -60,45 +60,14 @@ public:
   virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node);
   virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node);
 
-  EdgePairsDelegate *width_check (db::Coord d, const RegionCheckOptions &options) const
-  {
-    return run_single_polygon_check (db::WidthRelation, d, options);
-  }
-
-  EdgePairsDelegate *space_check (db::Coord d, const RegionCheckOptions &options) const
-  {
-    return run_check (db::SpaceRelation, false, 0, d, options);
-  }
-
-  EdgePairsDelegate *isolated_check (db::Coord d, const RegionCheckOptions &options) const
-  {
-    return run_check (db::SpaceRelation, true, 0, d, options);
-  }
-
-  EdgePairsDelegate *notch_check (db::Coord d, const RegionCheckOptions &options) const
-  {
-    return run_single_polygon_check (db::SpaceRelation, d, options);
-  }
-
-  EdgePairsDelegate *enclosing_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const
-  {
-    return run_check (db::OverlapRelation, true, &other, d, options);
-  }
-
-  EdgePairsDelegate *overlap_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const
-  {
-    return run_check (db::WidthRelation, true, &other, d, options);
-  }
-
-  EdgePairsDelegate *separation_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const
-  {
-    return run_check (db::SpaceRelation, true, &other, d, options);
-  }
-
-  EdgePairsDelegate *inside_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const
-  {
-    return run_check (db::InsideRelation, true, &other, d, options);
-  }
+  EdgePairsDelegate *width_check (db::Coord d, const RegionCheckOptions &options) const;
+  EdgePairsDelegate *space_check (db::Coord d, const RegionCheckOptions &options) const;
+  EdgePairsDelegate *isolated_check (db::Coord d, const RegionCheckOptions &options) const;
+  EdgePairsDelegate *notch_check (db::Coord d, const RegionCheckOptions &options) const;
+  EdgePairsDelegate *enclosing_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const;
+  EdgePairsDelegate *overlap_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const;
+  EdgePairsDelegate *separation_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const;
+  EdgePairsDelegate *inside_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const;
 
   virtual EdgePairsDelegate *grid_check (db::Coord gx, db::Coord gy) const;
   virtual EdgePairsDelegate *angle_check (double min, double max, bool inverse) const;
@@ -298,6 +267,7 @@ private:
 
   virtual db::Box compute_bbox () const;
   static RegionDelegate *region_from_box (const db::Box &b);
+  EdgePairsDelegate *space_or_isolated_check (db::Coord d, const RegionCheckOptions &options, bool isolated) const;
 };
 
 }

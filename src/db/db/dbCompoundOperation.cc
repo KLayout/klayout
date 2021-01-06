@@ -1487,7 +1487,7 @@ CompoundRegionEdgePairToEdgeProcessingOperationNode::do_compute_local (db::Layou
 // ---------------------------------------------------------------------------------------------
 
 CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (db::edge_relation_type rel, bool different_polygons, db::Coord d, const db::RegionCheckOptions &options)
-  : CompoundRegionMultiInputOperationNode (), m_check (rel, d, options.metrics), m_different_polygons (different_polygons), m_options (options)
+  : CompoundRegionMultiInputOperationNode (), m_check (rel, d, options.metrics), m_different_polygons (different_polygons), m_options (options), m_has_other (false), m_is_other_merged (false)
 {
   set_description ("check");
 
@@ -1499,7 +1499,7 @@ CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (db::edge_rel
 }
 
 CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (CompoundRegionOperationNode *input, db::edge_relation_type rel, bool different_polygons, db::Coord d, const db::RegionCheckOptions &options)
-  : CompoundRegionMultiInputOperationNode (input), m_check (rel, d, options.metrics), m_different_polygons (different_polygons), m_options (options)
+  : CompoundRegionMultiInputOperationNode (input), m_check (rel, d, options.metrics), m_different_polygons (different_polygons), m_options (options), m_has_other (false), m_is_other_merged (false)
 {
   set_description ("check");
 
@@ -1513,6 +1513,18 @@ CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (CompoundRegi
 CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (CompoundRegionOperationNode * /*input*/, CompoundRegionOperationNode *other, db::edge_relation_type rel, bool different_polygons, db::Coord d, const db::RegionCheckOptions &options)
   : CompoundRegionMultiInputOperationNode (other), m_check (rel, d, options.metrics), m_different_polygons (different_polygons), m_options (options)
 {
+  m_has_other = false;
+  std::vector<db::Region *> other_inputs = other->inputs ();
+  if (other_inputs.size () > 1) {
+    m_has_other = true;
+    m_is_other_merged = false;   //  or do we know better?
+  } else if (other_inputs.size () == 1) {
+    if (! is_subject_regionptr (other_inputs.front ())) {
+      m_has_other = true;
+      m_is_other_merged = other_inputs.front ()->is_merged ();
+    }
+  }
+
   set_description ("check");
 
   m_check.set_include_zero (false);
@@ -1525,7 +1537,7 @@ CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (CompoundRegi
 db::OnEmptyIntruderHint
 CompoundRegionCheckOperationNode::on_empty_intruder_hint () const
 {
-  return (m_different_polygons || !inputs ().empty ()) ? OnEmptyIntruderHint::Drop : OnEmptyIntruderHint::Ignore;
+  return (m_different_polygons || m_has_other) ? OnEmptyIntruderHint::Drop : OnEmptyIntruderHint::Ignore;
 }
 
 db::Coord
@@ -1543,9 +1555,7 @@ CompoundRegionCheckOperationNode::wants_merged () const
 void
 CompoundRegionCheckOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const
 {
-  bool other_merged = (children () > 0 && is_subject_regionptr (inputs ()[0]));
-
-  db::check_local_operation<db::Polygon, db::Polygon> op (m_check, m_different_polygons, children () > 0, other_merged, m_options);
+  db::check_local_operation<db::Polygon, db::Polygon> op (m_check, m_different_polygons, m_has_other, m_is_other_merged, m_options);
 
   tl_assert (results.size () == 1);
   if (results.front ().empty ()) {
@@ -1561,9 +1571,7 @@ CompoundRegionCheckOperationNode::do_compute_local (db::Layout *layout, const sh
 void
 CompoundRegionCheckOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const
 {
-  bool other_merged = (children () > 0 && is_subject_regionptr (inputs ()[0]));
-
-  db::check_local_operation<db::PolygonRef, db::PolygonRef> op (m_check, m_different_polygons, children () > 0, other_merged, m_options);
+  db::check_local_operation<db::PolygonRef, db::PolygonRef> op (m_check, m_different_polygons, m_has_other, m_is_other_merged, m_options);
 
   tl_assert (results.size () == 1);
   if (results.front ().empty ()) {

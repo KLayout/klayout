@@ -77,6 +77,11 @@ public:
     return m_interactions.end ();
   }
 
+  size_t num_interactions () const
+  {
+    return m_interactions.size ();
+  }
+
   subject_iterator begin_subjects () const
   {
     return m_subject_shapes.begin ();
@@ -87,6 +92,11 @@ public:
     return m_subject_shapes.end ();
   }
 
+  size_t num_subjects () const
+  {
+    return m_subject_shapes.size ();
+  }
+
   intruder_iterator begin_intruders () const
   {
     return m_intruder_shapes.begin ();
@@ -95,6 +105,11 @@ public:
   intruder_iterator end_intruders () const
   {
     return m_intruder_shapes.end ();
+  }
+
+  size_t num_intruders () const
+  {
+    return m_intruder_shapes.size ();
   }
 
   bool has_intruder_shape_id (unsigned int id) const;

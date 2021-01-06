@@ -418,14 +418,25 @@ static db::CompoundRegionOperationNode *new_width_check (db::Coord d, bool whole
   return new db::CompoundRegionToEdgePairProcessingOperationNode (new db::SinglePolygonCheck (db::WidthRelation, d, options), new_primary (), true /*processor is owned*/);
 }
 
+static db::CompoundRegionOperationNode *new_space_or_isolated_check (db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter, bool negative, bool isolated)
+{
+  if (opposite_filter != db::NoOppositeFilter || rect_filter != db::NoSideAllowed) {
+    //  NOTE: we have to use the "foreign" scheme with a filter because only this scheme
+    //  guarantees that all subject shapes are visited and receive all intruders.
+    return new_check_node (new_foreign (), db::SpaceRelation, isolated, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, opposite_filter, rect_filter, negative);
+  } else {
+    return new_check_node (db::SpaceRelation, isolated, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, opposite_filter, rect_filter, negative);
+  }
+}
+
 static db::CompoundRegionOperationNode *new_space_check (db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter, bool negative)
 {
-  return new_check_node (db::SpaceRelation, false, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, opposite_filter, rect_filter, negative);
+  return new_space_or_isolated_check (d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, opposite_filter, rect_filter, negative, false);
 }
 
 static db::CompoundRegionOperationNode *new_isolated_check (db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter, bool negative)
 {
-  return new_check_node (db::SpaceRelation, true, d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, opposite_filter, rect_filter, negative);
+  return new_space_or_isolated_check (d, whole_edges, metrics, ignore_angle, min_projection, max_projection, shielded, opposite_filter, rect_filter, negative, true);
 }
 
 static db::CompoundRegionOperationNode *new_notch_check (db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool negative)

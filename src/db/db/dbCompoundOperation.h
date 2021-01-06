@@ -1410,6 +1410,8 @@ private:
   db::EdgeRelationFilter m_check;
   bool m_different_polygons;
   db::RegionCheckOptions m_options;
+  bool m_has_other;
+  bool m_is_other_merged;
 };
 
 
@@ -1435,35 +1437,14 @@ public:
   { }
 
 protected:
-  virtual void compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio) const
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio) const
   {
-    for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-
-      const TS &subject_shape = interactions.subject_shape (i->first);
-
-      shape_interactions<TS, TI> single_interactions;
-
-      if (on_empty_intruder_hint () == OnEmptyIntruderHint::Drop) {
-        single_interactions.add_subject_shape (i->first, subject_shape);
-      } else {
-        //  this includes the subject-without-intruder "interaction"
-        single_interactions.add_subject (i->first, subject_shape);
-      }
-
-      const std::vector<unsigned int> &intruders = interactions.intruders_for (i->first);
-      for (typename std::vector<unsigned int>::const_iterator ii = intruders.begin (); ii != intruders.end (); ++ii) {
-        const std::pair<unsigned int, TI> &is = interactions.intruder_shape (*ii);
-        single_interactions.add_intruder_shape (*ii, is.first, is.second);
-        single_interactions.add_interaction (i->first, *ii);
-      }
-
-      mp_node->compute_local (layout, single_interactions, results, max_vertex_count, area_ratio);
-
-    }
+    mp_node->compute_local (layout, interactions, results, max_vertex_count, area_ratio);
   }
 
   virtual db::Coord dist () const { return mp_node->dist (); }
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const { return mp_node->on_empty_intruder_hint (); }
+  virtual bool requests_single_subjects () const { return true; }
   virtual std::string description () const { return mp_node->description (); }
 
   const TransformationReducer *vars () const { return mp_node->vars (); }

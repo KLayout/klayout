@@ -1094,6 +1094,66 @@ AsIfFlatRegion::cop_to_edges (db::CompoundRegionOperationNode &node)
 }
 
 EdgePairsDelegate *
+AsIfFlatRegion::width_check (db::Coord d, const RegionCheckOptions &options) const
+{
+  return run_single_polygon_check (db::WidthRelation, d, options);
+}
+
+EdgePairsDelegate *
+AsIfFlatRegion::space_or_isolated_check (db::Coord d, const RegionCheckOptions &options, bool isolated) const
+{
+  if (options.opposite_filter != NoOppositeFilter || options.rect_filter != NoSideAllowed) {
+    //  NOTE: we have to use the "foreign" scheme with a filter because only this scheme
+    //  guarantees that all subject shapes are visited.
+    return run_check (db::SpaceRelation, isolated, foreign_regionptr (), d, options);
+  } else {
+    return run_check (db::SpaceRelation, isolated, subject_regionptr (), d, options);
+  }
+}
+
+EdgePairsDelegate *
+AsIfFlatRegion::space_check (db::Coord d, const RegionCheckOptions &options) const
+{
+  return space_or_isolated_check (d, options, false);
+}
+
+EdgePairsDelegate *
+AsIfFlatRegion::isolated_check (db::Coord d, const RegionCheckOptions &options) const
+{
+  return space_or_isolated_check (d, options, true);
+}
+
+EdgePairsDelegate *
+AsIfFlatRegion::notch_check (db::Coord d, const RegionCheckOptions &options) const
+{
+  return run_single_polygon_check (db::SpaceRelation, d, options);
+}
+
+EdgePairsDelegate *
+AsIfFlatRegion::enclosing_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const
+{
+  return run_check (db::OverlapRelation, true, &other, d, options);
+}
+
+EdgePairsDelegate *
+AsIfFlatRegion::overlap_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const
+{
+  return run_check (db::WidthRelation, true, &other, d, options);
+}
+
+EdgePairsDelegate *
+AsIfFlatRegion::separation_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const
+{
+  return run_check (db::SpaceRelation, true, &other, d, options);
+}
+
+EdgePairsDelegate *
+AsIfFlatRegion::inside_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const
+{
+  return run_check (db::InsideRelation, true, &other, d, options);
+}
+
+EdgePairsDelegate *
 AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const
 {
 #if defined(USE_LOCAL_PROCESSOR)
@@ -1107,19 +1167,31 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   check.set_min_projection (options.min_projection);
   check.set_max_projection (options.max_projection);
 
-  db::check_local_operation<db::Polygon, db::Polygon> op (check, different_polygons, other != 0, other && other->is_merged (), options);
-
   db::local_processor<db::Polygon, db::Polygon, db::EdgePair> proc;
   proc.set_base_verbosity (base_verbosity ());
 
   std::vector<generic_shape_iterator<db::Polygon> > others;
-  others.push_back (other ? other->begin () : begin_merged ());
+  std::vector<bool> foreign;
+  bool has_other = false;
+  bool other_is_merged = true;
+
+  if (other == subject_regionptr () || other == foreign_regionptr ()) {
+    foreign.push_back (other == foreign_regionptr ());
+    others.push_back (begin_merged ());
+  } else {
+    foreign.push_back (false);
+    others.push_back (other->begin ());
+    other_is_merged = other->is_merged ();
+    has_other = true;
+  }
+
+  db::check_local_operation<db::Polygon, db::Polygon> op (check, different_polygons, has_other, other_is_merged, options);
 
   std::auto_ptr<FlatEdgePairs> output (new FlatEdgePairs ());
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_edge_pairs ());
 
-  proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
+  proc.run_flat (polygons, others, foreign, &op, results);
 
   return output.release ();
 

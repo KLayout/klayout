@@ -1429,11 +1429,20 @@ EdgePairsDelegate *
 DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const
 {
   const db::DeepRegion *other_deep = 0;
-  if (other) {
+  unsigned int other_layer = 0;
+  bool other_is_merged = true;
+
+  if (other == subject_regionptr ()) {
+    other_layer = subject_idlayer ();
+  } else if (other == foreign_regionptr ()) {
+    other_layer = foreign_idlayer ();
+  } else {
     other_deep = dynamic_cast<const db::DeepRegion *> (other->delegate ());
     if (! other_deep) {
       return db::AsIfFlatRegion::run_check (rel, different_polygons, other, d, options);
     }
+    other_layer = other_deep->deep_layer ().layer ();
+    other_is_merged = other->is_merged ();
   }
 
   const db::DeepLayer &polygons = merged_deep_layer ();
@@ -1447,7 +1456,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 
   std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
 
-  db::CheckLocalOperation op (check, different_polygons, other_deep != 0, other && other->is_merged (), options);
+  db::CheckLocalOperation op (check, different_polygons, other_deep != 0, other_is_merged, options);
 
   db::local_processor<db::PolygonRef, db::PolygonRef, db::EdgePair> proc (const_cast<db::Layout *> (&polygons.layout ()),
                                                                           const_cast<db::Cell *> (&polygons.initial_cell ()),
@@ -1459,7 +1468,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (polygons.store ()->threads ());
 
-  proc.run (&op, polygons.layer (), other_deep ? other_deep->deep_layer ().layer () : polygons.layer (), res->deep_layer ().layer ());
+  proc.run (&op, polygons.layer (), other_layer, res->deep_layer ().layer ());
 
   return res.release ();
 }

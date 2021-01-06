@@ -60,7 +60,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void compute_local (db::Layout *layout, const db::shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
+  virtual void do_compute_local (db::Layout *layout, const db::shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
   {
     db::shape_interactions<db::PolygonRef, db::PolygonRef> sized_interactions = interactions;
     for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = sized_interactions.begin (); i != sized_interactions.end (); ++i) {
@@ -72,7 +72,7 @@ public:
       }
     }
 
-    BoolAndOrNotLocalOperation::compute_local (layout, sized_interactions, results, max_vertex_count, area_ratio);
+    BoolAndOrNotLocalOperation::do_compute_local (layout, sized_interactions, results, max_vertex_count, area_ratio);
   }
 
   db::Coord dist () const
@@ -97,7 +97,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void compute_local (db::Layout *layout, const db::shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
+  virtual void do_compute_local (db::Layout *layout, const db::shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
   {
     db::shape_interactions<db::PolygonRef, db::PolygonRef> sized_interactions = interactions;
     for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = sized_interactions.begin (); i != sized_interactions.end (); ++i) {
@@ -118,7 +118,7 @@ public:
 
     }
 
-    SelfOverlapMergeLocalOperation::compute_local (layout, sized_interactions, results, max_vertex_count, area_ratio);
+    SelfOverlapMergeLocalOperation::do_compute_local (layout, sized_interactions, results, max_vertex_count, area_ratio);
   }
 
   db::Coord dist () const

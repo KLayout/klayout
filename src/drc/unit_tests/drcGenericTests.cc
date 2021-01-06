@@ -28,7 +28,7 @@
 #include "lymMacro.h"
 #include "tlFileUtils.h"
 
-static void runTest (tl::TestBase *_this, const std::string &number, bool deep)
+static void run_test (tl::TestBase *_this, const std::string &number, bool deep)
 {
   std::string rs = tl::testsrc ();
   rs += "/testdata/drc/drcGenericTests_" + number + ".drc";
@@ -71,20 +71,20 @@ static void runTest (tl::TestBase *_this, const std::string &number, bool deep)
 
 TEST(1)
 {
-  runTest (_this, "1", false);
+  run_test (_this, "1", false);
 }
 
 TEST(1d)
 {
-  runTest (_this, "1", true);
+  run_test (_this, "1", true);
 }
 
 TEST(2)
 {
-  runTest (_this, "2", false);
+  run_test (_this, "2", false);
 }
 
 TEST(2d)
 {
-  runTest (_this, "2", true);
+  run_test (_this, "2", true);
 }

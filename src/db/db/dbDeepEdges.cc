@@ -1078,7 +1078,7 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
     tl_assert (results.size () == 1);
     std::unordered_set<db::Edge> &result = results.front ();
@@ -1156,7 +1156,7 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
     tl_assert (results.size () == 1);
     std::unordered_set<db::Edge> &result = results.front ();
@@ -1211,7 +1211,7 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
     tl_assert (results.size () == 1);
     std::unordered_set<db::Edge> &result = results.front ();
@@ -1310,7 +1310,7 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
     tl_assert (results.size () == 1);
     std::unordered_set<db::PolygonRef> &result = results.front ();
@@ -1476,7 +1476,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
     tl_assert (results.size () == 1);
     std::unordered_set<db::EdgePair> &result = results.front ();

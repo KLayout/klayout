@@ -202,10 +202,9 @@ class check_local_operation
 public:
   check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options);
 
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
-
   virtual db::Coord dist () const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
+  virtual bool requests_single_subjects () const { return true; }
   virtual std::string description () const;
 
 private:
@@ -214,6 +213,8 @@ private:
   bool m_has_other;
   bool m_other_is_merged;
   db::RegionCheckOptions m_options;
+
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
 };
 
 typedef check_local_operation<db::PolygonRef, db::PolygonRef> CheckLocalOperation;
@@ -226,7 +227,7 @@ public:
   interacting_local_operation (int mode, bool touching, bool inverse, size_t min_count, size_t max_count);
 
   virtual db::Coord dist () const;
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
@@ -247,7 +248,7 @@ public:
   pull_local_operation (int mode, bool touching);
 
   virtual db::Coord dist () const;
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
@@ -266,7 +267,7 @@ public:
   interacting_with_edge_local_operation (bool inverse, size_t min_count, size_t max_count);
 
   virtual db::Coord dist () const;
-  virtual void compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
@@ -285,7 +286,7 @@ public:
   pull_with_edge_local_operation ();
 
   virtual db::Coord dist () const;
-  virtual void compute_local (db::Layout *, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
+  virtual void do_compute_local (db::Layout *, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 };
@@ -300,7 +301,7 @@ public:
   interacting_with_text_local_operation (bool inverse, size_t min_count, size_t max_count);
 
   virtual db::Coord dist () const;
-  virtual void compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
@@ -319,7 +320,7 @@ public:
   pull_with_text_local_operation ();
 
   virtual db::Coord dist () const;
-  virtual void compute_local (db::Layout *, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
+  virtual void do_compute_local (db::Layout *, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 };

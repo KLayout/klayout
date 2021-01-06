@@ -21,7 +21,8 @@ l1.drc(space(projection) < 1.0).polygons.output(100, 0)
 l1.drc(space(euclidian) < 1.0).polygons.output(110, 0)
 l1.drc(space(projection, projection_limits(0..2.0)) < 1.0).polygons.output(111, 0)
 l1.drc(space(projection, whole_edges) < 1.0).polygons.output(112, 0)
-l1.drc(separation(foreign, projection, only_opposite) < 1.0).polygons.output(113, 0)
+l1.drc(space(projection, only_opposite) < 1.0).output(113, 0)
+l1.drc(space(projection, not_opposite) < 1.0).output(114, 0)
 
 # notch
 l1.drc(notch(projection) <= 1.0).polygons.output(120, 0)
@@ -33,7 +34,11 @@ l1.drc(separation(projection, l2) < 1.0).polygons.output(132, 0)
 l1.drc(sep(projection, l2) < 1.0).polygons.output(133, 0)
 
 # isolation
-l1.drc(isolated(projection) < 1.0).polygons.output(140, 0)
+l1.drc(isolated(euclidian) < 1.0).polygons.output(140, 0)
+l1.drc(isolated(projection, projection_limits(0..2.0)) < 1.0).polygons.output(141, 0)
+l1.drc(isolated(projection, whole_edges) < 1.0).polygons.output(142, 0)
+l1.drc(isolated(projection, only_opposite) < 1.0).output(143, 0)
+l1.drc(isolated(projection, not_opposite) < 1.0).output(144, 0)
 
 # enclosing, overlap
 l2.drc(enclosing(l1, projection) < 1.0).polygons.output(150, 0)

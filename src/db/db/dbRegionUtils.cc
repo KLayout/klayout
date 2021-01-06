@@ -152,7 +152,6 @@ Edge2EdgeCheckBase::feed_pseudo_edges (db::box_scanner<db::Edge, size_t> &scanne
 {
   if (m_pass == 1) {
     for (std::set<std::pair<db::Edge, size_t> >::const_iterator e = m_pseudo_edges.begin (); e != m_pseudo_edges.end (); ++e) {
-//printf("@@@ PSEUDO %s[%d]\n", e->first.to_string().c_str(), int(e->second)); fflush(stdout);
       scanner.insert (&e->first, e->second);
     }
   }
@@ -258,7 +257,6 @@ Edge2EdgeCheckBase::add (const db::Edge *o1, size_t p1, const db::Edge *o2, size
       (m_pseudo_edges.find (std::make_pair (*o1, p1)) != m_pseudo_edges.end () || m_pseudo_edges.find (std::make_pair (*o2, p2)) != m_pseudo_edges.end ()) &&
       ! (m_pseudo_edges.find (std::make_pair (*o1, p1)) != m_pseudo_edges.end () && m_pseudo_edges.find (std::make_pair (*o2, p2)) != m_pseudo_edges.end ())) {
 
-//printf("@@@ PASS %d   -> %s[%d] x %s[%d]\n", m_pass, o1->to_string().c_str(), int(p1), o2->to_string().c_str(), int(p2)); fflush(stdout);
       //  Overlap or inside checks require input from different layers
       if ((! m_different_polygons || p1 != p2) && (! m_requires_different_layers || ((p1 ^ p2) & 1) != 0)) {
 
@@ -271,7 +269,6 @@ Edge2EdgeCheckBase::add (const db::Edge *o1, size_t p1, const db::Edge *o2, size
           std::swap (o1, o2);
           std::swap (p1, p2);
         }
-//printf("@@@1\n"); fflush(stdout);
 
         db::EdgePair ep;
         if (mp_check->check (*o1, *o2, &ep)) {
@@ -280,7 +277,6 @@ Edge2EdgeCheckBase::add (const db::Edge *o1, size_t p1, const db::Edge *o2, size
           m_ep.push_back (ep);
           m_e2ep.insert (std::make_pair (std::make_pair (*o1, p1), n * 2));
           m_e2ep.insert (std::make_pair (std::make_pair (*o2, p2), n * 2 + 1));
-//printf("@@@ CANCEL %s\n", ep.to_string().c_str()); fflush(stdout);
 
         }
 

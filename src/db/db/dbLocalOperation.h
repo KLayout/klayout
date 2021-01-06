@@ -89,13 +89,53 @@ public:
    *  @param layout The layout to which the shapes belong
    *  @param interactions The interaction set
    *  @param result The container to which the results are written
+   *
+   *  If the operation requests single subject mode, the interactions will be split into single subject/intruder clusters
    */
-  virtual void compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &result, size_t max_vertex_count, double area_ratio) const = 0;
+  void compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    if (interactions.num_subjects () <= 1 || ! requests_single_subjects ()) {
+
+      do_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+
+    } else {
+
+      for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+
+        const TS &subject_shape = interactions.subject_shape (i->first);
+
+        shape_interactions<TS, TI> single_interactions;
+
+        if (on_empty_intruder_hint () == OnEmptyIntruderHint::Drop) {
+          single_interactions.add_subject_shape (i->first, subject_shape);
+        } else {
+          //  this includes the subject-without-intruder "interaction"
+          single_interactions.add_subject (i->first, subject_shape);
+        }
+
+        const std::vector<unsigned int> &intruders = interactions.intruders_for (i->first);
+        for (typename std::vector<unsigned int>::const_iterator ii = intruders.begin (); ii != intruders.end (); ++ii) {
+          const std::pair<unsigned int, TI> &is = interactions.intruder_shape (*ii);
+          single_interactions.add_intruder_shape (*ii, is.first, is.second);
+          single_interactions.add_interaction (i->first, *ii);
+        }
+
+        do_compute_local (layout, single_interactions, results, max_vertex_count, area_ratio);
+
+      }
+
+    }
+  }
 
   /**
    *  @brief Indicates the desired behaviour when a shape does not have an intruder
    */
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const { return Ignore; }
+
+  /**
+   *  @brief If this method returns true, this operation requests single subjects for meal
+   */
+  virtual bool requests_single_subjects () const { return false; }
 
   /**
    *  @brief Gets a description text for this operation
@@ -107,6 +147,15 @@ public:
    *  A distance of means the shapes must overlap in order to interact.
    */
   virtual db::Coord dist () const { return 0; }
+
+protected:
+  /**
+   *  @brief Computes the results from a given set of interacting shapes
+   *  @param layout The layout to which the shapes belong
+   *  @param interactions The interaction set
+   *  @param result The container to which the results are written
+   */
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &result, size_t max_vertex_count, double area_ratio) const = 0;
 };
 
 /**
@@ -118,7 +167,7 @@ class DB_PUBLIC BoolAndOrNotLocalOperation
 public:
   BoolAndOrNotLocalOperation (bool is_and);
 
-  virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &result, size_t max_vertex_count, double area_ratio) const;
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &result, size_t max_vertex_count, double area_ratio) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
@@ -138,7 +187,7 @@ class DB_PUBLIC TwoBoolAndNotLocalOperation
 public:
   TwoBoolAndNotLocalOperation ();
 
-  virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &result, size_t max_vertex_count, double area_ratio) const;
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &result, size_t max_vertex_count, double area_ratio) const;
   virtual std::string description () const;
 };
 
@@ -153,7 +202,7 @@ class DB_PUBLIC SelfOverlapMergeLocalOperation
 public:
   SelfOverlapMergeLocalOperation (unsigned int wrap_count);
 
-  virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &result, size_t max_vertex_count, double area_ratio) const;
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &result, size_t max_vertex_count, double area_ratio) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
@@ -170,7 +219,7 @@ class DB_PUBLIC EdgeBoolAndOrNotLocalOperation
 public:
   EdgeBoolAndOrNotLocalOperation (EdgeBoolOp op);
 
-  virtual void compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &result, size_t max_vertex_count, double area_ratio) const;
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &result, size_t max_vertex_count, double area_ratio) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
@@ -193,7 +242,7 @@ class DB_PUBLIC EdgeToPolygonLocalOperation
 public:
   EdgeToPolygonLocalOperation (bool outside, bool include_borders);
 
-  virtual void compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &result, size_t max_vertex_count, double area_ratio) const;
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &result, size_t max_vertex_count, double area_ratio) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 

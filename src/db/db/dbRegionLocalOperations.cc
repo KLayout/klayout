@@ -147,13 +147,12 @@ void insert_into_hash (std::unordered_set<T> &hash, const T &shape)
 
 template <class TS, class TI>
 void
-check_local_operation<TS, TI>::compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
   tl_assert (results.size () == 1);
-  std::unordered_set<db::EdgePair> &result = results.front ();
-  tl_assert (result.empty ());
+  std::unordered_set<db::EdgePair> result;
 
-  edge2edge_check_negative_or_positive<std::unordered_set<db::EdgePair> > edge_check (m_check, result, m_options.negative, m_different_polygons, m_has_other, m_options.shielded);
+  edge2edge_check_negative_or_positive<std::unordered_set<db::EdgePair> > edge_check (m_check, result, m_options.negative, true, true, m_options.shielded);
   poly2poly_check<TS> poly_check (edge_check);
 
   std::list<TS> heap;
@@ -234,6 +233,8 @@ check_local_operation<TS, TI>::compute_local (db::Layout *layout, const shape_in
       n += 2;
     }
 
+    n = 1;
+
     for (std::set<unsigned int>::const_iterator id = ids.begin (); id != ids.end (); ++id) {
       const TI &ti = interactions.intruder_shape (*id).second;
       if (polygons.find (ti) == polygons.end ()) {
@@ -248,59 +249,155 @@ check_local_operation<TS, TI>::compute_local (db::Layout *layout, const shape_in
     scanner.process (poly_check, m_check.distance (), db::box_convert<TS> ());
   } while (edge_check.prepare_next_pass ());
 
+  //  now also handle the intra-polygon interactions if required
+
+  std::unordered_set<db::EdgePair> intra_polygon_result;
+
+  if (! m_different_polygons && ! m_has_other) {
+
+    for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+
+      std::list<TS> heap;
+
+      const TS &subject = interactions.subject_shape (i->first);
+      scanner.clear ();
+      scanner.insert (push_polygon_to_heap (layout, subject, heap), 0);
+
+      edge2edge_check_negative_or_positive<std::unordered_set<db::EdgePair> > edge_check_intra (m_check, intra_polygon_result, m_options.negative, false, false, m_options.shielded);
+      poly2poly_check<TS> poly_check_intra (edge_check_intra);
+
+      do {
+        scanner.process (poly_check_intra, m_check.distance (), db::box_convert<TS> ());
+      } while (edge_check_intra.prepare_next_pass ());
+
+    }
+
+  }
+
   //  detect and remove parts of the result which have or do not have results "opposite"
   //  ("opposite" is defined by the projection of edges "through" the subject shape)
-  if (m_options.opposite_filter != db::NoOppositeFilter && ! result.empty ()) {
+  if (m_options.opposite_filter != db::NoOppositeFilter && (! result.empty () || ! intra_polygon_result.empty ())) {
 
     db::EdgeRelationFilter opp (db::WidthRelation, std::numeric_limits<db::EdgeRelationFilter::distance_type>::max (), db::Projection);
 
-    std::vector<db::Edge> projections;
     std::unordered_set<db::EdgePair> cleaned_result;
 
-    //  filter out opposite edges
-    for (std::unordered_set<db::EdgePair>::const_iterator ep1 = result.begin (); ep1 != result.end (); ++ep1) {
+    if (m_has_other) {
 
-      projections.clear ();
+      //  filter out opposite edges: this is the case of two-layer checks where we can maintain the edge pairs but
+      //  strip them of the filtered-out part.
 
-      for (std::unordered_set<db::EdgePair>::const_iterator ep2 = result.begin (); ep2 != result.end (); ++ep2) {
+      std::vector<db::Edge> projections;
+      for (std::unordered_set<db::EdgePair>::const_iterator ep1 = result.begin (); ep1 != result.end (); ++ep1) {
 
-        if (ep1 == ep2) {
-          continue;
+        projections.clear ();
+
+        for (std::unordered_set<db::EdgePair>::const_iterator ep2 = result.begin (); ep2 != result.end (); ++ep2) {
+
+          if (ep1 == ep2) {
+            continue;
+          }
+
+          db::EdgePair ep_opp;
+          if (opp.check (ep1->first (), ep2->first (), &ep_opp)) {
+
+            bool shielded = false;
+            for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end () && ! shielded; ++i) {
+              shielded = shields_interaction (ep_opp, interactions.subject_shape (i->first));
+            }
+
+            if (! shielded) {
+              projections.push_back (ep_opp.first ());
+            }
+
+          }
+
         }
 
-        db::EdgePair ep_opp;
-        if (opp.check (ep1->first (), ep2->first (), &ep_opp)) {
-
-          bool shielded = false;
-          for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end () && ! shielded; ++i) {
-            shielded = shields_interaction (ep_opp, interactions.subject_shape (i->first));
+        if (! projections.empty ()) {
+          db::Edges ce;
+          if (m_options.opposite_filter == db::OnlyOpposite) {
+            ce = db::Edges (ep1->first ()) & db::Edges (projections.begin (), projections.end ());
+          } else if (m_options.opposite_filter == db::NotOpposite) {
+            ce = db::Edges (ep1->first ()) - db::Edges (projections.begin (), projections.end ());
           }
-
-          if (! shielded) {
-            projections.push_back (ep_opp.first ());
+          for (db::Edges::const_iterator re = ce.begin (); ! re.at_end (); ++re) {
+            cleaned_result.insert (db::EdgePair (*re, ep1->second ()));
           }
-
+        } else if (m_options.opposite_filter == db::NotOpposite) {
+          cleaned_result.insert (*ep1);
         }
 
       }
 
-      if (! projections.empty ()) {
-        db::Edges ce;
-        if (m_options.opposite_filter == db::OnlyOpposite) {
-          ce = db::Edges (ep1->first ()) & db::Edges (projections.begin (), projections.end ());
+    } else {
+
+      //  this is the single-layer case where we cannot maintain the edge pairs as we don't know how the
+      //  other side will be filtered. For the filtering we only need the first edges and both edges of the
+      //  intra-polygon checks
+
+      std::unordered_set<db::Edge> edges;
+
+      for (std::unordered_set<db::EdgePair>::const_iterator ep = result.begin (); ep != result.end (); ++ep) {
+        edges.insert (ep->first ());
+      }
+
+      for (std::unordered_set<db::EdgePair>::const_iterator ep = intra_polygon_result.begin (); ep != intra_polygon_result.end (); ++ep) {
+        edges.insert (ep->first ());
+        edges.insert (ep->second ());
+      }
+
+      //  filter out opposite edges
+      std::vector<db::Edge> projections;
+      for (std::unordered_set<db::Edge>::const_iterator e1 = edges.begin (); e1 != edges.end (); ++e1) {
+
+        projections.clear ();
+
+        for (std::unordered_set<db::Edge>::const_iterator e2 = edges.begin (); e2 != edges.end (); ++e2) {
+
+          if (e1 == e2) {
+            continue;
+          }
+
+          db::EdgePair ep_opp;
+          if (opp.check (*e1, *e2, &ep_opp)) {
+
+            bool shielded = false;
+            for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end () && ! shielded; ++i) {
+              shielded = shields_interaction (ep_opp, interactions.subject_shape (i->first));
+            }
+
+            if (! shielded) {
+              projections.push_back (ep_opp.first ());
+            }
+
+          }
+
+        }
+
+        if (! projections.empty ()) {
+          db::Edges ce;
+          if (m_options.opposite_filter == db::OnlyOpposite) {
+            ce = db::Edges (*e1) & db::Edges (projections.begin (), projections.end ());
+          } else if (m_options.opposite_filter == db::NotOpposite) {
+            ce = db::Edges (*e1) - db::Edges (projections.begin (), projections.end ());
+          }
+          for (db::Edges::const_iterator re = ce.begin (); ! re.at_end (); ++re) {
+            cleaned_result.insert (db::EdgePair (*re, re->swapped_points ()));
+          }
         } else if (m_options.opposite_filter == db::NotOpposite) {
-          ce = db::Edges (ep1->first ()) - db::Edges (projections.begin (), projections.end ());
+          cleaned_result.insert (db::EdgePair (*e1, e1->swapped_points ()));
         }
-        for (db::Edges::const_iterator re = ce.begin (); ! re.at_end (); ++re) {
-          cleaned_result.insert (db::EdgePair (*re, ep1->second ()));
-        }
-      } else if (m_options.opposite_filter == db::NotOpposite) {
-        cleaned_result.insert (*ep1);
+
       }
 
     }
 
     result.swap (cleaned_result);
+
+  } else {
+
+    result.insert (intra_polygon_result.begin (), intra_polygon_result.end ());
 
   }
 
@@ -374,6 +471,8 @@ check_local_operation<TS, TI>::compute_local (db::Layout *layout, const shape_in
     }
 
   }
+
+  results.front ().insert (result.begin (), result.end ());
 }
 
 template <class TS, class TI>
@@ -418,7 +517,7 @@ db::Coord interacting_local_operation<TS, TI, TR>::dist () const
 }
 
 template <class TS, class TI, class TR>
-void interacting_local_operation<TS, TI, TR>::compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+void interacting_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
   tl_assert (results.size () == 1);
   std::unordered_set<TR> &result = results.front ();
@@ -546,7 +645,7 @@ db::Coord pull_local_operation<TS, TI, TR>::dist () const
 }
 
 template <class TS, class TI, class TR>
-void pull_local_operation<TS, TI, TR>::compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+void pull_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
   tl_assert (results.size () == 1);
   std::unordered_set<TR> &result = results.front ();
@@ -625,7 +724,7 @@ db::Coord interacting_with_edge_local_operation<TS, TI, TR>::dist () const
 }
 
 template <class TS, class TI, class TR>
-void interacting_with_edge_local_operation<TS, TI, TR>::compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+void interacting_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
   std::unordered_map<TR, size_t> counted_results;
   bool counting = !(m_min_count == 1 && m_max_count == std::numeric_limits<size_t>::max ());
@@ -710,7 +809,7 @@ db::Coord pull_with_edge_local_operation<TS, TI, TR>::dist () const
 }
 
 template <class TS, class TI, class TR>
-void pull_with_edge_local_operation<TS, TI, TR>::compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+void pull_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
   tl_assert (results.size () == 1);
   std::unordered_set<TR> &result = results.front ();
@@ -771,7 +870,7 @@ db::Coord pull_with_text_local_operation<TS, TI, TR>::dist () const
 }
 
 template <class TS, class TI, class TR>
-void pull_with_text_local_operation<TS, TI, TR>::compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+void pull_with_text_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
   tl_assert (results.size () == 1);
   std::unordered_set<TR> &result = results.front ();
@@ -840,7 +939,7 @@ db::Coord interacting_with_text_local_operation<TS, TI, TR>::dist () const
 
 
 template <class TS, class TI, class TR>
-void interacting_with_text_local_operation<TS, TI, TR>::compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+void interacting_with_text_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
   std::unordered_map<TR, size_t> counted_results;
   bool counting = !(m_min_count == 1 && m_max_count == std::numeric_limits<size_t>::max ());

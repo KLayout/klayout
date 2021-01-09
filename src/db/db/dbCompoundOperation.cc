@@ -30,6 +30,7 @@ namespace db
 // ---------------------------------------------------------------------------------------------
 
 CompoundRegionOperationNode::CompoundRegionOperationNode ()
+  : m_dist (0)
 {
   invalidate_cache ();
 }
@@ -356,7 +357,7 @@ CompoundRegionMultiInputOperationNode::invalidate_cache () const
 }
 
 db::Coord
-CompoundRegionMultiInputOperationNode::dist () const
+CompoundRegionMultiInputOperationNode::computed_dist () const
 {
   db::Coord d = 0;
   for (tl::shared_collection<CompoundRegionOperationNode>::const_iterator i = m_children.begin (); i != m_children.end (); ++i) {
@@ -548,9 +549,9 @@ CompoundRegionGeometricalBoolOperationNode::result_type () const
 }
 
 db::Coord
-CompoundRegionGeometricalBoolOperationNode::dist () const
+CompoundRegionGeometricalBoolOperationNode::computed_dist () const
 {
-  db::Coord d = CompoundRegionMultiInputOperationNode::dist ();
+  db::Coord d = CompoundRegionMultiInputOperationNode::computed_dist ();
 
   ResultType res_a = child (0)->result_type ();
   ResultType res_b = child (1)->result_type ();
@@ -1541,7 +1542,7 @@ CompoundRegionCheckOperationNode::on_empty_intruder_hint () const
 }
 
 db::Coord
-CompoundRegionCheckOperationNode::dist () const
+CompoundRegionCheckOperationNode::computed_dist () const
 {
   return m_check.distance ();
 }

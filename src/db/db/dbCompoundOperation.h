@@ -67,21 +67,60 @@ public:
   CompoundRegionOperationNode ();
   virtual ~CompoundRegionOperationNode ();
 
+  /**
+   *  @brief Returns the description set with "set_description"
+   */
   const std::string &raw_description () const
   {
     return m_description;
   }
 
+  /**
+   *  @brief Gets the interaction distance of this operation
+   *  The returned value will be the minimum distance (set_dist) or the computed distance
+   *  (compute_dist), whichever is larger.
+   */
+  db::Coord dist () const
+  {
+    return std::max (m_dist, computed_dist ());
+  }
+
+  /**
+   *  @brief Sets a minmum distance
+   */
+  void set_dist (db::Coord d)
+  {
+    m_dist = d;
+  }
+
+  /**
+   *  @brief Gets the description for this node
+   */
   std::string description () const;
+
+  /**
+   *  @brief Sets the description for this node
+   *  If no description is set, the generated description will be used.
+   */
   void set_description (const std::string &d);
 
+  /**
+   *  @brief Returns a value giving a hint how to handle the case of empty intruders
+   */
   //  NOTE: it's probably going to be difficult to compute a different value here:
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const { return OnEmptyIntruderHint::Ignore; }
 
-  virtual db::Coord dist () const = 0;
+  /**
+   *  @brief Returns the inputs this node depends on
+   *  The returned vector may use subject_regionptr() or forein_regionptr() as abstract values
+   *  for the subject layer and the subject layer in "foreign" mode (asymmetric: other subjects are treated
+   *  as different shapes).
+   */
   virtual std::vector<db::Region *> inputs () const = 0;
 
-  //  specifies the result type
+  /**
+   *  @brief Specifies the type of shapes this node delivers
+   */
   virtual ResultType result_type () const = 0;
 
   /**
@@ -185,10 +224,13 @@ protected:
   virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> & /*interactions*/, std::vector<std::unordered_set<db::Edge> > & /*results*/,        size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
   virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> & /*interactions*/, std::vector<std::unordered_set<db::EdgePair> > & /*results*/,    size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
 
+  virtual db::Coord computed_dist () const = 0;
+
   virtual std::string generated_description () const;
 
 private:
   std::string m_description;
+  db::Coord m_dist;
   mutable std::vector<std::unordered_set<db::PolygonRef> > m_cache_polyref;
   mutable bool m_cache_polyref_valid;
   mutable std::vector<std::unordered_set<db::Polygon> > m_cache_poly;
@@ -263,7 +305,7 @@ public:
   { }
 
   virtual std::vector<db::Region *> inputs () const { return std::vector<db::Region *> (); }
-  virtual db::Coord dist () const { return 0; }
+  virtual db::Coord computed_dist () const { return 0; }
   virtual ResultType result_type () const { return m_type; }
 
 private:
@@ -279,7 +321,7 @@ public:
   virtual ~CompoundRegionOperationPrimaryNode ();
 
   virtual std::vector<db::Region *> inputs () const;
-  virtual db::Coord dist () const { return 0; }
+  virtual db::Coord computed_dist () const { return 0; }
   virtual ResultType result_type () const { return Region; }
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const;
@@ -294,7 +336,7 @@ public:
   virtual ~CompoundRegionOperationForeignNode ();
 
   virtual std::vector<db::Region *> inputs () const;
-  virtual db::Coord dist () const { return 0; }
+  virtual db::Coord computed_dist () const { return 0; }
   virtual ResultType result_type () const { return Region; }
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const;
@@ -309,7 +351,7 @@ public:
   virtual ~CompoundRegionOperationSecondaryNode ();
 
   virtual std::vector<db::Region *> inputs () const;
-  virtual db::Coord dist () const { return 0; }
+  virtual db::Coord computed_dist () const { return 0; }
   virtual ResultType result_type () const { return Region; }
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const;
@@ -349,7 +391,7 @@ public:
   CompoundRegionMultiInputOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b);
   ~CompoundRegionMultiInputOperationNode ();
 
-  virtual db::Coord dist () const;
+  virtual db::Coord computed_dist () const;
   virtual std::string generated_description () const;
 
   virtual std::vector<db::Region *> inputs () const
@@ -535,7 +577,7 @@ public:
 
   //  specifies the result type
   virtual ResultType result_type () const;
-  virtual db::Coord dist () const;
+  virtual db::Coord computed_dist () const;
 
   //  the different computation slots
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const;
@@ -586,7 +628,7 @@ public:
   virtual ResultType result_type () const { return compound_operation_type_traits<TR>::type (); }
   virtual const db::TransformationReducer *vars () const  { return mp_vars; }
   virtual bool wants_variants () const { return m_wants_variants; }
-  virtual db::Coord dist () const { return m_op->dist (); }
+  virtual db::Coord computed_dist () const { return m_op->dist (); }
   virtual bool wants_merged () const { return true; }
 
   virtual std::vector<db::Region *> inputs () const
@@ -1000,7 +1042,7 @@ public:
   //  specifies the result type
   virtual ResultType result_type () const { return Region; }
 
-  virtual db::Coord dist () const { return m_dist_adder + CompoundRegionMultiInputOperationNode::dist (); }
+  virtual db::Coord computed_dist () const { return m_dist_adder + CompoundRegionMultiInputOperationNode::computed_dist (); }
 
   virtual const TransformationReducer *vars () const { return mp_proc->vars (); }
   virtual bool wants_variants () const { return mp_proc->wants_variants (); }
@@ -1400,7 +1442,7 @@ public:
   virtual ResultType result_type () const { return EdgePairs; }
 
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
-  virtual db::Coord dist () const;
+  virtual db::Coord computed_dist () const;
   virtual bool wants_merged () const;
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const;

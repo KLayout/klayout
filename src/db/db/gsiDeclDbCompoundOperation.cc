@@ -709,6 +709,15 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   gsi::constructor ("new_empty", &new_empty, gsi::arg ("type"),
     "@brief Creates a node delivering an empty result of the given type\n"
   ) +
+  method ("distance=", &db::CompoundRegionOperationNode::set_dist, gsi::arg ("d"),
+    "@brief Sets the distance value for this node"
+    "Usually it's not required to provide a distance because the nodes compute a distance based on their "
+    "operation. If necessary you can supply a distance. The processor will use this distance or the computed one, "
+    "whichever is larger."
+  ) +
+  method ("distance", &db::CompoundRegionOperationNode::dist,
+    "@brief Gets the distance value for this node"
+  ) +
   method ("description=", &db::CompoundRegionOperationNode::set_description, gsi::arg ("d"),
     "@brief Sets the description for this node"
   ) +

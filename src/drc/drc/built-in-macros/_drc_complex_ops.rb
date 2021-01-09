@@ -902,13 +902,13 @@ CODE
 
   def extended_in(e)
     @engine._context("extended_in") do
-      DRCOpNodeFilter::new(@engine, self, :new_extended_in, "extended_in", self._make_value(e))
+      DRCOpNodeFilter::new(@engine, self, :new_extended_in, "extended_in", @engine._make_value(e))
     end
   end
   
   def extended_out(e)
     @engine._context("extended_out") do
-      DRCOpNodeFilter::new(@engine, self, :new_extended_out, "extended_out", self._make_value(e))
+      DRCOpNodeFilter::new(@engine, self, :new_extended_out, "extended_out", @engine._make_value(e))
     end
   end
   
@@ -935,7 +935,7 @@ CODE
   
   def polygons(e = 0)
     @engine._context("polygons") do
-      DRCOpNodeFilter::new(@engine, self, :new_polygons, "polygons", self._make_value(e))
+      DRCOpNodeFilter::new(@engine, self, :new_polygons, "polygons", @engine._make_value(e))
     end
   end
   

@@ -15,9 +15,11 @@ l1.output(1, 0)
 l2.output(2, 0)
 l3.output(3, 0)
 
-# sizing/foreign/merged
+# sizing/foreign/merged/extents
 
 l1.drc(sized(0.4)).output(100, 0)
 l1.drc(sized(0.4) & foreign.sized(0.4)).output(102, 0)
 l1.drc((sized(0.4) + foreign.sized(0.4)).merged(2)).output(103, 0)
+
+l1.drc(extents & foreign.extents).output(110, 0)
 

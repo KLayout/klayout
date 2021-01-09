@@ -128,3 +128,23 @@ TEST(6d)
 {
   run_test (_this, "6", true);
 }
+
+TEST(7)
+{
+  run_test (_this, "7", false);
+}
+
+TEST(7d)
+{
+  run_test (_this, "7", true);
+}
+
+TEST(8)
+{
+  run_test (_this, "8", false);
+}
+
+TEST(8d)
+{
+  run_test (_this, "8", true);
+}

@@ -1,0 +1,23 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+  threads(0) # easier to debug
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+
+# holes/hulls
+
+l12 = (l1 ^ l2)
+l12.drc(holes).output(100, 0)
+l12.drc(hulls).output(101, 0)
+

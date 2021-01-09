@@ -583,13 +583,13 @@ TEST(12)
   b.insert (db::Box (db::Point (30, 0), db::Point (100, 100)));
   EXPECT_EQ (b.separation_check (a, 15).to_string (), "(30,9;30,41)/(20,30;20,20)");
   EXPECT_EQ (b.separation_check (a, 15, true).to_string (), "(30,0;30,100)/(20,30;20,20)");
-  EXPECT_EQ (b.separation_check (a, 15, db::RegionCheckOptions (false, db::Euclidian, 91)).to_string (), "(30,9;30,20)/(20,20;15,20);(30,9;30,41)/(20,30;20,20);(30,30;30,41)/(15,30;20,30)");
+  EXPECT_EQ (b.separation_check (a, 15, db::RegionCheckOptions (false, db::Euclidian, 91)).to_string (), "(30,30;30,41)/(15,30;20,30);(30,9;30,41)/(20,30;20,20);(30,9;30,20)/(20,20;15,20)");
 
   b.clear ();
   b.insert (db::Box (db::Point (15, 0), db::Point (100, 100)));
   EXPECT_EQ (b.overlap_check (a, 15).to_string (), "(15,6;15,44)/(20,30;20,20)");
   EXPECT_EQ (b.overlap_check (a, 15, true).to_string (), "(15,0;15,100)/(20,30;20,20)");
-  EXPECT_EQ (b.overlap_check (a, 15, db::RegionCheckOptions (false, db::Euclidian, 91)).to_string (), "(15,20;15,35)/(20,20;15,20);(15,6;15,44)/(20,30;20,20);(15,15;15,30)/(15,30;20,30)");
+  EXPECT_EQ (b.overlap_check (a, 15, db::RegionCheckOptions (false, db::Euclidian, 91)).to_string (), "(15,15;15,30)/(15,30;20,30);(15,6;15,44)/(20,30;20,20);(15,20;15,35)/(20,20;15,20)");
 }
 
 TEST(20)

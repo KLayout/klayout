@@ -108,6 +108,16 @@ class DRCOpNode
   # of two expressions. The NOT operation is defined for polygons,
   # edges and polygons subtracted from edges (first argument edge,
   # second argument polygon).
+  #
+  # CAUTION: be careful not to take secondary input for the 
+  # first argument. This will not render the desired results.
+  # Remember that the "drc" function will walk over all primary
+  # shapes and present single primaries to the NOT operation together
+  # the the secondaries of that single shape. So when you use
+  # secondary shapes as the first argument, they will not see all
+  # all the primaries required to compute the correct result.
+  # That's also why a XOR operation cannot be provided in the 
+  # context of a generic DRC function.
   # 
   # The following example will produce edge markers where the 
   # width of is less then 0.3 micron but not inside polygons on 
@@ -117,16 +127,7 @@ class DRCOpNode
   # out = in.drc((width < 0.3).edges - secondary(waive))
   # @/code
   
-  # %DRC%
-  # @name ^
-  # @brief Boolean XOR between the results of two expressions
-  # @synopsis expression - expression
-  #
-  # The ^ operator will compute the XOR (symmetric difference) between the results
-  # of two expressions. The XOR operation is defined for polygons and edges.
-  # Both expressions must be of the same type.
-
-  %w(& - ^ | +).each do |f|
+  %w(& - | +).each do |f|
     eval <<"CODE"
       def #{f}(other)
         @engine._context("#{f}") do
@@ -976,10 +977,10 @@ class DRCOpNodeJoin < DRCOpNode
 
   attr_accessor :children
   
-  def initialize(engine, op, a, b)
+  def initialize(engine, cc)
     super(engine)
-    self.children = [a, b]
-    self.description = "Join #{op.to_s}"
+    self.children = cc
+    self.description = "Join"
   end
 
   def dump(indent)
@@ -988,10 +989,10 @@ class DRCOpNodeJoin < DRCOpNode
 
   def do_create_node(cache)
     nodes = self.children.collect { |c| c.create_node(cache) }
-    if nodes.collect(:result_type).sort.uniq.size > 1
+    if nodes.collect { |n| n.result_type.to_i }.sort.uniq.size > 1
       raise("All inputs to the + operator need to have the same type")
     end
-    RBA::CompoundRegionOperationNode::new_join(*nodes)
+    RBA::CompoundRegionOperationNode::new_join(nodes)
   end
   
 end

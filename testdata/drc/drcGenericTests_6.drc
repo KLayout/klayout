@@ -1,0 +1,31 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+  threads(0) # easier to debug
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+
+# processors
+
+l1.drc(corners).output(100, 0)
+l1.drc(-90 < corners(as_dots) <= 90.0).output(101, 0)
+l1.drc(corners(as_boxes) == -90).output(102, 0)  # outer corners
+l1.drc(corners(as_boxes) == 90).output(103, 0)  # inner corners
+l1.drc(corners(as_boxes) <= -90).output(104, 0)
+
+l1.drc(middle).output(110, 0)
+l1.drc(middle(as_dots)).output(111, 0)
+l1.drc(middle(as_boxes)).output(112, 0)
+l1.drc(extent_refs(0.0, 0.0, 0.25, 0.5, as_edges)).output(113, 0)
+l1.drc(extent_refs(0.0, 0.0, 0.25, 0.5, 0.5, 1.0, as_boxes)).output(114, 0)
+

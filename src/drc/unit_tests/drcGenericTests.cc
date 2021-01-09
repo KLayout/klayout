@@ -88,3 +88,13 @@ TEST(2d)
 {
   run_test (_this, "2", true);
 }
+
+TEST(3)
+{
+  run_test (_this, "3", false);
+}
+
+TEST(3d)
+{
+  run_test (_this, "3", true);
+}

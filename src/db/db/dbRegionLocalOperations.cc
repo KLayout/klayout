@@ -145,6 +145,56 @@ void insert_into_hash (std::unordered_set<T> &hash, const T &shape)
 
 }
 
+template <class TS>
+static
+uint32_t compute_error_pattern (const TS &subject, std::unordered_set<db::EdgePair> &result, std::map<db::Edge, uint32_t> &edges_with_errors)
+{
+  uint32_t p = 1;
+  for (typename TS::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end (); ++e) {
+    edges_with_errors [*e] = p;
+    p <<= 1;
+  }
+
+  uint32_t error_pattern = 0;
+  for (std::unordered_set<db::EdgePair>::const_iterator ep = result.begin (); ep != result.end (); ++ep) {
+    std::map<db::Edge, unsigned int>::iterator i = edges_with_errors.find (ep->first ());
+    if (i != edges_with_errors.end ()) {
+      if ((error_pattern & i->second) == 0) {
+        error_pattern |= i->second;
+      }
+    }
+  }
+
+  return error_pattern;
+}
+
+static bool rect_filter_can_be_waived (uint32_t error_pattern, uint32_t rect_filter)
+{
+  if (! error_pattern) {
+    return false;
+  }
+
+  bool can_be_waived = false;
+
+  //  decode pattern: consider each group of 4 bits and match them against the error pattern in their four rotation variants
+  uint32_t p32 = (uint32_t) rect_filter;
+  while (p32 != 0 && ! can_be_waived) {
+
+    uint32_t p4 = p32 & 0xf;
+    p32 >>= 4;
+
+    if (p4 > 0) {
+      for (unsigned int r = 0; r < 4 && ! can_be_waived; ++r) {
+        can_be_waived = (error_pattern == p4);
+        p4 = ((p4 << 1) & 0xf) | ((p4 & 0x8) >> 3);
+      }
+    }
+
+  }
+
+  return can_be_waived;
+}
+
 template <class TS, class TI>
 void
 check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
@@ -413,51 +463,15 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
         continue;
       }
 
-      unsigned int p = 1;
-      std::map<db::Edge, unsigned int> edges_with_errors;
-      for (typename TS::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end (); ++e) {
-        edges_with_errors [*e] = p;
-        p <<= 1;
-      }
+      std::map<db::Edge, uint32_t> edges_with_errors;
+      unsigned int error_pattern = compute_error_pattern (subject, result, edges_with_errors);
 
-      unsigned int error_pattern = 0;
-      for (std::unordered_set<db::EdgePair>::const_iterator ep = result.begin (); ep != result.end (); ++ep) {
-        std::map<db::Edge, unsigned int>::iterator i = edges_with_errors.find (ep->first ());
-        if (i != edges_with_errors.end ()) {
-          if ((error_pattern & i->second) == 0) {
-            error_pattern |= i->second;
+      if (rect_filter_can_be_waived (error_pattern, (uint32_t) m_options.rect_filter)) {
+
+        for (std::unordered_set<db::EdgePair>::const_iterator ep = result.begin (); ep != result.end (); ++ep) {
+          if (edges_with_errors.find (ep->first ()) != edges_with_errors.end ()) {
+            waived.insert (*ep);
           }
-        }
-      }
-
-      if (error_pattern != 0) {
-
-        bool can_be_waived = false;
-
-        //  decode pattern: consider each group of 4 bits and match them against the error pattern in their four rotation variants
-        uint32_t p32 = (uint32_t) m_options.rect_filter;
-        while (p32 != 0 && ! can_be_waived) {
-
-          uint32_t p4 = p32 & 0xf;
-          p32 >>= 4;
-
-          if (p4 > 0) {
-            for (unsigned int r = 0; r < 4 && ! can_be_waived; ++r) {
-              can_be_waived = (error_pattern == p4);
-              p4 = ((p4 << 1) & 0xf) | ((p4 & 0x8) >> 3);
-            }
-          }
-
-        }
-
-        if (can_be_waived) {
-
-          for (std::unordered_set<db::EdgePair>::const_iterator ep = result.begin (); ep != result.end (); ++ep) {
-            if (edges_with_errors.find (ep->first ()) != edges_with_errors.end ()) {
-              waived.insert (*ep);
-            }
-          }
-
         }
 
       }
@@ -470,9 +484,28 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
       }
     }
 
-  }
+    if (! m_has_other) {
 
-  results.front ().insert (result.begin (), result.end ());
+      //  this is the case of single-layer interaction. We need to separate the results
+      //  from edge pairs into single edges (basically returning the first edge only)
+      //  Reasoning: we cannot say what's going to happen on the other side of the
+      //  error - it may not be waived and we cannot waive half of an edge pair.
+
+      for (std::unordered_set<db::EdgePair>::const_iterator i = result.begin (); i != result.end (); ++i) {
+        results.front ().insert (db::EdgePair (i->first (), i->first ().swapped_points ()));
+      }
+
+    } else {
+
+      results.front ().insert (result.begin (), result.end ());
+
+    }
+
+  } else {
+
+    results.front ().insert (result.begin (), result.end ());
+
+  }
 }
 
 template <class TS, class TI>

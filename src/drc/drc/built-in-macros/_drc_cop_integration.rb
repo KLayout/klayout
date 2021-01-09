@@ -77,7 +77,8 @@ module DRC
       @engine._context("drc") do
         requires_region
         op.is_a?(DRCOpNode) || raise("A DRC expression is required for the argument (got #{op.inspect})")
-        DRCLayer::new(@engine, self.data.complex_op(op.create_node({})))
+        #  @@@ proper output type!!!
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :complex_op, op.create_node({})))
       end
     end
     

@@ -1553,7 +1553,8 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
 
           for (std::vector<unsigned int>::const_iterator il = contexts.intruder_layers ().begin (); il != contexts.intruder_layers ().end (); ++il) {
 
-            db::box_convert <db::CellInst, true> inst_bcii (*mp_intruder_layout, contexts.actual_intruder_layer (*il));
+            unsigned int ail = contexts.actual_intruder_layer (*il);
+            db::box_convert <db::CellInst, true> inst_bcii (*mp_intruder_layout, ail);
 
             for (std::unordered_set<const db::CellInstArray *>::const_iterator j = i->second.first.begin (); j != i->second.first.end (); ++j) {
               for (db::CellInstArray::iterator k = (*j)->begin_touching (safe_box_enlarged (nbox, -1, -1), inst_bcii); ! k.at_end (); ++k) {
@@ -1561,7 +1562,7 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
                 //  NOTE: no self-interactions
                 if (i->first != *j || tn != tk) {
                   //  optimize the intruder instance so it will be as low as possible
-                  std::pair<bool, db::CellInstArray> ei = effective_instance (contexts.subject_layer (), i->first->object ().cell_index (), contexts.actual_intruder_layer (*il), (*j)->object ().cell_index (), tni * tk, dist);
+                  std::pair<bool, db::CellInstArray> ei = effective_instance (contexts.subject_layer (), i->first->object ().cell_index (), ail, (*j)->object ().cell_index (), tni * tk, dist);
                   if (ei.first) {
                     intruders_below.first.insert (ei.second);
                   }
@@ -1902,7 +1903,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
     db::box_convert<db::CellInstArray, true> inst_bci (*mp_intruder_layout, ail);
 
-    typename std::map<unsigned int, std::set<TI> >::const_iterator ipl = intruders.second.find (ail);
+    typename std::map<unsigned int, std::set<TI> >::const_iterator ipl = intruders.second.find (*il);
     static std::set<TI> empty_intruders;
 
     if (! subject_shapes->empty () && (intruder_shapes || ipl != intruders.second.end ())) {
@@ -1932,7 +1933,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
       unsigned int inst_id = 0;
 
-      if (subject_cell == intruder_cell && contexts.subject_layer () == ail) {
+      if (subject_cell == intruder_cell && contexts.subject_layer () == ail && !foreign) {
 
         //  Same cell, same layer -> no shape to child instance interactions because this will be taken care of
         //  by the instances themselves (and their intruders). This also means, we prefer to deal with

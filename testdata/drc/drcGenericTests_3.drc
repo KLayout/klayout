@@ -1,0 +1,36 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+  threads(0) # easier to debug
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+
+# space with rectangle side selection option
+l1.drc(space(projection) < 1.um).polygons.output(100, 0)
+l1.drc(space(projection, one_side_allowed) < 1.um).output(101, 0)
+l1.drc(space(projection, two_sides_allowed) < 1.um).output(102, 0)
+l1.drc(space(projection, three_sides_allowed) < 1.um).output(103, 0)
+
+# space with rectangle side selection option
+l1.drc(iso(projection) < 1.um).polygons.output(110, 0)
+l1.drc(iso(projection, one_side_allowed) < 1.um).output(111, 0)
+l1.drc(iso(projection, two_sides_allowed) < 1.um).output(112, 0)
+l1.drc(iso(projection, three_sides_allowed) < 1.um).output(113, 0)
+
+# separation with rectangle side selection option
+l1.drc(sep(l2, projection) < 1.um).polygons.output(120, 0)
+l1.drc(sep(l2, projection, one_side_allowed) < 1.um).polygons.output(121, 0)
+l1.drc(sep(l2, projection, two_sides_allowed) < 1.um).polygons.output(122, 0)
+l1.drc(sep(l2, projection, three_sides_allowed) < 1.um).polygons.output(123, 0)
+
+

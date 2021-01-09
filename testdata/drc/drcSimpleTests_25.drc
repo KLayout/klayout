@@ -1,0 +1,30 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+
+l1.space(1.0, projection).polygons.output(100, 0)
+
+l1.space(1.0, euclidian).polygons.output(110, 0)
+l1.space(1.0, projection, projection_limits(0..2.0)).polygons.output(111, 0)
+l1.space(1.0, projection, whole_edges).polygons.output(112, 0)
+l1.space(1.0, projection, only_opposite).output(113, 0)
+l1.space(1.0, projection, not_opposite).output(114, 0)
+
+l1.isolated(1.0, euclidian).polygons.output(120, 0)
+l1.isolated(1.0, projection, projection_limits(0..2.0)).polygons.output(121, 0)
+l1.isolated(1.0, projection, whole_edges).polygons.output(122, 0)
+l1.isolated(1.0, projection, only_opposite).output(123, 0)
+l1.isolated(1.0, projection, not_opposite).output(124, 0)
+

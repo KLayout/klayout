@@ -112,14 +112,14 @@ static db::Region *texts_as_boxes2 (const db::Region *r, db::DeepShapeStore &dss
   return new db::Region (r->texts_as_boxes (pat, pattern, enl, dss));
 }
 
-static db::Edges corners_to_dots (const db::Region *r, double angle_start, double angle_end)
+static db::Edges corners_to_dots (const db::Region *r, double angle_start, double angle_end, bool include_angle_start, bool include_angle_end)
 {
-  return r->processed (db::CornersAsDots (angle_start, angle_end));
+  return r->processed (db::CornersAsDots (angle_start, include_angle_start, angle_end, include_angle_end));
 }
 
-static db::Region corners_to_boxes (const db::Region *r, double angle_start, double angle_end, db::Coord dim)
+static db::Region corners_to_boxes (const db::Region *r, double angle_start, double angle_end, db::Coord dim, bool include_angle_start, bool include_angle_end)
 {
-  return r->processed (db::CornersAsRectangles (angle_start, angle_end, dim));
+  return r->processed (db::CornersAsRectangles (angle_start, include_angle_start, angle_end, include_angle_end, dim));
 }
 
 static db::Region *new_si (const db::RecursiveShapeIterator &si)
@@ -1121,11 +1121,14 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@hide\n"
     "This method is provided for DRC implementation.\n"
   ) +
-  method_ext ("corners", &corners_to_boxes, gsi::arg ("angle_start", -180.0), gsi::arg ("angle_end", 180.0), gsi::arg ("dim", 1),
+  method_ext ("corners", &corners_to_boxes, gsi::arg ("angle_min", -180.0), gsi::arg ("angle_max", 180.0), gsi::arg ("dim", 1), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", true),
     "@brief This method will select all corners whose attached edges satisfy the angle condition.\n"
     "\n"
     "The angle values specify a range of angles: all corners whose attached edges form an angle "
-    "between angle_start and angle_end will be reported boxes with 2*dim x 2*dim dimension. The default dimension is 2x2 DBU.\n"
+    "between angle_min and angle_max will be reported boxes with 2*dim x 2*dim dimension. The default dimension is 2x2 DBU.\n"
+    "\n"
+    "If 'include_angle_min' is true, the angle condition is >= min. angle, otherwise it is > min. angle. "
+    "Same for 'include_angle_,ax' and the max. angle.\n"
     "\n"
     "The angle is measured "
     "between the incoming and the outcoming edge in mathematical sense: a positive value is a turn left "
@@ -1134,14 +1137,14 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "A similar function that reports corners as point-like edges is \\corners_dots.\n"
     "\n"
-    "This function has been introduced in version 0.25.\n"
+    "This function has been introduced in version 0.25. 'include_min_angle' and 'include_max_angle' have been added in version 0.27.\n"
   ) +
-  method_ext ("corners_dots", &corners_to_dots, gsi::arg ("angle_start", -180.0), gsi::arg ("angle_end", 180.0),
+  method_ext ("corners_dots", &corners_to_dots, gsi::arg ("angle_start", -180.0), gsi::arg ("angle_end", 180.0), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", true),
     "@brief This method will select all corners whose attached edges satisfy the angle condition.\n"
     "\n"
     "This method is similar to \\corners, but delivers an \\Edges collection with dot-like edges for each corner.\n"
     "\n"
-    "This function has been introduced in version 0.25.\n"
+    "This function has been introduced in version 0.25. 'include_min_angle' and 'include_max_angle' have been added in version 0.27.\n"
   ) +
   method ("merge", (db::Region &(db::Region::*) ()) &db::Region::merge,
     "@brief Merge the region\n"

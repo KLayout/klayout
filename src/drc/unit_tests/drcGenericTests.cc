@@ -118,3 +118,13 @@ TEST(5d)
 {
   run_test (_this, "5", true);
 }
+
+TEST(6)
+{
+  run_test (_this, "6", false);
+}
+
+TEST(6d)
+{
+  run_test (_this, "6", true);
+}

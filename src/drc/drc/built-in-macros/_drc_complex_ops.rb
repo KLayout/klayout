@@ -455,7 +455,7 @@ CODE
       else
         raise("Invalid argument (#{as_dots.inspect}) for 'corners' method")
       end
-      DRCOpNodeCornersFilter::new(@engine, self, as_dots)
+      DRCOpNodeCornersFilter::new(@engine, as_dots, self)
     end
   end
   
@@ -536,12 +536,12 @@ CODE
         end
             
         if as_edges
-          return DRCOpNodeRelativeExtents::new(self, true, *f)
+          return DRCOpNodeRelativeExtents::new(@engine, true, self, *f)
         else
           # add oversize for point- and edge-like regions
           zero_area = (f[0] - f[2]).abs < 1e-7 || (f[1] - f[3]).abs < 1e-7
           f += [ zero_area ? 1 : 0 ] * 2
-          return DRCOpNodeRelativeExtents::new(self, false, *f)
+          return DRCOpNodeRelativeExtents::new(@engine, false, self, *f)
         end
 
       end
@@ -1207,7 +1207,7 @@ class DRCOpNodeCountFilter < DRCOpNodeWithCompare
     args = [ self.input.create_node(cache), self.inverse ]
     args << (self.gt ? @engine._make_numeric_value(self.gt) + 1 : (self.ge ? @engine._make_numeric_value(self.ge) : 0))
     if self.lt || self.le
-      args << (self.lt ? @engine._make_numeric_value(self.lt) : @engine._make_numeric_value(self.le) - 1)
+      args << (self.lt ? @engine._make_numeric_value(self.lt) : @engine._make_numeric_value(self.le) + 1)
     end
     RBA::CompoundRegionOperationNode::new_count_filter(*args)
   end
@@ -1240,7 +1240,7 @@ class DRCOpNodeAreaFilter < DRCOpNodeWithCompare
     args = [ self.input.create_node(cache), self.inverse ]
     args << (self.gt ? @engine._make_area_value(self.gt) + 1 : (self.ge ? @engine._make_area_value(self.ge) : 0))
     if self.lt || self.le
-      args << (self.lt ? @engine._make_area_value(self.lt) : @engine._make_area_value(self.le) - 1)
+      args << (self.lt ? @engine._make_area_value(self.lt) : @engine._make_area_value(self.le) + 1)
     end
     RBA::CompoundRegionOperationNode::new_area_filter(*args)
   end
@@ -1281,7 +1281,7 @@ class DRCOpNodeEdgeLengthFilter < DRCOpNodeWithCompare
     args = [ n, self.inverse ]
     args << (self.gt ? @engine._make_value(self.gt) + 1 : (self.ge ? @engine._make_value(self.ge) : 0))
     if self.lt || self.le
-      args << (self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) - 1)
+      args << (self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) + 1)
     end
 
     RBA::CompoundRegionOperationNode::new_edge_length_filter(*args)
@@ -1324,7 +1324,7 @@ class DRCOpNodeEdgeOrientationFilter < DRCOpNodeWithCompare
     args = [ n, self.inverse ]
     angle_delta = 1e-6
     args << (self.gt ? self.gt + angle_delta : (self.ge ? self.ge : -180.0))
-    args << (self.lt ? self.lt : (self.le ? self.le - angle_delta : 180.0))
+    args << (self.lt ? self.lt : (self.le ? self.le + angle_delta : 180.0))
 
     RBA::CompoundRegionOperationNode::new_edge_orientation_filter(*args)
 
@@ -1358,7 +1358,7 @@ class DRCOpNodePerimeterFilter < DRCOpNodeWithCompare
     args = [ self.input.create_node(cache), self.inverse ]
     args << (self.gt ? @engine._make_value(self.gt) + 1 : (self.ge ? @engine._make_value(self.ge) : 0))
     if self.lt || self.le
-      args << (self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) - 1)
+      args << (self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) + 1)
     end
     RBA::CompoundRegionOperationNode::new_perimeter_filter(*args)
   end
@@ -1390,7 +1390,7 @@ class DRCOpNodeInteractingWithCount < DRCOpNodeWithCompare
     args = [ self.a.create_node(cache), self.b.create_node(cache), self.inverse ]
     args << (self.gt ? self.gt + 1 : (self.ge ? self.ge : 0))
     if self.lt || self.le
-      args << (self.lt ? self.lt : self.le - 1)
+      args << (self.lt ? self.lt : self.le + 1)
     end
     factory = { :covering => :new_enclosing,
                 :overlapping => :new_overlapping,
@@ -1549,7 +1549,7 @@ class DRCOpNodeBBoxParameterFilter < DRCOpNodeWithCompare
     args = [ self.input.create_node(cache), self.inverse ]
     args << (self.gt ? @engine._make_value(self.gt) + 1 : (self.ge ? @engine._make_value(self.ge) : 0))
     if self.lt || self.le
-      args << (self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) - 1)
+      args << (self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) + 1)
     end
     RBA::CompoundRegionOperationNode::new_perimeter_filter(*args)
   end
@@ -1565,8 +1565,7 @@ end
 class DRCOpNodeCornersFilter < DRCOpNodeWithCompare
 
   attr_accessor :input
-  attr_accessor :parameter
-  attr_accessor :inverse
+  attr_accessor :as_dots
   
   def initialize(engine, as_dots, input)
     super(engine)
@@ -1577,14 +1576,15 @@ class DRCOpNodeCornersFilter < DRCOpNodeWithCompare
   
   def do_create_node(cache)
     args = [ self.input.create_node(cache) ]
-    angle_delta = 1e-6
-    args << (self.gt ? self.gt + angle_delta : (self.ge ? self.ge : -180.0))
-    args << (self.lt ? self.lt : (self.le ? self.le - angle_delta : 180.0))
+    args << (self.gt ? self.gt : (self.ge ? self.ge : -180.0))
+    args << (self.gt ? false : true)
+    args << (self.lt ? self.lt : (self.le ? self.le : 180.0))
+    args << (self.lt ? false : true)
     if self.as_dots
-      RBA::CompoundRegionOperationNode::new_corners_as_dots_node(*args)
+      RBA::CompoundRegionOperationNode::new_corners_as_dots(*args)
     else
       args << 2 # dimension is 2x2 DBU
-      RBA::CompoundRegionOperationNode::new_corners_as_rectangles_node(*args)
+      RBA::CompoundRegionOperationNode::new_corners_as_rectangles(*args)
     end
   end
 
@@ -1595,11 +1595,17 @@ class DRCOpNodeRelativeExtents < DRCOpNode
   attr_accessor :input
   attr_accessor :as_edges, :fx1, :fx2, :fy1, :fy2, :dx, :dy
   
-  def initialize(engine, input, as_edges, fx1, fx2, fy1, fy2, dx = 0, dy = 0)
+  def initialize(engine, as_edges, input, fx1, fx2, fy1, fy2, dx = 0, dy = 0)
     super(engine)
     self.input = input
     self.as_edges = as_edges
     self.description = "extents"
+    self.fx1 = fx1
+    self.fx2 = fx2
+    self.fy1 = fy1
+    self.fy2 = fy2
+    self.dx = dx
+    self.dy = dy
   end
   
   def dump(indent)
@@ -1611,10 +1617,11 @@ class DRCOpNodeRelativeExtents < DRCOpNode
   end
       
   def do_create_node(cache)
+    node = self.input.create_node(cache)
     if !self.as_edges
-      RBA::CompoundRegionOperationNode::new_relative_extents_as_edges(self.input, self.fx1, self.fx2, self.fy1, self.fy2, self.dx, self.dy)
+      RBA::CompoundRegionOperationNode::new_relative_extents(node, self.fx1, self.fx2, self.fy1, self.fy2, self.dx, self.dy)
     else
-      RBA::CompoundRegionOperationNode::new_relative_extents_as_edges(self.input, self.fx1, self.fx2, self.fy1, self.fy2)
+      RBA::CompoundRegionOperationNode::new_relative_extents_as_edges(node, self.fx1, self.fx2, self.fy1, self.fy2)
     end
   end
 

@@ -91,13 +91,14 @@ private:
 class DB_PUBLIC CornerDetectorCore
 {
 public:
-  CornerDetectorCore (double angle_start, double angle_end);
+  CornerDetectorCore (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end);
   virtual ~CornerDetectorCore () { }
 
   void detect_corners (const db::Polygon &poly, const CornerPointDelivery &delivery) const;
 
 private:
   db::CplxTrans m_t_start, m_t_end;
+  bool m_include_start, m_include_end;
   bool m_big_angle, m_all;
 };
 
@@ -108,8 +109,8 @@ class DB_PUBLIC CornersAsRectangles
   : public db::PolygonProcessorBase, private CornerDetectorCore
 {
 public:
-  CornersAsRectangles (double angle_start, double angle_end, db::Coord dim = 1)
-    : CornerDetectorCore (angle_start, angle_end), m_dim (dim)
+  CornersAsRectangles (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end, db::Coord dim = 1)
+    : CornerDetectorCore (angle_start, include_angle_start, angle_end, include_angle_end), m_dim (dim)
   {
     //  .. nothing yet ..
   }
@@ -137,8 +138,8 @@ class DB_PUBLIC CornersAsDots
   : public db::PolygonToEdgeProcessorBase, private CornerDetectorCore
 {
 public:
-  CornersAsDots (double angle_start, double angle_end)
-    : CornerDetectorCore (angle_start, angle_end)
+  CornersAsDots (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end)
+    : CornerDetectorCore (angle_start, include_angle_start, angle_end, include_angle_end)
   {
     //  .. nothing yet ..
   }

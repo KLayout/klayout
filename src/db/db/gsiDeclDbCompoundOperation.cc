@@ -214,16 +214,16 @@ static db::CompoundRegionOperationNode *new_count_filter (db::CompoundRegionOper
   return new db::CompoundRegionCountFilterNode (input, invert, min_count, max_count);
 }
 
-static db::CompoundRegionOperationNode *new_corners_as_rectangles (db::CompoundRegionOperationNode *input, double angle_start, double angle_end, db::Coord dim = 1)
+static db::CompoundRegionOperationNode *new_corners_as_rectangles (db::CompoundRegionOperationNode *input, double angle_start, bool include_angle_start, double angle_end, bool include_angle_end, db::Coord dim = 1)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionProcessingOperationNode (new db::CornersAsRectangles (angle_start, angle_end, dim), input, true /*processor is owned*/, dim /*dist adder*/);
+  return new db::CompoundRegionProcessingOperationNode (new db::CornersAsRectangles (angle_start, include_angle_start, angle_end, include_angle_end, dim), input, true /*processor is owned*/, dim /*dist adder*/);
 }
 
-static db::CompoundRegionOperationNode *new_corners_as_dots (db::CompoundRegionOperationNode *input, double angle_start, double angle_end)
+static db::CompoundRegionOperationNode *new_corners_as_dots (db::CompoundRegionOperationNode *input, double angle_start, bool include_angle_start, double angle_end, bool include_angle_end)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionToEdgeProcessingOperationNode (new db::CornersAsDots (angle_start, angle_end), input, true /*processor is owned*/);
+  return new db::CompoundRegionToEdgeProcessingOperationNode (new db::CornersAsDots (angle_start, include_angle_start, angle_end, include_angle_end), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_extents (db::CompoundRegionOperationNode *input, db::Coord e)
@@ -584,10 +584,10 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   gsi::constructor ("new_count_filter", &new_count_filter, gsi::arg ("inputs"), gsi::arg ("invert", false), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", std::numeric_limits<size_t>::max ()),
     "@brief Creates a node selecting results but their shape count.\n"
   ) +
-  gsi::constructor ("new_corners_as_rectangles", &new_corners_as_rectangles, gsi::arg ("input"), gsi::arg ("angle_start"), gsi::arg ("angle_end"), gsi::arg ("dim"),
+  gsi::constructor ("new_corners_as_rectangles", &new_corners_as_rectangles, gsi::arg ("input"), gsi::arg ("angle_min"), gsi::arg ("include_angle_min"), gsi::arg ("angle_max"), gsi::arg ("include_angle_max"), gsi::arg ("dim"),
     "@brief Creates a node turning corners into rectangles.\n"
   ) +
-  gsi::constructor ("new_corners_as_dots", &new_corners_as_dots, gsi::arg ("input"), gsi::arg ("angle_start"), gsi::arg ("angle_end"),
+  gsi::constructor ("new_corners_as_dots", &new_corners_as_dots, gsi::arg ("input"), gsi::arg ("angle_min"), gsi::arg ("include_angle_min"), gsi::arg ("angle_max"), gsi::arg ("include_angle_max"),
     "@brief Creates a node turning corners into dots (single-point edges).\n"
   ) +
   gsi::constructor ("new_extents", &new_extents, gsi::arg ("input"), gsi::arg ("e", 0),

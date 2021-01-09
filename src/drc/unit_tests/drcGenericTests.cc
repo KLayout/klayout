@@ -108,3 +108,13 @@ TEST(4d)
 {
   run_test (_this, "4", true);
 }
+
+TEST(5)
+{
+  run_test (_this, "5", false);
+}
+
+TEST(5d)
+{
+  run_test (_this, "5", true);
+}

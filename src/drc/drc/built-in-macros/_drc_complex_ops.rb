@@ -1190,31 +1190,31 @@ end
 class DRCOpNodeCountFilter < DRCOpNodeWithCompare
 
   attr_accessor :input
-  attr_accessor :inverted
+  attr_accessor :inverse
   
   def initialize(engine, input)
     super(engine)
     self.input = input
-    self.inverted = false
+    self.inverse = false
     self.description = "count"
   end
 
   def _description_for_dump
-    self.inverted ? "count" : "not_count"
+    self.inverse ? "count" : "not_count"
   end
   
   def do_create_node(cache)
     args = [ self.input.create_node(cache), self.inverse ]
     args << (self.gt ? @engine._make_numeric_value(self.gt) + 1 : (self.ge ? @engine._make_numeric_value(self.ge) : 0))
     if self.lt || self.le
-      args << self.lt ? @engine._make_numeric_value(self.lt) : @engine._make_numeric_value(self.le) - 1
+      args << (self.lt ? @engine._make_numeric_value(self.lt) : @engine._make_numeric_value(self.le) - 1)
     end
     RBA::CompoundRegionOperationNode::new_count_filter(*args)
   end
 
   def inverted
     res = self.dup
-    res.inverted = !res.inverted
+    res.inverse = !res.inverse
     return res
   end
   
@@ -1223,31 +1223,31 @@ end
 class DRCOpNodeAreaFilter < DRCOpNodeWithCompare
 
   attr_accessor :input
-  attr_accessor :inverted
+  attr_accessor :inverse
   
   def initialize(engine, input)
     super(engine)
     self.input = input
-    self.inverted = false
+    self.inverse = false
     self.description = "area"
   end
 
   def _description_for_dump
-    self.inverted ? "area" : "not_area"
+    self.inverse ? "area" : "not_area"
   end
   
   def do_create_node(cache)
     args = [ self.input.create_node(cache), self.inverse ]
     args << (self.gt ? @engine._make_area_value(self.gt) + 1 : (self.ge ? @engine._make_area_value(self.ge) : 0))
     if self.lt || self.le
-      args << self.lt ? @engine._make_area_value(self.lt) : @engine._make_area_value(self.le) - 1
+      args << (self.lt ? @engine._make_area_value(self.lt) : @engine._make_area_value(self.le) - 1)
     end
     RBA::CompoundRegionOperationNode::new_area_filter(*args)
   end
 
   def inverted
     res = self.dup
-    res.inverted = !res.inverted
+    res.inverse = !res.inverse
     return res
   end
   
@@ -1256,17 +1256,17 @@ end
 class DRCOpNodeEdgeLengthFilter < DRCOpNodeWithCompare
 
   attr_accessor :input
-  attr_accessor :inverted
+  attr_accessor :inverse
   
   def initialize(engine, input)
     super(engine)
     self.input = input
-    self.inverted = false
+    self.inverse = false
     self.description = "length"
   end
   
   def _description_for_dump
-    self.inverted ? "length" : "not_length"
+    self.inverse ? "length" : "not_length"
   end
   
   def do_create_node(cache)
@@ -1281,7 +1281,7 @@ class DRCOpNodeEdgeLengthFilter < DRCOpNodeWithCompare
     args = [ n, self.inverse ]
     args << (self.gt ? @engine._make_value(self.gt) + 1 : (self.ge ? @engine._make_value(self.ge) : 0))
     if self.lt || self.le
-      args << self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) - 1
+      args << (self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) - 1)
     end
 
     RBA::CompoundRegionOperationNode::new_edge_length_filter(*args)
@@ -1290,7 +1290,7 @@ class DRCOpNodeEdgeLengthFilter < DRCOpNodeWithCompare
 
   def inverted
     res = self.dup
-    res.inverted = !res.inverted
+    res.inverse = !res.inverse
     return res
   end
   
@@ -1299,17 +1299,17 @@ end
 class DRCOpNodeEdgeOrientationFilter < DRCOpNodeWithCompare
 
   attr_accessor :input
-  attr_accessor :inverted
+  attr_accessor :inverse
   
   def initialize(engine, input)
     super(engine)
     self.input = input
-    self.inverted = false
+    self.inverse = false
     self.description = "angle"
   end
   
   def _description_for_dump
-    self.inverted ? "angle" : "not_angle"
+    self.inverse ? "angle" : "not_angle"
   end
   
   def do_create_node(cache)
@@ -1332,7 +1332,7 @@ class DRCOpNodeEdgeOrientationFilter < DRCOpNodeWithCompare
 
   def inverted
     res = self.dup
-    res.inverted = !res.inverted
+    res.inverse = !res.inverse
     return res
   end
   
@@ -1341,31 +1341,31 @@ end
 class DRCOpNodePerimeterFilter < DRCOpNodeWithCompare
 
   attr_accessor :input
-  attr_accessor :inverted
+  attr_accessor :inverse
   
   def initialize(engine, input)
     super(engine)
     self.input = input
-    self.inverted = false
+    self.inverse = false
     self.description = "perimeter"
   end
 
   def _description_for_dump
-    self.inverted ? "perimeter" : "not_perimeter"
+    self.inverse ? "perimeter" : "not_perimeter"
   end
   
   def do_create_node(cache)
     args = [ self.input.create_node(cache), self.inverse ]
     args << (self.gt ? @engine._make_value(self.gt) + 1 : (self.ge ? @engine._make_value(self.ge) : 0))
     if self.lt || self.le
-      args << self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) - 1
+      args << (self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) - 1)
     end
     RBA::CompoundRegionOperationNode::new_perimeter_filter(*args)
   end
 
   def inverted
     res = self.dup
-    res.inverted = !res.inverted
+    res.inverse = !res.inverse
     return res
   end
   
@@ -1374,7 +1374,7 @@ end
 class DRCOpNodeInteractingWithCount < DRCOpNodeWithCompare
 
   attr_accessor :a, :b
-  attr_accessor :inverted
+  attr_accessor :inverse
   attr_accessor :op
   
   def initialize(engine, a, b, op)
@@ -1382,15 +1382,15 @@ class DRCOpNodeInteractingWithCount < DRCOpNodeWithCompare
     self.a = a
     self.b = b
     self.op = op
-    self.inverted = false
-    self.description = (self.inverted ? "" : "not_") + self.op.to_s
+    self.inverse = false
+    self.description = (self.inverse ? "" : "not_") + self.op.to_s
   end
   
   def do_create_node(cache)
     args = [ self.a.create_node(cache), self.b.create_node(cache), self.inverse ]
     args << (self.gt ? self.gt + 1 : (self.ge ? self.ge : 0))
     if self.lt || self.le
-      args << self.lt ? self.lt : self.le - 1
+      args << (self.lt ? self.lt : self.le - 1)
     end
     factory = { :covering => :new_enclosing,
                 :overlapping => :new_overlapping,
@@ -1400,7 +1400,7 @@ class DRCOpNodeInteractingWithCount < DRCOpNodeWithCompare
 
   def inverted
     res = self.dup
-    res.inverted = !res.inverted
+    res.inverse = !res.inverse
     return res
   end
   
@@ -1409,7 +1409,7 @@ end
 class DRCOpNodeInteracting < DRCOpNode
 
   attr_accessor :a, :b
-  attr_accessor :inverted
+  attr_accessor :inverse
   attr_accessor :op
   
   def initialize(engine, a, b, op)
@@ -1417,8 +1417,8 @@ class DRCOpNodeInteracting < DRCOpNode
     self.a = a
     self.b = b
     self.op = op
-    self.inverted = false
-    self.description = (self.inverted ? "" : "not_") + self.op.to_s
+    self.inverse = false
+    self.description = (self.inverse ? "" : "not_") + self.op.to_s
   end
   
   def do_create_node(cache)
@@ -1429,7 +1429,7 @@ class DRCOpNodeInteracting < DRCOpNode
 
   def inverted
     res = self.dup
-    res.inverted = !res.inverted
+    res.inverse = !res.inverse
     return res
   end
   
@@ -1535,13 +1535,13 @@ class DRCOpNodeBBoxParameterFilter < DRCOpNodeWithCompare
 
   attr_accessor :input
   attr_accessor :parameter
-  attr_accessor :inverted
+  attr_accessor :inverse
   
   def initialize(engine, parameter, input, description)
     super(engine)
     self.parameter = parameter
     self.input = input
-    self.inverted = false
+    self.inverse = false
     self.description = description
   end
   
@@ -1549,14 +1549,14 @@ class DRCOpNodeBBoxParameterFilter < DRCOpNodeWithCompare
     args = [ self.input.create_node(cache), self.inverse ]
     args << (self.gt ? @engine._make_value(self.gt) + 1 : (self.ge ? @engine._make_value(self.ge) : 0))
     if self.lt || self.le
-      args << self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) - 1
+      args << (self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) - 1)
     end
     RBA::CompoundRegionOperationNode::new_perimeter_filter(*args)
   end
 
   def inverted
     res = self.dup
-    res.inverted = !res.inverted
+    res.inverse = !res.inverse
     return res
   end
   
@@ -1566,7 +1566,7 @@ class DRCOpNodeCornersFilter < DRCOpNodeWithCompare
 
   attr_accessor :input
   attr_accessor :parameter
-  attr_accessor :inverted
+  attr_accessor :inverse
   
   def initialize(engine, as_dots, input)
     super(engine)

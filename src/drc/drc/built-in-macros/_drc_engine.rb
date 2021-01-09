@@ -2264,7 +2264,7 @@ CODE
     
     def _make_area_value(v)
       self._check_numeric(v)
-      self._prep_area_value(v)
+      self._prep_value_area(v)
     end
   
     def _make_numeric_value(v)

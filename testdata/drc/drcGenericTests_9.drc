@@ -33,3 +33,11 @@ l1.drc(primary.edges & secondary(l2)).output(121, 0)
 l1.drc(primary.edges - (primary & secondary(l2)).edges).output(130, 0)
 l1.drc(primary.edges & (primary & secondary(l2)).edges).output(131, 0)
 
+# start_segments
+l1.drc(primary.edges.start_segments(1.0)).output(140, 0)
+l1.drc(primary.edges.start_segments(0.0, 0.5)).output(141, 0)
+l1.drc(primary.edges.end_segments(1.0)).output(142, 0)
+l1.drc(primary.edges.end_segments(1.0, 0.5)).output(143, 0)
+l1.drc(primary.edges.centers(1.0)).output(144, 0)
+l1.drc(primary.edges.centers(1.0, 0.5)).output(145, 0)
+

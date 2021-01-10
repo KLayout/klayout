@@ -807,31 +807,31 @@ overlaps = layer.size(0.2).raw.merged(2)</pre>
 
   <ul>
   <li>
-    <tt>drc(</tt> measurement <tt> != </tt> value <tt>)</tt></li>: 
+    <tt>drc(</tt> measurement <tt> != </tt> value <tt>)</tt>: 
     renders markers where the dimension is not matching the value
   </li>
   <li>
-    <tt>drc(</tt> measurement <tt> == </tt> value <tt>)</tt></li>:
+    <tt>drc(</tt> measurement <tt> == </tt> value <tt>)</tt>:
     renders markers where the dimension is matching the given value
   </li>
   <li>
-    <tt>drc(</tt> measurement less_op value <tt>)</tt></li>:
+    <tt>drc(</tt> measurement less_op value <tt>)</tt>:
     ("less_op" is <tt>&lt;</tt> or <tt>&lt;=</tt>)
     renders markers where the dimension is less than or less or equal to the given value
   </li>
   <li>
-    <tt>drc(</tt> measurement greater_op value <tt>)</tt></li>:
+    <tt>drc(</tt> measurement greater_op value <tt>)</tt>:
     ("greater_op" is <tt>&gt;</tt> or <tt>&gt;=</tt>)
     renders markers where the dimension is greater than or greater or equal to the given value
   </li>
   <li>
-    <tt>drc(</tt> lower_value less_op measurement greater_op upper_value <tt>)</tt></li>:
+    <tt>drc(</tt> lower_value less_op measurement greater_op upper_value <tt>)</tt>:
     renders markers where the dimension is between the lower and upper value
   </li>
   </ul>
 
   <p>
-  "measurement" is "width", "notch", "isolated" ("iso"), "separation" ("sep"), "overlap" or "enclosure" ("enc"). They have the 
+  "measurement" is "width", "notch", "isolated" ("iso"), "separation" ("sep"), "overlap" or "enclosure" ("enc").
   The last three checks are two-layer checks which require a second layer. The 
   second layer is specified together with the measurement like this:
   </p>
@@ -856,7 +856,8 @@ overlaps = layer.size(0.2).raw.merged(2)</pre>
   </pre>
 
   <p>
-  However, the universal DRC is much more: it offers a number of options to further process
+  However, the universal DRC is much more than a convenient way to write checks: 
+  it offers a number of options to further process
   the results. The functionality behind the universal DRC function is basically a kind of 
   loop over all primary shapes (the ones from the layer the "drc" function is called on).
   The operations in the drc function's brackets is executed on each of the primary shapes
@@ -876,7 +877,7 @@ overlaps = layer.size(0.2).raw.merged(2)</pre>
   </pre>
 
   <p>
-  The boolean AND is computed between the edges on the primary shape and returns these
+  The boolean AND is computed between the edges on the primary shape and returns the
   parts where both space and width violations are flagged. The boolean operation is 
   more efficient than the plain alternative:
   </p>
@@ -890,16 +891,16 @@ overlaps = layer.size(0.2).raw.merged(2)</pre>
   </pre>
 
   <p>
-  The reson is that performing the boolean computation in the local loop can be 
-  shortcut if one input is empty and it does not need to store a (potentially big)
-  layer set with edges as produced by the plain-method implementation. Instead it
+  The reason is that performing the boolean computation in the local loop can be 
+  shortcut if one inputs is empty. It does not need to store a (potentially big)
+  edge set with edges as produced by the plain-method implementation. Instead it
   will work with a temporary and local edge set only and free the memory space as
   soon as it moves on to the next primary shape.
   </p>
 
   <p>
-  The universal DRC function is a rich feature and offers filters based on 
-  polygons or edge properties, polygon or edge manipulation, conditionals
+  Overall, the universal DRC function is a rich feature and offers filters based on 
+  polygons or edge properties, polygon or edge manipulation operators, conditionals
   and a lot more. For more details see the <a href="/about/drc_ref_layer.xml#drc">drc function documentation</a>.
   </p>
 

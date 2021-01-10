@@ -27,4 +27,6 @@ l1.drc(1.5 <= wcheck).output(107, 0)
 l1.drc(wcheck == 1.5).output(108, 0)
 l1.drc(1.0 <= wcheck <= 1.5).output(109, 0)
 l1.drc(1.0 < wcheck < 2.0).output(110, 0)
+l1.drc(wcheck != 1.5).output(111, 0)
+l1.drc(wcheck != 1.0).output(112, 0)
 

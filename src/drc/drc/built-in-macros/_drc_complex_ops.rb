@@ -1055,12 +1055,16 @@ class DRCOpNodeWithCompare < DRCOpNode
   attr_accessor :reverse
   attr_accessor :original
   attr_accessor :lt, :le, :gt, :ge, :arg
+  attr_accessor :ne_allowed
+  attr_accessor :mode_or
   
   def initialize(engine, original = nil, reverse = false)
     super(engine)
     self.reverse = reverse
     self.original = original
     self.description = original ? original.description : "BasicWithCompare"
+    self.mode_or = false
+    self.ne_allowed = false
   end
   
   def _description_for_dump
@@ -1076,12 +1080,12 @@ class DRCOpNodeWithCompare < DRCOpNode
       self.le && (cmp << ("<=%.12g" % self.le))
       self.gt && (cmp << (">%.12g" % self.gt))
       self.ge && (cmp << (">=%.12g" % self.ge))
-      return indent + self.description + " " + cmp.join(" ")
+      return indent + self.description + " " + cmp.join(" ") + (self.mode_or ? " [or]" : "")
     end
   end
 
   def _check_bounds
-    if (self.lt || self.le) && (self.gt || self.ge)
+    if ! self.mode_or && (self.lt || self.le) && (self.gt || self.ge)
       epsilon = 1e-10
       lower = self.ge ? self.ge - epsilon : self.gt + epsilon
       upper = self.le ? self.le + epsilon : self.lt - epsilon
@@ -1121,6 +1125,20 @@ class DRCOpNodeWithCompare < DRCOpNode
   
   def _self_or_original
     return (self.original || self).dup
+  end
+  
+  def !=(other)
+    if !self.ne_allowed
+      raise("!= operator is not allowed for '" + self.description + "'")
+    end
+    if !(other.is_a?(Float) || other.is_a?(Integer))
+      raise("!= operator needs a numerical argument for '" + self.description + "' argument")
+    end
+    res = self._self_or_original
+    res.mode_or = true
+    res.set_lt(other)
+    res.set_gt(other)
+    return res
   end
   
   def ==(other)
@@ -1477,6 +1495,7 @@ class DRCOpNodeCheck < DRCOpNodeWithCompare
     self.other = other
     self.args = args
     self.description = check.to_s
+    self.ne_allowed = true
   end
 
   def _description_for_dump
@@ -1516,12 +1535,16 @@ class DRCOpNodeCheck < DRCOpNodeWithCompare
       if res
         if self.check == :width || self.check == :notch
           # Same polygon check - we need to take both edges of the result
-          and_with = RBA::CompoundRegionOperationNode::new_edges(res)
+          other = RBA::CompoundRegionOperationNode::new_edges(res)
         else
-          and_with = RBA::CompoundRegionOperationNode::new_edge_pair_to_first_edges(res)
+          other = RBA::CompoundRegionOperationNode::new_edge_pair_to_first_edges(res)
         end
         res_max = RBA::CompoundRegionOperationNode::new_edge_pair_to_first_edges(max_check)
-        res = RBA::CompoundRegionOperationNode::new_geometrical_boolean(RBA::CompoundRegionOperationNode::GeometricalOp::And, and_with, res_max)
+        if self.mode_or
+          res = RBA::CompoundRegionOperationNode::new_join([ other, res_max ])
+        else
+          res = RBA::CompoundRegionOperationNode::new_geometrical_boolean(RBA::CompoundRegionOperationNode::GeometricalOp::And, other, res_max)
+        end
       else
         res = max_check
       end

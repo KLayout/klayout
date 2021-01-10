@@ -399,6 +399,9 @@ output(w, "width violations")</pre>
       <a href="/about/drc_ref_layer.xml#enclosure">enclosure (enc)</a>,
       <a href="/about/drc_ref_layer.xml#overlap">overlap</a>
     </li>
+    <li>Universal DRC (see below):<br/>
+      <a href="/about/drc_ref_layer.xml#drc">drc</a>
+    </li>
     <li>Boolean operations:<br/>
       <a href="/about/drc_ref_layer.xml#&amp;">&amp; (and)</a>,
       <a href="/about/drc_ref_layer.xml#|">| (or)</a>,
@@ -766,6 +769,139 @@ overlaps = layer.size(0.2).raw.merged(2)</pre>
     </tr>
   </table>
 
+
+  <h2>Universal DRC</h2>
+  <keyword name="DRC"/>
+  <keyword name="Universal DRC"/>
+
+  <p>
+  Starting with version 0.27, the DRC language got a new feature which is "universal DRC".
+  </p>
+
+  <p>
+  On one hand, this is a more convenient way to write DRC checks because it allows 
+  specifications using natural compare operators. For example, the following plain width check
+  </p>
+
+  <pre>
+  ...
+  drc_w = input(1, 0).width(0.2)
+  ...
+  </pre>
+
+  <p>
+  can be written as:
+  </p>
+
+  <pre>
+  ...
+  drc_w = input(1, 0).drc(width &lt; 0.2)
+  ...
+  </pre>
+
+  <p>
+  The <a href="/about/drc_ref_layer.xml#drc">drc</a> method is the "universal DRC" method.
+  It takes an operator. In the simple case, this operator is a simple constraint of the 
+  form "measurement &lt; value", but it supports a number of different variants:
+  </p>
+
+  <ul>
+  <li>
+    <tt>drc(</tt> measurement <tt> != </tt> value <tt>)</tt></li>: 
+    renders markers where the dimension is not matching the value
+  </li>
+  <li>
+    <tt>drc(</tt> measurement <tt> == </tt> value <tt>)</tt></li>:
+    renders markers where the dimension is matching the given value
+  </li>
+  <li>
+    <tt>drc(</tt> measurement less_op value <tt>)</tt></li>:
+    ("less_op" is <tt>&lt;</tt> or <tt>&lt;=</tt>)
+    renders markers where the dimension is less than or less or equal to the given value
+  </li>
+  <li>
+    <tt>drc(</tt> measurement greater_op value <tt>)</tt></li>:
+    ("greater_op" is <tt>&gt;</tt> or <tt>&gt;=</tt>)
+    renders markers where the dimension is greater than or greater or equal to the given value
+  </li>
+  <li>
+    <tt>drc(</tt> lower_value less_op measurement greater_op upper_value <tt>)</tt></li>:
+    renders markers where the dimension is between the lower and upper value
+  </li>
+  </ul>
+
+  <p>
+  "measurement" is "width", "notch", "isolated" ("iso"), "separation" ("sep"), "overlap" or "enclosure" ("enc"). They have the 
+  The last three checks are two-layer checks which require a second layer. The 
+  second layer is specified together with the measurement like this:
+  </p>
+
+  <pre>
+  ...
+  l1 = input(1, 0)
+  l2 = input(2, 0)
+  drc_sep = l1.drc(separation(l2) &lt;= 0.5)
+  ...
+  </pre>
+
+  <p>
+  Options are also specified together with the measurement and follow the same notation
+  as the plain methods. For example to specify "projection" metrics, use:
+  </p>
+
+  <pre>
+  ...
+  drc_w = input(1, 0).drc(width(projection) &lt; 0.2)
+  ...
+  </pre>
+
+  <p>
+  However, the universal DRC is much more: it offers a number of options to further process
+  the results. The functionality behind the universal DRC function is basically a kind of 
+  loop over all primary shapes (the ones from the layer the "drc" function is called on).
+  The operations in the drc function's brackets is executed on each of the primary shapes
+  where the neighborhood of that single shape is considered. This scheme is more efficient
+  and enables applications beyond the capabilities of the plain layer methods.
+  </p>
+
+  <p>
+  For example, the boolean "&amp;" operator implements a "local" boolean AND inside this 
+  loop. This allows to efficiently check for both space and width violations:
+  </p>
+
+  <pre>
+  ...
+  drc_ws = input(1, 0).drc((width &lt; 0.2) &amp; (space &lt; 0.3))
+  ...
+  </pre>
+
+  <p>
+  The boolean AND is computed between the edges on the primary shape and returns these
+  parts where both space and width violations are flagged. The boolean operation is 
+  more efficient than the plain alternative:
+  </p>
+
+  <pre>
+  ...
+  drc_ws1 = input(1, 0).width(0.2).edges
+  drc_ws2 = input(1, 0).space(0.3).edges
+  drc_ws = drc_ws1 &amp; drc_ws2
+  ...
+  </pre>
+
+  <p>
+  The reson is that performing the boolean computation in the local loop can be 
+  shortcut if one input is empty and it does not need to store a (potentially big)
+  layer set with edges as produced by the plain-method implementation. Instead it
+  will work with a temporary and local edge set only and free the memory space as
+  soon as it moves on to the next primary shape.
+  </p>
+
+  <p>
+  The universal DRC function is a rich feature and offers filters based on 
+  polygons or edge properties, polygon or edge manipulation, conditionals
+  and a lot more. For more details see the <a href="/about/drc_ref_layer.xml#drc">drc function documentation</a>.
+  </p>
 
   <h2>Logging and verbosity</h2>
   <keyword name="Logging"/>

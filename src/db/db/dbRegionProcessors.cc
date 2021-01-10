@@ -31,15 +31,9 @@ namespace db
 //  CornerDetectorCore implementation
 
 CornerDetectorCore::CornerDetectorCore (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end)
+  : m_checker (angle_start, include_angle_start, angle_end, include_angle_end)
 {
-  m_t_start = db::CplxTrans(1.0, angle_start, false, db::DVector ());
-  m_t_end = db::CplxTrans(1.0, angle_end, false, db::DVector ());
-
-  m_include_start = include_angle_start;
-  m_include_end = include_angle_end;
-
-  m_big_angle = (angle_end - angle_start + db::epsilon) > 180.0;
-  m_all = (angle_end - angle_start - db::epsilon) > 360.0;
+  //  .. nothing yet ..
 }
 
 void CornerDetectorCore::detect_corners (const db::Polygon &poly, const CornerPointDelivery &delivery) const
@@ -57,30 +51,8 @@ void CornerDetectorCore::detect_corners (const db::Polygon &poly, const CornerPo
 
         db::Point pn = ctr [j];
 
-        if (m_all) {
+        if (m_checker (pt - pp, pn - pt)) {
           delivery.make_point (pt);
-        } else {
-
-          db::Vector vin (pt - pp);
-          db::DVector vout (pn - pt);
-
-          db::DVector v1 = m_t_start * vin;
-          db::DVector v2 = m_t_end * vin;
-
-          int vps1 = db::vprod_sign (v1, vout);
-          int vps2 = db::vprod_sign (v2, vout);
-          bool opp1 = vps1 == 0 && (db::sprod_sign (v1, vout) < 0);
-          bool opp2 = vps2 == 0 && (db::sprod_sign (v2, vout) < 0);
-
-          bool vp1 = !opp1 && (m_include_start ? (db::vprod_sign (v1, vout) >= 0) : (db::vprod_sign (v1, vout) > 0));
-          bool vp2 = !opp2 && (m_include_end ? (db::vprod_sign (v2, vout) <= 0) : (db::vprod_sign (v2, vout) < 0));
-
-          if (m_big_angle && (vp1 || vp2)) {
-            delivery.make_point (pt);
-          } else if (! m_big_angle && vp1 && vp2) {
-            delivery.make_point (pt);
-          }
-
         }
 
         pp = pt;

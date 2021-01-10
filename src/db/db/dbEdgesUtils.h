@@ -104,6 +104,41 @@ private:
 };
 
 /**
+ *  @brief An angle detector
+ *
+ *  This detector can check whether the angle between two edges is within a certain angle interval.
+ *  It takes two edges: a and b. If b "turns left" (b following a), the angle will be positive, if it "turns" right,
+ *  the angle will be negative. The angle can be between -180 and 180 degree. The case of reflection
+ *  (exactly 180 degree) is not considered.
+ *
+ *  The constraint can be given in terms of a minimum and maximum angle. "include" specifies whether the
+ *  angle value itself is included. The operator() will return true, if the angle between the given
+ *  edges a and b in matching the constraint.
+ */
+class DB_PUBLIC EdgeAngleChecker
+{
+public:
+  EdgeAngleChecker (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end);
+
+  bool operator() (const db::Edge &a, const db::Edge &b) const
+  {
+    return m_all || check (a.d (), b.d ());
+  }
+
+  bool operator() (const db::Vector &a, const db::Vector &b) const
+  {
+    return m_all || check (a, b);
+  }
+
+private:
+  db::CplxTrans m_t_start, m_t_end;
+  bool m_include_start, m_include_end;
+  bool m_big_angle, m_all;
+
+  bool check (const db::Vector &a, const db::Vector &b) const;
+};
+
+/**
  *  @brief An edge orientation filter for use with Edges::filter or Edges::filtered
  *
  *  This filter has two parameters: amin and amax.
@@ -126,12 +161,7 @@ struct DB_PUBLIC EdgeOrientationFilter
    *  This filter will filter out all edges whose angle against x axis
    *  is larger or equal to amin and less than amax.
    */
-  EdgeOrientationFilter (double amin, double amax, bool inverse)
-    : m_inverse (inverse), m_exact (false)
-  {
-    m_emin = db::DVector (cos (amin * M_PI / 180.0), sin (amin * M_PI / 180.0));
-    m_emax = db::DVector (cos (amax * M_PI / 180.0), sin (amax * M_PI / 180.0));
-  }
+  EdgeOrientationFilter (double amin, bool include_amin, double amax, bool include_amax, bool inverse);
 
   /**
    *  @brief Constructor
@@ -142,33 +172,12 @@ struct DB_PUBLIC EdgeOrientationFilter
    *  This filter will filter out all edges whose angle against x axis
    *  is equal to a.
    */
-  EdgeOrientationFilter (double a, bool inverse)
-    : m_inverse (inverse), m_exact (true)
-  {
-    m_emin = db::DVector (cos (a * M_PI / 180.0), sin (a * M_PI / 180.0));
-  }
+  EdgeOrientationFilter (double a, bool inverse);
 
   /**
    *  @brief Returns true if the edge orientation matches the criterion
    */
-  virtual bool selected (const db::Edge &edge) const
-  {
-    int smin = db::vprod_sign (m_emin, db::DVector (edge.d ()));
-    if (m_exact) {
-      if (! m_inverse) {
-        return smin == 0;
-      } else {
-        return smin != 0;
-      }
-    } else {
-      int smax = db::vprod_sign (m_emax, db::DVector (edge.d ()));
-      if (! m_inverse) {
-        return (smin >= 0 && smax < 0) || (smax > 0 && smin <= 0);
-      } else {
-        return ! ((smin >= 0 && smax < 0) || (smax > 0 && smin <= 0));
-      }
-    }
-  }
+  virtual bool selected (const db::Edge &edge) const;
 
   /**
    *  @brief This filter is not isotropic
@@ -197,8 +206,8 @@ struct DB_PUBLIC EdgeOrientationFilter
 private:
   db::DVector m_emin, m_emax;
   bool m_inverse;
-  bool m_exact;
   db::MagnificationAndOrientationReducer m_vars;
+  EdgeAngleChecker m_checker;
 };
 
 /**

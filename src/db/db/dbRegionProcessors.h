@@ -27,6 +27,7 @@
 #include "dbCommon.h"
 #include "dbRegionDelegate.h"
 #include "dbPolygonTools.h"
+#include "dbEdgesUtils.h"
 
 namespace db
 {
@@ -97,9 +98,7 @@ public:
   void detect_corners (const db::Polygon &poly, const CornerPointDelivery &delivery) const;
 
 private:
-  db::CplxTrans m_t_start, m_t_end;
-  bool m_include_start, m_include_end;
-  bool m_big_angle, m_all;
+  db::EdgeAngleChecker m_checker;
 };
 
 /**

@@ -178,3 +178,13 @@ TEST(11d)
 {
   run_test (_this, "11", true);
 }
+
+TEST(12)
+{
+  run_test (_this, "12", false);
+}
+
+TEST(12d)
+{
+  run_test (_this, "12", true);
+}

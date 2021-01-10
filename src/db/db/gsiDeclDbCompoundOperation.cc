@@ -326,10 +326,10 @@ static db::CompoundRegionOperationNode *new_edge_length_filter (db::CompoundRegi
   return new db::CompoundRegionEdgeFilterOperationNode (new db::EdgeLengthFilter (lmin, lmax, inverse), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_edge_orientation_filter (db::CompoundRegionOperationNode *input, bool inverse, double amin, double amax)
+static db::CompoundRegionOperationNode *new_edge_orientation_filter (db::CompoundRegionOperationNode *input, bool inverse, double amin, bool include_amin, double amax, bool include_amax)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionEdgeFilterOperationNode (new db::EdgeOrientationFilter (amin, amax, inverse), input, true /*processor is owned*/);
+  return new db::CompoundRegionEdgeFilterOperationNode (new db::EdgeOrientationFilter (amin, include_amin, amax, include_amax, inverse), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_polygons (db::CompoundRegionOperationNode *input, db::Coord e)
@@ -675,7 +675,7 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   gsi::constructor ("new_edge_length_filter", &new_edge_length_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("lmin", 0), gsi::arg ("lmax", std::numeric_limits<db::Edge::distance_type>::max (), "max"),
     "@brief Creates a node filtering edges by their length.\n"
   ) +
-  gsi::constructor ("new_edge_orientation_filter", &new_edge_orientation_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("amin"), gsi::arg ("amax"),
+  gsi::constructor ("new_edge_orientation_filter", &new_edge_orientation_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("amin"), gsi::arg ("include_amin"), gsi::arg ("amax"), gsi::arg ("include_amax"),
     "@brief Creates a node filtering edges by their orientation.\n"
   ) +
   gsi::constructor ("new_polygons", &new_polygons, gsi::arg ("input"), gsi::arg ("e", 0),

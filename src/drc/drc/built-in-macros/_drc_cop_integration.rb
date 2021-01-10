@@ -334,13 +334,15 @@ CODE
     
     # %DRC%
     # @name area
-    # @brief Selects the primary shape if the area is meeting the condition
+    # @brief Computes the total area or in universal DRC context: selects the primary shape if the area is meeting the condition
     # @synopsis area (in condition)
     # @synopsis area(layer)
     #
     # This function can be used with a layer argument in which case it
-    # is equivalent to "layer.area" (see \Layer#area). Without a layer
-    # argument, "area" represents an area filter for primary shapes in 
+    # is equivalent to "layer.area" (see \Layer#area) and returns the total area of the 
+    # polygons in the layer. 
+    #
+    # Without a layer argument, "area" represents an area filter for primary shapes in 
     # \DRC# expressions (see \Layer#drc and \DRC#area for more details).
     
     # %DRC%
@@ -378,13 +380,15 @@ CODE
 
     # %DRC%
     # @name perimeter
-    # @brief Selects the primary shape if the perimeter is meeting the condition
+    # @brief Computes the total perimeter or in universal DRC context: selects the primary shape if the perimeter is meeting the condition
     # @synopsis perimeter (in condition)
     # @synopsis perimeter(layer)
     #
     # This function can be used with a layer argument in which case it
-    # is equivalent to "layer.perimeter" (see \Layer#perimeter). Without a layer
-    # argument, "perimeter" represents a perimeter filter for primary shapes in 
+    # is equivalent to "layer.perimeter" (see \Layer#perimeter) and returns the
+    # total perimeter of all polygons in the layer.
+    #
+    # Without a layer argument, "perimeter" represents a perimeter filter for primary shapes in 
     # \DRC# expressions (see \Layer#drc and \DRC#perimeter for more details).
 
     # %DRC%
@@ -409,6 +413,27 @@ CODE
     # argument, "rectilinear" represents the rectilinear polygons filter for primary shapes in 
     # \DRC# expressions (see \Layer#drc and \DRC#rectilinear for more details).
 
+    # %DRC%
+    # @name length (in condition)
+    # @brief Computes the total edge length of an edge layer or in universal DRC context: selects edges based on a length condition
+    # @synopsis length (in condition)
+    # @synopsis length(layer)
+    #
+    # This function can be used with a layer argument in which case it
+    # is equivalent to "layer.length" (see \Layer#length). Without a layer
+    # argument, "length" represents the edge length filter on the primary shape edges in 
+    # \DRC# expressions (see \Layer#drc and \DRC#length for more details). In this context,
+    # the operation acts similar to \Layer#with_length.
+
+    # %DRC%
+    # @name angle (in condition)
+    # @brief In universal DRC context: selects edges based on their orientation
+    # @synopsis angle (in condition)
+    #
+    # "angle" represents the edge orientation filter on the primary shape edges in
+    # \DRC# expressions (see \Layer#drc and \DRC#angle for more details). In this context,
+    # the operation acts similar to \Layer#with_angle.
+
     %w(
       area
       holes
@@ -417,6 +442,8 @@ CODE
       perimeter
       rectangles
       rectilinear
+      length
+      angle
     ).each do |f|
       # NOTE: these methods are fallback for the respective global ones which route to DRCLayer or here.
       eval <<"CODE"

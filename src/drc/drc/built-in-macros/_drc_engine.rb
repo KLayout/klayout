@@ -1574,6 +1574,7 @@ CODE
     %w(
       and
       andnot
+      angle
       area
       bbox 
       centers

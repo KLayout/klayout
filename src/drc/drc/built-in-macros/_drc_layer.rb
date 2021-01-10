@@ -2780,7 +2780,7 @@ CODE
         @engine._cmd(self.data, :length) * @engine.dbu.to_f
       end
     end
-    
+
     # %DRC%
     # @name flatten
     # @brief Flattens the layer

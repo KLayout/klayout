@@ -206,9 +206,9 @@ static db::Edges with_angle1 (const db::Edges *r, double a, bool inverse)
   return r->filtered (f);
 }
 
-static db::Edges with_angle2 (const db::Edges *r, double amin, double amax, bool inverse)
+static db::Edges with_angle2 (const db::Edges *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
 {
-  db::EdgeOrientationFilter f (amin, amax, inverse);
+  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse);
   return r->filtered (f);
 }
 
@@ -581,12 +581,17 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "horizontal = edges.with_orientation(0, true)\n"
     "@/code\n"
   ) +
-  method_ext ("with_angle", with_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"),
+  method_ext ("with_angle", with_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_amin", true), gsi::arg ("include_amax", true),
     "@brief Filter the edges by orientation\n"
     "Filters the edges in the edge collection by orientation. If \"inverse\" is false, only "
     "edges which have an angle to the x-axis larger or equal to \"min_angle\" and less than \"max_angle\" are "
     "returned. If \"inverse\" is true, "
-    "edges which do not conform to this criterion are returned."
+    "edges which do not conform to this criterion are returned.\n"
+    "\n"
+    "With \"include_min\" set to true (the default), the minimum angle is included in the criterion while with false, the "
+    "minimum angle itself is not included. Same for \"include_max\".\n"
+    "\n"
+    "The two \"include..\" arguments have been added in version 0.27."
   ) +
   method ("insert", (void (db::Edges::*)(const db::Edge &)) &db::Edges::insert, gsi::arg ("edge"),
     "@brief Inserts an edge\n"

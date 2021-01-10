@@ -1324,7 +1324,9 @@ class DRCOpNodeEdgeOrientationFilter < DRCOpNodeWithCompare
     args = [ n, self.inverse ]
     angle_delta = 1e-6
     args << (self.gt ? self.gt + angle_delta : (self.ge ? self.ge : -180.0))
+    args << (self.gt ? false : true)
     args << (self.lt ? self.lt : (self.le ? self.le + angle_delta : 180.0))
+    args << (self.lt ? false : true)
 
     RBA::CompoundRegionOperationNode::new_edge_orientation_filter(*args)
 

@@ -200,23 +200,23 @@ TEST(4)
     EXPECT_EQ (r.filtered (f1).to_string (), "(0,200;100,200);(100,0;0,0);(300,0;200,0)");
   }
   {
-    db::EdgeOrientationFilter f1 (50.0, 80.0, false);
+    db::EdgeOrientationFilter f1 (50.0, true, 80.0, true, false);
     EXPECT_EQ (r.filtered (f1).to_string (), "(200,0;250,200);(250,-200;300,0)");
   }
   {
-    db::EdgeOrientationFilter f1 (50.0, 80.0, true);
+    db::EdgeOrientationFilter f1 (50.0, true, 80.0, true, true);
     EXPECT_EQ (r.filtered (f1).to_string (), "(0,0;0,200);(0,200;100,200);(100,200;100,0);(100,0;0,0);(250,200;300,0);(300,0;200,0);(200,0;250,-200)");
   }
   {
-    db::EdgeOrientationFilter f1 (0.0, 1.0, false);
+    db::EdgeOrientationFilter f1 (0.0, true, 1.0, true, false);
     EXPECT_EQ (r.filtered (f1).to_string (), "(0,200;100,200);(100,0;0,0);(300,0;200,0)");
   }
   {
-    db::EdgeOrientationFilter f1 (-1.0, 1.0, false);
+    db::EdgeOrientationFilter f1 (-1.0, true, 1.0, true, false);
     EXPECT_EQ (r.filtered (f1).to_string (), "(0,200;100,200);(100,0;0,0);(300,0;200,0)");
   }
   {
-    db::EdgeOrientationFilter f1 (-1.0, 0.0, false);
+    db::EdgeOrientationFilter f1 (-1.0, true, 0.0, true, false);
     EXPECT_EQ (r.filtered (f1).to_string (), "");
   }
   {
@@ -224,15 +224,15 @@ TEST(4)
     EXPECT_EQ (r.filtered (f1).to_string (), "(0,0;0,200);(100,200;100,0)");
   }
   {
-    db::EdgeOrientationFilter f1 (90.0, 91.0, false);
+    db::EdgeOrientationFilter f1 (90.0, true, 91.0, true, false);
     EXPECT_EQ (r.filtered (f1).to_string (), "(0,0;0,200);(100,200;100,0)");
   }
   {
-    db::EdgeOrientationFilter f1 (89.0, 91.0, false);
+    db::EdgeOrientationFilter f1 (89.0, true, 91.0, true, false);
     EXPECT_EQ (r.filtered (f1).to_string (), "(0,0;0,200);(100,200;100,0)");
   }
   {
-    db::EdgeOrientationFilter f1 (89.0, 90.0, false);
+    db::EdgeOrientationFilter f1 (89.0, true, 90.0, true, false);
     EXPECT_EQ (r.filtered (f1).to_string (), "");
   }
 }

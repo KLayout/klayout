@@ -158,3 +158,13 @@ TEST(9d)
 {
   run_test (_this, "9", true);
 }
+
+TEST(10)
+{
+  run_test (_this, "10", false);
+}
+
+TEST(10d)
+{
+  run_test (_this, "10", true);
+}

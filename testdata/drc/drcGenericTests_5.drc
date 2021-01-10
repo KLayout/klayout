@@ -39,3 +39,6 @@ l1.drc(! rectangles).output(141, 0)
 l1.drc(if_all(! rectangles, area < 8.0)).output(150, 0)
 l1.drc(if_any(rectangles, area > 8.0)).output(151, 0)
 
+l1.drc(if_any(corners.count > 4)).output(160, 0)
+l1.drc(if_any(corners.count == 4)).output(161, 0)
+

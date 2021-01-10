@@ -269,7 +269,7 @@ CODE
   # The plain function is equivalent to "primary.bbox_min".
   
   def bbox_min
-    DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::BoxMinDim, self)
+    DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::ParameterType::BoxMinDim, self)
   end
   
   # %DRC%
@@ -284,7 +284,7 @@ CODE
   # The plain function is equivalent to "primary.bbox_max".
 
   def bbox_max
-    DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::BoxMaxDim, self)
+    DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::ParameterType::BoxMaxDim, self)
   end
   
   # %DRC%
@@ -302,7 +302,7 @@ CODE
   # The plain function is equivalent to "primary.bbox_width".
 
   def bbox_width
-    DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::BoxWidth, self)
+    DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::ParameterType::BoxWidth, self)
   end
   
   # %DRC%
@@ -320,7 +320,7 @@ CODE
   # The plain function is equivalent to "primary.bbox_height".
 
   def bbox_height
-    DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::BoxHeight, self)
+    DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::ParameterType::BoxHeight, self)
   end
   
   # %DRC%
@@ -1537,21 +1537,21 @@ class DRCOpNodeBBoxParameterFilter < DRCOpNodeWithCompare
   attr_accessor :parameter
   attr_accessor :inverse
   
-  def initialize(engine, parameter, input, description)
+  def initialize(engine, parameter, input)
     super(engine)
     self.parameter = parameter
     self.input = input
     self.inverse = false
-    self.description = description
+    self.description = parameter.to_s
   end
   
   def do_create_node(cache)
-    args = [ self.input.create_node(cache), self.inverse ]
+    args = [ self.input.create_node(cache), self.parameter, self.inverse ]
     args << (self.gt ? @engine._make_value(self.gt) + 1 : (self.ge ? @engine._make_value(self.ge) : 0))
     if self.lt || self.le
       args << (self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) + 1)
     end
-    RBA::CompoundRegionOperationNode::new_perimeter_filter(*args)
+    RBA::CompoundRegionOperationNode::new_bbox_filter(*args)
   end
 
   def inverted

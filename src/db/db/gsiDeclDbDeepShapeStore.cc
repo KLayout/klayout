@@ -111,6 +111,19 @@ Class<db::DeepShapeStore> decl_dbDeepShapeStore ("db", "DeepShapeStore",
   gsi::method ("threads", &db::DeepShapeStore::threads,
     "@brief Gets the number of threads.\n"
   ) +
+  gsi::method ("reject_odd_polygons=", &db::DeepShapeStore::set_reject_odd_polygons, gsi::arg ("count"),
+    "@brief Sets a flag indicating whether to reject odd polygons\n"
+    "\n"
+    "Some kind of 'odd' (e.g. non-orientable) polygons may spoil the functionality "
+    "because they cannot be handled properly. By using this flag, the shape store "
+    "we reject these kind of polygons. The default is 'accept' (without warning).\n"
+    "\n"
+    "This attribute has been introduced in version 0.27."
+  ) +
+  gsi::method ("reject_odd_polygons", &db::DeepShapeStore::reject_odd_polygons,
+    "@brief Gets a flag indicating whether to reject odd polygons.\n"
+    "This attribute has been introduced in version 0.27."
+  ) +
   gsi::method ("max_vertex_count=", &db::DeepShapeStore::set_max_vertex_count, gsi::arg ("count"),
     "@brief Sets the maximum vertex count default value\n"
     "\n"

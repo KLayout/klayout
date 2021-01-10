@@ -53,9 +53,12 @@ module DRC
       dss = RBA::DeepShapeStore::new
       @max_area_ratio = dss.max_area_ratio
       @max_vertex_count = dss.max_vertex_count
+      @deep_reject_odd_polygons = dss.reject_odd_polygons
       dss._destroy
 
       @verbose = false
+
+      @in_context = false
 
     end
     
@@ -680,6 +683,28 @@ module DRC
       self.threads(n)
     end
     
+    # %DRC%
+    # @name deep_reject_odd_polygons
+    # @brief Gets or sets a value indicating whether the reject odd polygons in deep mode
+    # @synopsis deep_reject_odd_polygons(flag)
+    # @synopsis deep_reject_odd_polygons
+    #
+    # In deep mode, non-orientable (e.g. "8"-shaped) polygons may not be resolved properly.
+    # By default the interpretation of such polygons is undefined - they may even vanish entirely.
+    # By setting this flag to true, the deep mode layout processor will reject such polygons with 
+    # an error. 
+ 
+    def deep_reject_odd_polygons(*args)
+      if args.size > 0 
+        @deep_reject_odd_polygons = args[0] ? true : false
+      end
+      @deep_reject_odd_polygons
+    end
+
+    def deep_reject_odd_polygons=(flag)
+      self.deep_reject_odd_polygons(flag)
+    end
+
     # %DRC%
     # @name max_vertex_count
     # @brief Gets or sets the maximum vertex count for deep mode fragmentation
@@ -1770,18 +1795,29 @@ CODE
     end
 
     def _wrapper_context(func, *args, &proc)
+      in_context_outer = @in_context
       begin
+        @in_context = true
         return yield(*args)
       rescue => ex
         raise("'" + func + "': " + ex.to_s)
+      ensure 
+        @in_context = in_context_outer
       end
     end
     
     def _context(func, *args, &proc)
-      begin
+      if @in_context
         return yield(*args)
-      rescue => ex
-        raise("'" + func + "': " + ex.to_s)
+      else
+        begin
+          @in_context = true
+          return yield(*args)
+        rescue => ex
+          raise("'" + func + "': " + ex.to_s)
+        ensure
+          @in_context = false
+        end
       end
     end
     
@@ -1879,7 +1915,7 @@ CODE
 
       end
       
-      # enable progress
+      # disable progress again
       if obj.is_a?(RBA::Region)
         obj.disable_progress
       end
@@ -1934,7 +1970,7 @@ CODE
 
       end
       
-      # enable progress
+      # disable progress again
       if obj.is_a?(RBA::Region)
         obj.disable_progress
       end
@@ -1977,7 +2013,7 @@ CODE
 
       end
       
-      # enable progress
+      # disable progress again
       if obj.is_a?(RBA::Region)
         obj.disable_progress
       end
@@ -2322,6 +2358,7 @@ CODE
           # object which keeps the DSS.
           @dss.text_property_name = "LABEL"
           @dss.text_enlargement = 1
+          @dss.reject_odd_polygons = @deep_reject_odd_polygons
           @dss.max_vertex_count = @max_vertex_count
           @dss.max_area_ratio = @max_area_ratio
 

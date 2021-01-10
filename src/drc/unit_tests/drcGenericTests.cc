@@ -168,3 +168,13 @@ TEST(10d)
 {
   run_test (_this, "10", true);
 }
+
+TEST(11)
+{
+  run_test (_this, "11", false);
+}
+
+TEST(11d)
+{
+  run_test (_this, "11", true);
+}

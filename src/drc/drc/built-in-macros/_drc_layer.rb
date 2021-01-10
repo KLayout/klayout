@@ -1233,11 +1233,19 @@ CODE
     # @synopsis layer.odd_polygons
     # Returns the parts of the polygons which are not orientable (i.e. "8" configuration) or self-overlapping.
     # Merged semantics does not apply for this method. Always the raw polygons are taken (see \raw).
+    #
+    # The odd_polygons check is not available in deep mode currently. See \deep_reject_odd_polygons for
+    # an alternative.
     
     def odd_polygons
       @engine._context("odd_polygons") do
-        requires_region
-        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :strange_polygon_check))
+        if is_deep?
+          @engine.error("'odd_polygons' is not performing any check in deep mode - use 'deep_reject_odd_polygons' instead")
+          return @engine.polygons
+        else
+          requires_region
+          return DRCLayer::new(@engine, @engine._vcmd(self.data, :strange_polygon_check))
+        end
       end
     end
     

@@ -838,6 +838,107 @@ smooth (const db::Polygon &polygon, db::Coord d)
 }
 
 // -------------------------------------------------------------------------
+//  Strange polygons
+
+namespace
+{
+
+/**
+ *  @brief A helper class to implement the strange polygon detector
+ */
+struct StrangePolygonInsideFunc
+{
+  inline bool operator() (int wc) const
+  {
+    return wc < 0 || wc > 1;
+  }
+};
+
+/**
+ *  @brief A helper class to implement the non-orientable polygon detector
+ */
+struct NonOrientablePolygonFunc
+{
+  inline bool operator() (int wc) const
+  {
+    //  As polygon contours are normalized by default to positive wrap count a negative wrap count
+    //  indicates non-orientability
+    return wc < 0;
+  }
+};
+
+/**
+ *  @brief An exception type indicating a strange polygon
+ */
+struct OddPolygonException
+{
+  OddPolygonException () { }
+};
+
+/**
+ *  @brief An edge processor catching the error
+ */
+class ErrorCatchingEdgeSink
+  : public db::EdgeSink
+{
+  //  TODO: we should not use exceptions to indicate a condition, but right now, there is no good alternative
+  //  and this is considered an error anyway.
+  virtual void put (const db::Edge &) { throw OddPolygonException (); }
+  virtual void crossing_edge (const db::Edge &) { throw OddPolygonException (); }
+};
+
+}
+
+template <class F>
+bool
+check_wrapcount (const db::Polygon &poly, std::vector<db::Polygon> *error_parts)
+{
+  size_t vn = poly.vertices ();
+  if (vn < 4 || (vn == 4 && poly.is_box ())) {
+    return false;
+  }
+
+  EdgeProcessor ep;
+  ep.insert (poly);
+
+  F inside;
+  db::GenericMerge<F> op (inside);
+
+  if (error_parts) {
+
+    db::PolygonContainer pc (*error_parts, false);
+    db::PolygonGenerator pg (pc, false, false);
+    ep.process (pg, op);
+
+    return ! error_parts->empty ();
+
+  } else {
+
+    try {
+      ErrorCatchingEdgeSink es;
+      ep.process (es, op);
+    } catch (OddPolygonException &) {
+      return true;
+    }
+
+    return false;
+
+  }
+}
+
+bool
+is_strange_polygon (const db::Polygon &poly, std::vector<db::Polygon> *strange_parts)
+{
+  return check_wrapcount<StrangePolygonInsideFunc> (poly, strange_parts);
+}
+
+bool
+is_non_orientable_polygon (const db::Polygon &poly, std::vector<db::Polygon> *strange_parts)
+{
+  return check_wrapcount<NonOrientablePolygonFunc> (poly, strange_parts);
+}
+
+// -------------------------------------------------------------------------
 //  Rounding tools
 
 template <class C>

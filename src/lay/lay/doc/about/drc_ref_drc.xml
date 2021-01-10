@@ -86,6 +86,16 @@ of two expressions. The NOT operation is defined for polygons,
 edges and polygons subtracted from edges (first argument edge,
 second argument polygon).
 </p><p>
+CAUTION: be careful not to take secondary input for the 
+first argument. This will not render the desired results.
+Remember that the "drc" function will walk over all primary
+shapes and present single primaries to the NOT operation together
+the the secondaries of that single shape. So when you use
+secondary shapes as the first argument, they will not see all
+all the primaries required to compute the correct result.
+That's also why a XOR operation cannot be provided in the 
+context of a generic DRC function.
+</p><p>
 The following example will produce edge markers where the 
 width of is less then 0.3 micron but not inside polygons on 
 the "waive" layer:
@@ -93,17 +103,6 @@ the "waive" layer:
 <pre>
 out = in.drc((width &lt; 0.3).edges - secondary(waive))
 </pre>
-</p>
-<a name="^"/><h2>"^" - Boolean XOR between the results of two expressions</h2>
-<keyword name="^"/>
-<p>Usage:</p>
-<ul>
-<li><tt>expression - expression</tt></li>
-</ul>
-<p>
-The ^ operator will compute the XOR (symmetric difference) between the results
-of two expressions. The XOR operation is defined for polygons and edges.
-Both expressions must be of the same type.
 </p>
 <a name="angle"/><h2>"angle" - Selects edges based on their angle</h2>
 <keyword name="angle"/>

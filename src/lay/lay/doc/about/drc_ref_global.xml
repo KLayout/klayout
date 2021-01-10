@@ -8,6 +8,17 @@
 <title>DRC Reference: Global Functions</title>
 <keyword name="global"/>
 <h2-index/>
+<a name="angle (in condition)"/><h2>"angle (in condition)" - In universal DRC context: selects edges based on their orientation</h2>
+<keyword name="angle (in condition)"/>
+<p>Usage:</p>
+<ul>
+<li><tt>angle (in condition)</tt></li>
+</ul>
+<p>
+"angle" represents the edge orientation filter on the primary shape edges in
+<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#angle">DRC#angle</a> for more details). In this context,
+the operation acts similar to <a href="/about/drc_ref_layer.xml#with_angle">Layer#with_angle</a>.
+</p>
 <a name="antenna_check"/><h2>"antenna_check" - Performs an antenna check</h2>
 <keyword name="antenna_check"/>
 <p>Usage:</p>
@@ -17,7 +28,7 @@
 <p>
 See <a href="/about/drc_ref_netter.xml#antenna_check">Netter#antenna_check</a> for a description of that function.
 </p>
-<a name="area"/><h2>"area" - Selects the primary shape if the area is meeting the condition</h2>
+<a name="area"/><h2>"area" - Computes the total area or in universal DRC context: selects the primary shape if the area is meeting the condition</h2>
 <keyword name="area"/>
 <p>Usage:</p>
 <ul>
@@ -26,8 +37,10 @@ See <a href="/about/drc_ref_netter.xml#antenna_check">Netter#antenna_check</a> f
 </ul>
 <p>
 This function can be used with a layer argument in which case it
-is equivalent to "layer.area" (see <a href="/about/drc_ref_layer.xml#area">Layer#area</a>). Without a layer
-argument, "area" represents an area filter for primary shapes in 
+is equivalent to "layer.area" (see <a href="/about/drc_ref_layer.xml#area">Layer#area</a>) and returns the total area of the 
+polygons in the layer. 
+</p><p>
+Without a layer argument, "area" represents an area filter for primary shapes in 
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#area">DRC#area</a> for more details).
 </p>
 <a name="bbox_height"/><h2>"bbox_height" - Selects primary shapes based on their bounding box height</h2>
@@ -330,14 +343,21 @@ See <a href="/about/drc_ref_netter.xml#connect_implicit">Netter#connect_implicit
 <keyword name="corners"/>
 <p>Usage:</p>
 <ul>
-<li><tt>corners (in condition)</tt></li>
-<li><tt>corners(layer)</tt></li>
+<li><tt>corners([ options ]) (in condition)</tt></li>
+<li><tt>corners(layer [, options ])</tt></li>
 </ul>
 <p>
 This function can be used with a layer argument in which case it
 is equivalent to "layer.corners" (see <a href="/about/drc_ref_layer.xml#corners">Layer#corners</a>). Without a layer
 argument, "corners" represents the corner generator/filter in primary shapes for
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#corners">DRC#corners</a> for more details).
+</p><p>
+Like the layer-based version, the "corners" operator accepts the 
+output type option: "as_dots" for dot-like edges and "as_boxes" for
+small (2x2 DBU) box markers.
+</p><p>
+The "corners" operator can be put into a condition which means it's
+applied to coners meeting a particular angle constraint.
 </p>
 <a name="covering"/><h2>"covering" - Selects shapes entirely covering other shapes</h2>
 <keyword name="covering"/>
@@ -408,6 +428,19 @@ Hierarchical mode has some more implications, like "merged_semantics" being
 implied always. Sometimes cell variants will be created.
 </p><p>
 Deep mode can be cancelled with <a href="#tiles">tiles</a> or <a href="#flat">flat</a>.
+</p>
+<a name="deep_reject_odd_polygons"/><h2>"deep_reject_odd_polygons" - Gets or sets a value indicating whether the reject odd polygons in deep mode</h2>
+<keyword name="deep_reject_odd_polygons"/>
+<p>Usage:</p>
+<ul>
+<li><tt>deep_reject_odd_polygons(flag)</tt></li>
+<li><tt>deep_reject_odd_polygons</tt></li>
+</ul>
+<p>
+In deep mode, non-orientable (e.g. "8"-shaped) polygons may not be resolved properly.
+By default the interpretation of such polygons is undefined - they may even vanish entirely.
+By setting this flag to true, the deep mode layout processor will reject such polygons with 
+an error. 
 </p>
 <a name="device_scaling"/><h2>"device_scaling" - Specifies a dimension scale factor for the geometrical device properties</h2>
 <keyword name="device_scaling"/>
@@ -537,9 +570,13 @@ out = in.drc(enclosing(other) == 0.2.um)
 out = in.drc(0.1.um &lt;= enclosing(other) &lt; 0.2.um)
 </pre>
 </p><p>
-The result of the enclosing check are edge pairs forming the violation
-markers. With a lower limit, these markers are formed by two, identical but opposite edges attached to 
-the primary shape. Without a lower limit, the first edge of the marker is attached to the 
+The result of the enclosing check are edges or edge pairs forming the markers.
+These markers indicate the presence of the specified condition.
+</p><p>
+With a lower and upper limit, the results are edges marking the positions on the 
+primary shape where the condition is met.
+With a lower limit alone, these markers are formed by two, identical but opposite edges attached to 
+the primary shape. Without an upper limit only, the first edge of the marker is attached to the 
 primary shape while the second edge is attached to the shape of the "other" layer.
 </p>
 <a name="error"/><h2>"error" - Prints an error</h2>
@@ -829,6 +866,20 @@ l2 = layout("second_layout.gds")
 </p><p>
 For further methods on the source object see <a href="#Source">Source</a>.
 </p>
+<a name="length (in condition)"/><h2>"length (in condition)" - Computes the total edge length of an edge layer or in universal DRC context: selects edges based on a length condition</h2>
+<keyword name="length (in condition)"/>
+<p>Usage:</p>
+<ul>
+<li><tt>length (in condition)</tt></li>
+<li><tt>length(layer)</tt></li>
+</ul>
+<p>
+This function can be used with a layer argument in which case it
+is equivalent to "layer.length" (see <a href="/about/drc_ref_layer.xml#length">Layer#length</a>). Without a layer
+argument, "length" represents the edge length filter on the primary shape edges in 
+<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#length">DRC#length</a> for more details). In this context,
+the operation acts similar to <a href="/about/drc_ref_layer.xml#with_length">Layer#with_length</a>.
+</p>
 <a name="log"/><h2>"log" - Outputs as message to the logger window</h2>
 <keyword name="log"/>
 <p>Usage:</p>
@@ -1073,7 +1124,7 @@ x.insert(polygon([ p(0, 0), p(16.0, 0), p(8.0, 8.0) ]))
 This function creates a path object. The arguments are the same than for the 
 <class_doc href="DPath">DPath</class_doc> constructors.
 </p>
-<a name="perimeter"/><h2>"perimeter" - Selects the primary shape if the perimeter is meeting the condition</h2>
+<a name="perimeter"/><h2>"perimeter" - Computes the total perimeter or in universal DRC context: selects the primary shape if the perimeter is meeting the condition</h2>
 <keyword name="perimeter"/>
 <p>Usage:</p>
 <ul>
@@ -1082,8 +1133,10 @@ This function creates a path object. The arguments are the same than for the
 </ul>
 <p>
 This function can be used with a layer argument in which case it
-is equivalent to "layer.perimeter" (see <a href="/about/drc_ref_layer.xml#perimeter">Layer#perimeter</a>). Without a layer
-argument, "perimeter" represents a perimeter filter for primary shapes in 
+is equivalent to "layer.perimeter" (see <a href="/about/drc_ref_layer.xml#perimeter">Layer#perimeter</a>) and returns the
+total perimeter of all polygons in the layer.
+</p><p>
+Without a layer argument, "perimeter" represents a perimeter filter for primary shapes in 
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#perimeter">DRC#perimeter</a> for more details).
 </p>
 <a name="polygon"/><h2>"polygon" - Creates a polygon object</h2>
@@ -1518,9 +1571,10 @@ out = in.drc(width == 0.2.um)
 out = in.drc(0.1.um &lt;= width &lt; 0.2.um)
 </pre>
 </p><p>
-The result of the width check are edge pairs forming the violation
-markers. With a lower limit, these markers are formed by two, identical but opposite edges attached to 
-the primary shape. Without a lower limit, both edges are attached to different sides of the primary 
+With a lower and upper limit, the results are edges marking the positions on the 
+primary shape where the condition is met.
+With a lower limit alone, these markers are formed by two, identical but opposite edges attached to 
+the primary shape. Without an upper limit only, both edges are attached to different sides of the primary
 shape.
 </p>
 <a name="write_spice"/><h2>"write_spice" - Defines SPICE output format (with options)</h2>

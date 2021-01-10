@@ -1436,6 +1436,9 @@ The following image shows the effect of the notch check:
 <p>
 Returns the parts of the polygons which are not orientable (i.e. "8" configuration) or self-overlapping.
 Merged semantics does not apply for this method. Always the raw polygons are taken (see <a href="#raw">raw</a>).
+</p><p>
+The odd_polygons check is not available in deep mode currently. See <a href="#deep_reject_odd_polygons">deep_reject_odd_polygons</a> for
+an alternative.
 </p>
 <a name="ongrid"/><h2>"ongrid" - Checks for on-grid vertices</h2>
 <keyword name="ongrid"/>

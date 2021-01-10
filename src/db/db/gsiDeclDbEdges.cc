@@ -581,15 +581,15 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "horizontal = edges.with_orientation(0, true)\n"
     "@/code\n"
   ) +
-  method_ext ("with_angle", with_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_amin", true), gsi::arg ("include_amax", true),
+  method_ext ("with_angle", with_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
     "@brief Filter the edges by orientation\n"
     "Filters the edges in the edge collection by orientation. If \"inverse\" is false, only "
-    "edges which have an angle to the x-axis larger or equal to \"min_angle\" and less than \"max_angle\" are "
+    "edges which have an angle to the x-axis larger or equal to \"min_angle\" (depending on \"include_min_angle\") and equal or less than \"max_angle\" (depending on \"include_max_angle\") are "
     "returned. If \"inverse\" is true, "
     "edges which do not conform to this criterion are returned.\n"
     "\n"
-    "With \"include_min\" set to true (the default), the minimum angle is included in the criterion while with false, the "
-    "minimum angle itself is not included. Same for \"include_max\".\n"
+    "With \"include_min_angle\" set to true (the default), the minimum angle is included in the criterion while with false, the "
+    "minimum angle itself is not included. Same for \"include_max_angle\" where the default is false, meaning the maximum angle is not included in the range.\n"
     "\n"
     "The two \"include..\" arguments have been added in version 0.27."
   ) +

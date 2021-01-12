@@ -61,6 +61,21 @@ CompoundRegionOperationNode::generated_description () const
   return std::string ();
 }
 
+bool
+CompoundRegionOperationNode::is_merged () const
+{
+  std::vector<db::Region *> iv = inputs ();
+  //  NOTE: the primary is supposed to be merged always (except in raw mode)
+  return iv.size () == 1 && (is_subject_regionptr (iv.front ()) || iv.front ()->is_merged ());
+}
+
+bool
+CompoundRegionOperationNode::has_external_inputs () const
+{
+  std::vector<db::Region *> iv = inputs ();
+  return iv.size () == 1 && ! is_subject_regionptr (iv.front ());
+}
+
 // ---------------------------------------------------------------------------------------------
 
 static void translate (db::Layout *layout, const std::vector<std::unordered_set<db::Polygon> > &in, std::vector<std::unordered_set<db::PolygonRef> > &out)
@@ -1054,6 +1069,75 @@ template void CompoundRegionLogicalCaseSelectOperationNode::implement_compute_lo
 
 // ---------------------------------------------------------------------------------------------
 
+CompoundRegionInteractOperationNode::CompoundRegionInteractOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b, int mode, bool touching, bool inverse, size_t min_count, size_t max_count)
+  : compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon> (&m_op, a, b), m_op (mode, touching, inverse, min_count, max_count, b->is_merged ())
+{
+  //  .. nothing yet ..
+}
+
+CompoundRegionInteractOperationNode::CompoundRegionInteractOperationNode (db::Region *a, db::Region *b, int mode, bool touching, bool inverse, size_t min_count, size_t max_count)
+  : compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon> (&m_op, a, b), m_op (mode, touching, inverse, min_count, max_count, b->is_merged ())
+{
+  //  .. nothing yet ..
+}
+
+std::string
+CompoundRegionInteractOperationNode::generated_description () const
+{
+  return std::string ("interact") + compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon>::generated_description ();
+}
+
+// ---------------------------------------------------------------------------------------------
+
+CompoundRegionInteractWithEdgeOperationNode::CompoundRegionInteractWithEdgeOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b, bool inverse, size_t min_count, size_t max_count)
+  : compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon> (&m_op, a, b), m_op (inverse, min_count, max_count, b->is_merged ())
+{
+  //  .. nothing yet ..
+}
+
+std::string
+CompoundRegionInteractWithEdgeOperationNode::generated_description () const
+{
+  return std::string ("interact") + compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon>::generated_description ();
+}
+
+// ---------------------------------------------------------------------------------------------
+
+CompoundRegionPullOperationNode::CompoundRegionPullOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b, int mode, bool touching)
+  : compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon> (&m_op, a, b), m_op (mode, touching)
+{
+  //  .. nothing yet ..
+}
+
+CompoundRegionPullOperationNode::CompoundRegionPullOperationNode (db::Region *a, db::Region *b, int mode, bool touching)
+  : compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon> (&m_op, a, b), m_op (mode, touching)
+{
+  //  .. nothing yet ..
+}
+
+std::string
+CompoundRegionPullOperationNode::generated_description () const
+{
+  return std::string ("pull") + compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon>::generated_description ();
+}
+
+// ---------------------------------------------------------------------------------------------
+
+CompoundRegionPullWithEdgeOperationNode::CompoundRegionPullWithEdgeOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b)
+  : compound_region_generic_operation_node<db::Polygon, db::Edge, db::Edge> (&m_op, a, b), m_op ()
+{
+  //  .. nothing yet ..
+}
+
+std::string
+CompoundRegionPullWithEdgeOperationNode::generated_description () const
+{
+  return std::string ("pull") + compound_region_generic_operation_node<db::Polygon, db::Edge, db::Edge>::generated_description ();
+}
+
+
+// ---------------------------------------------------------------------------------------------
+
 CompoundRegionJoinOperationNode::CompoundRegionJoinOperationNode (const std::vector<CompoundRegionOperationNode *> &inputs)
   : CompoundRegionMultiInputOperationNode (inputs)
 {
@@ -1514,17 +1598,8 @@ CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (CompoundRegi
 CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (CompoundRegionOperationNode * /*input*/, CompoundRegionOperationNode *other, db::edge_relation_type rel, bool different_polygons, db::Coord d, const db::RegionCheckOptions &options)
   : CompoundRegionMultiInputOperationNode (other), m_check (rel, d, options.metrics), m_different_polygons (different_polygons), m_options (options)
 {
-  m_has_other = false;
-  std::vector<db::Region *> other_inputs = other->inputs ();
-  if (other_inputs.size () > 1) {
-    m_has_other = true;
-    m_is_other_merged = false;   //  or do we know better?
-  } else if (other_inputs.size () == 1) {
-    if (! is_subject_regionptr (other_inputs.front ())) {
-      m_has_other = true;
-      m_is_other_merged = other_inputs.front ()->is_merged ();
-    }
-  }
+  m_has_other = other->has_external_inputs ();
+  m_is_other_merged = other->is_merged ();
 
   set_description ("check");
 

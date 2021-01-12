@@ -105,6 +105,18 @@ public:
   void set_description (const std::string &d);
 
   /**
+   *  @brief Gets a value indicating whether the result is definitely merged
+   *  The default implementation is based on a heuristic analysis of the inputs.
+   */
+  virtual bool is_merged () const;
+
+  /**
+   *  @brief Returns a value indicating whether this node provides external inputs
+   *  A node has external inputs if it has inputs and does not refer to the primary alone.
+   */
+  virtual bool has_external_inputs () const;
+
+  /**
    *  @brief Returns a value giving a hint how to handle the case of empty intruders
    */
   //  NOTE: it's probably going to be difficult to compute a different value here:
@@ -676,22 +688,10 @@ class DB_PUBLIC CompoundRegionInteractOperationNode
   : public compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon>
 {
 public:
-  CompoundRegionInteractOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b, int mode, bool touching, bool inverse, size_t min_count = 0, size_t max_count = std::numeric_limits<size_t>::max ())
-    : compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon> (&m_op, a, b), m_op (mode, touching, inverse, min_count, max_count)
-  {
-    //  .. nothing yet ..
-  }
+  CompoundRegionInteractOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b, int mode, bool touching, bool inverse, size_t min_count = 0, size_t max_count = std::numeric_limits<size_t>::max ());
+  CompoundRegionInteractOperationNode (db::Region *a, db::Region *b, int mode, bool touching, bool inverse, size_t min_count = 0, size_t max_count = std::numeric_limits<size_t>::max ());
 
-  CompoundRegionInteractOperationNode (db::Region *a, db::Region *b, int mode, bool touching, bool inverse, size_t min_count = 0, size_t max_count = std::numeric_limits<size_t>::max ())
-    : compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon> (&m_op, a, b), m_op (mode, touching, inverse, min_count, max_count)
-  {
-    //  .. nothing yet ..
-  }
-
-  std::string generated_description () const
-  {
-    return std::string ("interact") + compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon>::generated_description ();
-  }
+  std::string generated_description () const;
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
   {
@@ -711,16 +711,9 @@ class DB_PUBLIC CompoundRegionInteractWithEdgeOperationNode
   : public compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon>
 {
 public:
-  CompoundRegionInteractWithEdgeOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b, bool inverse, size_t min_count = 0, size_t max_count = std::numeric_limits<size_t>::max ())
-    : compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon> (&m_op, a, b), m_op (inverse, min_count, max_count)
-  {
-    //  .. nothing yet ..
-  }
+  CompoundRegionInteractWithEdgeOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b, bool inverse, size_t min_count = 0, size_t max_count = std::numeric_limits<size_t>::max ());
 
-  std::string generated_description () const
-  {
-    return std::string ("interact") + compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon>::generated_description ();
-  }
+  std::string generated_description () const;
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
   {
@@ -740,22 +733,10 @@ class DB_PUBLIC CompoundRegionPullOperationNode
   : public compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon>
 {
 public:
-  CompoundRegionPullOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b, int mode, bool touching)
-    : compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon> (&m_op, a, b), m_op (mode, touching)
-  {
-    //  .. nothing yet ..
-  }
+  CompoundRegionPullOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b, int mode, bool touching);
+  CompoundRegionPullOperationNode (db::Region *a, db::Region *b, int mode, bool touching);
 
-  CompoundRegionPullOperationNode (db::Region *a, db::Region *b, int mode, bool touching)
-    : compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon> (&m_op, a, b), m_op (mode, touching)
-  {
-    //  .. nothing yet ..
-  }
-
-  std::string generated_description () const
-  {
-    return std::string ("pull") + compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon>::generated_description ();
-  }
+  std::string generated_description () const;
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
   {
@@ -775,16 +756,9 @@ class DB_PUBLIC CompoundRegionPullWithEdgeOperationNode
   : public compound_region_generic_operation_node<db::Polygon, db::Edge, db::Edge>
 {
 public:
-  CompoundRegionPullWithEdgeOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b)
-    : compound_region_generic_operation_node<db::Polygon, db::Edge, db::Edge> (&m_op, a, b), m_op ()
-  {
-    //  .. nothing yet ..
-  }
+  CompoundRegionPullWithEdgeOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b);
 
-  std::string generated_description () const
-  {
-    return std::string ("pull") + compound_region_generic_operation_node<db::Polygon, db::Edge, db::Edge>::generated_description ();
-  }
+  std::string generated_description () const;
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
   {

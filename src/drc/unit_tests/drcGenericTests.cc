@@ -188,3 +188,13 @@ TEST(12d)
 {
   run_test (_this, "12", true);
 }
+
+TEST(13)
+{
+  run_test (_this, "13", false);
+}
+
+TEST(13d)
+{
+  run_test (_this, "13", true);
+}

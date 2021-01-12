@@ -233,6 +233,9 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
 
     } else if (! m_other_is_merged && (ids.size () > 1 || ! interactions.intruder_shape (*ids.begin ()).second.is_box ())) {
 
+      //  NOTE: this local merge is not necessarily giving the same results than a global merge before running
+      //  the processor. Reason: the search range is limited, hence not all necessary components may have been
+      //  captured.
       db::EdgeProcessor ep;
 
       ep.clear ();
@@ -536,9 +539,31 @@ template class DB_PUBLIC check_local_operation<db::Polygon, db::Polygon>;
 
 // ---------------------------------------------------------------------------------------------------------------
 
+namespace {
+
+class PolygonToEdgeProcessor
+  : public db::PolygonSink
+{
+public:
+  PolygonToEdgeProcessor (db::EdgeProcessor *target, size_t *id)
+    : mp_target (target), mp_id (id)
+  { }
+
+  virtual void put (const db::Polygon &poly)
+  {
+    mp_target->insert (poly, (*mp_id)++);
+  }
+
+private:
+  db::EdgeProcessor *mp_target;
+  size_t *mp_id;
+};
+
+}
+
 template <class TS, class TI, class TR>
-interacting_local_operation<TS, TI, TR>::interacting_local_operation (int mode, bool touching, bool inverse, size_t min_count, size_t max_count)
-  : m_mode (mode), m_touching (touching), m_inverse (inverse), m_min_count (std::max (size_t (1), min_count)), m_max_count (max_count)
+interacting_local_operation<TS, TI, TR>::interacting_local_operation (int mode, bool touching, bool inverse, size_t min_count, size_t max_count, bool other_is_merged)
+  : m_mode (mode), m_touching (touching), m_inverse (inverse), m_min_count (std::max (size_t (1), min_count)), m_max_count (max_count), m_other_is_merged (other_is_merged)
 {
   //  .. nothing yet ..
 }
@@ -587,6 +612,24 @@ void interacting_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*l
       ep.insert (*o, n);
     }
     n++;
+
+  } else if (! m_other_is_merged && ! (m_min_count == size_t (1) && m_max_count == std::numeric_limits<size_t>::max ())) {
+
+    //  in counted mode we need to merge the shapes because they might overlap
+    db::EdgeProcessor ep_merge;
+
+    size_t i = 0;
+    for (typename std::set<TI>::const_iterator o = others.begin (); o != others.end (); ++o) {
+      for (typename TI::polygon_edge_iterator e = o->begin_edge (); ! e.at_end (); ++e) {
+        ep_merge.insert (*e, i);
+      }
+      i += 1;
+    }
+
+    PolygonToEdgeProcessor ps (&ep, &n);
+    db::PolygonGenerator pg (ps, false /*don't resolve holes*/, false);
+    db::SimpleMerge op (1 /*wc>0*/);
+    ep_merge.process (pg, op);
 
   } else {
 
@@ -743,8 +786,8 @@ template class DB_PUBLIC pull_local_operation<db::Polygon, db::Polygon, db::Poly
 // ---------------------------------------------------------------------------------------------------------------
 
 template <class TS, class TI, class TR>
-interacting_with_edge_local_operation<TS, TI, TR>::interacting_with_edge_local_operation (bool inverse, size_t min_count, size_t max_count)
-  : m_inverse (inverse), m_min_count (std::max (size_t (1), min_count)), m_max_count (max_count)
+interacting_with_edge_local_operation<TS, TI, TR>::interacting_with_edge_local_operation (bool inverse, size_t min_count, size_t max_count, bool other_is_merged)
+  : m_inverse (inverse), m_min_count (std::max (size_t (1), min_count)), m_max_count (max_count), m_other_is_merged (other_is_merged)
 {
   //  .. nothing yet ..
 }
@@ -774,8 +817,33 @@ void interacting_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::La
     }
   }
 
-  for (std::set<unsigned int>::const_iterator j = intruder_ids.begin (); j != intruder_ids.end (); ++j) {
-    scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
+  //  locally merge the intruder edges if required
+  std::unordered_set<TI> merged_heap;
+  if (! m_other_is_merged && counting) {
+
+    EdgeBooleanClusterCollector<std::unordered_set<TI> > cluster_collector (&merged_heap, EdgeOr);
+
+    db::box_scanner<TI, size_t> merge_scanner;
+
+    for (std::set<unsigned int>::const_iterator j = intruder_ids.begin (); j != intruder_ids.end (); ++j) {
+      const TI *e = &interactions.intruder_shape (*j).second;
+      if (! e->is_degenerate ()) {
+        merge_scanner.insert (e, 0);
+      }
+    }
+
+    merge_scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
+
+    for (typename std::unordered_set<TI>::const_iterator e = merged_heap.begin (); e != merged_heap.end (); ++e) {
+      scanner.insert2 (e.operator-> (), 0);
+    }
+
+  } else {
+
+    for (std::set<unsigned int>::const_iterator j = intruder_ids.begin (); j != intruder_ids.end (); ++j) {
+      scanner.insert2 (& interactions.intruder_shape (*j).second, 0);
+    }
+
   }
 
   std::list<TR> heap;

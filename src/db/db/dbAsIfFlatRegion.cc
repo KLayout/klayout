@@ -399,7 +399,7 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse, 
 
   db::RegionIterator polygons (begin_merged ());
 
-  db::interacting_with_edge_local_operation<db::Polygon, db::Edge, db::Polygon> op (inverse, min_count, max_count);
+  db::interacting_with_edge_local_operation<db::Polygon, db::Edge, db::Polygon> op (inverse, min_count, max_count, true);
 
   db::local_processor<db::Polygon, db::Edge, db::Polygon> proc;
   proc.set_base_verbosity (base_verbosity ());
@@ -560,7 +560,7 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
 
   db::RegionIterator polygons (begin_merged ());
 
-  db::interacting_local_operation<db::Polygon, db::Polygon, db::Polygon> op (mode, touching, inverse, min_count, max_count);
+  db::interacting_local_operation<db::Polygon, db::Polygon, db::Polygon> op (mode, touching, inverse, min_count, max_count, true);
 
   db::local_processor<db::Polygon, db::Polygon, db::Polygon> proc;
   proc.set_base_verbosity (base_verbosity ());

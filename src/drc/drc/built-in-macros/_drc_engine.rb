@@ -1579,7 +1579,6 @@ CODE
       bbox 
       centers
       corners
-      covering
       end_segments
       extended
       extended_in
@@ -1591,9 +1590,7 @@ CODE
       holes
       hulls
       in
-      inside
       inside_part
-      interacting
       intersections
       iso
       isolated
@@ -1619,9 +1616,7 @@ CODE
       ongrid
       or
       output
-      outside
       outside_part
-      overlapping
       perimeter 
       pull_inside 
       pull_interacting 

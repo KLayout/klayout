@@ -25,6 +25,52 @@ renders edge pairs. To obtain polygons from these edge pairs, use the "polygons"
 out = in.drc((width &lt; 2.0).polygons)
 </pre>
 </p><p>
+The following global functions are relevant for the DRC expressions:
+</p><p>
+<ul>
+<li><a href="/about/drc_ref_global.xml#case">global#case</a> </li>
+<li><a href="/about/drc_ref_global.xml#secondary">global#secondary</a> </li>
+<li><a href="/about/drc_ref_global.xml#primary">global#primary</a> </li>
+<li><a href="/about/drc_ref_global.xml#foreign">global#foreign</a> </li>
+<li><a href="/about/drc_ref_global.xml#if_all">global#if_all</a> </li>
+<li><a href="/about/drc_ref_global.xml#if_any">global#if_any</a> </li>
+<li><a href="/about/drc_ref_global.xml#if_none">global#if_none</a> </li>
+<li><a href="/about/drc_ref_global.xml#bbox_height">global#bbox_height</a> </li>
+<li><a href="/about/drc_ref_global.xml#bbox_width">global#bbox_width</a> </li>
+<li><a href="/about/drc_ref_global.xml#bbox_max">global#bbox_max</a> </li>
+<li><a href="/about/drc_ref_global.xml#bbox_min">global#bbox_min</a> </li>
+<li><a href="/about/drc_ref_global.xml#area">global#area</a> </li>
+<li><a href="/about/drc_ref_global.xml#hulls">global#hulls</a> </li>
+<li><a href="/about/drc_ref_global.xml#holes">global#holes</a> </li>
+<li><a href="/about/drc_ref_global.xml#odd_polygons">global#odd_polygons</a> </li>
+<li><a href="/about/drc_ref_global.xml#perimeter">global#perimeter</a> </li>
+<li><a href="/about/drc_ref_global.xml#rectangles">global#rectangles</a> </li>
+<li><a href="/about/drc_ref_global.xml#rectilinear">global#rectilinear</a> </li>
+<li><a href="/about/drc_ref_global.xml#length">global#length</a> (in condition) </li>
+<li><a href="/about/drc_ref_global.xml#angle">global#angle</a> (in condition) </li>
+<li><a href="/about/drc_ref_global.xml#corners">global#corners</a> </li>
+<li><a href="/about/drc_ref_global.xml#extent_refs">global#extent_refs</a> </li>
+<li><a href="/about/drc_ref_global.xml#extents">global#extents</a> </li>
+<li><a href="/about/drc_ref_global.xml#middle">global#middle</a> </li>
+<li><a href="/about/drc_ref_global.xml#rounded_corners">global#rounded_corners</a> </li>
+<li><a href="/about/drc_ref_global.xml#sized">global#sized</a> </li>
+<li><a href="/about/drc_ref_global.xml#smoothed">global#smoothed</a> </li>
+<li><a href="/about/drc_ref_global.xml#covering">global#covering</a> </li>
+<li><a href="/about/drc_ref_global.xml#interacting">global#interacting</a> </li>
+<li><a href="/about/drc_ref_global.xml#overlapping">global#overlapping</a> </li>
+<li><a href="/about/drc_ref_global.xml#inside">global#inside</a> </li>
+<li><a href="/about/drc_ref_global.xml#outside">global#outside</a> </li>
+<li><a href="/about/drc_ref_global.xml#enclosing">global#enclosing</a> </li>
+<li><a href="/about/drc_ref_global.xml#separation">global#separation</a> </li>
+<li><a href="/about/drc_ref_global.xml#overlap">global#overlap</a> </li>
+<li><a href="/about/drc_ref_global.xml#width">global#width</a> </li>
+<li><a href="/about/drc_ref_global.xml#space">global#space</a> </li>
+<li><a href="/about/drc_ref_global.xml#notch">global#notch</a> </li>
+<li><a href="/about/drc_ref_global.xml#iso">global#iso</a> </li>
+<li><a href="/about/drc_ref_global.xml#sep">global#sep</a> </li>
+<li><a href="/about/drc_ref_global.xml#enc">global#enc</a> </li>
+</ul>
+</p><p>
 The following documentation will list the methods available for DRC expression objects.
 </p>
 <h2-index/>

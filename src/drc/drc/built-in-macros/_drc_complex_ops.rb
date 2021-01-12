@@ -23,6 +23,52 @@ module DRC
 # @code
 # out = in.drc((width < 2.0).polygons)
 # @/code
+#
+# The following global functions are relevant for the DRC expressions:
+# 
+# @ul
+# @li \global#angle @/li
+# @li \global#area @/li
+# @li \global#bbox_height @/li
+# @li \global#bbox_max @/li
+# @li \global#bbox_min @/li
+# @li \global#bbox_width @/li
+# @li \global#case @/li
+# @li \global#corners @/li
+# @li \global#covering @/li
+# @li \global#enc @/li
+# @li \global#enclosing @/li
+# @li \global#extent_refs @/li
+# @li \global#extents @/li
+# @li \global#foreign @/li
+# @li \global#holes @/li
+# @li \global#hulls @/li
+# @li \global#if_all @/li
+# @li \global#if_any @/li
+# @li \global#if_none @/li
+# @li \global#inside @/li
+# @li \global#interacting @/li
+# @li \global#iso @/li
+# @li \global#length @/li
+# @li \global#middle @/li
+# @li \global#notch @/li
+# @li \global#odd_polygons @/li
+# @li \global#outside @/li
+# @li \global#overlap @/li
+# @li \global#overlapping @/li
+# @li \global#perimeter @/li
+# @li \global#primary @/li
+# @li \global#rectangles @/li
+# @li \global#rectilinear @/li
+# @li \global#rounded_corners @/li
+# @li \global#secondary @/li
+# @li \global#separation @/li
+# @li \global#sep @/li
+# @li \global#sized @/li
+# @li \global#smoothed @/li
+# @li \global#space @/li
+# @li \global#width @/li
+# @/ul
 # 
 # The following documentation will list the methods available for DRC expression objects.
   
@@ -939,6 +985,34 @@ CODE
     end
   end
   
+  %w(covering overlapping interacting).each do |f|
+    eval <<"CODE"
+      def #{f}(other)
+        @engine._context("#{f}") do
+          other = @engine._make_node(other)
+          if ! other.is_a?(DRCOpNode)
+            raise("Argument " + other.to_s + " to #{f} must be a DRC expression")
+          end
+          DRCOpNodeInteractingWithCount::new(@engine, self, other, :#{f})
+        end
+      end
+CODE
+  end
+  
+  %w(inside outside).each do |f|
+    eval <<"CODE"
+      def #{f}(other)
+        @engine._context("#{f}") do
+          other = @engine._make_node(other)
+          if ! other.is_a?(DRCOpNode)
+            raise("Argument " + other.to_s + " to #{f} must be a DRC expression")
+          end
+          DRCOpNodeInteracting::new(@engine, self, other, :#{f})
+        end
+      end
+CODE
+  end
+
 end
 
 class DRCOpNodeLogicalBool < DRCOpNode
@@ -1410,7 +1484,7 @@ class DRCOpNodeInteractingWithCount < DRCOpNodeWithCompare
     args = [ self.a.create_node(cache), self.b.create_node(cache), self.inverse ]
     args << (self.gt ? self.gt + 1 : (self.ge ? self.ge : 0))
     if self.lt || self.le
-      args << (self.lt ? self.lt : self.le + 1)
+      args << (self.lt ? self.lt - 1 : self.le)
     end
     factory = { :covering => :new_enclosing,
                 :overlapping => :new_overlapping,

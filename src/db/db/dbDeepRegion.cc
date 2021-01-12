@@ -1534,7 +1534,7 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
 
   DeepLayer dl_out (polygons.derived ());
 
-  db::InteractingLocalOperation op (mode, touching, inverse, min_count, max_count);
+  db::InteractingLocalOperation op (mode, touching, inverse, min_count, max_count, true);
 
   db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell (), polygons.breakout_cells (), other_polygons.breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
@@ -1573,7 +1573,7 @@ DeepRegion::selected_interacting_generic (const Edges &other, bool inverse, size
 
   DeepLayer dl_out (polygons.derived ());
 
-  db::InteractingWithEdgeLocalOperation op (inverse, min_count, max_count);
+  db::InteractingWithEdgeLocalOperation op (inverse, min_count, max_count, true);
 
   db::local_processor<db::PolygonRef, db::Edge, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), polygons.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());

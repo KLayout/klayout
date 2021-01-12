@@ -52,18 +52,143 @@ module DRC
     # using measurement operations like "area" on secondary polygons.
     #
     # Here is an example for a generic DRC operation which performs a width
-    # check for less than 0.5.um on the primary shapes.
+    # check for less than 0.5.um on the primary shapes. It uses the \global#width operator:
     #
     # @code
     # out = in.drc(width < 0.5.um)
     # @/code
     #
-    # Another example computes a boolean AND between two layers before selecting
-    # the result polygons with an area larger than 1 square micrometer:
+    # Other single or double-bounded conditions are available too, for example:
     #
     # @code
-    # other = ... another layer ..
-    # out = in.drc((primary & other).area > 1.0)
+    # out = in.drc(width <= 0.5.um)
+    # out = in.drc(width > 0.5.um)
+    # out = in.drc(width == 0.5.um)
+    # out = in.drc(width != 0.5.um)
+    # out = in.drc(0.2.um < width < 0.5.um)
+    # @/code
+    #
+    # To specify the second input for a two-layer check, specify the second input
+    # with the check function. Here a two-layer separation check is used (\global#separation):
+    #
+    # @code
+    # l1 = input(1, 0)
+    # l2 = input(2, 0)
+    # out = l1.drc(separation(l2) < 0.5.um)
+    # @/code
+    #
+    # The second input of this check function can be a computed expression. In this
+    # case the local loop will first evaluate the expression for the second input and
+    # then use it inside the check.  
+    #
+    # Options for the checks are also specified inside the brackets. For example,
+    # to specify a projection metrics for width use:
+    #
+    # @code 
+    # out = in.drc(width(projection) < 0.5.um)
+    # @/code
+    #
+    # The "drc" function supports filter operators. These select input or derived polygons 
+    # based on their properties. These filters are:
+    #
+    # @ul
+    # @li "\global#area": select polygons based on their area @/li
+    # @li "\global#perimeter": select polygons based on their perimeter @/li
+    # @li "\global#bbox_min", "\global#bbox_max", "\global#bbox_width", "\global#bbox_height": select polygons based on their bounding box properties @/li
+    # @/ul
+    # 
+    # For example, to select polygons with an area larger than one square micrometer, use:
+    #
+    # @code
+    # out = in.drc(area > 1.0)
+    # @/code
+    #
+    # For the condition, use the usual numerical bounds like:
+    #
+    # @code
+    # out = in.drc(area == 1.0)
+    # out = in.drc(area <= 1.0)
+    # out = in.drc(0.2 < area < 1.0)
+    # @/code
+    #
+    # The result of the area operation is the input polygon if the area condition is met.
+    # 
+    # In the same fashion, "perimeter" applies to the perimeter of the polygon.
+    # "bbox_min" etc. will evaluate a particular dimensions of the polygon's bounding box and
+    # use the respective dimension for filtering the polygon.
+    #
+    # Note that it's basically possible to use the polygon filters on any kind of input.
+    # In fact, plain "area" for example is a shortcut for "\global#primary.area" indicating that
+    # the area of primary shapes are supposed to be computed.
+    # However, any input other than the primary is not necessarily complete or it may 
+    # consist of multiple polygons. Hence the computed values may be too big or too small.
+    # It's recommended therefore to use the measurement functions on primary polygons
+    # only.
+    #
+    # The "drc" feature also supports some predicates. "predicates" are boolean values
+    # indicating a certain condition. A predicate filter works in a way that it only
+    # passes the polygons 
+    # The predicates available currently are:
+    #
+    # @ul
+    # @li "\global#rectangles": Filters rectangles @/li
+    # @li "\global#rectilinear": Filters rectilinear ("Manhattan") polygons @/li
+    # @/ul
+    #
+    # For the same reason as explained above, it's recommended to use these predicates
+    # standalone, so they act on primary shapes. It's possible to use the predicates
+    # on computed shapes or secondary input, but that may not render the desired results.
+    #
+    # The "!" operator will evaluate the expression behind it and return the 
+    # current primary shape if the input is empty and return an empty polygon set 
+    # if not. Hence the following filter will deliver all polygons which are 
+    # not rectangles:
+    #
+    # @code
+    # out = in.drc(! rectangles)
+    # @/code
+    #
+    # The logical "if_any" or "if_all" statements allow connecting multiple
+    # conditions and evaluate to "true" (means: a non-empty shape set) if either
+    # on input is a non-empty shape set ("if_any") or if all inputs are non-empty
+    # ("if_all"). For example, this will select all polygons which are rectangles
+    # and whose area is larger than 20 quare micrometers:
+    #
+    # @code
+    # out = in.drc(if_all(rectangles, area > 20.0))
+    # @/code
+    #
+    # In fact, "if_all" renders the result of the last expression, provided all
+    # previous ones are non-empty. So this operation will render rectangles
+    # sized by 100 nm and skip all other types of polygons:
+    #
+    # @code
+    # out = in.drc(if_all(rectangles, sized(100.nm)))
+    # @/code
+    #
+    # Contrary to this, the "if_any" operation will render the first non-empty
+    # expression result and skip the following ones. So this example will
+    # size all rectangles by 100 nm and leave all other types of polygons
+    # untouched:
+    #
+    # @code
+    # out = in.drc(if_any(rectangles.sized(100.nm), primary))
+    # @/code
+    #
+    #
+    # The "drc" operations feature polygon manipulations where the input is
+    # either the primary polygon or derived shapes.
+    # Manipulations include sizing ("\global#sized"), corner rounding ("\global#rounded_corners"), smoothing ("\global#smoothed")
+    # and boolean operations.
+    #
+    # This example computes a boolean AND between two layers before selecting
+    # the result polygons with an area larger than 1 square micrometer. Note that
+    # "primary" is a placeholder for the primary shape:
+    #
+    # @code
+    # l1 = input(1, 0)
+    # l2 = input(2, 0)
+    # out = l1.drc((primary & l2).area > 1.0)
     # @/code
     #
     # This example demonstrates how the "drc" operation can improve performance: as the
@@ -71,7 +196,64 @@ module DRC
     # less shapes need to be stored hence reducing the memory overhead and CPU time required
     # to manage these shapes.
     #
-    # For more details about the expression see the \DRC# class documentation. 
+    # Note that the precise form of the example above is
+    #
+    # @code
+    # out = l1.drc((primary & secondary(l2)).area > 1.0)
+    # @/code
+    #
+    # The "\global#secondar" operator indicates that "l2" is to be used as secondary input to the "drc" function. Only
+    # in this form, the operators of the boolean AND can be reversed:
+    # 
+    # @code
+    # out = l1.drc((secondary(l2) & primary).area > 1.0)
+    # @/code
+    #
+    # The expression inside the "drc" function is a Ruby object and can be 
+    # stored in variables. If you need the same expression multiple times, it can be 
+    # more efficient to use the same Ruby object. In this example, the same expression
+    # is used two times. Hence it's computed two times:
+    #
+    # @code
+    # out = l1.drc(((primary & l2).area == 1.0) + ((primary & l2).area == 2.0))
+    # @/code
+    #
+    # A more efficient version is:
+    #
+    # @code
+    # overlap_area = (primary & l2).area
+    # out = l1.drc((overlap_area == 1.0) + (overlap_area == 2.0))
+    # @/code
+    #
+    # Note that the first line prepares the operation, but does not execute the area computation
+    # or the boolean operation. But when the "drc" function executes the operation it will 
+    # only compute the area once as it is represented by the same Ruby object.
+    #
+    #
+    # The "drc" functionality also offers support for edge pairs and edges. Edge pairs
+    # are the results of check operations and can be turned into polygons using the 
+    # "polygons" method:
+    #
+    # @code
+    # drc = in.drc((width < 0.5.um).polygons)
+    # @/code
+    #
+    # Similarly, polygons can be converted into edges:
+    # 
+    # @code
+    # drc = in.drc(primary.edges)
+    # @/code
+    #
+    # The "drc" framework supports edge vs. edge and edge vs. polygon booleans, edge
+    # filters (\global#length, \global#angle), edge vs. polygon interactions (\global#interacting, \global#overlapping),
+    # edge sampling (\global#start_segments, \global#centers, \global#end_segments) and edge to polygon
+    # conversions (\global#extended, \global#extended_in, \global#extended_out). Edge pairs 
+    # can be converted into polygons and edges and separated into first and second edges (\global#first_edges,
+    # \global#second_edges).
+    #
+    #
+    # The bottom line is: DRC expressions are quite rich and there is a lot more to be said and written.
+    # More formal details about the bits and pieces can be found in the \DRC# class documentation.
 
     def drc(op)
       @engine._context("drc") do
@@ -564,12 +746,8 @@ CODE
     # @name covering
     # @brief Selects shapes entirely covering other shapes
     # @synopsis covering(other) (in conditions)
-    # @synopsis covering(layer, other [, options ])
     #
-    # This function can be used with a layer argument in which case it
-    # is equivalent to "layer.covering" (see \Layer#covering). 
-    # 
-    # Without a layer argument, this method represents the selector of primary shapes
+    # This method represents the selector of primary shapes
     # which entirely cover shapes from the other layer. This version can be put into
     # a condition indicating how many shapes of the other layer need to be covered.
     # Use this variant within \DRC# expressions (also see \Layer#drc).
@@ -593,32 +771,40 @@ CODE
     # @name interacting
     # @brief Selects shapes interacting with other shapes
     # @synopsis interacting(other) (in conditions)
-    # @synopsis interacting(layer, other [, options ])
     #
     # See \covering for a description of the use cases for this function. 
     # When using "interacting", shapes are selected when the interact (overlap, touch)
     # shapes from the other layer.
+    # 
+    # When using this method with a count, the operation may not render 
+    # the correct results if the other input is not merged. By nature of the
+    # generic DRC feature, only those shapes that interact with the primary shape
+    # will be selected. If the other input is split into multiple polygons,
+    # not all components may be captured and the computed interaction count
+    # may be incorrect.
     
     # %DRC%
     # @name overlapping
     # @brief Selects shapes overlapping with other shapes
     # @synopsis overlapping(other) (in conditions)
-    # @synopsis overlapping(layer, other [, options ])
     #
     # See \covering for a description of the use cases for this function. 
     # When using "overlapping", shapes are selected when the overlap
     # shapes from the other layer.
+    #
+    # When using this method with a count, the operation may not render 
+    # the correct results if the other input is not merged. By nature of the
+    # generic DRC feature, only those shapes that interact with the primary shape
+    # will be selected. If the other input is split into multiple polygons,
+    # not all components may be captured and the computed interaction count
+    # may be incorrect.
     
     # %DRC%
     # @name inside
     # @brief Selects shapes entirely inside other shapes
     # @synopsis inside(other)
-    # @synopsis inside(layer, other)
     #
-    # This function can be used with a layer argument in which case it
-    # is equivalent to "layer.inside" (see \Layer#inside). 
-    # 
-    # Without a layer argument, this method represents the selector of primary shapes
+    # This method represents the selector of primary shapes
     # which are entirely inside shapes from the other layer. 
     # Use this variant within \DRC# expressions (also see \Layer#drc).
     
@@ -626,12 +812,8 @@ CODE
     # @name outside
     # @brief Selects shapes entirely outside other shapes
     # @synopsis outside(other)
-    # @synopsis outside(layer, other)
     #
-    # This function can be used with a layer argument in which case it
-    # is equivalent to "layer.outside" (see \Layer#outside). 
-    # 
-    # Without a layer argument, this method represents the selector of primary shapes
+    # This method represents the selector of primary shapes
     # which are entirely outside shapes from the other layer. 
     # Use this variant within \DRC# expressions (also see \Layer#drc).
     
@@ -642,9 +824,8 @@ CODE
       outside
       overlapping
     ).each do |f|
-      # NOTE: these methods are fallback for the respective global ones which route to DRCLayer or here.
       eval <<"CODE"
-        def _cop_#{f}(other)
+        def #{f}(other)
           primary.#{f}(other)
         end
 CODE
@@ -674,6 +855,7 @@ CODE
     # out = in.drc(enclosing(other) > 0.2.um)
     # out = in.drc(enclosing(other) >= 0.2.um)
     # out = in.drc(enclosing(other) == 0.2.um)
+    # out = in.drc(enclosing(other) != 0.2.um)
     # out = in.drc(0.1.um <= enclosing(other) < 0.2.um)
     # @/code
     #
@@ -728,6 +910,7 @@ CODE
     # out = in.drc(width > 0.2.um)
     # out = in.drc(width >= 0.2.um)
     # out = in.drc(width == 0.2.um)
+    # out = in.drc(width != 0.2.um)
     # out = in.drc(0.1.um <= width < 0.2.um)
     # @/code
     #

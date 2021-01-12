@@ -224,7 +224,7 @@ class interacting_local_operation
   : public local_operation<TS, TI, TR>
 {
 public:
-  interacting_local_operation (int mode, bool touching, bool inverse, size_t min_count, size_t max_count);
+  interacting_local_operation (int mode, bool touching, bool inverse, size_t min_count, size_t max_count, bool other_is_merged);
 
   virtual db::Coord dist () const;
   virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
@@ -236,6 +236,7 @@ private:
   bool m_touching;
   bool m_inverse;
   size_t m_min_count, m_max_count;
+  bool m_other_is_merged;
 };
 
 typedef interacting_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> InteractingLocalOperation;
@@ -264,7 +265,7 @@ class interacting_with_edge_local_operation
   : public local_operation<TS, TI, TR>
 {
 public:
-  interacting_with_edge_local_operation (bool inverse, size_t min_count, size_t max_count);
+  interacting_with_edge_local_operation (bool inverse, size_t min_count, size_t max_count, bool other_is_merged);
 
   virtual db::Coord dist () const;
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
@@ -274,6 +275,7 @@ public:
 private:
   bool m_inverse;
   size_t m_min_count, m_max_count;
+  bool m_other_is_merged;
 };
 
 typedef interacting_with_edge_local_operation<db::PolygonRef, db::Edge, db::PolygonRef> InteractingWithEdgeLocalOperation;

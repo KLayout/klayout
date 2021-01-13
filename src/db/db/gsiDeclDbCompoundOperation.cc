@@ -484,10 +484,10 @@ static db::CompoundRegionOperationNode *new_rectilinear_filter (db::CompoundRegi
   return new db::CompoundRegionFilterOperationNode (new db::RectilinearFilter (inverse), input, true);
 }
 
-static db::CompoundRegionOperationNode *new_rectangle_filter (db::CompoundRegionOperationNode *input, bool inverse)
+static db::CompoundRegionOperationNode *new_rectangle_filter (db::CompoundRegionOperationNode *input, bool square, bool inverse)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionFilterOperationNode (new db::RectangleFilter (inverse), input, true);
+  return new db::CompoundRegionFilterOperationNode (new db::RectangleFilter (square, inverse), input, true);
 }
 
 static db::CompoundRegionOperationNode *new_bbox_filter (db::CompoundRegionOperationNode *input, db::RegionBBoxFilter::parameter_type parameter, bool inverse, db::coord_traits<db::Coord>::distance_type vmin, db::coord_traits<db::Coord>::distance_type vmax)
@@ -666,8 +666,9 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   gsi::constructor ("new_rectilinear_filter", &new_rectilinear_filter, gsi::arg ("input"), gsi::arg ("inverse", false),
     "@brief Creates a node filtering the input for rectilinear shapes (or non-rectilinear ones with 'inverse' set to 'true').\n"
   ) +
-  gsi::constructor ("new_rectangle_filter", &new_rectangle_filter, gsi::arg ("input"), gsi::arg ("inverse", false),
-    "@brief Creates a node filtering the input for rectangular shapes (or non-rectangular ones with 'inverse' set to 'true').\n"
+  gsi::constructor ("new_rectangle_filter", &new_rectangle_filter, gsi::arg ("input"), gsi::arg ("is_square", false), gsi::arg ("inverse", false),
+    "@brief Creates a node filtering the input for rectangular or square shapes.\n"
+    "If 'is_square' is true, only squares will be selected. If 'inverse' is true, the non-rectangle/non-square shapes are returned.\n"
   ) +
   gsi::constructor ("new_edges", &new_edges, gsi::arg ("input"),
     "@brief Creates a node converting polygons into it's edges.\n"

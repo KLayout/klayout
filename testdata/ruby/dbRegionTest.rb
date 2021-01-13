@@ -985,6 +985,58 @@ class DBRegion_TestClass < TestBase
 
   end
 
+  # Some filters
+  def test_boxfilters1
+
+    r = RBA::Region::new
+    r.insert(RBA::Box::new(0, 0, 1000, 5000))
+    r.insert(RBA::Box::new(3000, 0, 7000, 1000))
+    r.insert(RBA::Box::new(0, 10000, 2000, 12000))
+
+    assert_equal(r.with_bbox_width(1000, false).to_s, "(0,0;0,5000;1000,5000;1000,0)")
+    assert_equal(r.with_bbox_width(1000, true).to_s, "(3000,0;3000,1000;7000,1000;7000,0);(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_bbox_width(1000, 2001, false).to_s, "(0,0;0,5000;1000,5000;1000,0);(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_bbox_width(1000, 2000, false).to_s, "(0,0;0,5000;1000,5000;1000,0)")
+    assert_equal(r.with_bbox_width(1000, 2001, true).to_s, "(3000,0;3000,1000;7000,1000;7000,0)")
+
+    assert_equal(r.with_bbox_height(5000, false).to_s, "(0,0;0,5000;1000,5000;1000,0)")
+    assert_equal(r.with_bbox_height(5000, true).to_s, "(3000,0;3000,1000;7000,1000;7000,0);(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_bbox_height(1000, 2001, false).to_s, "(3000,0;3000,1000;7000,1000;7000,0);(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_bbox_height(1000, 1001, false).to_s, "(3000,0;3000,1000;7000,1000;7000,0)")
+    assert_equal(r.with_bbox_height(1000, 1001, true).to_s, "(0,0;0,5000;1000,5000;1000,0);(0,10000;0,12000;2000,12000;2000,10000)")
+
+    assert_equal(r.with_bbox_aspect_ratio(1.0, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_bbox_aspect_ratio(1.0, true).to_s, "(3000,0;3000,1000;7000,1000;7000,0);(0,0;0,5000;1000,5000;1000,0)")
+    assert_equal(r.with_bbox_aspect_ratio(0.9, 1.0, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_bbox_aspect_ratio(1.0, 1.1, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_bbox_aspect_ratio(0.9, 0.95, false).to_s, "")
+    assert_equal(r.with_bbox_aspect_ratio(0.9, 1.0, false, true, false).to_s, "")
+    assert_equal(r.with_bbox_aspect_ratio(1.0, 1.1, false, false, true).to_s, "")
+
+    assert_equal(r.with_relative_height(1.0, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_relative_height(1.0, true).to_s, "(3000,0;3000,1000;7000,1000;7000,0);(0,0;0,5000;1000,5000;1000,0)")
+    assert_equal(r.with_relative_height(0.9, 1.0, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_relative_height(1.0, 1.1, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_relative_height(0.9, 0.95, false).to_s, "")
+    assert_equal(r.with_relative_height(0.9, 1.0, false, true, false).to_s, "")
+    assert_equal(r.with_relative_height(1.0, 1.1, false, false, true).to_s, "")
+
+    r = RBA::Region::new
+    r.insert(RBA::Box::new(0, 0, 1000, 2000))
+    r.insert(RBA::Box::new(0, 0, 2000, 1000))
+    r.insert(RBA::Box::new(0, 10000, 2000, 12000))
+
+    assert_equal(r.with_area_ratio(1.0, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_area_ratio(1.0, true).to_s, "(0,0;0,2000;1000,2000;1000,1000;2000,1000;2000,0)")
+    assert_equal(r.with_area_ratio(4.0 / 3.0, false).to_s, "(0,0;0,2000;1000,2000;1000,1000;2000,1000;2000,0)")
+    assert_equal(r.with_area_ratio(1.3, 1.4, false).to_s, "(0,0;0,2000;1000,2000;1000,1000;2000,1000;2000,0)")
+    assert_equal(r.with_area_ratio(1.3, 4.0 / 3.0, false, false, true).to_s, "(0,0;0,2000;1000,2000;1000,1000;2000,1000;2000,0)")
+    assert_equal(r.with_area_ratio(1.3, 4.0 / 3.0, false, false, false).to_s, "")
+    assert_equal(r.with_area_ratio(4.0 / 3.0, 1.4, false, true, false).to_s, "(0,0;0,2000;1000,2000;1000,1000;2000,1000;2000,0)")
+    assert_equal(r.with_area_ratio(4.0 / 3.0, 1.4, false, false, false).to_s, "")
+
+  end
+
 end
 
 load("test_epilogue.rb")

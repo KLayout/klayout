@@ -52,36 +52,17 @@ struct DB_PUBLIC RegionPerimeterFilter
    *  @param amax The maximum perimeter (only polygons with a perimeter below this value are filtered)
    *  @param inverse If set to true, only polygons not matching this criterion will be filtered
    */
-  RegionPerimeterFilter (perimeter_type pmin, perimeter_type pmax, bool inverse)
-    : m_pmin (pmin), m_pmax (pmax), m_inverse (inverse)
-  {
-    //  .. nothing yet ..
-  }
+  RegionPerimeterFilter (perimeter_type pmin, perimeter_type pmax, bool inverse);
 
   /**
    *  @brief Returns true if the polygon's perimeter matches the criterion
    */
-  virtual bool selected (const db::Polygon &poly) const
-  {
-    perimeter_type p = 0;
-    for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end () && p < m_pmax; ++e) {
-      p += (*e).length ();
-    }
-
-    if (! m_inverse) {
-      return p >= m_pmin && p < m_pmax;
-    } else {
-      return ! (p >= m_pmin && p < m_pmax);
-    }
-  }
+  virtual bool selected (const db::Polygon &poly) const;
 
   /**
    *  @brief This filter is isotropic
    */
-  virtual const TransformationReducer *vars () const
-  {
-    return &m_vars;
-  }
+  virtual const TransformationReducer *vars () const;
 
   /**
    *  @brief This filter prefers producing variants
@@ -120,32 +101,17 @@ struct DB_PUBLIC RegionAreaFilter
    *  @param amax The maximum area (only polygons with an area below this value are filtered)
    *  @param inverse If set to true, only polygons not matching this criterion will be filtered
    */
-  RegionAreaFilter (area_type amin, area_type amax, bool inverse)
-    : m_amin (amin), m_amax (amax), m_inverse (inverse)
-  {
-    //  .. nothing yet ..
-  }
+  RegionAreaFilter (area_type amin, area_type amax, bool inverse);
 
   /**
    *  @brief Returns true if the polygon's area matches the criterion
    */
-  virtual bool selected (const db::Polygon &poly) const
-  {
-    area_type a = poly.area ();
-    if (! m_inverse) {
-      return a >= m_amin && a < m_amax;
-    } else {
-      return ! (a >= m_amin && a < m_amax);
-    }
-  }
+  virtual bool selected (const db::Polygon &poly) const;
 
   /**
    *  @brief This filter is isotropic
    */
-  virtual const TransformationReducer *vars () const
-  {
-    return &m_vars;
-  }
+  virtual const TransformationReducer *vars () const;
 
   /**
    *  @brief This filter prefers producing variants
@@ -176,27 +142,17 @@ struct DB_PUBLIC RectilinearFilter
    *  @brief Constructor
    *  @param inverse If set to true, only polygons not matching this criterion will be filtered
    */
-  RectilinearFilter (bool inverse)
-    : m_inverse (inverse)
-  {
-    //  .. nothing yet ..
-  }
+  RectilinearFilter (bool inverse);
 
   /**
    *  @brief Returns true if the polygon's area matches the criterion
    */
-  virtual bool selected (const db::Polygon &poly) const
-  {
-    return poly.is_rectilinear () != m_inverse;
-  }
+  virtual bool selected (const db::Polygon &poly) const;
 
   /**
    *  @brief This filter does not need variants
    */
-  virtual const TransformationReducer *vars () const
-  {
-    return 0;
-  }
+  virtual const TransformationReducer *vars () const;
 
   /**
    *  @brief This filter prefers producing variants
@@ -225,27 +181,17 @@ struct DB_PUBLIC RectangleFilter
    *  @brief Constructor
    *  @param inverse If set to true, only polygons not matching this criterion will be filtered
    */
-  RectangleFilter (bool inverse)
-    : m_inverse (inverse)
-  {
-    //  .. nothing yet ..
-  }
+  RectangleFilter (bool is_square, bool inverse);
 
   /**
    *  @brief Returns true if the polygon's area matches the criterion
    */
-  virtual bool selected (const db::Polygon &poly) const
-  {
-    return poly.is_box () != m_inverse;
-  }
+  virtual bool selected (const db::Polygon &poly) const;
 
   /**
    *  @brief This filter does not need variants
    */
-  virtual const TransformationReducer *vars () const
-  {
-    return 0;
-  }
+  virtual const TransformationReducer *vars () const;
 
   /**
    *  @brief This filter prefers producing variants
@@ -258,6 +204,7 @@ struct DB_PUBLIC RectangleFilter
   virtual bool requires_raw_input () const { return false; }
 
 private:
+  bool m_is_square;
   bool m_inverse;
 };
 
@@ -300,48 +247,17 @@ struct DB_PUBLIC RegionBBoxFilter
    *  @param vmax The max value (only polygons with bounding box parameters below this value are filtered)
    *  @param inverse If set to true, only polygons not matching this criterion will be filtered
    */
-  RegionBBoxFilter (value_type vmin, value_type vmax, bool inverse, parameter_type parameter)
-    : m_vmin (vmin), m_vmax (vmax), m_inverse (inverse), m_parameter (parameter)
-  {
-    //  .. nothing yet ..
-  }
+  RegionBBoxFilter (value_type vmin, value_type vmax, bool inverse, parameter_type parameter);
 
   /**
    *  @brief Returns true if the polygon's area matches the criterion
    */
-  virtual bool selected (const db::Polygon &poly) const
-  {
-    value_type v = 0;
-    db::Box box = poly.box ();
-    if (m_parameter == BoxWidth) {
-      v = box.width ();
-    } else if (m_parameter == BoxHeight) {
-      v = box.height ();
-    } else if (m_parameter == BoxMinDim) {
-      v = std::min (box.width (), box.height ());
-    } else if (m_parameter == BoxMaxDim) {
-      v = std::max (box.width (), box.height ());
-    } else if (m_parameter == BoxAverageDim) {
-      v = (box.width () + box.height ()) / 2;
-    }
-    if (! m_inverse) {
-      return v >= m_vmin && v < m_vmax;
-    } else {
-      return ! (v >= m_vmin && v < m_vmax);
-    }
-  }
+  virtual bool selected (const db::Polygon &poly) const;
 
   /**
    *  @brief This filter is isotropic unless the parameter is width or height
    */
-  virtual const TransformationReducer *vars () const
-  {
-    if (m_parameter != BoxWidth && m_parameter != BoxHeight) {
-      return &m_isotropic_vars;
-    } else {
-      return &m_anisotropic_vars;
-    }
-  }
+  virtual const TransformationReducer *vars () const;
 
   /**
    *  @brief This filter prefers producing variants
@@ -355,6 +271,69 @@ struct DB_PUBLIC RegionBBoxFilter
 
 private:
   value_type m_vmin, m_vmax;
+  bool m_inverse;
+  parameter_type m_parameter;
+  db::MagnificationReducer m_isotropic_vars;
+  db::MagnificationAndOrientationReducer m_anisotropic_vars;
+};
+
+/**
+ *  @brief A ratio filter for use with Region::filter or Region::filtered
+ *
+ *  This filter can select polygons based on certain ratio values.
+ *  "ratio values" are typically in the order of 1 and floating point
+ *  values. Ratio values are always >= 0.
+ *
+ *  Available ratio values are:
+ *    - (AreaRatio) area ratio (bounding box area vs. polygon area)
+ *    - (AspectRatio) bounding box aspect ratio (max / min)
+ *    - (RelativeHeight) bounding box height to width (tallness)
+ */
+
+struct DB_PUBLIC RegionRatioFilter
+  : public PolygonFilterBase
+{
+  /**
+   *  @brief The parameters available
+   */
+  enum parameter_type {
+    AreaRatio,
+    AspectRatio,
+    RelativeHeight
+  };
+
+  /**
+   *  @brief Constructor
+   *
+   *  @param vmin The min value (only polygons with bounding box parameters above this value are filtered)
+   *  @param vmax The max value (only polygons with bounding box parameters below this value are filtered)
+   *  @param inverse If set to true, only polygons not matching this criterion will be filtered
+   */
+  RegionRatioFilter (double vmin, bool min_included, double vmax, bool max_included, bool inverse, parameter_type parameter);
+
+  /**
+   *  @brief Returns true if the polygon's area matches the criterion
+   */
+  virtual bool selected (const db::Polygon &poly) const;
+
+  /**
+   *  @brief This filter is isotropic unless the parameter is width or height
+   */
+  virtual const TransformationReducer *vars () const;
+
+  /**
+   *  @brief This filter prefers producing variants
+   */
+  virtual bool wants_variants () const { return true; }
+
+  /**
+   *  @brief This filter wants merged input
+   */
+  virtual bool requires_raw_input () const { return false; }
+
+private:
+  double m_vmin, m_vmax;
+  bool m_vmin_included, m_vmax_included;
   bool m_inverse;
   parameter_type m_parameter;
   db::MagnificationReducer m_isotropic_vars;

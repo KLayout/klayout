@@ -366,6 +366,42 @@ static db::EdgePairs angle_check2 (const db::Region *r, double amin, double amax
   return r->angle_check (amin, amax, inverse);
 }
 
+static db::Region with_bbox_aspect_ratio1 (const db::Region *r, double v, bool inverse)
+{
+  db::RegionRatioFilter f (v, true, v, true, inverse, db::RegionRatioFilter::AspectRatio);
+  return r->filtered (f);
+}
+
+static db::Region with_bbox_aspect_ratio2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse, bool min_included, bool max_included)
+{
+  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, inverse, db::RegionRatioFilter::AspectRatio);
+  return r->filtered (f);
+}
+
+static db::Region with_area_ratio1 (const db::Region *r, double v, bool inverse)
+{
+  db::RegionRatioFilter f (v, true, v, true, inverse, db::RegionRatioFilter::AreaRatio);
+  return r->filtered (f);
+}
+
+static db::Region with_area_ratio2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse, bool min_included, bool max_included)
+{
+  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, inverse, db::RegionRatioFilter::AreaRatio);
+  return r->filtered (f);
+}
+
+static db::Region with_relative_height1 (const db::Region *r, double v, bool inverse)
+{
+  db::RegionRatioFilter f (v, true, v, true, inverse, db::RegionRatioFilter::RelativeHeight);
+  return r->filtered (f);
+}
+
+static db::Region with_relative_height2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse, bool min_included, bool max_included)
+{
+  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, inverse, db::RegionRatioFilter::RelativeHeight);
+  return r->filtered (f);
+}
+
 static db::Region in (const db::Region *r, const db::Region &other)
 {
   return r->in (other, false);
@@ -378,13 +414,25 @@ static db::Region not_in (const db::Region *r, const db::Region &other)
 
 static db::Region rectangles (const db::Region *r)
 {
-  db::RectangleFilter f (false);
+  db::RectangleFilter f (false, false);
   return r->filtered (f);
 }
 
 static db::Region non_rectangles (const db::Region *r)
 {
-  db::RectangleFilter f (true);
+  db::RectangleFilter f (false, true);
+  return r->filtered (f);
+}
+
+static db::Region squares (const db::Region *r)
+{
+  db::RectangleFilter f (true, false);
+  return r->filtered (f);
+}
+
+static db::Region non_squares (const db::Region *r)
+{
+  db::RectangleFilter f (true, true);
   return r->filtered (f);
 }
 
@@ -839,7 +887,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_perimeter", with_perimeter1, gsi::arg ("perimeter"), gsi::arg ("inverse"),
     "@brief Filter the polygons by perimeter\n"
-    "Filters the polygons inside the region by perimeter. If \"inverse\" is false, only "
+    "Filters the polygons of the region by perimeter. If \"inverse\" is false, only "
     "polygons which have the given perimeter are returned. If \"inverse\" is true, "
     "polygons not having the given perimeter are returned.\n"
     "\n"
@@ -847,7 +895,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_perimeter", with_perimeter2, gsi::arg ("min_perimeter"), gsi::arg ("max_perimeter"), gsi::arg ("inverse"),
     "@brief Filter the polygons by perimeter\n"
-    "Filters the polygons inside the region by perimeter. If \"inverse\" is false, only "
+    "Filters the polygons of the region by perimeter. If \"inverse\" is false, only "
     "polygons which have a perimeter larger or equal to \"min_perimeter\" and less than \"max_perimeter\" are "
     "returned. If \"inverse\" is true, "
     "polygons having a perimeter less than \"min_perimeter\" or larger or equal than \"max_perimeter\" are "
@@ -859,7 +907,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_area", with_area1, gsi::arg ("area"), gsi::arg ("inverse"),
     "@brief Filter the polygons by area\n"
-    "Filters the polygons inside the region by area. If \"inverse\" is false, only "
+    "Filters the polygons of the region by area. If \"inverse\" is false, only "
     "polygons which have the given area are returned. If \"inverse\" is true, "
     "polygons not having the given area are returned.\n"
     "\n"
@@ -867,7 +915,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_area", with_area2, gsi::arg ("min_area"), gsi::arg ("max_area"), gsi::arg ("inverse"),
     "@brief Filter the polygons by area\n"
-    "Filters the polygons inside the region by area. If \"inverse\" is false, only "
+    "Filters the polygons of the region by area. If \"inverse\" is false, only "
     "polygons which have an area larger or equal to \"min_area\" and less than \"max_area\" are "
     "returned. If \"inverse\" is true, "
     "polygons having an area less than \"min_area\" or larger or equal than \"max_area\" are "
@@ -879,7 +927,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_bbox_width", with_bbox_width1, gsi::arg ("width"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width\n"
-    "Filters the polygons inside the region by the width of their bounding box. If \"inverse\" is false, only "
+    "Filters the polygons of the region by the width of their bounding box. If \"inverse\" is false, only "
     "polygons whose bounding box has the given width are returned. If \"inverse\" is true, "
     "polygons whose bounding box does not have the given width are returned.\n"
     "\n"
@@ -887,7 +935,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_bbox_width", with_bbox_width2, gsi::arg ("min_width"), gsi::arg ("max_width"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width\n"
-    "Filters the polygons inside the region by the width of their bounding box. If \"inverse\" is false, only "
+    "Filters the polygons of the region by the width of their bounding box. If \"inverse\" is false, only "
     "polygons whose bounding box has a width larger or equal to \"min_width\" and less than \"max_width\" are "
     "returned. If \"inverse\" is true, all polygons not matching this criterion are returned."
     "\n"
@@ -897,7 +945,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_bbox_height", with_bbox_height1, gsi::arg ("height"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box height\n"
-    "Filters the polygons inside the region by the height of their bounding box. If \"inverse\" is false, only "
+    "Filters the polygons of the region by the height of their bounding box. If \"inverse\" is false, only "
     "polygons whose bounding box has the given height are returned. If \"inverse\" is true, "
     "polygons whose bounding box does not have the given height are returned.\n"
     "\n"
@@ -905,7 +953,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_bbox_height", with_bbox_height2, gsi::arg ("min_height"), gsi::arg ("max_height"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box height\n"
-    "Filters the polygons inside the region by the height of their bounding box. If \"inverse\" is false, only "
+    "Filters the polygons of the region by the height of their bounding box. If \"inverse\" is false, only "
     "polygons whose bounding box has a height larger or equal to \"min_height\" and less than \"max_height\" are "
     "returned. If \"inverse\" is true, all polygons not matching this criterion are returned."
     "\n"
@@ -924,7 +972,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_bbox_min", with_bbox_min2, gsi::arg ("min_dim"), gsi::arg ("max_dim"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width or height, whichever is smaller\n"
-    "Filters the polygons inside the region by the minimum dimension of their bounding box. "
+    "Filters the polygons of the region by the minimum dimension of their bounding box. "
     "If \"inverse\" is false, only polygons whose bounding box's smaller dimension is larger or equal to \"min_dim\" "
     "and less than \"max_dim\" are returned. "
     "If \"inverse\" is true, all polygons not matching this criterion are returned."
@@ -935,7 +983,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_bbox_max", with_bbox_max1, gsi::arg ("dim"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width or height, whichever is larger\n"
-    "Filters the polygons inside the region by the maximum dimension of their bounding box. "
+    "Filters the polygons of the region by the maximum dimension of their bounding box. "
     "If \"inverse\" is false, only polygons whose bounding box's larger dimension is equal to the given value "
     "are returned. "
     "If \"inverse\" is true, all polygons not matching this criterion are returned."
@@ -944,7 +992,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_bbox_max", with_bbox_max2, gsi::arg ("min_dim"), gsi::arg ("max_dim"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width or height, whichever is larger\n"
-    "Filters the polygons inside the region by the minimum dimension of their bounding box. "
+    "Filters the polygons of the region by the minimum dimension of their bounding box. "
     "If \"inverse\" is false, only polygons whose bounding box's larger dimension is larger or equal to \"min_dim\" "
     "and less than \"max_dim\" are returned. "
     "If \"inverse\" is true, all polygons not matching this criterion are returned."
@@ -953,7 +1001,96 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method ("strange_polygon_check", &db::Region::strange_polygon_check, 
+  method_ext ("with_bbox_aspect_ratio", with_bbox_aspect_ratio1, gsi::arg ("ratio"), gsi::arg ("inverse"),
+    "@brief Filters the polygons by the aspect ratio of their bounding boxes\n"
+    "Filters the polygons of the region by the apspect ratio of their bounding boxes. "
+    "The aspect ratio is the ratio of larger to smaller dimension of the bounding box. "
+    "A square has an aspect ratio of 1.\n"
+    "\n"
+    "With 'inverse' set to false, this version filters polygons which have a bounding box aspect ratio equal to the given value. "
+    "With 'inverse' set to true, all other polygons will be returned.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("with_bbox_aspect_ratio", with_bbox_aspect_ratio2, gsi::arg ("min_ratio"), gsi::arg ("max_ratio"), gsi::arg ("inverse"), gsi::arg ("min_included", true), gsi::arg ("max_included", true),
+    "@brief Filters the polygons by the aspect ratio of their bounding boxes\n"
+    "Filters the polygons of the region by the apspect ratio of their bounding boxes. "
+    "The aspect ratio is the ratio of larger to smaller dimension of the bounding box. "
+    "A square has an aspect ratio of 1.\n"
+    "\n"
+    "With 'inverse' set to false, this version filters polygons which have a bounding box aspect ratio between 'min_ratio' and 'max_ratio'. "
+    "With 'min_included' set to true, the 'min_ratio' value is included in the range, otherwise it's excluded. Same for 'max_included' and 'max_ratio'. "
+    "With 'inverse' set to true, all other polygons will be returned.\n"
+    "\n"
+    "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("with_area_ratio", with_area_ratio1, gsi::arg ("ratio"), gsi::arg ("inverse"),
+    "@brief Filters the polygons by the bounding box area to polygon area ratio\n"
+    "The area ratio is defined by the ratio of bounding box area to polygon area. It's a measure "
+    "how much the bounding box is approximating the polygon. 'Thin polygons' have a large area ratio, boxes has an area ratio of 1.\n"
+    "The area ratio is always larger or equal to 1. "
+    "\n"
+    "With 'inverse' set to false, this version filters polygons which have an area ratio equal to the given value. "
+    "With 'inverse' set to true, all other polygons will be returned.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("with_area_ratio", with_area_ratio2, gsi::arg ("min_ratio"), gsi::arg ("max_ratio"), gsi::arg ("inverse"), gsi::arg ("min_included", true), gsi::arg ("max_included", true),
+    "@brief Filters the polygons by the aspect ratio of their bounding boxes\n"
+    "The area ratio is defined by the ratio of bounding box area to polygon area. It's a measure "
+    "how much the bounding box is approximating the polygon. 'Thin polygons' have a large area ratio, boxes has an area ratio of 1.\n"
+    "The area ratio is always larger or equal to 1. "
+    "\n"
+    "With 'inverse' set to false, this version filters polygons which have an area ratio between 'min_ratio' and 'max_ratio'. "
+    "With 'min_included' set to true, the 'min_ratio' value is included in the range, otherwise it's excluded. Same for 'max_included' and 'max_ratio'. "
+    "With 'inverse' set to true, all other polygons will be returned.\n"
+    "\n"
+    "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("with_relative_height", with_relative_height1, gsi::arg ("ratio"), gsi::arg ("inverse"),
+    "@brief Filters the polygons by the ratio of heigth to width\n"
+    "This method filters the polygons of the region by the ratio of height vs. width of their bounding boxes. "
+    "'Tall' polygons have a large value while 'flat' polygons have a small value. A square has a relative height of 1.\n"
+    "\n"
+    "An alternative method is 'with_area_ratio' which can be more efficient because it's isotropic.\n"
+    "\n"
+    "With 'inverse' set to false, this version filters polygons which have a relative height equal to the given value. "
+    "With 'inverse' set to true, all other polygons will be returned.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("with_relative_height", with_relative_height2, gsi::arg ("min_ratio"), gsi::arg ("max_ratio"), gsi::arg ("inverse"), gsi::arg ("min_included", true), gsi::arg ("max_included", true),
+    "@brief Filters the polygons by the bounding box height to width ratio\n"
+    "This method filters the polygons of the region by the ratio of height vs. width of their bounding boxes. "
+    "'Tall' polygons have a large value while 'flat' polygons have a small value. A square has a relative height of 1.\n"
+    "\n"
+    "An alternative method is 'with_area_ratio' which can be more efficient because it's isotropic.\n"
+    "\n"
+    "With 'inverse' set to false, this version filters polygons which have a relative height between 'min_ratio' and 'max_ratio'. "
+    "With 'min_included' set to true, the 'min_ratio' value is included in the range, otherwise it's excluded. Same for 'max_included' and 'max_ratio'. "
+    "With 'inverse' set to true, all other polygons will be returned.\n"
+    "\n"
+    "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  method ("strange_polygon_check", &db::Region::strange_polygon_check,
     "@brief Returns a region containing those parts of polygons which are \"strange\"\n"
     "Strange parts of polygons are self-overlapping parts or non-orientable parts (i.e. in the \"8\" configuration).\n"
     "\n"
@@ -1876,6 +2013,20 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@brief Returns all polygons which are not rectangles\n"
     "This method returns all polygons in self which are not rectangles."
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+  ) +
+  method_ext ("squares", &squares,
+    "@brief Returns all polygons which are squares\n"
+    "This method returns all polygons in self which are squares."
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("non_squares", &non_squares,
+    "@brief Returns all polygons which are not squares\n"
+    "This method returns all polygons in self which are not squares."
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
   ) +
   method_ext ("rectilinear", &rectilinear,
     "@brief Returns all polygons which are rectilinear\n"

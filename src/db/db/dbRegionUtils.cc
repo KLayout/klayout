@@ -438,6 +438,193 @@ template class poly2poly_check<db::Polygon>;
 template class poly2poly_check<db::PolygonRef>;
 
 // -------------------------------------------------------------------------------------
+//  RegionPerimeterFilter implementation
+
+RegionPerimeterFilter::RegionPerimeterFilter (perimeter_type pmin, perimeter_type pmax, bool inverse)
+  : m_pmin (pmin), m_pmax (pmax), m_inverse (inverse)
+{
+  //  .. nothing yet ..
+}
+
+bool RegionPerimeterFilter::selected (const db::Polygon &poly) const
+{
+  perimeter_type p = 0;
+  for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end () && p < m_pmax; ++e) {
+    p += (*e).length ();
+  }
+
+  if (! m_inverse) {
+    return p >= m_pmin && p < m_pmax;
+  } else {
+    return ! (p >= m_pmin && p < m_pmax);
+  }
+}
+
+const TransformationReducer *RegionPerimeterFilter::vars () const
+{
+  return &m_vars;
+}
+
+// -------------------------------------------------------------------------------------
+//  RegionAreaFilter implementation
+
+RegionAreaFilter::RegionAreaFilter (area_type amin, area_type amax, bool inverse)
+  : m_amin (amin), m_amax (amax), m_inverse (inverse)
+{
+  //  .. nothing yet ..
+}
+
+bool
+RegionAreaFilter::selected (const db::Polygon &poly) const
+{
+  area_type a = poly.area ();
+  if (! m_inverse) {
+    return a >= m_amin && a < m_amax;
+  } else {
+    return ! (a >= m_amin && a < m_amax);
+  }
+}
+
+const TransformationReducer *
+RegionAreaFilter::vars () const
+{
+  return &m_vars;
+}
+
+// -------------------------------------------------------------------------------------
+//  RectilinearFilter implementation
+
+RectilinearFilter::RectilinearFilter (bool inverse)
+  : m_inverse (inverse)
+{
+  //  .. nothing yet ..
+}
+
+bool
+RectilinearFilter::selected (const db::Polygon &poly) const
+{
+  return poly.is_rectilinear () != m_inverse;
+}
+
+const TransformationReducer *
+RectilinearFilter::vars () const
+{
+  return 0;
+}
+
+// -------------------------------------------------------------------------------------
+//  RectilinearFilter implementation
+
+RectangleFilter::RectangleFilter (bool is_square, bool inverse)
+  : m_is_square (is_square), m_inverse (inverse)
+{
+  //  .. nothing yet ..
+}
+
+bool
+RectangleFilter::selected (const db::Polygon &poly) const
+{
+  bool ok = poly.is_box ();
+  if (ok && m_is_square) {
+    db::Box box = poly.box ();
+    ok = box.width () == box.height ();
+  }
+  return ok != m_inverse;
+}
+
+const TransformationReducer *RectangleFilter::vars () const
+{
+  return 0;
+}
+
+// -------------------------------------------------------------------------------------
+//  RectilinearFilter implementation
+
+RegionBBoxFilter::RegionBBoxFilter (value_type vmin, value_type vmax, bool inverse, parameter_type parameter)
+  : m_vmin (vmin), m_vmax (vmax), m_inverse (inverse), m_parameter (parameter)
+{
+  //  .. nothing yet ..
+}
+
+bool
+RegionBBoxFilter::selected (const db::Polygon &poly) const
+{
+  value_type v = 0;
+  db::Box box = poly.box ();
+  if (m_parameter == BoxWidth) {
+    v = box.width ();
+  } else if (m_parameter == BoxHeight) {
+    v = box.height ();
+  } else if (m_parameter == BoxMinDim) {
+    v = std::min (box.width (), box.height ());
+  } else if (m_parameter == BoxMaxDim) {
+    v = std::max (box.width (), box.height ());
+  } else if (m_parameter == BoxAverageDim) {
+    v = (box.width () + box.height ()) / 2;
+  }
+  if (! m_inverse) {
+    return v >= m_vmin && v < m_vmax;
+  } else {
+    return ! (v >= m_vmin && v < m_vmax);
+  }
+}
+
+const TransformationReducer *
+RegionBBoxFilter::vars () const
+{
+  if (m_parameter != BoxWidth && m_parameter != BoxHeight) {
+    return &m_isotropic_vars;
+  } else {
+    return &m_anisotropic_vars;
+  }
+}
+
+// -------------------------------------------------------------------------------------
+//  RectilinearFilter implementation
+
+RegionRatioFilter::RegionRatioFilter (double vmin, bool min_included, double vmax, bool max_included, bool inverse, parameter_type parameter)
+  : m_vmin (vmin), m_vmax (vmax), m_vmin_included (min_included), m_vmax_included (max_included), m_inverse (inverse), m_parameter (parameter)
+{
+  //  .. nothing yet ..
+}
+
+bool RegionRatioFilter::selected (const db::Polygon &poly) const
+{
+  double v = 0.0;
+  if (m_parameter == AreaRatio) {
+    v = poly.area_ratio ();
+  } else if (m_parameter == AspectRatio) {
+    db::Box box = poly.box ();
+    double f = std::max (box.height (), box.width ());
+    double d = std::min (box.height (), box.width ());
+    if (d < 1) {
+      return false;
+    }
+    v = f / d;
+  } else if (m_parameter == RelativeHeight) {
+    db::Box box = poly.box ();
+    double f = box.height ();
+    double d = box.width ();
+    if (d < 1) {
+      return false;
+    }
+    v = f / d;
+  }
+
+  bool ok = (v - (m_vmin_included ? -db::epsilon : db::epsilon) > m_vmin  && v - (m_vmax_included ? db::epsilon : -db::epsilon) < m_vmax);
+  return ok != m_inverse;
+}
+
+const TransformationReducer *RegionRatioFilter::vars () const
+{
+  if (m_parameter != RelativeHeight) {
+    return &m_isotropic_vars;
+  } else {
+    return &m_anisotropic_vars;
+  }
+}
+
+// -------------------------------------------------------------------------------------
 //  SinglePolygonCheck implementation
 
 SinglePolygonCheck::SinglePolygonCheck (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options)

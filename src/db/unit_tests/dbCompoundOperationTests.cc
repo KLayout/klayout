@@ -481,7 +481,7 @@ void run_test9 (tl::TestBase *_this, bool deep)
   db::CompoundRegionSizeOperationNode *result1 = new db::CompoundRegionSizeOperationNode (50, 50, 2, primary);
   inputs.push_back (result1);
 
-  db::CompoundRegionFilterOperationNode *condition2 = new db::CompoundRegionFilterOperationNode (new db::RectangleFilter (false), primary, true);
+  db::CompoundRegionFilterOperationNode *condition2 = new db::CompoundRegionFilterOperationNode (new db::RectangleFilter (false, false), primary, true);
   inputs.push_back (condition2);
 
   db::CompoundRegionSizeOperationNode *result2 = new db::CompoundRegionSizeOperationNode (-50, -50, 2, primary);
@@ -536,7 +536,7 @@ void run_test10 (tl::TestBase *_this, bool deep)
   db::CompoundRegionFilterOperationNode *condition1 = new db::CompoundRegionFilterOperationNode (new db::RegionAreaFilter (0, 10000000, true), primary, true);
   db::CompoundRegionFilterOperationNode *condition1r = new db::CompoundRegionFilterOperationNode (new db::RegionAreaFilter (0, 10000000, false), primary, true);
 
-  db::CompoundRegionFilterOperationNode *condition2 = new db::CompoundRegionFilterOperationNode (new db::RectangleFilter (false), primary, true);
+  db::CompoundRegionFilterOperationNode *condition2 = new db::CompoundRegionFilterOperationNode (new db::RectangleFilter (false, false), primary, true);
 
   std::vector<db::CompoundRegionOperationNode *> inputs;
   inputs.push_back (condition1r);

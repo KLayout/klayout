@@ -399,7 +399,7 @@ CODE
   # The plain function is equivalent to "primary.bbox_aspect_ratio".
   
   def bbox_aspect_ratio
-    DRCOpNodeRatioParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::RegionRatioFilter::AspectRatio, self)
+    DRCOpNodeRatioParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::RatioParameterType::AspectRatio, self)
   end
   
   # %DRC%
@@ -430,7 +430,7 @@ CODE
   # The plain function is equivalent to "primary.bbox_aspect_ratio".
   
   def relative_height
-    DRCOpNodeRatioParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::RegionRatioFilter::RelativeHeight, self)
+    DRCOpNodeRatioParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::RatioParameterType::RelativeHeight, self)
   end
   
   # %DRC%
@@ -459,7 +459,7 @@ CODE
   # The plain function is equivalent to "primary.area_ratio".
   
   def area_ratio
-    DRCOpNodeRatioParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::RegionRatioFilter::AreaRatio, self)
+    DRCOpNodeRatioParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::RatioParameterType::AreaRatio, self)
   end
   
   # %DRC%
@@ -1240,7 +1240,7 @@ class DRCOpNodeWithCompare < DRCOpNode
   attr_accessor :reverse
   attr_accessor :original
   attr_accessor :lt, :le, :gt, :ge, :arg
-  attr_accessor :ne_allowed
+  attr_accessor :mode_or_supported
   attr_accessor :mode_or
   
   def initialize(engine, original = nil, reverse = false)
@@ -1249,7 +1249,7 @@ class DRCOpNodeWithCompare < DRCOpNode
     self.original = original
     self.description = original ? original.description : "BasicWithCompare"
     self.mode_or = false
-    self.ne_allowed = false
+    self.mode_or_supported = false
   end
   
   def _description_for_dump
@@ -1313,17 +1313,21 @@ class DRCOpNodeWithCompare < DRCOpNode
   end
   
   def !=(other)
-    if !self.ne_allowed
-      raise("!= operator is not allowed for '" + self.description + "'")
+    if self.respond_to?(:inverted)
+      res = self.==(other).inverted
+    else
+      if !self.mode_or_supported
+        raise("!= operator is not allowed for '" + self.description + "'")
+      end
+      if !(other.is_a?(Float) || other.is_a?(Integer))
+        raise("!= operator needs a numerical argument for '" + self.description + "' argument")
+      end
+      res = self._self_or_original
+      res.mode_or = true
+      res.set_lt(other)
+      res.set_gt(other)
     end
-    if !(other.is_a?(Float) || other.is_a?(Integer))
-      raise("!= operator needs a numerical argument for '" + self.description + "' argument")
-    end
-    res = self._self_or_original
-    res.mode_or = true
-    res.set_lt(other)
-    res.set_gt(other)
-    return res
+    res
   end
   
   def ==(other)
@@ -1680,7 +1684,7 @@ class DRCOpNodeCheck < DRCOpNodeWithCompare
     self.other = other
     self.args = args
     self.description = check.to_s
-    self.ne_allowed = true
+    self.mode_or_supported = true
   end
 
   def _description_for_dump
@@ -1762,6 +1766,39 @@ class DRCOpNodeBBoxParameterFilter < DRCOpNodeWithCompare
       args << (self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) + 1)
     end
     RBA::CompoundRegionOperationNode::new_bbox_filter(*args)
+  end
+
+  def inverted
+    res = self.dup
+    res.inverse = !res.inverse
+    return res
+  end
+  
+end
+
+class DRCOpNodeRatioParameterFilter < DRCOpNodeWithCompare
+
+  attr_accessor :input
+  attr_accessor :parameter
+  attr_accessor :inverse
+  
+  def initialize(engine, parameter, input)
+    super(engine)
+    self.parameter = parameter
+    self.input = input
+    self.inverse = false
+    self.description = parameter.to_s
+  end
+  
+  def do_create_node(cache)
+    args = [ self.input.create_node(cache), self.parameter, self.inverse ]
+    args << (self.gt ? self.gt : (self.ge ? self.ge : 0.0))
+    args << (self.gt ? false : true)
+    if self.lt || self.le
+      args << (self.lt ? self.lt : self.le)
+      args << (self.lt ? false : true)
+    end
+    RBA::CompoundRegionOperationNode::new_ratio_filter(*args)
   end
 
   def inverted

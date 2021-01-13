@@ -652,16 +652,16 @@ CODE
     # the operation acts similar to \Layer#with_angle.
 
     %w(
+      angle
       area
       holes
       hulls
+      length
       odd_polygons
       perimeter
       rectangles
-      squares
       rectilinear
-      length
-      angle
+      squares
     ).each do |f|
       # NOTE: these methods are fallback for the respective global ones which route to DRCLayer or here.
       eval <<"CODE"

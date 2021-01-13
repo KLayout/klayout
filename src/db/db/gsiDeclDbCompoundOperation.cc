@@ -862,7 +862,7 @@ gsi::EnumIn<db::CompoundRegionOperationNode, db::RegionBBoxFilter::parameter_typ
   "This enum has been introduced in version 0.27."
 );
 
-gsi::EnumIn<db::CompoundRegionOperationNode, db::RegionRatioFilter::parameter_type> decl_dbRegionRatioFilter_ParameterType ("db", "ParameterType",
+gsi::EnumIn<db::CompoundRegionOperationNode, db::RegionRatioFilter::parameter_type> decl_dbRegionRatioFilter_ParameterType ("db", "RatioParameterType",
   gsi::enum_const ("AreaRatio", db::RegionRatioFilter::AreaRatio,
     "@brief Measures the area ratio (bounding box area / polygon area)\n"
   ) +

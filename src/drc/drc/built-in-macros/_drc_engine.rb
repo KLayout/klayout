@@ -1603,6 +1603,7 @@ CODE
       moved
       non_rectangles
       non_rectilinear
+      non_squares
       non_strict
       not 
       notch
@@ -1646,6 +1647,7 @@ CODE
       snap 
       snapped
       space
+      squares
       start_segments
       strict
       texts
@@ -1656,7 +1658,9 @@ CODE
       width
       with_angle
       with_area
+      with_area_ratio
       with_bbox_area
+      with_bbox_area_ratio
       with_bbox_height
       with_bbox_max
       with_bbox_min
@@ -1664,13 +1668,17 @@ CODE
       with_length
       without_angle
       without_area
+      without_area_ratio
       without_bbox
+      without_bbox_area_ratio
       without_bbox_height
       without_bbox_max
       without_bbox_min
       without_length
       without_perimeter
+      without_relative_height
       with_perimeter
+      with_relative_height
       xor
     ).each do |f|
       eval <<"CODE"

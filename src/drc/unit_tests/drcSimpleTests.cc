@@ -1127,3 +1127,13 @@ TEST(25d_spaceWithOptions)
 {
   run_test (_this, "25", true);
 }
+
+TEST(26_attributes)
+{
+  run_test (_this, "26", false);
+}
+
+TEST(26d_attributes)
+{
+  run_test (_this, "26", true);
+}

@@ -600,12 +600,12 @@ CODE
             if args.size == 1
               a = args[0]
               if a.is_a?(Range)
-                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._prep_value(a.first), @engine._make_numeric_value(a.last), #{inv.inspect}))
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_numeric_value(a.first), @engine._make_numeric_value(a.last), #{inv.inspect}))
               else
-                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._prep_value(a), #{inv.inspect}))
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_numeric_value(a), #{inv.inspect}))
               end
             elsif args.size == 2
-              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._prep_value(args[0]), @engine._make_numeric_value(args[1]), #{inv.inspect}))
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_numeric_value(args[0]), @engine._make_numeric_value(args[1]), #{inv.inspect}))
             else
               raise("Invalid number of arguments (1 or 2 expected)")
             end

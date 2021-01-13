@@ -1021,6 +1021,11 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.with_relative_height(0.9, 1.0, false, true, false).to_s, "")
     assert_equal(r.with_relative_height(1.0, 1.1, false, false, true).to_s, "")
 
+    assert_equal(r.rectangles.to_s, "(3000,0;3000,1000;7000,1000;7000,0);(0,0;0,5000;1000,5000;1000,0);(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.non_rectangles.to_s, "")
+    assert_equal(r.squares.to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.non_squares.to_s, "(3000,0;3000,1000;7000,1000;7000,0);(0,0;0,5000;1000,5000;1000,0)")
+
     r = RBA::Region::new
     r.insert(RBA::Box::new(0, 0, 1000, 2000))
     r.insert(RBA::Box::new(0, 0, 2000, 1000))

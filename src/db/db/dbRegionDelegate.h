@@ -65,6 +65,24 @@ public:
   virtual bool selected (const db::Polygon &polygon) const = 0;
 
   /**
+   *  @brief Filters the polygon reference
+   *  If this method returns true, the polygon is kept. Otherwise it's discarded.
+   */
+  virtual bool selected (const db::PolygonRef &polygon) const = 0;
+
+  /**
+   *  @brief Filters the set of polygons (taking the overall properties)
+   *  If this method returns true, the polygon is kept. Otherwise it's discarded.
+   */
+  virtual bool selected_set (const std::unordered_set<db::Polygon> &polygons) const = 0;
+
+  /**
+   *  @brief Filters the set of polygon references (taking the overall properties)
+   *  If this method returns true, the polygon is kept. Otherwise it's discarded.
+   */
+  virtual bool selected_set (const std::unordered_set<db::PolygonRef> &polygons) const = 0;
+
+  /**
    *  @brief Returns the transformation reducer for building cell variants
    *  This method may return 0. In this case, not cell variants are built.
    */

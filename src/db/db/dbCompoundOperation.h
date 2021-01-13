@@ -147,11 +147,6 @@ public:
    */
   virtual bool wants_variants () const { return false; }
 
-  /**
-   *  @brief Returns true, if the processor wants to have merged primary inputs
-   */
-  virtual bool wants_merged () const { return false; }
-
   void compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const
   {
     implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
@@ -413,7 +408,6 @@ public:
 
   virtual const TransformationReducer *vars () const;
   virtual bool wants_variants () const;
-  virtual bool wants_merged () const;
 
   virtual void invalidate_cache () const;
 
@@ -641,7 +635,6 @@ public:
   virtual const db::TransformationReducer *vars () const  { return mp_vars; }
   virtual bool wants_variants () const { return m_wants_variants; }
   virtual db::Coord computed_dist () const { return m_op->dist (); }
-  virtual bool wants_merged () const { return true; }
 
   virtual std::vector<db::Region *> inputs () const
   {
@@ -892,7 +885,7 @@ class DB_PUBLIC CompoundRegionFilterOperationNode
   : public CompoundRegionMultiInputOperationNode
 {
 public:
-  CompoundRegionFilterOperationNode (PolygonFilterBase *filter, CompoundRegionOperationNode *input, bool owns_filter = false);
+  CompoundRegionFilterOperationNode (PolygonFilterBase *filter, CompoundRegionOperationNode *input, bool owns_filter = false, bool sum_of_set = false);
   ~CompoundRegionFilterOperationNode ();
 
   //  specifies the result type
@@ -903,14 +896,11 @@ public:
 
   virtual const TransformationReducer *vars () const { return mp_filter->vars (); }
   virtual bool wants_variants () const { return mp_filter->wants_variants (); }
-  virtual bool wants_merged () const { return true; }
 
 private:
   PolygonFilterBase *mp_filter;
   bool m_owns_filter;
-
-  bool is_selected (const db::Polygon &p) const;
-  bool is_selected (const db::PolygonRef &p) const;
+  bool m_sum_of_set;
 
   template <class T>
   void implement_compute_local (db::Layout *layout, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<T> > &results, size_t max_vertex_count, double area_ratio) const
@@ -920,9 +910,15 @@ private:
 
     child (0)->compute_local (layout, interactions, one, max_vertex_count, area_ratio);
 
-    for (typename std::unordered_set<T>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
-      if (is_selected (*p)) {
-        results.front ().insert (*p);
+    if (m_sum_of_set) {
+      if (mp_filter->selected_set (one.front ())) {
+        results.front ().insert (one.front ().begin (), one.front ().end ());
+      }
+    } else {
+      for (typename std::unordered_set<T>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
+        if (mp_filter->selected (*p)) {
+          results.front ().insert (*p);
+        }
       }
     }
   }
@@ -932,7 +928,7 @@ class DB_PUBLIC CompoundRegionEdgeFilterOperationNode
   : public CompoundRegionMultiInputOperationNode
 {
 public:
-  CompoundRegionEdgeFilterOperationNode (EdgeFilterBase *filter, CompoundRegionOperationNode *input, bool owns_filter = false);
+  CompoundRegionEdgeFilterOperationNode (EdgeFilterBase *filter, CompoundRegionOperationNode *input, bool owns_filter = false, bool sum_of = false);
   ~CompoundRegionEdgeFilterOperationNode ();
 
   //  specifies the result type
@@ -943,13 +939,11 @@ public:
 
   virtual const TransformationReducer *vars () const { return mp_filter->vars (); }
   virtual bool wants_variants () const { return mp_filter->wants_variants (); }
-  virtual bool wants_merged () const { return true; }
 
 private:
   EdgeFilterBase *mp_filter;
   bool m_owns_filter;
-
-  bool is_selected (const db::Edge &p) const;
+  bool m_sum_of;
 
   template <class T>
   void implement_compute_local (db::Layout *layout, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
@@ -959,9 +953,15 @@ private:
 
     child (0)->compute_local (layout, interactions, one, max_vertex_count, area_ratio);
 
-    for (typename std::unordered_set<db::Edge>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
-      if (is_selected (*p)) {
-        results.front ().insert (*p);
+    if (m_sum_of) {
+      if (mp_filter->selected (one.front ())) {
+        results.front ().insert (one.front ().begin (), one.front ().end ());
+      }
+    } else {
+      for (typename std::unordered_set<db::Edge>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
+        if (mp_filter->selected (*p)) {
+          results.front ().insert (*p);
+        }
       }
     }
   }
@@ -982,7 +982,6 @@ public:
 
   virtual const TransformationReducer *vars () const { return mp_filter->vars (); }
   virtual bool wants_variants () const { return mp_filter->wants_variants (); }
-  virtual bool wants_merged () const { return true; }
 
 private:
   EdgePairFilterBase *mp_filter;
@@ -1020,7 +1019,6 @@ public:
 
   virtual const TransformationReducer *vars () const { return mp_proc->vars (); }
   virtual bool wants_variants () const { return mp_proc->wants_variants (); }
-  virtual bool wants_merged () const { return ! mp_proc->requires_raw_input (); }
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const;
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const;
@@ -1147,7 +1145,6 @@ public:
 
   virtual const TransformationReducer *vars () const { return mp_proc->vars (); }
   virtual bool wants_variants () const { return mp_proc->wants_variants (); }
-  virtual bool wants_merged () const { return true; }
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const;
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const;
@@ -1188,7 +1185,6 @@ public:
 
   virtual const TransformationReducer *vars () const { return mp_proc->vars (); }
   virtual bool wants_variants () const { return mp_proc->wants_variants (); }
-  virtual bool wants_merged () const { return true; }
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const;
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const;
@@ -1228,7 +1224,6 @@ public:
 
   virtual const TransformationReducer *vars () const { return mp_proc->vars (); }
   virtual bool wants_variants () const { return mp_proc->wants_variants (); }
-  virtual bool wants_merged () const { return true; }
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const;
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const;
@@ -1269,7 +1264,6 @@ public:
 
   virtual const TransformationReducer *vars () const { return mp_proc->vars (); }
   virtual bool wants_variants () const { return mp_proc->wants_variants (); }
-  virtual bool wants_merged () const { return true; }
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const;
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const;
@@ -1307,7 +1301,6 @@ public:
 
   virtual const TransformationReducer *vars () const { return mp_proc->vars (); }
   virtual bool wants_variants () const { return mp_proc->wants_variants (); }
-  virtual bool wants_merged () const { return true; }
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const;
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const;
@@ -1358,7 +1351,6 @@ public:
 
   virtual const TransformationReducer *vars () const { return mp_proc->vars (); }
   virtual bool wants_variants () const { return mp_proc->wants_variants (); }
-  virtual bool wants_merged () const { return true; }
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const;
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const;
@@ -1417,7 +1409,6 @@ public:
 
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual db::Coord computed_dist () const;
-  virtual bool wants_merged () const;
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const;
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const;

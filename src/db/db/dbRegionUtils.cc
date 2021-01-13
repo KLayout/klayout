@@ -446,18 +446,41 @@ RegionPerimeterFilter::RegionPerimeterFilter (perimeter_type pmin, perimeter_typ
   //  .. nothing yet ..
 }
 
-bool RegionPerimeterFilter::selected (const db::Polygon &poly) const
+bool RegionPerimeterFilter::check (perimeter_type p) const
 {
-  perimeter_type p = 0;
-  for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end () && p < m_pmax; ++e) {
-    p += (*e).length ();
-  }
-
   if (! m_inverse) {
     return p >= m_pmin && p < m_pmax;
   } else {
     return ! (p >= m_pmin && p < m_pmax);
   }
+}
+
+bool RegionPerimeterFilter::selected (const db::Polygon &poly) const
+{
+  return check (poly.perimeter ());
+}
+
+bool RegionPerimeterFilter::selected (const db::PolygonRef &poly) const
+{
+  return check (poly.perimeter ());
+}
+
+bool RegionPerimeterFilter::selected_set (const std::unordered_set<db::Polygon> &poly) const
+{
+  perimeter_type ps = 0;
+  for (std::unordered_set<db::Polygon>::const_iterator p = poly.begin (); p != poly.end (); ++p) {
+    ps += p->perimeter ();
+  }
+  return check (ps);
+}
+
+bool RegionPerimeterFilter::selected_set (const std::unordered_set<db::PolygonRef> &poly) const
+{
+  perimeter_type ps = 0;
+  for (std::unordered_set<db::PolygonRef>::const_iterator p = poly.begin (); p != poly.end (); ++p) {
+    ps += p->perimeter ();
+  }
+  return check (ps);
 }
 
 const TransformationReducer *RegionPerimeterFilter::vars () const
@@ -474,15 +497,41 @@ RegionAreaFilter::RegionAreaFilter (area_type amin, area_type amax, bool inverse
   //  .. nothing yet ..
 }
 
-bool
-RegionAreaFilter::selected (const db::Polygon &poly) const
+bool RegionAreaFilter::check (area_type a) const
 {
-  area_type a = poly.area ();
   if (! m_inverse) {
     return a >= m_amin && a < m_amax;
   } else {
     return ! (a >= m_amin && a < m_amax);
   }
+}
+
+bool RegionAreaFilter::selected (const db::Polygon &poly) const
+{
+  return check (poly.area ());
+}
+
+bool RegionAreaFilter::selected (const db::PolygonRef &poly) const
+{
+  return check (poly.area ());
+}
+
+bool RegionAreaFilter::selected_set (const std::unordered_set<db::Polygon> &poly) const
+{
+  area_type as = 0;
+  for (std::unordered_set<db::Polygon>::const_iterator p = poly.begin (); p != poly.end (); ++p) {
+    as += p->area ();
+  }
+  return check (as);
+}
+
+bool RegionAreaFilter::selected_set (const std::unordered_set<db::PolygonRef> &poly) const
+{
+  area_type as = 0;
+  for (std::unordered_set<db::PolygonRef>::const_iterator p = poly.begin (); p != poly.end (); ++p) {
+    as += p->area ();
+  }
+  return check (as);
 }
 
 const TransformationReducer *
@@ -502,6 +551,12 @@ RectilinearFilter::RectilinearFilter (bool inverse)
 
 bool
 RectilinearFilter::selected (const db::Polygon &poly) const
+{
+  return poly.is_rectilinear () != m_inverse;
+}
+
+bool
+RectilinearFilter::selected (const db::PolygonRef &poly) const
 {
   return poly.is_rectilinear () != m_inverse;
 }
@@ -532,6 +587,17 @@ RectangleFilter::selected (const db::Polygon &poly) const
   return ok != m_inverse;
 }
 
+bool
+RectangleFilter::selected (const db::PolygonRef &poly) const
+{
+  bool ok = poly.is_box ();
+  if (ok && m_is_square) {
+    db::Box box = poly.box ();
+    ok = box.width () == box.height ();
+  }
+  return ok != m_inverse;
+}
+
 const TransformationReducer *RectangleFilter::vars () const
 {
   return 0;
@@ -547,10 +613,9 @@ RegionBBoxFilter::RegionBBoxFilter (value_type vmin, value_type vmax, bool inver
 }
 
 bool
-RegionBBoxFilter::selected (const db::Polygon &poly) const
+RegionBBoxFilter::check (const db::Box &box) const
 {
   value_type v = 0;
-  db::Box box = poly.box ();
   if (m_parameter == BoxWidth) {
     v = box.width ();
   } else if (m_parameter == BoxHeight) {
@@ -567,6 +632,18 @@ RegionBBoxFilter::selected (const db::Polygon &poly) const
   } else {
     return ! (v >= m_vmin && v < m_vmax);
   }
+}
+
+bool
+RegionBBoxFilter::selected (const db::Polygon &poly) const
+{
+  return check (poly.box ());
+}
+
+bool
+RegionBBoxFilter::selected (const db::PolygonRef &poly) const
+{
+  return check (poly.box ());
 }
 
 const TransformationReducer *
@@ -588,28 +665,53 @@ RegionRatioFilter::RegionRatioFilter (double vmin, bool min_included, double vma
   //  .. nothing yet ..
 }
 
-bool RegionRatioFilter::selected (const db::Polygon &poly) const
+template <class P>
+static double compute_ratio_parameter (const P &poly, RegionRatioFilter::parameter_type parameter)
 {
   double v = 0.0;
-  if (m_parameter == AreaRatio) {
+
+  if (parameter == RegionRatioFilter::AreaRatio) {
+
     v = poly.area_ratio ();
-  } else if (m_parameter == AspectRatio) {
+
+  } else if (parameter == RegionRatioFilter::AspectRatio) {
+
     db::Box box = poly.box ();
     double f = std::max (box.height (), box.width ());
     double d = std::min (box.height (), box.width ());
     if (d < 1) {
       return false;
     }
+
     v = f / d;
-  } else if (m_parameter == RelativeHeight) {
+
+  } else if (parameter == RegionRatioFilter::RelativeHeight) {
+
     db::Box box = poly.box ();
     double f = box.height ();
     double d = box.width ();
     if (d < 1) {
       return false;
     }
+
     v = f / d;
+
   }
+
+  return v;
+}
+
+bool RegionRatioFilter::selected (const db::Polygon &poly) const
+{
+  double v = compute_ratio_parameter (poly, m_parameter);
+
+  bool ok = (v - (m_vmin_included ? -db::epsilon : db::epsilon) > m_vmin  && v - (m_vmax_included ? db::epsilon : -db::epsilon) < m_vmax);
+  return ok != m_inverse;
+}
+
+bool RegionRatioFilter::selected (const db::PolygonRef &poly) const
+{
+  double v = compute_ratio_parameter (poly, m_parameter);
 
   bool ok = (v - (m_vmin_included ? -db::epsilon : db::epsilon) > m_vmin  && v - (m_vmax_included ? db::epsilon : -db::epsilon) < m_vmax);
   return ok != m_inverse;

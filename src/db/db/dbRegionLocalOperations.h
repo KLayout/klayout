@@ -29,6 +29,9 @@
 #include "dbLocalOperation.h"
 #include "dbEdgeProcessor.h"
 
+#include <vector>
+#include <unordered_set>
+
 namespace db
 {
 

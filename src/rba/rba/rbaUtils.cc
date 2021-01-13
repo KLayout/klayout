@@ -150,14 +150,7 @@ rba_check_error ()
   rba_get_backtrace_from_array (rb_funcall (lasterr, rb_intern ("backtrace"), 0), bt, 0);
 
   const std::string &ds = RubyInterpreter::instance ()->debugger_scope ();
-  if (! ds.empty ()) {
-    for (size_t i = 0; i < bt.size (); ++i) {
-      if (bt [i].file == ds) {
-        bt.erase (bt.begin (), bt.begin () + i);
-        break;
-      }
-    }
-  }
+  bt.erase (bt.begin (), bt.begin () + RubyStackTraceProvider::scope_index (bt, ds));
 
   //  parse the backtrace to get the line number
   tl::BacktraceElement info;

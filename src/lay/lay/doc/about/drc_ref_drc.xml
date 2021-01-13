@@ -28,47 +28,51 @@ out = in.drc((width &lt; 2.0).polygons)
 The following global functions are relevant for the DRC expressions:
 </p><p>
 <ul>
+<li><a href="/about/drc_ref_global.xml#angle">global#angle</a> </li>
+<li><a href="/about/drc_ref_global.xml#area">global#area</a> </li>
+<li><a href="/about/drc_ref_global.xml#area_ratio">global#area_ratio</a> </li>
+<li><a href="/about/drc_ref_global.xml#bbox_area_ratio">global#bbox_area_ratio</a> </li>
+<li><a href="/about/drc_ref_global.xml#bbox_height">global#bbox_height</a> </li>
+<li><a href="/about/drc_ref_global.xml#bbox_max">global#bbox_max</a> </li>
+<li><a href="/about/drc_ref_global.xml#bbox_min">global#bbox_min</a> </li>
+<li><a href="/about/drc_ref_global.xml#bbox_width">global#bbox_width</a> </li>
 <li><a href="/about/drc_ref_global.xml#case">global#case</a> </li>
-<li><a href="/about/drc_ref_global.xml#secondary">global#secondary</a> </li>
-<li><a href="/about/drc_ref_global.xml#primary">global#primary</a> </li>
+<li><a href="/about/drc_ref_global.xml#corners">global#corners</a> </li>
+<li><a href="/about/drc_ref_global.xml#covering">global#covering</a> </li>
+<li><a href="/about/drc_ref_global.xml#enc">global#enc</a> </li>
+<li><a href="/about/drc_ref_global.xml#enclosing">global#enclosing</a> </li>
+<li><a href="/about/drc_ref_global.xml#extent_refs">global#extent_refs</a> </li>
+<li><a href="/about/drc_ref_global.xml#extents">global#extents</a> </li>
 <li><a href="/about/drc_ref_global.xml#foreign">global#foreign</a> </li>
+<li><a href="/about/drc_ref_global.xml#holes">global#holes</a> </li>
+<li><a href="/about/drc_ref_global.xml#hulls">global#hulls</a> </li>
 <li><a href="/about/drc_ref_global.xml#if_all">global#if_all</a> </li>
 <li><a href="/about/drc_ref_global.xml#if_any">global#if_any</a> </li>
 <li><a href="/about/drc_ref_global.xml#if_none">global#if_none</a> </li>
-<li><a href="/about/drc_ref_global.xml#bbox_height">global#bbox_height</a> </li>
-<li><a href="/about/drc_ref_global.xml#bbox_width">global#bbox_width</a> </li>
-<li><a href="/about/drc_ref_global.xml#bbox_max">global#bbox_max</a> </li>
-<li><a href="/about/drc_ref_global.xml#bbox_min">global#bbox_min</a> </li>
-<li><a href="/about/drc_ref_global.xml#area">global#area</a> </li>
-<li><a href="/about/drc_ref_global.xml#hulls">global#hulls</a> </li>
-<li><a href="/about/drc_ref_global.xml#holes">global#holes</a> </li>
+<li><a href="/about/drc_ref_global.xml#inside">global#inside</a> </li>
+<li><a href="/about/drc_ref_global.xml#interacting">global#interacting</a> </li>
+<li><a href="/about/drc_ref_global.xml#iso">global#iso</a> </li>
+<li><a href="/about/drc_ref_global.xml#length">global#length</a> </li>
+<li><a href="/about/drc_ref_global.xml#middle">global#middle</a> </li>
+<li><a href="/about/drc_ref_global.xml#notch">global#notch</a> </li>
 <li><a href="/about/drc_ref_global.xml#odd_polygons">global#odd_polygons</a> </li>
+<li><a href="/about/drc_ref_global.xml#outside">global#outside</a> </li>
+<li><a href="/about/drc_ref_global.xml#overlap">global#overlap</a> </li>
+<li><a href="/about/drc_ref_global.xml#overlapping">global#overlapping</a> </li>
 <li><a href="/about/drc_ref_global.xml#perimeter">global#perimeter</a> </li>
+<li><a href="/about/drc_ref_global.xml#primary">global#primary</a> </li>
 <li><a href="/about/drc_ref_global.xml#rectangles">global#rectangles</a> </li>
 <li><a href="/about/drc_ref_global.xml#rectilinear">global#rectilinear</a> </li>
-<li><a href="/about/drc_ref_global.xml#length">global#length</a> (in condition) </li>
-<li><a href="/about/drc_ref_global.xml#angle">global#angle</a> (in condition) </li>
-<li><a href="/about/drc_ref_global.xml#corners">global#corners</a> </li>
-<li><a href="/about/drc_ref_global.xml#extent_refs">global#extent_refs</a> </li>
-<li><a href="/about/drc_ref_global.xml#extents">global#extents</a> </li>
-<li><a href="/about/drc_ref_global.xml#middle">global#middle</a> </li>
+<li><a href="/about/drc_ref_global.xml#relative_height">global#relative_height</a> </li>
 <li><a href="/about/drc_ref_global.xml#rounded_corners">global#rounded_corners</a> </li>
+<li><a href="/about/drc_ref_global.xml#secondary">global#secondary</a> </li>
+<li><a href="/about/drc_ref_global.xml#separation">global#separation</a> </li>
+<li><a href="/about/drc_ref_global.xml#sep">global#sep</a> </li>
 <li><a href="/about/drc_ref_global.xml#sized">global#sized</a> </li>
 <li><a href="/about/drc_ref_global.xml#smoothed">global#smoothed</a> </li>
-<li><a href="/about/drc_ref_global.xml#covering">global#covering</a> </li>
-<li><a href="/about/drc_ref_global.xml#interacting">global#interacting</a> </li>
-<li><a href="/about/drc_ref_global.xml#overlapping">global#overlapping</a> </li>
-<li><a href="/about/drc_ref_global.xml#inside">global#inside</a> </li>
-<li><a href="/about/drc_ref_global.xml#outside">global#outside</a> </li>
-<li><a href="/about/drc_ref_global.xml#enclosing">global#enclosing</a> </li>
-<li><a href="/about/drc_ref_global.xml#separation">global#separation</a> </li>
-<li><a href="/about/drc_ref_global.xml#overlap">global#overlap</a> </li>
-<li><a href="/about/drc_ref_global.xml#width">global#width</a> </li>
 <li><a href="/about/drc_ref_global.xml#space">global#space</a> </li>
-<li><a href="/about/drc_ref_global.xml#notch">global#notch</a> </li>
-<li><a href="/about/drc_ref_global.xml#iso">global#iso</a> </li>
-<li><a href="/about/drc_ref_global.xml#sep">global#sep</a> </li>
-<li><a href="/about/drc_ref_global.xml#enc">global#enc</a> </li>
+<li><a href="/about/drc_ref_global.xml#squares">global#squares</a> </li>
+<li><a href="/about/drc_ref_global.xml#width">global#width</a> </li>
 </ul>
 </p><p>
 The following documentation will list the methods available for DRC expression objects.
@@ -206,7 +210,61 @@ out = in.drc(primary.area &lt; 2.0)   # equivalent
 The area method is available as a plain function or as a method on <a href="/about/drc_ref_drc.xml">DRC</a> expressions.
 The plain function is equivalent to "primary.area".
 </p>
-<a name="bbox_height"/><h2>"bbox_height" - Selects the primary shape if its bounding box height is meeting the condition</h2>
+<a name="area_ratio"/><h2>"area_ratio" - Selects the input polygon according to its area ratio (bounding box area by polygon area)</h2>
+<keyword name="area_ratio"/>
+<p>Usage:</p>
+<ul>
+<li><tt>expression.area_ratio (in condition)</tt></li>
+</ul>
+<p>
+This operation is used in conditions to select shapes based on their area ratio.
+The area ratio is the ratio of bounding box vs. polygon area. It's a measure how
+"sparse" the polygons are and how good an approximation the bounding box is. 
+The value is always larger or equal than 1. Boxes have a value of 1.
+</p><p>
+This filter is applicable on polygon expressions. The result will be the input 
+polygon if the condition is met.
+</p><p>
+See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> for more details about comparison specs.
+</p><p>
+The following example will select all polygons whose area ratio is larger than 3:
+</p><p>
+<pre>
+out = in.drc(area_ratio &gt; 3)
+out = in.drc(primary.area_ratio &gt; 3)   # equivalent
+</pre>
+</p><p>
+The "area_ratio" method is available as a plain function or as a method on <a href="/about/drc_ref_drc#.xml">DRC#</a> expressions.
+The plain function is equivalent to "primary.area_ratio".
+</p>
+<a name="bbox_aspect_ratio"/><h2>"bbox_aspect_ratio" - Selects the input polygon according to the aspect ratio of the bounding box</h2>
+<keyword name="bbox_aspect_ratio"/>
+<p>Usage:</p>
+<ul>
+<li><tt>expression.bbox_aspect_ratio (in condition)</tt></li>
+</ul>
+<p>
+This operation is used in conditions to select shapes based on aspect ratios of their bounding boxes.
+The aspect ratio is computed by dividing the larger of width and height by the smaller of both.
+The aspect ratio is always larger or equal to 1. Square or square-boxed shapes have a
+bounding box aspect ratio of 1.
+</p><p>
+This filter is applicable on polygon expressions. The result will be the input 
+polygon if the bounding box condition is met. 
+</p><p>
+See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> for more details about comparison specs.
+</p><p>
+The following example will select all polygons whose bounding box aspect ratio is larger than 3:
+</p><p>
+<pre>
+out = in.drc(bbox_aspect_ratio &gt; 3)
+out = in.drc(primary.bbox_aspect_ratio &gt; 3)   # equivalent
+</pre>
+</p><p>
+The "bbox_aspect_ratio" method is available as a plain function or as a method on <a href="/about/drc_ref_drc#.xml">DRC#</a> expressions.
+The plain function is equivalent to "primary.bbox_aspect_ratio".
+</p>
+<a name="bbox_height"/><h2>"bbox_height" - Selects the input polygon if its bounding box height is meeting the condition</h2>
 <keyword name="bbox_height"/>
 <p>Usage:</p>
 <ul>
@@ -222,7 +280,7 @@ ones not rotated. This usually results in a larger computation effort and larger
 The "bbox_height" method is available as a plain function or as a method on <a href="/about/drc_ref_drc.xml">DRC</a> expressions.
 The plain function is equivalent to "primary.bbox_height".
 </p>
-<a name="bbox_max"/><h2>"bbox_max" - Selects the primary shape if its bounding box larger dimension is meeting the condition</h2>
+<a name="bbox_max"/><h2>"bbox_max" - Selects the input polygon if its bounding box larger dimension is meeting the condition</h2>
 <keyword name="bbox_max"/>
 <p>Usage:</p>
 <ul>
@@ -235,7 +293,7 @@ bounding box.
 The "bbox_max" method is available as a plain function or as a method on <a href="/about/drc_ref_drc.xml">DRC</a> expressions.
 The plain function is equivalent to "primary.bbox_max".
 </p>
-<a name="bbox_min"/><h2>"bbox_min" - Selects the primary shape if its bounding box smaller dimension is meeting the condition</h2>
+<a name="bbox_min"/><h2>"bbox_min" - Selects the input polygon if its bounding box smaller dimension is meeting the condition</h2>
 <keyword name="bbox_min"/>
 <p>Usage:</p>
 <ul>
@@ -259,7 +317,7 @@ out = in.drc(primary.bbox_min &gt; 200.nm)   # equivalent
 The "bbox_min" method is available as a plain function or as a method on <a href="/about/drc_ref_drc#.xml">DRC#</a> expressions.
 The plain function is equivalent to "primary.bbox_min".
 </p>
-<a name="bbox_width"/><h2>"bbox_width" - Selects the primary shape if its bounding box width is meeting the condition</h2>
+<a name="bbox_width"/><h2>"bbox_width" - Selects the input polygon if its bounding box width is meeting the condition</h2>
 <keyword name="bbox_width"/>
 <p>Usage:</p>
 <ul>
@@ -554,7 +612,7 @@ wrap count rule in place.
 This operation can be used as a plain function in which case it acts on primary
 shapes or can be used as method on another DRC expression.
 </p>
-<a name="perimeter"/><h2>"perimeter" - Selects the primary shape if the perimeter is meeting the condition</h2>
+<a name="perimeter"/><h2>"perimeter" - Selects the input polygon if the perimeter is meeting the condition</h2>
 <keyword name="perimeter"/>
 <p>Usage:</p>
 <ul>
@@ -635,6 +693,35 @@ out = in.drc(rectilinear)
 out = in.drc(primary.rectilinear)    # equivalent
 </pre>
 </p>
+<a name="relative_height"/><h2>"relative_height" - Selects the input polygon according to the height vs. width of the bounding box</h2>
+<keyword name="relative_height"/>
+<p>Usage:</p>
+<ul>
+<li><tt>expression.relative_height (in condition)</tt></li>
+</ul>
+<p>
+This operation is used in conditions to select shapes based on the ratio of bounding box
+height vs. width. The taller the shape, the larger the value. Wide polygons have a value
+below 1. A square has a relative height of 1.
+</p><p>
+This filter is applicable on polygon expressions. The result will be the input 
+polygon if the condition is met.
+</p><p>
+Don't use this method if you can use <a href="#bbox_aspect_ratio">bbox_aspect_ratio</a>, because the latter is
+isotropic and can be used hierarchically without generating rotation variants.
+</p><p>
+See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> for more details about comparison specs.
+</p><p>
+The following example will select all polygons whose relative height is larger than 3:
+</p><p>
+<pre>
+out = in.drc(relative_height &gt; 3)
+out = in.drc(primary.relative_height &gt; 3)   # equivalent
+</pre>
+</p><p>
+The "relative_height" method is available as a plain function or as a method on <a href="/about/drc_ref_drc#.xml">DRC#</a> expressions.
+The plain function is equivalent to "primary.bbox_aspect_ratio".
+</p>
 <a name="rounded_corners"/><h2>"rounded_corners" - Applies corner rounding</h2>
 <keyword name="rounded_corners"/>
 <p>Usage:</p>
@@ -683,6 +770,22 @@ This operation acts on polygons and applies polygon smoothing with the tolerance
 </p><p>
 The "smoothed" method is available as a plain function or as a method on <a href="/about/drc_ref_drc.xml">DRC</a> expressions.
 The plain function is equivalent to "primary.smoothed".
+</p>
+<a name="squares"/><h2>"squares" - Selects all polygons which are squares</h2>
+<keyword name="squares"/>
+<p>Usage:</p>
+<ul>
+<li><tt>expression.squares</tt></li>
+</ul>
+<p>
+This operation can be used as a plain function in which case it acts on primary
+shapes or can be used as method on another DRC expression.
+The following example selects all squares:
+</p><p>
+<pre>
+out = in.drc(squares)
+out = in.drc(primary.squares)    # equivalent
+</pre>
 </p>
 <a name="start_segments"/><h2>"start_segments" - Returns the part at the beginning of each edge of the input</h2>
 <keyword name="start_segments"/>

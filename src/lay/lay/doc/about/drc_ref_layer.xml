@@ -366,18 +366,142 @@ merged, so the secondary polygons may be partial. This is important when
 using measurement operations like "area" on secondary polygons.
 </p><p>
 Here is an example for a generic DRC operation which performs a width
-check for less than 0.5.um on the primary shapes.
+check for less than 0.5.um on the primary shapes. It uses the <a href="/about/drc_ref_global.xml#width">global#width</a> operator:
 </p><p>
 <pre>
 out = in.drc(width &lt; 0.5.um)
 </pre>
 </p><p>
-Another example computes a boolean AND between two layers before selecting
-the result polygons with an area larger than 1 square micrometer:
+Other single or double-bounded conditions are available too, for example:
 </p><p>
 <pre>
-other = ... another layer ..
-out = in.drc((primary &amp; other).area &gt; 1.0)
+out = in.drc(width &lt;= 0.5.um)
+out = in.drc(width &gt; 0.5.um)
+out = in.drc(width == 0.5.um)
+out = in.drc(width != 0.5.um)
+out = in.drc(0.2.um &lt; width &lt; 0.5.um)
+</pre>
+</p><p>
+To specify the second input for a two-layer check, specify the second input
+with the check function. Here a two-layer separation check is used (<a href="/about/drc_ref_global.xml#separation">global#separation</a>):
+</p><p>
+<pre>
+l1 = input(1, 0)
+l2 = input(2, 0)
+out = l1.drc(separation(l2) &lt; 0.5.um)
+</pre>
+</p><p>
+The second input of this check function can be a computed expression. In this
+case the local loop will first evaluate the expression for the second input and
+then use it inside the check.  
+</p><p>
+Options for the checks are also specified inside the brackets. For example,
+to specify a projection metrics for width use:
+</p><p>
+<pre>
+out = in.drc(width(projection) &lt; 0.5.um)
+</pre>
+</p><p>
+The "drc" function supports filter operators. These select input or derived polygons 
+based on their properties. These filters are:
+</p><p>
+<ul>
+<li>"<a href="/about/drc_ref_global.xml#area">global#area</a>": select polygons based on their area </li>
+<li>"<a href="/about/drc_ref_global.xml#perimeter">global#perimeter</a>": select polygons based on their perimeter </li>
+<li>"<a href="/about/drc_ref_global.xml#bbox_min">global#bbox_min</a>", "<a href="/about/drc_ref_global.xml#bbox_max">global#bbox_max</a>", "<a href="/about/drc_ref_global.xml#bbox_width">global#bbox_width</a>", "<a href="/about/drc_ref_global.xml#bbox_height">global#bbox_height</a>": select polygons based on their bounding box properties </li>
+</ul>
+</p><p>
+For example, to select polygons with an area larger than one square micrometer, use:
+</p><p>
+<pre>
+out = in.drc(area &gt; 1.0)
+</pre>
+</p><p>
+For the condition, use the usual numerical bounds like:
+</p><p>
+<pre>
+out = in.drc(area == 1.0)
+out = in.drc(area &lt;= 1.0)
+out = in.drc(0.2 &lt; area &lt; 1.0)
+</pre>
+</p><p>
+The result of the area operation is the input polygon if the area condition is met.
+</p><p>
+In the same fashion, "perimeter" applies to the perimeter of the polygon.
+"bbox_min" etc. will evaluate a particular dimensions of the polygon's bounding box and
+use the respective dimension for filtering the polygon.
+</p><p>
+Note that it's basically possible to use the polygon filters on any kind of input.
+In fact, plain "area" for example is a shortcut for "<a href="/about/drc_ref_global.xml#primary">global#primary</a>.area" indicating that
+the area of primary shapes are supposed to be computed.
+However, any input other than the primary is not necessarily complete or it may 
+consist of multiple polygons. Hence the computed values may be too big or too small.
+It's recommended therefore to use the measurement functions on primary polygons
+only.
+</p><p>
+The "drc" feature also supports some predicates. "predicates" are boolean values
+indicating a certain condition. A predicate filter works in a way that it only
+passes the polygons 
+The predicates available currently are:
+</p><p>
+<ul>
+<li>"<a href="/about/drc_ref_global.xml#rectangles">global#rectangles</a>": Filters rectangles </li>
+<li>"<a href="/about/drc_ref_global.xml#rectilinear">global#rectilinear</a>": Filters rectilinear ("Manhattan") polygons </li>
+</ul>
+</p><p>
+For the same reason as explained above, it's recommended to use these predicates
+standalone, so they act on primary shapes. It's possible to use the predicates
+on computed shapes or secondary input, but that may not render the desired results.
+</p><p>
+The "!" operator will evaluate the expression behind it and return the 
+current primary shape if the input is empty and return an empty polygon set 
+if not. Hence the following filter will deliver all polygons which are 
+not rectangles:
+</p><p>
+<pre>
+out = in.drc(! rectangles)
+</pre>
+</p><p>
+The logical "if_any" or "if_all" statements allow connecting multiple
+conditions and evaluate to "true" (means: a non-empty shape set) if either
+on input is a non-empty shape set ("if_any") or if all inputs are non-empty
+("if_all"). For example, this will select all polygons which are rectangles
+and whose area is larger than 20 quare micrometers:
+</p><p>
+<pre>
+out = in.drc(if_all(rectangles, area &gt; 20.0))
+</pre>
+</p><p>
+In fact, "if_all" renders the result of the last expression, provided all
+previous ones are non-empty. So this operation will render rectangles
+sized by 100 nm and skip all other types of polygons:
+</p><p>
+<pre>
+out = in.drc(if_all(rectangles, sized(100.nm)))
+</pre>
+</p><p>
+Contrary to this, the "if_any" operation will render the first non-empty
+expression result and skip the following ones. So this example will
+size all rectangles by 100 nm and leave all other types of polygons
+untouched:
+</p><p>
+<pre>
+out = in.drc(if_any(rectangles.sized(100.nm), primary))
+</pre>
+</p><p>
+The "drc" operations feature polygon manipulations where the input is
+either the primary polygon or derived shapes.
+Manipulations include sizing ("<a href="/about/drc_ref_global.xml#sized">global#sized</a>"), corner rounding ("<a href="/about/drc_ref_global.xml#rounded_corners">global#rounded_corners</a>"), smoothing ("<a href="/about/drc_ref_global.xml#smoothed">global#smoothed</a>")
+and boolean operations.
+</p><p>
+This example computes a boolean AND between two layers before selecting
+the result polygons with an area larger than 1 square micrometer. Note that
+"primary" is a placeholder for the primary shape:
+</p><p>
+<pre>
+l1 = input(1, 0)
+l2 = input(2, 0)
+out = l1.drc((primary &amp; l2).area &gt; 1.0)
 </pre>
 </p><p>
 This example demonstrates how the "drc" operation can improve performance: as the
@@ -385,7 +509,62 @@ boolean operation is computed locally and the result is discarded when no longer
 less shapes need to be stored hence reducing the memory overhead and CPU time required
 to manage these shapes.
 </p><p>
-For more details about the expression see the <a href="/about/drc_ref_drc.xml">DRC</a> class documentation. 
+Note that the precise form of the example above is
+</p><p>
+<pre>
+out = l1.drc((primary &amp; secondary(l2)).area &gt; 1.0)
+</pre>
+</p><p>
+The "<a href="/about/drc_ref_global.xml#secondar">global#secondar</a>" operator indicates that "l2" is to be used as secondary input to the "drc" function. Only
+in this form, the operators of the boolean AND can be reversed:
+</p><p>
+<pre>
+out = l1.drc((secondary(l2) &amp; primary).area &gt; 1.0)
+</pre>
+</p><p>
+The expression inside the "drc" function is a Ruby object and can be 
+stored in variables. If you need the same expression multiple times, it can be 
+more efficient to use the same Ruby object. In this example, the same expression
+is used two times. Hence it's computed two times:
+</p><p>
+<pre>
+out = l1.drc(((primary &amp; l2).area == 1.0) + ((primary &amp; l2).area == 2.0))
+</pre>
+</p><p>
+A more efficient version is:
+</p><p>
+<pre>
+overlap_area = (primary &amp; l2).area
+out = l1.drc((overlap_area == 1.0) + (overlap_area == 2.0))
+</pre>
+</p><p>
+Note that the first line prepares the operation, but does not execute the area computation
+or the boolean operation. But when the "drc" function executes the operation it will 
+only compute the area once as it is represented by the same Ruby object.
+</p><p>
+The "drc" functionality also offers support for edge pairs and edges. Edge pairs
+are the results of check operations and can be turned into polygons using the 
+"polygons" method:
+</p><p>
+<pre>
+drc = in.drc((width &lt; 0.5.um).polygons)
+</pre>
+</p><p>
+Similarly, polygons can be converted into edges:
+</p><p>
+<pre>
+drc = in.drc(primary.edges)
+</pre>
+</p><p>
+The "drc" framework supports edge vs. edge and edge vs. polygon booleans, edge
+filters (<a href="/about/drc_ref_global.xml#length">global#length</a>, <a href="/about/drc_ref_global.xml#angle">global#angle</a>), edge vs. polygon interactions (<a href="/about/drc_ref_global.xml#interacting">global#interacting</a>, <a href="/about/drc_ref_global.xml#overlapping">global#overlapping</a>),
+edge sampling (<a href="/about/drc_ref_global.xml#start_segments">global#start_segments</a>, <a href="/about/drc_ref_global.xml#centers">global#centers</a>, <a href="/about/drc_ref_global.xml#end_segments">global#end_segments</a>) and edge to polygon
+conversions (<a href="/about/drc_ref_global.xml#extended">global#extended</a>, <a href="/about/drc_ref_global.xml#extended_in">global#extended_in</a>, <a href="/about/drc_ref_global.xml#extended_out">global#extended_out</a>). Edge pairs 
+can be converted into polygons and edges and separated into first and second edges (<a href="/about/drc_ref_global.xml#first_edges">global#first_edges</a>,
+<a href="/about/drc_ref_global.xml#second_edges">global#second_edges</a>).
+</p><p>
+The bottom line is: DRC expressions are quite rich and there is a lot more to be said and written.
+More formal details about the bits and pieces can be found in the <a href="/about/drc_ref_drc.xml">DRC</a> class documentation.
 </p>
 <a name="dup"/><h2>"dup" - Duplicates a layer</h2>
 <keyword name="dup"/>
@@ -1191,6 +1370,16 @@ i.e. all polygons are merged before non-rectangles are selected (see <a href="#c
 This method is available for polygon layers. By default "merged" semantics applies, 
 i.e. all polygons are merged before non-rectilinear polygons are selected (see <a href="#clean">clean</a> and <a href="#raw">raw</a>).
 </p>
+<a name="non_squares"/><h2>"non_squares" - Selects all polygons from the input which are not squares</h2>
+<keyword name="non_squares"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.non_rectangles</tt></li>
+</ul>
+<p>
+This method is available for polygon layers. By default "merged" semantics applies, 
+i.e. all polygons are merged before non-squares are selected (see <a href="#clean">clean</a> and <a href="#raw">raw</a>).
+</p>
 <a name="non_strict"/><h2>"non_strict" - Marks a layer for non-strict handling</h2>
 <keyword name="non_strict"/>
 <p>Usage:</p>
@@ -1725,7 +1914,7 @@ l.raw
 </p><p>
 To avoid that, use the <a href="#dup">dup</a> method to create a real (deep) copy.
 </p>
-<a name="rectangles"/><h2>"rectangles" - Selects all rectangle polygons from the input</h2>
+<a name="rectangles"/><h2>"rectangles" - Selects all rectangles from the input</h2>
 <keyword name="rectangles"/>
 <p>Usage:</p>
 <ul>
@@ -2306,6 +2495,17 @@ The following image shows the effect of the space check:
 </tr>
 </table>
 </p>
+<a name="squares"/><h2>"squares" - Selects all squares from the input</h2>
+<keyword name="squares"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.squares</tt></li>
+</ul>
+<p>
+This method is available for polygon layers. By default "merged" semantics applies, 
+i.e. all polygons are merged before squares are selected (see <a href="#clean">clean</a> and <a href="#raw">raw</a>).
+<a href="#non_squares">non_squares</a> will select all non-rectangles.
+</p>
 <a name="start_segments"/><h2>"start_segments" - Returns the part at the beginning of each edge</h2>
 <keyword name="start_segments"/>
 <p>Usage:</p>
@@ -2486,6 +2686,10 @@ make the check only consider edges enclosing angles of less than 45 degree. </li
 <li><b>projection_limits(min, max) or projection_limits(min .. max) </b>:
 this option makes the check only consider edge pairs whose projected length on
 each other is more or equal than min and less than max </li>
+<li><b>projecting (in condition) </b>: This specification is equivalent to "projection_limits"
+but is more intuitive, as "projecting" is written with a condition, like
+"projecting &lt; 2.um". Available operators are: "==", "&lt;", "&lt;=", "&gt;" and "&gt;=". 
+Double-bounded ranges are also available, like: "0.5 &lt;= projecting &lt; 2.0".
 <li><b>transparent </b>: performs the check without shielding (polygon layers only) </li>
 <li><b>shielded </b>: performs the check with shielding (polygon layers only) </li>
 </ul>
@@ -2594,6 +2798,38 @@ The third form basically is equivalent to the first form, but
 allows specification of nil for min or max indicating no lower or 
 upper limit.
 </p>
+<a name="with_area_ratio"/><h2>"with_area_ratio" - Selects polygons by the ratio of the bounding box area vs. polygon area</h2>
+<keyword name="with_area_ratio"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.with_area_ratio(min .. max)</tt></li>
+<li><tt>layer.with_area_ratio(value)</tt></li>
+<li><tt>layer.with_area_ratio(min, max)</tt></li>
+</ul>
+<p>
+The area ratio is a measure how far a polygon is approximated by it's
+bounding box. The value is always larger or equal to 1. Boxes have a 
+area ratio of 1. Larger values mean more empty area inside the bounding box.
+</p><p>
+This method is available for polygon layers only.
+</p>
+<a name="with_bbox_aspect_ratio"/><h2>"with_bbox_aspect_ratio" - Selects polygons by the aspect ratio of their bounding box</h2>
+<keyword name="with_bbox_aspect_ratio"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.with_bbox_aspect_ratio(min .. max)</tt></li>
+<li><tt>layer.with_bbox_aspect_ratio(value)</tt></li>
+<li><tt>layer.with_bbox_aspect_ratio(min, max)</tt></li>
+</ul>
+<p>
+The method selects polygons similar to <a href="#with_area">with_area</a> or <a href="#with_perimeter">with_perimeter</a>.
+However, the measured value is the aspect ratio of the bounding 
+box. It is the larger dimensions divided by the smaller one.
+The "thinner" the polygon, the larger the aspect ratio. A square
+bounding box gives an aspect ratio of 1. 
+</p><p>
+This method is available for polygon layers only.
+</p>
 <a name="with_bbox_height"/><h2>"with_bbox_height" - Selects polygons by the height of the bounding box</h2>
 <keyword name="with_bbox_height"/>
 <p>Usage:</p>
@@ -2691,6 +2927,24 @@ upper limit.
 </p><p>
 This method is available for polygon layers only.
 </p>
+<a name="with_relative_height"/><h2>"with_relative_height" - Selects polygons by the ratio of the height vs. width of it's bounding box</h2>
+<keyword name="with_relative_height"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.with_relative_height(min .. max)</tt></li>
+<li><tt>layer.with_relative_height(value)</tt></li>
+<li><tt>layer.with_relative_height(min, max)</tt></li>
+</ul>
+<p>
+The relative height is a measure how tall a polygon is. Tall polygons
+have values larger than 1, wide polygons have a value smaller than 1.
+Squares have a value of 1.
+</p><p>
+Don't use this method when you can use <a href="#with_area_ratio">with_area_ratio</a>, which provides a 
+similar measure but is isotropic. 
+</p><p>
+This method is available for polygon layers only.
+</p>
 <a name="without_angle"/><h2>"without_angle" - Selects edges by the their angle</h2>
 <keyword name="without_angle"/>
 <p>Usage:</p>
@@ -2719,18 +2973,29 @@ the given interval.
 </p><p>
 This method is available for polygon layers only.
 </p>
-<a name="without_bbox_height"/><h2>"without_bbox_height" - Selects polygons by the height of the bounding box</h2>
+<a name="without_area_ratio"/><h2>"without_area_ratio" - Selects polygons by the aspect ratio of their bounding box</h2>
+<keyword name="without_area_ratio"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.without_area_ratio(min .. max)</tt></li>
+<li><tt>layer.without_area_ratio(value)</tt></li>
+<li><tt>layer.without_area_ratio(min, max)</tt></li>
+</ul>
+<p>
+The method provides the opposite filter for <a href="#with_area_ratio">with_area_ratio</a>.
+</p><p>
+This method is available for polygon layers only.
+</p>
+<a name="without_bbox_height"/><h2>"without_bbox_height" - Selects polygons by the aspect ratio of their bounding box</h2>
 <keyword name="without_bbox_height"/>
 <p>Usage:</p>
 <ul>
-<li><tt>layer.without_bbox_height(min .. max)</tt></li>
-<li><tt>layer.without_bbox_height(value)</tt></li>
-<li><tt>layer.without_bbox_height(min, max)</tt></li>
+<li><tt>layer.without_bbox_aspect_ratio(min .. max)</tt></li>
+<li><tt>layer.without_bbox_aspect_ratio(value)</tt></li>
+<li><tt>layer.without_bbox_aspect_ratio(min, max)</tt></li>
 </ul>
 <p>
-The method selects polygons similar to <a href="#without_area">without_area</a> or <a href="#without_perimeter">without_perimeter</a>.
-However, the measured dimension is the width of the
-bounding box.
+The method provides the opposite filter for <a href="#with_bbox_aspect_ratio">with_bbox_aspect_ratio</a>.
 </p><p>
 This method is available for polygon layers only.
 </p>
@@ -2808,6 +3073,19 @@ This method is available for edge layers only.
 This method is the inverse of "with_perimeter". It will select 
 polygons without a perimeter equal to the given one or outside
 the given interval.
+</p><p>
+This method is available for polygon layers only.
+</p>
+<a name="without_relative_height"/><h2>"without_relative_height" - Selects polygons by the ratio of the height vs. width</h2>
+<keyword name="without_relative_height"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.without_relative_height(min .. max)</tt></li>
+<li><tt>layer.without_relative_height(value)</tt></li>
+<li><tt>layer.without_relative_height(min, max)</tt></li>
+</ul>
+<p>
+The method provides the opposite filter for <a href="#with_relative_height">with_relative_height</a>.
 </p><p>
 This method is available for polygon layers only.
 </p>

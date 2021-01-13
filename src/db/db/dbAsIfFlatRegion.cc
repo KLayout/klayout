@@ -1046,15 +1046,14 @@ void region_cop_impl (AsIfFlatRegion *region, db::Shapes *output_to, db::Compoun
   db::local_processor<db::Polygon, db::Polygon, TR> proc;
   proc.set_base_verbosity (region->base_verbosity ());
 
-  bool needs_merged = node.wants_merged ();
-  db::RegionIterator polygons (needs_merged ? region->begin_merged () : region->begin ());
+  db::RegionIterator polygons (region->begin_merged ());
 
   std::vector<generic_shape_iterator<db::Polygon> > others;
   std::vector<bool> foreign;
   std::vector<db::Region *> inputs = node.inputs ();
   for (std::vector<db::Region *>::const_iterator i = inputs.begin (); i != inputs.end (); ++i) {
     if (*i == subject_regionptr () || *i == foreign_regionptr ()) {
-      others.push_back (needs_merged ? region->begin_merged () : region->begin ());
+      others.push_back (region->begin_merged ());
       foreign.push_back (*i == foreign_regionptr ());
     } else {
       others.push_back ((*i)->begin ());

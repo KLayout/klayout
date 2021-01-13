@@ -326,6 +326,12 @@ static db::CompoundRegionOperationNode *new_edge_length_filter (db::CompoundRegi
   return new db::CompoundRegionEdgeFilterOperationNode (new db::EdgeLengthFilter (lmin, lmax, inverse), input, true /*processor is owned*/);
 }
 
+static db::CompoundRegionOperationNode *new_edge_length_sum_filter (db::CompoundRegionOperationNode *input, bool inverse, db::Edge::distance_type lmin, db::Edge::distance_type lmax)
+{
+  check_non_null (input, "input");
+  return new db::CompoundRegionEdgeFilterOperationNode (new db::EdgeLengthFilter (lmin, lmax, inverse), input, true /*processor is owned*/, true /*sum*/);
+}
+
 static db::CompoundRegionOperationNode *new_edge_orientation_filter (db::CompoundRegionOperationNode *input, bool inverse, double amin, bool include_amin, double amax, bool include_amax)
 {
   check_non_null (input, "input");
@@ -472,10 +478,22 @@ static db::CompoundRegionOperationNode *new_perimeter_filter (db::CompoundRegion
   return new db::CompoundRegionFilterOperationNode (new db::RegionPerimeterFilter (pmin, pmax, inverse), input, true);
 }
 
+static db::CompoundRegionOperationNode *new_perimeter_sum_filter (db::CompoundRegionOperationNode *input, bool inverse, db::coord_traits<db::Coord>::perimeter_type pmin, db::coord_traits<db::Coord>::perimeter_type pmax)
+{
+  check_non_null (input, "input");
+  return new db::CompoundRegionFilterOperationNode (new db::RegionPerimeterFilter (pmin, pmax, inverse), input, true, true /*sum of set*/);
+}
+
 static db::CompoundRegionOperationNode *new_area_filter (db::CompoundRegionOperationNode *input, bool inverse, db::coord_traits<db::Coord>::area_type amin, db::coord_traits<db::Coord>::area_type amax)
 {
   check_non_null (input, "input");
   return new db::CompoundRegionFilterOperationNode (new db::RegionAreaFilter (amin, amax, inverse), input, true);
+}
+
+static db::CompoundRegionOperationNode *new_area_sum_filter (db::CompoundRegionOperationNode *input, bool inverse, db::coord_traits<db::Coord>::area_type amin, db::coord_traits<db::Coord>::area_type amax)
+{
+  check_non_null (input, "input");
+  return new db::CompoundRegionFilterOperationNode (new db::RegionAreaFilter (amin, amax, inverse), input, true, true /*sum of set*/);
 }
 
 static db::CompoundRegionOperationNode *new_rectilinear_filter (db::CompoundRegionOperationNode *input, bool inverse)
@@ -659,10 +677,18 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
     "This node renders the input if the perimeter is between pmin and pmax (exclusively). If 'inverse' is set to true, the "
     "input shape is returned if the perimeter is less than pmin (exclusively) or larger than pmax (inclusively)."
   ) +
+  gsi::constructor ("new_perimeter_sum_filter", &new_perimeter_sum_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("amin", 0), gsi::arg ("amax", std::numeric_limits<db::coord_traits<db::Coord>::area_type>::max (), "max"),
+    "@brief Creates a node filtering the input by area sum.\n"
+    "Like \\new_perimeter_filter, but applies to the sum of all shapes in the current set.\n"
+  ) +
   gsi::constructor ("new_area_filter", &new_area_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("amin", 0), gsi::arg ("amax", std::numeric_limits<db::coord_traits<db::Coord>::area_type>::max (), "max"),
     "@brief Creates a node filtering the input by area.\n"
     "This node renders the input if the area is between amin and amax (exclusively). If 'inverse' is set to true, the "
     "input shape is returned if the area is less than amin (exclusively) or larger than amax (inclusively)."
+  ) +
+  gsi::constructor ("new_area_sum_filter", &new_area_sum_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("amin", 0), gsi::arg ("amax", std::numeric_limits<db::coord_traits<db::Coord>::area_type>::max (), "max"),
+    "@brief Creates a node filtering the input by area sum.\n"
+    "Like \\new_area_filter, but applies to the sum of all shapes in the current set.\n"
   ) +
   gsi::constructor ("new_bbox_filter", &new_bbox_filter, gsi::arg ("input"), gsi::arg ("parameter"), gsi::arg ("inverse", false), gsi::arg ("pmin", 0), gsi::arg ("pmax", std::numeric_limits<db::coord_traits<db::Coord>::area_type>::max (), "max"),
     "@brief Creates a node filtering the input by bounding box parameters.\n"
@@ -686,6 +712,9 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   ) +
   gsi::constructor ("new_edge_length_filter", &new_edge_length_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("lmin", 0), gsi::arg ("lmax", std::numeric_limits<db::Edge::distance_type>::max (), "max"),
     "@brief Creates a node filtering edges by their length.\n"
+  ) +
+  gsi::constructor ("new_edge_length_sum_filter", &new_edge_length_sum_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("lmin", 0), gsi::arg ("lmax", std::numeric_limits<db::Edge::distance_type>::max (), "max"),
+    "@brief Creates a node filtering edges by their length sum (over the local set).\n"
   ) +
   gsi::constructor ("new_edge_orientation_filter", &new_edge_orientation_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("amin"), gsi::arg ("include_amin"), gsi::arg ("amax"), gsi::arg ("include_amax"),
     "@brief Creates a node filtering edges by their orientation.\n"

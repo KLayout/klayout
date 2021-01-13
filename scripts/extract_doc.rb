@@ -14,12 +14,28 @@ def create_ref(mod, s)
     "<a href=\"/" + $loc + "/" + $1.downcase + "_ref_" + $2.downcase + ".xml\">#{s}</a>"
   elsif s =~ /(.*)#(.*)/
     if $2 != ""
-      "<a href=\"/" + $loc + "/" + mod.downcase + "_ref_" + $1.downcase + ".xml#" + $2 + "\">#{s}</a>"
+      "<a href=\"/" + $loc + "/" + mod.downcase + "_ref_" + $1.downcase + ".xml#" + $2 + "\">" + ($1 == "global" ? $2 : s) + "</a>"
     else
       "<a href=\"/" + $loc + "/" + mod.downcase + "_ref_" + $1.downcase + ".xml\">#{$1}</a>"
     end
   else
     "<a href=\"#" + s + "\">#{s}</a>"
+  end
+end
+
+def create_link(mod, s)
+  if s =~ /(.*)::(.*)#(.*)/
+    "<link href=\"/" + $loc + "/" + $1.downcase + "_ref_" + $2.downcase + ".xml#" + $3 + "\"/>"
+  elsif s =~ /(.*)::(.*)/
+    "<link href=\"/" + $loc + "/" + $1.downcase + "_ref_" + $2.downcase + ".xml\"/>"
+  elsif s =~ /(.*)#(.*)/
+    if $2 != ""
+      "<link href=\"/" + $loc + "/" + mod.downcase + "_ref_" + $1.downcase + ".xml#" + $2 + "\"/>"
+    else
+      "<link href=\"/" + $loc + "/" + mod.downcase + "_ref_" + $1.downcase + ".xml\"/>"
+    end
+  else
+    "<link href=\"#" + s + "\"/>"
   end
 end
 
@@ -32,6 +48,7 @@ def escape(mod, s)
     gsub("<", "&lt;").
     gsub(">", "&gt;").
     gsub(/\\([\w:#]+)/) { create_ref(mod, $1) }.
+    gsub(/\\\\([\w:#]+)/) { create_link(mod, $1) }.
     gsub(/RBA::([\w#]+)/) { create_class_doc_ref($1) }
 end
 

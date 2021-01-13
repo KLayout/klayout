@@ -428,17 +428,6 @@ CompoundRegionMultiInputOperationNode::wants_variants () const
   return false;
 }
 
-bool
-CompoundRegionMultiInputOperationNode::wants_merged () const
-{
-  for (tl::shared_collection<CompoundRegionOperationNode>::const_iterator i = m_children.begin (); i != m_children.end (); ++i) {
-    if (i->wants_merged ()) {
-      return true;
-    }
-  }
-  return false;
-}
-
 // ---------------------------------------------------------------------------------------------
 
 CompoundRegionLogicalBoolOperationNode::CompoundRegionLogicalBoolOperationNode (LogicalOp op, bool invert, const std::vector<CompoundRegionOperationNode *> &inputs)
@@ -1188,8 +1177,8 @@ template void CompoundRegionJoinOperationNode::implement_compute_local<db::Polyg
 
 // ---------------------------------------------------------------------------------------------
 
-CompoundRegionFilterOperationNode::CompoundRegionFilterOperationNode (PolygonFilterBase *filter, CompoundRegionOperationNode *input, bool owns_filter)
-  : CompoundRegionMultiInputOperationNode (input), mp_filter (filter), m_owns_filter (owns_filter)
+CompoundRegionFilterOperationNode::CompoundRegionFilterOperationNode (PolygonFilterBase *filter, CompoundRegionOperationNode *input, bool owns_filter, bool sum_of_set)
+  : CompoundRegionMultiInputOperationNode (input), mp_filter (filter), m_owns_filter (owns_filter), m_sum_of_set (sum_of_set)
 {
   set_description ("filter");
 }
@@ -1214,22 +1203,10 @@ CompoundRegionFilterOperationNode::do_compute_local (db::Layout *layout, const s
   implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
 }
 
-bool
-CompoundRegionFilterOperationNode::is_selected (const db::Polygon &p) const
-{
-  return mp_filter->selected (p);
-}
-
-bool
-CompoundRegionFilterOperationNode::is_selected (const db::PolygonRef &p) const
-{
-  return mp_filter->selected (p.obj ().transformed (p.trans ()));
-}
-
 // ---------------------------------------------------------------------------------------------
 
-CompoundRegionEdgeFilterOperationNode::CompoundRegionEdgeFilterOperationNode (EdgeFilterBase *filter, CompoundRegionOperationNode *input, bool owns_filter)
-  : CompoundRegionMultiInputOperationNode (input), mp_filter (filter), m_owns_filter (owns_filter)
+CompoundRegionEdgeFilterOperationNode::CompoundRegionEdgeFilterOperationNode (EdgeFilterBase *filter, CompoundRegionOperationNode *input, bool owns_filter, bool sum_of)
+  : CompoundRegionMultiInputOperationNode (input), mp_filter (filter), m_owns_filter (owns_filter), m_sum_of (sum_of)
 {
   set_description ("filter");
 }
@@ -1252,12 +1229,6 @@ void
 CompoundRegionEdgeFilterOperationNode::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t max_vertex_count, double area_ratio) const
 {
   implement_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
-}
-
-bool
-CompoundRegionEdgeFilterOperationNode::is_selected (const db::Edge &p) const
-{
-  return mp_filter->selected (p);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1620,12 +1591,6 @@ db::Coord
 CompoundRegionCheckOperationNode::computed_dist () const
 {
   return m_check.distance ();
-}
-
-bool
-CompoundRegionCheckOperationNode::wants_merged () const
-{
-  return true;
 }
 
 void

@@ -37,6 +37,8 @@
 #include "dbHierProcessor.h"
 #include "dbEmptyEdges.h"
 
+#include <unordered_set>
+
 namespace db
 {
 

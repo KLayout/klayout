@@ -1362,8 +1362,7 @@ Output *region_cop_impl (DeepRegion *region, db::CompoundRegionOperationNode &no
   proc.set_base_verbosity (region->base_verbosity ());
   proc.set_threads (region->deep_layer ().store ()->threads ());
 
-  bool needs_merged = node.wants_merged ();
-  const db::DeepLayer &polygons (needs_merged ? region->merged_deep_layer () : region->deep_layer ());
+  const db::DeepLayer &polygons (region->merged_deep_layer ());
 
   std::vector<unsigned int> other_layers;
   for (std::vector<db::Region *>::const_iterator i = inputs.begin (); i != inputs.end (); ++i) {

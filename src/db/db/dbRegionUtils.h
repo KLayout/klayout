@@ -60,6 +60,21 @@ struct DB_PUBLIC RegionPerimeterFilter
   virtual bool selected (const db::Polygon &poly) const;
 
   /**
+   *  @brief Returns true if the polygon's perimeter matches the criterion
+   */
+  virtual bool selected (const db::PolygonRef &poly) const;
+
+  /**
+   *  @brief Returns true if the polygon's perimeter sum matches the criterion
+   */
+  virtual bool selected_set (const std::unordered_set<db::PolygonRef> &polygons) const;
+
+  /**
+   *  @brief Returns true if the polygon's perimeter sum matches the criterion
+   */
+  virtual bool selected_set (const std::unordered_set<db::Polygon> &polygons) const;
+
+  /**
    *  @brief This filter is isotropic
    */
   virtual const TransformationReducer *vars () const;
@@ -78,6 +93,8 @@ private:
   perimeter_type m_pmin, m_pmax;
   bool m_inverse;
   db::MagnificationReducer m_vars;
+
+  bool check (perimeter_type p) const;
 };
 
 /**
@@ -109,6 +126,21 @@ struct DB_PUBLIC RegionAreaFilter
   virtual bool selected (const db::Polygon &poly) const;
 
   /**
+   *  @brief Returns true if the polygon's area matches the criterion
+   */
+  virtual bool selected (const db::PolygonRef &poly) const;
+
+  /**
+   *  @brief Returns true if the polygon's area sum matches the criterion
+   */
+  virtual bool selected_set (const std::unordered_set<db::PolygonRef> &polygons) const;
+
+  /**
+   *  @brief Returns true if the polygon's area sum matches the criterion
+   */
+  virtual bool selected_set (const std::unordered_set<db::Polygon> &polygons) const;
+
+  /**
    *  @brief This filter is isotropic
    */
   virtual const TransformationReducer *vars () const;
@@ -127,6 +159,42 @@ private:
   area_type m_amin, m_amax;
   bool m_inverse;
   db::MagnificationReducer m_vars;
+
+  bool check (area_type a) const;
+};
+
+/**
+ *  @brief A filter implementation which implements the set filters through "all must match"
+ */
+
+struct DB_PUBLIC AllMustMatchFilter
+  : public PolygonFilterBase
+{
+  /**
+   *  @brief Constructor
+   */
+  AllMustMatchFilter () { }
+
+  virtual bool selected_set (const std::unordered_set<db::PolygonRef> &polygons) const
+  {
+    for (std::unordered_set<db::PolygonRef>::const_iterator p = polygons.begin (); p != polygons.end (); ++p) {
+      if (! selected (*p)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  virtual bool selected_set (const std::unordered_set<db::Polygon> &polygons) const
+  {
+    for (std::unordered_set<db::Polygon>::const_iterator p = polygons.begin (); p != polygons.end (); ++p) {
+      if (! selected (*p)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
 };
 
 /**
@@ -136,7 +204,7 @@ private:
  */
 
 struct DB_PUBLIC RectilinearFilter
-  : public PolygonFilterBase
+  : public AllMustMatchFilter
 {
   /**
    *  @brief Constructor
@@ -145,9 +213,14 @@ struct DB_PUBLIC RectilinearFilter
   RectilinearFilter (bool inverse);
 
   /**
-   *  @brief Returns true if the polygon's area matches the criterion
+   *  @brief Returns true if the polygon is rectilinear
    */
   virtual bool selected (const db::Polygon &poly) const;
+
+  /**
+   *  @brief Returns true if the polygon is rectilinear
+   */
+  virtual bool selected (const db::PolygonRef &poly) const;
 
   /**
    *  @brief This filter does not need variants
@@ -175,7 +248,7 @@ private:
  */
 
 struct DB_PUBLIC RectangleFilter
-  : public PolygonFilterBase
+  : public AllMustMatchFilter
 {
   /**
    *  @brief Constructor
@@ -184,9 +257,14 @@ struct DB_PUBLIC RectangleFilter
   RectangleFilter (bool is_square, bool inverse);
 
   /**
-   *  @brief Returns true if the polygon's area matches the criterion
+   *  @brief Returns true if the polygon is a rectangle
    */
   virtual bool selected (const db::Polygon &poly) const;
+
+  /**
+   *  @brief Returns true if the polygon is a rectangle
+   */
+  virtual bool selected (const db::PolygonRef &poly) const;
 
   /**
    *  @brief This filter does not need variants
@@ -225,7 +303,7 @@ private:
  */
 
 struct DB_PUBLIC RegionBBoxFilter
-  : public PolygonFilterBase
+  : public AllMustMatchFilter
 {
   typedef db::Box::distance_type value_type;
 
@@ -250,9 +328,14 @@ struct DB_PUBLIC RegionBBoxFilter
   RegionBBoxFilter (value_type vmin, value_type vmax, bool inverse, parameter_type parameter);
 
   /**
-   *  @brief Returns true if the polygon's area matches the criterion
+   *  @brief Returns true if the polygon's bounding box matches the criterion
    */
   virtual bool selected (const db::Polygon &poly) const;
+
+  /**
+   *  @brief Returns true if the polygon's bounding box matches the criterion
+   */
+  virtual bool selected (const db::PolygonRef &poly) const;
 
   /**
    *  @brief This filter is isotropic unless the parameter is width or height
@@ -275,6 +358,8 @@ private:
   parameter_type m_parameter;
   db::MagnificationReducer m_isotropic_vars;
   db::MagnificationAndOrientationReducer m_anisotropic_vars;
+
+  bool check (const db::Box &box) const;
 };
 
 /**
@@ -291,7 +376,7 @@ private:
  */
 
 struct DB_PUBLIC RegionRatioFilter
-  : public PolygonFilterBase
+  : public AllMustMatchFilter
 {
   /**
    *  @brief The parameters available
@@ -315,6 +400,11 @@ struct DB_PUBLIC RegionRatioFilter
    *  @brief Returns true if the polygon's area matches the criterion
    */
   virtual bool selected (const db::Polygon &poly) const;
+
+  /**
+   *  @brief Returns true if the polygon's area matches the criterion
+   */
+  virtual bool selected (const db::PolygonRef &poly) const;
 
   /**
    *  @brief This filter is isotropic unless the parameter is width or height

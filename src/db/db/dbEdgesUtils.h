@@ -24,10 +24,13 @@
 #define HDR_dbEdgesUtils
 
 #include "dbCommon.h"
+#include "dbHash.h"
 #include "dbEdges.h"
 #include "dbBoxScanner.h"
 #include "dbPolygonTools.h"
 #include "tlSelect.h"
+
+#include <unordered_set>
 
 namespace db {
 
@@ -65,12 +68,19 @@ struct DB_PUBLIC EdgeLengthFilter
    */
   virtual bool selected (const db::Edge &edge) const
   {
-    length_type l = edge.length ();
-    if (! m_inverse) {
-      return l >= m_lmin && l < m_lmax;
-    } else {
-      return ! (l >= m_lmin && l < m_lmax);
+    return check (edge.length ());
+  }
+
+  /**
+   *  @brief Returns true if the total edge length matches the criterion
+   */
+  bool selected (const std::unordered_set<db::Edge> &edges) const
+  {
+    length_type l = 0;
+    for (std::unordered_set<db::Edge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
+      l += e->length ();
     }
+    return check (l);
   }
 
   /**
@@ -101,6 +111,15 @@ private:
   length_type m_lmin, m_lmax;
   bool m_inverse;
   db::MagnificationReducer m_vars;
+
+  virtual bool check (length_type l) const
+  {
+    if (! m_inverse) {
+      return l >= m_lmin && l < m_lmax;
+    } else {
+      return ! (l >= m_lmin && l < m_lmax);
+    }
+  }
 };
 
 /**
@@ -178,6 +197,19 @@ struct DB_PUBLIC EdgeOrientationFilter
    *  @brief Returns true if the edge orientation matches the criterion
    */
   virtual bool selected (const db::Edge &edge) const;
+
+  /**
+   *  @brief Returns true if all edge orientations match the criterion
+   */
+  virtual bool selected (const std::unordered_set<db::Edge> &edges) const
+  {
+    for (std::unordered_set<db::Edge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
+      if (! selected (*e)) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   /**
    *  @brief This filter is not isotropic

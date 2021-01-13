@@ -51,6 +51,8 @@ module DRC
     # merged, so the secondary polygons may be partial. This is important when
     # using measurement operations like "area" on secondary polygons.
     #
+    # @h3 Checks @/h3
+    #
     # Here is an example for a generic DRC operation which performs a width
     # check for less than 0.5.um on the primary shapes. It uses the \global#width operator:
     #
@@ -88,13 +90,90 @@ module DRC
     # out = in.drc(width(projection) < 0.5.um)
     # @/code
     #
-    # The "drc" function supports filter operators. These select input or derived polygons 
-    # based on their properties. These filters are:
+    #
+    # @h3 Edges and edge pairs @/h3
+    #
+    # Although the "drc" function operates on polygon layers, internally it is 
+    # able to handle edge and edge pair types too. Some operations generate edge pairs,
+    # some other generate edges. As results from one operation can be processed further
+    # in the DRC expressions, methods are available to filter, process and convert
+    # these types.
+    #
+    # For example, the check produces edge pairs which can be converted into polygons
+    # using the "polygons" method:
+    #
+    # @code
+    # out = in.drc((width(projection) < 0.5.um).polygons)
+    # @/code
+    # 
+    # Note the subtle difference: when putting the "polygons" method inside the "drc"
+    # brackets, it is executed locally on every checked primary polygon. The result
+    # may be identical to the global conversion:
+    #
+    # @code
+    # # same, but with "global" conversion:
+    # out = in.drc(width(projection) < 0.5.um).polygons
+    # @/code
+    #
+    # but having the check polygons inside the loop opens new opportunities and 
+    # is more efficient in general.
+    #
+    # Conversion methods are:
     #
     # @ul
-    # @li "\global#area": select polygons based on their area @/li
-    # @li "\global#perimeter": select polygons based on their perimeter @/li
-    # @li "\global#bbox_min", "\global#bbox_max", "\global#bbox_width", "\global#bbox_height": select polygons based on their bounding box properties @/li
+    # @li \DRC#polygons: converts edge pairs to polygons @/li
+    # @li \DRC#extended, \DRC#extended_in, \DRC#extended_out: converts edges to polygons @/li
+    # @li \DRC#first_edges, \DRC#second_edges: extracts edges from edge pairs @/li
+    # @li \DRC#edges: decomposes edge pairs and polygons into edges @/li
+    # @li \DRC#corners: can extract corners from polygons @/li
+    # @/ul
+    #
+    # This example decomposes the primary polygons into edges:
+    # 
+    # @code
+    # out = in.drc(primary.edges)
+    # @/code
+    #
+    # (for backward compatibility you cannot abbreviate "primary.edges" simply as "edges" like
+    # other functions). 
+    #
+    # The previous isn't quite exciting as it is equivalent to 
+    #
+    # @code
+    # # Same as above
+    # out = in.edges
+    # @/code
+    #
+    # But it gets more interesting as within the loop, "edges" delivers the edge set for
+    # each individual polygon. So this will give you the edges of polygons with more than four corners:
+    #
+    # @code
+    # out = in.drc(primary.edges.count > 4)
+    # @/code
+    # 
+    # The same result can be achieved with classic DRC with "interact" and a figure count, but
+    # at a much higher computation cost.
+    #
+    # @h3 Edge and edge/polygon operations @/h3
+    #
+    # The "drc" framework supports the following edge and edge/polygon operations:
+    #
+    # @ul
+    # @li Edge vs. edge and edge vs. polygon booleans @/li
+    # @li Edge vs. polygon interactions (\DRC#interacting, \DRC#overlapping) @/li
+    # @li Edge sampling (\DRC#start_segments, \DRC#centers, \DRC#end_segments) @/li
+    # @/ul
+    #
+    # @h3 Filters @/h3
+    #
+    # Filter operators select input polygons or edges based on their properties. These filters are:
+    #
+    # @ul
+    # @li "\DRC#area": selects polygons based on their area @/li
+    # @li "\DRC#perimeter": selects polygons based on their perimeter @/li
+    # @li "\DRC#bbox_min", "\global#bbox_max", "\global#bbox_width", "\global#bbox_height": selects polygons based on their bounding box properties @/li
+    # @li "\DRC#length": selects edges based on their length @/li
+    # @li "\DRC#angle": selects edges based on their orientation @/li
     # @/ul
     # 
     # For example, to select polygons with an area larger than one square micrometer, use:
@@ -125,6 +204,8 @@ module DRC
     # It's recommended therefore to use the measurement functions on primary polygons
     # only.
     #
+    # @h3 Filter predicates @/h3
+    #
     # The "drc" feature also supports some predicates. "predicates" are boolean values
     # indicating a certain condition. A predicate filter works in a way that it only
     # passes the polygons 
@@ -132,12 +213,15 @@ module DRC
     #
     # @ul
     # @li "\global#rectangles": Filters rectangles @/li
+    # @li "\global#squares": Filters squares @/li
     # @li "\global#rectilinear": Filters rectilinear ("Manhattan") polygons @/li
     # @/ul
     #
     # For the same reason as explained above, it's recommended to use these predicates
     # standalone, so they act on primary shapes. It's possible to use the predicates
     # on computed shapes or secondary input, but that may not render the desired results.
+    #
+    # @h3 Logical NOT operator @/h3
     #
     # The "!" operator will evaluate the expression behind it and return the 
     # current primary shape if the input is empty and return an empty polygon set 
@@ -147,6 +231,8 @@ module DRC
     # @code
     # out = in.drc(! rectangles)
     # @/code
+    #
+    # @h3 Logical combination operators @/h3
     #
     # The logical "if_any" or "if_all" statements allow connecting multiple
     # conditions and evaluate to "true" (means: a non-empty shape set) if either
@@ -175,6 +261,7 @@ module DRC
     # out = in.drc(if_any(rectangles.sized(100.nm), primary))
     # @/code
     #
+    # @h3 Polygon manipulations @/h3
     #
     # The "drc" operations feature polygon manipulations where the input is
     # either the primary polygon or derived shapes.
@@ -209,6 +296,32 @@ module DRC
     # out = l1.drc((secondary(l2) & primary).area > 1.0)
     # @/code
     #
+    # @h3 Quantifiers @/h3
+    #
+    # Some filters operate on properties of the full, local shape set. 
+    # While the loop is executed, the DRC expressions will collect shapes, either
+    # from the primary, it's neighborhood (secondary) or by deriving shape sets.
+    #
+    # Obviously the primary is a simple one: it consists of a single shape, because
+    # this is how the loop operates. Derived shape sets however can be more complex.
+    # "Quantifiers" allow to assess properties of the complete, per-primary shape
+    # set. A simple one is "count" which checks if the number of shapes within
+    # a shape set is within a given range.
+    #
+    # Obviously, "primary.count == 1" is always true. The following condition will
+    # select all primary shapes which have more than 13 corners:
+    #
+    # @code
+    # out = in.drc(if_any(primary.corners.count > 13))
+    # @/code
+    #
+    # Note an important detail here: the "if_any" function will render primary
+    # @b polygons @/b, if the expression inside gives a non-empty result. Without
+    # "if_any", the result would be the output of "count" which is the set of all
+    # corners where the corner count is larger than 13.
+    #
+    # @h3 Expressions as objects @/h3
+    #
     # The expression inside the "drc" function is a Ruby object and can be 
     # stored in variables. If you need the same expression multiple times, it can be 
     # more efficient to use the same Ruby object. In this example, the same expression
@@ -229,28 +342,7 @@ module DRC
     # or the boolean operation. But when the "drc" function executes the operation it will 
     # only compute the area once as it is represented by the same Ruby object.
     #
-    #
-    # The "drc" functionality also offers support for edge pairs and edges. Edge pairs
-    # are the results of check operations and can be turned into polygons using the 
-    # "polygons" method:
-    #
-    # @code
-    # drc = in.drc((width < 0.5.um).polygons)
-    # @/code
-    #
-    # Similarly, polygons can be converted into edges:
-    # 
-    # @code
-    # drc = in.drc(primary.edges)
-    # @/code
-    #
-    # The "drc" framework supports edge vs. edge and edge vs. polygon booleans, edge
-    # filters (\global#length, \global#angle), edge vs. polygon interactions (\global#interacting, \global#overlapping),
-    # edge sampling (\global#start_segments, \global#centers, \global#end_segments) and edge to polygon
-    # conversions (\global#extended, \global#extended_in, \global#extended_out). Edge pairs 
-    # can be converted into polygons and edges and separated into first and second edges (\global#first_edges,
-    # \global#second_edges).
-    #
+    # @h3 Summary @/h3
     #
     # The bottom line is: DRC expressions are quite rich and there is a lot more to be said and written.
     # More formal details about the bits and pieces can be found in the \DRC# class documentation.
@@ -1014,8 +1106,7 @@ CODE
           elsif a.is_a?(DRCLayer)
             other = self._make_node(a)
           elsif a.is_a?(DRCProjectionLimits)
-            minp = self._make_value(a.min)
-            maxp = self._make_value(a.max)
+            (minp, maxp) = a.get_limits(self)
           elsif a.is_a?(DRCShielded)
             shielded = a.value
           else

@@ -43,6 +43,24 @@ polygons in the layer.
 Without a layer argument, "area" represents an area filter for primary shapes in 
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#area">DRC#area</a> for more details).
 </p>
+<a name="area_ratio"/><h2>"area_ratio" - Selects primary shapes based on the ratio of bounding box and polygon area</h2>
+<keyword name="area_ratio"/>
+<p>Usage:</p>
+<ul>
+<li><tt>area_ratio (in condition)</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#area_ratio">area_ratio</a> and <a href="/about/drc_ref_drc.xml#area_ratio">DRC#area_ratio</a> for more details.
+</p>
+<a name="bbox_aspect_ratio"/><h2>"bbox_aspect_ratio" - Selects primary shapes based on the aspect ratio of their bounding boxes</h2>
+<keyword name="bbox_aspect_ratio"/>
+<p>Usage:</p>
+<ul>
+<li><tt>bbox_aspect_ratio (in condition)</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#bbox_aspect_ratio">bbox_aspect_ratio</a> and <a href="/about/drc_ref_drc.xml#bbox_aspect_ratio">DRC#bbox_aspect_ratio</a> for more details.
+</p>
 <a name="bbox_height"/><h2>"bbox_height" - Selects primary shapes based on their bounding box height</h2>
 <keyword name="bbox_height"/>
 <p>Usage:</p>
@@ -364,13 +382,9 @@ applied to coners meeting a particular angle constraint.
 <p>Usage:</p>
 <ul>
 <li><tt>covering(other) (in conditions)</tt></li>
-<li><tt>covering(layer, other [, options ])</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
-is equivalent to "layer.covering" (see <a href="/about/drc_ref_layer.xml#covering">Layer#covering</a>). 
-</p><p>
-Without a layer argument, this method represents the selector of primary shapes
+This method represents the selector of primary shapes
 which entirely cover shapes from the other layer. This version can be put into
 a condition indicating how many shapes of the other layer need to be covered.
 Use this variant within <a href="/about/drc_ref_drc.xml">DRC</a> expressions (also see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>).
@@ -567,6 +581,7 @@ out = in.drc(enclosing(other) &lt;= 0.2.um)
 out = in.drc(enclosing(other) &gt; 0.2.um)
 out = in.drc(enclosing(other) &gt;= 0.2.um)
 out = in.drc(enclosing(other) == 0.2.um)
+out = in.drc(enclosing(other) != 0.2.um)
 out = in.drc(0.1.um &lt;= enclosing(other) &lt; 0.2.um)
 </pre>
 </p><p>
@@ -759,13 +774,9 @@ this method.
 <p>Usage:</p>
 <ul>
 <li><tt>inside(other)</tt></li>
-<li><tt>inside(layer, other)</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
-is equivalent to "layer.inside" (see <a href="/about/drc_ref_layer.xml#inside">Layer#inside</a>). 
-</p><p>
-Without a layer argument, this method represents the selector of primary shapes
+This method represents the selector of primary shapes
 which are entirely inside shapes from the other layer. 
 Use this variant within <a href="/about/drc_ref_drc.xml">DRC</a> expressions (also see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>).
 </p>
@@ -774,12 +785,18 @@ Use this variant within <a href="/about/drc_ref_drc.xml">DRC</a> expressions (al
 <p>Usage:</p>
 <ul>
 <li><tt>interacting(other) (in conditions)</tt></li>
-<li><tt>interacting(layer, other [, options ])</tt></li>
 </ul>
 <p>
 See <a href="#covering">covering</a> for a description of the use cases for this function. 
 When using "interacting", shapes are selected when the interact (overlap, touch)
 shapes from the other layer.
+</p><p>
+When using this method with a count, the operation may not render 
+the correct results if the other input is not merged. By nature of the
+generic DRC feature, only those shapes that interact with the primary shape
+will be selected. If the other input is split into multiple polygons,
+not all components may be captured and the computed interaction count
+may be incorrect.
 </p>
 <a name="is_deep?"/><h2>"is_deep?" - Returns true, if in deep mode</h2>
 <keyword name="is_deep?"/>
@@ -1066,13 +1083,9 @@ layout if is report database.
 <p>Usage:</p>
 <ul>
 <li><tt>outside(other)</tt></li>
-<li><tt>outside(layer, other)</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
-is equivalent to "layer.outside" (see <a href="/about/drc_ref_layer.xml#outside">Layer#outside</a>). 
-</p><p>
-Without a layer argument, this method represents the selector of primary shapes
+This method represents the selector of primary shapes
 which are entirely outside shapes from the other layer. 
 Use this variant within <a href="/about/drc_ref_drc.xml">DRC</a> expressions (also see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>).
 </p>
@@ -1092,12 +1105,18 @@ function provides a two-layer check. See there for details how to use this funct
 <p>Usage:</p>
 <ul>
 <li><tt>overlapping(other) (in conditions)</tt></li>
-<li><tt>overlapping(layer, other [, options ])</tt></li>
 </ul>
 <p>
 See <a href="#covering">covering</a> for a description of the use cases for this function. 
 When using "overlapping", shapes are selected when the overlap
 shapes from the other layer.
+</p><p>
+When using this method with a count, the operation may not render 
+the correct results if the other input is not merged. By nature of the
+generic DRC feature, only those shapes that interact with the primary shape
+will be selected. If the other input is split into multiple polygons,
+not all components may be captured and the computed interaction count
+may be incorrect.
 </p>
 <a name="p"/><h2>"p" - Creates a point object</h2>
 <keyword name="p"/>
@@ -1205,6 +1224,15 @@ This function can be used with a layer argument in which case it
 is equivalent to "layer.rectilinear" (see <a href="/about/drc_ref_layer.xml#rectilinear">Layer#rectilinear</a>). Without a layer
 argument, "rectilinear" represents the rectilinear polygons filter for primary shapes in 
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#rectilinear">DRC#rectilinear</a> for more details).
+</p>
+<a name="relative_height"/><h2>"relative_height" - Selects primary shapes based on the ratio of height and width of their bounding boxes</h2>
+<keyword name="relative_height"/>
+<p>Usage:</p>
+<ul>
+<li><tt>relative_height (in condition)</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#relative_height">relative_height</a> and <a href="/about/drc_ref_drc.xml#relative_height">DRC#relative_height</a> for more details.
 </p>
 <a name="report"/><h2>"report" - Specifies a report database for output</h2>
 <keyword name="report"/>
@@ -1419,6 +1447,19 @@ For further methods on the source object see <a href="#Source">Source</a>.
 Provides a space check on the primary layer. Like <a href="#width">width</a> this 
 function provides a single-layer check. See there for details how to use this function.
 </p>
+<a name="squares"/><h2>"squares" - Selects all polygons which are squares</h2>
+<keyword name="squares"/>
+<p>Usage:</p>
+<ul>
+<li><tt>squares</tt></li>
+<li><tt>squares(layer)</tt></li>
+</ul>
+<p>
+This function can be used with a layer argument in which case it
+is equivalent to "layer.squares" (see <a href="/about/drc_ref_layer.xml#squares">Layer#squares</a>). Without a layer
+argument, "squares" represents the rectangles filter for primary shapes in 
+<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#squares">DRC#squares</a> for more details).
+</p>
 <a name="target"/><h2>"target" - Specify the target layout</h2>
 <keyword name="target"/>
 <p>Usage:</p>
@@ -1568,6 +1609,7 @@ out = in.drc(width &lt;= 0.2.um)
 out = in.drc(width &gt; 0.2.um)
 out = in.drc(width &gt;= 0.2.um)
 out = in.drc(width == 0.2.um)
+out = in.drc(width != 0.2.um)
 out = in.drc(0.1.um &lt;= width &lt; 0.2.um)
 </pre>
 </p><p>

@@ -27,55 +27,206 @@ module DRC
 # The following global functions are relevant for the DRC expressions:
 # 
 # @ul
-# @li \global#angle @/li
-# @li \global#area @/li
-# @li \global#area_ratio @/li
-# @li \global#bbox_area_ratio @/li
-# @li \global#bbox_height @/li
-# @li \global#bbox_max @/li
-# @li \global#bbox_min @/li
-# @li \global#bbox_width @/li
-# @li \global#case @/li
-# @li \global#corners @/li
-# @li \global#covering @/li
-# @li \global#enc @/li
-# @li \global#enclosing @/li
-# @li \global#extent_refs @/li
-# @li \global#extents @/li
-# @li \global#foreign @/li
-# @li \global#holes @/li
-# @li \global#hulls @/li
-# @li \global#if_all @/li
-# @li \global#if_any @/li
-# @li \global#if_none @/li
-# @li \global#inside @/li
-# @li \global#interacting @/li
-# @li \global#iso @/li
-# @li \global#length @/li
-# @li \global#middle @/li
-# @li \global#notch @/li
-# @li \global#odd_polygons @/li
-# @li \global#outside @/li
-# @li \global#overlap @/li
-# @li \global#overlapping @/li
-# @li \global#perimeter @/li
-# @li \global#primary @/li
-# @li \global#rectangles @/li
-# @li \global#rectilinear @/li
-# @li \global#relative_height @/li
-# @li \global#rounded_corners @/li
-# @li \global#secondary @/li
-# @li \global#separation @/li
-# @li \global#sep @/li
-# @li \global#sized @/li
-# @li \global#smoothed @/li
-# @li \global#space @/li
-# @li \global#squares @/li
-# @li \global#width @/li
+# @li \\global#angle @/li
+# @li \\global#area @/li
+# @li \\global#area_ratio @/li
+# @li \\global#bbox_area_ratio @/li
+# @li \\global#bbox_height @/li
+# @li \\global#bbox_max @/li
+# @li \\global#bbox_min @/li
+# @li \\global#bbox_width @/li
+# @li \\global#case @/li
+# @li \\global#corners @/li
+# @li \\global#covering @/li
+# @li \\global#enc @/li
+# @li \\global#enclosing @/li
+# @li \\global#extent_refs @/li
+# @li \\global#extents @/li
+# @li \\global#foreign @/li
+# @li \\global#holes @/li
+# @li \\global#hulls @/li
+# @li \\global#if_all @/li
+# @li \\global#if_any @/li
+# @li \\global#if_none @/li
+# @li \\global#inside @/li
+# @li \\global#interacting @/li
+# @li \\global#iso @/li
+# @li \\global#length @/li
+# @li \\global#middle @/li
+# @li \\global#notch @/li
+# @li \\global#odd_polygons @/li
+# @li \\global#outside @/li
+# @li \\global#overlap @/li
+# @li \\global#overlapping @/li
+# @li \\global#perimeter @/li
+# @li \\global#primary @/li
+# @li \\global#rectangles @/li
+# @li \\global#rectilinear @/li
+# @li \\global#relative_height @/li
+# @li \\global#rounded_corners @/li
+# @li \\global#secondary @/li
+# @li \\global#separation @/li
+# @li \\global#sep @/li
+# @li \\global#sized @/li
+# @li \\global#smoothed @/li
+# @li \\global#space @/li
+# @li \\global#squares @/li
+# @li \\global#width @/li
 # @/ul
 # 
 # The following documentation will list the methods available for DRC expression objects.
   
+# A base class for implementing ranges that can be put into a condition
+module DRCComparable
+  
+  attr_accessor :reverse
+  attr_accessor :original
+  attr_accessor :lt, :le, :gt, :ge
+  attr_accessor :description
+  attr_accessor :mode_or_supported
+  attr_accessor :mode_or
+  
+  def _init_comparable
+    self.reverse = false
+    self.original = nil
+    self.le = nil
+    self.ge = nil
+    self.lt = nil
+    self.gt = nil
+    self.gt = nil
+    self.description = ""
+    self.mode_or_supported = false
+    self.mode_or = false
+  end
+  
+  def _check_bounds
+    if ! self.mode_or && (self.lt || self.le) && (self.gt || self.ge)
+      epsilon = 1e-10
+      lower = self.ge ? self.ge - epsilon : self.gt + epsilon
+      upper = self.le ? self.le + epsilon : self.lt - epsilon
+      if lower > upper - epsilon
+        raise("'" + self.description + "': lower bound is larger than upper bound")
+      end 
+    end  
+  end
+    
+  def set_lt(value)
+    (self.lt || self.le) && raise("'" + self.description + "' already has an upper bound of " + ("%.12g" % (self.lt || self.le)))
+    self.lt = value
+    self._check_bounds
+  end    
+
+  def set_le(value)
+    (self.lt || self.le) && raise("'" + self.description + "' already has an upper bound of " + ("%.12g" % (self.lt || self.le)))
+    self.le = value
+    self._check_bounds
+  end    
+      
+  def set_gt(value)
+    (self.gt || self.ge) && raise("'" + self.description + "' already has an lower bound of " + ("%.12g" % (self.gt || self.ge)))
+    self.gt = value
+    self._check_bounds
+  end    
+
+  def set_ge(value)
+    (self.gt || self.ge) && raise("'" + self.description + "' already has an lower bound of " + ("%.12g" % (self.gt || self.ge)))
+    self.ge = value
+    self._check_bounds
+  end
+  
+  def coerce(something)
+    reversed = self.dup
+    reversed.reverse = true
+    reversed.original = self
+    [ reversed, something ]
+  end
+  
+  def _self_or_original
+    return (self.original || self).dup
+  end
+  
+  def !=(other)
+    if self.respond_to?(:inverted)
+      res = self.==(other).inverted
+    else
+      if !self.mode_or_supported
+        raise("!= operator is not allowed for '" + self.description + "'")
+      end
+      if !(other.is_a?(Float) || other.is_a?(Integer))
+        raise("!= operator needs a numerical argument for '" + self.description + "' argument")
+      end
+      res = self._self_or_original
+      res.mode_or = true
+      res.set_lt(other)
+      res.set_gt(other)
+    end
+    res
+  end
+  
+  def ==(other)
+    if !(other.is_a?(Float) || other.is_a?(Integer))
+      raise("== operator needs a numerical argument for '" + self.description + "' argument")
+    end
+    res = self._self_or_original
+    res.set_le(other)
+    res.set_ge(other)
+    return res
+  end
+  
+  def <(other)
+    if !(other.is_a?(Float) || other.is_a?(Integer))
+      raise("< operator needs a numerical argument for '" + self.description + "' argument")
+    end
+    res = self._self_or_original
+    if reverse
+      res.set_gt(other)
+    else
+      res.set_lt(other)
+    end
+    return res
+  end
+  
+  def <=(other)
+    if !(other.is_a?(Float) || other.is_a?(Integer))
+      raise("<= operator needs a numerical argument for '" + self.description + "' argument")
+    end
+    res = self._self_or_original
+    if reverse
+      res.set_ge(other)
+    else
+      res.set_le(other)
+    end
+    return res
+  end
+
+  def >(other)
+    if !(other.is_a?(Float) || other.is_a?(Integer))
+      raise("> operator needs a numerical argument for '" + self.description + "' argument")
+    end
+    res = self._self_or_original
+    if reverse
+      res.set_lt(other)
+    else
+      res.set_gt(other)
+    end
+    return res
+  end
+  
+  def >=(other)
+    if !(other.is_a?(Float) || other.is_a?(Integer))
+      raise(">= operator needs a numerical argument for '" + self.description + "' argument")
+    end
+    res = self._self_or_original
+    if reverse
+      res.set_le(other)
+    else
+      res.set_ge(other)
+    end
+    return res
+  end
+  
+end
+
 class DRCOpNode
 
   attr_accessor :description
@@ -239,7 +390,23 @@ CODE
   # The plain function is equivalent to "primary.area".
   
   def area
-    DRCOpNodeAreaFilter::new(@engine, self)
+    DRCOpNodeAreaFilter::new(@engine, self, false)
+  end
+  
+  # %DRC%
+  # @name area_sum
+  # @brief Selects the input polygons if the sum of all areas meets the condition
+  # @synopsis expression.area_sum (in condition)
+  #
+  # Returns the input polygons if the sum of their areas meets the specified
+  # condition. This condition is evaluated on the total of all shapes generated in one step of the 
+  # "drc" loop. As there is a single primary in each loop iteration, "primary.area_sum" is
+  # equivalent to "primary.area".
+  #
+  # See \Layer#drc for more details about comparison specs.
+  
+  def area_sum
+    DRCOpNodeAreaFilter::new(@engine, self, true)
   end
   
   # %DRC%
@@ -293,7 +460,23 @@ CODE
   # The plain function is equivalent to "primary.perimeter".
   
   def perimeter
-    DRCOpNodePerimeterFilter::new(@engine, self)
+    DRCOpNodePerimeterFilter::new(@engine, self, false)
+  end
+  
+  # %DRC%
+  # @name perimeter_sum
+  # @brief Selects the input polygons if the sum of all perimeters meets the condition
+  # @synopsis expression.perimeter_sum (in condition)
+  #
+  # Returns the input polygons if the sum of their perimeters meets the specified
+  # condition. This condition is evaluated on the total of all shapes generated in one step of the 
+  # "drc" loop. As there is a single primary in each loop iteration, "primary.perimeter_sum" is
+  # equivalent to "primary.perimeter".
+  #
+  # See \Layer#drc for more details about comparison specs.
+  
+  def perimeter_sum
+    DRCOpNodePerimeterFilter::new(@engine, self, true)
   end
   
   # %DRC%
@@ -482,7 +665,22 @@ CODE
   # The plain function is equivalent to "primary.length".
 
   def length
-    DRCOpNodeEdgeLengthFilter::new(@engine, self)
+    DRCOpNodeEdgeLengthFilter::new(@engine, self, false)
+  end
+  
+  # %DRC%
+  # @name length_sum
+  # @brief Selects the input edges if the sum of their lengths meets the condition
+  # @synopsis expression.length_sum (in condition)
+  #
+  # Returns the input edges if the sum of their lengths meets the specified
+  # condition. This condition is evaluated on the total of all edges generated in one step of the 
+  # "drc" loop.
+  #
+  # See \Layer#drc for more details about comparison specs.
+  
+  def length_sum
+    DRCOpNodeEdgeLengthFilter::new(@engine, self, true)
   end
   
   # %DRC%
@@ -1236,18 +1434,14 @@ class DRCOpNodeCase < DRCOpNode
 end
 
 class DRCOpNodeWithCompare < DRCOpNode
+
+  include DRCComparable
   
   attr_accessor :reverse
-  attr_accessor :original
-  attr_accessor :lt, :le, :gt, :ge, :arg
-  attr_accessor :mode_or_supported
-  attr_accessor :mode_or
   
-  def initialize(engine, original = nil, reverse = false)
+  def initialize(engine)
     super(engine)
-    self.reverse = reverse
-    self.original = original
-    self.description = original ? original.description : "BasicWithCompare"
+    self.description = "BasicWithCompare"
     self.mode_or = false
     self.mode_or_supported = false
   end
@@ -1269,129 +1463,6 @@ class DRCOpNodeWithCompare < DRCOpNode
     end
   end
 
-  def _check_bounds
-    if ! self.mode_or && (self.lt || self.le) && (self.gt || self.ge)
-      epsilon = 1e-10
-      lower = self.ge ? self.ge - epsilon : self.gt + epsilon
-      upper = self.le ? self.le + epsilon : self.lt - epsilon
-      if lower > upper - epsilon
-        raise("Lower bound is larger than upper bound")
-      end 
-    end  
-  end
-    
-  def set_lt(value)
-    (self.lt || self.le) && raise("'" + self.description + "' already has an upper bound of " + ("%.12g" % (self.lt || self.le)))
-    self.lt = value
-    self._check_bounds
-  end    
-
-  def set_le(value)
-    (self.lt || self.le) && raise("'" + self.description + "' already has an upper bound of " + ("%.12g" % (self.lt || self.le)))
-    self.le = value
-    self._check_bounds
-  end    
-      
-  def set_gt(value)
-    (self.gt || self.ge) && raise("'" + self.description + "' already has an lower bound of " + ("%.12g" % (self.gt || self.ge)))
-    self.gt = value
-    self._check_bounds
-  end    
-
-  def set_ge(value)
-    (self.gt || self.ge) && raise("'" + self.description + "' already has an lower bound of " + ("%.12g" % (self.gt || self.ge)))
-    self.ge = value
-    self._check_bounds
-  end
-  
-  def coerce(something)
-    [ DRCOpNodeWithCompare::new(@engine, self, true), something ]
-  end
-  
-  def _self_or_original
-    return (self.original || self).dup
-  end
-  
-  def !=(other)
-    if self.respond_to?(:inverted)
-      res = self.==(other).inverted
-    else
-      if !self.mode_or_supported
-        raise("!= operator is not allowed for '" + self.description + "'")
-      end
-      if !(other.is_a?(Float) || other.is_a?(Integer))
-        raise("!= operator needs a numerical argument for '" + self.description + "' argument")
-      end
-      res = self._self_or_original
-      res.mode_or = true
-      res.set_lt(other)
-      res.set_gt(other)
-    end
-    res
-  end
-  
-  def ==(other)
-    if !(other.is_a?(Float) || other.is_a?(Integer))
-      raise("== operator needs a numerical argument for '" + self.description + "' argument")
-    end
-    res = self._self_or_original
-    res.set_le(other)
-    res.set_ge(other)
-    return res
-  end
-  
-  def <(other)
-    if !(other.is_a?(Float) || other.is_a?(Integer))
-      raise("< operator needs a numerical argument for '" + self.description + "' argument")
-    end
-    res = self._self_or_original
-    if reverse
-      res.set_gt(other)
-    else
-      res.set_lt(other)
-    end
-    return res
-  end
-  
-  def <=(other)
-    if !(other.is_a?(Float) || other.is_a?(Integer))
-      raise("<= operator needs a numerical argument for '" + self.description + "' argument")
-    end
-    res = self._self_or_original
-    if reverse
-      res.set_ge(other)
-    else
-      res.set_le(other)
-    end
-    return res
-  end
-
-  def >(other)
-    if !(other.is_a?(Float) || other.is_a?(Integer))
-      raise("> operator needs a numerical argument for '" + self.description + "' argument")
-    end
-    res = self._self_or_original
-    if reverse
-      res.set_lt(other)
-    else
-      res.set_gt(other)
-    end
-    return res
-  end
-  
-  def >=(other)
-    if !(other.is_a?(Float) || other.is_a?(Integer))
-      raise(">= operator needs a numerical argument for '" + self.description + "' argument")
-    end
-    res = self._self_or_original
-    if reverse
-      res.set_le(other)
-    else
-      res.set_ge(other)
-    end
-    return res
-  end
-  
 end
 
 class DRCOpNodeCountFilter < DRCOpNodeWithCompare
@@ -1431,16 +1502,18 @@ class DRCOpNodeAreaFilter < DRCOpNodeWithCompare
 
   attr_accessor :input
   attr_accessor :inverse
+  attr_accessor :sum
   
-  def initialize(engine, input)
+  def initialize(engine, input, sum)
     super(engine)
     self.input = input
     self.inverse = false
     self.description = "area"
+    self.sum = sum
   end
 
   def _description_for_dump
-    self.inverse ? "area" : "not_area"
+    (self.inverse ? "area" : "not_area") + (self.sum ? "_sum" : "")
   end
   
   def do_create_node(cache)
@@ -1449,7 +1522,7 @@ class DRCOpNodeAreaFilter < DRCOpNodeWithCompare
     if self.lt || self.le
       args << (self.lt ? @engine._make_area_value(self.lt) : @engine._make_area_value(self.le) + 1)
     end
-    RBA::CompoundRegionOperationNode::new_area_filter(*args)
+    RBA::CompoundRegionOperationNode::send(self.sum ? :new_area_sum_filter : :new_area_filter, *args)
   end
 
   def inverted
@@ -1464,16 +1537,18 @@ class DRCOpNodeEdgeLengthFilter < DRCOpNodeWithCompare
 
   attr_accessor :input
   attr_accessor :inverse
+  attr_accessor :sum
   
-  def initialize(engine, input)
+  def initialize(engine, input, sum)
     super(engine)
     self.input = input
     self.inverse = false
     self.description = "length"
+    self.sum = sum
   end
   
   def _description_for_dump
-    self.inverse ? "length" : "not_length"
+    (self.inverse ? "length" : "not_length") + (self.sum ? "_sum" : "")
   end
   
   def do_create_node(cache)
@@ -1491,7 +1566,7 @@ class DRCOpNodeEdgeLengthFilter < DRCOpNodeWithCompare
       args << (self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) + 1)
     end
 
-    RBA::CompoundRegionOperationNode::new_edge_length_filter(*args)
+    RBA::CompoundRegionOperationNode::send(self.sum ? :new_edge_length_sum_filter : :new_edge_length_filter, *args)
 
   end
 
@@ -1551,16 +1626,18 @@ class DRCOpNodePerimeterFilter < DRCOpNodeWithCompare
 
   attr_accessor :input
   attr_accessor :inverse
+  attr_accessor :sum
   
-  def initialize(engine, input)
+  def initialize(engine, input, sum)
     super(engine)
     self.input = input
     self.inverse = false
     self.description = "perimeter"
+    self.sum = sum
   end
 
   def _description_for_dump
-    self.inverse ? "perimeter" : "not_perimeter"
+    (self.inverse ? "perimeter" : "not_perimeter") + (self.sum ? "_sum" : "")
   end
   
   def do_create_node(cache)
@@ -1569,7 +1646,7 @@ class DRCOpNodePerimeterFilter < DRCOpNodeWithCompare
     if self.lt || self.le
       args << (self.lt ? @engine._make_value(self.lt) : @engine._make_value(self.le) + 1)
     end
-    RBA::CompoundRegionOperationNode::new_perimeter_filter(*args)
+    RBA::CompoundRegionOperationNode::send(self.sum ? :new_perimeter_sum_filter : :new_perimeter_filter, *args)
   end
 
   def inverted

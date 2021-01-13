@@ -34,6 +34,7 @@
 #include "dbGenericShapeIterator.h"
 
 #include <list>
+#include <unordered_set>
 
 namespace db {
 
@@ -115,9 +116,15 @@ public:
 
   /**
    *  @brief Filters the edge
-   *  If this method returns true, the polygon is kept. Otherwise it's discarded.
+   *  If this method returns true, the edge is kept. Otherwise it's discarded.
    */
   virtual bool selected (const db::Edge &edge) const = 0;
+
+  /**
+   *  @brief Filters the edge set
+   *  If this method returns true, the edges are kept. Otherwise they are discarded.
+   */
+  virtual bool selected (const std::unordered_set<db::Edge> &edge) const = 0;
 
   /**
    *  @brief Returns the transformation reducer for building cell variants

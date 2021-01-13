@@ -3192,7 +3192,15 @@ public:
     }
   }
   
-  /** 
+  /**
+   *  @brief The area ratio of the polygon
+   */
+  double area_ratio () const
+  {
+    return this->obj ().area_ratio ();
+  }
+
+  /**
    *  @brief The area of the polygon
    */
   area_type area () const 

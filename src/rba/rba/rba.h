@@ -216,6 +216,29 @@ public:
   RubyInterpreterPrivateData *d;
 };
 
+class RBA_PUBLIC RubyStackTraceProvider
+  : public gsi::StackTraceProvider
+{
+public:
+  RubyStackTraceProvider (const std::string &scope);
+
+  virtual std::vector<tl::BacktraceElement> stack_trace () const;
+  virtual size_t scope_index () const;
+  virtual int stack_depth () const;
+
+  static size_t scope_index (const std::vector<tl::BacktraceElement> &bt, const std::string &scope);
+
+  //  we could use this for ruby >= 1.9.3
+#if 0
+  static int count_stack_levels(void *arg, VALUE file, int line, VALUE method);
+  extern "C" int rb_backtrace_each (int (*iter)(void *arg, VALUE file, int line, VALUE method), void *arg);
+  virtual int stack_depth ();
+#endif
+
+private:
+  const std::string &m_scope;
+};
+
 }
 
 #endif

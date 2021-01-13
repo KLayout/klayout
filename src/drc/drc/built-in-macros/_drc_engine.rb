@@ -96,7 +96,20 @@ module DRC
     
     def projection_limits(*args)
       self._context("projection_limits") do
-        DRCProjectionLimits::new(*args)
+        if args.size == 0
+          raise("At least one argument is required")
+        end
+        res = DRCProjectionLimits::new(*args)
+        res.description = "projection_limits"
+        res
+      end
+    end
+    
+    def projecting
+      self._context("projecting") do
+        res = DRCProjectionLimits::new
+        res.description = "projecting"
+        res
       end
     end
     
@@ -2308,6 +2321,30 @@ CODE
     end
   
     def _make_numeric_value(v)
+      self._check_numeric(v)
+      v
+    end
+  
+    def _make_value_with_nil(v)
+      if v == nil
+        return v
+      end
+      self._check_numeric(v)
+      self._prep_value(v)
+    end
+    
+    def _make_area_value_with_nil(v)
+      if v == nil
+        return v
+      end
+      self._check_numeric(v)
+      self._prep_value_area(v)
+    end
+  
+    def _make_numeric_value_with_nil(v)
+      if v == nil
+        return v
+      end
       self._check_numeric(v)
       v
     end

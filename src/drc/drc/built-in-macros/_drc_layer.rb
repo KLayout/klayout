@@ -344,12 +344,12 @@ module DRC
             if args.size == 1
               a = args[0]
               if a.is_a?(Range)
-                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._prep_value_area(a.first), @engine._prep_value_area(a.last), #{inv.inspect}))
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_area_value_with_nil(a.begin), @engine._make_area_value_with_nil(a.end), #{inv.inspect}))
               else
-                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._prep_value_area(a), #{inv.inspect}))
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_area_value(a), #{inv.inspect}))
               end
             elsif args.size == 2
-              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._prep_value_area(args[0]), @engine._prep_value_area(args[1]), #{inv.inspect}))
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_area_value_with_nil(args[0]), @engine._make_area_value_with_nil(args[1]), #{inv.inspect}))
             else
               raise("Invalid number of arguments (1 or 2 expected)")
             end
@@ -500,12 +500,12 @@ CODE
             if args.size == 1
               a = args[0]
               if a.is_a?(Range)
-                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._prep_value(a.first), @engine._prep_value(a.last), #{inv.inspect}))
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_value_with_nil(a.begin), @engine._make_value_with_nil(a.end), #{inv.inspect}))
               else
-                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._prep_value(a), #{inv.inspect}))
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_value(a), #{inv.inspect}))
               end
             elsif args.size == 2
-              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._prep_value(args[0]), @engine._prep_value(args[1]), #{inv.inspect}))
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_value_with_nil(args[0]), @engine._make_value_with_nil(args[1]), #{inv.inspect}))
             else
               raise("Invalid number of arguments (1 or 2 expected)")
             end
@@ -600,7 +600,7 @@ CODE
             if args.size == 1
               a = args[0]
               if a.is_a?(Range)
-                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_numeric_value(a.first), @engine._make_numeric_value(a.last), #{inv.inspect}))
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_numeric_value_with_nil(a.begin), @engine._make_numeric_value_with_nil(a.end), #{inv.inspect}))
               else
                 DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_numeric_value(a), #{inv.inspect}))
               end
@@ -655,12 +655,12 @@ CODE
             if args.size == 1
               a = args[0]
               if a.is_a?(Range)
-                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :with_#{f}, @engine._prep_value(a.first), @engine._prep_value(a.last), #{inv.inspect}))
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :with_#{f}, @engine._make_value_with_nil(a.begin), @engine._make_value_with_nil(a.end), #{inv.inspect}))
               else
-                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :with_#{f}, @engine._prep_value(a), #{inv.inspect}))
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :with_#{f}, @engine._make_value(a), #{inv.inspect}))
               end
             elsif args.size == 2
-              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :with_#{f}, @engine._prep_value(args[0]), @engine._prep_value(args[1]), #{inv.inspect}))
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :with_#{f}, @engine._make_value_with_nil(args[0]), @engine._make_value_with_nil(args[1]), #{inv.inspect}))
             else
               raise("Invalid number of arguments (1 or 2 expected)")
             end
@@ -733,7 +733,7 @@ CODE
           if args.size == 1
             a = args[0]
             if a.is_a?(Range)
-              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, :with_angle, a.first, a.last, #{inv.inspect}))
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, :with_angle, a.begin, a.end, #{inv.inspect}))
             else
               DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, :with_angle, a, #{inv.inspect}))
             end
@@ -779,7 +779,7 @@ CODE
     def rounded_corners(inner, outer, n)
       @engine._context("rounded_corners") do
         requires_region
-        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :rounded_corners, @engine._prep_value(inner), @engine._prep_value(outer), n))
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :rounded_corners, @engine._make_value(inner), @engine._make_value(outer), n))
       end
     end
     
@@ -798,7 +798,7 @@ CODE
     def smoothed(d)
       @engine._context("smoothed") do
         requires_region
-        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :smoothed, @engine._prep_value(d)))
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :smoothed, @engine._make_value(d)))
       end
     end
     
@@ -1365,9 +1365,9 @@ CODE
       @engine._context("ongrid") do
         requires_region
         if args.size == 1
-          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::EdgePairs, :grid_check, @engine._prep_value(args[0]), @engine._prep_value(args[0])))
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::EdgePairs, :grid_check, @engine._make_value(args[0]), @engine._make_value(args[0])))
         elsif args.size == 2
-          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::EdgePairs, :grid_check, @engine._prep_value(args[0]), @engine._prep_value(args[1])))
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::EdgePairs, :grid_check, @engine._make_value(args[0]), @engine._make_value(args[1])))
         else
           raise("Invalid number of arguments (1 or 2 expected)")
         end
@@ -1406,14 +1406,13 @@ CODE
           requires_region
           gx = gy = 0
           if args.size == 1
-            gx = gy = @engine._prep_value(args[0])
+            gx = gy = @engine._make_value(args[0])
           elsif args.size == 2
-            gx = @engine._prep_value(args[0])
-            gy = @engine._prep_value(args[1])
+            gx = @engine._make_value(args[0])
+            gy = @engine._make_value(args[1])
           else
             raise("Invalid number of arguments (1 or 2 expected)")
           end
-          aa = args.collect { |a| @engine._prep_value(a) }
           if :#{f} == :snap && @engine.is_tiled?
             # in tiled mode, no modifying versions are available
             self.data = @engine._tcmd(self.data, 0, self.data.class, :snapped, gx, gy)
@@ -2606,7 +2605,7 @@ CODE
       def #{f}(length, fraction = 0.0)
         @engine._context("#{f}") do
           requires_edges
-          length = @engine._prep_value(length)
+          length = @engine._make_value(length)
           DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :#{f}, length, fraction))
         end
       end
@@ -2657,16 +2656,16 @@ CODE
           av = [ 0, 0, 0, 0, false ]
           args.each_with_index do |a,i|
             if a.is_a?(Hash)
-              a[:begin]  && av[0] = @engine._prep_value(a[:begin])
-              a[:end]    && av[1] = @engine._prep_value(a[:end])
-              a[:out]    && av[2] = @engine._prep_value(a[:out])
-              a[:in]     && av[3] = @engine._prep_value(a[:in])
+              a[:begin]  && av[0] = @engine._make_value(a[:begin])
+              a[:end]    && av[1] = @engine._make_value(a[:end])
+              a[:out]    && av[2] = @engine._make_value(a[:out])
+              a[:in]     && av[3] = @engine._make_value(a[:in])
               a[:joined] && av[4] = true
             elsif i < 4
               if !a.is_a?(1.class) && !a.is_a?(Float)
                 raise("Invalid type for argument #" + (i+1).to_s)
               end
-              av[i] = @engine._prep_value(a)
+              av[i] = @engine._make_value(a)
             elsif i == 4
               if a.is_a?(DRCJoinFlag)
                 av[i] = a.value
@@ -2715,7 +2714,7 @@ CODE
       def #{f}(dist)
         @engine._context("#{f}") do
           requires_edges
-          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :#{f}, @engine._prep_value(dist)))
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :#{f}, @engine._make_value(dist)))
         end
       end
 CODE
@@ -2999,6 +2998,10 @@ CODE
     #   @li @b projection_limits(min, max) or projection_limits(min .. max) @/b:
     #         this option makes the check only consider edge pairs whose projected length on
     #         each other is more or equal than min and less than max @/li
+    #   @li @b projecting (in condition) @/b: This specification is equivalent to "projection_limits"
+    #         but is more intuitive, as "projecting" is written with a condition, like
+    #         "projecting < 2.um". Available operators are: "==", "<", "<=", ">" and ">=". 
+    #         Double-bounded ranges are also available, like: "0.5 <= projecting < 2.0".
     #   @li @b transparent @/b: performs the check without shielding (polygon layers only) @/li
     #   @li @b shielded @/b: performs the check with shielding (polygon layers only) @/li
     # @/ul
@@ -3333,13 +3336,12 @@ CODE
             elsif a.is_a?(DRCLayer)
               other = a
             elsif a.is_a?(DRCProjectionLimits)
-              minp = @engine._prep_value(a.min)
-              maxp = @engine._prep_value(a.max)
+              (minp, maxp) = a.get_limits(@engine)
             elsif a.is_a?(DRCShielded)
               shielded = a.value
             elsif a.is_a?(Float) || a.is_a?(1.class)
               value && raise("Value already specified")
-              value = @engine._prep_value(a)
+              value = @engine._make_value(a)
             else
               raise("Parameter #" + n.to_s + " does not have an expected type")
             end
@@ -3542,7 +3544,7 @@ CODE
           values = []
           args.each do |a|
             if a.is_a?(1.class) || a.is_a?(Float)
-              v = @engine._prep_value(a)
+              v = @engine._make_value(a)
               v.abs > dist && dist = v.abs 
               values.push(v)
             elsif a.is_a?(DRCSizingMode)

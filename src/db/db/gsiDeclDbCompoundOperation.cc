@@ -496,6 +496,12 @@ static db::CompoundRegionOperationNode *new_bbox_filter (db::CompoundRegionOpera
   return new db::CompoundRegionFilterOperationNode (new db::RegionBBoxFilter (vmin, vmax, inverse, parameter), input, true);
 }
 
+static db::CompoundRegionOperationNode *new_ratio_filter (db::CompoundRegionOperationNode *input, db::RegionRatioFilter::parameter_type parameter, bool inverse, double vmin, bool vmin_included, double vmax, bool vmax_included)
+{
+  check_non_null (input, "input");
+  return new db::CompoundRegionFilterOperationNode (new db::RegionRatioFilter (vmin, vmin_included, vmax, vmax_included, inverse, parameter), input, true);
+}
+
 static db::CompoundRegionOperationNode *new_start_segments (db::CompoundRegionOperationNode *input, db::Edges::length_type length, double fraction)
 {
   check_non_null (input, "input");
@@ -662,6 +668,11 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
     "@brief Creates a node filtering the input by bounding box parameters.\n"
     "This node renders the input if the specified bounding box parameter of the input shape is between pmin and pmax (exclusively). If 'inverse' is set to true, the "
     "input shape is returned if the parameter is less than pmin (exclusively) or larger than pmax (inclusively)."
+  ) +
+  gsi::constructor ("new_ratio_filter", &new_ratio_filter, gsi::arg ("input"), gsi::arg ("parameter"), gsi::arg ("inverse", false), gsi::arg ("pmin", 0.0), gsi::arg ("pmin_included"), gsi::arg ("pmax", std::numeric_limits<double>::max (), "max"), gsi::arg ("pmax_included", true),
+    "@brief Creates a node filtering the input by ratio parameters.\n"
+    "This node renders the input if the specified ratio parameter of the input shape is between pmin and pmax. If 'pmin_included' is true, the range will include pmin. Same for 'pmax_included' and pmax. "
+    "If 'inverse' is set to true, the input shape is returned if the parameter is not within the specified range."
   ) +
   gsi::constructor ("new_rectilinear_filter", &new_rectilinear_filter, gsi::arg ("input"), gsi::arg ("inverse", false),
     "@brief Creates a node filtering the input for rectilinear shapes (or non-rectilinear ones with 'inverse' set to 'true').\n"
@@ -847,6 +858,21 @@ gsi::EnumIn<db::CompoundRegionOperationNode, db::RegionBBoxFilter::parameter_typ
     "@brief Measures the average of width and height of the bounding box\n"
   ),
   "@brief This class represents the parameter type enum used in \\CompoundRegionOperationNode#new_bbox_filter\n"
+  "\n"
+  "This enum has been introduced in version 0.27."
+);
+
+gsi::EnumIn<db::CompoundRegionOperationNode, db::RegionRatioFilter::parameter_type> decl_dbRegionRatioFilter_ParameterType ("db", "ParameterType",
+  gsi::enum_const ("AreaRatio", db::RegionRatioFilter::AreaRatio,
+    "@brief Measures the area ratio (bounding box area / polygon area)\n"
+  ) +
+  gsi::enum_const ("AspectRatio", db::RegionRatioFilter::AspectRatio,
+    "@brief Measures the aspect ratio of the bounding box (larger / smaller dimension)\n"
+  ) +
+  gsi::enum_const ("RelativeHeight", db::RegionRatioFilter::RelativeHeight,
+    "@brief Measures the relative height (height / width)\n"
+  ),
+  "@brief This class represents the parameter type enum used in \\CompoundRegionOperationNode#new_ratio_filter\n"
   "\n"
   "This enum has been introduced in version 0.27."
 );

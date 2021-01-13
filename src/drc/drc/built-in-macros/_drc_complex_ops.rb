@@ -29,6 +29,8 @@ module DRC
 # @ul
 # @li \global#angle @/li
 # @li \global#area @/li
+# @li \global#area_ratio @/li
+# @li \global#bbox_area_ratio @/li
 # @li \global#bbox_height @/li
 # @li \global#bbox_max @/li
 # @li \global#bbox_min @/li
@@ -60,6 +62,7 @@ module DRC
 # @li \global#primary @/li
 # @li \global#rectangles @/li
 # @li \global#rectilinear @/li
+# @li \global#relative_height @/li
 # @li \global#rounded_corners @/li
 # @li \global#secondary @/li
 # @li \global#separation @/li
@@ -67,6 +70,7 @@ module DRC
 # @li \global#sized @/li
 # @li \global#smoothed @/li
 # @li \global#space @/li
+# @li \global#squares @/li
 # @li \global#width @/li
 # @/ul
 # 
@@ -269,7 +273,7 @@ CODE
   
   # %DRC%
   # @name perimeter
-  # @brief Selects the primary shape if the perimeter is meeting the condition
+  # @brief Selects the input polygon if the perimeter is meeting the condition
   # @synopsis expression.perimeter (in condition)
   #
   # This operation is used in conditions to select shapes based on their perimeter.
@@ -294,7 +298,7 @@ CODE
   
   # %DRC%
   # @name bbox_min
-  # @brief Selects the primary shape if its bounding box smaller dimension is meeting the condition
+  # @brief Selects the input polygon if its bounding box smaller dimension is meeting the condition
   # @synopsis expression.bbox_min (in condition)
   #
   # This operation is used in conditions to select shapes based on smaller dimension of their bounding boxes.
@@ -320,7 +324,7 @@ CODE
   
   # %DRC%
   # @name bbox_max
-  # @brief Selects the primary shape if its bounding box larger dimension is meeting the condition
+  # @brief Selects the input polygon if its bounding box larger dimension is meeting the condition
   # @synopsis expression.bbox_max (in condition)
   # 
   # This operation acts similar to \DRC#bbox_min, but takes the larger dimension of the shape's 
@@ -335,7 +339,7 @@ CODE
   
   # %DRC%
   # @name bbox_width
-  # @brief Selects the primary shape if its bounding box width is meeting the condition
+  # @brief Selects the input polygon if its bounding box width is meeting the condition
   # @synopsis expression.bbox_width (in condition)
   # 
   # This operation acts similar to \DRC#bbox_min, but takes the width of the shape's 
@@ -353,7 +357,7 @@ CODE
   
   # %DRC%
   # @name bbox_height
-  # @brief Selects the primary shape if its bounding box height is meeting the condition
+  # @brief Selects the input polygon if its bounding box height is meeting the condition
   # @synopsis expression.bbox_height (in condition)
   # 
   # This operation acts similar to \DRC#bbox_min, but takes the height of the shape's 
@@ -367,6 +371,95 @@ CODE
 
   def bbox_height
     DRCOpNodeBBoxParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::ParameterType::BoxHeight, self)
+  end
+  
+  # %DRC%
+  # @name bbox_aspect_ratio
+  # @brief Selects the input polygon according to the aspect ratio of the bounding box
+  # @synopsis expression.bbox_aspect_ratio (in condition)
+  #
+  # This operation is used in conditions to select shapes based on aspect ratios of their bounding boxes.
+  # The aspect ratio is computed by dividing the larger of width and height by the smaller of both.
+  # The aspect ratio is always larger or equal to 1. Square or square-boxed shapes have a
+  # bounding box aspect ratio of 1.
+  #
+  # This filter is applicable on polygon expressions. The result will be the input 
+  # polygon if the bounding box condition is met. 
+  #
+  # See \Layer#drc for more details about comparison specs.
+  #
+  # The following example will select all polygons whose bounding box aspect ratio is larger than 3:
+  #
+  # @code
+  # out = in.drc(bbox_aspect_ratio > 3)
+  # out = in.drc(primary.bbox_aspect_ratio > 3)   # equivalent
+  # @/code
+  #
+  # The "bbox_aspect_ratio" method is available as a plain function or as a method on \DRC## expressions.
+  # The plain function is equivalent to "primary.bbox_aspect_ratio".
+  
+  def bbox_aspect_ratio
+    DRCOpNodeRatioParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::RegionRatioFilter::AspectRatio, self)
+  end
+  
+  # %DRC%
+  # @name relative_height
+  # @brief Selects the input polygon according to the height vs. width of the bounding box
+  # @synopsis expression.relative_height (in condition)
+  #
+  # This operation is used in conditions to select shapes based on the ratio of bounding box
+  # height vs. width. The taller the shape, the larger the value. Wide polygons have a value
+  # below 1. A square has a relative height of 1.
+  #
+  # This filter is applicable on polygon expressions. The result will be the input 
+  # polygon if the condition is met.
+  #
+  # Don't use this method if you can use \bbox_aspect_ratio, because the latter is
+  # isotropic and can be used hierarchically without generating rotation variants.
+  #
+  # See \Layer#drc for more details about comparison specs.
+  #
+  # The following example will select all polygons whose relative height is larger than 3:
+  #
+  # @code
+  # out = in.drc(relative_height > 3)
+  # out = in.drc(primary.relative_height > 3)   # equivalent
+  # @/code
+  #
+  # The "relative_height" method is available as a plain function or as a method on \DRC## expressions.
+  # The plain function is equivalent to "primary.bbox_aspect_ratio".
+  
+  def relative_height
+    DRCOpNodeRatioParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::RegionRatioFilter::RelativeHeight, self)
+  end
+  
+  # %DRC%
+  # @name area_ratio
+  # @brief Selects the input polygon according to its area ratio (bounding box area by polygon area)
+  # @synopsis expression.area_ratio (in condition)
+  #
+  # This operation is used in conditions to select shapes based on their area ratio.
+  # The area ratio is the ratio of bounding box vs. polygon area. It's a measure how
+  # "sparse" the polygons are and how good an approximation the bounding box is. 
+  # The value is always larger or equal than 1. Boxes have a value of 1.
+  #
+  # This filter is applicable on polygon expressions. The result will be the input 
+  # polygon if the condition is met.
+  #
+  # See \Layer#drc for more details about comparison specs.
+  #
+  # The following example will select all polygons whose area ratio is larger than 3:
+  #
+  # @code
+  # out = in.drc(area_ratio > 3)
+  # out = in.drc(primary.area_ratio > 3)   # equivalent
+  # @/code
+  #
+  # The "area_ratio" method is available as a plain function or as a method on \DRC## expressions.
+  # The plain function is equivalent to "primary.area_ratio".
+  
+  def area_ratio
+    DRCOpNodeRatioParameterFilter::new(@engine, RBA::CompoundRegionOperationNode::RegionRatioFilter::AreaRatio, self)
   end
   
   # %DRC%
@@ -627,7 +720,25 @@ CODE
   # @/code
   
   def rectangles
-    return DRCOpNodeFilter::new(@engine, self, :new_rectangle_filter, "rectangle")
+    return DRCOpNodeFilter::new(@engine, self, :new_rectangle_filter, "rectangle", false)
+  end
+  
+  # %DRC%
+  # @name squares
+  # @brief Selects all polygons which are squares
+  # @synopsis expression.squares
+  #
+  # This operation can be used as a plain function in which case it acts on primary
+  # shapes or can be used as method on another DRC expression.
+  # The following example selects all squares:
+  #
+  # @code
+  # out = in.drc(squares)
+  # out = in.drc(primary.squares)    # equivalent
+  # @/code
+  
+  def squares
+    return DRCOpNodeFilter::new(@engine, self, :new_rectangle_filter, "rectangle", true)
   end
   
   # %DRC%

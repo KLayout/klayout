@@ -499,11 +499,35 @@ CODE
     #
     # See \Layer#drc, \bbox_min and \DRC#bbox_min for more details.
     
+    # %DRC%
+    # @name bbox_aspect_ratio
+    # @brief Selects primary shapes based on the aspect ratio of their bounding boxes
+    # @synopsis bbox_aspect_ratio (in condition)
+    #
+    # See \Layer#drc, \bbox_aspect_ratio and \DRC#bbox_aspect_ratio for more details.
+    
+    # %DRC%
+    # @name relative_height
+    # @brief Selects primary shapes based on the ratio of height and width of their bounding boxes
+    # @synopsis relative_height (in condition)
+    #
+    # See \Layer#drc, \relative_height and \DRC#relative_height for more details.
+    
+    # %DRC%
+    # @name area_ratio
+    # @brief Selects primary shapes based on the ratio of bounding box and polygon area
+    # @synopsis area_ratio (in condition)
+    #
+    # See \Layer#drc, \area_ratio and \DRC#area_ratio for more details.
+    
     %w(
       bbox_height
       bbox_max
       bbox_min
       bbox_width
+      bbox_aspect_ratio
+      area_ratio
+      relative_height
     ).each do |f|
       eval <<"CODE"
         def #{f}
@@ -585,6 +609,17 @@ CODE
     # \DRC# expressions (see \Layer#drc and \DRC#rectangles for more details).
 
     # %DRC%
+    # @name squares
+    # @brief Selects all polygons which are squares
+    # @synopsis squares
+    # @synopsis squares(layer)
+    #
+    # This function can be used with a layer argument in which case it
+    # is equivalent to "layer.squares" (see \Layer#squares). Without a layer
+    # argument, "squares" represents the rectangles filter for primary shapes in 
+    # \DRC# expressions (see \Layer#drc and \DRC#squares for more details).
+
+    # %DRC%
     # @name rectilinear
     # @brief Selects all polygons which are rectilinear
     # @synopsis rectilinear
@@ -623,6 +658,7 @@ CODE
       odd_polygons
       perimeter
       rectangles
+      squares
       rectilinear
       length
       angle

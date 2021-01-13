@@ -518,6 +518,106 @@ CODE
     end
     
     # %DRC%
+    # @name with_bbox_aspect_ratio
+    # @brief Selects polygons by the aspect ratio of their bounding box
+    # @synopsis layer.with_bbox_aspect_ratio(min .. max)
+    # @synopsis layer.with_bbox_aspect_ratio(value)
+    # @synopsis layer.with_bbox_aspect_ratio(min, max)
+    # The method selects polygons similar to \with_area or \with_perimeter.
+    # However, the measured value is the aspect ratio of the bounding 
+    # box. It is the larger dimensions divided by the smaller one.
+    # The "thinner" the polygon, the larger the aspect ratio. A square
+    # bounding box gives an aspect ratio of 1. 
+    #
+    # This method is available for polygon layers only.
+
+    # %DRC%
+    # @name without_bbox_height
+    # @brief Selects polygons by the aspect ratio of their bounding box
+    # @synopsis layer.without_bbox_aspect_ratio(min .. max)
+    # @synopsis layer.without_bbox_aspect_ratio(value)
+    # @synopsis layer.without_bbox_aspect_ratio(min, max)
+    # The method provides the opposite filter for \with_bbox_aspect_ratio.
+    #
+    # This method is available for polygon layers only.
+    
+    # %DRC%
+    # @name with_area_ratio
+    # @brief Selects polygons by the ratio of the bounding box area vs. polygon area
+    # @synopsis layer.with_area_ratio(min .. max)
+    # @synopsis layer.with_area_ratio(value)
+    # @synopsis layer.with_area_ratio(min, max)
+    # The area ratio is a measure how far a polygon is approximated by it's
+    # bounding box. The value is always larger or equal to 1. Boxes have a 
+    # area ratio of 1. Larger values mean more empty area inside the bounding box.
+    # 
+    # This method is available for polygon layers only.
+
+    # %DRC%
+    # @name without_area_ratio
+    # @brief Selects polygons by the aspect ratio of their bounding box
+    # @synopsis layer.without_area_ratio(min .. max)
+    # @synopsis layer.without_area_ratio(value)
+    # @synopsis layer.without_area_ratio(min, max)
+    # The method provides the opposite filter for \with_area_ratio.
+    #
+    # This method is available for polygon layers only.
+    
+    # %DRC%
+    # @name with_relative_height
+    # @brief Selects polygons by the ratio of the height vs. width of it's bounding box
+    # @synopsis layer.with_relative_height(min .. max)
+    # @synopsis layer.with_relative_height(value)
+    # @synopsis layer.with_relative_height(min, max)
+    # The relative height is a measure how tall a polygon is. Tall polygons
+    # have values larger than 1, wide polygons have a value smaller than 1.
+    # Squares have a value of 1.
+    #
+    # Don't use this method when you can use \with_area_ratio, which provides a 
+    # similar measure but is isotropic. 
+    # 
+    # This method is available for polygon layers only.
+
+    # %DRC%
+    # @name without_relative_height
+    # @brief Selects polygons by the ratio of the height vs. width
+    # @synopsis layer.without_relative_height(min .. max)
+    # @synopsis layer.without_relative_height(value)
+    # @synopsis layer.without_relative_height(min, max)
+    # The method provides the opposite filter for \with_relative_height.
+    #
+    # This method is available for polygon layers only.
+    
+    %w(area_ratio bbox_aspect_ratio relative_height).each do |f|
+      [true, false].each do |inv|
+        mn = (inv ? "without" : "with") + "_" + f
+        eval <<"CODE"
+        def #{mn}(*args)
+
+          @engine._context("#{mn}") do
+
+            requires_region
+            if args.size == 1
+              a = args[0]
+              if a.is_a?(Range)
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._prep_value(a.first), @engine._make_numeric_value(a.last), #{inv.inspect}))
+              else
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._prep_value(a), #{inv.inspect}))
+              end
+            elsif args.size == 2
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._prep_value(args[0]), @engine._make_numeric_value(args[1]), #{inv.inspect}))
+            else
+              raise("Invalid number of arguments (1 or 2 expected)")
+            end
+
+          end
+
+        end
+CODE
+      end
+    end
+    
+    # %DRC%
     # @name with_length
     # @brief Selects edges by their length
     # @synopsis layer.with_length(min .. max)
@@ -2332,12 +2432,21 @@ CODE
     
     # %DRC%
     # @name rectangles
-    # @brief Selects all rectangle polygons from the input
+    # @brief Selects all rectangles from the input
     # @synopsis layer.rectangles
     #
     # This method is available for polygon layers. By default "merged" semantics applies, 
     # i.e. all polygons are merged before rectangles are selected (see \clean and \raw).
     # \non_rectangles will select all non-rectangles.
+
+    # %DRC%
+    # @name squares
+    # @brief Selects all squares from the input
+    # @synopsis layer.squares
+    #
+    # This method is available for polygon layers. By default "merged" semantics applies, 
+    # i.e. all polygons are merged before squares are selected (see \clean and \raw).
+    # \non_squares will select all non-rectangles.
 
     # %DRC%
     # @name rectilinear
@@ -2347,6 +2456,14 @@ CODE
     # This method is available for polygon layers. By default "merged" semantics applies, 
     # i.e. all polygons are merged before rectilinear polygons are selected (see \clean and \raw).
     # \non_rectilinear will select all non-rectangles.
+    
+    # %DRC%
+    # @name non_squares
+    # @brief Selects all polygons from the input which are not squares
+    # @synopsis layer.non_rectangles
+    #
+    # This method is available for polygon layers. By default "merged" semantics applies, 
+    # i.e. all polygons are merged before non-squares are selected (see \clean and \raw).
     
     # %DRC%
     # @name non_rectangles
@@ -2400,7 +2517,7 @@ CODE
     #   @/tr
     # @/table
 
-    %w(rectangles rectilinear non_rectangles non_rectilinear
+    %w(rectangles rectilinear non_rectangles non_rectilinear squares non_squares
        holes hulls).each do |f| 
       eval <<"CODE"
       def #{f}

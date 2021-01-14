@@ -13,7 +13,7 @@ module DRC
     # @brief Provides a generic DRC function for use with \DRC# expressions
     # @synopsis layer.drc(expression)
     #
-    # This method implement the universal DRC which offers enhanced abilities,
+    # This method implements the universal DRC which offers enhanced abilities,
     # improved performance in some applications and better readability.
     #
     # The key concept for this method are DRC expressions. DRC expressions
@@ -56,7 +56,7 @@ module DRC
     # @h3 Checks @/h3
     #
     # Here is an example for a generic DRC operation which performs a width
-    # check for less than 0.5.um on the primary shapes. It uses the \global#width operator:
+    # check for less than 0.5.um on the primary shapes. It uses the "\global#width" operator:
     #
     # @code
     # out = in.drc(width < 0.5.um)
@@ -72,8 +72,8 @@ module DRC
     # out = in.drc(0.2.um < width < 0.5.um)
     # @/code
     #
-    # To specify the second input for a two-layer check, specify it in brackets in 
-    # the check function. This example shows how to use a two-layer separation check (\global#separation):
+    # To specify the second input for a two-layer check, add it to 
+    # the check function. This example shows how to use a two-layer separation check ("\global#separation"):
     #
     # @code
     # l1 = input(1, 0)
@@ -83,11 +83,11 @@ module DRC
     #
     # The second input of this check function can be a computed expression. In this
     # case the local loop will first evaluate the expression for the second input and
-    # then use the result for second input in the check. Note that this computation is
+    # then use the result as second input in the check. Note that this computation is
     # performed locally and separately for each primary and its context.
     #
     # Options for the checks are also specified inside the brackets. For example,
-    # to specify projection metrics ("projection") for width use:
+    # to select projection metrics ("projection") for the "width" check use:
     #
     # @code 
     # out = in.drc(width(projection) < 0.5.um)
@@ -129,11 +129,11 @@ module DRC
     # methods are provided:
     #
     # @ul
-    # @li \DRC#polygons: converts edge pairs to polygons @/li
-    # @li \DRC#extended, \DRC#extended_in, \DRC#extended_out: converts edges to polygons @/li
-    # @li \DRC#first_edges, \DRC#second_edges: extracts edges from edge pairs @/li
-    # @li \DRC#edges: decomposes edge pairs and polygons into edges @/li
-    # @li \DRC#corners: can extract corners from polygons @/li
+    # @li "\DRC#polygons": converts edge pairs to polygons @/li
+    # @li "\DRC#extended", "\DRC#extended_in", "\DRC#extended_out": converts edges to polygons @/li
+    # @li "\DRC#first_edges", \DRC#second_edges": extracts edges from edge pairs @/li
+    # @li "\DRC#edges": decomposes edge pairs and polygons into edges @/li
+    # @li "\DRC#corners": can extract corners from polygons @/li
     # @/ul
     #
     # The following example decomposes the primary polygons into edges:
@@ -174,8 +174,8 @@ module DRC
     #
     # @ul
     # @li Edge vs. edge and edge vs. polygon booleans @/li
-    # @li Edge vs. polygon interactions (\DRC#interacting, \DRC#overlapping) @/li
-    # @li Edge sampling (\DRC#start_segments, \DRC#centers, \DRC#end_segments) @/li
+    # @li Edge vs. polygon interactions ("\DRC#interacting", "\DRC#overlapping") @/li
+    # @li Edge sampling ("\DRC#start_segments", "\DRC#centers", "\DRC#end_segments") @/li
     # @/ul
     #
     # @h3 Filters @/h3
@@ -384,7 +384,7 @@ module DRC
     # writing DRC expressions, are more efficient and open new opportunities. DRC
     # development is likely to focus on this scheme in the future.
     #
-    # More formal details about the bits and pieces can be found in the \DRC# class documentation.
+    # More formal details about the bits and pieces can be found in the "\DRC" class documentation.
 
     def drc(op)
       @engine._context("drc") do
@@ -901,77 +901,55 @@ CODE
     # %DRC%
     # @name covering
     # @brief Selects shapes entirely covering other shapes
-    # @synopsis covering(other) (in conditions)
+    # @synopsis covering(other) (optionally in condition)
     #
-    # This method represents the selector of primary shapes
+    # This operator represents the selector of primary shapes
     # which entirely cover shapes from the other layer. This version can be put into
     # a condition indicating how many shapes of the other layer need to be covered.
-    # Use this variant within \DRC# expressions (also see \Layer#drc).
-    #
-    # For example, the following statement selects all input shapes which entirely 
-    # cover shapes from the "other" layer:
-    #
-    # @code
-    # out = in.drc(covering(other))
-    # @/code
-    #
-    # This example selects all input shapes which entire cover shapes from
-    # the other layer and there are more than two shapes from "other" inside
-    # primary shapes:
-    #
-    # @code
-    # out = in.drc(covering(other) > 2)
-    # @/code
+    # Use this operator within \DRC# expressions (also see \Layer#drc). If can be used
+    # as method to an expression. See there for more details: \DRC#covering.
 
     # %DRC%
     # @name interacting
     # @brief Selects shapes interacting with other shapes
-    # @synopsis interacting(other) (in conditions)
+    # @synopsis interacting(other) (optionally in condition)
     #
-    # See \covering for a description of the use cases for this function. 
-    # When using "interacting", shapes are selected when the interact (overlap, touch)
-    # shapes from the other layer.
-    # 
-    # When using this method with a count, the operation may not render 
-    # the correct results if the other input is not merged. By nature of the
-    # generic DRC feature, only those shapes that interact with the primary shape
-    # will be selected. If the other input is split into multiple polygons,
-    # not all components may be captured and the computed interaction count
-    # may be incorrect.
+    # This operator represents the selector of primary shapes
+    # which interact with shapes from the other layer. This version can be put into
+    # a condition indicating how many shapes of the other layer need to be covered.
+    # Use this operator within \DRC# expressions (also see \Layer#drc). If can be used
+    # as method to an expression. See there for more details: \DRC#interacting.
     
     # %DRC%
     # @name overlapping
     # @brief Selects shapes overlapping with other shapes
-    # @synopsis overlapping(other) (in conditions)
+    # @synopsis overlapping(other) (optionally in condition)
     #
-    # See \covering for a description of the use cases for this function. 
-    # When using "overlapping", shapes are selected when the overlap
-    # shapes from the other layer.
-    #
-    # When using this method with a count, the operation may not render 
-    # the correct results if the other input is not merged. By nature of the
-    # generic DRC feature, only those shapes that interact with the primary shape
-    # will be selected. If the other input is split into multiple polygons,
-    # not all components may be captured and the computed interaction count
-    # may be incorrect.
+    # This operator represents the selector of primary shapes
+    # which overlap shapes from the other layer. This version can be put into
+    # a condition indicating how many shapes of the other layer need to be covered.
+    # Use this operator within \DRC# expressions (also see \Layer#drc). If can be used
+    # as method to an expression. See there for more details: \DRC#overlapping.
     
     # %DRC%
     # @name inside
     # @brief Selects shapes entirely inside other shapes
     # @synopsis inside(other)
     #
-    # This method represents the selector of primary shapes
-    # which are entirely inside shapes from the other layer. 
-    # Use this variant within \DRC# expressions (also see \Layer#drc).
+    # This operator represents the selector of primary shapes
+    # which are inside shapes from the other layer. 
+    # Use this operator within \DRC# expressions (also see \Layer#drc). If can be used
+    # as method to an expression. See there for more details: \DRC#inside.
     
     # %DRC%
     # @name outside
     # @brief Selects shapes entirely outside other shapes
     # @synopsis outside(other)
     #
-    # This method represents the selector of primary shapes
-    # which are entirely outside shapes from the other layer. 
-    # Use this variant within \DRC# expressions (also see \Layer#drc).
+    # This operator represents the selector of primary shapes
+    # which are outside shapes from the other layer. 
+    # Use this operator within \DRC# expressions (also see \Layer#drc). If can be used
+    # as method to an expression. See there for more details: \DRC#outside.
     
     %w(
       covering

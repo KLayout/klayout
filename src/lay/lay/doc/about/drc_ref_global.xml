@@ -355,28 +355,14 @@ applied to coners meeting a particular angle constraint.
 <keyword name="covering"/>
 <p>Usage:</p>
 <ul>
-<li><tt>covering(other) (in conditions)</tt></li>
+<li><tt>covering(other) (optionally in condition)</tt></li>
 </ul>
 <p>
-This method represents the selector of primary shapes
+This operator represents the selector of primary shapes
 which entirely cover shapes from the other layer. This version can be put into
 a condition indicating how many shapes of the other layer need to be covered.
-Use this variant within <a href="/about/drc_ref_drc.xml">DRC</a> expressions (also see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>).
-</p><p>
-For example, the following statement selects all input shapes which entirely 
-cover shapes from the "other" layer:
-</p><p>
-<pre>
-out = in.drc(covering(other))
-</pre>
-</p><p>
-This example selects all input shapes which entire cover shapes from
-the other layer and there are more than two shapes from "other" inside
-primary shapes:
-</p><p>
-<pre>
-out = in.drc(covering(other) &gt; 2)
-</pre>
+Use this operator within <a href="/about/drc_ref_drc.xml">DRC</a> expressions (also see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>). If can be used
+as method to an expression. See there for more details: <a href="/about/drc_ref_drc.xml#covering">DRC#covering</a>.
 </p>
 <a name="dbu"/><h2>"dbu" - Gets or sets the database unit to use</h2>
 <keyword name="dbu"/>
@@ -750,27 +736,23 @@ this method.
 <li><tt>inside(other)</tt></li>
 </ul>
 <p>
-This method represents the selector of primary shapes
-which are entirely inside shapes from the other layer. 
-Use this variant within <a href="/about/drc_ref_drc.xml">DRC</a> expressions (also see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>).
+This operator represents the selector of primary shapes
+which are inside shapes from the other layer. 
+Use this operator within <a href="/about/drc_ref_drc.xml">DRC</a> expressions (also see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>). If can be used
+as method to an expression. See there for more details: <a href="/about/drc_ref_drc.xml#inside">DRC#inside</a>.
 </p>
 <a name="interacting"/><h2>"interacting" - Selects shapes interacting with other shapes</h2>
 <keyword name="interacting"/>
 <p>Usage:</p>
 <ul>
-<li><tt>interacting(other) (in conditions)</tt></li>
+<li><tt>interacting(other) (optionally in condition)</tt></li>
 </ul>
 <p>
-See <a href="#covering">covering</a> for a description of the use cases for this function. 
-When using "interacting", shapes are selected when the interact (overlap, touch)
-shapes from the other layer.
-</p><p>
-When using this method with a count, the operation may not render 
-the correct results if the other input is not merged. By nature of the
-generic DRC feature, only those shapes that interact with the primary shape
-will be selected. If the other input is split into multiple polygons,
-not all components may be captured and the computed interaction count
-may be incorrect.
+This operator represents the selector of primary shapes
+which interact with shapes from the other layer. This version can be put into
+a condition indicating how many shapes of the other layer need to be covered.
+Use this operator within <a href="/about/drc_ref_drc.xml">DRC</a> expressions (also see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>). If can be used
+as method to an expression. See there for more details: <a href="/about/drc_ref_drc.xml#interacting">DRC#interacting</a>.
 </p>
 <a name="is_deep?"/><h2>"is_deep?" - Returns true, if in deep mode</h2>
 <keyword name="is_deep?"/>
@@ -1059,9 +1041,10 @@ layout if is report database.
 <li><tt>outside(other)</tt></li>
 </ul>
 <p>
-This method represents the selector of primary shapes
-which are entirely outside shapes from the other layer. 
-Use this variant within <a href="/about/drc_ref_drc.xml">DRC</a> expressions (also see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>).
+This operator represents the selector of primary shapes
+which are outside shapes from the other layer. 
+Use this operator within <a href="/about/drc_ref_drc.xml">DRC</a> expressions (also see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>). If can be used
+as method to an expression. See there for more details: <a href="/about/drc_ref_drc.xml#outside">DRC#outside</a>.
 </p>
 <a name="overlap"/><h2>"overlap" - Performs an overlap check</h2>
 <keyword name="overlap"/>
@@ -1078,19 +1061,14 @@ function provides a two-layer check. See there for details how to use this funct
 <keyword name="overlapping"/>
 <p>Usage:</p>
 <ul>
-<li><tt>overlapping(other) (in conditions)</tt></li>
+<li><tt>overlapping(other) (optionally in condition)</tt></li>
 </ul>
 <p>
-See <a href="#covering">covering</a> for a description of the use cases for this function. 
-When using "overlapping", shapes are selected when the overlap
-shapes from the other layer.
-</p><p>
-When using this method with a count, the operation may not render 
-the correct results if the other input is not merged. By nature of the
-generic DRC feature, only those shapes that interact with the primary shape
-will be selected. If the other input is split into multiple polygons,
-not all components may be captured and the computed interaction count
-may be incorrect.
+This operator represents the selector of primary shapes
+which overlap shapes from the other layer. This version can be put into
+a condition indicating how many shapes of the other layer need to be covered.
+Use this operator within <a href="/about/drc_ref_drc.xml">DRC</a> expressions (also see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>). If can be used
+as method to an expression. See there for more details: <a href="/about/drc_ref_drc.xml#overlapping">DRC#overlapping</a>.
 </p>
 <a name="p"/><h2>"p" - Creates a point object</h2>
 <keyword name="p"/>

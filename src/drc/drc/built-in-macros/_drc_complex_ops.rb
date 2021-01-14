@@ -1125,7 +1125,7 @@ CODE
   # %DRC%
   # @name first_edges
   # @brief Returns the first edges of edge pairs
-  # @synopsis expression.extents([ enlargement ])
+  # @synopsis expression.first_edges
   # 
   # This method acts on edge pair expressions and returns the first edges of the
   # edge pairs delivered by the expression.
@@ -1133,7 +1133,7 @@ CODE
   # %DRC%
   # @name second_edges
   # @brief Returns the second edges of edge pairs
-  # @synopsis expression.extents([ enlargement ])
+  # @synopsis expression.second_edges
   # 
   # This method acts on edge pair expressions and returns the second edges of the
   # edge pairs delivered by the expression.
@@ -1294,6 +1294,86 @@ CODE
     end
   end
   
+  # %DRC%
+  # @name covering
+  # @brief Selects shapes entirely covering other shapes
+  # @synopsis expression.covering(other) (optionally in conditions)
+  # @synopsis covering(other) (optionally in conditions)
+  #
+  # This method represents the selector of primary shapes
+  # which entirely cover shapes from the other layer. This version can be put into
+  # a condition indicating how many shapes of the other layer need to be covered.
+  # Use this variant within \DRC# expressions (also see \Layer#drc).
+  #
+  # For example, the following statement selects all input shapes which entirely 
+  # cover shapes from the "other" layer:
+  #
+  # @code
+  # out = in.drc(covering(other))
+  # @/code
+  #
+  # This example selects all input shapes which entire cover shapes from
+  # the other layer and there are more than two shapes from "other" inside
+  # primary shapes:
+  #
+  # @code
+  # out = in.drc(covering(other) > 2)
+  # @/code
+
+  # %DRC%
+  # @name interacting
+  # @brief Selects shapes interacting with other shapes
+  # @synopsis expression.interacting(other) (optionally in conditions)
+  # @synopsis interacting(other) (optionally in conditions)
+  #
+  # See \covering for a description of the use cases for this function. 
+  # When using "interacting", shapes are selected when the interact (overlap, touch)
+  # shapes from the other layer.
+  # 
+  # When using this method with a count, the operation may not render 
+  # the correct results if the other input is not merged. By nature of the
+  # generic DRC feature, only those shapes that interact with the primary shape
+  # will be selected. If the other input is split into multiple polygons,
+  # not all components may be captured and the computed interaction count
+  # may be incorrect.
+  
+  # %DRC%
+  # @name overlapping
+  # @brief Selects shapes overlapping with other shapes
+  # @synopsis expression.overlapping(other) (optionally in conditions)
+  # @synopsis overlapping(other) (optionally in conditions)
+  #
+  # See \covering for a description of the use cases for this function. 
+  # When using "overlapping", shapes are selected when the overlap
+  # shapes from the other layer.
+  #
+  # When using this method with a count, the operation may not render 
+  # the correct results if the other input is not merged. By nature of the
+  # generic DRC feature, only those shapes that interact with the primary shape
+  # will be selected. If the other input is split into multiple polygons,
+  # not all components may be captured and the computed interaction count
+  # may be incorrect.
+  
+  # %DRC%
+  # @name inside
+  # @brief Selects shapes entirely inside other shapes
+  # @synopsis expression.inside(other)
+  # @synopsis inside(other)
+  #
+  # This method represents the selector of primary shapes
+  # which are entirely inside shapes from the other layer. 
+  # Use this variant within \DRC# expressions (also see \Layer#drc).
+  
+  # %DRC%
+  # @name outside
+  # @brief Selects shapes entirely outside other shapes
+  # @synopsis expression.outside(other)
+  # @synopsis outside(other)
+  #
+  # This method represents the selector of primary shapes
+  # which are entirely outside shapes from the other layer. 
+  # Use this variant within \DRC# expressions (also see \Layer#drc).
+    
   %w(covering overlapping interacting).each do |f|
     eval <<"CODE"
       def #{f}(other)

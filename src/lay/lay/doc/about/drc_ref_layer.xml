@@ -327,7 +327,7 @@ of the layer's data.
 <li><tt>layer.drc(expression)</tt></li>
 </ul>
 <p>
-This method implement the universal DRC which offers enhanced abilities,
+This method implements the universal DRC which offers enhanced abilities,
 improved performance in some applications and better readability.
 </p><p>
 The key concept for this method are DRC expressions. DRC expressions
@@ -370,7 +370,7 @@ using measurement operations like "area" on secondary polygons.
 <h3>Checks </h3>
 </p><p>
 Here is an example for a generic DRC operation which performs a width
-check for less than 0.5.um on the primary shapes. It uses the <a href="/about/drc_ref_global.xml#width">width</a> operator:
+check for less than 0.5.um on the primary shapes. It uses the "<a href="/about/drc_ref_global.xml#width">width</a>" operator:
 </p><p>
 <pre>
 out = in.drc(width &lt; 0.5.um)
@@ -386,8 +386,8 @@ out = in.drc(width != 0.5.um)
 out = in.drc(0.2.um &lt; width &lt; 0.5.um)
 </pre>
 </p><p>
-To specify the second input for a two-layer check, specify it in brackets in 
-the check function. This example shows how to use a two-layer separation check (<a href="/about/drc_ref_global.xml#separation">separation</a>):
+To specify the second input for a two-layer check, add it to 
+the check function. This example shows how to use a two-layer separation check ("<a href="/about/drc_ref_global.xml#separation">separation</a>"):
 </p><p>
 <pre>
 l1 = input(1, 0)
@@ -397,11 +397,11 @@ out = l1.drc(separation(l2) &lt; 0.5.um)
 </p><p>
 The second input of this check function can be a computed expression. In this
 case the local loop will first evaluate the expression for the second input and
-then use the result for second input in the check. Note that this computation is
+then use the result as second input in the check. Note that this computation is
 performed locally and separately for each primary and its context.
 </p><p>
 Options for the checks are also specified inside the brackets. For example,
-to specify projection metrics ("projection") for width use:
+to select projection metrics ("projection") for the "width" check use:
 </p><p>
 <pre>
 out = in.drc(width(projection) &lt; 0.5.um)
@@ -442,11 +442,11 @@ For the conversion of edges, edge pairs and polygons into other types, these
 methods are provided:
 </p><p>
 <ul>
-<li><a href="/about/drc_ref_drc.xml#polygons:">DRC#polygons:</a> converts edge pairs to polygons </li>
-<li><a href="/about/drc_ref_drc.xml#extended">DRC#extended</a>, <a href="/about/drc_ref_drc.xml#extended_in">DRC#extended_in</a>, <a href="/about/drc_ref_drc.xml#extended_out:">DRC#extended_out:</a> converts edges to polygons </li>
-<li><a href="/about/drc_ref_drc.xml#first_edges">DRC#first_edges</a>, <a href="/about/drc_ref_drc.xml#second_edges:">DRC#second_edges:</a> extracts edges from edge pairs </li>
-<li><a href="/about/drc_ref_drc.xml#edges:">DRC#edges:</a> decomposes edge pairs and polygons into edges </li>
-<li><a href="/about/drc_ref_drc.xml#corners:">DRC#corners:</a> can extract corners from polygons </li>
+<li>"<a href="/about/drc_ref_drc.xml#polygons">DRC#polygons</a>": converts edge pairs to polygons </li>
+<li>"<a href="/about/drc_ref_drc.xml#extended">DRC#extended</a>", "<a href="/about/drc_ref_drc.xml#extended_in">DRC#extended_in</a>", "<a href="/about/drc_ref_drc.xml#extended_out">DRC#extended_out</a>": converts edges to polygons </li>
+<li>"<a href="/about/drc_ref_drc.xml#first_edges">DRC#first_edges</a>", <a href="/about/drc_ref_drc.xml#second_edges">DRC#second_edges</a>": extracts edges from edge pairs </li>
+<li>"<a href="/about/drc_ref_drc.xml#edges">DRC#edges</a>": decomposes edge pairs and polygons into edges </li>
+<li>"<a href="/about/drc_ref_drc.xml#corners">DRC#corners</a>": can extract corners from polygons </li>
 </ul>
 </p><p>
 The following example decomposes the primary polygons into edges:
@@ -487,8 +487,8 @@ The "drc" framework supports the following edge and edge/polygon operations:
 </p><p>
 <ul>
 <li>Edge vs. edge and edge vs. polygon booleans </li>
-<li>Edge vs. polygon interactions (<a href="/about/drc_ref_drc.xml#interacting">DRC#interacting</a>, <a href="/about/drc_ref_drc.xml#overlapping">DRC#overlapping</a>) </li>
-<li>Edge sampling (<a href="/about/drc_ref_drc.xml#start_segments">DRC#start_segments</a>, <a href="/about/drc_ref_drc.xml#centers">DRC#centers</a>, <a href="/about/drc_ref_drc.xml#end_segments">DRC#end_segments</a>) </li>
+<li>Edge vs. polygon interactions ("<a href="/about/drc_ref_drc.xml#interacting">DRC#interacting</a>", "<a href="/about/drc_ref_drc.xml#overlapping">DRC#overlapping</a>") </li>
+<li>Edge sampling ("<a href="/about/drc_ref_drc.xml#start_segments">DRC#start_segments</a>", "<a href="/about/drc_ref_drc.xml#centers">DRC#centers</a>", "<a href="/about/drc_ref_drc.xml#end_segments">DRC#end_segments</a>") </li>
 </ul>
 </p><p>
 <h3>Filters </h3>
@@ -697,7 +697,7 @@ DRC expressions are quite rich and powerful. They provide a more intuitive way o
 writing DRC expressions, are more efficient and open new opportunities. DRC
 development is likely to focus on this scheme in the future.
 </p><p>
-More formal details about the bits and pieces can be found in the <a href="/about/drc_ref_drc.xml">DRC</a> class documentation.
+More formal details about the bits and pieces can be found in the "<a href="#DRC">DRC</a>" class documentation.
 </p>
 <a name="dup"/><h2>"dup" - Duplicates a layer</h2>
 <keyword name="dup"/>

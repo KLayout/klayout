@@ -27,51 +27,51 @@ module DRC
 # The following global functions are relevant for the DRC expressions:
 # 
 # @ul
-# @li \\global#angle @/li
-# @li \\global#area @/li
-# @li \\global#area_ratio @/li
-# @li \\global#bbox_area_ratio @/li
-# @li \\global#bbox_height @/li
-# @li \\global#bbox_max @/li
-# @li \\global#bbox_min @/li
-# @li \\global#bbox_width @/li
-# @li \\global#case @/li
-# @li \\global#corners @/li
-# @li \\global#covering @/li
-# @li \\global#enc @/li
-# @li \\global#enclosing @/li
-# @li \\global#extent_refs @/li
-# @li \\global#extents @/li
-# @li \\global#foreign @/li
-# @li \\global#holes @/li
-# @li \\global#hulls @/li
-# @li \\global#if_all @/li
-# @li \\global#if_any @/li
-# @li \\global#if_none @/li
-# @li \\global#inside @/li
-# @li \\global#interacting @/li
-# @li \\global#iso @/li
-# @li \\global#length @/li
-# @li \\global#middle @/li
-# @li \\global#notch @/li
-# @li \\global#odd_polygons @/li
-# @li \\global#outside @/li
-# @li \\global#overlap @/li
-# @li \\global#overlapping @/li
-# @li \\global#perimeter @/li
-# @li \\global#primary @/li
-# @li \\global#rectangles @/li
-# @li \\global#rectilinear @/li
-# @li \\global#relative_height @/li
-# @li \\global#rounded_corners @/li
-# @li \\global#secondary @/li
-# @li \\global#separation @/li
-# @li \\global#sep @/li
-# @li \\global#sized @/li
-# @li \\global#smoothed @/li
-# @li \\global#space @/li
-# @li \\global#squares @/li
-# @li \\global#width @/li
+# @li \global#angle @/li
+# @li \global#area @/li
+# @li \global#area_ratio @/li
+# @li \global#bbox_area_ratio @/li
+# @li \global#bbox_height @/li
+# @li \global#bbox_max @/li
+# @li \global#bbox_min @/li
+# @li \global#bbox_width @/li
+# @li \global#case @/li
+# @li \global#corners @/li
+# @li \global#covering @/li
+# @li \global#enc @/li
+# @li \global#enclosing @/li
+# @li \global#extent_refs @/li
+# @li \global#extents @/li
+# @li \global#foreign @/li
+# @li \global#holes @/li
+# @li \global#hulls @/li
+# @li \global#if_all @/li
+# @li \global#if_any @/li
+# @li \global#if_none @/li
+# @li \global#inside @/li
+# @li \global#interacting @/li
+# @li \global#iso @/li
+# @li \global#length @/li
+# @li \global#middle @/li
+# @li \global#notch @/li
+# @li \global#odd_polygons @/li
+# @li \global#outside @/li
+# @li \global#overlap @/li
+# @li \global#overlapping @/li
+# @li \global#perimeter @/li
+# @li \global#primary @/li
+# @li \global#rectangles @/li
+# @li \global#rectilinear @/li
+# @li \global#relative_height @/li
+# @li \global#rounded_corners @/li
+# @li \global#secondary @/li
+# @li \global#separation @/li
+# @li \global#sep @/li
+# @li \global#sized @/li
+# @li \global#smoothed @/li
+# @li \global#space @/li
+# @li \global#squares @/li
+# @li \global#width @/li
 # @/ul
 # 
 # The following documentation will list the methods available for DRC expression objects.
@@ -1428,7 +1428,20 @@ class DRCOpNodeCase < DRCOpNode
   end
   
   def do_create_node(cache)
-    RBA::CompoundRegionOperationNode::new_case(self.children.collect { |c| c.create_node(cache) })
+
+    nodes = self.children.collect { |c| c.create_node(cache) }
+    types = []
+    nodes.each_with_index do |a,index|
+      if index % 2 == 1
+        types << a.result_type
+      end
+    end
+    if types.sort.uniq.size > 1
+      raise("All result arguments need to have the same type (we got '" + types.collect(:to_s).join(",") + "')")
+    end
+
+    RBA::CompoundRegionOperationNode::new_case(nodes)
+
   end
 
 end

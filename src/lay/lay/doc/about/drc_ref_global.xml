@@ -165,32 +165,6 @@ The area_cap argument is the capacitance in Farad per square micrometer.
 See <class_doc href="DeviceExtractorCapacitorWithBulk">DeviceExtractorCapacitorWithBulk</class_doc> for more details
 about this extractor.
 </p>
-<a name="case"/><h2>"case" - A conditional selector for the "drc" universal DRC function</h2>
-<keyword name="case"/>
-<p>Usage:</p>
-<ul>
-<li><tt>case(...)</tt></li>
-</ul>
-<p>
-This function provides a conditional selector for the "drc" function.
-It is used this way:
-</p><p>
-<pre>
-out = in.drc(case(c1, r1, c2, r2, ..., cn, rn)
-out = in.drc(case(c1, r1, c2, r2, ..., cn, rn, rdef)
-</pre>
-</p><p>
-This function will evaluate c1 which is a universal DRC expression (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>).
-If the result is not empty, "case" will evaluate and return r1. Otherwise it
-will continue with c2 and the result of this expression is not empty it will
-return r2. Otherwise it will continue with c3/r3 etc. 
-</p><p>
-If an odd number of arguments is given, the last expression is evaluated if
-none of the conditions c1..cn gives a non-empty result.
-</p><p>
-As a requirement, the result types of all r1..rn expressions and the rdef
-needs to be the same - i.e. all need to render polygons or edges or edge pairs.
-</p>
 <a name="cell"/><h2>"cell" - Selects a cell for input on the default source</h2>
 <keyword name="cell"/>
 <p>Usage:</p>
@@ -1459,6 +1433,32 @@ This function can be used with a layer argument in which case it
 is equivalent to "layer.squares" (see <a href="/about/drc_ref_layer.xml#squares">Layer#squares</a>). Without a layer
 argument, "squares" represents the rectangles filter for primary shapes in 
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#squares">DRC#squares</a> for more details).
+</p>
+<a name="switch"/><h2>"switch" - A conditional selector for the "drc" universal DRC function</h2>
+<keyword name="switch"/>
+<p>Usage:</p>
+<ul>
+<li><tt>switch(...)</tt></li>
+</ul>
+<p>
+This function provides a conditional selector for the "drc" function.
+It is used this way:
+</p><p>
+<pre>
+out = in.drc(switch(c1, r1, c2, r2, ..., cn, rn)
+out = in.drc(switch(c1, r1, c2, r2, ..., cn, rn, rdef)
+</pre>
+</p><p>
+This function will evaluate c1 which is a universal DRC expression (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>).
+If the result is not empty, "switch" will evaluate and return r1. Otherwise it
+will continue with c2 and the result of this expression is not empty it will
+return r2. Otherwise it will continue with c3/r3 etc. 
+</p><p>
+If an odd number of arguments is given, the last expression is evaluated if
+none of the conditions c1..cn gives a non-empty result.
+</p><p>
+As a requirement, the result types of all r1..rn expressions and the rdef
+needs to be the same - i.e. all need to render polygons or edges or edge pairs.
 </p>
 <a name="target"/><h2>"target" - Specify the target layout</h2>
 <keyword name="target"/>

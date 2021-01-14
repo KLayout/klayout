@@ -28,51 +28,51 @@ out = in.drc((width &lt; 2.0).polygons)
 The following global functions are relevant for the DRC expressions:
 </p><p>
 <ul>
-<li><a href="/about/drc_ref_global.xml#angle">global#angle</a> </li>
-<li><a href="/about/drc_ref_global.xml#area">global#area</a> </li>
-<li><a href="/about/drc_ref_global.xml#area_ratio">global#area_ratio</a> </li>
-<li><a href="/about/drc_ref_global.xml#bbox_area_ratio">global#bbox_area_ratio</a> </li>
-<li><a href="/about/drc_ref_global.xml#bbox_height">global#bbox_height</a> </li>
-<li><a href="/about/drc_ref_global.xml#bbox_max">global#bbox_max</a> </li>
-<li><a href="/about/drc_ref_global.xml#bbox_min">global#bbox_min</a> </li>
-<li><a href="/about/drc_ref_global.xml#bbox_width">global#bbox_width</a> </li>
-<li><a href="/about/drc_ref_global.xml#case">global#case</a> </li>
-<li><a href="/about/drc_ref_global.xml#corners">global#corners</a> </li>
-<li><a href="/about/drc_ref_global.xml#covering">global#covering</a> </li>
-<li><a href="/about/drc_ref_global.xml#enc">global#enc</a> </li>
-<li><a href="/about/drc_ref_global.xml#enclosing">global#enclosing</a> </li>
-<li><a href="/about/drc_ref_global.xml#extent_refs">global#extent_refs</a> </li>
-<li><a href="/about/drc_ref_global.xml#extents">global#extents</a> </li>
-<li><a href="/about/drc_ref_global.xml#foreign">global#foreign</a> </li>
-<li><a href="/about/drc_ref_global.xml#holes">global#holes</a> </li>
-<li><a href="/about/drc_ref_global.xml#hulls">global#hulls</a> </li>
-<li><a href="/about/drc_ref_global.xml#if_all">global#if_all</a> </li>
-<li><a href="/about/drc_ref_global.xml#if_any">global#if_any</a> </li>
-<li><a href="/about/drc_ref_global.xml#if_none">global#if_none</a> </li>
-<li><a href="/about/drc_ref_global.xml#inside">global#inside</a> </li>
-<li><a href="/about/drc_ref_global.xml#interacting">global#interacting</a> </li>
-<li><a href="/about/drc_ref_global.xml#iso">global#iso</a> </li>
-<li><a href="/about/drc_ref_global.xml#length">global#length</a> </li>
-<li><a href="/about/drc_ref_global.xml#middle">global#middle</a> </li>
-<li><a href="/about/drc_ref_global.xml#notch">global#notch</a> </li>
-<li><a href="/about/drc_ref_global.xml#odd_polygons">global#odd_polygons</a> </li>
-<li><a href="/about/drc_ref_global.xml#outside">global#outside</a> </li>
-<li><a href="/about/drc_ref_global.xml#overlap">global#overlap</a> </li>
-<li><a href="/about/drc_ref_global.xml#overlapping">global#overlapping</a> </li>
-<li><a href="/about/drc_ref_global.xml#perimeter">global#perimeter</a> </li>
-<li><a href="/about/drc_ref_global.xml#primary">global#primary</a> </li>
-<li><a href="/about/drc_ref_global.xml#rectangles">global#rectangles</a> </li>
-<li><a href="/about/drc_ref_global.xml#rectilinear">global#rectilinear</a> </li>
-<li><a href="/about/drc_ref_global.xml#relative_height">global#relative_height</a> </li>
-<li><a href="/about/drc_ref_global.xml#rounded_corners">global#rounded_corners</a> </li>
-<li><a href="/about/drc_ref_global.xml#secondary">global#secondary</a> </li>
-<li><a href="/about/drc_ref_global.xml#separation">global#separation</a> </li>
-<li><a href="/about/drc_ref_global.xml#sep">global#sep</a> </li>
-<li><a href="/about/drc_ref_global.xml#sized">global#sized</a> </li>
-<li><a href="/about/drc_ref_global.xml#smoothed">global#smoothed</a> </li>
-<li><a href="/about/drc_ref_global.xml#space">global#space</a> </li>
-<li><a href="/about/drc_ref_global.xml#squares">global#squares</a> </li>
-<li><a href="/about/drc_ref_global.xml#width">global#width</a> </li>
+<li><a href="/about/drc_ref_global.xml#angle">angle</a> </li>
+<li><a href="/about/drc_ref_global.xml#area">area</a> </li>
+<li><a href="/about/drc_ref_global.xml#area_ratio">area_ratio</a> </li>
+<li><a href="/about/drc_ref_global.xml#bbox_area_ratio">bbox_area_ratio</a> </li>
+<li><a href="/about/drc_ref_global.xml#bbox_height">bbox_height</a> </li>
+<li><a href="/about/drc_ref_global.xml#bbox_max">bbox_max</a> </li>
+<li><a href="/about/drc_ref_global.xml#bbox_min">bbox_min</a> </li>
+<li><a href="/about/drc_ref_global.xml#bbox_width">bbox_width</a> </li>
+<li><a href="/about/drc_ref_global.xml#case">case</a> </li>
+<li><a href="/about/drc_ref_global.xml#corners">corners</a> </li>
+<li><a href="/about/drc_ref_global.xml#covering">covering</a> </li>
+<li><a href="/about/drc_ref_global.xml#enc">enc</a> </li>
+<li><a href="/about/drc_ref_global.xml#enclosing">enclosing</a> </li>
+<li><a href="/about/drc_ref_global.xml#extent_refs">extent_refs</a> </li>
+<li><a href="/about/drc_ref_global.xml#extents">extents</a> </li>
+<li><a href="/about/drc_ref_global.xml#foreign">foreign</a> </li>
+<li><a href="/about/drc_ref_global.xml#holes">holes</a> </li>
+<li><a href="/about/drc_ref_global.xml#hulls">hulls</a> </li>
+<li><a href="/about/drc_ref_global.xml#if_all">if_all</a> </li>
+<li><a href="/about/drc_ref_global.xml#if_any">if_any</a> </li>
+<li><a href="/about/drc_ref_global.xml#if_none">if_none</a> </li>
+<li><a href="/about/drc_ref_global.xml#inside">inside</a> </li>
+<li><a href="/about/drc_ref_global.xml#interacting">interacting</a> </li>
+<li><a href="/about/drc_ref_global.xml#iso">iso</a> </li>
+<li><a href="/about/drc_ref_global.xml#length">length</a> </li>
+<li><a href="/about/drc_ref_global.xml#middle">middle</a> </li>
+<li><a href="/about/drc_ref_global.xml#notch">notch</a> </li>
+<li><a href="/about/drc_ref_global.xml#odd_polygons">odd_polygons</a> </li>
+<li><a href="/about/drc_ref_global.xml#outside">outside</a> </li>
+<li><a href="/about/drc_ref_global.xml#overlap">overlap</a> </li>
+<li><a href="/about/drc_ref_global.xml#overlapping">overlapping</a> </li>
+<li><a href="/about/drc_ref_global.xml#perimeter">perimeter</a> </li>
+<li><a href="/about/drc_ref_global.xml#primary">primary</a> </li>
+<li><a href="/about/drc_ref_global.xml#rectangles">rectangles</a> </li>
+<li><a href="/about/drc_ref_global.xml#rectilinear">rectilinear</a> </li>
+<li><a href="/about/drc_ref_global.xml#relative_height">relative_height</a> </li>
+<li><a href="/about/drc_ref_global.xml#rounded_corners">rounded_corners</a> </li>
+<li><a href="/about/drc_ref_global.xml#secondary">secondary</a> </li>
+<li><a href="/about/drc_ref_global.xml#separation">separation</a> </li>
+<li><a href="/about/drc_ref_global.xml#sep">sep</a> </li>
+<li><a href="/about/drc_ref_global.xml#sized">sized</a> </li>
+<li><a href="/about/drc_ref_global.xml#smoothed">smoothed</a> </li>
+<li><a href="/about/drc_ref_global.xml#space">space</a> </li>
+<li><a href="/about/drc_ref_global.xml#squares">squares</a> </li>
+<li><a href="/about/drc_ref_global.xml#width">width</a> </li>
 </ul>
 </p><p>
 The following documentation will list the methods available for DRC expression objects.
@@ -236,6 +236,20 @@ out = in.drc(primary.area_ratio &gt; 3)   # equivalent
 </p><p>
 The "area_ratio" method is available as a plain function or as a method on <a href="/about/drc_ref_drc#.xml">DRC#</a> expressions.
 The plain function is equivalent to "primary.area_ratio".
+</p>
+<a name="area_sum"/><h2>"area_sum" - Selects the input polygons if the sum of all areas meets the condition</h2>
+<keyword name="area_sum"/>
+<p>Usage:</p>
+<ul>
+<li><tt>expression.area_sum (in condition)</tt></li>
+</ul>
+<p>
+Returns the input polygons if the sum of their areas meets the specified
+condition. This condition is evaluated on the total of all shapes generated in one step of the 
+"drc" loop. As there is a single primary in each loop iteration, "primary.area_sum" is
+equivalent to "primary.area".
+</p><p>
+See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> for more details about comparison specs.
 </p>
 <a name="bbox_aspect_ratio"/><h2>"bbox_aspect_ratio" - Selects the input polygon according to the aspect ratio of the bounding box</h2>
 <keyword name="bbox_aspect_ratio"/>
@@ -569,6 +583,19 @@ out = in.drc(primary.length &gt;= 1.um)   # equivalent
 The "length" method is available as a plain function or as a method on <a href="/about/drc_ref_drc.xml">DRC</a> expressions.
 The plain function is equivalent to "primary.length".
 </p>
+<a name="length_sum"/><h2>"length_sum" - Selects the input edges if the sum of their lengths meets the condition</h2>
+<keyword name="length_sum"/>
+<p>Usage:</p>
+<ul>
+<li><tt>expression.length_sum (in condition)</tt></li>
+</ul>
+<p>
+Returns the input edges if the sum of their lengths meets the specified
+condition. This condition is evaluated on the total of all edges generated in one step of the 
+"drc" loop.
+</p><p>
+See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> for more details about comparison specs.
+</p>
 <a name="merged"/><h2>"merged" - Returns the merged input polygons, optionally selecting multi-overlap</h2>
 <keyword name="merged"/>
 <p>Usage:</p>
@@ -634,6 +661,20 @@ out = in.drc(primary.perimeter &lt; 10.0)   # equivalent
 </p><p>
 The perimeter method is available as a plain function or as a method on <a href="/about/drc_ref_drc.xml">DRC</a> expressions.
 The plain function is equivalent to "primary.perimeter".
+</p>
+<a name="perimeter_sum"/><h2>"perimeter_sum" - Selects the input polygons if the sum of all perimeters meets the condition</h2>
+<keyword name="perimeter_sum"/>
+<p>Usage:</p>
+<ul>
+<li><tt>expression.perimeter_sum (in condition)</tt></li>
+</ul>
+<p>
+Returns the input polygons if the sum of their perimeters meets the specified
+condition. This condition is evaluated on the total of all shapes generated in one step of the 
+"drc" loop. As there is a single primary in each loop iteration, "primary.perimeter_sum" is
+equivalent to "primary.perimeter".
+</p><p>
+See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> for more details about comparison specs.
 </p>
 <a name="polygons"/><h2>"polygons" - Converts the input shapes into polygons</h2>
 <keyword name="polygons"/>

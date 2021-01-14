@@ -19,7 +19,7 @@ The LVS Netter object inherits all methods of the <a href="/about/drc_ref_netter
 </p><p>
 An individual netter object can be created, if the netter results
 need to be kept for multiple extractions. If you really need
-a Netter object, use the global <a href="/about/lvs_ref_global.xml#netter">global#netter</a> function:
+a Netter object, use the global <a href="/about/lvs_ref_global.xml#netter">netter</a> function:
 </p><p>
 <pre>
 # create a new Netter object:

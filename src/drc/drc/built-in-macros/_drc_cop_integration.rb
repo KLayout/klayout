@@ -18,35 +18,37 @@ module DRC
     #
     # The key concept for this method are DRC expressions. DRC expressions
     # are formed by using predefined keywords like "width", operators like "&" 
-    # and method to build an abstract definition of the operations to perform
+    # and methods to build an abstract definition of the operations to perform
     # within the DRC.
     #
     # When the DRC function is executed, it will basically visit all shapes
-    # from the input layer (the one, the "drc" method is called on), collect
-    # the neighbor shapes from all involved other inputs and run the requested
-    # operations on each cluster. Currently, "drc" is only available for polygon
-    # layers.
+    # from the input layer. This is the layer, the "drc" method is called on.
+    # While it does, it collects the neighbor shapes from all involved other inputs 
+    # and runs the requested operations on each cluster. 
+    # Currently, "drc" is only available for polygon layers.
     #
-    # The nature of the "drc" operation is that of the loop over all (merged) input
+    # This way, the nature of the "drc" operation is that of the loop over all (merged) input
     # polygons. Within the operation executed on each shape, it's possible to make
     # decisions such as "if the shape has an area larger than something, apply this
-    # operation" etc. This can be achieved with conventional DRC functions too,
+    # operation" or similar. This often can be achieved with conventional DRC functions too,
     # but involves potentially complex and heavy operations such as booleans, interact
-    # etc. For this reason, the "drc" function may provide a performance benefit.
+    # etc. For this reason, the "drc" function may provide a better performance.
     #
-    # In addition, within the loop, a single shape from the input layer is presented to
+    # In addition, within the loop a single shape from the input layer is presented to
     # execution engine which runs the operations.
     # This allows using operations such as "size" without having to consider 
     # neigbor polygons growing into the area of the initial shape. In this sense,
-    # the "drc" function allows seeing the layer as individual polygons rather than
+    # the "drc" function sees the layer as individual polygons rather than
     # a global "sea of polygons". This enables new applications which are otherwise
     # difficult to implement.
     #
-    # An important concept in the context of "drc" expressions is the "primary".
-    # This expression represents a single primary shape. "Secondaries" are shapes
-    # from other inputs. Primary shapes guide the operation - secondaries without
+    # @h3 Primaries and secondaries @/h3
+    #
+    # An important concept in "drc" expressions is the "primary".
+    # The primary represents a single shape from the input layer. "Secondaries" are shapes
+    # from other inputs. Primaries guide the operation - secondaries without
     # primaries are not seen. The "drc" operation will look for secondaries within
-    # a certain distance which is determined from the operations within the 
+    # a certain distance which is determined from the operations from the 
     # expression to execute. The secondaries collected in this step will not be
     # merged, so the secondary polygons may be partial. This is important when
     # using measurement operations like "area" on secondary polygons.
@@ -70,8 +72,8 @@ module DRC
     # out = in.drc(0.2.um < width < 0.5.um)
     # @/code
     #
-    # To specify the second input for a two-layer check, specify the second input
-    # with the check function. Here a two-layer separation check is used (\global#separation):
+    # To specify the second input for a two-layer check, specify it in brackets in 
+    # the check function. This example shows how to use a two-layer separation check (\global#separation):
     #
     # @code
     # l1 = input(1, 0)
@@ -81,10 +83,11 @@ module DRC
     #
     # The second input of this check function can be a computed expression. In this
     # case the local loop will first evaluate the expression for the second input and
-    # then use it inside the check.  
+    # then use the result for second input in the check. Note that this computation is
+    # performed locally and separately for each primary and its context.
     #
     # Options for the checks are also specified inside the brackets. For example,
-    # to specify a projection metrics for width use:
+    # to specify projection metrics ("projection") for width use:
     #
     # @code 
     # out = in.drc(width(projection) < 0.5.um)
@@ -99,26 +102,31 @@ module DRC
     # in the DRC expressions, methods are available to filter, process and convert
     # these types.
     #
-    # For example, the check produces edge pairs which can be converted into polygons
+    # For example, all checks produce edge pairs which can be converted into polygons
     # using the "polygons" method:
     #
     # @code
     # out = in.drc((width(projection) < 0.5.um).polygons)
     # @/code
     # 
-    # Note the subtle difference: when putting the "polygons" method inside the "drc"
-    # brackets, it is executed locally on every checked primary polygon. The result
-    # may be identical to the global conversion:
+    # Note a subtle detail: when putting the "polygons" method inside the "drc"
+    # brackets, it is executed locally on every visited primary polygon. The result
+    # in this case is identical to the global conversion:
     #
     # @code
     # # same, but with "global" conversion:
     # out = in.drc(width(projection) < 0.5.um).polygons
     # @/code
     #
-    # but having the check polygons inside the loop opens new opportunities and 
-    # is more efficient in general.
+    # But having the check polygons inside the loop opens new opportunities and 
+    # is more efficient in general. In the previous example, the local conversion
+    # will keep a few edge pairs after having converted them to polygons. In
+    # the global case, all edge pairs are collected first and then converted.
+    # If there are many edge pairs, this requires more memory and a larger computing
+    # overhead for managing the bigger number of shapes.
     #
-    # Conversion methods are:
+    # For the conversion of edges, edge pairs and polygons into other types, these
+    # methods are provided:
     #
     # @ul
     # @li \DRC#polygons: converts edge pairs to polygons @/li
@@ -128,7 +136,7 @@ module DRC
     # @li \DRC#corners: can extract corners from polygons @/li
     # @/ul
     #
-    # This example decomposes the primary polygons into edges:
+    # The following example decomposes the primary polygons into edges:
     # 
     # @code
     # out = in.drc(primary.edges)
@@ -137,19 +145,25 @@ module DRC
     # (for backward compatibility you cannot abbreviate "primary.edges" simply as "edges" like
     # other functions). 
     #
-    # The previous isn't quite exciting as it is equivalent to 
+    # The previous example isn't quite exciting as it is equivalent to 
     #
     # @code
     # # Same as above
     # out = in.edges
     # @/code
     #
-    # But it gets more interesting as within the loop, "edges" delivers the edge set for
-    # each individual polygon. So this will give you the edges of polygons with more than four corners:
+    # But it gets more interesting, as within the loop, "edges" delivers the edge set for
+    # each individual polygon. It's possible to work with this distinct set, so for example
+    # this will give you the edges of polygons with more than four corners:
     #
     # @code
     # out = in.drc(primary.edges.count > 4)
     # @/code
+    #
+    # Explanation: "count" is a "quantifier" which takes any kind of set (edges, edge pairs, polygons)
+    # and returns the set if the number of inhabitants meets the given condition. Otherwise the set
+    # is skipped. So it will look at the edges and if there are more than four (per primary shape),
+    # it will forward this set. 
     # 
     # The same result can be achieved with classic DRC with "interact" and a figure count, but
     # at a much higher computation cost.
@@ -166,11 +180,14 @@ module DRC
     #
     # @h3 Filters @/h3
     #
-    # Filter operators select input polygons or edges based on their properties. These filters are:
+    # Filter operators select input polygons or edges based on their properties. These filters are provided:
     #
     # @ul
     # @li "\DRC#area": selects polygons based on their area @/li
     # @li "\DRC#perimeter": selects polygons based on their perimeter @/li
+    # @li "\DRC#area_ratio": selects polygons based on their bounding box to polygon area ratio @/li
+    # @li "\DRC#bbox_aspect_ratio": selects polygons based on their bounding box aspect ratio @/li
+    # @li "\DRC#relative_height": selects polygons based on their relative height @/li
     # @li "\DRC#bbox_min", "\global#bbox_max", "\global#bbox_width", "\global#bbox_height": selects polygons based on their bounding box properties @/li
     # @li "\DRC#length": selects edges based on their length @/li
     # @li "\DRC#angle": selects edges based on their orientation @/li
@@ -196,19 +213,20 @@ module DRC
     # "bbox_min" etc. will evaluate a particular dimensions of the polygon's bounding box and
     # use the respective dimension for filtering the polygon.
     #
-    # Note that it's basically possible to use the polygon filters on any kind of input.
+    # Note that it's basically possible to use the polygon filters on any input - computed and secondaries.
     # In fact, plain "area" for example is a shortcut for "\global#primary.area" indicating that
     # the area of primary shapes are supposed to be computed.
     # However, any input other than the primary is not necessarily complete or it may 
     # consist of multiple polygons. Hence the computed values may be too big or too small.
     # It's recommended therefore to use the measurement functions on primary polygons
-    # only.
+    # unless you know what you're doing.
     #
     # @h3 Filter predicates @/h3
     #
     # The "drc" feature also supports some predicates. "predicates" are boolean values
     # indicating a certain condition. A predicate filter works in a way that it only
-    # passes the polygons 
+    # passes the polygons if the condition is met.
+    #
     # The predicates available currently are:
     #
     # @ul
@@ -219,7 +237,7 @@ module DRC
     #
     # For the same reason as explained above, it's recommended to use these predicates
     # standalone, so they act on primary shapes. It's possible to use the predicates
-    # on computed shapes or secondary input, but that may not render the desired results.
+    # on computed shapes or secondaries, but that may not render the desired results.
     #
     # @h3 Logical NOT operator @/h3
     #
@@ -234,37 +252,54 @@ module DRC
     #
     # @h3 Logical combination operators @/h3
     #
-    # The logical "if_any" or "if_all" statements allow connecting multiple
+    # The logical "if_any" or "if_all" functions allow connecting multiple
     # conditions and evaluate to "true" (means: a non-empty shape set) if either
-    # on input is a non-empty shape set ("if_any") or if all inputs are non-empty
-    # ("if_all"). For example, this will select all polygons which are rectangles
+    # one input is a non-empty shape set ("if_any") or if all inputs are non-empty
+    # ("if_all"). 
+    #
+    # For example, this will select all polygons which are rectangles
     # and whose area is larger than 20 quare micrometers:
     #
     # @code
     # out = in.drc(if_all(rectangles, area > 20.0))
     # @/code
     #
-    # In fact, "if_all" renders the result of the last expression, provided all
-    # previous ones are non-empty. So this operation will render rectangles
-    # sized by 100 nm and skip all other types of polygons:
+    # "if_all" delivers the primary shape if all of the input expressions
+    # render a non-empty result.
+    #
+    # In contrast to this, the "if_any" operation will deliver the primary shape
+    # if one of the input expressions renders a non-empty result.
+    #
+    # The "\global#switch" function allows selecting one input based on the results of an
+    # expression. In the two-input form it's equivalent to "if". The first expression
+    # is the condition. If it evaluates to a non-empty shape set, the result of the
+    # second expression is taken. Otherwise, the result is empty. 
+    #
+    # Hence the following code delivers all rectangles sized by 100 nm. All
+    # other shapes are skipped:
     #
     # @code
-    # out = in.drc(if_all(rectangles, sized(100.nm)))
+    # out = in.drc(switch(rectangles, primary.sized(100.nm)))
     # @/code
     #
-    # Contrary to this, the "if_any" operation will render the first non-empty
-    # expression result and skip the following ones. So this example will
-    # size all rectangles by 100 nm and leave all other types of polygons
-    # untouched:
+    # A third expression will be considered the "else" branch: the result of
+    # this expression will be taken if the first one is not taken. So this
+    # example will size all rectangles and leave other shapes untouched:
     #
     # @code
-    # out = in.drc(if_any(rectangles.sized(100.nm), primary))
+    # out = in.drc(switch(rectangles, primary.sized(100.nm), primary))
     # @/code
+    #
+    # If more expressions are given, they are considered as a sequence of condition/result
+    # chain (c1, e1, c2, e2, ...) in the sense of "if(c1) return(e1) else if(c2) return(e2) ...".
+    # So the e1 is taken if c1 is met, e2 is taken when c1 is not met, but c2 is and so forth.
+    # If there is an odd number of expressions, the last one will be the default expression
+    # which is taken if none of the conditions is met.
     #
     # @h3 Polygon manipulations @/h3
     #
     # The "drc" operations feature polygon manipulations where the input is
-    # either the primary polygon or derived shapes.
+    # either the primary, secondaries or derived shapes.
     # Manipulations include sizing ("\global#sized"), corner rounding ("\global#rounded_corners"), smoothing ("\global#smoothed")
     # and boolean operations.
     #
@@ -289,7 +324,7 @@ module DRC
     # out = l1.drc((primary & secondary(l2)).area > 1.0)
     # @/code
     #
-    # The "\global#secondar" operator indicates that "l2" is to be used as secondary input to the "drc" function. Only
+    # The "\global#secondary" operator indicates that "l2" is to be used as secondary input to the "drc" function. Only
     # in this form, the operators of the boolean AND can be reversed:
     # 
     # @code
@@ -298,25 +333,26 @@ module DRC
     #
     # @h3 Quantifiers @/h3
     #
-    # Some filters operate on properties of the full, local shape set. 
+    # Some filters operate on properties of the full, local, per-primary shape set. 
     # While the loop is executed, the DRC expressions will collect shapes, either
-    # from the primary, it's neighborhood (secondary) or by deriving shape sets.
+    # from the primary, it's neighborhood (secondaries) or from deriving shape sets.
     #
     # Obviously the primary is a simple one: it consists of a single shape, because
     # this is how the loop operates. Derived shape sets however can be more complex.
-    # "Quantifiers" allow to assess properties of the complete, per-primary shape
-    # set. A simple one is "count" which checks if the number of shapes within
+    # "Quantifiers" allow assessing properties of the complete, per-primary shape
+    # set. A simple one is "\DRC#count" which checks if the number of shapes within
     # a shape set is within a given range.
     #
-    # Obviously, "primary.count == 1" is always true. The following condition will
-    # select all primary shapes which have more than 13 corners:
+    # Obviously, "primary.count == 1" is always true. So using "count" primaries isn't
+    # much fun. So it's better to use it on derived sets.
+    # The following condition will select all primary shapes which have more than 13 corners:
     #
     # @code
     # out = in.drc(if_any(primary.corners.count > 13))
     # @/code
     #
-    # Note an important detail here: the "if_any" function will render primary
-    # @b polygons @/b, if the expression inside gives a non-empty result. Without
+    # Note an important detail here: the "if_any" function will make this statement render primary
+    # polygons, if the expression inside gives a non-empty result. Without
     # "if_any", the result would be the output of "count" which is the set of all
     # corners where the corner count is larger than 13.
     #
@@ -339,12 +375,15 @@ module DRC
     # @/code
     #
     # Note that the first line prepares the operation, but does not execute the area computation
-    # or the boolean operation. But when the "drc" function executes the operation it will 
-    # only compute the area once as it is represented by the same Ruby object.
+    # or the boolean operation. But when the "drc" function executes the loop over the primaries it will 
+    # only compute the area once per primary as it is represented by the same Ruby object.
     #
-    # @h3 Summary @/h3
+    # @h3 Outlook @/h3
     #
-    # The bottom line is: DRC expressions are quite rich and there is a lot more to be said and written.
+    # DRC expressions are quite rich and powerful. They provide a more intuitive way of
+    # writing DRC expressions, are more efficient and open new opportunities. DRC
+    # development is likely to focus on this scheme in the future.
+    #
     # More formal details about the bits and pieces can be found in the \DRC# class documentation.
 
     def drc(op)
@@ -375,20 +414,20 @@ module DRC
   class DRCEngine
 
     # %DRC%
-    # @name case
+    # @name switch
     # @brief A conditional selector for the "drc" universal DRC function
-    # @synopsis case(...)
+    # @synopsis switch(...)
     #
     # This function provides a conditional selector for the "drc" function.
     # It is used this way:
     #
     # @code
-    #   out = in.drc(case(c1, r1, c2, r2, ..., cn, rn)
-    #   out = in.drc(case(c1, r1, c2, r2, ..., cn, rn, rdef)
+    #   out = in.drc(switch(c1, r1, c2, r2, ..., cn, rn)
+    #   out = in.drc(switch(c1, r1, c2, r2, ..., cn, rn, rdef)
     # @/code
     # 
     # This function will evaluate c1 which is a universal DRC expression (see \Layer#drc).
-    # If the result is not empty, "case" will evaluate and return r1. Otherwise it
+    # If the result is not empty, "switch" will evaluate and return r1. Otherwise it
     # will continue with c2 and the result of this expression is not empty it will
     # return r2. Otherwise it will continue with c3/r3 etc. 
     #
@@ -398,27 +437,16 @@ module DRC
     # As a requirement, the result types of all r1..rn expressions and the rdef
     # needs to be the same - i.e. all need to render polygons or edges or edge pairs.
 
-    def case(*args)
+    def switch(*args)
 
-      self._context("case") do
-
-        anum = 1
+      self._context("switch") do
 
         args = args.collect { |a| self._make_node(a) }
 
-        types = []
-        args.each do |a|
+        args.each_with_index do |a,index|
           if !a.is_a?(DRCOpNode)
-            raise("All inputs need to be valid compound operation expressions (argument ##{anum} isn't)")
+            raise("All inputs need to be valid compound operation expressions (argument ##{index + 1} isn't)")
           end
-          if a % 2 == 0
-            types << a.result_type
-          end
-          anum += 1
-        end
-
-        if types.sort.uniq.size > 1
-          raise("All result arguments need to have the same type (we got '" + types.collect(:to_s).join(",") + "')")
         end
 
         DRCOpNodeCase::new(self, args)

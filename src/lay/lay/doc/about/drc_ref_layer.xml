@@ -332,41 +332,45 @@ improved performance in some applications and better readability.
 </p><p>
 The key concept for this method are DRC expressions. DRC expressions
 are formed by using predefined keywords like "width", operators like "&amp;" 
-and method to build an abstract definition of the operations to perform
+and methods to build an abstract definition of the operations to perform
 within the DRC.
 </p><p>
 When the DRC function is executed, it will basically visit all shapes
-from the input layer (the one, the "drc" method is called on), collect
-the neighbor shapes from all involved other inputs and run the requested
-operations on each cluster. Currently, "drc" is only available for polygon
-layers.
+from the input layer. This is the layer, the "drc" method is called on.
+While it does, it collects the neighbor shapes from all involved other inputs 
+and runs the requested operations on each cluster. 
+Currently, "drc" is only available for polygon layers.
 </p><p>
-The nature of the "drc" operation is that of the loop over all (merged) input
+This way, the nature of the "drc" operation is that of the loop over all (merged) input
 polygons. Within the operation executed on each shape, it's possible to make
 decisions such as "if the shape has an area larger than something, apply this
-operation" etc. This can be achieved with conventional DRC functions too,
+operation" or similar. This often can be achieved with conventional DRC functions too,
 but involves potentially complex and heavy operations such as booleans, interact
-etc. For this reason, the "drc" function may provide a performance benefit.
+etc. For this reason, the "drc" function may provide a better performance.
 </p><p>
-In addition, within the loop, a single shape from the input layer is presented to
+In addition, within the loop a single shape from the input layer is presented to
 execution engine which runs the operations.
 This allows using operations such as "size" without having to consider 
 neigbor polygons growing into the area of the initial shape. In this sense,
-the "drc" function allows seeing the layer as individual polygons rather than
+the "drc" function sees the layer as individual polygons rather than
 a global "sea of polygons". This enables new applications which are otherwise
 difficult to implement.
 </p><p>
-An important concept in the context of "drc" expressions is the "primary".
-This expression represents a single primary shape. "Secondaries" are shapes
-from other inputs. Primary shapes guide the operation - secondaries without
+<h3>Primaries and secondaries </h3>
+</p><p>
+An important concept in "drc" expressions is the "primary".
+The primary represents a single shape from the input layer. "Secondaries" are shapes
+from other inputs. Primaries guide the operation - secondaries without
 primaries are not seen. The "drc" operation will look for secondaries within
-a certain distance which is determined from the operations within the 
+a certain distance which is determined from the operations from the 
 expression to execute. The secondaries collected in this step will not be
 merged, so the secondary polygons may be partial. This is important when
 using measurement operations like "area" on secondary polygons.
 </p><p>
+<h3>Checks </h3>
+</p><p>
 Here is an example for a generic DRC operation which performs a width
-check for less than 0.5.um on the primary shapes. It uses the <a href="/about/drc_ref_global.xml#width">global#width</a> operator:
+check for less than 0.5.um on the primary shapes. It uses the <a href="/about/drc_ref_global.xml#width">width</a> operator:
 </p><p>
 <pre>
 out = in.drc(width &lt; 0.5.um)
@@ -382,8 +386,8 @@ out = in.drc(width != 0.5.um)
 out = in.drc(0.2.um &lt; width &lt; 0.5.um)
 </pre>
 </p><p>
-To specify the second input for a two-layer check, specify the second input
-with the check function. Here a two-layer separation check is used (<a href="/about/drc_ref_global.xml#separation">global#separation</a>):
+To specify the second input for a two-layer check, specify it in brackets in 
+the check function. This example shows how to use a two-layer separation check (<a href="/about/drc_ref_global.xml#separation">separation</a>):
 </p><p>
 <pre>
 l1 = input(1, 0)
@@ -393,22 +397,113 @@ out = l1.drc(separation(l2) &lt; 0.5.um)
 </p><p>
 The second input of this check function can be a computed expression. In this
 case the local loop will first evaluate the expression for the second input and
-then use it inside the check.  
+then use the result for second input in the check. Note that this computation is
+performed locally and separately for each primary and its context.
 </p><p>
 Options for the checks are also specified inside the brackets. For example,
-to specify a projection metrics for width use:
+to specify projection metrics ("projection") for width use:
 </p><p>
 <pre>
 out = in.drc(width(projection) &lt; 0.5.um)
 </pre>
 </p><p>
-The "drc" function supports filter operators. These select input or derived polygons 
-based on their properties. These filters are:
+<h3>Edges and edge pairs </h3>
+</p><p>
+Although the "drc" function operates on polygon layers, internally it is 
+able to handle edge and edge pair types too. Some operations generate edge pairs,
+some other generate edges. As results from one operation can be processed further
+in the DRC expressions, methods are available to filter, process and convert
+these types.
+</p><p>
+For example, all checks produce edge pairs which can be converted into polygons
+using the "polygons" method:
+</p><p>
+<pre>
+out = in.drc((width(projection) &lt; 0.5.um).polygons)
+</pre>
+</p><p>
+Note a subtle detail: when putting the "polygons" method inside the "drc"
+brackets, it is executed locally on every visited primary polygon. The result
+in this case is identical to the global conversion:
+</p><p>
+<pre>
+# same, but with "global" conversion:
+out = in.drc(width(projection) &lt; 0.5.um).polygons
+</pre>
+</p><p>
+But having the check polygons inside the loop opens new opportunities and 
+is more efficient in general. In the previous example, the local conversion
+will keep a few edge pairs after having converted them to polygons. In
+the global case, all edge pairs are collected first and then converted.
+If there are many edge pairs, this requires more memory and a larger computing
+overhead for managing the bigger number of shapes.
+</p><p>
+For the conversion of edges, edge pairs and polygons into other types, these
+methods are provided:
 </p><p>
 <ul>
-<li>"<a href="/about/drc_ref_global.xml#area">global#area</a>": select polygons based on their area </li>
-<li>"<a href="/about/drc_ref_global.xml#perimeter">global#perimeter</a>": select polygons based on their perimeter </li>
-<li>"<a href="/about/drc_ref_global.xml#bbox_min">global#bbox_min</a>", "<a href="/about/drc_ref_global.xml#bbox_max">global#bbox_max</a>", "<a href="/about/drc_ref_global.xml#bbox_width">global#bbox_width</a>", "<a href="/about/drc_ref_global.xml#bbox_height">global#bbox_height</a>": select polygons based on their bounding box properties </li>
+<li><a href="/about/drc_ref_drc.xml#polygons:">DRC#polygons:</a> converts edge pairs to polygons </li>
+<li><a href="/about/drc_ref_drc.xml#extended">DRC#extended</a>, <a href="/about/drc_ref_drc.xml#extended_in">DRC#extended_in</a>, <a href="/about/drc_ref_drc.xml#extended_out:">DRC#extended_out:</a> converts edges to polygons </li>
+<li><a href="/about/drc_ref_drc.xml#first_edges">DRC#first_edges</a>, <a href="/about/drc_ref_drc.xml#second_edges:">DRC#second_edges:</a> extracts edges from edge pairs </li>
+<li><a href="/about/drc_ref_drc.xml#edges:">DRC#edges:</a> decomposes edge pairs and polygons into edges </li>
+<li><a href="/about/drc_ref_drc.xml#corners:">DRC#corners:</a> can extract corners from polygons </li>
+</ul>
+</p><p>
+The following example decomposes the primary polygons into edges:
+</p><p>
+<pre>
+out = in.drc(primary.edges)
+</pre>
+</p><p>
+(for backward compatibility you cannot abbreviate "primary.edges" simply as "edges" like
+other functions). 
+</p><p>
+The previous example isn't quite exciting as it is equivalent to 
+</p><p>
+<pre>
+# Same as above
+out = in.edges
+</pre>
+</p><p>
+But it gets more interesting, as within the loop, "edges" delivers the edge set for
+each individual polygon. It's possible to work with this distinct set, so for example
+this will give you the edges of polygons with more than four corners:
+</p><p>
+<pre>
+out = in.drc(primary.edges.count &gt; 4)
+</pre>
+</p><p>
+Explanation: "count" is a "quantifier" which takes any kind of set (edges, edge pairs, polygons)
+and returns the set if the number of inhabitants meets the given condition. Otherwise the set
+is skipped. So it will look at the edges and if there are more than four (per primary shape),
+it will forward this set. 
+</p><p>
+The same result can be achieved with classic DRC with "interact" and a figure count, but
+at a much higher computation cost.
+</p><p>
+<h3>Edge and edge/polygon operations </h3>
+</p><p>
+The "drc" framework supports the following edge and edge/polygon operations:
+</p><p>
+<ul>
+<li>Edge vs. edge and edge vs. polygon booleans </li>
+<li>Edge vs. polygon interactions (<a href="/about/drc_ref_drc.xml#interacting">DRC#interacting</a>, <a href="/about/drc_ref_drc.xml#overlapping">DRC#overlapping</a>) </li>
+<li>Edge sampling (<a href="/about/drc_ref_drc.xml#start_segments">DRC#start_segments</a>, <a href="/about/drc_ref_drc.xml#centers">DRC#centers</a>, <a href="/about/drc_ref_drc.xml#end_segments">DRC#end_segments</a>) </li>
+</ul>
+</p><p>
+<h3>Filters </h3>
+</p><p>
+Filter operators select input polygons or edges based on their properties. These filters are provided:
+</p><p>
+<ul>
+<li>"<a href="/about/drc_ref_drc.xml#area">DRC#area</a>": selects polygons based on their area </li>
+<li>"<a href="/about/drc_ref_drc.xml#perimeter">DRC#perimeter</a>": selects polygons based on their perimeter </li>
+<li>"<a href="/about/drc_ref_drc.xml#area_ratio">DRC#area_ratio</a>": selects polygons based on their bounding box to polygon area ratio </li>
+<li>"<a href="/about/drc_ref_drc.xml#bbox_aspect_ratio">DRC#bbox_aspect_ratio</a>": selects polygons based on their bounding box aspect ratio </li>
+<li>"<a href="/about/drc_ref_drc.xml#relative_height">DRC#relative_height</a>": selects polygons based on their relative height </li>
+<li>"<a href="/about/drc_ref_drc.xml#bbox_min">DRC#bbox_min</a>", "<a href="/about/drc_ref_global.xml#bbox_max">bbox_max</a>", "<a href="/about/drc_ref_global.xml#bbox_width">bbox_width</a>", "<a href="/about/drc_ref_global.xml#bbox_height">bbox_height</a>": selects polygons based on their bounding box properties </li>
+<li>"<a href="/about/drc_ref_drc.xml#length">DRC#length</a>": selects edges based on their length </li>
+<li>"<a href="/about/drc_ref_drc.xml#angle">DRC#angle</a>": selects edges based on their orientation </li>
 </ul>
 </p><p>
 For example, to select polygons with an area larger than one square micrometer, use:
@@ -431,27 +526,33 @@ In the same fashion, "perimeter" applies to the perimeter of the polygon.
 "bbox_min" etc. will evaluate a particular dimensions of the polygon's bounding box and
 use the respective dimension for filtering the polygon.
 </p><p>
-Note that it's basically possible to use the polygon filters on any kind of input.
-In fact, plain "area" for example is a shortcut for "<a href="/about/drc_ref_global.xml#primary">global#primary</a>.area" indicating that
+Note that it's basically possible to use the polygon filters on any input - computed and secondaries.
+In fact, plain "area" for example is a shortcut for "<a href="/about/drc_ref_global.xml#primary">primary</a>.area" indicating that
 the area of primary shapes are supposed to be computed.
 However, any input other than the primary is not necessarily complete or it may 
 consist of multiple polygons. Hence the computed values may be too big or too small.
 It's recommended therefore to use the measurement functions on primary polygons
-only.
+unless you know what you're doing.
+</p><p>
+<h3>Filter predicates </h3>
 </p><p>
 The "drc" feature also supports some predicates. "predicates" are boolean values
 indicating a certain condition. A predicate filter works in a way that it only
-passes the polygons 
+passes the polygons if the condition is met.
+</p><p>
 The predicates available currently are:
 </p><p>
 <ul>
-<li>"<a href="/about/drc_ref_global.xml#rectangles">global#rectangles</a>": Filters rectangles </li>
-<li>"<a href="/about/drc_ref_global.xml#rectilinear">global#rectilinear</a>": Filters rectilinear ("Manhattan") polygons </li>
+<li>"<a href="/about/drc_ref_global.xml#rectangles">rectangles</a>": Filters rectangles </li>
+<li>"<a href="/about/drc_ref_global.xml#squares">squares</a>": Filters squares </li>
+<li>"<a href="/about/drc_ref_global.xml#rectilinear">rectilinear</a>": Filters rectilinear ("Manhattan") polygons </li>
 </ul>
 </p><p>
 For the same reason as explained above, it's recommended to use these predicates
 standalone, so they act on primary shapes. It's possible to use the predicates
-on computed shapes or secondary input, but that may not render the desired results.
+on computed shapes or secondaries, but that may not render the desired results.
+</p><p>
+<h3>Logical NOT operator </h3>
 </p><p>
 The "!" operator will evaluate the expression behind it and return the 
 current primary shape if the input is empty and return an empty polygon set 
@@ -462,36 +563,57 @@ not rectangles:
 out = in.drc(! rectangles)
 </pre>
 </p><p>
-The logical "if_any" or "if_all" statements allow connecting multiple
+<h3>Logical combination operators </h3>
+</p><p>
+The logical "if_any" or "if_all" functions allow connecting multiple
 conditions and evaluate to "true" (means: a non-empty shape set) if either
-on input is a non-empty shape set ("if_any") or if all inputs are non-empty
-("if_all"). For example, this will select all polygons which are rectangles
+one input is a non-empty shape set ("if_any") or if all inputs are non-empty
+("if_all"). 
+</p><p>
+For example, this will select all polygons which are rectangles
 and whose area is larger than 20 quare micrometers:
 </p><p>
 <pre>
 out = in.drc(if_all(rectangles, area &gt; 20.0))
 </pre>
 </p><p>
-In fact, "if_all" renders the result of the last expression, provided all
-previous ones are non-empty. So this operation will render rectangles
-sized by 100 nm and skip all other types of polygons:
+"if_all" delivers the primary shape if all of the input expressions
+render a non-empty result.
+</p><p>
+In contrast to this, the "if_any" operation will deliver the primary shape
+if one of the input expressions renders a non-empty result.
+</p><p>
+The "<a href="/about/drc_ref_global.xml#switch">switch</a>" function allows selecting one input based on the results of an
+expression. In the two-input form it's equivalent to "if". The first expression
+is the condition. If it evaluates to a non-empty shape set, the result of the
+second expression is taken. Otherwise, the result is empty. 
+</p><p>
+Hence the following code delivers all rectangles sized by 100 nm. All
+other shapes are skipped:
 </p><p>
 <pre>
-out = in.drc(if_all(rectangles, sized(100.nm)))
+out = in.drc(switch(rectangles, primary.sized(100.nm)))
 </pre>
 </p><p>
-Contrary to this, the "if_any" operation will render the first non-empty
-expression result and skip the following ones. So this example will
-size all rectangles by 100 nm and leave all other types of polygons
-untouched:
+A third expression will be considered the "else" branch: the result of
+this expression will be taken if the first one is not taken. So this
+example will size all rectangles and leave other shapes untouched:
 </p><p>
 <pre>
-out = in.drc(if_any(rectangles.sized(100.nm), primary))
+out = in.drc(switch(rectangles, primary.sized(100.nm), primary))
 </pre>
+</p><p>
+If more expressions are given, they are considered as a sequence of condition/result
+chain (c1, e1, c2, e2, ...) in the sense of "if(c1) return(e1) else if(c2) return(e2) ...".
+So the e1 is taken if c1 is met, e2 is taken when c1 is not met, but c2 is and so forth.
+If there is an odd number of expressions, the last one will be the default expression
+which is taken if none of the conditions is met.
+</p><p>
+<h3>Polygon manipulations </h3>
 </p><p>
 The "drc" operations feature polygon manipulations where the input is
-either the primary polygon or derived shapes.
-Manipulations include sizing ("<a href="/about/drc_ref_global.xml#sized">global#sized</a>"), corner rounding ("<a href="/about/drc_ref_global.xml#rounded_corners">global#rounded_corners</a>"), smoothing ("<a href="/about/drc_ref_global.xml#smoothed">global#smoothed</a>")
+either the primary, secondaries or derived shapes.
+Manipulations include sizing ("<a href="/about/drc_ref_global.xml#sized">sized</a>"), corner rounding ("<a href="/about/drc_ref_global.xml#rounded_corners">rounded_corners</a>"), smoothing ("<a href="/about/drc_ref_global.xml#smoothed">smoothed</a>")
 and boolean operations.
 </p><p>
 This example computes a boolean AND between two layers before selecting
@@ -515,12 +637,39 @@ Note that the precise form of the example above is
 out = l1.drc((primary &amp; secondary(l2)).area &gt; 1.0)
 </pre>
 </p><p>
-The "<a href="/about/drc_ref_global.xml#secondar">global#secondar</a>" operator indicates that "l2" is to be used as secondary input to the "drc" function. Only
+The "<a href="/about/drc_ref_global.xml#secondary">secondary</a>" operator indicates that "l2" is to be used as secondary input to the "drc" function. Only
 in this form, the operators of the boolean AND can be reversed:
 </p><p>
 <pre>
 out = l1.drc((secondary(l2) &amp; primary).area &gt; 1.0)
 </pre>
+</p><p>
+<h3>Quantifiers </h3>
+</p><p>
+Some filters operate on properties of the full, local, per-primary shape set. 
+While the loop is executed, the DRC expressions will collect shapes, either
+from the primary, it's neighborhood (secondaries) or from deriving shape sets.
+</p><p>
+Obviously the primary is a simple one: it consists of a single shape, because
+this is how the loop operates. Derived shape sets however can be more complex.
+"Quantifiers" allow assessing properties of the complete, per-primary shape
+set. A simple one is "<a href="/about/drc_ref_drc.xml#count">DRC#count</a>" which checks if the number of shapes within
+a shape set is within a given range.
+</p><p>
+Obviously, "primary.count == 1" is always true. So using "count" primaries isn't
+much fun. So it's better to use it on derived sets.
+The following condition will select all primary shapes which have more than 13 corners:
+</p><p>
+<pre>
+out = in.drc(if_any(primary.corners.count &gt; 13))
+</pre>
+</p><p>
+Note an important detail here: the "if_any" function will make this statement render primary
+polygons, if the expression inside gives a non-empty result. Without
+"if_any", the result would be the output of "count" which is the set of all
+corners where the corner count is larger than 13.
+</p><p>
+<h3>Expressions as objects </h3>
 </p><p>
 The expression inside the "drc" function is a Ruby object and can be 
 stored in variables. If you need the same expression multiple times, it can be 
@@ -539,31 +688,15 @@ out = l1.drc((overlap_area == 1.0) + (overlap_area == 2.0))
 </pre>
 </p><p>
 Note that the first line prepares the operation, but does not execute the area computation
-or the boolean operation. But when the "drc" function executes the operation it will 
-only compute the area once as it is represented by the same Ruby object.
+or the boolean operation. But when the "drc" function executes the loop over the primaries it will 
+only compute the area once per primary as it is represented by the same Ruby object.
 </p><p>
-The "drc" functionality also offers support for edge pairs and edges. Edge pairs
-are the results of check operations and can be turned into polygons using the 
-"polygons" method:
+<h3>Outlook </h3>
 </p><p>
-<pre>
-drc = in.drc((width &lt; 0.5.um).polygons)
-</pre>
+DRC expressions are quite rich and powerful. They provide a more intuitive way of
+writing DRC expressions, are more efficient and open new opportunities. DRC
+development is likely to focus on this scheme in the future.
 </p><p>
-Similarly, polygons can be converted into edges:
-</p><p>
-<pre>
-drc = in.drc(primary.edges)
-</pre>
-</p><p>
-The "drc" framework supports edge vs. edge and edge vs. polygon booleans, edge
-filters (<a href="/about/drc_ref_global.xml#length">global#length</a>, <a href="/about/drc_ref_global.xml#angle">global#angle</a>), edge vs. polygon interactions (<a href="/about/drc_ref_global.xml#interacting">global#interacting</a>, <a href="/about/drc_ref_global.xml#overlapping">global#overlapping</a>),
-edge sampling (<a href="/about/drc_ref_global.xml#start_segments">global#start_segments</a>, <a href="/about/drc_ref_global.xml#centers">global#centers</a>, <a href="/about/drc_ref_global.xml#end_segments">global#end_segments</a>) and edge to polygon
-conversions (<a href="/about/drc_ref_global.xml#extended">global#extended</a>, <a href="/about/drc_ref_global.xml#extended_in">global#extended_in</a>, <a href="/about/drc_ref_global.xml#extended_out">global#extended_out</a>). Edge pairs 
-can be converted into polygons and edges and separated into first and second edges (<a href="/about/drc_ref_global.xml#first_edges">global#first_edges</a>,
-<a href="/about/drc_ref_global.xml#second_edges">global#second_edges</a>).
-</p><p>
-The bottom line is: DRC expressions are quite rich and there is a lot more to be said and written.
 More formal details about the bits and pieces can be found in the <a href="/about/drc_ref_drc.xml">DRC</a> class documentation.
 </p>
 <a name="dup"/><h2>"dup" - Duplicates a layer</h2>
@@ -1014,10 +1147,10 @@ The following image shows the effect of the "in" method (input1: red, input2: bl
 <p>
 Objects that can be inserted are <class_doc href="Edge">Edge</class_doc> objects (into edge layers) or 
 <class_doc href="DPolygon">DPolygon</class_doc>, <class_doc href="DSimplePolygon">DSimplePolygon</class_doc>, <class_doc href="Path">Path</class_doc>, <class_doc href="DBox">DBox</class_doc> (into polygon layers).
-Convenience methods exist to create such objects (<a href="/about/drc_ref_global.xml#edge">global#edge</a>, <a href="/about/drc_ref_global.xml#polygon">global#polygon</a>, <a href="/about/drc_ref_global.xml#box">global#box</a> and <a href="/about/drc_ref_#global.xml#path">#global#path</a>).
+Convenience methods exist to create such objects (<a href="/about/drc_ref_global.xml#edge">edge</a>, <a href="/about/drc_ref_global.xml#polygon">polygon</a>, <a href="/about/drc_ref_global.xml#box">box</a> and <a href="/about/drc_ref_#global.xml#path">#global#path</a>).
 However, RBA constructors can used as well.
 </p><p>
-The insert method is useful in combination with the <a href="/about/drc_ref_global.xml#polygon_layer">global#polygon_layer</a> or <a href="/about/drc_ref_global.xml#edge_layer">global#edge_layer</a> functions: 
+The insert method is useful in combination with the <a href="/about/drc_ref_global.xml#polygon_layer">polygon_layer</a> or <a href="/about/drc_ref_global.xml#edge_layer">edge_layer</a> functions: 
 </p><p>
 <pre>
 el = edge_layer
@@ -1683,7 +1816,7 @@ one to three parameters: a layer number, a data type (optional, default is 0)
 and a layer name (optional). Alternatively, the output can be specified by 
 a single <class_doc href="LayerInfo">LayerInfo</class_doc> object.
 </p><p>
-See <a href="/about/drc_ref_global.xml#report">global#report</a> and <a href="/about/drc_ref_global.xml#target">global#target</a> on how to configure output to a target layout
+See <a href="/about/drc_ref_global.xml#report">report</a> and <a href="/about/drc_ref_global.xml#target">target</a> on how to configure output to a target layout
 or report database. 
 </p>
 <a name="outside"/><h2>"outside" - Selects shapes or regions of self which are outside the other region</h2>
@@ -2689,7 +2822,7 @@ each other is more or equal than min and less than max </li>
 <li><b>projecting (in condition) </b>: This specification is equivalent to "projection_limits"
 but is more intuitive, as "projecting" is written with a condition, like
 "projecting &lt; 2.um". Available operators are: "==", "&lt;", "&lt;=", "&gt;" and "&gt;=". 
-Double-bounded ranges are also available, like: "0.5 &lt;= projecting &lt; 2.0".
+Double-bounded ranges are also available, like: "0.5 &lt;= projecting &lt; 2.0". </li>
 <li><b>transparent </b>: performs the check without shielding (polygon layers only) </li>
 <li><b>shielded </b>: performs the check with shielding (polygon layers only) </li>
 </ul>

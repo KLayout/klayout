@@ -3001,7 +3001,7 @@ CODE
     #   @li @b projecting (in condition) @/b: This specification is equivalent to "projection_limits"
     #         but is more intuitive, as "projecting" is written with a condition, like
     #         "projecting < 2.um". Available operators are: "==", "<", "<=", ">" and ">=". 
-    #         Double-bounded ranges are also available, like: "0.5 <= projecting < 2.0".
+    #         Double-bounded ranges are also available, like: "0.5 <= projecting < 2.0". @/li
     #   @li @b transparent @/b: performs the check without shielding (polygon layers only) @/li
     #   @li @b shielded @/b: performs the check with shielding (polygon layers only) @/li
     # @/ul

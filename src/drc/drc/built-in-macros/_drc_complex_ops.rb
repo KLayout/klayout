@@ -1516,8 +1516,8 @@ class DRCOpNodeCase < DRCOpNode
         types << a.result_type
       end
     end
-    if types.sort.uniq.size > 1
-      raise("All result arguments need to have the same type (we got '" + types.collect(:to_s).join(",") + "')")
+    if types.uniq { |a,b| a.to_i <=> b.to_i }.size > 1
+      raise("All result arguments of 'switch' need to render the same type (got '" + types.map!(&:to_s).join(",") + "')")
     end
 
     RBA::CompoundRegionOperationNode::new_case(nodes)

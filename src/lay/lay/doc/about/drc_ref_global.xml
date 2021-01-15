@@ -36,7 +36,7 @@ See <a href="/about/drc_ref_netter.xml#antenna_check">Netter#antenna_check</a> f
 <li><tt>area(layer)</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
+This function can be used with a layer argument. In this case it
 is equivalent to "layer.area" (see <a href="/about/drc_ref_layer.xml#area">Layer#area</a>) and returns the total area of the 
 polygons in the layer. 
 </p><p>
@@ -339,7 +339,7 @@ See <a href="/about/drc_ref_netter.xml#connect_implicit">Netter#connect_implicit
 <li><tt>corners(layer [, options ])</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
+This function can be used with a layer argument. In this case it
 is equivalent to "layer.corners" (see <a href="/about/drc_ref_layer.xml#corners">Layer#corners</a>). Without a layer
 argument, "corners" represents the corner generator/filter in primary shapes for
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#corners">DRC#corners</a> for more details).
@@ -523,14 +523,39 @@ See <a href="/about/drc_ref_source.xml#edges">Source#edges</a> for a description
 <li><tt>enclosing(layer, other [, options ])</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
+This check verifies if the polygons of the input layer are enclosing the shapes
+of the other input layer by a certain distance.
+It has manifold options. See <a href="/about/drc_ref_layer.xml#width">Layer#width</a> for the basic options such
+as metrics, projection and angle constraints etc. This check also features
+opposite and rectangle filtering. See <a href="/about/drc_ref_layer.xml#separation">Layer#separation</a> for details about opposite and
+rectangle error filtering.
+</p><p>
+<h3>Classic mode </h3>
+</p><p>
+This function can be used in classic mode with a layer argument. In this case it
 is equivalent to "layer.enclosing" (see <a href="/about/drc_ref_layer.xml#enclosing">Layer#enclosing</a>). 
 </p><p>
-The version without the first layer is intended for use within <a href="/about/drc_ref_drc.xml">DRC</a> expressions
-together with the <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> method. In this case, this function needs to be 
+<pre>
+# classic "enclosing" check for &lt; 0.2 um
+in = layer(1, 0)
+other = layer(2, 0)
+errors = enclosing(in, other, 0.2.um)
+</pre>
+</p><p>
+<h3>Universal DRC </h3>
+</p><p>
+The version without a first layer is intended for use within <a href="/about/drc_ref_drc.xml">DRC</a> expressions
+together with the "universal DRC" method <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>. In this case, this function needs to be 
 put into a condition to specify the check constraints. The other options
 of <a href="/about/drc_ref_layer.xml#enclosing">Layer#enclosing</a> (e.g. metrics, projection constraints, angle limits etc.)
-apply to this version too. 
+apply to this version too:
+</p><p>
+<pre>
+# universal DRC "enclosing" check for &lt; 0.2 um
+in = layer(1, 0)
+other = layer(2, 0)
+errors = in.drc(enclosing(other) &lt; 0.2.um)
+</pre>
 </p><p>
 The conditions may involve an upper and lower limit. The following examples
 illustrate the use of this function with conditions:
@@ -553,6 +578,13 @@ primary shape where the condition is met.
 With a lower limit alone, these markers are formed by two, identical but opposite edges attached to 
 the primary shape. Without an upper limit only, the first edge of the marker is attached to the 
 primary shape while the second edge is attached to the shape of the "other" layer.
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_enc1u.png"/></td>
+<td><img src="/images/drc_enc2u.png"/></td>
+</tr>
+</table>
 </p>
 <a name="error"/><h2>"error" - Prints an error</h2>
 <keyword name="error"/>
@@ -580,7 +612,7 @@ See <a href="/about/drc_ref_source.xml#extent">Source#extent</a> for a descripti
 <li><tt>extent_refs(layer, [ options ])</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
+This function can be used with a layer argument. In this case it
 is equivalent to "layer.extent_refs" (see <a href="/about/drc_ref_layer.xml#extent_refs">Layer#extent_refs</a>). Without a layer
 argument, "extent_refs" represents the partial extents extractor on primary shapes within
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#extent_refs">DRC#extent_refs</a> for more details).
@@ -593,7 +625,7 @@ argument, "extent_refs" represents the partial extents extractor on primary shap
 <li><tt>extents(layer, [ enlargement ])</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
+This function can be used with a layer argument. In this case it
 is equivalent to "layer.extents" (see <a href="/about/drc_ref_layer.xml#extents">Layer#extents</a>). Without a layer
 argument, "extents" represents the extents generator on primary shapes within
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#extents">DRC#extents</a> for more details).
@@ -648,7 +680,7 @@ out = in.drc(primary &amp; foreign.sized(0.5.um))
 <li><tt>holes(layer)</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
+This function can be used with a layer argument. In this case it
 is equivalent to "layer.holes" (see <a href="/about/drc_ref_layer.xml#hulls">Layer#hulls</a>). Without a layer
 argument, "holes" represents a hole extractor for primary shapes in 
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#hulls">DRC#hulls</a> for more details).
@@ -661,7 +693,7 @@ argument, "holes" represents a hole extractor for primary shapes in
 <li><tt>hulls(layer)</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
+This function can be used with a layer argument. In this case it
 is equivalent to "layer.hulls" (see <a href="/about/drc_ref_layer.xml#hulls">Layer#hulls</a>). Without a layer
 argument, "hulls" represents a hull contour extractor for primary shapes in 
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#hulls">DRC#hulls</a> for more details).
@@ -775,6 +807,56 @@ as method to an expression. See there for more details: <a href="/about/drc_ref_
 <p>
 "iso" is the short form for <a href="#isolated">isolated</a>.
 </p>
+<a name="isolated"/><h2>"isolated" - Performs an isolation (inter-polygon space) check</h2>
+<keyword name="isolated"/>
+<p>Usage:</p>
+<ul>
+<li><tt>isolated([ options ]) (in conditions)</tt></li>
+<li><tt>iso([ options ]) (in conditions)</tt></li>
+<li><tt>isolated(layer [, options ])</tt></li>
+<li><tt>iso(layer [, options ])</tt></li>
+</ul>
+<p>
+Provides a intra-polygon space check for polygons. It is similar to
+<a href="#space">space</a>, but checks inter-polygon space only. "iso" is a synonym for "isolated".
+This check has manifold options. See <a href="/about/drc_ref_layer.xml#width">Layer#width</a> for the basic options such
+as metrics, projection and angle constraints etc. This check also features
+opposite and rectangle filtering. See <a href="/about/drc_ref_layer.xml#separation">Layer#separation</a> for details about opposite and
+rectangle error filtering.
+</p><p>
+<h3>Classic mode </h3>
+</p><p>
+This function can be used in classic mode with a layer argument. In this case it
+is equivalent to "layer.isolated" (see <a href="/about/drc_ref_layer.xml#isolated">Layer#isolated</a>). 
+</p><p>
+<pre>
+# classic "isolated" check for space &lt; 1.2 um
+in = layer(1, 0)
+errors = isolated(in, 1.2.um)
+</pre>
+</p><p>
+<h3>Universal DRC </h3>
+</p><p>
+The version without a layer is intended for use within <a href="/about/drc_ref_drc.xml">DRC</a> expressions
+together with the "universal DRC" method <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>. In this case, this function needs to be 
+put into a condition to specify the check constraints. The other options
+of <a href="/about/drc_ref_layer.xml#isolated">Layer#isolated</a> (e.g. metrics, projection constraints, angle limits etc.)
+apply to this version too:
+</p><p>
+<pre>
+# universal DRC "isolated" check for space &lt; 1.2.um
+in = layer(1, 0)
+errors = in.drc(isolated &lt; 1.2.um)
+</pre>
+</p><p>
+See <a href="#enclosing">enclosing</a> for more details about the various ways to specify conditions.
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_space3u.png"/></td>
+</tr>
+</table>
+</p>
 <a name="l2n_data"/><h2>"l2n_data" - Gets the internal <class_doc href="LayoutToNetlist">LayoutToNetlist</class_doc> object for the default <a href="#Netter">Netter</a></h2>
 <keyword name="l2n_data"/>
 <p>Usage:</p>
@@ -847,7 +929,7 @@ For further methods on the source object see <a href="#Source">Source</a>.
 <li><tt>length(layer)</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
+This function can be used with a layer argument. In this case it
 is equivalent to "layer.length" (see <a href="/about/drc_ref_layer.xml#length">Layer#length</a>). Without a layer
 argument, "length" represents the edge length filter on the primary shape edges in 
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#length">DRC#length</a> for more details). In this context,
@@ -934,7 +1016,7 @@ See also <a href="#max_area_ratio">max_area_ratio</a> for the other option affec
 <li><tt>middle(layer, [ options ])</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
+This function can be used with a layer argument. In this case it
 is equivalent to "layer.middle" (see <a href="/about/drc_ref_layer.xml#middle">Layer#middle</a>). Without a layer
 argument, "middle" represents the bounding box center marker generator on primary shapes within
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#middle">DRC#middle</a> for more details).
@@ -998,8 +1080,43 @@ Resets the tile borders - see <a href="#tile_borders">tile_borders</a> for a des
 <li><tt>notch(layer [, options ])</tt></li>
 </ul>
 <p>
-Provides a intra-polygon space check for polygons from the primary layer. Like <a href="#width">width</a> this 
-function provides a single-layer check. See there for details how to use this function.
+Provides a intra-polygon space check for polygons. It is similar to
+<a href="#space">space</a>, but checks intra-polygon space only.
+It has manifold options. See <a href="/about/drc_ref_layer.xml#width">Layer#width</a> for the basic options such
+as metrics, projection and angle constraints etc.
+</p><p>
+<h3>Classic mode </h3>
+</p><p>
+This function can be used in classic mode with a layer argument. In this case it
+is equivalent to "layer.notch" (see <a href="/about/drc_ref_layer.xml#notch">Layer#notch</a>). 
+</p><p>
+<pre>
+# classic "notch" check for space &lt; 1.2 um
+in = layer(1, 0)
+errors = notch(in, 1.2.um)
+</pre>
+</p><p>
+<h3>Universal DRC </h3>
+</p><p>
+The version without a layer is intended for use within <a href="/about/drc_ref_drc.xml">DRC</a> expressions
+together with the "universal DRC" method <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>. In this case, this function needs to be 
+put into a condition to specify the check constraints. The other options
+of <a href="/about/drc_ref_layer.xml#notch">Layer#notch</a> (e.g. metrics, projection constraints, angle limits etc.)
+apply to this version too:
+</p><p>
+<pre>
+# universal DRC "notch" check for space &lt; 1.2.um
+in = layer(1, 0)
+errors = in.drc(notch &lt; 1.2.um)
+</pre>
+</p><p>
+See <a href="#enclosing">enclosing</a> for more details about the various ways to specify conditions.
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_space2u.png"/></td>
+</tr>
+</table>
 </p>
 <a name="odd_polygons"/><h2>"odd_polygons" - Selects all polygons which are non-orientable</h2>
 <keyword name="odd_polygons"/>
@@ -1009,7 +1126,7 @@ function provides a single-layer check. See there for details how to use this fu
 <li><tt>odd_polygons(layer)</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
+This function can be used with a layer argument. In this case it
 is equivalent to "layer.odd_polygons" (see <a href="/about/drc_ref_layer.xml#odd_polygons">Layer#odd_polygons</a>). Without a layer
 argument, "odd_polygons" represents an odd polygon filter for primary shapes in 
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#odd_polygons">DRC#odd_polygons</a> for more details).
@@ -1054,8 +1171,42 @@ as method to an expression. See there for more details: <a href="/about/drc_ref_
 <li><tt>overlap(layer, other [, options ])</tt></li>
 </ul>
 <p>
-Provides an overlap check (primary layer vs. another layer). Like <a href="#enclosing">enclosing</a> this 
-function provides a two-layer check. See there for details how to use this function.
+Provides an overlap check (primary layer vs. another layer). 
+This check has manifold options. See <a href="/about/drc_ref_layer.xml#width">Layer#width</a> for the basic options such
+as metrics, projection and angle constraints etc. This check also features
+opposite and rectangle filtering. See <a href="/about/drc_ref_layer.xml#separation">Layer#separation</a> for details about opposite and
+rectangle error filtering.
+</p><p>
+<h3>Classic mode </h3>
+</p><p>
+Like other checks, this function is available as a classic DRC function with a layer as the first
+argument and as an <a href="#DRC">DRC</a> expression operator for use with <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>.
+</p><p>
+<pre>
+# classic "overlap" check for &lt; 0.2 um
+in = layer(1, 0)
+other = layer(2, 0)
+errors = overlap(in, other, 0.2.um)
+</pre>
+</p><p>
+<h3>Universal DRC </h3>
+</p><p>
+For use with the "unversal DRC" put the separation expression into the "drc"
+function call and use a condition to specify the constraint:
+</p><p>
+<pre>
+# universal DRC "overlap" check for &lt; 0.2 um
+in = layer(1, 0)
+other = layer(2, 0)
+errors = in.drc(overlap(other) &lt; 0.2.um)
+</pre>
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_overlap1u.png"/></td>
+<td><img src="/images/drc_overlap2u.png"/></td>
+</tr>
+</table>
 </p>
 <a name="overlapping"/><h2>"overlapping" - Selects shapes overlapping with other shapes</h2>
 <keyword name="overlapping"/>
@@ -1103,7 +1254,7 @@ This function creates a path object. The arguments are the same than for the
 <li><tt>perimeter(layer)</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
+This function can be used with a layer argument. In this case it
 is equivalent to "layer.perimeter" (see <a href="/about/drc_ref_layer.xml#perimeter">Layer#perimeter</a>) and returns the
 total perimeter of all polygons in the layer.
 </p><p>
@@ -1159,7 +1310,7 @@ is called on.
 <li><tt>rectangles(layer)</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
+This function can be used with a layer argument. In this case it
 is equivalent to "layer.rectangles" (see <a href="/about/drc_ref_layer.xml#rectangles">Layer#rectangles</a>). Without a layer
 argument, "rectangles" represents the rectangles filter for primary shapes in 
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#rectangles">DRC#rectangles</a> for more details).
@@ -1172,7 +1323,7 @@ argument, "rectangles" represents the rectangles filter for primary shapes in
 <li><tt>rectilinear(layer)</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
+This function can be used with a layer argument. In this case it
 is equivalent to "layer.rectilinear" (see <a href="/about/drc_ref_layer.xml#rectilinear">Layer#rectilinear</a>). Without a layer
 argument, "rectilinear" represents the rectilinear polygons filter for primary shapes in 
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#rectilinear">DRC#rectilinear</a> for more details).
@@ -1263,7 +1414,7 @@ about this extractor.
 <li><tt>rounded_corners(layer, inner, outer, n)</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
+This function can be used with a layer argument. In this case it
 is equivalent to "layer.rounded_corners" (see <a href="/about/drc_ref_layer.xml#rounded_corners">Layer#rounded_corners</a>). Without a layer
 argument, "rounded_corners" represents the corner rounding algorithm on primary shapes within
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#rounded_corners">DRC#rounded_corners</a> for more details).
@@ -1312,7 +1463,45 @@ See <a href="/about/drc_ref_source.xml#select">Source#select</a> for a descripti
 </ul>
 <p>
 Provides a separation check (primary layer vs. another layer). Like <a href="#enclosing">enclosing</a> this 
-function provides a two-layer check. See there for details how to use this function.
+function provides a two-layer check, but checking the distance rather than the 
+overlap. 
+This check has manifold options. See <a href="/about/drc_ref_layer.xml#width">Layer#width</a> for the basic options such
+as metrics, projection and angle constraints etc. This check also features
+opposite and rectangle filtering. See <a href="/about/drc_ref_layer.xml#separation">Layer#separation</a> for details about opposite and
+rectangle error filtering.
+</p><p>
+<h3>Classic mode </h3>
+</p><p>
+Like <a href="#enclosing">enclosing</a>, this function is available as a classic DRC function with a layer as the first
+argument and as an <a href="#DRC">DRC</a> expression operator for use with <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>.
+</p><p>
+<pre>
+# classic "separation" check for distance &lt; 0.2 um
+in = layer(1, 0)
+other = layer(2, 0)
+errors = separation(in, other, 0.2.um)
+</pre>
+</p><p>
+<h3>Universal DRC </h3>
+</p><p>
+For use with the "universal DRC" put the separation expression into the "drc"
+function call and use a condition to specify the constraint:
+</p><p>
+<pre>
+# universal DRC "separation" check for distance &lt; 0.2 um
+in = layer(1, 0)
+other = layer(2, 0)
+errors = in.drc(separation(other) &lt; 0.2.um)
+</pre>
+</p><p>
+<a href="#enclosing">enclosing</a> explains the constraints and how the
+work in generating error markers.
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_separation1u.png"/></td>
+</tr>
+</table>
 </p>
 <a name="silent"/><h2>"silent" - Resets verbose mode</h2>
 <keyword name="silent"/>
@@ -1333,7 +1522,7 @@ This function is equivalent to "verbose(false)" (see <a href="#verbose">verbose<
 <li><tt>sized(layer, dx, dy [, mode]))</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
+This function can be used with a layer argument. In this case it
 is equivalent to "layer.sized" (see <a href="/about/drc_ref_layer.xml#sized">Layer#sized</a>). Without a layer
 argument, "sized" represents the polygon sizer on primary shapes within
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#sized">DRC#sized</a> for more details).
@@ -1346,7 +1535,7 @@ argument, "sized" represents the polygon sizer on primary shapes within
 <li><tt>smoothed(layer, d)</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
+This function can be used with a layer argument. In this case it
 is equivalent to "layer.smoothed" (see <a href="/about/drc_ref_layer.xml#smoothed">Layer#smoothed</a>). Without a layer
 argument, "smoothed" represents the polygon smoother on primary shapes within
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#smoothed">DRC#smoothed</a> for more details).
@@ -1396,8 +1585,46 @@ For further methods on the source object see <a href="#Source">Source</a>.
 <li><tt>space(layer [, options ])</tt></li>
 </ul>
 <p>
-Provides a space check on the primary layer. Like <a href="#width">width</a> this 
-function provides a single-layer check. See there for details how to use this function.
+"space" looks for spacing violations between edges of the same polygon (intra-polygon checks)
+and between different polygons (inter-polygon checks).
+<a href="#notch">notch</a> is similar function that provides only intra-polygon space checks. <a href="#isolated">isolated</a>
+is the version checking inter-polygon distance only.
+The check has manifold options. See <a href="/about/drc_ref_layer.xml#width">Layer#width</a> for the basic options such
+as metrics, projection and angle constraints etc.
+</p><p>
+<h3>Classic mode </h3>
+</p><p>
+This function can be used in classic mode with a layer argument. In this case it
+is equivalent to "layer.space" (see <a href="/about/drc_ref_layer.xml#space">Layer#space</a>). In this mode, "space" is applicable to edge 
+layers too. 
+</p><p>
+<pre>
+# classic "space" check for space &lt; 0.2 um
+in = layer(1, 0)
+errors = space(in, 0.2.um)
+</pre>
+</p><p>
+<h3>Universal DRC </h3>
+</p><p>
+The version without a layer is intended for use within <a href="/about/drc_ref_drc.xml">DRC</a> expressions
+together with the "universal DRC" method <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>. In this case, this function needs to be 
+put into a condition to specify the check constraints. The other options
+of <a href="/about/drc_ref_layer.xml#space">Layer#space</a> (e.g. metrics, projection constraints, angle limits etc.)
+apply to this version too:
+</p><p>
+<pre>
+# universal DRC check for space &lt; 0.2.um
+in = layer(1, 0)
+errors = in.drc(space &lt; 0.2.um)
+</pre>
+</p><p>
+See <a href="#enclosing">enclosing</a> for more details about the various ways to specify conditions.
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_space1u.png"/></td>
+</tr>
+</table>
 </p>
 <a name="squares"/><h2>"squares" - Selects all polygons which are squares</h2>
 <keyword name="squares"/>
@@ -1407,7 +1634,7 @@ function provides a single-layer check. See there for details how to use this fu
 <li><tt>squares(layer)</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
+This function can be used with a layer argument. In this case it
 is equivalent to "layer.squares" (see <a href="/about/drc_ref_layer.xml#squares">Layer#squares</a>). Without a layer
 argument, "squares" represents the rectangles filter for primary shapes in 
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#squares">DRC#squares</a> for more details).
@@ -1569,26 +1796,44 @@ In verbose mode, more output is generated in the log file
 <li><tt>width(layer [, options ])</tt></li>
 </ul>
 <p>
-This function can be used with a layer argument in which case it
+A width check is a check for the distance of edges of the same polygon.
+</p><p>
+<h3>Classic mode </h3>
+</p><p>
+This function can be used in classic mode with a layer argument. In this case it
 is equivalent to "layer.width" (see <a href="/about/drc_ref_layer.xml#width">Layer#width</a>). 
 </p><p>
+<pre>
+# classic "width" check for width &lt; 2 um
+in = layer(1, 0)
+errors = width(in, 0.2.um)
+</pre>
+</p><p>
+<h3>Universal DRC </h3>
+</p><p>
 The version without a layer is intended for use within <a href="/about/drc_ref_drc.xml">DRC</a> expressions
-together with the <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> method. In this case, this function needs to be 
+together with the "universal DRC" method <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>. In this case, this function needs to be 
 put into a condition to specify the check constraints. The other options
 of <a href="/about/drc_ref_layer.xml#width">Layer#width</a> (e.g. metrics, projection constraints, angle limits etc.)
-apply to this version too. 
+apply to this version too:
+</p><p>
+<pre>
+# universal DRC check for width &lt; 2 um
+in = layer(1, 0)
+errors = in.drc(width &lt; 0.2.um)
+</pre>
 </p><p>
 The conditions may involve an upper and lower limit. The following examples
 illustrate the use of this function with conditions:
 </p><p>
 <pre>
-out = in.drc(width &lt; 0.2.um)
-out = in.drc(width &lt;= 0.2.um)
-out = in.drc(width &gt; 0.2.um)
-out = in.drc(width &gt;= 0.2.um)
-out = in.drc(width == 0.2.um)
-out = in.drc(width != 0.2.um)
-out = in.drc(0.1.um &lt;= width &lt; 0.2.um)
+errors = in.drc(width &lt; 0.2.um)
+errors = in.drc(width &lt;= 0.2.um)
+errors = in.drc(width &gt; 0.2.um)
+errors = in.drc(width &gt;= 0.2.um)
+errors = in.drc(width == 0.2.um)
+errors = in.drc(width != 0.2.um)
+errors = in.drc(0.1.um &lt;= width &lt; 0.2.um)
 </pre>
 </p><p>
 <table>

@@ -35,6 +35,5 @@ l1.output(1, 0)
 l1.odd_polygons.output(10, 0)
 
 l1.drc(smoothed(0.5)).output(100, 0)
-l1.drc(odd_polygons).output(101, 0)
 l1.drc(rounded_corners(1.0, 0.5, 8)).output(102, 0)
 

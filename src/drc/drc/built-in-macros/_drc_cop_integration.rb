@@ -664,7 +664,7 @@ CODE
     # @synopsis area (in condition)
     # @synopsis area(layer)
     #
-    # This function can be used with a layer argument in which case it
+    # This function can be used with a layer argument. In this case it
     # is equivalent to "layer.area" (see \Layer#area) and returns the total area of the 
     # polygons in the layer. 
     #
@@ -677,7 +677,7 @@ CODE
     # @synopsis hulls
     # @synopsis hulls(layer)
     #
-    # This function can be used with a layer argument in which case it
+    # This function can be used with a layer argument. In this case it
     # is equivalent to "layer.hulls" (see \Layer#hulls). Without a layer
     # argument, "hulls" represents a hull contour extractor for primary shapes in 
     # \DRC# expressions (see \Layer#drc and \DRC#hulls for more details).
@@ -688,29 +688,18 @@ CODE
     # @synopsis holes
     # @synopsis holes(layer)
     #
-    # This function can be used with a layer argument in which case it
+    # This function can be used with a layer argument. In this case it
     # is equivalent to "layer.holes" (see \Layer#hulls). Without a layer
     # argument, "holes" represents a hole extractor for primary shapes in 
     # \DRC# expressions (see \Layer#drc and \DRC#hulls for more details).
     
-    # %DRC%
-    # @name odd_polygons
-    # @brief Selects all polygons which are non-orientable
-    # @synopsis odd_polygons
-    # @synopsis odd_polygons(layer)
-    #
-    # This function can be used with a layer argument in which case it
-    # is equivalent to "layer.odd_polygons" (see \Layer#odd_polygons). Without a layer
-    # argument, "odd_polygons" represents an odd polygon filter for primary shapes in 
-    # \DRC# expressions (see \Layer#drc and \DRC#odd_polygons for more details).
-
     # %DRC%
     # @name perimeter
     # @brief Computes the total perimeter or in universal DRC context: selects the primary shape if the perimeter is meeting the condition
     # @synopsis perimeter (in condition)
     # @synopsis perimeter(layer)
     #
-    # This function can be used with a layer argument in which case it
+    # This function can be used with a layer argument. In this case it
     # is equivalent to "layer.perimeter" (see \Layer#perimeter) and returns the
     # total perimeter of all polygons in the layer.
     #
@@ -723,7 +712,7 @@ CODE
     # @synopsis rectangles
     # @synopsis rectangles(layer)
     #
-    # This function can be used with a layer argument in which case it
+    # This function can be used with a layer argument. In this case it
     # is equivalent to "layer.rectangles" (see \Layer#rectangles). Without a layer
     # argument, "rectangles" represents the rectangles filter for primary shapes in 
     # \DRC# expressions (see \Layer#drc and \DRC#rectangles for more details).
@@ -734,7 +723,7 @@ CODE
     # @synopsis squares
     # @synopsis squares(layer)
     #
-    # This function can be used with a layer argument in which case it
+    # This function can be used with a layer argument. In this case it
     # is equivalent to "layer.squares" (see \Layer#squares). Without a layer
     # argument, "squares" represents the rectangles filter for primary shapes in 
     # \DRC# expressions (see \Layer#drc and \DRC#squares for more details).
@@ -745,7 +734,7 @@ CODE
     # @synopsis rectilinear
     # @synopsis rectilinear(layer)
     #
-    # This function can be used with a layer argument in which case it
+    # This function can be used with a layer argument. In this case it
     # is equivalent to "layer.rectilinear" (see \Layer#rectilinear). Without a layer
     # argument, "rectilinear" represents the rectilinear polygons filter for primary shapes in 
     # \DRC# expressions (see \Layer#drc and \DRC#rectilinear for more details).
@@ -756,7 +745,7 @@ CODE
     # @synopsis length (in condition)
     # @synopsis length(layer)
     #
-    # This function can be used with a layer argument in which case it
+    # This function can be used with a layer argument. In this case it
     # is equivalent to "layer.length" (see \Layer#length). Without a layer
     # argument, "length" represents the edge length filter on the primary shape edges in 
     # \DRC# expressions (see \Layer#drc and \DRC#length for more details). In this context,
@@ -777,7 +766,6 @@ CODE
       holes
       hulls
       length
-      odd_polygons
       perimeter
       rectangles
       rectilinear
@@ -797,7 +785,7 @@ CODE
     # @synopsis corners([ options ]) (in condition)
     # @synopsis corners(layer [, options ])
     #
-    # This function can be used with a layer argument in which case it
+    # This function can be used with a layer argument. In this case it
     # is equivalent to "layer.corners" (see \Layer#corners). Without a layer
     # argument, "corners" represents the corner generator/filter in primary shapes for
     # \DRC# expressions (see \Layer#drc and \DRC#corners for more details).
@@ -820,7 +808,7 @@ CODE
     # @synopsis extent_refs([ options ])
     # @synopsis extent_refs(layer, [ options ])
     #
-    # This function can be used with a layer argument in which case it
+    # This function can be used with a layer argument. In this case it
     # is equivalent to "layer.extent_refs" (see \Layer#extent_refs). Without a layer
     # argument, "extent_refs" represents the partial extents extractor on primary shapes within
     # \DRC# expressions (see \Layer#drc and \DRC#extent_refs for more details).
@@ -831,7 +819,7 @@ CODE
     # @synopsis extents([ enlargement ])
     # @synopsis extents(layer, [ enlargement ])
     #
-    # This function can be used with a layer argument in which case it
+    # This function can be used with a layer argument. In this case it
     # is equivalent to "layer.extents" (see \Layer#extents). Without a layer
     # argument, "extents" represents the extents generator on primary shapes within
     # \DRC# expressions (see \Layer#drc and \DRC#extents for more details).
@@ -842,7 +830,7 @@ CODE
     # @synopsis middle([ options ])
     # @synopsis middle(layer, [ options ])
     #
-    # This function can be used with a layer argument in which case it
+    # This function can be used with a layer argument. In this case it
     # is equivalent to "layer.middle" (see \Layer#middle). Without a layer
     # argument, "middle" represents the bounding box center marker generator on primary shapes within
     # \DRC# expressions (see \Layer#drc and \DRC#middle for more details).
@@ -853,7 +841,7 @@ CODE
     # @synopsis rounded_corners(inner, outer, n)
     # @synopsis rounded_corners(layer, inner, outer, n)
     #
-    # This function can be used with a layer argument in which case it
+    # This function can be used with a layer argument. In this case it
     # is equivalent to "layer.rounded_corners" (see \Layer#rounded_corners). Without a layer
     # argument, "rounded_corners" represents the corner rounding algorithm on primary shapes within
     # \DRC# expressions (see \Layer#drc and \DRC#rounded_corners for more details).
@@ -866,7 +854,7 @@ CODE
     # @synopsis sized(layer, d [, mode])
     # @synopsis sized(layer, dx, dy [, mode]))
     #
-    # This function can be used with a layer argument in which case it
+    # This function can be used with a layer argument. In this case it
     # is equivalent to "layer.sized" (see \Layer#sized). Without a layer
     # argument, "sized" represents the polygon sizer on primary shapes within
     # \DRC# expressions (see \Layer#drc and \DRC#sized for more details).
@@ -877,7 +865,7 @@ CODE
     # @synopsis smoothed(d)
     # @synopsis smoothed(layer, d)
     #
-    # This function can be used with a layer argument in which case it
+    # This function can be used with a layer argument. In this case it
     # is equivalent to "layer.smoothed" (see \Layer#smoothed). Without a layer
     # argument, "smoothed" represents the polygon smoother on primary shapes within
     # \DRC# expressions (see \Layer#drc and \DRC#smoothed for more details).
@@ -971,14 +959,39 @@ CODE
     # @synopsis enclosing(other [, options ]) (in conditions)
     # @synopsis enclosing(layer, other [, options ])
     #
-    # This function can be used with a layer argument in which case it
+    # This check verifies if the polygons of the input layer are enclosing the shapes
+    # of the other input layer by a certain distance.
+    # It has manifold options. See \Layer#width for the basic options such
+    # as metrics, projection and angle constraints etc. This check also features
+    # opposite and rectangle filtering. See \Layer#separation for details about opposite and
+    # rectangle error filtering.
+    #
+    # @h3 Classic mode @/h3
+    #
+    # This function can be used in classic mode with a layer argument. In this case it
     # is equivalent to "layer.enclosing" (see \Layer#enclosing). 
     #
-    # The version without the first layer is intended for use within \DRC# expressions
-    # together with the \Layer#drc method. In this case, this function needs to be 
+    # @code
+    # # classic "enclosing" check for < 0.2 um
+    # in = layer(1, 0)
+    # other = layer(2, 0)
+    # errors = enclosing(in, other, 0.2.um)
+    # @/code
+    #
+    # @h3 Universal DRC @/h3
+    #
+    # The version without a first layer is intended for use within \DRC# expressions
+    # together with the "universal DRC" method \Layer#drc. In this case, this function needs to be 
     # put into a condition to specify the check constraints. The other options
     # of \Layer#enclosing (e.g. metrics, projection constraints, angle limits etc.)
-    # apply to this version too. 
+    # apply to this version too:
+    #
+    # @code
+    # # universal DRC "enclosing" check for < 0.2 um
+    # in = layer(1, 0)
+    # other = layer(2, 0)
+    # errors = in.drc(enclosing(other) < 0.2.um)
+    # @/code
     #
     # The conditions may involve an upper and lower limit. The following examples
     # illustrate the use of this function with conditions:
@@ -1001,6 +1014,13 @@ CODE
     # With a lower limit alone, these markers are formed by two, identical but opposite edges attached to 
     # the primary shape. Without an upper limit only, the first edge of the marker is attached to the 
     # primary shape while the second edge is attached to the shape of the "other" layer.
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_enc1u.png) @/td
+    #     @td @img(/images/drc_enc2u.png) @/td
+    #   @/tr
+    # @/table
     
     # %DRC%
     # @name separation
@@ -1009,7 +1029,45 @@ CODE
     # @synopsis separation(layer, other [, options ])
     #
     # Provides a separation check (primary layer vs. another layer). Like \enclosing this 
-    # function provides a two-layer check. See there for details how to use this function.
+    # function provides a two-layer check, but checking the distance rather than the 
+    # overlap. 
+    # This check has manifold options. See \Layer#width for the basic options such
+    # as metrics, projection and angle constraints etc. This check also features
+    # opposite and rectangle filtering. See \Layer#separation for details about opposite and
+    # rectangle error filtering.
+    #
+    # @h3 Classic mode @/h3
+    #
+    # Like \enclosing, this function is available as a classic DRC function with a layer as the first
+    # argument and as an \DRC expression operator for use with \Layer#drc.
+    # 
+    # @code
+    # # classic "separation" check for distance < 0.2 um
+    # in = layer(1, 0)
+    # other = layer(2, 0)
+    # errors = separation(in, other, 0.2.um)
+    # @/code
+    #
+    # @h3 Universal DRC @/h3
+    #
+    # For use with the "universal DRC" put the separation expression into the "drc"
+    # function call and use a condition to specify the constraint:
+    #
+    # @code
+    # # universal DRC "separation" check for distance < 0.2 um
+    # in = layer(1, 0)
+    # other = layer(2, 0)
+    # errors = in.drc(separation(other) < 0.2.um)
+    # @/code
+    #
+    # \enclosing explains the constraints and how the
+    # work in generating error markers.
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_separation1u.png) @/td
+    #   @/tr
+    # @/table
     
     # %DRC%
     # @name overlap
@@ -1017,8 +1075,42 @@ CODE
     # @synopsis overlap(other [, options ]) (in conditions)
     # @synopsis overlap(layer, other [, options ])
     #
-    # Provides an overlap check (primary layer vs. another layer). Like \enclosing this 
-    # function provides a two-layer check. See there for details how to use this function.
+    # Provides an overlap check (primary layer vs. another layer). 
+    # This check has manifold options. See \Layer#width for the basic options such
+    # as metrics, projection and angle constraints etc. This check also features
+    # opposite and rectangle filtering. See \Layer#separation for details about opposite and
+    # rectangle error filtering.
+    #
+    # @h3 Classic mode @/h3
+    #
+    # Like other checks, this function is available as a classic DRC function with a layer as the first
+    # argument and as an \DRC expression operator for use with \Layer#drc.
+    # 
+    # @code
+    # # classic "overlap" check for < 0.2 um
+    # in = layer(1, 0)
+    # other = layer(2, 0)
+    # errors = overlap(in, other, 0.2.um)
+    # @/code
+    #
+    # @h3 Universal DRC @/h3
+    #
+    # For use with the "unversal DRC" put the separation expression into the "drc"
+    # function call and use a condition to specify the constraint:
+    #
+    # @code
+    # # universal DRC "overlap" check for < 0.2 um
+    # in = layer(1, 0)
+    # other = layer(2, 0)
+    # errors = in.drc(overlap(other) < 0.2.um)
+    # @/code
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_overlap1u.png) @/td
+    #     @td @img(/images/drc_overlap2u.png) @/td
+    #   @/tr
+    # @/table
     
     # %DRC%
     # @name width
@@ -1026,26 +1118,44 @@ CODE
     # @synopsis width([ options ]) (in conditions)
     # @synopsis width(layer [, options ])
     #
-    # This function can be used with a layer argument in which case it
+    # A width check is a check for the distance of edges of the same polygon.
+    #
+    # @h3 Classic mode @/h3
+    #
+    # This function can be used in classic mode with a layer argument. In this case it
     # is equivalent to "layer.width" (see \Layer#width). 
     #
+    # @code
+    # # classic "width" check for width < 2 um
+    # in = layer(1, 0)
+    # errors = width(in, 0.2.um)
+    # @/code
+    #
+    # @h3 Universal DRC @/h3
+    #
     # The version without a layer is intended for use within \DRC# expressions
-    # together with the \Layer#drc method. In this case, this function needs to be 
+    # together with the "universal DRC" method \Layer#drc. In this case, this function needs to be 
     # put into a condition to specify the check constraints. The other options
     # of \Layer#width (e.g. metrics, projection constraints, angle limits etc.)
-    # apply to this version too. 
+    # apply to this version too:
+    #
+    # @code
+    # # universal DRC check for width < 2 um
+    # in = layer(1, 0)
+    # errors = in.drc(width < 0.2.um)
+    # @/code
     #
     # The conditions may involve an upper and lower limit. The following examples
     # illustrate the use of this function with conditions:
     #
     # @code
-    # out = in.drc(width < 0.2.um)
-    # out = in.drc(width <= 0.2.um)
-    # out = in.drc(width > 0.2.um)
-    # out = in.drc(width >= 0.2.um)
-    # out = in.drc(width == 0.2.um)
-    # out = in.drc(width != 0.2.um)
-    # out = in.drc(0.1.um <= width < 0.2.um)
+    # errors = in.drc(width < 0.2.um)
+    # errors = in.drc(width <= 0.2.um)
+    # errors = in.drc(width > 0.2.um)
+    # errors = in.drc(width >= 0.2.um)
+    # errors = in.drc(width == 0.2.um)
+    # errors = in.drc(width != 0.2.um)
+    # errors = in.drc(0.1.um <= width < 0.2.um)
     # @/code
     #
     # @table
@@ -1079,8 +1189,46 @@ CODE
     # @synopsis space([ options ]) (in conditions)
     # @synopsis space(layer [, options ])
     #
-    # Provides a space check on the primary layer. Like \width this 
-    # function provides a single-layer check. See there for details how to use this function.
+    # "space" looks for spacing violations between edges of the same polygon (intra-polygon checks)
+    # and between different polygons (inter-polygon checks).
+    # \notch is similar function that provides only intra-polygon space checks. \isolated
+    # is the version checking inter-polygon distance only.
+    # The check has manifold options. See \Layer#width for the basic options such
+    # as metrics, projection and angle constraints etc.
+    # 
+    # @h3 Classic mode @/h3
+    #
+    # This function can be used in classic mode with a layer argument. In this case it
+    # is equivalent to "layer.space" (see \Layer#space). In this mode, "space" is applicable to edge 
+    # layers too. 
+    #
+    # @code
+    # # classic "space" check for space < 0.2 um
+    # in = layer(1, 0)
+    # errors = space(in, 0.2.um)
+    # @/code
+    #
+    # @h3 Universal DRC @/h3
+    #
+    # The version without a layer is intended for use within \DRC# expressions
+    # together with the "universal DRC" method \Layer#drc. In this case, this function needs to be 
+    # put into a condition to specify the check constraints. The other options
+    # of \Layer#space (e.g. metrics, projection constraints, angle limits etc.)
+    # apply to this version too:
+    #
+    # @code
+    # # universal DRC check for space < 0.2.um
+    # in = layer(1, 0)
+    # errors = in.drc(space < 0.2.um)
+    # @/code
+    #
+    # See \enclosing for more details about the various ways to specify conditions.
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_space1u.png) @/td
+    #   @/tr
+    # @/table
     
     # %DRC%
     # @name notch
@@ -1088,8 +1236,91 @@ CODE
     # @synopsis notch([ options ]) (in conditions)
     # @synopsis notch(layer [, options ])
     #
-    # Provides a intra-polygon space check for polygons from the primary layer. Like \width this 
-    # function provides a single-layer check. See there for details how to use this function.
+    # Provides a intra-polygon space check for polygons. It is similar to
+    # \space, but checks intra-polygon space only.
+    # It has manifold options. See \Layer#width for the basic options such
+    # as metrics, projection and angle constraints etc.
+    # 
+    # @h3 Classic mode @/h3
+    #
+    # This function can be used in classic mode with a layer argument. In this case it
+    # is equivalent to "layer.notch" (see \Layer#notch). 
+    #
+    # @code
+    # # classic "notch" check for space < 1.2 um
+    # in = layer(1, 0)
+    # errors = notch(in, 1.2.um)
+    # @/code
+    #
+    # @h3 Universal DRC @/h3
+    #
+    # The version without a layer is intended for use within \DRC# expressions
+    # together with the "universal DRC" method \Layer#drc. In this case, this function needs to be 
+    # put into a condition to specify the check constraints. The other options
+    # of \Layer#notch (e.g. metrics, projection constraints, angle limits etc.)
+    # apply to this version too:
+    #
+    # @code
+    # # universal DRC "notch" check for space < 1.2.um
+    # in = layer(1, 0)
+    # errors = in.drc(notch < 1.2.um)
+    # @/code
+    #
+    # See \enclosing for more details about the various ways to specify conditions.
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_space2u.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name isolated
+    # @brief Performs an isolation (inter-polygon space) check
+    # @synopsis isolated([ options ]) (in conditions)
+    # @synopsis iso([ options ]) (in conditions)
+    # @synopsis isolated(layer [, options ])
+    # @synopsis iso(layer [, options ])
+    #
+    # Provides a intra-polygon space check for polygons. It is similar to
+    # \space, but checks inter-polygon space only. "iso" is a synonym for "isolated".
+    # This check has manifold options. See \Layer#width for the basic options such
+    # as metrics, projection and angle constraints etc. This check also features
+    # opposite and rectangle filtering. See \Layer#separation for details about opposite and
+    # rectangle error filtering.
+    # 
+    # @h3 Classic mode @/h3
+    #
+    # This function can be used in classic mode with a layer argument. In this case it
+    # is equivalent to "layer.isolated" (see \Layer#isolated). 
+    #
+    # @code
+    # # classic "isolated" check for space < 1.2 um
+    # in = layer(1, 0)
+    # errors = isolated(in, 1.2.um)
+    # @/code
+    #
+    # @h3 Universal DRC @/h3
+    #
+    # The version without a layer is intended for use within \DRC# expressions
+    # together with the "universal DRC" method \Layer#drc. In this case, this function needs to be 
+    # put into a condition to specify the check constraints. The other options
+    # of \Layer#isolated (e.g. metrics, projection constraints, angle limits etc.)
+    # apply to this version too:
+    #
+    # @code
+    # # universal DRC "isolated" check for space < 1.2.um
+    # in = layer(1, 0)
+    # errors = in.drc(isolated < 1.2.um)
+    # @/code
+    #
+    # See \enclosing for more details about the various ways to specify conditions.
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_space3u.png) @/td
+    #   @/tr
+    # @/table
     
     %w(
       enclosing

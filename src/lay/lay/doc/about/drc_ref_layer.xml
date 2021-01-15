@@ -769,6 +769,10 @@ See <a href="#enclosing">enclosing</a> for a description of that method
 <li><tt>layer.enc(other_layer, value [, options])</tt></li>
 </ul>
 <p>
+<b>Note: </b>"enclosing" and "enc" are available as operators for the "universal DRC" function <a href="#drc">drc</a> within
+the <a href="#DRC">DRC</a> framework. These variants have more options and are more intuitive to use. 
+See <a href="/about/drc_ref_global.xml#enclosing">enclosing</a> for more details.
+</p><p>
 This method checks whether layer encloses (is bigger than) other_layer by the
 given dimension. Locations, where this is not the case will be reported in form
 of edge pair error markers.
@@ -1332,6 +1336,9 @@ See <a href="#isolated">isolated</a> for a description of that method
 <li><tt>layer.iso(value [, options])</tt></li>
 </ul>
 <p>
+<b>Note: </b>"isolated" and "iso" are available as operators for the "universal DRC" function <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> within
+the <a href="#DRC">DRC</a> framework. These variants have more options and are more intuitive to use. See <a href="/about/drc_ref_global.xml#isolated">isolated</a> for more details.
+</p><p>
 See <a href="#space">space</a> for a description of this method. 
 In contrast to <a href="#space">space</a>, this
 method is available for polygon layers only, since only on such layers 
@@ -1735,6 +1742,9 @@ is <a href="#select_not_overlapping">select_not_overlapping</a>.
 <li><tt>layer.notch(value [, options])</tt></li>
 </ul>
 <p>
+<b>Note: </b>"notch" is available as an operator for the "universal DRC" function <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> within
+the <a href="#DRC">DRC</a> framework. This variant has more options and is more intuitive to use. See <a href="/about/drc_ref_global.xml#notch">notch</a> for more details.
+</p><p>
 See <a href="#space">space</a> for a description of this method.
 In contrast to <a href="#space">space</a>, this
 method is available for polygon layers only, since only on such layers 
@@ -1870,6 +1880,10 @@ This method is available for edge layers. The argument must be a polygon layer.
 <li><tt>layer.overlap(other_layer, value [, options])</tt></li>
 </ul>
 <p>
+<b>Note: </b>"overlap" is available as an operator for the "universal DRC" function <a href="#drc">drc</a> within
+the <a href="#DRC">DRC</a> framework. This variant has more options and is more intuitive to use. 
+See <a href="/about/drc_ref_global.xml#overlap">overlap</a> for more details.
+</p><p>
 This method checks whether layer and other_layer overlap by at least the
 given length. Locations, where this is not the case will be reported in form
 of edge pair error markers.
@@ -2392,6 +2406,10 @@ See <a href="#separation">separation</a> for a description of that method
 <li><tt>layer.sep(other_layer, value [, options])</tt></li>
 </ul>
 <p>
+<b>Note: </b>"separation" and "sep" are available as operators for the "universal DRC" function <a href="#drc">drc</a> within
+the <a href="#DRC">DRC</a> framework. These variants have more options and are more intuitive to use. 
+See <a href="/about/drc_ref_global.xml#separation">separation</a> for more details.
+</p><p>
 This method performs a two-layer spacing check. Like <a href="#space">space</a>, this method
 can be applied to edge or polygon layers. Locations where edges of the layer
 are closer than the specified distance to the other layer are reported
@@ -2403,8 +2421,7 @@ In contrast to the <a href="#space">space</a> and related methods, locations whe
 layers touch are also reported. More specifically, the case of zero spacing
 will also trigger an error while for <a href="#space">space</a> it will not.
 </p><p>
-As for the other DRC methods, merged semantics applies. The options available 
-are the same than for <a href="#width">width</a>.  
+As for the other DRC methods, merged semantics applies.
 Distance values can be given as floating-point values (in micron) or integer values (in
 database units). To explicitly specify the unit, use the unit denominators.
 </p><p>
@@ -2415,6 +2432,8 @@ The following image shows the effect of the separation check (input1: red, input
 <td><img src="/images/drc_separation1.png"/></td>
 </tr>
 </table>
+</p><p>
+<h3>opposite and rectangle error filtering </h3>
 </p><p>
 The options for the separation check are those available for the <a href="#width">width</a> or <a href="#space">space</a>
 method plus opposite and rectangle error filtering. 
@@ -2600,6 +2619,9 @@ not modify the layer but returns a snapped copy.
 <li><tt>layer.space(value [, options])</tt></li>
 </ul>
 <p>
+<b>Note: </b>"space" is available as an operator for the "universal DRC" function <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> within
+the <a href="#DRC">DRC</a> framework. This variant has more options and is more intuitive to use. See <a href="/about/drc_ref_global.xml#space">space</a> for more details.
+</p><p>
 This method performs a space check and returns a collection of edge pairs.
 A space check can be performed on polygon and edge layers. On edge layers, all
 edges are checked against all other edges. If two edges form a "face to face" relation
@@ -2619,6 +2641,8 @@ Like for the <a href="#width">width</a> method, merged semantics applies.
 </p><p>
 Distance values can be given as floating-point values (in micron) or integer values (in
 database units). To explicitly specify the unit, use the unit denominators.
+</p><p>
+For the manifold options of this function see the <a href="#width">width</a> method description.
 </p><p>
 The following image shows the effect of the space check:
 </p><p>
@@ -2796,6 +2820,9 @@ The following image shows the effect of the "moved" method:
 <li><tt>layer.width(value [, options])</tt></li>
 </ul>
 <p>
+<b>Note: </b>"width" is available as an operator for the "universal DRC" function <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> within
+the <a href="#DRC">DRC</a> framework. This variant has more options and is more intuitive to use. See <a href="/about/drc_ref_global.xml#width">width</a> for more details.
+</p><p>
 This method performs a width check and returns a collection of edge pairs.
 A width check can be performed on polygon and edge layers. On edge layers, all
 edges are checked against all other edges. If two edges form a "back to back" relation
@@ -2871,7 +2898,7 @@ The following images show the effect of various forms of the width check:
 </p><p>
 There is an alternative notation for the check using the "universal DRC" function ("<a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>"). 
 This notation is more intuitive and allows checking for widths bigger than a certain value 
-or within a certain range. 
+or within a certain range. See "<a href="/about/drc_ref_global.xml#width">width</a>" for details.
 </p><p>
 Apart from that it provides the same options than the plain width check. 
 Follow this link for the documentation of this feature: <a href="/about/drc_ref_global.xml#width">width</a>.

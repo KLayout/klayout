@@ -54,7 +54,6 @@ module DRC
 # @li \global#length @/li
 # @li \global#middle @/li
 # @li \global#notch @/li
-# @li \global#odd_polygons @/li
 # @li \global#outside @/li
 # @li \global#overlap @/li
 # @li \global#overlapping @/li
@@ -885,22 +884,6 @@ CODE
 
     end
 CODE
-  end
-  
-  # %DRC%
-  # @name odd_polygons
-  # @brief Selects all polygons which are non-orientable
-  # @synopsis expression.odd_polygons
-  #
-  # Non-orientable polygons are for example "8"-shape polygons. Such polygons are
-  # usually considered harmful as their definition of covered area is depending on the
-  # wrap count rule in place.
-  #
-  # This operation can be used as a plain function in which case it acts on primary
-  # shapes or can be used as method on another DRC expression.
-  
-  def odd_polygons
-    return DRCOpNodeFilter::new(@engine, self, :new_strange_polygons_filter, "odd_polygon")
   end
   
   # %DRC%
@@ -1874,7 +1857,7 @@ class DRCOpNodeCheck < DRCOpNodeWithCompare
     factory = { :width => :new_width_check, :space => :new_space_check,
                 :notch => :new_notch_check, :separation => :new_separation_check,
                 :isolated => :new_isolated_check, :overlap => :new_overlap_check, 
-                :enclosing => :new_inside_check }[self.check]
+                :enclosing => :new_enclosing_check }[self.check]
 
     oargs = []
     if self.other

@@ -13,7 +13,11 @@
   <file alias="drc_space1.png">doc/images/drc_space1.png</file>
   <file alias="drc_space2.png">doc/images/drc_space2.png</file>
   <file alias="drc_space3.png">doc/images/drc_space3.png</file>
+  <file alias="drc_space1u.png">doc/images/drc_space1u.png</file>
+  <file alias="drc_space2u.png">doc/images/drc_space2u.png</file>
+  <file alias="drc_space3u.png">doc/images/drc_space3u.png</file>
   <file alias="drc_separation1.png">doc/images/drc_separation1.png</file>
+  <file alias="drc_separation1u.png">doc/images/drc_separation1u.png</file>
   <file alias="drc_separation2.png">doc/images/drc_separation2.png</file>
   <file alias="drc_separation3.png">doc/images/drc_separation3.png</file>
   <file alias="drc_separation4.png">doc/images/drc_separation4.png</file>
@@ -29,8 +33,12 @@
   <file alias="drc_raw3.png">doc/images/drc_raw3.png</file>
   <file alias="drc_enc1.png">doc/images/drc_enc1.png</file>
   <file alias="drc_enc2.png">doc/images/drc_enc2.png</file>
+  <file alias="drc_enc1u.png">doc/images/drc_enc1u.png</file>
+  <file alias="drc_enc2u.png">doc/images/drc_enc2u.png</file>
   <file alias="drc_overlap1.png">doc/images/drc_overlap1.png</file>
   <file alias="drc_overlap2.png">doc/images/drc_overlap2.png</file>
+  <file alias="drc_overlap1u.png">doc/images/drc_overlap1u.png</file>
+  <file alias="drc_overlap2u.png">doc/images/drc_overlap2u.png</file>
   <file alias="drc_start_segments1.png">doc/images/drc_start_segments1.png</file>
   <file alias="drc_start_segments2.png">doc/images/drc_start_segments2.png</file>
   <file alias="drc_end_segments1.png">doc/images/drc_end_segments1.png</file>

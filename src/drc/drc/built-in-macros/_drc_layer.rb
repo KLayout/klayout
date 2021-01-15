@@ -2975,6 +2975,9 @@ CODE
     # @brief A width check
     # @synopsis layer.width(value [, options])
     # 
+    # @b Note: @/b "width" is available as an operator for the "universal DRC" function \Layer#drc within
+    # the \DRC framework. This variant has more options and is more intuitive to use. See \global#width for more details.
+    #
     # This method performs a width check and returns a collection of edge pairs.
     # A width check can be performed on polygon and edge layers. On edge layers, all
     # edges are checked against all other edges. If two edges form a "back to back" relation
@@ -3050,7 +3053,7 @@ CODE
     #
     # There is an alternative notation for the check using the "universal DRC" function ("\Layer#drc"). 
     # This notation is more intuitive and allows checking for widths bigger than a certain value 
-    # or within a certain range. 
+    # or within a certain range. See "\global#width" for details.
     #
     # Apart from that it provides the same options than the plain width check. 
     # Follow this link for the documentation of this feature: \global#width.
@@ -3074,6 +3077,9 @@ CODE
     # @brief A space check
     # @synopsis layer.space(value [, options])
     #
+    # @b Note: @/b "space" is available as an operator for the "universal DRC" function \Layer#drc within
+    # the \DRC framework. This variant has more options and is more intuitive to use. See \global#space for more details.
+    #
     # This method performs a space check and returns a collection of edge pairs.
     # A space check can be performed on polygon and edge layers. On edge layers, all
     # edges are checked against all other edges. If two edges form a "face to face" relation
@@ -3094,6 +3100,8 @@ CODE
     # Distance values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
     #
+    # For the manifold options of this function see the \width method description.
+    #
     # The following image shows the effect of the space check:
     # 
     # @table
@@ -3108,6 +3116,9 @@ CODE
     # @brief An isolation check
     # @synopsis layer.isolated(value [, options])
     # @synopsis layer.iso(value [, options])
+    #
+    # @b Note: @/b "isolated" and "iso" are available as operators for the "universal DRC" function \Layer#drc within
+    # the \DRC framework. These variants have more options and are more intuitive to use. See \global#isolated for more details.
     #
     # See \space for a description of this method. 
     # In contrast to \space, this
@@ -3129,6 +3140,9 @@ CODE
     # @brief An intra-region spacing check
     # @synopsis layer.notch(value [, options])
     #
+    # @b Note: @/b "notch" is available as an operator for the "universal DRC" function \Layer#drc within
+    # the \DRC framework. This variant has more options and is more intuitive to use. See \global#notch for more details.
+    #
     # See \space for a description of this method.
     # In contrast to \space, this
     # method is available for polygon layers only, since only on such layers 
@@ -3149,6 +3163,10 @@ CODE
     # @synopsis layer.separation(other_layer, value [, options])
     # @synopsis layer.sep(other_layer, value [, options])
     # 
+    # @b Note: @/b "separation" and "sep" are available as operators for the "universal DRC" function \drc within
+    # the \DRC framework. These variants have more options and are more intuitive to use. 
+    # See \global#separation for more details.
+    #
     # This method performs a two-layer spacing check. Like \space, this method
     # can be applied to edge or polygon layers. Locations where edges of the layer
     # are closer than the specified distance to the other layer are reported
@@ -3160,8 +3178,7 @@ CODE
     # layers touch are also reported. More specifically, the case of zero spacing
     # will also trigger an error while for \space it will not.
     # 
-    # As for the other DRC methods, merged semantics applies. The options available 
-    # are the same than for \width.  
+    # As for the other DRC methods, merged semantics applies.
     # Distance values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
     #
@@ -3172,6 +3189,8 @@ CODE
     #     @td @img(/images/drc_separation1.png) @/td
     #   @/tr
     # @/table
+    #
+    # @h3 opposite and rectangle error filtering @/h3
     #
     # The options for the separation check are those available for the \width or \space
     # method plus opposite and rectangle error filtering. 
@@ -3244,6 +3263,10 @@ CODE
     # @brief An overlap check
     # @synopsis layer.overlap(other_layer, value [, options])
     #
+    # @b Note: @/b "overlap" is available as an operator for the "universal DRC" function \drc within
+    # the \DRC framework. This variant has more options and is more intuitive to use. 
+    # See \global#overlap for more details.
+    #
     # This method checks whether layer and other_layer overlap by at least the
     # given length. Locations, where this is not the case will be reported in form
     # of edge pair error markers.
@@ -3282,6 +3305,10 @@ CODE
     # @brief An enclosing check
     # @synopsis layer.enclosing(other_layer, value [, options])
     # @synopsis layer.enc(other_layer, value [, options])
+    #
+    # @b Note: @/b "enclosing" and "enc" are available as operators for the "universal DRC" function \drc within
+    # the \DRC framework. These variants have more options and are more intuitive to use. 
+    # See \global#enclosing for more details.
     #
     # This method checks whether layer encloses (is bigger than) other_layer by the
     # given dimension. Locations, where this is not the case will be reported in form

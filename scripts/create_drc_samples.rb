@@ -231,6 +231,10 @@ run_demo gen, "input.space(1.2, euclidian)", "drc_space1.png"
 run_demo gen, "input.notch(1.2, euclidian)", "drc_space2.png"
 run_demo gen, "input.isolated(1.2, euclidian)", "drc_space3.png"
 
+run_demo gen, "input.drc(space(euclidian) < 1.2)", "drc_space1u.png"
+run_demo gen, "input.drc(notch(euclidian) < 1.2)", "drc_space2u.png"
+run_demo gen, "input.drc(isolated(euclidian) < 1.2)", "drc_space3u.png"
+
 class Gen
   def produce(s1, s2)
     pts = [ 
@@ -264,6 +268,7 @@ end
 gen = Gen::new
 
 run_demo gen, "input1.separation(input2, 1.2, euclidian)", "drc_separation1.png"
+run_demo gen, "input1.drc(separation(input2, euclidian) < 1.2)", "drc_separation1u.png"
 
 class Gen
   def produce(s1, s2)
@@ -442,6 +447,10 @@ gen = Gen::new
 run_demo gen, "input1.enclosing(input2, 2.0.um)", "drc_enc1.png"
 run_demo gen, "input1.enclosing(input2, 2.0.um, projection)", "drc_enc2.png"
 
+run_demo gen, "input1.drc(enclosing(input2) < 2.0.um)", "drc_enc1u.png"
+run_demo gen, "input1.drc(enclosing(input2,\n"+
+              "                     projection) < 2.0.um)", "drc_enc2u.png"
+
 
 class Gen
   def produce(s1, s2)
@@ -472,6 +481,10 @@ gen = Gen::new
 
 run_demo gen, "input1.overlap(input2, 2.0.um)", "drc_overlap1.png"
 run_demo gen, "input1.overlap(input2, 2.0.um, projection)", "drc_overlap2.png"
+
+run_demo gen, "input1.drc(overlap(input2) < 2.0.um)", "drc_overlap1u.png"
+run_demo gen, "input1.drc(overlap(input2,\n"+
+              "                   projection) < 2.0.um)", "drc_overlap2u.png"
 
 
 class Gen

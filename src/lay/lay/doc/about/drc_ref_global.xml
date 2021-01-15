@@ -1591,11 +1591,29 @@ out = in.drc(width != 0.2.um)
 out = in.drc(0.1.um &lt;= width &lt; 0.2.um)
 </pre>
 </p><p>
-With a lower and upper limit, the results are edges marking the positions on the 
+<table>
+<tr>
+<td><img src="/images/drc_width1u.png"/></td>
+<td><img src="/images/drc_width2u.png"/></td>
+</tr>
+</table>
+</p><p>
+With a lower and upper limit or with the "equal" condition, the results are edges marking the positions on the 
 primary shape where the condition is met.
 With a lower limit alone, these markers are formed by two, identical but opposite edges attached to 
 the primary shape. Without an upper limit only, both edges are attached to different sides of the primary
 shape.
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_width3u.png"/></td>
+<td><img src="/images/drc_width4u.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_width5u.png"/></td>
+<td><img src="/images/drc_width6u.png"/></td>
+</tr>
+</table>
 </p>
 <a name="write_spice"/><h2>"write_spice" - Defines SPICE output format (with options)</h2>
 <keyword name="write_spice"/>

@@ -180,6 +180,31 @@ run_demo gen, "input.width(1.2, whole_edges)", "drc_width4.png"
 class Gen
   def produce(s1, s2)
     pts = [ 
+      RBA::Point::new(0, 0),
+      RBA::Point::new(3000, 0),
+      RBA::Point::new(3000, 4000),
+      RBA::Point::new(5000, 4000),
+      RBA::Point::new(5000, 7000),
+      RBA::Point::new(2000, 7000),
+      RBA::Point::new(2000, 2000),
+      RBA::Point::new(0, 2000)
+    ];
+    s1.insert(RBA::Polygon::new(pts))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input.drc(width < 2.0)", "drc_width1u.png"
+run_demo gen, "input.drc(width(projection) < 2.0)", "drc_width2u.png"
+run_demo gen, "input.drc(width(projection) > 2.0)", "drc_width3u.png"
+run_demo gen, "input.drc(width(projection) == 2.0)", "drc_width4u.png"
+run_demo gen, "input.drc(width(projection) != 2.0)", "drc_width5u.png"
+run_demo gen, "input.drc(1.0 < width(projection) <= 3.0)", "drc_width6u.png"
+
+class Gen
+  def produce(s1, s2)
+    pts = [ 
       RBA::Point::new(4000, 0),
       RBA::Point::new(4000, 1000),
       RBA::Point::new(6000, 1000),

@@ -2804,6 +2804,8 @@ value, an error shape is generated for that edge pair.
 On polygon layers, the polygons on each layer are checked for locations where their
 width is less than the specified value. In that case, an edge pair error shape is generated.
 </p><p>
+<h3>Options </h3>
+</p><p>
 The options available are:
 </p><p>
 <ul>
@@ -2850,6 +2852,8 @@ markers = in.width(2.um)
 markers = in.width(20.nm)
 </pre>
 </p><p>
+<h3>Examples </h3>
+</p><p>
 The following images show the effect of various forms of the width check:
 </p><p>
 <table>
@@ -2862,6 +2866,17 @@ The following images show the effect of various forms of the width check:
 <td><img src="/images/drc_width4.png"/></td>
 </tr>
 </table>
+</p><p>
+<h3>Universal DRC function </h3>
+</p><p>
+There is an alternative notation for the check using the "universal DRC" function ("<a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>"). 
+This notation is more intuitive and allows checking for widths bigger than a certain value 
+or within a certain range. 
+</p><p>
+Apart from that it provides the same options than the plain width check. 
+Follow this link for the documentation of this feature: <a href="/about/drc_ref_global.xml#width">width</a>.
+</p><p>
+<h3>Shielding </h3>
 </p><p>
 "shielding" is a concept where an internal or external distance is measured only 
 if the opposite edge is not blocked by other edges between. Shielded mode makes 

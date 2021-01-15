@@ -2983,6 +2983,8 @@ CODE
     # On polygon layers, the polygons on each layer are checked for locations where their
     # width is less than the specified value. In that case, an edge pair error shape is generated.
     # 
+    # @h3 Options @/h3
+    #
     # The options available are:
     #
     # @ul
@@ -3029,6 +3031,8 @@ CODE
     #   markers = in.width(20.nm)
     # @/code
     #
+    # @h3 Examples @/h3
+    #
     # The following images show the effect of various forms of the width check:
     # 
     # @table
@@ -3041,6 +3045,17 @@ CODE
     #     @td @img(/images/drc_width4.png) @/td
     #   @/tr
     # @/table
+    #
+    # @h3 Universal DRC function @/h3
+    #
+    # There is an alternative notation for the check using the "universal DRC" function ("\Layer#drc"). 
+    # This notation is more intuitive and allows checking for widths bigger than a certain value 
+    # or within a certain range. 
+    #
+    # Apart from that it provides the same options than the plain width check. 
+    # Follow this link for the documentation of this feature: \global#width.
+    #
+    # @h3 Shielding @/h3
     #
     # "shielding" is a concept where an internal or external distance is measured only 
     # if the opposite edge is not blocked by other edges between. Shielded mode makes 

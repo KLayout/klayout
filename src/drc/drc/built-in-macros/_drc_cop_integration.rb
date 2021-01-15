@@ -1048,11 +1048,30 @@ CODE
     # out = in.drc(0.1.um <= width < 0.2.um)
     # @/code
     #
-    # With a lower and upper limit, the results are edges marking the positions on the 
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_width1u.png) @/td
+    #     @td @img(/images/drc_width2u.png) @/td
+    #   @/tr
+    # @/table
+    #
+    # With a lower and upper limit or with the "equal" condition, the results are edges marking the positions on the 
     # primary shape where the condition is met.
     # With a lower limit alone, these markers are formed by two, identical but opposite edges attached to 
     # the primary shape. Without an upper limit only, both edges are attached to different sides of the primary
     # shape.
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_width3u.png) @/td
+    #     @td @img(/images/drc_width4u.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_width5u.png) @/td
+    #     @td @img(/images/drc_width6u.png) @/td
+    #   @/tr
+    # @/table
+    #
     
     # %DRC%
     # @name space

@@ -4,6 +4,12 @@
   <file alias="drc_width2.png">doc/images/drc_width2.png</file>
   <file alias="drc_width3.png">doc/images/drc_width3.png</file>
   <file alias="drc_width4.png">doc/images/drc_width4.png</file>
+  <file alias="drc_width1u.png">doc/images/drc_width1u.png</file>
+  <file alias="drc_width2u.png">doc/images/drc_width2u.png</file>
+  <file alias="drc_width3u.png">doc/images/drc_width3u.png</file>
+  <file alias="drc_width4u.png">doc/images/drc_width4u.png</file>
+  <file alias="drc_width5u.png">doc/images/drc_width5u.png</file>
+  <file alias="drc_width6u.png">doc/images/drc_width6u.png</file>
   <file alias="drc_space1.png">doc/images/drc_space1.png</file>
   <file alias="drc_space2.png">doc/images/drc_space2.png</file>
   <file alias="drc_space3.png">doc/images/drc_space3.png</file>

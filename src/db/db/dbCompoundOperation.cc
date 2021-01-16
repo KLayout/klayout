@@ -366,6 +366,7 @@ CompoundRegionMultiInputOperationNode::~CompoundRegionMultiInputOperationNode ()
 void
 CompoundRegionMultiInputOperationNode::invalidate_cache () const
 {
+  CompoundRegionOperationNode::invalidate_cache ();
   for (tl::shared_collection<CompoundRegionOperationNode>::const_iterator i = m_children.begin (); i != m_children.end (); ++i) {
     i->invalidate_cache ();
   }

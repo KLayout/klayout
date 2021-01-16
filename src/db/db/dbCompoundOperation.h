@@ -222,6 +222,11 @@ public:
     m_cache_edge_pair_valid = false;
   }
 
+  void setup_cache () const
+  {
+    invalidate_cache ();
+  }
+
 protected:
   //  the different computation slots
   virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Polygon, db::Polygon> & /*interactions*/,       std::vector<std::unordered_set<db::Polygon> > & /*results*/,     size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
@@ -255,14 +260,27 @@ private:
   template <class TS, class TI, class TR>
   void implement_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio) const
   {
+    //  TODO: confine caching to those nodes which need it.
+
     std::vector<std::unordered_set<TR> > *cache = 0;
     bool *valid = 0;
     get_cache (cache, valid);
-    if (*valid) {
-      results = *cache;
-    } else {
-      do_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
-      *cache = results;
+
+    if (! *valid) {
+
+      std::vector<std::unordered_set<TR> > uncached_results;
+      uncached_results.resize (results.size ());
+
+      do_compute_local (layout, interactions, uncached_results, max_vertex_count, area_ratio);
+
+      cache->swap (uncached_results);
+      *valid = true;
+
+    }
+
+    tl_assert (results.size () == cache->size ());
+    for (size_t r = 0; r < results.size (); ++r) {
+      results[r].insert ((*cache)[r].begin (), (*cache)[r].end ());
     }
   }
 };
@@ -1569,6 +1587,7 @@ public:
 protected:
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio) const
   {
+    mp_node->setup_cache ();
     mp_node->compute_local (layout, interactions, results, max_vertex_count, area_ratio);
   }
 

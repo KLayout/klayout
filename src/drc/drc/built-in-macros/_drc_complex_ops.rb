@@ -313,7 +313,7 @@ class DRCOpNode
   # first argument. This will not render the desired results.
   # Remember that the "drc" function will walk over all primary
   # shapes and present single primaries to the NOT operation together
-  # the the secondaries of that single shape. So when you use
+  # with the secondaries of that single shape. So when you use
   # secondary shapes as the first argument, they will not see all
   # all the primaries required to compute the correct result.
   # That's also why a XOR operation cannot be provided in the 
@@ -692,7 +692,7 @@ CODE
   #
   # For this measurement edges are considered without their direction and straight lines. 
   # A horizontal edge has an angle of zero degree. A vertical one has
-  # an angle of 90 degee. The angle range is from -90 (exclusive) to 90 degree (inclusive).
+  # an angle of 90 degrees. The angle range is from -90 (exclusive) to 90 degree (inclusive).
   #
   # If the input shapes are not polygons or edge pairs, they are converted to edges 
   # before the angle test is made.
@@ -706,7 +706,7 @@ CODE
   # @/code
   #
   # Note that angle checks usually imply the need to rotation variant formation as cells which
-  # are placed unrotated and rotated by 90 degree cannot be considered identical. This imposes
+  # are placed non-rotated and rotated by 90 degree cannot be considered identical. This imposes
   # a performance penalty in hierarchical mode. If possible, consider using \DRC#rectilinear for
   # example to detect shapes with non-manhattan geometry instead of using angle checks.
   #
@@ -722,7 +722,7 @@ CODE
   # @brief Applies corner rounding
   # @synopsis expression.rounded_corners(inner, outer, n)
   #
-  # This operation acts on polygons and applies corner rounding the the given inner
+  # This operation acts on polygons and applies corner rounding to the given inner
   # and outer corner radius and the number of points n per full circle. See \Layer#rounded_corners for more details.
   #
   # The "rounded_corners" method is available as a plain function or as a method on \DRC# expressions.
@@ -806,7 +806,7 @@ CODE
 
   # %DRC%
   # @name extent_refs
-  # @brief Returns partial references to the boundings boxes of the polygons
+  # @brief Returns partial references to the bounding boxes of the polygons
   # @synopsis expression.extent_refs([ options ])
   #
   # The extent_refs operation acts on polygons and has the same effect than \Layer#extent_refs.

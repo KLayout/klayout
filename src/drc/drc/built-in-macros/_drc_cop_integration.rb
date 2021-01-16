@@ -22,7 +22,7 @@ module DRC
     # within the DRC.
     #
     # When the DRC function is executed, it will basically visit all shapes
-    # from the input layer. This is the layer, the "drc" method is called on.
+    # from the input layer (the layer, the "drc" method is called on)).
     # While it does, it collects the neighbor shapes from all involved other inputs 
     # and runs the requested operations on each cluster. 
     # Currently, "drc" is only available for polygon layers.
@@ -34,10 +34,10 @@ module DRC
     # but involves potentially complex and heavy operations such as booleans, interact
     # etc. For this reason, the "drc" function may provide a better performance.
     #
-    # In addition, within the loop a single shape from the input layer is presented to
+    # In addition, within the loop a single shape from the input layer is presented to the
     # execution engine which runs the operations.
     # This allows using operations such as "size" without having to consider 
-    # neigbor polygons growing into the area of the initial shape. In this sense,
+    # neighbor polygons growing into the area of the initial shape. In this sense,
     # the "drc" function sees the layer as individual polygons rather than
     # a global "sea of polygons". This enables new applications which are otherwise
     # difficult to implement.
@@ -258,7 +258,7 @@ module DRC
     # ("if_all"). 
     #
     # For example, this will select all polygons which are rectangles
-    # and whose area is larger than 20 quare micrometers:
+    # and whose area is larger than 20 square micrometers:
     #
     # @code
     # out = in.drc(if_all(rectangles, area > 20.0))
@@ -795,7 +795,7 @@ CODE
     # small (2x2 DBU) box markers.
     # 
     # The "corners" operator can be put into a condition which means it's
-    # applied to coners meeting a particular angle constraint.
+    # applied to corners meeting a particular angle constraint.
 
     def _cop_corners(as_dots = DRCAsDots::new(false))
       # NOTE: this method is a fallback for the respective global ones which route to DRCLayer or here.

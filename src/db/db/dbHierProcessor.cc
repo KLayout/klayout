@@ -1218,7 +1218,7 @@ local_processor<TS, TI, TR>::local_processor (db::Layout *layout, db::Cell *top,
   : mp_subject_layout (layout), mp_intruder_layout (layout),
     mp_subject_top (top), mp_intruder_top (top),
     mp_subject_breakout_cells (breakout_cells), mp_intruder_breakout_cells (breakout_cells),
-    m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30), m_progress (0), mp_progress (0)
+    m_report_progress (true), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30), m_progress (0), mp_progress (0)
 {
   //  .. nothing yet ..
 }
@@ -1228,7 +1228,7 @@ local_processor<TS, TI, TR>::local_processor (db::Layout *subject_layout, db::Ce
   : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout),
     mp_subject_top (subject_top), mp_intruder_top (intruder_top),
     mp_subject_breakout_cells (subject_breakout_cells), mp_intruder_breakout_cells (intruder_breakout_cells),
-    m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30), m_progress (0), mp_progress (0)
+    m_report_progress (true), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30), m_progress (0), mp_progress (0)
 {
   //  .. nothing yet ..
 }
@@ -1654,8 +1654,10 @@ local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, T
 
   //  prepare a progress for the computation tasks
   size_t comp_effort = 0;
-  for (typename local_processor_contexts<TS, TI, TR>::iterator c = contexts.begin (); c != contexts.end (); ++c) {
-    comp_effort += c->second.size ();
+  if (m_report_progress) {
+    for (typename local_processor_contexts<TS, TI, TR>::iterator c = contexts.begin (); c != contexts.end (); ++c) {
+      comp_effort += c->second.size ();
+    }
   }
 
   tl::RelativeProgress progress (description (op), comp_effort, 1);
@@ -1738,7 +1740,7 @@ local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, T
 
     try {
 
-      mp_progress = &progress;
+      mp_progress = m_report_progress ? &progress : 0;
 
       for (db::Layout::bottom_up_const_iterator bu = mp_subject_layout->begin_bottom_up (); bu != mp_subject_layout->end_bottom_up (); ++bu) {
 
@@ -2026,7 +2028,7 @@ namespace
 template <class TS, class TI>
 struct interaction_registration_shape1_scanner_combo
 {
-  interaction_registration_shape1_scanner_combo (shape_interactions<TS, TI> *, unsigned int)
+  interaction_registration_shape1_scanner_combo (shape_interactions<TS, TI> *, unsigned int, bool, const std::string &)
   {
     //  can't have self-interactions with different types
     tl_assert (false);
@@ -2046,8 +2048,8 @@ struct interaction_registration_shape1_scanner_combo
 template <class T>
 struct interaction_registration_shape1_scanner_combo<T, T>
 {
-  interaction_registration_shape1_scanner_combo (shape_interactions<T, T> *interactions, unsigned int intruder_layer_index)
-    : m_scanner (), m_rec (interactions, intruder_layer_index)
+  interaction_registration_shape1_scanner_combo (shape_interactions<T, T> *interactions, unsigned int intruder_layer_index, bool report_progress, const std::string &progress_description)
+    : m_scanner (report_progress, progress_description), m_rec (interactions, intruder_layer_index)
   {
     //  .. nothing yet ..
   }
@@ -2079,6 +2081,26 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
   tl_assert (mp_subject_top == 0);
   tl_assert (mp_intruder_top == 0);
+
+  std::string process_description, scan_description;
+
+  if (m_report_progress) {
+
+    process_description = description (op);
+    if (process_description.empty ()) {
+      process_description = tl::to_string (tr ("Processing"));
+    } else {
+      process_description += tl::to_string (tr (" (processing)"));
+    }
+
+    scan_description = description (op);
+    if (scan_description.empty ()) {
+      scan_description = tl::to_string (tr ("Scanning"));
+    } else {
+      scan_description += tl::to_string (tr (" (scan)"));
+    }
+
+  }
 
   shape_interactions<TS, TI> interactions;
 
@@ -2129,7 +2151,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
         if (*il == subjects && ! ff) {
 
-          interaction_registration_shape1_scanner_combo<TS, TI> scanner (&interactions, il_index);
+          interaction_registration_shape1_scanner_combo<TS, TI> scanner (&interactions, il_index, m_report_progress, scan_description);
 
           for (typename shape_interactions<TS, TI>::subject_iterator s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
             scanner.insert (&s->second, s->first);
@@ -2139,7 +2161,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
         } else {
 
-          db::box_scanner2<TS, unsigned int, TI, unsigned int> scanner;
+          db::box_scanner2<TS, unsigned int, TI, unsigned int> scanner (m_report_progress, scan_description);
           interaction_registration_shape2shape<TS, TI> rec (0 /*layout*/, &interactions, il_index);
 
           for (typename shape_interactions<TS, TI>::subject_iterator s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
@@ -2195,7 +2217,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
         if (*il == subjects && ! ff) {
 
-          interaction_registration_shape1_scanner_combo<TS, TI> scanner (&interactions, il_index);
+          interaction_registration_shape1_scanner_combo<TS, TI> scanner (&interactions, il_index, m_report_progress, scan_description);
 
           addressable_shape_delivery<TS> is (subjects.confined (common_box, true));
           unsigned int id = id_first;
@@ -2208,7 +2230,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
         } else {
 
-          db::box_scanner2<TS, unsigned int, TI, unsigned int> scanner;
+          db::box_scanner2<TS, unsigned int, TI, unsigned int> scanner (m_report_progress, scan_description);
           interaction_registration_shape2shape<TS, TI> rec (0 /*layout*/, &interactions, il_index);
 
           if (*il == subjects) {
@@ -2265,7 +2287,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
     std::vector<std::unordered_set<TR> > result;
     result.resize (result_shapes.size ());
-    op->compute_local (mp_subject_layout, interactions, result, m_max_vertex_count, m_area_ratio);
+    op->compute_local (mp_subject_layout, interactions, result, m_max_vertex_count, m_area_ratio, m_report_progress, process_description);
 
     for (std::vector<db::Shapes *>::const_iterator r = result_shapes.begin (); r != result_shapes.end (); ++r) {
       if (*r) {

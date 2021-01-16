@@ -77,6 +77,11 @@ public:
     return m_interactions.end ();
   }
 
+  size_t size () const
+  {
+    return m_interactions.size ();
+  }
+
   size_t num_interactions () const
   {
     return m_interactions.size ();
@@ -428,6 +433,11 @@ public:
     m_description = d;
   }
 
+  void set_report_progress (bool rp)
+  {
+    m_report_progress = rp;
+  }
+
   void set_base_verbosity (int vb)
   {
     m_base_verbosity = vb;
@@ -479,6 +489,7 @@ private:
   const std::set<db::cell_index_type> *mp_subject_breakout_cells;
   const std::set<db::cell_index_type> *mp_intruder_breakout_cells;
   std::string m_description;
+  bool m_report_progress;
   unsigned int m_nthreads;
   size_t m_max_vertex_count;
   double m_area_ratio;

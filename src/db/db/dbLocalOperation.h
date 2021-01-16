@@ -29,10 +29,13 @@
 
 #include "dbLayout.h"
 #include "dbEdgeBoolean.h"
+#include "tlProgress.h"
+#include "tlInternational.h"
 
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <memory>
 
 namespace db
 {
@@ -92,13 +95,18 @@ public:
    *
    *  If the operation requests single subject mode, the interactions will be split into single subject/intruder clusters
    */
-  void compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio) const
+  void compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio, bool report_progress = false, const std::string &progress_desc = std::string ()) const
   {
     if (interactions.num_subjects () <= 1 || ! requests_single_subjects ()) {
 
       do_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
 
     } else {
+
+      std::auto_ptr<tl::RelativeProgress> progress;
+      if (report_progress) {
+        progress.reset (new tl::RelativeProgress (progress_desc, interactions.size ()));
+      }
 
       for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
 
@@ -121,6 +129,10 @@ public:
         }
 
         do_compute_local (layout, single_interactions, results, max_vertex_count, area_ratio);
+
+        if (progress.get ()) {
+          ++*progress;
+        }
 
       }
 

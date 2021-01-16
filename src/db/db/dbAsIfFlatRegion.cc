@@ -1045,6 +1045,8 @@ void region_cop_impl (AsIfFlatRegion *region, db::Shapes *output_to, db::Compoun
 {
   db::local_processor<db::Polygon, db::Polygon, TR> proc;
   proc.set_base_verbosity (region->base_verbosity ());
+  proc.set_description (region->progress_desc ());
+  proc.set_report_progress (region->report_progress ());
 
   db::RegionIterator polygons (region->begin_merged ());
 

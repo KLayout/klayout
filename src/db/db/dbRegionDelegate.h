@@ -311,7 +311,6 @@ public:
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const = 0;
 
-protected:
   const std::string &progress_desc () const
   {
     return m_progress_desc;
@@ -322,6 +321,7 @@ protected:
     return m_report_progress;
   }
 
+protected:
   virtual void merged_semantics_changed () { }
   virtual void min_coherence_changed () { }
 

@@ -264,8 +264,8 @@ public:
 private:
   int m_threads;
   double m_max_area_ratio;
-  bool m_reject_odd_polygons;
   size_t m_max_vertex_count;
+  bool m_reject_odd_polygons;
   tl::Variant m_text_property_name;
   std::vector<std::set<db::cell_index_type> > m_breakout_cells;
   int m_text_enlargement;

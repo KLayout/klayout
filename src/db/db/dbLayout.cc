@@ -984,7 +984,7 @@ Layout::flatten (const db::Cell &source_cell, db::Cell &target_cell, const db::I
       //  even an iteration of the instances requires an update.
       start_changes ();
 
-      db::Instances old_instances (0);
+      db::Instances old_instances (&target_cell);
       old_instances = target_cell.instances ();
       target_cell.clear_insts ();
 

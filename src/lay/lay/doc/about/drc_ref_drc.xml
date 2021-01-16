@@ -55,7 +55,6 @@ The following global functions are relevant for the DRC expressions:
 <li><a href="/about/drc_ref_global.xml#length">length</a> </li>
 <li><a href="/about/drc_ref_global.xml#middle">middle</a> </li>
 <li><a href="/about/drc_ref_global.xml#notch">notch</a> </li>
-<li><a href="/about/drc_ref_global.xml#odd_polygons">odd_polygons</a> </li>
 <li><a href="/about/drc_ref_global.xml#outside">outside</a> </li>
 <li><a href="/about/drc_ref_global.xml#overlap">overlap</a> </li>
 <li><a href="/about/drc_ref_global.xml#overlapping">overlapping</a> </li>
@@ -140,7 +139,7 @@ CAUTION: be careful not to take secondary input for the
 first argument. This will not render the desired results.
 Remember that the "drc" function will walk over all primary
 shapes and present single primaries to the NOT operation together
-the the secondaries of that single shape. So when you use
+with the secondaries of that single shape. So when you use
 secondary shapes as the first argument, they will not see all
 all the primaries required to compute the correct result.
 That's also why a XOR operation cannot be provided in the 
@@ -166,7 +165,7 @@ axis in the mathematical sense.
 </p><p>
 For this measurement edges are considered without their direction and straight lines. 
 A horizontal edge has an angle of zero degree. A vertical one has
-an angle of 90 degee. The angle range is from -90 (exclusive) to 90 degree (inclusive).
+an angle of 90 degrees. The angle range is from -90 (exclusive) to 90 degree (inclusive).
 </p><p>
 If the input shapes are not polygons or edge pairs, they are converted to edges 
 before the angle test is made.
@@ -180,7 +179,7 @@ out = in.drc((primary.angle == 45) + (primary.angle == 135))    # equivalent
 </pre>
 </p><p>
 Note that angle checks usually imply the need to rotation variant formation as cells which
-are placed unrotated and rotated by 90 degree cannot be considered identical. This imposes
+are placed non-rotated and rotated by 90 degree cannot be considered identical. This imposes
 a performance penalty in hierarchical mode. If possible, consider using <a href="/about/drc_ref_drc.xml#rectilinear">DRC#rectilinear</a> for
 example to detect shapes with non-manhattan geometry instead of using angle checks.
 </p><p>
@@ -520,7 +519,7 @@ This method is basically equivalent to the <a href="#extended">extended</a> meth
 "extended(0, 0, dist, 0)".
 A version extending to the inside is <a href="#extended_in">extended_in</a>.
 </p>
-<a name="extent_refs"/><h2>"extent_refs" - Returns partial references to the boundings boxes of the polygons</h2>
+<a name="extent_refs"/><h2>"extent_refs" - Returns partial references to the bounding boxes of the polygons</h2>
 <keyword name="extent_refs"/>
 <p>Usage:</p>
 <ul>
@@ -684,20 +683,6 @@ The middle operation acts on polygons and has the same effect than <a href="/abo
 It takes the same arguments. It is available as a method on <a href="/about/drc_ref_drc.xml">DRC</a> expressions or
 as plain function, in which case it acts on the primary shapes.
 </p>
-<a name="odd_polygons"/><h2>"odd_polygons" - Selects all polygons which are non-orientable</h2>
-<keyword name="odd_polygons"/>
-<p>Usage:</p>
-<ul>
-<li><tt>expression.odd_polygons</tt></li>
-</ul>
-<p>
-Non-orientable polygons are for example "8"-shape polygons. Such polygons are
-usually considered harmful as their definition of covered area is depending on the
-wrap count rule in place.
-</p><p>
-This operation can be used as a plain function in which case it acts on primary
-shapes or can be used as method on another DRC expression.
-</p>
 <a name="outside"/><h2>"outside" - Selects shapes entirely outside other shapes</h2>
 <keyword name="outside"/>
 <p>Usage:</p>
@@ -860,7 +845,7 @@ The plain function is equivalent to "primary.bbox_aspect_ratio".
 <li><tt>expression.rounded_corners(inner, outer, n)</tt></li>
 </ul>
 <p>
-This operation acts on polygons and applies corner rounding the the given inner
+This operation acts on polygons and applies corner rounding to the given inner
 and outer corner radius and the number of points n per full circle. See <a href="/about/drc_ref_layer.xml#rounded_corners">Layer#rounded_corners</a> for more details.
 </p><p>
 The "rounded_corners" method is available as a plain function or as a method on <a href="/about/drc_ref_drc.xml">DRC</a> expressions.

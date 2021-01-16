@@ -349,7 +349,7 @@ output type option: "as_dots" for dot-like edges and "as_boxes" for
 small (2x2 DBU) box markers.
 </p><p>
 The "corners" operator can be put into a condition which means it's
-applied to coners meeting a particular angle constraint.
+applied to corners meeting a particular angle constraint.
 </p>
 <a name="covering"/><h2>"covering" - Selects shapes entirely covering other shapes</h2>
 <keyword name="covering"/>
@@ -1117,19 +1117,6 @@ See <a href="#enclosing">enclosing</a> for more details about the various ways t
 <td><img src="/images/drc_space2u.png"/></td>
 </tr>
 </table>
-</p>
-<a name="odd_polygons"/><h2>"odd_polygons" - Selects all polygons which are non-orientable</h2>
-<keyword name="odd_polygons"/>
-<p>Usage:</p>
-<ul>
-<li><tt>odd_polygons</tt></li>
-<li><tt>odd_polygons(layer)</tt></li>
-</ul>
-<p>
-This function can be used with a layer argument. In this case it
-is equivalent to "layer.odd_polygons" (see <a href="/about/drc_ref_layer.xml#odd_polygons">Layer#odd_polygons</a>). Without a layer
-argument, "odd_polygons" represents an odd polygon filter for primary shapes in 
-<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#odd_polygons">DRC#odd_polygons</a> for more details).
 </p>
 <a name="output"/><h2>"output" - Outputs a layer to the report database or output layout</h2>
 <keyword name="output"/>

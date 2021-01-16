@@ -1101,7 +1101,7 @@ AsIfFlatRegion::width_check (db::Coord d, const RegionCheckOptions &options) con
 EdgePairsDelegate *
 AsIfFlatRegion::space_or_isolated_check (db::Coord d, const RegionCheckOptions &options, bool isolated) const
 {
-  if (options.opposite_filter != NoOppositeFilter || options.rect_filter != NoSideAllowed) {
+  if (options.opposite_filter != NoOppositeFilter || options.rect_filter != NoSideAllowed || options.shielded) {
     //  NOTE: we have to use the "foreign" scheme with a filter because only this scheme
     //  guarantees that all subject shapes are visited.
     return run_check (db::SpaceRelation, isolated, foreign_regionptr (), d, options);

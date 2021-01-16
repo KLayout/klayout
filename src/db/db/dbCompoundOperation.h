@@ -334,6 +334,7 @@ public:
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const;
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const;
 
+  //  non-implemented
   virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Polygon, db::Polygon> & /*interactions*/,       std::vector<std::unordered_set<db::Edge> > & /*results*/,        size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
   virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Polygon, db::Polygon> & /*interactions*/,       std::vector<std::unordered_set<db::EdgePair> > & /*results*/,    size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
   virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> & /*interactions*/, std::vector<std::unordered_set<db::Edge> > & /*results*/,        size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
@@ -353,6 +354,12 @@ public:
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, size_t max_vertex_count, double area_ratio) const;
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const;
+
+  //  non-implemented
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Polygon, db::Polygon> & /*interactions*/,       std::vector<std::unordered_set<db::Edge> > & /*results*/,        size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Polygon, db::Polygon> & /*interactions*/,       std::vector<std::unordered_set<db::EdgePair> > & /*results*/,    size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> & /*interactions*/, std::vector<std::unordered_set<db::Edge> > & /*results*/,        size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> & /*interactions*/, std::vector<std::unordered_set<db::EdgePair> > & /*results*/,    size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
 };
 
 class DB_PUBLIC CompoundRegionOperationSecondaryNode
@@ -1569,7 +1576,7 @@ namespace tl
 {
 
 template <>
-struct tl::type_traits<db::CompoundRegionOperationNode>
+struct type_traits<db::CompoundRegionOperationNode>
   : public tl::type_traits<void>
 {
   typedef false_tag has_copy_constructor;

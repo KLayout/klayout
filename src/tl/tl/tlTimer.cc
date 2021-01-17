@@ -25,18 +25,21 @@
 #include "tlLog.h"
 #include "tlString.h"
 
-#ifndef _WIN32
+#if defined(_MSC_VER)
+
+#  include <Windows.h>
+
+#elif defined(_WIN32)
+
 #  include <sys/times.h>
+#  include <Windows.h>
+#
 #endif
 
 #include <stdio.h>
 
 #if !defined(_MSC_VER) // not available on MS VC++
 #  include <unistd.h>
-#endif
-
-#if defined(_MSC_VER)
-#  include <Windows.h>
 #endif
 
 #if defined(__MACH__)

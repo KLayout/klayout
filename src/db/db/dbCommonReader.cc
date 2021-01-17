@@ -54,6 +54,7 @@ CommonReader::make_cell (db::Layout &layout, const std::string &cn)
       common_reader_error (tl::sprintf (tl::to_string (tr ("A cell with name %s already exists")), cn));
     }
 
+    m_temp_cells.erase (cell.cell_index ());
     cell.set_ghost_cell (false);
     return cell.cell_index ();
 
@@ -98,6 +99,7 @@ CommonReader::make_cell (db::Layout &layout, size_t id)
       common_reader_error (tl::sprintf (tl::to_string (tr ("A cell with ID %ld already exists")), id));
     }
 
+    m_temp_cells.erase (cell.cell_index ());
     cell.set_ghost_cell (false);
     return cell.cell_index ();
 
@@ -180,6 +182,7 @@ CommonReader::rename_cell (db::Layout &layout, size_t id, const std::string &cn)
 
     db::cell_index_type ci = layout.add_anonymous_cell ();
     layout.cell (ci).set_ghost_cell (true);
+    m_temp_cells.insert (ci);
 
     m_id_map [id] = std::make_pair (cn, ci);
     m_name_map [cn] = std::make_pair (id, ci);
@@ -195,6 +198,7 @@ CommonReader::cell_for_instance (db::Layout &layout, size_t id)
   std::map<size_t, std::pair<std::string, db::cell_index_type> >::iterator iid = m_id_map.find (id);
   if (iid != m_id_map.end ()) {
 
+    m_temp_cells.erase (iid->second.second);
     return iid->second.second;
 
   } else {
@@ -216,6 +220,7 @@ CommonReader::cell_for_instance (db::Layout &layout, const std::string &cn)
   std::map<std::string, std::pair<size_t, db::cell_index_type> >::iterator iname = m_name_map.find (cn);
   if (iname != m_name_map.end ()) {
 
+    m_temp_cells.erase (iname->second.second);
     return iname->second.second;
 
   } else {
@@ -421,6 +426,12 @@ CommonReader::finish (db::Layout &layout)
 
     }
 
+  }
+
+  //  remove temporary cells (some that were "declared" by "rename_cell" but not used by cell_for_instance)
+
+  for (std::set<db::cell_index_type>::const_iterator ci = m_temp_cells.begin (); ci != m_temp_cells.end (); ++ci) {
+    layout.delete_cell (*ci);
   }
 
   //  resolve layer multi-mapping

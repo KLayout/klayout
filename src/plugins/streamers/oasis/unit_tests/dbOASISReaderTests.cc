@@ -264,6 +264,11 @@ TEST(2_6)
   run_test (_this, "2.6");
 }
 
+TEST(2_7)
+{
+  run_test (_this, "2.7");
+}
+
 TEST(3_1)
 {
   run_test (_this, "3.1");

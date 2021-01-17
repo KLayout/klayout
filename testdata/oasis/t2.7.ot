@@ -1,15 +1,10 @@
 # <test>
-#   <name>t2.4.ot</name>
-#   <content-description>Two empty cells</content-description>
-#   <test-intention>Basic reader capabilities</test-intention>
-#   <test-intention>CELL record reading</test-intention>
-#   <test-intention>Cell name specification by ID</test-intention>
-#   <test-intention>Explicit assignment of ID's</test-intention>
+#   <name>t2.7.ot</name>
+#   <content-description>Two cells, one just declared but not present</content-description>
+#   <test-intention>Unused CELLNAME must not generate an empty cell</test-intention>
 #   <content>
 #     begin_lib 0.001
 #     begin_cell {XYZ}
-#     end_cell
-#     begin_cell {ABC}
 #     end_cell
 #     end_lib
 #   </content>
@@ -33,10 +28,6 @@ record CELLNAME_ID
 # Cell XYZ (empty)
 record CELL_ID
   uint 0
-
-# Cell ABC
-record CELL_ID
-  uint 1
 
 # no body.
 

@@ -58,6 +58,7 @@ private slots:
   void fit_button_clicked ();
   void scale_factor_changed (double f);
   void scale_slider_changed (int value);
+  void init_failed ();
 
 private:
   Ui::D25View *mp_ui;

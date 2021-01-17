@@ -1137,3 +1137,13 @@ TEST(26d_attributes)
 {
   run_test (_this, "26", true);
 }
+
+TEST(27_advancedShielding)
+{
+  run_test (_this, "27", false);
+}
+
+TEST(27d_advancedShielding)
+{
+  run_test (_this, "27", true);
+}

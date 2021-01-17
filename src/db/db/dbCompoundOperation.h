@@ -680,7 +680,11 @@ public:
   virtual ResultType result_type () const { return compound_operation_type_traits<TR>::type (); }
   virtual const db::TransformationReducer *vars () const  { return mp_vars; }
   virtual bool wants_variants () const { return m_wants_variants; }
-  virtual db::Coord computed_dist () const { return m_op->dist (); }
+
+  virtual db::Coord computed_dist () const
+  {
+    return CompoundRegionMultiInputOperationNode::computed_dist () + m_op->dist ();
+  }
 
   virtual std::vector<db::Region *> inputs () const
   {

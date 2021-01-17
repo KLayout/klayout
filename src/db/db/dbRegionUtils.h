@@ -612,7 +612,7 @@ protected:
   /**
    *  @brief Normal edge pair output (violations)
    */
-  virtual void put (const db::EdgePair & /*edge*/) const { }
+  virtual void put (const db::EdgePair & /*edge*/, bool /*intra-polygon*/) const { }
 
   /**
    *  @brief Negative edge output
@@ -628,7 +628,7 @@ private:
   std::multimap<std::pair<db::Edge, size_t>, size_t> m_e2ep;
   std::set<std::pair<db::Edge, size_t> > m_pseudo_edges;
   size_t m_first_pseudo;
-  std::vector<bool> m_ep_discarded;
+  std::vector<bool> m_ep_discarded, m_ep_intra_polygon;
   bool m_with_shielding;
   bool m_has_edge_pair_output;
   bool m_has_negative_edge_output;
@@ -646,19 +646,30 @@ class DB_PUBLIC_TEMPLATE edge2edge_check
 {
 public:
   edge2edge_check (const EdgeRelationFilter &check, Output &output, bool different_polygons, bool requires_different_layers, bool with_shielding)
-    : Edge2EdgeCheckBase (check, different_polygons, requires_different_layers, with_shielding), mp_output (&output)
+    : Edge2EdgeCheckBase (check, different_polygons, requires_different_layers, with_shielding), mp_output_inter (&output), mp_output_intra (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  edge2edge_check (const EdgeRelationFilter &check, Output &output_inter, Output &output_intra, bool different_polygons, bool requires_different_layers, bool with_shielding)
+    : Edge2EdgeCheckBase (check, different_polygons, requires_different_layers, with_shielding), mp_output_inter (&output_inter), mp_output_intra (&output_intra)
   {
     //  .. nothing yet ..
   }
 
 protected:
-  void put (const db::EdgePair &edge) const
+  void put (const db::EdgePair &edge, bool inter_polygon) const
   {
-    mp_output->insert (edge);
+    if (! inter_polygon || ! mp_output_intra) {
+      mp_output_inter->insert (edge);
+    } else {
+      mp_output_intra->insert (edge);
+    }
   }
 
 private:
-  Output *mp_output;
+  Output *mp_output_inter;
+  Output *mp_output_intra;
 };
 
 /**
@@ -669,24 +680,26 @@ private:
  */
 template <class Output, class NegativeEdgeOutput>
 class DB_PUBLIC_TEMPLATE edge2edge_check_with_negative_output
-  : public Edge2EdgeCheckBase
+  : public edge2edge_check<Output>
 {
 public:
   edge2edge_check_with_negative_output (const EdgeRelationFilter &check, Output &output, NegativeEdgeOutput &l1_negative_output, NegativeEdgeOutput &l2_negative_output, bool different_polygons, bool requires_different_layers, bool with_shielding)
-    : Edge2EdgeCheckBase (check, different_polygons, requires_different_layers, with_shielding),
-      mp_output (&output),
+    : edge2edge_check<Output> (check, output, different_polygons, requires_different_layers, with_shielding),
       mp_l1_negative_output (&l1_negative_output),
       mp_l2_negative_output (&l2_negative_output)
   {
-    set_has_negative_edge_output (true);
+    edge2edge_check<Output>::set_has_negative_edge_output (true);
+  }
+
+  edge2edge_check_with_negative_output (const EdgeRelationFilter &check, Output &output_inter, Output &output_intra, NegativeEdgeOutput &l1_negative_output, NegativeEdgeOutput &l2_negative_output, bool different_polygons, bool requires_different_layers, bool with_shielding)
+    : edge2edge_check<Output> (check, output_inter, output_intra, different_polygons, requires_different_layers, with_shielding),
+      mp_l1_negative_output (&l1_negative_output),
+      mp_l2_negative_output (&l2_negative_output)
+  {
+    edge2edge_check<Output>::set_has_negative_edge_output (true);
   }
 
 protected:
-  void put (const db::EdgePair &ep) const
-  {
-    mp_output->insert (ep);
-  }
-
   void put_negative (const db::Edge &edge, int layer) const
   {
     if (layer == 0) {
@@ -698,7 +711,6 @@ protected:
   }
 
 private:
-  Output *mp_output;
   NegativeEdgeOutput *mp_l1_negative_output, *mp_l2_negative_output;
 };
 
@@ -746,35 +758,33 @@ private:
  */
 template <class Output>
 class DB_PUBLIC_TEMPLATE edge2edge_check_negative_or_positive
-  : public Edge2EdgeCheckBase
+  : public edge2edge_check<Output>
 {
 public:
   edge2edge_check_negative_or_positive (const EdgeRelationFilter &check, Output &output, bool negative_output, bool different_polygons, bool requires_different_layers, bool with_shielding)
-    : Edge2EdgeCheckBase (check, different_polygons, requires_different_layers, with_shielding),
-      mp_output (&output)
+    : edge2edge_check<Output> (check, output, different_polygons, requires_different_layers, with_shielding)
   {
-    set_has_negative_edge_output (negative_output);
-    set_has_edge_pair_output (! negative_output);
+    edge2edge_check<Output>::set_has_negative_edge_output (negative_output);
+    edge2edge_check<Output>::set_has_edge_pair_output (! negative_output);
+  }
+
+  edge2edge_check_negative_or_positive (const EdgeRelationFilter &check, Output &output_inter, Output &output_intra, bool negative_output, bool different_polygons, bool requires_different_layers, bool with_shielding)
+    : edge2edge_check<Output> (check, output_inter, output_intra, different_polygons, requires_different_layers, with_shielding)
+  {
+    edge2edge_check<Output>::set_has_negative_edge_output (negative_output);
+    edge2edge_check<Output>::set_has_edge_pair_output (! negative_output);
   }
 
 protected:
   void put_negative (const db::Edge &edge, int layer) const
   {
     if (layer == 0) {
-      mp_output->insert (db::EdgePair (edge, edge.swapped_points ()));
+      edge2edge_check<Output>::put (db::EdgePair (edge, edge.swapped_points ()), false);
     }
     if (layer == 1) {
-      mp_output->insert (db::EdgePair (edge.swapped_points (), edge));
+      edge2edge_check<Output>::put (db::EdgePair (edge.swapped_points (), edge), false);
     }
   }
-
-  void put (const db::EdgePair &edge) const
-  {
-    mp_output->insert (edge);
-  }
-
-private:
-  Output *mp_output;
 };
 
 /**

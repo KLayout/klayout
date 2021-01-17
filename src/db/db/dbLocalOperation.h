@@ -29,8 +29,6 @@
 
 #include "dbLayout.h"
 #include "dbEdgeBoolean.h"
-#include "tlProgress.h"
-#include "tlInternational.h"
 
 #include <unordered_map>
 #include <unordered_set>
@@ -89,55 +87,10 @@ public:
 
   /**
    *  @brief Computes the results from a given set of interacting shapes
-   *  @param layout The layout to which the shapes belong
-   *  @param interactions The interaction set
-   *  @param result The container to which the results are written
    *
    *  If the operation requests single subject mode, the interactions will be split into single subject/intruder clusters
    */
-  void compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio, bool report_progress = false, const std::string &progress_desc = std::string ()) const
-  {
-    if (interactions.num_subjects () <= 1 || ! requests_single_subjects ()) {
-
-      do_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
-
-    } else {
-
-      std::auto_ptr<tl::RelativeProgress> progress;
-      if (report_progress) {
-        progress.reset (new tl::RelativeProgress (progress_desc, interactions.size ()));
-      }
-
-      for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-
-        const TS &subject_shape = interactions.subject_shape (i->first);
-
-        shape_interactions<TS, TI> single_interactions;
-
-        if (on_empty_intruder_hint () == OnEmptyIntruderHint::Drop) {
-          single_interactions.add_subject_shape (i->first, subject_shape);
-        } else {
-          //  this includes the subject-without-intruder "interaction"
-          single_interactions.add_subject (i->first, subject_shape);
-        }
-
-        const std::vector<unsigned int> &intruders = interactions.intruders_for (i->first);
-        for (typename std::vector<unsigned int>::const_iterator ii = intruders.begin (); ii != intruders.end (); ++ii) {
-          const std::pair<unsigned int, TI> &is = interactions.intruder_shape (*ii);
-          single_interactions.add_intruder_shape (*ii, is.first, is.second);
-          single_interactions.add_interaction (i->first, *ii);
-        }
-
-        do_compute_local (layout, single_interactions, results, max_vertex_count, area_ratio);
-
-        if (progress.get ()) {
-          ++*progress;
-        }
-
-      }
-
-    }
-  }
+  void compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio, bool report_progress = false, const std::string &progress_desc = std::string ()) const;
 
   /**
    *  @brief Indicates the desired behaviour when a shape does not have an intruder

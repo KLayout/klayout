@@ -200,9 +200,9 @@ void
 check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
   tl_assert (results.size () == 1);
-  std::unordered_set<db::EdgePair> result;
+  std::unordered_set<db::EdgePair> result, intra_polygon_result;
 
-  edge2edge_check_negative_or_positive<std::unordered_set<db::EdgePair> > edge_check (m_check, result, m_options.negative, true, true, m_options.shielded);
+  edge2edge_check_negative_or_positive<std::unordered_set<db::EdgePair> > edge_check (m_check, result, intra_polygon_result, m_options.negative, m_different_polygons, m_has_other, m_options.shielded);
   poly2poly_check<TS> poly_check (edge_check);
 
   std::list<TS> heap;
@@ -302,30 +302,6 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
     scanner.process (poly_check, m_check.distance (), db::box_convert<TS> ());
   } while (edge_check.prepare_next_pass ());
 
-  //  now also handle the intra-polygon interactions if required
-
-  std::unordered_set<db::EdgePair> intra_polygon_result;
-
-  if (! m_different_polygons && ! m_has_other) {
-
-    for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-
-      std::list<TS> heap;
-
-      const TS &subject = interactions.subject_shape (i->first);
-      scanner.clear ();
-      scanner.insert (push_polygon_to_heap (layout, subject, heap), 0);
-
-      edge2edge_check_negative_or_positive<std::unordered_set<db::EdgePair> > edge_check_intra (m_check, intra_polygon_result, m_options.negative, false, false, m_options.shielded);
-      poly2poly_check<TS> poly_check_intra (edge_check_intra);
-
-      do {
-        scanner.process (poly_check_intra, m_check.distance (), db::box_convert<TS> ());
-      } while (edge_check_intra.prepare_next_pass ());
-
-    }
-
-  }
 
   //  detect and remove parts of the result which have or do not have results "opposite"
   //  ("opposite" is defined by the projection of edges "through" the subject shape)
@@ -497,18 +473,13 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
       for (std::unordered_set<db::EdgePair>::const_iterator i = result.begin (); i != result.end (); ++i) {
         results.front ().insert (db::EdgePair (i->first (), i->first ().swapped_points ()));
       }
-
-    } else {
-
-      results.front ().insert (result.begin (), result.end ());
+      result.clear ();
 
     }
 
-  } else {
-
-    results.front ().insert (result.begin (), result.end ());
-
   }
+
+  results.front ().insert (result.begin (), result.end ());
 }
 
 template <class TS, class TI>

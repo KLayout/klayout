@@ -67,6 +67,7 @@ Edge2EdgeCheckBase::prepare_next_pass ()
   if (! m_ep.empty () && m_has_edge_pair_output) {
 
     std::vector<bool>::const_iterator d = m_ep_discarded.begin ();
+    std::vector<bool>::const_iterator i = m_ep_intra_polygon.begin ();
     std::vector<db::EdgePair>::const_iterator ep = m_ep.begin ();
     while (ep != m_ep.end () && size_t (ep - m_ep.begin ()) < m_first_pseudo) {
       bool use_result = true;
@@ -75,9 +76,10 @@ Edge2EdgeCheckBase::prepare_next_pass ()
         ++d;
       }
       if (use_result) {
-        put (*ep);
+        put (*ep, *i);
       }
       ++ep;
+      ++i;
     }
 
   }
@@ -182,7 +184,10 @@ Edge2EdgeCheckBase::add (const db::Edge *o1, size_t p1, const db::Edge *o2, size
         //  pass we will eliminate those which are shielded completely (with shielding)
         //  and/or compute the negative edges.
         size_t n = m_ep.size ();
+
         m_ep.push_back (ep);
+        m_ep_intra_polygon.push_back (p1 == p2);
+
         m_e2ep.insert (std::make_pair (std::make_pair (*o1, p1), n * 2));
         m_e2ep.insert (std::make_pair (std::make_pair (*o2, p2), n * 2 + 1));
 
@@ -253,9 +258,12 @@ Edge2EdgeCheckBase::add (const db::Edge *o1, size_t p1, const db::Edge *o2, size
     }
 
     //  for negative output edges are cancelled by short interactions perpendicular to them
+    //  For this we have generated "pseudo edges" running along the sides of the original violation. We now check a real
+    //  edge vs. a pseudo edge with the same conditions as the normal interaction and add them to the results. In the
+    //  negative case this means we cancel a real edge.
+
     if (m_has_negative_edge_output &&
-      (m_pseudo_edges.find (std::make_pair (*o1, p1)) != m_pseudo_edges.end () || m_pseudo_edges.find (std::make_pair (*o2, p2)) != m_pseudo_edges.end ()) &&
-      ! (m_pseudo_edges.find (std::make_pair (*o1, p1)) != m_pseudo_edges.end () && m_pseudo_edges.find (std::make_pair (*o2, p2)) != m_pseudo_edges.end ())) {
+      (m_pseudo_edges.find (std::make_pair (*o1, p1)) != m_pseudo_edges.end ()) != (m_pseudo_edges.find (std::make_pair (*o2, p2)) != m_pseudo_edges.end ())) {
 
       //  Overlap or inside checks require input from different layers
       if ((! m_different_polygons || p1 != p2) && (! m_requires_different_layers || ((p1 ^ p2) & 1) != 0)) {
@@ -274,7 +282,10 @@ Edge2EdgeCheckBase::add (const db::Edge *o1, size_t p1, const db::Edge *o2, size
         if (mp_check->check (*o1, *o2, &ep)) {
 
           size_t n = m_ep.size ();
+
           m_ep.push_back (ep);
+          m_ep_intra_polygon.push_back (p1 == p2);  //  not really required, but there for consistency
+
           m_e2ep.insert (std::make_pair (std::make_pair (*o1, p1), n * 2));
           m_e2ep.insert (std::make_pair (std::make_pair (*o2, p2), n * 2 + 1));
 

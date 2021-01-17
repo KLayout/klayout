@@ -1601,11 +1601,11 @@ CompoundRegionCheckOperationNode::do_compute_local (db::Layout *layout, const sh
 
   tl_assert (results.size () == 1);
   if (results.front ().empty ()) {
-    op.compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+    op.do_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
   } else {
     std::vector<std::unordered_set<db::EdgePair> > r;
     r.resize (1);
-    op.compute_local (layout, interactions, r, max_vertex_count, area_ratio);
+    op.do_compute_local (layout, interactions, r, max_vertex_count, area_ratio);
     results.front ().insert (r.front ().begin (), r.front ().end ());
   }
 }
@@ -1617,11 +1617,11 @@ CompoundRegionCheckOperationNode::do_compute_local (db::Layout *layout, const sh
 
   tl_assert (results.size () == 1);
   if (results.front ().empty ()) {
-    op.compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+    op.do_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
   } else {
     std::vector<std::unordered_set<db::EdgePair> > r;
     r.resize (1);
-    op.compute_local (layout, interactions, r, max_vertex_count, area_ratio);
+    op.do_compute_local (layout, interactions, r, max_vertex_count, area_ratio);
     results.front ().insert (r.front ().begin (), r.front ().end ());
   }
 }

@@ -210,14 +210,14 @@ public:
   virtual bool requests_single_subjects () const { return true; }
   virtual std::string description () const;
 
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
+
 private:
   EdgeRelationFilter m_check;
   bool m_different_polygons;
   bool m_has_other;
   bool m_other_is_merged;
   db::RegionCheckOptions m_options;
-
-  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
 };
 
 typedef check_local_operation<db::PolygonRef, db::PolygonRef> CheckLocalOperation;

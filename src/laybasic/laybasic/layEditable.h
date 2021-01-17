@@ -319,14 +319,27 @@ public:
   }
 
   /**
-   *  @brief Tell how many objects are selected
-   *
-   *  This method is used to determine if anything is selected - i.e.
-   *  anything can be copied.
+   *  @brief Indicates if any objects are selected
+   */
+  virtual bool has_selection ()
+  {
+    return false;
+  }
+
+  /**
+   *  @brief Indicates how many objects are selected
    */
   virtual size_t selection_size ()
   {
     return 0;
+  }
+
+  /**
+   *  @brief Indicates if any objects are selected in the transient selection
+   */
+  virtual bool has_transient_selection ()
+  {
+    return false;
   }
 
   /**
@@ -528,12 +541,17 @@ public:
   void end_move (const db::DPoint &p, lay::angle_constraint_type ac, db::Transaction *transaction = 0);
 
   /**
-   *  @brief Tell how many objects are selected.
+   *  @brief Indicates how many objects are selected.
    *
    *  This method will return the number of selected objects.
    */
   size_t selection_size ();
   
+  /**
+   *  @brief Indicates whether any object is selected.
+   */
+  bool has_selection ();
+
   /**
    *  @brief Cancel any pending operations
    */

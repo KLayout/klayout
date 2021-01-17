@@ -227,7 +227,9 @@ URI::resolved (const URI &other) const
     if (other.path ()[0] == '/') {
       res.m_path = other.path ();
     } else {
-      res.m_path += "/";
+      if (! res.m_path.empty ()) {
+        res.m_path += "/";
+      }
       res.m_path += other.path ();
     }
   }

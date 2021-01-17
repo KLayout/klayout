@@ -2032,13 +2032,26 @@ PartialService::mouse_release_event (const db::DPoint &p, unsigned int buttons, 
   return false;
 }
 
-size_t 
+bool
+PartialService::has_selection ()
+{
+  return ! m_selection.empty ();
+}
+
+size_t
 PartialService::selection_size ()
 {
   return m_selection.size ();
 }
 
-void 
+bool
+PartialService::has_transient_selection ()
+{
+  //  there is no specific transient selection for the partial editor
+  return false;
+}
+
+void
 PartialService::del ()
 {
   //  stop dragging

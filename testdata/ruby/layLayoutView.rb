@@ -180,6 +180,25 @@ class LAYLayoutView_TestClass < TestBase
 
     assert_equal(cv1.index, 0)
 
+    assert_equal(view.has_selection?, false)
+    assert_equal(view.selection_size, 0)
+
+    view.select_from(RBA::DBox::new(-1.0, -1.0, 1.0, 1.0))
+    assert_equal(selection_changed, 1)
+    assert_equal(view.selection_size, 4)
+    assert_equal(view.has_selection?, true)
+
+    view.select_from(RBA::DPoint::new(0, 0), RBA::LayoutView::Invert)
+    assert_equal(selection_changed, 2)
+    assert_equal(view.selection_size, 3)
+    assert_equal(view.has_selection?, true)
+
+    view.clear_selection
+    assert_equal(selection_changed, 3)
+    assert_equal(view.has_selection?, false)
+    assert_equal(view.selection_size, 0)
+    selection_changed = 0
+
     cv2 = mw.load_layout(ENV["TESTSRC"] + "/testdata/gds/t10.gds", 2)
     assert_equal(RBA::CellView::active.index, 1)
     assert_equal(cv2.index, 1)
@@ -196,8 +215,7 @@ class LAYLayoutView_TestClass < TestBase
     assert_equal(layer_list_deleted, 0)
     assert_equal(current_layer_list_changed, 0)
     assert_equal(cell_visibility_changed, 0)
-    # TODO: spontaneous event: does it hurt?
-    assert_equal(selection_changed, 1)
+    assert_equal(selection_changed, 0)
 
     view.pan_up
     assert_equal(viewport_changed, 2)
@@ -234,8 +252,7 @@ class LAYLayoutView_TestClass < TestBase
     assert_equal(layer_list_deleted, 0)
     assert_equal(current_layer_list_changed, 0)
     assert_equal(cell_visibility_changed, 0)
-    # TODO: spontaneous event: does it hurt?
-    assert_equal(selection_changed, 1)
+    assert_equal(selection_changed, 0)
 
     cv2.path = [ cv2.layout.cell("RINGO").cell_index, cv2.layout.cell("INV2").cell_index, cv2.layout.cell("TRANS").cell_index ]
     assert_equal(cv2.cell_name, "TRANS")
@@ -252,8 +269,7 @@ class LAYLayoutView_TestClass < TestBase
     assert_equal(layer_list_deleted, 0)
     assert_equal(current_layer_list_changed, 0)
     assert_equal(cell_visibility_changed, 0)
-    # TODO: spontaneous event: does it hurt?
-    assert_equal(selection_changed, 2)
+    assert_equal(selection_changed, 0)
 
     cv2.path = [ cv2.layout.cell("RINGO").cell_index, cv2.layout.cell("INV2").cell_index ]
     assert_equal(cv2.cell_name, "INV2")
@@ -270,8 +286,7 @@ class LAYLayoutView_TestClass < TestBase
     assert_equal(layer_list_deleted, 0)
     assert_equal(current_layer_list_changed, 0)
     assert_equal(cell_visibility_changed, 0)
-    # TODO: spontaneous event: does it hurt?
-    assert_equal(selection_changed, 3)
+    assert_equal(selection_changed, 0)
 
     sp = []
     cv2.cell.each_inst { |i| sp << RBA::InstElement::new(i); break }
@@ -291,8 +306,7 @@ class LAYLayoutView_TestClass < TestBase
     assert_equal(layer_list_deleted, 0)
     assert_equal(current_layer_list_changed, 0)
     assert_equal(cell_visibility_changed, 0)
-    # TODO: spontaneous event: does it hurt?
-    assert_equal(selection_changed, 4)
+    assert_equal(selection_changed, 0)
 
     cv2.ascend
 
@@ -310,8 +324,7 @@ class LAYLayoutView_TestClass < TestBase
     assert_equal(layer_list_deleted, 0)
     assert_equal(current_layer_list_changed, 0)
     assert_equal(cell_visibility_changed, 0)
-    # TODO: spontaneous event: does it hurt?
-    assert_equal(selection_changed, 5)
+    assert_equal(selection_changed, 0)
 
     assert_equal(view.cellviews, 2)
 
@@ -332,8 +345,7 @@ class LAYLayoutView_TestClass < TestBase
     assert_equal(layer_list_deleted, 0)
     assert_equal(current_layer_list_changed, 0)
     assert_equal(cell_visibility_changed, 0)
-    # TODO: spontaneous event: does it hurt?
-    assert_equal(selection_changed, 6)
+    assert_equal(selection_changed, 0)
 
     active_cellview_changed = 0
     cellviews_changed = 0

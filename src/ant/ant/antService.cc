@@ -1642,7 +1642,7 @@ Service::reduce_rulers (int num)
 void 
 Service::cut ()
 {
-  if (selection_size () > 0) {
+  if (has_selection ()) {
 
     //  copy & delete the selected rulers
     copy_selected ();
@@ -1701,7 +1701,7 @@ Service::paste ()
 void 
 Service::del ()
 {
-  if (selection_size () > 0) {
+  if (has_selection ()) {
 
     //  delete the selected rulers
     del_selected ();
@@ -1727,10 +1727,22 @@ Service::del_selected ()
   mp_view->annotation_shapes ().erase_positions (positions.begin (), positions.end ());
 }
 
-size_t 
+bool
+Service::has_selection ()
+{
+  return ! m_selected.empty ();
+}
+
+size_t
 Service::selection_size ()
 {
   return m_selected.size ();
+}
+
+bool
+Service::has_transient_selection ()
+{
+  return mp_transient_ruler != 0;
 }
 
 bool 
@@ -1934,7 +1946,7 @@ Service::transient_select (const db::DPoint &pos)
     mp_transient_ruler = new ant::View (this, robj, true /*selected*/);
   }
 
-  if (any_selected && editables ()->selection_size () == 0) {
+  if (any_selected && ! editables ()->has_selection ()) {
     display_status (true);
   }
 

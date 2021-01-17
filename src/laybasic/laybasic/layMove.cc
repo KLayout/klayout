@@ -100,7 +100,7 @@ MoveService::key_event (unsigned int key, unsigned int /*buttons*/)
     dx = 1.0;
   }
 
-  if (! m_dragging && fabs (dx + dy) > 0.0 && mp_editables->selection_size () > 0) {
+  if (! m_dragging && fabs (dx + dy) > 0.0 && mp_editables->has_selection ()) {
 
     //  determine a shift distance which is 2, 5 or 10 times the grid and is more than 5 pixels
     double dmin = double (5 /*pixels min shift*/) / widget ()->mouse_event_trans ().mag ();
@@ -250,13 +250,13 @@ MoveService::begin_move (db::Transaction *transaction, bool selected_after_move)
   std::auto_ptr<db::Transaction> trans_holder (transaction);
 
   bool drag_transient = ! selected_after_move;
-  if (mp_editables->selection_size () == 0) {
+  if (! mp_editables->has_selection ()) {
     //  try to use the transient selection for the real one
     mp_editables->transient_to_selection ();
     drag_transient = true;
   }
 
-  if (mp_editables->selection_size () == 0) {
+  if (! mp_editables->has_selection ()) {
     //  still nothing selected
     return false;
   }

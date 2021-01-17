@@ -78,6 +78,8 @@ TEST(1)
 {
   tl::URI uri;
   EXPECT_EQ (uri2string (uri), "");
+  EXPECT_EQ (uri2string (uri.resolved (tl::URI ("http://www.klayout.de"))), "<http>://<www.klayout.de>");
+  EXPECT_EQ (uri2string (uri.resolved (tl::URI ("anyfile.txt"))), "<anyfile.txt>");
 
   uri = tl::URI ("scheme:");
   EXPECT_EQ (uri2string (uri), "<scheme>:");

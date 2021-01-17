@@ -293,7 +293,7 @@ Service::highlight (unsigned int n)
 void 
 Service::cut ()
 {
-  if (selection_size () > 0 && view ()->is_editable ()) {
+  if (has_selection () && view ()->is_editable ()) {
     //  copy & delete the selected objects
     copy_selected ();
     del_selected ();
@@ -834,7 +834,7 @@ Service::edit_cancel ()
 void 
 Service::del ()
 {
-  if (selection_size () > 0 && view ()->is_editable ()) {
+  if (has_selection () && view ()->is_editable ()) {
     //  delete the selected objects
     del_selected ();
   }
@@ -871,14 +871,19 @@ Service::del_selected ()
   }
 }
 
-size_t 
+bool
+Service::has_selection ()
+{
+  return ! m_selection.empty ();
+}
+
+size_t
 Service::selection_size ()
 {
   return m_selection.size ();
 }
 
-
-bool 
+bool
 Service::has_transient_selection ()
 {
   return ! m_transient_selection.empty ();
@@ -1016,7 +1021,7 @@ Service::transient_select (const db::DPoint &pos)
 
       }
 
-      if (editables ()->selection_size () == 0) {
+      if (! editables ()->has_selection ()) {
         display_status (true);
       }
 
@@ -1055,7 +1060,7 @@ Service::transient_select (const db::DPoint &pos)
 
       mp_transient_marker = marker;
 
-      if (editables ()->selection_size () == 0) {
+      if (! editables ()->has_selection ()) {
         display_status (true);
       }
 
@@ -1410,7 +1415,7 @@ Service::move_markers (const db::DTrans &t)
   if (m_move_trans != t) {
 
     //  display current move vector
-    if (selection_size () > 0) {
+    if (has_selection ()) {
       std::string pos = std::string ("dx: ") + tl::micron_to_string (t.disp ().x ()) + "  dy: " + tl::micron_to_string (t.disp ().y ());
       if (t.rot () != 0) {
         pos += std::string ("  ") + ((const db::DFTrans &) t).to_string ();

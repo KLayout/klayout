@@ -23,6 +23,7 @@
 
 #include "gsiDecl.h"
 #include "gsiSignals.h"
+#include "gsiEnums.h"
 #include "rdb.h"
 #include "layLayoutView.h"
 #include "layDitherPattern.h"
@@ -978,10 +979,31 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "selection. Calling this method is useful to ensure there are no potential interactions with the script's "
     "functionality.\n"
   ) +
-  gsi::method ("clear_selection", &lay::LayoutView::clear_selection,
+  gsi::method ("clear_selection", (void (lay::LayoutView::*) ()) &lay::LayoutView::clear_selection,
     "@brief Clears the selection of all objects (shapes, annotations, images ...)\n"
     "\n"
     "This method has been introduced in version 0.26.2\n"
+  ) +
+  gsi::method ("select_all", (void (lay::LayoutView::*) ()) &lay::LayoutView::select,
+    "@brief Selects all objects from the view\n"
+    "\n"
+    "This method has been introduced in version 0.27\n"
+  ) +
+  gsi::method ("select_from", (void (lay::LayoutView::*) (const db::DPoint &, lay::Editable::SelectionMode)) &lay::LayoutView::select, gsi::arg ("point"), gsi::arg ("mode", lay::Editable::SelectionMode::Replace, "Replace"),
+    "@brief Selects the objects from a given point\n"
+    "\n"
+    "The mode indicates whether to add to the selection, replace the selection, remove from selection or invert the selected status of the objects "
+    "found around the given point.\n"
+    "\n"
+    "This method has been introduced in version 0.27\n"
+  ) +
+  gsi::method ("select_from", (void (lay::LayoutView::*) (const db::DBox &, lay::Editable::SelectionMode)) &lay::LayoutView::select, gsi::arg ("box"), gsi::arg ("mode", lay::Editable::SelectionMode::Replace, "Replace"),
+    "@brief Selects the objects from a given box\n"
+    "\n"
+    "The mode indicates whether to add to the selection, replace the selection, remove from selection or invert the selected status of the objects "
+    "found inside the given box.\n"
+    "\n"
+    "This method has been introduced in version 0.27\n"
   ) +
   gsi::method ("clear_transient_selection", &lay::LayoutView::clear_transient_selection,
     "@brief Clears the transient selection (mouse-over hightlights) of all objects (shapes, annotations, images ...)\n"
@@ -1000,6 +1022,16 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "@brief Returns the bounding box of the current selection\n"
     "\n"
     "This method has been introduced in version 0.26.2\n"
+  ) +
+  gsi::method ("selection_size", (size_t (lay::LayoutView::*) ()) &lay::LayoutView::selection_size,
+    "@brief Returns the number of selected objects\n"
+    "\n"
+    "This method has been introduced in version 0.27\n"
+  ) +
+  gsi::method ("has_selection?", (bool (lay::LayoutView::*) ()) &lay::LayoutView::has_selection,
+    "@brief Indicates whether any objects are selected\n"
+    "\n"
+    "This method has been introduced in version 0.27\n"
   ) +
   gsi::method ("stop", &lay::LayoutView::stop,
     "@brief Stops redraw thread and close any browsers\n"
@@ -1866,6 +1898,27 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
   "are the redraw thread, the layout handles, cell lists, layer view lists etc. "
   "This object controls these aspects of the view and controls the appearance of the data. "
 );
+
+gsi::EnumIn<lay::LayoutView, lay::Editable::SelectionMode> decl_layLayoutView_SelectionMode ("lay", "SelectionMode",
+  gsi::enum_const ("Add", lay::Editable::SelectionMode::Add,
+    "@brief Adds to any existing selection\n"
+  ) +
+  gsi::enum_const ("Reset", lay::Editable::SelectionMode::Reset,
+    "@brief Removes from any existing selection\n"
+  ) +
+  gsi::enum_const ("Replace", lay::Editable::SelectionMode::Replace,
+    "@brief Replaces the existing selection\n"
+  ) +
+  gsi::enum_const ("Invert", lay::Editable::SelectionMode::Invert,
+    "@brief Adds to any existing selection, if it's not there yet or removes it from the selection if it's already selected\n"
+  ),
+  "@brief Specifies how selected objects interact with already selected ones.\n"
+  "\n"
+  "This enum was introduced in version 0.27.\n"
+);
+
+//  Inject the NetlistCrossReference::Status declarations into NetlistCrossReference:
+gsi::ClassExt<lay::LayoutView> inject_SelectionMode_in_parent (decl_layLayoutView_SelectionMode.defs ());
 
 static db::Layout *get_layout (const lay::CellViewRef *cv)
 {

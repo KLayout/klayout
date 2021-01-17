@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -29,50 +29,14 @@
 #include "dbAsIfFlatRegion.h"
 #include "dbShapes.h"
 #include "dbShapes2.h"
+#include "tlCopyOnWrite.h"
 
 namespace db {
 
 /**
  *  @brief An iterator delegate for the flat region
  */
-class DB_PUBLIC FlatRegionIterator
-  : public RegionIteratorDelegate
-{
-public:
-  typedef db::layer<db::Polygon, db::unstable_layer_tag> polygon_layer_type;
-  typedef polygon_layer_type::iterator iterator_type;
-
-  FlatRegionIterator (iterator_type from, iterator_type to)
-    : m_from (from), m_to (to)
-  {
-    //  .. nothing yet ..
-  }
-
-  virtual bool at_end () const
-  {
-    return m_from == m_to;
-  }
-
-  virtual void increment ()
-  {
-    ++m_from;
-  }
-
-  virtual const value_type *get () const
-  {
-    return m_from.operator-> ();
-  }
-
-  virtual RegionIteratorDelegate *clone () const
-  {
-    return new FlatRegionIterator (*this);
-  }
-
-private:
-  friend class Region;
-
-  iterator_type m_from, m_to;
-};
+typedef generic_shapes_iterator_delegate<db::Polygon> FlatRegionIterator;
 
 /**
  *  @brief A flat, polygon-set delegate
@@ -107,7 +71,8 @@ public:
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_merged_iter () const;
 
   virtual bool empty () const;
-  virtual size_t size () const;
+  virtual size_t count () const;
+  virtual size_t hier_count () const;
   virtual bool is_merged () const;
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
@@ -152,7 +117,7 @@ public:
   template <class Iter>
   void insert (const Iter &b, const Iter &e)
   {
-    reserve (size () + (e - b));
+    reserve (count () + (e - b));
     for (Iter i = b; i != e; ++i) {
       insert (*i);
     }
@@ -170,14 +135,16 @@ public:
   void transform (const Trans &trans)
   {
     if (! trans.is_unity ()) {
-      for (polygon_iterator_type p = m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin (); p != m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end (); ++p) {
-        m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
+      db::Shapes &polygons = *mp_polygons;
+      for (polygon_iterator_type p = polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin (); p != polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end (); ++p) {
+        polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
       }
       invalidate_cache ();
     }
   }
 
-  db::Shapes &raw_polygons () { return m_polygons; }
+  db::Shapes &raw_polygons () { return *mp_polygons; }
+  const db::Shapes &raw_polygons () const { return *mp_polygons; }
 
 protected:
   virtual void merged_semantics_changed ();
@@ -193,8 +160,8 @@ private:
   FlatRegion &operator= (const FlatRegion &other);
 
   bool m_is_merged;
-  mutable db::Shapes m_polygons;
-  mutable db::Shapes m_merged_polygons;
+  mutable tl::copy_on_write_ptr<db::Shapes> mp_polygons;
+  mutable tl::copy_on_write_ptr<db::Shapes> mp_merged_polygons;
   mutable bool m_merged_polygons_valid;
 
   void init ();

@@ -14,12 +14,28 @@ def create_ref(mod, s)
     "<a href=\"/" + $loc + "/" + $1.downcase + "_ref_" + $2.downcase + ".xml\">#{s}</a>"
   elsif s =~ /(.*)#(.*)/
     if $2 != ""
-      "<a href=\"/" + $loc + "/" + mod.downcase + "_ref_" + $1.downcase + ".xml#" + $2 + "\">#{s}</a>"
+      "<a href=\"/" + $loc + "/" + mod.downcase + "_ref_" + $1.downcase + ".xml#" + $2 + "\">" + ($1 == "global" ? $2 : s) + "</a>"
     else
       "<a href=\"/" + $loc + "/" + mod.downcase + "_ref_" + $1.downcase + ".xml\">#{$1}</a>"
     end
   else
     "<a href=\"#" + s + "\">#{s}</a>"
+  end
+end
+
+def create_link(mod, s)
+  if s =~ /(.*)::(.*)#(.*)/
+    "<link href=\"/" + $loc + "/" + $1.downcase + "_ref_" + $2.downcase + ".xml#" + $3 + "\"/>"
+  elsif s =~ /(.*)::(.*)/
+    "<link href=\"/" + $loc + "/" + $1.downcase + "_ref_" + $2.downcase + ".xml\"/>"
+  elsif s =~ /(.*)#(.*)/
+    if $2 != ""
+      "<link href=\"/" + $loc + "/" + mod.downcase + "_ref_" + $1.downcase + ".xml#" + $2 + "\"/>"
+    else
+      "<link href=\"/" + $loc + "/" + mod.downcase + "_ref_" + $1.downcase + ".xml\"/>"
+    end
+  else
+    "<link href=\"#" + s + "\"/>"
   end
 end
 
@@ -31,6 +47,7 @@ def escape(mod, s)
   s.gsub("&", "&amp;").
     gsub("<", "&lt;").
     gsub(">", "&gt;").
+    gsub(/\\\\([\w:#]+)/) { create_link(mod, $1) }.
     gsub(/\\([\w:#]+)/) { create_ref(mod, $1) }.
     gsub(/RBA::([\w#]+)/) { create_class_doc_ref($1) }
 end
@@ -127,6 +144,14 @@ class Scope < DocItem
     @items = {}
   end
 
+  def merge(other)
+    if !self.brief
+      self.brief = other.brief
+      self.doc = other.doc
+      self.synopsis = other.synopsis
+    end
+  end
+
   def add_doc_item(mod, block)
     item = DocItem::new(mod, block)
     @items[item.name] = item
@@ -136,7 +161,7 @@ class Scope < DocItem
 
   def produce_doc
 
-      doc = <<HEAD
+    doc = <<HEAD
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "klayout_doc.dtd">
 
@@ -197,8 +222,14 @@ class Collector
 
       # is a scope block
       @scopes ||= {}
-      @current_scope = Scope::new(@mod, block)
-      @scopes[@current_scope.name] = @current_scope
+      scope = Scope::new(@mod, block)
+      if ! @scopes[scope.name]
+        @current_scope = scope
+        @scopes[scope.name] = scope
+      else
+        @current_scope = @scopes[scope.name]
+        @current_scope.merge(scope)
+      end
 
     else
       @current_scope && @current_scope.add_doc_item(@mod, block)

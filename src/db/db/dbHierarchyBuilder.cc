@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -557,8 +557,8 @@ ClippingHierarchyBuilderShapeReceiver::insert_clipped (const db::Polygon &poly, 
 
 // ---------------------------------------------------------------------------------------------
 
-ReducingHierarchyBuilderShapeReceiver::ReducingHierarchyBuilderShapeReceiver (HierarchyBuilderShapeReceiver *pipe, double area_ratio, size_t max_vertex_count)
-  : mp_pipe (pipe ? pipe : &def_inserter), m_area_ratio (area_ratio), m_max_vertex_count (max_vertex_count)
+ReducingHierarchyBuilderShapeReceiver::ReducingHierarchyBuilderShapeReceiver (HierarchyBuilderShapeReceiver *pipe, double area_ratio, size_t max_vertex_count, bool reject_odd_polygons)
+  : mp_pipe (pipe ? pipe : &def_inserter), m_area_ratio (area_ratio), m_max_vertex_count (max_vertex_count), m_reject_odd_polygons (reject_odd_polygons)
 {
   //  .. nothing yet ..
 }
@@ -590,14 +590,24 @@ ReducingHierarchyBuilderShapeReceiver::push (const db::Polygon &shape, const db:
 }
 
 void
-ReducingHierarchyBuilderShapeReceiver::reduce (const db::Polygon &poly, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+ReducingHierarchyBuilderShapeReceiver::reduce (const db::Polygon &poly, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target, bool check)
 {
-  if (poly.vertices () > m_max_vertex_count || poly.area_ratio () > m_area_ratio) {
+  if (check && m_reject_odd_polygons && is_non_orientable_polygon (poly)) {
+    //  non-orientable polygons generate an error
+    if (target->cell () && target->cell ()->layout ()) {
+      throw tl::Exception (tl::to_string (tr ("Non-orientable polygon encountered: %s in cell %s")), poly.to_string (), target->cell ()->layout ()->cell_name (target->cell ()->cell_index ()));
+    } else {
+      throw tl::Exception (tl::to_string (tr ("Non-orientable polygon encountered: %s")), poly.to_string ());
+    }
+  }
+
+  if ((m_max_vertex_count >= 4 && poly.vertices () > m_max_vertex_count) || (m_area_ratio > 2.0 && poly.area_ratio () > m_area_ratio)) {
 
     std::vector <db::Polygon> split_polygons;
     db::split_polygon (poly, split_polygons);
+
     for (std::vector <db::Polygon>::const_iterator sp = split_polygons.begin (); sp != split_polygons.end (); ++sp) {
-      reduce (*sp, trans, region, complex_region, target);
+      reduce (*sp, trans, region, complex_region, target, false);
     }
 
   } else {

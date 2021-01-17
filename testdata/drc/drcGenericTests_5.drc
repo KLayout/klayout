@@ -1,0 +1,63 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+  threads(0) # easier to debug
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+
+# predicates and logical operations
+
+l1.drc(rectangles).output(100, 0)
+l1.drc(primary.rectangles).output(101, 0)
+l2.drc(secondary(l1).rectangles).output(102, 0)
+l1.drc(squares).output(103, 0)
+l1.drc(primary.squares).output(104, 0)
+l2.drc(secondary(l1).squares).output(105, 0)
+
+l1.drc(rectilinear).output(110, 0)
+l1.drc(primary.rectilinear).output(111, 0)
+l2.drc(secondary(l1).rectilinear).output(112, 0)
+
+l1.drc(area > 3.0).output(120, 0)
+l1.drc(area >= 3.0).output(121, 0)
+l1.drc(3.0 <= area < 4.0).output(122, 0)
+
+l1.drc(perimeter > 7.0).output(130, 0)
+l1.drc(perimeter >= 7.0).output(131, 0)
+l1.drc(7.0 <= perimeter < 8.0).output(132, 0)
+
+l1.drc(! rectilinear).output(140, 0)
+l1.drc(! rectangles).output(141, 0)
+
+l1.drc(if_all(! rectangles, area < 8.0)).output(150, 0)
+l1.drc(if_any(rectangles, area >= 8.0)).output(151, 0)
+
+l1.drc(if_any(corners.count > 4)).output(160, 0)
+l1.drc(if_any(corners.count == 4)).output(161, 0)
+
+l1.drc(switch(! rectangles, primary.sized(100.nm))).output(170, 0)
+l1.drc(switch(! rectangles, primary.sized(100.nm), primary.sized(200.nm))).output(171, 0)
+
+error = ""
+begin
+  l1.drc(switch(! rectangles, primary.sized(100.nm), squares, primary.sized(200.nm).edges))
+rescue => ex
+  error = ex.to_s
+end
+if error != "'drc': All result arguments of 'switch' need to render the same type (got 'Region,Edges')"
+  raise "switch did not give the right error when having different types. Was:\n" + error
+end
+
+l1.drc(switch(! rectangles, primary.sized(100.nm), squares, primary.sized(200.nm))).output(172, 0)
+l1.drc(switch(! rectangles, primary.sized(100.nm), squares, primary.sized(200.nm), primary)).output(173, 0)
+

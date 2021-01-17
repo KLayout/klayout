@@ -98,16 +98,20 @@ module DRC
 
     def connect(a, b)
 
-      a.is_a?(DRC::DRCLayer) || raise("First argument of Netter#connect must be a layer")
-      b.is_a?(DRC::DRCLayer) || raise("Second argument of Netter#connect must be a layer")
-      a.requires_texts_or_region("Netter#connect (first argument)")
-      b.requires_texts_or_region("Netter#connect (second argument)")
+      @engine._context("connect") do
 
-      register_layer(a.data)
-      register_layer(b.data)
-      a.data.is_a?(RBA::Region) && @l2n.connect(a.data)
-      b.data.is_a?(RBA::Region) && @l2n.connect(b.data)
-      @l2n.connect(a.data, b.data)
+        a.is_a?(DRC::DRCLayer) || raise("First argument must be a layer")
+        b.is_a?(DRC::DRCLayer) || raise("Second argument must be a layer")
+        a.requires_texts_or_region
+        b.requires_texts_or_region
+
+        register_layer(a.data)
+        register_layer(b.data)
+        a.data.is_a?(RBA::Region) && @l2n.connect(a.data)
+        b.data.is_a?(RBA::Region) && @l2n.connect(b.data)
+        @l2n.connect(a.data, b.data)
+
+      end
 
     end
 
@@ -122,12 +126,16 @@ module DRC
     
     def connect_global(l, name)
 
-      l.is_a?(DRC::DRCLayer) || raise("Layer argument of Netter#connect_global must be a layer")
-      l.requires_texts_or_region("Netter#connect_global (layer argument)")
+      @engine._context("connect_global") do
 
-      register_layer(l.data)
-      l.data.is_a?(RBA::Region) && @l2n.connect(l.data)
-      @l2n.connect_global(l.data, name)
+        l.is_a?(DRC::DRCLayer) || raise("Layer argument must be a layer")
+        l.requires_texts_or_region
+
+        register_layer(l.data)
+        l.data.is_a?(RBA::Region) && @l2n.connect(l.data)
+        @l2n.connect_global(l.data, name)
+
+      end
 
     end
     
@@ -186,21 +194,25 @@ module DRC
     
     def extract_devices(devex, layer_selection)
     
-      ensure_data
+      @engine._context("extract_devices") do
 
-      devex.is_a?(RBA::DeviceExtractorBase) || raise("First argument of Netter#extract_devices must be a device extractor instance in the two-arguments form")
+        ensure_data
 
-      layer_selection.is_a?(Hash) || raise("Second argument of Netter#extract_devices must be a hash")
+        devex.is_a?(RBA::DeviceExtractorBase) || raise("First argument of must be a device extractor instance in the two-arguments form")
 
-      ls = {}
-      layer_selection.keys.sort.each do |n|
-        l = layer_selection[n]
-        l.requires_texts_or_region("Netter#extract_devices (#{n} layer)")
-        register_layer(l.data)
-        ls[n.to_s] = l.data
+        layer_selection.is_a?(Hash) || raise("Second argument must be a hash")
+
+        ls = {}
+        layer_selection.keys.sort.each do |n|
+          l = layer_selection[n]
+          l.requires_texts_or_region
+          register_layer(l.data)
+          ls[n.to_s] = l.data
+        end
+
+        @engine._cmd(@l2n, :extract_devices, devex, ls) 
+
       end
-
-      @engine._cmd(@l2n, :extract_devices, devex, ls) 
 
     end
 
@@ -213,8 +225,10 @@ module DRC
     # does not correspond to the physical dimensions.
     
     def device_scaling(factor)
-      @device_scaling = factor
-      @l2n && @l2n.device_scaling = factor
+      @engine._context("device_scaling") do
+        @device_scaling = factor
+        @l2n && @l2n.device_scaling = factor
+      end
     end
     
     # %DRC%
@@ -254,16 +268,22 @@ module DRC
     # on "clear_connections".
 
     def connect_implicit(arg1, arg2 = nil)
-      cleanup
-      if arg2
-        (arg2.is_a?(String) && arg2 != "") || raise("The second argument of 'connect_implicit' has to be a non-empty string")
-        arg1.is_a?(String) || raise("The first argument of 'connect_implicit' has to be a string")
-        @connect_implicit_per_cell[arg1] ||= []
-        @connect_implicit_per_cell[arg1] << arg2
-      else
-        arg1.is_a?(String) || raise("The argument of 'connect_implicit' has to be a string")
-        @connect_implicit << arg1
+
+      @engine._context("connect_implicit") do
+
+        cleanup
+        if arg2
+          (arg2.is_a?(String) && arg2 != "") || raise("The second argument has to be a non-empty string")
+          arg1.is_a?(String) || raise("The first argument has to be a string")
+          @connect_implicit_per_cell[arg1] ||= []
+          @connect_implicit_per_cell[arg1] << arg2
+        else
+          arg1.is_a?(String) || raise("The argument has to be a string")
+          @connect_implicit << arg1
+        end
+
       end
+
     end
 
     # %DRC%
@@ -388,56 +408,60 @@ module DRC
 
     def antenna_check(agate, ametal, ratio, *diodes)
 
-      gate_perimeter_factor = 0.0
-      gate_area_factor = 1.0
-      if agate.is_a?(DRC::DRCLayer)
-        gate = agate
-      elsif agate.is_a?(DRC::DRCAreaAndPerimeter)
-        gate = agate.region
-        gate_perimeter_factor = agate.perimeter_factor
-        gate_area_factor = agate.area_factor
-        if ! gate.is_a?(DRC::DRCLayer)
-          raise("gate with area or area_and_perimeter: input argument must be a layer")
+      @engine._context("antenna_check") do
+
+        gate_perimeter_factor = 0.0
+        gate_area_factor = 1.0
+        if agate.is_a?(DRC::DRCLayer)
+          gate = agate
+        elsif agate.is_a?(DRC::DRCAreaAndPerimeter)
+          gate = agate.region
+          gate_perimeter_factor = agate.perimeter_factor
+          gate_area_factor = agate.area_factor
+          if ! gate.is_a?(DRC::DRCLayer)
+            raise("Gate with area or area_and_perimeter: input argument must be a layer")
+          end
+        else
+          raise("Gate argument must be a layer ")
         end
-      else
-        raise("gate argument of Netter#antenna_check must be a layer ")
-      end
 
-      gate.requires_region("Netter#antenna_check (gate argument)")
+        gate.requires_region
 
-      metal_perimeter_factor = 0.0
-      metal_area_factor = 1.0
-      if ametal.is_a?(DRC::DRCLayer)
-        metal = ametal
-      elsif ametal.is_a?(DRC::DRCAreaAndPerimeter)
-        metal = ametal.region
-        metal_perimeter_factor = ametal.perimeter_factor
-        metal_area_factor = ametal.area_factor
-        if ! metal.is_a?(DRC::DRCLayer)
-          raise("metal with area or area_and_perimeter: input argument must be a layer")
+        metal_perimeter_factor = 0.0
+        metal_area_factor = 1.0
+        if ametal.is_a?(DRC::DRCLayer)
+          metal = ametal
+        elsif ametal.is_a?(DRC::DRCAreaAndPerimeter)
+          metal = ametal.region
+          metal_perimeter_factor = ametal.perimeter_factor
+          metal_area_factor = ametal.area_factor
+          if ! metal.is_a?(DRC::DRCLayer)
+            raise("Metal with area or area_and_perimeter: input argument must be a layer")
+          end
+        else
+          raise("Metal argument must be a layer")
         end
-      else
-        raise("metal argument of Netter#antenna_check must be a layer")
-      end
 
-      metal.requires_region("Netter#antenna_check (metal argument)")
+        metal.requires_region
 
-      if !ratio.is_a?(1.class) && !ratio.is_a?(Float)
-        raise("ratio argument Netter#antenna_check is not a number")
-      end
-
-      dl = diodes.collect do |d|
-        if d.is_a?(Array)
-          d.size == 2 || raise("diode specification pair expects two elements")
-          d[0].requires_region("Netter#antenna_check (diode layer)")
-          [ d[0].data, d[1].to_f ]
-        else 
-          d.requires_region("Netter#antenna_check (diode layer)")
-          [ d.data, 0.0 ]
+        if !ratio.is_a?(1.class) && !ratio.is_a?(Float)
+          raise("Ratio argument is not a number")
         end
-      end
 
-      DRC::DRCLayer::new(@engine, @engine._cmd(l2n_data, :antenna_check, gate.data, gate_area_factor, gate_perimeter_factor, metal.data, metal_area_factor, metal_perimeter_factor, ratio, dl))
+        dl = diodes.collect do |d|
+          if d.is_a?(Array)
+            d.size == 2 || raise("Diode specification pair expects two elements")
+            d[0].requires_region
+            [ d[0].data, d[1].to_f ]
+          else 
+            d.requires_region
+            [ d.data, 0.0 ]
+          end
+        end
+
+        DRC::DRCLayer::new(@engine, @engine._cmd(l2n_data, :antenna_check, gate.data, gate_area_factor, gate_perimeter_factor, metal.data, metal_area_factor, metal_perimeter_factor, ratio, dl))
+
+      end
 
     end
 
@@ -450,26 +474,30 @@ module DRC
 
     def l2n_data
 
-      ensure_data
+      @engine._context("l2n_data") do
 
-      # run extraction in a timed environment
-      if ! @netlisted
+        ensure_data
 
-        # build a glob expression from the parts
-        expr = _join_glob_pattern(@connect_implicit)
+        # run extraction in a timed environment
+        if ! @netlisted
 
-        # build cell-pattern specific glob expressions from the parts
-        per_cell_expr = {}
-        @connect_implicit_per_cell.each do |cell_pattern,label_pattern|
-          per_cell_expr[cell_pattern] = _join_glob_pattern(label_pattern)
+          # build a glob expression from the parts
+          expr = _join_glob_pattern(@connect_implicit)
+
+          # build cell-pattern specific glob expressions from the parts
+          per_cell_expr = {}
+          @connect_implicit_per_cell.each do |cell_pattern,label_pattern|
+            per_cell_expr[cell_pattern] = _join_glob_pattern(label_pattern)
+          end
+
+          @engine._cmd(@l2n, :extract_netlist, expr, per_cell_expr)
+          @netlisted = true
+
         end
 
-        @engine._cmd(@l2n, :extract_netlist, expr, per_cell_expr)
-        @netlisted = true
+        @l2n
 
       end
-
-      @l2n
 
     end
 
@@ -482,7 +510,9 @@ module DRC
     # calls must have been made before this method is used. Further \connect
     # statements will clear the netlist and re-extract it again.
     def netlist
-      l2n_data && @l2n.netlist
+      @engine._context("netlist") do
+        l2n_data && @l2n.netlist
+      end
     end
     
     def _finish

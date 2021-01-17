@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -908,6 +908,17 @@ public:
   ReuseData *reuse_data () const
   {
     return mp_rdata;
+  }
+
+  /**
+   *  @brief Swaps the vector with another one
+   */
+  void swap (reuse_vector &other)
+  {
+    std::swap (mp_start, other.mp_start);
+    std::swap (mp_finish, other.mp_finish);
+    std::swap (mp_capacity, other.mp_capacity);
+    std::swap (mp_rdata, other.mp_rdata);
   }
 
 private:

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -47,7 +47,8 @@ public:
   virtual ~AsIfFlatRegion ();
 
   virtual bool is_box () const;
-  virtual size_t size () const;
+  virtual size_t count () const;
+  virtual size_t hier_count () const;
 
   virtual area_type area (const db::Box &box) const;
   virtual perimeter_type perimeter (const db::Box &box) const;
@@ -55,45 +56,18 @@ public:
 
   virtual std::string to_string (size_t nmax) const;
 
-  EdgePairsDelegate *width_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
-  {
-    return run_single_polygon_check (db::WidthRelation, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
-  }
+  virtual EdgePairsDelegate *cop_to_edge_pairs (db::CompoundRegionOperationNode &node);
+  virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node);
+  virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node);
 
-  EdgePairsDelegate *space_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
-  {
-    return run_check (db::SpaceRelation, false, 0, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
-  }
-
-  EdgePairsDelegate *isolated_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
-  {
-    return run_check (db::SpaceRelation, true, 0, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
-  }
-
-  EdgePairsDelegate *notch_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
-  {
-    return run_single_polygon_check (db::SpaceRelation, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
-  }
-
-  EdgePairsDelegate *enclosing_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
-  {
-    return run_check (db::OverlapRelation, true, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
-  }
-
-  EdgePairsDelegate *overlap_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
-  {
-    return run_check (db::WidthRelation, true, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
-  }
-
-  EdgePairsDelegate *separation_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
-  {
-    return run_check (db::SpaceRelation, true, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
-  }
-
-  EdgePairsDelegate *inside_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
-  {
-    return run_check (db::InsideRelation, true, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
-  }
+  EdgePairsDelegate *width_check (db::Coord d, const RegionCheckOptions &options) const;
+  EdgePairsDelegate *space_check (db::Coord d, const RegionCheckOptions &options) const;
+  EdgePairsDelegate *isolated_check (db::Coord d, const RegionCheckOptions &options) const;
+  EdgePairsDelegate *notch_check (db::Coord d, const RegionCheckOptions &options) const;
+  EdgePairsDelegate *enclosing_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const;
+  EdgePairsDelegate *overlap_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const;
+  EdgePairsDelegate *separation_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const;
+  EdgePairsDelegate *inside_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const;
 
   virtual EdgePairsDelegate *grid_check (db::Coord gx, db::Coord gy) const;
   virtual EdgePairsDelegate *angle_check (double min, double max, bool inverse) const;
@@ -154,6 +128,7 @@ public:
   virtual RegionDelegate *not_with (const Region &other) const;
   virtual RegionDelegate *xor_with (const Region &other) const;
   virtual RegionDelegate *or_with (const Region &other) const;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> andnot_with (const Region &) const;
 
   virtual RegionDelegate *add_in_place (const Region &other)
   {
@@ -182,44 +157,54 @@ public:
     return selected_interacting_generic (other, -1, true, true);
   }
 
-  virtual RegionDelegate *selected_interacting (const Region &other) const
+  virtual RegionDelegate *selected_enclosing (const Region &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, 0, true, false);
+    return selected_interacting_generic (other, -2, false, false, min_count, max_count);
   }
 
-  virtual RegionDelegate *selected_not_interacting (const Region &other) const
+  virtual RegionDelegate *selected_not_enclosing (const Region &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, 0, true, true);
+    return selected_interacting_generic (other, -2, false, true, min_count, max_count);
   }
 
-  virtual RegionDelegate *selected_interacting (const Edges &other) const
+  virtual RegionDelegate *selected_interacting (const Region &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, false);
+    return selected_interacting_generic (other, 0, true, false, min_count, max_count);
   }
 
-  virtual RegionDelegate *selected_not_interacting (const Edges &other) const
+  virtual RegionDelegate *selected_not_interacting (const Region &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, true);
+    return selected_interacting_generic (other, 0, true, true, min_count, max_count);
   }
 
-  virtual RegionDelegate *selected_interacting (const Texts &other) const
+  virtual RegionDelegate *selected_interacting (const Edges &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, false);
+    return selected_interacting_generic (other, false, min_count, max_count);
   }
 
-  virtual RegionDelegate *selected_not_interacting (const Texts &other) const
+  virtual RegionDelegate *selected_not_interacting (const Edges &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, true);
+    return selected_interacting_generic (other, true, min_count, max_count);
   }
 
-  virtual RegionDelegate *selected_overlapping (const Region &other) const
+  virtual RegionDelegate *selected_interacting (const Texts &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, 0, false, false);
+    return selected_interacting_generic (other, false, min_count, max_count);
   }
 
-  virtual RegionDelegate *selected_not_overlapping (const Region &other) const
+  virtual RegionDelegate *selected_not_interacting (const Texts &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, 0, false, true);
+    return selected_interacting_generic (other, true, min_count, max_count);
+  }
+
+  virtual RegionDelegate *selected_overlapping (const Region &other, size_t min_count, size_t max_count) const
+  {
+    return selected_interacting_generic (other, 0, false, false, min_count, max_count);
+  }
+
+  virtual RegionDelegate *selected_not_overlapping (const Region &other, size_t min_count, size_t max_count) const
+  {
+    return selected_interacting_generic (other, 0, false, true, min_count, max_count);
   }
 
   virtual RegionDelegate *pull_inside (const Region &other) const
@@ -258,11 +243,11 @@ protected:
   void update_bbox (const db::Box &box);
   void invalidate_bbox ();
 
-  EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
-  EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
-  virtual RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const;
-  virtual RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse) const;
-  virtual RegionDelegate *selected_interacting_generic (const Texts &other, bool inverse) const;
+  virtual EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const;
+  virtual EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options) const;
+  virtual RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const;
+  virtual RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const;
+  virtual RegionDelegate *selected_interacting_generic (const Texts &other, bool inverse, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const;
   virtual RegionDelegate *pull_generic (const Region &other, int mode, bool touching) const;
   virtual EdgesDelegate *pull_generic (const Edges &other) const;
   virtual TextsDelegate *pull_generic (const Texts &other) const;
@@ -282,6 +267,7 @@ private:
 
   virtual db::Box compute_bbox () const;
   static RegionDelegate *region_from_box (const db::Box &b);
+  EdgePairsDelegate *space_or_isolated_check (db::Coord d, const RegionCheckOptions &options, bool isolated) const;
 };
 
 }

@@ -70,6 +70,7 @@
 
 
   <h2>Including other files</h2>
+  <keyword name="include"/>
 
   <p>
   The DRC script language is based on Ruby which delivers many native language
@@ -398,6 +399,9 @@ output(w, "width violations")</pre>
       <a href="/about/drc_ref_layer.xml#enclosure">enclosure (enc)</a>,
       <a href="/about/drc_ref_layer.xml#overlap">overlap</a>
     </li>
+    <li>Universal DRC (see below):<br/>
+      <a href="/about/drc_ref_layer.xml#drc">drc</a>
+    </li>
     <li>Boolean operations:<br/>
       <a href="/about/drc_ref_layer.xml#&amp;">&amp; (and)</a>,
       <a href="/about/drc_ref_layer.xml#|">| (or)</a>,
@@ -506,6 +510,8 @@ output(w, "width violations")</pre>
   </ul>
 
   <h2>Polygon and edge layers</h2>
+  <keyword name="Polygon layer"/>
+  <keyword name="Edge layer"/>
 
   <p>
   KLayout knows four layer types: polygon, edge, edge pair and text layers.
@@ -573,6 +579,7 @@ output(w, "width violations")</pre>
   </p>
 
   <h2>Text collections</h2>
+  <keyword name="Text collections"/>
 
   <p>
   Starting with version 0.27, KLayout offers support for text layers.
@@ -618,6 +625,8 @@ output(w, "width violations")</pre>
   </ul>
 
   <h2>Edge pairs and edge pair collections</h2>
+  <keyword name="Edge pairs"/>
+  <keyword name="Edge pair collections"/>
 
   <p>
   Edge pairs are objects consisting of two edges. Edge pairs are handy when discribing a DRC check violation,
@@ -641,6 +650,8 @@ output(w, "width violations")</pre>
 
 
   <h2>Raw and clean layer mode</h2>
+  <keyword name="Raw mode"/>
+  <keyword name="Clean mode"/>
 
   <p>
   KLayout's DRC engine supports two basic ways to interpret geometrical information on a layer:
@@ -711,7 +722,190 @@ overlaps = layer.size(0.2).raw.merged(2)</pre>
   </table>
 
 
+  <h2>Shielding</h2>
+  <keyword name="Shielding"/>
+
+  <p>
+  "Shielding" is a concept where DRC measurements do not "look through" layout features.
+  With shielding, a DRC violation is skipped when another feature would (fully) block
+  the violation marker's path. Shielding is available and enabled by default for the (internal or external)
+  distance-based DRC functions:
+  <a href="/about/drc_ref_layer.xml#width">width</a>,
+  <a href="/about/drc_ref_layer.xml#space">space</a>,
+  <a href="/about/drc_ref_layer.xml#separation">separation (sep)</a>,
+  <a href="/about/drc_ref_layer.xml#notch">notch</a>,
+  <a href="/about/drc_ref_layer.xml#isolated">isolated (iso)</a>,
+  <a href="/about/drc_ref_layer.xml#enclosure">enclosure (enc)</a> or
+  <a href="/about/drc_ref_layer.xml#overlap">overlap</a>.
+  Shielding is turned off using the "transparent" option or turned on using "shielded". The latter
+  is only for clarity, but is not required as shielding is enabled by default.
+  </p>
+
+  <p>
+  The following examples demonstrate the effect of shielding: in the right example, shielding is turned off.
+  Hence, the violation between the upper box on the right and the lower bar is no longer shielded by the
+  small bar between them and this additional violation is reported too.
+  </p>
+
+  <table>
+    <tr>
+      <td><img src="/images/drc_shielded1.png"/></td>
+      <td><img src="/images/drc_shielded2.png"/></td>
+    </tr>
+  </table>
+
+  <p>
+  Although shielding feels more natural, it can have an adverse effect as it is effective at zero
+  distance already. In the following example, the second layer is a subset of the first. When
+  testing the distance between second and first, the overlapping first layer shapes will block
+  the separation measurement in shielded mode. Hence, only transparent mode will render the 
+  actual distance violation. The bottom right blue box is not shielded by the overlaying red box:
+  </p>
+
+  <table>
+    <tr>
+      <td><img src="/images/drc_shielded3.png"/></td>
+      <td><img src="/images/drc_shielded4.png"/></td>
+    </tr>
+  </table>
+
+
+  <h2>Universal DRC</h2>
+  <keyword name="DRC"/>
+  <keyword name="Universal DRC"/>
+
+  <p>
+  Starting with version 0.27, the DRC language got a new feature which is "universal DRC".
+  </p>
+
+  <p>
+  On one hand, this is a more convenient way to write DRC checks because it allows 
+  specifications using natural compare operators. For example, the following plain width check
+  </p>
+
+  <pre>
+  ...
+  drc_w = input(1, 0).width(0.2)
+  ...
+  </pre>
+
+  <p>
+  can be written as:
+  </p>
+
+  <pre>
+  ...
+  drc_w = input(1, 0).drc(width &lt; 0.2)
+  ...
+  </pre>
+
+  <p>
+  The <a href="/about/drc_ref_layer.xml#drc">drc</a> method is the "universal DRC" method.
+  It takes an operator. In the simple case, this operator is a simple constraint of the 
+  form "measurement &lt; value", but it supports a number of different variants:
+  </p>
+
+  <ul>
+  <li>
+    <tt>drc(</tt> measurement <tt> != </tt> value <tt>)</tt>: 
+    renders markers where the dimension is not matching the value
+  </li>
+  <li>
+    <tt>drc(</tt> measurement <tt> == </tt> value <tt>)</tt>:
+    renders markers where the dimension is matching the given value
+  </li>
+  <li>
+    <tt>drc(</tt> measurement less_op value <tt>)</tt>:
+    ("less_op" is <tt>&lt;</tt> or <tt>&lt;=</tt>)
+    renders markers where the dimension is less than or less or equal to the given value
+  </li>
+  <li>
+    <tt>drc(</tt> measurement greater_op value <tt>)</tt>:
+    ("greater_op" is <tt>&gt;</tt> or <tt>&gt;=</tt>)
+    renders markers where the dimension is greater than or greater or equal to the given value
+  </li>
+  <li>
+    <tt>drc(</tt> lower_value less_op measurement greater_op upper_value <tt>)</tt>:
+    renders markers where the dimension is between the lower and upper value
+  </li>
+  </ul>
+
+  <p>
+  "measurement" is "width", "notch", "isolated" ("iso"), "separation" ("sep"), "overlap" or "enclosure" ("enc").
+  The last three checks are two-layer checks which require a second layer. The 
+  second layer is specified together with the measurement like this:
+  </p>
+
+  <pre>
+  ...
+  l1 = input(1, 0)
+  l2 = input(2, 0)
+  drc_sep = l1.drc(separation(l2) &lt;= 0.5)
+  ...
+  </pre>
+
+  <p>
+  Options are also specified together with the measurement and follow the same notation
+  as the plain methods. For example to specify "projection" metrics, use:
+  </p>
+
+  <pre>
+  ...
+  drc_w = input(1, 0).drc(width(projection) &lt; 0.2)
+  ...
+  </pre>
+
+  <p>
+  However, the universal DRC is much more than a convenient way to write checks: 
+  it offers a number of options to further process
+  the results. The functionality behind the universal DRC function is basically a kind of 
+  loop over all primary shapes (the ones from the layer the "drc" function is called on).
+  The operations in the drc function's brackets is executed on each of the primary shapes
+  where the neighborhood of that single shape is considered. This scheme is more efficient
+  and enables applications beyond the capabilities of the plain layer methods.
+  </p>
+
+  <p>
+  For example, the boolean "&amp;" operator implements a "local" boolean AND inside this 
+  loop. This allows to efficiently check for both space and width violations:
+  </p>
+
+  <pre>
+  ...
+  drc_ws = input(1, 0).drc((width &lt; 0.2) &amp; (space &lt; 0.3))
+  ...
+  </pre>
+
+  <p>
+  The boolean AND is computed between the edges on the primary shape and returns the
+  parts where both space and width violations are flagged. The boolean operation is 
+  more efficient than the plain alternative:
+  </p>
+
+  <pre>
+  ...
+  drc_ws1 = input(1, 0).width(0.2).edges
+  drc_ws2 = input(1, 0).space(0.3).edges
+  drc_ws = drc_ws1 &amp; drc_ws2
+  ...
+  </pre>
+
+  <p>
+  The reason is that performing the boolean computation in the local loop can be 
+  shortcut if one inputs is empty. It does not need to store a (potentially big)
+  edge set with edges as produced by the plain-method implementation. Instead it
+  will work with a temporary and local edge set only and free the memory space as
+  soon as it moves on to the next primary shape.
+  </p>
+
+  <p>
+  Overall, the universal DRC function is a rich feature and offers filters based on 
+  polygons or edge properties, polygon or edge manipulation operators, conditionals
+  and a lot more. For more details see the <a href="/about/drc_ref_layer.xml#drc">drc function documentation</a>.
+  </p>
+
   <h2>Logging and verbosity</h2>
+  <keyword name="Logging"/>
 
   <p>
   While the runset is executed, a log is written that lists the methods and their execution times.
@@ -752,6 +946,7 @@ overlaps = layer.size(0.2).raw.merged(2)</pre>
   
 
   <h2>The tiling option</h2>
+  <keyword name="Tiling"/>
 
   <p>
   Tiling is a method to reduce the memory requirements for an operation. For big layouts, pulling a whole layer
@@ -831,6 +1026,8 @@ no_borders</pre>
   </p>
 
   <h2>Hierarchical mode</h2>
+  <keyword name="Hierarchical mode"/>
+  <keyword name="Deep"/>
 
   <p>
   Alternatively to the tiling option, hierarchical mode is available. In hierarchical

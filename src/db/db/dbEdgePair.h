@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -39,6 +39,16 @@
 
 namespace db {
 
+/**
+ *  @brief A pair of edges
+ *
+ *  An edge pair is a pair of edges which usually is used to mark a DRC violation. It flags the relationship of two edges.
+ *  It's a compoisition of two edges: first and second.
+ *
+ *  By default, an edge pair is directed: first and second are not commutable and indicate a relationship ("from first towards second").
+ *  The edge pair carries a flag which allows indicating symmetric mode: in this mode, the first and second edge are commutable.
+ *  As a consequence, when the symmetric flag is used, edge_pair(e1, e2, true) == edge_pair(e2, e1, true).
+ */
 template <class C>
 class DB_PUBLIC_TEMPLATE edge_pair
 {
@@ -61,7 +71,7 @@ public:
    *  The default constructor creates an edge pair with two default edges.
    */
   edge_pair ()
-    : m_first (), m_second ()
+    : m_first (), m_second (), m_symmetric (false)
   {
     //  .. nothing else ..
   }
@@ -71,10 +81,11 @@ public:
    *
    *  @param first The first edge
    *  @param second The second edge
+   *  @param symmetric True, if the edge pair is symmetric
    */
   template <class D>
-  edge_pair (const db::edge<D> &first, const db::edge<D> &second)
-    : m_first (first), m_second (second)
+  edge_pair (const db::edge<D> &first, const db::edge<D> &second, bool symmetric = false)
+    : m_first (first), m_second (second), m_symmetric (symmetric)
   {
     //  .. nothing else ..
   }
@@ -84,9 +95,25 @@ public:
    */
   template <class D>
   edge_pair (const edge_pair<D> &e)
-    : m_first (e.first ()), m_second (e.second ())
+    : m_first (e.first ()), m_second (e.second ()), m_symmetric (e.is_symmetric ())
   {
     //  .. nothing else ..
+  }
+
+  /**
+   *  @brief Gets the symmetric flag
+   */
+  bool is_symmetric () const
+  {
+    return m_symmetric;
+  }
+
+  /**
+   *  @brief Sets the symmetric flag
+   */
+  void set_symmetric (bool s)
+  {
+    m_symmetric = s;
   }
 
   /**
@@ -112,7 +139,15 @@ public:
    */
   bool operator< (const edge_pair<C> &b) const
   {
-    return m_first < b.m_first || (m_first == b.m_first && m_second < b.m_second);
+    if (m_symmetric != b.m_symmetric) {
+      return m_symmetric < b.m_symmetric;
+    }
+
+    const edge_type &l = lesser ();
+    const edge_type &g = greater ();
+    const edge_type &bl = b.lesser ();
+    const edge_type &bg = b.greater ();
+    return l < bl || (l == bl && g < bg);
   }
 
   /** 
@@ -120,7 +155,10 @@ public:
    */
   bool operator== (const edge_pair<C> &b) const
   {
-    return m_first == b.m_first && m_second == b.m_second;
+    if (m_symmetric != b.m_symmetric) {
+      return false;
+    }
+    return lesser () == b.lesser () && greater () == b.greater ();
   }
 
   /** 
@@ -136,7 +174,15 @@ public:
    */
   bool less (const edge_pair<C> &b) const
   {
-    return m_first.less (b.m_first) || (m_first.equal (b.m_first) && m_second.less (b.m_second));
+    if (m_symmetric != b.m_symmetric) {
+      return m_symmetric < b.m_symmetric;
+    }
+
+    const edge_type &l = lesser ();
+    const edge_type &g = greater ();
+    const edge_type &bl = b.lesser ();
+    const edge_type &bg = b.greater ();
+    return l.less (bl) || (l.equal (bl) && g.less (bg));
   }
 
   /**
@@ -144,7 +190,10 @@ public:
    */
   bool equal (const edge_pair<C> &b) const
   {
-    return m_first.equal (b.m_first) && m_second.equal (b.m_second);
+    if (m_symmetric != b.m_symmetric) {
+      return false;
+    }
+    return lesser ().equal (b.lesser ()) && greater ().equal (b.greater ());
   }
 
   /**
@@ -160,7 +209,7 @@ public:
    */
   edge_pair<C> scaled (double s) const
   {
-    return edge_pair<C> (edge_type (first () * s), edge_type (second () * s));
+    return edge_pair<C> (edge_type (first () * s), edge_type (second () * s), m_symmetric);
   }
 
   /**
@@ -193,7 +242,7 @@ public:
   template <class Tr>
   edge_pair<C> &transform (const Tr &t)
   {
-    *this = edge_pair<C> (t * m_first, t * m_second);
+    *this = edge_pair<C> (t * m_first, t * m_second, m_symmetric);
     return *this;
   }
 
@@ -210,7 +259,7 @@ public:
   template <class Tr>
   edge_pair<typename Tr::target_coord_type> transformed (const Tr &t) const
   {
-    return edge_pair<typename Tr::target_coord_type> (t * m_first, t * m_second);
+    return edge_pair<typename Tr::target_coord_type> (t * m_first, t * m_second, m_symmetric);
   }
 
   /**
@@ -279,6 +328,32 @@ public:
   }
 
   /**
+   *  @brief The "lesser" edge.
+   *  This feature is used for comparing symmetric edge pairs.
+   */
+  const edge_type &lesser () const
+  {
+    if (m_symmetric) {
+      return m_first < m_second ? m_first : m_second;
+    } else {
+      return m_first;
+    }
+  }
+
+  /**
+   *  @brief The "greater" edge.
+   *  This feature is used for comparing symmetric edge pairs.
+   */
+  const edge_type &greater () const
+  {
+    if (m_symmetric) {
+      return m_second < m_first ? m_first : m_second;
+    } else {
+      return m_second;
+    }
+  }
+
+  /**
    *  @brief returns the bounding box
    */
   const box_type bbox () const
@@ -310,7 +385,7 @@ public:
    */
   std::string to_string (double dbu) const
   {
-    return m_first.to_string (dbu) + "/" + m_second.to_string (dbu);
+    return lesser ().to_string (dbu) + (m_symmetric ? "|" : "/") + greater ().to_string (dbu);
   }
   
   /**
@@ -466,6 +541,7 @@ public:
 
 private:
   edge_type m_first, m_second;
+  bool m_symmetric;
 };
 
 /**

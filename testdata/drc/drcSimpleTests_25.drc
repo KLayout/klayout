@@ -1,0 +1,53 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+
+
+# Self-test "projection_limits"
+
+def self_test(id, a, b)
+  a == b || raise(id + ": self-test failed (" + a.inspect + " != " + b.inspect + ")")
+end
+
+l = projection_limits(0..2.0)
+self_test("projection_limits(1)", l.get_limits(self), [ 0, 2000 ])
+l = projecting < 2.0
+self_test("projection_limits(2)", l.get_limits(self), [ 0, 2000 ])
+l = projecting <= 2.0
+self_test("projection_limits(3)", l.get_limits(self), [ 0, 2001 ])
+l = projecting == 2.0
+self_test("projection_limits(3)", l.get_limits(self), [ 2000, 2001 ])
+l = projecting > 2.0
+self_test("projection_limits(3)", l.get_limits(self), [ 2001, nil ])
+l = projecting >= 2.0
+self_test("projection_limits(3)", l.get_limits(self), [ 2000, nil ])
+l = 1.0 < projecting < 2.0
+self_test("projection_limits(3)", l.get_limits(self), [ 1001, 2000 ])
+
+
+l1.space(1.0, projection).polygons.output(100, 0)
+
+l1.space(1.0, euclidian).polygons.output(110, 0)
+l1.space(1.0, projection, projection_limits(0..2.0)).polygons.output(111, 0)
+l1.space(1.0, projection, whole_edges).polygons.output(112, 0)
+l1.space(1.0, projection, only_opposite).output(113, 0)
+l1.space(1.0, projection, not_opposite).output(114, 0)
+
+l1.isolated(1.0, euclidian).polygons.output(120, 0)
+l1.isolated(1.0, projection, projecting < 2.0.um).polygons.output(121, 0)
+l1.isolated(1.0, projection, whole_edges).polygons.output(122, 0)
+l1.isolated(1.0, projection, only_opposite).output(123, 0)
+l1.isolated(1.0, projection, not_opposite).output(124, 0)
+

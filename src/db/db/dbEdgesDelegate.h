@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -31,10 +31,75 @@
 #include "dbEdgePairRelations.h"
 #include "dbShapeCollection.h"
 #include "dbShapeCollectionUtils.h"
+#include "dbGenericShapeIterator.h"
 
 #include <list>
+#include <unordered_set>
 
 namespace db {
+
+/**
+ *  @brief A structure holding the options for the region checks (space, width, ...)
+ */
+struct DB_PUBLIC EdgesCheckOptions
+{
+  typedef db::coord_traits<db::Coord>::distance_type distance_type;
+
+  /**
+   *  @brief Constructor
+   */
+  EdgesCheckOptions (bool _whole_edges = false,
+                      metrics_type _metrics = db::Euclidian,
+                      double _ignore_angle = 90,
+                      distance_type _min_projection = 0,
+                      distance_type _max_projection = std::numeric_limits<distance_type>::max ())
+    : whole_edges (_whole_edges),
+      metrics (_metrics),
+      ignore_angle (_ignore_angle),
+      min_projection (_min_projection),
+      max_projection (_max_projection)
+  { }
+
+  /**
+   *  @brief Specifies is whole edges are to be delivered
+   *
+   *  Without "whole_edges", the parts of
+   *  the edges are returned which violate the condition. If "whole_edges" is true, the
+   *  result will contain the complete edges participating in the result.
+   */
+  bool whole_edges;
+
+  /**
+   *  @brief Measurement metrics
+   *
+   *  The metrics parameter specifies which metrics to use. "Euclidian", "Square" and "Projected"
+   *  metrics are available.
+   */
+  metrics_type metrics;
+
+  /**
+   *  @brief Specifies the obtuse angle threshold
+   *
+   *  "ignore_angle" allows specification of a maximum angle that connected edges can have to not participate
+   *  in the check. By choosing 90 degree, edges with angles of 90 degree and larger are not checked,
+   *  but acute corners are for example.
+   */
+  double ignore_angle;
+
+  /**
+   *  @brief Specifies the projection limit's minimum value
+   *
+   *  With min_projection and max_projection it is possible to specify how edges must be related
+   *  to each other. If the length of the projection of either edge on the other is >= min_projection
+   *  or < max_projection, the edges are considered for the check.
+   */
+  distance_type min_projection;
+
+  /**
+   *  @brief Specifies the projection limit's maximum value
+   */
+  distance_type max_projection;
+};
 
 /**
  *  @brief A base class for edge filters
@@ -51,9 +116,15 @@ public:
 
   /**
    *  @brief Filters the edge
-   *  If this method returns true, the polygon is kept. Otherwise it's discarded.
+   *  If this method returns true, the edge is kept. Otherwise it's discarded.
    */
   virtual bool selected (const db::Edge &edge) const = 0;
+
+  /**
+   *  @brief Filters the edge set
+   *  If this method returns true, the edges are kept. Otherwise they are discarded.
+   */
+  virtual bool selected (const std::unordered_set<db::Edge> &edge) const = 0;
 
   /**
    *  @brief Returns the transformation reducer for building cell variants
@@ -141,19 +212,7 @@ class RegionDelegate;
 /**
  *  @brief The edge set iterator delegate
  */
-class DB_PUBLIC EdgesIteratorDelegate
-{
-public:
-  EdgesIteratorDelegate () { }
-  virtual ~EdgesIteratorDelegate () { }
-
-  typedef db::Edge value_type;
-
-  virtual bool at_end () const = 0;
-  virtual void increment () = 0;
-  virtual const value_type *get () const = 0;
-  virtual EdgesIteratorDelegate *clone () const = 0;
-};
+typedef db::generic_shape_iterator_delegate_base <db::Edge> EdgesIteratorDelegate;
 
 /**
  *  @brief The delegate for the actual edge set implementation
@@ -210,17 +269,18 @@ public:
 
   virtual bool empty () const = 0;
   virtual bool is_merged () const = 0;
-  virtual size_t size () const = 0;
+  virtual size_t count () const = 0;
+  virtual size_t hier_count () const = 0;
 
   virtual distance_type length (const db::Box &box) const = 0;
   virtual Box bbox () const = 0;
 
-  virtual EdgePairsDelegate *width_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const = 0;
-  virtual EdgePairsDelegate *space_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const = 0;
-  virtual EdgePairsDelegate *enclosing_check (const Edges &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const = 0;
-  virtual EdgePairsDelegate *overlap_check (const Edges &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const = 0;
-  virtual EdgePairsDelegate *separation_check (const Edges &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const = 0;
-  virtual EdgePairsDelegate *inside_check (const Edges &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const = 0;
+  virtual EdgePairsDelegate *width_check (db::Coord d, const db::EdgesCheckOptions &options) const = 0;
+  virtual EdgePairsDelegate *space_check (db::Coord d, const db::EdgesCheckOptions &options) const = 0;
+  virtual EdgePairsDelegate *enclosing_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options) const = 0;
+  virtual EdgePairsDelegate *overlap_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options) const = 0;
+  virtual EdgePairsDelegate *separation_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options) const = 0;
+  virtual EdgePairsDelegate *inside_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options) const = 0;
 
   virtual EdgesDelegate *filter_in_place (const EdgeFilterBase &filter) = 0;
   virtual EdgesDelegate *filtered (const EdgeFilterBase &filter) const = 0;

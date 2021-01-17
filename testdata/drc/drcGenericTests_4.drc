@@ -1,0 +1,43 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+  threads(0) # easier to debug
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+
+# booleans
+l1.drc(primary + l2 + l3).output(100, 0)
+l1.drc(secondary(l2) + primary + l3).output(101, 0)
+l1.drc(primary + secondary(l2) + l3).output(102, 0)
+
+l1.drc(primary - l2).output(110, 0)
+# This will not work as the l2 shapes (being intruders)
+# will not see all all primary shapes to give the 
+# correct result:
+# l1.drc(secondary(l2) - primary).output(111, 0)
+l1.drc(primary - secondary(l2)).output(112, 0)
+
+l1.drc(primary & l2).output(120, 0)
+l1.drc(secondary(l2) & primary).output(121, 0)
+l1.drc(primary & secondary(l2)).output(122, 0)
+
+l1.drc(primary | l2).output(130, 0)
+l1.drc(secondary(l2) | primary).output(131, 0)
+l1.drc(primary | secondary(l2)).output(132, 0)
+
+# XOR will not work as the l2 shapes (being intruders)
+# will not see all all primary shapes to give the 
+# correct result:
+# l1.drc(primary ^ l2).output(140, 0)
+# l1.drc(secondary(l2) ^ primary).output(141, 0)
+# l1.drc(primary ^ secondary(l2)).output(142, 0)

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -446,6 +446,7 @@ static unsigned int s_all ()                 { return db::ShapeIterator::All; }
 static unsigned int s_all_with_properties () { return db::ShapeIterator::AllWithProperties; }
 static unsigned int s_properties ()          { return db::ShapeIterator::Properties; }
 static unsigned int s_polygons ()            { return db::ShapeIterator::Polygons; }
+static unsigned int s_regions ()             { return db::ShapeIterator::Regions; }
 static unsigned int s_boxes ()               { return db::ShapeIterator::Boxes; }
 static unsigned int s_edges ()               { return db::ShapeIterator::Edges; }
 static unsigned int s_edge_pairs ()          { return db::ShapeIterator::EdgePairs; }
@@ -1253,6 +1254,11 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
   ) +
   gsi::method ("SPolygons|#s_polygons", &s_polygons,
     "@brief Indicates that polygons shall be retrieved"
+  ) +
+  gsi::method ("SRegions|#s_regions", &s_regions,
+    "@brief Indicates that objects which can be polygonized shall be retrieved (paths, boxes, polygons etc.)\n"
+    "\n"
+    "This constant has been added in version 0.27."
   ) +
   gsi::method ("SBoxes|#s_boxes", &s_boxes,
     "@brief Indicates that boxes shall be retrieved"

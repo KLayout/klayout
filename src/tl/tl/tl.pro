@@ -11,6 +11,7 @@ FORMS =
 SOURCES = \
     tlAssert.cc \
     tlClassRegistry.cc \
+    tlCopyOnWrite.cc \
     tlDataMapping.cc \
     tlDeflate.cc \
     tlException.cc \
@@ -54,6 +55,7 @@ HEADERS = \
     tlAlgorithm.h \
     tlAssert.h \
     tlClassRegistry.h \
+    tlCopyOnWrite.h \
     tlDataMapping.h \
     tlDeflate.h \
     tlException.h \

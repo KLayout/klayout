@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 # KLayout Layout Viewer
-# Copyright (C) 2006-2020 Matthias Koefferlein
+# Copyright (C) 2006-2021 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,7 +31,8 @@ class DBRegion_TestClass < TestBase
     r = RBA::Region::new
     assert_equal(r.to_s, "")
     assert_equal(r.is_empty?, true)
-    assert_equal(r.size, 0)
+    assert_equal(r.count, 0)
+    assert_equal(r.hier_count, 0)
     assert_equal(r.bbox.to_s, "()")
     assert_equal(r.is_merged?, true)
     assert_equal(r.is_box?, false)
@@ -41,7 +42,8 @@ class DBRegion_TestClass < TestBase
     assert_equal(data_id != r.data_id, true)
     assert_equal(r.to_s, "(10,20;10,200;100,200;100,20)")
     assert_equal(r.is_empty?, false)
-    assert_equal(r.size, 1)
+    assert_equal(r.count, 1)
+    assert_equal(r.hier_count, 1)
     assert_equal(r.bbox.to_s, "(10,20;100,200)")
     assert_equal(r.is_merged?, true)
     assert_equal(r.is_box?, true)
@@ -73,7 +75,8 @@ class DBRegion_TestClass < TestBase
     r.clear
     assert_equal(r.to_s, "")
     assert_equal(r.is_empty?, true)
-    assert_equal(r.size, 0)
+    assert_equal(r.count, 0)
+    assert_equal(r.hier_count, 0)
     assert_equal(r.bbox.to_s, "()")
     assert_equal(r.is_merged?, true)
     assert_equal(r.is_box?, false)
@@ -82,7 +85,8 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.to_s, "(10,20;10,200;100,200;100,20)")
     assert_equal(r.is_empty?, false)
     assert_equal(r.is_box?, true)
-    assert_equal(r.size, 1)
+    assert_equal(r.count, 1)
+    assert_equal(r.hier_count, 1)
     assert_equal(r.bbox.to_s, "(10,20;100,200)")
     assert_equal(r.is_merged?, false)
     
@@ -90,7 +94,8 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.to_s, "(10,20;10,200;100,200;100,20)")
     assert_equal(r.is_empty?, false)
     assert_equal(r.is_box?, true)
-    assert_equal(r.size, 1)
+    assert_equal(r.count, 1)
+    assert_equal(r.hier_count, 1)
     assert_equal(r.bbox.to_s, "(10,20;100,200)")
     assert_equal(r.area, 90*180)
     assert_equal(r.perimeter, 2*90+2*180)
@@ -101,7 +106,8 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.to_s, "(0,-10;0,10;100,10;100,-10)")
     assert_equal(r.is_box?, true)
     assert_equal(r.is_empty?, false)
-    assert_equal(r.size, 1)
+    assert_equal(r.count, 1)
+    assert_equal(r.hier_count, 1)
     assert_equal(r.bbox.to_s, "(0,-10;100,10)")
     assert_equal(r.is_merged?, false)
     
@@ -125,7 +131,8 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.merged(3).to_s, "")
     assert_equal(r.is_empty?, false)
     assert_equal(r.is_box?, false)
-    assert_equal(r.size, 2)
+    assert_equal(r.count, 2)
+    assert_equal(r.hier_count, 2)
     assert_equal(r.bbox.to_s, "(10,20;120,250)")
     assert_equal(r.is_merged?, false)
 
@@ -151,7 +158,8 @@ class DBRegion_TestClass < TestBase
     r = RBA::Region::new(ly.begin_shapes(c1.cell_index, l1))
     assert_equal(r.to_s, "(-10,-20;-10,20;10,20;10,-20);(-10,80;-10,120;10,120;10,80);(190,80;190,120;210,120;210,80)")
     assert_equal(r.is_empty?, false)
-    assert_equal(r.size, 3)
+    assert_equal(r.count, 3)
+    assert_equal(r.hier_count, 3)
     assert_equal(r.bbox.to_s, "(-10,-20;210,120)")
     assert_equal(r.is_merged?, false)
     assert_equal(r.has_valid_polygons?, false)
@@ -179,7 +187,8 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.extents(5, -5).to_s, "(-5,5;-5,35;25,35;25,5);(-5,105;-5,135;25,135;25,105);(195,105;195,135;225,135;225,105)")
     assert_equal(r.is_empty?, false)
     assert_equal(r.is_box?, false)
-    assert_equal(r.size, 3)
+    assert_equal(r.count, 3)
+    assert_equal(r.hier_count, 3)
     assert_equal(r.bbox.to_s, "(0,0;220,140)")
     assert_equal(r.is_merged?, false)
 
@@ -258,11 +267,14 @@ class DBRegion_TestClass < TestBase
     r2 = RBA::Region::new(RBA::Box::new(-10, -20, 80, 160))
 
     assert_equal((r1 & r2).to_s, "(10,20;10,160;80,160;80,20)")
+    assert_equal(r1.andnot(r2).count, 2)
+    assert_equal(r1.andnot(r2)[0].to_s, "(10,20;10,160;80,160;80,20)")
     rr = r1.dup
     rr &= r2
     assert_equal(rr.to_s, "(10,20;10,160;80,160;80,20)")
     
     assert_equal((r1 - r2).to_s, "(80,20;80,160;10,160;10,200;100,200;100,20)")
+    assert_equal(r1.andnot(r2)[1].to_s, "(80,20;80,160;10,160;10,200;100,200;100,20)")
     rr = r1.dup
     rr -= r2
     assert_equal(rr.to_s, "(80,20;80,160;10,160;10,200;100,200;100,20)")
@@ -466,38 +478,38 @@ class DBRegion_TestClass < TestBase
     assert_equal(r3b.overlap_check(r1, 15, false, RBA::Region::Projection, nil, 380, 500).to_s, "")
     assert_equal(r3b.overlap_check(r1, 15, false, RBA::Region::Projection, nil, 0, 300).to_s, "(0,10;10,10)/(10,0;0,0);(10,10;10,0)/(0,0;0,10)")
     
-    assert_equal((r1 | r2).merged.isolated_check(25).to_s, "(120,20;120,380)/(100,395;100,5)")
-    assert_equal((r1 | r2).merged.isolated_check(25, false, RBA::Region::Projection, nil, nil, nil).to_s, "(120,20;120,380)/(100,380;100,20)")
-    assert_equal((r1 | r2).merged.isolated_check(25, false, RBA::Region::Square, nil, nil, nil).to_s, "(120,20;120,380)/(100,400;100,0)")
-    assert_equal((r1 | r2).merged.isolated_check(25, false, RBA::Region::Euclidian, nil, nil, nil).to_s, "(120,20;120,380)/(100,395;100,5)")
-    assert_equal((r1 | r2).merged.isolated_check(25, true, RBA::Region::Euclidian, nil, nil, nil).to_s, "(120,20;120,380)/(100,400;100,0)")
+    assert_equal((r1 | r2).merged.isolated_check(25).to_s, "(120,20;120,380)|(100,395;100,5)")
+    assert_equal((r1 | r2).merged.isolated_check(25, false, RBA::Region::Projection, nil, nil, nil).to_s, "(120,20;120,380)|(100,380;100,20)")
+    assert_equal((r1 | r2).merged.isolated_check(25, false, RBA::Region::Square, nil, nil, nil).to_s, "(120,20;120,380)|(100,400;100,0)")
+    assert_equal((r1 | r2).merged.isolated_check(25, false, RBA::Region::Euclidian, nil, nil, nil).to_s, "(120,20;120,380)|(100,395;100,5)")
+    assert_equal((r1 | r2).merged.isolated_check(25, true, RBA::Region::Euclidian, nil, nil, nil).to_s, "(120,20;120,380)|(100,400;100,0)")
     assert_equal((r1 | r2).merged.isolated_check(25, false, RBA::Region::Euclidian, 0.0, nil, nil).to_s, "")
     assert_equal((r1 | r2).merged.isolated_check(25, false, RBA::Region::Euclidian, nil, 0, 300).to_s, "")
-    assert_equal((r1 | r2).merged.isolated_check(25, false, RBA::Region::Euclidian, nil, 300, 500).to_s, "(120,20;120,380)/(100,395;100,5)")
-    assert_equal((r1 | r2).merged.isolated_check(25, false, RBA::Region::Euclidian, nil, 300, nil).to_s, "(120,20;120,380)/(100,395;100,5)")
+    assert_equal((r1 | r2).merged.isolated_check(25, false, RBA::Region::Euclidian, nil, 300, 500).to_s, "(120,20;120,380)|(100,395;100,5)")
+    assert_equal((r1 | r2).merged.isolated_check(25, false, RBA::Region::Euclidian, nil, 300, nil).to_s, "(120,20;120,380)|(100,395;100,5)")
 
-    assert_equal((r1 | r2).merged.notch_check(25).to_s, "(0,200;50,200)/(50,220;10,220)")
-    assert_equal((r1 | r2).merged.notch_check(25, false, RBA::Region::Projection, nil, nil, nil).to_s, "(10,200;50,200)/(50,220;10,220)")
-    assert_equal((r1 | r2).merged.notch_check(25, true, RBA::Region::Projection, nil, nil, nil).to_s, "(0,200;50,200)/(50,220;10,220)")
+    assert_equal((r1 | r2).merged.notch_check(25).to_s, "(0,200;50,200)|(50,220;10,220)")
+    assert_equal((r1 | r2).merged.notch_check(25, false, RBA::Region::Projection, nil, nil, nil).to_s, "(10,200;50,200)|(50,220;10,220)")
+    assert_equal((r1 | r2).merged.notch_check(25, true, RBA::Region::Projection, nil, nil, nil).to_s, "(0,200;50,200)|(50,220;10,220)")
     assert_equal((r1 | r2).merged.notch_check(25, true, RBA::Region::Projection, 0.0, nil, nil).to_s, "")
-    assert_equal((r1 | r2).merged.notch_check(25, true, RBA::Region::Projection, nil, 40, nil).to_s, "(0,200;50,200)/(50,220;10,220)")
+    assert_equal((r1 | r2).merged.notch_check(25, true, RBA::Region::Projection, nil, 40, nil).to_s, "(0,200;50,200)|(50,220;10,220)")
     assert_equal((r1 | r2).merged.notch_check(25, true, RBA::Region::Projection, nil, 50, nil).to_s, "")
-    assert_equal((r1 | r2).merged.notch_check(25, true, RBA::Region::Projection, nil, 40, 50).to_s, "(0,200;50,200)/(50,220;10,220)")
+    assert_equal((r1 | r2).merged.notch_check(25, true, RBA::Region::Projection, nil, 40, 50).to_s, "(0,200;50,200)|(50,220;10,220)")
     assert_equal((r1 | r2).merged.notch_check(25, true, RBA::Region::Projection, nil, nil, 40).to_s, "")
 
-    assert_equal((r1 | r2).merged.space_check(25).to_s, "(120,20;120,380)/(100,395;100,5);(0,200;50,200)/(50,220;10,220)")
-    assert_equal((r1 | r2).merged.space_check(25, false, RBA::Region::Projection, nil, nil, nil).to_s, "(120,20;120,380)/(100,380;100,20);(10,200;50,200)/(50,220;10,220)")
-    assert_equal((r1 | r2).merged.space_check(25, true, RBA::Region::Projection, nil, nil, nil).to_s, "(120,20;120,380)/(100,400;100,0);(0,200;50,200)/(50,220;10,220)")
+    assert_equal((r1 | r2).merged.space_check(25).to_s, "(120,20;120,380)|(100,395;100,5);(0,200;50,200)|(50,220;10,220)")
+    assert_equal((r1 | r2).merged.space_check(25, false, RBA::Region::Projection, nil, nil, nil).to_s, "(120,20;120,380)|(100,380;100,20);(10,200;50,200)|(50,220;10,220)")
+    assert_equal((r1 | r2).merged.space_check(25, true, RBA::Region::Projection, nil, nil, nil).to_s, "(120,20;120,380)|(100,400;100,0);(0,200;50,200)|(50,220;10,220)")
     assert_equal((r1 | r2).merged.space_check(25, true, RBA::Region::Projection, 0.0, nil, nil).to_s, "")
-    assert_equal((r1 | r2).merged.space_check(25, true, RBA::Region::Projection, nil, 50, nil).to_s, "(120,20;120,380)/(100,400;100,0)")
-    assert_equal((r1 | r2).merged.space_check(25, true, RBA::Region::Projection, nil, nil, 50).to_s, "(0,200;50,200)/(50,220;10,220)")
+    assert_equal((r1 | r2).merged.space_check(25, true, RBA::Region::Projection, nil, 50, nil).to_s, "(120,20;120,380)|(100,400;100,0)")
+    assert_equal((r1 | r2).merged.space_check(25, true, RBA::Region::Projection, nil, nil, 50).to_s, "(0,200;50,200)|(50,220;10,220)")
 
-    assert_equal((r1 | r2).merged.width_check(60).to_s, "(120,20;120,380)/(130,380;130,20);(50,200;50,220)/(100,253;100,167)")
-    assert_equal((r1 | r2).merged.width_check(60, false, RBA::Region::Projection, nil, nil, nil).to_s, "(120,20;120,380)/(130,380;130,20);(50,200;50,220)/(100,220;100,200)")
-    assert_equal((r1 | r2).merged.width_check(60, true, RBA::Region::Projection, nil, nil, nil).to_s, "(120,20;120,380)/(130,380;130,20);(50,200;50,220)/(100,400;100,0)")
+    assert_equal((r1 | r2).merged.width_check(60).to_s, "(120,20;120,380)|(130,380;130,20);(50,200;50,220)|(100,253;100,167)")
+    assert_equal((r1 | r2).merged.width_check(60, false, RBA::Region::Projection, nil, nil, nil).to_s, "(120,20;120,380)|(130,380;130,20);(50,200;50,220)|(100,220;100,200)")
+    assert_equal((r1 | r2).merged.width_check(60, true, RBA::Region::Projection, nil, nil, nil).to_s, "(120,20;120,380)|(130,380;130,20);(50,200;50,220)|(100,400;100,0)")
     assert_equal((r1 | r2).merged.width_check(60, true, RBA::Region::Projection, 0.0, nil, nil).to_s, "")
-    assert_equal((r1 | r2).merged.width_check(60, true, RBA::Region::Projection, nil, 50, nil).to_s, "(120,20;120,380)/(130,380;130,20)")
-    assert_equal((r1 | r2).merged.width_check(60, true, RBA::Region::Projection, nil, nil, 50).to_s, "(50,200;50,220)/(100,400;100,0)")
+    assert_equal((r1 | r2).merged.width_check(60, true, RBA::Region::Projection, nil, 50, nil).to_s, "(120,20;120,380)|(130,380;130,20)")
+    assert_equal((r1 | r2).merged.width_check(60, true, RBA::Region::Projection, nil, nil, 50).to_s, "(50,200;50,220)|(100,400;100,0)")
 
   end
 
@@ -509,6 +521,8 @@ class DBRegion_TestClass < TestBase
     r1.insert(RBA::Box::new(50, 70, 150, 270))
     r1.insert(RBA::Box::new(100, 70, 250, 270))
     r2 = RBA::Region::new(RBA::Box::new(-10, -20, 100, 200))
+    r3 = RBA::Region::new(RBA::Box::new(150, 270, 160, 280))
+    r3 += r2
 
     assert_equal(r1.merged_semantics?, true)
     r1.merged_semantics = false
@@ -517,19 +531,81 @@ class DBRegion_TestClass < TestBase
     assert_equal(r1.inside(r2).to_s, "(10,20;10,200;100,200;100,20)")
     assert_equal(r1.not_inside(r2).to_s, "(50,70;50,270;150,270;150,70);(100,70;100,270;250,270;250,70)")
     assert_equal(r1.interacting(r2).to_s, "(10,20;10,200;100,200;100,20);(50,70;50,270;150,270;150,70);(100,70;100,270;250,270;250,70)")
+    assert_equal(r1.interacting(r3, 1).to_s, "(10,20;10,200;100,200;100,20);(50,70;50,270;150,270;150,70);(100,70;100,270;250,270;250,70)")
+    assert_equal(r1.interacting(r3, 2).to_s, "(50,70;50,270;150,270;150,70);(100,70;100,270;250,270;250,70)")
+    assert_equal(r1.interacting(r3, 3).to_s, "")
+    assert_equal(r1.interacting(r3, 1, 1).to_s, "(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.interacting(r3, 2, 2).to_s, "(50,70;50,270;150,270;150,70);(100,70;100,270;250,270;250,70)")
     assert_equal(r1.not_interacting(r2).to_s, "")
+    assert_equal(r1.not_interacting(r3, 1).to_s, "")
+    assert_equal(r1.not_interacting(r3, 2).to_s, "(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.not_interacting(r3, 3).to_s, "(10,20;10,200;100,200;100,20);(50,70;50,270;150,270;150,70);(100,70;100,270;250,270;250,70)")
+    assert_equal(r1.not_interacting(r3, 1, 1).to_s, "(50,70;50,270;150,270;150,70);(100,70;100,270;250,270;250,70)")
+    assert_equal(r1.not_interacting(r3, 2, 2).to_s, "(10,20;10,200;100,200;100,20)")
     assert_equal(r1.overlapping(r2).to_s, "(10,20;10,200;100,200;100,20);(50,70;50,270;150,270;150,70)")
     assert_equal(r1.not_overlapping(r2).to_s, "(100,70;100,270;250,270;250,70)")
     assert_equal(r1.outside(r2).to_s, "(100,70;100,270;250,270;250,70)")
     assert_equal(r1.not_outside(r2).to_s, "(10,20;10,200;100,200;100,20);(50,70;50,270;150,270;150,70)")
 
+    e2 = RBA::Edges::new(RBA::Edge::new(-10, -20, 100, 200))
+    e3 = RBA::Edges::new(RBA::Edge::new(150, 270, 160, 280))
+    e3 += e2
+
+    assert_equal(r1.interacting(e2).to_s, "(100,70;100,270;250,270;250,70);(50,70;50,270;150,270;150,70);(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.interacting(e3, 1).to_s, "(100,70;100,270;250,270;250,70);(50,70;50,270;150,270;150,70);(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.interacting(e3, 2).to_s, "(100,70;100,270;250,270;250,70);(50,70;50,270;150,270;150,70)")
+    assert_equal(r1.interacting(e3, 3).to_s, "")
+    assert_equal(r1.interacting(e3, 1, 1).to_s, "(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.interacting(e3, 2, 2).to_s, "(100,70;100,270;250,270;250,70);(50,70;50,270;150,270;150,70)")
+    assert_equal(r1.not_interacting(e2).to_s, "")
+    assert_equal(r1.not_interacting(e3, 1).to_s, "")
+    assert_equal(r1.not_interacting(e3, 2).to_s, "(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.not_interacting(e3, 3).to_s, "(100,70;100,270;250,270;250,70);(50,70;50,270;150,270;150,70);(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.not_interacting(e3, 1, 1).to_s, "(100,70;100,270;250,270;250,70);(50,70;50,270;150,270;150,70)")
+    assert_equal(r1.not_interacting(e3, 2, 2).to_s, "(10,20;10,200;100,200;100,20)")
+
+    t2 = RBA::Texts::new(RBA::Text::new("a", RBA::Trans::new(50, 100)))
+    t3 = RBA::Texts::new(RBA::Text::new("b", RBA::Trans::new(150, 270)))
+    t3 += t2
+
+    assert_equal(r1.interacting(t2).to_s, "(50,70;50,270;150,270;150,70);(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.interacting(t3, 1).to_s, "(100,70;100,270;250,270;250,70);(50,70;50,270;150,270;150,70);(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.interacting(t3, 2).to_s, "(50,70;50,270;150,270;150,70)")
+    assert_equal(r1.interacting(t3, 3).to_s, "")
+    assert_equal(r1.interacting(t3, 1, 1).to_s, "(100,70;100,270;250,270;250,70);(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.interacting(t3, 2, 2).to_s, "(50,70;50,270;150,270;150,70)")
+    assert_equal(r1.not_interacting(t2).to_s, "(100,70;100,270;250,270;250,70)")
+    assert_equal(r1.not_interacting(t3, 1).to_s, "")
+    assert_equal(r1.not_interacting(t3, 2).to_s, "(100,70;100,270;250,270;250,70);(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.not_interacting(t3, 3).to_s, "(100,70;100,270;250,270;250,70);(50,70;50,270;150,270;150,70);(10,20;10,200;100,200;100,20)")
+    assert_equal(r1.not_interacting(t3, 1, 1).to_s, "(50,70;50,270;150,270;150,70)")
+    assert_equal(r1.not_interacting(t3, 2, 2).to_s, "(100,70;100,270;250,270;250,70);(10,20;10,200;100,200;100,20)")
+
     rr = r1.dup
     rr.select_interacting(r2)
     assert_equal(rr.to_s, "(10,20;10,200;100,200;100,20);(50,70;50,270;150,270;150,70);(100,70;100,270;250,270;250,70)")
+    rr = r1.dup
+    rr.select_interacting(r3, 2, 2)
+    assert_equal(rr.to_s, "(50,70;50,270;150,270;150,70);(100,70;100,270;250,270;250,70)")
+    rr = r1.dup
+    rr.select_interacting(e3, 2, 2)
+    assert_equal(rr.to_s, "(100,70;100,270;250,270;250,70);(50,70;50,270;150,270;150,70)")
+    rr = r1.dup
+    rr.select_interacting(t3, 2, 2)
+    assert_equal(rr.to_s, "(50,70;50,270;150,270;150,70)")
     
     rr = r1.dup
     rr.select_not_interacting(r2)
     assert_equal(rr.to_s, "")
+    rr = r1.dup
+    rr.select_not_interacting(r3, 2, 2)
+    assert_equal(rr.to_s, "(10,20;10,200;100,200;100,20)")
+    rr = r1.dup
+    rr.select_not_interacting(e3, 2, 2)
+    assert_equal(rr.to_s, "(10,20;10,200;100,200;100,20)")
+    rr = r1.dup
+    rr.select_not_interacting(t3, 2, 2)
+    assert_equal(rr.to_s, "(100,70;100,270;250,270;250,70);(10,20;10,200;100,200;100,20)")
     
     rr = r1.dup
     rr.select_overlapping(r2)
@@ -866,7 +942,11 @@ class DBRegion_TestClass < TestBase
 
     assert_equal(r.is_deep?, true)
     assert_equal(r.area, 53120000)
+    assert_equal(r.count, 10)
+    assert_equal(r.hier_count, 1)
     assert_equal(rf.area, 53120000)
+    assert_equal(rf.count, 10)
+    assert_equal(rf.hier_count, 10)
 
     ly_new = RBA::Layout::new
     tc = ly_new.add_cell("TOP")
@@ -902,6 +982,63 @@ class DBRegion_TestClass < TestBase
     # force destroy, so the unit tests pass on the next iteration
     dss._destroy
     assert_equal(RBA::DeepShapeStore::instance_count, 0)
+
+  end
+
+  # Some filters
+  def test_boxfilters1
+
+    r = RBA::Region::new
+    r.insert(RBA::Box::new(0, 0, 1000, 5000))
+    r.insert(RBA::Box::new(3000, 0, 7000, 1000))
+    r.insert(RBA::Box::new(0, 10000, 2000, 12000))
+
+    assert_equal(r.with_bbox_width(1000, false).to_s, "(0,0;0,5000;1000,5000;1000,0)")
+    assert_equal(r.with_bbox_width(1000, true).to_s, "(3000,0;3000,1000;7000,1000;7000,0);(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_bbox_width(1000, 2001, false).to_s, "(0,0;0,5000;1000,5000;1000,0);(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_bbox_width(1000, 2000, false).to_s, "(0,0;0,5000;1000,5000;1000,0)")
+    assert_equal(r.with_bbox_width(1000, 2001, true).to_s, "(3000,0;3000,1000;7000,1000;7000,0)")
+
+    assert_equal(r.with_bbox_height(5000, false).to_s, "(0,0;0,5000;1000,5000;1000,0)")
+    assert_equal(r.with_bbox_height(5000, true).to_s, "(3000,0;3000,1000;7000,1000;7000,0);(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_bbox_height(1000, 2001, false).to_s, "(3000,0;3000,1000;7000,1000;7000,0);(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_bbox_height(1000, 1001, false).to_s, "(3000,0;3000,1000;7000,1000;7000,0)")
+    assert_equal(r.with_bbox_height(1000, 1001, true).to_s, "(0,0;0,5000;1000,5000;1000,0);(0,10000;0,12000;2000,12000;2000,10000)")
+
+    assert_equal(r.with_bbox_aspect_ratio(1.0, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_bbox_aspect_ratio(1.0, true).to_s, "(3000,0;3000,1000;7000,1000;7000,0);(0,0;0,5000;1000,5000;1000,0)")
+    assert_equal(r.with_bbox_aspect_ratio(0.9, 1.0, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_bbox_aspect_ratio(1.0, 1.1, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_bbox_aspect_ratio(0.9, 0.95, false).to_s, "")
+    assert_equal(r.with_bbox_aspect_ratio(0.9, 1.0, false, true, false).to_s, "")
+    assert_equal(r.with_bbox_aspect_ratio(1.0, 1.1, false, false, true).to_s, "")
+
+    assert_equal(r.with_relative_height(1.0, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_relative_height(1.0, true).to_s, "(3000,0;3000,1000;7000,1000;7000,0);(0,0;0,5000;1000,5000;1000,0)")
+    assert_equal(r.with_relative_height(0.9, 1.0, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_relative_height(1.0, 1.1, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_relative_height(0.9, 0.95, false).to_s, "")
+    assert_equal(r.with_relative_height(0.9, 1.0, false, true, false).to_s, "")
+    assert_equal(r.with_relative_height(1.0, 1.1, false, false, true).to_s, "")
+
+    assert_equal(r.rectangles.to_s, "(3000,0;3000,1000;7000,1000;7000,0);(0,0;0,5000;1000,5000;1000,0);(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.non_rectangles.to_s, "")
+    assert_equal(r.squares.to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.non_squares.to_s, "(3000,0;3000,1000;7000,1000;7000,0);(0,0;0,5000;1000,5000;1000,0)")
+
+    r = RBA::Region::new
+    r.insert(RBA::Box::new(0, 0, 1000, 2000))
+    r.insert(RBA::Box::new(0, 0, 2000, 1000))
+    r.insert(RBA::Box::new(0, 10000, 2000, 12000))
+
+    assert_equal(r.with_area_ratio(1.0, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.with_area_ratio(1.0, true).to_s, "(0,0;0,2000;1000,2000;1000,1000;2000,1000;2000,0)")
+    assert_equal(r.with_area_ratio(4.0 / 3.0, false).to_s, "(0,0;0,2000;1000,2000;1000,1000;2000,1000;2000,0)")
+    assert_equal(r.with_area_ratio(1.3, 1.4, false).to_s, "(0,0;0,2000;1000,2000;1000,1000;2000,1000;2000,0)")
+    assert_equal(r.with_area_ratio(1.3, 4.0 / 3.0, false, false, true).to_s, "(0,0;0,2000;1000,2000;1000,1000;2000,1000;2000,0)")
+    assert_equal(r.with_area_ratio(1.3, 4.0 / 3.0, false, false, false).to_s, "")
+    assert_equal(r.with_area_ratio(4.0 / 3.0, 1.4, false, true, false).to_s, "(0,0;0,2000;1000,2000;1000,1000;2000,1000;2000,0)")
+    assert_equal(r.with_area_ratio(4.0 / 3.0, 1.4, false, false, false).to_s, "")
 
   end
 

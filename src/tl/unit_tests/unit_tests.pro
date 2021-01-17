@@ -10,6 +10,7 @@ SOURCES = \
   tlAlgorithm.cc \
   tlClassRegistry.cc \
   tlCommandLineParser.cc \
+  tlCopyOnWriteTests.cc \
   tlDataMapping.cc \
   tlDeflate.cc \
   tlEvents.cc \

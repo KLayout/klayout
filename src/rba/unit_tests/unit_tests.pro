@@ -7,7 +7,7 @@ TARGET = rba_tests
 include($$PWD/../../lib_ut.pri)
 
 SOURCES = \
-  rba.cc
+  rbaTests.cc
 
 INCLUDEPATH += $$RBA_INC $$TL_INC $$DB_INC $$GSI_INC
 DEPENDPATH += $$RBA_INC $$TL_INC $$DB_INC $$GSI_INC

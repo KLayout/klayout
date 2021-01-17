@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -232,23 +232,27 @@ public:
    *  @brief Constructor
    *
    *  The mode parameter selects the interaction check mode.
-   *  0 is "overlapping". 
-   *  -1 will select all polygons inside polygons from the other layer.
-   *  +1 will select all polygons outside polygons from the other layer.
+   *  0 is "overlapping" or "touching".
+   *  -1 will select all secondary polygons inside polygons from the primary.
+   *  -2 will select all primary polygons enclosing polygons from the secondary.
+   *  +1 will select all secondary polygons outside polygons from the primary.
    *
-   *  In mode -1 and +1, finish () needs to be called before the interactions
-   *  can be used. In mode -1 and +1, the interactions delivered will contain
-   *  interactions of the reference property vs. the property of the respective
-   *  input polygons (property != reference property). In mode +1 these are 
-   *  pseudo-interactions, because "outside" by definition means non-interacting.
+   *  Use set_include_touching(f) to specify whether to include or not include the touching
+   *  case as interacting for mode 0.
    *
-   *  Mode -1 (inside) and +1 (outside) requires a single property value for the containing region.
-   *  This property value must be specified in the container_id parameter. 
-   *  For correct operation, the container_id must be the lowest property ID and
-   *  the interacting edges must have higher property id's.
-   *  The reported interactions will be (container_id,polygon_id) even for outside mode.
+   *  In modes -2, -1 and +1, finish () needs to be called before the interactions
+   *  can be used.
+   *
+   *  All modes require property IDs to differentiate both inputs into primary and secondary.
+   *  Property IDs from 0 to the given last primary ID value are considered to belong to
+   *  the primary region. Property IDs above the last primary ID are considered to belong to
+   *  the secondary region.
+   *  This last property ID must be specified in the last_primary_id parameter.
+   *  The reported interactions will be (primary_id,secondary_id) even for outside mode.
+   *  For outside mode, the primary_id is always last_primary_id. In outside mode, the
+   *  interactions are pseudo-interactions as by definition outside polygons don't interact.
    */
-  InteractionDetector (int mode = 0, property_type container_id = 0);
+  InteractionDetector (int mode = 0, property_type last_primary_id = 0);
 
   /**
    *  @brief Sets the "touching" flag
@@ -305,7 +309,7 @@ public:
 private:
   int m_mode;
   bool m_include_touching;
-  property_type m_container_id;
+  property_type m_last_primary_id;
   std::vector <int> m_wcv_n, m_wcv_s;
   std::set <property_type> m_inside_n, m_inside_s;
   std::set<std::pair<property_type, property_type> > m_interactions;
@@ -625,9 +629,14 @@ public:
   void insert (const db::Edge &e, property_type p = 0);
 
   /**
-   *  @brief Insert an polygon 
+   *  @brief Insert a polygon
    */
   void insert (const db::Polygon &q, property_type p = 0);
+
+  /**
+   *  @brief Insert a polygon reference
+   */
+  void insert (const db::PolygonRef &q, property_type p = 0);
 
   /**
    *  @brief Insert a sequence of edges
@@ -663,9 +672,21 @@ public:
   void clear (); 
 
   /**
-   *  @brief Process the edges stored currently
+   *  @brief Performs the actual processing
+   *
+   *  This method will use the edges stored so far and runs it through the
+   *  scanline algorithm.
    */
   void process (db::EdgeSink &es, EdgeEvaluatorBase &op);
+
+  /**
+   *  @brief Performs the actual processing
+   *
+   *  This version allows giving multiple edge sinks and evaluators.
+   *  Each evaluator is worked on separately and feeds the corresponding
+   *  edge sink.
+   */
+  void process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > &gen);
 
   /**
    *  @brief Merge the given polygons in a simple "non-zero wrapcount" fashion

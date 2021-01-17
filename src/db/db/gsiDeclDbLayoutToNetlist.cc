@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -722,7 +722,7 @@ gsi::EnumIn<db::LayoutToNetlist, db::LayoutToNetlist::BuildNetHierarchyMode> dec
   "This enum is used for \\LayoutToNetlist#build_all_nets and \\LayoutToNetlist#build_net."
 );
 
-//  Inject the NetlistCrossReference::Status declarations into NetlistCrossReference:
+//  Inject the NetlistCrossReference::BuildNetHierarchyMode declarations into NetlistCrossReference:
 gsi::ClassExt<db::LayoutToNetlist> inject_dbLayoutToNetlist_BuildNetHierarchyMode_in_parent (decl_dbLayoutToNetlist_BuildNetHierarchyMode.defs ());
 
 }

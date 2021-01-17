@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -107,6 +107,11 @@ const char *A::a_static ()
   return "static_a"; 
 }
 
+tl::Variant A::new_a_by_variant ()
+{
+  return tl::Variant (A ());
+}
+
 static A *a_ctor (int i)
 {
   return new A (i);
@@ -128,9 +133,11 @@ A *A::a20_get ()
 //  Implementation of B
 
 B *B::b_inst = 0;
+static int b_count = 0;
 
 B::B () 
 { 
+  ++b_count;
   av.push_back (A (100));
   av.push_back (A (121));
   av.push_back (A (144));
@@ -142,7 +149,7 @@ B::B ()
   av_nc.push_back (new A_NC (7169));
 }
 
-B::~B() 
+B::~B ()
 {
   while (! av_nc.empty ()) {
     delete av_nc.back ();
@@ -155,14 +162,21 @@ B::~B()
   if (b_inst == this) {
     b_inst = 0;
   }
+  --b_count;
 }
 
 B::B (const B &d)
 {
   operator=(d);
+  ++b_count;
 }
 
-B &B::operator=(const B &d) 
+int B::instance_count ()
+{
+  return b_count;
+}
+
+B &B::operator=(const B &d)
 {
   if (&d == this) {
     return *this;
@@ -211,6 +225,11 @@ B *B::inst ()
 bool B::has_inst () 
 { 
   return b_inst != 0; 
+}
+
+tl::Variant B::new_b_by_variant ()
+{
+  return tl::Variant (B ());
 }
 
 std::string B::addr () const 
@@ -790,6 +809,7 @@ static gsi::QFlagsClass<Enum> decl_qflags_enum ("", "Enums");
 static gsi::Class<A> decl_a ("", "A",
   gsi::constructor ("new_a|new", &a_ctor) +
   gsi::method ("instance_count", &A::instance_count) +
+  gsi::method ("new_a_by_variant", &A::new_a_by_variant) +
   gsi::method ("br", &A::br) +
   gsi::method ("get_e", &A::get_e) +
   gsi::method ("get_eptr", &A::get_eptr) +
@@ -918,17 +938,16 @@ static gsi::Class<B> decl_b ("", "B",
   gsi::method ("has_inst", &B::has_inst) +
   gsi::method ("set_inst", &B::set_inst) +
   gsi::method ("del_inst", &B::del_inst) +
+  gsi::method ("instance_count", &B::instance_count) +
+  gsi::method ("new_b_by_variant", &B::new_b_by_variant) +
   gsi::method ("addr", &B::addr) +
-  gsi::method ("b1|always_5", &B::b1) +
-  gsi::method ("b2|str", &B::str) +
+  gsi::method ("always_5", &B::always_5) +
+  gsi::method ("str", &B::str) +
   gsi::method ("set_str", &B::set_str) +
   gsi::method ("str_ccptr", &B::str_ccptr) +
   gsi::method ("set_str_combine", &B::set_str_combine) +
   gsi::method_ext ("b3|aptr_to_n", &b3_ext) +
   gsi::method ("b4|aref_to_s", &B::b4) +
-  gsi::method ("b5", &B::b5) +
-  gsi::method ("b5a", &B::b5a) +
-  gsi::method ("b5b", &B::b5b) +
   gsi::method ("make_a", &B::make_a) +
   gsi::method ("set_an", &B::set_an) +
   gsi::method ("an", &B::an) +

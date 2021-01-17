@@ -1,0 +1,30 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+
+l1.drc((primary & secondary(l2)).edges.length_sum == 6.0).output(100, 0)
+l1.drc((primary & secondary(l2)).edges.length_sum <= 6.0).output(101, 0)
+
+l1.drc((primary & secondary(l2)).area_sum == 1.0).output(110, 0)
+l1.drc((primary & secondary(l2)).area_sum != 1.0).output(111, 0)
+l1.drc((primary & secondary(l2)).area_sum <= 2.0).output(112, 0)
+l1.drc((primary & secondary(l2)).area_sum >= 2.0).output(113, 0)
+
+l1.drc((primary & secondary(l2)).count >= 2.0).output(120, 0)
+l1.drc((primary & secondary(l2)).count != 2.0).output(121, 0)
+
+l1.drc((primary & secondary(l2)).perimeter_sum == 6.0).output(130, 0)
+l1.drc((primary & secondary(l2)).perimeter_sum <= 6.0).output(131, 0)
+

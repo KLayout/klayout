@@ -281,7 +281,7 @@ form, the extractor object is given. In the second form, the extractor's
 class object and the new extractor's name is given.
 </p><p>
 The device extractor is either an instance of one of the predefined extractor
-classes (e.g. obtained from the utility methods such as <a href="/about/drc_ref_global.xml#mos4">global#mos4</a>) or a custom class. 
+classes (e.g. obtained from the utility methods such as <a href="/about/drc_ref_global.xml#mos4">mos4</a>) or a custom class. 
 It provides the
 algorithms for deriving the device parameters from the device geometry. It needs 
 several device recognition layers which are passed in the layer hash.
@@ -289,17 +289,17 @@ several device recognition layers which are passed in the layer hash.
 Predefined device extractors are:
 </p><p>
 <ul>
-<li><a href="/about/drc_ref_global.xml#mos3">global#mos3</a> - A three-terminal MOS transistor </li>
-<li><a href="/about/drc_ref_global.xml#mos4">global#mos4</a> - A four-terminal MOS transistor </li>
-<li><a href="/about/drc_ref_global.xml#dmos3">global#dmos3</a> - A three-terminal MOS asymmetric transistor </li>
-<li><a href="/about/drc_ref_global.xml#dmos4">global#dmos4</a> - A four-terminal MOS asymmetric transistor </li>
-<li><a href="/about/drc_ref_global.xml#bjt3">global#bjt3</a> - A three-terminal bipolar transistor </li>
-<li><a href="/about/drc_ref_global.xml#bjt4">global#bjt4</a> - A four-terminal bipolar transistor </li>
-<li><a href="/about/drc_ref_global.xml#diode">global#diode</a> - A planar diode </li>
-<li><a href="/about/drc_ref_global.xml#resistor">global#resistor</a> - A resistor </li>
-<li><a href="/about/drc_ref_global.xml#resistor_with_bulk">global#resistor_with_bulk</a> - A resistor with a separate bulk terminal </li>
-<li><a href="/about/drc_ref_global.xml#capacitor">global#capacitor</a> - A capacitor </li>
-<li><a href="/about/drc_ref_global.xml#capacitor_with_bulk">global#capacitor_with_bulk</a> - A capacitor with a separate bulk terminal </li>
+<li><a href="/about/drc_ref_global.xml#mos3">mos3</a> - A three-terminal MOS transistor </li>
+<li><a href="/about/drc_ref_global.xml#mos4">mos4</a> - A four-terminal MOS transistor </li>
+<li><a href="/about/drc_ref_global.xml#dmos3">dmos3</a> - A three-terminal MOS asymmetric transistor </li>
+<li><a href="/about/drc_ref_global.xml#dmos4">dmos4</a> - A four-terminal MOS asymmetric transistor </li>
+<li><a href="/about/drc_ref_global.xml#bjt3">bjt3</a> - A three-terminal bipolar transistor </li>
+<li><a href="/about/drc_ref_global.xml#bjt4">bjt4</a> - A four-terminal bipolar transistor </li>
+<li><a href="/about/drc_ref_global.xml#diode">diode</a> - A planar diode </li>
+<li><a href="/about/drc_ref_global.xml#resistor">resistor</a> - A resistor </li>
+<li><a href="/about/drc_ref_global.xml#resistor_with_bulk">resistor_with_bulk</a> - A resistor with a separate bulk terminal </li>
+<li><a href="/about/drc_ref_global.xml#capacitor">capacitor</a> - A capacitor </li>
+<li><a href="/about/drc_ref_global.xml#capacitor_with_bulk">capacitor_with_bulk</a> - A capacitor with a separate bulk terminal </li>
 </ul>
 </p><p>
 Each device class (e.g. n-MOS/p-MOS or high Vt/low Vt) needs its own instance

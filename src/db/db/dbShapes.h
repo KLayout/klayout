@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -164,6 +164,7 @@ public:
     Texts             = (1 << Text) 
                       | (1 << TextRef) 
                       | (1 << TextPtrArray),
+    Regions           = Polygons | Paths | Boxes,   //  convertible to polygons
     UserObjects       = (1 << UserObject),
     Properties        = (1 << Null),
     All               = (1 << Null) - 1,

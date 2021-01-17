@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 
 
 #include "dbRegion.h"
+#include "dbRegionUtils.h"
 #include "dbOriginalLayerRegion.h"
 #include "dbEmptyRegion.h"
 #include "dbFlatRegion.h"
@@ -29,153 +30,12 @@
 #include "dbDeepEdges.h"
 #include "dbFlatEdges.h"
 #include "dbPolygonTools.h"
+#include "dbCompoundOperation.h"
+#include "gsiClassBase.h"
 #include "tlGlobPattern.h"
 
 namespace db
 {
-
-namespace
-{
-
-// -------------------------------------------------------------------------------------------------------------
-//  Strange polygon processor
-
-/**
- *  @brief A helper class to implement the strange polygon detector
- */
-struct StrangePolygonInsideFunc
-{
-  inline bool operator() (int wc) const
-  {
-    return wc < 0 || wc > 1;
-  }
-};
-
-class StrangePolygonCheckProcessor
-  : public PolygonProcessorBase
-{
-public:
-  StrangePolygonCheckProcessor () { }
-
-  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
-  {
-    EdgeProcessor ep;
-    ep.insert (poly);
-
-    StrangePolygonInsideFunc inside;
-    db::GenericMerge<StrangePolygonInsideFunc> op (inside);
-    db::PolygonContainer pc (res, false);
-    db::PolygonGenerator pg (pc, false, false);
-    ep.process (pg, op);
-  }
-
-  virtual const TransformationReducer *vars () const { return 0; }
-  virtual bool result_is_merged () const { return false; }
-  virtual bool requires_raw_input () const { return true; }
-  virtual bool wants_variants () const { return true; }
-  virtual bool result_must_not_be_merged () const { return false; }
-};
-
-// -------------------------------------------------------------------------------------------------------------
-//  Smoothing processor
-
-class SmoothingProcessor
-  : public PolygonProcessorBase
-{
-public:
-  SmoothingProcessor (db::Coord d) : m_d (d) { }
-
-  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
-  {
-    res.push_back (db::smooth (poly, m_d));
-  }
-
-  virtual const TransformationReducer *vars () const { return &m_vars; }
-  virtual bool result_is_merged () const { return false; }
-  virtual bool requires_raw_input () const { return false; }
-  virtual bool wants_variants () const { return true; }
-  virtual bool result_must_not_be_merged () const { return false; }
-
-private:
-  db::Coord m_d;
-  db::MagnificationReducer m_vars;
-};
-
-// -------------------------------------------------------------------------------------------------------------
-//  Rounded corners processor
-
-class RoundedCornersProcessor
-  : public PolygonProcessorBase
-{
-public:
-  RoundedCornersProcessor (double rinner, double router, unsigned int n)
-    : m_rinner (rinner), m_router (router), m_n (n)
-  { }
-
-  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
-  {
-    res.push_back (db::compute_rounded (poly, m_rinner, m_router, m_n));
-  }
-
-  virtual const TransformationReducer *vars () const { return &m_vars; }
-  virtual bool result_is_merged () const { return true; }   //  we believe so ...
-  virtual bool requires_raw_input () const { return false; }
-  virtual bool wants_variants () const { return true; }
-  virtual bool result_must_not_be_merged () const { return false; }
-
-private:
-  double m_rinner, m_router;
-  unsigned int m_n;
-  db::MagnificationReducer m_vars;
-};
-
-// -------------------------------------------------------------------------------------------------------------
-//  Holes decomposition processor
-
-class HolesExtractionProcessor
-  : public PolygonProcessorBase
-{
-public:
-  HolesExtractionProcessor () { }
-
-  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
-  {
-    for (size_t i = 0; i < poly.holes (); ++i) {
-      res.push_back (db::Polygon ());
-      res.back ().assign_hull (poly.begin_hole ((unsigned int) i), poly.end_hole ((unsigned int) i));
-    }
-  }
-
-  virtual const TransformationReducer *vars () const { return 0; }
-  virtual bool result_is_merged () const { return true; }   //  we believe so ...
-  virtual bool requires_raw_input () const { return false; }
-  virtual bool wants_variants () const { return true; }
-  virtual bool result_must_not_be_merged () const { return false; }
-};
-
-// -------------------------------------------------------------------------------------------------------------
-//  Hull extraction processor
-
-class HullExtractionProcessor
-  : public PolygonProcessorBase
-{
-public:
-  HullExtractionProcessor () { }
-
-  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
-  {
-    res.push_back (db::Polygon ());
-    res.back ().assign_hull (poly.begin_hull (), poly.end_hull ());
-  }
-
-  virtual const TransformationReducer *vars () const { return 0; }
-  virtual bool result_is_merged () const { return true; }   //  we believe so ...
-  virtual bool requires_raw_input () const { return false; }
-  virtual bool wants_variants () const { return true; }
-  virtual bool result_must_not_be_merged () const { return false; }
-};
-
-}
 
 // -------------------------------------------------------------------------------------------------------------
 //  Region implementation
@@ -325,6 +185,41 @@ Region::flat_region ()
   }
 
   return region;
+}
+
+EdgePairs
+Region::cop_to_edge_pairs (db::CompoundRegionOperationNode &node)
+{
+  tl_assert (node.result_type () == db::CompoundRegionOperationNode::EdgePairs);
+  return EdgePairs (mp_delegate->cop_to_edge_pairs (node));
+}
+
+Region
+Region::cop_to_region (db::CompoundRegionOperationNode &node)
+{
+  tl_assert (node.result_type () == db::CompoundRegionOperationNode::Region);
+  return Region (mp_delegate->cop_to_region (node));
+}
+
+Edges
+Region::cop_to_edges (db::CompoundRegionOperationNode &node)
+{
+  tl_assert (node.result_type () == db::CompoundRegionOperationNode::Edges);
+  return Edges (mp_delegate->cop_to_edges (node));
+}
+
+tl::Variant
+Region::cop (db::CompoundRegionOperationNode &node)
+{
+  if (node.result_type () == db::CompoundRegionOperationNode::EdgePairs) {
+    return tl::Variant::make_variant (new EdgePairs (mp_delegate->cop_to_edge_pairs (node)));
+  } else if (node.result_type () == db::CompoundRegionOperationNode::Edges) {
+    return tl::Variant::make_variant (new Edges (mp_delegate->cop_to_edges (node)));
+  } else if (node.result_type () == db::CompoundRegionOperationNode::Region) {
+    return tl::Variant::make_variant (new Region (mp_delegate->cop_to_region (node)));
+  } else {
+    return tl::Variant ();
+  }
 }
 
 Region &

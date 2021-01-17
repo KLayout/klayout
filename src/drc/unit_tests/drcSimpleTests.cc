@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -795,4 +795,355 @@ TEST(17_issue570)
   }
 
   db::compare_layouts (_this, layout, au, db::NoNormalization);
+}
+
+TEST(18_forget)
+{
+  std::string rs = tl::testsrc ();
+  rs += "/testdata/drc/drcSimpleTests_18.drc";
+
+  std::string input = tl::testsrc ();
+  input += "/testdata/drc/drcSimpleTests_18.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/drc/drcSimpleTests_au18.gds";
+
+  std::string output = this->tmp_file ("tmp.gds");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+      , input, output)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (_this, layout, au, db::NoNormalization);
+}
+
+TEST(19_shielding)
+{
+  std::string rs = tl::testsrc ();
+  rs += "/testdata/drc/drcSimpleTests_19.drc";
+
+  std::string input = tl::testsrc ();
+  input += "/testdata/drc/drcSimpleTests_19.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/drc/drcSimpleTests_au19.gds";
+
+  std::string output = this->tmp_file ("tmp.gds");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+      , input, output)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (_this, layout, au, db::NoNormalization);
+}
+
+TEST(20_interact_with_count)
+{
+  std::string rs = tl::testsrc ();
+  rs += "/testdata/drc/drcSimpleTests_20.drc";
+
+  std::string input = tl::testsrc ();
+  input += "/testdata/drc/drcSimpleTests_20.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/drc/drcSimpleTests_au20.gds";
+
+  std::string output = this->tmp_file ("tmp.gds");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+      , input, output)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (_this, layout, au, db::NoNormalization);
+}
+
+TEST(21_breaking)
+{
+  std::string rs = tl::testsrc ();
+  rs += "/testdata/drc/drcSimpleTests_21.drc";
+
+  std::string input = tl::testsrc ();
+  input += "/testdata/drc/drcSimpleTests_21.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/drc/drcSimpleTests_au21.gds";
+
+  std::string output = this->tmp_file ("tmp.gds");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+      , input, output)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (_this, layout, au, db::NoNormalization);
+}
+
+TEST(22_opposite_filter)
+{
+  std::string rs = tl::testsrc ();
+  rs += "/testdata/drc/drcSimpleTests_22.drc";
+
+  std::string input = tl::testsrc ();
+  input += "/testdata/drc/drcSimpleTests_22.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/drc/drcSimpleTests_au22.gds";
+
+  std::string output = this->tmp_file ("tmp.gds");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+      , input, output)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (_this, layout, au, db::NoNormalization);
+}
+
+TEST(23_rect_filter)
+{
+  std::string rs = tl::testsrc ();
+  rs += "/testdata/drc/drcSimpleTests_23.drc";
+
+  std::string input = tl::testsrc ();
+  input += "/testdata/drc/drcSimpleTests_23.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/drc/drcSimpleTests_au23.gds";
+
+  std::string output = this->tmp_file ("tmp.gds");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+      , input, output)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (_this, layout, au, db::NoNormalization);
+}
+
+TEST(24_enclosing)
+{
+  std::string rs = tl::testsrc ();
+  rs += "/testdata/drc/drcSimpleTests_24.drc";
+
+  std::string input = tl::testsrc ();
+  input += "/testdata/drc/drcSimpleTests_24.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/drc/drcSimpleTests_au24.gds";
+
+  std::string output = this->tmp_file ("tmp.gds");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+      , input, output)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (_this, layout, au, db::NoNormalization);
+}
+
+static void run_test (tl::TestBase *_this, const std::string &number, bool deep)
+{
+  std::string rs = tl::testsrc ();
+  rs += "/testdata/drc/drcSimpleTests_" + number + ".drc";
+
+  std::string input = tl::testsrc ();
+  input += "/testdata/drc/drcSimpleTests_" + number + ".gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/drc/drcSimpleTests_au" + number + std::string (deep ? "d" : "") + ".gds";
+
+  std::string output = _this->tmp_file ("tmp.gds");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+        "$drc_test_deep = %s\n"
+      , input, output, deep ? "true" : "false")
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (_this, layout, au, db::NoNormalization);
+}
+
+TEST(25_spaceWithOptions)
+{
+  run_test (_this, "25", false);
+}
+
+TEST(25d_spaceWithOptions)
+{
+  run_test (_this, "25", true);
+}
+
+TEST(26_attributes)
+{
+  run_test (_this, "26", false);
+}
+
+TEST(26d_attributes)
+{
+  run_test (_this, "26", true);
+}
+
+TEST(27_advancedShielding)
+{
+  run_test (_this, "27", false);
+}
+
+TEST(27d_advancedShielding)
+{
+  run_test (_this, "27", true);
 }

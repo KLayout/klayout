@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -453,8 +453,19 @@ Class<db::Texts> decl_Texts (decl_dbShapeCollection, "db", "Texts",
   method ("is_empty?", &db::Texts::empty,
     "@brief Returns true if the collection is empty\n"
   ) +
-  method ("size", &db::Texts::size,
-    "@brief Returns the number of texts in this collection\n"
+  method ("count|#size", (size_t (db::Texts::*) () const) &db::Texts::count,
+    "@brief Returns the (flat) number of texts in the text collection\n"
+    "\n"
+    "The count is computed 'as if flat', i.e. texts inside a cell are multiplied by the number of times a cell is instantiated.\n"
+    "\n"
+    "Starting with version 0.27, the method is called 'count' for consistency with \\Region. 'size' is still provided as an alias."
+  ) +
+  method ("hier_count", (size_t (db::Texts::*) () const) &db::Texts::hier_count,
+    "@brief Returns the (hierarchical) number of texts in the text collection\n"
+    "\n"
+    "The count is computed 'hierarchical', i.e. texts inside a cell are counted once even if the cell is instantiated multiple times.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
   ) +
   gsi::iterator ("each", &db::Texts::begin,
     "@brief Returns each text of the text collection\n"

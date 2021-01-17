@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -139,8 +139,8 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
         error (tl::to_string (tr ("Gate shape touches no diffusion - ignored")), *p);
       } else {
 
-        if (rdiff2gate.size () != 2) {
-          error (tl::sprintf (tl::to_string (tr ("Expected two polygons on diff interacting with one gate shape (found %d) - gate shape ignored")), int (rdiff2gate.size ())), *p);
+        if (rdiff2gate.count () != 2) {
+          error (tl::sprintf (tl::to_string (tr ("Expected two polygons on diff interacting with one gate shape (found %d) - gate shape ignored")), int (rdiff2gate.count ())), *p);
           continue;
         }
 
@@ -183,7 +183,7 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
 
           //  count the number of gate shapes attached to this shape and distribute the area of the
           //  diffusion region to the number of gates
-          size_t n = rgates.selected_interacting (db::Region (*d)).size ();
+          size_t n = rgates.selected_interacting (db::Region (*d)).count ();
           tl_assert (n > 0);
 
           device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_AS : db::DeviceClassMOS3Transistor::param_id_AD, sdbu () * sdbu () * d->area () / double (n));
@@ -237,13 +237,13 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
         error (tl::to_string (tr ("Gate shape touches a single diffusion only - ignored")), *p);
       } else {
 
-        if (sdiff2gate.size () != 1) {
-          error (tl::sprintf (tl::to_string (tr ("Expected one polygons on source diff interacting with one gate shape (found %d) - gate shape ignored")), int (sdiff2gate.size ())), *p);
+        if (sdiff2gate.count () != 1) {
+          error (tl::sprintf (tl::to_string (tr ("Expected one polygons on source diff interacting with one gate shape (found %d) - gate shape ignored")), int (sdiff2gate.count ())), *p);
           continue;
         }
 
-        if (ddiff2gate.size () != 1) {
-          error (tl::sprintf (tl::to_string (tr ("Expected one polygons on drain diff interacting with one gate shape (found %d) - gate shape ignored")), int (ddiff2gate.size ())), *p);
+        if (ddiff2gate.count () != 1) {
+          error (tl::sprintf (tl::to_string (tr ("Expected one polygons on drain diff interacting with one gate shape (found %d) - gate shape ignored")), int (ddiff2gate.count ())), *p);
           continue;
         }
 
@@ -287,7 +287,7 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
 
           //  count the number of gate shapes attached to this shape and distribute the area of the
           //  diffusion region to the number of gates
-          size_t n = rgates.selected_interacting (*diff).size ();
+          size_t n = rgates.selected_interacting (*diff).count ();
           tl_assert (n > 0);
 
           device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_AS : db::DeviceClassMOS3Transistor::param_id_AD, sdbu () * sdbu () * diff->area () / double (n));
@@ -432,8 +432,8 @@ void NetlistDeviceExtractorResistor::extract_devices (const std::vector<db::Regi
     db::Region rres (*p);
     db::Region contacts_per_res = contact_wo_res.selected_interacting (rres);
 
-    if (contacts_per_res.size () != 2) {
-      error (tl::sprintf (tl::to_string (tr ("Expected two polygons on contacts interacting with one resistor shape (found %d) - resistor shape ignored")), int (contacts_per_res.size ())), *p);
+    if (contacts_per_res.count () != 2) {
+      error (tl::sprintf (tl::to_string (tr ("Expected two polygons on contacts interacting with one resistor shape (found %d) - resistor shape ignored")), int (contacts_per_res.count ())), *p);
       continue;
     }
 

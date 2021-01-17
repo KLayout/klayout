@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -34,13 +34,15 @@ namespace db
 {
 
 /**
- *  @brief An iterator delegate for the deep edge pair collection
+ *  @brief An iterator delegate for the deep region
  *  TODO: this is kind of redundant with OriginalLayerIterator ..
  */
 class DB_PUBLIC DeepEdgePairsIterator
   : public EdgePairsIteratorDelegate
 {
 public:
+  typedef db::EdgePair value_type;
+
   DeepEdgePairsIterator (const db::RecursiveShapeIterator &iter)
     : m_iter (iter)
   {
@@ -60,9 +62,20 @@ public:
     set ();
   }
 
+  virtual bool is_addressable() const
+  {
+    return false;
+  }
+
   virtual const value_type *get () const
   {
     return &m_edge_pair;
+  }
+
+  virtual bool equals (const generic_shape_iterator_delegate_base<value_type> *other) const
+  {
+    const DeepEdgePairsIterator *o = dynamic_cast<const DeepEdgePairsIterator *> (other);
+    return o && o->m_iter == m_iter;
   }
 
   virtual EdgePairsIteratorDelegate *clone () const
@@ -70,13 +83,26 @@ public:
     return new DeepEdgePairsIterator (*this);
   }
 
+  virtual void do_reset (const db::Box &region, bool overlapping)
+  {
+    m_iter.set_region (region);
+    m_iter.set_overlapping (overlapping);
+    set ();
+  }
+
+  virtual db::Box bbox () const
+  {
+    return m_iter.bbox ();
+  }
+
 private:
-  friend class EdgePairs;
+  friend class Texts;
 
   db::RecursiveShapeIterator m_iter;
   mutable value_type m_edge_pair;
 
-  void set () const  {
+  void set () const
+  {
     if (! m_iter.at_end ()) {
       m_iter.shape ().edge_pair (m_edge_pair);
       m_edge_pair.transform (m_iter.trans ());
@@ -146,7 +172,7 @@ std::pair<db::RecursiveShapeIterator, db::ICplxTrans> DeepEdgePairs::begin_iter 
   }
 }
 
-size_t DeepEdgePairs::size () const
+size_t DeepEdgePairs::count () const
 {
   size_t n = 0;
 
@@ -154,6 +180,18 @@ size_t DeepEdgePairs::size () const
   db::CellCounter cc (&layout);
   for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
     n += cc.weight (*c) * layout.cell (*c).shapes (deep_layer ().layer ()).size ();
+  }
+
+  return n;
+}
+
+size_t DeepEdgePairs::hier_count () const
+{
+  size_t n = 0;
+
+  const db::Layout &layout = deep_layer ().layout ();
+  for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
+    n += layout.cell (*c).shapes (deep_layer ().layer ()).size ();
   }
 
   return n;
@@ -244,6 +282,12 @@ RegionDelegate *
 DeepEdgePairs::processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const
 {
   return shape_collection_processed_impl<db::EdgePair, db::Polygon, db::DeepRegion> (deep_layer (), filter);
+}
+
+EdgesDelegate *
+DeepEdgePairs::processed_to_edges (const EdgePairToEdgeProcessorBase &filter) const
+{
+  return shape_collection_processed_impl<db::EdgePair, db::Edge, db::DeepEdges> (deep_layer (), filter);
 }
 
 RegionDelegate *DeepEdgePairs::polygons (db::Coord e) const

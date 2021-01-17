@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -288,9 +288,19 @@ struct DeepShapeStore::LayoutHolder
 // ----------------------------------------------------------------------------------
 
 DeepShapeStoreState::DeepShapeStoreState ()
-  : m_threads (1), m_max_area_ratio (3.0), m_max_vertex_count (16), m_text_property_name (), m_text_enlargement (-1)
+  : m_threads (1), m_max_area_ratio (3.0), m_max_vertex_count (16), m_reject_odd_polygons (false), m_text_property_name (), m_text_enlargement (-1)
 {
   //  .. nothing yet ..
+}
+
+void DeepShapeStoreState::set_reject_odd_polygons (bool f)
+{
+  m_reject_odd_polygons = f;
+}
+
+bool DeepShapeStoreState::reject_odd_polygons () const
+{
+  return m_reject_odd_polygons;
 }
 
 void DeepShapeStoreState::set_text_enlargement (int enl)
@@ -437,7 +447,7 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Region &region, bool for_n
 
   //  The chain of operators for producing clipped and reduced polygon references
   db::PolygonReferenceHierarchyBuilderShapeReceiver refs (&layout (), text_enlargement (), text_property_name ());
-  db::ReducingHierarchyBuilderShapeReceiver red (&refs, max_area_ratio, max_vertex_count);
+  db::ReducingHierarchyBuilderShapeReceiver red (&refs, max_area_ratio, max_vertex_count, m_state.reject_odd_polygons ());
 
   //  try to maintain the texts on top level - go through shape iterator
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> ii = region.begin_iter ();
@@ -631,6 +641,16 @@ double DeepShapeStore::max_area_ratio () const
   return m_state.max_area_ratio ();
 }
 
+void DeepShapeStore::set_reject_odd_polygons (bool f)
+{
+  m_state.set_reject_odd_polygons (f);
+}
+
+bool DeepShapeStore::reject_odd_polygons () const
+{
+  return m_state.reject_odd_polygons ();
+}
+
 void DeepShapeStore::set_max_vertex_count (size_t n)
 {
   m_state.set_max_vertex_count (n);
@@ -791,7 +811,7 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
 
   //  The chain of operators for producing clipped and reduced polygon references
   db::PolygonReferenceHierarchyBuilderShapeReceiver refs (& layout, text_enlargement (), text_property_name ());
-  db::ReducingHierarchyBuilderShapeReceiver red (&refs, max_area_ratio, max_vertex_count);
+  db::ReducingHierarchyBuilderShapeReceiver red (&refs, max_area_ratio, max_vertex_count, m_state.reject_odd_polygons ());
   db::ClippingHierarchyBuilderShapeReceiver clip (&red);
 
   //  Build the working hierarchy from the recursive shape iterator

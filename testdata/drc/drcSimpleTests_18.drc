@@ -1,0 +1,33 @@
+
+# "forget"
+
+source($drc_test_source, "TOP")
+target($drc_test_target)
+
+deep
+
+max_area_ratio(0)
+max_vertex_count(0)
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = l1 & l2
+
+l1.output(1, 0)
+l1.forget
+begin
+  l1.data 
+  raise("l1.data did not raise an error")
+rescue
+end
+
+l2.output(2, 0)
+l2.forget
+begin
+  l2.data 
+  raise("l1.data did not raise an error")
+rescue
+end
+
+l3.output(3, 0)
+

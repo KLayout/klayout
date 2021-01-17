@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 # KLayout Layout Viewer
-# Copyright (C) 2006-2020 Matthias Koefferlein
+# Copyright (C) 2006-2021 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -160,6 +160,53 @@ class DBEdgePair_TestClass < TestBase
     assert_equal(h[b2b], "a")
     assert_equal(h[b3a], "b")
     assert_equal(h[b3b], "c")
+
+  end
+
+  # Symmetric edge pairs
+  def test_5
+
+    b1 = RBA::DEdgePair::new(RBA::DEdge::new(1, 2, 3, 4), RBA::DEdge::new(11, 12, 13, 14), false)
+    b1x = RBA::DEdgePair::new(RBA::DEdge::new(11, 12, 13, 14), RBA::DEdge::new(1, 2, 3, 4), false)
+    b2a = RBA::DEdgePair::new(RBA::DEdge::new(1, 2, 3, 4), RBA::DEdge::new(11, 12, 13, 14), true)
+    b2b = RBA::DEdgePair::new(RBA::DEdge::new(11, 12, 13, 14), RBA::DEdge::new(1, 2, 3, 4), true)
+
+    assert_equal(b1.hash == b1x.hash, false)
+    assert_equal(b1.hash == b2a.hash, false)
+    assert_equal(b1.hash == b2b.hash, false)
+    assert_equal(b2a.hash == b2b.hash, true)
+
+    assert_equal(b1 < b1x, true)
+    assert_equal(b1 == b1x, false)
+    assert_equal(b1 < b2a, true)
+    assert_equal(b1 == b2a, false)
+    assert_equal(b1 < b2b, true)
+    assert_equal(b2a < b2b, false)
+    assert_equal(b2a == b2b, true)
+    assert_equal(b2b < b2a, false)
+
+    assert_equal(b1.to_s, "(1,2;3,4)/(11,12;13,14)")
+    assert_equal(b1x.to_s, "(11,12;13,14)/(1,2;3,4)")
+    assert_equal(b2a.to_s, "(1,2;3,4)|(11,12;13,14)")
+    assert_equal(b2b.to_s, "(1,2;3,4)|(11,12;13,14)")
+    
+    h = {}
+    h[b1] = 1
+    h[b1x] = 2
+    assert_equal(h.size, 2)
+    assert_equal(h.keys.collect(&:to_s).join(","), "(1,2;3,4)/(11,12;13,14),(11,12;13,14)/(1,2;3,4)")
+
+    h = {}
+    h[b1] = 1
+    h[b2a] = 2
+    assert_equal(h.size, 2)
+    assert_equal(h.keys.collect(&:to_s).join(","), "(1,2;3,4)/(11,12;13,14),(1,2;3,4)|(11,12;13,14)")
+
+    h = {}
+    h[b2a] = 1
+    h[b2b] = 2
+    assert_equal(h.size, 1)
+    assert_equal(h.keys.collect(&:to_s).join(","), "(1,2;3,4)|(11,12;13,14)")
 
   end
 

@@ -72,6 +72,24 @@ module DRC
     end
   end
   
+  # A wrapper for a rectangle error filter mode 
+  # The purpose of this wrapper is to identify the error filter mode
+  class DRCRectangleErrorFilter
+    attr_accessor :value
+    def initialize(v)
+      self.value = v
+    end
+  end
+  
+  # A wrapper for a opposite error filter mode 
+  # The purpose of this wrapper is to identify the error filter mode
+  class DRCOppositeErrorFilter
+    attr_accessor :value
+    def initialize(v)
+      self.value = v
+    end
+  end
+  
   # A wrapper for a glob-pattern style text selection for
   # some DRC functions. The purpose of this class
   # is to identify the value by the class.
@@ -88,28 +106,55 @@ module DRC
   # This class is used to identify projection limits for DRC
   # functions
   class DRCProjectionLimits
-    attr_accessor :min
-    attr_accessor :max
+
+    include DRCComparable
+
     def initialize(*a)
-      if a.size > 2 || a.size == 0
-        raise("A projection limits specification requires a maximum of two values and at least one argument")
+
+      _init_comparable
+
+      if a.size > 2
+
+        raise("A projection limits specification requires a maximum of two values")
+
       elsif a.size == 1
+
         if !a[0].is_a?(Range) || (!a[0].min.is_a?(Float) && !a[0].min.is_a?(1.class))
           raise("A projection limit requires an interval of two length values or two individual length values")
         end
-        self.min = a[0].min
-        self.max = a[0].max
+
+        self.set_ge(a[0].min)
+        self.set_lt(a[0].max)
+
       elsif a.size == 2
+
         if a[0] && !a[0].is_a?(Float) && !a[0].is_a?(1.class)
           raise("First argument to a projection limit must be either nil or a length value")
         end
         if a[1] && !a[1].is_a?(Float) && !a[1].is_a?(1.class)
           raise("Second argument to a projection limit must be either nil or a length value")
         end
-        self.min = a[0]
-        self.max = a[1]
+
+        self.set_ge(a[0])
+        self.set_lt(a[1])
+
       end
+
     end
+
+    def get_limits(engine)
+
+      if ! self.le && ! self.ge && ! self.lt && ! self.gt 
+        raise("No constraint given for projection limits (supply values or place inside a condition)")
+      end
+
+      min = self.ge ? engine._make_value(self.ge) : (self.gt ? engine._make_value(self.gt) + 1 : 0)
+      max = self.le ? engine._make_value(self.le) + 1 : (self.lt ? engine._make_value(self.lt) : nil)
+
+      [ min, max ]
+
+    end
+
   end
 
   # A wrapper for an input for the antenna check
@@ -126,5 +171,15 @@ module DRC
     end
   end
 
+  # A wrapper for specifying shielded mode
+  class DRCShielded
+    def initialize(f)
+      @value = f
+    end
+    def value
+      @value
+    end
+  end
+ 
 end
 

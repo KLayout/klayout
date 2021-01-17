@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -277,9 +277,9 @@ TEST(3)
   }
 
   EXPECT_EQ (or2.has_valid_polygons (), true);
-  EXPECT_EQ (or2.size () / 2000, size_t (50));  //  because we use rand () the value may vary - it's only accurate to 2%
+  EXPECT_EQ (or2.count () / 2000, size_t (50));  //  because we use rand () the value may vary - it's only accurate to 2%
   EXPECT_EQ (or2_copy.has_valid_polygons (), true);
-  EXPECT_EQ (or2_copy.size () / 2000, size_t (40));  //  because we use rand () the value may vary - it's only accurate to 2%
+  EXPECT_EQ (or2_copy.count () / 2000, size_t (40));  //  because we use rand () the value may vary - it's only accurate to 2%
   EXPECT_EQ ((or2 ^ or2_copy).empty (), true);
 
 #if 0

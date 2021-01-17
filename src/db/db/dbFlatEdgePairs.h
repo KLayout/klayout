@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -28,50 +28,15 @@
 
 #include "dbAsIfFlatEdgePairs.h"
 #include "dbShapes.h"
+#include "dbGenericShapeIterator.h"
+#include "tlCopyOnWrite.h"
 
 namespace db {
 
 /**
  *  @brief An iterator delegate for the flat edge pair set
  */
-class DB_PUBLIC FlatEdgePairsIterator
-  : public EdgePairsIteratorDelegate
-{
-public:
-  typedef db::layer<db::EdgePair, db::unstable_layer_tag> edge_pair_layer_type;
-  typedef edge_pair_layer_type::iterator iterator_type;
-
-  FlatEdgePairsIterator (iterator_type from, iterator_type to)
-    : m_from (from), m_to (to)
-  {
-    //  .. nothing yet ..
-  }
-
-  virtual bool at_end () const
-  {
-    return m_from == m_to;
-  }
-
-  virtual void increment ()
-  {
-    ++m_from;
-  }
-
-  virtual const value_type *get () const
-  {
-    return m_from.operator-> ();
-  }
-
-  virtual EdgePairsIteratorDelegate *clone () const
-  {
-    return new FlatEdgePairsIterator (*this);
-  }
-
-private:
-  friend class EdgePairs;
-
-  iterator_type m_from, m_to;
-};
+typedef generic_shapes_iterator_delegate<db::EdgePair> FlatEdgePairsIterator;
 
 /**
  *  @brief The delegate for the actual edge pair set implementation
@@ -101,7 +66,8 @@ public:
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const;
 
   virtual bool empty () const;
-  virtual size_t size () const;
+  virtual size_t count () const;
+  virtual size_t hier_count () const;
 
   virtual EdgePairsDelegate *filter_in_place (const EdgePairFilterBase &filter);
 
@@ -144,14 +110,16 @@ public:
   void transform (const Trans &trans)
   {
     if (! trans.is_unity ()) {
-      for (edge_pair_iterator_type p = m_edge_pairs.template get_layer<db::EdgePair, db::unstable_layer_tag> ().begin (); p != m_edge_pairs.template get_layer<db::EdgePair, db::unstable_layer_tag> ().end (); ++p) {
-        m_edge_pairs.get_layer<db::EdgePair, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
+      db::Shapes &ep = *mp_edge_pairs;
+      for (edge_pair_iterator_type p = ep.template get_layer<db::EdgePair, db::unstable_layer_tag> ().begin (); p != ep.template get_layer<db::EdgePair, db::unstable_layer_tag> ().end (); ++p) {
+        ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
       }
       invalidate_cache ();
     }
   }
 
-  db::Shapes &raw_edge_pairs () { return m_edge_pairs; }
+  db::Shapes &raw_edge_pairs () { return *mp_edge_pairs; }
+  const db::Shapes &raw_edge_pairs () const { return *mp_edge_pairs; }
 
 protected:
   virtual Box compute_bbox () const;
@@ -162,7 +130,7 @@ private:
 
   FlatEdgePairs &operator= (const FlatEdgePairs &other);
 
-  mutable db::Shapes m_edge_pairs;
+  mutable tl::copy_on_write_ptr<db::Shapes> mp_edge_pairs;
 };
 
 }

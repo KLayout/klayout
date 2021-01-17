@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -29,50 +29,15 @@
 #include "dbAsIfFlatEdges.h"
 #include "dbShapes.h"
 #include "dbShapes2.h"
+#include "dbGenericShapeIterator.h"
+#include "tlCopyOnWrite.h"
 
 namespace db {
 
 /**
- *  @brief An iterator delegate for the flat region
+ *  @brief An iterator delegate for the flat edge set
  */
-class DB_PUBLIC FlatEdgesIterator
-  : public EdgesIteratorDelegate
-{
-public:
-  typedef db::layer<db::Edge, db::unstable_layer_tag> edge_layer_type;
-  typedef edge_layer_type::iterator iterator_type;
-
-  FlatEdgesIterator (iterator_type from, iterator_type to)
-    : m_from (from), m_to (to)
-  {
-    //  .. nothing yet ..
-  }
-
-  virtual bool at_end () const
-  {
-    return m_from == m_to;
-  }
-
-  virtual void increment ()
-  {
-    ++m_from;
-  }
-
-  virtual const value_type *get () const
-  {
-    return m_from.operator-> ();
-  }
-
-  virtual EdgesIteratorDelegate *clone () const
-  {
-    return new FlatEdgesIterator (*this);
-  }
-
-private:
-  friend class Edges;
-
-  iterator_type m_from, m_to;
-};
+typedef generic_shapes_iterator_delegate<db::Edge> FlatEdgesIterator;
 
 /**
  *  @brief A flat, edge-set delegate
@@ -108,7 +73,8 @@ public:
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_merged_iter () const;
 
   virtual bool empty () const;
-  virtual size_t size () const;
+  virtual size_t count () const;
+  virtual size_t hier_count () const;
   virtual bool is_merged () const;
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
@@ -155,7 +121,7 @@ public:
   template <class Iter>
   void insert (const Iter &b, const Iter &e)
   {
-    reserve (size () + (e - b));
+    reserve (count () + (e - b));
     for (Iter i = b; i != e; ++i) {
       insert (*i);
     }
@@ -173,14 +139,16 @@ public:
   void transform (const Trans &trans)
   {
     if (! trans.is_unity ()) {
-      for (edge_iterator_type p = m_edges.template get_layer<db::Edge, db::unstable_layer_tag> ().begin (); p != m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().end (); ++p) {
-        m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
+      db::Shapes &e = *mp_edges;
+      for (edge_iterator_type p = e.template get_layer<db::Edge, db::unstable_layer_tag> ().begin (); p != e.get_layer<db::Edge, db::unstable_layer_tag> ().end (); ++p) {
+        e.get_layer<db::Edge, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
       }
       invalidate_cache ();
     }
   }
 
-  db::Shapes &raw_edges () { return m_edges; }
+  db::Shapes &raw_edges () { return *mp_edges; }
+  const db::Shapes &raw_edges () const { return *mp_edges; }
 
 protected:
   virtual void merged_semantics_changed ();
@@ -194,8 +162,8 @@ private:
   FlatEdges &operator= (const FlatEdges &other);
 
   bool m_is_merged;
-  mutable db::Shapes m_edges;
-  mutable db::Shapes m_merged_edges;
+  mutable tl::copy_on_write_ptr<db::Shapes> mp_edges;
+  mutable tl::copy_on_write_ptr<db::Shapes> mp_merged_edges;
   mutable bool m_merged_edges_valid;
 
   void init ();

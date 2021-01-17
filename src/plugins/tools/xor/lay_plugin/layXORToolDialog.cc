@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -809,7 +809,7 @@ XORWorker::do_perform_deep (const XORTask *xor_task)
       //  TODO: no clipping for hieararchical mode yet
       mp_job->issue_region (tol_index, xor_task->layer_index (), rr);
 
-      mp_job->add_results (xor_task->lp (), *t, rr.size (), xor_task->ix (), xor_task->iy ());
+      mp_job->add_results (xor_task->lp (), *t, rr.count (), xor_task->ix (), xor_task->iy ());
 
     } else if (mp_job->op () == db::BooleanOp::Xor ||
                (mp_job->op () == db::BooleanOp::ANotB && !la.empty ()) ||

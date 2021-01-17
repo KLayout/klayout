@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -92,6 +92,11 @@ struct A
    *  @brief A static method
    */
   static const char *a_static ();
+
+  /**
+   *  @brief Construction through tl::Variant
+   */
+  static tl::Variant new_a_by_variant ();
 
   /*
    *  @brief A dummy method providing a chance to set a breakpoint in the script
@@ -445,9 +450,16 @@ struct B
   static B *inst ();
   static bool has_inst ();
 
+  static int instance_count ();
+
+  /**
+   *  @brief Construction through tl::Variant
+   */
+  static tl::Variant new_b_by_variant ();
+
   std::string addr () const;
 
-  int b1 () const { 
+  int always_5 () const {
     return 5; 
   }
 
@@ -467,19 +479,6 @@ struct B
 
   std::string b4 (const A &aref) { 
     return tl::sprintf ("b4_result: %d", aref.n); 
-  }
-
-  void b5 (const char *p) { 
-    m = p; 
-  }
-
-  void b5b (const char *p1, const char *p2) { 
-    m = p1; 
-    m += p2;
-  }
-
-  const char *b5a () const {
-    return m.c_str ();
   }
 
   A make_a (int n) {

@@ -57,10 +57,12 @@ src/klayout.pro.user
 build/
 dist/
 
-
 # IDEs
 .vscode
 
+# vim
+.*.swp
+.*.swo
 
 # Macos artifacts
 *.dmg

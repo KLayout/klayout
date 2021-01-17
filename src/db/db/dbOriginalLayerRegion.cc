@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -50,6 +50,11 @@ namespace
       set ();
     }
 
+    virtual bool is_addressable() const
+    {
+      return false;
+    }
+
     virtual bool at_end () const
     {
       return m_rec_iter.at_end ();
@@ -57,7 +62,7 @@ namespace
 
     virtual void increment ()
     {
-      inc ();
+      do_increment ();
       set ();
     }
 
@@ -69,6 +74,28 @@ namespace
     virtual RegionIteratorDelegate *clone () const
     {
       return new OriginalLayerRegionIterator (*this);
+    }
+
+    virtual bool equals (const generic_shape_iterator_delegate_base<value_type> *other) const
+    {
+      const OriginalLayerRegionIterator *o = dynamic_cast<const OriginalLayerRegionIterator *> (other);
+      return o && o->m_rec_iter == m_rec_iter && o->m_iter_trans.equal (m_iter_trans);
+    }
+
+    virtual void do_reset (const db::Box &region, bool overlapping)
+    {
+      if (region == db::Box::world ()) {
+        m_rec_iter.set_region (region);
+      } else {
+        m_rec_iter.set_region (m_iter_trans.inverted () * region);
+      }
+      m_rec_iter.set_overlapping (overlapping);
+      set ();
+    }
+
+    virtual db::Box bbox () const
+    {
+      return m_iter_trans * m_rec_iter.bbox ();
     }
 
   private:
@@ -89,7 +116,7 @@ namespace
       }
     }
 
-    void inc ()
+    void do_increment ()
     {
       if (! m_rec_iter.at_end ()) {
         ++m_rec_iter;
@@ -172,7 +199,7 @@ OriginalLayerRegion::begin_merged () const
     return begin ();
   } else {
     ensure_merged_polygons_valid ();
-    return new FlatRegionIterator (m_merged_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin (), m_merged_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end ());
+    return new FlatRegionIterator (& m_merged_polygons);
   }
 }
 

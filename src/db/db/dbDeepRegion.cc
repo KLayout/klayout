@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -38,7 +38,9 @@
 #include "dbCellGraphUtils.h"
 #include "dbPolygonTools.h"
 #include "dbCellVariants.h"
+#include "dbRegionLocalOperations.h"
 #include "dbLocalOperationUtils.h"
+#include "dbCompoundOperation.h"
 #include "tlTimer.h"
 
 namespace db
@@ -73,14 +75,37 @@ public:
     set ();
   }
 
+  virtual bool is_addressable() const
+  {
+    return false;
+  }
+
   virtual const value_type *get () const
   {
     return &m_polygon;
   }
 
+  virtual bool equals (const generic_shape_iterator_delegate_base<value_type> *other) const
+  {
+    const DeepRegionIterator *o = dynamic_cast<const DeepRegionIterator *> (other);
+    return o && o->m_iter == m_iter;
+  }
+
   virtual RegionIteratorDelegate *clone () const
   {
     return new DeepRegionIterator (*this);
+  }
+
+  virtual void do_reset (const db::Box &region, bool overlapping)
+  {
+    m_iter.set_region (region);
+    m_iter.set_overlapping (overlapping);
+    set ();
+  }
+
+  virtual db::Box bbox () const
+  {
+    return m_iter.bbox ();
   }
 
 private:
@@ -542,6 +567,31 @@ DeepRegion::not_with (const Region &other) const
   }
 }
 
+std::pair<RegionDelegate *, RegionDelegate *>
+DeepRegion::andnot_with (const Region &other) const
+{
+  const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
+
+  if (empty ()) {
+
+    return std::make_pair (clone (), clone ());
+
+  } else if (other.empty ()) {
+
+    return std::make_pair (other.delegate ()->clone (), clone ());
+
+  } else if (! other_deep) {
+
+    return AsIfFlatRegion::andnot_with (other);
+
+  } else {
+
+    std::pair<DeepLayer, DeepLayer> res = and_and_not_with (other_deep);
+    return std::make_pair (new DeepRegion (res.first), new DeepRegion (res.second));
+
+  }
+}
+
 DeepLayer
 DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op) const
 {
@@ -558,6 +608,32 @@ DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op) const
   proc.run (&op, deep_layer ().layer (), other->deep_layer ().layer (), dl_out.layer ());
 
   return dl_out;
+}
+
+std::pair<DeepLayer, DeepLayer>
+DeepRegion::and_and_not_with (const DeepRegion *other) const
+{
+  DeepLayer dl_out1 (deep_layer ().derived ());
+  DeepLayer dl_out2 (deep_layer ().derived ());
+
+  db::TwoBoolAndNotLocalOperation op;
+
+  db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (deep_layer ().store ()->threads ());
+  proc.set_area_ratio (deep_layer ().store ()->max_area_ratio ());
+  proc.set_max_vertex_count (deep_layer ().store ()->max_vertex_count ());
+
+  std::vector<unsigned int> il;
+  il.push_back (other->deep_layer ().layer ());
+
+  std::vector<unsigned int> ol;
+  ol.push_back (dl_out1.layer ());
+  ol.push_back (dl_out2.layer ());
+
+  proc.run (&op, deep_layer ().layer (), il, ol);
+
+  return std::make_pair (dl_out1, dl_out2);
 }
 
 RegionDelegate *
@@ -666,7 +742,7 @@ DeepRegion::is_box () const
 }
 
 size_t
-DeepRegion::size () const
+DeepRegion::count () const
 {
   size_t n = 0;
 
@@ -674,6 +750,19 @@ DeepRegion::size () const
   db::CellCounter cc (&layout);
   for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
     n += cc.weight (*c) * layout.cell (*c).shapes (deep_layer ().layer ()).size ();
+  }
+
+  return n;
+}
+
+size_t
+DeepRegion::hier_count () const
+{
+  size_t n = 0;
+
+  const db::Layout &layout = deep_layer ().layout ();
+  for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
+    n += layout.cell (*c).shapes (deep_layer ().layer ()).size ();
   }
 
   return n;
@@ -1254,122 +1343,119 @@ DeepRegion::in (const Region &other, bool invert) const
   return db::AsIfFlatRegion::in (other, invert);
 }
 
-namespace
+template <class TR, class Output>
+static
+Output *region_cop_impl (DeepRegion *region, db::CompoundRegionOperationNode &node)
 {
-
-class CheckLocalOperation
-  : public local_operation<db::PolygonRef, db::PolygonRef, db::EdgePair>
-{
-public:
-  CheckLocalOperation (const EdgeRelationFilter &check, bool different_polygons, bool has_other)
-    : m_check (check), m_different_polygons (different_polygons), m_has_other (has_other)
-  {
-    //  .. nothing yet ..
+  //  Fall back to flat mode if one of the inputs is flat
+  std::vector<db::Region *> inputs = node.inputs ();
+  for (std::vector<db::Region *>::const_iterator i = inputs.begin (); i != inputs.end (); ++i) {
+    if (! is_subject_regionptr (*i) && ! dynamic_cast<const db::DeepRegion *> ((*i)->delegate ())) {
+      return 0;
+    }
   }
 
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::EdgePair> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
-  {
-    edge2edge_check<std::unordered_set<db::EdgePair> > edge_check (m_check, result, m_different_polygons, m_has_other);
-    poly2poly_check<std::unordered_set<db::EdgePair> > poly_check (edge_check);
+  db::local_processor<db::PolygonRef, db::PolygonRef, TR> proc (const_cast<db::Layout *> (&region->deep_layer ().layout ()),
+                                                                const_cast<db::Cell *> (&region->deep_layer ().initial_cell ()),
+                                                                region->deep_layer ().breakout_cells ());
 
-    std::list<db::Polygon> heap;
-    db::box_scanner<db::Polygon, size_t> scanner;
+  proc.set_base_verbosity (region->base_verbosity ());
+  proc.set_threads (region->deep_layer ().store ()->threads ());
 
-    if (m_has_other) {
+  const db::DeepLayer &polygons (region->merged_deep_layer ());
 
-      std::set<db::PolygonRef> others;
-      for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-        for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-          others.insert (interactions.intruder_shape (*j));
-        }
+  std::vector<unsigned int> other_layers;
+  for (std::vector<db::Region *>::const_iterator i = inputs.begin (); i != inputs.end (); ++i) {
+
+    if (is_subject_regionptr (*i)) {
+      if (*i == subject_regionptr ()) {
+        other_layers.push_back (subject_idlayer ());
+      } else {
+        other_layers.push_back (foreign_idlayer ());
       }
-
-      size_t n = 0;
-      for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-        const db::PolygonRef &subject = interactions.subject_shape (i->first);
-        heap.push_back (subject.obj ().transformed (subject.trans ()));
-        scanner.insert (& heap.back (), n);
-        n += 2;
-      }
-
-      n = 1;
-      for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
-        heap.push_back (o->obj ().transformed (o->trans ()));
-        scanner.insert (& heap.back (), n);
-        n += 2;
-      }
-
     } else {
-
-      std::set<db::PolygonRef> polygons;
-      for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-        polygons.insert (interactions.subject_shape (i->first));
-        for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-          polygons.insert (interactions.intruder_shape (*j));
-        }
+      const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> ((*i)->delegate ());
+      tl_assert (other_deep != 0);
+      if (&other_deep->deep_layer ().layout () != &region->deep_layer ().layout () || &other_deep->deep_layer ().initial_cell () != &region->deep_layer ().initial_cell ()) {
+        throw tl::Exception (tl::to_string (tr ("Complex DeepRegion operations need to use the same layout and top cell for all inputs")));
       }
-
-      size_t n = 0;
-      for (std::set<db::PolygonRef>::const_iterator o = polygons.begin (); o != polygons.end (); ++o) {
-        heap.push_back (o->obj ().transformed (o->trans ()));
-        scanner.insert (& heap.back (), n);
-        n += 2;
-      }
-
+      other_layers.push_back (other_deep->deep_layer ().layer ());
     }
 
-    do {
-      scanner.process (poly_check, m_check.distance (), db::box_convert<db::Polygon> ());
-    } while (edge_check.prepare_next_pass ());
   }
 
-  virtual db::Coord dist () const
-  {
-    //  TODO: will the distance be sufficient? Or should we take somewhat more?
-    return m_check.distance ();
-  }
+  std::auto_ptr<Output> res (new Output (polygons.derived ()));
+  compound_local_operation<db::PolygonRef, db::PolygonRef, TR> op (&node);
+  proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer ());
 
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const
-  {
-    return m_different_polygons ? Drop : Ignore;
-  }
-
-  virtual std::string description () const
-  {
-    return tl::to_string (tr ("Generic DRC check"));
-  }
-
-private:
-  EdgeRelationFilter m_check;
-  bool m_different_polygons;
-  bool m_has_other;
-};
-
+  return res.release ();
 }
 
 EdgePairsDelegate *
-DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+DeepRegion::cop_to_edge_pairs (db::CompoundRegionOperationNode &node)
+{
+  DeepEdgePairs *output = region_cop_impl<db::EdgePair, DeepEdgePairs> (this, node);
+  if (! output) {
+    return AsIfFlatRegion::cop_to_edge_pairs (node);
+  } else {
+    return output;
+  }
+}
+
+RegionDelegate *
+DeepRegion::cop_to_region (db::CompoundRegionOperationNode &node)
+{
+  DeepRegion *output = region_cop_impl<db::PolygonRef, db::DeepRegion> (this, node);
+  if (! output) {
+    return AsIfFlatRegion::cop_to_region (node);
+  } else {
+    return output;
+  }
+}
+
+EdgesDelegate *
+DeepRegion::cop_to_edges (db::CompoundRegionOperationNode &node)
+{
+  DeepEdges *output = region_cop_impl<db::Edge, db::DeepEdges> (this, node);
+  if (! output) {
+    return AsIfFlatRegion::cop_to_edges (node);
+  } else {
+    return output;
+  }
+}
+
+EdgePairsDelegate *
+DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const
 {
   const db::DeepRegion *other_deep = 0;
-  if (other) {
+  unsigned int other_layer = 0;
+  bool other_is_merged = true;
+
+  if (other == subject_regionptr ()) {
+    other_layer = subject_idlayer ();
+  } else if (other == foreign_regionptr ()) {
+    other_layer = foreign_idlayer ();
+  } else {
     other_deep = dynamic_cast<const db::DeepRegion *> (other->delegate ());
     if (! other_deep) {
-      return db::AsIfFlatRegion::run_check (rel, different_polygons, other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+      return db::AsIfFlatRegion::run_check (rel, different_polygons, other, d, options);
     }
+    other_layer = other_deep->deep_layer ().layer ();
+    other_is_merged = other->is_merged ();
   }
 
   const db::DeepLayer &polygons = merged_deep_layer ();
 
-  EdgeRelationFilter check (rel, d, metrics);
+  EdgeRelationFilter check (rel, d, options.metrics);
   check.set_include_zero (false);
-  check.set_whole_edges (whole_edges);
-  check.set_ignore_angle (ignore_angle);
-  check.set_min_projection (min_projection);
-  check.set_max_projection (max_projection);
+  check.set_whole_edges (options.whole_edges);
+  check.set_ignore_angle (options.ignore_angle);
+  check.set_min_projection (options.min_projection);
+  check.set_max_projection (options.max_projection);
 
   std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
 
-  db::CheckLocalOperation op (check, different_polygons, other_deep != 0);
+  db::CheckLocalOperation op (check, different_polygons, other_deep != 0, other_is_merged, options);
 
   db::local_processor<db::PolygonRef, db::PolygonRef, db::EdgePair> proc (const_cast<db::Layout *> (&polygons.layout ()),
                                                                           const_cast<db::Cell *> (&polygons.initial_cell ()),
@@ -1381,22 +1467,22 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (polygons.store ()->threads ());
 
-  proc.run (&op, polygons.layer (), other_deep ? other_deep->deep_layer ().layer () : polygons.layer (), res->deep_layer ().layer ());
+  proc.run (&op, polygons.layer (), other_layer, res->deep_layer ().layer ());
 
   return res.release ();
 }
 
 EdgePairsDelegate *
-DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options) const
 {
   const db::DeepLayer &polygons = merged_deep_layer ();
 
-  EdgeRelationFilter check (rel, d, metrics);
+  EdgeRelationFilter check (rel, d, options.metrics);
   check.set_include_zero (false);
-  check.set_whole_edges (whole_edges);
-  check.set_ignore_angle (ignore_angle);
-  check.set_min_projection (min_projection);
-  check.set_max_projection (max_projection);
+  check.set_whole_edges (options.whole_edges);
+  check.set_ignore_angle (options.ignore_angle);
+  check.set_min_projection (options.min_projection);
+  check.set_max_projection (options.max_projection);
 
   db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
@@ -1408,8 +1494,8 @@ DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, b
 
     for (db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::Polygons); ! s.at_end (); ++s) {
 
-      edge2edge_check<db::Shapes> edge_check (check, result, false, false);
-      poly2poly_check<db::Shapes> poly_check (edge_check);
+      edge2edge_check_negative_or_positive<db::Shapes> edge_check (check, result, options.negative, false /*does not require different polygons*/, false /*does not require different layers*/, options.shielded, true /*symmetric edge pairs*/);
+      poly2poly_check<db::Polygon> poly_check (edge_check);
 
       db::Polygon poly;
       s->polygon (poly);
@@ -1425,466 +1511,11 @@ DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, b
   return res.release ();
 }
 
-namespace
-{
-
-class InteractingLocalOperation
-  : public local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>
-{
-public:
-  InteractingLocalOperation (int mode, bool touching, bool inverse)
-    : m_mode (mode), m_touching (touching), m_inverse (inverse)
-  {
-    //  .. nothing yet ..
-  }
-
-  virtual db::Coord dist () const
-  {
-    return m_touching ? 1 : 0;
-  }
-
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
-  {
-    db::EdgeProcessor ep;
-
-    std::set<db::PolygonRef> others;
-    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        others.insert (interactions.intruder_shape (*j));
-      }
-    }
-
-    size_t n = 1;
-    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i, ++n) {
-      const db::PolygonRef &subject = interactions.subject_shape (i->first);
-      for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
-        ep.insert (*e, n);
-      }
-    }
-
-    for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
-      for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
-        ep.insert (*e, 0);
-      }
-    }
-
-    db::InteractionDetector id (m_mode, 0);
-    id.set_include_touching (m_touching);
-    db::EdgeSink es;
-    ep.process (es, id);
-    id.finish ();
-
-    n = 0;
-    std::set <size_t> selected;
-    for (db::InteractionDetector::iterator i = id.begin (); i != id.end () && i->first == 0; ++i) {
-      ++n;
-      selected.insert (i->second);
-    }
-
-    n = 1;
-    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i, ++n) {
-      if ((selected.find (n) == selected.end ()) == m_inverse) {
-        const db::PolygonRef &subject = interactions.subject_shape (i->first);
-        result.insert (subject);
-      }
-    }
-  }
-
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const
-  {
-    if ((m_mode <= 0) != m_inverse) {
-      return Drop;
-    } else {
-      return Copy;
-    }
-  }
-
-  virtual std::string description () const
-  {
-    return tl::to_string (tr ("Select regions by their geometric relation (interacting, inside, outside ..)"));
-  }
-
-private:
-  int m_mode;
-  bool m_touching;
-  bool m_inverse;
-};
-
-class PullLocalOperation
-  : public local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>
-{
-public:
-  PullLocalOperation (int mode, bool touching)
-    : m_mode (mode), m_touching (touching)
-  {
-    //  .. nothing yet ..
-  }
-
-  virtual db::Coord dist () const
-  {
-    return m_touching ? 1 : 0;
-  }
-
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
-  {
-    db::EdgeProcessor ep;
-
-    std::set<db::PolygonRef> others;
-    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        others.insert (interactions.intruder_shape (*j));
-      }
-    }
-
-    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      const db::PolygonRef &subject = interactions.subject_shape (i->first);
-      for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
-        ep.insert (*e, 0);
-      }
-    }
-
-    size_t n = 1;
-    for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o, ++n) {
-      for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
-        ep.insert (*e, n);
-      }
-    }
-
-    db::InteractionDetector id (m_mode, 0);
-    id.set_include_touching (m_touching);
-    db::EdgeSink es;
-    ep.process (es, id);
-    id.finish ();
-
-    n = 0;
-    std::set <size_t> selected;
-    for (db::InteractionDetector::iterator i = id.begin (); i != id.end () && i->first == 0; ++i) {
-      ++n;
-      selected.insert (i->second);
-    }
-
-    n = 1;
-    for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o, ++n) {
-      if (selected.find (n) != selected.end ()) {
-        result.insert (*o);
-      }
-    }
-  }
-
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const
-  {
-    return Drop;
-  }
-
-  virtual std::string description () const
-  {
-    return tl::to_string (tr ("Pull regions by their geometrical relation to first"));
-  }
-
-private:
-  int m_mode;
-  bool m_touching;
-};
-
-struct ResultInserter
-{
-  typedef db::Polygon value_type;
-
-  ResultInserter (db::Layout *layout, std::unordered_set<db::PolygonRef> &result)
-    : mp_layout (layout), mp_result (&result)
-  {
-    //  .. nothing yet ..
-  }
-
-  void insert (const db::Polygon &p)
-  {
-    (*mp_result).insert (db::PolygonRef (p, mp_layout->shape_repository ()));
-  }
-
-private:
-  db::Layout *mp_layout;
-  std::unordered_set<db::PolygonRef> *mp_result;
-};
-
-struct EdgeResultInserter
-{
-  typedef db::Edge value_type;
-
-  EdgeResultInserter (std::unordered_set<db::Edge> &result)
-    : mp_result (&result)
-  {
-    //  .. nothing yet ..
-  }
-
-  void insert (const db::Edge &e)
-  {
-    (*mp_result).insert (e);
-  }
-
-private:
-  std::unordered_set<db::Edge> *mp_result;
-};
-
-class InteractingWithEdgeLocalOperation
-  : public local_operation<db::PolygonRef, db::Edge, db::PolygonRef>
-{
-public:
-  InteractingWithEdgeLocalOperation (bool inverse)
-    : m_inverse (inverse)
-  {
-    //  .. nothing yet ..
-  }
-
-  virtual db::Coord dist () const
-  {
-    //  touching is sufficient
-    return 1;
-  }
-
-  virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
-  {
-    db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> scanner;
-
-    ResultInserter inserter (layout, result);
-    region_to_edge_interaction_filter<ResultInserter> filter (inserter, m_inverse);
-
-    for (shape_interactions<db::PolygonRef, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      for (shape_interactions<db::PolygonRef, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        scanner.insert2 (& interactions.intruder_shape (*j), 0);
-      }
-    }
-
-    std::list<db::Polygon> heap;
-    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-
-      const db::PolygonRef &subject = interactions.subject_shape (i->first);
-      heap.push_back (subject.obj ().transformed (subject.trans ()));
-
-      scanner.insert1 (&heap.back (), 0);
-      if (m_inverse) {
-        filter.preset (&heap.back ());
-      }
-
-    }
-
-    scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
-    if (m_inverse) {
-      filter.fill_output ();
-    }
-  }
-
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const
-  {
-    if (!m_inverse) {
-      return Drop;
-    } else {
-      return Copy;
-    }
-  }
-
-  virtual std::string description () const
-  {
-    return tl::to_string (tr ("Select regions by their geometric relation to edges"));
-  }
-
-private:
-  bool m_inverse;
-};
-
-class PullWithEdgeLocalOperation
-  : public local_operation<db::PolygonRef, db::Edge, db::Edge>
-{
-public:
-  PullWithEdgeLocalOperation ()
-  {
-    //  .. nothing yet ..
-  }
-
-  virtual db::Coord dist () const
-  {
-    //  touching is sufficient
-    return 1;
-  }
-
-  virtual void compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
-  {
-    db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> scanner;
-
-    EdgeResultInserter inserter (result);
-    region_to_edge_interaction_filter<EdgeResultInserter> filter (inserter, false);
-
-    for (shape_interactions<db::PolygonRef, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      for (shape_interactions<db::PolygonRef, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        scanner.insert2 (& interactions.intruder_shape (*j), 0);
-      }
-    }
-
-    std::list<db::Polygon> heap;
-    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-
-      const db::PolygonRef &subject = interactions.subject_shape (i->first);
-      heap.push_back (subject.obj ().transformed (subject.trans ()));
-
-      scanner.insert1 (&heap.back (), 0);
-
-    }
-
-    scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
-  }
-
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const
-  {
-    return Drop;
-  }
-
-  virtual std::string description () const
-  {
-    return tl::to_string (tr ("Pull edges from second by their geometric relation to first"));
-  }
-};
-
-struct TextResultInserter
-{
-  typedef db::TextRef value_type;
-
-  TextResultInserter (std::unordered_set<db::TextRef> &result)
-    : mp_result (&result)
-  {
-    //  .. nothing yet ..
-  }
-
-  void insert (const db::TextRef &e)
-  {
-    (*mp_result).insert (e);
-  }
-
-private:
-  std::unordered_set<db::TextRef> *mp_result;
-};
-
-class PullWithTextLocalOperation
-  : public local_operation<db::PolygonRef, db::TextRef, db::TextRef>
-{
-public:
-  PullWithTextLocalOperation ()
-  {
-    //  .. nothing yet ..
-  }
-
-  virtual db::Coord dist () const
-  {
-    //  touching is sufficient
-    return 1;
-  }
-
-  virtual void compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::TextRef> &interactions, std::unordered_set<db::TextRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
-  {
-    db::box_scanner2<db::Polygon, size_t, db::TextRef, size_t> scanner;
-
-    TextResultInserter inserter (result);
-    region_to_text_interaction_filter<TextResultInserter, db::TextRef> filter (inserter, false);
-
-    for (shape_interactions<db::PolygonRef, db::TextRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      for (shape_interactions<db::PolygonRef, db::TextRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        scanner.insert2 (& interactions.intruder_shape (*j), 0);
-      }
-    }
-
-    std::list<db::Polygon> heap;
-    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-
-      const db::PolygonRef &subject = interactions.subject_shape (i->first);
-      heap.push_back (subject.obj ().transformed (subject.trans ()));
-
-      scanner.insert1 (&heap.back (), 0);
-
-    }
-
-    scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::TextRef> ());
-  }
-
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const
-  {
-    return Drop;
-  }
-
-  virtual std::string description () const
-  {
-    return tl::to_string (tr ("Pull texts from second by their geometric relation to first"));
-  }
-};
-
-class InteractingWithTextLocalOperation
-  : public local_operation<db::PolygonRef, db::TextRef, db::PolygonRef>
-{
-public:
-  InteractingWithTextLocalOperation (bool inverse)
-    : m_inverse (inverse)
-  {
-    //  .. nothing yet ..
-  }
-
-  virtual db::Coord dist () const
-  {
-    //  touching is sufficient
-    return 1;
-  }
-
-  virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::TextRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
-  {
-    db::box_scanner2<db::Polygon, size_t, db::TextRef, size_t> scanner;
-
-    ResultInserter inserter (layout, result);
-    region_to_text_interaction_filter<ResultInserter, db::TextRef> filter (inserter, m_inverse);
-
-    for (shape_interactions<db::PolygonRef, db::Text>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      for (shape_interactions<db::PolygonRef, db::Text>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        scanner.insert2 (& interactions.intruder_shape (*j), 0);
-      }
-    }
-
-    std::list<db::Polygon> heap;
-    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-
-      const db::PolygonRef &subject = interactions.subject_shape (i->first);
-      heap.push_back (subject.obj ().transformed (subject.trans ()));
-
-      scanner.insert1 (&heap.back (), 0);
-      if (m_inverse) {
-        filter.preset (&heap.back ());
-      }
-
-    }
-
-    scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::TextRef> ());
-    if (m_inverse) {
-      filter.fill_output ();
-    }
-  }
-
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const
-  {
-    if (!m_inverse) {
-      return Drop;
-    } else {
-      return Copy;
-    }
-  }
-
-  virtual std::string description () const
-  {
-    return tl::to_string (tr ("Select regions by their geometric relation to texts"));
-  }
-
-private:
-  bool m_inverse;
-};
-
-}
-
 RegionDelegate *
-DeepRegion::selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const
+DeepRegion::selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse, size_t min_count, size_t max_count) const
 {
+  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+
   //  with these flag set to true, the resulting polygons are broken again.
   bool split_after = false;
 
@@ -1897,12 +1528,12 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
   }
 
   const db::DeepLayer &polygons = merged_deep_layer ();
-  //  NOTE: on "inside", the other polygons must be merged
-  const db::DeepLayer &other_polygons = mode < 0 ? other_deep->merged_deep_layer () : other_deep->deep_layer ();
+  //  NOTE: on "inside" or with counting, the other polygons must be merged
+  const db::DeepLayer &other_polygons = (mode < 0 || counting) ? other_deep->merged_deep_layer () : other_deep->deep_layer ();
 
   DeepLayer dl_out (polygons.derived ());
 
-  db::InteractingLocalOperation op (mode, touching, inverse);
+  db::InteractingLocalOperation op (mode, touching, inverse, min_count, max_count, true);
 
   db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell (), polygons.breakout_cells (), other_polygons.breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
@@ -1922,8 +1553,10 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
 }
 
 RegionDelegate *
-DeepRegion::selected_interacting_generic (const Edges &other, bool inverse) const
+DeepRegion::selected_interacting_generic (const Edges &other, bool inverse, size_t min_count, size_t max_count) const
 {
+  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+
   //  with these flag set to true, the resulting polygons are broken again.
   bool split_after = false;
 
@@ -1939,7 +1572,7 @@ DeepRegion::selected_interacting_generic (const Edges &other, bool inverse) cons
 
   DeepLayer dl_out (polygons.derived ());
 
-  db::InteractingWithEdgeLocalOperation op (inverse);
+  db::InteractingWithEdgeLocalOperation op (inverse, min_count, max_count, true);
 
   db::local_processor<db::PolygonRef, db::Edge, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), polygons.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
@@ -1949,7 +1582,7 @@ DeepRegion::selected_interacting_generic (const Edges &other, bool inverse) cons
     proc.set_max_vertex_count (polygons.store ()->max_vertex_count ());
   }
 
-  proc.run (&op, polygons.layer (), other_deep->deep_layer ().layer (), dl_out.layer ());
+  proc.run (&op, polygons.layer (), counting ? other_deep->merged_deep_layer ().layer () : other_deep->deep_layer ().layer (), dl_out.layer ());
 
   db::DeepRegion *res = new db::DeepRegion (dl_out);
   if (! split_after) {
@@ -2056,7 +1689,7 @@ DeepRegion::pull_generic (const Texts &other) const
 }
 
 RegionDelegate *
-DeepRegion::selected_interacting_generic (const Texts &other, bool inverse) const
+DeepRegion::selected_interacting_generic (const Texts &other, bool inverse, size_t min_count, size_t max_count) const
 {
   //  with these flag set to true, the resulting polygons are broken again.
   bool split_after = false;
@@ -2073,7 +1706,7 @@ DeepRegion::selected_interacting_generic (const Texts &other, bool inverse) cons
 
   DeepLayer dl_out (polygons.derived ());
 
-  db::InteractingWithTextLocalOperation op (inverse);
+  db::InteractingWithTextLocalOperation op (inverse, min_count, max_count);
 
   db::local_processor<db::PolygonRef, db::TextRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), polygons.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());

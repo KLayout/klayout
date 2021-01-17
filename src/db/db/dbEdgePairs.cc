@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -146,6 +146,11 @@ EdgePairs::iter () const
 void EdgePairs::processed (Region &output, const EdgePairToPolygonProcessorBase &filter) const
 {
   output = Region (mp_delegate->processed_to_polygons (filter));
+}
+
+void EdgePairs::processed (Edges &output, const EdgePairToEdgeProcessorBase &filter) const
+{
+  output = Edges (mp_delegate->processed_to_edges (filter));
 }
 
 void EdgePairs::polygons (Region &output, db::Coord e) const

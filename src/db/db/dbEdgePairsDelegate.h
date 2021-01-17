@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "dbEdgePair.h"
 #include "dbShapeCollection.h"
 #include "dbShapeCollectionUtils.h"
+#include "dbGenericShapeIterator.h"
 
 namespace db {
 
@@ -39,23 +40,109 @@ class EdgesDelegate;
 class Layout;
 
 typedef shape_collection_processor<db::EdgePair, db::Polygon> EdgePairToPolygonProcessorBase;
+typedef shape_collection_processor<db::EdgePair, db::Edge> EdgePairToEdgeProcessorBase;
+
+class DB_PUBLIC
+EdgePairToPolygonProcessor
+  : public EdgePairToPolygonProcessorBase
+{
+public:
+  EdgePairToPolygonProcessor (db::Coord e)
+    : m_e (e)
+  { }
+
+  void process(const EdgePair &ep, std::vector<db::Polygon> &res) const
+  {
+    db::Polygon poly = ep.normalized ().to_polygon (m_e);
+    if (poly.vertices () >= 3) {
+      res.push_back (poly);
+    }
+  }
+
+private:
+  db::Coord m_e;
+};
+
+class DB_PUBLIC
+EdgePairToEdgesProcessor
+  : public EdgePairToEdgeProcessorBase
+{
+public:
+  EdgePairToEdgesProcessor ()
+  { }
+
+  void process(const EdgePair &ep, std::vector<db::Edge> &res) const
+  {
+    res.push_back (ep.first ());
+    res.push_back (ep.second ());
+  }
+};
+
+class DB_PUBLIC
+EdgePairToFirstEdgesProcessor
+  : public EdgePairToEdgeProcessorBase
+{
+public:
+  EdgePairToFirstEdgesProcessor ()
+  { }
+
+  void process(const EdgePair &ep, std::vector<db::Edge> &res) const
+  {
+    res.push_back (ep.first ());
+    if (ep.is_symmetric ()) {
+      res.push_back (ep.second ());
+    }
+  }
+};
+
+class DB_PUBLIC
+EdgePairToSecondEdgesProcessor
+  : public EdgePairToEdgeProcessorBase
+{
+public:
+  EdgePairToSecondEdgesProcessor ()
+  { }
+
+  void process(const EdgePair &ep, std::vector<db::Edge> &res) const
+  {
+    if (! ep.is_symmetric ()) {
+      res.push_back (ep.second ());
+    }
+  }
+};
+
+class DB_PUBLIC
+EdgePairToLesserEdgesProcessor
+  : public EdgePairToEdgeProcessorBase
+{
+public:
+  EdgePairToLesserEdgesProcessor ()
+  { }
+
+  void process(const EdgePair &ep, std::vector<db::Edge> &res) const
+  {
+    res.push_back (ep.lesser ());
+  }
+};
+
+class DB_PUBLIC
+EdgePairToGreaterEdgesProcessor
+  : public EdgePairToEdgeProcessorBase
+{
+public:
+  EdgePairToGreaterEdgesProcessor ()
+  { }
+
+  void process(const EdgePair &ep, std::vector<db::Edge> &res) const
+  {
+    res.push_back (ep.greater ());
+  }
+};
 
 /**
  *  @brief The edge pair set iterator delegate
  */
-class DB_PUBLIC EdgePairsIteratorDelegate
-{
-public:
-  EdgePairsIteratorDelegate () { }
-  virtual ~EdgePairsIteratorDelegate () { }
-
-  typedef db::EdgePair value_type;
-
-  virtual bool at_end () const = 0;
-  virtual void increment () = 0;
-  virtual const value_type *get () const = 0;
-  virtual EdgePairsIteratorDelegate *clone () const = 0;
-};
+typedef db::generic_shape_iterator_delegate_base <db::EdgePair> EdgePairsIteratorDelegate;
 
 /**
  *  @brief The delegate for the actual edge set implementation
@@ -94,13 +181,15 @@ public:
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const = 0;
 
   virtual bool empty () const = 0;
-  virtual size_t size () const = 0;
+  virtual size_t count () const = 0;
+  virtual size_t hier_count () const = 0;
 
   virtual Box bbox () const = 0;
 
   virtual EdgePairsDelegate *filter_in_place (const EdgePairFilterBase &filter) = 0;
   virtual EdgePairsDelegate *filtered (const EdgePairFilterBase &filter) const = 0;
   virtual RegionDelegate *processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const = 0;
+  virtual EdgesDelegate *processed_to_edges (const EdgePairToEdgeProcessorBase &filter) const = 0;
 
   virtual RegionDelegate *polygons (db::Coord e) const = 0;
   virtual EdgesDelegate *edges () const = 0;

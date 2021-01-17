@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -49,7 +49,8 @@ public:
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const { return std::make_pair (db::RecursiveShapeIterator (), db::ICplxTrans ()); }
 
   virtual bool empty () const { return true; }
-  virtual size_t size () const { return 0; }
+  virtual size_t count () const { return 0; }
+  virtual size_t hier_count () const { return 0; }
 
   virtual Box bbox () const { return Box (); }
 

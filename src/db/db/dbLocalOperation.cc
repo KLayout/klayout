@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -33,9 +33,83 @@
 #include "tlLog.h"
 #include "tlTimer.h"
 #include "tlInternational.h"
+#include "tlProgress.h"
 
 namespace db
 {
+
+// ---------------------------------------------------------------------------------------------
+//  local_operations implementation
+
+template <class TS, class TI, class TR>
+void local_operation<TS, TI, TR>::compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio, bool report_progress, const std::string &progress_desc) const
+{
+  if (interactions.num_subjects () <= 1 || ! requests_single_subjects ()) {
+
+    do_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+
+  } else {
+
+    std::auto_ptr<tl::RelativeProgress> progress;
+    if (report_progress) {
+      progress.reset (new tl::RelativeProgress (progress_desc, interactions.size ()));
+    }
+
+    for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+
+      const TS &subject_shape = interactions.subject_shape (i->first);
+
+      shape_interactions<TS, TI> single_interactions;
+
+      if (on_empty_intruder_hint () == OnEmptyIntruderHint::Drop) {
+        single_interactions.add_subject_shape (i->first, subject_shape);
+      } else {
+        //  this includes the subject-without-intruder "interaction"
+        single_interactions.add_subject (i->first, subject_shape);
+      }
+
+      const std::vector<unsigned int> &intruders = interactions.intruders_for (i->first);
+      for (typename std::vector<unsigned int>::const_iterator ii = intruders.begin (); ii != intruders.end (); ++ii) {
+        const std::pair<unsigned int, TI> &is = interactions.intruder_shape (*ii);
+        single_interactions.add_intruder_shape (*ii, is.first, is.second);
+        single_interactions.add_interaction (i->first, *ii);
+      }
+
+      do_compute_local (layout, single_interactions, results, max_vertex_count, area_ratio);
+
+      if (progress.get ()) {
+        ++*progress;
+      }
+
+    }
+
+  }
+}
+
+
+//  explicit instantiations
+template class DB_PUBLIC local_operation<db::Polygon, db::Polygon, db::Polygon>;
+template class DB_PUBLIC local_operation<db::Polygon, db::Polygon, db::Edge>;
+template class DB_PUBLIC local_operation<db::Polygon, db::Text, db::Polygon>;
+template class DB_PUBLIC local_operation<db::Polygon, db::Text, db::Text>;
+template class DB_PUBLIC local_operation<db::Polygon, db::Edge, db::Polygon>;
+template class DB_PUBLIC local_operation<db::Polygon, db::Edge, db::Edge>;
+template class DB_PUBLIC local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_operation<db::PolygonRef, db::Text, db::PolygonRef>;
+template class DB_PUBLIC local_operation<db::PolygonRef, db::TextRef, db::PolygonRef>;
+template class DB_PUBLIC local_operation<db::PolygonRef, db::TextRef, db::TextRef>;
+template class DB_PUBLIC local_operation<db::PolygonRef, db::Edge, db::PolygonRef>;
+template class DB_PUBLIC local_operation<db::PolygonRef, db::Edge, db::Edge>;
+template class DB_PUBLIC local_operation<db::PolygonRef, db::PolygonRef, db::EdgePair>;
+template class DB_PUBLIC local_operation<db::PolygonRef, db::PolygonRef, db::Edge>;
+template class DB_PUBLIC local_operation<db::Polygon, db::Polygon, db::EdgePair>;
+template class DB_PUBLIC local_operation<db::Polygon, db::TextRef, db::TextRef>;
+template class DB_PUBLIC local_operation<db::Edge, db::Edge, db::Edge>;
+template class DB_PUBLIC local_operation<db::Edge, db::PolygonRef, db::Edge>;
+template class DB_PUBLIC local_operation<db::Edge, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_operation<db::Edge, db::Edge, db::EdgePair>;
+template class DB_PUBLIC local_operation<db::TextRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_operation<db::TextRef, db::PolygonRef, db::TextRef>;
 
 // ---------------------------------------------------------------------------------------------
 //  BoolAndOrNotLocalOperation implementation
@@ -46,7 +120,7 @@ BoolAndOrNotLocalOperation::BoolAndOrNotLocalOperation (bool is_and)
   //  .. nothing yet ..
 }
 
-local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>::on_empty_intruder_mode
+OnEmptyIntruderHint
 BoolAndOrNotLocalOperation::on_empty_intruder_hint () const
 {
   return m_is_and ? Drop : Copy;
@@ -59,8 +133,11 @@ BoolAndOrNotLocalOperation::description () const
 }
 
 void
-BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t max_vertex_count, double area_ratio) const
+BoolAndOrNotLocalOperation::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
 {
+  tl_assert (results.size () == 1);
+  std::unordered_set<db::PolygonRef> &result = results.front ();
+
   db::EdgeProcessor ep;
 
   size_t p1 = 0, p2 = 1;
@@ -68,7 +145,7 @@ BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const shape_inter
   std::set<db::PolygonRef> others;
   for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
     for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-      others.insert (interactions.intruder_shape (*j));
+      others.insert (interactions.intruder_shape (*j).second);
     }
   }
 
@@ -113,6 +190,86 @@ BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const shape_inter
 }
 
 // ---------------------------------------------------------------------------------------------
+//  TwoBoolAndNotLocalOperation implementation
+
+TwoBoolAndNotLocalOperation::TwoBoolAndNotLocalOperation ()
+  : db::local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> ()
+{
+  //  .. nothing yet ..
+}
+
+void
+TwoBoolAndNotLocalOperation::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  tl_assert (results.size () == 2);
+
+  db::EdgeProcessor ep;
+
+  std::unordered_set<db::PolygonRef> &result0 = results [0];
+  std::unordered_set<db::PolygonRef> &result1 = results [1];
+
+  size_t p1 = 0, p2 = 1;
+
+  std::set<db::PolygonRef> others;
+  for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+      others.insert (interactions.intruder_shape (*j).second);
+    }
+  }
+
+  for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+
+    const db::PolygonRef &subject = interactions.subject_shape (i->first);
+    if (others.find (subject) != others.end ()) {
+      result0.insert (subject);
+    } else if (i->second.empty ()) {
+      //  shortcut (not: keep, and: drop)
+      result1.insert (subject);
+    } else {
+      for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+        ep.insert (*e, p1);
+      }
+      p1 += 2;
+    }
+
+  }
+
+  if (! others.empty () || p1 > 0) {
+
+    for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
+      for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
+        ep.insert (*e, p2);
+      }
+      p2 += 2;
+    }
+
+    db::BooleanOp op0 (db::BooleanOp::And);
+    db::PolygonRefGenerator pr0 (layout, result0);
+    db::PolygonSplitter splitter0 (pr0, area_ratio, max_vertex_count);
+    db::PolygonGenerator pg0 (splitter0, true, true);
+
+    db::BooleanOp op1 (db::BooleanOp::ANotB);
+    db::PolygonRefGenerator pr1 (layout, result1);
+    db::PolygonSplitter splitter1 (pr1, area_ratio, max_vertex_count);
+    db::PolygonGenerator pg1 (splitter1, true, true);
+
+    ep.set_base_verbosity (50);
+
+    std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > procs;
+    procs.push_back (std::make_pair (&pg0, &op0));
+    procs.push_back (std::make_pair (&pg1, &op1));
+    ep.process (procs);
+
+  }
+
+}
+
+std::string TwoBoolAndNotLocalOperation::description () const
+{
+  return tl::to_string (tr ("ANDNOT operation"));
+}
+
+// ---------------------------------------------------------------------------------------------
 
 SelfOverlapMergeLocalOperation::SelfOverlapMergeLocalOperation (unsigned int wrap_count)
   : m_wrap_count (wrap_count)
@@ -120,8 +277,12 @@ SelfOverlapMergeLocalOperation::SelfOverlapMergeLocalOperation (unsigned int wra
   //  .. nothing yet ..
 }
 
-void SelfOverlapMergeLocalOperation::compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+void
+SelfOverlapMergeLocalOperation::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
+  tl_assert (results.size () == 1);
+  std::unordered_set<db::PolygonRef> &result = results.front ();
+
   if (m_wrap_count == 0) {
     return;
   }
@@ -147,7 +308,7 @@ void SelfOverlapMergeLocalOperation::compute_local (db::Layout *layout, const sh
       //  set does not take care to list just one copy of the same item on the intruder side.
       if (seen.find (*o) == seen.end ()) {
         seen.insert (*o);
-        const db::PolygonRef &intruder = interactions.intruder_shape (*o);
+        const db::PolygonRef &intruder = interactions.intruder_shape (*o).second;
         for (db::PolygonRef::polygon_edge_iterator e = intruder.begin_edge (); ! e.at_end(); ++e) {
           ep.insert (*e, p2);
         }
@@ -164,7 +325,7 @@ void SelfOverlapMergeLocalOperation::compute_local (db::Layout *layout, const sh
   ep.process (pg, op);
 }
 
-SelfOverlapMergeLocalOperation::on_empty_intruder_mode SelfOverlapMergeLocalOperation::on_empty_intruder_hint () const
+OnEmptyIntruderHint SelfOverlapMergeLocalOperation::on_empty_intruder_hint () const
 {
   return m_wrap_count > 1 ? Drop : Copy;
 }
@@ -183,7 +344,7 @@ EdgeBoolAndOrNotLocalOperation::EdgeBoolAndOrNotLocalOperation (EdgeBoolOp op)
   //  .. nothing yet ..
 }
 
-local_operation<db::Edge, db::Edge, db::Edge>::on_empty_intruder_mode
+OnEmptyIntruderHint
 EdgeBoolAndOrNotLocalOperation::on_empty_intruder_hint () const
 {
   return (m_op == EdgeAnd || m_op == EdgeIntersections) ? Drop : Copy;
@@ -204,8 +365,11 @@ EdgeBoolAndOrNotLocalOperation::description () const
 }
 
 void
-EdgeBoolAndOrNotLocalOperation::compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+EdgeBoolAndOrNotLocalOperation::do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
+  tl_assert (results.size () == 1);
+  std::unordered_set<db::Edge> &result = results.front ();
+
   EdgeBooleanClusterCollector<std::unordered_set<db::Edge> > cluster_collector (&result, m_op);
 
   db::box_scanner<db::Edge, size_t> scanner;
@@ -213,7 +377,7 @@ EdgeBoolAndOrNotLocalOperation::compute_local (db::Layout * /*layout*/, const sh
   std::set<db::Edge> others;
   for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
     for (shape_interactions<db::Edge, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-      others.insert (interactions.intruder_shape (*j));
+      others.insert (interactions.intruder_shape (*j).second);
     }
   }
 
@@ -259,7 +423,7 @@ EdgeToPolygonLocalOperation::EdgeToPolygonLocalOperation (bool outside, bool inc
   //  .. nothing yet ..
 }
 
-local_operation<db::Edge, db::PolygonRef, db::Edge>::on_empty_intruder_mode
+OnEmptyIntruderHint
 EdgeToPolygonLocalOperation::on_empty_intruder_hint () const
 {
   return m_outside ? Copy : Drop;
@@ -272,14 +436,17 @@ EdgeToPolygonLocalOperation::description () const
 }
 
 void
-EdgeToPolygonLocalOperation::compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+EdgeToPolygonLocalOperation::do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
+  tl_assert (results.size () == 1);
+  std::unordered_set<db::Edge> &result = results.front ();
+
   db::EdgeProcessor ep;
 
   std::set<db::PolygonRef> others;
   for (shape_interactions<db::Edge, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
     for (shape_interactions<db::Edge, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-      others.insert (interactions.intruder_shape (*j));
+      others.insert (interactions.intruder_shape (*j).second);
     }
   }
 

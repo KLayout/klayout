@@ -1,0 +1,35 @@
+
+# shielded/transparent
+
+source($drc_test_source, "TOP")
+target($drc_test_target)
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+
+l1.space(3.0, transparent, projection).output(100, 0)
+l1.space(3.0, shielded, projection).output(101, 0)
+# NOTE: for two-layer checks, the *second* layer
+# shields, but not the first one
+l2.separation(l1, 3.0, transparent, projection).output(110, 0)
+l2.separation(l1, 3.0, shielded, projection).output(111, 0)
+l1.separation(l2, 3.0, transparent, projection).output(120, 0)
+l1.separation(l2, 3.0, shielded, projection).output(121, 0)
+
+#deep 
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+l1.space(3.0, transparent, projection).output(200, 0)
+l1.space(3.0, shielded, projection).output(201, 0)
+# NOTE: for two-layer checks, the *second* layer
+# shields, but not the first one
+l2.separation(l1, 3.0, transparent, projection).output(210, 0)
+l2.separation(l1, 3.0, shielded, projection).output(211, 0)
+l1.separation(l2, 3.0, transparent, projection).output(220, 0)
+l1.separation(l2, 3.0, shielded, projection).output(221, 0)
+

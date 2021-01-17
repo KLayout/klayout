@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "dbShape.h"
 #include "dbRecursiveShapeIterator.h"
 #include "dbShapeCollection.h"
+#include "dbGenericShapeIterator.h"
 
 #include <list>
 
@@ -47,20 +48,16 @@ class TransformationReducer;
  *
  *  The iterator delivers the texts of the text set
  */
+
 class DB_PUBLIC TextsIterator
+  : public generic_shape_iterator<db::Text>
 {
 public:
-  typedef TextsIteratorDelegate::value_type value_type;
-  typedef const value_type &reference;
-  typedef const value_type *pointer;
-  typedef std::forward_iterator_tag iterator_category;
-  typedef void difference_type;
-
   /**
    *  @brief Default constructor
    */
   TextsIterator ()
-    : mp_delegate (0)
+    : generic_shape_iterator<db::Text> ()
   {
     //  .. nothing yet ..
   }
@@ -70,27 +67,18 @@ public:
    *  The iterator will take ownership over the delegate
    */
   TextsIterator (TextsIteratorDelegate *delegate)
-    : mp_delegate (delegate)
+    : generic_shape_iterator<db::Text> (delegate)
   {
     //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Destructor
-   */
-  ~TextsIterator ()
-  {
-    delete mp_delegate;
-    mp_delegate = 0;
   }
 
   /**
    *  @brief Copy constructor and assignment
    */
   TextsIterator (const TextsIterator &other)
-    : mp_delegate (0)
+    : generic_shape_iterator<db::Text> (static_cast<const generic_shape_iterator<db::Text> &> (other))
   {
-    operator= (other);
+    //  .. nothing yet ..
   }
 
   /**
@@ -98,19 +86,8 @@ public:
    */
   TextsIterator &operator= (const TextsIterator &other)
   {
-    if (this != &other) {
-      delete mp_delegate;
-      mp_delegate = other.mp_delegate ? other.mp_delegate->clone () : 0;
-    }
+    generic_shape_iterator<db::Text>::operator= (other);
     return *this;
-  }
-
-  /**
-   *  @Returns true, if the iterator is at the end
-   */
-  bool at_end () const
-  {
-    return mp_delegate == 0 || mp_delegate->at_end ();
   }
 
   /**
@@ -118,88 +95,12 @@ public:
    */
   TextsIterator &operator++ ()
   {
-    if (mp_delegate) {
-      mp_delegate->increment ();
-    }
+    generic_shape_iterator<db::Text>::operator++ ();
     return *this;
   }
-
-  /**
-   *  @brief Access
-   */
-  reference operator* () const
-  {
-    const value_type *value = operator-> ();
-    tl_assert (value != 0);
-    return *value;
-  }
-
-  /**
-   *  @brief Access
-   */
-  pointer operator-> () const
-  {
-    return mp_delegate ? mp_delegate->get () : 0;
-  }
-
-private:
-  TextsIteratorDelegate *mp_delegate;
 };
 
-/**
- *  @brief A helper class allowing delivery of addressable texts
- *
- *  In some applications (i.e. box scanner), texts need to be taken
- *  by address. The text set cannot always deliver adressable edges.
- *  This class help providing this ability by keeping a temporary copy
- *  if required.
- */
-
-class DB_PUBLIC AddressableTextDelivery
-{
-public:
-  AddressableTextDelivery ()
-    : m_iter (), m_valid (false)
-  {
-    //  .. nothing yet ..
-  }
-
-  AddressableTextDelivery (const TextsIterator &iter, bool valid)
-    : m_iter (iter), m_valid (valid)
-  {
-    if (! m_valid && ! m_iter.at_end ()) {
-      m_heap.push_back (*m_iter);
-    }
-  }
-
-  bool at_end () const
-  {
-    return m_iter.at_end ();
-  }
-
-  AddressableTextDelivery &operator++ ()
-  {
-    ++m_iter;
-    if (! m_valid && ! m_iter.at_end ()) {
-      m_heap.push_back (*m_iter);
-    }
-    return *this;
-  }
-
-  const db::Text *operator-> () const
-  {
-    if (m_valid) {
-      return m_iter.operator-> ();
-    } else {
-      return &m_heap.back ();
-    }
-  }
-
-private:
-  TextsIterator m_iter;
-  bool m_valid;
-  std::list<db::Text> m_heap;
-};
+typedef addressable_shape_delivery_gen<TextsIterator> AddressableTextDelivery;
 
 class Texts;
 
@@ -397,11 +298,19 @@ public:
   }
 
   /**
-   *  @brief Returns the number of texts in the text set
+   *  @brief Returns the number of (flat) texts in the text set
    */
-  size_t size () const
+  size_t count () const
   {
-    return mp_delegate->size ();
+    return mp_delegate->count ();
+  }
+
+  /**
+   *  @brief Returns the number of (hierarchical) texts in the text set
+   */
+  size_t hier_count () const
+  {
+    return mp_delegate->hier_count ();
   }
 
   /**

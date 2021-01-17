@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -30,13 +30,10 @@ namespace db
 // -----------------------------------------------------------------------------------
 //  CornerDetectorCore implementation
 
-CornerDetectorCore::CornerDetectorCore (double angle_start, double angle_end)
+CornerDetectorCore::CornerDetectorCore (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end)
+  : m_checker (angle_start, include_angle_start, angle_end, include_angle_end)
 {
-  m_t_start = db::CplxTrans(1.0, angle_start, false, db::DVector ());
-  m_t_end = db::CplxTrans(1.0, angle_end, false, db::DVector ());
-
-  m_big_angle = (angle_end - angle_start + db::epsilon) > 180.0;
-  m_all = (angle_end - angle_start - db::epsilon) > 360.0;
+  //  .. nothing yet ..
 }
 
 void CornerDetectorCore::detect_corners (const db::Polygon &poly, const CornerPointDelivery &delivery) const
@@ -54,27 +51,8 @@ void CornerDetectorCore::detect_corners (const db::Polygon &poly, const CornerPo
 
         db::Point pn = ctr [j];
 
-        if (m_all) {
+        if (m_checker (pt - pp, pn - pt)) {
           delivery.make_point (pt);
-        } else {
-
-          db::Vector vin (pt - pp);
-          db::DVector vout (pn - pt);
-
-          db::DVector v1 = m_t_start * vin;
-          db::DVector v2 = m_t_end * vin;
-
-          bool vp1 = db::vprod_sign (v1, vout) >= 0;
-          bool vp2 = db::vprod_sign (v2, vout) <= 0;
-
-          if (m_big_angle && (vp1 || vp2)) {
-            delivery.make_point (pt);
-          } else if (! m_big_angle && vp1 && vp2) {
-            if (db::sprod_sign (v1, vout) > 0 && db::sprod_sign (v2, vout) > 0) {
-              delivery.make_point (pt);
-            }
-          }
-
         }
 
         pp = pt;
@@ -84,6 +62,17 @@ void CornerDetectorCore::detect_corners (const db::Polygon &poly, const CornerPo
 
     }
 
+  }
+}
+
+// -----------------------------------------------------------------------------------
+//  Extents implementation
+
+void Extents::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
+{
+  db::Box b = poly.box ();
+  if (! b.empty ()) {
+    result.push_back (db::Polygon (b));
   }
 }
 
@@ -105,7 +94,7 @@ void RelativeExtents::process (const db::Polygon &poly, std::vector<db::Polygon>
 
 const TransformationReducer *RelativeExtents::vars () const
 {
-  if (m_dx == 0 && m_dy == 0 && fabs (m_fx1) < db::epsilon && fabs (m_fy1) < db::epsilon && fabs (m_fx2) < db::epsilon && fabs (m_fy2) < db::epsilon) {
+  if (m_dx == 0 && m_dy == 0 && fabs (m_fx1) < db::epsilon && fabs (m_fy1) < db::epsilon && fabs (1.0 - m_fx2) < db::epsilon && fabs (1.0 - m_fy2) < db::epsilon) {
     return 0;
   } else if (m_dx == m_dy && fabs (m_fx1 - m_fy1) < db::epsilon && fabs (1.0 - (m_fx1 + m_fx2)) < db::epsilon  && fabs (m_fx2 - m_fy2) < db::epsilon && fabs (1.0 - (m_fy1 + m_fy2)) < db::epsilon) {
     return & m_isotropic_reducer;
@@ -136,6 +125,16 @@ bool RelativeExtentsAsEdges::result_must_not_be_merged () const
 {
   //  don't merge if the results will just be points
   return (fabs (m_fx1 - m_fx2) < db::epsilon && fabs (m_fy1 - m_fy2) < db::epsilon);
+}
+
+// -----------------------------------------------------------------------------------
+//  PolygonToEdgeProcessor implementation
+
+void PolygonToEdgeProcessor::process (const db::Polygon &poly, std::vector<db::Edge> &result) const
+{
+  for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
+    result.push_back (*e);
+  }
 }
 
 // -----------------------------------------------------------------------------------
@@ -179,6 +178,37 @@ void PolygonBreaker::process (const db::Polygon &poly, std::vector<db::Polygon> 
   } else {
     result.push_back (poly);
   }
+}
+
+// -----------------------------------------------------------------------------------
+//  PolygonSizer implementation
+
+PolygonSizer::PolygonSizer (db::Coord dx, db::Coord dy, unsigned int mode)
+  : m_dx (dx), m_dy (dy), m_mode (mode)
+{
+  if (dx == dy) {
+    m_vars = new db::MagnificationReducer ();
+  } else {
+    m_vars = new db::XYAnisotropyAndMagnificationReducer ();
+  }
+}
+
+PolygonSizer::~PolygonSizer ()
+{
+  delete m_vars;
+}
+
+void PolygonSizer::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
+{
+  db::PolygonContainer pr (result);
+  db::PolygonGenerator pg2 (pr, false /*don't resolve holes*/, true /*min. coherence*/);
+  db::SizingPolygonFilter siz (pg2, m_dx, m_dy, m_mode);
+  siz.put (poly);
+}
+
+bool PolygonSizer::result_is_merged () const
+{
+  return (m_dx < 0 && m_dy < 0);
 }
 
 }

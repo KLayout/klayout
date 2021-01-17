@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -24,10 +24,13 @@
 #define HDR_dbEdgesUtils
 
 #include "dbCommon.h"
+#include "dbHash.h"
 #include "dbEdges.h"
 #include "dbBoxScanner.h"
 #include "dbPolygonTools.h"
 #include "tlSelect.h"
+
+#include <unordered_set>
 
 namespace db {
 
@@ -65,12 +68,19 @@ struct DB_PUBLIC EdgeLengthFilter
    */
   virtual bool selected (const db::Edge &edge) const
   {
-    length_type l = edge.length ();
-    if (! m_inverse) {
-      return l >= m_lmin && l < m_lmax;
-    } else {
-      return ! (l >= m_lmin && l < m_lmax);
+    return check (edge.length ());
+  }
+
+  /**
+   *  @brief Returns true if the total edge length matches the criterion
+   */
+  bool selected (const std::unordered_set<db::Edge> &edges) const
+  {
+    length_type l = 0;
+    for (std::unordered_set<db::Edge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
+      l += e->length ();
     }
+    return check (l);
   }
 
   /**
@@ -101,6 +111,50 @@ private:
   length_type m_lmin, m_lmax;
   bool m_inverse;
   db::MagnificationReducer m_vars;
+
+  virtual bool check (length_type l) const
+  {
+    if (! m_inverse) {
+      return l >= m_lmin && l < m_lmax;
+    } else {
+      return ! (l >= m_lmin && l < m_lmax);
+    }
+  }
+};
+
+/**
+ *  @brief An angle detector
+ *
+ *  This detector can check whether the angle between two edges is within a certain angle interval.
+ *  It takes two edges: a and b. If b "turns left" (b following a), the angle will be positive, if it "turns" right,
+ *  the angle will be negative. The angle can be between -180 and 180 degree. The case of reflection
+ *  (exactly 180 degree) is not considered.
+ *
+ *  The constraint can be given in terms of a minimum and maximum angle. "include" specifies whether the
+ *  angle value itself is included. The operator() will return true, if the angle between the given
+ *  edges a and b in matching the constraint.
+ */
+class DB_PUBLIC EdgeAngleChecker
+{
+public:
+  EdgeAngleChecker (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end);
+
+  bool operator() (const db::Edge &a, const db::Edge &b) const
+  {
+    return m_all || check (a.d (), b.d ());
+  }
+
+  bool operator() (const db::Vector &a, const db::Vector &b) const
+  {
+    return m_all || check (a, b);
+  }
+
+private:
+  db::CplxTrans m_t_start, m_t_end;
+  bool m_include_start, m_include_end;
+  bool m_big_angle, m_all;
+
+  bool check (const db::Vector &a, const db::Vector &b) const;
 };
 
 /**
@@ -126,12 +180,7 @@ struct DB_PUBLIC EdgeOrientationFilter
    *  This filter will filter out all edges whose angle against x axis
    *  is larger or equal to amin and less than amax.
    */
-  EdgeOrientationFilter (double amin, double amax, bool inverse)
-    : m_inverse (inverse), m_exact (false)
-  {
-    m_emin = db::DVector (cos (amin * M_PI / 180.0), sin (amin * M_PI / 180.0));
-    m_emax = db::DVector (cos (amax * M_PI / 180.0), sin (amax * M_PI / 180.0));
-  }
+  EdgeOrientationFilter (double amin, bool include_amin, double amax, bool include_amax, bool inverse);
 
   /**
    *  @brief Constructor
@@ -142,32 +191,24 @@ struct DB_PUBLIC EdgeOrientationFilter
    *  This filter will filter out all edges whose angle against x axis
    *  is equal to a.
    */
-  EdgeOrientationFilter (double a, bool inverse)
-    : m_inverse (inverse), m_exact (true)
-  {
-    m_emin = db::DVector (cos (a * M_PI / 180.0), sin (a * M_PI / 180.0));
-  }
+  EdgeOrientationFilter (double a, bool inverse);
 
   /**
    *  @brief Returns true if the edge orientation matches the criterion
    */
-  virtual bool selected (const db::Edge &edge) const
+  virtual bool selected (const db::Edge &edge) const;
+
+  /**
+   *  @brief Returns true if all edge orientations match the criterion
+   */
+  virtual bool selected (const std::unordered_set<db::Edge> &edges) const
   {
-    int smin = db::vprod_sign (m_emin, db::DVector (edge.d ()));
-    if (m_exact) {
-      if (! m_inverse) {
-        return smin == 0;
-      } else {
-        return smin != 0;
-      }
-    } else {
-      int smax = db::vprod_sign (m_emax, db::DVector (edge.d ()));
-      if (! m_inverse) {
-        return (smin >= 0 && smax < 0) || (smax > 0 && smin <= 0);
-      } else {
-        return ! ((smin >= 0 && smax < 0) || (smax > 0 && smin <= 0));
+    for (std::unordered_set<db::Edge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
+      if (! selected (*e)) {
+        return false;
       }
     }
+    return true;
   }
 
   /**
@@ -197,8 +238,8 @@ struct DB_PUBLIC EdgeOrientationFilter
 private:
   db::DVector m_emin, m_emax;
   bool m_inverse;
-  bool m_exact;
   db::MagnificationAndOrientationReducer m_vars;
+  EdgeAngleChecker m_checker;
 };
 
 /**
@@ -335,6 +376,55 @@ private:
  *  @brief Implements the extension algorithm to turn an edge into a polygon
  */
 db::Polygon extended_edge (const db::Edge &edge, db::Coord ext_b, db::Coord ext_e, db::Coord ext_o, db::Coord ext_i);
+
+/**
+ *  @brief Wraps the extension algorithm into a edge to polygon processor
+ */
+class DB_PUBLIC ExtendedEdgeProcessor
+  : public db::EdgeToPolygonProcessorBase
+{
+public:
+  ExtendedEdgeProcessor (db::Coord e)
+    : m_ext_b (e), m_ext_e (e), m_ext_o (e), m_ext_i (e)
+  { }
+
+  ExtendedEdgeProcessor (db::Coord ext_b, db::Coord ext_e, db::Coord ext_o, db::Coord ext_i)
+    : m_ext_b (ext_b), m_ext_e (ext_e), m_ext_o (ext_o), m_ext_i (ext_i)
+  { }
+
+  virtual void process (const Edge &edge, std::vector<db::Polygon> &res) const
+  {
+    res.push_back (extended_edge (edge, m_ext_b, m_ext_e, m_ext_o, m_ext_i));
+  }
+
+private:
+  db::Coord m_ext_b, m_ext_e, m_ext_o, m_ext_i;
+};
+
+/**
+ * @brief The EdgeSegmentSelector class
+ */
+class DB_PUBLIC EdgeSegmentSelector
+  : public EdgeProcessorBase
+{
+public:
+  EdgeSegmentSelector (int mode, db::Edges::length_type length, double fraction);
+  ~EdgeSegmentSelector ();
+
+  virtual void process (const db::Edge &edge, std::vector<db::Edge> &res) const;
+
+  virtual const TransformationReducer *vars () const { return &m_vars; }
+  virtual bool result_is_merged () const { return false; }
+  virtual bool requires_raw_input () const { return false; }
+  virtual bool result_must_not_be_merged () const { return m_length <= 0; }
+  virtual bool wants_variants () const { return true; }
+
+private:
+  int m_mode;
+  db::Edges::length_type m_length;
+  double m_fraction;
+  db::MagnificationReducer m_vars;
+};
 
 } // namespace db
 

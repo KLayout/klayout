@@ -1,0 +1,46 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+
+# space
+l1.drc(space(projection) < 1.0).polygons.output(100, 0)
+
+# further options for DRC functions
+l1.drc(space(euclidian) < 1.0).polygons.output(110, 0)
+l1.drc(space(projection, projection_limits(0..2.0)) < 1.0).polygons.output(111, 0)
+l1.drc(space(projection, whole_edges) < 1.0).polygons.output(112, 0)
+l1.drc(space(projection, only_opposite) < 1.0).output(113, 0)
+l1.drc(space(projection, not_opposite) < 1.0).output(114, 0)
+
+# notch
+l1.drc(notch(projection) <= 1.0).polygons.output(120, 0)
+
+# separation + flavours
+l1.drc(separation(l2, projection) < 1.0).polygons.output(130, 0)
+l1.drc(separation(secondary(l2), projection) < 1.0).polygons.output(131, 0)
+l1.drc(separation(projection, l2) < 1.0).polygons.output(132, 0)
+l1.drc(sep(projection, l2) < 1.0).polygons.output(133, 0)
+
+# isolation
+l1.drc(isolated(euclidian) < 1.0).polygons.output(140, 0)
+l1.drc(isolated(projection, projection_limits(0..2.0)) < 1.0).polygons.output(141, 0)
+l1.drc(isolated(projection, whole_edges) < 1.0).polygons.output(142, 0)
+l1.drc(isolated(projection, only_opposite) < 1.0).output(143, 0)
+l1.drc(isolated(projection, not_opposite) < 1.0).output(144, 0)
+
+# enclosing, overlap
+l2.drc(enclosing(l1, projection) < 1.0).polygons.output(150, 0)
+l1.drc(overlap(l2, projection) < 2.0).polygons.output(151, 0)
+

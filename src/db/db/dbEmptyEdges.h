@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -50,18 +50,19 @@ public:
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_merged_iter () const { return std::make_pair (db::RecursiveShapeIterator (), db::ICplxTrans ()); }
 
   virtual bool empty () const { return true; }
-  virtual size_t size () const { return 0; }
+  virtual size_t count () const { return 0; }
+  virtual size_t hier_count () const { return 0; }
   virtual std::string to_string (size_t) const { return std::string (); }
   virtual bool is_merged () const { return true; }
   virtual distance_type length (const db::Box &) const { return 0; }
   virtual Box bbox () const { return db::Box (); }
 
-  virtual EdgePairsDelegate *width_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
-  virtual EdgePairsDelegate *space_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
-  virtual EdgePairsDelegate *enclosing_check (const Edges &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
-  virtual EdgePairsDelegate *overlap_check (const Edges &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
-  virtual EdgePairsDelegate *separation_check (const Edges &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
-  virtual EdgePairsDelegate *inside_check (const Edges &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
+  virtual EdgePairsDelegate *width_check (db::Coord, const db::EdgesCheckOptions &) const;
+  virtual EdgePairsDelegate *space_check (db::Coord, const db::EdgesCheckOptions &) const;
+  virtual EdgePairsDelegate *enclosing_check (const Edges &, db::Coord, const db::EdgesCheckOptions &) const;
+  virtual EdgePairsDelegate *overlap_check (const Edges &, db::Coord, const db::EdgesCheckOptions &) const;
+  virtual EdgePairsDelegate *separation_check (const Edges &, db::Coord, const db::EdgesCheckOptions &) const;
+  virtual EdgePairsDelegate *inside_check (const Edges &, db::Coord, const db::EdgesCheckOptions &) const;
 
   virtual EdgesDelegate *filter_in_place (const EdgeFilterBase &) { return this; }
   virtual EdgesDelegate *filtered (const EdgeFilterBase &) const { return new EmptyEdges (); }

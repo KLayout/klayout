@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -464,6 +464,23 @@ void DB_PUBLIC smooth_contour (db::Polygon::polygon_contour_iterator from, db::P
  *  @brief Smooth a polygon (apply smoothing to the whole polygon)
  */
 db::Polygon DB_PUBLIC smooth (const db::Polygon &poly, db::Coord d);
+
+/**
+ *  @brief Returns a value indicating whether the polygon is an "strange polygon"
+ *  "strange polygons" are ones which are non-orientable or have self-overlaps, e.g. their wrap
+ *  count after orientation normalization is not 0 or 1.
+ *  If "error_parts" is given it will receive markers indicating the parts which violate
+ *  this wrap count condition.
+ */
+bool DB_PUBLIC is_strange_polygon (const db::Polygon &poly, std::vector<db::Polygon> *error_parts = 0);
+
+/**
+ *  @brief Returns a value indicating whether the polygon is "non-orientable"
+ *  Such polygons contain loops which cannot be oriented, e.g. "8"-type loops.
+ *  If "error_parts" is given it will receive markers indicating the parts which are
+ *  non-orientable.
+ */
+bool DB_PUBLIC is_non_orientable_polygon (const db::Polygon &poly, std::vector<db::Polygon> *error_parts = 0);
 
 /**
  *  @brief A area collector

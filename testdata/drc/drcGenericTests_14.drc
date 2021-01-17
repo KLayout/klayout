@@ -1,0 +1,36 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+
+ar = 4.0/3.0   # "L" shape
+l1.drc(area_ratio == ar).output(100, 0)
+l1.drc(primary.area_ratio != ar).output(101, 0)
+l1.drc(primary.area_ratio > ar).output(102, 0)
+l1.drc(primary.area_ratio < ar).output(103, 0)
+
+l1.drc(squares).output(110, 0)
+l1.drc(! primary.squares).output(111, 0)
+
+l2.drc(bbox_aspect_ratio == 2).output(120, 0)
+l2.drc(bbox_aspect_ratio == 1).output(121, 0)
+l2.drc(bbox_aspect_ratio <= 1).output(122, 0)
+l2.drc(bbox_aspect_ratio > 2).output(123, 0)
+
+l2.drc(relative_height == 2).output(130, 0)
+l2.drc(relative_height == 1).output(131, 0)
+l2.drc(relative_height <= 1).output(132, 0)
+l2.drc(relative_height > 2).output(133, 0)
+
+

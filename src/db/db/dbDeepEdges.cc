@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -37,17 +37,21 @@
 #include "dbHierProcessor.h"
 #include "dbEmptyEdges.h"
 
+#include <unordered_set>
+
 namespace db
 {
 
 /**
- *  @brief An iterator delegate for the deep edge collection
+ *  @brief An iterator delegate for the deep region
  *  TODO: this is kind of redundant with OriginalLayerIterator ..
  */
 class DB_PUBLIC DeepEdgesIterator
   : public EdgesIteratorDelegate
 {
 public:
+  typedef db::Edge value_type;
+
   DeepEdgesIterator (const db::RecursiveShapeIterator &iter)
     : m_iter (iter)
   {
@@ -67,9 +71,20 @@ public:
     set ();
   }
 
+  virtual bool is_addressable() const
+  {
+    return false;
+  }
+
   virtual const value_type *get () const
   {
     return &m_edge;
+  }
+
+  virtual bool equals (const generic_shape_iterator_delegate_base<value_type> *other) const
+  {
+    const DeepEdgesIterator *o = dynamic_cast<const DeepEdgesIterator *> (other);
+    return o && o->m_iter == m_iter;
   }
 
   virtual EdgesIteratorDelegate *clone () const
@@ -77,8 +92,20 @@ public:
     return new DeepEdgesIterator (*this);
   }
 
+  virtual void do_reset (const db::Box &region, bool overlapping)
+  {
+    m_iter.set_region (region);
+    m_iter.set_overlapping (overlapping);
+    set ();
+  }
+
+  virtual db::Box bbox () const
+  {
+    return m_iter.bbox ();
+  }
+
 private:
-  friend class Edges;
+  friend class Texts;
 
   db::RecursiveShapeIterator m_iter;
   mutable value_type m_edge;
@@ -460,7 +487,7 @@ DeepEdges::insert_into (db::Layout *layout, db::cell_index_type into_cell, unsig
   deep_layer ().insert_into (layout, into_cell, into_layer);
 }
 
-size_t DeepEdges::size () const
+size_t DeepEdges::count () const
 {
   size_t n = 0;
 
@@ -468,6 +495,18 @@ size_t DeepEdges::size () const
   db::CellCounter cc (&layout);
   for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
     n += cc.weight (*c) * layout.cell (*c).shapes (deep_layer ().layer ()).size ();
+  }
+
+  return n;
+}
+
+size_t DeepEdges::hier_count () const
+{
+  size_t n = 0;
+
+  const db::Layout &layout = deep_layer ().layout ();
+  for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
+    n += layout.cell (*c).shapes (deep_layer ().layer ()).size ();
   }
 
   return n;
@@ -1041,14 +1080,17 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
+    tl_assert (results.size () == 1);
+    std::unordered_set<db::Edge> &result = results.front ();
+
     db::box_scanner<db::Edge, size_t> scanner;
 
     std::set<db::Edge> others;
     for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       for (shape_interactions<db::Edge, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        others.insert (interactions.intruder_shape (*j));
+        others.insert (interactions.intruder_shape (*j).second);
       }
     }
 
@@ -1083,7 +1125,7 @@ public:
 
   }
 
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const
   {
     if (m_inverse) {
       return Copy;
@@ -1116,14 +1158,17 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
+    tl_assert (results.size () == 1);
+    std::unordered_set<db::Edge> &result = results.front ();
+
     db::box_scanner<db::Edge, size_t> scanner;
 
     std::set<db::Edge> others;
     for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       for (shape_interactions<db::Edge, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        others.insert (interactions.intruder_shape (*j));
+        others.insert (interactions.intruder_shape (*j).second);
       }
     }
 
@@ -1141,7 +1186,7 @@ public:
 
   }
 
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const
   {
     return Drop;
   }
@@ -1168,14 +1213,17 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
+    tl_assert (results.size () == 1);
+    std::unordered_set<db::Edge> &result = results.front ();
+
     db::box_scanner2<db::Edge, size_t, db::Polygon, size_t> scanner;
 
     std::set<db::PolygonRef> others;
     for (shape_interactions<db::Edge, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       for (shape_interactions<db::Edge, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        others.insert (interactions.intruder_shape (*j));
+        others.insert (interactions.intruder_shape (*j).second);
       }
     }
 
@@ -1211,7 +1259,7 @@ public:
     }
   }
 
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const
   {
     if (m_inverse) {
       return Copy;
@@ -1264,14 +1312,17 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
+    tl_assert (results.size () == 1);
+    std::unordered_set<db::PolygonRef> &result = results.front ();
+
     db::box_scanner2<db::Edge, size_t, db::Polygon, size_t> scanner;
 
     std::set<db::PolygonRef> others;
     for (shape_interactions<db::Edge, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       for (shape_interactions<db::Edge, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        others.insert (interactions.intruder_shape (*j));
+        others.insert (interactions.intruder_shape (*j).second);
       }
     }
 
@@ -1291,7 +1342,7 @@ public:
     scanner.process (filter, 1, db::box_convert<db::Edge> (), db::box_convert<db::Polygon> ());
   }
 
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const
   {
     return Drop;
   }
@@ -1417,18 +1468,21 @@ EdgesDelegate *DeepEdges::in (const Edges &other, bool invert) const
 namespace
 {
 
-class CheckLocalOperation
+class EdgesCheckLocalOperation
   : public local_operation<db::Edge, db::Edge, db::EdgePair>
 {
 public:
-  CheckLocalOperation (const EdgeRelationFilter &check, bool has_other)
+  EdgesCheckLocalOperation (const EdgeRelationFilter &check, bool has_other)
     : m_check (check), m_has_other (has_other)
   {
     //  .. nothing yet ..
   }
 
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::unordered_set<db::EdgePair> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
+    tl_assert (results.size () == 1);
+    std::unordered_set<db::EdgePair> &result = results.front ();
+
     edge2edge_check_for_edges<std::unordered_set<db::EdgePair> > edge_check (m_check, result, m_has_other);
 
     db::box_scanner<db::Edge, size_t> scanner;
@@ -1438,7 +1492,7 @@ public:
 
       for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
         for (shape_interactions<db::Edge, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-          others.insert (interactions.intruder_shape (*j));
+          others.insert (interactions.intruder_shape (*j).second);
         }
       }
 
@@ -1460,7 +1514,7 @@ public:
       for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
         others.insert (interactions.subject_shape (i->first));
         for (shape_interactions<db::Edge, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-          others.insert (interactions.intruder_shape (*j));
+          others.insert (interactions.intruder_shape (*j).second);
         }
       }
 
@@ -1481,7 +1535,7 @@ public:
     return m_check.distance ();
   }
 
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const
   {
     return Drop;
   }
@@ -1499,28 +1553,28 @@ private:
 }
 
 EdgePairsDelegate *
-DeepEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+DeepEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, const db::EdgesCheckOptions &options) const
 {
   const db::DeepEdges *other_deep = 0;
   if (other) {
     other_deep = dynamic_cast<const db::DeepEdges *> (other->delegate ());
     if (! other_deep) {
-      return db::AsIfFlatEdges::run_check (rel, other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+      return db::AsIfFlatEdges::run_check (rel, other, d, options);
     }
   }
 
   const db::DeepLayer &edges = merged_deep_layer ();
 
-  EdgeRelationFilter check (rel, d, metrics);
+  EdgeRelationFilter check (rel, d, options.metrics);
   check.set_include_zero (false);
-  check.set_whole_edges (whole_edges);
-  check.set_ignore_angle (ignore_angle);
-  check.set_min_projection (min_projection);
-  check.set_max_projection (max_projection);
+  check.set_whole_edges (options.whole_edges);
+  check.set_ignore_angle (options.ignore_angle);
+  check.set_min_projection (options.min_projection);
+  check.set_max_projection (options.max_projection);
 
   std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (edges.derived ()));
 
-  db::CheckLocalOperation op (check, other_deep != 0);
+  db::EdgesCheckLocalOperation op (check, other_deep != 0);
 
   db::local_processor<db::Edge, db::Edge, db::EdgePair> proc (const_cast<db::Layout *> (&edges.layout ()),
                                                               const_cast<db::Cell *> (&edges.initial_cell ()),

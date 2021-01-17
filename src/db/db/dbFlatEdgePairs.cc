@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ namespace db
 //  FlatEdgePairs implementation
 
 FlatEdgePairs::FlatEdgePairs ()
-  : AsIfFlatEdgePairs (), m_edge_pairs (false)
+  : AsIfFlatEdgePairs (), mp_edge_pairs (new db::Shapes (false))
 {
   //  .. nothing yet ..
 }
@@ -43,13 +43,13 @@ FlatEdgePairs::~FlatEdgePairs ()
 }
 
 FlatEdgePairs::FlatEdgePairs (const FlatEdgePairs &other)
-  : AsIfFlatEdgePairs (other), m_edge_pairs (false)
+  : AsIfFlatEdgePairs (other), mp_edge_pairs (other.mp_edge_pairs)
 {
-  m_edge_pairs = other.m_edge_pairs;
+  //  .. nothing yet ..
 }
 
 FlatEdgePairs::FlatEdgePairs (const db::Shapes &edge_pairs)
-  : AsIfFlatEdgePairs (), m_edge_pairs (edge_pairs)
+  : AsIfFlatEdgePairs (), mp_edge_pairs (new db::Shapes (edge_pairs))
 {
   //  .. nothing yet ..
 }
@@ -61,51 +61,58 @@ void FlatEdgePairs::invalidate_cache ()
 
 void FlatEdgePairs::reserve (size_t n)
 {
-  m_edge_pairs.reserve (db::EdgePair::tag (), n);
+  mp_edge_pairs->reserve (db::EdgePair::tag (), n);
 }
 
 EdgePairsIteratorDelegate *FlatEdgePairs::begin () const
 {
-  return new FlatEdgePairsIterator (m_edge_pairs.get_layer<db::EdgePair, db::unstable_layer_tag> ().begin (), m_edge_pairs.get_layer<db::EdgePair, db::unstable_layer_tag> ().end ());
+  return new FlatEdgePairsIterator (mp_edge_pairs.get_const ());
 }
 
 std::pair<db::RecursiveShapeIterator, db::ICplxTrans> FlatEdgePairs::begin_iter () const
 {
-  return std::make_pair (db::RecursiveShapeIterator (m_edge_pairs), db::ICplxTrans ());
+  return std::make_pair (db::RecursiveShapeIterator (*mp_edge_pairs), db::ICplxTrans ());
 }
 
 bool FlatEdgePairs::empty () const
 {
-  return m_edge_pairs.empty ();
+  return mp_edge_pairs->empty ();
 }
 
-size_t FlatEdgePairs::size () const
+size_t FlatEdgePairs::count () const
 {
-  return m_edge_pairs.size ();
+  return mp_edge_pairs->size ();
+}
+
+size_t FlatEdgePairs::hier_count () const
+{
+  return mp_edge_pairs->size ();
 }
 
 Box FlatEdgePairs::compute_bbox () const
 {
-  m_edge_pairs.update_bbox ();
-  return m_edge_pairs.bbox ();
+  mp_edge_pairs->update_bbox ();
+  return mp_edge_pairs->bbox ();
 }
 
 EdgePairsDelegate *
 FlatEdgePairs::filter_in_place (const EdgePairFilterBase &filter)
 {
-  edge_pair_iterator_type pw = m_edge_pairs.get_layer<db::EdgePair, db::unstable_layer_tag> ().begin ();
+  db::Shapes &ep = *mp_edge_pairs;
+
+  edge_pair_iterator_type pw = ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().begin ();
   for (EdgePairsIterator p (begin ()); ! p.at_end (); ++p) {
     if (filter.selected (*p)) {
-      if (pw == m_edge_pairs.get_layer<db::EdgePair, db::unstable_layer_tag> ().end ()) {
-        m_edge_pairs.get_layer<db::EdgePair, db::unstable_layer_tag> ().insert (*p);
-        pw = m_edge_pairs.get_layer<db::EdgePair, db::unstable_layer_tag> ().end ();
+      if (pw == ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().end ()) {
+        ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().insert (*p);
+        pw = ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().end ();
       } else {
-        m_edge_pairs.get_layer<db::EdgePair, db::unstable_layer_tag> ().replace (pw++, *p);
+        ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().replace (pw++, *p);
       }
     }
   }
 
-  m_edge_pairs.get_layer<db::EdgePair, db::unstable_layer_tag> ().erase (pw, m_edge_pairs.get_layer<db::EdgePair, db::unstable_layer_tag> ().end ());
+  ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().erase (pw, ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().end ());
 
   return this;
 }
@@ -142,22 +149,24 @@ EdgePairsDelegate *FlatEdgePairs::add_in_place (const EdgePairs &other)
 {
   invalidate_cache ();
 
+  db::Shapes &ep = *mp_edge_pairs;
+
   FlatEdgePairs *other_flat = dynamic_cast<FlatEdgePairs *> (other.delegate ());
   if (other_flat) {
 
-    m_edge_pairs.insert (other_flat->raw_edge_pairs ().get_layer<db::EdgePair, db::unstable_layer_tag> ().begin (), other_flat->raw_edge_pairs ().get_layer<db::EdgePair, db::unstable_layer_tag> ().end ());
+    ep.insert (other_flat->raw_edge_pairs ().get_layer<db::EdgePair, db::unstable_layer_tag> ().begin (), other_flat->raw_edge_pairs ().get_layer<db::EdgePair, db::unstable_layer_tag> ().end ());
 
   } else {
 
-    size_t n = m_edge_pairs.size ();
+    size_t n = ep.size ();
     for (EdgePairsIterator p (other.begin ()); ! p.at_end (); ++p) {
       ++n;
     }
 
-    m_edge_pairs.reserve (db::EdgePair::tag (), n);
+    ep.reserve (db::EdgePair::tag (), n);
 
     for (EdgePairsIterator p (other.begin ()); ! p.at_end (); ++p) {
-      m_edge_pairs.insert (*p);
+      ep.insert (*p);
     }
 
   }
@@ -167,7 +176,7 @@ EdgePairsDelegate *FlatEdgePairs::add_in_place (const EdgePairs &other)
 
 const db::EdgePair *FlatEdgePairs::nth (size_t n) const
 {
-  return n < m_edge_pairs.size () ? &m_edge_pairs.get_layer<db::EdgePair, db::unstable_layer_tag> ().begin () [n] : 0;
+  return n < mp_edge_pairs->size () ? &mp_edge_pairs->get_layer<db::EdgePair, db::unstable_layer_tag> ().begin () [n] : 0;
 }
 
 bool FlatEdgePairs::has_valid_edge_pairs () const
@@ -192,13 +201,13 @@ FlatEdgePairs::insert_into_as_polygons (Layout *layout, db::cell_index_type into
 void
 FlatEdgePairs::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
-  layout->cell (into_cell).shapes (into_layer).insert (m_edge_pairs);
+  layout->cell (into_cell).shapes (into_layer).insert (*mp_edge_pairs);
 }
 
 void
 FlatEdgePairs::insert (const db::EdgePair &ep)
 {
-  m_edge_pairs.insert (ep);
+  mp_edge_pairs->insert (ep);
   invalidate_cache ();
 }
 

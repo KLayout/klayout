@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "dbCommon.h"
 #include "dbShapeCollection.h"
 #include "dbShapeCollectionUtils.h"
+#include "dbGenericShapeIterator.h"
 #include "dbText.h"
 
 namespace db {
@@ -41,22 +42,7 @@ class Layout;
 
 typedef shape_collection_processor<db::Text, db::Polygon> TextToPolygonProcessorBase;
 
-/**
- *  @brief The edge pair set iterator delegate
- */
-class DB_PUBLIC TextsIteratorDelegate
-{
-public:
-  TextsIteratorDelegate () { }
-  virtual ~TextsIteratorDelegate () { }
-
-  typedef db::Text value_type;
-
-  virtual bool at_end () const = 0;
-  virtual void increment () = 0;
-  virtual const value_type *get () const = 0;
-  virtual TextsIteratorDelegate *clone () const = 0;
-};
+typedef db::generic_shape_iterator_delegate_base <db::Text> TextsIteratorDelegate;
 
 /**
  *  @brief The delegate for the actual edge set implementation
@@ -95,7 +81,8 @@ public:
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const = 0;
 
   virtual bool empty () const = 0;
-  virtual size_t size () const = 0;
+  virtual size_t count () const = 0;
+  virtual size_t hier_count () const = 0;
 
   virtual Box bbox () const = 0;
 

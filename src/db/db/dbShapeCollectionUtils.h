@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 #include "dbCellVariants.h"
 #include "dbShapeCollection.h"
 #include "dbDeepShapeStore.h"
+#include "tlObject.h"
 
 #include <list>
 
@@ -44,6 +45,7 @@ namespace db {
  */
 template <class Shape, class Result>
 class DB_PUBLIC_TEMPLATE shape_collection_processor
+  : public tl::Object
 {
 public:
   /**
@@ -67,30 +69,30 @@ public:
    *  @brief Returns the transformation reducer for building cell variants
    *  This method may return 0. In this case, not cell variants are built.
    */
-  virtual const TransformationReducer *vars () const = 0;
+  virtual const TransformationReducer *vars () const { return 0; }
 
   /**
    *  @brief Returns true, if the result of this operation can be regarded "merged" always.
    */
-  virtual bool result_is_merged () const = 0;
+  virtual bool result_is_merged () const { return false; }
 
   /**
    *  @brief Returns true, if the result of this operation must not be merged.
    *  This feature can be used, if the result represents "degenerated" objects such
    *  as point-like edges. These must not be merged. Otherwise they disappear.
    */
-  virtual bool result_must_not_be_merged () const = 0;
+  virtual bool result_must_not_be_merged () const { return false; }
 
   /**
    *  @brief Returns true, if the processor wants raw (not merged) input
    */
-  virtual bool requires_raw_input () const = 0;
+  virtual bool requires_raw_input () const { return false; }
 
   /**
    *  @brief Returns true, if the processor wants to build variants
    *  If not true, the processor accepts shape propagation as variant resolution.
    */
-  virtual bool wants_variants () const = 0;
+  virtual bool wants_variants () const { return false; }
 };
 
 /**

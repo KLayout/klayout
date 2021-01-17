@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ namespace db
 //  FlatRegion implementation
 
 FlatRegion::FlatRegion ()
-  : AsIfFlatRegion (), m_polygons (false), m_merged_polygons (false)
+  : AsIfFlatRegion (), mp_polygons (new db::Shapes (false)), mp_merged_polygons (new db::Shapes (false))
 {
   init ();
 }
@@ -44,18 +44,16 @@ FlatRegion::~FlatRegion ()
 }
 
 FlatRegion::FlatRegion (const FlatRegion &other)
-  : AsIfFlatRegion (other), m_polygons (false), m_merged_polygons (false)
+  : AsIfFlatRegion (other), mp_polygons (other.mp_polygons), mp_merged_polygons (other.mp_merged_polygons)
 {
   init ();
 
   m_is_merged = other.m_is_merged;
-  m_polygons = other.m_polygons;
-  m_merged_polygons = other.m_merged_polygons;
   m_merged_polygons_valid = other.m_merged_polygons_valid;
 }
 
 FlatRegion::FlatRegion (const db::Shapes &polygons, bool is_merged)
-  : AsIfFlatRegion (), m_polygons (polygons), m_merged_polygons (false)
+  : AsIfFlatRegion (), mp_polygons (new db::Shapes (polygons)), mp_merged_polygons (new db::Shapes (false))
 {
   init ();
 
@@ -63,7 +61,7 @@ FlatRegion::FlatRegion (const db::Shapes &polygons, bool is_merged)
 }
 
 FlatRegion::FlatRegion (bool is_merged)
-  : AsIfFlatRegion (), m_polygons (false), m_merged_polygons (false)
+  : AsIfFlatRegion (), mp_polygons (new db::Shapes (false)), mp_merged_polygons (new db::Shapes (false))
 {
   init ();
 
@@ -78,7 +76,7 @@ void FlatRegion::set_is_merged (bool m)
 void FlatRegion::invalidate_cache ()
 {
   invalidate_bbox ();
-  m_merged_polygons.clear ();
+  mp_merged_polygons->clear ();
   m_merged_polygons_valid = false;
 }
 
@@ -90,20 +88,20 @@ void FlatRegion::init ()
 
 void FlatRegion::merged_semantics_changed ()
 {
-  m_merged_polygons.clear ();
+  mp_merged_polygons->clear ();
   m_merged_polygons_valid = false;
 }
 
 void FlatRegion::min_coherence_changed ()
 {
   m_is_merged = false;
-  m_merged_polygons.clear ();
+  mp_merged_polygons->clear ();
   m_merged_polygons_valid = false;
 }
 
 void FlatRegion::reserve (size_t n)
 {
-  m_polygons.reserve (db::Polygon::tag (), n);
+  mp_polygons->reserve (db::Polygon::tag (), n);
 }
 
 void
@@ -111,7 +109,7 @@ FlatRegion::ensure_merged_polygons_valid () const
 {
   if (! m_merged_polygons_valid) {
 
-    m_merged_polygons.clear ();
+    mp_merged_polygons->clear ();
 
     db::EdgeProcessor ep (report_progress (), progress_desc ());
     ep.set_base_verbosity (base_verbosity ());
@@ -131,7 +129,7 @@ FlatRegion::ensure_merged_polygons_valid () const
 
     //  and run the merge step
     db::MergeOp op (0);
-    db::ShapeGenerator pc (m_merged_polygons);
+    db::ShapeGenerator pc (*mp_merged_polygons);
     db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence ());
     ep.process (pg, op);
 
@@ -142,7 +140,7 @@ FlatRegion::ensure_merged_polygons_valid () const
 
 RegionIteratorDelegate *FlatRegion::begin () const
 {
-  return new FlatRegionIterator (m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin (), m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end ());
+  return new FlatRegionIterator (mp_polygons.get_const ());
 }
 
 RegionIteratorDelegate *FlatRegion::begin_merged () const
@@ -151,13 +149,13 @@ RegionIteratorDelegate *FlatRegion::begin_merged () const
     return begin ();
   } else {
     ensure_merged_polygons_valid ();
-    return new FlatRegionIterator (m_merged_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin (), m_merged_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end ());
+    return new FlatRegionIterator (mp_merged_polygons.get_const ());
   }
 }
 
 std::pair<db::RecursiveShapeIterator, db::ICplxTrans> FlatRegion::begin_iter () const
 {
-  return std::make_pair (db::RecursiveShapeIterator (m_polygons), db::ICplxTrans ());
+  return std::make_pair (db::RecursiveShapeIterator (*mp_polygons), db::ICplxTrans ());
 }
 
 std::pair<db::RecursiveShapeIterator, db::ICplxTrans> FlatRegion::begin_merged_iter () const
@@ -166,18 +164,23 @@ std::pair<db::RecursiveShapeIterator, db::ICplxTrans> FlatRegion::begin_merged_i
     return begin_iter ();
   } else {
     ensure_merged_polygons_valid ();
-    return std::make_pair (db::RecursiveShapeIterator (m_merged_polygons), db::ICplxTrans ());
+    return std::make_pair (db::RecursiveShapeIterator (*mp_merged_polygons), db::ICplxTrans ());
   }
 }
 
 bool FlatRegion::empty () const
 {
-  return m_polygons.empty ();
+  return mp_polygons->empty ();
 }
 
-size_t FlatRegion::size () const
+size_t FlatRegion::count () const
 {
-  return m_polygons.size ();
+  return mp_polygons->size ();
+}
+
+size_t FlatRegion::hier_count () const
+{
+  return mp_polygons->size ();
 }
 
 bool FlatRegion::is_merged () const
@@ -187,54 +190,49 @@ bool FlatRegion::is_merged () const
 
 Box FlatRegion::compute_bbox () const
 {
-  m_polygons.update_bbox ();
-  return m_polygons.bbox ();
+  mp_polygons->update_bbox ();
+  return mp_polygons->bbox ();
 }
 
 RegionDelegate *FlatRegion::filter_in_place (const PolygonFilterBase &filter)
 {
-  polygon_iterator_type pw = m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin ();
-  for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
+  db::layer<db::Polygon, db::unstable_layer_tag> &poly_layer = mp_polygons->get_layer<db::Polygon, db::unstable_layer_tag> ();
+
+  polygon_iterator_type pw = poly_layer.begin ();
+  for (RegionIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
     if (filter.selected (*p)) {
-      if (pw == m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end ()) {
-        m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().insert (*p);
-        pw = m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end ();
+      if (pw == poly_layer.end ()) {
+        poly_layer.insert (*p);
+        poly_layer.end ();
       } else {
-        m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().replace (pw++, *p);
+        poly_layer.replace (pw++, *p);
       }
     }
   }
 
-  m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().erase (pw, m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end ());
-  m_merged_polygons.clear ();
-  m_is_merged = merged_semantics ();
+  poly_layer.erase (pw, poly_layer.end ());
+
+  mp_merged_polygons->clear ();
+  m_is_merged = filter.requires_raw_input () ? false : merged_semantics ();
 
   return this;
 }
 
 RegionDelegate *FlatRegion::process_in_place (const PolygonProcessorBase &filter)
 {
+  db::layer<db::Polygon, db::unstable_layer_tag> &poly_layer = mp_polygons->get_layer<db::Polygon, db::unstable_layer_tag> ();
+  db::layer<db::Polygon, db::unstable_layer_tag> out;
+
   std::vector<db::Polygon> poly_res;
-
-  polygon_iterator_type pw = m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin ();
   for (RegionIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
-
     poly_res.clear ();
     filter.process (*p, poly_res);
-
-    for (std::vector<db::Polygon>::const_iterator pr = poly_res.begin (); pr != poly_res.end (); ++pr) {
-      if (pw == m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end ()) {
-        m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().insert (*pr);
-        pw = m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end ();
-      } else {
-        m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().replace (pw++, *pr);
-      }
-    }
-
+    out.insert (poly_res.begin (), poly_res.end ());
   }
 
-  m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().erase (pw, m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end ());
-  m_merged_polygons.clear ();
+  poly_layer.swap (out);
+
+  mp_merged_polygons->clear ();
   m_is_merged = filter.result_is_merged () && merged_semantics ();
 
   if (filter.result_must_not_be_merged ()) {
@@ -250,8 +248,9 @@ RegionDelegate *FlatRegion::merged_in_place ()
 
     if (m_merged_polygons_valid) {
 
-      m_polygons.swap (m_merged_polygons);
-      m_merged_polygons.clear ();
+      db::Shapes &merged_polygons = *mp_merged_polygons;
+      mp_polygons->swap (merged_polygons);
+      merged_polygons.clear ();
       m_is_merged = true;
       return this;
 
@@ -300,7 +299,7 @@ RegionDelegate *FlatRegion::merged_in_place (bool min_coherence, unsigned int mi
 
     //  and run the merge step
     db::MergeOp op (min_wc);
-    db::ShapeGenerator pc (m_polygons, true /*clear*/);
+    db::ShapeGenerator pc (*mp_polygons, true /*clear*/);
     db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence);
     ep.process (pg, op);
 
@@ -316,7 +315,7 @@ RegionDelegate *FlatRegion::merged () const
   if (! m_is_merged) {
 
     if (m_merged_polygons_valid) {
-      return new FlatRegion (m_merged_polygons, true);
+      return new FlatRegion (*mp_merged_polygons, true);
     } else {
       return AsIfFlatRegion::merged (min_coherence (), 0);
     }
@@ -360,22 +359,24 @@ RegionDelegate *FlatRegion::add_in_place (const Region &other)
   invalidate_cache ();
   m_is_merged = false;
 
+  db::Shapes &polygons = *mp_polygons;
+
   FlatRegion *other_flat = dynamic_cast<FlatRegion *> (other.delegate ());
   if (other_flat) {
 
-    m_polygons.insert (other_flat->raw_polygons ().get_layer<db::Polygon, db::unstable_layer_tag> ().begin (), other_flat->raw_polygons ().get_layer<db::Polygon, db::unstable_layer_tag> ().end ());
+    polygons.insert (other_flat->raw_polygons ().get_layer<db::Polygon, db::unstable_layer_tag> ().begin (), other_flat->raw_polygons ().get_layer<db::Polygon, db::unstable_layer_tag> ().end ());
 
   } else {
 
-    size_t n = m_polygons.size ();
+    size_t n = polygons.size ();
     for (RegionIterator p (other.begin ()); ! p.at_end (); ++p) {
       ++n;
     }
 
-    m_polygons.reserve (db::Polygon::tag (), n);
+    polygons.reserve (db::Polygon::tag (), n);
 
     for (RegionIterator p (other.begin ()); ! p.at_end (); ++p) {
-      m_polygons.insert (*p);
+      polygons.insert (*p);
     }
 
   }
@@ -385,7 +386,7 @@ RegionDelegate *FlatRegion::add_in_place (const Region &other)
 
 const db::Polygon *FlatRegion::nth (size_t n) const
 {
-  return n < m_polygons.size () ? &m_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin () [n] : 0;
+  return n < mp_polygons->size () ? &mp_polygons->get_layer<db::Polygon, db::unstable_layer_tag> ().begin () [n] : 0;
 }
 
 bool FlatRegion::has_valid_polygons () const
@@ -405,7 +406,7 @@ const db::RecursiveShapeIterator *FlatRegion::iter () const
 
 void FlatRegion::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
-  layout->cell (into_cell).shapes (into_layer).insert (m_polygons);
+  layout->cell (into_cell).shapes (into_layer).insert (*mp_polygons);
 }
 
 void
@@ -415,13 +416,13 @@ FlatRegion::insert (const db::Box &box)
 
     if (empty ()) {
 
-      m_polygons.insert (db::Polygon (box));
+      mp_polygons->insert (db::Polygon (box));
       m_is_merged = true;
       update_bbox (box);
 
     } else {
 
-      m_polygons.insert (db::Polygon (box));
+      mp_polygons->insert (db::Polygon (box));
       m_is_merged = false;
       invalidate_cache ();
 
@@ -434,7 +435,7 @@ void
 FlatRegion::insert (const db::Path &path)
 {
   if (path.points () > 0) {
-    m_polygons.insert (path.polygon ());
+    mp_polygons->insert (path.polygon ());
     m_is_merged = false;
     invalidate_cache ();
   }
@@ -444,7 +445,7 @@ void
 FlatRegion::insert (const db::Polygon &polygon)
 {
   if (polygon.holes () > 0 || polygon.vertices () > 0) {
-    m_polygons.insert (polygon);
+    mp_polygons->insert (polygon);
     m_is_merged = false;
     invalidate_cache ();
   }
@@ -456,7 +457,7 @@ FlatRegion::insert (const db::SimplePolygon &polygon)
   if (polygon.vertices () > 0) {
     db::Polygon poly;
     poly.assign_hull (polygon.begin_hull (), polygon.end_hull ());
-    m_polygons.insert (poly);
+    mp_polygons->insert (poly);
     m_is_merged = false;
     invalidate_cache ();
   }
@@ -468,7 +469,7 @@ FlatRegion::insert (const db::Shape &shape)
   if (shape.is_polygon () || shape.is_path () || shape.is_box ()) {
     db::Polygon poly;
     shape.polygon (poly);
-    m_polygons.insert (poly);
+    mp_polygons->insert (poly);
     m_is_merged = false;
     invalidate_cache ();
   }

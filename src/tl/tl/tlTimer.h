@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -94,6 +94,11 @@ public:
   {
     return (double (m_wall_ms_res) * 0.001);
   }
+
+  /**
+   *  @brief Reports the current memory usage
+   */
+  static size_t memory_size ();
 
 private:
   timer_t m_user_ms, m_sys_ms, m_wall_ms;

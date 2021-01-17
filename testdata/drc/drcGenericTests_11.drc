@@ -1,0 +1,39 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+  threads(0) # easier to debug
+end
+
+if $drc_test_deep
+
+  begin
+    deep_reject_odd_polygons(true)
+    l1 = input(1, 0)
+    raise("Test failed: input should throw and error because of odd polygons") 
+  rescue => ex
+    if ex.to_s != "'input': Non-orientable polygon encountered: (1500,5000;6000,5000;1500,9500;6000,9500) in cell TOP in Region::initialize"
+      raise("Test failed: unexpected error message") 
+    end
+  end
+
+  # This one should work:
+  deep_reject_odd_polygons(false)
+  l1 = input(1, 0)
+
+else
+  l1 = input(1, 0)
+end
+
+# special functions
+
+l1.output(1, 0)
+
+# classical "odd_polygons" check for reference
+l1.odd_polygons.output(10, 0)
+
+l1.drc(smoothed(0.5)).output(100, 0)
+l1.drc(rounded_corners(1.0, 0.5, 8)).output(102, 0)
+

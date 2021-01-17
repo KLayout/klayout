@@ -1,0 +1,58 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+
+l2.drc(covering(l1)).output(100, 0)
+l2.drc(! covering(l1)).output(101, 0)
+
+l1.drc(interacting(l2)).output(110, 0)
+l1.drc(! interacting(l2)).output(111, 0)
+l1.drc(interacting(l2) >= 2).output(112, 0)
+l1.drc(interacting(l2) < 2).output(113, 0)
+
+l1.drc(overlapping(l2)).output(120, 0)
+l1.drc(! overlapping(l2)).output(121, 0)
+l1.drc(overlapping(l2) >= 2).output(122, 0)
+l1.drc(overlapping(l2) < 2).output(123, 0)
+
+l1.drc(outside(l2)).output(130, 0)
+l1.drc(! outside(l2)).output(131, 0)
+
+l1.drc(inside(l2)).output(140, 0)
+l1.drc(! inside(l2)).output(141, 0)
+
+l2e = secondary(l2).edges
+l1e = primary.edges
+
+# Secondary edges are supported, but as secondaries are not merged
+# internally, the result is not well defined for unmerged secondary:
+
+l1.drc(interacting(l2e)).output(200, 0)
+l1.drc(! interacting(l2e)).output(201, 0)
+l1.drc(interacting(l2e) >= 4).output(202, 0)
+l1.drc(interacting(l2e) < 4).output(203, 0)
+
+# TODO: edge-to-polygon interactions and edge-to-edge interactions not supported yet
+
+# l1.drc(l1e.interacting(l2)).output(210, 0)
+# l1.drc(! l1e.interacting(l2)).output(211, 0)
+# l1.drc(l1e.interacting(l2) >= 2).output(212, 0)
+# l1.drc(l1e.interacting(l2) < 2).output(213, 0)
+
+# l1.drc(l1e.interacting(l2e)).output(210, 0)
+# l1.drc(! l1e.interacting(l2e)).output(211, 0)
+# l1.drc(l1e.interacting(l2e) >= 2).output(212, 0)
+# l1.drc(l1e.interacting(l2e) < 2).output(213, 0)
+

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -2371,4 +2371,95 @@ TEST(404)
     EXPECT_EQ (sp[0].to_string (), "(390,0;438,936;390,925;438,937;541,961;821,102)");
     EXPECT_EQ (sp[1].to_string (), "(0,832;176,874;390,925)");
   }
+}
+
+static db::Polygon str2poly (const std::string &s)
+{
+  db::Polygon poly;
+  tl::Extractor ex (s.c_str ());
+  ex.read (poly);
+  return poly;
+}
+
+//  self-overlapping, non-orientable check
+TEST(405)
+{
+  std::string ps;
+  std::vector<db::Polygon> parts;
+
+  //  null polygon
+  ps = "()";
+  EXPECT_EQ (db::is_strange_polygon (str2poly (ps)), false);
+  EXPECT_EQ (db::is_non_orientable_polygon (str2poly (ps)), false);
+
+  //  triangle
+  ps = "(0,0;1000,0;1000,1000)";
+  EXPECT_EQ (db::is_strange_polygon (str2poly (ps)), false);
+  EXPECT_EQ (db::is_non_orientable_polygon (str2poly (ps)), false);
+
+  //  rectangle counter-clockwise
+  ps = "(0,0;1000,0;1000,1000;0,1000)";
+  EXPECT_EQ (db::is_strange_polygon (str2poly (ps)), false);
+  EXPECT_EQ (db::is_non_orientable_polygon (str2poly (ps)), false);
+
+  //  rectangle clockwise
+  ps = "(0,0;0,1000;1000,1000;1000,0)";
+  EXPECT_EQ (db::is_strange_polygon (str2poly (ps)), false);
+  EXPECT_EQ (db::is_non_orientable_polygon (str2poly (ps)), false);
+
+  //  "8" shape
+  ps = "(0,0;1000,1000;0,1000;1000,0)";
+  EXPECT_EQ (db::is_strange_polygon (str2poly (ps)), true);
+  EXPECT_EQ (db::is_non_orientable_polygon (str2poly (ps)), true);
+
+  parts.clear ();
+  EXPECT_EQ (db::is_strange_polygon (str2poly (ps), &parts), true);
+  EXPECT_EQ (parts.size (), size_t (1));
+  if (! parts.empty ()) {
+    EXPECT_EQ (parts[0].to_string (), "(0,0;500,500;1000,0)");
+  }
+
+  parts.clear ();
+  EXPECT_EQ (db::is_non_orientable_polygon (str2poly (ps), &parts), true);
+  EXPECT_EQ (parts.size (), size_t (1));
+  if (! parts.empty ()) {
+    EXPECT_EQ (parts[0].to_string (), "(0,0;500,500;1000,0)");
+  }
+
+  //  self-touching
+  ps = "(0,0;0,2000;1000,2000;1000,1000;3000,1000;3000,3000;1000,3000;1000,2000;0,2000;0,4000;4000,4000;4000,0)";
+  EXPECT_EQ (db::is_strange_polygon (str2poly (ps)), false);
+  EXPECT_EQ (db::is_non_orientable_polygon (str2poly (ps)), false);
+
+  //  self-overlap
+  ps = "(0,0;0,2500;1000,2500;1000,1000;3000,1000;3000,3000;1000,3000;1000,2000;0,2000;0,4000;4000,4000;4000,0)";
+  EXPECT_EQ (db::is_strange_polygon (str2poly (ps)), true);
+  EXPECT_EQ (db::is_non_orientable_polygon (str2poly (ps)), false);
+
+  parts.clear ();
+  EXPECT_EQ (db::is_strange_polygon (str2poly (ps), &parts), true);
+  EXPECT_EQ (parts.size (), size_t (1));
+  if (! parts.empty ()) {
+    EXPECT_EQ (parts[0].to_string (), "(0,2000;0,2500;1000,2500;1000,2000)");
+  }
+
+  //  inner loop twisted
+  ps = "(0,0;0,2000;1000,2000;1000,3000;3000,3000;3000,1000;1000,1000;1000,2000;0,2000;0,4000;4000,4000;4000,0)";
+  EXPECT_EQ (db::is_strange_polygon (str2poly (ps)), true);
+  //  This is a double loop, so it's orientable
+  EXPECT_EQ (db::is_non_orientable_polygon (str2poly (ps)), false);
+
+  //  non-orientable hole
+  ps = "(0,0;0,4000;4000,4000;4000,0/1000,1000;3000,3000;1000,3000;3000,1000)";
+  EXPECT_EQ (db::is_strange_polygon (str2poly (ps)), true);
+
+  //  NOTE: a non-orientable holes does not generate -1 wrapcount, but just 0. So the polygon is "orientable"
+  //  as a whole. Which isn't good for detecting invalid input polygons, but as those are hull-only for GDS and
+  //  OASIS and most other formats (except DXF), we don't care too much here:
+  EXPECT_EQ (db::is_non_orientable_polygon (str2poly (ps)), false);
+
+  //  hole outside hull
+  ps = "(0,0;0,4000;4000,4000;4000,0/1000,1000;5000,1000;5000,3000;1000,3000)";
+  EXPECT_EQ (db::is_strange_polygon (str2poly (ps)), true);
+  EXPECT_EQ (db::is_non_orientable_polygon (str2poly (ps)), true);
 }

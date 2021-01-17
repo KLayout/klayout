@@ -27,6 +27,7 @@
 
 #if defined(_MSC_VER) || defined(_WIN32)
 #  include <Windows.h>
+#  include <Psapi.h>
 #elif defined(__MACH__)
 #  include <mach/clock.h>
 #  include <mach/mach.h>

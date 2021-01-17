@@ -14,12 +14,12 @@ header
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
 
-# XYZ gets assigned 1 
+# ABC gets assigned 1 
 record CELLNAME_ID
   str ABC 
   uint 1
 
-# ABC gets assigned 0 implicitly
+# XYZ gets assigned 0 implicitly
 record CELLNAME
   str XYZ  ;# FAIL: implicit and explicit assignment may not be mixed
 

@@ -1,0 +1,4 @@
+begin_lib 0.001
+begin_cell {XYZ}
+end_cell
+end_lib
